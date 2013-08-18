@@ -11,6 +11,7 @@ namespace Benchmarks
                 new ProgramRunner("MultidimensionalArray", () => new MultidimensionalArrayProgram().Run()),
                 new ProgramRunner("StaticField", () => new StaticFieldProgram().Run()),
                 new ProgramRunner("ShiftVsMultiply", () => new ShiftVsMultiplyProgram().Run()), 
+                new ProgramRunner("ReverseSort", () => new ReverseSortProgram().Run()), 
             };
 
         static void Main(string[] args)
