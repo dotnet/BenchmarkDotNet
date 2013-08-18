@@ -2,7 +2,7 @@
 
 namespace Benchmarks
 {
-    public class IncrementBenchmark
+    public class IncrementProgram
     {
         public void Run()
         {

@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Linq;
-using BenchmarkDotNet;
 
 namespace Benchmarks
 {
     class Program
     {
-        private static BenchmarkProgram[] programs = new[]
+        private static readonly ProgramRunner[] programs = new[]
             {
-                new BenchmarkProgram("Increment", () => new IncrementBenchmark().Run()),
-                new BenchmarkProgram("MultidimensionalArray", () => new MultidimensionalArrayBenchmark().Run()),
-                new BenchmarkProgram("StaticField", () => new StaticFieldBenchmark().Run()),
-                new BenchmarkProgram("ShiftVsMultiply", () => new ShiftVsMultiplyBenchmark().Run()), 
+                new ProgramRunner("Increment", () => new IncrementProgram().Run()),
+                new ProgramRunner("MultidimensionalArray", () => new MultidimensionalArrayProgram().Run()),
+                new ProgramRunner("StaticField", () => new StaticFieldProgram().Run()),
+                new ProgramRunner("ShiftVsMultiply", () => new ShiftVsMultiplyProgram().Run()), 
             };
 
         static void Main(string[] args)
@@ -49,12 +48,12 @@ namespace Benchmarks
             Console.WriteLine();
         }
 
-        class BenchmarkProgram
+        class ProgramRunner
         {
-            public string Name { get; set; }
-            public Action Run { get; set; }
+            public string Name { get; private set; }
+            public Action Run { get; private set; }
 
-            public BenchmarkProgram(string name, Action run)
+            public ProgramRunner(string name, Action run)
             {
                 Name = name;
                 Run = run;

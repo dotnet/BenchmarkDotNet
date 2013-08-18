@@ -2,7 +2,7 @@
 
 namespace Benchmarks
 {
-    public class ShiftVsMultiplyBenchmark
+    public class ShiftVsMultiplyProgram
     {
         private const int IterationCount = 1000000000;
 

@@ -3,7 +3,7 @@ using BenchmarkDotNet;
 
 namespace Benchmarks
 {
-    public class MultidimensionalArrayBenchmark
+    public class MultidimensionalArrayProgram
     {
         private const int N = 100, M = 100, IterationCount = 100000;
         private int[] single;

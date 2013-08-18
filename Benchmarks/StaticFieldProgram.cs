@@ -2,7 +2,7 @@
 
 namespace Benchmarks
 {
-    public class StaticFieldBenchmark
+    public class StaticFieldProgram
     {
         private const int N = 1000, IterationCount = 1000000;
 
