@@ -10,13 +10,12 @@ namespace Benchmarks
             {
                 new BenchmarkProgram("Increment", () => new IncrementBenchmark().Run()),
                 new BenchmarkProgram("MultidimensionalArray", () => new MultidimensionalArrayBenchmark().Run()),
-                new BenchmarkProgram("StaticField", () => new StaticFieldBenchmark().Run())
+                new BenchmarkProgram("StaticField", () => new StaticFieldBenchmark().Run()),
+                new BenchmarkProgram("ShiftVsMultiply", () => new ShiftVsMultiplyBenchmark().Run()), 
             };
 
         static void Main(string[] args)
         {
-            new Benchmark().Run(() => IncrementBenchmark.After());
-            return;
             var name = args.Length == 0 ? "" : args[0];
             while (true)
             {

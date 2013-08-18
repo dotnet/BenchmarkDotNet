@@ -45,6 +45,7 @@
     <Compile Include="MultidimensionalArrayBenchmark.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ShiftVsMultiplyBenchmark.cs" />
     <Compile Include="StaticFieldBenchmark.cs" />
   </ItemGroup>
   <ItemGroup>
