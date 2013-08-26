@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IncrementProgram.cs" />
+    <Compile Include="MakeRefVsBoxingProgram.cs" />
     <Compile Include="MultidimensionalArrayProgram.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
