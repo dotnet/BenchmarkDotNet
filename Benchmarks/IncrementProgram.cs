@@ -7,8 +7,8 @@ namespace Benchmarks
         public void Run()
         {
             var competition = new BenchmarkCompetition();
-            competition.AddTask("After", () => After());
-            competition.AddTask("Before", () => Before());
+            competition.AddTask("i++", () => After());
+            competition.AddTask("++i", () => Before());
             competition.Run();
         }
 
