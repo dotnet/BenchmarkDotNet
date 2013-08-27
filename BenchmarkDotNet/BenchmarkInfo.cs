@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BenchmarkDotNet
+﻿namespace BenchmarkDotNet
 {
     public class BenchmarkInfo
     {
@@ -9,11 +7,11 @@ namespace BenchmarkDotNet
 
         public void Print()
         {
-            Console.WriteLine("WarmUp:");
+            ConsoleHelper.WriteLineHeader("WarmUp:");
             WarmUp.Print();
-            Console.WriteLine();
-            Console.WriteLine("Result:");
-            Result.Print();            
+            ConsoleHelper.NewLine();
+            ConsoleHelper.WriteLineHeader("Result:");
+            Result.Print();
         }
     }
 }

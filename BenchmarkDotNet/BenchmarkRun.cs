@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace BenchmarkDotNet
 {
@@ -16,12 +15,12 @@ namespace BenchmarkDotNet
 
         public void Print(int ticksWidth = 0, int millisecondsWidth = 0, string hint = "")
         {
-            Console.Write("Ticks: {0} ms: {1}", 
-                ElapsedTicks.ToString().PadLeft(ticksWidth), 
+            ConsoleHelper.WriteResult("Ticks: {0} ms: {1}",
+                ElapsedTicks.ToString().PadLeft(ticksWidth),
                 ElapsedMilliseconds.ToString().PadLeft(millisecondsWidth));
             if (!string.IsNullOrEmpty(hint))
-                Console.Write(" [{0}]", hint);
-            Console.WriteLine();
+                ConsoleHelper.WriteResult(" [{0}]", hint);
+            ConsoleHelper.NewLine();
         }
     }
 }

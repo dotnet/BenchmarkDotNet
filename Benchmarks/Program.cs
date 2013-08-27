@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
+using BenchmarkDotNet;
 
 namespace Benchmarks
 {
@@ -17,37 +20,44 @@ namespace Benchmarks
 
         static void Main(string[] args)
         {
-            var name = args.Length == 0 ? "" : args[0];
-            while (true)
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-us");
+            while (args.Length == 0)
             {
-                if (string.IsNullOrWhiteSpace(name))
-                {
-                    PrintAvailable();
-                    Console.WriteLine("Please, print name of a target program:");
-                    name = Console.ReadLine();
-                }
-                if (string.IsNullOrWhiteSpace(name))
-                    continue;
-                var target = programs.FirstOrDefault(runner => runner.Name.ToLower().StartsWith(name.ToLower()));
-                if (target == null)
-                {
-                    name = null;
-                    continue;
-                }
-                Console.WriteLine("Target program: " + target.Name);
-                target.Run();
-                break;
+                PrintHelp();
+                ConsoleHelper.WriteLineHelp("Argument list is empty. Please, print argument list:");
+                args = ConsoleHelper.ReadArgsLine();
+                ConsoleHelper.NewLine();
             }
+            foreach (var program in programs)
+                if (args.Any(arg => program.Name.ToLower().StartsWith(arg.ToLower())) || ContainsAll(args))
+                {
+                    ConsoleHelper.WriteLineHeader("Target program: " + program.Name);
+                    program.Run();
+                    ConsoleHelper.NewLine();
+                }
+        }
+
+        private static void PrintHelp()
+        {
+            ConsoleHelper.WriteLineHelp("Usage: Benchmarks <programs-names> [-a|--all]");
+            ConsoleHelper.WriteLineHelp("  -a, --all    Run all available programs");
+            ConsoleHelper.NewLine();
+            PrintAvailable();
         }
 
         private static void PrintAvailable()
         {
-            Console.WriteLine("Available programs:");
-            Console.Write("  ");
-            foreach (var runner in programs)
-                Console.Write(runner.Name + " ");
-            Console.WriteLine();
-            Console.WriteLine();
+            ConsoleHelper.WriteLineHelp("Available programs:");
+            foreach (var program in programs)
+                ConsoleHelper.WriteLineHelp("  " + program.Name);
+            ConsoleHelper.NewLine();
+            ConsoleHelper.NewLine();
+        }
+
+        private static bool ContainsAll(string[] args)
+        {
+            return args.Contains("-a") || args.Contains("--all");
         }
 
         class ProgramRunner

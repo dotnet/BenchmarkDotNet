@@ -29,17 +29,17 @@ namespace BenchmarkDotNet
 
         public void Run()
         {
-            Console.WriteLine("BenchmarkCompetition: start");
-            Console.WriteLine();
+            ConsoleHelper.WriteLineHeader("BenchmarkCompetition: start");
+            ConsoleHelper.NewLine();
             foreach (var task in tasks)
-                task.Run();            
-            Console.WriteLine("BenchmarkCompetition: finish");
-            Console.WriteLine();
-            Console.WriteLine("Competition results:");
+                task.Run();
+            ConsoleHelper.WriteLineHeader("BenchmarkCompetition: finish");
+            ConsoleHelper.NewLine();
+            ConsoleHelper.WriteLineHeader("Competition results:");
             var nameWidth = tasks.Max(task => task.Name.Length) + 1;
             var msWidth = tasks.Max(task => task.Info.Result.AverageMilliseconds.ToString().Length);
             foreach (var task in tasks)
-                Console.WriteLine("{0}: {1}ms [Error: {2:00.00}%]", 
+                ConsoleHelper.WriteLineStatistic("{0}: {1}ms [Error: {2:00.00}%]", 
                     task.Name.PadRight(nameWidth), 
                     task.Info.Result.AverageMilliseconds.ToString().PadLeft(msWidth),
                     task.Info.Result.Error * 100);

@@ -12,12 +12,12 @@ namespace BenchmarkDotNet
 
         public void Run()
         {
-            Console.WriteLine("***** {0}: start *****", Name);
+            ConsoleHelper.WriteLineHeader("***** {0}: start *****", Name);
             if (Initialize != null)
                 Initialize();
             Info = new Benchmark().Run(Action);
-            Console.WriteLine("***** {0}: end *****", Name);
-            Console.WriteLine();
+            ConsoleHelper.WriteLineHeader("***** {0}: end *****", Name);
+            ConsoleHelper.NewLine();
         }
     }
 }
