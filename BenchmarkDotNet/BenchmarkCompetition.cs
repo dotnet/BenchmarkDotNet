@@ -42,7 +42,7 @@ namespace BenchmarkDotNet
                 Console.WriteLine("{0}: {1}ms [Error: {2:00.00}%]", 
                     task.Name.PadRight(nameWidth), 
                     task.Info.Result.AverageMilliseconds.ToString().PadLeft(msWidth),
-                    task.Info.Result.DiffPercent);
+                    task.Info.Result.Error * 100);
         }
     }
 }
