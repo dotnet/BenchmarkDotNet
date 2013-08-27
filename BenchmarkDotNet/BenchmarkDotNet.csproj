@@ -53,6 +53,7 @@
     <Compile Include="BenchmarkInfo.cs" />
     <Compile Include="BenchmarkRun.cs" />
     <Compile Include="BenchmarkRunList.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

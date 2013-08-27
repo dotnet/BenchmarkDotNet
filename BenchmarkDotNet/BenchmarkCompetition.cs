@@ -37,11 +37,11 @@ namespace BenchmarkDotNet
             ConsoleHelper.NewLine();
             ConsoleHelper.WriteLineHeader("Competition results:");
             var nameWidth = tasks.Max(task => task.Name.Length) + 1;
-            var msWidth = tasks.Max(task => task.Info.Result.AverageMilliseconds.ToString().Length);
+            var msWidth = tasks.Max(task => task.Info.Result.MedianMilliseconds.ToString().Length);
             foreach (var task in tasks)
-                ConsoleHelper.WriteLineStatistic("{0}: {1}ms [Error: {2:00.00}%]", 
-                    task.Name.PadRight(nameWidth), 
-                    task.Info.Result.AverageMilliseconds.ToString().PadLeft(msWidth),
+                ConsoleHelper.WriteLineStatistic("{0}: {1}ms [Error: {2:00.00}%]",
+                    task.Name.PadRight(nameWidth),
+                    task.Info.Result.MedianMilliseconds.ToString().PadLeft(msWidth),
                     task.Info.Result.Error * 100);
         }
     }
