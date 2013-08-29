@@ -12,7 +12,7 @@ namespace Benchmarks
             {
                 new ProgramRunner("Increment", () => new IncrementProgram().Run()),
                 new ProgramRunner("MultidimensionalArray", () => new MultidimensionalArrayProgram().Run()),
-                new ProgramRunner("StaticField", () => new StaticFieldProgram().Run()),
+                new ProgramRunner("ArrayIteration", () => new ArrayIterationProgram().Run()),
                 new ProgramRunner("ShiftVsMultiply", () => new ShiftVsMultiplyProgram().Run()), 
                 new ProgramRunner("ReverseSort", () => new ReverseSortProgram().Run()),
                 new ProgramRunner("MakeRefVsBoxing", () => new MakeRefVsBoxingProgram().Run()), 
