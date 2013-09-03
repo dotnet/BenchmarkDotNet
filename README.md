@@ -1,4 +1,4 @@
-**BenchmarkDotNet:** Light .NET-framework for benchmarks.
+**BenchmarkDotNet:** Lightweight .NET-framework for benchmarks.
 
 **Benchmarks:** Simple benchmark program runner.
 
