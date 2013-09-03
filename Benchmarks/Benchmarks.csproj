@@ -41,6 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ForeachListProgram.cs" />
+    <Compile Include="ForeachArrayProgram.cs" />
     <Compile Include="IncrementProgram.cs" />
     <Compile Include="MakeRefVsBoxingProgram.cs" />
     <Compile Include="MultidimensionalArrayProgram.cs" />

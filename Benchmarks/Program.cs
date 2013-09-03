@@ -16,6 +16,8 @@ namespace Benchmarks
                 new ProgramRunner("ShiftVsMultiply", () => new ShiftVsMultiplyProgram().Run()), 
                 new ProgramRunner("ReverseSort", () => new ReverseSortProgram().Run()),
                 new ProgramRunner("MakeRefVsBoxing", () => new MakeRefVsBoxingProgram().Run()), 
+                new ProgramRunner("ForeachArray", () => new ForeachArrayProgram().Run()), 
+                new ProgramRunner("ForeachList", () => new ForeachListProgram().Run()), 
             };
 
         static void Main(string[] args)
