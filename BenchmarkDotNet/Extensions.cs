@@ -16,5 +16,18 @@ namespace BenchmarkDotNet
                 return list[list.Count / 2];
             return (list[list.Count / 2 - 1] + list[list.Count / 2]) / 2;
         }
+
+        public static double StandardDeviation<TSource>(this IEnumerable<TSource> source, Func<TSource, long> selector)
+        {
+            var list = source.Select(selector).ToList();
+            double result = 0;
+            if (list.Any())
+            {
+                double avg = list.Average();
+                double sum = list.Sum(d => Math.Pow(d - avg, 2));
+                result = Math.Sqrt(sum / list.Count());
+            }
+            return result;
+        }
     }
 }
