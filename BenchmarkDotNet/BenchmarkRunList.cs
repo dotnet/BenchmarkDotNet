@@ -26,10 +26,16 @@ namespace BenchmarkDotNet
 
         public void PrintStatistic()
         {
-            ConsoleHelper.WriteLineStatistic("TickStats: Min={0}, Max={1}, Med={2}, StdDev={3:0}, Err={4:00.00}%",
-                              MinTicks, MaxTicks, MedianTicks, StandardDeviationTicks, Error * 100);
-            ConsoleHelper.WriteLineStatistic("MsStats: Min={0}, Max={1}, Med={2}, StdDev={3:0.00}",
-                              MinMilliseconds, MaxMilliseconds, MedianMilliseconds, StandardDeviationMilliseconds);
+            if (BenchmarkSettings.Instance.DetailedMode)
+            {
+                ConsoleHelper.WriteLineStatistic("TickStats: Min={0}, Max={1}, Med={2}, StdDev={3:0}, Err={4:00.00}%",
+                                                 MinTicks, MaxTicks, MedianTicks, StandardDeviationTicks, Error * 100);
+                ConsoleHelper.WriteLineStatistic("MsStats: Min={0}, Max={1}, Med={2}, StdDev={3:0.00}",
+                                                 MinMilliseconds, MaxMilliseconds, MedianMilliseconds, StandardDeviationMilliseconds);
+            }
+            else
+                ConsoleHelper.WriteLineStatistic("Stats: MedianTicks={0}, MedianMs={1}, Error={2:00.00}%",
+                                                 MedianTicks, MedianMilliseconds, Error * 100);
         }
 
         public long MinTicks { get { return this.Min(run => run.ElapsedTicks); } }

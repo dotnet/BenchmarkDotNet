@@ -31,8 +31,10 @@ namespace Benchmarks
                 args = ConsoleHelper.ReadArgsLine();
                 ConsoleHelper.NewLine();
             }
+            BenchmarkSettings.Instance.DetailedMode = Contains(args, "-d", "--details");
+            bool runAll = Contains(args, "-a", "--all");
             foreach (var program in programs)
-                if (args.Any(arg => program.Name.ToLower().StartsWith(arg.ToLower())) || ContainsAll(args))
+                if (runAll || args.Any(arg => program.Name.ToLower().StartsWith(arg.ToLower())))
                 {
                     ConsoleHelper.WriteLineHeader("Target program: " + program.Name);
                     program.Run();
@@ -42,8 +44,9 @@ namespace Benchmarks
 
         private static void PrintHelp()
         {
-            ConsoleHelper.WriteLineHelp("Usage: Benchmarks <programs-names> [-a|--all]");
-            ConsoleHelper.WriteLineHelp("  -a, --all    Run all available programs");
+            ConsoleHelper.WriteLineHelp("Usage: Benchmarks <programs-names> [-a|--all] [-d|--details]");
+            ConsoleHelper.WriteLineHelp("  -a, --all      Run all available programs");
+            ConsoleHelper.WriteLineHelp("  -d, --details  Show detailed results");
             ConsoleHelper.NewLine();
             PrintAvailable();
         }
@@ -57,9 +60,9 @@ namespace Benchmarks
             ConsoleHelper.NewLine();
         }
 
-        private static bool ContainsAll(string[] args)
+        private static bool Contains(string[] args, params string[] patterns)
         {
-            return args.Contains("-a") || args.Contains("--all");
+            return patterns.Any(args.Contains);
         }
 
         class ProgramRunner

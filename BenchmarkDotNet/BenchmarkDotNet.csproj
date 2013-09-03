@@ -49,6 +49,7 @@
     <Compile Include="Benchmark.cs" />
     <Compile Include="BenchmarkCompetition.cs" />
     <Compile Include="BenchmarkCompetitionTask.cs" />
+    <Compile Include="BenchmarkSettings.cs" />
     <Compile Include="ConsoleHelper.cs" />
     <Compile Include="BenchmarkInfo.cs" />
     <Compile Include="BenchmarkRun.cs" />

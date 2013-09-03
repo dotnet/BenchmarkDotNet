@@ -35,76 +35,76 @@ Benchmark program example:
 
 Usage example:
 
-    Benchmarks.exe Increment
+    Benchmarks.exe Increment --details
 
 Result example:
 
 	Target program: Increment
 	BenchmarkCompetition: start
-
+	
 	***** i++: start *****
 	WarmUp:
-	Ticks: 1211858 ms: 565
-	Ticks: 1215415 ms: 567
-	Ticks: 1210399 ms: 564
-	Ticks: 1117163 ms: 521
-	Ticks: 988433 ms: 461
-	Ticks: 924355 ms: 431
-	Ticks: 848442 ms: 395
-	Ticks: 762970 ms: 355
-	Ticks: 734396 ms: 342
-	Ticks: 689765 ms: 321
-	Ticks: 590661 ms: 275
-	Ticks: 499016 ms: 232
-	Ticks: 499127 ms: 232
-	Ticks: 498824 ms: 232
-	Ticks: 498928 ms: 232
-	Ticks: 499227 ms: 232
-	TickStats: Min=498824, Max=1215415, Median=748683, Diff=143.66%
-	MsStats: Min=232, Max=567, Median=348
-
+	Ticks: 1214468 ms: 566
+	Ticks: 1213456 ms: 566
+	Ticks: 1197767 ms: 558
+	Ticks: 1118524 ms: 521
+	Ticks: 972896 ms: 453
+	Ticks: 890580 ms: 415
+	Ticks: 836877 ms: 390
+	Ticks: 766459 ms: 357
+	Ticks: 728634 ms: 339
+	Ticks: 693158 ms: 323
+	Ticks: 562414 ms: 262
+	Ticks: 500549 ms: 233
+	Ticks: 499788 ms: 233
+	Ticks: 499223 ms: 232
+	Ticks: 500034 ms: 233
+	Ticks: 500401 ms: 233
+	TickStats: Min=499223, Max=1214468, Med=747546, StdDev=269868, Err=143.27%
+	MsStats: Min=232, Max=566, Med=348, StdDev=125.85
+	
 	Result:
-	Ticks: 498641 ms: 232
-	Ticks: 499746 ms: 233
-	Ticks: 499539 ms: 233
-	Ticks: 499281 ms: 232
-	Ticks: 499347 ms: 232
-	Ticks: 498847 ms: 232
-	Ticks: 499387 ms: 232
-	Ticks: 499056 ms: 232
-	Ticks: 499318 ms: 232
-	Ticks: 498526 ms: 232
-	TickStats: Min=498526, Max=499746, Median=499299, Diff=00.24%
-	MsStats: Min=232, Max=233, Median=232
+	Ticks: 499911 ms: 233
+	Ticks: 499133 ms: 232
+	Ticks: 499636 ms: 233
+	Ticks: 499720 ms: 233
+	Ticks: 499894 ms: 233
+	Ticks: 500764 ms: 233
+	Ticks: 501977 ms: 234
+	Ticks: 501319 ms: 233
+	Ticks: 499859 ms: 233
+	Ticks: 499710 ms: 233
+	TickStats: Min=499133, Max=501977, Med=499876, StdDev=834, Err=00.57%
+	MsStats: Min=232, Max=234, Med=233, StdDev=0.45
 	***** i++: end *****
-
+	
 	***** ++i: start *****
 	WarmUp:
-	Ticks: 500325 ms: 233
-	Ticks: 498858 ms: 232
-	Ticks: 499322 ms: 232
-	Ticks: 499575 ms: 233
-	Ticks: 499512 ms: 233
-	TickStats: Min=498858, Max=500325, Median=499512, Diff=00.29%
-	MsStats: Min=232, Max=233, Median=233
-
+	Ticks: 500340 ms: 233
+	Ticks: 499891 ms: 233
+	Ticks: 500608 ms: 233
+	Ticks: 500135 ms: 233
+	Ticks: 499577 ms: 233
+	TickStats: Min=499577, Max=500608, Med=500135, StdDev=356, Err=00.21%
+	MsStats: Min=233, Max=233, Med=233, StdDev=0.00
+	
 	Result:
-	Ticks: 499320 ms: 232
-	Ticks: 498804 ms: 232
-	Ticks: 499200 ms: 232
-	Ticks: 499060 ms: 232
-	Ticks: 499333 ms: 232
-	Ticks: 499655 ms: 233
-	Ticks: 498957 ms: 232
-	Ticks: 500053 ms: 233
+	Ticks: 499572 ms: 233
+	Ticks: 499127 ms: 232
+	Ticks: 499461 ms: 233
+	Ticks: 499470 ms: 233
 	Ticks: 499350 ms: 232
-	Ticks: 499241 ms: 232
-	TickStats: Min=498804, Max=500053, Median=499280, Diff=00.25%
-	MsStats: Min=232, Max=233, Median=232
+	Ticks: 499199 ms: 232
+	Ticks: 499223 ms: 232
+	Ticks: 499133 ms: 232
+	Ticks: 499168 ms: 232
+	Ticks: 500137 ms: 233
+	TickStats: Min=499127, Max=500137, Med=499286, StdDev=292, Err=00.20%
+	MsStats: Min=232, Max=233, Med=232, StdDev=0.49
 	***** ++i: end *****
-
+	
 	BenchmarkCompetition: finish
-
+	
 	Competition results:
-	i++ : 232ms [Error: 00.24%]
-	++i : 232ms [Error: 00.25%]
+	i++ : 233ms [Error = 00.57%, StdDev = 0.45]
+	++i : 232ms [Error = 00.20%, StdDev = 0.49]
