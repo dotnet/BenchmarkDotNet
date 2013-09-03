@@ -6,27 +6,19 @@ namespace BenchmarkDotNet
 {
     public class Benchmark
     {
-        private const int DefaultMaxWarmUpIterationCount = 30;
-        private const int DefaultWarmUpIterationCount = 5;
-        private const double DefaultMaxWarpUpError = 0.05;
-        private const int DefaultResultIterationCount = 10;
-        private const bool DefaultPrintToConsole = true;
-
         public int MaxWarmUpIterationCount { get; set; }
         public int WarmUpIterationCount { get; set; }
-        public double MaxWarpUpError { get; set; }
-
+        public double MaxWarmUpError { get; set; }
         public int ResultIterationCount { get; set; }
-
         public bool PrintToConsole { get; set; }
 
         public Benchmark()
         {
-            MaxWarmUpIterationCount = DefaultMaxWarmUpIterationCount;
-            WarmUpIterationCount = DefaultWarmUpIterationCount;
-            MaxWarpUpError = DefaultMaxWarpUpError;
-            ResultIterationCount = DefaultResultIterationCount;
-            PrintToConsole = DefaultPrintToConsole;
+            MaxWarmUpIterationCount = BenchmarkSettings.Instance.DefaultMaxWarmUpIterationCount;
+            WarmUpIterationCount = BenchmarkSettings.Instance.DefaultWarmUpIterationCount;
+            MaxWarmUpError = BenchmarkSettings.Instance.DefaultMaxWarmUpError;
+            ResultIterationCount = BenchmarkSettings.Instance.DefaultResultIterationCount;
+            PrintToConsole = BenchmarkSettings.Instance.DefaultPrintBenchmarkBodyToConsole;
         }
 
         public BenchmarkInfo Run(Action action)
@@ -76,7 +68,7 @@ namespace BenchmarkDotNet
             var lastRuns = new BenchmarkRunList();
             for (int i = 0; i < WarmUpIterationCount; i++)
                 lastRuns.Add(runList[runList.Count - WarmUpIterationCount + i]);
-            return lastRuns.Error < MaxWarpUpError;
+            return lastRuns.Error < MaxWarmUpError;
         }
 
         #region Prepare
