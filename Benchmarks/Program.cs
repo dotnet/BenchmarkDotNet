@@ -18,6 +18,7 @@ namespace Benchmarks
                 new ProgramRunner("MakeRefVsBoxing", () => new MakeRefVsBoxingProgram().Run()), 
                 new ProgramRunner("ForeachArray", () => new ForeachArrayProgram().Run()), 
                 new ProgramRunner("ForeachList", () => new ForeachListProgram().Run()), 
+                new ProgramRunner("StackFrame", () => new StackFrameProgram().Run())
             };
 
         static void Main(string[] args)

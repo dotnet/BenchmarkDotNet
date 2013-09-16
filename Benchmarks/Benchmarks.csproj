@@ -51,6 +51,7 @@
     <Compile Include="ShiftVsMultiplyProgram.cs" />
     <Compile Include="ReverseSortProgram.cs" />
     <Compile Include="ArrayIterationProgram.cs" />
+    <Compile Include="StackFrameProgram.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj">
