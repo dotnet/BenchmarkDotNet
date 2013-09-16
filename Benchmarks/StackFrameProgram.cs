@@ -15,7 +15,7 @@ namespace Benchmarks
             competition.Run();
         }
 
-        private StackFrame StackTrace()
+        private StackFrame StackFrame()
         {
             StackFrame method = null;
             for (int i = 0; i < IterationCount; i++)
@@ -23,7 +23,7 @@ namespace Benchmarks
             return method;
         }
 
-        private StackFrame StackFrame()
+        private StackFrame StackTrace()
         {
             StackFrame method = null;
             for (int i = 0; i < IterationCount; i++)
