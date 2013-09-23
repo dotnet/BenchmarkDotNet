@@ -1,5 +1,7 @@
 **BenchmarkDotNet:** Lightweight .NET-framework for benchmarks.
 
+You can install BenchmarkDotNet via [NuGet package](https://www.nuget.org/packages/BenchmarkDotNet/).
+
 **Benchmarks:** Simple benchmark program runner.
 
 Benchmark program example:

@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>BenchmarkDotNet</id>
+        <version>0.5.0</version>
+        <title>BenchmarkDotNet</title>
+        <authors>Andrey Akinshin</authors>
+        <owners>Andrey Akinshin</owners>
+        <licenseUrl>https://github.com/AndreyAkinshin/BenchmarkDotNet/blob/master/LICENSE.md</licenseUrl>
+        <projectUrl>https://github.com/AndreyAkinshin/BenchmarkDotNet</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Lightweight .NET-framework for benchmarks</description>
+        <copyright>Andrey Akinshin</copyright>
+        <language>en-US</language>
+    </metadata>
+    <files>
+        <file src="BenchmarkDotNet\bin\Release\BenchmarkDotNet.dll" target="lib\net35\BenchmarkDotNet.dll" />
+    </files>
+</package>
