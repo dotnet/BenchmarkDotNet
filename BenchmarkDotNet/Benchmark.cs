@@ -11,6 +11,7 @@ namespace BenchmarkDotNet
         public double MaxWarmUpError { get; set; }
         public int ResultIterationCount { get; set; }
         public bool PrintToConsole { get; set; }
+        public int ProcessorAffinity { get; set; }
 
         public Benchmark()
         {
@@ -19,6 +20,7 @@ namespace BenchmarkDotNet
             MaxWarmUpError = BenchmarkSettings.Instance.DefaultMaxWarmUpError;
             ResultIterationCount = BenchmarkSettings.Instance.DefaultResultIterationCount;
             PrintToConsole = BenchmarkSettings.Instance.DefaultPrintBenchmarkBodyToConsole;
+            ProcessorAffinity = BenchmarkSettings.Instance.DefaultProcessorAffinity;
         }
 
         public BenchmarkInfo Run(Action action)
@@ -75,10 +77,10 @@ namespace BenchmarkDotNet
 
         private static long environmentTickCount;
 
-        public static void Prepare()
+        public void Prepare()
         {
             environmentTickCount = Environment.TickCount;
-            Process.GetCurrentProcess().ProcessorAffinity = new IntPtr(1);
+            Process.GetCurrentProcess().ProcessorAffinity = new IntPtr(ProcessorAffinity);
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
             Thread.CurrentThread.Priority = ThreadPriority.Highest;
             GCCleanUp();

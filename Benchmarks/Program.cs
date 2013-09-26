@@ -70,6 +70,10 @@ namespace Benchmarks
             bool? printBenchmark = GetBoolArgValue(args, "-pb", "--print-benchmark");
             if (printBenchmark != null)
                 BenchmarkSettings.Instance.DefaultPrintBenchmarkBodyToConsole = printBenchmark.Value;
+
+            int? processorAffinity = GetInt32ArgValue(args, "-pa", "--processor-affinity");
+            if (processorAffinity != null)
+                BenchmarkSettings.Instance.DefaultProcessorAffinity = processorAffinity.Value;
         }
 
         private static void RunPrograms(string[] args)
@@ -103,6 +107,8 @@ namespace Benchmarks
             ConsoleHelper.WriteLineHelp("      Max permissible error (in percent) as condition for finishing of WarmUp");
             ConsoleHelper.WriteLineHelp("  -pb=<false|true>, --print-benchmark=<false|true>");
             ConsoleHelper.WriteLineHelp("      Printing the report of each benchmark to the console");
+            ConsoleHelper.WriteLineHelp("  -pa=<n>, --processor-affinity=<n>");
+            ConsoleHelper.WriteLineHelp("      ProcessorAffinity");
             ConsoleHelper.NewLine();
             PrintAvailable();
         }

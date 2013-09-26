@@ -17,6 +17,7 @@
             DefaultWarmUpIterationCount = 5;
             DefaultMaxWarmUpError = 0.05;
             DefaultPrintBenchmarkBodyToConsole = true;
+            DefaultProcessorAffinity = 2;
         }
 
         public bool DetailedMode { get; set; }
@@ -26,5 +27,6 @@
         public int DefaultWarmUpIterationCount { get; set; }
         public double DefaultMaxWarmUpError { get; set; }
         public bool DefaultPrintBenchmarkBodyToConsole { get; set; }
+        public int DefaultProcessorAffinity { get; set; }
     }
 }
