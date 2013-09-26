@@ -24,6 +24,7 @@ namespace Benchmarks
         static void Main(string[] args)
         {
             SetCulture();
+            Array.Sort(programs, (a, b) => String.Compare(a.Name, b.Name, StringComparison.Ordinal));
             args = ReadArgumentList(args);
             ApplyBenchmarkSettings(args);
             RunPrograms(args);
@@ -50,6 +51,15 @@ namespace Benchmarks
         private static void ApplyBenchmarkSettings(string[] args)
         {
             BenchmarkSettings.Instance.DetailedMode = Contains(args, "-d", "--details");
+
+            if (Contains(args, "-dw", "--disable-warmup"))
+                BenchmarkSettings.Instance.DefaultMaxWarmUpIterationCount = 0;
+
+            if (Contains(args, "-s", "--single"))
+            {
+                BenchmarkSettings.Instance.DefaultMaxWarmUpIterationCount = 0;
+                BenchmarkSettings.Instance.DefaultResultIterationCount = 1;
+            }
 
             int? resultIterationCount = GetInt32ArgValue(args, "-rc", "--result-count");
             if (resultIterationCount != null)
@@ -109,6 +119,10 @@ namespace Benchmarks
             ConsoleHelper.WriteLineHelp("      Printing the report of each benchmark to the console");
             ConsoleHelper.WriteLineHelp("  -pa=<n>, --processor-affinity=<n>");
             ConsoleHelper.WriteLineHelp("      ProcessorAffinity");
+            ConsoleHelper.WriteLineHelp("  -dw, --disable-warmup");
+            ConsoleHelper.WriteLineHelp("      Disable WarmUp, equivalent of -mwc=0");
+            ConsoleHelper.WriteLineHelp("  -s, --single");
+            ConsoleHelper.WriteLineHelp("      Single result benchmark without WarmUp, equivalent of -mwc=0 -rc=1");
             ConsoleHelper.NewLine();
             PrintAvailable();
         }

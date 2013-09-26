@@ -29,12 +29,16 @@ namespace BenchmarkDotNet
 
             var info = new BenchmarkInfo();
 
-            if (PrintToConsole)
-                ConsoleHelper.WriteLineHeader("WarmUp:");
-            info.WarmUp = Run(action, MaxWarmUpIterationCount, StopWarmUpPredicate);
+            if (MaxWarmUpIterationCount > 0)
+            {
+                if (PrintToConsole)
+                    ConsoleHelper.WriteLineHeader("WarmUp:");
+                info.WarmUp = Run(action, MaxWarmUpIterationCount, StopWarmUpPredicate);
+                ConsoleHelper.NewLine();
+            }
 
             if (PrintToConsole)
-                ConsoleHelper.WriteLineHeader("\nResult:");
+                ConsoleHelper.WriteLineHeader("Result:");
             info.Result = Run(action, ResultIterationCount);
 
             return info;
