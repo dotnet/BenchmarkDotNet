@@ -36,6 +36,11 @@ namespace BenchmarkDotNet
             ConsoleHelper.WriteLineHeader("BenchmarkCompetition: finish");
             ConsoleHelper.NewLine();
             ConsoleHelper.WriteLineHeader("Competition results:");
+            PrintResults();
+        }
+
+        public void PrintResults()
+        {
             var nameWidth = tasks.Max(task => task.Name.Length) + 1;
             var msWidth = tasks.Max(task => task.Info.Result.MedianMilliseconds.ToString().Length);
             var stdDevWidth = tasks.Max(task => string.Format("{0:0.00}", task.Info.Result.StandardDeviationMilliseconds).Length);
@@ -45,7 +50,7 @@ namespace BenchmarkDotNet
                     ConsoleHelper.WriteLineStatistic("{0}: {1}ms [Error = {2:00.00}%, StdDev = {3}]",
                         task.Name.PadRight(nameWidth),
                         task.Info.Result.MedianMilliseconds.ToString().PadLeft(msWidth),
-                        task.Info.Result.Error * 100,
+                        task.Info.Result.Error*100,
                         string.Format("{0:0.00}", task.Info.Result.StandardDeviationMilliseconds).PadLeft(stdDevWidth));
                 else
                     ConsoleHelper.WriteLineStatistic("{0}: {1}ms",

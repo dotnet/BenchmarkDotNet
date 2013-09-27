@@ -6,7 +6,7 @@ namespace Benchmarks
 {
     public class ForeachListProgram
     {
-        public void Run()
+        public void Run(Manager manager)
         {
             var competition = new BenchmarkCompetition();
             var list = Enumerable.Range(0, 200000000).ToList();
@@ -15,6 +15,7 @@ namespace Benchmarks
             competition.AddTask("ListForeach", () => ListForeach(list));
             competition.AddTask("ListForEach", () => ListForEach(list));
             competition.Run();
+            manager.ProcessCompetition(competition);
         }
 
         static int ListForWithoutOptimization(List<int> list)

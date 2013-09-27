@@ -9,7 +9,7 @@ namespace Benchmarks
         private const int N = 6000000, RandSeed = 123;
         private int[] originalData, data;
 
-        public void Run()
+        public void Run(Manager manager)
         {
             originalData = new int[N];
             var random = new Random(RandSeed);
@@ -22,6 +22,8 @@ namespace Benchmarks
             competition.AddTask("(a,b)=>b-a", Initalize, ComparerMinusSort);
             competition.AddTask("Reverse", Initalize, ReverseSort);
             competition.Run();
+
+            manager.ProcessCompetition(competition);
         }
 
         private void Initalize()

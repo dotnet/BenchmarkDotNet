@@ -1,9 +1,32 @@
 ﻿using System;
+using System.IO;
 
 namespace BenchmarkDotNet
 {
     public static class ConsoleHelper
     {
+        static ConsoleHelper()
+        {
+            defaultOut = Console.Out;
+            UseColorfulScheme();
+        }
+
+        #region Out
+
+        private static readonly TextWriter defaultOut;
+
+        public static void SetOut(TextWriter newOut)
+        {
+            Console.SetOut(newOut);
+        }
+
+        public static void RestoreDefaultOut()
+        {
+            Console.SetOut(defaultOut);
+        }
+
+        #endregion
+
         #region ColorScheme
 
         public static ConsoleColor DefaultColor { get; set; }
@@ -11,11 +34,6 @@ namespace BenchmarkDotNet
         public static ConsoleColor HeaderColor { get; set; }
         public static ConsoleColor ResultColor { get; set; }
         public static ConsoleColor StatisticColor { get; set; }
-
-        static ConsoleHelper()
-        {
-            UseColorfulScheme();
-        }
 
         public static void UseColorfulScheme()
         {

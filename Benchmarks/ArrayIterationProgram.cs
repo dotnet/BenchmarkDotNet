@@ -9,7 +9,7 @@ namespace Benchmarks
         private int[] nonStaticField;
         private static int[] staticField;
 
-        public void Run()
+        public void Run(Manager manager)
         {
             nonStaticField = staticField = new int[N];
 
@@ -19,6 +19,7 @@ namespace Benchmarks
             competition.AddTask("Non-static", () => NonStaticRun());
             competition.AddTask("Static", () => StaticRun());
             competition.Run();
+            manager.ProcessCompetition(competition);
         }
 
         private int NonStaticUnrollRun()

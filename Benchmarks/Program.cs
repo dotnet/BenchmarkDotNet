@@ -10,16 +10,18 @@ namespace Benchmarks
     {
         private static readonly ProgramRunner[] programs = new[]
             {
-                new ProgramRunner("Increment", () => new IncrementProgram().Run()),
-                new ProgramRunner("MultidimensionalArray", () => new MultidimensionalArrayProgram().Run()),
-                new ProgramRunner("ArrayIteration", () => new ArrayIterationProgram().Run()),
-                new ProgramRunner("ShiftVsMultiply", () => new ShiftVsMultiplyProgram().Run()), 
-                new ProgramRunner("ReverseSort", () => new ReverseSortProgram().Run()),
-                new ProgramRunner("MakeRefVsBoxing", () => new MakeRefVsBoxingProgram().Run()), 
-                new ProgramRunner("ForeachArray", () => new ForeachArrayProgram().Run()), 
-                new ProgramRunner("ForeachList", () => new ForeachListProgram().Run()), 
-                new ProgramRunner("StackFrame", () => new StackFrameProgram().Run())
+                new ProgramRunner("Increment", m => new IncrementProgram().Run(m)),
+                new ProgramRunner("MultidimensionalArray", m => new MultidimensionalArrayProgram().Run(m)),
+                new ProgramRunner("ArrayIteration", m => new ArrayIterationProgram().Run(m)),
+                new ProgramRunner("ShiftVsMultiply", m => new ShiftVsMultiplyProgram().Run(m)), 
+                new ProgramRunner("ReverseSort", m => new ReverseSortProgram().Run(m)),
+                new ProgramRunner("MakeRefVsBoxing", m => new MakeRefVsBoxingProgram().Run(m)), 
+                new ProgramRunner("ForeachArray", m => new ForeachArrayProgram().Run(m)), 
+                new ProgramRunner("ForeachList", m => new ForeachListProgram().Run(m)), 
+                new ProgramRunner("StackFrame", m => new StackFrameProgram().Run(m))
             };
+
+        private static readonly Manager manager = new Manager();
 
         static void Main(string[] args)
         {
@@ -61,6 +63,10 @@ namespace Benchmarks
                 BenchmarkSettings.Instance.DefaultResultIterationCount = 1;
             }
 
+            string outputFileName = GetStringArgValue(args, "-of", "--output-file");
+            if (outputFileName != null)
+                manager.OutputFileName = outputFileName;
+
             int? resultIterationCount = GetInt32ArgValue(args, "-rc", "--result-count");
             if (resultIterationCount != null)
                 BenchmarkSettings.Instance.DefaultResultIterationCount = resultIterationCount.Value;
@@ -94,7 +100,7 @@ namespace Benchmarks
                 if (runAll || args.Any(arg => program.Name.ToLower().StartsWith(arg.ToLower())))
                 {
                     ConsoleHelper.WriteLineHeader("Target program: " + program.Name);
-                    program.Run();
+                    program.Run(manager);
                     ConsoleHelper.NewLine();
                 }
         }
@@ -123,6 +129,8 @@ namespace Benchmarks
             ConsoleHelper.WriteLineHelp("      Disable WarmUp, equivalent of -mwc=0");
             ConsoleHelper.WriteLineHelp("  -s, --single");
             ConsoleHelper.WriteLineHelp("      Single result benchmark without WarmUp, equivalent of -mwc=0 -rc=1");
+            ConsoleHelper.WriteLineHelp("  -of=<filename>, --output-file=<filename>");
+            ConsoleHelper.WriteLineHelp("      Save results of benchmark competition to file");
             ConsoleHelper.NewLine();
             PrintAvailable();
         }
@@ -168,12 +176,20 @@ namespace Benchmarks
             return values[0].ToLower() == "true" || values[0] == "1";
         }
 
+        private static string GetStringArgValue(string[] args, params string[] patterns)
+        {
+            var values = GetArgValues(args, patterns);
+            if (values.Length == 0)
+                return null;
+            return values[0];
+        }
+
         class ProgramRunner
         {
             public string Name { get; private set; }
-            public Action Run { get; private set; }
+            public Action<Manager> Run { get; private set; }
 
-            public ProgramRunner(string name, Action run)
+            public ProgramRunner(string name, Action<Manager> run)
             {
                 Name = name;
                 Run = run;

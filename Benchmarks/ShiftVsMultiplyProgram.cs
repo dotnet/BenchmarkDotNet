@@ -6,12 +6,13 @@ namespace Benchmarks
     {
         private const int IterationCount = 1000000000;
 
-        public void Run()
+        public void Run(Manager manager)
         {
             var competition = new BenchmarkCompetition();
             competition.AddTask("Shift", () => Shift());
             competition.AddTask("Multiply", () => Multiply());
             competition.Run();
+            manager.ProcessCompetition(competition);
         }
 
         public int Shift()

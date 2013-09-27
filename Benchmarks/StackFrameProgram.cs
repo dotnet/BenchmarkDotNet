@@ -7,12 +7,13 @@ namespace Benchmarks
     {
         private const int IterationCount = 100001;
 
-        public void Run()
+        public void Run(Manager manager)
         {
             var competition = new BenchmarkCompetition();
             competition.AddTask("StackFrame", () => StackFrame());
             competition.AddTask("StackTrace", () => StackTrace());
             competition.Run();
+            manager.ProcessCompetition(competition);
         }
 
         private StackFrame StackFrame()

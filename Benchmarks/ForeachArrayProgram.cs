@@ -5,7 +5,7 @@ namespace Benchmarks
 {
     public class ForeachArrayProgram
     {
-        public void Run()
+        public void Run(Manager manager)
         {
             var competition = new BenchmarkCompetition();
             int[] array = new int[500000000];
@@ -14,6 +14,7 @@ namespace Benchmarks
             competition.AddTask("ArrayForeach", () => ArrayForeach(array));
             competition.AddTask("ArrayForEach", () => ArrayForEach(array));
             competition.Run();
+            manager.ProcessCompetition(competition);
         }
 
         static int ArrayForWithoutOptimization(int[] array)

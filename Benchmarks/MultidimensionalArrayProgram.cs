@@ -10,7 +10,7 @@ namespace Benchmarks
         private int[][] jagged;
         private int[,] rectangular;
 
-        public void Run()
+        public void Run(Manager manager)
         {
             var competition = new BenchmarkCompetition();
 
@@ -32,6 +32,8 @@ namespace Benchmarks
                 () => RectangularRun(rectangular));
 
             competition.Run();
+
+            manager.ProcessCompetition(competition);
         }
 
         private int SingleRun(int[] a)

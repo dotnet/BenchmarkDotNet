@@ -4,12 +4,13 @@ namespace Benchmarks
 {
     public class IncrementProgram
     {
-        public void Run()
+        public void Run(Manager manager)
         {
             var competition = new BenchmarkCompetition();
             competition.AddTask("i++", () => After());
             competition.AddTask("++i", () => Before());
             competition.Run();
+            manager.ProcessCompetition(competition);
         }
 
         private const int IterationCount = 2000000000;

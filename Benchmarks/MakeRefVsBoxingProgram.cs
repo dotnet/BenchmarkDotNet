@@ -7,7 +7,7 @@ namespace Benchmarks
         private const int IterationCount = 100000000;
         private int[] array;
 
-        public void Run()
+        public void Run(Manager manager)
         {
             array = new int[5];
 
@@ -15,6 +15,7 @@ namespace Benchmarks
             competition.AddTask("MakeRef", MakeRef);
             competition.AddTask("Boxing", Boxing);
             competition.Run();
+            manager.ProcessCompetition(competition);
         }
 
         public void MakeRef()
