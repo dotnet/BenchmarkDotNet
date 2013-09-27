@@ -9,7 +9,7 @@ cd %RUNFOLDER%
 ..\..\Builds\v4.0-x64\%Name% %* -of=v4.0-x64.txt
 ..\..\Builds\v4.5-x64\%Name% %* -of=v4.5-x64.txt
 
-echo Total Results > total.txt
+echo Total Results for '%*' > total.txt
 echo. >> total.txt
 
 echo v3.5-x86 >> total.txt
