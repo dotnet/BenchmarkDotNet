@@ -9,7 +9,7 @@ namespace Benchmarks
 
         public void ProcessCompetition(BenchmarkCompetition competition)
         {
-            if (!string.IsNullOrWhiteSpace(OutputFileName))
+            if (!string.IsNullOrEmpty(OutputFileName))
             {
                 using (var writer = new StreamWriter(OutputFileName))
                 {
