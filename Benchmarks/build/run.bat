@@ -58,4 +58,6 @@ echo mono-v4.5-x64 >> total.txt
 cat mono-v4.5-x64.txt >> total.txt
 echo. >> total.txt
 
+Rscript ..\..\..\plot.R
+
 cd ..\..\..
