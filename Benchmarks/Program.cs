@@ -18,7 +18,7 @@ namespace Benchmarks
                 new ProgramRunner("MakeRefVsBoxing", m => new MakeRefVsBoxingProgram().Run(m)), 
                 new ProgramRunner("ForeachArray", m => new ForeachArrayProgram().Run(m)), 
                 new ProgramRunner("ForeachList", m => new ForeachListProgram().Run(m)), 
-                new ProgramRunner("StackFrame", m => new StackFrameProgram().Run(m))
+                new ProgramRunner("StackFrame", m => new StackFrameProgram().Run(m)),
             };
 
         private static readonly Manager manager = new Manager();
@@ -96,13 +96,16 @@ namespace Benchmarks
         {
             bool runAll = Contains(args, "-a", "--all");
 
-            foreach (var program in programs)
-                if (runAll || args.Any(arg => program.Name.ToLower().StartsWith(arg.ToLower())))
+            for (int i = 0; i < programs.Length; i++)
+            {
+                var program = programs[i];
+                if (runAll || args.Any(arg => program.Name.ToLower().StartsWith(arg.ToLower())) || args.Contains("#" + i))
                 {
                     ConsoleHelper.WriteLineHeader("Target program: " + program.Name);
                     program.Run(manager);
                     ConsoleHelper.NewLine();
                 }
+            }
         }
 
         private static void PrintHelp()
@@ -138,8 +141,9 @@ namespace Benchmarks
         private static void PrintAvailable()
         {
             ConsoleHelper.WriteLineHelp("Available programs:");
-            foreach (var program in programs)
-                ConsoleHelper.WriteLineHelp("  " + program.Name);
+            int numberWidth = programs.Length.ToString().Length;
+            for (int i = 0; i < programs.Length; i++)
+                ConsoleHelper.WriteLineHelp(string.Format("  #{0} {1}", i.ToString().PadRight(numberWidth), programs[i].Name));
             ConsoleHelper.NewLine();
             ConsoleHelper.NewLine();
         }
