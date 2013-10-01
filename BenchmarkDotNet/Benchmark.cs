@@ -79,11 +79,11 @@ namespace BenchmarkDotNet
 
         #region Prepare
 
-        private static long environmentTickCount;
+        protected static long PreparedEnvironmentTickCount { get; set; }
 
         public void Prepare()
         {
-            environmentTickCount = Environment.TickCount;
+            PreparedEnvironmentTickCount = Environment.TickCount; // Prevents the JIT Compiler from optimizing Fkt calls away
             Process.GetCurrentProcess().ProcessorAffinity = new IntPtr(ProcessorAffinity);
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
             Thread.CurrentThread.Priority = ThreadPriority.Highest;
