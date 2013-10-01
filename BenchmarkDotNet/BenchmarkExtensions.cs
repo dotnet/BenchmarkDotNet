@@ -34,5 +34,10 @@ namespace BenchmarkDotNet
         {
             return value.ToString(BenchmarkSettings.Instance.CultureInfo);
         }
+
+        internal static string WithoutSuffix(this string str, string suffix, StringComparison stringComparison = StringComparison.CurrentCulture)
+        {
+            return str.EndsWith(suffix, stringComparison) ? str.Substring(0, str.Length - suffix.Length) : str;
+        }
     }
 }
