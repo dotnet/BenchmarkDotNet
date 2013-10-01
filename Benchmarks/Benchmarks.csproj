@@ -49,6 +49,7 @@
     <Compile Include="MultidimensionalArrayProgram.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReflectionVsExpressionCompetition.cs" />
     <Compile Include="ShiftVsMultiplyProgram.cs" />
     <Compile Include="ReverseSortProgram.cs" />
     <Compile Include="ArrayIterationProgram.cs" />
