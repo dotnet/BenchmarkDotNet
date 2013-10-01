@@ -60,7 +60,7 @@ namespace BenchmarkDotNet
         public static void WriteLine(ConsoleColor color, string format, params object[] args)
         {
             Console.ForegroundColor = color;
-            Console.WriteLine(format, args);
+            Console.WriteLine(BenchmarkUtils.CultureFormat(format, args));
             Console.ForegroundColor = DefaultColor;
         }
 
@@ -101,7 +101,7 @@ namespace BenchmarkDotNet
         public static void Write(ConsoleColor color, string format, params object[] args)
         {
             Console.ForegroundColor = color;
-            Console.Write(format, args);
+            Console.Write(BenchmarkUtils.CultureFormat(format, args));
             Console.ForegroundColor = DefaultColor;
         }
 

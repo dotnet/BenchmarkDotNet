@@ -16,8 +16,8 @@ namespace BenchmarkDotNet
         public void Print(int ticksWidth = 0, int millisecondsWidth = 0, string hint = "")
         {
             ConsoleHelper.WriteResult("Ticks: {0} ms: {1}",
-                ElapsedTicks.ToString().PadLeft(ticksWidth),
-                ElapsedMilliseconds.ToString().PadLeft(millisecondsWidth));
+                ElapsedTicks.ToCultureString().PadLeft(ticksWidth),
+                ElapsedMilliseconds.ToCultureString().PadLeft(millisecondsWidth));
             if (!string.IsNullOrEmpty(hint))
                 ConsoleHelper.WriteResult(" [{0}]", hint);
             ConsoleHelper.NewLine();

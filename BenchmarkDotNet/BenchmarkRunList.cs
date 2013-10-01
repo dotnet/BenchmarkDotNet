@@ -10,8 +10,8 @@ namespace BenchmarkDotNet
             var minTicks = this.Min(run => run.ElapsedTicks);
             var maxTicks = this.Max(run => run.ElapsedTicks);
             var maxMs = this.Max(run => run.ElapsedMilliseconds);
-            var tickWidth = maxTicks.ToString().Length;
-            var msWidth = maxMs.ToString().Length;
+            var tickWidth = maxTicks.ToCultureString().Length;
+            var msWidth = maxMs.ToCultureString().Length;
             foreach (var run in this)
             {
                 var hint = "";

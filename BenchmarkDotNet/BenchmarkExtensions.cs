@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace BenchmarkDotNet
 {
-    public static class Extensions
+    public static class BenchmarkExtensions
     {
         public static long Median<TSource>(this IEnumerable<TSource> source, Func<TSource, long> selector)
         {
@@ -28,6 +28,11 @@ namespace BenchmarkDotNet
                 result = Math.Sqrt(sum / list.Count());
             }
             return result;
+        }
+
+        public static string ToCultureString(this long value)
+        {
+            return value.ToString(BenchmarkSettings.Instance.CultureInfo);
         }
     }
 }

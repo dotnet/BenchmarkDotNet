@@ -1,4 +1,6 @@
-﻿namespace BenchmarkDotNet
+﻿using System.Globalization;
+
+namespace BenchmarkDotNet
 {
     public class BenchmarkSettings
     {
@@ -12,6 +14,8 @@
         public BenchmarkSettings()
         {
             DetailedMode = false;
+            CultureInfo = new CultureInfo("") { NumberFormat = { NumberDecimalSeparator = "." } };
+
             DefaultResultIterationCount = 10;
             DefaultMaxWarmUpIterationCount = 30;
             DefaultWarmUpIterationCount = 5;
@@ -21,6 +25,7 @@
         }
 
         public bool DetailedMode { get; set; }
+        public CultureInfo CultureInfo { get; set; }
 
         public int DefaultResultIterationCount { get; set; }
         public int DefaultMaxWarmUpIterationCount { get; set; }

@@ -143,7 +143,7 @@ namespace Benchmarks
             ConsoleHelper.WriteLineHelp("Available programs:");
             int numberWidth = programs.Length.ToString().Length;
             for (int i = 0; i < programs.Length; i++)
-                ConsoleHelper.WriteLineHelp(string.Format("  #{0} {1}", i.ToString().PadRight(numberWidth), programs[i].Name));
+                ConsoleHelper.WriteLineHelp(BenchmarkUtils.CultureFormat("  #{0} {1}", i.ToString().PadRight(numberWidth), programs[i].Name));
             ConsoleHelper.NewLine();
             ConsoleHelper.NewLine();
         }

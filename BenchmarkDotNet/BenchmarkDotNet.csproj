@@ -47,11 +47,12 @@
     <Compile Include="BenchmarkCompetition.cs" />
     <Compile Include="BenchmarkCompetitionTask.cs" />
     <Compile Include="BenchmarkSettings.cs" />
+    <Compile Include="BenchmarkUtils.cs" />
     <Compile Include="ConsoleHelper.cs" />
     <Compile Include="BenchmarkInfo.cs" />
     <Compile Include="BenchmarkRun.cs" />
     <Compile Include="BenchmarkRunList.cs" />
-    <Compile Include="Extensions.cs" />
+    <Compile Include="BenchmarkExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
