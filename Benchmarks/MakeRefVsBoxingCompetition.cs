@@ -2,28 +2,24 @@
 
 namespace Benchmarks
 {
-    public class MakeRefVsBoxingProgram
+    public class MakeRefVsBoxingCompetition : BenchmarkCompetition
     {
         private const int IterationCount = 100000000;
         private int[] array;
 
-        public void Run(Manager manager)
+        protected override void Prepare()
         {
             array = new int[5];
-
-            var competition = new BenchmarkCompetition();
-            competition.AddTask("MakeRef", MakeRef);
-            competition.AddTask("Boxing", Boxing);
-            competition.Run();
-            manager.ProcessCompetition(competition);
         }
 
+        [BenchmarkMethod("MakeRef")]
         public void MakeRef()
         {
             for (int i = 0; i < IterationCount; i++)
                 Set1(array, 0, i);
         }
 
+        [BenchmarkMethod("Boxing")]
         public void Boxing()
         {
             for (int i = 0; i < IterationCount; i++)

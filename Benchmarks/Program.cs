@@ -1,44 +1,43 @@
 ﻿using System;
-using System.Globalization;
+using System.IO;
 using System.Linq;
-using System.Threading;
 using BenchmarkDotNet;
 
 namespace Benchmarks
 {
     class Program
     {
-        private static readonly ProgramRunner[] programs = new[]
-            {
-                new ProgramRunner("Increment", m => new IncrementProgram().Run(m)),
-                new ProgramRunner("MultidimensionalArray", m => new MultidimensionalArrayProgram().Run(m)),
-                new ProgramRunner("ArrayIteration", m => new ArrayIterationProgram().Run(m)),
-                new ProgramRunner("ShiftVsMultiply", m => new ShiftVsMultiplyProgram().Run(m)), 
-                new ProgramRunner("ReverseSort", m => new ReverseSortProgram().Run(m)),
-                new ProgramRunner("MakeRefVsBoxing", m => new MakeRefVsBoxingProgram().Run(m)), 
-                new ProgramRunner("ForeachArray", m => new ForeachArrayProgram().Run(m)), 
-                new ProgramRunner("ForeachList", m => new ForeachListProgram().Run(m)), 
-                new ProgramRunner("StackFrame", m => new StackFrameProgram().Run(m)),
-            };
-
-        private static readonly Manager manager = new Manager();
-
         static void Main(string[] args)
         {
-            SetCulture();
-            Array.Sort(programs, (a, b) => String.Compare(a.Name, b.Name, StringComparison.Ordinal));
+            new Program().Run(args);
+        }
+
+        private readonly BenchmarkCompetition[] competitions = new BenchmarkCompetition[]
+            {
+                new ArrayIterationCompetition(),
+                new ForeachArrayCompetition(), 
+                new ForeachListCompetition(), 
+                new IncrementCompetition(),
+                new MakeRefVsBoxingCompetition(), 
+                new MultidimensionalArrayCompetition(),                
+                new ReflectionVsExpressionCompetition(),
+                new ReverseSortCompetition(),
+                new ShiftVsMultiplyCompetition(), 
+                new StackFrameCompetition(),
+            };
+
+        private string outputFileName;
+
+
+        private void Run(string[] args)
+        {
+            Array.Sort(competitions, (a, b) => String.Compare(a.Name, b.Name, StringComparison.Ordinal));
             args = ReadArgumentList(args);
             ApplyBenchmarkSettings(args);
-            RunPrograms(args);
+            RunCompetitions(args);
         }
 
-        private static void SetCulture()
-        {
-            Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
-            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-us");
-        }
-
-        private static string[] ReadArgumentList(string[] args)
+        private string[] ReadArgumentList(string[] args)
         {
             while (args.Length == 0)
             {
@@ -50,7 +49,7 @@ namespace Benchmarks
             return args;
         }
 
-        private static void ApplyBenchmarkSettings(string[] args)
+        private void ApplyBenchmarkSettings(string[] args)
         {
             BenchmarkSettings.Instance.DetailedMode = Contains(args, "-d", "--details");
 
@@ -63,9 +62,7 @@ namespace Benchmarks
                 BenchmarkSettings.Instance.DefaultResultIterationCount = 1;
             }
 
-            string outputFileName = GetStringArgValue(args, "-of", "--output-file");
-            if (outputFileName != null)
-                manager.OutputFileName = outputFileName;
+            outputFileName = GetStringArgValue(args, "-of", "--output-file");
 
             int? resultIterationCount = GetInt32ArgValue(args, "-rc", "--result-count");
             if (resultIterationCount != null)
@@ -92,28 +89,40 @@ namespace Benchmarks
                 BenchmarkSettings.Instance.DefaultProcessorAffinity = processorAffinity.Value;
         }
 
-        private static void RunPrograms(string[] args)
+        private void RunCompetitions(string[] args)
         {
             bool runAll = Contains(args, "-a", "--all");
 
-            for (int i = 0; i < programs.Length; i++)
+            for (int i = 0; i < competitions.Length; i++)
             {
-                var program = programs[i];
-                if (runAll || args.Any(arg => program.Name.ToLower().StartsWith(arg.ToLower())) || args.Contains("#" + i))
+                var competition = competitions[i];
+                if (runAll || args.Any(arg => competition.Name.ToLower().StartsWith(arg.ToLower())) || args.Contains("#" + i))
                 {
-                    ConsoleHelper.WriteLineHeader("Target program: " + program.Name);
-                    program.Run(manager);
+                    ConsoleHelper.WriteLineHeader("Target program: " + competition.Name);
+                    competition.Run();
+                    SaveCompetitionResults(competition);
                     ConsoleHelper.NewLine();
                 }
             }
         }
 
-        private static void PrintHelp()
+        private void SaveCompetitionResults(BenchmarkCompetition competition)
         {
-            ConsoleHelper.WriteLineHelp("Usage: Benchmarks <programs-names> [<arguments>]");
+            if (!string.IsNullOrEmpty(outputFileName))
+                using (var writer = new StreamWriter(outputFileName))
+                {
+                    ConsoleHelper.SetOut(writer);
+                    competition.PrintResults();
+                    ConsoleHelper.RestoreDefaultOut();
+                }
+        }
+
+        private void PrintHelp()
+        {
+            ConsoleHelper.WriteLineHelp("Usage: Benchmarks <competitions-names> [<arguments>]");
             ConsoleHelper.WriteLineHelp("Arguments:");
             ConsoleHelper.WriteLineHelp("  -a, --all");
-            ConsoleHelper.WriteLineHelp("      Run all available programs");
+            ConsoleHelper.WriteLineHelp("      Run all available competitions");
             ConsoleHelper.WriteLineHelp("  -d, --details");
             ConsoleHelper.WriteLineHelp("      Show detailed results");
             ConsoleHelper.WriteLineHelp("  -rc=<n>, --result-count=<n>");
@@ -138,12 +147,12 @@ namespace Benchmarks
             PrintAvailable();
         }
 
-        private static void PrintAvailable()
+        private void PrintAvailable()
         {
-            ConsoleHelper.WriteLineHelp("Available programs:");
-            int numberWidth = programs.Length.ToString().Length;
-            for (int i = 0; i < programs.Length; i++)
-                ConsoleHelper.WriteLineHelp(BenchmarkUtils.CultureFormat("  #{0} {1}", i.ToString().PadRight(numberWidth), programs[i].Name));
+            ConsoleHelper.WriteLineHelp("Available competitions:");
+            int numberWidth = competitions.Length.ToString().Length;
+            for (int i = 0; i < competitions.Length; i++)
+                ConsoleHelper.WriteLineHelp(BenchmarkUtils.CultureFormat("  #{0} {1}", i.ToString().PadRight(numberWidth), competitions[i].Name));
             ConsoleHelper.NewLine();
             ConsoleHelper.NewLine();
         }
@@ -186,18 +195,6 @@ namespace Benchmarks
             if (values.Length == 0)
                 return null;
             return values[0];
-        }
-
-        class ProgramRunner
-        {
-            public string Name { get; private set; }
-            public Action<Manager> Run { get; private set; }
-
-            public ProgramRunner(string name, Action<Manager> run)
-            {
-                Name = name;
-                Run = run;
-            }
         }
     }
 }

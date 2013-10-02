@@ -7,6 +7,7 @@ namespace BenchmarkDotNet
         public string Name { get; set; }
         public Action Initialize { get; set; }
         public Action Action { get; set; }
+        public Action Clean { get; set; }
 
         public BenchmarkInfo Info { get; private set; }
 

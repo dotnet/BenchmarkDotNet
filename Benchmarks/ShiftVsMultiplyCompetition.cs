@@ -2,19 +2,11 @@
 
 namespace Benchmarks
 {
-    public class ShiftVsMultiplyProgram
+    public class ShiftVsMultiplyCompetition : BenchmarkCompetition
     {
         private const int IterationCount = 1000000000;
 
-        public void Run(Manager manager)
-        {
-            var competition = new BenchmarkCompetition();
-            competition.AddTask("Shift", () => Shift());
-            competition.AddTask("Multiply", () => Multiply());
-            competition.Run();
-            manager.ProcessCompetition(competition);
-        }
-
+        [BenchmarkMethod]
         public int Shift()
         {
             int value = 1;
@@ -23,6 +15,7 @@ namespace Benchmarks
             return value;
         }
 
+        [BenchmarkMethod]
         public int Multiply()
         {
             int value = 1;
