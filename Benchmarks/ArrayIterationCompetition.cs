@@ -2,27 +2,20 @@
 
 namespace Benchmarks
 {
-    public class ArrayIterationProgram
+    public class ArrayIterationCompetition : BenchmarkCompetition
     {
         private const int NUnroll = 1000, N = 1001, IterationCount = 1000000;
 
         private int[] nonStaticField;
         private static int[] staticField;
 
-        public void Run(Manager manager)
+        protected override void Prepare()
         {
             nonStaticField = staticField = new int[N];
-
-            var competition = new BenchmarkCompetition();
-            competition.AddTask("Non-static/unroll", () => NonStaticUnrollRun());
-            competition.AddTask("Static/unroll", () => StaticUnrollRun());
-            competition.AddTask("Non-static", () => NonStaticRun());
-            competition.AddTask("Static", () => StaticRun());
-            competition.Run();
-            manager.ProcessCompetition(competition);
         }
 
-        private int NonStaticUnrollRun()
+        [BenchmarkMethod("Non-static/unroll")]
+        public int NonStaticUnroll()
         {
             int sum = 0;
             for (int iteration = 0; iteration < IterationCount; iteration++)
@@ -31,7 +24,8 @@ namespace Benchmarks
             return sum;
         }
 
-        private int StaticUnrollRun()
+        [BenchmarkMethod("Static/unroll")]
+        public int StaticUnroll()
         {
             int sum = 0;
             for (int iteration = 0; iteration < IterationCount; iteration++)
@@ -40,7 +34,8 @@ namespace Benchmarks
             return sum;
         }
 
-        private int NonStaticRun()
+        [BenchmarkMethod("Non-static")]
+        public int NonStatic()
         {
             int sum = 0;
             for (int iteration = 0; iteration < IterationCount; iteration++)
@@ -49,7 +44,8 @@ namespace Benchmarks
             return sum;
         }
 
-        private int StaticRun()
+        [BenchmarkMethod("Static")]
+        public int Static()
         {
             int sum = 0;
             for (int iteration = 0; iteration < IterationCount; iteration++)

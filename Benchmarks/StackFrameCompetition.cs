@@ -3,20 +3,12 @@ using BenchmarkDotNet;
 
 namespace Benchmarks
 {
-    public class StackFrameProgram
+    public class StackFrameCompetition : BenchmarkCompetition
     {
         private const int IterationCount = 100001;
 
-        public void Run(Manager manager)
-        {
-            var competition = new BenchmarkCompetition();
-            competition.AddTask("StackFrame", () => StackFrame());
-            competition.AddTask("StackTrace", () => StackTrace());
-            competition.Run();
-            manager.ProcessCompetition(competition);
-        }
-
-        private StackFrame StackFrame()
+        [BenchmarkMethod]
+        public StackFrame StackFrame()
         {
             StackFrame method = null;
             for (int i = 0; i < IterationCount; i++)
@@ -24,7 +16,8 @@ namespace Benchmarks
             return method;
         }
 
-        private StackFrame StackTrace()
+        [BenchmarkMethod]
+        public StackFrame StackTrace()
         {
             StackFrame method = null;
             for (int i = 0; i < IterationCount; i++)

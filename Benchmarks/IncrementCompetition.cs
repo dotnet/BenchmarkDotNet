@@ -2,20 +2,12 @@
 
 namespace Benchmarks
 {
-    public class IncrementProgram
+    public class IncrementCompetition : BenchmarkCompetition
     {
-        public void Run(Manager manager)
-        {
-            var competition = new BenchmarkCompetition();
-            competition.AddTask("i++", () => After());
-            competition.AddTask("++i", () => Before());
-            competition.Run();
-            manager.ProcessCompetition(competition);
-        }
-
         private const int IterationCount = 2000000000;
 
-        public static int After()
+        [BenchmarkMethod("i++")]
+        public int After()
         {
             int counter = 0;
             for (int i = 0; i < IterationCount; i++)
@@ -23,7 +15,8 @@ namespace Benchmarks
             return counter;
         }
 
-        public static int Before()
+        [BenchmarkMethod("++i")]
+        public int Before()
         {
             int counter = 0;
             for (int i = 0; i < IterationCount; ++i)
