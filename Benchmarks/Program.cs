@@ -20,7 +20,6 @@ namespace Benchmarks
                 new IncrementCompetition(),
                 new MakeRefVsBoxingCompetition(), 
                 new MultidimensionalArrayCompetition(),                
-                new ReflectionVsExpressionCompetition(),
                 new ReverseSortCompetition(),
                 new ShiftVsMultiplyCompetition(), 
                 new StackFrameCompetition(),
