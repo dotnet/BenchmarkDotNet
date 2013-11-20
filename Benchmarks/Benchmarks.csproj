@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CacheConsciousBinarySearchCompetition.cs" />
     <Compile Include="ForeachListCompetition.cs" />
     <Compile Include="ForeachArrayCompetition.cs" />
     <Compile Include="IncrementCompetition.cs" />

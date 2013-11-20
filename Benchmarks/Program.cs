@@ -23,6 +23,7 @@ namespace Benchmarks
                 new ReverseSortCompetition(),
                 new ShiftVsMultiplyCompetition(), 
                 new StackFrameCompetition(),
+                new CacheConsciousBinarySearchCompetition()
             };
 
         private string outputFileName;
