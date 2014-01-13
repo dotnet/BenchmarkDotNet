@@ -49,6 +49,7 @@
     <Compile Include="MultidimensionalArrayCompetition.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SelectVsConvertAllCompetition.cs" />
     <Compile Include="ShiftVsMultiplyCompetition.cs" />
     <Compile Include="ReverseSortCompetition.cs" />
     <Compile Include="ArrayIterationCompetition.cs" />

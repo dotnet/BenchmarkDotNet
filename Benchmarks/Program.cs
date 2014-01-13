@@ -22,6 +22,7 @@ namespace Benchmarks
                 new MultidimensionalArrayCompetition(),                
                 new ReverseSortCompetition(),
                 new ShiftVsMultiplyCompetition(), 
+                new SelectVsConvertAllCompetition(),
                 new StackFrameCompetition(),
                 new CacheConsciousBinarySearchCompetition()
             };
