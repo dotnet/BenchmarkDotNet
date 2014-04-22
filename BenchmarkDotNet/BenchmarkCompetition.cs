@@ -123,7 +123,7 @@ namespace BenchmarkDotNet
             return (
                 from methodInfo in GetType().GetMethods()
                 let attribute = methodInfo.GetCustomAttributes(typeof(BenchmarkMethodCleanAttribute), false).
-                                OfType<BenchmarkMethodInitializeAttribute>().FirstOrDefault()
+                                OfType<BenchmarkMethodCleanAttribute>().FirstOrDefault()
                 where attribute != null && (attribute.Name == name || methodInfo.Name == name + "Clean")
                 select methodInfo).FirstOrDefault();
         }
