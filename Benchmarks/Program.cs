@@ -14,6 +14,7 @@ namespace Benchmarks
 
         private readonly BenchmarkCompetition[] competitions = new BenchmarkCompetition[]
             {
+                new BitCountCompetition(), 
                 new ArrayIterationCompetition(),
                 new ForeachArrayCompetition(), 
                 new ForeachListCompetition(), 
