@@ -17,6 +17,8 @@ namespace BenchmarkDotNet
             if (Initialize != null)
                 Initialize();
             Info = new Benchmark().Run(Action);
+            if (Clean != null)
+                Clean();
             ConsoleHelper.WriteLineHeader("***** {0}: end *****", Name);
             ConsoleHelper.NewLine();
         }
