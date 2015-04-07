@@ -25,6 +25,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>6</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -39,9 +40,6 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -49,23 +47,35 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Benchmark.cs" />
-    <Compile Include="BenchmarkCompetition.cs" />
-    <Compile Include="BenchmarkCompetitionTask.cs" />
-    <Compile Include="BenchmarkCompetitionTests.cs" />
-    <Compile Include="BenchmarkMethodAttribute.cs" />
-    <Compile Include="BenchmarkMethodCleanAttribute.cs" />
-    <Compile Include="BenchmarkMethodInitializeAttribute.cs" />
-    <Compile Include="BenchmarkSettings.cs" />
-    <Compile Include="BenchmarkUtils.cs" />
-    <Compile Include="ConsoleHelper.cs" />
-    <Compile Include="BenchmarkInfo.cs" />
-    <Compile Include="BenchmarkRun.cs" />
-    <Compile Include="BenchmarkRunList.cs" />
-    <Compile Include="BenchmarkExtensions.cs" />
+    <Compile Include="EnvironmentHelper.cs" />
+    <Compile Include="IBenchmark.cs" />
+    <Compile Include="ObjectToBenchmarkCompetitionConverter.cs" />
+    <Compile Include="Reports\BenchmarkMeasurementStatistic.cs" />
+    <Compile Include="Reports\BenchmarkReport.cs" />
+    <Compile Include="Reports\BenchmarkReportHelper.cs" />
+    <Compile Include="Reports\BenchmarkRunReportsStatistic.cs" />
+    <Compile Include="Reports\IBenchmarkMeasurementStatistic.cs" />
+    <Compile Include="Reports\IBenchmarkRunReport.cs" />
+    <Compile Include="Reports\IBenchmarkRunReportsStatistic.cs" />
+    <Compile Include="Settings\BenchmarkSettingDefinition.cs" />
+    <Compile Include="Settings\BenchmarkSettings.cs" />
+    <Compile Include="Settings\BenchmarkSettingsExtensions.cs" />
+    <Compile Include="Settings\BenchmarkSettingsHelper.cs" />
+    <Compile Include="Settings\IBenchmarkSettingDefinition.cs" />
+    <Compile Include="Logging\BenchmarkCompositeLogger.cs" />
+    <Compile Include="Logging\BenchmarkStreamLogger.cs" />
+    <Compile Include="Logging\BenchmarkLoggerExtensions.cs" />
+    <Compile Include="Logging\BenchmarkLogKind.cs" />
+    <Compile Include="Logging\IBenchmarkLogger.cs" />
+    <Compile Include="Attributes\BenchmarkMethodAttribute.cs" />
+    <Compile Include="Attributes\BenchmarkMethodCleanAttribute.cs" />
+    <Compile Include="Attributes\BenchmarkMethodInitializeAttribute.cs" />
+    <Compile Include="BenchmarkRunner.cs" />
+    <Compile Include="Logging\BenchmarkConsoleLogger.cs" />
+    <Compile Include="Reports\IBenchmarkReport.cs" />
+    <Compile Include="Reports\BenchmarkRunReport.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

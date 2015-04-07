@@ -1,4 +1,5 @@
-﻿using Benchmarks;
+﻿using System;
+using Benchmarks;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -6,12 +7,21 @@ namespace BenchmarkDotNet.Samples
     {
         static void Main()
         {
-            BenchmarkSettings.Instance.DefaultWarmUpIterationCount = 3;
-            BenchmarkSettings.Instance.DefaultResultIterationCount = 5;
-            BenchmarkSettings.Instance.DetailedMode = true;
-            new AttributesSampleCompetition().Run();
-            ConsoleHelper.WriteLineDefault("----------------------------------------");
-            new CustomSampleProgram().Run();
+            const string separator = "***************************************************************************";
+            var samples = new ISample[]
+            {
+                //                new ExplicitlySingleBenchmark(),
+                //                new ExplicitlyBenchmarkCompetition(),
+                new AttributesSample(),
+            };
+            foreach (var sample in samples)
+            {
+                var sampleName = sample.GetType().Name;
+                Console.WriteLine(separator);
+                Console.WriteLine("***** " + sampleName + " " + separator.Substring(7 + sampleName.Length));
+                Console.WriteLine(separator);
+                sample.Run();
+            }
         }
     }
 }

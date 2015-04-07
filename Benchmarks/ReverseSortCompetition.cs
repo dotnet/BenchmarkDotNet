@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Linq;
-using BenchmarkDotNet;
+using BenchmarkDotNet.Attributes;
 
 namespace Benchmarks
 {
-    public class ReverseSortCompetition : BenchmarkCompetition
+    public class ReverseSortCompetition
     {
         private const int N = 6000000, RandSeed = 123;
-        private int[] originalData, data;
+        private readonly int[] originalData;
+        private int[] data;
 
-        protected override void Prepare()
+        public ReverseSortCompetition()
         {
             originalData = new int[N];
             var random = new Random(RandSeed);

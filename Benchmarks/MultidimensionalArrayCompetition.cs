@@ -1,8 +1,8 @@
-﻿using BenchmarkDotNet;
+﻿using BenchmarkDotNet.Attributes;
 
 namespace Benchmarks
 {
-    public class MultidimensionalArrayCompetition : BenchmarkCompetition
+    public class MultidimensionalArrayCompetition
     {
         private const int N = 100, M = 100, IterationCount = 100000;
         private int[] single;

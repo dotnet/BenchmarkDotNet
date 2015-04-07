@@ -1,17 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet;
+using BenchmarkDotNet.Attributes;
 
 namespace Benchmarks
 {
-    public class ForeachListCompetition : BenchmarkCompetition
+    public class ForeachListCompetition
     {
-        private List<int> list;
-
-        protected override void Prepare()
-        {
-            list = Enumerable.Range(0, 200000000).ToList();
-        }
+        private readonly List<int> list = Enumerable.Range(0, 200000000).ToList();
 
         [BenchmarkMethod]
         public int ListForWithoutOptimization()

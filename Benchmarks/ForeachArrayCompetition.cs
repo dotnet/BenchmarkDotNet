@@ -1,13 +1,16 @@
 ﻿using System;
-using BenchmarkDotNet;
+using System.Diagnostics.CodeAnalysis;
+using BenchmarkDotNet.Attributes;
 
 namespace Benchmarks
 {
-    public class ForeachArrayCompetition : BenchmarkCompetition
+    [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
+    [SuppressMessage("ReSharper", "LoopCanBeConvertedToQuery")]
+    public class ForeachArrayCompetition
     {
-        private int[] array;
+        private readonly int[] array;
 
-        protected override void Prepare()
+        public ForeachArrayCompetition()
         {
             array = new int[500000000];
         }

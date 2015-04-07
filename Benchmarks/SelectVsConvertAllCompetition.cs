@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet;
+using BenchmarkDotNet.Attributes;
 
 namespace Benchmarks
 {
-    public class SelectVsConvertAllCompetition : BenchmarkCompetition
+    public class SelectVsConvertAllCompetition
     {
         private const int IterationCount = 10000000;
         private readonly List<int> list = new List<int> { 1, 2, 3, 4, 5 };

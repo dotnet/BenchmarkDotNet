@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
-using BenchmarkDotNet;
+using BenchmarkDotNet.Attributes;
 
 namespace Benchmarks
 {
-    public class StackFrameCompetition : BenchmarkCompetition
+    public class StackFrameCompetition
     {
         private const int IterationCount = 100001;
 

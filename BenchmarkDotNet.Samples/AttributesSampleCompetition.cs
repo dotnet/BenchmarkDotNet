@@ -1,58 +1,67 @@
 ﻿using System.Linq;
 using BenchmarkDotNet;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Samples;
 
 namespace Benchmarks
 {
-    // NUnit support
-    // Benchmark methods searched by the attributes
-    public class AttributesSampleCompetition : BenchmarkCompetitionTests
+    public class AttributesSample : ISample
     {
-        private const int IterationCount = 10;
-        private const int ArraySize = 1024 * 1024;
-
-        private int[] array;
-
-        [BenchmarkMethodInitialize]
-        public void ForInitialize()
+        public void Run()
         {
-            array = new int[ArraySize];
+            new BenchmarkRunner().RunCompetition(new AttributesSampleCompetition());
         }
 
-        [BenchmarkMethod]
-        public int For()
+        public class AttributesSampleCompetition
         {
-            int sum = 0;
-            for (int iteration = 0; iteration < IterationCount; iteration++)
-                for (int i = 0; i < array.Length; i++)
-                    sum += array[i];
-            return sum;
-        }
+            private const int IterationCount = 10;
+            private const int ArraySize = 1024 * 1024;
 
-        [BenchmarkMethodClean]
-        public void ForClean()
-        {
-            array = null;
-        }
+            private int[] array;
 
-        [BenchmarkMethodInitialize]
-        public void LinqInitialize()
-        {
-            array = new int[ArraySize];
-        }
+            [BenchmarkMethodInitialize]
+            public void ForInitialize()
+            {
+                array = new int[ArraySize];
+            }
 
-        [BenchmarkMethod]
-        public int Linq()
-        {
-            int sum = 0;
-            for (int iteration = 0; iteration < IterationCount; iteration++)
-                sum += array.Sum();
-            return sum;
-        }
+            [BenchmarkMethod]
+            public int For()
+            {
+                int sum = 0;
+                for (int iteration = 0; iteration < IterationCount; iteration++)
+                    for (int i = 0; i < array.Length; i++)
+                        sum += array[i];
+                return sum;
+            }
 
-        [BenchmarkMethodClean]
-        public void LinqClean()
-        {
-            array = null;
+            [BenchmarkMethodClean]
+            public void ForClean()
+            {
+                array = null;
+            }
+
+            [BenchmarkMethodInitialize]
+            public void LinqInitialize()
+            {
+                array = new int[ArraySize];
+            }
+
+            [BenchmarkMethod]
+            public int Linq()
+            {
+                int sum = 0;
+                for (int iteration = 0; iteration < IterationCount; iteration++)
+                    sum += array.Sum();
+                return sum;
+            }
+
+            [BenchmarkMethodClean]
+            public void LinqClean()
+            {
+                array = null;
+            }
         }
     }
+
 }

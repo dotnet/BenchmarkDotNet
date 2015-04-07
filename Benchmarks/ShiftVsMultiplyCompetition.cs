@@ -1,8 +1,8 @@
-﻿using BenchmarkDotNet;
+﻿using BenchmarkDotNet.Attributes;
 
 namespace Benchmarks
 {
-    public class ShiftVsMultiplyCompetition : BenchmarkCompetition
+    public class ShiftVsMultiplyCompetition
     {
         private const int IterationCount = 1000000000;
 

@@ -1,15 +1,15 @@
-﻿using BenchmarkDotNet;
+﻿using BenchmarkDotNet.Attributes;
 
 namespace Benchmarks
 {
-    public class ArrayIterationCompetition : BenchmarkCompetition
+    public class ArrayIterationCompetition
     {
         private const int NUnroll = 1000, N = 1001, IterationCount = 1000000;
 
-        private int[] nonStaticField;
+        private readonly int[] nonStaticField;
         private static int[] staticField;
 
-        protected override void Prepare()
+        public ArrayIterationCompetition()
         {
             nonStaticField = staticField = new int[N];
         }

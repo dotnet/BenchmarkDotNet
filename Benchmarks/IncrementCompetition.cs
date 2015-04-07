@@ -1,8 +1,8 @@
-﻿using BenchmarkDotNet;
+﻿using BenchmarkDotNet.Attributes;
 
 namespace Benchmarks
 {
-    public class IncrementCompetition : BenchmarkCompetition
+    public class IncrementCompetition
     {
         private const int IterationCount = 2000000000;
 

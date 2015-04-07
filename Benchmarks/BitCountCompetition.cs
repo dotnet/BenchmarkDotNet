@@ -1,6 +1,5 @@
 ﻿using System;
-
-using BenchmarkDotNet;
+using BenchmarkDotNet.Attributes;
 
 namespace Benchmarks
 {
@@ -59,7 +58,7 @@ namespace Benchmarks
         }
     }
 
-    public class BitCountCompetition : BenchmarkCompetition
+    public class BitCountCompetition
     {
         private const int IterationCount = 1001;
         private const int ArrayLength = 1000000;
@@ -68,7 +67,7 @@ namespace Benchmarks
 
         public ulong NextUInt64()
         {
-            var buffer = new byte[sizeof(Int64)];
+            var buffer = new byte[sizeof(long)];
             random.NextBytes(buffer);
             return BitConverter.ToUInt64(buffer, 0);
         }

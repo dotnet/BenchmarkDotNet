@@ -44,7 +44,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AttributesSampleCompetition.cs" />
-    <Compile Include="CustomSampleProgram.cs" />
+    <Compile Include="ExplicitlyBenchmarkCompetition.cs" />
+    <Compile Include="ExplicitlySingleBenchmarkSample.cs" />
+    <Compile Include="ISample.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -1,7 +1,10 @@
 ﻿using System;
-using System.IO;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using BenchmarkDotNet;
+using BenchmarkDotNet.Logging;
+using BenchmarkDotNet.Settings;
 
 namespace Benchmarks
 {
@@ -12,31 +15,28 @@ namespace Benchmarks
             new Program().Run(args);
         }
 
-        private readonly BenchmarkCompetition[] competitions = new BenchmarkCompetition[]
-            {
-                new BitCountCompetition(), 
-                new ArrayIterationCompetition(),
-                new ForeachArrayCompetition(), 
-                new ForeachListCompetition(), 
-                new IncrementCompetition(),
-                new MakeRefVsBoxingCompetition(), 
-                new MultidimensionalArrayCompetition(),                
-                new ReverseSortCompetition(),
-                new ShiftVsMultiplyCompetition(), 
-                new SelectVsConvertAllCompetition(),
-                new StackFrameCompetition(),
-                new CacheConsciousBinarySearchCompetition()
-            };
+        private readonly Type[] competitions =
+        {
+            typeof(BitCountCompetition),
+            typeof(ArrayIterationCompetition),
+            typeof(ForeachArrayCompetition),
+            typeof(ForeachListCompetition),
+            typeof(IncrementCompetition),
+            typeof(MultidimensionalArrayCompetition),
+            typeof(ReverseSortCompetition),
+            typeof(ShiftVsMultiplyCompetition),
+            typeof(SelectVsConvertAllCompetition),
+            typeof(StackFrameCompetition),
+            typeof(CacheConsciousBinarySearchCompetition)
+        };
 
-        private string outputFileName;
-
+        private readonly BenchmarkConsoleLogger logger = new BenchmarkConsoleLogger();
 
         private void Run(string[] args)
         {
             Array.Sort(competitions, (a, b) => String.Compare(a.Name, b.Name, StringComparison.Ordinal));
             args = ReadArgumentList(args);
-            ApplyBenchmarkSettings(args);
-            RunCompetitions(args);
+            RunCompetitions(args, CreateBenchmarkSettings(args));
         }
 
         private string[] ReadArgumentList(string[] args)
@@ -44,54 +44,53 @@ namespace Benchmarks
             while (args.Length == 0)
             {
                 PrintHelp();
-                ConsoleHelper.WriteLineHelp("Argument list is empty. Please, print the argument list:");
-                args = ConsoleHelper.ReadArgsLine();
-                ConsoleHelper.NewLine();
+                logger.WriteLineHelp("Argument list is empty. Please, print the argument list:");
+                args = ReadArgsLine();
+                logger.NewLine();
             }
             return args;
         }
 
-        private void ApplyBenchmarkSettings(string[] args)
+        private static Dictionary<string, object> CreateBenchmarkSettings(string[] args)
         {
-            BenchmarkSettings.Instance.DetailedMode = Contains(args, "-d", "--details");
+            var settings = new Dictionary<string, object>();
+
+            if (Contains(args, "-d", "--details"))
+                BenchmarkSettings.DetailedMode.Set(settings, true);
 
             if (Contains(args, "-dw", "--disable-warmup"))
-                BenchmarkSettings.Instance.DefaultMaxWarmUpIterationCount = 0;
+                BenchmarkSettings.MaxWarmUpIterationCount.Set(settings, (uint)0);
 
             if (Contains(args, "-s", "--single"))
             {
-                BenchmarkSettings.Instance.DefaultMaxWarmUpIterationCount = 0;
-                BenchmarkSettings.Instance.DefaultResultIterationCount = 1;
+                BenchmarkSettings.MaxWarmUpIterationCount.Set(settings, (uint)0);
+                BenchmarkSettings.TargetIterationCount.Set(settings, (uint)0);
             }
 
-            outputFileName = GetStringArgValue(args, "-of", "--output-file");
-
-            int? resultIterationCount = GetInt32ArgValue(args, "-rc", "--result-count");
+            uint? resultIterationCount = GetUInt32ArgValue(args, "-tc", "--target-count");
             if (resultIterationCount != null)
-                BenchmarkSettings.Instance.DefaultResultIterationCount = resultIterationCount.Value;
+                BenchmarkSettings.TargetIterationCount.Set(settings, resultIterationCount.Value);
 
-            int? warmUpIterationCount = GetInt32ArgValue(args, "-wc", "--warmup-count");
+            uint? warmUpIterationCount = GetUInt32ArgValue(args, "-wc", "--warmup-count");
             if (warmUpIterationCount != null)
-                BenchmarkSettings.Instance.DefaultWarmUpIterationCount = warmUpIterationCount.Value;
+                BenchmarkSettings.WarmUpIterationCount.Set(settings, warmUpIterationCount.Value);
 
-            int? maxWarmUpIterationCount = GetInt32ArgValue(args, "-mwc", "--max-warmup-count");
+            uint? maxWarmUpIterationCount = GetUInt32ArgValue(args, "-mwc", "--max-warmup-count");
             if (maxWarmUpIterationCount != null)
-                BenchmarkSettings.Instance.DefaultMaxWarmUpIterationCount = maxWarmUpIterationCount.Value;
+                BenchmarkSettings.MaxWarmUpIterationCount.Set(settings, maxWarmUpIterationCount.Value);
 
-            int? maxWarpUpError = GetInt32ArgValue(args, "-mwe", "--max-warmup-error");
+            uint? maxWarpUpError = GetUInt32ArgValue(args, "-mwe", "--max-warmup-error");
             if (maxWarpUpError != null)
-                BenchmarkSettings.Instance.DefaultMaxWarmUpError = maxWarpUpError.Value / 100.0;
+                BenchmarkSettings.MaxWarmUpError.Set(settings, maxWarpUpError.Value / 100.0);
 
-            bool? printBenchmark = GetBoolArgValue(args, "-pb", "--print-benchmark");
-            if (printBenchmark != null)
-                BenchmarkSettings.Instance.DefaultPrintBenchmarkBodyToConsole = printBenchmark.Value;
-
-            int? processorAffinity = GetInt32ArgValue(args, "-pa", "--processor-affinity");
+            uint? processorAffinity = GetUInt32ArgValue(args, "-pa", "--processor-affinity");
             if (processorAffinity != null)
-                BenchmarkSettings.Instance.DefaultProcessorAffinity = processorAffinity.Value;
+                BenchmarkSettings.ProcessorAffinity.Set(settings, processorAffinity.Value);
+
+            return settings;
         }
 
-        private void RunCompetitions(string[] args)
+        private void RunCompetitions(string[] args, Dictionary<string, object> settings)
         {
             bool runAll = Contains(args, "-a", "--all");
 
@@ -100,63 +99,49 @@ namespace Benchmarks
                 var competition = competitions[i];
                 if (runAll || args.Any(arg => competition.Name.ToLower().StartsWith(arg.ToLower())) || args.Contains("#" + i))
                 {
-                    ConsoleHelper.WriteLineHeader("Target program: " + competition.Name);
-                    competition.Run();
-                    SaveCompetitionResults(competition);
-                    ConsoleHelper.NewLine();
+                    logger.WriteLineHeader("Target program: " + competition.Name);
+                    new BenchmarkRunner(settings).RunCompetition(Activator.CreateInstance(competition));
+                    logger.NewLine();
                 }
             }
         }
 
-        private void SaveCompetitionResults(BenchmarkCompetition competition)
-        {
-            if (!string.IsNullOrEmpty(outputFileName))
-                using (var writer = new StreamWriter(outputFileName))
-                {
-                    ConsoleHelper.SetOut(writer);
-                    competition.PrintResults();
-                    ConsoleHelper.RestoreDefaultOut();
-                }
-        }
-
         private void PrintHelp()
         {
-            ConsoleHelper.WriteLineHelp("Usage: Benchmarks <competitions-names> [<arguments>]");
-            ConsoleHelper.WriteLineHelp("Arguments:");
-            ConsoleHelper.WriteLineHelp("  -a, --all");
-            ConsoleHelper.WriteLineHelp("      Run all available competitions");
-            ConsoleHelper.WriteLineHelp("  -d, --details");
-            ConsoleHelper.WriteLineHelp("      Show detailed results");
-            ConsoleHelper.WriteLineHelp("  -rc=<n>, --result-count=<n>");
-            ConsoleHelper.WriteLineHelp("      Result set iteration count");
-            ConsoleHelper.WriteLineHelp("  -wc=<n>, --warmup-count=<n>");
-            ConsoleHelper.WriteLineHelp("      WarmUp set default iteration count");
-            ConsoleHelper.WriteLineHelp("  -mwc=<n>, --max-warmup-count=<n>");
-            ConsoleHelper.WriteLineHelp("      WarmUp set max iteration count");
-            ConsoleHelper.WriteLineHelp("  -mwe=<n>, --max-warmup-error=<n>");
-            ConsoleHelper.WriteLineHelp("      Max permissible error (in percent) as condition for finishing of WarmUp");
-            ConsoleHelper.WriteLineHelp("  -pb=<false|true>, --print-benchmark=<false|true>");
-            ConsoleHelper.WriteLineHelp("      Printing the report of each benchmark to the console");
-            ConsoleHelper.WriteLineHelp("  -pa=<n>, --processor-affinity=<n>");
-            ConsoleHelper.WriteLineHelp("      ProcessorAffinity");
-            ConsoleHelper.WriteLineHelp("  -dw, --disable-warmup");
-            ConsoleHelper.WriteLineHelp("      Disable WarmUp, equivalent of -mwc=0");
-            ConsoleHelper.WriteLineHelp("  -s, --single");
-            ConsoleHelper.WriteLineHelp("      Single result benchmark without WarmUp, equivalent of -mwc=0 -rc=1");
-            ConsoleHelper.WriteLineHelp("  -of=<filename>, --output-file=<filename>");
-            ConsoleHelper.WriteLineHelp("      Save results of benchmark competition to file");
-            ConsoleHelper.NewLine();
+            logger.WriteLineHelp("Usage: Benchmarks <competitions-names> [<arguments>]");
+            logger.WriteLineHelp("Arguments:");
+            logger.WriteLineHelp("  -a, --all");
+            logger.WriteLineHelp("      Run all available competitions");
+            logger.WriteLineHelp("  -d, --details");
+            logger.WriteLineHelp("      Show detailed results");
+            logger.WriteLineHelp("  -tc=<n>, --target-count=<n>");
+            logger.WriteLineHelp("      Target set iteration count");
+            logger.WriteLineHelp("  -wc=<n>, --warmup-count=<n>");
+            logger.WriteLineHelp("      WarmUp set default iteration count");
+            logger.WriteLineHelp("  -mwc=<n>, --max-warmup-count=<n>");
+            logger.WriteLineHelp("      WarmUp set max iteration count");
+            logger.WriteLineHelp("  -mwe=<n>, --max-warmup-error=<n>");
+            logger.WriteLineHelp("      Max permissible error (in percent) as condition for finishing of WarmUp");
+            logger.WriteLineHelp("  -pb=<false|true>, --print-benchmark=<false|true>");
+            logger.WriteLineHelp("      Printing the report of each benchmark to the console");
+            logger.WriteLineHelp("  -pa=<n>, --processor-affinity=<n>");
+            logger.WriteLineHelp("      ProcessorAffinity");
+            logger.WriteLineHelp("  -dw, --disable-warmup");
+            logger.WriteLineHelp("      Disable WarmUp, equivalent of -mwc=0");
+            logger.WriteLineHelp("  -s, --single");
+            logger.WriteLineHelp("      Single result benchmark without WarmUp, equivalent of -mwc=0 -rc=1");
+            logger.NewLine();
             PrintAvailable();
         }
 
         private void PrintAvailable()
         {
-            ConsoleHelper.WriteLineHelp("Available competitions:");
+            logger.WriteLineHelp("Available competitions:");
             int numberWidth = competitions.Length.ToString().Length;
             for (int i = 0; i < competitions.Length; i++)
-                ConsoleHelper.WriteLineHelp(BenchmarkUtils.CultureFormat("  #{0} {1}", i.ToString().PadRight(numberWidth), competitions[i].Name));
-            ConsoleHelper.NewLine();
-            ConsoleHelper.NewLine();
+                logger.WriteLineHelp(string.Format(CultureInfo.InvariantCulture, "  #{0} {1}", i.ToString().PadRight(numberWidth), competitions[i].Name));
+            logger.NewLine();
+            logger.NewLine();
         }
 
         private static bool Contains(string[] args, params string[] patterns)
@@ -174,29 +159,18 @@ namespace Benchmarks
                     select arg.Substring(pattern.Length + 1)).ToArray();
         }
 
-        private static int? GetInt32ArgValue(string[] args, params string[] patterns)
+        private static uint? GetUInt32ArgValue(string[] args, params string[] patterns)
         {
             var values = GetArgValues(args, patterns);
-            int result;
-            if (values.Length > 0 && int.TryParse(values[0], out result))
+            uint result;
+            if (values.Length > 0 && uint.TryParse(values[0], out result))
                 return result;
             return null;
         }
 
-        private static bool? GetBoolArgValue(string[] args, params string[] patterns)
+        public static string[] ReadArgsLine()
         {
-            var values = GetArgValues(args, patterns);
-            if (values.Length == 0)
-                return null;
-            return values[0].ToLower() == "true" || values[0] == "1";
-        }
-
-        private static string GetStringArgValue(string[] args, params string[] patterns)
-        {
-            var values = GetArgValues(args, patterns);
-            if (values.Length == 0)
-                return null;
-            return values[0];
+            return (Console.ReadLine() ?? "").Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
         }
     }
 }

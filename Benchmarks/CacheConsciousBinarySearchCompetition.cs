@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
-using BenchmarkDotNet;
+using BenchmarkDotNet.Attributes;
 
 namespace Benchmarks
 {
-    public class CacheConsciousBinarySearchCompetition : BenchmarkCompetition
+    public class CacheConsciousBinarySearchCompetition
     {
         private const int K = 24, N = (1 << K) - 1, IterationCount = 10000000;
         private readonly Random random = new Random();
@@ -12,7 +12,7 @@ namespace Benchmarks
         private Tree originalTree;
         private int[] bfs;
 
-        protected override void Prepare()
+        public CacheConsciousBinarySearchCompetition()
         {
             originalTree = new Tree(Enumerable.Range(0, N).Select(x => 2 * x).ToArray());
             bfs = originalTree.Bfs();
