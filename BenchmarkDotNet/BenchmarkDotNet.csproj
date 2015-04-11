@@ -67,9 +67,9 @@
     <Compile Include="Logging\BenchmarkLoggerExtensions.cs" />
     <Compile Include="Logging\BenchmarkLogKind.cs" />
     <Compile Include="Logging\IBenchmarkLogger.cs" />
-    <Compile Include="Attributes\BenchmarkMethodAttribute.cs" />
-    <Compile Include="Attributes\BenchmarkMethodCleanAttribute.cs" />
-    <Compile Include="Attributes\BenchmarkMethodInitializeAttribute.cs" />
+    <Compile Include="Attributes\BenchmarkAttribute.cs" />
+    <Compile Include="Attributes\BenchmarkCleanAttribute.cs" />
+    <Compile Include="Attributes\BenchmarkInitializeAttribute.cs" />
     <Compile Include="BenchmarkRunner.cs" />
     <Compile Include="Logging\BenchmarkConsoleLogger.cs" />
     <Compile Include="Reports\IBenchmarkReport.cs" />

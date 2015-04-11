@@ -7,7 +7,7 @@ namespace Benchmarks
     {
         private const int IterationCount = 100001;
 
-        [BenchmarkMethod]
+        [Benchmark]
         public StackFrame StackFrame()
         {
             StackFrame method = null;
@@ -16,7 +16,7 @@ namespace Benchmarks
             return method;
         }
 
-        [BenchmarkMethod]
+        [Benchmark]
         public StackFrame StackTrace()
         {
             StackFrame method = null;

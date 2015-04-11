@@ -79,7 +79,7 @@ namespace Benchmarks
                 numbers[i] = NextUInt64();
         }
 
-        [BenchmarkMethod]
+        [Benchmark]
         public int PopCount1()
         {
             int counter = 0;
@@ -89,7 +89,7 @@ namespace Benchmarks
             return counter;
         }
 
-        [BenchmarkMethod]
+        [Benchmark]
         public int PopCount2()
         {
             int counter = 0;
@@ -99,7 +99,7 @@ namespace Benchmarks
             return counter;
         }
 
-        [BenchmarkMethod]
+        [Benchmark]
         public int PopCount3()
         {
             int counter = 0;

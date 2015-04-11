@@ -18,37 +18,37 @@ namespace Benchmarks
             bfs = originalTree.Bfs();
         }
 
-        [BenchmarkMethod]
+        [Benchmark]
         public void SimpleSearch()
         {
             SingleRun(originalTree);
         }
 
-        [BenchmarkMethod]
+        [Benchmark]
         public void CacheConsciousSearch1()
         {
             SingleRun(new CacheConsciousTree(bfs, 1));
         }
 
-        [BenchmarkMethod]
+        [Benchmark]
         public void CacheConsciousSearch2()
         {
             SingleRun(new CacheConsciousTree(bfs, 2));
         }
 
-        [BenchmarkMethod]
+        [Benchmark]
         public void CacheConsciousSearch3()
         {
             SingleRun(new CacheConsciousTree(bfs, 3));
         }
 
-        [BenchmarkMethod]
+        [Benchmark]
         public void CacheConsciousSearch4()
         {
             SingleRun(new CacheConsciousTree(bfs, 4));
         }
 
-        [BenchmarkMethod]
+        [Benchmark]
         public void CacheConsciousSearch5()
         {
             SingleRun(new CacheConsciousTree(bfs, 5));

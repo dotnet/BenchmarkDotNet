@@ -19,13 +19,13 @@ namespace Benchmarks
 
             private int[] array;
 
-            [BenchmarkMethodInitialize]
+            [BenchmarkInitialize]
             public void ForInitialize()
             {
                 array = new int[ArraySize];
             }
 
-            [BenchmarkMethod]
+            [Benchmark]
             public int For()
             {
                 int sum = 0;
@@ -35,19 +35,19 @@ namespace Benchmarks
                 return sum;
             }
 
-            [BenchmarkMethodClean]
+            [BenchmarkClean]
             public void ForClean()
             {
                 array = null;
             }
 
-            [BenchmarkMethodInitialize]
+            [BenchmarkInitialize]
             public void LinqInitialize()
             {
                 array = new int[ArraySize];
             }
 
-            [BenchmarkMethod]
+            [Benchmark]
             public int Linq()
             {
                 int sum = 0;
@@ -56,7 +56,7 @@ namespace Benchmarks
                 return sum;
             }
 
-            [BenchmarkMethodClean]
+            [BenchmarkClean]
             public void LinqClean()
             {
                 array = null;

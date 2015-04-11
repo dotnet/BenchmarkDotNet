@@ -6,7 +6,7 @@ namespace Benchmarks
     {
         private const int IterationCount = 1000000000;
 
-        [BenchmarkMethod]
+        [Benchmark]
         public int Shift()
         {
             int value = 1;
@@ -15,7 +15,7 @@ namespace Benchmarks
             return value;
         }
 
-        [BenchmarkMethod]
+        [Benchmark]
         public int Multiply()
         {
             int value = 1;

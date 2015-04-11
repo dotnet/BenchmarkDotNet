@@ -8,7 +8,7 @@ namespace Benchmarks
     {
         private readonly List<int> list = Enumerable.Range(0, 200000000).ToList();
 
-        [BenchmarkMethod]
+        [Benchmark]
         public int ListForWithoutOptimization()
         {
             int sum = 0;
@@ -17,7 +17,7 @@ namespace Benchmarks
             return sum;
         }
 
-        [BenchmarkMethod]
+        [Benchmark]
         public double ListForWithOptimization()
         {
             int length = list.Count;
@@ -27,7 +27,7 @@ namespace Benchmarks
             return sum;
         }
 
-        [BenchmarkMethod]
+        [Benchmark]
         public double ListForeach()
         {
             int sum = 0;
@@ -36,7 +36,7 @@ namespace Benchmarks
             return sum;
         }
 
-        [BenchmarkMethod]
+        [Benchmark]
         public double ListForEach()
         {
             int sum = 0;

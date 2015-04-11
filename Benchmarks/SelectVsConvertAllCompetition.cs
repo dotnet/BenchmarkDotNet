@@ -9,7 +9,7 @@ namespace Benchmarks
         private const int IterationCount = 10000000;
         private readonly List<int> list = new List<int> { 1, 2, 3, 4, 5 };
 
-        [BenchmarkMethod]
+        [Benchmark]
         public List<int> Select()
         {
             List<int> newList = null;
@@ -18,7 +18,7 @@ namespace Benchmarks
             return newList;
         }
 
-        [BenchmarkMethod]
+        [Benchmark]
         public List<int> ConvertAll()
         {
             List<int> newList = null;

@@ -3,13 +3,13 @@
 namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Method)]
-    public class BenchmarkMethodCleanAttribute : Attribute
+    public class BenchmarkAttribute : Attribute
     {
-        public BenchmarkMethodCleanAttribute()
+        public BenchmarkAttribute()
         {
         }
 
-        public BenchmarkMethodCleanAttribute(string name)
+        public BenchmarkAttribute(string name)
         {
             Name = name;
         }

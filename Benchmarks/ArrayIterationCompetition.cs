@@ -14,7 +14,7 @@ namespace Benchmarks
             nonStaticField = staticField = new int[N];
         }
 
-        [BenchmarkMethod("Non-static/unroll")]
+        [Benchmark("Non-static/unroll")]
         public int NonStaticUnroll()
         {
             int sum = 0;
@@ -24,7 +24,7 @@ namespace Benchmarks
             return sum;
         }
 
-        [BenchmarkMethod("Static/unroll")]
+        [Benchmark("Static/unroll")]
         public int StaticUnroll()
         {
             int sum = 0;
@@ -34,7 +34,7 @@ namespace Benchmarks
             return sum;
         }
 
-        [BenchmarkMethod("Non-static")]
+        [Benchmark("Non-static")]
         public int NonStatic()
         {
             int sum = 0;
@@ -44,7 +44,7 @@ namespace Benchmarks
             return sum;
         }
 
-        [BenchmarkMethod("Static")]
+        [Benchmark("Static")]
         public int Static()
         {
             int sum = 0;

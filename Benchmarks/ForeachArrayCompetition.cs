@@ -15,7 +15,7 @@ namespace Benchmarks
             array = new int[500000000];
         }
 
-        [BenchmarkMethod]
+        [Benchmark]
         public int ArrayForWithoutOptimization()
         {
             int sum = 0;
@@ -24,7 +24,7 @@ namespace Benchmarks
             return sum;
         }
 
-        [BenchmarkMethod]
+        [Benchmark]
         public double ArrayForWithOptimization()
         {
             int length = array.Length;
@@ -34,7 +34,7 @@ namespace Benchmarks
             return sum;
         }
 
-        [BenchmarkMethod]
+        [Benchmark]
         public double ArrayForeach()
         {
             int sum = 0;
@@ -43,7 +43,7 @@ namespace Benchmarks
             return sum;
         }
 
-        [BenchmarkMethod]
+        [Benchmark]
         public double ArrayForEach()
         {
             int sum = 0;

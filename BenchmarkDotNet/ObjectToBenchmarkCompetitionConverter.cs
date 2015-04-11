@@ -48,17 +48,17 @@ namespace BenchmarkDotNet
                 throw new InvalidOperationException($"Benchmark method {methodInfo.Name} has incorrect signature.\nMethod shouldn't have any arguments.");
         }
 
-        private static BenchmarkMethodAttribute GetBenchmarkMethodAttribute(MethodInfo methodInfo)
+        private static BenchmarkAttribute GetBenchmarkMethodAttribute(MethodInfo methodInfo)
         {
-            return methodInfo.GetCustomAttributes(typeof(BenchmarkMethodAttribute), false).FirstOrDefault() as BenchmarkMethodAttribute;
+            return methodInfo.GetCustomAttributes(typeof(BenchmarkAttribute), false).FirstOrDefault() as BenchmarkAttribute;
         }
 
         private static MethodInfo GetBenchmarkMethodInitialize(object competition, string name)
         {
             return (
                 from methodInfo in competition.GetType().GetMethods()
-                let attribute = methodInfo.GetCustomAttributes(typeof(BenchmarkMethodInitializeAttribute), false).
-                                OfType<BenchmarkMethodInitializeAttribute>().FirstOrDefault()
+                let attribute = methodInfo.GetCustomAttributes(typeof(BenchmarkInitializeAttribute), false).
+                                OfType<BenchmarkInitializeAttribute>().FirstOrDefault()
                 where attribute != null && (attribute.Name == name || methodInfo.Name == name + "Initialize")
                 select methodInfo).FirstOrDefault();
         }
@@ -67,8 +67,8 @@ namespace BenchmarkDotNet
         {
             return (
                 from methodInfo in competition.GetType().GetMethods()
-                let attribute = methodInfo.GetCustomAttributes(typeof(BenchmarkMethodCleanAttribute), false).
-                                OfType<BenchmarkMethodCleanAttribute>().FirstOrDefault()
+                let attribute = methodInfo.GetCustomAttributes(typeof(BenchmarkCleanAttribute), false).
+                                OfType<BenchmarkCleanAttribute>().FirstOrDefault()
                 where attribute != null && (attribute.Name == name || methodInfo.Name == name + "Clean")
                 select methodInfo).FirstOrDefault();
         }

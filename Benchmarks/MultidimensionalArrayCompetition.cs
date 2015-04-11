@@ -9,19 +9,19 @@ namespace Benchmarks
         private int[][] jagged;
         private int[,] rectangular;
 
-        [BenchmarkMethodInitialize]
+        [BenchmarkInitialize]
         public void SingleInitialize()
         {
             single = new int[N * M];
         }
 
-        [BenchmarkMethodClean]
+        [BenchmarkClean]
         public void SingleClean()
         {
             single = null;
         }
 
-        [BenchmarkMethodInitialize]
+        [BenchmarkInitialize]
         public void JaggedInitialize()
         {
             jagged = new int[N][];
@@ -29,25 +29,25 @@ namespace Benchmarks
                 jagged[i] = new int[M];
         }
 
-        [BenchmarkMethodClean]
+        [BenchmarkClean]
         public void JaggedClean()
         {
             jagged = null;
         }
 
-        [BenchmarkMethodInitialize]
+        [BenchmarkInitialize]
         public void RectangularInitialize()
         {
             rectangular = new int[N, M];
         }
 
-        [BenchmarkMethodClean]
+        [BenchmarkClean]
         public void RectangularClean()
         {
             rectangular = null;
         }
 
-        [BenchmarkMethod]
+        [Benchmark]
         public int Single()
         {
             int sum = 0;
@@ -58,7 +58,7 @@ namespace Benchmarks
             return sum;
         }
 
-        [BenchmarkMethod]
+        [Benchmark]
         public int Jagged()
         {
             int sum = 0;
@@ -69,7 +69,7 @@ namespace Benchmarks
             return sum;
         }
 
-        [BenchmarkMethod]
+        [Benchmark]
         public int Rectangular()
         {
             int sum = 0;

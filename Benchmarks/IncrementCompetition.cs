@@ -6,7 +6,7 @@ namespace Benchmarks
     {
         private const int IterationCount = 2000000000;
 
-        [BenchmarkMethod("i++")]
+        [Benchmark("i++")]
         public int After()
         {
             int counter = 0;
@@ -15,7 +15,7 @@ namespace Benchmarks
             return counter;
         }
 
-        [BenchmarkMethod("++i")]
+        [Benchmark("++i")]
         public int Before()
         {
             int counter = 0;
