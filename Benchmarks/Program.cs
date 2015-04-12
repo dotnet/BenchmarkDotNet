@@ -17,11 +17,14 @@ namespace Benchmarks
 
         private readonly Type[] competitions =
         {
+            typeof(ArrayBoundEliminationCompetition),
             typeof(BitCountCompetition),
             typeof(ArrayIterationCompetition),
             typeof(ForeachArrayCompetition),
             typeof(ForeachListCompetition),
             typeof(IncrementCompetition),
+            typeof(InstructionLevelParallelismCompetition),
+            typeof(MatrixMultiplicationCompetition),
             typeof(MultidimensionalArrayCompetition),
             typeof(ReverseSortCompetition),
             typeof(ShiftVsMultiplyCompetition),

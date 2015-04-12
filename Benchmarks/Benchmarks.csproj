@@ -41,11 +41,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArrayBoundEliminationCompetition.cs" />
     <Compile Include="BitCountCompetition.cs" />
     <Compile Include="CacheConsciousBinarySearchCompetition.cs" />
     <Compile Include="ForeachListCompetition.cs" />
     <Compile Include="ForeachArrayCompetition.cs" />
     <Compile Include="IncrementCompetition.cs" />
+    <Compile Include="InstructionLevelParallelismCompetition.cs" />
+    <Compile Include="MatrixMultiplicationCompetition.cs" />
     <Compile Include="MultidimensionalArrayCompetition.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
