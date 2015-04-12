@@ -42,12 +42,13 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Benchmark.cs" />
-    <Compile Include="EnvironmentHelper.cs" />
+    <Compile Include="Helpers\EnvironmentHelper.cs" />
     <Compile Include="IBenchmark.cs" />
     <Compile Include="ObjectToBenchmarkCompetitionConverter.cs" />
     <Compile Include="Reports\BenchmarkMeasurementStatistic.cs" />

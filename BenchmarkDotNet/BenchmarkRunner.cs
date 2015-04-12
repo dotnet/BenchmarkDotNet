@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Logging;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Settings;
@@ -37,6 +38,7 @@ namespace BenchmarkDotNet
             var reports = benchmarks.Select(Run).ToList();
             Logger.WriteLineHeader("####### Competition: Results #######");
             Logger.NewLine();
+            Logger.WriteLineExtraInfo(EnvironmentHelper.GetFullEnvironmentInfo());
             var reportStats = reports.Select(
                 r => new
                 {

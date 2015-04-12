@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
+using System.Management;
 using System.Reflection;
 
-namespace BenchmarkDotNet
+namespace BenchmarkDotNet.Helpers
 {
     internal static class EnvironmentHelper
     {
@@ -44,7 +46,46 @@ namespace BenchmarkDotNet
 
         public static string GetFullEnvironmentInfo()
         {
-            return $"CLR={GetClrVersion()}, Arch={GetArch()}, {GetConfiguration()}{GetDebuggerFlag()}{GetJitFlag()}";
+            var line1 = $"OS={GetOsVersion()}";
+            var line2 = $"Processor={GetProcessorName()}, ProcessorCount={GetProcessorCount()}";
+            var line3 = $"CLR={GetClrVersion()}, Arch={GetArch()}, {GetConfiguration()}{GetDebuggerFlag()}{GetJitFlag()}";
+            return line1 + Environment.NewLine + line2 + Environment.NewLine + line3;
+        }
+
+        private static string GetOsVersion()
+        {
+            return Environment.OSVersion.ToString();
+        }
+
+        private static string GetProcessorCount()
+        {
+            return Environment.ProcessorCount.ToString();
+        }
+
+        private static string GetProcessorName()
+        {
+            var info = string.Empty;
+            if (IsWindows())
+            {
+                try
+                {
+                    var mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
+                    foreach (var moProcessor in mosProcessor.Get().Cast<ManagementObject>())
+                        info += moProcessor["name"]?.ToString();
+                }
+                catch (Exception)
+                {
+                }
+            }
+            else
+                info = "?";
+            return info;
+        }
+
+        private static bool IsWindows()
+        {
+            var platform = Environment.OSVersion.Platform;
+            return platform == PlatformID.Win32NT || platform == PlatformID.Win32S || platform == PlatformID.Win32Windows || platform == PlatformID.WinCE;
         }
 
         private class JitHelper
