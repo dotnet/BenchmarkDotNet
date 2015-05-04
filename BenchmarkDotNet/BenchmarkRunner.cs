@@ -148,7 +148,7 @@ namespace BenchmarkDotNet
             var maxWarmUpError = BenchmarkSettings.MaxWarmUpError.Get(settings);
             if (runList.Count < warmUpIterationCount)
                 return false;
-            var lastRuns = runList.TakeLast(1).ToList();
+            var lastRuns = runList.TakeLast(5).ToList();
             var lastRunsStatistic = new BenchmarkRunReportsStatistic("", lastRuns);
             var lastRunsError = lastRunsStatistic.Ticks.Error;
             return lastRunsError < maxWarmUpError;
