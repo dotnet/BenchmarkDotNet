@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Helpers
 
         private static string GetConfiguration()
         {
-            string configuration = "RELEASE";
+            string configuration = "";
 #if DEBUG
             configuration = "DEBUG";
 #endif
@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Helpers
 
         private static string GetJitFlag()
         {
-            if (Type.GetType("Mono.Runtime") == null && IntPtr.Size == 8 && GetConfiguration() == "RELEASE")
+            if (Type.GetType("Mono.Runtime") == null && IntPtr.Size == 8 && GetConfiguration() != "DEBUG")
                 if (!new JitHelper().IsMsX64())
                     return " [RyuJIT]";
             return "";
