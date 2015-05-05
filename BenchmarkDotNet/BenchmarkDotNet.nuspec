@@ -2,12 +2,13 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>BenchmarkDotNet</id>
-        <version>0.5.2</version>
+        <version>0.6.0</version>
         <title>BenchmarkDotNet</title>
         <authors>Andrey Akinshin</authors>
         <owners>Andrey Akinshin</owners>
         <licenseUrl>https://github.com/AndreyAkinshin/BenchmarkDotNet/blob/master/LICENSE.md</licenseUrl>
         <projectUrl>https://github.com/AndreyAkinshin/BenchmarkDotNet</projectUrl>
+        <iconUrl>https://raw.githubusercontent.com/AndreyAkinshin/BenchmarkDotNet/master/BenchmarkDotNet/BenchmarkDotNet.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Lightweight .NET-framework for benchmarks</description>
         <copyright>Andrey Akinshin</copyright>

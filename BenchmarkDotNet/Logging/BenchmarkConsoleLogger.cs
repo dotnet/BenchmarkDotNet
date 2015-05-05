@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Logging
                 { BenchmarkLogKind.Header, ConsoleColor.Magenta },
                 { BenchmarkLogKind.Result, ConsoleColor.DarkCyan },
                 { BenchmarkLogKind.Statistic, ConsoleColor.Cyan },
-                { BenchmarkLogKind.ExtraInfo, ConsoleColor.DarkYellow },
+                { BenchmarkLogKind.Info, ConsoleColor.DarkYellow },
                 { BenchmarkLogKind.Error, ConsoleColor.Red }
             };
         }
