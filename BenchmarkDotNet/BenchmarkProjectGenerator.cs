@@ -65,7 +65,8 @@ namespace BenchmarkDotNet
             runMethod.Statements.Add(new CodeSnippetStatement("            Thread.CurrentThread.Priority = ThreadPriority.Highest;"));
             if (benchmark.Task.Configuration.Mode == BenchmarkMode.SingleRun)
             {
-                var snippet = new CodeSnippetStatement { Value = $"            BenchmarkUtils.SingleRun({benchmark.Target.Method.Name}, args);" };
+                var runMethodName = benchmark.Target.Method.ReturnType == typeof (void) ? "SingleRunVoid" : "SingleRun";
+                var snippet = new CodeSnippetStatement { Value = $"            BenchmarkUtils.{runMethodName}({benchmark.Target.Method.Name}, args);" };
                 runMethod.Statements.Add(snippet);
             }
             runMethod.Statements.Add(consoleWriteFinish);
