@@ -1,27 +1,27 @@
-﻿using System;
-using Benchmarks;
-
-namespace BenchmarkDotNet.Samples
+﻿namespace BenchmarkDotNet.Samples
 {
     class Program
     {
-        static void Main()
+        static void Main(string[] args)
         {
-            const string separator = "***************************************************************************";
-            var samples = new ISample[]
-            {
-                //                new ExplicitlySingleBenchmark(),
-                //                new ExplicitlyBenchmarkCompetition(),
-                new AttributesSample(),
-            };
-            foreach (var sample in samples)
-            {
-                var sampleName = sample.GetType().Name;
-                Console.WriteLine(separator);
-                Console.WriteLine("***** " + sampleName + " " + separator.Substring(7 + sampleName.Length));
-                Console.WriteLine(separator);
-                sample.Run();
-            }
+            var competitionSwitch = new BenchmarkCompetitionSwitch(new[] {
+                typeof(Trivial_SimpleSum),
+                typeof(Trivial_Increment),
+                typeof(Trivial_ShiftVsMultiply),
+                typeof(Jit_UnrollingArraySumLoop),
+                typeof(Jit_Inlining),
+                typeof(Jit_BoundsCheckingElimination),
+                typeof(Jit_MultidimensionalArrayAccess),
+                typeof(Cpu_MatrixMultiplication),
+                typeof(Cpu_InstructionLevelParallelism),
+                typeof(Framework_StringBuilder),
+                typeof(Framework_ForeachArray),
+                typeof(Framework_ForeachList),
+                typeof(Framework_SelectVsConvertAll),
+                typeof(Framework_StackFrameVsStackTrace),
+                typeof(Algo_BitCount)
+            });
+            competitionSwitch.Run(args);
         }
     }
 }

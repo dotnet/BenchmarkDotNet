@@ -1,32 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet
 {
-    public class Benchmark : IBenchmark
+    public class Benchmark
     {
-        public string Name { get; }
-        public Action Initialize { get; }
-        public Action Action { get; }
-        public Action Clean { get; }
-        public Dictionary<string, object> Settings { get; }
+        public BenchmarkTarget Target { get; }
+        public BenchmarkTask Task { get; }
 
-        public Benchmark(string name, Action initialize, Action action, Action clean, Dictionary<string, object> settings = null)
+        public string Caption => Target.Caption + "_" + Task.Configuration.Caption;
+        public string Description => $"{Target.Description} ({Task.Configuration.Caption}) [{Task.Settings.ToArgs()}]";
+
+        public Benchmark(BenchmarkTarget target, BenchmarkTask task)
         {
-            Name = name;
-            Initialize = initialize;
-            Action = action;
-            Clean = clean;
-            Settings = settings;
+            Target = target;
+            Task = task;
         }
 
-        public Benchmark(string name, Action action, Dictionary<string, object> settings = null)
+        public IEnumerable<BenchmarkProperty> Properties
         {
-            Name = name;
-            Initialize = null;
-            Action = action;
-            Clean = null;
-            Settings = settings;
+            get
+            {
+                foreach (var property in Target.Properties)
+                    yield return property;
+                foreach (var property in Task.Properties)
+                    yield return property;
+            }
         }
     }
 }

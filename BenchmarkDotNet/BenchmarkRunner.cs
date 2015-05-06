@@ -1,203 +1,178 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.IO;
 using System.Linq;
-using System.Threading;
-using BenchmarkDotNet.Helpers;
+using System.Reflection;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Logging;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Settings;
+using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet
 {
     public class BenchmarkRunner
     {
-        public BenchmarkRunner(IDictionary<string, object> defaultBenchmarkSettings, IEnumerable<IBenchmarkLogger> loggers)
+        public BenchmarkRunner(IEnumerable<IBenchmarkLogger> loggers)
         {
-            DefaultBenchmarkSettings = defaultBenchmarkSettings ?? new Dictionary<string, object>();
             Logger = new BenchmarkCompositeLogger(loggers.ToArray());
         }
 
-        public BenchmarkRunner(IDictionary<string, object> defaultBenchmarkSettings = null) :
-            this(defaultBenchmarkSettings, new[] { new BenchmarkConsoleLogger() })
+        public BenchmarkRunner() : this(new[] { new BenchmarkConsoleLogger() })
         {
         }
 
-        public IDictionary<string, object> DefaultBenchmarkSettings { get; }
         public IBenchmarkLogger Logger { get; }
 
-        public IEnumerable<IBenchmarkReport> RunCompetition(object benchmarkCompetition)
+        private readonly BenchmarkProjectGenerator benchmarkProjectGenerator = new BenchmarkProjectGenerator();
+
+        public IEnumerable<BenchmarkReport> RunCompetition(object benchmarkCompetition, BenchmarkSettings defaultSettings)
         {
-            return RunCompetition(ObjectToBenchmarkCompetitionConverter.Convert(benchmarkCompetition));
+            return RunCompetition(CompetitionToBenchmarks(benchmarkCompetition, defaultSettings).ToList());
         }
 
-        public IEnumerable<IBenchmarkReport> RunCompetition(IEnumerable<IBenchmark> benchmarks)
+        public IEnumerable<BenchmarkReport> RunCompetition(List<Benchmark> benchmarks)
         {
-            Logger.WriteLineHeader("####### Competition: Start   #######");
+            benchmarks.Sort((a, b) => string.Compare((a.Task.Configuration.Caption + a.Target.Caption), b.Task.Configuration.Caption + b.Target.Caption, StringComparison.Ordinal));
+            Logger.WriteLineHeader("// ***** Competition: Start   *****");
+            Logger.WriteLineInfo("// Found benchmarks:");
+            foreach (var benchmark in benchmarks)
+                Logger.WriteLineInfo($"//   {benchmark.Caption} {benchmark.Task.Settings.ToArgs()}");
             Logger.NewLine();
-            var reports = benchmarks.Select(Run).ToList();
-            Logger.WriteLineHeader("####### Competition: Results #######");
+
+            var importantPropertyNames = benchmarks.Select(b => b.Properties).GetImportantNames();
+
+            var reports = new List<BenchmarkReport>();
+            foreach (var benchmark in benchmarks)
+            {
+                var report = Run(benchmark, importantPropertyNames);
+                reports.Add(report);
+                var stat = new BenchmarkRunReportsStatistic("Target", report.Runs);
+                var values = stat.Values;
+                Logger.WriteLineResult($"Min={values.Min}; Max={values.Max}; Median={values.Median}; StdDev={values.StandardDeviation:0.00}");
+                Logger.NewLine();
+            }
+            Logger.WriteLineHeader("// ***** Competition: Finish  *****");
             Logger.NewLine();
-            Logger.WriteLineExtraInfo(EnvironmentHelper.GetFullEnvironmentInfo());
+            Logger.WriteLineInfo(EnvironmentHelper.GetFullEnvironmentInfo(false));
             var reportStats = reports.Select(
                 r => new
                 {
-                    r.Benchmark.Name,
-                    Stat = new BenchmarkRunReportsStatistic("Target", r.Target)
+                    r.Benchmark,
+                    Stat = new BenchmarkRunReportsStatistic("Target", r.Runs)
                 }).ToList();
-            reportStats.Sort((a, b) => Math.Sign(a.Stat.Ticks.Median - b.Stat.Ticks.Median));
-            var nameLength = reportStats.Max(r => r.Name.Length);
-            var msLength = reportStats.Max(r => r.Stat.Milliseconds.Median.GetStrLength());
-            var tickLength = reportStats.Max(r => r.Stat.Ticks.Median.GetStrLength());
-            var stdDevLength = reportStats.Max(r => ((int)Math.Round(r.Stat.Milliseconds.StandardDeviation)).GetStrLength());
-            var place = 1;
-            for (int i = 0; i < reportStats.Count; i++)
+            var table = new List<string[]> { new[] { "Type", "Method", "Mode", "Platform", "Jit", ".NET", "Value", "StdDev" } };
+            foreach (var reportStat in reportStats)
             {
-                var reportStat = reportStats[i];
-                if (i > 0 && reportStats[i - 1].Stat.Milliseconds.Max < reportStats[i].Stat.Milliseconds.Min)
-                    place++;
-                Logger.WriteLineStatistic(
-                    "{0} : {1}ms {2} ticks [Error = {3:00.00}%, StdDev = {4:0}ms] / Place #{5}",
-                    reportStat.Name.PadRight(nameLength),
-                    reportStat.Stat.Milliseconds.Median.ToInvariantString().PadLeft(msLength),
-                    reportStat.Stat.Ticks.Median.ToInvariantString().PadLeft(tickLength),
-                    reportStat.Stat.Milliseconds.Error * 100,
-                    ((int)Math.Round(reportStat.Stat.Milliseconds.StandardDeviation)).ToInvariantString().PadLeft(stdDevLength),
-                    place);
+                var b = reportStat.Benchmark;
+                string[] row = {
+                    b.Target.Type.Name,
+                    b.Target.Method.Name,
+                    b.Task.Configuration.Mode.ToString(),
+                    b.Task.Configuration.Platform.ToString(),
+                    b.Task.Configuration.JitVersion.ToString(),
+                    b.Task.Configuration.Framework.ToString(),
+                    reportStat.Stat.Values.Median.ToInvariantString() + reportStat.Stat.Unit,
+                    ((int)Math.Round(reportStat.Stat.Values.StandardDeviation)).ToInvariantString() + reportStat.Stat.Unit
+                };
+                table.Add(row);
             }
+            PrintTable(table);
             Logger.NewLine();
-            Logger.WriteLineHeader("####### Competition: End     #######");
+            Logger.WriteLineHeader("// ***** Competition: End *****");
             return reports;
         }
 
-        public IBenchmarkReport Run(IBenchmark benchmark)
+        private void PrintTable(List<string[]> table)
         {
-            Logger.WriteLineHeader("***** " + benchmark.Name + ": start *****");
-            Logger.WriteLineExtraInfo(EnvironmentHelper.GetFullEnvironmentInfo());
-            var settings = BenchmarkSettingsHelper.Union(benchmark.Settings, DefaultBenchmarkSettings);
-            Logger.WriteLineHeader("Settings:");
-            foreach (var setting in settings)
-                Logger.WriteLineExtraInfo("  {0} = {1}", setting.Key, setting.Value);
-            var hasInitialize = benchmark.Initialize != null;
-            var hasClean = benchmark.Clean != null;
-            if (hasInitialize || hasClean)
+            int rowCount = table.Count, colCount = table[0].Length;
+            int[] widths = new int[colCount];
+            bool[] areSame = new bool[colCount];
+            for (int colIndex = 0; colIndex < colCount; colIndex++)
             {
-                Logger.WriteLineHeader("Additional:");
-                if (hasInitialize)
-                    Logger.WriteLineExtraInfo(" Initialize action");
-                if (hasClean)
-                    Logger.WriteLineExtraInfo(" Clean action");
-            }
-            var processorAffinity = BenchmarkSettings.ProcessorAffinity.Get(settings);
-            var highPriority = BenchmarkSettings.HighPriority.Get(settings);
-            using (new BenchmarkScope(processorAffinity, highPriority))
-            {
-                IList<IBenchmarkRunReport> warmUp = new IBenchmarkRunReport[0];
-                var maxWarmUpIterationCount = BenchmarkSettings.MaxWarmUpIterationCount.Get(settings);
-                var targetIterationCount = BenchmarkSettings.TargetIterationCount.Get(settings);
-
-                benchmark.Initialize?.Invoke();
-                if (maxWarmUpIterationCount > 0)
-                    warmUp = Run("WarmUp", benchmark.Action, maxWarmUpIterationCount, settings, StopWarmUpPredicate);
-                var target = Run("Target", benchmark.Action, targetIterationCount, settings);
-                benchmark.Clean?.Invoke();
-
-                Logger.WriteLineHeader("***** " + benchmark.Name + ": end *****");
-                Logger.NewLine();
-                return new BenchmarkReport(benchmark, warmUp, target);
-            }
-        }
-
-        private IList<IBenchmarkRunReport> Run(
-            string name,
-            Action action,
-            uint iterationCount,
-            IDictionary<string, object> settings,
-            Func<IList<IBenchmarkRunReport>, IDictionary<string, object>, bool> stopPredicate = null)
-        {
-            var detailedMode = BenchmarkSettings.DetailedMode.Get(settings);
-            var autoGcCollect = BenchmarkSettings.AutoGcCollect.Get(settings);
-            Logger.WriteLineHeader(name + ":");
-            var runReports = new List<IBenchmarkRunReport>();
-            var stopwatch = new Stopwatch();
-            for (int i = 0; i < iterationCount; i++)
-            {
-                if (autoGcCollect)
-                    GcCollect();
-
-                stopwatch.Reset();
-                stopwatch.Start();
-                action();
-                stopwatch.Stop();
-
-                var runReport = new BenchmarkRunReport(stopwatch);
-                runReports.Add(runReport);
-                BenchmarkReportHelper.LogRunReport(Logger, runReport);
-                if (stopPredicate != null && stopPredicate(runReports, settings))
-                    break;
-            }
-            var statistic = new BenchmarkRunReportsStatistic(name, runReports);
-            BenchmarkReportHelper.Log(Logger, statistic, detailedMode);
-            Logger.NewLine();
-            return runReports;
-        }
-
-        private static bool StopWarmUpPredicate(IList<IBenchmarkRunReport> runList, IDictionary<string, object> settings)
-        {
-            var warmUpIterationCount = BenchmarkSettings.WarmUpIterationCount.Get(settings);
-            var maxWarmUpError = BenchmarkSettings.MaxWarmUpError.Get(settings);
-            if (runList.Count < warmUpIterationCount)
-                return false;
-            var lastRuns = runList.TakeLast(5).ToList();
-            var lastRunsStatistic = new BenchmarkRunReportsStatistic("", lastRuns);
-            var lastRunsError = lastRunsStatistic.Ticks.Error;
-            return lastRunsError < maxWarmUpError;
-        }
-
-        private void GcCollect()
-        {
-            try
-            {
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                GC.Collect();
-            }
-            catch (AccessViolationException)
-            {
-                Logger.WriteError("AccessViolationException during GC.Collect()");
-            }
-        }
-
-        protected static long PreparedEnvironmentTickCount { get; set; }
-
-        private class BenchmarkScope : IDisposable
-        {
-            private readonly IntPtr originalProcessorAffinity;
-            private readonly ProcessPriorityClass originalProcessPriorityClass;
-            private readonly ThreadPriority originalThreadPriority;
-
-            public BenchmarkScope(uint processorAffinity, bool highPriority)
-            {
-                PreparedEnvironmentTickCount = Environment.TickCount; // Prevents the JIT Compiler from optimizing Fkt calls away
-
-                originalProcessorAffinity = Process.GetCurrentProcess().ProcessorAffinity;
-                originalProcessPriorityClass = Process.GetCurrentProcess().PriorityClass;
-                originalThreadPriority = Thread.CurrentThread.Priority;
-
-                Process.GetCurrentProcess().ProcessorAffinity = new IntPtr(processorAffinity);
-                if (highPriority)
+                areSame[colIndex] = rowCount > 2 && colIndex < colCount - 2;
+                for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
                 {
-                    Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
-                    Thread.CurrentThread.Priority = ThreadPriority.Highest;
+                    widths[colIndex] = Math.Max(widths[colIndex], table[rowIndex][colIndex].Length + 1);
+                    if (rowIndex > 1 && table[rowIndex][colIndex] != table[1][colIndex])
+                        areSame[colIndex] = false;
                 }
             }
-
-            public void Dispose()
+            if (areSame.Any(s => s))
             {
-                Process.GetCurrentProcess().ProcessorAffinity = originalProcessorAffinity;
-                Process.GetCurrentProcess().PriorityClass = originalProcessPriorityClass;
-                Thread.CurrentThread.Priority = originalThreadPriority;
+                Logger.WriteStatistic("Common:  ");
+                for (int colIndex = 0; colIndex < colCount; colIndex++)
+                    if (areSame[colIndex])
+                        Logger.WriteStatistic($"{table[0][colIndex]}={table[1][colIndex]}  ");
+                Logger.NewLine();
+                Logger.NewLine();
             }
+
+            table.Insert(1, widths.Select(w => new string('-', w)).ToArray());
+            foreach (var row in table)
+            {
+                for (int colIndex = 0; colIndex < colCount; colIndex++)
+                    if (!areSame[colIndex])
+                        Logger.WriteStatistic(row[colIndex].PadLeft(widths[colIndex], ' ') + " |");
+                Logger.NewLine();
+            }
+        }
+
+        public BenchmarkReport Run(Benchmark benchmark, IList<string> importantPropertyNames)
+        {
+            Logger.WriteLineHeader("// **************************");
+            Logger.WriteLineHeader("// Benchmark: " + benchmark.Description);
+            var directoryPath = benchmarkProjectGenerator.GenerateProject(benchmark);
+            Logger.WriteLineInfo("// Generated project: " + directoryPath);
+            Logger.NewLine();
+            Logger.WriteLineInfo("// Build:");
+            benchmarkProjectGenerator.CompileCode(directoryPath);
+            Logger.NewLine();
+            var runtimeInstanceCount = Math.Max(1, benchmark.Task.RunCount);
+            var runReports = new List<BenchmarkRunReport>();
+            var exeFileName = Path.Combine(directoryPath, "Program.exe");
+            for (int i = 0; i < runtimeInstanceCount; i++)
+            {
+                Logger.WriteLineInfo($"// Run ({i + 1} of {runtimeInstanceCount})");
+                if (importantPropertyNames.Any())
+                {
+                    Logger.WriteInfo("// ");
+                    foreach (var name in importantPropertyNames)
+                        Logger.WriteInfo($"{name}={benchmark.Properties.GetValue(name)} ");
+                    Logger.NewLine();
+                }
+
+                var executor = new BenchmarkExecutor(Logger);
+                var lines = executor.Exec(exeFileName, benchmark.Task.Settings.ToArgs());
+                var iterRunReports = lines.Select(BenchmarkRunReport.Parse).ToList();
+                runReports.AddRange(iterRunReports);
+            }
+            Logger.NewLine();
+            return new BenchmarkReport(benchmark, runReports);
+        }
+
+        public static IEnumerable<Benchmark> CompetitionToBenchmarks(object competition, BenchmarkSettings defaultSettings)
+        {
+            var targetType = competition.GetType();
+            var methods = targetType.GetMethods();
+            for (int i = 0; i < methods.Length; i++)
+            {
+                var methodInfo = methods[i];
+                var benchmarkAttribute = methodInfo.ResolveAttribute<BenchmarkAttribute>();
+                if (benchmarkAttribute != null)
+                {
+                    var target = new BenchmarkTarget(targetType, methodInfo, benchmarkAttribute.Description);
+                    AssertBenchmarkMethodHasCorrectSignature(methodInfo);
+                    foreach (var task in BenchmarkTask.Resolve(methodInfo, defaultSettings))
+                        yield return new Benchmark(target, task);
+                }
+            }
+        }
+
+        private static void AssertBenchmarkMethodHasCorrectSignature(MethodInfo methodInfo)
+        {
+            if (methodInfo.GetParameters().Any())
+                throw new InvalidOperationException($"Benchmark method {methodInfo.Name} has incorrect signature.\nMethod shouldn't have any arguments.");
         }
     }
 }

@@ -1,126 +1,67 @@
-**BenchmarkDotNet:** Lightweight .NET-framework for benchmarks.
+**BenchmarkDotNet** is a lightweight .NET library for benchmarking. You can install BenchmarkDotNet via [NuGet package](https://www.nuget.org/packages/BenchmarkDotNet/).
 
-You can install BenchmarkDotNet via [NuGet package](https://www.nuget.org/packages/BenchmarkDotNet/).
+## Features
+* BenchmarkDotNet creates an isolated project for each benchmark method and run it in a separate runtime.
+* You can create benchmark tasks for running your benchmark with different CLR version, JIT version, platform version, and so on.
+* BenchmarkDotNet makes warmup of your code, then runs it several times, calculates statistic, and tries to eliminate some runtime side-effects.
 
-**Benchmarks:** Simple benchmark program runner.
+## An example
 
-    Usage: Benchmarks <programs-names> [<arguments>]
-    Arguments:
-      -a, --all
-          Run all available programs
-      -d, --details
-          Show detailed results
-      -rc=<n>, --result-count=<n>
-          Result set iteration count
-      -wc=<n>, --warmup-count=<n>
-          WarmUp set default iteration count
-      -mwc=<n>, --max-warmup-count=<n>
-          WarmUp set max iteration count
-      -mwe=<n>, --max-warmup-error=<n>
-          Max permissible error (in percent) as condition for finishing of WarmUp
-      -pb=<false|true>, --print-benchmark=<false|true>
-          Printing the report of each benchmark to the console
-      -pa=<n>, --processor-affinity=<n>
-          ProcessorAffinity
-      -dw, --disable-warmup
-          Disable WarmUp, equivalent of -mwc=0
-      -s, --single
-          Single result benchmark without WarmUp, equivalent of -mwc=0 -rc=1
-      -of=<filename>, --output-file=<filename>
-          Save results of benchmark competition to file
+Source:
 
-Benchmark program example:
+```cs
+[Task(mode: BenchmarkMode.SingleRun, platform: BenchmarkPlatform.X86)]
+[Task(mode: BenchmarkMode.SingleRun, platform: BenchmarkPlatform.X64)]
+[Task(mode: BenchmarkMode.SingleRun, platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
+public class Cpu_InstructionLevelParallelism
+{
+    private const int IterationCount = 400000001;
 
-    public class IncrementProgram
+    private readonly int[] a = new int[4];
+
+    [Benchmark]
+    public int[] Parallel()
     {
-        public void Run()
+        for (int iteration = 0; iteration < IterationCount; iteration++)
         {
-            var competition = new BenchmarkCompetition();
-            competition.AddTask("i++", () => After());
-            competition.AddTask("++i", () => Before());
-            competition.Run();
+            a[0]++;
+            a[1]++;
+            a[2]++;
+            a[3]++;
         }
-
-        private const int IterationCount = 2000000000;
-
-        public static int After()
-        {
-            int counter = 0;
-            for (int i = 0; i < IterationCount; i++)
-                counter++;
-            return counter;
-        }
-
-        public static int Before()
-        {
-            int counter = 0;
-            for (int i = 0; i < IterationCount; ++i)
-                ++counter;
-            return counter;
-        }
+        return a;
     }
 
-Usage example:
+    [Benchmark]
+    public int[] Sequential()
+    {
+        for (int iteration = 0; iteration < IterationCount; iteration++)
+            a[0]++;
+        for (int iteration = 0; iteration < IterationCount; iteration++)
+            a[1]++;
+        for (int iteration = 0; iteration < IterationCount; iteration++)
+            a[2]++;
+        for (int iteration = 0; iteration < IterationCount; iteration++)
+            a[3]++;
+        return a;
+    }
+}
 
-    Benchmarks.exe Increment --details
+new BenchmarkRunner().RunCompetition(new Cpu_InstructionLevelParallelism());
+```
 
-Result example:
+Result:
 
-    Target program: Increment
-    BenchmarkCompetition: start
-
-    ***** i++: start *****
-    WarmUp:
-    Ticks: 495926 ms: 231
-    Ticks: 494928 ms: 230
-    Ticks: 495826 ms: 231
-    Ticks: 495682 ms: 231
-    Ticks: 495454 ms: 231
-    TickStats: Min=494928, Max=495926, Med=495682, StdDev=355, Err=00.20%
-    MsStats: Min=230, Max=231, Med=231, StdDev=0.40
-
-    Result:
-    Ticks: 496039 ms: 231
-    Ticks: 494509 ms: 230
-    Ticks: 495990 ms: 231
-    Ticks: 497172 ms: 231
-    Ticks: 498618 ms: 232
-    Ticks: 496355 ms: 231
-    Ticks: 494009 ms: 230
-    Ticks: 494197 ms: 230
-    Ticks: 494269 ms: 230
-    Ticks: 494556 ms: 230
-    TickStats: Min=494009, Max=498618, Med=495273, StdDev=1450, Err=00.93%
-    MsStats: Min=230, Max=232, Med=230, StdDev=0.66
-    ***** i++: end *****
-
-    ***** ++i: start *****
-    WarmUp:
-    Ticks: 497367 ms: 232
-    Ticks: 494100 ms: 230
-    Ticks: 494443 ms: 230
-    Ticks: 495531 ms: 231
-    Ticks: 494104 ms: 230
-    TickStats: Min=494100, Max=497367, Med=494443, StdDev=1245, Err=00.66%
-    MsStats: Min=230, Max=232, Med=230, StdDev=0.80
-
-    Result:
-    Ticks: 521387 ms: 243
-    Ticks: 494761 ms: 230
-    Ticks: 493923 ms: 230
-    Ticks: 495095 ms: 230
-    Ticks: 495012 ms: 230
-    Ticks: 495339 ms: 231
-    Ticks: 495084 ms: 230
-    Ticks: 496295 ms: 231
-    Ticks: 496313 ms: 231
-    Ticks: 496413 ms: 231
-    TickStats: Min=493923, Max=521387, Med=495217, StdDev=7844, Err=05.56%
-    MsStats: Min=230, Max=243, Med=230, StdDev=3.80
-    ***** ++i: end *****
-
-    BenchmarkCompetition: finish
-
-    Competition results:
-    i++ : 230ms 495273 ticks [Error = 00.93%, StdDev = 0.66]
-    ++i : 230ms 495217 ticks [Error = 05.56%, StdDev = 3.80]
+	// BenchmarkDotNet=v0.7.0.0
+	// OS=Microsoft Windows NT 6.2.9200.0
+	// Processor=Intel(R) Core(TM) i7-4702MQ CPU @ 2.20GHz, ProcessorCount=8
+	Common:  Type=Cpu_InstructionLevelParallelism  Mode=SingleRun  .NET=V40
+	
+	     Method | Platform |       Jit |  Value | StdDev |
+	----------- |--------- |---------- |------- |------- |
+	   Parallel |      X64 | LegacyJit |  843ms |    1ms |
+	 Sequential |      X64 | LegacyJit | 3913ms |    4ms |
+	   Parallel |      X64 |    RyuJit |  994ms |    2ms |
+	 Sequential |      X64 |    RyuJit | 3391ms |    4ms |
+	   Parallel |      X86 | LegacyJit | 1444ms |    3ms |
+	 Sequential |      X86 | LegacyJit | 4171ms |   25ms |

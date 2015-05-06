@@ -3,17 +3,17 @@ using System.Linq;
 
 namespace BenchmarkDotNet.Reports
 {
-    internal sealed class BenchmarkRunReportsStatistic : IBenchmarkRunReportsStatistic
+    public sealed class BenchmarkRunReportsStatistic
     {
         public string Name { get; }
-        public IBenchmarkMeasurementStatistic Ticks { get; }
-        public IBenchmarkMeasurementStatistic Milliseconds { get; }
+        public BenchmarkMeasurementStatistic Values { get; }
+        public string Unit { get; }
 
-        public BenchmarkRunReportsStatistic(string name, IList<IBenchmarkRunReport> runReports)
+        public BenchmarkRunReportsStatistic(string name, IList<BenchmarkRunReport> runReports)
         {
             Name = name;
-            Ticks = new BenchmarkMeasurementStatistic("Ticks", runReports.Select(r => r.Ticks).ToArray());
-            Milliseconds = new BenchmarkMeasurementStatistic("Ms", runReports.Select(r => r.Milliseconds).ToArray());
+            Values = new BenchmarkMeasurementStatistic("Values", runReports.Select(r => r.Value).ToArray());
+            Unit = runReports.FirstOrDefault()?.Unit ?? "Undef";
         }
     }
 }

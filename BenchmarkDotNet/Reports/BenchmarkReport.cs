@@ -2,17 +2,15 @@ using System.Collections.Generic;
 
 namespace BenchmarkDotNet.Reports
 {
-    internal sealed class BenchmarkReport : IBenchmarkReport
+    public sealed class BenchmarkReport
     {
-        public IBenchmark Benchmark { get; }
-        public IList<IBenchmarkRunReport> WarmUp { get; }
-        public IList<IBenchmarkRunReport> Target { get; }
+        public Benchmark Benchmark { get; }
+        public IList<BenchmarkRunReport> Runs { get; }
 
-        public BenchmarkReport(IBenchmark benchmark, IList<IBenchmarkRunReport> warmUp, IList<IBenchmarkRunReport> target)
+        public BenchmarkReport(Benchmark benchmark, IList<BenchmarkRunReport> runs)
         {
             Benchmark = benchmark;
-            WarmUp = warmUp;
-            Target = target;
+            Runs = runs;
         }
     }
 }

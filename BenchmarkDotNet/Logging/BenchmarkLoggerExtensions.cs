@@ -36,9 +36,9 @@ namespace BenchmarkDotNet.Logging
             logger.WriteLine(BenchmarkLogKind.Statistic, format, args);
         }
 
-        public static void WriteLineExtraInfo(this IBenchmarkLogger logger, string format, params object[] args)
+        public static void WriteLineInfo(this IBenchmarkLogger logger, string format, params object[] args)
         {
-            logger.WriteLine(BenchmarkLogKind.ExtraInfo, format, args);
+            logger.WriteLine(BenchmarkLogKind.Info, format, args);
         }
 
         public static void WriteLineError(this IBenchmarkLogger logger, string format, params object[] args)
@@ -75,9 +75,9 @@ namespace BenchmarkDotNet.Logging
             logger.Write(BenchmarkLogKind.Statistic, format, args);
         }
 
-        public static void WriteExtraInfo(this IBenchmarkLogger logger, string format, params object[] args)
+        public static void WriteInfo(this IBenchmarkLogger logger, string format, params object[] args)
         {
-            logger.Write(BenchmarkLogKind.ExtraInfo, format, args);
+            logger.Write(BenchmarkLogKind.Info, format, args);
         }
 
         public static void WriteError(this IBenchmarkLogger logger, string format, params object[] args)

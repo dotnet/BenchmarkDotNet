@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BenchmarkDotNet.Samples</RootNamespace>
     <AssemblyName>BenchmarkDotNet.Samples</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -33,6 +33,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>6</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -43,12 +44,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AttributesSampleCompetition.cs" />
-    <Compile Include="ExplicitlyBenchmarkCompetition.cs" />
-    <Compile Include="ExplicitlySingleBenchmarkSample.cs" />
-    <Compile Include="ISample.cs" />
+    <Compile Include="Algo_BitCount.cs" />
+    <Compile Include="Cpu_InstructionLevelParallelism.cs" />
+    <Compile Include="Framework_ForeachList.cs" />
+    <Compile Include="Framework_ForeachArray.cs" />
+    <Compile Include="Jit_BoundsCheckingElimination.cs" />
+    <Compile Include="Cpu_MatrixMultiplication.cs" />
+    <Compile Include="Jit_Inlining.cs" />
+    <Compile Include="Jit_MultidimensionalArrayAccess.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Jit_UnrollingArraySumLoop.cs" />
+    <Compile Include="Framework_SelectVsConvertAll.cs" />
+    <Compile Include="Framework_StackFrameVsStackTrace.cs" />
+    <Compile Include="Trivial_Increment.cs" />
+    <Compile Include="Trivial_ShiftVsMultiply.cs" />
+    <Compile Include="Trivial_SimpleSum.cs" />
+    <Compile Include="Framework_StringBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj">

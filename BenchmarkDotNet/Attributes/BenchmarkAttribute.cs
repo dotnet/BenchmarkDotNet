@@ -9,11 +9,11 @@ namespace BenchmarkDotNet.Attributes
         {
         }
 
-        public BenchmarkAttribute(string name)
+        public BenchmarkAttribute(string description)
         {
-            Name = name;
+            Description = description;
         }
 
-        public string Name { get; set; }
+        public string Description { get; set; }
     }
 }

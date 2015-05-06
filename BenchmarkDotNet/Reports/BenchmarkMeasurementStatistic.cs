@@ -1,8 +1,9 @@
 ﻿using System.Linq;
+using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Reports
 {
-    internal sealed class BenchmarkMeasurementStatistic : IBenchmarkMeasurementStatistic
+    public sealed class BenchmarkMeasurementStatistic
     {
         public string Name { get; }
         public long Min { get; }
