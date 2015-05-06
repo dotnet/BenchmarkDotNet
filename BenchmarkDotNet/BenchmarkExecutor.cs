@@ -34,7 +34,16 @@ namespace BenchmarkDotNet
                     }
                     if (process.HasExited && process.ExitCode != 0)
                     {
-                        Logger.WriteError($"Something bad happens during starting execution of {exeName}. Try to run becnhmark using AnyCPU application");
+                        if (Logger != null)
+                        {
+                            Logger.WriteError(
+                                $"Something bad happens during starting execution of {exeName}. Try to run becnhmark using AnyCPU application");
+                        }
+                        else
+                        {
+                            if (exeName.ToLowerInvariant() == "msbuild")
+                                Console.WriteLine("Build failed");
+                        }
                         return new string[0];
                     }
                 }

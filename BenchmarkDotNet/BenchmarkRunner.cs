@@ -143,17 +143,20 @@ namespace BenchmarkDotNet
                 }
 
                 var executor = new BenchmarkExecutor(Logger);
-                var lines = executor.Exec(exeFileName, benchmark.Task.Settings.ToArgs());
-                var iterRunReports = lines.Select(BenchmarkRunReport.Parse).ToList();
-                runReports.AddRange(iterRunReports);
+                if (File.Exists(exeFileName))
+                {
+                    var lines = executor.Exec(exeFileName, benchmark.Task.Settings.ToArgs());
+                    var iterRunReports = lines.Select(BenchmarkRunReport.Parse).ToList();
+                    runReports.AddRange(iterRunReports);
+                }
             }
             Logger.NewLine();
             return new BenchmarkReport(benchmark, runReports);
         }
-       
+
         private static IEnumerable<Benchmark> CompetitionToBenchmarks(object competition, BenchmarkSettings defaultSettings)
-        {            
-            if (defaultSettings == null) 
+        {
+            if (defaultSettings == null)
                 defaultSettings = BenchmarkSettings.CreateDefault();
             var targetType = competition.GetType();
             var methods = targetType.GetMethods();
