@@ -1,0 +1,29 @@
+        private $TargetMethodReturnType$ value;
+		
+		public void RunBenchmark(BenchmarkSettings settings)
+        {
+            var stopwatch = new Stopwatch();
+            
+			$TargetMethod$();
+            for (int i = 0; i < settings.WarmupIterationCount; i++)
+            {
+                Console.Write("// Warmup " + (i + 1) + ":");
+                stopwatch.Start();
+                value = $TargetMethod$();
+                stopwatch.Stop();
+                Console.WriteLine(stopwatch.ElapsedMilliseconds + " ms");
+                stopwatch.Reset();
+                BenchmarkGcCollect();
+            }
+			$TargetMethod$();
+            for (int i = 0; i < settings.TargetIterationCount; i++)
+            {
+                Console.Write("Target " + (i + 1) + ":");
+                stopwatch.Start();
+                value = $TargetMethod$();
+                stopwatch.Stop();
+                Console.WriteLine(stopwatch.ElapsedMilliseconds + " ms");
+                stopwatch.Reset();
+                BenchmarkGcCollect();
+            }
+        }
