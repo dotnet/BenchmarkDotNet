@@ -1,60 +1,43 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet.Samples
 {
-    [Task(
-     mode: BenchmarkMode.SingleRun,
-     platform: BenchmarkPlatform.X86)]
-    [Task(
-     mode: BenchmarkMode.SingleRun,
-     platform: BenchmarkPlatform.X64,
-     jitVersion: BenchmarkJitVersion.LegacyJit)]
-    [Task(
-     mode: BenchmarkMode.SingleRun,
-     platform: BenchmarkPlatform.X64,
-     jitVersion: BenchmarkJitVersion.RyuJit)]
+    // See: http://en.wikipedia.org/wiki/Instruction-level_parallelism
+    [Task(mode: BenchmarkMode.SingleRun, platform: BenchmarkPlatform.X86)]
+    [Task(mode: BenchmarkMode.SingleRun, platform: BenchmarkPlatform.X64)]
+    [Task(mode: BenchmarkMode.SingleRun, platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
     public class Cpu_InstructionLevelParallelism
     {
-        private const int N = 10000, IterationCount = 40001;
+        private const int IterationCount = 40000001;
 
-        private readonly int[] a = new int[N];
+        private readonly int[] a = new int[4];
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private int MaxImplementation(int n)
+        [Benchmark]
+        public int[] Parallel()
         {
-            var max = int.MinValue;
             for (int iteration = 0; iteration < IterationCount; iteration++)
-                for (int i = 0; i < n; i++)
-                    max = Math.Max(a[i], max);
-            return max;
-        }
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private int MaxEvenOddImplementation(int n)
-        {
-            int maxEven = int.MinValue, maxOdd = int.MinValue;
-            for (int iteration = 0; iteration < IterationCount; iteration++)
-                for (int i = 0; i < n; i += 2)
-                {
-                    maxEven = Math.Max(a[i], maxEven);
-                    maxOdd = Math.Max(a[i + 1], maxOdd);
-                }
-            return Math.Max(maxEven, maxOdd);
+            {
+                a[0]++;
+                a[1]++;
+                a[2]++;
+                a[3]++;
+            }
+            return a;
         }
 
         [Benchmark]
-        public int Max()
+        public int[] Sequential()
         {
-            return MaxImplementation(N);
-        }
-
-        [Benchmark]
-        public int MaxEvenOdd()
-        {
-            return MaxEvenOddImplementation(N);
+            for (int iteration = 0; iteration < IterationCount; iteration++)
+                a[0]++;
+            for (int iteration = 0; iteration < IterationCount; iteration++)
+                a[1]++;
+            for (int iteration = 0; iteration < IterationCount; iteration++)
+                a[2]++;
+            for (int iteration = 0; iteration < IterationCount; iteration++)
+                a[3]++;
+            return a;
         }
     }
 }
