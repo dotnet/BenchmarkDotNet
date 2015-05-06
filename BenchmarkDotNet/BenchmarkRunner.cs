@@ -90,7 +90,7 @@ namespace BenchmarkDotNet
             bool[] areSame = new bool[colCount];
             for (int colIndex = 0; colIndex < colCount; colIndex++)
             {
-                areSame[colIndex] = rowCount > 2;
+                areSame[colIndex] = rowCount > 2 && colIndex < colCount - 2;
                 for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
                 {
                     widths[colIndex] = Math.Max(widths[colIndex], table[rowIndex][colIndex].Length + 1);

@@ -3,6 +3,8 @@ using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet.Samples
 {
+    // See http://en.wikipedia.org/wiki/Inline_expansion
+    // See http://aakinshin.net/en/blog/dotnet/inlining-and-starg/
     [Task(platform: BenchmarkPlatform.X86)]
     [Task(platform: BenchmarkPlatform.X64)]
     [Task(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]

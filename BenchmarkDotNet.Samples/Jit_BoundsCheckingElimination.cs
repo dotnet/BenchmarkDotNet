@@ -4,7 +4,7 @@ using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet.Samples
 {
-    // Bounds-checking elimination
+    // See http://en.wikipedia.org/wiki/Bounds-checking_elimination
     [Task(platform: BenchmarkPlatform.X86)]
     [Task(platform: BenchmarkPlatform.X64)]
     [Task(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]

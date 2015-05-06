@@ -1,8 +1,61 @@
 ﻿using System;
 using BenchmarkDotNet.Attributes;
 
-namespace Benchmarks
+namespace BenchmarkDotNet.Samples
 {
+    // See http://en.wikipedia.org/wiki/Hamming_weight
+    public class Algo_BitCount
+    {
+        private const int IterationCount = 100001;
+        private const int ArrayLength = 1001;
+        private readonly ulong[] numbers;
+        private readonly Random random = new Random(42);
+
+        public ulong NextUInt64()
+        {
+            var buffer = new byte[sizeof(long)];
+            random.NextBytes(buffer);
+            return BitConverter.ToUInt64(buffer, 0);
+        }
+
+        public Algo_BitCount()
+        {
+            numbers = new ulong[ArrayLength];
+            for (int i = 0; i < ArrayLength; i++)
+                numbers[i] = NextUInt64();
+        }
+
+        [Benchmark]
+        public int PopCount1()
+        {
+            int counter = 0;
+            for (int i = 0; i < IterationCount; i++)
+                for (int j = 0; j < ArrayLength; j++)
+                    counter += BitCountHelper.PopCount1(numbers[j]);
+            return counter;
+        }
+
+        [Benchmark]
+        public int PopCount2()
+        {
+            int counter = 0;
+            for (int i = 0; i < IterationCount; i++)
+                for (int j = 0; j < ArrayLength; j++)
+                    counter += BitCountHelper.PopCount2(numbers[j]);
+            return counter;
+        }
+
+        [Benchmark]
+        public int PopCount3()
+        {
+            int counter = 0;
+            for (int i = 0; i < IterationCount; i++)
+                for (int j = 0; j < ArrayLength; j++)
+                    counter += BitCountHelper.PopCount3(numbers[j]);
+            return counter;
+        }
+    }
+
     /// <summary>
     /// The original code was taken from Wikipedia
     /// http://en.wikipedia.org/wiki/Hamming_weight
@@ -55,58 +108,6 @@ namespace Benchmarks
             x = (x & m2) + ((x >> 2) & m2); //put count of each 4 bits into those 4 bits 
             x = (x + (x >> 4)) & m4;        //put count of each 8 bits into those 8 bits 
             return (int)((x * h01) >> 56);  //returns left 8 bits of x + (x<<8) + (x<<16) + (x<<24) + ... 
-        }
-    }
-
-    public class Algo_BitCount
-    {
-        private const int IterationCount = 100001;
-        private const int ArrayLength = 1001;
-        private readonly ulong[] numbers;
-        private readonly Random random = new Random(42);
-
-        public ulong NextUInt64()
-        {
-            var buffer = new byte[sizeof(long)];
-            random.NextBytes(buffer);
-            return BitConverter.ToUInt64(buffer, 0);
-        }
-
-        public Algo_BitCount()
-        {
-            numbers = new ulong[ArrayLength];
-            for (int i = 0; i < ArrayLength; i++)
-                numbers[i] = NextUInt64();
-        }
-
-        [Benchmark]
-        public int PopCount1()
-        {
-            int counter = 0;
-            for (int i = 0; i < IterationCount; i++)
-                for (int j = 0; j < ArrayLength; j++)
-                    counter += BitCountHelper.PopCount1(numbers[j]);
-            return counter;
-        }
-
-        [Benchmark]
-        public int PopCount2()
-        {
-            int counter = 0;
-            for (int i = 0; i < IterationCount; i++)
-                for (int j = 0; j < ArrayLength; j++)
-                    counter += BitCountHelper.PopCount2(numbers[j]);
-            return counter;
-        }
-
-        [Benchmark]
-        public int PopCount3()
-        {
-            int counter = 0;
-            for (int i = 0; i < IterationCount; i++)
-                for (int j = 0; j < ArrayLength; j++)
-                    counter += BitCountHelper.PopCount3(numbers[j]);
-            return counter;
         }
     }
 }

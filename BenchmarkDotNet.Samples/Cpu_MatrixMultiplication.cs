@@ -3,6 +3,7 @@ using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet.Samples
 {
+    // See http://en.wikipedia.org/wiki/Matrix_multiplication_algorithm#Cache_behavior
     [Task(platform: BenchmarkPlatform.X86)]
     [Task(platform: BenchmarkPlatform.X64)]
     [Task(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]

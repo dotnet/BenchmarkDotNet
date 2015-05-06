@@ -3,25 +3,18 @@ using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet.Samples
 {
-    [Task(
-         mode: BenchmarkMode.SingleRun,
-         platform: BenchmarkPlatform.X86)]
-    [Task(
-         mode: BenchmarkMode.SingleRun,
-         platform: BenchmarkPlatform.X64,
-         jitVersion: BenchmarkJitVersion.LegacyJit)]
-    [Task(
-         mode: BenchmarkMode.SingleRun,
-         platform: BenchmarkPlatform.X64,
-         jitVersion: BenchmarkJitVersion.RyuJit)]
-    public class Jit_LoopUnrolling
+    // See: http://en.wikipedia.org/wiki/Loop_unrolling
+    [Task(mode: BenchmarkMode.SingleRun, platform: BenchmarkPlatform.X86)]
+    [Task(mode: BenchmarkMode.SingleRun, platform: BenchmarkPlatform.X64)]
+    [Task(mode: BenchmarkMode.SingleRun, platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
+    public class Jit_UnrollingArraySumLoop
     {
         private const int NUnroll = 1000, N = 1001, IterationCount = 1000000;
 
         private readonly int[] nonStaticField;
         private static int[] staticField;
 
-        public Jit_LoopUnrolling()
+        public Jit_UnrollingArraySumLoop()
         {
             nonStaticField = staticField = new int[N];
         }

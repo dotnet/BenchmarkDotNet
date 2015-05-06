@@ -54,9 +54,10 @@
     <Compile Include="Jit_MultidimensionalArrayAccess.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Jit_LoopUnrolling.cs" />
+    <Compile Include="Jit_UnrollingArraySumLoop.cs" />
     <Compile Include="Framework_SelectVsConvertAll.cs" />
     <Compile Include="Framework_StackFrameVsStackTrace.cs" />
+    <Compile Include="Trivial_Increment.cs" />
     <Compile Include="Trivial_ShiftVsMultiply.cs" />
     <Compile Include="Trivial_SimpleSum.cs" />
     <Compile Include="Framework_StringBuilder.cs" />

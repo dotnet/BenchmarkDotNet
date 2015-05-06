@@ -1,6 +1,4 @@
-﻿using Benchmarks;
-
-namespace BenchmarkDotNet.Samples
+﻿namespace BenchmarkDotNet.Samples
 {
     class Program
     {
@@ -8,8 +6,9 @@ namespace BenchmarkDotNet.Samples
         {
             var competitionSwitch = new BenchmarkCompetitionSwitch(new[] {
                 typeof(Trivial_SimpleSum),
+                typeof(Trivial_Increment),
                 typeof(Trivial_ShiftVsMultiply),
-                typeof(Jit_LoopUnrolling),
+                typeof(Jit_UnrollingArraySumLoop),
                 typeof(Jit_Inlining),
                 typeof(Jit_BoundsCheckingElimination),
                 typeof(Jit_MultidimensionalArrayAccess),
