@@ -60,8 +60,8 @@ namespace Benchmarks
 
     public class Algo_BitCount
     {
-        private const int IterationCount = 101;
-        private const int ArrayLength = 1000000;
+        private const int IterationCount = 100001;
+        private const int ArrayLength = 1001;
         private readonly ulong[] numbers;
         private readonly Random random = new Random(42);
 

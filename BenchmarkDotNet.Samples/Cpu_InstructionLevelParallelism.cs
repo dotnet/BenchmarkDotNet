@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Tasks;
 
@@ -17,31 +18,43 @@ namespace BenchmarkDotNet.Samples
      jitVersion: BenchmarkJitVersion.RyuJit)]
     public class Cpu_InstructionLevelParallelism
     {
-        private const int N = 100001, IterationCount = 40001;
+        private const int N = 10000, IterationCount = 40001;
 
         private readonly int[] a = new int[N];
 
-        [Benchmark]
-        public int Max()
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private int MaxImplementation(int n)
         {
             var max = int.MinValue;
             for (int iteration = 0; iteration < IterationCount; iteration++)
-                for (int i = 0; i < N; i++)
+                for (int i = 0; i < n; i++)
                     max = Math.Max(a[i], max);
             return max;
         }
 
-        [Benchmark]
-        public int MaxEvenOdd()
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private int MaxEvenOddImplementation(int n)
         {
             int maxEven = int.MinValue, maxOdd = int.MinValue;
             for (int iteration = 0; iteration < IterationCount; iteration++)
-                for (int i = 0; i < N - 1; i += 2)
+                for (int i = 0; i < n; i += 2)
                 {
                     maxEven = Math.Max(a[i], maxEven);
                     maxOdd = Math.Max(a[i + 1], maxOdd);
                 }
             return Math.Max(maxEven, maxOdd);
+        }
+
+        [Benchmark]
+        public int Max()
+        {
+            return MaxImplementation(N);
+        }
+
+        [Benchmark]
+        public int MaxEvenOdd()
+        {
+            return MaxEvenOddImplementation(N);
         }
     }
 }
