@@ -27,5 +27,17 @@ namespace BenchmarkDotNet.Tasks
                 attrs.Add(new TaskAttribute(warmupIterationCount: defaultSettings.WarmupIterationCount, targetIterationCount: defaultSettings.TargetIterationCount));
             return attrs.Select(attr => attr.Task);
         }
+
+        public IEnumerable<BenchmarkProperty> Properties
+        {
+            get
+            {
+                yield return new BenchmarkProperty(nameof(RunCount), RunCount.ToString());
+                foreach (var property in Configuration.Properties)
+                    yield return property;
+                foreach (var property in Settings.Properties)
+                    yield return property;
+            }
+        }
     }
 }

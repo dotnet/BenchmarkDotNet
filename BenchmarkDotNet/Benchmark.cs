@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Tasks;
+﻿using System.Collections.Generic;
+using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet
 {
@@ -14,6 +15,17 @@ namespace BenchmarkDotNet
         {
             Target = target;
             Task = task;
+        }
+
+        public IEnumerable<BenchmarkProperty> Properties
+        {
+            get
+            {
+                foreach (var property in Target.Properties)
+                    yield return property;
+                foreach (var property in Task.Properties)
+                    yield return property;
+            }
         }
     }
 }

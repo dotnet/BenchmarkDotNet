@@ -1,4 +1,6 @@
-﻿namespace BenchmarkDotNet.Tasks
+﻿using System.Collections.Generic;
+
+namespace BenchmarkDotNet.Tasks
 {
     public class BenchmarkSettings
     {
@@ -35,6 +37,15 @@
                     int.TryParse(arg.Substring(3), out t);
             }
             return new BenchmarkSettings(w, t);
+        }
+
+        public IEnumerable<BenchmarkProperty> Properties
+        {
+            get
+            {
+                yield return new BenchmarkProperty(nameof(WarmupIterationCount), WarmupIterationCount.ToString());
+                yield return new BenchmarkProperty(nameof(TargetIterationCount), TargetIterationCount.ToString());
+            }
         }
     }
 }

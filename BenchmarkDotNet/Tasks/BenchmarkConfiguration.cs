@@ -1,4 +1,6 @@
-﻿namespace BenchmarkDotNet.Tasks
+﻿using System.Collections.Generic;
+
+namespace BenchmarkDotNet.Tasks
 {
     public class BenchmarkConfiguration
     {
@@ -15,6 +17,17 @@
             Platform = platform;
             JitVersion = jitVersion;
             Framework = framework;
+        }
+
+        public IEnumerable<BenchmarkProperty> Properties
+        {
+            get
+            {
+                yield return new BenchmarkProperty(nameof(Mode), Mode.ToString());
+                yield return new BenchmarkProperty(nameof(Platform), Platform.ToString());
+                yield return new BenchmarkProperty(nameof(JitVersion), JitVersion.ToString());
+                yield return new BenchmarkProperty(nameof(Framework), Framework.ToString());
+            }
         }
     }
 }

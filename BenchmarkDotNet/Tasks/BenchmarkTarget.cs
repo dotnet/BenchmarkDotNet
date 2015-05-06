@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using BenchmarkDotNet.Extensions;
 
@@ -17,6 +18,15 @@ namespace BenchmarkDotNet.Tasks
             Type = type;
             Method = method;
             Description = description ?? Caption;
+        }
+
+        public IEnumerable<BenchmarkProperty> Properties
+        {
+            get
+            {
+                yield return new BenchmarkProperty(nameof(Type), Type.Name);
+                yield return new BenchmarkProperty(nameof(Method), Method.Name);
+            }
         }
     }
 }

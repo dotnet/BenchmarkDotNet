@@ -40,10 +40,12 @@ namespace BenchmarkDotNet
                 Logger.WriteLineInfo($"//   {benchmark.Caption} {benchmark.Task.Settings.ToArgs()}");
             Logger.NewLine();
 
+            var importantPropertyNames = benchmarks.Select(b => b.Properties).GetImportantNames();
+
             var reports = new List<BenchmarkReport>();
             foreach (var benchmark in benchmarks)
             {
-                var report = Run(benchmark);
+                var report = Run(benchmark, importantPropertyNames);
                 reports.Add(report);
                 var stat = new BenchmarkRunReportsStatistic("Target", report.Runs);
                 var values = stat.Values;
@@ -116,7 +118,7 @@ namespace BenchmarkDotNet
             }
         }
 
-        public BenchmarkReport Run(Benchmark benchmark)
+        public BenchmarkReport Run(Benchmark benchmark, IList<string> importantPropertyNames)
         {
             Logger.WriteLineHeader("// **************************");
             Logger.WriteLineHeader("// Benchmark: " + benchmark.Description);
@@ -131,7 +133,14 @@ namespace BenchmarkDotNet
             var exeFileName = Path.Combine(directoryPath, "Program.exe");
             for (int i = 0; i < runtimeInstanceCount; i++)
             {
-                Logger.WriteLineInfo($"// Run ({i + 1} of {runtimeInstanceCount}):");
+                Logger.WriteLineInfo($"// Run ({i + 1} of {runtimeInstanceCount})");
+                if (importantPropertyNames.Any())
+                {
+                    Logger.WriteInfo("// ");
+                    foreach (var name in importantPropertyNames)
+                        Logger.WriteInfo($"{name}={benchmark.Properties.GetValue(name)} ");
+                    Logger.NewLine();
+                }
 
                 var executor = new BenchmarkExecutor(Logger);
                 var lines = executor.Exec(exeFileName, benchmark.Task.Settings.ToArgs());

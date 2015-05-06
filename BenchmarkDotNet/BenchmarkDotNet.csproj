@@ -58,6 +58,8 @@
     <Compile Include="Tasks\BenchmarkJitVersion.cs" />
     <Compile Include="Tasks\BenchmarkMode.cs" />
     <Compile Include="Tasks\BenchmarkPlatform.cs" />
+    <Compile Include="Tasks\BenchmarkPropertyExtensions.cs" />
+    <Compile Include="Tasks\BenchmarkProperty.cs" />
     <Compile Include="Tasks\BenchmarkTarget.cs" />
     <Compile Include="Tasks\BenchmarkTask.cs" />
     <Compile Include="Tasks\BenchmarkSettings.cs" />
