@@ -2,6 +2,6 @@
 {
     public enum BenchmarkPlatform
     {
-         AnyCpu, X86, X64
+        CurrentPlatform, AnyCpu, X86, X64
     }
 }

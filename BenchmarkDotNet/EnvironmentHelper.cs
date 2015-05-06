@@ -45,16 +45,13 @@ namespace BenchmarkDotNet
             return "";
         }
 
-        public static string GetFullEnvironmentInfo(bool includeClr = true)
+        public static string GetFullEnvironmentInfo()
         {
             var line1 = $"// BenchmarkDotNet=v{GetBenchmarkDotNetVersion()}";
             var line2 = $"// OS={GetOsVersion()}";
             var line3 = $"// Processor={GetProcessorName()}, ProcessorCount={GetProcessorCount()}";
             var line4 = $"// CLR={GetClrVersion()}, Arch={GetArch()} {GetConfiguration()}{GetDebuggerFlag()}{GetJitFlag()}";
-            var lines = new List<string> { line1, line2, line3 };
-            if (includeClr)
-                lines.Add(line4);
-            return string.Join(Environment.NewLine, lines.ToArray());
+            return string.Join(Environment.NewLine, new[] { line1, line2, line3, line4 });
         }
 
         private static string GetBenchmarkDotNetVersion()

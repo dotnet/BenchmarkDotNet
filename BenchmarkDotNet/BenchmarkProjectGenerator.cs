@@ -119,7 +119,8 @@ namespace BenchmarkDotNet
         private static void SaveAppConfigFile(string projectDir, BenchmarkConfiguration configuration)
         {
             string appConfigPath = Path.Combine(projectDir, "app.config");
-            File.WriteAllText(appConfigPath, GetAppConfig(configuration.JitVersion.ToConfig()));
+            var content = configuration.JitVersion == BenchmarkJitVersion.CurrentJit ? GetEmptyAppConfig() : GetAppConfig(configuration.JitVersion.ToConfig());
+            File.WriteAllText(appConfigPath, content);
         }
 
         private static string CreateProjectDirectory(Benchmark benchmark)
@@ -204,6 +205,16 @@ namespace BenchmarkDotNet
 </configuration>
 ";
             return appConfigTemplate.Replace("$USELEGACYJIT$", useLegacyJit);
+        }
+
+
+        private static string GetEmptyAppConfig()
+        {
+            const string appConfigTemplate = @"<?xml version=""1.0""?>
+<configuration>
+</configuration>
+";
+            return appConfigTemplate;
         }
 
         #endregion

@@ -2,6 +2,6 @@
 {
     public enum BenchmarkJitVersion
     {
-         LegacyJit, RyuJit
+        CurrentJit, LegacyJit, RyuJit
     }
 }

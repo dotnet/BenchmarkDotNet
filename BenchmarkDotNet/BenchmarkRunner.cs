@@ -54,7 +54,7 @@ namespace BenchmarkDotNet
             }
             Logger.WriteLineHeader("// ***** Competition: Finish  *****");
             Logger.NewLine();
-            Logger.WriteLineInfo(EnvironmentHelper.GetFullEnvironmentInfo(false));
+            Logger.WriteLineInfo(EnvironmentHelper.GetFullEnvironmentInfo());
             var reportStats = reports.Select(
                 r => new
                 {
