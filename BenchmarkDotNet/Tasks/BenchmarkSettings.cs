@@ -47,5 +47,10 @@ namespace BenchmarkDotNet.Tasks
                 yield return new BenchmarkProperty(nameof(TargetIterationCount), TargetIterationCount.ToString());
             }
         }
+
+        internal static BenchmarkSettings CreateDefault()
+        {
+            return new BenchmarkSettings(DefaultWarmupIterationCount, DefaultTargetIterationCount);
+        }
     }
 }

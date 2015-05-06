@@ -3,7 +3,7 @@ using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet.Extensions
 {
-    public static class ConfigurationExtensions
+    internal static class ConfigurationExtensions
     {
         public static string ToConfig(this BenchmarkPlatform platform)
         {

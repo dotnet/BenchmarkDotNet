@@ -26,7 +26,7 @@ namespace BenchmarkDotNet
 
         private readonly BenchmarkProjectGenerator benchmarkProjectGenerator = new BenchmarkProjectGenerator();
 
-        public IEnumerable<BenchmarkReport> RunCompetition(object benchmarkCompetition, BenchmarkSettings defaultSettings)
+        public IEnumerable<BenchmarkReport> RunCompetition(object benchmarkCompetition, BenchmarkSettings defaultSettings = null)
         {
             return RunCompetition(CompetitionToBenchmarks(benchmarkCompetition, defaultSettings).ToList());
         }
@@ -150,9 +150,11 @@ namespace BenchmarkDotNet
             Logger.NewLine();
             return new BenchmarkReport(benchmark, runReports);
         }
-
-        public static IEnumerable<Benchmark> CompetitionToBenchmarks(object competition, BenchmarkSettings defaultSettings)
-        {
+       
+        private static IEnumerable<Benchmark> CompetitionToBenchmarks(object competition, BenchmarkSettings defaultSettings)
+        {            
+            if (defaultSettings == null) 
+                defaultSettings = BenchmarkSettings.CreateDefault();
             var targetType = competition.GetType();
             var methods = targetType.GetMethods();
             for (int i = 0; i < methods.Length; i++)

@@ -5,7 +5,7 @@ using BenchmarkDotNet.Logging;
 
 namespace BenchmarkDotNet
 {
-    public class BenchmarkExecutor
+    internal class BenchmarkExecutor
     {
         public IBenchmarkLogger Logger { get; }
         public bool MonoMode { get; }
@@ -15,7 +15,7 @@ namespace BenchmarkDotNet
             Logger = logger;
             MonoMode = monoMode;
         }
-        
+
         public IList<string> Exec(string exeName, string args = "")
         {
             var lines = new List<string>();
@@ -31,6 +31,11 @@ namespace BenchmarkDotNet
                         Logger?.WriteLine(line);
                         if (!line.StartsWith("//") && !string.IsNullOrEmpty(line))
                             lines.Add(line);
+                    }
+                    if (process.HasExited && process.ExitCode != 0)
+                    {
+                        Logger.WriteError($"Something bad happens during starting execution of {exeName}. Try to run becnhmark using AnyCPU application");
+                        return new string[0];
                     }
                 }
             return lines;

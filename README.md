@@ -1,7 +1,7 @@
 **BenchmarkDotNet** is a lightweight .NET library for benchmarking. You can install BenchmarkDotNet via [NuGet package](https://www.nuget.org/packages/BenchmarkDotNet/).
 
 ## Features
-* BenchmarkDotNet creates an isolated project for each benchmark method and run it in a separate runtime.
+* BenchmarkDotNet creates an isolated project for each benchmark method and run it in a separate runtime in the Release mode without an attached debugger.
 * You can create benchmark tasks for running your benchmark with different CLR version, JIT version, platform version, and so on.
 * BenchmarkDotNet makes warmup of your code, then runs it several times, calculates statistic, and tries to eliminate some runtime side-effects.
 
@@ -12,7 +12,8 @@ Source:
 ```cs
 [Task(mode: BenchmarkMode.SingleRun, platform: BenchmarkPlatform.X86)]
 [Task(mode: BenchmarkMode.SingleRun, platform: BenchmarkPlatform.X64)]
-[Task(mode: BenchmarkMode.SingleRun, platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
+[Task(mode: BenchmarkMode.SingleRun, platform: BenchmarkPlatform.X64, 
+      jitVersion: BenchmarkJitVersion.RyuJit)]
 public class Cpu_InstructionLevelParallelism
 {
     private const int IterationCount = 400000001;
@@ -47,6 +48,7 @@ public class Cpu_InstructionLevelParallelism
     }
 }
 
+// You can run both x86 and x64 benchmark tasks only from AnyCPU application
 new BenchmarkRunner().RunCompetition(new Cpu_InstructionLevelParallelism());
 ```
 

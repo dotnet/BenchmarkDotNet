@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Reports
@@ -15,11 +16,19 @@ namespace BenchmarkDotNet.Reports
         public BenchmarkMeasurementStatistic(string name, long[] values)
         {
             Name = name;
-            Min = values.Min();
-            Max = values.Max();
-            Median = values.Median();
-            StandardDeviation = values.StandardDeviation();
-            Error = (Max - Min) * 1.0 / Min;
+            if (values.Length == 0)
+            {
+                Min = Max = Median = 00;
+                StandardDeviation = Error = double.PositiveInfinity;
+            }
+            else
+            {
+                Min = values.Min();
+                Max = values.Max();
+                Median = values.Median();
+                StandardDeviation = values.StandardDeviation();
+                Error = (Max - Min) * 1.0 / Min;
+            }
         }
     }
 }

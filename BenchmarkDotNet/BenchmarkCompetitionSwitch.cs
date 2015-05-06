@@ -29,7 +29,7 @@ namespace BenchmarkDotNet
             while (args.Length == 0)
             {
                 PrintAvailable();
-                logger.WriteLineHelp("Argument list is empty. Please, print the argument list:");
+                logger.WriteLineHelp("You should select the target benchmark. Please, print a number of a becnhmark (e.g. #0) or a benchmark caption:");
                 var line = Console.ReadLine() ?? "";
                 args = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 logger.NewLine();
