@@ -6,8 +6,7 @@ namespace BenchmarkDotNet.Samples
     // See http://en.wikipedia.org/wiki/Hamming_weight
     public class Algo_BitCount
     {
-        private const int IterationCount = 100001;
-        private const int ArrayLength = 1001;
+        private const int N = 1001;
         private readonly ulong[] numbers;
         private readonly Random random = new Random(42);
 
@@ -20,8 +19,8 @@ namespace BenchmarkDotNet.Samples
 
         public Algo_BitCount()
         {
-            numbers = new ulong[ArrayLength];
-            for (int i = 0; i < ArrayLength; i++)
+            numbers = new ulong[N];
+            for (int i = 0; i < N; i++)
                 numbers[i] = NextUInt64();
         }
 
@@ -29,9 +28,8 @@ namespace BenchmarkDotNet.Samples
         public int PopCount1()
         {
             int counter = 0;
-            for (int i = 0; i < IterationCount; i++)
-                for (int j = 0; j < ArrayLength; j++)
-                    counter += BitCountHelper.PopCount1(numbers[j]);
+            for (int i = 0; i < N; i++)
+                counter += BitCountHelper.PopCount1(numbers[i]);
             return counter;
         }
 
@@ -39,9 +37,8 @@ namespace BenchmarkDotNet.Samples
         public int PopCount2()
         {
             int counter = 0;
-            for (int i = 0; i < IterationCount; i++)
-                for (int j = 0; j < ArrayLength; j++)
-                    counter += BitCountHelper.PopCount2(numbers[j]);
+            for (int i = 0; i < N; i++)
+                counter += BitCountHelper.PopCount2(numbers[i]);
             return counter;
         }
 
@@ -49,9 +46,8 @@ namespace BenchmarkDotNet.Samples
         public int PopCount3()
         {
             int counter = 0;
-            for (int i = 0; i < IterationCount; i++)
-                for (int j = 0; j < ArrayLength; j++)
-                    counter += BitCountHelper.PopCount3(numbers[j]);
+            for (int i = 0; i < N; i++)
+                counter += BitCountHelper.PopCount3(numbers[i]);
             return counter;
         }
     }

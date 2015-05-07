@@ -1,0 +1,60 @@
+        $TargetMethodResultHolder$
+		
+        public void RunBenchmark(BenchmarkSettings settings)
+        {
+            var stopwatch = new Stopwatch();
+			var stopwatch2 = new Stopwatch();
+            long operationsPerMethod = $OperationsPerMethod$;
+
+            $TargetMethod$();
+			long bestRunCount = 0;
+            for (int i = 0; i < settings.WarmupIterationCount; i++)
+            {
+                Console.Write("// Warmup " + (i + 1) + ": ");
+                stopwatch.Start();
+                long runCount = 0;
+                while (stopwatch.ElapsedMilliseconds < 1000)
+                {
+                    $TargetMethodHoldValue$$TargetMethod$();
+                    runCount++;
+                }								
+                stopwatch.Stop();
+				long warmupRunCount = runCount;
+				// Eliminate infrastructure overhead
+				stopwatch2.Start();
+				while (runCount > 0 && stopwatch2.ElapsedMilliseconds < 1000)
+				{					
+					$TargetMethodHoldValue$$DummyDelegate$();
+					runCount--;
+				}
+				stopwatch2.Stop();
+				var actualElapsedMilliseconds = Math.Min(1000, Math.Max(100, stopwatch.ElapsedMilliseconds - stopwatch2.ElapsedMilliseconds));
+				bestRunCount = warmupRunCount * 1000 / actualElapsedMilliseconds;
+                Console.Write(warmupRunCount * operationsPerMethod + " op, ");				
+                BenchmarkPrintRunReport(stopwatch, stopwatch2, warmupRunCount);
+                stopwatch.Reset();				
+				stopwatch2.Reset();
+                BenchmarkGcCollect();
+            }
+            for (int i = 0; i < settings.TargetIterationCount; i++)
+            {
+                Console.Write("Target " + (i + 1) + ": " + bestRunCount * operationsPerMethod + " op, ");
+				for (int j = 0; j < bestRunCount; j++)
+                    $TargetMethodHoldValue$$TargetMethod$();
+                stopwatch.Start();
+				for (int j = 0; j < bestRunCount; j++)
+                    $TargetMethodHoldValue$$TargetMethod$();
+                stopwatch.Stop();
+				// Eliminate infrastructure overhead
+				for (int j = 0; j < bestRunCount; j++)
+				    $TargetMethodHoldValue$$DummyDelegate$();
+				stopwatch2.Start();
+				for (int j = 0; j < bestRunCount; j++)
+				    $TargetMethodHoldValue$$DummyDelegate$();
+				stopwatch2.Stop();
+				BenchmarkPrintRunReport(stopwatch, stopwatch2, bestRunCount);
+                stopwatch.Reset();
+				stopwatch2.Reset();
+                BenchmarkGcCollect();
+            }            
+        }

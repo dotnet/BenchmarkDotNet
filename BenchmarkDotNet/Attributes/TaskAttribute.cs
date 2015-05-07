@@ -10,10 +10,10 @@ namespace BenchmarkDotNet.Attributes
 
         public TaskAttribute(
             int runCount = 1,
-            BenchmarkMode mode = BenchmarkMode.SingleRun,
+            BenchmarkMode mode = BenchmarkMode.Throughput,
             BenchmarkPlatform platform = BenchmarkPlatform.CurrentPlatform,
             BenchmarkJitVersion jitVersion = BenchmarkJitVersion.CurrentJit,
-            BenchmarkFramework framework = BenchmarkFramework.V40,
+            BenchmarkFramework framework = BenchmarkFramework.Current,
             int warmupIterationCount = 5,
             int targetIterationCount = 10
             )

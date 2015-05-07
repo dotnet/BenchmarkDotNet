@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Extensions
 {
     internal static class CommonExtensions
     {
-        public static long Median(this IEnumerable<long> source)
+        public static double Median(this IEnumerable<double> source)
         {
             var list = source.ToList();
             if (list.Count == 0)
@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Extensions
             return (list[list.Count / 2 - 1] + list[list.Count / 2]) / 2;
         }
 
-        public static double StandardDeviation(this IEnumerable<long> source)
+        public static double StandardDeviation(this IEnumerable<double> source)
         {
             var list = source.ToList();
             double result = 0;

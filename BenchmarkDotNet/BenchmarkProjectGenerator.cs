@@ -28,29 +28,63 @@ namespace BenchmarkDotNet
 
         private static void GenerateProgramFile(string projectDir, Benchmark benchmark)
         {
+            var isVoid = benchmark.Target.Method.ReturnType == typeof(void);
+
             var targetType = benchmark.Target.Type.FullName;
             var targetTypeNamespace = benchmark.Target.Type.Namespace;
             var targetMethod = benchmark.Target.Method.Name;
-            var targetMethodReturnType = benchmark.Target.Method.ReturnType.FullName;
+            var targetMethodDelegate = "targetMethodDelegate";
+            var targetMethodReturnType = benchmark.Target.Method.ReturnType == typeof(void)
+                ? "void"
+                : benchmark.Target.Method.ReturnType.GetCorrectTypeName();
+            var operationsPerMethod = benchmark.Target.OperationsPerMethod;
+            var targetMethodResultHolder = isVoid ? "" : $"private {targetMethodReturnType} value;";
+            var targetMethodHoldValue = isVoid ? "" : "value = ";
+            var dummyDelegate = "dummyDelegate";
+            var targetMethodDelegateDeclaration =
+                "private " +
+                (isVoid ? "Action " : $"Func<{targetMethodReturnType}> ") +
+                targetMethodDelegate +
+                ";";
+            var targetMethodDelegateDefinition = "() => instance." + targetMethod + "()";
+            var dummyDelegateDeclaration =
+                "private " +
+                (isVoid ? "Action " : $"Func<{targetMethodReturnType}> ") +
+                dummyDelegate +
+                ";";
+            var dummyDelegateDefinition = "() => instance.Dummy()";
+            var dummyImplementation = isVoid
+                ? ""
+                : $"return default({targetMethodReturnType});";
 
             string runBenchmarkTemplate = "";
             switch (benchmark.Task.Configuration.Mode)
             {
                 case BenchmarkMode.SingleRun:
-                    {
-                        runBenchmarkTemplate = GetTemplate("BenchmarkSingleRun.txt");
-                    }
+                    runBenchmarkTemplate = GetTemplate("BenchmarkSingleRun.txt");
+                    break;
+                case BenchmarkMode.Throughput:
+                    runBenchmarkTemplate = GetTemplate("BenchmarkThroughput.txt");
                     break;
             }
-            var runBenchmarkContent = runBenchmarkTemplate.
-                Replace("$TargetMethod$", targetMethod).
-                Replace("$TargetMethodReturnType$", targetMethodReturnType);
 
             var contentTemplate = GetTemplate("BenchmarkProgram.txt");
             var content = contentTemplate.
+                Replace("$RunBenchmarkContent$", runBenchmarkTemplate).
+                Replace("$TargetMethod$", targetMethodDelegate).
+                Replace("$TargetMethodReturnType$", targetMethodReturnType).
+                Replace("$OperationsPerMethod$", operationsPerMethod.ToInvariantString()).
+                Replace("$TargetMethodResultHolder$", targetMethodResultHolder).
+                Replace("$TargetMethodHoldValue$", targetMethodHoldValue).
                 Replace("$TargetType$", targetType).
-                Replace("$TargetTypeNamespace$", targetTypeNamespace).
-                Replace("$RunBenchmarkContent$", runBenchmarkContent);
+                Replace("$TargetTypeNamespace$", targetTypeNamespace).                
+                Replace("$TargetMethodDelegateDeclaration$", targetMethodDelegateDeclaration).
+                Replace("$TargetMethodDelegate$", targetMethodDelegate).
+                Replace("$TargetMethodDelegateDefinition$", targetMethodDelegateDefinition).
+                Replace("$DummyDelegateDeclaration$", dummyDelegateDeclaration).
+                Replace("$DummyDelegateDefinition$", dummyDelegateDefinition).
+                Replace("$DummyDelegate$", dummyDelegate).
+                Replace("$DummyImplementation$", dummyImplementation);
 
             string fileName = Path.Combine(projectDir, MainClassName + ".cs");
             File.WriteAllText(fileName, content);

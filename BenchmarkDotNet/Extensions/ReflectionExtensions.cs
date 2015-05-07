@@ -10,5 +10,14 @@ namespace BenchmarkDotNet.Extensions
         {
             return methodInfo.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
         }
+
+        public static string GetCorrectTypeName(this Type type)
+        {
+            if (!type.IsGenericType)
+                return type.Name;
+            var mainName = type.Name.Substring(0, type.Name.IndexOf('`'));
+            string args = string.Join(", ", type.GetGenericArguments().Select(GetCorrectTypeName).ToArray());
+            return $"{type.Namespace}.{mainName}<{args}>";
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Management;
 using System.Reflection;
@@ -9,6 +10,14 @@ namespace BenchmarkDotNet
 {
     public static class EnvironmentHelper
     {
+        static EnvironmentHelper()
+        {
+            MainCultureInfo = (CultureInfo)CultureInfo.InvariantCulture.Clone();
+            MainCultureInfo.NumberFormat.NumberDecimalSeparator = ".";
+        }
+
+        public static readonly CultureInfo MainCultureInfo;
+
         private static string GetClrVersion()
         {
             var monoRuntimeType = Type.GetType("Mono.Runtime");

@@ -6,14 +6,15 @@ namespace BenchmarkDotNet.Reports
     public sealed class BenchmarkRunReportsStatistic
     {
         public string Name { get; }
-        public BenchmarkMeasurementStatistic Values { get; }
+        public BenchmarkMeasurementStatistic AverageTime { get; }
+        public BenchmarkMeasurementStatistic OperationsPerSeconds { get; }
         public string Unit { get; }
 
         public BenchmarkRunReportsStatistic(string name, IList<BenchmarkRunReport> runReports)
         {
             Name = name;
-            Values = new BenchmarkMeasurementStatistic("Values", runReports.Select(r => r.Value).ToArray());
-            Unit = runReports.FirstOrDefault()?.Unit ?? "Undef";
+            AverageTime = new BenchmarkMeasurementStatistic(runReports.Select(r => r.Time.Nanoseconds / r.Operations).ToArray());
+            OperationsPerSeconds = new BenchmarkMeasurementStatistic(runReports.Select(r => r.Operations / r.Time.Seconds).ToArray());
         }
     }
 }

@@ -4,6 +4,7 @@
 * BenchmarkDotNet creates an isolated project for each benchmark method and run it in a separate runtime in the Release mode without an attached debugger.
 * You can create benchmark tasks for running your benchmark with different CLR version, JIT version, platform version, and so on.
 * BenchmarkDotNet makes warmup of your code, then runs it several times, calculates statistic, and tries to eliminate some runtime side-effects.
+* BenchmarkDotNet almost eliminate own performance overhead.
 
 ## An example
 

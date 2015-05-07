@@ -1,22 +1,21 @@
-﻿namespace BenchmarkDotNet.Samples
+﻿using System;
+
+namespace BenchmarkDotNet.Samples
 {
     class Program
     {
         static void Main(string[] args)
         {
             var competitionSwitch = new BenchmarkCompetitionSwitch(new[] {
-                typeof(Trivial_SimpleSum),
+                typeof(Trivial_Empty),
+                typeof(Trivial_Sleep),
                 typeof(Trivial_Increment),
-                typeof(Trivial_ShiftVsMultiply),
                 typeof(Jit_UnrollingArraySumLoop),
                 typeof(Jit_Inlining),
-                typeof(Jit_BoundsCheckingElimination),
-                typeof(Jit_MultidimensionalArrayAccess),
+                typeof(Jit_Bce),
+                typeof(Jit_BceVsIlp),
                 typeof(Cpu_MatrixMultiplication),
-                typeof(Cpu_InstructionLevelParallelism),
-                typeof(Framework_StringBuilder),
-                typeof(Framework_ForeachArray),
-                typeof(Framework_ForeachList),
+                typeof(Cpu_Ilp),
                 typeof(Framework_SelectVsConvertAll),
                 typeof(Framework_StackFrameVsStackTrace),
                 typeof(Algo_BitCount)

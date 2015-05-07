@@ -48,8 +48,8 @@ namespace BenchmarkDotNet
                 var report = Run(benchmark, importantPropertyNames);
                 reports.Add(report);
                 var stat = new BenchmarkRunReportsStatistic("Target", report.Runs);
-                var values = stat.Values;
-                Logger.WriteLineResult($"Min={values.Min}; Max={values.Max}; Median={values.Median}; StdDev={values.StandardDeviation:0.00}");
+                Logger.WriteLineResult($"AverageTime (ns/op): {stat.AverageTime}");
+                Logger.WriteLineResult($"OperationsPerSecond: {stat.OperationsPerSeconds}");
                 Logger.NewLine();
             }
             Logger.WriteLineHeader("// ***** Competition: Finish  *****");
@@ -61,7 +61,7 @@ namespace BenchmarkDotNet
                     r.Benchmark,
                     Stat = new BenchmarkRunReportsStatistic("Target", r.Runs)
                 }).ToList();
-            var table = new List<string[]> { new[] { "Type", "Method", "Mode", "Platform", "Jit", ".NET", "Value", "StdDev" } };
+            var table = new List<string[]> { new[] { "Type", "Method", "Mode", "Platform", "Jit", ".NET", "AvrTime", "StdDev", "op/s" } };
             foreach (var reportStat in reportStats)
             {
                 var b = reportStat.Benchmark;
@@ -72,8 +72,9 @@ namespace BenchmarkDotNet
                     b.Task.Configuration.Platform.ToString(),
                     b.Task.Configuration.JitVersion.ToString(),
                     b.Task.Configuration.Framework.ToString(),
-                    reportStat.Stat.Values.Median.ToInvariantString() + reportStat.Stat.Unit,
-                    ((int)Math.Round(reportStat.Stat.Values.StandardDeviation)).ToInvariantString() + reportStat.Stat.Unit
+                    new BenchmarkTimeSpan(reportStat.Stat.AverageTime.Median).ToString(),
+                    new BenchmarkTimeSpan(reportStat.Stat.AverageTime.StandardDeviation).ToString(),
+                    string.Format(EnvironmentHelper.MainCultureInfo, "{0:0.##}", reportStat.Stat.OperationsPerSeconds.Median)
                 };
                 table.Add(row);
             }
@@ -90,7 +91,7 @@ namespace BenchmarkDotNet
             bool[] areSame = new bool[colCount];
             for (int colIndex = 0; colIndex < colCount; colIndex++)
             {
-                areSame[colIndex] = rowCount > 2 && colIndex < colCount - 2;
+                areSame[colIndex] = rowCount > 2 && colIndex < colCount - 3;
                 for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
                 {
                     widths[colIndex] = Math.Max(widths[colIndex], table[rowIndex][colIndex].Length + 1);
@@ -133,7 +134,7 @@ namespace BenchmarkDotNet
             var exeFileName = Path.Combine(directoryPath, "Program.exe");
             for (int i = 0; i < runtimeInstanceCount; i++)
             {
-                Logger.WriteLineInfo($"// Run ({i + 1} of {runtimeInstanceCount})");
+                Logger.WriteLineInfo($"// Run ({i + 1} / {runtimeInstanceCount})");
                 if (importantPropertyNames.Any())
                 {
                     Logger.WriteInfo("// ");

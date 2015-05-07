@@ -2,6 +2,7 @@
 {
     public enum BenchmarkMode
     {
-        SingleRun
+        SingleRun,
+        Throughput
     }
 }

@@ -48,10 +48,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\OperationCountAttribute.cs" />
     <Compile Include="Attributes\TaskAttribute.cs" />
     <Compile Include="Benchmark.cs" />
     <Compile Include="BenchmarkCompetitionSwitch.cs" />
     <Compile Include="BenchmarkExecutor.cs" />
+    <Compile Include="Reports\BenchmarkTimeSpan.cs" />
     <Compile Include="Tasks\BenchmarkConfiguration.cs" />
     <Compile Include="Tasks\BenchmarkFramework.cs" />
     <Compile Include="BenchmarkProjectGenerator.cs" />
@@ -63,7 +65,6 @@
     <Compile Include="Tasks\BenchmarkTarget.cs" />
     <Compile Include="Tasks\BenchmarkTask.cs" />
     <Compile Include="Tasks\BenchmarkSettings.cs" />
-    <Compile Include="BenchmarkUtils.cs" />
     <Compile Include="EnvironmentHelper.cs" />
     <Compile Include="Extensions\ConfigurationExtensions.cs" />
     <Compile Include="Extensions\ReflectionExtensions.cs" />
@@ -92,6 +93,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Templates\BenchmarkAppConfig.txt" />
     <EmbeddedResource Include="Templates\BenchmarkAppConfigEmpty.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\BenchmarkThroughput.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
