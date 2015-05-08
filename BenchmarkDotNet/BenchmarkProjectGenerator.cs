@@ -37,6 +37,9 @@ namespace BenchmarkDotNet
             var targetMethodReturnType = benchmark.Target.Method.ReturnType == typeof(void)
                 ? "void"
                 : benchmark.Target.Method.ReturnType.GetCorrectTypeName();
+            var targetMethodReturnTypeNamespace = benchmark.Target.Method.ReturnType == typeof(void)
+                ? "System"
+                : benchmark.Target.Method.ReturnType.Namespace;
             var operationsPerMethod = benchmark.Target.OperationsPerMethod;
             var targetMethodResultHolder = isVoid ? "" : $"private {targetMethodReturnType} value;";
             var targetMethodHoldValue = isVoid ? "" : "value = ";
@@ -77,7 +80,8 @@ namespace BenchmarkDotNet
                 Replace("$TargetMethodResultHolder$", targetMethodResultHolder).
                 Replace("$TargetMethodHoldValue$", targetMethodHoldValue).
                 Replace("$TargetType$", targetType).
-                Replace("$TargetTypeNamespace$", targetTypeNamespace).                
+                Replace("$TargetTypeNamespace$", targetTypeNamespace).
+                Replace("$TargetMethodReturnTypeNamespace$", targetMethodReturnTypeNamespace).
                 Replace("$TargetMethodDelegateDeclaration$", targetMethodDelegateDeclaration).
                 Replace("$TargetMethodDelegate$", targetMethodDelegate).
                 Replace("$TargetMethodDelegateDefinition$", targetMethodDelegateDefinition).
@@ -95,16 +99,31 @@ namespace BenchmarkDotNet
             var configuration = benchmark.Task.Configuration;
             var platform = configuration.Platform.ToConfig();
             var framework = configuration.Framework.ToConfig();
-            var targetAssembly = new FileInfo(benchmark.Target.Type.Assembly.Location).Name;
 
             var template = GetTemplate("BenchmarkCsproj.txt");
             var content = template.
                 Replace("$Platform$", platform).
                 Replace("$Framework$", framework).
-                Replace("$TargetAssembly$", targetAssembly);
+                Replace("$TargetAssemblyReference$", GetReferenceToAssembly(benchmark.Target.Type)).
+                Replace("$TargetMethodReturnTypeAssemblyReference$", GetReferenceToAssembly(benchmark.Target.Method.ReturnType));
 
             string fileName = Path.Combine(projectDir, MainClassName + ".csproj");
             File.WriteAllText(fileName, content);
+        }
+
+        private static string GetReferenceToAssembly(Type type)
+        {
+            var template = @"    <Reference Include=""$AssemblyName$"">
+      <HintPath>..\$AssemblyFileName$</HintPath>
+    </Reference>
+  ";
+            var assembly = type.Assembly;
+            var fileName = new FileInfo(type.Assembly.Location).Name;
+            return fileName == "mscorlib.dll"
+                ? ""
+                : template.
+                    Replace("$AssemblyName$", assembly.GetName(false).Name).
+                    Replace("$AssemblyFileName$", fileName);
         }
 
         private static void GenerateAppConfigFile(string projectDir, BenchmarkConfiguration configuration)

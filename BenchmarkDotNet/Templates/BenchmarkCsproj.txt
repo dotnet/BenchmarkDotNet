@@ -23,9 +23,8 @@
     <Reference Include="BenchmarkDotNet">
       <HintPath>..\BenchmarkDotNet.dll</HintPath>
     </Reference>
-    <Reference Include="Benchmarks">
-      <HintPath>..\$TargetAssembly$</HintPath>
-    </Reference>
+$TargetAssemblyReference$
+$TargetMethodReturnTypeAssemblyReference$
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
