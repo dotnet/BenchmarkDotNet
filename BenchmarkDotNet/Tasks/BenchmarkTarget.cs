@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Tasks
@@ -10,7 +9,7 @@ namespace BenchmarkDotNet.Tasks
     {
         public Type Type { get; }
         public MethodInfo Method { get; }
-        public long OperationsPerMethod { get; }
+        public long OperationsPerInvoke { get; }
         public string Description { get; }
 
         public string Caption => Type.Name.WithoutSuffix("Competition") + "_" + Method.Name;
@@ -19,7 +18,7 @@ namespace BenchmarkDotNet.Tasks
         {
             Type = type;
             Method = method;
-            OperationsPerMethod = method.ResolveAttribute<OperationCountAttribute>()?.Count ?? 1;
+            OperationsPerInvoke = method.ResolveAttribute<OperationsPerInvokeAttribute>()?.Count ?? 1;
             Description = description ?? Caption;
         }
 

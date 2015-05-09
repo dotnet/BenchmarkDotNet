@@ -48,11 +48,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes\OperationCountAttribute.cs" />
-    <Compile Include="Attributes\TaskAttribute.cs" />
+    <Compile Include="OperationsPerInvokeAttribute.cs" />
+    <Compile Include="Tasks\TaskAttribute.cs" />
     <Compile Include="Benchmark.cs" />
     <Compile Include="BenchmarkCompetitionSwitch.cs" />
     <Compile Include="BenchmarkExecutor.cs" />
+    <Compile Include="BenchmarkMethodInvoker.cs" />
     <Compile Include="Reports\BenchmarkTimeSpan.cs" />
     <Compile Include="Tasks\BenchmarkConfiguration.cs" />
     <Compile Include="Tasks\BenchmarkFramework.cs" />
@@ -76,7 +77,7 @@
     <Compile Include="Logging\BenchmarkLoggerExtensions.cs" />
     <Compile Include="Logging\BenchmarkLogKind.cs" />
     <Compile Include="Logging\IBenchmarkLogger.cs" />
-    <Compile Include="Attributes\BenchmarkAttribute.cs" />
+    <Compile Include="BenchmarkAttribute.cs" />
     <Compile Include="BenchmarkRunner.cs" />
     <Compile Include="Logging\BenchmarkConsoleLogger.cs" />
     <Compile Include="Reports\BenchmarkRunReport.cs" />

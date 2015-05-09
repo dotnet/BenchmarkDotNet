@@ -1,5 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Tasks;
+﻿using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet.Samples
 {

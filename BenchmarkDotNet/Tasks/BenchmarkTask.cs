@@ -1,19 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Tasks
 {
     public class BenchmarkTask
     {
-        public int RunCount { get; }
+        public int ProcessCount { get; }
         public BenchmarkConfiguration Configuration { get; }
         public BenchmarkSettings Settings { get; }
 
-        public BenchmarkTask(int runCount, BenchmarkConfiguration configuration, BenchmarkSettings settings)
+        public BenchmarkTask(int processCount, BenchmarkConfiguration configuration, BenchmarkSettings settings)
         {
-            RunCount = runCount;
+            ProcessCount = processCount;
             Configuration = configuration;
             Settings = settings;
         }
@@ -32,7 +31,7 @@ namespace BenchmarkDotNet.Tasks
         {
             get
             {
-                yield return new BenchmarkProperty(nameof(RunCount), RunCount.ToString());
+                yield return new BenchmarkProperty(nameof(ProcessCount), ProcessCount.ToString());
                 foreach (var property in Configuration.Properties)
                     yield return property;
                 foreach (var property in Settings.Properties)

@@ -1,30 +1,4 @@
-        $TargetMethodResultHolder$
-		
-		public void RunBenchmark(BenchmarkSettings settings)
+        public void RunBenchmark(BenchmarkSettings settings)
         {
-            var stopwatch = new Stopwatch();
-			long operationsPerMethod = $OperationsPerMethod$;
-            
-			$TargetMethod$();
-            for (int i = 0; i < settings.WarmupIterationCount; i++)
-            {
-                Console.Write("// Warmup " + (i + 1) + ": " + operationsPerMethod + " op, ");
-                stopwatch.Start();
-                $TargetMethodHoldValue$$TargetMethod$();
-                stopwatch.Stop();
-                BenchmarkPrintRunReport(stopwatch, 1);
-                stopwatch.Reset();
-                BenchmarkGcCollect();
-            }
-			$TargetMethod$();
-            for (int i = 0; i < settings.TargetIterationCount; i++)
-            {
-                Console.Write("Target " + (i + 1) + ": " + operationsPerMethod + " op, ");
-                stopwatch.Start();
-                $TargetMethodHoldValue$$TargetMethod$();
-                stopwatch.Stop();
-                BenchmarkPrintRunReport(stopwatch, 1);
-                stopwatch.Reset();
-                BenchmarkGcCollect();
-            }
+			new BenchmarkMethodInvoker().SingleRun(settings, $OperationsPerInvoke$, setupAction, targetAction, idleAction);
         }

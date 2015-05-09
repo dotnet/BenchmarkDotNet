@@ -30,33 +30,29 @@ namespace BenchmarkDotNet
         {
             var isVoid = benchmark.Target.Method.ReturnType == typeof(void);
 
-            var targetType = benchmark.Target.Type.FullName;
+            var operationsPerInvoke = benchmark.Target.OperationsPerInvoke;
+            
             var targetTypeNamespace = benchmark.Target.Type.Namespace;
-            var targetMethod = benchmark.Target.Method.Name;
-            var targetMethodDelegate = "targetMethodDelegate";
-            var targetMethodReturnType = benchmark.Target.Method.ReturnType == typeof(void)
-                ? "void"
-                : benchmark.Target.Method.ReturnType.GetCorrectTypeName();
             var targetMethodReturnTypeNamespace = benchmark.Target.Method.ReturnType == typeof(void)
                 ? "System"
                 : benchmark.Target.Method.ReturnType.Namespace;
-            var operationsPerMethod = benchmark.Target.OperationsPerMethod;
-            var targetMethodResultHolder = isVoid ? "" : $"private {targetMethodReturnType} value;";
-            var targetMethodHoldValue = isVoid ? "" : "value = ";
-            var dummyDelegate = "dummyDelegate";
-            var targetMethodDelegateDeclaration =
-                "private " +
-                (isVoid ? "Action " : $"Func<{targetMethodReturnType}> ") +
-                targetMethodDelegate +
-                ";";
-            var targetMethodDelegateDefinition = "() => instance." + targetMethod + "()";
-            var dummyDelegateDeclaration =
-                "private " +
-                (isVoid ? "Action " : $"Func<{targetMethodReturnType}> ") +
-                dummyDelegate +
-                ";";
-            var dummyDelegateDefinition = "() => instance.Dummy()";
-            var dummyImplementation = isVoid
+
+            var targetTypeName = benchmark.Target.Type.FullName;                                   
+            var targetMethodName = benchmark.Target.Method.Name;
+
+            var targetMethodReturnType = isVoid
+                ? "void"
+                : benchmark.Target.Method.ReturnType.GetCorrectTypeName();            
+            var targetMethodResultHolder = isVoid 
+                ? "" : 
+                $"private {targetMethodReturnType} value;";
+            var targetMethodHoldValue = isVoid 
+                ? "" 
+                : "value = ";
+            var targetMethodDelegateType = isVoid 
+                ? "Action " 
+                : $"Func<{targetMethodReturnType}> ";
+            var idleImplementation = isVoid
                 ? ""
                 : $"return default({targetMethodReturnType});";
 
@@ -74,21 +70,16 @@ namespace BenchmarkDotNet
             var contentTemplate = GetTemplate("BenchmarkProgram.txt");
             var content = contentTemplate.
                 Replace("$RunBenchmarkContent$", runBenchmarkTemplate).
-                Replace("$TargetMethod$", targetMethodDelegate).
-                Replace("$TargetMethodReturnType$", targetMethodReturnType).
-                Replace("$OperationsPerMethod$", operationsPerMethod.ToInvariantString()).
-                Replace("$TargetMethodResultHolder$", targetMethodResultHolder).
-                Replace("$TargetMethodHoldValue$", targetMethodHoldValue).
-                Replace("$TargetType$", targetType).
+                Replace("$OperationsPerInvoke$", operationsPerInvoke.ToInvariantString()).
                 Replace("$TargetTypeNamespace$", targetTypeNamespace).
                 Replace("$TargetMethodReturnTypeNamespace$", targetMethodReturnTypeNamespace).
-                Replace("$TargetMethodDelegateDeclaration$", targetMethodDelegateDeclaration).
-                Replace("$TargetMethodDelegate$", targetMethodDelegate).
-                Replace("$TargetMethodDelegateDefinition$", targetMethodDelegateDefinition).
-                Replace("$DummyDelegateDeclaration$", dummyDelegateDeclaration).
-                Replace("$DummyDelegateDefinition$", dummyDelegateDefinition).
-                Replace("$DummyDelegate$", dummyDelegate).
-                Replace("$DummyImplementation$", dummyImplementation);
+                Replace("$TargetTypeName$", targetTypeName).
+                Replace("$TargetMethodName$", targetMethodName).
+                Replace("$TargetMethodResultHolder$", targetMethodResultHolder).
+                Replace("$TargetMethodDelegateType$", targetMethodDelegateType).
+                Replace("$TargetMethodHoldValue$", targetMethodHoldValue).
+                Replace("$TargetMethodReturnType$", targetMethodReturnType).
+                Replace("$IdleImplementation$", idleImplementation);
 
             string fileName = Path.Combine(projectDir, MainClassName + ".cs");
             File.WriteAllText(fileName, content);

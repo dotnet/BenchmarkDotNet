@@ -1,7 +1,6 @@
 ﻿using System;
-using BenchmarkDotNet.Tasks;
 
-namespace BenchmarkDotNet.Attributes
+namespace BenchmarkDotNet.Tasks
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
     public class TaskAttribute : Attribute
@@ -9,7 +8,7 @@ namespace BenchmarkDotNet.Attributes
         public BenchmarkTask Task { get; }
 
         public TaskAttribute(
-            int runCount = 1,
+            int processCount = 3,
             BenchmarkMode mode = BenchmarkMode.Throughput,
             BenchmarkPlatform platform = BenchmarkPlatform.CurrentPlatform,
             BenchmarkJitVersion jitVersion = BenchmarkJitVersion.CurrentJit,
@@ -19,7 +18,7 @@ namespace BenchmarkDotNet.Attributes
             )
         {
             Task = new BenchmarkTask(
-                runCount,
+                processCount,
                 new BenchmarkConfiguration(mode, platform, jitVersion, framework),
                 new BenchmarkSettings(warmupIterationCount, targetIterationCount));
         }

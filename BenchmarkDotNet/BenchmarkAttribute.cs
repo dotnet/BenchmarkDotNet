@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BenchmarkDotNet.Attributes
+namespace BenchmarkDotNet
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class BenchmarkAttribute : Attribute

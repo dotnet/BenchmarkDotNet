@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Logging;
 using BenchmarkDotNet.Reports;
@@ -129,19 +128,19 @@ namespace BenchmarkDotNet
             Logger.WriteLineInfo("// Build:");
             benchmarkProjectGenerator.CompileCode(directoryPath);
             Logger.NewLine();
-            var runtimeInstanceCount = Math.Max(1, benchmark.Task.RunCount);
+            var processCount = Math.Max(1, benchmark.Task.ProcessCount);
             var runReports = new List<BenchmarkRunReport>();
             var exeFileName = Path.Combine(directoryPath, "Program.exe");
-            for (int i = 0; i < runtimeInstanceCount; i++)
+            for (int processNumber = 0; processNumber < processCount; processNumber++)
             {
-                Logger.WriteLineInfo($"// Run ({i + 1} / {runtimeInstanceCount})");
+                Logger.WriteLineInfo($"// Run, Process: {processNumber + 1} / {processCount}");
                 if (importantPropertyNames.Any())
                 {
                     Logger.WriteInfo("// ");
                     foreach (var name in importantPropertyNames)
                         Logger.WriteInfo($"{name}={benchmark.Properties.GetValue(name)} ");
                     Logger.NewLine();
-                }
+                }                
 
                 var executor = new BenchmarkExecutor(Logger);
                 if (File.Exists(exeFileName))

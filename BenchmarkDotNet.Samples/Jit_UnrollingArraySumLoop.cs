@@ -1,5 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Tasks;
+﻿using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -9,7 +8,7 @@ namespace BenchmarkDotNet.Samples
     [Task(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
     public class Jit_UnrollingArraySumLoop
     {
-        private const int NUnroll = 1000, N = 1001, IterationCount = 1000000;
+        private const int NUnroll = 1000, N = 1001;
 
         private readonly int[] nonStaticField;
         private static int[] staticField;

@@ -22,8 +22,10 @@
                 return string.Format(EnvironmentHelper.MainCultureInfo, "{0:0.0000} ns", Nanoseconds);
             if (Nanoseconds < 1)
                 return string.Format(EnvironmentHelper.MainCultureInfo, "{0:0.000} ns", Nanoseconds);
-            if (Nanoseconds < 100000)
+            if (Nanoseconds < 1000)
                 return string.Format(EnvironmentHelper.MainCultureInfo, "{0:0.00} ns", Nanoseconds);
+            if (Microseconds < 1000)
+                return string.Format(EnvironmentHelper.MainCultureInfo, "{0:0.00} us", Microseconds);
             if (Milliseconds < 1000)
                 return string.Format(EnvironmentHelper.MainCultureInfo, "{0:0.00} ms", Milliseconds);
             return string.Format(EnvironmentHelper.MainCultureInfo, "{0:0.00} s", Seconds);

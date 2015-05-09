@@ -272,6 +272,7 @@ Some plans for the future development:
 * Support of Mono and CoreCLR
 * Automatic warmup
 * Plots with results
+* Hardware analysis
 
 <a name="usage-example"></a>
 ## Usage example
@@ -282,7 +283,7 @@ In the following example, we will research how [Instruction-level parallelism](h
 [Task(platform: BenchmarkPlatform.X86, jitVersion: BenchmarkJitVersion.LegacyJit)]
 [Task(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
 [Task(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
-public class Cpu_Ilp
+public class Cpu_Ilp_Inc
 {
     private double a, b, c, d;
 
@@ -311,20 +312,20 @@ public class Cpu_Ilp
 An example of results:
 
 ```
-// BenchmarkDotNet=v0.7.3.0
+// BenchmarkDotNet=v0.7.4.0
 // OS=Microsoft Windows NT 6.2.9200.0
 // Processor=Intel(R) Core(TM) i7-4702MQ CPU @ 2.20GHz, ProcessorCount=8
 // CLR=MS.NET 4.0.30319.0, Arch=64-bit  [RyuJIT]
-Common:  Type=Cpu_Ilp  Mode=Throughput  .NET=Current
+Common:  Type=Cpu_Ilp_Inc  Mode=Throughput  .NET=Current
 
      Method | Platform |       Jit |  AvrTime |     StdDev |          op/s |
 ----------- |--------- |---------- |--------- |----------- |-------------- |
-   Parallel |      X64 | LegacyJit | 0.633 ns | 0.00155 ns | 1580204368.36 |
- Sequential |      X64 | LegacyJit |  2.62 ns | 0.00553 ns |  381039864.16 |
-   Parallel |      X64 |    RyuJit | 0.499 ns | 0.00178 ns | 2005148148.99 |
- Sequential |      X64 |    RyuJit | 0.840 ns | 0.00333 ns | 1191081597.57 |
-   Parallel |      X86 | LegacyJit | 0.947 ns | 0.00809 ns | 1056272162.34 |
- Sequential |      X86 | LegacyJit |  2.85 ns |  0.0223 ns |  350340534.83 |
+   Parallel |      X64 | LegacyJit | 0.443 ns |  0.0144 ns | 2255130155.43 |
+ Sequential |      X64 | LegacyJit |  2.62 ns | 0.00877 ns |  381202467.78 |
+   Parallel |      X64 |    RyuJit | 0.630 ns | 0.00436 ns | 1587486530.09 |
+ Sequential |      X64 |    RyuJit |  1.05 ns | 0.00486 ns |  949123537.96 |
+   Parallel |      X86 | LegacyJit | 0.562 ns |  0.0206 ns | 1777793672.86 |
+ Sequential |      X86 | LegacyJit |  2.96 ns |  0.0197 ns |  337625645.72 |
 ```
 
 You can find more examples in the [BenchmarkDotNet.Samples](https://github.com/AndreyAkinshin/BenchmarkDotNet/tree/master/BenchmarkDotNet.Samples) project.
