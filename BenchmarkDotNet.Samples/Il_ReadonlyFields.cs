@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Samples
         }
 
         [Benchmark]
-        public long ReadOnlyValue()
+        public long GetReadOnlyValue()
         {
             return readOnlyField.Bits0 + readOnlyField.Bits1 + readOnlyField.Bits2 + readOnlyField.Bits3;
         }        

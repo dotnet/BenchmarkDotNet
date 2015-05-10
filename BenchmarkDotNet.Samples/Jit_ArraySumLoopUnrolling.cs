@@ -6,14 +6,14 @@ namespace BenchmarkDotNet.Samples
     [Task(platform: BenchmarkPlatform.X86, jitVersion: BenchmarkJitVersion.LegacyJit)]
     [Task(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
     [Task(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
-    public class Jit_UnrollingArraySumLoop
+    public class Jit_ArraySumLoopUnrolling
     {
         private const int NUnroll = 1000, N = 1001;
 
         private readonly int[] nonStaticField;
         private static int[] staticField;
 
-        public Jit_UnrollingArraySumLoop()
+        public Jit_ArraySumLoopUnrolling()
         {
             nonStaticField = staticField = new int[N];
         }

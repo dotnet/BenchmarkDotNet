@@ -58,11 +58,12 @@
     <Compile Include="Cpu_Ilp_Max.cs" />
     <Compile Include="Jit_Inlining.cs" />
     <Compile Include="Jit_InterfaceMethod.cs" />
+    <Compile Include="Jit_LoopUnrolling.cs" />
     <Compile Include="Math_DoubleSqrtAvx.cs" />
     <Compile Include="Math_DoubleSqrt.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Jit_UnrollingArraySumLoop.cs" />
+    <Compile Include="Jit_ArraySumLoopUnrolling.cs" />
     <Compile Include="Framework_SelectVsConvertAll.cs" />
     <Compile Include="Framework_StackFrameVsStackTrace.cs" />
   </ItemGroup>
