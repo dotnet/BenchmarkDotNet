@@ -66,6 +66,7 @@
     <Compile Include="Jit_ArraySumLoopUnrolling.cs" />
     <Compile Include="Framework_SelectVsConvertAll.cs" />
     <Compile Include="Framework_StackFrameVsStackTrace.cs" />
+    <Compile Include="Cpu_Ilp_RyuJit.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj">
