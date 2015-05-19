@@ -4,14 +4,14 @@
         <id>BenchmarkDotNet</id>
         <version>0.7.4</version>
         <title>BenchmarkDotNet</title>
-        <authors>Andrey Akinshin</authors>
-        <owners>Andrey Akinshin</owners>
-        <licenseUrl>https://github.com/AndreyAkinshin/BenchmarkDotNet/blob/master/LICENSE.md</licenseUrl>
-        <projectUrl>https://github.com/AndreyAkinshin/BenchmarkDotNet</projectUrl>
-        <iconUrl>https://raw.githubusercontent.com/AndreyAkinshin/BenchmarkDotNet/master/BenchmarkDotNet/BenchmarkDotNet.png</iconUrl>
+        <authors>Andrey Akinshin, Jon Skeet, Matt Warren</authors>
+        <owners>Andrey Akinshin, Jon Skeet, Matt Warren</owners>
+        <licenseUrl>https://github.com/PerfDotNet/BenchmarkDotNet/blob/master/LICENSE.md</licenseUrl>
+        <projectUrl>https://github.com/PerfDotNet/BenchmarkDotNet</projectUrl>
+        <iconUrl>https://raw.githubusercontent.com/PerfDotNet/BenchmarkDotNet/master/BenchmarkDotNet/BenchmarkDotNet.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Lightweight .NET library for benchmarking</description>
-        <copyright>Andrey Akinshin</copyright>
+        <copyright>Andrey Akinshin, Jon Skeet, Matt Warren</copyright>
         <language>en-US</language>
     </metadata>
     <files>

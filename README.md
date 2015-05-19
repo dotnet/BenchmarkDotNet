@@ -329,3 +329,7 @@ Common:  Type=Cpu_Ilp_Inc  Mode=Throughput  .NET=Current
 ```
 
 You can find more examples in the [BenchmarkDotNet.Samples](https://github.com/AndreyAkinshin/BenchmarkDotNet/tree/master/BenchmarkDotNet.Samples) project.
+
+## Authors
+
+Andrey Akinshin, Jon Skeet, Matt Warren
