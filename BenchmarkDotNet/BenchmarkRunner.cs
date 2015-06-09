@@ -7,6 +7,7 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Logging;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tasks;
+using Microsoft.Build.Execution;
 
 namespace BenchmarkDotNet
 {
@@ -46,15 +47,18 @@ namespace BenchmarkDotNet
             {
                 var report = Run(benchmark, importantPropertyNames);
                 reports.Add(report);
-                var stat = new BenchmarkRunReportsStatistic("Target", report.Runs);
-                Logger.WriteLineResult($"AverageTime (ns/op): {stat.AverageTime}");
-                Logger.WriteLineResult($"OperationsPerSecond: {stat.OperationsPerSeconds}");
+                if (report.Runs.Count > 0)
+                {
+                    var stat = new BenchmarkRunReportsStatistic("Target", report.Runs);
+                    Logger.WriteLineResult($"AverageTime (ns/op): {stat.AverageTime}");
+                    Logger.WriteLineResult($"OperationsPerSecond: {stat.OperationsPerSeconds}");
+                }
                 Logger.NewLine();
             }
             Logger.WriteLineHeader("// ***** Competition: Finish  *****");
             Logger.NewLine();
             Logger.WriteLineInfo(EnvironmentHelper.GetFullEnvironmentInfo());
-            var reportStats = reports.Select(
+            var reportStats = reports.Where(r => r.Runs.Count > 0).Select(
                 r => new
                 {
                     r.Benchmark,
@@ -78,6 +82,14 @@ namespace BenchmarkDotNet
                 table.Add(row);
             }
             PrintTable(table);
+            var benchmarksWithTroubles = reports.Where(r => r.Runs.Count == 0).Select(r => r.Benchmark).ToList();
+            if (benchmarksWithTroubles.Count > 0)
+            {
+                Logger.NewLine();
+                Logger.WriteLineError("Benchmarks with troubles:");
+                foreach (var benchmarkWithTroubles in benchmarksWithTroubles)
+                    Logger.WriteLineError("  " + benchmarkWithTroubles.Caption);
+            }
             Logger.NewLine();
             Logger.WriteLineHeader("// ***** Competition: End *****");
             return reports;
@@ -126,7 +138,14 @@ namespace BenchmarkDotNet
             Logger.WriteLineInfo("// Generated project: " + directoryPath);
             Logger.NewLine();
             Logger.WriteLineInfo("// Build:");
-            benchmarkProjectGenerator.CompileCode(directoryPath);
+            var buildResult = benchmarkProjectGenerator.BuildProject(directoryPath);
+            if (buildResult.OverallResult == BuildResultCode.Success)
+                Logger.WriteLineInfo("// OverallResult = Success");
+            else
+            {
+                Logger.WriteLineError("// OverallResult = Failure");
+                return new BenchmarkReport(benchmark, new BenchmarkRunReport[0]);
+            }
             Logger.NewLine();
             var processCount = Math.Max(1, benchmark.Task.ProcessCount);
             var runReports = new List<BenchmarkRunReport>();
@@ -140,7 +159,7 @@ namespace BenchmarkDotNet
                     foreach (var name in importantPropertyNames)
                         Logger.WriteInfo($"{name}={benchmark.Properties.GetValue(name)} ");
                     Logger.NewLine();
-                }                
+                }
 
                 var executor = new BenchmarkExecutor(Logger);
                 if (File.Exists(exeFileName))

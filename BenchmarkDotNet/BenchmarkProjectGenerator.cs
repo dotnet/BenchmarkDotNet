@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Tasks;
+using Microsoft.Build.Evaluation;
+using Microsoft.Build.Execution;
 
 namespace BenchmarkDotNet
 {
@@ -19,11 +22,14 @@ namespace BenchmarkDotNet
             return projectDir;
         }
 
-        public void CompileCode(string directoryPath)
+        public BuildResult BuildProject(string directoryPath)
         {
-            var executor = new BenchmarkExecutor();
-            executor.Exec("MSBuild", Path.Combine(directoryPath, MainClassName + ".csproj"));
-            Console.WriteLine(File.Exists(Path.Combine(directoryPath, MainClassName + ".exe")) ? "Success" : "Fail");
+            string projectFileName = Path.Combine(directoryPath, MainClassName + ".csproj");
+            var projectCollection = new ProjectCollection();
+            var globalProperties = new Dictionary<string, string>();
+            var buidlRequest = new BuildRequestData(projectFileName, globalProperties, null, new[] { "Build" }, null);
+            var buildResult = BuildManager.DefaultBuildManager.Build(new BuildParameters(projectCollection), buidlRequest);
+            return buildResult;
         }
 
         private static void GenerateProgramFile(string projectDir, Benchmark benchmark)

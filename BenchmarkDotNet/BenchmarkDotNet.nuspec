@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>BenchmarkDotNet</id>
-        <version>0.7.4</version>
+        <version>0.7.5</version>
         <title>BenchmarkDotNet</title>
         <authors>Andrey Akinshin, Jon Skeet, Matt Warren</authors>
         <owners>Andrey Akinshin, Jon Skeet, Matt Warren</owners>
@@ -15,6 +15,6 @@
         <language>en-US</language>
     </metadata>
     <files>
-        <file src="bin\Release\BenchmarkDotNet.dll" target="lib\net35\BenchmarkDotNet.dll" />
+        <file src="bin\Release\BenchmarkDotNet.dll" target="lib\net40\BenchmarkDotNet.dll" />
     </files>
 </package>
