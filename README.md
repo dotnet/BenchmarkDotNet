@@ -328,7 +328,7 @@ Common:  Type=Cpu_Ilp_Inc  Mode=Throughput  .NET=Current
  Sequential |      X86 | LegacyJit |  2.96 ns |  0.0197 ns |  337625645.72 |
 ```
 
-You can find more examples in the [BenchmarkDotNet.Samples](https://github.com/AndreyAkinshin/PerfDotNet/tree/master/BenchmarkDotNet.Samples) project.
+You can find more examples in the [BenchmarkDotNet.Samples](https://github.com/PerfDotNet/BenchmarkDotNet/tree/master/BenchmarkDotNet.Samples) project.
 
 ## Authors
 
