@@ -187,6 +187,9 @@ namespace BenchmarkDotNet
                 {
                     var target = new BenchmarkTarget(targetType, methodInfo, benchmarkAttribute.Description);
                     AssertBenchmarkMethodHasCorrectSignature(methodInfo);
+                    AssertBenchmarkMethodIsAccessible(methodInfo);
+                    AssertBenchmarkMethodIsNotDeclaredInGeneric(methodInfo);
+                    AssertBenchmarkMethodIsNotGeneric(methodInfo);
                     foreach (var task in BenchmarkTask.Resolve(methodInfo, defaultSettings))
                         yield return new Benchmark(target, task);
                 }
@@ -197,6 +200,40 @@ namespace BenchmarkDotNet
         {
             if (methodInfo.GetParameters().Any())
                 throw new InvalidOperationException($"Benchmark method {methodInfo.Name} has incorrect signature.\nMethod shouldn't have any arguments.");
+        }
+        private static void AssertBenchmarkMethodIsAccessible(MethodInfo methodInfo)
+        {
+            if (!methodInfo.IsPublic)
+                throw new InvalidOperationException($"Benchmark method {methodInfo.Name} has incorrect access modifiers.\nMethod must be public.");
+
+            var declaringType = methodInfo.DeclaringType;
+
+            while (declaringType != null)
+            {
+                if (!declaringType.IsPublic && !declaringType.IsNestedPublic)
+                    throw new InvalidOperationException($"Benchmark method {methodInfo.Name} defined within type {declaringType.FullName} has incorrect access modifiers.\nDeclaring type must be public.");
+
+                declaringType = declaringType.DeclaringType;
+            }
+        }
+
+        private static void AssertBenchmarkMethodIsNotDeclaredInGeneric(MethodInfo methodInfo)
+        {
+            var declaringType = methodInfo.DeclaringType;
+
+            while (declaringType != null)
+            {
+                if (declaringType.IsGenericType)
+                    throw new InvalidOperationException($"Benchmark method {methodInfo.Name} defined within generic type {declaringType.FullName}.\nBenchmark methods in generic types are not supported.");
+
+                declaringType = declaringType.DeclaringType;
+            }
+        }
+
+        private static void AssertBenchmarkMethodIsNotGeneric(MethodInfo methodInfo)
+        {
+            if (methodInfo.IsGenericMethod)
+                throw new InvalidOperationException($"Benchmark method {methodInfo.Name} is generic.\nGeneric benchmark methods are not supported.");
         }
     }
 }
