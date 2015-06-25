@@ -43,7 +43,7 @@ namespace BenchmarkDotNet
                 ? "System"
                 : benchmark.Target.Method.ReturnType.Namespace;
 
-            var targetTypeName = benchmark.Target.Type.FullName;                                   
+            var targetTypeName = benchmark.Target.Type.FullName.Replace('+','.');                                   
             var targetMethodName = benchmark.Target.Method.Name;
 
             var targetMethodReturnType = isVoid
