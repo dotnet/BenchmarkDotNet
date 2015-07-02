@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("BenchmarkDotNet.Samples")]
-[assembly: AssemblyCopyright("Copyright © Andrey Akinshin 2013–2015")]
+[assembly: AssemblyCopyright("Copyright © Andrey Akinshin, Jon Skeet, Matt Warren 2013–2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -14,5 +14,5 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("6f2232a9-0d0c-46cf-b08c-f6e28ab612e3")]
 
-[assembly: AssemblyVersion("0.7.5")]
-[assembly: AssemblyFileVersion("0.7.5")]
+[assembly: AssemblyVersion("0.7.6")]
+[assembly: AssemblyFileVersion("0.7.6")]
