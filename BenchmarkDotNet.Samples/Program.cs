@@ -21,6 +21,7 @@
                 typeof(Cpu_Ilp_VsBce),
                 typeof(Cpu_Ilp_RyuJit),
                 typeof(Cpu_MatrixMultiplication),
+                typeof(Cpu_BranchPerdictor),
                 typeof(Framework_SelectVsConvertAll),
                 typeof(Framework_StackFrameVsStackTrace),
                 typeof(Math_DoubleSqrt),
