@@ -165,7 +165,7 @@ namespace BenchmarkDotNet
                 if (File.Exists(exeFileName))
                 {
                     var lines = executor.Exec(exeFileName, benchmark.Task.Settings.ToArgs());
-                    var iterRunReports = lines.Select(BenchmarkRunReport.Parse).ToList();
+                    var iterRunReports = lines.Select(line => BenchmarkRunReport.Parse(Logger, line)).Where(r => r != null).ToList();
                     runReports.AddRange(iterRunReports);
                 }
             }
