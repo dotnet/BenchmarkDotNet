@@ -26,7 +26,8 @@
                 typeof(Framework_StackFrameVsStackTrace),
                 typeof(Math_DoubleSqrt),
                 typeof(Math_DoubleSqrtAvx),
-                typeof(Algo_BitCount)
+                typeof(Algo_BitCount),
+                typeof(Algo_Md5VsSha256)
             });
             competitionSwitch.Run(args);
         }

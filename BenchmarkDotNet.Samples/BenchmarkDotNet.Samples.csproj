@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algo_BitCount.cs" />
+    <Compile Include="Algo_Md5VsSha256.cs" />
     <Compile Include="Cpu_BranchPerdictor.cs" />
     <Compile Include="Cpu_Ilp_Inc.cs" />
     <Compile Include="Il_ReadonlyFields.cs" />
