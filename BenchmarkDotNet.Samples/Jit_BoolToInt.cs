@@ -41,10 +41,10 @@ namespace BenchmarkDotNet.Samples
             unsafe
             {
                 bool v1 = first;
-                int sum = *(int*)(&v1);
+                int sum = *(byte*)(&v1);
 
                 bool v2 = second;
-                sum += *(int*)(&v2);
+                sum += *(byte*)(&v2);
                 return sum;
             }
         }
