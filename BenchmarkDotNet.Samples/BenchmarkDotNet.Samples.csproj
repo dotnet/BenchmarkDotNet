@@ -34,6 +34,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <LangVersion>5</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -46,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Algo_BitCount.cs" />
     <Compile Include="Algo_Md5VsSha256.cs" />
+    <Compile Include="Algo_MostSignificantBit.cs" />
     <Compile Include="Cpu_BranchPerdictor.cs" />
     <Compile Include="Cpu_Ilp_Inc.cs" />
     <Compile Include="Il_ReadonlyFields.cs" />
@@ -58,6 +60,7 @@
     <Compile Include="Jit_Bce.cs" />
     <Compile Include="Cpu_MatrixMultiplication.cs" />
     <Compile Include="Cpu_Ilp_Max.cs" />
+    <Compile Include="Jit_BoolToInt.cs" />
     <Compile Include="Jit_Inlining.cs" />
     <Compile Include="Jit_InterfaceMethod.cs" />
     <Compile Include="Jit_LoopUnrolling.cs" />
