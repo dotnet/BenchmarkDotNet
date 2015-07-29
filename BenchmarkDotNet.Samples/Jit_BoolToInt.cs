@@ -10,49 +10,43 @@ namespace BenchmarkDotNet.Samples
     [Task(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
     public class Jit_BoolToInt
     {
-        private const int N = 1001;
-        private readonly bool[] bits;
+        private bool first;
+        private bool second;
 
         public Jit_BoolToInt()
         {
-            bits = new bool[N];
-            for (int i = 0; i < N; i++)
-                bits[i] = i % 2 == 0;
+            first = true;
+            second = false;
         }
 
         [Benchmark]
         public int Framework()
         {
-            int sum = 0;
-            for (int i = 0; i < N; i++)
-                sum += Convert.ToInt32(bits[i]);
-
+            int sum = Convert.ToInt32(first);
+            sum += Convert.ToInt32(second);
             return sum;
         }
 
         [Benchmark]
         public int IfThenElse()
         {
-            int sum = 0;
-            for (int i = 0; i < N; i++)
-                sum += bits[i] ? 1 : 0;
-
+            int sum = first ? 1 : 0;
+            sum += second ? 1 : 0;
             return sum;
         }
 
         [Benchmark]
         public int UnsafeConvert()
         {
-            int sum = 0;
             unsafe
             {
-                for (int i = 0; i < N; i++)
-                {
-                    bool v = bits[i];
-                    sum += *(int*)(&v);
-                }
+                bool v1 = first;
+                int sum = *(int*)(&v1);
+
+                bool v2 = second;
+                sum += *(int*)(&v2);
+                return sum;
             }
-            return sum;
         }
     }
 }
