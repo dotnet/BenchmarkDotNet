@@ -37,26 +37,26 @@ namespace BenchmarkDotNet
             var isVoid = benchmark.Target.Method.ReturnType == typeof(void);
 
             var operationsPerInvoke = benchmark.Target.OperationsPerInvoke;
-            
+
             var targetTypeNamespace = benchmark.Target.Type.Namespace;
             var targetMethodReturnTypeNamespace = benchmark.Target.Method.ReturnType == typeof(void)
                 ? "System"
                 : benchmark.Target.Method.ReturnType.Namespace;
 
-            var targetTypeName = benchmark.Target.Type.FullName.Replace('+','.');                                   
+            var targetTypeName = benchmark.Target.Type.FullName.Replace('+', '.');
             var targetMethodName = benchmark.Target.Method.Name;
 
             var targetMethodReturnType = isVoid
                 ? "void"
-                : benchmark.Target.Method.ReturnType.GetCorrectTypeName();            
-            var targetMethodResultHolder = isVoid 
-                ? "" : 
+                : benchmark.Target.Method.ReturnType.GetCorrectTypeName();
+            var targetMethodResultHolder = isVoid
+                ? "" :
                 $"private {targetMethodReturnType} value;";
-            var targetMethodHoldValue = isVoid 
-                ? "" 
+            var targetMethodHoldValue = isVoid
+                ? ""
                 : "value = ";
-            var targetMethodDelegateType = isVoid 
-                ? "Action " 
+            var targetMethodDelegateType = isVoid
+                ? "Action "
                 : $"Func<{targetMethodReturnType}> ";
             var idleImplementation = isVoid
                 ? ""
