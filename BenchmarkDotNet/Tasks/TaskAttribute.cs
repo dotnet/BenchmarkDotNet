@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Tasks
     public class TaskAttribute : BenchmarkTaskAttribute
     {
         public TaskAttribute(
-            int processCount = 3,
+            int processCount = 1,
             BenchmarkMode mode = BenchmarkMode.Throughput,
             BenchmarkPlatform platform = BenchmarkPlatform.HostPlatform,
             BenchmarkJitVersion jitVersion = BenchmarkJitVersion.HostJit,

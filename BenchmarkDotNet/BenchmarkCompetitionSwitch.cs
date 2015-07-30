@@ -47,11 +47,23 @@ namespace BenchmarkDotNet
                     logger.WriteLineHeader("Target competition: " + competition.Name);
                     using (var logStreamWriter = new StreamWriter(competition.Name + ".log"))
                     {
-                        var loggers = new IBenchmarkLogger[] {new BenchmarkConsoleLogger(), new BenchmarkStreamLogger(logStreamWriter)};
+                        var loggers = new IBenchmarkLogger[] { new BenchmarkConsoleLogger(), new BenchmarkStreamLogger(logStreamWriter) };
                         var runner = new BenchmarkRunner(loggers);
                         runner.RunCompetition(Activator.CreateInstance(competition), BenchmarkSettings.Parse(args));
                     }
                     logger.NewLine();
+                }
+            }
+            if (args.Length > 0 && (args[0].StartsWith("http://") || args[0].StartsWith("https://")))
+            {
+                var url = args[0];
+                Uri uri = new Uri(url);
+                var name = uri.IsFile ? Path.GetFileName(uri.LocalPath) : "URL";
+                using (var logStreamWriter = new StreamWriter(name + ".log"))
+                {
+                    var loggers = new IBenchmarkLogger[] { new BenchmarkConsoleLogger(), new BenchmarkStreamLogger(logStreamWriter) };
+                    var runner = new BenchmarkRunner(loggers);
+                    runner.RunUrl(url, BenchmarkSettings.Parse(args));
                 }
             }
         }

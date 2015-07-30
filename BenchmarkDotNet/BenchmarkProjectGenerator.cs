@@ -85,7 +85,8 @@ namespace BenchmarkDotNet
                 Replace("$TargetMethodDelegateType$", targetMethodDelegateType).
                 Replace("$TargetMethodHoldValue$", targetMethodHoldValue).
                 Replace("$TargetMethodReturnType$", targetMethodReturnType).
-                Replace("$IdleImplementation$", idleImplementation);
+                Replace("$IdleImplementation$", idleImplementation).
+                Replace("$AdditionalLogic$", benchmark.Target.AdditionalLogic);
 
             string fileName = Path.Combine(projectDir, MainClassName + ".cs");
             File.WriteAllText(fileName, content);

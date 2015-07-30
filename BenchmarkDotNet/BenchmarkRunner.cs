@@ -1,13 +1,16 @@
 ﻿using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Logging;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tasks;
 using Microsoft.Build.Execution;
+using Microsoft.CSharp;
 
 namespace BenchmarkDotNet
 {
@@ -29,6 +32,11 @@ namespace BenchmarkDotNet
         public IEnumerable<BenchmarkReport> RunCompetition(object benchmarkCompetition, BenchmarkSettings defaultSettings = null)
         {
             return RunCompetition(CompetitionToBenchmarks(benchmarkCompetition, defaultSettings).ToList());
+        }
+
+        public IEnumerable<BenchmarkReport> RunUrl(string url, BenchmarkSettings defaultSettings = null)
+        {
+            return RunCompetition(UrlToBenchmarks(url, defaultSettings).ToList());
         }
 
         public IEnumerable<BenchmarkReport> RunCompetition(List<Benchmark> benchmarks)
@@ -196,11 +204,50 @@ namespace BenchmarkDotNet
             }
         }
 
+        private static IEnumerable<Benchmark> UrlToBenchmarks(string url, BenchmarkSettings defaultSettings)
+        {
+            string benchmarkContent = String.Empty;
+            try
+            {
+                var webRequest = WebRequest.Create(url);
+                using (var response = webRequest.GetResponse())
+                using (var content = response.GetResponseStream())
+                using (var reader = new StreamReader(content))
+                    benchmarkContent = reader.ReadToEnd();
+                if (string.IsNullOrWhiteSpace(benchmarkContent))
+                {
+                    Console.WriteLine($"content of '{url}' is empty.");
+                    yield break;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception: " + e.Message);
+                yield break;
+            }
+            var cSharpCodeProvider = new CSharpCodeProvider();
+            var compilerParameters = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll" }) { CompilerOptions = "/unsafe" };
+            compilerParameters.ReferencedAssemblies.Add(typeof(BenchmarkRunner).Assembly.Location);
+            var compilerResults = cSharpCodeProvider.CompileAssemblyFromSource(compilerParameters, benchmarkContent);
+            if (compilerResults.Errors.HasErrors)
+            {
+                compilerResults.Errors.Cast<CompilerError>().ToList().ForEach(error => Console.WriteLine(error.ErrorText));
+                yield break;
+            }
+            foreach (var type in compilerResults.CompiledAssembly.GetTypes())
+            {
+                var instance = Activator.CreateInstance(type);
+                foreach (var benchmark in CompetitionToBenchmarks(instance, defaultSettings))
+                    yield return new Benchmark(new BenchmarkTarget(benchmark.Target.Type, benchmark.Target.Method, benchmark.Target.Description, benchmarkContent), benchmark.Task);
+            }
+        }
+
         private static void AssertBenchmarkMethodHasCorrectSignature(MethodInfo methodInfo)
         {
             if (methodInfo.GetParameters().Any())
                 throw new InvalidOperationException($"Benchmark method {methodInfo.Name} has incorrect signature.\nMethod shouldn't have any arguments.");
         }
+
         private static void AssertBenchmarkMethodIsAccessible(MethodInfo methodInfo)
         {
             if (!methodInfo.IsPublic)
