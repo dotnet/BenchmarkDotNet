@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Samples
     public class Intro_01_MethodTasks
     {        
         [Benchmark]
-        // In this case, you can declare several tasks with the Task attrbute.
+        // In this case, you can declare several tasks with the Task attribute.
         // For example, we can run the benchmark methods for the x86 and x64 platforms.
         [BenchmarkTask(platform: BenchmarkPlatform.X86)]
         [BenchmarkTask(platform: BenchmarkPlatform.X64)]

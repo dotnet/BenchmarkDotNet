@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Samples
             return sum;
         }
 
-        // If the amount of iterations is odd, LegacyJit x64 can do unroll.
+        // If the amount of iterations is odd, LegacyJit x64 can't do unroll.
         // Thus, all of the JITs show the same results.
         [Benchmark]
         public int Loop1001()

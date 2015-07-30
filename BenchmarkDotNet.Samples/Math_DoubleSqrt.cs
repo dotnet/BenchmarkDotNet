@@ -3,7 +3,7 @@ using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet.Samples
 {    
-    // Math.Sqrt method uses different ASM inscrution of different JIT versions:
+    // Math.Sqrt method uses different ASM instruction of different JIT versions:
     // LegacyJit x86: fsqrt   (FPU)
     // LegacyJit x64: sqrtsd  (SSE2)
     // RyuJIT    x64: vsqrtsd (AVX)
