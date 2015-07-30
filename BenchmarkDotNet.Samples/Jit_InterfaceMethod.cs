@@ -2,8 +2,8 @@
 
 namespace BenchmarkDotNet.Samples
 {
-    [Task(platform: BenchmarkPlatform.X86)]
-    [Task(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
+    [BenchmarkTask(platform: BenchmarkPlatform.X86)]
+    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
     public class Jit_InterfaceMethod
     {
         private interface IFoo

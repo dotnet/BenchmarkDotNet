@@ -2,7 +2,7 @@
 
 namespace BenchmarkDotNet.Samples
 {
-    [Task(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
+    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
     public class Il_Switch
     {
         private int x = 7, y = 7000;

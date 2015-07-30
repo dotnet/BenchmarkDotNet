@@ -2,11 +2,12 @@
 
 namespace BenchmarkDotNet.Tasks
 {
-    [Obsolete]
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
-    public class TaskAttribute : BenchmarkTaskAttribute
+    public class BenchmarkTaskAttribute : Attribute
     {
-        public TaskAttribute(
+        public BenchmarkTask Task { get; protected set; }
+
+        public BenchmarkTaskAttribute(
             int processCount = 3,
             BenchmarkMode mode = BenchmarkMode.Throughput,
             BenchmarkPlatform platform = BenchmarkPlatform.HostPlatform,

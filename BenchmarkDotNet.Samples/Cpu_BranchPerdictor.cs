@@ -4,7 +4,7 @@ using BenchmarkDotNet.Tasks;
 namespace BenchmarkDotNet.Samples
 {
     // See http://stackoverflow.com/questions/11227809/why-is-processing-a-sorted-array-faster-than-an-unsorted-array/11227902
-    [Task(platform: BenchmarkPlatform.X86)]
+    [BenchmarkTask(platform: BenchmarkPlatform.X86)]
     public class Cpu_BranchPerdictor
     {
         private const int N = 32767;

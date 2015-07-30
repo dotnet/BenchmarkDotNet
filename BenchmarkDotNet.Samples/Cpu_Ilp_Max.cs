@@ -3,7 +3,7 @@ using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet.Samples
 {
-    [Task(platform: BenchmarkPlatform.X86, targetIterationCount: 20)]
+    [BenchmarkTask(platform: BenchmarkPlatform.X86, targetIterationCount: 20)]
     public class Cpu_Ilp_Max
     {
         private int[] x = new int[32];

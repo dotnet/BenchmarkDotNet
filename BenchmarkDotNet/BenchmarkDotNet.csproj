@@ -49,8 +49,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Tasks\BenchmarkTaskAttribute.cs" />
     <Compile Include="OperationsPerInvokeAttribute.cs" />
-    <Compile Include="Tasks\TaskAttribute.cs" />
     <Compile Include="Benchmark.cs" />
     <Compile Include="BenchmarkCompetitionSwitch.cs" />
     <Compile Include="BenchmarkExecutor.cs" />
@@ -84,6 +84,7 @@
     <Compile Include="Reports\BenchmarkRunReport.cs" />
     <Compile Include="Extensions\CommonExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tasks\TaskAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\BenchmarkCsproj.txt" />

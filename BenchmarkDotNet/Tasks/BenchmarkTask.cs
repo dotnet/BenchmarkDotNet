@@ -19,11 +19,11 @@ namespace BenchmarkDotNet.Tasks
 
         public static IEnumerable<BenchmarkTask> Resolve(MethodInfo methodInfo, BenchmarkSettings defaultSettings)
         {
-            var attrs = methodInfo.GetCustomAttributes(typeof(TaskAttribute), false).Cast<TaskAttribute>().ToList();
+            var attrs = methodInfo.GetCustomAttributes(typeof(BenchmarkTaskAttribute), false).Cast<BenchmarkTaskAttribute>().ToList();
             if (attrs.Count == 0)
-                attrs = methodInfo.DeclaringType.GetCustomAttributes(typeof(TaskAttribute), false).Cast<TaskAttribute>().ToList();
+                attrs = methodInfo.DeclaringType.GetCustomAttributes(typeof(BenchmarkTaskAttribute), false).Cast<BenchmarkTaskAttribute>().ToList();
             if (attrs.Count == 0)
-                attrs.Add(new TaskAttribute(warmupIterationCount: defaultSettings.WarmupIterationCount, targetIterationCount: defaultSettings.TargetIterationCount));
+                attrs.Add(new BenchmarkTaskAttribute(warmupIterationCount: defaultSettings.WarmupIterationCount, targetIterationCount: defaultSettings.TargetIterationCount));
             return attrs.Select(attr => attr.Task);
         }
 

@@ -3,8 +3,8 @@
 namespace BenchmarkDotNet.Samples
 {
     // See: https://github.com/dotnet/coreclr/issues/993
-    [Task(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
-    [Task(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
+    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
+    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
     public class Cpu_Ilp_RyuJit
     {
         private double[] x = new double[11];

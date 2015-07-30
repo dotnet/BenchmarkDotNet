@@ -4,7 +4,7 @@ using BenchmarkDotNet.Tasks;
 namespace BenchmarkDotNet.Samples
 {
     // You need RyuJit and AVX support for this benchmark
-    [Task(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
+    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
     public class Math_DoubleSqrtAvx
     {
         // vxorpd      xmm0,xmm0,xmm0  

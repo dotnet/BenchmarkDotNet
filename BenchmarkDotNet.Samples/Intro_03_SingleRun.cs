@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Samples
 
         // The SingleRun mode is useful, if you want to measure the cold start of your application
         [Benchmark]
-        [Task(5, mode: BenchmarkMode.SingleRun, platform: BenchmarkPlatform.X86, warmupIterationCount: 0, targetIterationCount: 1)]
+        [BenchmarkTask(5, mode: BenchmarkMode.SingleRun, platform: BenchmarkPlatform.X86, warmupIterationCount: 0, targetIterationCount: 1)]
         [OperationsPerInvoke(N / 16)] // The OperationsPerInvoke help you to specify amount of basic operation inside the target method
         public void ColdStart()
         {
@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Samples
         }
 
         [Benchmark]
-        [Task(5, mode: BenchmarkMode.Throughput, platform: BenchmarkPlatform.X86, warmupIterationCount: 5, targetIterationCount: 10)]
+        [BenchmarkTask(5, mode: BenchmarkMode.Throughput, platform: BenchmarkPlatform.X86, warmupIterationCount: 5, targetIterationCount: 10)]
         [OperationsPerInvoke(N / 16)]
         public void WarmStart()
         {
