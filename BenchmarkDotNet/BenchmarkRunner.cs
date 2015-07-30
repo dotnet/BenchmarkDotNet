@@ -65,7 +65,8 @@ namespace BenchmarkDotNet
             }
             Logger.WriteLineHeader("// ***** Competition: Finish  *****");
             Logger.NewLine();
-            Logger.WriteLineInfo(EnvironmentHelper.GetFullEnvironmentInfo("Host "));
+            Logger.WriteLineInfo("```ini");
+            Logger.WriteLineInfo(EnvironmentHelper.GetFullEnvironmentInfo("Host", false));
             var reportStats = reports.Where(r => r.Runs.Count > 0).Select(
                 r => new
                 {
@@ -132,11 +133,11 @@ namespace BenchmarkDotNet
             }
             if (areSame.Any(s => s))
             {
-                Logger.WriteStatistic("Common:  ");
                 for (int colIndex = 0; colIndex < colCount; colIndex++)
                     if (areSame[colIndex])
-                        Logger.WriteStatistic($"{table[0][colIndex]}={table[1][colIndex]}  ");
+                        Logger.WriteInfo($"{table[0][colIndex]}={table[1][colIndex]}  ");
                 Logger.NewLine();
+                Logger.WriteLineInfo("```");
                 Logger.NewLine();
             }
 

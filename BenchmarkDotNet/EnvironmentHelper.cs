@@ -54,12 +54,13 @@ namespace BenchmarkDotNet
             return "";
         }
 
-        public static string GetFullEnvironmentInfo(string clrHint = "")
+        public static string GetFullEnvironmentInfo(string clrHint = "", bool printDoubleSlash = true)
         {
-            var line1 = $"// BenchmarkDotNet=v{GetBenchmarkDotNetVersion()}";
-            var line2 = $"// OS={GetOsVersion()}";
-            var line3 = $"// Processor={GetProcessorName()}, ProcessorCount={GetProcessorCount()}";
-            var line4 = $"// {clrHint}CLR={GetClrVersion()}, Arch={GetArch()} {GetConfiguration()}{GetDebuggerFlag()}{GetJitFlag()}";
+            var prefix = printDoubleSlash ? "// " : string.Empty;
+            var line1 = $"{prefix}BenchmarkDotNet=v{GetBenchmarkDotNetVersion()}";
+            var line2 = $"{prefix}OS={GetOsVersion()}";
+            var line3 = $"{prefix}Processor={GetProcessorName()}, ProcessorCount={GetProcessorCount()}";
+            var line4 = $"{prefix}{clrHint}CLR={GetClrVersion()}, Arch={GetArch()} {GetConfiguration()}{GetDebuggerFlag()}{GetJitFlag()}";
             return string.Join(Environment.NewLine, new[] { line1, line2, line3, line4 });
         }
 
