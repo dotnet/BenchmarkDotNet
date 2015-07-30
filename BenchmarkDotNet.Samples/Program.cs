@@ -14,6 +14,7 @@
                 typeof(Jit_LoopUnrolling),
                 typeof(Jit_ArraySumLoopUnrolling),
                 typeof(Jit_Inlining),
+                typeof(Jit_BoolToInt),
                 typeof(Jit_Bce),
                 typeof(Jit_InterfaceMethod),
                 typeof(Cpu_Ilp_Inc),
@@ -27,6 +28,7 @@
                 typeof(Math_DoubleSqrt),
                 typeof(Math_DoubleSqrtAvx),
                 typeof(Algo_BitCount),
+                typeof(Algo_MostSignificantBit),
                 typeof(Algo_Md5VsSha256)
             });
             competitionSwitch.Run(args);
