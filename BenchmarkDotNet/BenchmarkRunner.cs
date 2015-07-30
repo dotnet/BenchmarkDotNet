@@ -76,6 +76,18 @@ namespace BenchmarkDotNet
             foreach (var reportStat in reportStats)
             {
                 var b = reportStat.Benchmark;
+
+                // Ops/sec number formatting:
+                //      - Thousand separators: we generally expect large numbers so these 
+                //        would make it easier to view.
+                //      - Decimals: Do we really need these? Perhaps we do but only if we have
+                //        really small values to deal with.
+                // In any case, we would like to have all numbers to be aligned, ideally by decimal point
+                // but I'm too lazy to do that now, so maybe a compomise of fixed two decimals would do at the mo.
+                //
+                // Hence the choice of {N2} formatting string.
+                var opsPerSecValue = string.Format(EnvironmentHelper.MainCultureInfo, "{0:N2}", reportStat.Stat.OperationsPerSeconds.Median);
+
                 string[] row = {
                     b.Target.Type.Name,
                     b.Target.Method.Name,
@@ -85,7 +97,7 @@ namespace BenchmarkDotNet
                     b.Task.Configuration.Framework.ToString(),
                     new BenchmarkTimeSpan(reportStat.Stat.AverageTime.Median).ToString(),
                     new BenchmarkTimeSpan(reportStat.Stat.AverageTime.StandardDeviation).ToString(),
-                    string.Format(EnvironmentHelper.MainCultureInfo, "{0:0.##}", reportStat.Stat.OperationsPerSeconds.Median)
+                    opsPerSecValue
                 };
                 table.Add(row);
             }
