@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Extensions
                     return "x86";
                 case BenchmarkPlatform.X64:
                     return "x64";
-                case BenchmarkPlatform.CurrentPlatform:
+                case BenchmarkPlatform.HostPlatform:
                     return IntPtr.Size == 4 ? "x86" : "x64";
                 default:
                     return "AnyCPU";
@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Extensions
 
         public static string ToConfig(this BenchmarkFramework framework)
         {
-            if (framework == BenchmarkFramework.Current)
+            if (framework == BenchmarkFramework.HostFramework)
                 return DetectCurrentFramework();
             var number = framework.ToString().Substring(1);
             var numberArray = number.ToCharArray().Select(c => c.ToString()).ToArray();

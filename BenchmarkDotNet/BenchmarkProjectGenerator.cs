@@ -127,7 +127,7 @@ namespace BenchmarkDotNet
         {
             var useLagacyJit = configuration.JitVersion.ToConfig();
 
-            var template = GetTemplate(configuration.JitVersion == BenchmarkJitVersion.CurrentJit ? "BenchmarkAppConfigEmpty.txt" : "BenchmarkAppConfig.txt");
+            var template = GetTemplate(configuration.JitVersion == BenchmarkJitVersion.HostJit ? "BenchmarkAppConfigEmpty.txt" : "BenchmarkAppConfig.txt");
             var content = template.
                 Replace("$UseLagacyJit$", useLagacyJit);
 

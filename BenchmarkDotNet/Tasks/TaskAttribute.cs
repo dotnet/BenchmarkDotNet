@@ -10,9 +10,9 @@ namespace BenchmarkDotNet.Tasks
         public TaskAttribute(
             int processCount = 3,
             BenchmarkMode mode = BenchmarkMode.Throughput,
-            BenchmarkPlatform platform = BenchmarkPlatform.CurrentPlatform,
-            BenchmarkJitVersion jitVersion = BenchmarkJitVersion.CurrentJit,
-            BenchmarkFramework framework = BenchmarkFramework.Current,
+            BenchmarkPlatform platform = BenchmarkPlatform.HostPlatform,
+            BenchmarkJitVersion jitVersion = BenchmarkJitVersion.HostJit,
+            BenchmarkFramework framework = BenchmarkFramework.HostFramework,
             int warmupIterationCount = 5,
             int targetIterationCount = 10
             )
