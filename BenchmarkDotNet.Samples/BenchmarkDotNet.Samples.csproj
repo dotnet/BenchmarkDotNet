@@ -56,6 +56,7 @@
     <Compile Include="Intro_01_MethodTasks.cs" />
     <Compile Include="Intro_02_ClassTasks.cs" />
     <Compile Include="Cpu_Ilp_VsBce.cs" />
+    <Compile Include="Intro_04_UniformReportingTest.cs" />
     <Compile Include="Intro_03_SingleRun.cs" />
     <Compile Include="Jit_Bce.cs" />
     <Compile Include="Cpu_MatrixMultiplication.cs" />
