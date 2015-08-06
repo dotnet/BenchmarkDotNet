@@ -9,6 +9,7 @@
                 typeof(Intro_01_MethodTasks),
                 typeof(Intro_02_ClassTasks),
                 typeof(Intro_03_SingleRun),
+                typeof(Intro_04_UniformReportingTest),
                 typeof(Il_ReadonlyFields),
                 typeof(Il_Switch),
                 typeof(Jit_LoopUnrolling),
