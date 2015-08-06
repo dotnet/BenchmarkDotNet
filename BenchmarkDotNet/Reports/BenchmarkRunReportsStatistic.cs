@@ -13,8 +13,8 @@ namespace BenchmarkDotNet.Reports
         public BenchmarkRunReportsStatistic(string name, IList<BenchmarkRunReport> runReports)
         {
             Name = name;
-            AverageTime = new BenchmarkMeasurementStatistic(runReports.Select(r => r.Time.Nanoseconds / r.Operations).ToArray());
-            OperationsPerSeconds = new BenchmarkMeasurementStatistic(runReports.Select(r => r.Operations / r.Time.Seconds).ToArray());
+            AverageTime = new BenchmarkMeasurementStatistic(runReports.Select(r => r.AverageNanoseconds).ToArray());
+            OperationsPerSeconds = new BenchmarkMeasurementStatistic(runReports.Select(r => r.OpsPerSecond).ToArray());
         }
     }
 }

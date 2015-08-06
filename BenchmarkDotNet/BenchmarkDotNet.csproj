@@ -55,7 +55,6 @@
     <Compile Include="BenchmarkCompetitionSwitch.cs" />
     <Compile Include="BenchmarkExecutor.cs" />
     <Compile Include="BenchmarkMethodInvoker.cs" />
-    <Compile Include="Reports\BenchmarkTimeSpan.cs" />
     <Compile Include="Tasks\BenchmarkConfiguration.cs" />
     <Compile Include="Tasks\BenchmarkFramework.cs" />
     <Compile Include="BenchmarkProjectGenerator.cs" />
