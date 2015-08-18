@@ -2,7 +2,7 @@
 
 namespace BenchmarkDotNet.Tasks
 {
-    [Obsolete]
+    [Obsolete("Use BenchmarkTask")]
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
     public class TaskAttribute : BenchmarkTaskAttribute
     {
