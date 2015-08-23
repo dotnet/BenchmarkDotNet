@@ -18,6 +18,7 @@
                 typeof(Jit_BoolToInt),
                 typeof(Jit_Bce),
                 typeof(Jit_InterfaceMethod),
+                typeof(Jit_RegistersVsStack),
                 typeof(Cpu_Ilp_Inc),
                 typeof(Cpu_Ilp_Max),
                 typeof(Cpu_Ilp_VsBce),
