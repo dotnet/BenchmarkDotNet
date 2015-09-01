@@ -42,6 +42,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Build" />
+    <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
@@ -49,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Logging\MSBuildConsoleLogger.cs" />
     <Compile Include="SetupAttribute.cs" />
     <Compile Include="Tasks\BenchmarkTaskAttribute.cs" />
     <Compile Include="OperationsPerInvokeAttribute.cs" />

@@ -6,6 +6,8 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Tasks;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Execution;
+using Microsoft.Build.Framework;
+using BenchmarkDotNet.Logging;
 
 namespace BenchmarkDotNet
 {
@@ -22,13 +24,14 @@ namespace BenchmarkDotNet
             return projectDir;
         }
 
-        public BuildResult BuildProject(string directoryPath)
+        public BuildResult BuildProject(string directoryPath, IBenchmarkLogger logger)
         {
             string projectFileName = Path.Combine(directoryPath, MainClassName + ".csproj");
-            var projectCollection = new ProjectCollection();
+            var consoleLogger = new MSBuildConsoleLogger(logger);
             var globalProperties = new Dictionary<string, string>();
-            var buidlRequest = new BuildRequestData(projectFileName, globalProperties, null, new[] { "Build" }, null);
-            var buildResult = BuildManager.DefaultBuildManager.Build(new BuildParameters(projectCollection), buidlRequest);
+            var buildRequest = new BuildRequestData(projectFileName, globalProperties, null, new[] { "Build" }, null);
+            var buildParameters = new BuildParameters(new ProjectCollection()) { DetailedSummary = false, Loggers = new ILogger[] { consoleLogger } };
+            var buildResult = BuildManager.DefaultBuildManager.Build(buildParameters, buildRequest);
             return buildResult;
         }
 

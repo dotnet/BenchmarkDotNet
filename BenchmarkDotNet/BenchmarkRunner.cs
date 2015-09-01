@@ -154,12 +154,16 @@ namespace BenchmarkDotNet
             Logger.WriteLineInfo("// Generated project: " + directoryPath);
             Logger.NewLine();
             Logger.WriteLineInfo("// Build:");
-            var buildResult = benchmarkProjectGenerator.BuildProject(directoryPath);
+            var buildResult = benchmarkProjectGenerator.BuildProject(directoryPath, Logger);
             if (buildResult.OverallResult == BuildResultCode.Success)
+            {
                 Logger.WriteLineInfo("// OverallResult = Success");
+            }
             else
             {
                 Logger.WriteLineError("// OverallResult = Failure");
+                if (buildResult.Exception != null)
+                    Logger.WriteLineError(buildResult.Exception.Message);
                 return new BenchmarkReport(benchmark, new BenchmarkRunReport[0]);
             }
             Logger.NewLine();
