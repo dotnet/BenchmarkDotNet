@@ -55,7 +55,8 @@ namespace BenchmarkDotNet
             var start = new ProcessStartInfo
             {
                 UseShellExecute = false,
-                RedirectStandardOutput = true
+                RedirectStandardOutput = true,
+                CreateNoWindow = true
             };
             if (MonoMode)
             {

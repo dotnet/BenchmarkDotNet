@@ -42,6 +42,11 @@ namespace BenchmarkDotNet
             return RunCompetition(UrlToBenchmarks(url, defaultSettings).ToList());
         }
 
+        public IEnumerable<BenchmarkReport> RunSource(string source, BenchmarkSettings defaultSettings = null)
+        {
+            return RunCompetition(SourceToBenchmarks(source, defaultSettings).ToList());
+        }
+
         public IEnumerable<BenchmarkReport> RunCompetition(List<Benchmark> benchmarks)
         {
             benchmarks.Sort((a, b) => string.Compare((a.Task.Configuration.Caption + a.Target.Caption), b.Task.Configuration.Caption + b.Target.Caption, StringComparison.Ordinal));
@@ -170,14 +175,20 @@ namespace BenchmarkDotNet
                 if (string.IsNullOrWhiteSpace(benchmarkContent))
                 {
                     Console.WriteLine($"content of '{url}' is empty.");
-                    yield break;
+                    return new Benchmark[0];
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine("Exception: " + e.Message);
-                yield break;
+                return new Benchmark[0];
             }
+            return SourceToBenchmarks(benchmarkContent, defaultSettings);
+        }
+
+        private static IEnumerable<Benchmark> SourceToBenchmarks(string source, BenchmarkSettings defaultSettings)
+        {
+            string benchmarkContent = source;
             var cSharpCodeProvider = new CSharpCodeProvider();
             var compilerParameters = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll" }) { CompilerOptions = "/unsafe" };
             compilerParameters.ReferencedAssemblies.Add(typeof(BenchmarkRunner).Assembly.Location);
