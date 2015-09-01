@@ -51,6 +51,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Export\CsvReportExporter.cs" />
+    <Compile Include="Export\IReportExporter.cs" />
+    <Compile Include="Export\MarkdownReportExporter.cs" />
+    <Compile Include="Export\ReportExporterExtensions.cs" />
+    <Compile Include="Export\ReportExporterHelper.cs" />
     <Compile Include="Logging\MSBuildConsoleLogger.cs" />
     <Compile Include="SetupAttribute.cs" />
     <Compile Include="Tasks\BenchmarkTaskAttribute.cs" />

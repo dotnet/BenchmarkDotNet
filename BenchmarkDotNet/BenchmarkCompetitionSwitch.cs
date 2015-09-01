@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using BenchmarkDotNet.Export;
 using BenchmarkDotNet.Logging;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet
@@ -45,12 +48,15 @@ namespace BenchmarkDotNet
                 if (args.Any(arg => competition.Name.ToLower().StartsWith(arg.ToLower())) || args.Contains("#" + i) || args.Contains("*"))
                 {
                     logger.WriteLineHeader("Target competition: " + competition.Name);
+                    List<BenchmarkReport> reports;
                     using (var logStreamWriter = new StreamWriter(competition.Name + ".log"))
                     {
                         var loggers = new IBenchmarkLogger[] { new BenchmarkConsoleLogger(), new BenchmarkStreamLogger(logStreamWriter) };
                         var runner = new BenchmarkRunner(loggers);
-                        runner.RunCompetition(Activator.CreateInstance(competition), BenchmarkSettings.Parse(args));
+                        reports = runner.RunCompetition(Activator.CreateInstance(competition), BenchmarkSettings.Parse(args)).ToList();
                     }
+                    MarkdownReportExporter.Default.SaveToFile(reports, competition.Name + "-report.md");
+                    CsvReportExporter.Default.SaveToFile(reports, competition.Name + "-report.csv");
                     logger.NewLine();
                 }
             }
