@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet", "Benchmar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.Samples", "BenchmarkDotNet.Samples\BenchmarkDotNet.Samples.csproj", "{8CC6F8BC-F949-4575-B65E-AA06D3E35460}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.IntegrationTests", "BenchmarkDotNet.IntegrationTests\BenchmarkDotNet.IntegrationTests.csproj", "{74362BB1-9F64-4BE5-B079-B4AC19DAE5DB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{8CC6F8BC-F949-4575-B65E-AA06D3E35460}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CC6F8BC-F949-4575-B65E-AA06D3E35460}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8CC6F8BC-F949-4575-B65E-AA06D3E35460}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74362BB1-9F64-4BE5-B079-B4AC19DAE5DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74362BB1-9F64-4BE5-B079-B4AC19DAE5DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74362BB1-9F64-4BE5-B079-B4AC19DAE5DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74362BB1-9F64-4BE5-B079-B4AC19DAE5DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

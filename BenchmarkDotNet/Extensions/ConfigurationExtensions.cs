@@ -35,8 +35,10 @@ namespace BenchmarkDotNet.Extensions
 
         private static string DetectCurrentFramework()
         {
-            var attribute = Assembly.GetEntryAssembly().GetCustomAttributes(false).
-             OfType<Attribute>().FirstOrDefault(a => a.ToString() == @"System.Runtime.Versioning.TargetFrameworkAttribute");
+            var attribute = (Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly())
+                                .GetCustomAttributes(false)
+                                .OfType<Attribute>()
+                                .FirstOrDefault(a => a.ToString() == @"System.Runtime.Versioning.TargetFrameworkAttribute");
             if (attribute == null)
                 return "v3.5";
             var frameworkName = attribute.GetType()
