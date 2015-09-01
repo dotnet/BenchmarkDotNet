@@ -196,6 +196,9 @@ namespace BenchmarkDotNet
             var targetType = competition.GetType();
             var methods = targetType.GetMethods();
             var setupMethod = methods.FirstOrDefault(m => m.ResolveAttribute<SetupAttribute>() != null);
+            if (setupMethod != null)
+            {
+                // setupMethod is optional, but if it's there it must have the correct signature, accessibility, etc
                 AssertMethodHasCorrectSignature("Setup", setupMethod);
                 AssertMethodIsAccessible("Setup", setupMethod);
                 AssertMethodIsNotDeclaredInGeneric("Setup", setupMethod);
