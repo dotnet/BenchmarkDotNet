@@ -27,6 +27,7 @@
                 typeof(Cpu_BranchPerdictor),
                 typeof(Framework_SelectVsConvertAll),
                 typeof(Framework_StackFrameVsStackTrace),
+                typeof(Framework_StopwatchVsDateTime),
                 typeof(Math_DoubleSqrt),
                 typeof(Math_DoubleSqrtAvx),
                 typeof(Algo_BitCount),

@@ -48,6 +48,7 @@
     <Compile Include="Algo_BitCount.cs" />
     <Compile Include="Algo_Md5VsSha256.cs" />
     <Compile Include="Algo_MostSignificantBit.cs" />
+    <Compile Include="Framework_StopwatchVsDateTime.cs" />
     <Compile Include="Jit_RegistersVsStack.cs" />
     <Compile Include="Cpu_BranchPerdictor.cs" />
     <Compile Include="Cpu_Ilp_Inc.cs" />
