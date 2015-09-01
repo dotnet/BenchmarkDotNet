@@ -9,16 +9,18 @@ namespace BenchmarkDotNet.Tasks
     {
         public Type Type { get; }
         public MethodInfo Method { get; }
+        public MethodInfo SetupMethod { get; }
         public string AdditionalLogic { get; }
         public long OperationsPerInvoke { get; }
         public string Description { get; }
 
         public string Caption => Type.Name.WithoutSuffix("Competition") + "_" + Method.Name;
 
-        public BenchmarkTarget(Type type, MethodInfo method, string description = null, string additionalLogic = null)
+        public BenchmarkTarget(Type type, MethodInfo method, MethodInfo setupMethod = null, string description = null, string additionalLogic = null)
         {
             Type = type;
             Method = method;
+            SetupMethod = setupMethod;
             OperationsPerInvoke = method.ResolveAttribute<OperationsPerInvokeAttribute>()?.Count ?? 1;
             AdditionalLogic = additionalLogic ?? string.Empty;
             Description = description ?? Caption;

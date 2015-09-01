@@ -58,6 +58,10 @@ namespace BenchmarkDotNet
             var targetMethodDelegateType = isVoid
                 ? "Action "
                 : $"Func<{targetMethodReturnType}> ";
+
+            // setupMethod is optional, so default to an empty delegate, so there is always something that can be invoked
+            var setupMethodName = benchmark.Target.SetupMethod != null ? benchmark.Target.SetupMethod.Name : "() => { }";
+
             var idleImplementation = isVoid
                 ? ""
                 : $"return default({targetMethodReturnType});";
@@ -85,6 +89,7 @@ namespace BenchmarkDotNet
                 Replace("$TargetMethodDelegateType$", targetMethodDelegateType).
                 Replace("$TargetMethodHoldValue$", targetMethodHoldValue).
                 Replace("$TargetMethodReturnType$", targetMethodReturnType).
+                Replace("$SetupMethodName$", setupMethodName).
                 Replace("$IdleImplementation$", idleImplementation).
                 Replace("$AdditionalLogic$", benchmark.Target.AdditionalLogic);
 

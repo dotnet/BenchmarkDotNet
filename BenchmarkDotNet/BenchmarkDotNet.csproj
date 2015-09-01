@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SetupAttribute.cs" />
     <Compile Include="Tasks\BenchmarkTaskAttribute.cs" />
     <Compile Include="OperationsPerInvokeAttribute.cs" />
     <Compile Include="Benchmark.cs" />

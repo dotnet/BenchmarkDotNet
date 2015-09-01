@@ -195,17 +195,24 @@ namespace BenchmarkDotNet
                 defaultSettings = BenchmarkSettings.CreateDefault();
             var targetType = competition.GetType();
             var methods = targetType.GetMethods();
+            var setupMethod = methods.FirstOrDefault(m => m.ResolveAttribute<SetupAttribute>() != null);
+                AssertMethodHasCorrectSignature("Setup", setupMethod);
+                AssertMethodIsAccessible("Setup", setupMethod);
+                AssertMethodIsNotDeclaredInGeneric("Setup", setupMethod);
+                AssertMethodIsNotGeneric("Setup", setupMethod);
+            }
+
             for (int i = 0; i < methods.Length; i++)
             {
                 var methodInfo = methods[i];
                 var benchmarkAttribute = methodInfo.ResolveAttribute<BenchmarkAttribute>();
                 if (benchmarkAttribute != null)
                 {
-                    var target = new BenchmarkTarget(targetType, methodInfo, benchmarkAttribute.Description);
-                    AssertBenchmarkMethodHasCorrectSignature(methodInfo);
-                    AssertBenchmarkMethodIsAccessible(methodInfo);
-                    AssertBenchmarkMethodIsNotDeclaredInGeneric(methodInfo);
-                    AssertBenchmarkMethodIsNotGeneric(methodInfo);
+                    var target = new BenchmarkTarget(targetType, methodInfo, setupMethod, benchmarkAttribute.Description);
+                    AssertMethodHasCorrectSignature("Benchmark", methodInfo);
+                    AssertMethodIsAccessible("Benchmark", methodInfo);
+                    AssertMethodIsNotDeclaredInGeneric("Benchmark", methodInfo);
+                    AssertMethodIsNotGeneric("Benchmark", methodInfo);
                     foreach (var task in BenchmarkTask.Resolve(methodInfo, defaultSettings))
                         yield return new Benchmark(target, task);
                 }
@@ -246,49 +253,56 @@ namespace BenchmarkDotNet
             {
                 var instance = Activator.CreateInstance(type);
                 foreach (var benchmark in CompetitionToBenchmarks(instance, defaultSettings))
-                    yield return new Benchmark(new BenchmarkTarget(benchmark.Target.Type, benchmark.Target.Method, benchmark.Target.Description, benchmarkContent), benchmark.Task);
+                {
+                    yield return new Benchmark(new BenchmarkTarget(benchmark.Target.Type,
+                                                                   benchmark.Target.Method,
+                                                                   benchmark.Target.SetupMethod,
+                                                                   benchmark.Target.Description,
+                                                                   benchmarkContent),
+                                               benchmark.Task);
+                }
             }
         }
 
-        private static void AssertBenchmarkMethodHasCorrectSignature(MethodInfo methodInfo)
+        private static void AssertMethodHasCorrectSignature(string methodType, MethodInfo methodInfo)
         {
             if (methodInfo.GetParameters().Any())
-                throw new InvalidOperationException($"Benchmark method {methodInfo.Name} has incorrect signature.\nMethod shouldn't have any arguments.");
+                throw new InvalidOperationException($"{methodType} method {methodInfo.Name} has incorrect signature.\nMethod shouldn't have any arguments.");
         }
 
-        private static void AssertBenchmarkMethodIsAccessible(MethodInfo methodInfo)
+        private static void AssertMethodIsAccessible(string methodType, MethodInfo methodInfo)
         {
             if (!methodInfo.IsPublic)
-                throw new InvalidOperationException($"Benchmark method {methodInfo.Name} has incorrect access modifiers.\nMethod must be public.");
+                throw new InvalidOperationException($"{methodType} method {methodInfo.Name} has incorrect access modifiers.\nMethod must be public.");
 
             var declaringType = methodInfo.DeclaringType;
 
             while (declaringType != null)
             {
                 if (!declaringType.IsPublic && !declaringType.IsNestedPublic)
-                    throw new InvalidOperationException($"Benchmark method {methodInfo.Name} defined within type {declaringType.FullName} has incorrect access modifiers.\nDeclaring type must be public.");
+                    throw new InvalidOperationException($"{methodType} method {methodInfo.Name} defined within type {declaringType.FullName} has incorrect access modifiers.\nDeclaring type must be public.");
 
                 declaringType = declaringType.DeclaringType;
             }
         }
 
-        private static void AssertBenchmarkMethodIsNotDeclaredInGeneric(MethodInfo methodInfo)
+        private static void AssertMethodIsNotDeclaredInGeneric(string methodType, MethodInfo methodInfo)
         {
             var declaringType = methodInfo.DeclaringType;
 
             while (declaringType != null)
             {
                 if (declaringType.IsGenericType)
-                    throw new InvalidOperationException($"Benchmark method {methodInfo.Name} defined within generic type {declaringType.FullName}.\nBenchmark methods in generic types are not supported.");
+                    throw new InvalidOperationException($"{methodType} method {methodInfo.Name} defined within generic type {declaringType.FullName}.\n{methodType} methods in generic types are not supported.");
 
                 declaringType = declaringType.DeclaringType;
             }
         }
 
-        private static void AssertBenchmarkMethodIsNotGeneric(MethodInfo methodInfo)
+        private static void AssertMethodIsNotGeneric(string methodType, MethodInfo methodInfo)
         {
             if (methodInfo.IsGenericMethod)
-                throw new InvalidOperationException($"Benchmark method {methodInfo.Name} is generic.\nGeneric benchmark methods are not supported.");
+                throw new InvalidOperationException($"{methodType} method {methodInfo.Name} is generic.\nGeneric {methodType} methods are not supported.");
         }
 
         /// <summary>
