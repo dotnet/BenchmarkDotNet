@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 
-namespace BenchmarkDotNet.Samples
+namespace BenchmarkDotNet.Samples.Introduction
 {
     // It is very easy to use BenchmarkDotNet. You should just create a class
     public class Intro_00_Basic
@@ -11,7 +11,6 @@ namespace BenchmarkDotNet.Samples
         {
             Thread.Sleep(100);
         }
-
 
         // You can write description for a method.
         [Benchmark("Thread.Sleep(100)")]

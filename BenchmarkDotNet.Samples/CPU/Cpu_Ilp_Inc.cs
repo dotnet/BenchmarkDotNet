@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Tasks;
 
-namespace BenchmarkDotNet.Samples
+namespace BenchmarkDotNet.Samples.CPU
 {
     // See http://en.wikipedia.org/wiki/Instruction-level_parallelism
     [BenchmarkTask(platform: BenchmarkPlatform.X86, jitVersion: BenchmarkJitVersion.LegacyJit)]

@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Tasks;
 
-namespace BenchmarkDotNet.Samples
+namespace BenchmarkDotNet.Samples.Introduction
 {
     public class Intro_03_SingleRun
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BenchmarkDotNet.Samples
+namespace BenchmarkDotNet.Samples.Algorithms
 {
     // See http://en.wikipedia.org/wiki/Hamming_weight
     public class Algo_BitCount

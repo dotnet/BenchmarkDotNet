@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace BenchmarkDotNet.Samples
+namespace BenchmarkDotNet.Samples.Framework
 {
     public class Framework_StackFrameVsStackTrace
     {

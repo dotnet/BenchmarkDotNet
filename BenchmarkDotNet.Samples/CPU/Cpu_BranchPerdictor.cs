@@ -1,7 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Tasks;
 
-namespace BenchmarkDotNet.Samples
+namespace BenchmarkDotNet.Samples.CPU
 {
     // See http://stackoverflow.com/questions/11227809/why-is-processing-a-sorted-array-faster-than-an-unsorted-array/11227902
     [BenchmarkTask(platform: BenchmarkPlatform.X86)]

@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Tasks;
 
-namespace BenchmarkDotNet.Samples
+namespace BenchmarkDotNet.Samples.CPU
 {
     // See http://en.wikipedia.org/wiki/Matrix_multiplication_algorithm#Cache_behavior
     [BenchmarkTask(platform: BenchmarkPlatform.X86)]

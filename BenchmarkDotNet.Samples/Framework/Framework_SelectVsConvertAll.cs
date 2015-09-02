@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace BenchmarkDotNet.Samples
+namespace BenchmarkDotNet.Samples.Framework
 {
     public class Framework_SelectVsConvertAll
     {

@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Tasks;
 
-namespace BenchmarkDotNet.Samples
+namespace BenchmarkDotNet.Samples.IL
 {
     [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
     public class Il_Switch

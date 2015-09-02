@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Tasks;
 
-namespace BenchmarkDotNet.Samples
+namespace BenchmarkDotNet.Samples.Introduction
 {
     using System;
     using System.Threading;
@@ -10,9 +10,9 @@ namespace BenchmarkDotNet.Samples
     /// and align nicely. These benchmarks produce widely different results but still we
     /// should be able to compare them side-by-side without doing any mental translations
     /// between nanoseconds to microseconds to milliseconds.
-    /// 
+    ///
     /// Expected output along these lines:
-    /// 
+    ///
     ///   Method |        AvrTime |      StdDev |       op/s |
     /// -------- |--------------- |------------ |----------- |
     ///  Slower1 |      1.8112 us |   0.2015 us | 552,120.14 |
@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Samples
     ///  Slower4 |     81.2006 us |   1.2585 us |  12,315.18 |
     ///  Slower5 |  4,148.1727 us | 740.3897 us |     241.07 |
     ///  Slower6 | 15,047.0119 us |  99.5290 us |      66.46 |
-    /// 
+    ///
     /// As can be seen, all time units are microseconds, even though the two slowest of them
     /// is in the milliseconds territory.
     /// </summary>

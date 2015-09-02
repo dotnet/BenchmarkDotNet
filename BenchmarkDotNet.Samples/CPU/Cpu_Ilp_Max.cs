@@ -1,7 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Tasks;
 
-namespace BenchmarkDotNet.Samples
+namespace BenchmarkDotNet.Samples.CPU
 {
     [BenchmarkTask(platform: BenchmarkPlatform.X86, targetIterationCount: 20)]
     public class Cpu_Ilp_Max

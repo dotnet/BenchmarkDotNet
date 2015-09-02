@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Tasks;
 
-namespace BenchmarkDotNet.Samples
+namespace BenchmarkDotNet.Samples.Introduction
 {
     // Also you can define set of tasks for a class.
     // In this case, all of these tasks will apply for all of the benchmark methods

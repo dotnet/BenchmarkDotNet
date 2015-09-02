@@ -2,7 +2,7 @@
 using System.Threading;
 using BenchmarkDotNet.Tasks;
 
-namespace BenchmarkDotNet.Samples
+namespace BenchmarkDotNet.Samples.Introduction
 {
     // For some methods, logic may differ for different environments.
     public class Intro_01_MethodTasks

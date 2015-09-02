@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
 
-namespace BenchmarkDotNet.Samples
+namespace BenchmarkDotNet.Samples.Algorithms
 {
     public class Algo_Md5VsSha256
     {
@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Samples
         private readonly byte[] data;
 
         private readonly SHA256 sha256 = SHA256.Create();
-        private readonly MD5 md5 = MD5.Create();        
+        private readonly MD5 md5 = MD5.Create();
 
         public Algo_Md5VsSha256()
         {

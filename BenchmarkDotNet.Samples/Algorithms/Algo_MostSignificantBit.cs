@@ -1,7 +1,7 @@
 ﻿using BenchmarkDotNet.Tasks;
 using System;
 
-namespace BenchmarkDotNet.Samples
+namespace BenchmarkDotNet.Samples.Algorithms
 {
     [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
     [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Samples
 
             public static int MostSignificantDeBruijn(int v)
             {
-                v |= v >> 1; // first round down to one less than a power of 2 
+                v |= v >> 1; // first round down to one less than a power of 2
                 v |= v >> 2;
                 v |= v >> 4;
                 v |= v >> 8;
@@ -106,7 +106,7 @@ namespace BenchmarkDotNet.Samples
 
             public static int MostSignificantShifted(int n)
             {
-                uint v = (uint)n;           // 32-bit value to find the log2 of 
+                uint v = (uint)n;           // 32-bit value to find the log2 of
                 uint r;                     // result of log2(v) will go here
                 uint shift;
 

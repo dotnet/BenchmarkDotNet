@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Tasks;
 
-namespace BenchmarkDotNet.Samples
+namespace BenchmarkDotNet.Samples.IL
 {
     // See: http://codeblog.jonskeet.uk/2014/07/16/micro-optimization-the-surprising-inefficiency-of-readonly-fields/
     [BenchmarkTask(platform: BenchmarkPlatform.X86, jitVersion: BenchmarkJitVersion.LegacyJit)]
@@ -39,6 +39,6 @@ namespace BenchmarkDotNet.Samples
         public long GetReadOnlyValue()
         {
             return readOnlyField.Bits0 + readOnlyField.Bits1 + readOnlyField.Bits2 + readOnlyField.Bits3;
-        }        
+        }
     }
 }

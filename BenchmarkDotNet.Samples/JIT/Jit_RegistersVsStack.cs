@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using BenchmarkDotNet.Tasks;
 
-namespace BenchmarkDotNet.Samples
+namespace BenchmarkDotNet.Samples.JIT
 {
     // See http://stackoverflow.com/questions/32114308/weird-performance-increase-in-simple-benchmark
     [BenchmarkTask(platform: BenchmarkPlatform.X86)]
@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Samples
             var sw = new Stopwatch();
             for (int i = 0; i < IterationCount; i++)
             {
-                // fld1  
+                // fld1
                 // fadd        qword ptr [ebp-0Ch]
                 // fstp        qword ptr [ebp-0Ch]
                 a = a + b;
@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Samples
             double a = 1, b = 1;
             for (int i = 0; i < IterationCount; i++)
             {
-                // fld1  
+                // fld1
                 // faddp       st(1),st
                 a = a + b;
             }

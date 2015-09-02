@@ -1,4 +1,12 @@
-﻿namespace BenchmarkDotNet.Samples
+﻿using BenchmarkDotNet.Samples.Algorithms;
+using BenchmarkDotNet.Samples.CPU;
+using BenchmarkDotNet.Samples.Framework;
+using BenchmarkDotNet.Samples.IL;
+using BenchmarkDotNet.Samples.Introduction;
+using BenchmarkDotNet.Samples.JIT;
+using BenchmarkDotNet.Samples.Other;
+
+namespace BenchmarkDotNet.Samples
 {
     class Program
     {

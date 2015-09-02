@@ -1,7 +1,7 @@
 ﻿using BenchmarkDotNet.Tasks;
 using System;
 
-namespace BenchmarkDotNet.Samples
+namespace BenchmarkDotNet.Samples.JIT
 {
     [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
     [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]

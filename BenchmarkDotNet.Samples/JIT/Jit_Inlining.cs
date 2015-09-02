@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Tasks;
 
-namespace BenchmarkDotNet.Samples
+namespace BenchmarkDotNet.Samples.JIT
 {
     // See http://en.wikipedia.org/wiki/Inline_expansion
     // See http://aakinshin.net/en/blog/dotnet/inlining-and-starg/
