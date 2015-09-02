@@ -85,89 +85,89 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Algo_BitCount.cs">
-      <Link>Samples\Algo_BitCount.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Algorithms\Algo_BitCount.cs">
+      <Link>Samples\Algorithms\Algo_BitCount.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Algo_Md5VsSha256.cs">
-      <Link>Samples\Algo_Md5VsSha256.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Algorithms\Algo_Md5VsSha256.cs">
+      <Link>Samples\Algorithms\Algo_Md5VsSha256.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Algo_MostSignificantBit.cs">
-      <Link>Samples\Algo_MostSignificantBit.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Algorithms\Algo_MostSignificantBit.cs">
+      <Link>Samples\Algorithms\Algo_MostSignificantBit.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Cpu_BranchPerdictor.cs">
-      <Link>Samples\Cpu_BranchPerdictor.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\CPU\Cpu_BranchPerdictor.cs">
+      <Link>Samples\CPU\Cpu_BranchPerdictor.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Cpu_Ilp_Inc.cs">
-      <Link>Samples\Cpu_Ilp_Inc.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\CPU\Cpu_Ilp_Inc.cs">
+      <Link>Samples\CPU\Cpu_Ilp_Inc.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Cpu_Ilp_Max.cs">
-      <Link>Samples\Cpu_Ilp_Max.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\CPU\Cpu_Ilp_Max.cs">
+      <Link>Samples\CPU\Cpu_Ilp_Max.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Cpu_Ilp_RyuJit.cs">
-      <Link>Samples\Cpu_Ilp_RyuJit.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\CPU\Cpu_Ilp_RyuJit.cs">
+      <Link>Samples\CPU\Cpu_Ilp_RyuJit.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Cpu_Ilp_VsBce.cs">
-      <Link>Samples\Cpu_Ilp_VsBce.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\CPU\Cpu_Ilp_VsBce.cs">
+      <Link>Samples\CPU\Cpu_Ilp_VsBce.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Cpu_MatrixMultiplication.cs">
-      <Link>Samples\Cpu_MatrixMultiplication.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\CPU\Cpu_MatrixMultiplication.cs">
+      <Link>Samples\CPU\Cpu_MatrixMultiplication.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Framework_SelectVsConvertAll.cs">
-      <Link>Samples\Framework_SelectVsConvertAll.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Framework\Framework_SelectVsConvertAll.cs">
+      <Link>Samples\Framework\Framework_SelectVsConvertAll.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Framework_StackFrameVsStackTrace.cs">
-      <Link>Samples\Framework_StackFrameVsStackTrace.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Framework\Framework_StackFrameVsStackTrace.cs">
+      <Link>Samples\Framework\Framework_StackFrameVsStackTrace.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Framework_StopwatchVsDateTime.cs">
-      <Link>Samples\Framework_StopwatchVsDateTime.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Framework\Framework_StopwatchVsDateTime.cs">
+      <Link>Samples\Framework\Framework_StopwatchVsDateTime.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Il_ReadonlyFields.cs">
-      <Link>Samples\Il_ReadonlyFields.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\IL\Il_ReadonlyFields.cs">
+      <Link>Samples\IL\Il_ReadonlyFields.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Il_Switch.cs">
-      <Link>Samples\Il_Switch.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\IL\Il_Switch.cs">
+      <Link>Samples\IL\Il_Switch.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Intro_00_Basic.cs">
-      <Link>Samples\Intro_00_Basic.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Introduction\Intro_00_Basic.cs">
+      <Link>Samples\Introduction\Intro_00_Basic.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Intro_01_MethodTasks.cs">
-      <Link>Samples\Intro_01_MethodTasks.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Introduction\Intro_01_MethodTasks.cs">
+      <Link>Samples\Introduction\Intro_01_MethodTasks.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Intro_02_ClassTasks.cs">
-      <Link>Samples\Intro_02_ClassTasks.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Introduction\Intro_02_ClassTasks.cs">
+      <Link>Samples\Introduction\Intro_02_ClassTasks.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Intro_03_SingleRun.cs">
-      <Link>Samples\Intro_03_SingleRun.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Introduction\Intro_03_SingleRun.cs">
+      <Link>Samples\Introduction\Intro_03_SingleRun.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Intro_04_UniformReportingTest.cs">
-      <Link>Samples\Intro_04_UniformReportingTest.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Introduction\Intro_04_UniformReportingTest.cs">
+      <Link>Samples\Introduction\Intro_04_UniformReportingTest.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Jit_ArraySumLoopUnrolling.cs">
-      <Link>Samples\Jit_ArraySumLoopUnrolling.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\JIT\Jit_ArraySumLoopUnrolling.cs">
+      <Link>Samples\JIT\Jit_ArraySumLoopUnrolling.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Jit_Bce.cs">
-      <Link>Samples\Jit_Bce.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\JIT\Jit_Bce.cs">
+      <Link>Samples\JIT\Jit_Bce.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Jit_BoolToInt.cs">
-      <Link>Samples\Jit_BoolToInt.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\JIT\Jit_BoolToInt.cs">
+      <Link>Samples\JIT\Jit_BoolToInt.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Jit_Inlining.cs">
-      <Link>Samples\Jit_Inlining.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\JIT\Jit_Inlining.cs">
+      <Link>Samples\JIT\Jit_Inlining.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Jit_InterfaceMethod.cs">
-      <Link>Samples\Jit_InterfaceMethod.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\JIT\Jit_InterfaceMethod.cs">
+      <Link>Samples\JIT\Jit_InterfaceMethod.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Jit_LoopUnrolling.cs">
-      <Link>Samples\Jit_LoopUnrolling.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\JIT\Jit_LoopUnrolling.cs">
+      <Link>Samples\JIT\Jit_LoopUnrolling.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Jit_RegistersVsStack.cs">
-      <Link>Samples\Jit_RegistersVsStack.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\JIT\Jit_RegistersVsStack.cs">
+      <Link>Samples\JIT\Jit_RegistersVsStack.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Math_DoubleSqrt.cs">
-      <Link>Samples\Math_DoubleSqrt.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Other\Math_DoubleSqrt.cs">
+      <Link>Samples\Other\Math_DoubleSqrt.cs</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Math_DoubleSqrtAvx.cs">
-      <Link>Samples\Math_DoubleSqrtAvx.cs</Link>
+    <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Other\Math_DoubleSqrtAvx.cs">
+      <Link>Samples\Other\Math_DoubleSqrtAvx.cs</Link>
     </EmbeddedResource>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
@@ -229,7 +229,7 @@
     </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
