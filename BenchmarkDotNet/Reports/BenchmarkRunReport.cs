@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Reports
         {
             Operations = operations;
             Nanoseconds = nanoseconds;
-            OpsPerSecond = operations / (nanoseconds / 1000000);
+            OpsPerSecond = operations / (nanoseconds / (1000 * 1000 * 1000)); // 1,000,000,000 ns in 1 second
             AverageNanoseconds = nanoseconds / operations;
         }
 
