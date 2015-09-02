@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Benchmark]
-        [BenchmarkTask(processCount: 1, warmupIterationCount: 1, targetIterationCount: 1)]
+        [BenchmarkTask(mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 1)]
         public void Benchmark()
         {
             Thread.Sleep(5);

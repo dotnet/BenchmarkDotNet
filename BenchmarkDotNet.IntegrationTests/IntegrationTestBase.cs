@@ -5,7 +5,7 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public abstract class IntegrationTestBase
     {
-        protected string GetTestOutput()
+        protected static string GetTestOutput()
         {
             // NOTE this only work with XUnit versions 1.9 and earlier, the mechanism changed in XUnit 2.0
             // see https://xunit.github.io/docs/capturing-output.html for more information
