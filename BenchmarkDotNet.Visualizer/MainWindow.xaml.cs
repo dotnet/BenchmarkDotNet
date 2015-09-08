@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -7,7 +6,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using BenchmarkDotNet.Export;
-using BenchmarkDotNet.Reports;
 using Microsoft.Win32;
 
 namespace BenchmarkDotNet.Visualizer
@@ -26,15 +24,17 @@ namespace BenchmarkDotNet.Visualizer
         private void OnRunButtonClick(object sender, RoutedEventArgs e)
         {
             OutputTextBox.Text = "";
-            var url = "https://raw.githubusercontent.com/PerfDotNet/BenchmarkDotNet/master/BenchmarkDotNet.Samples/Intro_00_Basic.cs";
             Task.Factory.StartNew(Run);
         }
 
         private void Run()
         {
             var reports = runner.RunSource(SourceTextBox.Text).ToList();
-            MarkdownReportTextBox.Text = "";
-            MarkdownReportExporter.Default.Export(reports, new FctbLogger(MarkdownReportTextBox));
+            Dispatcher.Invoke(() =>
+            {
+                MarkdownReportTextBox.Text = "";
+                MarkdownReportExporter.Default.Export(reports, new FctbLogger(MarkdownReportTextBox));
+            });
         }
 
         private void OnLoadFileButtonClick(object sender, RoutedEventArgs e)

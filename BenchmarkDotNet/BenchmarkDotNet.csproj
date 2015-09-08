@@ -58,6 +58,8 @@
     <Compile Include="Export\ReportExporterHelper.cs" />
     <Compile Include="Logging\MSBuildConsoleLogger.cs" />
     <Compile Include="ParamsAttribute.cs" />
+    <Compile Include="Statistic\ConfidenceInterval.cs" />
+    <Compile Include="Statistic\StatSummary.cs" />
     <Compile Include="SetupAttribute.cs" />
     <Compile Include="Tasks\BenchmarkParams.cs" />
     <Compile Include="Tasks\BenchmarkTaskAttribute.cs" />
@@ -80,7 +82,6 @@
     <Compile Include="EnvironmentHelper.cs" />
     <Compile Include="Extensions\ConfigurationExtensions.cs" />
     <Compile Include="Extensions\ReflectionExtensions.cs" />
-    <Compile Include="Reports\BenchmarkMeasurementStatistic.cs" />
     <Compile Include="Reports\BenchmarkReport.cs" />
     <Compile Include="Reports\BenchmarkRunReportsStatistic.cs" />
     <Compile Include="Logging\BenchmarkCompositeLogger.cs" />

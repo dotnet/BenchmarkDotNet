@@ -13,7 +13,6 @@ namespace BenchmarkDotNet.Samples.Other
     public class Math_DoubleSqrt
     {
         private int counter;
-        private double x = 42;
 
         [Benchmark]
         public double SqrtX()

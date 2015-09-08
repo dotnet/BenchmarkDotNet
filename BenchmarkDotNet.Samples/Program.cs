@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Samples.CPU;
 using BenchmarkDotNet.Samples.Framework;
 using BenchmarkDotNet.Samples.IL;
+using BenchmarkDotNet.Samples.Infra;
 using BenchmarkDotNet.Samples.Introduction;
 using BenchmarkDotNet.Samples.JIT;
 using BenchmarkDotNet.Samples.Other;
@@ -49,6 +50,8 @@ namespace BenchmarkDotNet.Samples
                 typeof(Math_DoubleSqrt),
                 typeof(Math_DoubleSqrtAvx),
                 typeof(Array_HeapAllocVsStackAlloc),
+                // Infra
+                typeof(Infra_Params)
             });
             competitionSwitch.Run(args);
         }

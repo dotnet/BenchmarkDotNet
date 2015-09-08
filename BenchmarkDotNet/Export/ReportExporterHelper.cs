@@ -8,7 +8,8 @@ namespace BenchmarkDotNet.Export
 {
     public static class ReportExporterHelper
     {
-        public static List<string[]> BuildTable(IList<BenchmarkReport> reports, bool pretty = true)
+        // TODO: signature refactoring
+        public static List<string[]> BuildTable(IList<BenchmarkReport> reports, bool pretty = true, bool extended = false)
         {
             var reportStats = reports.Where(r => r.Runs.Count > 0).Select(
              r => new
@@ -33,6 +34,8 @@ namespace BenchmarkDotNet.Export
             headerRow.Add("AvrTime");
             headerRow.Add("StdDev");
             headerRow.Add("op/s");
+            if (extended)
+                headerRow.Add("StdErr");
 
             var table = new List<string[]> { headerRow.ToArray() };
             foreach (var reportStat in reportStats)
@@ -54,6 +57,9 @@ namespace BenchmarkDotNet.Export
                 row.Add(timeToStringFunc(reportStat.Stat.AverageTime.Median));
                 row.Add(timeToStringFunc(reportStat.Stat.AverageTime.StandardDeviation));
                 row.Add(opsPerSecToStringFunc(reportStat.Stat.OperationsPerSeconds.Median));
+
+                if (extended)
+                    row.Add(timeToStringFunc(reportStat.Stat.AverageTime.StandardError));
 
                 table.Add(row.ToArray());
             }

@@ -49,6 +49,7 @@
     <Compile Include="Algorithms\Algo_Md5VsSha256.cs" />
     <Compile Include="Algorithms\Algo_MostSignificantBit.cs" />
     <Compile Include="Framework\Framework_StopwatchVsDateTime.cs" />
+    <Compile Include="Infra\Infra_Params.cs" />
     <Compile Include="JIT\Jit_RegistersVsStack.cs" />
     <Compile Include="CPU\Cpu_BranchPerdictor.cs" />
     <Compile Include="CPU\Cpu_Ilp_Inc.cs" />
