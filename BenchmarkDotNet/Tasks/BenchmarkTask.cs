@@ -9,12 +9,17 @@ namespace BenchmarkDotNet.Tasks
         public int ProcessCount { get; }
         public BenchmarkConfiguration Configuration { get; }
         public BenchmarkSettings Settings { get; }
+        public BenchmarkParams Params { get; }
 
-        public BenchmarkTask(int processCount, BenchmarkConfiguration configuration, BenchmarkSettings settings)
+        public string Caption => Configuration.Caption + (Params != null ? Params.Caption : "");
+        public string Description => Configuration.Caption + (Params != null ? Params.Caption : "");
+
+        public BenchmarkTask(int processCount, BenchmarkConfiguration configuration, BenchmarkSettings settings, BenchmarkParams @params = null)
         {
             ProcessCount = processCount;
             Configuration = configuration;
             Settings = settings;
+            Params = @params;
         }
 
         public static IEnumerable<BenchmarkTask> Resolve(MethodInfo methodInfo, BenchmarkSettings defaultSettings)

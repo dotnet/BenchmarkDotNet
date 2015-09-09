@@ -63,11 +63,17 @@ namespace BenchmarkDotNet
                 : $"Func<{targetMethodReturnType}> ";
 
             // setupMethod is optional, so default to an empty delegate, so there is always something that can be invoked
-            var setupMethodName = benchmark.Target.SetupMethod != null ? benchmark.Target.SetupMethod.Name : "() => { }";
+            var setupMethodName = benchmark.Target.SetupMethod != null
+                ? benchmark.Target.SetupMethod.Name
+                : "() => { }";
 
             var idleImplementation = isVoid
                 ? ""
                 : $"return default({targetMethodReturnType});";
+
+            var paramsContent = benchmark.Task.Params == null
+                ? ""
+                : $"instance.{benchmark.Task.Params.ParamFieldOrProperty} = BenchmarkParams.Parse(args);";
 
             string runBenchmarkTemplate = "";
             switch (benchmark.Task.Configuration.Mode)
@@ -94,7 +100,8 @@ namespace BenchmarkDotNet
                 Replace("$TargetMethodReturnType$", targetMethodReturnType).
                 Replace("$SetupMethodName$", setupMethodName).
                 Replace("$IdleImplementation$", idleImplementation).
-                Replace("$AdditionalLogic$", benchmark.Target.AdditionalLogic);
+                Replace("$AdditionalLogic$", benchmark.Target.AdditionalLogic)
+               .Replace("$ParamsContent$", paramsContent);
 
             string fileName = Path.Combine(projectDir, MainClassName + ".cs");
             File.WriteAllText(fileName, content);

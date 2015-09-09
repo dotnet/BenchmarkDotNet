@@ -57,7 +57,9 @@
     <Compile Include="Export\ReportExporterExtensions.cs" />
     <Compile Include="Export\ReportExporterHelper.cs" />
     <Compile Include="Logging\MSBuildConsoleLogger.cs" />
+    <Compile Include="ParamsAttribute.cs" />
     <Compile Include="SetupAttribute.cs" />
+    <Compile Include="Tasks\BenchmarkParams.cs" />
     <Compile Include="Tasks\BenchmarkTaskAttribute.cs" />
     <Compile Include="OperationsPerInvokeAttribute.cs" />
     <Compile Include="Benchmark.cs" />

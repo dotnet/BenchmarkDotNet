@@ -47,7 +47,7 @@ namespace BenchmarkDotNet
             return RunCompetition(SourceToBenchmarks(source, defaultSettings).ToList());
         }
 
-        public IEnumerable<BenchmarkReport> RunCompetition(List<Benchmark> benchmarks)
+        private IEnumerable<BenchmarkReport> RunCompetition(List<Benchmark> benchmarks)
         {
             benchmarks.Sort((a, b) => string.Compare((a.Task.Configuration.Caption + a.Target.Caption), b.Task.Configuration.Caption + b.Target.Caption, StringComparison.Ordinal));
             Logger.WriteLineHeader("// ***** Competition: Start   *****");
@@ -61,13 +61,31 @@ namespace BenchmarkDotNet
             var reports = new List<BenchmarkReport>();
             foreach (var benchmark in benchmarks)
             {
-                var report = Run(benchmark, importantPropertyNames);
-                reports.Add(report);
-                if (report.Runs.Count > 0)
+                if (benchmark.Task.Params == null)
                 {
-                    var stat = new BenchmarkRunReportsStatistic("Target", report.Runs);
-                    Logger.WriteLineResult($"AverageTime (ns/op): {stat.AverageTime}");
-                    Logger.WriteLineResult($"OperationsPerSecond: {stat.OperationsPerSeconds}");
+                    var report = Run(benchmark, importantPropertyNames);
+                    reports.Add(report);
+                    if (report.Runs.Count > 0)
+                    {
+                        var stat = new BenchmarkRunReportsStatistic("Target", report.Runs);
+                        Logger.WriteLineResult($"AverageTime (ns/op): {stat.AverageTime}");
+                        Logger.WriteLineResult($"OperationsPerSecond: {stat.OperationsPerSeconds}");
+                    }
+                }
+                else
+                {
+                    var @params = benchmark.Task.Params;
+                    foreach (int param in @params.Values)
+                    {
+                        var report = Run(benchmark, importantPropertyNames, param);
+                        reports.Add(report);
+                        if (report.Runs.Count > 0)
+                        {
+                            var stat = new BenchmarkRunReportsStatistic("Target", report.Runs);
+                            Logger.WriteLineResult($"AverageTime (ns/op): {stat.AverageTime}");
+                            Logger.WriteLineResult($"OperationsPerSecond: {stat.OperationsPerSeconds}");
+                        }
+                    }
                 }
                 Logger.NewLine();
             }
@@ -81,8 +99,7 @@ namespace BenchmarkDotNet
             return reports;
         }
 
-
-        public BenchmarkReport Run(Benchmark benchmark, IList<string> importantPropertyNames)
+        private BenchmarkReport Run(Benchmark benchmark, IList<string> importantPropertyNames, int? benchmarkParam = null)
         {
             Logger.WriteLineHeader("// **************************");
             Logger.WriteLineHeader("// Benchmark: " + benchmark.Description);
@@ -109,6 +126,8 @@ namespace BenchmarkDotNet
             for (int processNumber = 0; processNumber < processCount; processNumber++)
             {
                 Logger.WriteLineInfo($"// Run, Process: {processNumber + 1} / {processCount}");
+                if (benchmarkParam != null)
+                    Logger.WriteLineInfo($"// {BenchmarkParams.ParamTitle}={benchmarkParam}");
                 if (importantPropertyNames.Any())
                 {
                     Logger.WriteInfo("// ");
@@ -120,13 +139,16 @@ namespace BenchmarkDotNet
                 var executor = new BenchmarkExecutor(Logger);
                 if (File.Exists(exeFileName))
                 {
-                    var lines = executor.Exec(exeFileName, benchmark.Task.Settings.ToArgs());
+                    var args = benchmark.Task.Settings.ToArgs();
+                    if (benchmarkParam != null)
+                        args += (" " + BenchmarkParams.ParamToArgs(benchmarkParam.Value));
+                    var lines = executor.Exec(exeFileName, args);
                     var iterRunReports = lines.Select(line => BenchmarkRunReport.Parse(Logger, line)).Where(r => r != null).ToList();
                     runReports.AddRange(iterRunReports);
                 }
             }
             Logger.NewLine();
-            return new BenchmarkReport(benchmark, runReports);
+            return new BenchmarkReport(benchmark, runReports, benchmarkParam);
         }
 
         private static IEnumerable<Benchmark> CompetitionToBenchmarks(object competition, BenchmarkSettings defaultSettings)
@@ -145,6 +167,11 @@ namespace BenchmarkDotNet
                 AssertMethodIsNotGeneric("Setup", setupMethod);
             }
 
+            // If there is one, get the single Field or Property that has the [Params(..)] attribute
+            var fields = targetType.GetFields().Select(f => new { f.Name, Attribute = f.ResolveAttribute<ParamsAttribute>() });
+            var properties = targetType.GetProperties().Select(f => new { f.Name, Attribute = f.ResolveAttribute<ParamsAttribute>() });
+            var fieldOrProperty = fields.Concat(properties).FirstOrDefault(i => i.Attribute != null);
+
             for (int i = 0; i < methods.Length; i++)
             {
                 var methodInfo = methods[i];
@@ -157,7 +184,19 @@ namespace BenchmarkDotNet
                     AssertMethodIsNotDeclaredInGeneric("Benchmark", methodInfo);
                     AssertMethodIsNotGeneric("Benchmark", methodInfo);
                     foreach (var task in BenchmarkTask.Resolve(methodInfo, defaultSettings))
-                        yield return new Benchmark(target, task);
+                    {
+                        if (fieldOrProperty == null)
+                        {
+                            yield return new Benchmark(target, task);
+                        }
+                        else
+                        {
+                            var @params = new BenchmarkParams(fieldOrProperty.Name, fieldOrProperty.Attribute.Args);
+                            // All the properties of BenchmarkTask and it's children are immutable, so cloning a BenchmarkTask like this should be safe
+                            var newTask = new BenchmarkTask(task.ProcessCount, task.Configuration, task.Settings, @params);
+                            yield return new Benchmark(target, newTask);
+                        }
+                    }
                 }
             }
         }

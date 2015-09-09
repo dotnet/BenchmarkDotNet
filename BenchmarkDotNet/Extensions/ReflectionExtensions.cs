@@ -11,6 +11,16 @@ namespace BenchmarkDotNet.Extensions
             return methodInfo.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
         }
 
+        public static T ResolveAttribute<T>(this PropertyInfo propertyInfo) where T : Attribute
+        {
+            return propertyInfo.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
+        }
+
+        public static T ResolveAttribute<T>(this FieldInfo fieldInfo) where T : Attribute
+        {
+            return fieldInfo.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
+        }
+
         public static string GetCorrectTypeName(this Type type)
         {
             if (!type.IsGenericType)
