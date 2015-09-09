@@ -169,6 +169,9 @@
     <EmbeddedResource Include="..\BenchmarkDotNet.Samples\Other\Math_DoubleSqrtAvx.cs">
       <Link>Samples\Other\Math_DoubleSqrtAvx.cs</Link>
     </EmbeddedResource>
+    <Compile Include="..\BenchmarkDotNet.Samples\Other\Array_HeapAllocVsStackAlloc.cs">
+      <Link>Samples\Other\Array_HeapAllocVsStackAlloc.cs</Link>
+    </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
