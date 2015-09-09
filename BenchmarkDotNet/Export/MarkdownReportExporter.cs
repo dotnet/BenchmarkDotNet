@@ -20,7 +20,9 @@ namespace BenchmarkDotNet.Export
             logger.WriteLineInfo(EnvironmentHelper.GetFullEnvironmentInfo("Host", false));
 
             var table = ReportExporterHelper.BuildTable(reports);
-            PrintTable(table, logger);
+            // If we have Benchmarks with Params, force the "Method" columns to be displayed, otherwise it doesn't make as much sense
+            var columnsToAlwaysShow = reports.Any(r => r.Benchmark.Task.Params != null) ? new[] { "Method" } : new string[0];
+            PrintTable(table, logger, columnsToAlwaysShow);
             var benchmarksWithTroubles = reports.Where(r => r.Runs.Count == 0).Select(r => r.Benchmark).ToList();
             if (benchmarksWithTroubles.Count > 0)
             {
@@ -31,9 +33,10 @@ namespace BenchmarkDotNet.Export
             }
         }
 
-        private void PrintTable(List<string[]> table, IBenchmarkLogger logger)
+        private void PrintTable(List<string[]> table, IBenchmarkLogger logger, string [] columnsToAlwaysShow)
         {
             int rowCount = table.Count, colCount = table[0].Length;
+            var columnsToShowIndexes = columnsToAlwaysShow.Select(col => Array.IndexOf(table[0], col));
             int[] widths = new int[colCount];
             bool[] areSame = new bool[colCount];
             for (int colIndex = 0; colIndex < colCount; colIndex++)
@@ -49,7 +52,7 @@ namespace BenchmarkDotNet.Export
             if (areSame.Any(s => s))
             {
                 for (int colIndex = 0; colIndex < colCount; colIndex++)
-                    if (areSame[colIndex])
+                    if (areSame[colIndex] && columnsToShowIndexes.Contains(colIndex) == false)
                         logger.WriteInfo($"{table[0][colIndex]}={table[1][colIndex]}  ");
                 logger.NewLine();
                 logger.WriteLineInfo("```");
@@ -60,7 +63,7 @@ namespace BenchmarkDotNet.Export
             foreach (var row in table)
             {
                 for (int colIndex = 0; colIndex < colCount; colIndex++)
-                    if (!areSame[colIndex])
+                    if (!areSame[colIndex] || columnsToShowIndexes.Contains(colIndex))
                         logger.WriteStatistic(row[colIndex].PadLeft(widths[colIndex], ' ') + " |");
                 logger.NewLine();
             }

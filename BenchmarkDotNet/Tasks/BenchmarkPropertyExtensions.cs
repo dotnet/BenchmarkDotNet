@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Tasks
 
         public static IList<string> GetImportantNames(
             this IEnumerable<IEnumerable<BenchmarkProperty>> propertiesEnumerable)
-        {            
+        {
             var allProperties = new List<BenchmarkProperty>();
             foreach (var properties in propertiesEnumerable)
                 allProperties.AddRange(properties);
