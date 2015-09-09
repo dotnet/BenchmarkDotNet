@@ -37,7 +37,7 @@ namespace BenchmarkDotNet
                         if (Logger != null)
                         {
                             Logger.WriteError(
-                                $"Something bad happens during starting execution of {exeName}. Try to run becnhmark using AnyCPU application");
+                                $"Something bad happened during the execution of {exeName}. Try to run the benchmark again using an AnyCPU application\n");
                         }
                         else
                         {
