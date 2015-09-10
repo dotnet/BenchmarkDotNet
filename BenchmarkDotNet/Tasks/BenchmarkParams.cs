@@ -6,6 +6,7 @@ namespace BenchmarkDotNet.Tasks
     public class BenchmarkParams
     {
         public string ParamFieldOrProperty { get; }
+        public bool IsStatic { get; }
         public IList<int> Values { get; }
 
         public string Caption => $"_{ParamFieldOrProperty}";
@@ -13,12 +14,13 @@ namespace BenchmarkDotNet.Tasks
         // this is here to stop magic strings spreading around the code
         internal static string ParamTitle { get { return "Param"; } }
 
-        public BenchmarkParams(string paramFieldOrProperty, int[] values)
+        public BenchmarkParams(string paramFieldOrProperty, bool isStatic, int[] values)
         {
             if (paramFieldOrProperty == null) throw new ArgumentNullException(nameof(paramFieldOrProperty));
             if (values == null) throw new ArgumentNullException(nameof(values));
 
             ParamFieldOrProperty = paramFieldOrProperty;
+            IsStatic = isStatic;
             Values = new List<int>(values);
         }
 

@@ -24,6 +24,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [BenchmarkTask(mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 1)]
         public void Benchmark()
         {
+            Console.WriteLine("// ### Benchmark called ###");
             Thread.Sleep(5);
         }
     }

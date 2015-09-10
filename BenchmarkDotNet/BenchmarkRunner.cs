@@ -168,8 +168,18 @@ namespace BenchmarkDotNet
             }
 
             // If there is one, get the single Field or Property that has the [Params(..)] attribute
-            var fields = targetType.GetFields().Select(f => new { f.Name, Attribute = f.ResolveAttribute<ParamsAttribute>() });
-            var properties = targetType.GetProperties().Select(f => new { f.Name, Attribute = f.ResolveAttribute<ParamsAttribute>() });
+            var fields = targetType.GetFields().Select(f => new
+                {
+                    f.Name,
+                    Attribute = f.ResolveAttribute<ParamsAttribute>(),
+                    IsStatic = f.IsStatic,
+                });
+            var properties = targetType.GetProperties().Select(f => new
+                {
+                    f.Name,
+                    Attribute = f.ResolveAttribute<ParamsAttribute>(),
+                    IsStatic = f.GetSetMethod().IsStatic
+                });
             var fieldOrProperty = fields.Concat(properties).FirstOrDefault(i => i.Attribute != null);
 
             for (int i = 0; i < methods.Length; i++)
@@ -191,7 +201,7 @@ namespace BenchmarkDotNet
                         }
                         else
                         {
-                            var @params = new BenchmarkParams(fieldOrProperty.Name, fieldOrProperty.Attribute.Args);
+                            var @params = new BenchmarkParams(fieldOrProperty.Name, fieldOrProperty.IsStatic, fieldOrProperty.Attribute.Args);
                             // All the properties of BenchmarkTask and it's children are immutable, so cloning a BenchmarkTask like this should be safe
                             var newTask = new BenchmarkTask(task.ProcessCount, task.Configuration, task.Settings, @params);
                             yield return new Benchmark(target, newTask);

@@ -71,9 +71,14 @@ namespace BenchmarkDotNet
                 ? ""
                 : $"return default({targetMethodReturnType});";
 
-            var paramsContent = benchmark.Task.Params == null
-                ? ""
-                : $"instance.{benchmark.Task.Params.ParamFieldOrProperty} = BenchmarkParams.Parse(args);";
+            var paramsContent = "";
+            if (benchmark.Task.Params != null)
+            {
+                var typeQualifier = benchmark.Task.Params.IsStatic
+                    ? $"{benchmark.Target.Type.Name}"
+                    : "instance";
+                paramsContent = $"{typeQualifier}.{benchmark.Task.Params.ParamFieldOrProperty} = BenchmarkParams.Parse(args);";
+            }
 
             string runBenchmarkTemplate = "";
             switch (benchmark.Task.Configuration.Mode)

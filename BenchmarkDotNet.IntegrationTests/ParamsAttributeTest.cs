@@ -1,7 +1,6 @@
 ﻿using BenchmarkDotNet.Tasks;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -19,6 +18,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var reports = new BenchmarkRunner().RunCompetition(new ParamsTestProperty());
             foreach (var param in new[] { 1, 2, 3, 8, 9, 10 })
                 Assert.Contains($"// ### New Parameter {param} ###" +  Environment.NewLine, GetTestOutput());
+            Assert.DoesNotContain($"// ### New Parameter {default(int)} ###" + Environment.NewLine, GetTestOutput());
         }
 
         [Benchmark]
@@ -30,7 +30,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 Console.WriteLine($"// ### New Parameter {ParamProperty} ###");
                 collectedParams.Add(ParamProperty);
             }
-            Thread.Sleep(5 + ParamProperty);
         }
     }
 
@@ -47,6 +46,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var reports = new BenchmarkRunner().RunCompetition(new ParamsTestField());
             foreach (var param in new[] { 1, 2, 3, 8, 9, 10 })
                 Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, GetTestOutput());
+            Assert.DoesNotContain($"// ### New Parameter 0 ###" + Environment.NewLine, GetTestOutput());
         }
 
         [Benchmark]
@@ -58,36 +58,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 Console.WriteLine($"// ### New Parameter {ParamField} ###");
                 collectedParams.Add(ParamField);
             }
-            Thread.Sleep(5 + ParamField);
-        }
-    }
-
-    // Delibrately made everything "static" (as well as using a Field) to ensure that Params also work okay in this scenario
-    public class ParamsTestStaticField : IntegrationTestBase
-    {
-        [Params(1, 2, 3, 8, 9, 10)]
-        public static int StaticParamField = 0;
-
-        private static HashSet<int> collectedParams = new HashSet<int>();
-
-        [Fact]
-        public static void Test()
-        {
-            var reports = new BenchmarkRunner().RunCompetition(new ParamsTestField());
-            foreach (var param in new[] { 1, 2, 3, 8, 9, 10 })
-                Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, GetTestOutput());
-        }
-
-        [Benchmark]
-        [BenchmarkTask(mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 1)]
-        public static void Benchmark()
-        {
-            if (collectedParams.Contains(StaticParamField) == false)
-            {
-                Console.WriteLine($"// ### New Parameter {StaticParamField} ###");
-                collectedParams.Add(StaticParamField);
-            }
-            Thread.Sleep(5 + StaticParamField);
         }
     }
 }
