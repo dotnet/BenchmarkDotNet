@@ -6,7 +6,7 @@
     {
         // Sizes used in original benchmark are 10 – 4010 (step 500) and 6000 – 96000 (step 10,000).
         [Params(10, 510, 1010, 1510, 2010, 2510, 3010, 3510, 4010, 6000, 16000, 26000, 36000, 46000, 56000, 66000, 76000, 86000, 96000)]
-        public int ArraySize = 86000;
+        public int ArraySize = 0;
 
         [Benchmark]
         public int GetSquare()
