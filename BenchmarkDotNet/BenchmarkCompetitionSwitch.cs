@@ -45,7 +45,7 @@ namespace BenchmarkDotNet
             for (int i = 0; i < Competitions.Length; i++)
             {
                 var competition = Competitions[i];
-                if (args.Any(arg => competition.Name.ToLower().StartsWith(arg.ToLower())) || args.Contains("#" + i) || args.Contains("*"))
+                if (args.Any(arg => competition.Name.ToLower().StartsWith(arg.ToLower())) || args.Contains("#" + i) || args.Contains("" + i) || args.Contains("*"))
                 {
                     logger.WriteLineHeader("Target competition: " + competition.Name);
                     List<BenchmarkReport> reports;
