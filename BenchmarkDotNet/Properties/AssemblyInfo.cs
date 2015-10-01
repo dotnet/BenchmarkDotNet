@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("BenchmarkDotNet")]
+[assembly: AssemblyTitle("BenchmarkDotNet-Dev")] // Remove "Dev" for NuGet publishing
 [assembly: AssemblyDescription("A lightweight .NET library for benchmarking")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
@@ -14,5 +14,5 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("cbba82d3-e650-407f-a0f0-767891d4f04c")]
 
-[assembly: AssemblyVersion("0.7.7")]
-[assembly: AssemblyFileVersion("0.7.7")]
+[assembly: AssemblyVersion("0.7.8")]
+[assembly: AssemblyFileVersion("0.7.8")]

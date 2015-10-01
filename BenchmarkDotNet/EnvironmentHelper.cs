@@ -57,11 +57,16 @@ namespace BenchmarkDotNet
         public static string GetFullEnvironmentInfo(string clrHint = "", bool printDoubleSlash = true)
         {
             var prefix = printDoubleSlash ? "// " : string.Empty;
-            var line1 = $"{prefix}BenchmarkDotNet=v{GetBenchmarkDotNetVersion()}";
+            var line1 = $"{prefix}{GetBenchmarkDotNetCaption()}=v{GetBenchmarkDotNetVersion()}";
             var line2 = $"{prefix}OS={GetOsVersion()}";
             var line3 = $"{prefix}Processor={GetProcessorName()}, ProcessorCount={GetProcessorCount()}";
             var line4 = $"{prefix}{clrHint}CLR={GetClrVersion()}, Arch={GetArch()} {GetConfiguration()}{GetDebuggerFlag()}{GetJitFlag()}";
             return string.Join(Environment.NewLine, new[] { line1, line2, line3, line4 });
+        }
+
+        private static string GetBenchmarkDotNetCaption()
+        {
+            return ((AssemblyTitleAttribute)typeof(BenchmarkRunner).Assembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), false)[0]).Title;
         }
 
         private static string GetBenchmarkDotNetVersion()
