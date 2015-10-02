@@ -71,6 +71,7 @@
     <Compile Include="Other\Array_HeapAllocVsStackAlloc.cs" />
     <Compile Include="Other\Math_DoubleSqrtAvx.cs" />
     <Compile Include="Other\Math_DoubleSqrt.cs" />
+    <Compile Include="CPU\Cpu_Atomics.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="JIT\Jit_ArraySumLoopUnrolling.cs" />
