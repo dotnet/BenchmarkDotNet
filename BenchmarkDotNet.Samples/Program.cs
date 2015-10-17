@@ -31,6 +31,7 @@ namespace BenchmarkDotNet.Samples
                 typeof(Jit_Bce),
                 typeof(Jit_InterfaceMethod),
                 typeof(Jit_RegistersVsStack),
+                typeof(Jit_AsVsCast),
                 // CPU
                 typeof(Cpu_Atomics),
                 typeof(Cpu_Ilp_Inc),
