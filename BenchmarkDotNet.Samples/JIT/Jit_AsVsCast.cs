@@ -1,5 +1,10 @@
-﻿namespace BenchmarkDotNet.Samples.JIT
+﻿using BenchmarkDotNet.Tasks;
+
+namespace BenchmarkDotNet.Samples.JIT
 {
+    [BenchmarkTask(platform: BenchmarkPlatform.X86, jitVersion: BenchmarkJitVersion.LegacyJit)]
+    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
+    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
     public class Jit_AsVsCast
     {
         public class Foo
