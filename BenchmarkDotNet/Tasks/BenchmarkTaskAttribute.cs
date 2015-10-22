@@ -13,6 +13,7 @@ namespace BenchmarkDotNet.Tasks
             BenchmarkPlatform platform = BenchmarkPlatform.HostPlatform,
             BenchmarkJitVersion jitVersion = BenchmarkJitVersion.HostJit,
             BenchmarkFramework framework = BenchmarkFramework.HostFramework,
+            string runtime = null,
             int warmupIterationCount = 5,
             int targetIterationCount = 10
             )
@@ -20,7 +21,7 @@ namespace BenchmarkDotNet.Tasks
             Task = new BenchmarkTask(
                 processCount,
                 new BenchmarkConfiguration(mode, platform, jitVersion, framework),
-                new BenchmarkSettings(warmupIterationCount, targetIterationCount));
+                new BenchmarkSettings(warmupIterationCount, targetIterationCount, runtime));
         }
     }
 }

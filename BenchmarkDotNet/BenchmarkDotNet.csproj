@@ -62,6 +62,7 @@
     <Compile Include="Statistic\StatSummary.cs" />
     <Compile Include="SetupAttribute.cs" />
     <Compile Include="Tasks\BenchmarkParams.cs" />
+    <Compile Include="Tasks\BenchmarkRuntime.cs" />
     <Compile Include="Tasks\BenchmarkTaskAttribute.cs" />
     <Compile Include="OperationsPerInvokeAttribute.cs" />
     <Compile Include="Benchmark.cs" />

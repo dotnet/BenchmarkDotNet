@@ -9,15 +9,17 @@ namespace BenchmarkDotNet.Tasks
 
         public int WarmupIterationCount { get; }
         public int TargetIterationCount { get; }
+        public string Runtime { get; }
 
         public BenchmarkSettings()
         {
         }
 
-        public BenchmarkSettings(int warmupIterationCount, int targetIterationCount)
+        public BenchmarkSettings(int warmupIterationCount, int targetIterationCount, string runtime = null)
         {
             WarmupIterationCount = warmupIterationCount;
             TargetIterationCount = targetIterationCount;
+            Runtime = runtime;
         }
 
         public string ToArgs()

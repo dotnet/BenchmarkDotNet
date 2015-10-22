@@ -8,12 +8,12 @@ namespace BenchmarkDotNet
     internal class BenchmarkExecutor
     {
         public IBenchmarkLogger Logger { get; }
-        public bool MonoMode { get; }
+        public string Runtime { get; }
 
-        public BenchmarkExecutor(IBenchmarkLogger logger = null, bool monoMode = false)
+        public BenchmarkExecutor(IBenchmarkLogger logger = null, string runtime = null)
         {
             Logger = logger;
-            MonoMode = monoMode;
+            Runtime = runtime;
         }
 
         public IList<string> Exec(string exeName, string args = "")
@@ -58,15 +58,15 @@ namespace BenchmarkDotNet
                 RedirectStandardOutput = true,
                 CreateNoWindow = true
             };
-            if (MonoMode)
-            {
-                start.FileName = "mono";
-                start.Arguments = exeName + " " + args;
-            }
-            else
+            if (string.IsNullOrWhiteSpace(Runtime))
             {
                 start.FileName = exeName;
                 start.Arguments = args;
+            }
+            else
+            {
+                start.FileName = Runtime;
+                start.Arguments = exeName + " " + args;
             }
             return start;
         }
