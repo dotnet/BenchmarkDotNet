@@ -136,7 +136,7 @@ namespace BenchmarkDotNet
                     Logger.NewLine();
                 }
 
-                var executor = new BenchmarkExecutor(Logger);
+                var executor = new BenchmarkExecutor(Logger, benchmark.Task.Settings.Runtime);
                 if (File.Exists(exeFileName))
                 {
                     var args = benchmark.Task.Settings.ToArgs();
