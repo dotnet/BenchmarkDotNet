@@ -69,6 +69,7 @@
     <Compile Include="JIT\Jit_Inlining.cs" />
     <Compile Include="JIT\Jit_InterfaceMethod.cs" />
     <Compile Include="JIT\Jit_LoopUnrolling.cs" />
+    <Compile Include="JIT\Jit_RotateBits.cs" />
     <Compile Include="Other\Array_HeapAllocVsStackAlloc.cs" />
     <Compile Include="Other\Math_DoubleSqrtAvx.cs" />
     <Compile Include="Other\Math_DoubleSqrt.cs" />
