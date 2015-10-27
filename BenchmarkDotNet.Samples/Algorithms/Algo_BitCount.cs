@@ -5,7 +5,7 @@ namespace BenchmarkDotNet.Samples.Algorithms
     // See http://en.wikipedia.org/wiki/Hamming_weight
     public class Algo_BitCount
     {
-        private const int N = 1001;
+        private const int N = 1002;
         private readonly ulong[] numbers;
         private readonly Random random = new Random(42);
 
@@ -47,6 +47,24 @@ namespace BenchmarkDotNet.Samples.Algorithms
             int counter = 0;
             for (int i = 0; i < N; i++)
                 counter += BitCountHelper.PopCount3(numbers[i]);
+            return counter;
+        }
+
+        [Benchmark]
+        public int PopCount4()
+        {
+            int counter = 0;
+            for (int i = 0; i < N; i++)
+                counter += BitCountHelper.PopCount4(numbers[i]);
+            return counter;
+        }
+
+        [Benchmark]
+        public int PopCountParallel2()
+        {
+            int counter = 0;
+            for (int i = 0; i < N / 2; i++)
+                counter += BitCountHelper.PopCountParallel2(numbers[i],numbers[i+1]);
             return counter;
         }
     }
@@ -103,6 +121,234 @@ namespace BenchmarkDotNet.Samples.Algorithms
             x = (x & m2) + ((x >> 2) & m2); //put count of each 4 bits into those 4 bits 
             x = (x + (x >> 4)) & m4;        //put count of each 8 bits into those 8 bits 
             return (int)((x * h01) >> 56);  //returns left 8 bits of x + (x<<8) + (x<<16) + (x<<24) + ... 
+        }
+
+        // This implementation uses branches to count. 
+        // Found at https://github.com/aspnet/KestrelHttpServer/blob/78de14d24868fd1b44a7335b30d9a2064c984516/src/Microsoft.AspNet.Server.Kestrel/Http/FrameHeaders.Generated.cs#L65
+        public static int PopCount4(ulong x)
+        {
+            int count = 0;
+
+            if (((x & 1L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 2L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 4L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 8L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 16L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 32L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 64L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 128L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 256L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 512L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 1024L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 2048L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 4096L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 8192L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 16384L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 32768L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 65536L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 131072L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 262144L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 524288L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 1048576L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 2097152L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 4194304L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 8388608L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 16777216L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 33554432L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 67108864L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 134217728L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 268435456L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 536870912L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 1073741824L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 2147483648L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 4294967296L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 8589934592L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 17179869184L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 34359738368L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 68719476736L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 137438953472L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 274877906944L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 549755813888L) != 0))
+            {
+                ++count;
+            }
+
+            if (((x & 1099511627776L) != 0))
+            {
+                ++count;
+            }
+
+            return count;
+        }
+
+        public static int PopCountParallel2(ulong x, ulong y)
+        {
+            x -= (x >> 1) & m1;             //put count of each 2 bits into those 2 bits
+            y -= (y >> 1) & m1;             //put count of each 2 bits into those 2 bits
+
+            x = (x & m2) + ((x >> 2) & m2); //put count of each 4 bits into those 4 bits 
+            y = (y & m2) + ((y >> 2) & m2); //put count of each 4 bits into those 4 bits 
+
+            x = (x + (x >> 4)) & m4;        //put count of each 8 bits into those 8 bits                         
+            y = (y + (y >> 4)) & m4;        //put count of each 8 bits into those 8 bits 
+
+            return (int) ( ((y * h01) >> 56) + ((x * h01) >> 56) );  //returns left 8 bits of x + (x<<8) + (x<<16) + (x<<24) + ... 
         }
     }
 }
