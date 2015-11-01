@@ -10,11 +10,11 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void Test()
         {
-            Assert.Throws<InvalidOperationException>(() => new BenchmarkRunner().RunCompetition(new SetupAttributeInvalidMethodTest()));
+            Assert.Throws<InvalidOperationException>(() => new BenchmarkRunner().Run<SetupAttributeInvalidMethodTest>());
         }
 
         [Setup]
-        public void Setup(int someParameters) // [Setup] methods must have no parameters
+        public void Setup(int someParameters) // [Setup] methods must have no ParametersSets
         {
             Console.WriteLine("// ### Setup called ###");
         }

@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void Test()
         {
-            var reports = new BenchmarkRunner().RunCompetition(new SetupAttributeTest());
+            var reports = new BenchmarkRunner().Run<SetupAttributeTest>();
             Assert.Contains("// ### Setup called ###" + Environment.NewLine, GetTestOutput());
         }
 

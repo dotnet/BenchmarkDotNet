@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Tasks
             get
             {
                 yield return new BenchmarkProperty(nameof(Type), Type.Name);
-                yield return new BenchmarkProperty(nameof(Method), Method.Name);
+                yield return new BenchmarkProperty(nameof(Method), Description);
             }
         }
     }

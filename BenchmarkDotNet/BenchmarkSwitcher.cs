@@ -4,19 +4,19 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Export;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Logging;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet
 {
-    public class BenchmarkCompetitionSwitch
+    public class BenchmarkSwitcher
     {
-        public Type[] Competitions { get; }
+        public Type[] Types { get; }
 
-        public BenchmarkCompetitionSwitch(Type[] competitions)
+        public BenchmarkSwitcher(Type[] types)
         {
-            Competitions = competitions;
+            Types = types;
         }
 
         private readonly BenchmarkConsoleLogger logger = new BenchmarkConsoleLogger();
@@ -24,7 +24,7 @@ namespace BenchmarkDotNet
         public void Run(string[] args)
         {
             args = ReadArgumentList(args);
-            RunCompetitions(args);
+            RunBenchmarks(args);
         }
 
         private string[] ReadArgumentList(string[] args)
@@ -40,23 +40,23 @@ namespace BenchmarkDotNet
             return args;
         }
 
-        private void RunCompetitions(string[] args)
+        private void RunBenchmarks(string[] args)
         {
-            for (int i = 0; i < Competitions.Length; i++)
+            for (int i = 0; i < Types.Length; i++)
             {
-                var competition = Competitions[i];
-                if (args.Any(arg => competition.Name.ToLower().StartsWith(arg.ToLower())) || args.Contains("#" + i) || args.Contains("" + i) || args.Contains("*"))
+                var type = Types[i];
+                if (args.Any(arg => type.Name.ToLower().StartsWith(arg.ToLower())) || args.Contains("#" + i) || args.Contains("" + i) || args.Contains("*"))
                 {
-                    logger.WriteLineHeader("Target competition: " + competition.Name);
+                    logger.WriteLineHeader("Target competition: " + type.Name);
                     List<BenchmarkReport> reports;
-                    using (var logStreamWriter = new StreamWriter(competition.Name + ".log"))
+                    using (var logStreamWriter = new StreamWriter(type.Name + ".log"))
                     {
                         var loggers = new IBenchmarkLogger[] { new BenchmarkConsoleLogger(), new BenchmarkStreamLogger(logStreamWriter) };
                         var runner = new BenchmarkRunner(loggers);
-                        reports = runner.RunCompetition(Activator.CreateInstance(competition), BenchmarkSettings.Parse(args)).ToList();
+                        reports = runner.Run(type).ToList();
                     }
-                    MarkdownReportExporter.Default.SaveToFile(reports, competition.Name + "-report.md");
-                    CsvReportExporter.Default.SaveToFile(reports, competition.Name + "-report.csv");
+                    MarkdownReportExporter.Default.SaveToFile(reports, type.Name + "-report.md");
+                    CsvReportExporter.Default.SaveToFile(reports, type.Name + "-report.csv");
                     logger.NewLine();
                 }
             }
@@ -69,17 +69,17 @@ namespace BenchmarkDotNet
                 {
                     var loggers = new IBenchmarkLogger[] { new BenchmarkConsoleLogger(), new BenchmarkStreamLogger(logStreamWriter) };
                     var runner = new BenchmarkRunner(loggers);
-                    runner.RunUrl(url, BenchmarkSettings.Parse(args));
+                    runner.RunUrl(url);
                 }
             }
         }
 
         private void PrintAvailable()
         {
-            logger.WriteLineHelp("Available competitions:");
-            int numberWidth = Competitions.Length.ToString().Length;
-            for (int i = 0; i < Competitions.Length; i++)
-                logger.WriteLineHelp(string.Format(CultureInfo.InvariantCulture, "  #{0} {1}", i.ToString().PadRight(numberWidth), Competitions[i].Name));
+            logger.WriteLineHelp("Available Typesenchmark sets:");
+            int numberWidth = Types.Length.ToString().Length;
+            for (int i = 0; i < Types.Length; i++)
+                logger.WriteLineHelp(string.Format(CultureInfo.InvariantCulture, "  #{0} {1}", i.ToString().PadRight(numberWidth), Types[i].Name));
             logger.NewLine();
             logger.NewLine();
         }

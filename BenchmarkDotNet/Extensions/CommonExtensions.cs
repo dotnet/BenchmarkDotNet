@@ -36,5 +36,18 @@ namespace BenchmarkDotNet.Extensions
         {
             return value.ToString(CultureInfo.InvariantCulture);
         }
+
+        public static List<T> ToSortedList<T>(this IEnumerable<T> values)
+        {
+            var list = new List<T>();
+            list.AddRange(values);
+            list.Sort();
+            return list;
+        }
+
+        public static string ToCamelCase(this string value)
+        {
+            return string.IsNullOrEmpty(value) ? value : char.ToLowerInvariant(value[0]) + value.Substring(1);
+        }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using System.Threading;
+using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet.Samples.Introduction
 {
     // It is very easy to use BenchmarkDotNet. You should just create a class
+    [BenchmarkTask(1, BenchmarkMode.SingleRun)]
     public class Intro_00_Basic
     {
         // And define a method with the Benchmark attribute
@@ -20,6 +22,6 @@ namespace BenchmarkDotNet.Samples.Introduction
         }
 
         // Now you can run this benchmark competition with help of BenchmarkRunner:
-        // new BenchmarkRunner().RunCompetition(new Intro_00_Basic());
+        // new BenchmarkRunner().Run(new Intro_00_Basic());
     }
 }

@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.Samples", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.IntegrationTests", "BenchmarkDotNet.IntegrationTests\BenchmarkDotNet.IntegrationTests.csproj", "{74362BB1-9F64-4BE5-B079-B4AC19DAE5DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.Visualizer", "BenchmarkDotNet.Visualizer\BenchmarkDotNet.Visualizer.csproj", "{5AB013D1-494F-4647-B8A9-13B078B35B25}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.Tests", "BenchmarkDotNet.Tests\BenchmarkDotNet.Tests.csproj", "{16C47ABF-43E0-4DB4-8151-36CA7A4082AE}"
 EndProject
 Global
@@ -31,10 +29,6 @@ Global
 		{74362BB1-9F64-4BE5-B079-B4AC19DAE5DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74362BB1-9F64-4BE5-B079-B4AC19DAE5DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74362BB1-9F64-4BE5-B079-B4AC19DAE5DB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5AB013D1-494F-4647-B8A9-13B078B35B25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5AB013D1-494F-4647-B8A9-13B078B35B25}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5AB013D1-494F-4647-B8A9-13B078B35B25}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5AB013D1-494F-4647-B8A9-13B078B35B25}.Release|Any CPU.Build.0 = Release|Any CPU
 		{16C47ABF-43E0-4DB4-8151-36CA7A4082AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{16C47ABF-43E0-4DB4-8151-36CA7A4082AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{16C47ABF-43E0-4DB4-8151-36CA7A4082AE}.Release|Any CPU.ActiveCfg = Release|Any CPU

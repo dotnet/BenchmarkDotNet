@@ -51,27 +51,40 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BenchmarkConverter.cs" />
+    <Compile Include="BenchmarkIterationMode.cs" />
+    <Compile Include="BenchmarkState.cs" />
+    <Compile Include="BenchmarkRunnerExtensions.cs" />
+    <Compile Include="Flow\Classic\BenchmarkClassicFlow.cs" />
+    <Compile Include="Flow\Classic\BenchmarkClassicBuilder.cs" />
     <Compile Include="Export\CsvReportExporter.cs" />
     <Compile Include="Export\IReportExporter.cs" />
     <Compile Include="Export\MarkdownReportExporter.cs" />
     <Compile Include="Export\ReportExporterExtensions.cs" />
     <Compile Include="Export\ReportExporterHelper.cs" />
+    <Compile Include="Flow\BenchmarkFlowFactory.cs" />
+    <Compile Include="Flow\IBenchmarkFlow.cs" />
+    <Compile Include="Flow\Results\BenchmarkBuildResult.cs" />
+    <Compile Include="Flow\Results\BenchmarkExecResult.cs" />
+    <Compile Include="Flow\Results\BenchmarkGenerateResult.cs" />
     <Compile Include="Logging\MSBuildConsoleLogger.cs" />
-    <Compile Include="ParamsAttribute.cs" />
     <Compile Include="Statistic\ConfidenceInterval.cs" />
     <Compile Include="Statistic\StatSummary.cs" />
     <Compile Include="SetupAttribute.cs" />
-    <Compile Include="Tasks\BenchmarkParams.cs" />
+    <Compile Include="Tasks\BenchmarkExecutor.cs" />
+    <Compile Include="Tasks\BenchmarkParameters.cs" />
+    <Compile Include="Tasks\BenchmarkParametersSets.cs" />
     <Compile Include="Tasks\BenchmarkRuntime.cs" />
+    <Compile Include="Tasks\BenchmarkRuntimeVersion.cs" />
     <Compile Include="Tasks\BenchmarkTaskAttribute.cs" />
     <Compile Include="OperationsPerInvokeAttribute.cs" />
     <Compile Include="Benchmark.cs" />
-    <Compile Include="BenchmarkCompetitionSwitch.cs" />
-    <Compile Include="BenchmarkExecutor.cs" />
+    <Compile Include="BenchmarkSwitcher.cs" />
+    <Compile Include="Flow\Classic\BenchmarkClassicExecutor.cs" />
     <Compile Include="BenchmarkMethodInvoker.cs" />
     <Compile Include="Tasks\BenchmarkConfiguration.cs" />
     <Compile Include="Tasks\BenchmarkFramework.cs" />
-    <Compile Include="BenchmarkProjectGenerator.cs" />
+    <Compile Include="Flow\Classic\BenchmarkClassicGenerator.cs" />
     <Compile Include="Tasks\BenchmarkJitVersion.cs" />
     <Compile Include="Tasks\BenchmarkMode.cs" />
     <Compile Include="Tasks\BenchmarkPlatform.cs" />
@@ -79,7 +92,6 @@
     <Compile Include="Tasks\BenchmarkProperty.cs" />
     <Compile Include="Tasks\BenchmarkTarget.cs" />
     <Compile Include="Tasks\BenchmarkTask.cs" />
-    <Compile Include="Tasks\BenchmarkSettings.cs" />
     <Compile Include="EnvironmentHelper.cs" />
     <Compile Include="Extensions\ConfigurationExtensions.cs" />
     <Compile Include="Extensions\ReflectionExtensions.cs" />
@@ -112,6 +124,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Templates\BenchmarkThroughput.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,9 +1,7 @@
 ﻿namespace BenchmarkDotNet.Tasks
 {
-    public static class BenchmarkRuntime
+    public enum BenchmarkRuntime
     {
-        public const string Default = "";
-        public const string Mono = "mono";
-        public const string CoreClr = "CoreRun";
+        Clr, CoreClr, Mono
     }
 }

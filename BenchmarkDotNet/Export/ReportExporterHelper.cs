@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet.Export
 {
@@ -10,7 +9,7 @@ namespace BenchmarkDotNet.Export
     {
         // TODO: signature refactoring
         public static List<string[]> BuildTable(IList<BenchmarkReport> reports, bool pretty = true, bool extended = false)
-        {
+        {            
             var reportStats = reports.Where(r => r.Runs.Count > 0).Select(
              r => new
              {
@@ -18,6 +17,8 @@ namespace BenchmarkDotNet.Export
                  Report = r,
                  Stat = new BenchmarkRunReportsStatistic("Target", r.Runs)
              }).ToList();
+            if (reportStats.Count == 0)
+                return new List<string[]>();
 
             // Ensure uniform number formats and use of time units via these helpers.
             var averageTimeStats = reportStats.Select(reportStat => reportStat.Stat);
@@ -25,10 +26,11 @@ namespace BenchmarkDotNet.Export
             var opsPerSecToStringFunc = GetOpsPerSecFormattingFunc();
 
             var showParams = false;
-            var headerRow = new List<string> { "Type", "Method", "Mode", "Platform", "Jit", ".NET", };
-            if (reportStats.Any(r => r.Benchmark.Task.Params != null))
+            var headerRow = new List<string> { "Type", "Method", "Mode", "Platform", "Jit", ".NET", "Executor", "Runtime", "RuntimeVersion", "Warmup", "Target" };
+            if (reportStats.Any(r => !r.Benchmark.Task.ParametersSets.IsEmpty()))
             {
-                headerRow.Add(BenchmarkParams.ParamTitle);
+                // TODO: write generic logic for multiple parameters
+                headerRow.Add("IntParam");
                 showParams = true;
             }
             headerRow.Add("AvrTime");
@@ -45,15 +47,20 @@ namespace BenchmarkDotNet.Export
                 var row = new List<string>
                 {
                     b.Target.Type.Name,
-                    b.Target.Method.Name,
+                    b.Target.Description,
                     b.Task.Configuration.Mode.ToString(),
                     b.Task.Configuration.Platform.ToString(),
                     b.Task.Configuration.JitVersion.ToString(),
-                    b.Task.Configuration.Framework.ToString()
+                    b.Task.Configuration.Framework.ToString(),
+                    b.Task.Configuration.Executor.ToString(),
+                    b.Task.Configuration.Runtime.ToString(),
+                    b.Task.Configuration.RuntimeVersion ?? "Default",
+                    b.Task.Configuration.WarmupIterationCount.ToString(),
+                    b.Task.Configuration.TargetIterationCount.ToString()
                 };
 
                 if (showParams)
-                    row.Add(reportStat.Report.BenchmarkParam.ToString());
+                    row.Add(reportStat.Report.Parameters.IntParam.ToString());
                 row.Add(timeToStringFunc(reportStat.Stat.AverageTime.Median));
                 row.Add(timeToStringFunc(reportStat.Stat.AverageTime.StandardDeviation));
                 row.Add(opsPerSecToStringFunc(reportStat.Stat.OperationsPerSeconds.Median));

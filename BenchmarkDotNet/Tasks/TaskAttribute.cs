@@ -18,8 +18,7 @@ namespace BenchmarkDotNet.Tasks
         {
             Task = new BenchmarkTask(
                 processCount,
-                new BenchmarkConfiguration(mode, platform, jitVersion, framework),
-                new BenchmarkSettings(warmupIterationCount, targetIterationCount));
+                new BenchmarkConfiguration(mode, platform, jitVersion, framework, BenchmarkExecutor.Classic, BenchmarkRuntime.Clr, string.Empty, warmupIterationCount, targetIterationCount));
         }
     }
 }

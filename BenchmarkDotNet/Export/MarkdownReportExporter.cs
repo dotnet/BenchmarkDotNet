@@ -20,8 +20,8 @@ namespace BenchmarkDotNet.Export
             logger.WriteLineInfo(EnvironmentHelper.GetFullEnvironmentInfo("Host", false));
 
             var table = ReportExporterHelper.BuildTable(reports);
-            // If we have Benchmarks with Params, force the "Method" columns to be displayed, otherwise it doesn't make as much sense
-            var columnsToAlwaysShow = reports.Any(r => r.Benchmark.Task.Params != null) ? new[] { "Method" } : new string[0];
+            // If we have Benchmarks with ParametersSets, force the "Method" columns to be displayed, otherwise it doesn't make as much sense
+            var columnsToAlwaysShow = reports.Any(r => r.Benchmark.Task.ParametersSets != null) ? new[] { "Method" } : new string[0];
             PrintTable(table, logger, columnsToAlwaysShow);
             var benchmarksWithTroubles = reports.Where(r => r.Runs.Count == 0).Select(r => r.Benchmark).ToList();
             if (benchmarksWithTroubles.Count > 0)
@@ -35,6 +35,13 @@ namespace BenchmarkDotNet.Export
 
         private void PrintTable(List<string[]> table, IBenchmarkLogger logger, string [] columnsToAlwaysShow)
         {
+            if (table.Count == 0)
+            {
+                logger.WriteLineError("There are no found benchmarks");
+                logger.WriteLineInfo("```");
+                logger.NewLine();
+                return;
+            }
             int rowCount = table.Count, colCount = table[0].Length;
             var columnsToShowIndexes = columnsToAlwaysShow.Select(col => Array.IndexOf(table[0], col));
             int[] widths = new int[colCount];

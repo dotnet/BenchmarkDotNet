@@ -1,4 +1,4 @@
-        public void RunBenchmark(BenchmarkSettings settings)
+        public void RunBenchmark()
         {
-            new BenchmarkMethodInvoker().Throughput(settings, $OperationsPerInvoke$, setupAction, targetAction, idleAction);
+            new BenchmarkMethodInvoker().Throughput(task, $OperationsPerInvoke$, setupAction, targetAction, idleAction);
         }

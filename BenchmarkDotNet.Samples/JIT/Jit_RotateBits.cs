@@ -1,14 +1,5 @@
-﻿using BenchmarkDotNet.Tasks;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-
-namespace BenchmarkDotNet.Samples.JIT
+﻿namespace BenchmarkDotNet.Samples.JIT
 {
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit, runtime: BenchmarkRuntime.Default)]
-    //[BenchmarkTask(platform: BenchmarkPlatform.X64, runtime: BenchmarkRuntime.CoreClr)]
     public class Jit_RotateBits
     {
         private ulong au = 2340988;

@@ -1,12 +1,19 @@
-﻿namespace BenchmarkDotNet.Samples.Other
+﻿using BenchmarkDotNet.Tasks;
+
+namespace BenchmarkDotNet.Samples.Other
 {
     // See http://blogs.microsoft.co.il/sasha/2013/10/17/on-stackalloc-performance-and-the-large-object-heap/
     // For comparision, the original "hand-written" benchmark is available at https://gist.github.com/goldshtn/7021608
+    [BenchmarkTask(intParams:new []{ 10, 510, 1010, 1510, 2010, 2510, 3010, 3510, 4010, 6000, 16000, 26000, 36000, 46000, 56000, 66000, 76000, 86000, 96000 })]
     public class Array_HeapAllocVsStackAlloc
     {
+        public Array_HeapAllocVsStackAlloc()
+        {
+            ArraySize = BenchmarkState.Instance.IntParam;
+        }
+
         // Sizes used in original benchmark are 10 – 4010 (step 500) and 6000 – 96000 (step 10,000).
-        [Params(10, 510, 1010, 1510, 2010, 2510, 3010, 3510, 4010, 6000, 16000, 26000, 36000, 46000, 56000, 66000, 76000, 86000, 96000)]
-        public int ArraySize = 0;
+        public int ArraySize;
 
         [Benchmark]
         public int GetSquare()

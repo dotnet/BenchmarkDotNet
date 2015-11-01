@@ -8,27 +8,25 @@ namespace BenchmarkDotNet.Tasks
     {
         public int ProcessCount { get; }
         public BenchmarkConfiguration Configuration { get; }
-        public BenchmarkSettings Settings { get; }
-        public BenchmarkParams Params { get; }
+        public BenchmarkParametersSets ParametersSets { get; }
 
-        public string Caption => Configuration.Caption + (Params != null ? Params.Caption : "");
-        public string Description => Configuration.Caption + (Params != null ? Params.Caption : "");
+        public string Caption => Configuration.Caption;
+        public string Description => Configuration.Caption + (!ParametersSets.IsEmpty() ? $" {ParametersSets.Description}" : string.Empty) ;
 
-        public BenchmarkTask(int processCount, BenchmarkConfiguration configuration, BenchmarkSettings settings, BenchmarkParams @params = null)
+        public BenchmarkTask(int processCount, BenchmarkConfiguration configuration, BenchmarkParametersSets parametersSets = null)
         {
             ProcessCount = processCount;
             Configuration = configuration;
-            Settings = settings;
-            Params = @params;
+            ParametersSets = parametersSets ?? BenchmarkParametersSets.Empty;
         }
 
-        public static IEnumerable<BenchmarkTask> Resolve(MethodInfo methodInfo, BenchmarkSettings defaultSettings)
+        public static IEnumerable<BenchmarkTask> Resolve(MethodInfo methodInfo)
         {
             var attrs = methodInfo.GetCustomAttributes(typeof(BenchmarkTaskAttribute), false).Cast<BenchmarkTaskAttribute>().ToList();
-            if (attrs.Count == 0)
+            if (attrs.Count == 0 && methodInfo.DeclaringType != null)
                 attrs = methodInfo.DeclaringType.GetCustomAttributes(typeof(BenchmarkTaskAttribute), false).Cast<BenchmarkTaskAttribute>().ToList();
             if (attrs.Count == 0)
-                attrs.Add(new BenchmarkTaskAttribute(warmupIterationCount: defaultSettings.WarmupIterationCount, targetIterationCount: defaultSettings.TargetIterationCount));
+                attrs.Add(new BenchmarkTaskAttribute());
             return attrs.Select(attr => attr.Task);
         }
 
@@ -39,7 +37,7 @@ namespace BenchmarkDotNet.Tasks
                 yield return new BenchmarkProperty(nameof(ProcessCount), ProcessCount.ToString());
                 foreach (var property in Configuration.Properties)
                     yield return property;
-                foreach (var property in Settings.Properties)
+                foreach (var property in ParametersSets.Properties)
                     yield return property;
             }
         }

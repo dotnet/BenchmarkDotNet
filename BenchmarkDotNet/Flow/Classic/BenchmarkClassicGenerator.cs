@@ -1,38 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Flow.Results;
 using BenchmarkDotNet.Tasks;
-using Microsoft.Build.Evaluation;
-using Microsoft.Build.Execution;
-using Microsoft.Build.Framework;
-using BenchmarkDotNet.Logging;
 
-namespace BenchmarkDotNet
+namespace BenchmarkDotNet.Flow.Classic
 {
-    internal class BenchmarkProjectGenerator
+    internal class BenchmarkClassicGenerator
     {
-        private const string MainClassName = "Program";
+        public const string MainClassName = "Program";
 
-        public string GenerateProject(Benchmark benchmark)
+        public BenchmarkGenerateResult GenerateProject(Benchmark benchmark)
         {
-            var projectDir = CreateProjectDirectory(benchmark);
-            GenerateProgramFile(projectDir, benchmark);
-            GenerateProjectFile(projectDir, benchmark);
-            GenerateAppConfigFile(projectDir, benchmark.Task.Configuration);
-            return projectDir;
-        }
-
-        public BuildResult BuildProject(string directoryPath, IBenchmarkLogger logger)
-        {
-            string projectFileName = Path.Combine(directoryPath, MainClassName + ".csproj");
-            var consoleLogger = new MSBuildConsoleLogger(logger);
-            var globalProperties = new Dictionary<string, string>();
-            var buildRequest = new BuildRequestData(projectFileName, globalProperties, null, new[] { "Build" }, null);
-            var buildParameters = new BuildParameters(new ProjectCollection()) { DetailedSummary = false, Loggers = new ILogger[] { consoleLogger } };
-            var buildResult = BuildManager.DefaultBuildManager.Build(buildParameters, buildRequest);
-            return buildResult;
+            var result = CreateProjectDirectory(benchmark);
+            GenerateProgramFile(result.DirectoryPath, benchmark);
+            GenerateProjectFile(result.DirectoryPath, benchmark);
+            GenerateAppConfigFile(result.DirectoryPath, benchmark.Task.Configuration);
+            return result;
         }
 
         private static void GenerateProgramFile(string projectDir, Benchmark benchmark)
@@ -71,15 +56,6 @@ namespace BenchmarkDotNet
                 ? ""
                 : $"return default({targetMethodReturnType});";
 
-            var paramsContent = "";
-            if (benchmark.Task.Params != null)
-            {
-                var typeQualifier = benchmark.Task.Params.IsStatic
-                    ? $"{benchmark.Target.Type.Name}"
-                    : "instance";
-                paramsContent = $"{typeQualifier}.{benchmark.Task.Params.ParamFieldOrProperty} = BenchmarkParams.Parse(args);";
-            }
-
             string runBenchmarkTemplate = "";
             switch (benchmark.Task.Configuration.Mode)
             {
@@ -91,6 +67,11 @@ namespace BenchmarkDotNet
                     break;
             }
 
+            var targetBenchmarkTaskArguments = 
+                $"{benchmark.Task.ProcessCount}, " + 
+                $"{nameof(BenchmarkTask.Configuration).ToCamelCase()}: new {nameof(BenchmarkConfiguration)}({benchmark.Task.Configuration.ToCtorDefinition()}), " +
+                $"{nameof(BenchmarkTask.ParametersSets).ToCamelCase()}: new {nameof(BenchmarkParametersSets)}({benchmark.Task.ParametersSets.ToCtorDefinition()})";
+                
             var contentTemplate = GetTemplate("BenchmarkProgram.txt");
             var content = contentTemplate.
                 Replace("$RunBenchmarkContent$", runBenchmarkTemplate).
@@ -105,8 +86,8 @@ namespace BenchmarkDotNet
                 Replace("$TargetMethodReturnType$", targetMethodReturnType).
                 Replace("$SetupMethodName$", setupMethodName).
                 Replace("$IdleImplementation$", idleImplementation).
-                Replace("$AdditionalLogic$", benchmark.Target.AdditionalLogic)
-               .Replace("$ParamsContent$", paramsContent);
+                Replace("$AdditionalLogic$", benchmark.Target.AdditionalLogic).
+                Replace("$TargetBenchmarkTaskArguments$", targetBenchmarkTaskArguments);
 
             string fileName = Path.Combine(projectDir, MainClassName + ".cs");
             File.WriteAllText(fileName, content);
@@ -156,7 +137,7 @@ namespace BenchmarkDotNet
             File.WriteAllText(fileName, content);
         }
 
-        private static string CreateProjectDirectory(Benchmark benchmark)
+        private static BenchmarkGenerateResult CreateProjectDirectory(Benchmark benchmark)
         {
             var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), benchmark.Caption);
             try
@@ -164,13 +145,13 @@ namespace BenchmarkDotNet
                 if (Directory.Exists(directoryPath))
                     Directory.Delete(directoryPath, true);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                // Nevermind
+                return new BenchmarkGenerateResult(directoryPath, false, e);
             }
             if (!Directory.Exists(directoryPath))
                 Directory.CreateDirectory(directoryPath);
-            return directoryPath;
+            return new BenchmarkGenerateResult(directoryPath, true, null);
         }
 
         private static string GetTemplate(string name)

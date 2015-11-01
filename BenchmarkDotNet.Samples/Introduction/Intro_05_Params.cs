@@ -2,13 +2,17 @@
 using System.Threading;
 using BenchmarkDotNet.Tasks;
 
-namespace BenchmarkDotNet.Samples.Infra
+namespace BenchmarkDotNet.Samples.Introduction
 {
-    [BenchmarkTask(1)]
-    public class Infra_Params
+    [BenchmarkTask(1, warmupIterationCount: 3, targetIterationCount: 5, intParams: new[] { 50, 100, 150, 200 })]
+    public class Intro_05_Params
     {
-        [Params(50, 100, 150, 200)]
-        public int Value = 1;
+        public Intro_05_Params()
+        {
+            Value = BenchmarkState.Instance.IntParam;
+        }
+
+        public int Value;
 
         private readonly Random random = new Random();
 

@@ -18,12 +18,20 @@ namespace BenchmarkDotNet
 
         public static readonly CultureInfo MainCultureInfo;
 
+        private static bool IsMono()
+        {
+            return Type.GetType("Mono.Runtime") != null;
+        }
+
         private static string GetClrVersion()
         {
-            var monoRuntimeType = Type.GetType("Mono.Runtime");
-            var monoDisplayName = monoRuntimeType?.GetMethod("GetDisplayName", BindingFlags.NonPublic | BindingFlags.Static);
-            if (monoDisplayName != null)
-                return "Mono " + monoDisplayName.Invoke(null, null);
+            if (IsMono())
+            {
+                var monoRuntimeType = Type.GetType("Mono.Runtime");
+                var monoDisplayName = monoRuntimeType?.GetMethod("GetDisplayName", BindingFlags.NonPublic | BindingFlags.Static);
+                if (monoDisplayName != null)
+                    return "Mono " + monoDisplayName.Invoke(null, null);
+            }
             return "MS.NET " + Environment.Version;
         }
 
@@ -71,7 +79,7 @@ namespace BenchmarkDotNet
 
         private static string GetBenchmarkDotNetVersion()
         {
-            return typeof(BenchmarkRunner).Assembly.GetName().Version.ToString();
+            return typeof(BenchmarkRunner).Assembly.GetName().Version + (GetBenchmarkDotNetCaption().EndsWith("-Dev") ? "+" : string.Empty);
         }
 
         private static string GetOsVersion()
@@ -87,7 +95,7 @@ namespace BenchmarkDotNet
         private static string GetProcessorName()
         {
             var info = string.Empty;
-            if (IsWindows())
+            if (IsWindows() && !IsMono())
             {
                 try
                 {

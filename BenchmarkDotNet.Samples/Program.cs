@@ -2,7 +2,6 @@
 using BenchmarkDotNet.Samples.CPU;
 using BenchmarkDotNet.Samples.Framework;
 using BenchmarkDotNet.Samples.IL;
-using BenchmarkDotNet.Samples.Infra;
 using BenchmarkDotNet.Samples.Introduction;
 using BenchmarkDotNet.Samples.JIT;
 using BenchmarkDotNet.Samples.Other;
@@ -13,13 +12,15 @@ namespace BenchmarkDotNet.Samples
     {
         static void Main(string[] args)
         {
-            var competitionSwitch = new BenchmarkCompetitionSwitch(new[] {
+            var competitionSwitch = new BenchmarkSwitcher(new[] {
                 // Introduction
                 typeof(Intro_00_Basic),
                 typeof(Intro_01_MethodTasks),
                 typeof(Intro_02_ClassTasks),
                 typeof(Intro_03_SingleRun),
                 typeof(Intro_04_UniformReportingTest),
+                typeof(Intro_05_Params),
+                typeof(Intro_06_Runtime),
                 // IL
                 typeof(Il_ReadonlyFields),
                 typeof(Il_Switch),
@@ -53,8 +54,6 @@ namespace BenchmarkDotNet.Samples
                 typeof(Math_DoubleSqrt),
                 typeof(Math_DoubleSqrtAvx),
                 typeof(Array_HeapAllocVsStackAlloc),
-                // Infra
-                typeof(Infra_Params)
             });
             competitionSwitch.Run(args);
         }
