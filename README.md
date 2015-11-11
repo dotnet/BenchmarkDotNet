@@ -1,23 +1,20 @@
-**BenchmarkDotNet** is a lightweight .NET library for benchmarking. [Microbenchmarking is very hard](https://andreyakinshin.gitbooks.io/performancebookdotnet/content/science/microbenchmarking.html), but BenchmarkDotNet helps you to create good benchmarks easy way.
+**BenchmarkDotNet** is a lightweight .NET library for benchmarking. [Microbenchmarking is very hard](https://andreyakinshin.gitbooks.io/performancebookdotnet/content/science/microbenchmarking.html), but BenchmarkDotNet helps you to create accurate benchmarks in an easy way.
 
 ## Features
-* BenchmarkDotNet creates an isolated project for each benchmark method and automatically run it in a separate runtime in the Release mode without an attached debugger.
-* You can create benchmark tasks that run your benchmark with different CLR version, JIT version, platform version, and so on.
-* BenchmarkDotNet makes warmup of your code, then runs it several times in different CLR instances, calculates statistic, and tries to eliminate some runtime side-effects.
-* BenchmarkDotNet almost eliminate own performance overhead.
+* BenchmarkDotNet creates an isolated project for each benchmark method and automatically runs it in a separate runtime, in Release mode, without an attached debugger.
+* You can create benchmark tasks that run your benchmark with different CLR, JIT and platform versions.
+* BenchmarkDotNet performs warm-up executions of your code, then runs it several times in different CLR instances, calculates statistics and tries to eliminate some runtime side-effects.
+* BenchmarkDotNet runs with minimal overhead so as to give an accurate performance measurment.
 
 ## Getting started
 
-* Install BenchmarkDotNet via the NuGet package: [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/)
-* Write a class with methods that you want to measure and mark them with the *Benchmark* attribute. You can also use additional attributes like `OperationsPerInvoke` (amount of operations in your method) or `BenchmarkTask` (it specifies benchmark environment). In the following example, we will research how [Instruction-level parallelism](http://en.wikipedia.org/wiki/Instruction-level_parallelism) affects to the application performance:
+- **Step 1** Install BenchmarkDotNet via the NuGet package: [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/)
+- **Step 2** Write a class with methods that you want to measure and mark them with the `Benchmark` attribute. You can also use additional attributes like `OperationsPerInvoke` (amount of operations in your method) or `BenchmarkTask` (specify the benchmark environment). In the following example, we will research how [Instruction-level parallelism](http://en.wikipedia.org/wiki/Instruction-level_parallelism) affects application performance:
 
 ```cs
-[BenchmarkTask(platform: BenchmarkPlatform.X86, 
-               jitVersion: BenchmarkJitVersion.LegacyJit)]
-[BenchmarkTask(platform: BenchmarkPlatform.X64, 
-               jitVersion: BenchmarkJitVersion.LegacyJit)]
-[BenchmarkTask(platform: BenchmarkPlatform.X64,
-               jitVersion: BenchmarkJitVersion.RyuJit)]
+[BenchmarkTask(platform: BenchmarkPlatform.X86, jitVersion: BenchmarkJitVersion.LegacyJit)]
+[BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
+[BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
 public class Cpu_Ilp_Inc
 {
     private double a, b, c, d;
@@ -44,13 +41,13 @@ public class Cpu_Ilp_Inc
 }
 ```
 
-* Run it:
+- **Step 3** Run it:
 
 ```cs
 new BenchmarkRunner().RunCompetition(new Cpu_Ilp_Inc());
 ```
 
-* Here is an example of results:
+- **Step 4** View the results, here is the output from the benchmark above:
 
 ```ini
 BenchmarkDotNet=v0.7.7.0
@@ -69,14 +66,15 @@ Type=Cpu_Ilp_Inc  Mode=Throughput  .NET=HostFramework
 |   Parallel |      X86 | LegacyJit | 0.3743 ns | 0.0081 ns | 2,671,346,912.81 |
 | Sequential |      X86 | LegacyJit | 3.0057 ns | 0.0664 ns |   332,699,953.00 |
 
-* You can also run a benchmark from the internet:
+
+- You can also run a benchmark from the internet:
 
 ```cs
 new BenchmarkRunner().RunUrl(
   "https://raw.githubusercontent.com/PerfDotNet/BenchmarkDotNet/master/BenchmarkDotNet.Samples/CPU/Cpu_Ilp_Inc.cs");
 ```
 
-* Or you can create a set of benchmarks and choose one from command line. Here is set of benchmarks from the [BenchmarkDotNet.Samples](https://github.com/PerfDotNet/BenchmarkDotNet/tree/master/BenchmarkDotNet.Samples) project:
+- Or you can create a set of benchmarks and choose one from command line. Here is set of benchmarks from the [BenchmarkDotNet.Samples](https://github.com/PerfDotNet/BenchmarkDotNet/tree/master/BenchmarkDotNet.Samples) project:
 
 ```cs
 var competitionSwitch = new BenchmarkCompetitionSwitch(new[] {
@@ -125,12 +123,12 @@ competitionSwitch.Run(args);
 ## Future plans
 
 * In-line IL and ASM viewer
-* Plots
+* Graphing results
 * Mono/CoreCLR/.NET Native support
 * .NET 2.0 support
 * Hardware analysis
 * Multithreading support
-* Some infrastructure improvements
+* Infrastructure improvements
 
 ## Authors
 
