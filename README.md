@@ -9,6 +9,7 @@
 ## Getting started
 
 **Step 1** Install BenchmarkDotNet via the NuGet package: [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/)
+
 **Step 2** Write a class with methods that you want to measure and mark them with the `Benchmark` attribute. You can also use additional attributes like `OperationsPerInvoke` (amount of operations in your method) or `BenchmarkTask` (specify the benchmark environment). In the following example, we will research how [Instruction-level parallelism](http://en.wikipedia.org/wiki/Instruction-level_parallelism) affects application performance:
 
 ```cs
