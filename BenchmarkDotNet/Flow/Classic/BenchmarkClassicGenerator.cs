@@ -23,6 +23,7 @@ namespace BenchmarkDotNet.Flow.Classic
             var result = CreateProjectDirectory(benchmark);
             GenerateProgramFile(result.DirectoryPath, benchmark);
             GenerateProjectFile(result.DirectoryPath, benchmark);
+            GenerateProjectBuildFile(result.DirectoryPath);
             GenerateAppConfigFile(result.DirectoryPath, benchmark.Task.Configuration);
             return result;
         }
@@ -125,6 +126,13 @@ namespace BenchmarkDotNet.Flow.Classic
 
             EnsureDependancyInCorrectLocation(benchmark.Target.Type, projectDir);
             EnsureDependancyInCorrectLocation(benchmark.Target.Method.ReturnType, projectDir);
+        }
+
+        private void GenerateProjectBuildFile(string projectDir)
+        {
+            var content = GetTemplate("BuildBenchmark.txt");
+            string fileName = Path.Combine(projectDir, "BuildBenchmark.bat");
+            File.WriteAllText(fileName, content);
         }
 
         private static string GetReferenceToAssembly(Type type)
