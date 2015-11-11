@@ -66,15 +66,16 @@ Type=Cpu_Ilp_Inc  Mode=Throughput  .NET=HostFramework
 |   Parallel |      X86 | LegacyJit | 0.3743 ns | 0.0081 ns | 2,671,346,912.81 |
 | Sequential |      X86 | LegacyJit | 3.0057 ns | 0.0664 ns |   332,699,953.00 |
 
+### Alternative ways of executing Benchmarks
 
-- You can also run a benchmark from the internet:
+You can also run a benchmark directly from the internet:
 
 ```cs
 new BenchmarkRunner().RunUrl(
   "https://raw.githubusercontent.com/PerfDotNet/BenchmarkDotNet/master/BenchmarkDotNet.Samples/CPU/Cpu_Ilp_Inc.cs");
 ```
 
-- Or you can create a set of benchmarks and choose one from command line. Here is set of benchmarks from the [BenchmarkDotNet.Samples](https://github.com/PerfDotNet/BenchmarkDotNet/tree/master/BenchmarkDotNet.Samples) project:
+Or you can create a set of benchmarks and choose one from command line. Here is set of benchmarks from the [BenchmarkDotNet.Samples](https://github.com/PerfDotNet/BenchmarkDotNet/tree/master/BenchmarkDotNet.Samples) project:
 
 ```cs
 var competitionSwitch = new BenchmarkCompetitionSwitch(new[] {
