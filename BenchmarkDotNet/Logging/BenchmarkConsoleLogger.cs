@@ -21,7 +21,10 @@ namespace BenchmarkDotNet.Logging
         public void Write(BenchmarkLogKind logKind, string format, params object[] args)
         {
             Console.ForegroundColor = GetColor(logKind);
-            Console.Write(string.Format(cultureInfo, format, args));
+            if (args.Length == 0)
+                Console.Write(format);
+            else
+                Console.Write(string.Format(cultureInfo, format, args));
             Console.ForegroundColor = DefaultColor;
         }
 

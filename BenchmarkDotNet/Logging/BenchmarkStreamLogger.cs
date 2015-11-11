@@ -21,7 +21,10 @@ namespace BenchmarkDotNet.Logging
 
         public void Write(BenchmarkLogKind logKind, string format, params object[] args)
         {
-            writer.Write(string.Format(cultureInfo, format, args));
+            if (args.Length == 0)
+                writer.Write(format);
+            else
+                writer.Write(string.Format(cultureInfo, format, args));
         }
     }
 }
