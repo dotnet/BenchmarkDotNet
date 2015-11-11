@@ -1,10 +1,5 @@
-﻿using BenchmarkDotNet.Samples.Algorithms;
-using BenchmarkDotNet.Samples.CPU;
-using BenchmarkDotNet.Samples.Framework;
-using BenchmarkDotNet.Samples.IL;
-using BenchmarkDotNet.Samples.Introduction;
-using BenchmarkDotNet.Samples.JIT;
-using BenchmarkDotNet.Samples.Other;
+﻿using System.Linq;
+using System.Reflection;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -12,49 +7,16 @@ namespace BenchmarkDotNet.Samples
     {
         static void Main(string[] args)
         {
-            var competitionSwitch = new BenchmarkSwitcher(new[] {
-                // Introduction
-                typeof(Intro_00_Basic),
-                typeof(Intro_01_MethodTasks),
-                typeof(Intro_02_ClassTasks),
-                typeof(Intro_03_SingleRun),
-                typeof(Intro_04_UniformReportingTest),
-                typeof(Intro_05_Params),
-                typeof(Intro_06_Runtime),
-                // IL
-                typeof(Il_ReadonlyFields),
-                typeof(Il_Switch),
-                // JIT
-                typeof(Jit_LoopUnrolling),
-                typeof(Jit_ArraySumLoopUnrolling),
-                typeof(Jit_Inlining),
-                typeof(Jit_BoolToInt),
-                typeof(Jit_Bce),
-                typeof(Jit_InterfaceMethod),
-                typeof(Jit_RegistersVsStack),
-                typeof(Jit_AsVsCast),
-                typeof(Jit_RotateBits),
-                // CPU
-                typeof(Cpu_Atomics),
-                typeof(Cpu_Ilp_Inc),
-                typeof(Cpu_Ilp_Max),
-                typeof(Cpu_Ilp_VsBce),
-                typeof(Cpu_Ilp_RyuJit),
-                typeof(Cpu_MatrixMultiplication),
-                typeof(Cpu_BranchPerdictor),
-                // Framework
-                typeof(Framework_SelectVsConvertAll),
-                typeof(Framework_StackFrameVsStackTrace),
-                typeof(Framework_StopwatchVsDateTime),
-                // Algorithms
-                typeof(Algo_BitCount),
-                typeof(Algo_MostSignificantBit),
-                typeof(Algo_Md5VsSha256),
-                // Other
-                typeof(Math_DoubleSqrt),
-                typeof(Math_DoubleSqrtAvx),
-                typeof(Array_HeapAllocVsStackAlloc),
-            });
+            // Use reflection for a more maintainable way of creating the benchmark switcher,
+            // Benchmarks are listed in namespace order first (e.g. BenchmarkDotNet.Samples.CPU,
+            // BenchmarkDotNet.Samples.IL, etc) then by name, so the output is easy to understand
+            var benchmarks = Assembly.GetExecutingAssembly().GetTypes()
+                .Where(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                             .Any(m => m.GetCustomAttributes(typeof(BenchmarkAttribute), false).Any()))
+                .OrderBy(t => t.Namespace)
+                .ThenBy(t => t.Name)
+                .ToArray();
+            var competitionSwitch = new BenchmarkSwitcher(benchmarks);
             competitionSwitch.Run(args);
         }
     }
