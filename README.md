@@ -8,8 +8,8 @@
 
 ## Getting started
 
-- **Step 1** Install BenchmarkDotNet via the NuGet package: [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/)
-- **Step 2** Write a class with methods that you want to measure and mark them with the `Benchmark` attribute. You can also use additional attributes like `OperationsPerInvoke` (amount of operations in your method) or `BenchmarkTask` (specify the benchmark environment). In the following example, we will research how [Instruction-level parallelism](http://en.wikipedia.org/wiki/Instruction-level_parallelism) affects application performance:
+**Step 1** Install BenchmarkDotNet via the NuGet package: [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/)
+**Step 2** Write a class with methods that you want to measure and mark them with the `Benchmark` attribute. You can also use additional attributes like `OperationsPerInvoke` (amount of operations in your method) or `BenchmarkTask` (specify the benchmark environment). In the following example, we will research how [Instruction-level parallelism](http://en.wikipedia.org/wiki/Instruction-level_parallelism) affects application performance:
 
 ```cs
 [BenchmarkTask(platform: BenchmarkPlatform.X86, jitVersion: BenchmarkJitVersion.LegacyJit)]
@@ -41,13 +41,13 @@ public class Cpu_Ilp_Inc
 }
 ```
 
-- **Step 3** Run it:
+**Step 3** Run it:
 
 ```cs
 new BenchmarkRunner().RunCompetition(new Cpu_Ilp_Inc());
 ```
 
-- **Step 4** View the results, here is the output from the benchmark above:
+**Step 4** View the results, here is the output from the above benchmark:
 
 ```ini
 BenchmarkDotNet=v0.7.7.0
