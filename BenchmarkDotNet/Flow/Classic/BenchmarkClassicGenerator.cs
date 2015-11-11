@@ -4,12 +4,19 @@ using System.Reflection;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Flow.Results;
 using BenchmarkDotNet.Tasks;
+using BenchmarkDotNet.Logging;
 
 namespace BenchmarkDotNet.Flow.Classic
 {
     internal class BenchmarkClassicGenerator
     {
         public const string MainClassName = "Program";
+        private readonly IBenchmarkLogger logger;
+
+        public BenchmarkClassicGenerator(IBenchmarkLogger logger)
+        {
+            this.logger = logger;
+        }
 
         public BenchmarkGenerateResult GenerateProject(Benchmark benchmark)
         {
@@ -20,16 +27,20 @@ namespace BenchmarkDotNet.Flow.Classic
             return result;
         }
 
-        private static void GenerateProgramFile(string projectDir, Benchmark benchmark)
+        private void GenerateProgramFile(string projectDir, Benchmark benchmark)
         {
             var isVoid = benchmark.Target.Method.ReturnType == typeof(void);
 
             var operationsPerInvoke = benchmark.Target.OperationsPerInvoke;
 
-            var targetTypeNamespace = benchmark.Target.Type.Namespace;
-            var targetMethodReturnTypeNamespace = benchmark.Target.Method.ReturnType == typeof(void)
-                ? "System"
-                : benchmark.Target.Method.ReturnType.Namespace;
+            var targetTypeNamespace = string.IsNullOrWhiteSpace(benchmark.Target.Type.Namespace)
+                ? ""
+                : string.Format("using {0};", benchmark.Target.Type.Namespace);
+
+            var targetMethodReturnTypeNamespace = string.Format("using {0};",
+                    benchmark.Target.Method.ReturnType == typeof(void)
+                        ? "System"
+                        : benchmark.Target.Method.ReturnType.Namespace);
 
             var targetTypeName = benchmark.Target.Type.FullName.Replace('+', '.');
             var targetMethodName = benchmark.Target.Method.Name;
@@ -38,8 +49,8 @@ namespace BenchmarkDotNet.Flow.Classic
                 ? "void"
                 : benchmark.Target.Method.ReturnType.GetCorrectTypeName();
             var targetMethodResultHolder = isVoid
-                ? "" :
-                $"private {targetMethodReturnType} value;";
+                ? ""
+                : $"private {targetMethodReturnType} value;";
             var targetMethodHoldValue = isVoid
                 ? ""
                 : "value = ";
@@ -67,11 +78,11 @@ namespace BenchmarkDotNet.Flow.Classic
                     break;
             }
 
-            var targetBenchmarkTaskArguments = 
-                $"{benchmark.Task.ProcessCount}, " + 
+            var targetBenchmarkTaskArguments =
+                $"{benchmark.Task.ProcessCount}, " +
                 $"{nameof(BenchmarkTask.Configuration).ToCamelCase()}: new {nameof(BenchmarkConfiguration)}({benchmark.Task.Configuration.ToCtorDefinition()}), " +
                 $"{nameof(BenchmarkTask.ParametersSets).ToCamelCase()}: new {nameof(BenchmarkParametersSets)}({benchmark.Task.ParametersSets.ToCtorDefinition()})";
-                
+
             var contentTemplate = GetTemplate("BenchmarkProgram.txt");
             var content = contentTemplate.
                 Replace("$RunBenchmarkContent$", runBenchmarkTemplate).
@@ -93,7 +104,7 @@ namespace BenchmarkDotNet.Flow.Classic
             File.WriteAllText(fileName, content);
         }
 
-        private static void GenerateProjectFile(string projectDir, Benchmark benchmark)
+        private void GenerateProjectFile(string projectDir, Benchmark benchmark)
         {
             var configuration = benchmark.Task.Configuration;
             var platform = configuration.Platform.ToConfig();
@@ -108,14 +119,19 @@ namespace BenchmarkDotNet.Flow.Classic
 
             string fileName = Path.Combine(projectDir, MainClassName + ".csproj");
             File.WriteAllText(fileName, content);
+
+            // Ensure BenchmarkDotNet.dll is in the correct place (e.g. when running in LINQPad)
+            EnsureDependancyInCorrectLocation(typeof(BenchmarkAttribute), projectDir);
+
+            EnsureDependancyInCorrectLocation(benchmark.Target.Type, projectDir);
+            EnsureDependancyInCorrectLocation(benchmark.Target.Method.ReturnType, projectDir);
         }
 
         private static string GetReferenceToAssembly(Type type)
         {
             var template = @"    <Reference Include=""$AssemblyName$"">
       <HintPath>..\$AssemblyFileName$</HintPath>
-    </Reference>
-  ";
+    </Reference>";
             var assembly = type.Assembly;
             var fileName = new FileInfo(type.Assembly.Location).Name;
             return fileName == "mscorlib.dll"
@@ -125,7 +141,7 @@ namespace BenchmarkDotNet.Flow.Classic
                     Replace("$AssemblyFileName$", fileName);
         }
 
-        private static void GenerateAppConfigFile(string projectDir, BenchmarkConfiguration configuration)
+        private void GenerateAppConfigFile(string projectDir, BenchmarkConfiguration configuration)
         {
             var useLagacyJit = configuration.JitVersion.ToConfig();
 
@@ -164,6 +180,37 @@ namespace BenchmarkDotNet.Flow.Classic
                     throw new Exception($"Resource {resourceName} not found");
                 using (StreamReader reader = new StreamReader(stream))
                     return reader.ReadToEnd();
+            }
+        }
+
+        private void EnsureDependancyInCorrectLocation(Type type, string outputDir)
+        {
+            var fileInfo = new FileInfo(type.Assembly.Location);
+            if (fileInfo.Name == "mscorlib.dll")
+                return;
+
+            var expectedLocation = Path.GetFullPath(Path.Combine(outputDir, "..\\" + fileInfo.Name));
+            if (File.Exists(expectedLocation) == false)
+            {
+                logger.WriteLineInfo("// File doesn't exist: {0}", expectedLocation);
+                logger.WriteLineInfo("//   Actually at: {0}", fileInfo.FullName);
+                CopyFile(fileInfo.FullName, expectedLocation);
+            }
+        }
+
+        private void CopyFile(string sourcePath, string destinationPath)
+        {
+            logger.WriteLineInfo("//   Copying {0}", Path.GetFileName(sourcePath));
+            logger.WriteLineInfo("//   from: {0}", Path.GetDirectoryName(sourcePath));
+            logger.WriteLineInfo("//   to: {0}", Path.GetDirectoryName(destinationPath));
+            try
+            {
+                File.Copy(Path.GetFullPath(sourcePath), Path.GetFullPath(destinationPath), overwrite: true);
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLineError(ex.Message);
+                throw;
             }
         }
     }

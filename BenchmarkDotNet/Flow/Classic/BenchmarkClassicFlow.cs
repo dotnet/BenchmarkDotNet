@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Flow.Classic
         public BenchmarkClassicFlow(Benchmark benchmark, IBenchmarkLogger logger)
         {
             this.benchmark = benchmark;
-            generator = new BenchmarkClassicGenerator();
+            generator = new BenchmarkClassicGenerator(logger);
             builder = new BenchmarkClassicBuilder(logger);
             executor = new BenchmarkClassicExecutor(benchmark, logger);
         }
