@@ -67,6 +67,48 @@ Type=Cpu_Ilp_Inc  Mode=Throughput  .NET=HostFramework
 |   Parallel |      X86 | LegacyJit | 0.3743 ns | 0.0081 ns | 2,671,346,912.81 |
 | Sequential |      X86 | LegacyJit | 3.0057 ns | 0.0664 ns |   332,699,953.00 |
 
+## Advanced Features
+BenchmarkDotNet provieds you with several features that let you write more complex and powerful benchmarks. 
+
+- `[Setup]` attribute let you specify a method that can be run before each benchmark *batch* or *run*
+- `[Params(..)]` makes it easy to run the same benchmark with different input values
+ 
+The code below shows how these features can be used. In this example the benchmark will be run 4 times, with the value of `MaxCounter` automaticially initialised each time to the values [`1, 5, 10, 100`]. In addition before each run the `SetupData()` method will be called, so that `initialValuesArray` can be re-sized based on `MaxCounter`.
+
+``` csharp
+public class IL_Loops
+{
+    [Params(1, 5, 10, 100)]
+    int MaxCounter = 0;
+    
+    private int[] initialValuesArray;
+
+    [Setup]
+    public void SetupData()
+    {
+        initialValuesArray = Enumerable.Range(0, MaxCounter).ToArray();
+    }
+
+    [Benchmark]
+    public int ForLoop()
+    {
+        var counter = 0;
+        for (int i = 0; i < initialValuesArray.Length; i++)
+            counter += initialValuesArray[i];
+        return counter;
+    }
+
+    [Benchmark]
+    public int ForEachArray()
+    {
+        var counter = 0;
+        foreach (var i in initialValuesArray)
+            counter += i;
+        return counter;
+    }
+}
+```
+
 ### Alternative ways of executing Benchmarks
 
 You can also run a benchmark directly from the internet:
