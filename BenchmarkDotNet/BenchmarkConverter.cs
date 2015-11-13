@@ -22,7 +22,6 @@ namespace BenchmarkDotNet
                 // setupMethod is optional, but if it's there it must have the correct signature, accessibility, etc
                 AssertMethodHasCorrectSignature("Setup", setupMethod);
                 AssertMethodIsAccessible("Setup", setupMethod);
-                AssertMethodIsNotDeclaredInGeneric("Setup", setupMethod);
                 AssertMethodIsNotGeneric("Setup", setupMethod);
             }
 
@@ -35,7 +34,6 @@ namespace BenchmarkDotNet
                     var target = new BenchmarkTarget(type, methodInfo, setupMethod, benchmarkAttribute.Description);
                     AssertMethodHasCorrectSignature("Benchmark", methodInfo);
                     AssertMethodIsAccessible("Benchmark", methodInfo);
-                    AssertMethodIsNotDeclaredInGeneric("Benchmark", methodInfo);
                     AssertMethodIsNotGeneric("Benchmark", methodInfo);
                     foreach (var task in BenchmarkTask.Resolve(methodInfo))
                         yield return new Benchmark(target, task);
@@ -108,19 +106,6 @@ namespace BenchmarkDotNet
             {
                 if (!declaringType.IsPublic && !declaringType.IsNestedPublic)
                     throw new InvalidOperationException($"{methodType} method {methodInfo.Name} defined within type {declaringType.FullName} has incorrect access modifiers.\nDeclaring type must be public.");
-
-                declaringType = declaringType.DeclaringType;
-            }
-        }
-
-        private static void AssertMethodIsNotDeclaredInGeneric(string methodType, MethodInfo methodInfo)
-        {
-            var declaringType = methodInfo.DeclaringType;
-
-            while (declaringType != null)
-            {
-                if (declaringType.IsGenericType)
-                    throw new InvalidOperationException($"{methodType} method {methodInfo.Name} defined within generic type {declaringType.FullName}.\n{methodType} methods in generic types are not supported.");
 
                 declaringType = declaringType.DeclaringType;
             }
