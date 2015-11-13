@@ -1,10 +1,6 @@
 ﻿using BenchmarkDotNet.Tasks;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace BenchmarkDotNet.Samples.Other
+namespace BenchmarkDotNet.Samples.CPU
 {
     [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
     public class Cpu_Atomics
