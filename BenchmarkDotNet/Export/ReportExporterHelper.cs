@@ -9,14 +9,14 @@ namespace BenchmarkDotNet.Export
     {
         // TODO: signature refactoring
         public static List<string[]> BuildTable(IList<BenchmarkReport> reports, bool pretty = true, bool extended = false)
-        {            
-            var reportStats = reports.Where(r => r.Runs.Count > 0).Select(
-             r => new
-             {
-                 r.Benchmark,
-                 Report = r,
-                 Stat = new BenchmarkRunReportsStatistic("Target", r.Runs)
-             }).ToList();
+        {
+            var reportStats = reports.Where(r => r.Runs.Count > 0)
+                                     .Select(r => new
+                                        {
+                                            r.Benchmark,
+                                            Report = r,
+                                            Stat = new BenchmarkRunReportsStatistic("Target", r.Runs)
+                                        }).ToList();
             if (reportStats.Count == 0)
                 return new List<string[]>();
 
@@ -39,8 +39,15 @@ namespace BenchmarkDotNet.Export
             if (extended)
                 headerRow.Add("StdErr");
 
+            var orderedStats = reportStats;
+            // For https://github.com/PerfDotNet/BenchmarkDotNet/issues/36
+            if (showParams)
+                orderedStats = reportStats.OrderBy(r => r.Report.Parameters.IntParam)
+                                          .ThenBy(r => r.Benchmark.Target.Type.Name)
+                                          .ToList();
+
             var table = new List<string[]> { headerRow.ToArray() };
-            foreach (var reportStat in reportStats)
+            foreach (var reportStat in orderedStats)
             {
                 var b = reportStat.Benchmark;
 
