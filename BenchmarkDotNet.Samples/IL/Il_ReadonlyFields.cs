@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Samples.IL
     [BenchmarkTask(platform: BenchmarkPlatform.X86, jitVersion: BenchmarkJitVersion.LegacyJit)]
     [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
     [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
-    public class Il_ReadonlyFields
+    public class IL_ReadonlyFields
     {
         public struct Int256
         {

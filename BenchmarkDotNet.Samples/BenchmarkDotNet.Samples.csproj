@@ -56,8 +56,9 @@
     <Compile Include="JIT\Jit_RegistersVsStack.cs" />
     <Compile Include="CPU\Cpu_BranchPerdictor.cs" />
     <Compile Include="CPU\Cpu_Ilp_Inc.cs" />
-    <Compile Include="IL\Il_ReadonlyFields.cs" />
-    <Compile Include="IL\Il_Switch.cs" />
+    <Compile Include="IL\IL_ReadonlyFields.cs" />
+    <Compile Include="IL\IL_Switch.cs" />
+    <Compile Include="IL\IL_Loops.cs" />
     <Compile Include="Introduction\Intro_00_Basic.cs" />
     <Compile Include="Introduction\Intro_01_MethodTasks.cs" />
     <Compile Include="Introduction\Intro_02_ClassTasks.cs" />
