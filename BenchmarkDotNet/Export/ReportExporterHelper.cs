@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Export
             var opsPerSecToStringFunc = GetOpsPerSecFormattingFunc();
 
             var showParams = false;
-            var headerRow = new List<string> { "Type", "Method", "Mode", "Platform", "Jit", ".NET", "Executor", "Runtime", "Warmup", "Target" };
+            var headerRow = new List<string> { "Type", "Method", "Mode", "Platform", "Jit", ".NET", "toolchain", "Runtime", "Warmup", "Target" };
             if (reportStats.Any(r => !r.Benchmark.Task.ParametersSets.IsEmpty()))
             {
                 // TODO: write generic logic for multiple parameters
@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Export
                     b.Task.Configuration.Platform.ToString(),
                     b.Task.Configuration.JitVersion.ToString(),
                     b.Task.Configuration.Framework.ToString(),
-                    b.Task.Configuration.Executor.ToString(),
+                    b.Task.Configuration.Toolchain.ToString(),
                     b.Task.Configuration.Runtime.ToString(),
                     b.Task.Configuration.WarmupIterationCount.ToString(),
                     b.Task.Configuration.TargetIterationCount.ToString()

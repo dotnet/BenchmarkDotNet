@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BenchmarkDotNet.Flow.Results
+namespace BenchmarkDotNet.Toolchain.Results
 {
     public class BenchmarkBuildResult : BenchmarkGenerateResult
     {

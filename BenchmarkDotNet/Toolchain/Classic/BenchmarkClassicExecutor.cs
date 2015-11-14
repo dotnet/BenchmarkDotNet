@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using BenchmarkDotNet.Flow.Results;
 using BenchmarkDotNet.Logging;
 using BenchmarkDotNet.Tasks;
+using BenchmarkDotNet.Toolchain.Results;
 
-namespace BenchmarkDotNet.Flow.Classic
+namespace BenchmarkDotNet.Toolchain.Classic
 {
-    internal class BenchmarkClassicExecutor
+    internal class BenchmarkClassicExecutor : IBenchmarkExecutor
     {
         private readonly Benchmark benchmark;
         private readonly IBenchmarkLogger logger;

@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Export;
-using BenchmarkDotNet.Flow;
-using BenchmarkDotNet.Flow.Results;
 using BenchmarkDotNet.Logging;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tasks;
+using BenchmarkDotNet.Toolchain;
+using BenchmarkDotNet.Toolchain.Results;
 
 namespace BenchmarkDotNet
 {
@@ -78,27 +78,27 @@ namespace BenchmarkDotNet
 
         private BenchmarkReport Run(Benchmark benchmark, IList<string> importantPropertyNames, BenchmarkParameters parameters = null)
         {
-            var flow = BenchmarkFlowFactory.CreateFlow(benchmark, Logger);
+            var toolchain = BenchmarkToolchainFacade.CreateToolchain(benchmark, Logger);
 
             Logger.WriteLineHeader("// **************************");
             Logger.WriteLineHeader("// Benchmark: " + benchmark.Description);
 
-            var generateResult = Generate(flow);
+            var generateResult = Generate(toolchain);
             if (!generateResult.IsGenerateSuccess)
                 return BenchmarkReport.CreateEmpty(benchmark, parameters);
 
-            var buildResult = Build(flow, generateResult);
+            var buildResult = Build(toolchain, generateResult);
             if (!buildResult.IsBuildSuccess)
                 return BenchmarkReport.CreateEmpty(benchmark, parameters);
 
-            var runReports = Exec(benchmark, importantPropertyNames, parameters, flow, buildResult);
+            var runReports = Exec(benchmark, importantPropertyNames, parameters, toolchain, buildResult);
             return new BenchmarkReport(benchmark, runReports, parameters);
         }
 
-        private BenchmarkGenerateResult Generate(IBenchmarkFlow flow)
+        private BenchmarkGenerateResult Generate(IBenchmarkToolchainFacade toolchain)
         {
             Logger.WriteLineInfo("// *** Generate *** ");
-            var generateResult = flow.Generate();
+            var generateResult = toolchain.Generate();
             if (generateResult.IsGenerateSuccess)
             {
                 Logger.WriteLineInfo("// Result = Success");
@@ -114,10 +114,10 @@ namespace BenchmarkDotNet
             return generateResult;
         }
 
-        private BenchmarkBuildResult Build(IBenchmarkFlow flow, BenchmarkGenerateResult generateResult)
+        private BenchmarkBuildResult Build(IBenchmarkToolchainFacade toolchain, BenchmarkGenerateResult generateResult)
         {
             Logger.WriteLineInfo("// *** Build ***");
-            var buildResult = flow.Build(generateResult);
+            var buildResult = toolchain.Build(generateResult);
             if (buildResult.IsBuildSuccess)
             {
                 Logger.WriteLineInfo("// Result = Success");
@@ -132,7 +132,7 @@ namespace BenchmarkDotNet
             return buildResult;
         }
 
-        private List<BenchmarkRunReport> Exec(Benchmark benchmark, IList<string> importantPropertyNames, BenchmarkParameters parameters, IBenchmarkFlow flow, BenchmarkBuildResult buildResult)
+        private List<BenchmarkRunReport> Exec(Benchmark benchmark, IList<string> importantPropertyNames, BenchmarkParameters parameters, IBenchmarkToolchainFacade toolchain, BenchmarkBuildResult buildResult)
         {
             Logger.WriteLineInfo("// *** Exec ***");
             var processCount = Math.Max(1, benchmark.Task.ProcessCount);
@@ -151,7 +151,7 @@ namespace BenchmarkDotNet
                     Logger.NewLine();
                 }
 
-                var execResult = flow.Exec(buildResult, parameters);
+                var execResult = toolchain.Exec(buildResult, parameters);
 
                 if (execResult.FoundExecutable)
                 {

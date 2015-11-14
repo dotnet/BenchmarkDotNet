@@ -3,13 +3,13 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Flow.Results;
-using BenchmarkDotNet.Tasks;
 using BenchmarkDotNet.Logging;
+using BenchmarkDotNet.Tasks;
+using BenchmarkDotNet.Toolchain.Results;
 
-namespace BenchmarkDotNet.Flow.Classic
+namespace BenchmarkDotNet.Toolchain.Classic
 {
-    internal class BenchmarkClassicGenerator
+    internal class BenchmarkClassicGenerator : IBenchmarkGenerator
     {
         public const string MainClassName = "Program";
         private readonly IBenchmarkLogger logger;

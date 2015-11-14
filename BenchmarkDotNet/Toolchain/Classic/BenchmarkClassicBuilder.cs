@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using BenchmarkDotNet.Flow.Results;
 using BenchmarkDotNet.Logging;
+using BenchmarkDotNet.Toolchain.Results;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Execution;
 using Microsoft.Build.Framework;
 
-namespace BenchmarkDotNet.Flow.Classic
+namespace BenchmarkDotNet.Toolchain.Classic
 {
-    internal class BenchmarkClassicBuilder
+    internal class BenchmarkClassicBuilder : IBenchmarkBuilder
     {
         private readonly IBenchmarkLogger logger;
 

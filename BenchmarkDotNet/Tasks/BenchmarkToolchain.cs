@@ -1,6 +1,6 @@
 ﻿namespace BenchmarkDotNet.Tasks
 {
-    public enum BenchmarkExecutor
+    public enum BenchmarkToolchain
     {
         Classic
     }

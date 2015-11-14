@@ -1,9 +1,9 @@
-﻿using BenchmarkDotNet.Flow.Results;
-using BenchmarkDotNet.Tasks;
+﻿using BenchmarkDotNet.Tasks;
+using BenchmarkDotNet.Toolchain.Results;
 
-namespace BenchmarkDotNet.Flow
+namespace BenchmarkDotNet.Toolchain
 {
-    internal interface IBenchmarkFlow
+    internal interface IBenchmarkToolchainFacade
     {
         BenchmarkGenerateResult Generate();
         BenchmarkBuildResult Build(BenchmarkGenerateResult generateResult);

@@ -3,8 +3,8 @@ using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet.Samples.Introduction
 {
-    [BenchmarkTask(executor: BenchmarkExecutor.Classic, runtime: BenchmarkRuntime.Clr)]
-    [BenchmarkTask(executor: BenchmarkExecutor.Classic, runtime: BenchmarkRuntime.Mono)]
+    [BenchmarkTask(runtime: BenchmarkRuntime.Clr)]
+    [BenchmarkTask(runtime: BenchmarkRuntime.Mono)]
     public class Intro_06_Runtime
     {
         [Benchmark]

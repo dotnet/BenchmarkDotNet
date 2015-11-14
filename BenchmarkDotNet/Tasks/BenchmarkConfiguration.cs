@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Tasks
         public BenchmarkPlatform Platform { get; }
         public BenchmarkJitVersion JitVersion { get; }
         public BenchmarkFramework Framework { get; }
-        public BenchmarkExecutor Executor { get; }
+        public BenchmarkToolchain Toolchain { get; }
         public BenchmarkRuntime Runtime { get; }
         public int WarmupIterationCount { get; }
         public int TargetIterationCount { get; }
@@ -23,9 +23,9 @@ namespace BenchmarkDotNet.Tasks
             get
             {
                 string result = string.Empty;
-                switch (Executor)
+                switch (Toolchain)
                 {
-                    case BenchmarkExecutor.Classic:
+                    case BenchmarkToolchain.Classic:
                         switch (Runtime)
                         {
                             case BenchmarkRuntime.Clr:
@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Tasks
             BenchmarkPlatform platform,
             BenchmarkJitVersion jitVersion,
             BenchmarkFramework framework,
-            BenchmarkExecutor executor,
+            BenchmarkToolchain toolchain,
             BenchmarkRuntime runtime,
             int warmupIterationCount,
             int targetIterationCount)
@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Tasks
             Platform = platform;
             JitVersion = jitVersion;
             Framework = framework;
-            Executor = executor;
+            Toolchain = toolchain;
             Runtime = runtime;
             WarmupIterationCount = warmupIterationCount;
             TargetIterationCount = targetIterationCount;
@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Tasks
                 yield return new BenchmarkProperty(nameof(Platform), Platform.ToString());
                 yield return new BenchmarkProperty(nameof(JitVersion), JitVersion.ToString());
                 yield return new BenchmarkProperty(nameof(Framework), Framework.ToString());
-                yield return new BenchmarkProperty(nameof(Executor), Executor.ToString());
+                yield return new BenchmarkProperty(nameof(Toolchain), Toolchain.ToString());
                 yield return new BenchmarkProperty(nameof(Runtime), Runtime.ToString());
                 yield return new BenchmarkProperty(nameof(WarmupIterationCount), WarmupIterationCount.ToString());
                 yield return new BenchmarkProperty(nameof(TargetIterationCount), TargetIterationCount.ToString());
@@ -83,7 +83,7 @@ namespace BenchmarkDotNet.Tasks
             builder.Append($"{nameof(Platform).ToCamelCase()}: {nameof(BenchmarkPlatform)}.{Platform}, ");
             builder.Append($"{nameof(JitVersion).ToCamelCase()}: {nameof(BenchmarkJitVersion)}.{JitVersion}, ");
             builder.Append($"{nameof(Framework).ToCamelCase()}: {nameof(BenchmarkFramework)}.{Framework}, ");
-            builder.Append($"{nameof(Executor).ToCamelCase()}: {nameof(BenchmarkExecutor)}.{Executor}, ");
+            builder.Append($"{nameof(Toolchain).ToCamelCase()}: {nameof(BenchmarkToolchain)}.{Toolchain}, ");
             builder.Append($"{nameof(Runtime).ToCamelCase()}: {nameof(BenchmarkRuntime)}.{Runtime}, ");
             builder.Append($"{nameof(WarmupIterationCount).ToCamelCase()}: {WarmupIterationCount}, ");
             builder.Append($"{nameof(TargetIterationCount).ToCamelCase()}: {TargetIterationCount}");
