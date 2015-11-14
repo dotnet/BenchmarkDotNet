@@ -78,8 +78,6 @@ namespace BenchmarkDotNet.Flow.Classic
                     start.FileName = "mono";
                     start.Arguments = exeName + " " + args;
                     break;
-                case BenchmarkRuntime.CoreClr:
-                    throw new NotSupportedException();
             }
             return start;
         }

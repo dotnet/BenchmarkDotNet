@@ -13,7 +13,6 @@ namespace BenchmarkDotNet.Tasks
         public BenchmarkFramework Framework { get; }
         public BenchmarkExecutor Executor { get; }
         public BenchmarkRuntime Runtime { get; }
-        public string RuntimeVersion { get; }
         public int WarmupIterationCount { get; }
         public int TargetIterationCount { get; }
 
@@ -37,9 +36,6 @@ namespace BenchmarkDotNet.Tasks
                                 break;
                         }
                         break;
-                    case BenchmarkExecutor.Dnx:
-                        result = "dnx-" + Runtime + "-" + RuntimeVersion;
-                        break;
                 }
                 return (string.IsNullOrEmpty(result) ? string.Empty : "_") + result;
             }
@@ -52,7 +48,6 @@ namespace BenchmarkDotNet.Tasks
             BenchmarkFramework framework,
             BenchmarkExecutor executor,
             BenchmarkRuntime runtime,
-            string runtimeVersion,
             int warmupIterationCount,
             int targetIterationCount)
         {
@@ -62,7 +57,6 @@ namespace BenchmarkDotNet.Tasks
             Framework = framework;
             Executor = executor;
             Runtime = runtime;
-            RuntimeVersion = runtimeVersion;
             WarmupIterationCount = warmupIterationCount;
             TargetIterationCount = targetIterationCount;
         }
@@ -77,7 +71,6 @@ namespace BenchmarkDotNet.Tasks
                 yield return new BenchmarkProperty(nameof(Framework), Framework.ToString());
                 yield return new BenchmarkProperty(nameof(Executor), Executor.ToString());
                 yield return new BenchmarkProperty(nameof(Runtime), Runtime.ToString());
-                yield return new BenchmarkProperty(nameof(RuntimeVersion), RuntimeVersion);
                 yield return new BenchmarkProperty(nameof(WarmupIterationCount), WarmupIterationCount.ToString());
                 yield return new BenchmarkProperty(nameof(TargetIterationCount), TargetIterationCount.ToString());
             }
@@ -92,7 +85,6 @@ namespace BenchmarkDotNet.Tasks
             builder.Append($"{nameof(Framework).ToCamelCase()}: {nameof(BenchmarkFramework)}.{Framework}, ");
             builder.Append($"{nameof(Executor).ToCamelCase()}: {nameof(BenchmarkExecutor)}.{Executor}, ");
             builder.Append($"{nameof(Runtime).ToCamelCase()}: {nameof(BenchmarkRuntime)}.{Runtime}, ");
-            builder.Append($"{nameof(RuntimeVersion).ToCamelCase()}: \"{RuntimeVersion}\", ");
             builder.Append($"{nameof(WarmupIterationCount).ToCamelCase()}: {WarmupIterationCount}, ");
             builder.Append($"{nameof(TargetIterationCount).ToCamelCase()}: {TargetIterationCount}");
             return builder.ToString();

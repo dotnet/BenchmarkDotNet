@@ -2,6 +2,6 @@
 {
     public enum BenchmarkExecutor
     {
-        Classic, Dnx
+        Classic
     }
 }

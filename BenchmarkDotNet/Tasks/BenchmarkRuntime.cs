@@ -2,6 +2,6 @@
 {
     public enum BenchmarkRuntime
     {
-        Clr, CoreClr, Mono
+        Clr, Mono
     }
 }

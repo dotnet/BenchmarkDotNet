@@ -16,7 +16,6 @@ namespace BenchmarkDotNet.Export
 
         public void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger)
         {
-            logger.WriteLineInfo("```ini");
             logger.WriteLineInfo(EnvironmentHelper.GetFullEnvironmentInfo("Host", false));
 
             var table = ReportExporterHelper.BuildTable(reports);
@@ -38,7 +37,6 @@ namespace BenchmarkDotNet.Export
             if (table.Count == 0)
             {
                 logger.WriteLineError("There are no found benchmarks");
-                logger.WriteLineInfo("```");
                 logger.NewLine();
                 return;
             }

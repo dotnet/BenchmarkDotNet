@@ -76,7 +76,6 @@
     <Compile Include="Tasks\BenchmarkParameters.cs" />
     <Compile Include="Tasks\BenchmarkParametersSets.cs" />
     <Compile Include="Tasks\BenchmarkRuntime.cs" />
-    <Compile Include="Tasks\BenchmarkRuntimeVersion.cs" />
     <Compile Include="Tasks\BenchmarkTaskAttribute.cs" />
     <Compile Include="OperationsPerInvokeAttribute.cs" />
     <Compile Include="Benchmark.cs" />
