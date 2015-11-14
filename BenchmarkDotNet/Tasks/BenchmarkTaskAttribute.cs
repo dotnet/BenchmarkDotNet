@@ -17,14 +17,12 @@ namespace BenchmarkDotNet.Tasks
             BenchmarkRuntime runtime = BenchmarkRuntime.Clr,
             string runtimeVersion = null,
             int warmupIterationCount = 5,
-            int targetIterationCount = 10,
-            int[] intParams = null
+            int targetIterationCount = 10
             )
         {
             Task = new BenchmarkTask(
                 processCount,
-                new BenchmarkConfiguration(mode, platform, jitVersion, framework, executor, runtime, runtimeVersion, warmupIterationCount, targetIterationCount),
-                new BenchmarkParametersSets(intParams));
+                new BenchmarkConfiguration(mode, platform, jitVersion, framework, executor, runtime, runtimeVersion, warmupIterationCount, targetIterationCount));
         }
     }
 }

@@ -25,6 +25,21 @@ namespace BenchmarkDotNet
                 AssertMethodIsNotGeneric("Setup", setupMethod);
             }
 
+            // If there is one, get the single Field or Property that has the [Params(..)] attribute
+            var fields = type.GetFields().Select(f => new
+            {
+                f.Name,
+                Attribute = f.ResolveAttribute<ParamsAttribute>(),
+                IsStatic = f.IsStatic,
+            });
+            var properties = type.GetProperties().Select(f => new
+            {
+                f.Name,
+                Attribute = f.ResolveAttribute<ParamsAttribute>(),
+                IsStatic = f.GetSetMethod().IsStatic
+            });
+            var fieldOrProperty = fields.Concat(properties).FirstOrDefault(i => i.Attribute != null);
+
             for (int i = 0; i < methods.Length; i++)
             {
                 var methodInfo = methods[i];
@@ -36,7 +51,17 @@ namespace BenchmarkDotNet
                     AssertMethodIsAccessible("Benchmark", methodInfo);
                     AssertMethodIsNotGeneric("Benchmark", methodInfo);
                     foreach (var task in BenchmarkTask.Resolve(methodInfo))
-                        yield return new Benchmark(target, task);
+                        if (fieldOrProperty == null)
+                        {
+                            yield return new Benchmark(target, task);
+                        }
+                        else
+                        {
+                            var parametersSets = new BenchmarkParametersSets(fieldOrProperty.Name, fieldOrProperty.IsStatic, fieldOrProperty.Attribute.Args);
+                            // All the properties of BenchmarkTask and it's children are immutable, so cloning a BenchmarkTask like this should be safe
+                            var newTask = new BenchmarkTask(task.ProcessCount, task.Configuration, parametersSets);
+                            yield return new Benchmark(target, newTask);
+                        }
                 }
             }
         }

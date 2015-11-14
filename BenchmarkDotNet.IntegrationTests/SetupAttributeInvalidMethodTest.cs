@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Setup]
-        public void Setup(int someParameters) // [Setup] methods must have no ParametersSets
+        public void Setup(int someParameters) // [Setup] methods must have no parameters
         {
             Console.WriteLine("// ### Setup called ###");
         }

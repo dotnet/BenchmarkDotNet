@@ -2,8 +2,6 @@
 {
     public class BenchmarkState
     {
-        public int IntParam { get; set; }
-
         public int Iteration { get; set; }
         public BenchmarkIterationMode IterationMode { get; set; }
         public long Operation { get; set; }

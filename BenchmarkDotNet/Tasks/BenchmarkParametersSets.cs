@@ -7,12 +7,16 @@ namespace BenchmarkDotNet.Tasks
 {
     public class BenchmarkParametersSets
     {
-        public static BenchmarkParametersSets Empty = new BenchmarkParametersSets(new int[0]);
+        public static BenchmarkParametersSets Empty = new BenchmarkParametersSets(string.Empty, false, null);
 
+        public string ParamFieldOrProperty { get; }
+        public bool IsStatic { get; }
         public int[] IntParams { get; }
 
-        public BenchmarkParametersSets(int[] intParams)
+        public BenchmarkParametersSets(string paramFieldOrProperty, bool isStatic, int[] intParams)
         {
+            ParamFieldOrProperty = paramFieldOrProperty;
+            IsStatic = isStatic;
             IntParams = intParams ?? new int[0];
         }
 
@@ -37,7 +41,7 @@ namespace BenchmarkDotNet.Tasks
         public string ToCtorDefinition()
         {
             var builder = new StringBuilder();
-            builder.Append($"{nameof(IntParams).ToCamelCase()}: new int[] {{ {string.Join(", ", IntParams)} }}");
+            builder.Append($"\"{ParamFieldOrProperty}\", {IsStatic.ToString().ToCamelCase()}, {nameof(IntParams).ToCamelCase()}: new int[] {{ {string.Join(", ", IntParams)} }}");
             return builder.ToString();
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Flow.Results;
 using BenchmarkDotNet.Tasks;
@@ -68,6 +69,15 @@ namespace BenchmarkDotNet.Flow.Classic
                 ? ""
                 : $"return default({targetMethodReturnType});";
 
+            var paramsContent = "";
+            if (!benchmark.Task.ParametersSets.IsEmpty())
+            {
+                var typeQualifier = benchmark.Task.ParametersSets.IsStatic
+                    ? $"{benchmark.Target.Type.Name}"
+                    : "instance";
+                paramsContent = $"{typeQualifier}.{benchmark.Task.ParametersSets.ParamFieldOrProperty} = BenchmarkParameters.ParseArgs(args).IntParam;";
+            }
+
             string runBenchmarkTemplate = "";
             switch (benchmark.Task.Configuration.Mode)
             {
@@ -99,7 +109,8 @@ namespace BenchmarkDotNet.Flow.Classic
                 Replace("$SetupMethodName$", setupMethodName).
                 Replace("$IdleImplementation$", idleImplementation).
                 Replace("$AdditionalLogic$", benchmark.Target.AdditionalLogic).
-                Replace("$TargetBenchmarkTaskArguments$", targetBenchmarkTaskArguments);
+                Replace("$TargetBenchmarkTaskArguments$", targetBenchmarkTaskArguments).
+                Replace("$ParamsContent$", paramsContent);
 
             string fileName = Path.Combine(projectDir, MainClassName + ".cs");
             File.WriteAllText(fileName, content);
@@ -164,15 +175,25 @@ namespace BenchmarkDotNet.Flow.Classic
         private static BenchmarkGenerateResult CreateProjectDirectory(Benchmark benchmark)
         {
             var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), benchmark.Caption);
-            try
+            bool exist = Directory.Exists(directoryPath);
+            Exception deleteException = null;
+            for (int attempt = 0; attempt < 3 && exist; attempt++)
             {
-                if (Directory.Exists(directoryPath))
+                if (attempt != 0)
+                    Thread.Sleep(500); // Previous benchmark run didn't release some files
+                try
+                {
                     Directory.Delete(directoryPath, true);
+                    exist = Directory.Exists(directoryPath);
+                }
+                catch (Exception e)
+                {
+                    // Can't delete the directory =(
+                    deleteException = e;
+                }
             }
-            catch (Exception e)
-            {
-                return new BenchmarkGenerateResult(directoryPath, false, e);
-            }
+            if (exist)
+                return new BenchmarkGenerateResult(directoryPath, false, deleteException);
             if (!Directory.Exists(directoryPath))
                 Directory.CreateDirectory(directoryPath);
             return new BenchmarkGenerateResult(directoryPath, true, null);

@@ -68,6 +68,7 @@
     <Compile Include="Flow\Results\BenchmarkExecResult.cs" />
     <Compile Include="Flow\Results\BenchmarkGenerateResult.cs" />
     <Compile Include="Logging\MSBuildConsoleLogger.cs" />
+    <Compile Include="ParamsAttribute.cs" />
     <Compile Include="Statistic\ConfidenceInterval.cs" />
     <Compile Include="Statistic\StatSummary.cs" />
     <Compile Include="SetupAttribute.cs" />

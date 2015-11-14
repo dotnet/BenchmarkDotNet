@@ -1,10 +1,8 @@
 ﻿using System.Threading;
-using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet.Samples.Introduction
 {
     // It is very easy to use BenchmarkDotNet. You should just create a class
-    [BenchmarkTask(1, BenchmarkMode.SingleRun)]
     public class Intro_00_Basic
     {
         // And define a method with the Benchmark attribute

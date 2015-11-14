@@ -4,15 +4,11 @@ using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet.Samples.Introduction
 {
-    [BenchmarkTask(1, warmupIterationCount: 3, targetIterationCount: 5, intParams: new[] { 50, 100, 150, 200 })]
+    [BenchmarkTask(1, warmupIterationCount: 3, targetIterationCount: 5)]
     public class Intro_05_Params
     {
-        public Intro_05_Params()
-        {
-            Value = BenchmarkState.Instance.IntParam;
-        }
-
-        public int Value;
+        [Params(50, 100, 150, 200)]
+        public int Value = 1;
 
         private readonly Random random = new Random();
 

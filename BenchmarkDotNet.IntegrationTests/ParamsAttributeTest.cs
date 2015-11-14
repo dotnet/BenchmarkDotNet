@@ -7,11 +7,7 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class ParamsTestProperty : IntegrationTestBase
     {
-        public ParamsTestProperty()
-        {
-            ParamProperty = BenchmarkState.Instance.IntParam;
-        }
-
+        [Params(1, 2, 3, 8, 9, 10)]
         public int ParamProperty { get; set; }
 
         private HashSet<int> collectedParams = new HashSet<int>();
@@ -26,7 +22,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Benchmark]
-        [BenchmarkTask(mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 1, intParams: new[] { 1, 2, 3, 8, 9, 10 })]
+        [BenchmarkTask(mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 1)]
         public void Benchmark()
         {
             if (collectedParams.Contains(ParamProperty) == false)
@@ -39,12 +35,8 @@ namespace BenchmarkDotNet.IntegrationTests
 
     public class ParamsTestField : IntegrationTestBase
     {
-        public ParamsTestField()
-        {
-            ParamField = BenchmarkState.Instance.IntParam;
-        }
-
-        public int ParamField;
+        [Params(1, 2, 3, 8, 9, 10)]
+        public int ParamField = 0;
 
         private HashSet<int> collectedParams = new HashSet<int>();
 
@@ -58,7 +50,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Benchmark]
-        [BenchmarkTask(mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 1, intParams: new[] { 1, 2, 3, 8, 9, 10 })]
+        [BenchmarkTask(mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 1)]
         public void Benchmark()
         {
             if (collectedParams.Contains(ParamField) == false)
