@@ -44,11 +44,14 @@ namespace BenchmarkDotNet.Toolchain.Classic
                                 lines.Add(line);
 
                             // Wait until we know "Warmup" is happening, and then dissassemble the process
-                            if (codeAlreadyExtracted == false && (CommandLineArgs.PrintAssembly || CommandLineArgs.PrintIL) &&
+                            var shouldExtractCode = (CommandLineArgs.PrintAssembly || CommandLineArgs.PrintIL || CommandLineArgs.PrintDiagnostics);
+                            if (codeAlreadyExtracted == false && shouldExtractCode &&
                                 line.StartsWith("// Warmup") && !line.StartsWith("// Warmup (idle)"))
                             {
                                 var codeExtractor = new BenchmarkCodeExtractor(benchmark, process, codeExeName: Assembly.GetEntryAssembly().Location, logger: logger);
-                                codeExtractor.PrintCodeForMethod(printAssembly: CommandLineArgs.PrintAssembly, printIL: CommandLineArgs.PrintIL);
+                                codeExtractor.PrintCodeForMethod(printAssembly: CommandLineArgs.PrintAssembly,
+                                                                 printIL: CommandLineArgs.PrintIL,
+                                                                 printDiagnostics: CommandLineArgs.PrintDiagnostics);
                                 codeAlreadyExtracted = true;
                             }
                         }

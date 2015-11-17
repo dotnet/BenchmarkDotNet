@@ -24,6 +24,8 @@ namespace BenchmarkDotNet
 
         public static bool PrintIL => RawArgs.Any(arg => IsMatch(arg, "-printIL"));
 
+        public static bool PrintDiagnostics => RawArgs.Any(arg => IsMatch(arg, "-printDiagnostic", "-printDiagnostics", "-printDiag"));
+
         private static bool IsMatch(string arg, params string [] possibleMatches)
         {
             return possibleMatches.Any(possible => possible.Equals(arg, StringComparison.InvariantCultureIgnoreCase));

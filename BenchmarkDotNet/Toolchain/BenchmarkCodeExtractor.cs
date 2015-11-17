@@ -39,7 +39,7 @@ namespace BenchmarkDotNet
         /// Code from http://stackoverflow.com/questions/2057781/is-there-a-way-to-get-the-stacktraces-for-all-threads-in-c-like-java-lang-thre/24315960#24315960
         /// also see http://stackoverflow.com/questions/31633541/clrmd-throws-exception-when-creating-runtime/31745689#31745689
         /// </summary>
-        internal void PrintCodeForMethod(bool printAssembly, bool printIL)
+        internal void PrintCodeForMethod(bool printAssembly, bool printIL, bool printDiagnostics)
         {
             logger?.WriteLine($"\nPrintAssembly={printAssembly}, PrintIL={printIL}");
             logger?.WriteLine($"Attaching to process {Path.GetFileName(process.MainModule.FileName)}, Pid={process.Id}");
@@ -47,6 +47,11 @@ namespace BenchmarkDotNet
             using (var dataTarget = DataTarget.AttachToProcess(process.Id, 5000, AttachFlag.NonInvasive))
             {
                 var runtime = SetupClrRuntime(dataTarget);
+                if (printDiagnostics)
+                    PrintRuntimeDiagnosticInfo(dataTarget, runtime);
+
+                if (printAssembly == false && printIL == false)
+                    return;
 
                 ClrType @class = runtime.GetHeap().GetTypeByName(fullTypeName);
                 ClrMethod @method = @class.Methods.Single(m => m.GetFullSignature() == fullMethodName);
@@ -180,6 +185,56 @@ namespace BenchmarkDotNet
                 startOffset = endOffset;
                 Console.Write(lineOfAssembly.ToString());
             } while (disassemblySize > 0 && endOffset <= endAddress);
+            logger?.WriteLine();
+        }
+
+        private void PrintRuntimeDiagnosticInfo(DataTarget dataTarget, ClrRuntime runtime)
+        {
+            logger?.WriteLine(BenchmarkLogKind.Header, "\nRuntime Diagnostic Information");
+            logger?.WriteLine(BenchmarkLogKind.Header, "------------------------------");
+
+            logger?.WriteLine(BenchmarkLogKind.Header, "\nDataTarget Info:");
+            logger?.WriteLine(BenchmarkLogKind.Info, "  ClrVersion{0}: {1}", dataTarget.ClrVersions.Count > 1 ? "s" : "", string.Join(", ", dataTarget.ClrVersions));
+            logger?.WriteLine(BenchmarkLogKind.Info, "  Architecture: " + dataTarget.Architecture);
+            logger?.WriteLine(BenchmarkLogKind.Info, "  PointerSize: {0} ({1}-bit)", dataTarget.PointerSize, dataTarget.PointerSize == 8 ? 64 : 32);
+            logger?.WriteLine(BenchmarkLogKind.Info, "  SymbolPath: " + dataTarget.GetSymbolPath());
+
+            logger?.WriteLine(BenchmarkLogKind.Header, "\nClrRuntime Info:");
+            logger?.WriteLine(BenchmarkLogKind.Info, "  ServerGC: " + runtime.ServerGC);
+            logger?.WriteLine(BenchmarkLogKind.Info, "  HeapCount: " + runtime.HeapCount);
+            logger?.WriteLine(BenchmarkLogKind.Info, "  Thread Count: " + runtime.Threads.Count);
+
+            logger?.WriteLine(BenchmarkLogKind.Header, "\nClrRuntime Modules:");
+            foreach (var module in runtime.EnumerateModules())
+            {
+                logger?.WriteLine(BenchmarkLogKind.Info,
+                                  "  {0,36} Id:{1} - {2,10:N0} bytes @ 0x{3:X16}",
+                                  Path.GetFileName(module.FileName),
+                                  module.AssemblyId.ToString().PadRight(10),
+                                  module.Size,
+                                  module.ImageBase);
+            }
+
+            ClrHeap heap = runtime.GetHeap();
+            logger?.WriteLine(BenchmarkLogKind.Header, "\nClrHeap Info:");
+            logger?.WriteLine(BenchmarkLogKind.Info, "  TotalHeapSize: {0:N0} bytes ({1:N2} MB)", heap.TotalHeapSize, heap.TotalHeapSize / 1024.0 / 1024.0);
+            logger?.WriteLine(BenchmarkLogKind.Info, "  Gen0: {0,10:N0} bytes", heap.GetSizeByGen(0));
+            logger?.WriteLine(BenchmarkLogKind.Info, "  Gen1: {0,10:N0} bytes", heap.GetSizeByGen(1));
+            logger?.WriteLine(BenchmarkLogKind.Info, "  Gen2: {0,10:N0} bytes", heap.GetSizeByGen(2));
+            logger?.WriteLine(BenchmarkLogKind.Info, "   LOH: {0,10:N0} bytes", heap.GetSizeByGen(3));
+
+            logger?.WriteLine(BenchmarkLogKind.Info, "  Segments: " + heap.Segments.Count);
+            foreach (var segment in heap.Segments)
+            {
+                logger?.WriteLine(BenchmarkLogKind.Info,
+                                  "    Segment: {0,10:N0} bytes, {1,10}, Gen0: {2,10:N0} bytes, Gen1: {3,10:N0} bytes, Gen2: {4,10:N0} bytes",
+                                  segment.Length,
+                                  segment.IsLarge ? "Large" : (segment.IsEphemeral ? "Ephemeral" : "Unknown"),
+                                  segment.Gen0Length,
+                                  segment.Gen1Length,
+                                  segment.Gen2Length);
+            }
+
             logger?.WriteLine();
         }
     }
