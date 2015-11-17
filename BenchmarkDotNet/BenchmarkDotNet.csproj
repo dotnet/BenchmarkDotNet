@@ -41,9 +41,20 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Dia2Lib">
+      <HintPath>..\CLRMD\Dia2Lib.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Interop.Dia2Lib">
+      <HintPath>..\CLRMD\Interop.Dia2Lib.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
+    <Reference Include="Microsoft.Diagnostics.Runtime">
+      <HintPath>..\CLRMD\Microsoft.Diagnostics.Runtime.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />

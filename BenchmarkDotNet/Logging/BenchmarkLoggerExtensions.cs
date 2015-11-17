@@ -16,6 +16,11 @@ namespace BenchmarkDotNet.Logging
             logger.WriteLine(BenchmarkLogKind.Default, format, args);
         }
 
+        public static void WriteLine(this IBenchmarkLogger logger)
+        {
+            logger.WriteLine(BenchmarkLogKind.Default, "");
+        }
+
         public static void WriteLineHelp(this IBenchmarkLogger logger, string format, params object[] args)
         {
             logger.WriteLine(BenchmarkLogKind.Help, format, args);
