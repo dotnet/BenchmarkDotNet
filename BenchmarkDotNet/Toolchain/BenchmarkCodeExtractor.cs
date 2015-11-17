@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Globalization;
 using BenchmarkDotNet.Logging;
 using Microsoft.Diagnostics.Runtime;
 using Microsoft.Diagnostics.Runtime.Desktop;
@@ -18,6 +19,8 @@ namespace BenchmarkDotNet
 
         private string fullTypeName { get; set; }
         private string fullMethodName { get; set; }
+
+        private Dictionary<ulong, Tuple<string, string>> MethodAddressLookup { get; set; }
 
         private IBenchmarkLogger logger { get; set; }
 
@@ -67,6 +70,9 @@ namespace BenchmarkDotNet
                 logger?.WriteLine($"Type: {method.Type.Name}");
                 logger?.WriteLine($"Method: {method.Name}");
 
+                if (printAssembly)
+                    MethodAddressLookup = CreateMethodAddressLookup(runtime);
+
                 // TODO work out why this returns locations inside OTHER methods, it's like it doesn't have an upper bound and just keeps going!?
                 var ilOffsetLocations = module.GetSourceLocationsForMethod(@method.MetadataToken);
 
@@ -90,9 +96,11 @@ namespace BenchmarkDotNet
                     PrintLocationAndILMapInfo(@method, location, ilMaps);
                     PrintSourceCode(lines, location);
 
-                    var debugControl = dataTarget.DebuggerInterface as IDebugControl;
                     if (printAssembly)
+                    {
+                        var debugControl = dataTarget.DebuggerInterface as IDebugControl;
                         PrintAssemblyCode(@method, ilMaps, debugControl);
+                    }
                 }
             }
         }
@@ -183,11 +191,99 @@ namespace BenchmarkDotNet
                 var flags = DEBUG_DISASM.EFFECTIVE_ADDRESS; // DEBUG_DISASM.SOURCE_FILE_NAME | DEBUG_DISASM.SOURCE_LINE_NUMBER;
                 var result = debugControl.Disassemble(startOffset, flags, lineOfAssembly, bufferSize, out disassemblySize, out endOffset);
                 startOffset = endOffset;
-                Console.Write(lineOfAssembly.ToString());
+                logger?.Write(lineOfAssembly.ToString());
+
+                if (lineOfAssembly.ToString().Contains(" call ") == false)
+                    continue;
+
+                var methodCallInfo = GetCalledMethodFromAssemblyOutput(lineOfAssembly.ToString());
+                if (string.IsNullOrWhiteSpace(methodCallInfo) == false)
+                    logger?.WriteLine(BenchmarkLogKind.Info, $"  *** {methodCallInfo} ***");
             } while (disassemblySize > 0 && endOffset <= endAddress);
             logger?.WriteLine();
         }
 
+        private string GetCalledMethodFromAssemblyOutput(string assemblyString)
+        {
+            string hexAddressText = "";
+            var callLocation = assemblyString.LastIndexOf("call");
+            var qwordPtrLocation = assemblyString.IndexOf("qword ptr");
+            var openBracket = assemblyString.IndexOf('(');
+            var closeBracket = assemblyString.IndexOf(')');
+
+            if (openBracket != -1 && closeBracket != -1 && closeBracket > openBracket)
+            {
+                // 000007fe`979171fb e800261b5e      call    mscorlib_ni+0x499800 (000007fe`f5ac9800)
+                hexAddressText = assemblyString.Substring(openBracket, closeBracket - openBracket)
+                                               .Replace("(", "")
+                                               .Replace(")", "")
+                                               .Replace("`", "");
+            }
+            else if (callLocation != -1 && qwordPtrLocation != -1)
+            {
+                // TODO have to also deal with:
+                // 000007fe`979f666f 41ff13          call    qword ptr [r11] ds:000007fe`978e0050=000007fe978ed260
+            }
+            else if (callLocation != -1)
+            {
+                // 000007fe`979e6721 e8e2b5ffff      call    000007fe`979e1d08
+                var endOfCallLocation = callLocation + 4;
+                hexAddressText = assemblyString.Substring(endOfCallLocation, assemblyString.Length - endOfCallLocation)
+                                               .Replace("`", "")
+                                               .Trim(' ');
+            }
+
+            ulong actualAddress;
+            if (ulong.TryParse(hexAddressText, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out actualAddress))
+            {
+                if (MethodAddressLookup.ContainsKey(actualAddress))
+                    return string.Format("Call: {0:X16} -> {1}", actualAddress, MethodAddressLookup[actualAddress].Item2);
+                else
+                    return string.Format("Call: {0:X16} -> No matching method found", actualAddress);
+            }
+
+            return $"{hexAddressText} -> Not a valid hex value";
+        }
+
+        private Dictionary<ulong, Tuple<string, string>> CreateMethodAddressLookup(ClrRuntime runtime)
+        {
+            var methodLookup = new Dictionary<ulong, Tuple<string, string>>();
+            long dupes = 0, overriddenMethods = 0, skips = 0;
+            logger?.WriteLine("\nScanning loaded Modules for Method Definitions:");
+            foreach (var module in runtime.EnumerateModules())
+            {
+                logger?.WriteLine($"  {Path.GetFileName(module.FileName)}");
+                foreach (var type in module.EnumerateTypes().Where(t => t.IsPublic))
+                {
+                    foreach (var method in type.Methods.Where(m => m.IsPublic && //!m.IsAbstract &&
+                                                                   m.NativeCode != ulong.MaxValue))
+                    {
+                        var cleanedUpMethodName = method.ToString().Replace("ClrMethod signature=", "")
+                                                                   .Replace("<'", "")
+                                                                   .Replace("' />", "");
+                        if (cleanedUpMethodName.StartsWith(type.Name) == false)
+                        {
+                            overriddenMethods++;
+                            continue;
+                        }
+
+                        var methodAddress = method.NativeCode;
+                        if (methodLookup.ContainsKey(methodAddress))
+                        {
+                            dupes++;
+                        }
+                        else
+                        {
+                            methodLookup.Add(methodAddress, Tuple.Create(type.Name, cleanedUpMethodName));
+                        }
+                    }
+                }
+            }
+
+            logger?.WriteLine("After analysis there are {0:N0} items in the lookup, {1:N0} overridden Methods, {2:N0} skips and {3:N0} dupes",
+                              methodLookup.Count, overriddenMethods, skips, dupes);
+            return methodLookup;
+        }
         private void PrintRuntimeDiagnosticInfo(DataTarget dataTarget, ClrRuntime runtime)
         {
             logger?.WriteLine(BenchmarkLogKind.Header, "\nRuntime Diagnostic Information");

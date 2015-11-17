@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Export;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Logging;
 using BenchmarkDotNet.Reports;
 
@@ -76,7 +75,7 @@ namespace BenchmarkDotNet
 
         private void PrintAvailable()
         {
-            logger.WriteLineHelp("Available Typesenchmark sets:");
+            logger.WriteLineHelp("Available Benchmark(s):");
             int numberWidth = Types.Length.ToString().Length;
             for (int i = 0; i < Types.Length; i++)
                 logger.WriteLineHelp(string.Format(CultureInfo.InvariantCulture, "  #{0} {1}", i.ToString().PadRight(numberWidth), Types[i].Name));
