@@ -48,7 +48,9 @@
     <Compile Include="Algorithms\Algo_BitCount.cs" />
     <Compile Include="Algorithms\Algo_Md5VsSha256.cs" />
     <Compile Include="Algorithms\Algo_MostSignificantBit.cs" />
+    <Compile Include="Framework\Framework_DictionaryVsIDictionary.cs" />
     <Compile Include="Framework\Framework_StopwatchVsDateTime.cs" />
+    <Compile Include="Framework\Framework_StringConcatVsStringBuilder.cs" />
     <Compile Include="JIT\Jit_GenericsMethod.cs" />
     <Compile Include="Introduction\Intro_06_Runtime.cs" />
     <Compile Include="JIT\Jit_AsVsCast.cs" />
