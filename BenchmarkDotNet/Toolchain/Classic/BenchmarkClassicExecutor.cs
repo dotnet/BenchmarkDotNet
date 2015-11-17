@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using BenchmarkDotNet.Logging;
 using BenchmarkDotNet.Tasks;
 using BenchmarkDotNet.Toolchain.Results;
@@ -12,6 +13,7 @@ namespace BenchmarkDotNet.Toolchain.Classic
     {
         private readonly Benchmark benchmark;
         private readonly IBenchmarkLogger logger;
+        private bool codeAlreadyExtracted = false;
 
         public BenchmarkClassicExecutor(Benchmark benchmark, IBenchmarkLogger logger)
         {
@@ -29,6 +31,7 @@ namespace BenchmarkDotNet.Toolchain.Classic
                 var lines = new List<string>();
                 var startInfo = CreateStartInfo(exeName, args);
                 using (var process = Process.Start(startInfo))
+                {
                     if (process != null)
                     {
                         process.PriorityClass = ProcessPriorityClass.High;
@@ -39,6 +42,15 @@ namespace BenchmarkDotNet.Toolchain.Classic
                             logger?.WriteLine(line);
                             if (!line.StartsWith("//") && !string.IsNullOrEmpty(line))
                                 lines.Add(line);
+
+                            // Wait until we know "Warmup" is happening, and then dissassemble the process
+                            if (codeAlreadyExtracted == false && (CommandLineArgs.PrintAssembly || CommandLineArgs.PrintIL) &&
+                                line.StartsWith("// Warmup") && !line.StartsWith("// Warmup (idle)"))
+                            {
+                                var codeExtractor = new BenchmarkCodeExtractor(benchmark, process, codeExeName: Assembly.GetEntryAssembly().Location, logger: logger);
+                                codeExtractor.PrintCodeForMethod(printAssembly: CommandLineArgs.PrintAssembly, printIL: CommandLineArgs.PrintIL);
+                                codeAlreadyExtracted = true;
+                            }
                         }
                         if (process.HasExited && process.ExitCode != 0)
                         {
@@ -55,6 +67,7 @@ namespace BenchmarkDotNet.Toolchain.Classic
                             return new BenchmarkExecResult(true, new string[0]);
                         }
                     }
+                }
                 return new BenchmarkExecResult(true, lines);
             }
             return new BenchmarkExecResult(false, new string[0]);
