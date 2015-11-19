@@ -16,13 +16,13 @@ namespace BenchmarkDotNet.Samples.JIT
 
             public BaseClass()
             {
-                Enumerable.Empty<T>();
+                foreach (var _ in list) { }
             }
 
             public void Run()
             {
                 for (var i = 0; i < 11; i++)
-                    if (list.Any())
+                    if (list.Any(_ => true))
                         return;
             }
         }
