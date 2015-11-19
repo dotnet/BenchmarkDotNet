@@ -5,6 +5,9 @@
 * You can create benchmark tasks that run your benchmark with different CLR, JIT and platform versions.
 * BenchmarkDotNet performs warm-up executions of your code, then runs it several times in different CLR instances, calculates statistics and tries to eliminate some runtime side-effects.
 * BenchmarkDotNet runs with minimal overhead so as to give an accurate performance measurment.
+ 
+## Chat Room
+[![Join the chat at https://gitter.im/PerfDotNet/BenchmarkDotNet](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/PerfDotNet/BenchmarkDotNet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Getting started
 
