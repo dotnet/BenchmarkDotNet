@@ -7,7 +7,7 @@ using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    [BenchmarkTask(mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 1)]
+    [BenchmarkTask(mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 5)]
     public class PerformanceUnitTest : IntegrationTestBase
     {
         [Fact]
@@ -31,10 +31,12 @@ namespace BenchmarkDotNet.IntegrationTests
                                       slowBenchmarkRun.OpsPerSecond, fastBenchmarkRun.OpsPerSecond));
 
             // Whilst we're at it, let's do more specific Asserts as we know what the elasped time should be
-            Assert.InRange(slowBenchmarkRun.AverageNanoseconds / 1000.0 / 1000.0, low: 499, high: 501);
-            Assert.InRange(fastBenchmarkRun.AverageNanoseconds / 1000.0 / 1000.0, low: 4.5, high: 5.5);
             var slowBenchmarkReport = reports.GetReportFor<PerformanceUnitTest>(r => r.SlowBenchmark());
             var fastBenchmarkReport = reports.GetReportFor<PerformanceUnitTest>(r => r.FastBenchmark());
+            foreach (var slowRun in slowBenchmarkReport.Runs)
+                Assert.InRange(slowRun.AverageNanoseconds / 1000.0 / 1000.0, low: 499, high: 501);
+            foreach (var fastRun in fastBenchmarkReport.Runs)
+                Assert.InRange(fastRun.AverageNanoseconds / 1000.0 / 1000.0, low: 14, high: 16);
         }
 
         [Benchmark]
