@@ -61,7 +61,6 @@ namespace BenchmarkDotNet.Export
                         logger.WriteInfo($"{table[0][colIndex]}={table[1][colIndex]}  ");
                 logger.NewLine();
                 logger.WriteLineInfo("```");
-                logger.NewLine();
             }
 
             table.Insert(1, widths.Select(w => new string('-', w)).ToArray());
@@ -70,6 +69,12 @@ namespace BenchmarkDotNet.Export
                 for (int colIndex = 0; colIndex < colCount; colIndex++)
                     if (!areSame[colIndex] || columnsToShowIndexes.Contains(colIndex))
                         logger.WriteStatistic(row[colIndex].PadLeft(widths[colIndex], ' ') + " |");
+                logger.NewLine();
+            }
+
+            if (areSame.Any(s => s))
+            {
+                logger.WriteLineInfo("```");
                 logger.NewLine();
             }
         }
