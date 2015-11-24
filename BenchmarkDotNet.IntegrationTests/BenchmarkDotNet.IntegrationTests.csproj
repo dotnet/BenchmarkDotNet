@@ -47,6 +47,7 @@
     <Compile Include="IntegrationTestBase.cs" />
     <Compile Include="ParamsAttributeStaticTest.cs" />
     <Compile Include="ParamsAttributeTest.cs" />
+    <Compile Include="PerformanceUnitTest.cs" />
     <Compile Include="SetupAttributeInvalidMethodTest.cs" />
     <Compile Include="SetupAttributeTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
