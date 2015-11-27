@@ -12,7 +12,7 @@ using Microsoft.Diagnostics.Runtime.Interop;
 
 namespace BenchmarkDotNet.Diagnostics
 {
-    internal class BenchmarkCodeExtractor
+    public class BenchmarkCodeExtractor : IBenchmarkCodeExtractor
     {
         private Process process { get; set; }
         private string codeExeName { get; set; }
@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Diagnostics
         /// Code from http://stackoverflow.com/questions/2057781/is-there-a-way-to-get-the-stacktraces-for-all-threads-in-c-like-java-lang-thre/24315960#24315960
         /// also see http://stackoverflow.com/questions/31633541/clrmd-throws-exception-when-creating-runtime/31745689#31745689
         /// </summary>
-        internal void PrintCodeForMethod(bool printAssembly, bool printIL, bool printDiagnostics)
+        public void PrintCodeForMethod(bool printAssembly, bool printIL, bool printDiagnostics)
         {
             logger?.WriteLine($"\nPrintAssembly={printAssembly}, PrintIL={printIL}");
             logger?.WriteLine($"Attaching to process {Path.GetFileName(process.MainModule.FileName)}, Pid={process.Id}");
@@ -76,24 +76,13 @@ namespace BenchmarkDotNet.Diagnostics
                 // TODO work out why this returns locations inside OTHER methods, it's like it doesn't have an upper bound and just keeps going!?
                 var ilOffsetLocations = module.GetSourceLocationsForMethod(@method.MetadataToken);
 
-                logger?.WriteLine();
-                logger?.WriteLine($"IL Offset Maps for {@method.Type.Name}.{@method.Name}:");
-                foreach (var map in @method.ILOffsetMap)
-                {
-                    //logger?.WriteLine($"  IL Offset: {map.ILOffset}, StartAddress: {map.StartAddress}, EndAddress: {map.EndAddress}");
-                    logger?.WriteLine("  IL Offset: {0}, StartAddress: 0x{1:X8}, EndAddress: 0x{2:X8}", map.ILOffset, map.StartAddress, map.EndAddress);
-                }
-                logger?.WriteLine();
-
                 string filePath = null;
                 string[] lines = null;
                 logger?.WriteLine("");
                 for (int i = 0; i < ilOffsetLocations.Count; i++)
                 {
                     var location = ilOffsetLocations[i];
-                    logger?.WriteLine($"IL Offset: {location.ILOffset} {location.SourceLocation}");
                     var ilMaps = @method.ILOffsetMap.Where(il => il.ILOffset == location.ILOffset).ToList();
-                    logger?.WriteLine($"    Got {ilMaps.Count} IL Maps for IL Offset: {location.ILOffset} ({location.SourceLocation.FilePath})");
                     if (ilMaps.Any() == false)
                         continue;
 
@@ -199,9 +188,9 @@ namespace BenchmarkDotNet.Diagnostics
                 if (lineOfAssembly.ToString().Contains(" call ") == false)
                     continue;
 
-                //var methodCallInfo = GetCalledMethodFromAssemblyOutput(lineOfAssembly.ToString());
-                //if (string.IsNullOrWhiteSpace(methodCallInfo) == false)
-                //    logger?.WriteLine(BenchmarkLogKind.Info, $"  *** {methodCallInfo} ***");
+                var methodCallInfo = GetCalledMethodFromAssemblyOutput(lineOfAssembly.ToString());
+                if (string.IsNullOrWhiteSpace(methodCallInfo) == false)
+                    logger?.WriteLine(BenchmarkLogKind.Info, $"  *** {methodCallInfo} ***");
             } while (disassemblySize > 0 && endOffset <= endAddress);
             logger?.WriteLine();
         }
@@ -285,7 +274,6 @@ namespace BenchmarkDotNet.Diagnostics
 
             logger?.WriteLine("After analysis there are {0:N0} items in the lookup, {1:N0} overridden Methods, {2:N0} skips and {3:N0} dupes",
                               methodLookup.Count, overriddenMethods, skips, dupes);
-            //System.Diagnostics.Debugger.Launch();
             return methodLookup;
         }
         private void PrintRuntimeDiagnosticInfo(DataTarget dataTarget, ClrRuntime runtime)

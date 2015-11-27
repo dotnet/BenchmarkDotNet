@@ -6,6 +6,7 @@ using System.Reflection;
 using BenchmarkDotNet.Logging;
 using BenchmarkDotNet.Tasks;
 using BenchmarkDotNet.Toolchain.Results;
+using BenchmarkDotNet.Diagnostics;
 
 namespace BenchmarkDotNet.Toolchain.Classic
 {
@@ -48,12 +49,15 @@ namespace BenchmarkDotNet.Toolchain.Classic
                             if (codeAlreadyExtracted == false && shouldExtractCode &&
                                 line.StartsWith("// Warmup") && !line.StartsWith("// Warmup (idle)"))
                             {
-                                // TODO temporarily removing this, until the "plugin" mechanism is enabled
-                                //var codeExtractor = new BenchmarkCodeExtractor(benchmark, process, codeExeName: Assembly.GetEntryAssembly().Location, logger: logger);
-                                //codeExtractor.PrintCodeForMethod(printAssembly: CommandLineArgs.PrintAssembly,
-                                //                                 printIL: CommandLineArgs.PrintIL,
-                                //                                 printDiagnostics: CommandLineArgs.PrintDiagnostics);
-                                //codeAlreadyExtracted = true;
+                                try
+                                {
+                                    RunCodeExtractor(process);
+                                }
+                                finally
+                                {
+                                    // Always set this, even if something went wrong, otherwise we will try on every run of a benchmark batch
+                                    codeAlreadyExtracted = true;
+                                }
                             }
                         }
                         if (process.HasExited && process.ExitCode != 0)
@@ -75,6 +79,41 @@ namespace BenchmarkDotNet.Toolchain.Classic
                 return new BenchmarkExecResult(true, lines);
             }
             return new BenchmarkExecResult(false, new string[0]);
+        }
+
+        private void RunCodeExtractor(Process process)
+        {
+            var diagnosticAssembly = "BenchmarkDotNet.Diagnostics.dll";
+            try
+            {
+                var loadedAssembly = Assembly.LoadFrom(diagnosticAssembly);
+                var thisAssembly = Assembly.GetAssembly(GetType());
+                if (loadedAssembly.GetName().Version != thisAssembly.GetName().Version)
+                {
+                    var errorMsg = string.Format("Unable to load: {0} version {1}\nDoes not match: {2} version {3}",
+                                                 diagnosticAssembly,
+                                                 loadedAssembly.GetName().Version,
+                                                 Path.GetFileName(thisAssembly.Location),
+                                                 thisAssembly.GetName().Version);
+                    logger?.WriteLineError(errorMsg);
+                }
+                else
+                {
+                    Type type = loadedAssembly.GetType("BenchmarkDotNet.Diagnostics.BenchmarkCodeExtractor");
+                    var codeExtractor = (IBenchmarkCodeExtractor)Activator.CreateInstance(type,
+                                                                                          benchmark,
+                                                                                          process,
+                                                                                          Assembly.GetEntryAssembly().Location,
+                                                                                          logger);
+                    codeExtractor.PrintCodeForMethod(printAssembly: CommandLineArgs.PrintAssembly,
+                                                     printIL: CommandLineArgs.PrintIL,
+                                                     printDiagnostics: CommandLineArgs.PrintDiagnostics);
+                }
+            }
+            catch (Exception ex) // we're loading a plug-in, better to be safe rather than sorry
+            {
+                logger?.WriteLineError("Error loading {0}: {1}", diagnosticAssembly, ex.Message);
+            }
         }
 
         private ProcessStartInfo CreateStartInfo(string exeName, string args)

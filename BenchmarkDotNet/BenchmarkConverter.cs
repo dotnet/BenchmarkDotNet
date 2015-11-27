@@ -51,6 +51,7 @@ namespace BenchmarkDotNet
                     AssertMethodIsAccessible("Benchmark", methodInfo);
                     AssertMethodIsNotGeneric("Benchmark", methodInfo);
                     foreach (var task in BenchmarkTask.Resolve(methodInfo))
+                    {
                         if (fieldOrProperty == null)
                         {
                             yield return new Benchmark(target, task);
@@ -62,6 +63,7 @@ namespace BenchmarkDotNet
                             var newTask = new BenchmarkTask(task.ProcessCount, task.Configuration, parametersSets);
                             yield return new Benchmark(target, newTask);
                         }
+                    }
                 }
             }
         }

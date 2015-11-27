@@ -54,6 +54,7 @@
     <Compile Include="BenchmarkState.cs" />
     <Compile Include="BenchmarkRunnerExtensions.cs" />
     <Compile Include="CommandLineArgs.cs" />
+    <Compile Include="Diagnostics\IBenchmarkCodeExtractor.cs" />
     <Compile Include="Extensions\ReportExtensions.cs" />
     <Compile Include="Toolchain\BenchmarkToolchainFacade.cs" />
     <Compile Include="Toolchain\Classic\BenchmarkClassicBuilder.cs" />
