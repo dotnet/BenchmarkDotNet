@@ -10,7 +10,7 @@ using Microsoft.Diagnostics.Runtime;
 using Microsoft.Diagnostics.Runtime.Desktop;
 using Microsoft.Diagnostics.Runtime.Interop;
 
-namespace BenchmarkDotNet
+namespace BenchmarkDotNet.Diagnostics
 {
     internal class BenchmarkCodeExtractor
     {
@@ -76,13 +76,24 @@ namespace BenchmarkDotNet
                 // TODO work out why this returns locations inside OTHER methods, it's like it doesn't have an upper bound and just keeps going!?
                 var ilOffsetLocations = module.GetSourceLocationsForMethod(@method.MetadataToken);
 
+                logger?.WriteLine();
+                logger?.WriteLine($"IL Offset Maps for {@method.Type.Name}.{@method.Name}:");
+                foreach (var map in @method.ILOffsetMap)
+                {
+                    //logger?.WriteLine($"  IL Offset: {map.ILOffset}, StartAddress: {map.StartAddress}, EndAddress: {map.EndAddress}");
+                    logger?.WriteLine("  IL Offset: {0}, StartAddress: 0x{1:X8}, EndAddress: 0x{2:X8}", map.ILOffset, map.StartAddress, map.EndAddress);
+                }
+                logger?.WriteLine();
+
                 string filePath = null;
                 string[] lines = null;
                 logger?.WriteLine("");
                 for (int i = 0; i < ilOffsetLocations.Count; i++)
                 {
                     var location = ilOffsetLocations[i];
+                    logger?.WriteLine($"IL Offset: {location.ILOffset} {location.SourceLocation}");
                     var ilMaps = @method.ILOffsetMap.Where(il => il.ILOffset == location.ILOffset).ToList();
+                    logger?.WriteLine($"    Got {ilMaps.Count} IL Maps for IL Offset: {location.ILOffset} ({location.SourceLocation.FilePath})");
                     if (ilMaps.Any() == false)
                         continue;
 
@@ -133,10 +144,6 @@ namespace BenchmarkDotNet
             {
                 logger?.WriteLine(BenchmarkLogKind.Error, ex.ToString());
             }
-            finally
-            {
-                Console.ResetColor();
-            }
         }
 
         private void PrintSourceCode(IList<string> lines, ILOffsetSourceLocation location)
@@ -147,7 +154,7 @@ namespace BenchmarkDotNet
                 var lineToPrint = location.SourceLocation.LineNumber - 1;
                 if (lineToPrint >= 0 && lineToPrint < lines.Count)
                 {
-                    logger?.WriteLine(BenchmarkLogKind.Help, "{0,6}:{1}", location.SourceLocation.LineNumber, lines[(int)location.SourceLocation.LineNumber - 1]);
+                    logger?.WriteLine(BenchmarkLogKind.Help, "{0,6}:{1}", location.SourceLocation.LineNumber, lines[location.SourceLocation.LineNumber - 1]);
                     logger?.WriteLine(BenchmarkLogKind.Info,
                                       new string(' ', location.SourceLocation.ColStart - 1 + indent) +
                                       new string('*', location.SourceLocation.ColEnd - location.SourceLocation.ColStart));
@@ -160,10 +167,6 @@ namespace BenchmarkDotNet
             catch (Exception ex)
             {
                 logger?.WriteLine(BenchmarkLogKind.Error, ex.ToString());
-            }
-            finally
-            {
-                Console.ResetColor();
             }
         }
 
@@ -196,9 +199,9 @@ namespace BenchmarkDotNet
                 if (lineOfAssembly.ToString().Contains(" call ") == false)
                     continue;
 
-                var methodCallInfo = GetCalledMethodFromAssemblyOutput(lineOfAssembly.ToString());
-                if (string.IsNullOrWhiteSpace(methodCallInfo) == false)
-                    logger?.WriteLine(BenchmarkLogKind.Info, $"  *** {methodCallInfo} ***");
+                //var methodCallInfo = GetCalledMethodFromAssemblyOutput(lineOfAssembly.ToString());
+                //if (string.IsNullOrWhiteSpace(methodCallInfo) == false)
+                //    logger?.WriteLine(BenchmarkLogKind.Info, $"  *** {methodCallInfo} ***");
             } while (disassemblySize > 0 && endOffset <= endAddress);
             logger?.WriteLine();
         }
@@ -282,6 +285,7 @@ namespace BenchmarkDotNet
 
             logger?.WriteLine("After analysis there are {0:N0} items in the lookup, {1:N0} overridden Methods, {2:N0} skips and {3:N0} dupes",
                               methodLookup.Count, overriddenMethods, skips, dupes);
+            //System.Diagnostics.Debugger.Launch();
             return methodLookup;
         }
         private void PrintRuntimeDiagnosticInfo(DataTarget dataTarget, ClrRuntime runtime)

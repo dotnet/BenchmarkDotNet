@@ -48,11 +48,12 @@ namespace BenchmarkDotNet.Toolchain.Classic
                             if (codeAlreadyExtracted == false && shouldExtractCode &&
                                 line.StartsWith("// Warmup") && !line.StartsWith("// Warmup (idle)"))
                             {
-                                var codeExtractor = new BenchmarkCodeExtractor(benchmark, process, codeExeName: Assembly.GetEntryAssembly().Location, logger: logger);
-                                codeExtractor.PrintCodeForMethod(printAssembly: CommandLineArgs.PrintAssembly,
-                                                                 printIL: CommandLineArgs.PrintIL,
-                                                                 printDiagnostics: CommandLineArgs.PrintDiagnostics);
-                                codeAlreadyExtracted = true;
+                                // TODO temporarily removing this, until the "plugin" mechanism is enabled
+                                //var codeExtractor = new BenchmarkCodeExtractor(benchmark, process, codeExeName: Assembly.GetEntryAssembly().Location, logger: logger);
+                                //codeExtractor.PrintCodeForMethod(printAssembly: CommandLineArgs.PrintAssembly,
+                                //                                 printIL: CommandLineArgs.PrintIL,
+                                //                                 printDiagnostics: CommandLineArgs.PrintDiagnostics);
+                                //codeAlreadyExtracted = true;
                             }
                         }
                         if (process.HasExited && process.ExitCode != 0)
