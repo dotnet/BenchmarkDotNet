@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BenchmarkDotNet.Logging
+namespace BenchmarkDotNet.Plugins.Loggers
 {
     public static class BenchmarkLoggerExtensions
     {

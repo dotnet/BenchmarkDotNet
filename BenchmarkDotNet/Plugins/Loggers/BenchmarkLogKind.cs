@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Logging
+﻿namespace BenchmarkDotNet.Plugins.Loggers
 {
     public enum BenchmarkLogKind
     {

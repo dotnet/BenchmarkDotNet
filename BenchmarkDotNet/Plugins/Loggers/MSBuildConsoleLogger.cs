@@ -1,7 +1,7 @@
 ﻿using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
-namespace BenchmarkDotNet.Logging
+namespace BenchmarkDotNet.Plugins.Loggers
 {
     internal class MSBuildConsoleLogger : Logger
     {

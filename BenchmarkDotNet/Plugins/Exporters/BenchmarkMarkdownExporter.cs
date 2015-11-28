@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Logging;
+using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Reports;
 
-namespace BenchmarkDotNet.Export
+namespace BenchmarkDotNet.Plugins.Exporters
 {
-    public class MarkdownReportExporter : IReportExporter
+    // TODO: add support of GitHub markdown, Stackoverflow markdown
+    public class BenchmarkMarkdownExporter : IBenchmarkExporter
     {
-        public static readonly MarkdownReportExporter Default = new MarkdownReportExporter();
+        public static readonly BenchmarkMarkdownExporter Default = new BenchmarkMarkdownExporter();
 
-        private MarkdownReportExporter()
+        private BenchmarkMarkdownExporter()
         {
         }
 
@@ -18,7 +19,7 @@ namespace BenchmarkDotNet.Export
         {
             logger.WriteLineInfo(EnvironmentHelper.GetFullEnvironmentInfo("Host", false));
 
-            var table = ReportExporterHelper.BuildTable(reports);
+            var table = BenchmarkExporterHelper.BuildTable(reports);
             // If we have Benchmarks with ParametersSets, force the "Method" columns to be displayed, otherwise it doesn't make as much sense
             var columnsToAlwaysShow = reports.Any(r => r.Benchmark.Task.ParametersSets != null) ? new[] { "Method" } : new string[0];
             PrintTable(table, logger, columnsToAlwaysShow);

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using BenchmarkDotNet.Logging;
+using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Toolchain.Results;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Execution;

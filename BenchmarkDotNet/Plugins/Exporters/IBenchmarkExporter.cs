@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using BenchmarkDotNet.Logging;
+using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Reports;
 
-namespace BenchmarkDotNet.Export
+namespace BenchmarkDotNet.Plugins.Exporters
 {
-    public interface IReportExporter
+    public interface IBenchmarkExporter
     {
         void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger);
     }

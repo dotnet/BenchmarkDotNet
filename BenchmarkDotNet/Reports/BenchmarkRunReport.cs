@@ -1,5 +1,5 @@
 ﻿using System;
-using BenchmarkDotNet.Logging;
+using BenchmarkDotNet.Plugins.Loggers;
 
 namespace BenchmarkDotNet.Reports
 {

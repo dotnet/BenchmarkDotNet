@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.IO;
 
-namespace BenchmarkDotNet.Logging
+namespace BenchmarkDotNet.Plugins.Loggers
 {
     public class BenchmarkStreamLogger : IBenchmarkLogger
     {

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Export;
-using BenchmarkDotNet.Logging;
+using BenchmarkDotNet.Plugins.Exporters;
+using BenchmarkDotNet.Plugins;
+using BenchmarkDotNet.Plugins.Diagnosters;
+using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tasks;
 using BenchmarkDotNet.Toolchain;
@@ -12,18 +14,20 @@ namespace BenchmarkDotNet
 {
     public class BenchmarkRunner
     {
-        public BenchmarkRunner(IEnumerable<IBenchmarkLogger> loggers)
+        public BenchmarkRunner(BencmarkPluginMode mode = BencmarkPluginMode.Auto)
         {
-            Logger = new BenchmarkCompositeLogger(loggers.ToArray());
-            ReportExporter = MarkdownReportExporter.Default;
+            Plugins = new BenchmarkPlugins();
+            if (mode == BencmarkPluginMode.Auto)
+            {
+                Plugins.AddLogger(BenchmarkConsoleLogger.Default);
+                Plugins.AddExporter(BenchmarkMarkdownExporter.Default);
+            }
         }
 
-        public BenchmarkRunner() : this(new[] { new BenchmarkConsoleLogger() })
-        {
-        }
-
-        public IBenchmarkLogger Logger { get; }
-        public IReportExporter ReportExporter { get; }
+        public IBenchmarkPlugins Plugins { get; }
+        public IBenchmarkLogger Logger => Plugins.CompositeLogger;
+        public IBenchmarkExporter Exporter => Plugins.CompositeExporter;
+        public IBenchmarkDiagnoster Diagnoster => Plugins.CompositeDiagnoster;
 
         internal IEnumerable<BenchmarkReport> Run(List<Benchmark> benchmarks)
         {
@@ -69,7 +73,7 @@ namespace BenchmarkDotNet
             Logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
             Logger.NewLine();
 
-            ReportExporter.Export(reports, Logger);
+            Exporter.Export(reports, Logger);
 
             Logger.NewLine();
             Logger.WriteLineHeader("// ***** BenchmarkRunner: End *****");

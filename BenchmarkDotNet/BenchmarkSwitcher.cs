@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using BenchmarkDotNet.Export;
-using BenchmarkDotNet.Logging;
+using BenchmarkDotNet.Plugins;
+using BenchmarkDotNet.Plugins.Exporters;
+using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet
@@ -50,12 +51,14 @@ namespace BenchmarkDotNet
                     List<BenchmarkReport> reports;
                     using (var logStreamWriter = new StreamWriter(type.Name + ".log"))
                     {
-                        var loggers = new IBenchmarkLogger[] { new BenchmarkConsoleLogger(), new BenchmarkStreamLogger(logStreamWriter) };
-                        var runner = new BenchmarkRunner(loggers);
+                        var runner = new BenchmarkRunner(BencmarkPluginMode.Manual).
+                            AddLoggers(new BenchmarkConsoleLogger(), new BenchmarkStreamLogger(logStreamWriter)).
+                            AddExporters(BenchmarkMarkdownExporter.Default);
                         reports = runner.Run(type).ToList();
                     }
-                    MarkdownReportExporter.Default.SaveToFile(reports, type.Name + "-report.md");
-                    CsvReportExporter.Default.SaveToFile(reports, type.Name + "-report.csv");
+                    // TODO: use exporters
+                    BenchmarkMarkdownExporter.Default.SaveToFile(reports, type.Name + "-report.md");
+                    BenchmarkCsvExporter.Default.SaveToFile(reports, type.Name + "-report.csv");
                     logger.NewLine();
                 }
             }
@@ -66,8 +69,9 @@ namespace BenchmarkDotNet
                 var name = uri.IsFile ? Path.GetFileName(uri.LocalPath) : "URL";
                 using (var logStreamWriter = new StreamWriter(name + ".log"))
                 {
-                    var loggers = new IBenchmarkLogger[] { new BenchmarkConsoleLogger(), new BenchmarkStreamLogger(logStreamWriter) };
-                    var runner = new BenchmarkRunner(loggers);
+                    var runner = new BenchmarkRunner(BencmarkPluginMode.Manual).
+                        AddLoggers(new BenchmarkConsoleLogger(), new BenchmarkStreamLogger(logStreamWriter)).
+                        AddExporters(BenchmarkMarkdownExporter.Default);
                     runner.RunUrl(url);
                 }
             }

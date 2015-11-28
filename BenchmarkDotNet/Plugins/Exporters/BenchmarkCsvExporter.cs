@@ -1,20 +1,20 @@
 ﻿using System.Collections.Generic;
-using BenchmarkDotNet.Logging;
+using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Reports;
 
-namespace BenchmarkDotNet.Export
+namespace BenchmarkDotNet.Plugins.Exporters
 {
-    public class CsvReportExporter : IReportExporter
+    public class BenchmarkCsvExporter : IBenchmarkExporter
     {
-        public static CsvReportExporter Default = new CsvReportExporter();
+        public static readonly BenchmarkCsvExporter Default = new BenchmarkCsvExporter();
 
-        private CsvReportExporter()
+        private BenchmarkCsvExporter()
         {
         }
 
         public void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger)
         {
-            var table = ReportExporterHelper.BuildTable(reports, false, true);
+            var table = BenchmarkExporterHelper.BuildTable(reports, false, true);
             foreach (var line in table)
             {
                 for (int i = 0; i < line.Length; i++)

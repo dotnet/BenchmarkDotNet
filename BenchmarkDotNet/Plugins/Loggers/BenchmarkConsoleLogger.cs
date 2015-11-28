@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-namespace BenchmarkDotNet.Logging
+namespace BenchmarkDotNet.Plugins.Loggers
 {
     public sealed class BenchmarkConsoleLogger : IBenchmarkLogger
     {
+        public static readonly IBenchmarkLogger Default = new BenchmarkConsoleLogger();
+
         private const ConsoleColor DefaultColor = ConsoleColor.Gray;
 
         private readonly Dictionary<BenchmarkLogKind, ConsoleColor> colorScheme;

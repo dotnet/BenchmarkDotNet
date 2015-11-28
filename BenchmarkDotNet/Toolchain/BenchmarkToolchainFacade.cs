@@ -1,5 +1,5 @@
 ﻿using System;
-using BenchmarkDotNet.Logging;
+using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Tasks;
 using BenchmarkDotNet.Toolchain.Classic;
 using BenchmarkDotNet.Toolchain.Results;

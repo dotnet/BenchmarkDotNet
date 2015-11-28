@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using BenchmarkDotNet.Logging;
+using BenchmarkDotNet.Plugins.Diagnosters;
 using BenchmarkDotNet.Tasks;
 using BenchmarkDotNet.Toolchain.Results;
-using BenchmarkDotNet.Diagnostics;
+using BenchmarkDotNet.Plugins.Loggers;
 
 namespace BenchmarkDotNet.Toolchain.Classic
 {
@@ -81,6 +81,7 @@ namespace BenchmarkDotNet.Toolchain.Classic
             return new BenchmarkExecResult(false, new string[0]);
         }
 
+        // TODO: move to BenchmarkRunner (BencmarkPluginMode.Auto)
         private void RunCodeExtractor(Process process)
         {
             var diagnosticAssembly = "BenchmarkDotNet.Diagnostics.dll";
@@ -100,7 +101,7 @@ namespace BenchmarkDotNet.Toolchain.Classic
                 else
                 {
                     Type type = loadedAssembly.GetType("BenchmarkDotNet.Diagnostics.BenchmarkCodeExtractor");
-                    var codeExtractor = (IBenchmarkCodeExtractor)Activator.CreateInstance(type,
+                    var codeExtractor = (IBenchmarkDiagnoster)Activator.CreateInstance(type,
                                                                                           benchmark,
                                                                                           process,
                                                                                           Assembly.GetEntryAssembly().Location,

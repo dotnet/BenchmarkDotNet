@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Logging;
+using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Tasks;
 using BenchmarkDotNet.Toolchain.Results;
 

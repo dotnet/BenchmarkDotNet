@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Reports;
 
-namespace BenchmarkDotNet.Export
+namespace BenchmarkDotNet.Plugins.Exporters
 {
-    public static class ReportExporterHelper
+    public static class BenchmarkExporterHelper
     {
         // TODO: signature refactoring
         public static List<string[]> BuildTable(IList<BenchmarkReport> reports, bool pretty = true, bool extended = false)
