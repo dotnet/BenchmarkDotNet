@@ -75,9 +75,9 @@ namespace BenchmarkDotNet.Plugins.Exporters
 
                 if (showParams)
                     row.Add(reportStat.Report.Parameters.IntParam.ToString());
-                row.Add(timeToStringFunc(reportStat.Stat.AverageTime.Median));
+                row.Add(timeToStringFunc(reportStat.Stat.AverageTime.Mean));
                 row.Add(timeToStringFunc(reportStat.Stat.AverageTime.StandardDeviation));
-                row.Add(opsPerSecToStringFunc(reportStat.Stat.OperationsPerSeconds.Median));
+                row.Add(opsPerSecToStringFunc(reportStat.Stat.OperationsPerSeconds.Mean));
 
                 if (extended)
                     row.Add(timeToStringFunc(reportStat.Stat.AverageTime.StandardError));
