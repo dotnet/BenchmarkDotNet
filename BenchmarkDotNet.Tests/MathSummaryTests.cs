@@ -122,6 +122,7 @@ namespace BenchmarkDotNet.Tests
         {
             var summary = new StatSummary(Enumerable.Range(1, 30));
             Print(summary);
+            Assert.Equal(15.5, summary.ConfidenceInterval.Mean);
             Assert.Equal(12.34974, summary.ConfidenceInterval.Lower, 4);
             Assert.Equal(18.65026, summary.ConfidenceInterval.Upper, 4);
         }
