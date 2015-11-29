@@ -1,11 +1,13 @@
 ﻿using BenchmarkDotNet.Tasks;
 using System;
 using System.Collections.Generic;
+using BenchmarkDotNet.Plugins;
+using BenchmarkDotNet.Plugins.Loggers;
 using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class ParamsTestProperty : IntegrationTestBase
+    public class ParamsTestProperty
     {
         [Params(1, 2, 3, 8, 9, 10)]
         public int ParamProperty { get; set; }
@@ -15,10 +17,12 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void Test()
         {
-            var reports = new BenchmarkRunner().Run<ParamsTestProperty>();
+            var logger = new BenchmarkAccumulationLogger();
+            var plugins = new BenchmarkPluginBuilder().AddLogger(logger).Build();
+            var reports = new BenchmarkRunner(plugins).Run<ParamsTestProperty>();
             foreach (var param in new[] { 1, 2, 3, 8, 9, 10 })
-                Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, GetTestOutput());
-            Assert.DoesNotContain($"// ### New Parameter {default(int)} ###" + Environment.NewLine, GetTestOutput());
+                Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, logger.GetLog());
+            Assert.DoesNotContain($"// ### New Parameter {default(int)} ###" + Environment.NewLine, logger.GetLog());
         }
 
         [Benchmark]
@@ -33,7 +37,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
     }
 
-    public class ParamsTestField : IntegrationTestBase
+    public class ParamsTestField
     {
         [Params(1, 2, 3, 8, 9, 10)]
         public int ParamField = 0;
@@ -43,10 +47,12 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void Test()
         {
-            var reports = new BenchmarkRunner().Run<ParamsTestField>();
+            var logger = new BenchmarkAccumulationLogger();
+            var plugins = new BenchmarkPluginBuilder().AddLogger(logger).Build();
+            var reports = new BenchmarkRunner(plugins).Run<ParamsTestField>();
             foreach (var param in new[] { 1, 2, 3, 8, 9, 10 })
-                Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, GetTestOutput());
-            Assert.DoesNotContain($"// ### New Parameter 0 ###" + Environment.NewLine, GetTestOutput());
+                Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, logger.GetLog());
+            Assert.DoesNotContain($"// ### New Parameter 0 ###" + Environment.NewLine, logger.GetLog());
         }
 
         [Benchmark]

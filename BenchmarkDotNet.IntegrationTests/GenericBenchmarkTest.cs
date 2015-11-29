@@ -1,22 +1,28 @@
 ﻿using BenchmarkDotNet.Tasks;
 using System;
 using System.Linq;
+using BenchmarkDotNet.Plugins;
+using BenchmarkDotNet.Plugins.Loggers;
 using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class GenericBenchmarkTest : IntegrationTestBase
+    public class GenericBenchmarkTest
     {
         [Fact]
         public void Test()
         {
-            new BenchmarkRunner().Run<FlatClassBenchmark>();
-            var expected1 = $"// ### Benchmark: SerializationLibrary1, Type: {typeof(FlatClassBenchmark).Name} ###";
-            Assert.Contains(expected1, GetTestOutput());
+            var logger = new BenchmarkAccumulationLogger();
+            var plugins = new BenchmarkPluginBuilder().AddLogger(logger).Build();
 
-            new BenchmarkRunner().Run<DoubleArrayBenchmark>();
+            new BenchmarkRunner(plugins).Run<FlatClassBenchmark>();
+            var expected1 = $"// ### Benchmark: SerializationLibrary1, Type: {typeof(FlatClassBenchmark).Name} ###";
+            Assert.Contains(expected1, logger.GetLog());
+
+            logger.ClearLog();
+            new BenchmarkRunner(plugins).Run<DoubleArrayBenchmark>();
             var expected2 = $"// ### Benchmark: SerializationLibrary2, Type: {typeof(DoubleArrayBenchmark).Name} ###";
-            Assert.Contains(expected2, GetTestOutput());
+            Assert.Contains(expected2, logger.GetLog());
         }
     }
 

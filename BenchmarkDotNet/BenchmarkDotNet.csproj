@@ -57,11 +57,12 @@
     <Compile Include="Plugins\Diagnosers\BenchmarkCompositeDiagnoser.cs" />
     <Compile Include="Plugins\Diagnosers\IBenchmarkDiagnoser.cs" />
     <Compile Include="Extensions\ReportExtensions.cs" />
-    <Compile Include="Plugins\BenchmarkPlugins.cs" />
-    <Compile Include="Plugins\BenchmarkPluginMode.cs" />
+    <Compile Include="Plugins\BenchmarkPluginBuilder.cs" />
     <Compile Include="Plugins\Exporters\BenchmarkCompositeExporter.cs" />
+    <Compile Include="Plugins\IBenchmarkPluginBuilder.cs" />
     <Compile Include="Plugins\IBenchmarkPlugins.cs" />
     <Compile Include="Plugins\BenchmarkPluginsExtensions.cs" />
+    <Compile Include="Plugins\Loggers\BenchmarkAccumulationLogger.cs" />
     <Compile Include="Toolchain\BenchmarkToolchainFacade.cs" />
     <Compile Include="Toolchain\Classic\BenchmarkClassicBuilder.cs" />
     <Compile Include="Plugins\Exporters\BenchmarkCsvExporter.cs" />

@@ -51,9 +51,11 @@ namespace BenchmarkDotNet
                     List<BenchmarkReport> reports;
                     using (var logStreamWriter = new StreamWriter(type.Name + ".log"))
                     {
-                        var runner = new BenchmarkRunner(BenchmarkPluginMode.Manual).
+                        var plugins = new BenchmarkPluginBuilder().
                             AddLoggers(new BenchmarkConsoleLogger(), new BenchmarkStreamLogger(logStreamWriter)).
-                            AddExporters(BenchmarkMarkdownExporter.Default);
+                            AddExporters(BenchmarkMarkdownExporter.Default).
+                            Build();
+                        var runner = new BenchmarkRunner(plugins);
                         reports = runner.Run(type).ToList();
                     }
                     // TODO: use exporters
@@ -69,9 +71,11 @@ namespace BenchmarkDotNet
                 var name = uri.IsFile ? Path.GetFileName(uri.LocalPath) : "URL";
                 using (var logStreamWriter = new StreamWriter(name + ".log"))
                 {
-                    var runner = new BenchmarkRunner(BenchmarkPluginMode.Manual).
+                    var plugins = new BenchmarkPluginBuilder().
                         AddLoggers(new BenchmarkConsoleLogger(), new BenchmarkStreamLogger(logStreamWriter)).
-                        AddExporters(BenchmarkMarkdownExporter.Default);
+                        AddExporters(BenchmarkMarkdownExporter.Default).
+                        Build();
+                    var runner = new BenchmarkRunner(plugins);
                     runner.RunUrl(url);
                 }
             }

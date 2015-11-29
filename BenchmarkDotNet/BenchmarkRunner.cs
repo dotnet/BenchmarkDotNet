@@ -14,14 +14,16 @@ namespace BenchmarkDotNet
 {
     public class BenchmarkRunner
     {
-        public BenchmarkRunner(BenchmarkPluginMode mode = BenchmarkPluginMode.Auto)
-        {
-            Plugins = new BenchmarkPlugins();
-            if (mode == BenchmarkPluginMode.Auto)
+        public BenchmarkRunner(IBenchmarkPlugins plugins = null)
+        {            
+            if (plugins == null)
             {
-                Plugins.AddLogger(BenchmarkConsoleLogger.Default);
-                Plugins.AddExporter(BenchmarkMarkdownExporter.Default);
+                var builder = new BenchmarkPluginBuilder();
+                builder.AddLogger(BenchmarkConsoleLogger.Default);
+                builder.AddExporter(BenchmarkMarkdownExporter.Default);
+                plugins = builder.Build();
             }
+            Plugins = plugins;
         }
 
         public IBenchmarkPlugins Plugins { get; }

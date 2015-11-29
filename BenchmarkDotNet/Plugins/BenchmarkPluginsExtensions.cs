@@ -6,22 +6,25 @@ namespace BenchmarkDotNet.Plugins
 {
     public static class BenchmarkPluginsExtensions
     {
-        public static void AddLoggers(this IBenchmarkPlugins plugins, params IBenchmarkLogger[] loggers)
+        public static IBenchmarkPluginBuilder AddLoggers(this IBenchmarkPluginBuilder builder, params IBenchmarkLogger[] loggers)
         {
             foreach (var logger in loggers)
-                plugins.AddLogger(logger);
+                builder.AddLogger(logger);
+            return builder;
         }
 
-        public static void AddExporters(this IBenchmarkPlugins plugins, params IBenchmarkExporter[] exporters)
+        public static IBenchmarkPluginBuilder AddExporters(this IBenchmarkPluginBuilder builder, params IBenchmarkExporter[] exporters)
         {
             foreach (var exporter in exporters)
-                plugins.AddExporter(exporter);
+                builder.AddExporter(exporter);
+            return builder;
         }
 
-        public static void AddDiagnoser(this IBenchmarkPlugins plugins, params IBenchmarkDiagnoser[] diagnosers)
+        public static IBenchmarkPluginBuilder AddDiagnoser(this IBenchmarkPluginBuilder builder, params IBenchmarkDiagnoser[] diagnosers)
         {
             foreach (var diagnoser in diagnosers)
-                plugins.AddDiagnoser(diagnoser);
+                builder.AddDiagnoser(diagnoser);
+            return builder;
         }
     }
 }

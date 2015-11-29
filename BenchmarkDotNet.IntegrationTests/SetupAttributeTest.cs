@@ -1,17 +1,21 @@
 ﻿using BenchmarkDotNet.Tasks;
 using System;
 using System.Threading;
+using BenchmarkDotNet.Plugins;
+using BenchmarkDotNet.Plugins.Loggers;
 using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class SetupAttributeTest : IntegrationTestBase
+    public class SetupAttributeTest
     {
         [Fact]
         public void Test()
         {
-            var reports = new BenchmarkRunner().Run<SetupAttributeTest>();
-            Assert.Contains("// ### Setup called ###" + Environment.NewLine, GetTestOutput());
+            var logger = new BenchmarkAccumulationLogger();
+            var plugins = new BenchmarkPluginBuilder().AddLogger(logger).Build();
+            var reports = new BenchmarkRunner(plugins).Run<SetupAttributeTest>();
+            Assert.Contains("// ### Setup called ###" + Environment.NewLine, logger.GetLog());
         }
 
         [Setup]

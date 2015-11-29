@@ -3,20 +3,24 @@ using BenchmarkDotNet.Tasks;
 using System;
 using System.Linq;
 using System.Threading;
+using BenchmarkDotNet.Plugins;
+using BenchmarkDotNet.Plugins.Loggers;
 using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
     [BenchmarkTask(mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 5)]
-    public class PerformanceUnitTest : IntegrationTestBase
+    public class PerformanceUnitTest
     {
         [Fact]
         public void Test()
         {
-            var reports = new BenchmarkRunner().Run<PerformanceUnitTest>();
+            var logger = new BenchmarkAccumulationLogger();
+            var plugins = new BenchmarkPluginBuilder().AddLogger(logger).Build();
+            var reports = new BenchmarkRunner(plugins).Run<PerformanceUnitTest>();
 
             // Sanity checks, to be sure that the different benchmarks actually run
-            var testOutput = GetTestOutput();
+            var testOutput = logger.GetLog();
             Assert.Contains("// ### Slow Benchmark called ###" + Environment.NewLine, testOutput);
             Assert.Contains("// ### Fast Benchmark called ###" + Environment.NewLine, testOutput);
 

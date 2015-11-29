@@ -5,7 +5,7 @@ using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class SetupAttributeInvalidMethodTest : IntegrationTestBase
+    public class SetupAttributeInvalidMethodTest
     {
         [Fact]
         public void Test()

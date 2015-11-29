@@ -2,12 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Plugins;
+using BenchmarkDotNet.Plugins.Loggers;
 using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
     // Delibrately made the Property "static" to ensure that Params also work okay in this scenario
-    public class ParamsTestStaticProperty : IntegrationTestBase
+    public class ParamsTestStaticProperty
     {
         [Params(1, 2, 3, 8, 9, 10)]
         public static int StaticParamProperty { get; set; }
@@ -17,10 +19,12 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void Test()
         {
-            var reports = new BenchmarkRunner().Run<ParamsTestStaticProperty>();
+            var logger = new BenchmarkAccumulationLogger();
+            var plugins = new BenchmarkPluginBuilder().AddLogger(logger).Build();
+            var reports = new BenchmarkRunner(plugins).Run<ParamsTestStaticProperty>();
             foreach (var param in new[] { 1, 2, 3, 8, 9, 10 })
-                Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, GetTestOutput());
-            Assert.DoesNotContain($"// ### New Parameter {default(int)} ###" + Environment.NewLine, GetTestOutput());
+                Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, logger.GetLog());
+            Assert.DoesNotContain($"// ### New Parameter {default(int)} ###" + Environment.NewLine, logger.GetLog());
         }
 
         [Benchmark]
@@ -36,7 +40,7 @@ namespace BenchmarkDotNet.IntegrationTests
     }
 
     // Delibrately made everything "static" (as well as using a Field) to ensure that Params also work okay in this scenario
-    public class ParamsTestStaticField : IntegrationTestBase
+    public class ParamsTestStaticField
     {
         [Params(1, 2, 3, 8, 9, 10)]
         public static int StaticParamField = 0;
@@ -46,10 +50,12 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public static void Test()
         {
-            var reports = new BenchmarkRunner().Run<ParamsTestStaticField>();
+            var logger = new BenchmarkAccumulationLogger();
+            var plugins = new BenchmarkPluginBuilder().AddLogger(logger).Build();
+            var reports = new BenchmarkRunner(plugins).Run<ParamsTestStaticField>();
             foreach (var param in new[] { 1, 2, 3, 8, 9, 10 })
-                Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, GetTestOutput());
-            Assert.DoesNotContain($"// ### New Parameter 0 ###" + Environment.NewLine, GetTestOutput());
+                Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, logger.GetLog());
+            Assert.DoesNotContain($"// ### New Parameter 0 ###" + Environment.NewLine, logger.GetLog());
         }
 
         [Benchmark]
