@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var slowBenchmarkReport = reports.GetReportFor<PerformanceUnitTest>(r => r.SlowBenchmark());
             var fastBenchmarkReport = reports.GetReportFor<PerformanceUnitTest>(r => r.FastBenchmark());
             foreach (var slowRun in slowBenchmarkReport.Runs)
-                Assert.InRange(slowRun.AverageNanoseconds / 1000.0 / 1000.0, low: 499, high: 501);
+                Assert.InRange(slowRun.AverageNanoseconds / 1000.0 / 1000.0, low: 499, high: 502);
             foreach (var fastRun in fastBenchmarkReport.Runs)
                 Assert.InRange(fastRun.AverageNanoseconds / 1000.0 / 1000.0, low: 14, high: 16);
         }
