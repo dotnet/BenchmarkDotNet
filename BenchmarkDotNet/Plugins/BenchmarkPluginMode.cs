@@ -1,6 +1,6 @@
 ﻿namespace BenchmarkDotNet.Plugins
 {
-    public enum BencmarkPluginMode
+    public enum BenchmarkPluginMode
     {
         Auto, Manual
     }

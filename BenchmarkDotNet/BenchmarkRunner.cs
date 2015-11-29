@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Plugins.Exporters;
 using BenchmarkDotNet.Plugins;
-using BenchmarkDotNet.Plugins.Diagnosters;
+using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tasks;
@@ -14,10 +14,10 @@ namespace BenchmarkDotNet
 {
     public class BenchmarkRunner
     {
-        public BenchmarkRunner(BencmarkPluginMode mode = BencmarkPluginMode.Auto)
+        public BenchmarkRunner(BenchmarkPluginMode mode = BenchmarkPluginMode.Auto)
         {
             Plugins = new BenchmarkPlugins();
-            if (mode == BencmarkPluginMode.Auto)
+            if (mode == BenchmarkPluginMode.Auto)
             {
                 Plugins.AddLogger(BenchmarkConsoleLogger.Default);
                 Plugins.AddExporter(BenchmarkMarkdownExporter.Default);
@@ -27,7 +27,7 @@ namespace BenchmarkDotNet
         public IBenchmarkPlugins Plugins { get; }
         public IBenchmarkLogger Logger => Plugins.CompositeLogger;
         public IBenchmarkExporter Exporter => Plugins.CompositeExporter;
-        public IBenchmarkDiagnoster Diagnoster => Plugins.CompositeDiagnoster;
+        public IBenchmarkDiagnoser Diagnoser => Plugins.CompositeDiagnoser;
 
         internal IEnumerable<BenchmarkReport> Run(List<Benchmark> benchmarks)
         {

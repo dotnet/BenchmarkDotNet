@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Globalization;
-using BenchmarkDotNet.Plugins.Diagnosters;
+using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Plugins.Loggers;
 using Microsoft.Diagnostics.Runtime;
 using Microsoft.Diagnostics.Runtime.Desktop;
@@ -13,7 +13,7 @@ using Microsoft.Diagnostics.Runtime.Interop;
 
 namespace BenchmarkDotNet.Diagnostics
 {
-    public class BenchmarkDiagnoster : IBenchmarkDiagnoster
+    public class BenchmarkDiagnoser : IBenchmarkDiagnoser
     {
         private Process process { get; set; }
         private string codeExeName { get; set; }
@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Diagnostics
 
         private IBenchmarkLogger logger { get; set; }
 
-        public BenchmarkDiagnoster(Benchmark benchmark, Process process, string codeExeName, IBenchmarkLogger logger)
+        public BenchmarkDiagnoser(Benchmark benchmark, Process process, string codeExeName, IBenchmarkLogger logger)
         {
             this.process = process;
             this.codeExeName = codeExeName;

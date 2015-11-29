@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Plugins.Diagnosters;
+﻿using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Plugins.Exporters;
 using BenchmarkDotNet.Plugins.Loggers;
 
@@ -18,10 +18,10 @@ namespace BenchmarkDotNet.Plugins
                 plugins.AddExporter(exporter);
         }
 
-        public static void AddDiagnoster(this IBenchmarkPlugins plugins, params IBenchmarkDiagnoster[] diagnosters)
+        public static void AddDiagnoser(this IBenchmarkPlugins plugins, params IBenchmarkDiagnoser[] diagnosers)
         {
-            foreach (var diagnoster in diagnosters)
-                plugins.AddDiagnoster(diagnoster);
+            foreach (var diagnoser in diagnosers)
+                plugins.AddDiagnoser(diagnoser);
         }
     }
 }

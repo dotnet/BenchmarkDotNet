@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Plugins.Diagnosters;
+﻿using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Plugins.Exporters;
 using BenchmarkDotNet.Plugins.Loggers;
 
@@ -8,10 +8,10 @@ namespace BenchmarkDotNet.Plugins
     {
         void AddLogger(IBenchmarkLogger logger);
         void AddExporter(IBenchmarkExporter exporter);
-        void AddDiagnoster(IBenchmarkDiagnoster diagnoster);
+        void AddDiagnoser(IBenchmarkDiagnoser diagnoser);
 
         IBenchmarkLogger CompositeLogger { get; }
         IBenchmarkExporter CompositeExporter { get; }
-        IBenchmarkDiagnoster CompositeDiagnoster { get; }
+        IBenchmarkDiagnoser CompositeDiagnoser { get; }
     }
 }
