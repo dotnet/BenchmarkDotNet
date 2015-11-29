@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using BenchmarkDotNet.Plugins.Analyzers;
 using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Plugins.Exporters;
 using BenchmarkDotNet.Plugins.Loggers;
@@ -16,6 +17,7 @@ namespace BenchmarkDotNet.Plugins
         public static readonly IBenchmarkExporter[] Exporters = { BenchmarkCsvExporter.Default, BenchmarkMarkdownExporter.Default };
         public static readonly IBenchmarkDiagnoser[] Diagnosers = LoadDiagnoser();
         public static readonly IBenchmarkToolchainBuilder[] Toolchains = CreateToolchainBuilders();
+        public static readonly IBenchmarkAnalyser[] Analyserses = { BenchmarkStdDevAnalyser.Default };
 
         private static IBenchmarkDiagnoser[] LoadDiagnoser()
         {

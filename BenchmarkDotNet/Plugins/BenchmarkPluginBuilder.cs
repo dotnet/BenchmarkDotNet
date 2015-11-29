@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Plugins.Analyzers;
 using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Plugins.Exporters;
 using BenchmarkDotNet.Plugins.Loggers;
@@ -15,6 +16,7 @@ namespace BenchmarkDotNet.Plugins
         private readonly List<IBenchmarkExporter> exporters = new List<IBenchmarkExporter>();
         private readonly List<IBenchmarkDiagnoser> diagnosers = new List<IBenchmarkDiagnoser>();
         private readonly List<IBenchmarkToolchainBuilder> toolchains = new List<IBenchmarkToolchainBuilder>();
+        private readonly List<IBenchmarkAnalyser> analysers = new List<IBenchmarkAnalyser>();
 
         private BenchmarkPluginBuilder()
         {
@@ -44,9 +46,16 @@ namespace BenchmarkDotNet.Plugins
             return this;
         }
 
+        public IBenchmarkPluginBuilder AddAnalyser(IBenchmarkAnalyser analyser)
+        {
+            analysers.Add(analyser);
+            return this;
+        }
+
         public IBenchmarkLogger CompositeLogger => new BenchmarkCompositeLogger(loggers.ToArray());
         public IBenchmarkExporter CompositeExporter => new BenchmarkCompositeExporter(exporters.ToArray());
         public IBenchmarkDiagnoser CompositeDiagnoser => new BenchmarkCompositeDiagnoser(diagnosers.ToArray());
+        public IBenchmarkAnalyser CompositeAnalyser => new BenchmarkCompositeAnalyser(analysers.ToArray());
 
         public IBenchmarkToolchainFacade CreateToolchain(Benchmark benchmark, IBenchmarkLogger logger)
         {
@@ -79,7 +88,8 @@ namespace BenchmarkDotNet.Plugins
                 AddDiagnosers(GetMathced(BenchmarkDefaultPlugins.Diagnosers, requestedDiagnosers, false)).
                 AddLoggers(GetMathced(BenchmarkDefaultPlugins.Loggers, requestedLoggers, true)).
                 AddExporters(GetMathced(BenchmarkDefaultPlugins.Exporters, requestedExprters, true)).
-                AddToolchains(BenchmarkDefaultPlugins.Toolchains);
+                AddToolchains(BenchmarkDefaultPlugins.Toolchains).
+                AddAnalysers(BenchmarkDefaultPlugins.Analyserses);
         }
 
         private static T[] GetMathced<T>(T[] items, string[] requestedNames, bool takeByDefault) where T : IPlugin

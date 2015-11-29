@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Plugins.Exporters
                 var row = new List<string>
                 {
                     b.Target.Type.Name,
-                    b.Target.Description,
+                    b.Target.MethodTitle,
                     b.Task.Configuration.Mode.ToString(),
                     b.Task.Configuration.Platform.ToString(),
                     b.Task.Configuration.JitVersion.ToString(),

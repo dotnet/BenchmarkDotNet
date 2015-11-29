@@ -51,6 +51,7 @@
     <Compile Include="Framework\Framework_DictionaryVsIDictionary.cs" />
     <Compile Include="Framework\Framework_StopwatchVsDateTime.cs" />
     <Compile Include="Framework\Framework_StringConcatVsStringBuilder.cs" />
+    <Compile Include="Introduction\Intro_07_Warnings.cs" />
     <Compile Include="JIT\Jit_GenericsMethod.cs" />
     <Compile Include="Introduction\Intro_06_Runtime.cs" />
     <Compile Include="JIT\Jit_AsVsCast.cs" />

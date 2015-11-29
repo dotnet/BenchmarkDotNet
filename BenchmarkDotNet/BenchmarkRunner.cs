@@ -83,6 +83,15 @@ namespace BenchmarkDotNet
 
             BenchmarkMarkdownExporter.Default.Export(reports, logger);
 
+            var warnings = Plugins.CompositeAnalyser.Analyze(reports).ToList();
+            if (warnings.Count > 0)
+            {
+                logger.NewLine();
+                logger.WriteLineError("// *** Warnings *** ");
+                foreach (var warning in warnings)
+                    logger.WriteLineError($"{warning.Message}");
+            }
+
             logger.NewLine();
             logger.WriteLineHeader("// ***** BenchmarkRunner: End *****");
             return reports;

@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Plugins.Diagnosers;
+﻿using BenchmarkDotNet.Plugins.Analyzers;
+using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Plugins.Exporters;
 using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Plugins.Toolchains;
@@ -32,6 +33,13 @@ namespace BenchmarkDotNet.Plugins
         {
             foreach (var toolchain in toolchains)
                 builder.AddToolchain(toolchain);
+            return builder;
+        }
+
+        public static IBenchmarkPluginBuilder AddAnalysers(this IBenchmarkPluginBuilder builder, params IBenchmarkAnalyser[] analysers)
+        {
+            foreach (var analyser in analysers)
+                builder.AddAnalyser(analyser);
             return builder;
         }
     }
