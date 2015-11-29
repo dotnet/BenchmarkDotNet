@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
+using Xunit;
 
 [assembly: AssemblyTitle("BenchmarkDotNet.IntegrationTests")]
 [assembly: AssemblyDescription("BenchmarkDotNet IntegrationTests")]
@@ -14,5 +15,7 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("74362bb1-9f64-4be5-b079-b4ac19dae5db")]
 
-[assembly: AssemblyVersion("0.7.7")]
-[assembly: AssemblyFileVersion("0.7.7")]
+[assembly: AssemblyVersion("0.7.8")]
+[assembly: AssemblyFileVersion("0.7.8")]
+
+[assembly: CollectionBehavior(DisableTestParallelization = true)]

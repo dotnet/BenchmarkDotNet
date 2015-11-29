@@ -120,7 +120,7 @@ namespace BenchmarkDotNet.Toolchain.Classic
         {
             var configuration = benchmark.Task.Configuration;
             var platform = configuration.Platform.ToConfig();
-            var framework = configuration.Framework.ToConfig();
+            var framework = configuration.Framework.ToConfig(benchmark.Target.Type);
 
             var template = GetTemplate("BenchmarkCsproj.txt");
             var content = template.

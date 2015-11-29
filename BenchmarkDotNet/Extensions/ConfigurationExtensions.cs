@@ -24,26 +24,24 @@ namespace BenchmarkDotNet.Extensions
             }
         }
 
-        public static string ToConfig(this BenchmarkFramework framework)
+        public static string ToConfig(this BenchmarkFramework framework, Type benchmarkType)
         {
             if (framework == BenchmarkFramework.HostFramework)
-                return DetectCurrentFramework();
+                return DetectCurrentFramework(benchmarkType);
             var number = framework.ToString().Substring(1);
             var numberArray = number.ToCharArray().Select(c => c.ToString()).ToArray();
             return "v" + string.Join(".", numberArray);
         }
 
-        private static string DetectCurrentFramework()
+        private static string DetectCurrentFramework(Type benchmarkType)
         {
-            var attribute = (Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly())
-                                .GetCustomAttributes(false)
-                                .OfType<Attribute>()
-                                .FirstOrDefault(a => a.ToString() == @"System.Runtime.Versioning.TargetFrameworkAttribute");
-            if (attribute == null)
+            var attributes = benchmarkType.Assembly.GetCustomAttributes(false).OfType<Attribute>();
+            var frameworkAttribute = attributes.FirstOrDefault(a => a.ToString() == @"System.Runtime.Versioning.TargetFrameworkAttribute");
+            if (frameworkAttribute == null)
                 return "v3.5";
-            var frameworkName = attribute.GetType()
+            var frameworkName = frameworkAttribute.GetType()
                 .GetProperty("FrameworkName", BindingFlags.Public | BindingFlags.Instance)
-                .GetValue(attribute, null)?.ToString();
+                .GetValue(frameworkAttribute, null)?.ToString();
             if (frameworkName != null)
                 frameworkName = frameworkName.Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries).Skip(1).FirstOrDefault() ?? "";
             return frameworkName;

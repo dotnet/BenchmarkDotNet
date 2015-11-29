@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.IntegrationTests
             foreach (var slowRun in slowBenchmarkReport.Runs)
                 Assert.InRange(slowRun.AverageNanoseconds / 1000.0 / 1000.0, low: 499, high: 502);
             foreach (var fastRun in fastBenchmarkReport.Runs)
-                Assert.InRange(fastRun.AverageNanoseconds / 1000.0 / 1000.0, low: 14, high: 16);
+                Assert.InRange(fastRun.AverageNanoseconds / 1000.0 / 1000.0, low: 14, high: 17);
         }
 
         [Benchmark]
