@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using BenchmarkDotNet.Plugins.Loggers;
-using BenchmarkDotNet.Toolchain.Results;
+using BenchmarkDotNet.Plugins.Toolchains.Results;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Execution;
 using Microsoft.Build.Framework;
 
-namespace BenchmarkDotNet.Toolchain.Classic
+namespace BenchmarkDotNet.Plugins.Toolchains.Classic
 {
     internal class BenchmarkClassicBuilder : IBenchmarkBuilder
     {

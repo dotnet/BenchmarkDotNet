@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void Test()
         {
             var logger = new BenchmarkAccumulationLogger();
-            var plugins = new BenchmarkPluginBuilder().AddLogger(logger).Build();
+            var plugins = BenchmarkPluginBuilder.CreateDefault().AddLogger(logger).Build();
 
             new BenchmarkRunner(plugins).Run<FlatClassBenchmark>();
             var expected1 = $"// ### Benchmark: SerializationLibrary1, Type: {typeof(FlatClassBenchmark).Name} ###";

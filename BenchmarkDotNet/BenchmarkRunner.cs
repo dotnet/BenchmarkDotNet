@@ -7,8 +7,8 @@ using BenchmarkDotNet.Plugins;
 using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tasks;
-using BenchmarkDotNet.Toolchain;
-using BenchmarkDotNet.Toolchain.Results;
+using BenchmarkDotNet.Plugins.Toolchains;
+using BenchmarkDotNet.Plugins.Toolchains.Results;
 
 namespace BenchmarkDotNet
 {
@@ -16,14 +16,7 @@ namespace BenchmarkDotNet
     {
         public BenchmarkRunner(IBenchmarkPlugins plugins = null)
         {
-            if (plugins == null)
-            {
-                var builder = new BenchmarkPluginBuilder();
-                builder.AddLogger(BenchmarkConsoleLogger.Default);
-                builder.AddExporter(BenchmarkMarkdownExporter.Default);
-                plugins = builder.Build();
-            }
-            Plugins = plugins;
+            Plugins = plugins ?? BenchmarkPluginBuilder.CreateDefault().Build();
         }
 
         private IBenchmarkPlugins Plugins { get; }
@@ -97,7 +90,7 @@ namespace BenchmarkDotNet
 
         private BenchmarkReport Run(IBenchmarkLogger logger, Benchmark benchmark, IList<string> importantPropertyNames, BenchmarkParameters parameters = null)
         {
-            var toolchain = BenchmarkToolchainFacade.CreateToolchain(benchmark, logger);
+            var toolchain = Plugins.CreateToolchain(benchmark, logger);
 
             logger.WriteLineHeader("// **************************");
             logger.WriteLineHeader("// Benchmark: " + benchmark.Description);

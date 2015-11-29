@@ -4,10 +4,10 @@ using System.Reflection;
 using System.Threading;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Plugins.Loggers;
+using BenchmarkDotNet.Plugins.Toolchains.Results;
 using BenchmarkDotNet.Tasks;
-using BenchmarkDotNet.Toolchain.Results;
 
-namespace BenchmarkDotNet.Toolchain.Classic
+namespace BenchmarkDotNet.Plugins.Toolchains.Classic
 {
     internal class BenchmarkClassicGenerator : IBenchmarkGenerator
     {

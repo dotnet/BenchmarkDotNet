@@ -5,10 +5,10 @@ using System.IO;
 using System.Reflection;
 using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Tasks;
-using BenchmarkDotNet.Toolchain.Results;
 using BenchmarkDotNet.Plugins.Loggers;
+using BenchmarkDotNet.Plugins.Toolchains.Results;
 
-namespace BenchmarkDotNet.Toolchain.Classic
+namespace BenchmarkDotNet.Plugins.Toolchains.Classic
 {
     internal class BenchmarkClassicExecutor : IBenchmarkExecutor
     {

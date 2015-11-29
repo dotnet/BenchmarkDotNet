@@ -4,14 +4,18 @@ using System.Reflection;
 using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Plugins.Exporters;
 using BenchmarkDotNet.Plugins.Loggers;
+using BenchmarkDotNet.Plugins.Toolchains;
+using BenchmarkDotNet.Plugins.Toolchains.Classic;
+using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet.Plugins
 {
     public static class BenchmarkDefaultPlugins
     {
-        public static IBenchmarkLogger[] Loggers = { BenchmarkConsoleLogger.Default };
-        public static IBenchmarkExporter[] Exporters = { BenchmarkCsvExporter.Default, BenchmarkMarkdownExporter.Default };
-        public static IBenchmarkDiagnoser[] Diagnosers = LoadDiagnoser();
+        public static readonly IBenchmarkLogger[] Loggers = { BenchmarkConsoleLogger.Default };
+        public static readonly IBenchmarkExporter[] Exporters = { BenchmarkCsvExporter.Default, BenchmarkMarkdownExporter.Default };
+        public static readonly IBenchmarkDiagnoser[] Diagnosers = LoadDiagnoser();
+        public static readonly IBenchmarkToolchainBuilder[] Toolchains = CreateToolchainBuilders();
 
         private static IBenchmarkDiagnoser[] LoadDiagnoser()
         {
@@ -42,6 +46,18 @@ namespace BenchmarkDotNet.Plugins
                 BenchmarkConsoleLogger.Default.WriteLineError("Error loading {0}: {1}", diagnosticAssembly, ex.Message);
             }
             return new IBenchmarkDiagnoser[0];
+        }
+
+        private static IBenchmarkToolchainBuilder[] CreateToolchainBuilders()
+        {
+            return new IBenchmarkToolchainBuilder[]
+            {
+                new BenchmarkToolchainBuilder(
+                    BenchmarkToolchain.Classic,
+                    (benchmark, logger) => new BenchmarkClassicGenerator(logger),
+                    (benchmark, logger) => new BenchmarkClassicBuilder(logger),
+                    (benchmark, logger) => new BenchmarkClassicExecutor(benchmark, logger)),
+            };
         }
     }
 }

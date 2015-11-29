@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void Test()
         {
             var logger = new BenchmarkAccumulationLogger();
-            var plugins = new BenchmarkPluginBuilder().AddLogger(logger).Build();
+            var plugins = BenchmarkPluginBuilder.CreateDefault().AddLogger(logger).Build();
             var reports = new BenchmarkRunner(plugins).Run<ParamsTestStaticProperty>();
             foreach (var param in new[] { 1, 2, 3, 8, 9, 10 })
                 Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, logger.GetLog());
@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public static void Test()
         {
             var logger = new BenchmarkAccumulationLogger();
-            var plugins = new BenchmarkPluginBuilder().AddLogger(logger).Build();
+            var plugins = BenchmarkPluginBuilder.CreateDefault().AddLogger(logger).Build();
             var reports = new BenchmarkRunner(plugins).Run<ParamsTestStaticField>();
             foreach (var param in new[] { 1, 2, 3, 8, 9, 10 })
                 Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, logger.GetLog());

@@ -4,6 +4,8 @@ using System.Linq;
 using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Plugins.Exporters;
 using BenchmarkDotNet.Plugins.Loggers;
+using BenchmarkDotNet.Plugins.Toolchains;
+using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet.Plugins
 {
@@ -12,6 +14,11 @@ namespace BenchmarkDotNet.Plugins
         private readonly List<IBenchmarkLogger> loggers = new List<IBenchmarkLogger>();
         private readonly List<IBenchmarkExporter> exporters = new List<IBenchmarkExporter>();
         private readonly List<IBenchmarkDiagnoser> diagnosers = new List<IBenchmarkDiagnoser>();
+        private readonly List<IBenchmarkToolchainBuilder> toolchains = new List<IBenchmarkToolchainBuilder>();
+
+        private BenchmarkPluginBuilder()
+        {
+        }
 
         public IBenchmarkPluginBuilder AddLogger(IBenchmarkLogger logger)
         {
@@ -31,11 +38,36 @@ namespace BenchmarkDotNet.Plugins
             return this;
         }
 
+        public IBenchmarkPluginBuilder AddToolchain(IBenchmarkToolchainBuilder toolchain)
+        {
+            toolchains.Add(toolchain);
+            return this;
+        }
+
         public IBenchmarkLogger CompositeLogger => new BenchmarkCompositeLogger(loggers.ToArray());
         public IBenchmarkExporter CompositeExporter => new BenchmarkCompositeExporter(exporters.ToArray());
         public IBenchmarkDiagnoser CompositeDiagnoser => new BenchmarkCompositeDiagnoser(diagnosers.ToArray());
 
+        public IBenchmarkToolchainFacade CreateToolchain(Benchmark benchmark, IBenchmarkLogger logger)
+        {
+            var toolchain = benchmark.Task.Configuration.Toolchain;
+            var targetToolchainBuilder = toolchains.FirstOrDefault(t => t.TargetToolchain == toolchain);
+            if (targetToolchainBuilder != null)
+                return targetToolchainBuilder.Build(benchmark, logger);
+            throw new NotSupportedException($"There are no toolchain implementations for the '{toolchain}' toolchain");
+        }
+
         public IBenchmarkPlugins Build() => this;
+
+        public static IBenchmarkPluginBuilder CreateEmpty()
+        {
+            return new BenchmarkPluginBuilder();
+        }
+
+        public static IBenchmarkPluginBuilder CreateDefault()
+        {
+            return BuildFromArgs(new string[0]);
+        }
 
         public static IBenchmarkPluginBuilder BuildFromArgs(string[] args)
         {
@@ -46,7 +78,8 @@ namespace BenchmarkDotNet.Plugins
             return new BenchmarkPluginBuilder().
                 AddDiagnosers(GetMathced(BenchmarkDefaultPlugins.Diagnosers, requestedDiagnosers, false)).
                 AddLoggers(GetMathced(BenchmarkDefaultPlugins.Loggers, requestedLoggers, true)).
-                AddExporters(GetMathced(BenchmarkDefaultPlugins.Exporters, requestedExprters, true));
+                AddExporters(GetMathced(BenchmarkDefaultPlugins.Exporters, requestedExprters, true)).
+                AddToolchains(BenchmarkDefaultPlugins.Toolchains);
         }
 
         private static T[] GetMathced<T>(T[] items, string[] requestedNames, bool takeByDefault) where T : IPlugin

@@ -52,20 +52,13 @@ namespace BenchmarkDotNet
                     logger.NewLine();
                 }
             }
+            // TODO: move this logic to the RunUrl method
             if (args.Length > 0 && (args[0].StartsWith("http://") || args[0].StartsWith("https://")))
             {
                 var url = args[0];
                 Uri uri = new Uri(url);
                 var name = uri.IsFile ? Path.GetFileName(uri.LocalPath) : "URL";
-                using (var logStreamWriter = new StreamWriter(name + ".log"))
-                {
-                    var plugins = new BenchmarkPluginBuilder().
-                        AddLoggers(new BenchmarkConsoleLogger(), new BenchmarkStreamLogger(logStreamWriter)).
-                        AddExporters(BenchmarkMarkdownExporter.Default).
-                        Build();
-                    var runner = new BenchmarkRunner(plugins);
-                    runner.RunUrl(url);
-                }
+                new BenchmarkRunner(BenchmarkPluginBuilder.BuildFromArgs(args).Build()).RunUrl(url);
             }
         }
 

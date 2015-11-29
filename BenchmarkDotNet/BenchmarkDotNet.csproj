@@ -64,20 +64,22 @@
     <Compile Include="Plugins\BenchmarkPluginsExtensions.cs" />
     <Compile Include="Plugins\IPlugin.cs" />
     <Compile Include="Plugins\Loggers\BenchmarkAccumulationLogger.cs" />
-    <Compile Include="Toolchain\BenchmarkToolchainFacade.cs" />
-    <Compile Include="Toolchain\Classic\BenchmarkClassicBuilder.cs" />
+    <Compile Include="Plugins\Toolchains\BenchmarkToolchainBuilder.cs" />
+    <Compile Include="Plugins\Toolchains\IBenchmarkToolchainBuilder.cs" />
+    <Compile Include="Plugins\Toolchains\BenchmarkToolchainFacade.cs" />
+    <Compile Include="Plugins\Toolchains\Classic\BenchmarkClassicBuilder.cs" />
     <Compile Include="Plugins\Exporters\BenchmarkCsvExporter.cs" />
     <Compile Include="Plugins\Exporters\IBenchmarkExporter.cs" />
     <Compile Include="Plugins\Exporters\BenchmarkMarkdownExporter.cs" />
     <Compile Include="Plugins\Exporters\BenchmarkExporterExtensions.cs" />
     <Compile Include="Plugins\Exporters\BenchmarkExporterHelper.cs" />
-    <Compile Include="Toolchain\IBenchmarkGenerator.cs" />
-    <Compile Include="Toolchain\IBenchmarkBuilder.cs" />
-    <Compile Include="Toolchain\IBenchmarkExecutor.cs" />
-    <Compile Include="Toolchain\IBenchmarkToolchainFacade.cs" />
-    <Compile Include="Toolchain\Results\BenchmarkBuildResult.cs" />
-    <Compile Include="Toolchain\Results\BenchmarkExecResult.cs" />
-    <Compile Include="Toolchain\Results\BenchmarkGenerateResult.cs" />
+    <Compile Include="Plugins\Toolchains\IBenchmarkGenerator.cs" />
+    <Compile Include="Plugins\Toolchains\IBenchmarkBuilder.cs" />
+    <Compile Include="Plugins\Toolchains\IBenchmarkExecutor.cs" />
+    <Compile Include="Plugins\Toolchains\IBenchmarkToolchainFacade.cs" />
+    <Compile Include="Plugins\Toolchains\Results\BenchmarkBuildResult.cs" />
+    <Compile Include="Plugins\Toolchains\Results\BenchmarkExecResult.cs" />
+    <Compile Include="Plugins\Toolchains\Results\BenchmarkGenerateResult.cs" />
     <Compile Include="Plugins\Loggers\MSBuildConsoleLogger.cs" />
     <Compile Include="ParamsAttribute.cs" />
     <Compile Include="Statistic\ConfidenceInterval.cs" />
@@ -91,11 +93,11 @@
     <Compile Include="OperationsPerInvokeAttribute.cs" />
     <Compile Include="Benchmark.cs" />
     <Compile Include="BenchmarkSwitcher.cs" />
-    <Compile Include="Toolchain\Classic\BenchmarkClassicExecutor.cs" />
+    <Compile Include="Plugins\Toolchains\Classic\BenchmarkClassicExecutor.cs" />
     <Compile Include="BenchmarkMethodInvoker.cs" />
     <Compile Include="Tasks\BenchmarkConfiguration.cs" />
     <Compile Include="Tasks\BenchmarkFramework.cs" />
-    <Compile Include="Toolchain\Classic\BenchmarkClassicGenerator.cs" />
+    <Compile Include="Plugins\Toolchains\Classic\BenchmarkClassicGenerator.cs" />
     <Compile Include="Tasks\BenchmarkJitVersion.cs" />
     <Compile Include="Tasks\BenchmarkMode.cs" />
     <Compile Include="Tasks\BenchmarkPlatform.cs" />
@@ -137,6 +139,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\BuildBenchmark.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Toolchain\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

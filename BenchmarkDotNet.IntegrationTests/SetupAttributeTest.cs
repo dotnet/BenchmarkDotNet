@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void Test()
         {
             var logger = new BenchmarkAccumulationLogger();
-            var plugins = new BenchmarkPluginBuilder().AddLogger(logger).Build();
+            var plugins = BenchmarkPluginBuilder.CreateDefault().AddLogger(logger).Build();
             var reports = new BenchmarkRunner(plugins).Run<SetupAttributeTest>();
             Assert.Contains("// ### Setup called ###" + Environment.NewLine, logger.GetLog());
         }

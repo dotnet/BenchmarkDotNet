@@ -1,11 +1,8 @@
-﻿using System;
-using BenchmarkDotNet.Plugins.Diagnosers;
-using BenchmarkDotNet.Plugins.Loggers;
+﻿using BenchmarkDotNet.Plugins.Diagnosers;
+using BenchmarkDotNet.Plugins.Toolchains.Results;
 using BenchmarkDotNet.Tasks;
-using BenchmarkDotNet.Toolchain.Classic;
-using BenchmarkDotNet.Toolchain.Results;
 
-namespace BenchmarkDotNet.Toolchain
+namespace BenchmarkDotNet.Plugins.Toolchains
 {
     internal class BenchmarkToolchainFacade : IBenchmarkToolchainFacade
     {
@@ -35,17 +32,6 @@ namespace BenchmarkDotNet.Toolchain
         public BenchmarkExecResult Exec(BenchmarkBuildResult buildResult, BenchmarkParameters parameters, IBenchmarkDiagnoser diagnoser)
         {
             return executor.Exec(buildResult, parameters, diagnoser);
-        }
-
-        public static IBenchmarkToolchainFacade CreateToolchain(Benchmark benchmark, IBenchmarkLogger logger)
-        {
-            switch (benchmark.Task.Configuration.Toolchain)
-            {
-                case BenchmarkToolchain.Classic:
-                    return new BenchmarkToolchainFacade(benchmark, new BenchmarkClassicGenerator(logger), new BenchmarkClassicBuilder(logger), new BenchmarkClassicExecutor(benchmark, logger));
-                default:
-                    throw new NotSupportedException();
-            }
         }
     }
 }

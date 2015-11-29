@@ -1,10 +1,10 @@
 ﻿using BenchmarkDotNet.Plugins.Diagnosers;
+using BenchmarkDotNet.Plugins.Toolchains.Results;
 using BenchmarkDotNet.Tasks;
-using BenchmarkDotNet.Toolchain.Results;
 
-namespace BenchmarkDotNet.Toolchain
+namespace BenchmarkDotNet.Plugins.Toolchains
 {
-    internal interface IBenchmarkToolchainFacade
+    public interface IBenchmarkToolchainFacade
     {
         BenchmarkGenerateResult Generate();
         BenchmarkBuildResult Build(BenchmarkGenerateResult generateResult);

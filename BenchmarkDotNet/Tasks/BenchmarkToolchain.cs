@@ -2,6 +2,10 @@
 {
     public enum BenchmarkToolchain
     {
-        Classic
+        Classic,
+        Custom1,
+        Custom2,
+        Custom3,
+        Custom4
     }
 }

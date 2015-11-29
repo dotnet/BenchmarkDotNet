@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace BenchmarkDotNet.Toolchain.Results
+namespace BenchmarkDotNet.Plugins.Toolchains.Results
 {
     public class BenchmarkExecResult
     {
