@@ -1,10 +1,13 @@
-﻿namespace BenchmarkDotNet.Plugins.Diagnosers
+﻿using System.Diagnostics;
+using BenchmarkDotNet.Plugins.Loggers;
+
+namespace BenchmarkDotNet.Plugins.Diagnosers
 {
     /// <summary>
     /// This is the interface that we expect the BenchmarkDotNet.Diagnostics "plugin" to implement
     /// </summary>
-    public interface IBenchmarkDiagnoser
+    public interface IBenchmarkDiagnoser : IPlugin
     {
-        void PrintCodeForMethod(bool printAssembly, bool printIL, bool printDiagnostics);
+        void Print(Benchmark benchmark, Process process, string codeExeName, IBenchmarkLogger logger);
     }
 }

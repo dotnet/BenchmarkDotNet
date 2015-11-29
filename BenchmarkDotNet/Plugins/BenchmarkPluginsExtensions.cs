@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Plugins
             return builder;
         }
 
-        public static IBenchmarkPluginBuilder AddDiagnoser(this IBenchmarkPluginBuilder builder, params IBenchmarkDiagnoser[] diagnosers)
+        public static IBenchmarkPluginBuilder AddDiagnosers(this IBenchmarkPluginBuilder builder, params IBenchmarkDiagnoser[] diagnosers)
         {
             foreach (var diagnoser in diagnosers)
                 builder.AddDiagnoser(diagnoser);

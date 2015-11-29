@@ -2,6 +2,9 @@
 {
     public class BenchmarkCompositeLogger : IBenchmarkLogger
     {
+        public string Name => "composite";
+        public string Description => "Composite logger";
+
         private readonly IBenchmarkLogger[] loggers;
 
         public BenchmarkCompositeLogger(params IBenchmarkLogger[] loggers)

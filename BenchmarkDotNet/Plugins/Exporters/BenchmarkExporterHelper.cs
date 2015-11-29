@@ -1,22 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Plugins.Exporters
 {
     public static class BenchmarkExporterHelper
     {
+        public static void ExportToFile(IBenchmarkExporter exporter, IList<BenchmarkReport> reports, string competitionName)
+        {
+            using (var stream = new StreamWriter(competitionName + "-report." + exporter.Name))
+                exporter.Export(reports, new BenchmarkStreamLogger(stream));
+        }
+
         // TODO: signature refactoring
         public static List<string[]> BuildTable(IList<BenchmarkReport> reports, bool pretty = true, bool extended = false)
         {
             var reportStats = reports.Where(r => r.Runs.Count > 0)
                                      .Select(r => new
-                                        {
-                                            r.Benchmark,
-                                            Report = r,
-                                            Stat = new BenchmarkRunReportsStatistic("Target", r.Runs)
-                                        }).ToList();
+                                     {
+                                         r.Benchmark,
+                                         Report = r,
+                                         Stat = new BenchmarkRunReportsStatistic("Target", r.Runs)
+                                     }).ToList();
             if (reportStats.Count == 0)
                 return new List<string[]>();
 

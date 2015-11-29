@@ -1,4 +1,5 @@
 ﻿using System;
+using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Tasks;
 using BenchmarkDotNet.Toolchain.Classic;
@@ -31,9 +32,9 @@ namespace BenchmarkDotNet.Toolchain
             return builder.Build(generateResult);
         }
 
-        public BenchmarkExecResult Exec(BenchmarkBuildResult buildResult, BenchmarkParameters parameters)
+        public BenchmarkExecResult Exec(BenchmarkBuildResult buildResult, BenchmarkParameters parameters, IBenchmarkDiagnoser diagnoser)
         {
-            return executor.Exec(buildResult, parameters);
+            return executor.Exec(buildResult, parameters, diagnoser);
         }
 
         public static IBenchmarkToolchainFacade CreateToolchain(Benchmark benchmark, IBenchmarkLogger logger)

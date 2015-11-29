@@ -50,7 +50,9 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BenchmarkDiagnoser.cs" />
+    <Compile Include="BenchmarkRuntimeDiagnoser.cs" />
+    <Compile Include="BenchmarkDiagnoserBase.cs" />
+    <Compile Include="BenchmarkSourceDiagnoser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Tasks;
+﻿using BenchmarkDotNet.Plugins.Diagnosers;
+using BenchmarkDotNet.Tasks;
 using BenchmarkDotNet.Toolchain.Results;
 
 namespace BenchmarkDotNet.Toolchain
@@ -7,6 +8,6 @@ namespace BenchmarkDotNet.Toolchain
     {
         BenchmarkGenerateResult Generate();
         BenchmarkBuildResult Build(BenchmarkGenerateResult generateResult);
-        BenchmarkExecResult Exec(BenchmarkBuildResult buildResult, BenchmarkParameters parameters);
+        BenchmarkExecResult Exec(BenchmarkBuildResult buildResult, BenchmarkParameters parameters, IBenchmarkDiagnoser diagnoser);
     }
 }

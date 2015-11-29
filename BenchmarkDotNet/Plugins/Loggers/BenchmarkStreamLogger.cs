@@ -5,6 +5,9 @@ namespace BenchmarkDotNet.Plugins.Loggers
 {
     public class BenchmarkStreamLogger : IBenchmarkLogger
     {
+        public string Name => "stream";
+        public string Description => "Stream logger";
+
         private readonly StreamWriter writer;
         private readonly CultureInfo cultureInfo;
 

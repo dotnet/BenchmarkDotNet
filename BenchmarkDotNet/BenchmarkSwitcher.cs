@@ -48,19 +48,7 @@ namespace BenchmarkDotNet
                 if (args.Any(arg => type.Name.ToLower().StartsWith(arg.ToLower())) || args.Contains("#" + i) || args.Contains("" + i) || args.Contains("*"))
                 {
                     logger.WriteLineHeader("Target competition: " + type.Name);
-                    List<BenchmarkReport> reports;
-                    using (var logStreamWriter = new StreamWriter(type.Name + ".log"))
-                    {
-                        var plugins = new BenchmarkPluginBuilder().
-                            AddLoggers(new BenchmarkConsoleLogger(), new BenchmarkStreamLogger(logStreamWriter)).
-                            AddExporters(BenchmarkMarkdownExporter.Default).
-                            Build();
-                        var runner = new BenchmarkRunner(plugins);
-                        reports = runner.Run(type).ToList();
-                    }
-                    // TODO: use exporters
-                    BenchmarkMarkdownExporter.Default.SaveToFile(reports, type.Name + "-report.md");
-                    BenchmarkCsvExporter.Default.SaveToFile(reports, type.Name + "-report.csv");
+                    new BenchmarkRunner(BenchmarkPluginBuilder.BuildFromArgs(args).Build()).Run(type);
                     logger.NewLine();
                 }
             }

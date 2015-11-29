@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Globalization;
-using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Plugins.Loggers;
 using Microsoft.Diagnostics.Runtime;
 using Microsoft.Diagnostics.Runtime.Desktop;
@@ -13,7 +12,7 @@ using Microsoft.Diagnostics.Runtime.Interop;
 
 namespace BenchmarkDotNet.Diagnostics
 {
-    public class BenchmarkDiagnoser : IBenchmarkDiagnoser
+    public class BenchmarkDiagnoserBase
     {
         private Process process { get; set; }
         private string codeExeName { get; set; }
@@ -25,7 +24,11 @@ namespace BenchmarkDotNet.Diagnostics
 
         private IBenchmarkLogger logger { get; set; }
 
-        public BenchmarkDiagnoser(Benchmark benchmark, Process process, string codeExeName, IBenchmarkLogger logger)
+        /// <summary>
+        /// Code from http://stackoverflow.com/questions/2057781/is-there-a-way-to-get-the-stacktraces-for-all-threads-in-c-like-java-lang-thre/24315960#24315960
+        /// also see http://stackoverflow.com/questions/31633541/clrmd-throws-exception-when-creating-runtime/31745689#31745689
+        /// </summary>
+        public void PrintCodeForMethod(Benchmark benchmark, Process process, string codeExeName, IBenchmarkLogger logger, bool printAssembly, bool printIL, bool printDiagnostics)
         {
             this.process = process;
             this.codeExeName = codeExeName;
@@ -37,14 +40,7 @@ namespace BenchmarkDotNet.Diagnostics
 
             var methodParams = string.Join(", ", methodInfo.GetParameters().Select(p => p.ParameterType.FullName));
             fullMethodName = $"{fullTypeName}.{methodInfo.Name}({methodParams})";
-        }
 
-        /// <summary>
-        /// Code from http://stackoverflow.com/questions/2057781/is-there-a-way-to-get-the-stacktraces-for-all-threads-in-c-like-java-lang-thre/24315960#24315960
-        /// also see http://stackoverflow.com/questions/31633541/clrmd-throws-exception-when-creating-runtime/31745689#31745689
-        /// </summary>
-        public void PrintCodeForMethod(bool printAssembly, bool printIL, bool printDiagnostics)
-        {
             logger?.WriteLine($"\nPrintAssembly={printAssembly}, PrintIL={printIL}");
             logger?.WriteLine($"Attaching to process {Path.GetFileName(process.MainModule.FileName)}, Pid={process.Id}");
             logger?.WriteLine($"Path {process.MainModule.FileName}");

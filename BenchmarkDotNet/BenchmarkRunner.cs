@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Plugins.Exporters;
 using BenchmarkDotNet.Plugins;
-using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tasks;
@@ -15,7 +15,7 @@ namespace BenchmarkDotNet
     public class BenchmarkRunner
     {
         public BenchmarkRunner(IBenchmarkPlugins plugins = null)
-        {            
+        {
             if (plugins == null)
             {
                 var builder = new BenchmarkPluginBuilder();
@@ -26,18 +26,31 @@ namespace BenchmarkDotNet
             Plugins = plugins;
         }
 
-        public IBenchmarkPlugins Plugins { get; }
-        public IBenchmarkLogger Logger => Plugins.CompositeLogger;
-        public IBenchmarkExporter Exporter => Plugins.CompositeExporter;
-        public IBenchmarkDiagnoser Diagnoser => Plugins.CompositeDiagnoser;
+        private IBenchmarkPlugins Plugins { get; }
 
-        internal IEnumerable<BenchmarkReport> Run(List<Benchmark> benchmarks)
+        private static int benchmarkRunIndex = 0;
+
+        internal IEnumerable<BenchmarkReport> Run(List<Benchmark> benchmarks, string competitionName = null)
         {
-            Logger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
-            Logger.WriteLineInfo("// Found benchmarks:");
+            benchmarkRunIndex++;
+            if (competitionName == null)
+                competitionName = $"BenchmarkRun-{benchmarkRunIndex:##000}-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}";
+            using (var logStreamWriter = new StreamWriter(competitionName + ".log"))
+            {
+                var logger = new BenchmarkCompositeLogger(Plugins.CompositeLogger, new BenchmarkStreamLogger(logStreamWriter));
+                var reports = Run(benchmarks, logger);
+                Plugins.CompositeExporter.ExportToFile(reports, competitionName);
+                return reports;
+            }
+        }
+
+        private List<BenchmarkReport> Run(List<Benchmark> benchmarks, IBenchmarkLogger logger)
+        {
+            logger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
+            logger.WriteLineInfo("// Found benchmarks:");
             foreach (var benchmark in benchmarks)
-                Logger.WriteLineInfo($"//   {benchmark.Description}");
-            Logger.NewLine();
+                logger.WriteLineInfo($"//   {benchmark.Description}");
+            logger.NewLine();
 
             var importantPropertyNames = benchmarks.Select(b => b.Properties).GetImportantNames();
 
@@ -46,13 +59,13 @@ namespace BenchmarkDotNet
             {
                 if (benchmark.Task.ParametersSets.IsEmpty())
                 {
-                    var report = Run(benchmark, importantPropertyNames);
+                    var report = Run(logger, benchmark, importantPropertyNames);
                     reports.Add(report);
                     if (report.Runs.Count > 0)
                     {
                         var stat = new BenchmarkRunReportsStatistic("Target", report.Runs);
-                        Logger.WriteLineResult($"AverageTime (ns/op): {stat.AverageTime}");
-                        Logger.WriteLineResult($"OperationsPerSecond: {stat.OperationsPerSeconds}");
+                        logger.WriteLineResult($"AverageTime (ns/op): {stat.AverageTime}");
+                        logger.WriteLineResult($"OperationsPerSecond: {stat.OperationsPerSeconds}");
                     }
                 }
                 else
@@ -60,116 +73,116 @@ namespace BenchmarkDotNet
                     var parametersSets = benchmark.Task.ParametersSets;
                     foreach (var parameters in parametersSets.ToParameters())
                     {
-                        var report = Run(benchmark, importantPropertyNames, parameters);
+                        var report = Run(logger, benchmark, importantPropertyNames, parameters);
                         reports.Add(report);
                         if (report.Runs.Count > 0)
                         {
                             var stat = new BenchmarkRunReportsStatistic("Target", report.Runs);
-                            Logger.WriteLineResult($"AverageTime (ns/op): {stat.AverageTime}");
-                            Logger.WriteLineResult($"OperationsPerSecond: {stat.OperationsPerSeconds}");
+                            logger.WriteLineResult($"AverageTime (ns/op): {stat.AverageTime}");
+                            logger.WriteLineResult($"OperationsPerSecond: {stat.OperationsPerSeconds}");
                         }
                     }
                 }
-                Logger.NewLine();
+                logger.NewLine();
             }
-            Logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
-            Logger.NewLine();
+            logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
+            logger.NewLine();
 
-            Exporter.Export(reports, Logger);
+            BenchmarkMarkdownExporter.Default.Export(reports, logger);
 
-            Logger.NewLine();
-            Logger.WriteLineHeader("// ***** BenchmarkRunner: End *****");
+            logger.NewLine();
+            logger.WriteLineHeader("// ***** BenchmarkRunner: End *****");
             return reports;
         }
 
-        private BenchmarkReport Run(Benchmark benchmark, IList<string> importantPropertyNames, BenchmarkParameters parameters = null)
+        private BenchmarkReport Run(IBenchmarkLogger logger, Benchmark benchmark, IList<string> importantPropertyNames, BenchmarkParameters parameters = null)
         {
-            var toolchain = BenchmarkToolchainFacade.CreateToolchain(benchmark, Logger);
+            var toolchain = BenchmarkToolchainFacade.CreateToolchain(benchmark, logger);
 
-            Logger.WriteLineHeader("// **************************");
-            Logger.WriteLineHeader("// Benchmark: " + benchmark.Description);
+            logger.WriteLineHeader("// **************************");
+            logger.WriteLineHeader("// Benchmark: " + benchmark.Description);
 
-            var generateResult = Generate(toolchain);
+            var generateResult = Generate(logger, toolchain);
             if (!generateResult.IsGenerateSuccess)
                 return BenchmarkReport.CreateEmpty(benchmark, parameters);
 
-            var buildResult = Build(toolchain, generateResult);
+            var buildResult = Build(logger, toolchain, generateResult);
             if (!buildResult.IsBuildSuccess)
                 return BenchmarkReport.CreateEmpty(benchmark, parameters);
 
-            var runReports = Exec(benchmark, importantPropertyNames, parameters, toolchain, buildResult);
+            var runReports = Exec(logger, benchmark, importantPropertyNames, parameters, toolchain, buildResult);
             return new BenchmarkReport(benchmark, runReports, parameters);
         }
 
-        private BenchmarkGenerateResult Generate(IBenchmarkToolchainFacade toolchain)
+        private BenchmarkGenerateResult Generate(IBenchmarkLogger logger, IBenchmarkToolchainFacade toolchain)
         {
-            Logger.WriteLineInfo("// *** Generate *** ");
+            logger.WriteLineInfo("// *** Generate *** ");
             var generateResult = toolchain.Generate();
             if (generateResult.IsGenerateSuccess)
             {
-                Logger.WriteLineInfo("// Result = Success");
-                Logger.WriteLineInfo($"// {nameof(generateResult.DirectoryPath)} = {generateResult.DirectoryPath}");
+                logger.WriteLineInfo("// Result = Success");
+                logger.WriteLineInfo($"// {nameof(generateResult.DirectoryPath)} = {generateResult.DirectoryPath}");
             }
             else
             {
-                Logger.WriteLineError("// Result = Failure");
+                logger.WriteLineError("// Result = Failure");
                 if (generateResult.GenerateException != null)
-                    Logger.WriteLineError($"// Exception: {generateResult.GenerateException.Message}");
+                    logger.WriteLineError($"// Exception: {generateResult.GenerateException.Message}");
             }
-            Logger.NewLine();
+            logger.NewLine();
             return generateResult;
         }
 
-        private BenchmarkBuildResult Build(IBenchmarkToolchainFacade toolchain, BenchmarkGenerateResult generateResult)
+        private BenchmarkBuildResult Build(IBenchmarkLogger logger, IBenchmarkToolchainFacade toolchain, BenchmarkGenerateResult generateResult)
         {
-            Logger.WriteLineInfo("// *** Build ***");
+            logger.WriteLineInfo("// *** Build ***");
             var buildResult = toolchain.Build(generateResult);
             if (buildResult.IsBuildSuccess)
             {
-                Logger.WriteLineInfo("// Result = Success");
+                logger.WriteLineInfo("// Result = Success");
             }
             else
             {
-                Logger.WriteLineError("// Result = Failure");
+                logger.WriteLineError("// Result = Failure");
                 if (buildResult.BuildException != null)
-                    Logger.WriteLineError($"// Exception: {buildResult.BuildException.Message}");
+                    logger.WriteLineError($"// Exception: {buildResult.BuildException.Message}");
             }
-            Logger.NewLine();
+            logger.NewLine();
             return buildResult;
         }
 
-        private List<BenchmarkRunReport> Exec(Benchmark benchmark, IList<string> importantPropertyNames, BenchmarkParameters parameters, IBenchmarkToolchainFacade toolchain, BenchmarkBuildResult buildResult)
+        private List<BenchmarkRunReport> Exec(IBenchmarkLogger logger, Benchmark benchmark, IList<string> importantPropertyNames, BenchmarkParameters parameters, IBenchmarkToolchainFacade toolchain, BenchmarkBuildResult buildResult)
         {
-            Logger.WriteLineInfo("// *** Exec ***");
+            logger.WriteLineInfo("// *** Exec ***");
             var processCount = Math.Max(1, benchmark.Task.ProcessCount);
             var runReports = new List<BenchmarkRunReport>();
 
             for (int processNumber = 0; processNumber < processCount; processNumber++)
             {
-                Logger.WriteLineInfo($"// Run, Process: {processNumber + 1} / {processCount}");
+                logger.WriteLineInfo($"// Run, Process: {processNumber + 1} / {processCount}");
                 if (parameters != null)
-                    Logger.WriteLineInfo($"// {parameters.ToInfo()}");
+                    logger.WriteLineInfo($"// {parameters.ToInfo()}");
                 if (importantPropertyNames.Any())
                 {
-                    Logger.WriteInfo("// ");
+                    logger.WriteInfo("// ");
                     foreach (var name in importantPropertyNames)
-                        Logger.WriteInfo($"{name}={benchmark.Properties.GetValue(name)} ");
-                    Logger.NewLine();
+                        logger.WriteInfo($"{name}={benchmark.Properties.GetValue(name)} ");
+                    logger.NewLine();
                 }
 
-                var execResult = toolchain.Exec(buildResult, parameters);
+                var execResult = toolchain.Exec(buildResult, parameters, Plugins.CompositeDiagnoser);
 
                 if (execResult.FoundExecutable)
                 {
-                    var iterRunReports = execResult.Data.Select(line => BenchmarkRunReport.Parse(Logger, line)).Where(r => r != null).ToList();
+                    var iterRunReports = execResult.Data.Select(line => BenchmarkRunReport.Parse(logger, line)).Where(r => r != null).ToList();
                     runReports.AddRange(iterRunReports);
                 }
                 else
                 {
-                    Logger.WriteLineError("Executable not found");
+                    logger.WriteLineError("Executable not found");
                 }
             }
-            Logger.NewLine();
+            logger.NewLine();
             return runReports;
         }
     }

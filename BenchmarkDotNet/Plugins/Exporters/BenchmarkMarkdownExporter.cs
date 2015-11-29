@@ -9,7 +9,10 @@ namespace BenchmarkDotNet.Plugins.Exporters
     // TODO: add support of GitHub markdown, Stackoverflow markdown
     public class BenchmarkMarkdownExporter : IBenchmarkExporter
     {
-        public static readonly BenchmarkMarkdownExporter Default = new BenchmarkMarkdownExporter();
+        public string Name => "md";
+        public string Description => "Markdown exporter";
+
+        public static readonly IBenchmarkExporter Default = new BenchmarkMarkdownExporter();
 
         private BenchmarkMarkdownExporter()
         {
@@ -33,7 +36,12 @@ namespace BenchmarkDotNet.Plugins.Exporters
             }
         }
 
-        private void PrintTable(List<string[]> table, IBenchmarkLogger logger, string [] columnsToAlwaysShow)
+        public void ExportToFile(IList<BenchmarkReport> reports, string competitionName)
+        {
+            BenchmarkExporterHelper.ExportToFile(this, reports, competitionName);
+        }
+
+        private void PrintTable(List<string[]> table, IBenchmarkLogger logger, string[] columnsToAlwaysShow)
         {
             if (table.Count == 0)
             {
@@ -61,7 +69,6 @@ namespace BenchmarkDotNet.Plugins.Exporters
                     if (areSame[colIndex] && columnsToShowIndexes.Contains(colIndex) == false)
                         logger.WriteInfo($"{table[0][colIndex]}={table[1][colIndex]}  ");
                 logger.NewLine();
-                logger.WriteLineInfo("```");
             }
 
             table.Insert(1, widths.Select(w => new string('-', w)).ToArray());
@@ -75,7 +82,6 @@ namespace BenchmarkDotNet.Plugins.Exporters
 
             if (areSame.Any(s => s))
             {
-                logger.WriteLineInfo("```");
                 logger.NewLine();
             }
         }

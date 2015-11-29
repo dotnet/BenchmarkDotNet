@@ -5,6 +5,9 @@ namespace BenchmarkDotNet.Plugins.Loggers
 {
     public class BenchmarkAccumulationLogger : IBenchmarkLogger
     {
+        public string Name => "acc";
+        public string Description => "Accumulation logger";
+
         private readonly StringBuilder builder = new StringBuilder();
 
         public void Write(BenchmarkLogKind logKind, string format, params object[] args)

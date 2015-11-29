@@ -6,6 +6,9 @@ namespace BenchmarkDotNet.Plugins.Exporters
 {
     public class BenchmarkCompositeExporter : IBenchmarkExporter
     {
+        public string Name => "composite";
+        public string Description => "Composite exporter";
+
         private readonly IBenchmarkExporter[] exporters;
 
         public BenchmarkCompositeExporter(params IBenchmarkExporter[] exporters)
@@ -17,6 +20,12 @@ namespace BenchmarkDotNet.Plugins.Exporters
         {
             foreach (var exporter in exporters)
                 exporter.Export(reports, logger);
+        }
+
+        public void ExportToFile(IList<BenchmarkReport> reports, string competitionName)
+        {
+            foreach (var exporter in exporters)
+                exporter.ExportToFile(reports, competitionName);
         }
     }
 }

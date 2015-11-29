@@ -87,6 +87,10 @@
     <Compile Include="CPU\Cpu_Ilp_RyuJit.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BenchmarkDotNet.Diagnostics\BenchmarkDotNet.Diagnostics.csproj">
+      <Project>{7bbae514-895c-4ca5-95ba-b2a1a0c2e0af}</Project>
+      <Name>BenchmarkDotNet.Diagnostics</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj">
       <Project>{0F20FA04-52D8-4DB9-8B39-909125396A87}</Project>
       <Name>BenchmarkDotNet</Name>

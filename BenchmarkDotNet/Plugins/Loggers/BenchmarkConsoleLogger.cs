@@ -7,6 +7,9 @@ namespace BenchmarkDotNet.Plugins.Loggers
 {
     public sealed class BenchmarkConsoleLogger : IBenchmarkLogger
     {
+        public string Name => "console";
+        public string Description => "Console logger";
+
         public static readonly IBenchmarkLogger Default = new BenchmarkConsoleLogger();
 
         private const ConsoleColor DefaultColor = ConsoleColor.Gray;

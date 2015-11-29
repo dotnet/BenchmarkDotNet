@@ -14,17 +14,17 @@ namespace BenchmarkDotNet
 
         public static IEnumerable<BenchmarkReport> Run(this BenchmarkRunner runner, Type type)
         {
-            return runner.Run(BenchmarkConverter.TypeToBenchmarks(type).ToSortedList());
+            return runner.Run(BenchmarkConverter.TypeToBenchmarks(type).ToSortedList(), type.Name);
         }
 
         public static IEnumerable<BenchmarkReport> RunUrl(this BenchmarkRunner runner, string url)
         {
-            return runner.Run(BenchmarkConverter.UrlToBenchmarks(url).ToSortedList());
+            return runner.Run(BenchmarkConverter.UrlToBenchmarks(url).ToSortedList(), "url"); // TODO: improve name
         }
 
         public static IEnumerable<BenchmarkReport> RunSource(this BenchmarkRunner runner, string source)
         {
-            return runner.Run(BenchmarkConverter.SourceToBenchmarks(source).ToSortedList());
+            return runner.Run(BenchmarkConverter.SourceToBenchmarks(source).ToSortedList(), "source"); // TODO: improve name
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Plugins.Exporters;
 using BenchmarkDotNet.Plugins.Loggers;
@@ -34,5 +36,35 @@ namespace BenchmarkDotNet.Plugins
         public IBenchmarkDiagnoser CompositeDiagnoser => new BenchmarkCompositeDiagnoser(diagnosers.ToArray());
 
         public IBenchmarkPlugins Build() => this;
+
+        public static IBenchmarkPluginBuilder BuildFromArgs(string[] args)
+        {
+            var requestedDiagnosers = Parse(args, "d");
+            var requestedLoggers = Parse(args, "l");
+            var requestedExprters = Parse(args, "e");
+
+            return new BenchmarkPluginBuilder().
+                AddDiagnosers(GetMathced(BenchmarkDefaultPlugins.Diagnosers, requestedDiagnosers, false)).
+                AddLoggers(GetMathced(BenchmarkDefaultPlugins.Loggers, requestedLoggers, true)).
+                AddExporters(GetMathced(BenchmarkDefaultPlugins.Exporters, requestedExprters, true));
+        }
+
+        private static T[] GetMathced<T>(T[] items, string[] requestedNames, bool takeByDefault) where T : IPlugin
+        {
+            if (requestedNames.Length == 0 && takeByDefault)
+                return items;
+            return items.Where(item => requestedNames.Contains(item.Name)).ToArray();
+        }
+
+        private static string[] Parse(string[] args, string keyword)
+        {
+            var prefix1 = $"-{keyword}=";
+            var prefix2 = $"-{keyword}:";
+            var arg = args.FirstOrDefault(a => a.StartsWith(prefix1) || a.StartsWith(prefix2));
+            if (arg == null)
+                return new string[0];
+            var content = arg.Substring(prefix1.Length);
+            return content.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
+        }
     }
 }

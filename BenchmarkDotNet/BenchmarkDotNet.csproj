@@ -53,7 +53,7 @@
     <Compile Include="BenchmarkIterationMode.cs" />
     <Compile Include="BenchmarkState.cs" />
     <Compile Include="BenchmarkRunnerExtensions.cs" />
-    <Compile Include="CommandLineArgs.cs" />
+    <Compile Include="Plugins\BenchmarkDefaultPlugins.cs" />
     <Compile Include="Plugins\Diagnosers\BenchmarkCompositeDiagnoser.cs" />
     <Compile Include="Plugins\Diagnosers\IBenchmarkDiagnoser.cs" />
     <Compile Include="Extensions\ReportExtensions.cs" />
@@ -62,6 +62,7 @@
     <Compile Include="Plugins\IBenchmarkPluginBuilder.cs" />
     <Compile Include="Plugins\IBenchmarkPlugins.cs" />
     <Compile Include="Plugins\BenchmarkPluginsExtensions.cs" />
+    <Compile Include="Plugins\IPlugin.cs" />
     <Compile Include="Plugins\Loggers\BenchmarkAccumulationLogger.cs" />
     <Compile Include="Toolchain\BenchmarkToolchainFacade.cs" />
     <Compile Include="Toolchain\Classic\BenchmarkClassicBuilder.cs" />

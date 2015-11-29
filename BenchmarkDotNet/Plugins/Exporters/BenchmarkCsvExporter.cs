@@ -6,7 +6,10 @@ namespace BenchmarkDotNet.Plugins.Exporters
 {
     public class BenchmarkCsvExporter : IBenchmarkExporter
     {
-        public static readonly BenchmarkCsvExporter Default = new BenchmarkCsvExporter();
+        public string Name => "csv";
+        public string Description => "Csv exporter";
+
+        public static readonly IBenchmarkExporter Default = new BenchmarkCsvExporter();
 
         private BenchmarkCsvExporter()
         {
@@ -25,6 +28,11 @@ namespace BenchmarkDotNet.Plugins.Exporters
                 }
                 logger.NewLine();
             }
+        }
+
+        public void ExportToFile(IList<BenchmarkReport> reports, string competitionName)
+        {
+            BenchmarkExporterHelper.ExportToFile(this, reports, competitionName);
         }
     }
 }
