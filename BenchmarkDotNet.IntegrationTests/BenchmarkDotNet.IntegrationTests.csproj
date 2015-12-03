@@ -36,6 +36,17 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Dia2Lib">
+      <HintPath>..\CLRMD\Dia2Lib.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Interop.Dia2Lib">
+      <HintPath>..\CLRMD\Interop.Dia2Lib.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Diagnostics.Runtime">
+      <HintPath>..\CLRMD\Microsoft.Diagnostics.Runtime.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
@@ -64,9 +75,14 @@
     <Compile Include="SetupAttributeInvalidMethodTest.cs" />
     <Compile Include="SetupAttributeTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SourceDiagnoserTest.cs" />
     <Compile Include="ToolchainTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BenchmarkDotNet.Diagnostics\BenchmarkDotNet.Diagnostics.csproj">
+      <Project>{7bbae514-895c-4ca5-95ba-b2a1a0c2e0af}</Project>
+      <Name>BenchmarkDotNet.Diagnostics</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj">
       <Project>{0f20fa04-52d8-4db9-8b39-909125396a87}</Project>
       <Name>BenchmarkDotNet</Name>
@@ -85,6 +101,9 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props'))" />
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /F /Y $(ProjectDir)..\CLRMD\x86\msdia120.dll $(TargetDir)</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
