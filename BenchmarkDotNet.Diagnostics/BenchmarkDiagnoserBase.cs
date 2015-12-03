@@ -20,8 +20,6 @@ namespace BenchmarkDotNet.Diagnostics
         private string fullTypeName { get; set; }
         private string fullMethodName { get; set; }
 
-        private Dictionary<ulong, Tuple<string, string>> MethodAddressLookup { get; set; }
-
         private IBenchmarkLogger logger { get; set; }
 
         /// <summary>
@@ -67,9 +65,6 @@ namespace BenchmarkDotNet.Diagnostics
                 logger?.WriteLine($"Type: {method.Type.Name}");
                 logger?.WriteLine($"Method: {method.Name}");
 
-                if (printAssembly)
-                    MethodAddressLookup = CreateMethodAddressLookup(runtime);
-
                 // TODO work out why this returns locations inside OTHER methods, it's like it doesn't have an upper bound and just keeps going!?
                 var ilOffsetLocations = module.GetSourceLocationsForMethod(@method.MetadataToken);
 
@@ -96,7 +91,7 @@ namespace BenchmarkDotNet.Diagnostics
                     if (printAssembly)
                     {
                         var debugControl = dataTarget.DebuggerInterface as IDebugControl;
-                        PrintAssemblyCode(@method, ilMaps, debugControl);
+                        PrintAssemblyCode(@method, ilMaps, runtime, debugControl);
                     }
                 }
             }
@@ -160,7 +155,7 @@ namespace BenchmarkDotNet.Diagnostics
         /// See https://github.com/goldshtn/msos/commit/705d3758d15835d2520b31fcf3028353bdbca73b#commitcomment-12499813
         /// and https://github.com/Microsoft/dotnetsamples/blob/master/Microsoft.Diagnostics.Runtime/CLRMD/ClrMemDiag/Debugger/IDebugControl.cs#L126-L156
         /// </summary>
-        private void PrintAssemblyCode(ClrMethod method, IList<ILToNativeMap> ilMaps, IDebugControl debugControl)
+        private void PrintAssemblyCode(ClrMethod method, IList<ILToNativeMap> ilMaps, ClrRuntime runtime, IDebugControl debugControl)
         {
             // This is the first instruction of the JIT'ed (or NGEN'ed) machine code.
             ulong startAddress = ilMaps.Select(entry => entry.StartAddress).Min();
@@ -176,8 +171,7 @@ namespace BenchmarkDotNet.Diagnostics
             uint disassemblySize;
             do
             {
-                // result always seems to be = 0?!
-                var flags = DEBUG_DISASM.EFFECTIVE_ADDRESS; // DEBUG_DISASM.SOURCE_FILE_NAME | DEBUG_DISASM.SOURCE_LINE_NUMBER;
+                var flags = DEBUG_DISASM.EFFECTIVE_ADDRESS;
                 var result = debugControl.Disassemble(startOffset, flags, lineOfAssembly, bufferSize, out disassemblySize, out endOffset);
                 startOffset = endOffset;
                 logger?.Write(lineOfAssembly.ToString());
@@ -185,14 +179,14 @@ namespace BenchmarkDotNet.Diagnostics
                 if (lineOfAssembly.ToString().Contains(" call ") == false)
                     continue;
 
-                var methodCallInfo = GetCalledMethodFromAssemblyOutput(lineOfAssembly.ToString());
+                var methodCallInfo = GetCalledMethodFromAssemblyOutput(runtime, lineOfAssembly.ToString());
                 if (string.IsNullOrWhiteSpace(methodCallInfo) == false)
-                    logger?.WriteLine(BenchmarkLogKind.Info, $"  *** {methodCallInfo} ***");
+                    logger?.WriteLine(BenchmarkLogKind.Info, $"  {methodCallInfo}");
             } while (disassemblySize > 0 && endOffset <= endAddress);
             logger?.WriteLine();
         }
 
-        private string GetCalledMethodFromAssemblyOutput(string assemblyString)
+        private string GetCalledMethodFromAssemblyOutput(ClrRuntime runtime, string assemblyString)
         {
             string hexAddressText = "";
             var callLocation = assemblyString.LastIndexOf("call");
@@ -225,54 +219,18 @@ namespace BenchmarkDotNet.Diagnostics
             ulong actualAddress;
             if (ulong.TryParse(hexAddressText, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out actualAddress))
             {
-                if (MethodAddressLookup.ContainsKey(actualAddress))
-                    return string.Format("Call: {0:X16} -> {1}", actualAddress, MethodAddressLookup[actualAddress].Item2);
-                else
-                    return string.Format("Call: {0:X16} -> No matching method found", actualAddress);
-            }
-
-            return $"{hexAddressText} -> Not a valid hex value";
-        }
-
-        private Dictionary<ulong, Tuple<string, string>> CreateMethodAddressLookup(ClrRuntime runtime)
-        {
-            var methodLookup = new Dictionary<ulong, Tuple<string, string>>();
-            long dupes = 0, overriddenMethods = 0, skips = 0;
-            logger?.WriteLine("\nScanning loaded Modules for Method Definitions:");
-            foreach (var module in runtime.EnumerateModules())
-            {
-                logger?.WriteLine($"  {Path.GetFileName(module.FileName)}");
-                foreach (var type in module.EnumerateTypes().Where(t => t.IsPublic))
+                ClrMethod method = runtime.GetMethodByAddress(actualAddress);
+                if (method != null)
                 {
-                    foreach (var method in type.Methods.Where(m => m.IsPublic && //!m.IsAbstract &&
-                                                                   m.NativeCode != ulong.MaxValue))
-                    {
-                        var cleanedUpMethodName = method.ToString().Replace("ClrMethod signature=", "")
-                                                                   .Replace("<'", "")
-                                                                   .Replace("' />", "");
-                        if (cleanedUpMethodName.StartsWith(type.Name) == false)
-                        {
-                            overriddenMethods++;
-                            continue;
-                        }
-
-                        var methodAddress = method.NativeCode;
-                        if (methodLookup.ContainsKey(methodAddress))
-                        {
-                            dupes++;
-                        }
-                        else
-                        {
-                            methodLookup.Add(methodAddress, Tuple.Create(type.Name, cleanedUpMethodName));
-                        }
-                    }
+                    return $"Call: {method.GetFullSignature()}";
                 }
+                else
+                    return $"Call: {actualAddress:x16} -> No matching method found";
             }
 
-            logger?.WriteLine("After analysis there are {0:N0} items in the lookup, {1:N0} overridden Methods, {2:N0} skips and {3:N0} dupes",
-                              methodLookup.Count, overriddenMethods, skips, dupes);
-            return methodLookup;
+            return $"\"{hexAddressText}\" -> Not a valid hex value";
         }
+
         private void PrintRuntimeDiagnosticInfo(DataTarget dataTarget, ClrRuntime runtime)
         {
             logger?.WriteLine(BenchmarkLogKind.Header, "\nRuntime Diagnostic Information");
