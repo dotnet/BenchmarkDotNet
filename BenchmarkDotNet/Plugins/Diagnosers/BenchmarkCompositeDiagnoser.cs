@@ -15,10 +15,10 @@ namespace BenchmarkDotNet.Plugins.Diagnosers
             this.diagnosers = diagnosers;
         }
 
-        public void Print(Benchmark benchmark, Process process, string codeExeName, IBenchmarkLogger logger)
+        public void Print(Benchmark benchmark, Process process, IBenchmarkLogger logger)
         {
             foreach (var diagnoster in diagnosers)
-                diagnoster.Print(benchmark, process, codeExeName, logger);
+                diagnoster.Print(benchmark, process, logger);
         }
     }
 }

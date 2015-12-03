@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Tasks;
 using BenchmarkDotNet.Plugins.Loggers;
@@ -49,9 +48,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
                             {
                                 try
                                 {
-                                    var assembly = Assembly.GetEntryAssembly();
-                                    if (assembly != null)
-                                        diagnoser.Print(benchmark, process, assembly.Location, logger);
+                                    diagnoser.Print(benchmark, process, logger);
                                 }
                                 finally
                                 {

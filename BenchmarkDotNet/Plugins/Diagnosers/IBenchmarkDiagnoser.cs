@@ -8,6 +8,6 @@ namespace BenchmarkDotNet.Plugins.Diagnosers
     /// </summary>
     public interface IBenchmarkDiagnoser : IPlugin
     {
-        void Print(Benchmark benchmark, Process process, string codeExeName, IBenchmarkLogger logger);
+        void Print(Benchmark benchmark, Process process, IBenchmarkLogger logger);
     }
 }

@@ -9,9 +9,9 @@ namespace BenchmarkDotNet.Diagnostics
         public string Name => "runtime";
         public string Description => "Runtime Diagnoser";
 
-        public void Print(Benchmark benchmark, Process process, string codeExeName, IBenchmarkLogger logger)
+        public void Print(Benchmark benchmark, Process process, IBenchmarkLogger logger)
         {
-            PrintCodeForMethod(benchmark, process, codeExeName, logger, false, false, true);
+            PrintCodeForMethod(benchmark, process, logger, false, false, true);
         }
     }
 }

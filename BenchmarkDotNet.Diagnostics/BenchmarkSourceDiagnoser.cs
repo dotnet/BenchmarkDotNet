@@ -9,9 +9,9 @@ namespace BenchmarkDotNet.Diagnostics
         public string Name => "source";
         public string Description => "Source (IL/ASM) diagnoser";
 
-        public void Print(Benchmark benchmark, Process process, string codeExeName, IBenchmarkLogger logger)
+        public void Print(Benchmark benchmark, Process process, IBenchmarkLogger logger)
         {
-            PrintCodeForMethod(benchmark, process, codeExeName, logger, true, true, false);
+            PrintCodeForMethod(benchmark, process, logger, true, true, false);
         }
     }
 }

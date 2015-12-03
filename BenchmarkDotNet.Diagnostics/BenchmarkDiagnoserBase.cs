@@ -28,10 +28,9 @@ namespace BenchmarkDotNet.Diagnostics
         /// Code from http://stackoverflow.com/questions/2057781/is-there-a-way-to-get-the-stacktraces-for-all-threads-in-c-like-java-lang-thre/24315960#24315960
         /// also see http://stackoverflow.com/questions/31633541/clrmd-throws-exception-when-creating-runtime/31745689#31745689
         /// </summary>
-        public void PrintCodeForMethod(Benchmark benchmark, Process process, string codeExeName, IBenchmarkLogger logger, bool printAssembly, bool printIL, bool printDiagnostics)
+        public void PrintCodeForMethod(Benchmark benchmark, Process process, IBenchmarkLogger logger, bool printAssembly, bool printIL, bool printDiagnostics)
         {
             this.process = process;
-            this.codeExeName = codeExeName;
             this.logger = logger;
 
             //Method name format: "BenchmarkDotNet.Samples.Infra.RunFast()" (NOTE: WITHOUT the return type)
@@ -41,6 +40,7 @@ namespace BenchmarkDotNet.Diagnostics
             var methodParams = string.Join(", ", methodInfo.GetParameters().Select(p => p.ParameterType.FullName));
             fullMethodName = $"{fullTypeName}.{methodInfo.Name}({methodParams})";
 
+            logger?.WriteLine($"\nPrinting Code for Method: {fullMethodName}");
             logger?.WriteLine($"\nPrintAssembly={printAssembly}, PrintIL={printIL}");
             logger?.WriteLine($"Attaching to process {Path.GetFileName(process.MainModule.FileName)}, Pid={process.Id}");
             logger?.WriteLine($"Path {process.MainModule.FileName}");
