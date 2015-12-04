@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Plugins;
-using BenchmarkDotNet.Plugins.Exporters;
 using BenchmarkDotNet.Plugins.Loggers;
-using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet
 {

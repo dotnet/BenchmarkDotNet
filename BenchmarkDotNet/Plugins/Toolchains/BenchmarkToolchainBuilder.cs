@@ -1,7 +1,6 @@
 ﻿using System;
 using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Tasks;
-using BenchmarkDotNet.Plugins.Toolchains;
 
 namespace BenchmarkDotNet.Plugins.Toolchains
 {

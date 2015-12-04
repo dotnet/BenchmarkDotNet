@@ -6,7 +6,6 @@ using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Plugins.Exporters;
 using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Plugins.Toolchains;
-using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet.Plugins
 {
@@ -85,14 +84,14 @@ namespace BenchmarkDotNet.Plugins
             var requestedExprters = Parse(args, "e");
 
             return new BenchmarkPluginBuilder().
-                AddDiagnosers(GetMathced(BenchmarkDefaultPlugins.Diagnosers, requestedDiagnosers, false)).
-                AddLoggers(GetMathced(BenchmarkDefaultPlugins.Loggers, requestedLoggers, true)).
-                AddExporters(GetMathced(BenchmarkDefaultPlugins.Exporters, requestedExprters, true)).
+                AddDiagnosers(GetMatched(BenchmarkDefaultPlugins.Diagnosers, requestedDiagnosers, false)).
+                AddLoggers(GetMatched(BenchmarkDefaultPlugins.Loggers, requestedLoggers, true)).
+                AddExporters(GetMatched(BenchmarkDefaultPlugins.Exporters, requestedExprters, true)).
                 AddToolchains(BenchmarkDefaultPlugins.Toolchains).
-                AddAnalysers(BenchmarkDefaultPlugins.Analyserses);
+                AddAnalysers(BenchmarkDefaultPlugins.Analysers);
         }
 
-        private static T[] GetMathced<T>(T[] items, string[] requestedNames, bool takeByDefault) where T : IPlugin
+        private static T[] GetMatched<T>(T[] items, string[] requestedNames, bool takeByDefault) where T : IPlugin
         {
             if (requestedNames.Length == 0 && takeByDefault)
                 return items;
