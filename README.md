@@ -71,7 +71,7 @@ Type=Cpu_Ilp_Inc  Mode=Throughput  .NET=HostFramework
 | Sequential |      X86 | LegacyJit | 3.0057 ns | 0.0664 ns |   332,699,953.00 |
 
 ## Advanced Features
-BenchmarkDotNet provieds you with several features that let you write more complex and powerful benchmarks. 
+BenchmarkDotNet provides you with several features that let you write more complex and powerful benchmarks. 
 
 - `[Setup]` attribute let you specify a method that can be run before each benchmark *batch* or *run*
 - `[Params(..)]` makes it easy to run the same benchmark with different input values
