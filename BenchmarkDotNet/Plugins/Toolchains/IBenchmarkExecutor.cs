@@ -6,6 +6,6 @@ namespace BenchmarkDotNet.Plugins.Toolchains
 {
     public interface IBenchmarkExecutor
     {
-        BenchmarkExecResult Exec(BenchmarkBuildResult buildResult, BenchmarkParameters parameters, IBenchmarkDiagnoser diagnoser);
+        BenchmarkExecResult Execute(BenchmarkBuildResult buildResult, BenchmarkParameters parameters, IBenchmarkDiagnoser diagnoser);
     }
 }

@@ -29,9 +29,9 @@ namespace BenchmarkDotNet.Plugins.Toolchains
             return builder.Build(generateResult);
         }
 
-        public BenchmarkExecResult Exec(BenchmarkBuildResult buildResult, BenchmarkParameters parameters, IBenchmarkDiagnoser diagnoser)
+        public BenchmarkExecResult Execute(BenchmarkBuildResult buildResult, BenchmarkParameters parameters, IBenchmarkDiagnoser diagnoser)
         {
-            return executor.Exec(buildResult, parameters, diagnoser);
+            return executor.Execute(buildResult, parameters, diagnoser);
         }
     }
 }
