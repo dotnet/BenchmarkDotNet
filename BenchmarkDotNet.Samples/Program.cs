@@ -16,8 +16,8 @@ namespace BenchmarkDotNet.Samples
                 .OrderBy(t => t.Namespace)
                 .ThenBy(t => t.Name)
                 .ToArray();
-            var competitionSwitch = new BenchmarkSwitcher(benchmarks);
-            competitionSwitch.Run(args);
+            var benchmarkSwitcher = new BenchmarkSwitcher(benchmarks);
+            benchmarkSwitcher.Run(args);
         }
     }
 }
