@@ -8,6 +8,7 @@
  
 ## Developing
 Join the chat at: [![Join the chat at https://gitter.im/PerfDotNet/BenchmarkDotNet](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/PerfDotNet/BenchmarkDotNet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Also see the [developing page](https://github.com/PerfDotNet/BenchmarkDotNet/wiki).
 
 ## Getting started
@@ -25,7 +26,7 @@ public class Md5VsSha256
     private readonly SHA256 sha256 = SHA256.Create();
     private readonly MD5 md5 = MD5.Create();
 
-    public Algo_Md5VsSha256()
+    public Md5VsSha256()
     {
         data = new byte[N];
         new Random(42).NextBytes(data);
@@ -118,8 +119,8 @@ public class IL_Loops
 You can also run a benchmark directly from the internet:
 
 ```cs
-new BenchmarkRunner().RunUrl(
-  "https://raw.githubusercontent.com/PerfDotNet/BenchmarkDotNet/master/BenchmarkDotNet.Samples/CPU/Cpu_Ilp_Inc.cs");
+string url = "https://raw.githubusercontent.com/PerfDotNet/BenchmarkDotNet/master/BenchmarkDotNet.Samples/CPU/Cpu_Ilp_Inc.cs";
+new BenchmarkRunner().RunUrl(url);
 ```
 
 Or you can create a set of benchmarks and choose one from command line:
