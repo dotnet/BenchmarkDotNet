@@ -112,7 +112,7 @@ namespace BenchmarkDotNet
             if (!buildResult.IsBuildSuccess)
                 return BenchmarkReport.CreateEmpty(benchmark, parameters);
 
-            var runReports = Exec(logger, benchmark, importantPropertyNames, parameters, toolchain, buildResult);
+            var runReports = Execute(logger, benchmark, importantPropertyNames, parameters, toolchain, buildResult);
             return new BenchmarkReport(benchmark, runReports, parameters);
         }
 
@@ -153,9 +153,9 @@ namespace BenchmarkDotNet
             return buildResult;
         }
 
-        private List<BenchmarkRunReport> Exec(IBenchmarkLogger logger, Benchmark benchmark, IList<string> importantPropertyNames, BenchmarkParameters parameters, IBenchmarkToolchainFacade toolchain, BenchmarkBuildResult buildResult)
+        private List<BenchmarkRunReport> Execute(IBenchmarkLogger logger, Benchmark benchmark, IList<string> importantPropertyNames, BenchmarkParameters parameters, IBenchmarkToolchainFacade toolchain, BenchmarkBuildResult buildResult)
         {
-            logger.WriteLineInfo("// *** Exec ***");
+            logger.WriteLineInfo("// *** Execute ***");
             var processCount = Math.Max(1, benchmark.Task.ProcessCount);
             var runReports = new List<BenchmarkRunReport>();
 
@@ -172,7 +172,7 @@ namespace BenchmarkDotNet
                     logger.NewLine();
                 }
 
-                var execResult = toolchain.Exec(buildResult, parameters, Plugins.CompositeDiagnoser);
+                var execResult = toolchain.Execute(buildResult, parameters, Plugins.CompositeDiagnoser);
 
                 if (execResult.FoundExecutable)
                 {

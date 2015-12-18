@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
             this.logger = logger;
         }
 
-        public BenchmarkExecResult Exec(BenchmarkBuildResult buildResult, BenchmarkParameters parameters, IBenchmarkDiagnoser diagnoser)
+        public BenchmarkExecResult Execute(BenchmarkBuildResult buildResult, BenchmarkParameters parameters, IBenchmarkDiagnoser diagnoser)
         {
             var exeName = Path.Combine(buildResult.DirectoryPath, "Program.exe");
             var args = parameters == null ? string.Empty : parameters.ToArgs();

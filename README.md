@@ -6,41 +6,42 @@
 * BenchmarkDotNet performs warm-up executions of your code, then runs it several times in different CLR instances, calculates statistics and tries to eliminate some runtime side-effects.
 * BenchmarkDotNet runs with minimal overhead so as to give an accurate performance measurment.
  
-## Chat Room
-[![Join the chat at https://gitter.im/PerfDotNet/BenchmarkDotNet](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/PerfDotNet/BenchmarkDotNet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+## Developing
+Join the chat at: [![Join the chat at https://gitter.im/PerfDotNet/BenchmarkDotNet](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/PerfDotNet/BenchmarkDotNet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+Also see the [developing page](https://github.com/PerfDotNet/BenchmarkDotNet/wiki).
 
 ## Getting started
 
 **Step 1** Install BenchmarkDotNet via the NuGet package: [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/)
 
-**Step 2** Write a class with methods that you want to measure and mark them with the `Benchmark` attribute. You can also use additional attributes like `OperationsPerInvoke` (amount of operations in your method) or `BenchmarkTask` (specify the benchmark environment). In the following example, we will research how [Instruction-level parallelism](http://en.wikipedia.org/wiki/Instruction-level_parallelism) affects application performance:
+**Step 2** Write a class with methods that you want to measure and mark them with the `Benchmark` attribute. In the following example, we will compare [MD5](https://en.wikipedia.org/wiki/MD5) and [SHA256](https://en.wikipedia.org/wiki/SHA-2) cryptographic hash functions:
 
 ```cs
-[BenchmarkTask(platform: BenchmarkPlatform.X86, jitVersion: BenchmarkJitVersion.LegacyJit)]
-[BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
-[BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
-public class Cpu_Ilp_Inc
+public class Md5VsSha256
 {
-    private double a, b, c, d;
+    private const int N = 10000;
+    private readonly byte[] data;
 
-    [Benchmark]
-    [OperationsPerInvoke(4)]
-    public void Parallel()
+    private readonly SHA256 sha256 = SHA256.Create();
+    private readonly MD5 md5 = MD5.Create();
+
+    public Md5VsSha256()
     {
-        a++;
-        b++;
-        c++;
-        d++;
+        data = new byte[N];
+        new Random(42).NextBytes(data);
     }
 
     [Benchmark]
-    [OperationsPerInvoke(4)]
-    public void Sequential()
+    public byte[] Sha256()
     {
-        a++;
-        a++;
-        a++;
-        a++;
+        return sha256.ComputeHash(data);
+    }
+
+    [Benchmark]
+    public byte[] Md5()
+    {
+        return md5.ComputeHash(data);
     }
 }
 ```
@@ -48,37 +49,38 @@ public class Cpu_Ilp_Inc
 **Step 3** Run it:
 
 ```cs
-new BenchmarkRunner().RunCompetition(new Cpu_Ilp_Inc());
+new BenchmarkRunner().Run<Md5VsSha256>();
 ```
 
-**Step 4** View the results, here is the output from the above benchmark:
+**Step 4** View the results, here is an example of output from the above benchmark:
 
 ```ini
-BenchmarkDotNet=v0.7.7.0
+BenchmarkDotNet-Dev=v0.7.8.0
 OS=Microsoft Windows NT 6.2.9200.0
 Processor=Intel(R) Core(TM) i7-4702MQ CPU @ 2.20GHz, ProcessorCount=8
 HostCLR=MS.NET 4.0.30319.42000, Arch=64-bit  [RyuJIT]
-Type=Cpu_Ilp_Inc  Mode=Throughput  .NET=HostFramework
+Type=Algo_Md5VsSha256  Mode=Throughput  Platform=HostPlatform  Jit=HostJit  .NET=HostFramework  toolchain=Classic  Runtime=Clr  Warmup=5  Target=10
 ```
 
-|     Method | Platform |       Jit |   AvrTime |    StdDev |             op/s |
-|----------- |--------- |---------- |---------- |---------- |----------------- |
-|   Parallel |      X64 | LegacyJit | 0.2856 ns | 0.0281 ns | 3,501,283,192.20 |
-| Sequential |      X64 | LegacyJit | 2.6460 ns | 0.0513 ns |   377,932,149.37 |
-|   Parallel |      X64 |    RyuJit | 0.2760 ns | 0.0094 ns | 3,622,785,633.08 |
-| Sequential |      X64 |    RyuJit | 0.8576 ns | 0.0220 ns | 1,166,095,637.19 |
-|   Parallel |      X86 | LegacyJit | 0.3743 ns | 0.0081 ns | 2,671,346,912.81 |
-| Sequential |      X86 | LegacyJit | 3.0057 ns | 0.0664 ns |   332,699,953.00 |
+| Method |     AvrTime |    StdDev |      op/s |
+|------- |------------ |---------- |---------- |
+|    Md5 |  26.2220 us | 0.2254 us | 38,138.59 |
+| Sha256 | 139.7358 us | 9.2690 us |  7,183.93 |
 
 ## Advanced Features
-BenchmarkDotNet provieds you with several features that let you write more complex and powerful benchmarks. 
+BenchmarkDotNet provides you with several features that let you write more complex and powerful benchmarks.
 
+- `[BenchmarkTask]` attribute let you specify different useful variables: jit version (Legacy/RyuJIT), cpu architecture (x86/x64), target runtime (CLR/Mono), and so on. You can use several attributes to compare different benchmark configurations.
+- `[OperationsPerInvoke]` attribute let you create a benchmark that contains specific amount of operation. It can be very useful for really quick operations that hard to measure: you can merge them into a single method.
 - `[Setup]` attribute let you specify a method that can be run before each benchmark *batch* or *run*
 - `[Params(..)]` makes it easy to run the same benchmark with different input values
- 
+
 The code below shows how these features can be used. In this example the benchmark will be run 4 times, with the value of `MaxCounter` automaticially initialised each time to the values [`1, 5, 10, 100`]. In addition before each run the `SetupData()` method will be called, so that `initialValuesArray` can be re-sized based on `MaxCounter`.
 
-``` csharp
+```cs
+[BenchmarkTask(platform: BenchmarkPlatform.X86, jitVersion: BenchmarkJitVersion.LegacyJit)]
+[BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
+[BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
 public class IL_Loops
 {
     [Params(1, 5, 10, 100)]
@@ -117,65 +119,22 @@ public class IL_Loops
 You can also run a benchmark directly from the internet:
 
 ```cs
-new BenchmarkRunner().RunUrl(
-  "https://raw.githubusercontent.com/PerfDotNet/BenchmarkDotNet/master/BenchmarkDotNet.Samples/CPU/Cpu_Ilp_Inc.cs");
+string url = "https://raw.githubusercontent.com/PerfDotNet/BenchmarkDotNet/master/BenchmarkDotNet.Samples/CPU/Cpu_Ilp_Inc.cs";
+new BenchmarkRunner().RunUrl(url);
 ```
 
-Or you can create a set of benchmarks and choose one from command line. Here is set of benchmarks from the [BenchmarkDotNet.Samples](https://github.com/PerfDotNet/BenchmarkDotNet/tree/master/BenchmarkDotNet.Samples) project:
+Or you can create a set of benchmarks and choose one from command line:
 
 ```cs
-var competitionSwitch = new BenchmarkCompetitionSwitch(new[] {
-    // Introduction
+var benchmarkSwitcher = new BenchmarkSwitcher(new[] {
     typeof(Intro_00_Basic),
     typeof(Intro_01_MethodTasks),
     typeof(Intro_02_ClassTasks),
     typeof(Intro_03_SingleRun),
     typeof(Intro_04_UniformReportingTest),
-    // IL
-    typeof(Il_ReadonlyFields),
-    typeof(Il_Switch),
-    // JIT
-    typeof(Jit_LoopUnrolling),
-    typeof(Jit_ArraySumLoopUnrolling),
-    typeof(Jit_Inlining),
-    typeof(Jit_BoolToInt),
-    typeof(Jit_Bce),
-    typeof(Jit_InterfaceMethod),
-    typeof(Jit_RegistersVsStack),
-    // CPU
-    typeof(Cpu_Ilp_Inc),
-    typeof(Cpu_Ilp_Max),
-    typeof(Cpu_Ilp_VsBce),
-    typeof(Cpu_Ilp_RyuJit),
-    typeof(Cpu_MatrixMultiplication),
-    typeof(Cpu_BranchPerdictor),
-    // Framework
-    typeof(Framework_SelectVsConvertAll),
-    typeof(Framework_StackFrameVsStackTrace),
-    typeof(Framework_StopwatchVsDateTime),
-    // Algorithms
-    typeof(Algo_BitCount),
-    typeof(Algo_MostSignificantBit),
-    typeof(Algo_Md5VsSha256),
-    // Other
-    typeof(Math_DoubleSqrt),
-    typeof(Math_DoubleSqrtAvx),
-    typeof(Array_HeapAllocVsStackAlloc),
-    // Infra
-    typeof(Infra_Params)
 });
-competitionSwitch.Run(args);
+benchmarkSwitcher.Run(args);
 ```
-
-## Future plans
-
-* In-line IL and ASM viewer
-* Graphing results
-* Mono/CoreCLR/.NET Native support
-* .NET 2.0 support
-* Hardware analysis
-* Multithreading support
-* Infrastructure improvements
 
 ## Authors
 

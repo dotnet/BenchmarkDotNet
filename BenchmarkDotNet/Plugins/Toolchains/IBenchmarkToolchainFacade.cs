@@ -8,6 +8,6 @@ namespace BenchmarkDotNet.Plugins.Toolchains
     {
         BenchmarkGenerateResult Generate();
         BenchmarkBuildResult Build(BenchmarkGenerateResult generateResult);
-        BenchmarkExecResult Exec(BenchmarkBuildResult buildResult, BenchmarkParameters parameters, IBenchmarkDiagnoser diagnoser);
+        BenchmarkExecResult Execute(BenchmarkBuildResult buildResult, BenchmarkParameters parameters, IBenchmarkDiagnoser diagnoser);
     }
 }
