@@ -70,6 +70,7 @@
   <ItemGroup>
     <Compile Include="BenchmarkModeTests.cs" />
     <Compile Include="GenericBenchmarkTest.cs" />
+    <Compile Include="InnerClassTest.cs" />
     <Compile Include="ParamsAttributeStaticTest.cs" />
     <Compile Include="ParamsAttributeTest.cs" />
     <Compile Include="PerformanceUnitTest.cs" />

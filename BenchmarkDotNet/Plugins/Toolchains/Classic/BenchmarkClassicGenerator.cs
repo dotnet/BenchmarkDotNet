@@ -31,25 +31,27 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
 
         private void GenerateProgramFile(string projectDir, Benchmark benchmark)
         {
-            var isVoid = benchmark.Target.Method.ReturnType == typeof(void);
+            var target = benchmark.Target;
+            var isVoid = target.Method.ReturnType == typeof(void);
 
-            var operationsPerInvoke = benchmark.Target.OperationsPerInvoke;
+            var operationsPerInvoke = target.OperationsPerInvoke;
 
-            var targetTypeNamespace = string.IsNullOrWhiteSpace(benchmark.Target.Type.Namespace)
+            var targetTypeNamespace = string.IsNullOrWhiteSpace(target.Type.Namespace)
                 ? ""
-                : string.Format("using {0};", benchmark.Target.Type.Namespace);
+                : $"using {target.Type.Namespace};";
 
-            var targetMethodReturnTypeNamespace = string.Format("using {0};",
-                    benchmark.Target.Method.ReturnType == typeof(void)
-                        ? "System"
-                        : benchmark.Target.Method.ReturnType.Namespace);
+            // As "using System;" is always included in the template, don't emit it again
+            var targetMethodReturnTypeNamespace =
+                target.Method.ReturnType == typeof(void) || target.Method.ReturnType.Namespace == "System"
+                ? ""
+                : $"using {target.Method.ReturnType.Namespace};";
 
-            var targetTypeName = benchmark.Target.Type.FullName.Replace('+', '.');
-            var targetMethodName = benchmark.Target.Method.Name;
+            var targetTypeName = target.Type.FullName.Replace('+', '.');
+            var targetMethodName = target.Method.Name;
 
             var targetMethodReturnType = isVoid
                 ? "void"
-                : benchmark.Target.Method.ReturnType.GetCorrectTypeName();
+                : target.Method.ReturnType.GetCorrectTypeName();
             var targetMethodResultHolder = isVoid
                 ? ""
                 : $"private {targetMethodReturnType} value;";
@@ -61,8 +63,8 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
                 : $"Func<{targetMethodReturnType}> ";
 
             // setupMethod is optional, so default to an empty delegate, so there is always something that can be invoked
-            var setupMethodName = benchmark.Target.SetupMethod != null
-                ? benchmark.Target.SetupMethod.Name
+            var setupMethodName = target.SetupMethod != null
+                ? target.SetupMethod.Name
                 : "() => { }";
 
             var idleImplementation = isVoid
@@ -73,7 +75,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
             if (!benchmark.Task.ParametersSets.IsEmpty())
             {
                 var typeQualifier = benchmark.Task.ParametersSets.IsStatic
-                    ? $"{benchmark.Target.Type.Name}"
+                    ? $"{target.Type.Name}"
                     : "instance";
                 paramsContent = $"{typeQualifier}.{benchmark.Task.ParametersSets.ParamFieldOrProperty} = BenchmarkParameters.ParseArgs(args).IntParam;";
             }
@@ -108,7 +110,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
                 Replace("$TargetMethodReturnType$", targetMethodReturnType).
                 Replace("$SetupMethodName$", setupMethodName).
                 Replace("$IdleImplementation$", idleImplementation).
-                Replace("$AdditionalLogic$", benchmark.Target.AdditionalLogic).
+                Replace("$AdditionalLogic$", target.AdditionalLogic).
                 Replace("$TargetBenchmarkTaskArguments$", targetBenchmarkTaskArguments).
                 Replace("$ParamsContent$", paramsContent);
 
