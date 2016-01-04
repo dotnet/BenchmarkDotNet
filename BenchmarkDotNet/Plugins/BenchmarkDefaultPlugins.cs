@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using BenchmarkDotNet.Plugins.Analyzers;
 using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Plugins.Exporters;
@@ -15,7 +16,9 @@ namespace BenchmarkDotNet.Plugins
     {
         public static readonly IBenchmarkLogger[] Loggers = { BenchmarkConsoleLogger.Default };
         public static readonly IBenchmarkExporter[] Exporters = { BenchmarkCsvExporter.Default, BenchmarkMarkdownExporter.Default };
-        public static readonly IBenchmarkDiagnoser[] Diagnosers = LoadDiagnoser();
+        // Make the Diagnosers lazy-loaded, so they are only instantiated if needed
+        public static readonly Lazy<IBenchmarkDiagnoser[]> Diagnosers = 
+            new Lazy<IBenchmarkDiagnoser[]>(() => LoadDiagnoser(), LazyThreadSafetyMode.ExecutionAndPublication);
         public static readonly IBenchmarkToolchainBuilder[] Toolchains = CreateToolchainBuilders();
         public static readonly IBenchmarkAnalyser[] Analysers = { BenchmarkStdDevAnalyser.Default };
 
@@ -45,7 +48,7 @@ namespace BenchmarkDotNet.Plugins
             }
             catch (Exception ex) // we're loading a plug-in, better to be safe rather than sorry
             {
-                BenchmarkConsoleLogger.Default.WriteLineError("Error loading {0}: {1}", diagnosticAssembly, ex.Message);
+                BenchmarkConsoleLogger.Default.WriteLineError($"Error loading {diagnosticAssembly}: {ex.GetType().Name} - {ex.Message}");
             }
             return new IBenchmarkDiagnoser[0];
         }

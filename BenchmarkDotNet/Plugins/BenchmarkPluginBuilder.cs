@@ -81,14 +81,19 @@ namespace BenchmarkDotNet.Plugins
         {
             var requestedDiagnosers = Parse(args, "d");
             var requestedLoggers = Parse(args, "l");
-            var requestedExprters = Parse(args, "e");
+            var requestedExporters = Parse(args, "e");
 
-            return new BenchmarkPluginBuilder().
-                AddDiagnosers(GetMatched(BenchmarkDefaultPlugins.Diagnosers, requestedDiagnosers, false)).
+            var pluginBuilder = new BenchmarkPluginBuilder().
                 AddLoggers(GetMatched(BenchmarkDefaultPlugins.Loggers, requestedLoggers, true)).
-                AddExporters(GetMatched(BenchmarkDefaultPlugins.Exporters, requestedExprters, true)).
+                AddExporters(GetMatched(BenchmarkDefaultPlugins.Exporters, requestedExporters, true)).
                 AddToolchains(BenchmarkDefaultPlugins.Toolchains).
                 AddAnalysers(BenchmarkDefaultPlugins.Analysers);
+
+            // Only load the Diagnostic plugins if requested (i.e. lazy-loaded)
+            if (requestedDiagnosers.Length > 0)
+                pluginBuilder.AddDiagnosers(GetMatched(BenchmarkDefaultPlugins.Diagnosers.Value, requestedDiagnosers, false));
+
+            return pluginBuilder;
         }
 
         private static T[] GetMatched<T>(T[] items, string[] requestedNames, bool takeByDefault) where T : IPlugin
