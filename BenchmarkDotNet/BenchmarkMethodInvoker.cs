@@ -152,7 +152,6 @@ namespace BenchmarkDotNet
             }
         }
 
-
         public void SingleRun(BenchmarkTask task, long operationsPerInvoke, Action setupAction, Action targetAction, Action idleAction)
         {
             for (int i = 0; i < task.Configuration.WarmupIterationCount; i++)
@@ -166,6 +165,22 @@ namespace BenchmarkDotNet
                 BenchmarkState.Instance.IterationMode = BenchmarkIterationMode.Target;
                 BenchmarkState.Instance.Iteration = i;
                 MultiInvoke("Target " + (i + 1), setupAction, targetAction, 1, operationsPerInvoke);
+            }
+        }
+
+        public void SingleRun<T>(BenchmarkTask task, long operationsPerInvoke, Action setupAction, Func<T> targetAction, Func<T> idleAction)
+        {
+            for (int i = 0; i < task.Configuration.WarmupIterationCount; i++)
+            {
+                BenchmarkState.Instance.IterationMode = BenchmarkIterationMode.Warmup;
+                BenchmarkState.Instance.Iteration = i;
+                MultiInvoke("// Warmup " + (i + 1).ToString(), setupAction, targetAction, 1, operationsPerInvoke);
+            }
+            for (int i = 0; i < task.Configuration.TargetIterationCount; i++)
+            {
+                BenchmarkState.Instance.IterationMode = BenchmarkIterationMode.Target;
+                BenchmarkState.Instance.Iteration = i;
+                MultiInvoke("Target " + (i + 1).ToString(), setupAction, targetAction, 1, operationsPerInvoke);
             }
         }
 
