@@ -1,7 +1,6 @@
 ﻿using BenchmarkDotNet.Tasks;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using BenchmarkDotNet.Plugins;
 using BenchmarkDotNet.Plugins.Loggers;
 using Xunit;
@@ -21,10 +20,39 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var logger = new BenchmarkAccumulationLogger();
             var plugins = BenchmarkPluginBuilder.CreateDefault().AddLogger(logger).Build();
-            var reports = new BenchmarkRunner(plugins).Run<ParamsTestStaticProperty>();
+            var reports = new BenchmarkRunner(plugins).Run(this.GetType());
             foreach (var param in new[] { 1, 2, 3, 8, 9, 10 })
                 Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, logger.GetLog());
             Assert.DoesNotContain($"// ### New Parameter {default(int)} ###" + Environment.NewLine, logger.GetLog());
+        }
+
+        [Benchmark]
+        [BenchmarkTask(mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 1)]
+        public void Benchmark()
+        {
+            if (collectedParams.Contains(StaticParamProperty) == false)
+            {
+                Console.WriteLine($"// ### New Parameter {StaticParamProperty} ###");
+                collectedParams.Add(StaticParamProperty);
+            }
+        }
+    }
+
+    // Delibrately made the Property "static" to ensure that Params also work okay in this scenario
+    public class ParamsTestStaticPrivateProperty
+    {
+        [Params(1, 2, 3, 8, 9, 10)]
+        public static int StaticParamProperty { get; private set; }
+
+        private static HashSet<int> collectedParams = new HashSet<int>();
+
+        [Fact]
+        public void Test()
+        {
+            var logger = new BenchmarkAccumulationLogger();
+            var plugins = BenchmarkPluginBuilder.CreateDefault().AddLogger(logger).Build();
+            // System.InvalidOperationException : Property "StaticParamProperty" must be public and writable if it has the [Params(..)] attribute applied to it
+            Assert.Throws<InvalidOperationException>(() => new BenchmarkRunner(plugins).Run(this.GetType()));
         }
 
         [Benchmark]
@@ -56,6 +84,35 @@ namespace BenchmarkDotNet.IntegrationTests
             foreach (var param in new[] { 1, 2, 3, 8, 9, 10 })
                 Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, logger.GetLog());
             Assert.DoesNotContain($"// ### New Parameter 0 ###" + Environment.NewLine, logger.GetLog());
+        }
+
+        [Benchmark]
+        [BenchmarkTask(mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 1)]
+        public static void Benchmark()
+        {
+            if (collectedParams.Contains(StaticParamField) == false)
+            {
+                Console.WriteLine($"// ### New Parameter {StaticParamField} ###");
+                collectedParams.Add(StaticParamField);
+            }
+        }
+    }
+
+    // Delibrately made everything "static" (as well as using a Field) to ensure that Params also work okay in this scenario
+    public class ParamsTestStaticPrivateField
+    {
+        [Params(1, 2, 3, 8, 9, 10)]
+        private static int StaticParamField = 0;
+
+        private static HashSet<int> collectedParams = new HashSet<int>();
+
+        [Fact]
+        public static void Test()
+        {
+            var logger = new BenchmarkAccumulationLogger();
+            var plugins = BenchmarkPluginBuilder.CreateDefault().AddLogger(logger).Build();
+            // System.InvalidOperationException : Field "StaticParamField" must be public if it has the [Params(..)] attribute applied to it
+            Assert.Throws<InvalidOperationException>(() => new BenchmarkRunner(plugins).Run<ParamsTestStaticPrivateField>());
         }
 
         [Benchmark]

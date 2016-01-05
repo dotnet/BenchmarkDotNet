@@ -26,19 +26,30 @@ namespace BenchmarkDotNet
             }
 
             // If there is one, get the single Field or Property that has the [Params(..)] attribute
-            var fields = type.GetFields().Select(f => new
+            var reflectionFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+            var fields = type.GetFields(reflectionFlags).Select(f => new
             {
                 f.Name,
                 Attribute = f.ResolveAttribute<ParamsAttribute>(),
+                Private = f.IsPrivate,
                 IsStatic = f.IsStatic,
             });
-            var properties = type.GetProperties().Select(f => new
+            var properties = type.GetProperties(reflectionFlags).Select(p => new
             {
-                f.Name,
-                Attribute = f.ResolveAttribute<ParamsAttribute>(),
-                IsStatic = f.GetSetMethod().IsStatic
+                p.Name,
+                Attribute = p.ResolveAttribute<ParamsAttribute>(),
+                Private = p.GetSetMethod() == null ? true : false,
+                IsStatic = p.GetSetMethod() != null ? p.GetSetMethod().IsStatic : false
             });
             var fieldOrProperty = fields.Concat(properties).FirstOrDefault(i => i.Attribute != null);
+
+            var privateField = fields.FirstOrDefault(f => f.Attribute != null && f.Private);
+            if (privateField != null)
+                throw new InvalidOperationException($"Field \"{privateField.Name}\" must be public if it has the [Params(..)] attribute applied to it");
+
+            var privateProperty = properties.FirstOrDefault(p => p.Attribute != null && p.Private);
+            if (privateProperty != null)
+                throw new InvalidOperationException($"Property \"{privateProperty.Name}\" must be public and writable if it has the [Params(..)] attribute applied to it");
 
             for (int i = 0; i < methods.Length; i++)
             {
