@@ -41,8 +41,10 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
                 : $"using {target.Type.Namespace};";
 
             // As "using System;" is always included in the template, don't emit it again
-            var targetMethodReturnTypeNamespace =
-                target.Method.ReturnType == typeof(void) || target.Method.ReturnType.Namespace == "System"
+            var emptyReturnTypeNamespace = target.Method.ReturnType == typeof(void) || 
+                                           target.Method.ReturnType.Namespace == "System" || 
+                                           string.IsNullOrWhiteSpace(target.Method.ReturnType.Namespace);
+            var targetMethodReturnTypeNamespace = emptyReturnTypeNamespace
                 ? ""
                 : $"using {target.Method.ReturnType.Namespace};";
 

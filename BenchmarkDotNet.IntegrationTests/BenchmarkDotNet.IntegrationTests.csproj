@@ -40,6 +40,9 @@
       <HintPath>..\CLRMD\Dia2Lib.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="FSharpBenchmarkDotNet">
+      <HintPath>.\FSharpBenchmarkDotNet.exe</HintPath>
+    </Reference>
     <Reference Include="Interop.Dia2Lib">
       <HintPath>..\CLRMD\Interop.Dia2Lib.dll</HintPath>
       <Private>True</Private>
@@ -74,6 +77,7 @@
     <Compile Include="ParamsAttributeStaticTest.cs" />
     <Compile Include="ParamsAttributeTest.cs" />
     <Compile Include="PerformanceUnitTest.cs" />
+    <Compile Include="PretendFSharpTest.cs" />
     <Compile Include="SetupAttributeInvalidMethodTest.cs" />
     <Compile Include="SetupAttributeTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -95,6 +99,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PretendFSharpTest.fs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
