@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Plugins.Exporters
         }
 
         // TODO: signature refactoring
-        public static List<string[]> BuildTable(IList<BenchmarkReport> reports, bool pretty = true, bool extended = false)
+        public static List<string[]> BuildTable(IList<BenchmarkReport> reports, bool pretty = true)
         {
             var reportStats = reports.Where(r => r.Runs.Count > 0)
                                      .Select(r => new
@@ -42,10 +42,8 @@ namespace BenchmarkDotNet.Plugins.Exporters
                 showParams = true;
             }
             headerRow.Add("AvrTime");
-            headerRow.Add("StdDev");
+            headerRow.Add("Error");
             headerRow.Add("op/s");
-            if (extended)
-                headerRow.Add("StdErr");
 
             var orderedStats = reportStats;
             // For https://github.com/PerfDotNet/BenchmarkDotNet/issues/36
@@ -76,11 +74,8 @@ namespace BenchmarkDotNet.Plugins.Exporters
                 if (showParams)
                     row.Add(reportStat.Report.Parameters.IntParam.ToString());
                 row.Add(timeToStringFunc(reportStat.Stat.AverageTime.Mean));
-                row.Add(timeToStringFunc(reportStat.Stat.AverageTime.StandardDeviation));
+                row.Add(timeToStringFunc(reportStat.Stat.AverageTime.StandardError));
                 row.Add(opsPerSecToStringFunc(reportStat.Stat.OperationsPerSeconds.Mean));
-
-                if (extended)
-                    row.Add(timeToStringFunc(reportStat.Stat.AverageTime.StandardError));
 
                 table.Add(row.ToArray());
             }

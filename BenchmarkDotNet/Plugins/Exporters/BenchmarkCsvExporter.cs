@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Plugins.Exporters
 
         public void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger)
         {
-            var table = BenchmarkExporterHelper.BuildTable(reports, false, true);
+            var table = BenchmarkExporterHelper.BuildTable(reports, false);
             foreach (var line in table)
             {
                 for (int i = 0; i < line.Length; i++)
