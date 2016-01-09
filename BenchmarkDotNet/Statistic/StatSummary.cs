@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Statistic
 
             StandardDeviation = n == 1 ? 0 : Math.Sqrt(list.Sum(d => Math.Pow(d - Mean, 2)) / (n - 1));
             StandardError = StandardDeviation / Math.Sqrt(n);
-            ConfidenceInterval = new ConfidenceInterval(Mean, 1.96 * StandardError);
+            ConfidenceInterval = new ConfidenceInterval(Mean, StandardError);
         }
 
         public double Min { get; }
@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Statistic
 
         public override string ToString()
         {
-            return string.Format(EnvironmentInfo.MainCultureInfo, "Avr={0} +- {1}", Mean, ConfidenceInterval.Error);
+            return string.Format(EnvironmentInfo.MainCultureInfo, "Avr={0} +- {1}", Mean, ConfidenceInterval.Margin);
         }
     }
 }

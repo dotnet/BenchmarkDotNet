@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Tests
             output.WriteLine("InterquartileRange = " + summary.InterquartileRange);
             output.WriteLine("StandardDeviation = " + summary.StandardDeviation);
             output.WriteLine("Outlier = [" + string.Join("; ", summary.Outlier) + "]");
-            output.WriteLine("CI (95%) = " + summary.ConfidenceInterval);
+            output.WriteLine("CI = " + summary.ConfidenceInterval);
         }
 
         [Fact]
@@ -122,7 +122,9 @@ namespace BenchmarkDotNet.Tests
         {
             var summary = new StatSummary(Enumerable.Range(1, 30));
             Print(summary);
+            Assert.Equal(95, summary.ConfidenceInterval.Level.ToPercent());
             Assert.Equal(15.5, summary.ConfidenceInterval.Mean);
+            Assert.Equal(summary.StandardError, summary.ConfidenceInterval.Error);
             Assert.Equal(12.34974, summary.ConfidenceInterval.Lower, 4);
             Assert.Equal(18.65026, summary.ConfidenceInterval.Upper, 4);
         }
