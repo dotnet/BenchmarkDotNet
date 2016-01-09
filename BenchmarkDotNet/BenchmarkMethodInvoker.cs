@@ -32,7 +32,7 @@ namespace BenchmarkDotNet
 
             public string GetDisplayValue()
             {
-                return string.Format(EnvironmentHelper.MainCultureInfo,
+                return string.Format(EnvironmentInfo.MainCultureInfo,
                     "{0} op, {1:0.#} ms, {2:0.#} ns, {3} ticks, {4:0.####} ns/op, {5:0.#} op/s",
                     OperationCount, Milliseconds, Nanoseconds, Ticks, NanosecondsPerOperation, OperationsPerSecond);
             }

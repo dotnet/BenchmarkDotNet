@@ -19,7 +19,7 @@
 
         public override string ToString()
         {
-            return string.Format(EnvironmentHelper.MainCultureInfo, "[{0}; {1}]", Lower, Upper);
+            return string.Format(EnvironmentInfo.MainCultureInfo, "[{0}; {1}]", Lower, Upper);
         }
     }
 }

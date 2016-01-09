@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Plugins.Exporters
 
         public void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger)
         {
-            logger.WriteLineInfo(EnvironmentHelper.GetFullEnvironmentInfo("Host", false));
+            logger.WriteLineInfo(EnvironmentInfo.GetCurrentInfo().ToFormattedString("Host", false));
 
             var table = BenchmarkExporterHelper.BuildTable(reports);
             // If we have Benchmarks with ParametersSets, force the "Method" columns to be displayed, otherwise it doesn't make as much sense

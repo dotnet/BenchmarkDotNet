@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Statistic
 
         public override string ToString()
         {
-            return string.Format(EnvironmentHelper.MainCultureInfo, "Avr={0} +- {1}", Mean, ConfidenceInterval.Error);
+            return string.Format(EnvironmentInfo.MainCultureInfo, "Avr={0} +- {1}", Mean, ConfidenceInterval.Error);
         }
     }
 }

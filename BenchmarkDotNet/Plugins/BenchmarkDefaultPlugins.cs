@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Plugins
         public static readonly Lazy<IBenchmarkDiagnoser[]> Diagnosers = 
             new Lazy<IBenchmarkDiagnoser[]>(() => LoadDiagnoser(), LazyThreadSafetyMode.ExecutionAndPublication);
         public static readonly IBenchmarkToolchainBuilder[] Toolchains = CreateToolchainBuilders();
-        public static readonly IBenchmarkAnalyser[] Analysers = { BenchmarkStdDevAnalyser.Default };
+        public static readonly IBenchmarkAnalyser[] Analysers = { BenchmarkStdDevAnalyser.Default, BenchmarkEnvironmentAnalyser.Default };
 
         private static IBenchmarkDiagnoser[] LoadDiagnoser()
         {

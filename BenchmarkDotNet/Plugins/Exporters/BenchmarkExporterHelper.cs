@@ -112,7 +112,7 @@ namespace BenchmarkDotNet.Plugins.Exporters
         public static Func<double, string> GetTimeMeasurementFormattingFunc(IEnumerable<BenchmarkRunReportsStatistic> statistics, bool pretty = true)
         {
             if (!pretty)
-                return value => string.Format(EnvironmentHelper.MainCultureInfo, "{0:#.####}", value);
+                return value => string.Format(EnvironmentInfo.MainCultureInfo, "{0:#.####}", value);
 
             // Find the smallest measurement in the primary statistics, which is the Median.
             // This will determine the time unit we will use for all measurements.
@@ -123,19 +123,19 @@ namespace BenchmarkDotNet.Plugins.Exporters
             Func<double, string> measurementToString;
             if (minRecordedMedian < 1000)
             {
-                measurementToString = (value) => string.Format(EnvironmentHelper.MainCultureInfo, "{0:N4} ns", value);
+                measurementToString = (value) => string.Format(EnvironmentInfo.MainCultureInfo, "{0:N4} ns", value);
             }
             else if ((minRecordedMedian / 1000) < 1000)
             {
-                measurementToString = (value) => string.Format(EnvironmentHelper.MainCultureInfo, "{0:N4} us", value / 1000);
+                measurementToString = (value) => string.Format(EnvironmentInfo.MainCultureInfo, "{0:N4} us", value / 1000);
             }
             else if ((minRecordedMedian / 1000 / 1000) < 1000)
             {
-                measurementToString = (value) => string.Format(EnvironmentHelper.MainCultureInfo, "{0:N4} ms", value / 1000 / 1000);
+                measurementToString = (value) => string.Format(EnvironmentInfo.MainCultureInfo, "{0:N4} ms", value / 1000 / 1000);
             }
             else
             {
-                measurementToString = (value) => string.Format(EnvironmentHelper.MainCultureInfo, "{0:N4}  s", value / 1000 / 1000 / 1000);
+                measurementToString = (value) => string.Format(EnvironmentInfo.MainCultureInfo, "{0:N4}  s", value / 1000 / 1000 / 1000);
             }
 
             return measurementToString;
@@ -159,7 +159,7 @@ namespace BenchmarkDotNet.Plugins.Exporters
         ///  </remarks>
         public static Func<double, string> GetOpsPerSecFormattingFunc()
         {
-            return (opsPerSec) => string.Format(EnvironmentHelper.MainCultureInfo, "{0:N2}", opsPerSec);
+            return (opsPerSec) => string.Format(EnvironmentInfo.MainCultureInfo, "{0:N2}", opsPerSec);
         }
     }
 }

@@ -53,10 +53,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
                 }
                 finally
                 {
-                    if (consoleHandler != null)
-                    {
-                        consoleHandler.ClearProcess();
-                    }
+                    consoleHandler?.ClearProcess();
                 }
             }
             return new BenchmarkExecResult(false, new string[0]);

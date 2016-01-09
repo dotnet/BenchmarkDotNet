@@ -113,7 +113,7 @@ namespace BenchmarkDotNet
                 return BenchmarkReport.CreateEmpty(benchmark, parameters);
 
             var runReports = Execute(logger, benchmark, importantPropertyNames, parameters, toolchain, buildResult);
-            return new BenchmarkReport(benchmark, runReports, parameters);
+            return new BenchmarkReport(benchmark, runReports, EnvironmentInfo.GetCurrentInfo(), parameters);
         }
 
         private BenchmarkGenerateResult Generate(IBenchmarkLogger logger, IBenchmarkToolchainFacade toolchain)

@@ -39,7 +39,8 @@ namespace BenchmarkDotNet.Tests
                     new BenchmarkRunReport(1, 10),
                     new BenchmarkRunReport(1, 50),
                     new BenchmarkRunReport(1, 100)
-                });
+                },
+                EnvironmentInfo.GetCurrentInfo());
             var reports = new[] { report };
             var warnings = new BenchmarkStdDevAnalyser().Analyze(reports).ToList();
             Assert.Equal(1, warnings.Count);

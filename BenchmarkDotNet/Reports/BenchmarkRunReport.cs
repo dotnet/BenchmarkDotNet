@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Reports
                     switch (unit)
                     {
                         case "ns":
-                            ns = double.Parse(split[0], EnvironmentHelper.MainCultureInfo);
+                            ns = double.Parse(split[0], EnvironmentInfo.MainCultureInfo);
                             break;
                         case "op":
                             op = long.Parse(split[0]);
