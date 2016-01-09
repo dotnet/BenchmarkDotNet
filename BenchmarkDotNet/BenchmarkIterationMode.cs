@@ -2,6 +2,13 @@
 {
     public enum BenchmarkIterationMode
     {
-        PreWarmup, WarmupIdle, TargetIdle, Warmup, Target
+        /// <summary>
+        /// <seealso cref="https://en.wikipedia.org/wiki/Pilot_experiment"/>
+        /// </summary>
+        Pilot,
+        WarmupIdle,
+        TargetIdle,
+        Warmup,
+        Target
     }
 }

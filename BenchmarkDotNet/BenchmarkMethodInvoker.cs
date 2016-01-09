@@ -45,20 +45,20 @@ namespace BenchmarkDotNet
             idleAction();
 
             long invokeCount = 1;
-            double lastPreWarmupMilliseconds = 0;
-            int preWarmupCounter = 0;
+            double lastPilotMilliseconds = 0;
+            int pilotCounter = 0;
             while (true)
             {
-                BenchmarkState.Instance.IterationMode = BenchmarkIterationMode.PreWarmup;
-                BenchmarkState.Instance.Iteration = preWarmupCounter++;
+                BenchmarkState.Instance.IterationMode = BenchmarkIterationMode.Pilot;
+                BenchmarkState.Instance.Iteration = pilotCounter++;
                 var measurement = MultiInvoke("// Pre-Warmup", setupAction, targetAction, invokeCount, operationsPerInvoke);
-                lastPreWarmupMilliseconds = measurement.Milliseconds;
-                if (lastPreWarmupMilliseconds > InvokeTimoutMilliseconds)
+                lastPilotMilliseconds = measurement.Milliseconds;
+                if (lastPilotMilliseconds > InvokeTimoutMilliseconds)
                     break;
-                if (lastPreWarmupMilliseconds < 1)
+                if (lastPilotMilliseconds < 1)
                     invokeCount *= InvokeTimoutMilliseconds;
                 else
-                    invokeCount *= (long)Math.Ceiling(InvokeTimoutMilliseconds / lastPreWarmupMilliseconds);
+                    invokeCount *= (long)Math.Ceiling(InvokeTimoutMilliseconds / lastPilotMilliseconds);
             }
             double idleMilliseconds = 0;
             for (int i = 0; i < Math.Min(3, task.Configuration.WarmupIterationCount); i++)
@@ -68,7 +68,7 @@ namespace BenchmarkDotNet
                 var measurement = MultiInvoke("// Warmup (idle)", setupAction, idleAction, invokeCount, operationsPerInvoke);
                 idleMilliseconds = measurement.Milliseconds;
             }
-            invokeCount = invokeCount * 1000 / (long)Math.Round(Math.Min(1000, Math.Max(100, lastPreWarmupMilliseconds - idleMilliseconds)));
+            invokeCount = invokeCount * 1000 / (long)Math.Round(Math.Min(1000, Math.Max(100, lastPilotMilliseconds - idleMilliseconds)));
             Console.WriteLine("// IterationCount = " + invokeCount);
             long idleTicks = 0;
             var targetIdleInvokeCount = Math.Min(5, task.Configuration.TargetIterationCount);
@@ -102,20 +102,20 @@ namespace BenchmarkDotNet
             idleAction();
 
             long invokeCount = 1;
-            double lastPreWarmupMilliseconds = 0;
-            int preWarmupCounter = 0;
+            double lastPilotMilliseconds = 0;
+            int pilotCounter = 0;
             while (true)
             {
-                BenchmarkState.Instance.IterationMode = BenchmarkIterationMode.PreWarmup;
-                BenchmarkState.Instance.Iteration = preWarmupCounter++;
+                BenchmarkState.Instance.IterationMode = BenchmarkIterationMode.Pilot;
+                BenchmarkState.Instance.Iteration = pilotCounter++;
                 var measurement = MultiInvoke("// Pre-Warmup", setupAction, targetAction, invokeCount, operationsPerInvoke);
-                lastPreWarmupMilliseconds = measurement.Milliseconds;
-                if (lastPreWarmupMilliseconds > InvokeTimoutMilliseconds)
+                lastPilotMilliseconds = measurement.Milliseconds;
+                if (lastPilotMilliseconds > InvokeTimoutMilliseconds)
                     break;
-                if (lastPreWarmupMilliseconds < 1)
+                if (lastPilotMilliseconds < 1)
                     invokeCount *= InvokeTimoutMilliseconds;
                 else
-                    invokeCount *= (long)Math.Ceiling(InvokeTimoutMilliseconds / lastPreWarmupMilliseconds);
+                    invokeCount *= (long)Math.Ceiling(InvokeTimoutMilliseconds / lastPilotMilliseconds);
             }
             double idleMilliseconds = 0;
             for (int i = 0; i < Math.Min(3, task.Configuration.WarmupIterationCount); i++)
@@ -125,7 +125,7 @@ namespace BenchmarkDotNet
                 var measurement = MultiInvoke("// Warmup (idle)", setupAction, idleAction, invokeCount, operationsPerInvoke);
                 idleMilliseconds = measurement.Milliseconds;
             }
-            invokeCount = invokeCount * 1000 / (long)Math.Round(Math.Min(1000, Math.Max(100, lastPreWarmupMilliseconds - idleMilliseconds)));
+            invokeCount = invokeCount * 1000 / (long)Math.Round(Math.Min(1000, Math.Max(100, lastPilotMilliseconds - idleMilliseconds)));
             Console.WriteLine("// IterationCount = " + invokeCount);
             long idleTicks = 0;
             var targetIdleInvokeCount = Math.Min(5, task.Configuration.TargetIterationCount);
