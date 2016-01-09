@@ -1,13 +1,19 @@
 ﻿using System;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Plugins.Loggers;
 
 namespace BenchmarkDotNet.Reports
 {
+    // TODO: add processIndex
     /// <summary>
     /// The basic captured statistics for a benchmark.
     /// </summary>
     public sealed class BenchmarkRunReport
     {
+        public BenchmarkIterationMode IterationMode { get; }
+
+        public int IterationIndex { get; }
+
         /// <summary>
         /// Gets the number of operations performed.
         /// </summary>
@@ -19,26 +25,18 @@ namespace BenchmarkDotNet.Reports
         public double Nanoseconds { get; }
 
         /// <summary>
-        /// Gets the number of operations performed per second (ops/sec).
-        /// </summary>
-        public double OpsPerSecond { get; }
-
-        /// <summary>
-        /// Gets the average duration of one operation in nanoseconds.
-        /// </summary>
-        public double AverageNanoseconds { get; }
-
-        /// <summary>
         /// Creates an instance of <see cref="BenchmarkRunReport"/> class.
         /// </summary>
+        /// <param name="iterationMode"></param>
+        /// <param name="iterationIndex"></param>
         /// <param name="operations">The number of operations performed.</param>
         /// <param name="nanoseconds">The total number of nanoseconds it took to perform all operations.</param>
-        public BenchmarkRunReport(long operations, double nanoseconds)
+        public BenchmarkRunReport(BenchmarkIterationMode iterationMode, int iterationIndex, long operations, double nanoseconds)
         {
+            IterationMode = iterationMode;
+            IterationIndex = iterationIndex;
             Operations = operations;
             Nanoseconds = nanoseconds;
-            OpsPerSecond = operations / (nanoseconds / (1000 * 1000 * 1000)); // 1,000,000,000 ns in 1 second
-            AverageNanoseconds = nanoseconds / operations;
         }
 
         /// <summary>
@@ -46,7 +44,7 @@ namespace BenchmarkDotNet.Reports
         /// 
         /// E.g. given the input <paramref name="line"/>:
         /// 
-        ///     Target 1: 10 op, 1005.8 ms, 1005842518 ns, 3332139 ticks, 100584251.7955 ns/op, 9.9 op/s
+        ///     Target 1: 10 op, 1005842518 ns
         /// 
         /// Will extract the number of <see cref="Operations"/> performed and the 
         /// total number of <see cref="Nanoseconds"/> it took to perform them.
@@ -58,26 +56,34 @@ namespace BenchmarkDotNet.Reports
         {
             try
             {
+                var lineSplit = line.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+
+                var iterationInfo = lineSplit[0];
+                var iterationInfoSplit = iterationInfo.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                var iterationMode = ParseIterationMode(iterationInfoSplit[0]);
+                var iterationIndex = 0;
+                int.TryParse(iterationInfoSplit[1], out iterationIndex);
+
+                var measurementsInfo = lineSplit[1];
+                var measurementsInfoSplit = measurementsInfo.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 var op = 1L;
                 var ns = double.PositiveInfinity;
-                var items = line.
-                    Split(new[] {':'}, StringSplitOptions.RemoveEmptyEntries)[1].
-                    Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
-                foreach (var item in items)
+                foreach (var item in measurementsInfoSplit)
                 {
-                    var split = item.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
-                    var unit = split[1];
+                    var measurementSplit = item.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    var value = measurementSplit[0];
+                    var unit = measurementSplit[1];
                     switch (unit)
                     {
                         case "ns":
-                            ns = double.Parse(split[0], EnvironmentInfo.MainCultureInfo);
+                            ns = double.Parse(value, EnvironmentInfo.MainCultureInfo);
                             break;
                         case "op":
-                            op = long.Parse(split[0]);
+                            op = long.Parse(value);
                             break;
                     }
                 }
-                return new BenchmarkRunReport(op, ns);
+                return new BenchmarkRunReport(iterationMode, iterationIndex, op, ns);
             }
             catch (Exception)
             {
@@ -86,5 +92,32 @@ namespace BenchmarkDotNet.Reports
                 return null;
             }
         }
+
+        private static BenchmarkIterationMode ParseIterationMode(string name)
+        {
+            BenchmarkIterationMode mode;
+            return Enum.TryParse(name, out mode) ? mode : BenchmarkIterationMode.Unknown;
+        }
+    }
+
+    public static class BenchmarkRunReportExtensions
+    {
+        private const int NanosecondsInSecond = 1000 * 1000 * 1000;
+
+        /// <summary>
+        /// Gets the number of operations performed per second (ops/sec).
+        /// </summary>
+        public static double GetOpsPerSecond(this BenchmarkRunReport report) =>
+            report.Operations / (report.Nanoseconds / NanosecondsInSecond);
+
+        /// <summary>
+        /// Gets the average duration of one operation in nanoseconds.
+        /// </summary>
+        public static double GetAverageNanoseconds(this BenchmarkRunReport report) =>
+            report.Nanoseconds / report.Operations;
+
+        public static string ToStr(this BenchmarkRunReport run) =>
+            $"{run.IterationMode} {run.IterationIndex}: {run.Operations} op, {run.Nanoseconds.ToStr()} ns, {run.GetAverageNanoseconds().ToTimeStr()}/op";
+
     }
 }

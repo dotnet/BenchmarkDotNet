@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Management;
 using System.Reflection;
+using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet
 {
@@ -28,6 +29,16 @@ namespace BenchmarkDotNet
         public bool HasRyuJit { get; set; }
         public string Configuration { get; set; }
 
+        /// <summary>
+        /// The frequency of the timer as the number of ticks per second.
+        /// </summary>
+        public long StopwatchFrequency { get; set; }
+
+        /// <summary>
+        /// Indicates whether the timer is based on a high-resolution performance counter. 
+        /// </summary>
+        public bool IsStopwatchHighResolution { get; set; }
+
         public static EnvironmentInfo GetCurrentInfo() => new EnvironmentInfo
         {
             BenchmarkDotNetCaption = GetBenchmarkDotNetCaption(),
@@ -39,7 +50,9 @@ namespace BenchmarkDotNet
             Architecture = GetArchitecture(),
             HasAttachedDebugger = GetHasAttachedDebugger(),
             HasRyuJit = GetHasRyuJit(),
-            Configuration = GetConfiguration()
+            Configuration = GetConfiguration(),
+            StopwatchFrequency = GetStopwatchFrequency(),
+            IsStopwatchHighResolution = GetIsStopwatchHighResolution()
         };
 
         public string ToFormattedString(string clrHint = "", bool printDoubleSlash = true)
@@ -48,17 +61,18 @@ namespace BenchmarkDotNet
             var line1 = $"{prefix}{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}";
             var line2 = $"{prefix}OS={OsVersion}";
             var line3 = $"{prefix}Processor={ProcessorName}, ProcessorCount={ProcessorCount}";
-            var line4 = $"{prefix}{clrHint}CLR={ClrVersion}, Arch={Architecture} {Configuration}{GetDebuggerFlag()}{GetJitFlag()}";
-            return string.Join(System.Environment.NewLine, line1, line2, line3, line4);
+            var line4 = $"{prefix}Freq={StopwatchFrequency} ticks, Resolution={(1000000000.0 / StopwatchFrequency).ToTimeStr()} [{(IsStopwatchHighResolution ? "HighResolution" : "LowResolution")}]";
+            var line5 = $"{prefix}{clrHint}CLR={ClrVersion}, Arch={Architecture} {Configuration}{GetDebuggerFlag()}{GetJitFlag()}";
+            return string.Join(Environment.NewLine, line1, line2, line3, line4, line5);
         }
 
         private string GetJitFlag() => HasRyuJit ? " [RyuJIT]" : "";
         private string GetDebuggerFlag() => HasAttachedDebugger ? " [AttachedDebugger]" : "";
 
-        private static string GetBenchmarkDotNetCaption() => 
+        private static string GetBenchmarkDotNetCaption() =>
             ((AssemblyTitleAttribute)typeof(BenchmarkRunner).Assembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), false)[0]).Title;
 
-        private static string GetBenchmarkDotNetVersion() => 
+        private static string GetBenchmarkDotNetVersion() =>
             typeof(BenchmarkRunner).Assembly.GetName().Version + (GetBenchmarkDotNetCaption().EndsWith("-Dev") ? "+" : string.Empty);
 
         private static string GetOsVersion() => Environment.OSVersion.ToString();
@@ -111,17 +125,20 @@ namespace BenchmarkDotNet
 
         private static string GetConfiguration()
         {
-            string configuration = "";
+            string configuration = "RELEASE";
 #if DEBUG
             configuration = "DEBUG";
 #endif
             return configuration;
         }
 
+        private static long GetStopwatchFrequency() => Stopwatch.Frequency;
+        private static bool GetIsStopwatchHighResolution() => Stopwatch.IsHighResolution;
+
         private static bool IsMono() => Type.GetType("Mono.Runtime") != null;
 
-        private static bool IsWindows() => 
-            new[] {PlatformID.Win32NT, PlatformID.Win32S, PlatformID.Win32Windows, PlatformID.WinCE}.Contains(Environment.OSVersion.Platform);
+        private static bool IsWindows() =>
+            new[] { PlatformID.Win32NT, PlatformID.Win32S, PlatformID.Win32Windows, PlatformID.WinCE }.Contains(Environment.OSVersion.Platform);
 
         // See http://aakinshin.net/en/blog/dotnet/jit-version-determining-in-runtime/
         private class JitHelper

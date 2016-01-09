@@ -15,12 +15,12 @@ namespace BenchmarkDotNet.Plugins
     public static class BenchmarkDefaultPlugins
     {
         public static readonly IBenchmarkLogger[] Loggers = { BenchmarkConsoleLogger.Default };
-        public static readonly IBenchmarkExporter[] Exporters = { BenchmarkCsvExporter.Default, BenchmarkMarkdownExporter.Default };
+        public static readonly IBenchmarkExporter[] Exporters = { BenchmarkCsvExporter.Default, BenchmarkMarkdownExporter.Default, BenchmarkPlainExporter.Default };
         // Make the Diagnosers lazy-loaded, so they are only instantiated if needed
         public static readonly Lazy<IBenchmarkDiagnoser[]> Diagnosers = 
-            new Lazy<IBenchmarkDiagnoser[]>(() => LoadDiagnoser(), LazyThreadSafetyMode.ExecutionAndPublication);
+            new Lazy<IBenchmarkDiagnoser[]>(LoadDiagnoser, LazyThreadSafetyMode.ExecutionAndPublication);
         public static readonly IBenchmarkToolchainBuilder[] Toolchains = CreateToolchainBuilders();
-        public static readonly IBenchmarkAnalyser[] Analysers = { BenchmarkStdDevAnalyser.Default, BenchmarkEnvironmentAnalyser.Default };
+        public static readonly IBenchmarkAnalyser[] Analysers = { BenchmarkEnvironmentAnalyser.Default };
 
         private static IBenchmarkDiagnoser[] LoadDiagnoser()
         {

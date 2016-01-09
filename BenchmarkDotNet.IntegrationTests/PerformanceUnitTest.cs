@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using BenchmarkDotNet.Plugins;
 using BenchmarkDotNet.Plugins.Loggers;
+using BenchmarkDotNet.Reports;
 using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -27,20 +28,20 @@ namespace BenchmarkDotNet.IntegrationTests
             // Check that slow benchmark is actually slower than the fast benchmark!
             var slowBenchmarkRun = reports.GetRunsFor<PerformanceUnitTest>(r => r.SlowBenchmark()).First();
             var fastBenchmarkRun = reports.GetRunsFor<PerformanceUnitTest>(r => r.FastBenchmark()).First();
-            Assert.True(slowBenchmarkRun.AverageNanoseconds > fastBenchmarkRun.AverageNanoseconds,
+            Assert.True(slowBenchmarkRun.GetAverageNanoseconds() > fastBenchmarkRun.GetAverageNanoseconds(),
                         string.Format("Expected SlowBenchmark: {0:N2} ns to be MORE than FastBenchmark: {1:N2} ns",
-                                      slowBenchmarkRun.AverageNanoseconds, fastBenchmarkRun.AverageNanoseconds));
-            Assert.True(slowBenchmarkRun.OpsPerSecond < fastBenchmarkRun.OpsPerSecond,
+                                      slowBenchmarkRun.GetAverageNanoseconds(), fastBenchmarkRun.GetAverageNanoseconds()));
+            Assert.True(slowBenchmarkRun.GetOpsPerSecond() < fastBenchmarkRun.GetOpsPerSecond(),
                         string.Format("Expected SlowBenchmark: {0:N2} Ops to be LESS than FastBenchmark: {1:N2} Ops",
-                                      slowBenchmarkRun.OpsPerSecond, fastBenchmarkRun.OpsPerSecond));
+                                      slowBenchmarkRun.GetOpsPerSecond(), fastBenchmarkRun.GetOpsPerSecond()));
 
             // Whilst we're at it, let's do more specific Asserts as we know what the elasped time should be
             var slowBenchmarkReport = reports.GetReportFor<PerformanceUnitTest>(r => r.SlowBenchmark());
             var fastBenchmarkReport = reports.GetReportFor<PerformanceUnitTest>(r => r.FastBenchmark());
-            foreach (var slowRun in slowBenchmarkReport.Runs)
-                Assert.InRange(slowRun.AverageNanoseconds / 1000.0 / 1000.0, low: 499, high: 502);
-            foreach (var fastRun in fastBenchmarkReport.Runs)
-                Assert.InRange(fastRun.AverageNanoseconds / 1000.0 / 1000.0, low: 14, high: 17);
+            foreach (var slowRun in slowBenchmarkReport.GetTargetRuns())
+                Assert.InRange(slowRun.GetAverageNanoseconds() / 1000.0 / 1000.0, low: 499, high: 502);
+            foreach (var fastRun in fastBenchmarkReport.GetTargetRuns())
+                Assert.InRange(fastRun.GetAverageNanoseconds() / 1000.0 / 1000.0, low: 14, high: 17);
         }
 
         [Benchmark]

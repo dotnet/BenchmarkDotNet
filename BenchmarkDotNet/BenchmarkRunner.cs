@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Plugins.Exporters;
 using BenchmarkDotNet.Plugins;
 using BenchmarkDotNet.Plugins.Loggers;
@@ -30,14 +31,14 @@ namespace BenchmarkDotNet
                 competitionName = $"BenchmarkRun-{benchmarkRunIndex:##000}-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}";
             using (var logStreamWriter = new StreamWriter(competitionName + ".log"))
             {
-                var logger = new BenchmarkCompositeLogger(Plugins.CompositeLogger, new BenchmarkStreamLogger(logStreamWriter));
-                var reports = Run(benchmarks, logger);
-                Plugins.CompositeExporter.ExportToFile(reports, competitionName);
+                var logger = new BenchmarkCompositeLogger(Plugins.CompositeLogger,
+                    new BenchmarkStreamLogger(logStreamWriter));
+                var reports = Run(benchmarks, logger, competitionName);
                 return reports;
             }
         }
 
-        private List<BenchmarkReport> Run(List<Benchmark> benchmarks, IBenchmarkLogger logger)
+        private List<BenchmarkReport> Run(List<Benchmark> benchmarks, IBenchmarkLogger logger, string competitionName)
         {
             logger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
             logger.WriteLineInfo("// Found benchmarks:");
@@ -54,12 +55,8 @@ namespace BenchmarkDotNet
                 {
                     var report = Run(logger, benchmark, importantPropertyNames);
                     reports.Add(report);
-                    if (report.Runs.Count > 0)
-                    {
-                        var stat = new BenchmarkRunReportsStatistic("Target", report.Runs);
-                        logger.WriteLineResult($"AverageTime (ns/op): {stat.AverageTime}");
-                        logger.WriteLineResult($"OperationsPerSecond: {stat.OperationsPerSeconds}");
-                    }
+                    if (report.GetTargetRuns().Any())
+                        logger.WriteLineStatistic(report.GetTargetRuns().GetStats().ToTimeStr());
                 }
                 else
                 {
@@ -68,12 +65,8 @@ namespace BenchmarkDotNet
                     {
                         var report = Run(logger, benchmark, importantPropertyNames, parameters);
                         reports.Add(report);
-                        if (report.Runs.Count > 0)
-                        {
-                            var stat = new BenchmarkRunReportsStatistic("Target", report.Runs);
-                            logger.WriteLineResult($"AverageTime (ns/op): {stat.AverageTime}");
-                            logger.WriteLineResult($"OperationsPerSecond: {stat.OperationsPerSeconds}");
-                        }
+                        if (report.GetTargetRuns().Any())
+                            logger.WriteLineStatistic(report.GetTargetRuns().GetStats().ToTimeStr());
                     }
                 }
                 logger.NewLine();
@@ -81,13 +74,30 @@ namespace BenchmarkDotNet
             logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
             logger.NewLine();
 
+            logger.WriteLineHeader("// * Export *");
+            var files = Plugins.CompositeExporter.ExportToFile(reports, competitionName);
+            foreach (var file in files)
+                logger.WriteLineInfo($"  {file}");
+            logger.NewLine();
+
+            logger.WriteLineHeader("// * Detailed results *");
+
+            foreach (var report in reports)
+            {
+                logger.WriteLineInfo(report.Benchmark.Description);
+                logger.WriteLineStatistic(report.GetTargetRuns().GetStats().ToTimeStr());
+                logger.NewLine();
+            }
+
+
+            logger.WriteLineHeader("// * Summary *");
             BenchmarkMarkdownExporter.Default.Export(reports, logger);
 
             var warnings = Plugins.CompositeAnalyser.Analyze(reports).ToList();
             if (warnings.Count > 0)
             {
                 logger.NewLine();
-                logger.WriteLineError("// *** Warnings *** ");
+                logger.WriteLineError("// * Warnings * ");
                 foreach (var warning in warnings)
                     logger.WriteLineError($"{warning.Message}");
             }

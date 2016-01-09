@@ -30,9 +30,9 @@ namespace BenchmarkDotNet.Plugins.Exporters
             }
         }
 
-        public void ExportToFile(IList<BenchmarkReport> reports, string competitionName)
+        public IEnumerable<string> ExportToFile(IList<BenchmarkReport> reports, string fileNamePrefix)
         {
-            BenchmarkExporterHelper.ExportToFile(this, reports, competitionName);
+            yield return BenchmarkExporterHelper.ExportToFile(this, reports, fileNamePrefix);
         }
     }
 }

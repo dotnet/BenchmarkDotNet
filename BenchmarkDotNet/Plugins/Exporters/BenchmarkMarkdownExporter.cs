@@ -26,7 +26,9 @@ namespace BenchmarkDotNet.Plugins.Exporters
             // If we have Benchmarks with ParametersSets, force the "Method" columns to be displayed, otherwise it doesn't make as much sense
             var columnsToAlwaysShow = reports.Any(r => r.Benchmark.Task.ParametersSets != null) ? new[] { "Method" } : new string[0];
             PrintTable(table, logger, columnsToAlwaysShow);
-            var benchmarksWithTroubles = reports.Where(r => r.Runs.Count == 0).Select(r => r.Benchmark).ToList();
+
+            // TODO: move this logic to an analyser
+            var benchmarksWithTroubles = reports.Where(r => !r.GetTargetRuns().Any()).Select(r => r.Benchmark).ToList();
             if (benchmarksWithTroubles.Count > 0)
             {
                 logger.NewLine();
@@ -36,9 +38,9 @@ namespace BenchmarkDotNet.Plugins.Exporters
             }
         }
 
-        public void ExportToFile(IList<BenchmarkReport> reports, string competitionName)
+        public IEnumerable<string> ExportToFile(IList<BenchmarkReport> reports, string fileNamePrefix)
         {
-            BenchmarkExporterHelper.ExportToFile(this, reports, competitionName);
+            yield return BenchmarkExporterHelper.ExportToFile(this, reports, fileNamePrefix);
         }
 
         private void PrintTable(List<string[]> table, IBenchmarkLogger logger, string[] columnsToAlwaysShow)
@@ -55,7 +57,7 @@ namespace BenchmarkDotNet.Plugins.Exporters
             bool[] areSame = new bool[colCount];
             for (int colIndex = 0; colIndex < colCount; colIndex++)
             {
-                areSame[colIndex] = rowCount > 2 && colIndex < colCount - 3;
+                areSame[colIndex] = rowCount > 2 && colIndex < colCount - 2;
                 for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
                 {
                     widths[colIndex] = Math.Max(widths[colIndex], table[rowIndex][colIndex].Length + 1);

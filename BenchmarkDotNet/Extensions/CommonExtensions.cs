@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using BenchmarkDotNet.Common;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -49,5 +50,15 @@ namespace BenchmarkDotNet.Extensions
         {
             return string.IsNullOrEmpty(value) ? value : char.ToLowerInvariant(value[0]) + value.Substring(1);
         }
+
+        public static string ToTimeStr(this double value, TimeUnit unit = null, int unitNameWidth = 1)
+        {
+            unit = unit ?? TimeUnit.GetBestTimeUnit(value);
+            var unitValue = TimeUnit.Convert(value, TimeUnit.Nanoseconds, unit);
+            var unitName = unit.Name.PadLeft(unitNameWidth);
+            return $"{unitValue.ToStr("N4")} {unitName}";
+        }
+
+        public static string ToStr(this double value, string format = "0.##") => string.Format(EnvironmentInfo.MainCultureInfo, $"{{0:{format}}}", value);
     }
 }

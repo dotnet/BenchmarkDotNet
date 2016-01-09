@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using BenchmarkDotNet.Common;
+using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Statistic
 {
@@ -47,6 +49,7 @@ namespace BenchmarkDotNet.Statistic
             Upper = mean + Margin;
         }
 
-        public override string ToString() => string.Format(EnvironmentInfo.MainCultureInfo, "[{0}; {1}] (CI {2}%)", Lower, Upper, Level.ToPercent());
+        public string ToStr() => $"[{Lower.ToStr()}; {Upper.ToStr()}] (CI {Level.ToPercent()}%)";
+        public string ToTimeStr(TimeUnit unit) => $"[{Lower.ToTimeStr(unit)}; {Upper.ToTimeStr(unit)}] (CI {Level.ToPercent()}%)";
     }
 }
