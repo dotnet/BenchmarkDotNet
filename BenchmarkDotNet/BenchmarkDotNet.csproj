@@ -54,8 +54,10 @@
     <Compile Include="BenchmarkState.cs" />
     <Compile Include="BenchmarkRunnerExtensions.cs" />
     <Compile Include="EnvironmentInfo.cs" />
+    <Compile Include="Helpers\ResourceHelper.cs" />
     <Compile Include="Plugins\Exporters\BenchmarkCsvRunsExporter.cs" />
     <Compile Include="Plugins\Exporters\BenchmarkPlainExporter.cs" />
+    <Compile Include="Plugins\Exporters\BenchmarkRPlotExporter.cs" />
     <Compile Include="TimeUnit.cs" />
     <Compile Include="Plugins\Analyzers\BenchmarkAnalysisWarning.cs" />
     <Compile Include="Plugins\Analyzers\BenchmarkCompositeAnalyser.cs" />
@@ -147,7 +149,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Templates\BuildBenchmark.txt" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\BuildPlots.R" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

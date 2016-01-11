@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Reports;
@@ -29,7 +30,7 @@ namespace BenchmarkDotNet.Plugins.Exporters
             }
         }
 
-        private List<Column> columns = new List<Column>
+        private readonly List<Column> columns = new List<Column>
         {
             new Column("BenchmarkType", (report, run) => report.Benchmark.Target.Type.Name),
             new Column("BenchmarkMethod", (report, run) => report.Benchmark.Target.MethodTitle),
@@ -47,22 +48,15 @@ namespace BenchmarkDotNet.Plugins.Exporters
 
         public void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger)
         {
-            var table = BenchmarkExporterHelper.BuildTable(reports, false);
-            foreach (var line in table)
-            {
-                for (int i = 0; i < line.Length; i++)
-                {
-                    if (i != 0)
-                        logger.Write(";");
-                    logger.Write(line[i]);
-                }
-                logger.NewLine();
-            }
+            logger.WriteLine(string.Join(";", columns.Select(c => c.Title)));
+            foreach (var report in reports)
+                foreach (var run in report.Runs)
+                    logger.WriteLine(string.Join(";", columns.Select(column => column.GetValue(report, run))));
         }
 
         public IEnumerable<string> ExportToFile(IList<BenchmarkReport> reports, string fileNamePrefix)
         {
-            yield return BenchmarkExporterHelper.ExportToFile(this, reports, fileNamePrefix);
+            yield return BenchmarkExporterHelper.ExportToFile(this, reports, fileNamePrefix, "runs");
         }
     }
 }

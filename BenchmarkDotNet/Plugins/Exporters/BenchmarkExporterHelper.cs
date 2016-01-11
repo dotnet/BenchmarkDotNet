@@ -10,9 +10,9 @@ namespace BenchmarkDotNet.Plugins.Exporters
 {
     public static class BenchmarkExporterHelper
     {
-        public static string ExportToFile(IBenchmarkExporter exporter, IList<BenchmarkReport> reports, string fileNamePrefix)
+        public static string ExportToFile(IBenchmarkExporter exporter, IList<BenchmarkReport> reports, string fileNamePrefix, string caption = "report")
         {
-            var fileName = fileNamePrefix + "-report." + exporter.Name;
+            var fileName = fileNamePrefix + $"-{caption}." + exporter.Name;
             using (var stream = new StreamWriter(fileName))
                 exporter.Export(reports, new BenchmarkStreamLogger(stream));
             return fileName;
