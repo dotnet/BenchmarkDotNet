@@ -25,6 +25,13 @@ namespace BenchmarkDotNet
 
         internal IEnumerable<BenchmarkReport> Run(List<Benchmark> benchmarks, string competitionName = null)
         {
+            var baselineCount = benchmarks.Count(b => b.Target.Baseline == true);
+            if (baselineCount > 1)
+            {
+                var benchmarkClass = benchmarks.FirstOrDefault()?.Target?.Method?.DeclaringType?.FullName ?? "UNKNOWN";
+                throw new InvalidOperationException($"Only 1 [Benchmark] in a class can have \"Baseline = true\" applied to it, {benchmarkClass} has {baselineCount}");
+            }
+
             benchmarkRunIndex++;
             if (competitionName == null)
                 competitionName = $"BenchmarkRun-{benchmarkRunIndex:##000}-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}";
@@ -32,7 +39,10 @@ namespace BenchmarkDotNet
             {
                 var logger = new BenchmarkCompositeLogger(Plugins.CompositeLogger, new BenchmarkStreamLogger(logStreamWriter));
                 var reports = Run(benchmarks, logger);
-                Plugins.CompositeExporter.ExportToFile(reports, competitionName, Plugins.ResultExtenders);
+                if (baselineCount == 1)
+                    Plugins.CompositeExporter.ExportToFile(reports, competitionName, Plugins.ResultExtenders);
+                else
+                    Plugins.CompositeExporter.ExportToFile(reports, competitionName);
                 return reports;
             }
         }

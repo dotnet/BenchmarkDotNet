@@ -18,6 +18,15 @@ namespace BenchmarkDotNet.Plugins.ResultExtenders
         public IList<string> GetExtendedResults(IList<Tuple<BenchmarkReport, BenchmarkRunReportsStatistic>> reports)
         {
             var results = new List<string>(reports.Count);
+
+            // Sanity check, make sure at least one benchmark is a Baseline!
+            if (reports.Any(r => r.Item1.Benchmark.Target.Baseline) == false)
+            {
+                foreach (var item in reports)
+                    results.Add("-");
+                return results;
+            }
+
             foreach (var item in reports)
             {
                 double baseline = 0;

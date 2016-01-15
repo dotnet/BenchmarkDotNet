@@ -5,7 +5,7 @@ using BenchmarkDotNet.Tasks;
 using System.Collections.Generic;
 using Xunit;
 
-namespace BenchmarkDotNet.IntegrationTests
+namespace BenchmarkDotNet.IntegrationTests.Plugins
 {
     // TODO - #ifdef this test out under CoreCLR/DNX, it relies on CLRMD and other libraries that are only compatible with .NET Full/Desktop
     public class SourceDiagnoserTest 
@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var reports = new BenchmarkRunner(plugins).Run<SourceDiagnoserTest>();
 
             var testOutput = logger.GetLog();
-            Assert.Contains("Printing Code for Method: BenchmarkDotNet.IntegrationTests.SourceDiagnoserTest.DictionaryEnumeration()", testOutput);
+            Assert.Contains($"Printing Code for Method: {this.GetType().FullName}.DictionaryEnumeration()", testOutput);
             Assert.Contains("PrintAssembly=True", testOutput);
         }
 
