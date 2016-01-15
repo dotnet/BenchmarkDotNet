@@ -32,7 +32,7 @@ namespace BenchmarkDotNet
             {
                 var logger = new BenchmarkCompositeLogger(Plugins.CompositeLogger, new BenchmarkStreamLogger(logStreamWriter));
                 var reports = Run(benchmarks, logger);
-                Plugins.CompositeExporter.ExportToFile(reports, competitionName);
+                Plugins.CompositeExporter.ExportToFile(reports, competitionName, Plugins.ResultExtenders);
                 return reports;
             }
         }
@@ -81,7 +81,7 @@ namespace BenchmarkDotNet
             logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
             logger.NewLine();
 
-            BenchmarkMarkdownExporter.Default.Export(reports, logger);
+            BenchmarkMarkdownExporter.Default.Export(reports, logger, Plugins.ResultExtenders);
 
             var warnings = Plugins.CompositeAnalyser.Analyze(reports).ToList();
             if (warnings.Count > 0)

@@ -57,7 +57,7 @@ namespace BenchmarkDotNet
                 var benchmarkAttribute = methodInfo.ResolveAttribute<BenchmarkAttribute>();
                 if (benchmarkAttribute != null)
                 {
-                    var target = new BenchmarkTarget(type, methodInfo, setupMethod, benchmarkAttribute.Description);
+                    var target = new BenchmarkTarget(type, methodInfo, setupMethod, benchmarkAttribute.Description, baseline: benchmarkAttribute.Baseline);
                     AssertMethodHasCorrectSignature("Benchmark", methodInfo);
                     AssertMethodIsAccessible("Benchmark", methodInfo);
                     AssertMethodIsNotGeneric("Benchmark", methodInfo);
@@ -122,7 +122,8 @@ namespace BenchmarkDotNet
                                                                    benchmark.Target.Method,
                                                                    benchmark.Target.SetupMethod,
                                                                    benchmark.Target.Description,
-                                                                   benchmarkContent),
+                                                                   benchmarkContent,
+                                                                   benchmark.Target.Baseline),
                                                benchmark.Task);
                 }
         }

@@ -15,5 +15,7 @@ namespace BenchmarkDotNet
         }
 
         public string Description { get; set; }
+
+        public bool Baseline { get; set; }
     }
 }

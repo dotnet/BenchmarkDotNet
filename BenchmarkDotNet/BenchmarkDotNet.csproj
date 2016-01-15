@@ -71,6 +71,7 @@
     <Compile Include="Plugins\BenchmarkPluginsExtensions.cs" />
     <Compile Include="Plugins\IPlugin.cs" />
     <Compile Include="Plugins\Loggers\BenchmarkAccumulationLogger.cs" />
+    <Compile Include="Plugins\ResultExtenders\BenchmarkBaselineDeltaResultExtender.cs" />
     <Compile Include="Plugins\ResultExtenders\IBenchmarkResultExtender.cs" />
     <Compile Include="Plugins\Toolchains\BenchmarkToolchainBuilder.cs" />
     <Compile Include="Plugins\Toolchains\IBenchmarkToolchainBuilder.cs" />
