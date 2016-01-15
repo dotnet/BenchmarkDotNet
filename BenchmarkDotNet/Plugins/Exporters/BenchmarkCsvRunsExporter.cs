@@ -7,10 +7,13 @@ using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Plugins.Exporters
 {
-    public class BenchmarkCsvRunsExporter : IBenchmarkExporter
+    public class BenchmarkCsvRunsExporter : BenchmarkExporterBase
     {
-        public string Name => "csv";
-        public string Description => "Csv exporter";
+        public override string Name => "csv";
+        public override string Description => "Csv exporter";
+
+        public override string FileExtension => "csv";
+        public override string FileCaption => "runs";
 
         public static readonly IBenchmarkExporter Default = new BenchmarkCsvRunsExporter();
 
@@ -46,17 +49,12 @@ namespace BenchmarkDotNet.Plugins.Exporters
             new Column("RunOperations", (report, run) => run.Operations.ToString()),
         };
 
-        public void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger)
+        public override void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger)
         {
             logger.WriteLine(string.Join(";", columns.Select(c => c.Title)));
             foreach (var report in reports)
                 foreach (var run in report.Runs)
                     logger.WriteLine(string.Join(";", columns.Select(column => column.GetValue(report, run))));
-        }
-
-        public IEnumerable<string> ExportToFile(IList<BenchmarkReport> reports, string fileNamePrefix)
-        {
-            yield return BenchmarkExporterHelper.ExportToFile(this, reports, fileNamePrefix, "runs");
         }
     }
 }

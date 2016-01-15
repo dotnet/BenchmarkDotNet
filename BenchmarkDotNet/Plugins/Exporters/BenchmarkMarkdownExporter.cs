@@ -1,26 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Plugins.Exporters
 {
     // TODO: add support of GitHub markdown, Stackoverflow markdown
-    public class BenchmarkMarkdownExporter : IBenchmarkExporter
+    public class BenchmarkMarkdownExporter : BenchmarkExporterBase
     {
-        public string Name => "md";
-        public string Description => "Markdown exporter";
+        public override string Name => $"md-{Dialect}";
+        public override string Description => $"Markdown exporter - {Dialect}";
 
-        public static readonly IBenchmarkExporter Default = new BenchmarkMarkdownExporter();
+        public override string FileExtension => "md";
+        public override string FileNameSuffix => $"-{Dialect.ToLower()}";
+
+        public string Dialect { get; private set; }
+
+        public static readonly IBenchmarkExporter Default = new BenchmarkMarkdownExporter()
+        {
+            Dialect = nameof(Default)
+        };
+        public static readonly IBenchmarkExporter StackOverflow = new BenchmarkMarkdownExporter()
+        {
+            prefix = "    ",
+            Dialect = nameof(StackOverflow)
+        };
+        public static readonly IBenchmarkExporter GitHub = new BenchmarkMarkdownExporter()
+        {
+            Dialect = nameof(GitHub),
+            useCodeBlocks = true,
+            codeBlocksSyntax = "ini"
+        };
+
+        private string prefix = string.Empty;
+        private bool useCodeBlocks = false;
+        private string codeBlocksSyntax = string.Empty;
 
         private BenchmarkMarkdownExporter()
         {
         }
 
-        public void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger)
+        public override void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger)
         {
-            logger.WriteLineInfo(EnvironmentInfo.GetCurrentInfo().ToFormattedString("Host", false));
+            if(useCodeBlocks)
+                logger.WriteLine($"```{codeBlocksSyntax}");
+            logger = new BenchmarkLoggerWithPrefix(logger, prefix);
+            logger.WriteLineInfo(EnvironmentInfo.GetCurrentInfo().ToFormattedString("Host"));
+            logger.NewLine();
 
             var table = BenchmarkExporterHelper.BuildTable(reports);
             // If we have Benchmarks with ParametersSets, force the "Method" columns to be displayed, otherwise it doesn't make as much sense
@@ -36,11 +64,6 @@ namespace BenchmarkDotNet.Plugins.Exporters
                 foreach (var benchmarkWithTroubles in benchmarksWithTroubles)
                     logger.WriteLineError("  " + benchmarkWithTroubles.Caption);
             }
-        }
-
-        public IEnumerable<string> ExportToFile(IList<BenchmarkReport> reports, string fileNamePrefix)
-        {
-            yield return BenchmarkExporterHelper.ExportToFile(this, reports, fileNamePrefix);
         }
 
         private void PrintTable(List<string[]> table, IBenchmarkLogger logger, string[] columnsToAlwaysShow)
@@ -67,9 +90,25 @@ namespace BenchmarkDotNet.Plugins.Exporters
             }
             if (areSame.Any(s => s))
             {
+                var paramsOnLine = 0;
                 for (int colIndex = 0; colIndex < colCount; colIndex++)
                     if (areSame[colIndex] && columnsToShowIndexes.Contains(colIndex) == false)
+                    {
                         logger.WriteInfo($"{table[0][colIndex]}={table[1][colIndex]}  ");
+                        paramsOnLine++;
+                        if (paramsOnLine == 3)
+                        {
+                            logger.NewLine();
+                            paramsOnLine = 0;
+                        }
+                    }
+                        
+                logger.NewLine();
+            }
+
+            if (useCodeBlocks)
+            {
+                logger.Write("```");
                 logger.NewLine();
             }
 

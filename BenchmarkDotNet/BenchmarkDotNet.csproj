@@ -55,9 +55,12 @@
     <Compile Include="BenchmarkRunnerExtensions.cs" />
     <Compile Include="EnvironmentInfo.cs" />
     <Compile Include="Helpers\ResourceHelper.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Plugins\Exporters\BenchmarkCsvRunsExporter.cs" />
+    <Compile Include="Plugins\Exporters\BenchmarkExporterBase.cs" />
     <Compile Include="Plugins\Exporters\BenchmarkPlainExporter.cs" />
     <Compile Include="Plugins\Exporters\BenchmarkRPlotExporter.cs" />
+    <Compile Include="Plugins\Loggers\BenchmarkLoggerWithPrefix.cs" />
     <Compile Include="TimeUnit.cs" />
     <Compile Include="Plugins\Analyzers\BenchmarkAnalysisWarning.cs" />
     <Compile Include="Plugins\Analyzers\BenchmarkCompositeAnalyser.cs" />

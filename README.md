@@ -136,6 +136,16 @@ var benchmarkSwitcher = new BenchmarkSwitcher(new[] {
 benchmarkSwitcher.Run(args);
 ```
 
+## Export
+
+There are some preformatted md files that you can use to share benchmark results in the net. If you have a default plugins set they will be located in your bin directory. There are markdown files for StackOverflow and GitHub. They can be easily found by specific file suffix:
+
+```
+<benchmark_name>-report-default.md
+<benchmark_name>-report-github.md
+<benchmark_name>-report-stackoverflow.md
+```
+
 ## Authors
 
 Andrey Akinshin, Jon Skeet, Matt Warren

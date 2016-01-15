@@ -18,7 +18,9 @@ namespace BenchmarkDotNet.Plugins
         public static readonly IBenchmarkExporter[] Exporters =
         {
             BenchmarkCsvExporter.Default,
+            BenchmarkMarkdownExporter.StackOverflow,
             BenchmarkMarkdownExporter.Default,
+            BenchmarkMarkdownExporter.GitHub,
             BenchmarkPlainExporter.Default,
             BenchmarkCsvRunsExporter.Default,
             BenchmarkRPlotExporter.Default

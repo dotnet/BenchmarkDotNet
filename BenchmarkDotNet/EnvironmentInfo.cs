@@ -55,14 +55,13 @@ namespace BenchmarkDotNet
             IsStopwatchHighResolution = GetIsStopwatchHighResolution()
         };
 
-        public string ToFormattedString(string clrHint = "", bool printDoubleSlash = true)
+        public string ToFormattedString(string clrHint = "")
         {
-            var prefix = printDoubleSlash ? "// " : string.Empty;
-            var line1 = $"{prefix}{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}";
-            var line2 = $"{prefix}OS={OsVersion}";
-            var line3 = $"{prefix}Processor={ProcessorName}, ProcessorCount={ProcessorCount}";
-            var line4 = $"{prefix}Freq={StopwatchFrequency} ticks, Resolution={(1000000000.0 / StopwatchFrequency).ToTimeStr()} [{(IsStopwatchHighResolution ? "HighResolution" : "LowResolution")}]";
-            var line5 = $"{prefix}{clrHint}CLR={ClrVersion}, Arch={Architecture} {Configuration}{GetDebuggerFlag()}{GetJitFlag()}";
+            var line1 = $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}";
+            var line2 = $"OS={OsVersion}";
+            var line3 = $"Processor={ProcessorName}, ProcessorCount={ProcessorCount}";
+            var line4 = $"Freq={StopwatchFrequency} ticks, Resolution={(1000000000.0 / StopwatchFrequency).ToTimeStr()} [{(IsStopwatchHighResolution ? "HighResolution" : "LowResolution")}]";
+            var line5 = $"{clrHint}CLR={ClrVersion}, Arch={Architecture} {Configuration}{GetDebuggerFlag()}{GetJitFlag()}";
             return string.Join(Environment.NewLine, line1, line2, line3, line4, line5);
         }
 

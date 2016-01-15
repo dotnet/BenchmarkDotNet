@@ -6,14 +6,14 @@ using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Plugins.Exporters
 {
-    public class BenchmarkPlainExporter : IBenchmarkExporter
+    public class BenchmarkPlainExporter : BenchmarkExporterBase
     {
-        public string Name => "txt";
-        public string Description => "Plain exporter";
+        public override string Name => "txt";
+        public override string Description => "Plain exporter";
 
         public static readonly IBenchmarkExporter Default = new BenchmarkPlainExporter();
 
-        public void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger)
+        public override void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger)
         {
             foreach (var report in reports)
             {
@@ -30,11 +30,6 @@ namespace BenchmarkDotNet.Plugins.Exporters
                     logger.WriteLineStatistic(runs.Where(it => it.IterationMode == mode).GetStats().ToTimeStr());
                 }
             }
-        }
-
-        public IEnumerable<string> ExportToFile(IList<BenchmarkReport> reports, string fileNamePrefix)
-        {
-            yield return BenchmarkExporterHelper.ExportToFile(this, reports, fileNamePrefix);
         }
     }
 }
