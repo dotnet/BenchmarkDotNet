@@ -17,6 +17,7 @@ namespace BenchmarkDotNet.Plugins.Exporters
         public override string FileNameSuffix => $"-{Dialect.ToLower()}";
 
         public string Dialect { get; private set; }
+
         public static readonly IBenchmarkExporter Default = new BenchmarkMarkdownExporter()
         {
             Dialect = nameof(Default)
@@ -26,8 +27,16 @@ namespace BenchmarkDotNet.Plugins.Exporters
             prefix = "    ",
             Dialect = nameof(StackOverflow)
         };
+        public static readonly IBenchmarkExporter GitHub = new BenchmarkMarkdownExporter()
+        {
+            Dialect = nameof(GitHub),
+            useCodeBlocks = true,
+            codeBlocksSyntax = "ini"
+        };
 
         private string prefix = string.Empty;
+        private bool useCodeBlocks = false;
+        private string codeBlocksSyntax = string.Empty;
 
         private BenchmarkMarkdownExporter()
         {
@@ -35,8 +44,11 @@ namespace BenchmarkDotNet.Plugins.Exporters
 
         public override void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger)
         {
+            if(useCodeBlocks)
+                logger.WriteLine($"```{codeBlocksSyntax}");
             logger = new BenchmarkLoggerWithPrefix(logger, prefix);
             logger.WriteLineInfo(EnvironmentInfo.GetCurrentInfo().ToFormattedString("Host"));
+            logger.NewLine();
 
             var table = BenchmarkExporterHelper.BuildTable(reports);
             // If we have Benchmarks with ParametersSets, force the "Method" columns to be displayed, otherwise it doesn't make as much sense
@@ -78,9 +90,25 @@ namespace BenchmarkDotNet.Plugins.Exporters
             }
             if (areSame.Any(s => s))
             {
+                var paramsOnLine = 0;
                 for (int colIndex = 0; colIndex < colCount; colIndex++)
                     if (areSame[colIndex] && columnsToShowIndexes.Contains(colIndex) == false)
+                    {
                         logger.WriteInfo($"{table[0][colIndex]}={table[1][colIndex]}  ");
+                        paramsOnLine++;
+                        if (paramsOnLine == 3)
+                        {
+                            logger.NewLine();
+                            paramsOnLine = 0;
+                        }
+                    }
+                        
+                logger.NewLine();
+            }
+
+            if (useCodeBlocks)
+            {
+                logger.Write("```");
                 logger.NewLine();
             }
 
