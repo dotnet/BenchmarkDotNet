@@ -8,15 +8,23 @@ using BenchmarkDotNet.Reports;
 namespace BenchmarkDotNet.Plugins.Exporters
 {
     // TODO: add support of GitHub markdown, Stackoverflow markdown
-    public class BenchmarkMarkdownExporter : IBenchmarkExporter
+    public class BenchmarkMarkdownExporter : BenchmarkExporterBase
     {
-        public string Name => "md";
-        public string Description => "Markdown exporter";
+        public override string Name => $"md-{Dialect}";
+        public override string Description => $"Markdown exporter - {Dialect}";
 
-        public static readonly IBenchmarkExporter Default = new BenchmarkMarkdownExporter();
+        public override string FileExtension => "md";
+        public override string FileNameSuffix => $"-{Dialect.ToLower()}";
+
+        public string Dialect { get; private set; }
+        public static readonly IBenchmarkExporter Default = new BenchmarkMarkdownExporter()
+        {
+            Dialect = nameof(Default)
+        };
         public static readonly IBenchmarkExporter StackOverflow = new BenchmarkMarkdownExporter()
         {
-            prefix = "    "
+            prefix = "    ",
+            Dialect = nameof(StackOverflow)
         };
 
         private string prefix = string.Empty;
@@ -25,7 +33,7 @@ namespace BenchmarkDotNet.Plugins.Exporters
         {
         }
 
-        public void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger)
+        public override void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger)
         {
             logger = new BenchmarkLoggerWithPrefix(logger, prefix);
             logger.WriteLineInfo(EnvironmentInfo.GetCurrentInfo().ToFormattedString("Host"));
@@ -44,11 +52,6 @@ namespace BenchmarkDotNet.Plugins.Exporters
                 foreach (var benchmarkWithTroubles in benchmarksWithTroubles)
                     logger.WriteLineError("  " + benchmarkWithTroubles.Caption);
             }
-        }
-
-        public IEnumerable<string> ExportToFile(IList<BenchmarkReport> reports, string fileNamePrefix)
-        {
-            yield return BenchmarkExporterHelper.ExportToFile(this, reports, fileNamePrefix);
         }
 
         private void PrintTable(List<string[]> table, IBenchmarkLogger logger, string[] columnsToAlwaysShow)

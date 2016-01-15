@@ -57,6 +57,7 @@
     <Compile Include="Helpers\ResourceHelper.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Plugins\Exporters\BenchmarkCsvRunsExporter.cs" />
+    <Compile Include="Plugins\Exporters\BenchmarkExporterBase.cs" />
     <Compile Include="Plugins\Exporters\BenchmarkPlainExporter.cs" />
     <Compile Include="Plugins\Exporters\BenchmarkRPlotExporter.cs" />
     <Compile Include="Plugins\Loggers\BenchmarkLoggerWithPrefix.cs" />

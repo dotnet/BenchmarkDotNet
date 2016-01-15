@@ -10,14 +10,6 @@ namespace BenchmarkDotNet.Plugins.Exporters
 {
     public static class BenchmarkExporterHelper
     {
-        public static string ExportToFile(IBenchmarkExporter exporter, IList<BenchmarkReport> reports, string fileNamePrefix, string caption = "report")
-        {
-            var fileName = fileNamePrefix + $"-{caption}." + exporter.Name;
-            using (var stream = new StreamWriter(fileName))
-                exporter.Export(reports, new BenchmarkStreamLogger(stream));
-            return fileName;
-        }
-
         // TODO: signature refactoring
         public static List<string[]> BuildTable(IList<BenchmarkReport> reports, bool pretty = true)
         {
