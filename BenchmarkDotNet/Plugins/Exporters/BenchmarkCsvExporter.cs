@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Plugins.Loggers;
+using BenchmarkDotNet.Plugins.ResultExtenders;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Plugins.Exporters
@@ -15,9 +16,9 @@ namespace BenchmarkDotNet.Plugins.Exporters
         {
         }
 
-        public void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger)
+        public void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger, IEnumerable<IBenchmarkResultExtender> resultExtenders = null)
         {
-            var table = BenchmarkExporterHelper.BuildTable(reports, false, true);
+            var table = BenchmarkExporterHelper.BuildTable(reports, resultExtenders, false, true);
             foreach (var line in table)
             {
                 for (int i = 0; i < line.Length; i++)
@@ -30,9 +31,9 @@ namespace BenchmarkDotNet.Plugins.Exporters
             }
         }
 
-        public void ExportToFile(IList<BenchmarkReport> reports, string competitionName)
+        public void ExportToFile(IList<BenchmarkReport> reports, string competitionName, IEnumerable<IBenchmarkResultExtender> resultExtenders = null)
         {
-            BenchmarkExporterHelper.ExportToFile(this, reports, competitionName);
+            BenchmarkExporterHelper.ExportToFile(this, reports, competitionName, resultExtenders);
         }
     }
 }

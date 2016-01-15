@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Plugins.Loggers;
+using BenchmarkDotNet.Plugins.ResultExtenders;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Plugins.Exporters
@@ -18,11 +19,11 @@ namespace BenchmarkDotNet.Plugins.Exporters
         {
         }
 
-        public void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger)
+        public void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger, IEnumerable<IBenchmarkResultExtender> resultExtenders = null)
         {
             logger.WriteLineInfo(EnvironmentInfo.GetCurrentInfo().ToFormattedString("Host", false));
 
-            var table = BenchmarkExporterHelper.BuildTable(reports);
+            var table = BenchmarkExporterHelper.BuildTable(reports, resultExtenders);
             // If we have Benchmarks with ParametersSets, force the "Method" columns to be displayed, otherwise it doesn't make as much sense
             var columnsToAlwaysShow = reports.Any(r => r.Benchmark.Task.ParametersSets != null) ? new[] { "Method" } : new string[0];
             PrintTable(table, logger, columnsToAlwaysShow);
@@ -36,9 +37,9 @@ namespace BenchmarkDotNet.Plugins.Exporters
             }
         }
 
-        public void ExportToFile(IList<BenchmarkReport> reports, string competitionName)
+        public void ExportToFile(IList<BenchmarkReport> reports, string competitionName, IEnumerable<IBenchmarkResultExtender> resultExtenders = null)
         {
-            BenchmarkExporterHelper.ExportToFile(this, reports, competitionName);
+            BenchmarkExporterHelper.ExportToFile(this, reports, competitionName, resultExtenders);
         }
 
         private void PrintTable(List<string[]> table, IBenchmarkLogger logger, string[] columnsToAlwaysShow)

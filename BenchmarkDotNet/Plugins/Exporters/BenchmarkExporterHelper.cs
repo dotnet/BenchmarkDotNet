@@ -4,19 +4,23 @@ using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Plugins.ResultExtenders;
 
 namespace BenchmarkDotNet.Plugins.Exporters
 {
     public static class BenchmarkExporterHelper
     {
-        public static void ExportToFile(IBenchmarkExporter exporter, IList<BenchmarkReport> reports, string competitionName)
+        public static void ExportToFile(IBenchmarkExporter exporter, IList<BenchmarkReport> reports, string competitionName, 
+                                        IEnumerable<IBenchmarkResultExtender> resultExtenders = null)
         {
             using (var stream = new StreamWriter(competitionName + "-report." + exporter.Name))
-                exporter.Export(reports, new BenchmarkStreamLogger(stream));
+                exporter.Export(reports, new BenchmarkStreamLogger(stream), resultExtenders);
         }
 
         // TODO: signature refactoring
-        public static List<string[]> BuildTable(IList<BenchmarkReport> reports, bool pretty = true, bool extended = false)
+        public static List<string[]> BuildTable(IList<BenchmarkReport> reports, 
+                                                IEnumerable<IBenchmarkResultExtender> resultExtenders = null, 
+                                                bool pretty = true, bool extended = false)
         {
             var reportStats = reports.Where(r => r.Runs.Count > 0)
                                      .Select(r => new
@@ -46,6 +50,11 @@ namespace BenchmarkDotNet.Plugins.Exporters
             headerRow.Add("op/s");
             if (extended)
                 headerRow.Add("StdErr");
+            if (resultExtenders != null)
+            {
+                foreach (var extender in resultExtenders)
+                    headerRow.Add(extender.ColumnName);
+            }
 
             var orderedStats = reportStats;
             // For https://github.com/PerfDotNet/BenchmarkDotNet/issues/36
@@ -54,7 +63,23 @@ namespace BenchmarkDotNet.Plugins.Exporters
                                           .ThenBy(r => r.Benchmark.Target.Type.Name)
                                           .ToList();
 
+            IList<IList<string>> extraColumns = null;
+            if (resultExtenders != null)
+            {
+                extraColumns = new List<IList<string>>();
+                var resultsToProcess = orderedStats.Select(s => Tuple.Create(s.Report, s.Stat)).ToList();
+                foreach (var extender in resultExtenders)
+                {
+                    var column = extender.GetExtendedResults(resultsToProcess);
+                    // This behaviour/restriction is outlined in IBenchmarkResultExtender.cs
+                    if (column != null && column.Count == resultsToProcess.Count)
+                       extraColumns.Add(column);
+                    // TODO log an error if the two column counts  don't match (not sure where/how though?!)
+                }
+            }
+
             var table = new List<string[]> { headerRow.ToArray() };
+            var rowNumber = 0;
             foreach (var reportStat in orderedStats)
             {
                 var b = reportStat.Benchmark;
@@ -82,7 +107,14 @@ namespace BenchmarkDotNet.Plugins.Exporters
                 if (extended)
                     row.Add(timeToStringFunc(reportStat.Stat.AverageTime.StandardError));
 
+                if (extraColumns != null)
+                {
+                    foreach (var column in extraColumns)
+                        row.Add(column[rowNumber]);
+                }
+
                 table.Add(row.ToArray());
+                rowNumber++;
             }
 
             return table;

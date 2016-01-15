@@ -6,6 +6,7 @@ using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Plugins.Exporters;
 using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Plugins.Toolchains;
+using BenchmarkDotNet.Plugins.ResultExtenders;
 
 namespace BenchmarkDotNet.Plugins
 {
@@ -16,6 +17,7 @@ namespace BenchmarkDotNet.Plugins
         private readonly List<IBenchmarkDiagnoser> diagnosers = new List<IBenchmarkDiagnoser>();
         private readonly List<IBenchmarkToolchainBuilder> toolchains = new List<IBenchmarkToolchainBuilder>();
         private readonly List<IBenchmarkAnalyser> analysers = new List<IBenchmarkAnalyser>();
+        private readonly List<IBenchmarkResultExtender> resultExtenders = new List<IBenchmarkResultExtender>();
 
         private BenchmarkPluginBuilder()
         {
@@ -51,10 +53,17 @@ namespace BenchmarkDotNet.Plugins
             return this;
         }
 
+        public IBenchmarkPluginBuilder AddResultExtender(IBenchmarkResultExtender extender)
+        {
+            resultExtenders.Add(extender);
+            return this;
+        }
+
         public IBenchmarkLogger CompositeLogger => new BenchmarkCompositeLogger(loggers.ToArray());
         public IBenchmarkExporter CompositeExporter => new BenchmarkCompositeExporter(exporters.ToArray());
         public IBenchmarkDiagnoser CompositeDiagnoser => new BenchmarkCompositeDiagnoser(diagnosers.ToArray());
         public IBenchmarkAnalyser CompositeAnalyser => new BenchmarkCompositeAnalyser(analysers.ToArray());
+        public IList<IBenchmarkResultExtender> ResultExtenders => resultExtenders;
 
         public IBenchmarkToolchainFacade CreateToolchain(Benchmark benchmark, IBenchmarkLogger logger)
         {
