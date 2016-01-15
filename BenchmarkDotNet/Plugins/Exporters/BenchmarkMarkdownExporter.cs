@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Reports;
 
@@ -13,6 +14,12 @@ namespace BenchmarkDotNet.Plugins.Exporters
         public string Description => "Markdown exporter";
 
         public static readonly IBenchmarkExporter Default = new BenchmarkMarkdownExporter();
+        public static readonly IBenchmarkExporter StackOverflow = new BenchmarkMarkdownExporter()
+        {
+            prefix = "    "
+        };
+
+        private string prefix = string.Empty;
 
         private BenchmarkMarkdownExporter()
         {
@@ -20,7 +27,8 @@ namespace BenchmarkDotNet.Plugins.Exporters
 
         public void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger)
         {
-            logger.WriteLineInfo(EnvironmentInfo.GetCurrentInfo().ToFormattedString("Host", false));
+            logger = new BenchmarkLoggerWithPrefix(logger, prefix);
+            logger.WriteLineInfo(EnvironmentInfo.GetCurrentInfo().ToFormattedString("Host"));
 
             var table = BenchmarkExporterHelper.BuildTable(reports);
             // If we have Benchmarks with ParametersSets, force the "Method" columns to be displayed, otherwise it doesn't make as much sense
