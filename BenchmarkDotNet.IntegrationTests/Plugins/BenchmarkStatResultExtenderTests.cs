@@ -24,20 +24,21 @@ namespace BenchmarkDotNet.IntegrationTests.Plugins
         public void Test()
         {
             var logger = new BenchmarkAccumulationLogger();
-var extenders = new[]
-{
-    BenchmarkStatResultExtender.StdDev,
-    BenchmarkStatResultExtender.Min,
-    BenchmarkStatResultExtender.Q1,
-    BenchmarkStatResultExtender.Median,
-    BenchmarkStatResultExtender.Q3,
-    BenchmarkStatResultExtender.Max
-};
-var plugins = BenchmarkPluginBuilder.CreateDefault().
-    AddLogger(logger).
-    AddResultExtenders(extenders).
-    Build();
-var reports = new BenchmarkRunner(plugins).Run<Target>().ToList();
+            var extenders = new[]
+            {
+                BenchmarkStatResultExtender.StdDev,
+                BenchmarkStatResultExtender.Min,
+                BenchmarkStatResultExtender.Q1,
+                BenchmarkStatResultExtender.Median,
+                BenchmarkStatResultExtender.Q3,
+                BenchmarkStatResultExtender.Max,
+                BenchmarkStatResultExtender.OperationPerSecond
+            };
+            var plugins = BenchmarkPluginBuilder.CreateDefault().
+                AddLogger(logger).
+                AddResultExtenders(extenders).
+                Build();
+            var reports = new BenchmarkRunner(plugins).Run<Target>().ToList();
             output.WriteLine(logger.GetLog());
 
             var table = BenchmarkExporterHelper.BuildTable(reports, plugins.ResultExtenders);
@@ -46,22 +47,22 @@ var reports = new BenchmarkRunner(plugins).Run<Target>().ToList();
                 Assert.True(headerRow.Contains(extender.ColumnName));
         }
 
-[BenchmarkTask(mode: BenchmarkMode.SingleRun, processCount: 1, targetIterationCount: 5)]
-public class Target
-{
-    private readonly Random random = new Random(42);
+        [BenchmarkTask(mode: BenchmarkMode.SingleRun, processCount: 1, targetIterationCount: 5)]
+        public class Target
+        {
+            private readonly Random random = new Random(42);
 
-    [Benchmark]
-    public void Main50()
-    {
-        Thread.Sleep(50 + random.Next(50));
-    }
+            [Benchmark]
+            public void Main50()
+            {
+                Thread.Sleep(50 + random.Next(50));
+            }
 
-    [Benchmark]
-    public void Main100()
-    {
-        Thread.Sleep(100 + random.Next(50));
-    }
-}
+            [Benchmark]
+            public void Main100()
+            {
+                Thread.Sleep(100 + random.Next(50));
+            }
+        }
     }
 }

@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.IntegrationTests.Plugins
             var reports = new BenchmarkRunner(plugins).Run(this.GetType()).ToList();
             var table = BenchmarkExporterHelper.BuildTable(reports, plugins.ResultExtenders);
             var headerRow = table.First();
-            Assert.True(headerRow.Last() == extender.ColumnName);
+            Assert.Equal(headerRow.Last(), extender.ColumnName);
             var testNameColumn = Array.FindIndex(headerRow, c => c == "Method");
             var extraColumn = Array.FindIndex(headerRow, c => c == extender.ColumnName);
             foreach (var row in table)
@@ -76,7 +76,6 @@ namespace BenchmarkDotNet.IntegrationTests.Plugins
             Assert.False(testExporter.ExportCalled);
             Assert.Null(testExporter.ExportResultExtenders);
             Assert.True(testExporter.ExportToFileCalled);
-            Assert.Null(testExporter.ExportToFileResultExtenders);
         }
 
         [Benchmark]

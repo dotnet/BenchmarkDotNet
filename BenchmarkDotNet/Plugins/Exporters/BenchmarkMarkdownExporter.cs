@@ -53,7 +53,9 @@ namespace BenchmarkDotNet.Plugins.Exporters
 
             var table = BenchmarkExporterHelper.BuildTable(reports, resultExtenders);
             // If we have Benchmarks with ParametersSets, force the "Method" columns to be displayed, otherwise it doesn't make as much sense
-            var columnsToAlwaysShow = reports.Any(r => r.Benchmark.Task.ParametersSets != null) ? new[] { "Method" } : new string[0];
+            var columnsToAlwaysShow = 
+                (reports.Any(r => r.Benchmark.Task.ParametersSets != null) ? new[] { "Method" } : new string[0]).
+                Concat((resultExtenders ?? new IBenchmarkResultExtender[0]).Select(e => e.ColumnName)).ToArray();
             PrintTable(table, logger, columnsToAlwaysShow);
 
             // TODO: move this logic to an analyser
@@ -76,12 +78,12 @@ namespace BenchmarkDotNet.Plugins.Exporters
                 return;
             }
             int rowCount = table.Count, colCount = table[0].Length;
-            var columnsToShowIndexes = columnsToAlwaysShow.Select(col => Array.IndexOf(table[0], col));
+            var columnsToShowIndexes = columnsToAlwaysShow.Select(col => Array.IndexOf(table[0], col)).ToArray();
             int[] widths = new int[colCount];
             bool[] areSame = new bool[colCount];
             for (int colIndex = 0; colIndex < colCount; colIndex++)
             {
-                areSame[colIndex] = rowCount > 2 && colIndex < colCount - 2;
+                areSame[colIndex] = rowCount > 2 && colIndex < colCount;
                 for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
                 {
                     widths[colIndex] = Math.Max(widths[colIndex], table[rowIndex][colIndex].Length + 1);

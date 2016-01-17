@@ -11,8 +11,8 @@ namespace BenchmarkDotNet.Plugins.Exporters
     public static class BenchmarkExporterHelper
     {
         // TODO: signature refactoring
-        public static List<string[]> BuildTable(IList<BenchmarkReport> reports, 
-                                                IEnumerable<IBenchmarkResultExtender> resultExtenders = null, 
+        public static List<string[]> BuildTable(IList<BenchmarkReport> reports,
+                                                IEnumerable<IBenchmarkResultExtender> resultExtenders = null,
                                                 bool pretty = true)
         {
             var data = reports.
@@ -37,11 +37,6 @@ namespace BenchmarkDotNet.Plugins.Exporters
                 headerRow.Add("IntParam");
                 showParams = true;
             }
-            if (resultExtenders != null)
-            {
-                foreach (var extender in resultExtenders)
-                    headerRow.Add(extender.ColumnName);
-            }
 
             var orderedData = data;
             // For https://github.com/PerfDotNet/BenchmarkDotNet/issues/36
@@ -61,14 +56,17 @@ namespace BenchmarkDotNet.Plugins.Exporters
                     var column = extender.GetExtendedResults(resultsToProcess, timeUnit);
                     // This behaviour/restriction is outlined in IBenchmarkResultExtender.cs
                     if (column != null && column.Count == resultsToProcess.Count)
-                       extraColumns.Add(column);
+                    {
+                        headerRow.Add(extender.ColumnName);
+                        extraColumns.Add(column);
+                    }
                     // TODO log an error if the two column counts  don't match (not sure where/how though?!)
                 }
             }
 
             var table = new List<string[]> { headerRow.ToArray() };
             var rowNumber = 0;
-            foreach (var item in orderedData)            
+            foreach (var item in orderedData)
             {
                 var b = item.Benchmark;
 

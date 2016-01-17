@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Plugins.ResultExtenders
 
         public IList<string> GetExtendedResults(IList<Tuple<BenchmarkReport, StatSummary>> reports, TimeUnit timeUnit)
         {
-            var benchmarks = reports.Select(r => r.Item1.Benchmark);
+            var benchmarks = reports.Select(r => r.Item1.Benchmark).Distinct();
             var baselineCount = benchmarks.Count(b => b.Target.Baseline);
             if (baselineCount != 1)
                 return null;
