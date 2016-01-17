@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Plugins.Exporters;
 using BenchmarkDotNet.Plugins.Loggers;
+using BenchmarkDotNet.Plugins.ResultExtenders;
 using BenchmarkDotNet.Plugins.Toolchains;
 
 namespace BenchmarkDotNet.Plugins
@@ -40,6 +41,13 @@ namespace BenchmarkDotNet.Plugins
         {
             foreach (var analyser in analysers)
                 builder.AddAnalyser(analyser);
+            return builder;
+        }
+
+        public static IBenchmarkPluginBuilder AddResultExtenders(this IBenchmarkPluginBuilder builder, params IBenchmarkResultExtender[] extenders)
+        {
+            foreach (var extender in extenders)
+                builder.AddResultExtender(extender);
             return builder;
         }
     }

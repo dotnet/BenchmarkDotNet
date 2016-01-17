@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Plugins.ResultExtenders;
 using BenchmarkDotNet.Reports;
@@ -8,26 +9,57 @@ using BenchmarkDotNet.Reports;
 namespace BenchmarkDotNet.Plugins.Exporters
 {
     // TODO: add support of GitHub markdown, Stackoverflow markdown
-    public class BenchmarkMarkdownExporter : IBenchmarkExporter
+    public class BenchmarkMarkdownExporter : BenchmarkExporterBase
     {
-        public string Name => "md";
-        public string Description => "Markdown exporter";
+        public override string Name => $"md-{Dialect}";
+        public override string Description => $"Markdown exporter - {Dialect}";
 
-        public static readonly IBenchmarkExporter Default = new BenchmarkMarkdownExporter();
+        public override string FileExtension => "md";
+        public override string FileNameSuffix => $"-{Dialect.ToLower()}";
+
+        public string Dialect { get; private set; }
+
+        public static readonly IBenchmarkExporter Default = new BenchmarkMarkdownExporter()
+        {
+            Dialect = nameof(Default)
+        };
+        public static readonly IBenchmarkExporter StackOverflow = new BenchmarkMarkdownExporter()
+        {
+            prefix = "    ",
+            Dialect = nameof(StackOverflow)
+        };
+        public static readonly IBenchmarkExporter GitHub = new BenchmarkMarkdownExporter()
+        {
+            Dialect = nameof(GitHub),
+            useCodeBlocks = true,
+            codeBlocksSyntax = "ini"
+        };
+
+        private string prefix = string.Empty;
+        private bool useCodeBlocks = false;
+        private string codeBlocksSyntax = string.Empty;
 
         private BenchmarkMarkdownExporter()
         {
         }
 
-        public void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger, IEnumerable<IBenchmarkResultExtender> resultExtenders = null)
+        public override void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger, IEnumerable<IBenchmarkResultExtender> resultExtenders = null)
         {
-            logger.WriteLineInfo(EnvironmentInfo.GetCurrentInfo().ToFormattedString("Host", false));
+            if(useCodeBlocks)
+                logger.WriteLine($"```{codeBlocksSyntax}");
+            logger = new BenchmarkLoggerWithPrefix(logger, prefix);
+            logger.WriteLineInfo(EnvironmentInfo.GetCurrentInfo().ToFormattedString("Host"));
+            logger.NewLine();
 
             var table = BenchmarkExporterHelper.BuildTable(reports, resultExtenders);
             // If we have Benchmarks with ParametersSets, force the "Method" columns to be displayed, otherwise it doesn't make as much sense
-            var columnsToAlwaysShow = reports.Any(r => r.Benchmark.Task.ParametersSets != null) ? new[] { "Method" } : new string[0];
+            var columnsToAlwaysShow = 
+                (reports.Any(r => r.Benchmark.Task.ParametersSets != null) ? new[] { "Method" } : new string[0]).
+                Concat((resultExtenders ?? new IBenchmarkResultExtender[0]).Select(e => e.ColumnName)).ToArray();
             PrintTable(table, logger, columnsToAlwaysShow);
-            var benchmarksWithTroubles = reports.Where(r => r.Runs.Count == 0).Select(r => r.Benchmark).ToList();
+
+            // TODO: move this logic to an analyser
+            var benchmarksWithTroubles = reports.Where(r => !r.GetTargetRuns().Any()).Select(r => r.Benchmark).ToList();
             if (benchmarksWithTroubles.Count > 0)
             {
                 logger.NewLine();
@@ -35,11 +67,6 @@ namespace BenchmarkDotNet.Plugins.Exporters
                 foreach (var benchmarkWithTroubles in benchmarksWithTroubles)
                     logger.WriteLineError("  " + benchmarkWithTroubles.Caption);
             }
-        }
-
-        public void ExportToFile(IList<BenchmarkReport> reports, string competitionName, IEnumerable<IBenchmarkResultExtender> resultExtenders = null)
-        {
-            BenchmarkExporterHelper.ExportToFile(this, reports, competitionName, resultExtenders);
         }
 
         private void PrintTable(List<string[]> table, IBenchmarkLogger logger, string[] columnsToAlwaysShow)
@@ -51,12 +78,12 @@ namespace BenchmarkDotNet.Plugins.Exporters
                 return;
             }
             int rowCount = table.Count, colCount = table[0].Length;
-            var columnsToShowIndexes = columnsToAlwaysShow.Select(col => Array.IndexOf(table[0], col));
+            var columnsToShowIndexes = columnsToAlwaysShow.Select(col => Array.IndexOf(table[0], col)).ToArray();
             int[] widths = new int[colCount];
             bool[] areSame = new bool[colCount];
             for (int colIndex = 0; colIndex < colCount; colIndex++)
             {
-                areSame[colIndex] = rowCount > 2 && colIndex < colCount - 3;
+                areSame[colIndex] = rowCount > 2 && colIndex < colCount;
                 for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
                 {
                     widths[colIndex] = Math.Max(widths[colIndex], table[rowIndex][colIndex].Length + 1);
@@ -66,9 +93,25 @@ namespace BenchmarkDotNet.Plugins.Exporters
             }
             if (areSame.Any(s => s))
             {
+                var paramsOnLine = 0;
                 for (int colIndex = 0; colIndex < colCount; colIndex++)
                     if (areSame[colIndex] && columnsToShowIndexes.Contains(colIndex) == false)
+                    {
                         logger.WriteInfo($"{table[0][colIndex]}={table[1][colIndex]}  ");
+                        paramsOnLine++;
+                        if (paramsOnLine == 3)
+                        {
+                            logger.NewLine();
+                            paramsOnLine = 0;
+                        }
+                    }
+                        
+                logger.NewLine();
+            }
+
+            if (useCodeBlocks)
+            {
+                logger.Write("```");
                 logger.NewLine();
             }
 

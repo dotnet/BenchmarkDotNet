@@ -54,10 +54,19 @@
     <Compile Include="BenchmarkState.cs" />
     <Compile Include="BenchmarkRunnerExtensions.cs" />
     <Compile Include="EnvironmentInfo.cs" />
+    <Compile Include="Extensions\StatSummaryExtensions.cs" />
+    <Compile Include="Helpers\ResourceHelper.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Plugins\Exporters\BenchmarkCsvRunsExporter.cs" />
+    <Compile Include="Plugins\Exporters\BenchmarkExporterBase.cs" />
+    <Compile Include="Plugins\Exporters\BenchmarkPlainExporter.cs" />
+    <Compile Include="Plugins\Exporters\BenchmarkRPlotExporter.cs" />
+    <Compile Include="Plugins\Loggers\BenchmarkLoggerWithPrefix.cs" />
+    <Compile Include="Plugins\ResultExtenders\BenchmarkStatResultExtender.cs" />
+    <Compile Include="TimeUnit.cs" />
     <Compile Include="Plugins\Analyzers\BenchmarkAnalysisWarning.cs" />
     <Compile Include="Plugins\Analyzers\BenchmarkCompositeAnalyser.cs" />
     <Compile Include="Plugins\Analyzers\BenchmarkEnvironmentAnalyser.cs" />
-    <Compile Include="Plugins\Analyzers\BenchmarkStdDevAnalyser.cs" />
     <Compile Include="Plugins\Analyzers\IBenchmarkAnalyser.cs" />
     <Compile Include="Plugins\Analyzers\IBenchmarkAnalysisWarning.cs" />
     <Compile Include="Plugins\BenchmarkDefaultPlugins.cs" />
@@ -116,7 +125,6 @@
     <Compile Include="Extensions\ConfigurationExtensions.cs" />
     <Compile Include="Extensions\ReflectionExtensions.cs" />
     <Compile Include="Reports\BenchmarkReport.cs" />
-    <Compile Include="Reports\BenchmarkRunReportsStatistic.cs" />
     <Compile Include="Plugins\Loggers\BenchmarkCompositeLogger.cs" />
     <Compile Include="Plugins\Loggers\BenchmarkStreamLogger.cs" />
     <Compile Include="Plugins\Loggers\BenchmarkLoggerExtensions.cs" />
@@ -147,7 +155,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Templates\BuildBenchmark.txt" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\BuildPlots.R" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

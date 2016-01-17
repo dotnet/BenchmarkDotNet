@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Plugins.Toolchains.Results;
 using BenchmarkDotNet.Tasks;
@@ -86,10 +87,10 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
             switch (benchmark.Task.Configuration.Mode)
             {
                 case BenchmarkMode.SingleRun:
-                    runBenchmarkTemplate = GetTemplate("BenchmarkSingleRun.txt");
+                    runBenchmarkTemplate = ResourceHelper.LoadTemplate("BenchmarkSingleRun.txt");
                     break;
                 case BenchmarkMode.Throughput:
-                    runBenchmarkTemplate = GetTemplate("BenchmarkThroughput.txt");
+                    runBenchmarkTemplate = ResourceHelper.LoadTemplate("BenchmarkThroughput.txt");
                     break;
             }
 
@@ -98,7 +99,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
                 $"{nameof(BenchmarkTask.Configuration).ToCamelCase()}: new {nameof(BenchmarkConfiguration)}({benchmark.Task.Configuration.ToCtorDefinition()}), " +
                 $"{nameof(BenchmarkTask.ParametersSets).ToCamelCase()}: new {nameof(BenchmarkParametersSets)}({benchmark.Task.ParametersSets.ToCtorDefinition()})";
 
-            var contentTemplate = GetTemplate("BenchmarkProgram.txt");
+            var contentTemplate = ResourceHelper.LoadTemplate("BenchmarkProgram.txt");
             var content = contentTemplate.
                 Replace("$RunBenchmarkContent$", runBenchmarkTemplate).
                 Replace("$OperationsPerInvoke$", operationsPerInvoke.ToInvariantString()).
@@ -126,7 +127,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
             var platform = configuration.Platform.ToConfig();
             var framework = configuration.Framework.ToConfig(benchmark.Target.Type);
 
-            var template = GetTemplate("BenchmarkCsproj.txt");
+            var template = ResourceHelper.LoadTemplate("BenchmarkCsproj.txt");
             var content = template.
                 Replace("$Platform$", platform).
                 Replace("$Framework$", framework).
@@ -145,7 +146,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
 
         private void GenerateProjectBuildFile(string projectDir)
         {
-            var content = GetTemplate("BuildBenchmark.txt");
+            var content = ResourceHelper.LoadTemplate("BuildBenchmark.txt");
             string fileName = Path.Combine(projectDir, "BuildBenchmark.bat");
             File.WriteAllText(fileName, content);
         }
@@ -168,7 +169,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
         {
             var useLagacyJit = configuration.JitVersion.ToConfig();
 
-            var template = GetTemplate(configuration.JitVersion == BenchmarkJitVersion.HostJit ? "BenchmarkAppConfigEmpty.txt" : "BenchmarkAppConfig.txt");
+            var template = ResourceHelper.LoadTemplate(configuration.JitVersion == BenchmarkJitVersion.HostJit ? "BenchmarkAppConfigEmpty.txt" : "BenchmarkAppConfig.txt");
             var content = template.
                 Replace("$UseLagacyJit$", useLagacyJit);
 
@@ -201,19 +202,6 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
             if (!Directory.Exists(directoryPath))
                 Directory.CreateDirectory(directoryPath);
             return new BenchmarkGenerateResult(directoryPath, true, null);
-        }
-
-        private static string GetTemplate(string name)
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-            var resourceName = "BenchmarkDotNet.Templates." + name;
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            {
-                if (stream == null)
-                    throw new Exception($"Resource {resourceName} not found");
-                using (StreamReader reader = new StreamReader(stream))
-                    return reader.ReadToEnd();
-            }
         }
 
         private void EnsureDependancyInCorrectLocation(Type type, string outputDir)

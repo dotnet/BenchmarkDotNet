@@ -9,6 +9,7 @@
         WarmupIdle,
         TargetIdle,
         Warmup,
-        Target
+        Target,
+        Unknown
     }
 }

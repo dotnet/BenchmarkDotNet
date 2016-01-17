@@ -6,6 +6,7 @@ using BenchmarkDotNet.Plugins.Analyzers;
 using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Plugins.Exporters;
 using BenchmarkDotNet.Plugins.Loggers;
+using BenchmarkDotNet.Plugins.ResultExtenders;
 using BenchmarkDotNet.Plugins.Toolchains;
 using BenchmarkDotNet.Plugins.Toolchains.Classic;
 using BenchmarkDotNet.Tasks;
@@ -15,12 +16,27 @@ namespace BenchmarkDotNet.Plugins
     public static class BenchmarkDefaultPlugins
     {
         public static readonly IBenchmarkLogger[] Loggers = { BenchmarkConsoleLogger.Default };
-        public static readonly IBenchmarkExporter[] Exporters = { BenchmarkCsvExporter.Default, BenchmarkMarkdownExporter.Default };
+        public static readonly IBenchmarkExporter[] Exporters =
+        {
+            BenchmarkCsvExporter.Default,
+            BenchmarkMarkdownExporter.StackOverflow,
+            BenchmarkMarkdownExporter.Default,
+            BenchmarkMarkdownExporter.GitHub,
+            BenchmarkPlainExporter.Default,
+            BenchmarkCsvRunsExporter.Default,
+            BenchmarkRPlotExporter.Default
+        };
         // Make the Diagnosers lazy-loaded, so they are only instantiated if needed
-        public static readonly Lazy<IBenchmarkDiagnoser[]> Diagnosers = 
-            new Lazy<IBenchmarkDiagnoser[]>(() => LoadDiagnoser(), LazyThreadSafetyMode.ExecutionAndPublication);
+        public static readonly Lazy<IBenchmarkDiagnoser[]> Diagnosers =
+            new Lazy<IBenchmarkDiagnoser[]>(LoadDiagnoser, LazyThreadSafetyMode.ExecutionAndPublication);
         public static readonly IBenchmarkToolchainBuilder[] Toolchains = CreateToolchainBuilders();
-        public static readonly IBenchmarkAnalyser[] Analysers = { BenchmarkStdDevAnalyser.Default, BenchmarkEnvironmentAnalyser.Default };
+        public static readonly IBenchmarkAnalyser[] Analysers = { BenchmarkEnvironmentAnalyser.Default };
+
+        public static readonly IBenchmarkResultExtender[] ResultExtenders =
+        {
+            BenchmarkStatResultExtender.AvrTime,
+            BenchmarkStatResultExtender.Error
+        };
 
         private static IBenchmarkDiagnoser[] LoadDiagnoser()
         {
