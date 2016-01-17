@@ -1,19 +1,16 @@
-**BenchmarkDotNet** is a lightweight .NET library for benchmarking. [Microbenchmarking is very hard](https://andreyakinshin.gitbooks.io/performancebookdotnet/content/science/microbenchmarking.html), but BenchmarkDotNet helps you to create accurate benchmarks in an easy way.
+**BenchmarkDotNet** is a lightweight .NET library for benchmarking, it helps you to create accurate benchmarks in an easy way.
+
+[![NuGet version](https://badge.fury.io/nu/BenchmarkDotNet.svg)](https://badge.fury.io/nu/BenchmarkDotNet) [![Join the chat at https://gitter.im/PerfDotNet/BenchmarkDotNet](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/PerfDotNet/BenchmarkDotNet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [Wiki](https://github.com/PerfDotNet/BenchmarkDotNet/wiki)
 
 ## Features
 * BenchmarkDotNet creates an isolated project for each benchmark method and automatically runs it in a separate runtime, in Release mode, without an attached debugger.
 * You can create benchmark tasks that run your benchmark with different CLR, JIT and platform versions.
 * BenchmarkDotNet performs warm-up executions of your code, then runs it several times in different CLR instances, calculates statistics and tries to eliminate some runtime side-effects.
 * BenchmarkDotNet runs with minimal overhead so as to give an accurate performance measurment.
- 
-## Developing
-Join the chat at: [![Join the chat at https://gitter.im/PerfDotNet/BenchmarkDotNet](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/PerfDotNet/BenchmarkDotNet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-Also see the [developing page](https://github.com/PerfDotNet/BenchmarkDotNet/wiki).
 
 ## Getting started
 
-**Step 1** Install BenchmarkDotNet via the NuGet package: [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/) [![NuGet version](https://badge.fury.io/nu/BenchmarkDotNet.svg)](https://badge.fury.io/nu/BenchmarkDotNet)
+**Step 1** Install BenchmarkDotNet via the NuGet package: [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/)
 
 ```
 PM> Install-Package BenchmarkDotNet
@@ -72,6 +69,8 @@ Type=Algo_Md5VsSha256  Mode=Throughput  Platform=HostPlatform  Jit=HostJit  .NET
 | Sha256 | 139.7358 us | 9.2690 us |  7,183.93 |
 
 ## Advanced Features
+
+### Attributes
 BenchmarkDotNet provides you with several features that let you write more complex and powerful benchmarks.
 
 - `[BenchmarkTask]` attribute let you specify different useful variables: jit version (Legacy/RyuJIT), cpu architecture (x86/x64), target runtime (CLR/Mono), and so on. You can use several attributes to compare different benchmark configurations.
@@ -140,15 +139,24 @@ var benchmarkSwitcher = new BenchmarkSwitcher(new[] {
 benchmarkSwitcher.Run(args);
 ```
 
-## Export
+### Export
 
 There are some preformatted md files that you can use to share benchmark results in the net. If you have a default plugins set they will be located in your bin directory. There are markdown files for StackOverflow and GitHub. They can be easily found by specific file suffix:
 
 ```
-<benchmark_name>-report-default.md
-<benchmark_name>-report-github.md
-<benchmark_name>-report-stackoverflow.md
+<BenchmarkName>-report.csv
+<BenchmarkName>-runs.csv
+
+<BenchmarkName>-report-default.md
+<BenchmarkName>-report-github.md
+<BenchmarkName>-report-stackoverflow.md
+
+<BenchmarkName>-report.txt
 ```
+
+### Plots
+
+If you have installed [R](https://www.r-project.org/) and defined `%R_HOME%` variable, you will also get nice barplots and boxplots via `BenchmarkRPlotExporter` that generates `BuildPlots.R` in your bin directory.
 
 ## Authors
 
