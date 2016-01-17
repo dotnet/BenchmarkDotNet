@@ -13,7 +13,11 @@ Also see the [developing page](https://github.com/PerfDotNet/BenchmarkDotNet/wik
 
 ## Getting started
 
-**Step 1** Install BenchmarkDotNet via the NuGet package: [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/)
+**Step 1** Install BenchmarkDotNet via the NuGet package: [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/) [![NuGet version](https://badge.fury.io/nu/BenchmarkDotNet.svg)](https://badge.fury.io/nu/BenchmarkDotNet)
+
+```
+PM> Install-Package BenchmarkDotNet
+```
 
 **Step 2** Write a class with methods that you want to measure and mark them with the `Benchmark` attribute. In the following example, we will compare [MD5](https://en.wikipedia.org/wiki/MD5) and [SHA256](https://en.wikipedia.org/wiki/SHA-2) cryptographic hash functions:
 
