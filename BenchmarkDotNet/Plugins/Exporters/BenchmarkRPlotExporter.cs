@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Plugins.Loggers;
+using BenchmarkDotNet.Plugins.ResultExtenders;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Plugins.Exporters
@@ -15,12 +16,12 @@ namespace BenchmarkDotNet.Plugins.Exporters
 
         public static readonly IBenchmarkExporter Default = new BenchmarkRPlotExporter();
 
-        public void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger)
+        public void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger, IEnumerable<IBenchmarkResultExtender> resultExtenders = null)
         {
             throw new System.NotSupportedException();
         }
 
-        public IEnumerable<string> ExportToFile(IList<BenchmarkReport> reports, string fileNamePrefix)
+        public IEnumerable<string> ExportToFile(IList<BenchmarkReport> reports, string fileNamePrefix, IEnumerable<IBenchmarkResultExtender> resultExtenders = null)
         {
             const string scriptFileName = "BuildPlots.R";
             yield return scriptFileName;

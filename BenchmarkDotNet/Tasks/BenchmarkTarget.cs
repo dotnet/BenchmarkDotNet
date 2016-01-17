@@ -14,10 +14,12 @@ namespace BenchmarkDotNet.Tasks
         public long OperationsPerInvoke { get; }
         public string Description { get; }
         public string MethodTitle { get; }
+        public bool Baseline { get; }
 
         public string Caption => (Type?.Name.WithoutSuffix("Competition") ?? "Untitled") + "_" + (Method?.Name ?? "Untitled");
 
-        public BenchmarkTarget(Type type, MethodInfo method, MethodInfo setupMethod = null, string description = null, string additionalLogic = null)
+        public BenchmarkTarget(Type type, MethodInfo method, MethodInfo setupMethod = null, 
+                               string description = null, string additionalLogic = null, bool baseline = false)
         {
             Type = type;
             Method = method;
@@ -26,6 +28,7 @@ namespace BenchmarkDotNet.Tasks
             AdditionalLogic = additionalLogic ?? string.Empty;
             Description = description ?? Caption;
             MethodTitle = description ?? method?.Name ?? "Untitled";
+            Baseline = baseline;
         }
 
         public IEnumerable<BenchmarkProperty> Properties

@@ -26,14 +26,24 @@ namespace BenchmarkDotNet
 
         internal IEnumerable<BenchmarkReport> Run(List<Benchmark> benchmarks, string competitionName = null)
         {
+            var baselineCount = benchmarks.Count(b => b.Target.Baseline == true);
+            if (baselineCount > 1)
+            {
+                var benchmarkClass = benchmarks.FirstOrDefault()?.Target?.Method?.DeclaringType?.FullName ?? "UNKNOWN";
+                throw new InvalidOperationException($"Only 1 [Benchmark] in a class can have \"Baseline = true\" applied to it, {benchmarkClass} has {baselineCount}");
+            }
+
             benchmarkRunIndex++;
             if (competitionName == null)
                 competitionName = $"BenchmarkRun-{benchmarkRunIndex:##000}-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}";
             using (var logStreamWriter = new StreamWriter(competitionName + ".log"))
             {
-                var logger = new BenchmarkCompositeLogger(Plugins.CompositeLogger,
-                    new BenchmarkStreamLogger(logStreamWriter));
+                var logger = new BenchmarkCompositeLogger(Plugins.CompositeLogger, new BenchmarkStreamLogger(logStreamWriter));
                 var reports = Run(benchmarks, logger, competitionName);
+                if (baselineCount == 1)
+                    Plugins.CompositeExporter.ExportToFile(reports, competitionName, Plugins.ResultExtenders);
+                else
+                    Plugins.CompositeExporter.ExportToFile(reports, competitionName);
                 return reports;
             }
         }
@@ -75,7 +85,10 @@ namespace BenchmarkDotNet
             logger.NewLine();
 
             logger.WriteLineHeader("// * Export *");
-            var files = Plugins.CompositeExporter.ExportToFile(reports, competitionName);
+            var baselineCount = benchmarks.Count(b => b.Target.Baseline);
+            var files = baselineCount == 1 
+                ? Plugins.CompositeExporter.ExportToFile(reports, competitionName, Plugins.ResultExtenders) 
+                : Plugins.CompositeExporter.ExportToFile(reports, competitionName);
             foreach (var file in files)
                 logger.WriteLineInfo($"  {file}");
             logger.NewLine();
@@ -91,7 +104,7 @@ namespace BenchmarkDotNet
 
 
             logger.WriteLineHeader("// * Summary *");
-            BenchmarkMarkdownExporter.Default.Export(reports, logger);
+            BenchmarkMarkdownExporter.Default.Export(reports, logger, Plugins.ResultExtenders);
 
             var warnings = Plugins.CompositeAnalyser.Analyze(reports).ToList();
             if (warnings.Count > 0)

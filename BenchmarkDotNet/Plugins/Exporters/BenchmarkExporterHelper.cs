@@ -1,17 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Common;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Plugins.ResultExtenders;
 
 namespace BenchmarkDotNet.Plugins.Exporters
 {
     public static class BenchmarkExporterHelper
     {
         // TODO: signature refactoring
-        public static List<string[]> BuildTable(IList<BenchmarkReport> reports, bool pretty = true)
+        public static List<string[]> BuildTable(IList<BenchmarkReport> reports, 
+                                                IEnumerable<IBenchmarkResultExtender> resultExtenders = null, 
+                                                bool pretty = true, bool extended = false)
         {
             var data = reports.
                 Where(r => r.GetTargetRuns().Any()).
@@ -37,6 +41,11 @@ namespace BenchmarkDotNet.Plugins.Exporters
             }
             headerRow.Add("AvrTime");
             headerRow.Add("Error");
+            if (resultExtenders != null)
+            {
+                foreach (var extender in resultExtenders)
+                    headerRow.Add(extender.ColumnName);
+            }
 
             var orderedData = data;
             // For https://github.com/PerfDotNet/BenchmarkDotNet/issues/36
@@ -46,8 +55,24 @@ namespace BenchmarkDotNet.Plugins.Exporters
                     ThenBy(r => r.Benchmark.Target.Type.Name).
                     ToList();
 
+            IList<IList<string>> extraColumns = null;
+            if (resultExtenders != null)
+            {
+                extraColumns = new List<IList<string>>();
+                var resultsToProcess = orderedData.Select(s => Tuple.Create(s.Report, s.Stat)).ToList();
+                foreach (var extender in resultExtenders)
+                {
+                    var column = extender.GetExtendedResults(resultsToProcess);
+                    // This behaviour/restriction is outlined in IBenchmarkResultExtender.cs
+                    if (column != null && column.Count == resultsToProcess.Count)
+                       extraColumns.Add(column);
+                    // TODO log an error if the two column counts  don't match (not sure where/how though?!)
+                }
+            }
+
             var table = new List<string[]> { headerRow.ToArray() };
-            foreach (var item in orderedData)
+            var rowNumber = 0;
+            foreach (var item in orderedData)            
             {
                 var b = item.Benchmark;
 
@@ -70,7 +95,14 @@ namespace BenchmarkDotNet.Plugins.Exporters
                 row.Add(item.Stat.Mean.ToTimeStr(timeUnit));
                 row.Add(item.Stat.StandardError.ToTimeStr(timeUnit));
 
+                if (extraColumns != null)
+                {
+                    foreach (var column in extraColumns)
+                        row.Add(column[rowNumber]);
+                }
+
                 table.Add(row.ToArray());
+                rowNumber++;
             }
 
             return table;

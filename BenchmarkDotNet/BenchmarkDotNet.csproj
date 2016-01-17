@@ -78,6 +78,8 @@
     <Compile Include="Plugins\BenchmarkPluginsExtensions.cs" />
     <Compile Include="Plugins\IPlugin.cs" />
     <Compile Include="Plugins\Loggers\BenchmarkAccumulationLogger.cs" />
+    <Compile Include="Plugins\ResultExtenders\BenchmarkBaselineDeltaResultExtender.cs" />
+    <Compile Include="Plugins\ResultExtenders\IBenchmarkResultExtender.cs" />
     <Compile Include="Plugins\Toolchains\BenchmarkToolchainBuilder.cs" />
     <Compile Include="Plugins\Toolchains\IBenchmarkToolchainBuilder.cs" />
     <Compile Include="Plugins\Toolchains\BenchmarkToolchainFacade.cs" />
@@ -85,7 +87,6 @@
     <Compile Include="Plugins\Exporters\BenchmarkCsvExporter.cs" />
     <Compile Include="Plugins\Exporters\IBenchmarkExporter.cs" />
     <Compile Include="Plugins\Exporters\BenchmarkMarkdownExporter.cs" />
-    <Compile Include="Plugins\Exporters\BenchmarkExporterExtensions.cs" />
     <Compile Include="Plugins\Exporters\BenchmarkExporterHelper.cs" />
     <Compile Include="Plugins\Toolchains\IBenchmarkGenerator.cs" />
     <Compile Include="Plugins\Toolchains\IBenchmarkBuilder.cs" />

@@ -77,11 +77,12 @@
     <Compile Include="ParamsAttributeStaticTest.cs" />
     <Compile Include="ParamsAttributeTest.cs" />
     <Compile Include="PerformanceUnitTest.cs" />
+    <Compile Include="Plugins\BaselineDeltaResultExtenderTest.cs" />
     <Compile Include="PretendFSharpTest.cs" />
     <Compile Include="SetupAttributeInvalidMethodTest.cs" />
     <Compile Include="SetupAttributeTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SourceDiagnoserTest.cs" />
+    <Compile Include="Plugins\SourceDiagnoserTest.cs" />
     <Compile Include="ToolchainTest.cs" />
   </ItemGroup>
   <ItemGroup>

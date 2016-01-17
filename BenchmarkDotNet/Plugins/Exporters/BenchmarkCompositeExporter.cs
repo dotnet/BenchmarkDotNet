@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Plugins.Loggers;
+using BenchmarkDotNet.Plugins.ResultExtenders;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Plugins.Exporters
@@ -17,13 +18,13 @@ namespace BenchmarkDotNet.Plugins.Exporters
             this.exporters = exporters;
         }
 
-        public void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger)
+        public void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger, IEnumerable<IBenchmarkResultExtender> resultExtenders = null)
         {
             foreach (var exporter in exporters)
-                exporter.Export(reports, logger);
+                exporter.Export(reports, logger, resultExtenders);
         }
 
-        public IEnumerable<string> ExportToFile(IList<BenchmarkReport> reports, string fileNamePrefix) => 
-            exporters.SelectMany(exporter => exporter.ExportToFile(reports, fileNamePrefix));
+        public IEnumerable<string> ExportToFile(IList<BenchmarkReport> reports, string fileNamePrefix, IEnumerable<IBenchmarkResultExtender> resultExtenders = null) => 
+            exporters.SelectMany(exporter => exporter.ExportToFile(reports, fileNamePrefix, resultExtenders));
     }
 }

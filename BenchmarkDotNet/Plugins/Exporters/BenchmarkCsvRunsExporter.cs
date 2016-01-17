@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Plugins.Loggers;
+using BenchmarkDotNet.Plugins.ResultExtenders;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Plugins.Exporters
@@ -49,7 +50,7 @@ namespace BenchmarkDotNet.Plugins.Exporters
             new Column("RunOperations", (report, run) => run.Operations.ToString()),
         };
 
-        public override void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger)
+        public override void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger, IEnumerable<IBenchmarkResultExtender> resultExtenders = null)
         {
             logger.WriteLine(string.Join(";", columns.Select(c => c.Title)));
             foreach (var report in reports)
