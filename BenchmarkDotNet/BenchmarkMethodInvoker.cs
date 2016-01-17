@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using BenchmarkDotNet.Common;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Tasks;
 

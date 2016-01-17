@@ -1,14 +1,14 @@
 ﻿using System.Linq;
 
-namespace BenchmarkDotNet.Common
+namespace BenchmarkDotNet
 {
     public class TimeUnit
     {
         public string Name { get; }
         public string Description { get; }
-        public int NanosecondAmount { get; }
+        public long NanosecondAmount { get; }
 
-        private TimeUnit(string name, string description, int nanosecondAmount)
+        private TimeUnit(string name, string description, long nanosecondAmount)
         {
             Name = name;
             Description = description;

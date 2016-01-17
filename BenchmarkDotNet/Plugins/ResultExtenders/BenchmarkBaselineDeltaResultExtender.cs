@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using BenchmarkDotNet.Reports;
 using System.Linq;
-using BenchmarkDotNet.Common;
 using BenchmarkDotNet.Statistic;
 
 namespace BenchmarkDotNet.Plugins.ResultExtenders

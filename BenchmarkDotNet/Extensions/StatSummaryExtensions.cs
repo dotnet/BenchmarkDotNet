@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using BenchmarkDotNet.Common;
 using BenchmarkDotNet.Statistic;
 
 namespace BenchmarkDotNet.Extensions

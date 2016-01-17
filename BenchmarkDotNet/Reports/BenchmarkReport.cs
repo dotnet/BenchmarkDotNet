@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Common;
 using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet.Reports

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using BenchmarkDotNet.Common;
 using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Statistic
