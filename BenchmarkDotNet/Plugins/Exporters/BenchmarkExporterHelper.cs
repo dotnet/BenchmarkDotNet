@@ -92,8 +92,8 @@ namespace BenchmarkDotNet.Plugins.Exporters
 
                 if (showParams)
                     row.Add(item.Report.Parameters.IntParam.ToString());
-                row.Add(item.Stat.Mean.ToTimeStr(timeUnit));
-                row.Add(item.Stat.StandardError.ToTimeStr(timeUnit));
+                row.Add(pretty ? item.Stat.Mean.ToTimeStr(timeUnit) : item.Stat.Mean.ToStr());
+                row.Add(pretty ? item.Stat.StandardError.ToTimeStr(timeUnit) : item.Stat.StandardError.ToStr());
 
                 if (extraColumns != null)
                 {

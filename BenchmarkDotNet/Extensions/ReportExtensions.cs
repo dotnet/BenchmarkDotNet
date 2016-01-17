@@ -26,6 +26,12 @@ namespace BenchmarkDotNet.Extensions
             return reports.GetReportFor<T>(actionExp).GetTargetRuns().ToList();
         }
 
-        public static StatSummary GetStats(this IEnumerable<BenchmarkRunReport> runReports) => new StatSummary(runReports.Select(r => r.GetAverageNanoseconds()));
+        public static StatSummary GetStats(this IList<BenchmarkRunReport> runs) =>
+            runs.Any()
+            ? new StatSummary(runs.Select(r => r.GetAverageNanoseconds()))
+            : null;
+
+        public static StatSummary GetStats(this IEnumerable<BenchmarkRunReport> runs) =>
+            GetStats(runs.ToList());
     }
 }

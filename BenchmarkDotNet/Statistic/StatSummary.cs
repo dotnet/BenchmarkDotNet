@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Statistic
             var list = values.ToList();
             N = list.Count;
             if (N == 0)
-                throw new InvalidOperationException("Sequence contains no elements");
+                throw new InvalidOperationException("StatSummary: Sequence contains no elements");
             list.Sort();
 
             if (N == 1)
@@ -68,27 +68,5 @@ namespace BenchmarkDotNet.Statistic
         public double StandardError { get; }
         public double StandardDeviation { get; }
         public ConfidenceInterval ConfidenceInterval { get; }
-
-        public string ToStr()
-        {
-            var builder = new StringBuilder();
-            builder.AppendLine($"Mean = {Mean.ToStr()}, StdError = {StandardError.ToStr()} (N = {N}, StdDev = {StandardDeviation.ToStr()})");
-            builder.AppendLine($"Min = {Min.ToStr()}, Q1 = {Q1.ToStr()}, Median = {Median.ToStr()}, Q3 = {Q3.ToStr()}, Max = {Max.ToStr()}");
-            builder.AppendLine($"IQR = {InterquartileRange.ToStr()}, LowerFence = {LowerFence.ToStr()}, UpperFence = {UpperFence.ToStr()}");
-            builder.AppendLine($"ConfidenceInterval = {ConfidenceInterval.ToStr()}");
-            return builder.ToString();
-        }
-
-        public string ToTimeStr(TimeUnit unit = null)
-        {
-            if (unit == null)
-                unit = TimeUnit.GetBestTimeUnit(Mean);
-            var builder = new StringBuilder();
-            builder.AppendLine($"Mean = {Mean.ToTimeStr(unit)}, StdError = {StandardError.ToTimeStr(unit)} (N = {N}, StdDev = {StandardDeviation.ToTimeStr(unit)})");
-            builder.AppendLine($"Min = {Min.ToTimeStr(unit)}, Q1 = {Q1.ToTimeStr(unit)}, Median = {Median.ToTimeStr(unit)}, Q3 = {Q3.ToTimeStr(unit)}, Max = {Max.ToTimeStr(unit)}");
-            builder.AppendLine($"IQR = {InterquartileRange.ToTimeStr(unit)}, LowerFence = {LowerFence.ToTimeStr(unit)}, UpperFence = {UpperFence.ToTimeStr(unit)}");
-            builder.AppendLine($"ConfidenceInterval = {ConfidenceInterval.ToTimeStr(unit)}");
-            return builder.ToString();
-        }
     }
 }

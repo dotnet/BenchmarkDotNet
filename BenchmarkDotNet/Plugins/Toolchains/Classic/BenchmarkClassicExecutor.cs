@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
                     lines.Add(line);
 
                 // Wait until we know "Warmup" is happening, and then dissassemble the process
-                if (codeAlreadyExtracted == false && line.StartsWith("// Warmup") && !line.StartsWith("// Warmup (idle)"))
+                if (codeAlreadyExtracted == false && line.StartsWith("Warmup ") && !line.StartsWith("WarmupIdle "))
                 {
                     try
                     {

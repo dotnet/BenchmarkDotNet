@@ -54,6 +54,7 @@
     <Compile Include="BenchmarkState.cs" />
     <Compile Include="BenchmarkRunnerExtensions.cs" />
     <Compile Include="EnvironmentInfo.cs" />
+    <Compile Include="Extensions\StatSummaryExtensions.cs" />
     <Compile Include="Helpers\ResourceHelper.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Plugins\Exporters\BenchmarkCsvRunsExporter.cs" />

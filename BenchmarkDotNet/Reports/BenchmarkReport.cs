@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Reports
 
     public static class BenchmarkReportExtensions
     {
-        public static IEnumerable<BenchmarkRunReport> GetTargetRuns(this BenchmarkReport report) =>
-            report.Runs.Where(r => r.IterationMode == BenchmarkIterationMode.Target);
+        public static IList<BenchmarkRunReport> GetTargetRuns(this BenchmarkReport report) =>
+            report.Runs.Where(r => r.IterationMode == BenchmarkIterationMode.Target).ToList();
     }
 }
