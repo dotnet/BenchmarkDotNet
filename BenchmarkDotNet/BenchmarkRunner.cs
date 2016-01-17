@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Extensions;
@@ -58,6 +59,7 @@ namespace BenchmarkDotNet
 
             var importantPropertyNames = benchmarks.Select(b => b.Properties).GetImportantNames();
 
+            var globalStopwatch = Stopwatch.StartNew();
             var reports = new List<BenchmarkReport>();
             foreach (var benchmark in benchmarks)
             {
@@ -81,10 +83,11 @@ namespace BenchmarkDotNet
                 }
                 logger.NewLine();
             }
+            globalStopwatch.Stop();
             logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
             logger.NewLine();
 
-            logger.WriteLineHeader("// * Export *");            
+            logger.WriteLineHeader("// * Export *");
             var files = Plugins.CompositeExporter.ExportToFile(reports, competitionName, Plugins.ResultExtenders);
             foreach (var file in files)
                 logger.WriteLineInfo($"  {file}");
@@ -99,6 +102,8 @@ namespace BenchmarkDotNet
                 logger.NewLine();
             }
 
+            logger.WriteLineStatistic($"Total time: {globalStopwatch.Elapsed.TotalHours:00}:{globalStopwatch.Elapsed:mm\\:ss}");
+            logger.NewLine();
 
             logger.WriteLineHeader("// * Summary *");
             BenchmarkMarkdownExporter.Default.Export(reports, logger, Plugins.ResultExtenders);
