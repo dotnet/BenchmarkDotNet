@@ -78,7 +78,6 @@ Runtime=Clr  Warmup=5  Target=10
   * Plain report and log: `Md5VsSha256-report.txt`, `Md5VsSha256.log`
   * Plots (if you have installed R): `Md5VsSha256-barplot.png`, `Md5VsSha256-boxplot.png`
 
-
 ## Advanced Features
 
 ### Attributes
@@ -128,6 +127,55 @@ public class IL_Loops
 }
 ```
 
+### Baseline
+
+You can mark one of your benchmark method as a baseline:
+
+```cs
+public class Intro_08_Baseline
+{
+    [Benchmark]
+    public void Time50()
+    {
+        Thread.Sleep(50);
+    }
+
+    [Benchmark(Baseline = true)]
+    public void Time100()
+    {
+        Thread.Sleep(100);
+    }
+
+    [Benchmark]
+    public void Time150()
+    {
+        Thread.Sleep(150);
+    }
+}
+```
+
+As a result, you will have additional column in the summary table:
+
+```ini
+BenchmarkDotNet=v0.8.2.0
+OS=Microsoft Windows NT 6.2.9200.0
+Processor=Intel(R) Core(TM) i7-4810MQ CPU @ 2.80GHz, ProcessorCount=8
+Freq=2728058 ticks, Resolution=366.5611 ns [HighResolution]
+HostCLR=MS.NET 4.0.30319.42000, Arch=64-bit RELEASE [RyuJIT]
+
+Type=Intro_08_Baseline  Mode=Throughput  Platform=HostPlatform  
+Jit=HostJit  .NET=HostFramework  toolchain=Classic  
+Runtime=Clr  Warmup=5  Target=10  
+```
+
+  Method |     AvrTime |     Error | +/- Delta
+-------- |------------ |---------- |----------
+ Time100 | 100.4055 ms | 0.1595 ms |         -
+ Time150 | 150.2872 ms | 0.0231 ms |     49.7%
+  Time50 |  50.1891 ms | 0.0108 ms |    -50.0%
+
+
+
 ### Alternative ways of executing Benchmarks
 
 You can also run a benchmark directly from the internet:
@@ -160,10 +208,8 @@ You can add additional columns to the result table with help of `ResultExtenders
 var extenders = new[]
 {
     BenchmarkStatResultExtender.StdDev,
+    BenchmarkStatResultExtender.OperationPerSecond,
     BenchmarkStatResultExtender.Min,
-    BenchmarkStatResultExtender.Q1,
-    BenchmarkStatResultExtender.Median,
-    BenchmarkStatResultExtender.Q3,
     BenchmarkStatResultExtender.Max
 };
 var plugins = BenchmarkPluginBuilder.CreateDefault().
@@ -193,7 +239,7 @@ public class Target
 Result:
 
 ```ini
-BenchmarkDotNet-Dev=v0.8.1.0+
+BenchmarkDotNet=v0.8.2.0
 OS=Microsoft Windows NT 10.0.10586.0
 Processor=Intel(R) Core(TM) i7-4810MQ CPU @ 2.80GHz, ProcessorCount=8
 Freq=2728058 ticks, Resolution=366.5611 ns [HighResolution]
@@ -202,12 +248,14 @@ HostCLR=MS.NET 4.0.30319.42000, Arch=64-bit RELEASE [RyuJIT]
 Type=Target  Mode=SingleRun  Platform=HostPlatform  
 Jit=HostJit  .NET=HostFramework  toolchain=Classic  
 Runtime=Clr  Warmup=5  Target=5  
-
 ```
-Method |     AvrTime |     Error |     StdDev |         Min |          Q1 |      Median |          Q3 |         Max
--------- |------------ |---------- |----------- |------------ |------------ |------------ |------------ |------------
- Main100 | 124.2335 ms | 5.9687 ms | 13.3464 ms | 108.2972 ms | 110.8316 ms | 125.0659 ms | 137.2192 ms | 138.3347 ms
-  Main50 |  74.2533 ms | 5.9453 ms | 13.2941 ms |  58.5065 ms |  60.7835 ms |  75.4874 ms |  87.1061 ms |  88.0502 ms
+
+  Method |     AvrTime |     Error |     StdDev |  Op/s |         Min |         Max
+-------- |------------ |---------- |----------- |------ |------------ |------------
+ Main100 | 124.3011 ms | 5.9506 ms | 13.3059 ms |  8.04 | 108.5142 ms | 138.0630 ms
+  Main50 |  74.3163 ms | 5.9093 ms | 13.2137 ms | 13.46 |  59.0042 ms |  88.0454 ms
+
+
 
 In fact, default `AvrTime` and `Error` columns are also ResultExtenders.
 

@@ -1,9 +1,7 @@
 ﻿using System.Threading;
-using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet.Samples.Introduction
 {
-    [BenchmarkTask(1, BenchmarkMode.SingleRun, targetIterationCount: 1, warmupIterationCount: 0)]
     public class Intro_08_Baseline
     {
         [Benchmark]
