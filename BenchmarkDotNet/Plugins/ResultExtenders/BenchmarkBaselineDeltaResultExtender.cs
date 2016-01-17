@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BenchmarkDotNet.Reports;
 using System.Linq;
+using BenchmarkDotNet.Common;
 using BenchmarkDotNet.Statistic;
 
 namespace BenchmarkDotNet.Plugins.ResultExtenders
@@ -16,8 +17,13 @@ namespace BenchmarkDotNet.Plugins.ResultExtenders
             ColumnName = $"+/- Delta";
         }
 
-        public IList<string> GetExtendedResults(IList<Tuple<BenchmarkReport, StatSummary>> reports)
+        public IList<string> GetExtendedResults(IList<Tuple<BenchmarkReport, StatSummary>> reports, TimeUnit timeUnit)
         {
+            var benchmarks = reports.Select(r => r.Item1.Benchmark);
+            var baselineCount = benchmarks.Count(b => b.Target.Baseline);
+            if (baselineCount != 1)
+                return null;
+
             var results = new List<string>(reports.Count);
 
             // Sanity check, make sure at least one benchmark is a Baseline!

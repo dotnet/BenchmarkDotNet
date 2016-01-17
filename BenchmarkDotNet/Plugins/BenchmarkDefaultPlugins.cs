@@ -6,6 +6,7 @@ using BenchmarkDotNet.Plugins.Analyzers;
 using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Plugins.Exporters;
 using BenchmarkDotNet.Plugins.Loggers;
+using BenchmarkDotNet.Plugins.ResultExtenders;
 using BenchmarkDotNet.Plugins.Toolchains;
 using BenchmarkDotNet.Plugins.Toolchains.Classic;
 using BenchmarkDotNet.Tasks;
@@ -26,10 +27,16 @@ namespace BenchmarkDotNet.Plugins
             BenchmarkRPlotExporter.Default
         };
         // Make the Diagnosers lazy-loaded, so they are only instantiated if needed
-        public static readonly Lazy<IBenchmarkDiagnoser[]> Diagnosers = 
+        public static readonly Lazy<IBenchmarkDiagnoser[]> Diagnosers =
             new Lazy<IBenchmarkDiagnoser[]>(LoadDiagnoser, LazyThreadSafetyMode.ExecutionAndPublication);
         public static readonly IBenchmarkToolchainBuilder[] Toolchains = CreateToolchainBuilders();
         public static readonly IBenchmarkAnalyser[] Analysers = { BenchmarkEnvironmentAnalyser.Default };
+
+        public static readonly IBenchmarkResultExtender[] ResultExtenders =
+        {
+            BenchmarkStatResultExtender.AvrTime,
+            BenchmarkStatResultExtender.Error
+        };
 
         private static IBenchmarkDiagnoser[] LoadDiagnoser()
         {

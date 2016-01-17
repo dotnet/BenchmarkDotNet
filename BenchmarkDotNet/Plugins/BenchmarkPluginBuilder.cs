@@ -96,7 +96,8 @@ namespace BenchmarkDotNet.Plugins
                 AddLoggers(GetMatched(BenchmarkDefaultPlugins.Loggers, requestedLoggers, true)).
                 AddExporters(GetMatched(BenchmarkDefaultPlugins.Exporters, requestedExporters, true)).
                 AddToolchains(BenchmarkDefaultPlugins.Toolchains).
-                AddAnalysers(BenchmarkDefaultPlugins.Analysers);
+                AddAnalysers(BenchmarkDefaultPlugins.Analysers).
+                AddResultExtenders(BenchmarkDefaultPlugins.ResultExtenders);
 
             // Only load the Diagnostic plugins if requested (i.e. lazy-loaded)
             if (requestedDiagnosers.Length > 0)

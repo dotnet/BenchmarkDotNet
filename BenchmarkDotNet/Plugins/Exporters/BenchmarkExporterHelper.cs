@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Common;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Plugins.ResultExtenders;
 
@@ -15,7 +13,7 @@ namespace BenchmarkDotNet.Plugins.Exporters
         // TODO: signature refactoring
         public static List<string[]> BuildTable(IList<BenchmarkReport> reports, 
                                                 IEnumerable<IBenchmarkResultExtender> resultExtenders = null, 
-                                                bool pretty = true, bool extended = false)
+                                                bool pretty = true)
         {
             var data = reports.
                 Where(r => r.GetTargetRuns().Any()).
@@ -39,8 +37,6 @@ namespace BenchmarkDotNet.Plugins.Exporters
                 headerRow.Add("IntParam");
                 showParams = true;
             }
-            headerRow.Add("AvrTime");
-            headerRow.Add("Error");
             if (resultExtenders != null)
             {
                 foreach (var extender in resultExtenders)
@@ -62,7 +58,7 @@ namespace BenchmarkDotNet.Plugins.Exporters
                 var resultsToProcess = orderedData.Select(s => Tuple.Create(s.Report, s.Stat)).ToList();
                 foreach (var extender in resultExtenders)
                 {
-                    var column = extender.GetExtendedResults(resultsToProcess);
+                    var column = extender.GetExtendedResults(resultsToProcess, timeUnit);
                     // This behaviour/restriction is outlined in IBenchmarkResultExtender.cs
                     if (column != null && column.Count == resultsToProcess.Count)
                        extraColumns.Add(column);
@@ -92,8 +88,6 @@ namespace BenchmarkDotNet.Plugins.Exporters
 
                 if (showParams)
                     row.Add(item.Report.Parameters.IntParam.ToString());
-                row.Add(pretty ? item.Stat.Mean.ToTimeStr(timeUnit) : item.Stat.Mean.ToStr());
-                row.Add(pretty ? item.Stat.StandardError.ToTimeStr(timeUnit) : item.Stat.StandardError.ToStr());
 
                 if (extraColumns != null)
                 {

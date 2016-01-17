@@ -1,6 +1,7 @@
 ﻿using BenchmarkDotNet.Reports;
 using System;
 using System.Collections.Generic;
+using BenchmarkDotNet.Common;
 using BenchmarkDotNet.Statistic;
 
 namespace BenchmarkDotNet.Plugins.ResultExtenders
@@ -14,7 +15,7 @@ namespace BenchmarkDotNet.Plugins.ResultExtenders
         /// of items as the <code>IList{Tuple{BenchmarkReport, StatSummary}}</code> that is passed to it
         /// </summary>
         /// <param name="reports"></param>
-        /// <returns></returns>
-        IList<string> GetExtendedResults(IList<Tuple<BenchmarkReport, StatSummary>> reports);
+        /// <returns>null, if extender is invalid for this benchmark set. Otherwise, a valid list of string.</returns>
+        IList<string> GetExtendedResults(IList<Tuple<BenchmarkReport, StatSummary>> reports, TimeUnit timeUnit);
     }
 }

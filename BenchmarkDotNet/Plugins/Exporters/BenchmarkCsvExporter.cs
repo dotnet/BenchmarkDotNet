@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Plugins.Exporters
 
         public override void Export(IList<BenchmarkReport> reports, IBenchmarkLogger logger, IEnumerable<IBenchmarkResultExtender> resultExtenders = null)
         {
-            var table = BenchmarkExporterHelper.BuildTable(reports, resultExtenders, false, true);
+            var table = BenchmarkExporterHelper.BuildTable(reports, resultExtenders, false);
             foreach (var line in table)
             {
                 for (int i = 0; i < line.Length; i++)

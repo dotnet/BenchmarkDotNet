@@ -78,6 +78,7 @@
     <Compile Include="ParamsAttributeTest.cs" />
     <Compile Include="PerformanceUnitTest.cs" />
     <Compile Include="Plugins\BaselineDeltaResultExtenderTest.cs" />
+    <Compile Include="Plugins\BenchmarkStatResultExtenderTests.cs" />
     <Compile Include="PretendFSharpTest.cs" />
     <Compile Include="SetupAttributeInvalidMethodTest.cs" />
     <Compile Include="SetupAttributeTest.cs" />

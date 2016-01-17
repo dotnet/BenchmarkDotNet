@@ -56,17 +56,28 @@ new BenchmarkRunner().Run<Md5VsSha256>();
 **Step 4** View the results, here is an example of output from the above benchmark:
 
 ```ini
-BenchmarkDotNet-Dev=v0.7.8.0
+BenchmarkDotNet-Dev=v0.8.2.0
 OS=Microsoft Windows NT 6.2.9200.0
-Processor=Intel(R) Core(TM) i7-4702MQ CPU @ 2.20GHz, ProcessorCount=8
-HostCLR=MS.NET 4.0.30319.42000, Arch=64-bit  [RyuJIT]
-Type=Algo_Md5VsSha256  Mode=Throughput  Platform=HostPlatform  Jit=HostJit  .NET=HostFramework  toolchain=Classic  Runtime=Clr  Warmup=5  Target=10
-```
+Processor=Intel(R) Core(TM) i7-4810MQ CPU @ 2.80GHz, ProcessorCount=8
+Freq=2728058 ticks, Resolution=366.5611 ns [HighResolution]
+HostCLR=MS.NET 4.0.30319.42000, Arch=64-bit RELEASE [RyuJIT]
 
-| Method |     AvrTime |    StdDev |      op/s |
-|------- |------------ |---------- |---------- |
-|    Md5 |  26.2220 us | 0.2254 us | 38,138.59 |
-| Sha256 | 139.7358 us | 9.2690 us |  7,183.93 |
+Type=Algo_Md5VsSha256  Mode=Throughput  Platform=HostPlatform  
+Jit=HostJit  .NET=HostFramework  toolchain=Classic  
+Runtime=Clr  Warmup=5  Target=10  
+
+```
+ Method |     AvrTime |     Error
+------- |------------ |----------
+    Md5 |  21.0502 us | 0.0442 us
+ Sha256 | 118.5298 us | 1.2863 us
+
+**Step 5** Analyze it. In your bin directory, you can find a lot of useful files with detailed information. For example:
+  * Csv reports with raw data: `Md5VsSha256-report.csv`, `Md5VsSha256-runs.csv`
+  * Markdown reports:  `Md5VsSha256-report-default.md`, `Md5VsSha256-report-stackoverflow.md`, `Md5VsSha256-report-github.md`
+  * Plain report and log: `Md5VsSha256-report.txt`, `Md5VsSha256.log`
+  * Plots (if you have installed R): `Md5VsSha256-barplot.png`, `Md5VsSha256-boxplot.png`
+
 
 ## Advanced Features
 
@@ -138,6 +149,69 @@ var benchmarkSwitcher = new BenchmarkSwitcher(new[] {
 });
 benchmarkSwitcher.Run(args);
 ```
+
+### Plugins
+
+#### ResultExtenders
+
+You can add additional columns to the result table with help of `ResultExtenders`. An example:
+
+```cs
+var extenders = new[]
+{
+    BenchmarkStatResultExtender.StdDev,
+    BenchmarkStatResultExtender.Min,
+    BenchmarkStatResultExtender.Q1,
+    BenchmarkStatResultExtender.Median,
+    BenchmarkStatResultExtender.Q3,
+    BenchmarkStatResultExtender.Max
+};
+var plugins = BenchmarkPluginBuilder.CreateDefault().
+    AddResultExtenders(extenders).
+    Build();
+new BenchmarkRunner(plugins).Run<Target>();
+```
+
+```cs
+[BenchmarkTask(mode: BenchmarkMode.SingleRun, processCount: 1, targetIterationCount: 5)]
+public class Target
+{
+    private readonly Random random = new Random(42);
+    [Benchmark]
+    public void Main50()
+    {
+        Thread.Sleep(50 + random.Next(50));
+    }
+    [Benchmark]
+    public void Main100()
+    {
+        Thread.Sleep(100 + random.Next(50));
+    }
+}
+```
+
+Result:
+
+```ini
+BenchmarkDotNet-Dev=v0.8.1.0+
+OS=Microsoft Windows NT 10.0.10586.0
+Processor=Intel(R) Core(TM) i7-4810MQ CPU @ 2.80GHz, ProcessorCount=8
+Freq=2728058 ticks, Resolution=366.5611 ns [HighResolution]
+HostCLR=MS.NET 4.0.30319.42000, Arch=64-bit RELEASE [RyuJIT]
+
+Type=Target  Mode=SingleRun  Platform=HostPlatform  
+Jit=HostJit  .NET=HostFramework  toolchain=Classic  
+Runtime=Clr  Warmup=5  Target=5  
+
+```
+Method |     AvrTime |     Error |     StdDev |         Min |          Q1 |      Median |          Q3 |         Max
+-------- |------------ |---------- |----------- |------------ |------------ |------------ |------------ |------------
+ Main100 | 124.2335 ms | 5.9687 ms | 13.3464 ms | 108.2972 ms | 110.8316 ms | 125.0659 ms | 137.2192 ms | 138.3347 ms
+  Main50 |  74.2533 ms | 5.9453 ms | 13.2941 ms |  58.5065 ms |  60.7835 ms |  75.4874 ms |  87.1061 ms |  88.0502 ms
+
+In fact, default `AvrTime` and `Error` columns are also ResultExtenders.
+
+
 
 ### Export
 

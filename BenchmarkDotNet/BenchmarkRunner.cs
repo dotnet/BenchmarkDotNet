@@ -84,11 +84,8 @@ namespace BenchmarkDotNet
             logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
             logger.NewLine();
 
-            logger.WriteLineHeader("// * Export *");
-            var baselineCount = benchmarks.Count(b => b.Target.Baseline);
-            var files = baselineCount == 1 
-                ? Plugins.CompositeExporter.ExportToFile(reports, competitionName, Plugins.ResultExtenders) 
-                : Plugins.CompositeExporter.ExportToFile(reports, competitionName);
+            logger.WriteLineHeader("// * Export *");            
+            var files = Plugins.CompositeExporter.ExportToFile(reports, competitionName, Plugins.ResultExtenders);
             foreach (var file in files)
                 logger.WriteLineInfo($"  {file}");
             logger.NewLine();
