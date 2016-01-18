@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Plugins.Exporters;
 using BenchmarkDotNet.Plugins;
 using BenchmarkDotNet.Plugins.Loggers;
@@ -38,7 +40,7 @@ namespace BenchmarkDotNet
             using (var logStreamWriter = new StreamWriter(competitionName + ".log"))
             {
                 var logger = new BenchmarkCompositeLogger(Plugins.CompositeLogger, new BenchmarkStreamLogger(logStreamWriter));
-                var reports = Run(benchmarks, logger);
+                var reports = Run(benchmarks, logger, competitionName);
                 if (baselineCount == 1)
                     Plugins.CompositeExporter.ExportToFile(reports, competitionName, Plugins.ResultExtenders);
                 else
@@ -47,7 +49,7 @@ namespace BenchmarkDotNet
             }
         }
 
-        private List<BenchmarkReport> Run(List<Benchmark> benchmarks, IBenchmarkLogger logger)
+        private List<BenchmarkReport> Run(List<Benchmark> benchmarks, IBenchmarkLogger logger, string competitionName)
         {
             logger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
             logger.WriteLineInfo("// Found benchmarks:");
@@ -57,6 +59,7 @@ namespace BenchmarkDotNet
 
             var importantPropertyNames = benchmarks.Select(b => b.Properties).GetImportantNames();
 
+            var globalStopwatch = Stopwatch.StartNew();
             var reports = new List<BenchmarkReport>();
             foreach (var benchmark in benchmarks)
             {
@@ -64,12 +67,8 @@ namespace BenchmarkDotNet
                 {
                     var report = Run(logger, benchmark, importantPropertyNames);
                     reports.Add(report);
-                    if (report.Runs.Count > 0)
-                    {
-                        var stat = new BenchmarkRunReportsStatistic("Target", report.Runs);
-                        logger.WriteLineResult($"AverageTime (ns/op): {stat.AverageTime}");
-                        logger.WriteLineResult($"OperationsPerSecond: {stat.OperationsPerSeconds}");
-                    }
+                    if (report.GetTargetRuns().Any())
+                        logger.WriteLineStatistic(report.GetTargetRuns().GetStats().ToTimeStr());
                 }
                 else
                 {
@@ -78,26 +77,42 @@ namespace BenchmarkDotNet
                     {
                         var report = Run(logger, benchmark, importantPropertyNames, parameters);
                         reports.Add(report);
-                        if (report.Runs.Count > 0)
-                        {
-                            var stat = new BenchmarkRunReportsStatistic("Target", report.Runs);
-                            logger.WriteLineResult($"AverageTime (ns/op): {stat.AverageTime}");
-                            logger.WriteLineResult($"OperationsPerSecond: {stat.OperationsPerSeconds}");
-                        }
+                        if (report.GetTargetRuns().Any())
+                            logger.WriteLineStatistic(report.GetTargetRuns().GetStats().ToTimeStr());
                     }
                 }
                 logger.NewLine();
             }
+            globalStopwatch.Stop();
             logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
             logger.NewLine();
 
+            logger.WriteLineHeader("// * Export *");
+            var files = Plugins.CompositeExporter.ExportToFile(reports, competitionName, Plugins.ResultExtenders);
+            foreach (var file in files)
+                logger.WriteLineInfo($"  {file}");
+            logger.NewLine();
+
+            logger.WriteLineHeader("// * Detailed results *");
+
+            foreach (var report in reports)
+            {
+                logger.WriteLineInfo(report.Benchmark.Description);
+                logger.WriteLineStatistic(report.GetTargetRuns().GetStats().ToTimeStr());
+                logger.NewLine();
+            }
+
+            logger.WriteLineStatistic($"Total time: {globalStopwatch.Elapsed.TotalHours:00}:{globalStopwatch.Elapsed:mm\\:ss}");
+            logger.NewLine();
+
+            logger.WriteLineHeader("// * Summary *");
             BenchmarkMarkdownExporter.Default.Export(reports, logger, Plugins.ResultExtenders);
 
             var warnings = Plugins.CompositeAnalyser.Analyze(reports).ToList();
             if (warnings.Count > 0)
             {
                 logger.NewLine();
-                logger.WriteLineError("// *** Warnings *** ");
+                logger.WriteLineError("// * Warnings * ");
                 foreach (var warning in warnings)
                     logger.WriteLineError($"{warning.Message}");
             }

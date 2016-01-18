@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BenchmarkDotNet.Reports;
 using System.Linq;
+using BenchmarkDotNet.Statistic;
 
 namespace BenchmarkDotNet.Plugins.ResultExtenders
 {
@@ -15,8 +16,13 @@ namespace BenchmarkDotNet.Plugins.ResultExtenders
             ColumnName = $"+/- Delta";
         }
 
-        public IList<string> GetExtendedResults(IList<Tuple<BenchmarkReport, BenchmarkRunReportsStatistic>> reports)
+        public IList<string> GetExtendedResults(IList<Tuple<BenchmarkReport, StatSummary>> reports, TimeUnit timeUnit)
         {
+            var benchmarks = reports.Select(r => r.Item1.Benchmark).Distinct();
+            var baselineCount = benchmarks.Count(b => b.Target.Baseline);
+            if (baselineCount != 1)
+                return null;
+
             var results = new List<string>(reports.Count);
 
             // Sanity check, make sure at least one benchmark is a Baseline!
@@ -36,16 +42,16 @@ namespace BenchmarkDotNet.Plugins.ResultExtenders
                         reports.FirstOrDefault(r => r.Item1.Benchmark.Target.Baseline &&
                                                     r.Item1.Parameters.IntParam == item.Item1.Parameters.IntParam);
                     if (firstMatch != null)
-                        baseline = firstMatch.Item2.OperationsPerSeconds.Mean;
+                        baseline = firstMatch.Item2.Mean;
                 }
                 else
                 {
                     var firstMatch = reports.First(r => r.Item1.Benchmark.Target.Baseline);
                     if (firstMatch != null)
-                        baseline = firstMatch.Item2.OperationsPerSeconds.Mean;
+                        baseline = firstMatch.Item2.Mean;
                 }
 
-                var current = item.Item2.OperationsPerSeconds.Mean;
+                var current = item.Item2.Mean;
                 double diff = 0;
                 if (baseline != 0) // This can happen if we found no matching result
                     diff = (current - baseline) / baseline * 100.0;

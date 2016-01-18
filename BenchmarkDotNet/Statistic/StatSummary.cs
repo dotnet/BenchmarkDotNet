@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Statistic
 {
@@ -19,12 +21,12 @@ namespace BenchmarkDotNet.Statistic
         public StatSummary(IEnumerable<double> values)
         {
             var list = values.ToList();
-            var n = list.Count;
-            if (n == 0)
-                throw new InvalidOperationException("Sequence contains no elements");
+            N = list.Count;
+            if (N == 0)
+                throw new InvalidOperationException("StatSummary: Sequence contains no elements");
             list.Sort();
 
-            if (n == 1)
+            if (N == 1)
                 Q1 = Median = Q3 = list[0];
             else
             {
@@ -32,8 +34,8 @@ namespace BenchmarkDotNet.Statistic
                     ? (x[x.Count / 2 - 1] + x[x.Count / 2]) / 2
                     : x[x.Count / 2];
                 Median = getMedian(list);
-                Q1 = getMedian(list.Take(n / 2).ToList());
-                Q3 = getMedian(list.Skip((n + 1) / 2).ToList());
+                Q1 = getMedian(list.Take(N / 2).ToList());
+                Q3 = getMedian(list.Skip((N + 1) / 2).ToList());
             }
 
             Min = list.First();
@@ -46,11 +48,12 @@ namespace BenchmarkDotNet.Statistic
 
             Outlier = list.Where(value => value < LowerFence || value > UpperFence).ToArray();
 
-            StandardDeviation = n == 1 ? 0 : Math.Sqrt(list.Sum(d => Math.Pow(d - Mean, 2)) / (n - 1));
-            StandardError = StandardDeviation / Math.Sqrt(n);
+            StandardDeviation = N == 1 ? 0 : Math.Sqrt(list.Sum(d => Math.Pow(d - Mean, 2)) / (N - 1));
+            StandardError = StandardDeviation / Math.Sqrt(N);
             ConfidenceInterval = new ConfidenceInterval(Mean, StandardError);
         }
 
+        public int N { get; }
         public double Min { get; }
         public double LowerFence { get; }
         public double Q1 { get; }
@@ -64,10 +67,5 @@ namespace BenchmarkDotNet.Statistic
         public double StandardError { get; }
         public double StandardDeviation { get; }
         public ConfidenceInterval ConfidenceInterval { get; }
-
-        public override string ToString()
-        {
-            return string.Format(EnvironmentInfo.MainCultureInfo, "Avr={0} +- {1}", Mean, ConfidenceInterval.Margin);
-        }
     }
 }

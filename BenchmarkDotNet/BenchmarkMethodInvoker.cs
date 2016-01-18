@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet
@@ -14,28 +15,17 @@ namespace BenchmarkDotNet
             public long OperationCount { get; }
             public long Ticks { get; }
             public double Nanoseconds { get; }
-            public double Milliseconds { get; }
-            public double Seconds { get; }
-            public double NanosecondsPerOperation { get; }
-            public double OperationsPerSecond { get; }
+            public double Milliseconds => Nanoseconds / 1000000;
 
             public Measurement(long operationCount, long ticks)
             {
                 OperationCount = operationCount;
                 Ticks = Math.Max(ticks, 1);
-                Nanoseconds = (Ticks / (double)Stopwatch.Frequency) * 1000000000;
-                Milliseconds = Nanoseconds / 1000000;
-                Seconds = Nanoseconds / 1000000000;
-                NanosecondsPerOperation = Nanoseconds / OperationCount;
-                OperationsPerSecond = OperationCount / Seconds;
+                Nanoseconds = Ticks / (double)Stopwatch.Frequency * 1000000000;
             }
 
-            public string GetDisplayValue()
-            {
-                return string.Format(EnvironmentInfo.MainCultureInfo,
-                    "{0} op, {1:0.#} ms, {2:0.#} ns, {3} ticks, {4:0.####} ns/op, {5:0.#} op/s",
-                    OperationCount, Milliseconds, Nanoseconds, Ticks, NanosecondsPerOperation, OperationsPerSecond);
-            }
+            public string GetDisplayValue() => $"{OperationCount} op, {Nanoseconds.ToStr()} ns, {GetAverageTime()}";
+            private string GetAverageTime() => $"{(Nanoseconds / OperationCount).ToTimeStr()}/op";
         }
 
         public void Throughput(BenchmarkTask task, long operationsPerInvoke, Action setupAction, Action targetAction, Action idleAction)
@@ -51,7 +41,7 @@ namespace BenchmarkDotNet
             {
                 BenchmarkState.Instance.IterationMode = BenchmarkIterationMode.Pilot;
                 BenchmarkState.Instance.Iteration = pilotCounter++;
-                var measurement = MultiInvoke("// Pre-Warmup", setupAction, targetAction, invokeCount, operationsPerInvoke);
+                var measurement = MultiInvoke(BenchmarkIterationMode.Pilot, pilotCounter - 1, setupAction, targetAction, invokeCount, operationsPerInvoke);
                 lastPilotMilliseconds = measurement.Milliseconds;
                 if (lastPilotMilliseconds > InvokeTimoutMilliseconds)
                     break;
@@ -65,18 +55,17 @@ namespace BenchmarkDotNet
             {
                 BenchmarkState.Instance.IterationMode = BenchmarkIterationMode.WarmupIdle;
                 BenchmarkState.Instance.Iteration = i;
-                var measurement = MultiInvoke("// Warmup (idle)", setupAction, idleAction, invokeCount, operationsPerInvoke);
+                var measurement = MultiInvoke(BenchmarkIterationMode.WarmupIdle, i, setupAction, idleAction, invokeCount, operationsPerInvoke);
                 idleMilliseconds = measurement.Milliseconds;
             }
             invokeCount = invokeCount * 1000 / (long)Math.Round(Math.Min(1000, Math.Max(100, lastPilotMilliseconds - idleMilliseconds)));
-            Console.WriteLine("// IterationCount = " + invokeCount);
             long idleTicks = 0;
             var targetIdleInvokeCount = Math.Min(5, task.Configuration.TargetIterationCount);
             for (int i = 0; i < targetIdleInvokeCount; i++)
             {
                 BenchmarkState.Instance.IterationMode = BenchmarkIterationMode.TargetIdle;
                 BenchmarkState.Instance.Iteration = i;
-                var measurement = MultiInvoke("// Target (idle)", setupAction, idleAction, invokeCount, operationsPerInvoke);
+                var measurement = MultiInvoke(BenchmarkIterationMode.TargetIdle, i, setupAction, idleAction, invokeCount, operationsPerInvoke);
                 idleTicks += measurement.Ticks;
             }
             idleTicks /= targetIdleInvokeCount;
@@ -85,13 +74,13 @@ namespace BenchmarkDotNet
             {
                 BenchmarkState.Instance.IterationMode = BenchmarkIterationMode.Warmup;
                 BenchmarkState.Instance.Iteration = i;
-                MultiInvoke("// Warmup " + (i + 1), setupAction, targetAction, invokeCount, operationsPerInvoke, idleTicks);
+                MultiInvoke(BenchmarkIterationMode.Warmup, i, setupAction, targetAction, invokeCount, operationsPerInvoke, idleTicks);
             }
             for (int i = 0; i < task.Configuration.TargetIterationCount; i++)
             {
                 BenchmarkState.Instance.IterationMode = BenchmarkIterationMode.Target;
                 BenchmarkState.Instance.Iteration = i;
-                MultiInvoke("Target " + (i + 1), setupAction, targetAction, invokeCount, operationsPerInvoke, idleTicks);
+                MultiInvoke(BenchmarkIterationMode.Target, i, setupAction, targetAction, invokeCount, operationsPerInvoke, idleTicks);
             }
         }
 
@@ -108,7 +97,7 @@ namespace BenchmarkDotNet
             {
                 BenchmarkState.Instance.IterationMode = BenchmarkIterationMode.Pilot;
                 BenchmarkState.Instance.Iteration = pilotCounter++;
-                var measurement = MultiInvoke("// Pre-Warmup", setupAction, targetAction, invokeCount, operationsPerInvoke);
+                var measurement = MultiInvoke(BenchmarkIterationMode.Pilot, pilotCounter - 1, setupAction, targetAction, invokeCount, operationsPerInvoke);
                 lastPilotMilliseconds = measurement.Milliseconds;
                 if (lastPilotMilliseconds > InvokeTimoutMilliseconds)
                     break;
@@ -122,18 +111,17 @@ namespace BenchmarkDotNet
             {
                 BenchmarkState.Instance.IterationMode = BenchmarkIterationMode.WarmupIdle;
                 BenchmarkState.Instance.Iteration = i;
-                var measurement = MultiInvoke("// Warmup (idle)", setupAction, idleAction, invokeCount, operationsPerInvoke);
+                var measurement = MultiInvoke(BenchmarkIterationMode.WarmupIdle, i, setupAction, idleAction, invokeCount, operationsPerInvoke);
                 idleMilliseconds = measurement.Milliseconds;
             }
             invokeCount = invokeCount * 1000 / (long)Math.Round(Math.Min(1000, Math.Max(100, lastPilotMilliseconds - idleMilliseconds)));
-            Console.WriteLine("// IterationCount = " + invokeCount);
             long idleTicks = 0;
             var targetIdleInvokeCount = Math.Min(5, task.Configuration.TargetIterationCount);
             for (int i = 0; i < targetIdleInvokeCount; i++)
             {
                 BenchmarkState.Instance.IterationMode = BenchmarkIterationMode.TargetIdle;
                 BenchmarkState.Instance.Iteration = i;
-                var measurement = MultiInvoke("// Target (idle)", setupAction, idleAction, invokeCount, operationsPerInvoke);
+                var measurement = MultiInvoke(BenchmarkIterationMode.TargetIdle, i, setupAction, idleAction, invokeCount, operationsPerInvoke);
                 idleTicks += measurement.Ticks;
             }
             idleTicks /= targetIdleInvokeCount;
@@ -142,13 +130,13 @@ namespace BenchmarkDotNet
             {
                 BenchmarkState.Instance.IterationMode = BenchmarkIterationMode.Warmup;
                 BenchmarkState.Instance.Iteration = i;
-                MultiInvoke("// Warmup " + (i + 1), setupAction, targetAction, invokeCount, operationsPerInvoke, idleTicks);
+                MultiInvoke(BenchmarkIterationMode.Warmup, i, setupAction, targetAction, invokeCount, operationsPerInvoke, idleTicks);
             }
             for (int i = 0; i < task.Configuration.TargetIterationCount; i++)
             {
                 BenchmarkState.Instance.IterationMode = BenchmarkIterationMode.Target;
                 BenchmarkState.Instance.Iteration = i;
-                MultiInvoke("Target " + (i + 1), setupAction, targetAction, invokeCount, operationsPerInvoke, idleTicks);
+                MultiInvoke(BenchmarkIterationMode.Target, i, setupAction, targetAction, invokeCount, operationsPerInvoke, idleTicks);
             }
         }
 
@@ -158,13 +146,13 @@ namespace BenchmarkDotNet
             {
                 BenchmarkState.Instance.IterationMode = BenchmarkIterationMode.Warmup;
                 BenchmarkState.Instance.Iteration = i;
-                MultiInvoke("// Warmup " + (i + 1), setupAction, targetAction, 1, operationsPerInvoke);
+                MultiInvoke(BenchmarkIterationMode.Warmup, i, setupAction, targetAction, 1, operationsPerInvoke);
             }
             for (int i = 0; i < task.Configuration.TargetIterationCount; i++)
             {
                 BenchmarkState.Instance.IterationMode = BenchmarkIterationMode.Target;
                 BenchmarkState.Instance.Iteration = i;
-                MultiInvoke("Target " + (i + 1), setupAction, targetAction, 1, operationsPerInvoke);
+                MultiInvoke(BenchmarkIterationMode.Target, i, setupAction, targetAction, 1, operationsPerInvoke);
             }
         }
 
@@ -174,17 +162,17 @@ namespace BenchmarkDotNet
             {
                 BenchmarkState.Instance.IterationMode = BenchmarkIterationMode.Warmup;
                 BenchmarkState.Instance.Iteration = i;
-                MultiInvoke("// Warmup " + (i + 1).ToString(), setupAction, targetAction, 1, operationsPerInvoke);
+                MultiInvoke(BenchmarkIterationMode.Warmup, i, setupAction, targetAction, 1, operationsPerInvoke);
             }
             for (int i = 0; i < task.Configuration.TargetIterationCount; i++)
             {
                 BenchmarkState.Instance.IterationMode = BenchmarkIterationMode.Target;
                 BenchmarkState.Instance.Iteration = i;
-                MultiInvoke("Target " + (i + 1).ToString(), setupAction, targetAction, 1, operationsPerInvoke);
+                MultiInvoke(BenchmarkIterationMode.Target, i, setupAction, targetAction, 1, operationsPerInvoke);
             }
         }
 
-        private Measurement MultiInvoke(string name, Action setupAction, Action targetAction, long invocationCount, long operationsPerInvoke, long idleTicks = 0)
+        private Measurement MultiInvoke(BenchmarkIterationMode mode, int index, Action setupAction, Action targetAction, long invocationCount, long operationsPerInvoke, long idleTicks = 0)
         {
             var totalOperations = invocationCount * operationsPerInvoke;
             setupAction();
@@ -217,14 +205,14 @@ namespace BenchmarkDotNet
                 stopwatch.Stop();
             }
             var measurement = new Measurement(totalOperations, stopwatch.ElapsedTicks - idleTicks);
-            Console.WriteLine($"{name}: {measurement.GetDisplayValue()}");
+            Console.WriteLine($"{mode} {index + 1}: {measurement.GetDisplayValue()}");
             GcCollect();
             return measurement;
         }
 
         private object multiInvokeReturnHolder;
 
-        private Measurement MultiInvoke<T>(string name, Action setupAction, Func<T> targetAction, long invocationCount, long operationsPerInvoke, long idleTicks = 0, T returnHolder = default(T))
+        private Measurement MultiInvoke<T>(BenchmarkIterationMode mode, int index, Action setupAction, Func<T> targetAction, long invocationCount, long operationsPerInvoke, long idleTicks = 0, T returnHolder = default(T))
         {
             var totalOperations = invocationCount * operationsPerInvoke;
             setupAction();
@@ -258,7 +246,7 @@ namespace BenchmarkDotNet
             }
             multiInvokeReturnHolder = returnHolder;
             var measurement = new Measurement(totalOperations, stopwatch.ElapsedTicks - idleTicks);
-            Console.WriteLine($"{name}: {measurement.GetDisplayValue()}");
+            Console.WriteLine($"{mode} {index + 1}: {measurement.GetDisplayValue()}");
             GcCollect();
             return measurement;
         }
