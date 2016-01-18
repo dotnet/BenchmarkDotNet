@@ -31,14 +31,25 @@ namespace BenchmarkDotNet.Plugins.ResultExtenders
             {
                 double baseline = 0;
                 if (item.Item1.Parameters != null)
-                    baseline = reports.First(r => r.Item1.Benchmark.Target.Baseline &&
-                                                  r.Item1.Parameters.IntParam == item.Item1.Parameters.IntParam)
-                                      .Item2.OperationsPerSeconds.Mean;
+                {
+                    var firstMatch = 
+                        reports.FirstOrDefault(r => r.Item1.Benchmark.Target.Baseline &&
+                                                    r.Item1.Parameters.IntParam == item.Item1.Parameters.IntParam);
+                    if (firstMatch != null)
+                        baseline = firstMatch.Item2.OperationsPerSeconds.Mean;
+                }
                 else
-                    baseline = reports.First(r => r.Item1.Benchmark.Target.Baseline)
-                                      .Item2.OperationsPerSeconds.Mean;
+                {
+                    var firstMatch = reports.First(r => r.Item1.Benchmark.Target.Baseline);
+                    if (firstMatch != null)
+                        baseline = firstMatch.Item2.OperationsPerSeconds.Mean;
+                }
+
                 var current = item.Item2.OperationsPerSeconds.Mean;
-                var diff = (current - baseline) / baseline * 100.0;
+                double diff = 0;
+                if (baseline != 0) // This can happen if we found no matching result
+                    diff = (current - baseline) / baseline * 100.0;
+
                 if (item.Item1.Benchmark.Target.Baseline)
                     results.Add("-");
                 else
