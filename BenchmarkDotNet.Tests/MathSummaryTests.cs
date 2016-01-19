@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Tests
             output.WriteLine("InterquartileRange = " + summary.InterquartileRange);
             output.WriteLine("StandardDeviation = " + summary.StandardDeviation);
             output.WriteLine("Outlier = [" + string.Join("; ", summary.Outlier) + "]");
-            output.WriteLine("CI = " + summary.ConfidenceInterval);
+            output.WriteLine("CI = " + summary.ConfidenceInterval.ToStr());
         }
 
         [Fact]
