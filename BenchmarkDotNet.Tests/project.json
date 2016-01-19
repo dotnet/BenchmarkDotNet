@@ -1,5 +1,8 @@
 ﻿{
   "title": "BenchmarkDotNet.Tests",
+  "commands": {
+    "test": "xunit.runner.dnx"
+  },
   "frameworks": {
     "net45": {
       "frameworkAssemblies": {
@@ -9,6 +12,14 @@
         "System.Management": "4.0.0.0",
         "System.Runtime": "4.0.0.0",
         "System.Threading.Tasks": "4.0.0.0"
+      }
+    },
+    "dnx451": {
+      "frameworkAssemblies": {
+        "System.Runtime": "4.0.10.0"
+      },
+      "dependencies": {
+        "xunit.runner.dnx": "2.1.0-beta6-build191"
       }
     }
   },
