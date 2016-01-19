@@ -10,6 +10,8 @@
   },
   "frameworks": {
     "net40": {
+    },
+    "dnx451": {
     }
   },
   "dependencies": {
