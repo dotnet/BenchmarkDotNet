@@ -15,7 +15,7 @@ using Xunit;
 
 [assembly: Guid("74362bb1-9f64-4be5-b079-b4ac19dae5db")]
 
-[assembly: AssemblyVersion("0.8.1")]
-[assembly: AssemblyFileVersion("0.8.1")]
+[assembly: AssemblyVersion("0.8.2")]
+[assembly: AssemblyFileVersion("0.8.2")]
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
