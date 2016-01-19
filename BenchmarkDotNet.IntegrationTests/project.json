@@ -3,6 +3,8 @@
   "commands": {
     "test": "xunit.runner.dnx"
   },
+  "compileExclude": "**/Program.cs",
+  "veryImportantComment": "we need to exclude all auto-generated files that created during integration test execution",
   "frameworks": {
     "net45": {
       "dependencies": {

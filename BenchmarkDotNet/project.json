@@ -13,6 +13,8 @@
 
   "compilationOptions": { "optimize": true },
 
+  "resource": "Templates/*.txt",
+
   "frameworks": {
     "net40": {
       "frameworkAssemblies": {
