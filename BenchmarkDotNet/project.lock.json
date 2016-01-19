@@ -1,0 +1,19 @@
+{
+  "locked": false,
+  "version": 2,
+  "targets": {
+    ".NETFramework,Version=v4.0": {},
+    ".NETFramework,Version=v4.0/win7-x86": {},
+    ".NETFramework,Version=v4.0/win7-x64": {}
+  },
+  "libraries": {},
+  "projectFileDependencyGroups": {
+    "": [],
+    ".NETFramework,Version=v4.0": [
+      "fx/Microsoft.Build >= 4.0.0",
+      "fx/Microsoft.Build.Framework >= 4.0.0",
+      "fx/Microsoft.Build.Utilities.v4.0 >= 4.0.0",
+      "fx/System.Management >= 4.0.0"
+    ]
+  }
+}

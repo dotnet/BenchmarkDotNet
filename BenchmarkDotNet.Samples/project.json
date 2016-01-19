@@ -1,0 +1,22 @@
+﻿{
+  "title": "BenchmarkDotNet.Samples",
+  "compilationOptions": {
+    "emitEntryPoint": true,
+    "allowUnsafe": true,
+    "optimize": true
+  },
+  "commands": {
+    "run": "BenchmarkDotNet.Samples"
+  },
+  "frameworks": {
+    "net40": {
+    }
+  },
+  "dependencies": {
+    "BenchmarkDotNet": {
+      "target": "project",
+      "version": "0.8.1"
+    },
+    "BenchmarkDotNet.Diagnostics": "1.0.0-*"
+  }
+}

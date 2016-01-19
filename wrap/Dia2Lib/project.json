@@ -1,0 +1,10 @@
+{
+  "version": "1.0.0-*",
+  "frameworks": {
+    "net40": {
+      "bin": {
+        "assembly": "../../CLRMD/Dia2Lib.dll"
+      }
+    }
+  }
+}
