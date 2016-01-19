@@ -11,6 +11,7 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tasks;
 using BenchmarkDotNet.Plugins.Toolchains;
 using BenchmarkDotNet.Plugins.Toolchains.Results;
+using BenchmarkDotNet.Plugins.ResultExtenders;
 
 namespace BenchmarkDotNet
 {
@@ -21,18 +22,13 @@ namespace BenchmarkDotNet
             Plugins = plugins ?? BenchmarkPluginBuilder.CreateDefault().Build();
         }
 
-        private IBenchmarkPlugins Plugins { get; }
+        internal IBenchmarkPlugins Plugins { get; }
 
         private static int benchmarkRunIndex = 0;
 
         internal IEnumerable<BenchmarkReport> Run(List<Benchmark> benchmarks, string competitionName = null)
         {
-            var baselineCount = benchmarks.Count(b => b.Target.Baseline == true);
-            if (baselineCount > 1)
-            {
-                var benchmarkClass = benchmarks.FirstOrDefault()?.Target?.Method?.DeclaringType?.FullName ?? "UNKNOWN";
-                throw new InvalidOperationException($"Only 1 [Benchmark] in a class can have \"Baseline = true\" applied to it, {benchmarkClass} has {baselineCount}");
-            }
+            AddDetectedPlugins(benchmarks, Plugins, competitionName ?? "UNKNOWN");
 
             benchmarkRunIndex++;
             if (competitionName == null)
@@ -41,10 +37,7 @@ namespace BenchmarkDotNet
             {
                 var logger = new BenchmarkCompositeLogger(Plugins.CompositeLogger, new BenchmarkStreamLogger(logStreamWriter));
                 var reports = Run(benchmarks, logger, competitionName);
-                if (baselineCount == 1)
-                    Plugins.CompositeExporter.ExportToFile(reports, competitionName, Plugins.ResultExtenders);
-                else
-                    Plugins.CompositeExporter.ExportToFile(reports, competitionName);
+                Plugins.CompositeExporter.ExportToFile(reports, competitionName, Plugins.ResultExtenders);
                 return reports;
             }
         }
@@ -211,6 +204,23 @@ namespace BenchmarkDotNet
             }
             logger.NewLine();
             return runReports;
+        }
+
+        /// <summary>
+        /// This method is ONLY for wiring up extensions that can be detected/inferred from the list of Benchmarks.
+        /// Any extensions that are wired-up via command-line parameters are handled elsewhere
+        /// </summary>
+        private static void AddDetectedPlugins(List<Benchmark> benchmarks, IBenchmarkPlugins existingPlugins, string benchmarkName)
+        {
+            var baselineCount = benchmarks.Count(b => b.Target.Baseline == true);
+            if (baselineCount > 1)
+            {
+                throw new InvalidOperationException($"Only 1 [Benchmark] in a class can have \"Baseline = true\" applied to it, {benchmarkName} has {baselineCount}");
+            }
+            else if (baselineCount == 1)
+            {
+                existingPlugins.ResultExtenders.Add(new BenchmarkBaselineDeltaResultExtender());
+            }
         }
     }
 }

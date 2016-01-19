@@ -20,16 +20,16 @@ namespace BenchmarkDotNet.IntegrationTests.Plugins
         [Fact]
         public void Test()
         {
-            var logger = new BenchmarkAccumulationLogger();
-            var extender = new BenchmarkBaselineDeltaResultExtender();
-            var plugins = BenchmarkPluginBuilder.CreateDefault()
-                                .AddLogger(logger)
-                                .AddResultExtender(extender)
-                                .Build();
-            var reports = new BenchmarkRunner(plugins).Run(this.GetType()).ToList();
-            var table = BenchmarkExporterHelper.BuildTable(reports, plugins.ResultExtenders);
+            // This is the common way to run benchmarks, it should wire up the BenchmarkBaselineDeltaResultExtender for us
+            var runner = new BenchmarkRunner();
+            var reports = runner.Run<BaselineDeltaResultExtenderTest>().ToList();
+
+            var table = BenchmarkExporterHelper.BuildTable(reports, runner.Plugins.ResultExtenders);
             var headerRow = table.First();
-            Assert.Equal(headerRow.Last(), extender.ColumnName);
+            var extender = runner.Plugins.ResultExtenders.OfType<BenchmarkBaselineDeltaResultExtender>().FirstOrDefault();
+            Assert.NotNull(extender);
+
+            Assert.Equal(extender.ColumnName, headerRow.Last());
             var testNameColumn = Array.FindIndex(headerRow, c => c == "Method");
             var extraColumn = Array.FindIndex(headerRow, c => c == extender.ColumnName);
             foreach (var row in table)
@@ -63,18 +63,18 @@ namespace BenchmarkDotNet.IntegrationTests.Plugins
         public void Test()
         {
             var logger = new BenchmarkAccumulationLogger();
-            var extender = new BenchmarkBaselineDeltaResultExtender();
             var testExporter = new TestBenchmarkExporter();
             var plugins = BenchmarkPluginBuilder.CreateDefault()
                                 .AddLogger(logger)
                                 .AddExporters(testExporter)
-                                .AddResultExtender(extender)
                                 .Build();
             var reports = new BenchmarkRunner(plugins).Run(this.GetType()).ToList();
 
-            // Ensure that when the TestBenchmarkExporter() was run, it wasn't passed any "resultExtenders"
+            // Ensure that when the TestBenchmarkExporter() was run, it wasn't passed an instance of "BenchmarkBaselineDeltaResultExtender"
             Assert.False(testExporter.ExportCalled);
             Assert.Null(testExporter.ExportResultExtenders);
+            Assert.NotNull(testExporter.ExportToFileResultExtenders);
+            Assert.Equal(0, testExporter.ExportToFileResultExtenders.OfType<BenchmarkBaselineDeltaResultExtender>().Count());
             Assert.True(testExporter.ExportToFileCalled);
         }
 
@@ -120,7 +120,7 @@ namespace BenchmarkDotNet.IntegrationTests.Plugins
             {
                 ExportToFileResultExtenders = resultExtenders;
                 ExportToFileCalled = true;
-                yield break;
+                return Enumerable.Empty<string>();
             }
         }
     }
@@ -130,14 +130,8 @@ namespace BenchmarkDotNet.IntegrationTests.Plugins
         [Fact]
         public void Test()
         {
-            var logger = new BenchmarkAccumulationLogger();
-            var extender = new BenchmarkBaselineDeltaResultExtender();
-            var plugins = BenchmarkPluginBuilder.CreateDefault()
-                                .AddLogger(logger)
-                                .AddResultExtender(extender)
-                                .Build();
             // You can't have more than 1 method in a class with [Benchmark(Baseline = true)]
-            Assert.Throws<InvalidOperationException>(() => new BenchmarkRunner(plugins).Run(this.GetType()));
+            Assert.Throws<InvalidOperationException>(() => new BenchmarkRunner().Run(this.GetType()));
         }
 
         [Benchmark(Baseline = true)]

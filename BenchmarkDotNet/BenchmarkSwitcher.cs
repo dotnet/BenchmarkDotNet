@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Plugins;
 using BenchmarkDotNet.Plugins.Loggers;
-using BenchmarkDotNet.Plugins.ResultExtenders;
 
 namespace BenchmarkDotNet
 {
@@ -46,9 +45,7 @@ namespace BenchmarkDotNet
                 if (args.Any(arg => type.Name.ToLower().StartsWith(arg.ToLower())) || args.Contains("#" + i) || args.Contains("" + i) || args.Contains("*"))
                 {
                     logger.WriteLineHeader("Target competition: " + type.Name);
-                    var builder = BenchmarkPluginBuilder.BuildFromArgs(args);
-                    DetectBaselineBenchmark(type, builder);
-                    new BenchmarkRunner(builder.Build()).Run(type);
+                    new BenchmarkRunner(BenchmarkPluginBuilder.BuildFromArgs(args).Build()).Run(type);
                     logger.NewLine();
                 }
             }
@@ -59,20 +56,6 @@ namespace BenchmarkDotNet
                 Uri uri = new Uri(url);
                 var name = uri.IsFile ? Path.GetFileName(uri.LocalPath) : "URL";
                 new BenchmarkRunner(BenchmarkPluginBuilder.BuildFromArgs(args).Build()).RunUrl(url);
-            }
-        }
-
-        private static void DetectBaselineBenchmark(Type type, IBenchmarkPluginBuilder builder)
-        {
-            var benchmarks = BenchmarkConverter.TypeToBenchmarks(type);
-            var baselineCount = benchmarks.Count(b => b.Target.Baseline == true);
-            if (baselineCount > 1)
-            {
-                throw new InvalidOperationException($"Only 1 [Benchmark] in a class can have \"Baseline = true\" applied to it, {type.FullName} has {baselineCount}");
-            }
-            else if (baselineCount == 1)
-            {
-                builder.AddResultExtender(new BenchmarkBaselineDeltaResultExtender());
             }
         }
 

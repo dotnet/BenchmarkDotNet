@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("BenchmarkDotNet-Dev")] // Remove "Dev" for NuGet publishing
@@ -16,3 +17,5 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyVersion("0.8.1")]
 [assembly: AssemblyFileVersion("0.8.1")]
+
+[assembly: InternalsVisibleTo("BenchmarkDotNet.IntegrationTests")]
