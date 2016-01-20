@@ -33,3 +33,5 @@ _ReSharper*/
 *.resharper
 packages/
 nuget.exe
+BenchmarkDotNet.IntegrationTests/**/Program.cs
+BenchmarkDotNet.IntegrationTests/**/Program.csproj
