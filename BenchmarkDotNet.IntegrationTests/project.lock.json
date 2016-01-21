@@ -118,6 +118,7 @@
           "Microsoft.Build.Utilities.v4.0",
           "System",
           "System.Management",
+          "System.Reflection",
           "System.Runtime"
         ]
       },
@@ -910,6 +911,7 @@
           "Microsoft.Build.Utilities.v4.0",
           "System",
           "System.Management",
+          "System.Reflection",
           "System.Runtime"
         ]
       },
@@ -1498,6 +1500,7 @@
           "Microsoft.Build.Utilities.v4.0",
           "System",
           "System.Management",
+          "System.Reflection",
           "System.Runtime"
         ]
       },

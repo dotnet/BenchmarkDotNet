@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public bool Done { get; private set; }
 
-            public BenchmarkBuildResult Build(BenchmarkGenerateResult generateResult)
+            public BenchmarkBuildResult Build(BenchmarkGenerateResult generateResult, Benchmark benchmark)
             {
                 Done = true;
                 return new BenchmarkBuildResult(generateResult, true, null);

@@ -1,5 +1,5 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Plugins.Toolchains.Classic;
@@ -33,19 +33,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Dnx
 
         private static string SetPlatform(string template, BenchmarkPlatform platform)
         {
-            switch (platform)
-            {
-                case BenchmarkPlatform.HostPlatform:
-                    return template.Replace("\"platform\": \"$PLATFORM\",", string.Empty); // todo: verify that this is the way to go
-                case BenchmarkPlatform.AnyCpu:
-                    return template.Replace("$PLATFORM", "Any CPU"); // todo: verify name
-                case BenchmarkPlatform.X86:
-                    return template.Replace("$PLATFORM", "x86");
-                case BenchmarkPlatform.X64:
-                    return template.Replace("$PLATFORM", "x64");
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(platform), platform, null);
-            }
+            return template.Replace("$PLATFORM", platform.ToConfig()); // todo: verify name
         }
     }
 }

@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains
 
         public BenchmarkBuildResult Build(BenchmarkGenerateResult generateResult)
         {
-            return builder.Build(generateResult);
+            return builder.Build(generateResult, benchmark);
         }
 
         public BenchmarkExecResult Execute(BenchmarkBuildResult buildResult, BenchmarkParameters parameters, IBenchmarkDiagnoser diagnoser)

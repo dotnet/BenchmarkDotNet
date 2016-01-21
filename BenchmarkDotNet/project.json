@@ -34,7 +34,8 @@
         "Microsoft.Build": "4.0.0.0",
         "Microsoft.Build.Framework": "4.0.0.0",
         "Microsoft.Build.Utilities.v4.0": "4.0.0.0",
-        "System.Management": "4.0.0.0"
+        "System.Management": "4.0.0.0",
+        "System.Reflection": "4.0.0.0"
       },
       "dependencies": {
         "Microsoft.Dnx.Compilation": "1.0.0-rc1-final",

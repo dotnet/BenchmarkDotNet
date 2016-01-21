@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
             this.logger = logger;
         }
 
-        public BenchmarkBuildResult Build(BenchmarkGenerateResult generateResult)
+        public BenchmarkBuildResult Build(BenchmarkGenerateResult generateResult, Benchmark benchmark)
         {
             var projectFileName = Path.Combine(generateResult.DirectoryPath, BenchmarkClassicGenerator.MainClassName + ".csproj");
             var consoleLogger = new MSBuildConsoleLogger(logger);
