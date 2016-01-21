@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Plugins;
 using BenchmarkDotNet.Plugins.Loggers;
 
@@ -18,9 +19,9 @@ namespace BenchmarkDotNet
 
         private readonly BenchmarkConsoleLogger logger = new BenchmarkConsoleLogger();
 
-        public void Run(string[] args)
+        public void Run(string[] args = null)
         {
-            args = ReadArgumentList(args);
+            args = ReadArgumentList(args ?? new string[0]);
             RunBenchmarks(args);
         }
 
@@ -29,7 +30,8 @@ namespace BenchmarkDotNet
             while (args.Length == 0)
             {
                 PrintAvailable();
-                logger.WriteLineHelp("You should select the target benchmark. Please, print a number of a benchmark (e.g. '0') or a benchmark caption (e.g. 'Intro_00'):");
+                var benchmarkCaptionExample = Types.Length == 0 ? "Intro_00" : Types.First().Name;
+                logger.WriteLineHelp($"You should select the target benchmark. Please, print a number of a benchmark (e.g. '0') or a benchmark caption (e.g. '{benchmarkCaptionExample}'):");
                 var line = Console.ReadLine() ?? "";
                 args = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 logger.NewLine();
@@ -61,7 +63,12 @@ namespace BenchmarkDotNet
 
         private void PrintAvailable()
         {
-            logger.WriteLineHelp("Available Benchmark(s):");
+            if (Types.IsEmpty())
+            {
+                logger.WriteLineError("You don't have any benchmarks");
+                return;
+            }
+            logger.WriteLineHelp($"Available Benchmark{(Types.Length > 1 ? "s" : "")}:");
             int numberWidth = Types.Length.ToString().Length;
             for (int i = 0; i < Types.Length; i++)
                 logger.WriteLineHelp(string.Format(CultureInfo.InvariantCulture, "  #{0} {1}", i.ToString().PadRight(numberWidth), Types[i].Name));

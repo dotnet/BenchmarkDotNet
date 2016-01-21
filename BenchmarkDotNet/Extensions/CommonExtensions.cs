@@ -50,5 +50,7 @@ namespace BenchmarkDotNet.Extensions
         }
 
         public static string ToStr(this double value, string format = "0.##") => string.Format(EnvironmentInfo.MainCultureInfo, $"{{0:{format}}}", value);
+
+        public static bool IsEmpty<T>(this IList<T> value) => value.Count == 0;
     }
 }
