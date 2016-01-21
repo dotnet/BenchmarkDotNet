@@ -121,7 +121,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
             File.WriteAllText(fileName, content);
         }
 
-        private void GenerateProjectFile(string projectDir, Benchmark benchmark)
+        protected virtual void GenerateProjectFile(string projectDir, Benchmark benchmark)
         {
             var configuration = benchmark.Task.Configuration;
             var platform = configuration.Platform.ToConfig();
@@ -144,7 +144,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
             EnsureDependancyInCorrectLocation(benchmark.Target.Method.ReturnType, projectDir);
         }
 
-        private void GenerateProjectBuildFile(string projectDir)
+        protected virtual void GenerateProjectBuildFile(string projectDir)
         {
             var content = ResourceHelper.LoadTemplate("BuildBenchmark.txt");
             string fileName = Path.Combine(projectDir, "BuildBenchmark.bat");
