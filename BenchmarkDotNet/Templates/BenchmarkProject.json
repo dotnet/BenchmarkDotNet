@@ -22,7 +22,8 @@
       },
       "dependencies": {
         "BenchmarkDotNet": {
-          "version": "0.8.1",
+          "target": "Assembly",
+          "version": "0.8.2",
           "comment": "not sure what to put in version"
         }
       }

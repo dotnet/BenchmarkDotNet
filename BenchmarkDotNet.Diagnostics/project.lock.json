@@ -3,7 +3,7 @@
   "version": 2,
   "targets": {
     ".NETFramework,Version=v4.0": {
-      "BenchmarkDotNet/0.8.1": {
+      "BenchmarkDotNet/0.8.2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "frameworkAssemblies": [
@@ -30,7 +30,7 @@
       }
     },
     "DNX,Version=v4.5.1": {
-      "BenchmarkDotNet/0.8.1": {
+      "BenchmarkDotNet/0.8.2": {
         "type": "project",
         "framework": "DNX,Version=v4.5.1",
         "dependencies": {
@@ -41,6 +41,7 @@
           "Microsoft.Build",
           "Microsoft.Build.Framework",
           "Microsoft.Build.Utilities.v4.0",
+          "System",
           "System.Management",
           "System.Runtime"
         ]
@@ -394,7 +395,7 @@
       }
     },
     ".NETFramework,Version=v4.0/win7-x86": {
-      "BenchmarkDotNet/0.8.1": {
+      "BenchmarkDotNet/0.8.2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "frameworkAssemblies": [
@@ -421,7 +422,7 @@
       }
     },
     ".NETFramework,Version=v4.0/win7-x64": {
-      "BenchmarkDotNet/0.8.1": {
+      "BenchmarkDotNet/0.8.2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "frameworkAssemblies": [
@@ -448,7 +449,7 @@
       }
     },
     "DNX,Version=v4.5.1/win7-x86": {
-      "BenchmarkDotNet/0.8.1": {
+      "BenchmarkDotNet/0.8.2": {
         "type": "project",
         "framework": "DNX,Version=v4.5.1",
         "dependencies": {
@@ -459,6 +460,7 @@
           "Microsoft.Build",
           "Microsoft.Build.Framework",
           "Microsoft.Build.Utilities.v4.0",
+          "System",
           "System.Management",
           "System.Runtime"
         ]
@@ -812,7 +814,7 @@
       }
     },
     "DNX,Version=v4.5.1/win7-x64": {
-      "BenchmarkDotNet/0.8.1": {
+      "BenchmarkDotNet/0.8.2": {
         "type": "project",
         "framework": "DNX,Version=v4.5.1",
         "dependencies": {
@@ -823,6 +825,7 @@
           "Microsoft.Build",
           "Microsoft.Build.Framework",
           "Microsoft.Build.Utilities.v4.0",
+          "System",
           "System.Management",
           "System.Runtime"
         ]
@@ -1177,7 +1180,7 @@
     }
   },
   "libraries": {
-    "BenchmarkDotNet/0.8.1": {
+    "BenchmarkDotNet/0.8.2": {
       "type": "project",
       "path": "../BenchmarkDotNet/project.json"
     },
@@ -2013,7 +2016,7 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "BenchmarkDotNet >= 0.8.1"
+      "BenchmarkDotNet >= 0.8.2"
     ],
     ".NETFramework,Version=v4.0": [
       "Dia2Lib >= 1.0.0-*",

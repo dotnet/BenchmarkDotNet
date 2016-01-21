@@ -36,7 +36,7 @@
   "dependencies": {
     "BenchmarkDotNet": {
       "target": "project",
-      "version": "0.8.1"
+      "version": "0.8.2"
     },
     "BenchmarkDotNet.Diagnostics": "1.0.0-*",
     "xunit": "2.1.0",
