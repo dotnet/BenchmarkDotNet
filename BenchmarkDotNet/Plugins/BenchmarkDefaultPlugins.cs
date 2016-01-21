@@ -9,6 +9,7 @@ using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Plugins.ResultExtenders;
 using BenchmarkDotNet.Plugins.Toolchains;
 using BenchmarkDotNet.Plugins.Toolchains.Classic;
+using BenchmarkDotNet.Plugins.Toolchains.Dnx;
 using BenchmarkDotNet.Tasks;
 
 namespace BenchmarkDotNet.Plugins
@@ -71,14 +72,27 @@ namespace BenchmarkDotNet.Plugins
 
         private static IBenchmarkToolchainBuilder[] CreateToolchainBuilders()
         {
-            return new IBenchmarkToolchainBuilder[]
+            return new[]
             {
-                new BenchmarkToolchainBuilder(
-                    BenchmarkToolchain.Classic,
-                    (benchmark, logger) => new BenchmarkClassicGenerator(logger),
-                    (benchmark, logger) => new BenchmarkClassicBuilder(logger),
-                    (benchmark, logger) => new BenchmarkClassicExecutor(benchmark, logger)),
+                GetCurrentToolchainBuilder()
             };
+        }
+
+        private static IBenchmarkToolchainBuilder GetCurrentToolchainBuilder()
+        {
+#if DNX451
+            return new BenchmarkToolchainBuilder(
+                BenchmarkToolchain.Classic,
+                (benchmark, logger) => new BenchmarkDnxGenerator(logger), 
+                (benchmark, logger) => new BenchmarkDnxBuilder(), 
+                (benchmark, logger) => new BenchmarkDnxExecutor(benchmark, logger));
+#else
+            return new BenchmarkToolchainBuilder(
+                BenchmarkToolchain.Classic,
+                (benchmark, logger) => new BenchmarkClassicGenerator(logger),
+                (benchmark, logger) => new BenchmarkClassicBuilder(logger),
+                (benchmark, logger) => new BenchmarkClassicExecutor(benchmark, logger));
+#endif
         }
     }
 }
