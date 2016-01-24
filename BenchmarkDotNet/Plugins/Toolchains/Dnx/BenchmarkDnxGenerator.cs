@@ -22,11 +22,10 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Dnx
 
             var content = SetPlatform(template, benchmark.Task.Configuration.Platform);
             content = SetDependency(content, benchmark.Target.Type);
-
     
-            string fileName = Path.Combine(projectDir, ProjectFileName);
+            var projectJsonFilePath = Path.Combine(projectDir, ProjectFileName);
 
-            File.WriteAllText(fileName, content);
+            File.WriteAllText(projectJsonFilePath, content);
         }
 
         protected override void GenerateProjectBuildFile(string projectDir)
@@ -43,9 +42,11 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Dnx
         {
             var assemblyName = benchmarkTarget.Assembly.GetName();
 
+            var packageVersion =
+                $"{assemblyName.Version.Major}.{assemblyName.Version.Minor}.{assemblyName.Version.Build}-*";
+
             return template
-                // todo: handle number.number.number-text format
-                .Replace("$EXECUTINGASSEMBLYVERSION", assemblyName.Version.ToString()) 
+                .Replace("$EXECUTINGASSEMBLYVERSION", packageVersion) 
                 .Replace("$EXECUTINGASSEMBLY", assemblyName.Name);
         }
     }
