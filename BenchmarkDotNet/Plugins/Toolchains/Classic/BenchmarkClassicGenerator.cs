@@ -191,6 +191,11 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
                     Directory.Delete(directoryPath, true);
                     exist = Directory.Exists(directoryPath);
                 }
+                catch (DirectoryNotFoundException)
+                {
+                    exist = false;
+                    break;
+                }
                 catch (Exception e)
                 {
                     // Can't delete the directory =(
