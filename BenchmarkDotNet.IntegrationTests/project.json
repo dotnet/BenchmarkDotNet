@@ -8,6 +8,7 @@
   "frameworks": {
     "net45": {
       "dependencies": {
+        "BenchmarkDotNet.Diagnostics": "1.0.0-*",
         "Dia2Lib": "1.0.0-*",
         "FSharpBenchmarkDotNet": "1.0.0-*",
         "Interop.Dia2Lib": "1.0.0-*",
@@ -25,9 +26,7 @@
         "System.Threading.Tasks": "4.0.0.0"
       },
       "dependencies": {
-        "Dia2Lib": "1.0.0-*",
         "FSharpBenchmarkDotNet": "1.0.0-*",
-        "Interop.Dia2Lib": "1.0.0-*",
         "Microsoft.Diagnostics.Runtime": "1.0.0-*",
         "xunit.runner.dnx": "2.1.0-rc1-build204"
       }
@@ -38,7 +37,6 @@
       "target": "project",
       "version": "0.8.2"
     },
-    "BenchmarkDotNet.Diagnostics": "1.0.0-*",
     "xunit": "2.1.0",
     "xunit.abstractions": "2.0.0",
     "xunit.assert": "2.1.0",

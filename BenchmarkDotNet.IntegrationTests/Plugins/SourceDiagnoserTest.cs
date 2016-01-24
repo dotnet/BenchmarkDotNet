@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Diagnostics;
+﻿#if !DNX451
+using BenchmarkDotNet.Diagnostics;
 using BenchmarkDotNet.Plugins;
 using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Tasks;
@@ -7,7 +8,6 @@ using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests.Plugins
 {
-    // TODO - #ifdef this test out under CoreCLR/DNX, it relies on CLRMD and other libraries that are only compatible with .NET Full/Desktop
     public class SourceDiagnoserTest 
     {
         [Fact]
@@ -39,3 +39,4 @@ namespace BenchmarkDotNet.IntegrationTests.Plugins
         }
     }
 }
+#endif
