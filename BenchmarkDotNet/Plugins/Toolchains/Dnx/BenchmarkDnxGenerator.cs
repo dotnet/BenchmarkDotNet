@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Plugins.Loggers;
@@ -20,6 +21,8 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Dnx
             var template = ResourceHelper.LoadTemplate("BenchmarkProject.json");
 
             var content = SetPlatform(template, benchmark.Task.Configuration.Platform);
+            content = SetDependency(content, benchmark.Target.Type);
+
     
             string fileName = Path.Combine(projectDir, ProjectFileName);
 
@@ -34,6 +37,16 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Dnx
         private static string SetPlatform(string template, BenchmarkPlatform platform)
         {
             return template.Replace("$PLATFORM", platform.ToConfig()); // todo: verify name
+        }
+
+        private static string SetDependency(string template, Type benchmarkTarget)
+        {
+            var assemblyName = benchmarkTarget.Assembly.GetName();
+
+            return template
+                // todo: handle number.number.number-text format
+                .Replace("$EXECUTINGASSEMBLYVERSION", assemblyName.Version.ToString()) 
+                .Replace("$EXECUTINGASSEMBLY", assemblyName.Name);
         }
     }
 }
