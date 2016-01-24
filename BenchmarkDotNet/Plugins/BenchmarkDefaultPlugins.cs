@@ -84,7 +84,7 @@ namespace BenchmarkDotNet.Plugins
             return new BenchmarkToolchainBuilder(
                 BenchmarkToolchain.Classic,
                 (benchmark, logger) => new BenchmarkDnxGenerator(logger), 
-                (benchmark, logger) => new BenchmarkDnxBuilder(), 
+                (benchmark, logger) => new BenchmarkDnuBuilder(), 
                 (benchmark, logger) => new BenchmarkDnxExecutor(benchmark, logger));
 #else
             return new BenchmarkToolchainBuilder(

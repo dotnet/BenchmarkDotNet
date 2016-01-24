@@ -24,9 +24,12 @@
         "BenchmarkDotNet": {
           "target": "Package",
           "version": "0.8.2",
-          "comment": "not sure what to put in version and target, Assembly"
+          "comment": "not sure what to put in version and target"
         },
-        "$EXECUTINGASSEMBLY": "$EXECUTINGASSEMBLYVERSION"
+        "$EXECUTINGASSEMBLY": {
+          "version": "$EXECUTINGASSEMBLYVERSION",
+          "importantComment": "you must not set the target, otherwise dnu restore will fail!!!"
+        }
       }
     }
   }
