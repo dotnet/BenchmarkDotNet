@@ -157,6 +157,373 @@
           "lib/net451/Microsoft.Extensions.PlatformAbstractions.dll": {}
         }
       },
+      "Newtonsoft.Json/6.0.4": {
+        "type": "package",
+        "compile": {
+          "lib/net45/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/net45/Newtonsoft.Json.dll": {}
+        }
+      },
+      "NuGet.Client/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.ContentModel": "3.3.0",
+          "NuGet.Packaging": "3.3.0",
+          "NuGet.Repositories": "3.3.0",
+          "NuGet.RuntimeModel": "3.3.0",
+          "NuGet.Versioning": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Client.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Client.dll": {}
+        }
+      },
+      "NuGet.Commands/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Client": "3.3.0",
+          "NuGet.Configuration": "3.3.0",
+          "NuGet.ContentModel": "3.3.0",
+          "NuGet.DependencyResolver": "3.3.0",
+          "NuGet.ProjectModel": "3.3.0",
+          "NuGet.RuntimeModel": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Collections",
+          "System.Core",
+          "System.Runtime",
+          "System.Text.Encoding",
+          "System.Threading.Tasks",
+          "System.Xml",
+          "System.Xml.Linq"
+        ],
+        "compile": {
+          "lib/dnx451/NuGet.Commands.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/NuGet.Commands.dll": {}
+        }
+      },
+      "NuGet.Configuration/3.3.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core",
+          "System.Globalization",
+          "System.Security",
+          "System.Xml",
+          "System.Xml.Linq"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Configuration.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Configuration.dll": {}
+        }
+      },
+      "NuGet.ContentModel/3.3.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.ContentModel.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.ContentModel.dll": {}
+        }
+      },
+      "NuGet.DependencyResolver/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.DependencyResolver.Core": "3.3.0",
+          "NuGet.Packaging": "3.3.0",
+          "NuGet.Protocol.Core.v3": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.DependencyResolver.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.DependencyResolver.dll": {}
+        }
+      },
+      "NuGet.DependencyResolver.Core/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Frameworks": "3.3.0",
+          "NuGet.LibraryModel": "3.3.0",
+          "NuGet.Protocol.Core.v3": "3.3.0",
+          "NuGet.Repositories": "3.3.0",
+          "NuGet.RuntimeModel": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.DependencyResolver.Core.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.DependencyResolver.Core.dll": {}
+        }
+      },
+      "NuGet.Frameworks/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Versioning": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Frameworks.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Frameworks.dll": {}
+        }
+      },
+      "NuGet.LibraryModel/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Versioning": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.LibraryModel.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.LibraryModel.dll": {}
+        }
+      },
+      "NuGet.Logging/3.3.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Logging.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Logging.dll": {}
+        }
+      },
+      "NuGet.Packaging/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Logging": "3.3.0",
+          "NuGet.Packaging.Core": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core",
+          "System.IO.Compression",
+          "System.Xml",
+          "System.Xml.Linq"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Packaging.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Packaging.dll": {}
+        }
+      },
+      "NuGet.Packaging.Core/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Packaging.Core.Types": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core",
+          "System.IO.Compression",
+          "System.Xml",
+          "System.Xml.Linq"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Packaging.Core.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Packaging.Core.dll": {}
+        }
+      },
+      "NuGet.Packaging.Core.Types/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Frameworks": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Packaging.Core.Types.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Packaging.Core.Types.dll": {}
+        }
+      },
+      "NuGet.ProjectModel/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "6.0.4",
+          "NuGet.DependencyResolver.Core": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.ProjectModel.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.ProjectModel.dll": {}
+        }
+      },
+      "NuGet.Protocol.Core.Types/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Configuration": "3.3.0",
+          "NuGet.Packaging": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core",
+          "System.Net.Http"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Protocol.Core.Types.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Protocol.Core.Types.dll": {}
+        }
+      },
+      "NuGet.Protocol.Core.v3/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "6.0.4",
+          "NuGet.Logging": "3.3.0",
+          "NuGet.Packaging": "3.3.0",
+          "NuGet.Protocol.Core.Types": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Collections.Concurrent",
+          "System.Core",
+          "System.IdentityModel",
+          "System.Net.Http",
+          "System.Net.Http.WebRequest",
+          "System.ServiceModel"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Protocol.Core.v3.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Protocol.Core.v3.dll": {}
+        }
+      },
+      "NuGet.Repositories/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Versioning": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Repositories.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Repositories.dll": {}
+        }
+      },
+      "NuGet.RuntimeModel/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "6.0.4",
+          "NuGet.Frameworks": "3.3.0",
+          "NuGet.Versioning": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Collections",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.RuntimeModel.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.RuntimeModel.dll": {}
+        }
+      },
+      "NuGet.Versioning/3.3.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Versioning.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Versioning.dll": {}
+        }
+      },
       "System.Collections/4.0.0": {
         "type": "package",
         "compile": {
@@ -493,6 +860,373 @@
           "lib/net451/Microsoft.Extensions.PlatformAbstractions.dll": {}
         }
       },
+      "Newtonsoft.Json/6.0.4": {
+        "type": "package",
+        "compile": {
+          "lib/net45/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/net45/Newtonsoft.Json.dll": {}
+        }
+      },
+      "NuGet.Client/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.ContentModel": "3.3.0",
+          "NuGet.Packaging": "3.3.0",
+          "NuGet.Repositories": "3.3.0",
+          "NuGet.RuntimeModel": "3.3.0",
+          "NuGet.Versioning": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Client.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Client.dll": {}
+        }
+      },
+      "NuGet.Commands/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Client": "3.3.0",
+          "NuGet.Configuration": "3.3.0",
+          "NuGet.ContentModel": "3.3.0",
+          "NuGet.DependencyResolver": "3.3.0",
+          "NuGet.ProjectModel": "3.3.0",
+          "NuGet.RuntimeModel": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Collections",
+          "System.Core",
+          "System.Runtime",
+          "System.Text.Encoding",
+          "System.Threading.Tasks",
+          "System.Xml",
+          "System.Xml.Linq"
+        ],
+        "compile": {
+          "lib/dnx451/NuGet.Commands.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/NuGet.Commands.dll": {}
+        }
+      },
+      "NuGet.Configuration/3.3.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core",
+          "System.Globalization",
+          "System.Security",
+          "System.Xml",
+          "System.Xml.Linq"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Configuration.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Configuration.dll": {}
+        }
+      },
+      "NuGet.ContentModel/3.3.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.ContentModel.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.ContentModel.dll": {}
+        }
+      },
+      "NuGet.DependencyResolver/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.DependencyResolver.Core": "3.3.0",
+          "NuGet.Packaging": "3.3.0",
+          "NuGet.Protocol.Core.v3": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.DependencyResolver.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.DependencyResolver.dll": {}
+        }
+      },
+      "NuGet.DependencyResolver.Core/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Frameworks": "3.3.0",
+          "NuGet.LibraryModel": "3.3.0",
+          "NuGet.Protocol.Core.v3": "3.3.0",
+          "NuGet.Repositories": "3.3.0",
+          "NuGet.RuntimeModel": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.DependencyResolver.Core.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.DependencyResolver.Core.dll": {}
+        }
+      },
+      "NuGet.Frameworks/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Versioning": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Frameworks.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Frameworks.dll": {}
+        }
+      },
+      "NuGet.LibraryModel/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Versioning": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.LibraryModel.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.LibraryModel.dll": {}
+        }
+      },
+      "NuGet.Logging/3.3.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Logging.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Logging.dll": {}
+        }
+      },
+      "NuGet.Packaging/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Logging": "3.3.0",
+          "NuGet.Packaging.Core": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core",
+          "System.IO.Compression",
+          "System.Xml",
+          "System.Xml.Linq"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Packaging.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Packaging.dll": {}
+        }
+      },
+      "NuGet.Packaging.Core/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Packaging.Core.Types": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core",
+          "System.IO.Compression",
+          "System.Xml",
+          "System.Xml.Linq"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Packaging.Core.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Packaging.Core.dll": {}
+        }
+      },
+      "NuGet.Packaging.Core.Types/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Frameworks": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Packaging.Core.Types.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Packaging.Core.Types.dll": {}
+        }
+      },
+      "NuGet.ProjectModel/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "6.0.4",
+          "NuGet.DependencyResolver.Core": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.ProjectModel.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.ProjectModel.dll": {}
+        }
+      },
+      "NuGet.Protocol.Core.Types/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Configuration": "3.3.0",
+          "NuGet.Packaging": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core",
+          "System.Net.Http"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Protocol.Core.Types.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Protocol.Core.Types.dll": {}
+        }
+      },
+      "NuGet.Protocol.Core.v3/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "6.0.4",
+          "NuGet.Logging": "3.3.0",
+          "NuGet.Packaging": "3.3.0",
+          "NuGet.Protocol.Core.Types": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Collections.Concurrent",
+          "System.Core",
+          "System.IdentityModel",
+          "System.Net.Http",
+          "System.Net.Http.WebRequest",
+          "System.ServiceModel"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Protocol.Core.v3.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Protocol.Core.v3.dll": {}
+        }
+      },
+      "NuGet.Repositories/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Versioning": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Repositories.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Repositories.dll": {}
+        }
+      },
+      "NuGet.RuntimeModel/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "6.0.4",
+          "NuGet.Frameworks": "3.3.0",
+          "NuGet.Versioning": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Collections",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.RuntimeModel.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.RuntimeModel.dll": {}
+        }
+      },
+      "NuGet.Versioning/3.3.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Versioning.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Versioning.dll": {}
+        }
+      },
       "System.Collections/4.0.0": {
         "type": "package",
         "compile": {
@@ -827,6 +1561,373 @@
           "lib/net451/Microsoft.Extensions.PlatformAbstractions.dll": {}
         }
       },
+      "Newtonsoft.Json/6.0.4": {
+        "type": "package",
+        "compile": {
+          "lib/net45/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/net45/Newtonsoft.Json.dll": {}
+        }
+      },
+      "NuGet.Client/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.ContentModel": "3.3.0",
+          "NuGet.Packaging": "3.3.0",
+          "NuGet.Repositories": "3.3.0",
+          "NuGet.RuntimeModel": "3.3.0",
+          "NuGet.Versioning": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Client.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Client.dll": {}
+        }
+      },
+      "NuGet.Commands/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Client": "3.3.0",
+          "NuGet.Configuration": "3.3.0",
+          "NuGet.ContentModel": "3.3.0",
+          "NuGet.DependencyResolver": "3.3.0",
+          "NuGet.ProjectModel": "3.3.0",
+          "NuGet.RuntimeModel": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Collections",
+          "System.Core",
+          "System.Runtime",
+          "System.Text.Encoding",
+          "System.Threading.Tasks",
+          "System.Xml",
+          "System.Xml.Linq"
+        ],
+        "compile": {
+          "lib/dnx451/NuGet.Commands.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/NuGet.Commands.dll": {}
+        }
+      },
+      "NuGet.Configuration/3.3.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core",
+          "System.Globalization",
+          "System.Security",
+          "System.Xml",
+          "System.Xml.Linq"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Configuration.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Configuration.dll": {}
+        }
+      },
+      "NuGet.ContentModel/3.3.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.ContentModel.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.ContentModel.dll": {}
+        }
+      },
+      "NuGet.DependencyResolver/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.DependencyResolver.Core": "3.3.0",
+          "NuGet.Packaging": "3.3.0",
+          "NuGet.Protocol.Core.v3": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.DependencyResolver.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.DependencyResolver.dll": {}
+        }
+      },
+      "NuGet.DependencyResolver.Core/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Frameworks": "3.3.0",
+          "NuGet.LibraryModel": "3.3.0",
+          "NuGet.Protocol.Core.v3": "3.3.0",
+          "NuGet.Repositories": "3.3.0",
+          "NuGet.RuntimeModel": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.DependencyResolver.Core.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.DependencyResolver.Core.dll": {}
+        }
+      },
+      "NuGet.Frameworks/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Versioning": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Frameworks.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Frameworks.dll": {}
+        }
+      },
+      "NuGet.LibraryModel/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Versioning": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.LibraryModel.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.LibraryModel.dll": {}
+        }
+      },
+      "NuGet.Logging/3.3.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Logging.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Logging.dll": {}
+        }
+      },
+      "NuGet.Packaging/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Logging": "3.3.0",
+          "NuGet.Packaging.Core": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core",
+          "System.IO.Compression",
+          "System.Xml",
+          "System.Xml.Linq"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Packaging.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Packaging.dll": {}
+        }
+      },
+      "NuGet.Packaging.Core/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Packaging.Core.Types": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core",
+          "System.IO.Compression",
+          "System.Xml",
+          "System.Xml.Linq"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Packaging.Core.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Packaging.Core.dll": {}
+        }
+      },
+      "NuGet.Packaging.Core.Types/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Frameworks": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Packaging.Core.Types.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Packaging.Core.Types.dll": {}
+        }
+      },
+      "NuGet.ProjectModel/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "6.0.4",
+          "NuGet.DependencyResolver.Core": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.ProjectModel.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.ProjectModel.dll": {}
+        }
+      },
+      "NuGet.Protocol.Core.Types/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Configuration": "3.3.0",
+          "NuGet.Packaging": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core",
+          "System.Net.Http"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Protocol.Core.Types.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Protocol.Core.Types.dll": {}
+        }
+      },
+      "NuGet.Protocol.Core.v3/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "6.0.4",
+          "NuGet.Logging": "3.3.0",
+          "NuGet.Packaging": "3.3.0",
+          "NuGet.Protocol.Core.Types": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Collections.Concurrent",
+          "System.Core",
+          "System.IdentityModel",
+          "System.Net.Http",
+          "System.Net.Http.WebRequest",
+          "System.ServiceModel"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Protocol.Core.v3.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Protocol.Core.v3.dll": {}
+        }
+      },
+      "NuGet.Repositories/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Versioning": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Repositories.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Repositories.dll": {}
+        }
+      },
+      "NuGet.RuntimeModel/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "6.0.4",
+          "NuGet.Frameworks": "3.3.0",
+          "NuGet.Versioning": "3.3.0"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Collections",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.RuntimeModel.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.RuntimeModel.dll": {}
+        }
+      },
+      "NuGet.Versioning/3.3.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NuGet.Versioning.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NuGet.Versioning.dll": {}
+        }
+      },
       "System.Collections/4.0.0": {
         "type": "package",
         "compile": {
@@ -1135,6 +2236,266 @@
         "Microsoft.Extensions.PlatformAbstractions.1.0.0-rc1-final.nupkg",
         "Microsoft.Extensions.PlatformAbstractions.1.0.0-rc1-final.nupkg.sha512",
         "Microsoft.Extensions.PlatformAbstractions.nuspec"
+      ]
+    },
+    "Newtonsoft.Json/6.0.4": {
+      "type": "package",
+      "sha512": "FyQLmEpjsCrEP+znauLDGAi+h6i9YnaMkITlfIoiM4RYyX3nki306bTHsr/0okiIvIc7BJhQTbOAIZVocccFUw==",
+      "files": [
+        "lib/net20/Newtonsoft.Json.dll",
+        "lib/net20/Newtonsoft.Json.xml",
+        "lib/net35/Newtonsoft.Json.dll",
+        "lib/net35/Newtonsoft.Json.xml",
+        "lib/net40/Newtonsoft.Json.dll",
+        "lib/net40/Newtonsoft.Json.xml",
+        "lib/net45/Newtonsoft.Json.dll",
+        "lib/net45/Newtonsoft.Json.xml",
+        "lib/netcore45/Newtonsoft.Json.dll",
+        "lib/netcore45/Newtonsoft.Json.xml",
+        "lib/portable-net40+sl5+wp80+win8+wpa81/Newtonsoft.Json.dll",
+        "lib/portable-net40+sl5+wp80+win8+wpa81/Newtonsoft.Json.xml",
+        "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll",
+        "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.xml",
+        "Newtonsoft.Json.6.0.4.nupkg",
+        "Newtonsoft.Json.6.0.4.nupkg.sha512",
+        "Newtonsoft.Json.nuspec",
+        "tools/install.ps1"
+      ]
+    },
+    "NuGet.Client/3.3.0": {
+      "type": "package",
+      "sha512": "x9I1yLJp3YmVo8nSlS5ddqpXKQfpjkRBBUiQCiCmI50kw5voCSpB+2BnaGF8FdXg7ItO4cpSu/+0+2kmNSVK6g==",
+      "files": [
+        "lib/dnxcore50/NuGet.Client.dll",
+        "lib/dnxcore50/NuGet.Client.xml",
+        "lib/net45/NuGet.Client.dll",
+        "lib/net45/NuGet.Client.xml",
+        "NuGet.Client.3.3.0.nupkg",
+        "NuGet.Client.3.3.0.nupkg.sha512",
+        "NuGet.Client.nuspec"
+      ]
+    },
+    "NuGet.Commands/3.3.0": {
+      "type": "package",
+      "sha512": "baOcGHc1qLAlnAz3Z8gRDm/nu7AaXkZepPt4Eug2Fx3iZXwUinT7AU6ugcM6yTKfWJssxd3zR4Fx/9edr/ndfQ==",
+      "files": [
+        "lib/dnx451/NuGet.Commands.dll",
+        "lib/dnx451/NuGet.Commands.xml",
+        "lib/dnxcore50/NuGet.Commands.dll",
+        "lib/dnxcore50/NuGet.Commands.xml",
+        "lib/net45/NuGet.Commands.dll",
+        "lib/net45/NuGet.Commands.xml",
+        "NuGet.Commands.3.3.0.nupkg",
+        "NuGet.Commands.3.3.0.nupkg.sha512",
+        "NuGet.Commands.nuspec"
+      ]
+    },
+    "NuGet.Configuration/3.3.0": {
+      "type": "package",
+      "sha512": "ipCgunT8crlmkVAM7vPePY98AwnVRhlEvWkOsjOI1LKdCCoMdZjgkmmo7eMm/hZD5DnrSns0K2odH2UpmFRxVg==",
+      "files": [
+        "lib/dnxcore50/NuGet.Configuration.dll",
+        "lib/dnxcore50/NuGet.Configuration.xml",
+        "lib/net45/NuGet.Configuration.dll",
+        "lib/net45/NuGet.Configuration.xml",
+        "NuGet.Configuration.3.3.0.nupkg",
+        "NuGet.Configuration.3.3.0.nupkg.sha512",
+        "NuGet.Configuration.nuspec"
+      ]
+    },
+    "NuGet.ContentModel/3.3.0": {
+      "type": "package",
+      "sha512": "fVCmP89av9QPEnkw9R0PvtOc7Xg7iMbjVtx16aUl7crWjWIBOFQaV5Q3gW9tS2hkx3IW/2f1TpEoheep6v1cQA==",
+      "files": [
+        "lib/dnxcore50/NuGet.ContentModel.dll",
+        "lib/dnxcore50/NuGet.ContentModel.xml",
+        "lib/net45/NuGet.ContentModel.dll",
+        "lib/net45/NuGet.ContentModel.xml",
+        "NuGet.ContentModel.3.3.0.nupkg",
+        "NuGet.ContentModel.3.3.0.nupkg.sha512",
+        "NuGet.ContentModel.nuspec"
+      ]
+    },
+    "NuGet.DependencyResolver/3.3.0": {
+      "type": "package",
+      "sha512": "/mvaG6s0u2xFvT4rZazk685/CHxy3YFqYv+72+7KkllyoSX8cPwYUBCA6ENxCwSuj52ykpOzt5mGX6TY8E34/Q==",
+      "files": [
+        "lib/dnxcore50/NuGet.DependencyResolver.dll",
+        "lib/dnxcore50/NuGet.DependencyResolver.xml",
+        "lib/net45/NuGet.DependencyResolver.dll",
+        "lib/net45/NuGet.DependencyResolver.xml",
+        "NuGet.DependencyResolver.3.3.0.nupkg",
+        "NuGet.DependencyResolver.3.3.0.nupkg.sha512",
+        "NuGet.DependencyResolver.nuspec"
+      ]
+    },
+    "NuGet.DependencyResolver.Core/3.3.0": {
+      "type": "package",
+      "sha512": "tEv4ssN+/M4Uhm4L62zjkGgVZXJuvZHshriTXdApCHHLNK8eIPfrDi8GJm//RINT0mga+WGURPPH3UjaxsqObg==",
+      "files": [
+        "lib/dnxcore50/NuGet.DependencyResolver.Core.dll",
+        "lib/dnxcore50/NuGet.DependencyResolver.Core.xml",
+        "lib/net45/NuGet.DependencyResolver.Core.dll",
+        "lib/net45/NuGet.DependencyResolver.Core.xml",
+        "NuGet.DependencyResolver.Core.3.3.0.nupkg",
+        "NuGet.DependencyResolver.Core.3.3.0.nupkg.sha512",
+        "NuGet.DependencyResolver.Core.nuspec"
+      ]
+    },
+    "NuGet.Frameworks/3.3.0": {
+      "type": "package",
+      "sha512": "kOS9FTJqFvCQR3z8C3VhnvXM4Wgi2aGDZREK+gqpnQXdCvkBPgD1PKFjGDckQLqao38DijWPppaanVGiV5Vjxw==",
+      "files": [
+        "lib/dnxcore50/NuGet.Frameworks.dll",
+        "lib/dnxcore50/NuGet.Frameworks.xml",
+        "lib/net45/NuGet.Frameworks.dll",
+        "lib/net45/NuGet.Frameworks.xml",
+        "NuGet.Frameworks.3.3.0.nupkg",
+        "NuGet.Frameworks.3.3.0.nupkg.sha512",
+        "NuGet.Frameworks.nuspec"
+      ]
+    },
+    "NuGet.LibraryModel/3.3.0": {
+      "type": "package",
+      "sha512": "ccYoRkkqTTHxlR8ds8p5F7itUseZxK1WRqp7bg/z6tB9PLBIUak14cyOVGLD+JaPFoYavlEXIncqTXijYQdnLw==",
+      "files": [
+        "lib/dnxcore50/NuGet.LibraryModel.dll",
+        "lib/dnxcore50/NuGet.LibraryModel.xml",
+        "lib/net45/NuGet.LibraryModel.dll",
+        "lib/net45/NuGet.LibraryModel.xml",
+        "NuGet.LibraryModel.3.3.0.nupkg",
+        "NuGet.LibraryModel.3.3.0.nupkg.sha512",
+        "NuGet.LibraryModel.nuspec"
+      ]
+    },
+    "NuGet.Logging/3.3.0": {
+      "type": "package",
+      "sha512": "cnMsgbWx3a9sl4WoYSu03/zrOfmSK9ZQVghTwX0WPNW7LsHYRx2INhtxhcgHV14XUpxLvqJ8xTTSLhS/QEgpBA==",
+      "files": [
+        "lib/dnxcore50/NuGet.Logging.dll",
+        "lib/dnxcore50/NuGet.Logging.xml",
+        "lib/net45/NuGet.Logging.dll",
+        "lib/net45/NuGet.Logging.xml",
+        "NuGet.Logging.3.3.0.nupkg",
+        "NuGet.Logging.3.3.0.nupkg.sha512",
+        "NuGet.Logging.nuspec"
+      ]
+    },
+    "NuGet.Packaging/3.3.0": {
+      "type": "package",
+      "sha512": "8ZmxGaRSyuAg4tn+o2AtRrp5fs+hJRALTlIEPakPWSL/FMkg+2aQxce1hbNjAdpCh2LtxMdJBkbzpHevOnrb5A==",
+      "files": [
+        "lib/dnxcore50/NuGet.Packaging.dll",
+        "lib/dnxcore50/NuGet.Packaging.xml",
+        "lib/net45/NuGet.Packaging.dll",
+        "lib/net45/NuGet.Packaging.xml",
+        "NuGet.Packaging.3.3.0.nupkg",
+        "NuGet.Packaging.3.3.0.nupkg.sha512",
+        "NuGet.Packaging.nuspec"
+      ]
+    },
+    "NuGet.Packaging.Core/3.3.0": {
+      "type": "package",
+      "sha512": "Ix5M5F7eYIduNIFWQeYgzSo0HKs4Y4ZrLi7TjZC/tMSL5ioiuIF56r2AwLPy98g6J2HWP6j/M6bjkO1vRgIZxA==",
+      "files": [
+        "lib/dnxcore50/NuGet.Packaging.Core.dll",
+        "lib/dnxcore50/NuGet.Packaging.Core.xml",
+        "lib/net45/NuGet.Packaging.Core.dll",
+        "lib/net45/NuGet.Packaging.Core.xml",
+        "NuGet.Packaging.Core.3.3.0.nupkg",
+        "NuGet.Packaging.Core.3.3.0.nupkg.sha512",
+        "NuGet.Packaging.Core.nuspec"
+      ]
+    },
+    "NuGet.Packaging.Core.Types/3.3.0": {
+      "type": "package",
+      "sha512": "HjmbxDHozO9DMczF8Iyw2WPpbXHebfxFN18WBPpEabLEK9gNEAqyHS02wd5I8VS2VMBOzRljo24UIVb9yJEimA==",
+      "files": [
+        "lib/dnxcore50/NuGet.Packaging.Core.Types.dll",
+        "lib/dnxcore50/NuGet.Packaging.Core.Types.xml",
+        "lib/net45/NuGet.Packaging.Core.Types.dll",
+        "lib/net45/NuGet.Packaging.Core.Types.xml",
+        "NuGet.Packaging.Core.Types.3.3.0.nupkg",
+        "NuGet.Packaging.Core.Types.3.3.0.nupkg.sha512",
+        "NuGet.Packaging.Core.Types.nuspec"
+      ]
+    },
+    "NuGet.ProjectModel/3.3.0": {
+      "type": "package",
+      "sha512": "WkUGeIr2o98oTjQmpa+ywDTJpKYy+ojF2vdo77HkuayoHrCSxqbF8GlPE36XZapq0zM8vslyHsqD86UjL6qopQ==",
+      "files": [
+        "lib/dnxcore50/NuGet.ProjectModel.dll",
+        "lib/dnxcore50/NuGet.ProjectModel.xml",
+        "lib/net45/NuGet.ProjectModel.dll",
+        "lib/net45/NuGet.ProjectModel.xml",
+        "NuGet.ProjectModel.3.3.0.nupkg",
+        "NuGet.ProjectModel.3.3.0.nupkg.sha512",
+        "NuGet.ProjectModel.nuspec"
+      ]
+    },
+    "NuGet.Protocol.Core.Types/3.3.0": {
+      "type": "package",
+      "sha512": "5V59KlFagXaUiwhAqrqBgPtChnOKDfsUs8LF5zmI8Zg/hwRoGVcyD6XmF9GlBSYnoLzODhV8HaxUeqjZ0nZeKA==",
+      "files": [
+        "lib/dnxcore50/NuGet.Protocol.Core.Types.dll",
+        "lib/dnxcore50/NuGet.Protocol.Core.Types.xml",
+        "lib/net45/NuGet.Protocol.Core.Types.dll",
+        "lib/net45/NuGet.Protocol.Core.Types.xml",
+        "NuGet.Protocol.Core.Types.3.3.0.nupkg",
+        "NuGet.Protocol.Core.Types.3.3.0.nupkg.sha512",
+        "NuGet.Protocol.Core.Types.nuspec"
+      ]
+    },
+    "NuGet.Protocol.Core.v3/3.3.0": {
+      "type": "package",
+      "sha512": "O26gfhWTqlMg3j6m6isr8dUuKCSxT/w0xSjmUSl0RIoeJYDkGnHOUQC4TDr53wlNcuByRFvyCoMbq6cPV6r0ew==",
+      "files": [
+        "lib/dnxcore50/NuGet.Protocol.Core.v3.dll",
+        "lib/dnxcore50/NuGet.Protocol.Core.v3.xml",
+        "lib/net45/NuGet.Protocol.Core.v3.dll",
+        "lib/net45/NuGet.Protocol.Core.v3.xml",
+        "NuGet.Protocol.Core.v3.3.3.0.nupkg",
+        "NuGet.Protocol.Core.v3.3.3.0.nupkg.sha512",
+        "NuGet.Protocol.Core.v3.nuspec"
+      ]
+    },
+    "NuGet.Repositories/3.3.0": {
+      "type": "package",
+      "sha512": "mX7wcpFKH9/Awu+pTJTV5MtSNk2OSQeEg/gwZ6y5dmfL9lmOIpWXSHZJnIzcgFfoHBXiduuaeoCstayUobud8Q==",
+      "files": [
+        "lib/dnxcore50/NuGet.Repositories.dll",
+        "lib/dnxcore50/NuGet.Repositories.xml",
+        "lib/net45/NuGet.Repositories.dll",
+        "lib/net45/NuGet.Repositories.xml",
+        "NuGet.Repositories.3.3.0.nupkg",
+        "NuGet.Repositories.3.3.0.nupkg.sha512",
+        "NuGet.Repositories.nuspec"
+      ]
+    },
+    "NuGet.RuntimeModel/3.3.0": {
+      "type": "package",
+      "sha512": "+sQzErPT7g7lU8jiKpjZ8JBEhFu9ohxfLZZOiB+E9gjR9rcur+MmtKAyX5Dm1OI90qsHSCSShdB5Xyt5rNFz1A==",
+      "files": [
+        "lib/dnxcore50/NuGet.RuntimeModel.dll",
+        "lib/dnxcore50/NuGet.RuntimeModel.xml",
+        "lib/net45/NuGet.RuntimeModel.dll",
+        "lib/net45/NuGet.RuntimeModel.xml",
+        "NuGet.RuntimeModel.3.3.0.nupkg",
+        "NuGet.RuntimeModel.3.3.0.nupkg.sha512",
+        "NuGet.RuntimeModel.nuspec"
+      ]
+    },
+    "NuGet.Versioning/3.3.0": {
+      "type": "package",
+      "sha512": "90wrt/mbOApvWYz/skYYS9w2Y1YdGrHp7irAflAWEW4C1NKzFX80XB3h8BaGKJPcZ6gWNZhh+zZ21MdZ8rJETg==",
+      "files": [
+        "lib/dnxcore50/NuGet.Versioning.dll",
+        "lib/dnxcore50/NuGet.Versioning.xml",
+        "lib/net45/NuGet.Versioning.dll",
+        "lib/net45/NuGet.Versioning.xml",
+        "NuGet.Versioning.3.3.0.nupkg",
+        "NuGet.Versioning.3.3.0.nupkg.sha512",
+        "NuGet.Versioning.nuspec"
       ]
     },
     "System.Collections/4.0.0": {
@@ -1838,6 +3199,7 @@
     "DNX,Version=v4.5.1": [
       "Microsoft.Dnx.Compilation >= 1.0.0-rc1-final",
       "Microsoft.Dnx.Compilation.CSharp >= 1.0.0-rc1-final",
+      "NuGet.Commands >= 3.3.0",
       "fx/System >= 4.0.0",
       "fx/System.Runtime >= 4.0.10",
       "fx/Microsoft.Build >= 4.0.0",
