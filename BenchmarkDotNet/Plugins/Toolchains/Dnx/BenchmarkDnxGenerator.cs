@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Dnx
         {
             var template = ResourceHelper.LoadTemplate("BenchmarkProject.json");
 
-            var content = SetPlatform(template, benchmark.Task.Configuration.Platform);
+            var content = SetPlatform(template, BenchmarkPlatform.HostPlatform); // todo: research, should be benchmark.Task.Configuration.Platform
             content = SetDependency(content, benchmark.Target.Type);
     
             var projectJsonFilePath = Path.Combine(projectDir, ProjectFileName);

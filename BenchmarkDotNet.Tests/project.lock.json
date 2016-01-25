@@ -3,7 +3,7 @@
   "version": 2,
   "targets": {
     ".NETFramework,Version=v4.5": {
-      "BenchmarkDotNet/0.8.2": {
+      "BenchmarkDotNet/0.8.3": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "frameworkAssemblies": [
@@ -76,7 +76,7 @@
       }
     },
     "DNX,Version=v4.5.1": {
-      "BenchmarkDotNet/0.8.2": {
+      "BenchmarkDotNet/0.8.3": {
         "type": "project",
         "framework": "DNX,Version=v4.5.1",
         "dependencies": {
@@ -992,7 +992,7 @@
       }
     },
     ".NETFramework,Version=v4.5/win7-x86": {
-      "BenchmarkDotNet/0.8.2": {
+      "BenchmarkDotNet/0.8.3": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "frameworkAssemblies": [
@@ -1065,7 +1065,7 @@
       }
     },
     ".NETFramework,Version=v4.5/win7-x64": {
-      "BenchmarkDotNet/0.8.2": {
+      "BenchmarkDotNet/0.8.3": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "frameworkAssemblies": [
@@ -1138,7 +1138,7 @@
       }
     },
     "DNX,Version=v4.5.1/win7-x86": {
-      "BenchmarkDotNet/0.8.2": {
+      "BenchmarkDotNet/0.8.3": {
         "type": "project",
         "framework": "DNX,Version=v4.5.1",
         "dependencies": {
@@ -2054,7 +2054,7 @@
       }
     },
     "DNX,Version=v4.5.1/win7-x64": {
-      "BenchmarkDotNet/0.8.2": {
+      "BenchmarkDotNet/0.8.3": {
         "type": "project",
         "framework": "DNX,Version=v4.5.1",
         "dependencies": {
@@ -2971,7 +2971,7 @@
     }
   },
   "libraries": {
-    "BenchmarkDotNet/0.8.2": {
+    "BenchmarkDotNet/0.8.3": {
       "type": "project",
       "path": "../BenchmarkDotNet/project.json"
     },

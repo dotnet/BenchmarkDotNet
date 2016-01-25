@@ -22,9 +22,10 @@
       },
       "dependencies": {
         "BenchmarkDotNet": {
-          "target": "Package",
-          "version": "0.8.2",
-          "comment": "not sure what to put in version and target"
+          "target": "project",
+          "version": "0.8.3",
+          "comment": "for development our auto-generated dll should reference project of BenchmarkDotNet, not the existing nuget package.",
+          "commentc": "for production it should point to package, not project. todo!"
         },
         "$EXECUTINGASSEMBLY": {
           "version": "$EXECUTINGASSEMBLYVERSION",

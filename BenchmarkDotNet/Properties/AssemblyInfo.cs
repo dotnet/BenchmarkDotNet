@@ -15,7 +15,7 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("cbba82d3-e650-407f-a0f0-767891d4f04c")]
 
-[assembly: AssemblyVersion("0.8.2")]
-[assembly: AssemblyFileVersion("0.8.2")]
+[assembly: AssemblyVersion("0.8.3")]
+[assembly: AssemblyFileVersion("0.8.3")]
 
 [assembly: InternalsVisibleTo("BenchmarkDotNet.IntegrationTests")]
