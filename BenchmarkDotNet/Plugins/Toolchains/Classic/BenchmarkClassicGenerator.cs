@@ -177,9 +177,9 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
             File.WriteAllText(fileName, content);
         }
 
-        private static BenchmarkGenerateResult CreateProjectDirectory(Benchmark benchmark)
+        private BenchmarkGenerateResult CreateProjectDirectory(Benchmark benchmark)
         {
-            var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), benchmark.Caption);
+            var directoryPath = GetDirectoryPath(benchmark);
             bool exist = Directory.Exists(directoryPath);
             Exception deleteException = null;
             for (int attempt = 0; attempt < 3 && exist; attempt++)
@@ -207,6 +207,11 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
             if (!Directory.Exists(directoryPath))
                 Directory.CreateDirectory(directoryPath);
             return new BenchmarkGenerateResult(directoryPath, true, null);
+        }
+
+        protected virtual string GetDirectoryPath(Benchmark benchmark)
+        {
+            return Path.Combine(Directory.GetCurrentDirectory(), benchmark.Caption);
         }
 
         private void EnsureDependancyInCorrectLocation(Type type, string outputDir)

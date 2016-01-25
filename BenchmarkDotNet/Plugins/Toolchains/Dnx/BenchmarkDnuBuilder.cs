@@ -13,37 +13,12 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Dnx
     {
         public BenchmarkBuildResult Build(BenchmarkGenerateResult generateResult, Benchmark benchmark)
         {
-            if (!ExecuteCommand(generateResult.DirectoryPath, "dnu restore"))
+            if (!DnuCommandExecutor.ExecuteCommand(generateResult.DirectoryPath, "dnu restore"))
             {
-                return new BenchmarkBuildResult(generateResult, true, new Exception("dnu restore failed"));
-            }
-            if (!ExecuteCommand(generateResult.DirectoryPath, "dnu build"))
-            {
-                return new BenchmarkBuildResult(generateResult, true, new Exception("dnu build failed"));
+                return new BenchmarkBuildResult(generateResult, true, new Exception("dnu restore has failed"));
             }
 
             return new BenchmarkBuildResult(generateResult, true, null);
-        }
-
-        private static bool ExecuteCommand(string workingDirectory, string arguments)
-        {
-            var process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "cmd.exe",
-                    WorkingDirectory = workingDirectory,
-                    Arguments = $"/c {arguments}",
-                    UseShellExecute = true,
-                    WindowStyle = ProcessWindowStyle.Hidden
-                }
-            };
-
-            process.Start();
-
-            process.WaitForExit(); // todo: add timeout
-
-            return process.ExitCode <= 0;
         }
     }
 }

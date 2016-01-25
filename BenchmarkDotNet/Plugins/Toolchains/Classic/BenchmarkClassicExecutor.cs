@@ -32,30 +32,38 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
             }
         }
 
-        public BenchmarkExecResult Execute(BenchmarkBuildResult buildResult, BenchmarkParameters parameters, IBenchmarkDiagnoser diagnoser)
+        public virtual BenchmarkExecResult Execute(BenchmarkBuildResult buildResult, BenchmarkParameters parameters, IBenchmarkDiagnoser diagnoser)
         {
             var exeName = Path.Combine(buildResult.DirectoryPath, "Program.exe");
             var args = parameters == null ? string.Empty : parameters.ToArgs();
 
-            if (File.Exists(exeName))
+            if (!File.Exists(exeName))
             {
-                try
+                return new BenchmarkExecResult(false, new string[0]);
+            }
+
+            return Execute(exeName, args, null, diagnoser);
+        }
+
+        protected BenchmarkExecResult Execute(string exeName, string workingDirectory, string args, IBenchmarkDiagnoser diagnoser)
+        {
+            try
+            {
+                var startInfo = CreateStartInfo(exeName, args, workingDirectory);
+                using (var process = Process.Start(startInfo))
                 {
-                    var startInfo = CreateStartInfo(exeName, args);
-                    using (var process = Process.Start(startInfo))
+                    if (process != null)
                     {
-                        if (process != null)
-                        {
-                            consoleHandler.SetProcess(process);
-                            return ExecuteImpl(process, diagnoser, exeName);
-                        }
+                        consoleHandler.SetProcess(process);
+                        return ExecuteImpl(process, diagnoser, exeName);
                     }
                 }
-                finally
-                {
-                    consoleHandler?.ClearProcess();
-                }
             }
+            finally
+            {
+                consoleHandler?.ClearProcess();
+            }
+
             return new BenchmarkExecResult(false, new string[0]);
         }
 
@@ -105,13 +113,14 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
             return new BenchmarkExecResult(true, lines);
         }
 
-        private ProcessStartInfo CreateStartInfo(string exeName, string args)
+        private ProcessStartInfo CreateStartInfo(string exeName, string args, string workingDirectory)
         {
             var start = new ProcessStartInfo
             {
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
-                CreateNoWindow = true
+                CreateNoWindow = true,
+                WorkingDirectory = workingDirectory
             };
             switch (benchmark.Task.Configuration.Runtime)
             {
