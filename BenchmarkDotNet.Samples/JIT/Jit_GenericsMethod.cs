@@ -1,15 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Tasks;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples.JIT
 {
     // See: https://alexandrnikitin.github.io/blog/dotnet-generics-under-the-hood/
-    [BenchmarkTask(platform: BenchmarkPlatform.X86, jitVersion: BenchmarkJitVersion.LegacyJit)]
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
+    [Config(typeof(Config))]
     public class Jit_GenericsMethod
     {
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                Add(Job.AllJits);
+            }
+        }
+
         private class BaseClass<T>
         {
             private List<T> list = new List<T>();

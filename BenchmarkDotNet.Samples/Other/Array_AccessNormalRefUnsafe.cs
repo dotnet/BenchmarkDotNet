@@ -1,15 +1,22 @@
 ﻿using System;
-
-using BenchmarkDotNet.Tasks;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples.Other
 {
     // See: http://stackoverflow.com/q/8497018/974487
-    [BenchmarkTask(platform: BenchmarkPlatform.X86, jitVersion: BenchmarkJitVersion.LegacyJit)]
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
+    [Config(typeof(Config))]
     public class Array_AccessNormalRefUnsafe
     {
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                Add(Job.AllJits);
+            }
+        }
+
         private const int Iterations = 111;
         private static float[] buffer = new float[1024 * 1024 * 100];
         private static readonly int Len = buffer.Length;

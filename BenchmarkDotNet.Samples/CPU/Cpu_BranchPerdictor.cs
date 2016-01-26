@@ -1,12 +1,22 @@
 ﻿using System;
-using BenchmarkDotNet.Tasks;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples.CPU
 {
     // See http://stackoverflow.com/questions/11227809/why-is-processing-a-sorted-array-faster-than-an-unsorted-array/11227902
-    [BenchmarkTask(platform: BenchmarkPlatform.X86)]
+    [Config(typeof(Config))]
     public class Cpu_BranchPerdictor
     {
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                Add(Job.LegacyX86);
+            }
+        }
+
         private const int N = 32767;
         private readonly int[] sorted, unsorted;
 

@@ -1,16 +1,18 @@
-﻿using BenchmarkDotNet.Tasks;
-using System;
+﻿using System;
 using System.Threading;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
 using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
+    [Config(typeof(SingleRunFastConfig))]
     public class SetupAttributeInvalidMethodTest
     {
         [Fact]
         public void Test()
         {
-            Assert.Throws<InvalidOperationException>(() => new BenchmarkRunner().Run<SetupAttributeInvalidMethodTest>());
+            Assert.Throws<InvalidOperationException>(() => BenchmarkRunner.Run<SetupAttributeInvalidMethodTest>());
         }
 
         [Setup]
@@ -20,7 +22,6 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Benchmark]
-        [BenchmarkTask(mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 1)]
         public void Benchmark()
         {
             Thread.Sleep(5);

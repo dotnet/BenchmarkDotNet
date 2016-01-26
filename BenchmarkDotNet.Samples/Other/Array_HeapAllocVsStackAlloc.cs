@@ -1,4 +1,6 @@
-﻿namespace BenchmarkDotNet.Samples.Other
+﻿using BenchmarkDotNet.Attributes;
+
+namespace BenchmarkDotNet.Samples.Other
 {
     // See http://blogs.microsoft.co.il/sasha/2013/10/17/on-stackalloc-performance-and-the-large-object-heap/
     // For comparision, the original "hand-written" benchmark is available at https://gist.github.com/goldshtn/7021608

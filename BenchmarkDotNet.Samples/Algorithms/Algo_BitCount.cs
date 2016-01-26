@@ -1,4 +1,5 @@
 ﻿using System;
+using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples.Algorithms
 {

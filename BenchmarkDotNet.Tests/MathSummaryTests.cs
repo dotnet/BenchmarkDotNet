@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Statistic;
 using Xunit;
 using Xunit.Abstractions;
@@ -15,7 +16,7 @@ namespace BenchmarkDotNet.Tests
             this.output = output;
         }
 
-        private void Print(StatSummary summary)
+        private void Print(Statistics summary)
         {
             output.WriteLine("Min = " + summary.Min);
             output.WriteLine("LowerFence = " + summary.LowerFence);
@@ -34,13 +35,13 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void Test0()
         {
-            Assert.Throws<InvalidOperationException>(() => new StatSummary());
+            Assert.Throws<InvalidOperationException>(() => new Statistics());
         }
 
         [Fact]
         public void Test1()
         {
-            var summary = new StatSummary(1);
+            var summary = new Statistics(1);
             Print(summary);
             Assert.Equal(1, summary.Min);
             Assert.Equal(1, summary.LowerFence);
@@ -58,7 +59,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void Test2()
         {
-            var summary = new StatSummary(1, 2);
+            var summary = new Statistics(1, 2);
             Print(summary);
             Assert.Equal(1, summary.Min);
             Assert.Equal(-0.5, summary.LowerFence);
@@ -76,7 +77,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void Test3()
         {
-            var summary = new StatSummary(1, 2, 4);
+            var summary = new Statistics(1, 2, 4);
             Print(summary);
             Assert.Equal(1, summary.Min);
             Assert.Equal(-3.5, summary.LowerFence);
@@ -94,7 +95,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void Test7()
         {
-            var summary = new StatSummary(1, 2, 4, 8, 16, 32, 64);
+            var summary = new Statistics(1, 2, 4, 8, 16, 32, 64);
             Print(summary);
             Assert.Equal(1, summary.Min);
             Assert.Equal(-43, summary.LowerFence);
@@ -112,7 +113,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void OutlierTest()
         {
-            var summary = new StatSummary(1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 10, 10.1);
+            var summary = new Statistics(1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 10, 10.1);
             Print(summary);
             Assert.Equal(new[] { 10, 10.1 }, summary.Outlier);
         }
@@ -120,7 +121,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void ConfidenceIntervalTest()
         {
-            var summary = new StatSummary(Enumerable.Range(1, 30));
+            var summary = new Statistics(Enumerable.Range(1, 30));
             Print(summary);
             Assert.Equal(95, summary.ConfidenceInterval.Level.ToPercent());
             Assert.Equal(15.5, summary.ConfidenceInterval.Mean);

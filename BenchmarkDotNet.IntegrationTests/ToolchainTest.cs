@@ -1,50 +1,63 @@
 ﻿using System;
-using BenchmarkDotNet.Plugins;
-using BenchmarkDotNet.Plugins.Diagnosers;
-using BenchmarkDotNet.Plugins.Toolchains;
-using BenchmarkDotNet.Plugins.Toolchains.Results;
-using BenchmarkDotNet.Tasks;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.Results;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
     public class ToolchainTest
     {
-        private class MyGenerator : IBenchmarkGenerator
+        private readonly ITestOutputHelper output;
+
+        public ToolchainTest(ITestOutputHelper output)
+        {
+            this.output = output;
+        }
+
+        private class MyGenerator : IGenerator
         {
             public bool Done { get; private set; }
 
-            public BenchmarkGenerateResult GenerateProject(Benchmark benchmark)
+            public GenerateResult GenerateProject(Benchmark benchmark, ILogger logger)
             {
+                logger.WriteLine("Generating");
                 Done = true;
-                return new BenchmarkGenerateResult(null, true, null);
+                return new GenerateResult(null, true, null);
             }
         }
 
-        private class MyBuilder : IBenchmarkBuilder
+        private class MyBuilder : IBuilder
         {
             public bool Done { get; private set; }
 
-            public BenchmarkBuildResult Build(BenchmarkGenerateResult generateResult)
+            public BuildResult Build(GenerateResult generateResult, ILogger logger)
             {
+                logger.WriteLine("Building");
                 Done = true;
-                return new BenchmarkBuildResult(generateResult, true, null);
+                return new BuildResult(generateResult, true, null);
             }
         }
 
-        private class MyExecutor : IBenchmarkExecutor
+        private class MyExecutor : IExecutor
         {
             public bool Done { get; private set; }
 
-            public BenchmarkExecResult Execute(BenchmarkBuildResult buildResult, BenchmarkParameters parameters, IBenchmarkDiagnoser diagnoser)
+            public ExecuteResult Execute(BuildResult buildResult, IDiagnoser diagnoser, Benchmark benchmark, ILogger logger)
             {
+                logger.WriteLine("Executing");
                 Done = true;
-                return new BenchmarkExecResult(true, new string[0]);
+                return new ExecuteResult(true, new string[0]);
             }
         }
 
         [Benchmark]
-        [BenchmarkTask(toolchain: BenchmarkToolchain.Custom1, mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 1)]
         public void Benchmark()
         {
         }
@@ -52,21 +65,19 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void CustomToolchain()
         {
+            var logger = new OutputLogger(output);
+
             var generator = new MyGenerator();
             var builder = new MyBuilder();
             var executor = new MyExecutor();
-            var plugins = BenchmarkPluginBuilder.CreateEmpty().
-                AddToolchain(new BenchmarkToolchainBuilder(
-                    BenchmarkToolchain.Custom1,
-                    (benchmark, logger) => generator,
-                    (benchmark, logger) => builder,
-                    (benchmark, logger) => executor));
-            new BenchmarkRunner(plugins).Run<ToolchainTest>();
+            var myToolchain = new Toolchain("My", generator, builder, executor);
+            var job = Job.Default.With(myToolchain).With(Mode.SingleRun).WithProcessCount(1).WithWarmupCount(1).WithTargetCount(1);
+
+            var config = DefaultConfig.Instance.With(job).With(logger);
+            BenchmarkRunner.Run<ToolchainTest>(config);
             Assert.True(generator.Done);
             Assert.True(builder.Done);
             Assert.True(executor.Done);
-
-            Assert.Throws<NotSupportedException>(() => new BenchmarkRunner(BenchmarkPluginBuilder.CreateEmpty()).Run<ToolchainTest>());
         }
     }
 }

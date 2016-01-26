@@ -1,11 +1,19 @@
-﻿using BenchmarkDotNet.Tasks;
+﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples.JIT
 {
-    [BenchmarkTask(platform: BenchmarkPlatform.X86)]
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
     public class Jit_InterfaceMethod
     {
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                Add(Job.LegacyX86, Job.LegacyX64);
+            }
+        }
+
         private interface IFoo
         {
             double Inc(double x);

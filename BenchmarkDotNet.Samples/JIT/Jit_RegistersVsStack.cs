@@ -1,12 +1,22 @@
 ﻿using System.Diagnostics;
-using BenchmarkDotNet.Tasks;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples.JIT
 {
     // See http://stackoverflow.com/questions/32114308/weird-performance-increase-in-simple-benchmark
-    [BenchmarkTask(platform: BenchmarkPlatform.X86)]
+    [Config(typeof(Config))]
     public class Jit_RegistersVsStack
     {
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                Add(Job.LegacyX86);
+            }
+        }
+
         private const int IterationCount = 101;
 
         [Benchmark]

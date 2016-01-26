@@ -1,6 +1,8 @@
 ﻿using System;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Plugins.Loggers;
+using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -10,7 +12,9 @@ namespace BenchmarkDotNet.Reports
     /// </summary>
     public sealed class BenchmarkRunReport
     {
-        public BenchmarkIterationMode IterationMode { get; }
+        public IterationMode IterationMode { get; }
+
+        public int ProcessIndex { get; }
 
         public int IterationIndex { get; }
 
@@ -27,16 +31,18 @@ namespace BenchmarkDotNet.Reports
         /// <summary>
         /// Creates an instance of <see cref="BenchmarkRunReport"/> class.
         /// </summary>
+        /// <param name="processIndex"></param>
         /// <param name="iterationMode"></param>
         /// <param name="iterationIndex"></param>
         /// <param name="operations">The number of operations performed.</param>
         /// <param name="nanoseconds">The total number of nanoseconds it took to perform all operations.</param>
-        public BenchmarkRunReport(BenchmarkIterationMode iterationMode, int iterationIndex, long operations, double nanoseconds)
+        public BenchmarkRunReport(int processIndex, IterationMode iterationMode, int iterationIndex, long operations, double nanoseconds)
         {
             IterationMode = iterationMode;
             IterationIndex = iterationIndex;
             Operations = operations;
             Nanoseconds = nanoseconds;
+            ProcessIndex = processIndex;
         }
 
         /// <summary>
@@ -52,7 +58,7 @@ namespace BenchmarkDotNet.Reports
         /// <param name="logger">The logger to write any diagnostic messages to.</param>
         /// <param name="line">The line to parse.</param>
         /// <returns>An instance of <see cref="BenchmarkRunReport"/> if parsed successfully. <c>Null</c> in case of any trouble.</returns>
-        public static BenchmarkRunReport Parse(IBenchmarkLogger logger, string line)
+        public static BenchmarkRunReport Parse(ILogger logger, string line, int processIndex)
         {
             try
             {
@@ -76,14 +82,14 @@ namespace BenchmarkDotNet.Reports
                     switch (unit)
                     {
                         case "ns":
-                            ns = double.Parse(value, EnvironmentInfo.MainCultureInfo);
+                            ns = double.Parse(value, EnvironmentHelper.MainCultureInfo);
                             break;
                         case "op":
                             op = long.Parse(value);
                             break;
                     }
                 }
-                return new BenchmarkRunReport(iterationMode, iterationIndex, op, ns);
+                return new BenchmarkRunReport(processIndex, iterationMode, iterationIndex, op, ns);
             }
             catch (Exception)
             {
@@ -93,10 +99,10 @@ namespace BenchmarkDotNet.Reports
             }
         }
 
-        private static BenchmarkIterationMode ParseIterationMode(string name)
+        private static IterationMode ParseIterationMode(string name)
         {
-            BenchmarkIterationMode mode;
-            return Enum.TryParse(name, out mode) ? mode : BenchmarkIterationMode.Unknown;
+            IterationMode mode;
+            return Enum.TryParse(name, out mode) ? mode : IterationMode.Unknown;
         }
     }
 

@@ -1,4 +1,6 @@
-﻿namespace BenchmarkDotNet.Samples.JIT
+﻿using BenchmarkDotNet.Attributes;
+
+namespace BenchmarkDotNet.Samples.JIT
 {
     public class Jit_RotateBits
     {

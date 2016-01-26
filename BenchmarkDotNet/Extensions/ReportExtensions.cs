@@ -9,8 +9,9 @@ namespace BenchmarkDotNet.Extensions
 {
     public static class ReportExtensions
     {
-        public static BenchmarkReport GetReportFor<T>(this IEnumerable<BenchmarkReport> reports, Expression<Action<T>> actionExp)
+        public static BenchmarkReport GetReportFor<T>(this Summary summary, Expression<Action<T>> actionExp)
         {
+            var reports = summary.Reports.Values;
             if (actionExp.Body == null)
                 throw new ArgumentException("Extend a an Expression with a valid Body", nameof(actionExp));
 
@@ -21,17 +22,17 @@ namespace BenchmarkDotNet.Extensions
             return reports.First(r => r.Benchmark.Target.Method == methodExp.Method);
         }
 
-        public static IList<BenchmarkRunReport> GetRunsFor<T>(this IEnumerable<BenchmarkReport> reports, Expression<Action<T>> actionExp)
+        public static IList<BenchmarkRunReport> GetRunsFor<T>(this Summary summary, Expression<Action<T>> actionExp)
         {
-            return reports.GetReportFor<T>(actionExp).GetTargetRuns().ToList();
+            return summary.GetReportFor<T>(actionExp).GetTargetRuns().ToList();
         }
 
-        public static StatSummary GetStats(this IList<BenchmarkRunReport> runs) =>
+        public static Statistics GetStats(this IList<BenchmarkRunReport> runs) =>
             runs.Any()
-            ? new StatSummary(runs.Select(r => r.GetAverageNanoseconds()))
+            ? new Statistics(runs.Select(r => r.GetAverageNanoseconds()))
             : null;
 
-        public static StatSummary GetStats(this IEnumerable<BenchmarkRunReport> runs) =>
+        public static Statistics GetStats(this IEnumerable<BenchmarkRunReport> runs) =>
             GetStats(runs.ToList());
     }
 }

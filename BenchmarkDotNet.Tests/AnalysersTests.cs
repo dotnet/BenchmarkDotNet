@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Plugins.Analyzers;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Tasks;
+using BenchmarkDotNet.Jobs;
 using Xunit;
 using Xunit.Abstractions;
 

@@ -71,19 +71,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BenchmarkModeTests.cs" />
+    <Compile Include="ModeTests.cs" />
     <Compile Include="GenericBenchmarkTest.cs" />
     <Compile Include="InnerClassTest.cs" />
+    <Compile Include="OutputLogger.cs" />
     <Compile Include="ParamsAttributeStaticTest.cs" />
     <Compile Include="ParamsAttributeTest.cs" />
     <Compile Include="PerformanceUnitTest.cs" />
-    <Compile Include="Plugins\BaselineDeltaResultExtenderTest.cs" />
-    <Compile Include="Plugins\BenchmarkStatResultExtenderTests.cs" />
+    <Compile Include="BaselineDeltaResultExtenderTest.cs" />
+    <Compile Include="StatResultExtenderTests.cs" />
     <Compile Include="PretendFSharpTest.cs" />
     <Compile Include="SetupAttributeInvalidMethodTest.cs" />
     <Compile Include="SetupAttributeTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Plugins\SourceDiagnoserTest.cs" />
+    <Compile Include="SourceDiagnoserTest.cs" />
+    <Compile Include="TestConfigs.cs" />
     <Compile Include="ToolchainTest.cs" />
   </ItemGroup>
   <ItemGroup>

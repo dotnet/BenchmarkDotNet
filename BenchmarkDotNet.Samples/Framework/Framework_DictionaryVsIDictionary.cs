@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples.Framework
 {

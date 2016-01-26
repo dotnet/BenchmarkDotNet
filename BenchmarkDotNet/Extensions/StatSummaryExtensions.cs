@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using BenchmarkDotNet.Statistic;
+using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Extensions
     {
         private static string NullSummaryMessage = "<Empty statistic (N=0)>";
 
-        public static string ToStr(this StatSummary s)
+        public static string ToStr(this Statistics s)
         {
             if (s == null)
                 return NullSummaryMessage;
@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Extensions
             return builder.ToString();
         }
 
-        public static string ToTimeStr(this StatSummary s, TimeUnit unit = null)
+        public static string ToTimeStr(this Statistics s, TimeUnit unit = null)
         {
             if (s == null)
                 return NullSummaryMessage;

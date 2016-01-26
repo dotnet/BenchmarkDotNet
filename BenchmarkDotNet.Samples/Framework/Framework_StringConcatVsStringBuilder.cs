@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples.Framework
 {

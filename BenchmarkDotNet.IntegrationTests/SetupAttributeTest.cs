@@ -1,20 +1,23 @@
-﻿using BenchmarkDotNet.Tasks;
+﻿using BenchmarkDotNet.Jobs;
 using System;
 using System.Threading;
-using BenchmarkDotNet.Plugins;
-using BenchmarkDotNet.Plugins.Loggers;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Running;
 using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
+    [Config(typeof(SingleRunFastConfig))]
     public class SetupAttributeTest
     {
         [Fact]
         public void Test()
         {
-            var logger = new BenchmarkAccumulationLogger();
-            var plugins = BenchmarkPluginBuilder.CreateDefault().AddLogger(logger).Build();
-            var reports = new BenchmarkRunner(plugins).Run<SetupAttributeTest>();
+            var logger = new AccumulationLogger();
+            var config = DefaultConfig.Instance.With(logger);
+            BenchmarkRunner.Run<SetupAttributeTest>(config);
             Assert.Contains("// ### Setup called ###" + Environment.NewLine, logger.GetLog());
         }
 
@@ -25,7 +28,6 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Benchmark]
-        [BenchmarkTask(mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 1)]
         public void Benchmark()
         {
             Console.WriteLine("// ### Benchmark called ###");
