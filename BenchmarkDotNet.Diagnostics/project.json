@@ -2,18 +2,8 @@
   "title": "BenchmarkDotNet.Diagnostics",
   "frameworks": {
     "net40": {
-      "dependencies": {
-        "Dia2Lib": "1.0.0-*",
-        "Interop.Dia2Lib": "1.0.0-*",
-        "Microsoft.Diagnostics.Runtime": "1.0.0-*"
-      }
     },
     "dnx451": {
-      "dependencies": {
-        "Dia2Lib": "1.0.0-*",
-        "Interop.Dia2Lib": "1.0.0-*",
-        "Microsoft.Diagnostics.Runtime": "1.0.0-*"
-      },
       "frameworkAssemblies": {
         "System.Runtime": "4.0.10.0"
       }
@@ -22,6 +12,9 @@
   "dependencies": {
     "BenchmarkDotNet": {
       "target": "project"
-    }
+    },
+    "Dia2Lib": "1.0.0-*",
+    "Interop.Dia2Lib": "1.0.0-*",
+    "Microsoft.Diagnostics.Runtime": "1.0.0-*"
   }
 }

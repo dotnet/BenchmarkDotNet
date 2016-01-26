@@ -80,9 +80,6 @@
         "type": "project",
         "framework": "DNX,Version=v4.5.1",
         "frameworkAssemblies": [
-          "Microsoft.Build",
-          "Microsoft.Build.Framework",
-          "Microsoft.Build.Utilities.v4.0",
           "System",
           "System.Management",
           "System.Reflection",
@@ -480,9 +477,6 @@
         "type": "project",
         "framework": "DNX,Version=v4.5.1",
         "frameworkAssemblies": [
-          "Microsoft.Build",
-          "Microsoft.Build.Framework",
-          "Microsoft.Build.Utilities.v4.0",
           "System",
           "System.Management",
           "System.Reflection",
@@ -734,9 +728,6 @@
         "type": "project",
         "framework": "DNX,Version=v4.5.1",
         "frameworkAssemblies": [
-          "Microsoft.Build",
-          "Microsoft.Build.Framework",
-          "Microsoft.Build.Utilities.v4.0",
           "System",
           "System.Management",
           "System.Reflection",

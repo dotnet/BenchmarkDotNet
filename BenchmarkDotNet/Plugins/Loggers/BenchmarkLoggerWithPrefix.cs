@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Extensions;
-using Microsoft.Build.Framework;
 
 namespace BenchmarkDotNet.Plugins.Loggers
 {

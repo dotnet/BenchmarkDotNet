@@ -1,4 +1,5 @@
-﻿using Microsoft.Build.Framework;
+﻿#if !DNX451
+using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
 namespace BenchmarkDotNet.Plugins.Loggers
@@ -20,3 +21,4 @@ namespace BenchmarkDotNet.Plugins.Loggers
         }
     }
 }
+#endif

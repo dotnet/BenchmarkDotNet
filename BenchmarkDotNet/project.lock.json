@@ -21,9 +21,6 @@
     "DNX,Version=v4.5.1": [
       "fx/System >= 4.0.0",
       "fx/System.Runtime >= 4.0.10",
-      "fx/Microsoft.Build >= 4.0.0",
-      "fx/Microsoft.Build.Framework >= 4.0.0",
-      "fx/Microsoft.Build.Utilities.v4.0 >= 4.0.0",
       "fx/System.Management >= 4.0.0",
       "fx/System.Reflection >= 4.0.0"
     ]

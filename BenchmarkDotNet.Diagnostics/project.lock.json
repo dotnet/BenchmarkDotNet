@@ -34,9 +34,6 @@
         "type": "project",
         "framework": "DNX,Version=v4.5.1",
         "frameworkAssemblies": [
-          "Microsoft.Build",
-          "Microsoft.Build.Framework",
-          "Microsoft.Build.Utilities.v4.0",
           "System",
           "System.Management",
           "System.Reflection",
@@ -118,9 +115,6 @@
         "type": "project",
         "framework": "DNX,Version=v4.5.1",
         "frameworkAssemblies": [
-          "Microsoft.Build",
-          "Microsoft.Build.Framework",
-          "Microsoft.Build.Utilities.v4.0",
           "System",
           "System.Management",
           "System.Reflection",
@@ -148,9 +142,6 @@
         "type": "project",
         "framework": "DNX,Version=v4.5.1",
         "frameworkAssemblies": [
-          "Microsoft.Build",
-          "Microsoft.Build.Framework",
-          "Microsoft.Build.Utilities.v4.0",
           "System",
           "System.Management",
           "System.Reflection",
@@ -194,17 +185,13 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "BenchmarkDotNet "
-    ],
-    ".NETFramework,Version=v4.0": [
+      "BenchmarkDotNet ",
       "Dia2Lib >= 1.0.0-*",
       "Interop.Dia2Lib >= 1.0.0-*",
       "Microsoft.Diagnostics.Runtime >= 1.0.0-*"
     ],
+    ".NETFramework,Version=v4.0": [],
     "DNX,Version=v4.5.1": [
-      "Dia2Lib >= 1.0.0-*",
-      "Interop.Dia2Lib >= 1.0.0-*",
-      "Microsoft.Diagnostics.Runtime >= 1.0.0-*",
       "fx/System.Runtime >= 4.0.10"
     ]
   }
