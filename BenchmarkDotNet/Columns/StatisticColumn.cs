@@ -19,6 +19,8 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn Q3 = new StatisticColumn("Q3", s => s.Q3);
         public static readonly IColumn Max = new StatisticColumn("Max", s => s.Max);
 
+        public static readonly IColumn[] AllStatistics = { Time, Error, StdDev, OperationPerSecond, Min, Q1, Median, Q3, Max };
+
         private readonly Func<Statistics, double> calc;
         private readonly bool isTimeColumn;
         public string ColumnName { get; }
@@ -43,5 +45,7 @@ namespace BenchmarkDotNet.Columns
             var value = calc(statistics);
             return isTimeColumn ? value.ToTimeStr(timeUnit) : value.ToStr();
         }
+
+        public override string ToString() => ColumnName;
     }
 }

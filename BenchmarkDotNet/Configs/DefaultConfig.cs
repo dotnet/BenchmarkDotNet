@@ -31,8 +31,10 @@ namespace BenchmarkDotNet.Configs
             yield return PropertyColumn.Framework;
             yield return PropertyColumn.Toolchain;
             yield return PropertyColumn.Runtime;
+            yield return PropertyColumn.ProcessCount;
             yield return PropertyColumn.WarmupCount;
             yield return PropertyColumn.TargetCount;
+            yield return PropertyColumn.Affinity;
 
             yield return StatisticColumn.Time;
             yield return StatisticColumn.Error;

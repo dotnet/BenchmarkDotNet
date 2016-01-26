@@ -18,10 +18,7 @@ namespace BenchmarkDotNet.Running
     {
         public static IList<Benchmark> TypeToBenchmarks(Type type, IConfig config = null)
         {
-            config = config ?? DefaultConfig.Instance;
-            var configAttribute = type.ResolveAttribute<ConfigAttribute>();
-            if (configAttribute != null)
-                config = ManualConfig.Union(config, (IConfig)Activator.CreateInstance(configAttribute.Type));
+            config = GetFullConfig(type, config);
 
             var allMethods = type.GetMethods();
 
@@ -43,6 +40,15 @@ namespace BenchmarkDotNet.Running
                 from job in jobs
                 from parameterInstancese in parameterInstancesList
                 select new Benchmark(target, job, parameterInstancese)).ToSortedList();
+        }
+
+        public static IConfig GetFullConfig(Type type, IConfig config)
+        {
+            config = config ?? DefaultConfig.Instance;
+            var configAttribute = type?.ResolveAttribute<ConfigAttribute>();
+            if (configAttribute != null)
+                config = ManualConfig.Union(config, (IConfig)Activator.CreateInstance(configAttribute.Type));
+            return config;
         }
 
         private static IEnumerable<Target> GetTargets(IEnumerable<MethodInfo> targetMethods, Type type, MethodInfo setupMethod) => targetMethods.
@@ -139,8 +145,8 @@ namespace BenchmarkDotNet.Running
                 from benchmark in TypeToBenchmarks(type, config)
                 let target = benchmark.Target
                 select new Benchmark(
-                    new Target(target.Type, target.Method, target.SetupMethod, target.MethodTitle, benchmarkContent, target.Baseline), 
-                    benchmark.Job, 
+                    new Target(target.Type, target.Method, target.SetupMethod, target.MethodTitle, benchmarkContent, target.Baseline),
+                    benchmark.Job,
                     benchmark.Parameters)).ToList();
         }
 

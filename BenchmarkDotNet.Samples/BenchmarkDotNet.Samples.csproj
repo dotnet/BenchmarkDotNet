@@ -51,7 +51,10 @@
     <Compile Include="Framework\Framework_DictionaryVsIDictionary.cs" />
     <Compile Include="Framework\Framework_StopwatchVsDateTime.cs" />
     <Compile Include="Framework\Framework_StringConcatVsStringBuilder.cs" />
+    <Compile Include="Intro\IntroBaseline.cs" />
+    <Compile Include="Intro\IntroColumns.cs" />
     <Compile Include="Intro\IntroJobsFull.cs" />
+    <Compile Include="Intro\IntroTags.cs" />
     <Compile Include="JIT\Jit_GenericsMethod.cs" />
     <Compile Include="JIT\Jit_AsVsCast.cs" />
     <Compile Include="JIT\Jit_RegistersVsStack.cs" />

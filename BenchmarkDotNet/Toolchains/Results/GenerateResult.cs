@@ -15,5 +15,7 @@ namespace BenchmarkDotNet.Toolchains.Results
             IsGenerateSuccess = isGenerateSuccess;
             GenerateException = generateException;
         }
+
+        public override string ToString() => "GenerateResult: " + (IsGenerateSuccess ? "Success" : "Fail");
     }
 }

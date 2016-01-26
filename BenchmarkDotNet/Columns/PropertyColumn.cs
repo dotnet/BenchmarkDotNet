@@ -17,6 +17,7 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn ProcessCount = new PropertyColumn("ProcessCount", benchmark => benchmark.Job.ProcessCount.ToString());
         public static readonly IColumn WarmupCount = new PropertyColumn("WarmupCount", benchmark => benchmark.Job.WarmupCount.ToString());
         public static readonly IColumn TargetCount = new PropertyColumn("TargetCount", benchmark => benchmark.Job.TargetCount.ToString());
+        public static readonly IColumn Affinity = new PropertyColumn("Affinity", benchmark => benchmark.Job.Affinity.ToString());
 
         private readonly Func<Benchmark, string> calc;
         public string ColumnName { get; }
@@ -30,5 +31,7 @@ namespace BenchmarkDotNet.Columns
             AlwaysShow = alwaysShow;
             ColumnName = columnName;
         }
+
+        public override string ToString() => ColumnName;
     }
 }

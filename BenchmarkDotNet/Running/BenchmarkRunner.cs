@@ -32,10 +32,9 @@ namespace BenchmarkDotNet.Running
 
         internal static Summary Run(IList<Benchmark> benchmarks, IConfig config)
         {
-            config = config ?? DefaultConfig.Instance;
+            config = BenchmarkConverter.GetFullConfig(benchmarks.FirstOrDefault()?.Target.Type, config);
 
-            benchmarkRunIndex++;
-            var title = $"BenchmarkRun-{benchmarkRunIndex:##000}-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}"; // TODO
+            var title = GetTitle(benchmarks);
             EnsureNoMoreOneBaseline(benchmarks, title);
 
             using (var logStreamWriter = new StreamWriter(title + ".log"))
@@ -45,6 +44,15 @@ namespace BenchmarkDotNet.Running
                 config.GetCompositeExporter().ExportToFiles(summary);
                 return summary;
             }
+        }
+
+        private static string GetTitle(IList<Benchmark> benchmarks)
+        {
+            var types = benchmarks.Select(b => b.Target.Type.Name).Distinct().ToArray();
+            if (types.Length == 1)
+                return types[0];
+            benchmarkRunIndex++;
+            return $"BenchmarkRun-{benchmarkRunIndex:##000}-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}";
         }
 
         private static Summary Run(IList<Benchmark> benchmarks, ILogger logger, string title, IConfig config)
@@ -93,7 +101,7 @@ namespace BenchmarkDotNet.Running
                 logger.NewLine();
             }
 
-            logger.WriteLineStatistic($"Total time: {globalStopwatch.Elapsed.TotalHours:00}:{globalStopwatch.Elapsed:mm\\:ss}");
+            LogTotalTime(logger, globalStopwatch.Elapsed);
             logger.NewLine();
 
             logger.WriteLineHeader("// * Summary *");
@@ -112,6 +120,13 @@ namespace BenchmarkDotNet.Running
             logger.NewLine();
             logger.WriteLineHeader("// ***** BenchmarkRunner: End *****");
             return summary;
+        }
+
+        private static void LogTotalTime(ILogger logger, TimeSpan time)
+        {
+            var hhMmSs = $"{time.TotalHours:00}:{time:mm\\:ss}";
+            var totalSecs = $"{time.TotalSeconds.ToStr()} sec";
+            logger.WriteLineStatistic($"Total time: {hhMmSs} ({totalSecs})");
         }
 
         private static BenchmarkReport Run(Benchmark benchmark, ILogger logger, IConfig config)

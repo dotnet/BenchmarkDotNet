@@ -1,6 +1,6 @@
 ﻿namespace BenchmarkDotNet.Jobs
 {
-    public class Count
+    public struct Count
     {
         public static readonly Count Auto = new Count(-1);
 

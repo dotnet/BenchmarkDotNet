@@ -14,7 +14,9 @@ namespace BenchmarkDotNet.Reports
         public BuildResult BuildResult { get; }
         public IList<ExecuteResult> ExecuteResults { get; }
 
-        public Statistics TargetStatistics => this.GetTargetRuns().Any() ? new Statistics(this.GetTargetRuns().Select(r => r.Nanoseconds)) : null;
+        public Statistics TargetStatistics => this.GetTargetRuns().Any() 
+            ? new Statistics(this.GetTargetRuns().Select(r => r.GetAverageNanoseconds())) 
+            : null;
 
         public BenchmarkReport(
             Benchmark benchmark,
@@ -29,6 +31,8 @@ namespace BenchmarkDotNet.Reports
             ExecuteResults = executeResults;
             AllRuns = allRuns ?? new BenchmarkRunReport[0];
         }
+
+        public override string ToString() => $"{Benchmark.ShortInfo}, {AllRuns.Count} runs";
     }
 
     public static class BenchmarkReportExtensions

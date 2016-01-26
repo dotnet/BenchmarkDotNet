@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
@@ -8,12 +9,7 @@ namespace BenchmarkDotNet.Columns
     {
         public static readonly IColumn Default = new BaselineDeltaColumn();
 
-        public string ColumnName { get; }
-
-        public BaselineDeltaColumn()
-        {
-            ColumnName = "+/- Delta";
-        }
+        public string ColumnName => "Delta";
 
         public string GetValue(Summary summary, Benchmark benchmark)
         {
@@ -43,11 +39,12 @@ namespace BenchmarkDotNet.Columns
             if (baseline != 0) // This can happen if we found no matching result
                 diff = (current - baseline) / baseline * 100.0;
 
-            return benchmark.Target.Baseline ? "-" : diff.ToString("N1") + "%";
+            return benchmark.Target.Baseline ? "Baseline" : diff.ToStr("0.0") + "%";
         }
 
         public bool IsAvailable(Summary summary) => summary.Benchmarks.Any(b => b.Target.Baseline);
 
         public bool AlwaysShow => true;
+        public override string ToString() => ColumnName;
     }
 }

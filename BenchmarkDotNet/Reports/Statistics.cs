@@ -66,5 +66,7 @@ namespace BenchmarkDotNet.Reports
         public double StandardError { get; }
         public double StandardDeviation { get; }
         public ConfidenceInterval ConfidenceInterval { get; }
+
+        public override string ToString() => $"{Mean} +- {StandardError} (N = {N})";
     }
 }

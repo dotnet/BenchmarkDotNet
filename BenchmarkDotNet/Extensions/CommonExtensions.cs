@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Reports;
 
@@ -27,5 +28,7 @@ namespace BenchmarkDotNet.Extensions
 
         public static bool IsNullOrEmpty<T>(this IList<T> value) => value == null || value.Count == 0;
         public static bool IsEmpty<T>(this IList<T> value) => value.Count == 0;
+
+        public static bool IsOneOf<T>(this T value, params T[] values) => values.Contains(value);
     }
 }

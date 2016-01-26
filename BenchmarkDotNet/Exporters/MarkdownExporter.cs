@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -85,7 +83,7 @@ namespace BenchmarkDotNet.Exporters
 
         private static void PrintCommonColumns(SummaryTable table, ILogger logger)
         {
-            var commonColumns = table.Columns.Where(c => !c.NeedToShow).ToArray();
+            var commonColumns = table.Columns.Where(c => !c.NeedToShow && !c.IsTrivial).ToArray();
             if (commonColumns.Any())
             {
                 var paramsOnLine = 0;

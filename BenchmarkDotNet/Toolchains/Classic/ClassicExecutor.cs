@@ -56,7 +56,9 @@ namespace BenchmarkDotNet.Toolchains.Classic
         private ExecuteResult ExecuteImpl(Process process, IDiagnoser diagnoser, string exeName, Benchmark benchmark, ILogger logger)
         {
             process.PriorityClass = ProcessPriorityClass.High;
-            process.ProcessorAffinity = new IntPtr(2);
+            if (!benchmark.Job.Affinity.IsAuto)
+                process.ProcessorAffinity = new IntPtr(benchmark.Job.Affinity.Value);
+
 
             var lines = new List<string>();
             string line;

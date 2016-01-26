@@ -14,5 +14,9 @@ namespace BenchmarkDotNet.Attributes
             Type = type;
             UnionRule = unionRule;
         }
+
+        public ConfigAttribute(string command)
+        {
+        }
     }
 }

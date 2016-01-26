@@ -14,5 +14,11 @@ namespace BenchmarkDotNet.Jobs
         Count ProcessCount { get; }
         Count WarmupCount { get; }
         Count TargetCount { get; }
+
+        /// <summary>
+        /// ProcessorAffinity for the benchmark process.
+        /// <seealso cref="https://msdn.microsoft.com/library/system.diagnostics.process.processoraffinity.aspx"/>
+        /// </summary>
+        Count Affinity { get; }
     }
 }

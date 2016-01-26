@@ -12,14 +12,20 @@ namespace BenchmarkDotNet.Samples.Intro
         {
             public Config()
             {
-                Add(Job.LegacyX86.With(Mode.SingleRun).WithProcessCount(1).WithWarmupCount(1).WithTargetCount(1));
+                Add(Job.LegacyX86.With(Mode.SingleRun).WithProcessCount(1).WithWarmupCount(1).WithTargetCount(3));
             }
         }
 
-        [Benchmark]
+        [Benchmark(Baseline = true)]
         public void Sleep()
         {
             Thread.Sleep(100);
+        }
+
+        [Benchmark]
+        public void Sleep50()
+        {
+            Thread.Sleep(50);
         }
     }
 }

@@ -13,5 +13,7 @@ namespace BenchmarkDotNet.Toolchains.Results
             IsBuildSuccess = isBuildSuccess;
             BuildException = buildException;
         }
+
+        public override string ToString() => "BuildResult: "  + (IsBuildSuccess ? "Success" : "Fail");
     }
 }

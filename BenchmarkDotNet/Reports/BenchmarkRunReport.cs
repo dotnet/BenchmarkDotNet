@@ -104,6 +104,8 @@ namespace BenchmarkDotNet.Reports
             IterationMode mode;
             return Enum.TryParse(name, out mode) ? mode : IterationMode.Unknown;
         }
+
+        public override string ToString() => $"#{ProcessIndex}/{IterationMode} {IterationIndex}: {Operations} op, {Nanoseconds.ToTimeStr()}";
     }
 
     public static class BenchmarkRunReportExtensions

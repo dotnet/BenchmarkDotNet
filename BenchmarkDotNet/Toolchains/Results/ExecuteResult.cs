@@ -12,5 +12,7 @@ namespace BenchmarkDotNet.Toolchains.Results
             FoundExecutable = foundExecutable;
             Data = data;
         }
+
+        public override string ToString() => "ExecuteResult: " + (FoundExecutable ? "Found executable" : "Executable not found");
     }
 }

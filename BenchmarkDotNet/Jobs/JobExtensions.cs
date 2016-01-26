@@ -18,6 +18,7 @@ namespace BenchmarkDotNet.Jobs
         public static IJob WithProcessCount(this IJob job, Count processCount) => job.With(j => j.ProcessCount = processCount);
         public static IJob WithWarmupCount(this IJob job, Count warmupCount) => job.With(j => j.WarmupCount = warmupCount);
         public static IJob WithTargetCount(this IJob job, Count targetCount) => job.With(j => j.TargetCount = targetCount);
+        public static IJob WithAffinity(this IJob job, Count affinity) => job.With(j => j.Affinity = affinity);
 
         private static Job Clone(this IJob job) => new Job
         {
@@ -29,7 +30,8 @@ namespace BenchmarkDotNet.Jobs
             Mode = job.Mode,
             ProcessCount = job.ProcessCount,
             TargetCount = job.TargetCount,
-            WarmupCount = job.WarmupCount
+            WarmupCount = job.WarmupCount,
+            Affinity = job.Affinity
         };
 
         private static IJob With(this IJob job, Action<Job> set)
@@ -50,6 +52,7 @@ namespace BenchmarkDotNet.Jobs
             yield return new KeyValuePair<string, string>("Warmup", job.WarmupCount.ToString());
             yield return new KeyValuePair<string, string>("Target", job.TargetCount.ToString());
             yield return new KeyValuePair<string, string>("Process", job.ProcessCount.ToString());
+            yield return new KeyValuePair<string, string>("Affinity", job.Affinity.ToString());
         }
 
         public static string GetFullInfo(this IJob job) => string.Join("_", job.GetAllProperties().Select(p => $"{p.Key}-{p.Value}"));
@@ -89,6 +92,7 @@ namespace BenchmarkDotNet.Jobs
                 case "Warmup":
                 case "Target":
                 case "Process":
+                case "Affinity":
                     return property.Key + property.Value;
             }
             return $"{property.Key}-{property.Value}";

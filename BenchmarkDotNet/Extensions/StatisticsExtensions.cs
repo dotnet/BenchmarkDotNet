@@ -3,7 +3,7 @@ using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Extensions
 {
-    public static class StatSummaryExtensions
+    public static class StatisticsExtensions
     {
         private static string NullSummaryMessage = "<Empty statistic (N=0)>";
 

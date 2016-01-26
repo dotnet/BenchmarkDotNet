@@ -26,6 +26,7 @@ namespace BenchmarkDotNet.Jobs
         public Count ProcessCount { get; set; } = Count.Auto;
         public Count WarmupCount { get; set; } = Count.Auto;
         public Count TargetCount { get; set; } = Count.Auto;
+        public Count Affinity { get; set; } = Count.Auto;
 
         public bool Equals(IJob other)
         {
