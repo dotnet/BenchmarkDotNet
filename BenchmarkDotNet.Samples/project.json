@@ -16,8 +16,7 @@
   },
   "dependencies": {
     "BenchmarkDotNet": {
-      "target": "project",
-      "version": "0.8.3"
+      "target": "project"
     },
     "BenchmarkDotNet.Diagnostics": "1.0.0-*"
   }

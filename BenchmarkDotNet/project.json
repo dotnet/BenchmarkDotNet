@@ -36,11 +36,6 @@
         "Microsoft.Build.Utilities.v4.0": "4.0.0.0",
         "System.Management": "4.0.0.0",
         "System.Reflection": "4.0.0.0"
-      },
-      "dependencies": {
-        "Microsoft.Dnx.Compilation": "1.0.0-rc1-final",
-        "Microsoft.Dnx.Compilation.CSharp": "1.0.0-rc1-final",
-        "NuGet.Commands": "3.3.0"
       }
     }
   }

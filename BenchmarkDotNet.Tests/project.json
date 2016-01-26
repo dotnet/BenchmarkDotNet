@@ -29,8 +29,7 @@
   },
   "dependencies": {
     "BenchmarkDotNet": {
-      "target": "project",
-      "version": "0.8.2"
+      "target": "project"
     },
     "xunit": "2.1.0",
     "xunit.abstractions": "2.0.0",

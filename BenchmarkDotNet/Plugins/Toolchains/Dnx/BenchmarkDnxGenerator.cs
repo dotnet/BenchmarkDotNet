@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Dnx
         {
             var template = ResourceHelper.LoadTemplate("BenchmarkProject.json");
 
-            var content = SetPlatform(template, BenchmarkPlatform.HostPlatform); // todo: research, should be benchmark.Task.Configuration.Platform
+            var content = SetPlatform(template, BenchmarkPlatform.HostPlatform); // todo: research, should be benchmark.Task.Configuration.Platform but I am not sure if this is possible with DNX
             content = SetDependency(content, benchmark.Target.Type);
     
             var projectJsonFilePath = Path.Combine(projectDir, ProjectFileName);
@@ -52,6 +52,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Dnx
         {
             var assemblyName = benchmarkTarget.Assembly.GetName();
 
+            // we can not simply call assemblyName.Version.ToString() because it is different than package version which can contain (and often does) text
             var packageVersion =
                 $"{assemblyName.Version.Major}.{assemblyName.Version.Minor}.{assemblyName.Version.Build}-*";
 
