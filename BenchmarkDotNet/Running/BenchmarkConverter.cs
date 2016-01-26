@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Running
             config = config ?? DefaultConfig.Instance;
             var configAttribute = type?.ResolveAttribute<ConfigAttribute>();
             if (configAttribute != null)
-                config = ManualConfig.Union(config, (IConfig)Activator.CreateInstance(configAttribute.Type));
+                config = ManualConfig.Union(config, configAttribute.Config);
             return config;
         }
 

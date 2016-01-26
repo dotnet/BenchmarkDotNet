@@ -52,6 +52,7 @@
     <Compile Include="Attributes\ConfigAttribute.cs" />
     <Compile Include="Columns\Column.cs" />
     <Compile Include="Configs\ConfigExtensions.cs" />
+    <Compile Include="Configs\ConfigParser.cs" />
     <Compile Include="Configs\ConfigUnionRule.cs" />
     <Compile Include="Configs\IConfig.cs" />
     <Compile Include="Jobs\IJob.cs" />

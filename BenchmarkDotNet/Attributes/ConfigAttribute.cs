@@ -6,17 +6,16 @@ namespace BenchmarkDotNet.Attributes
     [AttributeUsage(AttributeTargets.Class)]
     public class ConfigAttribute : Attribute
     {
-        public Type Type { get; }
-        public ConfigUnionRule UnionRule { get; }
+        public IConfig Config { get; }
 
-        public ConfigAttribute(Type type, ConfigUnionRule unionRule = ConfigUnionRule.Union)
+        public ConfigAttribute(Type type)
         {
-            Type = type;
-            UnionRule = unionRule;
+            Config = (IConfig)Activator.CreateInstance(type);
         }
 
         public ConfigAttribute(string command)
         {
+            Config = new ConfigParser().Parse(command.Split(' '));
         }
     }
 }

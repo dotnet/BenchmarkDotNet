@@ -53,6 +53,7 @@
     <Compile Include="Framework\Framework_StringConcatVsStringBuilder.cs" />
     <Compile Include="Intro\IntroBaseline.cs" />
     <Compile Include="Intro\IntroColumns.cs" />
+    <Compile Include="Intro\IntroCommandStyle.cs" />
     <Compile Include="Intro\IntroJobsFull.cs" />
     <Compile Include="Intro\IntroTags.cs" />
     <Compile Include="JIT\Jit_GenericsMethod.cs" />
