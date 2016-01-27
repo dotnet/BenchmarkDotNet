@@ -22,17 +22,17 @@ namespace BenchmarkDotNet.Extensions
             return reports.First(r => r.Benchmark.Target.Method == methodExp.Method);
         }
 
-        public static IList<BenchmarkRunReport> GetRunsFor<T>(this Summary summary, Expression<Action<T>> actionExp)
+        public static IList<Measurement> GetRunsFor<T>(this Summary summary, Expression<Action<T>> actionExp)
         {
             return summary.GetReportFor<T>(actionExp).GetTargetRuns().ToList();
         }
 
-        public static Statistics GetStats(this IList<BenchmarkRunReport> runs) =>
+        public static Statistics GetStats(this IList<Measurement> runs) =>
             runs.Any()
             ? new Statistics(runs.Select(r => r.GetAverageNanoseconds()))
             : null;
 
-        public static Statistics GetStats(this IEnumerable<BenchmarkRunReport> runs) =>
+        public static Statistics GetStats(this IEnumerable<Measurement> runs) =>
             GetStats(runs.ToList());
     }
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.Classic;
 
 namespace BenchmarkDotNet.Jobs
 {
@@ -18,6 +17,7 @@ namespace BenchmarkDotNet.Jobs
         public static IJob WithProcessCount(this IJob job, Count processCount) => job.With(j => j.ProcessCount = processCount);
         public static IJob WithWarmupCount(this IJob job, Count warmupCount) => job.With(j => j.WarmupCount = warmupCount);
         public static IJob WithTargetCount(this IJob job, Count targetCount) => job.With(j => j.TargetCount = targetCount);
+        public static IJob WithIterationTime(this IJob job, Count iterationTime) => job.With(j => j.IterationTime = iterationTime);
         public static IJob WithAffinity(this IJob job, Count affinity) => job.With(j => j.Affinity = affinity);
 
         private static Job Clone(this IJob job) => new Job
@@ -31,6 +31,7 @@ namespace BenchmarkDotNet.Jobs
             ProcessCount = job.ProcessCount,
             TargetCount = job.TargetCount,
             WarmupCount = job.WarmupCount,
+            IterationTime = job.IterationTime,
             Affinity = job.Affinity
         };
 
@@ -52,6 +53,7 @@ namespace BenchmarkDotNet.Jobs
             yield return new KeyValuePair<string, string>("Warmup", job.WarmupCount.ToString());
             yield return new KeyValuePair<string, string>("Target", job.TargetCount.ToString());
             yield return new KeyValuePair<string, string>("Process", job.ProcessCount.ToString());
+            yield return new KeyValuePair<string, string>("IterationTime", job.IterationTime.ToString());
             yield return new KeyValuePair<string, string>("Affinity", job.Affinity.ToString());
         }
 
@@ -92,6 +94,7 @@ namespace BenchmarkDotNet.Jobs
                 case "Warmup":
                 case "Target":
                 case "Process":
+                case "IterationTime":
                 case "Affinity":
                     return property.Key + property.Value;
             }
@@ -102,8 +105,10 @@ namespace BenchmarkDotNet.Jobs
         public static string GenerateWithDefinitions(this IJob job)
         {
             var builder = new StringBuilder();
+            builder.Append($".With(BenchmarkDotNet.Jobs.Mode.{job.Mode})");
             builder.Append($".WithProcessCount({job.WarmupCount.Value})");
             builder.Append($".WithTargetCount({job.TargetCount.Value})");
+            builder.Append($".WithIterationTime({job.IterationTime.Value})");
             builder.Append($".WithProcessCount({job.ProcessCount.Value})");
             return builder.ToString();
         }

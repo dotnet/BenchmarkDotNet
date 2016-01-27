@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn Error = new StatisticColumn("Error", s => s.StandardError);
 
         public static readonly IColumn StdDev = new StatisticColumn("StdDev", s => s.StandardDeviation);
-        public static readonly IColumn OperationPerSecond = new StatisticColumn("Op/s", s => 1.0 * 1000 * 1000 * 1000 / s.Mean, false);
+        public static readonly IColumn OperationsPerSecond = new StatisticColumn("Op/s", s => 1.0 * 1000 * 1000 * 1000 / s.Mean, false);
 
         public static readonly IColumn Min = new StatisticColumn("Min", s => s.Min);
         public static readonly IColumn Q1 = new StatisticColumn("Q1", s => s.Q1);
@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn Q3 = new StatisticColumn("Q3", s => s.Q3);
         public static readonly IColumn Max = new StatisticColumn("Max", s => s.Max);
 
-        public static readonly IColumn[] AllStatistics = { Time, Error, StdDev, OperationPerSecond, Min, Q1, Median, Q3, Max };
+        public static readonly IColumn[] AllStatistics = { Time, Error, StdDev, OperationsPerSecond, Min, Q1, Median, Q3, Max };
 
         private readonly Func<Statistics, double> calc;
         private readonly bool isTimeColumn;

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Reports
@@ -53,9 +52,9 @@ namespace BenchmarkDotNet.Reports
                 Content = table.FullContent.Select(line => line[index]).ToArray();
                 NeedToShow = alwaysShow || Content.Distinct().Count() > 1;
                 Width = Math.Max(Header.Length, Content.Any() ? Content.Max(line => line.Length) : 0) + 1;
-                IsTrivial = Header.IsOneOf("Platform", "Jit", "Framework", "Runtime", "ProcessCount", "WarmupCount", "TargetCount", "Affinity") &&
+                IsTrivial = Header.IsOneOf("Platform", "Jit", "Framework", "Runtime", "ProcessCount", "WarmupCount", "TargetCount", "Affinity", "Toolchain") &&
                             Content.Distinct().Count() == 1 &&
-                            Content.First().IsOneOf("Host", "Auto");
+                            Content.First().IsOneOf("Host", "Auto", "Classic");
             }
 
             public override string ToString() => Header;

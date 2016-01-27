@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 Assert.Equal(row.Length, extraColumn + 1);
                 if (row[testNameColumn] == "BenchmarkSlow") // This is our baseline
-                    Assert.Equal(row[extraColumn], "-");
+                    Assert.Equal("Baseline", row[extraColumn]);
                 else if (row[testNameColumn] == "BenchmarkFast") // This should have been compared to the baseline
                     Assert.Contains("%", row[extraColumn]);
             }
@@ -71,13 +71,13 @@ namespace BenchmarkDotNet.IntegrationTests
         [Benchmark]
         public void BenchmarkSlow()
         {
-            Thread.Sleep(100);
+            Thread.Sleep(50);
         }
 
         [Benchmark]
         public void BenchmarkFast()
         {
-            Thread.Sleep(50);
+            Thread.Sleep(10);
         }
 
         public class TestExporter : IExporter
@@ -114,7 +114,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Benchmark(Baseline = true)]
         public void BenchmarkSlow()
         {
-            Thread.Sleep(100);
+            Thread.Sleep(50);
         }
 
         [Benchmark(Baseline = true)]

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
@@ -6,11 +7,10 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Reports
 {
-    // TODO: add processIndex
     /// <summary>
     /// The basic captured statistics for a benchmark.
     /// </summary>
-    public sealed class BenchmarkRunReport
+    public sealed class Measurement
     {
         public IterationMode IterationMode { get; }
 
@@ -29,14 +29,14 @@ namespace BenchmarkDotNet.Reports
         public double Nanoseconds { get; }
 
         /// <summary>
-        /// Creates an instance of <see cref="BenchmarkRunReport"/> class.
+        /// Creates an instance of <see cref="Measurement"/> class.
         /// </summary>
         /// <param name="processIndex"></param>
         /// <param name="iterationMode"></param>
         /// <param name="iterationIndex"></param>
         /// <param name="operations">The number of operations performed.</param>
         /// <param name="nanoseconds">The total number of nanoseconds it took to perform all operations.</param>
-        public BenchmarkRunReport(int processIndex, IterationMode iterationMode, int iterationIndex, long operations, double nanoseconds)
+        public Measurement(int processIndex, IterationMode iterationMode, int iterationIndex, long operations, double nanoseconds)
         {
             IterationMode = iterationMode;
             IterationIndex = iterationIndex;
@@ -44,6 +44,17 @@ namespace BenchmarkDotNet.Reports
             Nanoseconds = nanoseconds;
             ProcessIndex = processIndex;
         }
+
+        public static Measurement FromTicks(int processIndex, IterationMode iterationMode, int iterationIndex, long operationCount, long ticks)
+        {
+            ticks = Math.Max(ticks, 1);
+            var nanoseconds = ticks / (double)Stopwatch.Frequency * 1000000000;
+            return new Measurement(processIndex, iterationMode, iterationIndex, operationCount, nanoseconds);
+        }
+
+        public string ToOutputLine() => $"{IterationMode} {IterationIndex}: {GetDisplayValue()}";
+        private string GetDisplayValue() => $"{Operations} op, {Nanoseconds.ToStr()} ns, {GetAverageTime()}";
+        private string GetAverageTime() => $"{(Nanoseconds / Operations).ToTimeStr()}/op";
 
         /// <summary>
         /// Parses the benchmark statistics from the plain text line.
@@ -57,8 +68,8 @@ namespace BenchmarkDotNet.Reports
         /// </summary>
         /// <param name="logger">The logger to write any diagnostic messages to.</param>
         /// <param name="line">The line to parse.</param>
-        /// <returns>An instance of <see cref="BenchmarkRunReport"/> if parsed successfully. <c>Null</c> in case of any trouble.</returns>
-        public static BenchmarkRunReport Parse(ILogger logger, string line, int processIndex)
+        /// <returns>An instance of <see cref="Measurement"/> if parsed successfully. <c>Null</c> in case of any trouble.</returns>
+        public static Measurement Parse(ILogger logger, string line, int processIndex)
         {
             try
             {
@@ -89,7 +100,7 @@ namespace BenchmarkDotNet.Reports
                             break;
                     }
                 }
-                return new BenchmarkRunReport(processIndex, iterationMode, iterationIndex, op, ns);
+                return new Measurement(processIndex, iterationMode, iterationIndex, op, ns);
             }
             catch (Exception)
             {
@@ -106,26 +117,5 @@ namespace BenchmarkDotNet.Reports
         }
 
         public override string ToString() => $"#{ProcessIndex}/{IterationMode} {IterationIndex}: {Operations} op, {Nanoseconds.ToTimeStr()}";
-    }
-
-    public static class BenchmarkRunReportExtensions
-    {
-        private const int NanosecondsInSecond = 1000 * 1000 * 1000;
-
-        /// <summary>
-        /// Gets the number of operations performed per second (ops/sec).
-        /// </summary>
-        public static double GetOpsPerSecond(this BenchmarkRunReport report) =>
-            report.Operations / (report.Nanoseconds / NanosecondsInSecond);
-
-        /// <summary>
-        /// Gets the average duration of one operation in nanoseconds.
-        /// </summary>
-        public static double GetAverageNanoseconds(this BenchmarkRunReport report) =>
-            report.Nanoseconds / report.Operations;
-
-        public static string ToStr(this BenchmarkRunReport run) =>
-            $"{run.IterationMode} {run.IterationIndex}: {run.Operations} op, {run.Nanoseconds.ToStr()} ns, {run.GetAverageNanoseconds().ToTimeStr()}/op";
-
     }
 }

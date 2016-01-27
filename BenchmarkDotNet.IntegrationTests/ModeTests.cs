@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
@@ -42,12 +43,14 @@ namespace BenchmarkDotNet.IntegrationTests
         [Benchmark]
         public void BenchmarkSingleRunVoid()
         {
+            Thread.Sleep(10);
             Console.WriteLine("// ### BenchmarkSingleRunVoid method called ###");
         }
 
         [Benchmark]
         public string BenchmarkSingleRunWithReturnValue()
         {
+            Thread.Sleep(10);
             Console.WriteLine("// ### BenchmarkSingleRunWithReturnValue method called ###");
             return "okay";
         }
@@ -55,6 +58,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Benchmark]
         public void BenchmarkThroughputVoid()
         {
+            Thread.Sleep(10);
             if (FirstTime)
             {
                 Console.WriteLine("// ### BenchmarkThroughputVoid method called ###");
@@ -65,6 +69,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Benchmark]
         public string BenchmarkThroughputWithReturnValue()
         {
+            Thread.Sleep(10);
             if (FirstTime)
             {
                 Console.WriteLine("// ### BenchmarkThroughputWithReturnValue method called ###");

@@ -97,6 +97,8 @@ namespace BenchmarkDotNet.Exporters
                         paramsOnLine = 0;
                     }
                 }
+                if (paramsOnLine != 0)
+                    logger.NewLine();
 
                 logger.NewLine();
             }

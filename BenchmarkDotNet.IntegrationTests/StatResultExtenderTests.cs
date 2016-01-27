@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 StatisticColumn.Median,
                 StatisticColumn.Q3,
                 StatisticColumn.Max,
-                StatisticColumn.OperationPerSecond
+                StatisticColumn.OperationsPerSecond
             };
             var config = DefaultConfig.Instance.With(logger).With(columns);
             var summary = BenchmarkRunner.Run<Target>(config);

@@ -146,11 +146,11 @@ namespace BenchmarkDotNet.Running
 
             var executeResults = Execute(logger, benchmark, toolchain, buildResult, config);
 
-            var runs = new List<BenchmarkRunReport>();
+            var runs = new List<Measurement>();
             for (int index = 0; index < executeResults.Count; index++)
             {
                 var executeResult = executeResults[index];
-                runs.AddRange(executeResult.Data.Select(line => BenchmarkRunReport.Parse(logger, line, index + 1)).Where(r => r != null));
+                runs.AddRange(executeResult.Data.Select(line => Measurement.Parse(logger, line, index + 1)).Where(r => r != null));
             }
 
             return new BenchmarkReport(benchmark, generateResult, buildResult, executeResults, runs);

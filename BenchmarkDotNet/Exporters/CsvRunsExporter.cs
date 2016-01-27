@@ -21,9 +21,9 @@ namespace BenchmarkDotNet.Exporters
         private class RunColumn
         {
             public string Title { get; }
-            public Func<BenchmarkReport, BenchmarkRunReport, string> GetValue { get; }
+            public Func<BenchmarkReport, Measurement, string> GetValue { get; }
 
-            public RunColumn(string title, Func<BenchmarkReport, BenchmarkRunReport, string> getValue)
+            public RunColumn(string title, Func<BenchmarkReport, Measurement, string> getValue)
             {
                 Title = title;
                 GetValue = getValue;

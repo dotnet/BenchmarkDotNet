@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Configs
                 case "stddev":
                     return new[] { StatisticColumn.StdDev };
                 case "operationpersecond":
-                    return new[] { StatisticColumn.OperationPerSecond };
+                    return new[] { StatisticColumn.OperationsPerSecond };
                 case "min":
                     return new[] { StatisticColumn.Min };
                 case "q1":
@@ -61,6 +61,8 @@ namespace BenchmarkDotNet.Configs
                     return new[] { StatisticColumn.Max };
                 case "allstatistics":
                     return StatisticColumn.AllStatistics;
+                case "place":
+                    return new[] { PlaceColumn.ArabicNumber };
 
             }
             return new IColumn[0];

@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var slowBenchmarkReport = summary.GetReportFor<PerformanceUnitTest>(r => r.SlowBenchmark());
             var fastBenchmarkReport = summary.GetReportFor<PerformanceUnitTest>(r => r.FastBenchmark());
             foreach (var slowRun in slowBenchmarkReport.GetTargetRuns())
-                Assert.InRange(slowRun.GetAverageNanoseconds() / 1000.0 / 1000.0, low: 499, high: 502);
+                Assert.InRange(slowRun.GetAverageNanoseconds() / 1000.0 / 1000.0, low: 98, high: 102);
             foreach (var fastRun in fastBenchmarkReport.GetTargetRuns())
                 Assert.InRange(fastRun.GetAverageNanoseconds() / 1000.0 / 1000.0, low: 14, high: 17);
         }
@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void SlowBenchmark()
         {
             Console.WriteLine("// ### Slow Benchmark called ###");
-            Thread.Sleep(500);
+            Thread.Sleep(100);
         }
     }
 }

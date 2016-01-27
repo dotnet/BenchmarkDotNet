@@ -36,6 +36,8 @@ namespace BenchmarkDotNet.Helpers
         /// </summary>
         public long StopwatchFrequency { get; set; }
 
+        public double GetStopwatchResolution() => 1000000000.0 / StopwatchFrequency;
+
         /// <summary>
         /// Indicates whether the timer is based on a high-resolution performance counter. 
         /// </summary>
@@ -62,7 +64,7 @@ namespace BenchmarkDotNet.Helpers
             var line1 = $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}";
             var line2 = $"OS={OsVersion}";
             var line3 = $"Processor={ProcessorName}, ProcessorCount={ProcessorCount}";
-            var line4 = $"Freq={StopwatchFrequency} ticks, Resolution={(1000000000.0 / StopwatchFrequency).ToTimeStr()} [{(IsStopwatchHighResolution ? "HighResolution" : "LowResolution")}]";
+            var line4 = $"Freq={StopwatchFrequency} ticks, Resolution={GetStopwatchResolution().ToTimeStr()} [{(IsStopwatchHighResolution ? "HighResolution" : "LowResolution")}]";
             var line5 = $"{clrHint}CLR={ClrVersion}, Arch={Architecture} {Configuration}{GetDebuggerFlag()}{GetJitFlag()}";
             return string.Join(Environment.NewLine, line1, line2, line3, line4, line5);
         }

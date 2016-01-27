@@ -10,14 +10,14 @@ namespace BenchmarkDotNet.Samples.Intro
         [Benchmark]
         public void Sleep()
         {
-            Thread.Sleep(100);
+            Thread.Sleep(10);
         }
 
         // You can write a description for your method.
         [Benchmark("Thread.Sleep(100)")]
         public void SleepWithDescription()
         {
-            Thread.Sleep(100);
+            Thread.Sleep(10);
         }
     }
 }

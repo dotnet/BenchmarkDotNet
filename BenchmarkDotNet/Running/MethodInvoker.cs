@@ -1,194 +1,191 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Running
 {
-    // TODO: remove duplications
     public class MethodInvoker
     {
-        private const long InvokeTimoutMilliseconds = 1000; // TODO: Move to settings
+        private const int MinInvokeCount = 4;
+        private const int MinIterationTimeMs = 200;
+        private const int WarmupAutoMinIterationCount = 5;
+        private const int TargetAutoMinIterationCount = 10;
+        private const double TargetIdleAutoMaxAcceptableError = 0.05;
+        private const double TargetMainAutoMaxAcceptableError = 0.01;
 
-        private class Measurement
+        private struct MiltiInvokeInput
         {
-            public long OperationCount { get; }
-            public long Ticks { get; }
-            public double Nanoseconds { get; }
-            public double Milliseconds => Nanoseconds / 1000000;
+            public IterationMode IterationMode { get; }
+            public int Index { get; }
+            public long InvokeCount { get; }
 
-            public Measurement(long operationCount, long ticks)
+            public MiltiInvokeInput(IterationMode iterationMode, int index, long invokeCount)
             {
-                OperationCount = operationCount;
-                Ticks = Math.Max(ticks, 1);
-                Nanoseconds = Ticks / (double)Stopwatch.Frequency * 1000000000;
+                IterationMode = iterationMode;
+                Index = index;
+                InvokeCount = invokeCount;
             }
-
-            public string GetDisplayValue() => $"{OperationCount} op, {Nanoseconds.ToStr()} ns, {GetAverageTime()}";
-            private string GetAverageTime() => $"{(Nanoseconds / OperationCount).ToTimeStr()}/op";
         }
 
-        public void Throughput(IJob job, long operationsPerInvoke, Action setupAction, Action targetAction, Action idleAction)
+        public void Invoke(IJob job, long operationsPerInvoke, Action setupAction, Action targetAction, Action idleAction)
         {
-            int warmupCount = job.WarmupCount.IsAuto ? 5 : job.WarmupCount.Value; // TODO
-            int targetCount = job.TargetCount.IsAuto ? 10 : job.TargetCount.Value; // TODO
-
+            // Jitting
             setupAction();
             targetAction();
             idleAction();
 
-            long invokeCount = 1;
-            double lastPilotMilliseconds = 0;
-            int pilotCounter = 0;
-            while (true)
+            // Run
+            Func<MiltiInvokeInput, Measurement> multiInvoke = input =>
             {
-                State.Instance.IterationMode = IterationMode.Pilot;
-                State.Instance.Iteration = pilotCounter++;
-                var measurement = MultiInvoke(IterationMode.Pilot, pilotCounter - 1, setupAction, targetAction, invokeCount, operationsPerInvoke);
-                lastPilotMilliseconds = measurement.Milliseconds;
-                if (lastPilotMilliseconds > InvokeTimoutMilliseconds)
-                    break;
-                if (lastPilotMilliseconds < 1)
-                    invokeCount *= InvokeTimoutMilliseconds;
-                else
-                    invokeCount *= (long)Math.Ceiling(InvokeTimoutMilliseconds / lastPilotMilliseconds);
-            }
-            double idleMilliseconds = 0;
-            for (int i = 0; i < Math.Min(3, warmupCount); i++)
-            {
-                State.Instance.IterationMode = IterationMode.WarmupIdle;
-                State.Instance.Iteration = i;
-                var measurement = MultiInvoke(IterationMode.WarmupIdle, i, setupAction, idleAction, invokeCount, operationsPerInvoke);
-                idleMilliseconds = measurement.Milliseconds;
-            }
-            invokeCount = invokeCount * 1000 / (long)Math.Round(Math.Min(1000, Math.Max(100, lastPilotMilliseconds - idleMilliseconds)));
-            long idleTicks = 0;
-            var targetIdleInvokeCount = Math.Min(5, targetCount);
-            for (int i = 0; i < targetIdleInvokeCount; i++)
-            {
-                State.Instance.IterationMode = IterationMode.TargetIdle;
-                State.Instance.Iteration = i;
-                var measurement = MultiInvoke(IterationMode.TargetIdle, i, setupAction, idleAction, invokeCount, operationsPerInvoke);
-                idleTicks += measurement.Ticks;
-            }
-            idleTicks /= targetIdleInvokeCount;
-
-            for (int i = 0; i < warmupCount; i++)
-            {
-                State.Instance.IterationMode = IterationMode.Warmup;
-                State.Instance.Iteration = i;
-                MultiInvoke(IterationMode.Warmup, i, setupAction, targetAction, invokeCount, operationsPerInvoke, idleTicks);
-            }
-            for (int i = 0; i < targetCount; i++)
-            {
-                State.Instance.IterationMode = IterationMode.Target;
-                State.Instance.Iteration = i;
-                MultiInvoke(IterationMode.Target, i, setupAction, targetAction, invokeCount, operationsPerInvoke, idleTicks);
-            }
+                var action = input.IterationMode.IsOneOf(IterationMode.IdleWarmup, IterationMode.IdleTarget)
+                    ? idleAction
+                    : targetAction;
+                return MultiInvoke(input.IterationMode, input.Index, setupAction, action, input.InvokeCount,
+                    operationsPerInvoke);
+            };
+            Invoke(job, multiInvoke);
         }
 
-        public void Throughput<T>(IJob job, long operationsPerInvoke, Action setupAction, Func<T> targetAction, Func<T> idleAction)
+        public void Invoke<T>(IJob job, long operationsPerInvoke, Action setupAction, Func<T> targetAction, Func<T> idleAction)
         {
-            int warmupCount = job.WarmupCount.IsAuto ? 5 : job.WarmupCount.Value; // TODO
-            int targetCount = job.TargetCount.IsAuto ? 10 : job.TargetCount.Value; // TODO
-
+            // Jitting
             setupAction();
             targetAction();
             idleAction();
 
+            // Run
+            Func<MiltiInvokeInput, Measurement> multiInvoke = input =>
+            {
+                var action = input.IterationMode.IsOneOf(IterationMode.IdleWarmup, IterationMode.IdleTarget)
+                    ? idleAction
+                    : targetAction;
+                return MultiInvoke(input.IterationMode, input.Index, setupAction, action, input.InvokeCount,
+                    operationsPerInvoke);
+            };
+            Invoke(job, multiInvoke);
+        }
+
+        private void Invoke(IJob job, Func<MiltiInvokeInput, Measurement> multiInvoke)
+        {
             long invokeCount = 1;
-            double lastPilotMilliseconds = 0;
-            int pilotCounter = 0;
-            while (true)
+            if (job.Mode == Mode.Throughput)
             {
-                State.Instance.IterationMode = IterationMode.Pilot;
-                State.Instance.Iteration = pilotCounter++;
-                var measurement = MultiInvoke(IterationMode.Pilot, pilotCounter - 1, setupAction, targetAction, invokeCount, operationsPerInvoke);
-                lastPilotMilliseconds = measurement.Milliseconds;
-                if (lastPilotMilliseconds > InvokeTimoutMilliseconds)
-                    break;
-                if (lastPilotMilliseconds < 1)
-                    invokeCount *= InvokeTimoutMilliseconds;
-                else
-                    invokeCount *= (long)Math.Ceiling(InvokeTimoutMilliseconds / lastPilotMilliseconds);
+                invokeCount = RunPilot(multiInvoke, job.IterationTime);
+                RunWarmup(multiInvoke, invokeCount, IterationMode.IdleWarmup, Count.Auto);
+                RunTarget(multiInvoke, invokeCount, IterationMode.IdleTarget, Count.Auto);
             }
-            double idleMilliseconds = 0;
-            for (int i = 0; i < Math.Min(3, warmupCount); i++)
-            {
-                State.Instance.IterationMode = IterationMode.WarmupIdle;
-                State.Instance.Iteration = i;
-                var measurement = MultiInvoke(IterationMode.WarmupIdle, i, setupAction, idleAction, invokeCount, operationsPerInvoke);
-                idleMilliseconds = measurement.Milliseconds;
-            }
-            invokeCount = invokeCount * 1000 / (long)Math.Round(Math.Min(1000, Math.Max(100, lastPilotMilliseconds - idleMilliseconds)));
-            long idleTicks = 0;
-            var targetIdleInvokeCount = Math.Min(5, targetCount);
-            for (int i = 0; i < targetIdleInvokeCount; i++)
-            {
-                State.Instance.IterationMode = IterationMode.TargetIdle;
-                State.Instance.Iteration = i;
-                var measurement = MultiInvoke(IterationMode.TargetIdle, i, setupAction, idleAction, invokeCount, operationsPerInvoke);
-                idleTicks += measurement.Ticks;
-            }
-            idleTicks /= targetIdleInvokeCount;
 
-            for (int i = 0; i < warmupCount; i++)
-            {
-                State.Instance.IterationMode = IterationMode.Warmup;
-                State.Instance.Iteration = i;
-                MultiInvoke(IterationMode.Warmup, i, setupAction, targetAction, invokeCount, operationsPerInvoke, idleTicks);
-            }
-            for (int i = 0; i < targetCount; i++)
-            {
-                State.Instance.IterationMode = IterationMode.Target;
-                State.Instance.Iteration = i;
-                MultiInvoke(IterationMode.Target, i, setupAction, targetAction, invokeCount, operationsPerInvoke, idleTicks);
-            }
+            RunWarmup(multiInvoke, invokeCount, IterationMode.MainWarmup, job.WarmupCount);
+            RunTarget(multiInvoke, invokeCount, IterationMode.MainTarget, job.TargetCount);
         }
 
-        public void SingleRun(IJob job, long operationsPerInvoke, Action setupAction, Action targetAction, Action idleAction)
+        private static long RunPilot(Func<MiltiInvokeInput, Measurement> multiInvoke, Count iterationTime)
         {
-            int warmupCount = job.WarmupCount.IsAuto ? 5 : job.WarmupCount.Value; // TODO
-            int targetCount = job.TargetCount.IsAuto ? 10 : job.TargetCount.Value; // TODO
-
-            for (int i = 0; i < warmupCount; i++)
+            long invokeCount = MinInvokeCount;
+            if (iterationTime.IsAuto)
             {
-                State.Instance.IterationMode = IterationMode.Warmup;
-                State.Instance.Iteration = i;
-                MultiInvoke(IterationMode.Warmup, i, setupAction, targetAction, 1, operationsPerInvoke);
+                var stopwatchResolution = EnvironmentHelper.GetCurrentInfo().GetStopwatchResolution();
+                int iterationCounter = 0;
+                while (true)
+                {
+                    iterationCounter++;
+                    var measurement = multiInvoke(new MiltiInvokeInput(IterationMode.Pilot, iterationCounter, invokeCount));
+                    if (stopwatchResolution / invokeCount <
+                        measurement.GetAverageNanoseconds() * TargetMainAutoMaxAcceptableError &&
+                        measurement.Nanoseconds > TimeUnit.Convert(MinIterationTimeMs, TimeUnit.Millisecond, TimeUnit.Nanoseconds))
+                        break;
+                    invokeCount *= 2;
+                }
             }
-            for (int i = 0; i < targetCount; i++)
+            else
             {
-                State.Instance.IterationMode = IterationMode.Target;
-                State.Instance.Iteration = i;
-                MultiInvoke(IterationMode.Target, i, setupAction, targetAction, 1, operationsPerInvoke);
+                int iterationCounter = 0;
+                int downCount = 0;
+                while (true)
+                {
+                    iterationCounter++;
+                    var measurement = multiInvoke(new MiltiInvokeInput(IterationMode.Pilot, iterationCounter, invokeCount));
+                    var newInvokeCount = Math.Max(5, (long)Math.Round(invokeCount * iterationTime / measurement.Nanoseconds));
+                    if (newInvokeCount < invokeCount)
+                        downCount++;
+                    if (Math.Abs(newInvokeCount - invokeCount) <= 1 || downCount >= 3)
+                        break;
+                    invokeCount = newInvokeCount;
+                }
             }
+            Console.WriteLine();
+            return invokeCount;
         }
 
-        public void SingleRun<T>(IJob job, long operationsPerInvoke, Action setupAction, Func<T> targetAction, Func<T> idleAction)
+        private static void RunWarmup(Func<MiltiInvokeInput, Measurement> multiInvoke, long invokeCount, IterationMode iterationMode, Count iterationCount)
         {
-            int warmupCount = job.WarmupCount.IsAuto ? 5 : job.WarmupCount.Value; // TODO
-            int targetCount = job.TargetCount.IsAuto ? 10 : job.TargetCount.Value; // TODO
-
-            for (int i = 0; i < warmupCount; i++)
+            if (iterationCount.IsAuto)
             {
-                State.Instance.IterationMode = IterationMode.Warmup;
-                State.Instance.Iteration = i;
-                MultiInvoke(IterationMode.Warmup, i, setupAction, targetAction, 1, operationsPerInvoke);
+                int iterationCounter = 0;
+                Measurement previousMeasurement = null;
+                int upCount = 0;
+                while (true)
+                {
+                    iterationCounter++;
+                    var measurement = multiInvoke(new MiltiInvokeInput(iterationMode, iterationCounter, invokeCount));
+                    if (previousMeasurement != null && measurement.Nanoseconds > previousMeasurement.Nanoseconds - 0.1)
+                        upCount++;
+                    if (iterationCounter >= WarmupAutoMinIterationCount && upCount >= 3)
+                        break;
+                    previousMeasurement = measurement;
+                }
             }
-            for (int i = 0; i < targetCount; i++)
+            else
             {
-                State.Instance.IterationMode = IterationMode.Target;
-                State.Instance.Iteration = i;
-                MultiInvoke(IterationMode.Target, i, setupAction, targetAction, 1, operationsPerInvoke);
+                for (int i = 0; i < iterationCount; i++)
+                    multiInvoke(new MiltiInvokeInput(IterationMode.MainWarmup, i + 1, invokeCount));
             }
+            Console.WriteLine();
         }
 
-        private Measurement MultiInvoke(IterationMode mode, int index, Action setupAction, Action targetAction, long invocationCount, long operationsPerInvoke, long idleTicks = 0)
+        private static void RunTarget(Func<MiltiInvokeInput, Measurement> multiInvoke, long invokeCount, IterationMode iterationMode, Count iterationCount)
         {
+            var mainTarget = new List<Measurement>();
+            if (iterationCount.IsAuto)
+            {
+                int iterationCounter = 0;
+                var maxAcceptableError = iterationMode.IsOneOf(IterationMode.IdleWarmup, IterationMode.IdleTarget)
+                    ? TargetIdleAutoMaxAcceptableError
+                    : TargetIdleAutoMaxAcceptableError;
+                while (true)
+                {
+                    iterationCounter++;
+                    var measurement = multiInvoke(new MiltiInvokeInput(iterationMode, iterationCounter, invokeCount));
+                    mainTarget.Add(measurement);
+                    var statistics = new Statistics(mainTarget.Select(m => m.Nanoseconds));
+                    if (iterationCounter >= TargetAutoMinIterationCount &&
+                        statistics.StandardError < maxAcceptableError * statistics.Mean)
+                        break;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < iterationCount; i++)
+                    mainTarget.Add(multiInvoke(new MiltiInvokeInput(IterationMode.MainTarget, i + 1, invokeCount)));
+            }
+            Console.WriteLine();
+        }
+
+
+        private Measurement MultiInvoke(IterationMode mode, int index, Action setupAction, Action targetAction, long invocationCount, long operationsPerInvoke)
+        {
+            State.Instance.IterationMode = mode;
+            State.Instance.Iteration = index;
+
             var totalOperations = invocationCount * operationsPerInvoke;
             setupAction();
             var stopwatch = new Stopwatch();
+            GcCollect();
             if (invocationCount == 1)
             {
                 stopwatch.Start();
@@ -216,19 +213,23 @@ namespace BenchmarkDotNet.Running
                 }
                 stopwatch.Stop();
             }
-            var measurement = new Measurement(totalOperations, stopwatch.ElapsedTicks - idleTicks);
-            Console.WriteLine($"{mode} {index + 1}: {measurement.GetDisplayValue()}");
+            var measurement = Measurement.FromTicks(0, mode, index, totalOperations, stopwatch.ElapsedTicks);
+            Console.WriteLine(measurement.ToOutputLine());
             GcCollect();
             return measurement;
         }
 
         private object multiInvokeReturnHolder;
 
-        private Measurement MultiInvoke<T>(IterationMode mode, int index, Action setupAction, Func<T> targetAction, long invocationCount, long operationsPerInvoke, long idleTicks = 0, T returnHolder = default(T))
+        private Measurement MultiInvoke<T>(IterationMode mode, int index, Action setupAction, Func<T> targetAction, long invocationCount, long operationsPerInvoke, T returnHolder = default(T))
         {
+            State.Instance.IterationMode = mode;
+            State.Instance.Iteration = index;
+
             var totalOperations = invocationCount * operationsPerInvoke;
             setupAction();
             var stopwatch = new Stopwatch();
+            GcCollect();
             if (invocationCount == 1)
             {
                 stopwatch.Start();
@@ -257,8 +258,8 @@ namespace BenchmarkDotNet.Running
                 stopwatch.Stop();
             }
             multiInvokeReturnHolder = returnHolder;
-            var measurement = new Measurement(totalOperations, stopwatch.ElapsedTicks - idleTicks);
-            Console.WriteLine($"{mode} {index + 1}: {measurement.GetDisplayValue()}");
+            var measurement = Measurement.FromTicks(0, mode, index, totalOperations, stopwatch.ElapsedTicks);
+            Console.WriteLine(measurement.ToOutputLine());
             GcCollect();
             return measurement;
         }

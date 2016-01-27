@@ -16,6 +16,11 @@ namespace BenchmarkDotNet.Jobs
         Count TargetCount { get; }
 
         /// <summary>
+        /// Desired time of execution of an iteration (in ms).
+        /// </summary>
+        Count IterationTime { get; }
+
+        /// <summary>
         /// ProcessorAffinity for the benchmark process.
         /// <seealso cref="https://msdn.microsoft.com/library/system.diagnostics.process.processoraffinity.aspx"/>
         /// </summary>

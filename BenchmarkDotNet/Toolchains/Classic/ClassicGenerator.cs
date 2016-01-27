@@ -79,22 +79,10 @@ namespace BenchmarkDotNet.Toolchains.Classic
             //    paramsContent = $"{typeQualifier}.{benchmark.Job.ParametersSets.ParamFieldOrProperty} = BenchmarkParameters.ParseArgs(args).IntParam;";
             //}
 
-            string runBenchmarkTemplate = "";
-            switch (benchmark.Job.Mode)
-            {
-                case Mode.SingleRun:
-                    runBenchmarkTemplate = ResourceHelper.LoadTemplate("BenchmarkSingleRun.txt");
-                    break;
-                case Mode.Throughput:
-                    runBenchmarkTemplate = ResourceHelper.LoadTemplate("BenchmarkThroughput.txt");
-                    break;
-            }
-
             var targetBenchmarkTaskArguments = benchmark.Job.GenerateWithDefinitions();
 
             var contentTemplate = ResourceHelper.LoadTemplate("BenchmarkProgram.txt");
             var content = contentTemplate.
-                Replace("$RunBenchmarkContent$", runBenchmarkTemplate).
                 Replace("$OperationsPerInvoke$", operationsPerInvoke.ToString()).
                 Replace("$TargetTypeNamespace$", targetTypeNamespace).
                 Replace("$TargetMethodReturnTypeNamespace$", targetMethodReturnTypeNamespace).

@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Attributes\ConfigAttribute.cs" />
     <Compile Include="Columns\Column.cs" />
+    <Compile Include="Columns\PlaceColumn.cs" />
     <Compile Include="Configs\ConfigExtensions.cs" />
     <Compile Include="Configs\ConfigParser.cs" />
     <Compile Include="Configs\ConfigUnionRule.cs" />
@@ -60,6 +61,7 @@
     <Compile Include="Parameters\ParameterDefinition.cs" />
     <Compile Include="Parameters\ParameterDefinitions.cs" />
     <Compile Include="Parameters\ParameterInstance.cs" />
+    <Compile Include="Reports\MeasurementExtensions.cs" />
     <Compile Include="Running\BenchmarkConverter.cs" />
     <Compile Include="Running\IterationMode.cs" />
     <Compile Include="Running\State.cs" />
@@ -136,7 +138,7 @@
     <Compile Include="Attributes\BenchmarkAttribute.cs" />
     <Compile Include="Running\BenchmarkRunner.cs" />
     <Compile Include="Loggers\ConsoleLogger.cs" />
-    <Compile Include="Reports\BenchmarkRunReport.cs" />
+    <Compile Include="Reports\Measurement.cs" />
     <Compile Include="Extensions\CommonExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -145,14 +147,10 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\BenchmarkProgram.txt" />
-    <EmbeddedResource Include="Templates\BenchmarkSingleRun.txt" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\BenchmarkAppConfig.txt" />
     <EmbeddedResource Include="Templates\BenchmarkAppConfigEmpty.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Templates\BenchmarkThroughput.txt" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\BuildBenchmark.txt" />

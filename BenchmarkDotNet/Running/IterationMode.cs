@@ -10,22 +10,22 @@
         /// <summary>
         /// Warmup for idle method (overhead)
         /// </summary>
-        WarmupIdle,
+        IdleWarmup,
 
         /// <summary>
         /// Idle method (overhead)
         /// </summary>
-        TargetIdle,
+        IdleTarget,
 
         /// <summary>
         /// Warmup for main benchmark iteration (with overhead)
         /// </summary>
-        Warmup,
+        MainWarmup,
 
         /// <summary>
         /// Main benchmark iteration (with overhead)
         /// </summary>
-        Target,
+        MainTarget,
 
         /// <summary>
         /// Target - TargetIdle (without overhead)
