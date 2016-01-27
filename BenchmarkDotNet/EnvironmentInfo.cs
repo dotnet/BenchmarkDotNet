@@ -14,9 +14,12 @@ namespace BenchmarkDotNet
         {
             MainCultureInfo = (CultureInfo)CultureInfo.InvariantCulture.Clone();
             MainCultureInfo.NumberFormat.NumberDecimalSeparator = ".";
+            IsPublishedNuget = !GetBenchmarkDotNetCaption().EndsWith("-Dev");
         }
 
         public static readonly CultureInfo MainCultureInfo;
+
+        internal static readonly bool IsPublishedNuget;
 
         public string BenchmarkDotNetCaption { get; set; }
         public string BenchmarkDotNetVersion { get; set; }
@@ -72,7 +75,7 @@ namespace BenchmarkDotNet
             ((AssemblyTitleAttribute)typeof(BenchmarkRunner).Assembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), false)[0]).Title;
 
         private static string GetBenchmarkDotNetVersion() =>
-            typeof(BenchmarkRunner).Assembly.GetName().Version + (GetBenchmarkDotNetCaption().EndsWith("-Dev") ? "+" : string.Empty);
+            typeof(BenchmarkRunner).Assembly.GetName().Version + (IsPublishedNuget ? string.Empty : "+");
 
         private static string GetOsVersion() => Environment.OSVersion.ToString();
 

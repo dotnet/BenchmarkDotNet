@@ -24,6 +24,5 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Dnx
 
             return process.ExitCode <= 0;
         }
-
     }
 }

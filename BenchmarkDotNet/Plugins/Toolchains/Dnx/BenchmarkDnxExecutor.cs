@@ -1,5 +1,4 @@
-﻿using System.IO;
-using BenchmarkDotNet.Plugins.Diagnosers;
+﻿using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Plugins.Toolchains.Classic;
 using BenchmarkDotNet.Plugins.Toolchains.Results;

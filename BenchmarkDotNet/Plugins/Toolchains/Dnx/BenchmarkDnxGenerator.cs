@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Plugins.Loggers;
@@ -10,7 +11,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Dnx
 {
     internal class BenchmarkDnxGenerator : BenchmarkClassicGenerator
     {
-        internal const string ProjectFileName = "project.json";
+        private const string ProjectFileName = "project.json";
 
         public BenchmarkDnxGenerator(IBenchmarkLogger logger) : base(logger)
         {
@@ -31,7 +32,8 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Dnx
             var template = ResourceHelper.LoadTemplate("BenchmarkProject.json");
 
             var content = SetPlatform(template, BenchmarkPlatform.HostPlatform); // todo: research, should be benchmark.Task.Configuration.Platform but I am not sure if this is possible with DNX
-            content = SetDependency(content, benchmark.Target.Type);
+            content = SetDependencyToExecutingAssembly(content, benchmark.Target.Type);
+            content = SetDependencyToMyself(content);
     
             var projectJsonFilePath = Path.Combine(projectDir, ProjectFileName);
 
@@ -48,17 +50,43 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Dnx
             return template.Replace("$PLATFORM", platform.ToConfig()); // todo: verify name
         }
 
-        private static string SetDependency(string template, Type benchmarkTarget)
+        private static string SetDependencyToExecutingAssembly(string template, Type benchmarkTarget)
         {
             var assemblyName = benchmarkTarget.Assembly.GetName();
-
-            // we can not simply call assemblyName.Version.ToString() because it is different than package version which can contain (and often does) text
-            var packageVersion =
-                $"{assemblyName.Version.Major}.{assemblyName.Version.Minor}.{assemblyName.Version.Build}-*";
+            var packageVersion = GetPackageVersion(assemblyName);
 
             return template
                 .Replace("$EXECUTINGASSEMBLYVERSION", packageVersion) 
                 .Replace("$EXECUTINGASSEMBLY", assemblyName.Name);
         }
+
+        private static string SetDependencyToMyself(string template)
+        {
+            var assemblyName = typeof(BenchmarkDnxGenerator).Assembly.GetName();
+            var packageVersion = GetPackageVersion(assemblyName);
+            var targetType = GetTargetType();
+
+            return template
+                .Replace("$VERSION", packageVersion)
+                .Replace("$TARGETTYPE", targetType);
+        }
+
+        /// <summary>
+        /// we can not simply call assemblyName.Version.ToString() because it is different than package version which can contain (and often does) text
+        /// we are using the wildcard to get latest version of package/project restored
+        /// </summary>
+        private static string GetPackageVersion(AssemblyName assemblyName)
+        {
+            return $"{assemblyName.Version.Major}.{assemblyName.Version.Minor}.{assemblyName.Version.Build}-*";
+        }
+
+        /// <summary>
+        /// for our development our auto-generated dll should reference project of BenchmarkDotNet, 
+        /// not the existing nuget package
+        /// for production it should point to package, not project
+        /// otherwise dnu/nuget would point to the old package which could cause a lot of problems
+        /// </summary>
+        /// <returns></returns>
+        private static string GetTargetType() => EnvironmentInfo.IsPublishedNuget ?  "package" : "project";
     }
 }
