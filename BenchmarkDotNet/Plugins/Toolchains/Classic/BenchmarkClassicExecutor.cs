@@ -49,68 +49,52 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
         {
             try
             {
-                var startInfo = CreateStartInfo(exeName, args, workingDirectory);
-                using (var process = Process.Start(startInfo))
+                using (var process = new Process { StartInfo = CreateStartInfo(exeName, args, workingDirectory) })
+                using (var safeLoger = new ProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmark))
                 {
-                    if (process != null)
-                    {
-                        consoleHandler.SetProcess(process);
-                        return ExecuteImpl(process, diagnoser, exeName);
-                    }
+                    return Execute(process, safeLoger, exeName);
                 }
             }
             finally
             {
                 consoleHandler?.ClearProcess();
             }
-
-            return new BenchmarkExecResult(false, new string[0]);
         }
 
-        private BenchmarkExecResult ExecuteImpl(Process process, IBenchmarkDiagnoser diagnoser, string exeName)
+        private BenchmarkExecResult Execute(Process process, ProcessOutputLoggerWithDiagnoser safeLoger, string exeName)
         {
+            consoleHandler.SetProcess(process);
+
+            process.Start();
+
             process.PriorityClass = ProcessPriorityClass.High;
             process.ProcessorAffinity = new IntPtr(2);
 
-            var lines = new List<string>();
-            string line;
-            while ((line = process.StandardOutput.ReadLine()) != null)
-            {
-                logger?.WriteLine(line);
-                if (!line.StartsWith("//") && !string.IsNullOrEmpty(line))
-                    lines.Add(line);
+            // don't forget to call, otherwise logger will not get any events
+            process.BeginErrorReadLine();
+            process.BeginOutputReadLine();
 
-                // Wait until we know "Warmup" is happening, and then dissassemble the process
-                if (codeAlreadyExtracted == false && line.StartsWith("Warmup ") && !line.StartsWith("WarmupIdle "))
+            process.WaitForExit(); // should we add timeout here?
+
+            if (process.ExitCode == 0)
+            {
+                return new BenchmarkExecResult(true, safeLoger.Lines);
+            }
+
+            if (logger != null)
+            {
+                logger.WriteError(
+                    $"Something bad happened during the execution of {exeName}. Try to run the benchmark again using an AnyCPU application\n");
+            }
+            else
+            {
+                if (exeName.ToLowerInvariant() == "msbuild")
                 {
-                    try
-                    {
-                        diagnoser.Print(benchmark, process, logger);
-                    }
-                    finally
-                    {
-                        // Always set this, even if something went wrong, otherwise we will try on every run of a benchmark batch
-                        codeAlreadyExtracted = true;
-                    }
+                    Console.WriteLine("Build failed");
                 }
             }
 
-            if (process.HasExited && process.ExitCode != 0)
-            {
-                if (logger != null)
-                {
-                    logger.WriteError(
-                        $"Something bad happened during the execution of {exeName}. Try to run the benchmark again using an AnyCPU application\n");
-                }
-                else
-                {
-                    if (exeName.ToLowerInvariant() == "msbuild")
-                        Console.WriteLine("Build failed");
-                }
-                return new BenchmarkExecResult(true, new string[0]);
-            }
-
-            return new BenchmarkExecResult(true, lines);
+            return new BenchmarkExecResult(true, new string[0]);
         }
 
         private ProcessStartInfo CreateStartInfo(string exeName, string args, string workingDirectory)
@@ -119,6 +103,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
             {
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
+                RedirectStandardError = true,
                 CreateNoWindow = true,
                 WorkingDirectory = workingDirectory
             };
@@ -143,7 +128,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
             private Process process;
             private IBenchmarkLogger logger;
 
-            public ConsoleHandler( IBenchmarkLogger logger)
+            public ConsoleHandler(IBenchmarkLogger logger)
             {
                 this.logger = logger;
                 EventHandler = new ConsoleCancelEventHandler(HandlerCallback);
