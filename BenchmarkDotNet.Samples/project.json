@@ -19,5 +19,10 @@
       "target": "project"
     },
     "BenchmarkDotNet.Diagnostics": "1.0.0-*"
+  },
+  "scripts": {
+    "postbuild": [
+      "%project:Directory%/../build/batchcopy \"%project:Directory%/../artifacts/bin/BenchmarkDotNet/Debug/net40/*.*\" %project:BuildOutputDir%/Debug/net40"
+    ]
   }
 }

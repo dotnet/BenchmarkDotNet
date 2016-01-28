@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DEBUG_4.0": {
+      "executablePath": "BenchmarkDotNet.Samples.dll",
+      "workingDirectory": "..\\artifacts\\bin\\BenchmarkDotNet.Samples\\Debug\\net40\\"
+    }
+  }
+}

@@ -38,7 +38,11 @@ namespace BenchmarkDotNet.Extensions
             var attributes = benchmarkType.Assembly.GetCustomAttributes(false).OfType<Attribute>();
             var frameworkAttribute = attributes.FirstOrDefault(a => a.ToString() == @"System.Runtime.Versioning.TargetFrameworkAttribute");
             if (frameworkAttribute == null)
+#if DEBUG
+                return "v4.0"; // otherwise msbuild fails when debugging in new way from VS
+#else
                 return "v3.5";
+#endif
             var frameworkName = frameworkAttribute.GetType()
                 .GetProperty("FrameworkName", BindingFlags.Public | BindingFlags.Instance)
                 .GetValue(frameworkAttribute, null)?.ToString();
