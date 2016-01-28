@@ -14,7 +14,9 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Dnx
 
         public override BenchmarkExecResult Execute(BenchmarkBuildResult buildResult, BenchmarkParameters parameters, IBenchmarkDiagnoser diagnoser)
         {
-            return Execute("cmd.exe", BenchmarkDnxGenerator.GetDirectoryPath(), "/c dnx run", diagnoser);
+            var args = parameters == null ? "/c dnx run" : $"/c dnx run {parameters.ToArgs()}";
+
+            return Execute("cmd.exe", BenchmarkDnxGenerator.GetDirectoryPath(), args, diagnoser);
         }
     }
 }
