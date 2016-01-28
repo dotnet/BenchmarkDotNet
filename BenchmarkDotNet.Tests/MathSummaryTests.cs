@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Tests
             output.WriteLine("Max = " + summary.Max);
             output.WriteLine("InterquartileRange = " + summary.InterquartileRange);
             output.WriteLine("StandardDeviation = " + summary.StandardDeviation);
-            output.WriteLine("Outlier = [" + string.Join("; ", summary.Outlier) + "]");
+            output.WriteLine("Outlier = [" + string.Join("; ", summary.Outliers) + "]");
             output.WriteLine("CI = " + summary.ConfidenceInterval.ToStr());
         }
 
@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(1, summary.Max);
             Assert.Equal(0, summary.InterquartileRange);
             Assert.Equal(0, summary.StandardDeviation);
-            Assert.Equal(new double[0], summary.Outlier);
+            Assert.Equal(new double[0], summary.Outliers);
         }
 
         [Fact]
@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(2, summary.Max);
             Assert.Equal(1, summary.InterquartileRange);
             Assert.Equal(0.70711, summary.StandardDeviation, 4);
-            Assert.Equal(new double[0], summary.Outlier);
+            Assert.Equal(new double[0], summary.Outliers);
         }
 
         [Fact]
@@ -89,7 +89,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(4, summary.Max);
             Assert.Equal(3, summary.InterquartileRange);
             Assert.Equal(1.52753, summary.StandardDeviation, 4);
-            Assert.Equal(new double[0], summary.Outlier);
+            Assert.Equal(new double[0], summary.Outliers);
         }
 
         [Fact]
@@ -107,7 +107,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(64, summary.Max);
             Assert.Equal(30, summary.InterquartileRange);
             Assert.Equal(22.9378, summary.StandardDeviation, 4);
-            Assert.Equal(new double[0], summary.Outlier);
+            Assert.Equal(new double[0], summary.Outliers);
         }
 
         [Fact]
@@ -115,7 +115,7 @@ namespace BenchmarkDotNet.Tests
         {
             var summary = new Statistics(1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 10, 10.1);
             Print(summary);
-            Assert.Equal(new[] { 10, 10.1 }, summary.Outlier);
+            Assert.Equal(new[] { 10, 10.1 }, summary.Outliers);
         }
 
         [Fact]

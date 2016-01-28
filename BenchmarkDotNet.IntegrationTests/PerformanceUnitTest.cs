@@ -39,9 +39,9 @@ namespace BenchmarkDotNet.IntegrationTests
             // Whilst we're at it, let's do more specific Asserts as we know what the elasped time should be
             var slowBenchmarkReport = summary.GetReportFor<PerformanceUnitTest>(r => r.SlowBenchmark());
             var fastBenchmarkReport = summary.GetReportFor<PerformanceUnitTest>(r => r.FastBenchmark());
-            foreach (var slowRun in slowBenchmarkReport.GetTargetRuns())
+            foreach (var slowRun in slowBenchmarkReport.GetResultRuns())
                 Assert.InRange(slowRun.GetAverageNanoseconds() / 1000.0 / 1000.0, low: 98, high: 102);
-            foreach (var fastRun in fastBenchmarkReport.GetTargetRuns())
+            foreach (var fastRun in fastBenchmarkReport.GetResultRuns())
                 Assert.InRange(fastRun.GetAverageNanoseconds() / 1000.0 / 1000.0, low: 14, high: 17);
         }
 

@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Reports
             foreach (var report in reports)
                 Reports[report.Benchmark] = report;
 
-            TimeUnit = TimeUnit.GetBestTimeUnit(reports.Where(r => r.TargetStatistics != null).Select(r => r.TargetStatistics.Mean).ToArray());
+            TimeUnit = TimeUnit.GetBestTimeUnit(reports.Where(r => r.ResultStatistics != null).Select(r => r.ResultStatistics.Mean).ToArray());
             Table = new SummaryTable(this);
         }
     }

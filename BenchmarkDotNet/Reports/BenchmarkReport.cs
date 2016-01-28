@@ -14,8 +14,8 @@ namespace BenchmarkDotNet.Reports
         public BuildResult BuildResult { get; }
         public IList<ExecuteResult> ExecuteResults { get; }
 
-        public Statistics TargetStatistics => this.GetTargetRuns().Any() 
-            ? new Statistics(this.GetTargetRuns().Select(r => r.GetAverageNanoseconds())) 
+        public Statistics ResultStatistics => this.GetResultRuns().Any()
+            ? new Statistics(this.GetResultRuns().Select(r => r.GetAverageNanoseconds()))
             : null;
 
         public BenchmarkReport(
@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Reports
 
     public static class BenchmarkReportExtensions
     {
-        public static IList<Measurement> GetTargetRuns(this BenchmarkReport report) =>
-            report.AllRuns.Where(r => r.IterationMode == IterationMode.MainTarget).ToList();
+        public static IList<Measurement> GetResultRuns(this BenchmarkReport report) =>
+            report.AllRuns.Where(r => r.IterationMode == IterationMode.Result).ToList();
     }
 }

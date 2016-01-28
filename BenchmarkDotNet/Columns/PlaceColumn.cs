@@ -9,17 +9,38 @@ namespace BenchmarkDotNet.Columns
     // TODO: Words (best, worst)
     public class PlaceColumn : IColumn
     {
-        public static readonly IColumn ArabicNumber = new PlaceColumn();
+        private enum Kind
+        {
+            ArabicNumber,
+            Stars
+        }
 
+        private PlaceColumn(Kind kind)
+        {
+            this.kind = kind;
+        }
+
+        public static readonly IColumn ArabicNumber = new PlaceColumn(Kind.ArabicNumber);
+        public static readonly IColumn Stars = new PlaceColumn(Kind.Stars);
+
+        private Kind kind;
         public string ColumnName => "Place";
 
         public string GetValue(Summary summary, Benchmark benchmark)
         {
             var sortedBenchmarks = summary.Benchmarks.
-                OrderBy(b => summary.Reports[b].TargetStatistics.Mean).
+                OrderBy(b => summary.Reports[b].ResultStatistics.Mean).
                 ToArray();
-            var places = GetPlaces(sortedBenchmarks.Select(b => summary.Reports[b].TargetStatistics).ToArray());
-            return places[Array.IndexOf(sortedBenchmarks, benchmark)].ToString();
+            var places = GetPlaces(sortedBenchmarks.Select(b => summary.Reports[b].ResultStatistics).ToArray());
+            var place = places[Array.IndexOf(sortedBenchmarks, benchmark)];
+            switch (kind)
+            {
+                case Kind.ArabicNumber:
+                    return place.ToString();
+                case Kind.Stars:
+                    return new string('*', place);
+            }
+            return place.ToString();
         }
 
         private static int[] GetPlaces(Statistics[] s)
@@ -36,8 +57,8 @@ namespace BenchmarkDotNet.Columns
         }
 
         private static bool LookSame(Statistics s1, Statistics s2) =>
-            s1.Mean + 3 * s1.StandardDeviation > s2.Mean &&
-            s2.Mean - 3 * s1.StandardDeviation < s1.Mean;
+            s1.Mean + 3*s1.StandardDeviation > s2.Mean &&
+            s2.Mean - 3*s1.StandardDeviation < s1.Mean;
 
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;

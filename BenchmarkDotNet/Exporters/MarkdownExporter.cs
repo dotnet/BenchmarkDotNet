@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Exporters
             PrintTable(summary.Table, logger);
 
             // TODO: move this logic to an analyser
-            var benchmarksWithTroubles = summary.Reports.Values.Where(r => !r.GetTargetRuns().Any()).Select(r => r.Benchmark).ToList();
+            var benchmarksWithTroubles = summary.Reports.Values.Where(r => !r.GetResultRuns().Any()).Select(r => r.Benchmark).ToList();
             if (benchmarksWithTroubles.Count > 0)
             {
                 logger.NewLine();

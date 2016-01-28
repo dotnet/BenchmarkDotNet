@@ -70,8 +70,8 @@ namespace BenchmarkDotNet.Running
             {
                 var report = Run(benchmark, logger, config);
                 reports.Add(report);
-                if (report.GetTargetRuns().Any())
-                    logger.WriteLineStatistic(report.GetTargetRuns().GetStats().ToTimeStr());
+                if (report.GetResultRuns().Any())
+                    logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr());
 
                 logger.NewLine();
             }
@@ -97,7 +97,7 @@ namespace BenchmarkDotNet.Running
             foreach (var report in reports)
             {
                 logger.WriteLineInfo(report.Benchmark.ShortInfo);
-                logger.WriteLineStatistic(report.GetTargetRuns().GetStats().ToTimeStr());
+                logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr());
                 logger.NewLine();
             }
 
@@ -197,18 +197,33 @@ namespace BenchmarkDotNet.Running
         {
             var executeResults = new List<ExecuteResult>();
 
+
             logger.WriteLineInfo("// *** Execute ***");
-            var processCount = Math.Max(1, benchmark.Job.ProcessCount.IsAuto ? 3 : benchmark.Job.ProcessCount.Value); // TODO
+            var processCount = Math.Max(1, benchmark.Job.ProcessCount.IsAuto ? 2 : benchmark.Job.ProcessCount.Value);
 
             for (int processNumber = 0; processNumber < processCount; processNumber++)
             {
-                logger.WriteLineInfo($"// Run, Process: {processNumber + 1} / {processCount}");
+                var printedProcessNumber = (benchmark.Job.ProcessCount.IsAuto && processNumber < 2) ? "?" : processCount.ToString();
+                logger.WriteLineInfo($"// Run, Process: {processNumber + 1} / {printedProcessNumber}");
 
                 var executeResult = toolchain.Executor.Execute(buildResult, config.GetCompositeDiagnoser(), benchmark, logger);
 
                 if (!executeResult.FoundExecutable)
                     logger.WriteLineError("Executable not found");
                 executeResults.Add(executeResult);
+
+                if (benchmark.Job.ProcessCount.IsAuto && processNumber == 1)
+                {
+                    var measurements = executeResults.
+                        SelectMany(r => r.Data).
+                        Select(line => Measurement.Parse(logger, line, 0)).
+                        Where(r => r != null).
+                        ToArray();
+                    var idleApprox = new Statistics(measurements.Where(m => m.IterationMode == IterationMode.IdleTarget).Select(m => m.Nanoseconds)).Median;
+                    var mainApprox = new Statistics(measurements.Where(m => m.IterationMode == IterationMode.MainTarget).Select(m => m.Nanoseconds)).Median;
+                    var percent = idleApprox/mainApprox*100;
+                    processCount = (int) Math.Round(Math.Max(2, 2 + (percent - 1)/3)); // an empirical formula
+                }
             }
             logger.NewLine();
             return executeResults;

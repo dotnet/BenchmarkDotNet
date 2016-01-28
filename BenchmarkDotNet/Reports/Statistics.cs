@@ -7,6 +7,23 @@ namespace BenchmarkDotNet.Reports
 {
     public class Statistics
     {
+        private readonly List<double> list;
+
+        public int N { get; }
+        public double Min { get; }
+        public double LowerFence { get; }
+        public double Q1 { get; }
+        public double Median { get; }
+        public double Mean { get; }
+        public double Q3 { get; }
+        public double UpperFence { get; }
+        public double Max { get; }
+        public double InterquartileRange { get; }
+        public double[] Outliers { get; }
+        public double StandardError { get; }
+        public double StandardDeviation { get; }
+        public ConfidenceInterval ConfidenceInterval { get; }
+
         public Statistics(params double[] values) :
             this(values.ToList())
         {
@@ -19,7 +36,7 @@ namespace BenchmarkDotNet.Reports
 
         public Statistics(IEnumerable<double> values)
         {
-            var list = values.ToList();
+            list = values.ToList();
             N = list.Count;
             if (N == 0)
                 throw new InvalidOperationException("StatSummary: Sequence contains no elements");
@@ -45,27 +62,15 @@ namespace BenchmarkDotNet.Reports
             LowerFence = Q1 - 1.5 * InterquartileRange;
             UpperFence = Q3 + 1.5 * InterquartileRange;
 
-            Outlier = list.Where(value => value < LowerFence || value > UpperFence).ToArray();
+            Outliers = list.Where(IsOutlier).ToArray();
 
             StandardDeviation = N == 1 ? 0 : Math.Sqrt(list.Sum(d => Math.Pow(d - Mean, 2)) / (N - 1));
             StandardError = StandardDeviation / Math.Sqrt(N);
             ConfidenceInterval = new ConfidenceInterval(Mean, StandardError);
         }
 
-        public int N { get; }
-        public double Min { get; }
-        public double LowerFence { get; }
-        public double Q1 { get; }
-        public double Median { get; }
-        public double Mean { get; }
-        public double Q3 { get; }
-        public double UpperFence { get; }
-        public double Max { get; }
-        public double InterquartileRange { get; }
-        public double[] Outlier { get; }
-        public double StandardError { get; }
-        public double StandardDeviation { get; }
-        public ConfidenceInterval ConfidenceInterval { get; }
+        public bool IsOutlier(double value) => value < LowerFence || value > UpperFence;
+        public double[] WithoutOutliers() => list.Where(value => !IsOutlier(value)).ToArray();
 
         public override string ToString() => $"{Mean} +- {StandardError} (N = {N})";
     }

@@ -33,3 +33,6 @@ _ReSharper*/
 *.resharper
 packages/
 nuget.exe
+
+.idea/
+*.iml

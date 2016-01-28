@@ -31,10 +31,10 @@ namespace BenchmarkDotNet.Columns
                 // TODO: repair matching
                 var firstMatch = benchmarks.First(b => b.Target.Baseline);
                 if (firstMatch != null)
-                    baseline = summary.Reports[firstMatch].TargetStatistics.Mean;
+                    baseline = summary.Reports[firstMatch].ResultStatistics.Mean;
             }
 
-            var current = summary.Reports[benchmark].TargetStatistics.Mean;
+            var current = summary.Reports[benchmark].ResultStatistics.Mean;
             double diff = 0;
             if (baseline != 0) // This can happen if we found no matching result
                 diff = (current - baseline) / baseline * 100.0;

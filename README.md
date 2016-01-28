@@ -1,6 +1,6 @@
 **BenchmarkDotNet** is a .NET library for benchmarking, it helps you to create accurate benchmarks in an easy way.
 
-[![NuGet version](https://badge.fury.io/nu/BenchmarkDotNet.svg)](https://badge.fury.io/nu/BenchmarkDotNet) [![Join the chat at https://gitter.im/PerfDotNet/BenchmarkDotNet](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/PerfDotNet/BenchmarkDotNet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) 
+[![NuGet version](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/) [![NuGet downloads](https://img.shields.io/nuget/dt/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/) [![Join the chat at https://gitter.im/PerfDotNet/BenchmarkDotNet](https://img.shields.io/gitter/room/PerfDotNet/BenchmarkDotNet.svg)](https://gitter.im/PerfDotNet/BenchmarkDotNet)
 
 Wiki: [Home](https://github.com/PerfDotNet/BenchmarkDotNet/wiki), [ChangeLog](https://github.com/PerfDotNet/BenchmarkDotNet/wiki/ChangeLog), [Developing](https://github.com/PerfDotNet/BenchmarkDotNet/wiki/Developing), [Roadmap](https://github.com/PerfDotNet/BenchmarkDotNet/wiki/Roadmap)
 
@@ -257,6 +257,9 @@ class PropertyColumn
 * `StatisticColumn.Time`
 * `StatisticColumn.Error`
 * `BaselineDeltaColumn.Default`
+* `PlaceColumn`: specify "place" of each benchmark. Place 1 means a group of the fastest benchmarks, place 2 means the second group, and so on. There are several styles:
+  * `PlaceColumn.ArabicNumber`: `1`, `2`, `3`, ...
+  * `PlaceColumn.Stars`: `*`, `**`, `***`, ...
 
 ** Examples **
 

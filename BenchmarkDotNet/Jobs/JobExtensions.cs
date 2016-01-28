@@ -90,6 +90,7 @@ namespace BenchmarkDotNet.Jobs
                 case "Toolchain":
                     return property.Value + "Toolchain";
                 case "Mode":
+                case "Platform":
                     return property.Value;
                 case "Warmup":
                 case "Target":
@@ -106,7 +107,7 @@ namespace BenchmarkDotNet.Jobs
         {
             var builder = new StringBuilder();
             builder.Append($".With(BenchmarkDotNet.Jobs.Mode.{job.Mode})");
-            builder.Append($".WithProcessCount({job.WarmupCount.Value})");
+            builder.Append($".WithWarmupCount({job.WarmupCount.Value})");
             builder.Append($".WithTargetCount({job.TargetCount.Value})");
             builder.Append($".WithIterationTime({job.IterationTime.Value})");
             builder.Append($".WithProcessCount({job.ProcessCount.Value})");

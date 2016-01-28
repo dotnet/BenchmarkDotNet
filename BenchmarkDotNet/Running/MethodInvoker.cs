@@ -73,18 +73,22 @@ namespace BenchmarkDotNet.Running
         private void Invoke(IJob job, Func<MultiInvokeInput, Measurement> multiInvoke)
         {
             long invokeCount = 1;
+            IList<Measurement> idle = null;
             if (job.Mode == Mode.Throughput)
             {
                 invokeCount = RunPilot(multiInvoke, job.IterationTime);
                 RunWarmup(multiInvoke, invokeCount, IterationMode.IdleWarmup, Count.Auto);
-                RunTarget(multiInvoke, invokeCount, IterationMode.IdleTarget, Count.Auto);
+                idle = RunTarget(multiInvoke, invokeCount, IterationMode.IdleTarget, Count.Auto);
             }
 
             RunWarmup(multiInvoke, invokeCount, IterationMode.MainWarmup, job.WarmupCount);
-            RunTarget(multiInvoke, invokeCount, IterationMode.MainTarget, job.TargetCount);
+            var main = RunTarget(multiInvoke, invokeCount, IterationMode.MainTarget, job.TargetCount);
+
+            PrintResult(idle, main);
 
             RunDiagnostic(multiInvoke, invokeCount);
         }
+
 
         private static long RunPilot(Func<MultiInvokeInput, Measurement> multiInvoke, Count iterationTime)
         {
@@ -150,30 +154,51 @@ namespace BenchmarkDotNet.Running
             Console.WriteLine();
         }
 
-        private static void RunTarget(Func<MultiInvokeInput, Measurement> multiInvoke, long invokeCount, IterationMode iterationMode, Count iterationCount)
+        private static IList<Measurement> RunTarget(Func<MultiInvokeInput, Measurement> multiInvoke, long invokeCount, IterationMode iterationMode, Count iterationCount)
         {
-            var mainTarget = new List<Measurement>();
+            var measurements = new List<Measurement>();
             if (iterationCount.IsAuto)
             {
                 int iterationCounter = 0;
                 var maxAcceptableError = iterationMode.IsOneOf(IterationMode.IdleWarmup, IterationMode.IdleTarget)
                     ? TargetIdleAutoMaxAcceptableError
-                    : TargetIdleAutoMaxAcceptableError;
+                    : TargetMainAutoMaxAcceptableError;
                 while (true)
                 {
                     iterationCounter++;
                     var measurement = multiInvoke(new MultiInvokeInput(iterationMode, iterationCounter, invokeCount));
-                    mainTarget.Add(measurement);
-                    var statistics = new Statistics(mainTarget.Select(m => m.Nanoseconds));
-                    if (iterationCounter >= TargetAutoMinIterationCount &&
-                        statistics.StandardError < maxAcceptableError * statistics.Mean)
+                    measurements.Add(measurement);
+                    var statistics = new Statistics(measurements.Select(m => m.Nanoseconds));
+                    var valuesWithoutOutliers = statistics.WithoutOutliers();
+                    var statisticsWithoutOutliers = new Statistics(valuesWithoutOutliers);
+                    if (valuesWithoutOutliers.Length >= TargetAutoMinIterationCount &&
+                        statisticsWithoutOutliers.StandardError < maxAcceptableError * statisticsWithoutOutliers.Mean)
                         break;
                 }
             }
             else
             {
                 for (int i = 0; i < iterationCount; i++)
-                    mainTarget.Add(multiInvoke(new MultiInvokeInput(IterationMode.MainTarget, i + 1, invokeCount)));
+                    measurements.Add(multiInvoke(new MultiInvokeInput(IterationMode.MainTarget, i + 1, invokeCount)));
+            }
+            Console.WriteLine();
+            return measurements;
+        }
+
+        private static void PrintResult(IList<Measurement> idle, IList<Measurement> main)
+        {
+            var overhead = idle == null ? 0.0 : new Statistics(idle.Select(m => m.Nanoseconds)).Median;
+            var mainStatistics = new Statistics(main.Select(m => m.Nanoseconds));
+            int resultIndex = 0;
+            foreach (var measurement in main.Where(m => !mainStatistics.IsOutlier(m.Nanoseconds)))
+            {
+                var resultMeasurement = new Measurement(
+                    measurement.ProcessIndex,
+                    IterationMode.Result,
+                    ++resultIndex,
+                    measurement.Operations,
+                    Math.Max(0, measurement.Nanoseconds - overhead));
+                Console.WriteLine(resultMeasurement.ToOutputLine());
             }
             Console.WriteLine();
         }

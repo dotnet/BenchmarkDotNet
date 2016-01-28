@@ -24,15 +24,15 @@ namespace BenchmarkDotNet.Extensions
 
         public static IList<Measurement> GetRunsFor<T>(this Summary summary, Expression<Action<T>> actionExp)
         {
-            return summary.GetReportFor<T>(actionExp).GetTargetRuns().ToList();
+            return summary.GetReportFor<T>(actionExp).GetResultRuns().ToList();
         }
 
-        public static Statistics GetStats(this IList<Measurement> runs) =>
+        public static Statistics GetStatistics(this IList<Measurement> runs) =>
             runs.Any()
             ? new Statistics(runs.Select(r => r.GetAverageNanoseconds()))
             : null;
 
-        public static Statistics GetStats(this IEnumerable<Measurement> runs) =>
-            GetStats(runs.ToList());
+        public static Statistics GetStatistics(this IEnumerable<Measurement> runs) =>
+            GetStatistics(runs.ToList());
     }
 }
