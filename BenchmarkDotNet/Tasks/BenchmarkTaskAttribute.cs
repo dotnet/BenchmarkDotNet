@@ -13,7 +13,11 @@ namespace BenchmarkDotNet.Tasks
             BenchmarkPlatform platform = BenchmarkPlatform.HostPlatform,
             BenchmarkJitVersion jitVersion = BenchmarkJitVersion.HostJit,
             BenchmarkFramework framework = BenchmarkFramework.HostFramework,
+#if DNX451
+            BenchmarkToolchain toolchain = BenchmarkToolchain.DNX451,
+#else
             BenchmarkToolchain toolchain = BenchmarkToolchain.Classic,
+#endif
             BenchmarkRuntime runtime = BenchmarkRuntime.Clr,
             int warmupIterationCount = 5,
             int targetIterationCount = 10

@@ -16,9 +16,14 @@ namespace BenchmarkDotNet.Tasks
             int targetIterationCount = 10
             )
         {
+#if DNX451
+            var toolchain = BenchmarkToolchain.DNX451;
+#else
+            var toolchain = BenchmarkToolchain.Classic;
+#endif
             Task = new BenchmarkTask(
                 processCount,
-                new BenchmarkConfiguration(mode, platform, jitVersion, framework, BenchmarkToolchain.Classic, BenchmarkRuntime.Clr, warmupIterationCount, targetIterationCount));
+                new BenchmarkConfiguration(mode, platform, jitVersion, framework, toolchain, BenchmarkRuntime.Clr, warmupIterationCount, targetIterationCount));
         }
     }
 }

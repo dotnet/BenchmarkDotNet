@@ -3,6 +3,7 @@
     public enum BenchmarkToolchain
     {
         Classic,
+        DNX451,
         Custom1,
         Custom2,
         Custom3,
