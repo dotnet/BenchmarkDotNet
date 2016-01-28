@@ -1,8 +1,7 @@
-﻿// This file is NOT meant to be compiled as part of our Integration Tests
-// It is just here for reference, see PretendFSharpTest.CS for more information
-module BenchmarkSpec
+﻿module FSharpBenchmark
 
 open BenchmarkDotNet.Attributes
+open BenchmarkDotNet.Running
 open NUnit.Framework
 open FsUnit
 open System.Threading
@@ -30,13 +29,13 @@ type Db() =
 
 [<Test>]
 let ShouldExecuteBenchmark() = 
-    let reports = BenchmarkRunner().Run<Db>()
+    let reports = BenchmarkRunner.Run<Db>()
     ()
 
 
 // Can't get NUnit test runner to work in VS, so "simulate" it by calling the Test method from the EntryPoint method (main())
 [<EntryPoint>]
 let main argv = 
-    printfn "Running NUnit Test Method: ShouldExecuteBenchmark()"
+    printfn "Running Test Method: ShouldExecuteBenchmark()"
     ShouldExecuteBenchmark()
     0 // return an integer exit code
