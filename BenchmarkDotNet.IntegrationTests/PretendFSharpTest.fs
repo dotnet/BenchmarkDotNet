@@ -2,10 +2,9 @@
 // It is just here for reference, see PretendFSharpTest.CS for more information
 module BenchmarkSpec
 
-open BenchmarkDotNet
+open BenchmarkDotNet.Attributes
 open NUnit.Framework
 open FsUnit
-open BenchmarkDotNet.Tasks
 open System.Threading
 
 type File = 
@@ -14,10 +13,7 @@ type File =
       Extension : string
       Length : int }
 
-[<BenchmarkTask(platform = BenchmarkPlatform.X86, jitVersion = BenchmarkJitVersion.LegacyJit, 
-                mode = BenchmarkMode.SingleRun, processCount = 1, warmupIterationCount = 1, targetIterationCount = 1)>]
-[<BenchmarkTask(platform = BenchmarkPlatform.X64, jitVersion = BenchmarkJitVersion.LegacyJit,
-                mode = BenchmarkMode.SingleRun, processCount = 1, warmupIterationCount = 1, targetIterationCount = 1)>]
+[<Config("jobs=dry")>]
 type Db() = 
 
     let createDoc name = 
@@ -29,7 +25,7 @@ type Db() =
     [<Benchmark>]
     member this.Test() = 
         printfn "// ### F# Benchmark method called ###"
-        Thread.Sleep(500)
+        Thread.Sleep(50)
         createDoc("Testing")
 
 [<Test>]

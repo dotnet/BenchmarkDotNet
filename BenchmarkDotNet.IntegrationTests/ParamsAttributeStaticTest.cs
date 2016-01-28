@@ -13,19 +13,19 @@ namespace BenchmarkDotNet.IntegrationTests
     [Config(typeof(SingleRunFastConfig))]
     public class ParamsTestStaticProperty
     {
-        [Params(1, 2, 3, 8, 9, 10)]
+        [Params(1, 2)]
         public static int StaticParamProperty { get; set; }
 
         private static HashSet<int> collectedParams = new HashSet<int>();
 
-        [Fact(Skip = "TODO")]
+        [Fact]
         public void Test()
         {
             var logger = new AccumulationLogger();
             var config = DefaultConfig.Instance.With(logger);
 
             BenchmarkRunner.Run(this.GetType(), config);
-            foreach (var param in new[] { 1, 2, 3, 8, 9, 10 })
+            foreach (var param in new[] { 1, 2 })
                 Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, logger.GetLog());
             Assert.DoesNotContain($"// ### New Parameter {default(int)} ###" + Environment.NewLine, logger.GetLog());
         }
@@ -45,12 +45,12 @@ namespace BenchmarkDotNet.IntegrationTests
     [Config(typeof(SingleRunFastConfig))]
     public class ParamsTestStaticPrivateProperty
     {
-        [Params(1, 2, 3, 8, 9, 10)]
+        [Params(1, 2)]
         public static int StaticParamProperty { get; private set; }
 
         private static HashSet<int> collectedParams = new HashSet<int>();
 
-        [Fact(Skip = "TODO")]
+        [Fact]
         public void Test()
         {
             var logger = new AccumulationLogger();
@@ -74,18 +74,18 @@ namespace BenchmarkDotNet.IntegrationTests
     [Config(typeof(SingleRunFastConfig))]
     public class ParamsTestStaticField
     {
-        [Params(1, 2, 3, 8, 9, 10)]
+        [Params(1, 2)]
         public static int StaticParamField = 0;
 
         private static HashSet<int> collectedParams = new HashSet<int>();
 
-        [Fact(Skip = "TODO")]
+        [Fact]
         public static void Test()
         {
             var logger = new AccumulationLogger();
             var config = DefaultConfig.Instance.With(logger);
             BenchmarkRunner.Run<ParamsTestStaticField>(config);
-            foreach (var param in new[] { 1, 2, 3, 8, 9, 10 })
+            foreach (var param in new[] { 1, 2 })
                 Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, logger.GetLog());
             Assert.DoesNotContain($"// ### New Parameter 0 ###" + Environment.NewLine, logger.GetLog());
         }
@@ -105,12 +105,12 @@ namespace BenchmarkDotNet.IntegrationTests
     [Config(typeof(SingleRunFastConfig))]
     public class ParamsTestStaticPrivateField
     {
-        [Params(1, 2, 3, 8, 9, 10)]
+        [Params(1, 2)]
         private static int StaticParamField = 0;
 
         private static HashSet<int> collectedParams = new HashSet<int>();
 
-        [Fact(Skip = "TODO")]
+        [Fact]
         public static void Test()
         {
             var logger = new AccumulationLogger();

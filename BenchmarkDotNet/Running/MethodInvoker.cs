@@ -18,13 +18,13 @@ namespace BenchmarkDotNet.Running
         private const double TargetIdleAutoMaxAcceptableError = 0.05;
         private const double TargetMainAutoMaxAcceptableError = 0.01;
 
-        private struct MiltiInvokeInput
+        private struct MultiInvokeInput
         {
             public IterationMode IterationMode { get; }
             public int Index { get; }
             public long InvokeCount { get; }
 
-            public MiltiInvokeInput(IterationMode iterationMode, int index, long invokeCount)
+            public MultiInvokeInput(IterationMode iterationMode, int index, long invokeCount)
             {
                 IterationMode = iterationMode;
                 Index = index;
@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Running
             idleAction();
 
             // Run
-            Func<MiltiInvokeInput, Measurement> multiInvoke = input =>
+            Func<MultiInvokeInput, Measurement> multiInvoke = input =>
             {
                 var action = input.IterationMode.IsOneOf(IterationMode.IdleWarmup, IterationMode.IdleTarget)
                     ? idleAction
@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Running
             idleAction();
 
             // Run
-            Func<MiltiInvokeInput, Measurement> multiInvoke = input =>
+            Func<MultiInvokeInput, Measurement> multiInvoke = input =>
             {
                 var action = input.IterationMode.IsOneOf(IterationMode.IdleWarmup, IterationMode.IdleTarget)
                     ? idleAction
@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Running
             Invoke(job, multiInvoke);
         }
 
-        private void Invoke(IJob job, Func<MiltiInvokeInput, Measurement> multiInvoke)
+        private void Invoke(IJob job, Func<MultiInvokeInput, Measurement> multiInvoke)
         {
             long invokeCount = 1;
             if (job.Mode == Mode.Throughput)
@@ -82,9 +82,11 @@ namespace BenchmarkDotNet.Running
 
             RunWarmup(multiInvoke, invokeCount, IterationMode.MainWarmup, job.WarmupCount);
             RunTarget(multiInvoke, invokeCount, IterationMode.MainTarget, job.TargetCount);
+
+            RunDiagnostic(multiInvoke, invokeCount);
         }
 
-        private static long RunPilot(Func<MiltiInvokeInput, Measurement> multiInvoke, Count iterationTime)
+        private static long RunPilot(Func<MultiInvokeInput, Measurement> multiInvoke, Count iterationTime)
         {
             long invokeCount = MinInvokeCount;
             if (iterationTime.IsAuto)
@@ -94,7 +96,7 @@ namespace BenchmarkDotNet.Running
                 while (true)
                 {
                     iterationCounter++;
-                    var measurement = multiInvoke(new MiltiInvokeInput(IterationMode.Pilot, iterationCounter, invokeCount));
+                    var measurement = multiInvoke(new MultiInvokeInput(IterationMode.Pilot, iterationCounter, invokeCount));
                     if (stopwatchResolution / invokeCount <
                         measurement.GetAverageNanoseconds() * TargetMainAutoMaxAcceptableError &&
                         measurement.Nanoseconds > TimeUnit.Convert(MinIterationTimeMs, TimeUnit.Millisecond, TimeUnit.Nanoseconds))
@@ -109,7 +111,7 @@ namespace BenchmarkDotNet.Running
                 while (true)
                 {
                     iterationCounter++;
-                    var measurement = multiInvoke(new MiltiInvokeInput(IterationMode.Pilot, iterationCounter, invokeCount));
+                    var measurement = multiInvoke(new MultiInvokeInput(IterationMode.Pilot, iterationCounter, invokeCount));
                     var newInvokeCount = Math.Max(5, (long)Math.Round(invokeCount * iterationTime / measurement.Nanoseconds));
                     if (newInvokeCount < invokeCount)
                         downCount++;
@@ -122,7 +124,7 @@ namespace BenchmarkDotNet.Running
             return invokeCount;
         }
 
-        private static void RunWarmup(Func<MiltiInvokeInput, Measurement> multiInvoke, long invokeCount, IterationMode iterationMode, Count iterationCount)
+        private static void RunWarmup(Func<MultiInvokeInput, Measurement> multiInvoke, long invokeCount, IterationMode iterationMode, Count iterationCount)
         {
             if (iterationCount.IsAuto)
             {
@@ -132,7 +134,7 @@ namespace BenchmarkDotNet.Running
                 while (true)
                 {
                     iterationCounter++;
-                    var measurement = multiInvoke(new MiltiInvokeInput(iterationMode, iterationCounter, invokeCount));
+                    var measurement = multiInvoke(new MultiInvokeInput(iterationMode, iterationCounter, invokeCount));
                     if (previousMeasurement != null && measurement.Nanoseconds > previousMeasurement.Nanoseconds - 0.1)
                         upCount++;
                     if (iterationCounter >= WarmupAutoMinIterationCount && upCount >= 3)
@@ -143,12 +145,12 @@ namespace BenchmarkDotNet.Running
             else
             {
                 for (int i = 0; i < iterationCount; i++)
-                    multiInvoke(new MiltiInvokeInput(IterationMode.MainWarmup, i + 1, invokeCount));
+                    multiInvoke(new MultiInvokeInput(IterationMode.MainWarmup, i + 1, invokeCount));
             }
             Console.WriteLine();
         }
 
-        private static void RunTarget(Func<MiltiInvokeInput, Measurement> multiInvoke, long invokeCount, IterationMode iterationMode, Count iterationCount)
+        private static void RunTarget(Func<MultiInvokeInput, Measurement> multiInvoke, long invokeCount, IterationMode iterationMode, Count iterationCount)
         {
             var mainTarget = new List<Measurement>();
             if (iterationCount.IsAuto)
@@ -160,7 +162,7 @@ namespace BenchmarkDotNet.Running
                 while (true)
                 {
                     iterationCounter++;
-                    var measurement = multiInvoke(new MiltiInvokeInput(iterationMode, iterationCounter, invokeCount));
+                    var measurement = multiInvoke(new MultiInvokeInput(iterationMode, iterationCounter, invokeCount));
                     mainTarget.Add(measurement);
                     var statistics = new Statistics(mainTarget.Select(m => m.Nanoseconds));
                     if (iterationCounter >= TargetAutoMinIterationCount &&
@@ -171,11 +173,16 @@ namespace BenchmarkDotNet.Running
             else
             {
                 for (int i = 0; i < iterationCount; i++)
-                    mainTarget.Add(multiInvoke(new MiltiInvokeInput(IterationMode.MainTarget, i + 1, invokeCount)));
+                    mainTarget.Add(multiInvoke(new MultiInvokeInput(IterationMode.MainTarget, i + 1, invokeCount)));
             }
             Console.WriteLine();
         }
 
+        private static void RunDiagnostic(Func<MultiInvokeInput, Measurement> multiInvoke, long invokeCount)
+        {
+            multiInvoke(new MultiInvokeInput(IterationMode.Diagnostic, 1, invokeCount));
+            Console.WriteLine();
+        }
 
         private Measurement MultiInvoke(IterationMode mode, int index, Action setupAction, Action targetAction, long invocationCount, long operationsPerInvoke)
         {

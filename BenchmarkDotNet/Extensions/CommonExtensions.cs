@@ -28,6 +28,7 @@ namespace BenchmarkDotNet.Extensions
 
         public static bool IsNullOrEmpty<T>(this IList<T> value) => value == null || value.Count == 0;
         public static bool IsEmpty<T>(this IList<T> value) => value.Count == 0;
+        public static T Penult<T>(this IList<T> list) => list[list.Count - 2];
 
         public static bool IsOneOf<T>(this T value, params T[] values) => values.Contains(value);
     }

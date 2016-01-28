@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.IntegrationTests
     // (It seemed simpler to do it this way, rather than trying to compile F# code as part of our integration tests)
     public class PretendFSharpTest
     {
-        [Fact(Skip = "TODO")]
+        [Fact]
         public void Test()
         {
             var logger = new AccumulationLogger();

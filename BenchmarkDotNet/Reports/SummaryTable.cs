@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Reports
@@ -19,7 +20,16 @@ namespace BenchmarkDotNet.Reports
         internal SummaryTable(Summary summary)
         {
             Summary = summary;
-            var columns = summary.Config.GetColumns().Where(c => c.IsAvailable(summary)).ToArray();
+
+            var configColumns = summary.Config.
+                GetColumns().
+                Where(c => c.IsAvailable(summary));
+            var paramColumns = summary.Benchmarks.
+                SelectMany(b => b.Parameters.Items.Select(item => item.Name)).
+                Distinct().
+                Select(name => new ParamColumn(name));
+            var columns = configColumns.Concat(paramColumns).ToArray();
+
             ColumnCount = columns.Length;
             FullHeader = columns.Select(c => c.ColumnName).ToArray();
 

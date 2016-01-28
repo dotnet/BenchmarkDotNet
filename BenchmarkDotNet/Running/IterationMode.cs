@@ -33,6 +33,11 @@
         Result,
 
         /// <summary>
+        /// Additional iterations for diagnosers
+        /// </summary>
+        Diagnostic,
+
+        /// <summary>
         /// Unknown 
         /// </summary>
         Unknown

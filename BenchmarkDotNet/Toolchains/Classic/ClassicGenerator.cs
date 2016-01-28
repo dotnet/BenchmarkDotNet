@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
@@ -69,15 +70,8 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 ? ""
                 : $"return default({targetMethodReturnType});";
 
-            // TODO: Implement params
-            var paramsContent = "";
-            //if (!benchmark.Job.ParametersSets.IsEmpty())
-            //{
-            //    var typeQualifier = benchmark.Job.ParametersSets.IsStatic
-            //        ? $"{target.Type.Name}"
-            //        : "instance";
-            //    paramsContent = $"{typeQualifier}.{benchmark.Job.ParametersSets.ParamFieldOrProperty} = BenchmarkParameters.ParseArgs(args).IntParam;";
-            //}
+            var paramsContent = string.Join("", benchmark.Parameters.Items.Select(parameter => 
+                $"{(parameter.IsStatic ? "" : "instance.")}{parameter.Name} = {parameter.Value};"));
 
             var targetBenchmarkTaskArguments = benchmark.Job.GenerateWithDefinitions();
 

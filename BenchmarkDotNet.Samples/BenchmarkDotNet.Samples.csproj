@@ -55,6 +55,7 @@
     <Compile Include="Intro\IntroColumns.cs" />
     <Compile Include="Intro\IntroCommandStyle.cs" />
     <Compile Include="Intro\IntroJobsFull.cs" />
+    <Compile Include="Intro\IntroParams.cs" />
     <Compile Include="Intro\IntroTags.cs" />
     <Compile Include="JIT\Jit_GenericsMethod.cs" />
     <Compile Include="JIT\Jit_AsVsCast.cs" />

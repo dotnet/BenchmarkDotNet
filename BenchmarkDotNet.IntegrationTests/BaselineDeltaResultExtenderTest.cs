@@ -9,6 +9,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 
@@ -31,12 +32,12 @@ namespace BenchmarkDotNet.IntegrationTests
             var column = summary.Config.GetColumns().OfType<BaselineDeltaColumn>().FirstOrDefault();
             Assert.NotNull(column);
 
-            Assert.Equal(column.ColumnName, headerRow.Last());
+            Assert.Equal(column.ColumnName, headerRow.Penult());
             var testNameColumn = Array.FindIndex(headerRow, c => c == "Method");
             var extraColumn = Array.FindIndex(headerRow, c => c == column.ColumnName);
             foreach (var row in table.FullContent)
             {
-                Assert.Equal(row.Length, extraColumn + 1);
+                Assert.Equal(row.Length, extraColumn + 2);
                 if (row[testNameColumn] == "BenchmarkSlow") // This is our baseline
                     Assert.Equal("Baseline", row[extraColumn]);
                 else if (row[testNameColumn] == "BenchmarkFast") // This should have been compared to the baseline
@@ -45,7 +46,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Benchmark(Baseline = true)]
-        public void BenchmarkSlow() => Thread.Sleep(100);
+        public void BenchmarkSlow() => Thread.Sleep(20);
 
         [Benchmark]
         public void BenchmarkFast() => Thread.Sleep(5);
