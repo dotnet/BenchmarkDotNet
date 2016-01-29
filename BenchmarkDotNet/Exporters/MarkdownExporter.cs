@@ -63,11 +63,12 @@ namespace BenchmarkDotNet.Exporters
         {
             if (table.FullContent.Length == 0)
             {
-                logger.WriteLineError("There are no found benchmarks");
+                logger.WriteLineError("There are no benchmarks found ");
                 logger.NewLine();
                 return;
             }
-            PrintCommonColumns(table, logger);
+            table.PrintCommonColumns(logger);
+            logger.NewLine();
 
             if (useCodeBlocks)
             {
@@ -75,42 +76,14 @@ namespace BenchmarkDotNet.Exporters
                 logger.NewLine();
             }
 
-            PrintLine(table, table.FullHeader, logger);
+            table.PrintLine(table.FullHeader, logger, "", " |");
+            logger.NewLine();
             logger.WriteLineStatistic(string.Join("", table.Columns.Where(c => c.NeedToShow).Select(c => new string('-', c.Width) + " |")));
             foreach (var line in table.FullContent)
-                PrintLine(table, line, logger);
-        }
-
-        private static void PrintCommonColumns(SummaryTable table, ILogger logger)
-        {
-            var commonColumns = table.Columns.Where(c => !c.NeedToShow && !c.IsTrivial).ToArray();
-            if (commonColumns.Any())
             {
-                var paramsOnLine = 0;
-                foreach (var column in commonColumns)
-                {
-                    logger.WriteInfo($"{column.Header}={column.Content[0]}  ");
-                    paramsOnLine++;
-                    if (paramsOnLine == 3)
-                    {
-                        logger.NewLine();
-                        paramsOnLine = 0;
-                    }
-                }
-                if (paramsOnLine != 0)
-                    logger.NewLine();
-
+                table.PrintLine(line, logger, "", " |");
                 logger.NewLine();
             }
-        }
-
-        private void PrintLine(SummaryTable table, string[] line, ILogger logger)
-        {
-            for (int columnIndex = 0; columnIndex < table.ColumnCount; columnIndex++)
-                if (table.Columns[columnIndex].NeedToShow)
-                    logger.WriteStatistic(line[columnIndex].PadLeft(table.Columns[columnIndex].Width, ' ') + " |");
-            logger.NewLine();
-
         }
     }
 }

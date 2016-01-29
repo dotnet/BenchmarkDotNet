@@ -51,6 +51,7 @@ namespace BenchmarkDotNet.Configs
             yield return PlainExporter.Default;
             yield return CsvRunsExporter.Default;
             yield return RPlotExporter.Default;
+            yield return HtmlExporter.Default;
         }
 
         public IEnumerable<ILogger> GetLoggers()
