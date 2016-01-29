@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Plugins.Diagnosers;
 using BenchmarkDotNet.Tasks;
 using BenchmarkDotNet.Plugins.Loggers;
@@ -15,7 +15,6 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
     {
         private readonly Benchmark benchmark;
         private readonly IBenchmarkLogger logger;
-        private bool codeAlreadyExtracted = false;
 
         // This needs to be static, so that we can share a single handler amongst all instances of BenchmarkClassicExecutor's
         private static ConsoleHandler consoleHandler;
@@ -67,8 +66,8 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
 
             process.Start();
 
-            process.PriorityClass = ProcessPriorityClass.High;
-            process.ProcessorAffinity = new IntPtr(2);
+            process.EnsureHighPriority();
+            process.EnsureRightProcessorAffinity();
 
             // don't forget to call, otherwise logger will not get any events
             process.BeginErrorReadLine();
