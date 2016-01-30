@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn Framework = new PropertyColumn("Framework", benchmark => benchmark.Job.Framework.ToString());
         public static readonly IColumn Toolchain = new PropertyColumn("Toolchain", benchmark => benchmark.Job.Toolchain.Name);
         public static readonly IColumn Runtime = new PropertyColumn("Runtime", benchmark => benchmark.Job.Runtime.ToString());
-        public static readonly IColumn ProcessCount = new PropertyColumn("ProcessCount", benchmark => benchmark.Job.ProcessCount.ToString());
+        public static readonly IColumn LaunchCount = new PropertyColumn("LaunchCount", benchmark => benchmark.Job.LaunchCount.ToString());
         public static readonly IColumn WarmupCount = new PropertyColumn("WarmupCount", benchmark => benchmark.Job.WarmupCount.ToString());
         public static readonly IColumn TargetCount = new PropertyColumn("TargetCount", benchmark => benchmark.Job.TargetCount.ToString());
         public static readonly IColumn Affinity = new PropertyColumn("Affinity", benchmark => benchmark.Job.Affinity.ToString());

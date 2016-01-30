@@ -17,8 +17,7 @@ namespace BenchmarkDotNet.Samples.JIT
         private const int N = 11;
         private int[] x = new int[N];
 
-        [Benchmark]
-        [OperationsPerInvoke(N)]
+        [Benchmark(OperationsPerInvoke = N)]
         public int SumConst()
         {
             var y = x;
@@ -28,8 +27,7 @@ namespace BenchmarkDotNet.Samples.JIT
             return sum;
         }
 
-        [Benchmark]
-        [OperationsPerInvoke(N)]
+        [Benchmark(OperationsPerInvoke = N)]
         public int SumLength()
         {
             var y = x;

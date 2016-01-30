@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Samples.Intro
         {
             public Config()
             {
-                Add(Job.LegacyX86.With(Mode.SingleRun).WithProcessCount(1).WithWarmupCount(1).WithTargetCount(3));
+                Add(Job.LegacyX86.With(Mode.SingleRun).WithLaunchCount(1).WithWarmupCount(1).WithTargetCount(3));
             }
         }
 

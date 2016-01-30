@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Exporters
                     RedirectStandardOutput = false,
                     CreateNoWindow = true,
                     FileName = Path.Combine(rHome, "Rscript.exe"),
-                    Arguments = $"{scriptFullPath} {fileNamePrefix}-runs.csv"
+                    Arguments = $"{scriptFullPath} {fileNamePrefix}-measurements.csv"
                 };
                 using (var process = Process.Start(start))
                 {

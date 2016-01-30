@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Exporters
         {
             foreach (var report in summary.Reports.Values)
             {
-                var runs = report.AllRuns;
+                var runs = report.AllMeasurements;
                 var modes = runs.Select(it => it.IterationMode).Distinct();
                 logger.WriteLineHeader($"*** {report.Benchmark.ShortInfo} ***");
                 logger.WriteLineHeader("* Raw *");

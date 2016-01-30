@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public Config()
             {
-                Add(Job.Default.With(Mode.SingleRun).WithProcessCount(1).WithWarmupCount(1).WithTargetCount(1));
+                Add(Job.Default.With(Mode.SingleRun).WithLaunchCount(1).WithWarmupCount(1).WithTargetCount(1));
             }
         }
 

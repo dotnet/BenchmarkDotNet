@@ -19,8 +19,7 @@ namespace BenchmarkDotNet.Samples.JIT
 
         private const int IterationCount = 101;
 
-        [Benchmark]
-        [OperationsPerInvoke(IterationCount)]
+        [Benchmark(OperationsPerInvoke = IterationCount)]
         public double WithStopwatch()
         {
             double a = 1, b = 1;
@@ -35,8 +34,7 @@ namespace BenchmarkDotNet.Samples.JIT
             return a + sw.ElapsedMilliseconds;
         }
 
-        [Benchmark]
-        [OperationsPerInvoke(IterationCount)]
+        [Benchmark(OperationsPerInvoke = IterationCount)]
         public double WithoutStopwatch()
         {
             double a = 1, b = 1;

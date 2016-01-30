@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 
@@ -16,24 +17,22 @@ namespace BenchmarkDotNet.Samples.Framework
             public Config()
             {
                 Add(Job.Clr, Job.Mono);
+                Add(StatisticColumn.Min);
+                Add(new TagColumn("Tool", name => name.Replace(GetMetric(name), "")));
+                Add(new TagColumn("Metric", GetMetric));
+            }
+
+            private static string GetMetric(string name)
+            {
+                return name.Contains("Latency") ? "Latency" : "Granularity";
             }
         }
+
+
         [Benchmark]
         public long StopwatchLatency()
         {
             return Stopwatch.GetTimestamp();
-        }
-
-        [Benchmark]
-        public long StopwatchGranularity()
-        {
-            // Keep calling Stopwatch.GetTimestamp() till we get a different/new value
-            long current, lastValue = Stopwatch.GetTimestamp();
-            do
-            {
-                current = Stopwatch.GetTimestamp();
-            } while (current == lastValue);
-            return current;
         }
 
         [Benchmark]
@@ -43,15 +42,23 @@ namespace BenchmarkDotNet.Samples.Framework
         }
 
         [Benchmark]
+        public long StopwatchGranularity()
+        {
+            long lastTimestamp = Stopwatch.GetTimestamp();
+            while (Stopwatch.GetTimestamp() == lastTimestamp)
+            {
+            }
+            return lastTimestamp;
+        }
+
+        [Benchmark]
         public long DateTimeGranularity()
         {
-            // Keep calling DateTime.Now.Ticks till we get a different/new value
-            long current, lastValue = DateTime.Now.Ticks;
-            do
+            long lastTicks = DateTime.UtcNow.Ticks;
+            while (DateTime.UtcNow.Ticks == lastTicks)
             {
-                current = DateTime.Now.Ticks;
-            } while (current == lastValue);
-            return current;
+            }
+            return lastTicks;
         }
     }
 }

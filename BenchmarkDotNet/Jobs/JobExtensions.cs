@@ -14,11 +14,18 @@ namespace BenchmarkDotNet.Jobs
         public static IJob With(this IJob job, Jit jit) => job.With(j => j.Jit = jit);
         public static IJob With(this IJob job, Framework framework) => job.With(j => j.Framework = framework);
         public static IJob With(this IJob job, Runtime runtime) => job.With(j => j.Runtime = runtime);
-        public static IJob WithProcessCount(this IJob job, Count processCount) => job.With(j => j.ProcessCount = processCount);
+        public static IJob WithLaunchCount(this IJob job, Count launchCount) => job.With(j => j.LaunchCount = launchCount);
         public static IJob WithWarmupCount(this IJob job, Count warmupCount) => job.With(j => j.WarmupCount = warmupCount);
         public static IJob WithTargetCount(this IJob job, Count targetCount) => job.With(j => j.TargetCount = targetCount);
-        public static IJob WithIterationTime(this IJob job, Count iterationTime) => job.With(j => j.IterationTime = iterationTime);
         public static IJob WithAffinity(this IJob job, Count affinity) => job.With(j => j.Affinity = affinity);
+
+        /// <summary>
+        /// Create a new job as a copy of the original job with specific time of a single iteration
+        /// </summary>
+        /// <param name="job">Original job</param>
+        /// <param name="iterationTime">Iteration time in Millisecond or Auto</param>
+        /// <returns></returns>
+        public static IJob WithIterationTime(this IJob job, Count iterationTime) => job.With(j => j.IterationTime = iterationTime);
 
         private static Job Clone(this IJob job) => new Job
         {
@@ -28,7 +35,7 @@ namespace BenchmarkDotNet.Jobs
             Toolchain = job.Toolchain,
             Runtime = job.Runtime,
             Mode = job.Mode,
-            ProcessCount = job.ProcessCount,
+            LaunchCount = job.LaunchCount,
             TargetCount = job.TargetCount,
             WarmupCount = job.WarmupCount,
             IterationTime = job.IterationTime,
@@ -52,7 +59,7 @@ namespace BenchmarkDotNet.Jobs
             yield return new KeyValuePair<string, string>("Runtime", job.Runtime.ToString());
             yield return new KeyValuePair<string, string>("Warmup", job.WarmupCount.ToString());
             yield return new KeyValuePair<string, string>("Target", job.TargetCount.ToString());
-            yield return new KeyValuePair<string, string>("Process", job.ProcessCount.ToString());
+            yield return new KeyValuePair<string, string>("Process", job.LaunchCount.ToString());
             yield return new KeyValuePair<string, string>("IterationTime", job.IterationTime.ToString());
             yield return new KeyValuePair<string, string>("Affinity", job.Affinity.ToString());
         }
@@ -83,6 +90,32 @@ namespace BenchmarkDotNet.Jobs
             return string.Join("_", targetProperties.Select(GetShortInfoForProperty));
         }
 
+        public static string GetShortInfo(this IJob job, IList<IJob> allJobs)
+        {
+            // TODO: make it automatically
+            if (job.Equals(Job.LegacyX86))
+                return "LegacyX86";
+            if (job.Equals(Job.LegacyX64))
+                return "LegacyX64";
+            if (job.Equals(Job.RyuJitX64))
+                return "RyuJitX64";
+            if (job.Equals(Job.Dry))
+                return "Dry";
+            if (job.Equals(Job.Mono))
+                return "Mono";
+            if (job.Equals(Job.Clr))
+                return "Clr";
+            var defaultJobProperties = Job.Default.GetAllProperties().ToArray();
+            var ownProperties = job.GetAllProperties().ToArray();
+            var n = ownProperties.Length;
+            var targetProperties = Enumerable.Range(0, n).
+                Where(i => ownProperties[i].Value != defaultJobProperties[i].Value &&
+                           allJobs.Select(j => j.GetAllProperties().ToArray()[i].Value).Distinct().Count() > 1).
+                Select(i => ownProperties[i]);
+            return string.Join("_", targetProperties.Select(GetShortInfoForProperty));
+        }
+
+
         private static string GetShortInfoForProperty(KeyValuePair<string, string> property)
         {
             switch (property.Key)
@@ -110,7 +143,7 @@ namespace BenchmarkDotNet.Jobs
             builder.Append($".WithWarmupCount({job.WarmupCount.Value})");
             builder.Append($".WithTargetCount({job.TargetCount.Value})");
             builder.Append($".WithIterationTime({job.IterationTime.Value})");
-            builder.Append($".WithProcessCount({job.ProcessCount.Value})");
+            builder.Append($".WithLaunchCount({job.LaunchCount.Value})");
             return builder.ToString();
         }
     }

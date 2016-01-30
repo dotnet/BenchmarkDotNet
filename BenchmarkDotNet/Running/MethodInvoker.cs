@@ -110,13 +110,14 @@ namespace BenchmarkDotNet.Running
             }
             else
             {
+                var iterationTimeInNanoseconds = TimeUnit.Convert(iterationTime, TimeUnit.Millisecond, TimeUnit.Nanoseconds);
                 int iterationCounter = 0;
                 int downCount = 0;
                 while (true)
                 {
                     iterationCounter++;
                     var measurement = multiInvoke(new MultiInvokeInput(IterationMode.Pilot, iterationCounter, invokeCount));
-                    var newInvokeCount = Math.Max(5, (long)Math.Round(invokeCount * iterationTime / measurement.Nanoseconds));
+                    var newInvokeCount = Math.Max(5, (long)Math.Round(invokeCount * iterationTimeInNanoseconds / measurement.Nanoseconds));
                     if (newInvokeCount < invokeCount)
                         downCount++;
                     if (Math.Abs(newInvokeCount - invokeCount) <= 1 || downCount >= 3)
@@ -169,10 +170,8 @@ namespace BenchmarkDotNet.Running
                     var measurement = multiInvoke(new MultiInvokeInput(iterationMode, iterationCounter, invokeCount));
                     measurements.Add(measurement);
                     var statistics = new Statistics(measurements.Select(m => m.Nanoseconds));
-                    var valuesWithoutOutliers = statistics.WithoutOutliers();
-                    var statisticsWithoutOutliers = new Statistics(valuesWithoutOutliers);
-                    if (valuesWithoutOutliers.Length >= TargetAutoMinIterationCount &&
-                        statisticsWithoutOutliers.StandardError < maxAcceptableError * statisticsWithoutOutliers.Mean)
+                    if (iterationCounter >= TargetAutoMinIterationCount &&
+                        statistics.StandardError < maxAcceptableError * statistics.Mean)
                         break;
                 }
             }
@@ -187,13 +186,12 @@ namespace BenchmarkDotNet.Running
 
         private static void PrintResult(IList<Measurement> idle, IList<Measurement> main)
         {
-            var overhead = idle == null ? 0.0 : new Statistics(idle.Select(m => m.Nanoseconds)).Median;
-            var mainStatistics = new Statistics(main.Select(m => m.Nanoseconds));
+            var overhead = idle == null ? 0.0 : new Statistics(idle.Select(m => m.Nanoseconds)).Median;            
             int resultIndex = 0;
-            foreach (var measurement in main.Where(m => !mainStatistics.IsOutlier(m.Nanoseconds)))
+            foreach (var measurement in main)
             {
                 var resultMeasurement = new Measurement(
-                    measurement.ProcessIndex,
+                    measurement.LaunchIndex,
                     IterationMode.Result,
                     ++resultIndex,
                     measurement.Operations,

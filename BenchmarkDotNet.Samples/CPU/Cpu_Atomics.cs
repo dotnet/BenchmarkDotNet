@@ -18,8 +18,7 @@ namespace BenchmarkDotNet.Samples.CPU
         private int a;
         private object syncRoot = new object();
 
-        [Benchmark]
-        [OperationsPerInvoke(4)]
+        [Benchmark(OperationsPerInvoke = 4)]
         public void Lock()
         {
             lock (syncRoot) a++;
@@ -28,8 +27,7 @@ namespace BenchmarkDotNet.Samples.CPU
             lock (syncRoot) a++;
         }
 
-        [Benchmark]
-        [OperationsPerInvoke(4)]
+        [Benchmark(OperationsPerInvoke = 4)]
         public void Interlocked()
         {
             System.Threading.Interlocked.Increment(ref a);
@@ -38,8 +36,7 @@ namespace BenchmarkDotNet.Samples.CPU
             System.Threading.Interlocked.Increment(ref a);
         }
 
-        [Benchmark]
-        [OperationsPerInvoke(4)]
+        [Benchmark(OperationsPerInvoke = 4)]
         public void NoLock()
         {
             a++;

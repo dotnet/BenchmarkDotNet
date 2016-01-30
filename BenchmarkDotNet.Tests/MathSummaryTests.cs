@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Statistic;
 using Xunit;
 using Xunit.Abstractions;
 

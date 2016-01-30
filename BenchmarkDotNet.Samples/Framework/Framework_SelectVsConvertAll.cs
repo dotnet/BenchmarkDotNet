@@ -8,15 +8,13 @@ namespace BenchmarkDotNet.Samples.Framework
     {
         private readonly List<int> list = new List<int> { 1, 2, 3, 4, 5 };
 
-        [Benchmark]
-        [OperationsPerInvoke(5)]
+        [Benchmark(OperationsPerInvoke = 5)]
         public List<int> Select()
         {
             return list.Select(x => 2 * x).ToList();
         }
 
-        [OperationsPerInvoke(5)]
-        [Benchmark]
+        [Benchmark(OperationsPerInvoke = 5)]
         public List<int> ConvertAll()
         {
             return list.ConvertAll(x => 2 * x).ToList();

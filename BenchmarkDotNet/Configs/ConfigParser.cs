@@ -41,10 +41,10 @@ namespace BenchmarkDotNet.Configs
         {
             switch (value)
             {
-                case "time":
-                    return new[] { StatisticColumn.Time };
-                case "error":
-                    return new[] { StatisticColumn.Error };
+                case "mean":
+                    return new[] { StatisticColumn.Mean };
+                case "stderror":
+                    return new[] { StatisticColumn.StdError };
                 case "stddev":
                     return new[] { StatisticColumn.StdDev };
                 case "operationpersecond":

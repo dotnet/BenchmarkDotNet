@@ -31,13 +31,13 @@ namespace BenchmarkDotNet.Configs
             yield return PropertyColumn.Framework;
             yield return PropertyColumn.Toolchain;
             yield return PropertyColumn.Runtime;
-            yield return PropertyColumn.ProcessCount;
+            yield return PropertyColumn.LaunchCount;
             yield return PropertyColumn.WarmupCount;
             yield return PropertyColumn.TargetCount;
             yield return PropertyColumn.Affinity;
 
-            yield return StatisticColumn.Time;
-            yield return StatisticColumn.Error;
+            yield return StatisticColumn.Mean;
+            yield return StatisticColumn.StdError;
 
             yield return BaselineDeltaColumn.Default;
         }
@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Configs
             yield return MarkdownExporter.Default;
             yield return MarkdownExporter.GitHub;
             yield return PlainExporter.Default;
-            yield return CsvRunsExporter.Default;
+            yield return CsvMeasurementsExporter.Default;
             yield return RPlotExporter.Default;
             yield return HtmlExporter.Default;
         }

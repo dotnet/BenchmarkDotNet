@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Reports;
 
-namespace BenchmarkDotNet.Statistic
+namespace BenchmarkDotNet.Reports
 {
     public enum ConfidenceLevel
     {
@@ -49,7 +48,7 @@ namespace BenchmarkDotNet.Statistic
             Upper = mean + Margin;
         }
 
-        public string ToStr() => $"[{Lower.ToStr()}; {Upper.ToStr()}] (CI {Level.ToPercent()}%)";
-        public string ToTimeStr(TimeUnit unit) => $"[{Lower.ToTimeStr(unit)}; {Upper.ToTimeStr(unit)}] (CI {Level.ToPercent()}%)";
+        public string ToStr(bool showLevel = true) => $"[{Lower.ToStr()}; {Upper.ToStr()}] (CI {Level.ToPercent()}%)";
+        public string ToTimeStr(TimeUnit unit = null, bool showLevel = true) => $"[{Lower.ToTimeStr(unit)}; {Upper.ToTimeStr(unit)}] (CI {Level.ToPercent()}%)";
     }
 }

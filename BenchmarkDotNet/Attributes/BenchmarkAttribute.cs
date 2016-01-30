@@ -17,5 +17,7 @@ namespace BenchmarkDotNet.Attributes
         public string Description { get; set; }
 
         public bool Baseline { get; set; }
+
+        public int OperationsPerInvoke { get; set; } = 1;
     }
 }

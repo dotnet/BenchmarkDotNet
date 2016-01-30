@@ -7,8 +7,8 @@ namespace BenchmarkDotNet.Columns
 {
     public class StatisticColumn : IColumn
     {
-        public static readonly IColumn Time = new StatisticColumn("Time", s => s.Mean);
-        public static readonly IColumn Error = new StatisticColumn("Error", s => s.StandardError);
+        public static readonly IColumn Mean = new StatisticColumn("Mean", s => s.Mean);
+        public static readonly IColumn StdError = new StatisticColumn("StdError", s => s.StandardError);
 
         public static readonly IColumn StdDev = new StatisticColumn("StdDev", s => s.StandardDeviation);
         public static readonly IColumn OperationsPerSecond = new StatisticColumn("Op/s", s => 1.0 * 1000 * 1000 * 1000 / s.Mean, false);
@@ -19,7 +19,12 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn Q3 = new StatisticColumn("Q3", s => s.Q3);
         public static readonly IColumn Max = new StatisticColumn("Max", s => s.Max);
 
-        public static readonly IColumn[] AllStatistics = { Time, Error, StdDev, OperationsPerSecond, Min, Q1, Median, Q3, Max };
+        public static IColumn CiLower(ConfidenceLevel level) => new StatisticColumn($"CI {level.ToPercent()}% Lower",
+            s => new ConfidenceInterval(s.Mean, s.StandardError, level).Lower);
+        public static IColumn CiUpper(ConfidenceLevel level) => new StatisticColumn($"CI {level.ToPercent()}% Upper",
+            s => new ConfidenceInterval(s.Mean, s.StandardError, level).Upper);
+
+        public static readonly IColumn[] AllStatistics = { Mean, StdError, StdDev, OperationsPerSecond, Min, Q1, Median, Q3, Max };
 
         private readonly Func<Statistics, double> calc;
         private readonly bool isTimeColumn;

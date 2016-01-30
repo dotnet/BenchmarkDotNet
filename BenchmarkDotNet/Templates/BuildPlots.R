@@ -21,50 +21,41 @@ ends_with <- function(vars, match, ignore.case = TRUE) {
 std.error <- function(x) sqrt(var(x)/length(x))
 
 args <- commandArgs(trailingOnly = TRUE)
-files <- if (length(args) > 0) args else list.files()[list.files() %>% ends_with("-runs.csv")]
+files <- if (length(args) > 0) args else list.files()[list.files() %>% ends_with("-measurements.csv")]
 for (file in files) {
-  title <- gsub("-runs.csv", "", file)
-  runs <- read.csv(file, sep = ";")
-  xColumns <- colnames(runs)[startsWith(colnames(runs), "Benchmark")]
-  distinctValues <- sapply(xColumns, function(columnName) nrow(runs %>% select(get(columnName)) %>% unique))
-  uniqueColumns <- xColumns[distinctValues > 1]
-  sameColumns <- xColumns[distinctValues == 1]
-  runs <- runs %>% select(-one_of(sameColumns))
-  if (length(uniqueColumns) > 1) {
-    runs <- runs %>% mutate(Env = unite_(runs, "Env", uniqueColumns[-1])$Env)
-  } else {
-    runs <- runs %>% mutate(Env = "")
-  }
-  runs <- runs %>% mutate(FullEnv = unite_(runs, "FullEnv", uniqueColumns)$FullEnv)
+  title <- gsub("-measurements.csv", "", basename(file))
+  measurements <- read.csv(file, sep = ";")
   
-  targetRuns <- runs %>% filter(RunIterationMode == "Target")
-  targetRuns$Value <- targetRuns$RunNanoseconds / targetRuns$RunOperations
+  result <- measurements %>% filter(MeasurementIterationMode == "Result")
+  result[is.na(result$Job),]$Job <- ""
+  
   timeUnit <- "ns"
-  if (min(targetRuns$Value) > 1000) {
-    targetRuns$Value <- targetRuns$Value / 1000
+  if (min(result$MeasurementValue) > 1000) {
+    result$MeasurementValue <- result$MeasurementValue / 1000
     timeUnit <- "us"
   }
-  if (min(targetRuns$Value) > 1000) {
-    targetRuns$Value <- targetRuns$Value / 1000
+  if (min(result$MeasurementValue) > 1000) {
+    result$MeasurementValue <- result$MeasurementValue / 1000
     timeUnit <- "ms"
   }
-  if (min(targetRuns$Value) > 1000) {
-    targetRuns$Value <- targetRuns$Value / 1000
+  if (min(result$MeasurementValue) > 1000) {
+    result$MeasurementValue <- result$MeasurementValue / 1000
     timeUnit <- "sec"
   }
-  targetRunsStats <- targetRuns %>% 
-    group_by_(.dots = c(uniqueColumns, "Env", "FullEnv")) %>% 
-    summarise(se = std.error(Value), Value = mean(Value))
   
-  benchmarkBoxplot <- ggplot(targetRuns, aes(x=Env, y=Value, fill=get(uniqueColumns[1]))) + 
-    guides(fill=guide_legend(title=uniqueColumns[1])) +
-    xlab("Environment") +
+  resultStats <- result %>% 
+    group_by_(.dots = c("TargetMethod", "Job")) %>% 
+    summarise(se = std.error(MeasurementValue), Value = mean(MeasurementValue))
+  
+  benchmarkBoxplot <- ggplot(result, aes(x=TargetMethod, y=MeasurementValue, fill=Job)) + 
+    guides(fill=guide_legend(title="Job")) +
+    xlab("Target") +
     ylab(paste("Time,", timeUnit)) +
     ggtitle(title) +
     geom_boxplot()
-  benchmarkBarplot <- ggplot(targetRunsStats, aes(x=Env, y=Value, fill=get(uniqueColumns[1]))) + 
-    guides(fill=guide_legend(title=uniqueColumns[1])) +
-    xlab("Environment") +
+  benchmarkBarplot <- ggplot(resultStats, aes(x=TargetMethod, y=Value, fill=Job)) + 
+    guides(fill=guide_legend(title="Job")) +
+    xlab("Target") +
     ylab(paste("Time,", timeUnit)) + 
     ggtitle(title) +
     geom_bar(position=position_dodge(), stat="identity")
@@ -72,6 +63,16 @@ for (file in files) {
   
   print(benchmarkBoxplot)
   print(benchmarkBarplot)
-  ggsave(gsub("-runs.csv", "-boxplot.png", file), benchmarkBoxplot)
-  ggsave(gsub("-runs.csv", "-barplot.png", file), benchmarkBarplot)
+  ggsave(gsub("-measurements.csv", "-boxplot.png", file), benchmarkBoxplot)
+  ggsave(gsub("-measurements.csv", "-barplot.png", file), benchmarkBarplot)
+  
+  for (target in unique(result$TargetMethod)) {
+    df <- (result %>% filter(TargetMethod == target))
+    densityPlot <- ggplot(df, aes(x=MeasurementValue, fill=Job)) + 
+      ggtitle(paste(title, "/", target)) +
+      xlab(paste("Time,", timeUnit)) +
+      geom_density(alpha=.5)
+    print(densityPlot)
+    ggsave(gsub("-measurements.csv", paste0("-", target, "-density.png"), file), densityPlot)
+  }
 }

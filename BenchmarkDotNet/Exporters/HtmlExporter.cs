@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Exporters
             var prefixLogger = new LoggerWithPrefix(logger, "\t");
 
             prefixLogger.Write("<tr>");
-            table.PrintLine(table.FullHeader, prefixLogger, "<td>", "</td>");
+            table.PrintLine(table.FullHeader, prefixLogger, "<th>", "</th>");
             prefixLogger.WriteLine("</tr>");
 
             foreach (var line in table.FullContent)

@@ -2,56 +2,67 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Exporters
 {
-    public class CsvRunsExporter : ExporterBase
+    public class CsvMeasurementsExporter : ExporterBase
     {
         protected override string FileExtension => "csv";
-        protected override string FileCaption => "runs";
+        protected override string FileCaption => "measurements";
 
-        public static readonly IExporter Default = new CsvRunsExporter();
+        public static readonly IExporter Default = new CsvMeasurementsExporter();
 
-        private CsvRunsExporter()
+        private CsvMeasurementsExporter()
         {
         }
 
-        private class RunColumn
+        private class MeasurementColumn
         {
             public string Title { get; }
-            public Func<BenchmarkReport, Measurement, string> GetValue { get; }
+            public Func<Summary, BenchmarkReport, Measurement, string> GetValue { get; }
 
-            public RunColumn(string title, Func<BenchmarkReport, Measurement, string> getValue)
+            public MeasurementColumn(string title, Func<Summary, BenchmarkReport, Measurement, string> getValue)
             {
                 Title = title;
                 GetValue = getValue;
             }
         }
 
-        private readonly List<RunColumn> runColumns = new List<RunColumn>
+        // TODO: add params
+        private readonly List<MeasurementColumn> columns = new List<MeasurementColumn>
         {
-            new RunColumn("BenchmarkType", (report, run) => report.Benchmark.Target.Type.Name),
-            new RunColumn("BenchmarkMethod", (report, run) => report.Benchmark.Target.MethodTitle),
-            new RunColumn("BenchmarkMode", (report, run) => report.Benchmark.Job.Mode.ToString()),
-            new RunColumn("BenchmarkPlatform", (report, run) => report.Benchmark.Job.Platform.ToString()),
-            new RunColumn("BenchmarkJitVersion", (report, run) => report.Benchmark.Job.Jit.ToString()),
-            new RunColumn("BenchmarkFramework", (report, run) => report.Benchmark.Job.Framework.ToString()),
-            new RunColumn("BenchmarkToolchain", (report, run) => report.Benchmark.Job.Toolchain.ToString()),
-            new RunColumn("BenchmarkRuntime", (report, run) => report.Benchmark.Job.Runtime.ToString()),
-            new RunColumn("RunIterationMode", (report, run) => run.IterationMode.ToString()),
-            new RunColumn("RunIterationIndex", (report, run) => run.IterationIndex.ToString()),
-            new RunColumn("RunNanoseconds", (report, run) => run.Nanoseconds.ToStr()),
-            new RunColumn("RunOperations", (report, run) => run.Operations.ToString()),
+            new MeasurementColumn("Target", (summary, report, m) => report.Benchmark.Target.Type.Name + "." +report.Benchmark.Target.MethodTitle),
+            new MeasurementColumn("TargetType", (summary, report, m) => report.Benchmark.Target.Type.Name),
+            new MeasurementColumn("TargetMethod", (summary, report, m) => report.Benchmark.Target.MethodTitle),
+
+            new MeasurementColumn("Job", (summary, report, m) => report.Benchmark.Job.GetShortInfo(GetJobs(summary))),
+            new MeasurementColumn("JobMode", (summary, report, m) => report.Benchmark.Job.Mode.ToString()),
+            new MeasurementColumn("JobPlatform", (summary, report, m) => report.Benchmark.Job.Platform.ToString()),
+            new MeasurementColumn("JobJit", (summary, report, m) => report.Benchmark.Job.Jit.ToString()),
+            new MeasurementColumn("JobFramework", (summary, report, m) => report.Benchmark.Job.Framework.ToString()),
+            new MeasurementColumn("JobToolchain", (summary, report, m) => report.Benchmark.Job.Toolchain.ToString()),
+            new MeasurementColumn("JobRuntime", (summary, report, m) => report.Benchmark.Job.Runtime.ToString()),
+
+            new MeasurementColumn("MeasurementLaunchIndex", (summary, report, m) => m.LaunchIndex.ToString()),
+            new MeasurementColumn("MeasurementIterationMode", (summary, report, m) => m.IterationMode.ToString()),
+            new MeasurementColumn("MeasurementIterationIndex", (summary, report, m) => m.IterationIndex.ToString()),
+            new MeasurementColumn("MeasurementNanoseconds", (summary, report, m) => m.Nanoseconds.ToStr()),
+            new MeasurementColumn("MeasurementOperations", (summary, report, m) => m.Operations.ToString()),
+            new MeasurementColumn("MeasurementValue", (summary, report, m) => (m.Nanoseconds / m.Operations).ToStr()),
         };
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
-            logger.WriteLine(string.Join(";", runColumns.Select(c => c.Title)));
+            logger.WriteLine(string.Join(";", columns.Select(c => c.Title)));
             foreach (var report in summary.Reports.Values)
-                foreach (var run in report.AllRuns)
-                    logger.WriteLine(string.Join(";", runColumns.Select(column => column.GetValue(report, run))));
+                foreach (var measurement in report.AllMeasurements)
+                    logger.WriteLine(string.Join(";", columns.Select(column => column.GetValue(summary, report, measurement))));
         }
+
+
+        public static IJob[] GetJobs(Summary summary) => summary.Benchmarks.Select(b => b.Job).ToArray();
     }
 }

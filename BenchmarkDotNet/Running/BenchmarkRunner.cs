@@ -199,11 +199,11 @@ namespace BenchmarkDotNet.Running
 
 
             logger.WriteLineInfo("// *** Execute ***");
-            var processCount = Math.Max(1, benchmark.Job.ProcessCount.IsAuto ? 2 : benchmark.Job.ProcessCount.Value);
+            var launchCount = Math.Max(1, benchmark.Job.LaunchCount.IsAuto ? 2 : benchmark.Job.LaunchCount.Value);
 
-            for (int processNumber = 0; processNumber < processCount; processNumber++)
+            for (int processNumber = 0; processNumber < launchCount; processNumber++)
             {
-                var printedProcessNumber = (benchmark.Job.ProcessCount.IsAuto && processNumber < 2) ? "?" : processCount.ToString();
+                var printedProcessNumber = (benchmark.Job.LaunchCount.IsAuto && processNumber < 2) ? "?" : launchCount.ToString();
                 logger.WriteLineInfo($"// Run, Process: {processNumber + 1} / {printedProcessNumber}");
 
                 var executeResult = toolchain.Executor.Execute(buildResult, config.GetCompositeDiagnoser(), benchmark, logger);
@@ -212,7 +212,7 @@ namespace BenchmarkDotNet.Running
                     logger.WriteLineError("Executable not found");
                 executeResults.Add(executeResult);
 
-                if (benchmark.Job.ProcessCount.IsAuto && processNumber == 1)
+                if (benchmark.Job.LaunchCount.IsAuto && processNumber == 1)
                 {
                     var measurements = executeResults.
                         SelectMany(r => r.Data).
@@ -222,7 +222,7 @@ namespace BenchmarkDotNet.Running
                     var idleApprox = new Statistics(measurements.Where(m => m.IterationMode == IterationMode.IdleTarget).Select(m => m.Nanoseconds)).Median;
                     var mainApprox = new Statistics(measurements.Where(m => m.IterationMode == IterationMode.MainTarget).Select(m => m.Nanoseconds)).Median;
                     var percent = idleApprox/mainApprox*100;
-                    processCount = (int) Math.Round(Math.Max(2, 2 + (percent - 1)/3)); // an empirical formula
+                    launchCount = (int) Math.Round(Math.Max(2, 2 + (percent - 1)/3)); // an empirical formula
                 }
             }
             logger.NewLine();

@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var builder = new MyBuilder();
             var executor = new MyExecutor();
             var myToolchain = new Toolchain("My", generator, builder, executor);
-            var job = Job.Default.With(myToolchain).With(Mode.SingleRun).WithProcessCount(1).WithWarmupCount(1).WithTargetCount(1);
+            var job = Job.Default.With(myToolchain).With(Mode.SingleRun).WithLaunchCount(1).WithWarmupCount(1).WithTargetCount(1);
 
             var config = DefaultConfig.Instance.With(job).With(logger);
             BenchmarkRunner.Run<ToolchainTest>(config);

@@ -118,7 +118,6 @@
     <Compile Include="Attributes\SetupAttribute.cs" />
     <Compile Include="Parameters\ParameterInstances.cs" />
     <Compile Include="Jobs\Runtime.cs" />
-    <Compile Include="Attributes\OperationsPerInvokeAttribute.cs" />
     <Compile Include="Running\Benchmark.cs" />
     <Compile Include="Running\BenchmarkSwitcher.cs" />
     <Compile Include="Toolchains\Classic\ClassicExecutor.cs" />

@@ -25,8 +25,7 @@ namespace BenchmarkDotNet.Samples.JIT
             p2 = p4 = p6 = false;
         }
 
-        [Benchmark]
-        [OperationsPerInvoke(6)]
+        [Benchmark(OperationsPerInvoke = 6)]
         public void Framework()
         {
             q1 = Convert.ToInt32(p1);
@@ -37,8 +36,7 @@ namespace BenchmarkDotNet.Samples.JIT
             q6 = Convert.ToInt32(p6);
         }
 
-        [Benchmark]
-        [OperationsPerInvoke(6)]
+        [Benchmark(OperationsPerInvoke = 6)]
         public void IfThenElse()
         {
             q1 = p1 ? 1 : 0;
@@ -49,8 +47,7 @@ namespace BenchmarkDotNet.Samples.JIT
             q6 = p6 ? 1 : 0;
         }
 
-        [Benchmark]
-        [OperationsPerInvoke(6)]
+        [Benchmark(OperationsPerInvoke = 6)]
         public void UnsafeConvert()
         {
             unsafe

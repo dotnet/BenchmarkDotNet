@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Reports
     {
         public IterationMode IterationMode { get; }
 
-        public int ProcessIndex { get; }
+        public int LaunchIndex { get; }
 
         public int IterationIndex { get; }
 
@@ -31,18 +31,18 @@ namespace BenchmarkDotNet.Reports
         /// <summary>
         /// Creates an instance of <see cref="Measurement"/> class.
         /// </summary>
-        /// <param name="processIndex"></param>
+        /// <param name="launchIndex"></param>
         /// <param name="iterationMode"></param>
         /// <param name="iterationIndex"></param>
         /// <param name="operations">The number of operations performed.</param>
         /// <param name="nanoseconds">The total number of nanoseconds it took to perform all operations.</param>
-        public Measurement(int processIndex, IterationMode iterationMode, int iterationIndex, long operations, double nanoseconds)
+        public Measurement(int launchIndex, IterationMode iterationMode, int iterationIndex, long operations, double nanoseconds)
         {
             IterationMode = iterationMode;
             IterationIndex = iterationIndex;
             Operations = operations;
             Nanoseconds = nanoseconds;
-            ProcessIndex = processIndex;
+            LaunchIndex = launchIndex;
         }
 
         public static Measurement FromTicks(int processIndex, IterationMode iterationMode, int iterationIndex, long operationCount, long ticks)
@@ -116,6 +116,6 @@ namespace BenchmarkDotNet.Reports
             return Enum.TryParse(name, out mode) ? mode : IterationMode.Unknown;
         }
 
-        public override string ToString() => $"#{ProcessIndex}/{IterationMode} {IterationIndex}: {Operations} op, {Nanoseconds.ToTimeStr()}";
+        public override string ToString() => $"#{LaunchIndex}/{IterationMode} {IterationIndex}: {Operations} op, {Nanoseconds.ToTimeStr()}";
     }
 }

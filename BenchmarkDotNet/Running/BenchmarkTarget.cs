@@ -11,19 +11,19 @@ namespace BenchmarkDotNet.Running
         public MethodInfo Method { get; }
         public MethodInfo SetupMethod { get; }
         public string AdditionalLogic { get; }
-        public long OperationsPerInvoke { get; }
+        public int OperationsPerInvoke { get; }
         public string MethodTitle { get; }
         public bool Baseline { get; }
 
         public string FullInfo => (Type?.Name.WithoutSuffix("Competition") ?? "Untitled") + "_" + (Method?.Name ?? "Untitled");
 
         public Target(Type type, MethodInfo method, MethodInfo setupMethod = null,
-                               string description = null, string additionalLogic = null, bool baseline = false)
+                               string description = null, string additionalLogic = null, bool baseline = false, int operationsPerInvoke = 1)
         {
             Type = type;
             Method = method;
             SetupMethod = setupMethod;
-            OperationsPerInvoke = method.ResolveAttribute<OperationsPerInvokeAttribute>()?.Count ?? 1;
+            OperationsPerInvoke = operationsPerInvoke;
             AdditionalLogic = additionalLogic ?? string.Empty;
             MethodTitle = description ?? method?.Name ?? "Untitled";
             Baseline = baseline;

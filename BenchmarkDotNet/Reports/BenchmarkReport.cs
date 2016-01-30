@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Reports
     public sealed class BenchmarkReport
     {
         public Benchmark Benchmark { get; }
-        public IList<Measurement> AllRuns { get; }
+        public IList<Measurement> AllMeasurements { get; }
 
         public GenerateResult GenerateResult { get; }
         public BuildResult BuildResult { get; }
@@ -29,15 +29,15 @@ namespace BenchmarkDotNet.Reports
             GenerateResult = generateResult;
             BuildResult = buildResult;
             ExecuteResults = executeResults;
-            AllRuns = allRuns ?? new Measurement[0];
+            AllMeasurements = allRuns ?? new Measurement[0];
         }
 
-        public override string ToString() => $"{Benchmark.ShortInfo}, {AllRuns.Count} runs";
+        public override string ToString() => $"{Benchmark.ShortInfo}, {AllMeasurements.Count} runs";
     }
 
     public static class BenchmarkReportExtensions
     {
         public static IList<Measurement> GetResultRuns(this BenchmarkReport report) =>
-            report.AllRuns.Where(r => r.IterationMode == IterationMode.Result).ToList();
+            report.AllMeasurements.Where(r => r.IterationMode == IterationMode.Result).ToList();
     }
 }

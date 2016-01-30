@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Running
 
         private static Target CreateTarget(Type type, MethodInfo setupMethod, MethodInfo methodInfo, BenchmarkAttribute attr)
         {
-            var target = new Target(type, methodInfo, setupMethod, attr.Description, baseline: attr.Baseline);
+            var target = new Target(type, methodInfo, setupMethod, attr.Description, baseline: attr.Baseline, operationsPerInvoke: attr.OperationsPerInvoke);
             AssertMethodHasCorrectSignature("Benchmark", methodInfo);
             AssertMethodIsAccessible("Benchmark", methodInfo);
             AssertMethodIsNotGeneric("Benchmark", methodInfo);
@@ -145,7 +145,7 @@ namespace BenchmarkDotNet.Running
                 from benchmark in TypeToBenchmarks(type, config)
                 let target = benchmark.Target
                 select new Benchmark(
-                    new Target(target.Type, target.Method, target.SetupMethod, target.MethodTitle, benchmarkContent, target.Baseline),
+                    new Target(target.Type, target.Method, target.SetupMethod, target.MethodTitle, benchmarkContent, target.Baseline, target.OperationsPerInvoke),
                     benchmark.Job,
                     benchmark.Parameters)).ToList();
         }

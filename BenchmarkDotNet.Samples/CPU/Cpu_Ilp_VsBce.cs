@@ -18,8 +18,7 @@ namespace BenchmarkDotNet.Samples.CPU
 
         private int[] a = new int[4];
 
-        [Benchmark]
-        [OperationsPerInvoke(4)]
+        [Benchmark(OperationsPerInvoke = 4)]
         public void Parallel()
         {
             a[0]++;
@@ -28,8 +27,7 @@ namespace BenchmarkDotNet.Samples.CPU
             a[3]++;
         }
 
-        [Benchmark]
-        [OperationsPerInvoke(4)]
+        [Benchmark(OperationsPerInvoke = 4)]
         public void Sequential()
         {
             a[0]++;

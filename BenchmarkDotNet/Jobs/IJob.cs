@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Jobs
         Jit Jit { get; }
         Framework Framework { get; }
         Runtime Runtime { get; }
-        Count ProcessCount { get; }
+        Count LaunchCount { get; }
         Count WarmupCount { get; }
         Count TargetCount { get; }
 

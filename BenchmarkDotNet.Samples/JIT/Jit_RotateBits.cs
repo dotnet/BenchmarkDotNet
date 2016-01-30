@@ -14,8 +14,7 @@ namespace BenchmarkDotNet.Samples.JIT
         private long cx = 1;
         private long dx = 23444111111;
 
-        [Benchmark]
-        [OperationsPerInvoke(4)]
+        [Benchmark(OperationsPerInvoke = 4)]
         public void ShouldOptimize()
         {
             RotateRight64(au, 16);
@@ -24,8 +23,7 @@ namespace BenchmarkDotNet.Samples.JIT
             RotateRight64(du, 48);
         }
 
-        [Benchmark]
-        [OperationsPerInvoke(4)]
+        [Benchmark(OperationsPerInvoke = 4)]
         public void ShouldNotOptimize()
         {
             RotateRight64(ax, 16);

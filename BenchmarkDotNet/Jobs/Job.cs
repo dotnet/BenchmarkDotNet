@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly IJob LegacyX86 = new Job { Platform = Platform.X86, Jit = Jit.LegacyJit };
         public static readonly IJob LegacyX64 = new Job { Platform = Platform.X64, Jit = Jit.LegacyJit };
         public static readonly IJob RyuJitX64 = new Job { Platform = Platform.X64, Jit = Jit.RyuJit };
-        public static readonly IJob Dry = new Job { Mode = Mode.SingleRun, ProcessCount = 1, WarmupCount = 1, TargetCount = 1 };
+        public static readonly IJob Dry = new Job { Mode = Mode.SingleRun, LaunchCount = 1, WarmupCount = 1, TargetCount = 1 };
         public static readonly IJob[] AllJits = { LegacyX86, LegacyX64, RyuJitX64 };
         public static readonly IJob Clr = new Job { Runtime = Runtime.Clr };
         public static readonly IJob Mono = new Job { Runtime = Runtime.Mono };
@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Jobs
         public Framework Framework { get; set; } = Framework.Host;
         public Runtime Runtime { get; set; } = Runtime.Host;
 
-        public Count ProcessCount { get; set; } = Count.Auto;
+        public Count LaunchCount { get; set; } = Count.Auto;
         public Count WarmupCount { get; set; } = Count.Auto;
         public Count TargetCount { get; set; } = Count.Auto;
         public Count IterationTime { get; set; } = Count.Auto;
