@@ -57,12 +57,14 @@
     <Compile Include="Configs\ConfigParser.cs" />
     <Compile Include="Configs\ConfigUnionRule.cs" />
     <Compile Include="Configs\IConfig.cs" />
+    <Compile Include="Exporters\HtmlExporter.cs" />
     <Compile Include="Jobs\IJob.cs" />
     <Compile Include="Jobs\JobExtensions.cs" />
     <Compile Include="Parameters\ParameterDefinition.cs" />
     <Compile Include="Parameters\ParameterDefinitions.cs" />
     <Compile Include="Parameters\ParameterInstance.cs" />
     <Compile Include="Reports\MeasurementExtensions.cs" />
+    <Compile Include="Reports\SummaryTableExtensions.cs" />
     <Compile Include="Running\BenchmarkConverter.cs" />
     <Compile Include="Running\IterationMode.cs" />
     <Compile Include="Running\State.cs" />

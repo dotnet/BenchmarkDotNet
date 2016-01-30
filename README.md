@@ -309,6 +309,8 @@ There are some preformatted md files that you can use to share benchmark results
 <BenchmarkName>-report.csv
 <BenchmarkName>-runs.csv
 
+<BenchmarkName>-report.html
+
 <BenchmarkName>-report-default.md
 <BenchmarkName>-report-github.md
 <BenchmarkName>-report-stackoverflow.md
