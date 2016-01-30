@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
 {
     internal class BenchmarkClassicExecutor : IBenchmarkExecutor
     {
-        private readonly Benchmark benchmark;
+        protected readonly Benchmark benchmark;
         private readonly IBenchmarkLogger logger;
 
         // This needs to be static, so that we can share a single handler amongst all instances of BenchmarkClassicExecutor's

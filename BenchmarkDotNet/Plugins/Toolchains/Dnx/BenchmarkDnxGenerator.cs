@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Dnx
         {
             var template = ResourceHelper.LoadTemplate("BenchmarkProject.json");
 
-            var content = SetPlatform(template, BenchmarkPlatform.HostPlatform); // todo: research, should be benchmark.Task.Configuration.Platform but I am not sure if this is possible with DNX
+            var content = SetPlatform(template, benchmark.Task.Configuration.Platform);
             content = SetDependencyToExecutingAssembly(content, benchmark.Target.Type);
             content = SetDependencyToMyself(content);
     
@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Dnx
 
         private static string SetPlatform(string template, BenchmarkPlatform platform)
         {
-            return template.Replace("$PLATFORM", platform.ToConfig()); // todo: verify name
+            return template.Replace("$PLATFORM", platform.ToConfig());
         }
 
         private static string SetDependencyToExecutingAssembly(string template, Type benchmarkTarget)
