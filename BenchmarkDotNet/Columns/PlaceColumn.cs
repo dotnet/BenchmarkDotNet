@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 

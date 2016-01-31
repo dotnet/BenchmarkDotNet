@@ -27,7 +27,8 @@ for (file in files) {
   measurements <- read.csv(file, sep = ";")
   
   result <- measurements %>% filter(MeasurementIterationMode == "Result")
-  result[is.na(result$Job),]$Job <- ""
+  if (nrow(result[is.na(result$Job),]) > 0)
+    result[is.na(result$Job),]$Job <- ""
   
   timeUnit <- "ns"
   if (min(result$MeasurementValue) > 1000) {

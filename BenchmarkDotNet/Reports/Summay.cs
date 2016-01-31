@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Reports

@@ -45,13 +45,6 @@ namespace BenchmarkDotNet.Reports
             LaunchIndex = launchIndex;
         }
 
-        public static Measurement FromTicks(int processIndex, IterationMode iterationMode, int iterationIndex, long operationCount, long ticks)
-        {
-            ticks = Math.Max(ticks, 1);
-            var nanoseconds = ticks / (double)Stopwatch.Frequency * 1000000000;
-            return new Measurement(processIndex, iterationMode, iterationIndex, operationCount, nanoseconds);
-        }
-
         public string ToOutputLine() => $"{IterationMode} {IterationIndex}: {GetDisplayValue()}";
         private string GetDisplayValue() => $"{Operations} op, {Nanoseconds.ToStr()} ns, {GetAverageTime()}";
         private string GetAverageTime() => $"{(Nanoseconds / Operations).ToTimeStr()}/op";

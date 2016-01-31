@@ -59,8 +59,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AnalysersTests.cs" />
-    <Compile Include="MathSummaryTests.cs" />
+    <Compile Include="StatisticsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TimeUnitTests.cs" />
   </ItemGroup>

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
@@ -7,17 +6,14 @@ using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples.Framework
 {
-    // This shows that not only is Stopwatch more accurate (granularity) but it's cheaper/quicker to call each time (latency)
-    // Inspired by http://shipilev.net/blog/2014/nanotrusting-nanotime/#_latency and http://shipilev.net/blog/2014/nanotrusting-nanotime/#_granularity
     [Config(typeof(Config))]
-    public class Framework_StopwatchVsDateTime
+    public class Framework_DateTime
     {
         private class Config : ManualConfig
         {
             public Config()
             {
                 Add(Job.Clr, Job.Mono);
-                Add(StatisticColumn.Min);
                 Add(new TagColumn("Tool", name => name.Replace(GetMetric(name), "")));
                 Add(new TagColumn("Metric", GetMetric));
             }
@@ -28,34 +24,33 @@ namespace BenchmarkDotNet.Samples.Framework
             }
         }
 
-
         [Benchmark]
-        public long StopwatchLatency()
+        public long UtcNowLatency()
         {
-            return Stopwatch.GetTimestamp();
+            return DateTime.UtcNow.Ticks;
         }
 
         [Benchmark]
-        public long DateTimeLatency()
+        public long NowLatency()
         {
             return DateTime.Now.Ticks;
         }
 
         [Benchmark]
-        public long StopwatchGranularity()
-        {
-            long lastTimestamp = Stopwatch.GetTimestamp();
-            while (Stopwatch.GetTimestamp() == lastTimestamp)
-            {
-            }
-            return lastTimestamp;
-        }
-
-        [Benchmark]
-        public long DateTimeGranularity()
+        public long UtcNowGranularity()
         {
             long lastTicks = DateTime.UtcNow.Ticks;
             while (DateTime.UtcNow.Ticks == lastTicks)
+            {
+            }
+            return lastTicks;
+        }
+
+        [Benchmark]
+        public long NowGranularity()
+        {
+            long lastTicks = DateTime.Now.Ticks;
+            while (DateTime.Now.Ticks == lastTicks)
             {
             }
             return lastTicks;

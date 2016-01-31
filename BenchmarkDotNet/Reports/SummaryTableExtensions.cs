@@ -21,6 +21,8 @@ namespace BenchmarkDotNet.Reports
                         paramsOnLine = 0;
                     }
                 }
+                if (paramsOnLine != 0)
+                    logger.NewLine();
             }
         }
 

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Management;
 using System.Reflection;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 
@@ -34,14 +35,9 @@ namespace BenchmarkDotNet.Helpers
         /// <summary>
         /// The frequency of the timer as the number of ticks per second.
         /// </summary>
-        public long StopwatchFrequency { get; set; }
+        public long ChronometerFrequency { get; set; }
 
-        public double GetStopwatchResolution() => 1000000000.0 / StopwatchFrequency;
-
-        /// <summary>
-        /// Indicates whether the timer is based on a high-resolution performance counter. 
-        /// </summary>
-        public bool IsStopwatchHighResolution { get; set; }
+        public double GetChronometerResolution() => Chronometer.BestClock.GetResolution(TimeUnit.Nanoseconds);
 
         public static EnvironmentHelper GetCurrentInfo() => new EnvironmentHelper
         {
@@ -55,8 +51,7 @@ namespace BenchmarkDotNet.Helpers
             HasAttachedDebugger = GetHasAttachedDebugger(),
             HasRyuJit = GetHasRyuJit(),
             Configuration = GetConfiguration(),
-            StopwatchFrequency = GetStopwatchFrequency(),
-            IsStopwatchHighResolution = GetIsStopwatchHighResolution()
+            ChronometerFrequency = GetChronometerFrequency()
         };
 
         public string ToFormattedString(string clrHint = "")
@@ -64,7 +59,7 @@ namespace BenchmarkDotNet.Helpers
             var line1 = $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}";
             var line2 = $"OS={OsVersion}";
             var line3 = $"Processor={ProcessorName}, ProcessorCount={ProcessorCount}";
-            var line4 = $"Freq={StopwatchFrequency} ticks, Resolution={GetStopwatchResolution().ToTimeStr()} [{(IsStopwatchHighResolution ? "HighResolution" : "LowResolution")}]";
+            var line4 = $"Frequency={ChronometerFrequency} ticks, Resolution={GetChronometerResolution().ToTimeStr()}";
             var line5 = $"{clrHint}CLR={ClrVersion}, Arch={Architecture} {Configuration}{GetDebuggerFlag()}{GetJitFlag()}";
             return string.Join(Environment.NewLine, line1, line2, line3, line4, line5);
         }
@@ -137,13 +132,11 @@ namespace BenchmarkDotNet.Helpers
             return configuration;
         }
 
-        private static long GetStopwatchFrequency() => Stopwatch.Frequency;
-        private static bool GetIsStopwatchHighResolution() => Stopwatch.IsHighResolution;
+        private static long GetChronometerFrequency() => Chronometer.Frequency;
 
         public static bool IsMono() => Type.GetType("Mono.Runtime") != null;
 
-        private static bool IsWindows() =>
-            new[] { PlatformID.Win32NT, PlatformID.Win32S, PlatformID.Win32Windows, PlatformID.WinCE }.Contains(Environment.OSVersion.Platform);
+        public static bool IsWindows() => Environment.OSVersion.Platform.IsOneOf(PlatformID.Win32NT, PlatformID.Win32S, PlatformID.Win32Windows, PlatformID.WinCE);
 
         // See http://aakinshin.net/en/blog/dotnet/jit-version-determining-in-runtime/
         private class JitHelper

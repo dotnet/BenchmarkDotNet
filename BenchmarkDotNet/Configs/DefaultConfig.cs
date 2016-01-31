@@ -36,8 +36,8 @@ namespace BenchmarkDotNet.Configs
             yield return PropertyColumn.TargetCount;
             yield return PropertyColumn.Affinity;
 
-            yield return StatisticColumn.Mean;
-            yield return StatisticColumn.StdError;
+            yield return StatisticColumn.Median;
+            yield return StatisticColumn.StdDev;
 
             yield return BaselineDeltaColumn.Default;
         }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 

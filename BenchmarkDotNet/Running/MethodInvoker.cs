@@ -4,7 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Running
@@ -16,6 +18,7 @@ namespace BenchmarkDotNet.Running
         private const int WarmupAutoMinIterationCount = 5;
         private const int TargetAutoMinIterationCount = 10;
         private const double TargetIdleAutoMaxAcceptableError = 0.05;
+        private const double TargetIdleAutoMaxIterationCount = 30;
         private const double TargetMainAutoMaxAcceptableError = 0.01;
 
         private struct MultiInvokeInput
@@ -92,13 +95,13 @@ namespace BenchmarkDotNet.Running
             long invokeCount = MinInvokeCount;
             if (iterationTime.IsAuto)
             {
-                var stopwatchResolution = EnvironmentHelper.GetCurrentInfo().GetStopwatchResolution();
+                var resolution = Chronometer.GetResolution();
                 int iterationCounter = 0;
                 while (true)
                 {
                     iterationCounter++;
                     var measurement = multiInvoke(new MultiInvokeInput(IterationMode.Pilot, iterationCounter, invokeCount));
-                    if (stopwatchResolution / invokeCount <
+                    if (resolution / invokeCount <
                         measurement.GetAverageNanoseconds() * TargetMainAutoMaxAcceptableError &&
                         measurement.Nanoseconds > TimeUnit.Convert(MinIterationTimeMs, TimeUnit.Millisecond, TimeUnit.Nanoseconds))
                         break;
@@ -158,9 +161,8 @@ namespace BenchmarkDotNet.Running
             if (iterationCount.IsAuto)
             {
                 int iterationCounter = 0;
-                var maxAcceptableError = iterationMode.IsOneOf(IterationMode.IdleWarmup, IterationMode.IdleTarget)
-                    ? TargetIdleAutoMaxAcceptableError
-                    : TargetMainAutoMaxAcceptableError;
+                bool isIdle = iterationMode.IsOneOf(IterationMode.IdleWarmup, IterationMode.IdleTarget);
+                var maxAcceptableError = isIdle ? TargetIdleAutoMaxAcceptableError : TargetMainAutoMaxAcceptableError;
                 while (true)
                 {
                     iterationCounter++;
@@ -169,6 +171,8 @@ namespace BenchmarkDotNet.Running
                     var statistics = new Statistics(measurements.Select(m => m.Nanoseconds));
                     if (iterationCounter >= TargetAutoMinIterationCount &&
                         statistics.StandardError < maxAcceptableError * statistics.Mean)
+                        break;
+                    if (isIdle && iterationCounter >= TargetIdleAutoMaxIterationCount)
                         break;
                 }
             }
@@ -183,7 +187,7 @@ namespace BenchmarkDotNet.Running
 
         private static void PrintResult(IList<Measurement> idle, IList<Measurement> main)
         {
-            var overhead = idle == null ? 0.0 : new Statistics(idle.Select(m => m.Nanoseconds)).Median;            
+            var overhead = idle == null ? 0.0 : new Statistics(idle.Select(m => m.Nanoseconds)).Median;
             int resultIndex = 0;
             foreach (var measurement in main)
             {
@@ -205,36 +209,36 @@ namespace BenchmarkDotNet.Running
 
             var totalOperations = invocationCount * operationsPerInvoke;
             setupAction();
-            var stopwatch = new Stopwatch();
+            ClockSpan clockSpan;
             GcCollect();
             if (invocationCount == 1)
             {
-                stopwatch.Start();
+                var chronometer = Chronometer.Start();
                 targetAction();
-                stopwatch.Stop();
+                clockSpan = chronometer.Stop();
             }
             else if (invocationCount < int.MaxValue)
             {
                 int intInvocationCount = (int)invocationCount;
-                stopwatch.Start();
+                var chronometer = Chronometer.Start();
                 for (int i = 0; i < intInvocationCount; i++)
                 {
                     State.Instance.Operation = i;
                     targetAction();
                 }
-                stopwatch.Stop();
+                clockSpan = chronometer.Stop();
             }
             else
             {
-                stopwatch.Start();
+                var chronometer = Chronometer.Start();
                 for (long i = 0; i < invocationCount; i++)
                 {
                     State.Instance.Operation = i;
                     targetAction();
                 }
-                stopwatch.Stop();
+                clockSpan = chronometer.Stop();
             }
-            var measurement = Measurement.FromTicks(0, mode, index, totalOperations, stopwatch.ElapsedTicks);
+            var measurement = new Measurement(0, mode, index, totalOperations, clockSpan.GetNanoseconds());
             Console.WriteLine(measurement.ToOutputLine());
             GcCollect();
             return measurement;
@@ -249,37 +253,37 @@ namespace BenchmarkDotNet.Running
 
             var totalOperations = invocationCount * operationsPerInvoke;
             setupAction();
-            var stopwatch = new Stopwatch();
+            ClockSpan clockSpan;
             GcCollect();
             if (invocationCount == 1)
             {
-                stopwatch.Start();
+                var chronometer = Chronometer.Start();
                 returnHolder = targetAction();
-                stopwatch.Stop();
+                clockSpan = chronometer.Stop();
             }
             else if (invocationCount < int.MaxValue)
             {
                 int intInvocationCount = (int)invocationCount;
-                stopwatch.Start();
+                var chronometer = Chronometer.Start();
                 for (int i = 0; i < intInvocationCount; i++)
                 {
                     State.Instance.Operation = i;
                     returnHolder = targetAction();
                 }
-                stopwatch.Stop();
+                clockSpan = chronometer.Stop();
             }
             else
             {
-                stopwatch.Start();
+                var chronometer = Chronometer.Start();
                 for (long i = 0; i < invocationCount; i++)
                 {
                     State.Instance.Operation = i;
                     returnHolder = targetAction();
                 }
-                stopwatch.Stop();
+                clockSpan = chronometer.Stop();
             }
             multiInvokeReturnHolder = returnHolder;
-            var measurement = Measurement.FromTicks(0, mode, index, totalOperations, stopwatch.ElapsedTicks);
+            var measurement = new Measurement(0, mode, index, totalOperations, clockSpan.GetNanoseconds());
             Console.WriteLine(measurement.ToOutputLine());
             GcCollect();
             return measurement;

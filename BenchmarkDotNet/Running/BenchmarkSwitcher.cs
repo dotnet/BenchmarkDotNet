@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
@@ -43,6 +45,7 @@ namespace BenchmarkDotNet.Running
 
         private IEnumerable<Summary> RunBenchmarks(string[] args)
         {
+            var globalChronometer = Chronometer.Start();
             var summaries = new List<Summary>();
             var config = ManualConfig.Parse(args);
             for (int i = 0; i < Types.Length; i++)
@@ -63,6 +66,8 @@ namespace BenchmarkDotNet.Running
                 var name = uri.IsFile ? Path.GetFileName(uri.LocalPath) : "URL";
                 summaries.Add(BenchmarkRunner.RunUrl(url, config));
             }
+            var clockSpan = globalChronometer.Stop();
+            BenchmarkRunner.LogTotalTime(logger, clockSpan.GetTimeSpan(), "Global total time");
             return summaries;
         }
 

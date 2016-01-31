@@ -1,4 +1,6 @@
 ﻿using System.Text;
+using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Extensions

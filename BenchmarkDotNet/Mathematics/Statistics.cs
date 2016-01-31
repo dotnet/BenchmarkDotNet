@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BenchmarkDotNet.Reports
+namespace BenchmarkDotNet.Mathematics
 {
     public class Statistics
     {

@@ -49,7 +49,8 @@
     <Compile Include="Algorithms\Algo_Md5VsSha256.cs" />
     <Compile Include="Algorithms\Algo_MostSignificantBit.cs" />
     <Compile Include="Framework\Framework_DictionaryVsIDictionary.cs" />
-    <Compile Include="Framework\Framework_StopwatchVsDateTime.cs" />
+    <Compile Include="Framework\Framework_Stopwatch.cs" />
+    <Compile Include="Framework\Framework_DateTime.cs" />
     <Compile Include="Framework\Framework_StringConcatVsStringBuilder.cs" />
     <Compile Include="Intro\IntroBaseline.cs" />
     <Compile Include="Intro\IntroColumns.cs" />
@@ -80,6 +81,7 @@
     <Compile Include="Other\Math_DoubleSqrtAvx.cs" />
     <Compile Include="Other\Math_DoubleSqrt.cs" />
     <Compile Include="CPU\Cpu_Atomics.cs" />
+    <Compile Include="Other\Os_Sleep.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="JIT\Jit_ArraySumLoopUnrolling.cs" />

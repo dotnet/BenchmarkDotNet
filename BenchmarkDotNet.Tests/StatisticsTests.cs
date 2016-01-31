@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Linq;
-using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Mathematics;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests
 {
-    public class MathSummaryTests
+    public class StatisticsTests
     {
         private readonly ITestOutputHelper output;
 
-        public MathSummaryTests(ITestOutputHelper output)
+        public StatisticsTests(ITestOutputHelper output)
         {
             this.output = output;
         }

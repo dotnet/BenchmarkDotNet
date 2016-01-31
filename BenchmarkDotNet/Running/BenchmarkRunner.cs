@@ -7,7 +7,9 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Results;
@@ -64,7 +66,7 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineInfo($"//   {benchmark.ShortInfo}");
             logger.NewLine();
 
-            var globalStopwatch = Stopwatch.StartNew();
+            var globalChronometer = Chronometer.Start();
             var reports = new List<BenchmarkReport>();
             foreach (var benchmark in benchmarks)
             {
@@ -75,9 +77,9 @@ namespace BenchmarkDotNet.Running
 
                 logger.NewLine();
             }
-            globalStopwatch.Stop();
+            var clockSpan = globalChronometer.Stop();
 
-            var summary = new Summary(title, reports, EnvironmentHelper.GetCurrentInfo(), config, currentDirectory, globalStopwatch.Elapsed);
+            var summary = new Summary(title, reports, EnvironmentHelper.GetCurrentInfo(), config, currentDirectory, clockSpan.GetTimeSpan());
 
             logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
             logger.NewLine();
@@ -101,7 +103,7 @@ namespace BenchmarkDotNet.Running
                 logger.NewLine();
             }
 
-            LogTotalTime(logger, globalStopwatch.Elapsed);
+            LogTotalTime(logger, clockSpan.GetTimeSpan());
             logger.NewLine();
 
             if (config.GetDiagnosers().Count() > 0)
@@ -128,11 +130,11 @@ namespace BenchmarkDotNet.Running
             return summary;
         }
 
-        private static void LogTotalTime(ILogger logger, TimeSpan time)
+        internal static void LogTotalTime(ILogger logger, TimeSpan time, string message = "Total time")
         {
             var hhMmSs = $"{time.TotalHours:00}:{time:mm\\:ss}";
             var totalSecs = $"{time.TotalSeconds.ToStr()} sec";
-            logger.WriteLineStatistic($"Total time: {hhMmSs} ({totalSecs})");
+            logger.WriteLineStatistic($"{message}: {hhMmSs} ({totalSecs})");
         }
 
         private static BenchmarkReport Run(Benchmark benchmark, ILogger logger, IConfig config)
@@ -208,8 +210,8 @@ namespace BenchmarkDotNet.Running
 
             for (int processNumber = 0; processNumber < launchCount; processNumber++)
             {
-                var printedProcessNumber = (benchmark.Job.LaunchCount.IsAuto && processNumber < 2) ? "?" : launchCount.ToString();
-                logger.WriteLineInfo($"// Run, Process: {processNumber + 1} / {printedProcessNumber}");
+                var printedProcessNumber = (benchmark.Job.LaunchCount.IsAuto && processNumber < 2) ? "" : " / " + launchCount.ToString();
+                logger.WriteLineInfo($"// Launch: {processNumber + 1}{printedProcessNumber}");
 
                 var executeResult = toolchain.Executor.Execute(buildResult, benchmark, logger);
 
@@ -226,8 +228,8 @@ namespace BenchmarkDotNet.Running
                         ToArray();
                     var idleApprox = new Statistics(measurements.Where(m => m.IterationMode == IterationMode.IdleTarget).Select(m => m.Nanoseconds)).Median;
                     var mainApprox = new Statistics(measurements.Where(m => m.IterationMode == IterationMode.MainTarget).Select(m => m.Nanoseconds)).Median;
-                    var percent = idleApprox/mainApprox*100;
-                    launchCount = (int) Math.Round(Math.Max(2, 2 + (percent - 1)/3)); // an empirical formula
+                    var percent = idleApprox / mainApprox * 100;
+                    launchCount = (int)Math.Round(Math.Max(2, 2 + (percent - 1) / 3)); // an empirical formula
                 }
             }
             logger.NewLine();

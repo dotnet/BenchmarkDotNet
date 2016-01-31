@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace BenchmarkDotNet.Reports
+namespace BenchmarkDotNet.Horology
 {
     public class TimeUnit
     {
@@ -29,19 +29,6 @@ namespace BenchmarkDotNet.Reports
         /// </summary>
         /// <param name="values">The list of time measurements in nanoseconds.</param>
         /// <returns>Best time unit.</returns>
-        /// <remarks>
-        /// The measurements are formatted in such a way that they use the same time unit
-        /// the number of decimals so that they are easily comparable and align nicely.
-        ///
-        /// Example:
-        /// Consider we have the following raw input where numbers are durations in nanoseconds:
-        ///     Median=597855, StdErr=485;
-        ///     Median=7643, StdErr=87;
-        ///
-        /// When using the formatting function, the output will be like this:
-        ///     597.8550 us, 0.0485 us;
-        ///       7.6430 us, 0.0087 us;
-        /// </remarks>
         public static TimeUnit GetBestTimeUnit(params double[] values)
         {
             if (values.Length == 0)
