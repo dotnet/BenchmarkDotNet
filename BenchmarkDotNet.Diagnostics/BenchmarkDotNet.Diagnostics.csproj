@@ -50,6 +50,9 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ETWDiagnoser.cs" />
+    <Compile Include="GCDiagnoser.cs" />
+    <Compile Include="LogCapture.cs" />
     <Compile Include="RuntimeDiagnoser.cs" />
     <Compile Include="DiagnoserBase.cs" />
     <Compile Include="SourceDiagnoser.cs" />

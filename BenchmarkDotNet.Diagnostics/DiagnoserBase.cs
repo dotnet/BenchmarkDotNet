@@ -13,31 +13,6 @@ using Microsoft.Diagnostics.Runtime.Interop;
 
 namespace BenchmarkDotNet.Diagnostics
 {
-    public class OutputLine
-    {
-        public LogKind Kind { get; set; }
-        public string Text { get; set; }
-    }
-
-    public class LogCapture : ILogger
-    {
-        public IList<OutputLine> CapturedOutput = new List<OutputLine>();
-
-        public void Write(LogKind logKind, string format, params object[] args)
-        {
-            CapturedOutput.Add(new OutputLine
-            {
-                Kind = logKind,
-                Text = args.Length == 0 ? format : string.Format(CultureInfo.InvariantCulture, format, args)
-            });
-        }
-
-        public void Clear()
-        {
-            CapturedOutput.Clear();
-        }
-    }
-
     public class DiagnoserBase
     {
         private Process process { get; set; }
@@ -52,7 +27,7 @@ namespace BenchmarkDotNet.Diagnostics
         /// Code from http://stackoverflow.com/questions/2057781/is-there-a-way-to-get-the-stacktraces-for-all-threads-in-c-like-java-lang-thre/24315960#24315960
         /// also see http://stackoverflow.com/questions/31633541/clrmd-throws-exception-when-creating-runtime/31745689#31745689
         /// </summary>
-        public IList<OutputLine> PrintCodeForMethod(Benchmark benchmark, Process process, bool printAssembly, bool printIL, bool printDiagnostics)
+        internal IList<OutputLine> PrintCodeForMethod(Benchmark benchmark, Process process, bool printAssembly, bool printIL, bool printDiagnostics)
         {
             this.process = process;
             logger.Clear();

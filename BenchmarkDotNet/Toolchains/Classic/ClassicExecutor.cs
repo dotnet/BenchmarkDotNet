@@ -79,8 +79,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
                     continue;
 
                 // This is important so the Diagnoser can know the [Benchmark] methods will have run and (e.g.) it can do a Memory Dump
-                if (diagnosticsAlreadyRun == false && 
-                    line.StartsWith(IterationMode.MainWarmup.ToString()))
+                if (diagnosticsAlreadyRun == false && line.StartsWith(IterationMode.MainWarmup.ToString()))
                 {
                     try
                     {

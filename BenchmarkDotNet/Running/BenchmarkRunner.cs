@@ -238,7 +238,9 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineInfo($"// Run, Diagnostic");
                 config.GetCompositeDiagnoser().Start(benchmark);
                 var executeResult = toolchain.Executor.Execute(buildResult, benchmark, logger, config.GetCompositeDiagnoser());
-                config.GetCompositeDiagnoser().Stop(executeResult);
+                var allRuns = executeResult.Data.Select(line => Measurement.Parse(logger, line, 0)).Where(r => r != null).ToList();
+                var report = new BenchmarkReport(benchmark, null, null, new[] { executeResult }, allRuns);
+                config.GetCompositeDiagnoser().Stop(benchmark, report);
 
                 if (!executeResult.FoundExecutable)
                     logger.WriteLineError("Executable not found");
@@ -248,10 +250,6 @@ namespace BenchmarkDotNet.Running
             return executeResults;
         }
 
-        /// <summary>
-        /// This method is ONLY for wiring up extensions that can be detected/inferred from the list of Benchmarks.
-        /// Any extensions that are wired-up via command-line parameters are handled elsewhere
-        /// </summary>
         private static void EnsureNoMoreThanOneBaseline(IList<Benchmark> benchmarks, string benchmarkName)
         {
             var baselineCount = benchmarks.Select(b => b.Target).Distinct().Count(target => target.Baseline);

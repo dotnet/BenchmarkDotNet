@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.Results;
+using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Diagnosers
     {
         void Start(Benchmark benchmark);
 
-        void Stop(ExecuteResult result);
+        void Stop(Benchmark benchmark, BenchmarkReport report);
 
         void ProcessStarted(Process process);
 
