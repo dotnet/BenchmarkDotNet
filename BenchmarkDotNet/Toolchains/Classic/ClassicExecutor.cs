@@ -15,12 +15,12 @@ namespace BenchmarkDotNet.Toolchains.Classic
 {
     internal class ClassicExecutor : IExecutor
     {
-        private bool codeAlreadyExtracted = false;
+        private bool diagnosticsAlreadyRun = false;
 
         // This needs to be static, so that we can share a single handler amongst all instances of BenchmarkClassicExecutor's
         private static ConsoleHandler consoleHandler;
 
-        public ExecuteResult Execute(BuildResult buildResult, IDiagnoser diagnoser, Benchmark benchmark, ILogger logger)
+        public ExecuteResult Execute(BuildResult buildResult, Benchmark benchmark, ILogger logger, IDiagnoser compositeDiagnoser = null)
         {
             if (consoleHandler == null)
             {
@@ -40,8 +40,16 @@ namespace BenchmarkDotNet.Toolchains.Classic
                     {
                         if (process != null)
                         {
+                            if (compositeDiagnoser != null)
+                                compositeDiagnoser.ProcessStarted(process);
+
                             consoleHandler.SetProcess(process);
-                            return ExecuteImpl(process, diagnoser, exeName, benchmark, logger);
+                            var result = ExecuteImpl(process, exeName, benchmark, logger, compositeDiagnoser);
+
+                            if (compositeDiagnoser != null)
+                                compositeDiagnoser.ProcessStopped(process);
+
+                            return result;
                         }
                     }
                 }
@@ -53,12 +61,11 @@ namespace BenchmarkDotNet.Toolchains.Classic
             return new ExecuteResult(false, new string[0]);
         }
 
-        private ExecuteResult ExecuteImpl(Process process, IDiagnoser diagnoser, string exeName, Benchmark benchmark, ILogger logger)
+        private ExecuteResult ExecuteImpl(Process process, string exeName, Benchmark benchmark, ILogger logger, IDiagnoser compositeDiagnoser = null)
         {
             process.PriorityClass = ProcessPriorityClass.High;
             if (!benchmark.Job.Affinity.IsAuto)
                 process.ProcessorAffinity = new IntPtr(benchmark.Job.Affinity.Value);
-
 
             var lines = new List<string>();
             string line;
@@ -68,17 +75,21 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 if (!line.StartsWith("//") && !string.IsNullOrEmpty(line))
                     lines.Add(line);
 
-                // Wait until we know "Warmup" is happening, and then dissassemble the process
-                if (codeAlreadyExtracted == false && line.StartsWith("Warmup ") && !line.StartsWith("WarmupIdle "))
+                if (compositeDiagnoser == null)
+                    continue;
+
+                // This is important so the Diagnoser can know the [Benchmark] methods will have run and (e.g.) it can do a Memory Dump
+                if (diagnosticsAlreadyRun == false && 
+                    line.StartsWith(IterationMode.MainWarmup.ToString()))
                 {
                     try
                     {
-                        diagnoser.Print(benchmark, process, logger);
+                        compositeDiagnoser.AfterBenchmarkHasRun(benchmark, process);
                     }
                     finally
                     {
                         // Always set this, even if something went wrong, otherwise we will try on every run of a benchmark batch
-                        codeAlreadyExtracted = true;
+                        diagnosticsAlreadyRun = true;
                     }
                 }
             }

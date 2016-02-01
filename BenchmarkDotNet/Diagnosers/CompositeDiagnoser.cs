@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.Results;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -13,10 +14,46 @@ namespace BenchmarkDotNet.Diagnosers
             this.diagnosers = diagnosers;
         }
 
-        public void Print(Benchmark benchmark, Process process, ILogger logger)
+        public void Start(Benchmark benchmark)
         {
-            foreach (var diagnoster in diagnosers)
-                diagnoster.Print(benchmark, process, logger);
+            foreach (var diagnoser in diagnosers)
+                diagnoser.Start(benchmark);
+        }
+
+        public void Stop(ExecuteResult result)
+        {
+            foreach (var diagnoser in diagnosers)
+                diagnoser.Stop(result);
+        }
+
+        public void ProcessStarted(Process process)
+        {
+            foreach (var diagnoser in diagnosers)
+                diagnoser.ProcessStarted(process);
+        }
+
+        public void AfterBenchmarkHasRun(Benchmark benchmark, Process process)
+        {
+            foreach (var diagnoser in diagnosers)
+                diagnoser.AfterBenchmarkHasRun(benchmark, process);
+        }
+
+        public void ProcessStopped(Process process)
+        {
+            foreach (var diagnoser in diagnosers)
+                diagnoser.ProcessStopped(process);
+        }
+
+        public void DisplayResults(ILogger logger)
+        {
+            foreach (var diagnoser in diagnosers)
+            {
+                // TODO when Diagnosers/Diagnostis are wired up properly, instead of the Type name, 
+                // print the name used on the cmd line, i.e. -d=<NAME>
+                logger.WriteLineHeader($"// * Diagnostic Output - {diagnoser.GetType().Name} *");
+                diagnoser.DisplayResults(logger);
+                logger.NewLine();
+            }
         }
     }
 }

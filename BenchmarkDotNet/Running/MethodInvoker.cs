@@ -85,10 +85,7 @@ namespace BenchmarkDotNet.Running
             var main = RunTarget(multiInvoke, invokeCount, IterationMode.MainTarget, job.TargetCount);
 
             PrintResult(idle, main);
-
-            RunDiagnostic(multiInvoke, invokeCount);
         }
-
 
         private static long RunPilot(Func<MultiInvokeInput, Measurement> multiInvoke, Count iterationTime)
         {
@@ -198,12 +195,6 @@ namespace BenchmarkDotNet.Running
                     Math.Max(0, measurement.Nanoseconds - overhead));
                 Console.WriteLine(resultMeasurement.ToOutputLine());
             }
-            Console.WriteLine();
-        }
-
-        private static void RunDiagnostic(Func<MultiInvokeInput, Measurement> multiInvoke, long invokeCount)
-        {
-            multiInvoke(new MultiInvokeInput(IterationMode.Diagnostic, 1, invokeCount));
             Console.WriteLine();
         }
 

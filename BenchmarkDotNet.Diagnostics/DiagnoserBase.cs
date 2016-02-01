@@ -13,7 +13,31 @@ using Microsoft.Diagnostics.Runtime.Interop;
 
 namespace BenchmarkDotNet.Diagnostics
 {
-    // TODO: Refactoring
+    public class OutputLine
+    {
+        public LogKind Kind { get; set; }
+        public string Text { get; set; }
+    }
+
+    public class LogCapture : ILogger
+    {
+        public IList<OutputLine> CapturedOutput = new List<OutputLine>();
+
+        public void Write(LogKind logKind, string format, params object[] args)
+        {
+            CapturedOutput.Add(new OutputLine
+            {
+                Kind = logKind,
+                Text = args.Length == 0 ? format : string.Format(CultureInfo.InvariantCulture, format, args)
+            });
+        }
+
+        public void Clear()
+        {
+            CapturedOutput.Clear();
+        }
+    }
+
     public class DiagnoserBase
     {
         private Process process { get; set; }
@@ -22,16 +46,16 @@ namespace BenchmarkDotNet.Diagnostics
         private string fullTypeName { get; set; }
         private string fullMethodName { get; set; }
 
-        private ILogger logger { get; set; }
+        private LogCapture logger = new LogCapture();
 
         /// <summary>
         /// Code from http://stackoverflow.com/questions/2057781/is-there-a-way-to-get-the-stacktraces-for-all-threads-in-c-like-java-lang-thre/24315960#24315960
         /// also see http://stackoverflow.com/questions/31633541/clrmd-throws-exception-when-creating-runtime/31745689#31745689
         /// </summary>
-        public void PrintCodeForMethod(Benchmark benchmark, Process process, ILogger logger, bool printAssembly, bool printIL, bool printDiagnostics)
+        public IList<OutputLine> PrintCodeForMethod(Benchmark benchmark, Process process, bool printAssembly, bool printIL, bool printDiagnostics)
         {
             this.process = process;
-            this.logger = logger;
+            logger.Clear();
 
             //Method name format: "BenchmarkDotNet.Samples.Infra.RunFast()" (NOTE: WITHOUT the return type)
             var methodInfo = benchmark.Target.Method;
@@ -51,7 +75,7 @@ namespace BenchmarkDotNet.Diagnostics
                     PrintRuntimeDiagnosticInfo(dataTarget, runtime);
 
                 if (printAssembly == false && printIL == false)
-                    return;
+                    return logger.CapturedOutput;
 
                 ClrType @class = runtime.GetHeap().GetTypeByName(fullTypeName);
                 ClrMethod @method = @class.Methods.Single(m => m.GetFullSignature() == fullMethodName);
@@ -96,6 +120,8 @@ namespace BenchmarkDotNet.Diagnostics
                         PrintAssemblyCode(@method, ilMaps, runtime, debugControl);
                     }
                 }
+
+                return logger.CapturedOutput;
             }
         }
 

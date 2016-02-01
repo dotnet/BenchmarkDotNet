@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public bool Done { get; private set; }
 
-            public ExecuteResult Execute(BuildResult buildResult, IDiagnoser diagnoser, Benchmark benchmark, ILogger logger)
+            public ExecuteResult Execute(BuildResult buildResult, Benchmark benchmark, ILogger logger, IDiagnoser diagnoser)
             {
                 logger.WriteLine("Executing");
                 Done = true;

@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Running
             config = BenchmarkConverter.GetFullConfig(benchmarks.FirstOrDefault()?.Target.Type, config);
 
             var title = GetTitle(benchmarks);
-            EnsureNoMoreOneBaseline(benchmarks, title);
+            EnsureNoMoreThanOneBaseline(benchmarks, title);
 
             using (var logStreamWriter = new StreamWriter(title + ".log"))
             {
@@ -103,6 +103,12 @@ namespace BenchmarkDotNet.Running
 
             LogTotalTime(logger, globalStopwatch.Elapsed);
             logger.NewLine();
+
+            if (config.GetDiagnosers().Count() > 0)
+            {
+                logger.NewLine();
+                config.GetCompositeDiagnoser().DisplayResults(logger);
+            }
 
             logger.WriteLineHeader("// * Summary *");
             MarkdownExporter.Default.ExportToLog(summary, logger);
@@ -197,7 +203,6 @@ namespace BenchmarkDotNet.Running
         {
             var executeResults = new List<ExecuteResult>();
 
-
             logger.WriteLineInfo("// *** Execute ***");
             var launchCount = Math.Max(1, benchmark.Job.LaunchCount.IsAuto ? 2 : benchmark.Job.LaunchCount.Value);
 
@@ -206,7 +211,7 @@ namespace BenchmarkDotNet.Running
                 var printedProcessNumber = (benchmark.Job.LaunchCount.IsAuto && processNumber < 2) ? "?" : launchCount.ToString();
                 logger.WriteLineInfo($"// Run, Process: {processNumber + 1} / {printedProcessNumber}");
 
-                var executeResult = toolchain.Executor.Execute(buildResult, config.GetCompositeDiagnoser(), benchmark, logger);
+                var executeResult = toolchain.Executor.Execute(buildResult, benchmark, logger);
 
                 if (!executeResult.FoundExecutable)
                     logger.WriteLineError("Executable not found");
@@ -226,6 +231,20 @@ namespace BenchmarkDotNet.Running
                 }
             }
             logger.NewLine();
+
+            // Do a "Diagnostic" run, but DISCARD the results, so that the overhead of Diagnostics doesn't skew the overall results
+            if (config.GetDiagnosers().Count() > 0)
+            {
+                logger.WriteLineInfo($"// Run, Diagnostic");
+                config.GetCompositeDiagnoser().Start(benchmark);
+                var executeResult = toolchain.Executor.Execute(buildResult, benchmark, logger, config.GetCompositeDiagnoser());
+                config.GetCompositeDiagnoser().Stop(executeResult);
+
+                if (!executeResult.FoundExecutable)
+                    logger.WriteLineError("Executable not found");
+                logger.NewLine();
+            }
+
             return executeResults;
         }
 
@@ -233,7 +252,7 @@ namespace BenchmarkDotNet.Running
         /// This method is ONLY for wiring up extensions that can be detected/inferred from the list of Benchmarks.
         /// Any extensions that are wired-up via command-line parameters are handled elsewhere
         /// </summary>
-        private static void EnsureNoMoreOneBaseline(IList<Benchmark> benchmarks, string benchmarkName)
+        private static void EnsureNoMoreThanOneBaseline(IList<Benchmark> benchmarks, string benchmarkName)
         {
             var baselineCount = benchmarks.Select(b => b.Target).Distinct().Count(target => target.Baseline);
             if (baselineCount > 1)

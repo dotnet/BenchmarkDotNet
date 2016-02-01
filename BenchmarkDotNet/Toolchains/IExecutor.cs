@@ -8,6 +8,6 @@ namespace BenchmarkDotNet.Toolchains
 {
     public interface IExecutor
     {
-        ExecuteResult Execute(BuildResult buildResult, IDiagnoser diagnoser, Benchmark benchmark, ILogger logger);
+        ExecuteResult Execute(BuildResult buildResult, Benchmark benchmark, ILogger logger, IDiagnoser diagnoser = null);
     }
 }
