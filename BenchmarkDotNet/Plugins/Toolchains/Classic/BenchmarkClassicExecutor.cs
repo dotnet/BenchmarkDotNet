@@ -33,15 +33,15 @@ namespace BenchmarkDotNet.Plugins.Toolchains.Classic
 
         public virtual BenchmarkExecResult Execute(BenchmarkBuildResult buildResult, BenchmarkParameters parameters, IBenchmarkDiagnoser diagnoser)
         {
-            var exeName = Path.Combine(buildResult.DirectoryPath, "Program.exe");
+            var exePath = Path.Combine(buildResult.DirectoryPath, "Program.exe");
             var args = parameters == null ? string.Empty : parameters.ToArgs();
 
-            if (!File.Exists(exeName))
+            if (!File.Exists(exePath))
             {
                 return new BenchmarkExecResult(false, new string[0]);
             }
 
-            return Execute(exeName, args, null, diagnoser);
+            return Execute(exePath, null, args, diagnoser);
         }
 
         protected BenchmarkExecResult Execute(string exeName, string workingDirectory, string args, IBenchmarkDiagnoser diagnoser)
