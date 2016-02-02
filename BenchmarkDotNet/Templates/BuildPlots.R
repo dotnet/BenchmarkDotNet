@@ -68,12 +68,41 @@ for (file in files) {
   ggsave(gsub("-measurements.csv", "-barplot.png", file), benchmarkBarplot)
   
   for (target in unique(result$TargetMethod)) {
-    df <- (result %>% filter(TargetMethod == target))
+    df <- result %>% filter(TargetMethod == target)
+    df$Launch <- factor(df$MeasurementLaunchIndex)
     densityPlot <- ggplot(df, aes(x=MeasurementValue, fill=Job)) + 
       ggtitle(paste(title, "/", target)) +
       xlab(paste("Time,", timeUnit)) +
       geom_density(alpha=.5)
     print(densityPlot)
     ggsave(gsub("-measurements.csv", paste0("-", target, "-density.png"), file), densityPlot)
+    
+    for (job in unique(df$Job)) {
+      jobDf <- df %>% filter(Job == job)
+      timelinePlot <- ggplot(jobDf, aes(x = MeasurementIterationIndex, y=MeasurementValue, group=Launch, color=Launch)) + 
+        ggtitle(paste(title, "/", target, "/", job)) +
+        xlab("IterationIndex") +
+        ylab(paste("Time,", timeUnit)) +
+        geom_line() +
+        geom_point()
+      print(timelinePlot)
+      ggsave(gsub("-measurements.csv", paste0("-", target, "-", job, "-timeline.png"), file), timelinePlot)
+      timelinePlotSmooth <- timelinePlot + geom_smooth()
+      print(timelinePlotSmooth)
+      ggsave(gsub("-measurements.csv", paste0("-", target, "-", job, "-timelineSmooth.png"), file), timelinePlotSmooth)
+    }
+    
+    timelinePlot <- ggplot(df, aes(x = MeasurementIterationIndex, y=MeasurementValue, group=Launch, color=Launch)) + 
+      ggtitle(paste(title, "/", target)) +
+      xlab("IterationIndex") +
+      ylab(paste("Time,", timeUnit)) +
+      geom_line() +
+      geom_point() +
+      facet_wrap(~Job)
+    print(timelinePlot)
+    ggsave(gsub("-measurements.csv", paste0("-", target, "-facetTimeline.png"), file), timelinePlot)
+    timelinePlotSmooth <- timelinePlot + geom_smooth()
+    print(timelinePlotSmooth)
+    ggsave(gsub("-measurements.csv", paste0("-", target, "-facetTimelineSmooth.png"), file), timelinePlotSmooth)
   }
 }

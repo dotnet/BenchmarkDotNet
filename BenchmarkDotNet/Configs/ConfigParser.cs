@@ -88,6 +88,8 @@ namespace BenchmarkDotNet.Configs
                     return new[] { Job.Clr };
                 case "mono":
                     return new[] { Job.Mono };
+                case "longrun":
+                    return new[] { Job.LongRun };
             }
             return new IJob[0];
         }

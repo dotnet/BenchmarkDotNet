@@ -4,7 +4,7 @@
 
 Wiki: [Home](https://github.com/PerfDotNet/BenchmarkDotNet/wiki), [ChangeLog](https://github.com/PerfDotNet/BenchmarkDotNet/wiki/ChangeLog), [Developing](https://github.com/PerfDotNet/BenchmarkDotNet/wiki/Developing), [Roadmap](https://github.com/PerfDotNet/BenchmarkDotNet/wiki/Roadmap)
 
-Content:
+## Content
 
 * [Getting started](#getting-started)
 * [Configs](#configs)
@@ -15,13 +15,13 @@ Content:
 
 ## Getting started
 
-**Step 1** Install BenchmarkDotNet via the NuGet package: [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/)
+**Step 1.** Install BenchmarkDotNet via the NuGet package: [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/)
 
 ```
 PM> Install-Package BenchmarkDotNet
 ```
 
-**Step 2** Write a class with methods that you want to measure and mark them with the `Benchmark` attribute. In the following example, we will compare [MD5](https://en.wikipedia.org/wiki/MD5) and [SHA256](https://en.wikipedia.org/wiki/SHA-2) cryptographic hash functions:
+**Step 2.** Write a class with methods that you want to measure and mark them with the `Benchmark` attribute. In the following example, we compare [MD5](https://en.wikipedia.org/wiki/MD5) and [SHA256](https://en.wikipedia.org/wiki/SHA-2) cryptographic hash functions:
 
 ```cs
 public class Md5VsSha256
@@ -52,36 +52,35 @@ public class Md5VsSha256
 }
 ```
 
-**Step 3** Run it:
+**Step 3.** Run it:
 
 ```cs
 var summary = BenchmarkRunner.Run<Md5VsSha256>();
 ```
 
-**Step 4** View the results, here is an example of output from the above benchmark:
+**Step 4.** View the results. Here is an example of output from the above benchmark:
 
 ```ini
-BenchmarkDotNet-Dev=v0.8.2.0
+BenchmarkDotNet-Dev=v0.8.2.0+
 OS=Microsoft Windows NT 6.2.9200.0
 Processor=Intel(R) Core(TM) i7-4810MQ CPU @ 2.80GHz, ProcessorCount=8
-Freq=2728058 ticks, Resolution=366.5611 ns [HighResolution]
+Frequency=2728067 ticks, Resolution=366.5599 ns
 HostCLR=MS.NET 4.0.30319.42000, Arch=64-bit RELEASE [RyuJIT]
 
-Type=Algo_Md5VsSha256  Mode=Throughput  Platform=HostPlatform  
-Jit=HostJit  .NET=HostFramework  toolchain=Classic  
-Runtime=Clr  Warmup=5  Target=10  
-
+Type=Md5VsSha256  Mode=Throughput
 ```
- Method |     AvrTime |     Error
-------- |------------ |----------
-    Md5 |  21.0502 us | 0.0442 us
- Sha256 | 118.5298 us | 1.2863 us
 
-**Step 5** Analyze it. In your bin directory, you can find a lot of useful files with detailed information. For example:
+ Method |      Median |    StdDev
+------- |------------ |----------
+    Md5 |  21.2912 us | 0.4373 us
+ Sha256 | 107.4124 us | 1.8339 us
+
+
+**Step 5.** Analyze it. In your bin directory, you can find a lot of useful files with detailed information. For example:
   * Csv reports with raw data: `Md5VsSha256-report.csv`, `Md5VsSha256-runs.csv`
   * Markdown reports:  `Md5VsSha256-report-default.md`, `Md5VsSha256-report-stackoverflow.md`, `Md5VsSha256-report-github.md`
   * Plain report and log: `Md5VsSha256-report.txt`, `Md5VsSha256.log`
-  * Plots (if you have installed R): `Md5VsSha256-barplot.png`, `Md5VsSha256-boxplot.png`
+  * Plots (if you have installed R): `Md5VsSha256-barplot.png`, `Md5VsSha256-boxplot.png`, and so on.
 
 ## Configs
 
@@ -147,18 +146,19 @@ A *job* is an environment for your benchmarks. You can set one or several jobs f
 
 Job characteristics:
 
-* **Toolchain** A toolchain for generating/building/executing your benchmark. Values: `Classic` (csproj based) *(default)*. Coming soon: `Dnx`.
-* **Mode** Values: `Throughput` *(default)*, `SingleRun`
-* **Platform** Values: `Host` *(default)*, `AnyCpu`, `X86`, X64`
-* **Jit** Values: `Host` *(default)*, `LegacyJit`, `RyuJit`
-* **Framework** Values: `Host` *(default)*, `V40`, `V45`, `V451`, `V452`, `V46`
-* **Runtime** Values: `Host` *(default)*, `Clr`, `Mono`. Coming soon: `CoreClr`.
-* **ProcessCount** Values: `Auto` *(default)* or specific number.
-* **WarmupCount** Values: `Auto` *(default)* or specific number.
-* **TargetCount** Values: `Auto` *(default)* or specific number.
-* **Affinity** [ProcessorAffinity](https://msdn.microsoft.com/library/system.diagnostics.process.processoraffinity.aspx). Values: `Auto` *(default)* or specific mask.
+* **Toolchain.** A toolchain for generating/building/executing your benchmark. Values: `Classic` (csproj based) *[default]*. Coming soon: `Dnx`.
+* **Mode.** Values: `Throughput` *[default]*, `SingleRun`.
+* **Platform.** Values: `Host` *[default]*, `AnyCpu`, `X86`, `X64`.
+* **Jit.** Values: `Host` *[default]*, `LegacyJit`, `RyuJit`.
+* **Framework.** Values: `Host` *[default]*, `V40`, `V45`, `V451`, `V452`, `V46`.
+* **Runtime.** Values: `Host` *[default]*, `Clr`, `Mono`. Coming soon: `CoreClr`.
+* **LaunchCount.** Count of separated process launches. Values: `Auto` *[default]* or specific number.
+* **WarmupCount.** Count of warmup iterations. Values: `Auto` *[default]* or specific number.
+* **TargetCount.** Count of target iterations (that will be used for summary). Values: `Auto` *[default]* or specific number.
+* **IterationTime.** Desired time of execution of an iteration (in ms). Values: `Auto` *[default]* or specific number.
+* **Affinity.** [ProcessorAffinity](https://msdn.microsoft.com/library/system.diagnostics.process.processoraffinity.aspx) of process. Values: `Auto` *[default]* or specific mask.
 
-The `Host` value means that value will be resolved from host process settings. The `Auto` values means the BenchmarkDotNet automatically choose the best value.
+The `Host` value means that value will be inherited from host process settings. The `Auto` values means the BenchmarkDotNet automatically choose the best value.
 
 **Predefined**
 
@@ -173,6 +173,7 @@ class Job
     IJob[] AllJits = { LegacyX86, LegacyX64, RyuJitX64 };
     IJob Clr = new Job { Runtime = Runtime.Clr };
     IJob Mono = new Job { Runtime = Runtime.Mono };
+    IJob LongRun = new Job { LaunchCount = 3, WarmupCount = 30, TargetCount = 1000 };
 }
 ```
 
@@ -206,10 +207,10 @@ A *column* is a column in the summary table.
 **Predefined**
 
 ```cs
-class StatisticColumn 
+class StatisticColumn
 {
-    IColumn Time;
-    IColumn Error;
+    IColumn Mean;
+    IColumn StdError;
     IColumn StdDev;
     IColumn OperationPerSecond;
     IColumn Min;
@@ -219,9 +220,11 @@ class StatisticColumn
     IColumn Max;
     IColumn[] AllStatistics = { Time, Error, StdDev, OperationPerSecond, Min, Q1, Median, Q3, Max };}
 }
+// Specify a "place" of each benchmark. Place 1 means a group of the fastest benchmarks, place 2 means the second group, and so on. There are several styles:
 class Place
 {
-    IColumn ArabicNumber;
+    IColumn ArabicNumber; // `1`, `2`, `3`, ...
+    IColumn Stars; // `*`, `**`, `***`, ...
 }
 class PropertyColumn
 {
@@ -233,7 +236,7 @@ class PropertyColumn
     IColumn Framework;
     IColumn Toolchain;
     IColumn Runtime;
-    IColumn ProcessCount;
+    IColumn LaunchCount;
     IColumn WarmupCount;
     IColumn TargetCount;
     IColumn Affinity;
@@ -254,12 +257,9 @@ class PropertyColumn
 * `PropertyColumn.WarmupCount`
 * `PropertyColumn.TargetCount`
 * `PropertyColumn.Affinity`
-* `StatisticColumn.Time`
-* `StatisticColumn.Error`
+* `StatisticColumn.Median`
+* `StatisticColumn.StdDev`
 * `BaselineDeltaColumn.Default`
-* `PlaceColumn`: specify "place" of each benchmark. Place 1 means a group of the fastest benchmarks, place 2 means the second group, and so on. There are several styles:
-  * `PlaceColumn.ArabicNumber`: `1`, `2`, `3`, ...
-  * `PlaceColumn.Stars`: `*`, `**`, `***`, ...
 
 ** Examples **
 
@@ -271,7 +271,6 @@ class PropertyColumn
 
 ```cs
 // *** Object style ***
-// You can add custom tags per each method using Columns
 [Config(typeof(Config))]
 public class IntroTags
 {
@@ -280,6 +279,7 @@ public class IntroTags
         public Config()
         {
             Add(Job.Dry);
+            // You can add custom tags per each method using Columns
             Add(new TagColumn("Foo or Bar", name => name.Substring(0, 3)));
             Add(new TagColumn("Number", name => name.Substring(3)));
         }
@@ -291,7 +291,7 @@ public class IntroTags
     [Benchmark] public void Bar34() { /* ... */ }
 }
 // Result:
-//  Method |       Time |     Error | Foo or Bar | Number |
+//  Method |     Median |    StdDev | Foo or Bar | Number |
 // ------- |----------- |---------- |----------- |------- |
 //   Bar34 | 10.3636 ms | 0.0000 ms |        Bar |     34 |
 //    Bar3 | 10.4662 ms | 0.0000 ms |        Bar |      3 |
@@ -301,42 +301,66 @@ public class IntroTags
 
 ### Exporters
 
-TODO
+An *exporter* allows you to export results of your benchmark in different formats. By default, files with results will be located in your bin directory. Here are some exporter examples:
 
-There are some preformatted md files that you can use to share benchmark results in the net. If you have a default plugins set they will be located in your bin directory. There are markdown files for StackOverflow and GitHub. They can be easily found by specific file suffix:
+* **Markdown**
 
 ```
-<BenchmarkName>-report.csv
-<BenchmarkName>-runs.csv
-
-<BenchmarkName>-report.html
-
 <BenchmarkName>-report-default.md
 <BenchmarkName>-report-github.md
 <BenchmarkName>-report-stackoverflow.md
+```
 
+* **Csv**
+
+```
+<BenchmarkName>-report.csv
+<BenchmarkName>-measurements.csv
+```
+
+* **Html**
+
+```
+<BenchmarkName>-report.html
+```
+
+* **Plain**
+
+```
 <BenchmarkName>-report.txt
 ```
 
-**Plots** If you have installed [R](https://www.r-project.org/) and defined `%R_HOME%` variable, you will also get nice barplots and boxplots via `BenchmarkRPlotExporter` that generates `BuildPlots.R` in your bin directory.
+* **Plots**
+
+If you have installed [R](https://www.r-project.org/) and defined `%R_HOME%` variable, you will also get nice plots with help of the `BuildPlots.R` script in your bin directory. Examples:
+
+```
+<BenchmarkName>-barplot.png
+<BenchmarkName>-boxplot.png
+<BenchmarkName>-<MethodName>-density.png
+<BenchmarkName>-<MethodName>-facetTimeline.png
+<BenchmarkName>-<MethodName>-facetTimelineSmooth.png
+<BenchmarkName>-<MethodName>-<JobName>-timelineSmooth.png
+<BenchmarkName>-<MethodName>-<JobName>-timelineSmooth.png
+```
 
 ### Loggers
 
-TODO
+A **logger** allows you to log results of your benchmark. By default, you can see log on console and in a file (`<BenchmarkName>.log`).
 
 ### Diagnosers
 
-TODO
+A **diagnoser** can attach to your benchmark and get some useful info. For now, there are no default diagnosers in the NuGet package. If you want to use it, you should build BenchmarkDotNet manually from the source code.
 
 ### Analysers
 
-TODO
+An **analyser** can analyze summary of your benchmarks and produce some useful warnings. For example, `EnvironmentAnalyser` warns you, if you build your application in the DEBUG mode or run it with an attached debugger.
 
 ## Advanced Features
 
 ### Params
 
-TODO
+You can mark one or several fields or properties in your class by the `Params` attribute. In this attribute, you can specify set of values. As a result, you will get results for each combination of params values.
 
 **Example**
 
@@ -357,7 +381,7 @@ public class IntroParams
 }
 ```
 
-   Method  |        Time |     Error |   A |  B
+   Method  |      Median |    StdDev |   A |  B
 ---------- |------------ |---------- |---- |---
  Benchmark | 115.3325 ms | 0.0242 ms | 100 | 10
  Benchmark | 125.3282 ms | 0.0245 ms | 100 | 20
@@ -366,11 +390,67 @@ public class IntroParams
 
 ### OperationsPerInvoke
 
-TODO
+Sometimes you want to measure several operations in a single method. In this case, you can specify amount of operations in the `Benchmark` attribute.
+
+**Example**
+
+```cs
+private double a, b, c, d;
+
+[Benchmark(OperationsPerInvoke = 4)]
+public void Parallel()
+{
+    a++;
+    b++;
+    c++;
+    d++;
+}
+
+[Benchmark(OperationsPerInvoke = 4)]
+public void Sequential()
+{
+    a++;
+    a++;
+    a++;
+    a++;
+}
+```
 
 ### Setup
 
-TODO
+If you have some data that you want to initialize, the `Setup` method is the best place for this:
+
+```cs
+private int[] initialValuesArray;
+private List<int> initialValuesList;
+
+[Setup]
+public void SetupData()
+{
+    int MaxCounter = 1000;
+    initialValuesArray = Enumerable.Range(0, MaxCounter).ToArray();
+    initialValuesList = Enumerable.Range(0, MaxCounter).ToList();
+}
+
+[Benchmark]
+public int ForLoop()
+{
+    var counter = 0;
+    for (int i = 0; i < initialValuesArray.Length; i++)
+        counter += initialValuesArray[i];
+    return counter;
+}
+
+[Benchmark]
+public int ForEachList()
+{
+    var counter = 0;
+    foreach (var i in initialValuesList)
+        counter += i;
+    return counter;
+}
+
+```
 
 ### Baseline
 
@@ -425,50 +505,69 @@ Runtime=Clr  Warmup=5  Target=10
 
 There are several ways to run your benchmarks.
 
-#### Types
+**Types**
 
-TODO
+```cs
+var summary = BenchmarkRunner.Run<MyBenchmarkClass>();
+var summary = BenchmarkRunner.Run(typeof(MyBenchmarkClass));
+```
 
-#### Url
+**Url**
 
 You can also run a benchmark directly from the internet:
 
 ```cs
-string url = "https://raw.githubusercontent.com/PerfDotNet/BenchmarkDotNet/master/BenchmarkDotNet.Samples/CPU/Cpu_Ilp_Inc.cs";
-new BenchmarkRunner().RunUrl(url);
+string url = "<E.g. direct link to raw content of a gist>";
+var summary = BenchmarkRunner.RunUrl(url);
 ```
 
-#### Source
+**Source**
 
-TODO
+```cs
+string benchmarkSource = "public class MyBenchmarkClass { ...";
+var summary = BenchmarkRUnner.RunSource(benchmarkSource);
+```
 
-#### BenchmarkSwitcher
+**BenchmarkSwitcher**
 
 Or you can create a set of benchmarks and choose one from command line:
 
 ```cs
-var benchmarkSwitcher = new BenchmarkSwitcher(new[] {
-    typeof(Intro_00_Basic),
-    typeof(Intro_01_MethodTasks),
-    typeof(Intro_02_ClassTasks),
-    typeof(Intro_03_SingleRun),
-    typeof(Intro_04_UniformReportingTest),
-});
-benchmarkSwitcher.Run(args);
+static void Main(string[] args)
+{
+    var switcher = new BenchmarkSwitcher(new[] {
+        typeof(BenchmarkClass1),
+        typeof(BenchmarkClass2),
+        typeof(BenchmarkClass3)
+    });
+    switcher.Run(args);
+}
 ```
 
-#### Command line
+Also you can use the config command style to specify some config via switcher or even command line:
 
-TODO
+```cs
+switcher.Run(new[] { "jobs=dry", "columns=min,max" });
+```
 
 
 ## How it works?
 
-TODO
-* BenchmarkDotNet creates an isolated project for each benchmark method and automatically runs it in a separate runtime, in Release mode, without an attached debugger.
-* You can create benchmark tasks that run your benchmark with different CLR, JIT and platform versions.
-* BenchmarkDotNet performs warm-up executions of your code, then runs it several times in different CLR instances, calculates statistics and tries to eliminate some runtime side-effects.
-* BenchmarkDotNet runs with minimal overhead so as to give an accurate performance measurment.
+1. `BenchmarkRunner` generates an isolated project per each benchmark method/job/params, build it in Release mode and automatically runs it several time in the Release mode.
+
+2. Each run consist from several stages:
+
+* `Pilot`: On this stage, the best iteration count will be choosen.
+* `IdleWarmup`, `IdleTarget`: On these stage, BenchmarkDotNet overhead will be evaluated
+* `MainWarmup`: Warmup of the main method.
+* `MainTarget`: Main measurements.
+* `Result` = `MainTarget` - `<AverageOverhead>`
+
+3. After all of the runs, BenchmarkDotNet creates:
+
+* An instance of the `Summary` class that contains all information about benchmark runs.
+* Set of files that contains summary in human-readable and machine-readable formats.
+* Set of plots.
 
 ## Authors
 
