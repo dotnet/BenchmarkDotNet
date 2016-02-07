@@ -57,6 +57,7 @@
     <Compile Include="Configs\ConfigParser.cs" />
     <Compile Include="Configs\ConfigUnionRule.cs" />
     <Compile Include="Configs\IConfig.cs" />
+    <Compile Include="Configs\IConfigSource.cs" />
     <Compile Include="Exporters\HtmlExporter.cs" />
     <Compile Include="Horology\ClockExtensions.cs" />
     <Compile Include="Horology\ClockSpan.cs" />

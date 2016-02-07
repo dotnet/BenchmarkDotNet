@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Running
         public static IConfig GetFullConfig(Type type, IConfig config)
         {
             config = config ?? DefaultConfig.Instance;
-            var configAttribute = type?.ResolveAttribute<ConfigAttribute>();
+            var configAttribute = type?.GetCustomAttributes(true).OfType<IConfigSource>().FirstOrDefault();
             if (configAttribute != null)
                 config = ManualConfig.Union(config, configAttribute.Config);
             return config;

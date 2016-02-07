@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 : $"return default({targetMethodReturnType});";
 
             var paramsContent = string.Join("", benchmark.Parameters.Items.Select(parameter => 
-                $"{(parameter.IsStatic ? "" : "instance.")}{parameter.Name} = {parameter.Value};"));
+                $"{(parameter.IsStatic ? "" : "instance.")}{parameter.Name} = {GetParameterValue(parameter.Value)};"));
 
             var targetBenchmarkTaskArguments = benchmark.Job.GenerateWithDefinitions();
 
@@ -94,6 +94,15 @@ namespace BenchmarkDotNet.Toolchains.Classic
 
             string fileName = Path.Combine(projectDir, MainClassName + ".cs");
             File.WriteAllText(fileName, content);
+        }
+
+        private string GetParameterValue(object value)
+        {
+            if (value is bool)
+                return value.ToString().ToLower();
+            if (value is string)
+                return "\"" + value + "\"";
+            return value.ToString();
         }
 
         private void GenerateProjectFile(ILogger logger, string projectDir, Benchmark benchmark)

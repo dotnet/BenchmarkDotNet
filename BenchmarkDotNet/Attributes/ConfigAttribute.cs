@@ -4,7 +4,7 @@ using BenchmarkDotNet.Configs;
 namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class ConfigAttribute : Attribute
+    public class ConfigAttribute : Attribute, IConfigSource
     {
         public IConfig Config { get; }
 

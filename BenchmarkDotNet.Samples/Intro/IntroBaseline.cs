@@ -3,24 +3,28 @@ using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples.Intro
 {
+    [Config("jobs=dry")]
     public class IntroBaseline
     {
+        [Params(100, 200)]
+        public int BaselineTime { get; set; }
+
         [Benchmark(Baseline = true)]
         public void BaselineMethod()
         {
-            Thread.Sleep(100);
+            Thread.Sleep(BaselineTime);
         }
 
         [Benchmark]
         public void Fast()
         {
-            Thread.Sleep(50);
+            Thread.Sleep(BaselineTime / 2);
         }
 
         [Benchmark]
         public void Slow()
         {
-            Thread.Sleep(150);
+            Thread.Sleep(BaselineTime * 2);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
@@ -13,37 +14,24 @@ namespace BenchmarkDotNet.Columns
 
         public string GetValue(Summary summary, Benchmark benchmark)
         {
-            var reports = summary.Reports.Values;
-            var benchmarks = summary.Benchmarks;
+            if (benchmark.Target.Baseline)
+                return "Baseline";
 
-            double baseline = 0;
-            // TODO: Implement params
-            //if (item.Item1.Parameters != null)
-            //{
-            //    var firstMatch =
-            //        reports.FirstOrDefault(r => r.Item1.Benchmark.Target.Baseline &&
-            //                                    r.Item1.Parameters.IntParam == item.Item1.Parameters.IntParam);
-            //    if (firstMatch != null)
-            //        baseline = firstMatch.Item2.Mean;
-            //}
-            //else
-            {
-                // TODO: repair matching
-                var firstMatch = benchmarks.First(b => b.Target.Baseline);
-                if (firstMatch != null)
-                    baseline = summary.Reports[firstMatch].ResultStatistics.Mean;
-            }
+            var baselineBenchmark = summary.Benchmarks.
+                Where(b => b.Job.GetFullInfo() == benchmark.Job.GetFullInfo()).
+                Where(b => b.Parameters.FullInfo == benchmark.Parameters.FullInfo).
+                FirstOrDefault(b => b.Target.Baseline);
+            if (baselineBenchmark == null)
+                return "?";
 
-            var current = summary.Reports[benchmark].ResultStatistics.Mean;
-            double diff = 0;
-            if (baseline != 0) // This can happen if we found no matching result
-                diff = (current - baseline) / baseline * 100.0;
+            var baselineMedian = summary.Reports[baselineBenchmark].ResultStatistics.Median;
+            var currentMedian = summary.Reports[benchmark].ResultStatistics.Median;
+            var diff = (currentMedian - baselineMedian) / baselineMedian * 100.0;
 
-            return benchmark.Target.Baseline ? "Baseline" : diff.ToStr("0.0") + "%";
+            return diff.ToStr("0.0") + "%";
         }
 
         public bool IsAvailable(Summary summary) => summary.Benchmarks.Any(b => b.Target.Baseline);
-
         public bool AlwaysShow => true;
         public override string ToString() => ColumnName;
     }

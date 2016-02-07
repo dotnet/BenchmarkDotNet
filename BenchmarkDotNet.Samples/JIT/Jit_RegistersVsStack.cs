@@ -17,10 +17,20 @@ namespace BenchmarkDotNet.Samples.JIT
             }
         }
 
-        private const int IterationCount = 101;
+        [Params(false, true)]
+        public bool CallStopwatchTimestamp { get; set; }
+
+        [Setup]
+        public void Setup()
+        {
+            if (CallStopwatchTimestamp)
+                Stopwatch.GetTimestamp();
+        }
+
+        private const int IterationCount = 10001;
 
         [Benchmark(OperationsPerInvoke = IterationCount)]
-        public double WithStopwatch()
+        public string WithStopwatch()
         {
             double a = 1, b = 1;
             var sw = new Stopwatch();
@@ -31,11 +41,11 @@ namespace BenchmarkDotNet.Samples.JIT
                 // fstp        qword ptr [ebp-0Ch]
                 a = a + b;
             }
-            return a + sw.ElapsedMilliseconds;
+            return string.Format("{0}{1}", a, sw.ElapsedMilliseconds);
         }
 
         [Benchmark(OperationsPerInvoke = IterationCount)]
-        public double WithoutStopwatch()
+        public string WithoutStopwatch()
         {
             double a = 1, b = 1;
             for (int i = 0; i < IterationCount; i++)
@@ -44,7 +54,7 @@ namespace BenchmarkDotNet.Samples.JIT
                 // faddp       st(1),st
                 a = a + b;
             }
-            return a;
+            return string.Format("{0}", a);
         }
     }
 }
