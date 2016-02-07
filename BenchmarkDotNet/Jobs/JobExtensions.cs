@@ -69,9 +69,9 @@ namespace BenchmarkDotNet.Jobs
         public static string GetShortInfo(this IJob job)
         {
             // TODO: make it automatically
-            if (job.Equals(Job.LegacyX86))
+            if (job.Equals(Job.LegacyJitX86))
                 return "LegacyX86";
-            if (job.Equals(Job.LegacyX64))
+            if (job.Equals(Job.LegacyJitX64))
                 return "LegacyX64";
             if (job.Equals(Job.RyuJitX64))
                 return "RyuJitX64";
@@ -93,9 +93,9 @@ namespace BenchmarkDotNet.Jobs
         public static string GetShortInfo(this IJob job, IList<IJob> allJobs)
         {
             // TODO: make it automatically
-            if (job.Equals(Job.LegacyX86))
+            if (job.Equals(Job.LegacyJitX86))
                 return "LegacyX86";
-            if (job.Equals(Job.LegacyX64))
+            if (job.Equals(Job.LegacyJitX64))
                 return "LegacyX64";
             if (job.Equals(Job.RyuJitX64))
                 return "RyuJitX64";

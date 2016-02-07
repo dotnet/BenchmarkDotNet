@@ -58,7 +58,6 @@ namespace BenchmarkDotNet.Configs
             return manualConfig;
         }
 
-        // TODO Implement
-        public static IConfig Parse(string[] args) => DefaultConfig.Instance;
+        public static IConfig Parse(string[] args) => new ConfigParser().Parse(args);
     }
 }

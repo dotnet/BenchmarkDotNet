@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Samples.CPU
         {
             public Config()
             {
-                Add(Job.LegacyX86);
+                Add(Job.LegacyJitX86);
             }
         }
 

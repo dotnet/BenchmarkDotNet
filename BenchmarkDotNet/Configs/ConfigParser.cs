@@ -74,10 +74,10 @@ namespace BenchmarkDotNet.Configs
             {
                 case "default":
                     return new[] { Job.Default };
-                case "legacyx86":
-                    return new[] { Job.LegacyX86 };
-                case "legacyx64":
-                    return new[] { Job.LegacyX64 };
+                case "legacyjitx86":
+                    return new[] { Job.LegacyJitX86 };
+                case "legacyjitx64":
+                    return new[] { Job.LegacyJitX64 };
                 case "ryujitx64":
                     return new[] { Job.RyuJitX64 };
                 case "dry":

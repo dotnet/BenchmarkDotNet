@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Samples.IL
         {
             public Config()
             {
-                Add(Job.LegacyX86, Job.LegacyX64, Job.RyuJitX64);
+                Add(Job.LegacyJitX86, Job.LegacyJitX64, Job.RyuJitX64);
             }
         }
 
