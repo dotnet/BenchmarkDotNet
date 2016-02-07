@@ -56,6 +56,7 @@
     <Compile Include="Intro\IntroColumns.cs" />
     <Compile Include="Intro\IntroCommandStyle.cs" />
     <Compile Include="Intro\IntroConfigSource.cs" />
+    <Compile Include="Intro\IntroConfigUnion.cs" />
     <Compile Include="Intro\IntroJobsFull.cs" />
     <Compile Include="Intro\IntroParams.cs" />
     <Compile Include="Intro\IntroTags.cs" />

@@ -65,6 +65,7 @@ namespace BenchmarkDotNet.Configs
         }
 
         public IEnumerable<IJob> GetJobs() => EnumerableHelper.Empty<IJob>();
+        public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
 
         // TODO use LoadDiagnoser
         public IEnumerable<IDiagnoser> GetDiagnosers() => EnumerableHelper.Empty<IDiagnoser>();

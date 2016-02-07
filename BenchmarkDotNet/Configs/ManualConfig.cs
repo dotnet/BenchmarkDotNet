@@ -23,6 +23,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IDiagnoser> GetDiagnosers() => diagnosers;
         public IEnumerable<IAnalyser> GetAnalysers() => analysers;
         public IEnumerable<IJob> GetJobs() => jobs;
+        public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
 
         public void Add(params IColumn[] newColumns) => columns.AddRange(newColumns);
         public void Add(params IExporter[] newExprters) => exporters.AddRange(newExprters);
@@ -50,11 +51,22 @@ namespace BenchmarkDotNet.Configs
             return manualConfig;
         }
 
-        public static ManualConfig Union(params IConfig[] configs)
+        public static ManualConfig Union(IConfig globalConfig, IConfig localConfig)
         {
             var manualConfig = new ManualConfig();
-            foreach (var config in configs)
-                manualConfig.Add(config);
+            switch (localConfig.UnionRule)
+            {
+                case ConfigUnionRule.AlwaysUseLocal:
+                    manualConfig.Add(localConfig);
+                    break;
+                case ConfigUnionRule.AlwaysUseGlobal:
+                    manualConfig.Add(globalConfig);
+                    break;
+                case ConfigUnionRule.Union:
+                    manualConfig.Add(globalConfig);
+                    manualConfig.Add(localConfig);
+                    break;
+            }
             return manualConfig;
         }
 

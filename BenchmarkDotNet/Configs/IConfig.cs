@@ -16,5 +16,7 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<IDiagnoser> GetDiagnosers();
         IEnumerable<IAnalyser> GetAnalysers();
         IEnumerable<IJob> GetJobs();
+
+        ConfigUnionRule UnionRule { get; }
     }
 }
