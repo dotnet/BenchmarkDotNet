@@ -1,11 +1,14 @@
+BenchmarkDotNetVersion <- "$BenchmarkDotNetVersion$ "
 dir.create(Sys.getenv("R_LIBS_USER"), recursive = TRUE, showWarnings = FALSE)
-list.of.packages <- c("ggplot2", "dplyr", "gdata", "tidyr")
+list.of.packages <- c("ggplot2", "dplyr", "gdata", "tidyr", "grid", "gridExtra")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages, lib = Sys.getenv("R_LIBS_USER"), repos = "http://cran.rstudio.com/")
 library(ggplot2)
 library(dplyr)
 library(gdata)
 library(tidyr)
+library(grid)
+library(gridExtra)
 
 ends_with <- function(vars, match, ignore.case = TRUE) {
   if (ignore.case) 
@@ -19,6 +22,10 @@ ends_with <- function(vars, match, ignore.case = TRUE) {
   substr(vars, pmax(1, length - n + 1), length) == match
 }
 std.error <- function(x) sqrt(var(x)/length(x))
+BenchmarkDotNetVersionGrob <- textGrob(BenchmarkDotNetVersion, gp = gpar(fontface=3, fontsize=10), hjust=1, x=1)
+nicePlot <- function(p) grid.arrange(p, bottom = BenchmarkDotNetVersionGrob)
+printNice <- function(p) print(nicePlot(p))
+ggsaveNice <- function(fileName, p, ...) ggsave(fileName, plot = nicePlot(p), ...)
 
 args <- commandArgs(trailingOnly = TRUE)
 files <- if (length(args) > 0) args else list.files()[list.files() %>% ends_with("-measurements.csv")]
@@ -62,10 +69,10 @@ for (file in files) {
     geom_bar(position=position_dodge(), stat="identity")
     #geom_errorbar(aes(ymin=Value-1.96*se, ymax=Value+1.96*se), width=.2, position=position_dodge(.9))
   
-  print(benchmarkBoxplot)
-  print(benchmarkBarplot)
-  ggsave(gsub("-measurements.csv", "-boxplot.png", file), benchmarkBoxplot)
-  ggsave(gsub("-measurements.csv", "-barplot.png", file), benchmarkBarplot)
+  printNice(benchmarkBoxplot)
+  printNice(benchmarkBarplot)
+  ggsaveNice(gsub("-measurements.csv", "-boxplot.png", file), benchmarkBoxplot)
+  ggsaveNice(gsub("-measurements.csv", "-barplot.png", file), benchmarkBarplot)
   
   for (target in unique(result$TargetMethod)) {
     df <- result %>% filter(TargetMethod == target)
@@ -74,8 +81,8 @@ for (file in files) {
       ggtitle(paste(title, "/", target)) +
       xlab(paste("Time,", timeUnit)) +
       geom_density(alpha=.5)
-    print(densityPlot)
-    ggsave(gsub("-measurements.csv", paste0("-", target, "-density.png"), file), densityPlot)
+    printNice(densityPlot)
+    ggsaveNice(gsub("-measurements.csv", paste0("-", target, "-density.png"), file), densityPlot)
     
     for (job in unique(df$Job)) {
       jobDf <- df %>% filter(Job == job)
@@ -85,11 +92,11 @@ for (file in files) {
         ylab(paste("Time,", timeUnit)) +
         geom_line() +
         geom_point()
-      print(timelinePlot)
-      ggsave(gsub("-measurements.csv", paste0("-", target, "-", job, "-timeline.png"), file), timelinePlot)
+      printNice(timelinePlot)
+      ggsaveNice(gsub("-measurements.csv", paste0("-", target, "-", job, "-timeline.png"), file), timelinePlot)
       timelinePlotSmooth <- timelinePlot + geom_smooth()
-      print(timelinePlotSmooth)
-      ggsave(gsub("-measurements.csv", paste0("-", target, "-", job, "-timelineSmooth.png"), file), timelinePlotSmooth)
+      printNice(timelinePlotSmooth)
+      ggsaveNice(gsub("-measurements.csv", paste0("-", target, "-", job, "-timelineSmooth.png"), file), timelinePlotSmooth)
     }
     
     timelinePlot <- ggplot(df, aes(x = MeasurementIterationIndex, y=MeasurementValue, group=Launch, color=Launch)) + 
@@ -99,10 +106,10 @@ for (file in files) {
       geom_line() +
       geom_point() +
       facet_wrap(~Job)
-    print(timelinePlot)
-    ggsave(gsub("-measurements.csv", paste0("-", target, "-facetTimeline.png"), file), timelinePlot)
+    printNice(timelinePlot)
+    ggsaveNice(gsub("-measurements.csv", paste0("-", target, "-facetTimeline.png"), file), timelinePlot)
     timelinePlotSmooth <- timelinePlot + geom_smooth()
-    print(timelinePlotSmooth)
-    ggsave(gsub("-measurements.csv", paste0("-", target, "-facetTimelineSmooth.png"), file), timelinePlotSmooth)
+    printNice(timelinePlotSmooth)
+    ggsaveNice(gsub("-measurements.csv", paste0("-", target, "-facetTimelineSmooth.png"), file), timelinePlotSmooth)
   }
 }

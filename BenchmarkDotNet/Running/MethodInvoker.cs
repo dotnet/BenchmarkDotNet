@@ -169,8 +169,9 @@ namespace BenchmarkDotNet.Running
                     var measurement = multiInvoke(new MultiInvokeInput(iterationMode, iterationCounter, invokeCount));
                     measurements.Add(measurement);
                     var statistics = new Statistics(measurements.Select(m => m.Nanoseconds));
+                    var statisticsWithoutOutliers = new Statistics(statistics.WithoutOutliers());
                     if (iterationCounter >= TargetAutoMinIterationCount &&
-                        statistics.StandardError < maxAcceptableError * statistics.Mean)
+                        statisticsWithoutOutliers.StandardError < maxAcceptableError * statisticsWithoutOutliers.Mean)
                         break;
                     if (isIdle && iterationCounter >= TargetIdleAutoMaxIterationCount)
                         break;
