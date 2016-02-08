@@ -16,7 +16,7 @@ using BenchmarkDotNet.Running;
 namespace BenchmarkDotNet.IntegrationTests
 {
     [Config(typeof(SingleRunFastConfig))]
-    public class BaselineDeltaColumnTest
+    public class BaselineDiffColumnTest
     {
         [Params(1, 2)]
         public int ParamProperty { get; set; }
@@ -25,11 +25,11 @@ namespace BenchmarkDotNet.IntegrationTests
         public void Test()
         {
             // This is the common way to run benchmarks, it should wire up the BenchmarkBaselineDeltaResultExtender for us
-            var summary = BenchmarkRunner.Run<BaselineDeltaColumnTest>();
+            var summary = BenchmarkRunner.Run<BaselineDiffColumnTest>();
 
             var table = summary.Table;
             var headerRow = table.FullHeader;
-            var column = summary.Config.GetColumns().OfType<BaselineDeltaColumn>().FirstOrDefault();
+            var column = summary.Config.GetColumns().OfType<BaselineDiffColumn>().FirstOrDefault();
             Assert.NotNull(column);
 
             Assert.Equal(column.ColumnName, headerRow.Penult());
@@ -39,9 +39,9 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 Assert.Equal(row.Length, extraColumn + 2);
                 if (row[testNameColumn] == "BenchmarkSlow") // This is our baseline
-                    Assert.Equal("Baseline", row[extraColumn]);
+                    Assert.Equal("1.00", row[extraColumn]);
                 else if (row[testNameColumn] == "BenchmarkFast") // This should have been compared to the baseline
-                    Assert.Contains("%", row[extraColumn]);
+                    Assert.Contains(".", row[extraColumn]);
             }
         }
 

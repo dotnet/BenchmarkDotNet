@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Configs
             yield return StatisticColumn.Median;
             yield return StatisticColumn.StdDev;
 
-            yield return BaselineDeltaColumn.Default;
+            yield return BaselineDiffColumn.Scaled;
         }
 
         public IEnumerable<IExporter> GetExporters()

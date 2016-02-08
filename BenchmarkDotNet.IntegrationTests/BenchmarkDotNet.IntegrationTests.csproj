@@ -76,7 +76,7 @@
     <Compile Include="ParamsAttributeStaticTest.cs" />
     <Compile Include="ParamsAttributeTest.cs" />
     <Compile Include="PerformanceUnitTest.cs" />
-    <Compile Include="BaselineDeltaResultExtenderTest.cs" />
+    <Compile Include="BaselineDiffColumnTest.cs" />
     <Compile Include="StatResultExtenderTests.cs" />
     <Compile Include="SetupAttributeInvalidMethodTest.cs" />
     <Compile Include="SetupAttributeTest.cs" />
