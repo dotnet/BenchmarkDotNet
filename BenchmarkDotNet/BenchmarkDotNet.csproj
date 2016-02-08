@@ -85,7 +85,7 @@
     <Compile Include="Helpers\ResourceHelper.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Columns\PropertyColumn.cs" />
-    <Compile Include="Exporters\CsvRunsExporter.cs" />
+    <Compile Include="Exporters\CsvMeasurementsExporter.cs" />
     <Compile Include="Exporters\ExporterBase.cs" />
     <Compile Include="Exporters\PlainExporter.cs" />
     <Compile Include="Exporters\RPlotExporter.cs" />

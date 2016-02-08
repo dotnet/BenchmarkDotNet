@@ -46,6 +46,8 @@ namespace BenchmarkDotNet.Exporters
             new MeasurementColumn("JobToolchain", (summary, report, m) => report.Benchmark.Job.Toolchain.ToString()),
             new MeasurementColumn("JobRuntime", (summary, report, m) => report.Benchmark.Job.Runtime.ToString()),
 
+            new MeasurementColumn("Params", (summary, report, m) => report.Benchmark.Parameters.PrintInfo),
+
             new MeasurementColumn("MeasurementLaunchIndex", (summary, report, m) => m.LaunchIndex.ToString()),
             new MeasurementColumn("MeasurementIterationMode", (summary, report, m) => m.IterationMode.ToString()),
             new MeasurementColumn("MeasurementIterationIndex", (summary, report, m) => m.IterationIndex.ToString()),

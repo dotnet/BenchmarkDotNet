@@ -36,6 +36,11 @@ for (file in files) {
   result <- measurements %>% filter(MeasurementIterationMode == "Result")
   if (nrow(result[is.na(result$Job),]) > 0)
     result[is.na(result$Job),]$Job <- ""
+  if (nrow(result[is.na(result$Params),]) > 0) {
+    result[is.na(result$Params),]$Params <- ""
+  } else {
+    result$Job <- trim(paste(result$Job, result$Params))
+  }
   
   timeUnit <- "ns"
   if (min(result$MeasurementValue) > 1000) {

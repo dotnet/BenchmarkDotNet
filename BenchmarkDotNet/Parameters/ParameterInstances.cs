@@ -13,5 +13,6 @@ namespace BenchmarkDotNet.Parameters
         }
 
         public string FullInfo => string.Join("_", Items.Select(p => $"{p.Name}-{p.Value}"));
+        public string PrintInfo => string.Join("&", Items.Select(p => $"{p.Name}={p.Value}"));
     }
 }
