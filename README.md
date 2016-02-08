@@ -164,7 +164,8 @@ public class IntroConfigSource
     {
         Thread.Sleep(10);
     }
-}```
+}
+```
 
 ### Jobs
 
