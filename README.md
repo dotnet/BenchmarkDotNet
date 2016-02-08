@@ -140,6 +140,32 @@ public class MyClassWithBenchmarks
 }
 ```
 
+* **Custom configs**
+
+You can also define own config attribute:
+
+```cs
+[MyConfigSource(Jit.LegacyJit, Jit.RyuJit)]
+public class IntroConfigSource
+{
+    private class MyConfigSourceAttribute : Attribute, IConfigSource
+    {
+        public IConfig Config { get; private set; }
+
+        public MyConfigSourceAttribute(params Jit[] jits)
+        {
+            var jobs = jits.Select(jit => Job.Dry.With(Platform.X64).With(jit)).ToArray();
+            Config = ManualConfig.CreateEmpty().With(jobs);
+        }
+    }
+
+    [Benchmark]
+    public void Foo()
+    {
+        Thread.Sleep(10);
+    }
+}```
+
 ### Jobs
 
 A *job* is an environment for your benchmarks. You can set one or several jobs for your set of benchmarks.
@@ -261,7 +287,7 @@ class PropertyColumn
 * `StatisticColumn.StdDev`
 * `BaselineDeltaColumn.Default`
 
-** Examples **
+**Examples**
 
 ```cs
 // *** Command style ***
@@ -557,17 +583,17 @@ switcher.Run(new[] { "jobs=dry", "columns=min,max" });
 
 2. Each run consist from several stages:
 
-* `Pilot`: On this stage, the best iteration count will be choosen.
-* `IdleWarmup`, `IdleTarget`: On these stage, BenchmarkDotNet overhead will be evaluated
-* `MainWarmup`: Warmup of the main method.
-* `MainTarget`: Main measurements.
-* `Result` = `MainTarget` - `<AverageOverhead>`
+    * `Pilot`: On this stage, the best iteration count will be choosen.
+    * `IdleWarmup`, `IdleTarget`: On these stage, BenchmarkDotNet overhead will be evaluated
+    * `MainWarmup`: Warmup of the main method.
+    * `MainTarget`: Main measurements.
+    * `Result` = `MainTarget` - `<AverageOverhead>`
 
 3. After all of the runs, BenchmarkDotNet creates:
 
-* An instance of the `Summary` class that contains all information about benchmark runs.
-* Set of files that contains summary in human-readable and machine-readable formats.
-* Set of plots.
+    * An instance of the `Summary` class that contains all information about benchmark runs.
+    * Set of files that contains summary in human-readable and machine-readable formats.
+    * Set of plots.
 
 ## Authors
 
