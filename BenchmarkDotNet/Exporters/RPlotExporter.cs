@@ -35,11 +35,11 @@ namespace BenchmarkDotNet.Exporters
                     RedirectStandardOutput = false,
                     CreateNoWindow = true,
                     FileName = Path.Combine(rHome, "Rscript.exe"),
-                    Arguments = $"{scriptFullPath} {fileNamePrefix}-measurements.csv"
+                    WorkingDirectory = summary.CurrentDirectory,
+                    Arguments = $"\"{scriptFullPath}\" \"{fileNamePrefix}-measurements.csv\""
                 };
                 using (var process = Process.Start(start))
-                {
-                }
+                    process?.WaitForExit();
                 yield return fileNamePrefix + "-boxplot.png";
                 yield return fileNamePrefix + "-barplot.png";
             }
