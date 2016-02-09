@@ -1,11 +1,21 @@
 ﻿using System;
-using BenchmarkDotNet.Tasks;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples.CPU
 {
-    [BenchmarkTask(platform: BenchmarkPlatform.X86, targetIterationCount: 20)]
+    [Config(typeof(Config))]
     public class Cpu_Ilp_Max
     {
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                Add(Job.LegacyJitX86.WithTargetCount(20));
+            }
+        }
+
         private int[] x = new int[32];
 
         [Benchmark]

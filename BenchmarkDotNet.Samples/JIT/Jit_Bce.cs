@@ -1,17 +1,23 @@
-﻿using BenchmarkDotNet.Tasks;
+﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples.JIT
 {
-    [BenchmarkTask(platform: BenchmarkPlatform.X86, jitVersion: BenchmarkJitVersion.LegacyJit)]
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
+    [Config(typeof(Config))]
     public class Jit_Bce
     {
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                Add(Job.AllJits);
+            }
+        }
         private const int N = 11;
         private int[] x = new int[N];
 
-        [Benchmark]
-        [OperationsPerInvoke(N)]
+        [Benchmark(OperationsPerInvoke = N)]
         public int SumConst()
         {
             var y = x;
@@ -21,8 +27,7 @@ namespace BenchmarkDotNet.Samples.JIT
             return sum;
         }
 
-        [Benchmark]
-        [OperationsPerInvoke(N)]
+        [Benchmark(OperationsPerInvoke = N)]
         public int SumLength()
         {
             var y = x;

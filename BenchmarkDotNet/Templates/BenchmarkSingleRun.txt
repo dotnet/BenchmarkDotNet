@@ -1,4 +1,0 @@
-        public void RunBenchmark()
-        {
-            new BenchmarkMethodInvoker().SingleRun(task, $OperationsPerInvoke$, setupAction, targetAction, idleAction);
-        }

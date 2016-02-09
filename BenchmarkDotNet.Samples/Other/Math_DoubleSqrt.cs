@@ -1,5 +1,7 @@
 ﻿using System;
-using BenchmarkDotNet.Tasks;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples.Other
 {
@@ -7,11 +9,16 @@ namespace BenchmarkDotNet.Samples.Other
     // LegacyJit x86: fsqrt   (FPU)
     // LegacyJit x64: sqrtsd  (SSE2)
     // RyuJIT    x64: vsqrtsd (AVX)
-    [BenchmarkTask(platform: BenchmarkPlatform.X86, jitVersion: BenchmarkJitVersion.LegacyJit)]
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
+    [Config(typeof(Config))]
     public class Math_DoubleSqrt
     {
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                Add(Job.AllJits);
+            }
+        }
         private int counter;
 
         [Benchmark]

@@ -1,66 +1,91 @@
 ﻿using System;
-using System.Linq;
-using BenchmarkDotNet.Plugins;
-using BenchmarkDotNet.Plugins.Loggers;
-using BenchmarkDotNet.Tasks;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Extensions;
 using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
     public class ProcessorArchitectureTest
     {
-        const string FailedCaption = "FAILED";
+        private class PlatformConfig : ManualConfig
+        {
+            public PlatformConfig(Platform platform)
+            {
+                Add(Job.Dry.With(platform).With(Jit.Host));
+            }
+        }
+
+        const string X86FailedCaption = "x86FAILED";
+        const string X64FailedCaption = "x64FAILED";
         const string AnyCpuOkCaption = "AnyCpuOkCaption";
         const string HostPlatformOkCaption = "HostPlatformOkCaption";
+        const string BenchmarkNotFound = "There are no benchmarks found";
 
         [Fact]
         public void SpecifiedProccesorArchitectureMustBeRespected()
         {
-            var logger = new BenchmarkAccumulationLogger();
-            var plugins = BenchmarkPluginBuilder.CreateDefault().AddLogger(logger).Build();
-            var reports = new BenchmarkRunner(plugins).Run<ProcessorArchitectureTest>().ToArray();
+            Verify(Platform.X86, typeof(X86Benchmark), X86FailedCaption);
+            Verify(Platform.X64, typeof(X64Benchmark), X64FailedCaption);
+            Verify(Platform.AnyCpu, typeof(AnyCpuBenchmark), "nvm");
+            Verify(Platform.Host, typeof(HostBenchmark), "nvm");
+        }
+
+        private void Verify(Platform platform, Type benchmark, string failureText)
+        {
+            var logger = new AccumulationLogger();
+            var config = new PlatformConfig(platform).With(logger);
+
+            BenchmarkRunner.Run(benchmark, config);
             var testLog = logger.GetLog();
 
-            Assert.True(reports.Any());
-            Assert.True(reports.All(report => report.Runs.Count > 1));
-
-            Assert.DoesNotContain(FailedCaption, testLog);
-            Assert.Contains(AnyCpuOkCaption, testLog);
-            Assert.Contains(HostPlatformOkCaption, testLog);
+            Assert.DoesNotContain(failureText, testLog);
+            Assert.DoesNotContain(BenchmarkNotFound, testLog);
         }
 
-        [Benchmark]
-        [BenchmarkTask(platform: BenchmarkPlatform.X86, mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 1)]
-        public void _32Bit()
+        public class X86Benchmark
         {
-            if (IntPtr.Size != 4)
+            [Benchmark]
+            public void _32Bit()
             {
-                throw new InvalidOperationException(FailedCaption);
+                if (IntPtr.Size != 4)
+                {
+                    throw new InvalidOperationException(X86FailedCaption);
+                }
             }
         }
 
-        [Benchmark]
-        [BenchmarkTask(platform: BenchmarkPlatform.X64, mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 1)]
-        public void _64Bit()
+        public class X64Benchmark
         {
-            if (IntPtr.Size != 8)
+            [Benchmark]
+            public void _64Bit()
             {
-                throw new InvalidOperationException(FailedCaption);
+                if (IntPtr.Size != 8)
+                {
+                    throw new InvalidOperationException(X64FailedCaption);
+                }
             }
         }
 
-        [Benchmark]
-        [BenchmarkTask(platform: BenchmarkPlatform.AnyCpu, mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 1)]
-        public void AnyCpu()
+        public class AnyCpuBenchmark
         {
-            Console.WriteLine(AnyCpuOkCaption);
+            [Benchmark]
+            public void AnyCpu()
+            {
+                Console.WriteLine(AnyCpuOkCaption);
+            }
         }
 
-        [Benchmark]
-        [BenchmarkTask(platform: BenchmarkPlatform.HostPlatform, mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 1)]
-        public void Host()
+        public class HostBenchmark
         {
-            Console.WriteLine(HostPlatformOkCaption);
+            [Benchmark]
+            public void Host()
+            {
+                Console.WriteLine(HostPlatformOkCaption);
+            }
         }
     }
 }

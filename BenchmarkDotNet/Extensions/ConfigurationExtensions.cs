@@ -1,32 +1,32 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using BenchmarkDotNet.Tasks;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Extensions
 {
     internal static class ConfigurationExtensions
     {
-        public static string ToConfig(this BenchmarkPlatform platform)
+        public static string ToConfig(this Platform platform)
         {
             switch (platform)
             {
-                case BenchmarkPlatform.AnyCpu:
+                case Platform.AnyCpu:
                     return "AnyCPU";
-                case BenchmarkPlatform.X86:
+                case Platform.X86:
                     return "x86";
-                case BenchmarkPlatform.X64:
+                case Platform.X64:
                     return "x64";
-                case BenchmarkPlatform.HostPlatform:
+                case Platform.Host:
                     return IntPtr.Size == 4 ? "x86" : "x64";
                 default:
                     return "AnyCPU";
             }
         }
 
-        public static string ToConfig(this BenchmarkFramework framework, Type benchmarkType)
+        public static string ToConfig(this Framework framework, Type benchmarkType)
         {
-            if (framework == BenchmarkFramework.HostFramework)
+            if (framework == Framework.Host)
                 return DetectCurrentFramework(benchmarkType);
             var number = framework.ToString().Substring(1);
             var numberArray = number.ToCharArray().Select(c => c.ToString()).ToArray();
@@ -38,11 +38,8 @@ namespace BenchmarkDotNet.Extensions
             var attributes = benchmarkType.Assembly.GetCustomAttributes(false).OfType<Attribute>();
             var frameworkAttribute = attributes.FirstOrDefault(a => a.ToString() == @"System.Runtime.Versioning.TargetFrameworkAttribute");
             if (frameworkAttribute == null)
-#if DEBUG
-                return "v4.0"; // otherwise msbuild fails when debugging in new way from VS
-#else
-                return "v3.5";
-#endif
+                return "v4.0";
+
             var frameworkName = frameworkAttribute.GetType()
                 .GetProperty("FrameworkName", BindingFlags.Public | BindingFlags.Instance)
                 .GetValue(frameworkAttribute, null)?.ToString();
@@ -51,9 +48,9 @@ namespace BenchmarkDotNet.Extensions
             return frameworkName;
         }
 
-        public static string ToConfig(this BenchmarkJitVersion jitVersion)
+        public static string ToConfig(this Jit jit)
         {
-            return jitVersion == BenchmarkJitVersion.LegacyJit ? "1" : "0";
+            return jit == Jit.LegacyJit ? "1" : "0";
         }
     }
 }

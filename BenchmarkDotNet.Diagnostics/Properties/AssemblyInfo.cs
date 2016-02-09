@@ -1,18 +1,18 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
+using BenchmarkDotNet.Properties;
 
-[assembly: AssemblyTitle("BenchmarkDotNet.Diagnostics")]
-[assembly: AssemblyDescription("BenchmarkDotNet Diagnostic Tools")]
+[assembly: AssemblyTitle(BenchmarkDotNetInfo.Title + ".Diagnostics")]
+[assembly: AssemblyProduct(BenchmarkDotNetInfo.Title + ".Diagnostics")]
+[assembly: AssemblyDescription(BenchmarkDotNetInfo.Description + " Diagnostic Tools")]
+[assembly: AssemblyCopyright(BenchmarkDotNetInfo.Copyright)]
+[assembly: AssemblyVersion(BenchmarkDotNetInfo.Version)]
+[assembly: AssemblyFileVersion(BenchmarkDotNetInfo.Version)]
+
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("BenchmarkDotNet.Diagnostics")]
-[assembly: AssemblyCopyright("Copyright © Andrey Akinshin, Jon Skeet, Matt Warren 2013–2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 [assembly: ComVisible(false)]
-
 [assembly: Guid("7bbae514-895c-4ca5-95ba-b2a1a0c2e0af")]
-
-[assembly: AssemblyVersion("0.8.2")]
-[assembly: AssemblyFileVersion("0.8.2")]

@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Diagnostics;
+using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Plugins.Loggers
 {
     internal class ProcessOutputLogger : IDisposable
     {
-        protected readonly IBenchmarkLogger logger;
+        protected readonly ILogger logger;
         protected readonly Process process;
 
-        public ProcessOutputLogger(IBenchmarkLogger logger, Process process)
+        public ProcessOutputLogger(ILogger logger, Process process)
         {
             if (process.StartInfo.UseShellExecute)
             {
@@ -38,12 +39,12 @@ namespace BenchmarkDotNet.Plugins.Loggers
 
         protected virtual void ProcessOnOutputDataReceived(object sender, DataReceivedEventArgs dataReceivedEventArgs)
         {
-            logger.WriteLine(BenchmarkLogKind.Default, dataReceivedEventArgs.Data);
+            logger.WriteLine(LogKind.Default, dataReceivedEventArgs.Data);
         }
 
         private void ProcessOnErrorDataReceived(object sender, DataReceivedEventArgs dataReceivedEventArgs)
         {
-            logger.WriteLine(BenchmarkLogKind.Error, dataReceivedEventArgs.Data);
+            logger.WriteLine(LogKind.Error, dataReceivedEventArgs.Data);
         }
     }
 }

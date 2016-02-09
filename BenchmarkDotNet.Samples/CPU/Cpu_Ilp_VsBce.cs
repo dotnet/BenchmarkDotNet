@@ -1,17 +1,24 @@
-﻿using BenchmarkDotNet.Tasks;
+﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples.CPU
 {
     // See http://en.wikipedia.org/wiki/Instruction-level_parallelism
-    [BenchmarkTask(platform: BenchmarkPlatform.X86, jitVersion: BenchmarkJitVersion.LegacyJit)]
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
+    [Config(typeof(Config))]
     public class Cpu_Ilp_VsBce
     {
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                Add(Job.LegacyJitX86, Job.LegacyJitX64, Job.RyuJitX64);
+            }
+        }
+
         private int[] a = new int[4];
 
-        [Benchmark]
-        [OperationsPerInvoke(4)]
+        [Benchmark(OperationsPerInvoke = 4)]
         public void Parallel()
         {
             a[0]++;
@@ -20,8 +27,7 @@ namespace BenchmarkDotNet.Samples.CPU
             a[3]++;
         }
 
-        [Benchmark]
-        [OperationsPerInvoke(4)]
+        [Benchmark(OperationsPerInvoke = 4)]
         public void Sequential()
         {
             a[0]++;

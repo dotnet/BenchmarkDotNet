@@ -1,12 +1,21 @@
-﻿using BenchmarkDotNet.Tasks;
+﻿using BenchmarkDotNet.Jobs;
 using System;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
 
 namespace BenchmarkDotNet.Samples.Algorithms
 {
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
+    [Config(typeof(Config))]
     public class Algo_MostSignificantBit
     {
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                Add(Job.LegacyJitX64, Job.RyuJitX64);
+            }
+        }
+
         private const int N = 4001;
         private readonly int[] numbers;
         private readonly Random random = new Random(42);
@@ -89,7 +98,7 @@ namespace BenchmarkDotNet.Samples.Algorithms
                 return r;
             }
 
-            private static readonly int[] BranchedValues = new int[] { 0,1,2,2,3,3,3,3,4,4,4,4,4,4,4,4 };
+            private static readonly int[] BranchedValues = new int[] { 0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4 };
 
             public static int MostSignificantBranched(int x)
             {

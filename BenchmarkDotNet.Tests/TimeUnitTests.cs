@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Reports;
 using Xunit;
 using Xunit.Abstractions;
 

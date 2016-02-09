@@ -17,6 +17,9 @@
 
   "frameworks": {
     "net40": {
+      "compilationOptions": {
+        "define": [ "CLASSIC" ]
+      },
       "frameworkAssemblies": {
         "Microsoft.Build": "4.0.0.0",
         "Microsoft.Build.Framework": "4.0.0.0",

@@ -1,15 +1,18 @@
-﻿using BenchmarkDotNet.Tasks;
+﻿using BenchmarkDotNet.Jobs;
 using System;
 using System.Collections.Generic;
-using BenchmarkDotNet.Plugins;
-using BenchmarkDotNet.Plugins.Loggers;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Running;
 using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
+    [Config(typeof(SingleRunFastConfig))]
     public class ParamsTestProperty
     {
-        [Params(1, 2, 3, 8, 9, 10)]
+        [Params(1, 2)]
         public int ParamProperty { get; set; }
 
         private HashSet<int> collectedParams = new HashSet<int>();
@@ -17,16 +20,15 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void Test()
         {
-            var logger = new BenchmarkAccumulationLogger();
-            var plugins = BenchmarkPluginBuilder.CreateDefault().AddLogger(logger).Build();
-            var reports = new BenchmarkRunner(plugins).Run(this.GetType());
-            foreach (var param in new[] { 1, 2, 3, 8, 9, 10 })
+            var logger = new AccumulationLogger();
+            var config = DefaultConfig.Instance.With(logger);
+            BenchmarkRunner.Run(this.GetType(), config);
+            foreach (var param in new[] { 1, 2 })
                 Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, logger.GetLog());
             Assert.DoesNotContain($"// ### New Parameter {default(int)} ###" + Environment.NewLine, logger.GetLog());
         }
 
         [Benchmark]
-        [BenchmarkTask(mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 1)]
         public void Benchmark()
         {
             if (collectedParams.Contains(ParamProperty) == false)
@@ -37,9 +39,10 @@ namespace BenchmarkDotNet.IntegrationTests
         }
     }
 
+    [Config(typeof(SingleRunFastConfig))]
     public class ParamsTestPrivateProperty
     {
-        [Params(1, 2, 3, 8, 9, 10)]
+        [Params(1, 2)]
         public int ParamProperty { get; private set; }
 
         private HashSet<int> collectedParams = new HashSet<int>();
@@ -47,14 +50,13 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void Test()
         {
-            var logger = new BenchmarkAccumulationLogger();
-            var plugins = BenchmarkPluginBuilder.CreateDefault().AddLogger(logger).Build();
+            var logger = new AccumulationLogger();
+            var config = DefaultConfig.Instance.With(logger);
             // System.InvalidOperationException : Property "ParamProperty" must be public and writable if it has the [Params(..)] attribute applied to it
-            Assert.Throws<InvalidOperationException>(() => new BenchmarkRunner(plugins).Run(this.GetType()));
+            Assert.Throws<InvalidOperationException>(() => BenchmarkRunner.Run(this.GetType(), config));
         }
 
         [Benchmark]
-        [BenchmarkTask(mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 1)]
         public void Benchmark()
         {
             if (collectedParams.Contains(ParamProperty) == false)
@@ -65,9 +67,10 @@ namespace BenchmarkDotNet.IntegrationTests
         }
     }
 
+    [Config(typeof(SingleRunFastConfig))]
     public class ParamsTestField
     {
-        [Params(1, 2, 3, 8, 9, 10)]
+        [Params(1, 2)]
         public int ParamField = 0;
 
         private HashSet<int> collectedParams = new HashSet<int>();
@@ -75,16 +78,15 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void Test()
         {
-            var logger = new BenchmarkAccumulationLogger();
-            var plugins = BenchmarkPluginBuilder.CreateDefault().AddLogger(logger).Build();
-            var reports = new BenchmarkRunner(plugins).Run(this.GetType());
-            foreach (var param in new[] { 1, 2, 3, 8, 9, 10 })
+            var logger = new AccumulationLogger();
+            var config = DefaultConfig.Instance.With(logger);
+            BenchmarkRunner.Run(this.GetType(), config);
+            foreach (var param in new[] { 1, 2 })
                 Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, logger.GetLog());
             Assert.DoesNotContain($"// ### New Parameter 0 ###" + Environment.NewLine, logger.GetLog());
         }
 
         [Benchmark]
-        [BenchmarkTask(mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 1)]
         public void Benchmark()
         {
             if (collectedParams.Contains(ParamField) == false)
@@ -95,9 +97,10 @@ namespace BenchmarkDotNet.IntegrationTests
         }
     }
 
+    [Config(typeof(SingleRunFastConfig))]
     public class ParamsTestPrivateField
     {
-        [Params(1, 2, 3, 8, 9, 10)]
+        [Params(1, 2)]
         private int ParamField = 0;
 
         private HashSet<int> collectedParams = new HashSet<int>();
@@ -105,14 +108,13 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void Test()
         {
-            var logger = new BenchmarkAccumulationLogger();
-            var plugins = BenchmarkPluginBuilder.CreateDefault().AddLogger(logger).Build();
+            var logger = new AccumulationLogger();
+            var config = DefaultConfig.Instance.With(logger);
             // System.InvalidOperationException : Field "ParamField" must be public if it has the [Params(..)] attribute applied to it
-            Assert.Throws<InvalidOperationException>(() => new BenchmarkRunner(plugins).Run(this.GetType()));
+            Assert.Throws<InvalidOperationException>(() => BenchmarkRunner.Run(this.GetType(), config));
         }
 
         [Benchmark]
-        [BenchmarkTask(mode: BenchmarkMode.SingleRun, processCount: 1, warmupIterationCount: 1, targetIterationCount: 1)]
         public void Benchmark()
         {
             if (collectedParams.Contains(ParamField) == false)

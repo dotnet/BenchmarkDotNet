@@ -1,12 +1,21 @@
-﻿using BenchmarkDotNet.Tasks;
+﻿using BenchmarkDotNet.Jobs;
 using System;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
 
 namespace BenchmarkDotNet.Samples.JIT
 {
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
+    [Config(typeof(Config))]
     public class Jit_BoolToInt
     {
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                Add(Job.LegacyJitX64, Job.RyuJitX64);
+            }
+        }
+
         private bool p1, p2, p3, p4, p5, p6;
         public int q1, q2, q3, q4, q5, q6;
 
@@ -16,8 +25,7 @@ namespace BenchmarkDotNet.Samples.JIT
             p2 = p4 = p6 = false;
         }
 
-        [Benchmark]
-        [OperationsPerInvoke(6)]
+        [Benchmark(OperationsPerInvoke = 6)]
         public void Framework()
         {
             q1 = Convert.ToInt32(p1);
@@ -28,8 +36,7 @@ namespace BenchmarkDotNet.Samples.JIT
             q6 = Convert.ToInt32(p6);
         }
 
-        [Benchmark]
-        [OperationsPerInvoke(6)]
+        [Benchmark(OperationsPerInvoke = 6)]
         public void IfThenElse()
         {
             q1 = p1 ? 1 : 0;
@@ -40,8 +47,7 @@ namespace BenchmarkDotNet.Samples.JIT
             q6 = p6 ? 1 : 0;
         }
 
-        [Benchmark]
-        [OperationsPerInvoke(6)]
+        [Benchmark(OperationsPerInvoke = 6)]
         public void UnsafeConvert()
         {
             unsafe

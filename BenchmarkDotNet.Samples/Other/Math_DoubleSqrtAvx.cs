@@ -1,12 +1,22 @@
 ﻿using System;
-using BenchmarkDotNet.Tasks;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples.Other
 {
     // You need RyuJit and AVX support for this benchmark
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
+    [Config(typeof(Config))]
     public class Math_DoubleSqrtAvx
     {
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                Add(Job.RyuJitX64);
+            }
+        }
+
         // vxorpd      xmm0,xmm0,xmm0
         // vsqrtsd     xmm0,xmm0,xmm0
         // vsqrtsd     xmm1,xmm0,mmword ptr [7FFF83C14D88h]

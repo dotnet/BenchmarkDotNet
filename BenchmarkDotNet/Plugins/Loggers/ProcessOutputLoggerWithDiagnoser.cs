@@ -1,17 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using BenchmarkDotNet.Plugins.Diagnosers;
+using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Plugins.Loggers
 {
     internal class ProcessOutputLoggerWithDiagnoser : ProcessOutputLogger
     {
         private readonly Benchmark benchmark;
-        private readonly IBenchmarkDiagnoser diagnoser;
+        private readonly IDiagnoser diagnoser;
 
-        private bool codeAlreadyExtracted = false;
+        private bool diagnosticsAlreadyRun = false;
 
-        public ProcessOutputLoggerWithDiagnoser(IBenchmarkLogger logger, Process process, IBenchmarkDiagnoser diagnoser, Benchmark benchmark) : base(logger, process)
+        public ProcessOutputLoggerWithDiagnoser(ILogger logger, Process process, IDiagnoser diagnoser, Benchmark benchmark) : base(logger, process)
         {
             this.diagnoser = diagnoser;
             this.benchmark = benchmark;
@@ -34,17 +36,17 @@ namespace BenchmarkDotNet.Plugins.Loggers
             if (!line.StartsWith("//") && !string.IsNullOrEmpty(line))
                 Lines.Add(line);
 
-            // Wait until we know "Warmup" is happening, and then dissassemble the process
-            if (codeAlreadyExtracted == false && line.StartsWith("Warmup ") && !line.StartsWith("WarmupIdle "))
+            // This is important so the Diagnoser can know the [Benchmark] methods will have run and (e.g.) it can do a Memory Dump
+            if (diagnosticsAlreadyRun == false && line.StartsWith(IterationMode.MainWarmup.ToString()))
             {
                 try
                 {
-                    diagnoser.Print(benchmark, process, logger);
+                    diagnoser?.AfterBenchmarkHasRun(benchmark, process);
                 }
                 finally
                 {
                     // Always set this, even if something went wrong, otherwise we will try on every run of a benchmark batch
-                    codeAlreadyExtracted = true;
+                    diagnosticsAlreadyRun = true;
                 }
             }
         }

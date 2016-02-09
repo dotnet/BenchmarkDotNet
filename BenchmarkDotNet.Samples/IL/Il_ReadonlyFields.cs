@@ -1,13 +1,21 @@
-﻿using BenchmarkDotNet.Tasks;
+﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples.IL
 {
     // See: http://codeblog.jonskeet.uk/2014/07/16/micro-optimization-the-surprising-inefficiency-of-readonly-fields/
-    [BenchmarkTask(platform: BenchmarkPlatform.X86, jitVersion: BenchmarkJitVersion.LegacyJit)]
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
+    [Config(typeof(Config))]
     public class IL_ReadonlyFields
     {
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                Add(Job.LegacyJitX86, Job.LegacyJitX64, Job.RyuJitX64);
+            }
+        }
+
         public struct Int256
         {
             private readonly long bits0, bits1, bits2, bits3;

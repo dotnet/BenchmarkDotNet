@@ -1,5 +1,7 @@
 ﻿using System.Linq;
 using System.Reflection;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Samples
 {

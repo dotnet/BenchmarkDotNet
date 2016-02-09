@@ -1,14 +1,26 @@
-﻿using BenchmarkDotNet.Tasks;
+﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples.JIT
 {
     // See: http://en.wikipedia.org/wiki/Loop_unrolling
-    [BenchmarkTask(platform: BenchmarkPlatform.X86, jitVersion: BenchmarkJitVersion.LegacyJit)]
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
+    [Config(typeof(Config))]
     public class Jit_ArraySumLoopUnrolling
     {
-        private const int NUnroll = 1000, N = 1001;
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                Add(Job.AllJits);
+                Add(new TagColumn("N", name => (name.Contains("Unroll") ? NUnroll : N).ToString()));
+                Add(new TagColumn("Static", name => name.Contains("NonStatic") ? "No" : "Yes"));
+                Add(PlaceColumn.ArabicNumber);
+            }
+        }
+
+        private const int NUnroll = 10000, N = 10001;
 
         private readonly int[] nonStaticField;
         private static int[] staticField;

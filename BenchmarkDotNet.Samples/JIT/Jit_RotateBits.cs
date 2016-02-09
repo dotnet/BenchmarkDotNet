@@ -1,4 +1,6 @@
-﻿namespace BenchmarkDotNet.Samples.JIT
+﻿using BenchmarkDotNet.Attributes;
+
+namespace BenchmarkDotNet.Samples.JIT
 {
     public class Jit_RotateBits
     {
@@ -12,8 +14,7 @@
         private long cx = 1;
         private long dx = 23444111111;
 
-        [Benchmark]
-        [OperationsPerInvoke(4)]
+        [Benchmark(OperationsPerInvoke = 4)]
         public void ShouldOptimize()
         {
             RotateRight64(au, 16);
@@ -22,8 +23,7 @@
             RotateRight64(du, 48);
         }
 
-        [Benchmark]
-        [OperationsPerInvoke(4)]
+        [Benchmark(OperationsPerInvoke = 4)]
         public void ShouldNotOptimize()
         {
             RotateRight64(ax, 16);

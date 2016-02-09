@@ -1,15 +1,24 @@
-﻿using BenchmarkDotNet.Tasks;
+﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples.CPU
 {
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
+    [Config(typeof(Config))]
     public class Cpu_Atomics
     {
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                Add(Job.RyuJitX64);
+            }
+        }
+
         private int a;
         private object syncRoot = new object();
 
-        [Benchmark]
-        [OperationsPerInvoke(4)]
+        [Benchmark(OperationsPerInvoke = 4)]
         public void Lock()
         {
             lock (syncRoot) a++;
@@ -18,8 +27,7 @@ namespace BenchmarkDotNet.Samples.CPU
             lock (syncRoot) a++;
         }
 
-        [Benchmark]
-        [OperationsPerInvoke(4)]
+        [Benchmark(OperationsPerInvoke = 4)]
         public void Interlocked()
         {
             System.Threading.Interlocked.Increment(ref a);
@@ -28,8 +36,7 @@ namespace BenchmarkDotNet.Samples.CPU
             System.Threading.Interlocked.Increment(ref a);
         }
 
-        [Benchmark]
-        [OperationsPerInvoke(4)]
+        [Benchmark(OperationsPerInvoke = 4)]
         public void NoLock()
         {
             a++;

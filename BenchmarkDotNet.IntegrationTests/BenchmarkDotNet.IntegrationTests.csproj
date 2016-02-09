@@ -40,9 +40,6 @@
       <HintPath>..\CLRMD\Dia2Lib.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="FSharpBenchmarkDotNet">
-      <HintPath>.\FSharpBenchmarkDotNet.exe</HintPath>
-    </Reference>
     <Reference Include="Interop.Dia2Lib">
       <HintPath>..\CLRMD\Interop.Dia2Lib.dll</HintPath>
       <Private>True</Private>
@@ -71,19 +68,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BenchmarkModeTests.cs" />
+    <Compile Include="FSharpTest.cs" />
+    <Compile Include="ModeTests.cs" />
     <Compile Include="GenericBenchmarkTest.cs" />
     <Compile Include="InnerClassTest.cs" />
+    <Compile Include="OutputLogger.cs" />
     <Compile Include="ParamsAttributeStaticTest.cs" />
     <Compile Include="ParamsAttributeTest.cs" />
     <Compile Include="PerformanceUnitTest.cs" />
-    <Compile Include="Plugins\BaselineDeltaResultExtenderTest.cs" />
-    <Compile Include="Plugins\BenchmarkStatResultExtenderTests.cs" />
-    <Compile Include="PretendFSharpTest.cs" />
+    <Compile Include="BaselineDiffColumnTest.cs" />
+    <Compile Include="StatResultExtenderTests.cs" />
     <Compile Include="SetupAttributeInvalidMethodTest.cs" />
     <Compile Include="SetupAttributeTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Plugins\SourceDiagnoserTest.cs" />
+    <Compile Include="SourceDiagnoserTest.cs" />
+    <Compile Include="TestConfigs.cs" />
     <Compile Include="ToolchainTest.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -91,19 +90,21 @@
       <Project>{7bbae514-895c-4ca5-95ba-b2a1a0c2e0af}</Project>
       <Name>BenchmarkDotNet.Diagnostics</Name>
     </ProjectReference>
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.FSharp\BenchmarkDotNet.IntegrationTests.FSharp.fsproj">
+      <Project>{367fafe1-a1c8-4aa1-9334-f4762e128dbb}</Project>
+      <Name>BenchmarkDotNet.IntegrationTests.FSharp</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj">
       <Project>{0f20fa04-52d8-4db9-8b39-909125396a87}</Project>
       <Name>BenchmarkDotNet</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PretendFSharpTest.fs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

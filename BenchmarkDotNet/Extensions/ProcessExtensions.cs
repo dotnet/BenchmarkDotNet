@@ -15,9 +15,9 @@ namespace BenchmarkDotNet.Extensions
             process.PriorityClass = ProcessPriorityClass.High;;
         }
 
-        public static void EnsureRightProcessorAffinity(this Process process)
+        public static void EnsureProcessorAffinity(this Process process, int value)
         {
-            process.ProcessorAffinity = new IntPtr(2);
+            process.ProcessorAffinity = new IntPtr(value);
         }
     }
 }

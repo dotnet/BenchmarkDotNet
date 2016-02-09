@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{0F20FA04-52D8-4DB9-8B39-909125396A87}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -49,108 +49,120 @@
     <Reference Include="System.Management" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BenchmarkConverter.cs" />
-    <Compile Include="BenchmarkIterationMode.cs" />
-    <Compile Include="BenchmarkState.cs" />
-    <Compile Include="BenchmarkRunnerExtensions.cs" />
-    <Compile Include="EnvironmentInfo.cs" />
-    <Compile Include="Extensions\StatSummaryExtensions.cs" />
+    <Compile Include="Attributes\ConfigAttribute.cs" />
+    <Compile Include="Columns\Column.cs" />
+    <Compile Include="Columns\ParamColumn.cs" />
+    <Compile Include="Columns\PlaceColumn.cs" />
+    <Compile Include="Configs\ConfigExtensions.cs" />
+    <Compile Include="Configs\ConfigParser.cs" />
+    <Compile Include="Configs\ConfigUnionRule.cs" />
+    <Compile Include="Configs\IConfig.cs" />
+    <Compile Include="Configs\IConfigSource.cs" />
+    <Compile Include="Exporters\HtmlExporter.cs" />
+    <Compile Include="Horology\ClockExtensions.cs" />
+    <Compile Include="Horology\ClockSpan.cs" />
+    <Compile Include="Horology\DateTimeClock.cs" />
+    <Compile Include="Horology\IClock.cs" />
+    <Compile Include="Horology\StartedClock.cs" />
+    <Compile Include="Horology\StopwatchClock.cs" />
+    <Compile Include="Horology\WindowsClock.cs" />
+    <Compile Include="Jobs\IJob.cs" />
+    <Compile Include="Jobs\JobExtensions.cs" />
+    <Compile Include="Parameters\ParameterDefinition.cs" />
+    <Compile Include="Parameters\ParameterDefinitions.cs" />
+    <Compile Include="Parameters\ParameterInstance.cs" />
+    <Compile Include="Properties\BenchmarkDotNetInfo.cs" />
+    <Compile Include="Reports\MeasurementExtensions.cs" />
+    <Compile Include="Reports\SummaryTableExtensions.cs" />
+    <Compile Include="Running\BenchmarkConverter.cs" />
+    <Compile Include="Running\IterationMode.cs" />
+    <Compile Include="Running\State.cs" />
+    <Compile Include="Configs\DefaultConfig.cs" />
+    <Compile Include="Configs\ManualConfig.cs" />
+    <Compile Include="Helpers\EnvironmentHelper.cs" />
+    <Compile Include="Extensions\StatisticsExtensions.cs" />
+    <Compile Include="Helpers\EnumerableHelper.cs" />
     <Compile Include="Helpers\ResourceHelper.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
-    <Compile Include="Plugins\Exporters\BenchmarkCsvRunsExporter.cs" />
-    <Compile Include="Plugins\Exporters\BenchmarkExporterBase.cs" />
-    <Compile Include="Plugins\Exporters\BenchmarkPlainExporter.cs" />
-    <Compile Include="Plugins\Exporters\BenchmarkRPlotExporter.cs" />
-    <Compile Include="Plugins\Loggers\BenchmarkLoggerWithPrefix.cs" />
-    <Compile Include="Plugins\ResultExtenders\BenchmarkStatResultExtender.cs" />
-    <Compile Include="TimeUnit.cs" />
-    <Compile Include="Plugins\Analyzers\BenchmarkAnalysisWarning.cs" />
-    <Compile Include="Plugins\Analyzers\BenchmarkCompositeAnalyser.cs" />
-    <Compile Include="Plugins\Analyzers\BenchmarkEnvironmentAnalyser.cs" />
-    <Compile Include="Plugins\Analyzers\IBenchmarkAnalyser.cs" />
-    <Compile Include="Plugins\Analyzers\IBenchmarkAnalysisWarning.cs" />
-    <Compile Include="Plugins\BenchmarkDefaultPlugins.cs" />
-    <Compile Include="Plugins\Diagnosers\BenchmarkCompositeDiagnoser.cs" />
-    <Compile Include="Plugins\Diagnosers\IBenchmarkDiagnoser.cs" />
+    <Compile Include="Columns\PropertyColumn.cs" />
+    <Compile Include="Exporters\CsvMeasurementsExporter.cs" />
+    <Compile Include="Exporters\ExporterBase.cs" />
+    <Compile Include="Exporters\PlainExporter.cs" />
+    <Compile Include="Exporters\RPlotExporter.cs" />
+    <Compile Include="Jobs\Count.cs" />
+    <Compile Include="Loggers\LoggerWithPrefix.cs" />
+    <Compile Include="Columns\StatisticColumn.cs" />
+    <Compile Include="Reports\SummaryTable.cs" />
+    <Compile Include="Reports\Summay.cs" />
+    <Compile Include="Horology\Chronometer.cs" />
+    <Compile Include="Horology\TimeUnit.cs" />
+    <Compile Include="Analyzers\Warning.cs" />
+    <Compile Include="Analyzers\CompositeAnalyser.cs" />
+    <Compile Include="Analyzers\EnvironmentAnalyser.cs" />
+    <Compile Include="Analyzers\IAnalyser.cs" />
+    <Compile Include="Analyzers\IWarning.cs" />
+    <Compile Include="Diagnosers\CompositeDiagnoser.cs" />
+    <Compile Include="Diagnosers\IDiagnoser.cs" />
     <Compile Include="Extensions\ReportExtensions.cs" />
-    <Compile Include="Plugins\BenchmarkPluginBuilder.cs" />
-    <Compile Include="Plugins\Exporters\BenchmarkCompositeExporter.cs" />
-    <Compile Include="Plugins\IBenchmarkPluginBuilder.cs" />
-    <Compile Include="Plugins\IBenchmarkPlugins.cs" />
-    <Compile Include="Plugins\BenchmarkPluginsExtensions.cs" />
-    <Compile Include="Plugins\IPlugin.cs" />
-    <Compile Include="Plugins\Loggers\BenchmarkAccumulationLogger.cs" />
-    <Compile Include="Plugins\ResultExtenders\BenchmarkBaselineDeltaResultExtender.cs" />
-    <Compile Include="Plugins\ResultExtenders\IBenchmarkResultExtender.cs" />
-    <Compile Include="Plugins\Toolchains\BenchmarkToolchainBuilder.cs" />
-    <Compile Include="Plugins\Toolchains\IBenchmarkToolchainBuilder.cs" />
-    <Compile Include="Plugins\Toolchains\BenchmarkToolchainFacade.cs" />
-    <Compile Include="Plugins\Toolchains\Classic\BenchmarkClassicBuilder.cs" />
-    <Compile Include="Plugins\Exporters\BenchmarkCsvExporter.cs" />
-    <Compile Include="Plugins\Exporters\IBenchmarkExporter.cs" />
-    <Compile Include="Plugins\Exporters\BenchmarkMarkdownExporter.cs" />
-    <Compile Include="Plugins\Exporters\BenchmarkExporterHelper.cs" />
-    <Compile Include="Plugins\Toolchains\IBenchmarkGenerator.cs" />
-    <Compile Include="Plugins\Toolchains\IBenchmarkBuilder.cs" />
-    <Compile Include="Plugins\Toolchains\IBenchmarkExecutor.cs" />
-    <Compile Include="Plugins\Toolchains\IBenchmarkToolchainFacade.cs" />
-    <Compile Include="Plugins\Toolchains\Results\BenchmarkBuildResult.cs" />
-    <Compile Include="Plugins\Toolchains\Results\BenchmarkExecResult.cs" />
-    <Compile Include="Plugins\Toolchains\Results\BenchmarkGenerateResult.cs" />
-    <Compile Include="Plugins\Loggers\MSBuildConsoleLogger.cs" />
-    <Compile Include="ParamsAttribute.cs" />
-    <Compile Include="Statistic\ConfidenceInterval.cs" />
-    <Compile Include="Statistic\StatSummary.cs" />
-    <Compile Include="SetupAttribute.cs" />
-    <Compile Include="Tasks\BenchmarkToolchain.cs" />
-    <Compile Include="Tasks\BenchmarkParameters.cs" />
-    <Compile Include="Tasks\BenchmarkParametersSets.cs" />
-    <Compile Include="Tasks\BenchmarkRuntime.cs" />
-    <Compile Include="Tasks\BenchmarkTaskAttribute.cs" />
-    <Compile Include="OperationsPerInvokeAttribute.cs" />
-    <Compile Include="Benchmark.cs" />
-    <Compile Include="BenchmarkSwitcher.cs" />
-    <Compile Include="Plugins\Toolchains\Classic\BenchmarkClassicExecutor.cs" />
-    <Compile Include="BenchmarkMethodInvoker.cs" />
-    <Compile Include="Tasks\BenchmarkConfiguration.cs" />
-    <Compile Include="Tasks\BenchmarkFramework.cs" />
-    <Compile Include="Plugins\Toolchains\Classic\BenchmarkClassicGenerator.cs" />
-    <Compile Include="Tasks\BenchmarkJitVersion.cs" />
-    <Compile Include="Tasks\BenchmarkMode.cs" />
-    <Compile Include="Tasks\BenchmarkPlatform.cs" />
-    <Compile Include="Tasks\BenchmarkPropertyExtensions.cs" />
-    <Compile Include="Tasks\BenchmarkProperty.cs" />
-    <Compile Include="Tasks\BenchmarkTarget.cs" />
-    <Compile Include="Tasks\BenchmarkTask.cs" />
+    <Compile Include="Exporters\CompositeExporter.cs" />
+    <Compile Include="Loggers\AccumulationLogger.cs" />
+    <Compile Include="Columns\BaselineDiffColumn.cs" />
+    <Compile Include="Columns\IColumn.cs" />
+    <Compile Include="Toolchains\Classic\ClassicToolchain.cs" />
+    <Compile Include="Toolchains\Toolchain.cs" />
+    <Compile Include="Toolchains\Classic\ClassicBuilder.cs" />
+    <Compile Include="Exporters\CsvExporter.cs" />
+    <Compile Include="Exporters\IExporter.cs" />
+    <Compile Include="Exporters\MarkdownExporter.cs" />
+    <Compile Include="Toolchains\IGenerator.cs" />
+    <Compile Include="Toolchains\IBuilder.cs" />
+    <Compile Include="Toolchains\IExecutor.cs" />
+    <Compile Include="Toolchains\IToolchain.cs" />
+    <Compile Include="Toolchains\Results\BuildResult.cs" />
+    <Compile Include="Toolchains\Results\ExecuteResult.cs" />
+    <Compile Include="Toolchains\Results\GenerateResult.cs" />
+    <Compile Include="Loggers\MsBuildConsoleLogger.cs" />
+    <Compile Include="Attributes\ParamsAttribute.cs" />
+    <Compile Include="Mathematics\ConfidenceInterval.cs" />
+    <Compile Include="Mathematics\Statistics.cs" />
+    <Compile Include="Attributes\SetupAttribute.cs" />
+    <Compile Include="Parameters\ParameterInstances.cs" />
+    <Compile Include="Jobs\Runtime.cs" />
+    <Compile Include="Running\Benchmark.cs" />
+    <Compile Include="Running\BenchmarkSwitcher.cs" />
+    <Compile Include="Toolchains\Classic\ClassicExecutor.cs" />
+    <Compile Include="Running\MethodInvoker.cs" />
+    <Compile Include="Jobs\Framework.cs" />
+    <Compile Include="Toolchains\Classic\ClassicGenerator.cs" />
+    <Compile Include="Jobs\Jit.cs" />
+    <Compile Include="Jobs\Mode.cs" />
+    <Compile Include="Jobs\Platform.cs" />
+    <Compile Include="Running\BenchmarkTarget.cs" />
+    <Compile Include="Jobs\Job.cs" />
     <Compile Include="Extensions\ConfigurationExtensions.cs" />
     <Compile Include="Extensions\ReflectionExtensions.cs" />
     <Compile Include="Reports\BenchmarkReport.cs" />
-    <Compile Include="Plugins\Loggers\BenchmarkCompositeLogger.cs" />
-    <Compile Include="Plugins\Loggers\BenchmarkStreamLogger.cs" />
-    <Compile Include="Plugins\Loggers\BenchmarkLoggerExtensions.cs" />
-    <Compile Include="Plugins\Loggers\BenchmarkLogKind.cs" />
-    <Compile Include="Plugins\Loggers\IBenchmarkLogger.cs" />
-    <Compile Include="BenchmarkAttribute.cs" />
-    <Compile Include="BenchmarkRunner.cs" />
-    <Compile Include="Plugins\Loggers\BenchmarkConsoleLogger.cs" />
-    <Compile Include="Reports\BenchmarkRunReport.cs" />
+    <Compile Include="Loggers\CompositeLogger.cs" />
+    <Compile Include="Loggers\StreamLogger.cs" />
+    <Compile Include="Loggers\LoggerExtensions.cs" />
+    <Compile Include="Loggers\LogKind.cs" />
+    <Compile Include="Loggers\ILogger.cs" />
+    <Compile Include="Attributes\BenchmarkAttribute.cs" />
+    <Compile Include="Running\BenchmarkRunner.cs" />
+    <Compile Include="Loggers\ConsoleLogger.cs" />
+    <Compile Include="Reports\Measurement.cs" />
     <Compile Include="Extensions\CommonExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tasks\TaskAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\BenchmarkCsproj.txt" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\BenchmarkProgram.txt" />
-    <EmbeddedResource Include="Templates\BenchmarkSingleRun.txt" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\BenchmarkAppConfig.txt" />
     <EmbeddedResource Include="Templates\BenchmarkAppConfigEmpty.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Templates\BenchmarkThroughput.txt" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\BuildBenchmark.txt" />
@@ -158,6 +170,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Templates\BuildPlots.R" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

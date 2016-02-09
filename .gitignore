@@ -33,6 +33,10 @@ _ReSharper*/
 *.resharper
 packages/
 nuget.exe
+
+.idea/
+*.iml
+
 BenchmarkDotNet.IntegrationTests/**/Program.cs
 BenchmarkDotNet.IntegrationTests/**/Program.csproj
 BenchmarkDotNet.IntegrationTests/*.csv
