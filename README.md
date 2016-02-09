@@ -1,4 +1,4 @@
-**BenchmarkDotNet** is a .NET library for benchmarking, it helps you to create accurate benchmarks in an easy way.
+**BenchmarkDotNet** is a powerful .NET library for benchmarking.
 
 [![NuGet version](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/) [![NuGet downloads](https://img.shields.io/nuget/dt/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/) [![Join the chat at https://gitter.im/PerfDotNet/BenchmarkDotNet](https://img.shields.io/gitter/room/PerfDotNet/BenchmarkDotNet.svg)](https://gitter.im/PerfDotNet/BenchmarkDotNet)
 
@@ -61,7 +61,7 @@ var summary = BenchmarkRunner.Run<Md5VsSha256>();
 **Step 4.** View the results. Here is an example of output from the above benchmark:
 
 ```ini
-BenchmarkDotNet-Dev=v0.8.2.0+
+BenchmarkDotNet=v0.9.0.0
 OS=Microsoft Windows NT 6.2.9200.0
 Processor=Intel(R) Core(TM) i7-4810MQ CPU @ 2.80GHz, ProcessorCount=8
 Frequency=2728067 ticks, Resolution=366.5599 ns
@@ -415,34 +415,6 @@ public class IntroParams
  Benchmark | 215.3024 ms | 0.0375 ms | 200 | 10
  Benchmark | 225.2710 ms | 0.0434 ms | 200 | 20
 
-### OperationsPerInvoke
-
-Sometimes you want to measure several operations in a single method. In this case, you can specify amount of operations in the `Benchmark` attribute.
-
-**Example**
-
-```cs
-private double a, b, c, d;
-
-[Benchmark(OperationsPerInvoke = 4)]
-public void Parallel()
-{
-    a++;
-    b++;
-    c++;
-    d++;
-}
-
-[Benchmark(OperationsPerInvoke = 4)]
-public void Sequential()
-{
-    a++;
-    a++;
-    a++;
-    a++;
-}
-```
-
 ### Setup
 
 If you have some data that you want to initialize, the `Setup` method is the best place for this:
@@ -481,10 +453,10 @@ public int ForEachList()
 
 ### Baseline
 
-You can mark one of your benchmark method as a baseline:
+You can mark one of your benchmark methods as a baseline:
 
 ```cs
-public class Intro_08_Baseline
+public class Sleeps
 {
     [Benchmark]
     public void Time50()
@@ -509,23 +481,20 @@ public class Intro_08_Baseline
 As a result, you will have additional column in the summary table:
 
 ```ini
-BenchmarkDotNet=v0.8.2.0
+BenchmarkDotNet=v0.9.0.0
 OS=Microsoft Windows NT 6.2.9200.0
 Processor=Intel(R) Core(TM) i7-4810MQ CPU @ 2.80GHz, ProcessorCount=8
-Freq=2728058 ticks, Resolution=366.5611 ns [HighResolution]
+Frequency=2728067 ticks, Resolution=366.5599 ns
 HostCLR=MS.NET 4.0.30319.42000, Arch=64-bit RELEASE [RyuJIT]
 
-Type=Intro_08_Baseline  Mode=Throughput  Platform=HostPlatform  
-Jit=HostJit  .NET=HostFramework  toolchain=Classic  
-Runtime=Clr  Warmup=5  Target=10  
+Type=Sleeps  Mode=Throughput
 ```
 
-  Method |     AvrTime |     Error | +/- Delta
--------- |------------ |---------- |----------
- Time100 | 100.4055 ms | 0.1595 ms |         -
- Time150 | 150.2872 ms | 0.0231 ms |     49.7%
-  Time50 |  50.1891 ms | 0.0108 ms |    -50.0%
-
+  Method |      Median |    StdDev | Scaled
+-------- |------------ |---------- |-------
+ Time100 | 100.2640 ms | 0.1238 ms |   1.00
+ Time150 | 150.2093 ms | 0.1034 ms |   1.50
+  Time50 |  50.2509 ms | 0.1153 ms |   0.50
 
 
 ### How to run?
