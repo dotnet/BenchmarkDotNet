@@ -1,11 +1,9 @@
-﻿module Program =
-
-    open BenchmarkDotNet.Attributes 
-    open BenchmarkDotNet.Running
+module Program =
     open System
-    open System.Reflection
     open System.IO
     open System.Collections.Concurrent
+    open BenchmarkDotNet.Attributes
+    open BenchmarkDotNet.Running
 
     let getStrings len = Array.init len (fun _ -> Path.GetRandomFileName())
 
@@ -36,11 +34,7 @@
         member self.OrdinalLookup () = lookup arr dict2
 
 
-    let defaultSwitch () =
-        Assembly.GetExecutingAssembly().GetTypes() |> Array.filter (fun t ->
-            t.GetMethods ()|> Array.exists (fun m -> 
-                m.GetCustomAttributes (typeof<BenchmarkAttribute>, false) <> [||] ))
-        |> BenchmarkSwitcher
+    let defaultSwitch () = BenchmarkSwitcher [| typeof<StringKeyComparison>  |]
 
     let [<EntryPoint>] main args =
         defaultSwitch().Run args 
