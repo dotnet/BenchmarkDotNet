@@ -7,10 +7,12 @@
   "veryImportantComment": "we need to exclude all auto-generated files that created during integration test execution",
   "frameworks": {
     "net45": {
+      "compilationOptions": {
+        "define": [ "CLASSIC" ]
+      },
       "dependencies": {
         "BenchmarkDotNet.Diagnostics": "1.0.0-*",
         "Dia2Lib": "1.0.0-*",
-        "FSharpBenchmarkDotNet": "1.0.0-*",
         "Interop.Dia2Lib": "1.0.0-*",
         "Microsoft.Diagnostics.Runtime": "1.0.0-*",
         "xunit.runner.visualstudio": "2.1.0"
@@ -26,7 +28,6 @@
         "System.Threading.Tasks": "4.0.0.0"
       },
       "dependencies": {
-        "FSharpBenchmarkDotNet": "1.0.0-*",
         "Microsoft.Diagnostics.Runtime": "1.0.0-*",
         "xunit.runner.dnx": "2.1.0-rc1-build204"
       }

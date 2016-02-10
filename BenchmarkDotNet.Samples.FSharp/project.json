@@ -1,0 +1,42 @@
+{
+  "version": "1.0.0-*",
+
+  "compilationOptions": {
+    "emitEntryPoint": true,
+    "allowUnsafe": true,
+    "optimize": true
+  },
+  "commands": {
+    "runOnlyFromConsole": "BenchmarkDotNet.Samples.FSharp"
+  },
+
+  "dependencies": {
+    "BenchmarkDotNet": {
+      "target": "project"
+    }
+  },
+  "frameworks": {
+    "net45": { },
+    "dnx451": {
+      "dependencies": {
+        "FSharp.Dnx": {
+          "type": "build",
+          "version": "1.0.0-*"
+        }
+      }
+    }
+  },
+
+  "compiler": {
+    "name": "F#",
+    "compilerAssembly": "FSharp.Dnx",
+    "compilerType": "FSharp.Dnx.FSharpProjectCompiler"
+  },
+
+  "fsharp": {
+    "files": [
+      "AssemblyInfo.fs",
+      "Program.fs"
+    ]
+  }
+}
