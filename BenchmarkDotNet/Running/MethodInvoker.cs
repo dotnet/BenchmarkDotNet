@@ -73,6 +73,20 @@ namespace BenchmarkDotNet.Running
             Invoke(job, multiInvoke);
         }
 
+        public void Invoke<T>(IJob job, long operationsPerInvoke, Action setupAction, Func<T> targetAction, Func<int> idleAction)
+        {
+            // Jitting
+            setupAction();
+            targetAction();
+            idleAction();
+
+            // Run
+            Func<MultiInvokeInput, Measurement> multiInvoke = input => input.IterationMode.IsOneOf(IterationMode.IdleWarmup, IterationMode.IdleTarget) ?
+                MultiInvoke(input.IterationMode, input.Index, setupAction, idleAction, input.InvokeCount, operationsPerInvoke) :
+                MultiInvoke(input.IterationMode, input.Index, setupAction, targetAction, input.InvokeCount, operationsPerInvoke);
+            Invoke(job, multiInvoke);
+        }
+
         private void Invoke(IJob job, Func<MultiInvokeInput, Measurement> multiInvoke)
         {
             long invokeCount = 1;

@@ -51,6 +51,9 @@ namespace BenchmarkDotNet.Toolchains.Classic
             var targetMethodReturnType = isVoid
                 ? "void"
                 : target.Method.ReturnType.GetCorrectTypeName();
+            var idleMethodReturnType = isVoid || !target.Method.ReturnType.IsValueType
+                ? targetMethodReturnType
+                : "int";
             var targetMethodResultHolder = isVoid
                 ? ""
                 : $"private {targetMethodReturnType} value;";
@@ -60,6 +63,9 @@ namespace BenchmarkDotNet.Toolchains.Classic
             var targetMethodDelegateType = isVoid
                 ? "Action "
                 : $"Func<{targetMethodReturnType}> ";
+            var idleMethodDelegateType = isVoid
+                ? "Action "
+                : $"Func<{idleMethodReturnType}> ";
 
             // setupMethod is optional, so default to an empty delegate, so there is always something that can be invoked
             var setupMethodName = target.SetupMethod != null
@@ -68,7 +74,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
 
             var idleImplementation = isVoid
                 ? ""
-                : $"return default({targetMethodReturnType});";
+                : $"return {(target.Method.ReturnType.IsValueType ? "0" : "null")};";
 
             var paramsContent = string.Join("", benchmark.Parameters.Items.Select(parameter => 
                 $"{(parameter.IsStatic ? "" : "instance.")}{parameter.Name} = {GetParameterValue(parameter.Value)};"));
@@ -86,6 +92,8 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 Replace("$TargetMethodDelegateType$", targetMethodDelegateType).
                 Replace("$TargetMethodHoldValue$", targetMethodHoldValue).
                 Replace("$TargetMethodReturnType$", targetMethodReturnType).
+                Replace("$IdleMethodDelegateType$", idleMethodDelegateType).
+                Replace("$IdleMethodReturnType$", idleMethodReturnType).
                 Replace("$SetupMethodName$", setupMethodName).
                 Replace("$IdleImplementation$", idleImplementation).
                 Replace("$AdditionalLogic$", target.AdditionalLogic).

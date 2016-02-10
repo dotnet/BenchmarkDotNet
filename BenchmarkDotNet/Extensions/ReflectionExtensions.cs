@@ -23,7 +23,11 @@ namespace BenchmarkDotNet.Extensions
 
         public static string GetCorrectTypeName(this Type type)
         {
-            var prefix = type.IsNested ? $"{type.Namespace}.{type.DeclaringType.Name}." : $"{ type.Namespace}.";
+            var prefix = "";
+            if (!string.IsNullOrEmpty(type.Namespace))
+                prefix += type.Namespace + ".";
+            if (type.IsNested && type.DeclaringType != null)
+                prefix += type.DeclaringType.Name + ".";
 
             if (type.IsGenericType)
             {
