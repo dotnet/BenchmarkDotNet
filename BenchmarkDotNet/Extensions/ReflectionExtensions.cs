@@ -23,20 +23,19 @@ namespace BenchmarkDotNet.Extensions
 
         public static string GetCorrectTypeName(this Type type)
         {
-            if (!type.IsGenericType)
+            var prefix = type.IsNested ? $"{type.Namespace}.{type.DeclaringType.Name}." : $"{ type.Namespace}.";
+
+            if (type.IsGenericType)
             {
-                if (type.IsNested)
-                    return $"{type.DeclaringType.Name}.{type.Name}";
-                return type.Name;
+                var mainName = type.Name.Substring(0, type.Name.IndexOf('`'));
+                string args = string.Join(", ", type.GetGenericArguments().Select(GetCorrectTypeName).ToArray());
+                return $"{prefix}{mainName}<{args}>";
             }
 
-            var mainName = type.Name.Substring(0, type.Name.IndexOf('`'));
-            string args = string.Join(", ", type.GetGenericArguments().Select(GetCorrectTypeName).ToArray());
-            if (type.IsNested)
-            {
-                return $"{type.Namespace}.{type.DeclaringType.Name}.{mainName}<{args}>";
-            }
-            return $"{type.Namespace}.{mainName}<{args}>";
+            if (type.IsArray)
+                return GetCorrectTypeName(type.GetElementType()) + "[" + new string(',', type.GetArrayRank() - 1) + "]";
+
+            return prefix + type.Name;
         }
     }
 }
