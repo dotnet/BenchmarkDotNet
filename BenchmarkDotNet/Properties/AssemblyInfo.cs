@@ -18,4 +18,5 @@ using BenchmarkDotNet.Properties;
 [assembly: ComVisible(false)]
 [assembly: Guid("cbba82d3-e650-407f-a0f0-767891d4f04c")]
 
+[assembly: InternalsVisibleTo("BenchmarkDotNet.Tests")]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.IntegrationTests")]
