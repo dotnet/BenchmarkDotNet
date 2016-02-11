@@ -73,6 +73,7 @@
     <Compile Include="Parameters\ParameterInstance.cs" />
     <Compile Include="Properties\BenchmarkDotNetInfo.cs" />
     <Compile Include="Reports\MeasurementExtensions.cs" />
+    <Compile Include="Reports\ParameterComparer.cs" />
     <Compile Include="Reports\SummaryTableExtensions.cs" />
     <Compile Include="Running\BenchmarkConverter.cs" />
     <Compile Include="Running\IterationMode.cs" />
