@@ -6,6 +6,8 @@ namespace BenchmarkDotNet.Parameters
     public class ParameterInstances
     {
         public IList<ParameterInstance> Items { get; }
+        public int Count => Items.Count;
+        public ParameterInstance this[int index] => Items[index];
 
         public ParameterInstances(IList<ParameterInstance> items)
         {

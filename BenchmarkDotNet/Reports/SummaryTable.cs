@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Reports
             FullHeader = columns.Select(c => c.ColumnName).ToArray();
 
             var reports = summary.Reports.Values.
-                OrderBy(r => r.Benchmark.Parameters, new ParameterComparer()).
+                OrderBy(r => r.Benchmark.Parameters, ParameterComparer.Instance).
                 ThenBy(r => r.Benchmark.Target.Type.Name).
                 ToList();
             FullContent = reports.Select(r => columns.Select(c => c.GetValue(summary, r.Benchmark)).ToArray()).ToArray();

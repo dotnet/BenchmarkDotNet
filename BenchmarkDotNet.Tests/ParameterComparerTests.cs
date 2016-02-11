@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void BasicComparisionTest()
         {
-            var comparer = new ParameterComparer();
+            var comparer = ParameterComparer.Instance;
 
             var sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: new object[0]);
             var originalData = new[]
@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void MultiParameterComparisionTest()
         {
-            var comparer = new ParameterComparer();
+            var comparer = ParameterComparer.Instance;
 
             var sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: new object[0]);
             var originalData = new []
@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void AlphaNumericComparisionTest()
         {
-            var comparer = new ParameterComparer();
+            var comparer = ParameterComparer.Instance;
 
             var sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: new object[0]);
             var originalData = new[]
@@ -117,7 +117,7 @@ namespace BenchmarkDotNet.Tests
 
             var sortedData = originalData.OrderBy(d => d, comparer).ToArray();
 
-            // Check that we sory by numeric value, not string order!!
+            // Check that we sort by numeric value, not string order!!
             Assert.Equal(100, sortedData[0].Items[0].Value);
             Assert.Equal(500, sortedData[1].Items[0].Value);
             Assert.Equal(1000, sortedData[2].Items[0].Value);
