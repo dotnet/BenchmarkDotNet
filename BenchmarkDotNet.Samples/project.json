@@ -10,15 +10,16 @@
   },
   "frameworks": {
     "net40": {
+      "BenchmarkDotNet.Diagnostics": "1.0.0-*"
     },
     "dnx451": {
     }
   },
   "dependencies": {
     "BenchmarkDotNet": {
-      "target": "project"
-    },
-    "BenchmarkDotNet.Diagnostics": "1.0.0-*"
+      "target": "project",
+      "version": "1.0.0-*"
+    }
   },
   "scripts": {
     "postbuild": [

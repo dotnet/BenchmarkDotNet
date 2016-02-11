@@ -6,28 +6,30 @@ using BenchmarkDotNet.Toolchains.Results;
 
 namespace BenchmarkDotNet.Toolchains.Dnx
 {
-    /// <summary>
-    /// relies on a MS "dnu" command line tool (it is just Microsoft.Dnx.Tooling.dll installed with dnvm)
-    /// Nuget 3 will replace dnu restore in the future: https://github.com/aspnet/dnx/issues/3216
-    /// </summary>
-    public class DnuBuilder : IBuilder
+    public class DnxBuilder : IBuilder
     {
         private static readonly int DefaultTimeout = (int)TimeSpan.FromMinutes(2).TotalMilliseconds;
 
         /// <summary>
         /// generates project.lock.json that tells compiler where to take dlls and source from
+        /// and builds executable and copies all required dll's
         /// </summary>
         public BuildResult Build(GenerateResult generateResult, ILogger logger)
         {
-            if (!ExecuteCommand(generateResult.DirectoryPath, "dnu restore", logger))
+            if (!ExecuteCommand("restore", generateResult.DirectoryPath, logger))
             {
-                return new BuildResult(generateResult, true, new Exception("dnu restore has failed"));
+                return new BuildResult(generateResult, true, new Exception("dotnet restore has failed"));
+            }
+
+            if (!ExecuteCommand("build --framework dnx451 --configuration RELEASE", generateResult.DirectoryPath, logger))
+            {
+                return new BuildResult(generateResult, true, new Exception("dotnet build has failed"));
             }
 
             return new BuildResult(generateResult, true, null);
         }
 
-        private bool ExecuteCommand(string workingDirectory, string arguments, ILogger logger)
+        private bool ExecuteCommand(string arguments, string workingDirectory, ILogger logger)
         {
             using (var process = new Process { StartInfo = BuildStartInfo(workingDirectory, arguments)})
             {
@@ -50,9 +52,9 @@ namespace BenchmarkDotNet.Toolchains.Dnx
         {
             return new ProcessStartInfo
             {
-                FileName = "cmd.exe",
+                FileName = "dotnet.exe",
                 WorkingDirectory = workingDirectory,
-                Arguments = $"/c {arguments}",
+                Arguments = arguments,
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,

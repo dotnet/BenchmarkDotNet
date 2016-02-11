@@ -12,31 +12,6 @@
           "Microsoft.Build.Utilities.v4.0",
           "System.Management"
         ]
-      },
-      "BenchmarkDotNet.Diagnostics/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0",
-        "dependencies": {
-          "BenchmarkDotNet": null,
-          "Dia2Lib": "1.0.0",
-          "Interop.Dia2Lib": "1.0.0",
-          "Microsoft.Diagnostics.Runtime": "1.0.0"
-        }
-      },
-      "Dia2Lib/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0"
-      },
-      "Interop.Dia2Lib/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0"
-      },
-      "Microsoft.Diagnostics.Runtime/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0",
-        "dependencies": {
-          "Dia2Lib": "1.0.0"
-        }
       }
     },
     "DNX,Version=v4.5.1": {
@@ -49,34 +24,6 @@
           "System.Reflection",
           "System.Runtime"
         ]
-      },
-      "BenchmarkDotNet.Diagnostics/1.0.0": {
-        "type": "project",
-        "framework": "DNX,Version=v4.5.1",
-        "dependencies": {
-          "BenchmarkDotNet": null,
-          "Dia2Lib": "1.0.0",
-          "Interop.Dia2Lib": "1.0.0",
-          "Microsoft.Diagnostics.Runtime": "1.0.0"
-        },
-        "frameworkAssemblies": [
-          "System.Runtime"
-        ]
-      },
-      "Dia2Lib/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0"
-      },
-      "Interop.Dia2Lib/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0"
-      },
-      "Microsoft.Diagnostics.Runtime/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0",
-        "dependencies": {
-          "Dia2Lib": "1.0.0"
-        }
       }
     },
     ".NETFramework,Version=v4.0/win7-x86": {
@@ -89,31 +36,6 @@
           "Microsoft.Build.Utilities.v4.0",
           "System.Management"
         ]
-      },
-      "BenchmarkDotNet.Diagnostics/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0",
-        "dependencies": {
-          "BenchmarkDotNet": null,
-          "Dia2Lib": "1.0.0",
-          "Interop.Dia2Lib": "1.0.0",
-          "Microsoft.Diagnostics.Runtime": "1.0.0"
-        }
-      },
-      "Dia2Lib/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0"
-      },
-      "Interop.Dia2Lib/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0"
-      },
-      "Microsoft.Diagnostics.Runtime/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0",
-        "dependencies": {
-          "Dia2Lib": "1.0.0"
-        }
       }
     },
     ".NETFramework,Version=v4.0/win7-x64": {
@@ -126,31 +48,6 @@
           "Microsoft.Build.Utilities.v4.0",
           "System.Management"
         ]
-      },
-      "BenchmarkDotNet.Diagnostics/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0",
-        "dependencies": {
-          "BenchmarkDotNet": null,
-          "Dia2Lib": "1.0.0",
-          "Interop.Dia2Lib": "1.0.0",
-          "Microsoft.Diagnostics.Runtime": "1.0.0"
-        }
-      },
-      "Dia2Lib/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0"
-      },
-      "Interop.Dia2Lib/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0"
-      },
-      "Microsoft.Diagnostics.Runtime/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0",
-        "dependencies": {
-          "Dia2Lib": "1.0.0"
-        }
       }
     },
     "DNX,Version=v4.5.1/win7-x86": {
@@ -163,34 +60,6 @@
           "System.Reflection",
           "System.Runtime"
         ]
-      },
-      "BenchmarkDotNet.Diagnostics/1.0.0": {
-        "type": "project",
-        "framework": "DNX,Version=v4.5.1",
-        "dependencies": {
-          "BenchmarkDotNet": null,
-          "Dia2Lib": "1.0.0",
-          "Interop.Dia2Lib": "1.0.0",
-          "Microsoft.Diagnostics.Runtime": "1.0.0"
-        },
-        "frameworkAssemblies": [
-          "System.Runtime"
-        ]
-      },
-      "Dia2Lib/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0"
-      },
-      "Interop.Dia2Lib/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0"
-      },
-      "Microsoft.Diagnostics.Runtime/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0",
-        "dependencies": {
-          "Dia2Lib": "1.0.0"
-        }
       }
     },
     "DNX,Version=v4.5.1/win7-x64": {
@@ -203,34 +72,6 @@
           "System.Reflection",
           "System.Runtime"
         ]
-      },
-      "BenchmarkDotNet.Diagnostics/1.0.0": {
-        "type": "project",
-        "framework": "DNX,Version=v4.5.1",
-        "dependencies": {
-          "BenchmarkDotNet": null,
-          "Dia2Lib": "1.0.0",
-          "Interop.Dia2Lib": "1.0.0",
-          "Microsoft.Diagnostics.Runtime": "1.0.0"
-        },
-        "frameworkAssemblies": [
-          "System.Runtime"
-        ]
-      },
-      "Dia2Lib/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0"
-      },
-      "Interop.Dia2Lib/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0"
-      },
-      "Microsoft.Diagnostics.Runtime/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0",
-        "dependencies": {
-          "Dia2Lib": "1.0.0"
-        }
       }
     }
   },
@@ -238,28 +79,11 @@
     "BenchmarkDotNet/0.8.3": {
       "type": "project",
       "path": "../BenchmarkDotNet/project.json"
-    },
-    "BenchmarkDotNet.Diagnostics/1.0.0": {
-      "type": "project",
-      "path": "../BenchmarkDotNet.Diagnostics/project.json"
-    },
-    "Dia2Lib/1.0.0": {
-      "type": "project",
-      "path": "../wrap/Dia2Lib/project.json"
-    },
-    "Interop.Dia2Lib/1.0.0": {
-      "type": "project",
-      "path": "../wrap/Interop.Dia2Lib/project.json"
-    },
-    "Microsoft.Diagnostics.Runtime/1.0.0": {
-      "type": "project",
-      "path": "../wrap/Microsoft.Diagnostics.Runtime/project.json"
     }
   },
   "projectFileDependencyGroups": {
     "": [
-      "BenchmarkDotNet ",
-      "BenchmarkDotNet.Diagnostics >= 1.0.0-*"
+      "BenchmarkDotNet >= 1.0.0-*"
     ],
     ".NETFramework,Version=v4.0": [],
     "DNX,Version=v4.5.1": []

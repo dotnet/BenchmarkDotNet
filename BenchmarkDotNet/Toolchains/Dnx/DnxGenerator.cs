@@ -5,7 +5,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Classic;
 
@@ -31,7 +30,6 @@ namespace BenchmarkDotNet.Toolchains.Dnx
 
             var content = SetPlatform(template, benchmark.Job.Platform);
             content = SetDependencyToExecutingAssembly(content, benchmark.Target.Type);
-            content = SetDependencyToMyself(content);
     
             var projectJsonFilePath = Path.Combine(projectDir, ProjectFileName);
 
@@ -54,19 +52,8 @@ namespace BenchmarkDotNet.Toolchains.Dnx
             var packageVersion = GetPackageVersion(assemblyName);
 
             return template
-                .Replace("$EXECUTINGASSEMBLYVERSION", packageVersion) 
-                .Replace("$EXECUTINGASSEMBLY", assemblyName.Name);
-        }
-
-        private static string SetDependencyToMyself(string template)
-        {
-            var assemblyName = typeof(DnxGenerator).Assembly.GetName();
-            var packageVersion = GetPackageVersion(assemblyName);
-            var targetType = GetTargetType();
-
-            return template
-                .Replace("$VERSION", packageVersion)
-                .Replace("$TARGETTYPE", targetType);
+                .Replace("$EXECUTINGASSEMBLYVERSION$", packageVersion) 
+                .Replace("$EXECUTINGASSEMBLY$", assemblyName.Name);
         }
 
         /// <summary>
@@ -77,14 +64,5 @@ namespace BenchmarkDotNet.Toolchains.Dnx
         {
             return $"{assemblyName.Version.Major}.{assemblyName.Version.Minor}.{assemblyName.Version.Build}-*";
         }
-
-        /// <summary>
-        /// for our development our auto-generated dll should reference project of BenchmarkDotNet, 
-        /// not the existing nuget package
-        /// for production it should point to package, not project
-        /// otherwise dnu/nuget would point to the old package which could cause a lot of problems
-        /// </summary>
-        /// <returns></returns>
-        private static string GetTargetType() => BenchmarkDotNetInfo.IsDevelopVersion ? "project" : "package";
     }
 }

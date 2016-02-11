@@ -3,13 +3,6 @@
     "DEBUG_4.0": {
       "executablePath": "BenchmarkDotNet.Samples.dll",
       "workingDirectory": "..\\artifacts\\bin\\BenchmarkDotNet.Samples\\Debug\\net40\\"
-    },
-    "DNX_TRACE": {
-      "commandName": "run",
-      "environmentVariables": {
-        "DNX_TRACE": "1"
-      },
-      "comment": "setting DNX_TRACE = 1 makes dnx tools gives much more details, use for troubleshooting DNX"
     }
   }
 }
