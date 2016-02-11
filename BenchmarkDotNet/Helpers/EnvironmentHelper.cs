@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Management;
 using System.Reflection;
@@ -31,6 +32,7 @@ namespace BenchmarkDotNet.Helpers
         public bool HasAttachedDebugger { get; set; }
         public bool HasRyuJit { get; set; }
         public string Configuration { get; set; }
+        public string JitModules { get; set; }
 
         /// <summary>
         /// The frequency of the timer as the number of ticks per second.
@@ -51,7 +53,8 @@ namespace BenchmarkDotNet.Helpers
             HasAttachedDebugger = GetHasAttachedDebugger(),
             HasRyuJit = GetHasRyuJit(),
             Configuration = GetConfiguration(),
-            ChronometerFrequency = GetChronometerFrequency()
+            ChronometerFrequency = GetChronometerFrequency(),
+            JitModules = GetJitModules()
         };
 
         public string ToFormattedString(string clrHint = "")
@@ -61,7 +64,8 @@ namespace BenchmarkDotNet.Helpers
             var line3 = $"Processor={ProcessorName}, ProcessorCount={ProcessorCount}";
             var line4 = $"Frequency={ChronometerFrequency} ticks, Resolution={GetChronometerResolution().ToTimeStr()}";
             var line5 = $"{clrHint}CLR={ClrVersion}, Arch={Architecture} {Configuration}{GetDebuggerFlag()}{GetJitFlag()}";
-            return string.Join(Environment.NewLine, line1, line2, line3, line4, line5);
+            var line6 = $"JitModules={JitModules}";
+            return string.Join(Environment.NewLine, line1, line2, line3, line4, line5, line6);
         }
 
         private string GetJitFlag() => HasRyuJit ? " [RyuJIT]" : "";
@@ -130,6 +134,15 @@ namespace BenchmarkDotNet.Helpers
             configuration = "DEBUG";
 #endif
             return configuration;
+        }
+
+        private static string GetJitModules()
+        {
+            return string.Join(";",
+                Process.GetCurrentProcess().Modules.
+                OfType<ProcessModule>().
+                Where(module => module.ModuleName.Contains("jit")).
+                Select(module => Path.GetFileNameWithoutExtension(module.FileName) + "-v" + module.FileVersionInfo.ProductVersion));
         }
 
         private static long GetChronometerFrequency() => Chronometer.Frequency;
