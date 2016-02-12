@@ -38,8 +38,8 @@ namespace BenchmarkDotNet.Running
             return (
                 from target in targets
                 from job in jobs
-                from parameterInstancese in parameterInstancesList
-                select new Benchmark(target, job, parameterInstancese)).ToSortedList();
+                from parameterInstance in parameterInstancesList
+                select new Benchmark(target, job, parameterInstance)).ToSortedList();
         }
 
         public static IConfig GetFullConfig(Type type, IConfig config)

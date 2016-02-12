@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Diagnosers;
@@ -35,6 +36,8 @@ namespace BenchmarkDotNet.Configs
                         break;
                     case "loggers":
                         break;
+                    default:
+                        throw new InvalidOperationException($"\"{split[0]}\" (from \"{arg}\") is an unrecognised Option");
                 }
             }
             return config;
@@ -66,8 +69,9 @@ namespace BenchmarkDotNet.Configs
                     return StatisticColumn.AllStatistics;
                 case "place":
                     return new[] { PlaceColumn.ArabicNumber };
+                default:
+                    throw new InvalidOperationException($"\"{value}\" is an unrecognised Column");
             }
-            return new IColumn[0];
         }
 
         private IJob[] ParseJobs(string value)
@@ -92,8 +96,9 @@ namespace BenchmarkDotNet.Configs
                     return new[] { Job.Mono };
                 case "longrun":
                     return new[] { Job.LongRun };
+                default:
+                    throw new InvalidOperationException($"\"{value}\" is an unrecognised Job");
             }
-            return new IJob[0];
         }
 
         private IDiagnoser[] ParseDiagnosers(string value)
@@ -103,7 +108,7 @@ namespace BenchmarkDotNet.Configs
                 if (value == diagnoser.GetType().Name.Replace("Diagnoser", "").ToLowerInvariant())
                     return new[] { diagnoser };
             }
-            return new IDiagnoser[0];
+            throw new InvalidOperationException($"{value} is an unrecognised Diagnoser");
         }
     }
 }

@@ -22,6 +22,7 @@ namespace BenchmarkDotNet.Parameters
             var nextDefinition = definitions.First();
             var newInstancesList = new List<ParameterInstances>();
             foreach (var instances in instancesList)
+            {
                 foreach (var value in nextDefinition.Values)
                 {
                     var items = new List<ParameterInstance>();
@@ -29,6 +30,7 @@ namespace BenchmarkDotNet.Parameters
                     items.Add(new ParameterInstance(nextDefinition, value));
                     newInstancesList.Add(new ParameterInstances(items));
                 }
+            }
             return Expand(newInstancesList, definitions.Skip(1).ToArray());
         }
 
