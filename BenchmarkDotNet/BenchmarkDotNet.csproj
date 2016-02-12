@@ -63,6 +63,8 @@
     <Compile Include="Horology\ClockExtensions.cs" />
     <Compile Include="Horology\ClockSpan.cs" />
     <Compile Include="Horology\DateTimeClock.cs" />
+    <Compile Include="Horology\FrequencyUnit.cs" />
+    <Compile Include="Horology\HardwareTimerKind.cs" />
     <Compile Include="Horology\IClock.cs" />
     <Compile Include="Horology\StartedClock.cs" />
     <Compile Include="Horology\StopwatchClock.cs" />

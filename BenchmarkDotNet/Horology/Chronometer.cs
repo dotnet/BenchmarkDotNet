@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Horology
 
         public static readonly IClock BestClock;
 
-        public static long Frequency => BestClock.Frequency;        
+        public static long Frequency => BestClock.Frequency;
         public static long GetTimestamp() => BestClock.GetTimestamp();
         public static StartedClock Start() => BestClock.Start();
         public static double GetResolution(TimeUnit timeUnit = null) => BestClock.GetResolution(timeUnit);
@@ -22,6 +22,18 @@ namespace BenchmarkDotNet.Horology
                 BestClock = WindowsClock;
             else
                 BestClock = Stopwatch;
+        }
+
+        public static HardwareTimerKind HardwareTimerKind
+        {
+            get
+            {
+                if (System.Diagnostics.Stopwatch.IsHighResolution)
+                    return Stopwatch.Frequency >= 10 * FrequencyUnit.MHz.HertzAmount 
+                        ? HardwareTimerKind.Hpet 
+                        : HardwareTimerKind.Tsc;
+                return HardwareTimerKind.Rtc;
+            }
         }
     }
 }

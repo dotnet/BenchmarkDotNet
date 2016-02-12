@@ -39,6 +39,8 @@ namespace BenchmarkDotNet.Helpers
         /// </summary>
         public long ChronometerFrequency { get; set; }
 
+        public HardwareTimerKind HardwareTimerKind { get; set; }
+
         public double GetChronometerResolution() => Chronometer.BestClock.GetResolution(TimeUnit.Nanoseconds);
 
         public static EnvironmentHelper GetCurrentInfo() => new EnvironmentHelper
@@ -54,7 +56,8 @@ namespace BenchmarkDotNet.Helpers
             HasRyuJit = GetHasRyuJit(),
             Configuration = GetConfiguration(),
             ChronometerFrequency = GetChronometerFrequency(),
-            JitModules = GetJitModules()
+            JitModules = GetJitModules(),
+            HardwareTimerKind = GetHardwareTimerKind()
         };
 
         public string ToFormattedString(string clrHint = "")
@@ -62,13 +65,14 @@ namespace BenchmarkDotNet.Helpers
             var line1 = $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}";
             var line2 = $"OS={OsVersion}";
             var line3 = $"Processor={ProcessorName}, ProcessorCount={ProcessorCount}";
-            var line4 = $"Frequency={ChronometerFrequency} ticks, Resolution={GetChronometerResolution().ToTimeStr()}";
+            var line4 = $"Frequency={ChronometerFrequency} ticks, Resolution={GetChronometerResolution().ToTimeStr()}, Timer={HardwareTimerKind.ToString().ToUpper()}";
             var line5 = $"{clrHint}CLR={ClrVersion}, Arch={Architecture} {Configuration}{GetDebuggerFlag()}{GetJitFlag()}";
             var line6 = $"JitModules={JitModules}";
             return string.Join(Environment.NewLine, line1, line2, line3, line4, line5, line6);
         }
 
         private string GetJitFlag() => HasRyuJit ? " [RyuJIT]" : "";
+
         private string GetDebuggerFlag() => HasAttachedDebugger ? " [AttachedDebugger]" : "";
 
         private static string GetBenchmarkDotNetCaption() =>
@@ -135,6 +139,8 @@ namespace BenchmarkDotNet.Helpers
 #endif
             return configuration;
         }
+
+        private static HardwareTimerKind GetHardwareTimerKind() => Chronometer.HardwareTimerKind;
 
         private static string GetJitModules()
         {
