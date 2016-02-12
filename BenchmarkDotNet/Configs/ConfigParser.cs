@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Diagnosers;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -27,6 +28,8 @@ namespace BenchmarkDotNet.Configs
                     case "exporters":
                         break;
                     case "diagnosers":
+                        foreach (var value in values)
+                            config.Add(ParseDiagnosers(value));
                         break;
                     case "analysers":
                         break;
@@ -63,7 +66,6 @@ namespace BenchmarkDotNet.Configs
                     return StatisticColumn.AllStatistics;
                 case "place":
                     return new[] { PlaceColumn.ArabicNumber };
-
             }
             return new IColumn[0];
         }
@@ -92,6 +94,16 @@ namespace BenchmarkDotNet.Configs
                     return new[] { Job.LongRun };
             }
             return new IJob[0];
+        }
+
+        private IDiagnoser[] ParseDiagnosers(string value)
+        {
+            foreach (var diagnoser in DefaultConfig.LazyLoadedDiagnosers.Value)
+            {
+                if (value == diagnoser.GetType().Name.Replace("Diagnoser", "").ToLowerInvariant())
+                    return new[] { diagnoser };
+            }
+            return new IDiagnoser[0];
         }
     }
 }

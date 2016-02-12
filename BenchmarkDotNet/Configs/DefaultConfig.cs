@@ -67,14 +67,13 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IJob> GetJobs() => EnumerableHelper.Empty<IJob>();
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
 
-        // TODO use LoadDiagnoser
         public IEnumerable<IDiagnoser> GetDiagnosers() => EnumerableHelper.Empty<IDiagnoser>();
 
         // Make the Diagnosers lazy-loaded, so they are only instantiated if neededs
-        private static readonly Lazy<IDiagnoser[]> Diagnosers =
-            new Lazy<IDiagnoser[]>(LoadDiagnoser, LazyThreadSafetyMode.ExecutionAndPublication);
+        public static readonly Lazy<IDiagnoser[]> LazyLoadedDiagnosers =
+            new Lazy<IDiagnoser[]>(LoadDiagnosers, LazyThreadSafetyMode.ExecutionAndPublication);
 
-        private static IDiagnoser[] LoadDiagnoser()
+        private static IDiagnoser[] LoadDiagnosers()
         {
             var diagnosticAssembly = "BenchmarkDotNet.Diagnostics.dll";
             try
@@ -91,11 +90,12 @@ namespace BenchmarkDotNet.Configs
                 }
                 else
                 {
-                    var runtimeDiagnoserType = loadedAssembly.GetType("BenchmarkDotNet.Diagnostics.RuntimeDiagnoser");
-                    var runtimeDiagnoser = (IDiagnoser)Activator.CreateInstance(runtimeDiagnoserType);
-                    var sourceDiagnoserType = loadedAssembly.GetType("BenchmarkDotNet.Diagnostics.SourceDiagnoser");
-                    var sourceDiagnoser = (IDiagnoser)Activator.CreateInstance(sourceDiagnoserType);
-                    return new[] { runtimeDiagnoser, sourceDiagnoser };
+                    return new[] 
+                    {
+                        GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.RuntimeDiagnoser"),
+                        GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.SourceDiagnoser"),
+                        GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.GCDiagnoser"),
+                    };
                 }
             }
             catch (Exception ex) // we're loading a plug-in, better to be safe rather than sorry
@@ -105,5 +105,10 @@ namespace BenchmarkDotNet.Configs
             return new IDiagnoser[0];
         }
 
+        private static IDiagnoser GetDiagnoser(Assembly loadedAssembly, string typeName)
+        {
+            var diagnoserType = loadedAssembly.GetType(typeName);
+            return (IDiagnoser)Activator.CreateInstance(diagnoserType);
+        }
     }
 }

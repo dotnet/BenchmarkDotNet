@@ -188,6 +188,8 @@ namespace BenchmarkDotNet.Diagnostics
                 if (results.ContainsKey(benchmark) && results[benchmark] != null)
                 {
                     var result = results[benchmark];
+                    if (result.GenCounts[generation] == 0)
+                        return "-"; // make zero more obvious
                     return (result.GenCounts[generation] / (double)result.TotalOperations * opsPerGCCount).ToString("N2");
                 }
                 return "N/A";

@@ -106,12 +106,6 @@ namespace BenchmarkDotNet.Running
             LogTotalTime(logger, clockSpan.GetTimeSpan());
             logger.NewLine();
 
-            if (config.GetDiagnosers().Count() > 0)
-            {
-                logger.NewLine();
-                config.GetCompositeDiagnoser().DisplayResults(logger);
-            }
-
             logger.WriteLineHeader("// * Summary *");
             MarkdownExporter.Default.ExportToLog(summary, logger);
 
@@ -123,6 +117,12 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineError("// * Warnings * ");
                 foreach (var warning in warnings)
                     logger.WriteLineError($"{warning.Message}");
+            }
+
+            if (config.GetDiagnosers().Count() > 0)
+            {
+                logger.NewLine();
+                config.GetCompositeDiagnoser().DisplayResults(logger);
             }
 
             logger.NewLine();
