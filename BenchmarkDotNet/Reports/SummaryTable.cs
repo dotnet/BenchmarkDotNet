@@ -28,7 +28,12 @@ namespace BenchmarkDotNet.Reports
                 SelectMany(b => b.Parameters.Items.Select(item => item.Name)).
                 Distinct().
                 Select(name => new ParamColumn(name));
-            var columns = configColumns.Concat(paramColumns).ToArray();
+            var diagnoserColumns = summary.Config.
+                GetDiagnosers().
+                Where(d => d is IColumnProvider).
+                Cast<IColumnProvider>().
+                SelectMany(cp => cp.GetColumns);
+            var columns = configColumns.Concat(paramColumns).Concat(diagnoserColumns).ToArray();
 
             ColumnCount = columns.Length;
             FullHeader = columns.Select(c => c.ColumnName).ToArray();
