@@ -4,7 +4,7 @@
     {
         public static readonly IToolchain Instance = new DnxToolchain();
 
-        public DnxToolchain() : base("Dnx451", new DnxGenerator(), new DnxBuilder(), new DnxExecutor())
+        private DnxToolchain() : base("Dnx", new DnxGenerator(), new DnxBuilder(), new DnxExecutor())
         {
         }
     }

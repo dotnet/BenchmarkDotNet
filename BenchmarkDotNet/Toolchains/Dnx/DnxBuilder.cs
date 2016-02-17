@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Toolchains.Results;
 
 namespace BenchmarkDotNet.Toolchains.Dnx
@@ -18,12 +17,12 @@ namespace BenchmarkDotNet.Toolchains.Dnx
         {
             if (!ExecuteCommand("restore", generateResult.DirectoryPath, logger))
             {
-                return new BuildResult(generateResult, true, new Exception("dotnet restore has failed"));
+                return new BuildResult(generateResult, false, new Exception("dotnet restore has failed"));
             }
 
             if (!ExecuteCommand("build --framework dnx451 --configuration RELEASE", generateResult.DirectoryPath, logger))
             {
-                return new BuildResult(generateResult, true, new Exception("dotnet build has failed"));
+                return new BuildResult(generateResult, false, new Exception("dotnet build has failed"));
             }
 
             return new BuildResult(generateResult, true, null);
@@ -39,7 +38,9 @@ namespace BenchmarkDotNet.Toolchains.Dnx
 
                     // don't forget to call, otherwise logger will not get any events
                     process.BeginErrorReadLine();
+#if DEBUG
                     process.BeginOutputReadLine();
+#endif
 
                     process.WaitForExit(DefaultTimeout);
 
@@ -57,7 +58,9 @@ namespace BenchmarkDotNet.Toolchains.Dnx
                 Arguments = arguments,
                 UseShellExecute = false,
                 CreateNoWindow = true,
+#if DEBUG
                 RedirectStandardOutput = true,
+#endif
                 RedirectStandardError = true
             };
         }

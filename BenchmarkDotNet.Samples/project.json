@@ -10,9 +10,15 @@
   },
   "frameworks": {
     "net40": {
+      "compilationOptions": {
+        "define": [ "CLASSIC" ]
+      },
       "BenchmarkDotNet.Diagnostics": "1.0.0-*"
     },
     "dnx451": {
+      "compilationOptions": {
+        "define": [ "DNX" ]
+      }
     }
   },
   "dependencies": {

@@ -1,7 +1,5 @@
 ﻿using System.Linq;
 using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.Classic;
-using BenchmarkDotNet.Toolchains.Dnx;
 
 namespace BenchmarkDotNet.Jobs
 {
@@ -19,9 +17,9 @@ namespace BenchmarkDotNet.Jobs
 
         public IToolchain Toolchain { get; set; }
 #if CLASSIC
-            = ClassicToolchain.Instance;
-#elif DNX451
-            = DnxToolchain.Instance;
+            = Toolchains.Classic.ClassicToolchain.Instance;
+#elif DNX
+            = Toolchains.Dnx.DnxToolchain.Instance;
 #endif
 
         public Mode Mode { get; set; } = Mode.Throughput;

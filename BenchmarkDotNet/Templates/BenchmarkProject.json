@@ -6,7 +6,7 @@
     "optimize": true,
     "allowUnsafe": true,
     "emitEntryPoint": true,
-    "platform": "$PLATFORM",
+    "platform": "$PLATFORM$",
     "debugSymbols": "pdbOnly",
     "comment": "both platform key and debugSymbols seems to be not documented, found at https://github.com/aspnet/dnx/blob/e874201acc19854caff9236b420b2864152659c0/test/Microsoft.Dnx.Compilation.CSharp.Tests/ProjectExtensionsFacts.cs"
   },
@@ -17,13 +17,17 @@
 
   "frameworks": {
     "dnx451": {
+      "compilationOptions": {
+        "define": [ "DNX" ]
+      },
       "frameworkAssemblies": {
         "System.Runtime": "4.0.10.0"
       },
       "dependencies": {
         "$EXECUTINGASSEMBLY$": {
           "version": "$EXECUTINGASSEMBLYVERSION$",
-          "importantComment": "you must not set the target, otherwise restore will fail!!!"
+          "importantComment": "you must not set the target, otherwise restore will fail!!!",
+          "dependenciesComment": "restore adds all of them in recursive way, so we only need this single one"
         }
       }
     }

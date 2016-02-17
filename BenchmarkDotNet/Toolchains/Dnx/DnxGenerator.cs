@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Toolchains.Dnx
 
         private static string SetPlatform(string template, Platform platform)
         {
-            return template.Replace("$PLATFORM", platform.ToConfig());
+            return template.Replace("$PLATFORM$", platform.ToConfig());
         }
 
         private static string SetDependencyToExecutingAssembly(string template, Type benchmarkTarget)

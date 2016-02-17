@@ -1,4 +1,4 @@
-﻿#if !DNX451
+﻿#if CLASSIC
 using BenchmarkDotNet.Diagnostics;
 using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;

@@ -1305,7 +1305,7 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "BenchmarkDotNet ",
+      "BenchmarkDotNet >= 1.0.0-*",
       "xunit >= 2.1.0",
       "xunit.abstractions >= 2.0.0",
       "xunit.assert >= 2.1.0",

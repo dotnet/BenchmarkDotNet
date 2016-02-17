@@ -21,6 +21,9 @@
       }
     },
     "dnx451": {
+      "compilationOptions": {
+        "define": [ "DNX" ]
+      },
       "frameworkAssemblies": {
         "System.Runtime": "4.0.10.0",
         "System.Threading.Tasks": "4.0.0.0"

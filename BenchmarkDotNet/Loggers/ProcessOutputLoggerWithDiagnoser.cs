@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 
-namespace BenchmarkDotNet.Plugins.Loggers
+namespace BenchmarkDotNet.Loggers
 {
     internal class ProcessOutputLoggerWithDiagnoser : ProcessOutputLogger
     {
@@ -15,6 +15,11 @@ namespace BenchmarkDotNet.Plugins.Loggers
 
         public ProcessOutputLoggerWithDiagnoser(ILogger logger, Process process, IDiagnoser diagnoser, Benchmark benchmark) : base(logger, process)
         {
+            if (!process.StartInfo.RedirectStandardOutput)
+            {
+                throw new NotSupportedException("set RedirectStandardOutput to true first");
+            }
+
             this.diagnoser = diagnoser;
             this.benchmark = benchmark;
 

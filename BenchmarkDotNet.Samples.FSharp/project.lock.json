@@ -1993,7 +1993,7 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "BenchmarkDotNet "
+      "BenchmarkDotNet >= 1.0.0-*"
     ],
     ".NETFramework,Version=v4.5": [],
     "DNX,Version=v4.5.1": [

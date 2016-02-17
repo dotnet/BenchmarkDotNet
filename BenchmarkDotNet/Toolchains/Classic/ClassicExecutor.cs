@@ -8,7 +8,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Plugins.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 
@@ -50,7 +49,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
             }
             finally
             {
-                consoleHandler?.ClearProcess();
+                consoleHandler.ClearProcess();
             }
         }
 

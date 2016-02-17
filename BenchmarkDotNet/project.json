@@ -29,7 +29,7 @@
     },
     "dnx451": {
       "compilationOptions": {
-        "define": [ "DNX451" ] 
+        "define": [ "DNX" ]
       },
       "frameworkAssemblies": {
         "System": "4.0.0.0",

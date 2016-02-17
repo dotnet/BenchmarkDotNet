@@ -1,5 +1,6 @@
 ﻿{
   "title": "BenchmarkDotNet.Tests",
+  "version": "1.0.0-*",
   "commands": {
     "test": "xunit.runner.dnx"
   },
@@ -29,13 +30,14 @@
   },
   "dependencies": {
     "BenchmarkDotNet": {
-      "target": "project"
+      "target": "project",
+      "version": "1.0.0-*"
     },
     "xunit": "2.1.0",
     "xunit.abstractions": "2.0.0",
     "xunit.assert": "2.1.0",
     "xunit.core": "2.1.0",
     "xunit.extensibility.core": "2.1.0",
-    "xunit.extensibility.execution": "2.1.0"    
+    "xunit.extensibility.execution": "2.1.0"
   }
 }
