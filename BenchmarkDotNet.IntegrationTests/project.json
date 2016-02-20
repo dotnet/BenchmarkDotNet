@@ -13,7 +13,7 @@
       "dependencies": {
         "BenchmarkDotNet.Diagnostics": "1.0.0-*",
         "Microsoft.Diagnostics.Runtime": "1.0.0-*",
-        "xunit.runner.visualstudio": "2.1.0"
+        "xunit.runner.console": "2.1.0"
       },
       "frameworkAssemblies": {
         "System.Runtime": "4.0.0.0",

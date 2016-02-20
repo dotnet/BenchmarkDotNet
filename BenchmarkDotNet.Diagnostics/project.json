@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "BenchmarkDotNet": {
-      "target": "project"
+      "target": "project",
+      "version": "1.0.0-*"
     },
     "Dia2Lib": "1.0.0-*",
     "Interop.Dia2Lib": "1.0.0-*",

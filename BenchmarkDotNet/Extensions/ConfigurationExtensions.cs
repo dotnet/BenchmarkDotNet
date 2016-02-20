@@ -38,7 +38,11 @@ namespace BenchmarkDotNet.Extensions
             var attributes = benchmarkType.Assembly.GetCustomAttributes(false).OfType<Attribute>();
             var frameworkAttribute = attributes.FirstOrDefault(a => a.ToString() == @"System.Runtime.Versioning.TargetFrameworkAttribute");
             if (frameworkAttribute == null)
+#if NET45
+                return "v4.5";
+#else
                 return "v4.0";
+#endif
 
             var frameworkName = frameworkAttribute.GetType()
                 .GetProperty("FrameworkName", BindingFlags.Public | BindingFlags.Instance)
