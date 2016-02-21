@@ -17,9 +17,6 @@
 
   "frameworks": {
     "dnx451": {
-      "compilationOptions": {
-        "define": [ "DNX" ]
-      },
       "frameworkAssemblies": {
         "System.Runtime": "4.0.10.0"
       },

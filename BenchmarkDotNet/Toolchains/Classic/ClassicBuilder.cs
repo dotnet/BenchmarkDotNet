@@ -20,14 +20,14 @@ namespace BenchmarkDotNet.Toolchains.Classic
             lock (buildLock)
             {
                 var projectFileName = Path.Combine(generateResult.DirectoryPath, ClassicGenerator.MainClassName + ".csproj");
-                var exeFileName = Path.Combine(generateResult.DirectoryPath, ClassicGenerator.MainClassName + ".exe");
+                var exeFilePath = Path.Combine(generateResult.DirectoryPath, ClassicGenerator.MainClassName + ".exe");
                 var consoleLogger = new MsBuildConsoleLogger(logger);
                 var globalProperties = new Dictionary<string, string>();
                 var buildRequest = new BuildRequestData(projectFileName, globalProperties, null, new[] { "Build" }, null);
                 var buildParameters = new BuildParameters(new ProjectCollection()) { DetailedSummary = false, Loggers = new Microsoft.Build.Framework.ILogger[] { consoleLogger } };
                 var buildResult = BuildManager.DefaultBuildManager.Build(buildParameters, buildRequest);
 
-                if (buildResult.OverallResult != BuildResultCode.Success && !File.Exists(exeFileName))
+                if (buildResult.OverallResult != BuildResultCode.Success && !File.Exists(exeFilePath))
                 {
                     logger.WriteLineInfo("BuildManager.DefaultBuildManager can't build this project. =(");
                     logger.WriteLineInfo("Let's try to build it via BuildBenchmark.bat!");
@@ -43,11 +43,11 @@ namespace BenchmarkDotNet.Toolchains.Classic
                     };
                     buildProcess.Start();
                     buildProcess.WaitForExit();
-                    if (File.Exists(exeFileName))
-                        return new BuildResult(generateResult, true, null);
+                    if (File.Exists(exeFilePath))
+                        return new BuildResult(generateResult, true, null, exeFilePath);
                 }
 
-                return new BuildResult(generateResult, buildResult.OverallResult == BuildResultCode.Success, buildResult.Exception);
+                return new BuildResult(generateResult, buildResult.OverallResult == BuildResultCode.Success, buildResult.Exception, exeFilePath);
             }
         }
     }

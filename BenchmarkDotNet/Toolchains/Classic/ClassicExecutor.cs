@@ -18,9 +18,9 @@ namespace BenchmarkDotNet.Toolchains.Classic
         // This needs to be static, so that we can share a single handler amongst all instances of BenchmarkClassicExecutor's
         private static ConsoleHandler consoleHandler;
 
-        public virtual ExecuteResult Execute(BuildResult buildResult, Benchmark benchmark, ILogger logger, IDiagnoser compositeDiagnoser = null)
+        public ExecuteResult Execute(BuildResult buildResult, Benchmark benchmark, ILogger logger, IDiagnoser compositeDiagnoser = null)
         {
-            var exePath = Path.Combine(buildResult.DirectoryPath, "Program.exe");
+            var exePath = buildResult.ExecutablePath;
             var args = string.Empty;
 
             if (!File.Exists(exePath))
@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
             return Execute(benchmark, logger, exePath, null, args, compositeDiagnoser);
         }
 
-        protected ExecuteResult Execute(Benchmark benchmark, ILogger logger, string exeName, string workingDirectory, string args, IDiagnoser diagnoser)
+        private ExecuteResult Execute(Benchmark benchmark, ILogger logger, string exeName, string workingDirectory, string args, IDiagnoser diagnoser)
         {
             if (consoleHandler == null)
             {

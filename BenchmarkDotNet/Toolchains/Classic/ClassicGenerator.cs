@@ -79,10 +79,6 @@ namespace BenchmarkDotNet.Toolchains.Classic
             var paramsContent = string.Join("", benchmark.Parameters.Items.Select(parameter =>
                 $"{(parameter.IsStatic ? "" : "instance.")}{parameter.Name} = {GetParameterValue(parameter.Value)};"));
 
-            var affinity = benchmark.Job.Affinity.IsAuto
-                ? string.Empty
-                : $"Process.GetCurrentProcess().EnsureProcessorAffinity({benchmark.Job.Affinity.Value});";
-
             var targetBenchmarkTaskArguments = benchmark.Job.GenerateWithDefinitions();
 
             var contentTemplate = ResourceHelper.LoadTemplate("BenchmarkProgram.txt");
@@ -102,8 +98,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 Replace("$IdleImplementation$", idleImplementation).
                 Replace("$AdditionalLogic$", target.AdditionalLogic).
                 Replace("$TargetBenchmarkTaskArguments$", targetBenchmarkTaskArguments).
-                Replace("$ParamsContent$", paramsContent).
-                Replace("$Affinity$", affinity);
+                Replace("$ParamsContent$", paramsContent);
 
             string fileName = Path.Combine(projectDir, MainClassName + ".cs");
             File.WriteAllText(fileName, content);
