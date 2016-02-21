@@ -3,12 +3,12 @@ using System.Diagnostics;
 
 namespace BenchmarkDotNet.Loggers
 {
-    internal class ProcessOutputLogger : IDisposable
+    internal class AsynchronousProcessOutputLogger : IDisposable
     {
         protected readonly Process process;
         private readonly ILogger logger;
 
-        public ProcessOutputLogger(ILogger logger, Process process)
+        public AsynchronousProcessOutputLogger(ILogger logger, Process process)
         {
             if (process.StartInfo.UseShellExecute)
             {
@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Loggers
             process.ErrorDataReceived -= ProcessOnErrorDataReceived;
         }
 
-        protected virtual void ProcessOnOutputDataReceived(object sender, DataReceivedEventArgs dataReceivedEventArgs)
+        private void ProcessOnOutputDataReceived(object sender, DataReceivedEventArgs dataReceivedEventArgs)
         {
             logger.WriteLine(LogKind.Default, dataReceivedEventArgs.Data);
         }

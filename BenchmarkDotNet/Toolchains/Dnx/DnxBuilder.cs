@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Toolchains.Dnx
         {
             using (var process = new Process { StartInfo = BuildStartInfo(workingDirectory, commandWithArguments)})
             {
-                using (new ProcessOutputLogger(logger, process))
+                using (new AsynchronousProcessOutputLogger(logger, process))
                 {
                     process.Start();
 

@@ -6,20 +6,24 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Loggers
 {
-    internal class ProcessOutputLoggerWithDiagnoser : ProcessOutputLogger
+    internal class SynchronousProcessOutputLoggerWithDiagnoser
     {
+        private readonly ILogger logger;
+        private readonly Process process;
         private readonly Benchmark benchmark;
         private readonly IDiagnoser diagnoser;
 
         private bool diagnosticsAlreadyRun = false;
 
-        public ProcessOutputLoggerWithDiagnoser(ILogger logger, Process process, IDiagnoser diagnoser, Benchmark benchmark) : base(logger, process)
+        public SynchronousProcessOutputLoggerWithDiagnoser(ILogger logger, Process process, IDiagnoser diagnoser, Benchmark benchmark)
         {
             if (!process.StartInfo.RedirectStandardOutput)
             {
                 throw new NotSupportedException("set RedirectStandardOutput to true first");
             }
 
+            this.logger = logger;
+            this.process = process;
             this.diagnoser = diagnoser;
             this.benchmark = benchmark;
 
@@ -28,22 +32,24 @@ namespace BenchmarkDotNet.Loggers
 
         internal List<string> Lines { get; }
 
-        protected override void ProcessOnOutputDataReceived(object sender, DataReceivedEventArgs dataReceivedEventArgs)
+        internal void ProcessInput()
         {
-            var line = dataReceivedEventArgs.Data;
-            if (line == null)
+            string line;
+            while ((line = process.StandardOutput.ReadLine()) != null)
             {
-                return;
-            }
+                logger.WriteLine(LogKind.Default, line);
 
-            base.ProcessOnOutputDataReceived(sender, dataReceivedEventArgs); // let's put it in log first
+                if (!line.StartsWith("//") && !string.IsNullOrEmpty(line))
+                {
+                    Lines.Add(line);
+                }
 
-            if (!line.StartsWith("//") && !string.IsNullOrEmpty(line))
-                Lines.Add(line);
+                // This is important so the Diagnoser can know the [Benchmark] methods will have run and (e.g.) it can do a Memory Dump
+                if (diagnosticsAlreadyRun || !line.StartsWith(IterationMode.MainWarmup.ToString()))
+                {
+                    continue;
+                }
 
-            // This is important so the Diagnoser can know the [Benchmark] methods will have run and (e.g.) it can do a Memory Dump
-            if (diagnosticsAlreadyRun == false && line.StartsWith(IterationMode.MainWarmup.ToString()))
-            {
                 try
                 {
                     diagnoser?.AfterBenchmarkHasRun(benchmark, process);

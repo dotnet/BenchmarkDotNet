@@ -10,9 +10,7 @@
       "compilationOptions": {
         "define": [ "CLASSIC" ]
       },
-      "dependencies": {
-        "BenchmarkDotNet.Diagnostics": "1.0.0-*",
-        "Microsoft.Diagnostics.Runtime": "1.0.0-*",
+      "dependencies": {        
         "xunit.runner.console": "2.1.0"
       },
       "frameworkAssemblies": {
@@ -38,6 +36,8 @@
       "target": "project",
       "version": "1.0.0-*"
     },
+    "BenchmarkDotNet.Diagnostics": "1.0.0-*",
+    "Microsoft.Diagnostics.Runtime": "1.0.0-*",
     "xunit": "2.1.0",
     "xunit.abstractions": "2.0.0",
     "xunit.assert": "2.1.0",

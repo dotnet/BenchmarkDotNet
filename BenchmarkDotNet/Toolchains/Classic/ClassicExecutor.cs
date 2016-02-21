@@ -42,9 +42,10 @@ namespace BenchmarkDotNet.Toolchains.Classic
             try
             {
                 using (var process = new Process { StartInfo = CreateStartInfo(benchmark, exeName, args, workingDirectory) })
-                using (var safeLoger = new ProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmark))
                 {
-                    return Execute(process, benchmark, safeLoger, diagnoser);
+                    var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmark);
+
+                    return Execute(process, benchmark, loggerWithDiagnoser, diagnoser);
                 }
             }
             finally
@@ -53,7 +54,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
             }
         }
 
-        private ExecuteResult Execute(Process process, Benchmark benchmark, ProcessOutputLoggerWithDiagnoser safeLoger, IDiagnoser compositeDiagnoser)
+        private ExecuteResult Execute(Process process, Benchmark benchmark, SynchronousProcessOutputLoggerWithDiagnoser loggerWithDiagnoser, IDiagnoser compositeDiagnoser)
         {
             consoleHandler.SetProcess(process);
 
@@ -67,9 +68,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 process.EnsureProcessorAffinity(benchmark.Job.Affinity.Value);
             }
 
-            // don't forget to call, otherwise logger will not get any events
-            process.BeginErrorReadLine();
-            process.BeginOutputReadLine();
+            loggerWithDiagnoser.ProcessInput();
 
             process.WaitForExit(); // should we add timeout here?
 
@@ -77,7 +76,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
 
             if (process.ExitCode == 0)
             {
-                return new ExecuteResult(true, safeLoger.Lines);
+                return new ExecuteResult(true, loggerWithDiagnoser.Lines);
             }
 
             return new ExecuteResult(true, new string[0]);

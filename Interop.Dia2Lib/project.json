@@ -3,7 +3,7 @@
   "frameworks": {
     "net40": {
       "bin": {
-        "assembly": "../../CLRMD/Interop.Dia2Lib.dll"
+        "assembly": "../CLRMD/Interop.Dia2Lib.dll"
       }
     }
   }

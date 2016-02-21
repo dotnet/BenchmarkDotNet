@@ -1,5 +1,4 @@
-﻿#if CLASSIC
-using BenchmarkDotNet.Diagnostics;
+﻿using BenchmarkDotNet.Diagnostics;
 using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
@@ -37,4 +36,3 @@ namespace BenchmarkDotNet.IntegrationTests
         }
     }
 }
-#endif
