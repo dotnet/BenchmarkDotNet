@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Horology
                     return Stopwatch.Frequency >= 10 * FrequencyUnit.MHz.HertzAmount 
                         ? HardwareTimerKind.Hpet 
                         : HardwareTimerKind.Tsc;
-                return HardwareTimerKind.Rtc;
+                return HardwareTimerKind.System;
             }
         }
     }

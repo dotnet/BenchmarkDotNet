@@ -3,10 +3,9 @@
     public enum HardwareTimerKind
     {
         /// <summary>
-        /// Real-time clock
-        /// <seealso cref="https://en.wikipedia.org/wiki/Real-time_clock"/>
+        /// System timer
         /// </summary>
-        Rtc,
+        System,
 
         /// <summary>
         /// Time Stamp Counter
