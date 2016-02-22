@@ -23,12 +23,16 @@ namespace BenchmarkDotNet.Extensions
 
         public static string GetCorrectTypeName(this Type type)
         {
+            if (type == typeof (void))
+                return "void";
             var prefix = "";
             if (!string.IsNullOrEmpty(type.Namespace))
                 prefix += type.Namespace + ".";
             if (type.IsNested && type.DeclaringType != null)
                 prefix += type.DeclaringType.Name + ".";
 
+            if (type.IsGenericParameter)
+                return type.Name;
             if (type.IsGenericType)
             {
                 var mainName = type.Name.Substring(0, type.Name.IndexOf('`'));

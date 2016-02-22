@@ -9,10 +9,17 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void GetCorrectTypeNameTest()
         {
-            Assert.Equal("System.Int32", typeof(int).GetCorrectTypeName());
-            Assert.Equal("System.Int32[]", typeof(int[]).GetCorrectTypeName());
-            Assert.Equal("System.Int32[,]", typeof(int[,]).GetCorrectTypeName());
-            Assert.Equal("System.Tuple<System.Int32, System.Int32>[]", typeof(Tuple<int, int>[]).GetCorrectTypeName());
+            CheckCorrectTypeName("System.Int32", typeof(int));
+            CheckCorrectTypeName("System.Int32[]", typeof(int[]));
+            CheckCorrectTypeName("System.Int32[,]", typeof(int[,]));
+            CheckCorrectTypeName("System.Tuple<System.Int32, System.Int32>[]", typeof(Tuple<int, int>[]));
+            CheckCorrectTypeName("void", typeof(void));
+            CheckCorrectTypeName("System.IEquatable<T>", typeof(IEquatable<>));
+        }
+
+        private static void CheckCorrectTypeName(string name, Type type)
+        {
+            Assert.Equal(name, type.GetCorrectTypeName());
         }
     }
 }
