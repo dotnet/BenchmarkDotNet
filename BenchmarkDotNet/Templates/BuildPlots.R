@@ -41,6 +41,7 @@ for (file in files) {
   } else {
     result$Job <- trim(paste(result$Job, result$Params))
   }
+  result$Job <- factor(result$Job, levels = unique(result$Job))
   
   timeUnit <- "ns"
   if (min(result$MeasurementValue) > 1000) {

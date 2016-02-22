@@ -59,11 +59,13 @@ namespace BenchmarkDotNet.Exporters
         public override void ExportToLog(Summary summary, ILogger logger)
         {
             logger.WriteLine(string.Join(";", columns.Select(c => c.Title)));
-            foreach (var report in summary.Reports.Values)
+            var reports = summary.Reports.Values.
+                OrderBy(r => r.Benchmark.Parameters, ParameterComparer.Instance).
+                ThenBy(r => r.Benchmark.Target.Type.Name);
+            foreach (var report in reports)
                 foreach (var measurement in report.AllMeasurements)
                     logger.WriteLine(string.Join(";", columns.Select(column => column.GetValue(summary, report, measurement))));
         }
-
 
         public static IJob[] GetJobs(Summary summary) => summary.Benchmarks.Select(b => b.Job).ToArray();
     }
