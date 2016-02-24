@@ -6,7 +6,7 @@
     "optimize": true
   },
   "commands": {
-    "run": "BenchmarkDotNet.Samples"
+    "#DNX": "BenchmarkDotNet.Samples"
   },
   "frameworks": {
     "net40": {

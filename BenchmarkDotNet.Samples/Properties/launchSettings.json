@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "DEBUG_4.0": {
+    "#CLASSIC": {
       "executablePath": "BenchmarkDotNet.Samples.dll",
       "workingDirectory": "..\\artifacts\\bin\\BenchmarkDotNet.Samples\\Debug\\net40\\"
     }
