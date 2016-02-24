@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Execution;
@@ -15,7 +16,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
     {
         private static readonly object buildLock = new object();
 
-        public BuildResult Build(GenerateResult generateResult, ILogger logger)
+        public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark)
         {
             lock (buildLock)
             {
