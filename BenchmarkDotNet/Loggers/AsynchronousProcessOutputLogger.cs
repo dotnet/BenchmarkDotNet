@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Loggers
         {
             if (!string.IsNullOrEmpty(dataReceivedEventArgs.Data)) // happened often and added unnecessary blank line to output
             {
-                logger.WriteLine(LogKind.Error, dataReceivedEventArgs.Data);
+                logger.WriteLine(LogKind.Default, dataReceivedEventArgs.Data); // warnings also comes as errors so Default log kind is used to avoid red output for things that are just warnings
             }
         }
     }

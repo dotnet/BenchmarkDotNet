@@ -15,6 +15,8 @@ namespace BenchmarkDotNet.Toolchains.Dnx
 
         private string Configuration { get; } = "RELEASE";
 
+        private string OutputDirectory { get; } = "binaries";
+
         /// <summary>
         /// generates project.lock.json that tells compiler where to take dlls and source from
         /// and builds executable and copies all required dll's
@@ -26,8 +28,19 @@ namespace BenchmarkDotNet.Toolchains.Dnx
                 return new BuildResult(generateResult, false, new Exception("dotnet restore has failed"), null);
             }
 
-            if (!ExecuteCommand($"build --framework {Framework} --configuration {Configuration}", generateResult.DirectoryPath, logger))
+            if (!ExecuteCommand(
+                $"build --framework {Framework} --configuration {Configuration} --output {OutputDirectory}", 
+                generateResult.DirectoryPath, 
+                logger))
             {
+                // dotnet cli could have succesfully builded the program, but returned 1 as exit code because it had some warnings
+                // so we need to check whether the exe exists or not, if it does then it is OK
+                var executablePath = BuildExecutablePath(generateResult, benchmark);
+                if (File.Exists(executablePath))
+                {
+                    return new BuildResult(generateResult, true, null, executablePath);
+                }
+
                 return new BuildResult(generateResult, false, new Exception("dotnet build has failed"), null);
             }
 
@@ -59,7 +72,7 @@ namespace BenchmarkDotNet.Toolchains.Dnx
         {
             return new ProcessStartInfo
             {
-                FileName = "dotnet.exe",
+                FileName = "dotnet",
                 WorkingDirectory = workingDirectory,
                 Arguments = arguments,
                 UseShellExecute = false,
@@ -72,11 +85,9 @@ namespace BenchmarkDotNet.Toolchains.Dnx
         }
 
         /// <summary>
-        /// based on info from https://github.com/dotnet/cli
-        /// "dotnet build will drop a binary in ./bin/[configuration]/[framework]/[binary name] that you can just run."
+        /// we use custom output path in order to avoid any future problems related to dotnet cli paths changing
         /// </summary>
         private string BuildExecutablePath(GenerateResult generateResult, Benchmark benchmark)
-            => Path.Combine(
-                generateResult.DirectoryPath, $"bin\\{Configuration}\\{Framework}", $"{benchmark.ShortInfo}.exe");
+            => Path.Combine(generateResult.DirectoryPath, OutputDirectory, $"{benchmark.ShortInfo}.exe");
     }
 }
