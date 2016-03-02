@@ -117,6 +117,8 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 return ((double)value).ToString("G", CultureInfo.InvariantCulture) + "d";
             if (value is decimal)
                 return ((decimal)value).ToString("G", CultureInfo.InvariantCulture) + "m";
+            if (value.GetType().IsEnum)
+                return value.GetType().FullName + "." + value;
             return value.ToString();
         }
 
