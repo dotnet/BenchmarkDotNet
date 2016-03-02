@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -110,6 +111,12 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 return value.ToString().ToLower();
             if (value is string)
                 return "\"" + value + "\"";
+            if (value is float)
+                return ((float)value).ToString("G", CultureInfo.InvariantCulture) + "f";
+            if (value is double)
+                return ((double)value).ToString("G", CultureInfo.InvariantCulture) + "d";
+            if (value is decimal)
+                return ((decimal)value).ToString("G", CultureInfo.InvariantCulture) + "m";
             return value.ToString();
         }
 
