@@ -1,14 +1,19 @@
-﻿using System.IO;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.Linq;
+﻿using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Columns;
-using Diagnostics.Tracing;
-using Diagnostics.Tracing.Parsers;
+using BenchmarkDotNet.Running;
+using Microsoft.Diagnostics.Tracing;
+using Microsoft.Diagnostics.Tracing.Parsers;
+using Microsoft.Diagnostics.Tracing.Parsers.Clr;
+using Microsoft.Diagnostics.Tracing.Session;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Diagnostics
 {
@@ -17,6 +22,8 @@ namespace BenchmarkDotNet.Diagnostics
         private readonly List<OutputLine> output = new List<OutputLine>();
         private readonly LogCapture logger = new LogCapture();
         private readonly Dictionary<Benchmark, Stats> results = new Dictionary<Benchmark, Stats>();
+        private TraceEventSession session;
+        private readonly ConcurrentDictionary<int, Stats> statsPerProcess = new ConcurrentDictionary<int, Stats>();
 
         public IEnumerable<IColumn> GetColumns => 
             new IColumn[]
@@ -30,44 +37,39 @@ namespace BenchmarkDotNet.Diagnostics
         public void Start(Benchmark benchmark)
         {
             ProcessIdsUsedInRuns.Clear();
+            statsPerProcess.Clear();
 
-            if (Directory.Exists(ProfilingFolder) == false)
-                Directory.CreateDirectory(ProfilingFolder);
+            var sessionName = GetSessionName("GC", benchmark, benchmark.Parameters);
+            session = new TraceEventSession(sessionName);
+            session.EnableProvider(ClrTraceEventParser.ProviderGuid, TraceEventLevel.Verbose,
+                (ulong)(ClrTraceEventParser.Keywords.GC));
 
-            var filePrefix = GetFileName("GC", benchmark, benchmark.Parameters);
-
-            // Clean-up in case a previous run is still going!! We don't have to print the output here, 
-            // because it can fail if things worked okay last time (i.e. nothing to clean-up)
-            var output = RunProcess("logman", string.Format("stop {0} -ets", filePrefix));
-            DeleteIfFileExists(filePrefix + ".etl");
-
-            // 0x00000001 means collect GC Events only, (JIT Events are 0x00000010),
-            // see https://msdn.microsoft.com/en-us/library/ff357720(v=vs.110).aspx for full list
-            // 0x5 is the "ETW Event Level" and we set it to "Verbose" (and below)
-            // Other flags used:
-            // -ets                          Send commands to Event Trace Sessions directly without saving or scheduling.
-            // -ct <perf|system|cycle>       Specifies the clock resolution to use when logging the time stamp for each event. 
-            //                               You can use query performance counter, system time, or CPU cycle.
-            var arguments =
-                $"start {filePrefix} -o .\\{ProfilingFolder}\\{filePrefix}.etl -p {CLRRuntimeProvider} 0x00000001 0x5 -ets -ct perf";
-            output = RunProcess("logman", arguments);
-            if (output.Contains(ExecutedOkayMessage) == false)
-                logger.WriteLineError("logman start output:\n" + output);
+            // The ETW collection thread starts receiving events immediately, but we only
+            // start aggregating them after ProcessStarted is called and we know which process
+            // (or processes) we should be monitoring. Communication between the benchmark thread
+            // and the ETW collection thread is through the statsPerProcess concurrent dictionary
+            // and through the TraceEventSession class, which is thread-safe.
+            Task.Factory.StartNew(StartProcessingEvents, TaskCreationOptions.LongRunning);
         }
 
         public void Stop(Benchmark benchmark, BenchmarkReport report)
         {
-            var filePrefix = GetFileName("GC", report.Benchmark, benchmark.Parameters);
-            var output = RunProcess("logman", string.Format("stop {0} -ets", filePrefix));
-            if (output.Contains(ExecutedOkayMessage) == false)
-                logger.WriteLineError("logman stop output\n" + output);
-            var stats = ProcessEtwEvents(benchmark, $".\\{ProfilingFolder}\\{filePrefix}.etl", report.AllMeasurements.Sum(m => m.Operations));
+            // ETW real-time sessions receive events with a slight delay. Typically it
+            // shouldn't be more than a few seconds. This increases the likelihood that
+            // all relevant events are processed by the collection thread by the time we
+            // are done with the benchmark.
+            Thread.Sleep(TimeSpan.FromSeconds(3));
+
+            session.Dispose();
+
+            var stats = ProcessEtwEvents(report.AllMeasurements.Sum(m => m.Operations));
             results.Add(benchmark, stats);
         }
 
         public void ProcessStarted(Process process)
         {
             ProcessIdsUsedInRuns.Add(process.Id);
+            statsPerProcess.TryAdd(process.Id, new Stats());
         }
 
         public void AfterBenchmarkHasRun(Benchmark benchmark, Process process)
@@ -86,15 +88,14 @@ namespace BenchmarkDotNet.Diagnostics
                 logger.Write(line.Kind, line.Text);
         }
 
-        private Stats ProcessEtwEvents(Benchmark benchmark, string fileName, long totalOperations)
+        private Stats ProcessEtwEvents(long totalOperations)
         {
-            var statsPerProcess = CollectEtwData(fileName);
             if (ProcessIdsUsedInRuns.Count > 0)
             {
                 var processToReport = ProcessIdsUsedInRuns[0];
-                if (statsPerProcess.ContainsKey(processToReport))
+                Stats stats;
+                if (statsPerProcess.TryGetValue(processToReport, out stats))
                 {
-                    var stats = statsPerProcess[processToReport];
                     stats.TotalOperations = totalOperations;
                     return stats;
                 }
@@ -102,41 +103,36 @@ namespace BenchmarkDotNet.Diagnostics
             return null;
         }
 
-        private Dictionary<int, Stats> CollectEtwData(string fileName)
+        private void StartProcessingEvents()
         {
-            var statsPerProcess = new Dictionary<int, Stats>();
-            foreach (var process in ProcessIdsUsedInRuns)
-                statsPerProcess.Add(process, new Stats());
-            using (var source = new ETWTraceEventSource(fileName))
+            session.Source.Clr.GCAllocationTick += gcData =>
             {
-                source.Clr.GCAllocationTick += (gcData =>
-                {
-                    if (statsPerProcess.ContainsKey(gcData.ProcessID))
-                        statsPerProcess[gcData.ProcessID].AllocatedBytes += gcData.AllocationAmount64;
-                });
+                Stats stats;
+                if (statsPerProcess.TryGetValue(gcData.ProcessID, out stats))
+                    stats.AllocatedBytes += gcData.AllocationAmount64;
+            };
 
-                source.Clr.GCStart += (gcData =>
+            session.Source.Clr.GCStart += gcData =>
+            {
+                Stats stats;
+                if (statsPerProcess.TryGetValue(gcData.ProcessID, out stats))
                 {
-                    if (statsPerProcess.ContainsKey(gcData.ProcessID))
+                    var genCounts = stats.GenCounts;
+                    if (gcData.Depth >= 0 && gcData.Depth < genCounts.Length)
                     {
-                        var genCounts = statsPerProcess[gcData.ProcessID].GenCounts;
-                        if (gcData.Depth >= 0 && gcData.Depth < genCounts.Length)
-                        {
-                            // BenchmarkDotNet calls GC.Collect(..) before/after benchmark runs, ignore these in our results!!!
-                            if (gcData.Reason != GCReason.Induced)
-                                genCounts[gcData.Depth]++;
-                        }
-                        else
-                        {
-                            logger.WriteLineError("Error Process{0}, Unexpected GC Depth: {1}, Count: {2} -> Reason: {3}",
-                                                  gcData.ProcessID, gcData.Depth, gcData.Count, gcData.Reason);
-                        }
+                        // BenchmarkDotNet calls GC.Collect(..) before/after benchmark runs, ignore these in our results!!!
+                        if (gcData.Reason != GCReason.Induced)
+                            genCounts[gcData.Depth]++;
                     }
-                });
+                    else
+                    {
+                        logger.WriteLineError("Error Process{0}, Unexpected GC Depth: {1}, Count: {2} -> Reason: {3}",
+                                              gcData.ProcessID, gcData.Depth, gcData.Count, gcData.Reason);
+                    }
+                }
+            };
 
-                source.Process();
-            }
-            return statsPerProcess;
+            session.Source.Process();
         }
 
         public class AllocationColumn : IColumn
@@ -148,7 +144,7 @@ namespace BenchmarkDotNet.Diagnostics
                 this.results = results;
             }
 
-            public string ColumnName => "Memory Traffic/Op";
+            public string ColumnName => "Bytes Allocated/Op";
             public bool IsAvailable(Summary summary) => true;
             public bool AlwaysShow => true;
 
@@ -158,7 +154,7 @@ namespace BenchmarkDotNet.Diagnostics
                 {
                     var result = results[benchmark];
                     // TODO scale this based on the minimum value in the column, i.e. use B/KB/MB as appropriate
-                    return (result.AllocatedBytes / (double)result.TotalOperations).ToString("N2") + " B";
+                    return (result.AllocatedBytes / (double)result.TotalOperations).ToString("N2");
                 }
                 return "N/A";
             }
@@ -176,7 +172,7 @@ namespace BenchmarkDotNet.Diagnostics
                 ColumnName = $"Gen {generation}";
                 this.results = results;
                 this.generation = generation;
-                opsPerGCCount = results.Min(r => r.Value.TotalOperations);
+                opsPerGCCount = results.Min(r => r.Value?.TotalOperations ?? 0);
             }
 
             public string ColumnName { get; private set; }
