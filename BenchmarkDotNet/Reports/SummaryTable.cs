@@ -15,6 +15,7 @@ namespace BenchmarkDotNet.Reports
 
         public string[] FullHeader { get; }
         public string[][] FullContent { get; }
+        public bool[] FullContentStartOfGroup { get; }
         public string[][] FullContentWithHeader { get; }
 
         internal SummaryTable(Summary summary)
@@ -44,6 +45,18 @@ namespace BenchmarkDotNet.Reports
                 ThenBy(r => r.Benchmark.Target.MethodTitle).                
                 ToList();
             FullContent = reports.Select(r => columns.Select(c => c.GetValue(summary, r.Benchmark)).ToArray()).ToArray();
+            FullContentStartOfGroup = new bool[reports.Count];
+            var counter = 0;
+            var currentParams = "";
+            foreach (var report in reports)
+            {
+                if (currentParams != report.Benchmark.Parameters.FullInfo)
+                {
+                    FullContentStartOfGroup[counter] = true;
+                    currentParams = report.Benchmark.Parameters.FullInfo;
+                }
+                counter++;
+            }
 
             var full = new List<string[]> { FullHeader };
             full.AddRange(FullContent);

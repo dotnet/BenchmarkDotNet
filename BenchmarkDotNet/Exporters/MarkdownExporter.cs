@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Exporters
             if (benchmarksWithTroubles.Count > 0)
             {
                 logger.NewLine();
-                logger.WriteLineError("Benchmarks with troubles:");
+                logger.WriteLineError("Benchmarks with issues:");
                 foreach (var benchmarkWithTroubles in benchmarksWithTroubles)
                     logger.WriteLineError("  " + benchmarkWithTroubles.ShortInfo);
             }
@@ -79,10 +79,16 @@ namespace BenchmarkDotNet.Exporters
             table.PrintLine(table.FullHeader, logger, "", " |");
             logger.NewLine();
             logger.WriteLineStatistic(string.Join("", table.Columns.Where(c => c.NeedToShow).Select(c => new string('-', c.Width) + " |")));
+            var rowCounter = 0;
+            var highlightRow = false;
             foreach (var line in table.FullContent)
             {
-                table.PrintLine(line, logger, "", " |");
+                // Each time we hit the start of a new group, alternative the colour (in the console) or display bold in Markdown
+                if (table.FullContentStartOfGroup[rowCounter])
+                    highlightRow = !highlightRow;
+                table.PrintLine(line, logger, "", " |", highlightRow);
                 logger.NewLine();
+                rowCounter++;
             }
         }
     }

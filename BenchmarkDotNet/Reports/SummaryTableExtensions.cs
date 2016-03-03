@@ -26,11 +26,19 @@ namespace BenchmarkDotNet.Reports
             }
         }
 
-        public static void PrintLine(this SummaryTable table, string[] line, ILogger logger, string leftDel = "", string rightDel = "")
+        public static void PrintLine(this SummaryTable table, string[] line, ILogger logger, string leftDel = "", string rightDel = "", bool highlightRow = false)
         {
             for (int columnIndex = 0; columnIndex < table.ColumnCount; columnIndex++)
+            {
                 if (table.Columns[columnIndex].NeedToShow)
-                    logger.WriteStatistic(leftDel + line[columnIndex].PadLeft(table.Columns[columnIndex].Width, ' ') + rightDel);
+                {
+                    var text = leftDel + line[columnIndex].PadLeft(table.Columns[columnIndex].Width, ' ') + rightDel;
+                    if (highlightRow) // write the row in an alternative colour
+                        logger.WriteHeader(text);
+                    else
+                        logger.WriteStatistic(text);
+                }
+            }
         }
     }
 }
