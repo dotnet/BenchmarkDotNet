@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Configs;
@@ -219,13 +218,21 @@ namespace BenchmarkDotNet.Running
                     logger.WriteLineError("Executable not found");
                 executeResults.Add(executeResult);
 
-                if (benchmark.Job.LaunchCount.IsAuto && processNumber == 1)
-                {
-                    var measurements = executeResults.
+                var measurements = executeResults.
                         SelectMany(r => r.Data).
                         Select(line => Measurement.Parse(logger, line, 0)).
                         Where(r => r != null).
                         ToArray();
+
+                if (measurements.Count() == 0)
+                {
+                    // Something went wrong during the benchmark, don't bother doing more runs
+                    logger.WriteLineError($"No more Benchmark runs will be launched as NO measurments were obtained from the previous run!");
+                    break;
+                }
+
+                if (benchmark.Job.LaunchCount.IsAuto && processNumber == 1)
+                {
                     var idleApprox = new Statistics(measurements.Where(m => m.IterationMode == IterationMode.IdleTarget).Select(m => m.Nanoseconds)).Median;
                     var mainApprox = new Statistics(measurements.Where(m => m.IterationMode == IterationMode.MainTarget).Select(m => m.Nanoseconds)).Median;
                     var percent = idleApprox / mainApprox * 100;
