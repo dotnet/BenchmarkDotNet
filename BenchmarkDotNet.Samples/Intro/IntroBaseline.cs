@@ -3,7 +3,7 @@ using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples.Intro
 {
-    [ConfigWithDryJobs]
+    [DryConfig]
     public class IntroBaseline
     {
         [Params(100, 200)]

@@ -50,7 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\ConfigAttribute.cs" />
-    <Compile Include="Attributes\ConfigWithDryJobsAttribute.cs" />
+    <Compile Include="Attributes\DryConfigAttribute.cs" />
     <Compile Include="Columns\Column.cs" />
     <Compile Include="Columns\IColumnProvider.cs" />
     <Compile Include="Columns\ParamColumn.cs" />
