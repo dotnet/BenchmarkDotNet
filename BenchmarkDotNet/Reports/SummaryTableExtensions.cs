@@ -26,13 +26,19 @@ namespace BenchmarkDotNet.Reports
             }
         }
 
-        public static void PrintLine(this SummaryTable table, string[] line, ILogger logger, string leftDel = "", string rightDel = "", bool highlightRow = false)
+        public static void PrintLine(this SummaryTable table, string[] line, ILogger logger, 
+                                     string leftDel = "", string rightDel = "", 
+                                     bool highlightRow = false, bool startOfGroup = false, bool startOfGroupInBold = false)
         {
             for (int columnIndex = 0; columnIndex < table.ColumnCount; columnIndex++)
             {
                 if (table.Columns[columnIndex].NeedToShow)
                 {
-                    var text = leftDel + line[columnIndex].PadLeft(table.Columns[columnIndex].Width, ' ') + rightDel;
+                    string text = null;
+                    if (startOfGroup && startOfGroupInBold)
+                        text = leftDel + ("**" + line[columnIndex] + "**").PadLeft(table.Columns[columnIndex].Width + 4, ' ') + rightDel;
+                    else
+                        text = leftDel + line[columnIndex].PadLeft(table.Columns[columnIndex].Width, ' ') + rightDel;
                     if (highlightRow) // write the row in an alternative colour
                         logger.WriteHeader(text);
                     else

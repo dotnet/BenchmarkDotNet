@@ -14,25 +14,35 @@ namespace BenchmarkDotNet.Exporters
 
         public static readonly IExporter Default = new MarkdownExporter
         {
-            Dialect = nameof(Default)
+            Dialect = nameof(Default),
+            startOfGroupInBold = true
+        };
+
+        public static readonly IExporter Console = new MarkdownExporter
+        {
+            Dialect = nameof(Console),
+            startOfGroupInBold = false
         };
 
         public static readonly IExporter StackOverflow = new MarkdownExporter
         {
-            prefix = "    ",
-            Dialect = nameof(StackOverflow)
+            Dialect = nameof(StackOverflow),
+            prefix = "    ",            
+            startOfGroupInBold = true
         };
 
         public static readonly IExporter GitHub = new MarkdownExporter
         {
             Dialect = nameof(GitHub),
             useCodeBlocks = true,
-            codeBlocksSyntax = "ini"
+            codeBlocksSyntax = "ini",
+            startOfGroupInBold = true
         };
 
         private string prefix = string.Empty;
         private bool useCodeBlocks = false;
         private string codeBlocksSyntax = string.Empty;
+        private bool startOfGroupInBold = false;
 
         private MarkdownExporter()
         {
@@ -86,7 +96,7 @@ namespace BenchmarkDotNet.Exporters
                 // Each time we hit the start of a new group, alternative the colour (in the console) or display bold in Markdown
                 if (table.FullContentStartOfGroup[rowCounter])
                     highlightRow = !highlightRow;
-                table.PrintLine(line, logger, "", " |", highlightRow);
+                table.PrintLine(line, logger, "", " |", highlightRow, startOfGroup: table.FullContentStartOfGroup[rowCounter], startOfGroupInBold: startOfGroupInBold);
                 logger.NewLine();
                 rowCounter++;
             }

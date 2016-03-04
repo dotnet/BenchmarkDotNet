@@ -106,7 +106,7 @@ namespace BenchmarkDotNet.Running
             logger.NewLine();
 
             logger.WriteLineHeader("// * Summary *");
-            MarkdownExporter.Default.ExportToLog(summary, logger);
+            MarkdownExporter.Console.ExportToLog(summary, logger);
 
             // TODO: make exporter
             var warnings = config.GetCompositeAnalyser().Analyze(summary).ToList();
