@@ -95,6 +95,7 @@ namespace BenchmarkDotNet.Configs
                         GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.RuntimeDiagnoser"),
                         GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.SourceDiagnoser"),
                         GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.GCDiagnoser"),
+                        GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.InliningDiagnoser"),
                     };
                 }
             }
