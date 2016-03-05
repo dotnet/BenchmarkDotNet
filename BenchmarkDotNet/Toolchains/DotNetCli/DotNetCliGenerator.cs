@@ -56,7 +56,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         private static string SetPlatform(string template, Platform platform)
         {
+#if CORE
+            return template.Replace("$PLATFORM$", "x64"); // dotnet cli supports only x64 compilation now
+#else
             return template.Replace("$PLATFORM$", platform.ToConfig());
+#endif
         }
 
         private static string SetDependencyToExecutingAssembly(string template, Type benchmarkTarget)
