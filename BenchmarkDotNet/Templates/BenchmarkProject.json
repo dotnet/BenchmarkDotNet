@@ -19,6 +19,8 @@
 
   "frameworks": {
     "$TFM$": {
+      "imports": "portable-net45+win8",
+      "theImportsIsJustAXunitAndVSBugWorkaround": "https://github.com/dotnet/corefx/issues/4448#issuecomment-156255106",
       "dependencies": {
         "$EXECUTINGASSEMBLY$": {
           "version": "$EXECUTINGASSEMBLYVERSION$",

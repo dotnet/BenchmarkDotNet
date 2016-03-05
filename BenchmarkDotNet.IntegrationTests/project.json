@@ -39,6 +39,7 @@
         "define": [ "CORE" ]
       },
       "dependencies": {
+        "NETStandard.Library": "1.0.0-rc2-23811",
         "xunit.runner.dnx": "2.1.0-rc1-build204"
       }
     }
