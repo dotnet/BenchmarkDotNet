@@ -1,0 +1,53 @@
+﻿{
+  "title": "BenchmarkDotNet",
+  "version": "0.9.2",
+  "authors": [ "Andrey Akinshin", "Jon Skeet", "Matt Warren" ],
+  "owners": [ "Andrey Akinshin", "Jon Skeet", "Matt Warren" ],
+  "licenseUrl": "https://github.com/PerfDotNet/BenchmarkDotNet/blob/master/LICENSE.md",
+  "projectUrl": "https://github.com/PerfDotNet/BenchmarkDotNet",
+  "iconUrl": "https://raw.githubusercontent.com/PerfDotNet/BenchmarkDotNet/master/BenchmarkDotNet/BenchmarkDotNet.png",
+  "requireLicenseAcceptance": false,
+  "description": "A lightweight .NET library for benchmarking",
+  "copyright": "Andrey Akinshin, Jon Skeet, Matt Warren",
+  "language": "en-US",
+
+  "compilationOptions": { "optimize": true },
+
+  "resource": [ "Templates/*.txt", "Templates/*.R", "Templates/*.json" ],
+
+  "frameworks": {
+    "net40": {
+      "compilationOptions": {
+        "define": [ "CLASSIC" ]
+      },
+      "frameworkAssemblies": {
+        "Microsoft.Build": "4.0.0.0",
+        "Microsoft.Build.Framework": "4.0.0.0",
+        "Microsoft.Build.Utilities.v4.0": "4.0.0.0",
+        "System.Management": "4.0.0.0"
+      }
+    },
+    "net45": {
+      "compilationOptions": {
+        "define": [ "CLASSIC" ]
+      },
+      "frameworkAssemblies": {
+        "Microsoft.Build": "4.0.0.0",
+        "Microsoft.Build.Framework": "4.0.0.0",
+        "Microsoft.Build.Utilities.v4.0": "4.0.0.0",
+        "System.Management": "4.0.0.0"
+      }
+    },
+    "dnx451": {
+      "compilationOptions": {
+        "define": [ "DNX" ]
+      },
+      "frameworkAssemblies": {
+        "System": "4.0.0.0",
+        "System.Runtime": "4.0.10.0",
+        "System.Management": "4.0.0.0",
+        "System.Reflection": "4.0.0.0"
+      }
+    }
+  }
+}

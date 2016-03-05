@@ -1,4 +1,5 @@
-﻿namespace BenchmarkDotNet.Toolchains.Classic
+﻿#if CLASSIC
+namespace BenchmarkDotNet.Toolchains.Classic
 {
     public class ClassicToolchain : Toolchain
     {
@@ -9,3 +10,4 @@
         }
     }
 }
+#endif

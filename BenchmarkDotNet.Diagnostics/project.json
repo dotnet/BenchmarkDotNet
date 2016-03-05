@@ -1,0 +1,29 @@
+﻿{
+  "title": "BenchmarkDotNet.Diagnostics",
+  "frameworks": {
+    "net40": {
+    },
+    "dnx451": {
+      "frameworkAssemblies": {
+        "System.Runtime": "4.0.10.0"
+      }
+    }
+  },
+  "dependencies": {
+    "BenchmarkDotNet": {
+      "target": "project",
+      "version": "1.0.0-*"
+    },
+    "Dia2Lib": "1.0.0-*",
+    "Interop.Dia2Lib": "1.0.0-*",
+    "Microsoft.Diagnostics.Runtime": "1.0.0-*"
+  },
+  "scripts": {
+    "postbuild": [
+      "%project:Directory%/../build/batchcopy \"%project:Directory%/../CLRMD/*.*\" %project:BuildOutputDir%/Debug/net40",
+      "%project:Directory%/../build/batchcopy \"%project:Directory%/../CLRMD/*.*\" %project:BuildOutputDir%/Release/net40",
+      "%project:Directory%/../build/batchcopy \"%project:Directory%/../CLRMD/*.*\" %project:BuildOutputDir%/Debug/dnx451",
+      "%project:Directory%/../build/batchcopy \"%project:Directory%/../CLRMD/*.*\" %project:BuildOutputDir%/Release/dnx451"
+    ]
+  }
+}

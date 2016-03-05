@@ -1,9 +1,8 @@
 ﻿module FSharpBenchmark
 
+open Xunit
 open BenchmarkDotNet.Attributes
 open BenchmarkDotNet.Running
-open NUnit.Framework
-open FsUnit
 open System.Threading
 
 type File = 
@@ -27,15 +26,9 @@ type Db() =
         Thread.Sleep(50)
         createDoc("Testing")
 
-[<Test>]
-let ShouldExecuteBenchmark() = 
-    let reports = BenchmarkRunner.Run<Db>()
-    ()
+type FSharpTests() =
 
-
-// Can't get NUnit test runner to work in VS, so "simulate" it by calling the Test method from the EntryPoint method (main())
-[<EntryPoint>]
-let main argv = 
-    printfn "Running Test Method: ShouldExecuteBenchmark()"
-    ShouldExecuteBenchmark()
-    0 // return an integer exit code
+    [<Fact>]
+    let ShouldExecuteBenchmark() = 
+        let reports = BenchmarkRunner.Run<Db>()
+        ()
