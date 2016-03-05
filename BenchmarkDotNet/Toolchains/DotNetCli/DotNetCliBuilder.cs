@@ -2,20 +2,26 @@
 using System.Diagnostics;
 using System.IO;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 
-namespace BenchmarkDotNet.Toolchains.Dnx
+namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
-    public class DnxBuilder : IBuilder
+    public class DotNetCliBuilder : IBuilder
     {
+        private const string Configuration = "RELEASE";
+
+        private const string OutputDirectory = "binaries";
+
         private static readonly int DefaultTimeout = (int)TimeSpan.FromMinutes(2).TotalMilliseconds;
 
-        private string Framework { get; } = "dnx451";
+        private string Framework { get; }
 
-        private string Configuration { get; } = "RELEASE";
-
-        private string OutputDirectory { get; } = "binaries";
+        public DotNetCliBuilder(string framework)
+        {
+            Framework = framework;
+        }
 
         /// <summary>
         /// generates project.lock.json that tells compiler where to take dlls and source from
@@ -23,7 +29,7 @@ namespace BenchmarkDotNet.Toolchains.Dnx
         /// </summary>
         public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark)
         {
-            if (!ExecuteCommand("restore", generateResult.DirectoryPath, logger))
+            if (!ExecuteCommand("restore --fallbacksource https://dotnet.myget.org/F/dotnet-core/api/v3/index.json", generateResult.DirectoryPath, logger))
             {
                 return new BuildResult(generateResult, false, new Exception("dotnet restore has failed"), null);
             }
@@ -88,6 +94,6 @@ namespace BenchmarkDotNet.Toolchains.Dnx
         /// we use custom output path in order to avoid any future problems related to dotnet cli paths changing
         /// </summary>
         private string BuildExecutablePath(GenerateResult generateResult, Benchmark benchmark)
-            => Path.Combine(generateResult.DirectoryPath, OutputDirectory, $"{benchmark.ShortInfo}.exe");
+            => Path.Combine(generateResult.DirectoryPath, OutputDirectory, $"{benchmark.ShortInfo}{RuntimeInformation.ExecutableExtension}");
     }
 }

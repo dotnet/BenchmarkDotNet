@@ -10,6 +10,8 @@ namespace BenchmarkDotNet.Portability
 {
     internal class RuntimeInformation
     {
+        internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
+
         internal static bool IsWindows()
         {
 #if !CORE
@@ -81,6 +83,5 @@ namespace BenchmarkDotNet.Portability
             return "CORE"; // TODO: verify if it is possible to get this for CORE
 #endif
         }
-
     }
 }

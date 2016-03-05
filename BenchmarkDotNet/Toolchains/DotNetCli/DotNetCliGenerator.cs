@@ -5,15 +5,22 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Classic;
-using BenchmarkDotNet.Portability;
 
-namespace BenchmarkDotNet.Toolchains.Dnx
+namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
-    internal class DnxGenerator : ClassicGenerator
+    internal class DotNetCliGenerator : ClassicGenerator
     {
         private const string ProjectFileName = "project.json";
+
+        private string TargetFrameworkMoniker { get; }
+
+        public DotNetCliGenerator(string targetFrameworkMoniker)
+        {
+            TargetFrameworkMoniker = targetFrameworkMoniker;
+        }
 
         /// <summary>
         /// we need our folder to be on the same level as the project that we want to reference
@@ -34,7 +41,9 @@ namespace BenchmarkDotNet.Toolchains.Dnx
 
             var content = SetPlatform(template, benchmark.Job.Platform);
             content = SetDependencyToExecutingAssembly(content, benchmark.Target.Type);
-    
+            content = SetTargetFrameworkMoniker(content, TargetFrameworkMoniker);
+            content = SetExtraDependencies(content);
+
             var projectJsonFilePath = Path.Combine(projectDir, ProjectFileName);
 
             File.WriteAllText(projectJsonFilePath, content);
@@ -58,6 +67,20 @@ namespace BenchmarkDotNet.Toolchains.Dnx
             return template
                 .Replace("$EXECUTINGASSEMBLYVERSION$", packageVersion) 
                 .Replace("$EXECUTINGASSEMBLY$", assemblyName.Name);
+        }
+
+        private static string SetTargetFrameworkMoniker(string content, string targetFrameworkMoniker)
+        {
+            return content.Replace("$TFM$", targetFrameworkMoniker);
+        }
+
+        private static string SetExtraDependencies(string content)
+        {
+#if CORE
+            return content.Replace("$REQUIREDDEPENDENCY$", "\"dependencies\": { \"NETStandard.Library\": \"1.0.0-rc2-23811\" }");
+#else
+            return content.Replace("$REQUIREDDEPENDENCY$", "\"frameworkAssemblies\": { \"System.Runtime\": \"4.0.10.0\" }");
+#endif
         }
 
         /// <summary>
