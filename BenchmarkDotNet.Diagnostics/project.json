@@ -16,7 +16,8 @@
     },
     "Dia2Lib": "1.0.0-*",
     "Interop.Dia2Lib": "1.0.0-*",
-    "Microsoft.Diagnostics.Runtime": "1.0.0-*"
+    "Microsoft.Diagnostics.Runtime": "1.0.0-*",
+    "Microsoft.Diagnostics.Tracing.TraceEvent": "1.0.41.0"
   },
   "scripts": {
     "postbuild": [
