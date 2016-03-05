@@ -3,6 +3,14 @@
     "#CLASSIC": {
       "executablePath": "BenchmarkDotNet.Samples.dll",
       "workingDirectory": "..\\artifacts\\bin\\BenchmarkDotNet.Samples\\Debug\\net40\\"
+    },
+    "#DNX": {
+      "commandName": "run",
+      "sdkVersion": "dnx-clr-win-x86.1.0.0-rc1-update1"
+    },
+    "#CORE": {
+      "commandName": "run",
+      "sdkVersion": "dnx-coreclr-win-x86.1.0.0-rc1-update1"
     }
   }
 }
