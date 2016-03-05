@@ -7,6 +7,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Classic;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Toolchains.Dnx
 {
@@ -51,7 +52,7 @@ namespace BenchmarkDotNet.Toolchains.Dnx
 
         private static string SetDependencyToExecutingAssembly(string template, Type benchmarkTarget)
         {
-            var assemblyName = benchmarkTarget.Assembly.GetName();
+            var assemblyName = benchmarkTarget.Assembly().GetName();
             var packageVersion = GetPackageVersion(assemblyName);
 
             return template

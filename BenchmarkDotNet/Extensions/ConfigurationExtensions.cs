@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -35,7 +36,7 @@ namespace BenchmarkDotNet.Extensions
 
         private static string DetectCurrentFramework(Type benchmarkType)
         {
-            var attributes = benchmarkType.Assembly.GetCustomAttributes(false).OfType<Attribute>();
+            var attributes = benchmarkType.Assembly().GetCustomAttributes<Attribute>(false);
             var frameworkAttribute = attributes.FirstOrDefault(a => a.ToString() == @"System.Runtime.Versioning.TargetFrameworkAttribute");
             if (frameworkAttribute == null)
 #if NET45

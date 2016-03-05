@@ -9,6 +9,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Toolchains.Classic
 {
@@ -51,7 +52,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
             var targetMethodReturnType = isVoid
                 ? "void"
                 : target.Method.ReturnType.GetCorrectTypeName();
-            var idleMethodReturnType = isVoid || !target.Method.ReturnType.IsValueType
+            var idleMethodReturnType = isVoid || !target.Method.ReturnType.IsValueType()
                 ? targetMethodReturnType
                 : "int";
             var targetMethodResultHolder = isVoid
@@ -74,7 +75,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
 
             var idleImplementation = isVoid
                 ? ""
-                : $"return {(target.Method.ReturnType.IsValueType ? "0" : "null")};";
+                : $"return {(target.Method.ReturnType.IsValueType() ? "0" : "null")};";
 
             var paramsContent = string.Join("", benchmark.Parameters.Items.Select(parameter =>
                 $"{(parameter.IsStatic ? "" : "instance.")}{parameter.Name} = {GetParameterValue(parameter.Value)};"));
@@ -145,6 +146,9 @@ namespace BenchmarkDotNet.Toolchains.Classic
 
         private static string GetReferenceToAssembly(Type type)
         {
+#if !CLASSIC
+            throw new InvalidOperationException("Must not be called");
+#else
             var template = @"    <Reference Include=""$AssemblyName$"">
       <HintPath>..\$AssemblyFileName$</HintPath>
     </Reference>";
@@ -155,6 +159,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 : template.
                     Replace("$AssemblyName$", assembly.GetName(false).Name).
                     Replace("$AssemblyFileName$", fileName);
+#endif
         }
 
         private void GenerateAppConfigFile(string projectDir, IJob job)
@@ -208,6 +213,9 @@ namespace BenchmarkDotNet.Toolchains.Classic
 
         private void EnsureDependancyInCorrectLocation(ILogger logger, Type type, string outputDir)
         {
+#if !CLASSIC
+            throw new InvalidOperationException("Must not be called");
+#else
             var fileInfo = new FileInfo(type.Assembly.Location);
             if (fileInfo.Name == "mscorlib.dll")
                 return;
@@ -219,6 +227,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 logger.WriteLineInfo("//   Actually at: {0}", fileInfo.FullName);
                 CopyFile(logger, fileInfo.FullName, expectedLocation);
             }
+#endif
         }
 
         private void CopyFile(ILogger logger, string sourcePath, string destinationPath)

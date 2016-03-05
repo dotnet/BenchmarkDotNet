@@ -10,6 +10,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -76,11 +77,12 @@ namespace BenchmarkDotNet.Configs
 
         private static IDiagnoser[] LoadDiagnoser()
         {
+#if !CORE
             var diagnosticAssembly = "BenchmarkDotNet.Diagnostics.dll";
             try
             {
                 var loadedAssembly = Assembly.LoadFrom(diagnosticAssembly);
-                var thisAssembly = Assembly.GetAssembly(typeof(DefaultConfig));
+                var thisAssembly = typeof(DefaultConfig).Assembly();
                 if (loadedAssembly.GetName().Version != thisAssembly.GetName().Version)
                 {
                     var errorMsg =
@@ -102,6 +104,7 @@ namespace BenchmarkDotNet.Configs
             {
                 ConsoleLogger.Default.WriteLineError($"Error loading {diagnosticAssembly}: {ex.GetType().Name} - {ex.Message}");
             }
+#endif
             return new IDiagnoser[0];
         }
 

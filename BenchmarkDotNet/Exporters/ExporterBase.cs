@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Exporters
         public IEnumerable<string> ExportToFiles(Summary summary)
         {
             var fileName = $"{Path.Combine(summary.CurrentDirectory, summary.Title)}-{FileCaption}{FileNameSuffix}.{FileExtension}";
-            using (var stream = new StreamWriter(fileName))
+            using (var stream = Portability.StreamWriter.FromPath(fileName))
                 ExportToLog(summary, new StreamLogger(stream));
             yield return fileName;
         }

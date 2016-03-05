@@ -26,11 +26,13 @@ namespace BenchmarkDotNet.Running
         public static Summary Run(Type type, IConfig config = null) =>
             Run(BenchmarkConverter.TypeToBenchmarks(type, config), config);
 
+#if CLASSIC
         public static Summary RunUrl(string url, IConfig config = null) =>
             Run(BenchmarkConverter.UrlToBenchmarks(url, config), config);
 
         public static Summary RunSource(string source, IConfig config = null) =>
             Run(BenchmarkConverter.SourceToBenchmarks(source, config), config);
+#endif
 
         internal static Summary Run(IList<Benchmark> benchmarks, IConfig config)
         {
@@ -39,7 +41,7 @@ namespace BenchmarkDotNet.Running
             var title = GetTitle(benchmarks);
             EnsureNoMoreThanOneBaseline(benchmarks, title);
 
-            using (var logStreamWriter = new StreamWriter(title + ".log"))
+            using (var logStreamWriter = Portability.StreamWriter.FromPath(title + ".log"))
             {
                 var logger = new CompositeLogger(config.GetCompositeLogger(), new StreamLogger(logStreamWriter));
                 var summary = Run(benchmarks, logger, title, config);
