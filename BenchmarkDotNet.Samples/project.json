@@ -1,0 +1,35 @@
+﻿{
+  "title": "BenchmarkDotNet.Samples",
+  "compilationOptions": {
+    "emitEntryPoint": true,
+    "allowUnsafe": true,
+    "optimize": true
+  },
+  "commands": {
+    "#DNX": "BenchmarkDotNet.Samples"
+  },
+  "frameworks": {
+    "net40": {
+      "compilationOptions": {
+        "define": [ "CLASSIC" ]
+      },
+      "BenchmarkDotNet.Diagnostics": "1.0.0-*"
+    },
+    "dnx451": {
+      "compilationOptions": {
+        "define": [ "DNX" ]
+      }
+    }
+  },
+  "dependencies": {
+    "BenchmarkDotNet": {
+      "target": "project",
+      "version": "1.0.0-*"
+    }
+  },
+  "scripts": {
+    "postbuild": [
+      "%project:Directory%/../build/batchcopy \"%project:Directory%/../artifacts/bin/BenchmarkDotNet/Debug/net40/*.*\" %project:BuildOutputDir%/Debug/net40"
+    ]
+  }
+}

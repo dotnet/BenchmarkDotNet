@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 ? ""
                 : $"return {(target.Method.ReturnType.IsValueType ? "0" : "null")};";
 
-            var paramsContent = string.Join("", benchmark.Parameters.Items.Select(parameter => 
+            var paramsContent = string.Join("", benchmark.Parameters.Items.Select(parameter =>
                 $"{(parameter.IsStatic ? "" : "instance.")}{parameter.Name} = {GetParameterValue(parameter.Value)};"));
 
             var targetBenchmarkTaskArguments = benchmark.Job.GenerateWithDefinitions();
@@ -122,7 +122,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
             return value.ToString();
         }
 
-        private void GenerateProjectFile(ILogger logger, string projectDir, Benchmark benchmark)
+        protected virtual void GenerateProjectFile(ILogger logger, string projectDir, Benchmark benchmark)
         {
             var job = benchmark.Job;
             var platform = job.Platform.ToConfig();
@@ -145,7 +145,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
             EnsureDependancyInCorrectLocation(logger, benchmark.Target.Method.ReturnType, projectDir);
         }
 
-        private void GenerateProjectBuildFile(string projectDir)
+        protected virtual void GenerateProjectBuildFile(string projectDir)
         {
             var content = ResourceHelper.LoadTemplate("BuildBenchmark.txt");
             string fileName = Path.Combine(projectDir, "BuildBenchmark.bat");
@@ -178,9 +178,9 @@ namespace BenchmarkDotNet.Toolchains.Classic
             File.WriteAllText(fileName, content);
         }
 
-        private static GenerateResult CreateProjectDirectory(Benchmark benchmark)
+        private GenerateResult CreateProjectDirectory(Benchmark benchmark)
         {
-            var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), benchmark.ShortInfo);
+            var directoryPath = GetDirectoryPath(benchmark);
             bool exist = Directory.Exists(directoryPath);
             Exception deleteException = null;
             for (int attempt = 0; attempt < 3 && exist; attempt++)
@@ -191,6 +191,11 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 {
                     Directory.Delete(directoryPath, true);
                     exist = Directory.Exists(directoryPath);
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    exist = false;
+                    break;
                 }
                 catch (Exception e)
                 {
@@ -203,6 +208,11 @@ namespace BenchmarkDotNet.Toolchains.Classic
             if (!Directory.Exists(directoryPath))
                 Directory.CreateDirectory(directoryPath);
             return new GenerateResult(directoryPath, true, null);
+        }
+
+        protected virtual string GetDirectoryPath(Benchmark benchmark)
+        {
+            return Path.Combine(Directory.GetCurrentDirectory(), benchmark.ShortInfo);
         }
 
         private void EnsureDependancyInCorrectLocation(ILogger logger, Type type, string outputDir)

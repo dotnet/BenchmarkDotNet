@@ -1,0 +1,50 @@
+{
+  "version": "1.0.0-*",
+
+  "commands": {
+    "testOnlyFromConsole": "xunit.runner.dnx"
+  },
+
+  "dependencies": {
+    "BenchmarkDotNet": {
+      "target": "project"
+    },
+    "xunit": "2.1.0",
+    "xunit.core": "2.1.0"
+  },
+
+  "frameworks": {
+    "net45": {
+      "frameworkAssemblies": {
+        "System": "4.0.0.0",
+        "System.Runtime": "4.0.0.0"
+      }
+    },
+    "dnx451": {
+      "frameworkAssemblies": {
+        "System": "4.0.0.0",
+        "System.Runtime": "4.0.10.0"
+      },
+      "dependencies": {
+        "FSharp.Dnx": {
+          "type": "build",
+          "version": "1.0.0-*"
+        },
+        "xunit.runner.dnx": "2.1.0-rc1-build204"
+      }
+    }
+  },
+
+  "compiler": {
+    "name": "F#",
+    "compilerAssembly": "FSharp.Dnx",
+    "compilerType": "FSharp.Dnx.FSharpProjectCompiler"
+  },
+
+  "fsharp": {
+    "files": [
+      "AssemblyInfo.fs",
+      "Program.fs"
+    ]
+  }
+}

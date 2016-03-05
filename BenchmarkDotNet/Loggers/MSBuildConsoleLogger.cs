@@ -1,4 +1,5 @@
-﻿using Microsoft.Build.Framework;
+﻿#if CLASSIC
+using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
 namespace BenchmarkDotNet.Loggers
@@ -23,3 +24,4 @@ namespace BenchmarkDotNet.Loggers
             Logger.WriteLineError("// {0}({1},{2}): error {3}: {4}", e.File, e.LineNumber, e.ColumnNumber, e.Code, e.Message);
     }
 }
+#endif

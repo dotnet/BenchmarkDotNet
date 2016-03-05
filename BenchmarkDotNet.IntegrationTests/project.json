@@ -1,0 +1,56 @@
+﻿{
+  "title": "BenchmarkDotNet.IntegrationTests",
+  "commands": {
+    "test": "xunit.runner.dnx"
+  },
+  "compileExclude": "**/Program.cs",
+  "veryImportantComment": "we need to exclude all auto-generated files that created during integration test execution",
+  "frameworks": {
+    "net45": {
+      "compilationOptions": {
+        "define": [ "CLASSIC" ]
+      },
+      "dependencies": {        
+        "xunit.runner.console": "2.1.0"
+      },
+      "frameworkAssemblies": {
+        "System.Runtime": "4.0.0.0",
+        "System.Threading.Tasks": "4.0.0.0"
+      }
+    },
+    "dnx451": {
+      "compilationOptions": {
+        "define": [ "DNX" ]
+      },
+      "frameworkAssemblies": {
+        "System.Runtime": "4.0.10.0",
+        "System.Threading.Tasks": "4.0.0.0"
+      },
+      "dependencies": {
+        "xunit.runner.dnx": "2.1.0-rc1-build204"
+      }
+    }
+  },
+  "dependencies": {
+    "BenchmarkDotNet": {
+      "target": "project",
+      "version": "1.0.0-*"
+    },
+    "BenchmarkDotNet.Diagnostics": "1.0.0-*",
+    "Microsoft.Diagnostics.Runtime": "1.0.0-*",
+    "xunit": "2.1.0",
+    "xunit.abstractions": "2.0.0",
+    "xunit.assert": "2.1.0",
+    "xunit.core": "2.1.0",
+    "xunit.extensibility.core": "2.1.0",
+    "xunit.extensibility.execution": "2.1.0"
+  },
+  "scripts": {
+    "postbuild": [
+      "%project:Directory%/../build/batchcopy \"%project:Directory%/../CLRMD/x86/msdia120.dll\" %project:BuildOutputDir%/Debug/net45",
+      "%project:Directory%/../build/batchcopy \"%project:Directory%/../CLRMD/x86/msdia120.dll\" %project:BuildOutputDir%/Release/net45",
+      "%project:Directory%/../build/batchcopy \"%project:Directory%/../CLRMD/x86/msdia120.dll\" %project:BuildOutputDir%/Debug/dnx451",
+      "%project:Directory%/../build/batchcopy \"%project:Directory%/../CLRMD/x86/msdia120.dll\" %project:BuildOutputDir%/Release/dnx451"
+    ]
+  }
+}

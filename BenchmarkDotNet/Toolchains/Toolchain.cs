@@ -2,6 +2,13 @@
 {
     public class Toolchain : IToolchain
     {
+        public static readonly IToolchain Current 
+#if CLASSIC 
+            = Classic.ClassicToolchain.Instance; 
+#elif DNX 
+            = Dnx.DnxToolchain.Instance; 
+#endif
+
         public string Name { get; }
         public IGenerator Generator { get; }
         public IBuilder Builder { get; }

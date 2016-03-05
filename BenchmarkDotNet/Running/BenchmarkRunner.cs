@@ -147,7 +147,7 @@ namespace BenchmarkDotNet.Running
             if (!generateResult.IsGenerateSuccess)
                 return new BenchmarkReport(benchmark, generateResult, null, null, null);
 
-            var buildResult = Build(logger, toolchain, generateResult);
+            var buildResult = Build(logger, toolchain, generateResult, benchmark);
             if (!buildResult.IsBuildSuccess)
                 return new BenchmarkReport(benchmark, generateResult, buildResult, null, null);
 
@@ -182,10 +182,10 @@ namespace BenchmarkDotNet.Running
             return generateResult;
         }
 
-        private static BuildResult Build(ILogger logger, IToolchain toolchain, GenerateResult generateResult)
+        private static BuildResult Build(ILogger logger, IToolchain toolchain, GenerateResult generateResult, Benchmark benchmark)
         {
             logger.WriteLineInfo("// *** Build ***");
-            var buildResult = toolchain.Builder.Build(generateResult, logger);
+            var buildResult = toolchain.Builder.Build(generateResult, logger, benchmark);
             if (buildResult.IsBuildSuccess)
             {
                 logger.WriteLineInfo("// Result = Success");

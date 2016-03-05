@@ -36,11 +36,11 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public bool Done { get; private set; }
 
-            public BuildResult Build(GenerateResult generateResult, ILogger logger)
+            public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark)
             {
                 logger.WriteLine("Building");
                 Done = true;
-                return new BuildResult(generateResult, true, null);
+                return new BuildResult(generateResult, true, null, "doesNotMatterHere");
             }
         }
 

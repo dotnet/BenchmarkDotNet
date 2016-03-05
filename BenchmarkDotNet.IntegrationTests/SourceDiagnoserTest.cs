@@ -8,7 +8,6 @@ using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    // TODO - #ifdef this test out under CoreCLR/DNX, it relies on CLRMD and other libraries that are only compatible with .NET Full/Desktop
     [Config(typeof(ThroughputFastConfig))]
     public class SourceDiagnoserTest 
     {
