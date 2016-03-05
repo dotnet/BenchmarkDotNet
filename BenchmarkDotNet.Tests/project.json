@@ -13,9 +13,6 @@
         "System.Management": "4.0.0.0",
         "System.Runtime": "4.0.0.0",
         "System.Threading.Tasks": "4.0.0.0"
-      },
-      "dependencies": {
-        "xunit.runner.visualstudio": "2.1.0"
       }
     },
     "dnx451": {
@@ -23,6 +20,11 @@
         "System.Runtime": "4.0.10.0",
         "System.Threading.Tasks": "4.0.0.0"
       },
+      "dependencies": {
+        "xunit.runner.dnx": "2.1.0-rc1-build204"
+      }
+    },
+    "dnxcore50": {
       "dependencies": {
         "xunit.runner.dnx": "2.1.0-rc1-build204"
       }

@@ -19,6 +19,14 @@
       "compilationOptions": {
         "define": [ "DNX" ]
       }
+    },
+    "dnxcore50": {
+      "compilationOptions": {
+        "define": [ "CORE" ]
+      },
+      "dependencies": {
+        "System.Security.Cryptography.Hashing.Algorithms": "4.0.0-beta-23225"
+      }
     }
   },
   "dependencies": {
