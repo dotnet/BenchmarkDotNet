@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Extensions
     internal static class ReflectionExtensions
     {
         public static T ResolveAttribute<T>(this Type type) where T : Attribute =>
-            type?.GetCustomAttributes<T>(false).FirstOrDefault();
+            type?.GetCustomAttributes<T>(typeof(T), false).FirstOrDefault();
 
         public static T ResolveAttribute<T>(this MethodInfo methodInfo) where T : Attribute =>
             methodInfo?.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;

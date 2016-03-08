@@ -8,6 +8,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
@@ -44,6 +45,8 @@ namespace BenchmarkDotNet.Running
             using (var logStreamWriter = Portability.StreamWriter.FromPath(title + ".log"))
             {
                 var logger = new CompositeLogger(config.GetCompositeLogger(), new StreamLogger(logStreamWriter));
+                benchmarks = GetSupportedBenchmarks(benchmarks, logger);
+
                 var summary = Run(benchmarks, logger, title, config);
                 config.GetCompositeExporter().ExportToFiles(summary);
                 return summary;
@@ -259,6 +262,11 @@ namespace BenchmarkDotNet.Running
             var baselineCount = benchmarks.Select(b => b.Target).Distinct().Count(target => target.Baseline);
             if (baselineCount > 1)
                 throw new InvalidOperationException($"Only 1 [Benchmark] in a class can have \"Baseline = true\" applied to it, {benchmarkName} has {baselineCount}");
+        }
+
+        private static IList<Benchmark> GetSupportedBenchmarks(IList<Benchmark> benchmarks, CompositeLogger logger)
+        {
+            return benchmarks.Where(benchmark => benchmark.Job.Toolchain.IsSupported(benchmark, logger)).ToArray();
         }
     }
 }

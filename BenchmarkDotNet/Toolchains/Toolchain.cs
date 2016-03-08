@@ -1,4 +1,7 @@
-﻿namespace BenchmarkDotNet.Toolchains
+﻿using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Running;
+
+namespace BenchmarkDotNet.Toolchains
 {
     public class Toolchain : IToolchain
     {
@@ -23,6 +26,8 @@
             Builder = builder;
             Executor = executor;
         }
+
+        public virtual bool IsSupported(Benchmark benchmark, ILogger logger) => true;
 
         public override string ToString() => Name;
     }
