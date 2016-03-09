@@ -35,8 +35,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         protected override string GetDirectoryPath(Benchmark benchmark)
         {
             return Path.Combine(
-                Directory.GetCurrentDirectory(), 
-                @"..\", 
+                new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.FullName, 
                 benchmark.ShortInfo);
         }
 
