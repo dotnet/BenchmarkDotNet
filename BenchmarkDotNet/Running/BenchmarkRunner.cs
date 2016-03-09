@@ -144,7 +144,7 @@ namespace BenchmarkDotNet.Running
 
         private static BenchmarkReport Run(Benchmark benchmark, ILogger logger, IConfig config)
         {
-            var toolchain = benchmark.Job.Toolchain;
+            var toolchain = Toolchain.GetToolchain(benchmark.Job.Runtime);
 
             logger.WriteLineHeader("// **************************");
             logger.WriteLineHeader("// Benchmark: " + benchmark.ShortInfo);
@@ -266,7 +266,7 @@ namespace BenchmarkDotNet.Running
 
         private static IList<Benchmark> GetSupportedBenchmarks(IList<Benchmark> benchmarks, CompositeLogger logger)
         {
-            return benchmarks.Where(benchmark => benchmark.Job.Toolchain.IsSupported(benchmark, logger)).ToArray();
+            return benchmarks.Where(benchmark => Toolchain.GetToolchain(benchmark.Job.Runtime).IsSupported(benchmark, logger)).ToArray();
         }
     }
 }

@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.Helpers
 
         private static string GetClrVersion() => RuntimeInformation.GetClrVersion();
 
-        public static Runtime GetCurrentRuntime() => IsMono() ? Runtime.Mono : Runtime.Clr;
+        public static Runtime GetCurrentRuntime() => RuntimeInformation.GetCurrent();
 
         private static string GetArchitecture() => IntPtr.Size == 4 ? "32-bit" : "64-bit";
 

@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Toolchains;
 #if !CORE
 using System.Management;
 #endif
@@ -77,10 +79,23 @@ namespace BenchmarkDotNet.Portability
                 if (monoDisplayName != null)
                     return "Mono " + monoDisplayName.Invoke(null, null);
             }
-#if !CORE
+#if CLASSIC
             return "MS.NET " + Environment.Version;
-#else
+#elif DNX
+            return "DNX MS.NET " + Environment.Version;
+#elif CORE
             return "CORE"; // TODO: verify if it is possible to get this for CORE
+#endif
+        }
+
+        internal static Runtime GetCurrent()
+        {
+#if CLASSIC
+            return IsMono() ? Runtime.Mono : Runtime.Clr;
+#elif DNX
+            return Runtime.Dnx;
+#elif CORE
+            return Runtime.Core;
 #endif
         }
     }

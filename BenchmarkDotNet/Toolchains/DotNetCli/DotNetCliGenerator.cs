@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -17,9 +16,15 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         private string TargetFrameworkMoniker { get; }
 
-        public DotNetCliGenerator(string targetFrameworkMoniker)
+        private string ExtraDependencies { get; }
+
+        private Func<Platform, string> PlatformProvider { get; }
+
+        public DotNetCliGenerator(string targetFrameworkMoniker, string extraDependencies, Func<Platform, string> platformProvider)
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
+            ExtraDependencies = extraDependencies;
+            PlatformProvider = platformProvider;
         }
 
         /// <summary>
@@ -39,10 +44,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         {
             var template = ResourceHelper.LoadTemplate("BenchmarkProject.json");
 
-            var content = SetPlatform(template, benchmark.Job.Platform);
+            var content = SetPlatform(template, PlatformProvider(benchmark.Job.Platform));
             content = SetDependencyToExecutingAssembly(content, benchmark.Target.Type);
             content = SetTargetFrameworkMoniker(content, TargetFrameworkMoniker);
-            content = SetExtraDependencies(content);
+            content = SetExtraDependencies(content, ExtraDependencies);
 
             var projectJsonFilePath = Path.Combine(projectDir, ProjectFileName);
 
@@ -54,13 +59,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             // do nothing on purpose, we do not need bat file
         }
 
-        private static string SetPlatform(string template, Platform platform)
+        private static string SetPlatform(string template, string platform)
         {
-#if CORE
-            return template.Replace("$PLATFORM$", "x64"); // dotnet cli supports only x64 compilation now
-#else
-            return template.Replace("$PLATFORM$", platform.ToConfig());
-#endif
+            return template.Replace("$PLATFORM$", platform);
         }
 
         private static string SetDependencyToExecutingAssembly(string template, Type benchmarkTarget)
@@ -78,13 +79,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return content.Replace("$TFM$", targetFrameworkMoniker);
         }
 
-        private static string SetExtraDependencies(string content)
+        private static string SetExtraDependencies(string content, string extraDependencies)
         {
-#if CORE
-            return content.Replace("$REQUIREDDEPENDENCY$", "\"dependencies\": { \"NETStandard.Library\": \"1.0.0-rc2-23811\" }");
-#else
-            return content.Replace("$REQUIREDDEPENDENCY$", "\"frameworkAssemblies\": { \"System.Runtime\": \"4.0.10.0\" }");
-#endif
+            return content.Replace("$REQUIREDDEPENDENCY$", extraDependencies);
         }
 
         /// <summary>

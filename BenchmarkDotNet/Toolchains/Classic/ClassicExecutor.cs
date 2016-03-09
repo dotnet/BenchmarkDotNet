@@ -96,6 +96,8 @@ namespace BenchmarkDotNet.Toolchains.Classic
             switch (runtime)
             {
                 case Runtime.Clr:
+                case Runtime.Dnx:
+                case Runtime.Core:
                     start.FileName = exeName;
                     start.Arguments = args;
                     break;

@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.Jobs
 {
     public static class JobExtensions
     {
-        public static IJob With(this IJob job, IToolchain toolchain) => job.With(j => j.Toolchain = toolchain);
         public static IJob With(this IJob job, Mode mode) => job.With(j => j.Mode = mode);
         public static IJob With(this IJob job, Platform platform) => job.With(j => j.Platform = platform);
         public static IJob With(this IJob job, Jit jit) => job.With(j => j.Jit = jit);
@@ -32,7 +30,6 @@ namespace BenchmarkDotNet.Jobs
             Jit = job.Jit,
             Platform = job.Platform,
             Framework = job.Framework,
-            Toolchain = job.Toolchain,
             Runtime = job.Runtime,
             Mode = job.Mode,
             LaunchCount = job.LaunchCount,
@@ -51,7 +48,6 @@ namespace BenchmarkDotNet.Jobs
 
         public static IEnumerable<KeyValuePair<string, string>> GetAllProperties(this IJob job)
         {
-            yield return new KeyValuePair<string, string>("Toolchain", job.Toolchain?.Name ?? "Default");
             yield return new KeyValuePair<string, string>("Mode", job.Mode.ToString());
             yield return new KeyValuePair<string, string>("Platform", job.Platform.ToString());
             yield return new KeyValuePair<string, string>("Jit", job.Jit.ToString());
@@ -69,18 +65,12 @@ namespace BenchmarkDotNet.Jobs
         public static string GetShortInfo(this IJob job)
         {
             // TODO: make it automatically
-            if (job.Equals(Job.LegacyJitX86))
-                return "LegacyX86";
-            if (job.Equals(Job.LegacyJitX64))
-                return "LegacyX64";
-            if (job.Equals(Job.RyuJitX64))
-                return "RyuJitX64";
-            if (job.Equals(Job.Dry))
-                return "Dry";
-            if (job.Equals(Job.Mono))
-                return "Mono";
-            if (job.Equals(Job.Clr))
-                return "Clr";
+            string shortInfo;
+            if (TryGetShortInfo(job, out shortInfo))
+            {
+                return shortInfo;
+            }
+
             var defaultJobProperties = Job.Default.GetAllProperties().ToArray();
             var ownProperties = job.GetAllProperties().ToArray();
             var n = ownProperties.Length;
@@ -93,18 +83,12 @@ namespace BenchmarkDotNet.Jobs
         public static string GetShortInfo(this IJob job, IList<IJob> allJobs)
         {
             // TODO: make it automatically
-            if (job.Equals(Job.LegacyJitX86))
-                return "LegacyX86";
-            if (job.Equals(Job.LegacyJitX64))
-                return "LegacyX64";
-            if (job.Equals(Job.RyuJitX64))
-                return "RyuJitX64";
-            if (job.Equals(Job.Dry))
-                return "Dry";
-            if (job.Equals(Job.Mono))
-                return "Mono";
-            if (job.Equals(Job.Clr))
-                return "Clr";
+            string shortInfo;
+            if (TryGetShortInfo(job, out shortInfo))
+            {
+                return shortInfo;
+            }
+
             var defaultJobProperties = Job.Default.GetAllProperties().ToArray();
             var ownProperties = job.GetAllProperties().ToArray();
             var n = ownProperties.Length;
@@ -120,8 +104,6 @@ namespace BenchmarkDotNet.Jobs
         {
             switch (property.Key)
             {
-                case "Toolchain":
-                    return property.Value + "Toolchain";
                 case "Mode":
                 case "Platform":
                     return property.Value;
@@ -145,6 +127,30 @@ namespace BenchmarkDotNet.Jobs
             builder.Append($".WithIterationTime({job.IterationTime.Value})");
             builder.Append($".WithLaunchCount({job.LaunchCount.Value})");
             return builder.ToString();
+        }
+
+        private static bool TryGetShortInfo(IJob job, out string shortInfo)
+        {
+            shortInfo = null;
+
+            if (job.Equals(Job.LegacyJitX86))
+                shortInfo = "LegacyX86";
+            if (job.Equals(Job.LegacyJitX64))
+                shortInfo = "LegacyX64";
+            if (job.Equals(Job.RyuJitX64))
+                shortInfo = "RyuJitX64";
+            if (job.Equals(Job.Dry))
+                shortInfo = "Dry";
+            if (job.Equals(Job.Mono))
+                shortInfo = "Mono";
+            if (job.Equals(Job.Clr))
+                shortInfo = "Clr";
+            if (job.Equals(Job.Dnx))
+                shortInfo = "Dnx";
+            if (job.Equals(Job.Core))
+                shortInfo = "Core";
+
+            return !string.IsNullOrEmpty(shortInfo);
         }
     }
 }
