@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 {
                     var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmark);
 
-                    return Execute(process, benchmark, loggerWithDiagnoser, diagnoser);
+                    return Execute(process, benchmark, loggerWithDiagnoser, diagnoser, logger);
                 }
             }
             finally
@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
             }
         }
 
-        private ExecuteResult Execute(Process process, Benchmark benchmark, SynchronousProcessOutputLoggerWithDiagnoser loggerWithDiagnoser, IDiagnoser compositeDiagnoser)
+        private ExecuteResult Execute(Process process, Benchmark benchmark, SynchronousProcessOutputLoggerWithDiagnoser loggerWithDiagnoser, IDiagnoser compositeDiagnoser, ILogger logger)
         {
             consoleHandler.SetProcess(process);
 
@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
 
             compositeDiagnoser?.ProcessStarted(process);
 
-            process.EnsureHighPriority();
+            process.EnsureHighPriority(logger);
             if (!benchmark.Job.Affinity.IsAuto)
             {
                 process.EnsureProcessorAffinity(benchmark.Job.Affinity.Value);
