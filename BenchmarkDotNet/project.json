@@ -1,6 +1,6 @@
 ﻿{
   "title": "BenchmarkDotNet",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "authors": [ "Andrey Akinshin", "Jon Skeet", "Matt Warren" ],
   "owners": [ "Andrey Akinshin", "Jon Skeet", "Matt Warren" ],
   "licenseUrl": "https://github.com/PerfDotNet/BenchmarkDotNet/blob/master/LICENSE.md",
