@@ -20,3 +20,4 @@ using BenchmarkDotNet.Properties;
 
 [assembly: InternalsVisibleTo("BenchmarkDotNet.Tests")]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.IntegrationTests")]
+[assembly: InternalsVisibleTo("BenchmarkDotNet.Samples")]

@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Extensions
 {
     internal static class ReflectionExtensions
     {
         public static T ResolveAttribute<T>(this Type type) where T : Attribute =>
-            type?.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
+            type?.GetCustomAttributes<T>(typeof(T), false).FirstOrDefault();
 
         public static T ResolveAttribute<T>(this MethodInfo methodInfo) where T : Attribute =>
             methodInfo?.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
@@ -29,7 +30,7 @@ namespace BenchmarkDotNet.Extensions
             if (type.IsNested && type.DeclaringType != null)
                 prefix += type.DeclaringType.Name + ".";
 
-            if (type.IsGenericType)
+            if (type.IsGenericType())
             {
                 var mainName = type.Name.Substring(0, type.Name.IndexOf('`'));
                 string args = string.Join(", ", type.GetGenericArguments().Select(GetCorrectTypeName).ToArray());

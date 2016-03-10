@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿#if !CORE
+using System.Diagnostics;
 using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples.Framework
@@ -18,3 +19,4 @@ namespace BenchmarkDotNet.Samples.Framework
         }
     }
 }
+#endif

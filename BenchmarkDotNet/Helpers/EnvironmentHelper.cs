@@ -2,12 +2,12 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Management;
 using System.Reflection;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Helpers
 {
@@ -68,48 +68,20 @@ namespace BenchmarkDotNet.Helpers
         private string GetDebuggerFlag() => HasAttachedDebugger ? " [AttachedDebugger]" : "";
 
         private static string GetBenchmarkDotNetCaption() =>
-            ((AssemblyTitleAttribute)typeof(BenchmarkRunner).Assembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), false)[0]).Title;
+            typeof(BenchmarkRunner).Assembly().GetCustomAttributes<AssemblyTitleAttribute>(false).First().Title;
 
         private static string GetBenchmarkDotNetVersion() =>
-            typeof(BenchmarkRunner).Assembly.GetName().Version + (GetBenchmarkDotNetCaption().EndsWith("-Dev") ? "+" : string.Empty);
+            typeof(BenchmarkRunner).Assembly().GetName().Version + (GetBenchmarkDotNetCaption().EndsWith("-Dev") ? "+" : string.Empty);
 
-        private static string GetOsVersion() => Environment.OSVersion.ToString();
+        private static string GetOsVersion() => RuntimeInformation.GetOsVersion();
 
-        private static string GetProcessorName()
-        {
-            var info = string.Empty;
-            if (IsWindows() && !IsMono())
-            {
-                try
-                {
-                    var mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
-                    foreach (var moProcessor in mosProcessor.Get().Cast<ManagementObject>())
-                        info += moProcessor["name"]?.ToString();
-                }
-                catch (Exception)
-                {
-                }
-            }
-            else
-                info = "?";
-            return info;
-        }
+        private static string GetProcessorName() => RuntimeInformation.GetProcessorName();
 
         private static int GetProcessorCount() => Environment.ProcessorCount;
 
-        private static string GetClrVersion()
-        {
-            if (IsMono())
-            {
-                var monoRuntimeType = Type.GetType("Mono.Runtime");
-                var monoDisplayName = monoRuntimeType?.GetMethod("GetDisplayName", BindingFlags.NonPublic | BindingFlags.Static);
-                if (monoDisplayName != null)
-                    return "Mono " + monoDisplayName.Invoke(null, null);
-            }
-            return "MS.NET " + Environment.Version;
-        }
+        private static string GetClrVersion() => RuntimeInformation.GetClrVersion();
 
-        public static Runtime GetCurrentRuntime() => IsMono() ? Runtime.Mono : Runtime.Clr;
+        public static Runtime GetCurrentRuntime() => RuntimeInformation.GetCurrent();
 
         private static string GetArchitecture() => IntPtr.Size == 4 ? "32-bit" : "64-bit";
 
@@ -134,9 +106,9 @@ namespace BenchmarkDotNet.Helpers
 
         private static long GetChronometerFrequency() => Chronometer.Frequency;
 
-        public static bool IsMono() => Type.GetType("Mono.Runtime") != null;
+        public static bool IsMono() => RuntimeInformation.IsMono();
 
-        public static bool IsWindows() => Environment.OSVersion.Platform.IsOneOf(PlatformID.Win32NT, PlatformID.Win32S, PlatformID.Win32Windows, PlatformID.WinCE);
+        public static bool IsWindows() => RuntimeInformation.IsWindows();
 
         // See http://aakinshin.net/en/blog/dotnet/jit-version-determining-in-runtime/
         private class JitHelper

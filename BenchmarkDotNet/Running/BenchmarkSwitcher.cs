@@ -59,6 +59,7 @@ namespace BenchmarkDotNet.Running
                 }
             }
             // TODO: move this logic to the RunUrl method
+#if CLASSIC
             if (args.Length > 0 && (args[0].StartsWith("http://") || args[0].StartsWith("https://")))
             {
                 var url = args[0];
@@ -66,6 +67,7 @@ namespace BenchmarkDotNet.Running
                 var name = uri.IsFile ? Path.GetFileName(uri.LocalPath) : "URL";
                 summaries.Add(BenchmarkRunner.RunUrl(url, config));
             }
+#endif
             var clockSpan = globalChronometer.Stop();
             BenchmarkRunner.LogTotalTime(logger, clockSpan.GetTimeSpan(), "Global total time");
             return summaries;

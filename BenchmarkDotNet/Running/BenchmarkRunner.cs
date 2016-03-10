@@ -8,6 +8,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
@@ -26,11 +27,13 @@ namespace BenchmarkDotNet.Running
         public static Summary Run(Type type, IConfig config = null) =>
             Run(BenchmarkConverter.TypeToBenchmarks(type, config), config);
 
+#if CLASSIC
         public static Summary RunUrl(string url, IConfig config = null) =>
             Run(BenchmarkConverter.UrlToBenchmarks(url, config), config);
 
         public static Summary RunSource(string source, IConfig config = null) =>
             Run(BenchmarkConverter.SourceToBenchmarks(source, config), config);
+#endif
 
         internal static Summary Run(IList<Benchmark> benchmarks, IConfig config)
         {
@@ -39,9 +42,11 @@ namespace BenchmarkDotNet.Running
             var title = GetTitle(benchmarks);
             EnsureNoMoreThanOneBaseline(benchmarks, title);
 
-            using (var logStreamWriter = new StreamWriter(title + ".log"))
+            using (var logStreamWriter = Portability.StreamWriter.FromPath(title + ".log"))
             {
                 var logger = new CompositeLogger(config.GetCompositeLogger(), new StreamLogger(logStreamWriter));
+                benchmarks = GetSupportedBenchmarks(benchmarks, logger);
+
                 var summary = Run(benchmarks, logger, title, config);
                 config.GetCompositeExporter().ExportToFiles(summary);
                 return summary;
@@ -139,7 +144,7 @@ namespace BenchmarkDotNet.Running
 
         private static BenchmarkReport Run(Benchmark benchmark, ILogger logger, IConfig config)
         {
-            var toolchain = benchmark.Job.Toolchain;
+            var toolchain = Toolchain.GetToolchain(benchmark.Job.Runtime);
 
             logger.WriteLineHeader("// **************************");
             logger.WriteLineHeader("// Benchmark: " + benchmark.ShortInfo);
@@ -257,6 +262,11 @@ namespace BenchmarkDotNet.Running
             var baselineCount = benchmarks.Select(b => b.Target).Distinct().Count(target => target.Baseline);
             if (baselineCount > 1)
                 throw new InvalidOperationException($"Only 1 [Benchmark] in a class can have \"Baseline = true\" applied to it, {benchmarkName} has {baselineCount}");
+        }
+
+        private static IList<Benchmark> GetSupportedBenchmarks(IList<Benchmark> benchmarks, CompositeLogger logger)
+        {
+            return benchmarks.Where(benchmark => Toolchain.GetToolchain(benchmark.Job.Runtime).IsSupported(benchmark, logger)).ToArray();
         }
     }
 }

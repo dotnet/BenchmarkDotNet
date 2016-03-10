@@ -1,4 +1,7 @@
-﻿namespace BenchmarkDotNet.Toolchains
+﻿using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Running;
+
+namespace BenchmarkDotNet.Toolchains
 {
     public interface IToolchain
     {
@@ -6,5 +9,7 @@
         IGenerator Generator { get; }
         IBuilder Builder { get; }
         IExecutor Executor { get; }
+
+        bool IsSupported(Benchmark benchmark, ILogger logger);
     }
 }
