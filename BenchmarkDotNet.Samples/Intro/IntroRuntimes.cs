@@ -26,16 +26,17 @@ namespace BenchmarkDotNet.Samples.Intro
             }
         }
 
-        private class DnxAndCoreConfig : ManualConfig
+        private class MultipleRuntimesConfig : ManualConfig
         {
-            public DnxAndCoreConfig()
+            public MultipleRuntimesConfig()
             {
                 Add(Job.Dry.With(Runtime.Dnx).With(Jit.Host));
                 Add(Job.Dry.With(Runtime.Core).With(Jit.Host));
+                Add(Job.Dry.With(Runtime.Clr).With(Jit.Host).With(Jobs.Framework.V40));
             }
         }
 
-        [Config(typeof(DnxAndCoreConfig))]
+        [Config(typeof(MultipleRuntimesConfig))]
         public class IntroMultipleRuntimes
         {
             [Benchmark]
