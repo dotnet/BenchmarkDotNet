@@ -3,7 +3,9 @@ using BenchmarkDotNet.Configs;
 
 namespace BenchmarkDotNet.Attributes
 {
-    // This is here to save people having to write "[Config("Jobs=Dry")]" every time, i.e. less "magic strings"
+    /// <summary>
+    /// This attribute has the same effect as writing <code>[Config("Jobs=Dry")]</code>
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public class DryConfigAttribute : Attribute, IConfigSource
     {
