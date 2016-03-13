@@ -3,6 +3,8 @@
   "frameworks": {
     "net40": {
     },
+    "net45": {
+    },
     "dnx451": {
       "frameworkAssemblies": {
         "System.Runtime": "4.0.10.0"
