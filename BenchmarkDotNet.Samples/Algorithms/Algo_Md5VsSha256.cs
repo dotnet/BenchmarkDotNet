@@ -1,9 +1,22 @@
 ﻿using System;
 using System.Security.Cryptography;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples.Algorithms
 {
+    internal class AllRuntimesConfig : ManualConfig
+    {
+        public AllRuntimesConfig()
+        {
+            Add(Job.Default.With(Runtime.Dnx).With(Jit.Host));
+            Add(Job.Default.With(Runtime.Core).With(Jit.Host));
+            Add(Job.Default.With(Runtime.Clr).With(Jit.Host).With(Jobs.Framework.V40));
+        }
+    }
+
+    [Config(typeof(AllRuntimesConfig))]
     public class Algo_Md5VsSha256
     {
         private const int N = 10000;

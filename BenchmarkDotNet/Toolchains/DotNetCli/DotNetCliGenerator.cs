@@ -14,15 +14,15 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     {
         private const string ProjectFileName = "project.json";
 
-        private string TargetFrameworkMoniker { get; }
+        private Func<Framework, string> TargetFrameworkMonikerProvider { get; }
 
         private string ExtraDependencies { get; }
 
         private Func<Platform, string> PlatformProvider { get; }
 
-        public DotNetCliGenerator(string targetFrameworkMoniker, string extraDependencies, Func<Platform, string> platformProvider)
+        public DotNetCliGenerator(Func<Framework, string> targetFrameworkMonikerProvider, string extraDependencies, Func<Platform, string> platformProvider)
         {
-            TargetFrameworkMoniker = targetFrameworkMoniker;
+            TargetFrameworkMonikerProvider = targetFrameworkMonikerProvider;
             ExtraDependencies = extraDependencies;
             PlatformProvider = platformProvider;
         }
@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             var content = SetPlatform(template, PlatformProvider(benchmark.Job.Platform));
             content = SetDependencyToExecutingAssembly(content, benchmark.Target.Type);
-            content = SetTargetFrameworkMoniker(content, TargetFrameworkMoniker);
+            content = SetTargetFrameworkMoniker(content, TargetFrameworkMonikerProvider(benchmark.Job.Framework));
             content = SetExtraDependencies(content, ExtraDependencies);
 
             var projectJsonFilePath = Path.Combine(projectDir, ProjectFileName);

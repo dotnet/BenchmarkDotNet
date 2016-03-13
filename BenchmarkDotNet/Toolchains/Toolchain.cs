@@ -36,9 +36,7 @@ namespace BenchmarkDotNet.Toolchains
                     return GetToolchain(RuntimeInformation.GetCurrent());
                 case Runtime.Clr:
                 case Runtime.Mono:
-#if CLASSIC
                     return Classic.ClassicToolchain.Instance;
-#endif
                 case Runtime.Dnx:
                     return Dnx.DnxToolchain.Instance;
                 case Runtime.Core:
