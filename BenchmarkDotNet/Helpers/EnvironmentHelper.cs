@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Management;
 using System.Reflection;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Helpers
 {
@@ -47,17 +46,17 @@ namespace BenchmarkDotNet.Helpers
         {
             BenchmarkDotNetCaption = GetBenchmarkDotNetCaption(),
             BenchmarkDotNetVersion = GetBenchmarkDotNetVersion(),
-            OsVersion = GetOsVersion(),
-            ProcessorName = GetProcessorName(),
-            ProcessorCount = GetProcessorCount(),
-            ClrVersion = GetClrVersion(),
+            OsVersion = RuntimeInformation.GetOsVersion(),
+            ProcessorName = RuntimeInformation.GetProcessorName(),
+            ProcessorCount = Environment.ProcessorCount,
+            ClrVersion = RuntimeInformation.GetClrVersion(),
             Architecture = GetArchitecture(),
-            HasAttachedDebugger = GetHasAttachedDebugger(),
+            HasAttachedDebugger = Debugger.IsAttached,
             HasRyuJit = GetHasRyuJit(),
             Configuration = GetConfiguration(),
-            ChronometerFrequency = GetChronometerFrequency(),
-            JitModules = GetJitModules(),
-            HardwareTimerKind = GetHardwareTimerKind()
+            ChronometerFrequency = Chronometer.Frequency,
+            JitModules = RuntimeInformation.GetJitModules(),
+            HardwareTimerKind = Chronometer.HardwareTimerKind
         };
 
         public string ToFormattedString(string clrHint = "")
@@ -76,52 +75,14 @@ namespace BenchmarkDotNet.Helpers
         private string GetDebuggerFlag() => HasAttachedDebugger ? " [AttachedDebugger]" : "";
 
         private static string GetBenchmarkDotNetCaption() =>
-            ((AssemblyTitleAttribute)typeof(BenchmarkRunner).Assembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), false)[0]).Title;
+            typeof(BenchmarkRunner).Assembly().GetCustomAttributes<AssemblyTitleAttribute>(false).First().Title;
 
         private static string GetBenchmarkDotNetVersion() =>
-            typeof(BenchmarkRunner).Assembly.GetName().Version + (GetBenchmarkDotNetCaption().EndsWith("-Dev") ? "+" : string.Empty);
+            typeof(BenchmarkRunner).Assembly().GetName().Version + (GetBenchmarkDotNetCaption().EndsWith("-Dev") ? "+" : string.Empty);
 
-        private static string GetOsVersion() => Environment.OSVersion.ToString();
-
-        private static string GetProcessorName()
-        {
-            var info = string.Empty;
-            if (IsWindows() && !IsMono())
-            {
-                try
-                {
-                    var mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
-                    foreach (var moProcessor in mosProcessor.Get().Cast<ManagementObject>())
-                        info += moProcessor["name"]?.ToString();
-                }
-                catch (Exception)
-                {
-                }
-            }
-            else
-                info = "?";
-            return info;
-        }
-
-        private static int GetProcessorCount() => Environment.ProcessorCount;
-
-        private static string GetClrVersion()
-        {
-            if (IsMono())
-            {
-                var monoRuntimeType = Type.GetType("Mono.Runtime");
-                var monoDisplayName = monoRuntimeType?.GetMethod("GetDisplayName", BindingFlags.NonPublic | BindingFlags.Static);
-                if (monoDisplayName != null)
-                    return "Mono " + monoDisplayName.Invoke(null, null);
-            }
-            return "MS.NET " + Environment.Version;
-        }
-
-        public static Runtime GetCurrentRuntime() => IsMono() ? Runtime.Mono : Runtime.Clr;
+        public static Runtime GetCurrentRuntime() => RuntimeInformation.GetCurrent();
 
         private static string GetArchitecture() => IntPtr.Size == 4 ? "32-bit" : "64-bit";
-
-        private static bool GetHasAttachedDebugger() => Debugger.IsAttached;
 
         private static bool GetHasRyuJit()
         {
@@ -140,22 +101,9 @@ namespace BenchmarkDotNet.Helpers
             return configuration;
         }
 
-        private static HardwareTimerKind GetHardwareTimerKind() => Chronometer.HardwareTimerKind;
+        public static bool IsMono() => RuntimeInformation.IsMono();
 
-        private static string GetJitModules()
-        {
-            return string.Join(";",
-                Process.GetCurrentProcess().Modules.
-                OfType<ProcessModule>().
-                Where(module => module.ModuleName.Contains("jit")).
-                Select(module => Path.GetFileNameWithoutExtension(module.FileName) + "-v" + module.FileVersionInfo.ProductVersion));
-        }
-
-        private static long GetChronometerFrequency() => Chronometer.Frequency;
-
-        public static bool IsMono() => Type.GetType("Mono.Runtime") != null;
-
-        public static bool IsWindows() => Environment.OSVersion.Platform.IsOneOf(PlatformID.Win32NT, PlatformID.Win32S, PlatformID.Win32Windows, PlatformID.WinCE);
+        public static bool IsWindows() => RuntimeInformation.IsWindows();
 
         // See http://aakinshin.net/en/blog/dotnet/jit-version-determining-in-runtime/
         private class JitHelper

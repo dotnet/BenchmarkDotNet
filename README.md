@@ -1,8 +1,17 @@
 **BenchmarkDotNet** is a powerful .NET library for benchmarking.
 
-[![NuGet version](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/) [![NuGet downloads](https://img.shields.io/nuget/dt/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/) [![Join the chat at https://gitter.im/PerfDotNet/BenchmarkDotNet](https://img.shields.io/gitter/room/PerfDotNet/BenchmarkDotNet.svg)](https://gitter.im/PerfDotNet/BenchmarkDotNet)
+**Links:** [NuGet](https://www.nuget.org/packages/BenchmarkDotNet/), [Wiki](https://github.com/PerfDotNet/BenchmarkDotNet/wiki), [ChangeLog](https://github.com/PerfDotNet/BenchmarkDotNet/wiki/ChangeLog), [Developing](DEVELOPING.md)
 
-Wiki: [Home](https://github.com/PerfDotNet/BenchmarkDotNet/wiki), [ChangeLog](https://github.com/PerfDotNet/BenchmarkDotNet/wiki/ChangeLog), [Developing](https://github.com/PerfDotNet/BenchmarkDotNet/wiki/Developing), [Roadmap](https://github.com/PerfDotNet/BenchmarkDotNet/wiki/Roadmap)
+[![Join the chat at https://gitter.im/PerfDotNet/BenchmarkDotNet](https://img.shields.io/gitter/room/PerfDotNet/BenchmarkDotNet.svg)](https://gitter.im/PerfDotNet/BenchmarkDotNet)
+
+**Summary**
+
+* Standard benchmarking routine: generating an isolated project per each benchmark method; autoselection of iteration amount; warmup; overhead evaluation; statistics calucalation; and so on.
+* Easy way to compare different environments (`x86` vs `x64`, `LegacyJit` vs `RyuJit`, and so on; see: [Jobs](#jobs))
+* Reports: markdown (default, github, stackoverflow), csv, html, plain text; png plots.
+* Advanced features: [Baseline](#baseline), [Params](#params)
+* Powerful diagnostics based on ETW events (currently, works only from source)
+* Supported: Full .NET Framework, Mono, Dnx451, DnxCore50 (in prerelease version)
 
 ## Content
 
@@ -19,6 +28,12 @@ Wiki: [Home](https://github.com/PerfDotNet/BenchmarkDotNet/wiki), [ChangeLog](ht
 
 ```
 PM> Install-Package BenchmarkDotNet
+```
+
+If you want to use CoreCLR (`dnxcore50`), you need prerelease version of the package:
+
+```
+PM> Install-Package BenchmarkDotNet -Pre
 ```
 
 **Step 2.** Write a class with methods that you want to measure and mark them with the `Benchmark` attribute. In the following example, we compare [MD5](https://en.wikipedia.org/wiki/MD5) and [SHA256](https://en.wikipedia.org/wiki/SHA-2) cryptographic hash functions:

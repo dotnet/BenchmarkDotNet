@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -8,11 +9,16 @@ namespace BenchmarkDotNet.Extensions
     [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
     public static class ProcessExtensions
     {
-        // no catch blocks on purpose -> if this fails, the measurements might be inaccurate
-
-        public static void EnsureHighPriority(this Process process)
+        public static void EnsureHighPriority(this Process process, ILogger logger)
         {
-            process.PriorityClass = ProcessPriorityClass.High;;
+            try
+            {
+                process.PriorityClass = ProcessPriorityClass.High;
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLineError($"Failed to set up high priority. Make sure you have the right permissions. Message: {ex.Message}");
+            }
         }
 
         public static void EnsureProcessorAffinity(this Process process, int value)

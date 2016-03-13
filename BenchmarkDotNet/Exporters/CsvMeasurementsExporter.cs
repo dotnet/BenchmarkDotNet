@@ -43,7 +43,6 @@ namespace BenchmarkDotNet.Exporters
             new MeasurementColumn("JobPlatform", (summary, report, m) => report.Benchmark.Job.Platform.ToString()),
             new MeasurementColumn("JobJit", (summary, report, m) => report.Benchmark.Job.Jit.ToString()),
             new MeasurementColumn("JobFramework", (summary, report, m) => report.Benchmark.Job.Framework.ToString()),
-            new MeasurementColumn("JobToolchain", (summary, report, m) => report.Benchmark.Job.Toolchain.ToString()),
             new MeasurementColumn("JobRuntime", (summary, report, m) => report.Benchmark.Job.Runtime.ToString()),
 
             new MeasurementColumn("Params", (summary, report, m) => report.Benchmark.Parameters.PrintInfo),

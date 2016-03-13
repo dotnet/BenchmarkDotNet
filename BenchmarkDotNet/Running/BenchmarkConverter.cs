@@ -1,20 +1,17 @@
 ﻿using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Parameters;
-using Microsoft.CSharp;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Running
 {
-    internal static class BenchmarkConverter
+    internal static partial class BenchmarkConverter
     {
         public static IList<Benchmark> TypeToBenchmarks(Type type, IConfig config = null)
         {
@@ -45,7 +42,7 @@ namespace BenchmarkDotNet.Running
         public static IConfig GetFullConfig(Type type, IConfig config)
         {
             config = config ?? DefaultConfig.Instance;
-            var configAttribute = type?.GetCustomAttributes(true).OfType<IConfigSource>().FirstOrDefault();
+            var configAttribute = type?.GetCustomAttributes<IConfigSource>(true).FirstOrDefault();
             if (configAttribute != null)
                 config = ManualConfig.Union(config, configAttribute.Config);
             return config;
@@ -104,52 +101,6 @@ namespace BenchmarkDotNet.Running
             return setupMethod;
         }
 
-        public static IList<Benchmark> UrlToBenchmarks(string url, IConfig config = null)
-        {
-            string benchmarkContent;
-            try
-            {
-                var webRequest = WebRequest.Create(url);
-                using (var response = webRequest.GetResponse())
-                using (var content = response.GetResponseStream())
-                using (var reader = new StreamReader(content))
-                    benchmarkContent = reader.ReadToEnd();
-                if (string.IsNullOrWhiteSpace(benchmarkContent))
-                {
-                    Console.WriteLine($"content of '{url}' is empty.");
-                    return new Benchmark[0];
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("BuildException: " + e.Message);
-                return new Benchmark[0];
-            }
-            return SourceToBenchmarks(benchmarkContent, config);
-        }
-
-        public static IList<Benchmark> SourceToBenchmarks(string source, IConfig config = null)
-        {
-            string benchmarkContent = source;
-            var cSharpCodeProvider = new CSharpCodeProvider();
-            var compilerParameters = new CompilerParameters(new[] { "mscorlib.dll", "System.dll", "System.Core.dll" }) { CompilerOptions = "/unsafe" };
-            compilerParameters.ReferencedAssemblies.Add(typeof(BenchmarkRunner).Assembly.Location);
-            var compilerResults = cSharpCodeProvider.CompileAssemblyFromSource(compilerParameters, benchmarkContent);
-            if (compilerResults.Errors.HasErrors)
-            {
-                compilerResults.Errors.Cast<CompilerError>().ToList().ForEach(error => Console.WriteLine(error.ErrorText));
-                return new Benchmark[0];
-            }
-            return (
-                from type in compilerResults.CompiledAssembly.GetTypes()
-                from benchmark in TypeToBenchmarks(type, config)
-                let target = benchmark.Target
-                select new Benchmark(
-                    new Target(target.Type, target.Method, target.SetupMethod, target.MethodTitle, benchmarkContent, target.Baseline, target.OperationsPerInvoke),
-                    benchmark.Job,
-                    benchmark.Parameters)).ToList();
-        }
-
         private static void AssertMethodHasCorrectSignature(string methodType, MethodInfo methodInfo)
         {
             if (methodInfo.GetParameters().Any())
@@ -165,7 +116,7 @@ namespace BenchmarkDotNet.Running
 
             while (declaringType != null)
             {
-                if (!declaringType.IsPublic && !declaringType.IsNestedPublic)
+                if (!declaringType.IsPublic() && !declaringType.IsNestedPublic())
                     throw new InvalidOperationException($"{methodType} method {methodInfo.Name} defined within type {declaringType.FullName} has incorrect access modifiers.\nDeclaring type must be public.");
 
                 declaringType = declaringType.DeclaringType;

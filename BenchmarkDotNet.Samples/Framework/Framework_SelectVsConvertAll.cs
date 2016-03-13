@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if !CORE
+using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 
@@ -21,3 +22,4 @@ namespace BenchmarkDotNet.Samples.Framework
         }
     }
 }
+#endif

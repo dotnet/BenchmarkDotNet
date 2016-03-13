@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Helpers
 {
@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Helpers
     {
         public static string LoadTemplate(string name)
         {
-            var assembly = Assembly.GetExecutingAssembly();
+            var assembly = typeof(ResourceHelper).Assembly();
             var resourceName = "BenchmarkDotNet.Templates." + name;
             using (var stream = assembly.GetManifestResourceStream(resourceName))
             {

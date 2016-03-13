@@ -1,18 +1,31 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Classic;
 
-namespace BenchmarkDotNet.Toolchains.Dnx
+namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
-    internal class DnxGenerator : ClassicGenerator
+    internal class DotNetCliGenerator : ClassicGenerator
     {
         private const string ProjectFileName = "project.json";
+
+        private string TargetFrameworkMoniker { get; }
+
+        private string ExtraDependencies { get; }
+
+        private Func<Platform, string> PlatformProvider { get; }
+
+        public DotNetCliGenerator(string targetFrameworkMoniker, string extraDependencies, Func<Platform, string> platformProvider)
+        {
+            TargetFrameworkMoniker = targetFrameworkMoniker;
+            ExtraDependencies = extraDependencies;
+            PlatformProvider = platformProvider;
+        }
 
         /// <summary>
         /// we need our folder to be on the same level as the project that we want to reference
@@ -22,8 +35,7 @@ namespace BenchmarkDotNet.Toolchains.Dnx
         protected override string GetDirectoryPath(Benchmark benchmark)
         {
             return Path.Combine(
-                Directory.GetCurrentDirectory(), 
-                @"..\", 
+                new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.FullName, 
                 benchmark.ShortInfo);
         }
 
@@ -31,9 +43,11 @@ namespace BenchmarkDotNet.Toolchains.Dnx
         {
             var template = ResourceHelper.LoadTemplate("BenchmarkProject.json");
 
-            var content = SetPlatform(template, benchmark.Job.Platform);
+            var content = SetPlatform(template, PlatformProvider(benchmark.Job.Platform));
             content = SetDependencyToExecutingAssembly(content, benchmark.Target.Type);
-    
+            content = SetTargetFrameworkMoniker(content, TargetFrameworkMoniker);
+            content = SetExtraDependencies(content, ExtraDependencies);
+
             var projectJsonFilePath = Path.Combine(projectDir, ProjectFileName);
 
             File.WriteAllText(projectJsonFilePath, content);
@@ -44,19 +58,29 @@ namespace BenchmarkDotNet.Toolchains.Dnx
             // do nothing on purpose, we do not need bat file
         }
 
-        private static string SetPlatform(string template, Platform platform)
+        private static string SetPlatform(string template, string platform)
         {
-            return template.Replace("$PLATFORM$", platform.ToConfig());
+            return template.Replace("$PLATFORM$", platform);
         }
 
         private static string SetDependencyToExecutingAssembly(string template, Type benchmarkTarget)
         {
-            var assemblyName = benchmarkTarget.Assembly.GetName();
+            var assemblyName = benchmarkTarget.Assembly().GetName();
             var packageVersion = GetPackageVersion(assemblyName);
 
             return template
                 .Replace("$EXECUTINGASSEMBLYVERSION$", packageVersion) 
                 .Replace("$EXECUTINGASSEMBLY$", assemblyName.Name);
+        }
+
+        private static string SetTargetFrameworkMoniker(string content, string targetFrameworkMoniker)
+        {
+            return content.Replace("$TFM$", targetFrameworkMoniker);
+        }
+
+        private static string SetExtraDependencies(string content, string extraDependencies)
+        {
+            return content.Replace("$REQUIREDDEPENDENCY$", extraDependencies);
         }
 
         /// <summary>

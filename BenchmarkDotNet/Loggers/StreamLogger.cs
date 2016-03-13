@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Loggers
 
         public StreamLogger(string filePath, bool append = false)
         {
-            writer = new StreamWriter(filePath, append);
+            writer = Portability.StreamWriter.FromPath(filePath, append);
         }
 
         public void Write(LogKind logKind, string format, params object[] args) =>
