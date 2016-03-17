@@ -4,6 +4,7 @@ using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Reports
@@ -20,6 +21,9 @@ namespace BenchmarkDotNet.Reports
         public SummaryTable Table { get; }
         public TimeSpan TotalTime { get; }
 
+        private Dictionary<IJob, string> ShortInfos { get; }
+        private Lazy<IJob[]> Jobs { get; }
+
         public Summary(string title, IList<BenchmarkReport> reports, EnvironmentHelper hostEnvironmentHelper, IConfig config, string currentDirectory, TimeSpan totalTime)
         {
             Title = title;
@@ -35,6 +39,19 @@ namespace BenchmarkDotNet.Reports
 
             TimeUnit = TimeUnit.GetBestTimeUnit(reports.Where(r => r.ResultStatistics != null).Select(r => r.ResultStatistics.Mean).ToArray());
             Table = new SummaryTable(this);
+            ShortInfos = new Dictionary<IJob, string>();
+            Jobs = new Lazy<IJob[]>(() => Benchmarks.Select(b => b.Job).ToArray());
+        }
+
+        internal string GetJobShortInfo(IJob job)
+        {
+            string result;
+            if (!ShortInfos.TryGetValue(job, out result))
+            {
+                ShortInfos[job] = result = job.GetShortInfo(Jobs.Value);
+            }
+
+            return result;
         }
     }
 }
