@@ -20,10 +20,22 @@ namespace BenchmarkDotNet.Loggers
             this.cultureInfo = cultureInfo ?? CultureInfo.InvariantCulture;
         }
 
-        public void Write(LogKind logKind, string format, params object[] args)
+        public void Write(LogKind logKind, string text)
         {
             Console.ForegroundColor = GetColor(logKind);
-            Console.Write(args.Length == 0 ? format : string.Format(cultureInfo, format, args));
+            Console.Write(text);
+            Console.ForegroundColor = DefaultColor;
+        }
+
+        public void WriteLine()
+        {
+            Console.WriteLine();
+        }
+
+        public void WriteLine(LogKind logKind, string text)
+        {
+            Console.ForegroundColor = GetColor(logKind);
+            Console.WriteLine(text);
             Console.ForegroundColor = DefaultColor;
         }
 

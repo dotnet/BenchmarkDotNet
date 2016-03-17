@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineHelp($"You should select the target benchmark. Please, print a number of a benchmark (e.g. '0') or a benchmark caption (e.g. '{benchmarkCaptionExample}'):");
                 var line = Console.ReadLine() ?? "";
                 args = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                logger.NewLine();
+                logger.WriteLine();
             }
             return args;
         }
@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Running
                 {
                     logger.WriteLineHeader("Target type: " + type.Name);
                     summaries.Add(BenchmarkRunner.Run(type, config));
-                    logger.NewLine();
+                    logger.WriteLine();
                 }
             }
             // TODO: move this logic to the RunUrl method
@@ -83,8 +83,8 @@ namespace BenchmarkDotNet.Running
             int numberWidth = Types.Length.ToString().Length;
             for (int i = 0; i < Types.Length; i++)
                 logger.WriteLineHelp(string.Format(CultureInfo.InvariantCulture, "  #{0} {1}", i.ToString().PadRight(numberWidth), Types[i].Name));
-            logger.NewLine();
-            logger.NewLine();
+            logger.WriteLine();
+            logger.WriteLine();
         }
     }
 }

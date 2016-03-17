@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.Loggers
 {
@@ -18,13 +17,25 @@ namespace BenchmarkDotNet.Loggers
             Prefix = prefix;
         }
 
-        public void Write(LogKind logKind, string format, params object[] args)
+        public void Write(LogKind logKind, string text)
         {
-            var s = string.Format(EnvironmentHelper.MainCultureInfo, format, args).AddPrefixMultiline(Prefix);
+            // this logic seems crazy to me
+            var s = text.AddPrefixMultiline(Prefix);
             if (!isNewLine)
                 s = s.Remove(0, Prefix.Length);
             Logger.Write(logKind, s);
             isNewLine = s.EndsWith("\n");
+        }
+
+        public void WriteLine()
+        {
+            Logger.WriteLine();
+        }
+
+        public void WriteLine(LogKind logKind, string text)
+        {
+            Logger.Write(logKind, Prefix);
+            Logger.WriteLine(logKind, text);
         }
     }
 }

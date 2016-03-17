@@ -17,12 +17,12 @@ namespace BenchmarkDotNet.Reports
                     paramsOnLine++;
                     if (paramsOnLine == 3)
                     {
-                        logger.NewLine();
+                        logger.WriteLine();
                         paramsOnLine = 0;
                     }
                 }
                 if (paramsOnLine != 0)
-                    logger.NewLine();
+                    logger.WriteLine();
             }
         }
 

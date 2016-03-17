@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.Loggers
 {
@@ -7,10 +6,14 @@ namespace BenchmarkDotNet.Loggers
     {
         private readonly StringBuilder builder = new StringBuilder();
 
-        public virtual void Write(LogKind logKind, string format, params object[] args) =>
-            builder.Append(string.Format(EnvironmentHelper.MainCultureInfo, format, args));
+        public virtual void Write(LogKind logKind, string text) => builder.Append(text);
+
+        public virtual void WriteLine() => builder.AppendLine();
+
+        public virtual void WriteLine(LogKind logKind, string text) => builder.AppendLine(text);
 
         public void ClearLog() => builder.Clear();
+
         public string GetLog() => builder.ToString();
     }
 }

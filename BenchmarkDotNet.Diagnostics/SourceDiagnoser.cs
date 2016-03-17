@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Diagnostics
         public void DisplayResults(ILogger logger)
         {
             foreach (var line in output)
-                logger.Write(line.Kind, line.Text);
+                logger.WriteLine(line.Kind, line.Text);
         }
     }
 }

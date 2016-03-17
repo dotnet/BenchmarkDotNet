@@ -52,9 +52,9 @@ namespace BenchmarkDotNet.Exporters
         {
             if (useCodeBlocks)
                 logger.WriteLine($"```{codeBlocksSyntax}");
-            logger = new LoggerWithPrefix(logger, prefix);
+            logger = GetRightLogger(logger);
             logger.WriteLineInfo(EnvironmentHelper.GetCurrentInfo().ToFormattedString("Host"));
-            logger.NewLine();
+            logger.WriteLine();
 
             PrintTable(summary.Table, logger);
 
@@ -62,11 +62,21 @@ namespace BenchmarkDotNet.Exporters
             var benchmarksWithTroubles = summary.Reports.Values.Where(r => !r.GetResultRuns().Any()).Select(r => r.Benchmark).ToList();
             if (benchmarksWithTroubles.Count > 0)
             {
-                logger.NewLine();
+                logger.WriteLine();
                 logger.WriteLineError("Benchmarks with issues:");
                 foreach (var benchmarkWithTroubles in benchmarksWithTroubles)
                     logger.WriteLineError("  " + benchmarkWithTroubles.ShortInfo);
             }
+        }
+
+        private ILogger GetRightLogger(ILogger logger)
+        {
+            if (string.IsNullOrEmpty(prefix)) // most common scenario!! we don't need expensive LoggerWithPrefix
+            {
+                return logger;
+            }
+
+            return new LoggerWithPrefix(logger, prefix);
         }
 
         private void PrintTable(SummaryTable table, ILogger logger)
@@ -74,20 +84,20 @@ namespace BenchmarkDotNet.Exporters
             if (table.FullContent.Length == 0)
             {
                 logger.WriteLineError("There are no benchmarks found ");
-                logger.NewLine();
+                logger.WriteLine();
                 return;
             }
             table.PrintCommonColumns(logger);
-            logger.NewLine();
+            logger.WriteLine();
 
             if (useCodeBlocks)
             {
                 logger.Write("```");
-                logger.NewLine();
+                logger.WriteLine();
             }
 
             table.PrintLine(table.FullHeader, logger, "", " |");
-            logger.NewLine();
+            logger.WriteLine();
             logger.WriteLineStatistic(string.Join("", table.Columns.Where(c => c.NeedToShow).Select(c => new string('-', c.Width) + " |")));
             var rowCounter = 0;
             var highlightRow = false;
@@ -97,7 +107,7 @@ namespace BenchmarkDotNet.Exporters
                 if (table.FullContentStartOfGroup[rowCounter])
                     highlightRow = !highlightRow;
                 table.PrintLine(line, logger, "", " |", highlightRow, startOfGroup: table.FullContentStartOfGroup[rowCounter], startOfGroupInBold: startOfGroupInBold);
-                logger.NewLine();
+                logger.WriteLine();
                 rowCounter++;
             }
         }

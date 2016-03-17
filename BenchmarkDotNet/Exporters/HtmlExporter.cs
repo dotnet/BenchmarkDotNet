@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using BenchmarkDotNet.Helpers;
+﻿using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
@@ -30,23 +28,22 @@ namespace BenchmarkDotNet.Exporters
             logger.Write("<pre><code>");
             table.PrintCommonColumns(logger);
             logger.WriteLine("</code></pre>");
-            logger.NewLine();
+            logger.WriteLine();
 
             logger.WriteLine("<table>");
-            var prefixLogger = new LoggerWithPrefix(logger, "\t");
 
-            prefixLogger.Write("<tr>");
-            table.PrintLine(table.FullHeader, prefixLogger, "<th>", "</th>");
-            prefixLogger.WriteLine("</tr>");
+            logger.Write("<tr>");
+            table.PrintLine(table.FullHeader, logger, "<th>", "</th>");
+            logger.WriteLine("</tr>");
 
             foreach (var line in table.FullContent)
             {
-                prefixLogger.Write("<tr>");
-                table.PrintLine(line, prefixLogger, "<td>", "</td>");
-                prefixLogger.WriteLine("</tr>");
+                logger.Write("<tr>");
+                table.PrintLine(line, logger, "<td>", "</td>");
+                logger.WriteLine("</tr>");
             }
-            logger.WriteLine("</table>");
 
+            logger.WriteLine("</table>");
         }
     }
 }
