@@ -53,7 +53,11 @@ namespace BenchmarkDotNet.Exporters
             if (useCodeBlocks)
                 logger.WriteLine($"```{codeBlocksSyntax}");
             logger = GetRightLogger(logger);
-            logger.WriteLineInfo(EnvironmentHelper.GetCurrentInfo().ToFormattedString("Host"));
+            logger.WriteLine();
+            foreach (var infoLine in EnvironmentHelper.GetCurrentInfo().ToFormattedString("Host"))
+            {
+                logger.WriteLineInfo(infoLine);
+            }
             logger.WriteLine();
 
             PrintTable(summary.Table, logger);

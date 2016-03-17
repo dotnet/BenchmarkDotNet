@@ -26,24 +26,30 @@ namespace BenchmarkDotNet.Reports
             }
         }
 
+        /// <summary>
+        /// this method does not put NewLine at the end. You need to do this on your own
+        /// </summary>
         public static void PrintLine(this SummaryTable table, string[] line, ILogger logger, 
                                      string leftDel = "", string rightDel = "", 
                                      bool highlightRow = false, bool startOfGroup = false, bool startOfGroupInBold = false)
         {
             for (int columnIndex = 0; columnIndex < table.ColumnCount; columnIndex++)
             {
-                if (table.Columns[columnIndex].NeedToShow)
+                if (!table.Columns[columnIndex].NeedToShow)
                 {
-                    string text = null;
-                    if (startOfGroup && startOfGroupInBold)
-                        text = leftDel + ("**" + line[columnIndex] + "**").PadLeft(table.Columns[columnIndex].Width + 4, ' ') + rightDel;
-                    else
-                        text = leftDel + line[columnIndex].PadLeft(table.Columns[columnIndex].Width, ' ') + rightDel;
-                    if (highlightRow) // write the row in an alternative colour
-                        logger.WriteHeader(text);
-                    else
-                        logger.WriteStatistic(text);
+                    continue;
                 }
+
+                string text = null;
+                if (startOfGroup && startOfGroupInBold)
+                    text = leftDel + ("**" + line[columnIndex] + "**").PadLeft(table.Columns[columnIndex].Width + 4, ' ') + rightDel;
+                else
+                    text = leftDel + line[columnIndex].PadLeft(table.Columns[columnIndex].Width, ' ') + rightDel;
+
+                if (highlightRow) // write the row in an alternative colour
+                    logger.WriteHeader(text);
+                else
+                    logger.WriteStatistic(text);
             }
         }
     }

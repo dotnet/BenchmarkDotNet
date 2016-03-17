@@ -12,7 +12,13 @@ namespace BenchmarkDotNet.Exporters
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
-            logger.WriteLine($"<pre><code>{EnvironmentHelper.GetCurrentInfo().ToFormattedString("Host")}</code></pre>");
+            logger.Write("<pre><code>");
+            logger.WriteLine();
+            foreach (var infoLine in EnvironmentHelper.GetCurrentInfo().ToFormattedString("Host"))
+            {
+                logger.WriteLineInfo(infoLine);
+            }
+            logger.Write("</code></pre>");
             logger.WriteLine();
 
             PrintTable(summary.Table, logger);
