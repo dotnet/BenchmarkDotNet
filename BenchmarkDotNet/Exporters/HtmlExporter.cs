@@ -31,6 +31,7 @@ namespace BenchmarkDotNet.Exporters
                 logger.WriteLineError("<pre>There are no benchmarks found</pre>");
                 return;
             }
+
             logger.Write("<pre><code>");
             table.PrintCommonColumns(logger);
             logger.WriteLine("</code></pre>");
@@ -40,13 +41,13 @@ namespace BenchmarkDotNet.Exporters
 
             logger.Write("<tr>");
             table.PrintLine(table.FullHeader, logger, "<th>", "</th>");
-            logger.WriteLine("</tr>");
+            logger.Write("</tr>");
 
             foreach (var line in table.FullContent)
             {
                 logger.Write("<tr>");
                 table.PrintLine(line, logger, "<td>", "</td>");
-                logger.WriteLine("</tr>");
+                logger.Write("</tr>");
             }
 
             logger.WriteLine("</table>");

@@ -91,6 +91,7 @@ namespace BenchmarkDotNet.Exporters
                 logger.WriteLine();
                 return;
             }
+
             table.PrintCommonColumns(logger);
             logger.WriteLine();
 
@@ -100,8 +101,7 @@ namespace BenchmarkDotNet.Exporters
                 logger.WriteLine();
             }
 
-            table.PrintLine(table.FullHeader, logger, "", " |");
-            logger.WriteLine();
+            table.PrintLine(table.FullHeader, logger, string.Empty, " |");
             logger.WriteLineStatistic(string.Join("", table.Columns.Where(c => c.NeedToShow).Select(c => new string('-', c.Width) + " |")));
             var rowCounter = 0;
             var highlightRow = false;
@@ -109,9 +109,11 @@ namespace BenchmarkDotNet.Exporters
             {
                 // Each time we hit the start of a new group, alternative the colour (in the console) or display bold in Markdown
                 if (table.FullContentStartOfGroup[rowCounter])
+                {
                     highlightRow = !highlightRow;
-                table.PrintLine(line, logger, "", " |", highlightRow, startOfGroup: table.FullContentStartOfGroup[rowCounter], startOfGroupInBold: startOfGroupInBold);
-                logger.WriteLine();
+                }
+
+                table.PrintLine(line, logger, string.Empty, " |", highlightRow, table.FullContentStartOfGroup[rowCounter], startOfGroupInBold);
                 rowCounter++;
             }
         }
