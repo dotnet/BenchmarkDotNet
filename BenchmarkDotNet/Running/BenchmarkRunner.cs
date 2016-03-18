@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Running
                 benchmarks = GetSupportedBenchmarks(benchmarks, logger);
 
                 var summary = Run(benchmarks, logger, title, config);
-                config.GetCompositeExporter().ExportToFiles(summary);
+                config.GetCompositeExporter().ExportToFiles(summary).ToArray();
                 return summary;
             }
         }
@@ -89,8 +89,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteLine();
 
             logger.WriteLineHeader("// * Export *");
-            var files = config.GetCompositeExporter().ExportToFiles(summary);
-            foreach (var file in files)
+            foreach (var file in config.GetCompositeExporter().ExportToFiles(summary))
             {
                 var printedFile = file.StartsWith(currentDirectory) ? file.Substring(currentDirectory.Length).Trim('/', '\\') : file;
                 logger.WriteLineInfo($"  {printedFile}");

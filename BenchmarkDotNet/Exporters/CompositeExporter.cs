@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
@@ -21,10 +22,7 @@ namespace BenchmarkDotNet.Exporters
 
         public IEnumerable<string> ExportToFiles(Summary summary)
         {
-            var fileNames = new List<string>();
-            foreach (var exporter in exporters)
-                fileNames.AddRange(exporter.ExportToFiles(summary));
-            return fileNames;
+            return exporters.SelectMany(exporter => exporter.ExportToFiles(summary));
         }
     }
 }
