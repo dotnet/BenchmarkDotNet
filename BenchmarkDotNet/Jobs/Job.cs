@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using System;
 
 namespace BenchmarkDotNet.Jobs
 {
@@ -28,16 +28,35 @@ namespace BenchmarkDotNet.Jobs
         public Count IterationTime { get; set; } = Count.Auto;
         public Count Affinity { get; set; } = Count.Auto;
 
+        public Property[] AllProperties => allProperties.Value;
+
+        private Lazy<Property[]> allProperties { get; }
+
+        public Job()
+        {
+            allProperties = new Lazy<Property[]>(this.GetAllProperties, isThreadSafe: false);
+        }
+
         public bool Equals(IJob other)
         {
-            var ownProperties = this.GetAllProperties().ToArray();
-            var otherProperties = other.GetAllProperties().ToArray();
+            var ownProperties = AllProperties;
+            var otherProperties = other.AllProperties;
+
             if (ownProperties.Length != otherProperties.Length)
+            {
                 return false;
-            int n = ownProperties.Length;
-            return Enumerable.Range(0, n).All(i =>
-                ownProperties[i].Key == otherProperties[i].Key &&
-                ownProperties[i].Value == otherProperties[i].Value);
+            }
+
+            for (int i = 0; i < ownProperties.Length; i++)
+            {
+                if (ownProperties[i].Name != otherProperties[i].Name
+                    || ownProperties[i].Value != otherProperties[i].Value)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

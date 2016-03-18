@@ -23,5 +23,7 @@ namespace BenchmarkDotNet.Jobs
         /// <seealso cref="https://msdn.microsoft.com/library/system.diagnostics.process.processoraffinity.aspx"/>
         /// </summary>
         Count Affinity { get; }
+
+        Property[] AllProperties { get; }
     }
 }

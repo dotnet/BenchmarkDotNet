@@ -25,6 +25,62 @@ namespace BenchmarkDotNet.Jobs
         /// <returns></returns>
         public static IJob WithIterationTime(this IJob job, Count iterationTime) => job.With(j => j.IterationTime = iterationTime);
 
+        public static Property[] GetAllProperties(this IJob job)
+        {
+            return new[]
+            {
+                new Property("Mode", job.Mode.ToString()),
+                new Property("Platform", job.Platform.ToString()),
+                new Property("Jit", job.Jit.ToString()),
+                new Property("Framework", job.Framework.ToString()),
+                new Property("Runtime", job.Runtime.ToString()),
+                new Property("Warmup", job.WarmupCount.ToString()),
+                new Property("Target", job.TargetCount.ToString()),
+                new Property("Process", job.LaunchCount.ToString()),
+                new Property("IterationTime", job.IterationTime.ToString()),
+                new Property("Affinity", job.Affinity.ToString())
+            };
+        }
+
+        public static string GetFullInfo(this IJob job) => string.Join("_", job.AllProperties.Select(p => $"{p.Name}-{p.Value}"));
+
+        public static string GetShortInfo(this IJob job, IJob[] allJobs = null)
+        {
+            // TODO: make it automatically
+            string shortInfo;
+            if (TryGetShortInfoForPredefinedJobs(job, out shortInfo))
+            {
+                return shortInfo;
+            }
+
+            var defaultJobProperties = Job.Default.AllProperties;
+            var ownProperties = job.AllProperties;
+
+            var nonDefaultProperties = ownProperties
+                .Where((ownProperty, i) => ownProperty.Value != defaultJobProperties[i].Value
+                    && (allJobs == null || HaveMoreThanOneUniqueValue(allJobs, i)));
+
+            return string.Join("_", nonDefaultProperties.Select(property => property.GetShortInfo()));
+        }
+
+        public static string GenerateWithDefinitions(this IJob job)
+        {
+            var builder = new StringBuilder(80);
+            builder.Append($".With(BenchmarkDotNet.Jobs.Mode.{job.Mode})");
+            builder.Append($".WithWarmupCount({job.WarmupCount.Value})");
+            builder.Append($".WithTargetCount({job.TargetCount.Value})");
+            builder.Append($".WithIterationTime({job.IterationTime.Value})");
+            builder.Append($".WithLaunchCount({job.LaunchCount.Value})");
+            return builder.ToString();
+        }
+
+        private static IJob With(this IJob job, Action<Job> set)
+        {
+            var newJob = job.Clone();
+            set(newJob);
+            return newJob;
+        }
+
         private static Job Clone(this IJob job) => new Job
         {
             Jit = job.Jit,
@@ -39,97 +95,7 @@ namespace BenchmarkDotNet.Jobs
             Affinity = job.Affinity
         };
 
-        private static IJob With(this IJob job, Action<Job> set)
-        {
-            var newJob = job.Clone();
-            set(newJob);
-            return newJob;
-        }
-
-        public static IEnumerable<KeyValuePair<string, string>> GetAllProperties(this IJob job)
-        {
-            yield return new KeyValuePair<string, string>("Mode", job.Mode.ToString());
-            yield return new KeyValuePair<string, string>("Platform", job.Platform.ToString());
-            yield return new KeyValuePair<string, string>("Jit", job.Jit.ToString());
-            yield return new KeyValuePair<string, string>("Framework", job.Framework.ToString());
-            yield return new KeyValuePair<string, string>("Runtime", job.Runtime.ToString());
-            yield return new KeyValuePair<string, string>("Warmup", job.WarmupCount.ToString());
-            yield return new KeyValuePair<string, string>("Target", job.TargetCount.ToString());
-            yield return new KeyValuePair<string, string>("Process", job.LaunchCount.ToString());
-            yield return new KeyValuePair<string, string>("IterationTime", job.IterationTime.ToString());
-            yield return new KeyValuePair<string, string>("Affinity", job.Affinity.ToString());
-        }
-
-        public static string GetFullInfo(this IJob job) => string.Join("_", job.GetAllProperties().Select(p => $"{p.Key}-{p.Value}"));
-
-        public static string GetShortInfo(this IJob job)
-        {
-            // TODO: make it automatically
-            string shortInfo;
-            if (TryGetShortInfo(job, out shortInfo))
-            {
-                return shortInfo;
-            }
-
-            var defaultJobProperties = Job.Default.GetAllProperties().ToArray();
-            var ownProperties = job.GetAllProperties().ToArray();
-            var n = ownProperties.Length;
-            var targetProperties = Enumerable.Range(0, n).
-                Where(i => ownProperties[i].Value != defaultJobProperties[i].Value).
-                Select(i => ownProperties[i]);
-            return string.Join("_", targetProperties.Select(GetShortInfoForProperty));
-        }
-
-        public static string GetShortInfo(this IJob job, IList<IJob> allJobs)
-        {
-            // TODO: make it automatically
-            string shortInfo;
-            if (TryGetShortInfo(job, out shortInfo))
-            {
-                return shortInfo;
-            }
-
-            var defaultJobProperties = Job.Default.GetAllProperties().ToArray();
-            var ownProperties = job.GetAllProperties().ToArray();
-            var n = ownProperties.Length;
-            var targetProperties = Enumerable.Range(0, n).
-                Where(i => ownProperties[i].Value != defaultJobProperties[i].Value &&
-                           allJobs.Select(j => j.GetAllProperties().ToArray()[i].Value).Distinct().Count() > 1).
-                Select(i => ownProperties[i]);
-            return string.Join("_", targetProperties.Select(GetShortInfoForProperty));
-        }
-
-
-        private static string GetShortInfoForProperty(KeyValuePair<string, string> property)
-        {
-            switch (property.Key)
-            {
-                case "Mode":
-                case "Platform":
-                    return property.Value;
-                case "Warmup":
-                case "Target":
-                case "Process":
-                case "IterationTime":
-                case "Affinity":
-                    return property.Key + property.Value;
-            }
-            return $"{property.Key}-{property.Value}";
-        }
-
-        // TODO: make toolchain
-        public static string GenerateWithDefinitions(this IJob job)
-        {
-            var builder = new StringBuilder();
-            builder.Append($".With(BenchmarkDotNet.Jobs.Mode.{job.Mode})");
-            builder.Append($".WithWarmupCount({job.WarmupCount.Value})");
-            builder.Append($".WithTargetCount({job.TargetCount.Value})");
-            builder.Append($".WithIterationTime({job.IterationTime.Value})");
-            builder.Append($".WithLaunchCount({job.LaunchCount.Value})");
-            return builder.ToString();
-        }
-
-        private static bool TryGetShortInfo(IJob job, out string shortInfo)
+        private static bool TryGetShortInfoForPredefinedJobs(IJob job, out string shortInfo)
         {
             shortInfo = null;
 
@@ -151,6 +117,32 @@ namespace BenchmarkDotNet.Jobs
                 shortInfo = "Core";
 
             return !string.IsNullOrEmpty(shortInfo);
+        }
+
+        private static bool HaveMoreThanOneUniqueValue(IJob[] allJobs, int propertyIndex)
+        {
+            if (allJobs.Length <= 1)
+            {
+                return false;
+            }
+
+            var uniqueValues = new HashSet<string>();
+            for (int i = 0; i < allJobs.Length; i++)
+            {
+                var value = allJobs[i].AllProperties[propertyIndex].Value;
+                if (uniqueValues.Contains(value))
+                {
+                    continue;
+                }
+
+                if (uniqueValues.Count > 0)
+                {
+                    return true;
+                }
+                uniqueValues.Add(value);
+            }
+
+            return false;
         }
     }
 }
