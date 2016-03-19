@@ -57,8 +57,8 @@ namespace BenchmarkDotNet.Jobs
             var ownProperties = job.AllProperties;
 
             var nonDefaultProperties = ownProperties
-                .Where((ownProperty, i) => ownProperty.Value != defaultJobProperties[i].Value
-                    && (allJobs == null || HaveMoreThanOneUniqueValue(allJobs, i)));
+                .Where((ownProperty, propertyIndex) => ownProperty.Value != defaultJobProperties[propertyIndex].Value
+                    && (allJobs == null || MoreThanOneJobHaveUniquePropertyValue(allJobs, propertyIndex)));
 
             return string.Join("_", nonDefaultProperties.Select(property => property.GetShortInfo()));
         }
@@ -119,7 +119,7 @@ namespace BenchmarkDotNet.Jobs
             return !string.IsNullOrEmpty(shortInfo);
         }
 
-        private static bool HaveMoreThanOneUniqueValue(IJob[] allJobs, int propertyIndex)
+        private static bool MoreThanOneJobHaveUniquePropertyValue(IJob[] allJobs, int propertyIndex)
         {
             if (allJobs.Length <= 1)
             {

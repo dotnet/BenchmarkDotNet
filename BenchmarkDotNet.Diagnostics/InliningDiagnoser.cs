@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Diagnostics
             if (logger.CapturedOutput.Count > 0)
                 outputLogger.WriteLineHeader(new string('-', 20));
             foreach (var line in logger.CapturedOutput)
-                outputLogger.WriteLine(line.Kind, line.Text);
+                outputLogger.Write(line.Kind, line.Text);
         }
 
         private void StartProcessingEvents(Benchmark benchmark)

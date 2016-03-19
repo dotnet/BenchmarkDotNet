@@ -36,12 +36,10 @@ namespace BenchmarkDotNet.Reports
         {
             for (int columnIndex = 0; columnIndex < table.ColumnCount; columnIndex++)
             {
-                if (!table.Columns[columnIndex].NeedToShow)
+                if (table.Columns[columnIndex].NeedToShow)
                 {
-                    continue;
+                    logger.WriteStatistic(BuildStandardText(table, line, leftDel, rightDel, columnIndex));
                 }
-
-                logger.WriteStatistic(BuildStandardText(table, line, leftDel, rightDel, columnIndex));
             }
 
             logger.WriteLine();
@@ -58,7 +56,7 @@ namespace BenchmarkDotNet.Reports
                 }
 
                 var text = (startOfGroup && startOfGroupInBold)
-                    ? BuildBold(table, line, leftDel, rightDel, columnIndex)
+                    ? BuildBoldText(table, line, leftDel, rightDel, columnIndex)
                     : BuildStandardText(table, line, leftDel, rightDel, columnIndex);
 
                 if (highlightRow) // write the row in an alternative colour
@@ -86,7 +84,7 @@ namespace BenchmarkDotNet.Reports
             return buffer.ToString();
         }
 
-        private static string BuildBold(SummaryTable table, string[] line, string leftDel, string rightDel, int columnIndex)
+        private static string BuildBoldText(SummaryTable table, string[] line, string leftDel, string rightDel, int columnIndex)
         {
             const string markdownBold = "**";
 
@@ -120,7 +118,7 @@ namespace BenchmarkDotNet.Reports
         private static void PadLeft(SummaryTable table, string[] line, string leftDel, string rightDel, int columnIndex, StringBuilder buffer)
         {
             const char space = ' ';
-            const int extraWidth = 2; // " |".Length is not included in the Length
+            const int extraWidth = 2; // " |".Length is not included in the column's Width
 
             var repeatCount = table.Columns[columnIndex].Width + extraWidth - leftDel.Length - line[columnIndex].Length - rightDel.Length;
             if (repeatCount > 0)

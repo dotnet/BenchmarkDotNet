@@ -26,14 +26,10 @@ namespace BenchmarkDotNet.Diagnostics
             });
         }
 
-
         public void WriteLine(LogKind logKind, string text)
         {
-            CapturedOutput.Add(new OutputLine
-            {
-                Kind = logKind,
-                Text = text
-            });
+            Write(logKind, text);
+            WriteLine();
         }
 
         public void Clear()

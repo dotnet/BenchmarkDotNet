@@ -49,8 +49,7 @@ namespace BenchmarkDotNet.Jobs
 
             for (int i = 0; i < ownProperties.Length; i++)
             {
-                if (ownProperties[i].Name != otherProperties[i].Name
-                    || ownProperties[i].Value != otherProperties[i].Value)
+                if (!ownProperties[i].Equals(otherProperties[i]))
                 {
                     return false;
                 }
