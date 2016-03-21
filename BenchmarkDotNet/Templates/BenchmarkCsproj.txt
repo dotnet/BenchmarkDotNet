@@ -21,11 +21,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BenchmarkDotNet">
-      <HintPath>..\BenchmarkDotNet.dll</HintPath>
-    </Reference>
-$TargetAssemblyReference$
-$TargetMethodReturnTypeAssemblyReference$
+    $CustomReferences$
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

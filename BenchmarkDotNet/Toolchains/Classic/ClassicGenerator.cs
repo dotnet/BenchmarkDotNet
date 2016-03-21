@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 using System.Threading;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
@@ -17,6 +20,16 @@ namespace BenchmarkDotNet.Toolchains.Classic
     internal class ClassicGenerator : IGenerator
     {
         public const string MainClassName = "Program";
+
+        private static readonly HashSet<string> PredefinedAssemblies = new HashSet<string>(
+            new[]
+            {
+                "mscorlib",
+                "System",
+                "System.Core",
+                "System.Xml.Linq",
+                "System.Xml"
+            });
 
         public GenerateResult GenerateProject(Benchmark benchmark, ILogger logger)
         {
@@ -41,8 +54,8 @@ namespace BenchmarkDotNet.Toolchains.Classic
 
             // As "using System;" is always included in the template, don't emit it again
             var emptyReturnTypeNamespace = target.Method.ReturnType == typeof(void) ||
-                                           target.Method.ReturnType.Namespace == "System" ||
-                                           string.IsNullOrWhiteSpace(target.Method.ReturnType.Namespace);
+                target.Method.ReturnType.Namespace == "System" ||
+                string.IsNullOrWhiteSpace(target.Method.ReturnType.Namespace);
             var targetMethodReturnTypeNamespace = emptyReturnTypeNamespace
                 ? ""
                 : $"using {target.Method.ReturnType.Namespace};";
@@ -78,8 +91,11 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 ? ""
                 : $"return {(target.Method.ReturnType.IsValueType() ? "0" : "null")};";
 
-            var paramsContent = string.Join("", benchmark.Parameters.Items.Select(parameter =>
-                $"{(parameter.IsStatic ? "" : "instance.")}{parameter.Name} = {GetParameterValue(parameter.Value)};"));
+            var paramsContent = string.Join(
+                "",
+                benchmark.Parameters.Items.Select(
+                    parameter =>
+                        $"{(parameter.IsStatic ? "" : "instance.")}{parameter.Name} = {GetParameterValue(parameter.Value)};"));
 
             var targetBenchmarkTaskArguments = benchmark.Job.GenerateWithDefinitions();
 
@@ -125,16 +141,18 @@ namespace BenchmarkDotNet.Toolchains.Classic
 
         protected virtual void GenerateProjectFile(ILogger logger, string projectDir, Benchmark benchmark)
         {
+#if !CLASSIC
+            throw new InvalidOperationException("Must not be called");
+#else
             var job = benchmark.Job;
             var platform = job.Platform.ToConfig();
             var framework = job.Framework.ToConfig(benchmark.Target.Type);
 
             var template = ResourceHelper.LoadTemplate("BenchmarkCsproj.txt");
-            var content = template.
-                Replace("$Platform$", platform).
-                Replace("$Framework$", framework).
-                Replace("$TargetAssemblyReference$", GetReferenceToAssembly(benchmark.Target.Type)).
-                Replace("$TargetMethodReturnTypeAssemblyReference$", GetReferenceToAssembly(benchmark.Target.Method.ReturnType));
+            var content = template
+                .Replace("$Platform$", platform)
+                .Replace("$Framework$", framework)
+                .Replace("$CustomReferences$", BuildCustomReferences(benchmark));
 
             string fileName = Path.Combine(projectDir, MainClassName + ".csproj");
             File.WriteAllText(fileName, content);
@@ -144,6 +162,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
 
             EnsureDependancyInCorrectLocation(logger, benchmark.Target.Type, projectDir);
             EnsureDependancyInCorrectLocation(logger, benchmark.Target.Method.ReturnType, projectDir);
+#endif
         }
 
         protected virtual void GenerateProjectBuildFile(string projectDir)
@@ -153,29 +172,16 @@ namespace BenchmarkDotNet.Toolchains.Classic
             File.WriteAllText(fileName, content);
         }
 
-        private static string GetReferenceToAssembly(Type type)
-        {
-#if !CLASSIC
-            throw new InvalidOperationException("Must not be called");
-#else
-            var template = @"    <Reference Include=""$AssemblyName$"">
-      <HintPath>..\$AssemblyFileName$</HintPath>
-    </Reference>";
-            var assembly = type.Assembly;
-            var fileName = new FileInfo(type.Assembly.Location).Name;
-            return fileName == "mscorlib.dll"
-                ? ""
-                : template.
-                    Replace("$AssemblyName$", assembly.GetName(false).Name).
-                    Replace("$AssemblyFileName$", fileName);
-#endif
-        }
-
         private void GenerateAppConfigFile(string projectDir, IJob job)
         {
-            var useLagacyJit = job.Jit == Jit.RyuJit || (job.Jit == Jit.Host && EnvironmentHelper.GetCurrentInfo().HasRyuJit) ? "0" : "1";
+            var useLagacyJit = job.Jit == Jit.RyuJit
+                || (job.Jit == Jit.Host && EnvironmentHelper.GetCurrentInfo().HasRyuJit)
+                ? "0"
+                : "1";
 
-            var template = ResourceHelper.LoadTemplate(job.Jit == Jit.Host ? "BenchmarkAppConfigEmpty.txt" : "BenchmarkAppConfig.txt");
+            var template =
+                ResourceHelper.LoadTemplate(
+                    job.Jit == Jit.Host ? "BenchmarkAppConfigEmpty.txt" : "BenchmarkAppConfig.txt");
             var content = template.
                 Replace("$UseLagacyJit$", useLagacyJit);
 
@@ -220,25 +226,6 @@ namespace BenchmarkDotNet.Toolchains.Classic
             return Path.Combine(Directory.GetCurrentDirectory(), benchmark.ShortInfo);
         }
 
-        private void EnsureDependancyInCorrectLocation(ILogger logger, Type type, string outputDir)
-        {
-#if !CLASSIC
-            throw new InvalidOperationException("Must not be called");
-#else
-            var fileInfo = new FileInfo(type.Assembly.Location);
-            if (fileInfo.Name == "mscorlib.dll")
-                return;
-
-            var expectedLocation = Path.GetFullPath(Path.Combine(outputDir, "..\\" + fileInfo.Name));
-            if (File.Exists(expectedLocation) == false)
-            {
-                logger.WriteLineInfo("// File doesn't exist: {0}", expectedLocation);
-                logger.WriteLineInfo("//   Actually at: {0}", fileInfo.FullName);
-                CopyFile(logger, fileInfo.FullName, expectedLocation);
-            }
-#endif
-        }
-
         private void CopyFile(ILogger logger, string sourcePath, string destinationPath)
         {
             logger.WriteLineInfo("//   Copying {0}", Path.GetFileName(sourcePath));
@@ -254,5 +241,52 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 throw;
             }
         }
+
+#if CLASSIC
+        private void EnsureDependancyInCorrectLocation(ILogger logger, Type type, string outputDir)
+        {
+            var fileInfo = new FileInfo(type.Assembly.Location);
+            if (fileInfo.Name == "mscorlib.dll")
+                return;
+
+            var expectedLocation = Path.GetFullPath(Path.Combine(outputDir, "..\\" + fileInfo.Name));
+            if (File.Exists(expectedLocation) == false)
+            {
+                logger.WriteLineInfo("// File doesn't exist: {0}", expectedLocation);
+                logger.WriteLineInfo("//   Actually at: {0}", fileInfo.FullName);
+                CopyFile(logger, fileInfo.FullName, expectedLocation);
+            }
+        }
+
+        private string BuildCustomReferences(Benchmark benchmark)
+        {
+            var buffer = new StringBuilder();
+
+            foreach (var assemblyName in benchmark.Target.Type.Assembly.GetReferencedAssemblies()
+                .Concat(new[] { benchmark.Target.Type.Assembly.GetName() }) // do not forget about the dll that defines benchmark!
+                .Where(assemblyName => !PredefinedAssemblies.Contains(assemblyName.Name)))
+            {
+                var referencedAssembly = Assembly.Load(assemblyName);
+
+                buffer.Append($"<Reference Include=\"{assemblyName.Name}\">")
+                      .Append(GetHintPath(referencedAssembly))
+                      .AppendLine("</Reference>");
+            }
+
+            return buffer.ToString();
+        }
+
+        private string GetHintPath(Assembly loadedReferencedAssembly)
+        {
+            if (loadedReferencedAssembly.GlobalAssemblyCache)
+            {
+                // there is no need to specify path if assembly was loaded from GAC
+                return string.Empty;
+            }
+
+            // the assembly is loaded so we just give the absolute path
+            return $"<HintPath>{loadedReferencedAssembly.Location}</HintPath>";
+        }
+#endif
     }
 }
