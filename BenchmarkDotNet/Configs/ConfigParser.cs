@@ -1,39 +1,51 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Properties;
-using System.Collections.Generic;
 
 namespace BenchmarkDotNet.Configs
 {
     public class ConfigParser
     {
-        // TODO, refactor this, at the moment they keys for availableOptions and availableParameters MUST stay in sync (which is brittle)
-        private static Dictionary<string, Action<ManualConfig, string>> availableOptions = 
-            new Dictionary<string, Action<ManualConfig, string>>
-            {
-                { "jobs", (config, value) => config.Add(ParseJobs(value)) },
-                { "columns", (config, value) => config.Add(ParseColumns(value)) },
-                { "exporters", (config, value) => { } },
-                { "diagnosers", (config, value) => config.Add(ParseDiagnosers(value)) },
-                { "analysers", (config, value) => { } },
-                { "loggers", (config, value) => { } }
-            };
-        
-        // NOTE: These need to be Lazy<T>, so so that we know they are only called AFTER availableOptions has been initialised (it's static)
-        private static Dictionary<string, Lazy<IEnumerable<string>>> availableParameters =
-            new Dictionary<string, Lazy<IEnumerable<string>>>
-            {
-                { "jobs", new Lazy<IEnumerable<string>>(() => availableJobs.Keys) },
-                { "columns", new Lazy<IEnumerable<string>>(() => availableColumns.Keys) },
-                { "exporters", new Lazy<IEnumerable<string>>(() => Enumerable.Empty<string>()) },
-                { "diagnosers", new Lazy<IEnumerable<string>>(() => Enumerable.Empty<string>()) },
-                { "analysers", new Lazy<IEnumerable<string>>(() => Enumerable.Empty<string>()) },
-                { "loggers", new Lazy<IEnumerable<string>>(() => Enumerable.Empty<string>()) }
-            };
+        private class Options
+        {
+            public Action<ManualConfig, string> ProcessOption { get; set; } = (config, value) => { };
+            public Lazy<IEnumerable<string>> GetAllOptions { get; set; } = new Lazy<IEnumerable<string>>(() => Enumerable.Empty<string>());
+        }
+
+        // NOTE: GetAllOptions needs to be Lazy<T>, because they call static variables (and initialisation order it tricky!!)
+        private static Dictionary<string, Options> configuration = new Dictionary<string, Options>
+        {
+            { "jobs", new Options {
+                ProcessOption = (config, value) => config.Add(ParseItem("Job", availableJobs, value)),
+                GetAllOptions = new Lazy<IEnumerable<string>>(() => availableJobs.Keys)
+            } },
+            { "columns", new Options {
+                ProcessOption = (config, value) => config.Add(ParseItem("Column", availableColumns, value)),
+                GetAllOptions = new Lazy<IEnumerable<string>>(() => availableColumns.Keys)
+            } },
+            { "exporters", new Options {
+                // TODO allow Exporters to be configured on the cmd line
+                ProcessOption = (config, value) => { throw new InvalidOperationException($"{value} is an unrecognised Exporter"); },
+            } },
+            { "diagnosers", new Options {
+                ProcessOption = (config, value) => config.Add(ParseDiagnosers(value)),
+                // TODO these 2 should match the lookup in LoadDiagnosers() in DefaultConfig.cs
+                GetAllOptions = new Lazy<IEnumerable<string>>(() => Enumerable.Empty<string>())
+            } },
+            { "analysers", new Options {
+                // TODO allow Analysers to be configured on the cmd line
+                ProcessOption = (config, value) => { throw new InvalidOperationException($"{value} is an unrecognised Analyser"); },
+            } },
+            { "loggers", new Options {
+                // TODO does it make sense to allows Loggers to be configured on the cmd-line?
+                ProcessOption = (config, value) => { throw new InvalidOperationException($"{value} is an unrecognised Logger"); },
+            } },
+        };
 
         private static Dictionary<string, IJob[]> availableJobs =
             new Dictionary<string, IJob[]>
@@ -74,16 +86,13 @@ namespace BenchmarkDotNet.Configs
                 var values = split[1].Split(',');
                 // Delibrately allow both "jobs" and "job" to be specified, makes it easier for users!!
                 var argument = split[0].EndsWith("s") ? split[0] : split[0] + "s";
-                if (availableOptions.ContainsKey(argument))
-                {
-                    var action = availableOptions[argument];
+
+                if (configuration.ContainsKey(argument) == false)
+                    throw new InvalidOperationException($"\"{split[0]}\" (from \"{arg}\") is an unrecognised Option");
+
+                var action = configuration[argument].ProcessOption;
                     foreach (var value in values)
                         action(config, value);
-                }
-                else
-                {
-                    throw new InvalidOperationException($"\"{split[0]}\" (from \"{arg}\") is an unrecognised Option");
-                }
             }
             return config;
         }
@@ -98,32 +107,22 @@ namespace BenchmarkDotNet.Configs
             logger.WriteLineHeader($"{BenchmarkDotNetInfo.FullTitle}");
             logger.WriteLine();
             logger.WriteLineHeader("Options:");
-            foreach (var option in availableOptions)
+            foreach (var option in configuration)
             {
                 // TODO also consider allowing short version (i.e. '-d' and '--diagnosers')             
                 var optionText = $"--{option.Key} <{option.Key.ToUpperInvariant()}>";
-                var parameters = string.Empty;
-                if (availableParameters.ContainsKey(option.Key))
-                    parameters = string.Join(", ", availableParameters[option.Key].Value);
+                var parameters = string.Join(", ", option.Value.GetAllOptions.Value);
                 var explanation = $"Allowed values: {parameters}";
                 logger.WriteLineInfo($"  {optionText,-30} {explanation}");
             }
         }
 
-        private static IJob[] ParseJobs(string value)
+        private static T[] ParseItem<T>(string itemName, Dictionary<string, T[]> itemLookup, string value)
         {
-            if (availableJobs.ContainsKey(value))
-                return availableJobs[value];
+            if (itemLookup.ContainsKey(value))
+                return itemLookup[value];
 
-            throw new InvalidOperationException($"\"{value}\" is an unrecognised Job");
-        }
-
-        private static IColumn[] ParseColumns(string value)
-        {
-            if (availableColumns.ContainsKey(value))
-                return availableColumns[value];
-
-            throw new InvalidOperationException($"\"{value}\" is an unrecognised Column");
+            throw new InvalidOperationException($"\"{value}\" is an unrecognised {itemName}");
         }
 
         private static IDiagnoser[] ParseDiagnosers(string value)
