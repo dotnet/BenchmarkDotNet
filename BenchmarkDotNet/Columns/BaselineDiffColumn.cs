@@ -44,10 +44,10 @@ namespace BenchmarkDotNet.Columns
                     if (benchmark.Target.Baseline)
                         return "Baseline";
                     var diff = (currentMedian - baselineMedian)/baselineMedian*100.0;
-                    return diff.ToStr("0.0") + "%";
+                    return diff.ToStr("N1") + "%";
                 case DiffKind.Scaled:
                     var scale = currentMedian/baselineMedian;
-                    return scale.ToStr("0.00");
+                    return scale.ToStr("N2");
                 default:
                     return "?";
             }
