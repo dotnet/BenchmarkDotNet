@@ -46,6 +46,12 @@ namespace BenchmarkDotNet.Running
         {
             var globalChronometer = Chronometer.Start();
             var summaries = new List<Summary>();
+            if (ManualConfig.ShouldDisplayOptions(args))
+            {
+                ManualConfig.PrintOptions(logger);
+                return Enumerable.Empty<Summary>();
+            }
+
             var config = ManualConfig.Union(DefaultConfig.Instance, ManualConfig.Parse(args));
             for (int i = 0; i < Types.Length; i++)
             {

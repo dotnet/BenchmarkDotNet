@@ -3,12 +3,68 @@ using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Properties;
+using System.Collections.Generic;
 
 namespace BenchmarkDotNet.Configs
 {
-    // TODO: refactoring
     public class ConfigParser
     {
+        // TODO, refactor this, at the moment they keys for availableOptions and availableParameters MUST stay in sync (which is brittle)
+        private static Dictionary<string, Action<ManualConfig, string>> availableOptions = 
+            new Dictionary<string, Action<ManualConfig, string>>
+            {
+                { "jobs", (config, value) => config.Add(ParseJobs(value)) },
+                { "columns", (config, value) => config.Add(ParseColumns(value)) },
+                { "exporters", (config, value) => { } },
+                { "diagnosers", (config, value) => config.Add(ParseDiagnosers(value)) },
+                { "analysers", (config, value) => { } },
+                { "loggers", (config, value) => { } }
+            };
+        
+        // NOTE: These need to be Lazy<T>, so so that we know they are only called AFTER availableOptions has been initialised (it's static)
+        private static Dictionary<string, Lazy<IEnumerable<string>>> availableParameters =
+            new Dictionary<string, Lazy<IEnumerable<string>>>
+            {
+                { "jobs", new Lazy<IEnumerable<string>>(() => availableJobs.Keys) },
+                { "columns", new Lazy<IEnumerable<string>>(() => availableColumns.Keys) },
+                { "exporters", new Lazy<IEnumerable<string>>(() => Enumerable.Empty<string>()) },
+                { "diagnosers", new Lazy<IEnumerable<string>>(() => Enumerable.Empty<string>()) },
+                { "analysers", new Lazy<IEnumerable<string>>(() => Enumerable.Empty<string>()) },
+                { "loggers", new Lazy<IEnumerable<string>>(() => Enumerable.Empty<string>()) }
+            };
+
+        private static Dictionary<string, IJob[]> availableJobs =
+            new Dictionary<string, IJob[]>
+            {
+                { "default", new [] { Job.Default } },
+                { "legacyjitx86", new[] { Job.LegacyJitX86 } },
+                { "legacyjitx64", new[] { Job.LegacyJitX64 } } ,
+                { "ryujitx64", new[] { Job.RyuJitX64 } },
+                { "dry", new[] { Job.Dry } },
+                { "alljits", Job.AllJits },
+                { "clr", new[] { Job.Clr } },
+                { "mono", new[] { Job.Mono } },
+                { "longrun", new[] { Job.LongRun } }
+            };
+
+        private static Dictionary<string, IColumn[]> availableColumns =
+            new Dictionary<string, IColumn[]>
+            {
+                { "mean", new [] { StatisticColumn.Mean } },
+                { "stderror", new[] { StatisticColumn.StdError } },
+                { "stddev", new[] { StatisticColumn.StdDev } },
+                { "operationpersecond", new [] { StatisticColumn.OperationsPerSecond } },
+                { "min", new[] { StatisticColumn.Min } },
+                { "q1", new[] { StatisticColumn.Q1 } },
+                { "median", new[] { StatisticColumn.Median } },
+                { "q3", new[] { StatisticColumn.Q3 } },
+                { "max", new[] { StatisticColumn.Max } },
+                { "allstatistics", StatisticColumn.AllStatistics  },
+                { "place", new[] { PlaceColumn.ArabicNumber } }
+            };
+
         public IConfig Parse(string[] args)
         {
             var config = new ManualConfig();
@@ -16,92 +72,61 @@ namespace BenchmarkDotNet.Configs
             {
                 var split = arg.ToLowerInvariant().Split('=');
                 var values = split[1].Split(',');
-                switch (split[0])
+                // Delibrately allow both "jobs" and "job" to be specified, makes it easier for users!!
+                var argument = split[0].EndsWith("s") ? split[0] : split[0] + "s";
+                if (availableOptions.ContainsKey(argument))
                 {
-                    case "jobs":
-                        foreach (var value in values)
-                            config.Add(ParseJobs(value));
-                        break;
-                    case "columns":
-                        foreach (var value in values)
-                            config.Add(ParseColumns(value));
-                        break;
-                    case "exporters":
-                        break;
-                    case "diagnosers":
-                        foreach (var value in values)
-                            config.Add(ParseDiagnosers(value));
-                        break;
-                    case "analysers":
-                        break;
-                    case "loggers":
-                        break;
-                    default:
-                        throw new InvalidOperationException($"\"{split[0]}\" (from \"{arg}\") is an unrecognised Option");
+                    var action = availableOptions[argument];
+                    foreach (var value in values)
+                        action(config, value);
+                }
+                else
+                {
+                    throw new InvalidOperationException($"\"{split[0]}\" (from \"{arg}\") is an unrecognised Option");
                 }
             }
             return config;
         }
 
-        private IColumn[] ParseColumns(string value)
+        public bool ShouldDisplayOptions(string[] args)
         {
-            switch (value)
+            return args.Select(a => a.ToLowerInvariant()).Any(a => a == "--help" || a == "-h");
+        }
+
+        public void PrintOptions(ILogger logger)
+        {
+            logger.WriteLineHeader($"{BenchmarkDotNetInfo.FullTitle}");
+            logger.WriteLine();
+            logger.WriteLineHeader("Options:");
+            foreach (var option in availableOptions)
             {
-                case "mean":
-                    return new[] { StatisticColumn.Mean };
-                case "stderror":
-                    return new[] { StatisticColumn.StdError };
-                case "stddev":
-                    return new[] { StatisticColumn.StdDev };
-                case "operationpersecond":
-                    return new[] { StatisticColumn.OperationsPerSecond };
-                case "min":
-                    return new[] { StatisticColumn.Min };
-                case "q1":
-                    return new[] { StatisticColumn.Q1 };
-                case "median":
-                    return new[] { StatisticColumn.Median };
-                case "q3":
-                    return new[] { StatisticColumn.Q3 };
-                case "max":
-                    return new[] { StatisticColumn.Max };
-                case "allstatistics":
-                    return StatisticColumn.AllStatistics;
-                case "place":
-                    return new[] { PlaceColumn.ArabicNumber };
-                default:
-                    throw new InvalidOperationException($"\"{value}\" is an unrecognised Column");
+                // TODO also consider allowing short version (i.e. '-d' and '--diagnosers')             
+                var optionText = $"--{option.Key} <{option.Key.ToUpperInvariant()}>";
+                var parameters = string.Empty;
+                if (availableParameters.ContainsKey(option.Key))
+                    parameters = string.Join(", ", availableParameters[option.Key].Value);
+                var explanation = $"Allowed values: {parameters}";
+                logger.WriteLineInfo($"  {optionText,-30} {explanation}");
             }
         }
 
-        private IJob[] ParseJobs(string value)
+        private static IJob[] ParseJobs(string value)
         {
-            switch (value)
-            {
-                case "default":
-                    return new[] { Job.Default };
-                case "legacyjitx86":
-                    return new[] { Job.LegacyJitX86 };
-                case "legacyjitx64":
-                    return new[] { Job.LegacyJitX64 };
-                case "ryujitx64":
-                    return new[] { Job.RyuJitX64 };
-                case "dry":
-                    return new[] { Job.Dry };
-                case "alljits":
-                    return Job.AllJits;
-                case "clr":
-                    return new[] { Job.Clr };
-                case "mono":
-                    return new[] { Job.Mono };
-                case "longrun":
-                    return new[] { Job.LongRun };
-                default:
-                    throw new InvalidOperationException($"\"{value}\" is an unrecognised Job");
-            }
+            if (availableJobs.ContainsKey(value))
+                return availableJobs[value];
+
+            throw new InvalidOperationException($"\"{value}\" is an unrecognised Job");
         }
 
-        private IDiagnoser[] ParseDiagnosers(string value)
+        private static IColumn[] ParseColumns(string value)
+        {
+            if (availableColumns.ContainsKey(value))
+                return availableColumns[value];
+
+            throw new InvalidOperationException($"\"{value}\" is an unrecognised Column");
+        }
+
+        private static IDiagnoser[] ParseDiagnosers(string value)
         {
             foreach (var diagnoser in DefaultConfig.LazyLoadedDiagnosers.Value)
             {
