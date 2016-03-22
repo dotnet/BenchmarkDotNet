@@ -16,6 +16,7 @@ namespace BenchmarkDotNet.Configs
         private class Options
         {
             public Action<ManualConfig, string> ProcessOption { get; set; } = (config, value) => { };
+            public Action<ManualConfig> ProcessAllOptions { get; set; } = (config) => { };
             public Lazy<IEnumerable<string>> GetAllOptions { get; set; } = new Lazy<IEnumerable<string>>(() => Enumerable.Empty<string>());
         }
 
@@ -24,14 +25,17 @@ namespace BenchmarkDotNet.Configs
         {
             { "jobs", new Options {
                 ProcessOption = (config, value) => config.Add(ParseItem("Job", availableJobs, value)),
+                ProcessAllOptions = (config) => config.Add(allJobs.Value),
                 GetAllOptions = new Lazy<IEnumerable<string>>(() => availableJobs.Keys)
             } },
             { "columns", new Options {
                 ProcessOption = (config, value) => config.Add(ParseItem("Column", availableColumns, value)),
+                ProcessAllOptions = (config) => config.Add(allColumns.Value),
                 GetAllOptions = new Lazy<IEnumerable<string>>(() => availableColumns.Keys)
             } },
             { "exporters", new Options {
-                ProcessOption = (config, value) => config.Add(ParseItem("Exporter", availableColumns, value)),
+                ProcessOption = (config, value) => config.Add(ParseItem("Exporter", availableExporters, value)),
+                ProcessAllOptions = (config) => config.Add(allExporters.Value),
                 GetAllOptions = new Lazy<IEnumerable<string>>(() => availableExporters.Keys)
             } },
             { "diagnosers", new Options {
@@ -62,6 +66,7 @@ namespace BenchmarkDotNet.Configs
                 { "mono", new[] { Job.Mono } },
                 { "longrun", new[] { Job.LongRun } }
             };
+        private static Lazy<IJob[]> allJobs = new Lazy<IJob[]>(() => availableJobs.SelectMany(e => e.Value).ToArray());
 
         private static Dictionary<string, IColumn[]> availableColumns =
             new Dictionary<string, IColumn[]>
@@ -78,6 +83,7 @@ namespace BenchmarkDotNet.Configs
                 { "allstatistics", StatisticColumn.AllStatistics  },
                 { "place", new[] { PlaceColumn.ArabicNumber } }
             };
+        private static Lazy<IColumn[]> allColumns = new Lazy<IColumn[]>(() => availableColumns.SelectMany(e => e.Value).ToArray());
 
         private static Dictionary<string, IExporter[]> availableExporters =
             new Dictionary<string, IExporter[]>
@@ -112,9 +118,16 @@ namespace BenchmarkDotNet.Configs
                 if (configuration.ContainsKey(argument) == false)
                     throw new InvalidOperationException($"\"{split[0]}\" (from \"{arg}\") is an unrecognised Option");
 
-                var action = configuration[argument].ProcessOption;
-                foreach (var value in values)
-                    action(config, value);
+                if (values.Length == 1 && values[0] == "all")
+                {
+                    configuration[argument].ProcessAllOptions(config);
+                }
+                else
+                {
+                    var action = configuration[argument].ProcessOption;
+                    foreach (var value in values)
+                        action(config, value);
+                }
             }
             return config;
         }
