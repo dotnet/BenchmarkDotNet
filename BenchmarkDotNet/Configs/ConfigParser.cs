@@ -6,6 +6,8 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Properties;
+using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Analyzers;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -29,8 +31,8 @@ namespace BenchmarkDotNet.Configs
                 GetAllOptions = new Lazy<IEnumerable<string>>(() => availableColumns.Keys)
             } },
             { "exporters", new Options {
-                // TODO allow Exporters to be configured on the cmd line
-                ProcessOption = (config, value) => { throw new InvalidOperationException($"{value} is an unrecognised Exporter"); },
+                ProcessOption = (config, value) => config.Add(ParseItem("Exporter", availableColumns, value)),
+                GetAllOptions = new Lazy<IEnumerable<string>>(() => availableExporters.Keys)
             } },
             { "diagnosers", new Options {
                 ProcessOption = (config, value) => config.Add(ParseDiagnosers(value)),
@@ -38,8 +40,8 @@ namespace BenchmarkDotNet.Configs
                 GetAllOptions = new Lazy<IEnumerable<string>>(() => Enumerable.Empty<string>())
             } },
             { "analysers", new Options {
-                // TODO allow Analysers to be configured on the cmd line
-                ProcessOption = (config, value) => { throw new InvalidOperationException($"{value} is an unrecognised Analyser"); },
+                ProcessOption = (config, value) => config.Add(ParseItem("Analyser", availableAnalysers, value)),
+                GetAllOptions = new Lazy<IEnumerable<string>>(() => availableAnalysers.Keys)
             } },
             { "loggers", new Options {
                 // TODO does it make sense to allows Loggers to be configured on the cmd-line?
@@ -77,6 +79,26 @@ namespace BenchmarkDotNet.Configs
                 { "place", new[] { PlaceColumn.ArabicNumber } }
             };
 
+        private static Dictionary<string, IExporter[]> availableExporters =
+            new Dictionary<string, IExporter[]>
+            {
+                { "csv", new [] { CsvExporter.Default } },
+                { "csvmeasurements", new[] { CsvMeasurementsExporter.Default } },
+                { "html", new[] { HtmlExporter.Default } },
+                { "markdown", new [] { MarkdownExporter.Default } },
+                { "stackoverflow", new[] { MarkdownExporter.StackOverflow } },
+                { "github", new[] { MarkdownExporter.GitHub } },
+                { "plain", new[] { PlainExporter.Default } },
+                { "rplot", new[] { RPlotExporter.Default } },
+            };
+        private static Lazy<IExporter[]> allExporters = new Lazy<IExporter[]>(() => availableExporters.SelectMany(e => e.Value).ToArray());
+
+        private static Dictionary<string, IAnalyser[]> availableAnalysers =
+            new Dictionary<string, IAnalyser[]>
+            {
+                { "environment", new [] { EnvironmentAnalyser.Default } },
+            };
+
         public IConfig Parse(string[] args)
         {
             var config = new ManualConfig();
@@ -91,8 +113,8 @@ namespace BenchmarkDotNet.Configs
                     throw new InvalidOperationException($"\"{split[0]}\" (from \"{arg}\") is an unrecognised Option");
 
                 var action = configuration[argument].ProcessOption;
-                    foreach (var value in values)
-                        action(config, value);
+                foreach (var value in values)
+                    action(config, value);
             }
             return config;
         }

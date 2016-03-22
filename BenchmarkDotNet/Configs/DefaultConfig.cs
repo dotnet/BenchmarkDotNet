@@ -44,13 +44,10 @@ namespace BenchmarkDotNet.Configs
 
         public IEnumerable<IExporter> GetExporters()
         {
+            // Now that we can specify exporters on the cmd line (e.g. "exporters=html,stackoverflow"), 
+            // we should have less enabled by default and then users can turn on the ones they want
             yield return CsvExporter.Default;
-            yield return MarkdownExporter.StackOverflow;
-            yield return MarkdownExporter.Default;
             yield return MarkdownExporter.GitHub;
-            yield return PlainExporter.Default;
-            yield return CsvMeasurementsExporter.Default;
-            yield return RPlotExporter.Default;
             yield return HtmlExporter.Default;
         }
 
