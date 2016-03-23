@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
@@ -32,13 +31,13 @@ namespace BenchmarkDotNet.Exporters
         }
 
         // TODO: add params
-        private readonly List<MeasurementColumn> columns = new List<MeasurementColumn>
+        private readonly MeasurementColumn[] columns =
         {
             new MeasurementColumn("Target", (summary, report, m) => report.Benchmark.Target.Type.Name + "." +report.Benchmark.Target.MethodTitle),
             new MeasurementColumn("TargetType", (summary, report, m) => report.Benchmark.Target.Type.Name),
             new MeasurementColumn("TargetMethod", (summary, report, m) => report.Benchmark.Target.MethodTitle),
 
-            new MeasurementColumn("Job", (summary, report, m) => report.Benchmark.Job.GetShortInfo(GetJobs(summary))),
+            new MeasurementColumn("Job", (summary, report, m) => summary.GetJobShortInfo(report.Benchmark.Job)),
             new MeasurementColumn("JobMode", (summary, report, m) => report.Benchmark.Job.Mode.ToString()),
             new MeasurementColumn("JobPlatform", (summary, report, m) => report.Benchmark.Job.Platform.ToString()),
             new MeasurementColumn("JobJit", (summary, report, m) => report.Benchmark.Job.Jit.ToString()),
@@ -58,12 +57,27 @@ namespace BenchmarkDotNet.Exporters
         public override void ExportToLog(Summary summary, ILogger logger)
         {
             logger.WriteLine(string.Join(";", columns.Select(c => c.Title)));
-            var reports = summary.Reports.Values.
-                OrderBy(r => r.Benchmark.Parameters, ParameterComparer.Instance).
-                ThenBy(r => r.Benchmark.Target.Type.Name);
+
+            var reports = summary.Reports.Values
+                .OrderBy(r => r.Benchmark.Parameters, ParameterComparer.Instance)
+                .ThenBy(r => r.Benchmark.Target.Type.Name);
+
             foreach (var report in reports)
+            {
                 foreach (var measurement in report.AllMeasurements)
-                    logger.WriteLine(string.Join(";", columns.Select(column => column.GetValue(summary, report, measurement))));
+                {
+                    for (int i = 0; i < columns.Length; )
+                    {
+                        logger.Write(columns[i].GetValue(summary, report, measurement));
+
+                        if (++i < columns.Length)
+                        {
+                            logger.Write(";");
+                        }
+                    }
+                    logger.WriteLine();
+                }
+            }
         }
 
         public static IJob[] GetJobs(Summary summary) => summary.Benchmarks.Select(b => b.Job).ToArray();

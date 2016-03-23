@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Running
                 benchmarks = GetSupportedBenchmarks(benchmarks, logger);
 
                 var summary = Run(benchmarks, logger, title, config);
-                config.GetCompositeExporter().ExportToFiles(summary);
+                config.GetCompositeExporter().ExportToFiles(summary).ToArray();
                 return summary;
             }
         }
@@ -68,7 +68,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineInfo("// Found benchmarks:");
             foreach (var benchmark in benchmarks)
                 logger.WriteLineInfo($"//   {benchmark.ShortInfo}");
-            logger.NewLine();
+            logger.WriteLine();
 
             var globalChronometer = Chronometer.Start();
             var reports = new List<BenchmarkReport>();
@@ -79,23 +79,22 @@ namespace BenchmarkDotNet.Running
                 if (report.GetResultRuns().Any())
                     logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr());
 
-                logger.NewLine();
+                logger.WriteLine();
             }
             var clockSpan = globalChronometer.Stop();
 
             var summary = new Summary(title, reports, EnvironmentHelper.GetCurrentInfo(), config, currentDirectory, clockSpan.GetTimeSpan());
 
             logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
-            logger.NewLine();
+            logger.WriteLine();
 
             logger.WriteLineHeader("// * Export *");
-            var files = config.GetCompositeExporter().ExportToFiles(summary);
-            foreach (var file in files)
+            foreach (var file in config.GetCompositeExporter().ExportToFiles(summary))
             {
                 var printedFile = file.StartsWith(currentDirectory) ? file.Substring(currentDirectory.Length).Trim('/', '\\') : file;
                 logger.WriteLineInfo($"  {printedFile}");
             }
-            logger.NewLine();
+            logger.WriteLine();
 
             logger.WriteLineHeader("// * Detailed results *");
 
@@ -104,11 +103,11 @@ namespace BenchmarkDotNet.Running
             {
                 logger.WriteLineInfo(report.Benchmark.ShortInfo);
                 logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr());
-                logger.NewLine();
+                logger.WriteLine();
             }
 
             LogTotalTime(logger, clockSpan.GetTimeSpan());
-            logger.NewLine();
+            logger.WriteLine();
 
             logger.WriteLineHeader("// * Summary *");
             MarkdownExporter.Console.ExportToLog(summary, logger);
@@ -117,7 +116,7 @@ namespace BenchmarkDotNet.Running
             var warnings = config.GetCompositeAnalyser().Analyze(summary).ToList();
             if (warnings.Count > 0)
             {
-                logger.NewLine();
+                logger.WriteLine();
                 logger.WriteLineError("// * Warnings * ");
                 foreach (var warning in warnings)
                     logger.WriteLineError($"{warning.Message}");
@@ -125,11 +124,11 @@ namespace BenchmarkDotNet.Running
 
             if (config.GetDiagnosers().Count() > 0)
             {
-                logger.NewLine();
+                logger.WriteLine();
                 config.GetCompositeDiagnoser().DisplayResults(logger);
             }
 
-            logger.NewLine();
+            logger.WriteLine();
             logger.WriteLineHeader("// ***** BenchmarkRunner: End *****");
             return summary;
         }
@@ -183,7 +182,7 @@ namespace BenchmarkDotNet.Running
                 if (generateResult.GenerateException != null)
                     logger.WriteLineError($"// Exception: {generateResult.GenerateException.Message}");
             }
-            logger.NewLine();
+            logger.WriteLine();
             return generateResult;
         }
 
@@ -201,7 +200,7 @@ namespace BenchmarkDotNet.Running
                 if (buildResult.BuildException != null)
                     logger.WriteLineError($"// Exception: {buildResult.BuildException.Message}");
             }
-            logger.NewLine();
+            logger.WriteLine();
             return buildResult;
         }
 
@@ -244,7 +243,7 @@ namespace BenchmarkDotNet.Running
                     launchCount = (int)Math.Round(Math.Max(2, 2 + (percent - 1) / 3)); // an empirical formula
                 }
             }
-            logger.NewLine();
+            logger.WriteLine();
 
             // Do a "Diagnostic" run, but DISCARD the results, so that the overhead of Diagnostics doesn't skew the overall results
             if (config.GetDiagnosers().Count() > 0)
@@ -258,7 +257,7 @@ namespace BenchmarkDotNet.Running
 
                 if (!executeResult.FoundExecutable)
                     logger.WriteLineError("Executable not found");
-                logger.NewLine();
+                logger.WriteLine();
             }
 
             return executeResults;

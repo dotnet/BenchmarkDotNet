@@ -10,9 +10,11 @@ namespace BenchmarkDotNet.Running
         public IJob Job { get; }
         public ParameterInstances Parameters { get; }
 
-        public string ShortInfo => (Target.FullInfo + "_" + Job.GetShortInfo() + "_" + Parameters.FullInfo).Trim('_');
+        public string ShortInfo => shortInfo ?? (shortInfo = (Target.FullInfo + "_" + Job.GetShortInfo() + "_" + Parameters.FullInfo).Trim('_'));
         public string FullInfo => (Target.FullInfo + "_" + Job.GetFullInfo() + "_" + Parameters.FullInfo).Trim('_');
         public override string ToString() => ShortInfo;
+
+        private string shortInfo;
 
         public Benchmark(Target target, IJob job, ParameterInstances parameters)
         {

@@ -1,8 +1,12 @@
 {
   "profiles": {
-    "#CLASSIC": {
+    "#CLASSIC_DEBUG": {
       "executablePath": "BenchmarkDotNet.Samples.dll",
       "workingDirectory": "..\\artifacts\\bin\\BenchmarkDotNet.Samples\\Debug\\net40\\"
+    },
+    "#CLASSIC_RELEASE": {
+      "executablePath": "BenchmarkDotNet.Samples.dll",
+      "workingDirectory": "..\\artifacts\\bin\\BenchmarkDotNet.Samples\\Release\\net40\\"
     },
     "#DNX": {
       "commandName": "run",

@@ -2,6 +2,10 @@
 {
     public interface ILogger
     {
-        void Write(LogKind logKind, string format, params object[] args);
+        void Write(LogKind logKind, string text);
+
+        void WriteLine();
+
+        void WriteLine(LogKind logKind, string text);
     }
 }

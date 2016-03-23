@@ -229,9 +229,9 @@ namespace BenchmarkDotNet.Toolchains.Classic
 
         private void CopyFile(ILogger logger, string sourcePath, string destinationPath)
         {
-            logger.WriteLineInfo("//   Copying {0}", Path.GetFileName(sourcePath));
-            logger.WriteLineInfo("//   from: {0}", Path.GetDirectoryName(sourcePath));
-            logger.WriteLineInfo("//   to: {0}", Path.GetDirectoryName(destinationPath));
+            logger.WriteLineInfo($"//   Copying {Path.GetFileName(sourcePath)}");
+            logger.WriteLineInfo($"//   from: {Path.GetDirectoryName(sourcePath)}");
+            logger.WriteLineInfo($"//   to: {Path.GetDirectoryName(destinationPath)}");
             try
             {
                 File.Copy(Path.GetFullPath(sourcePath), Path.GetFullPath(destinationPath), overwrite: true);
@@ -253,8 +253,8 @@ namespace BenchmarkDotNet.Toolchains.Classic
             var expectedLocation = Path.GetFullPath(Path.Combine(outputDir, "..\\" + fileInfo.Name));
             if (File.Exists(expectedLocation) == false)
             {
-                logger.WriteLineInfo("// File doesn't exist: {0}", expectedLocation);
-                logger.WriteLineInfo("//   Actually at: {0}", fileInfo.FullName);
+                logger.WriteLineInfo($"// File doesn't exist: {expectedLocation}");
+                logger.WriteLineInfo($"//   Actually at: {fileInfo.FullName}");
                 CopyFile(logger, fileInfo.FullName, expectedLocation);
             }
         }

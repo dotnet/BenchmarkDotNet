@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Exporters
                     logger.WriteLineResult(run.ToStr());
                 foreach (var mode in modes)
                 {
-                    logger.NewLine();
+                    logger.WriteLine();
                     logger.WriteLineHeader($"* Statistics for {mode}");
                     logger.WriteLineStatistic(runs.Where(it => it.IterationMode == mode).GetStatistics().ToTimeStr());
                 }

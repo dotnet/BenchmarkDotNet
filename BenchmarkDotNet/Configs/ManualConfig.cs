@@ -71,5 +71,9 @@ namespace BenchmarkDotNet.Configs
         }
 
         public static IConfig Parse(string[] args) => new ConfigParser().Parse(args);
+
+        public static bool ShouldDisplayOptions(string[] args) => new ConfigParser().ShouldDisplayOptions(args);
+
+        public static void PrintOptions(ILogger logger) => new ConfigParser().PrintOptions(logger);
     }
 }

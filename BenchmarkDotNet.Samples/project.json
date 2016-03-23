@@ -38,7 +38,8 @@
   },
   "scripts": {
     "postbuild": [
-      "%project:Directory%/../build/batchcopy \"%project:Directory%/../artifacts/bin/BenchmarkDotNet/Debug/net40/*.*\" %project:BuildOutputDir%/Debug/net40"
+      "%project:Directory%/../build/batchcopy \"%project:Directory%/../artifacts/bin/BenchmarkDotNet/Debug/net40/*.*\" %project:BuildOutputDir%/Debug/net40",
+      "%project:Directory%/../build/batchcopy \"%project:Directory%/../artifacts/bin/BenchmarkDotNet/Release/net40/*.*\" %project:BuildOutputDir%/Release/net40"
     ]
   }
 }

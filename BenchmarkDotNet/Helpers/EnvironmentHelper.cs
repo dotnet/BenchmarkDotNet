@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -59,15 +60,14 @@ namespace BenchmarkDotNet.Helpers
             HardwareTimerKind = Chronometer.HardwareTimerKind
         };
 
-        public string ToFormattedString(string clrHint = "")
+        public IEnumerable<string> ToFormattedString(string clrHint = "")
         {
-            var line1 = $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}";
-            var line2 = $"OS={OsVersion}";
-            var line3 = $"Processor={ProcessorName}, ProcessorCount={ProcessorCount}";
-            var line4 = $"Frequency={ChronometerFrequency} ticks, Resolution={GetChronometerResolution().ToTimeStr()}, Timer={HardwareTimerKind.ToString().ToUpper()}";
-            var line5 = $"{clrHint}CLR={ClrVersion}, Arch={Architecture} {Configuration}{GetDebuggerFlag()}{GetJitFlag()}";
-            var line6 = $"JitModules={JitModules}";
-            return string.Join(Environment.NewLine, line1, line2, line3, line4, line5, line6);
+            yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}";
+            yield return $"OS={OsVersion}";
+            yield return $"Processor={ProcessorName}, ProcessorCount={ProcessorCount}";
+            yield return $"Frequency={ChronometerFrequency} ticks, Resolution={GetChronometerResolution().ToTimeStr()}, Timer={HardwareTimerKind.ToString().ToUpper()}";
+            yield return $"{clrHint}CLR={ClrVersion}, Arch={Architecture} {Configuration}{GetDebuggerFlag()}{GetJitFlag()}";
+            yield return $"JitModules={JitModules}";
         }
 
         private string GetJitFlag() => HasRyuJit ? " [RyuJIT]" : "";

@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Loggers;
+﻿using System;
+using BenchmarkDotNet.Loggers;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -12,10 +13,22 @@ namespace BenchmarkDotNet.IntegrationTests
             this.testOutputHelper = testOutputHelper;
         }
 
-        public override void Write(LogKind logKind, string format, params object[] args)
+        public override void Write(LogKind logKind, string text)
         {
-            testOutputHelper.WriteLine(format, args);
-            base.Write(logKind, format, args);
+            testOutputHelper.WriteLine(text);
+            base.Write(logKind, text);
+        }
+
+        public override void WriteLine()
+        {
+            testOutputHelper.WriteLine(string.Empty);
+            base.WriteLine();
+        }
+
+        public override void WriteLine(LogKind logKind, string text)
+        {
+            testOutputHelper.WriteLine(text);
+            base.WriteLine(logKind, text);
         }
     }
 }

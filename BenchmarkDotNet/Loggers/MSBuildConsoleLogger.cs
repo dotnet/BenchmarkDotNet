@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Loggers
         }
 
         private void OnEventSourceErrorRaised(object sender, BuildErrorEventArgs e) =>
-            Logger.WriteLineError("// {0}({1},{2}): error {3}: {4}", e.File, e.LineNumber, e.ColumnNumber, e.Code, e.Message);
+            Logger.WriteLineError($"// {e.File}({e.LineNumber},{e.ColumnNumber}): error {e.Code}: {e.Message}");
     }
 }
 #endif

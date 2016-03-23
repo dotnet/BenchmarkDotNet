@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Diagnostics
         private TraceEventSession session;
         private readonly ConcurrentDictionary<int, Stats> statsPerProcess = new ConcurrentDictionary<int, Stats>();
 
-        public IEnumerable<IColumn> GetColumns => 
+        public IEnumerable<IColumn> GetColumns =>
             new IColumn[]
             {
                 new GCCollectionColumn(results, 0),
@@ -126,8 +126,7 @@ namespace BenchmarkDotNet.Diagnostics
                     }
                     else
                     {
-                        logger.WriteLineError("Error Process{0}, Unexpected GC Depth: {1}, Count: {2} -> Reason: {3}",
-                                              gcData.ProcessID, gcData.Depth, gcData.Count, gcData.Reason);
+                        logger.WriteLineError(string.Format("Error Process{0}, Unexpected GC Depth: {1}, Count: {2} -> Reason: {3}", gcData.ProcessID, gcData.Depth, gcData.Count, gcData.Reason));
                     }
                 }
             };
