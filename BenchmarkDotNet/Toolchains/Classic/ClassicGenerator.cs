@@ -269,7 +269,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
             {
                 var referencedAssembly = Assembly.Load(assemblyName);
 
-                buffer.Append($"<Reference Include=\"{assemblyName.Name}\">")
+                buffer.Append($"<Reference Include=\"{assemblyName.FullName}\">")
                       .Append(GetHintPath(referencedAssembly))
                       .AppendLine("</Reference>");
             }
