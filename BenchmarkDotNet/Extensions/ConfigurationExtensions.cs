@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -25,32 +23,11 @@ namespace BenchmarkDotNet.Extensions
             }
         }
 
-        public static string ToConfig(this Framework framework, Type benchmarkType)
+        public static string ToConfig(this Framework framework)
         {
-            if (framework == Framework.Host)
-                return DetectCurrentFramework(benchmarkType);
             var number = framework.ToString().Substring(1);
             var numberArray = number.ToCharArray().Select(c => c.ToString()).ToArray();
             return "v" + string.Join(".", numberArray);
-        }
-
-        private static string DetectCurrentFramework(Type benchmarkType)
-        {
-            var attributes = benchmarkType.Assembly().GetCustomAttributes<Attribute>(false);
-            var frameworkAttribute = attributes.FirstOrDefault(a => a.ToString() == @"System.Runtime.Versioning.TargetFrameworkAttribute");
-            if (frameworkAttribute == null)
-#if NET45
-                return "v4.5";
-#else
-                return "v4.0";
-#endif
-
-            var frameworkName = frameworkAttribute.GetType()
-                .GetProperty("FrameworkName", BindingFlags.Public | BindingFlags.Instance)
-                .GetValue(frameworkAttribute, null)?.ToString();
-            if (frameworkName != null)
-                frameworkName = frameworkName.Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries).Skip(1).FirstOrDefault() ?? "";
-            return frameworkName;
         }
 
         public static string ToConfig(this Jit jit)

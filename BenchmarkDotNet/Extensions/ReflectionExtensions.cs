@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Versioning;
 using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Extensions
@@ -45,6 +46,23 @@ namespace BenchmarkDotNet.Extensions
                 return GetCorrectTypeName(type.GetElementType()) + "[" + new string(',', type.GetArrayRank() - 1) + "]";
 
             return prefix + type.Name;
+        }
+
+        internal static string GetTargetFrameworkVersion(this Assembly assembly)
+        {
+            var targetFrameworkAttribute = assembly.GetCustomAttributes<TargetFrameworkAttribute>(false).FirstOrDefault();
+            if (targetFrameworkAttribute == null)
+            {
+#if NET45
+                return "v4.5";
+#else
+                return "v4.0";
+#endif
+            }
+
+            var frameworkName = new FrameworkName(targetFrameworkAttribute.FrameworkName);
+
+            return $"v{frameworkName.Version}";
         }
     }
 }

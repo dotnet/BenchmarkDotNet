@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Threading;
 using BenchmarkDotNet.Attributes;
@@ -146,12 +147,12 @@ namespace BenchmarkDotNet.Toolchains.Classic
 #else
             var job = benchmark.Job;
             var platform = job.Platform.ToConfig();
-            var framework = job.Framework.ToConfig(benchmark.Target.Type);
+            var targetFrameworkVersion = GetTargetFrameworkVersion(benchmark);
 
             var template = ResourceHelper.LoadTemplate("BenchmarkCsproj.txt");
             var content = template
                 .Replace("$Platform$", platform)
-                .Replace("$Framework$", framework)
+                .Replace("$Framework$", targetFrameworkVersion)
                 .Replace("$CustomReferences$", BuildCustomReferences(benchmark));
 
             string fileName = Path.Combine(projectDir, MainClassName + ".csproj");
@@ -286,6 +287,29 @@ namespace BenchmarkDotNet.Toolchains.Classic
 
             // the assembly is loaded so we just give the absolute path
             return $"<HintPath>{loadedReferencedAssembly.Location}</HintPath>";
+        }
+
+        private string GetTargetFrameworkVersion(Benchmark benchmark)
+        {
+            if (benchmark.Job.Framework != Framework.Host) 
+            {
+                // user decided to configure it in explicit way
+                return benchmark.Job.Framework.ToConfig();
+            }
+
+            // let's take the highest value we can to ensure that we don't fall to any framework mismatch problems
+            return GetAllKnownTargetFrameworkVersions(benchmark).Max();
+        }
+
+        private IEnumerable<string> GetAllKnownTargetFrameworkVersions(Benchmark benchmark)
+        {
+            yield return benchmark.Target.Type.Assembly().GetTargetFrameworkVersion(); // the dll that defines benchmark
+            yield return Assembly.GetExecutingAssembly().GetTargetFrameworkVersion(); // the executing program
+
+            foreach (var assemblyName in benchmark.Target.Type.Assembly.GetReferencedAssemblies())
+            {
+                yield return Assembly.Load(assemblyName).GetTargetFrameworkVersion();
+            }
         }
 #endif
     }

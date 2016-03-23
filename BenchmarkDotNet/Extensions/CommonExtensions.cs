@@ -2,7 +2,6 @@
 using System.Linq;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Extensions
 {
