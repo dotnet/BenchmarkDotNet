@@ -20,7 +20,7 @@
 * [Advanced features](#advanced-features)
 * [How to run?](#how-to-run)
 * [How it works?](#how-it-works)
-* [Authors](#authors)
+* [Team](#team)
 
 ## Getting started
 
@@ -580,6 +580,9 @@ switcher.Run(new[] { "jobs=dry", "columns=min,max" });
     * Set of files that contains summary in human-readable and machine-readable formats.
     * Set of plots.
 
-## Authors
+## Team
 
-Andrey Akinshin, Jon Skeet, Matt Warren (2013–2016)
+Authors: [Andrey Akinshin](https://github.com/AndreyAkinshin) (maintainer), [Jon Skeet](https://github.com/jskeet), [Matt Warren](https://github.com/mattwarren)
+Contributors: [Adam Sitnik](https://github.com/adamsitnik), [Sasha Goldshtein](https://github.com/goldshtn), and [others](https://github.com/PerfDotNet/BenchmarkDotNet/graphs/contributors)
+
+2013–2016
