@@ -9,10 +9,22 @@
             this.loggers = loggers;
         }
 
-        public void Write(LogKind logKind, string format, params object[] args)
+        public void Write(LogKind logKind, string text)
         {
             foreach (var logger in loggers)
-                logger.Write(logKind, format, args);
+                logger.Write(logKind, text);
+        }
+
+        public void WriteLine()
+        {
+            foreach (var logger in loggers)
+                logger.WriteLine();
+        }
+
+        public void WriteLine(LogKind logKind, string text)
+        {
+            foreach (var logger in loggers)
+                logger.WriteLine(logKind, text);
         }
     }
 }

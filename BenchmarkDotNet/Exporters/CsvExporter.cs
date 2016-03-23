@@ -16,7 +16,19 @@ namespace BenchmarkDotNet.Exporters
         public override void ExportToLog(Summary summary, ILogger logger)
         {
             foreach (var line in summary.Table.FullContentWithHeader)
-                logger.WriteLine(string.Join(";", line));
+            {
+                for (int i = 0; i < line.Length;)
+                {
+                    logger.Write(line[i]);
+
+                    if (++i < line.Length)
+                    {
+                        logger.Write(";");
+                    }
+                }
+
+                logger.WriteLine();
+            }
         }
     }
 }

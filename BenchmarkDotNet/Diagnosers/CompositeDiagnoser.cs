@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Diagnosers
                 // print the name used on the cmd line, i.e. -d=<NAME>
                 logger.WriteLineHeader($"// * Diagnostic Output - {diagnoser.GetType().Name} *");
                 diagnoser.DisplayResults(logger);
-                logger.NewLine();
+                logger.WriteLine();
             }
         }
     }

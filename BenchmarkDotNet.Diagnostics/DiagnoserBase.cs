@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.Diagnostics
 
                 string filePath = null;
                 string[] lines = null;
-                logger?.WriteLine("");
+                logger?.WriteLine();
                 for (int i = 0; i < ilOffsetLocations.Count; i++)
                 {
                     var location = ilOffsetLocations[i];
@@ -138,14 +138,14 @@ namespace BenchmarkDotNet.Diagnostics
                 var lineToPrint = location.SourceLocation.LineNumber - 1;
                 if (lineToPrint >= 0 && lineToPrint < lines.Count)
                 {
-                    logger?.WriteLine(LogKind.Help, "{0,6}:{1}", location.SourceLocation.LineNumber, lines[location.SourceLocation.LineNumber - 1]);
+                    logger?.WriteLine(LogKind.Help, string.Format("{0,6}:{1}", location.SourceLocation.LineNumber, lines[location.SourceLocation.LineNumber - 1]));
                     logger?.WriteLine(LogKind.Info,
                                       new string(' ', location.SourceLocation.ColStart - 1 + indent) +
                                       new string('*', location.SourceLocation.ColEnd - location.SourceLocation.ColStart));
                 }
                 else
                 {
-                    logger?.WriteLine("Unable to show line {0} (0x{0:X8}), there are only {1} lines", lineToPrint, lines.Count);
+                    logger?.WriteLine(string.Format("Unable to show line {0} (0x{0:X8}), there are only {1} lines", lineToPrint, lines.Count));
                 }
             }
             catch (Exception ex)
@@ -240,9 +240,9 @@ namespace BenchmarkDotNet.Diagnostics
             logger?.WriteLine(LogKind.Header, "------------------------------");
 
             logger?.WriteLine(LogKind.Header, "\nDataTarget Info:");
-            logger?.WriteLine(LogKind.Info, "  ClrVersion{0}: {1}", dataTarget.ClrVersions.Count > 1 ? "s" : "", string.Join(", ", dataTarget.ClrVersions));
+            logger?.WriteLine(LogKind.Info, string.Format("  ClrVersion{0}: {1}", dataTarget.ClrVersions.Count > 1 ? "s" : "", string.Join(", ", dataTarget.ClrVersions)));
             logger?.WriteLine(LogKind.Info, "  Architecture: " + dataTarget.Architecture);
-            logger?.WriteLine(LogKind.Info, "  PointerSize: {0} ({1}-bit)", dataTarget.PointerSize, dataTarget.PointerSize == 8 ? 64 : 32);
+            logger?.WriteLine(LogKind.Info, string.Format("  PointerSize: {0} ({1}-bit)", dataTarget.PointerSize, dataTarget.PointerSize == 8 ? 64 : 32));
             logger?.WriteLine(LogKind.Info, "  SymbolPath: " + dataTarget.GetSymbolPath());
 
             logger?.WriteLine(LogKind.Header, "\nClrRuntime Info:");
@@ -254,31 +254,32 @@ namespace BenchmarkDotNet.Diagnostics
             foreach (var module in runtime.EnumerateModules())
             {
                 logger?.WriteLine(LogKind.Info,
+                            string.Format(
                                   "  {0,36} Id:{1} - {2,10:N0} bytes @ 0x{3:X16}",
                                   Path.GetFileName(module.FileName),
                                   module.AssemblyId.ToString().PadRight(10),
                                   module.Size,
-                                  module.ImageBase);
+                                  module.ImageBase));
             }
 
             ClrHeap heap = runtime.GetHeap();
             logger?.WriteLine(LogKind.Header, "\nClrHeap Info:");
-            logger?.WriteLine(LogKind.Info, "  TotalHeapSize: {0:N0} bytes ({1:N2} MB)", heap.TotalHeapSize, heap.TotalHeapSize / 1024.0 / 1024.0);
-            logger?.WriteLine(LogKind.Info, "  Gen0: {0,10:N0} bytes", heap.GetSizeByGen(0));
-            logger?.WriteLine(LogKind.Info, "  Gen1: {0,10:N0} bytes", heap.GetSizeByGen(1));
-            logger?.WriteLine(LogKind.Info, "  Gen2: {0,10:N0} bytes", heap.GetSizeByGen(2));
-            logger?.WriteLine(LogKind.Info, "   LOH: {0,10:N0} bytes", heap.GetSizeByGen(3));
+            logger?.WriteLine(LogKind.Info, string.Format("  TotalHeapSize: {0:N0} bytes ({1:N2} MB)", heap.TotalHeapSize, heap.TotalHeapSize / 1024.0 / 1024.0));
+            logger?.WriteLine(LogKind.Info, string.Format("  Gen0: {0,10:N0} bytes", heap.GetSizeByGen(0)));
+            logger?.WriteLine(LogKind.Info, string.Format("  Gen1: {0,10:N0} bytes", heap.GetSizeByGen(1)));
+            logger?.WriteLine(LogKind.Info, string.Format("  Gen2: {0,10:N0} bytes", heap.GetSizeByGen(2)));
+            logger?.WriteLine(LogKind.Info, string.Format("   LOH: {0,10:N0} bytes", heap.GetSizeByGen(3)));
 
             logger?.WriteLine(LogKind.Info, "  Segments: " + heap.Segments.Count);
             foreach (var segment in heap.Segments)
             {
                 logger?.WriteLine(LogKind.Info,
-                                  "    Segment: {0,10:N0} bytes, {1,10}, Gen0: {2,10:N0} bytes, Gen1: {3,10:N0} bytes, Gen2: {4,10:N0} bytes",
+                                  string.Format("    Segment: {0,10:N0} bytes, {1,10}, Gen0: {2,10:N0} bytes, Gen1: {3,10:N0} bytes, Gen2: {4,10:N0} bytes",
                                   segment.Length,
                                   segment.IsLarge ? "Large" : (segment.IsEphemeral ? "Ephemeral" : "Unknown"),
                                   segment.Gen0Length,
                                   segment.Gen1Length,
-                                  segment.Gen2Length);
+                                  segment.Gen2Length));
             }
 
             logger?.WriteLine();

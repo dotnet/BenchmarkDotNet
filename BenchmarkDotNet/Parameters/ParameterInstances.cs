@@ -9,12 +9,15 @@ namespace BenchmarkDotNet.Parameters
         public int Count => Items.Count;
         public ParameterInstance this[int index] => Items[index];
 
+        private string printInfo;
+
         public ParameterInstances(IList<ParameterInstance> items)
         {
             Items = items;
         }
 
         public string FullInfo => string.Join("_", Items.Select(p => $"{p.Name}-{p.Value}"));
-        public string PrintInfo => string.Join("&", Items.Select(p => $"{p.Name}={p.Value}"));
+
+        public string PrintInfo => printInfo ?? (printInfo = string.Join("&", Items.Select(p => $"{p.Name}={p.Value}")));
     }
 }

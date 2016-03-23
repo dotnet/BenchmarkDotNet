@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 
 namespace BenchmarkDotNet.Loggers
@@ -12,18 +11,28 @@ namespace BenchmarkDotNet.Loggers
         private const ConsoleColor DefaultColor = ConsoleColor.Gray;
 
         private readonly Dictionary<LogKind, ConsoleColor> colorScheme;
-        private readonly CultureInfo cultureInfo;
 
-        public ConsoleLogger(Dictionary<LogKind, ConsoleColor> colorScheme = null, CultureInfo cultureInfo = null)
+        public ConsoleLogger(Dictionary<LogKind, ConsoleColor> colorScheme = null)
         {
             this.colorScheme = colorScheme ?? CreateColorfulScheme();
-            this.cultureInfo = cultureInfo ?? CultureInfo.InvariantCulture;
         }
 
-        public void Write(LogKind logKind, string format, params object[] args)
+        public void Write(LogKind logKind, string text)
         {
             Console.ForegroundColor = GetColor(logKind);
-            Console.Write(args.Length == 0 ? format : string.Format(cultureInfo, format, args));
+            Console.Write(text);
+            Console.ForegroundColor = DefaultColor;
+        }
+
+        public void WriteLine()
+        {
+            Console.WriteLine();
+        }
+
+        public void WriteLine(LogKind logKind, string text)
+        {
+            Console.ForegroundColor = GetColor(logKind);
+            Console.WriteLine(text);
             Console.ForegroundColor = DefaultColor;
         }
 
