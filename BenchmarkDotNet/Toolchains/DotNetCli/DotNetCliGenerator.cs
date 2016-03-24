@@ -6,11 +6,10 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.Classic;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
-    internal class DotNetCliGenerator : ClassicGenerator
+    internal class DotNetCliGenerator : GeneratorBase
     {
         private const string ProjectFileName = "project.json";
 

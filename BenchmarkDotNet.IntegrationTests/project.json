@@ -1,4 +1,4 @@
-﻿{
+{
   "title": "BenchmarkDotNet.IntegrationTests",
   "commands": {
     "test": "xunit.runner.dnx"
@@ -17,7 +17,8 @@
       },
       "frameworkAssemblies": {
         "System.Runtime": "4.0.0.0",
-        "System.Threading.Tasks": "4.0.0.0"
+        "System.Threading.Tasks": "4.0.0.0",
+        "WindowsBase": "4.0.0.0"
       }
     },
     "dnx451": {
@@ -26,7 +27,8 @@
       },
       "frameworkAssemblies": {
         "System.Runtime": "4.0.10.0",
-        "System.Threading.Tasks": "4.0.0.0"
+        "System.Threading.Tasks": "4.0.0.0",
+        "WindowsBase": "4.0.0.0"
       },
       "dependencies": {
         "BenchmarkDotNet.Diagnostics": "1.0.0-*",
