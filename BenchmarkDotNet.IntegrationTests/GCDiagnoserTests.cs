@@ -1,40 +1,28 @@
-﻿#if !CORE
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Diagnostics;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    [Config(typeof(ThroughputFastConfig))]
-    public class GCDiagnoserTests
+    internal class MultipleRuntimesConfig : ManualConfig
+    {
+        public MultipleRuntimesConfig()
+        {
+            Add(Job.Dry.With(Runtime.Clr).With(Jit.Host).With(Framework.V45).With(Mode.Throughput).WithTargetCount(1));
+            Add(Job.Dry.With(Runtime.Dnx).With(Jit.Host).With(Mode.Throughput).WithTargetCount(1));
+            Add(Job.Dry.With(Runtime.Core).With(Jit.Host).With(Mode.Throughput).WithTargetCount(1));
+        }
+    }
+
+    [Config(typeof(MultipleRuntimesConfig))]
+    public class ListEnumeratorsBenchmarks
     {
         private List<int> list;
-
-        [Fact]
-        public void Test()
-        {
-            var logger = new AccumulationLogger();
-            var gcDiagnoser = new GCDiagnoser();
-            var config = DefaultConfig.Instance.With(logger).With(gcDiagnoser);
-            var benchmarks = BenchmarkConverter.TypeToBenchmarks(typeof(GCDiagnoserTests), config);
-
-            var summary = BenchmarkRunner.Run(benchmarks, config);
-
-            var gcCollectionColumns = gcDiagnoser.GetColumns.OfType<GCDiagnoser.GCCollectionColumn>().ToArray();
-            var listStructEnumeratorBenchmark = benchmarks.Single(benchmark => benchmark.ShortInfo.Contains("ListStructEnumerator"));
-            var listObjectEnumeratorBenchmark = benchmarks.Single(benchmark => benchmark.ShortInfo.Contains("ListObjectEnumerator"));
-            const int gen0Index = 0;
-            var structEnumeratorGen0Collections = gcCollectionColumns[gen0Index].GetValue(summary, listStructEnumeratorBenchmark);
-            var objectEnumeratorGen0Collections = gcCollectionColumns[gen0Index].GetValue(summary, listObjectEnumeratorBenchmark);
-
-            Assert.Equal("-", structEnumeratorGen0Collections);
-            Assert.True(double.Parse(objectEnumeratorGen0Collections) > 0);
-        }
 
         [Setup]
         public void SetUp()
@@ -64,5 +52,44 @@ namespace BenchmarkDotNet.IntegrationTests
             return sum;
         }
     }
-}
+
+#if !CORE
+    // this class is not compiled for CORE because it is using Diagnosers that currently do not support Core
+    public class GCDiagnoserTests 
+    {
+        [Fact]
+        public void Test()
+        {
+            var logger = new AccumulationLogger();
+            var gcDiagnoser = new Diagnostics.GCDiagnoser();
+            var config = DefaultConfig.Instance.With(logger).With(gcDiagnoser);
+            var benchmarks = BenchmarkConverter.TypeToBenchmarks(typeof(ListEnumeratorsBenchmarks), config);
+
+            var summary = BenchmarkRunner.Run(benchmarks, config);
+
+            var gcCollectionColumns = gcDiagnoser.GetColumns.OfType<Diagnostics.GCDiagnoser.GCCollectionColumn>().ToArray();
+            var listStructEnumeratorBenchmarks = benchmarks.Where(benchmark => benchmark.ShortInfo.Contains("ListStructEnumerator"));
+            var listObjectEnumeratorBenchmarks = benchmarks.Where(benchmark => benchmark.ShortInfo.Contains("ListObjectEnumerator"));
+            const int gen0Index = 0;
+
+            foreach (var listStructEnumeratorBenchmark in listStructEnumeratorBenchmarks)
+            {
+                var structEnumeratorGen0Collections = gcCollectionColumns[gen0Index].GetValue(
+                    summary,
+                    listStructEnumeratorBenchmark);
+
+                Assert.Equal("-", structEnumeratorGen0Collections);
+            }
+
+            foreach (var listObjectEnumeratorBenchmark in listObjectEnumeratorBenchmarks)
+            {
+                var objectEnumeratorGen0Collections = gcCollectionColumns[gen0Index].GetValue(
+                    summary,
+                    listObjectEnumeratorBenchmark);
+
+                Assert.True(double.Parse(objectEnumeratorGen0Collections) > 0);
+            }
+        }
+    }
 #endif
+}
