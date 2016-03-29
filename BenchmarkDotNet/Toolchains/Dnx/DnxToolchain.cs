@@ -1,4 +1,7 @@
 ﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Classic;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 
@@ -19,6 +22,17 @@ namespace BenchmarkDotNet.Toolchains.Dnx
                   new DotNetCliBuilder(TargetFrameworkMoniker), 
                   new ClassicExecutor())
         {
+        }
+
+        public override bool IsSupported(Benchmark benchmark, ILogger logger)
+        {
+            if (!EnvironmentInfo.GetCurrent().IsDotNetCliInstalled())
+            {
+                logger.WriteLineError($"BenchmarkDotNet requires dotnet cli toolchain to be installed, benchmark {benchmark.ShortInfo} will not be executed");
+                return false;
+            }
+
+            return true;
         }
     }
 }

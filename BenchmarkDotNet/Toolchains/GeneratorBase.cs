@@ -148,7 +148,7 @@ namespace BenchmarkDotNet.Toolchains
         private void GenerateAppConfigFile(string projectDir, IJob job)
         {
             var useLagacyJit = job.Jit == Jit.RyuJit
-                || (job.Jit == Jit.Host && EnvironmentHelper.GetCurrentInfo().HasRyuJit)
+                || (job.Jit == Jit.Host && EnvironmentInfo.GetCurrent().HasRyuJit)
                 ? "0"
                 : "1";
 

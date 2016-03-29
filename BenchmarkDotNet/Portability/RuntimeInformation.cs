@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
 #if !CORE
@@ -111,6 +112,41 @@ namespace BenchmarkDotNet.Portability
                     .Select(module => Path.GetFileNameWithoutExtension(module.FileName) + "-v" + module.FileVersionInfo.ProductVersion));
 #endif
             return "?"; // TODO: verify if it is possible to get this for CORE
+        }
+
+        internal static bool HasRyuJit()
+        {
+            return !RuntimeInformation.IsMono()
+                && IntPtr.Size == 8
+                && GetConfiguration() != "DEBUG"
+                && !new JitHelper().IsMsX64();
+        }
+
+        internal static string GetConfiguration()
+        {
+#if DEBUG
+            return "DEBUG";
+#elif RELEASE
+            return "RELEASE";
+#endif
+        }
+
+        // See http://aakinshin.net/en/blog/dotnet/jit-version-determining-in-runtime/
+        private class JitHelper
+        {
+            private int bar;
+
+            public bool IsMsX64(int step = 1)
+            {
+                var value = 0;
+                for (int i = 0; i < step; i++)
+                {
+                    bar = i + 10;
+                    for (int j = 0; j < 2 * step; j += step)
+                        value = j + 10;
+                }
+                return value == 20 + step;
+            }
         }
     }
 }

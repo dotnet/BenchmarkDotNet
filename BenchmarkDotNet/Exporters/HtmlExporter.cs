@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Exporters
         {
             logger.Write("<pre><code>");
             logger.WriteLine();
-            foreach (var infoLine in EnvironmentHelper.GetCurrentInfo().ToFormattedString("Host"))
+            foreach (var infoLine in EnvironmentInfo.GetCurrent().ToFormattedString("Host", true))
             {
                 logger.WriteLine(infoLine);
             }

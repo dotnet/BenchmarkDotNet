@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Analyzers
 
         public IEnumerable<IWarning> Analyze(Summary summary)
         {
-            var hostInfo = summary.HostEnvironmentHelper;
+            var hostInfo = summary.HostEnvironmentInfo;
             if (hostInfo.HasAttachedDebugger)
                 yield return new Warning("AttachedDebugger", "Benchmark was executed with attached debugger.", null);
             if (hostInfo.Configuration.EqualsWithIgnoreCase("DEBUG"))

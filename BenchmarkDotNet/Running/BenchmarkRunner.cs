@@ -83,7 +83,7 @@ namespace BenchmarkDotNet.Running
             }
             var clockSpan = globalChronometer.Stop();
 
-            var summary = new Summary(title, reports, EnvironmentHelper.GetCurrentInfo(), config, currentDirectory, clockSpan.GetTimeSpan());
+            var summary = new Summary(title, reports, EnvironmentInfo.GetCurrent(), config, currentDirectory, clockSpan.GetTimeSpan());
 
             logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
             logger.WriteLine();

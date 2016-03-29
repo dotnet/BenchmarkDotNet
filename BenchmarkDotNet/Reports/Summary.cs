@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Reports
         public Benchmark[] Benchmarks { get; }
         public IDictionary<Benchmark, BenchmarkReport> Reports { get; }
         public TimeUnit TimeUnit { get; private set; }
-        public EnvironmentHelper HostEnvironmentHelper { get; }
+        public EnvironmentInfo HostEnvironmentInfo { get; }
         public IConfig Config { get; }
         public string CurrentDirectory { get; }
         public SummaryTable Table { get; }
@@ -24,10 +24,10 @@ namespace BenchmarkDotNet.Reports
         private Dictionary<IJob, string> ShortInfos { get; }
         private Lazy<IJob[]> Jobs { get; }
 
-        public Summary(string title, IList<BenchmarkReport> reports, EnvironmentHelper hostEnvironmentHelper, IConfig config, string currentDirectory, TimeSpan totalTime)
+        public Summary(string title, IList<BenchmarkReport> reports, EnvironmentInfo hostEnvironmentInfo, IConfig config, string currentDirectory, TimeSpan totalTime)
         {
             Title = title;
-            HostEnvironmentHelper = hostEnvironmentHelper;
+            HostEnvironmentInfo = hostEnvironmentInfo;
             Config = config;
             CurrentDirectory = currentDirectory;
             TotalTime = totalTime;

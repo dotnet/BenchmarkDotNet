@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using BenchmarkDotNet.Helpers;
+﻿using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Horology
 {
@@ -18,7 +17,7 @@ namespace BenchmarkDotNet.Horology
 
         static Chronometer()
         {
-            if (EnvironmentHelper.IsWindows() && WindowsClock.IsAvailable)
+            if (RuntimeInformation.IsWindows() && WindowsClock.IsAvailable)
                 BestClock = WindowsClock;
             else
                 BestClock = Stopwatch;

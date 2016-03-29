@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -14,7 +13,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         private const string OutputDirectory = "binaries";
 
-        private static readonly int DefaultTimeout = (int)TimeSpan.FromMinutes(2).TotalMilliseconds;
+        private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMinutes(2);
 
         private string Framework { get; }
 
@@ -29,15 +28,20 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// </summary>
         public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark)
         {
-            if (!ExecuteCommand("restore --fallbacksource https://dotnet.myget.org/F/dotnet-core/api/v3/index.json", generateResult.DirectoryPath, logger))
+            if (!DotNetCliCommandExecutor.ExecuteCommand(
+                "restore --fallbacksource https://dotnet.myget.org/F/dotnet-core/api/v3/index.json", 
+                generateResult.DirectoryPath, 
+                logger, 
+                DefaultTimeout))
             {
                 return new BuildResult(generateResult, false, new Exception("dotnet restore has failed"), null);
             }
 
-            if (!ExecuteCommand(
+            if (!DotNetCliCommandExecutor.ExecuteCommand(
                 $"build --framework {Framework} --configuration {Configuration} --output {OutputDirectory}", 
                 generateResult.DirectoryPath, 
-                logger))
+                logger,
+                DefaultTimeout))
             {
                 // dotnet cli could have succesfully builded the program, but returned 1 as exit code because it had some warnings
                 // so we need to check whether the exe exists or not, if it does then it is OK
@@ -53,42 +57,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return new BuildResult(generateResult, true, null, BuildExecutablePath(generateResult, benchmark));
         }
 
-        private static bool ExecuteCommand(string commandWithArguments, string workingDirectory, ILogger logger)
-        {
-            using (var process = new Process { StartInfo = BuildStartInfo(workingDirectory, commandWithArguments)})
-            {
-                using (new AsynchronousProcessOutputLogger(logger, process))
-                {
-                    process.Start();
-
-                    // don't forget to call, otherwise logger will not get any events
-                    process.BeginErrorReadLine();
-#if DEBUG
-                    process.BeginOutputReadLine();
-#endif
-
-                    process.WaitForExit(DefaultTimeout);
-
-                    return process.ExitCode <= 0;
-                }
-            }
-        }
-
-        private static ProcessStartInfo BuildStartInfo(string workingDirectory, string arguments)
-        {
-            return new ProcessStartInfo
-            {
-                FileName = "dotnet",
-                WorkingDirectory = workingDirectory,
-                Arguments = arguments,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-#if DEBUG
-                RedirectStandardOutput = true,
-#endif
-                RedirectStandardError = true
-            };
-        }
+        
 
         /// <summary>
         /// we use custom output path in order to avoid any future problems related to dotnet cli paths changing

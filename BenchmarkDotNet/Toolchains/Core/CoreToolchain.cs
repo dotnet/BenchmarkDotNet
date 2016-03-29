@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Jobs;
+﻿using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Classic;
@@ -25,6 +26,12 @@ namespace BenchmarkDotNet.Toolchains.Core
 
         public override bool IsSupported(Benchmark benchmark, ILogger logger)
         {
+            if (!EnvironmentInfo.GetCurrent().IsDotNetCliInstalled())
+            {
+                logger.WriteLineError($"BenchmarkDotNet requires dotnet cli toolchain to be installed, benchmark {benchmark.ShortInfo} will not be executed");
+                return false;
+            }
+
             if (benchmark.Job.Platform == Platform.X86)
             {
                 logger.WriteLineError($"Currently dotnet cli toolchain supports only X64 compilation, benchmark {benchmark.ShortInfo} will not be executed");

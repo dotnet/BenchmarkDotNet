@@ -5,9 +5,9 @@ using System.Linq;
 using System.Threading;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 
@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 CreateNoWindow = true,
                 WorkingDirectory = workingDirectory
             };
-            var runtime = benchmark.Job.Runtime == Runtime.Host ? EnvironmentHelper.GetCurrentRuntime() : benchmark.Job.Runtime;
+            var runtime = benchmark.Job.Runtime == Runtime.Host ? RuntimeInformation.GetCurrent() : benchmark.Job.Runtime;
             switch (runtime)
             {
                 case Runtime.Clr:
