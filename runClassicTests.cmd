@@ -21,7 +21,21 @@ call build/batchcopy.cmd "%USERPROFILE%/.dnx/packages/xunit.assert/2.1.0/lib/por
 echo -----------------------------
 echo Copying files ended
 
-echo Running Tests
+echo Running Tests for .NET 4.5
 echo -----------------------------
 
 call "testsOutput/xunit.console.exe" "testsOutput/BenchmarkDotNet.Tests.dll" "testsOutput/BenchmarkDotNet.IntegrationTests.dll" "testsOutput/BenchmarkDotNet.IntegrationTests.Classic.exe"
+
+if NOT %ERRORLEVEL% == 0 (
+    echo .NET 4.5 tests has failed
+    goto end
+)
+
+echo Running Tests for .NET 4.6
+echo -----------------------------
+
+call build/batchcopy.cmd "artifacts/bin/BenchmarkDotNet/Release/net46/*.*" "testsOutput"
+
+call "testsOutput/xunit.console.exe" "testsOutput/BenchmarkDotNet.Tests.dll" "testsOutput/BenchmarkDotNet.IntegrationTests.dll" "testsOutput/BenchmarkDotNet.IntegrationTests.Classic.exe"
+
+:end

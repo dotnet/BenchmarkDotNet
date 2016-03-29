@@ -38,6 +38,17 @@
         "System.Management": "4.0.0.0"
       }
     },
+    "net46": {
+      "compilationOptions": {
+        "define": [ "CLASSIC" ]
+      },
+      "frameworkAssemblies": {
+        "Microsoft.Build": "14.0.0.0",
+        "Microsoft.Build.Framework": "14.0.0.0",
+        "Microsoft.Build.Utilities.Core": "14.0.0.0",
+        "System.Management": "4.0.0.0"
+      }
+    },
     "dnx451": {
       "compilationOptions": {
         "define": [ "DNX" ]
