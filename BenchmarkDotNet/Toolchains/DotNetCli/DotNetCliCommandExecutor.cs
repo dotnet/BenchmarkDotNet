@@ -24,6 +24,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
                 var output = process.StandardOutput.ReadToEnd();
 
+                process.WaitForExit();
+
                 // first line contains something like ".NET Command Line Tools (1.0.0-beta-001603)"
                 return Regex.Split(output, Environment.NewLine, RegexOptions.Compiled)
                     .FirstOrDefault(line => !string.IsNullOrEmpty(line));

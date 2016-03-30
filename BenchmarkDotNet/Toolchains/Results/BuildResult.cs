@@ -8,8 +8,8 @@ namespace BenchmarkDotNet.Toolchains.Results
         public Exception BuildException { get; }
         public string ExecutablePath { get; }
 
-        public BuildResult(GenerateResult generateResult, bool isBuildSuccess, Exception buildException, string executablePath) :
-            base(generateResult.DirectoryPath, generateResult.IsGenerateSuccess, generateResult.GenerateException)
+        public BuildResult(GenerateResult generateResult, bool isBuildSuccess, Exception buildException, string executablePath) 
+            : base(generateResult.DirectoryPath, generateResult.IsGenerateSuccess, generateResult.GenerateException)
         {
             IsBuildSuccess = isBuildSuccess;
             BuildException = buildException;

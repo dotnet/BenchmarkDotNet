@@ -52,11 +52,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             File.WriteAllText(projectJsonFilePath, content);
         }
 
-        protected override void GenerateProjectBuildFile(string projectDir)
-        {
-            // do nothing on purpose, we do not need bat file
-        }
-
         private static string SetPlatform(string template, string platform)
         {
             return template.Replace("$PLATFORM$", platform);

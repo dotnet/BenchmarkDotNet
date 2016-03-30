@@ -46,13 +46,6 @@ namespace BenchmarkDotNet.Toolchains.Classic
             File.WriteAllText(fileName, content);
         }
 
-        protected override void GenerateProjectBuildFile(string projectDir)
-        {
-            var content = ResourceHelper.LoadTemplate("BuildBenchmark.txt");
-            string fileName = Path.Combine(projectDir, "BuildBenchmark.bat");
-            File.WriteAllText(fileName, content);
-        }
-
         private string GetTargetFrameworkVersion(Benchmark benchmark)
         {
             if (benchmark.Job.Framework != Framework.Host) 

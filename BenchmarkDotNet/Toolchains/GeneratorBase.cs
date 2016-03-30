@@ -23,7 +23,6 @@ namespace BenchmarkDotNet.Toolchains
 
             GenerateProgramFile(result.DirectoryPath, benchmark);
             GenerateProjectFile(logger, result.DirectoryPath, benchmark);
-            GenerateProjectBuildFile(result.DirectoryPath);
             GenerateAppConfigFile(result.DirectoryPath, benchmark.Job);
 
             return result;
@@ -32,8 +31,6 @@ namespace BenchmarkDotNet.Toolchains
         protected abstract string GetDirectoryPath(Benchmark benchmark);
 
         protected abstract void GenerateProjectFile(ILogger logger, string projectDir, Benchmark benchmark);
-
-        protected abstract void GenerateProjectBuildFile(string projectDir);
 
         private GenerateResult CreateProjectDirectory(Benchmark benchmark)
         {
