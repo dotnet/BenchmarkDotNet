@@ -25,9 +25,9 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 "System.Xml"
             });
 
-        protected override string GetDirectoryPath(Benchmark benchmark)
+        protected override string GetBinariesDirectoryPath(Benchmark benchmark, string rootArtifactsFolderPath)
         {
-            return Path.Combine(Directory.GetCurrentDirectory(), benchmark.ShortInfo);
+            return Path.Combine(rootArtifactsFolderPath, "bin", benchmark.ShortInfo);
         }
 
         protected override void GenerateProjectFile(ILogger logger, string projectDir, Benchmark benchmark)

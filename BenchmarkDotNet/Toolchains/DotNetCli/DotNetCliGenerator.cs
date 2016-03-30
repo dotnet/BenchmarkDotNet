@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// we are limited by xprojs (by default compiles all .cs files in all subfolders, Program.cs could be doubled and fail the build)
         /// and also by nuget internal implementation like looking for global.json file in parent folders
         /// </summary>
-        protected override string GetDirectoryPath(Benchmark benchmark)
+        protected override string GetBinariesDirectoryPath(Benchmark benchmark, string rootArtifactsFolderPath)
         {
             return Path.Combine(
                 new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.FullName, 

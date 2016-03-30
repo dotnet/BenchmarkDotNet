@@ -41,12 +41,14 @@ namespace BenchmarkDotNet.Running
             var title = GetTitle(benchmarks);
             EnsureNoMoreThanOneBaseline(benchmarks, title);
 
-            using (var logStreamWriter = Portability.StreamWriter.FromPath(title + ".log"))
+            var rootArtifactsFolderPath = GetRootArtifactsFolderPath();
+
+            using (var logStreamWriter = Portability.StreamWriter.FromPath(Path.Combine(rootArtifactsFolderPath, title + ".log")))
             {
                 var logger = new CompositeLogger(config.GetCompositeLogger(), new StreamLogger(logStreamWriter));
                 benchmarks = GetSupportedBenchmarks(benchmarks, logger);
 
-                var summary = Run(benchmarks, logger, title, config);
+                var summary = Run(benchmarks, logger, title, config, rootArtifactsFolderPath);
                 config.GetCompositeExporter().ExportToFiles(summary).ToArray();
                 return summary;
             }
@@ -61,9 +63,8 @@ namespace BenchmarkDotNet.Running
             return $"BenchmarkRun-{benchmarkRunIndex:##000}-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}";
         }
 
-        private static Summary Run(IList<Benchmark> benchmarks, ILogger logger, string title, IConfig config)
+        private static Summary Run(IList<Benchmark> benchmarks, ILogger logger, string title, IConfig config, string rootArtifactsFolderPath)
         {
-            var currentDirectory = Directory.GetCurrentDirectory();
             logger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
             logger.WriteLineInfo("// Found benchmarks:");
             foreach (var benchmark in benchmarks)
@@ -74,7 +75,7 @@ namespace BenchmarkDotNet.Running
             var reports = new List<BenchmarkReport>();
             foreach (var benchmark in benchmarks)
             {
-                var report = Run(benchmark, logger, config);
+                var report = Run(benchmark, logger, config, rootArtifactsFolderPath);
                 reports.Add(report);
                 if (report.GetResultRuns().Any())
                     logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr());
@@ -83,16 +84,16 @@ namespace BenchmarkDotNet.Running
             }
             var clockSpan = globalChronometer.Stop();
 
-            var summary = new Summary(title, reports, EnvironmentInfo.GetCurrent(), config, currentDirectory, clockSpan.GetTimeSpan());
+            var summary = new Summary(title, reports, EnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), clockSpan.GetTimeSpan());
 
             logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
             logger.WriteLine();
 
             logger.WriteLineHeader("// * Export *");
+            var currentDirectory = Directory.GetCurrentDirectory();
             foreach (var file in config.GetCompositeExporter().ExportToFiles(summary))
             {
-                var printedFile = file.StartsWith(currentDirectory) ? file.Substring(currentDirectory.Length).Trim('/', '\\') : file;
-                logger.WriteLineInfo($"  {printedFile}");
+                logger.WriteLineInfo($"  {file.Replace(currentDirectory, string.Empty).Trim('/', '\\')}");
             }
             logger.WriteLine();
 
@@ -140,14 +141,14 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineStatistic($"{message}: {hhMmSs} ({totalSecs})");
         }
 
-        private static BenchmarkReport Run(Benchmark benchmark, ILogger logger, IConfig config)
+        private static BenchmarkReport Run(Benchmark benchmark, ILogger logger, IConfig config, string rootArtifactsFolderPath)
         {
             var toolchain = Toolchain.GetToolchain(benchmark.Job.Runtime);
 
             logger.WriteLineHeader("// **************************");
             logger.WriteLineHeader("// Benchmark: " + benchmark.ShortInfo);
 
-            var generateResult = Generate(logger, toolchain, benchmark);
+            var generateResult = Generate(logger, toolchain, benchmark, rootArtifactsFolderPath);
             if (!generateResult.IsGenerateSuccess)
                 return new BenchmarkReport(benchmark, generateResult, null, null, null);
 
@@ -167,10 +168,10 @@ namespace BenchmarkDotNet.Running
             return new BenchmarkReport(benchmark, generateResult, buildResult, executeResults, runs);
         }
 
-        private static GenerateResult Generate(ILogger logger, IToolchain toolchain, Benchmark benchmark)
+        private static GenerateResult Generate(ILogger logger, IToolchain toolchain, Benchmark benchmark, string rootArtifactsFolderPath)
         {
             logger.WriteLineInfo("// *** Generate *** ");
-            var generateResult = toolchain.Generator.GenerateProject(benchmark, logger);
+            var generateResult = toolchain.Generator.GenerateProject(benchmark, logger, rootArtifactsFolderPath);
             if (generateResult.IsGenerateSuccess)
             {
                 logger.WriteLineInfo("// Result = Success");
@@ -273,6 +274,21 @@ namespace BenchmarkDotNet.Running
         private static IList<Benchmark> GetSupportedBenchmarks(IList<Benchmark> benchmarks, CompositeLogger logger)
         {
             return benchmarks.Where(benchmark => Toolchain.GetToolchain(benchmark.Job.Runtime).IsSupported(benchmark, logger)).ToArray();
+        }
+
+        private static string GetRootArtifactsFolderPath() => CombineAndCreate(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");
+
+        private static string GetResultsFolderPath(string rootArtifactsFolderPath) => CombineAndCreate(rootArtifactsFolderPath, "results");
+
+        private static string CombineAndCreate(string rootFolderPath, string childFolderName)
+        {
+            var path = Path.Combine(rootFolderPath, childFolderName);
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            return path;
         }
     }
 }

@@ -19,9 +19,9 @@ namespace BenchmarkDotNet.Toolchains
 
         public const string BuildBenchmarkScriptFileName = "BuildBenchmark.bat";
 
-        public GenerateResult GenerateProject(Benchmark benchmark, ILogger logger)
+        public GenerateResult GenerateProject(Benchmark benchmark, ILogger logger, string rootArtifactsFolderPath)
         {
-            var result = CreateProjectDirectory(benchmark);
+            var result = CreateProjectDirectory(benchmark, rootArtifactsFolderPath);
 
             GenerateProgramFile(result.DirectoryPath, benchmark);
             GenerateProjectFile(logger, result.DirectoryPath, benchmark);
@@ -31,15 +31,15 @@ namespace BenchmarkDotNet.Toolchains
             return result;
         }
 
-        protected abstract string GetDirectoryPath(Benchmark benchmark);
+        protected abstract string GetBinariesDirectoryPath(Benchmark benchmark, string rootArtifactsFolderPath);
 
         protected abstract void GenerateProjectFile(ILogger logger, string projectDir, Benchmark benchmark);
 
         protected abstract void GenerateProjectBuildFile(string scriptFilePath);
 
-        private GenerateResult CreateProjectDirectory(Benchmark benchmark)
+        private GenerateResult CreateProjectDirectory(Benchmark benchmark, string rootArtifactsFolderPath)
         {
-            var directoryPath = GetDirectoryPath(benchmark);
+            var directoryPath = GetBinariesDirectoryPath(benchmark, rootArtifactsFolderPath);
             bool exist = Directory.Exists(directoryPath);
             Exception deleteException = null;
             for (int attempt = 0; attempt < 3 && exist; attempt++)

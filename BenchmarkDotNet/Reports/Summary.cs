@@ -17,19 +17,19 @@ namespace BenchmarkDotNet.Reports
         public TimeUnit TimeUnit { get; private set; }
         public EnvironmentInfo HostEnvironmentInfo { get; }
         public IConfig Config { get; }
-        public string CurrentDirectory { get; }
+        public string ResultsDirectoryPath { get; }
         public SummaryTable Table { get; }
         public TimeSpan TotalTime { get; }
 
         private Dictionary<IJob, string> ShortInfos { get; }
         private Lazy<IJob[]> Jobs { get; }
 
-        public Summary(string title, IList<BenchmarkReport> reports, EnvironmentInfo hostEnvironmentInfo, IConfig config, string currentDirectory, TimeSpan totalTime)
+        public Summary(string title, IList<BenchmarkReport> reports, EnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime)
         {
             Title = title;
             HostEnvironmentInfo = hostEnvironmentInfo;
             Config = config;
-            CurrentDirectory = currentDirectory;
+            ResultsDirectoryPath = resultsDirectoryPath;
             TotalTime = totalTime;
 
             Reports = new Dictionary<Benchmark, BenchmarkReport>();

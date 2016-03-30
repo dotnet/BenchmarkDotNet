@@ -6,6 +6,6 @@ namespace BenchmarkDotNet.Toolchains
 {
     public interface IGenerator
     {
-        GenerateResult GenerateProject(Benchmark benchmark, ILogger logger);
+        GenerateResult GenerateProject(Benchmark benchmark, ILogger logger, string rootArtifactsFolderPath);
     }
 }

@@ -15,10 +15,13 @@ namespace BenchmarkDotNet.Exporters
 
         public IEnumerable<string> ExportToFiles(Summary summary)
         {
-            var fileName = $"{Path.Combine(summary.CurrentDirectory, summary.Title)}-{FileCaption}{FileNameSuffix}.{FileExtension}";
-            using (var stream = Portability.StreamWriter.FromPath(fileName))
+            var filePath = $"{Path.Combine(summary.ResultsDirectoryPath, summary.Title)}-{FileCaption}{FileNameSuffix}.{FileExtension}";
+            using (var stream = Portability.StreamWriter.FromPath(filePath))
+            {
                 ExportToLog(summary, new StreamLogger(stream));
-            yield return fileName;
+            }
+
+            return new [] { filePath };
         }
     }
 }
