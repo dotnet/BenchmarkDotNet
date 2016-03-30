@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
@@ -63,7 +62,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
             {
                 StartInfo =
                 {
-                    FileName = GenerateProjectBuildFile(generateResult.DirectoryPath), // let's wait with bat generation until it is not needed
+                    FileName = Path.Combine(generateResult.DirectoryPath, GeneratorBase.BuildBenchmarkScriptFileName),
                     WorkingDirectory = generateResult.DirectoryPath,
                     UseShellExecute = false,
                     RedirectStandardOutput = false,
@@ -73,15 +72,6 @@ namespace BenchmarkDotNet.Toolchains.Classic
             buildProcess.WaitForExit();
 
             return new BuildResult(generateResult, File.Exists(exeFilePath), null, exeFilePath);
-        }
-
-        private string GenerateProjectBuildFile(string projectDir)
-        {
-            var content = ResourceHelper.LoadTemplate("BuildBenchmark.txt");
-            string filePath = Path.Combine(projectDir, "BuildBenchmark.bat");
-            File.WriteAllText(filePath, content);
-
-            return filePath;
         }
     }
 }

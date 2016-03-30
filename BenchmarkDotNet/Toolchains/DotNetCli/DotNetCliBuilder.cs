@@ -9,6 +9,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     public class DotNetCliBuilder : IBuilder
     {
+        internal const string RestoreCommand = "restore --fallbacksource https://dotnet.myget.org/F/dotnet-core/api/v3/index.json";
+
         private const string Configuration = "RELEASE";
 
         private const string OutputDirectory = "binaries";
@@ -29,7 +31,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark)
         {
             if (!DotNetCliCommandExecutor.ExecuteCommand(
-                "restore --fallbacksource https://dotnet.myget.org/F/dotnet-core/api/v3/index.json", 
+                RestoreCommand, 
                 generateResult.DirectoryPath, 
                 logger, 
                 DefaultTimeout))
@@ -38,7 +40,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
 
             if (!DotNetCliCommandExecutor.ExecuteCommand(
-                $"build --framework {Framework} --configuration {Configuration} --output {OutputDirectory}", 
+                GetBuildCommand(Framework), 
                 generateResult.DirectoryPath, 
                 logger,
                 DefaultTimeout))
@@ -57,7 +59,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return new BuildResult(generateResult, true, null, BuildExecutablePath(generateResult, benchmark));
         }
 
-        
+        internal static string GetBuildCommand(string frameworkMoniker)
+        {
+            return $"build --framework {frameworkMoniker} --configuration {Configuration} --output {OutputDirectory}";
+        }
 
         /// <summary>
         /// we use custom output path in order to avoid any future problems related to dotnet cli paths changing

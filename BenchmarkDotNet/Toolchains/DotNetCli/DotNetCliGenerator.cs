@@ -52,6 +52,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             File.WriteAllText(projectJsonFilePath, content);
         }
 
+        protected override void GenerateProjectBuildFile(string scriptFilePath)
+        {
+            var content = $@"call dotnet {DotNetCliBuilder.RestoreCommand}{Environment.NewLine}call dotnet {DotNetCliBuilder.GetBuildCommand(TargetFrameworkMoniker)}";
+            File.WriteAllText(scriptFilePath, content);
+        }
+
         private static string SetPlatform(string template, string platform)
         {
             return template.Replace("$PLATFORM$", platform);

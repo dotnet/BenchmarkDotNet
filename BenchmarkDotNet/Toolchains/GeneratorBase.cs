@@ -17,12 +17,15 @@ namespace BenchmarkDotNet.Toolchains
     {
         public const string MainClassName = "Program";
 
+        public const string BuildBenchmarkScriptFileName = "BuildBenchmark.bat";
+
         public GenerateResult GenerateProject(Benchmark benchmark, ILogger logger)
         {
             var result = CreateProjectDirectory(benchmark);
 
             GenerateProgramFile(result.DirectoryPath, benchmark);
             GenerateProjectFile(logger, result.DirectoryPath, benchmark);
+            GenerateProjectBuildFile(Path.Combine(result.DirectoryPath, BuildBenchmarkScriptFileName));
             GenerateAppConfigFile(result.DirectoryPath, benchmark.Job);
 
             return result;
@@ -31,6 +34,8 @@ namespace BenchmarkDotNet.Toolchains
         protected abstract string GetDirectoryPath(Benchmark benchmark);
 
         protected abstract void GenerateProjectFile(ILogger logger, string projectDir, Benchmark benchmark);
+
+        protected abstract void GenerateProjectBuildFile(string scriptFilePath);
 
         private GenerateResult CreateProjectDirectory(Benchmark benchmark)
         {
