@@ -49,14 +49,14 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Program.fs" />
-    <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj">
-      <Name>BenchmarkDotNet</Name>
-      <Project>{0f20fa04-52d8-4db9-8b39-909125396a87}</Project>
-      <Private>True</Private>
-    </ProjectReference>
+    <Reference Include="BenchmarkDotNet" Condition="'$(Configuration)'=='Release'">
+      <HintPath>..\artifacts\bin\BenchmarkDotNet\Release\net45\BenchmarkDotNet.dll</HintPath>
+    </Reference>
+    <Reference Include="BenchmarkDotNet" Condition="'$(Configuration)'=='Debug'">
+      <HintPath>..\artifacts\bin\BenchmarkDotNet\Debug\net45\BenchmarkDotNet.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>

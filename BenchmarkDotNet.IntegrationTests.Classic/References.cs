@@ -11,6 +11,12 @@ namespace BenchmarkDotNet.IntegrationTests.Classic
     public class References
     {
         [Fact]
+        public void FSharpIsSupported()
+        {
+            CanCompileAndRun<FSharpBenchmark.Db>();
+        }
+
+        [Fact]
         public void BenchmarksThatUseTypeFromCustomPathDllAreSupported()
         {
             CanCompileAndRun<BenchmarksThatUseTypeFromCustomPathDll>();
@@ -48,6 +54,7 @@ namespace BenchmarkDotNet.IntegrationTests.Classic
             internal SingleRunFastConfig()
             {
                 Add(Job.Dry);
+                Add(Loggers.ConsoleLogger.Default);
             }
         }
     }

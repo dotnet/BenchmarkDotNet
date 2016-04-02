@@ -81,6 +81,10 @@
       <Project>{19411154-3ac9-4689-bc2e-9646121ed63d}</Project>
       <Name>BenchmarkDotNet.IntegrationTests.DifferentRuntime</Name>
     </ProjectReference>
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.FSharp\BenchmarkDotNet.IntegrationTests.FSharp.fsproj">
+      <Project>{367fafe1-a1c8-4aa1-9334-f4762e128dbb}</Project>
+      <Name>BenchmarkDotNet.IntegrationTests.FSharp</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -1,0 +1,32 @@
+{
+  "version": "1.0.0-*",
+
+  "compilationOptions": {
+    "emitEntryPoint": true,
+    "allowUnsafe": true,
+    "optimize": true
+  },
+
+  "compilerName": "fsc",
+  "compileFiles": [
+    "AssemblyInfo.fs",
+    "Program.fs"
+  ],
+
+  "commands": {
+    "run": "BenchmarkDotNet.Samples.FSharp"
+  },
+
+  "dependencies": {
+    "BenchmarkDotNet": {
+      "target": "package",
+      "version": "0.9.4-beta"
+    },
+    "Microsoft.FSharp.Core.netcore": "1.0.0-alpha-151221",
+    "NETStandard.Library": "1.0.0-rc2-23811"
+  },
+
+  "frameworks": {
+    "dnxcore50": { }
+  }
+}

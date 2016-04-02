@@ -1,6 +1,5 @@
 ﻿module FSharpBenchmark
 
-open Xunit
 open BenchmarkDotNet.Attributes
 open BenchmarkDotNet.Running
 open System.Threading
@@ -25,10 +24,3 @@ type Db() =
         printfn "// ### F# Benchmark method called ###"
         Thread.Sleep(50)
         createDoc("Testing")
-
-type FSharpTests() =
-
-    [<Fact>]
-    let ShouldExecuteBenchmark() = 
-        let reports = BenchmarkRunner.Run<Db>()
-        ()
