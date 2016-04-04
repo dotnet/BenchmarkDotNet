@@ -128,5 +128,36 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(12.34974, summary.ConfidenceInterval.Lower, 4);
             Assert.Equal(18.65026, summary.ConfidenceInterval.Upper, 4);
         }
+
+        [Fact]
+        public void PercentileValuesTest()
+        {
+            var summary = new Statistics(Enumerable.Range(1, 30));
+            Print(summary);
+            Assert.Equal(1, summary.Percentiles.P0);
+            Assert.Equal(8.25, summary.Percentiles.P25);
+            Assert.Equal(15.5, summary.Percentiles.P50);
+            Assert.Equal(20.3333, summary.Percentiles.P67, 4);
+            Assert.Equal(24.2, summary.Percentiles.P80, 4);
+            Assert.Equal(25.65, summary.Percentiles.P85);
+            Assert.Equal(27.1, summary.Percentiles.P90);
+            Assert.Equal(28.55, summary.Percentiles.P95, 4);
+            Assert.Equal(30, summary.Percentiles.P100);
+
+            var a = Enumerable.Range(1, 30);
+            var b = Enumerable.Concat(Enumerable.Repeat(0, 30), a);
+            var c = Enumerable.Concat(b, Enumerable.Repeat(31, 30));
+            summary = new Statistics(c);
+            Print(summary);
+            Assert.Equal(0, summary.Percentiles.P0);
+            Assert.Equal(0, summary.Percentiles.P25);
+            Assert.Equal(15.5, summary.Percentiles.P50);
+            Assert.Equal(30.3333, summary.Percentiles.P67, 4);
+            Assert.Equal(31, summary.Percentiles.P80);
+            Assert.Equal(31, summary.Percentiles.P85);
+            Assert.Equal(31, summary.Percentiles.P90);
+            Assert.Equal(31, summary.Percentiles.P95);
+            Assert.Equal(31, summary.Percentiles.P100);
+        }
     }
 }
