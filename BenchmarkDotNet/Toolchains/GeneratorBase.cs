@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Toolchains
     {
         public const string MainClassName = "Program";
 
-        public const string BuildBenchmarkScriptFileName = "BuildBenchmark.bat";
+        internal static string BuildBenchmarkScriptFileName => "BuildBenchmark" + RuntimeInformation.ScriptFileExtension;
 
         public GenerateResult GenerateProject(Benchmark benchmark, ILogger logger, string rootArtifactsFolderPath)
         {

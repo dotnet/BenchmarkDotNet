@@ -17,6 +17,8 @@ namespace BenchmarkDotNet.Portability
     {
         internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
 
+        internal static string ScriptFileExtension => IsWindows() ? ".bat" : ".sh";
+
         internal static bool IsWindows()
         {
 #if !CORE

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using Microsoft.Build.Evaluation;
@@ -32,9 +33,15 @@ namespace BenchmarkDotNet.Toolchains.Classic
 
                 return new BuildResult(generateResult, buildResult.OverallResult == BuildResultCode.Success, buildResult.Exception, executablePath);
             }
-            catch (FileNotFoundException msBuildDllNotFound)
+            catch (FileLoadException msBuildDllNotFound)
             {
                 logger.WriteLineInfo($"Unable to load {msBuildDllNotFound.FileName}");
+
+                return BuildWithBat(generateResult, logger, executablePath);
+            }
+            catch (FileNotFoundException msBuildDllNotFound)
+            {
+                logger.WriteLineInfo($"Unable to find {msBuildDllNotFound.FileName}");
 
                 return BuildWithBat(generateResult, logger, executablePath);
             }
@@ -56,7 +63,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
 
         private BuildResult BuildWithBat(GenerateResult generateResult, ILogger logger, string exeFilePath)
         {
-            logger.WriteLineInfo("Let's try to build it via BuildBenchmark.bat!");
+            logger.WriteLineInfo($"Let's try to build it via {GeneratorBase.BuildBenchmarkScriptFileName}!");
 
             var buildProcess = new Process
             {
