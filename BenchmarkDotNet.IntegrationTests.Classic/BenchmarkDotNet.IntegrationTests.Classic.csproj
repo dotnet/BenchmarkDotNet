@@ -85,6 +85,10 @@
       <Project>{367fafe1-a1c8-4aa1-9334-f4762e128dbb}</Project>
       <Name>BenchmarkDotNet.IntegrationTests.FSharp</Name>
     </ProjectReference>
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.VisualBasic\BenchmarkDotNet.IntegrationTests.VisualBasic.vbproj">
+      <Project>{d8803eca-4abf-45b8-bd1d-7c637416c448}</Project>
+      <Name>BenchmarkDotNet.IntegrationTests.VisualBasic</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

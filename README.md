@@ -11,7 +11,8 @@
 * Reports: markdown (default, github, stackoverflow), csv, html, plain text; png plots.
 * Advanced features: [Baseline](#baseline), [Params](#params)
 * Powerful diagnostics based on ETW events (currently, works only from source)
-* Supported: Full .NET Framework, Mono, Dnx451, DnxCore50 (in prerelease version)
+* Supported runtimes: Full .NET Framework, Mono, Dnx451, DnxCore50 (in prerelease version)
+* Supported languages: C#, F# (also on [.NET Core](https://github.com/PerfDotNet/BenchmarkDotNet/issues/135)) and Visual Basic
 
 ## Content
 

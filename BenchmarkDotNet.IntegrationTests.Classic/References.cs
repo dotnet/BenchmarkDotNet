@@ -17,6 +17,12 @@ namespace BenchmarkDotNet.IntegrationTests.Classic
         }
 
         [Fact]
+        public void VisualBasicIsSupported()
+        {
+            CanCompileAndRun<VisualBasic.Sample>();
+        }
+
+        [Fact]
         public void BenchmarksThatUseTypeFromCustomPathDllAreSupported()
         {
             CanCompileAndRun<BenchmarksThatUseTypeFromCustomPathDll>();
