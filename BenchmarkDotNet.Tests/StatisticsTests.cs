@@ -137,7 +137,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(1, summary.Percentiles.P0);
             Assert.Equal(8.25, summary.Percentiles.P25);
             Assert.Equal(15.5, summary.Percentiles.P50);
-            Assert.Equal(20.3333, summary.Percentiles.P67, 4);
+            Assert.Equal(20.43, summary.Percentiles.P67, 4);
             Assert.Equal(24.2, summary.Percentiles.P80, 4);
             Assert.Equal(25.65, summary.Percentiles.P85);
             Assert.Equal(27.1, summary.Percentiles.P90);
@@ -152,7 +152,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(0, summary.Percentiles.P0);
             Assert.Equal(0, summary.Percentiles.P25);
             Assert.Equal(15.5, summary.Percentiles.P50);
-            Assert.Equal(30.3333, summary.Percentiles.P67, 4);
+            Assert.Equal(30.63, summary.Percentiles.P67, 4);
             Assert.Equal(31, summary.Percentiles.P80);
             Assert.Equal(31, summary.Percentiles.P85);
             Assert.Equal(31, summary.Percentiles.P90);

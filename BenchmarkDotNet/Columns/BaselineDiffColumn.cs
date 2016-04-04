@@ -17,20 +17,22 @@ namespace BenchmarkDotNet.Columns
 
         public static readonly IColumn Delta = new BaselineDiffColumn(DiffKind.Delta);
         public static readonly IColumn Scaled = new BaselineDiffColumn(DiffKind.Scaled);
-        public static readonly IColumn Scaled50 = new BaselineDiffColumn(DiffKind.Scaled, PercentileLevel.P50);
-        public static readonly IColumn Scaled85 = new BaselineDiffColumn(DiffKind.Scaled, PercentileLevel.P85);
-        public static readonly IColumn Scaled95 = new BaselineDiffColumn(DiffKind.Scaled, PercentileLevel.P95);
+        public static readonly IColumn Scaled50 = new BaselineDiffColumn(DiffKind.Scaled, 50);
+        public static readonly IColumn Scaled85 = new BaselineDiffColumn(DiffKind.Scaled, 85);
+        public static readonly IColumn Scaled95 = new BaselineDiffColumn(DiffKind.Scaled, 95);
 
         public DiffKind Kind { get; set; }
-        public PercentileLevel? Percentile { get; set; }
+        public int? Percentile { get; set; }
 
-        private BaselineDiffColumn(DiffKind kind, PercentileLevel? percentile = null)
+        private BaselineDiffColumn(DiffKind kind, int? percentile = null)
         {
             Kind = kind;
             Percentile = percentile;
         }
 
-        public string ColumnName => Kind.ToString() + Percentile?.ToString();
+        public string ColumnName => Percentile == null ?
+            Kind.ToString() :
+            Kind.ToString() + "P" + Percentile?.ToString();
 
         public string GetValue(Summary summary, Benchmark benchmark)
         {
@@ -59,10 +61,10 @@ namespace BenchmarkDotNet.Columns
                 case DiffKind.Delta:
                     if (benchmark.Target.Baseline)
                         return "Baseline";
-                    var diff = (currentMetric - baselineMetric)/baselineMetric*100.0;
+                    var diff = (currentMetric - baselineMetric) / baselineMetric * 100.0;
                     return diff.ToStr("N1") + "%";
                 case DiffKind.Scaled:
-                    var scale = currentMetric/baselineMetric;
+                    var scale = currentMetric / baselineMetric;
                     return scale.ToStr("N2");
                 default:
                     return "?";

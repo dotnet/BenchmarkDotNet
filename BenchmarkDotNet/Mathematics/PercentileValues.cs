@@ -6,29 +6,6 @@ using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Mathematics
 {
-    public enum PercentileLevel : int
-    {
-        P0 = 0,
-        P25 = 25,
-        P50 = 50,
-        P67 = 67,
-        P80 = 80,
-        P85 = 85,
-        P90 = 90,
-        P95 = 95,
-        P100 = 100
-    }
-
-    public static class PercentileLevelExtensions
-    {
-        public static double ToRatio(this PercentileLevel level)
-        {
-            return level == PercentileLevel.P67 ?
-                 2.0 / 3.0 :
-                 (int)level / 100.0;
-        }
-    }
-
     public class PercentileValues
     {
         /// <summary>
@@ -40,18 +17,18 @@ namespace BenchmarkDotNet.Mathematics
         /// And it's a good idea to have same results from all tools being used.
         /// </remarks>
         /// <param name="values">Sequence of the values to be calculated</param>
-        /// <param name="percentileRatio">Value in range 0.0..1.0</param>
+        /// <param name="percentile">Value in range 0..100</param>
         /// <returns>Percentile from the set of values</returns>
         // BASEDON: http://stackoverflow.com/a/8137526
-        private static double Percentile(List<double> sortedValues, double percentileRatio)
+        private static double Percentile(List<double> sortedValues, int percentile)
         {
             if (sortedValues == null)
                 throw new ArgumentNullException(nameof(sortedValues));
-            if (percentileRatio < 0 || percentileRatio > 1)
+            if (percentile < 0 || percentile > 100)
             {
                 throw new ArgumentOutOfRangeException(
-                     nameof(percentileRatio), percentileRatio,
-                     "The percentileRatio arg should be in range of 0.0 - 1.0.");
+                     nameof(percentile), percentile,
+                     "The percentile arg should be in range of 0 - 100.");
             }
 
             if (sortedValues.Count == 0)
@@ -60,7 +37,7 @@ namespace BenchmarkDotNet.Mathematics
             // DONTTOUCH: the following code was taken from http://stackoverflow.com/a/8137526 and it is proven
             // to work in the same way the excel's counterpart does.
             // So it's better to leave it as it is unless you do not want to reimplement it from scratch:)
-            double realIndex = percentileRatio * (sortedValues.Count - 1);
+            double realIndex = percentile / 100.0 * (sortedValues.Count - 1);
             int index = (int)realIndex;
             double frac = realIndex - index;
             if (index + 1 < sortedValues.Count)
@@ -69,8 +46,7 @@ namespace BenchmarkDotNet.Mathematics
                 return sortedValues[index];
         }
 
-        public double Percentile(double ratio) => Percentile(SortedValues, ratio);
-        public double Percentile(PercentileLevel percentileLevel) => Percentile(SortedValues, percentileLevel.ToRatio());
+        public double Percentile(int percentile) => Percentile(SortedValues, percentile);
 
         private List<double> SortedValues { get; }
 
@@ -87,16 +63,17 @@ namespace BenchmarkDotNet.Mathematics
         internal PercentileValues(List<double> sortedValues)
         {
             SortedValues = sortedValues;
+
             // TODO: Collect all in one call?
-            P0 = Percentile(PercentileLevel.P0);
-            P25 = Percentile(PercentileLevel.P25);
-            P50 = Percentile(PercentileLevel.P50);
-            P67 = Percentile(PercentileLevel.P67);
-            P80 = Percentile(PercentileLevel.P80);
-            P85 = Percentile(PercentileLevel.P85);
-            P90 = Percentile(PercentileLevel.P90);
-            P95 = Percentile(PercentileLevel.P95);
-            P100 = Percentile(PercentileLevel.P100);
+            P0 = Percentile(0);
+            P25 = Percentile(25);
+            P50 = Percentile(50);
+            P67 = Percentile(67);
+            P80 = Percentile(80);
+            P85 = Percentile(85);
+            P90 = Percentile(90);
+            P95 = Percentile(95);
+            P100 = Percentile(100);
         }
 
         public string ToStr(bool showLevel = true) => $"[.95: {P95.ToStr()}] (0: {P0.ToStr()}]; .5: {P50.ToStr()}; 1: {P100.ToStr()})";
