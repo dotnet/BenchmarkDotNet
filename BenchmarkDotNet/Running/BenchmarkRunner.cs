@@ -232,7 +232,7 @@ namespace BenchmarkDotNet.Running
                 if (measurements.Count() == 0)
                 {
                     // Something went wrong during the benchmark, don't bother doing more runs
-                    logger.WriteLineError($"No more Benchmark runs will be launched as NO measurments were obtained from the previous run!");
+                    logger.WriteLineError($"No more Benchmark runs will be launched as NO measurements were obtained from the previous run!");
                     break;
                 }
 
