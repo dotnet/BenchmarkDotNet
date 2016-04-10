@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 {
                     process.Start();
                 }
-                catch (Win32Exception dotNetCliNotInstalled)
+                catch (Win32Exception) // dotnet cli is not installed
                 {
                     return null;
                 }

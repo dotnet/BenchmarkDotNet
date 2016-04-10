@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Horology
                     QueryPerformanceFrequency(out frequency) && 
                     QueryPerformanceCounter(out counter);
             }
-            catch (Exception e)
+            catch
             {
                 isAvailable = false;
             }

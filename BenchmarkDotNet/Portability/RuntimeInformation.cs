@@ -112,8 +112,9 @@ namespace BenchmarkDotNet.Portability
                     .OfType<ProcessModule>()
                     .Where(module => module.ModuleName.Contains("jit"))
                     .Select(module => Path.GetFileNameWithoutExtension(module.FileName) + "-v" + module.FileVersionInfo.ProductVersion));
-#endif
+#else
             return "?"; // TODO: verify if it is possible to get this for CORE
+#endif
         }
 
         internal static bool HasRyuJit()
