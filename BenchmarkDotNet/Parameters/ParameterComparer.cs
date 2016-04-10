@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using BenchmarkDotNet.Parameters;
 
-namespace BenchmarkDotNet.Reports
+namespace BenchmarkDotNet.Parameters
 {
     internal class ParameterComparer : IComparer<ParameterInstances>
     {

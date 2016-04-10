@@ -15,8 +15,8 @@ namespace BenchmarkDotNet.IntegrationTests
             var summary = BenchmarkRunner.Run<ValuesReturnedByBenchmarkTest>();
 
             Assert.True(summary.Reports.Any());
-            Assert.True(summary.Reports.All(report => report.Value.ExecuteResults.All(executeResult => executeResult.FoundExecutable)));
-            Assert.True(summary.Reports.All(report => report.Value.AllMeasurements.Any()));
+            Assert.True(summary.Reports.All(report => report.ExecuteResults.All(executeResult => executeResult.FoundExecutable)));
+            Assert.True(summary.Reports.All(report => report.AllMeasurements.Any()));
         }
 
 #if !CORE

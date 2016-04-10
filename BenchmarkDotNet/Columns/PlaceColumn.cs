@@ -24,15 +24,15 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn ArabicNumber = new PlaceColumn(Kind.ArabicNumber);
         public static readonly IColumn Stars = new PlaceColumn(Kind.Stars);
 
-        private Kind kind;
+        private readonly Kind kind;
         public string ColumnName => "Place";
 
         public string GetValue(Summary summary, Benchmark benchmark)
         {
             var sortedBenchmarks = summary.Benchmarks.
-                OrderBy(b => summary.Reports[b].ResultStatistics.Mean).
+                OrderBy(b => summary[b].ResultStatistics.Mean).
                 ToArray();
-            var places = GetPlaces(sortedBenchmarks.Select(b => summary.Reports[b].ResultStatistics).ToArray());
+            var places = GetPlaces(sortedBenchmarks.Select(b => summary[b].ResultStatistics).ToArray());
             var place = places[Array.IndexOf(sortedBenchmarks, benchmark)];
             switch (kind)
             {

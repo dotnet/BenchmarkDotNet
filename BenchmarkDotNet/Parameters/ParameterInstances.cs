@@ -8,6 +8,7 @@ namespace BenchmarkDotNet.Parameters
         public IList<ParameterInstance> Items { get; }
         public int Count => Items.Count;
         public ParameterInstance this[int index] => Items[index];
+        public object this[string name] => Items.FirstOrDefault(item => item.Name == name)?.Value;
 
         private string printInfo;
 

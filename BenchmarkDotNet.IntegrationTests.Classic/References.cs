@@ -51,8 +51,8 @@ namespace BenchmarkDotNet.IntegrationTests.Classic
             var summary = BenchmarkRunner.Run<TBenchmark>(new SingleRunFastConfig());
 
             Assert.True(summary.Reports.Any());
-            Assert.True(summary.Reports.All(report => report.Value.ExecuteResults.All(executeResult => executeResult.FoundExecutable)));
-            Assert.True(summary.Reports.All(report => report.Value.AllMeasurements.Any()));
+            Assert.True(summary.Reports.All(report => report.ExecuteResults.All(executeResult => executeResult.FoundExecutable)));
+            Assert.True(summary.Reports.All(report => report.AllMeasurements.Any()));
         }
 
         private class SingleRunFastConfig : ManualConfig

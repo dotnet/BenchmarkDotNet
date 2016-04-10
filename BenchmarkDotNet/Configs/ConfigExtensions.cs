@@ -6,6 +6,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Order;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -22,6 +23,7 @@ namespace BenchmarkDotNet.Configs
         public static IConfig With(this IConfig config, params IDiagnoser[] diagnosers) => config.With(m => m.Add(diagnosers));
         public static IConfig With(this IConfig config, params IAnalyser[] analysers) => config.With(m => m.Add(analysers));
         public static IConfig With(this IConfig config, params IJob[] jobs) => config.With(m => m.Add(jobs));
+        public static IConfig With(this IConfig config, IOrderProvider provider) => config.With(m => m.Set(provider));
 
         private static IConfig With(this IConfig config, Action<ManualConfig> addAction)
         {

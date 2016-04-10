@@ -5,6 +5,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Order;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -16,6 +17,8 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<IDiagnoser> GetDiagnosers();
         IEnumerable<IAnalyser> GetAnalysers();
         IEnumerable<IJob> GetJobs();
+
+        IOrderProvider GetOrderProvider();
 
         ConfigUnionRule UnionRule { get; }
     }

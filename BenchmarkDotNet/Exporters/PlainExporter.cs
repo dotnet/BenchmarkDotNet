@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Exporters
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
-            foreach (var report in summary.Reports.Values)
+            foreach (var report in summary.Reports)
             {
                 var runs = report.AllMeasurements;
                 var modes = runs.Select(it => it.IterationMode).Distinct();

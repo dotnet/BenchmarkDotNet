@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Columns
         }
 
         public string GetValue(Summary summary, Benchmark benchmark) =>
-            Format(summary.Reports[benchmark].ResultStatistics, summary.TimeUnit);
+            Format(summary[benchmark].ResultStatistics, summary.TimeUnit);
 
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;

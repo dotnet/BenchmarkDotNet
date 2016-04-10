@@ -58,11 +58,7 @@ namespace BenchmarkDotNet.Exporters
         {
             logger.WriteLine(string.Join(";", columns.Select(c => c.Title)));
 
-            var reports = summary.Reports.Values
-                .OrderBy(r => r.Benchmark.Parameters, ParameterComparer.Instance)
-                .ThenBy(r => r.Benchmark.Target.Type.Name);
-
-            foreach (var report in reports)
+            foreach (var report in summary.Reports)
             {
                 foreach (var measurement in report.AllMeasurements)
                 {

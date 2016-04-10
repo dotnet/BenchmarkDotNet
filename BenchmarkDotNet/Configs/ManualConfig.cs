@@ -5,6 +5,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Order;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -16,6 +17,7 @@ namespace BenchmarkDotNet.Configs
         private readonly List<IDiagnoser> diagnosers = new List<IDiagnoser>();
         private readonly List<IAnalyser> analysers = new List<IAnalyser>();
         private readonly List<IJob> jobs = new List<IJob>();
+        private IOrderProvider orderProvider = null;
 
         public IEnumerable<IColumn> GetColumns() => columns;
         public IEnumerable<IExporter> GetExporters() => exporters;
@@ -23,6 +25,8 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IDiagnoser> GetDiagnosers() => diagnosers;
         public IEnumerable<IAnalyser> GetAnalysers() => analysers;
         public IEnumerable<IJob> GetJobs() => jobs;
+        public IOrderProvider GetOrderProvider() => orderProvider;
+
         public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
 
         public void Add(params IColumn[] newColumns) => columns.AddRange(newColumns);
@@ -31,6 +35,7 @@ namespace BenchmarkDotNet.Configs
         public void Add(params IDiagnoser[] newDiagnosers) => diagnosers.AddRange(newDiagnosers);
         public void Add(params IAnalyser[] newAnalysers) => analysers.AddRange(newAnalysers);
         public void Add(params IJob[] newJobs) => jobs.AddRange(newJobs);
+        public void Set(IOrderProvider provider) => orderProvider = provider ?? orderProvider;
 
         public void Add(IConfig config)
         {
@@ -40,6 +45,7 @@ namespace BenchmarkDotNet.Configs
             diagnosers.AddRange(config.GetDiagnosers());
             analysers.AddRange(config.GetAnalysers());
             jobs.AddRange(config.GetJobs());
+            orderProvider = config.GetOrderProvider() ?? orderProvider;
         }
 
         public static ManualConfig CreateEmpty() => new ManualConfig();

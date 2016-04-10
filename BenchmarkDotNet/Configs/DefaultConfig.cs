@@ -10,6 +10,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Configs
@@ -62,6 +63,9 @@ namespace BenchmarkDotNet.Configs
         }
 
         public IEnumerable<IJob> GetJobs() => EnumerableHelper.Empty<IJob>();
+
+        public IOrderProvider GetOrderProvider() => null;
+
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
 
         public IEnumerable<IDiagnoser> GetDiagnosers() => EnumerableHelper.Empty<IDiagnoser>();

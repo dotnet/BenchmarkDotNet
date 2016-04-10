@@ -35,8 +35,8 @@ namespace BenchmarkDotNet.Columns
             if (baselineBenchmark == null)
                 return "?";
 
-            var baselineMedian = summary.Reports[baselineBenchmark].ResultStatistics.Median;
-            var currentMedian = summary.Reports[benchmark].ResultStatistics.Median;
+            var baselineMedian = summary[baselineBenchmark].ResultStatistics.Median;
+            var currentMedian = summary[benchmark].ResultStatistics.Median;
 
             switch (Kind)
             {

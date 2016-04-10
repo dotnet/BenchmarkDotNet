@@ -11,7 +11,6 @@ namespace BenchmarkDotNet.Extensions
     {
         public static BenchmarkReport GetReportFor<T>(this Summary summary, Expression<Action<T>> actionExp)
         {
-            var reports = summary.Reports.Values;
             if (actionExp.Body == null)
                 throw new ArgumentException("Extend a an Expression with a valid Body", nameof(actionExp));
 
@@ -19,7 +18,7 @@ namespace BenchmarkDotNet.Extensions
             if (methodExp == null)
                 throw new ArgumentException("Extend a MethodCallExpression, but got a " + actionExp.Body.GetType().Name, nameof(actionExp));
 
-            return reports.First(r => r.Benchmark.Target.Method == methodExp.Method);
+            return summary.Reports.First(r => r.Benchmark.Target.Method == methodExp.Method);
         }
 
         public static IList<Measurement> GetRunsFor<T>(this Summary summary, Expression<Action<T>> actionExp)
