@@ -68,6 +68,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="JitOptimizations.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="References.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -80,6 +81,14 @@
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.DifferentRuntime\BenchmarkDotNet.IntegrationTests.DifferentRuntime.csproj">
       <Project>{19411154-3ac9-4689-bc2e-9646121ed63d}</Project>
       <Name>BenchmarkDotNet.IntegrationTests.DifferentRuntime</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.DisabledOptimizations\BenchmarkDotNet.IntegrationTests.DisabledOptimizations.csproj">
+      <Project>{ac2188e5-a140-43e2-8a76-4bdabfe30aba}</Project>
+      <Name>BenchmarkDotNet.IntegrationTests.DisabledOptimizations</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.EnabledOptimizations\BenchmarkDotNet.IntegrationTests.EnabledOptimizations.csproj">
+      <Project>{873581ff-db9d-42e5-8f11-32a4b7bb28ec}</Project>
+      <Name>BenchmarkDotNet.IntegrationTests.EnabledOptimizations</Name>
     </ProjectReference>
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.FSharp\BenchmarkDotNet.IntegrationTests.FSharp.fsproj">
       <Project>{367fafe1-a1c8-4aa1-9334-f4762e128dbb}</Project>

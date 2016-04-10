@@ -60,6 +60,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IAnalyser> GetAnalysers()
         {
             yield return EnvironmentAnalyser.Default;
+            yield return JitOptimizationsAnalyser.Instance;
         }
 
         public IEnumerable<IJob> GetJobs() => EnumerableHelper.Empty<IJob>();

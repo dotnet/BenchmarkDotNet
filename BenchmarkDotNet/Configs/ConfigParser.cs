@@ -103,6 +103,7 @@ namespace BenchmarkDotNet.Configs
             new Dictionary<string, IAnalyser[]>
             {
                 { "environment", new [] { EnvironmentAnalyser.Default } },
+                { "jitoptimizations", new [] { JitOptimizationsAnalyser.Instance } },
             };
 
         public IConfig Parse(string[] args)
