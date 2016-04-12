@@ -10,11 +10,23 @@
   "description": "Powerful .NET library for benchmarking",
   "copyright": "Andrey Akinshin, Jon Skeet, Matt Warren",
   "language": "en-US",
-
-  "compilationOptions": { "optimize": true },
-
+  "configurations": {
+    "Debug": {
+      "compilationOptions": {
+        "define": [ "DEBUG", "TRACE" ]
+      }
+    },
+    "Release": {
+      "compilationOptions": {
+        "define": [ "RELEASE", "TRACE" ],
+        "optimize": true,
+        "xmlDoc": true,
+        "keyFile": "../strongNameKey.snk",
+        "strongName": true
+      }
+    }
+  },
   "resource": [ "Templates/*.txt", "Templates/*.R", "Templates/*.json" ],
-
   "frameworks": {
     "net40": {
       "compilationOptions": {

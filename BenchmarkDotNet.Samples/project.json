@@ -2,8 +2,22 @@
   "title": "BenchmarkDotNet.Samples",
   "compilationOptions": {
     "emitEntryPoint": true,
-    "allowUnsafe": true,
-    "optimize": true
+    "allowUnsafe": true
+  },
+  "configurations": {
+    "Debug": {
+      "compilationOptions": {
+        "define": [ "DEBUG", "TRACE" ]
+      }
+    },
+    "Release": {
+      "compilationOptions": {
+        "define": [ "RELEASE", "TRACE" ],
+        "optimize": true,
+        "keyFile": "../strongNameKey.snk",
+        "strongName": true
+      }
+    }
   },
   "commands": {
     "run": "BenchmarkDotNet.Samples"

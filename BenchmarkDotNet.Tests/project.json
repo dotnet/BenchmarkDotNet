@@ -1,5 +1,20 @@
 ﻿{
   "title": "BenchmarkDotNet.Tests",
+  "configurations": {
+    "Debug": {
+      "compilationOptions": {
+        "define": [ "DEBUG", "TRACE" ]
+      }
+    },
+    "Release": {
+      "compilationOptions": {
+        "define": [ "RELEASE", "TRACE" ],
+        "optimize": true,
+        "keyFile": "../strongNameKey.snk",
+        "strongName": true
+      }
+    }
+  },
   "commands": {
     "test": "xunit.runner.dnx"
   },

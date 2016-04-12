@@ -1,5 +1,21 @@
 ﻿{
   "title": "BenchmarkDotNet.Diagnostics",
+  "configurations": {
+    "Debug": {
+      "compilationOptions": {
+        "define": [ "DEBUG", "TRACE" ]
+      }
+    },
+    "Release": {
+      "compilationOptions": {
+        "define": [ "RELEASE", "TRACE" ],
+        "optimize": true,
+        "xmlDoc": true,
+        "keyFile": "../strongNameKey.snk",
+        "strongName": true
+      }
+    }
+  },
   "frameworks": {
     "net40": { },
     "dnx451": { }
