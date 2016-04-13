@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.Analyzers;
 
 namespace BenchmarkDotNet.Configs
 {

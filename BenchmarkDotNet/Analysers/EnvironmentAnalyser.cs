@@ -2,7 +2,7 @@
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 
-namespace BenchmarkDotNet.Analyzers
+namespace BenchmarkDotNet.Analysers
 {
     public class EnvironmentAnalyser : IAnalyser
     {
@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Analyzers
         {
         }
 
-        public IEnumerable<IWarning> Analyze(Summary summary)
+        public IEnumerable<IWarning> Analyse(Summary summary)
         {
             var hostInfo = summary.HostEnvironmentInfo;
             if (hostInfo.HasAttachedDebugger)

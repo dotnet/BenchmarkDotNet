@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 
@@ -12,7 +10,7 @@ namespace BenchmarkDotNet.IntegrationTests.DisabledOptimizations
         {
             Add(Job.Dry);
             Add(Loggers.ConsoleLogger.Default);
-            Add(Analyzers.JitOptimizationsAnalyser.Instance);
+            Add(Analysers.JitOptimizationsAnalyser.Instance);
         }
     }
 

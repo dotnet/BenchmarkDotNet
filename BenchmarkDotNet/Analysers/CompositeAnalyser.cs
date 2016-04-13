@@ -2,7 +2,7 @@
 using System.Linq;
 using BenchmarkDotNet.Reports;
 
-namespace BenchmarkDotNet.Analyzers
+namespace BenchmarkDotNet.Analysers
 {
     public class CompositeAnalyser : IAnalyser
     {
@@ -13,6 +13,6 @@ namespace BenchmarkDotNet.Analyzers
             this.analysers = analysers;
         }
 
-        public IEnumerable<IWarning> Analyze(Summary summary) => analysers.SelectMany(analyser => analyser.Analyze(summary));
+        public IEnumerable<IWarning> Analyse(Summary summary) => analysers.SelectMany(analyser => analyser.Analyse(summary));
     }
 }

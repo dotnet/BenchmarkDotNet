@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Reports;
 
-namespace BenchmarkDotNet.Analyzers
+namespace BenchmarkDotNet.Analysers
 {
     public interface IWarning
     {

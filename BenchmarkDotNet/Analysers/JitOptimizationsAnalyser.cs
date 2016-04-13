@@ -5,7 +5,7 @@ using System.Reflection;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 
-namespace BenchmarkDotNet.Analyzers
+namespace BenchmarkDotNet.Analysers
 {
     public class JitOptimizationsAnalyser : IAnalyser
     {
@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Analyzers
         {
         }
 
-        public IEnumerable<IWarning> Analyze(Summary summary)
+        public IEnumerable<IWarning> Analyse(Summary summary)
         {
 #if CORE
             yield break; // todo: implement when it becomes possible

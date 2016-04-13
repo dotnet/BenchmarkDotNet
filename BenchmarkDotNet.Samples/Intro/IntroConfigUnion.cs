@@ -1,5 +1,5 @@
 ﻿using System.Threading;
-using BenchmarkDotNet.Analyzers;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;

@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 
@@ -10,7 +11,7 @@ namespace BenchmarkDotNet.IntegrationTests.EnabledOptimizations
         {
             Add(Job.Dry);
             Add(Loggers.ConsoleLogger.Default);
-            Add(Analyzers.JitOptimizationsAnalyser.Instance);
+            Add(JitOptimizationsAnalyser.Instance);
         }
     }
 

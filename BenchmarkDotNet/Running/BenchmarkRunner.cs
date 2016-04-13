@@ -114,7 +114,7 @@ namespace BenchmarkDotNet.Running
             MarkdownExporter.Console.ExportToLog(summary, logger);
 
             // TODO: make exporter
-            var warnings = config.GetCompositeAnalyser().Analyze(summary).ToList();
+            var warnings = config.GetCompositeAnalyser().Analyse(summary).ToList();
             if (warnings.Count > 0)
             {
                 logger.WriteLine();

@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Reports;
 
-namespace BenchmarkDotNet.Analyzers
+namespace BenchmarkDotNet.Analysers
 {
     public interface IAnalyser
     {
-        IEnumerable<IWarning> Analyze(Summary summary);
+        IEnumerable<IWarning> Analyse(Summary summary);
     }
 }

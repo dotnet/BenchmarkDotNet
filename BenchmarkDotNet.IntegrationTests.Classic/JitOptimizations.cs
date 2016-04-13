@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using BenchmarkDotNet.Analyzers;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.IntegrationTests.Classic
         {
             var summaryWithNonOptimizedDll = CreateSummary(typeof(DisabledOptimizations.OptimizationsDisabledInCsproj));
 
-            var warnings = JitOptimizationsAnalyser.Instance.Analyze(summaryWithNonOptimizedDll).ToArray();
+            var warnings = JitOptimizationsAnalyser.Instance.Analyse(summaryWithNonOptimizedDll).ToArray();
 
             Assert.NotEmpty(warnings);
         }
@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.IntegrationTests.Classic
         {
             var summaryWithOptimizedDll = CreateSummary(typeof(EnabledOptimizations.OptimizationsEnabledInCsproj));
 
-            var warnings = JitOptimizationsAnalyser.Instance.Analyze(summaryWithOptimizedDll).ToArray();
+            var warnings = JitOptimizationsAnalyser.Instance.Analyse(summaryWithOptimizedDll).ToArray();
 
             Assert.Empty(warnings);
         }
