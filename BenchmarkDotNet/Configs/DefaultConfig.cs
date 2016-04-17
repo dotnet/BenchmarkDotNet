@@ -12,6 +12,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -60,7 +61,12 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IAnalyser> GetAnalysers()
         {
             yield return EnvironmentAnalyser.Default;
-            yield return JitOptimizationsAnalyser.Instance;
+        }
+
+        public IEnumerable<IValidator> GetValidators()
+        {
+            yield return BaselineValidator.FailOnError;
+            yield return JitOptimizationsValidator.DontFailOnError;
         }
 
         public IEnumerable<IJob> GetJobs() => EnumerableHelper.Empty<IJob>();

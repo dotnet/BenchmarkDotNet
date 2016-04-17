@@ -6,6 +6,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
+using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -16,6 +17,7 @@ namespace BenchmarkDotNet.Configs
         private readonly List<ILogger> loggers = new List<ILogger>();
         private readonly List<IDiagnoser> diagnosers = new List<IDiagnoser>();
         private readonly List<IAnalyser> analysers = new List<IAnalyser>();
+        private readonly List<IValidator> validators = new List<IValidator>();
         private readonly List<IJob> jobs = new List<IJob>();
         private IOrderProvider orderProvider = null;
 
@@ -24,7 +26,9 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<ILogger> GetLoggers() => loggers;
         public IEnumerable<IDiagnoser> GetDiagnosers() => diagnosers;
         public IEnumerable<IAnalyser> GetAnalysers() => analysers;
+        public IEnumerable<IValidator> GetValidators() => validators;
         public IEnumerable<IJob> GetJobs() => jobs;
+
         public IOrderProvider GetOrderProvider() => orderProvider;
 
         public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
@@ -34,6 +38,7 @@ namespace BenchmarkDotNet.Configs
         public void Add(params ILogger[] newLoggers) => loggers.AddRange(newLoggers);
         public void Add(params IDiagnoser[] newDiagnosers) => diagnosers.AddRange(newDiagnosers);
         public void Add(params IAnalyser[] newAnalysers) => analysers.AddRange(newAnalysers);
+        public void Add(params IValidator[] newValidators) => validators.AddRange(newValidators);
         public void Add(params IJob[] newJobs) => jobs.AddRange(newJobs);
         public void Set(IOrderProvider provider) => orderProvider = provider ?? orderProvider;
 

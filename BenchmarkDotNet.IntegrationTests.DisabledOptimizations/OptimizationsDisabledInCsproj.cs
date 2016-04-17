@@ -1,20 +1,21 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.IntegrationTests.DisabledOptimizations
 {               
-    internal class JitOptimizationsAnalyserConfig : ManualConfig
+    internal class JitOptimizationsValidatorConfig : ManualConfig
     {
-        internal JitOptimizationsAnalyserConfig()
+        public JitOptimizationsValidatorConfig()
         {
             Add(Job.Dry);
             Add(Loggers.ConsoleLogger.Default);
-            Add(Analysers.JitOptimizationsAnalyser.Instance);
+            Add(JitOptimizationsValidator.DontFailOnError);
         }
     }
 
-    [Config(typeof(JitOptimizationsAnalyserConfig))]
+    [Config(typeof(JitOptimizationsValidatorConfig))]
     public class OptimizationsDisabledInCsproj
     {
         [Benchmark]

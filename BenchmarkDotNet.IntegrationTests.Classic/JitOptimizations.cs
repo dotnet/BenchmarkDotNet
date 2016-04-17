@@ -1,10 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Analysers;
-using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Parameters;
-using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Validators;
 using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests.Classic
@@ -14,43 +12,30 @@ namespace BenchmarkDotNet.IntegrationTests.Classic
         [Fact]
         public void UserGetsWarningWhenNonOptimizedDllIsReferenced()
         {
-            var summaryWithNonOptimizedDll = CreateSummary(typeof(DisabledOptimizations.OptimizationsDisabledInCsproj));
+            var benchmarksWithNonOptimizedDll = CreateBenchmarks(typeof(DisabledOptimizations.OptimizationsDisabledInCsproj));
 
-            var warnings = JitOptimizationsAnalyser.Instance.Analyse(summaryWithNonOptimizedDll).ToArray();
+            var warnings = JitOptimizationsValidator.DontFailOnError.Validate(benchmarksWithNonOptimizedDll).ToArray();
+            var criticalErrors = JitOptimizationsValidator.FailOnError.Validate(benchmarksWithNonOptimizedDll).ToArray();
 
             Assert.NotEmpty(warnings);
+            Assert.True(warnings.All(error => error.IsCritical == false));
+            Assert.NotEmpty(criticalErrors);
+            Assert.True(criticalErrors.All(error => error.IsCritical));
         }
 
         [Fact]
         public void UserGetsNoWarningWhenOnlyOptimizedDllAreReferenced()
         {
-            var summaryWithOptimizedDll = CreateSummary(typeof(EnabledOptimizations.OptimizationsEnabledInCsproj));
+            var benchmarksWithOptimizedDll = CreateBenchmarks(typeof(EnabledOptimizations.OptimizationsEnabledInCsproj));
 
-            var warnings = JitOptimizationsAnalyser.Instance.Analyse(summaryWithOptimizedDll).ToArray();
+            var warnings = JitOptimizationsValidator.DontFailOnError.Validate(benchmarksWithOptimizedDll).ToArray();
 
             Assert.Empty(warnings);
         }
 
-        private Summary CreateSummary(Type targetBenchmarkType)
+        private IList<Benchmark> CreateBenchmarks(Type targetBenchmarkType)
         {
-            return new Summary(
-                string.Empty,
-                new[]
-                {
-                    new BenchmarkReport(
-                        new Benchmark(
-                            new Target(targetBenchmarkType, null),
-                            Jobs.Job.Dry,
-                            new ParameterInstances(new [] { new ParameterInstance(new ParameterDefinition("nothing", false, new object[0]), "some") } )),
-                        null,
-                        null,
-                        null,
-                        null)
-                },
-                EnvironmentInfo.GetCurrent(),
-                new Configs.ManualConfig(),
-                null,
-                TimeSpan.Zero);
+            return BenchmarkConverter.TypeToBenchmarks(targetBenchmarkType);
         }
     }
 }

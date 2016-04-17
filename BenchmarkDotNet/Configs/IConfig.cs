@@ -6,6 +6,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
+using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -17,6 +18,7 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<IDiagnoser> GetDiagnosers();
         IEnumerable<IAnalyser> GetAnalysers();
         IEnumerable<IJob> GetJobs();
+        IEnumerable<IValidator> GetValidators();
 
         IOrderProvider GetOrderProvider();
 

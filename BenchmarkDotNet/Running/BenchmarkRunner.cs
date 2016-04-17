@@ -13,6 +13,7 @@ using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Results;
+using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Running
 {
@@ -34,13 +35,11 @@ namespace BenchmarkDotNet.Running
             Run(BenchmarkConverter.SourceToBenchmarks(source, config), config);
 #endif
 
-        internal static Summary Run(IList<Benchmark> benchmarks, IConfig config)
+        internal static Summary Run(Benchmark[] benchmarks, IConfig config)
         {
             config = BenchmarkConverter.GetFullConfig(benchmarks.FirstOrDefault()?.Target.Type, config);
 
             var title = GetTitle(benchmarks);
-            EnsureNoMoreThanOneBaseline(benchmarks, title);
-
             var rootArtifactsFolderPath = GetRootArtifactsFolderPath();
 
             using (var logStreamWriter = Portability.StreamWriter.FromPath(Path.Combine(rootArtifactsFolderPath, title + ".log")))
@@ -49,7 +48,10 @@ namespace BenchmarkDotNet.Running
                 benchmarks = GetSupportedBenchmarks(benchmarks, logger);
 
                 var summary = Run(benchmarks, logger, title, config, rootArtifactsFolderPath);
-                config.GetCompositeExporter().ExportToFiles(summary).ToArray();
+                if (!summary.HasCriticalValidationErrors)
+                {
+                    config.GetCompositeExporter().ExportToFiles(summary).ToArray();
+                }
                 return summary;
             }
         }
@@ -63,13 +65,19 @@ namespace BenchmarkDotNet.Running
             return $"BenchmarkRun-{benchmarkRunIndex:##000}-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}";
         }
 
-        private static Summary Run(IList<Benchmark> benchmarks, ILogger logger, string title, IConfig config, string rootArtifactsFolderPath)
+        private static Summary Run(Benchmark[] benchmarks, ILogger logger, string title, IConfig config, string rootArtifactsFolderPath)
         {
             logger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
             logger.WriteLineInfo("// Found benchmarks:");
             foreach (var benchmark in benchmarks)
                 logger.WriteLineInfo($"//   {benchmark.ShortInfo}");
             logger.WriteLine();
+
+            var validationErrors = Validate(benchmarks, logger, config);
+            if (validationErrors.Any(validationError => validationError.IsCritical))
+            {
+                return Summary.CreateFailed(benchmarks, title, EnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), validationErrors);
+            }
 
             var globalChronometer = Chronometer.Start();
             var reports = new List<BenchmarkReport>();
@@ -84,7 +92,7 @@ namespace BenchmarkDotNet.Running
             }
             var clockSpan = globalChronometer.Stop();
 
-            var summary = new Summary(title, reports, EnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), clockSpan.GetTimeSpan());
+            var summary = new Summary(title, reports, EnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), clockSpan.GetTimeSpan(), validationErrors);
 
             logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
             logger.WriteLine();
@@ -132,6 +140,17 @@ namespace BenchmarkDotNet.Running
             logger.WriteLine();
             logger.WriteLineHeader("// ***** BenchmarkRunner: End *****");
             return summary;
+        }
+
+        private static IValidationError[] Validate(IList<Benchmark> benchmarks, ILogger logger, IConfig config)
+        {
+            logger.WriteLineInfo("// Validating benchmarks:");
+            var validationErrors = config.GetCompositeValidator().Validate(benchmarks).ToArray();
+            foreach (var validationError in validationErrors)
+            {
+                logger.WriteLineError(validationError.Message);
+            }
+            return validationErrors;
         }
 
         internal static void LogTotalTime(ILogger logger, TimeSpan time, string message = "Total time")
@@ -264,14 +283,7 @@ namespace BenchmarkDotNet.Running
             return executeResults;
         }
 
-        private static void EnsureNoMoreThanOneBaseline(IList<Benchmark> benchmarks, string benchmarkName)
-        {
-            var baselineCount = benchmarks.Select(b => b.Target).Distinct().Count(target => target.Baseline);
-            if (baselineCount > 1)
-                throw new InvalidOperationException($"Only 1 [Benchmark] in a class can have \"Baseline = true\" applied to it, {benchmarkName} has {baselineCount}");
-        }
-
-        private static IList<Benchmark> GetSupportedBenchmarks(IList<Benchmark> benchmarks, CompositeLogger logger)
+        private static Benchmark[] GetSupportedBenchmarks(IList<Benchmark> benchmarks, CompositeLogger logger)
         {
             return benchmarks.Where(benchmark => Toolchain.GetToolchain(benchmark.Job.Runtime).IsSupported(benchmark, logger)).ToArray();
         }

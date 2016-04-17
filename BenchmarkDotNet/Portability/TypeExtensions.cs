@@ -105,5 +105,50 @@ namespace BenchmarkDotNet.Portability
             return type.GetTypeInfo().BaseType;
 #endif
         }
+
+        internal static IEnumerable<MethodInfo> GetAllMethods(this Type type)
+        {
+#if !CORE
+            return type.GetMethods();
+#else
+            var typeInfo = type.GetTypeInfo();
+            while (typeInfo != null)
+            {
+                foreach (var methodInfo in typeInfo.DeclaredMethods)
+                    yield return methodInfo;
+                typeInfo = typeInfo.BaseType?.GetTypeInfo();
+            }
+#endif
+        }
+
+        internal static IEnumerable<FieldInfo> GetAllFields(this Type type)
+        {
+#if !CORE
+            return type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+#else
+            var typeInfo = type.GetTypeInfo();
+            while (typeInfo != null)
+            {
+                foreach (var fieldInfo in typeInfo.DeclaredFields)
+                    yield return fieldInfo;
+                typeInfo = typeInfo.BaseType?.GetTypeInfo();
+            }
+#endif
+        }
+
+        internal static IEnumerable<PropertyInfo> GetAllProperties(this Type type)
+        {
+#if !CORE
+            return type.GetProperties();
+#else
+            var typeInfo = type.GetTypeInfo();
+            while (typeInfo != null)
+            {
+                foreach (var propertyInfo in typeInfo.DeclaredProperties)
+                    yield return propertyInfo;
+                typeInfo = typeInfo.BaseType?.GetTypeInfo();
+            }
+#endif
+        }
     }
 }

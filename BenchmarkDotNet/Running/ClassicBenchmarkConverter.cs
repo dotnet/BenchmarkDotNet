@@ -1,7 +1,6 @@
 ﻿#if CLASSIC
 using System;
 using System.CodeDom.Compiler;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -10,9 +9,9 @@ using Microsoft.CSharp;
 
 namespace BenchmarkDotNet.Running
 {
-    internal static partial class BenchmarkConverter
+    public static partial class BenchmarkConverter
     {
-        public static IList<Benchmark> UrlToBenchmarks(string url, IConfig config = null)
+        public static Benchmark[] UrlToBenchmarks(string url, IConfig config = null)
         {
             string benchmarkContent;
             try
@@ -36,7 +35,7 @@ namespace BenchmarkDotNet.Running
             return SourceToBenchmarks(benchmarkContent, config);
         }
 
-        public static IList<Benchmark> SourceToBenchmarks(string source, IConfig config = null)
+        public static Benchmark[] SourceToBenchmarks(string source, IConfig config = null)
         {
             string benchmarkContent = source;
             var cSharpCodeProvider = new CSharpCodeProvider();
@@ -55,7 +54,7 @@ namespace BenchmarkDotNet.Running
                 select new Benchmark(
                     new Target(target.Type, target.Method, target.SetupMethod, target.MethodTitle, benchmarkContent, target.Baseline, target.OperationsPerInvoke),
                     benchmark.Job,
-                    benchmark.Parameters)).ToList();
+                    benchmark.Parameters)).ToArray();
         }
     }
 }

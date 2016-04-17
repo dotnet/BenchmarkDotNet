@@ -109,7 +109,9 @@ namespace BenchmarkDotNet.IntegrationTests
         public void Test()
         {
             // You can't have more than 1 method in a class with [Benchmark(Baseline = true)]
-            Assert.Throws<InvalidOperationException>(() => BenchmarkRunner.Run(this.GetType()));
+            var summary = BenchmarkRunner.Run(this.GetType());
+
+            Assert.True(summary.HasCriticalValidationErrors);
         }
 
         [Benchmark(Baseline = true)]

@@ -8,6 +8,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -46,6 +47,10 @@ namespace BenchmarkDotNet.Configs
             { "analysers", new Options {
                 ProcessOption = (config, value) => config.Add(ParseItem("Analyser", availableAnalysers, value)),
                 GetAllOptions = new Lazy<IEnumerable<string>>(() => availableAnalysers.Keys)
+            } },
+            { "validators", new Options {
+                ProcessOption = (config, value) => config.Add(ParseItem("Validator", availableValidators, value)),
+                GetAllOptions = new Lazy<IEnumerable<string>>(() => availableValidators.Keys)
             } },
             { "loggers", new Options {
                 // TODO does it make sense to allows Loggers to be configured on the cmd-line?
@@ -102,8 +107,15 @@ namespace BenchmarkDotNet.Configs
         private static Dictionary<string, IAnalyser[]> availableAnalysers =
             new Dictionary<string, IAnalyser[]>
             {
-                { "environment", new [] { EnvironmentAnalyser.Default } },
-                { "jitoptimizations", new [] { JitOptimizationsAnalyser.Instance } },
+                { "environment", new [] { EnvironmentAnalyser.Default } }
+            };
+
+        private static Dictionary<string, IValidator[]> availableValidators =
+            new Dictionary<string, IValidator[]>
+            {
+                { "baseline", new [] { BaselineValidator.FailOnError } },
+                { "jitOptimizations", new [] { JitOptimizationsValidator.DontFailOnError } },
+                { "jitOptimizationsFailOnError", new [] { JitOptimizationsValidator.FailOnError } },
             };
 
         public IConfig Parse(string[] args)

@@ -12,9 +12,9 @@ using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Running
 {
-    internal static partial class BenchmarkConverter
+    public static partial class BenchmarkConverter
     {
-        public static IList<Benchmark> TypeToBenchmarks(Type type, IConfig config = null)
+        public static Benchmark[] TypeToBenchmarks(Type type, IConfig config = null)
         {
             config = GetFullConfig(type, config);
 
@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Running
                 select new Benchmark(target, job, parameterInstance)).ToArray();
 
             var orderProvider = config?.GetOrderProvider() ?? DefaultOrderProvider.Instance;
-            return orderProvider.GetExecutionOrder(benchmarks).ToList();
+            return orderProvider.GetExecutionOrder(benchmarks).ToArray();
         }
 
         public static IConfig GetFullConfig(Type type, IConfig config)

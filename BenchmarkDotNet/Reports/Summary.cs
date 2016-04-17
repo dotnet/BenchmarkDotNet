@@ -7,6 +7,7 @@ using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -21,6 +22,7 @@ namespace BenchmarkDotNet.Reports
         public string ResultsDirectoryPath { get; }
         public SummaryTable Table { get; }
         public TimeSpan TotalTime { get; }
+        public IValidationError[] ValidationErrors { get; }
 
         private Dictionary<IJob, string> ShortInfos { get; }
         private Lazy<IJob[]> Jobs { get; }
@@ -28,14 +30,11 @@ namespace BenchmarkDotNet.Reports
 
         public BenchmarkReport this[Benchmark benchmark] => reportMap[benchmark];
 
-        public Summary(string title, IList<BenchmarkReport> reports, EnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime)
-        {
-            Title = title;
-            HostEnvironmentInfo = hostEnvironmentInfo;
-            Config = config;
-            ResultsDirectoryPath = resultsDirectoryPath;
-            TotalTime = totalTime;
+        public bool HasCriticalValidationErrors => ValidationErrors.Any(validationError => validationError.IsCritical);
 
+        public Summary(string title, IList<BenchmarkReport> reports, EnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, IValidationError[] validationErrors)
+            : this(title, hostEnvironmentInfo, config, resultsDirectoryPath, totalTime, validationErrors)
+        {
             Benchmarks = reports.Select(r => r.Benchmark).ToArray();
             reportMap = new Dictionary<Benchmark, BenchmarkReport>();
             foreach (var report in reports)
@@ -50,6 +49,27 @@ namespace BenchmarkDotNet.Reports
             Table = new SummaryTable(this);
             ShortInfos = new Dictionary<IJob, string>();
             Jobs = new Lazy<IJob[]>(() => Benchmarks.Select(b => b.Job).ToArray());
+        }
+
+        internal Summary(string title, EnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, IValidationError[] validationErrors, Benchmark[] benchmarks)
+            : this(title, hostEnvironmentInfo, config, resultsDirectoryPath, totalTime, validationErrors)
+        {
+            Benchmarks = benchmarks;
+        }
+
+        private Summary(string title, EnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, IValidationError[] validationErrors)
+        {
+            Title = title;
+            HostEnvironmentInfo = hostEnvironmentInfo;
+            Config = config;
+            ResultsDirectoryPath = resultsDirectoryPath;
+            TotalTime = totalTime;
+            ValidationErrors = validationErrors;
+        }
+
+        internal static Summary CreateFailed(Benchmark[] benchmarks, string title, EnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, IValidationError[] validationErrors)
+        {
+            return new Summary(title, hostEnvironmentInfo, config, resultsDirectoryPath, TimeSpan.Zero, validationErrors, benchmarks);
         }
 
         internal string GetJobShortInfo(IJob job)
