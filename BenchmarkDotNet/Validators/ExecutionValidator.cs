@@ -12,12 +12,12 @@ namespace BenchmarkDotNet.Validators
         public static readonly ExecutionValidator DontFailOnError = new ExecutionValidator(false);
         public static readonly ExecutionValidator FailOnError = new ExecutionValidator(true);
 
-        private readonly bool failOnError;
-
         private ExecutionValidator(bool failOnError)
         {
-            this.failOnError = failOnError;
+            TreatsWarningsAsErrors = failOnError;
         }
+
+        public bool TreatsWarningsAsErrors { get; }
 
         public IEnumerable<IValidationError> Validate(IList<Benchmark> benchmarks)
         {
@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Validators
             catch (Exception ex)
             {
                 errors.Add(new ValidationError(
-                    failOnError,
+                    TreatsWarningsAsErrors,
                     $"Unable to create instance of {type.Name}, exception was: {ex.Message}"));
 
                 instance = null;
@@ -88,7 +88,7 @@ namespace BenchmarkDotNet.Validators
             if (setupMethods.Length > 1)
             {
                 errors.Add(new ValidationError(
-                    failOnError,
+                    TreatsWarningsAsErrors,
                     $"Only single [Setup] method is allowed per type, type {benchmarkTypeInstance.GetType().Name} has few"));
 
                 return false;
@@ -101,7 +101,7 @@ namespace BenchmarkDotNet.Validators
             catch (Exception ex)
             {
                 errors.Add(new ValidationError(
-                    failOnError,
+                    TreatsWarningsAsErrors,
                     $"Failed to execute [Setup] for {benchmarkTypeInstance.GetType().Name}, exception was {ex.Message}"));
 
                 return false;
@@ -128,7 +128,7 @@ namespace BenchmarkDotNet.Validators
                 if (!paramField.IsPublic)
                 {
                     errors.Add(new ValidationError(
-                        failOnError,
+                        TreatsWarningsAsErrors,
                         $"Fields marked with [Params] must be public, {paramField.Name} of {benchmarkTypeInstance.GetType().Name} is not"));
 
                     return false;
@@ -138,7 +138,7 @@ namespace BenchmarkDotNet.Validators
                 if (!values.Any())
                 {
                     errors.Add(new ValidationError(
-                        failOnError,
+                        TreatsWarningsAsErrors,
                         $"Fields marked with [Params] must have some values defined, {paramField.Name} of {benchmarkTypeInstance.GetType().Name} has none"));
 
                     return false;
@@ -151,7 +151,7 @@ namespace BenchmarkDotNet.Validators
                 catch (Exception ex)
                 {
                     errors.Add(new ValidationError(
-                            failOnError,
+                            TreatsWarningsAsErrors,
                             $"Failed to set {paramField.Name} of {benchmarkTypeInstance.GetType().Name} to {values.First()}, exception was: {ex.Message}"));
 
                     return false;
@@ -180,7 +180,7 @@ namespace BenchmarkDotNet.Validators
                 if (setter == null || !setter.IsPublic)
                 {
                     errors.Add(new ValidationError(
-                        failOnError,
+                        TreatsWarningsAsErrors,
                         $"Properties marked with [Params] must have public setter, {paramProperty.Name} of {benchmarkTypeInstance.GetType().Name} has not"));
 
                     return false;
@@ -190,7 +190,7 @@ namespace BenchmarkDotNet.Validators
                 if (!values.Any())
                 {
                     errors.Add(new ValidationError(
-                        failOnError,
+                        TreatsWarningsAsErrors,
                         $"Properties marked with [Params] must have some values defined, {paramProperty.Name} of {benchmarkTypeInstance.GetType().Name} has not"));
 
                     return false;
@@ -203,7 +203,7 @@ namespace BenchmarkDotNet.Validators
                 catch (Exception ex)
                 {
                     errors.Add(new ValidationError(
-                        failOnError,
+                        TreatsWarningsAsErrors,
                         $"Failed to set {paramProperty.Name} of {benchmarkTypeInstance.GetType().Name} to {values.First()}, exception was: {ex.Message}"));
 
                     return false;
@@ -224,7 +224,7 @@ namespace BenchmarkDotNet.Validators
                 catch (Exception ex)
                 {
                     errors.Add(new ValidationError(
-                        failOnError,
+                        TreatsWarningsAsErrors,
                         $"Failed to execute benchmark {benchmark.ShortInfo}, exception was: {ex.Message}",
                         benchmark));
                 }

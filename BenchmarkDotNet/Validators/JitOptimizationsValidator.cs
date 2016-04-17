@@ -12,12 +12,12 @@ namespace BenchmarkDotNet.Validators
         public static readonly IValidator DontFailOnError = new JitOptimizationsValidator(false);
         public static readonly IValidator FailOnError = new JitOptimizationsValidator(true);
 
-        private readonly bool failOnError;
-
-        private JitOptimizationsValidator(bool failOnError)
+        private JitOptimizationsValidator(bool failOnErrors)
         {
-            this.failOnError = failOnError;
+            TreatsWarningsAsErrors = failOnErrors;
         }
+
+        public bool TreatsWarningsAsErrors { get; }
 
         public IEnumerable<IValidationError> Validate(IList<Benchmark> benchmarks)
         {
@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Validators
                     if (IsJITOptimizationDisabled(referencedAssembly))
                     {
                         yield return new ValidationError(
-                            failOnError,
+                            TreatsWarningsAsErrors,
                             $"Assembly {group.Key} which defines benchmarks references non-optimized {referencedAssemblyName.Name}");
                     }
                 }
@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Validators
                 if (IsJITOptimizationDisabled(group.Key))
                 {
                     yield return new ValidationError(
-                        failOnError,
+                        TreatsWarningsAsErrors,
                         $"Assembly {group.Key} which defines benchmarks is non-optimized");
                 }
             }

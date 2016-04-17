@@ -8,11 +8,11 @@ namespace BenchmarkDotNet.Validators
 {
     public class BaselineValidator : IValidator
     {
-        private const bool AlwaysFailOnError = true; // it is a must!
-
         public static readonly BaselineValidator FailOnError = new BaselineValidator();
 
         private BaselineValidator() { }
+
+        public bool TreatsWarningsAsErrors => true; // it is a must!
 
         public IEnumerable<IValidationError> Validate(IList<Benchmark> benchmarks)
         {
@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Validators
                 if (allMethods.Count(method => method.GetCustomAttributes<BenchmarkAttribute>(false).Any(benchmarkAttribute => benchmarkAttribute.Baseline)) > 1)
                 {
                     yield return new ValidationError(
-                        AlwaysFailOnError,
+                        TreatsWarningsAsErrors,
                         $"Only 1 [Benchmark] in a class can have \"Baseline = true\" applied to it, class {groupByType.Key.Name} has few");
                 }
             }

@@ -24,6 +24,7 @@ namespace BenchmarkDotNet.Configs
         public static IConfig With(this IConfig config, params IExporter[] exporters) => config.With(m => m.Add(exporters));
         public static IConfig With(this IConfig config, params IDiagnoser[] diagnosers) => config.With(m => m.Add(diagnosers));
         public static IConfig With(this IConfig config, params IAnalyser[] analysers) => config.With(m => m.Add(analysers));
+        public static IConfig With(this IConfig config, params IValidator[] validators) => config.With(m => m.Add(validators));
         public static IConfig With(this IConfig config, params IJob[] jobs) => config.With(m => m.Add(jobs));
         public static IConfig With(this IConfig config, IOrderProvider provider) => config.With(m => m.Set(provider));
 
