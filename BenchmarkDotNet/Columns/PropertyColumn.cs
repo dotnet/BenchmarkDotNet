@@ -23,6 +23,7 @@ namespace BenchmarkDotNet.Columns
         public string GetValue(Summary summary, Benchmark benchmark) => calc(benchmark);
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow { get; }
+        public ColumnCategory Category => ColumnCategory.Job;
 
         private PropertyColumn(string columnName, Func<Benchmark, string> calc, bool alwaysShow = false)
         {

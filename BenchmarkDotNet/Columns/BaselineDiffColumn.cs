@@ -55,6 +55,7 @@ namespace BenchmarkDotNet.Columns
 
         public bool IsAvailable(Summary summary) => summary.Benchmarks.Any(b => b.Target.Baseline);
         public bool AlwaysShow => true;
+        public ColumnCategory Category => ColumnCategory.Statistics;
         public override string ToString() => ColumnName;
     }
 }

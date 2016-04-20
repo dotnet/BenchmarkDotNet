@@ -20,6 +20,7 @@ namespace BenchmarkDotNet.Columns
 
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;
+        public ColumnCategory Category => ColumnCategory.Custom;
         public override string ToString() => ColumnName;
     }
 }

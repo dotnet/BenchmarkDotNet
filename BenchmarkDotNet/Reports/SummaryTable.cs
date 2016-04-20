@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Reports
                 Where(d => d is IColumnProvider).
                 Cast<IColumnProvider>().
                 SelectMany(cp => cp.GetColumns);
-            var columns = configColumns.Concat(paramColumns).Concat(diagnoserColumns).ToArray();
+            var columns = configColumns.Concat(paramColumns).Concat(diagnoserColumns).ToArray().OrderBy(c => c.Category).ToArray();
 
             ColumnCount = columns.Length;
             FullHeader = columns.Select(c => c.ColumnName).ToArray();

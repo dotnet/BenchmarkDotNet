@@ -146,6 +146,7 @@ namespace BenchmarkDotNet.Diagnostics
             public string ColumnName => "Bytes Allocated/Op";
             public bool IsAvailable(Summary summary) => true;
             public bool AlwaysShow => true;
+            public ColumnCategory Category => ColumnCategory.Diagnoser;
 
             public string GetValue(Summary summary, Benchmark benchmark)
             {
@@ -177,6 +178,7 @@ namespace BenchmarkDotNet.Diagnostics
             public string ColumnName { get; private set; }
             public bool IsAvailable(Summary summary) => true;
             public bool AlwaysShow => true;
+            public ColumnCategory Category => ColumnCategory.Diagnoser;
 
             public string GetValue(Summary summary, Benchmark benchmark)
             {

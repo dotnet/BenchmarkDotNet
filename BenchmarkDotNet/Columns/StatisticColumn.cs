@@ -44,6 +44,7 @@ namespace BenchmarkDotNet.Columns
 
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;
+        public ColumnCategory Category => ColumnCategory.Statistics;
 
         private string Format(Statistics statistics, TimeUnit timeUnit)
         {
