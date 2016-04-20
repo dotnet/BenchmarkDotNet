@@ -519,7 +519,7 @@ Type=Sleeps  Mode=Throughput
 
 * **Use the Release build without an attached debugger**
 
-Never use the Debug build for benchmarking. *Never*. The debug version of the target method can run 10–100 times slower. The release mode means that you should have `<Optimize>true</Optimize>` in your csproj file or use https://msdn.microsoft.com/en-us/library/t0hfscdc.aspx[/optimize] for `csc`. Also your never should use an attached debugger (e.g. Visual Studio or WinDbg) during the benchmarking. The best way is build our benchmark in the Release mode and run it with `cmd`.
+Never use the Debug build for benchmarking. *Never*. The debug version of the target method can run 10–100 times slower. The release mode means that you should have `<Optimize>true</Optimize>` in your csproj file or use [/optimize](https://msdn.microsoft.com/en-us/library/t0hfscdc.aspx) for `csc`. Also your never should use an attached debugger (e.g. Visual Studio or WinDbg) during the benchmarking. The best way is build our benchmark in the Release mode and run it with `cmd`.
 
 * **Try different environments**
 
@@ -565,7 +565,7 @@ In this case, you should create a small list like this:
 List<int> list = new List<int> { 1, 2, 3, 4, 5 };
 ```
 
-If you create a big list (with millions of elements), then you will also measure efficiency of the CPU cache because you will have big amount of http://en.wikipedia.org/wiki/CPU_cache#Cache_miss[cache miss] during the calculation.  
+If you create a big list (with millions of elements), then you will also measure efficiency of the CPU cache because you will have big amount of [cache miss](http://en.wikipedia.org/wiki/CPU_cache#Cache_miss) during the calculation.  
 
 * **Power settings and other applications**
 
