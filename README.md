@@ -103,7 +103,7 @@ Type=Md5VsSha256  Mode=Throughput
 
 ## Configs
 
-Config is a set of so called `jobs`, `columns`, `exporters`, `loggers`, `diagnosers`, `analysers` that help you to build your benchmark. There are two ways to set your config:
+Config is a set of so called `jobs`, `columns`, `exporters`, `loggers`, `diagnosers`, `analysers`, `validators` that help you to build your benchmark. There are two ways to set your config:
 
 * **Object style**
 
@@ -186,6 +186,20 @@ public class IntroConfigSource
 }
 ```
 
+* **Fluent config**
+
+There is no need to create new Config type, you can simply use fluent interface:
+
+```cs
+BenchmarkRunner
+	.Run<Algo_Md5VsSha256>(
+		ManualConfig
+			.Create(DefaultConfig.Instance)
+			.With(Job.RyuJitX64)
+			.With(Job.Core)
+			.With(ExecutionValidator.FailOnError));
+```
+
 ### Jobs
 
 A *job* is an environment for your benchmarks. You can set one or several jobs for your set of benchmarks.
@@ -219,6 +233,8 @@ class Job
     IJob[] AllJits = { LegacyX86, LegacyX64, RyuJitX64 };
     IJob Clr = new Job { Runtime = Runtime.Clr };
     IJob Mono = new Job { Runtime = Runtime.Mono };
+    IJob Dnx = new Job { Runtime = Runtime.Dnx };
+    IJob Core = new Job { Runtime = Runtime.Core };
     IJob LongRun = new Job { LaunchCount = 3, WarmupCount = 30, TargetCount = 1000 };
 }
 ```
@@ -347,38 +363,24 @@ public class IntroTags
 
 ### Exporters
 
-An *exporter* allows you to export results of your benchmark in different formats. By default, files with results will be located in your bin directory. Here are some exporter examples:
+An *exporter* allows you to export results of your benchmark in different formats. By default, files with results will be located in .\BenchmarkDotNet.Artifacts\results directory. Default exporters are: csv, html and markdown. Here is list of all available exporters:
 
-* **Markdown**
-
-```
-<BenchmarkName>-report-default.md
-<BenchmarkName>-report-github.md
-<BenchmarkName>-report-stackoverflow.md
-```
-
-* **Csv**
-
-```
-<BenchmarkName>-report.csv
-<BenchmarkName>-measurements.csv
-```
-
-* **Html**
-
-```
-<BenchmarkName>-report.html
-```
-
-* **Plain**
-
-```
-<BenchmarkName>-report.txt
+```cs
+public IEnumerable<IExporter> GetExporters()
+{
+    yield return MarkdownExporter.Default; // produces <BenchmarkName>-report-default.md
+    yield return MarkdownExporter.GitHub; // produces <BenchmarkName>-report-github.md
+    yield return MarkdownExporter.StackOverflow; // produces <BenchmarkName>-report-stackoverflow.md
+    yield return CsvExporter.Default; // produces <BenchmarkName>-report.csv
+    yield return CsvMeasurementsExporter.Default; // produces <BenchmarkName>-measurements.csv
+    yield return HtmlExporter.Default; // produces <BenchmarkName>-report.html
+    yield return PlainExporter.Default; // produces <BenchmarkName>-report.txt
+}
 ```
 
 * **Plots**
 
-If you have installed [R](https://www.r-project.org/) and defined `%R_HOME%` variable, you will also get nice plots with help of the `BuildPlots.R` script in your bin directory. Examples:
+If you have installed [R](https://www.r-project.org/), defined `%R_HOME%` variable and used `RPlotExporter.Default` in your config, you will also get nice plots with help of the `BuildPlots.R` script in your bin directory. Examples:
 
 ```
 <BenchmarkName>-barplot.png
@@ -401,6 +403,14 @@ A **diagnoser** can attach to your benchmark and get some useful info. For now, 
 ### Analysers
 
 An **analyser** can analyze summary of your benchmarks and produce some useful warnings. For example, `EnvironmentAnalyser` warns you, if you build your application in the DEBUG mode or run it with an attached debugger.
+
+### Validators
+
+A **validator** can validate your benchmarks before they are executed and produce validation errors. If any of the validation errors is critical, then none of the benchmarks will get executed. Available validators are:
+
+* `BaselineValidator.FailOnError` - it checks if more than 1 Benchmark per class has `Baseline = true` applied. This validator is mandatory.
+* `JitOptimizationsValidator.(Dont)FailOnError` - it checks whether any of the referenced assemblies is non-optimized. DontFailOnError version is enabled by default.
+* `ExecutionValidator.(Dont)FailOnError` - it checks if it is possible to run your benchmarks by executing each of them once. Optional.
 
 ## Advanced Features
 
@@ -436,7 +446,7 @@ public class IntroParams
 
 ### Setup
 
-If you have some data that you want to initialize, the `Setup` method is the best place for this:
+If you have some data that you want to initialize, the `[Setup]` method is the best place for this. It will be invoked only once before each iteration.
 
 ```cs
 private int[] initialValuesArray;
@@ -472,7 +482,7 @@ public int ForEachList()
 
 ### Baseline
 
-You can mark one of your benchmark methods as a baseline:
+In order to scale your results you need to mark one of your benchmark methods as a baseline. Only one method in class can have `Baseline = true` applied.
 
 ```cs
 public class Sleeps
