@@ -7,7 +7,7 @@
 
 **Summary**
 
-* Standard benchmarking routine: generating an isolated project per each benchmark method; autoselection of iteration amount; warmup; overhead evaluation; statistics calucalation; and so on.
+* Standard benchmarking routine: generating an isolated project per each benchmark method; auto-selection of iteration amount; warmup; overhead evaluation; statistics calculation; and so on.
 * Easy way to compare different environments (`x86` vs `x64`, `LegacyJit` vs `RyuJit`, and so on; see: [Jobs](#jobs))
 * Reports: markdown (default, github, stackoverflow), csv, html, plain text; png plots.
 * Advanced features: [Baseline](#baseline), [Params](#params)
@@ -400,6 +400,17 @@ A **logger** allows you to log results of your benchmark. By default, you can se
 
 A **diagnoser** can attach to your benchmark and get some useful info. For now, there are no default diagnosers in the NuGet package. If you want to use it, you should build BenchmarkDotNet manually from the source code.
 
+The current Diagnosers are:
+- GC and Memory Allocation
+- JIT Inlining Events
+
+Below is a sample output from the `GC and Memory Allocation` diagnoser, note the extra columns on the right-hand side ("Gen 0", "Gen 1", "Gen 2" and "Bytes Allocated/Op"):
+
+    Method |  Lookup |     Median |    StdDev | Scaled |    Gen 0 | Gen 1 | Gen 2 | Bytes Allocated/Op |
+---------- |-------- |----------- |---------- |------- |--------- |------ |------ |------------------- |
+      LINQ | Testing | 49.1154 ns | 0.5301 ns |   2.48 | 1,526.00 |     - |     - |              25.21 |
+ Iterative | Testing | 19.8040 ns | 0.0456 ns |   1.00 |        - |     - |     - |               0.00 |
+
 ### Analysers
 
 An **analyser** can analyze summary of your benchmarks and produce some useful warnings. For example, `EnvironmentAnalyser` warns you, if you build your application in the DEBUG mode or run it with an attached debugger.
@@ -640,7 +651,7 @@ switcher.Run(new[] { "jobs=dry", "columns=min,max" });
 
 * An invocation of the target method is an *operation*. A bunch of operation is an *iteration*. If you have a `Setup` method, it will be invoked before each iteration, but not between operations. We have the following type of iterations:
 
-    * `Pilot`: The best operation count will be choosen.
+    * `Pilot`: The best operation count will be chosen.
     * `IdleWarmup`, `IdleTarget`: BenchmarkDotNet overhead will be evaluated.
     * `MainWarmup`: Warmup of the main method.
     * `MainTarget`: Main measurements.
@@ -656,7 +667,7 @@ switcher.Run(new[] { "jobs=dry", "columns=min,max" });
 
 **Question** Benchmarks takes a lot of time, how I can speedup it?
 
-**Answer** In general case, you need a lot of time for achiving good accuracy. If you are sure that you don't have any tricky performance effects and you don't need such level of accuracy, you can create a special Job. An example:
+**Answer** In general case, you need a lot of time for achieving good accuracy. If you are sure that you don't have any tricky performance effects and you don't need such level of accuracy, you can create a special Job. An example:
 
 ```cs
 public class FastAndDirtyConfig : ManualConfig
@@ -676,6 +687,7 @@ public class FastAndDirtyConfig : ManualConfig
 ## Team
 
 Authors: [Andrey Akinshin](https://github.com/AndreyAkinshin) (maintainer), [Jon Skeet](https://github.com/jskeet), [Matt Warren](https://github.com/mattwarren)
+
 Contributors: [Adam Sitnik](https://github.com/adamsitnik), [Sasha Goldshtein](https://github.com/goldshtn), and [others](https://github.com/PerfDotNet/BenchmarkDotNet/graphs/contributors)
 
 2013–2016
