@@ -84,7 +84,7 @@ namespace BenchmarkDotNet.Configs
         private static IDiagnoser[] LoadDiagnosers()
         {
 #if !CORE
-            var diagnosticAssembly = "BenchmarkDotNet.Diagnostics.dll";
+            var diagnosticAssembly = "BenchmarkDotNet.Diagnostics.Windows.dll";
             try
             {
                 var loadedAssembly = Assembly.LoadFrom(diagnosticAssembly);
@@ -101,10 +101,10 @@ namespace BenchmarkDotNet.Configs
                 {
                     return new[] 
                     {
-                        GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.RuntimeDiagnoser"),
-                        GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.SourceDiagnoser"),
-                        GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.GCDiagnoser"),
-                        GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.InliningDiagnoser"),
+                        GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.Windows.RuntimeDiagnoser"),
+                        GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.Windows.SourceDiagnoser"),
+                        GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.Windows.GCDiagnoser"),
+                        GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.Windows.InliningDiagnoser"),
                     };
                 }
             }
