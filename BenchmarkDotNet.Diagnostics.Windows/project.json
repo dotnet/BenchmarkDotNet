@@ -1,18 +1,29 @@
 ﻿{
   "title": "BenchmarkDotNet.Diagnostics.Windows",
-  "frameworks": {
-    "net40": {
+  "configurations": {
+    "Debug": {
+      "compilationOptions": {
+        "define": [ "DEBUG", "TRACE" ]
+      }
     },
-    "dnx451": {
-      "frameworkAssemblies": {
-        "System.Runtime": "4.0.10.0"
+    "Release": {
+      "compilationOptions": {
+        "define": [ "RELEASE", "TRACE" ],
+        "optimize": true,
+        "xmlDoc": true,
+        "keyFile": "../strongNameKey.snk",
+        "strongName": true
       }
     }
+  },
+  "frameworks": {
+    "net40": { },
+    "dnx451": { }
   },
   "dependencies": {
     "BenchmarkDotNet": {
       "target": "project",
-      "version": "1.0.0-*"
+      "version": "0.9.4-*"
     },
     "Dia2Lib": "1.0.0-*",
     "Interop.Dia2Lib": "1.0.0-*",
