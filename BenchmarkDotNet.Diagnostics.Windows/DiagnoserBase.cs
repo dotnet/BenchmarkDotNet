@@ -11,7 +11,7 @@ using Microsoft.Diagnostics.Runtime;
 using Microsoft.Diagnostics.Runtime.Desktop;
 using Microsoft.Diagnostics.Runtime.Interop;
 
-namespace BenchmarkDotNet.Diagnostics
+namespace BenchmarkDotNet.Diagnostics.Windows
 {
     public class DiagnoserBase
     {
@@ -156,7 +156,7 @@ namespace BenchmarkDotNet.Diagnostics
 
         /// <summary>
         /// See https://github.com/goldshtn/msos/commit/705d3758d15835d2520b31fcf3028353bdbca73b#commitcomment-12499813
-        /// and https://github.com/Microsoft/dotnetsamples/blob/master/Microsoft.Diagnostics.Runtime/CLRMD/ClrMemDiag/Debugger/IDebugControl.cs#L126-L156
+        /// and https://github.com/Microsoft/dotnetsamples/blob/master/Microsoft.Diagnostics.Windows.Runtime/CLRMD/ClrMemDiag/Debugger/IDebugControl.cs#L126-L156
         /// </summary>
         private void PrintAssemblyCode(ClrMethod method, IList<ILToNativeMap> ilMaps, ClrRuntime runtime, IDebugControl debugControl)
         {

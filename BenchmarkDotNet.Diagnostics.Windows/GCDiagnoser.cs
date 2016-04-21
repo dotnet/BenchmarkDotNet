@@ -15,7 +15,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BenchmarkDotNet.Diagnostics
+namespace BenchmarkDotNet.Diagnostics.Windows
 {
     public class GCDiagnoser : ETWDiagnoser, IDiagnoser, IColumnProvider
     {

@@ -7,7 +7,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BenchmarkDotNet", "Benchmar
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BenchmarkDotNet.Tests", "BenchmarkDotNet.Tests\BenchmarkDotNet.Tests.xproj", "{7CFC4790-9A2F-4E34-98CB-4FDF4144FD6E}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BenchmarkDotNet.Diagnostics", "BenchmarkDotNet.Diagnostics\BenchmarkDotNet.Diagnostics.xproj", "{B61A2815-4E2F-42F7-A87C-973C488B11CA}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BenchmarkDotNet.Diagnostics.Windows", "BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.xproj", "{B61A2815-4E2F-42F7-A87C-973C488B11CA}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BenchmarkDotNet.Samples", "BenchmarkDotNet.Samples\BenchmarkDotNet.Samples.xproj", "{697AAA71-A681-41B2-AC13-ADF864C7212B}"
 EndProject

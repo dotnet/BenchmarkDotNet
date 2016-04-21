@@ -2,9 +2,9 @@
 using System.Runtime.InteropServices;
 using BenchmarkDotNet.Properties;
 
-[assembly: AssemblyTitle(BenchmarkDotNetInfo.Title + ".Diagnostics")]
-[assembly: AssemblyProduct(BenchmarkDotNetInfo.Title + ".Diagnostics")]
-[assembly: AssemblyDescription(BenchmarkDotNetInfo.Description + " Diagnostic Tools")]
+[assembly: AssemblyTitle(BenchmarkDotNetInfo.Title + ".Diagnostics.Windows")]
+[assembly: AssemblyProduct(BenchmarkDotNetInfo.Title + ".Diagnostics.Windows")]
+[assembly: AssemblyDescription(BenchmarkDotNetInfo.Description + " Diagnostic Tools for Windows")]
 [assembly: AssemblyCopyright(BenchmarkDotNetInfo.Copyright)]
 [assembly: AssemblyVersion(BenchmarkDotNetInfo.Version)]
 [assembly: AssemblyFileVersion(BenchmarkDotNetInfo.Version)]

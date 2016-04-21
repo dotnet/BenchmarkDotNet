@@ -5,7 +5,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Reports;
 
-namespace BenchmarkDotNet.Diagnostics
+namespace BenchmarkDotNet.Diagnostics.Windows
 {
     /// <summary>
     /// Source (IL/ASM) diagnoser

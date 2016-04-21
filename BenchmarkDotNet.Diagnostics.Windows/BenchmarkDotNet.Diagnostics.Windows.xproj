@@ -7,13 +7,13 @@
   <Import Project="$(VSToolsPath)\DNX\Microsoft.DNX.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
     <ProjectGuid>B61A2815-4E2F-42F7-A87C-973C488B11CA</ProjectGuid>
-    <RootNamespace>BenchmarkDotNet.Diagnostics</RootNamespace>
+    <RootNamespace>BenchmarkDotNet.Diagnostics.Windows</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">..\artifacts\obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">..\artifacts\bin\$(MSBuildProjectName)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup>
     <SchemaVersion>2.0</SchemaVersion>
-	<ProduceOutputsOnBuild>True</ProduceOutputsOnBuild>
+    <ProduceOutputsOnBuild>True</ProduceOutputsOnBuild>
     <TypeScriptCompileBlocked>True</TypeScriptCompileBlocked>
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\DNX\Microsoft.DNX.targets" Condition="'$(VSToolsPath)' != ''" />

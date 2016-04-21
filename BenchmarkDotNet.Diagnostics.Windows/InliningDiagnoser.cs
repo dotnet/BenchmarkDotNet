@@ -11,7 +11,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BenchmarkDotNet.Diagnostics
+namespace BenchmarkDotNet.Diagnostics.Windows
 {
     public class InliningDiagnoser : ETWDiagnoser, IDiagnoser
     {

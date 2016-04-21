@@ -2,7 +2,7 @@
 using BenchmarkDotNet.Running;
 using System.Collections.Generic;
 
-namespace BenchmarkDotNet.Diagnostics
+namespace BenchmarkDotNet.Diagnostics.Windows
 {
     public abstract class ETWDiagnoser
     {
