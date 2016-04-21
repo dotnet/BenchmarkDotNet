@@ -27,7 +27,7 @@
       "compilationOptions": {
         "define": [ "CLASSIC" ]
       },
-      "BenchmarkDotNet.Diagnostics": "1.0.0-*"
+      "BenchmarkDotNet.Diagnostics.Windows": "1.0.0-*"
     },
     "dnx451": {
       "compilationOptions": {

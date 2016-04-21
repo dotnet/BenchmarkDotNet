@@ -33,7 +33,7 @@ echo -----------------------------
 
 mkdir testsOutput
 call build/batchcopy.cmd "artifacts/bin/BenchmarkDotNet/Release/net45/*.*" "testsOutput"
-call build/batchcopy.cmd "artifacts/bin/BenchmarkDotNet.Diagnostics/Release/net40/*.*" "testsOutput"
+call build/batchcopy.cmd "artifacts/bin/BenchmarkDotNet.Diagnostics.Windows/Release/net40/*.*" "testsOutput"
 call build/batchcopy.cmd "artifacts/bin/BenchmarkDotNet.IntegrationTests/Release/net45/*.*" "testsOutput"
 call build/batchcopy.cmd "artifacts/bin/BenchmarkDotNet.Tests/Release/net45/*.*" "testsOutput"
 call build/batchcopy.cmd "BenchmarkDotNet.IntegrationTests.Classic/bin/Release" "testsOutput"

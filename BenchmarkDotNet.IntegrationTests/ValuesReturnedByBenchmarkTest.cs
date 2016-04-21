@@ -27,9 +27,9 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Benchmark]
-        public Diagnostics.InliningDiagnoser TypeFromCustomDependency()
+        public Diagnostics.Windows.InliningDiagnoser TypeFromCustomDependency()
         {
-            return new Diagnostics.InliningDiagnoser();
+            return new Diagnostics.Windows.InliningDiagnoser();
         }
 #endif
 

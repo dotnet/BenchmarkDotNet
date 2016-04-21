@@ -1,5 +1,5 @@
 ﻿#if !CORE
-using BenchmarkDotNet.Diagnostics;
+using BenchmarkDotNet.Diagnostics.Windows;
 using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;

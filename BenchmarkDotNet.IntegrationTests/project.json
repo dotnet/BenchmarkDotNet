@@ -26,7 +26,7 @@
         "define": [ "CLASSIC" ]
       },
       "dependencies": {
-        "BenchmarkDotNet.Diagnostics": "1.0.0-*",
+        "BenchmarkDotNet.Diagnostics.Windows": "1.0.0-*",
         "xunit.runner.console": "2.1.0"
       },
       "frameworkAssemblies": {
@@ -44,7 +44,7 @@
         "WindowsBase": "4.0.0.0"
       },
       "dependencies": {
-        "BenchmarkDotNet.Diagnostics": "1.0.0-*",
+        "BenchmarkDotNet.Diagnostics.Windows": "1.0.0-*",
         "xunit.runner.dnx": "2.1.0-rc1-build204"
       }
     },
