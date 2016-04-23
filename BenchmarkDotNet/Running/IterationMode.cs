@@ -3,7 +3,7 @@
     public enum IterationMode
     {
         /// <summary>
-        /// <seealso cref="https://en.wikipedia.org/wiki/Pilot_experiment"/>
+        /// <seealso href="https://en.wikipedia.org/wiki/Pilot_experiment"/>
         /// </summary>
         Pilot,
 

@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
             File.WriteAllText(fileName, content);
         }
 
-        protected override void GenerateProjectBuildFile(string scriptFilePath)
+        protected override void GenerateProjectBuildFile(string scriptFilePath, Framework framework)
         {
             var content = ResourceHelper.LoadTemplate("BuildBenchmark.txt");
             File.WriteAllText(scriptFilePath, content);

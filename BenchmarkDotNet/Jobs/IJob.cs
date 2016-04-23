@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Jobs
 
         /// <summary>
         /// ProcessorAffinity for the benchmark process.
-        /// <seealso cref="https://msdn.microsoft.com/library/system.diagnostics.process.processoraffinity.aspx"/>
+        /// <seealso href="https://msdn.microsoft.com/library/system.diagnostics.process.processoraffinity.aspx"/>
         /// </summary>
         Count Affinity { get; }
 

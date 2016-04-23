@@ -242,13 +242,13 @@ namespace BenchmarkDotNet.Running
                     logger.WriteLineError("Executable not found");
                 executeResults.Add(executeResult);
 
-                var measurements = executeResults.
-                        SelectMany(r => r.Data).
-                        Select(line => Measurement.Parse(logger, line, 0)).
-                        Where(r => r != null).
+                var measurements = executeResults
+                        .SelectMany(r => r.Data)
+                        .Select(line => Measurement.Parse(logger, line, 0))
+                        .Where(r => r != null).
                         ToArray();
 
-                if (measurements.Count() == 0)
+                if (!measurements.Any())
                 {
                     // Something went wrong during the benchmark, don't bother doing more runs
                     logger.WriteLineError($"No more Benchmark runs will be launched as NO measurements were obtained from the previous run!");

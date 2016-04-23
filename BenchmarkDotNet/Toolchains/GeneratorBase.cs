@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Toolchains
 
             GenerateProgramFile(result.DirectoryPath, benchmark);
             GenerateProjectFile(logger, result.DirectoryPath, benchmark);
-            GenerateProjectBuildFile(Path.Combine(result.DirectoryPath, BuildBenchmarkScriptFileName));
+            GenerateProjectBuildFile(Path.Combine(result.DirectoryPath, BuildBenchmarkScriptFileName), benchmark.Job.Framework);
             GenerateAppConfigFile(result.DirectoryPath, benchmark.Job);
 
             return result;
@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Toolchains
 
         protected abstract void GenerateProjectFile(ILogger logger, string projectDir, Benchmark benchmark);
 
-        protected abstract void GenerateProjectBuildFile(string scriptFilePath);
+        protected abstract void GenerateProjectBuildFile(string scriptFilePath, Framework framework);
 
         private GenerateResult CreateProjectDirectory(Benchmark benchmark, string rootArtifactsFolderPath)
         {

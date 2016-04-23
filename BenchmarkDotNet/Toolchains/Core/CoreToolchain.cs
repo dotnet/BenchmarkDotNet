@@ -16,10 +16,10 @@ namespace BenchmarkDotNet.Toolchains.Core
         private CoreToolchain()
             : base("Core",
                   new DotNetCliGenerator(
-                      TargetFrameworkMoniker, 
+                      _ => TargetFrameworkMoniker, 
                       extraDependencies: "\"dependencies\": { \"NETStandard.Library\": \"1.0.0-rc2-23811\" }", // required by dotnet cli
                       platformProvider: _ => "x64"), // dotnet cli supports only x64 compilation now
-                  new DotNetCliBuilder(TargetFrameworkMoniker),
+                  new DotNetCliBuilder(_ => TargetFrameworkMoniker),
                   new ClassicExecutor())
         {
         }

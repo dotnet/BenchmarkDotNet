@@ -16,10 +16,10 @@ namespace BenchmarkDotNet.Toolchains.Dnx
         private DnxToolchain() 
             : base("Dnx",
                   new DotNetCliGenerator(
-                      TargetFrameworkMoniker,
+                      _ => TargetFrameworkMoniker,
                       extraDependencies: "\"frameworkAssemblies\": { \"System.Runtime\": \"4.0.10.0\" }",
                       platformProvider: platform => platform.ToConfig()),
-                  new DotNetCliBuilder(TargetFrameworkMoniker), 
+                  new DotNetCliBuilder(_ => TargetFrameworkMoniker), 
                   new ClassicExecutor())
         {
         }

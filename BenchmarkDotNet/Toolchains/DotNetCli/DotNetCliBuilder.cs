@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -17,11 +18,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMinutes(2);
 
-        private string Framework { get; }
+        private Func<Framework, string> TargetFrameworkMonikerProvider { get; }
 
-        public DotNetCliBuilder(string framework)
+        public DotNetCliBuilder(Func<Framework, string> targetFrameworkMonikerProvider)
         {
-            Framework = framework;
+            TargetFrameworkMonikerProvider = targetFrameworkMonikerProvider;
         }
 
         /// <summary>
@@ -40,7 +41,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
 
             if (!DotNetCliCommandExecutor.ExecuteCommand(
-                GetBuildCommand(Framework), 
+                GetBuildCommand(TargetFrameworkMonikerProvider(benchmark.Job.Framework)), 
                 generateResult.DirectoryPath, 
                 logger,
                 DefaultTimeout))
