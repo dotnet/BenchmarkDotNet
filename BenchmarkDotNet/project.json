@@ -1,6 +1,6 @@
 ﻿{
   "title": "BenchmarkDotNet",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "authors": [ "Andrey Akinshin", "Jon Skeet", "Matt Warren" ],
   "owners": [ "Andrey Akinshin", "Jon Skeet", "Matt Warren" ],
   "licenseUrl": "https://github.com/PerfDotNet/BenchmarkDotNet/blob/master/LICENSE.md",
@@ -71,7 +71,7 @@
         "System.Management": "4.0.0.0"
       }
     },
-    "dnxcore50": {
+    "dotnet5.4": {
       "compilationOptions": {
         "define": [ "CORE" ]
       },
