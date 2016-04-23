@@ -2,6 +2,19 @@
 {
     public enum Runtime
     {
-        Host, Clr, Mono, Dnx, Core
+        Host,
+        /// <summary>
+        /// Desktop CLR
+        /// </summary>
+        Clr,
+        Mono,
+        /// <summary>
+        /// Desktop CLR hosted on Windows with Dot Net eXecution (DNX)
+        /// </summary>
+        Dnx,
+        /// <summary>
+        /// Cross-platform CoreCLR runtime
+        /// </summary>
+        Core
     }
 }

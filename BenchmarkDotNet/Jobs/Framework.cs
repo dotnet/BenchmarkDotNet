@@ -13,6 +13,7 @@ namespace BenchmarkDotNet.Jobs
         V451,
         V452,
         V46,
-        V461
+        V461,
+        V462
     }
 }

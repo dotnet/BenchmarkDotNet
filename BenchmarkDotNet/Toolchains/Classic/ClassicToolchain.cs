@@ -41,6 +41,8 @@ namespace BenchmarkDotNet.Toolchains.Classic
                     return "net46";
                 case Framework.V461:
                     return "net461";
+                case Framework.V462:
+                    return "net462";
                 default:
                     throw new ArgumentOutOfRangeException(nameof(framework), framework, null);
             }
