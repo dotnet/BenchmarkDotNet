@@ -1,5 +1,7 @@
-﻿using BenchmarkDotNet.Extensions;
+﻿using System;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Classic;
@@ -9,17 +11,15 @@ namespace BenchmarkDotNet.Toolchains.Dnx
 {
     public class DnxToolchain : Toolchain
     {
-        private const string TargetFrameworkMoniker = "dnx451";
-
         public static readonly IToolchain Instance = new DnxToolchain();
 
         private DnxToolchain() 
             : base("Dnx",
                   new DotNetCliGenerator(
-                      _ => TargetFrameworkMoniker,
-                      extraDependencies: "\"frameworkAssemblies\": { \"System.Runtime\": \"4.0.10.0\" }",
+                      TargetFrameworkMonikerProvider,
+                      extraDependencies: "\"frameworkAssemblies\": { \"System.Runtime\": \"4.0.20.0\" }",
                       platformProvider: platform => platform.ToConfig()),
-                  new DotNetCliBuilder(_ => TargetFrameworkMoniker), 
+                  new DotNetCliBuilder(TargetFrameworkMonikerProvider), 
                   new ClassicExecutor())
         {
         }
@@ -33,6 +33,22 @@ namespace BenchmarkDotNet.Toolchains.Dnx
             }
 
             return true;
+        }
+
+        private static string TargetFrameworkMonikerProvider(Framework framework)
+        {
+            switch (framework)
+            {
+                case Framework.Host: // we create dnx46 app so it can reference dnx451, dnx452 and dnx46 components as well
+                case Framework.V46:
+                    return "dnx46";
+                case Framework.V451:
+                    return "dnx451";
+                case Framework.V452:
+                    return "dnx452";
+                default:
+                    throw new NotSupportedException("Only Host, V451, V452 and V46 values are supported");
+            }
         }
     }
 }
