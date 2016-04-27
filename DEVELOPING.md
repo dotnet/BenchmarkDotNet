@@ -12,7 +12,7 @@
 Required:
 * Visual Studio 2015 Update 1
 * [ASP.NET 5 RC](https://go.microsoft.com/fwlink/?LinkId=627627) I am not sure about this, but it installs dnx toolchain and DNX/CORE projects templates.
-* [dotnet cli toolchain](https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-win-x64.latest.exe)
+* [dotnet cli toolchain](http://dotnet.github.io/getting-started/) (current stable version: `dotnet-win-x64.1.0.0.001598.exe`)
 * Internet connection to download all packages
 
 If your build fails because some packages are not available, let say F#, then just disable these project and hope for nuget server to work later on ;)
