@@ -32,12 +32,12 @@ namespace BenchmarkDotNet.IntegrationTests
             var column = summary.Config.GetColumns().OfType<BaselineDiffColumn>().FirstOrDefault();
             Assert.NotNull(column);
 
-            Assert.Equal(column.ColumnName, headerRow.Penult());
+            Assert.Equal(column.ColumnName, headerRow.Last());
             var testNameColumn = Array.FindIndex(headerRow, c => c == "Method");
             var extraColumn = Array.FindIndex(headerRow, c => c == column.ColumnName);
             foreach (var row in table.FullContent)
             {
-                Assert.Equal(row.Length, extraColumn + 2);
+                Assert.Equal(row.Length, extraColumn + 1);
                 if (row[testNameColumn] == "BenchmarkSlow") // This is our baseline
                     Assert.Equal("1.00", row[extraColumn]);
                 else if (row[testNameColumn] == "BenchmarkFast") // This should have been compared to the baseline
