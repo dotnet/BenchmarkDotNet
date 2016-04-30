@@ -10,6 +10,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
+using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Toolchains
 {
@@ -169,7 +170,9 @@ namespace BenchmarkDotNet.Toolchains
             if (value is bool)
                 return value.ToString().ToLower();
             if (value is string)
-                return "\"" + value + "\"";
+                return $"\"{value}\"";
+            if(value is char)
+                return $"'{value}'";
             if (value is float)
                 return ((float)value).ToString("G", CultureInfo.InvariantCulture) + "f";
             if (value is double)

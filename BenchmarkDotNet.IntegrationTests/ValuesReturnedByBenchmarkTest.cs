@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Linq;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Running;
 using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -12,11 +10,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void AnyValueCanBeReturned()
         {
-            var summary = BenchmarkRunner.Run<ValuesReturnedByBenchmarkTest>();
-
-            Assert.True(summary.Reports.Any());
-            Assert.True(summary.Reports.All(report => report.ExecuteResults.All(executeResult => executeResult.FoundExecutable)));
-            Assert.True(summary.Reports.All(report => report.AllMeasurements.Any()));
+            BenchmarkTestExecutor.CanExecute<ValuesReturnedByBenchmarkTest>();
         }
 
 #if !CORE

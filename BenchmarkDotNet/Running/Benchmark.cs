@@ -1,4 +1,5 @@
 ﻿using System;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Parameters;
 
@@ -10,7 +11,7 @@ namespace BenchmarkDotNet.Running
         public IJob Job { get; }
         public ParameterInstances Parameters { get; }
 
-        public string ShortInfo => shortInfo ?? (shortInfo = (Target.FullInfo + "_" + Job.GetShortInfo() + "_" + Parameters.FullInfo).Trim('_'));
+        public string ShortInfo => shortInfo ?? (shortInfo = (Target.FullInfo + "_" + Job.GetShortInfo() + "_" + Parameters.FullInfo).Trim('_').AsValidPath());
         public string FullInfo => (Target.FullInfo + "_" + Job.GetFullInfo() + "_" + Parameters.FullInfo).Trim('_');
         public override string ToString() => ShortInfo;
 

@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.IO;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
@@ -126,35 +127,44 @@ namespace BenchmarkDotNet.IntegrationTests
         }
     }
 
-    [Config(typeof(SingleRunFastConfig))]
     public class NedtedEnumsAsParams
     {
+        public enum NestedOne
+        {
+            SampleValue = 1234
+        }
+
         [Params(NestedOne.SampleValue)]
         public NestedOne Field;
 
         [Fact]
         public void AreSupported()
         {
-            var summary = BenchmarkRunner.Run<NedtedEnumsAsParams>();
-
-            Assert.True(summary.Reports.Any());
-            Assert.True(summary
-                .Reports
-                .All(report => 
-                    report
-                        .ExecuteResults
-                        .Any(executeResult => executeResult.FoundExecutable && executeResult.Data.Any())));
+            BenchmarkTestExecutor.CanExecute<NedtedEnumsAsParams>();
         }
 
         [Benchmark]
-        public int Benchmark()
+        public NestedOne Benchmark()
         {
-            return (int)NestedOne.SampleValue;
+            return Field;
         }
-        
-        public enum NestedOne
+    }
+
+    public class CharactersAsParams
+    {
+        [Params('*')]
+        public char Field;
+
+        [Fact]
+        public void AreSupported()
         {
-            SampleValue = 1234
+            BenchmarkTestExecutor.CanExecute<CharactersAsParams>();
+        }
+
+        [Benchmark]
+        public char Benchmark()
+        {
+            return Field;
         }
     }
 }
