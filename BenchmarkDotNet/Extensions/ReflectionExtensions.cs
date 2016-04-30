@@ -48,6 +48,14 @@ namespace BenchmarkDotNet.Extensions
             return prefix + type.Name;
         }
 
+        /// <summary>
+        /// replaces '+' with '.' to support NestedTypes
+        /// </summary>
+        internal static string GetCorrectFullName(this Type type)
+        {
+            return type.FullName.Replace('+', '.');
+        }
+
         internal static string GetTargetFrameworkVersion(this Assembly assembly)
         {
             var targetFrameworkAttribute = assembly.GetCustomAttributes<TargetFrameworkAttribute>(false).FirstOrDefault();
