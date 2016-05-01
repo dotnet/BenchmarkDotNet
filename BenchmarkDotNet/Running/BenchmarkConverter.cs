@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Running
             var rawJobs = config?.GetJobs().ToArray() ?? new IJob[0];
             if (rawJobs.IsEmpty())
                 rawJobs = new[] { Job.Default };
-            var jobs = rawJobs.ToArray();
+            var jobs = rawJobs.Distinct().ToArray();
 
             var targets = GetTargets(targetMethods, type, setupMethod).ToArray();
 
