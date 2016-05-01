@@ -10,7 +10,6 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
-using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Toolchains
 {

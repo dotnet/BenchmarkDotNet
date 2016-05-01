@@ -1,5 +1,4 @@
-﻿using BenchmarkDotNet.Jobs;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;

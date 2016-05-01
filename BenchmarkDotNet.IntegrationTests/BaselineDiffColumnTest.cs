@@ -1,5 +1,4 @@
-﻿using BenchmarkDotNet.Jobs;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using Xunit;
@@ -9,7 +8,6 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 
