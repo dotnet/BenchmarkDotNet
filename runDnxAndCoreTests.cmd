@@ -10,6 +10,28 @@ echo -----------------------------
 echo Initial Cleanup finished
 echo -----------------------------
 
+echo -----------------------------
+echo Running dotnet restore to make sure that all projects are compatible with dotnet cli
+echo -----------------------------
+
+call dotnet restore
+
+if NOT %ERRORLEVEL% == 0 (
+    echo Dotnet restore has failed
+    goto cleanup
+)
+
+echo -----------------------------
+echo Running dnu restore to make sure that all projects are compatible with dnx toolchain
+echo -----------------------------
+
+call dnu restore
+
+if NOT %ERRORLEVEL% == 0 (
+    echo dnu restore has failed
+    goto cleanup
+)
+
 cd BenchmarkDotNet.IntegrationTests
 
 echo -----------------------------
