@@ -4,7 +4,6 @@ using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Order;
-using BenchmarkDotNet.Parameters;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -23,6 +22,17 @@ namespace BenchmarkDotNet.Reports
         internal SummaryTable(Summary summary)
         {
             Summary = summary;
+
+            if (summary.HasCriticalValidationErrors)
+            {
+                Columns = new SummaryTableColumn[0];
+                ColumnCount = 0;
+                FullHeader = new string[0];
+                FullContent = new string[0][];
+                FullContentStartOfGroup = new bool[0];
+                FullContentWithHeader = new string[0][];
+                return;
+            }
 
             var configColumns = summary.Config.
                 GetColumns().

@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Reports
         public string Title { get; }
         public Benchmark[] Benchmarks { get; }
         public BenchmarkReport[] Reports { get; }
-        public TimeUnit TimeUnit { get; private set; }
+        public TimeUnit TimeUnit { get; }
         public EnvironmentInfo HostEnvironmentInfo { get; }
         public IConfig Config { get; }
         public string ResultsDirectoryPath { get; }
@@ -51,10 +51,12 @@ namespace BenchmarkDotNet.Reports
             Jobs = new Lazy<IJob[]>(() => Benchmarks.Select(b => b.Job).ToArray());
         }
 
-        internal Summary(string title, EnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, IValidationError[] validationErrors, Benchmark[] benchmarks)
+        private Summary(string title, EnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, IValidationError[] validationErrors, Benchmark[] benchmarks, BenchmarkReport[] reports)
             : this(title, hostEnvironmentInfo, config, resultsDirectoryPath, totalTime, validationErrors)
         {
             Benchmarks = benchmarks;
+            Table = new SummaryTable(this);
+            Reports = reports;
         }
 
         private Summary(string title, EnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, IValidationError[] validationErrors)
@@ -69,7 +71,7 @@ namespace BenchmarkDotNet.Reports
 
         internal static Summary CreateFailed(Benchmark[] benchmarks, string title, EnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, IValidationError[] validationErrors)
         {
-            return new Summary(title, hostEnvironmentInfo, config, resultsDirectoryPath, TimeSpan.Zero, validationErrors, benchmarks);
+            return new Summary(title, hostEnvironmentInfo, config, resultsDirectoryPath, TimeSpan.Zero, validationErrors, benchmarks, new BenchmarkReport[0]);
         }
 
         internal string GetJobShortInfo(IJob job)
