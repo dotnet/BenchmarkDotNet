@@ -50,6 +50,7 @@ namespace BenchmarkDotNet.Configs
             diagnosers.AddRange(config.GetDiagnosers());
             analysers.AddRange(config.GetAnalysers());
             jobs.AddRange(config.GetJobs());
+            validators.AddRange(config.GetValidators());
             orderProvider = config.GetOrderProvider() ?? orderProvider;
         }
 
