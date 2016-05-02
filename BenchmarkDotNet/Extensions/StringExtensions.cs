@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Extensions
 {
     public static class StringExtensions
     {
-        private static readonly Lazy<Dictionary<string, string>> InvalidPathCharactersMappings
+        private static readonly Lazy<Dictionary<string, string>> InvalidFileNameCharactersMappings
             = new Lazy<Dictionary<string, string>>(BuildInvalidPathCharactersMappings);
 
         internal static string WithoutSuffix(this string str, string suffix, StringComparison stringComparison = StringComparison.CurrentCulture)
@@ -17,13 +17,13 @@ namespace BenchmarkDotNet.Extensions
         }
 
         /// <summary>
-        /// replaces all invalid folder name chars with their number representation
+        /// replaces all invalid file name chars with their number representation
         /// </summary>
-        internal static string AsValidPath(this string inputPath)
+        internal static string AsValidFileName(this string inputPath)
         {
             var validPathBuilder = new StringBuilder(inputPath);
 
-            foreach (var mapping in InvalidPathCharactersMappings.Value)
+            foreach (var mapping in InvalidFileNameCharactersMappings.Value)
             {
                 validPathBuilder.Replace(mapping.Key, mapping.Value);
             }
@@ -33,8 +33,7 @@ namespace BenchmarkDotNet.Extensions
 
         private static Dictionary<string, string> BuildInvalidPathCharactersMappings()
         {
-            return Path.GetInvalidPathChars()
-                       .Concat(new[] { '*', '?' }) // also illegal but not listed in Path.GetInvalidPathChars() ?!?!
+            return Path.GetInvalidFileNameChars()
                        .ToDictionary(
                            character => character.ToString(),
                            character => $"char{(short)character}");

@@ -7,12 +7,20 @@ namespace BenchmarkDotNet.Tests
     public class StringExtensionsTests
     {
         [Fact]
-        public void AsValidPathReplacesAllInvalidFolderPathNameCharactersWithTheirRepresentation()
+        public void AsValidFileNameReplacesAllInvalidFileNameCharactersWithTheirRepresentation()
         {
-            foreach (var invalidPathChar in Path.GetInvalidPathChars())
+            foreach (var invalidPathChar in Path.GetInvalidFileNameChars())
             {
-                Assert.Equal($"char{(short)invalidPathChar}", invalidPathChar.ToString().AsValidPath());
+                Assert.Equal($"char{(short)invalidPathChar}", invalidPathChar.ToString().AsValidFileName());
             }
+        }
+
+        [Fact]
+        public void AsValidFileNameDoesNotChangeValidFileNames()
+        {
+            const string validFileName = "valid_File-Name.exe";
+
+            Assert.Equal(validFileName, validFileName.AsValidFileName());
         }
     }
 }
