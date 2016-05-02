@@ -20,7 +20,7 @@
   "dependencies": {
     "BenchmarkDotNet": {
       "target": "package",
-      "version": "0.9.4-beta"
+      "version": "0.9.5-beta"
     },
     "Microsoft.FSharp.Core.netcore": "1.0.0-alpha-151221",
     "NETStandard.Library": "1.0.0-rc2-23811"

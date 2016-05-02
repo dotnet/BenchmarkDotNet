@@ -23,7 +23,7 @@
   "dependencies": {
     "BenchmarkDotNet": {
       "target": "project",
-      "version": "0.9.4-*"
+      "version": "0.9.5-*"
     },
     "Dia2Lib": "1.0.0-*",
     "Interop.Dia2Lib": "1.0.0-*",
