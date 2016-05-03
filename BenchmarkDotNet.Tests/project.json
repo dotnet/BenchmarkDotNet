@@ -36,7 +36,6 @@
     "dnxcore50": {
       "imports": "portable-net45+win8",
       "dependencies": {
-        "Microsoft.NETCore.Platforms": "1.0.1-beta-23516",
         "System.ComponentModel.EventBasedAsync": "4.0.11-beta-23516",
         "xunit.runner.dnx": "2.1.0-rc1-build204"
       }
