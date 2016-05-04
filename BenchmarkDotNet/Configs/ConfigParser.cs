@@ -101,6 +101,7 @@ namespace BenchmarkDotNet.Configs
                 { "github", new[] { MarkdownExporter.GitHub } },
                 { "plain", new[] { PlainExporter.Default } },
                 { "rplot", new[] { RPlotExporter.Default } },
+                { "json", new[] { JsonExporter.Default } },
             };
         private static Lazy<IExporter[]> allExporters = new Lazy<IExporter[]>(() => availableExporters.SelectMany(e => e.Value).ToArray());
 
