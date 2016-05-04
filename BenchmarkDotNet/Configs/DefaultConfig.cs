@@ -101,8 +101,6 @@ namespace BenchmarkDotNet.Configs
                 {
                     return new[] 
                     {
-                        GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.Windows.RuntimeDiagnoser"),
-                        GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.Windows.SourceDiagnoser"),
                         GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.Windows.GCDiagnoser"),
                         GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.Windows.InliningDiagnoser"),
                     };
