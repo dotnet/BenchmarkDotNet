@@ -32,7 +32,13 @@ namespace BenchmarkDotNet.Columns
                 Where(b => b.Job.GetFullInfo() == benchmark.Job.GetFullInfo()).
                 Where(b => b.Parameters.FullInfo == benchmark.Parameters.FullInfo).
                 FirstOrDefault(b => b.Target.Baseline);
-            if (baselineBenchmark == null)
+            var invalidResults = baselineBenchmark == null ||
+                                 summary[baselineBenchmark] == null ||
+                                 summary[baselineBenchmark].ResultStatistics == null ||
+                                 summary[benchmark] == null ||
+                                 summary[benchmark].ResultStatistics == null;
+
+            if (invalidResults)
                 return "?";
 
             var baselineMedian = summary[baselineBenchmark].ResultStatistics.Median;

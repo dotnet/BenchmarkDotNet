@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void Test()
         {
             // This is the common way to run benchmarks, it should wire up the BenchmarkBaselineDeltaResultExtender for us
-            var summary = BenchmarkRunner.Run<BaselineDiffColumnTest>();
+            var summary = BenchmarkRunner.Run(this.GetType());
 
             var table = summary.Table;
             var headerRow = table.FullHeader;
@@ -122,6 +122,49 @@ namespace BenchmarkDotNet.IntegrationTests
         public void BenchmarkFast()
         {
             Thread.Sleep(5);
+        }
+    }
+
+    [Config(typeof(SingleRunFastConfig))]
+    public class BaselineDeltaResultExtenderHandlesBenchmarkErrorTest
+    {
+        [Fact]
+        public void Test()
+        {
+            // This is the common way to run benchmarks, it should wire up the BenchmarkBaselineDeltaResultExtender for us
+            var summary = BenchmarkRunner.Run(this.GetType());
+
+            var table = summary.Table;
+            var headerRow = table.FullHeader;
+            var column = summary.Config.GetColumns().OfType<BaselineDiffColumn>().FirstOrDefault();
+            Assert.NotNull(column);
+
+            Assert.Equal(column.ColumnName, headerRow.Last());
+            var testNameColumn = Array.FindIndex(headerRow, c => c == "Method");
+            var extraColumn = Array.FindIndex(headerRow, c => c == column.ColumnName);
+            foreach (var row in table.FullContent)
+            {
+                Assert.Equal(row.Length, extraColumn + 1);
+                if (row[testNameColumn] == "BenchmarkSlow") // This is our baseline
+                    Assert.Equal("1.00", row[extraColumn]);
+                else if (row[testNameColumn] == "BenchmarkThrows") // This should have "?" as it threw an error
+                    Assert.Contains("?", row[extraColumn]);
+            }
+        }
+
+        [Benchmark(Baseline = true)]
+        public void BenchmarkSlow()
+        {
+            Thread.Sleep(50);
+        }
+
+        [Benchmark]
+        public void BenchmarkThrows()
+        {
+            // Check that BaselineDiffColumn can handle Benchmarks that throw
+            // See https://github.com/PerfDotNet/BenchmarkDotNet/issues/151
+            // and https://github.com/PerfDotNet/BenchmarkDotNet/issues/158
+            throw new InvalidOperationException("Part of a Unit test - This is expected");
         }
     }
 }
