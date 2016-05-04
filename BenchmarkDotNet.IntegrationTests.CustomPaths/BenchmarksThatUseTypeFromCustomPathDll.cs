@@ -1,5 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
-using Microsoft.Diagnostics.Runtime.Utilities;
+using VerySimple;
 
 namespace BenchmarkDotNet.IntegrationTests.CustomPaths
 {
@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.IntegrationTests.CustomPaths
         [Benchmark]
         public string Benchmark()
         {
-            return MachineType.Native.ToString();
+            return new SingleClass().ToString();
         }
     }
 }

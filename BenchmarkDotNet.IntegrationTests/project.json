@@ -65,13 +65,5 @@
       "version": "0.9.5-*"
     },
     "xunit": "2.1.0"
-  },
-  "scripts": {
-    "postbuild": [
-      "%project:Directory%/../build/batchcopy \"%project:Directory%/../CLRMD/x86/msdia120.dll\" %project:BuildOutputDir%/Debug/net45",
-      "%project:Directory%/../build/batchcopy \"%project:Directory%/../CLRMD/x86/msdia120.dll\" %project:BuildOutputDir%/Release/net45",
-      "%project:Directory%/../build/batchcopy \"%project:Directory%/../CLRMD/x86/msdia120.dll\" %project:BuildOutputDir%/Debug/dnx451",
-      "%project:Directory%/../build/batchcopy \"%project:Directory%/../CLRMD/x86/msdia120.dll\" %project:BuildOutputDir%/Release/dnx451"
-    ]
   }
 }

@@ -1,14 +1,14 @@
 ﻿using BenchmarkDotNet.Attributes;
-using Microsoft.Diagnostics.Runtime.Utilities;
+using VerySimple;
 
 namespace BenchmarkDotNet.IntegrationTests.CustomPaths
 {
     public class BenchmarksThatReturnTypeFromCustomPathDll
     {
         [Benchmark]
-        public MachineType Benchmark()
+        public SingleClass Benchmark()
         {
-            return MachineType.Native;
+            return new SingleClass();
         }
     }
 }
