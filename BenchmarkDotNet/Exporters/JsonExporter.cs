@@ -41,10 +41,12 @@ namespace BenchmarkDotNet.Exporters
                     HostEnvironmentInfo = environmentInfo,
                     Benchmarks = summary.Reports.Select(r => new
                         {
+                            // We don't need Benchmark.ShortInfo, that info is available via Benchmark.Parameters below
                             r.Benchmark.ShortInfo,
                             Type = r.Benchmark.Target.Type.Name,
                             Method = r.Benchmark.Target.Method.Name,
                             r.Benchmark.Target.MethodTitle,
+                            Parameters = r.Benchmark.Parameters.PrintInfo,
                             Properties = r.Benchmark.Job.AllProperties.ToDictionary(p => p.Name, p => p.Value),
                             Statistics = r.ResultStatistics,
                             // We construct Measurment manually, so that we can have the IterationMode enum as text, rather than an integer

@@ -20,10 +20,10 @@
 // VERSION:
 
 // NOTE: uncomment the following line to make SimpleJson class internal.
-//#define SIMPLE_JSON_INTERNAL
+#define SIMPLE_JSON_INTERNAL
 
 // NOTE: uncomment the following line to make JsonArray and JsonObject class internal.
-//#define SIMPLE_JSON_OBJARRAYINTERNAL
+#define SIMPLE_JSON_OBJARRAYINTERNAL
 
 // NOTE: uncomment the following line to enable dynamic support.
 //#define SIMPLE_JSON_DYNAMIC
@@ -46,7 +46,7 @@
 
 // original json parsing code from http://techblog.procurios.nl/k/618/news/view/14605/14863/How-do-I-write-my-own-parser-for-JSON.html
 
-#if NETFX_CORE
+#if NETFX_CORE || CORE
 #define SIMPLE_JSON_TYPEINFO
 #endif
 
