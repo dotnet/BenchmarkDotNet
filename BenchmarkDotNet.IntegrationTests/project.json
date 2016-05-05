@@ -20,6 +20,7 @@
   },
   "compileExclude": "**/Program.cs",
   "veryImportantComment": "we need to exclude all auto-generated files that created during integration test execution",
+  "exclude": [ "**/BenchmarkDotNet.Artifacts/*" ],
   "frameworks": {
     "net45": {
       "compilationOptions": {
