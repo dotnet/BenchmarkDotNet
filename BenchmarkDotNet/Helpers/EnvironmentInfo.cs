@@ -82,19 +82,23 @@ namespace BenchmarkDotNet.Helpers
         public double GetChronometerResolution() => Chronometer.BestClock.GetResolution(TimeUnit.Nanoseconds);
 
         /// <param name="includeDotnetCliVersion">disabled by default to avoid perf hit for auto-generated program that also calls this method</param>
-        public IEnumerable<string> ToFormattedString(string clrHint = "", bool includeDotnetCliVersion = false)
+        public IEnumerable<EnvironmentInfoItem> ToList(string clrHint = "", bool includeDotnetCliVersion = false)
         {
-            yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}";
-            yield return $"OS={OsVersion}";
-            yield return $"Processor={ProcessorName}, ProcessorCount={ProcessorCount}";
-            yield return $"Frequency={ChronometerFrequency} ticks, Resolution={GetChronometerResolution().ToTimeStr()}, Timer={HardwareTimerKind.ToString().ToUpper()}";
-            yield return $"{clrHint}CLR={ClrVersion}, Arch={Architecture} {Configuration}{GetDebuggerFlag()}{GetJitFlag()}";
-            yield return $"JitModules={JitModules}";
+            yield return new EnvironmentInfoItem(BenchmarkDotNetCaption, BenchmarkDotNetVersion, 0);
+            yield return new EnvironmentInfoItem("OS", OsVersion, 1);
+            yield return new EnvironmentInfoItem("Processor", ProcessorName, 2);
+            yield return new EnvironmentInfoItem("ProcessorCount", ProcessorCount.ToString(), 2);
+            yield return new EnvironmentInfoItem("Frequency", $"{ChronometerFrequency} ticks", 3);
+            yield return new EnvironmentInfoItem("Resolution", GetChronometerResolution().ToTimeStr(), 3);
+            yield return new EnvironmentInfoItem("Timer", HardwareTimerKind.ToString().ToUpper(), 3);
+            yield return new EnvironmentInfoItem($"{clrHint}CLR", ClrVersion, 4);
+            yield return new EnvironmentInfoItem("Arch", $"{Architecture} {Configuration}{GetDebuggerFlag()}{GetJitFlag()}", 4);
+            yield return new EnvironmentInfoItem("JitModules", JitModules, 5);
 
 #if !CLASSIC
             if(includeDotnetCliVersion)
             {
-                yield return DotNetCliVersion.Value;
+                yield return new EnvironmentInfoItem("DotNetCliVersion", DotNetCliVersion.Value, 6);
             }
 #endif
         }
