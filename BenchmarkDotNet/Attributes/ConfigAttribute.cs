@@ -3,7 +3,7 @@ using BenchmarkDotNet.Configs;
 
 namespace BenchmarkDotNet.Attributes
 {
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
     public class ConfigAttribute : Attribute, IConfigSource
     {
         public IConfig Config { get; }

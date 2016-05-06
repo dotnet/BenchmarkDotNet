@@ -68,9 +68,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="JitOptimizations.cs" />
+    <Compile Include="AssemblyConfigAttribute.cs" />
+    <Compile Include="AssemblyConfigTests.cs" />
+    <Compile Include="JitOptimizationsTests.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="References.cs" />
+    <Compile Include="ReferencesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

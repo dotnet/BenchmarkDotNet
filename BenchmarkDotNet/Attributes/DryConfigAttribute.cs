@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Attributes
     /// <summary>
     /// This attribute has the same effect as writing <code>[Config("Jobs=Dry")]</code>
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
     public class DryConfigAttribute : Attribute, IConfigSource
     {
         public IConfig Config { get; }

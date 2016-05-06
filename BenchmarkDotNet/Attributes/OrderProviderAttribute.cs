@@ -4,7 +4,7 @@ using BenchmarkDotNet.Order;
 
 namespace BenchmarkDotNet.Attributes
 {
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
     public class OrderProviderAttribute : Attribute, IConfigSource
     {
         public OrderProviderAttribute(

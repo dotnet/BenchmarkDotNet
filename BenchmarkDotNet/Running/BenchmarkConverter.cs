@@ -47,8 +47,13 @@ namespace BenchmarkDotNet.Running
         {
             config = config ?? DefaultConfig.Instance;
             if (type != null)
-                foreach (var configSource in type.GetCustomAttributes<IConfigSource>(true))
+            {
+                var typeAttributes = type.GetCustomAttributes<IConfigSource>(true);                
+                var assemblyAttributes = type.Assembly().GetCustomAttributes<IConfigSource>(false);
+                var allAttributes = typeAttributes.Concat(assemblyAttributes);
+                foreach (var configSource in allAttributes)
                     config = ManualConfig.Union(config, configSource.Config);
+            }
             return config;
         }
 
