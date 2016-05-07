@@ -14,10 +14,14 @@ namespace BenchmarkDotNet.Exporters
         {
             logger.Write("<pre><code>");
             logger.WriteLine();
-            foreach (var infoLine in EnvironmentInfo.GetCurrent().ToFormattedString("Host", true))
+            var lastGroup = -1;
+            foreach (var infoLine in EnvironmentInfo.GetCurrent().ToList("Host", true))
             {
-                logger.WriteLine(infoLine);
+                if (infoLine.Group != lastGroup) logger.WriteLineInfo(infoLine.ToString());
+                else logger.WriteInfo(", " + infoLine);
+                lastGroup = infoLine.Group;
             }
+            logger.WriteLine();
             logger.Write("</code></pre>");
             logger.WriteLine();
 
