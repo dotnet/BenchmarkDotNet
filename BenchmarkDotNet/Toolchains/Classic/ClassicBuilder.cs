@@ -1,4 +1,5 @@
 ﻿#if CLASSIC
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -31,7 +32,8 @@ namespace BenchmarkDotNet.Toolchains.Classic
                     return BuildWithBat(generateResult, logger, executablePath);
                 }
 
-                return new BuildResult(generateResult, buildResult.OverallResult == BuildResultCode.Success, buildResult.Exception, executablePath);
+                return new BuildResult(generateResult, buildResult.OverallResult == BuildResultCode.Success,
+                    buildResult.Exception, executablePath);
             }
             catch (FileLoadException msBuildDllNotFound)
             {
@@ -42,6 +44,12 @@ namespace BenchmarkDotNet.Toolchains.Classic
             catch (FileNotFoundException msBuildDllNotFound)
             {
                 logger.WriteLineInfo($"Unable to find {msBuildDllNotFound.FileName}");
+
+                return BuildWithBat(generateResult, logger, executablePath);
+            }
+            catch (InvalidOperationException exception)
+            {
+                logger.WriteLine($"Unable to build (InvalidOperationException). More information: {exception.Message}");
 
                 return BuildWithBat(generateResult, logger, executablePath);
             }
