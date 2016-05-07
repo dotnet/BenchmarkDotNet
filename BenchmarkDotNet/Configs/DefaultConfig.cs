@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
@@ -69,13 +69,15 @@ namespace BenchmarkDotNet.Configs
             yield return JitOptimizationsValidator.DontFailOnError;
         }
 
-        public IEnumerable<IJob> GetJobs() => EnumerableHelper.Empty<IJob>();
+        public IEnumerable<IJob> GetJobs() => Enumerable.Empty<IJob>();
 
         public IOrderProvider GetOrderProvider() => null;
 
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
 
-        public IEnumerable<IDiagnoser> GetDiagnosers() => EnumerableHelper.Empty<IDiagnoser>();
+        public bool KeepBenchmarkFiles => false;
+
+        public IEnumerable<IDiagnoser> GetDiagnosers() => Enumerable.Empty<IDiagnoser>();
 
         // Make the Diagnosers lazy-loaded, so they are only instantiated if neededs
         public static readonly Lazy<IDiagnoser[]> LazyLoadedDiagnosers =

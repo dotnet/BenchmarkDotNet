@@ -33,6 +33,8 @@ namespace BenchmarkDotNet.Configs
 
         public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
 
+        public bool KeepBenchmarkFiles { get; set; }
+
         public void Add(params IColumn[] newColumns) => columns.AddRange(newColumns);
         public void Add(params IExporter[] newExprters) => exporters.AddRange(newExprters);
         public void Add(params ILogger[] newLoggers) => loggers.AddRange(newLoggers);

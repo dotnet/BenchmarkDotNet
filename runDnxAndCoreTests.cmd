@@ -65,5 +65,4 @@ echo -----------------------------
 :cleanup
 del failedDnxTests.txt
 del failedCoreTests.txt
-FOR /D /R %cd%\.. %%X IN (*_*) DO RMDIR /S /Q "%%X"
 cd ..

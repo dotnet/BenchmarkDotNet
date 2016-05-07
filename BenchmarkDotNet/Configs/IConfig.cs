@@ -23,5 +23,10 @@ namespace BenchmarkDotNet.Configs
         IOrderProvider GetOrderProvider();
 
         ConfigUnionRule UnionRule { get; }
+
+        /// <summary>
+        /// determines if all auto-generated files should be kept or removed after running benchmarks
+        /// </summary>
+        bool KeepBenchmarkFiles { get; }
     }
 }
