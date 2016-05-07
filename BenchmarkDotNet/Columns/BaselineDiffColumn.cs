@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
@@ -16,15 +17,22 @@ namespace BenchmarkDotNet.Columns
 
         public static readonly IColumn Delta = new BaselineDiffColumn(DiffKind.Delta);
         public static readonly IColumn Scaled = new BaselineDiffColumn(DiffKind.Scaled);
+        public static readonly IColumn Scaled50 = new BaselineDiffColumn(DiffKind.Scaled, 50);
+        public static readonly IColumn Scaled85 = new BaselineDiffColumn(DiffKind.Scaled, 85);
+        public static readonly IColumn Scaled95 = new BaselineDiffColumn(DiffKind.Scaled, 95);
 
         public DiffKind Kind { get; set; }
+        public int? Percentile { get; set; }
 
-        private BaselineDiffColumn(DiffKind kind)
+        private BaselineDiffColumn(DiffKind kind, int? percentile = null)
         {
             Kind = kind;
+            Percentile = percentile;
         }
 
-        public string ColumnName => Kind.ToString();
+        public string ColumnName => Percentile == null ?
+            Kind.ToString() :
+            Kind.ToString() + "P" + Percentile?.ToString();
 
         public string GetValue(Summary summary, Benchmark benchmark)
         {
@@ -41,18 +49,34 @@ namespace BenchmarkDotNet.Columns
             if (invalidResults)
                 return "?";
 
-            var baselineMedian = summary[baselineBenchmark].ResultStatistics.Median;
-            var currentMedian = summary[benchmark].ResultStatistics.Median;
+            double baselineMetric;
+            double currentMetric;
+
+            var resultStatistics = summary[baselineBenchmark].ResultStatistics;
+            var statistics = summary[benchmark].ResultStatistics;
+            if (Percentile == null)
+            {
+                baselineMetric = resultStatistics.Median;
+                currentMetric = statistics.Median;
+            }
+            else
+            {
+                baselineMetric = resultStatistics.Percentiles.Percentile(Percentile.GetValueOrDefault());
+                currentMetric = statistics.Percentiles.Percentile(Percentile.GetValueOrDefault());
+            }
+
+            if (baselineMetric == 0)
+                return "?";
 
             switch (Kind)
             {
                 case DiffKind.Delta:
                     if (benchmark.Target.Baseline)
                         return "Baseline";
-                    var diff = (currentMedian - baselineMedian)/baselineMedian*100.0;
+                    var diff = (currentMetric - baselineMetric) / baselineMetric * 100.0;
                     return diff.ToStr("N1") + "%";
                 case DiffKind.Scaled:
-                    var scale = currentMedian/baselineMedian;
+                    var scale = currentMetric / baselineMetric;
                     return scale.ToStr("N2");
                 default:
                     return "?";
