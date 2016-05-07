@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Extensions
 
         public static string GetCorrectTypeName(this Type type)
         {
-            if (type == typeof (void))
+            if (type == typeof(void))
                 return "void";
             var prefix = "";
             if (!string.IsNullOrEmpty(type.Namespace))
@@ -46,14 +46,6 @@ namespace BenchmarkDotNet.Extensions
                 return GetCorrectTypeName(type.GetElementType()) + "[" + new string(',', type.GetArrayRank() - 1) + "]";
 
             return prefix + type.Name;
-        }
-
-        /// <summary>
-        /// replaces '+' with '.' to support NestedTypes
-        /// </summary>
-        internal static string GetCorrectFullName(this Type type)
-        {
-            return type.FullName.Replace('+', '.');
         }
 
         internal static string GetTargetFrameworkVersion(this Assembly assembly)
