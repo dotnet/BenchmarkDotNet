@@ -162,7 +162,7 @@ namespace BenchmarkDotNet.Running
 
         private static BenchmarkReport Run(Benchmark benchmark, ILogger logger, IConfig config, string rootArtifactsFolderPath)
         {
-            var toolchain = Toolchain.GetToolchain(benchmark.Job.Runtime);
+            var toolchain = Toolchain.GetToolchain(benchmark.Job);
 
             logger.WriteLineHeader("// **************************");
             logger.WriteLineHeader("// Benchmark: " + benchmark.ShortInfo);
@@ -308,7 +308,7 @@ namespace BenchmarkDotNet.Running
 
         private static Benchmark[] GetSupportedBenchmarks(IList<Benchmark> benchmarks, CompositeLogger logger)
         {
-            return benchmarks.Where(benchmark => Toolchain.GetToolchain(benchmark.Job.Runtime).IsSupported(benchmark, logger)).ToArray();
+            return benchmarks.Where(benchmark => Toolchain.GetToolchain(benchmark.Job).IsSupported(benchmark, logger)).ToArray();
         }
 
         private static string GetRootArtifactsFolderPath() => CombineAndCreate(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");

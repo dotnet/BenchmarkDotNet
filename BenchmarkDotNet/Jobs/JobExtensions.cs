@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BenchmarkDotNet.Toolchains;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,7 @@ namespace BenchmarkDotNet.Jobs
         public static IJob With(this IJob job, Platform platform) => job.With(j => j.Platform = platform);
         public static IJob With(this IJob job, Jit jit) => job.With(j => j.Jit = jit);
         public static IJob With(this IJob job, Framework framework) => job.With(j => j.Framework = framework);
+        public static IJob With(this IJob job, IToolchain toolchain) => job.With(j => j.Toolchain = toolchain);
         public static IJob With(this IJob job, Runtime runtime) => job.With(j => j.Runtime = runtime);
         public static IJob WithLaunchCount(this IJob job, Count launchCount) => job.With(j => j.LaunchCount = launchCount);
         public static IJob WithWarmupCount(this IJob job, Count warmupCount) => job.With(j => j.WarmupCount = warmupCount);
@@ -85,6 +87,7 @@ namespace BenchmarkDotNet.Jobs
         {
             Jit = job.Jit,
             Platform = job.Platform,
+            Toolchain = job.Toolchain,
             Framework = job.Framework,
             Runtime = job.Runtime,
             Mode = job.Mode,

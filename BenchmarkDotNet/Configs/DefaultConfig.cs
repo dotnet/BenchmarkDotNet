@@ -32,6 +32,7 @@ namespace BenchmarkDotNet.Configs
             yield return PropertyColumn.Platform;
             yield return PropertyColumn.Jit;
             yield return PropertyColumn.Framework;
+            yield return PropertyColumn.Toolchain;
             yield return PropertyColumn.Runtime;
             yield return PropertyColumn.LaunchCount;
             yield return PropertyColumn.WarmupCount;
