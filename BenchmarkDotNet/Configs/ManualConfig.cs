@@ -54,6 +54,7 @@ namespace BenchmarkDotNet.Configs
             jobs.AddRange(config.GetJobs());
             validators.AddRange(config.GetValidators());
             orderProvider = config.GetOrderProvider() ?? orderProvider;
+            KeepBenchmarkFiles |= config.KeepBenchmarkFiles;
         }
 
         public static ManualConfig CreateEmpty() => new ManualConfig();
@@ -72,16 +73,13 @@ namespace BenchmarkDotNet.Configs
             {
                 case ConfigUnionRule.AlwaysUseLocal:
                     manualConfig.Add(localConfig);
-                    manualConfig.KeepBenchmarkFiles = localConfig.KeepBenchmarkFiles;
                     break;
                 case ConfigUnionRule.AlwaysUseGlobal:
                     manualConfig.Add(globalConfig);
-                    manualConfig.KeepBenchmarkFiles = globalConfig.KeepBenchmarkFiles;
                     break;
                 case ConfigUnionRule.Union:
                     manualConfig.Add(globalConfig);
                     manualConfig.Add(localConfig);
-                    manualConfig.KeepBenchmarkFiles = localConfig.KeepBenchmarkFiles || globalConfig.KeepBenchmarkFiles;
                     break;
             }
             return manualConfig;
