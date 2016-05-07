@@ -22,6 +22,7 @@ namespace BenchmarkDotNet.Mathematics
         public double StandardError { get; }
         public double StandardDeviation { get; }
         public ConfidenceInterval ConfidenceInterval { get; }
+        public PercentileValues Percentiles { get; }
 
         public Statistics(params double[] values) :
             this(values.ToList())
@@ -66,6 +67,7 @@ namespace BenchmarkDotNet.Mathematics
             StandardDeviation = N == 1 ? 0 : Math.Sqrt(list.Sum(d => Math.Pow(d - Mean, 2)) / (N - 1));
             StandardError = StandardDeviation / Math.Sqrt(N);
             ConfidenceInterval = new ConfidenceInterval(Mean, StandardError);
+            Percentiles = new PercentileValues(list);
         }
 
         public bool IsOutlier(double value) => value < LowerFence || value > UpperFence;
