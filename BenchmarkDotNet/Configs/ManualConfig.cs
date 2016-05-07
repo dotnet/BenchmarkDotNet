@@ -72,13 +72,16 @@ namespace BenchmarkDotNet.Configs
             {
                 case ConfigUnionRule.AlwaysUseLocal:
                     manualConfig.Add(localConfig);
+                    manualConfig.KeepBenchmarkFiles = localConfig.KeepBenchmarkFiles;
                     break;
                 case ConfigUnionRule.AlwaysUseGlobal:
                     manualConfig.Add(globalConfig);
+                    manualConfig.KeepBenchmarkFiles = globalConfig.KeepBenchmarkFiles;
                     break;
                 case ConfigUnionRule.Union:
                     manualConfig.Add(globalConfig);
                     manualConfig.Add(localConfig);
+                    manualConfig.KeepBenchmarkFiles = localConfig.KeepBenchmarkFiles || globalConfig.KeepBenchmarkFiles;
                     break;
             }
             return manualConfig;
