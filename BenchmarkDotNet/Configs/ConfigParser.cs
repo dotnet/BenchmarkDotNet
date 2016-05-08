@@ -102,6 +102,7 @@ namespace BenchmarkDotNet.Configs
                 { "plain", new[] { PlainExporter.Default } },
                 { "rplot", new[] { RPlotExporter.Default } },
                 { "json", new[] { JsonExporter.Default } },
+                { "asciidoc", new[] { AsciiDocExporter.Default } },
             };
         private static Lazy<IExporter[]> allExporters = new Lazy<IExporter[]>(() => availableExporters.SelectMany(e => e.Value).ToArray());
 
