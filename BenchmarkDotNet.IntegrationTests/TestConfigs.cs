@@ -26,4 +26,13 @@ namespace BenchmarkDotNet.IntegrationTests
             Add(Job.Dry.With(Mode.Throughput).WithTargetCount(1));
         }
     }
+
+    public class DiagnoserConfig : ManualConfig
+    {
+        public DiagnoserConfig()
+        {
+            // Diagnosers need enough runs to collects the statistics!
+            Add(Job.Default.WithLaunchCount(1).WithWarmupCount(5).WithTargetCount(5));
+        }
+    }
 }

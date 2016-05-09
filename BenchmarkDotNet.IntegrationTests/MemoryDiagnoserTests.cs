@@ -8,6 +8,7 @@ using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
+    [Config(typeof(DiagnoserConfig))]
     public class ListEnumeratorsBenchmarks
     {
         private List<int> list;
@@ -43,22 +44,22 @@ namespace BenchmarkDotNet.IntegrationTests
 
 #if !CORE
     // this class is not compiled for CORE because it is using Diagnosers that currently do not support Core
-    public class GCDiagnoserTests 
+    public class MemoryDiagnoserTests 
     {
         [Fact]
         public void Test()
         {
             var benchmarks = BenchmarkConverter.TypeToBenchmarks(typeof(ListEnumeratorsBenchmarks));
-            var gcDiagnoser = new Diagnostics.Windows.GCDiagnoser();
+            var memoryDiagnoser = new Diagnostics.Windows.MemoryDiagnoser();
 
             var summary = BenchmarkRunner
                 .Run(benchmarks, 
                     ManualConfig.CreateEmpty()
                         .With(Job.Dry.With(Runtime.Dnx).With(Jit.Host).With(Mode.Throughput).WithTargetCount(1))
                         .With(Job.Dry.With(Runtime.Core).With(Jit.Host).With(Mode.Throughput).WithTargetCount(1))
-                        .With(gcDiagnoser));
+                        .With(memoryDiagnoser));
 
-            var gcCollectionColumns = gcDiagnoser.GetColumns.OfType<Diagnostics.Windows.GCDiagnoser.GCCollectionColumn>().ToArray();
+            var gcCollectionColumns = memoryDiagnoser.GetColumns.OfType<Diagnostics.Windows.MemoryDiagnoser.GCCollectionColumn>().ToArray();
             var listStructEnumeratorBenchmarks = benchmarks.Where(benchmark => benchmark.ShortInfo.Contains("ListStructEnumerator"));
             var listObjectEnumeratorBenchmarks = benchmarks.Where(benchmark => benchmark.ShortInfo.Contains("ListObjectEnumerator"));
             const int gen0Index = 0;
