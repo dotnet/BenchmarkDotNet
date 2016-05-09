@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BenchmarkDotNet.Toolchains;
+using System;
 
 namespace BenchmarkDotNet.Jobs
 {
@@ -8,6 +9,7 @@ namespace BenchmarkDotNet.Jobs
         Platform Platform { get; }
         Jit Jit { get; }
         Framework Framework { get; }
+        IToolchain Toolchain { get; }
         Runtime Runtime { get; }
         Count LaunchCount { get; }
         Count WarmupCount { get; }

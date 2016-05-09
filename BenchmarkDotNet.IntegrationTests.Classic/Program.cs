@@ -5,7 +5,7 @@
         // used only for easy debugging
         public static void Main(string[] args)
         {
-            new JitOptimizations().UserGetsNoWarningWhenOnlyOptimizedDllAreReferenced();
+            new JitOptimizationsTests().UserGetsNoWarningWhenOnlyOptimizedDllAreReferenced();
         }
     }
 }

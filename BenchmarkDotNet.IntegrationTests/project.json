@@ -27,7 +27,7 @@
         "define": [ "CLASSIC" ]
       },
       "dependencies": {
-        "BenchmarkDotNet.Diagnostics.Windows": "1.0.0-*",
+        "BenchmarkDotNet.Diagnostics.Windows": "0.9.5-develop",
         "xunit.runner.console": "2.1.0"
       },
       "frameworkAssemblies": {
@@ -45,7 +45,7 @@
         "WindowsBase": "4.0.0.0"
       },
       "dependencies": {
-        "BenchmarkDotNet.Diagnostics.Windows": "1.0.0-*",
+        "BenchmarkDotNet.Diagnostics.Windows": "0.9.5-develop",
         "xunit.runner.dnx": "2.1.0-rc1-build204"
       }
     },
@@ -63,7 +63,7 @@
   "dependencies": {
     "BenchmarkDotNet": {
       "target": "project",
-      "version": "0.9.5-*"
+      "version": "0.9.5-develop"
     },
     "xunit": "2.1.0"
   }

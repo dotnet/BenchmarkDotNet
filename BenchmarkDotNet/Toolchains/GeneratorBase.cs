@@ -88,7 +88,7 @@ namespace BenchmarkDotNet.Toolchains
                 ? ""
                 : $"using {target.Method.ReturnType.Namespace};";
 
-            var targetTypeName = target.Type.GetCorrectFullName();
+            var targetTypeName = target.Type.GetCorrectTypeName();
             var targetMethodName = target.Method.Name;
 
             var targetMethodReturnType = isVoid
@@ -179,7 +179,7 @@ namespace BenchmarkDotNet.Toolchains
             if (value is decimal)
                 return ((decimal)value).ToString("G", CultureInfo.InvariantCulture) + "m";
             if (value.GetType().IsEnum())
-                return value.GetType().GetCorrectFullName() + "." + value;
+                return value.GetType().GetCorrectTypeName() + "." + value;
             return value.ToString();
         }
     }

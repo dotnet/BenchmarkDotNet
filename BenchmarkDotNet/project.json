@@ -1,6 +1,6 @@
 ﻿{
   "title": "BenchmarkDotNet",
-  "version": "0.9.5-nonexisting",
+  "version": "0.9.5-develop",
   "authors": [ "Andrey Akinshin", "Jon Skeet", "Matt Warren" ],
   "owners": [ "Andrey Akinshin", "Jon Skeet", "Matt Warren" ],
   "licenseUrl": "https://github.com/PerfDotNet/BenchmarkDotNet/blob/master/LICENSE.md",
@@ -33,9 +33,9 @@
         "define": [ "CLASSIC" ]
       },
       "frameworkAssemblies": {
-        "Microsoft.Build": "4.0.0.0",
-        "Microsoft.Build.Framework": "4.0.0.0",
-        "Microsoft.Build.Utilities.v4.0": "4.0.0.0",
+        "Microsoft.Build": { "type": "build", "version": "4.0.0.0" },
+        "Microsoft.Build.Framework": { "type": "build", "version": "4.0.0.0" },
+        "Microsoft.Build.Utilities.v4.0": { "type": "build", "version": "4.0.0.0" },
         "System.Management": "4.0.0.0"
       }
     },
@@ -44,9 +44,9 @@
         "define": [ "CLASSIC" ]
       },
       "frameworkAssemblies": {
-        "Microsoft.Build": "12.0.0.0",
-        "Microsoft.Build.Framework": "12.0.0.0",
-        "Microsoft.Build.Utilities.v12.0": "12.0.0.0",
+        "Microsoft.Build": { "type": "build", "version": "12.0.0.0" },
+        "Microsoft.Build.Framework": { "type": "build", "version": "12.0.0.0" },
+        "Microsoft.Build.Utilities.v12.0": { "type": "build", "version": "12.0.0.0" },
         "System.Management": "4.0.0.0"
       }
     },
@@ -55,9 +55,9 @@
         "define": [ "CLASSIC" ]
       },
       "frameworkAssemblies": {
-        "Microsoft.Build": "14.0.0.0",
-        "Microsoft.Build.Framework": "14.0.0.0",
-        "Microsoft.Build.Utilities.Core": "14.0.0.0",
+        "Microsoft.Build": { "type": "build", "version": "14.0.0.0" },
+        "Microsoft.Build.Framework": { "type": "build", "version": "14.0.0.0" },
+        "Microsoft.Build.Utilities.Core": { "type": "build", "version": "14.0.0.0" },
         "System.Management": "4.0.0.0"
       }
     },

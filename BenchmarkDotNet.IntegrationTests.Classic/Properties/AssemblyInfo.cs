@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
+using BenchmarkDotNet.IntegrationTests.Classic;
 using BenchmarkDotNet.Properties;
 
 [assembly: AssemblyTitle(BenchmarkDotNetInfo.Title + ".IntegrationTests.Classic")]
@@ -16,3 +17,5 @@ using BenchmarkDotNet.Properties;
 
 [assembly: ComVisible(false)]
 [assembly: Guid("27dc34d9-3ba1-46f4-b2a1-e89aa0d842aa")]
+
+[assembly: AssemblyConfig]

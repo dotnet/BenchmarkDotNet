@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Running
@@ -18,6 +21,21 @@ namespace BenchmarkDotNet.Running
         public BenchmarkSwitcher(Type[] types)
         {
             Types = types;
+        }
+
+        public BenchmarkSwitcher(Assembly assembly)
+        {
+            // Use reflection for a more maintainable way of creating the benchmark switcher,
+            // Benchmarks are listed in namespace order first (e.g. BenchmarkDotNet.Samples.CPU,
+            // BenchmarkDotNet.Samples.IL, etc) then by name, so the output is easy to understand.
+            Types = assembly
+                .GetTypes()
+                .Where(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                             .Any(m => MemberInfoExtensions.GetCustomAttributes<BenchmarkAttribute>(m, true).Any()))
+                .Where(t => !Portability.TypeExtensions.IsGenericType(t))
+                .OrderBy(t => t.Namespace)
+                .ThenBy(t => t.Name)
+                .ToArray();
         }
 
         private readonly ConsoleLogger logger = new ConsoleLogger();

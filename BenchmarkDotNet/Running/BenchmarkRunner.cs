@@ -162,29 +162,37 @@ namespace BenchmarkDotNet.Running
 
         private static BenchmarkReport Run(Benchmark benchmark, ILogger logger, IConfig config, string rootArtifactsFolderPath)
         {
-            var toolchain = Toolchain.GetToolchain(benchmark.Job.Runtime);
+            var toolchain = Toolchain.GetToolchain(benchmark.Job);
 
             logger.WriteLineHeader("// **************************");
             logger.WriteLineHeader("// Benchmark: " + benchmark.ShortInfo);
 
             var generateResult = Generate(logger, toolchain, benchmark, rootArtifactsFolderPath);
-            if (!generateResult.IsGenerateSuccess)
-                return new BenchmarkReport(benchmark, generateResult, null, null, null);
-
-            var buildResult = Build(logger, toolchain, generateResult, benchmark);
-            if (!buildResult.IsBuildSuccess)
-                return new BenchmarkReport(benchmark, generateResult, buildResult, null, null);
-
-            var executeResults = Execute(logger, benchmark, toolchain, buildResult, config);
-
-            var runs = new List<Measurement>();
-            for (int index = 0; index < executeResults.Count; index++)
+            
+            try
             {
-                var executeResult = executeResults[index];
-                runs.AddRange(executeResult.Data.Select(line => Measurement.Parse(logger, line, index + 1)).Where(r => r != null));
-            }
+                if (!generateResult.IsGenerateSuccess)
+                    return new BenchmarkReport(benchmark, generateResult, null, null, null);
 
-            return new BenchmarkReport(benchmark, generateResult, buildResult, executeResults, runs);
+                var buildResult = Build(logger, toolchain, generateResult, benchmark);
+                if (!buildResult.IsBuildSuccess)
+                    return new BenchmarkReport(benchmark, generateResult, buildResult, null, null);
+
+                List<ExecuteResult> executeResults = Execute(logger, benchmark, toolchain, buildResult, config);
+
+                var runs = new List<Measurement>();
+                for (int index = 0; index < executeResults.Count; index++)
+                {
+                    var executeResult = executeResults[index];
+                    runs.AddRange(executeResult.Data.Select(line => Measurement.Parse(logger, line, index + 1)).Where(r => r != null));
+                }
+
+                return new BenchmarkReport(benchmark, generateResult, buildResult, executeResults, runs);
+            }
+            finally
+            {
+                Cleanup(generateResult.DirectoryPath, config);
+            }
         }
 
         private static GenerateResult Generate(ILogger logger, IToolchain toolchain, Benchmark benchmark, string rootArtifactsFolderPath)
@@ -283,9 +291,24 @@ namespace BenchmarkDotNet.Running
             return executeResults;
         }
 
+        private static void Cleanup(string directoryPath, IConfig config)
+        {
+            if (!config.KeepBenchmarkFiles && Directory.Exists(directoryPath))
+            {
+                try
+                { 
+                    Directory.Delete(directoryPath, recursive: true);
+                }
+                catch
+                {
+                    // we have to continue anyway
+                }
+            }
+        }
+
         private static Benchmark[] GetSupportedBenchmarks(IList<Benchmark> benchmarks, CompositeLogger logger)
         {
-            return benchmarks.Where(benchmark => Toolchain.GetToolchain(benchmark.Job.Runtime).IsSupported(benchmark, logger)).ToArray();
+            return benchmarks.Where(benchmark => Toolchain.GetToolchain(benchmark.Job).IsSupported(benchmark, logger)).ToArray();
         }
 
         private static string GetRootArtifactsFolderPath() => CombineAndCreate(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");

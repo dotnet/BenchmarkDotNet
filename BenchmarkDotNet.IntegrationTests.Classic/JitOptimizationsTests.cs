@@ -7,7 +7,7 @@ using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests.Classic
 {
-    public class JitOptimizations
+    public class JitOptimizationsTests
     {
         [Fact]
         public void UserGetsWarningWhenNonOptimizedDllIsReferenced()

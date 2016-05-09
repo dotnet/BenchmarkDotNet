@@ -8,7 +8,7 @@ using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests.Classic
 {
-    public class References
+    public class ReferencesTests
     {
         [Fact]
         public void FSharpIsSupported()
