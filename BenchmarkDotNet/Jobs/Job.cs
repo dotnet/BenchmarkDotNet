@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Jobs
 
         public Job()
         {
-            allProperties = new Lazy<Property[]>(this.GetAllProperties, isThreadSafe: false);
+            allProperties = new Lazy<Property[]>(this.GetAllProperties, isThreadSafe: true);
         }
 
         public bool Equals(IJob other)
