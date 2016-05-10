@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var logger = new AccumulationLogger();
             var config = DefaultConfig.Instance.With(logger);
-            BenchmarkRunner.Run<SetupAttributeTest>(config);
+            BenchmarkTestExecutor.CanExecute<SetupAttributeTest>(config);
             Assert.Contains("// ### Setup called ###" + Environment.NewLine, logger.GetLog());
         }
 

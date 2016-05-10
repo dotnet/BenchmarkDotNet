@@ -4,11 +4,11 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Extensions;
 using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
+    [Config(typeof(PlatformConfig))]
     public class ProcessorArchitectureTest
     {
         private class PlatformConfig : ManualConfig
@@ -19,11 +19,11 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        const string X86FailedCaption = "x86FAILED";
-        const string X64FailedCaption = "x64FAILED";
-        const string AnyCpuOkCaption = "AnyCpuOkCaption";
-        const string HostPlatformOkCaption = "HostPlatformOkCaption";
-        const string BenchmarkNotFound = "There are no benchmarks found";
+        const string X86FailedCaption = "// x86FAILED";
+        const string X64FailedCaption = "// x64FAILED";
+        const string AnyCpuOkCaption = "// AnyCpuOkCaption";
+        const string HostPlatformOkCaption = "// HostPlatformOkCaption";
+        const string BenchmarkNotFound = "// There are no benchmarks found";
 
         [Fact]
         public void SpecifiedProccesorArchitectureMustBeRespected()
@@ -39,9 +39,10 @@ namespace BenchmarkDotNet.IntegrationTests
         private void Verify(Platform platform, Type benchmark, string failureText)
         {
             var logger = new AccumulationLogger();
-            var config = new PlatformConfig(platform).With(logger);
+            // make sure we get an output in the TestRunner log
+            var config = new PlatformConfig(platform).With(logger).With(ConsoleLogger.Default);
 
-            BenchmarkRunner.Run(benchmark, config);
+            BenchmarkTestExecutor.CanExecute(benchmark, config);
             var testLog = logger.GetLog();
 
             Assert.DoesNotContain(failureText, testLog);

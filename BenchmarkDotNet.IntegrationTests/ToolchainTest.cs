@@ -74,7 +74,8 @@ namespace BenchmarkDotNet.IntegrationTests
             var job = Job.Default.With(myToolchain).With(Mode.SingleRun).WithLaunchCount(1).WithWarmupCount(1).WithTargetCount(1);
 
             var config = DefaultConfig.Instance.With(job).With(logger);
-            BenchmarkRunner.Run<ToolchainTest>(config);
+            BenchmarkTestExecutor.CanExecute<ToolchainTest>(config, fullValidation: false);
+
             Assert.True(generator.Done);
             Assert.True(builder.Done);
             Assert.True(executor.Done);

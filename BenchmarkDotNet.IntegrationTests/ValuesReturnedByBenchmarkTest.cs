@@ -4,7 +4,6 @@ using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    [Config(typeof(SingleRunFastConfig))]
     public class ValuesReturnedByBenchmarkTest
     {
         [Fact]

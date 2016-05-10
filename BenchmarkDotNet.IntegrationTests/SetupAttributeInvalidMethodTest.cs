@@ -6,13 +6,12 @@ using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    [Config(typeof(SingleRunFastConfig))]
     public class SetupAttributeInvalidMethodTest
     {
         [Fact]
         public void Test()
         {
-            Assert.Throws<InvalidOperationException>(() => BenchmarkRunner.Run<SetupAttributeInvalidMethodTest>());
+            Assert.Throws<InvalidOperationException>(() => BenchmarkTestExecutor.CanExecute<SetupAttributeInvalidMethodTest>());
         }
 
         [Setup]

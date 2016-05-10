@@ -31,6 +31,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     ManualConfig
                         .CreateEmpty()
                         .With(new FailingValidator())
+                        .With(ConsoleLogger.Default) // so we get an output in the TestRunner log
                         .With(AllKnownExportersThatSupportExportToLog));
         }
 
@@ -41,6 +42,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .Run<ValidatorsTest>(
                     ManualConfig
                         .CreateEmpty()
+                        .With(ConsoleLogger.Default) // so we get an output in the TestRunner log
                         .With(new FailingValidator()));
 
             foreach (var exporter in AllKnownExportersThatSupportExportToLog)

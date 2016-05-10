@@ -22,8 +22,8 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var logger = new AccumulationLogger();
             var config = DefaultConfig.Instance.With(logger);
+            BenchmarkTestExecutor.CanExecute<ParamsTestStaticProperty>(config);
 
-            BenchmarkRunner.Run(this.GetType(), config);
             foreach (var param in new[] { 1, 2 })
                 Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, logger.GetLog());
             Assert.DoesNotContain($"// ### New Parameter {default(int)} ###" + Environment.NewLine, logger.GetLog());
@@ -41,8 +41,7 @@ namespace BenchmarkDotNet.IntegrationTests
     }
 
     // Delibrately made the Property "static" to ensure that Params also work okay in this scenario
-    [Config(typeof(SingleRunFastConfig))]
-    public class ParamsTestStaticPrivateProperty
+    public class ParamsTestStaticPrivatePropertyError
     {
         [Params(1, 2)]
         public static int StaticParamProperty { get; private set; }
@@ -52,10 +51,8 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void Test()
         {
-            var logger = new AccumulationLogger();
-            var config = DefaultConfig.Instance.With(logger);
             // System.InvalidOperationException : Property "StaticParamProperty" must be public and writable if it has the [Params(..)] attribute applied to it
-            Assert.Throws<InvalidOperationException>(() => BenchmarkRunner.Run(this.GetType(), config));
+            Assert.Throws<InvalidOperationException>(() => BenchmarkTestExecutor.CanExecute<ParamsTestStaticPrivatePropertyError>());
         }
 
         [Benchmark]
@@ -83,7 +80,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var logger = new AccumulationLogger();
             var config = DefaultConfig.Instance.With(logger);
-            BenchmarkRunner.Run<ParamsTestStaticField>(config);
+            BenchmarkTestExecutor.CanExecute<ParamsTestStaticField>(config);
             foreach (var param in new[] { 1, 2 })
                 Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, logger.GetLog());
             Assert.DoesNotContain($"// ### New Parameter 0 ###" + Environment.NewLine, logger.GetLog());
@@ -102,7 +99,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
     // Delibrately made everything "static" (as well as using a Field) to ensure that Params also work okay in this scenario
     [Config(typeof(SingleRunFastConfig))]
-    public class ParamsTestStaticPrivateField
+    public class ParamsTestStaticPrivateFieldError
     {
         [Params(1, 2)]
         private static int StaticParamField = 0;
@@ -112,10 +109,8 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public static void Test()
         {
-            var logger = new AccumulationLogger();
-            var config = DefaultConfig.Instance.With(logger);
             // System.InvalidOperationException : Field "StaticParamField" must be public if it has the [Params(..)] attribute applied to it
-            Assert.Throws<InvalidOperationException>(() => BenchmarkRunner.Run<ParamsTestStaticPrivateField>(config));
+            Assert.Throws<InvalidOperationException>(() => BenchmarkTestExecutor.CanExecute<ParamsTestStaticPrivateFieldError>());
         }
 
         [Benchmark]
