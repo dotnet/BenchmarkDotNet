@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Configs
         public bool KeepBenchmarkFiles { get; set; }
 
         public void Add(params IColumn[] newColumns) => columns.AddRange(newColumns);
-        public void Add(params IExporter[] newExprters) => exporters.AddRange(newExprters);
+        public void Add(params IExporter[] newExporters) => exporters.AddRange(newExporters);
         public void Add(params ILogger[] newLoggers) => loggers.AddRange(newLoggers);
         public void Add(params IDiagnoser[] newDiagnosers) => diagnosers.AddRange(newDiagnosers);
         public void Add(params IAnalyser[] newAnalysers) => analysers.AddRange(newAnalysers);
@@ -87,8 +87,7 @@ namespace BenchmarkDotNet.Configs
 
         public static IConfig Parse(string[] args) => new ConfigParser().Parse(args);
 
-        public static bool ShouldDisplayOptions(string[] args) => new ConfigParser().ShouldDisplayOptions(args);
-
-        public static void PrintOptions(ILogger logger) => new ConfigParser().PrintOptions(logger);
+        public static void PrintOptions(ILogger logger, int prefixWidth, int outputWidth) 
+            => new ConfigParser().PrintOptions(logger, prefixWidth: prefixWidth, outputWidth: outputWidth);
     }
 }

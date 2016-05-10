@@ -6,53 +6,53 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Validators;
+using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Configs
 {
     public class ConfigParser
     {
-        private class Options
+        private class ConfigOption
         {
             public Action<ManualConfig, string> ProcessOption { get; set; } = (config, value) => { };
             public Action<ManualConfig> ProcessAllOptions { get; set; } = (config) => { };
             public Lazy<IEnumerable<string>> GetAllOptions { get; set; } = new Lazy<IEnumerable<string>>(() => Enumerable.Empty<string>());
         }
 
-        // NOTE: GetAllOptions needs to be Lazy<T>, because they call static variables (and initialisation order it tricky!!)
-        private static Dictionary<string, Options> configuration = new Dictionary<string, Options>
+        // NOTE: GetAllOptions needs to be Lazy<T>, because they call static variables (and then the initialisation order is tricky!!)
+        private static Dictionary<string, ConfigOption> configuration = new Dictionary<string, ConfigOption>
         {
-            { "jobs", new Options {
+            { "jobs", new ConfigOption {
                 ProcessOption = (config, value) => config.Add(ParseItem("Job", availableJobs, value)),
                 ProcessAllOptions = (config) => config.Add(allJobs.Value),
                 GetAllOptions = new Lazy<IEnumerable<string>>(() => availableJobs.Keys)
             } },
-            { "columns", new Options {
+            { "columns", new ConfigOption {
                 ProcessOption = (config, value) => config.Add(ParseItem("Column", availableColumns, value)),
                 ProcessAllOptions = (config) => config.Add(allColumns.Value),
                 GetAllOptions = new Lazy<IEnumerable<string>>(() => availableColumns.Keys)
             } },
-            { "exporters", new Options {
+            { "exporters", new ConfigOption {
                 ProcessOption = (config, value) => config.Add(ParseItem("Exporter", availableExporters, value)),
                 ProcessAllOptions = (config) => config.Add(allExporters.Value),
                 GetAllOptions = new Lazy<IEnumerable<string>>(() => availableExporters.Keys)
             } },
-            { "diagnosers", new Options {
+            { "diagnosers", new ConfigOption {
                 ProcessOption = (config, value) => config.Add(ParseDiagnosers(value)),
                 // TODO these 2 should match the lookup in LoadDiagnosers() in DefaultConfig.cs
                 GetAllOptions = new Lazy<IEnumerable<string>>(() => Enumerable.Empty<string>())
             } },
-            { "analysers", new Options {
+            { "analysers", new ConfigOption {
                 ProcessOption = (config, value) => config.Add(ParseItem("Analyser", availableAnalysers, value)),
                 GetAllOptions = new Lazy<IEnumerable<string>>(() => availableAnalysers.Keys)
             } },
-            { "validators", new Options {
+            { "validators", new ConfigOption {
                 ProcessOption = (config, value) => config.Add(ParseItem("Validator", availableValidators, value)),
                 GetAllOptions = new Lazy<IEnumerable<string>>(() => availableValidators.Keys)
             } },
-            { "loggers", new Options {
+            { "loggers", new ConfigOption {
                 // TODO does it make sense to allows Loggers to be configured on the cmd-line?
                 ProcessOption = (config, value) => { throw new InvalidOperationException($"{value} is an unrecognised Logger"); },
             } },
@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Configs
             {
                 { "default", new [] { Job.Default } },
                 { "legacyjitx86", new[] { Job.LegacyJitX86 } },
-                { "legacyjitx64", new[] { Job.LegacyJitX64 } } ,
+                { "legacyjitx64", new[] { Job.LegacyJitX64 } },
                 { "ryujitx64", new[] { Job.RyuJitX64 } },
                 { "dry", new[] { Job.Dry } },
                 { "alljits", Job.AllJits },
@@ -138,31 +138,43 @@ namespace BenchmarkDotNet.Configs
                 }
                 else
                 {
-                    var action = configuration[argument].ProcessOption;
+                    var processOption = configuration[argument].ProcessOption;
                     foreach (var value in values)
-                        action(config, value);
+                        processOption(config, value);
                 }
             }
             return config;
         }
 
-        public bool ShouldDisplayOptions(string[] args)
-        {
-            return args.Select(a => a.ToLowerInvariant()).Any(a => a == "--help" || a == "-h");
-        }
+        // TODO also consider allowing short version (i.e. '-d' and '--diagnosers')
+        private string optionPrefix = "--";
+        private char[] trimChars = new[] { ' ' };
+        private const string breakText = ": ";
 
-        public void PrintOptions(ILogger logger)
+        public void PrintOptions(ILogger logger, int prefixWidth, int outputWidth)
         {
-            logger.WriteLineHeader($"{BenchmarkDotNetInfo.FullTitle}");
-            logger.WriteLine();
-            logger.WriteLineHeader("Options:");
             foreach (var option in configuration)
             {
-                // TODO also consider allowing short version (i.e. '-d' and '--diagnosers')             
-                var optionText = $"--{option.Key} <{option.Key.ToUpperInvariant()}>";
+                var optionText = $"  {optionPrefix}{option.Key} <{option.Key.ToUpperInvariant()}>";
+                logger.WriteResult($"{optionText.PadRight(prefixWidth)}");
+
                 var parameters = string.Join(", ", option.Value.GetAllOptions.Value);
-                var explanation = $"Allowed values: {parameters}";
-                logger.WriteLineInfo($"  {optionText,-30} {explanation}");
+                var explanation = $"Allowed values: ";
+                logger.WriteInfo($": {explanation}");
+
+                var maxWidth = outputWidth - prefixWidth - explanation.Length - Environment.NewLine.Length - breakText.Length;
+                var lines = StringExtensions.Wrap(parameters, maxWidth);
+                if (lines.Count == 0)
+                {
+                    logger.WriteLine();
+                    continue;
+                }
+
+                logger.WriteLineInfo($"{lines.First().Trim(trimChars)}");
+                var padding = new string(' ', prefixWidth);
+                var explanationPadding = new string(' ', explanation.Length);
+                foreach (var line in lines.Skip(1))
+                    logger.WriteLineInfo($"{padding}{breakText}{explanationPadding}{line.Trim(trimChars)}");
             }
         }
 
