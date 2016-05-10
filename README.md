@@ -390,7 +390,7 @@ public IEnumerable<IExporter> GetExporters()
 
 * **Plots**
 
-If you have installed [R](https://www.r-project.org/), defined `%R_HOME%` variable and used `RPlotExporter.Default` in your config, you will also get nice plots with help of the `BuildPlots.R` script in your bin directory. Examples:
+If you have installed [R](https://www.r-project.org/), defined `%R_HOME%` variable and used `RPlotExporter.Default` and `CsvMeasurementsExporter.Default` in your config, you will also get nice plots with help of the `BuildPlots.R` script in your bin directory. Examples:
 
 ```
 <BenchmarkName>-barplot.png
@@ -400,6 +400,19 @@ If you have installed [R](https://www.r-project.org/), defined `%R_HOME%` variab
 <BenchmarkName>-<MethodName>-facetTimelineSmooth.png
 <BenchmarkName>-<MethodName>-<JobName>-timelineSmooth.png
 <BenchmarkName>-<MethodName>-<JobName>-timelineSmooth.png
+```
+
+A config example:
+
+```cs
+public class Config : ManualConfig
+{
+    public Config()
+    {
+        Add(CsvMeasurementsExporter.Default);
+        Add(RPlotExporter.Default);
+    }
+}
 ```
 
 ### Loggers
