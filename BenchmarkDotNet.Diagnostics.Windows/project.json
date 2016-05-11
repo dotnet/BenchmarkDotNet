@@ -1,6 +1,6 @@
 ﻿{
   "title": "BenchmarkDotNet.Diagnostics.Windows",
-  "version": "0.9.5-develop",
+  "version": "0.9.6-develop",
   "authors": [ "Andrey Akinshin", "Jon Skeet", "Matt Warren" ],
   "owners": [ "Andrey Akinshin", "Jon Skeet", "Matt Warren" ],
   "licenseUrl": "https://github.com/PerfDotNet/BenchmarkDotNet/blob/master/LICENSE.md",
@@ -32,7 +32,7 @@
   "dependencies": {
     "BenchmarkDotNet": {
       "target": "project",
-      "version": "0.9.5-develop"
+      "version": "0.9.6-develop"
     },
     "Microsoft.Diagnostics.Tracing.TraceEvent": "1.0.41.0"
   }

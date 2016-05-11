@@ -48,7 +48,7 @@
   "dependencies": {
     "BenchmarkDotNet": {
       "target": "project",
-      "version": "0.9.5-develop"
+      "version": "0.9.6-develop"
     }
   },
   "scripts": {
