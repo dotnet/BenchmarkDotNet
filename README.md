@@ -17,6 +17,7 @@
 
 ## Content
 
+* [Prerequisites](#prerequisites)
 * [Getting started](#getting-started)
 * [Configs](#configs)
 * [Advanced features](#advanced-features)
@@ -25,6 +26,11 @@
 * [How it works?](#how-it-works)
 * [FAQ](#faq)
 * [Team](#team)
+
+
+## Prerequisites
+
+If you are using Visual Studio 2015 and you do not have Visual Studio 2013 installed, you'll need the [Microsoft Build Tools 2013](https://www.microsoft.com/en-us/download/details.aspx?id=40760) installed on your machine.
 
 ## Getting started
 
