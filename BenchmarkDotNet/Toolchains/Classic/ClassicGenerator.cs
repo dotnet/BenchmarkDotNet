@@ -95,12 +95,6 @@ namespace BenchmarkDotNet.Toolchains.Classic
 
         private string GetHintPath(Assembly loadedReferencedAssembly)
         {
-            if (loadedReferencedAssembly.GlobalAssemblyCache)
-            {
-                // there is no need to specify path if assembly was loaded from GAC
-                return string.Empty;
-            }
-
             // the assembly is loaded so we just give the absolute path
             return $"<HintPath>{loadedReferencedAssembly.Location}</HintPath>";
         }
