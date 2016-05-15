@@ -17,6 +17,8 @@
         /// High Precision Event Timer
         /// <seealso href="https://en.wikipedia.org/wiki/High_Precision_Event_Timer"/>
         /// </summary>
-        Hpet
+        Hpet,
+
+        Unknown
     }
 }

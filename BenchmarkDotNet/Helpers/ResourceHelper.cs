@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using BenchmarkDotNet.Portability;
 
@@ -8,9 +9,8 @@ namespace BenchmarkDotNet.Helpers
     {
         public static string LoadTemplate(string name)
         {
-            var assembly = typeof(ResourceHelper).Assembly();
             var resourceName = "BenchmarkDotNet.Templates." + name;
-            using (var stream = assembly.GetManifestResourceStream(resourceName))
+            using (var stream = GetResouceStream(resourceName))
             {
                 if (stream == null)
                     throw new Exception($"Resource {resourceName} not found");
@@ -18,5 +18,19 @@ namespace BenchmarkDotNet.Helpers
                     return reader.ReadToEnd();
             }
         }
+
+        public static Stream GetResouceStream(string resourceName)
+        {
+            return typeof(ResourceHelper).Assembly().GetManifestResourceStream(resourceName);
+        }
+
+        public static IEnumerable<string> GetAllResources(string prefix)
+        {
+            var assembly = typeof(ResourceHelper).Assembly();
+
+            foreach (var resourceName in assembly.GetManifestResourceNames())
+                if (resourceName.StartsWith(prefix, StringComparison.Ordinal))
+                    yield return resourceName;
+        }        
     }
 }

@@ -28,9 +28,14 @@ namespace BenchmarkDotNet.Horology
             get
             {
                 if (System.Diagnostics.Stopwatch.IsHighResolution)
-                    return Stopwatch.Frequency >= 10 * FrequencyUnit.MHz.HertzAmount 
-                        ? HardwareTimerKind.Hpet 
+                {
+                    var threshold = 10 * FrequencyUnit.MHz.HertzAmount;
+                    if (Stopwatch.Frequency == threshold)
+                        return HardwareTimerKind.Unknown;
+                    return Stopwatch.Frequency >= 10 * FrequencyUnit.MHz.HertzAmount
+                        ? HardwareTimerKind.Hpet
                         : HardwareTimerKind.Tsc;
+                }
                 return HardwareTimerKind.System;
             }
         }

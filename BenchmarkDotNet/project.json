@@ -26,7 +26,7 @@
       }
     }
   },
-  "resource": [ "Templates/*.txt", "Templates/*.R", "Templates/*.json" ],
+  "resource": [ "Templates/*.txt", "Templates/*.R", "Templates/*.json", "Roslyn/*" ],
   "frameworks": {
     "net40": {
       "compilationOptions": {

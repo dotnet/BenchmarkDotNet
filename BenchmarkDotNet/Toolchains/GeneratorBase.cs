@@ -15,11 +15,13 @@ namespace BenchmarkDotNet.Toolchains
 {
     internal abstract class GeneratorBase : IGenerator
     {
-        public const string MainClassName = "Program";
+        protected const string AppConfigFileName = "app.config";
+
+        protected virtual string GetProgramName(Benchmark benchmark) => "Program";
 
         internal static string BuildBenchmarkScriptFileName => "BuildBenchmark" + RuntimeInformation.ScriptFileExtension;
 
-        public GenerateResult GenerateProject(Benchmark benchmark, ILogger logger, string rootArtifactsFolderPath)
+        public virtual GenerateResult GenerateProject(Benchmark benchmark, ILogger logger, string rootArtifactsFolderPath)
         {
             var result = CreateProjectDirectory(benchmark, rootArtifactsFolderPath);
 
@@ -30,6 +32,7 @@ namespace BenchmarkDotNet.Toolchains
 
             return result;
         }
+
 
         protected abstract string GetBinariesDirectoryPath(Benchmark benchmark, string rootArtifactsFolderPath);
 
@@ -63,13 +66,13 @@ namespace BenchmarkDotNet.Toolchains
                 }
             }
             if (exist)
-                return new GenerateResult(directoryPath, false, deleteException);
+                return new GenerateResult(directoryPath, GetProgramName(benchmark), false, deleteException);
             if (!Directory.Exists(directoryPath))
                 Directory.CreateDirectory(directoryPath);
-            return new GenerateResult(directoryPath, true, null);
+            return new GenerateResult(directoryPath, GetProgramName(benchmark), true, null);
         }
 
-        private void GenerateProgramFile(string projectDir, Benchmark benchmark)
+        protected void GenerateProgramFile(string projectDir, Benchmark benchmark)
         {
             var target = benchmark.Target;
             var isVoid = target.Method.ReturnType == typeof(void);
@@ -119,7 +122,7 @@ namespace BenchmarkDotNet.Toolchains
                 ? ""
                 : $"return {(target.Method.ReturnType.IsValueType() ? "0" : "null")};";
 
-            var paramsContent = string.Join("", benchmark.Parameters.Items.Select(parameter => 
+            var paramsContent = string.Join("", benchmark.Parameters.Items.Select(parameter =>
                 $"{(parameter.IsStatic ? "" : "instance.")}{parameter.Name} = {GetParameterValue(parameter.Value)};"));
 
             var targetBenchmarkTaskArguments = benchmark.Job.GenerateWithDefinitions();
@@ -143,7 +146,7 @@ namespace BenchmarkDotNet.Toolchains
                 Replace("$TargetBenchmarkTaskArguments$", targetBenchmarkTaskArguments).
                 Replace("$ParamsContent$", paramsContent);
 
-            string fileName = Path.Combine(projectDir, MainClassName + ".cs");
+            string fileName = Path.Combine(projectDir, GetProgramName(benchmark) + ".cs");
             File.WriteAllText(fileName, content);
         }
 
@@ -160,7 +163,7 @@ namespace BenchmarkDotNet.Toolchains
             var content = template.
                 Replace("$UseLagacyJit$", useLagacyJit);
 
-            string fileName = Path.Combine(projectDir, "app.config");
+            string fileName = Path.Combine(projectDir, AppConfigFileName);
             File.WriteAllText(fileName, content);
         }
 
@@ -170,7 +173,7 @@ namespace BenchmarkDotNet.Toolchains
                 return value.ToString().ToLower();
             if (value is string)
                 return $"\"{value}\"";
-            if(value is char)
+            if (value is char)
                 return $"'{value}'";
             if (value is float)
                 return ((float)value).ToString("G", CultureInfo.InvariantCulture) + "f";
