@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
@@ -64,6 +65,7 @@ namespace BenchmarkDotNet.Portability
                     var mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
                     foreach (var moProcessor in mosProcessor.Get().Cast<ManagementObject>())
                         info += moProcessor["name"]?.ToString();
+                  info = Regex.Replace(info.Replace("@", ""), @"\s+", " ");
                 }
                 catch (Exception)
                 {

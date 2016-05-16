@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using BenchmarkDotNet.IntegrationTests.Classic;
 using BenchmarkDotNet.Properties;
+using Xunit;
 
 [assembly: AssemblyTitle(BenchmarkDotNetInfo.Title + ".IntegrationTests.Classic")]
 [assembly: AssemblyProduct(BenchmarkDotNetInfo.Title + ".IntegrationTests.Classic")]
@@ -19,3 +20,5 @@ using BenchmarkDotNet.Properties;
 [assembly: Guid("27dc34d9-3ba1-46f4-b2a1-e89aa0d842aa")]
 
 [assembly: AssemblyConfig]
+
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
