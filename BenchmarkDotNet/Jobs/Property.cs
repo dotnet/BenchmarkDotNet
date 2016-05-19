@@ -18,14 +18,14 @@ namespace BenchmarkDotNet.Jobs
         {
             switch (Name)
             {
-                case "Mode":
-                case "Platform":
+                case nameof(Mode):
+                case nameof(Platform):
                     return Value;
-                case "Warmup":
-                case "Target":
-                case "Process":
-                case "IterationTime":
-                case "Affinity":
+                case nameof(IJob.WarmupCount):
+                case nameof(IJob.TargetCount):
+                case nameof(IJob.LaunchCount):
+                case nameof(IJob.IterationTime):
+                case nameof(IJob.Affinity):
                     return Name + Value;
             }
 

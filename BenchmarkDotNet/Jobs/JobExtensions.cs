@@ -31,16 +31,16 @@ namespace BenchmarkDotNet.Jobs
         {
             return new[]
             {
-                new Property("Mode", job.Mode.ToString()),
-                new Property("Platform", job.Platform.ToString()),
-                new Property("Jit", job.Jit.ToString()),
-                new Property("Framework", job.Framework.ToString()),
-                new Property("Runtime", job.Runtime.ToString()),
-                new Property("Warmup", job.WarmupCount.ToString()),
-                new Property("Target", job.TargetCount.ToString()),
-                new Property("Process", job.LaunchCount.ToString()),
-                new Property("IterationTime", job.IterationTime.ToString()),
-                new Property("Affinity", job.Affinity.ToString())
+                new Property(nameof(Mode), job.Mode.ToString()),
+                new Property(nameof(Platform), job.Platform.ToString()),
+                new Property(nameof(Jit), job.Jit.ToString()),
+                new Property(nameof(Framework), job.Framework.ToString()),
+                new Property(nameof(Runtime), job.Runtime.ToString()),
+                new Property(nameof(IJob.WarmupCount), job.WarmupCount.ToString()),
+                new Property(nameof(IJob.TargetCount), job.TargetCount.ToString()),
+                new Property(nameof(IJob.LaunchCount), job.LaunchCount.ToString()),
+                new Property(nameof(IJob.IterationTime), job.IterationTime.ToString()),
+                new Property(nameof(IJob.Affinity), job.Affinity.ToString())
             };
         }
 
