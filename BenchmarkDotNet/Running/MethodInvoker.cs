@@ -94,8 +94,8 @@ namespace BenchmarkDotNet.Running
             if (job.Mode == Mode.Throughput)
             {
                 invokeCount = RunPilot(multiInvoke, job.IterationTime);
-                RunWarmup(multiInvoke, invokeCount, IterationMode.IdleWarmup, Count.Auto);
-                idle = RunTarget(multiInvoke, invokeCount, IterationMode.IdleTarget, Count.Auto);
+                RunWarmup(multiInvoke, invokeCount, IterationMode.IdleWarmup, job.WarmupCount);
+                idle = RunTarget(multiInvoke, invokeCount, IterationMode.IdleTarget, job.TargetCount);
             }
 
             RunWarmup(multiInvoke, invokeCount, IterationMode.MainWarmup, job.WarmupCount);
