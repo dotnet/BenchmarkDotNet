@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
@@ -26,6 +26,9 @@ namespace BenchmarkDotNet.Running
 
         public static Summary Run(Type type, IConfig config = null) =>
             Run(BenchmarkConverter.TypeToBenchmarks(type, config), config);
+
+        public static Summary Run(Type type, MethodInfo[] methods, IConfig config = null) =>
+            Run(BenchmarkConverter.MethodsToBenchmarks(type, methods, config), config);
 
 #if CLASSIC
         public static Summary RunUrl(string url, IConfig config = null) =>

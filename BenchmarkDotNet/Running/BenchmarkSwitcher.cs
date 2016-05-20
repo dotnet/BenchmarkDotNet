@@ -39,10 +39,10 @@ namespace BenchmarkDotNet.Running
             typeParser = new TypeParser(types, logger);
         }
 
-        public void Run(string[] args = null)
+        public IEnumerable<Summary> Run(string[] args = null)
         {
             args = typeParser.ReadArgumentList(args ?? new string[0]);
-            RunBenchmarks(args);
+            return RunBenchmarks(args);
         }
 
         private IEnumerable<Summary> RunBenchmarks(string[] args)
@@ -58,10 +58,13 @@ namespace BenchmarkDotNet.Running
 
             var config = ManualConfig.Union(DefaultConfig.Instance, ManualConfig.Parse(args));
 
-            foreach (var type in typeParser.MatchingTypes(args))
+            foreach (var typeWithMethods in typeParser.MatchingTypesWithMethods(args))
             {
-                logger.WriteLineHeader("Target type: " + type.Name);
-                summaries.Add(BenchmarkRunner.Run(type, config));
+                logger.WriteLineHeader("Target type: " + typeWithMethods.Type.Name);
+                if (typeWithMethods.AllMethodsInType)
+                    summaries.Add(BenchmarkRunner.Run(typeWithMethods.Type, config));
+                else
+                    summaries.Add(BenchmarkRunner.Run(typeWithMethods.Type, typeWithMethods.Methods, config));
                 logger.WriteLine();
             }
 

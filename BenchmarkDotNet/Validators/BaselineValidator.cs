@@ -19,12 +19,13 @@ namespace BenchmarkDotNet.Validators
             foreach (var groupByType in benchmarks.GroupBy(benchmark => benchmark.Target.Type))
             {
                 var allMethods = groupByType.Key.GetAllMethods();
-
-                if (allMethods.Count(method => method.GetCustomAttributes<BenchmarkAttribute>(false).Any(benchmarkAttribute => benchmarkAttribute.Baseline)) > 1)
+                var count = allMethods.Count(method => method.GetCustomAttributes<BenchmarkAttribute>(false)
+                                                             .Any(benchmarkAttribute => benchmarkAttribute.Baseline));
+                if (count > 1)
                 {
                     yield return new ValidationError(
                         TreatsWarningsAsErrors,
-                        $"Only 1 [Benchmark] in a class can have \"Baseline = true\" applied to it, class {groupByType.Key.Name} has few");
+                        $"Only 1 [Benchmark] in a class can have \"Baseline = true\" applied to it, class {groupByType.Key.Name} has {count}");
                 }
             }
         }

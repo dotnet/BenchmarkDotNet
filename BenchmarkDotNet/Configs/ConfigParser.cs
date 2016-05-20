@@ -126,11 +126,11 @@ namespace BenchmarkDotNet.Configs
             {
                 var split = arg.ToLowerInvariant().Split('=');
                 var values = split[1].Split(',');
-                // Delibrately allow both "jobs" and "job" to be specified, makes it easier for users!!
+                // Delibrately allow both "job" and "jobs" to be specified, makes it easier for users!!
                 var argument = split[0].EndsWith("s") ? split[0] : split[0] + "s";
 
                 if (configuration.ContainsKey(argument) == false)
-                    throw new InvalidOperationException($"\"{split[0]}\" (from \"{arg}\") is an unrecognised Option");
+                    continue;
 
                 if (values.Length == 1 && values[0] == "all")
                 {

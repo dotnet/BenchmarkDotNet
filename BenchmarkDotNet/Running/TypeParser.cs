@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Loggers;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Running
 {
@@ -11,33 +13,41 @@ namespace BenchmarkDotNet.Running
     {
         public TypeParser(Type[] types, ILogger logger)
         {
-            this.types = types;
+            this.allTypes = types;
             this.logger = logger;
         }
 
-        private class TypeOption
+        public class TypeWithMethods
         {
-            public Action<string> ProcessOption { get; set; } = value => { };
-            public string FixedText { get; set; } = string.Empty;
+            public Type Type { get; private set; }
+            public MethodInfo [] Methods { get; private set; }
+            public bool AllMethodsInType { get; private set; }
+
+            public TypeWithMethods(Type type, MethodInfo [] methods = null)
+            {
+                AllMethodsInType = methods == null;
+                Type = type;
+                Methods = methods;
+            }
         }
 
-        private static Dictionary<string, TypeOption> configuration = new Dictionary<string, TypeOption>
+        private static Dictionary<string, string> configuration = new Dictionary<string, string>
         {
-            { "method", new TypeOption {
-                ProcessOption = value => { throw new InvalidOperationException($"{value} is an unrecognised method"); },
-                FixedText = "run a given test method (should be fully specified; i.e., 'MyNamespace.MyClass.MyTestMethod')"
-            } },
-            { "class", new TypeOption {
-                ProcessOption = value => { throw new InvalidOperationException($"{value} is an unrecognised class"); },
-                FixedText = "run all methods in a given test class (should be fully specified; i.e., 'MyNamespace.MyClass')"
-            } },
-            { "namespace", new TypeOption {
-                ProcessOption = value => { throw new InvalidOperationException($"{value} is an unrecognised namespace"); },
-                FixedText = "run all methods in a given namespace (i.e., 'MyNamespace.MySubNamespace')"
-            } },
+            {
+                "method",
+                "run a given test method (just the method name, i.e. 'MyTestMethod', or can be fully specified, i.e. 'MyNamespace.MyClass.MyTestMethod')"
+            },
+            {
+                "class",
+                "run all methods in a given test class (just the class name, i.e. 'MyClass', or can be fully specified, i.e. 'MyNamespace.MyClass')"
+            },
+            {
+                "namespace",
+                "run all methods in a given namespace (i.e. 'MyNamespace.MySubNamespace')"
+            }
         };
 
-        private Type[] types;
+        private Type[] allTypes;
         private readonly ILogger logger;
 
         internal string[] ReadArgumentList(string[] args)
@@ -45,7 +55,7 @@ namespace BenchmarkDotNet.Running
             while (args.Length == 0)
             {
                 PrintAvailable();
-                var benchmarkCaptionExample = types.Length == 0 ? "Intro_00" : types.First().Name;
+                var benchmarkCaptionExample = allTypes.Length == 0 ? "Intro_00" : allTypes.First().Name;
                 logger.WriteLineHelp(
                     $"You should select the target benchmark. Please, print a number of a benchmark (e.g. '0') or a benchmark caption (e.g. '{benchmarkCaptionExample}'):");
                 var line = Console.ReadLine() ?? "";
@@ -55,18 +65,59 @@ namespace BenchmarkDotNet.Running
             return args;
         }
 
-        internal IEnumerable<Type> MatchingTypes(string[] args)
+        internal IEnumerable<TypeWithMethods> MatchingTypesWithMethods(string[] args)
         {
-            // TODO extend this to support Method, Class & Namespace matching, done using configuration (above)
-            for (int i = 0; i < types.Length; i++)
+            for (int i = 0; i < allTypes.Length; i++)
             {
-                var type = types[i];
+                var type = allTypes[i];
                 if (args.Any(arg => type.Name.ToLower().StartsWith(arg.ToLower())) || 
                     args.Contains("#" + i) || args.Contains("" + i) || args.Contains("*"))
                 {
-                    yield return type;
+                    yield return new TypeWithMethods(type);
                 }
             }
+
+            var types = new List<Type>();
+            var methods = new List<TypeWithMethods>();
+            foreach (var arg in args.Where(arg => arg.Contains("=")))
+            {
+                var split = arg.Split('=');
+                var values = split[1].Split(',');
+                var argument = split[0].ToLowerInvariant();
+
+                var qualifyingTypes = allTypes.Where(t => t.GetMethods().Any(m => m.HasAttribute<BenchmarkAttribute>()));
+                switch (argument)
+                {
+                    case "method":
+                    case "methods":
+                        foreach (var type in allTypes)
+                        {
+                            var allTargetMethods = type.GetMethods().Where(method => method.HasAttribute<BenchmarkAttribute>());
+                            var typeWithNamespace = type.Namespace + "." + type.Name;
+                            var matchingMethods = allTargetMethods.Where(m => values.Any(v => v == m.Name || v == typeWithNamespace + "." + m.Name)).ToArray();
+                            if (matchingMethods.Length > 0)
+                            {
+                                methods.Add(new TypeWithMethods(type, matchingMethods));
+                            }
+                        }
+                        break;
+                    case "class":
+                    case "classes":
+                        types.AddRange(qualifyingTypes.Where(t => values.Any(v => v == t.Name || v == t.Namespace + "." + t.Name)));
+                        break;
+                    case "namespace":
+                    case "namespaces":
+                        types.AddRange(qualifyingTypes.Where(t => values.Any(v => v == t.Namespace)));
+                        break;
+                }
+            }
+
+            // Have to normalise, i.e. if we matched some methods in TypeA, but also got "class=TypeA", 
+            // we want to use the super-set, i.e. the entire Type, rather than just individual methods
+            foreach (var method in methods.Where(m => types.Any(t => t.FullName == m.Type.FullName) == false))
+                yield return new TypeWithMethods(method.Type, method.Methods);
+            foreach (var type in types)
+                yield return new TypeWithMethods(type);
         }
 
         private string optionPrefix = "--";
@@ -81,7 +132,7 @@ namespace BenchmarkDotNet.Running
                 logger.WriteResult($"{optionText.PadRight(prefixWidth)}");
 
                 var maxWidth = outputWidth - prefixWidth - Environment.NewLine.Length - breakText.Length;
-                var lines = StringExtensions.Wrap(option.Value.FixedText, maxWidth);
+                var lines = StringExtensions.Wrap(option.Value, maxWidth);
                 if (lines.Count == 0)
                 {
                     logger.WriteLine();
@@ -97,17 +148,17 @@ namespace BenchmarkDotNet.Running
 
         private void PrintAvailable()
         {
-            if (types.IsEmpty())
+            if (allTypes.IsEmpty())
             {
                 logger.WriteLineError("You don't have any benchmarks");
                 return;
             }
 
-            logger.WriteLineHelp($"Available Benchmark{(types.Length > 1 ? "s" : "")}:");
+            logger.WriteLineHelp($"Available Benchmark{(allTypes.Length > 1 ? "s" : "")}:");
 
-            int numberWidth = types.Length.ToString().Length;
-            for (int i = 0; i < types.Length; i++)
-                logger.WriteLineHelp(string.Format(CultureInfo.InvariantCulture, "  #{0} {1}", i.ToString().PadRight(numberWidth), types[i].Name));
+            int numberWidth = allTypes.Length.ToString().Length;
+            for (int i = 0; i < allTypes.Length; i++)
+                logger.WriteLineHelp(string.Format(CultureInfo.InvariantCulture, "  #{0} {1}", i.ToString().PadRight(numberWidth), allTypes[i].Name));
             logger.WriteLine();
             logger.WriteLine();
         }

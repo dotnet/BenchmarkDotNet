@@ -125,7 +125,7 @@ namespace BenchmarkDotNet.Tests
         public class NonPublicFieldWithParams
         {
             [Params(1)]
-            internal int Field;
+            internal int Field = 0;
 
             [Benchmark]
             public void NonThrowing() { }

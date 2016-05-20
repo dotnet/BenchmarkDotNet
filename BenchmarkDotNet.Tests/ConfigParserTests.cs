@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(0, config.GetColumns().Count());
             Assert.Equal(0, config.GetDiagnosers().Count());
             Assert.Equal(0, config.GetAnalysers().Count());
-            Assert.Equal(0, config.GetLoggers().Count());            
+            Assert.Equal(0, config.GetLoggers().Count());
         }
 
         [Fact]
