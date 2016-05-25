@@ -131,6 +131,8 @@ namespace BenchmarkDotNet.Configs
                 var values = split[1].Split(',');
                 // Delibrately allow both "job" and "jobs" to be specified, makes it easier for users!!
                 var argument = split[0].EndsWith("s") ? split[0] : split[0] + "s";
+                // Allow both "--arg=<value>" and "arg=<value>" (i.e. with and without the double dashes)
+                argument = argument.StartsWith(optionPrefix) ? argument.Remove(0, 2) : argument;
 
                 if (configuration.ContainsKey(argument) == false)
                     continue;

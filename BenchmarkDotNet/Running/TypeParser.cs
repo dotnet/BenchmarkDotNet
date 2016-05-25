@@ -84,6 +84,8 @@ namespace BenchmarkDotNet.Running
                 var split = arg.Split('=');
                 var values = split[1].Split(',');
                 var argument = split[0].ToLowerInvariant();
+                // Allow both "--arg=<value>" and "arg=<value>" (i.e. with and without the double dashes)
+                argument = argument.StartsWith(optionPrefix) ? argument.Remove(0, 2) : argument;
 
                 var qualifyingTypes = allTypes.Where(t => t.GetMethods().Any(m => m.HasAttribute<BenchmarkAttribute>()));
                 switch (argument)
