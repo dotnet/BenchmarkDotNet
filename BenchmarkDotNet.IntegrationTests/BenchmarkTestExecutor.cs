@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 Assert.True(summary.Reports.All(r => r.ExecuteResults.Any(er => er.FoundExecutable && er.Data.Any())),
                             "All reports should have at least one \"ExecuteResult\" with \"FoundExecutable\" = true and at least one \"Data\" item");
                 Assert.True(summary.Reports.All(report => report.AllMeasurements.Any()),
-                            "All reports should have at least one \"Measurment\" in the \"AllMeasurements\" collection");
+                            "All reports should have at least one \"Measurement\" in the \"AllMeasurements\" collection");
             }
 
             return summary;

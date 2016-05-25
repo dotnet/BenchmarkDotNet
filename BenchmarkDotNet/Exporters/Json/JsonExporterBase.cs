@@ -11,12 +11,12 @@ namespace BenchmarkDotNet.Exporters.Json
         protected override string FileExtension => "json";
 
         private bool IndentJson { get; set; }
-        private bool ExcludeMeasurments { get; set; }
+        private bool ExcludeMeasurements { get; set; }
 
         public JsonExporterBase(bool indentJson = false, bool excludeMeasurements = false)
         {
             IndentJson = indentJson;
-            ExcludeMeasurments = excludeMeasurements;
+            ExcludeMeasurements = excludeMeasurements;
         }
 
         public override void ExportToLog(Summary summary, ILogger logger)
@@ -58,9 +58,9 @@ namespace BenchmarkDotNet.Exporters.Json
                     { "Statistics", r.ResultStatistics },
                 };
 
-                if (ExcludeMeasurments == false)
+                if (ExcludeMeasurements == false)
                 {
-                    // We construct Measurment manually, so that we can have the IterationMode enum as text, rather than an integer
+                    // We construct Measurements manually, so that we can have the IterationMode enum as text, rather than an integer
                     data.Add("Measurements",
                         r.AllMeasurements.Select(m => new
                         {
