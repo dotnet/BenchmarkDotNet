@@ -15,11 +15,11 @@ namespace BenchmarkDotNet.IntegrationTests
         public void SingleBenchmarkCanBeExecutedForMultpleRuntimes()
         {
             var summary = BenchmarkRunner
-                .Run<MultipleRuntimesTest>(
+                .Run<C>(
                     ManualConfig.CreateEmpty()
                                 .With(Job.Dry.With(Runtime.Dnx))
-                                .With(Job.Dry.With(Runtime.Core)));
-                                // .With(Job.Dry.With(Runtime.Clr).With(Framework.V40)));
+                                .With(Job.Dry.With(Runtime.Core))
+                                .With(Job.Dry.With(Runtime.Clr).With(Framework.V46)));
 
             Assert.True(summary.Reports
                 .All(report => report.ExecuteResults
@@ -27,11 +27,10 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.True(summary.Reports.All(report => report.AllMeasurements.Any()));
 
-            // currently disabled due to dotnet cli bug (can not build our .net 4.5 and 4.6 assemblies)
-            //Assert.True(summary.Reports
-            //    .Single(report => report.Benchmark.Job.Runtime == Runtime.Clr)
-            //    .ExecuteResults
-            //    .All(executeResult => executeResult.Data.Contains("Classic")));
+            Assert.True(summary.Reports
+                .Single(report => report.Benchmark.Job.Runtime == Runtime.Clr)
+                .ExecuteResults
+                .All(executeResult => executeResult.Data.Contains("Classic")));
 
             Assert.True(summary.Reports
                 .Single(report => report.Benchmark.Job.Runtime == Runtime.Dnx)
@@ -44,8 +43,14 @@ namespace BenchmarkDotNet.IntegrationTests
                 .All(executeResult => executeResult.Data.Contains("Core")));
         }
 
+        
+    }
+
+    // this test was suffering from too long path ex so I had to rename the class and benchmark method to fit within the limit
+    public class C
+    {
         [Benchmark]
-        public void Benchmark()
+        public void B()
         {
             Console.WriteLine($"{Toolchain.GetToolchain(Runtime.Host)}");
         }

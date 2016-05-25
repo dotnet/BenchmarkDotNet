@@ -7,7 +7,6 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Properties;
 
@@ -31,7 +30,7 @@ namespace BenchmarkDotNet.Running
             var types = assembly
                 .GetTypes()
                 .Where(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Public)
-                             .Any(m => MemberInfoExtensions.GetCustomAttributes<BenchmarkAttribute>(m, true).Any()))
+                             .Any(m => Portability.MemberInfoExtensions.GetCustomAttributes<BenchmarkAttribute>(m, true).Any()))
                 .Where(t => !Portability.TypeExtensions.IsGenericType(t))
                 .OrderBy(t => t.Namespace)
                 .ThenBy(t => t.Name)

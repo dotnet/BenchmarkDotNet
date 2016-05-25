@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     {
         internal const string RestoreCommand = "restore --fallbacksource https://dotnet.myget.org/F/dotnet-core/api/v3/index.json";
 
-        private const string Configuration = "RELEASE";
+        private const string Configuration = "Release";
 
         private const string OutputDirectory = "binaries";
 

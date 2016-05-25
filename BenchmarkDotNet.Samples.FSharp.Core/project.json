@@ -1,32 +1,42 @@
 {
   "version": "1.0.0-*",
-
-  "compilationOptions": {
+  "buildOptions": {
     "emitEntryPoint": true,
-    "allowUnsafe": true,
-    "optimize": true
+    "compilerName": "fsc",
+    "compile": {
+      "includeFiles": [
+        "AssemblyInfo.fs",
+        "Program.fs"
+      ]
+    }
   },
-
-  "compilerName": "fsc",
-  "compileFiles": [
-    "AssemblyInfo.fs",
-    "Program.fs"
-  ],
-
-  "commands": {
-    "run": "BenchmarkDotNet.Samples.FSharp"
-  },
-
   "dependencies": {
-    "BenchmarkDotNet": {
-      "target": "package",
-      "version": "0.9.5-beta"
+    "Microsoft.FSharp.Core.netcore": "1.0.0-alpha-160316",
+    "Microsoft.NETCore.App": {
+      "type": "platform",
+      "version": "1.0.0-rc2-3002702"
     },
-    "Microsoft.FSharp.Core.netcore": "1.0.0-alpha-151221",
-    "NETStandard.Library": "1.0.0-rc2-23811"
+    "BenchmarkDotNet": {
+      "target": "project",
+      "version": "0.9.6-develop"
+    }
   },
-
+  "tools": {
+    "dotnet-compile-fsc": {
+      "version": "1.0.0-*",
+      "imports": [
+        "dnxcore50",
+        "portable-net45+win81",
+        "netstandard1.3"
+      ]
+    }
+  },
   "frameworks": {
-    "dnxcore50": { }
+    "netstandard1.5": {
+      "imports": [
+        "portable-net45+win8",
+        "dnxcore50"
+      ]
+    }
   }
 }

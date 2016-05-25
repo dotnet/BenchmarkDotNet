@@ -1,22 +1,28 @@
-﻿{
+{
   "title": "BenchmarkDotNet.Diagnostics.Windows",
   "version": "0.9.6-develop",
   "authors": [ "Andrey Akinshin", "Jon Skeet", "Matt Warren" ],
-  "owners": [ "Andrey Akinshin", "Jon Skeet", "Matt Warren" ],
-  "licenseUrl": "https://github.com/PerfDotNet/BenchmarkDotNet/blob/master/LICENSE.md",
-  "projectUrl": "https://github.com/PerfDotNet/BenchmarkDotNet",
-  "iconUrl": "https://raw.githubusercontent.com/PerfDotNet/BenchmarkDotNet/master/BenchmarkDotNet/BenchmarkDotNet.png",
-  "requireLicenseAcceptance": false,
   "description": "Powerful .NET library for benchmarking (Diagnostic Tools for Windows)",
   "copyright": "Andrey Akinshin, Jon Skeet, Matt Warren",
+  "packOptions": {
+    "owners": [ "Andrey Akinshin", "Jon Skeet", "Matt Warren" ],
+    "licenseUrl": "https://github.com/PerfDotNet/BenchmarkDotNet/blob/master/LICENSE.md",
+    "projectUrl": "https://github.com/PerfDotNet/BenchmarkDotNet",
+    "iconUrl": "https://raw.githubusercontent.com/PerfDotNet/BenchmarkDotNet/master/BenchmarkDotNet/BenchmarkDotNet.png",
+    "requireLicenseAcceptance": false,
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/PerfDotNet/BenchmarkDotNet"
+    }
+  },
   "configurations": {
     "Debug": {
-      "compilationOptions": {
+      "buildOptions": {
         "define": [ "DEBUG", "TRACE" ]
       }
     },
     "Release": {
-      "compilationOptions": {
+      "buildOptions": {
         "define": [ "RELEASE", "TRACE" ],
         "optimize": true,
         "xmlDoc": true,
@@ -35,5 +41,8 @@
       "version": "0.9.6-develop"
     },
     "Microsoft.Diagnostics.Tracing.TraceEvent": "1.0.41.0"
+  },
+  "buildOptions": {
+    "nowarn": [ "1591" ]
   }
 }

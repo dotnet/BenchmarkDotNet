@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
@@ -19,11 +20,22 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         private Func<Platform, string> PlatformProvider { get; }
 
-        public DotNetCliGenerator(Func<Framework, string> targetFrameworkMonikerProvider, string extraDependencies, Func<Platform, string> platformProvider)
+        private string Imports { get; }
+
+        private string Runtime { get; }
+
+        public DotNetCliGenerator(
+            Func<Framework, string> targetFrameworkMonikerProvider, 
+            string extraDependencies, 
+            Func<Platform, string> platformProvider, 
+            string imports,
+            string runtime = null)
         {
             TargetFrameworkMonikerProvider = targetFrameworkMonikerProvider;
             ExtraDependencies = extraDependencies;
             PlatformProvider = platformProvider;
+            Imports = imports;
+            Runtime = runtime;
         }
 
         /// <summary>
@@ -33,6 +45,19 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// </summary>
         protected override string GetBinariesDirectoryPath(Benchmark benchmark, string rootArtifactsFolderPath)
         {
+            var directoryInfo = new DirectoryInfo(Directory.GetCurrentDirectory());
+            while (directoryInfo != null)
+            {
+                if (IsRootSolutionFolder(directoryInfo))
+                {
+                    return Path.Combine(directoryInfo.FullName, benchmark.ShortInfo);
+                }
+
+                directoryInfo = directoryInfo.Parent;
+            }
+
+            // we did not find global.json or any Visual Studio solution file? 
+            // let's return it in the old way and hope that it works ;)
             return Path.Combine(
                 new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.FullName, 
                 benchmark.ShortInfo);
@@ -46,6 +71,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             content = SetDependencyToExecutingAssembly(content, benchmark.Target.Type);
             content = SetTargetFrameworkMoniker(content, TargetFrameworkMonikerProvider(benchmark.Job.Framework));
             content = SetExtraDependencies(content, ExtraDependencies);
+            content = SetImports(content, Imports);
+            content = SetRuntime(content, Runtime);
 
             var projectJsonFilePath = Path.Combine(projectDir, ProjectFileName);
 
@@ -85,6 +112,16 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return content.Replace("$REQUIREDDEPENDENCY$", extraDependencies);
         }
 
+        private static string SetImports(string content, string imports)
+        {
+            return content.Replace("$IMPORTS$", imports);
+        }
+
+        private static string SetRuntime(string content, string runtime)
+        {
+            return content.Replace("$RUNTIME$", runtime);
+        }
+
         /// <summary>
         /// we can not simply call assemblyName.Version.ToString() because it is different than package version which can contain (and often does) text
         /// we are using the wildcard to get latest version of package/project restored
@@ -92,6 +129,18 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         private static string GetPackageVersion(AssemblyName assemblyName)
         {
             return $"{assemblyName.Version.Major}.{assemblyName.Version.Minor}.{assemblyName.Version.Build}-*";
+        }
+
+        private static bool IsRootSolutionFolder(DirectoryInfo directoryInfo)
+        {
+            if (directoryInfo == null)
+            {
+                return false;
+            }
+
+            return directoryInfo
+                .GetFileSystemInfos()
+                .Any(fileInfo => fileInfo.Extension == "sln" || fileInfo.Name == "global.json");
         }
     }
 }

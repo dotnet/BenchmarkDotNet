@@ -17,8 +17,9 @@ namespace BenchmarkDotNet.Toolchains.Dnx
             : base("Dnx",
                   new DotNetCliGenerator(
                       TargetFrameworkMonikerProvider,
-                      extraDependencies: "\"frameworkAssemblies\": { \"System.Runtime\": \"4.0.20.0\" }",
-                      platformProvider: platform => platform.ToConfig()),
+                      extraDependencies: "\"frameworkAssemblies\": { \"System.Runtime\": \"4.0.20.0\" },",
+                      platformProvider: platform => platform.ToConfig(),
+                      imports: "\"portable-net45+win8\""),
                   new DotNetCliBuilder(TargetFrameworkMonikerProvider), 
                   new ClassicExecutor())
         {
