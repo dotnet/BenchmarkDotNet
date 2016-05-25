@@ -4,7 +4,7 @@
     {
         public static readonly IExporter Default = new JsonExporter();
 
-        public JsonExporter() : base(indentJson: false, excludeMeasurments: false)
+        public JsonExporter() : base(indentJson: false, excludeMeasurements: false)
         {
         }
     }

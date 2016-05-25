@@ -7,6 +7,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Extensions;
 
@@ -102,6 +103,8 @@ namespace BenchmarkDotNet.Configs
                 { "plain", new[] { PlainExporter.Default } },
                 { "rplot", new[] { RPlotExporter.Default } },
                 { "json", new[] { JsonExporter.Default } },
+                { "briefjson", new[] { BriefJsonExporter.Default } },
+                { "formattedjson", new[] { FormattedJsonExporter.Default } },
             };
         private static Lazy<IExporter[]> allExporters = new Lazy<IExporter[]>(() => availableExporters.SelectMany(e => e.Value).ToArray());
 

@@ -6,7 +6,7 @@
 
         protected override string FileNameSuffix => "-formatted";
 
-        public FormattedJsonExporter() : base(indentJson: true, excludeMeasurments: false)
+        public FormattedJsonExporter() : base(indentJson: true, excludeMeasurements: false)
         {
         }
     }

@@ -6,7 +6,7 @@
 
         protected override string FileNameSuffix => "-brief";
 
-        public BriefJsonExporter() : base(indentJson: true, excludeMeasurments: true)
+        public BriefJsonExporter() : base(indentJson: true, excludeMeasurements: true)
         {
         }
     }
