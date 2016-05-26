@@ -22,7 +22,6 @@
   "commands": {
     "run": "BenchmarkDotNet.Samples"
   },
-  "exclude": [ "**/BenchmarkDotNet.Artifacts/*" ],
   "frameworks": {
     "net40": {
       "buildOptions": {

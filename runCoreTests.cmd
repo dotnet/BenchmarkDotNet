@@ -11,27 +11,21 @@ if NOT %ERRORLEVEL% == 0 (
     goto end
 )
 
-cd BenchmarkDotNet.IntegrationTests
-
 echo -----------------------------
 echo Running Core tests
 echo -----------------------------
 
-call dotnet test --configuration Release --framework netcoreapp1.0 2> failedCoreTests.txt
+call dotnet test BenchmarkDotNet.IntegrationTests/ --configuration Release --framework netcoreapp1.0 2> failedCoreTests.txt
 
 if NOT %ERRORLEVEL% == 0 (
     echo CORE tests has failed
 	type failedCoreTests.txt
-    goto restoreCurrentFolder
+    goto end
 )
 
 echo -----------------------------
 echo All tests has passed for Core
 echo -----------------------------
-
-
-:restoreCurrentFolder
-cd ..
 
 :end
 del failedCoreTests.txt	
