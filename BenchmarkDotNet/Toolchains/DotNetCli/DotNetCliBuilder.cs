@@ -66,9 +66,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         /// <summary>
-        /// we use custom output path in order to avoid any future problems related to dotnet cli paths changing
+        /// we use custom output path in order to avoid any future problems related to dotnet cli paths changes
         /// </summary>
         private string BuildExecutablePath(GenerateResult generateResult, Benchmark benchmark)
-            => Path.Combine(generateResult.DirectoryPath, OutputDirectory, $"{benchmark.ShortInfo}{RuntimeInformation.ExecutableExtension}");
+        {
+            return Path.Combine(
+                generateResult.DirectoryPath,
+                OutputDirectory,
+                $"{new DirectoryInfo(generateResult.DirectoryPath).Name}{RuntimeInformation.ExecutableExtension}");
+        }
     }
 }

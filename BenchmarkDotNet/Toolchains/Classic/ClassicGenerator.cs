@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
@@ -25,9 +26,14 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 "System.Xml"
             });
 
-        protected override string GetBinariesDirectoryPath(Benchmark benchmark, string rootArtifactsFolderPath)
+        protected override string GetBinariesDirectoryPath(Benchmark benchmark, string rootArtifactsFolderPath, IConfig config)
         {
-            return Path.Combine(rootArtifactsFolderPath, "bin", benchmark.ShortInfo);
+            if (config.KeepBenchmarkFiles)
+            {
+                return Path.Combine(rootArtifactsFolderPath, "bin", benchmark.ShortInfo);
+            }
+
+            return Path.Combine(rootArtifactsFolderPath, "bin", ShortFolderName);
         }
 
         protected override void GenerateProjectFile(ILogger logger, string projectDir, Benchmark benchmark)

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -43,14 +44,15 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// we are limited by xprojs (by default compiles all .cs files in all subfolders, Program.cs could be doubled and fail the build)
         /// and also by nuget internal implementation like looking for global.json file in parent folders
         /// </summary>
-        protected override string GetBinariesDirectoryPath(Benchmark benchmark, string rootArtifactsFolderPath)
+        protected override string GetBinariesDirectoryPath(Benchmark benchmark, string rootArtifactsFolderPath, IConfig config)
         {
             var directoryInfo = new DirectoryInfo(Directory.GetCurrentDirectory());
             while (directoryInfo != null)
             {
                 if (IsRootSolutionFolder(directoryInfo))
                 {
-                    return Path.Combine(directoryInfo.FullName, benchmark.ShortInfo);
+                    return Path.Combine(directoryInfo.FullName, 
+                        config.KeepBenchmarkFiles ? benchmark.ShortInfo : ShortFolderName);
                 }
 
                 directoryInfo = directoryInfo.Parent;
@@ -58,9 +60,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             // we did not find global.json or any Visual Studio solution file? 
             // let's return it in the old way and hope that it works ;)
-            return Path.Combine(
-                new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.FullName, 
-                benchmark.ShortInfo);
+            return Path.Combine(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.FullName,
+                config.KeepBenchmarkFiles ? benchmark.ShortInfo : ShortFolderName);
         }
 
         protected override void GenerateProjectFile(ILogger logger, string projectDir, Benchmark benchmark)

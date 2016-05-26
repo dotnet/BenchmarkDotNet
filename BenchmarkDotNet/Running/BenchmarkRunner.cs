@@ -170,7 +170,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineHeader("// **************************");
             logger.WriteLineHeader("// Benchmark: " + benchmark.ShortInfo);
 
-            var generateResult = Generate(logger, toolchain, benchmark, rootArtifactsFolderPath);
+            var generateResult = Generate(logger, toolchain, benchmark, rootArtifactsFolderPath, config);
             
             try
             {
@@ -198,10 +198,10 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        private static GenerateResult Generate(ILogger logger, IToolchain toolchain, Benchmark benchmark, string rootArtifactsFolderPath)
+        private static GenerateResult Generate(ILogger logger, IToolchain toolchain, Benchmark benchmark, string rootArtifactsFolderPath, IConfig config)
         {
             logger.WriteLineInfo("// *** Generate *** ");
-            var generateResult = toolchain.Generator.GenerateProject(benchmark, logger, rootArtifactsFolderPath);
+            var generateResult = toolchain.Generator.GenerateProject(benchmark, logger, rootArtifactsFolderPath, config);
             if (generateResult.IsGenerateSuccess)
             {
                 logger.WriteLineInfo("// Result = Success");

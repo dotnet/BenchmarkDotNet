@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
@@ -17,11 +18,13 @@ namespace BenchmarkDotNet.Toolchains
     {
         public const string MainClassName = "Program";
 
+        public const string ShortFolderName = "BDN.Auto";
+
         internal static string BuildBenchmarkScriptFileName => "BuildBenchmark" + RuntimeInformation.ScriptFileExtension;
 
-        public GenerateResult GenerateProject(Benchmark benchmark, ILogger logger, string rootArtifactsFolderPath)
+        public GenerateResult GenerateProject(Benchmark benchmark, ILogger logger, string rootArtifactsFolderPath, IConfig config)
         {
-            var result = CreateProjectDirectory(benchmark, rootArtifactsFolderPath);
+            var result = CreateProjectDirectory(benchmark, rootArtifactsFolderPath, config);
 
             GenerateProgramFile(result.DirectoryPath, benchmark);
             GenerateProjectFile(logger, result.DirectoryPath, benchmark);
@@ -31,15 +34,15 @@ namespace BenchmarkDotNet.Toolchains
             return result;
         }
 
-        protected abstract string GetBinariesDirectoryPath(Benchmark benchmark, string rootArtifactsFolderPath);
+        protected abstract string GetBinariesDirectoryPath(Benchmark benchmark, string rootArtifactsFolderPath, IConfig config);
 
         protected abstract void GenerateProjectFile(ILogger logger, string projectDir, Benchmark benchmark);
 
         protected abstract void GenerateProjectBuildFile(string scriptFilePath, Framework framework);
 
-        private GenerateResult CreateProjectDirectory(Benchmark benchmark, string rootArtifactsFolderPath)
+        private GenerateResult CreateProjectDirectory(Benchmark benchmark, string rootArtifactsFolderPath, IConfig config)
         {
-            var directoryPath = GetBinariesDirectoryPath(benchmark, rootArtifactsFolderPath);
+            var directoryPath = GetBinariesDirectoryPath(benchmark, rootArtifactsFolderPath, config);
             bool exist = Directory.Exists(directoryPath);
             Exception deleteException = null;
             for (int attempt = 0; attempt < 3 && exist; attempt++)
