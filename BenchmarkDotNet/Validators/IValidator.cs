@@ -7,6 +7,6 @@ namespace BenchmarkDotNet.Validators
     {
         bool TreatsWarningsAsErrors { get; }
 
-        IEnumerable<IValidationError> Validate(IList<Benchmark> benchmarks);
+        IEnumerable<ValidationError> Validate(IList<Benchmark> benchmarks);
     }
 }

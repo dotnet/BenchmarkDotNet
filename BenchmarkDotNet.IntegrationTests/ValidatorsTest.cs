@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public bool TreatsWarningsAsErrors => true;
 
-            public IEnumerable<IValidationError> Validate(IList<Benchmark> benchmarks)
+            public IEnumerable<ValidationError> Validate(IList<Benchmark> benchmarks)
             {
                 yield return new ValidationError(true, "It just fails");
             }

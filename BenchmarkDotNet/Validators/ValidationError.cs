@@ -2,7 +2,7 @@
 
 namespace BenchmarkDotNet.Validators
 {
-    internal class ValidationError : IValidationError
+    public class ValidationError
     {
         public ValidationError(bool isCritical, string message, Benchmark benchmark = null)
         {

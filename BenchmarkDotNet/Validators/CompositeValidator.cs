@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Validators
 
         public bool TreatsWarningsAsErrors => Validators.All(validator => validator.TreatsWarningsAsErrors);
 
-        public IEnumerable<IValidationError> Validate(IList<Benchmark> benchmarks)
+        public IEnumerable<ValidationError> Validate(IList<Benchmark> benchmarks)
         {
             return Validators.SelectMany(validator => validator.Validate(benchmarks));
         }

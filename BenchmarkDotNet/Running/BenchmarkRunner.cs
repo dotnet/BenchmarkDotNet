@@ -145,7 +145,7 @@ namespace BenchmarkDotNet.Running
             return summary;
         }
 
-        private static IValidationError[] Validate(IList<Benchmark> benchmarks, ILogger logger, IConfig config)
+        private static ValidationError[] Validate(IList<Benchmark> benchmarks, ILogger logger, IConfig config)
         {
             logger.WriteLineInfo("// Validating benchmarks:");
             var validationErrors = config.GetCompositeValidator().Validate(benchmarks).ToArray();

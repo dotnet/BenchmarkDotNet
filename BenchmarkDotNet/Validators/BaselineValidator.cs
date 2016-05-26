@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Validators
 
         public bool TreatsWarningsAsErrors => true; // it is a must!
 
-        public IEnumerable<IValidationError> Validate(IList<Benchmark> benchmarks)
+        public IEnumerable<ValidationError> Validate(IList<Benchmark> benchmarks)
         {
             foreach (var groupByType in benchmarks.GroupBy(benchmark => benchmark.Target.Type))
             {
