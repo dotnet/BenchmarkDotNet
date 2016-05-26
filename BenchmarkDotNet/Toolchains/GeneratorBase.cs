@@ -143,7 +143,7 @@ namespace BenchmarkDotNet.Toolchains
                 Replace("$TargetBenchmarkTaskArguments$", targetBenchmarkTaskArguments).
                 Replace("$ParamsContent$", paramsContent);
 
-            string fileName = Path.Combine(projectDir, MainClassName + ".cs");
+            string fileName = Path.Combine(projectDir, MainClassName + ".notcs");
             File.WriteAllText(fileName, content);
         }
 

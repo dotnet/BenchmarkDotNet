@@ -29,7 +29,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="Program.notcs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">
