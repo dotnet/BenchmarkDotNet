@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
@@ -219,9 +220,6 @@ namespace BenchmarkDotNet.Running
 
         private Measurement MultiInvoke(IterationMode mode, int index, Action setupAction, Action targetAction, long invocationCount, long operationsPerInvoke)
         {
-            State.Instance.IterationMode = mode;
-            State.Instance.Iteration = index;
-
             var totalOperations = invocationCount * operationsPerInvoke;
             setupAction();
             ClockSpan clockSpan;
@@ -236,21 +234,13 @@ namespace BenchmarkDotNet.Running
             {
                 int intInvocationCount = (int)invocationCount;
                 var chronometer = Chronometer.Start();
-                for (int i = 0; i < intInvocationCount; i++)
-                {
-                    State.Instance.Operation = i;
-                    targetAction();
-                }
+                RunAction(targetAction, intInvocationCount);
                 clockSpan = chronometer.Stop();
             }
             else
             {
                 var chronometer = Chronometer.Start();
-                for (long i = 0; i < invocationCount; i++)
-                {
-                    State.Instance.Operation = i;
-                    targetAction();
-                }
+                RunAction(targetAction, invocationCount);
                 clockSpan = chronometer.Stop();
             }
             var measurement = new Measurement(0, mode, index, totalOperations, clockSpan.GetNanoseconds());
@@ -263,9 +253,6 @@ namespace BenchmarkDotNet.Running
 
         private Measurement MultiInvoke<T>(IterationMode mode, int index, Action setupAction, Func<T> targetAction, long invocationCount, long operationsPerInvoke, T returnHolder = default(T))
         {
-            State.Instance.IterationMode = mode;
-            State.Instance.Iteration = index;
-
             var totalOperations = invocationCount * operationsPerInvoke;
             setupAction();
             ClockSpan clockSpan;
@@ -280,21 +267,13 @@ namespace BenchmarkDotNet.Running
             {
                 int intInvocationCount = (int)invocationCount;
                 var chronometer = Chronometer.Start();
-                for (int i = 0; i < intInvocationCount; i++)
-                {
-                    State.Instance.Operation = i;
-                    returnHolder = targetAction();
-                }
+                RunAction(targetAction, intInvocationCount);
                 clockSpan = chronometer.Stop();
             }
             else
             {
                 var chronometer = Chronometer.Start();
-                for (long i = 0; i < invocationCount; i++)
-                {
-                    State.Instance.Operation = i;
-                    returnHolder = targetAction();
-                }
+                RunAction(targetAction, invocationCount);
                 clockSpan = chronometer.Stop();
             }
             multiInvokeReturnHolder = returnHolder;
@@ -303,6 +282,37 @@ namespace BenchmarkDotNet.Running
             GcCollect();
             return measurement;
         }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void RunAction(Action action, int count)
+        {
+            for (int i = 0; i < count; i++)
+                action();
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void RunAction(Action action, long count)
+        {
+            for (int i = 0; i < count; i++)
+                action();
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void RunAction<T>(Func<T> action, int count, T returnHolder = default(T))
+        {            
+            for (int i = 0; i < count; i++)
+                returnHolder = action();
+            multiInvokeReturnHolder = returnHolder;
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void RunAction<T>(Func<T> action, long count, T returnHolder = default(T))
+        {
+            for (int i = 0; i < count; i++)
+                returnHolder = action();
+            multiInvokeReturnHolder = returnHolder;
+        }
+
 
         private static void GcCollect()
         {
