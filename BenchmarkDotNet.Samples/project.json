@@ -19,9 +19,6 @@
       }
     }
   },
-  "commands": {
-    "run": "BenchmarkDotNet.Samples"
-  },
   "frameworks": {
     "net40": {
       "buildOptions": {
