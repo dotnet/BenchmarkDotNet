@@ -1,6 +1,6 @@
 ﻿{
   "title": "BenchmarkDotNet",
-  "version": "0.9.6-develop",
+  "version": "0.9.7-develop",
   "authors": [ "Andrey Akinshin", "Jon Skeet", "Matt Warren" ],
   "description": "Powerful .NET library for benchmarking",
   "copyright": "Andrey Akinshin, Jon Skeet, Matt Warren",

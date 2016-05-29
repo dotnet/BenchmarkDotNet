@@ -1,6 +1,6 @@
 {
   "title": "BenchmarkDotNet.Diagnostics.Windows",
-  "version": "0.9.6-develop",
+  "version": "0.9.7-develop",
   "authors": [ "Andrey Akinshin", "Jon Skeet", "Matt Warren" ],
   "description": "Powerful .NET library for benchmarking (Diagnostic Tools for Windows)",
   "copyright": "Andrey Akinshin, Jon Skeet, Matt Warren",
@@ -38,7 +38,7 @@
   "dependencies": {
     "BenchmarkDotNet": {
       "target": "project",
-      "version": "0.9.6-develop"
+      "version": "0.9.7-develop"
     },
     "Microsoft.Diagnostics.Tracing.TraceEvent": "1.0.41.0"
   },

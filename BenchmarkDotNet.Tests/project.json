@@ -43,7 +43,7 @@
   "dependencies": {
     "BenchmarkDotNet": {
       "target": "project",
-      "version": "0.9.6-develop"
+      "version": "0.9.7-develop"
     },
     "xunit": "2.1.0",
     "dotnet-test-xunit": "1.0.0-rc3-*"
