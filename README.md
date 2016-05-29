@@ -11,7 +11,7 @@
 * Easy way to compare different environments (`x86` vs `x64`, `LegacyJit` vs `RyuJit`, and so on; see: [Jobs](#jobs))
 * Reports: markdown (default, github, stackoverflow), csv, html, plain text; png plots.
 * Advanced features: [Baseline](#baseline), [Params](#params), [Percentiles](#percentiles)
-* Powerful diagnostics based on ETW events (currently, works only from source)
+* Powerful diagnostics based on ETW events (see [BenchmarkDotNet.Diagnostics.Windows](https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/))
 * Supported runtimes: Full .NET Framework, .NET Core (both RC2 and RC1), Mono, Dnx (dnx451-dnx46)
 * Supported languages: C#, F# (also on [.NET Core](https://github.com/PerfDotNet/BenchmarkDotNet/issues/135)) and Visual Basic
 
