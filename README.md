@@ -12,7 +12,7 @@
 * Reports: markdown (default, github, stackoverflow), csv, html, plain text; png plots.
 * Advanced features: [Baseline](#baseline), [Params](#params), [Percentiles](#percentiles)
 * Powerful diagnostics based on ETW events (currently, works only from source)
-* Supported runtimes: Full .NET Framework, Mono, Dnx451, DnxCore50 (in prerelease version)
+* Supported runtimes: Full .NET Framework, .NET Core (both RC2 and RC1), Mono, Dnx (dnx451-dnx46)
 * Supported languages: C#, F# (also on [.NET Core](https://github.com/PerfDotNet/BenchmarkDotNet/issues/135)) and Visual Basic
 
 ## Content
@@ -34,7 +34,7 @@
 PM> Install-Package BenchmarkDotNet
 ```
 
-If you want to use CoreCLR (`dnxcore50`), you need prerelease version of the package:
+If you want to use CoreCLR (`netstandard1.5` or `dnxcore50`), you need prerelease version of the package:
 
 ```
 PM> Install-Package BenchmarkDotNet -Pre
@@ -211,7 +211,7 @@ Job characteristics:
 * **Platform.** Values: `Host` *[default]*, `AnyCpu`, `X86`, `X64`.
 * **Jit.** Values: `Host` *[default]*, `LegacyJit`, `RyuJit`.
 * **Framework.** Values: `Host` *[default]*, `V40`, `V45`, `V451`, `V452`, `V46`.
-* **Runtime.** Values: `Host` *[default]*, `Clr`, `Mono`. Coming soon: `CoreClr`.
+* **Runtime.** Values: `Host` *[default]*, `Clr`, `Mono`, `Core`, `Dnx`.
 * **LaunchCount.** Count of separated process launches. Values: `Auto` *[default]* or specific number.
 * **WarmupCount.** Count of warmup iterations. Values: `Auto` *[default]* or specific number.
 * **TargetCount.** Count of target iterations (that will be used for summary). Values: `Auto` *[default]* or specific number.
