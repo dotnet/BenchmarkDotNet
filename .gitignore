@@ -41,3 +41,4 @@ nuget.exe
 **/project.lock.json
 testsOutput/*
 .vs/restore.dg
+BDN.Auto
