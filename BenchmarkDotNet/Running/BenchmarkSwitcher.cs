@@ -94,9 +94,24 @@ namespace BenchmarkDotNet.Running
             logger.WriteLine();
             logger.WriteLineHeader("Options:");
 
-            ManualConfig.PrintOptions(logger, prefixWidth: 30, outputWidth: Console.WindowWidth);
+            var consoleWidth = 80;
+            try
+            {
+                consoleWidth = Console.WindowWidth;
+            }
+            // IOException causes build error
+            // The type 'IOException' exists in both 
+            //    'System.IO, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a' and 
+            //    'System.Runtime, Version=4.0.20.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+            // TODO see if this error goes away after RC2, in the meantime just use "catch (Exception)"
+            catch (Exception)
+            {
+                logger.WriteLine($"Unable to get the Console width, defaulting to {consoleWidth}");
+            }
+
+            ManualConfig.PrintOptions(logger, prefixWidth: 30, outputWidth: consoleWidth);
             logger.WriteLine();
-            typeParser.PrintOptions(logger, prefixWidth: 30, outputWidth: Console.WindowWidth);
+            typeParser.PrintOptions(logger, prefixWidth: 30, outputWidth: consoleWidth);
         }
     }
 }
