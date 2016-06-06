@@ -6,6 +6,7 @@ using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Running
 {
@@ -107,6 +108,33 @@ namespace BenchmarkDotNet.Running
                     case "classes":
                         types.AddRange(qualifyingTypes.Where(t => values.Any(v => v == t.Name || v == t.Namespace + "." + t.Name)));
                         break;
+                    case "attribute":
+                    case "attributes":
+                        foreach (var type in allTypes)
+                        {
+                            // First see if the entire Type/Class has a matching attribute
+                            foreach (var attributeName in type.GetCustomAttributes(inherit: true)
+                                                              .Select(a => a.GetType().Name))
+                            {
+                                // Allow short and long version of the attributes to be specified, i.e. "Run" and "RunAttribute"
+                                if (values.Any(v => v == attributeName || v + "Attribute" == attributeName))
+                                {
+                                    types.Add(type);
+                                }
+                            }
+
+                            // Now see if any methods within the Type/Class have a matching attribute
+                            var allTargetMethods = type.GetMethods().Where(method => method.HasAttribute<BenchmarkAttribute>());
+                            var matchingMethods = allTargetMethods.Where(m => m.GetCustomAttributes(inherit: false)
+                                                                               .Select(a => a.GetType().Name)
+                                                                               .Any(a => values.Any(v => v == a || v + "Attribute" == a)))
+                                                                  .ToArray();
+                            if (matchingMethods.Length > 0)
+                            {
+                                methods.Add(new TypeWithMethods(type, matchingMethods));
+                            }
+                        }
+                        break;
                     case "namespace":
                     case "namespaces":
                         types.AddRange(qualifyingTypes.Where(t => values.Any(v => v == t.Namespace)));
@@ -134,7 +162,7 @@ namespace BenchmarkDotNet.Running
                 logger.WriteResult($"{optionText.PadRight(prefixWidth)}");
 
                 var maxWidth = outputWidth - prefixWidth - Environment.NewLine.Length - breakText.Length;
-                var lines = StringExtensions.Wrap(option.Value, maxWidth);
+                var lines = StringAndTextExtensions.Wrap(option.Value, maxWidth);
                 if (lines.Count == 0)
                 {
                     logger.WriteLine();

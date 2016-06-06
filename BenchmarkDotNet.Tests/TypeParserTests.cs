@@ -1,8 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using Xunit;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Attributes;
-using Xunit;
+using BenchmarkDotNet.Tests;
 
 namespace BenchmarkDotNet.Tests
 {
@@ -46,6 +48,8 @@ namespace BenchmarkDotNet.Tests
             var typeParser = new TypeParser(types, ConsoleLogger.Default);
 
             var matches = typeParser.MatchingTypesWithMethods(new[] { "class=ClassC,ClassA" });
+            // TODO do we want to allow "class = ClassC, ClassA" aswell as "class=ClassC,ClassA"
+            //var matches = typeParser.MatchingTypesWithMethods(new[] { "class = ClassC, ClassA" });
 
             // ClassC not matched as it has NO methods with the [Benchmark] attribute
             Assert.Equal(1, matches.Count());
@@ -63,6 +67,36 @@ namespace BenchmarkDotNet.Tests
             // ClassC not matched as it has NO methods with the [Benchmark] attribute
             Assert.Equal(1, matches.Count());
             Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassA" && match.AllMethodsInType));
+        }
+
+        [Fact]
+        public void CanSelectAttributes()
+        {
+            var types = new[] { typeof(ClassA), typeof(ClassB), typeof(ClassC), typeof(NOTTests.ClassD) };
+            var typeParser = new TypeParser(types, ConsoleLogger.Default);
+
+            var matches = typeParser.MatchingTypesWithMethods(new[] { "attribute=Run" });
+
+            // Find entire classes or individual methods that have the [Run] attribute
+            Assert.Equal(2, matches.Count());
+            Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassA" && match.AllMethodsInType));
+            Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassD" &&
+                                                   match.Methods.Any(m => m.Name == "Method1")));
+        }
+
+        [Fact]
+        public void CanSelectAttributesWithFullName()
+        {
+            var types = new[] { typeof(ClassA), typeof(ClassB), typeof(ClassC), typeof(NOTTests.ClassD) };
+            var typeParser = new TypeParser(types, ConsoleLogger.Default);
+
+            var matches = typeParser.MatchingTypesWithMethods(new[] { "attribute=DontRunAttribute" });
+
+            // Find entire classes or individual methods that have the [DontRun] attribute
+            Assert.Equal(2, matches.Count());
+            Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassB" && match.AllMethodsInType));
+            Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassD" &&
+                                                   match.Methods.Any(m => m.Name == "Method2")));
         }
 
         [Fact]
@@ -114,12 +148,17 @@ namespace BenchmarkDotNet.Tests
 
 namespace BenchmarkDotNet.Tests
 {
+    public class RunAttribute : Attribute { }
+    public class DontRunAttribute : Attribute { }
+
+    [Run]
     public class ClassA
     {
         [Benchmark] public void Method1() { }
         [Benchmark] public void Method2() { }
     }
 
+    [DontRun]
     public class ClassB
     {
         [Benchmark] public void Method1() { }
@@ -140,8 +179,11 @@ namespace BenchmarkDotNet.NOTTests
 {
     public class ClassD
     {
+        [Run]
         [Benchmark]
         public void Method1() { }
+
+        [DontRun]
         [Benchmark]
         public void Method2() { }
     }

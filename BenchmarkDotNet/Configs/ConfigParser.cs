@@ -168,7 +168,7 @@ namespace BenchmarkDotNet.Configs
                 logger.WriteInfo($": {explanation}");
 
                 var maxWidth = outputWidth - prefixWidth - explanation.Length - Environment.NewLine.Length - breakText.Length;
-                var lines = StringExtensions.Wrap(parameters, maxWidth);
+                var lines = StringAndTextExtensions.Wrap(parameters, maxWidth);
                 if (lines.Count == 0)
                 {
                     logger.WriteLine();

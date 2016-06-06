@@ -6,7 +6,8 @@ using System.Text;
 
 namespace BenchmarkDotNet.Extensions
 {
-    public static class StringExtensions
+    // Renamed to "StringAndTextExtensions", so it doesn't clash with "StringExtensions" in BenchmarkDotNet.Portability
+    public static class StringAndTextExtensions
     {
         private static readonly Lazy<Dictionary<string, string>> InvalidFileNameCharactersMappings
             = new Lazy<Dictionary<string, string>>(BuildInvalidPathCharactersMappings);
