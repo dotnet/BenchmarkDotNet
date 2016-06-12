@@ -21,7 +21,8 @@ namespace BenchmarkDotNet.IntegrationTests
             output = outputHelper;
         }
 
-        [Fact]
+        // See also: https://github.com/PerfDotNet/BenchmarkDotNet/issues/204
+        [Fact(Skip = "This test fails on AppVeyor")]
         public void Test()
         {
             var logger = new OutputLogger(output);
