@@ -14,17 +14,17 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class PerformanceUnitTestRunner
     {
-        private readonly ITestOutputHelper _output;
+        private readonly ITestOutputHelper output;
 
-        public PerformanceUnitTestRunner(ITestOutputHelper output)
+        public PerformanceUnitTestRunner(ITestOutputHelper outputHelper)
         {
-            _output = output;
+            output = outputHelper;
         }
 
         [Fact]
         public void Test()
         {
-            var logger = new OutputLogger(_output);
+            var logger = new OutputLogger(output);
             var config = DefaultConfig.Instance.With(logger);
             var summary = BenchmarkRunner.Run<PerformanceUnitTest>(config);
 

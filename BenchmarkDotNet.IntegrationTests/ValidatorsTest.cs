@@ -24,11 +24,11 @@ namespace BenchmarkDotNet.IntegrationTests
                 PlainExporter.Default,
             };
 
-        private readonly ITestOutputHelper _output;
+        private readonly ITestOutputHelper output;
 
-        public ValidatorsTest(ITestOutputHelper output)
+        public ValidatorsTest(ITestOutputHelper outputHelper)
         {
-            _output = output;
+            output = outputHelper;
         }
 
         [Fact]
@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.IntegrationTests
                         .CreateEmpty()
                         .With(new FailingValidator())
                         .With(ConsoleLogger.Default) // so we get an output in the TestRunner log
-                        .With(new OutputLogger(_output))
+                        .With(new OutputLogger(output))
                         .With(AllKnownExportersThatSupportExportToLog));
         }
 
@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     ManualConfig
                         .CreateEmpty()
                         .With(ConsoleLogger.Default) // so we get an output in the TestRunner log
-                        .With(new OutputLogger(_output))
+                        .With(new OutputLogger(output))
                         .With(new FailingValidator()));
 
             foreach (var exporter in AllKnownExportersThatSupportExportToLog)

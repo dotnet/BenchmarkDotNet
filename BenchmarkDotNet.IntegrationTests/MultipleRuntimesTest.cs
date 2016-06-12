@@ -12,11 +12,11 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class MultipleRuntimesTest
     {
-        private readonly ITestOutputHelper _output;
+        private readonly ITestOutputHelper output;
 
-        public MultipleRuntimesTest(ITestOutputHelper output)
+        public MultipleRuntimesTest(ITestOutputHelper outputHelper)
         {
-            _output = output;
+            output = outputHelper;
         }
 
         [Fact]
@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.IntegrationTests
                                 .With(Job.Dry.With(Runtime.Dnx))
                                 .With(Job.Dry.With(Runtime.Core))
                                 .With(Job.Dry.With(Runtime.Clr).With(Framework.V46))
-                                .With(new OutputLogger(_output)));
+                                .With(new OutputLogger(output)));
 
             Assert.True(summary.Reports
                 .All(report => report.ExecuteResults

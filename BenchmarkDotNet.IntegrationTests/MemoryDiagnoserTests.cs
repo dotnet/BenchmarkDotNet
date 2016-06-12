@@ -47,11 +47,11 @@ namespace BenchmarkDotNet.IntegrationTests
     // this class is not compiled for CORE because it is using Diagnosers that currently do not support Core
     public class MemoryDiagnoserTests 
     {
-        private readonly ITestOutputHelper _output;
+        private readonly ITestOutputHelper output;
 
-        public MemoryDiagnoserTests(ITestOutputHelper output)
+        public MemoryDiagnoserTests(ITestOutputHelper outputHelper)
         {
-            _output = output;
+            output = outputHelper;
         }
 
         [Fact]
@@ -68,7 +68,7 @@ namespace BenchmarkDotNet.IntegrationTests
                         .With(DefaultConfig.Instance.GetLoggers().ToArray())
                         .With(DefaultConfig.Instance.GetColumns().ToArray())
                         .With(memoryDiagnoser)
-                        .With(new OutputLogger(_output)));
+                        .With(new OutputLogger(output)));
 
             var gcCollectionColumns = memoryDiagnoser.GetColumns.OfType<Diagnostics.Windows.MemoryDiagnoser.GCCollectionColumn>().ToArray();
             var listStructEnumeratorBenchmarks = benchmarks.Where(benchmark => benchmark.ShortInfo.Contains("ListStructEnumerator"));
