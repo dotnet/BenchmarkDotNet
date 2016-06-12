@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
@@ -46,7 +47,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
 #if !CORE
     // this class is not compiled for CORE because it is using Diagnosers that currently do not support Core
-    public class MemoryDiagnoserTests 
+    public class MemoryDiagnoserTests
     {
         private readonly ITestOutputHelper output;
 
@@ -62,7 +63,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var memoryDiagnoser = new Diagnostics.Windows.MemoryDiagnoser();
 
             var summary = BenchmarkRunner
-                .Run(benchmarks, 
+                .Run(benchmarks,
                     ManualConfig.CreateEmpty()
                         .With(Job.Dry.With(Runtime.Dnx).With(Jit.Host).With(Mode.Throughput).WithWarmupCount(1).WithTargetCount(1))
                         .With(Job.Dry.With(Runtime.Core).With(Jit.Host).With(Mode.Throughput).WithWarmupCount(1).WithTargetCount(1))
@@ -87,11 +88,17 @@ namespace BenchmarkDotNet.IntegrationTests
 
             foreach (var listObjectEnumeratorBenchmark in listObjectEnumeratorBenchmarks)
             {
-                var objectEnumeratorGen0Collections = gcCollectionColumns[gen0Index].GetValue(
+                var gen0Str = gcCollectionColumns[gen0Index].GetValue(
                     summary,
                     listObjectEnumeratorBenchmark);
 
-                Assert.True(double.Parse(objectEnumeratorGen0Collections, EnvironmentInfo.MainCultureInfo) > 0);
+                double gen0Value;
+                if (double.TryParse(gen0Str, NumberStyles.Number, EnvironmentInfo.MainCultureInfo, out gen0Value))
+                    Assert.True(gen0Value > 0);
+                else
+                {
+                    Assert.True(false, $"Can't parse '{gen0Str}'");
+                }
             }
         }
     }
