@@ -96,7 +96,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
 
         private void CopyAllReferencedLibraries(string binariesDirectoryPath, Benchmark benchmark)
         {
-            foreach (var assembly in GetAllReferences(benchmark))
+            foreach (var assembly in GetAllReferences(benchmark).Where(assemlby => !assemlby.GlobalAssemblyCache))
             {
                 File.Copy(assembly.Location, Path.Combine(binariesDirectoryPath, $"{assembly.GetName().Name}.dll"));
             }
@@ -104,12 +104,32 @@ namespace BenchmarkDotNet.Toolchains.Classic
 
         private static IEnumerable<Assembly> GetAllReferences(Benchmark benchmark)
         {
-            return benchmark.Target.Type.Assembly
-                            .GetReferencedAssemblies()
-                            .Concat(new[] { benchmark.Target.Type.Assembly.GetName() })
-                            .Where(assemblyName => !PredefinedAssemblies.Contains(assemblyName.Name))
-                            .Select(Assembly.Load)
-                            .Where(assembly => !assembly.GlobalAssemblyCache);
+            var uniqueDependencies = new HashSet<Assembly>();
+            var assembliesToCheck = new Stack<AssemblyName>(benchmark.Target.Type.Assembly.GetReferencedAssemblies());
+            assembliesToCheck.Push(benchmark.Target.Type.Assembly.GetName());
+
+            while (assembliesToCheck.Any())
+            {
+                var assemblyName = assembliesToCheck.Pop();
+                if (PredefinedAssemblies.Contains(assemblyName.Name))
+                {
+                    continue;
+                }
+
+                var loaded = Assembly.Load(assemblyName);
+                if (uniqueDependencies.Contains(loaded))
+                {
+                    continue;
+                }
+
+                uniqueDependencies.Add(loaded);
+                foreach (var referencedAssembly in loaded.GetReferencedAssemblies())
+                {
+                    assembliesToCheck.Push(referencedAssembly);
+                }
+            }
+
+            return uniqueDependencies;
         }
     }
 }
