@@ -6,6 +6,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -23,15 +24,23 @@ namespace BenchmarkDotNet.IntegrationTests
                 PlainExporter.Default,
             };
 
+        private readonly ITestOutputHelper output;
+
+        public ValidatorsTest(ITestOutputHelper outputHelper)
+        {
+            output = outputHelper;
+        }
+
         [Fact]
         public void BenchmarkRunnerShouldNotFailOnCriticalValidationErrors()
         {
             BenchmarkRunner
-                .Run<ValidatorsTest>(
+                .Run<Nothing>(
                     ManualConfig
                         .CreateEmpty()
                         .With(new FailingValidator())
                         .With(ConsoleLogger.Default) // so we get an output in the TestRunner log
+                        .With(new OutputLogger(output))
                         .With(AllKnownExportersThatSupportExportToLog));
         }
 
@@ -39,10 +48,11 @@ namespace BenchmarkDotNet.IntegrationTests
         public void LoggersShouldNotFailOnCriticalValidationErrors()
         {
             var summary = BenchmarkRunner
-                .Run<ValidatorsTest>(
+                .Run<Nothing>(
                     ManualConfig
                         .CreateEmpty()
                         .With(ConsoleLogger.Default) // so we get an output in the TestRunner log
+                        .With(new OutputLogger(output))
                         .With(new FailingValidator()));
 
             foreach (var exporter in AllKnownExportersThatSupportExportToLog)
@@ -55,13 +65,16 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public bool TreatsWarningsAsErrors => true;
 
-            public IEnumerable<IValidationError> Validate(IList<Benchmark> benchmarks)
+            public IEnumerable<ValidationError> Validate(IList<Benchmark> benchmarks)
             {
                 yield return new ValidationError(true, "It just fails");
             }
         }
 
-        [Benchmark]
-        public void Nothing() { }
+        public class Nothing
+        {
+            [Benchmark]
+            public void DoNothing() { }
+        }
     }
 }

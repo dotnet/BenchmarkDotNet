@@ -19,11 +19,15 @@ namespace BenchmarkDotNet.Running
             config = GetFullConfig(type, config);
 
             var allMethods = type.GetMethods();
+            return MethodsToBenchmarks(type, allMethods, config);
+        }
 
-            var setupMethod = GetSetupMethod(allMethods);
-            var targetMethods = allMethods.Where(method => method.HasAttribute<BenchmarkAttribute>()).ToArray();
+        public static Benchmark[] MethodsToBenchmarks(Type containingType, MethodInfo[] methods, IConfig config = null)
+        {
+            var setupMethod = GetSetupMethod(methods);
+            var targetMethods = methods.Where(method => method.HasAttribute<BenchmarkAttribute>()).ToArray();
 
-            var parameterDefinitions = GetParameterDefinitions(type);
+            var parameterDefinitions = GetParameterDefinitions(containingType);
             var parameterInstancesList = parameterDefinitions.Expand();
 
             var rawJobs = config?.GetJobs().ToArray() ?? new IJob[0];
@@ -31,7 +35,7 @@ namespace BenchmarkDotNet.Running
                 rawJobs = new[] { Job.Default };
             var jobs = rawJobs.Distinct().ToArray();
 
-            var targets = GetTargets(targetMethods, type, setupMethod).ToArray();
+            var targets = GetTargets(targetMethods, containingType, setupMethod).ToArray();
 
             var benchmarks = (
                 from target in targets
@@ -48,7 +52,7 @@ namespace BenchmarkDotNet.Running
             config = config ?? DefaultConfig.Instance;
             if (type != null)
             {
-                var typeAttributes = type.GetCustomAttributes<IConfigSource>(true);                
+                var typeAttributes = type.GetCustomAttributes<IConfigSource>(true);
                 var assemblyAttributes = type.Assembly().GetCustomAttributes<IConfigSource>(false);
                 var allAttributes = typeAttributes.Concat(assemblyAttributes);
                 foreach (var configSource in allAttributes)

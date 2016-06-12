@@ -4,7 +4,7 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Validators
 {
-    public class CompositeValidator : IValidator
+    internal class CompositeValidator : IValidator
     {
         private static readonly IValidator[] MandatoryValidators = 
         {
@@ -17,15 +17,18 @@ namespace BenchmarkDotNet.Validators
         {
             Validators = configuredValidators
                 .Concat(MandatoryValidators)
-                .GroupBy(valiadator => valiadator.GetType())
-                .Select(grouppedByType => grouppedByType.FirstOrDefault(validator => validator.TreatsWarningsAsErrors) ?? grouppedByType.First())
+                .GroupBy(validator => validator.GetType())
+                .Select(groupedByType => groupedByType.FirstOrDefault(validator => validator.TreatsWarningsAsErrors) ?? groupedByType.First())
                 .Distinct()
                 .ToArray();
         }
 
-        public bool TreatsWarningsAsErrors => Validators.All(validator => validator.TreatsWarningsAsErrors);
+        /// <summary>
+        /// returns true if any of the validators has TreatsWarningsAsErrors == true
+        /// </summary>
+        public bool TreatsWarningsAsErrors => Validators.Any(validator => validator.TreatsWarningsAsErrors);
 
-        public IEnumerable<IValidationError> Validate(IList<Benchmark> benchmarks)
+        public IEnumerable<ValidationError> Validate(IList<Benchmark> benchmarks)
         {
             return Validators.SelectMany(validator => validator.Validate(benchmarks));
         }

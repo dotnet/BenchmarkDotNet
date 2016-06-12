@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
@@ -15,15 +16,15 @@ namespace BenchmarkDotNet.Toolchains
 {
     internal abstract class GeneratorBase : IGenerator
     {
-        protected const string AppConfigFileName = "app.config";
+        public const string ShortFolderName = "BDN.Auto";
 
-        protected virtual string GetProgramName(Benchmark benchmark) => "Program";
+        protected const string AppConfigFileName = "app.config";
 
         internal static string BuildBenchmarkScriptFileName => "BuildBenchmark" + RuntimeInformation.ScriptFileExtension;
 
-        public virtual GenerateResult GenerateProject(Benchmark benchmark, ILogger logger, string rootArtifactsFolderPath)
+        public virtual GenerateResult GenerateProject(Benchmark benchmark, ILogger logger, string rootArtifactsFolderPath, IConfig config)
         {
-            var result = CreateProjectDirectory(benchmark, rootArtifactsFolderPath);
+            var result = CreateProjectDirectory(benchmark, rootArtifactsFolderPath, config);
 
             GenerateProgramFile(result.DirectoryPath, benchmark);
             GenerateProjectFile(logger, result.DirectoryPath, benchmark);
@@ -33,16 +34,17 @@ namespace BenchmarkDotNet.Toolchains
             return result;
         }
 
-
-        protected abstract string GetBinariesDirectoryPath(Benchmark benchmark, string rootArtifactsFolderPath);
+        protected abstract string GetBinariesDirectoryPath(Benchmark benchmark, string rootArtifactsFolderPath, IConfig config);
 
         protected abstract void GenerateProjectFile(ILogger logger, string projectDir, Benchmark benchmark);
 
         protected abstract void GenerateProjectBuildFile(string scriptFilePath, Framework framework);
 
-        private GenerateResult CreateProjectDirectory(Benchmark benchmark, string rootArtifactsFolderPath)
+        protected virtual string GetProgramName(Benchmark benchmark) => "Program";
+
+        private GenerateResult CreateProjectDirectory(Benchmark benchmark, string rootArtifactsFolderPath, IConfig config)
         {
-            var directoryPath = GetBinariesDirectoryPath(benchmark, rootArtifactsFolderPath);
+            var directoryPath = GetBinariesDirectoryPath(benchmark, rootArtifactsFolderPath, config);
             bool exist = Directory.Exists(directoryPath);
             Exception deleteException = null;
             for (int attempt = 0; attempt < 3 && exist; attempt++)
@@ -146,7 +148,7 @@ namespace BenchmarkDotNet.Toolchains
                 Replace("$TargetBenchmarkTaskArguments$", targetBenchmarkTaskArguments).
                 Replace("$ParamsContent$", paramsContent);
 
-            string fileName = Path.Combine(projectDir, GetProgramName(benchmark) + ".cs");
+            string fileName = Path.Combine(projectDir, GetProgramName(benchmark) + ".notcs");
             File.WriteAllText(fileName, content);
         }
 

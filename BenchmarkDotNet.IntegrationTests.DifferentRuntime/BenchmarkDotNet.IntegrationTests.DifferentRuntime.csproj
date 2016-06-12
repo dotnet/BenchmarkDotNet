@@ -32,10 +32,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="BenchmarkDotNet" Condition="'$(Configuration)'=='Release'">
-      <HintPath>..\artifacts\bin\BenchmarkDotNet\Release\net45\BenchmarkDotNet.dll</HintPath>
+      <HintPath>..\BenchmarkDotNet\bin\Release\net40\BenchmarkDotNet.dll</HintPath>
     </Reference>
     <Reference Include="BenchmarkDotNet" Condition="'$(Configuration)'=='Debug'">
-      <HintPath>..\artifacts\bin\BenchmarkDotNet\Debug\net45\BenchmarkDotNet.dll</HintPath>
+      <HintPath>..\BenchmarkDotNet\bin\Debug\net40\BenchmarkDotNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

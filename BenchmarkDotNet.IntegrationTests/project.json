@@ -2,12 +2,12 @@
   "title": "BenchmarkDotNet.IntegrationTests",
   "configurations": {
     "Debug": {
-      "compilationOptions": {
+      "buildOptions": {
         "define": [ "DEBUG", "TRACE" ]
       }
     },
     "Release": {
-      "compilationOptions": {
+      "buildOptions": {
         "define": [ "RELEASE", "TRACE" ],
         "optimize": true,
         "keyFile": "../strongNameKey.snk",
@@ -15,56 +15,44 @@
       }
     }
   },
-  "commands": {
-    "test": "xunit.runner.dnx"
-  },
-  "compileExclude": "**/Program.cs",
-  "veryImportantComment": "we need to exclude all auto-generated files that created during integration test execution",
-  "exclude": [ "**/BenchmarkDotNet.Artifacts/*" ],
+  "testRunner": "xunit",
   "frameworks": {
-    "net45": {
-      "compilationOptions": {
+    "netcoreapp1.0": {
+      "buildOptions": {
+        "define": [ "CORE" ]
+      },
+      "imports": [
+        "dnxcore50",
+        "portable-net45+win8"
+      ],
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.0-rc2-3002702"
+        },
+        "System.ComponentModel.EventBasedAsync": "4.0.11-rc2-24027"
+      }
+    },
+    "net451": {
+      "buildOptions": {
         "define": [ "CLASSIC" ]
       },
       "dependencies": {
-        "BenchmarkDotNet.Diagnostics.Windows": "0.9.6-develop",
-        "xunit.runner.console": "2.1.0"
+        "BenchmarkDotNet.Diagnostics.Windows": "0.9.7-develop",
+        "Microsoft.NETCore.Platforms": "1.0.1-rc2-24027"
       },
       "frameworkAssemblies": {
-        "System.Runtime": "4.0.0.0",
+        "System.Runtime": "4.0.10.0",
         "System.Threading.Tasks": "4.0.0.0",
         "WindowsBase": "4.0.0.0"
-      }
-    },
-    "dnx451": {
-      "compilationOptions": {
-        "define": [ "DNX" ]
-      },
-      "frameworkAssemblies": {
-        "System.Threading.Tasks": "4.0.0.0",
-        "WindowsBase": "4.0.0.0"
-      },
-      "dependencies": {
-        "BenchmarkDotNet.Diagnostics.Windows": "0.9.6-develop",
-        "xunit.runner.dnx": "2.1.0-rc1-build204"
-      }
-    },
-    "dnxcore50": {
-      "compilationOptions": {
-        "define": [ "CORE" ]
-      },
-      "imports": "portable-net45+win8",
-      "dependencies": {
-        "System.ComponentModel.EventBasedAsync": "4.0.11-beta-23516",
-        "xunit.runner.dnx": "2.1.0-rc1-build204"
       }
     }
   },
   "dependencies": {
     "BenchmarkDotNet": {
-      "target": "project",
-      "version": "0.9.6-develop"
+      "target": "project"
     },
-    "xunit": "2.1.0"
+    "xunit": "2.1.0",
+    "dotnet-test-xunit": "1.0.0-rc3-*"
   }
 }

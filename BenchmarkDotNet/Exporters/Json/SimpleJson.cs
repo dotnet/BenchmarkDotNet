@@ -604,6 +604,7 @@ namespace SimpleJson
         public static string SerializeObject(object json, IJsonSerializerStrategy jsonSerializerStrategy)
         {
             StringBuilder builder = new StringBuilder(BUILDER_CAPACITY);
+            ResetIndentationLevel();
             bool success = SerializeValue(jsonSerializerStrategy, json, builder);
             return (success ? builder.ToString() : null);
         }
@@ -1051,6 +1052,11 @@ namespace SimpleJson
         static bool SerializeObject(IJsonSerializerStrategy jsonSerializerStrategy, IEnumerable keys, IEnumerable values, StringBuilder builder)
         {
             builder.Append("{");
+            if (jsonSerializerStrategy.Indent)
+            {
+                HandleIndent(+1);
+                builder.Append(indentationText);
+            }
             IEnumerator ke = keys.GetEnumerator();
             IEnumerator ve = values.GetEnumerator();
             bool first = true;
@@ -1059,7 +1065,13 @@ namespace SimpleJson
                 object key = ke.Current;
                 object value = ve.Current;
                 if (!first)
+                {
                     builder.Append(",");
+                    if (jsonSerializerStrategy.Indent)
+                    {
+                        builder.Append(indentationText);
+                    }
+                }
                 string stringKey = key as string;
                 if (stringKey != null)
                     SerializeString(stringKey, builder);
@@ -1070,6 +1082,11 @@ namespace SimpleJson
                     return false;
                 first = false;
             }
+            if (jsonSerializerStrategy.Indent)
+            {
+                HandleIndent(-1);
+                builder.Append(indentationText);
+            }
             builder.Append("}");
             return true;
         }
@@ -1077,6 +1094,11 @@ namespace SimpleJson
         static bool SerializeArray(IJsonSerializerStrategy jsonSerializerStrategy, IEnumerable anArray, StringBuilder builder)
         {
             builder.Append("[");
+            if (jsonSerializerStrategy.Indent)
+            {
+                HandleIndent(+1);
+                builder.Append(indentationText);
+            }
             bool first = true;
             foreach (object value in anArray)
             {
@@ -1085,6 +1107,11 @@ namespace SimpleJson
                 if (!SerializeValue(jsonSerializerStrategy, value, builder))
                     return false;
                 first = false;
+            }
+            if (jsonSerializerStrategy.Indent)
+            {
+                HandleIndent(-1);
+                builder.Append(indentationText);
             }
             builder.Append("]");
             return true;
@@ -1178,6 +1205,22 @@ namespace SimpleJson
             return false;
         }
 
+        private static int indentationLevel;
+        private static string indentationText;
+        private static readonly int spacesPerIndent = 3;
+
+        private static void ResetIndentationLevel()
+        {
+            indentationLevel = 0;
+            indentationText = "\n" + new string(' ', indentationLevel * spacesPerIndent);
+        }
+
+        private static void HandleIndent(int change)
+        {
+            indentationLevel += change;
+            indentationText = "\n" + new string(' ', indentationLevel * spacesPerIndent);
+        }
+
         private static IJsonSerializerStrategy _currentJsonSerializerStrategy;
         public static IJsonSerializerStrategy CurrentJsonSerializerStrategy
         {
@@ -1234,6 +1277,7 @@ namespace SimpleJson
         [SuppressMessage("Microsoft.Design", "CA1007:UseGenericsWhereAppropriate", Justification="Need to support .NET 2")]
         bool TrySerializeNonPrimitiveObject(object input, out object output);
         object DeserializeObject(object value, Type type);
+        bool Indent { get; set; }
     }
 
     [GeneratedCode("simple-json", "1.0.0")]
@@ -1257,6 +1301,8 @@ namespace SimpleJson
                                                                  @"yyyy-MM-dd\THH:mm:ss\Z",
                                                                  @"yyyy-MM-dd\THH:mm:ssK"
                                                              };
+
+        public bool Indent { get; set; }
 
         public PocoJsonSerializerStrategy()
         {

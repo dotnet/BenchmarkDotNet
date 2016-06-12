@@ -88,6 +88,15 @@ namespace BenchmarkDotNet.Portability
 #endif
         }
 
+        internal static IEnumerable<object> GetCustomAttributes(this Type sourceType, bool inherit)
+        {
+#if !CORE
+            return sourceType.GetCustomAttributes(inherit);
+#else
+            return sourceType.GetTypeInfo().GetCustomAttributes(inherit);
+#endif
+        }
+
         internal static IEnumerable<T> GetCustomAttributes<T>(this Type sourceType, Type attributeType, bool inherit)
         {
 #if !CORE

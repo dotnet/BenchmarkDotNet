@@ -61,6 +61,7 @@ namespace BenchmarkDotNet.Reports
         /// </summary>
         /// <param name="logger">The logger to write any diagnostic messages to.</param>
         /// <param name="line">The line to parse.</param>
+        /// <param name="processIndex"></param>
         /// <returns>An instance of <see cref="Measurement"/> if parsed successfully. <c>Null</c> in case of any trouble.</returns>
         public static Measurement Parse(ILogger logger, string line, int processIndex)
         {

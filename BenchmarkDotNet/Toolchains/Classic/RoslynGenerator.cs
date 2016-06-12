@@ -10,6 +10,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.Results;
+using BenchmarkDotNet.Configs;
 
 namespace BenchmarkDotNet.Toolchains.Classic
 {
@@ -27,7 +28,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 "System.Xml"
             });
 
-        public override GenerateResult GenerateProject(Benchmark benchmark, ILogger logger, string rootArtifactsFolderPath)
+        public override GenerateResult GenerateProject(Benchmark benchmark, ILogger logger, string rootArtifactsFolderPath, IConfig config)
         {
             var directory = Directory.GetCurrentDirectory();
 
@@ -108,7 +109,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
 
         #endregion
 
-        protected override string GetBinariesDirectoryPath(Benchmark benchmark, string rootArtifactsFolderPath)
+        protected override string GetBinariesDirectoryPath(Benchmark benchmark, string rootArtifactsFolderPath, IConfig config)
         {
             throw new System.NotImplementedException();
         }

@@ -1,0 +1,79 @@
+#---------------------------------#
+#      general configuration      #
+#---------------------------------#
+
+# version format
+version: 0.9.7.{build}
+
+# branches to build
+branches:
+  # blacklist
+  except:
+    - gh-pages
+
+# Do not build on tags (GitHub only)
+skip_tags: true
+
+#---------------------------------#
+#    environment configuration    #
+#---------------------------------#
+cache:
+  - packages
+
+# scripts that are called at very beginning, before repo cloning
+init:
+  - git config --global core.autocrlf input
+
+# scripts that run after cloning repository
+install:
+  # remove this when nuget 3.5 will be available on appveyor
+  - ps: Start-FileDownload "https://dist.nuget.org/win-x86-commandline/v3.5.0-beta/NuGet.exe"
+
+# enable patching of AssemblyInfo.* files
+assembly_info:
+  patch: true
+  file: AssemblyInfo.*
+  assembly_version: "{version}"
+  assembly_file_version: "{version}"
+  assembly_informational_version: "{version}"
+
+#---------------------------------#
+#       build configuration       #
+#---------------------------------#
+
+# build platform, i.e. x86, x64, Any CPU. This setting is optional.
+platform: Any CPU
+
+# build Configuration, i.e. Debug, Release, etc.
+configuration: Release
+
+os: Visual Studio 2015
+
+before_build:
+  - ps: .\build\version.ps1
+  - .\nuget.exe restore
+  - dotnet --info
+
+build:
+  parallel: true                  # enable MSBuild parallel builds
+  project: BenchmarkDotNet.sln    # path to Visual Studio solution or project
+
+after_build:
+  - dotnet pack .\BenchmarkDotNet\project.json --configuration Release
+  
+#---------------------------------#
+#       tests configuration       #
+#---------------------------------#
+test_script:
+  - dotnet test .\BenchmarkDotNet.Tests\project.json --configuration Release -xml tests-results01.xml
+  - ps: .\build\uploadtests.ps1 "tests-results01.xml"
+  - dotnet test .\BenchmarkDotNet.IntegrationTests\project.json --configuration Release -xml tests-results02.xml
+  - ps: .\build\uploadtests.ps1 "tests-results02.xml"
+
+test:
+  assemblies:
+    - BenchmarkDotNet.IntegrationTests.Classic\bin\$(configuration)\BenchmarkDotNet.IntegrationTests.Classic.exe
+
+artifacts:
+  - path: '**\BenchmarkDotNet.*.nupkg' # find all NuGet packages recursively
+

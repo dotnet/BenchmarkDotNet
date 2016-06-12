@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
@@ -26,6 +26,9 @@ namespace BenchmarkDotNet.Running
 
         public static Summary Run(Type type, IConfig config = null) =>
             Run(BenchmarkConverter.TypeToBenchmarks(type, config), config);
+
+        public static Summary Run(Type type, MethodInfo[] methods, IConfig config = null) =>
+            Run(BenchmarkConverter.MethodsToBenchmarks(type, methods, config), config);
 
 #if CLASSIC
         public static Summary RunUrl(string url, IConfig config = null) =>
@@ -142,7 +145,7 @@ namespace BenchmarkDotNet.Running
             return summary;
         }
 
-        private static IValidationError[] Validate(IList<Benchmark> benchmarks, ILogger logger, IConfig config)
+        private static ValidationError[] Validate(IList<Benchmark> benchmarks, ILogger logger, IConfig config)
         {
             logger.WriteLineInfo("// Validating benchmarks:");
             var validationErrors = config.GetCompositeValidator().Validate(benchmarks).ToArray();
@@ -167,7 +170,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineHeader("// **************************");
             logger.WriteLineHeader("// Benchmark: " + benchmark.ShortInfo);
 
-            var generateResult = Generate(logger, toolchain, benchmark, rootArtifactsFolderPath);
+            var generateResult = Generate(logger, toolchain, benchmark, rootArtifactsFolderPath, config);
             
             try
             {
@@ -195,10 +198,10 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        private static GenerateResult Generate(ILogger logger, IToolchain toolchain, Benchmark benchmark, string rootArtifactsFolderPath)
+        private static GenerateResult Generate(ILogger logger, IToolchain toolchain, Benchmark benchmark, string rootArtifactsFolderPath, IConfig config)
         {
             logger.WriteLineInfo("// *** Generate *** ");
-            var generateResult = toolchain.Generator.GenerateProject(benchmark, logger, rootArtifactsFolderPath);
+            var generateResult = toolchain.Generator.GenerateProject(benchmark, logger, rootArtifactsFolderPath, config);
             if (generateResult.IsGenerateSuccess)
             {
                 logger.WriteLineInfo("// Result = Success");

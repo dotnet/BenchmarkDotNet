@@ -8,16 +8,24 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    [Config(typeof(SingleRunFastConfig))]
-    public class PerformanceUnitTest
+    public class PerformanceUnitTestRunner
     {
-        [Fact]
+        private readonly ITestOutputHelper output;
+
+        public PerformanceUnitTestRunner(ITestOutputHelper outputHelper)
+        {
+            output = outputHelper;
+        }
+
+        // See also: https://github.com/PerfDotNet/BenchmarkDotNet/issues/204
+        [Fact(Skip = "This test fails on AppVeyor")]
         public void Test()
         {
-            var logger = new AccumulationLogger();
+            var logger = new OutputLogger(output);
             var config = DefaultConfig.Instance.With(logger);
             var summary = BenchmarkRunner.Run<PerformanceUnitTest>(config);
 
@@ -44,7 +52,11 @@ namespace BenchmarkDotNet.IntegrationTests
             foreach (var fastRun in fastBenchmarkReport.GetResultRuns())
                 Assert.InRange(fastRun.GetAverageNanoseconds() / 1000.0 / 1000.0, low: 14, high: 17);
         }
+    }
 
+    [Config(typeof(SingleRunFastConfig))]
+    public class PerformanceUnitTest
+    {
         [Benchmark]
         public void FastBenchmark()
         {

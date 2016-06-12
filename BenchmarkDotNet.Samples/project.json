@@ -1,17 +1,17 @@
 ﻿{
   "title": "BenchmarkDotNet.Samples",
-  "compilationOptions": {
+  "buildOptions": {
     "emitEntryPoint": true,
     "allowUnsafe": true
   },
   "configurations": {
     "Debug": {
-      "compilationOptions": {
+      "buildOptions": {
         "define": [ "DEBUG", "TRACE" ]
       }
     },
     "Release": {
-      "compilationOptions": {
+      "buildOptions": {
         "define": [ "RELEASE", "TRACE" ],
         "optimize": true,
         "keyFile": "../strongNameKey.snk",
@@ -19,42 +19,30 @@
       }
     }
   },
-  "commands": {
-    "run": "BenchmarkDotNet.Samples"
-  },
-  "exclude": [ "**/BenchmarkDotNet.Artifacts/*" ],
   "frameworks": {
     "net40": {
-      "compilationOptions": {
+      "buildOptions": {
         "define": [ "CLASSIC" ]
       },
       "BenchmarkDotNet.Diagnostics.Windows": "1.0.0-*"
     },
-    "dnx451": {
-      "compilationOptions": {
-        "define": [ "DNX" ]
-      }
-    },
-    "dnxcore50": {
-      "compilationOptions": {
+    "netcoreapp1.0": {
+      "buildOptions": {
         "define": [ "CORE" ]
       },
       "dependencies": {
-        "System.ComponentModel.EventBasedAsync": "4.0.11-beta-23516",
-        "System.Security.Cryptography.Hashing.Algorithms": "4.0.0-beta-23225"
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.0-rc2-3002702"
+        },
+        "System.ComponentModel.EventBasedAsync": "4.0.11-rc2-24027"
       }
     }
   },
   "dependencies": {
     "BenchmarkDotNet": {
       "target": "project",
-      "version": "0.9.6-develop"
+      "version": "0.9.7-develop"
     }
-  },
-  "scripts": {
-    "postbuild": [
-      "%project:Directory%/../build/batchcopy \"%project:Directory%/../artifacts/bin/BenchmarkDotNet/Debug/net40/*.*\" %project:BuildOutputDir%/Debug/net40",
-      "%project:Directory%/../build/batchcopy \"%project:Directory%/../artifacts/bin/BenchmarkDotNet/Release/net40/*.*\" %project:BuildOutputDir%/Release/net40"
-    ]
   }
 }

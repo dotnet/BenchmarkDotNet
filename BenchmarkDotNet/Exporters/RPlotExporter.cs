@@ -9,11 +9,17 @@ using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Exporters
 {
-    public class RPlotExporter : IExporter
+    public class RPlotExporter : IExporter, IExporterDependancies
     {
         public static readonly IExporter Default = new RPlotExporter();
 
         private static object buildScriptLock = new object();
+
+        public IEnumerable<IExporter> Dependancies
+        {
+            // R Plots depends on having the full measurments available
+            get { yield return CsvMeasurementsExporter.Default; }
+        }
 
         public IEnumerable<string> ExportToFiles(Summary summary)
         {

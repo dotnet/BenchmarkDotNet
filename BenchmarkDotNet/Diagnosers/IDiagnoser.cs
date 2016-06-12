@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Diagnosers
     /// The events are guaranteed to happen in the following sequence:
     /// Start                  // When the Benchmark run is started and most importantly BEFORE the process has been launched
     /// ProcessStarted         // After the Process (in a "Diagnostic" run) has been launched
-    /// AfterBenchmarkHasRun   // After a "Warmpup" iteration of the Benchmark has run, i.e. we know the [Benchmark] method has been 
+    /// AfterBenchmarkHasRun   // After a "Warmup" iteration of the Benchmark has run, i.e. we know the [Benchmark] method has been 
     ///                        // executed and JITted, this is important if the Diagnoser needs to know when it can do a Memory Dump.
     /// ProcessStopped         // Once the Process (in a "Diagnostic" run) has stopped/completed
     /// Stop                   // At the end, when the entire Benchmark run has complete

@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Validators
 
         public bool TreatsWarningsAsErrors { get; }
 
-        public IEnumerable<IValidationError> Validate(IList<Benchmark> benchmarks)
+        public IEnumerable<ValidationError> Validate(IList<Benchmark> benchmarks)
         {
 #if CORE
             yield break; // todo: implement when it becomes possible

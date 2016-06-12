@@ -53,13 +53,7 @@ namespace BenchmarkDotNet.Extensions
             var targetFrameworkAttribute = assembly.GetCustomAttributes<TargetFrameworkAttribute>(false).FirstOrDefault();
             if (targetFrameworkAttribute == null)
             {
-#if NET46
-                return "v4.6";
-#elif NET45
-                return "v4.5";
-#else
                 return "v4.0";
-#endif
             }
 
             var frameworkName = new FrameworkName(targetFrameworkAttribute.FrameworkName);

@@ -2,9 +2,11 @@
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -46,6 +48,13 @@ namespace BenchmarkDotNet.IntegrationTests
     // this class is not compiled for CORE because it is using Diagnosers that currently do not support Core
     public class MemoryDiagnoserTests 
     {
+        private readonly ITestOutputHelper output;
+
+        public MemoryDiagnoserTests(ITestOutputHelper outputHelper)
+        {
+            output = outputHelper;
+        }
+
         [Fact]
         public void Test()
         {
@@ -59,7 +68,8 @@ namespace BenchmarkDotNet.IntegrationTests
                         .With(Job.Dry.With(Runtime.Core).With(Jit.Host).With(Mode.Throughput).WithWarmupCount(1).WithTargetCount(1))
                         .With(DefaultConfig.Instance.GetLoggers().ToArray())
                         .With(DefaultConfig.Instance.GetColumns().ToArray())
-                        .With(memoryDiagnoser));
+                        .With(memoryDiagnoser)
+                        .With(new OutputLogger(output)));
 
             var gcCollectionColumns = memoryDiagnoser.GetColumns.OfType<Diagnostics.Windows.MemoryDiagnoser.GCCollectionColumn>().ToArray();
             var listStructEnumeratorBenchmarks = benchmarks.Where(benchmark => benchmark.ShortInfo.Contains("ListStructEnumerator"));
@@ -81,7 +91,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     summary,
                     listObjectEnumeratorBenchmark);
 
-                Assert.True(double.Parse(objectEnumeratorGen0Collections) > 0);
+                Assert.True(double.Parse(objectEnumeratorGen0Collections, EnvironmentInfo.MainCultureInfo) > 0);
             }
         }
     }

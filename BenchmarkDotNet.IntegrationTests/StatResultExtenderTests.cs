@@ -4,8 +4,8 @@ using System.Threading;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Running;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -37,7 +37,10 @@ namespace BenchmarkDotNet.IntegrationTests
                 StatisticColumn.P95,
                 StatisticColumn.P95
             };
-            var config = DefaultConfig.Instance.With(logger).With(columns);
+            var config = DefaultConfig.Instance
+                .With(Job.Default.WithWarmupCount(0).WithTargetCount(50).WithIterationTime(10))
+                .With(logger)
+                .With(columns);
             var summary = BenchmarkTestExecutor.CanExecute<Target>(config);
             output.WriteLine(logger.GetLog());
 

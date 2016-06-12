@@ -7,11 +7,24 @@ namespace BenchmarkDotNet.Exporters
 {
     public class CompositeExporter : IExporter
     {
-        private readonly IExporter[] exporters;
+        internal readonly IEnumerable<IExporter> exporters;
 
         public CompositeExporter(params IExporter[] exporters)
         {
-            this.exporters = exporters;
+            // Start with all the Exporters we were given
+            var tempList = new List<IExporter>(exporters);
+
+            // Now fetch their dependancies (if any) and add them if they AREN'T already present
+            foreach (var exporter in exporters.OfType<IExporterDependancies>())
+            {
+                foreach (var dependancy in exporter.Dependancies)
+                {
+                    if (exporters.Contains(dependancy) == false)
+                        tempList.Add(dependancy);
+                }
+            }
+
+            this.exporters = tempList;
         }
 
         public void ExportToLog(Summary summary, ILogger logger)
