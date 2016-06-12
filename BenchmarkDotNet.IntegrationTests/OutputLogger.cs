@@ -10,6 +10,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public OutputLogger(ITestOutputHelper testOutputHelper)
         {
+            if (testOutputHelper == null)
+                throw new ArgumentNullException(nameof(testOutputHelper));
+
             this.testOutputHelper = testOutputHelper;
         }
 

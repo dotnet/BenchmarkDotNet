@@ -6,11 +6,19 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
     public class MultipleRuntimesTest
     {
+        private readonly ITestOutputHelper output;
+
+        public MultipleRuntimesTest(ITestOutputHelper outputHelper)
+        {
+            output = outputHelper;
+        }
+
         [Fact]
         public void SingleBenchmarkCanBeExecutedForMultpleRuntimes()
         {
@@ -19,7 +27,8 @@ namespace BenchmarkDotNet.IntegrationTests
                     ManualConfig.CreateEmpty()
                                 .With(Job.Dry.With(Runtime.Dnx))
                                 .With(Job.Dry.With(Runtime.Core))
-                                .With(Job.Dry.With(Runtime.Clr).With(Framework.V46)));
+                                .With(Job.Dry.With(Runtime.Clr).With(Framework.V46))
+                                .With(new OutputLogger(output)));
 
             Assert.True(summary.Reports
                 .All(report => report.ExecuteResults
