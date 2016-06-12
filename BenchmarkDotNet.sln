@@ -19,6 +19,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.Integration
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.IntegrationTests.Classic", "BenchmarkDotNet.IntegrationTests.Classic\BenchmarkDotNet.IntegrationTests.Classic.csproj", "{27DC34D9-3BA1-46F4-B2A1-E89AA0D842AA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AF1E6F8A-5C63-465F-96F4-5E5F183A33B9} = {AF1E6F8A-5C63-465F-96F4-5E5F183A33B9}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.IntegrationTests.DifferentRuntime", "BenchmarkDotNet.IntegrationTests.DifferentRuntime\BenchmarkDotNet.IntegrationTests.DifferentRuntime.csproj", "{19411154-3AC9-4689-BC2E-9646121ED63D}"
 	ProjectSection(ProjectDependencies) = postProject
