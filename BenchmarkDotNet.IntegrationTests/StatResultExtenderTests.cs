@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 StatisticColumn.P95
             };
             var config = DefaultConfig.Instance
-                .With(Job.Default.WithWarmupCount(0).WithTargetCount(50).WithIterationTime(10))
+                .With(Job.Dry.WithTargetCount(10).WithIterationTime(10))
                 .With(logger)
                 .With(columns);
             var summary = BenchmarkTestExecutor.CanExecute<Target>(config);

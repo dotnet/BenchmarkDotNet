@@ -177,6 +177,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             // This is the common way to run benchmarks, it should wire up the BenchmarkBaselineDeltaResultExtender for us
             var config = DefaultConfig.Instance
+                .With(Job.Dry.WithTargetCount(5))
                 .With(BaselineDiffColumn.Scaled50)
                 .With(BaselineDiffColumn.Scaled85)
                 .With(BaselineDiffColumn.Scaled95);
