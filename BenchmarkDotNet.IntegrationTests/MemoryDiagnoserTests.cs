@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.IntegrationTests
             output = outputHelper;
         }
 
-        [Fact]
+        [Fact(Skip = "Temporarily suppressed, see https://github.com/PerfDotNet/BenchmarkDotNet/issues/208")]
         public void Test()
         {
             var benchmarks = BenchmarkConverter.TypeToBenchmarks(typeof(ListEnumeratorsBenchmarks));
