@@ -81,6 +81,7 @@ namespace BenchmarkDotNet.Helpers
 
         public double GetChronometerResolution() => Chronometer.BestClock.GetResolution(TimeUnit.Nanoseconds);
 
+        /// <param name="clrHint"></param>
         /// <param name="includeDotnetCliVersion">disabled by default to avoid perf hit for auto-generated program that also calls this method</param>
         public IEnumerable<string> ToFormattedString(string clrHint = "", bool includeDotnetCliVersion = false)
         {

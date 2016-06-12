@@ -39,5 +39,5 @@ let defaultSwitch () = BenchmarkSwitcher [| typeof<StringKeyComparison>  |]
 
 [<EntryPoint>]
 let Main args =
-    defaultSwitch().Run args 
+    let summary = defaultSwitch().Run args 
     0

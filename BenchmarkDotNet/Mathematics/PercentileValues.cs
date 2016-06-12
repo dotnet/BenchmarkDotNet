@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Mathematics
 {
@@ -16,7 +15,7 @@ namespace BenchmarkDotNet.Mathematics
         /// It's a quite common to export bench output into .csv for further analysis 
         /// And it's a good idea to have same results from all tools being used.
         /// </remarks>
-        /// <param name="values">Sequence of the values to be calculated</param>
+        /// <param name="sortedValues">Sequence of the values to be calculated</param>
         /// <param name="percentile">Value in range 0..100</param>
         /// <returns>Percentile from the set of values</returns>
         // BASEDON: http://stackoverflow.com/a/8137526
