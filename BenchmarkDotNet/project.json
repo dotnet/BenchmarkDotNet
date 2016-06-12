@@ -42,18 +42,6 @@
         "define": [ "CLASSIC" ]
       },
       "frameworkAssemblies": {
-        "Microsoft.Build": {
-          "type": "build",
-          "version": "4.0.0.0"
-        },
-        "Microsoft.Build.Framework": {
-          "type": "build",
-          "version": "4.0.0.0"
-        },
-        "Microsoft.Build.Utilities.v4.0": {
-          "type": "build",
-          "version": "4.0.0.0"
-        },
         "System.Management": "4.0.0.0"
       }
     },
