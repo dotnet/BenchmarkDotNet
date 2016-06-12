@@ -5,10 +5,10 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Jobs;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    [Config(typeof(PlatformConfig))]
     public class ProcessorArchitectureTest
     {
         private class PlatformConfig : ManualConfig
@@ -25,6 +25,13 @@ namespace BenchmarkDotNet.IntegrationTests
         const string HostPlatformOkCaption = "// HostPlatformOkCaption";
         const string BenchmarkNotFound = "// There are no benchmarks found";
 
+        private readonly ITestOutputHelper _output;
+
+        public ProcessorArchitectureTest(ITestOutputHelper output)
+        {
+            _output = output;
+        }
+
         [Fact]
         public void SpecifiedProccesorArchitectureMustBeRespected()
         {
@@ -38,9 +45,11 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private void Verify(Platform platform, Type benchmark, string failureText)
         {
-            var logger = new AccumulationLogger();
+            var logger = new OutputLogger(_output);
             // make sure we get an output in the TestRunner log
-            var config = new PlatformConfig(platform).With(logger).With(ConsoleLogger.Default);
+            var config = new PlatformConfig(platform)
+                                .With(logger)
+                                .With(ConsoleLogger.Default);
 
             BenchmarkTestExecutor.CanExecute(benchmark, config);
             var testLog = logger.GetLog();
