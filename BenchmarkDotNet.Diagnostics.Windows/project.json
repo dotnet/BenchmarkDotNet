@@ -37,8 +37,7 @@
   },
   "dependencies": {
     "BenchmarkDotNet": {
-      "target": "project",
-      "version": "0.9.7-develop"
+      "target": "project"
     },
     "Microsoft.Diagnostics.Tracing.TraceEvent": "1.0.41.0"
   },
