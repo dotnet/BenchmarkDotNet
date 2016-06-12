@@ -2,6 +2,7 @@
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using Xunit;
@@ -90,7 +91,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     summary,
                     listObjectEnumeratorBenchmark);
 
-                Assert.True(double.Parse(objectEnumeratorGen0Collections) > 0);
+                Assert.True(double.Parse(objectEnumeratorGen0Collections, EnvironmentInfo.MainCultureInfo) > 0);
             }
         }
     }
