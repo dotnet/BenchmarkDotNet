@@ -14,10 +14,10 @@ namespace BenchmarkDotNet.Toolchains.Classic
     {
         public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark)
         {
-            var buildScriptName = generateResult.ProgramName + "-" + GeneratorBase.BuildBenchmarkScriptFileName;
+            var buildScriptName = GeneratorBase.BuildBenchmarkScriptFileName;
             var buildScriptPath = Path.Combine(generateResult.DirectoryPath, buildScriptName);
             logger.WriteLineInfo("BuildScript: " + buildScriptPath);
-            var exeFilePath = generateResult.ProgramName + ".exe";
+            var exeFilePath = Path.Combine(generateResult.DirectoryPath, "Program.exe");
             var buildProcess = new Process
             {
                 StartInfo =

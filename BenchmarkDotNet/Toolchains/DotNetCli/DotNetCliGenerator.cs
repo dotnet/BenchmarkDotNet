@@ -80,10 +80,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             File.WriteAllText(projectJsonFilePath, content);
         }
 
-        protected override void GenerateProjectBuildFile(string scriptFilePath, Framework framework)
+        protected override void GenerateProjectBuildFile(string scriptFilePath, Benchmark benchmark, string rootArtifactsFolderPath)
         {
             var content = $"call dotnet {DotNetCliBuilder.RestoreCommand}{Environment.NewLine}" +
-                          $"call dotnet {DotNetCliBuilder.GetBuildCommand(TargetFrameworkMonikerProvider(framework))}";
+                          $"call dotnet {DotNetCliBuilder.GetBuildCommand(TargetFrameworkMonikerProvider(benchmark.Job.Framework))}";
 
             File.WriteAllText(scriptFilePath, content);
         }

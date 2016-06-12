@@ -5,19 +5,15 @@ using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Configs;
 
 namespace BenchmarkDotNet.Toolchains.Classic
 {
     internal class RoslynGenerator : GeneratorBase
     {
-        protected override string GetProgramName(Benchmark benchmark) => benchmark.ShortInfo;
-
         private static readonly HashSet<string> PredefinedAssemblies = new HashSet<string>(
             new[]
             {
@@ -28,100 +24,92 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 "System.Xml"
             });
 
-        public override GenerateResult GenerateProject(Benchmark benchmark, ILogger logger, string rootArtifactsFolderPath, IConfig config)
+        protected override string GetBinariesDirectoryPath(Benchmark benchmark, string rootArtifactsFolderPath, IConfig config)
         {
-            var directory = Directory.GetCurrentDirectory();
-
-            GenerateBuildScript(directory, benchmark);
-            GenerateProgramFile(directory, benchmark);
-
-            return new GenerateResult(directory, benchmark.ShortInfo, true, null);
-        }
-      
-        protected void GenerateBuildScript(string projectDir, Benchmark benchmark)
-        {
-            var fileName = Path.Combine(projectDir, benchmark.ShortInfo + "-" + BuildBenchmarkScriptFileName);
-            File.WriteAllText(fileName, CreateRoslynCompileCommand(benchmark, benchmark.ShortInfo));
-        }
-
-        private static IEnumerable<Assembly> GetAllReferences(Benchmark benchmark)
-        {
-            return benchmark.Target.Type.Assembly
-                .GetReferencedAssemblies()
-                .Concat(new[] { benchmark.Target.Type.Assembly.GetName() })
-                .Where(assemblyName => !PredefinedAssemblies.Contains(assemblyName.Name))
-                .Select(Assembly.Load)
-                .Where(assembly => !assembly.GlobalAssemblyCache);
-        }
-
-        #region Roslyn
-
-        private const string RoslynResourcePrefix = "BenchmarkDotNet.Roslyn.";
-
-        public static string GetDefaultDirectory() => Path.Combine(Directory.GetCurrentDirectory(), "Roslyn");
-
-        private static void CreateIfNotExist()
-        {
-            var folder = GetDefaultDirectory();
-            if (!Directory.Exists(folder))
-                Create(GetDefaultDirectory());
-        }
-
-        public static void Create(string destFolder)
-        {
-            if (!Directory.Exists(destFolder))
-                Directory.CreateDirectory(destFolder);
-            foreach (var resource in ResourceHelper.GetAllResources(RoslynResourcePrefix))
+            if (config.KeepBenchmarkFiles)
             {
-                var fileName = resource.Substring(RoslynResourcePrefix.Length);
-                using (var input = ResourceHelper.GetResouceStream(resource))
-                using (var output = File.Create(Path.Combine(destFolder, fileName)))
-                    StreamHelper.CopyStream(input, output);
+                return Path.Combine(rootArtifactsFolderPath, "bin", benchmark.ShortInfo);
             }
+
+            return Path.Combine(rootArtifactsFolderPath, "bin", ShortFolderName);
         }
 
-        public static string GetCscExePath()
+        protected override void CopyAllRequiredFiles(string rootArtifactsFolderPath, string binariesDirectoryPath, Benchmark benchmark)
         {
-            CreateIfNotExist();
-            return Path.Combine(GetDefaultDirectory(), "csc.exe");
+            CopyRoslynFiles(GetCompilerFolderPath(rootArtifactsFolderPath));
+
+            CopyAllReferencedLibraries(binariesDirectoryPath, benchmark);
         }
 
-        public static string CreateRoslynCompileCommand(Benchmark benchmark, string programName)
+        protected override void GenerateProjectFile(ILogger logger, string projectDir, Benchmark benchmark)
+        {
+            // do nothing on PURPOSE
+        }
+
+        protected override void GenerateProjectBuildFile(string scriptFilePath, Benchmark benchmark, string rootArtifactsFolderPath)
         {
             var prefix = RuntimeInformation.IsWindows() ? "" : "#!/bin/bash\n";
             var list = new List<string>();
             if (!RuntimeInformation.IsWindows())
                 list.Add("mono");
-            list.Add(Escape(GetCscExePath()));
+            list.Add(GetCompilerPath(rootArtifactsFolderPath).Escape());
             list.Add("/noconfig");
             list.Add("/target:exe");
             list.Add("/optimize");
             list.Add("/unsafe");
             list.Add("/platform:" + benchmark.Job.Platform.ToConfig());
             // list.Add("/appconfig:" + AppConfigFileName);
-            var refernces = GetAllReferences(benchmark).Select(a => Escape(a.Location));
+            var refernces = GetAllReferences(benchmark).Select(a => a.Location.Escape());
             list.Add("/reference:" + string.Join(",", refernces));
-            list.Add(programName + ".cs");
-            return prefix + string.Join(" ", list);
+            list.Add(ProgramFileName);
+
+            File.WriteAllText(
+                scriptFilePath, 
+                prefix + string.Join(" ", list));
         }
 
-        private static string Escape(string path) => "\"" + path + "\"";
+        private string GetCompilerPath(string rootArtifactsFolderPath) => Path.Combine(GetCompilerFolderPath(rootArtifactsFolderPath), "csc.exe");
 
-        #endregion
+        private string GetCompilerFolderPath(string rootArtifactsFolderPath) => Path.Combine(rootArtifactsFolderPath, "Roslyn");
 
-        protected override string GetBinariesDirectoryPath(Benchmark benchmark, string rootArtifactsFolderPath, IConfig config)
+        private void CopyRoslynFiles(string compilerFolderPath)
         {
-            throw new System.NotImplementedException();
+            if (Directory.Exists(compilerFolderPath))
+            {
+                return;
+            }
+
+            if (!Directory.Exists(compilerFolderPath))
+            {
+                Directory.CreateDirectory(compilerFolderPath);
+            }
+
+            const string roslynResourcePrefix = "BenchmarkDotNet.Roslyn.";
+            foreach (var resource in ResourceHelper.GetAllResources(roslynResourcePrefix))
+            {
+                var fileName = resource.Substring(roslynResourcePrefix.Length);
+                using (var input = ResourceHelper.GetResouceStream(resource))
+                using (var output = File.Create(Path.Combine(compilerFolderPath, fileName)))
+                    StreamHelper.CopyStream(input, output);
+            }
         }
 
-        protected override void GenerateProjectFile(ILogger logger, string projectDir, Benchmark benchmark)
+        private void CopyAllReferencedLibraries(string binariesDirectoryPath, Benchmark benchmark)
         {
-            throw new System.NotImplementedException();
+            foreach (var assembly in GetAllReferences(benchmark))
+            {
+                File.Copy(assembly.Location, Path.Combine(binariesDirectoryPath, $"{assembly.GetName().Name}.dll"));
+            }
         }
 
-        protected override void GenerateProjectBuildFile(string scriptFilePath, Framework framework)
+        private static IEnumerable<Assembly> GetAllReferences(Benchmark benchmark)
         {
-            throw new System.NotImplementedException();
+            return benchmark.Target.Type.Assembly
+                            .GetReferencedAssemblies()
+                            .Concat(new[] { benchmark.Target.Type.Assembly.GetName() })
+                            .Where(assemblyName => !PredefinedAssemblies.Contains(assemblyName.Name))
+                            .Select(Assembly.Load)
+                            .Where(assembly => !assembly.GlobalAssemblyCache);
         }
     }
 }

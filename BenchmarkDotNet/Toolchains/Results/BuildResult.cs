@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Toolchains.Results
         public string ExecutablePath { get; }
 
         public BuildResult(GenerateResult generateResult, bool isBuildSuccess, Exception buildException, string executablePath)
-            : base(generateResult.DirectoryPath, generateResult.ProgramName, generateResult.IsGenerateSuccess, generateResult.GenerateException)
+            : base(generateResult.DirectoryPath, generateResult.IsGenerateSuccess, generateResult.GenerateException)
         {
             IsBuildSuccess = isBuildSuccess;
             BuildException = buildException;

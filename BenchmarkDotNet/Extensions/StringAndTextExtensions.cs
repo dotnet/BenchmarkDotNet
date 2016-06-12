@@ -12,6 +12,8 @@ namespace BenchmarkDotNet.Extensions
         private static readonly Lazy<Dictionary<string, string>> InvalidFileNameCharactersMappings
             = new Lazy<Dictionary<string, string>>(BuildInvalidPathCharactersMappings);
 
+        internal static string Escape(this string path) => "\"" + path + "\"";
+
         internal static string WithoutSuffix(this string str, string suffix, StringComparison stringComparison = StringComparison.CurrentCulture)
         {
             return str.EndsWith(suffix, stringComparison) ? str.Substring(0, str.Length - suffix.Length) : str;

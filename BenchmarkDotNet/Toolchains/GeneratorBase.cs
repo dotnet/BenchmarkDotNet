@@ -16,31 +16,35 @@ namespace BenchmarkDotNet.Toolchains
 {
     internal abstract class GeneratorBase : IGenerator
     {
-        public const string ShortFolderName = "BDN.Auto";
+        protected const string ShortFolderName = "BDN.Auto";
 
-        protected const string AppConfigFileName = "app.config";
+        protected const string ProgramFileName = "Program.notcs";
+
+        private const string AppConfigFileName = "app.config";
 
         internal static string BuildBenchmarkScriptFileName => "BuildBenchmark" + RuntimeInformation.ScriptFileExtension;
 
-        public virtual GenerateResult GenerateProject(Benchmark benchmark, ILogger logger, string rootArtifactsFolderPath, IConfig config)
+        public GenerateResult GenerateProject(Benchmark benchmark, ILogger logger, string rootArtifactsFolderPath, IConfig config)
         {
             var result = CreateProjectDirectory(benchmark, rootArtifactsFolderPath, config);
 
+            CopyAllRequiredFiles(rootArtifactsFolderPath, result.DirectoryPath, benchmark);
+
             GenerateProgramFile(result.DirectoryPath, benchmark);
             GenerateProjectFile(logger, result.DirectoryPath, benchmark);
-            GenerateProjectBuildFile(Path.Combine(result.DirectoryPath, BuildBenchmarkScriptFileName), benchmark.Job.Framework);
+            GenerateProjectBuildFile(Path.Combine(result.DirectoryPath, BuildBenchmarkScriptFileName), benchmark, rootArtifactsFolderPath);
             GenerateAppConfigFile(result.DirectoryPath, benchmark.Job);
 
             return result;
         }
 
+        protected virtual void CopyAllRequiredFiles(string rootArtifactsFolderPath, string binariesDirectoryPath, Benchmark benchmark) { }
+
         protected abstract string GetBinariesDirectoryPath(Benchmark benchmark, string rootArtifactsFolderPath, IConfig config);
 
         protected abstract void GenerateProjectFile(ILogger logger, string projectDir, Benchmark benchmark);
 
-        protected abstract void GenerateProjectBuildFile(string scriptFilePath, Framework framework);
-
-        protected virtual string GetProgramName(Benchmark benchmark) => "Program";
+        protected abstract void GenerateProjectBuildFile(string scriptFilePath, Benchmark benchmark, string rootArtifactsFolderPath);
 
         private GenerateResult CreateProjectDirectory(Benchmark benchmark, string rootArtifactsFolderPath, IConfig config)
         {
@@ -68,13 +72,13 @@ namespace BenchmarkDotNet.Toolchains
                 }
             }
             if (exist)
-                return new GenerateResult(directoryPath, GetProgramName(benchmark), false, deleteException);
+                return new GenerateResult(directoryPath, false, deleteException);
             if (!Directory.Exists(directoryPath))
                 Directory.CreateDirectory(directoryPath);
-            return new GenerateResult(directoryPath, GetProgramName(benchmark), true, null);
+            return new GenerateResult(directoryPath, true, null);
         }
 
-        protected void GenerateProgramFile(string projectDir, Benchmark benchmark)
+        private void GenerateProgramFile(string projectDir, Benchmark benchmark)
         {
             var target = benchmark.Target;
             var isVoid = target.Method.ReturnType == typeof(void);
@@ -148,8 +152,7 @@ namespace BenchmarkDotNet.Toolchains
                 Replace("$TargetBenchmarkTaskArguments$", targetBenchmarkTaskArguments).
                 Replace("$ParamsContent$", paramsContent);
 
-            string fileName = Path.Combine(projectDir, GetProgramName(benchmark) + ".notcs");
-            File.WriteAllText(fileName, content);
+            File.WriteAllText(Path.Combine(projectDir, ProgramFileName), content);
         }
 
         private void GenerateAppConfigFile(string projectDir, IJob job)
