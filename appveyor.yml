@@ -17,6 +17,8 @@ skip_tags: true
 #---------------------------------#
 #    environment configuration    #
 #---------------------------------#
+cache:
+  - packages
 
 # scripts that are called at very beginning, before repo cloning
 init:
@@ -62,14 +64,14 @@ after_build:
 #---------------------------------#
 #       tests configuration       #
 #---------------------------------#
-before_test:
-  - dotnet test .\BenchmarkDotNet.Tests\project.json --configuration Release
-  - dotnet test .\BenchmarkDotNet.IntegrationTests\project.json --configuration Release
+test_script:
+  - dotnet test .\BenchmarkDotNet.Tests\project.json --configuration Release -xml tests-results01.xml
+  - ps: .\build\uploadtests.ps1 "tests-results01.xml"
+  - dotnet test .\BenchmarkDotNet.IntegrationTests\project.json --configuration Release -xml tests-results02.xml
+  - ps: .\build\uploadtests.ps1 "tests-results02.xml"
 
 test:
   assemblies:
-    - BenchmarkDotNet.Tests\bin\$(configuration)\net451\win7-x64\BenchmarkDotNet.Tests.dll
-    - BenchmarkDotNet.IntegrationTests\bin\$(configuration)\net451\win7-x64\BenchmarkDotNet.IntegrationTests.dll
     - BenchmarkDotNet.IntegrationTests.Classic\bin\$(configuration)\BenchmarkDotNet.IntegrationTests.Classic.exe
 
 artifacts:
