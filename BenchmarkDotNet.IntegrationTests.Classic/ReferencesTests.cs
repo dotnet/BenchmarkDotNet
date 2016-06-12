@@ -1,9 +1,5 @@
-﻿using System.Linq;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.IntegrationTests.CustomPaths;
+﻿using BenchmarkDotNet.IntegrationTests.CustomPaths;
 using BenchmarkDotNet.IntegrationTests.DifferentRuntime;
-using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Running;
 using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests.Classic
@@ -13,55 +9,37 @@ namespace BenchmarkDotNet.IntegrationTests.Classic
         [Fact]
         public void FSharpIsSupported()
         {
-            CanCompileAndRun<FSharpBenchmark.Db>();
+            BenchmarkTestRunner.CanCompileAndRun<FSharpBenchmark.Db>();
         }
 
         [Fact]
         public void VisualBasicIsSupported()
         {
-            CanCompileAndRun<VisualBasic.Sample>();
+            BenchmarkTestRunner.CanCompileAndRun<VisualBasic.Sample>();
         }
 
         [Fact]
         public void BenchmarksThatUseTypeFromCustomPathDllAreSupported()
         {
-            CanCompileAndRun<BenchmarksThatUseTypeFromCustomPathDll>();
+            BenchmarkTestRunner.CanCompileAndRun<BenchmarksThatUseTypeFromCustomPathDll>();
         }
 
         [Fact]
         public void BenchmarksThatReturnTypeFromCustomPathDllAreSupported()
         {
-            CanCompileAndRun<BenchmarksThatReturnTypeFromCustomPathDll>();
+            BenchmarkTestRunner.CanCompileAndRun<BenchmarksThatReturnTypeFromCustomPathDll>();
         }
 
         [Fact]
         public void BenchmarksThatReturnTypeThatRequiresDifferentRuntimeAreSupported()
         {
-            CanCompileAndRun<BenchmarksThatReturnTypeThatRequiresDifferentRuntime>();
+            BenchmarkTestRunner.CanCompileAndRun<BenchmarksThatReturnTypeThatRequiresDifferentRuntime>();
         }
 
         [Fact]
         public void BenchmarksThatUseTypeThatRequiresDifferentRuntimeAreSupported()
         {
-            CanCompileAndRun<BenchmarksThatUseTypeThatRequiresDifferentRuntime>();
-        }
-
-        private void CanCompileAndRun<TBenchmark>()
-        {
-            var summary = BenchmarkRunner.Run<TBenchmark>(new SingleRunFastConfig());
-
-            Assert.True(summary.Reports.Any());
-            Assert.True(summary.Reports.All(report => report.ExecuteResults.All(executeResult => executeResult.FoundExecutable)));
-            Assert.True(summary.Reports.All(report => report.AllMeasurements.Any()));
-        }
-
-        private class SingleRunFastConfig : ManualConfig
-        {
-            internal SingleRunFastConfig()
-            {
-                Add(Job.Dry);
-                Add(Loggers.ConsoleLogger.Default);
-            }
+            BenchmarkTestRunner.CanCompileAndRun<BenchmarksThatUseTypeThatRequiresDifferentRuntime>();
         }
     }
 }

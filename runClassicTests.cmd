@@ -48,7 +48,7 @@ echo -----------------------------
 echo Running Tests for Classic Desktop CLR
 echo -----------------------------
 
-call "testsOutput/xunit.console.exe" "testsOutput/BenchmarkDotNet.Tests.dll" "testsOutput/BenchmarkDotNet.IntegrationTests.dll" "testsOutput/BenchmarkDotNet.IntegrationTests.Classic.exe" 2> failedTests.txt
+call "testsOutput/xunit.console.exe" "testsOutput/BenchmarkDotNet.Tests.dll" "testsOutput/BenchmarkDotNet.IntegrationTests.dll" "testsOutput/BenchmarkDotNet.IntegrationTests.Classic.exe" -noshadow 2> failedTests.txt
 
 if NOT %ERRORLEVEL% == 0 (	
 	type failedTests.txt	

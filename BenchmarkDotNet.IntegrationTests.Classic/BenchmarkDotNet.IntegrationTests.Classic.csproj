@@ -43,6 +43,7 @@
       <HintPath>..\BenchmarkDotNet\bin\Debug\net40\BenchmarkDotNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -68,8 +69,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppConfigTests.cs" />
     <Compile Include="AssemblyConfigAttribute.cs" />
     <Compile Include="AssemblyConfigTests.cs" />
+    <Compile Include="BenchmarkTestRunner.cs" />
     <Compile Include="JitOptimizationsTests.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ReferencesTests.cs" />
@@ -102,6 +105,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

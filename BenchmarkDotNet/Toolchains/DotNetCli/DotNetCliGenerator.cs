@@ -80,13 +80,15 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             File.WriteAllText(projectJsonFilePath, content);
         }
 
-        protected override void GenerateProjectBuildFile(string scriptFilePath, Benchmark benchmark, string rootArtifactsFolderPath)
+        protected override void GenerateProjectBuildFile(string scriptFilePath, Benchmark benchmark, string rootArtifactsFolderPath, string appConfigPath)
         {
             var content = $"call dotnet {DotNetCliBuilder.RestoreCommand}{Environment.NewLine}" +
                           $"call dotnet {DotNetCliBuilder.GetBuildCommand(TargetFrameworkMonikerProvider(benchmark.Job.Framework))}";
 
             File.WriteAllText(scriptFilePath, content);
         }
+
+        protected override string GetProgramName(Benchmark benchmark, IConfig config) => config.KeepBenchmarkFiles ? benchmark.ShortInfo : ShortFolderName;
 
         private static string SetPlatform(string template, string platform)
         {

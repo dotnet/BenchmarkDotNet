@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
@@ -20,8 +22,6 @@ namespace BenchmarkDotNet.Toolchains
 
         protected const string ProgramFileName = "Program.notcs";
 
-        private const string AppConfigFileName = "app.config";
-
         internal static string BuildBenchmarkScriptFileName => "BuildBenchmark" + RuntimeInformation.ScriptFileExtension;
 
         public GenerateResult GenerateProject(Benchmark benchmark, ILogger logger, string rootArtifactsFolderPath, IConfig config)
@@ -32,8 +32,9 @@ namespace BenchmarkDotNet.Toolchains
 
             GenerateProgramFile(result.DirectoryPath, benchmark);
             GenerateProjectFile(logger, result.DirectoryPath, benchmark);
-            GenerateProjectBuildFile(Path.Combine(result.DirectoryPath, BuildBenchmarkScriptFileName), benchmark, rootArtifactsFolderPath);
-            GenerateAppConfigFile(result.DirectoryPath, benchmark.Job);
+
+            var appConfigPath = GenerateAppConfigFile(result.DirectoryPath, benchmark, config);
+            GenerateProjectBuildFile(Path.Combine(result.DirectoryPath, BuildBenchmarkScriptFileName), benchmark, rootArtifactsFolderPath, appConfigPath);
 
             return result;
         }
@@ -42,9 +43,11 @@ namespace BenchmarkDotNet.Toolchains
 
         protected abstract string GetBinariesDirectoryPath(Benchmark benchmark, string rootArtifactsFolderPath, IConfig config);
 
-        protected abstract void GenerateProjectFile(ILogger logger, string projectDir, Benchmark benchmark);
+        protected virtual void GenerateProjectFile(ILogger logger, string projectDir, Benchmark benchmark) { }
 
-        protected abstract void GenerateProjectBuildFile(string scriptFilePath, Benchmark benchmark, string rootArtifactsFolderPath);
+        protected abstract void GenerateProjectBuildFile(string scriptFilePath, Benchmark benchmark, string rootArtifactsFolderPath, string appConfigPath);
+
+        protected virtual string GetProgramName(Benchmark benchmark, IConfig config) => "Program";
 
         private GenerateResult CreateProjectDirectory(Benchmark benchmark, string rootArtifactsFolderPath, IConfig config)
         {
@@ -155,21 +158,22 @@ namespace BenchmarkDotNet.Toolchains
             File.WriteAllText(Path.Combine(projectDir, ProgramFileName), content);
         }
 
-        private void GenerateAppConfigFile(string projectDir, IJob job)
+        private string GenerateAppConfigFile(string projectDir, Benchmark benchmark, IConfig config)
         {
-            var useLagacyJit = job.Jit == Jit.RyuJit
-                || (job.Jit == Jit.Host && EnvironmentInfo.GetCurrent().HasRyuJit)
-                ? "0"
-                : "1";
+#if !RC1
+            var sourcePath = benchmark.Target.Type.Assembly().Location + ".config";
+#else
+            var sourcePath = Process.GetCurrentProcess().MainModule.FileName + ".config";
+#endif
+            var destinationPath = Path.Combine(projectDir, $"{GetProgramName(benchmark, config)}.exe.config");
 
-            var template =
-                ResourceHelper.LoadTemplate(
-                    job.Jit == Jit.Host ? "BenchmarkAppConfigEmpty.txt" : "BenchmarkAppConfig.txt");
-            var content = template.
-                Replace("$UseLagacyJit$", useLagacyJit);
+            using (var source = File.Exists(sourcePath) ? new StreamReader(File.OpenRead(sourcePath)) : TextReader.Null)
+            using (var destination = new System.IO.StreamWriter(File.Create(destinationPath), System.Text.Encoding.UTF8))
+            {
+                AppConfigGenerator.Generate(benchmark.Job, source, destination);
+            }
 
-            string fileName = Path.Combine(projectDir, AppConfigFileName);
-            File.WriteAllText(fileName, content);
+            return destinationPath;
         }
 
         private string GetParameterValue(object value)

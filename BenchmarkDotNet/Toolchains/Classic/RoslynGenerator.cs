@@ -41,12 +41,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
             CopyAllReferencedLibraries(binariesDirectoryPath, benchmark);
         }
 
-        protected override void GenerateProjectFile(ILogger logger, string projectDir, Benchmark benchmark)
-        {
-            // do nothing on PURPOSE
-        }
-
-        protected override void GenerateProjectBuildFile(string scriptFilePath, Benchmark benchmark, string rootArtifactsFolderPath)
+        protected override void GenerateProjectBuildFile(string scriptFilePath, Benchmark benchmark, string rootArtifactsFolderPath, string appConfigPath)
         {
             var prefix = RuntimeInformation.IsWindows() ? "" : "#!/bin/bash\n";
             var list = new List<string>();
@@ -58,7 +53,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
             list.Add("/optimize");
             list.Add("/unsafe");
             list.Add("/platform:" + benchmark.Job.Platform.ToConfig());
-            // list.Add("/appconfig:" + AppConfigFileName);
+            list.Add("/appconfig:" + appConfigPath.Escape());
             var refernces = GetAllReferences(benchmark).Select(a => a.Location.Escape());
             list.Add("/reference:" + string.Join(",", refernces));
             list.Add(ProgramFileName);
@@ -123,6 +118,11 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 }
 
                 uniqueDependencies.Add(loaded);
+                if (loaded.GlobalAssemblyCache)
+                {
+                    continue;
+                }
+
                 foreach (var referencedAssembly in loaded.GetReferencedAssemblies())
                 {
                     assembliesToCheck.Push(referencedAssembly);

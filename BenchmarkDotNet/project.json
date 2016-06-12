@@ -42,7 +42,8 @@
         "define": [ "CLASSIC" ]
       },
       "frameworkAssemblies": {
-        "System.Management": "4.0.0.0"
+        "System.Management": "4.0.0.0",
+        "System.Xml": "4.0.0.0"
       }
     },
     "dnx451": {
@@ -52,7 +53,8 @@
       "frameworkAssemblies": {
         "System": "4.0.0.0",
         "System.Runtime": "4.0.10.0",
-        "System.Management": "4.0.0.0"
+        "System.Management": "4.0.0.0",
+        "System.Xml": "4.0.0.0"
       }
     },
     "dnxcore50": {
@@ -70,7 +72,8 @@
         "System.IO.FileSystem": "4.0.1-beta-23516",
         "System.Runtime.InteropServices.RuntimeInformation": "4.0.0-beta-23516",
         "System.Runtime.Serialization.Primitives": "4.1.0-beta-23516",
-        "System.Diagnostics.Tools": "4.0.1-beta-23516"
+        "System.Diagnostics.Tools": "4.0.1-beta-23516",
+        "System.Xml.XPath.XmlDocument": "4.0.1-beta-23516"
       }
     },
     "netstandard1.5": {
@@ -97,7 +100,8 @@
         "System.Runtime.InteropServices": "4.1.0-rc2-24027",
         "Microsoft.DotNet.InternalAbstractions": "1.0.0-rc2-002702",
         "System.Reflection.Extensions": "4.0.1-rc2-24027",
-        "System.Diagnostics.Debug": "4.0.11-rc2-24027"
+        "System.Diagnostics.Debug": "4.0.11-rc2-24027",
+        "System.Xml.XPath.XmlDocument": "4.0.1-rc2-24027"
       }
     }
   }
