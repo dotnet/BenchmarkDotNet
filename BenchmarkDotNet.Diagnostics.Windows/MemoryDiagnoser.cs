@@ -14,6 +14,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
@@ -187,7 +188,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     var result = results[benchmark];
                     if (result.GenCounts[generation] == 0)
                         return "-"; // make zero more obvious
-                    return (result.GenCounts[generation] / (double)result.TotalOperations * opsPerGCCount).ToString("N2");
+                    return (result.GenCounts[generation] / (double)result.TotalOperations * opsPerGCCount).ToString("N2", EnvironmentInfo.MainCultureInfo);
                 }
                 return "N/A";
             }

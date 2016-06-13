@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void Test()
         {
-            var logger = new AccumulationLogger();
+            var logger = new OutputLogger(output);
             var columns = new[]
             {
                 StatisticColumn.StdDev,
@@ -38,11 +38,10 @@ namespace BenchmarkDotNet.IntegrationTests
                 StatisticColumn.P95
             };
             var config = DefaultConfig.Instance
-                .With(Job.Default.WithWarmupCount(0).WithTargetCount(50).WithIterationTime(10))
+                .With(Job.Dry.WithTargetCount(10).WithIterationTime(10))
                 .With(logger)
                 .With(columns);
             var summary = BenchmarkTestExecutor.CanExecute<Target>(config);
-            output.WriteLine(logger.GetLog());
 
             var table = summary.Table;
             var headerRow = table.FullHeader;

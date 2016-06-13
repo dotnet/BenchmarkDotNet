@@ -38,7 +38,9 @@
         "define": [ "CLASSIC" ]
       },
       "dependencies": {
-        "BenchmarkDotNet.Diagnostics.Windows": "0.9.7-develop",
+        "BenchmarkDotNet.Diagnostics.Windows": {
+          "target": "project"
+        },
         "Microsoft.NETCore.Platforms": "1.0.1-rc2-24027"
       },
       "frameworkAssemblies": {
