@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public override void Write(LogKind logKind, string text)
         {
-            testOutputHelper.WriteLine(text);
+            testOutputHelper.WriteLine(RemoveInvalidChars(text));
             base.Write(logKind, text);
         }
 
@@ -30,8 +30,18 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public override void WriteLine(LogKind logKind, string text)
         {
-            testOutputHelper.WriteLine(text);
+            testOutputHelper.WriteLine(RemoveInvalidChars(text));
             base.WriteLine(logKind, text);
         }
+
+        #region Xunit bug workaround
+        /// <summary>
+        /// Workaround for xunit bug: https://github.com/xunit/xunit/issues/876
+        /// </summary>
+        private static string RemoveInvalidChars(string text)
+        {
+            return text.Replace((char)0x1B, ' ');
+        }
+        #endregion
     }
 }
