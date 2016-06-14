@@ -17,7 +17,8 @@ namespace BenchmarkDotNet.Toolchains
 
             ClearAllCustomRuntimeSettingsExceptRedirects(runtimeElement);
 
-            GenerateJitSettings(xmlDocument, runtimeElement, job);
+            GenerateJitSettings(xmlDocument, runtimeElement, job.Jit);
+            GenerateGCSettings(xmlDocument, runtimeElement, job.GC);
 
             xmlDocument.Save(destination);
         }
@@ -53,17 +54,29 @@ namespace BenchmarkDotNet.Toolchains
             }
         }
 
-        private static void GenerateJitSettings(XmlDocument xmlDocument, XmlNode runtimeElement, IJob job)
+        private static void GenerateJitSettings(XmlDocument xmlDocument, XmlNode runtimeElement, Jit jit)
         {
-            if (job.Jit == Jit.Host)
+            if (jit == Jit.Host)
             {
                 return;
             }
 
             CreateNodeWithAttribute(xmlDocument, runtimeElement, "useLegacyJit", "enabled",
-                job.Jit == Jit.RyuJit || (job.Jit == Jit.Host && EnvironmentInfo.GetCurrent().HasRyuJit)
+                jit == Jit.RyuJit || (jit == Jit.Host && EnvironmentInfo.GetCurrent().HasRyuJit)
                     ? "0"
                     : "1");
+        }
+
+        private static void GenerateGCSettings(XmlDocument xmlDocument, XmlNode runtimeElement, GC gc)
+        {
+            if (gc == null || gc == GC.Default)
+            {
+                return;
+            }
+
+            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcConcurrent", "enabled", gc.Concurrent.ToString().ToLower());
+            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcServer", "enabled", gc.Server.ToString().ToLower());
+            CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCCpuGroup", "enabled", gc.CpuGroups.ToString().ToLower());
         }
 
         private static void CreateNodeWithAttribute(

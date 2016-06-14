@@ -9,6 +9,7 @@ using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
+using GC = System.GC;
 
 namespace BenchmarkDotNet.Running
 {
