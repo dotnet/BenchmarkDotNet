@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void CanEnableServerGcMode()
         {
             var config = ManualConfig.CreateEmpty()
-                                     .With(Job.Dry.With(new Jobs.GC { Server = true }));
+                                     .With(Job.Dry.With(new GarbageCollection { Server = true }));
 
             BenchmarkTestExecutor.CanExecute<ServerModeEnabled>(config);
         }
@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void CanDisableServerGcMode()
         {
             var config = ManualConfig.CreateEmpty()
-                                     .With(Job.Dry.With(new Jobs.GC { Server = false }));
+                                     .With(Job.Dry.With(new GarbageCollection { Server = false }));
 
             BenchmarkTestExecutor.CanExecute<WorkstationGcOnly>(config);
         }
@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void CanEnableConcurrentGcMode()
         {
             var config = ManualConfig.CreateEmpty()
-                                     .With(Job.Dry.With(new Jobs.GC { Concurrent = true }));
+                                     .With(Job.Dry.With(new GarbageCollection { Concurrent = true }));
 
             BenchmarkTestExecutor.CanExecute<ConcurrentModeEnabled>(config);
         }
@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void CanDisableConcurrentGcMode()
         {
             var config = ManualConfig.CreateEmpty()
-                                     .With(Job.Dry.With(new Jobs.GC { Concurrent = false }));
+                                     .With(Job.Dry.With(new GarbageCollection { Concurrent = false }));
 
             BenchmarkTestExecutor.CanExecute<ConcurrentModeDisabled>(config);
         }
@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void CanAvoidForcingGarbageCollections()
         {
             var config = ManualConfig.CreateEmpty()
-                                     .With(Job.Dry.With(new Jobs.GC { Force = false }));
+                                     .With(Job.Dry.With(new GarbageCollection { Force = false }));
             
             BenchmarkTestExecutor.CanExecute<AvoidForcingGarbageCollection>(config);
         }
@@ -119,15 +119,15 @@ namespace BenchmarkDotNet.IntegrationTests
         [Setup]
         public void Setup()
         {
-            initialCollectionCountGen1 = System.GC.CollectionCount(1);
-            initialCollectionCountGen2 = System.GC.CollectionCount(2);
+            initialCollectionCountGen1 = GC.CollectionCount(1);
+            initialCollectionCountGen2 = GC.CollectionCount(2);
         }
 
         [Benchmark]
         public void Benchmark()
         {
-            if (initialCollectionCountGen1 != System.GC.CollectionCount(1)
-                || initialCollectionCountGen2 != System.GC.CollectionCount(2))
+            if (initialCollectionCountGen1 != GC.CollectionCount(1)
+                || initialCollectionCountGen2 != GC.CollectionCount(2))
             {
                 throw new InvalidOperationException("Did not disable GC Force");
             }

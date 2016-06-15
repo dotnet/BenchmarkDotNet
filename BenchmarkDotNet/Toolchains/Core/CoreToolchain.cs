@@ -43,6 +43,11 @@ namespace BenchmarkDotNet.Toolchains.Core
                 logger.WriteLineError($"Currently dotnet cli toolchain supports only RyuJit, benchmark {benchmark.ShortInfo} will not be executed");
                 return false;
             }
+            if (benchmark.Job.GarbageCollection.CpuGroups)
+            {
+                logger.WriteLineError($"Currently project.json does not support CpuGroups (app.config does), benchmark {benchmark.ShortInfo} will not be executed");
+                return false;
+            }
 
             return true;
         }

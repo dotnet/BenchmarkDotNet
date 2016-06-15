@@ -18,10 +18,10 @@ namespace BenchmarkDotNet.Samples.Intro
         {
             public Config()
             {
-                Add(Job.Dry.With(Mode.SingleRun).WithTargetCount(1).With(new GC { Server = true, Force = true }));
-                Add(Job.Dry.With(Mode.SingleRun).WithTargetCount(1).With(new GC { Server = true, Force = false }));
-                Add(Job.Dry.With(Mode.SingleRun).WithTargetCount(1).With(new GC { Server = false, Force = true }));
-                Add(Job.Dry.With(Mode.SingleRun).WithTargetCount(1).With(new GC { Server = false, Force = false }));
+                Add(Job.Dry.With(Mode.SingleRun).WithTargetCount(1).With(new GarbageCollection { Server = true, Force = true }));
+                Add(Job.Dry.With(Mode.SingleRun).WithTargetCount(1).With(new GarbageCollection { Server = true, Force = false }));
+                Add(Job.Dry.With(Mode.SingleRun).WithTargetCount(1).With(new GarbageCollection { Server = false, Force = true }));
+                Add(Job.Dry.With(Mode.SingleRun).WithTargetCount(1).With(new GarbageCollection { Server = false, Force = false }));
 
                 Add(MarkdownExporter.GitHub);
 

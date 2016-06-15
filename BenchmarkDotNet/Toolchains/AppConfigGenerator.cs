@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Toolchains
             ClearAllCustomRuntimeSettingsExceptRedirects(runtimeElement);
 
             GenerateJitSettings(xmlDocument, runtimeElement, job.Jit);
-            GenerateGCSettings(xmlDocument, runtimeElement, job.GC);
+            GenerateGCSettings(xmlDocument, runtimeElement, job.GarbageCollection);
 
             xmlDocument.Save(destination);
         }
@@ -67,16 +67,16 @@ namespace BenchmarkDotNet.Toolchains
                     : "1");
         }
 
-        private static void GenerateGCSettings(XmlDocument xmlDocument, XmlNode runtimeElement, GC gc)
+        private static void GenerateGCSettings(XmlDocument xmlDocument, XmlNode runtimeElement, GarbageCollection garbageCollection)
         {
-            if (gc == null || gc == GC.Default)
+            if (garbageCollection == null || garbageCollection == GarbageCollection.Default)
             {
                 return;
             }
 
-            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcConcurrent", "enabled", gc.Concurrent.ToString().ToLower());
-            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcServer", "enabled", gc.Server.ToString().ToLower());
-            CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCCpuGroup", "enabled", gc.CpuGroups.ToString().ToLower());
+            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcConcurrent", "enabled", garbageCollection.Concurrent.ToString().ToLower());
+            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcServer", "enabled", garbageCollection.Server.ToString().ToLower());
+            CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCCpuGroup", "enabled", garbageCollection.CpuGroups.ToString().ToLower());
         }
 
         private static void CreateNodeWithAttribute(

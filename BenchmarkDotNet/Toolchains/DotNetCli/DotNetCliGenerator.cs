@@ -8,7 +8,6 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
-using GC = BenchmarkDotNet.Jobs.GC;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
@@ -75,7 +74,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             content = SetExtraDependencies(content, ExtraDependencies);
             content = SetImports(content, Imports);
             content = SetRuntime(content, Runtime);
-            content = SetGarbageCollectionSettings(content, benchmark.Job.GC);
+            content = SetGarbageCollectionSettings(content, benchmark.Job.GarbageCollection);
 
             var projectJsonFilePath = Path.Combine(projectDir, ProjectFileName);
 
@@ -127,16 +126,16 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return content.Replace("$RUNTIME$", runtime);
         }
 
-        private static string SetGarbageCollectionSettings(string content, GC gc)
+        private static string SetGarbageCollectionSettings(string content, GarbageCollection garbageCollection)
         {
-            if (gc == null || gc == GC.Default)
+            if (garbageCollection == null || garbageCollection == GarbageCollection.Default)
             {
                 return content.Replace("$GC$", null);
             }
 
             return content.Replace(
                 "$GC$",
-                $"\"runtimeOptions\": {{ \"configProperties\": {{ \"System.GC.Concurrent\": {gc.Concurrent.ToString().ToLower()}, \"System.GC.Server\": {gc.Server.ToString().ToLower()} }} }}, ");
+                $"\"runtimeOptions\": {{ \"configProperties\": {{ \"System.GC.Concurrent\": {garbageCollection.Concurrent.ToString().ToLower()}, \"System.GC.Server\": {garbageCollection.Server.ToString().ToLower()} }} }}, ");
         }
 
         /// <summary>

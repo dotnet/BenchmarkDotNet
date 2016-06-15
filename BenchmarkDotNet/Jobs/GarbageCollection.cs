@@ -5,7 +5,7 @@ namespace BenchmarkDotNet.Jobs
 {
     // it should have been struct, but then I was not able to set up Concurrent = true as default value 
     // due to "cannot have instance property or field initializers in structs"
-    public sealed class GC : IEquatable<GC>
+    public sealed class GarbageCollection : IEquatable<GarbageCollection>
     {
         /// <summary>
         /// Specifies whether the common language runtime runs server garbage collection.
@@ -36,17 +36,17 @@ namespace BenchmarkDotNet.Jobs
         public bool Force { get; set; } = true;
 
         /// <summary>
-        /// the default settings in are "Concurrent = true, Server = false, CpuGroups = false, Force = true"
+        /// the default settings "Concurrent = true, Server = false, CpuGroups = false, Force = true"
         /// </summary>
-        public static GC Default => new GC { Concurrent = true, Force = true };
+        public static GarbageCollection Default => new GarbageCollection { Concurrent = true, Force = true };
 
         public override string ToString()
         {
-            const string longestPossible = "Nonconcurrent Workstation CpuGroupsEnabled DontForce";
+            const string longestPossible = "Non-concurrent Workstation CpuGroupsEnabled DontForce";
             var representation = new StringBuilder(longestPossible.Length);
 
             if (Concurrent) representation.Append("Concurrent");
-            if (Concurrent == false) representation.Append("Nonconcurrent");
+            if (Concurrent == false) representation.Append("Non-concurrent");
             if (Server) representation.Append(" Server");
             if (Server == false) representation.Append(" Workstation");
             if (CpuGroups) representation.Append(" CpuGroupsEnabled");
@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.Jobs
             return representation.ToString();
         }
 
-        public bool Equals(GC other)
+        public bool Equals(GarbageCollection other)
         {
             if (ReferenceEquals(null, other))
             {
@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.Jobs
             {
                 return true;
             }
-            return obj is GC && Equals((GC)obj);
+            return obj is GarbageCollection && Equals((GarbageCollection)obj);
         }
 
         public override int GetHashCode()
@@ -94,12 +94,12 @@ namespace BenchmarkDotNet.Jobs
             }
         }
 
-        public static bool operator ==(GC left, GC right)
+        public static bool operator ==(GarbageCollection left, GarbageCollection right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(GC left, GC right)
+        public static bool operator !=(GarbageCollection left, GarbageCollection right)
         {
             return !Equals(left, right);
         }
