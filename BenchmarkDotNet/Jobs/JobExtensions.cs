@@ -74,7 +74,7 @@ namespace BenchmarkDotNet.Jobs
             builder.Append($".WithWarmupCount({job.WarmupCount.Value})");
             builder.Append($".WithTargetCount({job.TargetCount.Value})");
             builder.Append($".WithIterationTime({job.IterationTime.Value})");
-            builder.Append($".WithLaunchCount({job.LaunchCount.Value})");
+            builder.Append($".With(new BenchmarkDotNet.Jobs.GC {{ Force = {job.GC.Force.ToString().ToLower()} }})");
             return builder.ToString();
         }
 

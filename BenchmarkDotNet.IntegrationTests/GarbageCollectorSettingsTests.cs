@@ -8,11 +8,11 @@ using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class GarbageCollectorModesTests
+    public class GarbageCollectorSettingsTests
     {
         private readonly ITestOutputHelper output;
 
-        public GarbageCollectorModesTests(ITestOutputHelper outputHelper)
+        public GarbageCollectorSettingsTests(ITestOutputHelper outputHelper)
         {
             output = outputHelper;
         }
@@ -51,6 +51,15 @@ namespace BenchmarkDotNet.IntegrationTests
                                      .With(Job.Dry.With(new Jobs.GC { Concurrent = false }));
 
             BenchmarkTestExecutor.CanExecute<ConcurrentModeDisabled>(config);
+        }
+
+        [Fact]
+        public void CanAvoidForcingGarbageCollections()
+        {
+            var config = ManualConfig.CreateEmpty()
+                                     .With(Job.Dry.With(new Jobs.GC { Force = false }));
+            
+            BenchmarkTestExecutor.CanExecute<AvoidForcingGarbageCollection>(config);
         }
     }
 
@@ -98,6 +107,29 @@ namespace BenchmarkDotNet.IntegrationTests
             if (GCSettings.LatencyMode != GCLatencyMode.Batch)
             {
                 throw new InvalidOperationException("Did not disable Concurrent GC mode");
+            }
+        }
+    }
+
+    public class AvoidForcingGarbageCollection
+    {
+        int initialCollectionCountGen1;
+        int initialCollectionCountGen2;
+
+        [Setup]
+        public void Setup()
+        {
+            initialCollectionCountGen1 = System.GC.CollectionCount(1);
+            initialCollectionCountGen2 = System.GC.CollectionCount(2);
+        }
+
+        [Benchmark]
+        public void Benchmark()
+        {
+            if (initialCollectionCountGen1 != System.GC.CollectionCount(1)
+                || initialCollectionCountGen2 != System.GC.CollectionCount(2))
+            {
+                throw new InvalidOperationException("Did not disable GC Force");
             }
         }
     }

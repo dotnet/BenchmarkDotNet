@@ -29,20 +29,29 @@ namespace BenchmarkDotNet.Jobs
         public bool CpuGroups { get; set; }
 
         /// <summary>
-        /// the default settings in .NET are "Concurrent = true, Server = false, CpuGroups = false"
+        /// Specifies whether the BenchmarkDotNet's benchmark runner forces full garbage collection after each benchmark invocation
+        /// <value>false: Does not force garbage collection.</value>
+        /// <value>true: Forces full garbage collection after each benchmark invocation. This is the default.</value>
         /// </summary>
-        public static GC Default => new GC { Concurrent = true };
+        public bool Force { get; set; } = true;
+
+        /// <summary>
+        /// the default settings in are "Concurrent = true, Server = false, CpuGroups = false, Force = true"
+        /// </summary>
+        public static GC Default => new GC { Concurrent = true, Force = true };
 
         public override string ToString()
         {
-            const string longestPossible = "Nonconcurrent Workstation CpuGroupsEnabled";
+            const string longestPossible = "Nonconcurrent Workstation CpuGroupsEnabled DontForce";
             var representation = new StringBuilder(longestPossible.Length);
 
             if (Concurrent) representation.Append("Concurrent");
             if (Concurrent == false) representation.Append("Nonconcurrent");
             if (Server) representation.Append(" Server");
             if (Server == false) representation.Append(" Workstation");
-            if(CpuGroups) representation.Append(" CpuGroupsEnabled");
+            if (CpuGroups) representation.Append(" CpuGroupsEnabled");
+            if (Force) representation.Append(" Force");
+            if (Force == false) representation.Append(" DontForce");
 
             return representation.ToString();
         }
@@ -57,7 +66,7 @@ namespace BenchmarkDotNet.Jobs
             {
                 return true;
             }
-            return Server == other.Server && Concurrent == other.Concurrent && CpuGroups == other.CpuGroups;
+            return Server == other.Server && Concurrent == other.Concurrent && CpuGroups == other.CpuGroups && Force == other.Force;
         }
 
         public override bool Equals(object obj)
@@ -80,6 +89,7 @@ namespace BenchmarkDotNet.Jobs
                 var hashCode = Server.GetHashCode();
                 hashCode = (hashCode * 397) ^ Concurrent.GetHashCode();
                 hashCode = (hashCode * 397) ^ CpuGroups.GetHashCode();
+                hashCode = (hashCode * 397) ^ Force.GetHashCode();
                 return hashCode;
             }
         }
