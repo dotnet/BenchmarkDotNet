@@ -61,6 +61,17 @@ namespace BenchmarkDotNet.IntegrationTests
             
             BenchmarkTestExecutor.CanExecute<AvoidForcingGarbageCollection>(config);
         }
+
+#if CLASSIC // not supported by project.json so far
+        [Fact]
+        public void CanAllowToCreateVeryLargeObjectsFor64Bit()
+        {
+            var config = ManualConfig.CreateEmpty()
+                                     .With(Job.Dry.With(Platform.X64).With(new GarbageCollection { AllowVeryLargeObjects = true }));
+
+            BenchmarkTestExecutor.CanExecute<CreateVeryLargeObjects>(config);
+        }
+#endif
     }
 
     public class ServerModeEnabled
@@ -131,6 +142,15 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 throw new InvalidOperationException("Did not disable GC Force");
             }
+        }
+    }
+
+    public class CreateVeryLargeObjects
+    {
+        [Benchmark]
+        public long[] Benchmark()
+        {
+            return new long[2147483648 / sizeof(long)]; // 2GB is the default limit
         }
     }
 

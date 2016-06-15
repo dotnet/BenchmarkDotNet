@@ -77,6 +77,7 @@ namespace BenchmarkDotNet.Toolchains
             CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcConcurrent", "enabled", garbageCollection.Concurrent.ToString().ToLower());
             CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcServer", "enabled", garbageCollection.Server.ToString().ToLower());
             CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCCpuGroup", "enabled", garbageCollection.CpuGroups.ToString().ToLower());
+            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcAllowVeryLargeObjects", "enabled", garbageCollection.AllowVeryLargeObjects.ToString().ToLower());
         }
 
         private static void CreateNodeWithAttribute(

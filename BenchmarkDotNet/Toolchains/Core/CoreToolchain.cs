@@ -48,6 +48,11 @@ namespace BenchmarkDotNet.Toolchains.Core
                 logger.WriteLineError($"Currently project.json does not support CpuGroups (app.config does), benchmark {benchmark.ShortInfo} will not be executed");
                 return false;
             }
+            if (benchmark.Job.GarbageCollection.AllowVeryLargeObjects)
+            {
+                logger.WriteLineError($"Currently project.json does not support gcAllowVeryLargeObjects (app.config does), benchmark {benchmark.ShortInfo} will not be executed");
+                return false;
+            }
 
             return true;
         }

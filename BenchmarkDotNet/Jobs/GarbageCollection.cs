@@ -36,13 +36,20 @@ namespace BenchmarkDotNet.Jobs
         public bool Force { get; set; } = true;
 
         /// <summary>
-        /// the default settings "Concurrent = true, Server = false, CpuGroups = false, Force = true"
+        /// On 64-bit platforms, enables arrays that are greater than 2 gigabytes (GB) in total size.
+        /// <value>false: Arrays greater than 2 GB in total size are not enabled. This is the default.</value>
+        /// <value>true: Arrays greater than 2 GB in total size are enabled on 64-bit platforms.</value>
+        /// </summary>
+        public bool AllowVeryLargeObjects { get; set; }
+
+        /// <summary>
+        /// the default settings "Concurrent = true, Server = false, CpuGroups = false, Force = true, AllowVeryLargeObjects = false"
         /// </summary>
         public static GarbageCollection Default => new GarbageCollection { Concurrent = true, Force = true };
 
         public override string ToString()
         {
-            const string longestPossible = "Non-concurrent Workstation CpuGroupsEnabled DontForce";
+            const string longestPossible = "Non-concurrent Workstation CpuGroupsEnabled DontForce AllowVeryLargeObjects";
             var representation = new StringBuilder(longestPossible.Length);
 
             if (Concurrent) representation.Append("Concurrent");
@@ -52,6 +59,7 @@ namespace BenchmarkDotNet.Jobs
             if (CpuGroups) representation.Append(" CpuGroupsEnabled");
             if (Force) representation.Append(" Force");
             if (Force == false) representation.Append(" DontForce");
+            if (AllowVeryLargeObjects) representation.Append(" AllowVeryLargeObjects");
 
             return representation.ToString();
         }
@@ -66,7 +74,11 @@ namespace BenchmarkDotNet.Jobs
             {
                 return true;
             }
-            return Server == other.Server && Concurrent == other.Concurrent && CpuGroups == other.CpuGroups && Force == other.Force;
+            return Server == other.Server 
+                && Concurrent == other.Concurrent 
+                && CpuGroups == other.CpuGroups 
+                && Force == other.Force
+                && AllowVeryLargeObjects == other.AllowVeryLargeObjects;
         }
 
         public override bool Equals(object obj)
@@ -90,6 +102,7 @@ namespace BenchmarkDotNet.Jobs
                 hashCode = (hashCode * 397) ^ Concurrent.GetHashCode();
                 hashCode = (hashCode * 397) ^ CpuGroups.GetHashCode();
                 hashCode = (hashCode * 397) ^ Force.GetHashCode();
+                hashCode = (hashCode * 397) ^ AllowVeryLargeObjects.GetHashCode();
                 return hashCode;
             }
         }
