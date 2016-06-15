@@ -60,6 +60,30 @@ namespace BenchmarkDotNet.Jobs
             return Server == other.Server && Concurrent == other.Concurrent && CpuGroups == other.CpuGroups;
         }
 
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            return obj is GC && Equals((GC)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = Server.GetHashCode();
+                hashCode = (hashCode * 397) ^ Concurrent.GetHashCode();
+                hashCode = (hashCode * 397) ^ CpuGroups.GetHashCode();
+                return hashCode;
+            }
+        }
+
         public static bool operator ==(GC left, GC right)
         {
             return Equals(left, right);
