@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Helpers
         {
             yield return "Benchmark Process Environment Information:";
             yield return $"CLR={ClrVersion}, Arch={Architecture} {Configuration}{GetDebuggerFlag()}{GetJitFlag()}";
-            yield return $"GC={GetGCMode()} {GetGCLatencyMode()}";
+            yield return $"GC={GetGCLatencyMode()} {GetGCMode()}";
         }
 
         protected string GetJitFlag() => HasRyuJit ? " [RyuJIT]" : "";
@@ -125,7 +125,7 @@ namespace BenchmarkDotNet.Helpers
             yield return $"Processor={ProcessorName.Value}, ProcessorCount={ProcessorCount}";
             yield return $"Frequency={ChronometerFrequency} ticks, Resolution={GetChronometerResolution().ToTimeStr()}, Timer={HardwareTimerKind.ToString().ToUpper()}";
             yield return $"CLR={ClrVersion}, Arch={Architecture} {Configuration}{GetDebuggerFlag()}{GetJitFlag()}";
-            yield return $"GC={GetGCMode()} {GetGCLatencyMode()}";
+            yield return $"GC={GetGCLatencyMode()} {GetGCMode()}";
             yield return $"JitModules={JitModules}";
 #if !CLASSIC
             yield return $"dotnet cli version: {DotNetCliVersion.Value}";
