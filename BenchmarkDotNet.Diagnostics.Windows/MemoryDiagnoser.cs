@@ -188,7 +188,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     var result = results[benchmark];
                     if (result.GenCounts[generation] == 0)
                         return "-"; // make zero more obvious
-                    return (result.GenCounts[generation] / (double)result.TotalOperations * opsPerGCCount).ToString("N2", EnvironmentInfo.MainCultureInfo);
+                    return (result.GenCounts[generation] / (double)result.TotalOperations * opsPerGCCount).ToString("N2", HostEnvironmentInfo.MainCultureInfo);
                 }
                 return "N/A";
             }

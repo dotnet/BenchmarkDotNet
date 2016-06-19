@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Toolchains.Dnx
 
         public override bool IsSupported(Benchmark benchmark, ILogger logger)
         {
-            if (!EnvironmentInfo.GetCurrent().IsDotNetCliInstalled())
+            if (!HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled())
             {
                 logger.WriteLineError($"BenchmarkDotNet requires dotnet cli toolchain to be installed, benchmark {benchmark.ShortInfo} will not be executed");
                 return false;

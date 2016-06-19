@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Toolchains
             }
 
             CreateNodeWithAttribute(xmlDocument, runtimeElement, "useLegacyJit", "enabled",
-                jit == Jit.RyuJit || (jit == Jit.Host && EnvironmentInfo.GetCurrent().HasRyuJit)
+                jit == Jit.RyuJit || (jit == Jit.Host && HostEnvironmentInfo.GetCurrent().HasRyuJit)
                     ? "0"
                     : "1");
         }

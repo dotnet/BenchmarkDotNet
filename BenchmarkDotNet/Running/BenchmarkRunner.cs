@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.Running
             var validationErrors = Validate(benchmarks, logger, config);
             if (validationErrors.Any(validationError => validationError.IsCritical))
             {
-                return Summary.CreateFailed(benchmarks, title, EnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), validationErrors);
+                return Summary.CreateFailed(benchmarks, title, HostEnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), validationErrors);
             }
 
             var globalChronometer = Chronometer.Start();
@@ -95,7 +95,7 @@ namespace BenchmarkDotNet.Running
             }
             var clockSpan = globalChronometer.Stop();
 
-            var summary = new Summary(title, reports, EnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), clockSpan.GetTimeSpan(), validationErrors);
+            var summary = new Summary(title, reports, HostEnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), clockSpan.GetTimeSpan(), validationErrors);
 
             logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
             logger.WriteLine();

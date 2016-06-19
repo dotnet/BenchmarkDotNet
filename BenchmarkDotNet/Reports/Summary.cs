@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Reports
         public Benchmark[] Benchmarks { get; }
         public BenchmarkReport[] Reports { get; }
         public TimeUnit TimeUnit { get; }
-        public EnvironmentInfo HostEnvironmentInfo { get; }
+        public HostEnvironmentInfo HostEnvironmentInfo { get; }
         public IConfig Config { get; }
         public string ResultsDirectoryPath { get; }
         public SummaryTable Table { get; }
@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Reports
 
         public bool HasCriticalValidationErrors => ValidationErrors.Any(validationError => validationError.IsCritical);
 
-        public Summary(string title, IList<BenchmarkReport> reports, EnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, ValidationError[] validationErrors)
+        public Summary(string title, IList<BenchmarkReport> reports, HostEnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, ValidationError[] validationErrors)
             : this(title, hostEnvironmentInfo, config, resultsDirectoryPath, totalTime, validationErrors)
         {
             Benchmarks = reports.Select(r => r.Benchmark).ToArray();
@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Reports
             Jobs = new Lazy<IJob[]>(() => Benchmarks.Select(b => b.Job).ToArray());
         }
 
-        private Summary(string title, EnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, ValidationError[] validationErrors, Benchmark[] benchmarks, BenchmarkReport[] reports)
+        private Summary(string title, HostEnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, ValidationError[] validationErrors, Benchmark[] benchmarks, BenchmarkReport[] reports)
             : this(title, hostEnvironmentInfo, config, resultsDirectoryPath, totalTime, validationErrors)
         {
             Benchmarks = benchmarks;
@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Reports
             Reports = reports;
         }
 
-        private Summary(string title, EnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, ValidationError[] validationErrors)
+        private Summary(string title, HostEnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, ValidationError[] validationErrors)
         {
             Title = title;
             HostEnvironmentInfo = hostEnvironmentInfo;
@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Reports
             ValidationErrors = validationErrors;
         }
 
-        internal static Summary CreateFailed(Benchmark[] benchmarks, string title, EnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, ValidationError[] validationErrors)
+        internal static Summary CreateFailed(Benchmark[] benchmarks, string title, HostEnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, ValidationError[] validationErrors)
         {
             return new Summary(title, hostEnvironmentInfo, config, resultsDirectoryPath, TimeSpan.Zero, validationErrors, benchmarks, new BenchmarkReport[0]);
         }

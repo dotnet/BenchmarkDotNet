@@ -27,13 +27,13 @@ namespace BenchmarkDotNet.Extensions
         {
             // Here we should manually create an object[] for string.Format
             // If we write something like
-            //     string.Format(EnvironmentInfo.MainCultureInfo, $"{{0:{format}}}", value)
+            //     string.Format(HostEnvironmentInfo.MainCultureInfo, $"{{0:{format}}}", value)
             // it will be resolved to:
             //     string.Format(System.IFormatProvider, string, params object[]) // .NET 4.5
             //     string.Format(System.IFormatProvider, string, object)          // .NET 4.6
             // Unfortunately, Mono doesn't have the second overload (with object instead of params object[]).            
             var args = new object[] { value };
-            return string.Format(EnvironmentInfo.MainCultureInfo, $"{{0:{format}}}", args);
+            return string.Format(HostEnvironmentInfo.MainCultureInfo, $"{{0:{format}}}", args);
         }
 
         public static bool IsNullOrEmpty<T>(this IList<T> value) => value == null || value.Count == 0;

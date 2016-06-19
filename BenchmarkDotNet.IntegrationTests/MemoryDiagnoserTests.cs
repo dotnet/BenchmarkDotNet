@@ -93,7 +93,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     listObjectEnumeratorBenchmark);
 
                 double gen0Value;
-                if (double.TryParse(gen0Str, NumberStyles.Number, EnvironmentInfo.MainCultureInfo, out gen0Value))
+                if (double.TryParse(gen0Str, NumberStyles.Number, HostEnvironmentInfo.MainCultureInfo, out gen0Value))
                     Assert.True(gen0Value > 0);
                 else
                 {

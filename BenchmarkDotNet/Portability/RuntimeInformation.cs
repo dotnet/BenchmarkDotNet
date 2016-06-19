@@ -20,6 +20,8 @@ namespace BenchmarkDotNet.Portability
 
         internal static string ScriptFileExtension => IsWindows() ? ".bat" : ".sh";
 
+        internal static string GetArchitecture() => IntPtr.Size == 4 ? "32-bit" : "64-bit";
+
         internal static bool IsWindows()
         {
 #if !CORE
