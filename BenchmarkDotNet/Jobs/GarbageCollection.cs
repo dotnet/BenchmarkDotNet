@@ -49,16 +49,15 @@ namespace BenchmarkDotNet.Jobs
 
         public override string ToString()
         {
-            const string longestPossible = "Non-concurrent Workstation CpuGroupsEnabled DontForce AllowVeryLargeObjects";
+            const string longestPossible = "DontForce Non-concurrent Workstation CpuGroupsEnabled AllowVeryLargeObjects";
             var representation = new StringBuilder(longestPossible.Length);
 
-            if (Concurrent) representation.Append("Concurrent");
-            if (Concurrent == false) representation.Append("Non-concurrent");
-            if (Server) representation.Append(" Server");
-            if (Server == false) representation.Append(" Workstation");
+            if (Force == false) representation.Append("DontForce ");
+            if (Concurrent) representation.Append("Concurrent ");
+            if (Concurrent == false) representation.Append("Non-concurrent ");
+            if (Server) representation.Append("Server");
+            if (Server == false) representation.Append("Workstation");
             if (CpuGroups) representation.Append(" CpuGroupsEnabled");
-            if (Force) representation.Append(" Force");
-            if (Force == false) representation.Append(" DontForce");
             if (AllowVeryLargeObjects) representation.Append(" AllowVeryLargeObjects");
 
             return representation.ToString();

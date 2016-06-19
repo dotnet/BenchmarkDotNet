@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Runtime;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Running;
@@ -27,12 +28,18 @@ namespace BenchmarkDotNet.Helpers
 
         public bool HasRyuJit { get; }
 
+        public bool IsServerGC { get; }
+
+        public bool IsConcurrentGC { get; }
+
         protected BenchmarkEnvironmentInfo()
         {
             Architecture = RuntimeInformation.GetArchitecture();
             ClrVersion = RuntimeInformation.GetClrVersion();
             Configuration = RuntimeInformation.GetConfiguration();
             HasRyuJit = RuntimeInformation.HasRyuJit();
+            IsServerGC = GCSettings.IsServerGC;
+            IsConcurrentGC = GCSettings.LatencyMode != GCLatencyMode.Batch;
         }
 
         public static BenchmarkEnvironmentInfo GetCurrent() => new BenchmarkEnvironmentInfo();
@@ -42,11 +49,16 @@ namespace BenchmarkDotNet.Helpers
         {
             yield return "Benchmark Process Environment Information:";
             yield return $"CLR={ClrVersion}, Arch={Architecture} {Configuration}{GetDebuggerFlag()}{GetJitFlag()}";
+            yield return $"GC={GetGCMode()} {GetGCLatencyMode()}";
         }
 
         protected string GetJitFlag() => HasRyuJit ? " [RyuJIT]" : "";
 
         protected string GetDebuggerFlag() => HasAttachedDebugger ? " [AttachedDebugger]" : "";
+
+        protected string GetGCMode() => IsServerGC ? "Server" : "Workstation";
+
+        protected string GetGCLatencyMode() => IsConcurrentGC ? "Concurrent" : "Non-concurrent";
     }
 
     public sealed class HostEnvironmentInfo : BenchmarkEnvironmentInfo
@@ -113,6 +125,7 @@ namespace BenchmarkDotNet.Helpers
             yield return $"Processor={ProcessorName.Value}, ProcessorCount={ProcessorCount}";
             yield return $"Frequency={ChronometerFrequency} ticks, Resolution={GetChronometerResolution().ToTimeStr()}, Timer={HardwareTimerKind.ToString().ToUpper()}";
             yield return $"CLR={ClrVersion}, Arch={Architecture} {Configuration}{GetDebuggerFlag()}{GetJitFlag()}";
+            yield return $"GC={GetGCMode()} {GetGCLatencyMode()}";
             yield return $"JitModules={JitModules}";
 #if !CLASSIC
             yield return $"dotnet cli version: {DotNetCliVersion.Value}";
