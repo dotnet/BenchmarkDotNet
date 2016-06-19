@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Threading;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -18,70 +15,80 @@ namespace BenchmarkDotNet.Toolchains
 {
     internal abstract class GeneratorBase : IGenerator
     {
-        protected const string ShortFolderName = "BDN.Auto";
-
-        protected const string ProgramFileName = "Program.notcs";
-
-        internal static string BuildBenchmarkScriptFileName => "BuildBenchmark" + RuntimeInformation.ScriptFileExtension;
-
         public GenerateResult GenerateProject(Benchmark benchmark, ILogger logger, string rootArtifactsFolderPath, IConfig config)
         {
-            var result = CreateProjectDirectory(benchmark, rootArtifactsFolderPath, config);
-
-            CopyAllRequiredFiles(rootArtifactsFolderPath, result.DirectoryPath, benchmark);
-
-            GenerateProgramFile(result.DirectoryPath, benchmark);
-            GenerateProjectFile(logger, result.DirectoryPath, benchmark);
-
-            var appConfigPath = GenerateAppConfigFile(result.DirectoryPath, benchmark, config);
-            GenerateProjectBuildFile(Path.Combine(result.DirectoryPath, BuildBenchmarkScriptFileName), benchmark, rootArtifactsFolderPath, appConfigPath);
-
-            return result;
-        }
-
-        protected virtual void CopyAllRequiredFiles(string rootArtifactsFolderPath, string binariesDirectoryPath, Benchmark benchmark) { }
-
-        protected abstract string GetBinariesDirectoryPath(Benchmark benchmark, string rootArtifactsFolderPath, IConfig config);
-
-        protected virtual void GenerateProjectFile(ILogger logger, string projectDir, Benchmark benchmark) { }
-
-        protected abstract void GenerateProjectBuildFile(string scriptFilePath, Benchmark benchmark, string rootArtifactsFolderPath, string appConfigPath);
-
-        protected virtual string GetProgramName(Benchmark benchmark, IConfig config) => "Program";
-
-        private GenerateResult CreateProjectDirectory(Benchmark benchmark, string rootArtifactsFolderPath, IConfig config)
-        {
-            var directoryPath = GetBinariesDirectoryPath(benchmark, rootArtifactsFolderPath, config);
-            bool exist = Directory.Exists(directoryPath);
-            Exception deleteException = null;
-            for (int attempt = 0; attempt < 3 && exist; attempt++)
+            ArtifactsPaths artifactsPaths = null;
+            try
             {
-                if (attempt != 0)
-                    Thread.Sleep(500); // Previous benchmark run didn't release some files
-                try
-                {
-                    Directory.Delete(directoryPath, true);
-                    exist = Directory.Exists(directoryPath);
-                }
-                catch (DirectoryNotFoundException)
-                {
-                    exist = false;
-                    break;
-                }
-                catch (Exception e)
-                {
-                    // Can't delete the directory =(
-                    deleteException = e;
-                }
+                artifactsPaths = GetArtifactsPaths(benchmark, config, rootArtifactsFolderPath);
+
+                Cleanup(artifactsPaths);
+
+                CopyAllRequiredFiles(artifactsPaths);
+
+                GenerateCode(benchmark, artifactsPaths);
+                GenerateAppConfig(benchmark, artifactsPaths);
+                GenerateProject(benchmark, artifactsPaths);
+                GenerateBuildScript(benchmark, artifactsPaths);
+
+                return GenerateResult.Success(artifactsPaths);
             }
-            if (exist)
-                return new GenerateResult(directoryPath, false, deleteException);
-            if (!Directory.Exists(directoryPath))
-                Directory.CreateDirectory(directoryPath);
-            return new GenerateResult(directoryPath, true, null);
+            catch (Exception ex)
+            {
+                return GenerateResult.Failure(artifactsPaths, ex);
+            }
         }
 
-        private void GenerateProgramFile(string projectDir, Benchmark benchmark)
+        protected abstract string GetBuildArtifactsDirectoryPath(Benchmark benchmark, string programName);
+
+        protected virtual string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath) => buildArtifactsDirectoryPath;
+
+        protected virtual string GetCompilerPath(string rootArtifactsFolderPath) => string.Empty;
+
+        protected virtual string GetProjectFilePath(string binariesDirectoryPath) => string.Empty;
+
+        protected abstract void Cleanup(ArtifactsPaths artifactsPaths);
+
+        protected abstract void CopyAllRequiredFiles(ArtifactsPaths artifactsPaths);
+
+        protected virtual void GenerateProject(Benchmark benchmark, ArtifactsPaths artifactsPaths) { }
+
+        protected abstract void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths);
+
+        private ArtifactsPaths GetArtifactsPaths(Benchmark benchmark, IConfig config, string rootArtifactsFolderPath)
+        {
+            // its not ".cs" in order to avoid VS from displaying and compiling it with xprojs
+            const string codeFileExtension = ".notcs";
+
+            var programName = GetProgramName(benchmark, config);
+            var buildArtifactsDirectoryPath = GetBuildArtifactsDirectoryPath(benchmark, programName);
+            var binariesDirectoryPath = GetBinariesDirectoryPath(buildArtifactsDirectoryPath);
+            var executablePath = Path.Combine(binariesDirectoryPath, $"{programName}{RuntimeInformation.ExecutableExtension}");
+
+            return new ArtifactsPaths(
+                cleanup: Cleanup,
+                rootArtifactsFolderPath: rootArtifactsFolderPath,
+                buildArtifactsDirectoryPath: buildArtifactsDirectoryPath,
+                binariesDirectoryPath: binariesDirectoryPath,
+                programCodePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{codeFileExtension}"),
+                appConfigPath: $"{executablePath}.config",
+                projectFilePath: GetProjectFilePath(buildArtifactsDirectoryPath),
+                buildScriptFilePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{RuntimeInformation.ScriptFileExtension}"),
+                executablePath: executablePath,
+                compilerPath: GetCompilerPath(rootArtifactsFolderPath));
+        }
+
+        /// <summary>
+        /// when config is set to KeepBenchmarkFiles we use benchmark.ShortInfo as name,
+        /// otherwise (default) "BDN.Auto", mostly to prevent PathTooLongException
+        /// </summary>
+        private string GetProgramName(Benchmark benchmark, IConfig config)
+        {
+            const string shortName = "BDN.Auto";
+            return config.KeepBenchmarkFiles ? benchmark.ShortInfo : shortName;
+        }
+
+        private void GenerateCode(Benchmark benchmark, ArtifactsPaths artifactsPaths)
         {
             var target = benchmark.Target;
             var isVoid = target.Method.ReturnType == typeof(void);
@@ -155,25 +162,21 @@ namespace BenchmarkDotNet.Toolchains
                 Replace("$TargetBenchmarkTaskArguments$", targetBenchmarkTaskArguments).
                 Replace("$ParamsContent$", paramsContent);
 
-            File.WriteAllText(Path.Combine(projectDir, ProgramFileName), content);
+            File.WriteAllText(artifactsPaths.ProgramCodePath, content);
         }
 
-        private string GenerateAppConfigFile(string projectDir, Benchmark benchmark, IConfig config)
+        private void GenerateAppConfig(Benchmark benchmark, ArtifactsPaths artifactsPaths)
         {
 #if !RC1
             var sourcePath = benchmark.Target.Type.Assembly().Location + ".config";
 #else
-            var sourcePath = Process.GetCurrentProcess().MainModule.FileName + ".config";
+            var sourcePath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName + ".config";
 #endif
-            var destinationPath = Path.Combine(projectDir, $"{GetProgramName(benchmark, config)}.exe.config");
-
             using (var source = File.Exists(sourcePath) ? new StreamReader(File.OpenRead(sourcePath)) : TextReader.Null)
-            using (var destination = new System.IO.StreamWriter(File.Create(destinationPath), System.Text.Encoding.UTF8))
+            using (var destination = new System.IO.StreamWriter(File.Create(artifactsPaths.AppConfigPath), System.Text.Encoding.UTF8))
             {
                 AppConfigGenerator.Generate(benchmark.Job, source, destination);
             }
-
-            return destinationPath;
         }
 
         private string GetParameterValue(object value)

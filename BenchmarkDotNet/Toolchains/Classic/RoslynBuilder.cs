@@ -14,34 +14,32 @@ namespace BenchmarkDotNet.Toolchains.Classic
     {
         public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark)
         {
-            var buildScriptName = GeneratorBase.BuildBenchmarkScriptFileName;
-            var buildScriptPath = Path.Combine(generateResult.DirectoryPath, buildScriptName);
-            logger.WriteLineInfo("BuildScript: " + buildScriptPath);
-            var exeFilePath = Path.Combine(generateResult.DirectoryPath, "Program.exe");
+            logger.WriteLineInfo($"BuildScript: {generateResult.ArtifactsPaths.BuildScriptFilePath}");
+
             var buildProcess = new Process
             {
                 StartInfo =
                 {
-                    WorkingDirectory = generateResult.DirectoryPath,
+                    WorkingDirectory = generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath,
                     UseShellExecute = false,
                     RedirectStandardOutput = true
                 }
             };
             if (RuntimeInformation.IsWindows())
             {
-                buildProcess.StartInfo.FileName = buildScriptPath;
+                buildProcess.StartInfo.FileName = generateResult.ArtifactsPaths.BuildScriptFilePath;
             }
             else
             {
                 buildProcess.StartInfo.FileName = "/bin/sh";
-                buildProcess.StartInfo.Arguments = buildScriptPath;
+                buildProcess.StartInfo.Arguments = generateResult.ArtifactsPaths.BuildScriptFilePath;
             }
             buildProcess.Start();
             var output = buildProcess.StandardOutput.ReadToEnd();
             buildProcess.WaitForExit();
             logger.WriteLineInfo(output);
 
-            return new BuildResult(generateResult, File.Exists(exeFilePath), null, exeFilePath);
+            return new BuildResult(generateResult, File.Exists(generateResult.ArtifactsPaths.ExecutablePath), null);
         }
     }
 }

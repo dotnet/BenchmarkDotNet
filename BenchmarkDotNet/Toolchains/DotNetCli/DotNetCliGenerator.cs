@@ -2,10 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using BenchmarkDotNet.Configs;
+using System.Threading;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 
@@ -13,8 +12,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     internal class DotNetCliGenerator : GeneratorBase
     {
-        private const string ProjectFileName = "project.json";
-
         private Func<Framework, string> TargetFrameworkMonikerProvider { get; }
 
         private string ExtraDependencies { get; }
@@ -26,9 +23,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         private string Runtime { get; }
 
         public DotNetCliGenerator(
-            Func<Framework, string> targetFrameworkMonikerProvider, 
-            string extraDependencies, 
-            Func<Platform, string> platformProvider, 
+            Func<Framework, string> targetFrameworkMonikerProvider,
+            string extraDependencies,
+            Func<Platform, string> platformProvider,
             string imports,
             string runtime = null)
         {
@@ -44,15 +41,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// we are limited by xprojs (by default compiles all .cs files in all subfolders, Program.cs could be doubled and fail the build)
         /// and also by nuget internal implementation like looking for global.json file in parent folders
         /// </summary>
-        protected override string GetBinariesDirectoryPath(Benchmark benchmark, string rootArtifactsFolderPath, IConfig config)
+        protected override string GetBuildArtifactsDirectoryPath(Benchmark benchmark, string programName)
         {
             var directoryInfo = new DirectoryInfo(Directory.GetCurrentDirectory());
             while (directoryInfo != null)
             {
                 if (IsRootSolutionFolder(directoryInfo))
                 {
-                    return Path.Combine(directoryInfo.FullName, 
-                        config.KeepBenchmarkFiles ? benchmark.ShortInfo : ShortFolderName);
+                    return Path.Combine(directoryInfo.FullName, programName);
                 }
 
                 directoryInfo = directoryInfo.Parent;
@@ -60,15 +56,58 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             // we did not find global.json or any Visual Studio solution file? 
             // let's return it in the old way and hope that it works ;)
-            return Path.Combine(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.FullName,
-                config.KeepBenchmarkFiles ? benchmark.ShortInfo : ShortFolderName);
+            return Path.Combine(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.FullName, programName);
         }
 
-        protected override void GenerateProjectFile(ILogger logger, string projectDir, Benchmark benchmark)
+        /// <summary>
+        /// we use custom output path in order to avoid any future problems related to dotnet cli ArtifactsPaths changes
+        /// </summary>
+        protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath)
+            => Path.Combine(buildArtifactsDirectoryPath, DotNetCliBuilder.OutputDirectory);
+
+        protected override string GetProjectFilePath(string binariesDirectoryPath)
+            => Path.Combine(binariesDirectoryPath, "project.json");
+
+        protected override void Cleanup(ArtifactsPaths artifactsPaths)
+        {
+            if (!Directory.Exists(artifactsPaths.BuildArtifactsDirectoryPath))
+            {
+                return;
+            }
+
+            int attempt = 0;
+            while (true)
+            {
+                try
+                {
+                    Directory.Delete(artifactsPaths.BuildArtifactsDirectoryPath, recursive: true);
+                    return;
+                }
+                catch (DirectoryNotFoundException) // it's crazy but it happens ;)
+                {
+                    return;
+                }
+                catch (Exception) when (attempt++ < 3)
+                {
+                    Thread.Sleep(TimeSpan.FromMilliseconds(500)); // Previous benchmark run didn't release some files
+                }
+            }
+        }
+
+        protected override void CopyAllRequiredFiles(ArtifactsPaths artifactsPaths)
+        {
+            if (!Directory.Exists(artifactsPaths.BinariesDirectoryPath))
+            {
+                Directory.CreateDirectory(artifactsPaths.BinariesDirectoryPath);
+            }   
+        }
+
+        protected override void GenerateProject(Benchmark benchmark, ArtifactsPaths artifactsPaths)
         {
             var template = ResourceHelper.LoadTemplate("BenchmarkProject.json");
 
             var content = SetPlatform(template, PlatformProvider(benchmark.Job.Platform));
+            content = SetCodeFileName(content, Path.GetFileName(artifactsPaths.ProgramCodePath));
             content = SetDependencyToExecutingAssembly(content, benchmark.Target.Type);
             content = SetTargetFrameworkMoniker(content, TargetFrameworkMonikerProvider(benchmark.Job.Framework));
             content = SetExtraDependencies(content, ExtraDependencies);
@@ -76,57 +115,40 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             content = SetRuntime(content, Runtime);
             content = SetGarbageCollectionSettings(content, benchmark.Job.GarbageCollection);
 
-            var projectJsonFilePath = Path.Combine(projectDir, ProjectFileName);
-
-            File.WriteAllText(projectJsonFilePath, content);
+            File.WriteAllText(artifactsPaths.ProjectFilePath, content);
         }
 
-        protected override void GenerateProjectBuildFile(string scriptFilePath, Benchmark benchmark, string rootArtifactsFolderPath, string appConfigPath)
+        protected override void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths)
         {
             var content = $"call dotnet {DotNetCliBuilder.RestoreCommand}{Environment.NewLine}" +
                           $"call dotnet {DotNetCliBuilder.GetBuildCommand(TargetFrameworkMonikerProvider(benchmark.Job.Framework))}";
 
-            File.WriteAllText(scriptFilePath, content);
+            File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
         }
 
-        protected override string GetProgramName(Benchmark benchmark, IConfig config) => config.KeepBenchmarkFiles ? benchmark.ShortInfo : ShortFolderName;
+        private string SetPlatform(string template, string platform) => template.Replace("$PLATFORM$", platform);
 
-        private static string SetPlatform(string template, string platform)
-        {
-            return template.Replace("$PLATFORM$", platform);
-        }
+        private string SetCodeFileName(string template, string codeFileName) => template.Replace("$CODEFILENAME$", codeFileName);
 
-        private static string SetDependencyToExecutingAssembly(string template, Type benchmarkTarget)
+        private string SetDependencyToExecutingAssembly(string template, Type benchmarkTarget)
         {
             var assemblyName = benchmarkTarget.Assembly().GetName();
             var packageVersion = GetPackageVersion(assemblyName);
 
             return template
-                .Replace("$EXECUTINGASSEMBLYVERSION$", packageVersion) 
+                .Replace("$EXECUTINGASSEMBLYVERSION$", packageVersion)
                 .Replace("$EXECUTINGASSEMBLY$", assemblyName.Name);
         }
 
-        private static string SetTargetFrameworkMoniker(string content, string targetFrameworkMoniker)
-        {
-            return content.Replace("$TFM$", targetFrameworkMoniker);
-        }
+        private string SetTargetFrameworkMoniker(string content, string targetFrameworkMoniker) => content.Replace("$TFM$", targetFrameworkMoniker);
 
-        private static string SetExtraDependencies(string content, string extraDependencies)
-        {
-            return content.Replace("$REQUIREDDEPENDENCY$", extraDependencies);
-        }
+        private string SetExtraDependencies(string content, string extraDependencies) => content.Replace("$REQUIREDDEPENDENCY$", extraDependencies);
 
-        private static string SetImports(string content, string imports)
-        {
-            return content.Replace("$IMPORTS$", imports);
-        }
+        private string SetImports(string content, string imports) => content.Replace("$IMPORTS$", imports);
 
-        private static string SetRuntime(string content, string runtime)
-        {
-            return content.Replace("$RUNTIME$", runtime);
-        }
+        private string SetRuntime(string content, string runtime) => content.Replace("$RUNTIME$", runtime);
 
-        private static string SetGarbageCollectionSettings(string content, GarbageCollection garbageCollection)
+        private string SetGarbageCollectionSettings(string content, GarbageCollection garbageCollection)
         {
             if (garbageCollection == null || garbageCollection == GarbageCollection.Default)
             {

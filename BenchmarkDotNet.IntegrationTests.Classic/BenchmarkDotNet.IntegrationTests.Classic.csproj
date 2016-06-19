@@ -73,6 +73,7 @@
     <Compile Include="AssemblyConfigAttribute.cs" />
     <Compile Include="AssemblyConfigTests.cs" />
     <Compile Include="BenchmarkTestRunner.cs" />
+    <Compile Include="CopyToOutputTests.cs" />
     <Compile Include="JitOptimizationsTests.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ReferencesTests.cs" />

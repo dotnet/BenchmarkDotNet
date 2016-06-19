@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
 
         public ExecuteResult Execute(BuildResult buildResult, Benchmark benchmark, ILogger logger, IDiagnoser compositeDiagnoser = null)
         {
-            var exePath = buildResult.ExecutablePath;
+            var exePath = buildResult.ArtifactsPaths.ExecutablePath;
             var args = string.Empty;
 
             if (!File.Exists(exePath))

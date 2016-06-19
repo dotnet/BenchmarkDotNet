@@ -194,7 +194,10 @@ namespace BenchmarkDotNet.Running
             }
             finally
             {
-                Cleanup(generateResult.DirectoryPath, config);
+                if (!config.KeepBenchmarkFiles)
+                {
+                    generateResult.ArtifactsPaths?.RemoveBenchmarkFiles();
+                }
             }
         }
 
@@ -205,7 +208,7 @@ namespace BenchmarkDotNet.Running
             if (generateResult.IsGenerateSuccess)
             {
                 logger.WriteLineInfo("// Result = Success");
-                logger.WriteLineInfo($"// {nameof(generateResult.DirectoryPath)} = {generateResult.DirectoryPath}");
+                logger.WriteLineInfo($"// {nameof(generateResult.ArtifactsPaths.BinariesDirectoryPath)} = {generateResult.ArtifactsPaths?.BinariesDirectoryPath}");
             }
             else
             {
@@ -292,21 +295,6 @@ namespace BenchmarkDotNet.Running
             }
 
             return executeResults;
-        }
-
-        private static void Cleanup(string directoryPath, IConfig config)
-        {
-            if (!config.KeepBenchmarkFiles && Directory.Exists(directoryPath))
-            {
-                try
-                { 
-                    Directory.Delete(directoryPath, recursive: true);
-                }
-                catch
-                {
-                    // we have to continue anyway
-                }
-            }
         }
 
         private static Benchmark[] GetSupportedBenchmarks(IList<Benchmark> benchmarks, CompositeLogger logger)
