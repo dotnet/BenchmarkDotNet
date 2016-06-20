@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.Toolchains
         private string GetProgramName(Benchmark benchmark, IConfig config)
         {
             const string shortName = "BDN.Auto";
-            return config.KeepBenchmarkFiles ? benchmark.ShortInfo : shortName;
+            return config.KeepBenchmarkFiles ? benchmark.ShortInfo.Replace(' ', '_') : shortName;
         }
 
         private void GenerateCode(Benchmark benchmark, ArtifactsPaths artifactsPaths)
