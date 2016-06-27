@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     public class DotNetCliBuilder : IBuilder
     {
-        internal const string RestoreCommand = "restore --fallbacksource https://dotnet.myget.org/F/dotnet-core/api/v3/index.json";
+        internal const string RestoreCommand = "restore";
 
         private const string Configuration = "Release";
 

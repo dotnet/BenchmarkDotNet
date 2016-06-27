@@ -167,11 +167,8 @@ namespace BenchmarkDotNet.Toolchains
 
         private void GenerateAppConfig(Benchmark benchmark, ArtifactsPaths artifactsPaths)
         {
-#if !RC1
             var sourcePath = benchmark.Target.Type.Assembly().Location + ".config";
-#else
-            var sourcePath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName + ".config";
-#endif
+
             using (var source = File.Exists(sourcePath) ? new StreamReader(File.OpenRead(sourcePath)) : TextReader.Null)
             using (var destination = new System.IO.StreamWriter(File.Create(artifactsPaths.AppConfigPath), System.Text.Encoding.UTF8))
             {

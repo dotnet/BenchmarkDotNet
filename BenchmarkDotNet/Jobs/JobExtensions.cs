@@ -117,8 +117,6 @@ namespace BenchmarkDotNet.Jobs
                 shortInfo = "Mono";
             if (job.Equals(Job.Clr))
                 shortInfo = "Clr";
-            if (job.Equals(Job.Dnx))
-                shortInfo = "Dnx";
             if (job.Equals(Job.Core))
                 shortInfo = "Core";
             if (job.Equals(Job.ConcurrentServerGC))

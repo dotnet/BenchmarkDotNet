@@ -65,7 +65,6 @@ namespace BenchmarkDotNet.IntegrationTests
             var summary = BenchmarkRunner
                 .Run(benchmarks,
                     ManualConfig.CreateEmpty()
-                        .With(Job.Dry.With(Runtime.Dnx).With(Jit.Host).With(Mode.Throughput).WithWarmupCount(1).WithTargetCount(1))
                         .With(Job.Dry.With(Runtime.Core).With(Jit.Host).With(Mode.Throughput).WithWarmupCount(1).WithTargetCount(1))
                         .With(DefaultConfig.Instance.GetLoggers().ToArray())
                         .With(DefaultConfig.Instance.GetColumns().ToArray())

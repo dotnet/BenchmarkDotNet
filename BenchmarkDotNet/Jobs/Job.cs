@@ -13,7 +13,6 @@ namespace BenchmarkDotNet.Jobs
         public static readonly IJob[] AllJits = { LegacyJitX86, LegacyJitX64, RyuJitX64 };
         public static readonly IJob Clr = new Job { Runtime = Runtime.Clr };
         public static readonly IJob Mono = new Job { Runtime = Runtime.Mono };
-        public static readonly IJob Dnx = new Job { Runtime = Runtime.Dnx };
         public static readonly IJob Core = new Job { Runtime = Runtime.Core };
         public static readonly IJob LongRun = new Job { LaunchCount = 3, WarmupCount = 30, TargetCount = 1000 };
         public static readonly IJob ConcurrentServerGC = new Job { GarbageCollection = new GarbageCollection { Server = true, Concurrent = true} };

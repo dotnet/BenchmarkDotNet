@@ -11,10 +11,10 @@
     }
   },
   "dependencies": {
-    "Microsoft.FSharp.Core.netcore": "1.0.0-alpha-160316",
+    "Microsoft.FSharp.Core.netcore": "1.0.0-*",
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.0-rc2-3002702"
+      "version": "1.0.0"
     },
     "BenchmarkDotNet": {
       "target": "project",
@@ -32,7 +32,7 @@
     }
   },
   "frameworks": {
-    "netstandard1.5": {
+    "netcoreapp1.0": {
       "imports": [
         "portable-net45+win8",
         "dnxcore50"
