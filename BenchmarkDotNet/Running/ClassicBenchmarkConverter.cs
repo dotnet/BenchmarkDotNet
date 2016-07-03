@@ -13,6 +13,7 @@ namespace BenchmarkDotNet.Running
     {
         public static Benchmark[] UrlToBenchmarks(string url, IConfig config = null)
         {
+            url = GetRawUrl(url);
             string benchmarkContent;
             try
             {
@@ -55,6 +56,15 @@ namespace BenchmarkDotNet.Running
                     new Target(target.Type, target.Method, target.SetupMethod, target.MethodTitle, benchmarkContent, target.Baseline, target.OperationsPerInvoke),
                     benchmark.Job,
                     benchmark.Parameters)).ToArray();
+        }
+
+        private static string GetRawUrl(string url)
+        {
+            if (url.StartsWith("https://gist.github.com/") && !(url.EndsWith("/raw") || url.EndsWith("/raw/")))
+                return url.TrimEnd('/') + "/raw";
+            if (url.StartsWith("https://github.com/") && url.Contains("/blob/"))
+                return url.Replace("https://github.com/", "https://raw.githubusercontent.com/").Replace("/blob/", "/");
+            return url;
         }
     }
 }
