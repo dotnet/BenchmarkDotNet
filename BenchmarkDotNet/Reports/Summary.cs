@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
@@ -24,11 +25,16 @@ namespace BenchmarkDotNet.Reports
         public TimeSpan TotalTime { get; }
         public ValidationError[] ValidationErrors { get; }
 
-        private Dictionary<IJob, string> ShortInfos { get; }
-        private Lazy<IJob[]> Jobs { get; }
-        private IDictionary<Benchmark, BenchmarkReport> reportMap { get; }
+        private readonly Dictionary<IJob, string> shortInfos;
+        private readonly Lazy<IJob[]> jobs;
+        private readonly IDictionary<Benchmark, BenchmarkReport> reportMap = new Dictionary<Benchmark, BenchmarkReport>();
 
-        public BenchmarkReport this[Benchmark benchmark] => reportMap[benchmark];
+        public bool HasReport(Benchmark benchmark) => reportMap.ContainsKey(benchmark);
+
+        /// <summary>
+        /// Returns a report for the given benchmark or null if there is no a corresponded report.
+        /// </summary>        
+        public BenchmarkReport this[Benchmark benchmark] => reportMap.GetValueOrDefault(benchmark);
 
         public bool HasCriticalValidationErrors => ValidationErrors.Any(validationError => validationError.IsCritical);
 
@@ -36,7 +42,6 @@ namespace BenchmarkDotNet.Reports
             : this(title, hostEnvironmentInfo, config, resultsDirectoryPath, totalTime, validationErrors)
         {
             Benchmarks = reports.Select(r => r.Benchmark).ToArray();
-            reportMap = new Dictionary<Benchmark, BenchmarkReport>();
             foreach (var report in reports)
                 reportMap[report.Benchmark] = report;
             Reports = Benchmarks.Select(b => reportMap[b]).ToArray();
@@ -47,8 +52,8 @@ namespace BenchmarkDotNet.Reports
 
             TimeUnit = TimeUnit.GetBestTimeUnit(reports.Where(r => r.ResultStatistics != null).Select(r => r.ResultStatistics.Mean).ToArray());
             Table = new SummaryTable(this);
-            ShortInfos = new Dictionary<IJob, string>();
-            Jobs = new Lazy<IJob[]>(() => Benchmarks.Select(b => b.Job).ToArray());
+            shortInfos = new Dictionary<IJob, string>();
+            jobs = new Lazy<IJob[]>(() => Benchmarks.Select(b => b.Job).ToArray());
         }
 
         private Summary(string title, EnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, ValidationError[] validationErrors, Benchmark[] benchmarks, BenchmarkReport[] reports)
@@ -77,8 +82,8 @@ namespace BenchmarkDotNet.Reports
         internal string GetJobShortInfo(IJob job)
         {
             string result;
-            if (!ShortInfos.TryGetValue(job, out result))
-                ShortInfos[job] = result = job.GetShortInfo(Jobs.Value);
+            if (!shortInfos.TryGetValue(job, out result))
+                shortInfos[job] = result = job.GetShortInfo(jobs.Value);
 
             return result;
         }
