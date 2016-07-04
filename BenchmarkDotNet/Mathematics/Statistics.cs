@@ -20,6 +20,7 @@ namespace BenchmarkDotNet.Mathematics
         public double InterquartileRange { get; }
         public double[] Outliers { get; }
         public double StandardError { get; }
+        public double Variance { get; }
         public double StandardDeviation { get; }
         public ConfidenceInterval ConfidenceInterval { get; }
         public PercentileValues Percentiles { get; }
@@ -64,7 +65,8 @@ namespace BenchmarkDotNet.Mathematics
 
             Outliers = list.Where(IsOutlier).ToArray();
 
-            StandardDeviation = N == 1 ? 0 : Math.Sqrt(list.Sum(d => Math.Pow(d - Mean, 2)) / (N - 1));
+            Variance = N == 1 ? 0 : list.Sum(d => Math.Pow(d - Mean, 2)) / (N - 1);
+            StandardDeviation = Math.Sqrt(Variance);
             StandardError = StandardDeviation / Math.Sqrt(N);
             ConfidenceInterval = new ConfidenceInterval(Mean, StandardError);
             Percentiles = new PercentileValues(list);

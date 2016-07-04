@@ -47,5 +47,7 @@ namespace BenchmarkDotNet.Extensions
             TValue value;
             return dictionary.TryGetValue(key, out value) ? value : default(TValue);
         }
+
+        public static double Sqr(this double x) => x * x;
     }
 }
