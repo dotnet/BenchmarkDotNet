@@ -11,10 +11,10 @@
     }
   },
   "dependencies": {
-    "Microsoft.FSharp.Core.netcore": "1.0.0-alpha-160316",
+    "Microsoft.FSharp.Core.netcore": "1.0.0-*",
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.0-rc2-3002702"
+      "version": "1.0.0"
     },
     "BenchmarkDotNet": {
       "target": "project",
@@ -23,19 +23,21 @@
   },
   "tools": {
     "dotnet-compile-fsc": {
-      "version": "1.0.0-*",
+      "version": "1.0.0-preview2-020000",
       "imports": [
         "dnxcore50",
         "portable-net45+win81",
-        "netstandard1.3"
+        "netstandard1.3",
+        "netstandard1.6"
       ]
     }
   },
   "frameworks": {
-    "netstandard1.5": {
+    "netcoreapp1.0": {
       "imports": [
         "portable-net45+win8",
-        "dnxcore50"
+        "dnxcore50",
+        "netstandard1.6"
       ]
     }
   }

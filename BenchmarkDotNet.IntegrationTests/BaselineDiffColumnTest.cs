@@ -194,7 +194,7 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Equal(columns[3].ColumnName, headerRow[headerRow.Length - 1]);
 
             var testNameColumn = Array.FindIndex(headerRow, c => c == "Method");
-            var parseCulture = EnvironmentInfo.MainCultureInfo;
+            var parseCulture = HostEnvironmentInfo.MainCultureInfo;
             foreach (var row in table.FullContent)
             {
                 Assert.Equal(row.Length, headerRow.Length);

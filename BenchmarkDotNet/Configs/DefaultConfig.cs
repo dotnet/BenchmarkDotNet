@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -11,7 +10,6 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Configs
@@ -34,6 +32,7 @@ namespace BenchmarkDotNet.Configs
             yield return PropertyColumn.Framework;
             yield return PropertyColumn.Toolchain;
             yield return PropertyColumn.Runtime;
+            yield return PropertyColumn.GarbageCollection;
             yield return PropertyColumn.LaunchCount;
             yield return PropertyColumn.WarmupCount;
             yield return PropertyColumn.TargetCount;
@@ -91,13 +90,13 @@ namespace BenchmarkDotNet.Configs
             try
             {
                 var loadedAssembly = Assembly.LoadFrom(diagnosticAssembly);
-                var thisAssembly = typeof(DefaultConfig).Assembly();
+                var thisAssembly = typeof(DefaultConfig).GetTypeInfo().Assembly;
                 if (loadedAssembly.GetName().Version != thisAssembly.GetName().Version)
                 {
                     var errorMsg =
                         $"Unable to load: {diagnosticAssembly} version {loadedAssembly.GetName().Version}" +
                         Environment.NewLine +
-                        $"Does not match: {Path.GetFileName(thisAssembly.Location)} version {thisAssembly.GetName().Version}";
+                        $"Does not match: {System.IO.Path.GetFileName(thisAssembly.Location)} version {thisAssembly.GetName().Version}";
                     ConsoleLogger.Default.WriteLineError(errorMsg);
                 }
                 else

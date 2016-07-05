@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
 
         public ExecuteResult Execute(BuildResult buildResult, Benchmark benchmark, ILogger logger, IDiagnoser compositeDiagnoser = null)
         {
-            var exePath = buildResult.ExecutablePath;
+            var exePath = buildResult.ArtifactsPaths.ExecutablePath;
             var args = string.Empty;
 
             if (!File.Exists(exePath))
@@ -96,7 +96,6 @@ namespace BenchmarkDotNet.Toolchains.Classic
             switch (runtime)
             {
                 case Runtime.Clr:
-                case Runtime.Dnx:
                 case Runtime.Core:
                     start.FileName = exeName;
                     start.Arguments = args;

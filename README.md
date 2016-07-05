@@ -12,7 +12,7 @@
 * Reports: markdown (default, github, stackoverflow), csv, html, plain text; png plots.
 * Advanced features: [Baseline](#baseline), [Params](#params), [Percentiles](#percentiles)
 * Powerful diagnostics based on ETW events (see [BenchmarkDotNet.Diagnostics.Windows](https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/))
-* Supported runtimes: Full .NET Framework, .NET Core (both RC2 and RC1), Mono, Dnx (dnx451-dnx46)
+* Supported runtimes: Full .NET Framework, .NET Core (RTM), Mono
 * Supported languages: C#, F# (also on [.NET Core](https://github.com/PerfDotNet/BenchmarkDotNet/issues/135)) and Visual Basic
 
 ## Content
@@ -32,12 +32,6 @@
 
 ```
 PM> Install-Package BenchmarkDotNet
-```
-
-If you want to use CoreCLR (`netstandard1.5` or `dnxcore50`), you need prerelease version of the package:
-
-```
-PM> Install-Package BenchmarkDotNet -Pre
 ```
 
 **Step 2.** Write a class with methods that you want to measure and mark them with the `Benchmark` attribute. In the following example, we compare [MD5](https://en.wikipedia.org/wiki/MD5) and [SHA256](https://en.wikipedia.org/wiki/SHA-2) cryptographic hash functions:
@@ -206,12 +200,12 @@ A *job* is an environment for your benchmarks. You can set one or several jobs f
 
 Job characteristics:
 
-* **Toolchain.** A toolchain for generating/building/executing your benchmark. Values: `Classic` (csproj based) *[default]*. Coming soon: `Dnx`.
+* **Toolchain.** A toolchain for generating/building/executing your benchmark. Values: `Classic` (Roslyn based) *[default]* and `Core` (dotnet cli based) .
 * **Mode.** Values: `Throughput` *[default]*, `SingleRun`.
 * **Platform.** Values: `Host` *[default]*, `AnyCpu`, `X86`, `X64`.
 * **Jit.** Values: `Host` *[default]*, `LegacyJit`, `RyuJit`.
 * **Framework.** Values: `Host` *[default]*, `V40`, `V45`, `V451`, `V452`, `V46`.
-* **Runtime.** Values: `Host` *[default]*, `Clr`, `Mono`, `Core`, `Dnx`.
+* **Runtime.** Values: `Host` *[default]*, `Clr`, `Mono`, `Core`.
 * **LaunchCount.** Count of separated process launches. Values: `Auto` *[default]* or specific number.
 * **WarmupCount.** Count of warmup iterations. Values: `Auto` *[default]* or specific number.
 * **TargetCount.** Count of target iterations (that will be used for summary). Values: `Auto` *[default]* or specific number.
@@ -233,7 +227,6 @@ class Job
     IJob[] AllJits = { LegacyX86, LegacyX64, RyuJitX64 };
     IJob Clr = new Job { Runtime = Runtime.Clr };
     IJob Mono = new Job { Runtime = Runtime.Mono };
-    IJob Dnx = new Job { Runtime = Runtime.Dnx };
     IJob Core = new Job { Runtime = Runtime.Core };
     IJob LongRun = new Job { LaunchCount = 3, WarmupCount = 30, TargetCount = 1000 };
 }

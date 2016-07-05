@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Toolchains.Core
 
         public override bool IsSupported(Benchmark benchmark, ILogger logger)
         {
-            if (!EnvironmentInfo.GetCurrent().IsDotNetCliInstalled())
+            if (!HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled())
             {
                 logger.WriteLineError($"BenchmarkDotNet requires dotnet cli toolchain to be installed, benchmark {benchmark.ShortInfo} will not be executed");
                 return false;
@@ -43,37 +43,32 @@ namespace BenchmarkDotNet.Toolchains.Core
                 logger.WriteLineError($"Currently dotnet cli toolchain supports only RyuJit, benchmark {benchmark.ShortInfo} will not be executed");
                 return false;
             }
+            if (benchmark.Job.GarbageCollection.CpuGroups)
+            {
+                logger.WriteLineError($"Currently project.json does not support CpuGroups (app.config does), benchmark {benchmark.ShortInfo} will not be executed");
+                return false;
+            }
+            if (benchmark.Job.GarbageCollection.AllowVeryLargeObjects)
+            {
+                logger.WriteLineError($"Currently project.json does not support gcAllowVeryLargeObjects (app.config does), benchmark {benchmark.ShortInfo} will not be executed");
+                return false;
+            }
 
             return true;
         }
 
-        private static string GetTargetFrameworkMoniker(Framework framework)
-        {
-#if RC1
-            return "dnxcore50";
-#else
-            return "netcoreapp1.0";
-#endif
-        }
+        private static string GetTargetFrameworkMoniker(Framework framework) => "netcoreapp1.0";
 
         private static string GetExtraDependencies()
         {
-#if RC1
-            return "\"dependencies\": { \"NETStandard.Library\": \"1.0.0-rc2-23811\" },"; // required by dotnet cli
-#else
             // do not set the type to platform in order to produce exe
             // https://github.com/dotnet/core/issues/77#issuecomment-219692312
-            return "\"dependencies\": { \"Microsoft.NETCore.App\": { \"version\": \"1.0.0-rc2-3002702\" } },";
-#endif
+            return "\"dependencies\": { \"Microsoft.NETCore.App\": { \"version\": \"1.0.0\" } },";
         }
 
         private static string GetImports()
         {
-#if RC1
-            return "\"portable-net45+win8\"";
-#else
             return "[ \"dnxcore50\", \"portable-net45+win8\", \"dotnet5.6\", \"netcore50\" ]";
-#endif
         }
 
         private static string GetRuntime()

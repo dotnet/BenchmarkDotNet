@@ -25,7 +25,6 @@ namespace BenchmarkDotNet.IntegrationTests
             var summary = BenchmarkRunner
                 .Run<C>(
                     ManualConfig.CreateEmpty()
-                                .With(Job.Dry.With(Runtime.Dnx))
                                 .With(Job.Dry.With(Runtime.Core))
                                 .With(Job.Dry.With(Runtime.Clr).With(Framework.V46))
                                 .With(new OutputLogger(output)));
@@ -40,11 +39,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 .Single(report => report.Benchmark.Job.Runtime == Runtime.Clr)
                 .ExecuteResults
                 .All(executeResult => executeResult.Data.Contains("Classic")));
-
-            Assert.True(summary.Reports
-                .Single(report => report.Benchmark.Job.Runtime == Runtime.Dnx)
-                .ExecuteResults
-                .All(executeResult => executeResult.Data.Contains("Dnx")));
 
             Assert.True(summary.Reports
                 .Single(report => report.Benchmark.Job.Runtime == Runtime.Core)

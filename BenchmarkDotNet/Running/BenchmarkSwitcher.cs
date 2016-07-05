@@ -30,8 +30,8 @@ namespace BenchmarkDotNet.Running
             var types = assembly
                 .GetTypes()
                 .Where(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Public)
-                             .Any(m => Portability.MemberInfoExtensions.GetCustomAttributes<BenchmarkAttribute>(m, true).Any()))
-                .Where(t => !Portability.TypeExtensions.IsGenericType(t))
+                             .Any(m => m.GetCustomAttributes(false).OfType<BenchmarkAttribute>().Any()))
+                .Where(t => !t.GetTypeInfo().IsGenericType)
                 .OrderBy(t => t.Namespace)
                 .ThenBy(t => t.Name)
                 .ToArray();

@@ -65,7 +65,6 @@ namespace BenchmarkDotNet.IntegrationTests
             var summary = BenchmarkRunner
                 .Run(benchmarks,
                     ManualConfig.CreateEmpty()
-                        .With(Job.Dry.With(Runtime.Dnx).With(Jit.Host).With(Mode.Throughput).WithWarmupCount(1).WithTargetCount(1))
                         .With(Job.Dry.With(Runtime.Core).With(Jit.Host).With(Mode.Throughput).WithWarmupCount(1).WithTargetCount(1))
                         .With(DefaultConfig.Instance.GetLoggers().ToArray())
                         .With(DefaultConfig.Instance.GetColumns().ToArray())
@@ -93,7 +92,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     listObjectEnumeratorBenchmark);
 
                 double gen0Value;
-                if (double.TryParse(gen0Str, NumberStyles.Number, EnvironmentInfo.MainCultureInfo, out gen0Value))
+                if (double.TryParse(gen0Str, NumberStyles.Number, HostEnvironmentInfo.MainCultureInfo, out gen0Value))
                     Assert.True(gen0Value > 0);
                 else
                 {

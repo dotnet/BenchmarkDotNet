@@ -11,10 +11,10 @@
 
 Required:
 
-* Visual Studio 2015 Update **2**
+* [Visual Studio 2015 Update **3**](http://go.microsoft.com/fwlink/?LinkId=691129)
 * [Latest NuGet Manager extension for Visual Studio](https://dist.nuget.org/visualstudio-2015-vsix/v3.5.0-beta/NuGet.Tools.vsix)
-* [.NET Core SDK](https://go.microsoft.com/fwlink/?LinkID=798398)
-* [.NET Core Tooling Preview 1 for Visual Studio 2015](https://go.microsoft.com/fwlink/?LinkId=798481)
+* [.NET Core SDK](https://go.microsoft.com/fwlink/?LinkID=809122)
+* [.NET Core Tooling Preview 2 for Visual Studio 2015](https://go.microsoft.com/fwlink/?LinkId=817245)
 * Internet connection and disk space to download all the required packages
 
 If your build fails because some packages are not available, let say F#, then just disable these project and hope for nuget server to work later on ;)
@@ -60,37 +60,36 @@ But if you want to include some files as resources, you have to do this in expli
         "define": [ "CLASSIC" ]
       },
       "frameworkAssemblies": {
-        "Microsoft.Build": "4.0.0.0",
-        "Microsoft.Build.Framework": "4.0.0.0",
-        "Microsoft.Build.Utilities.v4.0": "4.0.0.0",
-        "System.Management": "4.0.0.0"
+        "System.Management": "4.0.0.0",
+        "System.Xml": "4.0.0.0"
       }
     },
     "netstandard1.5": {
       "buildOptions": {
-        "define": [ "CORE", "RC2" ]
+        "define": [ "CORE"]
       },
       "dependencies": {
-        "System.Linq": "4.1.0-rc2-24027",
-        "System.Resources.ResourceManager": "4.0.1-rc2-24027",
-        "Microsoft.CSharp": "4.0.1-rc2-24027",
-        "Microsoft.Win32.Primitives": "4.0.1-rc2-24027",
-        "System.Console": "4.0.0-rc2-24027",
-        "System.Text.RegularExpressions": "4.0.12-rc2-24027",
-        "System.Threading": "4.0.11-rc2-24027",
-        "System.Reflection": "4.1.0-rc2-24027",
-        "System.Reflection.Primitives": "4.0.1-rc2-24027",
-        "System.Reflection.TypeExtensions": "4.1.0-rc2-24027",
-        "System.Threading.Thread": "4.0.0-rc2-24027",
-        "System.Diagnostics.Process": "4.1.0-rc2-24027",
-        "System.IO.FileSystem": "4.0.1-rc2-24027",
-        "System.Runtime.InteropServices.RuntimeInformation": "4.0.0-rc2-24027",
-        "System.Runtime.Serialization.Primitives": "4.1.1-rc2-24027",
-        "System.Diagnostics.Tools": "4.0.1-rc2-24027",
-        "System.Runtime.InteropServices": "4.1.0-rc2-24027",
-        "Microsoft.DotNet.InternalAbstractions": "1.0.0-rc2-002702",
-        "System.Reflection.Extensions": "4.0.1-rc2-24027",
-        "System.Diagnostics.Debug": "4.0.11-rc2-24027"
+        "System.Linq": "4.1.0",
+        "System.Resources.ResourceManager": "4.0.1",
+        "Microsoft.CSharp": "4.0.1",
+        "Microsoft.Win32.Primitives": "4.0.1",
+        "System.Console": "4.0.0",
+        "System.Text.RegularExpressions": "4.1.0",
+        "System.Threading": "4.0.11",
+        "System.Reflection": "4.1.0",
+        "System.Reflection.Primitives": "4.0.1",
+        "System.Reflection.TypeExtensions": "4.1.0",
+        "System.Threading.Thread": "4.0.0",
+        "System.Diagnostics.Process": "4.1.0",
+        "System.IO.FileSystem": "4.0.1",
+        "System.Runtime.InteropServices.RuntimeInformation": "4.0.0",
+        "System.Runtime.Serialization.Primitives": "4.1.1",
+        "System.Diagnostics.Tools": "4.0.1",
+        "System.Runtime.InteropServices": "4.1.0",
+        "Microsoft.DotNet.InternalAbstractions": "1.0.0",
+        "System.Reflection.Extensions": "4.0.1",
+        "System.Diagnostics.Debug": "4.0.11",
+        "System.Xml.XPath.XmlDocument": "4.0.1"
       }
     }
   }
@@ -134,7 +133,7 @@ But if you want to include some files as resources, you have to do this in expli
     }
   }
 ```
-* If the desired package does not support all frameworks, then you add it as dependency to specific framework, but in code you use ugly #if #endif to exclude it for other compilation targets. We define #CLASSIC, #DNX, #CORE and #RC1 & #RC2. In other OSS projects you can meet more complex names like #NET40, #NET451, #DNX451 or #DNXCORE50. 
+* If the desired package does not support all frameworks, then you add it as dependency to specific framework, but in code you use ugly #if #endif to exclude it for other compilation targets. We define #CLASSIC, #CORE. In other OSS projects you can meet more complex names like #NET40, #NET451, #DNXCORE50 or #NETCORE. 
 
 ```cs
 #if CLASSIC

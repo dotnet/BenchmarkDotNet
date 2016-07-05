@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
 
         private ClassicToolchain()
 #if CLASSIC
-            : base("Classic", new ClassicGenerator(), new ClassicBuilder(), new ClassicExecutor())
+            : base("Classic", new RoslynGenerator(), new RoslynBuilder(), new ClassicExecutor())
 #else
             : base("Classic", new DotNetCliGenerator(
                       TargetFrameworkMonikerProvider,

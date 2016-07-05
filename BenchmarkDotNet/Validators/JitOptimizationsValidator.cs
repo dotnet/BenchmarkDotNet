@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Validators
@@ -24,7 +23,7 @@ namespace BenchmarkDotNet.Validators
 #if CORE
             yield break; // todo: implement when it becomes possible
 #else
-            foreach (var group in benchmarks.GroupBy(benchmark => benchmark.Target.Type.Assembly()))
+            foreach (var group in benchmarks.GroupBy(benchmark => benchmark.Target.Type.GetTypeInfo().Assembly))
             {
                 foreach (var referencedAssemblyName in group.Key.GetReferencedAssemblies())
                 {
@@ -51,8 +50,8 @@ namespace BenchmarkDotNet.Validators
 #if !CORE
         private bool IsJITOptimizationDisabled(Assembly assembly)
         {
-            return assembly
-                .GetCustomAttributes<DebuggableAttribute>(false)
+            return assembly.GetCustomAttributes(false)
+                .OfType<DebuggableAttribute>()
                 .Any(attribute => attribute.IsJITOptimizerDisabled);
         }
 #endif

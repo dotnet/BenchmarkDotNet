@@ -3,7 +3,7 @@
 namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Method)]
-    public class BenchmarkAttribute : Attribute
+    public sealed class BenchmarkAttribute : Attribute
     {
         public string Description { get; set; }
 

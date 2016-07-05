@@ -20,6 +20,8 @@ namespace BenchmarkDotNet.Portability
 
         internal static string ScriptFileExtension => IsWindows() ? ".bat" : ".sh";
 
+        internal static string GetArchitecture() => IntPtr.Size == 4 ? "32-bit" : "64-bit";
+
         internal static bool IsWindows()
         {
 #if !CORE
@@ -88,8 +90,6 @@ namespace BenchmarkDotNet.Portability
             }
 #if CLASSIC
             return "MS.NET " + Environment.Version;
-#elif DNX
-            return "DNX MS.NET " + Environment.Version;
 #elif CORE
             return "CORE"; // TODO: verify if it is possible to get this for CORE
 #endif
@@ -99,8 +99,6 @@ namespace BenchmarkDotNet.Portability
         {
 #if CLASSIC
             return IsMono() ? Runtime.Mono : Runtime.Clr;
-#elif DNX
-            return Runtime.Dnx;
 #elif CORE
             return Runtime.Core;
 #endif
@@ -138,9 +136,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetDotNetCliRuntimeIdentifier()
         {
-#if RC1
-            return string.Empty; // it is not mandatory
-#elif RC2
+#if CORE
             return Microsoft.DotNet.InternalAbstractions.RuntimeEnvironment.GetRuntimeIdentifier();
 #else
             // the Microsoft.DotNet.InternalAbstractions has no .NET 4.0 support, so we have to build it on our own

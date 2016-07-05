@@ -32,8 +32,7 @@
     }
   },
   "frameworks": {
-    "net40": { },
-    "dnx451": { }
+    "net45": { }
   },
   "dependencies": {
     "BenchmarkDotNet": {

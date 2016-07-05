@@ -2,7 +2,6 @@
 using System.IO;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 
@@ -10,11 +9,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     public class DotNetCliBuilder : IBuilder
     {
-        internal const string RestoreCommand = "restore --fallbacksource https://dotnet.myget.org/F/dotnet-core/api/v3/index.json";
+        internal const string RestoreCommand = "restore";
 
         private const string Configuration = "Release";
 
-        private const string OutputDirectory = "binaries";
+        internal const string OutputDirectory = "binaries";
 
         private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMinutes(2);
 
@@ -33,47 +32,35 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         {
             if (!DotNetCliCommandExecutor.ExecuteCommand(
                 RestoreCommand, 
-                generateResult.DirectoryPath, 
+                generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, 
                 logger, 
                 DefaultTimeout))
             {
-                return new BuildResult(generateResult, false, new Exception("dotnet restore has failed"), null);
+                return BuildResult.Failure(generateResult, new Exception("dotnet restore has failed"));
             }
 
             if (!DotNetCliCommandExecutor.ExecuteCommand(
-                GetBuildCommand(TargetFrameworkMonikerProvider(benchmark.Job.Framework)), 
-                generateResult.DirectoryPath, 
+                GetBuildCommand(TargetFrameworkMonikerProvider(benchmark.Job.Framework)),
+                generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, 
                 logger,
                 DefaultTimeout))
             {
                 // dotnet cli could have succesfully builded the program, but returned 1 as exit code because it had some warnings
                 // so we need to check whether the exe exists or not, if it does then it is OK
-                var executablePath = BuildExecutablePath(generateResult, benchmark);
-                if (File.Exists(executablePath))
+                if (File.Exists(generateResult.ArtifactsPaths.ExecutablePath))
                 {
-                    return new BuildResult(generateResult, true, null, executablePath);
+                    return BuildResult.Success(generateResult);
                 }
 
-                return new BuildResult(generateResult, false, new Exception("dotnet build has failed"), null);
+                return BuildResult.Failure(generateResult);
             }
 
-            return new BuildResult(generateResult, true, null, BuildExecutablePath(generateResult, benchmark));
+            return BuildResult.Success(generateResult);
         }
 
         internal static string GetBuildCommand(string frameworkMoniker)
         {
             return $"build --framework {frameworkMoniker} --configuration {Configuration} --output {OutputDirectory}";
-        }
-
-        /// <summary>
-        /// we use custom output path in order to avoid any future problems related to dotnet cli paths changes
-        /// </summary>
-        private string BuildExecutablePath(GenerateResult generateResult, Benchmark benchmark)
-        {
-            return Path.Combine(
-                generateResult.DirectoryPath,
-                OutputDirectory,
-                $"{new DirectoryInfo(generateResult.DirectoryPath).Name}{RuntimeInformation.ExecutableExtension}");
         }
     }
 }

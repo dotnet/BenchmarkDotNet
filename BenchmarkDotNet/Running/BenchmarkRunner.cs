@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.Running
             var validationErrors = Validate(benchmarks, logger, config);
             if (validationErrors.Any(validationError => validationError.IsCritical))
             {
-                return Summary.CreateFailed(benchmarks, title, EnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), validationErrors);
+                return Summary.CreateFailed(benchmarks, title, HostEnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), validationErrors);
             }
 
             var globalChronometer = Chronometer.Start();
@@ -95,7 +95,7 @@ namespace BenchmarkDotNet.Running
             }
             var clockSpan = globalChronometer.Stop();
 
-            var summary = new Summary(title, reports, EnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), clockSpan.GetTimeSpan(), validationErrors);
+            var summary = new Summary(title, reports, HostEnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), clockSpan.GetTimeSpan(), validationErrors);
 
             logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
             logger.WriteLine();
@@ -194,7 +194,10 @@ namespace BenchmarkDotNet.Running
             }
             finally
             {
-                Cleanup(generateResult.DirectoryPath, config);
+                if (!config.KeepBenchmarkFiles)
+                {
+                    generateResult.ArtifactsPaths?.RemoveBenchmarkFiles();
+                }
             }
         }
 
@@ -205,7 +208,7 @@ namespace BenchmarkDotNet.Running
             if (generateResult.IsGenerateSuccess)
             {
                 logger.WriteLineInfo("// Result = Success");
-                logger.WriteLineInfo($"// {nameof(generateResult.DirectoryPath)} = {generateResult.DirectoryPath}");
+                logger.WriteLineInfo($"// {nameof(generateResult.ArtifactsPaths.BinariesDirectoryPath)} = {generateResult.ArtifactsPaths?.BinariesDirectoryPath}");
             }
             else
             {
@@ -292,21 +295,6 @@ namespace BenchmarkDotNet.Running
             }
 
             return executeResults;
-        }
-
-        private static void Cleanup(string directoryPath, IConfig config)
-        {
-            if (!config.KeepBenchmarkFiles && Directory.Exists(directoryPath))
-            {
-                try
-                { 
-                    Directory.Delete(directoryPath, recursive: true);
-                }
-                catch
-                {
-                    // we have to continue anyway
-                }
-            }
         }
 
         private static Benchmark[] GetSupportedBenchmarks(IList<Benchmark> benchmarks, CompositeLogger logger)

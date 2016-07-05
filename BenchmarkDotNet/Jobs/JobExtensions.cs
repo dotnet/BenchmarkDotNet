@@ -14,6 +14,7 @@ namespace BenchmarkDotNet.Jobs
         public static IJob With(this IJob job, Framework framework) => job.With(j => j.Framework = framework);
         public static IJob With(this IJob job, IToolchain toolchain) => job.With(j => j.Toolchain = toolchain);
         public static IJob With(this IJob job, Runtime runtime) => job.With(j => j.Runtime = runtime);
+        public static IJob With(this IJob job, GarbageCollection garbageCollection) => job.With(j => j.GarbageCollection = garbageCollection);
         public static IJob WithLaunchCount(this IJob job, Count launchCount) => job.With(j => j.LaunchCount = launchCount);
         public static IJob WithWarmupCount(this IJob job, Count warmupCount) => job.With(j => j.WarmupCount = warmupCount);
         public static IJob WithTargetCount(this IJob job, Count targetCount) => job.With(j => j.TargetCount = targetCount);
@@ -36,6 +37,7 @@ namespace BenchmarkDotNet.Jobs
                 new Property(nameof(Jit), job.Jit.ToString()),
                 new Property(nameof(Framework), job.Framework.ToString()),
                 new Property(nameof(Runtime), job.Runtime.ToString()),
+                new Property(nameof(GarbageCollection), job.GarbageCollection?.ToString()),
                 new Property(nameof(IJob.WarmupCount), job.WarmupCount.ToString()),
                 new Property(nameof(IJob.TargetCount), job.TargetCount.ToString()),
                 new Property(nameof(IJob.LaunchCount), job.LaunchCount.ToString()),
@@ -72,7 +74,7 @@ namespace BenchmarkDotNet.Jobs
             builder.Append($".WithWarmupCount({job.WarmupCount.Value})");
             builder.Append($".WithTargetCount({job.TargetCount.Value})");
             builder.Append($".WithIterationTime({job.IterationTime.Value})");
-            builder.Append($".WithLaunchCount({job.LaunchCount.Value})");
+            builder.Append($".With(new BenchmarkDotNet.Jobs.GarbageCollection {{ Force = {job.GarbageCollection.Force.ToString().ToLower()} }})");
             return builder.ToString();
         }
 
@@ -90,6 +92,7 @@ namespace BenchmarkDotNet.Jobs
             Toolchain = job.Toolchain,
             Framework = job.Framework,
             Runtime = job.Runtime,
+            GarbageCollection = job.GarbageCollection,
             Mode = job.Mode,
             LaunchCount = job.LaunchCount,
             TargetCount = job.TargetCount,
@@ -114,10 +117,12 @@ namespace BenchmarkDotNet.Jobs
                 shortInfo = "Mono";
             if (job.Equals(Job.Clr))
                 shortInfo = "Clr";
-            if (job.Equals(Job.Dnx))
-                shortInfo = "Dnx";
             if (job.Equals(Job.Core))
                 shortInfo = "Core";
+            if (job.Equals(Job.ConcurrentServerGC))
+                shortInfo = "ConcurrentServerGC";
+            if (job.Equals(Job.ConcurrentWorkstationGC))
+                shortInfo = "ConcurrentWorkstationGC";
 
             return !string.IsNullOrEmpty(shortInfo);
         }

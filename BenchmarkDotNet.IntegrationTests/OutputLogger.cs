@@ -40,6 +40,11 @@ namespace BenchmarkDotNet.IntegrationTests
         /// </summary>
         private static string RemoveInvalidChars(string text)
         {
+            if (string.IsNullOrEmpty(text))
+            {
+                return string.Empty;
+            }
+
             return text.Replace((char)0x1B, ' ');
         }
         #endregion

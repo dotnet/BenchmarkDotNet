@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Validators
@@ -19,7 +20,7 @@ namespace BenchmarkDotNet.Validators
             foreach (var groupByType in benchmarks.GroupBy(benchmark => benchmark.Target.Type))
             {
                 var allMethods = groupByType.Key.GetAllMethods();
-                var count = allMethods.Count(method => method.GetCustomAttributes<BenchmarkAttribute>(false)
+                var count = allMethods.Count(method => method.GetCustomAttributes(false).OfType<BenchmarkAttribute>()
                                                              .Any(benchmarkAttribute => benchmarkAttribute.Baseline));
                 if (count > 1)
                 {

@@ -1,22 +1,26 @@
 ﻿using System;
 using System.IO;
-using BenchmarkDotNet.Portability;
+using System.Reflection;
 
 namespace BenchmarkDotNet.Helpers
 {
-    public static class ResourceHelper
+    internal static class ResourceHelper
     {
-        public static string LoadTemplate(string name)
+        internal static string LoadTemplate(string name)
         {
-            var assembly = typeof(ResourceHelper).Assembly();
             var resourceName = "BenchmarkDotNet.Templates." + name;
-            using (var stream = assembly.GetManifestResourceStream(resourceName))
+            using (var stream = GetResouceStream(resourceName))
             {
                 if (stream == null)
                     throw new Exception($"Resource {resourceName} not found");
                 using (var reader = new StreamReader(stream))
                     return reader.ReadToEnd();
             }
+        }
+
+        private static Stream GetResouceStream(string resourceName)
+        {
+            return typeof(ResourceHelper).GetTypeInfo().Assembly.GetManifestResourceStream(resourceName);
         }
     }
 }

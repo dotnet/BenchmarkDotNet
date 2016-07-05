@@ -113,7 +113,7 @@ namespace BenchmarkDotNet.Running
                         foreach (var type in allTypes)
                         {
                             // First see if the entire Type/Class has a matching attribute
-                            foreach (var attributeName in type.GetCustomAttributes(inherit: true)
+                            foreach (var attributeName in (type.GetTypeInfo().GetCustomAttributes(true))
                                                               .Select(a => a.GetType().Name))
                             {
                                 // Allow short and long version of the attributes to be specified, i.e. "Run" and "RunAttribute"

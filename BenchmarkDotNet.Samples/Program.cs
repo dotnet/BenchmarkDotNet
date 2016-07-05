@@ -1,4 +1,8 @@
-﻿using BenchmarkDotNet.Running;
+﻿using System.Collections;
+using System.Globalization;
+using System.Reflection;
+using System.Resources;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Samples
@@ -7,7 +11,7 @@ namespace BenchmarkDotNet.Samples
     {
         static void Main(string[] args)
         {
-            new BenchmarkSwitcher(typeof(Program).Assembly()).Run(args);
+            new BenchmarkSwitcher(typeof(Program).GetTypeInfo().Assembly).Run(args);            
         }
     }
 }
