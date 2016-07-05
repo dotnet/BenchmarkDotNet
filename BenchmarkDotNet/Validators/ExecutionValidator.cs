@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Validators
             var setupMethods = benchmarkTypeInstance
                 .GetType()
                 .GetAllMethods()
-                .Where(methodInfo => methodInfo.GetCustomAttributes(true).OfType<SetupAttribute>().Any())
+                .Where(methodInfo => methodInfo.GetCustomAttributes(false).OfType<SetupAttribute>().Any())
                 .ToArray();
 
             if (!setupMethods.Any())
