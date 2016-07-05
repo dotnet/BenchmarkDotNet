@@ -43,13 +43,11 @@ namespace BenchmarkDotNet.Toolchains
 
         protected virtual string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath) => buildArtifactsDirectoryPath;
 
-        protected virtual string GetCompilerPath(string rootArtifactsFolderPath) => string.Empty;
-
         protected virtual string GetProjectFilePath(string binariesDirectoryPath) => string.Empty;
 
         protected abstract void Cleanup(ArtifactsPaths artifactsPaths);
 
-        protected abstract void CopyAllRequiredFiles(ArtifactsPaths artifactsPaths);
+        protected virtual void CopyAllRequiredFiles(ArtifactsPaths artifactsPaths) { }
 
         protected virtual void GenerateProject(Benchmark benchmark, ArtifactsPaths artifactsPaths) { }
 
@@ -74,8 +72,7 @@ namespace BenchmarkDotNet.Toolchains
                 appConfigPath: $"{executablePath}.config",
                 projectFilePath: GetProjectFilePath(buildArtifactsDirectoryPath),
                 buildScriptFilePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{RuntimeInformation.ScriptFileExtension}"),
-                executablePath: executablePath,
-                compilerPath: GetCompilerPath(rootArtifactsFolderPath));
+                executablePath: executablePath);
         }
 
         /// <summary>

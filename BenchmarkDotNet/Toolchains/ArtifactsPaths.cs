@@ -22,8 +22,6 @@ namespace BenchmarkDotNet.Toolchains
 
         public string ExecutablePath { get; }
 
-        public string CompilerPath { get; }
-
         public ArtifactsPaths(
             Action<ArtifactsPaths> cleanup,
             string rootArtifactsFolderPath,
@@ -33,8 +31,7 @@ namespace BenchmarkDotNet.Toolchains
             string appConfigPath,
             string projectFilePath,
             string buildScriptFilePath,
-            string executablePath,
-            string compilerPath = null)
+            string executablePath)
         {
             Cleanup = cleanup;
             RootArtifactsFolderPath = rootArtifactsFolderPath;
@@ -45,7 +42,6 @@ namespace BenchmarkDotNet.Toolchains
             ProjectFilePath = projectFilePath;
             BuildScriptFilePath = buildScriptFilePath;
             ExecutablePath = executablePath;
-            CompilerPath = compilerPath;
         }
 
         public void RemoveBenchmarkFiles()

@@ -68,10 +68,10 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="BenchmarkDotNet" Condition="'$(Configuration)'=='Release'">
-      <HintPath>..\BenchmarkDotNet\bin\Release\net40\BenchmarkDotNet.dll</HintPath>
+      <HintPath>..\BenchmarkDotNet\bin\Release\net45\BenchmarkDotNet.dll</HintPath>
     </Reference>
     <Reference Include="BenchmarkDotNet" Condition="'$(Configuration)'=='Debug'">
-      <HintPath>..\BenchmarkDotNet\bin\Debug\net40\BenchmarkDotNet.dll</HintPath>
+      <HintPath>..\BenchmarkDotNet\bin\Debug\net45\BenchmarkDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -31,16 +31,16 @@ echo Starting Copying files
 echo -----------------------------
 
 mkdir testsOutput
-call build/batchcopy.cmd "BenchmarkDotNet/bin/Release/net40/*.*" "testsOutput"
-call build/batchcopy.cmd "BenchmarkDotNet.Diagnostics.Windows/bin/Release/net40/*.*" "testsOutput"
+call build/batchcopy.cmd "BenchmarkDotNet/bin/Release/net45/*.*" "testsOutput"
+call build/batchcopy.cmd "BenchmarkDotNet.Diagnostics.Windows/bin/Release/net45/*.*" "testsOutput"
 call build/batchcopy.cmd "BenchmarkDotNet.IntegrationTests/bin/Release/net451/*.*" "testsOutput"
 call build/batchcopy.cmd "BenchmarkDotNet.Tests/bin/Release/net451/*.*" "testsOutput"
 call build/batchcopy.cmd "BenchmarkDotNet.IntegrationTests.Classic/bin/Release/*.*" "testsOutput"
 call build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/Microsoft.Diagnostics.Tracing.TraceEvent/1.0.41/lib/net40" "testsOutput"
-call build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.runner.console/2.1.0/tools" "testsOutput"
-call build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.extensibility.execution/2.1.0/lib/net45" "testsOutput"
-call build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.extensibility.core/2.1.0/lib/portable-net45+win8+wp8+wpa81" "testsOutput"
-call build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.assert/2.1.0/lib/portable-net45+win8+wp8+wpa81" "testsOutput"
+call build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.runner.console/2.2.0-beta2-build3300/tools" "testsOutput"
+call build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.extensibility.execution/2.2.0-beta2-build3300/lib/net45" "testsOutput"
+call build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.extensibility.core/2.2.0-beta2-build3300/lib/net45" "testsOutput"
+call build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.assert/2.2.0-beta2-build3300/lib/netstandard1.0" "testsOutput"
 
 echo -----------------------------
 echo Copying files ended

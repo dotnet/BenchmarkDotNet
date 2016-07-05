@@ -1,12 +1,12 @@
 ﻿#if CLASSIC
-using System.Diagnostics;
 using System.IO;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
-using BuildResult = BenchmarkDotNet.Toolchains.Results.BuildResult;
-using ILogger = BenchmarkDotNet.Loggers.ILogger;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis;
+using System;
+using System.Linq;
 
 namespace BenchmarkDotNet.Toolchains.Classic
 {
@@ -16,30 +16,59 @@ namespace BenchmarkDotNet.Toolchains.Classic
         {
             logger.WriteLineInfo($"BuildScript: {generateResult.ArtifactsPaths.BuildScriptFilePath}");
 
-            var buildProcess = new Process
-            {
-                StartInfo =
-                {
-                    WorkingDirectory = generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true
-                }
-            };
-            if (RuntimeInformation.IsWindows())
-            {
-                buildProcess.StartInfo.FileName = generateResult.ArtifactsPaths.BuildScriptFilePath;
-            }
-            else
-            {
-                buildProcess.StartInfo.FileName = "/bin/sh";
-                buildProcess.StartInfo.Arguments = generateResult.ArtifactsPaths.BuildScriptFilePath;
-            }
-            buildProcess.Start();
-            var output = buildProcess.StandardOutput.ReadToEnd();
-            buildProcess.WaitForExit();
-            logger.WriteLineInfo(output);
+            var syntaxTree = CSharpSyntaxTree.ParseText(File.ReadAllText(generateResult.ArtifactsPaths.ProgramCodePath));
 
-            return new BuildResult(generateResult, File.Exists(generateResult.ArtifactsPaths.ExecutablePath), null);
+            var compilationOptions = new CSharpCompilationOptions(
+                 outputKind: OutputKind.ConsoleApplication,
+                 optimizationLevel: OptimizationLevel.Release,
+                 allowUnsafe: true,
+                 platform: GetPlatform(benchmark.Job.Platform),
+                 deterministic: true);
+
+            var references = RoslynGenerator
+                .GetAllReferences(benchmark, includePredefined: true)
+                .Select(assembly => MetadataReference.CreateFromFile(assembly.Location));
+
+            var compilation = CSharpCompilation
+                .Create(assemblyName: Path.GetFileName(generateResult.ArtifactsPaths.ExecutablePath))
+                .AddSyntaxTrees(syntaxTree)
+                .WithOptions(compilationOptions)
+                .AddReferences(references);
+
+            using (var executable = File.Create(generateResult.ArtifactsPaths.ExecutablePath))
+            {
+                var emitResult = compilation.Emit(executable);
+
+                if(emitResult.Success)
+                {
+                    return BuildResult.Success(generateResult);
+                }
+
+                foreach (var diagnostic in emitResult.Diagnostics
+                    .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error))
+                {
+                    logger.WriteError($"{diagnostic.Id}: {diagnostic.GetMessage()}");
+                }
+
+                return BuildResult.Failure(generateResult);
+            }
+        }
+
+        private Platform GetPlatform(Jobs.Platform platform)
+        {
+            switch(platform)
+            {
+                case Jobs.Platform.Host:
+                    return IntPtr.Size == 4 ? Platform.X86 : Platform.X64;
+                case Jobs.Platform.AnyCpu:
+                    return Platform.AnyCpu;
+                case Jobs.Platform.X86:
+                    return Platform.X86;
+                case Jobs.Platform.X64:
+                    return Platform.X64;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(platform), platform, null);
+            }
         }
     }
 }

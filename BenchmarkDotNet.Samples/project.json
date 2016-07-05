@@ -20,11 +20,15 @@
     }
   },
   "frameworks": {
-    "net40": {
+    "net45": {
       "buildOptions": {
         "define": [ "CLASSIC" ]
       },
-      "BenchmarkDotNet.Diagnostics.Windows": "1.0.0-*"
+      "dependencies": {
+        "BenchmarkDotNet.Diagnostics.Windows": {
+          "target": "project"
+        }
+      }
     },
     "netcoreapp1.0": {
       "buildOptions": {
