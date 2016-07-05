@@ -24,6 +24,9 @@
       "buildOptions": {
         "define": [ "CLASSIC" ]
       },
+      "frameworkAssemblies": {
+        "System.Reflection": "4.0.0.0"
+      },
       "dependencies": {
         "BenchmarkDotNet.Diagnostics.Windows": {
           "target": "project"

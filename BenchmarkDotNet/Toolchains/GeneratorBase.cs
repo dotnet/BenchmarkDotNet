@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -110,7 +111,7 @@ namespace BenchmarkDotNet.Toolchains
             var targetMethodReturnType = isVoid
                 ? "void"
                 : target.Method.ReturnType.GetCorrectTypeName();
-            var idleMethodReturnType = isVoid || !target.Method.ReturnType.IsValueType()
+            var idleMethodReturnType = isVoid || !target.Method.ReturnType.GetTypeInfo().IsValueType
                 ? targetMethodReturnType
                 : "int";
             var targetMethodResultHolder = isVoid
@@ -133,7 +134,7 @@ namespace BenchmarkDotNet.Toolchains
 
             var idleImplementation = isVoid
                 ? ""
-                : $"return {(target.Method.ReturnType.IsValueType() ? "0" : "null")};";
+                : $"return {(target.Method.ReturnType.GetTypeInfo().IsValueType ? "0" : "null")};";
 
             var paramsContent = string.Join("", benchmark.Parameters.Items.Select(parameter =>
                 $"{(parameter.IsStatic ? "" : "instance.")}{parameter.Name} = {GetParameterValue(parameter.Value)};"));
@@ -164,7 +165,7 @@ namespace BenchmarkDotNet.Toolchains
 
         private void GenerateAppConfig(Benchmark benchmark, ArtifactsPaths artifactsPaths)
         {
-            var sourcePath = benchmark.Target.Type.Assembly().Location + ".config";
+            var sourcePath = benchmark.Target.Type.GetTypeInfo().Assembly.Location + ".config";
 
             using (var source = File.Exists(sourcePath) ? new StreamReader(File.OpenRead(sourcePath)) : TextReader.Null)
             using (var destination = new System.IO.StreamWriter(File.Create(artifactsPaths.AppConfigPath), System.Text.Encoding.UTF8))
@@ -187,7 +188,7 @@ namespace BenchmarkDotNet.Toolchains
                 return ((double)value).ToString("G", CultureInfo.InvariantCulture) + "d";
             if (value is decimal)
                 return ((decimal)value).ToString("G", CultureInfo.InvariantCulture) + "m";
-            if (value.GetType().IsEnum())
+            if (value.GetType().GetTypeInfo().IsEnum)
                 return value.GetType().GetCorrectTypeName() + "." + value;
             return value.ToString();
         }

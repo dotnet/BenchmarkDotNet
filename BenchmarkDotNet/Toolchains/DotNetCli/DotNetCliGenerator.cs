@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Threading;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
@@ -132,7 +131,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         private string SetDependencyToExecutingAssembly(string template, Type benchmarkTarget)
         {
-            var assemblyName = benchmarkTarget.Assembly().GetName();
+            var assemblyName = benchmarkTarget.GetTypeInfo().Assembly.GetName();
             var packageVersion = GetPackageVersion(assemblyName);
 
             return template

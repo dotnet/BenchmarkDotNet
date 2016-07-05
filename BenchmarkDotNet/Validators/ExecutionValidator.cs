@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Validators
@@ -77,7 +78,7 @@ namespace BenchmarkDotNet.Validators
             var setupMethods = benchmarkTypeInstance
                 .GetType()
                 .GetAllMethods()
-                .Where(methodInfo => methodInfo.GetCustomAttributes<SetupAttribute>(true).Any())
+                .Where(methodInfo => methodInfo.GetCustomAttributes(true).OfType<SetupAttribute>().Any())
                 .ToArray();
 
             if (!setupMethods.Any())
@@ -115,7 +116,7 @@ namespace BenchmarkDotNet.Validators
             var paramFields = benchmarkTypeInstance
                 .GetType()
                 .GetAllFields()
-                .Where(fieldInfo => fieldInfo.GetCustomAttributes<ParamsAttribute>(false).Any())
+                .Where(fieldInfo => fieldInfo.GetCustomAttributes(false).OfType<ParamsAttribute>().Any())
                 .ToArray();
 
             if (!paramFields.Any())
@@ -134,7 +135,7 @@ namespace BenchmarkDotNet.Validators
                     return false;
                 }
 
-                var values = paramField.GetCustomAttributes<ParamsAttribute>(false).Single().Values;
+                var values = paramField.GetCustomAttributes(false).OfType<ParamsAttribute>().Single().Values;
                 if (!values.Any())
                 {
                     errors.Add(new ValidationError(
@@ -166,7 +167,7 @@ namespace BenchmarkDotNet.Validators
             var paramProperties = benchmarkTypeInstance
                 .GetType()
                 .GetAllProperties()
-                .Where(propertyInfo => propertyInfo.GetCustomAttributes<ParamsAttribute>(false).Any())
+                .Where(propertyInfo => propertyInfo.GetCustomAttributes(false).OfType<ParamsAttribute>().Any())
                 .ToArray();
 
             if (!paramProperties.Any())
@@ -176,7 +177,7 @@ namespace BenchmarkDotNet.Validators
 
             foreach (var paramProperty in paramProperties)
             {
-                var setter = paramProperty.GetSetter();
+                var setter = paramProperty.SetMethod;
                 if (setter == null || !setter.IsPublic)
                 {
                     errors.Add(new ValidationError(
@@ -186,7 +187,7 @@ namespace BenchmarkDotNet.Validators
                     return false;
                 }
 
-                var values = paramProperty.GetCustomAttributes<ParamsAttribute>(false).Single().Values;
+                var values = paramProperty.GetCustomAttributes(false).OfType<ParamsAttribute>().Single().Values;
                 if (!values.Any())
                 {
                     errors.Add(new ValidationError(

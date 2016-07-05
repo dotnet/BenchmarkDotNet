@@ -8,7 +8,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Parameters;
-using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Running
 {
@@ -52,8 +51,8 @@ namespace BenchmarkDotNet.Running
             config = config ?? DefaultConfig.Instance;
             if (type != null)
             {
-                var typeAttributes = type.GetCustomAttributes<IConfigSource>(true);
-                var assemblyAttributes = type.Assembly().GetCustomAttributes<IConfigSource>(false);
+                var typeAttributes = type.GetTypeInfo().GetCustomAttributes(true).OfType<IConfigSource>();
+                var assemblyAttributes = type.GetTypeInfo().Assembly.GetCustomAttributes().OfType<IConfigSource>();
                 var allAttributes = typeAttributes.Concat(assemblyAttributes);
                 foreach (var configSource in allAttributes)
                     config = ManualConfig.Union(config, configSource.Config);
@@ -136,7 +135,7 @@ namespace BenchmarkDotNet.Running
 
             while (declaringType != null)
             {
-                if (!declaringType.IsPublic() && !declaringType.IsNestedPublic())
+                if (!declaringType.GetTypeInfo().IsPublic && !declaringType.GetTypeInfo().IsNestedPublic)
                     throw new InvalidOperationException($"{methodType} method {methodInfo.Name} defined within type {declaringType.FullName} has incorrect access modifiers.\nDeclaring type must be public.");
 
                 declaringType = declaringType.DeclaringType;

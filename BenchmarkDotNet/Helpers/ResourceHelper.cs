@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using BenchmarkDotNet.Portability;
+using System.Reflection;
 
 namespace BenchmarkDotNet.Helpers
 {
@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Helpers
 
         private static Stream GetResouceStream(string resourceName)
         {
-            return typeof(ResourceHelper).Assembly().GetManifestResourceStream(resourceName);
+            return typeof(ResourceHelper).GetTypeInfo().Assembly.GetManifestResourceStream(resourceName);
         }
     }
 }
