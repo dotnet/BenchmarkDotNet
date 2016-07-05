@@ -17,7 +17,11 @@ namespace BenchmarkDotNet.IntegrationTests
             output = outputHelper;
         }
 
+#if !CORE
         [Fact]
+#else
+        [Fact(Skip = "It fails on appveyor")]
+#endif
         public void CanEnableServerGcMode()
         {
             var config = ManualConfig.CreateEmpty()
