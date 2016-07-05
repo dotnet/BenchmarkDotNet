@@ -27,7 +27,8 @@
       "imports": [
         "dnxcore50",
         "portable-net45+win81",
-        "netstandard1.3"
+        "netstandard1.3",
+        "netstandard1.6"
       ]
     }
   },
