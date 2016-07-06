@@ -10,8 +10,9 @@ namespace BenchmarkDotNet.Mathematics
         /// 
         /// Calculates $(1/\sqrt{2\pi}) \int_{-\infty}^x e^{-u^2 / 2} du$
         /// by means of polynomial approximations due to A. M. Murray of Aberdeen University;
+        /// 
+        /// See: http://dl.acm.org/citation.cfm?id=367664
         /// </summary>        
-        /// <see cref="http://dl.acm.org/citation.cfm?id=367664"/>        
         /// <param name="x">-infinity..+infinity</param>        
         /// <returns>Area under the Standard Normal Curve from -infinity to x</returns>
         public static double Gauss(double x)
@@ -49,8 +50,9 @@ namespace BenchmarkDotNet.Mathematics
         /// 
         /// Evaluates the two-tail probability P(t|n) that t is exceeded 
         /// in magnitude for Student's t-distribution with n degrees of freedom.
+        /// 
+        /// http://dl.acm.org/citation.cfm?id=355599
         /// </summary>
-        /// <see cref="http://dl.acm.org/citation.cfm?id=355599"/>
         /// <param name="t">t-value</param>
         /// <param name="n">Degree of freedom, n >= 20</param>
         /// <returns>2-tail p-value</returns>
