@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     internal class DotNetCliGenerator : GeneratorBase
     {
-        private Func<Framework, string> TargetFrameworkMonikerProvider { get; }
+        private string TargetFrameworkMoniker { get; }
 
         private string ExtraDependencies { get; }
 
@@ -22,13 +22,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         private string Runtime { get; }
 
         public DotNetCliGenerator(
-            Func<Framework, string> targetFrameworkMonikerProvider,
+            string targetFrameworkMoniker,
             string extraDependencies,
             Func<Platform, string> platformProvider,
             string imports,
             string runtime = null)
         {
-            TargetFrameworkMonikerProvider = targetFrameworkMonikerProvider;
+            TargetFrameworkMoniker = targetFrameworkMoniker;
             ExtraDependencies = extraDependencies;
             PlatformProvider = platformProvider;
             Imports = imports;
@@ -108,7 +108,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             var content = SetPlatform(template, PlatformProvider(benchmark.Job.Platform));
             content = SetCodeFileName(content, Path.GetFileName(artifactsPaths.ProgramCodePath));
             content = SetDependencyToExecutingAssembly(content, benchmark.Target.Type);
-            content = SetTargetFrameworkMoniker(content, TargetFrameworkMonikerProvider(benchmark.Job.Framework));
+            content = SetTargetFrameworkMoniker(content, TargetFrameworkMoniker);
             content = SetExtraDependencies(content, ExtraDependencies);
             content = SetImports(content, Imports);
             content = SetRuntime(content, Runtime);
@@ -120,7 +120,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         protected override void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths)
         {
             var content = $"call dotnet {DotNetCliBuilder.RestoreCommand}{Environment.NewLine}" +
-                          $"call dotnet {DotNetCliBuilder.GetBuildCommand(TargetFrameworkMonikerProvider(benchmark.Job.Framework))}";
+                          $"call dotnet {DotNetCliBuilder.GetBuildCommand(TargetFrameworkMoniker)}";
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
         }

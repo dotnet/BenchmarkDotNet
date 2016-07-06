@@ -21,7 +21,6 @@ namespace BenchmarkDotNet.Jobs
         public Mode Mode { get; set; } = Mode.Throughput;
         public Platform Platform { get; set; } = Platform.Host;
         public Jit Jit { get; set; } = Jit.Host;
-        public Framework Framework { get; set; } = Framework.Host;
         public IToolchain Toolchain { get; set; }
         public Runtime Runtime { get; set; } = Runtime.Host;
         public GarbageCollection GarbageCollection { get; set; } = GarbageCollection.Default;

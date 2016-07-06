@@ -7,6 +7,12 @@ namespace BenchmarkDotNet.Toolchains.Classic
 {
     public class ClassicToolchain : Toolchain
     {
+        // In case somebody calls ClassicToolchain from .NET Core process 
+        // we will build the project as 4.6 because it's the most safe way to do it:
+        // * everybody that uses .NET Core must have VS 2015 installed and 4.6 is part of the installation
+        // * from 4.6 you can target < 4.6
+        private const string TargetFrameworkMoniker = "net46";
+
         public static readonly IToolchain Instance = new ClassicToolchain();
 
         private ClassicToolchain()
@@ -14,39 +20,14 @@ namespace BenchmarkDotNet.Toolchains.Classic
             : base("Classic", new RoslynGenerator(), new RoslynBuilder(), new ClassicExecutor())
 #else
             : base("Classic", new DotNetCliGenerator(
-                      TargetFrameworkMonikerProvider,
+                      TargetFrameworkMoniker,
                       extraDependencies: "\"frameworkAssemblies\": { \"System.Runtime\": \"4.0.0.0\" },",
                       platformProvider: platform => platform.ToConfig(),
                       imports: "\"portable-net45+win8\""),
-                  new DotNetCliBuilder(TargetFrameworkMonikerProvider),
+                  new DotNetCliBuilder(TargetFrameworkMoniker),
                   new ClassicExecutor())
 #endif
         {
-        }
-
-        private static string TargetFrameworkMonikerProvider(Framework framework)
-        {
-            switch (framework)
-            {
-                case Framework.Host:
-                    throw new ArgumentException("Framework must be set");
-                case Framework.V40:
-                    return "net40";
-                case Framework.V45:
-                    return "net45";
-                case Framework.V451:
-                    return "net451";
-                case Framework.V452:
-                    return "net452";
-                case Framework.V46:
-                    return "net46";
-                case Framework.V461:
-                    return "net461";
-                case Framework.V462:
-                    return "net462";
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(framework), framework, null);
-            }
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Extensions
@@ -21,13 +20,6 @@ namespace BenchmarkDotNet.Extensions
                 default:
                     return "AnyCPU";
             }
-        }
-
-        public static string ToConfig(this Framework framework)
-        {
-            var number = framework.ToString().Substring(1);
-            var numberArray = number.ToCharArray().Select(c => c.ToString()).ToArray();
-            return "v" + string.Join(".", numberArray);
         }
 
         public static string ToConfig(this Jit jit)

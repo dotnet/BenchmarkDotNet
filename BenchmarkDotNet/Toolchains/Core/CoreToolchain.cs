@@ -10,17 +10,19 @@ namespace BenchmarkDotNet.Toolchains.Core
 {
     public class CoreToolchain : Toolchain
     {
+        private const string TargetFrameworkMoniker = "netcoreapp1.0";
+
         public static readonly IToolchain Instance = new CoreToolchain();
 
         private CoreToolchain()
             : base("Core",
                   new DotNetCliGenerator(
-                      GetTargetFrameworkMoniker, 
+                      TargetFrameworkMoniker, 
                       GetExtraDependencies(), 
                       platformProvider: _ => "x64", // dotnet cli supports only x64 compilation now
                       imports: GetImports(),
                       runtime: GetRuntime()), 
-                  new DotNetCliBuilder(GetTargetFrameworkMoniker),
+                  new DotNetCliBuilder(TargetFrameworkMoniker),
                   new ClassicExecutor())
         {
         }
@@ -56,8 +58,6 @@ namespace BenchmarkDotNet.Toolchains.Core
 
             return true;
         }
-
-        private static string GetTargetFrameworkMoniker(Framework framework) => "netcoreapp1.0";
 
         private static string GetExtraDependencies()
         {

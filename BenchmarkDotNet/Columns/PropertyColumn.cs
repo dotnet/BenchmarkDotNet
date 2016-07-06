@@ -11,7 +11,8 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn Mode = new PropertyColumn("Mode", benchmark => benchmark.Job.Mode.ToString());
         public static readonly IColumn Platform = new PropertyColumn("Platform", benchmark => benchmark.Job.Platform.ToString());
         public static readonly IColumn Jit = new PropertyColumn("Jit", benchmark => benchmark.Job.Jit.ToString());
-        public static readonly IColumn Framework = new PropertyColumn("Framework", benchmark => benchmark.Job.Framework.ToString());
+        [Obsolete("Framework setting is not supported anymore, see https://github.com/PerfDotNet/BenchmarkDotNet/issues/194 for more details", true)]
+        public static readonly IColumn Framework = new PropertyColumn("Framework", benchmark => null);
         public static readonly IColumn Toolchain = new PropertyColumn("Toolchain", benchmark => Toolchains.Toolchain.GetToolchain(benchmark.Job).Name);
         public static readonly IColumn Runtime = new PropertyColumn("Runtime", benchmark => benchmark.Job.Runtime.ToString());
         public static readonly IColumn GarbageCollection = new PropertyColumn("GarbageCollection", benchmark => benchmark.Job.GarbageCollection?.ToString());

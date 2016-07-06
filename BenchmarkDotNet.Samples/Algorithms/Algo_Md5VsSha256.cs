@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Samples.Algorithms
     {
         public AllWindowsRuntimesConfig()
         {
-            Add(Job.Default.With(Runtime.Clr).With(Jit.RyuJit).With(Jobs.Framework.V40));
+            Add(Job.Default.With(Runtime.Clr).With(Jit.RyuJit));
             Add(Job.Default.With(Runtime.Core).With(Jit.RyuJit));
         }
     }

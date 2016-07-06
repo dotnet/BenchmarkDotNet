@@ -17,11 +17,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMinutes(2);
 
-        private Func<Framework, string> TargetFrameworkMonikerProvider { get; }
+        private string TargetFrameworkMoniker { get; }
 
-        public DotNetCliBuilder(Func<Framework, string> targetFrameworkMonikerProvider)
+        public DotNetCliBuilder(string targetFrameworkMoniker)
         {
-            TargetFrameworkMonikerProvider = targetFrameworkMonikerProvider;
+            TargetFrameworkMoniker = targetFrameworkMoniker;
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
 
             if (!DotNetCliCommandExecutor.ExecuteCommand(
-                GetBuildCommand(TargetFrameworkMonikerProvider(benchmark.Job.Framework)),
+                GetBuildCommand(TargetFrameworkMoniker),
                 generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, 
                 logger,
                 DefaultTimeout))

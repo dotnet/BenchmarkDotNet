@@ -8,7 +8,6 @@ namespace BenchmarkDotNet.Jobs
         Mode Mode { get; }
         Platform Platform { get; }
         Jit Jit { get; }
-        Framework Framework { get; }
         IToolchain Toolchain { get; }
         Runtime Runtime { get; }
         GarbageCollection GarbageCollection { get; }

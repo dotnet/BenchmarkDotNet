@@ -11,7 +11,6 @@ namespace BenchmarkDotNet.Jobs
         public static IJob With(this IJob job, Mode mode) => job.With(j => j.Mode = mode);
         public static IJob With(this IJob job, Platform platform) => job.With(j => j.Platform = platform);
         public static IJob With(this IJob job, Jit jit) => job.With(j => j.Jit = jit);
-        public static IJob With(this IJob job, Framework framework) => job.With(j => j.Framework = framework);
         public static IJob With(this IJob job, IToolchain toolchain) => job.With(j => j.Toolchain = toolchain);
         public static IJob With(this IJob job, Runtime runtime) => job.With(j => j.Runtime = runtime);
         public static IJob With(this IJob job, GarbageCollection garbageCollection) => job.With(j => j.GarbageCollection = garbageCollection);
@@ -35,7 +34,6 @@ namespace BenchmarkDotNet.Jobs
                 new Property(nameof(Mode), job.Mode.ToString()),
                 new Property(nameof(Platform), job.Platform.ToString()),
                 new Property(nameof(Jit), job.Jit.ToString()),
-                new Property(nameof(Framework), job.Framework.ToString()),
                 new Property(nameof(Runtime), job.Runtime.ToString()),
                 new Property(nameof(GarbageCollection), job.GarbageCollection?.ToString()),
                 new Property(nameof(IJob.WarmupCount), job.WarmupCount.ToString()),
@@ -90,7 +88,6 @@ namespace BenchmarkDotNet.Jobs
             Jit = job.Jit,
             Platform = job.Platform,
             Toolchain = job.Toolchain,
-            Framework = job.Framework,
             Runtime = job.Runtime,
             GarbageCollection = job.GarbageCollection,
             Mode = job.Mode,

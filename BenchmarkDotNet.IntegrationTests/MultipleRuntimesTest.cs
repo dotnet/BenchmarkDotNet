@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .Run<C>(
                     ManualConfig.CreateEmpty()
                                 .With(Job.Dry.With(Runtime.Core))
-                                .With(Job.Dry.With(Runtime.Clr).With(Framework.V46))
+                                .With(Job.Dry.With(Runtime.Clr))
                                 .With(new OutputLogger(output)));
 
             Assert.True(summary.Reports

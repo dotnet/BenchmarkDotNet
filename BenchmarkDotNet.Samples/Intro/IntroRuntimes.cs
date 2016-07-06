@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Samples.Intro
         {
             public MultipleRuntimesConfig()
             {
-                Add(Job.Dry.With(Runtime.Clr).With(Jit.RyuJit).With(Jobs.Framework.V40)); // framework for Clr must be set in explicit way
+                Add(Job.Dry.With(Runtime.Clr).With(Jit.RyuJit));
                 Add(Job.Dry.With(Runtime.Core).With(Jit.RyuJit));
             }
         }
