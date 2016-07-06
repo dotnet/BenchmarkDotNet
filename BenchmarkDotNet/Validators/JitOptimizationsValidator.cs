@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Validators
@@ -20,16 +20,13 @@ namespace BenchmarkDotNet.Validators
 
         public IEnumerable<ValidationError> Validate(IList<Benchmark> benchmarks)
         {
-#if CORE
-            yield break; // todo: implement when it becomes possible
-#else
             foreach (var group in benchmarks.GroupBy(benchmark => benchmark.Target.Type.GetTypeInfo().Assembly))
             {
                 foreach (var referencedAssemblyName in group.Key.GetReferencedAssemblies())
                 {
                     var referencedAssembly = Assembly.Load(referencedAssemblyName);
 
-                    if (IsJITOptimizationDisabled(referencedAssembly))
+                    if (referencedAssembly.IsJITOptimizationDisabled().IsTrue())
                     {
                         yield return new ValidationError(
                             TreatsWarningsAsErrors,
@@ -37,23 +34,13 @@ namespace BenchmarkDotNet.Validators
                     }
                 }
 
-                if (IsJITOptimizationDisabled(group.Key))
+                if (group.Key.IsJITOptimizationDisabled().IsTrue())
                 {
                     yield return new ValidationError(
                         TreatsWarningsAsErrors,
                         $"Assembly {group.Key} which defines benchmarks is non-optimized");
                 }
             }
-#endif
         }
-
-#if !CORE
-        private bool IsJITOptimizationDisabled(Assembly assembly)
-        {
-            return assembly.GetCustomAttributes(false)
-                .OfType<DebuggableAttribute>()
-                .Any(attribute => attribute.IsJITOptimizerDisabled);
-        }
-#endif
     }
 }

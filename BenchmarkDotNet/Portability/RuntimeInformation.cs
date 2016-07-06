@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
@@ -16,6 +17,10 @@ namespace BenchmarkDotNet.Portability
 {
     internal class RuntimeInformation
     {
+        private const string Debug = "DEBUG";
+        private const string Release = "RELEASE";
+        private const string Unknown = "?";
+
         internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
 
         internal static string ScriptFileExtension => IsWindows() ? ".bat" : ".sh";
@@ -32,7 +37,7 @@ namespace BenchmarkDotNet.Portability
 #endif
         }
 
-        internal static bool IsMono() => Type.GetType("Mono.Runtime") != null;
+        private static bool IsMono() => Type.GetType("Mono.Runtime") != null;
 
         internal static string GetOsVersion()
         {
@@ -52,7 +57,7 @@ namespace BenchmarkDotNet.Portability
                 return "OSX";
             }
 
-            return "?";
+            return Unknown;
 #endif
         }
 
@@ -76,7 +81,7 @@ namespace BenchmarkDotNet.Portability
                 return info;
             }
 #endif
-            return "?"; // TODO: verify if it is possible to get this for CORE
+            return Unknown; // TODO: verify if it is possible to get this for CORE
         }
 
         internal static string GetClrVersion()
@@ -113,26 +118,27 @@ namespace BenchmarkDotNet.Portability
                     .Where(module => module.ModuleName.Contains("jit"))
                     .Select(module => Path.GetFileNameWithoutExtension(module.FileName) + "-v" + module.FileVersionInfo.ProductVersion));
 #else
-            return "?"; // TODO: verify if it is possible to get this for CORE
+            return Unknown; // TODO: verify if it is possible to get this for CORE
 #endif
         }
 
         internal static bool HasRyuJit()
         {
-            return !RuntimeInformation.IsMono()
+            return !IsMono()
                 && IntPtr.Size == 8
-                && GetConfiguration() != "DEBUG"
+                && GetConfiguration() != Debug
                 && !new JitHelper().IsMsX64();
         }
 
         internal static string GetConfiguration()
         {
-#if DEBUG
-            return "DEBUG";
-#elif RELEASE
-            return "RELEASE";
-#endif
-        }
+            bool? isDebug = Assembly.GetEntryAssembly().IsDebug();
+            if (isDebug.HasValue == false)
+            {
+                return Unknown;
+            }
+            return isDebug.Value ? Debug : Release;
+        } 
 
         internal static string GetDotNetCliRuntimeIdentifier()
         {
