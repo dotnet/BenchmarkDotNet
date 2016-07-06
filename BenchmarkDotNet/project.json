@@ -44,11 +44,11 @@
       },
       "frameworkAssemblies": {
         "System.Management": "4.0.0.0",
-        "System.Xml": "4.0.0.0",
-        "System.Threading.Tasks": "4.0.0.0"
+        "System.Xml": "4.0.0.0"
       },
       "dependencies": {
-        "Microsoft.CodeAnalysis.CSharp": "1.3.2"
+        "Microsoft.CodeAnalysis.CSharp": "1.3.2",
+        "System.Threading.Tasks": "4.0.0"
       }
     },
     "netstandard1.5": {
