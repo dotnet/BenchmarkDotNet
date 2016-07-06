@@ -6,6 +6,7 @@
 * [Development](#development)
 * [Chat room](#chat-room)
 * [F#](#f-sharp)
+* [NuGet][#nuget]
 
 ## Building
 
@@ -185,3 +186,11 @@ We have full F# support, all you have to do is to run `dotnet restore` to downlo
 
 ## Chat room
 [![Join the chat at https://gitter.im/PerfDotNet/BenchmarkDotNet](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/PerfDotNet/BenchmarkDotNet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+## NuGet
+
+If you want to check the develop version of the BenchmarkDotNet NuGet package, add the following line in the `<packageSources>` section of your `NuGet.congig`:
+```xml
+<add key="appveyor-bdn" value="https://ci.appveyor.com/nuget/benchmarkdotnet" />
+```
+Now you can install the package from the `appveyor-bdn` feed.
