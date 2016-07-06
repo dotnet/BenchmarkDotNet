@@ -60,6 +60,7 @@ build:
 
 after_build:
   - dotnet pack .\BenchmarkDotNet\project.json --configuration Release
+  - dotnet pack .\BenchmarkDotNet.Diagnostics.Windows\project.json --configuration Release
   
 #---------------------------------#
 #       tests configuration       #
