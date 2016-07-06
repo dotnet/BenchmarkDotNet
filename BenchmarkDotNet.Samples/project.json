@@ -49,7 +49,7 @@
   "dependencies": {
     "BenchmarkDotNet": {
       "target": "project",
-      "version": "0.9.7-develop"
+      "version": "0.9.8-develop"
     }
   }
 }
