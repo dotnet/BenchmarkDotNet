@@ -6,7 +6,7 @@
 * [Development](#development)
 * [Chat room](#chat-room)
 * [F#](#f-sharp)
-* [NuGet][#nuget]
+* [NuGet](#nuget)
 
 ## Building
 
