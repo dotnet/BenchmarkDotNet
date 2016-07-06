@@ -86,7 +86,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 {
                     return;
                 }
-                catch (Exception) when (attempt++ < 3)
+                catch (Exception) when (attempt++ < 5)
                 {
                     Thread.Sleep(TimeSpan.FromMilliseconds(500)); // Previous benchmark run didn't release some files
                 }
