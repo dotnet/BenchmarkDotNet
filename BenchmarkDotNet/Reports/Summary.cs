@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Reports
         {
             Benchmarks = benchmarks;
             Table = new SummaryTable(this);
-            Reports = reports;
+            Reports = reports ?? new BenchmarkReport[0];
         }
 
         private Summary(string title, HostEnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, ValidationError[] validationErrors)
@@ -72,6 +72,7 @@ namespace BenchmarkDotNet.Reports
             ResultsDirectoryPath = resultsDirectoryPath;
             TotalTime = totalTime;
             ValidationErrors = validationErrors;
+            Reports = new BenchmarkReport[0];
         }
 
         internal static Summary CreateFailed(Benchmark[] benchmarks, string title, HostEnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, ValidationError[] validationErrors)

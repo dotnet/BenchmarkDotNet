@@ -35,10 +35,7 @@ namespace BenchmarkDotNet.Samples.Intro
                     StatisticColumn.P85,
                     StatisticColumn.P90,
                     StatisticColumn.P95,
-                    StatisticColumn.P100,
-                    BaselineDiffColumn.Scaled50,
-                    BaselineDiffColumn.Scaled85,
-                    BaselineDiffColumn.Scaled95);
+                    StatisticColumn.P100);
             }
         }
 

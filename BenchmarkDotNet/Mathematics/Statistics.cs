@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Mathematics
 {
@@ -31,7 +32,7 @@ namespace BenchmarkDotNet.Mathematics
         }
 
         public Statistics(IEnumerable<int> values) :
-            this(values.Select(value => (double)value))
+            this(values.Select(value => (double) value))
         {
         }
 
@@ -76,5 +77,50 @@ namespace BenchmarkDotNet.Mathematics
         public double[] WithoutOutliers() => list.Where(value => !IsOutlier(value)).ToArray();
 
         public override string ToString() => $"{Mean} +- {StandardError} (N = {N})";
+
+        /// <summary>
+        /// Statistics for [1/X]. If Min is less then or equal to 0, returns null.
+        /// </summary>        
+        public Statistics Invert() => Min < 1e-9 ? null : new Statistics(list.Select(x => 1 / x));
+
+        /// <summary>
+        /// Statistics for [X^2].
+        /// </summary>        
+        public Statistics Sqr() => new Statistics(list.Select(x => x * x));
+
+        /// <summary>
+        /// Mean for [X*Y].
+        /// </summary>        
+        public static double MulMean(Statistics x, Statistics y) => x.Mean * y.Mean;
+
+        /// <summary>
+        /// Mean for [X/Y].
+        /// </summary>        
+        public static double DivMean(Statistics x, Statistics y)
+        {
+            var yInvert = y.Invert();
+            if (yInvert == null)
+                throw new DivideByZeroException();
+            return MulMean(x, yInvert);
+        }
+
+        /// <summary>
+        /// Variance for [X*Y].
+        /// </summary>        
+        public static double MulVariance(Statistics x, Statistics y)
+        {
+            return x.Sqr().Mean * y.Sqr().Mean - x.Mean.Sqr() * y.Mean.Sqr();
+        } 
+
+        /// <summary>
+        /// Variance for [X/Y].
+        /// </summary>        
+        public static double DivVariance(Statistics x, Statistics y)
+        {
+            var yInvert = y.Invert();
+            if (yInvert == null)
+                throw new DivideByZeroException();
+            return MulVariance(x, yInvert);
+        } 
     }
 }
