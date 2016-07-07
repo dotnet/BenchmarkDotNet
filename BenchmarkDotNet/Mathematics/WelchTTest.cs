@@ -8,6 +8,7 @@ namespace BenchmarkDotNet.Mathematics
         public double T { get; }
         public double Df { get; }
         public double PValue { get; }
+        public bool NullHypothesisIsRejected => PValue < 0.05;
 
         public WelchTTest(double x, double df, double pValue)
         {

@@ -187,7 +187,7 @@ namespace BenchmarkDotNet.Running
                 for (int index = 0; index < executeResults.Count; index++)
                 {
                     var executeResult = executeResults[index];
-                    runs.AddRange(executeResult.Data.Select(line => Measurement.Parse(logger, line, index + 1)).Where(r => r != null));
+                    runs.AddRange(executeResult.Data.Select(line => Measurement.Parse(logger, line, index + 1)).Where(r => r.IterationMode != IterationMode.Unknown));
                 }
 
                 return new BenchmarkReport(benchmark, generateResult, buildResult, executeResults, runs);
@@ -259,7 +259,7 @@ namespace BenchmarkDotNet.Running
                 var measurements = executeResults
                         .SelectMany(r => r.Data)
                         .Select(line => Measurement.Parse(logger, line, 0))
-                        .Where(r => r != null).
+                        .Where(r => r.IterationMode != IterationMode.Unknown).
                         ToArray();
 
                 if (!measurements.Any())
@@ -285,7 +285,7 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineInfo($"// Run, Diagnostic");
                 config.GetCompositeDiagnoser().Start(benchmark);
                 var executeResult = toolchain.Executor.Execute(buildResult, benchmark, logger, config.GetCompositeDiagnoser());
-                var allRuns = executeResult.Data.Select(line => Measurement.Parse(logger, line, 0)).Where(r => r != null).ToList();
+                var allRuns = executeResult.Data.Select(line => Measurement.Parse(logger, line, 0)).Where(r => r.IterationMode != IterationMode.Unknown).ToList();
                 var report = new BenchmarkReport(benchmark, null, null, new[] { executeResult }, allRuns);
                 config.GetCompositeDiagnoser().Stop(benchmark, report);
 

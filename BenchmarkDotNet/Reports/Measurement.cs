@@ -10,8 +10,10 @@ namespace BenchmarkDotNet.Reports
     /// <summary>
     /// The basic captured statistics for a benchmark.
     /// </summary>
-    public sealed class Measurement
+    public struct Measurement
     {
+        private static readonly Measurement Error = new Measurement(-1, IterationMode.Unknown, 0, 0, 0);
+
         public IterationMode IterationMode { get; }
 
         public int LaunchIndex { get; }
@@ -100,7 +102,7 @@ namespace BenchmarkDotNet.Reports
             {
                 logger.WriteLineError("Parse error in the following line:");
                 logger.WriteLineError(line);
-                return null;
+                return Error;
             }
         }
 

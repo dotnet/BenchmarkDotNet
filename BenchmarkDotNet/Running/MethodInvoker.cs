@@ -147,17 +147,13 @@ namespace BenchmarkDotNet.Running
             if (iterationCount.IsAuto)
             {
                 int iterationCounter = 0;
-                Measurement previousMeasurement = null;
-                int upCount = 0;
+                var measurements = new List<Measurement>(50);
                 while (true)
                 {
                     iterationCounter++;
-                    var measurement = multiInvoke(new MultiInvokeInput(iterationMode, iterationCounter, invokeCount));
-                    if (previousMeasurement != null && measurement.Nanoseconds > previousMeasurement.Nanoseconds - 0.1)
-                        upCount++;
-                    if (iterationCounter >= WarmupAutoMinIterationCount && upCount >= 3)
+                    measurements.Add(multiInvoke(new MultiInvokeInput(iterationMode, iterationCounter, invokeCount)));
+                    if (IsWarmupFinished(measurements))
                         break;
-                    previousMeasurement = measurement;
                 }
             }
             else
@@ -166,6 +162,29 @@ namespace BenchmarkDotNet.Running
                     multiInvoke(new MultiInvokeInput(IterationMode.MainWarmup, i + 1, invokeCount));
             }
             Console.WriteLine();
+        }
+
+        private static bool IsWarmupFinished(List<Measurement> measurements)
+        {
+            int n = measurements.Count;
+            if (n < 6 || n >= 50)
+                return false;
+            
+            int dir = -1, changeCount = 0;
+            for (int i = 1; i < n; i++)
+            {
+                var nextDir = Math.Sign(measurements[i].Nanoseconds - measurements[i - 1].Nanoseconds);
+                if (nextDir != dir)
+                {
+                    dir = nextDir;
+                    changeCount++;
+                }
+            }
+            if (changeCount < 4)
+                return false;
+
+            // TODO: add t-test
+            return true;
         }
 
         private static IList<Measurement> RunTarget(Func<MultiInvokeInput, Measurement> multiInvoke, long invokeCount, IterationMode iterationMode, Count iterationCount)
@@ -297,7 +316,7 @@ namespace BenchmarkDotNet.Running
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void RunAction<T>(Func<T> action, int count, T returnHolder = default(T))
-        {            
+        {
             for (int i = 0; i < count; i++)
                 returnHolder = action();
             multiInvokeReturnHolder = returnHolder;
