@@ -14,6 +14,7 @@
 * Powerful diagnostics based on ETW events (see [BenchmarkDotNet.Diagnostics.Windows](https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/))
 * Supported runtimes: Full .NET Framework, .NET Core (RTM), Mono
 * Supported languages: C#, F# (also on [.NET Core](https://github.com/PerfDotNet/BenchmarkDotNet/issues/135)) and Visual Basic
+* Supported OS: Windows, Linux, MacOS
 
 ## Content
 
