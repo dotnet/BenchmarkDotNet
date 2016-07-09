@@ -1,21 +1,12 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Attributes.Jobs;
 
 namespace BenchmarkDotNet.Samples.IL
 {
     // See: http://codeblog.jonskeet.uk/2014/07/16/micro-optimization-the-surprising-inefficiency-of-readonly-fields/
-    [Config(typeof(Config))]
+    [AllJitsJob]
     public class IL_ReadonlyFields
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(Job.LegacyJitX86, Job.LegacyJitX64, Job.RyuJitX64);
-            }
-        }
-
         public struct Int256
         {
             private readonly long bits0, bits1, bits2, bits3;

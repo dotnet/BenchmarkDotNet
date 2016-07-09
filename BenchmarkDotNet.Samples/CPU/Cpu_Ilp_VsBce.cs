@@ -1,21 +1,12 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Attributes.Jobs;
 
 namespace BenchmarkDotNet.Samples.CPU
 {
     // See http://en.wikipedia.org/wiki/Instruction-level_parallelism
-    [Config(typeof(Config))]
+    [AllJitsJob]
     public class Cpu_Ilp_VsBce
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(Job.LegacyJitX86, Job.LegacyJitX64, Job.RyuJitX64);
-            }
-        }
-
         private int[] a = new int[4];
 
         [Benchmark(OperationsPerInvoke = 4)]

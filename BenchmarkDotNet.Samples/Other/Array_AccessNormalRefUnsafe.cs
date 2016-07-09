@@ -1,22 +1,15 @@
 ﻿using System;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes.Jobs;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples.Other
 {
     // See: http://stackoverflow.com/q/8497018/974487
-    [Config(typeof(Config))]
+    [AllJitsJob]
     public class Array_AccessNormalRefUnsafe
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(Job.AllJits);
-            }
-        }
-
         private const int Iterations = 111;
         private static float[] buffer = new float[1024 * 1024 * 100];
         private static readonly int Len = buffer.Length;

@@ -1,9 +1,5 @@
-﻿using System.Collections;
-using System.Globalization;
-using System.Reflection;
-using System.Resources;
+﻿using System.Reflection;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Samples
 {

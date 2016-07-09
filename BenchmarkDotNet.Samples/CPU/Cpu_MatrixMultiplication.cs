@@ -1,21 +1,14 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes.Jobs;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples.CPU
 {
     // See http://en.wikipedia.org/wiki/Matrix_multiplication_algorithm#Cache_behavior
-    [Config(typeof(Config))]
+    [AllJitsJob]
     public class Cpu_MatrixMultiplication
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(Job.LegacyJitX86, Job.LegacyJitX64, Job.RyuJitX64);
-            }
-        }
-
         private const int N = 512;
         private readonly double[,] a = new double[N, N];
         private readonly double[,] b = new double[N, N];

@@ -1,19 +1,11 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Attributes.Jobs;
 
 namespace BenchmarkDotNet.Samples.JIT
 {
+    [LegacyJitX86Job, LegacyJitX64Job]
     public class Jit_InterfaceMethod
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(Job.LegacyJitX86, Job.LegacyJitX64);
-            }
-        }
-
         private interface IFoo
         {
             double Inc(double x);

@@ -2,7 +2,7 @@
 
 namespace BenchmarkDotNet.Attributes.Columns
 {
-    public class SkewnessColumnAttribute : ColumnConfigAttribute
+    public class SkewnessColumnAttribute : ColumnConfigBaseAttribute
     {
         public SkewnessColumnAttribute() : base(StatisticColumn.Skewness)
         {

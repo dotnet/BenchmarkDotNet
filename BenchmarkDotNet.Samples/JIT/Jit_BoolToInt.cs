@@ -1,21 +1,12 @@
-﻿using BenchmarkDotNet.Jobs;
-using System;
+﻿using System;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Attributes.Jobs;
 
 namespace BenchmarkDotNet.Samples.JIT
 {
-    [Config(typeof(Config))]
+    [LegacyJitX64Job, RyuJitX64Job]
     public class Jit_BoolToInt
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(Job.LegacyJitX64, Job.RyuJitX64);
-            }
-        }
-
         private bool p1, p2, p3, p4, p5, p6;
         public int q1, q2, q3, q4, q5, q6;
 

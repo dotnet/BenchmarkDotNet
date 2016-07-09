@@ -5,11 +5,11 @@ using BenchmarkDotNet.Jobs;
 namespace BenchmarkDotNet.Attributes.Jobs
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
-    public class JobProviderAttribute : Attribute, IConfigSource
+    public class JobConfigBaseAttribute : Attribute, IConfigSource
     {
-        protected JobProviderAttribute(IJob job)
+        protected JobConfigBaseAttribute(params IJob[] jobs)
         {
-            Config = ManualConfig.CreateEmpty().With(job);
+            Config = ManualConfig.CreateEmpty().With(jobs);
         }
 
         public IConfig Config { get; }

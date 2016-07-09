@@ -2,7 +2,7 @@
 
 namespace BenchmarkDotNet.Attributes.Jobs
 {
-    public class LongRunJobAttribute : JobProviderAttribute
+    public class LongRunJobAttribute : JobConfigBaseAttribute
     {
         public LongRunJobAttribute() : base(Job.LongRun)
         {

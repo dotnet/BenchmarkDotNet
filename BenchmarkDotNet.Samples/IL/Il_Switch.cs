@@ -1,20 +1,11 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Attributes.Jobs;
 
 namespace BenchmarkDotNet.Samples.IL
 {
-    [Config(typeof(Config))]
+    [LegacyJitX64Job]
     public class IL_Switch
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(Job.LegacyJitX64);
-            }
-        }
-
         private int x = 7, y = 7000;
 
         [Benchmark]

@@ -1,22 +1,13 @@
 ﻿using System.Diagnostics;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Attributes.Jobs;
 
 namespace BenchmarkDotNet.Samples.JIT
 {
     // See http://stackoverflow.com/questions/32114308/weird-performance-increase-in-simple-benchmark
-    [Config(typeof(Config))]
+    [LegacyJitX86Job]
     public class Jit_RegistersVsStack
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(Job.LegacyJitX86);
-            }
-        }
-
         [Params(false, true)]
         public bool CallStopwatchTimestamp { get; set; }
 

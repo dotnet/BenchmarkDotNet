@@ -1,22 +1,13 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Attributes.Jobs;
 
 namespace BenchmarkDotNet.Samples.JIT
 {
     // See http://en.wikipedia.org/wiki/Inline_expansion
     // See http://aakinshin.net/en/blog/dotnet/inlining-and-starg/
-    [Config(typeof(Config))]
+    [AllJitsJob]
     public class Jit_Inlining
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(Job.AllJits);
-            }
-        }
-
         [Benchmark]
         public int Calc()
         {

@@ -1,21 +1,12 @@
 ﻿using System.Diagnostics;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Attributes.Jobs;
 
 namespace BenchmarkDotNet.Samples.Framework
 {
-    [Config(typeof(Config))]
+    [ClrJob, MonoJob]
     public class Framework_Stopwatch
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(Job.Clr, Job.Mono);
-            }
-        }    
-
         [Benchmark]
         public long Latency()
         {

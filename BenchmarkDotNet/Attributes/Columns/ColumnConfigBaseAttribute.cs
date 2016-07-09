@@ -3,13 +3,13 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 
 namespace BenchmarkDotNet.Attributes.Columns
-{
+{    
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
-    public abstract class ColumnConfigAttribute : Attribute, IConfigSource
+    public abstract class ColumnConfigBaseAttribute : Attribute, IConfigSource
     {
-        protected ColumnConfigAttribute(IColumn column)
+        protected ColumnConfigBaseAttribute(params IColumn[] columns)
         {
-            Config = ManualConfig.CreateEmpty().With(column);
+            Config = ManualConfig.CreateEmpty().With(columns);
         }
 
         public IConfig Config { get; }

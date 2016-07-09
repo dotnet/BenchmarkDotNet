@@ -1,19 +1,11 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Attributes.Jobs;
 
 namespace BenchmarkDotNet.Samples.JIT
 {
-    [Config(typeof(Config))]
+    [AllJitsJob]
     public class Jit_Bce
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(Job.AllJits);
-            }
-        }
         private const int N = 11;
         private int[] x = new int[N];
 

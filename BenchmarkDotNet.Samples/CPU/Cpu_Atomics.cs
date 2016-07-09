@@ -1,20 +1,11 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Attributes.Jobs;
 
 namespace BenchmarkDotNet.Samples.CPU
 {
-    [Config(typeof(Config))]
+    [RyuJitX64Job]
     public class Cpu_Atomics
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(Job.RyuJitX64);
-            }
-        }
-
         private int a;
         private object syncRoot = new object();
 

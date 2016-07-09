@@ -1,20 +1,11 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Attributes.Jobs;
 
 namespace BenchmarkDotNet.Samples.JIT
 {
-    [Config(typeof(Config))]
+    [AllJitsJob]
     public class Jit_LoopUnrolling
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(Job.AllJits);
-            }
-        }
-
         [Benchmark]
         public int Sum()
         {

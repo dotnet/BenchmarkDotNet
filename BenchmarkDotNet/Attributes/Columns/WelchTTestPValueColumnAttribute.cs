@@ -2,7 +2,7 @@
 
 namespace BenchmarkDotNet.Attributes.Columns
 {
-    public class WelchTTestPValueColumnAttribute : ColumnConfigAttribute
+    public class WelchTTestPValueColumnAttribute : ColumnConfigBaseAttribute
     {
         public WelchTTestPValueColumnAttribute() : base(BaselineScaledColumn.WelchTTestPValue)
         {

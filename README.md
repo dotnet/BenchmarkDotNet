@@ -153,7 +153,22 @@ public class MyClassWithBenchmarks
 }
 ```
 
-* **Custom configs**
+* **Attribute style**
+
+You can also use a set of predefined config attributes:
+
+```cs
+[ClrJob, MonoJob, CoreJob]
+[SkewnessColumn, KurtosisColumn, WelchTTestPValueColumn]
+[RPlotExporter, AsciiDocExporter, HtmlExporter]
+public class MyClassWithBenchmarks
+{
+  // ...
+}
+```
+
+
+* **Custom style**
 
 You can also define own config attribute:
 
@@ -180,7 +195,7 @@ public class IntroConfigSource
 }
 ```
 
-* **Fluent config**
+* **Fluent style**
 
 There is no need to create new Config type, you can simply use fluent interface:
 

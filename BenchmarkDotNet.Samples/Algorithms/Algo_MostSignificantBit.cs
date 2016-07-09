@@ -1,21 +1,12 @@
-﻿using BenchmarkDotNet.Jobs;
-using System;
+﻿using System;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Attributes.Jobs;
 
 namespace BenchmarkDotNet.Samples.Algorithms
 {
-    [Config(typeof(Config))]
+    [LegacyJitX64Job, RyuJitX64Job]
     public class Algo_MostSignificantBit
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(Job.LegacyJitX64, Job.RyuJitX64);
-            }
-        }
-
         private const int N = 4001;
         private readonly int[] numbers;
         private readonly Random random = new Random(42);

@@ -1,21 +1,12 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Attributes.Jobs;
 
 namespace BenchmarkDotNet.Samples.CPU
 {
     // See: https://github.com/dotnet/coreclr/issues/993
-    [Config(typeof(Config))]
+    [LegacyJitX64Job, RyuJitX64Job]
     public class Cpu_Ilp_RyuJit
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(Job.LegacyJitX64, Job.RyuJitX64);
-            }
-        }
-
         private double[] x = new double[11];
 
         [Benchmark]
