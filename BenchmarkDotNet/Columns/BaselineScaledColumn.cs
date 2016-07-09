@@ -13,11 +13,13 @@ namespace BenchmarkDotNet.Columns
         public enum DiffKind
         {
             Mean,
-            StdDev
+            StdDev,
+            WelchTTestPValue
         }
 
         public static readonly IColumn Scaled = new BaselineScaledColumn(DiffKind.Mean);
         public static readonly IColumn ScaledStdDev = new BaselineScaledColumn(DiffKind.StdDev);
+        public static readonly IColumn WelchTTestPValue = new BaselineScaledColumn(DiffKind.WelchTTestPValue);
 
         public DiffKind Kind { get; set; }
 
@@ -36,6 +38,8 @@ namespace BenchmarkDotNet.Columns
                         return "Scaled";
                     case DiffKind.StdDev:
                         return "Scaled-SD";
+                    case DiffKind.WelchTTestPValue:
+                        return "t-test p-value";
                 }
                 throw new NotSupportedException();
             }
@@ -69,6 +73,11 @@ namespace BenchmarkDotNet.Columns
                     return mean.ToStr("N2");
                 case DiffKind.StdDev:
                     return stdDev.ToStr("N2");
+                case DiffKind.WelchTTestPValue:
+                {
+                    var pvalue = WelchTTest.Calc(baselineStat, targetStat).PValue;
+                    return pvalue > 0.0001 ? pvalue.ToStr("N4") : pvalue.ToStr("e2");
+                }
                 default:
                     throw new NotSupportedException();
             }

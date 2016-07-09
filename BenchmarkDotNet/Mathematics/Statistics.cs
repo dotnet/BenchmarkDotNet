@@ -23,6 +23,8 @@ namespace BenchmarkDotNet.Mathematics
         public double StandardError { get; }
         public double Variance { get; }
         public double StandardDeviation { get; }
+        public double Skewness { get; }
+        public double Kurtosis { get; }
         public ConfidenceInterval ConfidenceInterval { get; }
         public PercentileValues Percentiles { get; }
 
@@ -69,12 +71,16 @@ namespace BenchmarkDotNet.Mathematics
             Variance = N == 1 ? 0 : list.Sum(d => Math.Pow(d - Mean, 2)) / (N - 1);
             StandardDeviation = Math.Sqrt(Variance);
             StandardError = StandardDeviation / Math.Sqrt(N);
+            Skewness = CalcCentralMoment(3) / StandardDeviation.Pow(3);
+            Kurtosis = CalcCentralMoment(4) / StandardDeviation.Pow(4);
             ConfidenceInterval = new ConfidenceInterval(Mean, StandardError);
             Percentiles = new PercentileValues(list);
         }
 
         public bool IsOutlier(double value) => value < LowerFence || value > UpperFence;
         public double[] WithoutOutliers() => list.Where(value => !IsOutlier(value)).ToArray();
+
+        public double CalcCentralMoment(int k) => list.Average(x => (x - Mean).Pow(k));
 
         public override string ToString() => $"{Mean} +- {StandardError} (N = {N})";
 
@@ -110,7 +116,7 @@ namespace BenchmarkDotNet.Mathematics
         public static double MulVariance(Statistics x, Statistics y)
         {
             return x.Sqr().Mean * y.Sqr().Mean - x.Mean.Sqr() * y.Mean.Sqr();
-        } 
+        }
 
         /// <summary>
         /// Variance for [X/Y].
@@ -121,6 +127,6 @@ namespace BenchmarkDotNet.Mathematics
             if (yInvert == null)
                 throw new DivideByZeroException();
             return MulVariance(x, yInvert);
-        } 
+        }
     }
 }

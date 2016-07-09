@@ -42,3 +42,4 @@ nuget.exe
 testsOutput/*
 .vs/restore.dg
 BDN.Auto
+BenchmarkDotNet.Samples/Properties/launchSettings.json

@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Mathematics;
-using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -19,6 +18,7 @@ namespace BenchmarkDotNet.Extensions
             builder.AppendLine($"Min = {s.Min.ToStr()}, Q1 = {s.Q1.ToStr()}, Median = {s.Median.ToStr()}, Q3 = {s.Q3.ToStr()}, Max = {s.Max.ToStr()}");
             builder.AppendLine($"IQR = {s.InterquartileRange.ToStr()}, LowerFence = {s.LowerFence.ToStr()}, UpperFence = {s.UpperFence.ToStr()}");
             builder.AppendLine($"ConfidenceInterval = {s.ConfidenceInterval.ToStr()}");
+            builder.AppendLine($"Skewness = {s.Skewness}, Kurtosis = {s.Kurtosis}");
             return builder.ToString();
         }
 
@@ -34,6 +34,7 @@ namespace BenchmarkDotNet.Extensions
             builder.AppendLine($"Min = {s.Min.ToTimeStr(unit)}, Q1 = {s.Q1.ToTimeStr(unit)}, Median = {s.Median.ToTimeStr(unit)}, Q3 = {s.Q3.ToTimeStr(unit)}, Max = {s.Max.ToTimeStr(unit)}");
             builder.AppendLine($"IQR = {s.InterquartileRange.ToTimeStr(unit)}, LowerFence = {s.LowerFence.ToTimeStr(unit)}, UpperFence = {s.UpperFence.ToTimeStr(unit)}");
             builder.AppendLine($"ConfidenceInterval = {s.ConfidenceInterval.ToTimeStr(unit)}");
+            builder.AppendLine($"Skewness = {s.Skewness}, Kurtosis = {s.Kurtosis}");
             return builder.ToString();
         }
     }

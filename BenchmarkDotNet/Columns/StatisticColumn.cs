@@ -21,6 +21,9 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn Q3 = new StatisticColumn("Q3", s => s.Q3);
         public static readonly IColumn Max = new StatisticColumn("Max", s => s.Max);
 
+        public static readonly IColumn Skewness = new StatisticColumn("Skewness", s => s.Skewness, false);
+        public static readonly IColumn Kurtosis = new StatisticColumn("Kurtosis", s => s.Kurtosis, false);
+
         public static readonly IColumn P0 = new StatisticColumn("P0", s => s.Percentiles.P0);
         public static readonly IColumn P25 = new StatisticColumn("P25", s => s.Percentiles.P25);
         public static readonly IColumn P50 = new StatisticColumn("P50", s => s.Percentiles.P50);
