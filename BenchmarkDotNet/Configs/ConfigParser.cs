@@ -70,6 +70,7 @@ namespace BenchmarkDotNet.Configs
                 { "alljits", Job.AllJits },
                 { "clr", new[] { Job.Clr } },
                 { "mono", new[] { Job.Mono } },
+                { "monollvm", new[] { Job.MonoLLVM } },
                 { "longrun", new[] { Job.LongRun } }
             };
         private static Lazy<IJob[]> allJobs = new Lazy<IJob[]>(() => availableJobs.SelectMany(e => e.Value).ToArray());

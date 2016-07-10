@@ -112,6 +112,8 @@ namespace BenchmarkDotNet.Jobs
                 shortInfo = "Dry";
             if (job.Equals(Job.Mono))
                 shortInfo = "Mono";
+            if (job.Equals(Job.MonoLLVM))
+                shortInfo = "MonoLLVM";
             if (job.Equals(Job.Clr))
                 shortInfo = "Clr";
             if (job.Equals(Job.Core))

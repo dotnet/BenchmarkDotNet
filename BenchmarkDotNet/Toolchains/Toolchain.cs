@@ -24,7 +24,17 @@ namespace BenchmarkDotNet.Toolchains
             Executor = executor;
         }
 
-        public virtual bool IsSupported(Benchmark benchmark, ILogger logger) => true;
+        public virtual bool IsSupported(Benchmark benchmark, ILogger logger)
+        {
+            var runtime = benchmark.Job.Runtime == Runtime.Host ? RuntimeInformation.GetCurrent() : benchmark.Job.Runtime;
+            if (runtime != Runtime.Mono && benchmark.Job.Jit == Jit.LLVM)
+            {
+                logger.WriteLineError($"LLVM is supported only for Mono, benchmark {benchmark.ShortInfo} will not be executed");
+                return false;
+            }
+
+            return true;
+        }
 
         public override string ToString() => Name;
 

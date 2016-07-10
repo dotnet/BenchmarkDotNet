@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Extensions;
@@ -102,12 +103,24 @@ namespace BenchmarkDotNet.Toolchains.Classic
                     break;
                 case Runtime.Mono:
                     start.FileName = "mono";
-                    start.Arguments = exeName + " " + args;
+                    start.Arguments = GetMonoArguments(benchmark.Job, exeName, args);
                     break;
                 default:
                     throw new NotSupportedException("Runtime = " + benchmark.Job.Runtime);
             }
             return start;
+        }
+
+        private string GetMonoArguments(IJob job, string exeName, string args)
+        {
+            // from mono --help: "Usage is: mono [options] program [program-options]"
+            return new StringBuilder(30)
+                .Append(job.Jit == Jit.LLVM ? "--llvm" : "--nollvm")
+                .Append(' ')
+                .Append(exeName)
+                .Append(' ')
+                .Append(args)
+                .ToString();
         }
 
         private class ConsoleHandler

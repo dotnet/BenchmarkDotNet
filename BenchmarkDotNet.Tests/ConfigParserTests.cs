@@ -54,8 +54,8 @@ namespace BenchmarkDotNet.Tests
             var parser = new ConfigParser();
             var config = parser.Parse(new[] { "jobs=all" });
 
-            // TODO How to make this robust, 11 is only valid when there are 11 items in "availableJobs" in ConfigParser.cs
-            Assert.Equal(11, config.GetJobs().Count());
+            // TODO How to make this robust, 12 is only valid when there are 12 items in "availableJobs" in ConfigParser.cs
+            Assert.Equal(12, config.GetJobs().Count());
 
             Assert.Equal(0, config.GetColumns().Count());
             Assert.Equal(0, config.GetExporters().Count());

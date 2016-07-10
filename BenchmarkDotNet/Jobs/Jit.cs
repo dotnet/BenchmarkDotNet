@@ -2,6 +2,12 @@
 {
     public enum Jit
     {
-        Host, LegacyJit, RyuJit
+        Host,
+        LegacyJit,
+        RyuJit,
+        /// <summary>
+        /// supported only for Mono
+        /// </summary>
+        LLVM
     }
 }
