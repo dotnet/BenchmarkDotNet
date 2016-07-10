@@ -3,7 +3,7 @@
 namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Method)]
-    public sealed class SetupAttribute : Attribute
+    public class SetupAttribute : Attribute
     {
         public SetupAttribute()
         {
