@@ -39,7 +39,7 @@ nuget.exe
 
 **/BenchmarkDotNet.Artifacts/*
 **/project.lock.json
-testsOutput/*
+tests/output/*
 .vs/restore.dg
 BDN.Auto
 BenchmarkDotNet.Samples/Properties/launchSettings.json

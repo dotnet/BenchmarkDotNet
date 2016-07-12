@@ -1,5 +1,9 @@
 ﻿{
-  "title": "BenchmarkDotNet.Tests",
+  "title": "BenchmarkDotNet.Samples",
+  "buildOptions": {
+    "emitEntryPoint": true,
+    "allowUnsafe": true
+  },
   "configurations": {
     "Debug": {
       "buildOptions": {
@@ -10,19 +14,29 @@
       "buildOptions": {
         "define": [ "RELEASE", "TRACE" ],
         "optimize": true,
-        "keyFile": "../strongNameKey.snk",
+        "keyFile": "../../strongNameKey.snk",
         "strongName": true
       }
     }
   },
-  "testRunner": "xunit",
   "frameworks": {
+    "net45": {
+      "buildOptions": {
+        "define": [ "CLASSIC" ]
+      },
+      "frameworkAssemblies": {
+        "System.Reflection": "4.0.0.0"
+      },
+      "dependencies": {
+        "BenchmarkDotNet.Diagnostics.Windows": {
+          "target": "project"
+        }
+      }
+    },
     "netcoreapp1.0": {
-      "imports": [
-        "dnxcore50",
-        "portable-net45+win8",
-        "netstandard1.6"
-      ],
+      "buildOptions": {
+        "define": [ "CORE" ]
+      },
       "dependencies": {
         "Microsoft.NETCore.App": {
           "type": "platform",
@@ -30,23 +44,12 @@
         },
         "System.ComponentModel.EventBasedAsync": "4.0.11"
       }
-    },
-    "net451": {
-      "dependencies": {
-        "Microsoft.NETCore.Platforms": "1.0.1"
-      },
-      "frameworkAssemblies": {
-        "System.Runtime": "4.0.10.0",
-        "System.Threading.Tasks": "4.0.0.0"
-      }
     }
   },
   "dependencies": {
     "BenchmarkDotNet": {
       "target": "project",
       "version": "0.9.8-develop"
-    },
-    "xunit": "2.2.0-beta2-build3300",
-    "dotnet-test-xunit": "2.2.0-preview2-build1029"
+    }
   }
 }

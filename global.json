@@ -1,5 +1,5 @@
 {
   "projects": [
-    "Dia2Lib", "Interop.Dia2Lib", "Microsoft.Diagnostics.Runtime"
+    "src", "samples", "tests"
   ]
 }

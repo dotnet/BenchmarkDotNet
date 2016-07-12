@@ -59,21 +59,21 @@ build:
   project: BenchmarkDotNet.sln    # path to Visual Studio solution or project
 
 after_build:
-  - dotnet pack .\BenchmarkDotNet\project.json --configuration Release
-  - dotnet pack .\BenchmarkDotNet.Diagnostics.Windows\project.json --configuration Release
+  - dotnet pack .\src\BenchmarkDotNet\project.json --configuration Release
+  - dotnet pack .\src\BenchmarkDotNet.Diagnostics.Windows\project.json --configuration Release
   
 #---------------------------------#
 #       tests configuration       #
 #---------------------------------#
 test_script:
-  - dotnet test .\BenchmarkDotNet.Tests\project.json --configuration Release -xml tests-results01.xml
+  - dotnet test .\tests\BenchmarkDotNet.Tests\project.json --configuration Release -xml tests-results01.xml
   - ps: .\build\uploadtests.ps1 "tests-results01.xml"
-  - dotnet test .\BenchmarkDotNet.IntegrationTests\project.json --configuration Release -xml tests-results02.xml
+  - dotnet test .\tests\BenchmarkDotNet.IntegrationTests\project.json --configuration Release -xml tests-results02.xml
   - ps: .\build\uploadtests.ps1 "tests-results02.xml"
 
 test:
   assemblies:
-    - BenchmarkDotNet.IntegrationTests.Classic\bin\$(configuration)\BenchmarkDotNet.IntegrationTests.Classic.exe
+    - tests\BenchmarkDotNet.IntegrationTests.Classic\bin\$(configuration)\BenchmarkDotNet.IntegrationTests.Classic.exe
 
 artifacts:
   - path: '**\BenchmarkDotNet.*.nupkg' # find all NuGet packages recursively

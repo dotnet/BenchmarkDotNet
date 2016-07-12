@@ -4,25 +4,26 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0031728E-A5D4-47C1-9C1A-6C859A765C9D}</ProjectGuid>
+    <ProjectGuid>{873581FF-DB9D-42E5-8F11-32A4B7BB28EC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BenchmarkDotNet.IntegrationTests.CustomPaths</RootNamespace>
-    <AssemblyName>BenchmarkDotNet.IntegrationTests.CustomPaths</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <RootNamespace>BenchmarkDotNet.IntegrationTests.EnabledOptimizations</RootNamespace>
+    <AssemblyName>BenchmarkDotNet.IntegrationTests.EnabledOptimizations</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -30,12 +31,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="BenchmarkDotNet" Condition="'$(Configuration)'=='Release'">
-      <HintPath>..\BenchmarkDotNet\bin\Release\net45\BenchmarkDotNet.dll</HintPath>
+      <HintPath>..\..\src\BenchmarkDotNet\bin\Release\net45\BenchmarkDotNet.dll</HintPath>
     </Reference>
     <Reference Include="BenchmarkDotNet" Condition="'$(Configuration)'=='Debug'">
-      <HintPath>..\BenchmarkDotNet\bin\Debug\net45\BenchmarkDotNet.dll</HintPath>
+      <HintPath>..\..\src\BenchmarkDotNet\bin\Debug\net45\BenchmarkDotNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -45,21 +49,10 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="VerySimple, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>customPath\VerySimple.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BenchmarksThatReturnTypeFromCustomPathDll.cs" />
-    <Compile Include="BenchmarksThatUsesFileFromOutput.cs" />
-    <Compile Include="BenchmarksThatUseTypeFromCustomPathDll.cs" />
+    <Compile Include="OptimizationsEnabledInCsproj.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="ShouldGetCopied.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

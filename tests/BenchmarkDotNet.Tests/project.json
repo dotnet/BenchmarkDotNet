@@ -1,5 +1,5 @@
-{
-  "title": "BenchmarkDotNet.IntegrationTests",
+﻿{
+  "title": "BenchmarkDotNet.Tests",
   "configurations": {
     "Debug": {
       "buildOptions": {
@@ -10,7 +10,7 @@
       "buildOptions": {
         "define": [ "RELEASE", "TRACE" ],
         "optimize": true,
-        "keyFile": "../strongNameKey.snk",
+        "keyFile": "../../strongNameKey.snk",
         "strongName": true
       }
     }
@@ -18,9 +18,6 @@
   "testRunner": "xunit",
   "frameworks": {
     "netcoreapp1.0": {
-      "buildOptions": {
-        "define": [ "CORE" ]
-      },
       "imports": [
         "dnxcore50",
         "portable-net45+win8",
@@ -35,25 +32,19 @@
       }
     },
     "net451": {
-      "buildOptions": {
-        "define": [ "CLASSIC" ]
-      },
       "dependencies": {
-        "BenchmarkDotNet.Diagnostics.Windows": {
-          "target": "project"
-        },
         "Microsoft.NETCore.Platforms": "1.0.1"
       },
       "frameworkAssemblies": {
         "System.Runtime": "4.0.10.0",
-        "System.Threading.Tasks": "4.0.0.0",
-        "WindowsBase": "4.0.0.0"
+        "System.Threading.Tasks": "4.0.0.0"
       }
     }
   },
   "dependencies": {
     "BenchmarkDotNet": {
-      "target": "project"
+      "target": "project",
+      "version": "0.9.8-develop"
     },
     "xunit": "2.2.0-beta2-build3300",
     "dotnet-test-xunit": "2.2.0-preview2-build1029"
