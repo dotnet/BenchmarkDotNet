@@ -35,7 +35,7 @@ If your build fails because some packages are not available, let say F#, then ju
 
 
 ### Branches
-Please, use the `develop` branch for developing. The `master` branch should correspond the latest NuGet package of the library.
+Please, use the `master` branch for developing. The `stable` branch should correspond the latest NuGet package of the library.
 
 ### New project files
 
