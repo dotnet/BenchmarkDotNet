@@ -190,6 +190,8 @@ namespace BenchmarkDotNet.Toolchains
                 return ((decimal)value).ToString("G", CultureInfo.InvariantCulture) + "m";
             if (value.GetType().GetTypeInfo().IsEnum)
                 return value.GetType().GetCorrectTypeName() + "." + value;
+            if (value is Type)
+                return "typeof(" + ((Type) value).GetCorrectTypeName() + ")";
             return value.ToString();
         }
     }
