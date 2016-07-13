@@ -16,6 +16,9 @@
     }
   },
   "testRunner": "xunit",
+  "buildOptions": {
+    "copyToOutput": [ "xunit.runner.json" ]
+  },
   "frameworks": {
     "netcoreapp1.0": {
       "buildOptions": {
