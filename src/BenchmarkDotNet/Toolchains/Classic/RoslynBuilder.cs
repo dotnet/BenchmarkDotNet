@@ -12,6 +12,8 @@ namespace BenchmarkDotNet.Toolchains.Classic
 {
     internal class RoslynBuilder : IBuilder
     {
+        private static readonly Lazy<AssemblyMetadata[]> FrameworkAssembliesMetadata = new Lazy<AssemblyMetadata[]>(GetFrameworkAssembliesMetadata);
+
         public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark)
         {
             logger.WriteLineInfo($"BuildScript: {generateResult.ArtifactsPaths.BuildScriptFilePath}");
@@ -26,8 +28,11 @@ namespace BenchmarkDotNet.Toolchains.Classic
                  deterministic: true);
 
             var references = RoslynGenerator
-                .GetAllReferences(benchmark, includePredefined: true)
-                .Select(assembly => MetadataReference.CreateFromFile(assembly.Location));
+                .GetAllReferences(benchmark)
+                .Select(assembly => AssemblyMetadata.CreateFromFile(assembly.Location))
+                .Concat(FrameworkAssembliesMetadata.Value)
+                .Distinct()
+                .Select(uniqueMetadata => uniqueMetadata.GetReference());
 
             var compilation = CSharpCompilation
                 .Create(assemblyName: Path.GetFileName(generateResult.ArtifactsPaths.ExecutablePath))
@@ -69,6 +74,31 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 default:
                     throw new ArgumentOutOfRangeException(nameof(platform), platform, null);
             }
+        }
+
+        private static AssemblyMetadata[] GetFrameworkAssembliesMetadata()
+        {
+            return GetFrameworkAssembliesPaths()
+                .Where(File.Exists)
+                .Select(AssemblyMetadata.CreateFromFile)
+                .ToArray();
+        }
+
+        private static string[] GetFrameworkAssembliesPaths()
+        {
+            var frameworkAssembliesDirectory = Path.GetDirectoryName(typeof(object).Assembly.Location);
+            if (frameworkAssembliesDirectory == null)
+            {
+                return new string[0];
+            }
+
+            return new[]
+            {
+                Path.Combine(frameworkAssembliesDirectory, "mscorlib.dll"),
+                Path.Combine(frameworkAssembliesDirectory, "System.dll"),
+                Path.Combine(frameworkAssembliesDirectory, "System.Core.dll"),
+                Path.Combine(frameworkAssembliesDirectory, "System.Runtime.dll")
+            };
         }
     }
 }

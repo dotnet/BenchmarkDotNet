@@ -10,16 +10,6 @@ namespace BenchmarkDotNet.Toolchains.Classic
 {
     internal class RoslynGenerator : GeneratorBase
     {
-        private static readonly HashSet<string> PredefinedAssemblies = new HashSet<string>(
-            new[]
-            {
-                "mscorlib",
-                "System",
-                "System.Core",
-                "System.Xml.Linq",
-                "System.Xml"
-            });
-
         protected override string GetBuildArtifactsDirectoryPath(Benchmark benchmark, string programName)
             => Path.GetDirectoryName(benchmark.Target.Type.GetTypeInfo().Assembly.Location);
 
@@ -53,11 +43,11 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 prefix + string.Join(" ", list));
         }
 
-        internal static IEnumerable<Assembly> GetAllReferences(Benchmark benchmark, bool includePredefined = false)
+        internal static IEnumerable<Assembly> GetAllReferences(Benchmark benchmark)
         {
-            return (from referencedAssembly in benchmark.Target.Type.GetTypeInfo().Assembly.GetReferencedAssemblies()
-                    where (includePredefined || !PredefinedAssemblies.Contains(referencedAssembly.Name))
-                    select Assembly.Load(referencedAssembly))
+            return benchmark.Target.Type.GetTypeInfo().Assembly
+                .GetReferencedAssemblies()
+                .Select(Assembly.Load)
                 .Concat(new[] { benchmark.Target.Type.GetTypeInfo().Assembly });
         }
 
