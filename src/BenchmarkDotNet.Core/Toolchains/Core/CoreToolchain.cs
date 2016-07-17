@@ -3,7 +3,6 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.Classic;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 
 namespace BenchmarkDotNet.Toolchains.Core
@@ -23,7 +22,7 @@ namespace BenchmarkDotNet.Toolchains.Core
                       imports: GetImports(),
                       runtime: GetRuntime()), 
                   new DotNetCliBuilder(TargetFrameworkMoniker),
-                  new ClassicExecutor())
+                  new Executor())
         {
         }
 

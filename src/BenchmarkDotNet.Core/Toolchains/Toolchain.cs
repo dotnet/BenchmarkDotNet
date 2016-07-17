@@ -38,22 +38,6 @@ namespace BenchmarkDotNet.Toolchains
 
         public override string ToString() => Name;
 
-        public static IToolchain GetToolchain(IJob job) => job.Toolchain ?? GetToolchain(job.Runtime);
-
-        internal static IToolchain GetToolchain(Runtime runtime)
-        {
-            switch (runtime)
-            {
-                case Runtime.Host:
-                    return GetToolchain(RuntimeInformation.GetCurrent());
-                case Runtime.Clr:
-                case Runtime.Mono:
-                    return Classic.ClassicToolchain.Instance;
-                case Runtime.Core:
-                    return Core.CoreToolchain.Instance;
-            }
-
-            throw new NotSupportedException("Runtime not supported");
-        }
+        
     }
 }

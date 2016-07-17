@@ -59,6 +59,8 @@ build:
   project: BenchmarkDotNet.sln    # path to Visual Studio solution or project
 
 after_build:
+  - dotnet pack .\src\BenchmarkDotNet.Core\project.json --configuration Release
+  - dotnet pack .\src\BenchmarkDotNet.Toolchains.Roslyn\project.json --configuration Release
   - dotnet pack .\src\BenchmarkDotNet\project.json --configuration Release
   - dotnet pack .\src\BenchmarkDotNet.Diagnostics.Windows\project.json --configuration Release
   

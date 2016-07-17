@@ -1,5 +1,4 @@
 {
-  "version": "1.0.0-*",
   "buildOptions": {
     "emitEntryPoint": true,
     "compilerName": "fsc",
@@ -17,8 +16,7 @@
       "version": "1.0.0"
     },
     "BenchmarkDotNet": {
-      "target": "project",
-      "version": "0.9.8-develop"
+      "target": "project"
     }
   },
   "tools": {

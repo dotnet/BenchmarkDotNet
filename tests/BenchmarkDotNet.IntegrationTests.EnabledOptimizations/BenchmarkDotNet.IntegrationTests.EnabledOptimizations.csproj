@@ -35,11 +35,11 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BenchmarkDotNet" Condition="'$(Configuration)'=='Release'">
-      <HintPath>..\..\src\BenchmarkDotNet\bin\Release\net45\BenchmarkDotNet.dll</HintPath>
+    <Reference Include="BenchmarkDotNet.Core" Condition="'$(Configuration)'=='Release'">
+      <HintPath>..\..\src\BenchmarkDotNet.Core\bin\Release\net45\BenchmarkDotNet.Core.dll</HintPath>
     </Reference>
     <Reference Include="BenchmarkDotNet" Condition="'$(Configuration)'=='Debug'">
-      <HintPath>..\..\src\BenchmarkDotNet\bin\Debug\net45\BenchmarkDotNet.dll</HintPath>
+      <HintPath>..\..\src\BenchmarkDotNet.Core\bin\Debug\net45\BenchmarkDotNet.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

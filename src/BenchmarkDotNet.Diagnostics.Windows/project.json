@@ -32,7 +32,7 @@
     }
   },
   "frameworks": {
-    "net45": { }
+    "net45": {}
   },
   "dependencies": {
     "BenchmarkDotNet": {

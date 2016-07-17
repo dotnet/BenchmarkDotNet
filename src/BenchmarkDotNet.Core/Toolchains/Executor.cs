@@ -12,11 +12,11 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 
-namespace BenchmarkDotNet.Toolchains.Classic
+namespace BenchmarkDotNet.Toolchains
 {
-    internal class ClassicExecutor : IExecutor
+    internal class Executor : IExecutor
     {
-        // This needs to be static, so that we can share a single handler amongst all instances of BenchmarkClassicExecutor's
+        // This needs to be static, so that we can share a single handler amongst all instances of Executor's
         private static ConsoleHandler consoleHandler;
 
         public ExecuteResult Execute(BuildResult buildResult, Benchmark benchmark, ILogger logger, IDiagnoser compositeDiagnoser = null)

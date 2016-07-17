@@ -1,5 +1,5 @@
 ﻿{
-  "title": "BenchmarkDotNet",
+  "title": "BenchmarkDotNet.Toolchains.Roslyn",
   "version": "0.9.8-develop",
   "authors": [ "Andrey Akinshin", "Jon Skeet", "Matt Warren" ],
   "description": "Powerful .NET library for benchmarking",
@@ -33,28 +33,14 @@
       }
     }
   },
-  "buildOptions": {
-    "nowarn": [ "1591" ]
-  },
   "frameworks": {
     "net45": {
-      "buildOptions": {
-        "define": [ "CLASSIC" ]
-      },
-      "dependencies": {
-        "BenchmarkDotNet.Toolchains.Roslyn": {
-          "target": "project"
-        }
-      }
-    },
-    "netstandard1.5": {
-      "buildOptions": {
-        "define": [ "CORE" ]
-      },
       "dependencies": {
         "BenchmarkDotNet.Core": {
           "target": "project"
-        }
+        },
+        "Microsoft.CodeAnalysis.CSharp": "1.3.2",
+        "System.Threading.Tasks": "4.0.0"
       }
     }
   }

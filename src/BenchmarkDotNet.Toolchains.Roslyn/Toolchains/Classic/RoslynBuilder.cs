@@ -1,5 +1,4 @@
-﻿#if CLASSIC
-using System.IO;
+﻿using System.IO;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
@@ -102,4 +101,3 @@ namespace BenchmarkDotNet.Toolchains.Classic
         }
     }
 }
-#endif

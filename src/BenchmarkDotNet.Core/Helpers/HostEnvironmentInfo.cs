@@ -135,9 +135,9 @@ namespace BenchmarkDotNet.Helpers
         internal bool IsDotNetCliInstalled() => !string.IsNullOrEmpty(DotNetCliVersion.Value);
 
         private static string GetBenchmarkDotNetCaption() =>
-            typeof(BenchmarkRunner).GetTypeInfo().Assembly.GetCustomAttributes<AssemblyTitleAttribute>().First().Title;
+            typeof(Benchmark).GetTypeInfo().Assembly.GetCustomAttributes<AssemblyTitleAttribute>().First().Title;
 
         private static string GetBenchmarkDotNetVersion() =>
-            typeof(BenchmarkRunner).GetTypeInfo().Assembly.GetName().Version + (GetBenchmarkDotNetCaption().EndsWith("-Dev") ? "+" : string.Empty);
+            typeof(Benchmark).GetTypeInfo().Assembly.GetName().Version + (GetBenchmarkDotNetCaption().EndsWith("-Dev") ? "+" : string.Empty);
     }
 }

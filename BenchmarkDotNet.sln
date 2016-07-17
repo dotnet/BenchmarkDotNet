@@ -21,45 +21,50 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BenchmarkDotNet.Integration
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.IntegrationTests.CustomPaths", "tests\BenchmarkDotNet.IntegrationTests.CustomPaths\BenchmarkDotNet.IntegrationTests.CustomPaths.csproj", "{0031728E-A5D4-47C1-9C1A-6C859A765C9D}"
 	ProjectSection(ProjectDependencies) = postProject
-		{AF1E6F8A-5C63-465F-96F4-5E5F183A33B9} = {AF1E6F8A-5C63-465F-96F4-5E5F183A33B9}
+		{95F5D645-19E3-432F-95D4-C5EA374DD15B} = {95F5D645-19E3-432F-95D4-C5EA374DD15B}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.IntegrationTests.Classic", "tests\BenchmarkDotNet.IntegrationTests.Classic\BenchmarkDotNet.IntegrationTests.Classic.csproj", "{27DC34D9-3BA1-46F4-B2A1-E89AA0D842AA}"
 	ProjectSection(ProjectDependencies) = postProject
+		{95F5D645-19E3-432F-95D4-C5EA374DD15B} = {95F5D645-19E3-432F-95D4-C5EA374DD15B}
 		{AF1E6F8A-5C63-465F-96F4-5E5F183A33B9} = {AF1E6F8A-5C63-465F-96F4-5E5F183A33B9}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.IntegrationTests.DifferentRuntime", "tests\BenchmarkDotNet.IntegrationTests.DifferentRuntime\BenchmarkDotNet.IntegrationTests.DifferentRuntime.csproj", "{19411154-3AC9-4689-BC2E-9646121ED63D}"
 	ProjectSection(ProjectDependencies) = postProject
-		{AF1E6F8A-5C63-465F-96F4-5E5F183A33B9} = {AF1E6F8A-5C63-465F-96F4-5E5F183A33B9}
+		{95F5D645-19E3-432F-95D4-C5EA374DD15B} = {95F5D645-19E3-432F-95D4-C5EA374DD15B}
 	EndProjectSection
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BenchmarkDotNet.Samples.FSharp", "samples\BenchmarkDotNet.Samples.FSharp\BenchmarkDotNet.Samples.FSharp.fsproj", "{A329F00E-4B9D-4BC6-B688-92698D773CBF}"
 	ProjectSection(ProjectDependencies) = postProject
-		{AF1E6F8A-5C63-465F-96F4-5E5F183A33B9} = {AF1E6F8A-5C63-465F-96F4-5E5F183A33B9}
+		{95F5D645-19E3-432F-95D4-C5EA374DD15B} = {95F5D645-19E3-432F-95D4-C5EA374DD15B}
 	EndProjectSection
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BenchmarkDotNet.IntegrationTests.FSharp", "tests\BenchmarkDotNet.IntegrationTests.FSharp\BenchmarkDotNet.IntegrationTests.FSharp.fsproj", "{367FAFE1-A1C8-4AA1-9334-F4762E128DBB}"
 	ProjectSection(ProjectDependencies) = postProject
-		{AF1E6F8A-5C63-465F-96F4-5E5F183A33B9} = {AF1E6F8A-5C63-465F-96F4-5E5F183A33B9}
+		{95F5D645-19E3-432F-95D4-C5EA374DD15B} = {95F5D645-19E3-432F-95D4-C5EA374DD15B}
 	EndProjectSection
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BenchmarkDotNet.IntegrationTests.VisualBasic", "tests\BenchmarkDotNet.IntegrationTests.VisualBasic\BenchmarkDotNet.IntegrationTests.VisualBasic.vbproj", "{D8803ECA-4ABF-45B8-BD1D-7C637416C448}"
 	ProjectSection(ProjectDependencies) = postProject
-		{AF1E6F8A-5C63-465F-96F4-5E5F183A33B9} = {AF1E6F8A-5C63-465F-96F4-5E5F183A33B9}
+		{95F5D645-19E3-432F-95D4-C5EA374DD15B} = {95F5D645-19E3-432F-95D4-C5EA374DD15B}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.IntegrationTests.DisabledOptimizations", "tests\BenchmarkDotNet.IntegrationTests.DisabledOptimizations\BenchmarkDotNet.IntegrationTests.DisabledOptimizations.csproj", "{AC2188E5-A140-43E2-8A76-4BDABFE30ABA}"
 	ProjectSection(ProjectDependencies) = postProject
-		{AF1E6F8A-5C63-465F-96F4-5E5F183A33B9} = {AF1E6F8A-5C63-465F-96F4-5E5F183A33B9}
+		{95F5D645-19E3-432F-95D4-C5EA374DD15B} = {95F5D645-19E3-432F-95D4-C5EA374DD15B}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.IntegrationTests.EnabledOptimizations", "tests\BenchmarkDotNet.IntegrationTests.EnabledOptimizations\BenchmarkDotNet.IntegrationTests.EnabledOptimizations.csproj", "{873581FF-DB9D-42E5-8F11-32A4B7BB28EC}"
 	ProjectSection(ProjectDependencies) = postProject
-		{AF1E6F8A-5C63-465F-96F4-5E5F183A33B9} = {AF1E6F8A-5C63-465F-96F4-5E5F183A33B9}
+		{95F5D645-19E3-432F-95D4-C5EA374DD15B} = {95F5D645-19E3-432F-95D4-C5EA374DD15B}
 	EndProjectSection
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BenchmarkDotNet.Samples.FSharp.Core", "samples\BenchmarkDotNet.Samples.FSharp.Core\BenchmarkDotNet.Samples.FSharp.Core.xproj", "{24D62335-B878-4F00-8555-C6DC3E40FA70}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BenchmarkDotNet.Core", "src\BenchmarkDotNet.Core\BenchmarkDotNet.Core.xproj", "{95F5D645-19E3-432F-95D4-C5EA374DD15B}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BenchmarkDotNet.Toolchains.Roslyn", "src\BenchmarkDotNet.Toolchains.Roslyn\BenchmarkDotNet.Toolchains.Roslyn.xproj", "{F5785871-7E2C-4894-85DE-A28EACB1D9B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -123,6 +128,14 @@ Global
 		{24D62335-B878-4F00-8555-C6DC3E40FA70}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24D62335-B878-4F00-8555-C6DC3E40FA70}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24D62335-B878-4F00-8555-C6DC3E40FA70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95F5D645-19E3-432F-95D4-C5EA374DD15B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95F5D645-19E3-432F-95D4-C5EA374DD15B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95F5D645-19E3-432F-95D4-C5EA374DD15B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95F5D645-19E3-432F-95D4-C5EA374DD15B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5785871-7E2C-4894-85DE-A28EACB1D9B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5785871-7E2C-4894-85DE-A28EACB1D9B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5785871-7E2C-4894-85DE-A28EACB1D9B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5785871-7E2C-4894-85DE-A28EACB1D9B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -142,5 +155,7 @@ Global
 		{AC2188E5-A140-43E2-8A76-4BDABFE30ABA} = {14195214-591A-45B7-851A-19D3BA2413F9}
 		{873581FF-DB9D-42E5-8F11-32A4B7BB28EC} = {14195214-591A-45B7-851A-19D3BA2413F9}
 		{24D62335-B878-4F00-8555-C6DC3E40FA70} = {602236FF-A83D-43BA-9EE7-A4B0BE2CA4B3}
+		{95F5D645-19E3-432F-95D4-C5EA374DD15B} = {D6597E3A-6892-4A68-8E14-042FC941FDA2}
+		{F5785871-7E2C-4894-85DE-A28EACB1D9B5} = {D6597E3A-6892-4A68-8E14-042FC941FDA2}
 	EndGlobalSection
 EndGlobal

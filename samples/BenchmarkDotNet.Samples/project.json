@@ -48,8 +48,7 @@
   },
   "dependencies": {
     "BenchmarkDotNet": {
-      "target": "project",
-      "version": "0.9.8-develop"
+      "target": "project"
     }
   }
 }

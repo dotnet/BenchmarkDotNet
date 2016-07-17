@@ -3,9 +3,7 @@ param(
     $Version = $env:APPVEYOR_BUILD_VERSION
 )
 
-$projects = Get-ChildItem -Path $Path -Directory |
-                    foreach { "$($_.Fullname)\project.json" } |
-                    Where-Object { Test-Path $_ }
+$projects = Get-ChildItem -Path .\ -Filter project.json -Recurse -Name
 
 function Set-DotnetProjectVersion
 {
