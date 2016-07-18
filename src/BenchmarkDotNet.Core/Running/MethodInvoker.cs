@@ -34,12 +34,13 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        public void Invoke(IJob job, long operationsPerInvoke, Action setupAction, Action targetAction, Action idleAction)
+        public void Invoke(IJob job, long operationsPerInvoke, Action setupAction, Action targetAction, Action cleanupAction, Action idleAction)
         {
             // Jitting
             setupAction();
             targetAction();
             idleAction();
+            cleanupAction();
 
             // Run
             Func<MultiInvokeInput, Measurement> multiInvoke = input =>
@@ -47,8 +48,8 @@ namespace BenchmarkDotNet.Running
                 var action = input.IterationMode.IsOneOf(IterationMode.IdleWarmup, IterationMode.IdleTarget)
                     ? idleAction
                     : targetAction;
-                return MultiInvoke(input.IterationMode, input.Index, setupAction, action, input.InvokeCount,
-                    operationsPerInvoke, job.GarbageCollection);
+                return MultiInvoke(input.IterationMode, input.Index, setupAction, action, cleanupAction, 
+                    input.InvokeCount, operationsPerInvoke, job.GarbageCollection);
             };
             Invoke(job, multiInvoke);
         }
@@ -235,7 +236,7 @@ namespace BenchmarkDotNet.Running
             Console.WriteLine();
         }
 
-        private Measurement MultiInvoke(IterationMode mode, int index, Action setupAction, Action targetAction, long invocationCount, long operationsPerInvoke, GarbageCollection garbageCollectionSettings)
+        private Measurement MultiInvoke(IterationMode mode, int index, Action setupAction, Action targetAction, Action cleanupAction, long invocationCount, long operationsPerInvoke, GarbageCollection garbageCollectionSettings)
         {
             var totalOperations = invocationCount * operationsPerInvoke;
             setupAction();
@@ -260,6 +261,7 @@ namespace BenchmarkDotNet.Running
                 RunAction(targetAction, invocationCount);
                 clockSpan = chronometer.Stop();
             }
+            cleanupAction();
             var measurement = new Measurement(0, mode, index, totalOperations, clockSpan.GetNanoseconds());
             Console.WriteLine(measurement.ToOutputLine());
             GcCollect(garbageCollectionSettings);
