@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
@@ -9,7 +10,7 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class ProcessorArchitectureTest
+    public class ProcessorArchitectureTest : BenchmarkTestExecutor
     {
         private class PlatformConfig : ManualConfig
         {
@@ -25,12 +26,7 @@ namespace BenchmarkDotNet.IntegrationTests
         const string HostPlatformOkCaption = "// HostPlatformOkCaption";
         const string BenchmarkNotFound = "// There are no benchmarks found";
 
-        private readonly ITestOutputHelper output;
-
-        public ProcessorArchitectureTest(ITestOutputHelper outputHelper)
-        {
-            output = outputHelper;
-        }
+        public ProcessorArchitectureTest(ITestOutputHelper outputHelper) : base(outputHelper) {  }
 
         [Fact]
         public void SpecifiedProccesorArchitectureMustBeRespected()
@@ -45,13 +41,13 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private void Verify(Platform platform, Type benchmark, string failureText)
         {
-            var logger = new OutputLogger(output);
+            var logger = new OutputLogger(Output);
             // make sure we get an output in the TestRunner log
             var config = new PlatformConfig(platform)
                                 .With(logger)
-                                .With(ConsoleLogger.Default);
+                                .With(DefaultConfig.Instance.GetColumns().ToArray());
 
-            BenchmarkTestExecutor.CanExecute(benchmark, config);
+            CanExecute(benchmark, config);
             var testLog = logger.GetLog();
 
             Assert.DoesNotContain(failureText, testLog);

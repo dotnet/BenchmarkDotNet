@@ -11,27 +11,22 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class GenericBenchmarkTest
+    public class GenericBenchmarkTest : BenchmarkTestExecutor
     {
-        private readonly ITestOutputHelper output;
-
-        public GenericBenchmarkTest(ITestOutputHelper output)
-        {
-            this.output = output;
-        }
+        public GenericBenchmarkTest(ITestOutputHelper output) : base(output) { }
 
         [Fact]
-        public void Test()
+        public void GenericClassesAreSupported()
         {
-            var logger = new OutputLogger(output);
-            var config = DefaultConfig.Instance.With(logger);
+            var logger = new OutputLogger(Output);
+            var config = CreateSimpleConfig(logger);
 
-            BenchmarkTestExecutor.CanExecute<FlatClassBenchmark>(config);
+            CanExecute<FlatClassBenchmark>(config);
             var expected1 = $"// ### Benchmark: SerializationLibrary1, Type: {typeof(FlatClassBenchmark).Name} ###";
             Assert.Contains(expected1, logger.GetLog());
 
             logger.ClearLog();
-            BenchmarkTestExecutor.CanExecute<DoubleArrayBenchmark>(config);
+            CanExecute<DoubleArrayBenchmark>(config);
             var expected2 = $"// ### Benchmark: SerializationLibrary2, Type: {typeof(DoubleArrayBenchmark).Name} ###";
             Assert.Contains(expected2, logger.GetLog());
         }

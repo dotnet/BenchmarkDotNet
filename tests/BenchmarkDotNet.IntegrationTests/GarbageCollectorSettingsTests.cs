@@ -8,14 +8,9 @@ using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class GarbageCollectorSettingsTests
+    public class GarbageCollectorSettingsTests : BenchmarkTestExecutor
     {
-        private readonly ITestOutputHelper output;
-
-        public GarbageCollectorSettingsTests(ITestOutputHelper outputHelper)
-        {
-            output = outputHelper;
-        }
+        public GarbageCollectorSettingsTests(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
         [Fact(Skip = "It fails on appveyor")]
         public void CanEnableServerGcMode()
@@ -23,7 +18,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = ManualConfig.CreateEmpty()
                                      .With(Job.Dry.With(new GarbageCollection { Server = true }));
 
-            BenchmarkTestExecutor.CanExecute<ServerModeEnabled>(config);
+            CanExecute<ServerModeEnabled>(config);
         }
 
         [Fact]
@@ -32,7 +27,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = ManualConfig.CreateEmpty()
                                      .With(Job.Dry.With(new GarbageCollection { Server = false }));
 
-            BenchmarkTestExecutor.CanExecute<WorkstationGcOnly>(config);
+            CanExecute<WorkstationGcOnly>(config);
         }
 
         [Fact]
@@ -41,7 +36,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = ManualConfig.CreateEmpty()
                                      .With(Job.Dry.With(new GarbageCollection { Concurrent = true }));
 
-            BenchmarkTestExecutor.CanExecute<ConcurrentModeEnabled>(config);
+            CanExecute<ConcurrentModeEnabled>(config);
         }
 
         [Fact]
@@ -50,7 +45,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = ManualConfig.CreateEmpty()
                                      .With(Job.Dry.With(new GarbageCollection { Concurrent = false }));
 
-            BenchmarkTestExecutor.CanExecute<ConcurrentModeDisabled>(config);
+            CanExecute<ConcurrentModeDisabled>(config);
         }
 
         [Fact]
@@ -59,7 +54,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = ManualConfig.CreateEmpty()
                                      .With(Job.Dry.With(new GarbageCollection { Force = false }));
             
-            BenchmarkTestExecutor.CanExecute<AvoidForcingGarbageCollection>(config);
+            CanExecute<AvoidForcingGarbageCollection>(config);
         }
 
 #if CLASSIC // not supported by project.json so far
@@ -69,7 +64,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = ManualConfig.CreateEmpty()
                                      .With(Job.Dry.With(Platform.X64).With(new GarbageCollection { AllowVeryLargeObjects = true }));
 
-            BenchmarkTestExecutor.CanExecute<CreateVeryLargeObjects>(config);
+            CanExecute<CreateVeryLargeObjects>(config);
         }
 #endif
     }

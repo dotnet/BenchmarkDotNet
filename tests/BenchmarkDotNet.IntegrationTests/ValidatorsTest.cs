@@ -10,8 +10,10 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class ValidatorsTest
+    public class ValidatorsTest : BenchmarkTestExecutor
     {
+        public ValidatorsTest(ITestOutputHelper output) : base(output) { }
+
         private readonly IExporter[] AllKnownExportersThatSupportExportToLog =
             {
                 MarkdownExporter.Console,
@@ -24,36 +26,20 @@ namespace BenchmarkDotNet.IntegrationTests
                 PlainExporter.Default,
             };
 
-        private readonly ITestOutputHelper output;
-
-        public ValidatorsTest(ITestOutputHelper outputHelper)
-        {
-            output = outputHelper;
-        }
-
         [Fact]
         public void BenchmarkRunnerShouldNotFailOnCriticalValidationErrors()
         {
-            BenchmarkRunner
-                .Run<Nothing>(
-                    ManualConfig
-                        .CreateEmpty()
+            CanExecute<Nothing>(
+                CreateSimpleConfig()
                         .With(new FailingValidator())
-                        .With(ConsoleLogger.Default) // so we get an output in the TestRunner log
-                        .With(new OutputLogger(output))
-                        .With(AllKnownExportersThatSupportExportToLog));
+                        .With(AllKnownExportersThatSupportExportToLog),
+                fullValidation: false);
         }
 
         [Fact]
         public void LoggersShouldNotFailOnCriticalValidationErrors()
         {
-            var summary = BenchmarkRunner
-                .Run<Nothing>(
-                    ManualConfig
-                        .CreateEmpty()
-                        .With(ConsoleLogger.Default) // so we get an output in the TestRunner log
-                        .With(new OutputLogger(output))
-                        .With(new FailingValidator()));
+            var summary = CanExecute<Nothing>(CreateSimpleConfig().With(new FailingValidator()), fullValidation: false);
 
             foreach (var exporter in AllKnownExportersThatSupportExportToLog)
             {

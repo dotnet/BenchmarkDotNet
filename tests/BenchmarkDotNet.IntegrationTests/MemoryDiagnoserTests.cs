@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact(Skip = "Temporarily suppressed, see https://github.com/PerfDotNet/BenchmarkDotNet/issues/208")]
-        public void Test()
+        public void MemoryDiagnoserTracksHeapMemoryAllocation()
         {
             var benchmarks = BenchmarkConverter.TypeToBenchmarks(typeof(ListEnumeratorsBenchmarks));
             var memoryDiagnoser = new Diagnostics.Windows.MemoryDiagnoser();

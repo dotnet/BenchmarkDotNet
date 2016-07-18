@@ -5,20 +5,23 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
     // See https://github.com/PerfDotNet/BenchmarkDotNet/issues/55
     // https://github.com/PerfDotNet/BenchmarkDotNet/issues/59 is also related
-    [Config(typeof(SingleRunFastConfig))]
-    public class InnerClassTest
+    public class InnerClassTest : BenchmarkTestExecutor
     {
+        public InnerClassTest(ITestOutputHelper output) : base(output) { }
+
         [Fact]
-        public void Test()
+        public void InnerClassesAreSupported()
         {
-            var logger = new AccumulationLogger();
-            var config = DefaultConfig.Instance.With(logger);
-            BenchmarkTestExecutor.CanExecute<InnerClassTest>(config);
+            var logger = new OutputLogger(Output);
+            var config = CreateSimpleConfig(logger);
+
+            CanExecute<Inner>(config);
 
             var testLog = logger.GetLog();
             Assert.Contains("// ### BenchmarkInnerClass method called ###" + Environment.NewLine, testLog);
@@ -26,18 +29,21 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.DoesNotContain("No benchmarks found", logger.GetLog());
         }
 
-        [Benchmark]
-        public Tuple<Outer, Outer.Inner> BenchmarkInnerClass()
+        public class Inner
         {
-            Console.WriteLine("// ### BenchmarkInnerClass method called ###");
-            return Tuple.Create(new Outer(), new Outer.Inner());
-        }
+            [Benchmark]
+            public Tuple<Outer, Outer.Inner> BenchmarkInnerClass()
+            {
+                Console.WriteLine("// ### BenchmarkInnerClass method called ###");
+                return Tuple.Create(new Outer(), new Outer.Inner());
+            }
 
-        [Benchmark]
-        public Tuple<Outer, Outer.InnerGeneric<string>> BenchmarkGenericInnerClass()
-        {
-            Console.WriteLine("// ### BenchmarkGenericInnerClass method called ###");
-            return Tuple.Create(new Outer(), new Outer.InnerGeneric<string>());
+            [Benchmark]
+            public Tuple<Outer, Outer.InnerGeneric<string>> BenchmarkGenericInnerClass()
+            {
+                Console.WriteLine("// ### BenchmarkGenericInnerClass method called ###");
+                return Tuple.Create(new Outer(), new Outer.InnerGeneric<string>());
+            }
         }
     }
 

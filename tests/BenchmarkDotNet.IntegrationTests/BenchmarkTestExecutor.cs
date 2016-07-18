@@ -2,12 +2,23 @@
 using System.Linq;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Loggers;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    internal static class BenchmarkTestExecutor
+    public class BenchmarkTestExecutor
     {
+        protected readonly ITestOutputHelper Output;
+
+        public BenchmarkTestExecutor() { }
+
+        protected BenchmarkTestExecutor(ITestOutputHelper output)
+        {
+            Output = output;
+        }
+
         /// <summary>
         /// Runs Benchmarks with the most simple config (SingleRunFastConfig) 
         /// combined with any benchmark config applied to TBenchmark (via an attribute)
@@ -17,7 +28,7 @@ namespace BenchmarkDotNet.IntegrationTests
         /// <param name="config">Optional custom config to be used instead of the default</param>
         /// <param name="fullValidation">Optional: disable validation (default = true/enabled)</param>
         /// <returns>The summary from the benchmark run</returns>
-        internal static Reports.Summary CanExecute<TBenchmark>(IConfig config = null, bool fullValidation = true)
+        internal Reports.Summary CanExecute<TBenchmark>(IConfig config = null, bool fullValidation = true)
         {
             return CanExecute(typeof(TBenchmark), config, fullValidation);
         }
@@ -31,14 +42,17 @@ namespace BenchmarkDotNet.IntegrationTests
         /// <param name="config">Optional custom config to be used instead of the default</param>
         /// <param name="fullValidation">Optional: disable validation (default = true/enabled)</param>
         /// <returns>The summary from the benchmark run</returns>
-        internal static Reports.Summary CanExecute(Type type, IConfig config = null, bool fullValidation = true)
+        protected Reports.Summary CanExecute(Type type, IConfig config = null, bool fullValidation = true)
         {
             // Add logging, so the Benchmark execution is in the TestRunner output (makes Debugging easier)
             if (config == null)
             {
-                config = new SingleRunFastConfig()
-                             .With(DefaultConfig.Instance.GetLoggers().ToArray())
-                             .With(DefaultConfig.Instance.GetColumns().ToArray());
+                config = CreateSimpleConfig();
+            }
+
+            if (!config.GetLoggers().OfType<OutputLogger>().Any())
+            {
+                config = config.With(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default);
             }
 
             // Make sure we ALWAYS conbine the Config (default or passed in) with any Config applied to the Type/Class
@@ -55,6 +69,13 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             return summary;
+        }
+
+        protected IConfig CreateSimpleConfig(OutputLogger logger = null)
+        {
+            return new SingleRunFastConfig()
+                .With(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default))
+                .With(DefaultConfig.Instance.GetColumns().ToArray());
         }
     }
 }

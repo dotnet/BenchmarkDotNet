@@ -7,23 +7,14 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class AttributesTests
+    public class AttributesTests : BenchmarkTestExecutor
     {
-        private readonly ITestOutputHelper output;
-
-        public AttributesTests(ITestOutputHelper output)
-        {
-            this.output = output;
-        }
+        public AttributesTests(ITestOutputHelper output) : base(output) { }
 
         [Fact]
-        public void AreNotSealed()
+        public void AttributesAreNotSealed()
         {
-            var config = new SingleRunFastConfig()
-                .With(new OutputLogger(output))
-                .With(DefaultConfig.Instance.GetColumns().ToArray());
-
-            BenchmarkTestExecutor.CanExecute<ConsumingCustomAttributes>(config);
+            CanExecute<ConsumingCustomAttributes>();
         }
 
         public class ConsumingCustomAttributes

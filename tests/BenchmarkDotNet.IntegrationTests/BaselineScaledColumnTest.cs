@@ -13,20 +13,20 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class BaselineScaledColumnTest
+    public class BaselineScaledColumnTest : BenchmarkTestExecutor
     {
-        [Params(1, 2)]
-        public int ParamProperty { get; set; }
+        public BaselineScaledColumnTest(ITestOutputHelper output) : base(output) { }
 
         [Fact]
-        public void Test()
+        public void ColumnsWithBaselineGetsScaled()
         {
             // This is the common way to run benchmarks, it should wire up the BenchmarkBaselineDeltaResultExtender for us
             // BenchmarkTestExecutor.CanExecute(..) calls BenchmarkRunner.Run(..) under the hood
-            var summary = BenchmarkTestExecutor.CanExecute<BaselineScaledColumnTest>();
+            var summary = CanExecute<BaselineScaledColumnBenchmarks>();
 
             var table = summary.Table;
             var headerRow = table.FullHeader;
@@ -48,39 +48,43 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Benchmark(Baseline = true)]
-        public void BenchmarkSlow() => Thread.Sleep(20);
+        public class BaselineScaledColumnBenchmarks
+        {
+            [Params(1, 2)]
+            public int ParamProperty { get; set; }
 
-        [Benchmark]
-        public void BenchmarkFast() => Thread.Sleep(5);
+            [Benchmark(Baseline = true)]
+            public void BenchmarkSlow() => Thread.Sleep(20);
+
+            [Benchmark]
+            public void BenchmarkFast() => Thread.Sleep(5);
+        }
     }
 
-    // TODO: repair
-    [Config(typeof(SingleRunFastConfig))]
-    public class BaselineScaledResultExtenderNoBaselineTest
+    public class BaselineScaledResultExtenderNoBaselineTest : BenchmarkTestExecutor
     {
+        public BaselineScaledResultExtenderNoBaselineTest(ITestOutputHelper output) : base(output) { }
+
         [Fact]
         public void Test()
         {
             var testExporter = new TestExporter();
-            var config = DefaultConfig.Instance.With(testExporter);
-            BenchmarkTestExecutor.CanExecute<BaselineScaledResultExtenderNoBaselineTest>(config);
+            var config = CreateSimpleConfig().With(testExporter);
+
+            CanExecute<BaselineScaledResultExtenderNoBaseline>(config);
 
             // Ensure that when the TestBenchmarkExporter() was run, it wasn't passed an instance of "BenchmarkBaselineDeltaResultExtender"
             Assert.False(testExporter.ExportCalled);
             Assert.True(testExporter.ExportToFileCalled);
         }
 
-        [Benchmark]
-        public void BenchmarkSlow()
+        public class BaselineScaledResultExtenderNoBaseline
         {
-            Thread.Sleep(50);
-        }
+            [Benchmark]
+            public void BenchmarkSlow() => Thread.Sleep(50);
 
-        [Benchmark]
-        public void BenchmarkFast()
-        {
-            Thread.Sleep(10);
+            [Benchmark]
+            public void BenchmarkFast() => Thread.Sleep(10);
         }
 
         public class TestExporter : IExporter
@@ -93,7 +97,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             public string Name => "TestBenchmarkExporter";
 
-            public void ExportToLog(Summary summary, ILogger logger) => ExportCalled = true;
+            public void ExportToLog(Summary summary, BenchmarkDotNet.Loggers.ILogger logger) => ExportCalled = true;
 
             public IEnumerable<string> ExportToFiles(Summary summary)
             {
@@ -103,27 +107,26 @@ namespace BenchmarkDotNet.IntegrationTests
         }
     }
     
-    public class BaselineScaledResultExtenderErrorTest
+    public class BaselineScaledResultExtenderErrorTest : BenchmarkTestExecutor
     {
+        public BaselineScaledResultExtenderErrorTest(ITestOutputHelper output) : base(output) { }
+
         [Fact]
-        public void Test()
+        public void OnlyOneMethodCanBeBaseline()
         {
-            var summary = BenchmarkTestExecutor.CanExecute<BaselineScaledResultExtenderErrorTest>(fullValidation: false);
+            var summary = CanExecute<BaselineScaledResultExtenderError>(fullValidation: false);
 
             // You can't have more than 1 method in a class with [Benchmark(Baseline = true)]
             Assert.True(summary.HasCriticalValidationErrors);
         }
 
-        [Benchmark(Baseline = true)]
-        public void BenchmarkSlow()
+        public class BaselineScaledResultExtenderError
         {
-            Thread.Sleep(50);
-        }
+            [Benchmark(Baseline = true)]
+            public void BenchmarkSlow() => Thread.Sleep(50);
 
-        [Benchmark(Baseline = true)]
-        public void BenchmarkFast()
-        {
-            Thread.Sleep(5);
+            [Benchmark(Baseline = true)]
+            public void BenchmarkFast() => Thread.Sleep(5);
         }
     }
 }

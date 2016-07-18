@@ -6,32 +6,38 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    [Config(typeof(SingleRunFastConfig))]
-    public class SetupAttributeTest
+    public class SetupAttributeTest : BenchmarkTestExecutor
     {
+        public SetupAttributeTest(ITestOutputHelper output) : base(output) { }
+
         [Fact]
-        public void Test()
+        public void SetupAttributeMethodGetsCalled()
         {
-            var logger = new AccumulationLogger();
-            var config = DefaultConfig.Instance.With(logger);
-            BenchmarkTestExecutor.CanExecute<SetupAttributeTest>(config);
+            var logger = new OutputLogger(Output);
+            var config = CreateSimpleConfig(logger);
+
+            CanExecute<SetupAttributeBenchmarks>(config);
             Assert.Contains("// ### Setup called ###" + Environment.NewLine, logger.GetLog());
         }
 
-        [Setup]
-        public void Setup()
+        public class SetupAttributeBenchmarks
         {
-            Console.WriteLine("// ### Setup called ###");
-        }
+            [Setup]
+            public void Setup()
+            {
+                Console.WriteLine("// ### Setup called ###");
+            }
 
-        [Benchmark]
-        public void Benchmark()
-        {
-            Console.WriteLine("// ### Benchmark called ###");
-            Thread.Sleep(5);
+            [Benchmark]
+            public void Benchmark()
+            {
+                Console.WriteLine("// ### Benchmark called ###");
+                Thread.Sleep(5);
+            }
         }
     }
 }

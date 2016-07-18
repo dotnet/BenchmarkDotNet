@@ -7,31 +7,25 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class ModeTests
+    public class ModeTests : BenchmarkTestExecutor
     {
-        private static AccumulationLogger logger = new AccumulationLogger();
-
-        public class ModeConfig : ManualConfig
-        {
-            public ModeConfig()
-            {
-                // Use our own Config, as we explicitly want to test the different "Mode" values, i.e. SingleRun and Throughput
-                Add(Job.Dry.With(Mode.SingleRun));
-                Add(Job.Dry.With(Mode.Throughput));
-                Add(DefaultConfig.Instance.GetLoggers().ToArray());
-                Add(logger); // So we can capture/parse the output in our test
-                Add(DefaultConfig.Instance.GetColumns().ToArray());
-            }
-        }
+        public ModeTests(ITestOutputHelper output) : base(output) { }
 
         [Fact]
-        public void Test()
+        public void ModesAreSupported()
         {
-            logger.ClearLog();
-            var results = BenchmarkTestExecutor.CanExecute<ModeTests>(new ModeConfig());
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty()
+                .With(DefaultConfig.Instance.GetColumns().ToArray())
+                .With(logger)
+                .With(Job.Dry.With(Mode.SingleRun))
+                .With(Job.Dry.With(Mode.Throughput));
+
+            var results = CanExecute<ModeBenchmarks>(config);
 
             Assert.Equal(4, results.Benchmarks.Count());
 
@@ -47,36 +41,39 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.DoesNotContain("No benchmarks found", logger.GetLog());
         }
 
-        public bool FirstTime { get; set; }
-
-        [Setup]
-        public void Setup()
+        public class ModeBenchmarks
         {
-            // Ensure we only print the diagnostic messages once per run in the tests, otherwise it fills up the output log!!
-            FirstTime = true;
-        }
+            public bool FirstTime { get; set; }
 
-        [Benchmark]
-        public void BenchmarkWithVoid()
-        {
-            Thread.Sleep(10);
-            if (FirstTime)
+            [Setup]
+            public void Setup()
             {
-                Console.WriteLine("// ### Benchmark with void called ###");
-                FirstTime = false;
+                // Ensure we only print the diagnostic messages once per run in the tests, otherwise it fills up the output log!!
+                FirstTime = true;
             }
-        }
 
-        [Benchmark]
-        public string BenchmarkWithReturnValue()
-        {
-            Thread.Sleep(10);
-            if (FirstTime)
+            [Benchmark]
+            public void BenchmarkWithVoid()
             {
-                Console.WriteLine("// ### Benchmark with return value called ###");
-                FirstTime = false;
+                Thread.Sleep(10);
+                if (FirstTime)
+                {
+                    Console.WriteLine("// ### Benchmark with void called ###");
+                    FirstTime = false;
+                }
             }
-            return "okay";
+
+            [Benchmark]
+            public string BenchmarkWithReturnValue()
+            {
+                Thread.Sleep(10);
+                if (FirstTime)
+                {
+                    Console.WriteLine("// ### Benchmark with return value called ###");
+                    FirstTime = false;
+                }
+                return "okay";
+            }
         }
     }
 }

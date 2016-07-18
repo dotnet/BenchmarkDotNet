@@ -27,6 +27,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     ManualConfig.CreateEmpty()
                                 .With(Job.Dry.With(Runtime.Core))
                                 .With(Job.Dry.With(Runtime.Clr))
+                                .With(DefaultConfig.Instance.GetColumns().ToArray())
                                 .With(new OutputLogger(output)));
 
             Assert.True(summary.Reports
@@ -45,8 +46,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 .ExecuteResults
                 .All(executeResult => executeResult.Data.Contains("Core")));
         }
-
-        
     }
 
     // this test was suffering from too long path ex so I had to rename the class and benchmark method to fit within the limit

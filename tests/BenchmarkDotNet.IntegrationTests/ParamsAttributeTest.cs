@@ -5,157 +5,177 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    [Config(typeof(SingleRunFastConfig))]
-    public class ParamsTestProperty
+    public class ParamsTestPropertyTest : BenchmarkTestExecutor
     {
-        [Params(1, 2)]
-        public int ParamProperty { get; set; }
-
-        private HashSet<int> collectedParams = new HashSet<int>();
+        public ParamsTestPropertyTest(ITestOutputHelper output) : base(output) { }
 
         [Fact]
-        public void Test()
+        public void ParamsSupportPropertyWithPublicSetter()
         {
-            var logger = new AccumulationLogger();
-            var config = DefaultConfig.Instance.With(logger);
-            BenchmarkTestExecutor.CanExecute<ParamsTestProperty>(config);
+            var logger = new OutputLogger(Output);
+            var config = CreateSimpleConfig(logger);
+
+            CanExecute<ParamsTestProperty>(config);
             foreach (var param in new[] { 1, 2 })
                 Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, logger.GetLog());
             Assert.DoesNotContain($"// ### New Parameter {default(int)} ###" + Environment.NewLine, logger.GetLog());
         }
 
-        [Benchmark]
-        public void Benchmark()
+        public class ParamsTestProperty
         {
-            if (collectedParams.Contains(ParamProperty) == false)
+            [Params(1, 2)]
+            public int ParamProperty { get; set; }
+
+            private HashSet<int> collectedParams = new HashSet<int>();
+
+            [Benchmark]
+            public void Benchmark()
             {
-                Console.WriteLine($"// ### New Parameter {ParamProperty} ###");
-                collectedParams.Add(ParamProperty);
+                if (collectedParams.Contains(ParamProperty) == false)
+                {
+                    Console.WriteLine($"// ### New Parameter {ParamProperty} ###");
+                    collectedParams.Add(ParamProperty);
+                }
             }
         }
     }
 
-    public class ParamsTestPrivatePropertyError
+    public class ParamsTestPrivatePropertyErrorTest : BenchmarkTestExecutor
     {
-        [Params(1, 2)]
-        public int ParamProperty { get; private set; }
-
-        private HashSet<int> collectedParams = new HashSet<int>();
+        public ParamsTestPrivatePropertyErrorTest(ITestOutputHelper output) : base(output) { }
 
         [Fact]
-        public void Test()
+        public void ParamsDoesNotSupportPropertyWithoutPublicSetter()
         {
             // System.InvalidOperationException : Property "ParamProperty" must be public and writable if it has the [Params(..)] attribute applied to it
-            Assert.Throws<InvalidOperationException>(() => BenchmarkTestExecutor.CanExecute<ParamsTestPrivatePropertyError>());
+            Assert.Throws<InvalidOperationException>(() => CanExecute<ParamsTestPrivatePropertyError>());
         }
 
-        [Benchmark]
-        public void Benchmark()
+        public class ParamsTestPrivatePropertyError
         {
-            if (collectedParams.Contains(ParamProperty) == false)
+            [Params(1, 2)]
+            public int ParamProperty { get; private set; }
+
+            private HashSet<int> collectedParams = new HashSet<int>();
+            
+            [Benchmark]
+            public void Benchmark()
             {
-                Console.WriteLine($"// ### New Parameter {ParamProperty} ###");
-                collectedParams.Add(ParamProperty);
+                if (collectedParams.Contains(ParamProperty) == false)
+                {
+                    Console.WriteLine($"// ### New Parameter {ParamProperty} ###");
+                    collectedParams.Add(ParamProperty);
+                }
             }
         }
     }
 
-    [Config(typeof(SingleRunFastConfig))]
-    public class ParamsTestField
+    public class ParamsTestFieldTest : BenchmarkTestExecutor
     {
-        [Params(1, 2)]
-        public int ParamField = 0;
-
-        private HashSet<int> collectedParams = new HashSet<int>();
+        public ParamsTestFieldTest(ITestOutputHelper output) : base(output) { }
 
         [Fact]
-        public void Test()
+        public void ParamsSupportPublicFields()
         {
-            var logger = new AccumulationLogger();
-            var config = DefaultConfig.Instance.With(logger);
-            BenchmarkTestExecutor.CanExecute<ParamsTestField>(config);
+            var logger = new OutputLogger(Output);
+            var config = CreateSimpleConfig(logger);
+
+            CanExecute<ParamsTestField>(config);
+
             foreach (var param in new[] { 1, 2 })
                 Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, logger.GetLog());
             Assert.DoesNotContain($"// ### New Parameter 0 ###" + Environment.NewLine, logger.GetLog());
         }
 
-        [Benchmark]
-        public void Benchmark()
+        public class ParamsTestField
         {
-            if (collectedParams.Contains(ParamField) == false)
+            [Params(1, 2)]
+            public int ParamField = 0;
+
+            private HashSet<int> collectedParams = new HashSet<int>();
+
+            [Benchmark]
+            public void Benchmark()
             {
-                Console.WriteLine($"// ### New Parameter {ParamField} ###");
-                collectedParams.Add(ParamField);
+                if (collectedParams.Contains(ParamField) == false)
+                {
+                    Console.WriteLine($"// ### New Parameter {ParamField} ###");
+                    collectedParams.Add(ParamField);
+                }
             }
         }
     }
 
-    public class ParamsTestPrivateFieldError
+    public class ParamsTestPrivateFieldErrorTest : BenchmarkTestExecutor
     {
-        [Params(1, 2)]
-        private int ParamField = 0;
-
-        private HashSet<int> collectedParams = new HashSet<int>();
+        public ParamsTestPrivateFieldErrorTest(ITestOutputHelper output) : base(output) { }
 
         [Fact]
-        public void Test()
+        public void ParamsDoesNotSupportPrivateFields()
         {
             // System.InvalidOperationException : Field "ParamField" must be public if it has the [Params(..)] attribute applied to it
-            Assert.Throws<InvalidOperationException>(() => BenchmarkTestExecutor.CanExecute<ParamsTestPrivateFieldError>());
+            Assert.Throws<InvalidOperationException>(() => CanExecute<ParamsTestPrivateFieldError>());
         }
 
-        [Benchmark]
-        public void Benchmark()
+        public class ParamsTestPrivateFieldError
         {
-            if (collectedParams.Contains(ParamField) == false)
+            [Params(1, 2)]
+            private int ParamField = 0;
+
+            private HashSet<int> collectedParams = new HashSet<int>();
+
+            [Benchmark]
+            public void Benchmark()
             {
-                Console.WriteLine($"// ### New Parameter {ParamField} ###");
-                collectedParams.Add(ParamField);
+                if (collectedParams.Contains(ParamField) == false)
+                {
+                    Console.WriteLine($"// ### New Parameter {ParamField} ###");
+                    collectedParams.Add(ParamField);
+                }
             }
         }
     }
 
-    public class NestedEnumsAsParams
+    public class NestedEnumsAsParamsTest : BenchmarkTestExecutor
     {
+        public NestedEnumsAsParamsTest(ITestOutputHelper output) : base(output) { }
+
         public enum NestedOne
         {
             SampleValue = 1234
         }
 
-        [Params(NestedOne.SampleValue)]
-        public NestedOne Field;
-
         [Fact]
-        public void AreSupported()
-        {
-            BenchmarkTestExecutor.CanExecute<NestedEnumsAsParams>();
-        }
+        public void NestedEnumsAsParamsAreSupported() => CanExecute<NestedEnumsAsParams>();
 
-        [Benchmark]
-        public NestedOne Benchmark()
+        public class NestedEnumsAsParams
         {
-            return Field;
+            [Params(NestedOne.SampleValue)]
+            public NestedOne Field;
+
+            [Benchmark]
+            public NestedOne Benchmark() => Field;
         }
     }
 
-    public class CharactersAsParams
+    public class CharactersAsParamsTest : BenchmarkTestExecutor
     {
-        [Params('*')]
-        public char Field;
+        public CharactersAsParamsTest(ITestOutputHelper output) : base(output) { }
 
         [Fact]
-        public void AreSupported()
-        {
-            BenchmarkTestExecutor.CanExecute<CharactersAsParams>();
-        }
+        public void CharactersAsParamsAreSupported() => CanExecute<CharactersAsParams>();
 
-        [Benchmark]
-        public char Benchmark()
+        public class CharactersAsParams
         {
-            return Field;
+            [Params('*')]
+            public char Field;
+
+            [Benchmark]
+            public char Benchmark() => Field;
         }
     }
 }

@@ -5,44 +5,56 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    // Delibrately made the Property "static" to ensure that Params also work okay in this scenario
-    [Config(typeof(SingleRunFastConfig))]
-    public class ParamsTestStaticProperty
+    public class ParamsTestStaticPropertyTest : BenchmarkTestExecutor
     {
-        [Params(1, 2)]
-        public static int StaticParamProperty { get; set; }
-
-        private static HashSet<int> collectedParams = new HashSet<int>();
+        public ParamsTestStaticPropertyTest(ITestOutputHelper output) : base(output) { }
 
         [Fact]
         public void Test()
         {
-            var logger = new AccumulationLogger();
-            var config = DefaultConfig.Instance.With(logger);
-            BenchmarkTestExecutor.CanExecute<ParamsTestStaticProperty>(config);
+            var logger = new OutputLogger(Output);
+            var config = CreateSimpleConfig(logger);
+
+            CanExecute<ParamsTestStaticProperty>(config);
 
             foreach (var param in new[] { 1, 2 })
                 Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, logger.GetLog());
             Assert.DoesNotContain($"// ### New Parameter {default(int)} ###" + Environment.NewLine, logger.GetLog());
         }
 
-        [Benchmark]
-        public void Benchmark()
+        public class ParamsTestStaticProperty
         {
-            if (collectedParams.Contains(StaticParamProperty) == false)
+            /// <summary>
+            /// Delibrately made the Property "static" to ensure that Params also work okay in this scenario 
+            /// </summary>
+            [Params(1, 2)]
+            public static int StaticParamProperty { get; set; }
+
+            private static HashSet<int> collectedParams = new HashSet<int>();
+
+            [Benchmark]
+            public void Benchmark()
             {
-                Console.WriteLine($"// ### New Parameter {StaticParamProperty} ###");
-                collectedParams.Add(StaticParamProperty);
+                if (collectedParams.Contains(StaticParamProperty) == false)
+                {
+                    Console.WriteLine($"// ### New Parameter {StaticParamProperty} ###");
+                    collectedParams.Add(StaticParamProperty);
+                }
             }
         }
     }
-
-    // Delibrately made the Property "static" to ensure that Params also work okay in this scenario
-    public class ParamsTestStaticPrivatePropertyError
+    
+    public class ParamsTestStaticPrivatePropertyError : BenchmarkTestExecutor
     {
+        public ParamsTestStaticPrivatePropertyError(ITestOutputHelper output) : base(output) { }
+
+        /// <summary>
+        /// Delibrately made the Property "static" to ensure that Params also work okay in this scenario
+        /// </summary>
         [Params(1, 2)]
         public static int StaticParamProperty { get; private set; }
 
@@ -52,7 +64,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void Test()
         {
             // System.InvalidOperationException : Property "StaticParamProperty" must be public and writable if it has the [Params(..)] attribute applied to it
-            Assert.Throws<InvalidOperationException>(() => BenchmarkTestExecutor.CanExecute<ParamsTestStaticPrivatePropertyError>());
+            Assert.Throws<InvalidOperationException>(() => CanExecute<ParamsTestStaticPrivatePropertyError>());
         }
 
         [Benchmark]
@@ -67,32 +79,40 @@ namespace BenchmarkDotNet.IntegrationTests
     }
 
     // Delibrately made everything "static" (as well as using a Field) to ensure that Params also work okay in this scenario
-    [Config(typeof(SingleRunFastConfig))]
-    public class ParamsTestStaticField
+    public class ParamsTestStaticFieldTest : BenchmarkTestExecutor
     {
-        [Params(1, 2)]
-        public static int StaticParamField = 0;
-
-        private static HashSet<int> collectedParams = new HashSet<int>();
+        public ParamsTestStaticFieldTest(ITestOutputHelper output) : base(output)
+        {
+        }
 
         [Fact]
-        public static void Test()
+        public void Test()
         {
-            var logger = new AccumulationLogger();
-            var config = DefaultConfig.Instance.With(logger);
-            BenchmarkTestExecutor.CanExecute<ParamsTestStaticField>(config);
+            var logger = new OutputLogger(Output);
+            var config = CreateSimpleConfig(logger);
+
+            CanExecute<ParamsTestStaticField>(config);
+
             foreach (var param in new[] { 1, 2 })
                 Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, logger.GetLog());
             Assert.DoesNotContain($"// ### New Parameter 0 ###" + Environment.NewLine, logger.GetLog());
         }
 
-        [Benchmark]
-        public static void Benchmark()
+        public class ParamsTestStaticField
         {
-            if (collectedParams.Contains(StaticParamField) == false)
+            [Params(1, 2)]
+            public static int StaticParamField = 0;
+
+            private static HashSet<int> collectedParams = new HashSet<int>();
+
+            [Benchmark]
+            public static void Benchmark()
             {
-                Console.WriteLine($"// ### New Parameter {StaticParamField} ###");
-                collectedParams.Add(StaticParamField);
+                if (collectedParams.Contains(StaticParamField) == false)
+                {
+                    Console.WriteLine($"// ### New Parameter {StaticParamField} ###");
+                    collectedParams.Add(StaticParamField);
+                }
             }
         }
     }
@@ -110,7 +130,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public static void Test()
         {
             // System.InvalidOperationException : Field "StaticParamField" must be public if it has the [Params(..)] attribute applied to it
-            Assert.Throws<InvalidOperationException>(() => BenchmarkTestExecutor.CanExecute<ParamsTestStaticPrivateFieldError>());
+            Assert.Throws<InvalidOperationException>(() => new BenchmarkTestExecutor().CanExecute<ParamsTestStaticPrivateFieldError>());
         }
 
         [Benchmark]

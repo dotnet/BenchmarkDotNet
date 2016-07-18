@@ -11,19 +11,14 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class StatResultExtenderTests
+    public class StatResultExtenderTests : BenchmarkTestExecutor
     {
-        private readonly ITestOutputHelper output;
-
-        public StatResultExtenderTests(ITestOutputHelper output)
-        {
-            this.output = output;
-        }
+        public StatResultExtenderTests(ITestOutputHelper output) : base(output) { }
 
         [Fact]
-        public void Test()
+        public void ExtraColumnsCanBeDefined()
         {
-            var logger = new OutputLogger(output);
+            var logger = new OutputLogger(Output);
             var columns = new[]
             {
                 StatisticColumn.StdDev,
@@ -41,7 +36,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .With(Job.Dry.WithTargetCount(10).WithIterationTime(10))
                 .With(logger)
                 .With(columns);
-            var summary = BenchmarkTestExecutor.CanExecute<Target>(config);
+            var summary = CanExecute<Target>(config);
 
             var table = summary.Table;
             var headerRow = table.FullHeader;

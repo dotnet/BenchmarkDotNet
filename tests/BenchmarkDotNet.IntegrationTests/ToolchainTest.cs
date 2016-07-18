@@ -12,14 +12,9 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class ToolchainTest
+    public class ToolchainTest : BenchmarkTestExecutor
     {
-        private readonly ITestOutputHelper output;
-
-        public ToolchainTest(ITestOutputHelper output)
-        {
-            this.output = output;
-        }
+        public ToolchainTest(ITestOutputHelper output) : base(output) { }
 
         private class MyGenerator : IGenerator
         {
@@ -57,24 +52,27 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Benchmark]
-        public void Benchmark()
+        public class ToolchainBenchmark
         {
+            [Benchmark]
+            public void Benchmark()
+            {
+            }
         }
 
         [Fact]
-        public void CustomToolchain()
+        public void CustomToolchainsAreSupported()
         {
-            var logger = new OutputLogger(output);
+            var logger = new OutputLogger(Output);
 
             var generator = new MyGenerator();
             var builder = new MyBuilder();
             var executor = new MyExecutor();
             var myToolchain = new Toolchain("My", generator, builder, executor);
-            var job = Job.Default.With(myToolchain).With(Mode.SingleRun).WithLaunchCount(1).WithWarmupCount(1).WithTargetCount(1);
+            var job = Job.Dry.With(myToolchain);
+            var config = CreateSimpleConfig(logger).With(job);
 
-            var config = DefaultConfig.Instance.With(job).With(logger);
-            BenchmarkTestExecutor.CanExecute<ToolchainTest>(config, fullValidation: false);
+            CanExecute<ToolchainBenchmark>(config, fullValidation: false);
 
             Assert.True(generator.Done);
             Assert.True(builder.Done);
