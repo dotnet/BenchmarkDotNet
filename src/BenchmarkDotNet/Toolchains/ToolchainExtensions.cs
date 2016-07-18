@@ -4,9 +4,9 @@ using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Toolchains
 {
-    public static class ToolchainExtensions
+    internal static class ToolchainExtensions
     {
-        public static IToolchain GetToolchain(this IJob job) => job.Toolchain ?? GetToolchain(job.Runtime);
+        internal static IToolchain GetToolchain(this IJob job) => job.Toolchain ?? GetToolchain(job.Runtime);
 
         internal static IToolchain GetToolchain(this Runtime runtime)
         {
