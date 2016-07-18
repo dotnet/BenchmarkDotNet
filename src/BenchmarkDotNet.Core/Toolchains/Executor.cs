@@ -115,7 +115,7 @@ namespace BenchmarkDotNet.Toolchains
         {
             // from mono --help: "Usage is: mono [options] program [program-options]"
             return new StringBuilder(30)
-                .Append(job.Jit == Jit.LLVM ? "--llvm" : "--nollvm")
+                .Append(job.Jit == Jit.Llvm ? "--llvm" : "--nollvm")
                 .Append(' ')
                 .Append(exeName)
                 .Append(' ')

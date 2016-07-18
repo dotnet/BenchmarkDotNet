@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using BenchmarkDotNet.Order;
 
 namespace BenchmarkDotNet.Running

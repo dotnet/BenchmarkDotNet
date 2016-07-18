@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;

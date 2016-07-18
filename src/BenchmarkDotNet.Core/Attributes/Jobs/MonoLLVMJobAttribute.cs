@@ -2,9 +2,9 @@
 
 namespace BenchmarkDotNet.Attributes.Jobs
 {
-    public class MonoLLVMJobAttribute : JobConfigBaseAttribute
+    public class MonoLlvmJobAttribute : JobConfigBaseAttribute
     {
-        public MonoLLVMJobAttribute() : base(Job.MonoLLVM)
+        public MonoLlvmJobAttribute() : base(Job.MonoLlvm)
         {
         }
     }

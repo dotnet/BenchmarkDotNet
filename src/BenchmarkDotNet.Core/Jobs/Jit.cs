@@ -8,6 +8,6 @@
         /// <summary>
         /// supported only for Mono
         /// </summary>
-        LLVM
+        Llvm
     }
 }

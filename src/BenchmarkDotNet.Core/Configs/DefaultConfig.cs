@@ -103,11 +103,6 @@ namespace BenchmarkDotNet.Configs
                 {
                     return new[] 
                     {
-                        // GCDiagnoser is marked as obsolete because it has been renamed to MemoryDiagnoser,
-                        // Eventually we'll removed it completely, for the time being let it load, but when
-                        // it turns it'll throw an error, telling the dev to use the MemoryDiagnoser instead
-                        GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.Windows.GCDiagnoser"),
-
                         GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.Windows.MemoryDiagnoser"),
                         GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.Windows.InliningDiagnoser"),
                     };

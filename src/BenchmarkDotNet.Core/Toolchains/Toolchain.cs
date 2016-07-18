@@ -1,5 +1,4 @@
-﻿using System;
-using BenchmarkDotNet.Jobs;
+﻿using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -27,9 +26,9 @@ namespace BenchmarkDotNet.Toolchains
         public virtual bool IsSupported(Benchmark benchmark, ILogger logger)
         {
             var runtime = benchmark.Job.Runtime == Runtime.Host ? RuntimeInformation.GetCurrent() : benchmark.Job.Runtime;
-            if (runtime != Runtime.Mono && benchmark.Job.Jit == Jit.LLVM)
+            if (runtime != Runtime.Mono && benchmark.Job.Jit == Jit.Llvm)
             {
-                logger.WriteLineError($"LLVM is supported only for Mono, benchmark {benchmark.ShortInfo} will not be executed");
+                logger.WriteLineError($"Llvm is supported only for Mono, benchmark {benchmark.ShortInfo} will not be executed");
                 return false;
             }
 
@@ -37,7 +36,5 @@ namespace BenchmarkDotNet.Toolchains
         }
 
         public override string ToString() => Name;
-
-        
     }
 }

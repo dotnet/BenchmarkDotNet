@@ -6,7 +6,6 @@ using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Running
 {

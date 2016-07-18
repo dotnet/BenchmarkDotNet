@@ -1,5 +1,4 @@
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
