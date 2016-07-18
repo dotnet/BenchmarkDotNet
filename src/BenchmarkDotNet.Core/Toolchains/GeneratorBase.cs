@@ -127,9 +127,12 @@ namespace BenchmarkDotNet.Toolchains
                 ? "Action "
                 : $"Func<{idleMethodReturnType}> ";
 
-            // setupMethod is optional, so default to an empty delegate, so there is always something that can be invoked
+            // "Setup" or "Cleanup" methods are optional, so default to an empty delegate, so there is always something that can be invoked
             var setupMethodName = target.SetupMethod != null
                 ? target.SetupMethod.Name
+                : "() => { }";
+            var cleanupMethodName = target.CleanupMethod != null
+                ? target.CleanupMethod.Name
                 : "() => { }";
 
             var idleImplementation = isVoid
@@ -155,6 +158,7 @@ namespace BenchmarkDotNet.Toolchains
                 Replace("$IdleMethodDelegateType$", idleMethodDelegateType).
                 Replace("$IdleMethodReturnType$", idleMethodReturnType).
                 Replace("$SetupMethodName$", setupMethodName).
+                Replace("$CleanupMethodName$", cleanupMethodName).
                 Replace("$IdleImplementation$", idleImplementation).
                 Replace("$AdditionalLogic$", target.AdditionalLogic).
                 Replace("$TargetBenchmarkTaskArguments$", targetBenchmarkTaskArguments).

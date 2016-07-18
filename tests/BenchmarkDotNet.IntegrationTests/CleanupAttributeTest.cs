@@ -10,29 +10,23 @@ using Xunit;
 namespace BenchmarkDotNet.IntegrationTests
 {
     [Config(typeof(SingleRunFastConfig))]
-    public class SetupAttributeTest
+    public class CleanupAttributeTest
     {
-        private const string SetupCalled = "// ### Setup called ###";
+        private const string CleanupCalled = "// ### Cleanup called ###";
         private const string BenchmarkCalled = "// ### Benchmark called ###";
 
         [Fact]
-        public void SetupMethodRunsTest()
+        public void CleanupMethodRunsTest()
         {
             var logger = new AccumulationLogger();
             var config = DefaultConfig.Instance.With(logger);
-            BenchmarkTestExecutor.CanExecute<SetupAttributeTest>(config);
+            BenchmarkTestExecutor.CanExecute<CleanupAttributeTest>(config);
 
             string log = logger.GetLog();
-            Assert.Contains(SetupCalled + Environment.NewLine, log);
+            Assert.Contains(CleanupCalled + Environment.NewLine, log);
             Assert.True(
-                log.IndexOf(SetupCalled + Environment.NewLine) <
+                log.IndexOf(CleanupCalled + Environment.NewLine) > 
                 log.IndexOf(BenchmarkCalled + Environment.NewLine));
-        }
-
-        [Setup]
-        public void Setup()
-        {
-            Console.WriteLine(SetupCalled);
         }
 
         [Benchmark]
@@ -40,6 +34,12 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             Console.WriteLine(BenchmarkCalled);
             Thread.Sleep(5);
+        }
+
+        [Cleanup]
+        public void Cleanup()
+        {
+            Console.WriteLine(CleanupCalled);
         }
     }
 }

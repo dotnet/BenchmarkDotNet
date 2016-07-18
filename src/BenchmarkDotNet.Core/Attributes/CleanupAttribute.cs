@@ -3,12 +3,12 @@
 namespace BenchmarkDotNet.Attributes
 {
     /// <summary>
-    /// Marks method to be executed before benchmark.
+    /// Marks method to be executed after benchmark.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class SetupAttribute : Attribute
+    public class CleanupAttribute : Attribute
     {
-        public SetupAttribute()
+        public CleanupAttribute()
         {
         }
     }
