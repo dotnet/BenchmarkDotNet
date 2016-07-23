@@ -9,6 +9,7 @@ namespace BenchmarkDotNet.Running
         public Type Type { get; }
         public MethodInfo Method { get; }
         public MethodInfo SetupMethod { get; }
+        public MethodInfo CleanupMethod { get; }
         public string AdditionalLogic { get; }
         public int OperationsPerInvoke { get; }
         public string MethodTitle { get; }
@@ -21,6 +22,7 @@ namespace BenchmarkDotNet.Running
             Type type,
             MethodInfo method,
             MethodInfo setupMethod = null,
+            MethodInfo cleanupMethod = null,
             string description = null,
             string additionalLogic = null,
             bool baseline = false,
@@ -30,6 +32,7 @@ namespace BenchmarkDotNet.Running
             Type = type;
             Method = method;
             SetupMethod = setupMethod;
+            CleanupMethod = cleanupMethod;
             OperationsPerInvoke = operationsPerInvoke;
             AdditionalLogic = additionalLogic ?? string.Empty;
             MethodTitle = description ?? method?.Name ?? "Untitled";
