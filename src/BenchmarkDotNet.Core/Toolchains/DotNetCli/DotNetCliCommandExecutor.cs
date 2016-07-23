@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     {
         internal static string GetDotNetCliVersion()
         {
-            using (var process = new Process { StartInfo = BuildStartInfo(arguments: "--version", redirectStandardOutput: true, workingDirectory: string.Empty) })
+            using (var process = new Process { StartInfo = BuildStartInfo(arguments: "--version", workingDirectory: string.Empty) })
             {
                 try
                 {
@@ -34,14 +34,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         internal static bool ExecuteCommand(string commandWithArguments, string workingDirectory, ILogger logger, TimeSpan timeout)
         {
-            bool redirectStandardOutput =
-#if DEBUG // redirect only for DEBUG to get more info while developing/debugging
-                true;
-#else
-                false;
-#endif
-
-            using (var process = new Process { StartInfo = BuildStartInfo(workingDirectory, commandWithArguments, redirectStandardOutput) })
+            using (var process = new Process { StartInfo = BuildStartInfo(workingDirectory, commandWithArguments) })
             {
                 using (new AsynchronousProcessOutputLogger(logger, process))
                 {
@@ -49,10 +42,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
                     // don't forget to call, otherwise logger will not get any events
                     process.BeginErrorReadLine();
-                    if (redirectStandardOutput)
-                    {
-                        process.BeginOutputReadLine();
-                    }
 
                     process.WaitForExit((int)timeout.TotalMilliseconds);
 
@@ -61,7 +50,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        private static ProcessStartInfo BuildStartInfo(string workingDirectory, string arguments, bool redirectStandardOutput)
+        private static ProcessStartInfo BuildStartInfo(string workingDirectory, string arguments)
         {
             return new ProcessStartInfo
             {
@@ -70,7 +59,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 Arguments = arguments,
                 UseShellExecute = false,
                 CreateNoWindow = true,
-                RedirectStandardOutput = redirectStandardOutput,
+                RedirectStandardOutput = true, // we redirect it but never call process.BeginOutputReadLine() in order to ignore it
                 RedirectStandardError = true
             };
         }

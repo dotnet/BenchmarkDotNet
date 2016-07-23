@@ -5,7 +5,7 @@ namespace BenchmarkDotNet.Loggers
 {
     internal class AsynchronousProcessOutputLogger : IDisposable
     {
-        protected readonly Process process;
+        private readonly Process process;
         private readonly ILogger logger;
 
         public AsynchronousProcessOutputLogger(ILogger logger, Process process)
