@@ -34,12 +34,13 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        public void Invoke(IJob job, long operationsPerInvoke, Action setupAction, Action targetAction, Action idleAction)
+        public void Invoke(IJob job, long operationsPerInvoke, Action setupAction, Action targetAction, Action cleanupAction, Action idleAction)
         {
             // Jitting
             setupAction();
             targetAction();
             idleAction();
+            cleanupAction();
 
             // Run
             Func<MultiInvokeInput, Measurement> multiInvoke = input =>
@@ -47,18 +48,19 @@ namespace BenchmarkDotNet.Running
                 var action = input.IterationMode.IsOneOf(IterationMode.IdleWarmup, IterationMode.IdleTarget)
                     ? idleAction
                     : targetAction;
-                return MultiInvoke(input.IterationMode, input.Index, setupAction, action, input.InvokeCount,
-                    operationsPerInvoke, job.GarbageCollection);
+                return MultiInvoke(input.IterationMode, input.Index, setupAction, action, cleanupAction, 
+                    input.InvokeCount, operationsPerInvoke, job.GarbageCollection);
             };
             Invoke(job, multiInvoke);
         }
 
-        public void Invoke<T>(IJob job, long operationsPerInvoke, Action setupAction, Func<T> targetAction, Func<T> idleAction)
+        public void Invoke<T>(IJob job, long operationsPerInvoke, Action setupAction, Func<T> targetAction, Action cleanupAction, Func<T> idleAction)
         {
             // Jitting
             setupAction();
             targetAction();
             idleAction();
+            cleanupAction();
 
             // Run
             Func<MultiInvokeInput, Measurement> multiInvoke = input =>
@@ -66,23 +68,24 @@ namespace BenchmarkDotNet.Running
                 var action = input.IterationMode.IsOneOf(IterationMode.IdleWarmup, IterationMode.IdleTarget)
                     ? idleAction
                     : targetAction;
-                return MultiInvoke(input.IterationMode, input.Index, setupAction, action, input.InvokeCount,
+                return MultiInvoke(input.IterationMode, input.Index, setupAction, action, cleanupAction, input.InvokeCount,
                     operationsPerInvoke, job.GarbageCollection);
             };
             Invoke(job, multiInvoke);
         }
 
-        public void Invoke<T>(IJob job, long operationsPerInvoke, Action setupAction, Func<T> targetAction, Func<int> idleAction)
+        public void Invoke<T>(IJob job, long operationsPerInvoke, Action setupAction, Func<T> targetAction, Action cleanupAction, Func<int> idleAction)
         {
             // Jitting
             setupAction();
             targetAction();
             idleAction();
+            cleanupAction();
 
             // Run
             Func<MultiInvokeInput, Measurement> multiInvoke = input => input.IterationMode.IsOneOf(IterationMode.IdleWarmup, IterationMode.IdleTarget) ?
-                MultiInvoke(input.IterationMode, input.Index, setupAction, idleAction, input.InvokeCount, operationsPerInvoke, job.GarbageCollection) :
-                MultiInvoke(input.IterationMode, input.Index, setupAction, targetAction, input.InvokeCount, operationsPerInvoke, job.GarbageCollection);
+                MultiInvoke(input.IterationMode, input.Index, setupAction, idleAction, cleanupAction, input.InvokeCount, operationsPerInvoke, job.GarbageCollection) :
+                MultiInvoke(input.IterationMode, input.Index, setupAction, targetAction, cleanupAction, input.InvokeCount, operationsPerInvoke, job.GarbageCollection);
             Invoke(job, multiInvoke);
         }
 
@@ -235,7 +238,7 @@ namespace BenchmarkDotNet.Running
             Console.WriteLine();
         }
 
-        private Measurement MultiInvoke(IterationMode mode, int index, Action setupAction, Action targetAction, long invocationCount, long operationsPerInvoke, GarbageCollection garbageCollectionSettings)
+        private Measurement MultiInvoke(IterationMode mode, int index, Action setupAction, Action targetAction, Action cleanupAction, long invocationCount, long operationsPerInvoke, GarbageCollection garbageCollectionSettings)
         {
             var totalOperations = invocationCount * operationsPerInvoke;
             setupAction();
@@ -260,6 +263,7 @@ namespace BenchmarkDotNet.Running
                 RunAction(targetAction, invocationCount);
                 clockSpan = chronometer.Stop();
             }
+            cleanupAction();
             var measurement = new Measurement(0, mode, index, totalOperations, clockSpan.GetNanoseconds());
             Console.WriteLine(measurement.ToOutputLine());
             GcCollect(garbageCollectionSettings);
@@ -268,7 +272,7 @@ namespace BenchmarkDotNet.Running
 
         private object multiInvokeReturnHolder;
 
-        private Measurement MultiInvoke<T>(IterationMode mode, int index, Action setupAction, Func<T> targetAction, long invocationCount, long operationsPerInvoke, GarbageCollection garbageCollectionSettings, T returnHolder = default(T))
+        private Measurement MultiInvoke<T>(IterationMode mode, int index, Action setupAction, Func<T> targetAction, Action cleanupAction, long invocationCount, long operationsPerInvoke, GarbageCollection garbageCollectionSettings, T returnHolder = default(T))
         {
             var totalOperations = invocationCount * operationsPerInvoke;
             setupAction();

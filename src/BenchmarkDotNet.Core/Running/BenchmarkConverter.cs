@@ -23,8 +23,9 @@ namespace BenchmarkDotNet.Running
 
         public static Benchmark[] MethodsToBenchmarks(Type containingType, MethodInfo[] methods, IConfig config = null)
         {
-            var setupMethod = GetSetupMethod(methods);
+            var setupMethod = GetWrappingMethod<SetupAttribute>(methods, "Setup");
             var targetMethods = methods.Where(method => method.HasAttribute<BenchmarkAttribute>()).ToArray();
+            var cleanupMethod = GetWrappingMethod<CleanupAttribute>(methods, "Cleanup");
 
             var parameterDefinitions = GetParameterDefinitions(containingType);
             var parameterInstancesList = parameterDefinitions.Expand();
@@ -34,7 +35,7 @@ namespace BenchmarkDotNet.Running
                 rawJobs = new[] { Job.Default };
             var jobs = rawJobs.Distinct().ToArray();
 
-            var targets = GetTargets(targetMethods, containingType, setupMethod).ToArray();
+            var targets = GetTargets(targetMethods, containingType, setupMethod, cleanupMethod).ToArray();
 
             var benchmarks = (
                 from target in targets
@@ -60,16 +61,17 @@ namespace BenchmarkDotNet.Running
             return config;
         }
 
-        private static IEnumerable<Target> GetTargets(MethodInfo[] targetMethods, Type type, MethodInfo setupMethod) => targetMethods.
+        private static IEnumerable<Target> GetTargets(MethodInfo[] targetMethods, Type type, MethodInfo setupMethod, MethodInfo cleanupMethod) => targetMethods.
             Where(m => m.HasAttribute<BenchmarkAttribute>()).
-            Select(methodInfo => CreateTarget(type, setupMethod, methodInfo, methodInfo.ResolveAttribute<BenchmarkAttribute>(), targetMethods));
+            Select(methodInfo => CreateTarget(type, setupMethod, methodInfo, cleanupMethod, methodInfo.ResolveAttribute<BenchmarkAttribute>(), targetMethods));
 
-        private static Target CreateTarget(Type type, MethodInfo setupMethod, MethodInfo methodInfo, BenchmarkAttribute attr, MethodInfo[] targetMethods)
+        private static Target CreateTarget(Type type, MethodInfo setupMethod, MethodInfo methodInfo, MethodInfo cleanupMethod, BenchmarkAttribute attr, MethodInfo[] targetMethods)
         {
             var target = new Target(
                 type, 
                 methodInfo, 
-                setupMethod, 
+                setupMethod,
+                cleanupMethod,
                 attr.Description, 
                 baseline: attr.Baseline, 
                 operationsPerInvoke: attr.OperationsPerInvoke, 
@@ -107,15 +109,15 @@ namespace BenchmarkDotNet.Running
             return new ParameterDefinitions(definitions);
         }
 
-        private static MethodInfo GetSetupMethod(MethodInfo[] methods)
+        private static MethodInfo GetWrappingMethod<T>(MethodInfo[] methods, string methodName) where T : Attribute
         {
-            var setupMethod = methods.FirstOrDefault(m => m.HasAttribute<SetupAttribute>());
+            var setupMethod = methods.FirstOrDefault(m => m.HasAttribute<T>());
             if (setupMethod != null)
             {
-                // setupMethod is optional, but if it's there it must have the correct signature, accessibility, etc
-                AssertMethodHasCorrectSignature("Setup", setupMethod);
-                AssertMethodIsAccessible("Setup", setupMethod);
-                AssertMethodIsNotGeneric("Setup", setupMethod);
+                // "Setup" or "Cleanup" methods are optional, but if they're there, they must have the correct signature, accessibility, etc ...
+                AssertMethodHasCorrectSignature(methodName, setupMethod);
+                AssertMethodIsAccessible(methodName, setupMethod);
+                AssertMethodIsNotGeneric(methodName, setupMethod);
             }
             return setupMethod;
         }

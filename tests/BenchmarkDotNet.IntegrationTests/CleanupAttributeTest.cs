@@ -10,40 +10,40 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class SetupAttributeTest : BenchmarkTestExecutor
+    public class CleanupAttributeTest : BenchmarkTestExecutor
     {
-        private const string SetupCalled = "// ### Setup called ###";
+        private const string CleanupCalled = "// ### Cleanup called ###";
         private const string BenchmarkCalled = "// ### Benchmark called ###";
 
-        public SetupAttributeTest(ITestOutputHelper output) : base(output) { }
+        public CleanupAttributeTest(ITestOutputHelper output) : base(output) { }
 
         [Fact]
-        public void SetupMethodRunsTest()
+        public void CleanupMethodRunsTest()
         {
             var logger = new OutputLogger(Output);
             var config = CreateSimpleConfig(logger);
 
-            CanExecute<SetupAttributeBenchmarks>(config);
+            CanExecute<CleanupAttributeBenchmarks>(config);
 
             string log = logger.GetLog();
-            Assert.Contains(SetupCalled + Environment.NewLine, log);
+            Assert.Contains(CleanupCalled + Environment.NewLine, log);
             Assert.True(
-                log.IndexOf(SetupCalled + Environment.NewLine) <
+                log.IndexOf(CleanupCalled + Environment.NewLine) > 
                 log.IndexOf(BenchmarkCalled + Environment.NewLine));
         }
 
-        public class SetupAttributeBenchmarks
+        public class CleanupAttributeBenchmarks
         {
-            [Setup]
-            public void Setup()
-            {
-                Console.WriteLine(SetupCalled);
-            }
-
             [Benchmark]
             public void Benchmark()
             {
                 Console.WriteLine(BenchmarkCalled);
+            }
+
+            [Cleanup]
+            public void Cleanup()
+            {
+                Console.WriteLine(CleanupCalled);
             }
         }
     }

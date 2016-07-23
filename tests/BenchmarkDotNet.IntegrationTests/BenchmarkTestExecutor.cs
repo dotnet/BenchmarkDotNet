@@ -55,7 +55,12 @@ namespace BenchmarkDotNet.IntegrationTests
                 config = config.With(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default);
             }
 
-            // Make sure we ALWAYS conbine the Config (default or passed in) with any Config applied to the Type/Class
+            if (!config.GetColumns().Any())
+            {
+                config = config.With(DefaultConfig.Instance.GetColumns().ToArray());
+            }
+
+            // Make sure we ALWAYS combine the Config (default or passed in) with any Config applied to the Type/Class
             var summary = BenchmarkRunner.Run(type, BenchmarkConverter.GetFullConfig(type, config));
 
             if (fullValidation)
