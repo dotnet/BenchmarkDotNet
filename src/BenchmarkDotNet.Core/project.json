@@ -45,6 +45,9 @@
       "frameworkAssemblies": {
         "System.Management": "4.0.0.0",
         "System.Xml": "4.0.0.0"
+      },
+      "dependencies": {
+        "System.Threading.Tasks.Extensions": "4.0.0"
       }
     },
     "netstandard1.5": {
@@ -62,6 +65,7 @@
         "System.Reflection": "4.1.0",
         "System.Reflection.Primitives": "4.0.1",
         "System.Reflection.TypeExtensions": "4.1.0",
+        "System.Threading.Tasks.Extensions": "4.0.0",
         "System.Threading.Thread": "4.0.0",
         "System.Diagnostics.Process": "4.1.0",
         "System.IO.FileSystem": "4.0.1",

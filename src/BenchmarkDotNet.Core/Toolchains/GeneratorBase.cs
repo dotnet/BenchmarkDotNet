@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Reflection;
+using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -88,83 +84,7 @@ namespace BenchmarkDotNet.Toolchains
 
         private void GenerateCode(Benchmark benchmark, ArtifactsPaths artifactsPaths)
         {
-            var target = benchmark.Target;
-            var isVoid = target.Method.ReturnType == typeof(void);
-
-            var operationsPerInvoke = target.OperationsPerInvoke;
-
-            var targetTypeNamespace = string.IsNullOrWhiteSpace(target.Type.Namespace)
-                ? ""
-                : $"using {target.Type.Namespace};";
-
-            // As "using System;" is always included in the template, don't emit it again
-            var emptyReturnTypeNamespace = target.Method.ReturnType == typeof(void) ||
-                target.Method.ReturnType.Namespace == "System" ||
-                string.IsNullOrWhiteSpace(target.Method.ReturnType.Namespace);
-            var targetMethodReturnTypeNamespace = emptyReturnTypeNamespace
-                ? ""
-                : $"using {target.Method.ReturnType.Namespace};";
-
-            var targetTypeName = target.Type.GetCorrectTypeName();
-            var targetMethodName = target.Method.Name;
-
-            var targetMethodReturnType = isVoid
-                ? "void"
-                : target.Method.ReturnType.GetCorrectTypeName();
-            var idleMethodReturnType = isVoid || !target.Method.ReturnType.GetTypeInfo().IsValueType
-                ? targetMethodReturnType
-                : "int";
-            var targetMethodResultHolder = isVoid
-                ? ""
-                : $"private {targetMethodReturnType} value;";
-            var targetMethodHoldValue = isVoid
-                ? ""
-                : "value = ";
-            var targetMethodDelegateType = isVoid
-                ? "Action "
-                : $"Func<{targetMethodReturnType}> ";
-            var idleMethodDelegateType = isVoid
-                ? "Action "
-                : $"Func<{idleMethodReturnType}> ";
-
-            // "Setup" or "Cleanup" methods are optional, so default to an empty delegate, so there is always something that can be invoked
-            var setupMethodName = target.SetupMethod != null
-                ? target.SetupMethod.Name
-                : "() => { }";
-            var cleanupMethodName = target.CleanupMethod != null
-                ? target.CleanupMethod.Name
-                : "() => { }";
-
-            var idleImplementation = isVoid
-                ? ""
-                : $"return {(target.Method.ReturnType.GetTypeInfo().IsValueType ? "0" : "null")};";
-
-            var paramsContent = string.Join("", benchmark.Parameters.Items.Select(parameter =>
-                $"{(parameter.IsStatic ? "" : "instance.")}{parameter.Name} = {GetParameterValue(parameter.Value)};"));
-
-            var targetBenchmarkTaskArguments = benchmark.Job.GenerateWithDefinitions();
-
-            var contentTemplate = ResourceHelper.LoadTemplate("BenchmarkProgram.txt");
-            var content = contentTemplate.
-                Replace("$OperationsPerInvoke$", operationsPerInvoke.ToString()).
-                Replace("$TargetTypeNamespace$", targetTypeNamespace).
-                Replace("$TargetMethodReturnTypeNamespace$", targetMethodReturnTypeNamespace).
-                Replace("$TargetTypeName$", targetTypeName).
-                Replace("$TargetMethodName$", targetMethodName).
-                Replace("$TargetMethodResultHolder$", targetMethodResultHolder).
-                Replace("$TargetMethodDelegateType$", targetMethodDelegateType).
-                Replace("$TargetMethodHoldValue$", targetMethodHoldValue).
-                Replace("$TargetMethodReturnType$", targetMethodReturnType).
-                Replace("$IdleMethodDelegateType$", idleMethodDelegateType).
-                Replace("$IdleMethodReturnType$", idleMethodReturnType).
-                Replace("$SetupMethodName$", setupMethodName).
-                Replace("$CleanupMethodName$", cleanupMethodName).
-                Replace("$IdleImplementation$", idleImplementation).
-                Replace("$AdditionalLogic$", target.AdditionalLogic).
-                Replace("$TargetBenchmarkTaskArguments$", targetBenchmarkTaskArguments).
-                Replace("$ParamsContent$", paramsContent);
-
-            File.WriteAllText(artifactsPaths.ProgramCodePath, content);
+            File.WriteAllText(artifactsPaths.ProgramCodePath, CodeGenerator.Generate(benchmark));
         }
 
         private void GenerateAppConfig(Benchmark benchmark, ArtifactsPaths artifactsPaths)
@@ -176,27 +96,6 @@ namespace BenchmarkDotNet.Toolchains
             {
                 AppConfigGenerator.Generate(benchmark.Job, source, destination);
             }
-        }
-
-        private string GetParameterValue(object value)
-        {
-            if (value is bool)
-                return value.ToString().ToLower();
-            if (value is string)
-                return $"\"{value}\"";
-            if (value is char)
-                return $"'{value}'";
-            if (value is float)
-                return ((float)value).ToString("G", CultureInfo.InvariantCulture) + "f";
-            if (value is double)
-                return ((double)value).ToString("G", CultureInfo.InvariantCulture) + "d";
-            if (value is decimal)
-                return ((decimal)value).ToString("G", CultureInfo.InvariantCulture) + "m";
-            if (value.GetType().GetTypeInfo().IsEnum)
-                return value.GetType().GetCorrectTypeName() + "." + value;
-            if (value is Type)
-                return "typeof(" + ((Type) value).GetCorrectTypeName() + ")";
-            return value.ToString();
         }
     }
 }
