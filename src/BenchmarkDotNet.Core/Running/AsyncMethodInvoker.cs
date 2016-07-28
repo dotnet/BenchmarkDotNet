@@ -14,8 +14,10 @@ namespace BenchmarkDotNet.Running
         [HideFromIntelliSense(System.ComponentModel.EditorBrowsableState.Never)]
         public static void Idle() => ExecuteBlocking(() => Completed);
 
+        // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
+        // and will eventually throw actual exception, not aggregated one
         [HideFromIntelliSense(System.ComponentModel.EditorBrowsableState.Never)]
-        public static void ExecuteBlocking(Func<Task> future) => future.Invoke().Wait();
+        public static void ExecuteBlocking(Func<Task> future) => future.Invoke().GetAwaiter().GetResult();
     }
 
     public static class TaskMethodInvoker<T>
@@ -25,9 +27,10 @@ namespace BenchmarkDotNet.Running
         [HideFromIntelliSense(System.ComponentModel.EditorBrowsableState.Never)]
         public static T Idle() => ExecuteBlocking(() => Completed);
 
-        // we use .Result because it's blocking and will eventually rethrow any exception
-        [HideFromIntelliSense(System.ComponentModel.EditorBrowsableState.Never)]        
-        public static T ExecuteBlocking(Func<Task<T>> future) => future.Invoke().Result;         
+        // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
+        // and will eventually throw actual exception, not aggregated one
+        [HideFromIntelliSense(System.ComponentModel.EditorBrowsableState.Never)]
+        public static T ExecuteBlocking(Func<Task<T>> future) => future.Invoke().GetAwaiter().GetResult();
     }
 
     public static class ValueTaskMethodInvoker<T>
@@ -35,6 +38,7 @@ namespace BenchmarkDotNet.Running
         [HideFromIntelliSense(System.ComponentModel.EditorBrowsableState.Never)]
         public static T Idle() => ExecuteBlocking(() => new ValueTask<T>(default(T)));
 
+        // we use .Result instead of .GetAwaiter().GetResult() because it's faster
         [HideFromIntelliSense(System.ComponentModel.EditorBrowsableState.Never)]
         public static T ExecuteBlocking(Func<ValueTask<T>> future) => future.Invoke().Result;
     }
