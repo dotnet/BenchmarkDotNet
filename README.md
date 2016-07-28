@@ -583,7 +583,7 @@ At first, you should have enough runs to count percentiles from. The `TargetCoun
 Second, the count of iterations for each run should not be very high, or the peak timings will be averaged.  
  The `IterationTime = 25` works fine for most cases; for long-running benchmarks the `Mode = Mode.SingleRun` will be the best choice. Hovewer, feel free to experiment with the config values.
 
-Third, if you want to be sure that measurements are repeatable, set the `LanuchCount` to 3 or higher.
+Third, if you want to be sure that measurements are repeatable, set the `LaunchCount` to 3 or higher.
 
 And the last, don't forget to include the columns into the config. They are not included by default (as said above, these are not too useful for most of the benchmarks).
 There're predefined `StatisticColumn.P0`..`StatisticColumn.P100` for absolute timing percentiles and `BaselineDiffColumn.Scaled50`..`BaselineDiffColumn.Scaled95` for relative percentiles.
