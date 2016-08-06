@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Jobs - BenchmarkDotNet Documentation</title>
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../css/theme_colors.css" type="text/css" />
+    <link rel="stylesheet" href="../css/styles/vs.css">
+    <link rel="stylesheet" href="../css/font-awesome.4.5.0.min.css">
+</head>
+<body role="document">
+    <div class="grid-for-nav">
+        <nav data-toggle="nav-shift" class="nav-side stickynav">
+            <div class="side-nav-search">
+                <a href="../index.htm"><i class="fa fa-home"></i> BenchmarkDotNet Documentation</a>
+                <div role="search">
+                    <form id="search-form" class="form" action="../Docnet_search.htm" method="get">
+                        <input type="text" name="q" placeholder="Search docs" />
+                    </form>
+                </div>
+            </div>
+            <div class="menu menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+<ul>
+<li class="tocentry"><a href="../index.htm">Home</a>
+</li>
+
+<li class="tocentry"><a href="../GettingStarted.htm">Getting Started</a>
+</li>
+<li class="tocentry">
+<ul>
+<li><span class="navigationgroup"><i class="fa fa-caret-down"></i> <a href="../Configuration.htm">Configuration</a></span></li>
+<li class="tocentry"><a href="../Configuration/Configs.htm">Configs</a>
+</li>
+<li class="tocentry current"><a class="current" href="../Configuration/Jobs.htm">Jobs</a>
+<ul class="currentrelative">
+<li class="tocentry"><a href="#characteristics">Characteristics</a></li>
+<li class="tocentry"><a href="#predefined-jobs">Predefined jobs</a></li>
+<li class="tocentry"><a href="#examples">Examples</a></li>
+</ul>
+<li class="tocentry"><a href="../Configuration/Columns.htm">Columns</a>
+</li>
+<li class="tocentry"><a href="../Configuration/Exporters.htm">Exporters</a>
+</li>
+<li class="tocentry"><a href="../Configuration/Loggers.htm">Loggers</a>
+</li>
+<li class="tocentry"><a href="../Configuration/Diagnosers.htm">Diagnosers</a>
+</li>
+<li class="tocentry"><a href="../Configuration/Analyzers.htm">Analyzers</a>
+</li>
+<li class="tocentry"><a href="../Configuration/Validators.htm">Validators</a>
+</li>
+
+</ul>
+</li>
+<li class="tocentry"><a href="../HowToRun.htm">How to run your benchmarks</a>
+</li>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Advancedfeatures.htm">Advanced features</a></span>
+</li>
+<li class="tocentry"><a href="../HowItWorks.htm">How it works</a>
+</li>
+<li class="tocentry"><a href="../RulesOfBenchmarking.htm">Rules of benchmarking</a>
+</li>
+<li class="tocentry"><a href="../faq.htm">FAQ</a>
+</li>
+<li class="tocentry"><a href="../Team.htm">Team</a>
+</li>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Contributing.htm">Contributing</a></span>
+</li>
+<li class="tocentry"><a href="../license.htm">License</a>
+</li>
+</ul>
+				<div class="toc-footer">
+					<span class="text-small">
+						<hr/>
+						<a href="https://github.com/FransBouma/DocNet" target="_blank">Made with <i class="fa fa-github"></i> DocNet</a>
+					</span>
+				</div>	
+			</div>
+            &nbsp;
+        </nav>
+        <section data-toggle="nav-shift" class="nav-content-wrap">
+            <nav class="nav-top" role="navigation" aria-label="top navigation">
+                <i data-toggle="nav-top" class="fa fa-bars"></i>
+                <a href="../index.htm">BenchmarkDotNet Documentation</a>
+            </nav>
+            <div class="nav-content">
+                <div role="navigation" aria-label="breadcrumbs navigation">
+                    <div class="breadcrumbs">
+<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Configuration.htm">Configuration</a></li> / <li><a href="../Configuration/Jobs.htm">Jobs</a></li></ul>
+					
+                    </div>
+                    <hr />
+                </div>
+                <div role="main">
+                    <div class="section">
+<h1 id="jobs">Jobs<a class="headerlink" href="#jobs" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<p>A <em>job</em> is an environment for your benchmarks. You can set one or several jobs for your set of benchmarks.</p>
+<h2 id="characteristics">Characteristics<a class="headerlink" href="#characteristics" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<ul>
+<li><strong>Toolchain.</strong> A toolchain for generating/building/executing your benchmark. Values: <code>Classic</code> (Roslyn based) <em>[default]</em> and <code>Core</code> (dotnet cli based) .</li>
+<li><strong>Mode.</strong> Values: <code>Throughput</code> <em>[default]</em>, <code>SingleRun</code>.</li>
+<li><strong>Platform.</strong> Values: <code>Host</code> <em>[default]</em>, <code>AnyCpu</code>, <code>X86</code>, <code>X64</code>.</li>
+<li><strong>Jit.</strong> Values: <code>Host</code> <em>[default]</em>, <code>LegacyJit</code>, <code>RyuJit</code>.</li>
+<li><strong>Framework.</strong> Values: <code>Host</code> <em>[default]</em>, <code>V40</code>, <code>V45</code>, <code>V451</code>, <code>V452</code>, <code>V46</code>.</li>
+<li><strong>Runtime.</strong> Values: <code>Host</code> <em>[default]</em>, <code>Clr</code>, <code>Mono</code>, <code>Core</code>.</li>
+<li><strong>LaunchCount.</strong> Count of separated process launches. Values: <code>Auto</code> <em>[default]</em> or specific number.</li>
+<li><strong>WarmupCount.</strong> Count of warmup iterations. Values: <code>Auto</code> <em>[default]</em> or specific number.</li>
+<li><strong>TargetCount.</strong> Count of target iterations (that will be used for summary). Values: <code>Auto</code> <em>[default]</em> or specific number.</li>
+<li><strong>IterationTime.</strong> Desired time of execution of an iteration (in ms). Values: <code>Auto</code> <em>[default]</em> or specific number.</li>
+<li><strong>Affinity.</strong> <a href="https://msdn.microsoft.com/library/system.diagnostics.process.processoraffinity.aspx" target="_blank">ProcessorAffinity</a> of process. Values: <code>Auto</code> <em>[default]</em> or specific mask.</li>
+</ul>
+<p>The <code>Host</code> value means that value will be inherited from host process settings. The <code>Auto</code> values means the BenchmarkDotNet automatically choose the best value.</p>
+<h2 id="predefined-jobs">Predefined jobs<a class="headerlink" href="#predefined-jobs" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<pre><code class="cs">class Job
+{
+    IJob Default = new Job();
+    IJob LegacyX86 = new Job { Platform = Platform.X86, Jit = Jit.LegacyJit };
+    IJob LegacyX64 = new Job { Platform = Platform.X64, Jit = Jit.LegacyJit };
+    IJob RyuJitX64 = new Job { Platform = Platform.X64, Jit = Jit.RyuJit };
+    IJob Dry = new Job { Mode = Mode.SingleRun, ProcessCount = 1, WarmupCount = 1, TargetCount = 1 };
+    IJob[] AllJits = { LegacyX86, LegacyX64, RyuJitX64 };
+    IJob Clr = new Job { Runtime = Runtime.Clr };
+    IJob Mono = new Job { Runtime = Runtime.Mono };
+    IJob Core = new Job { Runtime = Runtime.Core };
+    IJob LongRun = new Job { LaunchCount = 3, WarmupCount = 30, TargetCount = 1000 };
+}
+</code></pre>
+
+<h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<pre><code class="cs">// *** Command style ***
+[Config(&quot;jobs=AllJits&quot;)]
+[Config(&quot;jobs=Dry&quot;)]
+[Config(&quot;jobs=LegacyX64,RyuJitX64&quot;)]
+</code></pre>
+
+<pre><code class="cs">// *** Object style ***
+class Config : ManualConfig
+{
+    public Config()
+    {
+        Add(Job.AllJits);
+        Add(Job.LegacyX64, Job.RyuJitX64);
+        Add(Job.Default.With(Mode.SingleRun).WithProcessCount(1).WithWarmupCount(1).WithTargetCount(1));
+        Add(Job.Default.With(Framework.V40).With(Runtime.Mono).With(Platform.X64));
+    }
+}
+</code></pre>
+
+
+                    </div>
+                </div>
+                <footer>
+                    <hr />
+                    <div role="contentinfo">
+BenchmarkDotNet Documentation. &copy;2013-2016. <a href='https://github.com/PerfDotNet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.
+                    </div>
+                </footer>
+            </div>
+        </section>
+    </div>
+    <script src="../js/jquery-2.1.1.min.js"></script>
+    <script src="../js/modernizr-2.8.3.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>

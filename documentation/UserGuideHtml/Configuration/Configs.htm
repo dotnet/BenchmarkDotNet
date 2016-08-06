@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Configs - BenchmarkDotNet Documentation</title>
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../css/theme_colors.css" type="text/css" />
+    <link rel="stylesheet" href="../css/styles/vs.css">
+    <link rel="stylesheet" href="../css/font-awesome.4.5.0.min.css">
+</head>
+<body role="document">
+    <div class="grid-for-nav">
+        <nav data-toggle="nav-shift" class="nav-side stickynav">
+            <div class="side-nav-search">
+                <a href="../index.htm"><i class="fa fa-home"></i> BenchmarkDotNet Documentation</a>
+                <div role="search">
+                    <form id="search-form" class="form" action="../Docnet_search.htm" method="get">
+                        <input type="text" name="q" placeholder="Search docs" />
+                    </form>
+                </div>
+            </div>
+            <div class="menu menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+<ul>
+<li class="tocentry"><a href="../index.htm">Home</a>
+</li>
+
+<li class="tocentry"><a href="../GettingStarted.htm">Getting Started</a>
+</li>
+<li class="tocentry">
+<ul>
+<li><span class="navigationgroup"><i class="fa fa-caret-down"></i> <a href="../Configuration.htm">Configuration</a></span></li>
+<li class="tocentry current"><a class="current" href="../Configuration/Configs.htm">Configs</a>
+<ul class="currentrelative">
+<li class="tocentry"><a href="#built-in-configuration">Built-in configuration</a></li>
+<li class="tocentry"><a href="#custom-configs">Custom configs</a></li>
+</ul>
+<li class="tocentry"><a href="../Configuration/Jobs.htm">Jobs</a>
+</li>
+<li class="tocentry"><a href="../Configuration/Columns.htm">Columns</a>
+</li>
+<li class="tocentry"><a href="../Configuration/Exporters.htm">Exporters</a>
+</li>
+<li class="tocentry"><a href="../Configuration/Loggers.htm">Loggers</a>
+</li>
+<li class="tocentry"><a href="../Configuration/Diagnosers.htm">Diagnosers</a>
+</li>
+<li class="tocentry"><a href="../Configuration/Analyzers.htm">Analyzers</a>
+</li>
+<li class="tocentry"><a href="../Configuration/Validators.htm">Validators</a>
+</li>
+
+</ul>
+</li>
+<li class="tocentry"><a href="../HowToRun.htm">How to run your benchmarks</a>
+</li>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Advancedfeatures.htm">Advanced features</a></span>
+</li>
+<li class="tocentry"><a href="../HowItWorks.htm">How it works</a>
+</li>
+<li class="tocentry"><a href="../RulesOfBenchmarking.htm">Rules of benchmarking</a>
+</li>
+<li class="tocentry"><a href="../faq.htm">FAQ</a>
+</li>
+<li class="tocentry"><a href="../Team.htm">Team</a>
+</li>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Contributing.htm">Contributing</a></span>
+</li>
+<li class="tocentry"><a href="../license.htm">License</a>
+</li>
+</ul>
+				<div class="toc-footer">
+					<span class="text-small">
+						<hr/>
+						<a href="https://github.com/FransBouma/DocNet" target="_blank">Made with <i class="fa fa-github"></i> DocNet</a>
+					</span>
+				</div>	
+			</div>
+            &nbsp;
+        </nav>
+        <section data-toggle="nav-shift" class="nav-content-wrap">
+            <nav class="nav-top" role="navigation" aria-label="top navigation">
+                <i data-toggle="nav-top" class="fa fa-bars"></i>
+                <a href="../index.htm">BenchmarkDotNet Documentation</a>
+            </nav>
+            <div class="nav-content">
+                <div role="navigation" aria-label="breadcrumbs navigation">
+                    <div class="breadcrumbs">
+<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Configuration.htm">Configuration</a></li> / <li><a href="../Configuration/Configs.htm">Configs</a></li></ul>
+					
+                    </div>
+                    <hr />
+                </div>
+                <div role="main">
+                    <div class="section">
+<h1 id="configs">Configs<a class="headerlink" href="#configs" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<p>Config is a set of so called <code>jobs</code>, <code>columns</code>, <code>exporters</code>, <code>loggers</code>, <code>diagnosers</code>, <code>analysers</code>, <code>validators</code> that help you to build your benchmark. </p>
+<h2 id="built-in-configuration">Built-in configuration<a class="headerlink" href="#built-in-configuration" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>There are two built-in ways to set your config:</p>
+<h3 id="object-style">Object style<a class="headerlink" href="#object-style" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<pre><code class="cs">[Config(typeof(Config))]
+public class MyClassWithBenchmarks
+{
+    private class Config : ManualConfig
+    {
+        public Config()
+        {
+            Add(new Job1(), new Job2());
+            Add(new Column1(), new Column2());
+            Add(new Exporter1(), new Exporter2());
+            Add(new Logger1(), new Logger2());
+            Add(new Diagnoser1(), new Diagnoser2());
+            Add(new Analyser1(), new Analyser2());
+        }
+    }
+    
+    [Benchmark]
+    public void Benchmark1()
+    {
+    }
+    
+    [Benchmark]
+    public void Benchmark2()
+    {
+    }
+}
+</code></pre>
+
+<h3 id="command-style">Command style<a class="headerlink" href="#command-style" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<pre><code class="cs">[Config(&quot;jobs=job1,job2 &quot; +
+        &quot;columns=column1,column2 &quot; +
+        &quot;exporters=exporter1,exporter2 &quot; +
+        &quot;loggers=logger1,logger2 &quot; +
+        &quot;diagnosers=diagnoser1,diagnoser2 &quot; +
+        &quot;analysers=analyser1,analyser2&quot;)]
+public class MyClassWithBenchmarks
+{
+    [Benchmark]
+    public void Benchmark1()
+    {
+    }
+    
+    [Benchmark]
+    public void Benchmark2()
+    {
+    }
+}
+</code></pre>
+
+<h2 id="custom-configs">Custom configs<a class="headerlink" href="#custom-configs" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>You can also define your own way to specify config parameters. </p>
+<h3 id="custom-attribute">Custom attribute<a class="headerlink" href="#custom-attribute" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>You can define own config attribute:</p>
+<pre><code class="cs">[MyConfigSource(Jit.LegacyJit, Jit.RyuJit)]
+public class IntroConfigSource
+{
+    private class MyConfigSourceAttribute : Attribute, IConfigSource
+    {
+        public IConfig Config { get; private set; }
+
+        public MyConfigSourceAttribute(params Jit[] jits)
+        {
+            var jobs = jits.Select(jit =&gt; Job.Dry.With(Platform.X64).With(jit)).ToArray();
+            Config = ManualConfig.CreateEmpty().With(jobs);
+        }
+    }
+
+    [Benchmark]
+    public void Foo()
+    {
+        Thread.Sleep(10);
+    }
+}
+</code></pre>
+
+<h3 id="fluent-config">Fluent config<a class="headerlink" href="#fluent-config" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>There is no need to create new Config type, you can simply use fluent interface:</p>
+<pre><code class="cs">BenchmarkRunner
+    .Run&lt;Algo_Md5VsSha256&gt;(
+        ManualConfig
+            .Create(DefaultConfig.Instance)
+            .With(Job.RyuJitX64)
+            .With(Job.Core)
+            .With(ExecutionValidator.FailOnError));
+</code></pre>
+
+
+                    </div>
+                </div>
+                <footer>
+                    <hr />
+                    <div role="contentinfo">
+BenchmarkDotNet Documentation. &copy;2013-2016. <a href='https://github.com/PerfDotNet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.
+                    </div>
+                </footer>
+            </div>
+        </section>
+    </div>
+    <script src="../js/jquery-2.1.1.min.js"></script>
+    <script src="../js/modernizr-2.8.3.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>

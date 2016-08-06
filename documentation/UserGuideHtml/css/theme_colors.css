@@ -1,0 +1,335 @@
+/*
+	This is the color css for the theme. Colors are defined here instead of in the main file, so they can be easier adjusted. 
+	To adjust a color, you can change it below or opt for a separate css file to overwrite the color definition. Include that
+	css file after this file in the page template.
+*/
+a {
+	color: #2980B9;
+}
+
+a:hover, a:visited:hover {
+	color: #65bffa;
+}
+
+a:visited {
+	color: #2980B9;
+}
+
+body {
+	color: #404040;
+}
+
+code, pre.nocode {
+	background: #fff;
+	border: solid 1px #e1e4e5;
+}
+
+footer {
+	color: #999;
+}
+
+hr {
+	border-top-color: #e1e4e5;
+}
+
+input[type="text"] {
+	border-color:  #ccc;
+	border-radius: 0;
+}
+
+ins {
+	background: #ff9;
+	color: #000;
+}
+
+label {
+	color: #999;
+}
+
+mark {
+	background: #ff0;
+	color: #000;
+}
+/* #endregion*/
+
+/* #region general classes */
+.no-highlight {
+	color: #333;
+}
+
+.toc-footer hr {
+	border-color: #3e3a3a;
+}
+/* #endregion */
+
+/* #region Alert boxes*/
+.alert {
+	background: #e7f2fa;
+}
+
+.alert-title {
+	color: #fff;
+	background: #6ab0de;
+}
+
+.alert.alert-danger {
+	background: #fdf3f2;
+}
+
+.alert.alert-danger .alert-title {
+	background: #f29f97;
+}
+
+.alert.alert-warning {
+	background: #ffedcc;
+}
+
+.alert.alert-warning .alert-title {
+	background: #f0b37e;
+}
+
+.alert.alert-info {
+	background: #e7f2fa;
+}
+
+.alert.alert-info .alert-title {
+	background: #6ab0de;
+}
+
+.alert.alert-neutral {
+	background: #f3f6f6;
+}
+
+.alert.alert-neutral .alert-title {
+	color: #404040;
+	background: #e1e4e5;
+}
+
+.alert.alert-neutral a {
+	color: #2980B9;
+}
+
+.alert.alert-tip {
+	background:#dbfaf4;
+}
+
+.alert.alert-tip .alert-title {
+	background:#1abc9c;
+}
+
+/* #endregion*/
+
+/* #region Tables*/
+.table caption {
+	color: #000;
+}
+
+.table thead {
+	color: #000;
+}
+
+.table thead th {
+	border-bottom-color: #e1e4e5;
+}
+
+.table-secondary {
+	color: gray;
+}
+
+.table-tertiary {
+	color: gray;
+}
+
+.table-odd td, .table-striped tr:nth-child(2n-1) td {
+	background-color: #f3f6f6;
+}
+
+.table-backed {
+	background-color: #f3f6f6;
+}
+
+.table-bordered-all {
+	border-color: #e1e4e5;
+}
+
+.table-bordered-all td {
+	border-bottom-color: #e1e4e5;
+	border-left-color: #e1e4e5;
+}
+
+.table-bordered {
+	border-color: #e1e4e5;
+}
+
+.table-bordered-rows td {
+	border-bottom-color: #e1e4e5;
+}
+
+.table-horizontal td, .table-horizontal th {
+	border-bottom-color: #e1e4e5;
+}
+/* #endregion*/
+
+/* #region Breadcrumbs*/
+.breadcrumbs-extra {
+	color: #b3b3b3;
+}
+/* #endregion*/
+
+/* #region Navigation */
+.menu-vertical header {
+	color: #2980B9;
+}
+
+.menu-vertical ul.currentrelative, .menu-vertical ul.currentrelativeroot {
+	background-color: #e3e3e3;
+}
+
+.menu-vertical li.current {
+	background-color: #fff;
+}
+
+.menu-vertical ul.current {
+	background-color: #3e3a3a;
+}
+
+.menu-vertical li.current a {
+	color: #777;
+}
+
+.menu-vertical li.current.tocentry > a, .menu-vertical li.current > a {
+	color: #444;
+}
+
+.menu-vertical li.current.tocentry ul li > a {
+	color: #777;
+}
+
+.menu-vertical a {
+	color: #ccc;
+}
+
+.menu-vertical a:hover, .menu-vertical li.on a:hover {
+	color: #ccc;
+}
+
+
+.menu-vertical span, .menu-vertical span > a {
+    color: #999;
+}
+
+.nav-side {
+	background: #343131;
+}
+
+.nav-top {
+	background: #2980B9;
+	color: #fff;
+}
+
+.nav-top a {
+	color: #fff;
+}
+
+.nav-top img {
+	background-color: #2980B9;
+}
+
+.nav-content-wrap {
+	background: #fcfcfc;
+}
+
+.side-nav-search {
+	background-color: #2980B9;
+	color: #fcfcfc;
+}
+
+.side-nav-search input[type=text] {
+	border-color: #2472a4;
+}
+
+.side-nav-search img {
+	background-color: #2980B9;
+}
+
+.side-nav-search > a, .side-nav-search .dropdown > a {
+	color: #fcfcfc;
+}
+
+.side-nav-search > a:hover, .side-nav-search .dropdown > a:hover {
+	background: rgba(255,255,255,0.1);
+}
+
+.nav .menu-vertical a {
+	color: #b3b3b3;
+}
+
+/* #endregion*/
+
+/* #region Tabs*/
+/* 
+	Tab CSS by Joseph Fusco. http://codepen.io/fusco/pen/Wvzjrm, slightly adjusted to remove the round corners. 
+	Shadow colors are defined in theme.css, as they can only be defined with the shadow definition directly.
+*/
+
+.tab-wrap {
+	background-color: #fff;
+}
+
+.tab:checked + label {
+	background-color: #fff;
+}
+
+.tab + label {
+	color: #222;
+	background-color: #f2f2f2;
+}
+
+.tab + label:hover {
+	background-color: #f9f9f9;
+}
+/* #endregion*/
+
+
+
+/* #region media queries*/
+@media screen and (max-width: 768px) {
+	.body-for-nav {
+		background: #fcfcfc;
+	}
+}
+
+@media screen and (min-width: 1400px) {
+	.nav-content-wrap {
+		background: rgba(0,0,0,0.05);
+	}
+
+	.nav-content {
+		background: #fcfcfc;
+	}
+}
+
+/* #endregion */
+
+/* #region Search results */
+#search-results .search li {
+	border-bottom-color: #e1e4e5;
+}
+
+#search-results .search li:first-child {
+	border-top-color: #e1e4e5;
+}
+
+#search-results .context {
+	color: gray;
+}
+
+#mkdocs-search-results article h3
+{
+    border-top-color: #E1E4E5;
+}
+
+#mkdocs-search-query{
+    border-color: #D1D4D5;
+}
+/* #endregion */

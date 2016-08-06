@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Getting Started - BenchmarkDotNet Documentation</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="css/theme_colors.css" type="text/css" />
+    <link rel="stylesheet" href="css/styles/vs.css">
+    <link rel="stylesheet" href="css/font-awesome.4.5.0.min.css">
+</head>
+<body role="document">
+    <div class="grid-for-nav">
+        <nav data-toggle="nav-shift" class="nav-side stickynav">
+            <div class="side-nav-search">
+                <a href="index.htm"><i class="fa fa-home"></i> BenchmarkDotNet Documentation</a>
+                <div role="search">
+                    <form id="search-form" class="form" action="Docnet_search.htm" method="get">
+                        <input type="text" name="q" placeholder="Search docs" />
+                    </form>
+                </div>
+            </div>
+            <div class="menu menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+<ul>
+<li class="tocentry"><a href="index.htm">Home</a>
+</li>
+
+<li class="tocentry current"><a class="current" href="GettingStarted.htm">Getting Started</a>
+<ul class="currentrelativeroot">
+<li class="tocentry"><a href="#step-1.-installation">Step 1. Installation</a></li>
+<li class="tocentry"><a href="#step-2.-write-code-to-benchmark">Step 2. Write code to benchmark</a></li>
+<li class="tocentry"><a href="#step-3.-run-the-benchmark">Step 3. Run the benchmark</a></li>
+<li class="tocentry"><a href="#step-4.-view-results">Step 4. View results</a></li>
+<li class="tocentry"><a href="#step-5.-analyze-results">Step 5. Analyze results</a></li>
+</ul>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="Configuration.htm">Configuration</a></span>
+</li>
+<li class="tocentry"><a href="HowToRun.htm">How to run your benchmarks</a>
+</li>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="Advancedfeatures.htm">Advanced features</a></span>
+</li>
+<li class="tocentry"><a href="HowItWorks.htm">How it works</a>
+</li>
+<li class="tocentry"><a href="RulesOfBenchmarking.htm">Rules of benchmarking</a>
+</li>
+<li class="tocentry"><a href="faq.htm">FAQ</a>
+</li>
+<li class="tocentry"><a href="Team.htm">Team</a>
+</li>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="Contributing.htm">Contributing</a></span>
+</li>
+<li class="tocentry"><a href="license.htm">License</a>
+</li>
+</ul>
+				<div class="toc-footer">
+					<span class="text-small">
+						<hr/>
+						<a href="https://github.com/FransBouma/DocNet" target="_blank">Made with <i class="fa fa-github"></i> DocNet</a>
+					</span>
+				</div>	
+			</div>
+            &nbsp;
+        </nav>
+        <section data-toggle="nav-shift" class="nav-content-wrap">
+            <nav class="nav-top" role="navigation" aria-label="top navigation">
+                <i data-toggle="nav-top" class="fa fa-bars"></i>
+                <a href="index.htm">BenchmarkDotNet Documentation</a>
+            </nav>
+            <div class="nav-content">
+                <div role="navigation" aria-label="breadcrumbs navigation">
+                    <div class="breadcrumbs">
+<ul><li><a href="index.htm">Home</a></li> / <li><a href="GettingStarted.htm">Getting Started</a></li></ul>
+					
+                    </div>
+                    <hr />
+                </div>
+                <div role="main">
+                    <div class="section">
+<h1 id="getting-started">Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<p>To get started with BenchmarkDotNet, please follow these steps. </p>
+<h2 id="step-1.-installation">Step 1. Installation<a class="headerlink" href="#step-1.-installation" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Install BenchmarkDotNet via the NuGet package: <a href="https://www.nuget.org/packages/BenchmarkDotNet/" target="_blank">BenchmarkDotNet</a></p>
+<pre class="nocode">PM&gt; Install-Package BenchmarkDotNet
+</pre><h2 id="step-2.-write-code-to-benchmark">Step 2. Write code to benchmark<a class="headerlink" href="#step-2.-write-code-to-benchmark" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Write a class with methods that you want to measure and mark them with the <code>Benchmark</code> attribute. In the following example, we 
+compare <a href="https://en.wikipedia.org/wiki/MD5" target="_blank">MD5</a> and <a href="https://en.wikipedia.org/wiki/SHA-2" target="_blank">SHA256</a> cryptographic hash functions:</p>
+<pre><code class="cs">public class Md5VsSha256
+{
+    private const int N = 10000;
+    private readonly byte[] data;
+
+    private readonly SHA256 sha256 = SHA256.Create();
+    private readonly MD5 md5 = MD5.Create();
+
+    public Md5VsSha256()
+    {
+        data = new byte[N];
+        new Random(42).NextBytes(data);
+    }
+
+    [Benchmark]
+    public byte[] Sha256()
+    {
+        return sha256.ComputeHash(data);
+    }
+
+    [Benchmark]
+    public byte[] Md5()
+    {
+        return md5.ComputeHash(data);
+    }
+}
+</code></pre>
+
+<h2 id="step-3.-run-the-benchmark">Step 3. Run the benchmark<a class="headerlink" href="#step-3.-run-the-benchmark" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Run it:</p>
+<pre><code class="cs">var summary = BenchmarkRunner.Run&lt;Md5VsSha256&gt;();
+</code></pre>
+
+<h2 id="step-4.-view-results">Step 4. View results<a class="headerlink" href="#step-4.-view-results" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>View the results. Here is an example of output from the above benchmark:</p>
+<pre><code class="ini">BenchmarkDotNet=v0.9.0.0
+OS=Microsoft Windows NT 6.2.9200.0
+Processor=Intel(R) Core(TM) i7-4810MQ CPU @ 2.80GHz, ProcessorCount=8
+Frequency=2728067 ticks, Resolution=366.5599 ns
+HostCLR=MS.NET 4.0.30319.42000, Arch=64-bit RELEASE [RyuJIT]
+
+Type=Md5VsSha256  Mode=Throughput
+</code></pre>
+
+<table class="table table-bordered-all table-responsive">
+<thead>
+<tr>
+	<th>Method</th>
+	<th>Median</th>
+	<th>StdDev</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>Md5</td>
+	<td>21.2912 us</td>
+	<td>0.4373 us</td>
+</tr>
+<tr>
+	<td>Sha256</td>
+	<td>107.4124 us</td>
+	<td>1.8339 us</td>
+</tr>
+</tbody>
+</table>
+<h2 id="step-5.-analyze-results">Step 5. Analyze results<a class="headerlink" href="#step-5.-analyze-results" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Analyze it. In your bin directory, you can find a lot of useful files with detailed information. For example:</p>
+<ul>
+<li>Csv reports with raw data: <code>Md5VsSha256-report.csv</code>, <code>Md5VsSha256-runs.csv</code></li>
+<li>Markdown reports:  <code>Md5VsSha256-report-default.md</code>, <code>Md5VsSha256-report-stackoverflow.md</code>, <code>Md5VsSha256-report-github.md</code></li>
+<li>Plain report and log: <code>Md5VsSha256-report.txt</code>, <code>Md5VsSha256.log</code></li>
+<li>Plots (if you have installed R): <code>Md5VsSha256-barplot.png</code>, <code>Md5VsSha256-boxplot.png</code>, and so on.</li>
+</ul>
+
+                    </div>
+                </div>
+                <footer>
+                    <hr />
+                    <div role="contentinfo">
+BenchmarkDotNet Documentation. &copy;2013-2016. <a href='https://github.com/PerfDotNet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.
+                    </div>
+                </footer>
+            </div>
+        </section>
+    </div>
+    <script src="js/jquery-2.1.1.min.js"></script>
+    <script src="js/modernizr-2.8.3.min.js"></script>
+    <script src="js/highlight.pack.js"></script>
+    <script src="js/theme.js"></script>
+
+</body>
+</html>
