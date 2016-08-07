@@ -33,6 +33,7 @@ _ReSharper*/
 *.resharper
 packages/
 nuget.exe
+docs/guidehtml
 
 .idea/
 *.iml
