@@ -34,6 +34,7 @@ _ReSharper*/
 packages/
 nuget.exe
 docs/guidehtml
+docs/apihtml
 
 .idea/
 *.iml
