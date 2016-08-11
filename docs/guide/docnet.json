@@ -4,41 +4,43 @@
     "Destination" : "..\\guidehtml",
     "Theme" : "Default",
     "Footer" : "BenchmarkDotNet Documentation. &copy;2013-2016. <a href='https://github.com/PerfDotNet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.",
+    "SourceFoldersToCopy" : ["Images"],
     "Pages" : 
     {
         "__index" : "index.md",
+        "Overview" : "Overview.md",
         "Getting Started" : "GettingStarted.md",
         "Configuration" : 
-		{
-			"Configs": "Configuration\\Configs.md",
-			"Jobs": "Configuration\\Jobs.md",
-			"Columns": "Configuration\\Columns.md",
-			"Exporters": "Configuration\\Exporters.md",
-			"Loggers":"Configuration\\Loggers.md",
-			"Diagnosers":"Configuration\\Diagnosers.md",
-			"Analyzers":"Configuration\\Analyzers.md",
-			"Validators":"Configuration\\Validators.md"
-		},
-		"How to run your benchmarks": "HowToRun.md",
-		"Advanced features": 
-		{
-			"Params": "Advanced\\Params.md",
-			"Setup":"Advanced\\Setup.md",
-			"Baseline":"Advanced\\Baseline.md",
-			"Percentiles":"Advanced\\Percentiles.md"
-		},
-		"How it works": "HowItWorks.md",
-		"Rules of benchmarking": "RulesOfBenchmarking.md",
-		"FAQ": "faq.md",
-		"Team": "Team.md",
-		"Contributing": 
-		{
-			"Building":"Contributing\\Building.md",
-			"Debugging":"Contributing\\Debugging.md",
-			"Running tests":"Contributing\\RunningTests.md",
-			"Development":"Contributing\\Development.md",
-			"Miscellaneous topics":"Contributing\\Miscellaneous.md",
-		},
+        {
+            "Configs": "Configuration\\Configs.md",
+            "Jobs": "Configuration\\Jobs.md",
+            "Columns": "Configuration\\Columns.md",
+            "Exporters": "Configuration\\Exporters.md",
+            "Loggers":"Configuration\\Loggers.md",
+            "Diagnosers":"Configuration\\Diagnosers.md",
+            "Analyzers":"Configuration\\Analyzers.md",
+            "Validators":"Configuration\\Validators.md"
+        },
+        "How to run your benchmarks": "HowToRun.md",
+        "Advanced features": 
+        {
+            "Params": "Advanced\\Params.md",
+            "Setup":"Advanced\\Setup.md",
+            "Baseline":"Advanced\\Baseline.md",
+            "Percentiles":"Advanced\\Percentiles.md"
+        },
+        "How it works": "HowItWorks.md",
+        "Rules of benchmarking": "RulesOfBenchmarking.md",
+        "FAQ": "faq.md",
+        "Team": "Team.md",
+        "Contributing": 
+        {
+            "Building":"Contributing\\Building.md",
+            "Debugging":"Contributing\\Debugging.md",
+            "Running tests":"Contributing\\RunningTests.md",
+            "Development":"Contributing\\Development.md",
+            "Miscellaneous topics":"Contributing\\Miscellaneous.md",
+        },
         "License": "license.md"
     }
 }
