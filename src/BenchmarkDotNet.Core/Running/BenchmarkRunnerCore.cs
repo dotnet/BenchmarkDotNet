@@ -141,9 +141,7 @@ namespace BenchmarkDotNet.Running
 
         internal static void LogTotalTime(ILogger logger, TimeSpan time, string message = "Total time")
         {
-            var hhMmSs = $"{time.TotalHours:00}:{time:mm\\:ss}";
-            var totalSecs = $"{time.TotalSeconds.ToStr()} sec";
-            logger.WriteLineStatistic($"{message}: {hhMmSs} ({totalSecs})");
+            logger.WriteLineStatistic($"{message}: {time.ToFormattedTotalTime()}");
         }
 
         private static BenchmarkReport Run(Benchmark benchmark, ILogger logger, IConfig config, string rootArtifactsFolderPath, Func<IJob, IToolchain> toolchainProvider)
