@@ -1,4 +1,4 @@
-﻿{
+{
   "title": "BenchmarkDotNet.Core",
   "version": "0.9.8-develop",
   "authors": [ "Andrey Akinshin", "Jon Skeet", "Matt Warren" ],
@@ -35,7 +35,8 @@
   },
   "buildOptions": {
     "embed": [ "Templates/*" ],
-    "nowarn": [ "1591" ]
+    "nowarn": [ "1591" ],
+    "xmlDoc": true
   },
   "frameworks": {
     "net45": {

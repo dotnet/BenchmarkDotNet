@@ -56,17 +56,23 @@
         <component id="API Token Resolution">{@TokenFiles}
 <replace elements="/*//token" item="string(.)" /></component>
       </ComponentConfig>
-<ComponentConfig id="Code Block Component" enabled="True" xmlns=""><component id="Code Block Component">
-  <basePath value="{@HtmlEncProjectFolder}" />
-  <outputPaths>{@HelpFormatOutputPaths}</outputPaths>
-  <allowMissingSource value="false" />
-  <removeRegionMarkers value="false" />
-  <colorizer syntaxFile="{@SHFBFolder}PresentationStyles\Colorizer\highlight.xml" styleFile="{@SHFBFolder}PresentationStyles\Colorizer\highlight.xsl" stylesheet="{@SHFBFolder}PresentationStyles\Colorizer\highlight.css" scriptFile="{@SHFBFolder}PresentationStyles\Colorizer\highlight.js" disabled="{@DisableCodeBlockComponent}" language="cs" tabSize="0" numberLines="false" outlining="false" keepSeeTags="false" defaultTitle="true" />
-</component></ComponentConfig></ComponentConfigurations>
+      <ComponentConfig id="Code Block Component" enabled="True" xmlns="">
+        <component id="Code Block Component">
+          <basePath value="{@HtmlEncProjectFolder}" />
+          <outputPaths>{@HelpFormatOutputPaths}</outputPaths>
+          <allowMissingSource value="false" />
+          <removeRegionMarkers value="false" />
+          <colorizer syntaxFile="{@SHFBFolder}PresentationStyles\Colorizer\highlight.xml" styleFile="{@SHFBFolder}PresentationStyles\Colorizer\highlight.xsl" stylesheet="{@SHFBFolder}PresentationStyles\Colorizer\highlight.css" scriptFile="{@SHFBFolder}PresentationStyles\Colorizer\highlight.js" disabled="{@DisableCodeBlockComponent}" language="cs" tabSize="0" numberLines="false" outlining="false" keepSeeTags="false" defaultTitle="true" />
+        </component>
+      </ComponentConfig>
+    </ComponentConfigurations>
     <DocumentationSources>
-      <DocumentationSource sourceFile="..\..\src\BenchmarkDotNet\bin\Debug\net45\BenchmarkDotNet.Core.dll" />
-<DocumentationSource sourceFile="..\..\src\BenchmarkDotNet\bin\Debug\net45\BenchmarkDotNet.dll" />
-<DocumentationSource sourceFile="..\..\src\BenchmarkDotNet.Diagnostics.Windows\bin\Debug\net45\BenchmarkDotNet.Diagnostics.Windows.dll" /></DocumentationSources>
+      <DocumentationSource sourceFile="..\..\src\BenchmarkDotNet\bin\Release\net45\BenchmarkDotNet.Core.dll" />
+<DocumentationSource sourceFile="..\..\src\BenchmarkDotNet\bin\Release\net45\BenchmarkDotNet.dll" />
+<DocumentationSource sourceFile="..\..\src\BenchmarkDotNet.Diagnostics.Windows\bin\Release\net45\BenchmarkDotNet.Diagnostics.Windows.dll" />
+<DocumentationSource sourceFile="..\..\src\BenchmarkDotNet\bin\Release\net45\BenchmarkDotNet.Core.xml" />
+<DocumentationSource sourceFile="..\..\src\BenchmarkDotNet.Diagnostics.Windows\bin\Release\net45\BenchmarkDotNet.Diagnostics.Windows.xml" />
+<DocumentationSource sourceFile="..\..\src\BenchmarkDotNet\bin\Release\net45\BenchmarkDotNet.xml" /></DocumentationSources>
   </PropertyGroup>
   <!-- There are no properties for these groups.  AnyCPU needs to appear in order for Visual Studio to perform
 			 the build.  The others are optional common platform types that may appear. -->
