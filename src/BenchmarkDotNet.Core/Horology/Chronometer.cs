@@ -23,23 +23,22 @@ namespace BenchmarkDotNet.Horology
                 BestClock = Stopwatch;
         }
 
-        public static HardwareTimerKind HardwareTimerKind
+        public static HardwareTimerKind HardwareTimerKind => GetHardwareTimerKind(BestClock.Frequency);
+
+        public static HardwareTimerKind GetHardwareTimerKind(long frequency)
         {
-            get
-            {
-                var freqKHz = BestClock.Frequency / FrequencyUnit.KHz.HertzAmount;
-                if (14300 <= freqKHz && freqKHz <= 14400)
-                    return HardwareTimerKind.Hpet;
-                if (3500 <= freqKHz && freqKHz <= 3600)
-                    return HardwareTimerKind.Acpi;
-                if (freqKHz == 10000)
-                    return HardwareTimerKind.Unknown;
-                if (5 <= freqKHz && freqKHz < 3500)
-                    return HardwareTimerKind.Tsc;
-                if (freqKHz <= 4)
-                    return HardwareTimerKind.System;
+            var freqKHz = frequency / FrequencyUnit.KHz.HertzAmount;
+            if (14300 <= freqKHz && freqKHz <= 14400)
+                return HardwareTimerKind.Hpet;
+            if (3579500 <= frequency && frequency <= 3579600)
+                return HardwareTimerKind.Acpi;
+            if (freqKHz == 10000)
                 return HardwareTimerKind.Unknown;
-            }
+            if (5 <= freqKHz && freqKHz < 4000)
+                return HardwareTimerKind.Tsc;
+            if (freqKHz <= 4)
+                return HardwareTimerKind.System;
+            return HardwareTimerKind.Unknown;
         }
     }
 }
