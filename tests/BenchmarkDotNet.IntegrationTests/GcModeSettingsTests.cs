@@ -8,15 +8,15 @@ using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class GarbageCollectorSettingsTests : BenchmarkTestExecutor
+    public class GcModeSettingsTests : BenchmarkTestExecutor
     {
-        public GarbageCollectorSettingsTests(ITestOutputHelper outputHelper) : base(outputHelper) { }
+        public GcModeSettingsTests(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
         [Fact(Skip = "It fails on appveyor")]
         public void CanEnableServerGcMode()
         {
             var config = ManualConfig.CreateEmpty()
-                                     .With(Job.Dry.With(new GarbageCollection { Server = true }));
+                                     .With(Job.Dry.With(new GcMode { Server = true }));
 
             CanExecute<ServerModeEnabled>(config);
         }
@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void CanDisableServerGcMode()
         {
             var config = ManualConfig.CreateEmpty()
-                                     .With(Job.Dry.With(new GarbageCollection { Server = false }));
+                                     .With(Job.Dry.With(new GcMode { Server = false }));
 
             CanExecute<WorkstationGcOnly>(config);
         }
@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void CanEnableConcurrentGcMode()
         {
             var config = ManualConfig.CreateEmpty()
-                                     .With(Job.Dry.With(new GarbageCollection { Concurrent = true }));
+                                     .With(Job.Dry.With(new GcMode { Concurrent = true }));
 
             CanExecute<ConcurrentModeEnabled>(config);
         }
@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void CanDisableConcurrentGcMode()
         {
             var config = ManualConfig.CreateEmpty()
-                                     .With(Job.Dry.With(new GarbageCollection { Concurrent = false }));
+                                     .With(Job.Dry.With(new GcMode { Concurrent = false }));
 
             CanExecute<ConcurrentModeDisabled>(config);
         }
@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void CanAvoidForcingGarbageCollections()
         {
             var config = ManualConfig.CreateEmpty()
-                                     .With(Job.Dry.With(new GarbageCollection { Force = false }));
+                                     .With(Job.Dry.With(new GcMode { Force = false }));
             
             CanExecute<AvoidForcingGarbageCollection>(config);
         }
@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void CanAllowToCreateVeryLargeObjectsFor64Bit()
         {
             var config = ManualConfig.CreateEmpty()
-                                     .With(Job.Dry.With(Platform.X64).With(new GarbageCollection { AllowVeryLargeObjects = true }));
+                                     .With(Job.Dry.With(Platform.X64).With(new GcMode { AllowVeryLargeObjects = true }));
 
             CanExecute<CreateVeryLargeObjects>(config);
         }

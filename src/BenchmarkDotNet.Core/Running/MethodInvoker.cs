@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Running
                     ? idleAction
                     : targetAction;
                 return MultiInvoke(input.IterationMode, input.Index, setupAction, action, cleanupAction, 
-                    input.InvokeCount, operationsPerInvoke, job.GarbageCollection);
+                    input.InvokeCount, operationsPerInvoke, job.GcMode);
             };
             Invoke(job, multiInvoke);
         }
@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Running
                     ? idleAction
                     : targetAction;
                 return MultiInvoke(input.IterationMode, input.Index, setupAction, action, cleanupAction, input.InvokeCount,
-                    operationsPerInvoke, job.GarbageCollection);
+                    operationsPerInvoke, job.GcMode);
             };
             Invoke(job, multiInvoke);
         }
@@ -84,8 +84,8 @@ namespace BenchmarkDotNet.Running
 
             // Run
             Func<MultiInvokeInput, Measurement> multiInvoke = input => input.IterationMode.IsOneOf(IterationMode.IdleWarmup, IterationMode.IdleTarget) ?
-                MultiInvoke(input.IterationMode, input.Index, setupAction, idleAction, cleanupAction, input.InvokeCount, operationsPerInvoke, job.GarbageCollection) :
-                MultiInvoke(input.IterationMode, input.Index, setupAction, targetAction, cleanupAction, input.InvokeCount, operationsPerInvoke, job.GarbageCollection);
+                MultiInvoke(input.IterationMode, input.Index, setupAction, idleAction, cleanupAction, input.InvokeCount, operationsPerInvoke, job.GcMode) :
+                MultiInvoke(input.IterationMode, input.Index, setupAction, targetAction, cleanupAction, input.InvokeCount, operationsPerInvoke, job.GcMode);
             Invoke(job, multiInvoke);
         }
 
@@ -238,12 +238,12 @@ namespace BenchmarkDotNet.Running
             Console.WriteLine();
         }
 
-        private Measurement MultiInvoke(IterationMode mode, int index, Action setupAction, Action targetAction, Action cleanupAction, long invocationCount, long operationsPerInvoke, GarbageCollection garbageCollectionSettings)
+        private Measurement MultiInvoke(IterationMode mode, int index, Action setupAction, Action targetAction, Action cleanupAction, long invocationCount, long operationsPerInvoke, GcMode gcModeSettings)
         {
             var totalOperations = invocationCount * operationsPerInvoke;
             setupAction();
             ClockSpan clockSpan;
-            GcCollect(garbageCollectionSettings);
+            GcCollect(gcModeSettings);
             if (invocationCount == 1)
             {
                 var chronometer = Chronometer.Start();
@@ -266,18 +266,18 @@ namespace BenchmarkDotNet.Running
             cleanupAction();
             var measurement = new Measurement(0, mode, index, totalOperations, clockSpan.GetNanoseconds());
             Console.WriteLine(measurement.ToOutputLine());
-            GcCollect(garbageCollectionSettings);
+            GcCollect(gcModeSettings);
             return measurement;
         }
 
         private object multiInvokeReturnHolder;
 
-        private Measurement MultiInvoke<T>(IterationMode mode, int index, Action setupAction, Func<T> targetAction, Action cleanupAction, long invocationCount, long operationsPerInvoke, GarbageCollection garbageCollectionSettings, T returnHolder = default(T))
+        private Measurement MultiInvoke<T>(IterationMode mode, int index, Action setupAction, Func<T> targetAction, Action cleanupAction, long invocationCount, long operationsPerInvoke, GcMode gcModeSettings, T returnHolder = default(T))
         {
             var totalOperations = invocationCount * operationsPerInvoke;
             setupAction();
             ClockSpan clockSpan;
-            GcCollect(garbageCollectionSettings);
+            GcCollect(gcModeSettings);
             if (invocationCount == 1)
             {
                 var chronometer = Chronometer.Start();
@@ -300,7 +300,7 @@ namespace BenchmarkDotNet.Running
             multiInvokeReturnHolder = returnHolder;
             var measurement = new Measurement(0, mode, index, totalOperations, clockSpan.GetNanoseconds());
             Console.WriteLine(measurement.ToOutputLine());
-            GcCollect(garbageCollectionSettings);
+            GcCollect(gcModeSettings);
             return measurement;
         }
 
@@ -334,9 +334,9 @@ namespace BenchmarkDotNet.Running
             multiInvokeReturnHolder = returnHolder;
         }
 
-        private static void GcCollect(GarbageCollection garbageCollectionSettings)
+        private static void GcCollect(GcMode gcModeSettings)
         {
-            if (garbageCollectionSettings != null && !garbageCollectionSettings.Force)
+            if (gcModeSettings != null && !gcModeSettings.Force)
             {
                 return;
             }

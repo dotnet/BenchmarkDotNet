@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Jobs
         Jit Jit { get; }
         IToolchain Toolchain { get; }
         Runtime Runtime { get; }
-        GarbageCollection GarbageCollection { get; }
+        GcMode GcMode { get; }
         Count LaunchCount { get; }
         Count WarmupCount { get; }
         Count TargetCount { get; }

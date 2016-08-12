@@ -112,7 +112,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             content = SetExtraDependencies(content, ExtraDependencies);
             content = SetImports(content, Imports);
             content = SetRuntime(content, Runtime);
-            content = SetGarbageCollectionSettings(content, benchmark.Job.GarbageCollection);
+            content = SetGcMode(content, benchmark.Job.GcMode);
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
         }
@@ -147,16 +147,16 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         private string SetRuntime(string content, string runtime) => content.Replace("$RUNTIME$", runtime);
 
-        private string SetGarbageCollectionSettings(string content, GarbageCollection garbageCollection)
+        private string SetGcMode(string content, GcMode gcMode)
         {
-            if (garbageCollection == null || garbageCollection == GarbageCollection.Default)
+            if (gcMode == null || gcMode == GcMode.Default)
             {
                 return content.Replace("$GC$", null);
             }
 
             return content.Replace(
                 "$GC$",
-                $"\"runtimeOptions\": {{ \"configProperties\": {{ \"System.GC.Concurrent\": {garbageCollection.Concurrent.ToString().ToLower()}, \"System.GC.Server\": {garbageCollection.Server.ToString().ToLower()} }} }}, ");
+                $"\"runtimeOptions\": {{ \"configProperties\": {{ \"System.GC.Concurrent\": {gcMode.Concurrent.ToString().ToLower()}, \"System.GC.Server\": {gcMode.Server.ToString().ToLower()} }} }}, ");
         }
 
         /// <summary>

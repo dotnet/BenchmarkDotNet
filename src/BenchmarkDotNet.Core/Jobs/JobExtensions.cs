@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Jobs
         public static IJob With(this IJob job, Jit jit) => job.With(j => j.Jit = jit);
         public static IJob With(this IJob job, IToolchain toolchain) => job.With(j => j.Toolchain = toolchain);
         public static IJob With(this IJob job, Runtime runtime) => job.With(j => j.Runtime = runtime);
-        public static IJob With(this IJob job, GarbageCollection garbageCollection) => job.With(j => j.GarbageCollection = garbageCollection);
+        public static IJob With(this IJob job, GcMode gcMode) => job.With(j => j.GcMode = gcMode);
         public static IJob WithLaunchCount(this IJob job, Count launchCount) => job.With(j => j.LaunchCount = launchCount);
         public static IJob WithWarmupCount(this IJob job, Count warmupCount) => job.With(j => j.WarmupCount = warmupCount);
         public static IJob WithTargetCount(this IJob job, Count targetCount) => job.With(j => j.TargetCount = targetCount);
@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Jobs
                 new Property(nameof(Platform), job.Platform.ToString()),
                 new Property(nameof(Jit), job.Jit.ToString()),
                 new Property(nameof(Runtime), job.Runtime.ToString()),
-                new Property(nameof(GarbageCollection), job.GarbageCollection?.ToString()),
+                new Property(nameof(GcMode), job.GcMode?.ToString()),
                 new Property(nameof(IJob.WarmupCount), job.WarmupCount.ToString()),
                 new Property(nameof(IJob.TargetCount), job.TargetCount.ToString()),
                 new Property(nameof(IJob.LaunchCount), job.LaunchCount.ToString()),
@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Jobs
             builder.Append($".WithWarmupCount({job.WarmupCount.Value})");
             builder.Append($".WithTargetCount({job.TargetCount.Value})");
             builder.Append($".WithIterationTime({job.IterationTime.Value})");
-            builder.Append($".With(new BenchmarkDotNet.Jobs.GarbageCollection {{ Force = {job.GarbageCollection.Force.ToString().ToLower()} }})");
+            builder.Append($".With(new BenchmarkDotNet.Jobs.GcMode {{ Force = {job.GcMode.Force.ToString().ToLower()} }})");
             return builder.ToString();
         }
 
@@ -89,7 +89,7 @@ namespace BenchmarkDotNet.Jobs
             Platform = job.Platform,
             Toolchain = job.Toolchain,
             Runtime = job.Runtime,
-            GarbageCollection = job.GarbageCollection,
+            GcMode = job.GcMode,
             Mode = job.Mode,
             LaunchCount = job.LaunchCount,
             TargetCount = job.TargetCount,

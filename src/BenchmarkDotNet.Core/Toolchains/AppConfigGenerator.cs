@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Toolchains
             ClearAllCustomRuntimeSettingsExceptRedirects(runtimeElement);
 
             GenerateJitSettings(xmlDocument, runtimeElement, job.Jit);
-            GenerateGCSettings(xmlDocument, runtimeElement, job.GarbageCollection);
+            GenerateGCSettings(xmlDocument, runtimeElement, job.GcMode);
 
             xmlDocument.Save(destination);
         }
@@ -67,17 +67,17 @@ namespace BenchmarkDotNet.Toolchains
                     : "1");
         }
 
-        private static void GenerateGCSettings(XmlDocument xmlDocument, XmlNode runtimeElement, GarbageCollection garbageCollection)
+        private static void GenerateGCSettings(XmlDocument xmlDocument, XmlNode runtimeElement, GcMode gcMode)
         {
-            if (garbageCollection == null || garbageCollection == GarbageCollection.Default)
+            if (gcMode == null || gcMode == GcMode.Default)
             {
                 return;
             }
 
-            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcConcurrent", "enabled", garbageCollection.Concurrent.ToString().ToLower());
-            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcServer", "enabled", garbageCollection.Server.ToString().ToLower());
-            CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCCpuGroup", "enabled", garbageCollection.CpuGroups.ToString().ToLower());
-            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcAllowVeryLargeObjects", "enabled", garbageCollection.AllowVeryLargeObjects.ToString().ToLower());
+            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcConcurrent", "enabled", gcMode.Concurrent.ToString().ToLower());
+            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcServer", "enabled", gcMode.Server.ToString().ToLower());
+            CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCCpuGroup", "enabled", gcMode.CpuGroups.ToString().ToLower());
+            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcAllowVeryLargeObjects", "enabled", gcMode.AllowVeryLargeObjects.ToString().ToLower());
         }
 
         private static void CreateNodeWithAttribute(

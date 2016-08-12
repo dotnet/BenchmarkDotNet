@@ -12,16 +12,16 @@ using BenchmarkDotNet.Running;
 namespace BenchmarkDotNet.Samples.Intro
 {
     [Config(typeof(Config))]
-    public class IntroGarbageCollection
+    public class IntroGcMode
     {
         private class Config : ManualConfig
         {
             public Config()
             {
-                Add(Job.Dry.With(Mode.SingleRun).WithTargetCount(1).With(new GarbageCollection { Server = true, Force = true }));
-                Add(Job.Dry.With(Mode.SingleRun).WithTargetCount(1).With(new GarbageCollection { Server = true, Force = false }));
-                Add(Job.Dry.With(Mode.SingleRun).WithTargetCount(1).With(new GarbageCollection { Server = false, Force = true }));
-                Add(Job.Dry.With(Mode.SingleRun).WithTargetCount(1).With(new GarbageCollection { Server = false, Force = false }));
+                Add(Job.Dry.With(Mode.SingleRun).WithTargetCount(1).With(new GcMode { Server = true, Force = true }));
+                Add(Job.Dry.With(Mode.SingleRun).WithTargetCount(1).With(new GcMode { Server = true, Force = false }));
+                Add(Job.Dry.With(Mode.SingleRun).WithTargetCount(1).With(new GcMode { Server = false, Force = true }));
+                Add(Job.Dry.With(Mode.SingleRun).WithTargetCount(1).With(new GcMode { Server = false, Force = false }));
 
                 Add(MarkdownExporter.GitHub);
 
