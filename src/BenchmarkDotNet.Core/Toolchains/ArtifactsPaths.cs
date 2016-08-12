@@ -4,6 +4,8 @@ namespace BenchmarkDotNet.Toolchains
 {
     public class ArtifactsPaths
     {
+        public static ArtifactsPaths Empty = new ArtifactsPaths(p => { }, "", "", "", "", "", "", "", "");
+
         public Action<ArtifactsPaths> Cleanup { get; }
 
         public string RootArtifactsFolderPath { get; }

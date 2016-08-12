@@ -55,6 +55,9 @@
     }
   },
   "dependencies": {
+    "BenchmarkDotNet.Tests": {
+      "target": "project"
+    },
     "BenchmarkDotNet": {
       "target": "project"
     },
