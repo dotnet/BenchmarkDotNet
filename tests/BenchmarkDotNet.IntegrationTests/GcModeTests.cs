@@ -8,52 +8,51 @@ using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class GcModeSettingsTests : BenchmarkTestExecutor
+    public class GcModeTests : BenchmarkTestExecutor
     {
-        public GcModeSettingsTests(ITestOutputHelper outputHelper) : base(outputHelper) { }
+        public GcModeTests(ITestOutputHelper outputHelper) : base(outputHelper) { }
+
+        private IConfig CreateConfig(GcMode gcMode) => ManualConfig.CreateEmpty().With(Job.Dry.With(gcMode));
+
+        [Fact]
+        public void CanHostGcMode()
+        {
+            var config = CreateConfig(null);
+            CanExecute<WorkstationGcOnly>(config);
+        }
 
         [Fact(Skip = "It fails on appveyor")]
         public void CanEnableServerGcMode()
         {
-            var config = ManualConfig.CreateEmpty()
-                                     .With(Job.Dry.With(new GcMode { Server = true }));
-
+            var config = CreateConfig(new GcMode {Server = true});
             CanExecute<ServerModeEnabled>(config);
         }
 
         [Fact]
         public void CanDisableServerGcMode()
         {
-            var config = ManualConfig.CreateEmpty()
-                                     .With(Job.Dry.With(new GcMode { Server = false }));
-
+            var config = CreateConfig(new GcMode {Server = false});
             CanExecute<WorkstationGcOnly>(config);
         }
 
         [Fact]
         public void CanEnableConcurrentGcMode()
         {
-            var config = ManualConfig.CreateEmpty()
-                                     .With(Job.Dry.With(new GcMode { Concurrent = true }));
-
+            var config = CreateConfig(new GcMode {Concurrent = true});
             CanExecute<ConcurrentModeEnabled>(config);
         }
 
         [Fact]
         public void CanDisableConcurrentGcMode()
         {
-            var config = ManualConfig.CreateEmpty()
-                                     .With(Job.Dry.With(new GcMode { Concurrent = false }));
-
+            var config = CreateConfig(new GcMode {Concurrent = false});
             CanExecute<ConcurrentModeDisabled>(config);
         }
 
         [Fact]
         public void CanAvoidForcingGarbageCollections()
         {
-            var config = ManualConfig.CreateEmpty()
-                                     .With(Job.Dry.With(new GcMode { Force = false }));
-            
+            var config = CreateConfig(new GcMode {Force = false});            
             CanExecute<AvoidForcingGarbageCollection>(config);
         }
 

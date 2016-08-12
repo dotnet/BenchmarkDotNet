@@ -1,4 +1,6 @@
 ﻿using System;
+using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
@@ -13,7 +15,7 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn Jit = new PropertyColumn("Jit", benchmark => benchmark.Job.Jit.ToString());
         public static readonly IColumn Toolchain = new PropertyColumn("Toolchain", benchmark => benchmark.Job.Toolchain?.Name ?? benchmark.Job.Runtime.ToString());
         public static readonly IColumn Runtime = new PropertyColumn("Runtime", benchmark => benchmark.Job.Runtime.ToString());
-        public static readonly IColumn GcMode = new PropertyColumn("GcMode", benchmark => benchmark.Job.GcMode?.ToString());
+        public static readonly IColumn GcMode = new PropertyColumn("GcMode", benchmark => benchmark.Job.GcMode.ToStr());
         public static readonly IColumn LaunchCount = new PropertyColumn("LaunchCount", benchmark => benchmark.Job.LaunchCount.ToString());
         public static readonly IColumn WarmupCount = new PropertyColumn("WarmupCount", benchmark => benchmark.Job.WarmupCount.ToString());
         public static readonly IColumn TargetCount = new PropertyColumn("TargetCount", benchmark => benchmark.Job.TargetCount.ToString());

@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Tests.Reports
         public void GcModeTest()
         {
             var gcModeColumn = CreateColumn("GcMode");
-            Assert.Equal(false, gcModeColumn.IsTrivial);
+            Assert.Equal(true, gcModeColumn.IsTrivial);
         }
     }
 }

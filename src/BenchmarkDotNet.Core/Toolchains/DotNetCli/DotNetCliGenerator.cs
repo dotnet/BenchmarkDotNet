@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
@@ -112,7 +113,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             content = SetExtraDependencies(content, ExtraDependencies);
             content = SetImports(content, Imports);
             content = SetRuntime(content, Runtime);
-            content = SetGcMode(content, benchmark.Job.GcMode);
+            content = SetGcMode(content, benchmark.Job.GcMode.Resolve());
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
         }
@@ -149,10 +150,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         private string SetGcMode(string content, GcMode gcMode)
         {
-            if (gcMode == null || gcMode == GcMode.Default)
-            {
-                return content.Replace("$GC$", null);
-            }
+            if (gcMode == GcMode.Default)
+                return content.Replace("$GC$", null);            
 
             return content.Replace(
                 "$GC$",

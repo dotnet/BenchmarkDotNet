@@ -10,7 +10,12 @@ namespace BenchmarkDotNet.Jobs
         Jit Jit { get; }
         IToolchain Toolchain { get; }
         Runtime Runtime { get; }
+
+        /// <summary>
+        /// GcMode == null means Host
+        /// </summary>
         GcMode GcMode { get; }
+
         Count LaunchCount { get; }
         Count WarmupCount { get; }
         Count TargetCount { get; }

@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Jobs
         public Jit Jit { get; set; } = Jit.Host;
         public IToolchain Toolchain { get; set; }
         public Runtime Runtime { get; set; } = Runtime.Host;
-        public GcMode GcMode { get; set; } = GcMode.Default;
+        public GcMode GcMode { get; set; }
 
         public Count LaunchCount { get; set; } = Count.Auto;
         public Count WarmupCount { get; set; } = Count.Auto;

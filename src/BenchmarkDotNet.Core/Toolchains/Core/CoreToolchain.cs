@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Helpers;
+﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -49,12 +50,12 @@ namespace BenchmarkDotNet.Toolchains.Core
                 logger.WriteLineError($"Currently dotnet cli toolchain supports only RyuJit, benchmark {benchmark.ShortInfo} will not be executed");
                 return false;
             }
-            if (benchmark.Job.GcMode.CpuGroups)
+            if (benchmark.Job.GcMode.Resolve().CpuGroups)
             {
                 logger.WriteLineError($"Currently project.json does not support CpuGroups (app.config does), benchmark {benchmark.ShortInfo} will not be executed");
                 return false;
             }
-            if (benchmark.Job.GcMode.AllowVeryLargeObjects)
+            if (benchmark.Job.GcMode.Resolve().AllowVeryLargeObjects)
             {
                 logger.WriteLineError($"Currently project.json does not support gcAllowVeryLargeObjects (app.config does), benchmark {benchmark.ShortInfo} will not be executed");
                 return false;

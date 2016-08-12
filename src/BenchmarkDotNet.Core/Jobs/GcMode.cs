@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.Jobs
 {
@@ -46,6 +47,12 @@ namespace BenchmarkDotNet.Jobs
         /// the default settings "Concurrent = true, Server = false, CpuGroups = false, Force = true, AllowVeryLargeObjects = false"
         /// </summary>
         public static GcMode Default => new GcMode { Concurrent = true, Force = true };
+
+        public static GcMode Host => new GcMode
+        {
+            Concurrent = HostEnvironmentInfo.GetCurrent().IsConcurrentGC,
+            Server = HostEnvironmentInfo.GetCurrent().IsServerGC
+        };
 
         public override string ToString()
         {
