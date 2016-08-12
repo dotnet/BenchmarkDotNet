@@ -26,6 +26,8 @@ namespace BenchmarkDotNet.Tests
             Assert.Throws<NotSupportedException>(() => CodeGenerator.Generate(benchmark));
         }
 
+
+        #pragma warning disable CS1998
         [Benchmark]
         public async void AsyncVoidMethod() { }
     }
