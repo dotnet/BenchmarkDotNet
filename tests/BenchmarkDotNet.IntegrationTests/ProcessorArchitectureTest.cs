@@ -5,6 +5,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Tests.Loggers;
 using Xunit;
 using Xunit.Abstractions;
 

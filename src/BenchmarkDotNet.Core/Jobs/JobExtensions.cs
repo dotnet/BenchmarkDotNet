@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Jobs
                 new Property(nameof(Platform), job.Platform.ToString()),
                 new Property(nameof(Jit), job.Jit.ToString()),
                 new Property(nameof(Runtime), job.Runtime.ToString()),
-                new Property(nameof(GcMode), job.GcMode.ToStr()),
+                new Property(nameof(GcMode), job.GcMode.ToSafeString()),
                 new Property(nameof(IJob.WarmupCount), job.WarmupCount.ToString()),
                 new Property(nameof(IJob.TargetCount), job.TargetCount.ToString()),
                 new Property(nameof(IJob.LaunchCount), job.LaunchCount.ToString()),

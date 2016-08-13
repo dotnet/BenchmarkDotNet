@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Extensions
         /// </summary>
         /// <param name="gcMode"></param>
         /// <returns></returns>
-        public static string ToStr(this GcMode gcMode)
+        public static string ToSafeString(this GcMode gcMode)
         {
             return gcMode == null ? "Host" : gcMode.ToString();
         }
