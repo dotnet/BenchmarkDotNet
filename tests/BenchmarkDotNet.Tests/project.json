@@ -36,8 +36,7 @@
     },
     "net451": {
       "dependencies": {
-        "Microsoft.NETCore.Platforms": "1.0.1",
-        "System.Globalization": "4.0.11"
+        "Microsoft.NETCore.Platforms": "1.0.1"
       },
       "frameworkAssemblies": {
         "System.Runtime": "4.0.10.0",
