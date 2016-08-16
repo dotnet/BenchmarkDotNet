@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Jobs
                 new Property(nameof(Platform), job.Platform.ToString()),
                 new Property(nameof(Jit), job.Jit.ToString()),
                 new Property(nameof(Runtime), job.Runtime.ToString()),
-                new Property(nameof(GcMode), job.GcMode.ToSafeString()),
+                new Property(nameof(GcMode), job.GcMode.ToString()),
                 new Property(nameof(IJob.WarmupCount), job.WarmupCount.ToString()),
                 new Property(nameof(IJob.TargetCount), job.TargetCount.ToString()),
                 new Property(nameof(IJob.LaunchCount), job.LaunchCount.ToString()),
@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Jobs
             builder.Append($".WithWarmupCount({job.WarmupCount.Value})");
             builder.Append($".WithTargetCount({job.TargetCount.Value})");
             builder.Append($".WithIterationTime({job.IterationTime.Value})");
-            builder.Append($".With(new BenchmarkDotNet.Jobs.GcMode {{ Force = {job.GcMode.Resolve().Force.ToString().ToLower()} }})");
+            builder.Append($".With(new BenchmarkDotNet.Jobs.GcMode {{ Force = {job.GcMode.Value.Force.ToLowerCase()} }})");
             return builder.ToString();
         }
 

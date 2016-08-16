@@ -83,7 +83,7 @@ namespace BenchmarkDotNet.Code
         private static string GetParameterValue(object value)
         {
             if (value is bool)
-                return value.ToString().ToLower();
+                return ((bool)value).ToLowerCase();
             if (value is string)
                 return $"\"{value}\"";
             if (value is char)

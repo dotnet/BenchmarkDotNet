@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Running
                     ? idleAction
                     : targetAction;
                 return MultiInvoke(input.IterationMode, input.Index, setupAction, action, cleanupAction, 
-                    input.InvokeCount, operationsPerInvoke, job.GcMode.Resolve());
+                    input.InvokeCount, operationsPerInvoke, job.GcMode);
             };
             Invoke(job, multiInvoke);
         }
@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Running
                     ? idleAction
                     : targetAction;
                 return MultiInvoke(input.IterationMode, input.Index, setupAction, action, cleanupAction, input.InvokeCount,
-                    operationsPerInvoke, job.GcMode.Resolve());
+                    operationsPerInvoke, job.GcMode);
             };
             Invoke(job, multiInvoke);
         }
@@ -84,8 +84,8 @@ namespace BenchmarkDotNet.Running
 
             // Run
             Func<MultiInvokeInput, Measurement> multiInvoke = input => input.IterationMode.IsOneOf(IterationMode.IdleWarmup, IterationMode.IdleTarget) ?
-                MultiInvoke(input.IterationMode, input.Index, setupAction, idleAction, cleanupAction, input.InvokeCount, operationsPerInvoke, job.GcMode.Resolve()) :
-                MultiInvoke(input.IterationMode, input.Index, setupAction, targetAction, cleanupAction, input.InvokeCount, operationsPerInvoke, job.GcMode.Resolve());
+                MultiInvoke(input.IterationMode, input.Index, setupAction, idleAction, cleanupAction, input.InvokeCount, operationsPerInvoke, job.GcMode) :
+                MultiInvoke(input.IterationMode, input.Index, setupAction, targetAction, cleanupAction, input.InvokeCount, operationsPerInvoke, job.GcMode);
             Invoke(job, multiInvoke);
         }
 

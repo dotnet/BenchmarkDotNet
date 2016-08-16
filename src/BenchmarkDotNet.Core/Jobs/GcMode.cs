@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Jobs
 {
     // it should have been struct, but then I was not able to set up Concurrent = true as default value 
     // due to "cannot have instance property or field initializers in structs"
-    public sealed class GcMode : IEquatable<GcMode>
+    public sealed class GcMode : IEquatable<GcMode>, IProperty<GcMode>
     {
         /// <summary>
         /// Specifies whether the common language runtime runs server garbage collection.
@@ -43,16 +43,13 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         public bool AllowVeryLargeObjects { get; set; }
 
-        /// <summary>
-        /// the default settings "Concurrent = true, Server = false, CpuGroups = false, Force = true, AllowVeryLargeObjects = false"
-        /// </summary>
-        public static GcMode Default => new GcMode { Concurrent = true, Force = true };
-
-        public static GcMode Host => new GcMode
+        public GcMode CreateDefaultValue() => new GcMode
         {
             Concurrent = HostEnvironmentInfo.GetCurrent().IsConcurrentGC,
             Server = HostEnvironmentInfo.GetCurrent().IsServerGC
         };
+
+        public string DefaultValueDisplayName => "Host";
 
         public override string ToString()
         {

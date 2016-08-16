@@ -12,9 +12,9 @@ namespace BenchmarkDotNet.Jobs
         Runtime Runtime { get; }
 
         /// <summary>
-        /// GcMode == null means Host
+        /// no value means Host
         /// </summary>
-        GcMode GcMode { get; }
+        Property<GcMode> GcMode { get; }
 
         Count LaunchCount { get; }
         Count WarmupCount { get; }

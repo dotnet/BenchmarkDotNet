@@ -113,7 +113,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             content = SetExtraDependencies(content, ExtraDependencies);
             content = SetImports(content, Imports);
             content = SetRuntime(content, Runtime);
-            content = SetGcMode(content, benchmark.Job.GcMode.Resolve());
+            content = SetGcMode(content, benchmark.Job.GcMode);
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
         }
@@ -150,12 +150,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         private string SetGcMode(string content, GcMode gcMode)
         {
-            if (gcMode == GcMode.Default)
-                return content.Replace("$GC$", null);            
+            if (gcMode == new GcMode())
+                return content.Replace("$GC$", null);
 
             return content.Replace(
                 "$GC$",
-                $"\"runtimeOptions\": {{ \"configProperties\": {{ \"System.GC.Concurrent\": {gcMode.Concurrent.ToString().ToLower()}, \"System.GC.Server\": {gcMode.Server.ToString().ToLower()} }} }}, ");
+                $"\"runtimeOptions\": {{ \"configProperties\": {{ \"System.GC.Concurrent\": {gcMode.Concurrent.ToLowerCase()}, \"System.GC.Server\": {gcMode.Server.ToLowerCase()} }} }}, ");
         }
 
         /// <summary>
