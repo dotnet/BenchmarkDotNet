@@ -12,6 +12,8 @@ namespace BenchmarkDotNet.Extensions
         private static readonly Lazy<Dictionary<string, string>> InvalidFileNameCharactersMappings
             = new Lazy<Dictionary<string, string>>(BuildInvalidPathCharactersMappings);
 
+        internal static string ToLowerCase(this bool value) => value ? "true" : "false"; // to avoid .ToString().ToLower() allocation
+
         internal static string Escape(this string path) => "\"" + path + "\"";
 
         internal static string WithoutSuffix(this string str, string suffix, StringComparison stringComparison = StringComparison.CurrentCulture)

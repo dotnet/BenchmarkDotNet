@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
@@ -112,7 +113,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             content = SetExtraDependencies(content, ExtraDependencies);
             content = SetImports(content, Imports);
             content = SetRuntime(content, Runtime);
-            content = SetGarbageCollectionSettings(content, benchmark.Job.GarbageCollection);
+            content = SetGcMode(content, benchmark.Job.GcMode);
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
         }
@@ -147,16 +148,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         private string SetRuntime(string content, string runtime) => content.Replace("$RUNTIME$", runtime);
 
-        private string SetGarbageCollectionSettings(string content, GarbageCollection garbageCollection)
+        private string SetGcMode(string content, GcMode gcMode)
         {
-            if (garbageCollection == null || garbageCollection == GarbageCollection.Default)
-            {
+            if (gcMode == new GcMode())
                 return content.Replace("$GC$", null);
-            }
 
             return content.Replace(
                 "$GC$",
-                $"\"runtimeOptions\": {{ \"configProperties\": {{ \"System.GC.Concurrent\": {garbageCollection.Concurrent.ToString().ToLower()}, \"System.GC.Server\": {garbageCollection.Server.ToString().ToLower()} }} }}, ");
+                $"\"runtimeOptions\": {{ \"configProperties\": {{ \"System.GC.Concurrent\": {gcMode.Concurrent.ToLowerCase()}, \"System.GC.Server\": {gcMode.Server.ToLowerCase()} }} }}, ");
         }
 
         /// <summary>

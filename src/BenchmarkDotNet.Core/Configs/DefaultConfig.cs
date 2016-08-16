@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Configs
             yield return PropertyColumn.Jit;
             yield return PropertyColumn.Toolchain;
             yield return PropertyColumn.Runtime;
-            yield return PropertyColumn.GarbageCollection;
+            yield return PropertyColumn.GcMode;
             yield return PropertyColumn.LaunchCount;
             yield return PropertyColumn.WarmupCount;
             yield return PropertyColumn.TargetCount;

@@ -24,13 +24,13 @@ namespace BenchmarkDotNet.Reports
             GenerateResult generateResult,
             BuildResult buildResult,
             IList<ExecuteResult> executeResults,
-            IList<Measurement> allRuns)
+            IList<Measurement> allMeasurements)
         {
             Benchmark = benchmark;
             GenerateResult = generateResult;
             BuildResult = buildResult;
             ExecuteResults = executeResults;
-            AllMeasurements = allRuns ?? new Measurement[0];
+            AllMeasurements = allMeasurements ?? new Measurement[0];
         }
 
         public override string ToString() => $"{Benchmark.ShortInfo}, {AllMeasurements.Count} runs";

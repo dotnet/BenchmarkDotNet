@@ -86,7 +86,7 @@ namespace BenchmarkDotNet.Reports
                 Content = table.FullContent.Select(line => line[index]).ToArray();
                 NeedToShow = alwaysShow || Content.Distinct().Count() > 1;
                 Width = Math.Max(Header.Length, Content.Any() ? Content.Max(line => line.Length) : 0) + 1;
-                IsTrivial = Header.IsOneOf("Platform", "Jit", "Framework", "Runtime", "LaunchCount", "WarmupCount", "TargetCount", "Affinity", "Toolchain") &&
+                IsTrivial = Header.IsOneOf("Platform", "Jit", "Framework", "Runtime", "LaunchCount", "WarmupCount", "TargetCount", "Affinity", "Toolchain", "GcMode") &&
                             Content.Distinct().Count() == 1 &&
                             Content.First().IsOneOf("Host", "Auto", "Classic");
             }

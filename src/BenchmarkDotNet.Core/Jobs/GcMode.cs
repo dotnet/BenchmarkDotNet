@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Text;
+using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.Jobs
 {
     // it should have been struct, but then I was not able to set up Concurrent = true as default value 
     // due to "cannot have instance property or field initializers in structs"
-    public sealed class GarbageCollection : IEquatable<GarbageCollection>
+    public sealed class GcMode : IEquatable<GcMode>, IProperty<GcMode>
     {
         /// <summary>
         /// Specifies whether the common language runtime runs server garbage collection.
@@ -42,10 +43,13 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         public bool AllowVeryLargeObjects { get; set; }
 
-        /// <summary>
-        /// the default settings "Concurrent = true, Server = false, CpuGroups = false, Force = true, AllowVeryLargeObjects = false"
-        /// </summary>
-        public static GarbageCollection Default => new GarbageCollection { Concurrent = true, Force = true };
+        public GcMode CreateDefaultValue() => new GcMode
+        {
+            Concurrent = HostEnvironmentInfo.GetCurrent().IsConcurrentGC,
+            Server = HostEnvironmentInfo.GetCurrent().IsServerGC
+        };
+
+        public string DefaultValueDisplayName => "Host";
 
         public override string ToString()
         {
@@ -63,7 +67,7 @@ namespace BenchmarkDotNet.Jobs
             return representation.ToString();
         }
 
-        public bool Equals(GarbageCollection other)
+        public bool Equals(GcMode other)
         {
             if (ReferenceEquals(null, other))
             {
@@ -90,7 +94,7 @@ namespace BenchmarkDotNet.Jobs
             {
                 return true;
             }
-            return obj is GarbageCollection && Equals((GarbageCollection)obj);
+            return obj is GcMode && Equals((GcMode)obj);
         }
 
         public override int GetHashCode()
@@ -106,12 +110,12 @@ namespace BenchmarkDotNet.Jobs
             }
         }
 
-        public static bool operator ==(GarbageCollection left, GarbageCollection right)
+        public static bool operator ==(GcMode left, GcMode right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(GarbageCollection left, GarbageCollection right)
+        public static bool operator !=(GcMode left, GcMode right)
         {
             return !Equals(left, right);
         }

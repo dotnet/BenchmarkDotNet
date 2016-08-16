@@ -17,15 +17,15 @@ namespace BenchmarkDotNet.Jobs
         public static readonly IJob Core = new Job { Runtime = Runtime.Core };
         public static readonly IJob MediumRun = new Job { LaunchCount = 3, WarmupCount = 15, TargetCount = 100 };
         public static readonly IJob LongRun = new Job { LaunchCount = 3, WarmupCount = 30, TargetCount = 1000 };
-        public static readonly IJob ConcurrentServerGC = new Job { GarbageCollection = new GarbageCollection { Server = true, Concurrent = true} };
-        public static readonly IJob ConcurrentWorkstationGC = new Job { GarbageCollection = new GarbageCollection { Server = false, Concurrent = true } };
+        public static readonly IJob ConcurrentServerGC = new Job { GcMode = new GcMode { Server = true, Concurrent = true} };
+        public static readonly IJob ConcurrentWorkstationGC = new Job { GcMode = new GcMode { Server = false, Concurrent = true } };
 
         public Mode Mode { get; set; } = Mode.Throughput;
         public Platform Platform { get; set; } = Platform.Host;
         public Jit Jit { get; set; } = Jit.Host;
         public IToolchain Toolchain { get; set; }
         public Runtime Runtime { get; set; } = Runtime.Host;
-        public GarbageCollection GarbageCollection { get; set; } = GarbageCollection.Default;
+        public Property<GcMode> GcMode { get; set; }
 
         public Count LaunchCount { get; set; } = Count.Auto;
         public Count WarmupCount { get; set; } = Count.Auto;

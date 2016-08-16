@@ -2,7 +2,7 @@
 using BenchmarkDotNet.Loggers;
 using Xunit.Abstractions;
 
-namespace BenchmarkDotNet.IntegrationTests
+namespace BenchmarkDotNet.Tests.Loggers
 {
     public class OutputLogger : AccumulationLogger
     {
