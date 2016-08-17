@@ -1,6 +1,6 @@
 {
   "title": "BenchmarkDotNet.Diagnostics.Windows",
-  "version": "0.9.8-develop",
+  "version": "0.9.9-develop",
   "authors": [ "Andrey Akinshin", "Jon Skeet", "Matt Warren" ],
   "description": "Powerful .NET library for benchmarking (Diagnostic Tools for Windows)",
   "copyright": "Andrey Akinshin, Jon Skeet, Matt Warren",
