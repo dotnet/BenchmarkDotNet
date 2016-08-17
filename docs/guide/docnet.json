@@ -31,6 +31,7 @@
         },
         "How it works": "HowItWorks.md",
         "Rules of benchmarking": "RulesOfBenchmarking.md",
+        "NuGet Packages": "NuGet.md",
         "FAQ": "faq.md",
         "Team": "Team.md",
         "Contributing": 
