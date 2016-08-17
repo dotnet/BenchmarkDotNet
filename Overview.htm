@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Overview - BenchmarkDotNet Documentation</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="css/theme_colors.css" type="text/css" />
+    <link rel="stylesheet" href="css/styles/vs.css">
+    <link rel="stylesheet" href="css/font-awesome.4.5.0.min.css">
+</head>
+<body role="document">
+    <div class="grid-for-nav">
+        <nav data-toggle="nav-shift" class="nav-side stickynav">
+            <div class="side-nav-search">
+                <a href="index.htm"><i class="fa fa-home"></i> BenchmarkDotNet Documentation</a>
+                <div role="search">
+                    <form id="search-form" class="form" action="Docnet_search.htm" method="get">
+                        <input type="text" name="q" placeholder="Search docs" />
+                    </form>
+                </div>
+            </div>
+            <div class="menu menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+<ul>
+<li class="tocentry"><a href="index.htm">Home</a>
+</li>
+
+<li class="tocentry current"><a class="current" href="Overview.htm">Overview</a>
+<ul class="currentrelativeroot">
+<li class="tocentry"><a href="#install">Install</a></li>
+<li class="tocentry"><a href="#create-benchmark">Create benchmark</a></li>
+<li class="tocentry"><a href="#run-benchmark">Run benchmark</a></li>
+<li class="tocentry"><a href="#benchmark-results">Benchmark results</a></li>
+<li class="tocentry"><a href="#jobs">Jobs</a></li>
+<li class="tocentry"><a href="#columns">Columns</a></li>
+<li class="tocentry"><a href="#exporters">Exporters</a></li>
+<li class="tocentry"><a href="#baseline">Baseline</a></li>
+<li class="tocentry"><a href="#params">Params</a></li>
+<li class="tocentry"><a href="#languages">Languages</a></li>
+<li class="tocentry"><a href="#diagnostics">Diagnostics</a></li>
+<li class="tocentry"><a href="#benchmarkrunner">BenchmarkRunner</a></li>
+</ul>
+<li class="tocentry"><a href="GettingStarted.htm">Getting Started</a>
+</li>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="Configuration.htm">Configuration</a></span>
+</li>
+<li class="tocentry"><a href="HowToRun.htm">How to run your benchmarks</a>
+</li>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="Advancedfeatures.htm">Advanced features</a></span>
+</li>
+<li class="tocentry"><a href="HowItWorks.htm">How it works</a>
+</li>
+<li class="tocentry"><a href="RulesOfBenchmarking.htm">Rules of benchmarking</a>
+</li>
+<li class="tocentry"><a href="NuGet.htm">NuGet Packages</a>
+</li>
+<li class="tocentry"><a href="faq.htm">FAQ</a>
+</li>
+<li class="tocentry"><a href="Team.htm">Team</a>
+</li>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="Contributing.htm">Contributing</a></span>
+</li>
+<li class="tocentry"><a href="license.htm">License</a>
+</li>
+</ul>
+				<div class="toc-footer">
+					<span class="text-small">
+						<hr/>
+						<a href="https://github.com/FransBouma/DocNet" target="_blank">Made with <i class="fa fa-github"></i> DocNet</a>
+					</span>
+				</div>	
+			</div>
+            &nbsp;
+        </nav>
+        <section data-toggle="nav-shift" class="nav-content-wrap">
+            <nav class="nav-top" role="navigation" aria-label="top navigation">
+                <i data-toggle="nav-top" class="fa fa-bars"></i>
+                <a href="index.htm">BenchmarkDotNet Documentation</a>
+            </nav>
+            <div class="nav-content">
+                <div role="navigation" aria-label="breadcrumbs navigation">
+                    <div class="breadcrumbs">
+<ul><li><a href="index.htm">Home</a></li> / <li><a href="Overview.htm">Overview</a></li></ul>
+					
+                    </div>
+                    <hr />
+                </div>
+                <div role="main">
+                    <div class="section">
+<h1 id="overview">Overview<a class="headerlink" href="#overview" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<h2 id="install">Install<a class="headerlink" href="#install" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Create new console application and install the <a href="https://www.nuget.org/packages/BenchmarkDotNet/" target="_blank">BenchmarkDotNet</a> NuGet package. We support:</p>
+<ul>
+<li><em>Projects:</em> Classic (<code>*.csproj</code>), Modern (<code>*.xproj</code>/<code>project.json</code>)</li>
+<li><em>Runtimes:</em> Full .NET Framework, .NET Core, Mono</li>
+<li><em>OS:</em> Windows, Linux, MacOS</li>
+<li><em>Languages:</em> C#, F#, VB</li>
+</ul>
+<h2 id="create-benchmark">Create benchmark<a class="headerlink" href="#create-benchmark" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Write a class with methods that you want to measure and mark them with the <code>Benchmark</code> attribute. In the following example, we 
+compare the <a href="https://en.wikipedia.org/wiki/MD5" target="_blank">MD5</a> and <a href="https://en.wikipedia.org/wiki/SHA-2" target="_blank">SHA256</a> cryptographic hash functions:</p>
+<pre><code class="cs">public class Md5VsSha256
+{
+    private readonly byte[] data = new byte[10000];
+    private readonly SHA256 sha256 = SHA256.Create();
+    private readonly MD5 md5 = MD5.Create();
+
+    public Md5VsSha256()
+    {
+        new Random(42).NextBytes(data);
+    }
+
+    [Benchmark]
+    public byte[] Sha256() =&gt; sha256.ComputeHash(data);
+
+    [Benchmark]
+    public byte[] Md5() =&gt; md5.ComputeHash(data);
+}
+</code></pre>
+
+<h2 id="run-benchmark">Run benchmark<a class="headerlink" href="#run-benchmark" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>It's very simple, just call <code>BenchmarkRunner.Run</code>:</p>
+<pre><code class="cs">var summary = BenchmarkRunner.Run&lt;Md5VsSha256&gt;();
+</code></pre>
+
+<p>Notice, that you should use only the <code>Release</code> configuration for your benchmarks. Otherwise, the results will not correspond to reality. If you forgot to change the configuration, BenchmarkDotNet will print a warning.</p>
+<h2 id="benchmark-results">Benchmark results<a class="headerlink" href="#benchmark-results" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<pre class="nocode">Host Process Environment Information:
+BenchmarkDotNet-Dev.Core=v0.9.8.0
+OS=Microsoft Windows NT 6.2.9200.0
+Processor=Intel(R) Core(TM) i7-4702MQ CPU 2.20GHz, ProcessorCount=8
+Frequency=2143477 ticks, Resolution=466.5317 ns, Timer=TSC
+CLR=MS.NET 4.0.30319.42000, Arch=32-bit RELEASE
+GC=Concurrent Workstation
+JitModules=clrjit-v4.6.1586.0
+
+Type=Md5VsSha256  Mode=Throughput
+
+ Method |      Median |    StdDev |
+------- |------------ |---------- |
+ Sha256 | 129.9503 us | 2.0627 us |
+    Md5 |  26.1774 us | 0.6362 us |
+</pre><h2 id="jobs">Jobs<a class="headerlink" href="#jobs" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>You can check several environments at once. For example, you can compare performance of Full .NET Framework, .NET Core, and Mono. Just add the <code>ClrJob</code>, <code>MonoJob</code>, <code>CoreJob</code> attributes before the class declaration (it requires a <code>project.json</code> based project, installed CoreCLR and Mono):</p>
+<pre><code class="cs">[ClrJob, MonoJob, CoreJob]
+public class Md5VsSha256
+</code></pre>
+
+<table class="table table-bordered-all table-responsive">
+<thead>
+<tr>
+	<th>Method</th>
+	<th>Toolchain</th>
+	<th>Runtime</th>
+	<th>Median</th>
+	<th>StdDev</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>Md5</td>
+	<td>Clr</td>
+	<td>Clr</td>
+	<td>25.6889 us</td>
+	<td>1.1810 us</td>
+</tr>
+<tr>
+	<td>Sha256</td>
+	<td>Clr</td>
+	<td>Clr</td>
+	<td>129.6621 us</td>
+	<td>3.2028 us</td>
+</tr>
+<tr>
+	<td>Md5</td>
+	<td>Core</td>
+	<td>Core</td>
+	<td>24.0038 us</td>
+	<td>0.1683 us</td>
+</tr>
+<tr>
+	<td>Sha256</td>
+	<td>Core</td>
+	<td>Core</td>
+	<td>57.5698 us</td>
+	<td>0.5385 us</td>
+</tr>
+<tr>
+	<td>Md5</td>
+	<td>Mono</td>
+	<td>Mono</td>
+	<td>53.8173 us</td>
+	<td>0.4953 us</td>
+</tr>
+<tr>
+	<td>Sha256</td>
+	<td>Mono</td>
+	<td>Mono</td>
+	<td>205.7487 us</td>
+	<td>2.8628 us</td>
+</tr>
+</tbody>
+</table>
+<p>There are a lot of predefined jobs which you can use. For example, you can compare <code>LegacyJitX86</code> vs <code>LegacyJitX64</code> vs <code>RyuJITx64</code>:</p>
+<pre><code class="cs">[LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
+</code></pre>
+
+<p>Or you can define own jobs:</p>
+<pre><code class="cs">[Config(typeof(Config))]
+public class Md5VsSha256
+{
+    private class Config : ManualConfig
+    {
+        public Config()
+        {
+            Add(Job.Default.
+                With(Platform.X86).
+                With(Jit.LegacyJit).
+                With(Runtime.Clr).
+                WithLaunchCount(3).
+                WithWarmupCount(5).
+                WithTargetCount(10));
+        }
+    }
+</code></pre>
+
+<p>Read more:  <a href="Configuration/Jobs.htm">Jobs</a>, <a href="Configuration/Configs.htm">Configs</a></p>
+<h2 id="columns">Columns<a class="headerlink" href="#columns" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>You can also add custom columns to the summary table:</p>
+<pre><code class="cs">[MinColumn, MaxColumn]
+public class Md5VsSha256
+</code></pre>
+
+<table class="table table-bordered-all table-responsive">
+<thead>
+<tr>
+	<th>Method</th>
+	<th>Median</th>
+	<th>StdDev</th>
+	<th>Min</th>
+	<th>Max</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>Sha256</td>
+	<td>131.3200 us</td>
+	<td>4.6744 us</td>
+	<td>129.8216 us</td>
+	<td>147.7630 us</td>
+</tr>
+<tr>
+	<td>Md5</td>
+	<td>26.2847 us</td>
+	<td>0.4424 us</td>
+	<td>25.8442 us</td>
+	<td>27.4258 us</td>
+</tr>
+</tbody>
+</table>
+<p>Of course, you can define own columns based on full benchmark summary.</p>
+<p>Read more:  <a href="Configuration/Columns.htm">Columns</a></p>
+<h2 id="exporters">Exporters<a class="headerlink" href="#exporters" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>You can export result of your benchmark in different formats:</p>
+<pre><code class="cs">[MarkdownExporter, AsciiDocExporter, HtmlExporter, CsvExporter, RPlotExporter]
+public class Md5VsSha256
+</code></pre>
+
+<p>If you have installed R, <code>RPlotExporter</code> will generate a lot of nice plots:</p>
+<p><img src="Images/Overview-RPlot.png" alt="Overview-RPlot.png" width="900" height="897" /></p>
+<p>Read more:  <a href="Configuration/Exporters.htm">Exporters</a></p>
+<h2 id="baseline">Baseline<a class="headerlink" href="#baseline" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>In order to scale your results you need to mark one of your benchmark methods as a <code>Baseline</code>:</p>
+<pre><code class="cs">public class Sleeps
+{
+    [Benchmark]
+    public void Time50() =&gt; Thread.Sleep(50);
+
+    [Benchmark(Baseline = true)]
+    public void Time100() =&gt; Thread.Sleep(100);
+
+    [Benchmark]
+    public void Time150() =&gt; Thread.Sleep(150);
+}
+</code></pre>
+
+<p>As a result, you will have additional column in the summary table:</p>
+<table class="table table-bordered-all table-responsive">
+<thead>
+<tr>
+	<th>Method</th>
+	<th>Median</th>
+	<th>StdDev</th>
+	<th>Scaled</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>Time100</td>
+	<td>100.2640 ms</td>
+	<td>0.1238 ms</td>
+	<td>1.00</td>
+</tr>
+<tr>
+	<td>Time150</td>
+	<td>150.2093 ms</td>
+	<td>0.1034 ms</td>
+	<td>1.50</td>
+</tr>
+<tr>
+	<td>Time50</td>
+	<td>50.2509 ms</td>
+	<td>0.1153 ms</td>
+	<td>0.50</td>
+</tr>
+</tbody>
+</table>
+<p>Read more:  <a href="Advanced/Baseline.htm">Baseline</a></p>
+<h2 id="params">Params<a class="headerlink" href="#params" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>You can mark one or several fields or properties in your class by the <code>Params</code> attribute. In this attribute, you can specify set of values. As a result, you will get results for each combination of params values.</p>
+<pre><code class="cs">public class IntroParams
+{
+    [Params(100, 200)]
+    public int A { get; set; }
+
+    [Params(10, 20)]
+    public int B { get; set; }
+
+    [Benchmark]
+    public void Benchmark()
+    {
+        Thread.Sleep(A + B + 5);
+    }
+}
+</code></pre>
+
+<table class="table table-bordered-all table-responsive">
+<thead>
+<tr>
+	<th>Method</th>
+	<th>Median</th>
+	<th>StdDev</th>
+	<th>A</th>
+	<th>B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>Benchmark</td>
+	<td>115.3325 ms</td>
+	<td>0.0242 ms</td>
+	<td>100</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>Benchmark</td>
+	<td>125.3282 ms</td>
+	<td>0.0245 ms</td>
+	<td>100</td>
+	<td>20</td>
+</tr>
+<tr>
+	<td>Benchmark</td>
+	<td>215.3024 ms</td>
+	<td>0.0375 ms</td>
+	<td>200</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>Benchmark</td>
+	<td>225.2710 ms</td>
+	<td>0.0434 ms</td>
+	<td>200</td>
+	<td>20</td>
+</tr>
+</tbody>
+</table>
+<p>Read more:  <a href="Advanced/Params.htm">Params</a></p>
+<h2 id="languages">Languages<a class="headerlink" href="#languages" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>You can also write you benchmarks on <code>F#</code> or <code>VB</code>. Examples:</p>
+<pre><code class="fs">type StringKeyComparison () =
+    let mutable arr : string [] = [||]
+    let dict1 = ConcurrentDictionary&lt;_,_&gt;()
+    let dict2 = ConcurrentDictionary&lt;_,_&gt;(StringComparer.Ordinal)
+
+    [&lt;Params (100, 500, 1000, 2000)&gt;] 
+    member val public DictSize = 0 with get, set
+
+    [&lt;Setup&gt;]
+    member self.SetupData() =
+        dict1.Clear(); dict2.Clear()
+        arr &lt;- getStrings self.DictSize
+        arr |&gt; Array.iter (fun x -&gt; dict1.[x] &lt;- true ; dict2.[x] &lt;- true)
+
+    [&lt;Benchmark&gt;]
+    member self.StandardLookup () = lookup arr dict1
+
+    [&lt;Benchmark&gt;]
+    member self.OrdinalLookup () = lookup arr dict2
+</code></pre>
+
+<pre><code class="vb">Public Class Sample
+    &lt;Params(1, 2)&gt;
+    Public Property A As Integer
+    &lt;Params(3, 4)&gt;
+    Public Property B As Integer
+
+    &lt;Benchmark&gt;
+    Public Function Benchmark() As Integer
+            return A + B
+    End Function
+End Class
+</code></pre>
+
+<h2 id="diagnostics">Diagnostics<a class="headerlink" href="#diagnostics" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>A <strong>diagnoser</strong> can attach to your benchmark and get some useful info. There is a separated package with diagnosers for Windows (<a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/" target="_blank">BenchmarkDotNet.Diagnostics.Windows</a>). The current Diagnosers are: <em>GC and Memory Allocation</em> (<code>MemoryDiagnoser</code>) and <em>JIT Inlining Events</em> (<code>InliningDiagnoser</code>).</p>
+<p>Below is a sample output from the <code>GC and Memory Allocation</code> diagnoser, note the extra columns on the right-hand side (<code>Gen 0</code>, <code>Gen 1</code>, <code>Gen 2</code> and <code>Bytes Allocated/Op</code>):</p>
+<table class="table table-bordered-all table-responsive">
+<thead>
+<tr>
+	<th>Method</th>
+	<th>Lookup</th>
+	<th>Median</th>
+	<th>StdDev</th>
+	<th>Scaled</th>
+	<th>Gen 0</th>
+	<th>Gen 1</th>
+	<th>Gen 2</th>
+	<th>Bytes Allocated/Op</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>LINQ</td>
+	<td>Testing</td>
+	<td>49.1154 ns</td>
+	<td>0.5301 ns</td>
+	<td>2.48</td>
+	<td>1,526.00</td>
+	<td>-</td>
+	<td>-</td>
+	<td>25.21</td>
+</tr>
+<tr>
+	<td>Iterative</td>
+	<td>Testing</td>
+	<td>19.8040 ns</td>
+	<td>0.0456 ns</td>
+	<td>1.00</td>
+	<td>-</td>
+	<td>-</td>
+	<td>-</td>
+	<td>0.00</td>
+</tr>
+</tbody>
+</table>
+<p>Read more:  <a href="Configuration/Diagnosers.htm">Diagnosers</a></p>
+<h2 id="benchmarkrunner">BenchmarkRunner<a class="headerlink" href="#benchmarkrunner" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>There are several ways to run your benchmarks: you can use existed class, run a benchmark based on code from internet or based on source code:</p>
+<pre><code class="cs">var summary = BenchmarkRunner.Run&lt;MyBenchmarkClass&gt;();
+var summary = BenchmarkRunner.Run(typeof(MyBenchmarkClass));
+
+string url = &quot;&lt;E.g. direct link to a gist&gt;&quot;;
+var summary = BenchmarkRunner.RunUrl(url);
+
+string benchmarkSource = &quot;public class MyBenchmarkClass { ...&quot;;
+var summary = BenchmarkRunner.RunSource(benchmarkSource);
+</code></pre>
+
+<p>Read more:  <a href="HowToRun.htm">HowToRun</a></p>
+
+                    </div>
+                </div>
+                <footer>
+                    <hr />
+                    <div role="contentinfo">
+BenchmarkDotNet Documentation. &copy;2013-2016. <a href='https://github.com/PerfDotNet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.
+                    </div>
+                </footer>
+            </div>
+        </section>
+    </div>
+    <script src="js/jquery-2.1.1.min.js"></script>
+    <script src="js/modernizr-2.8.3.min.js"></script>
+    <script src="js/highlight.pack.js"></script>
+    <script src="js/theme.js"></script>
+
+</body>
+</html>
