@@ -11,9 +11,11 @@ namespace BenchmarkDotNet.Exporters
         public static IExporter Markdown = MarkdownExporter.Default;
         public static IExporter Plain = PlainExporter.Default;
         public static IExporter RPlot = RPlotExporter.Default;
-        public static IExporter BriefJson = BriefJsonExporter.Default;
-        public static IExporter FormattedJson = FormattedJsonExporter.Default;
+
+        public static IExporter Json = JsonExporter.Default;
+        public static IExporter JsonBrief = JsonExporter.Brief;
+        public static IExporter JsonBriefCompressed = JsonExporter.BriefCompressed;
+        public static IExporter JsonFull = JsonExporter.Full;
+        public static IExporter JsonFullCompressed = JsonExporter.FullCompressed;
     }
-
-
 }
