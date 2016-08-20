@@ -46,10 +46,11 @@ namespace BenchmarkDotNet.Exporters.Json
 
             var benchmarks = summary.Reports.Select(r =>
             {
-                var data  = new Dictionary<string, object>
+                var data = new Dictionary<string, object>
                 {
                     // We don't need Benchmark.ShortInfo, that info is available via Benchmark.Parameters below
                     { "ShortInfo", r.Benchmark.ShortInfo },
+                    { "Namespace", r.Benchmark.Target.Type.Namespace },
                     { "Type", r.Benchmark.Target.Type.Name },
                     { "Method", r.Benchmark.Target.Method.Name },
                     { "MethodTitle", r.Benchmark.Target.MethodTitle },
