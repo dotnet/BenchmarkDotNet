@@ -6,6 +6,7 @@ namespace BenchmarkDotNet.Columns
 {
     public class PropertyColumn : IColumn
     {
+        public static readonly IColumn Namespace = new PropertyColumn("Namespace", benchmark => benchmark.Target.Type.Namespace);
         public static readonly IColumn Type = new PropertyColumn("Type", benchmark => benchmark.Target.Type.Name);
         public static readonly IColumn Method = new PropertyColumn("Method", benchmark => benchmark.Target.MethodTitle, true);
         public static readonly IColumn Mode = new PropertyColumn("Mode", benchmark => benchmark.Job.Mode.ToString());

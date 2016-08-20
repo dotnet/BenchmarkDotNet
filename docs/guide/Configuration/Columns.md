@@ -43,6 +43,7 @@ class Place
 
 class PropertyColumn
 {
+    IColumn Namespace;
     IColumn Type;
     IColumn Method;
     IColumn Mode;
