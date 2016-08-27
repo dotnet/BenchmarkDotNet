@@ -6,7 +6,7 @@ Never use the Debug build for benchmarking. *Never*. The debug version of the ta
 The release mode means that you should have `<Optimize>true</Optimize>` in your csproj file 
 or use [/optimize](https://msdn.microsoft.com/en-us/library/t0hfscdc.aspx) for `csc`. Also your never 
 should use an attached debugger (e.g. Visual Studio or WinDbg) during the benchmarking. The best way is 
-build our benchmark in the Release mode and run it with `cmd`.
+build our benchmark in the Release mode and run it from the command line.
 
 ##Try different environments
 
