@@ -16,8 +16,7 @@
         [Test]
         public void RunMember_NoBenchmarks_NoTests()
         {
-            var benchmarkTestRunner = Substitute.For<BenchmarkTestRunner>();
-            benchmarkTestRunner.GetConfig().Returns(new SuperQuickConfig());
+            var benchmarkTestRunner = new BenchmarkTestRunner(typeof(QuickConfig));
             var testListener = Substitute.For<ITestListener>();
             var targetType = typeof(NoBenchmarks).GetTypeInfo();
 
@@ -29,8 +28,7 @@
         [Test]
         public void RunMember_SomeBenchmarks_Success2Tests()
         {
-            var benchmarkTestRunner = Substitute.For<BenchmarkTestRunner>();
-            benchmarkTestRunner.GetConfig().Returns(new SuperQuickConfig());
+            var benchmarkTestRunner = new BenchmarkTestRunner(typeof(QuickConfig));
             var testListener = Substitute.For<ITestListener>();
             var targetType = typeof(SomeBenchmarks).GetTypeInfo();
 
@@ -43,8 +41,7 @@
         [Test]
         public void RunMember_SomeBenchmarks_TestRunnerName()
         {
-            var benchmarkTestRunner = Substitute.For<BenchmarkTestRunner>();
-            benchmarkTestRunner.GetConfig().Returns(new SuperQuickConfig());
+            var benchmarkTestRunner = new BenchmarkTestRunner(typeof(QuickConfig));
             var testListener = Substitute.For<ITestListener>();
             var targetType = typeof(SomeBenchmarks).GetTypeInfo();
             var version = typeof(BenchmarkAttribute).GetTypeInfo().Assembly.GetName().Version;
@@ -58,8 +55,7 @@
         [Test]
         public void RunMember_SomeBenchmarks_TestResultName()
         {
-            var benchmarkTestRunner = Substitute.For<BenchmarkTestRunner>();
-            benchmarkTestRunner.GetConfig().Returns(new SuperQuickConfig());
+            var benchmarkTestRunner = new BenchmarkTestRunner(typeof(QuickConfig));
             var testListener = Substitute.For<ITestListener>();
             var targetType = typeof(SomeBenchmarks).GetTypeInfo();
             var method = new Action(new SomeBenchmarks().Benchmark1).GetMethodInfo();
@@ -73,8 +69,7 @@
         [Test]
         public void RunMember_SomeBenchmarksBenchmark1_TestResultName()
         {
-            var benchmarkTestRunner = Substitute.For<BenchmarkTestRunner>();
-            benchmarkTestRunner.GetConfig().Returns(new SuperQuickConfig());
+            var benchmarkTestRunner = new BenchmarkTestRunner(typeof(QuickConfig));
             var testListener = Substitute.For<ITestListener>();
             var targetType = typeof(SomeBenchmarks).GetTypeInfo();
             var method = new Action(new SomeBenchmarks().Benchmark1).GetMethodInfo();
@@ -85,11 +80,24 @@
             testListener.Received(1).TestFinished(Arg.Any<TestResult>());
             testListener.Received().TestFinished(Arg.Is<TestResult>(r => r.Name == testName));
         }
+
+        [Test]
+        public void RunMember_ConfigTypeNotIConfig_ErrorWithWarning()
+        {
+            var benchmarkTestRunner = new BenchmarkTestRunner(typeof(object));
+            var testListener = Substitute.For<ITestListener>();
+            var targetType = typeof(SomeBenchmarks).GetTypeInfo();
+
+            var testRunState = benchmarkTestRunner.RunMember(testListener, targetType.Assembly, targetType);
+
+            Assert.That(testRunState, Is.EqualTo(TestRunState.Error));
+            testListener.Received(1).WriteLine(Arg.Any<string>(), Category.Warning);
+        }
     }
 
-    class SuperQuickConfig : ManualConfig
+    class QuickConfig : ManualConfig
     {
-        internal SuperQuickConfig()
+        public QuickConfig()
         {
             Add(Job.Default
                 .WithLaunchCount(1)     // benchmark process will be launched only once

@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Reports;
@@ -7,29 +8,45 @@ using TestDriven.Framework;
 
 namespace BenchmarkDotNet.TestDriven
 {
-    public abstract class BenchmarkTestRunner : ITestRunner
+    public class BenchmarkTestRunner : ITestRunner
     {
-        public abstract IConfig GetConfig();
+        Type configType;
+
+        public BenchmarkTestRunner()
+        {
+        }
+
+        public BenchmarkTestRunner(Type configType)
+        {
+            this.configType = configType;
+        }
 
         public TestRunState RunMember(ITestListener testListener, Assembly assembly, MemberInfo member)
         {
-            var summary = run(member);
-            if (summary == null)
+            try
             {
-                return TestRunState.NoTests;
-            }
+                var summary = run(assembly, member);
+                if (summary == null)
+                {
+                    return TestRunState.NoTests;
+                }
 
-            foreach (var benchmark in summary.Benchmarks)
+                foreach (var benchmark in summary.Benchmarks)
+                {
+                    var testResult = getTestResult(benchmark);
+                    testListener.TestFinished(testResult);
+                }
+
+                testListener.TestResultsUrl(summary.ResultsDirectoryPath);
+
+                return TestRunState.Success;
+            }
+            catch(TestRunnerException e)
             {
-                var testResult = getTestResult(benchmark);
-                testListener.TestFinished(testResult);
+                testListener.WriteLine(e.Message, Category.Warning);
+                return TestRunState.Error;
             }
-
-            testListener.TestResultsUrl(summary.ResultsDirectoryPath);
-
-            return TestRunState.Success;
         }
-
 
         static TestResult getTestResult(Benchmark benchmark)
         {
@@ -51,14 +68,15 @@ namespace BenchmarkDotNet.TestDriven
             return string.Format("BenchmarkDotNet {0}.{1}.{2}", version.Major, version.Minor, version.Build);
         }
 
-        Summary run(MemberInfo member)
+        Summary run(Assembly assembly, MemberInfo member)
         {
             if (member is TypeInfo)
             {
                 var type = (TypeInfo)member;
                 if (isBenchmarkType(type))
                 {
-                    return BenchmarkRunner.Run(type.AsType(), GetConfig());
+                    var config = getConfig(assembly);
+                    return BenchmarkRunner.Run(type.AsType(), config);
                 }
             }
             else if (member is MethodInfo)
@@ -67,11 +85,38 @@ namespace BenchmarkDotNet.TestDriven
                 if (isBenchmarkMethod(method))
                 {
                     var type = method.DeclaringType;
-                    return BenchmarkRunner.Run(type, new[] { method }, GetConfig());
+                    var config = getConfig(assembly);
+                    return BenchmarkRunner.Run(type, new[] { method }, config);
                 }
             }
 
             return null;
+        }
+
+        IConfig getConfig(Assembly assembly)
+        {
+            var configType = getConfigType(assembly);
+            try
+            {
+                var config = (IConfig)Activator.CreateInstance(configType);
+                return config;
+            }
+            catch(InvalidCastException)
+            {
+                throw new TestRunnerException(string.Format("ConfigType `{0}` must implement `{1}`.",
+                    configType.FullName, typeof(IConfig).FullName));
+            }
+        }
+
+        Type getConfigType(Assembly assembly)
+        {
+            if (configType != null)
+            {
+                return configType;
+            }
+
+            var attribute = assembly.GetCustomAttribute<BenchmarkTestRunnerAttribute>();
+            return attribute.ConfigType;
         }
 
         static bool isBenchmarkType(TypeInfo type)
@@ -100,6 +145,13 @@ namespace BenchmarkDotNet.TestDriven
         public TestRunState RunAssembly(ITestListener testListener, Assembly assembly)
         {
             return TestRunState.NoTests;
+        }
+
+        class TestRunnerException : Exception
+        {
+            internal TestRunnerException(string message) : base(message)
+            {
+            }
         }
     }
 }

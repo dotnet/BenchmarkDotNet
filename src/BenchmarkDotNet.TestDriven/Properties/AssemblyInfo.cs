@@ -1,9 +1,5 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
-using TestDriven.Framework;
-using BenchmarkDotNet.TestDriven;
-
-[assembly: CustomTestRunner(typeof(FastAndDirtyBenchmarkTestRunner))]
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information

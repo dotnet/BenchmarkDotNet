@@ -2,7 +2,6 @@
 using System.Runtime.InteropServices;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.TestDriven;
-using TestDriven.Framework;
 
 [assembly: AssemblyTitle(BenchmarkDotNetInfo.Title + ".Samples")]
 [assembly: AssemblyProduct(BenchmarkDotNetInfo.Title + ".Samples")]
@@ -19,4 +18,5 @@ using TestDriven.Framework;
 [assembly: ComVisible(false)]
 [assembly: Guid("6f2232a9-0d0c-46cf-b08c-f6e28ab612e3")]
 
-[assembly: CustomTestRunner(typeof(FastAndDirtyBenchmarkTestRunner))]
+[assembly: BenchmarkTestRunner(typeof(FastAndDirtyConfig))]
+//[assembly: BenchmarkTestRunner(typeof(FastAndDirtyClrAndCoreConfig))]
