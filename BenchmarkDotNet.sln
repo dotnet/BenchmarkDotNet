@@ -66,6 +66,10 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BenchmarkDotNet.Core", "src
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BenchmarkDotNet.Toolchains.Roslyn", "src\BenchmarkDotNet.Toolchains.Roslyn\BenchmarkDotNet.Toolchains.Roslyn.xproj", "{F5785871-7E2C-4894-85DE-A28EACB1D9B5}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BenchmarkDotNet.TestDriven", "src\BenchmarkDotNet.TestDriven\BenchmarkDotNet.TestDriven.xproj", "{EA3B1CCF-9146-40F6-84D0-DC98C940F78B}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BenchmarkDotNet.IntegrationTests.TestDriven", "tests\BenchmarkDotNet.IntegrationTests.TestDriven\BenchmarkDotNet.IntegrationTests.TestDriven.xproj", "{FD33C931-6F5B-4F55-959C-605408BA1C3B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -136,6 +140,14 @@ Global
 		{F5785871-7E2C-4894-85DE-A28EACB1D9B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5785871-7E2C-4894-85DE-A28EACB1D9B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5785871-7E2C-4894-85DE-A28EACB1D9B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA3B1CCF-9146-40F6-84D0-DC98C940F78B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA3B1CCF-9146-40F6-84D0-DC98C940F78B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA3B1CCF-9146-40F6-84D0-DC98C940F78B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA3B1CCF-9146-40F6-84D0-DC98C940F78B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD33C931-6F5B-4F55-959C-605408BA1C3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD33C931-6F5B-4F55-959C-605408BA1C3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD33C931-6F5B-4F55-959C-605408BA1C3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD33C931-6F5B-4F55-959C-605408BA1C3B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -157,5 +169,7 @@ Global
 		{24D62335-B878-4F00-8555-C6DC3E40FA70} = {602236FF-A83D-43BA-9EE7-A4B0BE2CA4B3}
 		{95F5D645-19E3-432F-95D4-C5EA374DD15B} = {D6597E3A-6892-4A68-8E14-042FC941FDA2}
 		{F5785871-7E2C-4894-85DE-A28EACB1D9B5} = {D6597E3A-6892-4A68-8E14-042FC941FDA2}
+		{EA3B1CCF-9146-40F6-84D0-DC98C940F78B} = {D6597E3A-6892-4A68-8E14-042FC941FDA2}
+		{FD33C931-6F5B-4F55-959C-605408BA1C3B} = {14195214-591A-45B7-851A-19D3BA2413F9}
 	EndGlobalSection
 EndGlobal

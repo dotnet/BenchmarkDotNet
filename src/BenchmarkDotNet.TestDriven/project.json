@@ -1,0 +1,19 @@
+﻿{
+  "version": "1.0.0-*",
+
+  "dependencies": {
+    "BenchmarkDotNet": {
+      "target": "project"
+    },
+    "TestDriven.Framework": "2.0.0-alpha2"
+  },
+
+  "frameworks": {
+    "net45": { },
+    "netstandard1.6": {
+      "dependencies": {
+        "NETStandard.Library": "1.6.0"
+      }
+    }
+  }
+}
