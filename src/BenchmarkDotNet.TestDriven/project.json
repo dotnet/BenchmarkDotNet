@@ -1,18 +1,89 @@
 ﻿{
-  "version": "1.0.0-*",
-
+  "title": "BenchmarkDotNet.TestDriven",
+  "version": "0.9.9-develop",
+  "authors": [ "Jamie Cansdale", "Andrey Akinshin", "Jon Skeet", "Matt Warren" ],
+  "description": "Adapter to allow BenchmarkDotNet benchmarks to be run using TestDriven.Net",
+  "copyright": "Jamie Cansdale, Andrey Akinshin, Jon Skeet, Matt Warren",
+  "packOptions": {
+    "owners": [ "Jamie Cansdale", "Andrey Akinshin", "Jon Skeet", "Matt Warren" ],
+    "licenseUrl": "https://github.com/PerfDotNet/BenchmarkDotNet/blob/master/LICENSE.md",
+    "projectUrl": "https://github.com/PerfDotNet/BenchmarkDotNet",
+    "iconUrl": "https://raw.githubusercontent.com/PerfDotNet/BenchmarkDotNet/master/BenchmarkDotNet/BenchmarkDotNet.png",
+    "requireLicenseAcceptance": false,
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/PerfDotNet/BenchmarkDotNet"
+    },
+    "tags": [ "benchmark benchmarking performance testdriven tdnet" ]
+  },
+  "language": "en-US",
+  "configurations": {
+    "Debug": {
+      "buildOptions": {
+        "define": [ "DEBUG", "TRACE" ]
+      }
+    },
+    "Release": {
+      "buildOptions": {
+        "define": [ "RELEASE", "TRACE" ],
+        "optimize": true,
+        "xmlDoc": true,
+        "keyFile": "../../strongNameKey.snk",
+        "strongName": true
+      }
+    }
+  },
+  "buildOptions": {
+    "embed": [ "Templates/*" ],
+    "nowarn": [ "1591" ],
+    "xmlDoc": true
+  },
   "dependencies": {
     "BenchmarkDotNet": {
       "target": "project"
     },
     "TestDriven.Framework": "2.0.0-alpha2"
   },
-
   "frameworks": {
-    "net45": { },
-    "netstandard1.6": {
+    "net45": {
+      "buildOptions": {
+        "define": [ "CLASSIC" ]
+      },
+      "frameworkAssemblies": {
+        "System.Management": "4.0.0.0",
+        "System.Xml": "4.0.0.0"
+      },
       "dependencies": {
-        "NETStandard.Library": "1.6.0"
+        "System.Threading.Tasks.Extensions": "4.0.0"
+      }
+    },
+    "netstandard1.6": {
+      "buildOptions": {
+        "define": [ "CORE" ]
+      },
+      "dependencies": {
+        "System.Linq": "4.1.0",
+        "System.Resources.ResourceManager": "4.0.1",
+        "Microsoft.CSharp": "4.0.1",
+        "Microsoft.Win32.Primitives": "4.0.1",
+        "System.Console": "4.0.0",
+        "System.Text.RegularExpressions": "4.1.0",
+        "System.Threading": "4.0.11",
+        "System.Reflection": "4.1.0",
+        "System.Reflection.Primitives": "4.0.1",
+        "System.Reflection.TypeExtensions": "4.1.0",
+        "System.Threading.Tasks.Extensions": "4.0.0",
+        "System.Threading.Thread": "4.0.0",
+        "System.Diagnostics.Process": "4.1.0",
+        "System.IO.FileSystem": "4.0.1",
+        "System.Runtime.InteropServices.RuntimeInformation": "4.0.0",
+        "System.Runtime.Serialization.Primitives": "4.1.1",
+        "System.Diagnostics.Tools": "4.0.1",
+        "System.Runtime.InteropServices": "4.1.0",
+        "Microsoft.DotNet.InternalAbstractions": "1.0.0",
+        "System.Reflection.Extensions": "4.0.1",
+        "System.Diagnostics.Debug": "4.0.11",
+        "System.Xml.XPath.XmlDocument": "4.0.1"
       }
     }
   }
