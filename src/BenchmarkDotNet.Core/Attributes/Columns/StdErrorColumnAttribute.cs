@@ -4,7 +4,7 @@ namespace BenchmarkDotNet.Attributes.Columns
 {
     public class StdErrorColumnAttribute : ColumnConfigBaseAttribute
     {
-        public StdErrorColumnAttribute() : base(StatisticColumn.StdError)
+        public StdErrorColumnAttribute() : base(StatisticColumn.StdErr)
         {
         }
     }

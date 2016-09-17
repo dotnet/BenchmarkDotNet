@@ -12,7 +12,7 @@ Source code is available at [@fa-github github.com/PerfDotNet/BenchmarkDotNet](h
 * Supported runtimes: Full .NET Framework, .NET Core (RTM), Mono
 * Supported languages: C#, F#, and Visual Basic
 * Supported OS: Windows, Linux, MacOS
-* Easy way to compare different environments (`x86` vs `x64`, `LegacyJit` vs `RyuJit`, and so on; see: [Jobs](https://perfdotnet.github.io/BenchmarkDotNet/Configuration/Jobs.htm))
+* Easy way to compare different environments (`x86` vs `x64`, `LegacyJit` vs `RyuJit`, and so on; see: [Jobs](https://perfdotnet.github.io/BenchmarkDotNet/Configs/Jobs.htm))
 * Reports: markdown, csv, html, plain text, png plots.
 * Advanced features: [Baseline](https://perfdotnet.github.io/BenchmarkDotNet/Advanced/Baseline.htm), [Params](https://perfdotnet.github.io/BenchmarkDotNet/Advanced/Params.htm)
 * Powerful diagnostics based on ETW events (see [BenchmarkDotNet.Diagnostics.Windows](https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/))

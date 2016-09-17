@@ -2,7 +2,10 @@
 using System.Globalization;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
@@ -65,16 +68,16 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var summary = BenchmarkRunner
                 .Run(benchmarks,
-                    ManualConfig.CreateEmpty()
-                        .With(Job.Dry.With(Runtime.Core).With(Jit.Host).With(Mode.Throughput).WithWarmupCount(1).WithTargetCount(1))
-                        .With(DefaultConfig.Instance.GetLoggers().ToArray())
-                        .With(DefaultConfig.Instance.GetColumns().ToArray())
-                        .With(memoryDiagnoser)
-                        .With(new OutputLogger(output)));
+                    ManualConfig.CreateEmpty().
+                        With(Job.Dry.With(Runtime.Core).With(RunStrategy.Throughput).WithWarmupCount(1).WithTargetCount(1)).
+                        With(DefaultConfig.Instance.GetLoggers().ToArray()).
+                        With(DefaultColumnProviders.Instance).
+                        With(memoryDiagnoser).
+                        With(new OutputLogger(output)));
 
-            var gcCollectionColumns = memoryDiagnoser.GetColumns.OfType<Diagnostics.Windows.MemoryDiagnoser.GCCollectionColumn>().ToArray();
-            var listStructEnumeratorBenchmarks = benchmarks.Where(benchmark => benchmark.ShortInfo.Contains("ListStructEnumerator"));
-            var listObjectEnumeratorBenchmarks = benchmarks.Where(benchmark => benchmark.ShortInfo.Contains("ListObjectEnumerator"));
+            var gcCollectionColumns = memoryDiagnoser.GetColumnProvider().GetColumns(null).OfType<Diagnostics.Windows.MemoryDiagnoser.GCCollectionColumn>().ToArray();
+            var listStructEnumeratorBenchmarks = benchmarks.Where(benchmark => benchmark.DisplayInfo.Contains("ListStructEnumerator"));
+            var listObjectEnumeratorBenchmarks = benchmarks.Where(benchmark => benchmark.DisplayInfo.Contains("ListObjectEnumerator"));
             const int gen0Index = 0;
 
             foreach (var listStructEnumeratorBenchmark in listStructEnumeratorBenchmarks)

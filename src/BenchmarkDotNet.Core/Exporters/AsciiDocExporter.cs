@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -38,7 +39,7 @@ namespace BenchmarkDotNet.Exporters
                 logger.WriteLineError(".Benchmarks with issues");
                 logger.WriteLine("====");
                 foreach (var benchmarkWithTroubles in benchmarksWithTroubles)
-                    logger.WriteLineError("* " + benchmarkWithTroubles.ShortInfo);
+                    logger.WriteLineError("* " + benchmarkWithTroubles.DisplayInfo);
                 logger.WriteLine("====");
             }
         }

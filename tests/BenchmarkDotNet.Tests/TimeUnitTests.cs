@@ -16,8 +16,8 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void ConvertTest()
         {
-            CheckConvertTwoWay(1000, TimeUnit.Nanoseconds, 1, TimeUnit.Microseconds);
-            CheckConvertTwoWay(1000, TimeUnit.Microseconds, 1, TimeUnit.Millisecond);
+            CheckConvertTwoWay(1000, TimeUnit.Nanosecond, 1, TimeUnit.Microsecond);
+            CheckConvertTwoWay(1000, TimeUnit.Microsecond, 1, TimeUnit.Millisecond);
             CheckConvertTwoWay(1000, TimeUnit.Millisecond, 1, TimeUnit.Second);
             CheckConvertTwoWay(60, TimeUnit.Second, 1, TimeUnit.Minute);
             CheckConvertTwoWay(60, TimeUnit.Minute, 1, TimeUnit.Hour);
@@ -27,10 +27,10 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void GetBestTimeUnitTest()
         {
-            CheckGetBestTimeUnit(TimeUnit.Nanoseconds, 1.0);
-            CheckGetBestTimeUnit(TimeUnit.Nanoseconds, 100.0);
-            CheckGetBestTimeUnit(TimeUnit.Microseconds, 1.0 * 1000);
-            CheckGetBestTimeUnit(TimeUnit.Microseconds, 100.0 * 1000);
+            CheckGetBestTimeUnit(TimeUnit.Nanosecond, 1.0);
+            CheckGetBestTimeUnit(TimeUnit.Nanosecond, 100.0);
+            CheckGetBestTimeUnit(TimeUnit.Microsecond, 1.0 * 1000);
+            CheckGetBestTimeUnit(TimeUnit.Microsecond, 100.0 * 1000);
             CheckGetBestTimeUnit(TimeUnit.Millisecond, 1.0 * 1000 * 1000);
             CheckGetBestTimeUnit(TimeUnit.Millisecond, 100.0 * 1000 * 1000);
             CheckGetBestTimeUnit(TimeUnit.Second, 1.0 * 1000 * 1000 * 1000);

@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Parameters
                 if (compareTo != 0)
                     return compareTo;
             }
-            return string.CompareOrdinal(x.FullInfo, y.FullInfo);
+            return string.CompareOrdinal(x.DisplayInfo, y.DisplayInfo);
         }
 
         private class Comparer

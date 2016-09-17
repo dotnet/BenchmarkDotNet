@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Loggers;
+﻿using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Toolchains
@@ -10,6 +11,6 @@ namespace BenchmarkDotNet.Toolchains
         IBuilder Builder { get; }
         IExecutor Executor { get; }
 
-        bool IsSupported(Benchmark benchmark, ILogger logger);
+        bool IsSupported(Benchmark benchmark, ILogger logger, IResolver resolver);
     }
 }

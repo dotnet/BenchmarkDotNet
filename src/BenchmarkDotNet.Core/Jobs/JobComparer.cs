@@ -1,27 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BenchmarkDotNet.Jobs
 {
-    internal class JobComparer : IComparer<IJob>
+    internal class JobComparer : IComparer<Job>
     {
-        public static readonly IComparer<IJob> Instance = new JobComparer();
+        public static readonly IComparer<Job> Instance = new JobComparer();
 
-        public int Compare(IJob x, IJob y)
+        public int Compare(Job x, Job y)
         {
-            var xp = x.AllProperties;
-            var yp = y.AllProperties;
+            var xp = x.ToSet().GetValues();
+            var yp = y.ToSet().GetValues();
             if (xp.Length != yp.Length)
                 throw new InvalidOperationException("xJob.Length != yJob.Length");
             for (int i = 0; i < xp.Length; i++)
             {
-                if (xp[i].Name != yp[i].Name)
-                    throw new InvalidOperationException($"xJob[{i}].Name != yJob[{i}].Name");
-                var jobCompare = string.CompareOrdinal(xp[i].Value, yp[i].Value);
+                if (xp[i].Id != yp[i].Id)
+                    throw new InvalidOperationException($"xJob[{i}].Id != yJob[{i}].Id");
+                if (xp[i].IsDefault && yp[i].IsDefault)
+                    continue;
+                if (xp[i].IsDefault && !yp[i].IsDefault)
+                    return 1;
+                if (!xp[i].IsDefault && yp[i].IsDefault)
+                    return -1;
+                var jobCompare = string.CompareOrdinal(xp[i].ObjectValue.ToString(), yp[i].ObjectValue.ToString());
                 if (jobCompare != 0)
                     return jobCompare;
             }
-            return string.CompareOrdinal(x.GetFullInfo(), y.GetFullInfo());
+            return string.CompareOrdinal(x.DisplayInfo, y.DisplayInfo);
         }
     }
 }

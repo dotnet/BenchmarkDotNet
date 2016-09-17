@@ -14,11 +14,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Environments;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
-    public class MemoryDiagnoser : ETWDiagnoser, IDiagnoser, IColumnProvider
+    public class MemoryDiagnoser : ETWDiagnoser, IDiagnoser
     {
         private readonly List<OutputLine> output = new List<OutputLine>();
         private readonly LogCapture logger = new LogCapture();
@@ -26,14 +26,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         private TraceEventSession session;
         private readonly ConcurrentDictionary<int, Stats> statsPerProcess = new ConcurrentDictionary<int, Stats>();
 
-        public IEnumerable<IColumn> GetColumns =>
-            new IColumn[]
-            {
-                new GCCollectionColumn(results, 0),
-                new GCCollectionColumn(results, 1),
-                new GCCollectionColumn(results, 2),
-                new AllocationColumn(results)
-            };
+        public IColumnProvider GetColumnProvider() => new SimpleColumnProvider(
+            new GCCollectionColumn(results, 0),
+            new GCCollectionColumn(results, 1),
+            new GCCollectionColumn(results, 2),
+            new AllocationColumn(results));
 
         public void Start(Benchmark benchmark)
         {
@@ -43,7 +40,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             var sessionName = GetSessionName("GC", benchmark, benchmark.Parameters);
             session = new TraceEventSession(sessionName);
             session.EnableProvider(ClrTraceEventParser.ProviderGuid, TraceEventLevel.Verbose,
-                (ulong)(ClrTraceEventParser.Keywords.GC));
+                (ulong) (ClrTraceEventParser.Keywords.GC));
 
             // The ETW collection thread starts receiving events immediately, but we only
             // start aggregating them after ProcessStarted is called and we know which process
@@ -127,7 +124,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     }
                     else
                     {
-                        logger.WriteLineError(string.Format("Error Process{0}, Unexpected GC Depth: {1}, Count: {2} -> Reason: {3}", gcData.ProcessID, gcData.Depth, gcData.Count, gcData.Reason));
+                        logger.WriteLineError(string.Format("Error Process{0}, Unexpected GC Depth: {1}, Count: {2} -> Reason: {3}", gcData.ProcessID,
+                            gcData.Depth, gcData.Count, gcData.Reason));
                     }
                 }
             };
@@ -145,6 +143,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             }
 
             public string ColumnName => "Bytes Allocated/Op";
+            public bool IsDefault(Summary summary, Benchmark benchmark) => false;
+
             public bool IsAvailable(Summary summary) => true;
             public bool AlwaysShow => true;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
@@ -155,7 +155,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 {
                     var result = results[benchmark];
                     // TODO scale this based on the minimum value in the column, i.e. use B/KB/MB as appropriate
-                    return (result.AllocatedBytes / (double)result.TotalOperations).ToString("N2");
+                    return (result.AllocatedBytes / (double) result.TotalOperations).ToString("N2");
                 }
                 return "N/A";
             }
@@ -176,6 +176,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 opsPerGCCount = results.Min(r => r.Value?.TotalOperations ?? 0);
             }
 
+            public bool IsDefault(Summary summary, Benchmark benchmark) => false;
             public string ColumnName { get; private set; }
             public bool IsAvailable(Summary summary) => true;
             public bool AlwaysShow => true;
@@ -188,7 +189,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     var result = results[benchmark];
                     if (result.GenCounts[generation] == 0)
                         return "-"; // make zero more obvious
-                    return (result.GenCounts[generation] / (double)result.TotalOperations * opsPerGCCount).ToString("N2", HostEnvironmentInfo.MainCultureInfo);
+                    return (result.GenCounts[generation] / (double) result.TotalOperations * opsPerGCCount).ToString("N2", HostEnvironmentInfo.MainCultureInfo);
                 }
                 return "N/A";
             }

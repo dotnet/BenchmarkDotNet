@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Columns
     public class StatisticColumn : IColumn
     {
         public static readonly IColumn Mean = new StatisticColumn("Mean", s => s.Mean);
-        public static readonly IColumn StdError = new StatisticColumn("StdError", s => s.StandardError);
+        public static readonly IColumn StdErr = new StatisticColumn("StdErr", s => s.StandardError);
 
         public static readonly IColumn StdDev = new StatisticColumn("StdDev", s => s.StandardDeviation);
         public static readonly IColumn OperationsPerSecond = new StatisticColumn("Op/s", s => 1.0 * 1000 * 1000 * 1000 / s.Mean, false);
@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Columns
         public static IColumn CiUpper(ConfidenceLevel level) => new StatisticColumn($"CI {level.ToPercent()}% Upper",
             s => new ConfidenceInterval(s.Mean, s.StandardError, level).Upper);
 
-        public static readonly IColumn[] AllStatistics = { Mean, StdError, StdDev, OperationsPerSecond, Min, Q1, Median, Q3, Max };
+        public static readonly IColumn[] AllStatistics = { Mean, StdErr, StdDev, OperationsPerSecond, Min, Q1, Median, Q3, Max };
 
         private readonly Func<Statistics, double> calc;
         private readonly bool isTimeColumn;
@@ -68,5 +68,7 @@ namespace BenchmarkDotNet.Columns
         }
 
         public override string ToString() => ColumnName;
+
+        public bool IsDefault(Summary summary, Benchmark benchmark) => false;
     }
 }

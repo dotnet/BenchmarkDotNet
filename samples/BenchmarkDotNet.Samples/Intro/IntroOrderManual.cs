@@ -2,9 +2,10 @@
 using System.Linq;
 using System.Threading;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes.Jobs;
+using BenchmarkDotNet.Attributes.Columns;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -12,15 +13,15 @@ using BenchmarkDotNet.Running;
 namespace BenchmarkDotNet.Samples.Intro
 {
     [Config(typeof(Config))]
+    [DryJob]
+    [RankColumn]
     public class IntroOrderManual
     {
         private class Config : ManualConfig
         {
             public Config()
             {
-                Add(Job.Dry);
                 Set(new FastestToSlowestOrderProvider());
-                Add(PlaceColumn.ArabicNumber);
             }
 
             private class FastestToSlowestOrderProvider : IOrderProvider
@@ -28,12 +29,12 @@ namespace BenchmarkDotNet.Samples.Intro
                 public IEnumerable<Benchmark> GetExecutionOrder(Benchmark[] benchmarks) =>
                     from benchmark in benchmarks
                     orderby benchmark.Parameters["X"] descending,
-                            benchmark.Target.MethodTitle
+                            benchmark.Target.MethodDisplayInfo
                     select benchmark;
 
                 public IEnumerable<Benchmark> GetSummaryOrder(Benchmark[] benchmarks, Summary summary) =>
                     from benchmark in benchmarks
-                    orderby summary[benchmark].ResultStatistics.Median
+                    orderby summary[benchmark].ResultStatistics.Mean
                     select benchmark;
 
                 public string GetGroupKey(Benchmark benchmark, Summary summary) => null;

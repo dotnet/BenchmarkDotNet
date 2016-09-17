@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -21,7 +20,7 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn ScaledStdDev = new BaselineScaledColumn(DiffKind.StdDev);
         public static readonly IColumn WelchTTestPValue = new BaselineScaledColumn(DiffKind.WelchTTestPValue);
 
-        public DiffKind Kind { get; set; }
+        public DiffKind Kind { get; }
 
         private BaselineScaledColumn(DiffKind kind)
         {
@@ -37,21 +36,22 @@ namespace BenchmarkDotNet.Columns
                     case DiffKind.Mean:
                         return "Scaled";
                     case DiffKind.StdDev:
-                        return "Scaled-SD";
+                        return "Scaled-StdDev";
                     case DiffKind.WelchTTestPValue:
                         return "t-test p-value";
+                    default:
+                        throw new NotSupportedException();
                 }
-                throw new NotSupportedException();
             }
         }
 
         public string GetValue(Summary summary, Benchmark benchmark)
         {
             var baseline = summary.Benchmarks.
-                Where(b => b.Job.GetFullInfo() == benchmark.Job.GetFullInfo()).
-                Where(b => b.Parameters.FullInfo == benchmark.Parameters.FullInfo).
+                Where(b => b.Job.DisplayInfo == benchmark.Job.DisplayInfo).
+                Where(b => b.Parameters.DisplayInfo == benchmark.Parameters.DisplayInfo).
                 FirstOrDefault(b => b.Target.Baseline);
-            var invalidResults = baseline == null ||
+            bool invalidResults = baseline == null ||
                                  summary[baseline] == null ||
                                  summary[baseline].ResultStatistics == null ||
                                  summary[baseline].ResultStatistics.Invert() == null ||
@@ -64,8 +64,8 @@ namespace BenchmarkDotNet.Columns
             var baselineStat = summary[baseline].ResultStatistics;
             var targetStat = summary[benchmark].ResultStatistics;
 
-            var mean = benchmark.Target.Baseline ? 1 : Statistics.DivMean(targetStat, baselineStat);
-            var stdDev = benchmark.Target.Baseline ? 0 : Math.Sqrt(Statistics.DivVariance(targetStat, baselineStat));
+            double mean = benchmark.Target.Baseline ? 1 : Statistics.DivMean(targetStat, baselineStat);
+            double stdDev = benchmark.Target.Baseline ? 0 : Math.Sqrt(Statistics.DivVariance(targetStat, baselineStat));
 
             switch (Kind)
             {
@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Columns
                     return stdDev.ToStr("N2");
                 case DiffKind.WelchTTestPValue:
                 {
-                    var pvalue = WelchTTest.Calc(baselineStat, targetStat).PValue;
+                    double pvalue = WelchTTest.Calc(baselineStat, targetStat).PValue;
                     return pvalue > 0.0001 ? pvalue.ToStr("N4") : pvalue.ToStr("e2");
                 }
                 default:
@@ -87,5 +87,6 @@ namespace BenchmarkDotNet.Columns
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Statistics;
         public override string ToString() => ColumnName;
+        public bool IsDefault(Summary summary, Benchmark benchmark) => false;
     }
 }

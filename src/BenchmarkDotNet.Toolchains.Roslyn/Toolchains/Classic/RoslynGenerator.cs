@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Portability;
@@ -21,7 +22,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
             DelteIfExists(artifactsPaths.ExecutablePath);
         }
 
-        protected override void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths)
+        protected override void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)
         {
             var prefix = RuntimeInformation.IsWindows() ? "" : "#!/bin/bash\n";
             var list = new List<string>();
@@ -32,7 +33,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
             list.Add("/target:exe");
             list.Add("/optimize");
             list.Add("/unsafe");
-            list.Add("/platform:" + benchmark.Job.Platform.ToConfig());
+            list.Add("/platform:" + benchmark.Job.Env.Platform.Resolve(resolver).ToConfig());
             list.Add("/appconfig:" + artifactsPaths.AppConfigPath.Escape());
             var references = GetAllReferences(benchmark).Select(assembly => assembly.Location.Escape());
             list.Add("/reference:" + string.Join(",", references));

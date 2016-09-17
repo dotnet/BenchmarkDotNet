@@ -1,31 +1,16 @@
 ﻿using System.Threading;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Attributes.Jobs;
 
 namespace BenchmarkDotNet.Samples.Intro
 {
-    [Config(typeof(Config))]
+    [DryJob]
     public class IntroJobsFull
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(Job.LegacyJitX86.With(Mode.SingleRun).WithLaunchCount(1).WithWarmupCount(1).WithTargetCount(3));
-            }
-        }
-
         [Benchmark(Baseline = true)]
-        public void Sleep()
-        {
-            Thread.Sleep(100);
-        }
+        public void Sleep100() => Thread.Sleep(100);
 
         [Benchmark]
-        public void Sleep50()
-        {
-            Thread.Sleep(50);
-        }
+        public void Sleep50() => Thread.Sleep(50);
     }
 }

@@ -1,22 +1,22 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes.Jobs;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples.JIT
 {
     // See: http://en.wikipedia.org/wiki/Loop_unrolling
     [Config(typeof(Config))]
+    [LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
     public class Jit_ArraySumLoopUnrolling
     {
         private class Config : ManualConfig
         {
             public Config()
             {
-                Add(Job.AllJits);
                 Add(new TagColumn("N", name => (name.Contains("Unroll") ? NUnroll : N).ToString()));
                 Add(new TagColumn("Static", name => name.Contains("NonStatic") ? "No" : "Yes"));
-                Add(PlaceColumn.ArabicNumber);
+                Add(RankColumn.Arabic);
             }
         }
 

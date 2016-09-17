@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Attributes.Jobs
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
     public class JobConfigBaseAttribute : Attribute, IConfigSource
     {
-        protected JobConfigBaseAttribute(params IJob[] jobs)
+        protected JobConfigBaseAttribute(params Job[] jobs)
         {
             Config = ManualConfig.CreateEmpty().With(jobs);
         }

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.Loggers;
 using Xunit;
@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public PlatformConfig(Platform platform)
             {
-                Add(Job.Dry.With(platform).With(Jit.Host));
+                Add(Job.Dry.With(platform));
             }
         }
 
@@ -27,7 +27,9 @@ namespace BenchmarkDotNet.IntegrationTests
         const string HostPlatformOkCaption = "// HostPlatformOkCaption";
         const string BenchmarkNotFound = "// There are no benchmarks found";
 
-        public ProcessorArchitectureTest(ITestOutputHelper outputHelper) : base(outputHelper) {  }
+        public ProcessorArchitectureTest(ITestOutputHelper outputHelper) : base(outputHelper)
+        {
+        }
 
         [Fact]
         public void SpecifiedProccesorArchitectureMustBeRespected()
@@ -37,16 +39,13 @@ namespace BenchmarkDotNet.IntegrationTests
 #endif
             Verify(Platform.X64, typeof(X64Benchmark), X64FailedCaption);
             Verify(Platform.AnyCpu, typeof(AnyCpuBenchmark), "nvm");
-            Verify(Platform.Host, typeof(HostBenchmark), "nvm");
         }
 
         private void Verify(Platform platform, Type benchmark, string failureText)
         {
             var logger = new OutputLogger(Output);
             // make sure we get an output in the TestRunner log
-            var config = new PlatformConfig(platform)
-                                .With(logger)
-                                .With(DefaultConfig.Instance.GetColumns().ToArray());
+            var config = new PlatformConfig(platform).With(logger).With(DefaultColumnProviders.Instance);
 
             CanExecute(benchmark, config);
             var testLog = logger.GetLog();

@@ -7,6 +7,7 @@ namespace BenchmarkDotNet.Columns
     {
         string ColumnName { get; }
         string GetValue(Summary summary, Benchmark benchmark);
+        bool IsDefault(Summary summary, Benchmark benchmark);
         bool IsAvailable(Summary summary);
         bool AlwaysShow { get; }
         ColumnCategory Category { get; }

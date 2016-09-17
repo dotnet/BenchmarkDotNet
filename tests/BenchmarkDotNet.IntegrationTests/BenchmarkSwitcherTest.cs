@@ -1,6 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using System.Linq;
+using BenchmarkDotNet.Attributes.Jobs;
 using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -59,7 +60,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
 namespace BenchmarkDotNet.NOTIntegrationTests
 {
-    [DryConfig]
+    [DryJob]
     public class ClassD
     {
         [Benchmark]

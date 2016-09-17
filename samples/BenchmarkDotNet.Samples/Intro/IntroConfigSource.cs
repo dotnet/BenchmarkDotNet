@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples.Intro

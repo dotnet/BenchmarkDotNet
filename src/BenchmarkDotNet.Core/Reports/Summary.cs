@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
@@ -25,8 +25,8 @@ namespace BenchmarkDotNet.Reports
         public TimeSpan TotalTime { get; }
         public ValidationError[] ValidationErrors { get; }
 
-        private readonly Dictionary<IJob, string> shortInfos;
-        private readonly Lazy<IJob[]> jobs;
+        private readonly Dictionary<Job, string> shortInfos;
+        private readonly Lazy<Job[]> jobs;
         private readonly IDictionary<Benchmark, BenchmarkReport> reportMap = new Dictionary<Benchmark, BenchmarkReport>();
 
         public bool HasReport(Benchmark benchmark) => reportMap.ContainsKey(benchmark);
@@ -52,8 +52,8 @@ namespace BenchmarkDotNet.Reports
 
             TimeUnit = TimeUnit.GetBestTimeUnit(reports.Where(r => r.ResultStatistics != null).Select(r => r.ResultStatistics.Mean).ToArray());
             Table = new SummaryTable(this);
-            shortInfos = new Dictionary<IJob, string>();
-            jobs = new Lazy<IJob[]>(() => Benchmarks.Select(b => b.Job).ToArray());
+            shortInfos = new Dictionary<Job, string>();
+            jobs = new Lazy<Job[]>(() => Benchmarks.Select(b => b.Job).ToArray());
         }
 
         private Summary(string title, HostEnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, ValidationError[] validationErrors, Benchmark[] benchmarks, BenchmarkReport[] reports)
@@ -80,13 +80,5 @@ namespace BenchmarkDotNet.Reports
             return new Summary(title, hostEnvironmentInfo, config, resultsDirectoryPath, TimeSpan.Zero, validationErrors, benchmarks, new BenchmarkReport[0]);
         }
 
-        internal string GetJobShortInfo(IJob job)
-        {
-            string result;
-            if (!shortInfos.TryGetValue(job, out result))
-                shortInfos[job] = result = job.GetShortInfo(jobs.Value);
-
-            return result;
-        }
     }
 }

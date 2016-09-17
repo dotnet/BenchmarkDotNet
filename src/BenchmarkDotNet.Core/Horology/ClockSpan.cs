@@ -5,9 +5,9 @@ namespace BenchmarkDotNet.Horology
     public struct ClockSpan
     {
         public long StartTimestamp, EndTimestamp;
-        public long Frequency;
+        public Frequency Frequency;
 
-        public ClockSpan(long startTimestamp, long endTimestamp, long frequency)
+        public ClockSpan(long startTimestamp, long endTimestamp, Frequency frequency)
         {
             StartTimestamp = startTimestamp;
             EndTimestamp = endTimestamp;

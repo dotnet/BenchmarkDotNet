@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Tests.Loggers;
 using Xunit;
 using Xunit.Abstractions;
@@ -13,7 +15,9 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         protected readonly ITestOutputHelper Output;
 
-        public BenchmarkTestExecutor() { }
+        public BenchmarkTestExecutor()
+        {
+        }
 
         protected BenchmarkTestExecutor(ITestOutputHelper output)
         {
@@ -47,19 +51,13 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             // Add logging, so the Benchmark execution is in the TestRunner output (makes Debugging easier)
             if (config == null)
-            {
                 config = CreateSimpleConfig();
-            }
 
             if (!config.GetLoggers().OfType<OutputLogger>().Any())
-            {
                 config = config.With(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default);
-            }
 
-            if (!config.GetColumns().Any())
-            {
-                config = config.With(DefaultConfig.Instance.GetColumns().ToArray());
-            }
+            if (!config.GetColumnProviders().Any())
+                config = config.With(DefaultColumnProviders.Instance);
 
             // Make sure we ALWAYS combine the Config (default or passed in) with any Config applied to the Type/Class
             var summary = BenchmarkRunner.Run(type, BenchmarkConverter.GetFullConfig(type, config));
@@ -67,11 +65,22 @@ namespace BenchmarkDotNet.IntegrationTests
             if (fullValidation)
             {
                 Assert.False(summary.HasCriticalValidationErrors, "The \"Summary\" should have NOT \"HasCriticalValidationErrors\"");
+
                 Assert.True(summary.Reports.Any(), "The \"Summary\" should contain at least one \"BenchmarkReport\" in the \"Reports\" collection");
+
+                Assert.True(summary.Reports.All(r => r.BuildResult.IsBuildSuccess),
+                    "The following benchmarks are failed to build: " +
+                    string.Join(", ", summary.Reports.Where(r => !r.BuildResult.IsBuildSuccess).Select(r => r.Benchmark.DisplayInfo)));
+
+                Assert.True(summary.Reports.All(r => r.ExecuteResults != null),
+                    "The following benchmarks don't have any execution results: " +
+                    string.Join(", ", summary.Reports.Where(r => r.ExecuteResults == null).Select(r => r.Benchmark.DisplayInfo)));
+                
                 Assert.True(summary.Reports.All(r => r.ExecuteResults.Any(er => er.FoundExecutable && er.Data.Any())),
-                            "All reports should have at least one \"ExecuteResult\" with \"FoundExecutable\" = true and at least one \"Data\" item");
+                    "All reports should have at least one \"ExecuteResult\" with \"FoundExecutable\" = true and at least one \"Data\" item");
+
                 Assert.True(summary.Reports.All(report => report.AllMeasurements.Any()),
-                            "All reports should have at least one \"Measurement\" in the \"AllMeasurements\" collection");
+                    "All reports should have at least one \"Measurement\" in the \"AllMeasurements\" collection");
             }
 
             return summary;
@@ -81,7 +90,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             return new SingleRunFastConfig()
                 .With(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default))
-                .With(DefaultConfig.Instance.GetColumns().ToArray());
+                .With(DefaultColumnProviders.Instance);
         }
     }
 }

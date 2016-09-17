@@ -1,5 +1,7 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -7,7 +9,7 @@ namespace BenchmarkDotNet.Samples
     {
         static void Main(string[] args)
         {
-            new BenchmarkSwitcher(typeof(Program).GetTypeInfo().Assembly).Run(args);            
+            new BenchmarkSwitcher(typeof(Program).GetTypeInfo().Assembly).Run(args);
         }
     }
 }

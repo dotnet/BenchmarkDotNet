@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
@@ -33,7 +34,7 @@ namespace BenchmarkDotNet.Reports
             AllMeasurements = allMeasurements ?? new Measurement[0];
         }
 
-        public override string ToString() => $"{Benchmark.ShortInfo}, {AllMeasurements.Count} runs";
+        public override string ToString() => $"{Benchmark.DisplayInfo}, {AllMeasurements.Count} runs";
     }
 
     public static class BenchmarkReportExtensions

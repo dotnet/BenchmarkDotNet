@@ -1,43 +1,23 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
-using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Samples.Intro
 {
     [Config(typeof(Config))]
+    [OrderProvider(SummaryOrderPolicy.FastestToSlowest)]
     public class IntroGcMode
     {
         private class Config : ManualConfig
         {
             public Config()
             {
-                Add(Job.Dry.With(Mode.SingleRun).WithTargetCount(1).With(new GcMode { Server = true, Force = true }));
-                Add(Job.Dry.With(Mode.SingleRun).WithTargetCount(1).With(new GcMode { Server = true, Force = false }));
-                Add(Job.Dry.With(Mode.SingleRun).WithTargetCount(1).With(new GcMode { Server = false, Force = true }));
-                Add(Job.Dry.With(Mode.SingleRun).WithTargetCount(1).With(new GcMode { Server = false, Force = false }));
-
-                Add(MarkdownExporter.GitHub);
-
-                Set(new FastestToSlowestOrderProvider());
-            }
-
-            private class FastestToSlowestOrderProvider : IOrderProvider
-            {
-                public IEnumerable<Benchmark> GetExecutionOrder(Benchmark[] benchmarks) => benchmarks;
-
-                public IEnumerable<Benchmark> GetSummaryOrder(Benchmark[] benchmarks, Summary summary) =>
-                    from benchmark in benchmarks
-                    orderby summary[benchmark].ResultStatistics.Median
-                    select benchmark;
-
-                public string GetGroupKey(Benchmark benchmark, Summary summary) => null;
+                Add(Job.Dry.WithGcServer(true).WithGcForce(true).WithId("ServerForce"));
+                Add(Job.Dry.WithGcServer(true).WithGcForce(false).WithId("Server"));
+                Add(Job.Dry.WithGcServer(false).WithGcForce(true).WithId("Workstation"));
+                Add(Job.Dry.WithGcServer(false).WithGcForce(false).WithId("WorkstationForce"));
             }
         }
 
@@ -51,16 +31,11 @@ namespace BenchmarkDotNet.Samples.Intro
         public unsafe void AllocateWithStackalloc()
         {
             var array = stackalloc byte[10000];
-            Blackhole(array);
+            Consume(array);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private void Blackhole<T>(T input)
-        {
-        }
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private unsafe void Blackhole(byte* input)
+        private static unsafe void Consume(byte* input)
         {
         }
     }

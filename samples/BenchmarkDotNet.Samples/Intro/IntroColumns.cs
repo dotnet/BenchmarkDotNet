@@ -1,32 +1,19 @@
 ﻿using System;
 using System.Threading;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Attributes.Columns;
+using BenchmarkDotNet.Attributes.Jobs;
+using BenchmarkDotNet.Engines;
 
 namespace BenchmarkDotNet.Samples.Intro
 {
-    [Config(typeof(Config))]
+    [SimpleJob(RunStrategy.ColdStart, launchCount: 1, warmupCount: 0, targetCount: 10, id: "FastJob")]
+    [MinColumn, MaxColumn]
     public class IntroColumns
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(Job.Dry.WithTargetCount(10));
-                Add(StatisticColumn.StdDev);
-                Add(StatisticColumn.Min);
-                Add(StatisticColumn.Max);
-            }
-        }
-
         private readonly Random random = new Random();
 
         [Benchmark]
-        public void Benchmark()
-        {
-            Thread.Sleep(random.Next(2) == 0 ? 10 : 50);
-        }
+        public void Benchmark() => Thread.Sleep(random.Next(2) == 0 ? 10 : 50);
     }
 }

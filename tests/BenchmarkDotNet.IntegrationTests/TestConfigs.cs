@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -23,7 +24,7 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public ThroughputFastConfig()
         {
-            Add(Job.Dry.With(Mode.Throughput).WithTargetCount(1));
+            Add(Job.Dry.With(RunStrategy.Throughput).WithTargetCount(1));
         }
     }
 

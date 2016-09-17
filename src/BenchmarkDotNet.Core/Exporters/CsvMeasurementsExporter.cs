@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -9,6 +10,8 @@ namespace BenchmarkDotNet.Exporters
 {
     public class CsvMeasurementsExporter : ExporterBase
     {
+        private static readonly CharacteristicPresenter Presenter = CharacteristicPresenter.SummaryPresenter;
+
         protected override string FileExtension => "csv";
         protected override string FileCaption => "measurements";
 
@@ -30,19 +33,19 @@ namespace BenchmarkDotNet.Exporters
             }
         }
 
-        // TODO: add params
+        // TODO: rewrite
         private readonly MeasurementColumn[] columns =
         {
-            new MeasurementColumn("Target", (summary, report, m) => report.Benchmark.Target.Type.Name + "." +report.Benchmark.Target.MethodTitle),
+            new MeasurementColumn("Target", (summary, report, m) => report.Benchmark.Target.Type.Name + "." +report.Benchmark.Target.MethodDisplayInfo),
             new MeasurementColumn("TargetType", (summary, report, m) => report.Benchmark.Target.Type.Name),
-            new MeasurementColumn("TargetMethod", (summary, report, m) => report.Benchmark.Target.MethodTitle),
+            new MeasurementColumn("TargetMethod", (summary, report, m) => report.Benchmark.Target.MethodDisplayInfo),
 
-            new MeasurementColumn("Job", (summary, report, m) => summary.GetJobShortInfo(report.Benchmark.Job)),
-            new MeasurementColumn("JobMode", (summary, report, m) => report.Benchmark.Job.Mode.ToString()),
-            new MeasurementColumn("JobPlatform", (summary, report, m) => report.Benchmark.Job.Platform.ToString()),
-            new MeasurementColumn("JobJit", (summary, report, m) => report.Benchmark.Job.Jit.ToString()),
-            new MeasurementColumn("JobToolchain", (summary, report, m) => report.Benchmark.Job.Toolchain?.Name ?? report.Benchmark.Job.Runtime.ToString()),
-            new MeasurementColumn("JobRuntime", (summary, report, m) => report.Benchmark.Job.Runtime.ToString()),
+            new MeasurementColumn("Job", (summary, report, m) => report.Benchmark.Job.DisplayInfo),
+            new MeasurementColumn("JobRunStrategy", (summary, report, m) => Presenter.ToPresentation(report.Benchmark.Job.Run.RunStrategy)),
+            new MeasurementColumn("JobPlatform", (summary, report, m) => Presenter.ToPresentation(report.Benchmark.Job.Env.Platform)),
+            new MeasurementColumn("JobJit", (summary, report, m) => Presenter.ToPresentation(report.Benchmark.Job.Env.Jit)),
+            new MeasurementColumn("JobToolchain", (summary, report, m) => Presenter.ToPresentation(report.Benchmark.Job.Infra.Toolchain)),
+            new MeasurementColumn("JobRuntime", (summary, report, m) => Presenter.ToPresentation(report.Benchmark.Job.Env.Runtime)),
 
             new MeasurementColumn("Params", (summary, report, m) => report.Benchmark.Parameters.PrintInfo),
 
@@ -76,6 +79,6 @@ namespace BenchmarkDotNet.Exporters
             }
         }
 
-        public static IJob[] GetJobs(Summary summary) => summary.Benchmarks.Select(b => b.Job).ToArray();
+        public static Job[] GetJobs(Summary summary) => summary.Benchmarks.Select(b => b.Job).ToArray();
     }
 }

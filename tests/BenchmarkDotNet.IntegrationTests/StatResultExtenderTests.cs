@@ -4,8 +4,8 @@ using System.Threading;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Loggers;
 using Xunit;
 using Xunit.Abstractions;
@@ -14,7 +14,9 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class StatResultExtenderTests : BenchmarkTestExecutor
     {
-        public StatResultExtenderTests(ITestOutputHelper output) : base(output) { }
+        public StatResultExtenderTests(ITestOutputHelper output) : base(output)
+        {
+        }
 
         [Fact]
         public void ExtraColumnsCanBeDefined()
@@ -33,10 +35,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 StatisticColumn.P95,
                 StatisticColumn.P95
             };
-            var config = DefaultConfig.Instance
-                .With(Job.Dry.WithTargetCount(10).WithIterationTime(10))
-                .With(logger)
-                .With(columns);
+            var config = DefaultConfig.Instance.With(CreateJob()).With(logger).With(columns);
             var summary = CanExecute<Target>(config);
 
             var table = summary.Table;
@@ -45,22 +44,21 @@ namespace BenchmarkDotNet.IntegrationTests
                 Assert.True(headerRow.Contains(column.ColumnName));
         }
 
-        [Config(typeof(SingleRunMediumConfig))]
+        private static Job CreateJob() =>
+            Job.Dry.
+                WithTargetCount(10).
+                WithIterationTime(TimeInterval.Millisecond * 10).
+                WithId("MainJob");
+
         public class Target
         {
             private readonly Random random = new Random(42);
 
             [Benchmark]
-            public void Main50()
-            {
-                Thread.Sleep(50 + random.Next(50));
-            }
+            public void Sleep50() => Thread.Sleep(50 + random.Next(50));
 
             [Benchmark]
-            public void Main100()
-            {
-                Thread.Sleep(100 + random.Next(50));
-            }
+            public void Sleep100() => Thread.Sleep(100 + random.Next(50));
         }
     }
 }

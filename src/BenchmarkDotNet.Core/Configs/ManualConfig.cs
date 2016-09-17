@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
@@ -12,22 +14,22 @@ namespace BenchmarkDotNet.Configs
 {
     public class ManualConfig : IConfig
     {
-        private readonly List<IColumn> columns = new List<IColumn>();
+        private readonly List<IColumnProvider> columnProviders = new List<IColumnProvider>();
         private readonly List<IExporter> exporters = new List<IExporter>();
         private readonly List<ILogger> loggers = new List<ILogger>();
         private readonly List<IDiagnoser> diagnosers = new List<IDiagnoser>();
         private readonly List<IAnalyser> analysers = new List<IAnalyser>();
         private readonly List<IValidator> validators = new List<IValidator>();
-        private readonly List<IJob> jobs = new List<IJob>();
+        private readonly List<Job> jobs = new List<Job>();
         private IOrderProvider orderProvider = null;
 
-        public IEnumerable<IColumn> GetColumns() => columns;
+        public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;
         public IEnumerable<ILogger> GetLoggers() => loggers;
         public IEnumerable<IDiagnoser> GetDiagnosers() => diagnosers;
         public IEnumerable<IAnalyser> GetAnalysers() => analysers;
         public IEnumerable<IValidator> GetValidators() => validators;
-        public IEnumerable<IJob> GetJobs() => jobs;
+        public IEnumerable<Job> GetJobs() => jobs;
 
         public IOrderProvider GetOrderProvider() => orderProvider;
 
@@ -35,18 +37,19 @@ namespace BenchmarkDotNet.Configs
 
         public bool KeepBenchmarkFiles { get; set; }
 
-        public void Add(params IColumn[] newColumns) => columns.AddRange(newColumns);
+        public void Add(params IColumn[] newColumns) => columnProviders.AddRange(newColumns.Select(c => c.ToProvider()));
+        public void Add(params IColumnProvider[] newColumnProviders) => columnProviders.AddRange(newColumnProviders);
         public void Add(params IExporter[] newExporters) => exporters.AddRange(newExporters);
         public void Add(params ILogger[] newLoggers) => loggers.AddRange(newLoggers);
         public void Add(params IDiagnoser[] newDiagnosers) => diagnosers.AddRange(newDiagnosers);
         public void Add(params IAnalyser[] newAnalysers) => analysers.AddRange(newAnalysers);
         public void Add(params IValidator[] newValidators) => validators.AddRange(newValidators);
-        public void Add(params IJob[] newJobs) => jobs.AddRange(newJobs);
+        public void Add(params Job[] newJobs) => jobs.AddRange(newJobs);
         public void Set(IOrderProvider provider) => orderProvider = provider ?? orderProvider;
 
         public void Add(IConfig config)
         {
-            columns.AddRange(config.GetColumns());
+            columnProviders.AddRange(config.GetColumnProviders());
             exporters.AddRange(config.GetExporters());
             loggers.AddRange(config.GetLoggers());
             diagnosers.AddRange(config.GetDiagnosers());
@@ -81,6 +84,8 @@ namespace BenchmarkDotNet.Configs
                     manualConfig.Add(globalConfig);
                     manualConfig.Add(localConfig);
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
             return manualConfig;
         }

@@ -1,10 +1,11 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes.Jobs;
 using BenchmarkDotNet.Running;
 using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests.Classic
 {
-    [DryConfig]
+    [DryJob]
     public class AssemblyConfigBenchmarks
     {
         [Benchmark]

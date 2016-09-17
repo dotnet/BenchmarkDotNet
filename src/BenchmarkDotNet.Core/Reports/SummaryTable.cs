@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Order;
 
 namespace BenchmarkDotNet.Reports
@@ -18,6 +17,7 @@ namespace BenchmarkDotNet.Reports
         public string[][] FullContent { get; }
         public bool[] FullContentStartOfGroup { get; }
         public string[][] FullContentWithHeader { get; }
+        public bool[] IsDefault { get; }
 
         internal SummaryTable(Summary summary)
         {
@@ -31,28 +31,18 @@ namespace BenchmarkDotNet.Reports
                 FullContent = new string[0][];
                 FullContentStartOfGroup = new bool[0];
                 FullContentWithHeader = new string[0][];
+                IsDefault = new bool[0];
                 return;
             }
 
-            var configColumns = summary.Config.
-                GetColumns().
-                Where(c => c.IsAvailable(summary));
-            var paramColumns = summary.Benchmarks.
-                SelectMany(b => b.Parameters.Items.Select(item => item.Name)).
-                Distinct().
-                Select(name => new ParamColumn(name));
-            var diagnoserColumns = summary.Config.
-                GetDiagnosers().
-                Where(d => d is IColumnProvider).
-                Cast<IColumnProvider>().
-                SelectMany(cp => cp.GetColumns);
-            var columns = configColumns.Concat(paramColumns).Concat(diagnoserColumns).ToArray().OrderBy(c => c.Category).ToArray();
+            var columns = summary.GetColumns();
 
             ColumnCount = columns.Length;
             FullHeader = columns.Select(c => c.ColumnName).ToArray();
 
             var orderProvider = summary.Config.GetOrderProvider() ?? DefaultOrderProvider.Instance;
             FullContent = summary.Reports.Select(r => columns.Select(c => c.GetValue(summary, r.Benchmark)).ToArray()).ToArray();
+            IsDefault = columns.Select(c => summary.Reports.All(r => c.IsDefault(summary, r.Benchmark))).ToArray();
             var groupKeys = summary.Benchmarks.Select(b => orderProvider.GetGroupKey(b, summary)).ToArray();
             FullContentStartOfGroup = new bool[summary.Reports.Length];
 
@@ -77,7 +67,7 @@ namespace BenchmarkDotNet.Reports
             public string[] Content { get; }
             public bool NeedToShow { get; }
             public int Width { get; }
-            public bool IsTrivial { get; }
+            public bool IsDefault { get; }
 
             public SummaryTableColumn(SummaryTable table, int index, bool alwaysShow)
             {
@@ -86,9 +76,7 @@ namespace BenchmarkDotNet.Reports
                 Content = table.FullContent.Select(line => line[index]).ToArray();
                 NeedToShow = alwaysShow || Content.Distinct().Count() > 1;
                 Width = Math.Max(Header.Length, Content.Any() ? Content.Max(line => line.Length) : 0) + 1;
-                IsTrivial = Header.IsOneOf("Platform", "Jit", "Framework", "Runtime", "LaunchCount", "WarmupCount", "TargetCount", "Affinity", "Toolchain", "GcMode") &&
-                            Content.Distinct().Count() == 1 &&
-                            Content.First().IsOneOf("Host", "Auto", "Classic");
+                IsDefault = table.IsDefault[index];
             }
 
             public override string ToString() => Header;

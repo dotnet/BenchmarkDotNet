@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Loggers

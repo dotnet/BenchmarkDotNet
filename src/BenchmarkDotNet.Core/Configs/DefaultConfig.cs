@@ -22,27 +22,7 @@ namespace BenchmarkDotNet.Configs
         {
         }
 
-        public IEnumerable<IColumn> GetColumns()
-        {
-            yield return PropertyColumn.Type;
-            yield return PropertyColumn.Method;
-            yield return PropertyColumn.Mode;
-            yield return PropertyColumn.Platform;
-            yield return PropertyColumn.Jit;
-            yield return PropertyColumn.Toolchain;
-            yield return PropertyColumn.Runtime;
-            yield return PropertyColumn.GcMode;
-            yield return PropertyColumn.LaunchCount;
-            yield return PropertyColumn.WarmupCount;
-            yield return PropertyColumn.TargetCount;
-            yield return PropertyColumn.Affinity;
-
-            yield return StatisticColumn.Median;
-            yield return StatisticColumn.StdDev;
-
-            yield return BaselineScaledColumn.Scaled;
-            yield return BaselineScaledColumn.ScaledStdDev;
-        }
+        public IEnumerable<IColumnProvider> GetColumnProviders() => DefaultColumnProviders.Instance;
 
         public IEnumerable<IExporter> GetExporters()
         {
@@ -69,7 +49,7 @@ namespace BenchmarkDotNet.Configs
             yield return JitOptimizationsValidator.DontFailOnError;
         }
 
-        public IEnumerable<IJob> GetJobs() => Enumerable.Empty<IJob>();
+        public IEnumerable<Job> GetJobs() => Enumerable.Empty<Job>();
 
         public IOrderProvider GetOrderProvider() => null;
 
@@ -95,13 +75,13 @@ namespace BenchmarkDotNet.Configs
                 {
                     var errorMsg =
                         $"Unable to load: {diagnosticAssembly} version {loadedAssembly.GetName().Version}" +
-                        Environment.NewLine +
+                        System.Environment.NewLine +
                         $"Does not match: {System.IO.Path.GetFileName(thisAssembly.Location)} version {thisAssembly.GetName().Version}";
                     ConsoleLogger.Default.WriteLineError(errorMsg);
                 }
                 else
                 {
-                    return new[] 
+                    return new[]
                     {
                         GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.Windows.MemoryDiagnoser"),
                         GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.Windows.InliningDiagnoser"),
@@ -119,7 +99,7 @@ namespace BenchmarkDotNet.Configs
         private static IDiagnoser GetDiagnoser(Assembly loadedAssembly, string typeName)
         {
             var diagnoserType = loadedAssembly.GetType(typeName);
-            return (IDiagnoser)Activator.CreateInstance(diagnoserType);
+            return (IDiagnoser) Activator.CreateInstance(diagnoserType);
         }
     }
 }

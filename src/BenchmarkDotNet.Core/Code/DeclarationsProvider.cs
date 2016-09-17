@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
@@ -34,12 +33,6 @@ namespace BenchmarkDotNet.Code
 
         public abstract string TargetMethodReturnTypeNamespace { get; }
 
-        public abstract string TargetMethodReturnType { get; }
-
-        public abstract string TargetMethodResultHolder { get; }
-
-        public abstract string TargetMethodHoldValue { get; }
-
         public abstract string TargetMethodDelegateType { get; }
 
         public abstract string IdleMethodReturnType { get; }
@@ -47,6 +40,8 @@ namespace BenchmarkDotNet.Code
         public abstract string IdleMethodDelegateType { get; }
 
         public abstract string IdleImplementation { get; }
+
+        public abstract string HasReturnValue { get; }
     }
 
     internal class VoidDeclarationsProvider : DeclarationsProvider
@@ -55,19 +50,15 @@ namespace BenchmarkDotNet.Code
 
         public override string TargetMethodReturnTypeNamespace => string.Empty;
 
-        public override string TargetMethodReturnType => "void";
-
-        public override string TargetMethodResultHolder => string.Empty;
-
-        public override string TargetMethodHoldValue => string.Empty;
-
         public override string TargetMethodDelegateType => "Action";
 
-        public override string IdleMethodReturnType => TargetMethodReturnType;
+        public override string IdleMethodReturnType => "void";
 
         public override string IdleMethodDelegateType => TargetMethodDelegateType;
 
         public override string IdleImplementation => string.Empty;
+
+        public override string HasReturnValue => "false";
     }
 
     internal class NonVoidDeclarationsProvider : DeclarationsProvider
@@ -80,11 +71,7 @@ namespace BenchmarkDotNet.Code
                     ? string.Empty 
                     : $"using {Target.Method.ReturnType.Namespace};";
 
-        public override string TargetMethodReturnType => Target.Method.ReturnType.GetCorrectTypeName();
-
-        public override string TargetMethodResultHolder => $"private {TargetMethodReturnType} value;";
-
-        public override string TargetMethodHoldValue => "value = ";
+        public virtual string TargetMethodReturnType => Target.Method.ReturnType.GetCorrectTypeName();
 
         public override string TargetMethodDelegateType => $"Func<{TargetMethodReturnType}>";
 
@@ -102,6 +89,8 @@ namespace BenchmarkDotNet.Code
             => Target.Method.ReturnType.GetTypeInfo().IsValueType
                 ? "return 0;"
                 : "return null;";
+
+        public override string HasReturnValue => "true";
     }
 
     internal class TaskDeclarationsProvider : VoidDeclarationsProvider
@@ -129,7 +118,7 @@ namespace BenchmarkDotNet.Code
             invokerFullName = invoker.GetTypeInfo().FullName.Split(GenericArgumentSign).First();
         }
 
-        public override string TargetMethodReturnType 
+        public override string TargetMethodReturnType
             => Target.Method.ReturnType.GetTypeInfo().GetGenericArguments().Single().GetCorrectTypeName();
 
         public override string TargetMethodDelegate

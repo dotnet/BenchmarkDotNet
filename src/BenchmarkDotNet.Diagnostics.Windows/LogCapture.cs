@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             CapturedOutput.Add(new OutputLine
             {
                 Kind = LogKind.Default,
-                Text = Environment.NewLine
+                Text = System.Environment.NewLine
             });
         }
 

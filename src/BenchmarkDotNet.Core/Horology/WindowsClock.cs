@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Horology
         private static extern bool QueryPerformanceFrequency(out long value);
 
         public bool IsAvailable => isAvailable;
-        public long Frequency => frequency;
+        public Frequency Frequency => new Frequency(frequency);
         
         public long GetTimestamp()
         {

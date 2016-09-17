@@ -20,16 +20,17 @@ namespace BenchmarkDotNet.Configs
         public static IValidator GetCompositeValidator(this IConfig config) => new CompositeValidator(config.GetValidators().ToArray());
 
         public static IConfig With(this IConfig config, params IColumn[] columns) => config.With(m => m.Add(columns));
+        public static IConfig With(this IConfig config, params IColumnProvider[] columnProviders) => config.With(m => m.Add(columnProviders));
         public static IConfig With(this IConfig config, params ILogger[] loggers) => config.With(m => m.Add(loggers));
         public static IConfig With(this IConfig config, params IExporter[] exporters) => config.With(m => m.Add(exporters));
         public static IConfig With(this IConfig config, params IDiagnoser[] diagnosers) => config.With(m => m.Add(diagnosers));
         public static IConfig With(this IConfig config, params IAnalyser[] analysers) => config.With(m => m.Add(analysers));
         public static IConfig With(this IConfig config, params IValidator[] validators) => config.With(m => m.Add(validators));
-        public static IConfig With(this IConfig config, params IJob[] jobs) => config.With(m => m.Add(jobs));
+        public static IConfig With(this IConfig config, params Job[] jobs) => config.With(m => m.Add(jobs));
         public static IConfig With(this IConfig config, IOrderProvider provider) => config.With(m => m.Set(provider));
 
-        public static IConfig KeepBenchmarkFiles(this IConfig config) => config.With(m => m.KeepBenchmarkFiles = true);
-        public static IConfig RemoveBenchmarkFiles(this IConfig config) => config.With(m => m.KeepBenchmarkFiles = false);
+        public static IConfig KeepBenchmarkFiles(this IConfig config, bool value = true) => config.With(m => m.KeepBenchmarkFiles = value);
+        public static IConfig RemoveBenchmarkFiles(this IConfig config) => config.KeepBenchmarkFiles(false);
 
         private static IConfig With(this IConfig config, Action<ManualConfig> addAction)
         {

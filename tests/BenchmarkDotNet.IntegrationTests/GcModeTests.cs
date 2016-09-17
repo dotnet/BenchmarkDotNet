@@ -5,6 +5,9 @@ using Xunit.Abstractions;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
+#if CLASSIC
+using BenchmarkDotNet.Environments;
+#endif
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -12,47 +15,47 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public GcModeTests(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
-        private IConfig CreateConfig(GcMode gcMode) => ManualConfig.CreateEmpty().With(Job.Dry.With(gcMode));
+        private IConfig CreateConfig(GcMode gc) => ManualConfig.CreateEmpty().With(Job.Dry.With(gc));
 
         [Fact]
         public void CanHostGcMode()
         {
-            var config = CreateConfig(null);
+            var config = CreateConfig(GcMode.Default);
             CanExecute<WorkstationGcOnly>(config);
         }
 
         [Fact(Skip = "It fails on appveyor")]
         public void CanEnableServerGcMode()
         {
-            var config = CreateConfig(new GcMode {Server = true});
+            var config = CreateConfig(GcMode.Default.WithServer(true));
             CanExecute<ServerModeEnabled>(config);
         }
 
         [Fact]
         public void CanDisableServerGcMode()
         {
-            var config = CreateConfig(new GcMode {Server = false});
+            var config = CreateConfig(GcMode.Default.WithServer(false));
             CanExecute<WorkstationGcOnly>(config);
         }
 
         [Fact]
         public void CanEnableConcurrentGcMode()
         {
-            var config = CreateConfig(new GcMode {Concurrent = true});
+            var config = CreateConfig(GcMode.Default.WithConcurrent(true));
             CanExecute<ConcurrentModeEnabled>(config);
         }
 
         [Fact]
         public void CanDisableConcurrentGcMode()
         {
-            var config = CreateConfig(new GcMode {Concurrent = false});
+            var config = CreateConfig(GcMode.Default.WithConcurrent(false));
             CanExecute<ConcurrentModeDisabled>(config);
         }
 
         [Fact]
         public void CanAvoidForcingGarbageCollections()
         {
-            var config = CreateConfig(new GcMode {Force = false});            
+            var config = CreateConfig(GcMode.Default.WithForce(false));
             CanExecute<AvoidForcingGarbageCollection>(config);
         }
 
@@ -60,8 +63,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void CanAllowToCreateVeryLargeObjectsFor64Bit()
         {
-            var config = ManualConfig.CreateEmpty()
-                                     .With(Job.Dry.With(Platform.X64).With(new GcMode { AllowVeryLargeObjects = true }));
+            var config = ManualConfig.CreateEmpty().With(Job.Dry.With(Platform.X64).WithGcAllowVeryLargeObjects(true));
 
             CanExecute<CreateVeryLargeObjects>(config);
         }

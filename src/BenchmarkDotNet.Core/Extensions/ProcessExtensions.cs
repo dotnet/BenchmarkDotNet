@@ -21,9 +21,9 @@ namespace BenchmarkDotNet.Extensions
             }
         }
 
-        public static void EnsureProcessorAffinity(this Process process, int value)
+        public static void EnsureProcessorAffinity(this Process process, IntPtr value)
         {
-            process.ProcessorAffinity = new IntPtr(value);
+            process.ProcessorAffinity = value;
         }
     }
 }

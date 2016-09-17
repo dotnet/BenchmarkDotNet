@@ -11,8 +11,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         protected string GetSessionName(string prefix, Benchmark benchmark, ParameterInstances parameters = null)
         {
             if (parameters != null && parameters.Items.Count > 0)
-                return $"{prefix}-{benchmark.ShortInfo}-{parameters.FullInfo}";
-            return $"{prefix}-{benchmark.ShortInfo}";
+                return $"{prefix}-{benchmark.FolderInfo}-{parameters.FolderInfo}";
+            return $"{prefix}-{benchmark.FolderInfo}";
         }
     }
 }

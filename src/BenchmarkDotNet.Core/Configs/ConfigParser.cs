@@ -59,27 +59,25 @@ namespace BenchmarkDotNet.Configs
             } },
         };
 
-        private static Dictionary<string, IJob[]> availableJobs =
-            new Dictionary<string, IJob[]>
+        private static Dictionary<string, Job[]> availableJobs =
+            new Dictionary<string, Job[]>
             {
                 { "default", new [] { Job.Default } },
                 { "legacyjitx86", new[] { Job.LegacyJitX86 } },
                 { "legacyjitx64", new[] { Job.LegacyJitX64 } },
                 { "ryujitx64", new[] { Job.RyuJitX64 } },
                 { "dry", new[] { Job.Dry } },
-                { "alljits", Job.AllJits },
                 { "clr", new[] { Job.Clr } },
                 { "mono", new[] { Job.Mono } },
-                { "monollvm", new[] { Job.MonoLlvm } },
                 { "longrun", new[] { Job.LongRun } }
             };
-        private static Lazy<IJob[]> allJobs = new Lazy<IJob[]>(() => availableJobs.SelectMany(e => e.Value).ToArray());
+        private static Lazy<Job[]> allJobs = new Lazy<Job[]>(() => availableJobs.SelectMany(e => e.Value).ToArray());
 
         private static Dictionary<string, IColumn[]> availableColumns =
             new Dictionary<string, IColumn[]>
             {
                 { "mean", new [] { StatisticColumn.Mean } },
-                { "stderror", new[] { StatisticColumn.StdError } },
+                { "stderror", new[] { StatisticColumn.StdErr } },
                 { "stddev", new[] { StatisticColumn.StdDev } },
                 { "operationpersecond", new [] { StatisticColumn.OperationsPerSecond } },
                 { "min", new[] { StatisticColumn.Min } },
@@ -88,7 +86,7 @@ namespace BenchmarkDotNet.Configs
                 { "q3", new[] { StatisticColumn.Q3 } },
                 { "max", new[] { StatisticColumn.Max } },
                 { "allstatistics", StatisticColumn.AllStatistics  },
-                { "place", new[] { PlaceColumn.ArabicNumber } }
+                { "rank", new[] { RankColumn.Arabic } }
             };
         private static Lazy<IColumn[]> allColumns = new Lazy<IColumn[]>(() => availableColumns.SelectMany(e => e.Value).ToArray());
 
@@ -169,7 +167,7 @@ namespace BenchmarkDotNet.Configs
                 var explanation = $"Allowed values: ";
                 logger.WriteInfo($": {explanation}");
 
-                var maxWidth = outputWidth - prefixWidth - explanation.Length - Environment.NewLine.Length - breakText.Length;
+                var maxWidth = outputWidth - prefixWidth - explanation.Length - System.Environment.NewLine.Length - breakText.Length;
                 var lines = StringAndTextExtensions.Wrap(parameters, maxWidth);
                 if (lines.Count == 0)
                 {

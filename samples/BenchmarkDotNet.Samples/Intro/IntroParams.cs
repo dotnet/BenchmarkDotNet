@@ -12,9 +12,6 @@ namespace BenchmarkDotNet.Samples.Intro
         public int B { get; set; }
 
         [Benchmark]
-        public void Benchmark()
-        {
-            Thread.Sleep(A + B + 5);
-        }
+        public void Benchmark() => Thread.Sleep(A + B + 5);
     }
 }

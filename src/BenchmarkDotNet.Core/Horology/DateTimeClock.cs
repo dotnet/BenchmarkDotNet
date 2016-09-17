@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Horology
         private const long TicksPerSecond = (long)10 * 1000 * 1000;
 
         public bool IsAvailable => true;
-        public long Frequency => TicksPerSecond;
+        public Frequency Frequency => new Frequency(TicksPerSecond);
         public long GetTimestamp() => DateTime.UtcNow.Ticks;
     }
 }

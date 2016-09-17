@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
-using BenchmarkDotNet.Extensions;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Running
 {
@@ -12,11 +13,15 @@ namespace BenchmarkDotNet.Running
         public MethodInfo CleanupMethod { get; }
         public string AdditionalLogic { get; }
         public int OperationsPerInvoke { get; }
-        public string MethodTitle { get; }
+        public string MethodDisplayInfo { get; }
         public int MethodIndex { get; }
         public bool Baseline { get; }
 
-        public string FullInfo => (Type?.Name.WithoutSuffix("Competition") ?? "Untitled") + "_" + (Method?.Name ?? "Untitled");
+        private string TypeInfo => Type?.Name ?? "Untitled";
+        private string MethodFolderInfo => Method?.Name ?? "Untitled";
+
+        public string FolderInfo => TypeInfo + "_" + MethodFolderInfo;
+        public string DisplayInfo => TypeInfo + "." + MethodDisplayInfo;
 
         public Target(
             Type type,
@@ -35,11 +40,19 @@ namespace BenchmarkDotNet.Running
             CleanupMethod = cleanupMethod;
             OperationsPerInvoke = operationsPerInvoke;
             AdditionalLogic = additionalLogic ?? string.Empty;
-            MethodTitle = description ?? method?.Name ?? "Untitled";
+            MethodDisplayInfo = FormatDescription(description) ?? method?.Name ?? "Untitled";
             Baseline = baseline;
             MethodIndex = methodIndex;
         }
 
-        public override string ToString() => FullInfo;
+        public override string ToString() => DisplayInfo;
+
+        private static string FormatDescription([CanBeNull] string description)
+        {
+            var specialSymbols = new[] { ' ', '\'', '[', ']' };
+            return description != null && specialSymbols.Any(description.Contains)
+                ? "'" + description + "'"
+                : description;
+        }
     }
 }

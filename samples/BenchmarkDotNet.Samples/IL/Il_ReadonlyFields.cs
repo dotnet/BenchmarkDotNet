@@ -4,7 +4,7 @@ using BenchmarkDotNet.Attributes.Jobs;
 namespace BenchmarkDotNet.Samples.IL
 {
     // See: http://codeblog.jonskeet.uk/2014/07/16/micro-optimization-the-surprising-inefficiency-of-readonly-fields/
-    [AllJitsJob]
+    [LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
     public class IL_ReadonlyFields
     {
         public struct Int256

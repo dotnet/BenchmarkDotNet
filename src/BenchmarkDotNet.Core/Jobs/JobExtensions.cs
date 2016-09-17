@@ -1,156 +1,53 @@
-﻿using BenchmarkDotNet.Toolchains;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using BenchmarkDotNet.Extensions;
+﻿using System;
+using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Horology;
 
 namespace BenchmarkDotNet.Jobs
 {
     public static class JobExtensions
     {
-        public static IJob With(this IJob job, Mode mode) => job.With(j => j.Mode = mode);
-        public static IJob With(this IJob job, Platform platform) => job.With(j => j.Platform = platform);
-        public static IJob With(this IJob job, Jit jit) => job.With(j => j.Jit = jit);
-        public static IJob With(this IJob job, IToolchain toolchain) => job.With(j => j.Toolchain = toolchain);
-        public static IJob With(this IJob job, Runtime runtime) => job.With(j => j.Runtime = runtime);
-        public static IJob With(this IJob job, GcMode gcMode) => job.With(j => j.GcMode = gcMode);
-        public static IJob WithLaunchCount(this IJob job, Count launchCount) => job.With(j => j.LaunchCount = launchCount);
-        public static IJob WithWarmupCount(this IJob job, Count warmupCount) => job.With(j => j.WarmupCount = warmupCount);
-        public static IJob WithTargetCount(this IJob job, Count targetCount) => job.With(j => j.TargetCount = targetCount);
-        public static IJob WithAffinity(this IJob job, Count affinity) => job.With(j => j.Affinity = affinity);
+        // General
+        public static Job With<T>(this Job job, ICharacteristic<T> characteristic) => Job.Parse(job.ToSet().Mutate(characteristic));
 
-        /// <summary>
-        /// Create a new job as a copy of the original job with specific time of a single iteration
-        /// </summary>
-        /// <param name="job">Original job</param>
-        /// <param name="iterationTime">Iteration time in Millisecond or Auto</param>
-        /// <returns></returns>
-        public static IJob WithIterationTime(this IJob job, Count iterationTime) => job.With(j => j.IterationTime = iterationTime);
+        // Env
+        public static Job With(this Job job, Platform platform) => job.With(job.Env.Platform.Mutate(platform));
+        public static Job With(this Job job, Jit jit) => job.With(job.Env.Jit.Mutate(jit));
+        public static Job With(this Job job, Runtime runtime) => job.With(job.Env.Runtime.Mutate(runtime));
+        public static Job WithAffinity(this Job job, IntPtr affinity) => job.With(job.Env.Affinity.Mutate(affinity));
+        public static Job WithGcServer(this Job job, bool value) => job.With(job.Env.Gc.Server.Mutate(value));
+        public static Job WithGcConcurrent(this Job job, bool value) => job.With(job.Env.Gc.Concurrent.Mutate(value));
+        public static Job WithGcCpuGroups(this Job job, bool value) => job.With(job.Env.Gc.CpuGroups.Mutate(value));
+        public static Job WithGcForce(this Job job, bool value) => job.With(job.Env.Gc.Force.Mutate(value));
+        public static Job WithGcAllowVeryLargeObjects(this Job job, bool value) => job.With(job.Env.Gc.AllowVeryLargeObjects.Mutate(value));
+        public static Job With(this Job job, GcMode gc) => job.Mutate(gc.ToMutator());
 
-        public static Property[] GetAllProperties(this IJob job)
-        {
-            return new[]
-            {
-                new Property(nameof(Mode), job.Mode.ToString()),
-                new Property(nameof(Platform), job.Platform.ToString()),
-                new Property(nameof(Jit), job.Jit.ToString()),
-                new Property(nameof(Runtime), job.Runtime.ToString()),
-                new Property(nameof(GcMode), job.GcMode.ToString()),
-                new Property(nameof(IJob.WarmupCount), job.WarmupCount.ToString()),
-                new Property(nameof(IJob.TargetCount), job.TargetCount.ToString()),
-                new Property(nameof(IJob.LaunchCount), job.LaunchCount.ToString()),
-                new Property(nameof(IJob.IterationTime), job.IterationTime.ToString()),
-                new Property(nameof(IJob.Affinity), job.Affinity.ToString())
-            };
-        }
+        // Run
+        public static Job With(this Job job, RunStrategy strategy) => job.With(job.Run.RunStrategy.Mutate(strategy));
+        public static Job WithLaunchCount(this Job job, int count) => job.With(job.Run.LaunchCount.Mutate(count));
+        public static Job WithWarmupCount(this Job job, int count) => job.With(job.Run.WarmupCount.Mutate(count));
+        public static Job WithTargetCount(this Job job, int count) => job.With(job.Run.TargetCount.Mutate(count));
+        public static Job WithIterationTime(this Job job, TimeInterval time) => job.With(job.Run.IterationTime.Mutate(time));
+        public static Job WithInvocationCount(this Job job, int count) => job.With(job.Run.InvocationCount.Mutate(count));
 
-        public static string GetFullInfo(this IJob job) => string.Join("_", job.AllProperties.Select(p => $"{p.Name}-{p.Value}"));
+        // Infra
+        public static Job With(this Job job, IToolchain toolchain) => job.With(job.Infra.Toolchain.Mutate(toolchain));
+        public static Job With(this Job job, IClock clock) => job.With(job.Infra.Clock.Mutate(clock));
+        public static Job With(this Job job, IEngine engine) => job.With(job.Infra.Engine.Mutate(engine));
 
-        public static string GetShortInfo(this IJob job, IJob[] allJobs = null)
-        {
-            // TODO: make it automatically
-            string shortInfo;
-            if (TryGetShortInfoForPredefinedJobs(job, out shortInfo))
-            {
-                return shortInfo;
-            }
+        // Accuracy
+        public static Job WithMaxStdErrRelative(this Job job, double value) => job.With(job.Accuracy.MaxStdErrRelative.Mutate(value));
+        public static Job WithMinIterationTime(this Job job, TimeInterval value) => job.With(job.Accuracy.MinIterationTime.Mutate(value));
+        public static Job WithMinInvokeCount(this Job job, int value) => job.With(job.Accuracy.MinInvokeCount.Mutate(value));
+        public static Job WithEvaluateOverhead(this Job job, bool value) => job.With(job.Accuracy.EvaluateOverhead.Mutate(value));
+        public static Job WithRemoveOutliers(this Job job, bool value) => job.With(job.Accuracy.RemoveOutliers.Mutate(value));
 
-            var defaultJobProperties = Job.Default.AllProperties;
-            var ownProperties = job.AllProperties;
-
-            var nonDefaultProperties = ownProperties
-                .Where((ownProperty, propertyIndex) => ownProperty.Value != defaultJobProperties[propertyIndex].Value
-                    && (allJobs == null || MoreThanOneJobHaveUniquePropertyValue(allJobs, propertyIndex)));
-
-            return string.Join("_", nonDefaultProperties.Select(property => property.GetShortInfo()));
-        }
-
-        public static string GenerateWithDefinitions(this IJob job)
-        {
-            var builder = new StringBuilder(80);
-            builder.Append($".With(BenchmarkDotNet.Jobs.Mode.{job.Mode})");
-            builder.Append($".WithWarmupCount({job.WarmupCount.Value})");
-            builder.Append($".WithTargetCount({job.TargetCount.Value})");
-            builder.Append($".WithIterationTime({job.IterationTime.Value})");
-            builder.Append($".With(new BenchmarkDotNet.Jobs.GcMode {{ Force = {job.GcMode.Value.Force.ToLowerCase()} }})");
-            return builder.ToString();
-        }
-
-        private static IJob With(this IJob job, Action<Job> set)
-        {
-            var newJob = job.Clone();
-            set(newJob);
-            return newJob;
-        }
-
-        private static Job Clone(this IJob job) => new Job
-        {
-            Jit = job.Jit,
-            Platform = job.Platform,
-            Toolchain = job.Toolchain,
-            Runtime = job.Runtime,
-            GcMode = job.GcMode,
-            Mode = job.Mode,
-            LaunchCount = job.LaunchCount,
-            TargetCount = job.TargetCount,
-            WarmupCount = job.WarmupCount,
-            IterationTime = job.IterationTime,
-            Affinity = job.Affinity
-        };
-
-        private static bool TryGetShortInfoForPredefinedJobs(IJob job, out string shortInfo)
-        {
-            shortInfo = null;
-
-            if (job.Equals(Job.LegacyJitX86))
-                shortInfo = "LegacyX86";
-            if (job.Equals(Job.LegacyJitX64))
-                shortInfo = "LegacyX64";
-            if (job.Equals(Job.RyuJitX64))
-                shortInfo = "RyuJitX64";
-            if (job.Equals(Job.Dry))
-                shortInfo = "Dry";
-            if (job.Equals(Job.Mono))
-                shortInfo = "Mono";
-            if (job.Equals(Job.MonoLlvm))
-                shortInfo = "MonoLlvm";
-            if (job.Equals(Job.Clr))
-                shortInfo = "Clr";
-            if (job.Equals(Job.Core))
-                shortInfo = "Core";
-            if (job.Equals(Job.ConcurrentServerGC))
-                shortInfo = "ConcurrentServerGC";
-            if (job.Equals(Job.ConcurrentWorkstationGC))
-                shortInfo = "ConcurrentWorkstationGC";
-
-            return !string.IsNullOrEmpty(shortInfo);
-        }
-
-        private static bool MoreThanOneJobHaveUniquePropertyValue(IJob[] allJobs, int propertyIndex)
-        {
-            if (allJobs.Length <= 1)
-            {
-                return false;
-            }
-
-            var uniqueValues = new HashSet<string>();
-            for (int i = 0; i < allJobs.Length; i++)
-            {
-                var value = allJobs[i].AllProperties[propertyIndex].Value;
-                if (uniqueValues.Contains(value))
-                {
-                    continue;
-                }
-
-                if (uniqueValues.Count > 0)
-                {
-                    return true;
-                }
-                uniqueValues.Add(value);
-            }
-
-            return false;
-        }        
+        // Info
+        [Obsolete]
+        public static string GetShortInfo(this Job job) => job.ResolvedId;
+        [Obsolete]
+        public static string GetFullInfo(this Job job) => CharacteristicSetPresenter.Default.ToPresentation(job.ToSet());
     }
 }

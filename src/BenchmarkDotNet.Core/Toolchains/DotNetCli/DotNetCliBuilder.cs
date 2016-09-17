@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
@@ -27,7 +28,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// generates project.lock.json that tells compiler where to take dlls and source from
         /// and builds executable and copies all required dll's
         /// </summary>
-        public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark)
+        public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark, IResolver resolver)
         {
             if (!DotNetCliCommandExecutor.ExecuteCommand(
                 RestoreCommand, 

@@ -226,7 +226,7 @@ namespace BenchmarkDotNet.Validators
                 {
                     errors.Add(new ValidationError(
                         TreatsWarningsAsErrors,
-                        $"Failed to execute benchmark {benchmark.ShortInfo}, exception was: {ex.Message}",
+                        $"Failed to execute benchmark '{benchmark.DisplayInfo}', exception was: '{ex.Message}'",
                         benchmark));
                 }
             }

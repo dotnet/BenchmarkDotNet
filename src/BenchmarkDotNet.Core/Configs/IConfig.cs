@@ -12,12 +12,12 @@ namespace BenchmarkDotNet.Configs
 {
     public interface IConfig
     {
-        IEnumerable<IColumn> GetColumns();
+        IEnumerable<IColumnProvider> GetColumnProviders();
         IEnumerable<IExporter> GetExporters();
         IEnumerable<ILogger> GetLoggers();
         IEnumerable<IDiagnoser> GetDiagnosers();
         IEnumerable<IAnalyser> GetAnalysers();
-        IEnumerable<IJob> GetJobs();
+        IEnumerable<Job> GetJobs();
         IEnumerable<IValidator> GetValidators();
 
         IOrderProvider GetOrderProvider();

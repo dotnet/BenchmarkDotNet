@@ -27,10 +27,10 @@ namespace BenchmarkDotNet.IntegrationTests
             CanExecute<CleanupAttributeBenchmarks>(config);
 
             string log = logger.GetLog();
-            Assert.Contains(CleanupCalled + Environment.NewLine, log);
+            Assert.Contains(CleanupCalled + System.Environment.NewLine, log);
             Assert.True(
-                log.IndexOf(CleanupCalled + Environment.NewLine) > 
-                log.IndexOf(BenchmarkCalled + Environment.NewLine));
+                log.IndexOf(CleanupCalled + System.Environment.NewLine) >
+                log.IndexOf(BenchmarkCalled + System.Environment.NewLine));
         }
 
         public class CleanupAttributeBenchmarks

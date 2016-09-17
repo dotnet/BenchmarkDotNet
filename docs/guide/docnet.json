@@ -10,16 +10,16 @@
         "__index" : "index.md",
         "Overview" : "Overview.md",
         "Getting Started" : "GettingStarted.md",
-        "Configuration" : 
+        "Configs" : 
         {
-            "Configs": "Configuration\\Configs.md",
-            "Jobs": "Configuration\\Jobs.md",
-            "Columns": "Configuration\\Columns.md",
-            "Exporters": "Configuration\\Exporters.md",
-            "Loggers":"Configuration\\Loggers.md",
-            "Diagnosers":"Configuration\\Diagnosers.md",
-            "Analyzers":"Configuration\\Analyzers.md",
-            "Validators":"Configuration\\Validators.md"
+            "Configs": "Configs\\Configs.md",
+            "Jobs": "Configs\\Jobs.md",
+            "Columns": "Configs\\Columns.md",
+            "Exporters": "Configs\\Exporters.md",
+            "Loggers":"Configs\\Loggers.md",
+            "Diagnosers":"Configs\\Diagnosers.md",
+            "Analyzers":"Configs\\Analyzers.md",
+            "Validators":"Configs\\Validators.md"
         },
         "How to run your benchmarks": "HowToRun.md",
         "Advanced features": 
@@ -32,7 +32,6 @@
         "How it works": "HowItWorks.md",
         "Rules of benchmarking": "RulesOfBenchmarking.md",
         "NuGet Packages": "NuGet.md",
-        "FAQ": "faq.md",
         "Team": "Team.md",
         "Contributing": 
         {

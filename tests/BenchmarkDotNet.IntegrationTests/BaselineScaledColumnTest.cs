@@ -1,5 +1,4 @@
-﻿using BenchmarkDotNet.Jobs;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using Xunit;
@@ -10,9 +9,6 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Running;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -30,7 +26,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var table = summary.Table;
             var headerRow = table.FullHeader;
-            var column = summary.Config.GetColumns()
+            var column = summary.GetColumns()
                 .OfType<BaselineScaledColumn>()
                 .FirstOrDefault(c => c.Kind == BaselineScaledColumn.DiffKind.Mean);
             Assert.NotNull(column);

@@ -1,5 +1,4 @@
 ﻿using System;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Parameters;
 
@@ -8,22 +7,21 @@ namespace BenchmarkDotNet.Running
     public class Benchmark : IComparable<Benchmark>
     {
         public Target Target { get; }
-        public IJob Job { get; }
+        public Job Job { get; }
         public ParameterInstances Parameters { get; }
 
-        public string ShortInfo => shortInfo ?? (shortInfo = (Target.FullInfo + "_" + Job.GetShortInfo() + "_" + Parameters.FullInfo).Trim('_').AsValidFileName());
-        public string FullInfo => (Target.FullInfo + "_" + Job.GetFullInfo() + "_" + Parameters.FullInfo).Trim('_');
-        public override string ToString() => ShortInfo;
+        public string FolderInfo => (Target.FolderInfo + "_" + Job.FolderInfo + "_" + Parameters.FolderInfo).Trim('_');
+        public string DisplayInfo => (Target.DisplayInfo + ": " + Job.DisplayInfo + " " + Parameters.DisplayInfo).Trim(' ');
 
-        private string shortInfo;
+        public override string ToString() => DisplayInfo;
 
-        public Benchmark(Target target, IJob job, ParameterInstances parameters)
+        public Benchmark(Target target, Job job, ParameterInstances parameters)
         {
             Target = target;
             Job = job;
             Parameters = parameters;
         }
 
-        public int CompareTo(Benchmark other) => string.Compare(FullInfo, other.FullInfo, StringComparison.Ordinal);
+        public int CompareTo(Benchmark other) => string.Compare(FolderInfo, other.FolderInfo, StringComparison.Ordinal);
     }
 }

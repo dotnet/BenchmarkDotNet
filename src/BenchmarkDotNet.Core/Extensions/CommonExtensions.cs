@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 
@@ -19,7 +20,7 @@ namespace BenchmarkDotNet.Extensions
         public static string ToTimeStr(this double value, TimeUnit unit = null, int unitNameWidth = 1)
         {
             unit = unit ?? TimeUnit.GetBestTimeUnit(value);
-            var unitValue = TimeUnit.Convert(value, TimeUnit.Nanoseconds, unit);
+            var unitValue = TimeUnit.Convert(value, TimeUnit.Nanosecond, unit);
             var unitName = unit.Name.PadLeft(unitNameWidth);
             return $"{unitValue.ToStr("N4")} {unitName}";
         }
@@ -51,5 +52,8 @@ namespace BenchmarkDotNet.Extensions
 
         public static double Sqr(this double x) => x * x;
         public static double Pow(this double x, double k) => Math.Pow(x, k);
+
+        public static int RoundToInt(this double x) => (int) Math.Round(x);
+        public static long RoundToLong(this double x) => (long) Math.Round(x);
     }
 }

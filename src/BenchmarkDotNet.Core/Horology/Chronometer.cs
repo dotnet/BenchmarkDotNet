@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Portability;
+﻿using System;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Horology
 {
@@ -10,10 +11,10 @@ namespace BenchmarkDotNet.Horology
 
         public static readonly IClock BestClock;
 
-        public static long Frequency => BestClock.Frequency;
+        public static Frequency Frequency => BestClock.Frequency;
         public static long GetTimestamp() => BestClock.GetTimestamp();
         public static StartedClock Start() => BestClock.Start();
-        public static double GetResolution(TimeUnit timeUnit = null) => BestClock.GetResolution(timeUnit);
+        public static TimeInterval GetResolution() => BestClock.GetResolution();
 
         static Chronometer()
         {
@@ -25,9 +26,9 @@ namespace BenchmarkDotNet.Horology
 
         public static HardwareTimerKind HardwareTimerKind => GetHardwareTimerKind(BestClock.Frequency);
 
-        public static HardwareTimerKind GetHardwareTimerKind(long frequency)
+        public static HardwareTimerKind GetHardwareTimerKind(Frequency frequency)
         {
-            var freqKHz = frequency / FrequencyUnit.KHz.HertzAmount;
+            long freqKHz = (long)Math.Round(frequency / Frequency.KHz);
             if (14300 <= freqKHz && freqKHz <= 14400)
                 return HardwareTimerKind.Hpet;
             if (3579500 <= frequency && frequency <= 3579600)

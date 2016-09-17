@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Contains(HtmlExporter.Default, config.GetExporters());
             Assert.Contains(RPlotExporter.Default, config.GetExporters());
 
-            Assert.Equal(0, config.GetColumns().Count());
+            Assert.Equal(0, config.GetColumnProviders().Count());
             Assert.Equal(0, config.GetDiagnosers().Count());
             Assert.Equal(0, config.GetAnalysers().Count());
             Assert.Equal(0, config.GetLoggers().Count());
@@ -46,22 +46,6 @@ namespace BenchmarkDotNet.Tests
         {
             var parser = new ConfigParser();
             Assert.Throws<InvalidOperationException>(() => parser.Parse(new[] { "jobs=unknown" }));
-        }
-
-        [Fact]
-        public void ConfigWithAllOptionParsedCorrectly()
-        {
-            var parser = new ConfigParser();
-            var config = parser.Parse(new[] { "jobs=all" });
-
-            // TODO How to make this robust, 12 is only valid when there are 12 items in "availableJobs" in ConfigParser.cs
-            Assert.Equal(12, config.GetJobs().Count());
-
-            Assert.Equal(0, config.GetColumns().Count());
-            Assert.Equal(0, config.GetExporters().Count());
-            Assert.Equal(0, config.GetDiagnosers().Count());
-            Assert.Equal(0, config.GetAnalysers().Count());
-            Assert.Equal(0, config.GetLoggers().Count());
         }
     }
 }

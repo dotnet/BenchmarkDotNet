@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Attributes.Columns
     /// </summary>
     public class NamespaceColumnAttribute : ColumnConfigBaseAttribute
     {
-        public NamespaceColumnAttribute() : base(PropertyColumn.Namespace)
+        public NamespaceColumnAttribute() : base(TargetMethodColumn.Namespace)
         {
         }
     }

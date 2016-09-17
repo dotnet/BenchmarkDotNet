@@ -1,4 +1,6 @@
-﻿using BenchmarkDotNet.Extensions;
+﻿using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -27,37 +29,37 @@ namespace BenchmarkDotNet.Toolchains.Core
         {
         }
 
-        public override bool IsSupported(Benchmark benchmark, ILogger logger)
+        public override bool IsSupported(Benchmark benchmark, ILogger logger, IResolver resolver)
         {
-            if(!base.IsSupported(benchmark, logger))
+            if(!base.IsSupported(benchmark, logger, resolver))
             {
                 return false;
             }
 
             if (!HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled())
             {
-                logger.WriteLineError($"BenchmarkDotNet requires dotnet cli toolchain to be installed, benchmark {benchmark.ShortInfo} will not be executed");
+                logger.WriteLineError($"BenchmarkDotNet requires dotnet cli toolchain to be installed, benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;
             }
 
-            if (benchmark.Job.Platform == Platform.X86)
+            if (benchmark.Job.Env.Platform.Resolve(resolver) == Platform.X86)
             {
-                logger.WriteLineError($"Currently dotnet cli toolchain supports only X64 compilation, benchmark {benchmark.ShortInfo} will not be executed");
+                logger.WriteLineError($"Currently dotnet cli toolchain supports only X64 compilation, benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;
             }
-            if (benchmark.Job.Jit == Jit.LegacyJit)
+            if (benchmark.Job.Env.Jit.Resolve(resolver) == Jit.LegacyJit)
             {
-                logger.WriteLineError($"Currently dotnet cli toolchain supports only RyuJit, benchmark {benchmark.ShortInfo} will not be executed");
+                logger.WriteLineError($"Currently dotnet cli toolchain supports only RyuJit, benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;
             }
-            if (benchmark.Job.GcMode.Value.CpuGroups)
+            if (benchmark.Job.Env.Gc.CpuGroups.Resolve(resolver))
             {
-                logger.WriteLineError($"Currently project.json does not support CpuGroups (app.config does), benchmark {benchmark.ShortInfo} will not be executed");
+                logger.WriteLineError($"Currently project.json does not support CpuGroups (app.config does), benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;
             }
-            if (benchmark.Job.GcMode.Value.AllowVeryLargeObjects)
+            if (benchmark.Job.Env.Gc.AllowVeryLargeObjects.Resolve(resolver))
             {
-                logger.WriteLineError($"Currently project.json does not support gcAllowVeryLargeObjects (app.config does), benchmark {benchmark.ShortInfo} will not be executed");
+                logger.WriteLineError($"Currently project.json does not support gcAllowVeryLargeObjects (app.config does), benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;
             }
 

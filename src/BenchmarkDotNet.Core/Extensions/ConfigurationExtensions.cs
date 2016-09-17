@@ -1,5 +1,4 @@
-﻿using System;
-using BenchmarkDotNet.Jobs;
+﻿using BenchmarkDotNet.Environments;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -15,8 +14,6 @@ namespace BenchmarkDotNet.Extensions
                     return "x86";
                 case Platform.X64:
                     return "x64";
-                case Platform.Host:
-                    return IntPtr.Size == 4 ? "x86" : "x64";
                 default:
                     return "AnyCPU";
             }

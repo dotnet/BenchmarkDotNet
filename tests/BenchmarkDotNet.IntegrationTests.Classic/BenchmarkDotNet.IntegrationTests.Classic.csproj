@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{27DC34D9-3BA1-46F4-B2A1-E89AA0D842AA}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BenchmarkDotNet.IntegrationTests.Classic</RootNamespace>
     <AssemblyName>BenchmarkDotNet.IntegrationTests.Classic</AssemblyName>
@@ -75,13 +75,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\BenchmarkDotNet.Tests\Loggers\OutputLogger.cs">
+      <Link>OutputLogger.cs</Link>
+    </Compile>
     <Compile Include="AppConfigTests.cs" />
     <Compile Include="AssemblyConfigAttribute.cs" />
     <Compile Include="AssemblyConfigTests.cs" />
     <Compile Include="BenchmarkTestRunner.cs" />
     <Compile Include="CopyToOutputTests.cs" />
     <Compile Include="JitOptimizationsTests.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="ReferencesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

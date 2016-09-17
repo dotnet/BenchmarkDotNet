@@ -3,7 +3,7 @@ namespace BenchmarkDotNet.Horology
     public interface IClock
     {
         bool IsAvailable { get; }
-        long Frequency { get; }
+        Frequency Frequency { get; }
         long GetTimestamp();
     }
 }

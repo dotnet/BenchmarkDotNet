@@ -1,123 +1,72 @@
-﻿using System;
-using System.Text;
-using BenchmarkDotNet.Helpers;
+﻿using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Environments;
 
 namespace BenchmarkDotNet.Jobs
 {
-    // it should have been struct, but then I was not able to set up Concurrent = true as default value 
-    // due to "cannot have instance property or field initializers in structs"
-    public sealed class GcMode : IEquatable<GcMode>, IProperty<GcMode>
+    public sealed class GcMode
     {
+        public static readonly GcMode Default = new GcMode();
+
+        private GcMode()
+        {
+        }
+
+        private static ICharacteristic<T> Create<T>(string id) => Characteristic<T>.Create("Env", "Gc" + id);
+
         /// <summary>
         /// Specifies whether the common language runtime runs server garbage collection.
         /// <value>false: Does not run server garbage collection. This is the default.</value>
         /// <value>true: Runs server garbage collection.</value>
         /// </summary>
-        public bool Server { get; set; }
+        public ICharacteristic<bool> Server { get; private set; } = Create<bool>(nameof(Server));
 
         /// <summary>
         /// Specifies whether the common language runtime runs garbage collection on a separate thread.
         /// <value>false: Does not run garbage collection concurrently.</value>
         /// <value>true: Runs garbage collection concurrently. This is the default.</value>
         /// </summary>
-        public bool Concurrent { get; set; } = true;
+        public ICharacteristic<bool> Concurrent { get; private set; } = Create<bool>(nameof(Concurrent));
 
         /// <summary>
         /// Specifies whether garbage collection supports multiple CPU groups.
         /// <value>false: Garbage collection does not support multiple CPU groups. This is the default.</value>
         /// <value>true: Garbage collection supports multiple CPU groups, if server garbage collection is enabled.</value>
         /// </summary>
-        public bool CpuGroups { get; set; }
+        public ICharacteristic<bool> CpuGroups { get; private set; } = Create<bool>(nameof(CpuGroups));
 
         /// <summary>
         /// Specifies whether the BenchmarkDotNet's benchmark runner forces full garbage collection after each benchmark invocation
         /// <value>false: Does not force garbage collection.</value>
         /// <value>true: Forces full garbage collection after each benchmark invocation. This is the default.</value>
         /// </summary>
-        public bool Force { get; set; } = true;
+        public ICharacteristic<bool> Force { get; private set; } = Create<bool>(nameof(Force));
 
         /// <summary>
         /// On 64-bit platforms, enables arrays that are greater than 2 gigabytes (GB) in total size.
         /// <value>false: Arrays greater than 2 GB in total size are not enabled. This is the default.</value>
         /// <value>true: Arrays greater than 2 GB in total size are enabled on 64-bit platforms.</value>
         /// </summary>
-        public bool AllowVeryLargeObjects { get; set; }
+        public ICharacteristic<bool> AllowVeryLargeObjects { get; private set; } = Create<bool>(nameof(AllowVeryLargeObjects));
 
-        public GcMode CreateDefaultValue() => new GcMode
+        public static GcMode Parse(CharacteristicSet set)
         {
-            Concurrent = HostEnvironmentInfo.GetCurrent().IsConcurrentGC,
-            Server = HostEnvironmentInfo.GetCurrent().IsServerGC
-        };
-
-        public string DefaultValueDisplayName => "Host";
-
-        public override string ToString()
-        {
-            const string longestPossible = "DontForce Non-concurrent Workstation CpuGroupsEnabled AllowVeryLargeObjects";
-            var representation = new StringBuilder(longestPossible.Length);
-
-            if (Force == false) representation.Append("DontForce ");
-            if (Concurrent) representation.Append("Concurrent ");
-            if (Concurrent == false) representation.Append("Non-concurrent ");
-            if (Server) representation.Append("Server");
-            if (Server == false) representation.Append("Workstation");
-            if (CpuGroups) representation.Append(" CpuGroupsEnabled");
-            if (AllowVeryLargeObjects) representation.Append(" AllowVeryLargeObjects");
-
-            return representation.ToString();
+            var mode = new GcMode();
+            mode.Server = mode.Server.Mutate(set);
+            mode.Concurrent = mode.Concurrent.Mutate(set);
+            mode.CpuGroups = mode.CpuGroups.Mutate(set);
+            mode.Force = mode.Force.Mutate(set);
+            mode.AllowVeryLargeObjects = mode.AllowVeryLargeObjects.Mutate(set);
+            return mode;
         }
 
-        public bool Equals(GcMode other)
-        {
-            if (ReferenceEquals(null, other))
-            {
-                return false;
-            }
-            if (ReferenceEquals(this, other))
-            {
-                return true;
-            }
-            return Server == other.Server 
-                && Concurrent == other.Concurrent 
-                && CpuGroups == other.CpuGroups 
-                && Force == other.Force
-                && AllowVeryLargeObjects == other.AllowVeryLargeObjects;
-        }
+        public CharacteristicSet ToSet() => new CharacteristicSet(
+            Server,
+            Concurrent,
+            CpuGroups,
+            Force,
+            AllowVeryLargeObjects
+        );
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj))
-            {
-                return false;
-            }
-            if (ReferenceEquals(this, obj))
-            {
-                return true;
-            }
-            return obj is GcMode && Equals((GcMode)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = Server.GetHashCode();
-                hashCode = (hashCode * 397) ^ Concurrent.GetHashCode();
-                hashCode = (hashCode * 397) ^ CpuGroups.GetHashCode();
-                hashCode = (hashCode * 397) ^ Force.GetHashCode();
-                hashCode = (hashCode * 397) ^ AllowVeryLargeObjects.GetHashCode();
-                return hashCode;
-            }
-        }
-
-        public static bool operator ==(GcMode left, GcMode right)
-        {
-            return Equals(left, right);
-        }
-
-        public static bool operator !=(GcMode left, GcMode right)
-        {
-            return !Equals(left, right);
-        }
+        public JobMutator ToMutator() => new JobMutator("SpecificGcMode").Add(ToSet());
     }
 }

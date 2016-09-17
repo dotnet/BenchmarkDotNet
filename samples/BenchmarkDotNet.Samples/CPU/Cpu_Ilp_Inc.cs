@@ -4,7 +4,7 @@ using BenchmarkDotNet.Attributes.Jobs;
 namespace BenchmarkDotNet.Samples.CPU
 {
     // See http://en.wikipedia.org/wiki/Instruction-level_parallelism
-    [AllJitsJob]
+    [LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
     public class Cpu_Ilp_Inc
     {
         private double a, b, c, d;

@@ -8,7 +8,7 @@ using BenchmarkDotNet.Jobs;
 namespace BenchmarkDotNet.Samples.JIT
 {
     // See: https://alexandrnikitin.github.io/blog/dotnet-generics-under-the-hood/
-    [AllJitsJob]
+    [LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
     public class Jit_GenericsMethod
     {
         private class BaseClass<T>

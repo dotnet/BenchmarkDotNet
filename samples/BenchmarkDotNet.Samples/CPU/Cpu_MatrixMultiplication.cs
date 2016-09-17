@@ -1,12 +1,8 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Attributes.Jobs;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples.CPU
 {
     // See http://en.wikipedia.org/wiki/Matrix_multiplication_algorithm#Cache_behavior
-    [AllJitsJob]
     public class Cpu_MatrixMultiplication
     {
         private const int N = 512;

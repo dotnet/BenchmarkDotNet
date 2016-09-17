@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.Linq;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Reports;
@@ -55,5 +57,7 @@ namespace BenchmarkDotNet.Diagnosers
                 logger.WriteLine();
             }
         }
+
+        public IColumnProvider GetColumnProvider() => new CompositeColumnProvider(diagnosers.Select(d => d.GetColumnProvider()).ToArray());
     }
 }

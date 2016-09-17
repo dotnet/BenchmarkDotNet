@@ -4,6 +4,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tests.Loggers;
+using BenchmarkDotNet.Tests.Mocks;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -40,14 +41,7 @@ namespace BenchmarkDotNet.Tests.Reports
         public void PlatformTest()
         {
             var gcModeColumn = CreateColumn("Platform");
-            Assert.Equal(true, gcModeColumn.IsTrivial);
-        }
-
-        [Fact]
-        public void GcModeTest()
-        {
-            var gcModeColumn = CreateColumn("GcMode");
-            Assert.Equal(true, gcModeColumn.IsTrivial);
+            Assert.Equal(true, gcModeColumn.IsDefault);
         }
     }
 }

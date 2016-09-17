@@ -5,7 +5,7 @@ namespace BenchmarkDotNet.Horology
     public class StopwatchClock : IClock
     {
         public bool IsAvailable => true;
-        public long Frequency => Stopwatch.Frequency;
+        public Frequency Frequency => new Frequency(Stopwatch.Frequency);
         public long GetTimestamp() => Stopwatch.GetTimestamp();
     }
 }

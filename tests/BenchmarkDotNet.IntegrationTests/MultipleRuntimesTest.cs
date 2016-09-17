@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Toolchains;
@@ -28,7 +31,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     ManualConfig.CreateEmpty()
                                 .With(Job.Dry.With(Runtime.Core))
                                 .With(Job.Dry.With(Runtime.Clr))
-                                .With(DefaultConfig.Instance.GetColumns().ToArray())
+                                .With(DefaultColumnProviders.Instance)
                                 .With(new OutputLogger(output)));
 
             Assert.True(summary.Reports
@@ -38,12 +41,12 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.True(summary.Reports.All(report => report.AllMeasurements.Any()));
 
             Assert.True(summary.Reports
-                .Single(report => report.Benchmark.Job.Runtime == Runtime.Clr)
+                .Single(report => report.Benchmark.Job.Env.Runtime.SpecifiedValue == Runtime.Clr)
                 .ExecuteResults
                 .All(executeResult => executeResult.Data.Contains("Classic")));
 
             Assert.True(summary.Reports
-                .Single(report => report.Benchmark.Job.Runtime == Runtime.Core)
+                .Single(report => report.Benchmark.Job.Env.Runtime.SpecifiedValue == Runtime.Core)
                 .ExecuteResults
                 .All(executeResult => executeResult.Data.Contains("Core")));
         }
@@ -55,7 +58,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Benchmark]
         public void B()
         {
-            Console.WriteLine($"{Runtime.Host.GetToolchain()}");
+            Console.WriteLine($"{RuntimeInformation.GetCurrentRuntime().GetToolchain()}");
         }
     }
 }

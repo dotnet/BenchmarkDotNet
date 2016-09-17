@@ -1,11 +1,12 @@
 ﻿using System.Threading;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes.Jobs;
 using BenchmarkDotNet.Order;
 
 namespace BenchmarkDotNet.Samples.Intro
 {
     [OrderProvider(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
-    [DryConfig]
+    [DryJob]
     public class IntroOrderAttr
     {
         [Params(1, 2, 3)]

@@ -13,6 +13,7 @@ namespace BenchmarkDotNet.Columns
             ColumnName = columnName;
         }
 
+        public bool IsDefault(Summary summary, Benchmark benchmark) => false;
         public string GetValue(Summary summary, Benchmark benchmark) =>
             benchmark.Parameters.Items.FirstOrDefault(item => item.Name == ColumnName)?.Value.ToString() ?? "?";
 

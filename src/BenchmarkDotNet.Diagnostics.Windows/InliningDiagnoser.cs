@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using BenchmarkDotNet.Columns;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
@@ -80,7 +81,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             logger.WriteLine();
             logger.WriteLineHeader(new string('-', 20));
-            logger.WriteLineInfo($"{benchmark.FullInfo}");
+            logger.WriteLineInfo($"{benchmark.DisplayInfo}");
             logger.WriteLineHeader(new string('-', 20));
 
             session.Source.Clr.MethodInliningSucceeded += jitData =>
@@ -121,5 +122,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             session.Source.Process();
         }
+
+        public IColumnProvider GetColumnProvider() => EmptyColumnProvider.Instance;
     }
 }

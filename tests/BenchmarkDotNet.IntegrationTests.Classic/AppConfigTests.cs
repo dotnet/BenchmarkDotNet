@@ -2,15 +2,23 @@
 using System.Configuration;
 using BenchmarkDotNet.Attributes;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests.Classic
 {
     public class AppConfigTests
     {
+        private readonly ITestOutputHelper output;
+
+        public AppConfigTests(ITestOutputHelper output)
+        {
+            this.output = output;
+        }
+
         [Fact]
         public void CustomSettingsGetRewritten()
         {
-            BenchmarkTestRunner.CanCompileAndRun<AppConfigConsumingBenchmark>();
+            BenchmarkTestRunner.CanCompileAndRun<AppConfigConsumingBenchmark>(output);
         }
     }
 

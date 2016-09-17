@@ -5,21 +5,23 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
+
 #if !CORE
 using System.Management;
 #endif
 
 namespace BenchmarkDotNet.Portability
 {
-    internal class RuntimeInformation
+    public class RuntimeInformation
     {
         private const string Debug = "DEBUG";
         private const string Release = "RELEASE";
-        private const string Unknown = "?";
+        internal const string Unknown = "?";
 
         internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
 
@@ -31,7 +33,7 @@ namespace BenchmarkDotNet.Portability
         {
 #if !CORE
             return new[] { PlatformID.Win32NT, PlatformID.Win32S, PlatformID.Win32Windows, PlatformID.WinCE }
-                .Contains(Environment.OSVersion.Platform);
+                .Contains(System.Environment.OSVersion.Platform);
 #else
             return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 #endif
@@ -42,7 +44,7 @@ namespace BenchmarkDotNet.Portability
         internal static string GetOsVersion()
         {
 #if !CORE
-            return Environment.OSVersion.ToString();
+            return System.Environment.OSVersion.ToString();
 #else
             if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
@@ -84,7 +86,7 @@ namespace BenchmarkDotNet.Portability
             return Unknown; // TODO: verify if it is possible to get this for CORE
         }
 
-        internal static string GetClrVersion()
+        internal static string GetRuntimeVersion()
         {
             if (IsMono())
             {
@@ -94,13 +96,13 @@ namespace BenchmarkDotNet.Portability
                     return "Mono " + monoDisplayName.Invoke(null, null);
             }
 #if CLASSIC
-            return "MS.NET " + Environment.Version;
+            return "Clr " + System.Environment.Version;
 #elif CORE
-            return "CORE"; // TODO: verify if it is possible to get this for CORE
+            return "Core"; // TODO: verify if it is possible to get this for CORE
 #endif
         }
 
-        internal static Runtime GetCurrent()
+        internal static Runtime GetCurrentRuntime()
         {
 #if CLASSIC
             return IsMono() ? Runtime.Mono : Runtime.Clr;
@@ -108,6 +110,8 @@ namespace BenchmarkDotNet.Portability
             return Runtime.Core;
 #endif
         }
+
+        public static Platform GetCurrentPlatform() => IntPtr.Size == 4 ? Platform.X86 : Platform.X64;
 
         internal static string GetJitModules()
         {
@@ -125,9 +129,19 @@ namespace BenchmarkDotNet.Portability
         internal static bool HasRyuJit()
         {
             return !IsMono()
-                && IntPtr.Size == 8
-                && GetConfiguration() != Debug
-                && !new JitHelper().IsMsX64();
+                   && IntPtr.Size == 8
+                   && GetConfiguration() != Debug
+                   && !new JitHelper().IsMsX64();
+        }
+
+        internal static Jit GetCurrentJit()
+        {
+            return HasRyuJit() ? Jit.RyuJit : Jit.LegacyJit;
+        }
+
+        internal static IntPtr GetCurrentAffinity()
+        {
+            return Process.GetCurrentProcess().ProcessorAffinity;
         }
 
         internal static string GetConfiguration()
@@ -138,16 +152,16 @@ namespace BenchmarkDotNet.Portability
                 return Unknown;
             }
             return isDebug.Value ? Debug : Release;
-        } 
+        }
 
         internal static string GetDotNetCliRuntimeIdentifier()
         {
 #if CORE
             return Microsoft.DotNet.InternalAbstractions.RuntimeEnvironment.GetRuntimeIdentifier();
 #else
-            // the Microsoft.DotNet.InternalAbstractions has no .NET 4.0 support, so we have to build it on our own
-            // code based on https://github.com/dotnet/cli/blob/f8631fa4b731d4c903dbe8b0b5e5332eee40ecae/src/Microsoft.DotNet.InternalAbstractions/RuntimeEnvironment.cs
-            var version = Environment.OSVersion.Version;
+// the Microsoft.DotNet.InternalAbstractions has no .NET 4.0 support, so we have to build it on our own
+// code based on https://github.com/dotnet/cli/blob/f8631fa4b731d4c903dbe8b0b5e5332eee40ecae/src/Microsoft.DotNet.InternalAbstractions/RuntimeEnvironment.cs
+            var version = System.Environment.OSVersion.Version;
             if (version.Major == 6)
             {
                 if (version.Minor == 1)

@@ -6,8 +6,6 @@ using BenchmarkDotNet.Properties;
 [assembly: AssemblyProduct(BenchmarkDotNetInfo.Title + ".Samples")]
 [assembly: AssemblyDescription(BenchmarkDotNetInfo.Description + " Samples")]
 [assembly: AssemblyCopyright(BenchmarkDotNetInfo.Copyright)]
-[assembly: AssemblyVersion(BenchmarkDotNetInfo.Version)]
-[assembly: AssemblyFileVersion(BenchmarkDotNetInfo.Version)]
 
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]

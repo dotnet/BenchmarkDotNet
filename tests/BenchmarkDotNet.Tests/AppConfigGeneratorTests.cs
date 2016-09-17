@@ -1,15 +1,19 @@
-﻿using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Jobs;
+﻿using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
 using System;
 using System.IO;
 using System.Text;
+using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Running;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests
 {
     public class AppConfigGeneratorTests
     {
+        private static readonly IResolver Resolver = BenchmarkRunnerCore.DefaultResolver;
+
         [Fact]
         public void GeneratesMinimalRequiredAppConfigForEmptySource()
         {
@@ -21,9 +25,9 @@ namespace BenchmarkDotNet.Tests
                     "<runtime/>" +
                     "</configuration>";
 
-                AppConfigGenerator.Generate(Job.Default, TextReader.Null, destination);
+                AppConfigGenerator.Generate(Job.Default, TextReader.Null, destination, Resolver);
 
-                Assert.True(AreEqualIgnoringWhitespacesAndCase(expectedMinimal, destination.ToString()));
+                AssertAreEqualIgnoringWhitespacesAndCase(expectedMinimal, destination.ToString());
             }
         }
 
@@ -35,13 +39,13 @@ namespace BenchmarkDotNet.Tests
             {
                 const string expectedMinimal =
                     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-                        "<configuration>" +
-                        "<runtime/>" +
-                        "</configuration>";
+                    "<configuration>" +
+                    "<runtime/>" +
+                    "</configuration>";
 
-                AppConfigGenerator.Generate(Job.Default, source, destination);
+                AppConfigGenerator.Generate(Job.Default, source, destination, Resolver);
 
-                Assert.True(AreEqualIgnoringWhitespacesAndCase(expectedMinimal, destination.ToString()));
+                AssertAreEqualIgnoringWhitespacesAndCase(expectedMinimal, destination.ToString());
             }
         }
 
@@ -51,24 +55,23 @@ namespace BenchmarkDotNet.Tests
             string customSettings =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<!--" +
-                    "commentsAreSupported" +
+                "commentsAreSupported" +
                 "-->" +
                 "<configuration>" +
-                    "<someConfig>withItsValue</someConfig>" +
-                    "<runtime/>" +
+                "<someConfig>withItsValue</someConfig>" +
+                "<runtime/>" +
                 "</configuration>";
 
             using (var source = new StringReader(customSettings))
             using (var destination = new Utf8StringWriter())
             {
-                AppConfigGenerator.Generate(Job.Default, source, destination);
+                AppConfigGenerator.Generate(Job.Default, source, destination, Resolver);
 
-                Assert.True(AreEqualIgnoringWhitespacesAndCase(customSettings, destination.ToString()));
+                AssertAreEqualIgnoringWhitespacesAndCase(customSettings, destination.ToString());
             }
         }
 
         [Theory]
-        [InlineData(Jit.Host, "<runtime/>")]
         [InlineData(Jit.LegacyJit, "<runtime><useLegacyJit enabled=\"1\" /></runtime>")]
         [InlineData(Jit.RyuJit, "<runtime><useLegacyJit enabled=\"0\" /></runtime>")]
         public void GeneratesRightJitSettings(Jit jit, string expectedRuntimeNode)
@@ -76,22 +79,22 @@ namespace BenchmarkDotNet.Tests
             string customSettings =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<configuration>" +
-                    "<someConfig>withItsValue</someConfig>" +
+                "<someConfig>withItsValue</someConfig>" +
                 "</configuration>";
 
             string customSettingsAndJit =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<configuration>" +
-                    "<someConfig>withItsValue</someConfig>" +
-                    expectedRuntimeNode +
+                "<someConfig>withItsValue</someConfig>" +
+                expectedRuntimeNode +
                 "</configuration>" + Environment.NewLine;
 
             using (var source = new StringReader(customSettings))
             using (var destination = new Utf8StringWriter())
             {
-                AppConfigGenerator.Generate(Job.Default.With(jit), source, destination);
+                AppConfigGenerator.Generate(Job.Default.With(jit), source, destination, Resolver);
 
-                Assert.True(AreEqualIgnoringWhitespacesAndCase(customSettingsAndJit, destination.ToString()));
+                AssertAreEqualIgnoringWhitespacesAndCase(customSettingsAndJit, destination.ToString());
             }
         }
 
@@ -101,53 +104,52 @@ namespace BenchmarkDotNet.Tests
             string settingsWithBindings =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<configuration>" +
-                    "<runtime>" +
-                        "<assemblyBinding xmlns=\"urn:schemas-microsoft-com:asm.v1\">" +
-                            "<dependentAssembly>" +
-                                "<assemblyIdentity name=\"System.Runtime\" publicKeyToken=\"b03f5f7f11d50a3a\" culture=\"neutral\" />" +
-                                "<bindingRedirect oldVersion=\"0.0.0.0-4.0.20.0\" newVersion=\"4.0.20.0\" />" +
-                            "</dependentAssembly>" +
-                        "</assemblyBinding>" +
-                    "</runtime>" +
+                "<runtime>" +
+                "<assemblyBinding xmlns=\"urn:schemas-microsoft-com:asm.v1\">" +
+                "<dependentAssembly>" +
+                "<assemblyIdentity name=\"System.Runtime\" publicKeyToken=\"b03f5f7f11d50a3a\" culture=\"neutral\" />" +
+                "<bindingRedirect oldVersion=\"0.0.0.0-4.0.20.0\" newVersion=\"4.0.20.0\" />" +
+                "</dependentAssembly>" +
+                "</assemblyBinding>" +
+                "</runtime>" +
                 "</configuration>";
 
             string settingsWithBindingsAndJit =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<configuration>" +
-                    "<runtime>" +
-                        "<assemblyBinding xmlns=\"urn:schemas-microsoft-com:asm.v1\">" +
-                            "<dependentAssembly>" +
-                                "<assemblyIdentity name=\"System.Runtime\" publicKeyToken=\"b03f5f7f11d50a3a\" culture=\"neutral\" />" +
-                                "<bindingRedirect oldVersion=\"0.0.0.0-4.0.20.0\" newVersion=\"4.0.20.0\" />" +
-                            "</dependentAssembly>" +
-                        "</assemblyBinding>" +
-                        "<useLegacyJit enabled =\"0\" />" +
-                    "</runtime>" +
+                "<runtime>" +
+                "<assemblyBinding xmlns=\"urn:schemas-microsoft-com:asm.v1\">" +
+                "<dependentAssembly>" +
+                "<assemblyIdentity name=\"System.Runtime\" publicKeyToken=\"b03f5f7f11d50a3a\" culture=\"neutral\" />" +
+                "<bindingRedirect oldVersion=\"0.0.0.0-4.0.20.0\" newVersion=\"4.0.20.0\" />" +
+                "</dependentAssembly>" +
+                "</assemblyBinding>" +
+                "<useLegacyJit enabled =\"0\" />" +
+                "</runtime>" +
                 "</configuration>";
 
             using (var source = new StringReader(settingsWithBindings))
             using (var destination = new Utf8StringWriter())
             {
-                AppConfigGenerator.Generate(Job.RyuJitX64, source, destination);
+                AppConfigGenerator.Generate(Job.RyuJitX64, source, destination, Resolver);
 
-                Assert.True(AreEqualIgnoringWhitespacesAndCase(settingsWithBindingsAndJit, destination.ToString()));
+                AssertAreEqualIgnoringWhitespacesAndCase(settingsWithBindingsAndJit, destination.ToString());
             }
         }
 
-        bool AreEqualIgnoringWhitespacesAndCase(string expectedXml, string actualXml)
+        private void AssertAreEqualIgnoringWhitespacesAndCase(string expectedXml, string actualXml)
         {
-            var expectedNoWhiteSpaces = RemoveWhiteSpaces(expectedXml);
-            var actualNoWhiteSpaces = RemoveWhiteSpaces(actualXml);
+            var expected = RemoveWhiteSpaces(expectedXml);
+            var actual = RemoveWhiteSpaces(actualXml);
 
-            return expectedNoWhiteSpaces.Equals(actualNoWhiteSpaces, StringComparison.OrdinalIgnoreCase);
+            Assert.Equal(expected, actual, StringComparer.OrdinalIgnoreCase);
         }
 
-        string RemoveWhiteSpaces(string input)
+        private static string RemoveWhiteSpaces(string input)
         {
-            StringBuilder buffer = new StringBuilder(input.Length);
-            for (int i = 0; i < input.Length; i++)
+            var buffer = new StringBuilder(input.Length);
+            foreach (char character in input)
             {
-                char character = input[i];
                 switch (character)
                 {
                     case '\r':

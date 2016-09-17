@@ -3,6 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
@@ -102,68 +104,66 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }   
         }
 
-        protected override void GenerateProject(Benchmark benchmark, ArtifactsPaths artifactsPaths)
+        protected override void GenerateProject(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)
         {
-            var template = ResourceHelper.LoadTemplate("BenchmarkProject.json");
+            string template = ResourceHelper.LoadTemplate("BenchmarkProject.json");
 
-            var content = SetPlatform(template, PlatformProvider(benchmark.Job.Platform));
+            string content = SetPlatform(template, PlatformProvider(benchmark.Job.Env.Platform.Resolve(resolver)));
             content = SetCodeFileName(content, Path.GetFileName(artifactsPaths.ProgramCodePath));
             content = SetDependencyToExecutingAssembly(content, benchmark.Target.Type);
             content = SetTargetFrameworkMoniker(content, TargetFrameworkMoniker);
             content = SetExtraDependencies(content, ExtraDependencies);
             content = SetImports(content, Imports);
             content = SetRuntime(content, Runtime);
-            content = SetGcMode(content, benchmark.Job.GcMode);
+            content = SetGcMode(content, benchmark.Job.Env.Gc, resolver);
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
         }
 
-        protected override void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths)
+        protected override void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)
         {
-            var content = $"call dotnet {DotNetCliBuilder.RestoreCommand}{Environment.NewLine}" +
-                          $"call dotnet {DotNetCliBuilder.GetBuildCommand(TargetFrameworkMoniker)}";
+            string content = $"call dotnet {DotNetCliBuilder.RestoreCommand}{Environment.NewLine}" +
+                             $"call dotnet {DotNetCliBuilder.GetBuildCommand(TargetFrameworkMoniker)}";
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
         }
 
-        private string SetPlatform(string template, string platform) => template.Replace("$PLATFORM$", platform);
+        private static string SetPlatform(string template, string platform) => template.Replace("$PLATFORM$", platform);
 
-        private string SetCodeFileName(string template, string codeFileName) => template.Replace("$CODEFILENAME$", codeFileName);
+        private static string SetCodeFileName(string template, string codeFileName) => template.Replace("$CODEFILENAME$", codeFileName);
 
-        private string SetDependencyToExecutingAssembly(string template, Type benchmarkTarget)
+        private static string SetDependencyToExecutingAssembly(string template, Type benchmarkTarget)
         {
             var assemblyName = benchmarkTarget.GetTypeInfo().Assembly.GetName();
-            var packageVersion = GetPackageVersion(assemblyName);
+            string packageVersion = GetPackageVersion(assemblyName);
 
-            return template
-                .Replace("$EXECUTINGASSEMBLYVERSION$", packageVersion)
-                .Replace("$EXECUTINGASSEMBLY$", assemblyName.Name);
+            return template.
+                Replace("$EXECUTINGASSEMBLYVERSION$", packageVersion).
+                Replace("$EXECUTINGASSEMBLY$", assemblyName.Name);
         }
 
-        private string SetTargetFrameworkMoniker(string content, string targetFrameworkMoniker) => content.Replace("$TFM$", targetFrameworkMoniker);
+        private static string SetTargetFrameworkMoniker(string content, string targetFrameworkMoniker) => content.Replace("$TFM$", targetFrameworkMoniker);
 
-        private string SetExtraDependencies(string content, string extraDependencies) => content.Replace("$REQUIREDDEPENDENCY$", extraDependencies);
+        private static string SetExtraDependencies(string content, string extraDependencies) => content.Replace("$REQUIREDDEPENDENCY$", extraDependencies);
 
-        private string SetImports(string content, string imports) => content.Replace("$IMPORTS$", imports);
+        private static string SetImports(string content, string imports) => content.Replace("$IMPORTS$", imports);
 
-        private string SetRuntime(string content, string runtime) => content.Replace("$RUNTIME$", runtime);
+        private static string SetRuntime(string content, string runtime) => content.Replace("$RUNTIME$", runtime);
 
-        private string SetGcMode(string content, GcMode gcMode)
+        private static string SetGcMode(string content, GcMode gcMode, IResolver resolver)
         {
-            if (gcMode == new GcMode())
+            if (gcMode.ToSet().GetValues().All(c => c.IsDefault))
                 return content.Replace("$GC$", null);
 
             return content.Replace(
                 "$GC$",
-                $"\"runtimeOptions\": {{ \"configProperties\": {{ \"System.GC.Concurrent\": {gcMode.Concurrent.ToLowerCase()}, \"System.GC.Server\": {gcMode.Server.ToLowerCase()} }} }}, ");
+                $"\"runtimeOptions\": {{ \"configProperties\": {{ \"System.GC.Concurrent\": {gcMode.Concurrent.Resolve(resolver).ToLowerCase()}, \"System.GC.Server\": {gcMode.Server.Resolve(resolver).ToLowerCase()} }} }}, ");
         }
 
-        /// <summary>
-        /// we can not simply call assemblyName.Version.ToString() because it is different than package version which can contain (and often does) text
-        /// we are using the wildcard to get latest version of package/project restored
-        /// </summary>
         private static string GetPackageVersion(AssemblyName assemblyName)
         {
+            // we can not simply call assemblyName.Version.ToString() because it is different than package version which can contain (and often does) text
+            // we are using the wildcard to get latest version of package/project restored
             return $"{assemblyName.Version.Major}.{assemblyName.Version.Minor}.{assemblyName.Version.Build}-*";
         }
 

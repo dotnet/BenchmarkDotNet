@@ -160,7 +160,7 @@ namespace BenchmarkDotNet.Running
                 var optionText = $"  {optionPrefix}{option.Key} <{option.Key.ToUpperInvariant()}>";
                 logger.WriteResult($"{optionText.PadRight(prefixWidth)}");
 
-                var maxWidth = outputWidth - prefixWidth - Environment.NewLine.Length - breakText.Length;
+                var maxWidth = outputWidth - prefixWidth - System.Environment.NewLine.Length - breakText.Length;
                 var lines = StringAndTextExtensions.Wrap(option.Value, maxWidth);
                 if (lines.Count == 0)
                 {

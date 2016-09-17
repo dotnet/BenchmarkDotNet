@@ -1,14 +1,16 @@
 ﻿using BenchmarkDotNet.Jobs;
 using System.IO;
+using System.Linq;
 using System.Xml;
+using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.Toolchains
 {
     internal static class AppConfigGenerator
     {
-        internal static void Generate(IJob job, TextReader source, TextWriter destination)
+        internal static void Generate(Job job, TextReader source, TextWriter destination, IResolver resolver)
         {
             var xmlReader = XmlReader.Create(source);
             var xmlDocument = new XmlDocument();
@@ -18,8 +20,8 @@ namespace BenchmarkDotNet.Toolchains
 
             ClearAllCustomRuntimeSettingsExceptRedirects(runtimeElement);
 
-            GenerateJitSettings(xmlDocument, runtimeElement, job.Jit);
-            GenerateGCSettings(xmlDocument, runtimeElement, job.GcMode);
+            GenerateJitSettings(xmlDocument, runtimeElement, job.Env.Jit);
+            GenerateGCSettings(xmlDocument, runtimeElement, job.Env.Gc, resolver);
 
             xmlDocument.Save(destination);
         }
@@ -41,7 +43,7 @@ namespace BenchmarkDotNet.Toolchains
         private static XmlNode GetOrCreateRuntimeElement(XmlDocument xmlDocument, XmlNode configurationElement)
         {
             return configurationElement.SelectSingleNode("runtime")
-                ?? configurationElement.AppendChild(xmlDocument.CreateNode(XmlNodeType.Element, "runtime", string.Empty));
+                   ?? configurationElement.AppendChild(xmlDocument.CreateNode(XmlNodeType.Element, "runtime", string.Empty));
         }
 
         private static void ClearAllCustomRuntimeSettingsExceptRedirects(XmlNode runtimeElement)
@@ -55,28 +57,24 @@ namespace BenchmarkDotNet.Toolchains
             }
         }
 
-        private static void GenerateJitSettings(XmlDocument xmlDocument, XmlNode runtimeElement, Jit jit)
+        private static void GenerateJitSettings(XmlDocument xmlDocument, XmlNode runtimeElement, ICharacteristic<Jit> jit)
         {
-            if (jit == Jit.Host)
+            if (!jit.IsDefault)
             {
-                return;
+                string useLegacyJit = jit.SpecifiedValue == Jit.RyuJit ? "0" : "1";
+                CreateNodeWithAttribute(xmlDocument, runtimeElement, "useLegacyJit", "enabled", useLegacyJit);
             }
-
-            CreateNodeWithAttribute(xmlDocument, runtimeElement, "useLegacyJit", "enabled",
-                jit == Jit.RyuJit || (jit == Jit.Host && HostEnvironmentInfo.GetCurrent().HasRyuJit)
-                    ? "0"
-                    : "1");
         }
 
-        private static void GenerateGCSettings(XmlDocument xmlDocument, XmlNode runtimeElement, GcMode gcMode)
+        private static void GenerateGCSettings(XmlDocument xmlDocument, XmlNode runtimeElement, GcMode gcMode, IResolver resolver)
         {
-            if (gcMode == new GcMode())
+            if (gcMode.ToSet().GetValues().All(c => c.IsDefault))
                 return;
 
-            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcConcurrent", "enabled", gcMode.Concurrent.ToLowerCase());
-            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcServer", "enabled", gcMode.Server.ToLowerCase());
-            CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCCpuGroup", "enabled", gcMode.CpuGroups.ToLowerCase());
-            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcAllowVeryLargeObjects", "enabled", gcMode.AllowVeryLargeObjects.ToLowerCase());
+            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcConcurrent", "enabled", gcMode.Concurrent.Resolve(resolver).ToLowerCase());
+            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcServer", "enabled", gcMode.Server.Resolve(resolver).ToLowerCase());
+            CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCCpuGroup", "enabled", gcMode.CpuGroups.Resolve(resolver).ToLowerCase());
+            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcAllowVeryLargeObjects", "enabled", gcMode.AllowVeryLargeObjects.Resolve(resolver).ToLowerCase());
         }
 
         private static void CreateNodeWithAttribute(

@@ -1,7 +1,9 @@
 ﻿using System;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.Samples.Intro
@@ -21,7 +23,7 @@ namespace BenchmarkDotNet.Samples.Intro
             [Benchmark]
             public void Benchmark()
             {
-                Console.WriteLine($"{AvoidParsingException} {Runtime.Host.GetToolchain()}");
+                Console.WriteLine($"{AvoidParsingException} {RuntimeInformation.GetCurrentRuntime().GetToolchain()}");
             }
         }
 
@@ -45,7 +47,7 @@ namespace BenchmarkDotNet.Samples.Intro
             [Benchmark]
             public void Benchmark()
             {
-                Console.WriteLine($"{AvoidParsingException} {Runtime.Host.GetToolchain()}");
+                Console.WriteLine($"{AvoidParsingException} {RuntimeInformation.GetCurrentRuntime().GetToolchain()}");
             }
         }
     }

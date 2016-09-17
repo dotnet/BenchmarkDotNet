@@ -6,6 +6,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Linq;
+using BenchmarkDotNet.Characteristics;
+using OurPlatform = BenchmarkDotNet.Environments.Platform;
 
 namespace BenchmarkDotNet.Toolchains.Classic
 {
@@ -13,18 +15,18 @@ namespace BenchmarkDotNet.Toolchains.Classic
     {
         private static readonly Lazy<AssemblyMetadata[]> FrameworkAssembliesMetadata = new Lazy<AssemblyMetadata[]>(GetFrameworkAssembliesMetadata);
 
-        public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark)
+        public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark, IResolver resolver)
         {
             logger.WriteLineInfo($"BuildScript: {generateResult.ArtifactsPaths.BuildScriptFilePath}");
 
             var syntaxTree = CSharpSyntaxTree.ParseText(File.ReadAllText(generateResult.ArtifactsPaths.ProgramCodePath));
 
             var compilationOptions = new CSharpCompilationOptions(
-                 outputKind: OutputKind.ConsoleApplication,
-                 optimizationLevel: OptimizationLevel.Release,
-                 allowUnsafe: true,
-                 platform: GetPlatform(benchmark.Job.Platform),
-                 deterministic: true);
+                outputKind: OutputKind.ConsoleApplication,
+                optimizationLevel: OptimizationLevel.Release,
+                allowUnsafe: true,
+                platform: GetPlatform(benchmark.Job.Env.Platform.Resolve(resolver)),
+                deterministic: true);
 
             var references = RoslynGenerator
                 .GetAllReferences(benchmark)
@@ -43,7 +45,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
             {
                 var emitResult = compilation.Emit(executable);
 
-                if(emitResult.Success)
+                if (emitResult.Success)
                 {
                     return BuildResult.Success(generateResult);
                 }
@@ -58,17 +60,15 @@ namespace BenchmarkDotNet.Toolchains.Classic
             }
         }
 
-        private Platform GetPlatform(Jobs.Platform platform)
+        private Platform GetPlatform(OurPlatform platform)
         {
-            switch(platform)
+            switch (platform)
             {
-                case Jobs.Platform.Host:
-                    return IntPtr.Size == 4 ? Platform.X86 : Platform.X64;
-                case Jobs.Platform.AnyCpu:
+                case OurPlatform.AnyCpu:
                     return Platform.AnyCpu;
-                case Jobs.Platform.X86:
+                case OurPlatform.X86:
                     return Platform.X86;
-                case Jobs.Platform.X64:
+                case OurPlatform.X64:
                     return Platform.X64;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(platform), platform, null);

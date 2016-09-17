@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Order
         public static readonly IOrderProvider Instance = new DefaultOrderProvider();
 
         private readonly IComparer<ParameterInstances> paramsComparer = ParameterComparer.Instance;
-        private readonly IComparer<IJob> jobComparer = JobComparer.Instance;
+        private readonly IComparer<Job> jobComparer = JobComparer.Instance;
         private readonly IComparer<Target> targetComparer;
 
         private readonly SummaryOrderPolicy summaryOrderPolicy;
@@ -37,9 +37,9 @@ namespace BenchmarkDotNet.Order
             switch (summaryOrderPolicy)
             {
                 case SummaryOrderPolicy.FastestToSlowest:
-                    return benchmarks.OrderBy(b => summary[b].ResultStatistics.Median);
+                    return benchmarks.OrderBy(b => summary[b].ResultStatistics.Mean);
                 case SummaryOrderPolicy.SlowestToFastest:
-                    return benchmarks.OrderByDescending(b => summary[b].ResultStatistics.Median);
+                    return benchmarks.OrderByDescending(b => summary[b].ResultStatistics.Mean);
                 default:
                     return GetExecutionOrder(benchmarks);
             }
@@ -47,16 +47,16 @@ namespace BenchmarkDotNet.Order
 
         public string GetGroupKey(Benchmark benchmark, Summary summary) =>
             summaryOrderPolicy == SummaryOrderPolicy.Default
-            ? benchmark.Parameters.FullInfo
+            ? benchmark.Parameters.DisplayInfo
             : null;
 
         private class BenchmarkComparer : IComparer<Benchmark>
         {
             private readonly IComparer<ParameterInstances> paramsComparer;
-            private readonly IComparer<IJob> jobComparer;
+            private readonly IComparer<Job> jobComparer;
             private readonly IComparer<Target> targetComparer;
 
-            public BenchmarkComparer(IComparer<ParameterInstances> paramsComparer, IComparer<IJob> jobComparer, IComparer<Target> targetComparer)
+            public BenchmarkComparer(IComparer<ParameterInstances> paramsComparer, IComparer<Job> jobComparer, IComparer<Target> targetComparer)
             {
                 this.targetComparer = targetComparer;
                 this.jobComparer = jobComparer;
@@ -68,7 +68,7 @@ namespace BenchmarkDotNet.Order
                 paramsComparer?.Compare(x.Parameters, y.Parameters) ?? 0,
                 jobComparer?.Compare(x.Job, y.Job) ?? 0,
                 targetComparer?.Compare(x.Target, y.Target) ?? 0,
-                string.CompareOrdinal(x.FullInfo, y.FullInfo)
+                string.CompareOrdinal(x.DisplayInfo, y.DisplayInfo)
             }.FirstOrDefault(c => c != 0);
         }
     }

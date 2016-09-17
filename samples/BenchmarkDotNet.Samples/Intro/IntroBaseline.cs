@@ -1,50 +1,29 @@
 ﻿using System;
 using System.Threading;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Attributes.Jobs;
+using BenchmarkDotNet.Engines;
 
 namespace BenchmarkDotNet.Samples.Intro
 {
-    [Config(typeof(Config))]
+    [SimpleJob(RunStrategy.ColdStart, launchCount: 1, warmupCount: 0, targetCount: 5, id: "FastJob")]
     public class IntroBaseline
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(Job.Default.WithLaunchCount(0).WithWarmupCount(0).WithTargetCount(5));
-            }
-        }
-
         private readonly Random random = new Random(42);
 
         [Params(100, 200)]
-        public int BaselineTime { get; set; }
+        public int BaseTime { get; set; }
 
         [Benchmark(Baseline = true)]
-        public void Baseline()
-        {
-            Thread.Sleep(BaselineTime);
-        }
+        public void Baseline() => Thread.Sleep(BaseTime);
 
         [Benchmark]
-        public void Slow()
-        {
-            Thread.Sleep(BaselineTime * 2);
-        }
+        public void Slow() => Thread.Sleep(BaseTime * 2);
 
         [Benchmark]
-        public void Fast()
-        {
-            Thread.Sleep(BaselineTime / 2);
-        }
+        public void Fast() => Thread.Sleep(BaseTime / 2);
 
         [Benchmark]
-        public void Unstable()
-        {
-            var diff = (int)((random.NextDouble() - 0.5) * 2 * BaselineTime);
-            Thread.Sleep(BaselineTime + diff);
-        }
+        public void Unstable() => Thread.Sleep(BaseTime + (int) ((random.NextDouble() - 0.5) * 2 * BaseTime));
     }
 }

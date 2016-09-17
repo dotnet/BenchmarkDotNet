@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Running
             switch (methodOrderPolicy)
             {
                 case MethodOrderPolicy.Alphabetical:
-                    return string.CompareOrdinal(x.FullInfo, y.FullInfo);
+                    return string.CompareOrdinal(x.DisplayInfo, y.DisplayInfo);
                 case MethodOrderPolicy.Declared:
                     return x.MethodIndex - y.MethodIndex;
                 default:

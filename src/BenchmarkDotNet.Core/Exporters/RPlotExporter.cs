@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Exporters
             lock (buildScriptLock)
                 File.WriteAllText(scriptFullPath, script);
 
-            var rHome = Environment.GetEnvironmentVariable("R_HOME") ?? @"C:\Program Files\R\R-3.2.3\bin\";
+            var rHome = System.Environment.GetEnvironmentVariable("R_HOME") ?? @"C:\Program Files\R\R-3.3.1\bin\";
             if (Directory.Exists(rHome))
             {
                 var start = new ProcessStartInfo

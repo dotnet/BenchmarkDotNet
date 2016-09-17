@@ -43,5 +43,5 @@ docs/apihtml
 **/project.lock.json
 tests/output/*
 .vs/restore.dg
-BDN.Auto
+BDN.Generated
 BenchmarkDotNet.Samples/Properties/launchSettings.json

@@ -8,13 +8,13 @@ namespace BenchmarkDotNet.Horology
         {
             Console.WriteLine($"{clock.GetType().Name}");
             Console.WriteLine($"  Frequency = {clock.Frequency}");
-            Console.WriteLine($"  Resolution = {clock.GetResolution(TimeUnit.Nanoseconds)} ns");
+            Console.WriteLine($"  Resolution = {clock.GetResolution().Nanoseconds} ns");
             Console.WriteLine($"  Availability = {(clock.IsAvailable ? "Available" : "Not available")}");
         }
 
-        public static double GetResolution(this IClock clock, TimeUnit timeUnit = null)
+        public static TimeInterval GetResolution(this IClock clock)
         {
-            return TimeUnit.Convert(1.0 / clock.Frequency, TimeUnit.Second, timeUnit ?? TimeUnit.Nanoseconds);
+            return clock.Frequency.ToResolution();
         }
 
         public static StartedClock Start(this IClock clock)

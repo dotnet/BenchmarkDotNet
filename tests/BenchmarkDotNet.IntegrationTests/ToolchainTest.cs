@@ -1,5 +1,5 @@
-﻿using System;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Jobs;
@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public bool Done { get; private set; }
 
-            public GenerateResult GenerateProject(Benchmark benchmark, ILogger logger, string rootArtifactsFolderPath, IConfig config)
+            public GenerateResult GenerateProject(Benchmark benchmark, ILogger logger, string rootArtifactsFolderPath, IConfig config, IResolver resolver)
             {
                 logger.WriteLine("Generating");
                 Done = true;
@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public bool Done { get; private set; }
 
-            public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark)
+            public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark, IResolver resolver)
             {
                 logger.WriteLine("Building");
                 Done = true;
@@ -45,11 +45,11 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public bool Done { get; private set; }
 
-            public ExecuteResult Execute(BuildResult buildResult, Benchmark benchmark, ILogger logger, IDiagnoser diagnoser)
+            public ExecuteResult Execute(BuildResult buildResult, Benchmark benchmark, ILogger logger, IResolver resolver, IDiagnoser diagnoser)
             {
                 logger.WriteLine("Executing");
                 Done = true;
-                return new ExecuteResult(true, new string[0]);
+                return new ExecuteResult(true, 0, new string[0]);
             }
         }
 

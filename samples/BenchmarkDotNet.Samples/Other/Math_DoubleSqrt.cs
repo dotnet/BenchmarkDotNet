@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Samples.Other
     // LegacyJit x86: fsqrt   (FPU)
     // LegacyJit x64: sqrtsd  (SSE2)
     // RyuJIT    x64: vsqrtsd (AVX)
-    [AllJitsJob]
+    [LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
     public class Math_DoubleSqrt
     {
         private int counter;

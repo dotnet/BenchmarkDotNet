@@ -7,7 +7,7 @@ using BenchmarkDotNet.Jobs;
 namespace BenchmarkDotNet.Samples.Other
 {
     // See: http://stackoverflow.com/q/8497018/974487
-    [AllJitsJob]
+    [LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
     public class Array_AccessNormalRefUnsafe
     {
         private const int Iterations = 111;

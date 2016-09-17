@@ -5,7 +5,7 @@ namespace BenchmarkDotNet.Samples.JIT
 {
     // See http://en.wikipedia.org/wiki/Inline_expansion
     // See http://aakinshin.net/en/blog/dotnet/inlining-and-starg/
-    [AllJitsJob]
+    [LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
     public class Jit_Inlining
     {
         [Benchmark]

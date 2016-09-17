@@ -1,66 +1,80 @@
-﻿using BenchmarkDotNet.Toolchains;
-using System;
+﻿using System.Linq;
+using BenchmarkDotNet.Characteristics;
 
 namespace BenchmarkDotNet.Jobs
 {
-    public class Job : IJob
+    public sealed class Job
     {
-        public static readonly IJob Default = new Job();
-        public static readonly IJob LegacyJitX86 = new Job { Platform = Platform.X86, Jit = Jit.LegacyJit };
-        public static readonly IJob LegacyJitX64 = new Job { Platform = Platform.X64, Jit = Jit.LegacyJit };
-        public static readonly IJob RyuJitX64 = new Job { Platform = Platform.X64, Jit = Jit.RyuJit };
-        public static readonly IJob Dry = new Job { Mode = Mode.SingleRun, LaunchCount = 1, WarmupCount = 1, TargetCount = 1 };
-        public static readonly IJob[] AllJits = { LegacyJitX86, LegacyJitX64, RyuJitX64 };
-        public static readonly IJob Clr = new Job { Runtime = Runtime.Clr };
-        public static readonly IJob Mono = new Job { Runtime = Runtime.Mono };
-        public static readonly IJob MonoLlvm = new Job { Runtime = Runtime.Mono, Jit = Jit.Llvm};
-        public static readonly IJob Core = new Job { Runtime = Runtime.Core };
-        public static readonly IJob MediumRun = new Job { LaunchCount = 3, WarmupCount = 15, TargetCount = 100 };
-        public static readonly IJob LongRun = new Job { LaunchCount = 3, WarmupCount = 30, TargetCount = 1000 };
-        public static readonly IJob ConcurrentServerGC = new Job { GcMode = new GcMode { Server = true, Concurrent = true} };
-        public static readonly IJob ConcurrentWorkstationGC = new Job { GcMode = new GcMode { Server = false, Concurrent = true } };
+        #region Predifined
 
-        public Mode Mode { get; set; } = Mode.Throughput;
-        public Platform Platform { get; set; } = Platform.Host;
-        public Jit Jit { get; set; } = Jit.Host;
-        public IToolchain Toolchain { get; set; }
-        public Runtime Runtime { get; set; } = Runtime.Host;
-        public Property<GcMode> GcMode { get; set; }
+        public static readonly Job Default = new Job().WithId("Default");
 
-        public Count LaunchCount { get; set; } = Count.Auto;
-        public Count WarmupCount { get; set; } = Count.Auto;
-        public Count TargetCount { get; set; } = Count.Auto;
-        public Count IterationTime { get; set; } = Count.Auto;
-        public Count Affinity { get; set; } = Count.Auto;
+        // Env
+        public static readonly Job Clr = Default.Mutate(EnvMode.Clr).WithId(nameof(Clr));
+        public static readonly Job Core = Default.Mutate(EnvMode.Core).WithId(nameof(Core));
+        public static readonly Job Mono = Default.Mutate(EnvMode.Mono).WithId(nameof(Mono));
 
-        public Property[] AllProperties => allProperties.Value;
+        public static readonly Job LegacyJitX86 = Default.Mutate(EnvMode.LegacyJitX86).WithId(nameof(LegacyJitX86));
+        public static readonly Job LegacyJitX64 = Default.Mutate(EnvMode.LegacyJitX64).WithId(nameof(LegacyJitX64));
+        public static readonly Job RyuJitX64 = Default.Mutate(EnvMode.RyuJitX64).WithId(nameof(RyuJitX64));
 
-        private Lazy<Property[]> allProperties { get; }
+        // Run
+        public static readonly Job Dry = Default.Mutate(RunMode.Dry).WithId(nameof(Dry));
+        public static readonly Job ShortRun = Default.Mutate(RunMode.Short).WithId(nameof(ShortRun));
+        public static readonly Job MediumRun = Default.Mutate(RunMode.Medium).WithId(nameof(MediumRun));
+        public static readonly Job LongRun = Default.Mutate(RunMode.Long).WithId(nameof(LongRun));
+        public static readonly Job VeryLongRun = Default.Mutate(RunMode.VeryLong).WithId(nameof(VeryLongRun));
 
-        public Job()
+        #endregion
+
+        public ICharacteristic<string> Id { get; private set; } = Characteristic<string>.Create("Job", "Id");
+        public EnvMode Env { get; private set; } = EnvMode.Default;
+        public RunMode Run { get; private set; } = RunMode.Default;
+        public InfraMode Infra { get; private set; } = InfraMode.Default;
+        public AccuracyMode Accuracy { get; private set; } = AccuracyMode.Default;
+
+        public static Job Parse(CharacteristicSet set, bool clearId = true)
         {
-            allProperties = new Lazy<Property[]>(this.GetAllProperties, isThreadSafe: true);
+            var job = new Job();
+            if (!clearId)
+                job.Id = job.Id.Mutate(set);
+            job.Env = EnvMode.Parse(set);
+            job.Run = RunMode.Parse(set);
+            job.Infra = InfraMode.Parse(set);
+            job.Accuracy = AccuracyMode.Parse(set);
+            return job;
         }
 
-        public bool Equals(IJob other)
+        public Job WithId(string id)
         {
-            var ownProperties = AllProperties;
-            var otherProperties = other.AllProperties;
+            var job = Clone();
+            job.Id = job.Id.Mutate(id);
+            return job;
+        }
 
-            if (ownProperties.Length != otherProperties.Length)
+        public Job Clone() => Parse(ToSet());
+
+        public CharacteristicSet ToSet(bool includeId = true) =>
+            new CharacteristicSet(includeId ? new ICharacteristic[] { Id } : new ICharacteristic[0]).Mutate(
+                Env.ToSet(),
+                Run.ToSet(),
+                Infra.ToSet(),
+                Accuracy.ToSet()
+            );
+
+        public Job Mutate(JobMutator mutator) => mutator.Apply(this);
+
+        public string ResolvedId => Id.IsDefault ? JobIdGenerator.GenerateRandomId(this) : Id.SpecifiedValue;
+        public string FolderInfo => ResolvedId;
+
+        public string DisplayInfo
+        {
+            get
             {
-                return false;
+                var set = ToSet(false);
+                string characteristics = set.AllAreDefaults() ? "" : "(" + CharacteristicSetPresenter.Display.ToPresentation(set) + ")";
+                return ResolvedId + characteristics;
             }
-
-            for (int i = 0; i < ownProperties.Length; i++)
-            {
-                if (!ownProperties[i].Equals(otherProperties[i]))
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
     }
 }

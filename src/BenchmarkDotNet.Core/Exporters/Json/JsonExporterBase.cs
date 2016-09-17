@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Exporters.Json
                 summary.HostEnvironmentInfo.OsVersion,
                 summary.HostEnvironmentInfo.ProcessorName,
                 summary.HostEnvironmentInfo.ProcessorCount,
-                summary.HostEnvironmentInfo.ClrVersion,
+                summary.HostEnvironmentInfo.RuntimeVersion,
                 summary.HostEnvironmentInfo.Architecture,
                 summary.HostEnvironmentInfo.HasAttachedDebugger,
                 summary.HostEnvironmentInfo.HasRyuJit,
@@ -49,13 +49,13 @@ namespace BenchmarkDotNet.Exporters.Json
                 var data = new Dictionary<string, object>
                 {
                     // We don't need Benchmark.ShortInfo, that info is available via Benchmark.Parameters below
-                    { "ShortInfo", r.Benchmark.ShortInfo },
+                    { "DisplayInfo", r.Benchmark.DisplayInfo },
                     { "Namespace", r.Benchmark.Target.Type.Namespace },
                     { "Type", r.Benchmark.Target.Type.Name },
                     { "Method", r.Benchmark.Target.Method.Name },
-                    { "MethodTitle", r.Benchmark.Target.MethodTitle },
+                    { "MethodTitle", r.Benchmark.Target.MethodDisplayInfo },
                     { "Parameters", r.Benchmark.Parameters.PrintInfo },
-                    { "Properties", r.Benchmark.Job.AllProperties.ToDictionary(p => p.Name, p => p.Value) },
+                    // { "Properties", r.Benchmark.Job.ToSet().ToDictionary(p => p.Name, p => p.Value) }, // TODO
                     { "Statistics", r.ResultStatistics },
                 };
 

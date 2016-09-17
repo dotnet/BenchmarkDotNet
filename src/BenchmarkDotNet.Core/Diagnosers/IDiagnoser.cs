@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Reports;
@@ -26,5 +27,7 @@ namespace BenchmarkDotNet.Diagnosers
         void ProcessStopped(Process process);
 
         void DisplayResults(ILogger logger);
+
+        IColumnProvider GetColumnProvider();
     }
 }

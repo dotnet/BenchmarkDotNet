@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Samples.Algorithms
         }
 
         [Benchmark]
-        public int MostSignificantDeBruijn()
+        public int DeBruijn()
         {
             int counter = 0;
             for (int i = 0; i < N; i++)
@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Samples.Algorithms
         }
 
         [Benchmark]
-        public int MostSignificantNaive()
+        public int Naive()
         {
             int counter = 0;
             for (int i = 0; i < N; i++)
@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Samples.Algorithms
         }
 
         [Benchmark]
-        public int MostSignificantShifted()
+        public int Shifted()
         {
             int counter = 0;
             for (int i = 0; i < N; i++)
@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Samples.Algorithms
         }
 
         [Benchmark]
-        public int MostSignificantBranched()
+        public int Branched()
         {
             int counter = 0;
             for (int i = 0; i < N; i++)
