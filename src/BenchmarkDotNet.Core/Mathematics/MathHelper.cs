@@ -22,12 +22,12 @@ namespace BenchmarkDotNet.Mathematics
                 z = 0.0;
             else
             {
-                var y = Abs(x) / 2;
+                double y = Abs(x) / 2;
                 if (y >= 3.0)
                     z = 1.0;
                 else if (y < 1.0)
                 {
-                    var w = y * y;
+                    double w = y * y;
                     z = ((((((((0.000124818987 * w - 0.001075204047) * w + 0.005198775019) * w - 0.019198292004) * w +
                              0.059054035642) * w - 0.151968751364) * w + 0.319152932694) * w - 0.531923007300) * w +
                          0.797884560593) * y * 2.0;
@@ -59,11 +59,11 @@ namespace BenchmarkDotNet.Mathematics
         public static double Student(double t, double n)
         {
             t = t.Sqr();
-            var y = t / n;
-            var b = y + 1.0;
+            double y = t / n;
+            double b = y + 1.0;
             if (y > 1.0e-6)
                 y = Log(b);
-            var a = n - 0.5;
+            double a = n - 0.5;
             b = 48.0 * a.Sqr();
             y = a * y;
             y = (((((-0.4 * y - 3.3) * y - 24.0) * y - 85.5) / (0.8 * y.Sqr() + 100.0 + b) + y + 3.0) / b + 1.0) * Sqrt(y);

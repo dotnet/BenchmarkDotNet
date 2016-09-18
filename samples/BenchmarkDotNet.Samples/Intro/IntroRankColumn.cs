@@ -2,17 +2,16 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Columns;
 using BenchmarkDotNet.Attributes.Jobs;
-using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Order;
 
 namespace BenchmarkDotNet.Samples.Intro
 {
     [ShortRunJob]
     [OrderProvider(SummaryOrderPolicy.FastestToSlowest)]
-    [RankColumn(RankColumn.Kind.Arabic)]
-    [RankColumn(RankColumn.Kind.Roman)]
-    [RankColumn(RankColumn.Kind.Stars)]
-    [RankColumn(RankColumn.Kind.Words)]
+    [RankColumn(NumeralSystem.Arabic)]
+    [RankColumn(NumeralSystem.Roman)]
+    [RankColumn(NumeralSystem.Stars)]
     public class IntroRankColumn
     {
         [Params(1, 2)]
