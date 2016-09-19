@@ -88,16 +88,18 @@ namespace BenchmarkDotNet.Code
 
         private class SmartStringBuilder
         {
+            private readonly string originalText;
             private readonly StringBuilder builder;
 
             public SmartStringBuilder(string text)
             {
+                originalText = text;
                 builder = new StringBuilder(text);
             }
 
             public SmartStringBuilder Replace(string oldValue, string newValue)
             {
-                if (builder.ToString().Contains(oldValue))
+                if (originalText.Contains(oldValue))
                     builder.Replace(oldValue, newValue);
                 else
                     builder.Append($"\n// '{oldValue}' not found");

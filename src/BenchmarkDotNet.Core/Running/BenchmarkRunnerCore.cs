@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Running
     {
         private static int benchmarkRunIndex;
 
-        internal static readonly IResolver DefaultResolver = new CompositeResolver(EnvResolver.Instance, InfraResolver.Instance);
+        internal static readonly IResolver DefaultResolver = new CompositeResolver(EnvResolver.Instance, InfrastructureResolver.Instance);
 
         internal static Summary Run(Benchmark[] benchmarks, IConfig config, Func<Job, IToolchain> toolchainProvider)
         {

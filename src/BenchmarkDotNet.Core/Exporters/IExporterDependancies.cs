@@ -8,6 +8,6 @@ namespace BenchmarkDotNet.Exporters
     /// </summary>
     internal interface IExporterDependancies
     {
-        IEnumerable<IExporter> Dependancies { get; }
+        IEnumerable<IExporter> Dependencies { get; }
     }
 }

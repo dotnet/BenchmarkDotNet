@@ -63,6 +63,7 @@ namespace BenchmarkDotNet.Engines
             }
             var main = targetStage.RunMain(invokeCount);
 
+            // TODO: Move calculation of the result measurements to a separated class
             PrintResult(idle, main);
         }
 
@@ -104,7 +105,7 @@ namespace BenchmarkDotNet.Engines
             GcCollect();
 
             // Measure
-            var clock = TargetJob.Infra.Clock.Resolve(Resolver).Start();
+            var clock = TargetJob.Infrastructure.Clock.Resolve(Resolver).Start();
             action(invokeCount);
             var clockSpan = clock.Stop();
 

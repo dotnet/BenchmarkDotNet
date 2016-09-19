@@ -85,9 +85,14 @@ namespace BenchmarkDotNet.Mathematics
         public override string ToString() => $"{Mean} +- {StandardError} (N = {N})";
 
         /// <summary>
+        /// Returns true, if this statistics can be inverted (see <see cref="Invert"/>).
+        /// </summary>
+        public bool CanBeInverted() => Min > 1e-9;
+
+        /// <summary>
         /// Statistics for [1/X]. If Min is less then or equal to 0, returns null.
         /// </summary>        
-        public Statistics Invert() => Min < 1e-9 ? null : new Statistics(list.Select(x => 1 / x));
+        public Statistics Invert() => CanBeInverted() ? new Statistics(list.Select(x => 1 / x)) : null;
 
         /// <summary>
         /// Statistics for [X^2].

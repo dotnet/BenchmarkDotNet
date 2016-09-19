@@ -10,16 +10,16 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn Type = new TargetMethodColumn("Type", benchmark => benchmark.Target.Type.Name);
         public static readonly IColumn Method = new TargetMethodColumn("Method", benchmark => benchmark.Target.MethodDisplayInfo, true);
 
-        private readonly Func<Benchmark, string> calc;
+        private readonly Func<Benchmark, string> valueProvider;
         public string ColumnName { get; }
-        public string GetValue(Summary summary, Benchmark benchmark) => calc(benchmark);
+        public string GetValue(Summary summary, Benchmark benchmark) => valueProvider(benchmark);
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow { get; }
         public ColumnCategory Category => ColumnCategory.Job;
 
-        private TargetMethodColumn(string columnName, Func<Benchmark, string> calc, bool alwaysShow = false)
+        private TargetMethodColumn(string columnName, Func<Benchmark, string> valueProvider, bool alwaysShow = false)
         {
-            this.calc = calc;
+            this.valueProvider = valueProvider;
             AlwaysShow = alwaysShow;
             ColumnName = columnName;
         }

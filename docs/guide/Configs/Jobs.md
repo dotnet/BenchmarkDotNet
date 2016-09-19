@@ -54,7 +54,7 @@ If you want to change the accuracy level, you should use the following character
 * `EvaluateOverhead`: if you benchmark method takes nanoseconds, BenchmarkDotNet overhead can significantly affect measurements. If this characterics is enable, the overhead will be evaluated and substracted from the result measurements. Default value is `true`.
 * `RemoveOutliers`: sometimes you could have outliers in your measurements. Usually it's *unexpected* ourliers which arised because of other processes activities. If this characteristics is enable, all outliers will be removed from the result measurements. However, some of benchmarks have *expected* outliers. In these situation, you expect that some of invocation can produce ourliers measurements (e.g. in case of network acitivities, cache operations, and so on). If you want to see result statistics with these outliers, you should disable this characteristic. Default value is `true`.
 
-### Infra
+### Infrastructure
 Usually, you shouldn't specify any characteristics from this section, it can be used for advanced cases only.
 
 * `Toolchain`: a toolchain which generate source code for target benchmark methods, build it, and execute it. BenchmarkDotNet has own toolchains for CoreCLR projects and classic projects (the last one is `RoslynToolchain`, you can find it in the [BenchmarkDotNet.Toolchains.Roslyn](https://www.nuget.org/packages/BenchmarkDotNet.Toolchains.Roslyn/) NuGet package). If you want, you can define own toolchain.

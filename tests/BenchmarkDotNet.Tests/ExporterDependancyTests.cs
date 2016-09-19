@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Tests
     {
         public static readonly TestExporter Default = new TestExporter();
 
-        public IEnumerable<IExporter> Dependancies
+        public IEnumerable<IExporter> Dependencies
         {
             get { yield return TestExporterDependancy.Default; }
         }

@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Columns
             bool invalidResults = baseline == null ||
                                  summary[baseline] == null ||
                                  summary[baseline].ResultStatistics == null ||
-                                 summary[baseline].ResultStatistics.Invert() == null ||
+                                 !summary[baseline].ResultStatistics.CanBeInverted() ||
                                  summary[benchmark] == null ||
                                  summary[benchmark].ResultStatistics == null;
 

@@ -5,23 +5,23 @@ using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.Jobs
 {
-    public sealed class InfraMode
+    public sealed class InfrastructureMode
     {
-        public static readonly InfraMode Default = new InfraMode();
+        public static readonly InfrastructureMode Default = new InfrastructureMode();
 
-        private InfraMode()
+        private InfrastructureMode()
         {
         }
 
-        private static ICharacteristic<T> Create<T>(string id) => Characteristic<T>.Create("Infra", id);
+        private static ICharacteristic<T> Create<T>(string id) => Characteristic<T>.Create("Infrastructure", id);
 
         public ICharacteristic<IToolchain> Toolchain { get; private set; } = Create<IToolchain>(nameof(Toolchain));
         public ICharacteristic<IClock> Clock { get; private set; } = Create<IClock>(nameof(Clock));
         public ICharacteristic<IEngine> Engine { get; private set; } = Create<IEngine>(nameof(Engine));
 
-        public static InfraMode Parse(CharacteristicSet set)
+        public static InfrastructureMode Parse(CharacteristicSet set)
         {
-            var mode = new InfraMode();
+            var mode = new InfrastructureMode();
             mode.Toolchain = mode.Toolchain.Mutate(set);
             mode.Clock = mode.Clock.Mutate(set);
             mode.Engine = mode.Engine.Mutate(set);

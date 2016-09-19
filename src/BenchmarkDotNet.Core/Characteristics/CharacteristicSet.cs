@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Characteristics
             return this;
         }
 
-        public ICharacteristic[] GetValues() => characteristics.Values.ToArray();
+        public IEnumerable<ICharacteristic> GetValues() => characteristics.Values;
 
         public ICharacteristic Get(string id) => characteristics.GetValueOrDefault(id);
 

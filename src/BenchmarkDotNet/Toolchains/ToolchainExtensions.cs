@@ -9,9 +9,9 @@ namespace BenchmarkDotNet.Toolchains
     {
         internal static IToolchain GetToolchain(this Job job)
         {
-            return job.Infra.Toolchain.IsDefault
+            return job.Infrastructure.Toolchain.IsDefault
                 ? GetToolchain(job.Env.Runtime.Resolve(EnvResolver.Instance))
-                : job.Infra.Toolchain.SpecifiedValue;
+                : job.Infrastructure.Toolchain.SpecifiedValue;
         }
 
         internal static IToolchain GetToolchain(this Runtime runtime)

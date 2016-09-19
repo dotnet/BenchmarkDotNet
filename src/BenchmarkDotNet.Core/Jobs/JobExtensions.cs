@@ -32,10 +32,10 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithIterationTime(this Job job, TimeInterval time) => job.With(job.Run.IterationTime.Mutate(time));
         public static Job WithInvocationCount(this Job job, int count) => job.With(job.Run.InvocationCount.Mutate(count));
 
-        // Infra
-        public static Job With(this Job job, IToolchain toolchain) => job.With(job.Infra.Toolchain.Mutate(toolchain));
-        public static Job With(this Job job, IClock clock) => job.With(job.Infra.Clock.Mutate(clock));
-        public static Job With(this Job job, IEngine engine) => job.With(job.Infra.Engine.Mutate(engine));
+        // Infrastructure
+        public static Job With(this Job job, IToolchain toolchain) => job.With(job.Infrastructure.Toolchain.Mutate(toolchain));
+        public static Job With(this Job job, IClock clock) => job.With(job.Infrastructure.Clock.Mutate(clock));
+        public static Job With(this Job job, IEngine engine) => job.With(job.Infrastructure.Engine.Mutate(engine));
 
         // Accuracy
         public static Job WithMaxStdErrRelative(this Job job, double value) => job.With(job.Accuracy.MaxStdErrRelative.Mutate(value));

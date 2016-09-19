@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Columns
         }
 
 
-        public string ColumnName => CharacteristicHelper.GetDisplayId(id);
+        public string ColumnName => CharacteristicHelper.GetDisplayName(id);
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => false;
         public ColumnCategory Category => ColumnCategory.Job;

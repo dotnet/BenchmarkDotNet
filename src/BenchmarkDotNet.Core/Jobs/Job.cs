@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Jobs
         public ICharacteristic<string> Id { get; private set; } = Characteristic<string>.Create("Job", "Id");
         public EnvMode Env { get; private set; } = EnvMode.Default;
         public RunMode Run { get; private set; } = RunMode.Default;
-        public InfraMode Infra { get; private set; } = InfraMode.Default;
+        public InfrastructureMode Infrastructure { get; private set; } = InfrastructureMode.Default;
         public AccuracyMode Accuracy { get; private set; } = AccuracyMode.Default;
 
         public static Job Parse(CharacteristicSet set, bool clearId = true)
@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Jobs
                 job.Id = job.Id.Mutate(set);
             job.Env = EnvMode.Parse(set);
             job.Run = RunMode.Parse(set);
-            job.Infra = InfraMode.Parse(set);
+            job.Infrastructure = InfrastructureMode.Parse(set);
             job.Accuracy = AccuracyMode.Parse(set);
             return job;
         }
@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.Jobs
             new CharacteristicSet(includeId ? new ICharacteristic[] { Id } : new ICharacteristic[0]).Mutate(
                 Env.ToSet(),
                 Run.ToSet(),
-                Infra.ToSet(),
+                Infrastructure.ToSet(),
                 Accuracy.ToSet()
             );
 

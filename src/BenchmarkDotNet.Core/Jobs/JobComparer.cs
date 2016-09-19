@@ -10,8 +10,8 @@ namespace BenchmarkDotNet.Jobs
 
         public int Compare(Job x, Job y)
         {
-            var xp = x.ToSet().GetValues();
-            var yp = y.ToSet().GetValues();
+            var xp = x.ToSet().GetValues().ToArray();
+            var yp = y.ToSet().GetValues().ToArray();
             if (xp.Length != yp.Length)
                 throw new InvalidOperationException("xJob.Length != yJob.Length");
             for (int i = 0; i < xp.Length; i++)

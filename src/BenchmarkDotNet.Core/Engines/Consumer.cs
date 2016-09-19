@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Engines
         [MethodImpl(MethodImplOptions.NoInlining)]
         public void Consume<T>(T x)
         {
-            // TODO
+            // TODO: Investigate how the current approach works with nanoseconds benchmarks
         }
     }
 }

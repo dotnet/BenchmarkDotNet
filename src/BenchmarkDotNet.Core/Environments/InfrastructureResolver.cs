@@ -4,13 +4,13 @@ using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Environments
 {
-    public class InfraResolver : Resolver
+    public class InfrastructureResolver : Resolver
     {
-        public static readonly IResolver Instance = new InfraResolver();
+        public static readonly IResolver Instance = new InfrastructureResolver();
 
-        private InfraResolver()
+        private InfrastructureResolver()
         {
-            var infra = Job.Default.Infra;
+            var infra = Job.Default.Infrastructure;
             Register(infra.Clock, () => Chronometer.BestClock);
         }
     }

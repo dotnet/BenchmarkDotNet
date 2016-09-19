@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Exporters
             // Now fetch their dependancies (if any) and add them if they AREN'T already present
             foreach (var exporter in exporters.OfType<IExporterDependancies>())
             {
-                foreach (var dependancy in exporter.Dependancies)
+                foreach (var dependancy in exporter.Dependencies)
                 {
                     if (exporters.Contains(dependancy) == false)
                         tempList.Add(dependancy);

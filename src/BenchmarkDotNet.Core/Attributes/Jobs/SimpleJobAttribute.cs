@@ -5,10 +5,12 @@ namespace BenchmarkDotNet.Attributes.Jobs
 {
     public class SimpleJobAttribute : JobConfigBaseAttribute
     {
+        private const int DefaultValue = -1;
+
         public SimpleJobAttribute(
-            int launchCount = -1,
-            int warmupCount = -1,
-            int targetCount = -1,
+            int launchCount = DefaultValue,
+            int warmupCount = DefaultValue,
+            int targetCount = DefaultValue,
             string id = null
         ) : base(CreateJob(id, launchCount, warmupCount, targetCount, null))
         {
@@ -16,9 +18,9 @@ namespace BenchmarkDotNet.Attributes.Jobs
 
         public SimpleJobAttribute(
             RunStrategy runStrategy,
-            int launchCount = -1,
-            int warmupCount = -1,
-            int targetCount = -1,
+            int launchCount = DefaultValue,
+            int warmupCount = DefaultValue,
+            int targetCount = DefaultValue,
             string id = null
         ) : base(CreateJob(id, launchCount, warmupCount, targetCount, runStrategy))
         {
@@ -27,11 +29,11 @@ namespace BenchmarkDotNet.Attributes.Jobs
         private static Job CreateJob(string id, int launchCount, int warmupCount, int targetCount, RunStrategy? runStrategy)
         {
             var job = Job.Default;
-            if (launchCount >= 0)
+            if (launchCount != DefaultValue)
                 job = job.WithLaunchCount(launchCount);
-            if (warmupCount >= 0)
+            if (warmupCount != DefaultValue)
                 job = job.WithWarmupCount(warmupCount);
-            if (targetCount >= 0)
+            if (targetCount != DefaultValue)
                 job = job.WithTargetCount(targetCount);
             if (runStrategy != null)
                 job = job.With(runStrategy.Value);

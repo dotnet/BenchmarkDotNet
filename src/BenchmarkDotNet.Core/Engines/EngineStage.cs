@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Engines
 
         protected Job TargetJob => engine.TargetJob;
         protected AccuracyMode TargetAccuracy => TargetJob.Accuracy;
-        protected IClock TargetClock => engine.Resolver.Resolve(TargetJob.Infra.Clock);
+        protected IClock TargetClock => engine.Resolver.Resolve(TargetJob.Infrastructure.Clock);
         protected IResolver Resolver => engine.Resolver;
 
         protected Measurement RunIteration(IterationMode mode, int index, long invokeCount)

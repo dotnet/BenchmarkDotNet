@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Exporters
 
         private static object buildScriptLock = new object();
 
-        public IEnumerable<IExporter> Dependancies
+        public IEnumerable<IExporter> Dependencies
         {
             // R Plots depends on having the full measurments available
             get { yield return CsvMeasurementsExporter.Default; }
@@ -32,7 +32,8 @@ namespace BenchmarkDotNet.Exporters
             lock (buildScriptLock)
                 File.WriteAllText(scriptFullPath, script);
 
-            var rHome = System.Environment.GetEnvironmentVariable("R_HOME") ?? @"C:\Program Files\R\R-3.3.1\bin\";
+            // TODO: implement smart autodetection of the R bin folder
+            var rHome = Environment.GetEnvironmentVariable("R_HOME") ?? @"C:\Program Files\R\R-3.3.1\bin\";
             if (Directory.Exists(rHome))
             {
                 var start = new ProcessStartInfo
@@ -48,6 +49,10 @@ namespace BenchmarkDotNet.Exporters
                     process?.WaitForExit();
                 yield return fileNamePrefix + "-boxplot.png";
                 yield return fileNamePrefix + "-barplot.png";
+            }
+            else
+            {
+                // TODO: print warning, if the folder is not found
             }
         }
 
