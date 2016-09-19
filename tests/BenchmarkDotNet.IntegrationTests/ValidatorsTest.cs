@@ -4,6 +4,7 @@ using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Loggers;
 using Xunit;
 using Xunit.Abstractions;

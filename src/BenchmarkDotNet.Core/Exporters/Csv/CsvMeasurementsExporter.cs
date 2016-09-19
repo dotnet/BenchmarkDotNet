@@ -6,19 +6,21 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
-namespace BenchmarkDotNet.Exporters
+namespace BenchmarkDotNet.Exporters.Csv
 {
     public class CsvMeasurementsExporter : ExporterBase
     {
+        private readonly string separator;
         private static readonly CharacteristicPresenter Presenter = CharacteristicPresenter.SummaryPresenter;
 
         protected override string FileExtension => "csv";
         protected override string FileCaption => "measurements";
 
-        public static readonly IExporter Default = new CsvMeasurementsExporter();
+        public static readonly IExporter Default = new CsvMeasurementsExporter(CsvSeparator.CurrentCulture);
 
-        private CsvMeasurementsExporter()
+        public CsvMeasurementsExporter(CsvSeparator separator)
         {
+            this.separator = separator.ToRealSeparator();
         }
 
         private class MeasurementColumn
@@ -59,7 +61,7 @@ namespace BenchmarkDotNet.Exporters
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
-            logger.WriteLine(string.Join(";", columns.Select(c => c.Title)));
+            logger.WriteLine(string.Join(separator, columns.Select(c => CsvHelper.Escape(c.Title))));
 
             foreach (var report in summary.Reports)
             {
@@ -67,11 +69,11 @@ namespace BenchmarkDotNet.Exporters
                 {
                     for (int i = 0; i < columns.Length; )
                     {
-                        logger.Write(columns[i].GetValue(summary, report, measurement));
+                        logger.Write(CsvHelper.Escape(columns[i].GetValue(summary, report, measurement)));
 
                         if (++i < columns.Length)
                         {
-                            logger.Write(";");
+                            logger.Write(separator);
                         }
                     }
                     logger.WriteLine();

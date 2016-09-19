@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Exporters.Json;
+﻿using BenchmarkDotNet.Exporters.Csv;
+using BenchmarkDotNet.Exporters.Json;
 
 namespace BenchmarkDotNet.Exporters
 {

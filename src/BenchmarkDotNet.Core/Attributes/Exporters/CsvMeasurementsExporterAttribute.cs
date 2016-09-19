@@ -1,10 +1,10 @@
-﻿using BenchmarkDotNet.Exporters;
+﻿using BenchmarkDotNet.Exporters.Csv;
 
 namespace BenchmarkDotNet.Attributes.Exporters
 {
     public class CsvMeasurementsExporterAttribute : ExporterConfigBaseAttribute
     {
-        public CsvMeasurementsExporterAttribute() : base(DefaultExporters.CsvMeasurements)
+        public CsvMeasurementsExporterAttribute(CsvSeparator separator = CsvSeparator.CurrentCulture) : base(new CsvMeasurementsExporter(separator))
         {
         }
     }
