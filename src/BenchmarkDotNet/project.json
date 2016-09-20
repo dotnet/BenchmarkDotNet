@@ -28,7 +28,7 @@
         "define": [ "RELEASE", "TRACE" ],
         "optimize": true,
         "xmlDoc": true,
-        "keyFile": "../../strongNameKey.snk",
+        "keyFile": "../strongNameKey.snk",
         "strongName": true
       }
     }
