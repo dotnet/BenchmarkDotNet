@@ -77,6 +77,7 @@ namespace BenchmarkDotNet.Mathematics
             Percentiles = new PercentileValues(list);
         }
 
+        public ConfidenceInterval GetConfidenceInterval(ConfidenceLevel level) => new ConfidenceInterval(Mean, StandardError, level);
         public bool IsOutlier(double value) => value < LowerFence || value > UpperFence;
         public double[] WithoutOutliers() => list.Where(value => !IsOutlier(value)).ToArray();
 

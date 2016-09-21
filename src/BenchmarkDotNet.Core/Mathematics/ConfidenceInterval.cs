@@ -49,6 +49,8 @@ namespace BenchmarkDotNet.Mathematics
             Upper = mean + Margin;
         }
 
+        public bool Contains(double value) => Lower < value && value < Upper;
+
         public string ToStr(bool showLevel = true) => $"[{Lower.ToStr()}; {Upper.ToStr()}] (CI {Level.ToPercent()}%)";
         public string ToTimeStr(TimeUnit unit = null, bool showLevel = true) => $"[{Lower.ToTimeStr(unit)}; {Upper.ToTimeStr(unit)}] (CI {Level.ToPercent()}%)";
     }

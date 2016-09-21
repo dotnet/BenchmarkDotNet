@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BenchmarkDotNet.Reports;
 using System.Linq;
+using BenchmarkDotNet.Mathematics;
 
 namespace BenchmarkDotNet.Columns
 {
@@ -36,13 +38,23 @@ namespace BenchmarkDotNet.Columns
             public IEnumerable<IColumn> GetColumns(Summary summary)
             {
                 yield return StatisticColumn.Mean;
-                yield return StatisticColumn.StdErr;
-                // TODO: Meadian, P95
-                if (summary.Reports != null && summary.Reports.Any(r => r.ResultStatistics != null && r.ResultStatistics.StandardDeviation > 1e-9))
+
+                if (NeedToShow(summary, s => s.StandardError > s.Mean * 0.01)) // TODO: Use Accuracy.MaxStdErrRelative
+                    yield return StatisticColumn.StdErr;
+                if (NeedToShow(summary, s => s.Percentiles.P95 > s.Mean + 3 * s.StandardDeviation))
+                    yield return StatisticColumn.P95;
+                if (NeedToShow(summary, s=> s.GetConfidenceInterval(ConfidenceLevel.L99).Contains(s.Median)))
+                    yield return StatisticColumn.Median;
+                if (NeedToShow(summary, s => s.StandardDeviation > 1e-9))
                     yield return StatisticColumn.StdDev;
 
                 yield return BaselineScaledColumn.Scaled;
                 yield return BaselineScaledColumn.ScaledStdDev; // TODO: make optional
+            }
+
+            private static bool NeedToShow(Summary summary, Func<Statistics, bool> check)
+            {
+                return summary.Reports != null && summary.Reports.Any(r => r.ResultStatistics != null && check(r.ResultStatistics));
             }
         }
 
