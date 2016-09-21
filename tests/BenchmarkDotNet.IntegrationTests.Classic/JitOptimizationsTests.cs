@@ -4,11 +4,19 @@ using System.Linq;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests.Classic
 {
     public class JitOptimizationsTests
     {
+        private readonly ITestOutputHelper output;
+
+        public JitOptimizationsTests(ITestOutputHelper output)
+        {
+            this.output = output;
+        }
+
         [Fact]
         public void UserGetsWarningWhenNonOptimizedDllIsReferenced()
         {
@@ -30,7 +38,18 @@ namespace BenchmarkDotNet.IntegrationTests.Classic
 
             var warnings = JitOptimizationsValidator.DontFailOnError.Validate(benchmarksWithOptimizedDll).ToArray();
 
+            if (warnings.Any())
+            {
+                output.WriteLine("*** Warnings ***");
+                foreach (var warning in warnings)
+                    output.WriteLine(warning.Message);
+            }
+
+#if DEBUG
+            Assert.NotEmpty(warnings);
+#else
             Assert.Empty(warnings);
+#endif
         }
 
         private IList<Benchmark> CreateBenchmarks(Type targetBenchmarkType)
