@@ -18,6 +18,7 @@ namespace BenchmarkDotNet.Jobs
         public ICharacteristic<int> MinInvokeCount { get; private set; } = Create<int>(nameof(MinInvokeCount));
         public ICharacteristic<bool> EvaluateOverhead { get; private set; } = Create<bool>(nameof(EvaluateOverhead));
         public ICharacteristic<bool> RemoveOutliers { get; private set; } = Create<bool>(nameof(RemoveOutliers));
+        public ICharacteristic<bool> AnaylyzeLaunchVariance { get; private set; } = Create<bool>(nameof(AnaylyzeLaunchVariance));
 
         public static AccuracyMode Parse(CharacteristicSet set)
         {
@@ -27,6 +28,7 @@ namespace BenchmarkDotNet.Jobs
             mode.MinInvokeCount = mode.MinInvokeCount.Mutate(set);
             mode.EvaluateOverhead = mode.EvaluateOverhead.Mutate(set);
             mode.RemoveOutliers = mode.RemoveOutliers.Mutate(set);
+            mode.AnaylyzeLaunchVariance = mode.AnaylyzeLaunchVariance.Mutate(set);
             return mode;
         }
 
@@ -35,7 +37,8 @@ namespace BenchmarkDotNet.Jobs
             MinIterationTime,
             MinInvokeCount,
             EvaluateOverhead,
-            RemoveOutliers
+            RemoveOutliers,
+            AnaylyzeLaunchVariance
         );
     }
 }

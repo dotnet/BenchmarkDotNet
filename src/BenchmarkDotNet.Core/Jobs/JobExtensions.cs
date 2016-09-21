@@ -43,6 +43,7 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithMinInvokeCount(this Job job, int value) => job.With(job.Accuracy.MinInvokeCount.Mutate(value));
         public static Job WithEvaluateOverhead(this Job job, bool value) => job.With(job.Accuracy.EvaluateOverhead.Mutate(value));
         public static Job WithRemoveOutliers(this Job job, bool value) => job.With(job.Accuracy.RemoveOutliers.Mutate(value));
+        public static Job WithAnaylyzeLaunchVariance(this Job job, bool value) => job.With(job.Accuracy.AnaylyzeLaunchVariance.Mutate(value));
 
         // Info
         [Obsolete]

@@ -157,7 +157,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineHeader("// Benchmark: " + benchmark.DisplayInfo);
 
             var generateResult = Generate(logger, toolchain, benchmark, rootArtifactsFolderPath, config, resolver);
-            
+
             try
             {
                 if (!generateResult.IsGenerateSuccess)
@@ -229,12 +229,14 @@ namespace BenchmarkDotNet.Running
             var executeResults = new List<ExecuteResult>();
 
             logger.WriteLineInfo("// *** Execute ***");
-            var launchCount = Math.Max(1, benchmark.Job.Run.LaunchCount.IsDefault ? 2 : benchmark.Job.Run.LaunchCount.SpecifiedValue);
+            bool analyzeRunToRunVariance = benchmark.Job.Accuracy.AnaylyzeLaunchVariance.Resolve(resolver);
+            int defaultValue = analyzeRunToRunVariance ? 2 : 1;
+            int launchCount = Math.Max(1, benchmark.Job.Run.LaunchCount.IsDefault ? defaultValue : benchmark.Job.Run.LaunchCount.SpecifiedValue);
 
-            for (int processNumber = 0; processNumber < launchCount; processNumber++)
+            for (int launchIndex = 0; launchIndex < launchCount; launchIndex++)
             {
-                var printedProcessNumber = (benchmark.Job.Run.LaunchCount.IsDefault && processNumber < 2) ? "" : " / " + launchCount.ToString();
-                logger.WriteLineInfo($"// Launch: {processNumber + 1}{printedProcessNumber}");
+                string printedLaunchCount = analyzeRunToRunVariance && benchmark.Job.Run.LaunchCount.IsDefault && launchIndex < 2 ? "" : " / " + launchCount;
+                logger.WriteLineInfo($"// Launch: {launchIndex + 1}{printedLaunchCount}");
 
                 var executeResult = toolchain.Executor.Execute(buildResult, benchmark, logger, resolver);
 
@@ -257,8 +259,9 @@ namespace BenchmarkDotNet.Running
                     break;
                 }
 
-                if (benchmark.Job.Run.LaunchCount.IsDefault && processNumber == 1)
+                if (benchmark.Job.Run.LaunchCount.IsDefault && launchIndex == 1 && analyzeRunToRunVariance)
                 {
+                    // TODO: improve this logic
                     var idleApprox = new Statistics(measurements.Where(m => m.IterationMode == IterationMode.IdleTarget).Select(m => m.Nanoseconds)).Median;
                     var mainApprox = new Statistics(measurements.Where(m => m.IterationMode == IterationMode.MainTarget).Select(m => m.Nanoseconds)).Median;
                     var percent = idleApprox / mainApprox * 100;

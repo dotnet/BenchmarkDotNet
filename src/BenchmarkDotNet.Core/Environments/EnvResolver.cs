@@ -15,6 +15,10 @@ namespace BenchmarkDotNet.Environments
             Register(envMode.Runtime, RuntimeInformation.GetCurrentRuntime);
             Register(envMode.Jit, RuntimeInformation.GetCurrentJit);
             Register(envMode.Affinity, RuntimeInformation.GetCurrentAffinity);
+
+            // TODO: find a better place
+            var acc = Job.Default.Accuracy;
+            Register(acc.AnaylyzeLaunchVariance, () => false);
         }
     }
 }
