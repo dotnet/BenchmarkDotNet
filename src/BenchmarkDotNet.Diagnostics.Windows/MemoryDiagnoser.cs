@@ -142,12 +142,14 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 this.results = results;
             }
 
+            public string Id => nameof(AllocationColumn);
             public string ColumnName => "Bytes Allocated/Op";
             public bool IsDefault(Summary summary, Benchmark benchmark) => false;
 
             public bool IsAvailable(Summary summary) => true;
             public bool AlwaysShow => true;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
+            public int PriorityInCategory => 0;
 
             public string GetValue(Summary summary, Benchmark benchmark)
             {
@@ -177,10 +179,12 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             }
 
             public bool IsDefault(Summary summary, Benchmark benchmark) => false;
+            public string Id => nameof(GCCollectionColumn);
             public string ColumnName { get; private set; }
             public bool IsAvailable(Summary summary) => true;
             public bool AlwaysShow => true;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
+            public int PriorityInCategory => 0;
 
             public string GetValue(Summary summary, Benchmark benchmark)
             {

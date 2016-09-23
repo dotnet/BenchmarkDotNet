@@ -27,6 +27,8 @@ namespace BenchmarkDotNet.Columns
             Kind = kind;
         }
 
+        public string Id => nameof(BaselineScaledColumn) + "." + Kind;
+
         public string ColumnName
         {
             get
@@ -85,7 +87,8 @@ namespace BenchmarkDotNet.Columns
 
         public bool IsAvailable(Summary summary) => summary.Benchmarks.Any(b => b.Target.Baseline);
         public bool AlwaysShow => true;
-        public ColumnCategory Category => ColumnCategory.Statistics;
+        public ColumnCategory Category => ColumnCategory.Baseline;
+        public int PriorityInCategory => (int) Kind;
         public override string ToString() => ColumnName;
         public bool IsDefault(Summary summary, Benchmark benchmark) => false;
     }

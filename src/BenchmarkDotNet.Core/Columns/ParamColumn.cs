@@ -6,6 +6,7 @@ namespace BenchmarkDotNet.Columns
 {
     public class ParamColumn : IColumn
     {
+        public string Id => nameof(ParamColumn) + "." + ColumnName;
         public string ColumnName { get; }
 
         public ParamColumn(string columnName)
@@ -20,6 +21,7 @@ namespace BenchmarkDotNet.Columns
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Params;
+        public int PriorityInCategory => 0;
         public override string ToString() => ColumnName;
     }
 }

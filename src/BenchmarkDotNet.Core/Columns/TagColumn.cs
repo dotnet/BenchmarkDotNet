@@ -8,6 +8,7 @@ namespace BenchmarkDotNet.Columns
     {
         private readonly Func<string, string> getTag;
 
+        public string Id => nameof(TagColumn);
         public string ColumnName { get; }
 
         public TagColumn(string columnName, Func<string, string> getTag)
@@ -22,6 +23,7 @@ namespace BenchmarkDotNet.Columns
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Custom;
+        public int PriorityInCategory => 0;
         public override string ToString() => ColumnName;
     }
 }

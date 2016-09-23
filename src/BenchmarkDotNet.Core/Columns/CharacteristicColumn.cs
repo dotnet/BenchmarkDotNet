@@ -20,10 +20,12 @@ namespace BenchmarkDotNet.Columns
         }
 
 
+        public string Id => "Job." + id;
         public string ColumnName => CharacteristicHelper.GetDisplayName(id);
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => false;
         public ColumnCategory Category => ColumnCategory.Job;
+        public int PriorityInCategory => 0;
 
         public bool IsDefault(Summary summary, Benchmark benchmark) => benchmark.Job.ToSet().Get(id).IsDefault;
 

@@ -19,6 +19,7 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn Roman = new RankColumn(NumeralSystem.Roman);
         public static readonly IColumn Stars = new RankColumn(NumeralSystem.Stars);
 
+        public string Id => nameof(RankColumn) + "." + system;
         public string ColumnName => "Rank";
 
         public string GetValue(Summary summary, Benchmark benchmark)
@@ -33,6 +34,7 @@ namespace BenchmarkDotNet.Columns
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Custom;
+        public int PriorityInCategory => (int) system;
         public override string ToString() => ColumnName;
     }
 }
