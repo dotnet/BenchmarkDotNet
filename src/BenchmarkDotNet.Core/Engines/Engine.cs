@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Engines
     public class Engine : IEngine
     {
         public const int MinInvokeCount = 4;
-        public const int MinIterationTimeMs = 200;
+        public static readonly TimeInterval MinIterationTime = 200 * TimeInterval.Millisecond;
 
         public Job TargetJob { get; set; } = Job.Default;
         public long OperationsPerInvoke { get; set; } = 1;
@@ -47,6 +47,7 @@ namespace BenchmarkDotNet.Engines
             Jitting();
 
             long invokeCount = 1;
+            int unrollFactor = TargetJob.Run.UnrollFactor.Resolve(Resolver);
             IList<Measurement> idle = null;
 
             if (TargetJob.Run.RunStrategy.Resolve(Resolver) != RunStrategy.ColdStart)
@@ -55,13 +56,13 @@ namespace BenchmarkDotNet.Engines
 
                 if (TargetJob.Accuracy.EvaluateOverhead.Resolve(Resolver))
                 {
-                    warmupStage.RunIdle(invokeCount);
-                    idle = targetStage.RunIdle(invokeCount);
+                    warmupStage.RunIdle(invokeCount, unrollFactor);
+                    idle = targetStage.RunIdle(invokeCount, unrollFactor);
                 }
 
-                warmupStage.RunMain(invokeCount);
+                warmupStage.RunMain(invokeCount, unrollFactor);
             }
-            var main = targetStage.RunMain(invokeCount);
+            var main = targetStage.RunMain(invokeCount, unrollFactor);
 
             // TODO: Move calculation of the result measurements to a separated class
             PrintResult(idle, main);
@@ -78,7 +79,8 @@ namespace BenchmarkDotNet.Engines
         private void PrintResult(IList<Measurement> idle, IList<Measurement> main)
         {
             // TODO: use Accuracy.RemoveOutliers
-            var overhead = idle == null ? 0.0 : new Statistics(idle.Select(m => m.Nanoseconds)).Median;
+            // TODO: check if resulted measurements are too small (like < 0.1ns)
+            double overhead = idle == null ? 0.0 : new Statistics(idle.Select(m => m.Nanoseconds)).Median;
             int resultIndex = 0;
             foreach (var measurement in main)
             {
@@ -97,7 +99,8 @@ namespace BenchmarkDotNet.Engines
         {
             // Initialization
             long invokeCount = data.InvokeCount;
-            var totalOperations = invokeCount * OperationsPerInvoke;
+            int unrollFactor = data.UnrollFactor;
+            long totalOperations = invokeCount * OperationsPerInvoke;
             var action = data.IterationMode.IsIdle() ? IdleAction : MainAction;
 
             // Setup
@@ -106,7 +109,7 @@ namespace BenchmarkDotNet.Engines
 
             // Measure
             var clock = TargetJob.Infrastructure.Clock.Resolve(Resolver).Start();
-            action(invokeCount);
+            action(invokeCount / unrollFactor);
             var clockSpan = clock.Stop();
 
             // Cleanup

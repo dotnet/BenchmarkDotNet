@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -6,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Core.Helpers;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
@@ -18,7 +20,7 @@ namespace BenchmarkDotNet.Code
         {
             var provider = GetDeclarationsProvider(benchmark.Target);
 
-            return new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt")).
+            string text = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt")).
                 Replace("$OperationsPerInvoke$", provider.OperationsPerInvoke).
                 Replace("$TargetTypeNamespace$", provider.TargetTypeNamespace).
                 Replace("$TargetMethodReturnTypeNamespace$", provider.TargetMethodReturnTypeNamespace).
@@ -35,6 +37,29 @@ namespace BenchmarkDotNet.Code
                 Replace("$JobSetDefinition$", GetJobsSetDefinition(benchmark)).
                 Replace("$ParamsContent$", GetParamsContent(benchmark)).
                 ToString();
+
+            text = Unroll(text, benchmark.Job.Run.UnrollFactor.Resolve(EnvResolver.Instance));
+
+            return text;
+        }
+
+        private static string Unroll(string text, int factor)
+        {
+            const string unrollDirective = "@Unroll@";
+            var oldLines = text.Split('\n');
+            var newLines = new List<string>();
+            foreach (string line in oldLines)
+            {
+                if (line.Contains(unrollDirective))
+                {
+                    string newLine = line.Replace(unrollDirective, "");
+                    for (int i = 0; i < factor; i++)
+                        newLines.Add(newLine);
+                }
+                else
+                    newLines.Add(line);
+            }
+            return string.Join("\n", newLines);
         }
 
         private static string GetJobsSetDefinition(Benchmark benchmark)

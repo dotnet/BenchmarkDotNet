@@ -4,7 +4,8 @@ using BenchmarkDotNet.Attributes.Jobs;
 
 namespace BenchmarkDotNet.Samples.Intro
 {
-    [DryJob]
+    [ShortRunJob]
+    [KeepBenchmarkFiles()]
     public class IntroJobsFull
     {
         [Benchmark(Baseline = true)]

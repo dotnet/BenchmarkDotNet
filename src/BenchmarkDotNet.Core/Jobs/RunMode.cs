@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Jobs
     {
         public static readonly RunMode Default = new RunMode();
 
-        public static readonly JobMutator Dry = CreateMutator(nameof(Dry), 1, 1, 1, Engines.RunStrategy.ColdStart);
+        public static readonly JobMutator Dry = CreateMutator(nameof(Dry), 1, 1, 1, Engines.RunStrategy.ColdStart).Add(Default.UnrollFactor.Mutate(1));
         public static readonly JobMutator Short = CreateMutator(nameof(Short), 1, 3, 3);
         public static readonly JobMutator Medium = CreateMutator(nameof(Medium), 2, 10, 15);
         public static readonly JobMutator Long = CreateMutator(nameof(Long), 3, 15, 100);
@@ -17,22 +17,24 @@ namespace BenchmarkDotNet.Jobs
         private static ICharacteristic<T> Create<T>(string id) => Characteristic<T>.Create("Run", id);
 
         /// <summary>
-        /// RunStrategy
+        /// Available values: Throughput and ColdStart.
+        ///     Throughput: default strategy which allows to get good precision level.
+        ///     ColdStart: should be used only for measuring cold start of the application or testing purpose.
         /// </summary>
         public ICharacteristic<RunStrategy> RunStrategy { get; private set; } = Create<RunStrategy>(nameof(RunStrategy));
 
         /// <summary>
-        /// LaunchCount
+        /// How many times we should launch process with target benchmark.
         /// </summary>
         public ICharacteristic<int> LaunchCount { get; private set; } = Create<int>(nameof(LaunchCount));
 
         /// <summary>
-        /// WarmupCount
+        /// How many warmup iterations should be performed.
         /// </summary>
         public ICharacteristic<int> WarmupCount { get; private set; } = Create<int>(nameof(WarmupCount));
 
         /// <summary>
-        /// TargetCount
+        /// How many target iterations should be performed
         /// </summary>
         public ICharacteristic<int> TargetCount { get; private set; } = Create<int>(nameof(TargetCount));
 
@@ -42,9 +44,16 @@ namespace BenchmarkDotNet.Jobs
         public ICharacteristic<TimeInterval> IterationTime { get; private set; } = Create<TimeInterval>(nameof(IterationTime));
 
         /// <summary>
-        /// Invocation count in a single iteration. If specified, <see cref="IterationTime"/> will be ignored.
+        /// Invocation count in a single iteration.
+        /// If specified, <see cref="IterationTime"/> will be ignored.
+        /// If specified, it must be a multiple of <see cref="UnrollFactor"/>.
         /// </summary>
         public ICharacteristic<int> InvocationCount { get; private set; } = Create<int>(nameof(InvocationCount));
+
+        /// <summary>
+        /// How many times the benchmark method will be invoked per one iteration of a generated loop.
+        /// </summary>
+        public ICharacteristic<int> UnrollFactor { get; private set; }= Create<int>(nameof(UnrollFactor));
 
         public static JobMutator CreateMutator(string id, int launchCount, int warmupCount, int targetCount,
             RunStrategy strategy = Engines.RunStrategy.Throughput)
@@ -66,6 +75,7 @@ namespace BenchmarkDotNet.Jobs
             mode.TargetCount = mode.TargetCount.Mutate(set);
             mode.IterationTime = mode.IterationTime.Mutate(set);
             mode.InvocationCount = mode.InvocationCount.Mutate(set);
+            mode.UnrollFactor = mode.UnrollFactor.Mutate(set);
             return mode;
         }
 
@@ -75,7 +85,8 @@ namespace BenchmarkDotNet.Jobs
             WarmupCount,
             TargetCount,
             IterationTime,
-            InvocationCount
+            InvocationCount,
+            UnrollFactor
         );
     }
 }

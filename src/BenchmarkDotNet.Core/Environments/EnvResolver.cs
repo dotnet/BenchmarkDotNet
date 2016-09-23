@@ -19,6 +19,8 @@ namespace BenchmarkDotNet.Environments
             // TODO: find a better place
             var acc = Job.Default.Accuracy;
             Register(acc.AnaylyzeLaunchVariance, () => false);
+            var run = Job.Default.Run;
+            Register(run.UnrollFactor, () => 16);
         }
     }
 }

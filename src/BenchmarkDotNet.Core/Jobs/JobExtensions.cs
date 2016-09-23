@@ -31,6 +31,7 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithTargetCount(this Job job, int count) => job.With(job.Run.TargetCount.Mutate(count));
         public static Job WithIterationTime(this Job job, TimeInterval time) => job.With(job.Run.IterationTime.Mutate(time));
         public static Job WithInvocationCount(this Job job, int count) => job.With(job.Run.InvocationCount.Mutate(count));
+        public static Job WithUnrollFactor(this Job job, int factor) => job.With(job.Run.UnrollFactor.Mutate(factor));
 
         // Infrastructure
         public static Job With(this Job job, IToolchain toolchain) => job.With(job.Infrastructure.Toolchain.Mutate(toolchain));

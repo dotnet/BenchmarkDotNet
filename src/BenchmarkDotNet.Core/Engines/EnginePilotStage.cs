@@ -28,9 +28,12 @@ namespace BenchmarkDotNet.Engines
         /// </summary>
         private long RunAuto()
         {
-            long invokeCount = TargetAccuracy.MinInvokeCount.Resolve(Resolver);
+            int unrollFactor = TargetJob.Run.UnrollFactor.Resolve(Resolver);
+            Func<long, long> autocorrect = count => (count + unrollFactor - 1) / unrollFactor * unrollFactor;
+
+            long invokeCount = autocorrect(TargetAccuracy.MinInvokeCount.Resolve(Resolver));
             double maxError = TargetAccuracy.MaxStdErrRelative.Resolve(Resolver); // TODO: introduce a StdErr factor
-            double minIterationTome = TimeUnit.Convert(Engine.MinIterationTimeMs, TimeUnit.Millisecond, TimeUnit.Nanosecond);
+            double minIterationTime = Engine.MinIterationTime.Nanoseconds;
 
             double resolution = TargetClock.GetResolution().Nanoseconds;
 
@@ -38,12 +41,12 @@ namespace BenchmarkDotNet.Engines
             while (true)
             {
                 iterationCounter++;
-                var measurement = RunIteration(IterationMode.Pilot, iterationCounter, invokeCount);
-                double iterationTime = measurement.Nanoseconds;                
+                var measurement = RunIteration(IterationMode.Pilot, iterationCounter, invokeCount, unrollFactor);
+                double iterationTime = measurement.Nanoseconds;
                 double operationError = 2.0 * resolution / invokeCount; // An operation error which has arisen due to the Chronometer precision
                 double operationMaxError = iterationTime / invokeCount * maxError; // Max acceptable operation error
 
-                bool isFinished = operationError < operationMaxError && iterationTime >= minIterationTome;
+                bool isFinished = operationError < operationMaxError && iterationTime >= minIterationTime;
                 if (isFinished)
                     break;
                 if (invokeCount >= MaxInvokeCount)
@@ -61,7 +64,10 @@ namespace BenchmarkDotNet.Engines
         /// </summary>
         private long RunSpecific()
         {
-            long invokeCount = Engine.MinInvokeCount;
+            int unrollFactor = TargetJob.Run.UnrollFactor.Resolve(Resolver);
+            Func<long, long> autocorrect = count => (count + unrollFactor - 1) / unrollFactor * unrollFactor;
+
+            long invokeCount = autocorrect(Engine.MinInvokeCount);
             double targetIterationTime = TargetJob.Run.IterationTime.Resolve(Resolver).ToNanoseconds();
             int iterationCounter = 0;
 
@@ -69,9 +75,9 @@ namespace BenchmarkDotNet.Engines
             while (true)
             {
                 iterationCounter++;
-                var measurement = RunIteration(IterationMode.Pilot, iterationCounter, invokeCount);
+                var measurement = RunIteration(IterationMode.Pilot, iterationCounter, invokeCount, unrollFactor);
                 double actualIterationTime = measurement.Nanoseconds;
-                long newInvokeCount = Math.Max(TargetAccuracy.MinInvokeCount.Resolve(Resolver), (long) Math.Round(invokeCount * targetIterationTime / actualIterationTime));
+                long newInvokeCount = autocorrect(Math.Max(TargetAccuracy.MinInvokeCount.Resolve(Resolver), (long) Math.Round(invokeCount * targetIterationTime / actualIterationTime)));
 
                 if (newInvokeCount < invokeCount)
                     downCount++;

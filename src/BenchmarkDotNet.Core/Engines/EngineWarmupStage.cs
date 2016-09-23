@@ -15,24 +15,24 @@ namespace BenchmarkDotNet.Engines
         {
         }
 
-        public List<Measurement> Run(long invokeCount, IterationMode iterationMode, ICharacteristic<int> iterationCount)
+        public List<Measurement> Run(long invokeCount, IterationMode iterationMode, ICharacteristic<int> iterationCount, int unrollFactor)
         {
             return iterationCount.IsDefault
-                ? RunAuto(invokeCount, iterationMode)
-                : RunSpecific(invokeCount, iterationMode, iterationCount.SpecifiedValue);
+                ? RunAuto(invokeCount, iterationMode, unrollFactor)
+                : RunSpecific(invokeCount, iterationMode, iterationCount.SpecifiedValue, unrollFactor);
         }
 
-        public void RunIdle(long invokeCount) => Run(invokeCount, IterationMode.IdleWarmup, TargetJob.Run.WarmupCount.MakeDefault());
-        public void RunMain(long invokeCount) => Run(invokeCount, IterationMode.MainWarmup, TargetJob.Run.WarmupCount);
+        public void RunIdle(long invokeCount, int unrollFactor) => Run(invokeCount, IterationMode.IdleWarmup, TargetJob.Run.WarmupCount.MakeDefault(), unrollFactor);
+        public void RunMain(long invokeCount, int unrollFactor) => Run(invokeCount, IterationMode.MainWarmup, TargetJob.Run.WarmupCount, unrollFactor);
 
-        private List<Measurement> RunAuto(long invokeCount, IterationMode iterationMode)
+        private List<Measurement> RunAuto(long invokeCount, IterationMode iterationMode, int unrollFactor)
         {
             int iterationCounter = 0;
             var measurements = new List<Measurement>(MaxIterationCount);
             while (true)
             {
                 iterationCounter++;
-                measurements.Add(RunIteration(iterationMode, iterationCounter, invokeCount));
+                measurements.Add(RunIteration(iterationMode, iterationCounter, invokeCount, unrollFactor));
                 if (IsWarmupFinished(measurements, iterationMode))
                     break;
             }
@@ -40,11 +40,11 @@ namespace BenchmarkDotNet.Engines
             return measurements;
         }
 
-        private List<Measurement> RunSpecific(long invokeCount, IterationMode iterationMode, int iterationCount)
+        private List<Measurement> RunSpecific(long invokeCount, IterationMode iterationMode, int iterationCount, int unrollFactor)
         {
             var measurements = new List<Measurement>(iterationCount);
             for (int i = 0; i < iterationCount; i++)
-                measurements.Add(RunIteration(iterationMode, i + 1, invokeCount));
+                measurements.Add(RunIteration(iterationMode, i + 1, invokeCount, unrollFactor));
             WriteLine();
             return measurements;
         }

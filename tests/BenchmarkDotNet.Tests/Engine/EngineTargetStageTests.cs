@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Tests.Engine
                 max = min;
             var job = Job.Default;
             var stage = CreateStage(job, measure);
-            var measurements = stage.Run(1, mode, Characteristic<int>.Create(""));
+            var measurements = stage.Run(1, mode, Characteristic<int>.Create(""), 1);
             int count = measurements.Count;
             output.WriteLine($"MeasurementCount = {count} (Min= {min}, Max = {max})");
             Assert.InRange(count, min, max);

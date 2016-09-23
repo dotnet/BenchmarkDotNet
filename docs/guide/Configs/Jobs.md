@@ -41,7 +41,8 @@ In this category, you can specifiy how to benchmark each method.
 * `WarmupCount`: how many warmup iterations should be performed
 * `TargetCount`: how many target iterations should be performed
 * `IterationTime`: desired time of a single iteration
-* `InvocationCount`: count of invocation in a single iteration (if specified, `IterationTime` will be ignored)
+* `UnrollFactor`: how many times the benchmark method will be invoked per one iteration of a generated loop
+* `InvocationCount`: count of invocation in a single iteration (if specified, `IterationTime` will be ignored), must be a multiple of `UnrollFactor`
 
 Usually, you shouldn't specify such characteristics like `LaunchCount`, `WarmupCount`, `TargetCount`, or `IterationTime` because BenchmarkDotNet has a smart algorithm to choose these values automatically based on recieved measurements. You can specify it for testing purposes or when you are damn sure that you know perfect characteristics for your benchmark (when you set `TargetCount` = `20` you should unserstand why `20` is a good value for your case).
 

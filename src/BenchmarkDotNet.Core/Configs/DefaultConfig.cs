@@ -48,6 +48,7 @@ namespace BenchmarkDotNet.Configs
         {
             yield return BaselineValidator.FailOnError;
             yield return JitOptimizationsValidator.DontFailOnError;
+            yield return UnrollFactorValidator.Default;
         }
 
         public IEnumerable<Job> GetJobs() => Enumerable.Empty<Job>();

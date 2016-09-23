@@ -18,17 +18,17 @@ namespace BenchmarkDotNet.Engines
         {
         }
 
-        public List<Measurement> Run(long invokeCount, IterationMode iterationMode, ICharacteristic<int> iterationCount)
+        public List<Measurement> Run(long invokeCount, IterationMode iterationMode, ICharacteristic<int> iterationCount, int unrollFactor)
         {
             return iterationCount.IsDefault
-                ? RunAuto(invokeCount, iterationMode)
-                : RunSpecific(invokeCount, iterationMode, iterationCount.SpecifiedValue);
+                ? RunAuto(invokeCount, iterationMode, unrollFactor)
+                : RunSpecific(invokeCount, iterationMode, iterationCount.SpecifiedValue, unrollFactor);
         }
 
-        public List<Measurement> RunIdle(long invokeCount) => Run(invokeCount, IterationMode.IdleTarget, TargetJob.Run.TargetCount.MakeDefault());
-        public List<Measurement> RunMain(long invokeCount) => Run(invokeCount, IterationMode.MainTarget, TargetJob.Run.TargetCount);
+        public List<Measurement> RunIdle(long invokeCount, int unrollFactor) => Run(invokeCount, IterationMode.IdleTarget, TargetJob.Run.TargetCount.MakeDefault(), unrollFactor);
+        public List<Measurement> RunMain(long invokeCount, int unrollFactor) => Run(invokeCount, IterationMode.MainTarget, TargetJob.Run.TargetCount, unrollFactor);
 
-        private List<Measurement> RunAuto(long invokeCount, IterationMode iterationMode)
+        private List<Measurement> RunAuto(long invokeCount, IterationMode iterationMode, int unrollFactor)
         {
             var measurements = new List<Measurement>();
             int iterationCounter = 0;
@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Engines
             while (true)
             {
                 iterationCounter++;
-                var measurement = RunIteration(iterationMode, iterationCounter, invokeCount);
+                var measurement = RunIteration(iterationMode, iterationCounter, invokeCount, unrollFactor);
                 measurements.Add(measurement);
 
                 var statistics = new Statistics(measurements.Select(m => m.Nanoseconds));
@@ -56,11 +56,11 @@ namespace BenchmarkDotNet.Engines
             return measurements;
         }
 
-        private List<Measurement> RunSpecific(long invokeCount, IterationMode iterationMode, int iterationCount)
+        private List<Measurement> RunSpecific(long invokeCount, IterationMode iterationMode, int iterationCount, int unrollFactor)
         {
             var measurements = new List<Measurement>();
             for (int i = 0; i < iterationCount; i++)
-                measurements.Add(RunIteration(iterationMode, i + 1, invokeCount));
+                measurements.Add(RunIteration(iterationMode, i + 1, invokeCount, unrollFactor));
             WriteLine();
             return measurements;
         }
