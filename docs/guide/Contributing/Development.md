@@ -1,11 +1,8 @@
 # Development
 
-## Branches
-Please, use the `develop` branch for developing. The `master` branch should correspond the latest NuGet package of the library.
-
 ## New project files
 
-.csproj and package.config files have been replaced with .xproj and project.json files. project.json automatically references all .cs files so you 
+`.csproj` and `packages.config` files have been replaced with `.xproj` and `project.json` files. `project.json` automatically references all `.cs` files so you 
 don’t have to update it with every new class/interface/enum added (number of git conflicts has just dropped). It also has some side efects. 
 For example if you create some subfolder in any of the folders that contain project.json file and put some .cs files there, then these files are 
 going to be compiled as part of parent project by default. 
@@ -70,7 +67,7 @@ Project.json allows us to target multiple frameworks with one file and manage al
 
  There are at least 3 types of dependencies. Project, package and build. Sample:
 
- ```json
+```json
  "dependencies": {
     "BenchmarkDotNet": {
       "target": "project",
