@@ -7,6 +7,7 @@ namespace BenchmarkDotNet.Tests.Loggers
     public class OutputLogger : AccumulationLogger
     {
         private readonly ITestOutputHelper testOutputHelper;
+        private string currentLine = "";
 
         public OutputLogger(ITestOutputHelper testOutputHelper)
         {
@@ -18,19 +19,21 @@ namespace BenchmarkDotNet.Tests.Loggers
 
         public override void Write(LogKind logKind, string text)
         {
-            testOutputHelper.WriteLine(RemoveInvalidChars(text));
+            currentLine += RemoveInvalidChars(text);
             base.Write(logKind, text);
         }
 
         public override void WriteLine()
         {
-            testOutputHelper.WriteLine(string.Empty);
+            testOutputHelper.WriteLine(currentLine);
+            currentLine = "";
             base.WriteLine();
         }
 
         public override void WriteLine(LogKind logKind, string text)
         {
-            testOutputHelper.WriteLine(RemoveInvalidChars(text));
+            testOutputHelper.WriteLine(currentLine + RemoveInvalidChars(text));
+            currentLine = "";
             base.WriteLine(logKind, text);
         }
 
