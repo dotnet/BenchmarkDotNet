@@ -49,7 +49,13 @@ namespace BenchmarkDotNet.Toolchains.Classic
             return benchmark.Target.Type.GetTypeInfo().Assembly
                 .GetReferencedAssemblies()
                 .Select(Assembly.Load)
-                .Concat(new[] { benchmark.Target.Type.GetTypeInfo().Assembly });
+                .Concat(
+                    new[]
+                    {
+                        benchmark.Target.Type.GetTypeInfo().Assembly, // this assembly does not has to have a reference to BenchmarkDotNet (e.g. custom framework for benchmarking that internally uses BenchmarkDotNet
+                        typeof(Benchmark).Assembly, // BenchmarkDotNet.Core
+                    })
+                .Distinct();
         }
 
         private static void DelteIfExists(string filePath)
