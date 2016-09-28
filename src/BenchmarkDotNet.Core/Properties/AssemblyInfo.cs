@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using BenchmarkDotNet.Properties;
@@ -17,6 +18,8 @@ using BenchmarkDotNet.Properties;
 
 [assembly: ComVisible(false)]
 [assembly: Guid("95f5d645-19e3-432f-95d4-c5ea374dd15b")]
+
+[assembly: CLSCompliant(true)]
 
 #if RELEASE
 [assembly: InternalsVisibleTo("BenchmarkDotNet.Toolchains.Roslyn,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
