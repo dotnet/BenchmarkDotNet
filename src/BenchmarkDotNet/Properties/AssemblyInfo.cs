@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using BenchmarkDotNet.Properties;
@@ -17,6 +18,8 @@ using BenchmarkDotNet.Properties;
 
 [assembly: ComVisible(false)]
 [assembly: Guid("cbba82d3-e650-407f-a0f0-767891d4f04c")]
+
+[assembly: CLSCompliant(true)]
 
 #if RELEASE
 [assembly: InternalsVisibleTo("BenchmarkDotNet.Tests,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]

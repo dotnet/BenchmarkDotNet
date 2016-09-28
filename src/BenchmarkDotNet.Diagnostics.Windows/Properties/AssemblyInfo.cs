@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using BenchmarkDotNet.Properties;
 
@@ -16,3 +17,5 @@ using BenchmarkDotNet.Properties;
 
 [assembly: ComVisible(false)]
 [assembly: Guid("7bbae514-895c-4ca5-95ba-b2a1a0c2e0af")]
+
+[assembly: CLSCompliant(true)]
