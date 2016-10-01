@@ -22,6 +22,8 @@ namespace BenchmarkDotNet.Extensions
         internal static bool HasAttribute<T>(this MethodInfo methodInfo) where T : Attribute =>
             methodInfo.ResolveAttribute<T>() != null;
 
+        internal static bool IsNullable(this Type type) => Nullable.GetUnderlyingType(type) != null;
+
         internal static string GetCorrectTypeName(this Type type)
         {
             if (type == typeof(void))

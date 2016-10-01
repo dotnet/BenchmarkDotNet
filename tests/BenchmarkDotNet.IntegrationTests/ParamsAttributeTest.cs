@@ -179,4 +179,24 @@ namespace BenchmarkDotNet.IntegrationTests
             public char Benchmark() => Field;
         }
     }
+
+    public class NullableTypesAsParamsTest : BenchmarkTestExecutor
+    {
+        public NullableTypesAsParamsTest(ITestOutputHelper output) : base(output) { }
+
+        [Fact]
+        public void NullableTypesAsParamsAreSupported() => CanExecute<NullableTypesAsParams>();
+
+        public class NullableTypesAsParams
+        {
+            [Params(null)]
+            public int? Field = 1;
+
+            [Benchmark]
+            public void Benchmark()
+            {
+                if(Field != null) { throw new Exception("Field should be initialized in ctor with 1 and then set to null by Engine"); }
+            }
+        }
+    }
 }

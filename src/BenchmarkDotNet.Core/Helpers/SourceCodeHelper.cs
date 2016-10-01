@@ -10,6 +10,8 @@ namespace BenchmarkDotNet.Core.Helpers
     {
         public static string ToSourceCode(object value)
         {
+            if (value == null)
+                return "null";
             if (value is bool)
                 return ((bool) value).ToLowerCase();
             if (value is string)

@@ -90,14 +90,16 @@ namespace BenchmarkDotNet.Running
                 f.Name,
                 Attribute = f.ResolveAttribute<ParamsAttribute>(),
                 Private = f.IsPrivate,
-                IsStatic = f.IsStatic
+                IsStatic = f.IsStatic,
+                ParameterType = f.FieldType
             });
             var allProperties = type.GetProperties(reflectionFlags).Select(p => new
             {
                 p.Name,
                 Attribute = p.ResolveAttribute<ParamsAttribute>(),
                 Private = p.GetSetMethod() == null,
-                IsStatic = p.GetSetMethod() != null && p.GetSetMethod().IsStatic
+                IsStatic = p.GetSetMethod() != null && p.GetSetMethod().IsStatic,
+                ParameterType = p.PropertyType
             });
             var allParameterMembers = allFields.Concat(allProperties).Where(member => member.Attribute != null).ToArray();
 
@@ -105,7 +107,14 @@ namespace BenchmarkDotNet.Running
             if (firstPrivateMember != null)
                 throw new InvalidOperationException($"Member \"{firstPrivateMember.Name}\" must be public if it has the [Params(..)] attribute applied to it");
 
-            var definitions = allParameterMembers.Select(member => new ParameterDefinition(member.Name, member.IsStatic, member.Attribute.Values)).ToArray();
+            var definitions = allParameterMembers
+                .Select(member => 
+                    new ParameterDefinition(
+                        member.Name, 
+                        member.IsStatic, 
+                        GetValidValues(member.Attribute.Values, member.ParameterType)))
+                .ToArray();
+
             return new ParameterDefinitions(definitions);
         }
 
@@ -148,6 +157,16 @@ namespace BenchmarkDotNet.Running
         {
             if (methodInfo.IsGenericMethod)
                 throw new InvalidOperationException($"{methodType} method {methodInfo.Name} is generic.\nGeneric {methodType} methods are not supported.");
+        }
+
+        private static object[] GetValidValues(object[] values, Type parameterType)
+        {
+            if (values == null && parameterType.IsNullable())
+            {
+                return new object[] { null };
+            }
+
+            return values;
         }
     }
 }
