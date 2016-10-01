@@ -36,6 +36,7 @@ namespace BenchmarkDotNet.Code
                 Replace("$AdditionalLogic$", benchmark.Target.AdditionalLogic).
                 Replace("$JobSetDefinition$", GetJobsSetDefinition(benchmark)).
                 Replace("$ParamsContent$", GetParamsContent(benchmark)).
+                Replace("$ExtraAttribute$", GetExtraAttributes(benchmark.Target)).
                 ToString();
 
             text = Unroll(text, benchmark.Job.Run.UnrollFactor.Resolve(EnvResolver.Instance));
@@ -109,6 +110,18 @@ namespace BenchmarkDotNet.Code
                 benchmark.Parameters.Items.Select(
                     parameter =>
                         $"{(parameter.IsStatic ? "" : "instance.")}{parameter.Name} = {SourceCodeHelper.ToSourceCode(parameter.Value)};"));
+        }
+
+        private static string GetExtraAttributes(Target target)
+        {
+#if !CORE
+            if (target.Method.GetCustomAttributes(false).OfType<System.STAThreadAttribute>().Any())
+            {
+                return "[System.STAThreadAttribute]";
+            }
+#endif
+
+            return string.Empty;
         }
 
         private class SmartStringBuilder
