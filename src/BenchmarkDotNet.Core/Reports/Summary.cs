@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
@@ -14,6 +16,9 @@ namespace BenchmarkDotNet.Reports
 {
     public class Summary
     {
+        private const string DisplayedRuntimeInfoPrefix = "// " + BenchmarkEnvironmentInfo.RuntimeInfoPrefix;
+        private static readonly Regex runtimeRegex = new Regex($"{DisplayedRuntimeInfoPrefix}(.*?){BenchmarkEnvironmentInfo.RuntimeInfoPostfix}", RegexOptions.Compiled);
+
         public string Title { get; }
         public Benchmark[] Benchmarks { get; }
         public BenchmarkReport[] Reports { get; }
@@ -24,6 +29,7 @@ namespace BenchmarkDotNet.Reports
         public SummaryTable Table { get; }
         public TimeSpan TotalTime { get; }
         public ValidationError[] ValidationErrors { get; }
+        public string RuntimesInfo { get; }
 
         private readonly Dictionary<Job, string> shortInfos;
         private readonly Lazy<Job[]> jobs;
@@ -54,6 +60,7 @@ namespace BenchmarkDotNet.Reports
             Table = new SummaryTable(this);
             shortInfos = new Dictionary<Job, string>();
             jobs = new Lazy<Job[]>(() => Benchmarks.Select(b => b.Job).ToArray());
+            RuntimesInfo = BuildRuntimesInfo();
         }
 
         private Summary(string title, HostEnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, ValidationError[] validationErrors, Benchmark[] benchmarks, BenchmarkReport[] reports)
@@ -80,5 +87,22 @@ namespace BenchmarkDotNet.Reports
             return new Summary(title, hostEnvironmentInfo, config, resultsDirectoryPath, TimeSpan.Zero, validationErrors, benchmarks, new BenchmarkReport[0]);
         }
 
+        private string BuildRuntimesInfo()
+        {
+            var runtimes = new HashSet<string>();
+            foreach (var benchmarkReport in Reports)
+                foreach (var executeResults in benchmarkReport.ExecuteResults)
+                    foreach (var extraOutputLine in executeResults.ExtraOutput)
+                    {
+                        if (extraOutputLine.StartsWith(DisplayedRuntimeInfoPrefix))
+                        {
+                            string runtime = runtimeRegex.Match(extraOutputLine).Groups[1].Value;
+
+                            runtimes.Add(runtime);
+                        }
+                    }
+
+            return $"Runtime(s): {string.Join(", ", runtimes)}";
+        }
     }
 }

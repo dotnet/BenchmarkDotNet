@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Tests.Mocks
         {
             var benchmark = CreateBenchmark(config);
             var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty));
-            var executeResult = new ExecuteResult(true, 0, new List<string>());
+            var executeResult = new ExecuteResult(true, 0, new List<string>(), new string[0]);
             var measurements = new List<Measurement>
             {
                 new Measurement(1, IterationMode.Result, 1, 1, 1)

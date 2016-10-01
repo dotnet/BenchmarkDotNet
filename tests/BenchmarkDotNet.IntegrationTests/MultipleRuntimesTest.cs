@@ -49,6 +49,9 @@ namespace BenchmarkDotNet.IntegrationTests
                 .Single(report => report.Benchmark.Job.Env.Runtime.SpecifiedValue == Runtime.Core)
                 .ExecuteResults
                 .All(executeResult => executeResult.Data.Contains("Core")));
+
+            Assert.Contains("Clr 4", summary.RuntimesInfo);
+            Assert.Contains("Core", summary.RuntimesInfo);
         }
     }
 

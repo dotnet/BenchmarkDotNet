@@ -28,10 +28,13 @@ namespace BenchmarkDotNet.Loggers
             this.diagnoser = diagnoser;
             this.benchmark = benchmark;
 
-            Lines = new List<string>();
+            LinesWithResults = new List<string>();
+            LinesWithExtraOutput = new List<string>();
         }
 
-        internal List<string> Lines { get; }
+        internal List<string> LinesWithResults { get; }
+
+        internal List<string> LinesWithExtraOutput { get; }
 
         internal void ProcessInput()
         {
@@ -40,9 +43,12 @@ namespace BenchmarkDotNet.Loggers
             {
                 logger.WriteLine(LogKind.Default, line);
 
-                if (!line.StartsWith("//") && !string.IsNullOrEmpty(line))
+                if (!string.IsNullOrEmpty(line))
                 {
-                    Lines.Add(line);
+                    if (!line.StartsWith("//"))
+                        LinesWithResults.Add(line);
+                    else
+                        LinesWithExtraOutput.Add(line);
                 }
 
                 // This is important so the Diagnoser can know the [Benchmark] methods will have run and (e.g.) it can do a Memory Dump

@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Toolchains
 
             if (!File.Exists(exePath))
             {
-                return new ExecuteResult(false, -1, new string[0]);
+                return new ExecuteResult(false, -1, new string[0], new string[0]);
             }
 
             return Execute(benchmark, logger, exePath, null, args, compositeDiagnoser, resolver);
@@ -79,10 +79,10 @@ namespace BenchmarkDotNet.Toolchains
 
             if (process.ExitCode == 0)
             {
-                return new ExecuteResult(true, process.ExitCode, loggerWithDiagnoser.Lines);
+                return new ExecuteResult(true, process.ExitCode, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
             }
 
-            return new ExecuteResult(true, process.ExitCode, new string[0]);
+            return new ExecuteResult(true, process.ExitCode, new string[0], new string[0]);
         }
 
         private ProcessStartInfo CreateStartInfo(Benchmark benchmark, string exeName, string args, string workingDirectory, IResolver resolver)

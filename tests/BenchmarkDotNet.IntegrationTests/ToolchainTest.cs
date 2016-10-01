@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 logger.WriteLine("Executing");
                 Done = true;
-                return new ExecuteResult(true, 0, new string[0]);
+                return new ExecuteResult(true, 0, new string[0], new string[0]);
             }
         }
 
