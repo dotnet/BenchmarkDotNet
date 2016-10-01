@@ -52,14 +52,35 @@ namespace BenchmarkDotNet.Tests
 
         public class MultipleSetups
         {
-            [Setup]
-            public void First() { }
+            [Setup] public void First() { }
 
-            [Setup]
-            public void Second() { }
+            [Setup] public void Second() { }
 
-            [Benchmark]
-            public void NonThrowing() { }
+            [Benchmark] public void NonThrowing() { }
+        }
+
+        [Fact]
+        public void VirtualSetupsAreSupported()
+        {
+            Assert.False(OverridesSetup.WasCalled);
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(OverridesSetup)));
+
+            Assert.True(OverridesSetup.WasCalled);
+            Assert.Empty(validationErrors);
+        }
+
+        public class BaseClassWithThrowingSetup
+        {
+            [Setup] public virtual void Setup() { throw new Exception("should not be executed when overridden"); }
+
+            [Benchmark] public void NonThrowing() { }
+        }
+
+        public class OverridesSetup : BaseClassWithThrowingSetup
+        {
+            public static bool WasCalled;
+
+            [Setup] public override void Setup() { WasCalled = true; }
         }
 
         [Fact]

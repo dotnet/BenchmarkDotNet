@@ -86,7 +86,7 @@ namespace BenchmarkDotNet.Validators
                 return true;
             }
 
-            if (setupMethods.Length > 1)
+            if (setupMethods.Count(methodInfo => !methodInfo.IsVirtual) > 1)
             {
                 errors.Add(new ValidationError(
                     TreatsWarningsAsErrors,
@@ -97,7 +97,7 @@ namespace BenchmarkDotNet.Validators
 
             try
             {
-                setupMethods.Single().Invoke(benchmarkTypeInstance, null);
+                setupMethods.First().Invoke(benchmarkTypeInstance, null);
             }
             catch (Exception ex)
             {
