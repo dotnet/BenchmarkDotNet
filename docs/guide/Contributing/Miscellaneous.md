@@ -9,7 +9,7 @@ We have full F# support, all you have to do is to run `dotnet restore` to downlo
 
 ## How can I help?
 
-Here is a list of up-for-grabs issues: https://github.com/PerfDotNet/BenchmarkDotNet/issues?q=is%3Aissue+is%3Aopen+label%3Aup-for-grabs
+[Here is a list of up-for-grabs issues](https://github.com/PerfDotNet/BenchmarkDotNet/issues?q=is%3Aissue+is%3Aopen+label%3Aup-for-grabs)
 
 ## Nightly NuGet feed
 
