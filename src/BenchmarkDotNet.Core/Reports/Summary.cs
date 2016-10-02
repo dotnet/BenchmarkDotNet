@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
+using System.Text;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
@@ -17,7 +16,6 @@ namespace BenchmarkDotNet.Reports
     public class Summary
     {
         private const string DisplayedRuntimeInfoPrefix = "// " + BenchmarkEnvironmentInfo.RuntimeInfoPrefix;
-        private static readonly Regex runtimeRegex = new Regex($"{DisplayedRuntimeInfoPrefix}(.*?){BenchmarkEnvironmentInfo.RuntimeInfoPostfix}", RegexOptions.Compiled);
 
         public string Title { get; }
         public Benchmark[] Benchmarks { get; }
@@ -29,7 +27,7 @@ namespace BenchmarkDotNet.Reports
         public SummaryTable Table { get; }
         public TimeSpan TotalTime { get; }
         public ValidationError[] ValidationErrors { get; }
-        public string RuntimesInfo { get; }
+        public string JobRuntimes { get; }
 
         private readonly Dictionary<Job, string> shortInfos;
         private readonly Lazy<Job[]> jobs;
@@ -60,7 +58,7 @@ namespace BenchmarkDotNet.Reports
             Table = new SummaryTable(this);
             shortInfos = new Dictionary<Job, string>();
             jobs = new Lazy<Job[]>(() => Benchmarks.Select(b => b.Job).ToArray());
-            RuntimesInfo = BuildRuntimesInfo();
+            JobRuntimes = BuildJobRuntimes();
         }
 
         private Summary(string title, HostEnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, ValidationError[] validationErrors, Benchmark[] benchmarks, BenchmarkReport[] reports)
@@ -87,22 +85,24 @@ namespace BenchmarkDotNet.Reports
             return new Summary(title, hostEnvironmentInfo, config, resultsDirectoryPath, TimeSpan.Zero, validationErrors, benchmarks, new BenchmarkReport[0]);
         }
 
-        private string BuildRuntimesInfo()
+        private string BuildJobRuntimes()
         {
+            var result = new StringBuilder("Job Runtime(s):");
             var runtimes = new HashSet<string>();
+
             foreach (var benchmarkReport in Reports)
                 foreach (var executeResults in benchmarkReport.ExecuteResults)
-                    foreach (var extraOutputLine in executeResults.ExtraOutput)
+                    foreach (var extraOutputLine in executeResults.ExtraOutput.Where(line => line.StartsWith(DisplayedRuntimeInfoPrefix)))
                     {
-                        if (extraOutputLine.StartsWith(DisplayedRuntimeInfoPrefix))
-                        {
-                            string runtime = runtimeRegex.Match(extraOutputLine).Groups[1].Value;
+                        string runtime = extraOutputLine.Substring(DisplayedRuntimeInfoPrefix.Length);
 
-                            runtimes.Add(runtime);
+                        if (runtimes.Add(runtime))
+                        {
+                            result.Append($"\n\t{runtime}");
                         }
                     }
 
-            return $"Runtime(s): {string.Join(", ", runtimes)}";
+            return result.ToString();
         }
     }
 }

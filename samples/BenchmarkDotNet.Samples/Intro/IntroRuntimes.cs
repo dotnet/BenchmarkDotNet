@@ -38,6 +38,7 @@ namespace BenchmarkDotNet.Samples.Intro
             {
                 Add(Job.Dry.With(Runtime.Clr).With(Jit.RyuJit));
                 Add(Job.Dry.With(Runtime.Core).With(Jit.RyuJit));
+                Add(Job.Dry.With(Runtime.Mono));
             }
         }
 

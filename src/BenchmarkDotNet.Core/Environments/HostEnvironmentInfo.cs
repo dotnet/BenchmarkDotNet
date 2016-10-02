@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Environments
             yield return $"OS={OsVersion}";
             yield return $"Processor={ProcessorName.Value}, ProcessorCount={ProcessorCount}";
             yield return $"Frequency={ChronometerFrequency}, Resolution={GetChronometerResolution()}, Timer={HardwareTimerKind.ToString().ToUpper()}";
-            yield return $"CLR={RuntimeVersion}, Arch={Architecture} {GetConfigurationFlag()}{GetDebuggerFlag()}{GetJitFlag()}";
+            yield return $"Host Runtime={RuntimeVersion}, Arch={Architecture} {GetConfigurationFlag()}{GetDebuggerFlag()}{GetJitFlag()}";
             yield return $"GC={GetGcConcurrentFlag()} {GetGcServerFlag()}";
 #if CLASSIC
             yield return $"JitModules={JitModules}";

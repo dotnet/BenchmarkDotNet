@@ -96,9 +96,9 @@ namespace BenchmarkDotNet.Portability
                     return "Mono " + monoDisplayName.Invoke(null, null);
             }
 #if CLASSIC
-            return "Clr " + System.Environment.Version;
+            return $"Clr {System.Environment.Version}";
 #elif CORE
-            return "Core"; // TODO: verify if it is possible to get this for CORE
+            return System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
 #endif
         }
 

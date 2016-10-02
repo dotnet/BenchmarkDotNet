@@ -8,7 +8,6 @@ namespace BenchmarkDotNet.Environments
     public class BenchmarkEnvironmentInfo
     {
         internal const string RuntimeInfoPrefix = "Runtime=";
-        internal const char RuntimeInfoPostfix = ',';
 
         public string Architecture { get; }
 
@@ -40,7 +39,7 @@ namespace BenchmarkDotNet.Environments
         public virtual IEnumerable<string> ToFormattedString()
         {
             yield return "Benchmark Process Environment Information:";
-            yield return $"{RuntimeInfoPrefix}{RuntimeVersion}{RuntimeInfoPostfix} Arch={Architecture} {GetConfigurationFlag()}{GetDebuggerFlag()}{GetJitFlag()}";
+            yield return $"{RuntimeInfoPrefix}{RuntimeVersion}, Arch={Architecture} {GetConfigurationFlag()}{GetDebuggerFlag()}{GetJitFlag()}";
             yield return $"GC={GetGcConcurrentFlag()} {GetGcServerFlag()}";
         }
 

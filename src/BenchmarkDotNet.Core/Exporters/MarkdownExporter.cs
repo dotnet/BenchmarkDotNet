@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Exporters
             {
                 logger.WriteLineInfo(infoLine);
             }
-            logger.WriteLineInfo(summary.RuntimesInfo);
+            logger.WriteLineInfo(summary.JobRuntimes);
             logger.WriteLine();
 
             PrintTable(summary.Table, logger);
