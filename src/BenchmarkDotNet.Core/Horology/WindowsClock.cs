@@ -1,4 +1,6 @@
+using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
+using System.Security;
 
 namespace BenchmarkDotNet.Horology
 {
@@ -6,20 +8,10 @@ namespace BenchmarkDotNet.Horology
     {
         private static readonly bool isAvailable;
         private static readonly long frequency;
-
+        
         static WindowsClock()
         {
-            try
-            {
-                long counter;
-                isAvailable = 
-                    QueryPerformanceFrequency(out frequency) && 
-                    QueryPerformanceCounter(out counter);
-            }
-            catch
-            {
-                isAvailable = false;
-            }
+            isAvailable = Initialize(out frequency);
         }
 
         [DllImport("kernel32.dll")]
@@ -36,6 +28,27 @@ namespace BenchmarkDotNet.Horology
             long value;
             QueryPerformanceCounter(out value);
             return value;
+        }
+
+#if !CORE
+        [HandleProcessCorruptedStateExceptions] // #276
+        [SecurityCritical]
+#endif
+        static bool Initialize(out long frequency)
+        {
+            try
+            {
+                long counter;
+                return 
+                    QueryPerformanceFrequency(out frequency) &&
+                    QueryPerformanceCounter(out counter);
+            }
+            catch
+            {
+                frequency = default(long);
+
+                return false;
+            }
         }
     }
 }
