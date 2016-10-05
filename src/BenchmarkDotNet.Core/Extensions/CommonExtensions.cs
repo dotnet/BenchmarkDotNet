@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 
 namespace BenchmarkDotNet.Extensions
@@ -55,5 +54,13 @@ namespace BenchmarkDotNet.Extensions
 
         public static int RoundToInt(this double x) => (int) Math.Round(x);
         public static long RoundToLong(this double x) => (long) Math.Round(x);
+
+        internal static void ForEach<T>(this IList<T> source, Action<T> command)
+        {
+            foreach (var item in source)
+            {
+                command(item);
+            }
+        }
     }
 }

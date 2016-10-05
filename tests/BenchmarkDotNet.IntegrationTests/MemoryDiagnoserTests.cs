@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿#if !CORE
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
@@ -12,44 +15,53 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using Xunit;
 using Xunit.Abstractions;
+using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    [Config(typeof(DiagnoserConfig))]
-    public class ListEnumeratorsBenchmarks
+    public class NewVsStackalloc
+    {
+        [Benchmark]
+        public void New() => Blackhole(new byte[100]);
+
+        [Benchmark]
+        public unsafe void Stackalloc()
+        {
+            var bytes = stackalloc byte[100];
+            Blackhole(bytes);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void Blackhole<T>(T input) { }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private unsafe void Blackhole(byte* input) { }
+    }
+
+    public class AllocatingSetupAndCleanup
     {
         private List<int> list;
 
         [Setup]
-        public void SetUp()
-        {
-            list = Enumerable.Range(0, 100).ToList();
-        }
+        public void AllocatingSetUp() => AllocateUntilGcWakesUp();
 
         [Benchmark]
-        public int ListStructEnumerator()
-        {
-            int sum = 0;
-            foreach (var i in list)
-            {
-                sum += i;
-            }
-            return sum;
-        }
+        public void AllocateNothing() { }
 
-        [Benchmark]
-        public int ListObjectEnumerator()
+        [Cleanup]
+        public void AllocatingCleanUp() => AllocateUntilGcWakesUp();
+
+        private void AllocateUntilGcWakesUp()
         {
-            int sum = 0;
-            foreach (var i in (IEnumerable<int>)list)
+            int initialCollectionCount = GC.CollectionCount(0);
+
+            while (initialCollectionCount == GC.CollectionCount(0))
             {
-                sum += i;
+                list = Enumerable.Range(0, 100).ToList();
             }
-            return sum;
         }
     }
 
-#if !CORE
     // this class is not compiled for CORE because it is using Diagnosers that currently do not support Core
     public class MemoryDiagnoserTests
     {
@@ -63,47 +75,76 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact(Skip = "Temporarily suppressed, see https://github.com/PerfDotNet/BenchmarkDotNet/issues/208")]
         public void MemoryDiagnoserTracksHeapMemoryAllocation()
         {
-            var benchmarks = BenchmarkConverter.TypeToBenchmarks(typeof(ListEnumeratorsBenchmarks));
+            var benchmarks = BenchmarkConverter.TypeToBenchmarks(typeof(NewVsStackalloc));
             var memoryDiagnoser = new Diagnostics.Windows.MemoryDiagnoser();
 
-            var summary = BenchmarkRunner
-                .Run(benchmarks,
-                    ManualConfig.CreateEmpty().
-                        With(Job.Dry.With(Runtime.Core).With(RunStrategy.Throughput).WithWarmupCount(1).WithTargetCount(1)).
-                        With(DefaultConfig.Instance.GetLoggers().ToArray()).
-                        With(DefaultColumnProviders.Instance).
-                        With(memoryDiagnoser).
-                        With(new OutputLogger(output)));
+            var summary = Execute(benchmarks, memoryDiagnoser);
 
-            var gcCollectionColumns = memoryDiagnoser.GetColumnProvider().GetColumns(null).OfType<Diagnostics.Windows.MemoryDiagnoser.GCCollectionColumn>().ToArray();
-            var listStructEnumeratorBenchmarks = benchmarks.Where(benchmark => benchmark.DisplayInfo.Contains("ListStructEnumerator"));
-            var listObjectEnumeratorBenchmarks = benchmarks.Where(benchmark => benchmark.DisplayInfo.Contains("ListObjectEnumerator"));
+            var gcCollectionColumns = GetColumns<Diagnostics.Windows.MemoryDiagnoser.GCCollectionColumn>(memoryDiagnoser).ToArray();
+            var stackallocBenchmarks = benchmarks.Where(benchmark => benchmark.DisplayInfo.Contains("Stackalloc"));
+            var newArrayBenchmarks = benchmarks.Where(benchmark => benchmark.DisplayInfo.Contains("New"));
+
             const int gen0Index = 0;
 
-            foreach (var listStructEnumeratorBenchmark in listStructEnumeratorBenchmarks)
+            foreach (var benchmark in stackallocBenchmarks)
             {
-                var structEnumeratorGen0Collections = gcCollectionColumns[gen0Index].GetValue(
-                    summary,
-                    listStructEnumeratorBenchmark);
+                var gen0Collections = gcCollectionColumns[gen0Index].GetValue(summary, benchmark);
 
-                Assert.Equal("-", structEnumeratorGen0Collections);
+                Assert.Equal("-", gen0Collections);
             }
 
-            foreach (var listObjectEnumeratorBenchmark in listObjectEnumeratorBenchmarks)
+            foreach (var benchmark in newArrayBenchmarks)
             {
-                var gen0Str = gcCollectionColumns[gen0Index].GetValue(
-                    summary,
-                    listObjectEnumeratorBenchmark);
+                var gen0Str = gcCollectionColumns[gen0Index].GetValue(summary, benchmark);
 
-                double gen0Value;
-                if (double.TryParse(gen0Str, NumberStyles.Number, HostEnvironmentInfo.MainCultureInfo, out gen0Value))
-                    Assert.True(gen0Value > 0);
-                else
-                {
-                    Assert.True(false, $"Can't parse '{gen0Str}'");
-                }
+                AssertParsed(gen0Str, gen0Value => gen0Value > 0);
+            }
+        }
+
+        [Fact(Skip = "Temporarily suppressed, see https://github.com/PerfDotNet/BenchmarkDotNet/issues/208")]
+        public void MemoryDiagnoserDoesNotIncludeAllocationsFromSetupAndCleanup()
+        {
+            var benchmarks = BenchmarkConverter.TypeToBenchmarks(typeof(AllocatingSetupAndCleanup));
+            var memoryDiagnoser = new Diagnostics.Windows.MemoryDiagnoser();
+
+            var summary = Execute(benchmarks, memoryDiagnoser);
+
+            var allocationColumn = GetColumns<Diagnostics.Windows.MemoryDiagnoser.AllocationColumn>(memoryDiagnoser).Single();
+            var allocateNothingBenchmarks = benchmarks.Where(benchmark => benchmark.DisplayInfo.Contains("AllocateNothing"));
+
+            foreach (var benchmark in allocateNothingBenchmarks)
+            {
+                var allocations = allocationColumn.GetValue(summary, benchmark);
+
+                AssertParsed(allocations, allocatedBytes => allocatedBytes == 0);
+            }
+        }
+
+        private Reports.Summary Execute(Benchmark[] benchmarks, Diagnostics.Windows.MemoryDiagnoser memoryDiagnoser)
+            => BenchmarkRunner
+                .Run(benchmarks,
+                    ManualConfig.CreateEmpty()
+                        .With(Job.Dry.WithLaunchCount(1).WithWarmupCount(1).WithTargetCount(50).With(GcMode.Default.WithForce(false)))
+                        .With(DefaultConfig.Instance.GetLoggers().ToArray())
+                        .With(DefaultColumnProviders.Instance)
+                        .With(memoryDiagnoser)
+                        .With(new OutputLogger(output)));
+
+        private static T[] GetColumns<T>(Diagnostics.Windows.MemoryDiagnoser memoryDiagnoser)
+            => memoryDiagnoser.GetColumnProvider().GetColumns(null).OfType<T>().ToArray();
+
+        private static void AssertParsed(string text, Predicate<double> condition)
+        {
+            double value;
+            if (double.TryParse(text, NumberStyles.Number, HostEnvironmentInfo.MainCultureInfo, out value))
+            {
+                Assert.True(condition(value));
+            }
+            else
+            {
+                Assert.True(false, $"Can't parse '{text}'");
             }
         }
     }
-#endif
 }
+#endif

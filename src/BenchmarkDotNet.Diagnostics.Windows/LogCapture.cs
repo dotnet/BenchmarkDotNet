@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
-    internal class LogCapture : ILogger
+    public class LogCapture : ILogger
     {
         public IList<OutputLine> CapturedOutput = new List<OutputLine>(100);
 
@@ -38,7 +37,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         }
     }
 
-    internal struct OutputLine
+    public struct OutputLine
     {
         public LogKind Kind { get; set; }
         public string Text { get; set; }

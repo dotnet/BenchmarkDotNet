@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 
@@ -30,7 +29,7 @@ namespace BenchmarkDotNet.Engines
 
         private List<Measurement> RunAuto(long invokeCount, IterationMode iterationMode, int unrollFactor)
         {
-            var measurements = new List<Measurement>();
+            var measurements = new List<Measurement>(MinIterationCount);
             int iterationCounter = 0;
             bool isIdle = iterationMode.IsIdle();
             double maxErrorRelative = isIdle ? MaxIdleStdErrRelative : Resolver.Resolve(TargetAccuracy.MaxStdErrRelative);
@@ -58,7 +57,7 @@ namespace BenchmarkDotNet.Engines
 
         private List<Measurement> RunSpecific(long invokeCount, IterationMode iterationMode, int iterationCount, int unrollFactor)
         {
-            var measurements = new List<Measurement>();
+            var measurements = new List<Measurement>(iterationCount);
             for (int i = 0; i < iterationCount; i++)
                 measurements.Add(RunIteration(iterationMode, i + 1, invokeCount, unrollFactor));
             WriteLine();

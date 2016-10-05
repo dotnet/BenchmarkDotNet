@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public DiagnoserConfig()
         {
             // Diagnosers need enough runs to collects the statistics!
-            Add(Job.Default.WithLaunchCount(1).WithWarmupCount(5).WithTargetCount(5));
+            Add(Job.Default.WithLaunchCount(1).WithWarmupCount(1).WithTargetCount(50));
         }
     }
 }

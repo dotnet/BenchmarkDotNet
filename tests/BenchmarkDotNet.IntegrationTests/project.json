@@ -17,7 +17,8 @@
   },
   "testRunner": "xunit",
   "buildOptions": {
-    "copyToOutput": [ "xunit.runner.json" ]
+    "copyToOutput": [ "xunit.runner.json" ],
+    "allowUnsafe": true
   },
   "frameworks": {
     "netcoreapp1.0": {

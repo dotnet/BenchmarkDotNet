@@ -3,28 +3,20 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
-using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Parsers.Clr;
 using Microsoft.Diagnostics.Tracing.Session;
-using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Environments;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
-    public class MemoryDiagnoser : ETWDiagnoser, IDiagnoser
+    public class MemoryDiagnoser : EtwDiagnoser<MemoryDiagnoser.Stats>, IDiagnoser
     {
         private readonly List<OutputLine> output = new List<OutputLine>();
-        private readonly LogCapture logger = new LogCapture();
         private readonly Dictionary<Benchmark, Stats> results = new Dictionary<Benchmark, Stats>();
-        private TraceEventSession session;
-        private readonly ConcurrentDictionary<int, Stats> statsPerProcess = new ConcurrentDictionary<int, Stats>();
 
         public IColumnProvider GetColumnProvider() => new SimpleColumnProvider(
             new GCCollectionColumn(results, 0),
@@ -32,52 +24,20 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             new GCCollectionColumn(results, 2),
             new AllocationColumn(results));
 
-        public void Start(Benchmark benchmark)
+        protected override ClrTraceEventParser.Keywords EventType => ClrTraceEventParser.Keywords.GC;
+
+        protected override string SessionNamePrefix => "GC";
+
+        public void BeforeAnythingElse(Process process, Benchmark benchmark) { }
+
+        public void AfterSetup(Process process, Benchmark benchmark) => Start(process, benchmark);
+
+        public void BeforeCleanup() => Stop();
+
+        public void ProcessResults(Benchmark benchmark, BenchmarkReport report)
         {
-            ProcessIdsUsedInRuns.Clear();
-            statsPerProcess.Clear();
-
-            var sessionName = GetSessionName("GC", benchmark, benchmark.Parameters);
-            session = new TraceEventSession(sessionName);
-            session.EnableProvider(ClrTraceEventParser.ProviderGuid, TraceEventLevel.Verbose,
-                (ulong) (ClrTraceEventParser.Keywords.GC));
-
-            // The ETW collection thread starts receiving events immediately, but we only
-            // start aggregating them after ProcessStarted is called and we know which process
-            // (or processes) we should be monitoring. Communication between the benchmark thread
-            // and the ETW collection thread is through the statsPerProcess concurrent dictionary
-            // and through the TraceEventSession class, which is thread-safe.
-            Task.Factory.StartNew(StartProcessingEvents, TaskCreationOptions.LongRunning);
-        }
-
-        public void Stop(Benchmark benchmark, BenchmarkReport report)
-        {
-            // ETW real-time sessions receive events with a slight delay. Typically it
-            // shouldn't be more than a few seconds. This increases the likelihood that
-            // all relevant events are processed by the collection thread by the time we
-            // are done with the benchmark.
-            Thread.Sleep(TimeSpan.FromSeconds(3));
-
-            session.Dispose();
-
             var stats = ProcessEtwEvents(report.AllMeasurements.Sum(m => m.Operations));
             results.Add(benchmark, stats);
-        }
-
-        public void ProcessStarted(Process process)
-        {
-            ProcessIdsUsedInRuns.Add(process.Id);
-            statsPerProcess.TryAdd(process.Id, new Stats());
-        }
-
-        public void AfterBenchmarkHasRun(Benchmark benchmark, Process process)
-        {
-            // Do nothing
-        }
-
-        public void ProcessStopped(Process process)
-        {
-            // Do nothing
         }
 
         public void DisplayResults(ILogger logger)
@@ -92,7 +52,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             {
                 var processToReport = ProcessIdsUsedInRuns[0];
                 Stats stats;
-                if (statsPerProcess.TryGetValue(processToReport, out stats))
+                if (StatsPerProcess.TryGetValue(processToReport, out stats))
                 {
                     stats.TotalOperations = totalOperations;
                     return stats;
@@ -101,19 +61,19 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             return null;
         }
 
-        private void StartProcessingEvents()
+        protected override void AttachToEvents(TraceEventSession session, Benchmark benchmark)
         {
             session.Source.Clr.GCAllocationTick += gcData =>
             {
                 Stats stats;
-                if (statsPerProcess.TryGetValue(gcData.ProcessID, out stats))
+                if (StatsPerProcess.TryGetValue(gcData.ProcessID, out stats))
                     stats.AllocatedBytes += gcData.AllocationAmount64;
             };
 
             session.Source.Clr.GCStart += gcData =>
             {
                 Stats stats;
-                if (statsPerProcess.TryGetValue(gcData.ProcessID, out stats))
+                if (StatsPerProcess.TryGetValue(gcData.ProcessID, out stats))
                 {
                     var genCounts = stats.GenCounts;
                     if (gcData.Depth >= 0 && gcData.Depth < genCounts.Length)
@@ -124,13 +84,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     }
                     else
                     {
-                        logger.WriteLineError(string.Format("Error Process{0}, Unexpected GC Depth: {1}, Count: {2} -> Reason: {3}", gcData.ProcessID,
+                        Logger.WriteLineError(string.Format("Error Process{0}, Unexpected GC Depth: {1}, Count: {2} -> Reason: {3}", gcData.ProcessID,
                             gcData.Depth, gcData.Count, gcData.Reason));
                     }
                 }
             };
-
-            session.Source.Process();
         }
 
         public class AllocationColumn : IColumn

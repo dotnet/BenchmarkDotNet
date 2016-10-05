@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Reports
         public double Nanoseconds { get; }
 
         /// <summary>
-        /// Creates an instance of <see cref="Measurement"/> class.
+        /// Creates an instance of <see cref="Measurement"/> struct.
         /// </summary>
         /// <param name="launchIndex"></param>
         /// <param name="iterationMode"></param>

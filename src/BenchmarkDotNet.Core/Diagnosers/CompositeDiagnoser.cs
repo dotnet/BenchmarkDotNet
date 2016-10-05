@@ -4,6 +4,7 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -16,35 +17,19 @@ namespace BenchmarkDotNet.Diagnosers
             this.diagnosers = diagnosers;
         }
 
-        public void Start(Benchmark benchmark)
-        {
-            foreach (var diagnoser in diagnosers)
-                diagnoser.Start(benchmark);
-        }
+        public IColumnProvider GetColumnProvider() 
+            => new CompositeColumnProvider(diagnosers.Select(d => d.GetColumnProvider()).ToArray());
 
-        public void Stop(Benchmark benchmark, BenchmarkReport report)
-        {
-            foreach (var diagnoser in diagnosers)
-                diagnoser.Stop(benchmark, report);
-        }
+        public void BeforeAnythingElse(Process process, Benchmark benchmark) 
+            => diagnosers.ForEach(diagnoser => diagnoser.BeforeAnythingElse(process, benchmark));
 
-        public void ProcessStarted(Process process)
-        {
-            foreach (var diagnoser in diagnosers)
-                diagnoser.ProcessStarted(process);
-        }
+        public void AfterSetup(Process process, Benchmark benchmark) 
+            => diagnosers.ForEach(diagnoser => diagnoser.AfterSetup(process, benchmark));
 
-        public void AfterBenchmarkHasRun(Benchmark benchmark, Process process)
-        {
-            foreach (var diagnoser in diagnosers)
-                diagnoser.AfterBenchmarkHasRun(benchmark, process);
-        }
+        public void BeforeCleanup() => diagnosers.ForEach(diagnoser => diagnoser.BeforeCleanup());
 
-        public void ProcessStopped(Process process)
-        {
-            foreach (var diagnoser in diagnosers)
-                diagnoser.ProcessStopped(process);
-        }
+        public void ProcessResults(Benchmark benchmark, BenchmarkReport report)
+            => diagnosers.ForEach(diagnoser => diagnoser.ProcessResults(benchmark, report));
 
         public void DisplayResults(ILogger logger)
         {
@@ -57,7 +42,5 @@ namespace BenchmarkDotNet.Diagnosers
                 logger.WriteLine();
             }
         }
-
-        public IColumnProvider GetColumnProvider() => new CompositeColumnProvider(diagnosers.Select(d => d.GetColumnProvider()).ToArray());
     }
 }

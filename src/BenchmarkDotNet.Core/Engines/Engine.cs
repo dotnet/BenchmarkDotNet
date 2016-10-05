@@ -41,7 +41,6 @@ namespace BenchmarkDotNet.Engines
         }
 
         // TODO: return all measurements
-        [UsedImplicitly]
         public void Run()
         {
             Jitting();
@@ -62,6 +61,7 @@ namespace BenchmarkDotNet.Engines
 
                 warmupStage.RunMain(invokeCount, unrollFactor);
             }
+
             var main = targetStage.RunMain(invokeCount, unrollFactor);
 
             // TODO: Move calculation of the result measurements to a separated class
@@ -70,10 +70,10 @@ namespace BenchmarkDotNet.Engines
 
         private void Jitting()
         {
-            SetupAction?.Invoke();
+            // first signal about jitting is raised from auto-generated Program.cs, look at BenchmarkProgram.txt
+            
             MainAction.Invoke(1);
             IdleAction.Invoke(1);
-            CleanupAction?.Invoke();
         }
 
         private void PrintResult(IList<Measurement> idle, IList<Measurement> main)
@@ -103,8 +103,6 @@ namespace BenchmarkDotNet.Engines
             long totalOperations = invokeCount * OperationsPerInvoke;
             var action = data.IterationMode.IsIdle() ? IdleAction : MainAction;
 
-            // Setup
-            SetupAction?.Invoke();
             GcCollect();
 
             // Measure
@@ -112,8 +110,6 @@ namespace BenchmarkDotNet.Engines
             action(invokeCount / unrollFactor);
             var clockSpan = clock.Stop();
 
-            // Cleanup
-            CleanupAction?.Invoke();
             GcCollect();
 
             // Results
@@ -136,5 +132,15 @@ namespace BenchmarkDotNet.Engines
 
         public void WriteLine() => Console.WriteLine();
         public void WriteLine(string line) => Console.WriteLine(line);
+
+        [UsedImplicitly]
+        public class Signals
+        {
+            public const string BeforeAnythingElse = "// BeforeAnythingElse";
+
+            public const string AfterSetup = "// AfterSetup";
+
+            public const string BeforeCleanup = "// BeforeCleanup";
+        }
     }
 }

@@ -271,14 +271,16 @@ namespace BenchmarkDotNet.Running
             logger.WriteLine();
 
             // Do a "Diagnostic" run, but DISCARD the results, so that the overhead of Diagnostics doesn't skew the overall results
-            if (config.GetDiagnosers().Count() > 0)
+            if (config.GetDiagnosers().Any())
             {
                 logger.WriteLineInfo($"// Run, Diagnostic");
-                config.GetCompositeDiagnoser().Start(benchmark);
-                var executeResult = toolchain.Executor.Execute(buildResult, benchmark, logger, resolver, config.GetCompositeDiagnoser());
+                var compositeDiagnoser = config.GetCompositeDiagnoser();
+
+                var executeResult = toolchain.Executor.Execute(buildResult, benchmark, logger, resolver, compositeDiagnoser);
+
                 var allRuns = executeResult.Data.Select(line => Measurement.Parse(logger, line, 0)).Where(r => r.IterationMode != IterationMode.Unknown).ToList();
                 var report = new BenchmarkReport(benchmark, null, null, new[] { executeResult }, allRuns);
-                config.GetCompositeDiagnoser().Stop(benchmark, report);
+                compositeDiagnoser.ProcessResults(benchmark, report);
 
                 if (!executeResult.FoundExecutable)
                     logger.WriteLineError("Executable not found");

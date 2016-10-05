@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Toolchains
                 using (var process = new Process { StartInfo = CreateStartInfo(benchmark, exeName, args, workingDirectory, resolver) })
                 {
                     var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmark);
-
+                    
                     return Execute(process, benchmark, loggerWithDiagnoser, diagnoser, logger);
                 }
             }
@@ -63,8 +63,6 @@ namespace BenchmarkDotNet.Toolchains
 
             process.Start();
 
-            compositeDiagnoser?.ProcessStarted(process);
-
             process.EnsureHighPriority(logger);
             if (!benchmark.Job.Env.Affinity.IsDefault)
             {
@@ -74,8 +72,6 @@ namespace BenchmarkDotNet.Toolchains
             loggerWithDiagnoser.ProcessInput();
 
             process.WaitForExit(); // should we add timeout here?
-
-            compositeDiagnoser?.ProcessStopped(process);
 
             if (process.ExitCode == 0)
             {
