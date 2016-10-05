@@ -34,19 +34,23 @@ namespace BenchmarkDotNet.Horology
         [HandleProcessCorruptedStateExceptions] // #276
         [SecurityCritical]
 #endif
-        static bool Initialize(out long frequency)
+        private static bool Initialize(out long qpf)
         {
+            if (!Portability.RuntimeInformation.IsWindows())
+            {
+                qpf = default(long);
+                return false;
+            }
             try
             {
                 long counter;
                 return 
-                    QueryPerformanceFrequency(out frequency) &&
+                    QueryPerformanceFrequency(out qpf) &&
                     QueryPerformanceCounter(out counter);
             }
             catch
             {
-                frequency = default(long);
-
+                qpf = default(long);
                 return false;
             }
         }
