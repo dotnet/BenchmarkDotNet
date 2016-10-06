@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
@@ -28,7 +27,7 @@ namespace BenchmarkDotNet.Exporters
         public static readonly IExporter StackOverflow = new MarkdownExporter
         {
             Dialect = nameof(StackOverflow),
-            prefix = "    ",            
+            prefix = "    ",
             startOfGroupInBold = true
         };
 
@@ -36,14 +35,31 @@ namespace BenchmarkDotNet.Exporters
         {
             Dialect = nameof(GitHub),
             useCodeBlocks = true,
-            codeBlocksSyntax = "ini",
+            codeBlockStart = "``` ini",
             startOfGroupInBold = true
+        };
+
+        public static readonly IExporter Atlassian = new MarkdownExporter
+        {
+            Dialect = nameof(Atlassian),
+            startOfGroupInBold = true,
+            tableHeaderSeparator = " ||",
+            useHeaderSeparatingRow = false,
+            columnsStartWithSeparator = true,
+            useCodeBlocks = true,
+            codeBlockStart = "{noformat}",
+            codeBlockEnd = "{noformat}"
         };
 
         private string prefix = string.Empty;
         private bool useCodeBlocks = false;
-        private string codeBlocksSyntax = string.Empty;
+        private string codeBlockStart = "```";
+        private string codeBlockEnd = "```";
         private bool startOfGroupInBold = false;
+        private string tableHeaderSeparator = " |";
+        private string tableColumnSeparator = " |";
+        private bool useHeaderSeparatingRow = true;
+        private bool columnsStartWithSeparator = false;
 
         private MarkdownExporter()
         {
@@ -52,7 +68,9 @@ namespace BenchmarkDotNet.Exporters
         public override void ExportToLog(Summary summary, ILogger logger)
         {
             if (useCodeBlocks)
-                logger.WriteLine($"```{codeBlocksSyntax}");
+            {
+                logger.WriteLine(codeBlockStart);
+            }
             logger = GetRightLogger(logger);
             logger.WriteLine();
             foreach (var infoLine in HostEnvironmentInfo.GetCurrent().ToFormattedString())
@@ -71,7 +89,9 @@ namespace BenchmarkDotNet.Exporters
                 logger.WriteLine();
                 logger.WriteLineError("Benchmarks with issues:");
                 foreach (var benchmarkWithTroubles in benchmarksWithTroubles)
+                {
                     logger.WriteLineError("  " + benchmarkWithTroubles.DisplayInfo);
+                }
             }
         }
 
@@ -99,12 +119,20 @@ namespace BenchmarkDotNet.Exporters
 
             if (useCodeBlocks)
             {
-                logger.Write("```");
+                logger.Write(codeBlockEnd);
                 logger.WriteLine();
             }
 
-            table.PrintLine(table.FullHeader, logger, string.Empty, " |");
-            logger.WriteLineStatistic(string.Join("", table.Columns.Where(c => c.NeedToShow).Select(c => new string('-', c.Width) + " |")));
+            if (columnsStartWithSeparator)
+            {
+                logger.Write(tableHeaderSeparator);
+            }
+
+            table.PrintLine(table.FullHeader, logger, string.Empty, tableHeaderSeparator);
+            if (useHeaderSeparatingRow)
+            {
+                logger.WriteLineStatistic(string.Join("", table.Columns.Where(c => c.NeedToShow).Select(c => new string('-', c.Width) + " |")));
+            }
             var rowCounter = 0;
             var highlightRow = false;
             foreach (var line in table.FullContent)
@@ -115,7 +143,12 @@ namespace BenchmarkDotNet.Exporters
                     highlightRow = !highlightRow;
                 }
 
-                table.PrintLine(line, logger, string.Empty, " |", highlightRow, table.FullContentStartOfGroup[rowCounter], startOfGroupInBold);
+                if (columnsStartWithSeparator)
+                {
+                    logger.Write(tableColumnSeparator);
+                }
+
+                table.PrintLine(line, logger, string.Empty, tableColumnSeparator, highlightRow, table.FullContentStartOfGroup[rowCounter], startOfGroupInBold);
                 rowCounter++;
             }
         }
