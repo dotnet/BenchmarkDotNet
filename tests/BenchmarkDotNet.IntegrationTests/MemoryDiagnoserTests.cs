@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
@@ -16,6 +17,7 @@ using BenchmarkDotNet.Tests.Loggers;
 using Xunit;
 using Xunit.Abstractions;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Diagnostics.Windows;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -62,6 +64,13 @@ namespace BenchmarkDotNet.IntegrationTests
         }
     }
 
+    [KeepBenchmarkFiles()]
+    public class NoAllocationsAtAll
+    {
+        [Benchmark]
+        public void EmptyMethod() { }
+    }
+
     // this class is not compiled for CORE because it is using Diagnosers that currently do not support Core
     public class MemoryDiagnoserTests
     {
@@ -75,12 +84,13 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact(Skip = "Temporarily suppressed, see https://github.com/PerfDotNet/BenchmarkDotNet/issues/208")]
         public void MemoryDiagnoserTracksHeapMemoryAllocation()
         {
-            var benchmarks = BenchmarkConverter.TypeToBenchmarks(typeof(NewVsStackalloc));
-            var memoryDiagnoser = new Diagnostics.Windows.MemoryDiagnoser();
+            var memoryDiagnoser = new MemoryDiagnoser();
+            var config = CreateConfig(memoryDiagnoser, 50);
+            var benchmarks = BenchmarkConverter.TypeToBenchmarks(typeof(NewVsStackalloc), config);
 
-            var summary = Execute(benchmarks, memoryDiagnoser);
+            var summary = BenchmarkRunner.Run((Benchmark[])benchmarks, config);
 
-            var gcCollectionColumns = GetColumns<Diagnostics.Windows.MemoryDiagnoser.GCCollectionColumn>(memoryDiagnoser).ToArray();
+            var gcCollectionColumns = GetColumns<MemoryDiagnoser.GCCollectionColumn>(memoryDiagnoser).ToArray();
             var stackallocBenchmarks = benchmarks.Where(benchmark => benchmark.DisplayInfo.Contains("Stackalloc"));
             var newArrayBenchmarks = benchmarks.Where(benchmark => benchmark.DisplayInfo.Contains("New"));
 
@@ -104,13 +114,25 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact(Skip = "Temporarily suppressed, see https://github.com/PerfDotNet/BenchmarkDotNet/issues/208")]
         public void MemoryDiagnoserDoesNotIncludeAllocationsFromSetupAndCleanup()
         {
-            var benchmarks = BenchmarkConverter.TypeToBenchmarks(typeof(AllocatingSetupAndCleanup));
-            var memoryDiagnoser = new Diagnostics.Windows.MemoryDiagnoser();
+            AssertZeroAllocations(typeof(AllocatingSetupAndCleanup), "AllocateNothing", targetCount: 50);
+        }
 
-            var summary = Execute(benchmarks, memoryDiagnoser);
+        [Fact(Skip = "Temporarily suppressed, see https://github.com/PerfDotNet/BenchmarkDotNet/issues/208")]
+        public void EngineShouldNotInterfereAllocationResults()
+        {
+            AssertZeroAllocations(typeof(NoAllocationsAtAll), "EmptyMethod", targetCount: 5000); // we need a lot of iterations to be sure!!
+        }
 
-            var allocationColumn = GetColumns<Diagnostics.Windows.MemoryDiagnoser.AllocationColumn>(memoryDiagnoser).Single();
-            var allocateNothingBenchmarks = benchmarks.Where(benchmark => benchmark.DisplayInfo.Contains("AllocateNothing"));
+        public void AssertZeroAllocations(Type benchmarkType, string benchmarkMethodName, int targetCount)
+        {
+            var memoryDiagnoser = new MemoryDiagnoser();
+            var config = CreateConfig(memoryDiagnoser, targetCount);
+            var benchmarks = BenchmarkConverter.TypeToBenchmarks(benchmarkType, config);
+
+            var summary = BenchmarkRunner.Run((Benchmark[])benchmarks, config);
+
+            var allocationColumn = GetColumns<MemoryDiagnoser.AllocationColumn>(memoryDiagnoser).Single();
+            var allocateNothingBenchmarks = benchmarks.Where(benchmark => benchmark.DisplayInfo.Contains(benchmarkMethodName));
 
             foreach (var benchmark in allocateNothingBenchmarks)
             {
@@ -120,17 +142,17 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private Reports.Summary Execute(Benchmark[] benchmarks, Diagnostics.Windows.MemoryDiagnoser memoryDiagnoser)
-            => BenchmarkRunner
-                .Run(benchmarks,
-                    ManualConfig.CreateEmpty()
-                        .With(Job.Dry.WithLaunchCount(1).WithWarmupCount(1).WithTargetCount(50).With(GcMode.Default.WithForce(false)))
-                        .With(DefaultConfig.Instance.GetLoggers().ToArray())
-                        .With(DefaultColumnProviders.Instance)
-                        .With(memoryDiagnoser)
-                        .With(new OutputLogger(output)));
+        private IConfig CreateConfig(IDiagnoser diagnoser, int targetCount)
+        {
+            return ManualConfig.CreateEmpty()
+                               .With(Job.Dry.WithLaunchCount(1).WithWarmupCount(1).WithTargetCount(targetCount).With(GcMode.Default.WithForce(false)))
+                               .With(DefaultConfig.Instance.GetLoggers().ToArray())
+                               .With(DefaultColumnProviders.Instance)
+                               .With(diagnoser)
+                               .With(new OutputLogger(output));
+        }
 
-        private static T[] GetColumns<T>(Diagnostics.Windows.MemoryDiagnoser memoryDiagnoser)
+        private static T[] GetColumns<T>(MemoryDiagnoser memoryDiagnoser)
             => memoryDiagnoser.GetColumnProvider().GetColumns(null).OfType<T>().ToArray();
 
         private static void AssertParsed(string text, Predicate<double> condition)

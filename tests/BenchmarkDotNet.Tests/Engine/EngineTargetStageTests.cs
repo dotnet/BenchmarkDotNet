@@ -46,7 +46,9 @@ namespace BenchmarkDotNet.Tests.Engine
         private EngineTargetStage CreateStage(Job job, Func<IterationData, TimeInterval> measure)
         {
             var engine = new MockEngine(output, job, measure);
-            return new EngineTargetStage(engine);
+            var stage = new EngineTargetStage(engine);
+            stage.PreAllocateResultsList(Characteristic<int>.Create(""));
+            return stage;
         }
     }
 }

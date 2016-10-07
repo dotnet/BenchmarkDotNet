@@ -54,8 +54,6 @@ namespace BenchmarkDotNet.Engines
 
                 invokeCount *= 2;
             }
-            WriteLine();
-
             return invokeCount;
         }
 
@@ -87,7 +85,6 @@ namespace BenchmarkDotNet.Engines
 
                 invokeCount = newInvokeCount;
             }
-            WriteLine();
 
             return invokeCount;
         }

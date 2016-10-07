@@ -36,7 +36,6 @@ namespace BenchmarkDotNet.Engines
                 if (IsWarmupFinished(measurements, iterationMode))
                     break;
             }
-            WriteLine();
             return measurements;
         }
 
@@ -45,7 +44,6 @@ namespace BenchmarkDotNet.Engines
             var measurements = new List<Measurement>(iterationCount);
             for (int i = 0; i < iterationCount; i++)
                 measurements.Add(RunIteration(iterationMode, i + 1, invokeCount, unrollFactor));
-            WriteLine();
             return measurements;
         }
 

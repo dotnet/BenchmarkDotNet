@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
@@ -23,12 +21,17 @@ namespace BenchmarkDotNet.Engines
         public Action CleanupAction { get; set; } = null;
         public Action<long> MainAction { get; }
         public Action<long> IdleAction { get; }
+        public IResolver Resolver { get; }
+
+        private bool ForceAllocations { get; set; }
+        private IClock Clock { get; set; }
+        private int UnrollFactor { get; set; }
+        private RunStrategy Strategy { get; set; }
+        private bool EvaluateOverhead { get; set; }
 
         private readonly EnginePilotStage pilotStage;
         private readonly EngineWarmupStage warmupStage;
         private readonly EngineTargetStage targetStage;
-
-        public IResolver Resolver { get; }
 
         public Engine([NotNull] Action<long> idleAction, [NotNull] Action<long> mainAction)
         {
@@ -40,59 +43,53 @@ namespace BenchmarkDotNet.Engines
             Resolver = new CompositeResolver(BenchmarkRunnerCore.DefaultResolver, EngineResolver.Instance);
         }
 
-        // TODO: return all measurements
-        public void Run()
+        /// <summary>
+        /// allocation-heavy method, execute before attaching any diagnosers!
+        /// </summary>
+        public void Initialize()
+        {
+            ForceAllocations = TargetJob.Env.Gc.Force.Resolve(Resolver);
+            Clock = TargetJob.Infrastructure.Clock.Resolve(Resolver);
+            UnrollFactor = TargetJob.Run.UnrollFactor.Resolve(Resolver);
+            Strategy = TargetJob.Run.RunStrategy.Resolve(Resolver);
+            EvaluateOverhead = TargetJob.Accuracy.EvaluateOverhead.Resolve(Resolver);
+
+            targetStage.PreAllocateResultsList(TargetJob.Run.TargetCount);
+
+            if (TimeUnit.All == null) { throw new Exception("just use this type here to provoke static ctor"); }
+        }
+
+        public RunResults Run()
         {
             Jitting();
 
             long invokeCount = 1;
-            int unrollFactor = TargetJob.Run.UnrollFactor.Resolve(Resolver);
-            IList<Measurement> idle = null;
+            List<Measurement> idle = null;
 
-            if (TargetJob.Run.RunStrategy.Resolve(Resolver) != RunStrategy.ColdStart)
+            if (Strategy != RunStrategy.ColdStart)
             {
                 invokeCount = pilotStage.Run();
 
-                if (TargetJob.Accuracy.EvaluateOverhead.Resolve(Resolver))
+                if (EvaluateOverhead)
                 {
-                    warmupStage.RunIdle(invokeCount, unrollFactor);
-                    idle = targetStage.RunIdle(invokeCount, unrollFactor);
+                    warmupStage.RunIdle(invokeCount, UnrollFactor);
+                    idle = targetStage.RunIdle(invokeCount, UnrollFactor);
                 }
 
-                warmupStage.RunMain(invokeCount, unrollFactor);
+                warmupStage.RunMain(invokeCount, UnrollFactor);
             }
 
-            var main = targetStage.RunMain(invokeCount, unrollFactor);
+            var main = targetStage.RunMain(invokeCount, UnrollFactor);
 
-            // TODO: Move calculation of the result measurements to a separated class
-            PrintResult(idle, main);
+            return new RunResults(idle, main);
         }
 
         private void Jitting()
         {
             // first signal about jitting is raised from auto-generated Program.cs, look at BenchmarkProgram.txt
-            
+
             MainAction.Invoke(1);
             IdleAction.Invoke(1);
-        }
-
-        private void PrintResult(IList<Measurement> idle, IList<Measurement> main)
-        {
-            // TODO: use Accuracy.RemoveOutliers
-            // TODO: check if resulted measurements are too small (like < 0.1ns)
-            double overhead = idle == null ? 0.0 : new Statistics(idle.Select(m => m.Nanoseconds)).Median;
-            int resultIndex = 0;
-            foreach (var measurement in main)
-            {
-                var resultMeasurement = new Measurement(
-                    measurement.LaunchIndex,
-                    IterationMode.Result,
-                    ++resultIndex,
-                    measurement.Operations,
-                    Math.Max(0, measurement.Nanoseconds - overhead));
-                WriteLine(resultMeasurement.ToOutputLine());
-            }
-            WriteLine();
         }
 
         public Measurement RunIteration(IterationData data)
@@ -106,32 +103,30 @@ namespace BenchmarkDotNet.Engines
             GcCollect();
 
             // Measure
-            var clock = TargetJob.Infrastructure.Clock.Resolve(Resolver).Start();
+            var clock = Clock.Start();
             action(invokeCount / unrollFactor);
             var clockSpan = clock.Stop();
 
             GcCollect();
 
             // Results
-            var measurement = new Measurement(0, data.IterationMode, data.Index, totalOperations, clockSpan.GetNanoseconds());
-            WriteLine(measurement.ToOutputLine());
-            return measurement;
+            return new Measurement(0, data.IterationMode, data.Index, totalOperations, clockSpan.GetNanoseconds());
         }
 
-        private void GcCollect() => GcCollect(TargetJob.Env.Gc.Force.Resolve(Resolver));
-
-        private static void GcCollect(bool isForce)
+        private void GcCollect()
         {
-            if (!isForce)
+            if (!ForceAllocations)
                 return;
 
+            ForceGcCollect();
+        }
+
+        private static void ForceGcCollect()
+        {
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();
         }
-
-        public void WriteLine() => Console.WriteLine();
-        public void WriteLine(string line) => Console.WriteLine(line);
 
         [UsedImplicitly]
         public class Signals

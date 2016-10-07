@@ -27,9 +27,6 @@ namespace BenchmarkDotNet.Engines
 
         Measurement RunIteration(IterationData data);
 
-        void WriteLine();
-        void WriteLine(string line);
-
         IResolver Resolver { get; }
     }
 }
