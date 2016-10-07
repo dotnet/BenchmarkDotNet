@@ -26,5 +26,11 @@ namespace BenchmarkDotNet.Engines
                 throw new ArgumentOutOfRangeException($"InvokeCount({invokeCount}) should be a multiple of UnrollFactor({unrollFactor}).");
             return engine.RunIteration(new IterationData(mode, index, invokeCount, unrollFactor));
         }
+
+        protected bool IsDiagnoserAttached => engine.IsDiagnoserAttached;
+
+        protected void WriteLine() => engine.WriteLine();
+
+        protected void WriteLine(string line) => engine.WriteLine(line);
     }
 }

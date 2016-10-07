@@ -273,7 +273,7 @@ namespace BenchmarkDotNet.Running
             // Do a "Diagnostic" run, but DISCARD the results, so that the overhead of Diagnostics doesn't skew the overall results
             if (config.GetDiagnosers().Any())
             {
-                logger.WriteLineInfo($"// Run, Diagnostic");
+                logger.WriteLineInfo("// Run, Diagnostic");
                 var compositeDiagnoser = config.GetCompositeDiagnoser();
 
                 var executeResult = toolchain.Executor.Execute(buildResult, benchmark, logger, resolver, compositeDiagnoser);

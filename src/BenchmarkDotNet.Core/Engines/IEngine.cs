@@ -25,7 +25,12 @@ namespace BenchmarkDotNet.Engines
         [NotNull]
         Action<long> IdleAction { get; }
 
+        bool IsDiagnoserAttached { get; set; }
+
         Measurement RunIteration(IterationData data);
+
+        void WriteLine();
+        void WriteLine(string line);
 
         IResolver Resolver { get; }
     }

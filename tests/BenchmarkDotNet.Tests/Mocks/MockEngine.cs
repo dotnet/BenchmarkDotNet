@@ -25,6 +25,7 @@ namespace BenchmarkDotNet.Tests.Mocks
         public long OperationsPerInvoke { get; set; } = 1;
         public Action SetupAction { get; set; }
         public Action CleanupAction { get; set; }
+        public bool IsDiagnoserAttached { get; set; }
         public Action<long> MainAction { get;  } = _ => { };
         public Action<long> IdleAction { get; } = _ => { };
 

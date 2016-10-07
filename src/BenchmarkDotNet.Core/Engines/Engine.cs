@@ -19,6 +19,7 @@ namespace BenchmarkDotNet.Engines
         public long OperationsPerInvoke { get; set; } = 1;
         public Action SetupAction { get; set; } = null;
         public Action CleanupAction { get; set; } = null;
+        public bool IsDiagnoserAttached { get; set; }
         public Action<long> MainAction { get; }
         public Action<long> IdleAction { get; }
         public IResolver Resolver { get; }
@@ -110,7 +111,10 @@ namespace BenchmarkDotNet.Engines
             GcCollect();
 
             // Results
-            return new Measurement(0, data.IterationMode, data.Index, totalOperations, clockSpan.GetNanoseconds());
+            var measurement = new Measurement(0, data.IterationMode, data.Index, totalOperations, clockSpan.GetNanoseconds());
+            if (!IsDiagnoserAttached) WriteLine(measurement.ToOutputLine());
+
+            return measurement;
         }
 
         private void GcCollect()
@@ -128,14 +132,35 @@ namespace BenchmarkDotNet.Engines
             GC.Collect();
         }
 
+        public void WriteLine(string text)
+        {
+            EnsureNothingIsPrintedWhenDiagnoserIsAttached();
+
+            Console.WriteLine(text);
+        }
+
+        public void WriteLine()
+        {
+            EnsureNothingIsPrintedWhenDiagnoserIsAttached();
+
+            Console.WriteLine();
+        }
+
+        private void EnsureNothingIsPrintedWhenDiagnoserIsAttached()
+        {
+            if (IsDiagnoserAttached)
+            {
+                throw new InvalidOperationException("to avoid memory allocations we must not print anything when diagnoser is still attached");
+            }
+        }
+
         [UsedImplicitly]
         public class Signals
         {
             public const string BeforeAnythingElse = "// BeforeAnythingElse";
-
             public const string AfterSetup = "// AfterSetup";
-
             public const string BeforeCleanup = "// BeforeCleanup";
+            public const string DiagnoserIsAttachedParam = "diagnoserAttached";
         }
     }
 }

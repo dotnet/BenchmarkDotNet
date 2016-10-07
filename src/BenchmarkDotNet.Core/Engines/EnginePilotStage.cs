@@ -54,6 +54,8 @@ namespace BenchmarkDotNet.Engines
 
                 invokeCount *= 2;
             }
+            if(!IsDiagnoserAttached) WriteLine();
+
             return invokeCount;
         }
 
@@ -85,6 +87,7 @@ namespace BenchmarkDotNet.Engines
 
                 invokeCount = newInvokeCount;
             }
+            if (!IsDiagnoserAttached) WriteLine();
 
             return invokeCount;
         }
