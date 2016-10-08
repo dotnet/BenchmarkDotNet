@@ -4,6 +4,7 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -14,6 +15,8 @@ namespace BenchmarkDotNet.Reports
 
         public GenerateResult GenerateResult { get; }
         public BuildResult BuildResult { get; }
+
+        [NotNull]
         public IList<ExecuteResult> ExecuteResults { get; }
 
         public Statistics ResultStatistics => this.GetResultRuns().Any()
@@ -30,7 +33,7 @@ namespace BenchmarkDotNet.Reports
             Benchmark = benchmark;
             GenerateResult = generateResult;
             BuildResult = buildResult;
-            ExecuteResults = executeResults;
+            ExecuteResults = executeResults ?? new ExecuteResult[0];
             AllMeasurements = allMeasurements ?? new Measurement[0];
         }
 

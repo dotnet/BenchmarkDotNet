@@ -91,16 +91,17 @@ namespace BenchmarkDotNet.Reports
             var runtimes = new HashSet<string>();
 
             foreach (var benchmarkReport in Reports)
-                foreach (var executeResults in benchmarkReport.ExecuteResults)
-                    foreach (var extraOutputLine in executeResults.ExtraOutput.Where(line => line.StartsWith(DisplayedRuntimeInfoPrefix)))
-                    {
-                        string runtime = extraOutputLine.Substring(DisplayedRuntimeInfoPrefix.Length);
-
-                        if (runtimes.Add(runtime))
+                if (benchmarkReport.ExecuteResults != null)
+                    foreach (var executeResults in benchmarkReport.ExecuteResults)
+                        foreach (var extraOutputLine in executeResults.ExtraOutput.Where(line => line.StartsWith(DisplayedRuntimeInfoPrefix)))
                         {
-                            result.Append($"\n\t{runtime}");
+                            string runtime = extraOutputLine.Substring(DisplayedRuntimeInfoPrefix.Length);
+
+                            if (runtimes.Add(runtime))
+                            {
+                                result.Append($"\n\t{runtime}");
+                            }
                         }
-                    }
 
             return result.ToString();
         }
