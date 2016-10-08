@@ -22,13 +22,14 @@ namespace BenchmarkDotNet.Engines
         public Action SetupAction { get; }
         public Action CleanupAction { get; }
         public bool IsDiagnoserAttached { get; }
-
         public IResolver Resolver { get; }
+
         private IClock Clock { get; }
         private bool ForceAllocations { get; }
         private int UnrollFactor { get; }
         private RunStrategy Strategy { get; }
         private bool EvaluateOverhead { get; }
+        private int InvocationCount { get; }
 
         private readonly EnginePilotStage pilotStage;
         private readonly EngineWarmupStage warmupStage;
@@ -51,6 +52,7 @@ namespace BenchmarkDotNet.Engines
             UnrollFactor = targetJob.Run.UnrollFactor.Resolve(Resolver);
             Strategy = targetJob.Run.RunStrategy.Resolve(Resolver);
             EvaluateOverhead = targetJob.Accuracy.EvaluateOverhead.Resolve(Resolver);
+            InvocationCount = targetJob.Run.InvocationCount.Resolve(Resolver);
 
             warmupStage = new EngineWarmupStage(this);
             pilotStage = new EnginePilotStage(this);
@@ -65,7 +67,7 @@ namespace BenchmarkDotNet.Engines
         {
             Jitting();
 
-            long invokeCount = 1;
+            long invokeCount = InvocationCount;
             List<Measurement> idle = null;
 
             if (Strategy != RunStrategy.ColdStart)
