@@ -15,50 +15,51 @@ namespace BenchmarkDotNet.Engines
         public const int MinInvokeCount = 4;
         public static readonly TimeInterval MinIterationTime = 200 * TimeInterval.Millisecond;
 
-        public Job TargetJob { get; set; } = Job.Default;
-        public long OperationsPerInvoke { get; set; } = 1;
-        public Action SetupAction { get; set; } = null;
-        public Action CleanupAction { get; set; } = null;
-        public bool IsDiagnoserAttached { get; set; }
         public Action<long> MainAction { get; }
         public Action<long> IdleAction { get; }
-        public IResolver Resolver { get; }
+        public Job TargetJob { get; }
+        public long OperationsPerInvoke { get; }
+        public Action SetupAction { get; }
+        public Action CleanupAction { get; }
+        public bool IsDiagnoserAttached { get; }
 
-        private bool ForceAllocations { get; set; }
-        private IClock Clock { get; set; }
-        private int UnrollFactor { get; set; }
-        private RunStrategy Strategy { get; set; }
-        private bool EvaluateOverhead { get; set; }
+        public IResolver Resolver { get; }
+        private IClock Clock { get; }
+        private bool ForceAllocations { get; }
+        private int UnrollFactor { get; }
+        private RunStrategy Strategy { get; }
+        private bool EvaluateOverhead { get; }
 
         private readonly EnginePilotStage pilotStage;
         private readonly EngineWarmupStage warmupStage;
         private readonly EngineTargetStage targetStage;
 
-        public Engine([NotNull] Action<long> idleAction, [NotNull] Action<long> mainAction)
+        internal Engine(Action<long> idleAction, Action<long> mainAction, Job targetJob, Action setupAction, Action cleanupAction, long operationsPerInvoke, bool isDiagnoserAttached)
         {
             IdleAction = idleAction;
             MainAction = mainAction;
-            pilotStage = new EnginePilotStage(this);
-            warmupStage = new EngineWarmupStage(this);
-            targetStage = new EngineTargetStage(this);
+            TargetJob = targetJob;
+            SetupAction = setupAction;
+            CleanupAction = cleanupAction;
+            OperationsPerInvoke = operationsPerInvoke;
+            IsDiagnoserAttached = isDiagnoserAttached;
+
             Resolver = new CompositeResolver(BenchmarkRunnerCore.DefaultResolver, EngineResolver.Instance);
-        }
 
-        /// <summary>
-        /// allocation-heavy method, execute before attaching any diagnosers!
-        /// </summary>
-        public void Initialize()
-        {
-            ForceAllocations = TargetJob.Env.Gc.Force.Resolve(Resolver);
-            Clock = TargetJob.Infrastructure.Clock.Resolve(Resolver);
-            UnrollFactor = TargetJob.Run.UnrollFactor.Resolve(Resolver);
-            Strategy = TargetJob.Run.RunStrategy.Resolve(Resolver);
-            EvaluateOverhead = TargetJob.Accuracy.EvaluateOverhead.Resolve(Resolver);
+            Clock = targetJob.Infrastructure.Clock.Resolve(Resolver);
+            ForceAllocations = targetJob.Env.Gc.Force.Resolve(Resolver);
+            UnrollFactor = targetJob.Run.UnrollFactor.Resolve(Resolver);
+            Strategy = targetJob.Run.RunStrategy.Resolve(Resolver);
+            EvaluateOverhead = targetJob.Accuracy.EvaluateOverhead.Resolve(Resolver);
 
-            targetStage.PreAllocateResultsList(TargetJob.Run.TargetCount);
+            warmupStage = new EngineWarmupStage(this);
+            pilotStage = new EnginePilotStage(this);
+            targetStage = new EngineTargetStage(this);
 
             if (TimeUnit.All == null) { throw new Exception("just use this type here to provoke static ctor"); }
         }
+
+        public IEngineFactory Factory => new EngineFactory();
 
         public RunResults Run()
         {

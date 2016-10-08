@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using BenchmarkDotNet.Characteristics;
+﻿using BenchmarkDotNet.Characteristics;
 
 namespace BenchmarkDotNet.Jobs
 {

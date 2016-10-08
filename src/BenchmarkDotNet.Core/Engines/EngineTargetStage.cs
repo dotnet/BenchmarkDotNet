@@ -11,45 +11,47 @@ namespace BenchmarkDotNet.Engines
         internal const int MinIterationCount = 15;
         internal const int MaxIterationCount = 100;
         internal const int MaxIdleIterationCount = 20;
-        private const double MaxIdleStdErrRelative = 0.05;
+        internal const double MaxIdleStdErrRelative = 0.05;
 
-        private List<Measurement> measurements;
+        private readonly ICharacteristic<int> targetCount;
+        private readonly double maxStdErrRelative;
+        private readonly bool removeOutliers;
+        private readonly List<Measurement> measurements;
 
         public EngineTargetStage(IEngine engine) : base(engine)
         {
-        }
-
-        public void PreAllocateResultsList(ICharacteristic<int> iterationCount)
-        {
-            var maxSize = WillRunAuto(iterationCount) ? MaxIterationCount : iterationCount.SpecifiedValue;
+            targetCount = engine.TargetJob.Run.TargetCount;
+            maxStdErrRelative = engine.Resolver.Resolve(engine.TargetJob.Accuracy.MaxStdErrRelative);
+            removeOutliers = engine.Resolver.Resolve(engine.TargetJob.Accuracy.RemoveOutliers);
+            var maxSize = ShouldRunAuto(targetCount) ? MaxIterationCount : targetCount.SpecifiedValue;
             measurements = new List<Measurement>(maxSize);
         }
 
-        public List<Measurement> Run(long invokeCount, IterationMode iterationMode, ICharacteristic<int> iterationCount, int unrollFactor)
-        {
-            return WillRunAuto(iterationCount)
+        public List<Measurement> RunIdle(long invokeCount, int unrollFactor) 
+            => Run(invokeCount, IterationMode.IdleTarget, targetCount.MakeDefault(), unrollFactor);
+
+        public List<Measurement> RunMain(long invokeCount, int unrollFactor) 
+            => Run(invokeCount, IterationMode.MainTarget, targetCount, unrollFactor);
+
+        internal List<Measurement> Run(long invokeCount, IterationMode iterationMode, ICharacteristic<int> iterationCount, int unrollFactor)
+            => ShouldRunAuto(iterationCount)
                 ? RunAuto(invokeCount, iterationMode, unrollFactor)
                 : RunSpecific(invokeCount, iterationMode, iterationCount.SpecifiedValue, unrollFactor);
-        }
-
-        public List<Measurement> RunIdle(long invokeCount, int unrollFactor) => Run(invokeCount, IterationMode.IdleTarget, TargetJob.Run.TargetCount.MakeDefault(), unrollFactor);
-
-        public List<Measurement> RunMain(long invokeCount, int unrollFactor) => Run(invokeCount, IterationMode.MainTarget, TargetJob.Run.TargetCount, unrollFactor);
 
         private List<Measurement> RunAuto(long invokeCount, IterationMode iterationMode, int unrollFactor)
         {
             int iterationCounter = 0;
             bool isIdle = iterationMode.IsIdle();
-            double maxErrorRelative = isIdle ? MaxIdleStdErrRelative : Resolver.Resolve(TargetAccuracy.MaxStdErrRelative);
+            double maxErrorRelative = isIdle ? MaxIdleStdErrRelative : maxStdErrRelative;
             while (true)
             {
                 iterationCounter++;
                 var measurement = RunIteration(iterationMode, iterationCounter, invokeCount, unrollFactor);
                 measurements.Add(measurement);
 
-                var statistics = new Statistics(measurements.Select(m => m.Nanoseconds));
-                if (Resolver.Resolve(TargetAccuracy.RemoveOutliers))
-                    statistics = new Statistics(statistics.WithoutOutliers());
+                var statistics = new Statistics(measurements.Select(m => m.Nanoseconds)); // todo: remove allocations
+                if (removeOutliers)
+                    statistics = new Statistics(statistics.WithoutOutliers()); // todo: remove allocations
                 double actualError = statistics.StandardError;
                 double maxError = maxErrorRelative * statistics.Mean;
 
@@ -59,6 +61,7 @@ namespace BenchmarkDotNet.Engines
                 if (iterationCounter >= MaxIterationCount || (isIdle && iterationCounter >= MaxIdleIterationCount))
                     break;
             }
+            if (!IsDiagnoserAttached) WriteLine();
             return measurements;
         }
 
@@ -71,7 +74,5 @@ namespace BenchmarkDotNet.Engines
 
             return measurements;
         }
-
-        private bool WillRunAuto(ICharacteristic<int> iterationCount) => iterationCount.IsDefault;
     }
 }

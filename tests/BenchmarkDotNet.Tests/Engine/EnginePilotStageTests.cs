@@ -5,6 +5,8 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.Mocks;
 using Xunit;
 using Xunit.Abstractions;
+using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Tests.Engine
 {

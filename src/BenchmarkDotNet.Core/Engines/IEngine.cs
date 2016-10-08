@@ -1,5 +1,6 @@
 ﻿using System;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
@@ -9,15 +10,15 @@ namespace BenchmarkDotNet.Engines
     public interface IEngine
     {
         [NotNull]
-        Job TargetJob { get; set; }
+        Job TargetJob { get; }
 
-        long OperationsPerInvoke { get; set; }
-
-        [CanBeNull]
-        Action SetupAction { get; set; }
+        long OperationsPerInvoke { get; }
 
         [CanBeNull]
-        Action CleanupAction { get; set; }
+        Action SetupAction { get; }
+
+        [CanBeNull]
+        Action CleanupAction { get; }
 
         [NotNull]
         Action<long> MainAction { get; }
@@ -25,13 +26,21 @@ namespace BenchmarkDotNet.Engines
         [NotNull]
         Action<long> IdleAction { get; }
 
-        bool IsDiagnoserAttached { get; set; }
+        bool IsDiagnoserAttached { get; }
+
+        IResolver Resolver { get; }
 
         Measurement RunIteration(IterationData data);
 
         void WriteLine();
         void WriteLine(string line);
 
-        IResolver Resolver { get; }
+        RunResults Run();
+
+        /// <summary>
+        /// this type will be used in the auto-generated program to create engine in separate process
+        /// <remarks>it must have parameterless constructor</remarks>
+        /// </summary>
+        IEngineFactory Factory { get; }
     }
 }

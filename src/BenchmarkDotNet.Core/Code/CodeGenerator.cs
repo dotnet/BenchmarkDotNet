@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Core.Helpers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -37,6 +38,7 @@ namespace BenchmarkDotNet.Code
                 Replace("$JobSetDefinition$", GetJobsSetDefinition(benchmark)).
                 Replace("$ParamsContent$", GetParamsContent(benchmark)).
                 Replace("$ExtraAttribute$", GetExtraAttributes(benchmark.Target)).
+                Replace("$EngineFactoryType$", typeof(EngineFactory).GetCorrectTypeName()). // todo: get it from Job's settings
                 ToString();
 
             text = Unroll(text, benchmark.Job.Run.UnrollFactor.Resolve(EnvResolver.Instance));

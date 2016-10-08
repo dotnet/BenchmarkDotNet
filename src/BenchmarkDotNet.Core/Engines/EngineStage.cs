@@ -16,9 +16,7 @@ namespace BenchmarkDotNet.Engines
         }
 
         protected Job TargetJob => engine.TargetJob;
-        protected AccuracyMode TargetAccuracy => TargetJob.Accuracy;
-        protected IClock TargetClock => engine.Resolver.Resolve(TargetJob.Infrastructure.Clock);
-        protected IResolver Resolver => engine.Resolver;
+        protected bool IsDiagnoserAttached => engine.IsDiagnoserAttached;
 
         protected Measurement RunIteration(IterationMode mode, int index, long invokeCount, int unrollFactor)
         {
@@ -27,10 +25,9 @@ namespace BenchmarkDotNet.Engines
             return engine.RunIteration(new IterationData(mode, index, invokeCount, unrollFactor));
         }
 
-        protected bool IsDiagnoserAttached => engine.IsDiagnoserAttached;
+        protected bool ShouldRunAuto(ICharacteristic<int> iterationCount) => iterationCount.IsDefault;
 
         protected void WriteLine() => engine.WriteLine();
-
         protected void WriteLine(string line) => engine.WriteLine(line);
     }
 }

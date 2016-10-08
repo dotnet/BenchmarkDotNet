@@ -28,6 +28,7 @@ namespace BenchmarkDotNet.Tests.Mocks
         public bool IsDiagnoserAttached { get; set; }
         public Action<long> MainAction { get;  } = _ => { };
         public Action<long> IdleAction { get; } = _ => { };
+        public IEngineFactory Factory => null;
 
         public Measurement RunIteration(IterationData data)
         {
@@ -37,15 +38,10 @@ namespace BenchmarkDotNet.Tests.Mocks
             return measurement;
         }
 
-        public void WriteLine()
-        {
-            output.WriteLine("");
-        }
+        public RunResults Run() => default(RunResults);
 
-        public void WriteLine(string line)
-        {
-            output.WriteLine(line);
-        }
+        public void WriteLine() => output.WriteLine("");
+        public void WriteLine(string line) => output.WriteLine(line);
 
         public IResolver Resolver => new CompositeResolver(BenchmarkRunnerCore.DefaultResolver, EngineResolver.Instance);
     }

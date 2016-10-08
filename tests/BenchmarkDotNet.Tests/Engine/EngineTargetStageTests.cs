@@ -6,6 +6,8 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.Mocks;
 using Xunit;
 using Xunit.Abstractions;
+using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Tests.Engine
 {
@@ -46,9 +48,7 @@ namespace BenchmarkDotNet.Tests.Engine
         private EngineTargetStage CreateStage(Job job, Func<IterationData, TimeInterval> measure)
         {
             var engine = new MockEngine(output, job, measure);
-            var stage = new EngineTargetStage(engine);
-            stage.PreAllocateResultsList(Characteristic<int>.Create(""));
-            return stage;
+            return new EngineTargetStage(engine);
         }
     }
 }
