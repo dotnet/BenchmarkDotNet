@@ -81,5 +81,11 @@ namespace BenchmarkDotNet.Extensions
                 typeInfo = typeInfo.BaseType?.GetTypeInfo();
             }
         }
+
+        internal static bool IsStruct(this Type type)
+        {
+            var typeInfo = type.GetTypeInfo();
+            return typeInfo.IsValueType && !typeInfo.IsPrimitive;
+        }
     }
 }

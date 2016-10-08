@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using BenchmarkDotNet.Core.Helpers;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 
@@ -76,19 +77,30 @@ namespace BenchmarkDotNet.Code
         public override string TargetMethodDelegateType => $"Func<{TargetMethodReturnType}>";
 
         public override string IdleMethodReturnType
-            => Target.Method.ReturnType.GetTypeInfo().IsValueType
+            => Target.Method.ReturnType.IsStruct()
                 ? "int" // we return int because creating bigger ValueType could take longer than benchmarked method itself
                 : TargetMethodReturnType;
 
         public override string IdleMethodDelegateType
-            => Target.Method.ReturnType.GetTypeInfo().IsValueType
+            => Target.Method.ReturnType.IsStruct()
                 ? "Func<int>" 
                 : $"Func<{TargetMethodReturnType}>";
 
         public override string IdleImplementation
-            => Target.Method.ReturnType.GetTypeInfo().IsValueType
-                ? "return 0;"
-                : "return null;";
+        {
+            get
+            {
+                string value;
+                var type = Target.Method.ReturnType;
+                if (type.IsStruct())
+                    value = "0";
+                else if (type.GetTypeInfo().IsClass)
+                    value = "null";
+                else
+                    value = SourceCodeHelper.ToSourceCode(Activator.CreateInstance(type)) + ";";                                    
+                return $"return {value};";
+            }
+        }
 
         public override string HasReturnValue => "true";
     }
