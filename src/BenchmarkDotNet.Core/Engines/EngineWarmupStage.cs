@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Engines

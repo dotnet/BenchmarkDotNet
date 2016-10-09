@@ -1,6 +1,5 @@
 ﻿using System;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 

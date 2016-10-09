@@ -49,9 +49,7 @@ namespace BenchmarkDotNet.Engines
                 var measurement = RunIteration(iterationMode, iterationCounter, invokeCount, unrollFactor);
                 measurements.Add(measurement);
 
-                var statistics = new Statistics(measurements.Select(m => m.Nanoseconds)); // todo: remove allocations
-                if (removeOutliers)
-                    statistics = new Statistics(statistics.WithoutOutliers()); // todo: remove allocations
+                var statistics = MeasurementsStatistics.Calculate(measurements, removeOutliers);
                 double actualError = statistics.StandardError;
                 double maxError = maxErrorRelative * statistics.Mean;
 
