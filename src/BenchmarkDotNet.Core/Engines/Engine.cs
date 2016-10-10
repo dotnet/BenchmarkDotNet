@@ -34,6 +34,7 @@ namespace BenchmarkDotNet.Engines
         private readonly EnginePilotStage pilotStage;
         private readonly EngineWarmupStage warmupStage;
         private readonly EngineTargetStage targetStage;
+        private bool jittingWasDone;
 
         internal Engine(Action<long> idleAction, Action<long> mainAction, Job targetJob, Action setupAction, Action cleanupAction, long operationsPerInvoke, bool isDiagnoserAttached)
         {
@@ -57,15 +58,26 @@ namespace BenchmarkDotNet.Engines
             warmupStage = new EngineWarmupStage(this);
             pilotStage = new EnginePilotStage(this);
             targetStage = new EngineTargetStage(this);
-
-            if (TimeUnit.All == null) { throw new Exception("just use this type here to provoke static ctor"); }
         }
 
         public IEngineFactory Factory => new EngineFactory();
 
-        public RunResults Run()
+        public void ProvokeAllPossibleAllocations()
         {
             Jitting();
+
+            var list = new List<Measurement> { new Measurement(), new Measurement() };
+            list.Sort(); // provoke JIT, static ctors etc (was using 1740 bytes ;))
+            if (TimeUnit.All == null || list[0].Nanoseconds != default(long))
+                throw new Exception("just use this things here to provoke static ctor");
+
+            jittingWasDone = true;
+        }
+
+        public RunResults Run()
+        {
+            if (!jittingWasDone)
+                throw new Exception("You must call ProvokeAllPossibleAllocations first!");
 
             long invokeCount = InvocationCount;
             List<Measurement> idle = null;

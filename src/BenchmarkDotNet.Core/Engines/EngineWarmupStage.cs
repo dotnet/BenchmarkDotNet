@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Engines
         }
 
         public void RunIdle(long invokeCount, int unrollFactor) 
-            => Run(invokeCount, IterationMode.IdleWarmup, warmupCount.MakeDefault(), unrollFactor);
+            => RunAuto(invokeCount, IterationMode.IdleWarmup, unrollFactor);
 
         public void RunMain(long invokeCount, int unrollFactor) 
             => Run(invokeCount, IterationMode.MainWarmup, warmupCount, unrollFactor);

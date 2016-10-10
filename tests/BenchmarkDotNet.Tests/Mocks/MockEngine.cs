@@ -38,6 +38,8 @@ namespace BenchmarkDotNet.Tests.Mocks
             return measurement;
         }
 
+        public void ProvokeAllPossibleAllocations() { }
+
         public RunResults Run() => default(RunResults);
 
         public void WriteLine() => output.WriteLine("");

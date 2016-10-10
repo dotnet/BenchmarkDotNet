@@ -41,9 +41,7 @@ namespace BenchmarkDotNet.Engines
         /// </summary>
         private long RunAuto()
         {
-            Func<long, long> autocorrect = count => (count + unrollFactor - 1) / unrollFactor * unrollFactor;
-
-            long invokeCount = autocorrect(minInvokeCount);
+            long invokeCount = Autocorrect(minInvokeCount);
             double maxError = maxStdErrRelative; // TODO: introduce a StdErr factor
             double minIterationTime = Engine.MinIterationTime.Nanoseconds;
 
@@ -74,9 +72,7 @@ namespace BenchmarkDotNet.Engines
         /// </summary>
         private long RunSpecific()
         {
-            Func<long, long> autocorrect = count => (count + unrollFactor - 1) / unrollFactor * unrollFactor;
-
-            long invokeCount = autocorrect(Engine.MinInvokeCount);
+            long invokeCount = Autocorrect(Engine.MinInvokeCount);
 
             int iterationCounter = 0;
 
@@ -86,7 +82,7 @@ namespace BenchmarkDotNet.Engines
                 iterationCounter++;
                 var measurement = RunIteration(IterationMode.Pilot, iterationCounter, invokeCount, unrollFactor);
                 double actualIterationTime = measurement.Nanoseconds;
-                long newInvokeCount = autocorrect(Math.Max(minInvokeCount, (long)Math.Round(invokeCount * targetIterationTime / actualIterationTime)));
+                long newInvokeCount = Autocorrect(Math.Max(minInvokeCount, (long)Math.Round(invokeCount * targetIterationTime / actualIterationTime)));
 
                 if (newInvokeCount < invokeCount)
                     downCount++;
@@ -100,5 +96,7 @@ namespace BenchmarkDotNet.Engines
 
             return invokeCount;
         }
+
+        private long Autocorrect(long count) => (count + unrollFactor - 1) / unrollFactor * unrollFactor;
     }
 }

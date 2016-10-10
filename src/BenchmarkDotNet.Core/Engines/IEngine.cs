@@ -35,6 +35,11 @@ namespace BenchmarkDotNet.Engines
         void WriteLine();
         void WriteLine(string line);
 
+        /// <summary>
+        /// does the jitting, should also provoke all static ctors
+        /// </summary>
+        void ProvokeAllPossibleAllocations();
+
         RunResults Run();
 
         /// <summary>

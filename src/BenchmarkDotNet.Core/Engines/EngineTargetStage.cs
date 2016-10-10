@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Engines
         }
 
         public List<Measurement> RunIdle(long invokeCount, int unrollFactor) 
-            => Run(invokeCount, IterationMode.IdleTarget, targetCount.MakeDefault(), unrollFactor);
+            => RunAuto(invokeCount, IterationMode.IdleTarget, unrollFactor);
 
         public List<Measurement> RunMain(long invokeCount, int unrollFactor) 
             => Run(invokeCount, IterationMode.MainTarget, targetCount, unrollFactor);
