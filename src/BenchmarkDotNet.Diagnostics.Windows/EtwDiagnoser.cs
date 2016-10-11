@@ -49,11 +49,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         protected void Stop()
         {
-            // ETW real-time sessions receive events with a slight delay. Typically it
-            // shouldn't be more than a few seconds. This increases the likelihood that
-            // all relevant events are processed by the collection thread by the time we
-            // are done with the benchmark.
-            Thread.Sleep(TimeSpan.FromSeconds(3));
+            WaitForDelayedEvents();
 
             session.Dispose();
         }
@@ -98,6 +94,17 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             {
                 Thread.Sleep(10);
             }
+        }
+
+        /// <summary>
+        /// ETW real-time sessions receive events with a slight delay. Typically it
+        /// shouldn't be more than a few seconds. This increases the likelihood that
+        /// all relevant events are processed by the collection thread by the time we
+        /// are done with the benchmark.
+        /// </summary>
+        private static void WaitForDelayedEvents()
+        {
+            Thread.Sleep(TimeSpan.FromSeconds(3));
         }
     }
 }

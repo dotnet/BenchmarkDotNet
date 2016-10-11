@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Samples.JIT
     // See http://en.wikipedia.org/wiki/Inline_expansion
     // See http://aakinshin.net/en/blog/dotnet/inlining-and-starg/
 #if !CORE
-    [Diagnostics.Windows.Configs.InliningDiagnoserConfig]
+    [Diagnostics.Windows.Configs.InliningDiagnoser]
 #endif
     [LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
     public class Jit_Inlining

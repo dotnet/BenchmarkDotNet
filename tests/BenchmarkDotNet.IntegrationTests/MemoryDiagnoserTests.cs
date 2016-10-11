@@ -24,20 +24,20 @@ namespace BenchmarkDotNet.IntegrationTests
     public class NewVsStackalloc
     {
         [Benchmark]
-        public void New() => Blackhole(new byte[100]);
+        public void New() => Consume(new byte[100]);
 
         [Benchmark]
         public unsafe void Stackalloc()
         {
             var bytes = stackalloc byte[100];
-            Blackhole(bytes);
+            Consume(bytes);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private void Blackhole<T>(T input) { }
+        private void Consume<T>(T input) { }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private unsafe void Blackhole(byte* input) { }
+        private unsafe void Consume(byte* input) { }
     }
 
     public class AllocatingSetupAndCleanup
@@ -145,7 +145,12 @@ namespace BenchmarkDotNet.IntegrationTests
         private IConfig CreateConfig(IDiagnoser diagnoser, int targetCount)
         {
             return ManualConfig.CreateEmpty()
-                               .With(Job.Dry.WithLaunchCount(1).WithWarmupCount(1).WithTargetCount(targetCount).With(GcMode.Default.WithForce(false)))
+                               .With(
+                                    Job.Dry
+                                       .WithLaunchCount(1)
+                                       .WithWarmupCount(1)
+                                       .WithTargetCount(targetCount)
+                                       .WithGcForce(false))
                                .With(DefaultConfig.Instance.GetLoggers().ToArray())
                                .With(DefaultColumnProviders.Instance)
                                .With(diagnoser)

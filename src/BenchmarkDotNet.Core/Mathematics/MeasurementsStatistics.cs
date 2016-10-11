@@ -90,7 +90,7 @@ namespace BenchmarkDotNet.Mathematics
 
             double variance = 0;
             for (int i = 0; i < measurements.Count; i++)
-                variance += Math.Pow(measurements[i].Nanoseconds - mean, 2) / (N - 1);
+                variance += (measurements[i].Nanoseconds - mean) * (measurements[i].Nanoseconds - mean) / (N - 1);
 
             return variance;
         }
@@ -103,7 +103,7 @@ namespace BenchmarkDotNet.Mathematics
             double variance = 0;
             for (int i = 0; i < measurements.Count; i++)
                 if (!IsOutlier(measurements[i].Nanoseconds, lowerFence, upperFence))
-                    variance += Math.Pow(measurements[i].Nanoseconds - mean, 2) / (N - 1);
+                    variance += (measurements[i].Nanoseconds - mean) * (measurements[i].Nanoseconds - mean) / (N - 1);
 
             return variance;
         }
@@ -116,7 +116,7 @@ namespace BenchmarkDotNet.Mathematics
             return measurements[count / 2].Nanoseconds;
         }
 
-        private static bool IsOutlier(double value, double LowerFence, double UpperFence)
-            => value < LowerFence || value > UpperFence;
+        private static bool IsOutlier(double value, double lowerFence, double upperFence)
+            => value < lowerFence || value > upperFence;
     }
 }

@@ -3,11 +3,11 @@ using BenchmarkDotNet.Configs;
 
 namespace BenchmarkDotNet.Diagnostics.Windows.Configs
 {
-    public class InliningDiagnoserConfigAttribute : Attribute, IConfigSource
+    public class InliningDiagnoserAttribute : Attribute, IConfigSource
     {
         public IConfig Config { get; }
 
-        public InliningDiagnoserConfigAttribute()
+        public InliningDiagnoserAttribute()
         {
             Config = ManualConfig.CreateEmpty().With(new InliningDiagnoser());
         }

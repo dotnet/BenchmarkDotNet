@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Engines
         {
             // TODO: use Accuracy.RemoveOutliers
             // TODO: check if resulted measurements are too small (like < 0.1ns)
-            double overhead = Idle == null ? 0.0 : new Statistics(Idle.Select(m => m.Nanoseconds)).Median;
+            double overhead = Idle == null ? 0.0 : new Statistics(Idle.Select(m => m.Nanoseconds)).Mean;
             int resultIndex = 0;
             foreach (var measurement in Main)
             {

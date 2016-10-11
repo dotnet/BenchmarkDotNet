@@ -6,15 +6,17 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 {
     public class InliningDiagnoser : JitDiagnoser
     {
+        private static readonly string LogSeparator = new string('-', 20);
+
         protected override void AttachToEvents(TraceEventSession session, Benchmark benchmark)
         {
             var expected = benchmark.Target.Method.DeclaringType.Namespace + "." +
                            benchmark.Target.Method.DeclaringType.Name;
 
             Logger.WriteLine();
-            Logger.WriteLineHeader(new string('-', 20));
+            Logger.WriteLineHeader(LogSeparator);
             Logger.WriteLineInfo($"{benchmark.DisplayInfo}");
-            Logger.WriteLineHeader(new string('-', 20));
+            Logger.WriteLineHeader(LogSeparator);
 
             session.Source.Clr.MethodInliningSucceeded += jitData =>
             {
@@ -29,7 +31,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     {
                         Logger.WriteLineHelp($"Inliner: {jitData.InlinerNamespace}.{jitData.InlinerName} - {jitData.InlinerNameSignature}");
                         Logger.WriteLineHelp($"Inlinee: {jitData.InlineeNamespace}.{jitData.InlineeName} - {jitData.InlineeNameSignature}");
-                        Logger.WriteLineHeader(new string('-', 20));
+                        Logger.WriteLineHeader(LogSeparator);
                     }
                 }
             };
@@ -47,7 +49,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                         Logger.WriteLineError($"Inlinee: {jitData.InlineeNamespace}.{jitData.InlineeName} - {jitData.InlineeNameSignature}");
                         // See https://blogs.msdn.microsoft.com/clrcodegeneration/2009/10/21/jit-etw-inlining-event-fail-reasons/
                         Logger.WriteLineError($"Fail Reason: {jitData.FailReason}");
-                        Logger.WriteLineHeader(new string('-', 20));
+                        Logger.WriteLineHeader(LogSeparator);
                     }
                 }
             };
