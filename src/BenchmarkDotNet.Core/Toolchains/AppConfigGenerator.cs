@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Toolchains
 
                 return xmlDocument.SelectSingleNode("/configuration");
             }
-            catch (XmlException) // empty document
+            catch // empty document
             {
                 return xmlDocument.AppendChild(xmlDocument.CreateNode(XmlNodeType.Element, "configuration", string.Empty));
             }
