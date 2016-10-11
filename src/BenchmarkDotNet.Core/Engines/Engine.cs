@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Engines
         private readonly EnginePilotStage pilotStage;
         private readonly EngineWarmupStage warmupStage;
         private readonly EngineTargetStage targetStage;
-        private bool jittingWasDone;
+        private bool isJitted, isPreAllocated;
 
         internal Engine(Action<long> idleAction, Action<long> mainAction, Job targetJob, Action setupAction, Action cleanupAction, long operationsPerInvoke, bool isDiagnoserAttached)
         {
@@ -62,22 +62,27 @@ namespace BenchmarkDotNet.Engines
 
         public IEngineFactory Factory => new EngineFactory();
 
-        public void ProvokeAllPossibleAllocations()
+        public void PreAllocate()
         {
-            Jitting();
-
             var list = new List<Measurement> { new Measurement(), new Measurement() };
-            list.Sort(); // provoke JIT, static ctors etc (was using 1740 bytes ;))
-            if (TimeUnit.All == null || list[0].Nanoseconds != default(long))
+            list.Sort(); // provoke JIT, static ctors etc (was allocating 1740 bytes with first call)
+            if (TimeUnit.All == null || list[0].Nanoseconds != default(double))
                 throw new Exception("just use this things here to provoke static ctor");
+            isPreAllocated = true;
+        }
 
-            jittingWasDone = true;
+        public void Jitting()
+        {
+            // first signal about jitting is raised from auto-generated Program.cs, look at BenchmarkProgram.txt
+            MainAction.Invoke(1);
+            IdleAction.Invoke(1);
+            isJitted = true;
         }
 
         public RunResults Run()
         {
-            if (!jittingWasDone)
-                throw new Exception("You must call ProvokeAllPossibleAllocations first!");
+            if (!isJitted || !isPreAllocated)
+                throw new Exception("You must call PreAllocate() and Jitting() first!");
 
             long invokeCount = InvocationCount;
             List<Measurement> idle = null;
@@ -98,14 +103,6 @@ namespace BenchmarkDotNet.Engines
             var main = targetStage.RunMain(invokeCount, UnrollFactor);
 
             return new RunResults(idle, main);
-        }
-
-        private void Jitting()
-        {
-            // first signal about jitting is raised from auto-generated Program.cs, look at BenchmarkProgram.txt
-
-            MainAction.Invoke(1);
-            IdleAction.Invoke(1);
         }
 
         public Measurement RunIteration(IterationData data)

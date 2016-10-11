@@ -38,7 +38,8 @@ namespace BenchmarkDotNet.Tests.Mocks
             return measurement;
         }
 
-        public void ProvokeAllPossibleAllocations() { }
+        public void PreAllocate() { }
+        public void Jitting() { }
 
         public RunResults Run() => default(RunResults);
 

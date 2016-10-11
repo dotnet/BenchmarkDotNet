@@ -36,9 +36,16 @@ namespace BenchmarkDotNet.Engines
         void WriteLine(string line);
 
         /// <summary>
-        /// does the jitting, should also provoke all static ctors
+        /// must provoke all static ctors and perform any other necessary allocations 
+        /// so Run() has 0 exclusive allocations and our Memory Diagnostics is 100% accurate!
         /// </summary>
-        void ProvokeAllPossibleAllocations();
+        void PreAllocate();
+
+        /// <summary>
+        /// must perform jitting via warmup calls
+        /// <remarks>is called after first call to Setup, from the auto-generated benchmark process</remarks>
+        /// </summary>
+        void Jitting();
 
         RunResults Run();
 
