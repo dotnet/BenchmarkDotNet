@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Jobs
         // Infrastructure
         public static Job With(this Job job, IToolchain toolchain) => job.With(job.Infrastructure.Toolchain.Mutate(toolchain));
         public static Job With(this Job job, IClock clock) => job.With(job.Infrastructure.Clock.Mutate(clock));
-        public static Job With(this Job job, IEngine engine) => job.With(job.Infrastructure.Engine.Mutate(engine));
+        public static Job With(this Job job, IEngineFactory engineFactory) => job.With(job.Infrastructure.EngineFactory.Mutate(engineFactory));
 
         // Accuracy
         public static Job WithMaxStdErrRelative(this Job job, double value) => job.With(job.Accuracy.MaxStdErrRelative.Mutate(value));

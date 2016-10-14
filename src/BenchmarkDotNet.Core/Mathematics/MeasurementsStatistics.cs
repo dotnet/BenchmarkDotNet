@@ -20,43 +20,43 @@ namespace BenchmarkDotNet.Mathematics
 
         public static MeasurementsStatistics Calculate(List<Measurement> measurements, bool removeOutliers)
         {
-            var N = measurements.Count;
-            if (N == 0)
+            var n = measurements.Count;
+            if (n == 0)
                 throw new InvalidOperationException("StatSummary: Sequence contains no elements");
 
             var sum = Sum(measurements);
-            var mean = sum / N;
+            var mean = sum / n;
 
-            var variance = Variance(measurements, N, mean);
+            var variance = Variance(measurements, n, mean);
             var standardDeviation = Math.Sqrt(variance);
-            var standardError = standardDeviation / Math.Sqrt(N);
+            var standardError = standardDeviation / Math.Sqrt(n);
 
             if (!removeOutliers) // most simple scenario is done without allocations! but this is not the default case
                 return new MeasurementsStatistics(standardError, mean);
 
             measurements.Sort(); // sort in place
 
-            double Q1, Median, Q3;
+            double q1, median, q3;
 
-            if (N == 1)
-                Q1 = Median = Q3 = measurements[0].Nanoseconds;
+            if (n == 1)
+                q1 = median = q3 = measurements[0].Nanoseconds;
             else
             {
-                Q1 = GetQuartile(measurements, measurements.Count / 2);
-                Median = GetQuartile(measurements, measurements.Count);
-                Q3 = GetQuartile(measurements, measurements.Count * 3 / 2);
+                q1 = GetQuartile(measurements, measurements.Count / 2);
+                median = GetQuartile(measurements, measurements.Count);
+                q3 = GetQuartile(measurements, measurements.Count * 3 / 2);
             }
 
-            var InterquartileRange = Q3 - Q1;
-            var LowerFence = Q1 - 1.5 * InterquartileRange;
-            var UpperFence = Q3 + 1.5 * InterquartileRange;
+            var interquartileRange = q3 - q1;
+            var lowerFence = q1 - 1.5 * interquartileRange;
+            var upperFence = q3 + 1.5 * interquartileRange;
 
-            SumWithoutOutliers(measurements, LowerFence, UpperFence, out sum, out N); // updates sum and N
-            mean = sum / N;
+            SumWithoutOutliers(measurements, lowerFence, upperFence, out sum, out n); // updates sum and N
+            mean = sum / n;
 
-            variance = VarianceWithoutOutliers(measurements, N, mean, LowerFence, UpperFence);
+            variance = VarianceWithoutOutliers(measurements, n, mean, lowerFence, upperFence);
             standardDeviation = Math.Sqrt(variance);
-            standardError = standardDeviation / Math.Sqrt(N);
+            standardError = standardDeviation / Math.Sqrt(n);
 
             return new MeasurementsStatistics(standardError, mean);
         }
@@ -70,40 +70,40 @@ namespace BenchmarkDotNet.Mathematics
         }
 
         private static void SumWithoutOutliers(List<Measurement> measurements,
-            double lowerFence, double upperFence, out double sum, out int N)
+            double lowerFence, double upperFence, out double sum, out int n)
         {
             sum = 0;
-            N = 0;
+            n = 0;
 
             for (int i = 0; i < measurements.Count; i++)
                 if (!IsOutlier(measurements[i].Nanoseconds, lowerFence, upperFence))
                 {
                     sum += measurements[i].Nanoseconds;
-                    ++N;
+                    ++n;
                 }
         }
 
-        private static double Variance(List<Measurement> measurements, int N, double mean)
+        private static double Variance(List<Measurement> measurements, int n, double mean)
         {
-            if (N == 1)
+            if (n == 1)
                 return 0;
 
             double variance = 0;
             for (int i = 0; i < measurements.Count; i++)
-                variance += (measurements[i].Nanoseconds - mean) * (measurements[i].Nanoseconds - mean) / (N - 1);
+                variance += (measurements[i].Nanoseconds - mean) * (measurements[i].Nanoseconds - mean) / (n - 1);
 
             return variance;
         }
 
-        private static double VarianceWithoutOutliers(List<Measurement> measurements, int N, double mean, double lowerFence, double upperFence)
+        private static double VarianceWithoutOutliers(List<Measurement> measurements, int n, double mean, double lowerFence, double upperFence)
         {
-            if (N == 1)
+            if (n == 1)
                 return 0;
 
             double variance = 0;
             for (int i = 0; i < measurements.Count; i++)
                 if (!IsOutlier(measurements[i].Nanoseconds, lowerFence, upperFence))
-                    variance += (measurements[i].Nanoseconds - mean) * (measurements[i].Nanoseconds - mean) / (N - 1);
+                    variance += (measurements[i].Nanoseconds - mean) * (measurements[i].Nanoseconds - mean) / (n - 1);
 
             return variance;
         }

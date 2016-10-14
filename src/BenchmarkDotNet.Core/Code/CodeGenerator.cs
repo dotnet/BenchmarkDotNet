@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Core.Helpers;
-using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -38,7 +37,7 @@ namespace BenchmarkDotNet.Code
                 Replace("$JobSetDefinition$", GetJobsSetDefinition(benchmark)).
                 Replace("$ParamsContent$", GetParamsContent(benchmark)).
                 Replace("$ExtraAttribute$", GetExtraAttributes(benchmark.Target)).
-                Replace("$EngineFactoryType$", typeof(EngineFactory).GetCorrectTypeName()). // todo: get it from Job's settings
+                Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark)). 
                 ToString();
 
             text = Unroll(text, benchmark.Job.Run.UnrollFactor.Resolve(EnvResolver.Instance));
@@ -125,6 +124,20 @@ namespace BenchmarkDotNet.Code
 
             return string.Empty;
         }
+
+        private static string GetEngineFactoryTypeName(Benchmark benchmark)
+        {
+            var factory = benchmark.Job.Infrastructure.EngineFactory.Resolve(InfrastructureResolver.Instance);
+            var factoryType = factory.GetType();
+
+            if (!factoryType.GetTypeInfo().DeclaredConstructors.Any(ctor => ctor.IsPublic && !ctor.GetParameters().Any()))
+            {
+                throw new NotSupportedException("Custom factory must have a public parameterless constructor");
+            }
+
+            return factoryType.GetCorrectTypeName();
+        }
+
 
         private class SmartStringBuilder
         {

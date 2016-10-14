@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 
@@ -12,6 +13,7 @@ namespace BenchmarkDotNet.Environments
         {
             var infra = Job.Default.Infrastructure;
             Register(infra.Clock, () => Chronometer.BestClock);
+            Register(infra.EngineFactory, () =>  new EngineFactory());
         }
     }
 }

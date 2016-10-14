@@ -60,8 +60,6 @@ namespace BenchmarkDotNet.Engines
             targetStage = new EngineTargetStage(this);
         }
 
-        public IEngineFactory Factory => new EngineFactory();
-
         public void PreAllocate()
         {
             var list = new List<Measurement> { new Measurement(), new Measurement() };
