@@ -12,6 +12,7 @@ namespace BenchmarkDotNet.Reports
     {
         public Benchmark Benchmark { get; }
         public IList<Measurement> AllMeasurements { get; }
+        public GcStats GcStats { get; }
 
         public GenerateResult GenerateResult { get; }
         public BuildResult BuildResult { get; }
@@ -28,13 +29,15 @@ namespace BenchmarkDotNet.Reports
             GenerateResult generateResult,
             BuildResult buildResult,
             IList<ExecuteResult> executeResults,
-            IList<Measurement> allMeasurements)
+            IList<Measurement> allMeasurements, 
+            GcStats gcStats)
         {
             Benchmark = benchmark;
             GenerateResult = generateResult;
             BuildResult = buildResult;
             ExecuteResults = executeResults ?? new ExecuteResult[0];
             AllMeasurements = allMeasurements ?? new Measurement[0];
+            GcStats = gcStats;
         }
 
         public override string ToString() => $"{Benchmark.DisplayInfo}, {AllMeasurements.Count} runs";

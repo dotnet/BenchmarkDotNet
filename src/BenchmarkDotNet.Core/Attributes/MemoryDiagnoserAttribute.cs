@@ -1,7 +1,8 @@
 using System;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
 
-namespace BenchmarkDotNet.Diagnostics.Windows.Configs
+namespace BenchmarkDotNet.Attributes
 {
     public class MemoryDiagnoserAttribute : Attribute, IConfigSource
     {
@@ -9,7 +10,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Configs
 
         public MemoryDiagnoserAttribute()
         {
-            Config = ManualConfig.CreateEmpty().With(new MemoryDiagnoser());
+            Config = ManualConfig.CreateEmpty().With(MemoryDiagnoser.Default);
         }
     }
 }

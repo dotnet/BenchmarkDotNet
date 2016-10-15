@@ -35,6 +35,7 @@ namespace BenchmarkDotNet.Engines
         private readonly EngineWarmupStage warmupStage;
         private readonly EngineTargetStage targetStage;
         private bool isJitted, isPreAllocated;
+        private int forcedFullGarbageCollections;
 
         internal Engine(Action<long> idleAction, Action<long> mainAction, Job targetJob, Action setupAction, Action cleanupAction, long operationsPerInvoke, bool isDiagnoserAttached)
         {
@@ -98,9 +99,17 @@ namespace BenchmarkDotNet.Engines
                 warmupStage.RunMain(invokeCount, UnrollFactor);
             }
 
+            // we enable monitoring after pilot & warmup, just to ignore the memory allocated by these runs
+            EnableMonitoring(); 
+            var initialGcStats = GcStats.ReadInitial(IsDiagnoserAttached);
+
             var main = targetStage.RunMain(invokeCount, UnrollFactor);
 
-            return new RunResults(idle, main);
+            var finalGcStats = GcStats.ReadFinal(IsDiagnoserAttached);
+            var forcedCollections = GcStats.FromForced(forcedFullGarbageCollections);
+            var workGcHasDone = finalGcStats - forcedCollections - initialGcStats;
+
+            return new RunResults(idle, main, workGcHasDone);
         }
 
         public Measurement RunIteration(IterationData data)
@@ -135,11 +144,13 @@ namespace BenchmarkDotNet.Engines
             ForceGcCollect();
         }
 
-        private static void ForceGcCollect()
+        private void ForceGcCollect()
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();
+
+            forcedFullGarbageCollections += 2;
         }
 
         public void WriteLine(string text)
@@ -154,6 +165,15 @@ namespace BenchmarkDotNet.Engines
             EnsureNothingIsPrintedWhenDiagnoserIsAttached();
 
             Console.WriteLine();
+        }
+
+        private void EnableMonitoring()
+        {
+            if(!IsDiagnoserAttached) // it could affect the results, we do this in separate, diagnostics-only run
+                return;
+#if CLASSIC
+            AppDomain.MonitoringIsEnabled = true;
+#endif
         }
 
         private void EnsureNothingIsPrintedWhenDiagnoserIsAttached()

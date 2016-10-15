@@ -37,7 +37,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.Integration
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BenchmarkDotNet.Samples.FSharp", "samples\BenchmarkDotNet.Samples.FSharp\BenchmarkDotNet.Samples.FSharp.fsproj", "{A329F00E-4B9D-4BC6-B688-92698D773CBF}"
 	ProjectSection(ProjectDependencies) = postProject
-		{95F5D645-19E3-432F-95D4-C5EA374DD15B} = {95F5D645-19E3-432F-95D4-C5EA374DD15B}
+		{AF1E6F8A-5C63-465F-96F4-5E5F183A33B9} = {AF1E6F8A-5C63-465F-96F4-5E5F183A33B9}
 	EndProjectSection
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BenchmarkDotNet.IntegrationTests.FSharp", "tests\BenchmarkDotNet.IntegrationTests.FSharp\BenchmarkDotNet.IntegrationTests.FSharp.fsproj", "{367FAFE1-A1C8-4AA1-9334-F4762E128DBB}"

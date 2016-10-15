@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public CompositeDiagnoser(params IDiagnoser[] diagnosers)
         {
-            this.diagnosers = diagnosers;
+            this.diagnosers = diagnosers.Distinct().ToArray();
         }
 
         public IColumnProvider GetColumnProvider() 

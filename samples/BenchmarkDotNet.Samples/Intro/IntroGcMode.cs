@@ -8,6 +8,7 @@ namespace BenchmarkDotNet.Samples.Intro
 {
     [Config(typeof(Config))]
     [OrderProvider(SummaryOrderPolicy.FastestToSlowest)]
+    [MemoryDiagnoser]
     public class IntroGcMode
     {
         private class Config : ManualConfig
@@ -18,9 +19,6 @@ namespace BenchmarkDotNet.Samples.Intro
                 Add(Job.MediumRun.WithGcServer(true).WithGcForce(false).WithId("Server"));
                 Add(Job.MediumRun.WithGcServer(false).WithGcForce(true).WithId("Workstation"));
                 Add(Job.MediumRun.WithGcServer(false).WithGcForce(false).WithId("WorkstationForce"));
-#if !CORE
-                Add(new Diagnostics.Windows.MemoryDiagnoser());
-#endif
             }
         }
 

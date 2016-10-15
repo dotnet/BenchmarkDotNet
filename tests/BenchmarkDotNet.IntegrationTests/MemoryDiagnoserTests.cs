@@ -1,5 +1,4 @@
-﻿#if !CORE
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -17,63 +16,18 @@ using BenchmarkDotNet.Tests.Loggers;
 using Xunit;
 using Xunit.Abstractions;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Diagnostics.Windows;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class NewVsStackalloc
-    {
-        [Benchmark]
-        public void New() => Consume(new byte[100]);
-
-        [Benchmark]
-        public unsafe void Stackalloc()
-        {
-            var bytes = stackalloc byte[100];
-            Consume(bytes);
-        }
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private void Consume<T>(T input) { }
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private unsafe void Consume(byte* input) { }
-    }
-
-    public class AllocatingSetupAndCleanup
-    {
-        private List<int> list;
-
-        [Setup]
-        public void AllocatingSetUp() => AllocateUntilGcWakesUp();
-
-        [Benchmark]
-        public void AllocateNothing() { }
-
-        [Cleanup]
-        public void AllocatingCleanUp() => AllocateUntilGcWakesUp();
-
-        private void AllocateUntilGcWakesUp()
-        {
-            int initialCollectionCount = GC.CollectionCount(0);
-
-            while (initialCollectionCount == GC.CollectionCount(0))
-            {
-                list = Enumerable.Range(0, 100).ToList();
-            }
-        }
-    }
-
-    [KeepBenchmarkFiles()]
-    public class NoAllocationsAtAll
-    {
-        [Benchmark]
-        public void EmptyMethod() { }
-    }
-
-    // this class is not compiled for CORE because it is using Diagnosers that currently do not support Core
     public class MemoryDiagnoserTests
     {
+        private const string SkipAllocationsTests
+#if CORE
+         = "Not supported for .NET Core yet";
+#else
+         = null;
+#endif
+
         private readonly ITestOutputHelper output;
 
         public MemoryDiagnoserTests(ITestOutputHelper outputHelper)
@@ -81,80 +35,106 @@ namespace BenchmarkDotNet.IntegrationTests
             output = outputHelper;
         }
 
-        [Fact(Skip = "Temporarily suppressed, see https://github.com/PerfDotNet/BenchmarkDotNet/issues/208")]
-        public void MemoryDiagnoserTracksHeapMemoryAllocation()
+        public class AccurateAllocations
         {
-            var memoryDiagnoser = new MemoryDiagnoser();
-            var config = CreateConfig(memoryDiagnoser, 50);
-            var benchmarks = BenchmarkConverter.TypeToBenchmarks(typeof(NewVsStackalloc), config);
+            [Benchmark]public void Empty() { }
+            [Benchmark]public byte[] EightBytes() => new byte[8];
+            [Benchmark]public byte[] SixtyFourBytes() => new byte[64];
+            [Benchmark]public byte[] ThousandBytes() => new byte[1000];
+        }
 
-            var summary = BenchmarkRunner.Run((Benchmark[])benchmarks, config);
-
-            var gcCollectionColumns = GetColumns<MemoryDiagnoser.GCCollectionColumn>(memoryDiagnoser).ToArray();
-            var stackallocBenchmarks = benchmarks.Where(benchmark => benchmark.DisplayInfo.Contains("Stackalloc"));
-            var newArrayBenchmarks = benchmarks.Where(benchmark => benchmark.DisplayInfo.Contains("New"));
-
-            const int gen0Index = 0;
-
-            foreach (var benchmark in stackallocBenchmarks)
+        [Fact(Skip = SkipAllocationsTests)]
+        public void MemoryDiagnoserIsAccurate()
+        {
+            double objectAllocationOverhead = IntPtr.Size * 3; // pointer to method table + object header word + pointer to the object 
+            AssertAllocations(typeof(AccurateAllocations), 100, new Dictionary<string, Predicate<double>>
             {
-                var gen0Collections = gcCollectionColumns[gen0Index].GetValue(summary, benchmark);
+                { "Empty", allocatedBytes => allocatedBytes == 0 },
+                { "EightBytes", allocatedBytes => allocatedBytes == 8 + objectAllocationOverhead },
+                { "SixtyFourBytes", allocatedBytes => allocatedBytes == 64 + objectAllocationOverhead },
+                { "ThousandBytes", allocatedBytes => allocatedBytes == 1000 + objectAllocationOverhead }
+            });
+        }
 
-                Assert.Equal("-", gen0Collections);
-            }
+        public class AllocatingSetupAndCleanup
+        {
+            private List<int> list;
 
-            foreach (var benchmark in newArrayBenchmarks)
+            [Benchmark]public void AllocateNothing() { }
+
+            [Setup]public void AllocatingSetUp() => AllocateUntilGcWakesUp();
+            [Cleanup]public void AllocatingCleanUp() => AllocateUntilGcWakesUp();
+
+            private void AllocateUntilGcWakesUp()
             {
-                var gen0Str = gcCollectionColumns[gen0Index].GetValue(summary, benchmark);
+                int initialCollectionCount = GC.CollectionCount(0);
 
-                AssertParsed(gen0Str, gen0Value => gen0Value > 0);
+                while (initialCollectionCount == GC.CollectionCount(0))
+                    list = Enumerable.Range(0, 100).ToList();
             }
         }
 
-        [Fact(Skip = "Temporarily suppressed, see https://github.com/PerfDotNet/BenchmarkDotNet/issues/208")]
+        [Fact(Skip = SkipAllocationsTests)]
         public void MemoryDiagnoserDoesNotIncludeAllocationsFromSetupAndCleanup()
         {
-            AssertZeroAllocations(typeof(AllocatingSetupAndCleanup), "AllocateNothing", targetCount: 50);
+            AssertAllocations(typeof(AllocatingSetupAndCleanup), 5, new Dictionary<string, Predicate<double>>
+            {
+                { "AllocateNothing",  allocatedBytes => allocatedBytes == 0 }
+            });
         }
 
-        [Fact(Skip = "Temporarily suppressed, see https://github.com/PerfDotNet/BenchmarkDotNet/issues/208")]
+        public class NoAllocationsAtAll
+        {
+            [Benchmark]public void EmptyMethod() { }
+        }
+
+        [Fact(Skip = SkipAllocationsTests)]
         public void EngineShouldNotInterfereAllocationResults()
         {
-            AssertZeroAllocations(typeof(NoAllocationsAtAll), "EmptyMethod", targetCount: 5000); // we need a lot of iterations to be sure!!
+            AssertAllocations(typeof(NoAllocationsAtAll), 100, new Dictionary<string, Predicate<double>>
+            {
+                { "EmptyMethod",  allocatedBytes => allocatedBytes == 0 }
+            });
         }
 
-        public void AssertZeroAllocations(Type benchmarkType, string benchmarkMethodName, int targetCount)
+        private void AssertAllocations(Type benchmarkType, int targetCount,
+            Dictionary<string, Predicate<double>> benchmarksAllocationsValidators)
         {
-            var memoryDiagnoser = new MemoryDiagnoser();
+            var memoryDiagnoser = MemoryDiagnoser.Default;
             var config = CreateConfig(memoryDiagnoser, targetCount);
             var benchmarks = BenchmarkConverter.TypeToBenchmarks(benchmarkType, config);
 
             var summary = BenchmarkRunner.Run((Benchmark[])benchmarks, config);
 
             var allocationColumn = GetColumns<MemoryDiagnoser.AllocationColumn>(memoryDiagnoser).Single();
-            var allocateNothingBenchmarks = benchmarks.Where(benchmark => benchmark.DisplayInfo.Contains(benchmarkMethodName));
 
-            foreach (var benchmark in allocateNothingBenchmarks)
+            foreach (var benchmarkAllocationsValidator in benchmarksAllocationsValidators)
             {
-                var allocations = allocationColumn.GetValue(summary, benchmark);
+                var allocatingBenchmarks = benchmarks.Where(benchmark => benchmark.DisplayInfo.Contains(benchmarkAllocationsValidator.Key));
 
-                AssertParsed(allocations, allocatedBytes => allocatedBytes == 0);
+                foreach (var benchmark in allocatingBenchmarks)
+                {
+                    var allocations = allocationColumn.GetValue(summary, benchmark);
+
+                    AssertParsed(allocations, benchmarkAllocationsValidator.Value);
+                }
             }
         }
 
         private IConfig CreateConfig(IDiagnoser diagnoser, int targetCount)
         {
             return ManualConfig.CreateEmpty()
-                               .With(
-                                    Job.Dry
-                                       .WithLaunchCount(1)
-                                       .WithWarmupCount(1)
-                                       .WithTargetCount(targetCount)
-                                       .WithGcForce(false))
-                               .With(DefaultConfig.Instance.GetLoggers().ToArray())
-                               .With(DefaultColumnProviders.Instance)
-                               .With(diagnoser)
-                               .With(new OutputLogger(output));
+                .With(
+                    Job.Dry
+                        .WithLaunchCount(1)
+                        .WithWarmupCount(1)
+                        .WithTargetCount(targetCount)
+                        .WithInvocationCount(100)
+                        .WithGcForce(false))
+                .With(DefaultConfig.Instance.GetLoggers().ToArray())
+                .With(DefaultColumnProviders.Instance)
+                .With(diagnoser)
+                .With(new OutputLogger(output));
         }
 
         private static T[] GetColumns<T>(MemoryDiagnoser memoryDiagnoser)
@@ -165,7 +145,7 @@ namespace BenchmarkDotNet.IntegrationTests
             double value;
             if (double.TryParse(text, NumberStyles.Number, HostEnvironmentInfo.MainCultureInfo, out value))
             {
-                Assert.True(condition(value));
+                Assert.True(condition(value), $"Failed for value {value}");
             }
             else
             {
@@ -174,4 +154,3 @@ namespace BenchmarkDotNet.IntegrationTests
         }
     }
 }
-#endif

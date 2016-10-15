@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Columns;
+﻿using System;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -13,9 +14,9 @@ using BenchmarkDotNet.Environments;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
+    [Obsolete("Please use our new BenchmarkDotNet.Diagnosers.MemoryDiagnoser", true)]
     public class MemoryDiagnoser : EtwDiagnoser<MemoryDiagnoser.Stats>, IDiagnoser
     {
-        private readonly List<OutputLine> output = new List<OutputLine>();
         private readonly Dictionary<Benchmark, Stats> results = new Dictionary<Benchmark, Stats>();
 
         public IColumnProvider GetColumnProvider() => new SimpleColumnProvider(
@@ -40,11 +41,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             results.Add(benchmark, stats);
         }
 
-        public void DisplayResults(ILogger logger)
-        {
-            foreach (var line in output)
-                logger.Write(line.Kind, line.Text);
-        }
+        public void DisplayResults(ILogger logger) { }
 
         private Stats ProcessEtwEvents(long totalOperations)
         {

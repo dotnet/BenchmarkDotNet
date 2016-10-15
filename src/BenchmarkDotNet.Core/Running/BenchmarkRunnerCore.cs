@@ -156,22 +156,26 @@ namespace BenchmarkDotNet.Running
             try
             {
                 if (!generateResult.IsGenerateSuccess)
-                    return new BenchmarkReport(benchmark, generateResult, null, null, null);
+                    return new BenchmarkReport(benchmark, generateResult, null, null, null, default(GcStats));
 
                 var buildResult = Build(logger, toolchain, generateResult, benchmark, resolver);
                 if (!buildResult.IsBuildSuccess)
-                    return new BenchmarkReport(benchmark, generateResult, buildResult, null, null);
+                    return new BenchmarkReport(benchmark, generateResult, buildResult, null, null, default(GcStats));
 
-                List<ExecuteResult> executeResults = Execute(logger, benchmark, toolchain, buildResult, config, resolver);
+                var executeResults = Execute(logger, benchmark, toolchain, buildResult, config, resolver);
 
                 var runs = new List<Measurement>();
+                GcStats gcStats = default(GcStats);
                 for (int index = 0; index < executeResults.Count; index++)
                 {
                     var executeResult = executeResults[index];
                     runs.AddRange(executeResult.Data.Select(line => Measurement.Parse(logger, line, index + 1)).Where(r => r.IterationMode != IterationMode.Unknown));
+
+                    if (executeResult.Data.Any())
+                        gcStats = gcStats + GcStats.Parse(executeResult.Data.Last());
                 }
 
-                return new BenchmarkReport(benchmark, generateResult, buildResult, executeResults, runs);
+                return new BenchmarkReport(benchmark, generateResult, buildResult, executeResults, runs, gcStats);
             }
             finally
             {
@@ -250,7 +254,7 @@ namespace BenchmarkDotNet.Running
                 if (!measurements.Any())
                 {
                     // Something went wrong during the benchmark, don't bother doing more runs
-                    logger.WriteLineError($"No more Benchmark runs will be launched as NO measurements were obtained from the previous run!");
+                    logger.WriteLineError("No more Benchmark runs will be launched as NO measurements were obtained from the previous run!");
                     break;
                 }
 
@@ -274,7 +278,8 @@ namespace BenchmarkDotNet.Running
                 var executeResult = toolchain.Executor.Execute(buildResult, benchmark, logger, resolver, compositeDiagnoser);
 
                 var allRuns = executeResult.Data.Select(line => Measurement.Parse(logger, line, 0)).Where(r => r.IterationMode != IterationMode.Unknown).ToList();
-                var report = new BenchmarkReport(benchmark, null, null, new[] { executeResult }, allRuns);
+                var gcStats = GcStats.Parse(executeResult.Data.Last());
+                var report = new BenchmarkReport(benchmark, null, null, new[] { executeResult }, allRuns, gcStats);
                 compositeDiagnoser.ProcessResults(benchmark, report);
 
                 if (!executeResult.FoundExecutable)
