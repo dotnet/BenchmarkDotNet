@@ -38,12 +38,7 @@ namespace BenchmarkDotNet.Running
                 var logger = new CompositeLogger(config.GetCompositeLogger(), new StreamLogger(logStreamWriter));
                 benchmarks = GetSupportedBenchmarks(benchmarks, logger, toolchainProvider, resolver);
 
-                var summary = Run(benchmarks, logger, title, config, rootArtifactsFolderPath, toolchainProvider, resolver);
-                if (!summary.HasCriticalValidationErrors)
-                {
-                    config.GetCompositeExporter().ExportToFiles(summary).ToArray();
-                }
-                return summary;
+                return Run(benchmarks, logger, title, config, rootArtifactsFolderPath, toolchainProvider, resolver);
             }
         }
 
@@ -114,7 +109,7 @@ namespace BenchmarkDotNet.Running
 
             // TODO: make exporter
             var warnings = config.GetCompositeAnalyser().Analyse(summary).ToList();
-            if (warnings.Count > 0)
+            if (warnings.Any())
             {
                 logger.WriteLine();
                 logger.WriteLineError("// * Warnings * ");
@@ -122,7 +117,7 @@ namespace BenchmarkDotNet.Running
                     logger.WriteLineError($"{warning.Message}");
             }
 
-            if (config.GetDiagnosers().Count() > 0)
+            if (config.GetDiagnosers().Any())
             {
                 logger.WriteLine();
                 config.GetCompositeDiagnoser().DisplayResults(logger);
