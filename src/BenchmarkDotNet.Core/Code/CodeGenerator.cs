@@ -37,6 +37,7 @@ namespace BenchmarkDotNet.Code
                 Replace("$JobSetDefinition$", GetJobsSetDefinition(benchmark)).
                 Replace("$ParamsContent$", GetParamsContent(benchmark)).
                 Replace("$ExtraAttribute$", GetExtraAttributes(benchmark.Target)).
+                Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark)). 
                 ToString();
 
             text = Unroll(text, benchmark.Job.Run.UnrollFactor.Resolve(EnvResolver.Instance));
@@ -123,6 +124,20 @@ namespace BenchmarkDotNet.Code
 
             return string.Empty;
         }
+
+        private static string GetEngineFactoryTypeName(Benchmark benchmark)
+        {
+            var factory = benchmark.Job.Infrastructure.EngineFactory.Resolve(InfrastructureResolver.Instance);
+            var factoryType = factory.GetType();
+
+            if (!factoryType.GetTypeInfo().DeclaredConstructors.Any(ctor => ctor.IsPublic && !ctor.GetParameters().Any()))
+            {
+                throw new NotSupportedException("Custom factory must have a public parameterless constructor");
+            }
+
+            return factoryType.GetCorrectTypeName();
+        }
+
 
         private class SmartStringBuilder
         {

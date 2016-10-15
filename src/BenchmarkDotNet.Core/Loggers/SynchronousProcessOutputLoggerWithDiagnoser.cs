@@ -43,28 +43,28 @@ namespace BenchmarkDotNet.Loggers
             {
                 logger.WriteLine(LogKind.Default, line);
 
-                if (!string.IsNullOrEmpty(line))
-                {
-                    if (!line.StartsWith("//"))
-                        LinesWithResults.Add(line);
-                    else
-                        LinesWithExtraOutput.Add(line);
-                }
-
-                // This is important so the Diagnoser can know the [Benchmark] methods will have run and (e.g.) it can do a Memory Dump
-                if (diagnosticsAlreadyRun || !line.StartsWith(IterationMode.MainWarmup.ToString()))
-                {
+                if (string.IsNullOrEmpty(line))
                     continue;
-                }
 
-                try
+                if (!line.StartsWith("//"))
                 {
-                    diagnoser?.AfterBenchmarkHasRun(benchmark, process);
+                    LinesWithResults.Add(line);
                 }
-                finally
+                else if (line == Engine.Signals.BeforeAnythingElse)
                 {
-                    // Always set this, even if something went wrong, otherwise we will try on every run of a benchmark batch
-                    diagnosticsAlreadyRun = true;
+                    diagnoser?.BeforeAnythingElse(process, benchmark);
+                }
+                else if (line == Engine.Signals.AfterSetup)
+                {
+                    diagnoser?.AfterSetup(process, benchmark);
+                }
+                else if (line == Engine.Signals.BeforeCleanup)
+                {
+                    diagnoser?.BeforeCleanup();
+                }
+                else
+                {
+                    LinesWithExtraOutput.Add(line);
                 }
             }
         }

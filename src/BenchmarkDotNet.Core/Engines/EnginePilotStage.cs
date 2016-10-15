@@ -1,6 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Engines
 {
@@ -8,8 +9,20 @@ namespace BenchmarkDotNet.Engines
     {
         internal const long MaxInvokeCount = (long.MaxValue / 2 + 1) / 2;
 
+        private readonly int unrollFactor;
+        private readonly int minInvokeCount;
+        private readonly double maxStdErrRelative;
+        private readonly double targetIterationTime;
+        private readonly TimeInterval clockResolution;
+        private readonly double resolution;
+
         public EnginePilotStage(IEngine engine) : base(engine)
         {
+            unrollFactor = engine.TargetJob.Run.UnrollFactor.Resolve(engine.Resolver);
+            minInvokeCount = engine.TargetJob.Accuracy.MinInvokeCount.Resolve(engine.Resolver);
+            maxStdErrRelative = engine.TargetJob.Accuracy.MaxStdErrRelative.Resolve(engine.Resolver);
+            targetIterationTime = engine.TargetJob.Run.IterationTime.Resolve(engine.Resolver).ToNanoseconds();
+            resolution =  engine.TargetJob.Infrastructure.Clock.Resolve(engine.Resolver).GetResolution().Nanoseconds;
         }
 
         /// <returns>Perfect invocation count</returns>
@@ -28,14 +41,9 @@ namespace BenchmarkDotNet.Engines
         /// </summary>
         private long RunAuto()
         {
-            int unrollFactor = TargetJob.Run.UnrollFactor.Resolve(Resolver);
-            Func<long, long> autocorrect = count => (count + unrollFactor - 1) / unrollFactor * unrollFactor;
-
-            long invokeCount = autocorrect(TargetAccuracy.MinInvokeCount.Resolve(Resolver));
-            double maxError = TargetAccuracy.MaxStdErrRelative.Resolve(Resolver); // TODO: introduce a StdErr factor
+            long invokeCount = Autocorrect(minInvokeCount);
+            double maxError = maxStdErrRelative; // TODO: introduce a StdErr factor
             double minIterationTime = Engine.MinIterationTime.Nanoseconds;
-
-            double resolution = TargetClock.GetResolution().Nanoseconds;
 
             int iterationCounter = 0;
             while (true)
@@ -54,7 +62,7 @@ namespace BenchmarkDotNet.Engines
 
                 invokeCount *= 2;
             }
-            WriteLine();
+            if (!IsDiagnoserAttached) WriteLine();
 
             return invokeCount;
         }
@@ -64,11 +72,8 @@ namespace BenchmarkDotNet.Engines
         /// </summary>
         private long RunSpecific()
         {
-            int unrollFactor = TargetJob.Run.UnrollFactor.Resolve(Resolver);
-            Func<long, long> autocorrect = count => (count + unrollFactor - 1) / unrollFactor * unrollFactor;
+            long invokeCount = Autocorrect(Engine.MinInvokeCount);
 
-            long invokeCount = autocorrect(Engine.MinInvokeCount);
-            double targetIterationTime = TargetJob.Run.IterationTime.Resolve(Resolver).ToNanoseconds();
             int iterationCounter = 0;
 
             int downCount = 0; // Amount of iterations where newInvokeCount < invokeCount
@@ -77,7 +82,7 @@ namespace BenchmarkDotNet.Engines
                 iterationCounter++;
                 var measurement = RunIteration(IterationMode.Pilot, iterationCounter, invokeCount, unrollFactor);
                 double actualIterationTime = measurement.Nanoseconds;
-                long newInvokeCount = autocorrect(Math.Max(TargetAccuracy.MinInvokeCount.Resolve(Resolver), (long) Math.Round(invokeCount * targetIterationTime / actualIterationTime)));
+                long newInvokeCount = Autocorrect(Math.Max(minInvokeCount, (long)Math.Round(invokeCount * targetIterationTime / actualIterationTime)));
 
                 if (newInvokeCount < invokeCount)
                     downCount++;
@@ -87,9 +92,11 @@ namespace BenchmarkDotNet.Engines
 
                 invokeCount = newInvokeCount;
             }
-            WriteLine();
+            if (!IsDiagnoserAttached) WriteLine();
 
             return invokeCount;
         }
+
+        private long Autocorrect(long count) => (count + unrollFactor - 1) / unrollFactor * unrollFactor;
     }
 }

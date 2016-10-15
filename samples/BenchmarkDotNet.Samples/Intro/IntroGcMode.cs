@@ -14,10 +14,13 @@ namespace BenchmarkDotNet.Samples.Intro
         {
             public Config()
             {
-                Add(Job.Dry.WithGcServer(true).WithGcForce(true).WithId("ServerForce"));
-                Add(Job.Dry.WithGcServer(true).WithGcForce(false).WithId("Server"));
-                Add(Job.Dry.WithGcServer(false).WithGcForce(true).WithId("Workstation"));
-                Add(Job.Dry.WithGcServer(false).WithGcForce(false).WithId("WorkstationForce"));
+                Add(Job.MediumRun.WithGcServer(true).WithGcForce(true).WithId("ServerForce"));
+                Add(Job.MediumRun.WithGcServer(true).WithGcForce(false).WithId("Server"));
+                Add(Job.MediumRun.WithGcServer(false).WithGcForce(true).WithId("Workstation"));
+                Add(Job.MediumRun.WithGcServer(false).WithGcForce(false).WithId("WorkstationForce"));
+#if !CORE
+                Add(new Diagnostics.Windows.MemoryDiagnoser());
+#endif
             }
         }
 

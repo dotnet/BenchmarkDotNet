@@ -21,6 +21,7 @@ namespace BenchmarkDotNet.Environments
             Register(acc.AnaylyzeLaunchVariance, () => false);
             var run = Job.Default.Run;
             Register(run.UnrollFactor, () => 16);
+            Register(run.InvocationCount, () => 1);
         }
     }
 }

@@ -6,28 +6,27 @@ using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Diagnosers
 {
-    /// The events are guaranteed to happen in the following sequence:
-    /// Start                  // When the Benchmark run is started and most importantly BEFORE the process has been launched
-    /// ProcessStarted         // After the Process (in a "Diagnostic" run) has been launched
-    /// AfterBenchmarkHasRun   // After a "Warmup" iteration of the Benchmark has run, i.e. we know the [Benchmark] method has been 
-    ///                        // executed and JITted, this is important if the Diagnoser needs to know when it can do a Memory Dump.
-    /// ProcessStopped         // Once the Process (in a "Diagnostic" run) has stopped/completed
-    /// Stop                   // At the end, when the entire Benchmark run has complete
-    /// DisplayResults         // When the results/output should be displayed
     public interface IDiagnoser
     {
-        void Start(Benchmark benchmark);
+        IColumnProvider GetColumnProvider();
 
-        void Stop(Benchmark benchmark, BenchmarkReport report);
+        /// <summary>
+        /// before jitting, warmup
+        /// </summary>
+        void BeforeAnythingElse(Process process, Benchmark benchmark);
 
-        void ProcessStarted(Process process);
+        /// <summary>
+        /// after setup, before run
+        /// </summary>
+        void AfterSetup(Process process, Benchmark benchmark);
 
-        void AfterBenchmarkHasRun(Benchmark benchmark, Process process);
+        /// <summary>
+        /// after run, before cleanup
+        /// </summary>
+        void BeforeCleanup();
 
-        void ProcessStopped(Process process);
+        void ProcessResults(Benchmark benchmark, BenchmarkReport report);
 
         void DisplayResults(ILogger logger);
-
-        IColumnProvider GetColumnProvider();
     }
 }

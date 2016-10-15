@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
@@ -22,7 +23,7 @@ namespace BenchmarkDotNet.Toolchains
         public ExecuteResult Execute(BuildResult buildResult, Benchmark benchmark, ILogger logger, IResolver resolver, IDiagnoser compositeDiagnoser = null)
         {
             var exePath = buildResult.ArtifactsPaths.ExecutablePath;
-            var args = string.Empty;
+            var args = compositeDiagnoser == null ? string.Empty : Engine.Signals.DiagnoserIsAttachedParam;
 
             if (!File.Exists(exePath))
             {
@@ -46,7 +47,7 @@ namespace BenchmarkDotNet.Toolchains
                 using (var process = new Process { StartInfo = CreateStartInfo(benchmark, exeName, args, workingDirectory, resolver) })
                 {
                     var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmark);
-
+                    
                     return Execute(process, benchmark, loggerWithDiagnoser, diagnoser, logger);
                 }
             }
@@ -63,8 +64,6 @@ namespace BenchmarkDotNet.Toolchains
 
             process.Start();
 
-            compositeDiagnoser?.ProcessStarted(process);
-
             process.EnsureHighPriority(logger);
             if (!benchmark.Job.Env.Affinity.IsDefault)
             {
@@ -74,8 +73,6 @@ namespace BenchmarkDotNet.Toolchains
             loggerWithDiagnoser.ProcessInput();
 
             process.WaitForExit(); // should we add timeout here?
-
-            compositeDiagnoser?.ProcessStopped(process);
 
             if (process.ExitCode == 0)
             {
