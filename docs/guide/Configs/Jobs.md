@@ -61,7 +61,7 @@ Usually, you shouldn't specify any characteristics from this section, it can be 
 
 * `Toolchain`: a toolchain which generate source code for target benchmark methods, build it, and execute it. BenchmarkDotNet has own toolchains for CoreCLR projects and classic projects (the last one is `RoslynToolchain`, you can find it in the [BenchmarkDotNet.Toolchains.Roslyn](https://www.nuget.org/packages/BenchmarkDotNet.Toolchains.Roslyn/) NuGet package). If you want, you can define own toolchain.
 * `Clock`: a clock which will be used for measurements. BenchmarkDotNet automatically choose the best available clock source, but you can specify own clock source.
-* `Engine`: a measurement engine which performs all the measurement magic. If you don't trust BenchmarkDotNet, you can define own engine and implement all the measurement stages manually.
+* `EngineFactory`: a provider for measurement engine which performs all the measurement magic. If you don't trust BenchmarkDotNet, you can define own engine and implement all the measurement stages manually.
 
 ## Usage
 
@@ -79,22 +79,22 @@ public class MyBenchmarks
     {
         public Config()
         {
-            Add(Job.Default.
-                With(Platform.X64).
-                With(Jit.RyuJit).
-                With(Runtime.Core).
-                WithLaunchCount(5).
-                WithIterationTime(TimeInterval.Millisecond * 200).
-                WithMaxStdErrRelative(0.01).
-                WithId("MySuperJob")
-            );
+            Add(
+                new Job("MySuperJob", EnvMode.RyuJitX64, RunMode.Dry)
+                {
+                    Env = { Runtime = Runtime.Core },
+                    Run = { LaunchCount = 5, IterationTime = TimeInterval.Millisecond * 200 },
+                    Accuracy = { MaxStdErrRelative = 0.01 }
+                })
         }
     }
     // Benchmarks
 }
 ```
 
-Basically, it's a good idea to start with one of predefined jobs (e.g. `Job.Default` or `Job.Dry`) and modify it with help of `With*` methods.
+Basically, it's a good idea to start with predefined values (e.g. `EnvMode.RyuJitX64` and `RunMode.Dry` passed as constructor args) and modify rest of the properties using property setters or with help of object initialzer syntax.
+
+Note that the job cannot be modified after it's added into config. Trying to set a value on property of the frozen job will throw an `InvalidOperationException`. Use the `Job.Frozen` property to determine if the code properties can be altered.
 
 ### Attribute style
 
@@ -108,6 +108,8 @@ You can also add new jobs via attributes. Examples:
 public class MyBenchmarkClass
 ```
 
+Note that each of the attribute identifies a separate job, the sample above will result in 8 different jobs, not merged one.
+
 #### Custom attributes
 
 You can also create own custom attribute with your favorite set of jobs. Example:
@@ -118,7 +120,8 @@ public class MySuperJobAttribute : Attribute, IConfigSource
 {
     protected MySuperJobAttribute()
     {
-        var job = Job.Default.With(Runtime.Core).WithId("MySuperJob");
+        var job = new Job("MySuperJob", RunMode.Core);
+        job.Env.Platform = Platform.X64;
         Config = ManualConfig.CreateEmpty().With(job);
     }
 
