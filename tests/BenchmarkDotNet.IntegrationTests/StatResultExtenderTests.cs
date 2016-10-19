@@ -45,10 +45,10 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         private static Job CreateJob() =>
-            Job.Dry.
-                WithTargetCount(10).
-                WithIterationTime(TimeInterval.Millisecond * 10).
-                WithId("MainJob");
+            new Job("MainJob", Job.Dry)
+            {
+                Run = { TargetCount = 10, IterationTime = TimeInterval.Millisecond * 10 }
+            };
 
         public class Target
         {

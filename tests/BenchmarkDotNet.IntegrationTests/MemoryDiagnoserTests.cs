@@ -146,11 +146,11 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             return ManualConfig.CreateEmpty()
                                .With(
-                                    Job.Dry
-                                       .WithLaunchCount(1)
-                                       .WithWarmupCount(1)
-                                       .WithTargetCount(targetCount)
-                                       .WithGcForce(false))
+                                    new Job(Job.Dry)
+                                    {
+                                        Run = { LaunchCount = 1, WarmupCount = 1, TargetCount = targetCount },
+                                        Env = { Gc = { Force = false }}
+                                    })
                                .With(DefaultConfig.Instance.GetLoggers().ToArray())
                                .With(DefaultColumnProviders.Instance)
                                .With(diagnoser)

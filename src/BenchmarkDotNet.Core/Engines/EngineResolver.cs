@@ -10,16 +10,14 @@ namespace BenchmarkDotNet.Engines
 
         private EngineResolver()
         {
-            var run = Job.Default.Run;
-            Register(run.RunStrategy, () => RunStrategy.Throughput);
-            Register(run.IterationTime, () => TimeInterval.Millisecond * 200);
+            Register(RunMode.RunStrategyCharacteristic, () => RunStrategy.Throughput);
+            Register(RunMode.IterationTimeCharacteristic, () => TimeInterval.Millisecond * 200);
 
-            var acc = Job.Default.Accuracy;
-            Register(acc.MaxStdErrRelative, () => 0.01);
-            Register(acc.MinIterationTime, () => TimeInterval.Millisecond * 200);
-            Register(acc.MinInvokeCount, () => 4);
-            Register(acc.EvaluateOverhead, () => true);
-            Register(acc.RemoveOutliers, () => true);
+            Register(AccuracyMode.MaxStdErrRelativeCharacteristic, () => 0.01);
+            Register(AccuracyMode.MinIterationTimeCharacteristic, () => TimeInterval.Millisecond * 200);
+            Register(AccuracyMode.MinInvokeCountCharacteristic, () => 4);
+            Register(AccuracyMode.EvaluateOverheadCharacteristic, () => true);
+            Register(AccuracyMode.RemoveOutliersCharacteristic, () => true);
         }
     }
 }

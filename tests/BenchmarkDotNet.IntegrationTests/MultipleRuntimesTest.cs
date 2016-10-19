@@ -29,8 +29,8 @@ namespace BenchmarkDotNet.IntegrationTests
             var summary = BenchmarkRunner
                 .Run<C>(
                     ManualConfig.CreateEmpty()
-                                .With(Job.Dry.With(Runtime.Core))
-                                .With(Job.Dry.With(Runtime.Clr))
+                                .With(new Job(Job.Dry, EnvMode.Core))
+                                .With(new Job(Job.Dry, EnvMode.Clr))
                                 .With(DefaultColumnProviders.Instance)
                                 .With(new OutputLogger(output)));
 
@@ -41,12 +41,12 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.True(summary.Reports.All(report => report.AllMeasurements.Any()));
 
             Assert.True(summary.Reports
-                .Single(report => report.Benchmark.Job.Env.Runtime.SpecifiedValue == Runtime.Clr)
+                .Single(report => report.Benchmark.Job.Env.Runtime == Runtime.Clr)
                 .ExecuteResults
                 .All(executeResult => executeResult.Data.Contains("Classic")));
 
             Assert.True(summary.Reports
-                .Single(report => report.Benchmark.Job.Env.Runtime.SpecifiedValue == Runtime.Core)
+                .Single(report => report.Benchmark.Job.Env.Runtime == Runtime.Core)
                 .ExecuteResults
                 .All(executeResult => executeResult.Data.Contains("Core")));
 

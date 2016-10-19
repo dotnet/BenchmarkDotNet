@@ -20,7 +20,9 @@ namespace BenchmarkDotNet.Samples.Intro
 
             public MyConfigSourceAttribute(params Jit[] jits)
             {
-                var jobs = jits.Select(jit => Job.Dry.With(Platform.X64).With(jit)).ToArray();
+                var jobs = jits
+                    .Select(jit => new Job(Job.Dry) { Env = { Jit = jit, Platform = Platform.X64 } })
+                    .ToArray();
                 Config = ManualConfig.CreateEmpty().With(jobs);
             }
         }

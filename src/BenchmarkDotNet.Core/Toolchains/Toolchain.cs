@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 
@@ -25,8 +26,8 @@ namespace BenchmarkDotNet.Toolchains
 
         public virtual bool IsSupported(Benchmark benchmark, ILogger logger, IResolver resolver)
         {
-            var runtime = benchmark.Job.Env.Runtime.Resolve(resolver);
-            var jit = benchmark.Job.Env.Jit.Resolve(resolver);
+            var runtime = benchmark.Job.ResolveValue(EnvMode.RuntimeCharacteristic, resolver);
+            var jit = benchmark.Job.ResolveValue(EnvMode.JitCharacteristic, resolver);
             if (runtime != Runtime.Mono && jit == Jit.Llvm)
             {
                 logger.WriteLineError($"Llvm is supported only for Mono, benchmark '{benchmark.DisplayInfo}' will not be executed");

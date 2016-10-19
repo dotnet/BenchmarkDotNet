@@ -48,12 +48,12 @@ namespace BenchmarkDotNet.Engines
 
             Resolver = new CompositeResolver(BenchmarkRunnerCore.DefaultResolver, EngineResolver.Instance);
 
-            Clock = targetJob.Infrastructure.Clock.Resolve(Resolver);
-            ForceAllocations = targetJob.Env.Gc.Force.Resolve(Resolver);
-            UnrollFactor = targetJob.Run.UnrollFactor.Resolve(Resolver);
-            Strategy = targetJob.Run.RunStrategy.Resolve(Resolver);
-            EvaluateOverhead = targetJob.Accuracy.EvaluateOverhead.Resolve(Resolver);
-            InvocationCount = targetJob.Run.InvocationCount.Resolve(Resolver);
+            Clock = targetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, Resolver);
+            ForceAllocations = targetJob.ResolveValue(GcMode.ForceCharacteristic, Resolver);
+            UnrollFactor = targetJob.ResolveValue(RunMode.UnrollFactorCharacteristic, Resolver);
+            Strategy = targetJob.ResolveValue(RunMode.RunStrategyCharacteristic, Resolver);
+            EvaluateOverhead = targetJob.ResolveValue(AccuracyMode.EvaluateOverheadCharacteristic, Resolver);
+            InvocationCount = targetJob.ResolveValue(RunMode.InvocationCountCharacteristic, Resolver);
 
             warmupStage = new EngineWarmupStage(this);
             pilotStage = new EnginePilotStage(this);

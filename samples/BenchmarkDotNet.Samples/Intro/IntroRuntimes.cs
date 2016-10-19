@@ -36,9 +36,9 @@ namespace BenchmarkDotNet.Samples.Intro
         {
             public MultipleRuntimesConfig()
             {
-                Add(Job.Dry.With(Runtime.Clr).With(Jit.RyuJit));
-                Add(Job.Dry.With(Runtime.Core).With(Jit.RyuJit));
-                Add(Job.Dry.With(Runtime.Mono));
+                Add(new Job(Job.Dry, EnvMode.Clr, EnvMode.RyuJitX64));
+                Add(new Job(Job.Dry, EnvMode.Core, EnvMode.RyuJitX64));
+                Add(new Job(Job.Dry, EnvMode.Mono));
             }
         }
 

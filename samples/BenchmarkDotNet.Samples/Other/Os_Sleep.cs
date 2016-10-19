@@ -12,7 +12,10 @@ namespace BenchmarkDotNet.Samples.Other
         {
             public Config()
             {
-                Add(Job.Default.WithLaunchCount(3).WithTargetCount(100));
+                Add(new Job
+                {
+                    Run = { LaunchCount = 3, TargetCount = 100 }
+                });
             }
         }
 

@@ -224,13 +224,20 @@ namespace BenchmarkDotNet.Running
             var executeResults = new List<ExecuteResult>();
 
             logger.WriteLineInfo("// *** Execute ***");
-            bool analyzeRunToRunVariance = benchmark.Job.Accuracy.AnaylyzeLaunchVariance.Resolve(resolver);
+            bool analyzeRunToRunVariance = benchmark.Job.ResolveValue(AccuracyMode.AnaylyzeLaunchVarianceCharacteristic, resolver);
+            bool autoLaunchCount = !benchmark.Job.HasValue(RunMode.LaunchCountCharacteristic);
             int defaultValue = analyzeRunToRunVariance ? 2 : 1;
-            int launchCount = Math.Max(1, benchmark.Job.Run.LaunchCount.IsDefault ? defaultValue : benchmark.Job.Run.LaunchCount.SpecifiedValue);
+            int launchCount = Math.Max(
+                1,
+                autoLaunchCount ? defaultValue: benchmark.Job.Run.LaunchCount);
 
             for (int launchIndex = 0; launchIndex < launchCount; launchIndex++)
             {
-                string printedLaunchCount = analyzeRunToRunVariance && benchmark.Job.Run.LaunchCount.IsDefault && launchIndex < 2 ? "" : " / " + launchCount;
+                string printedLaunchCount = (analyzeRunToRunVariance &&
+                    autoLaunchCount &&
+                    launchIndex < 2)
+                    ? ""
+                    : " / " + launchCount;
                 logger.WriteLineInfo($"// Launch: {launchIndex + 1}{printedLaunchCount}");
 
                 var executeResult = toolchain.Executor.Execute(buildResult, benchmark, logger, resolver);
@@ -254,7 +261,7 @@ namespace BenchmarkDotNet.Running
                     break;
                 }
 
-                if (benchmark.Job.Run.LaunchCount.IsDefault && launchIndex == 1 && analyzeRunToRunVariance)
+                if (autoLaunchCount && launchIndex == 1 && analyzeRunToRunVariance)
                 {
                     // TODO: improve this logic
                     var idleApprox = new Statistics(measurements.Where(m => m.IterationMode == IterationMode.IdleTarget).Select(m => m.Nanoseconds)).Median;

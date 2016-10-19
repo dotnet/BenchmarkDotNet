@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Validators
@@ -21,15 +22,15 @@ namespace BenchmarkDotNet.Validators
             foreach (var benchmark in benchmarks)
             {
                 var run = benchmark.Job.Run;
-                int unrollFactor = run.UnrollFactor.Resolve(resolver);
+                int unrollFactor = run.ResolveValue(RunMode.UnrollFactorCharacteristic, resolver);
                 if (unrollFactor <= 0)
                 {
                     string message = $"Specified UnrollFactor ({unrollFactor}) must be greater than zero";
                     yield return new ValidationError(true, message, benchmark);
                 }
-                else if (!run.InvocationCount.IsDefault)
+                else if (run.HasValue(RunMode.InvocationCountCharacteristic))
                 {
-                    int invocationCount = run.InvocationCount.SpecifiedValue;
+                    int invocationCount = run.InvocationCount;
                     if (invocationCount % unrollFactor != 0)
                     {
                         string message = $"Specified InvocationCount ({invocationCount}) must be a multiple of UnrollFactor ({unrollFactor})";

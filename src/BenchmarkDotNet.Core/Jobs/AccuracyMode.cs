@@ -1,44 +1,51 @@
-﻿using BenchmarkDotNet.Characteristics;
+﻿using System;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Horology;
 
+// ReSharper disable once CheckNamespace
 namespace BenchmarkDotNet.Jobs
 {
-    public sealed class AccuracyMode
+    public sealed class AccuracyMode : JobMode<AccuracyMode>
     {
-        public static readonly AccuracyMode Default = new AccuracyMode();
+        public static readonly Characteristic<double> MaxStdErrRelativeCharacteristic = Characteristic.Create((AccuracyMode a) => a.MaxStdErrRelative);
+        public static readonly Characteristic<TimeInterval> MinIterationTimeCharacteristic = Characteristic.Create((AccuracyMode a) => a.MinIterationTime);
+        public static readonly Characteristic<int> MinInvokeCountCharacteristic = Characteristic.Create((AccuracyMode a) => a.MinInvokeCount);
+        public static readonly Characteristic<bool> EvaluateOverheadCharacteristic = Characteristic.Create((AccuracyMode a) => a.EvaluateOverhead);
+        public static readonly Characteristic<bool> RemoveOutliersCharacteristic = Characteristic.Create((AccuracyMode a) => a.RemoveOutliers);
 
-        private AccuracyMode()
+        // TODO: fix typo
+        public static readonly Characteristic<bool> AnaylyzeLaunchVarianceCharacteristic = Characteristic.Create((AccuracyMode a) => a.AnaylyzeLaunchVariance);
+
+        public double MaxStdErrRelative
         {
+            get { return MaxStdErrRelativeCharacteristic[this]; }
+            set { MaxStdErrRelativeCharacteristic[this] = value; }
         }
-
-        private static ICharacteristic<T> Create<T>(string id) => Characteristic<T>.Create("Accuracy", id);
-
-        public ICharacteristic<double> MaxStdErrRelative { get; private set; } = Create<double>(nameof(MaxStdErrRelative));
-        public ICharacteristic<TimeInterval> MinIterationTime { get; private set; } = Create<TimeInterval>(nameof(MinIterationTime));
-        public ICharacteristic<int> MinInvokeCount { get; private set; } = Create<int>(nameof(MinInvokeCount));
-        public ICharacteristic<bool> EvaluateOverhead { get; private set; } = Create<bool>(nameof(EvaluateOverhead));
-        public ICharacteristic<bool> RemoveOutliers { get; private set; } = Create<bool>(nameof(RemoveOutliers));
-        public ICharacteristic<bool> AnaylyzeLaunchVariance { get; private set; } = Create<bool>(nameof(AnaylyzeLaunchVariance));
-
-        public static AccuracyMode Parse(CharacteristicSet set)
+        public TimeInterval MinIterationTime
         {
-            var mode = new AccuracyMode();
-            mode.MaxStdErrRelative = mode.MaxStdErrRelative.Mutate(set);
-            mode.MinIterationTime = mode.MinIterationTime.Mutate(set);
-            mode.MinInvokeCount = mode.MinInvokeCount.Mutate(set);
-            mode.EvaluateOverhead = mode.EvaluateOverhead.Mutate(set);
-            mode.RemoveOutliers = mode.RemoveOutliers.Mutate(set);
-            mode.AnaylyzeLaunchVariance = mode.AnaylyzeLaunchVariance.Mutate(set);
-            return mode;
+            get { return MinIterationTimeCharacteristic[this]; }
+            set { MinIterationTimeCharacteristic[this] = value; }
         }
-
-        public CharacteristicSet ToSet() => new CharacteristicSet(
-            MaxStdErrRelative,
-            MinIterationTime,
-            MinInvokeCount,
-            EvaluateOverhead,
-            RemoveOutliers,
-            AnaylyzeLaunchVariance
-        );
+        public int MinInvokeCount
+        {
+            get { return MinInvokeCountCharacteristic[this]; }
+            set { MinInvokeCountCharacteristic[this] = value; }
+        }
+        public bool EvaluateOverhead
+        {
+            get { return EvaluateOverheadCharacteristic[this]; }
+            set { EvaluateOverheadCharacteristic[this] = value; }
+        }
+        public bool RemoveOutliers
+        {
+            get { return RemoveOutliersCharacteristic[this]; }
+            set { RemoveOutliersCharacteristic[this] = value; }
+        }
+        // TODO: fix typo
+        public bool AnaylyzeLaunchVariance
+        {
+            get { return AnaylyzeLaunchVarianceCharacteristic[this]; }
+            set { AnaylyzeLaunchVarianceCharacteristic[this] = value; }
+        }
     }
 }

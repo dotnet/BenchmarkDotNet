@@ -12,22 +12,22 @@ namespace BenchmarkDotNet.Characteristics
             this.resolvers = resolvers;
         }
 
-        public bool CanResolve(ICharacteristic characteristic) => resolvers.Any(r => r.CanResolve(characteristic));
+        public bool CanResolve(Characteristic characteristic) => resolvers.Any(r => r.CanResolve(characteristic));
 
-        public T Resolve<T>(ICharacteristic<T> characteristic)
+        public object Resolve(JobMode jobMode, Characteristic characteristic)
         {
             var resolver = resolvers.FirstOrDefault(r => r.CanResolve(characteristic));
             if (resolver != null)
-                return resolver.Resolve(characteristic);
-            throw new InvalidOperationException($"There is no default resolver for {characteristic.Id}");
+                return resolver.Resolve(jobMode, characteristic);
+            throw new InvalidOperationException($"There is no default resolver for {characteristic.FullId}");
         }
 
-        public object Resolve(ICharacteristic characteristic)
+        public T Resolve<T>(JobMode jobMode, Characteristic<T> characteristic)
         {
             var resolver = resolvers.FirstOrDefault(r => r.CanResolve(characteristic));
             if (resolver != null)
-                return resolver.Resolve(characteristic);
-            throw new InvalidOperationException($"There is no default resolver for {characteristic.Id}");
+                return resolver.Resolve(jobMode, characteristic);
+            throw new InvalidOperationException($"There is no default resolver for {characteristic.FullId}");
         }
     }
 }

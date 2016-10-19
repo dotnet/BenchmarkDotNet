@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Engines
             return engine.RunIteration(new IterationData(mode, index, invokeCount, unrollFactor));
         }
 
-        protected bool ShouldRunAuto(ICharacteristic<int> iterationCount) => iterationCount.IsDefault;
+        protected bool ShouldRunAuto(RunMode runMode, Characteristic<int> iterationCount) => !runMode.HasValue(iterationCount);
 
         protected void WriteLine() => engine.WriteLine();
         protected void WriteLine(string line) => engine.WriteLine(line);

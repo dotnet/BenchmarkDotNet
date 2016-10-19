@@ -2,83 +2,92 @@
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 
+// ReSharper disable once CheckNamespace
+
 namespace BenchmarkDotNet.Jobs
 {
-    public sealed class EnvMode
+    public sealed class EnvMode : JobMode<EnvMode>
     {
-        public static readonly EnvMode Default = new EnvMode();
+        public static readonly Characteristic<Platform> PlatformCharacteristic = Characteristic.Create((EnvMode e) => e.Platform);
+        public static readonly Characteristic<Jit> JitCharacteristic = Characteristic.Create((EnvMode e) => e.Jit);
+        public static readonly Characteristic<Runtime> RuntimeCharacteristic = Characteristic.Create((EnvMode e) => e.Runtime);
+        public static readonly Characteristic<IntPtr> AffinityCharacteristic = Characteristic.Create((EnvMode e) => e.Affinity);
+        public static readonly Characteristic<GcMode> GcCharacteristic = Characteristic.Create((EnvMode e) => e.Gc);
 
-        public static readonly JobMutator Clr = CreateMutator(Environments.Runtime.Clr);
-        public static readonly JobMutator Core = CreateMutator(Environments.Runtime.Core);
-        public static readonly JobMutator Mono = CreateMutator(Environments.Runtime.Mono);
+        public static readonly EnvMode Clr = new EnvMode(Runtime.Clr).Freeze();
+        public static readonly EnvMode Core = new EnvMode(Runtime.Core).Freeze();
+        public static readonly EnvMode Mono = new EnvMode(Runtime.Mono).Freeze();
+        public static readonly EnvMode LegacyJitX86 = new EnvMode(
+            nameof(LegacyJitX86), Jit.LegacyJit, Platform.X86)
+            .Freeze();
+        public static readonly EnvMode LegacyJitX64 = new EnvMode(
+            nameof(LegacyJitX64), Jit.LegacyJit, Platform.X64)
+            .Freeze();
+        public static readonly EnvMode RyuJitX64 = new EnvMode(
+            nameof(RyuJitX64), Jit.RyuJit, Platform.X64)
+            .Freeze();
 
-        public static readonly JobMutator LegacyJitX86 = CreateMutator(Environments.Jit.LegacyJit, Environments.Platform.X86);
-        public static readonly JobMutator LegacyJitX64 = CreateMutator(Environments.Jit.LegacyJit, Environments.Platform.X64);
-        public static readonly JobMutator RyuJitX64 = CreateMutator(Environments.Jit.RyuJit, Environments.Platform.X64);
+        public EnvMode() : this(null) { }
 
-        private EnvMode()
+        public EnvMode(Runtime runtime) : this(runtime.ToString())
         {
+            Runtime = runtime;
         }
 
-        private static ICharacteristic<T> Create<T>(string id) => Characteristic<T>.Create("Env", id);
+        public EnvMode(string id, Jit jit, Platform platform) : this(id)
+        {
+            Jit = jit;
+            Platform = platform;
+            if (jit == Jit.LegacyJit)
+                Runtime = Runtime.Clr;
+        }
+
+        public EnvMode(string id) : base(id)
+        {
+            GcCharacteristic[this] = new GcMode();
+        }
+
 
         /// <summary>
         /// Platform (x86 or x64)
         /// </summary>
-        public ICharacteristic<Platform> Platform { get; private set; } = Create<Platform>(nameof(Platform));
+        public Platform Platform
+        {
+            get { return PlatformCharacteristic[this]; }
+            set { PlatformCharacteristic[this] = value; }
+        }
 
         /// <summary>
         /// JIT (Just-In-Time compiler)
         /// </summary>
-        public ICharacteristic<Jit> Jit { get; private set; } = Create<Jit>(nameof(Jit));
+        public Jit Jit
+        {
+            get { return JitCharacteristic[this]; }
+            set { JitCharacteristic[this] = value; }
+        }
 
         /// <summary>
         /// Runtime
         /// </summary>
-        public ICharacteristic<Runtime> Runtime { get; private set; } = Create<Runtime>(nameof(Runtime));
+        public Runtime Runtime
+        {
+            get { return RuntimeCharacteristic[this]; }
+            set { RuntimeCharacteristic[this] = value; }
+        }
 
         /// <summary>
         /// ProcessorAffinity for the benchmark process.
         /// See also: https://msdn.microsoft.com/library/system.diagnostics.process.processoraffinity.aspx
         /// </summary>
-        public ICharacteristic<IntPtr> Affinity { get; private set; } = Create<IntPtr>(nameof(Affinity));
+        public IntPtr Affinity
+        {
+            get { return AffinityCharacteristic[this]; }
+            set { AffinityCharacteristic[this] = value; }
+        }
 
         /// <summary>
         /// GcMode
         /// </summary>
-        public GcMode Gc { get; private set; } = GcMode.Default;
-
-        public static JobMutator CreateMutator(Runtime runtime)
-        {
-            return new JobMutator(runtime.ToString()).Add(Default.Runtime.Mutate(runtime));
-        }
-
-        public static JobMutator CreateMutator(Jit jit, Platform platform)
-        {
-            var mutator = new JobMutator(jit.ToString() + platform).
-                Add(Default.Jit.Mutate(jit)).
-                Add(Default.Platform.Mutate(platform));
-            if (jit == Environments.Jit.LegacyJit)
-                mutator = mutator.Add(Default.Runtime.Mutate(Environments.Runtime.Clr));
-            return mutator;
-        }
-
-        public static EnvMode Parse(CharacteristicSet set)
-        {
-            var mode = new EnvMode();
-            mode.Platform = mode.Platform.Mutate(set);
-            mode.Jit = mode.Jit.Mutate(set);
-            mode.Runtime = mode.Runtime.Mutate(set);
-            mode.Affinity = mode.Affinity.Mutate(set);
-            mode.Gc = GcMode.Parse(set);
-            return mode;
-        }
-
-        public CharacteristicSet ToSet() => new CharacteristicSet(
-            Platform,
-            Jit,
-            Runtime,
-            Affinity
-        ).Mutate(Gc.ToSet());
+        public GcMode Gc => GcCharacteristic[this];
     }
 }
