@@ -1,78 +1,79 @@
-﻿using BenchmarkDotNet.Characteristics;
+﻿using System;
+using BenchmarkDotNet.Characteristics;
 
+// ReSharper disable once CheckNamespace
 namespace BenchmarkDotNet.Jobs
 {
-    public sealed class Job
+    public sealed class Job : JobMode<Job>
     {
-        #region Predifined
+        public static readonly Characteristic<EnvMode> EnvCharacteristic = Characteristic.Create((Job j) => j.Env);
+        public static readonly Characteristic<RunMode> RunCharacteristic = Characteristic.Create((Job j) => j.Run);
+        public static readonly Characteristic<InfrastructureMode> InfrastructureCharacteristic = Characteristic.Create((Job j) => j.Infrastructure);
+        public static readonly Characteristic<AccuracyMode> AccuracyCharacteristic = Characteristic.Create((Job j) => j.Accuracy);
 
-        public static readonly Job Default = new Job().WithId("Default");
-
+        #region Predefined
         // Env
-        public static readonly Job Clr = Default.Mutate(EnvMode.Clr).WithId(nameof(Clr));
-        public static readonly Job Core = Default.Mutate(EnvMode.Core).WithId(nameof(Core));
-        public static readonly Job Mono = Default.Mutate(EnvMode.Mono).WithId(nameof(Mono));
+        public static readonly Job Clr = new Job(nameof(Clr), EnvMode.Clr).Freeze();
+        public static readonly Job Core = new Job(nameof(Core), EnvMode.Core).Freeze();
+        public static readonly Job Mono = new Job(nameof(Mono), EnvMode.Mono).Freeze();
 
-        public static readonly Job LegacyJitX86 = Default.Mutate(EnvMode.LegacyJitX86).WithId(nameof(LegacyJitX86));
-        public static readonly Job LegacyJitX64 = Default.Mutate(EnvMode.LegacyJitX64).WithId(nameof(LegacyJitX64));
-        public static readonly Job RyuJitX64 = Default.Mutate(EnvMode.RyuJitX64).WithId(nameof(RyuJitX64));
+        public static readonly Job LegacyJitX86 = new Job(nameof(LegacyJitX86), EnvMode.LegacyJitX86).Freeze();
+        public static readonly Job LegacyJitX64 = new Job(nameof(LegacyJitX64), EnvMode.LegacyJitX64).Freeze();
+        public static readonly Job RyuJitX64 = new Job(nameof(RyuJitX64), EnvMode.RyuJitX64).Freeze();
 
         // Run
-        public static readonly Job Dry = Default.Mutate(RunMode.Dry).WithId(nameof(Dry));
-        public static readonly Job ShortRun = Default.Mutate(RunMode.Short).WithId(nameof(ShortRun));
-        public static readonly Job MediumRun = Default.Mutate(RunMode.Medium).WithId(nameof(MediumRun));
-        public static readonly Job LongRun = Default.Mutate(RunMode.Long).WithId(nameof(LongRun));
-        public static readonly Job VeryLongRun = Default.Mutate(RunMode.VeryLong).WithId(nameof(VeryLongRun));
-
+        public static readonly Job Dry = new Job(nameof(Dry), RunMode.Dry).Freeze();
+        public static readonly Job ShortRun = new Job(nameof(ShortRun), RunMode.Short).Freeze();
+        public static readonly Job MediumRun = new Job(nameof(MediumRun), RunMode.Medium).Freeze();
+        public static readonly Job LongRun = new Job(nameof(LongRun), RunMode.Long).Freeze();
+        public static readonly Job VeryLongRun = new Job(nameof(VeryLongRun), RunMode.VeryLong).Freeze();
         #endregion
 
-        public ICharacteristic<string> Id { get; private set; } = Characteristic<string>.Create("Job", "Id");
-        public EnvMode Env { get; private set; } = EnvMode.Default;
-        public RunMode Run { get; private set; } = RunMode.Default;
-        public InfrastructureMode Infrastructure { get; private set; } = InfrastructureMode.Default;
-        public AccuracyMode Accuracy { get; private set; } = AccuracyMode.Default;
+        public Job() : this((string)null)
+        { }
 
-        public static Job Parse(CharacteristicSet set, bool clearId = true)
+        public Job(string id) : base(id)
         {
-            var job = new Job();
-            if (!clearId)
-                job.Id = job.Id.Mutate(set);
-            job.Env = EnvMode.Parse(set);
-            job.Run = RunMode.Parse(set);
-            job.Infrastructure = InfrastructureMode.Parse(set);
-            job.Accuracy = AccuracyMode.Parse(set);
-            return job;
+            EnvCharacteristic[this] = new EnvMode();
+            RunCharacteristic[this] = new RunMode();
+            InfrastructureCharacteristic[this] = new InfrastructureMode();
+            AccuracyCharacteristic[this] = new AccuracyMode();
         }
 
-        public Job WithId(string id)
+        public Job(JobMode other) : this((string)null, other)
         {
-            var job = Clone();
-            job.Id = job.Id.Mutate(id);
-            return job;
         }
 
-        public Job Clone() => Parse(ToSet());
+        public Job(params JobMode[] others) : this((string)null, others)
+        {
+        }
 
-        public CharacteristicSet ToSet(bool includeId = true) =>
-            new CharacteristicSet(includeId ? new ICharacteristic[] { Id } : new ICharacteristic[0]).Mutate(
-                Env.ToSet(),
-                Run.ToSet(),
-                Infrastructure.ToSet(),
-                Accuracy.ToSet()
-            );
+        public Job(string id, JobMode other) : this(id)
+        {
+            Apply(other);
+        }
 
-        public Job Mutate(JobMutator mutator) => mutator.Apply(this);
+        public Job(string id, params JobMode[] others) : this(id)
+        {
+            Apply(others);
+        }
 
-        public string ResolvedId => Id.IsDefault ? JobIdGenerator.GenerateRandomId(this) : Id.SpecifiedValue;
+        public EnvMode Env => EnvCharacteristic[this];
+        public RunMode Run => RunCharacteristic[this];
+        public InfrastructureMode Infrastructure => InfrastructureCharacteristic[this];
+        public AccuracyMode Accuracy => AccuracyCharacteristic[this];
+
+        public string ResolvedId => HasValue(IdCharacteristic) ? Id : JobIdGenerator.GenerateRandomId(this);
         public string FolderInfo => ResolvedId;
 
         public string DisplayInfo
         {
             get
             {
-                var set = ToSet(false);
-                string characteristics = set.AllAreDefaults() ? "" : "(" + CharacteristicSetPresenter.Display.ToPresentation(set) + ")";
-                return ResolvedId + characteristics;
+                var props = ResolveId(this, null);
+                return props == IdCharacteristic.FallbackValue
+                    ? ResolvedId
+                    : ResolvedId + $"({props})";
             }
         }
     }

@@ -12,33 +12,34 @@ namespace BenchmarkDotNet.Columns
     {
         private static readonly CharacteristicPresenter Presenter = CharacteristicPresenter.SummaryPresenter;
 
-        private readonly string id;
+        private readonly Characteristic characteristic;
 
-        public CharacteristicColumn(string id)
+        public CharacteristicColumn(Characteristic characteristic)
         {
-            this.id = id;
+            this.characteristic = characteristic;
         }
 
 
-        public string Id => "Job." + id;
-        public string ColumnName => CharacteristicHelper.GetDisplayName(id);
+        public string Id => "Job." + characteristic.Id;
+        public string ColumnName => characteristic.Id;
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => false;
         public ColumnCategory Category => ColumnCategory.Job;
         public int PriorityInCategory => 0;
 
-        public bool IsDefault(Summary summary, Benchmark benchmark) => benchmark.Job.ToSet().Get(id).IsDefault;
+        public bool IsDefault(Summary summary, Benchmark benchmark) => !benchmark.Job.HasValue(characteristic);
 
         public string GetValue(Summary summary, Benchmark benchmark)
         {
-            var characteristic = benchmark.Job.ToSet().Get(id);
-            if (characteristic.IsDefault && EnvResolver.Instance.CanResolve(characteristic))
-                return EnvResolver.Instance.Resolve(characteristic).ToString();
-            return Presenter.ToPresentation(characteristic);
+            if (!benchmark.Job.HasValue(characteristic) && EnvResolver.Instance.CanResolve(characteristic))
+                return benchmark.Job.ResolveValue(characteristic, EnvResolver.Instance).ToString();
+            return Presenter.ToPresentation(benchmark.Job, characteristic);
         }
 
         private static readonly Lazy<IColumn[]> LazyAllColumns =
-            new Lazy<IColumn[]>(() => Job.Default.ToSet(false).GetValues().Select(c => new CharacteristicColumn(c.Id)).OfType<IColumn>().ToArray());
+            new Lazy<IColumn[]>(() =>
+                CharacteristicHelper.GetAllPresentableCharacteristics(typeof(Job), true)
+                .Select(c => (IColumn)new CharacteristicColumn(c)).ToArray());
 
         public static IColumn[] AllColumns => LazyAllColumns.Value;
     }

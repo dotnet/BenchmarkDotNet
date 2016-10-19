@@ -65,9 +65,9 @@ namespace BenchmarkDotNet.Toolchains
             process.Start();
 
             process.EnsureHighPriority(logger);
-            if (!benchmark.Job.Env.Affinity.IsDefault)
+            if (benchmark.Job.Env.HasValue(EnvMode.AffinityCharacteristic))
             {
-                process.EnsureProcessorAffinity(benchmark.Job.Env.Affinity.SpecifiedValue);
+                process.EnsureProcessorAffinity(benchmark.Job.Env.Affinity);
             }
 
             loggerWithDiagnoser.ProcessInput();
@@ -92,7 +92,9 @@ namespace BenchmarkDotNet.Toolchains
                 CreateNoWindow = true,
                 WorkingDirectory = workingDirectory
             };
-            var runtime = benchmark.Job.Env.Runtime.IsDefault ? RuntimeInformation.GetCurrentRuntime() : benchmark.Job.Env.Runtime.SpecifiedValue;
+            var runtime = benchmark.Job.Env.HasValue(EnvMode.RuntimeCharacteristic)
+                ? benchmark.Job.Env.Runtime
+                : RuntimeInformation.GetCurrentRuntime();
                 // TODO: use resolver
             switch (runtime)
             {
@@ -115,7 +117,7 @@ namespace BenchmarkDotNet.Toolchains
         {
             // from mono --help: "Usage is: mono [options] program [program-options]"
             return new StringBuilder(30)
-                .Append(job.Env.Jit.Resolve(resolver) == Jit.Llvm ? "--llvm" : "--nollvm")
+                .Append(job.ResolveValue(EnvMode.JitCharacteristic, resolver) == Jit.Llvm ? "--llvm" : "--nollvm")
                 .Append(' ')
                 .Append(exeName)
                 .Append(' ')

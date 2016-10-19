@@ -2,6 +2,7 @@ using System;
 
 namespace BenchmarkDotNet.Engines
 {
+    // TODO: Default instance?
     public class EngineFactory : IEngineFactory
     {
         public IEngine Create(EngineParameters engineParameters)

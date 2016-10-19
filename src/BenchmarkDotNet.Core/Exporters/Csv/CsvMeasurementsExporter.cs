@@ -43,11 +43,11 @@ namespace BenchmarkDotNet.Exporters.Csv
             new MeasurementColumn("TargetMethod", (summary, report, m) => report.Benchmark.Target.MethodDisplayInfo),
 
             new MeasurementColumn("Job", (summary, report, m) => report.Benchmark.Job.DisplayInfo),
-            new MeasurementColumn("JobRunStrategy", (summary, report, m) => Presenter.ToPresentation(report.Benchmark.Job.Run.RunStrategy)),
-            new MeasurementColumn("JobPlatform", (summary, report, m) => Presenter.ToPresentation(report.Benchmark.Job.Env.Platform)),
-            new MeasurementColumn("JobJit", (summary, report, m) => Presenter.ToPresentation(report.Benchmark.Job.Env.Jit)),
-            new MeasurementColumn("JobToolchain", (summary, report, m) => Presenter.ToPresentation(report.Benchmark.Job.Infrastructure.Toolchain)),
-            new MeasurementColumn("JobRuntime", (summary, report, m) => Presenter.ToPresentation(report.Benchmark.Job.Env.Runtime)),
+            new MeasurementColumn("JobRunStrategy", (summary, report, m) => Presenter.ToPresentation(report.Benchmark.Job, RunMode.RunStrategyCharacteristic)),
+            new MeasurementColumn("JobPlatform", (summary, report, m) => Presenter.ToPresentation(report.Benchmark.Job,EnvMode.PlatformCharacteristic)),
+            new MeasurementColumn("JobJit", (summary, report, m) => Presenter.ToPresentation(report.Benchmark.Job,EnvMode.JitCharacteristic)),
+            new MeasurementColumn("JobToolchain", (summary, report, m) => Presenter.ToPresentation(report.Benchmark.Job,InfrastructureMode.ToolchainCharacteristic)),
+            new MeasurementColumn("JobRuntime", (summary, report, m) => Presenter.ToPresentation(report.Benchmark.Job,EnvMode.RuntimeCharacteristic)),
 
             new MeasurementColumn("Params", (summary, report, m) => report.Benchmark.Parameters.PrintInfo),
 

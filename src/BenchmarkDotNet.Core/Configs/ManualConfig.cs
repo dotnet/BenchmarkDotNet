@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Configs
         public void Add(params IDiagnoser[] newDiagnosers) => diagnosers.AddRange(newDiagnosers);
         public void Add(params IAnalyser[] newAnalysers) => analysers.AddRange(newAnalysers);
         public void Add(params IValidator[] newValidators) => validators.AddRange(newValidators);
-        public void Add(params Job[] newJobs) => jobs.AddRange(newJobs);
+        public void Add(params Job[] newJobs) => jobs.AddRange(newJobs.Select(j => j.Freeze())); // DONTTOUCH: please DO NOT remove .Freeze() call.
         public void Set(IOrderProvider provider) => orderProvider = provider ?? orderProvider;
 
         public void Add(IConfig config)
@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.Configs
 
         public static IConfig Parse(string[] args) => new ConfigParser().Parse(args);
 
-        public static void PrintOptions(ILogger logger, int prefixWidth, int outputWidth) 
+        public static void PrintOptions(ILogger logger, int prefixWidth, int outputWidth)
             => new ConfigParser().PrintOptions(logger, prefixWidth: prefixWidth, outputWidth: outputWidth);
     }
 }

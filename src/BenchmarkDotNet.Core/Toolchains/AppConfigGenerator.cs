@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Toolchains
 
             ClearAllCustomRuntimeSettingsExceptRedirects(runtimeElement);
 
-            GenerateJitSettings(xmlDocument, runtimeElement, job.Env.Jit);
+            GenerateJitSettings(xmlDocument, runtimeElement, job.Env);
             GenerateGCSettings(xmlDocument, runtimeElement, job.Env.Gc, resolver);
 
             xmlDocument.Save(destination);
@@ -57,24 +57,24 @@ namespace BenchmarkDotNet.Toolchains
             }
         }
 
-        private static void GenerateJitSettings(XmlDocument xmlDocument, XmlNode runtimeElement, ICharacteristic<Jit> jit)
+        private static void GenerateJitSettings(XmlDocument xmlDocument, XmlNode runtimeElement, EnvMode envMode)
         {
-            if (!jit.IsDefault)
+            if (envMode.HasValue(EnvMode.JitCharacteristic))
             {
-                string useLegacyJit = jit.SpecifiedValue == Jit.RyuJit ? "0" : "1";
+                string useLegacyJit = envMode.Jit == Jit.RyuJit ? "0" : "1";
                 CreateNodeWithAttribute(xmlDocument, runtimeElement, "useLegacyJit", "enabled", useLegacyJit);
             }
         }
 
         private static void GenerateGCSettings(XmlDocument xmlDocument, XmlNode runtimeElement, GcMode gcMode, IResolver resolver)
         {
-            if (gcMode.ToSet().GetValues().All(c => c.IsDefault))
+            if (!gcMode.HasChanges)
                 return;
 
-            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcConcurrent", "enabled", gcMode.Concurrent.Resolve(resolver).ToLowerCase());
-            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcServer", "enabled", gcMode.Server.Resolve(resolver).ToLowerCase());
-            CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCCpuGroup", "enabled", gcMode.CpuGroups.Resolve(resolver).ToLowerCase());
-            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcAllowVeryLargeObjects", "enabled", gcMode.AllowVeryLargeObjects.Resolve(resolver).ToLowerCase());
+            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcConcurrent", "enabled", gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver).ToLowerCase());
+            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcServer", "enabled", gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase());
+            CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCCpuGroup", "enabled", gcMode.ResolveValue(GcMode.CpuGroupsCharacteristic, resolver).ToLowerCase());
+            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcAllowVeryLargeObjects", "enabled", gcMode.ResolveValue(GcMode.AllowVeryLargeObjectsCharacteristic, resolver).ToLowerCase());
         }
 
         private static void CreateNodeWithAttribute(

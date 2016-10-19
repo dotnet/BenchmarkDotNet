@@ -42,22 +42,22 @@ namespace BenchmarkDotNet.Toolchains.Core
                 return false;
             }
 
-            if (benchmark.Job.Env.Platform.Resolve(resolver) == Platform.X86)
+            if (benchmark.Job.ResolveValue(EnvMode.PlatformCharacteristic, resolver) == Platform.X86)
             {
                 logger.WriteLineError($"Currently dotnet cli toolchain supports only X64 compilation, benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;
             }
-            if (benchmark.Job.Env.Jit.Resolve(resolver) == Jit.LegacyJit)
+            if (benchmark.Job.ResolveValue(EnvMode.JitCharacteristic, resolver) == Jit.LegacyJit)
             {
                 logger.WriteLineError($"Currently dotnet cli toolchain supports only RyuJit, benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;
             }
-            if (benchmark.Job.Env.Gc.CpuGroups.Resolve(resolver))
+            if (benchmark.Job.ResolveValue(GcMode.CpuGroupsCharacteristic, resolver))
             {
                 logger.WriteLineError($"Currently project.json does not support CpuGroups (app.config does), benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;
             }
-            if (benchmark.Job.Env.Gc.AllowVeryLargeObjects.Resolve(resolver))
+            if (benchmark.Job.ResolveValue(GcMode.AllowVeryLargeObjectsCharacteristic, resolver))
             {
                 logger.WriteLineError($"Currently project.json does not support gcAllowVeryLargeObjects (app.config does), benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;

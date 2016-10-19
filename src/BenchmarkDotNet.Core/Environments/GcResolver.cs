@@ -9,12 +9,11 @@ namespace BenchmarkDotNet.Environments
 
         private GcResolver()
         {
-            var gc = Job.Default.Env.Gc;
-            Register(gc.Server, () => HostEnvironmentInfo.GetCurrent().IsServerGC);
-            Register(gc.Concurrent, () => HostEnvironmentInfo.GetCurrent().IsConcurrentGC);
-            Register(gc.CpuGroups, () => false);
-            Register(gc.Force, () => true);
-            Register(gc.AllowVeryLargeObjects, () => false);
+            Register(GcMode.ServerCharacteristic, () => HostEnvironmentInfo.GetCurrent().IsServerGC);
+            Register(GcMode.ConcurrentCharacteristic, () => HostEnvironmentInfo.GetCurrent().IsConcurrentGC);
+            Register(GcMode.CpuGroupsCharacteristic, () => false);
+            Register(GcMode.ForceCharacteristic, () => true);
+            Register(GcMode.AllowVeryLargeObjectsCharacteristic, () => false);
         }
     }
 }
