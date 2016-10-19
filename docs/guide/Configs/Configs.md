@@ -77,7 +77,7 @@ public class IntroConfigSource
 
         public MyConfigSourceAttribute(params Jit[] jits)
         {
-            var jobs = jits.Select(jit => Job.Dry.With(Platform.X64).With(jit)).ToArray();
+            var jobs = jits.Select(jit => new Job(Job.Dry) { Env = { Platform = Platform.X64, Jit = jit } }).ToArray();
             Config = ManualConfig.CreateEmpty().With(jobs);
         }
     }
