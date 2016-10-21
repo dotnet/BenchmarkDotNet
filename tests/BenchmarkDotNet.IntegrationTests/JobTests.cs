@@ -60,7 +60,21 @@ namespace BenchmarkDotNet.IntegrationTests
             Equal(j.Env.Gc.AllowVeryLargeObjects, false);
             Equal(j.Env.Platform, Platform.AnyCpu);
             Equal(j.Run.RunStrategy, RunStrategy.Throughput); // set by default
-            Equal(j.Id, "Default"); // id reset on copy
+            Equal(j.Id, "Default"); // id reset
+            True(j.DisplayInfo.StartsWith("Job-"));
+            True(j.ResolvedId.StartsWith("Job-"));
+            Equal(j.ResolvedId, j.FolderInfo);
+            Equal(j.Env.Id, "Default");
+
+            // new job
+            j = new Job(j.Freeze());
+            Equal(j.Frozen, false);
+            Equal(j.Env.Frozen, false);
+            Equal(j.Run.Frozen, false);
+            Equal(j.Env.Gc.AllowVeryLargeObjects, false);
+            Equal(j.Env.Platform, Platform.AnyCpu);
+            Equal(j.Run.RunStrategy, RunStrategy.Throughput); // set by default
+            Equal(j.Id, "Default"); // id reset
             True(j.DisplayInfo.StartsWith("Job-"));
             True(j.ResolvedId.StartsWith("Job-"));
             Equal(j.ResolvedId, j.FolderInfo);
@@ -70,8 +84,9 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public static void Test02Modify()
         {
-            var j = new Job();
+            var j = new Job("SomeId");
 
+            Equal(j.Id, "SomeId");
             Equal(j.Env.Platform, Platform.AnyCpu);
             Equal(j.Run.LaunchCount, 0);
 
@@ -84,9 +99,10 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertProperties(j.Env, "Default");
 
             // 1. change values
+            j.Env.Platform = Platform.X64;
             j.Run.LaunchCount = 1;
-            j.With(Platform.X64);
 
+            Equal(j.Id, "SomeId");
             Equal(j.Env.Platform, Platform.X64);
             Equal(j.Run.LaunchCount, 1);
 
@@ -103,6 +119,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var oldEnv = j.Env;
             Job.EnvCharacteristic[j] = new EnvMode();
 
+            Equal(j.Id, "SomeId");
             Equal(j.Env.Platform, Platform.AnyCpu);
             Equal(j.Run.LaunchCount, 1);
 
@@ -116,6 +133,7 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertProperties(j.Run, "LaunchCount=1");
 
             // 2.1 proof that oldEnv was the same
+            Equal(j.Id, "SomeId");
             Equal(oldEnv.Platform, Platform.X64);
             True(oldEnv.HasValue(EnvMode.PlatformCharacteristic));
             Equal(oldEnv.Id, "Platform=X64");
@@ -126,6 +144,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 Platform = Platform.X86
             };
 
+            Equal(j.Id, "SomeId");
             Equal(j.Env.Platform, Platform.X86);
             Equal(j.Run.LaunchCount, 1);
 
@@ -141,6 +160,7 @@ namespace BenchmarkDotNet.IntegrationTests
             // 4. Freeze-unfreeze:
             j = j.Freeze().UnfreezeCopy();
 
+            Equal(j.Id, "Platform=X86, LaunchCount=1");
             Equal(j.Env.Platform, Platform.X86);
             Equal(j.Run.LaunchCount, 1);
 
@@ -152,33 +172,62 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertProperties(j, "Platform=X86, LaunchCount=1");
             AssertProperties(j.Env, "Platform=X86");
             AssertProperties(j.Run, "LaunchCount=1");
+
+            // 5. Test .With extensions
+            j = j.Freeze()
+                .WithId("NewId");
+            Equal(j.Id, "NewId"); // id set
+
+            j = j.Freeze()
+                .With(Platform.X64)
+                .WithLaunchCount(2);
+
+            Equal(j.Id, "Platform=X64, LaunchCount=2"); // id lost
+            Equal(j.Env.Platform, Platform.X64);
+            Equal(j.Run.LaunchCount, 2);
+
+            True(j.HasValue(EnvMode.PlatformCharacteristic));
+            True(j.Env.HasValue(EnvMode.PlatformCharacteristic));
+            True(j.HasValue(RunMode.LaunchCountCharacteristic));
+            True(j.Run.HasValue(RunMode.LaunchCountCharacteristic));
+
+            AssertProperties(j, "Platform=X64, LaunchCount=2");
+            AssertProperties(j.Env, "Platform=X64");
+            AssertProperties(j.Run, "LaunchCount=2");
+
         }
 
 
         [Fact]
         public static void Test03IdDoesNotFlow()
         {
-            var j = new Job(EnvMode.LegacyJitX64, RunMode.Long);
+            var j = new Job(EnvMode.LegacyJitX64, RunMode.Long); // id will not flow, new Job
             False(j.HasValue(JobMode.IdCharacteristic));
             False(j.Env.HasValue(JobMode.IdCharacteristic));
 
-            Job.EnvCharacteristic[j] = EnvMode.LegacyJitX86.UnfreezeCopy();
+            Job.EnvCharacteristic[j] = EnvMode.LegacyJitX86.UnfreezeCopy(); // id will not flow
             False(j.HasValue(JobMode.IdCharacteristic));
             False(j.Env.HasValue(JobMode.IdCharacteristic));
 
-            var c = new CharacteristicSet(EnvMode.LegacyJitX64, RunMode.Long);
+            var c = new CharacteristicSet(EnvMode.LegacyJitX64, RunMode.Long); // id will not flow, new CharacteristicSet
             False(c.HasValue(JobMode.IdCharacteristic));
 
-            Job.EnvCharacteristic[c] = EnvMode.LegacyJitX86.UnfreezeCopy();
+            Job.EnvCharacteristic[c] = EnvMode.LegacyJitX86.UnfreezeCopy(); // id will not flow
             False(c.HasValue(JobMode.IdCharacteristic));
 
-            j = new Job("MyId", EnvMode.LegacyJitX64, RunMode.Long);
+            JobMode.IdCharacteristic[c] = "MyId"; // id set explicitly
+            Equal(c.Id, "MyId");
+
+            j = new Job("MyId", EnvMode.LegacyJitX64, RunMode.Long); // id set explicitly
             Equal(j.Id, "MyId");
             Equal(j.Env.Id, "MyId");
 
-            Job.EnvCharacteristic[j] = EnvMode.LegacyJitX86.UnfreezeCopy();
+            Job.EnvCharacteristic[j] = EnvMode.LegacyJitX86.UnfreezeCopy(); // id will not flow
             Equal(j.Id, "MyId");
             Equal(j.Env.Id, "MyId");
+
+            j = j.With(Jit.RyuJit);  // id will not flow
+            False(j.HasValue(JobMode.IdCharacteristic));
         }
 
         [Fact]

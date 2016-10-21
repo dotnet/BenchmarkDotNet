@@ -44,13 +44,13 @@ namespace BenchmarkDotNet.Characteristics
             Expression<Func<TOwner, T>> propertyGetterExpression,
             Func<JobMode, T, T> resolver,
             T fallbackValue,
-            bool dontClone)
+            bool ignoreOnApply)
             where TOwner : JobMode =>
             new Characteristic<T>(
                 GetMemberName(propertyGetterExpression),
                 GetDeclaringType(propertyGetterExpression),
                 resolver, fallbackValue,
-                dontClone);
+                ignoreOnApply);
         #endregion
 
         protected Characteristic(
@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.Characteristics
             Type characteristicType,
             Type declaringType,
             object fallbackValue,
-            bool dontClone)
+            bool ignoreOnApply)
         {
             if (string.IsNullOrEmpty(id))
                 throw new ArgumentNullException(nameof(id));
@@ -71,14 +71,14 @@ namespace BenchmarkDotNet.Characteristics
             CharacteristicType = characteristicType;
             DeclaringType = declaringType;
             FallbackValue = fallbackValue;
-            DontClone = dontClone;
+            IgnoreOnApply = ignoreOnApply;
         }
 
         public string Id { get; }
         public string FullId => DeclaringType.Name + "." + Id;
 
-        // TODO: better naming. As it is for now this property used for Id only and has meaning "if set, will not change nor be cleared".
-        public bool DontClone { get; }
+        // TODO: better naming. As it is for now this property used for Id only and has meaning "if set, will not transfer to others nor be cleared".
+        public bool IgnoreOnApply { get; }
 
         public Type CharacteristicType { get; }
 
