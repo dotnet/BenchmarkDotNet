@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Characteristics
         public string Id { get; }
         public string FullId => DeclaringType.Name + "." + Id;
 
-        // TODO: better naming. Ignorable, DontApply, smth else?
+        // TODO: better naming. As it is for now this property used for Id only and has meaning "if set, will not change nor be cleared".
         public bool DontClone { get; }
 
         public Type CharacteristicType { get; }

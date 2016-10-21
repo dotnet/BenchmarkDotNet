@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Environments
             Register(EnvMode.AffinityCharacteristic, RuntimeInformation.GetCurrentAffinity);
 
             // TODO: find a better place
-            Register(AccuracyMode.AnaylyzeLaunchVarianceCharacteristic, () => false);
+            Register(AccuracyMode.AnalyzeLaunchVarianceCharacteristic, () => false);
             Register(RunMode.UnrollFactorCharacteristic, () => 16);
             Register(RunMode.InvocationCountCharacteristic, () => 1);
         }

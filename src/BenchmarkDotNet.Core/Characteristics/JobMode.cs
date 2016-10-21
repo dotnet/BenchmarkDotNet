@@ -185,7 +185,7 @@ namespace BenchmarkDotNet.Characteristics
                 {
                     newJobValue?.AssertIsNonFrozenRoot();
 
-                    oldJobValue?.DetachFromOwner(characteristic);
+                    TransferOnDetach(oldJobValue, characteristic);
                     newJobValue?.AttachToOwner(OwnerOrSelf, characteristic);
                 }
             }
@@ -257,6 +257,25 @@ namespace BenchmarkDotNet.Characteristics
             }
         }
 
+        private void TransferOnDetach(JobMode jobMode, Characteristic jobModeCharacteristic)
+        {
+            if (jobMode != null)
+            {
+                jobMode.DetachFromOwner(jobModeCharacteristic);
+            }
+            else // workaround for case the node itself was not added but children were (can be easily reproduced with CharacteristicSet, see Test03IdDoesNotFlow)
+            {
+                foreach (var characteristic in CharacteristicHelper.GetAllCharacteristics(jobModeCharacteristic.CharacteristicType))
+                {
+                    object value;
+                    if (characteristic.HasChildCharacteristics && sharedValues.TryGetValue(characteristic, out value))
+                    {
+                        ((JobMode)value).DetachFromOwner(characteristic);
+                    }
+                }
+            }
+        }
+
         private void DetachFromOwner(Characteristic thisCharacteristic)
         {
             AssertNotFrozen();
@@ -276,7 +295,7 @@ namespace BenchmarkDotNet.Characteristics
             foreach (var characteristic in this.GetAllCharacteristics())
             {
                 object value;
-                if (oldValues.TryGetValue(characteristic, out value))
+                if (!characteristic.DontClone && oldValues.TryGetValue(characteristic, out value))
                 {
                     oldValues.Remove(characteristic);
                     SetValueCore(characteristic, value);

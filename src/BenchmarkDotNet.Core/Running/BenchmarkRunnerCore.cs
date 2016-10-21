@@ -224,7 +224,7 @@ namespace BenchmarkDotNet.Running
             var executeResults = new List<ExecuteResult>();
 
             logger.WriteLineInfo("// *** Execute ***");
-            bool analyzeRunToRunVariance = benchmark.Job.ResolveValue(AccuracyMode.AnaylyzeLaunchVarianceCharacteristic, resolver);
+            bool analyzeRunToRunVariance = benchmark.Job.ResolveValue(AccuracyMode.AnalyzeLaunchVarianceCharacteristic, resolver);
             bool autoLaunchCount = !benchmark.Job.HasValue(RunMode.LaunchCountCharacteristic);
             int defaultValue = analyzeRunToRunVariance ? 2 : 1;
             int launchCount = Math.Max(

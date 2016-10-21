@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<bool> RemoveOutliersCharacteristic = Characteristic.Create((AccuracyMode a) => a.RemoveOutliers);
 
         // TODO: fix typo
-        public static readonly Characteristic<bool> AnaylyzeLaunchVarianceCharacteristic = Characteristic.Create((AccuracyMode a) => a.AnaylyzeLaunchVariance);
+        public static readonly Characteristic<bool> AnalyzeLaunchVarianceCharacteristic = Characteristic.Create((AccuracyMode a) => a.AnalyzeLaunchVariance);
 
         public double MaxStdErrRelative
         {
@@ -42,10 +42,10 @@ namespace BenchmarkDotNet.Jobs
             set { RemoveOutliersCharacteristic[this] = value; }
         }
         // TODO: fix typo
-        public bool AnaylyzeLaunchVariance
+        public bool AnalyzeLaunchVariance
         {
-            get { return AnaylyzeLaunchVarianceCharacteristic[this]; }
-            set { AnaylyzeLaunchVarianceCharacteristic[this] = value; }
+            get { return AnalyzeLaunchVarianceCharacteristic[this]; }
+            set { AnalyzeLaunchVarianceCharacteristic[this] = value; }
         }
     }
 }

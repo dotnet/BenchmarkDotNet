@@ -54,7 +54,7 @@ If you want to change the accuracy level, you should use the following character
 * `MinInvokeCount`:  Minimum about of target method invocation. Default value if `4` but you can decrease this value for cases when single invocations takes a lot of time.
 * `EvaluateOverhead`: if you benchmark method takes nanoseconds, BenchmarkDotNet overhead can significantly affect measurements. If this characterics is enable, the overhead will be evaluated and substracted from the result measurements. Default value is `true`.
 * `RemoveOutliers`: sometimes you could have outliers in your measurements. Usually these are *unexpected* ourliers which arised because of other processes activities. If this characteristics is enable, all outliers will be removed from the result measurements. However, some of benchmarks have *expected* outliers. In these situation, you expect that some of invocation can produce ourliers measurements (e.g. in case of network acitivities, cache operations, and so on). If you want to see result statistics with these outliers, you should disable this characteristic. Default value is `true`.
-* `AnaylyzeLaunchVariance`: this characteristics makes sense only if `Run.LaunchCount` is default. If this mode is enabled and , BenchmarkDotNet will try to perform several launches and detect if there is a veriance betnween launches. If this mode is disable, only one launch will be performed.
+* `AnalyzeLaunchVariance`: this characteristics makes sense only if `Run.LaunchCount` is default. If this mode is enabled and , BenchmarkDotNet will try to perform several launches and detect if there is a veriance betnween launches. If this mode is disable, only one launch will be performed.
 
 ### Infrastructure
 Usually, you shouldn't specify any characteristics from this section, it can be used for advanced cases only.
@@ -86,13 +86,21 @@ public class MyBenchmarks
                     Run = { LaunchCount = 5, IterationTime = TimeInterval.Millisecond * 200 },
                     Accuracy = { MaxStdErrRelative = 0.01 }
                 })
+
+            // Or, the same result
+            Add(
+                new Job("MySuperJob", EnvMode.RyuJitX64, RunMode.Dry)
+                .With(Runtime.Core)
+                .WithLaunchCount(5)
+                .WithIterationTime(TimeInterval.Millisecond * 200)
+                .WithMaxStdErrRelative(0.01);
         }
     }
     // Benchmarks
 }
 ```
 
-Basically, it's a good idea to start with predefined values (e.g. `EnvMode.RyuJitX64` and `RunMode.Dry` passed as constructor args) and modify rest of the properties using property setters or with help of object initialzer syntax.
+Basically, it's a good idea to start with predefined values (e.g. `EnvMode.RyuJitX64` and `RunMode.Dry` passed as constructor args) and modify rest of the properties using property setters, `.With()` extension methods or with help of object initialzer syntax.
 
 Note that the job cannot be modified after it's added into config. Trying to set a value on property of the frozen job will throw an `InvalidOperationException`. Use the `Job.Frozen` property to determine if the code properties can be altered.
 
