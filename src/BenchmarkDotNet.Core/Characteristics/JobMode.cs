@@ -110,7 +110,9 @@ namespace BenchmarkDotNet.Characteristics
                 : this.GetAllCharacteristics().Where(HasValue);
 
         private IEnumerable<Characteristic> GetCharacteristicsToApply() =>
-             this.GetAllCharacteristics().Where(c => !c.IgnoreOnApply);
+           IsPropertyBag
+                ? sharedValues.Keys.Where(c => !c.IgnoreOnApply).OrderBy(c => c.Id)
+                : this.GetAllCharacteristics().Where(c => !c.IgnoreOnApply);
 
         private IEnumerable<Characteristic> GetCharacteristicsToApply(JobMode other)
         {
