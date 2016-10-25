@@ -5,35 +5,17 @@ namespace BenchmarkDotNet.Jobs
 {
     public static class GcModeExtensions
     {
-        public static GcMode WithServer(this GcMode mode, bool value)
+        private static GcMode WithCore(this GcMode mode, Action<GcMode> updateCallback)
         {
             mode = new GcMode().Apply(mode);
-            mode.Server = value;
+            updateCallback(mode);
             return mode;
         }
-        public static GcMode WithConcurrent(this GcMode mode, bool value)
-        {
-            mode = new GcMode().Apply(mode);
-            mode.Concurrent = value;
-            return mode;
-        }
-        public static GcMode WithCpuGroups(this GcMode mode, bool value)
-        {
-            mode = new GcMode().Apply(mode);
-            mode.CpuGroups = value;
-            return mode;
-        }
-        public static GcMode WithForce(this GcMode mode, bool value)
-        {
-            mode = new GcMode().Apply(mode);
-            mode.Force = value;
-            return mode;
-        }
-        public static GcMode WithAllowVeryLargeObjects(this GcMode mode, bool value)
-        {
-            mode = new GcMode().Apply(mode);
-            mode.AllowVeryLargeObjects = value;
-            return mode;
-        }
+
+        public static GcMode WithServer(this GcMode mode, bool value) => mode.WithCore(m => m.Server = value);
+        public static GcMode WithConcurrent(this GcMode mode, bool value) => mode.WithCore(m => m.Concurrent = value);
+        public static GcMode WithCpuGroups(this GcMode mode, bool value) => mode.WithCore(m => m.CpuGroups = value);
+        public static GcMode WithForce(this GcMode mode, bool value) => mode.WithCore(m => m.Force = value);
+        public static GcMode WithAllowVeryLargeObjects(this GcMode mode, bool value) => mode.WithCore(m => m.AllowVeryLargeObjects = value);
     }
 }
