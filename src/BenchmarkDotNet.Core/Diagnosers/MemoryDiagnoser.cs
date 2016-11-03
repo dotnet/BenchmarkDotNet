@@ -7,6 +7,7 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using System.Linq;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -55,6 +56,9 @@ namespace BenchmarkDotNet.Diagnosers
             public string GetValue(Summary summary, Benchmark benchmark)
             {
 #if !CORE
+                if (RuntimeInformation.IsMono())
+                    return "?";
+
                 if (results.ContainsKey(benchmark))
                 {
                     var result = results[benchmark];

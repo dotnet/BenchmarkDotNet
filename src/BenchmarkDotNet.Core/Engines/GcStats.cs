@@ -1,4 +1,5 @@
 ﻿using System;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Engines
 {
@@ -79,7 +80,7 @@ namespace BenchmarkDotNet.Engines
 #if NETCOREAPP11 // when MS releases new version of .NET Runtime to nuget.org
             return GC.GetAllocatedBytesForCurrentThread(); // https://github.com/dotnet/corefx/pull/12489
 #elif CLASSIC
-            if (!isDiagnosticsEnabled)
+            if (!isDiagnosticsEnabled || RuntimeInformation.IsMono()) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-
                 return 0;
 
             // "This instance Int64 property returns the number of bytes that have been allocated by a specific 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
@@ -172,6 +173,9 @@ namespace BenchmarkDotNet.Engines
             if(!IsDiagnoserAttached) // it could affect the results, we do this in separate, diagnostics-only run
                 return;
 #if CLASSIC
+            if(RuntimeInformation.IsMono()) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-in-mono
+                return;
+
             AppDomain.MonitoringIsEnabled = true;
 #endif
         }
