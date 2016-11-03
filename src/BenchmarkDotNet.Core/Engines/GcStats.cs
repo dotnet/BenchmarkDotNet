@@ -23,6 +23,8 @@ namespace BenchmarkDotNet.Engines
         public long AllocatedBytes { get; }
         public long TotalOperations { get; }
 
+        public long BytesAllocatedPerOperation => AllocatedBytes / TotalOperations;
+
         public static GcStats operator +(GcStats left, GcStats right)
         {
             return new GcStats(
