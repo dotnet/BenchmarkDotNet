@@ -60,7 +60,21 @@ namespace BenchmarkDotNet.IntegrationTests
             Equal(j.Env.Gc.AllowVeryLargeObjects, false);
             Equal(j.Env.Platform, Platform.AnyCpu);
             Equal(j.Run.RunStrategy, RunStrategy.Throughput); // set by default
-            Equal(j.Id, "Default"); // id reset on copy
+            Equal(j.Id, "Default"); // id reset
+            True(j.DisplayInfo.StartsWith("Job-"));
+            True(j.ResolvedId.StartsWith("Job-"));
+            Equal(j.ResolvedId, j.FolderInfo);
+            Equal(j.Env.Id, "Default");
+
+            // new job
+            j = new Job(j.Freeze());
+            Equal(j.Frozen, false);
+            Equal(j.Env.Frozen, false);
+            Equal(j.Run.Frozen, false);
+            Equal(j.Env.Gc.AllowVeryLargeObjects, false);
+            Equal(j.Env.Platform, Platform.AnyCpu);
+            Equal(j.Run.RunStrategy, RunStrategy.Throughput); // set by default
+            Equal(j.Id, "Default"); // id reset
             True(j.DisplayInfo.StartsWith("Job-"));
             True(j.ResolvedId.StartsWith("Job-"));
             Equal(j.ResolvedId, j.FolderInfo);
@@ -70,8 +84,9 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public static void Test02Modify()
         {
-            var j = new Job();
+            var j = new Job("SomeId");
 
+            Equal(j.Id, "SomeId");
             Equal(j.Env.Platform, Platform.AnyCpu);
             Equal(j.Run.LaunchCount, 0);
 
@@ -84,9 +99,10 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertProperties(j.Env, "Default");
 
             // 1. change values
-            j.Run.LaunchCount = 1;
             j.Env.Platform = Platform.X64;
+            j.Run.LaunchCount = 1;
 
+            Equal(j.Id, "SomeId");
             Equal(j.Env.Platform, Platform.X64);
             Equal(j.Run.LaunchCount, 1);
 
@@ -103,6 +119,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var oldEnv = j.Env;
             Job.EnvCharacteristic[j] = new EnvMode();
 
+            Equal(j.Id, "SomeId");
             Equal(j.Env.Platform, Platform.AnyCpu);
             Equal(j.Run.LaunchCount, 1);
 
@@ -116,6 +133,7 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertProperties(j.Run, "LaunchCount=1");
 
             // 2.1 proof that oldEnv was the same
+            Equal(j.Id, "SomeId");
             Equal(oldEnv.Platform, Platform.X64);
             True(oldEnv.HasValue(EnvMode.PlatformCharacteristic));
             Equal(oldEnv.Id, "Platform=X64");
@@ -126,6 +144,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 Platform = Platform.X86
             };
 
+            Equal(j.Id, "SomeId");
             Equal(j.Env.Platform, Platform.X86);
             Equal(j.Run.LaunchCount, 1);
 
@@ -141,6 +160,7 @@ namespace BenchmarkDotNet.IntegrationTests
             // 4. Freeze-unfreeze:
             j = j.Freeze().UnfreezeCopy();
 
+            Equal(j.Id, "Platform=X86, LaunchCount=1");
             Equal(j.Env.Platform, Platform.X86);
             Equal(j.Run.LaunchCount, 1);
 
@@ -152,26 +172,70 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertProperties(j, "Platform=X86, LaunchCount=1");
             AssertProperties(j.Env, "Platform=X86");
             AssertProperties(j.Run, "LaunchCount=1");
+
+            // 5. Test .With extensions
+            j = j.Freeze()
+                .WithId("NewId");
+            Equal(j.Id, "NewId"); // id set
+
+            j = j.Freeze()
+                .With(Platform.X64)
+                .WithLaunchCount(2);
+
+            Equal(j.Id, "Platform=X64, LaunchCount=2"); // id lost
+            Equal(j.Env.Platform, Platform.X64);
+            Equal(j.Run.LaunchCount, 2);
+
+            True(j.HasValue(EnvMode.PlatformCharacteristic));
+            True(j.Env.HasValue(EnvMode.PlatformCharacteristic));
+            True(j.HasValue(RunMode.LaunchCountCharacteristic));
+            True(j.Run.HasValue(RunMode.LaunchCountCharacteristic));
+
+            AssertProperties(j, "Platform=X64, LaunchCount=2");
+            AssertProperties(j.Env, "Platform=X64");
+            AssertProperties(j.Run, "LaunchCount=2");
+
         }
 
 
         [Fact]
-        public static void Test02Id()
+        public static void Test03IdDoesNotFlow()
         {
-            // TODO: more checks
-            var j = new Job(EnvMode.LegacyJitX64, RunMode.Long);
+            var j = new Job(EnvMode.LegacyJitX64, RunMode.Long); // id will not flow, new Job
+            False(j.HasValue(JobMode.IdCharacteristic));
+            False(j.Env.HasValue(JobMode.IdCharacteristic));
+
+            Job.EnvCharacteristic[j] = EnvMode.LegacyJitX86.UnfreezeCopy(); // id will not flow
+            False(j.HasValue(JobMode.IdCharacteristic));
+            False(j.Env.HasValue(JobMode.IdCharacteristic));
+
+            var c = new CharacteristicSet(EnvMode.LegacyJitX64, RunMode.Long); // id will not flow, new CharacteristicSet
+            False(c.HasValue(JobMode.IdCharacteristic));
+
+            Job.EnvCharacteristic[c] = EnvMode.LegacyJitX86.UnfreezeCopy(); // id will not flow
+            False(c.HasValue(JobMode.IdCharacteristic));
+
+            JobMode.IdCharacteristic[c] = "MyId"; // id set explicitly
+            Equal(c.Id, "MyId");
+
+            j = new Job("MyId", EnvMode.LegacyJitX64, RunMode.Long); // id set explicitly
+            Equal(j.Id, "MyId");
+            Equal(j.Env.Id, "MyId");
+
+            Job.EnvCharacteristic[j] = EnvMode.LegacyJitX86.UnfreezeCopy(); // id will not flow
+            Equal(j.Id, "MyId");
+            Equal(j.Env.Id, "MyId");
+
+            j = j.With(Jit.RyuJit);  // id will not flow
             False(j.HasValue(JobMode.IdCharacteristic));
         }
 
         [Fact]
-        public static void Test03Apply()
+        public static void Test04Apply()
         {
             var j = new Job()
             {
-                Run =
-                {
-                    TargetCount = 1
-                }
+                Run = { TargetCount = 1 }
             };
 
             AssertProperties(j, "TargetCount=1");
@@ -179,35 +243,18 @@ namespace BenchmarkDotNet.IntegrationTests
             j.Apply(
                 new Job
                 {
-                    Env =
-                    {
-                        Platform = Platform.X64
-                    },
-                    Run =
-                    {
-                        TargetCount = 2
-                    }
+                    Env = { Platform = Platform.X64 },
+                    Run = { TargetCount = 2 }
                 });
             AssertProperties(j, "Platform=X64, TargetCount=2");
 
             // filter by properties
             j.Env.Apply(
-                new Job
-                {
-                    Env =
-                    {
-                        Jit = Jit.RyuJit,
-                        Gc =
-                        {
-                            AllowVeryLargeObjects = true
-                        }
-                    },
-                    Run =
-                    {
-                        TargetCount = 3, // does not belong to env
-						LaunchCount = 22
-                    }
-                });
+                new Job()
+                    .With(Jit.RyuJit)
+                    .WithGcAllowVeryLargeObjects(true)
+                    .WithTargetCount(3)
+                    .WithLaunchCount(22));
             AssertProperties(j, "Jit=RyuJit, Platform=X64, AllowVeryLargeObjects=True, TargetCount=2");
 
             // apply subnode
@@ -224,7 +271,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public static void Test04ApplyCharacteristicSet()
+        public static void Test05ApplyCharacteristicSet()
         {
             var set1 = new CharacteristicSet();
             var set2 = new CharacteristicSet();
@@ -280,7 +327,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public static void Test05CharacteristicHacks()
+        public static void Test06CharacteristicHacks()
         {
             var j = new Job();
             Equal(j.Run.TargetCount, 0);
@@ -317,7 +364,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public static void Test06GetCharacteristics()
+        public static void Test07GetCharacteristics()
         {
             // Update expected values only if Job properties were changed.
             // Otherwise, there's a bug.
@@ -328,7 +375,7 @@ namespace BenchmarkDotNet.IntegrationTests
             a = CharacteristicHelper
                 .GetAllCharacteristics(typeof(Job))
                 .Select(c => c.Id);
-            Equal(string.Join(";", a), "Id;Accuracy;AnaylyzeLaunchVariance;EvaluateOverhead;" +
+            Equal(string.Join(";", a), "Id;Accuracy;AnalyzeLaunchVariance;EvaluateOverhead;" +
                 "MaxStdErrRelative;MinInvokeCount;MinIterationTime;RemoveOutliers;Env;Affinity;" +
                 "Jit;Platform;Runtime;Gc;AllowVeryLargeObjects;Concurrent;CpuGroups;Force;" +
                 "Server;Infrastructure;Clock;EngineFactory;Toolchain;Run;InvocationCount;IterationTime;" +

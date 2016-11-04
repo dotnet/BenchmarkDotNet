@@ -99,9 +99,33 @@ namespace BenchmarkDotNet.Characteristics
         public bool Frozen => Owner?.Frozen ?? frozen;
 
         protected virtual bool IsPropertyBag => false;
+
+        public bool HasChanges => GetCharacteristicsWithValues().Any(c => c.IsPresentableCharacteristic());
+        #endregion
+
+        #region  GetCharacteristics helpers
+        public IEnumerable<Characteristic> GetCharacteristicsWithValues() =>
+            IsPropertyBag
+                ? sharedValues.Keys.OrderBy(c => c.Id)
+                : this.GetAllCharacteristics().Where(HasValue);
+
+        private IEnumerable<Characteristic> GetCharacteristicsToApply() =>
+           IsPropertyBag
+                ? sharedValues.Keys.Where(c => !c.IgnoreOnApply).OrderBy(c => c.Id)
+                : this.GetAllCharacteristics().Where(c => !c.IgnoreOnApply);
+
+        private IEnumerable<Characteristic> GetCharacteristicsToApply(JobMode other)
+        {
+            var result = other.GetCharacteristicsToApply();
+            if (GetType() != other.GetType() && !IsPropertyBag)
+                result = result.Intersect(this.GetAllCharacteristics());
+
+            return result;
+        }
         #endregion
 
         #region Get or set value
+        #region Get value
         public bool HasValue(Characteristic characteristic)
         {
             object result;
@@ -111,39 +135,6 @@ namespace BenchmarkDotNet.Characteristics
             return false;
         }
 
-        public object ResolveValue(Characteristic characteristic, IResolver resolver)
-        {
-            return resolver.Resolve(this, characteristic);
-        }
-
-        public object ResolveValue(Characteristic characteristic, object defaultValue)
-        {
-            return HasValue(characteristic) ? GetValue(characteristic) : characteristic.ResolveValueCore(this, defaultValue);
-        }
-
-        public T ResolveValue<T>(Characteristic<T> characteristic, IResolver resolver)
-        {
-            return resolver.Resolve(this, characteristic);
-        }
-
-        public T ResolveValue<T>(Characteristic<T> characteristic, T defaultValue)
-        {
-            return HasValue(characteristic) ? GetValue(characteristic) : (T)characteristic.ResolveValueCore(this, defaultValue);
-        }
-
-        public T? ResolveValueAsNullable<T>(Characteristic<T> characteristic) where T : struct
-        {
-            return HasValue(characteristic) ? GetValue(characteristic) : (T?)null;
-        }
-
-        public IEnumerable<Characteristic> GetCharacteristicsWithValues() =>
-            IsPropertyBag
-                ? sharedValues.Keys.OrderBy(c => c.Id)
-                : this.GetAllCharacteristics().Where(HasValue);
-
-        public bool HasChanges => GetCharacteristicsWithValues().Any(c => c.IsPresentableCharacteristic());
-
-        #region Get value
         internal T GetValue<T>(Characteristic<T> characteristic)
         {
             return (T)GetValue((Characteristic)characteristic);
@@ -161,6 +152,33 @@ namespace BenchmarkDotNet.Characteristics
         private object ResolveCore(Characteristic characteristic, object result)
         {
             return characteristic.ResolveValueCore(this, result);
+        }
+        #endregion
+
+        #region Resolve
+        public T ResolveValue<T>(Characteristic<T> characteristic, IResolver resolver)
+        {
+            return resolver.Resolve(this, characteristic);
+        }
+
+        public object ResolveValue(Characteristic characteristic, IResolver resolver)
+        {
+            return resolver.Resolve(this, characteristic);
+        }
+
+        public T ResolveValue<T>(Characteristic<T> characteristic, T defaultValue)
+        {
+            return HasValue(characteristic) ? GetValue(characteristic) : (T)characteristic.ResolveValueCore(this, defaultValue);
+        }
+
+        public object ResolveValue(Characteristic characteristic, object defaultValue)
+        {
+            return HasValue(characteristic) ? GetValue(characteristic) : characteristic.ResolveValueCore(this, defaultValue);
+        }
+
+        public T? ResolveValueAsNullable<T>(Characteristic<T> characteristic) where T : struct
+        {
+            return HasValue(characteristic) ? GetValue(characteristic) : (T?)null;
         }
         #endregion
 
@@ -183,8 +201,6 @@ namespace BenchmarkDotNet.Characteristics
 
                 if (!ReferenceEquals(oldJobValue, newJobValue))
                 {
-                    newJobValue?.AssertIsNonFrozenRoot();
-
                     oldJobValue?.DetachFromOwner(characteristic);
                     newJobValue?.AttachToOwner(OwnerOrSelf, characteristic);
                 }
@@ -217,7 +233,7 @@ namespace BenchmarkDotNet.Characteristics
 
                     sharedValues[characteristic] = jobMode;
                 }
-                else if (!characteristic.DontClone || !sharedValues.ContainsKey(characteristic))
+                else
                 {
                     sharedValues[characteristic] = value;
                 }
@@ -237,6 +253,33 @@ namespace BenchmarkDotNet.Characteristics
             frozen = false;
         }
 
+        private void DetachFromOwner(Characteristic thisCharacteristic)
+        {
+            AssertNotFrozen();
+            if (IsPropertyBag)
+                throw new InvalidOperationException("The property bag has no owner.");
+
+            if (Owner == null)
+                return;
+
+            var oldValues = sharedValues;
+
+            owner = null;
+            sharedValues = new Dictionary<Characteristic, object>();
+            frozen = false;
+
+            oldValues.Remove(thisCharacteristic);
+            foreach (var characteristic in GetCharacteristicsToApply())
+            {
+                object value;
+                if (oldValues.TryGetValue(characteristic, out value))
+                {
+                    oldValues.Remove(characteristic);
+                    SetValueCore(characteristic, value);
+                }
+            }
+        }
+
         private void AttachToOwner(JobMode newOwnerJob, Characteristic thisCharacteristic)
         {
             if (newOwnerJob == null)
@@ -250,41 +293,27 @@ namespace BenchmarkDotNet.Characteristics
 
             var oldValues = sharedValues;
 
-            newOwnerJob.SetValueCore(thisCharacteristic, this);
+            newOwnerJob.SetValueOnAttach(thisCharacteristic, this);
             foreach (var pair in oldValues)
             {
-                newOwnerJob.SetValueCore(pair.Key, pair.Value);
+                newOwnerJob.SetValueOnAttach(pair.Key, pair.Value);
             }
         }
 
-        private void DetachFromOwner(Characteristic thisCharacteristic)
+        private void SetValueOnAttach(Characteristic characteristic, object value)
         {
-            AssertNotFrozen();
+            AssertIsAssignable(characteristic, value);
 
-            if (Owner == null)
-                return;
-            if (IsPropertyBag)
-                throw new InvalidOperationException("The property bag has no owner.");
-
-            var oldValues = sharedValues;
-
-            owner = null;
-            sharedValues = new Dictionary<Characteristic, object>();
-            frozen = false;
-
-            oldValues.Remove(thisCharacteristic);
-            foreach (var characteristic in this.GetAllCharacteristics())
+            if (characteristic.HasChildCharacteristics)
             {
-                object value;
-                if (oldValues.TryGetValue(characteristic, out value))
-                {
-                    oldValues.Remove(characteristic);
-                    SetValueCore(characteristic, value);
-                }
+                // DONTTOUCH: workaround on case there were no parent characteristic.
+                var jobMode = (JobMode)GetValue(characteristic);
+                jobMode?.DetachFromOwner(characteristic);
             }
+
+            SetValueCore(characteristic, value);
         }
         #endregion
-
         #endregion
 
         #region Apply
@@ -322,25 +351,13 @@ namespace BenchmarkDotNet.Characteristics
                         SetValueCore(characteristic, value);
                     }
                 }
-                else if (!characteristic.DontClone)
+                else
                 {
                     SetValueCore(characteristic, value);
                 }
             }
 
             return this;
-        }
-
-        private IEnumerable<Characteristic> GetCharacteristicsToApply(
-            JobMode other)
-        {
-            var result = other.GetCharacteristicsWithValues();
-            if (GetType() != other.GetType() && !IsPropertyBag)
-            {
-                result = result.Intersect(this.GetAllCharacteristics());
-            }
-
-            return result;
         }
         #endregion
 
@@ -364,7 +381,7 @@ namespace BenchmarkDotNet.Characteristics
             AssertIsRoot();
 
             var newRoot = (JobMode)Activator.CreateInstance(GetType());
-            newRoot.Apply(this);
+            newRoot.ApplyCore(this);
 
             return newRoot;
         }

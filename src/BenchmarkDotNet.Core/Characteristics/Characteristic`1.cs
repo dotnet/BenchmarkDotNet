@@ -9,8 +9,8 @@ namespace BenchmarkDotNet.Characteristics
             Type declaringType,
             Func<JobMode, T, T> resolver,
             T fallbackValue,
-            bool dontClone)
-            : base(id, typeof(T), declaringType, fallbackValue, dontClone)
+            bool ignoreOnApply)
+            : base(id, typeof(T), declaringType, fallbackValue, ignoreOnApply)
         {
             Resolver = resolver;
             FallbackValue = fallbackValue;

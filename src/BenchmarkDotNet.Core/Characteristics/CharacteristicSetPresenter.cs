@@ -12,10 +12,10 @@ namespace BenchmarkDotNet.Characteristics
 
         public abstract string ToPresentation(JobMode jobMode);
 
-        protected virtual IEnumerable<Characteristic> GetPresentableCharacteristics(JobMode jobMode, bool withDontClone = false) =>
+        protected virtual IEnumerable<Characteristic> GetPresentableCharacteristics(JobMode jobMode, bool includeIgnoreOnApply = false) =>
             jobMode
                 .GetCharacteristicsWithValues()
-                .Where(c => c.IsPresentableCharacteristic(withDontClone));
+                .Where(c => c.IsPresentableCharacteristic(includeIgnoreOnApply));
 
         private class DefaultPresenter : CharacteristicSetPresenter
         {
@@ -57,8 +57,6 @@ namespace BenchmarkDotNet.Characteristics
             }
         }
 
-        // TODO: add new T() line to the code.
-        // OR: make this work with  CharacteristicSet ONLY!!!
         private class SourceCodePresenter : CharacteristicSetPresenter
         {
             private const string Separator = "; ";
@@ -66,7 +64,7 @@ namespace BenchmarkDotNet.Characteristics
 
             public override string ToPresentation(JobMode jobMode)
             {
-                var values = GetPresentableCharacteristics(jobMode, withDontClone: true)
+                var values = GetPresentableCharacteristics(jobMode, includeIgnoreOnApply: true)
                     .Select(c => CharacteristicPresenter.ToPresentation(jobMode, c));
                 return string.Join(Separator, values);
             }

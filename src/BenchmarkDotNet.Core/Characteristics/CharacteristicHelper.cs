@@ -34,8 +34,8 @@ namespace BenchmarkDotNet.Characteristics
             where TOwner : JobMode =>
                 ((MemberExpression)propertyGetterExpression.Body).Member.DeclaringType;
 
-        public static bool IsPresentableCharacteristic(this Characteristic c, bool withDontClone = false) =>
-            !c.HasChildCharacteristics && (withDontClone || !c.DontClone);
+        public static bool IsPresentableCharacteristic(this Characteristic c, bool includeIgnoreOnApply = false) =>
+            !c.HasChildCharacteristics && (includeIgnoreOnApply || !c.IgnoreOnApply);
         #endregion
 
         #region Type characteristics
@@ -121,9 +121,9 @@ namespace BenchmarkDotNet.Characteristics
             }
         }
 
-        public static IReadOnlyList<Characteristic> GetAllPresentableCharacteristics(Type jobModeType, bool withDontClone = false) =>
+        public static IReadOnlyList<Characteristic> GetAllPresentableCharacteristics(Type jobModeType, bool includeIgnoreOnApply = false) =>
             GetAllCharacteristics(jobModeType)
-                .Where(c => c.IsPresentableCharacteristic(withDontClone))
+                .Where(c => c.IsPresentableCharacteristic(includeIgnoreOnApply))
                 .ToArray();
         #endregion
     }
