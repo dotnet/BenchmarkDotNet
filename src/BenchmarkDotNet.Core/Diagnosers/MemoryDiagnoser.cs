@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Diagnosers
             }
 
             public string Id => nameof(AllocationColumn);
-            public string ColumnName => "Bytes Allocated/Op";
+            public string ColumnName => "Bytes Allocated";
             public bool IsDefault(Summary summary, Benchmark benchmark) => false;
             public bool IsAvailable(Summary summary) => true;
             public bool AlwaysShow => true;
@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Diagnosers
 
             public bool IsDefault(Summary summary, Benchmark benchmark) => true;
             public string Id => $"{nameof(GCCollectionColumn)}{generation}";
-            public string ColumnName => $"Gen {generation}/op";
+            public string ColumnName => $"Gen {generation}";
             public bool IsAvailable(Summary summary) => true;
             public bool AlwaysShow => true;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
@@ -95,7 +95,7 @@ namespace BenchmarkDotNet.Diagnosers
                     if (value == 0)
                         return "-"; // make zero more obvious
 
-                    return (value / (double)gcStats.TotalOperations).ToString("N6", HostEnvironmentInfo.MainCultureInfo);
+                    return (value / (double)gcStats.TotalOperations).ToString("#0.000‰", HostEnvironmentInfo.MainCultureInfo);
                 }
                 return "N/A";
             }
