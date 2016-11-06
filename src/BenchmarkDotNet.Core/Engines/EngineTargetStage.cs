@@ -37,6 +37,8 @@ namespace BenchmarkDotNet.Engines
         private List<Measurement> RunAuto(long invokeCount, IterationMode iterationMode, int unrollFactor)
         {
             var measurements = new List<Measurement>(MaxIterationCount);
+            var measurementsForStatistics = new List<Measurement>(MaxIterationCount);
+
             int iterationCounter = 0;
             bool isIdle = iterationMode.IsIdle();
             double maxErrorRelative = isIdle ? MaxIdleStdErrRelative : maxStdErrRelative;
@@ -45,8 +47,9 @@ namespace BenchmarkDotNet.Engines
                 iterationCounter++;
                 var measurement = RunIteration(iterationMode, iterationCounter, invokeCount, unrollFactor);
                 measurements.Add(measurement);
+                measurementsForStatistics.Add(measurement);
 
-                var statistics = MeasurementsStatistics.Calculate(measurements, removeOutliers);
+                var statistics = MeasurementsStatistics.Calculate(measurementsForStatistics, removeOutliers);
                 double actualError = statistics.StandardError;
                 double maxError = maxErrorRelative * statistics.Mean;
 
