@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Toolchains.Core
         {
             // do not set the type to platform in order to produce exe
             // https://github.com/dotnet/core/issues/77#issuecomment-219692312
-            return "\"dependencies\": { \"Microsoft.NETCore.App\": { \"version\": \"1.0.0\" } },";
+            return "\"dependencies\": { \"Microsoft.NETCore.App\": { \"version\": \"1.*\" } },";
         }
 
         private static string GetImports()
