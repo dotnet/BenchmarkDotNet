@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.Tests
             using (var source = new StringReader(customSettings))
             using (var destination = new Utf8StringWriter())
             {
-                AppConfigGenerator.Generate(Job.Default.With(jit), source, destination, Resolver);
+                AppConfigGenerator.Generate(new Job { Env = { Jit = jit }}.Freeze(), source, destination, Resolver);
 
                 AssertAreEqualIgnoringWhitespacesAndCase(customSettingsAndJit, destination.ToString());
             }

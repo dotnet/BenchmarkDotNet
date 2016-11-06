@@ -29,12 +29,15 @@ namespace BenchmarkDotNet.Exporters
 
             var fileNamePrefix = Path.Combine(summary.ResultsDirectoryPath, summary.Title);
             var scriptFullPath = Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
-            var script = ResourceHelper.LoadTemplate(scriptFileName).Replace("$BenchmarkDotNetVersion$", BenchmarkDotNetInfo.FullTitle);
+            var script = ResourceHelper.
+                LoadTemplate(scriptFileName).
+                Replace("$BenchmarkDotNetVersion$", BenchmarkDotNetInfo.FullTitle).
+                Replace("$CsvSeparator$", CsvMeasurementsExporter.Default.Separator);
             lock (buildScriptLock)
                 File.WriteAllText(scriptFullPath, script);
 
             // TODO: implement smart autodetection of the R bin folder
-            var rHome = Environment.GetEnvironmentVariable("R_HOME") ?? @"C:\Program Files\R\R-3.3.1\bin\";
+            var rHome = Environment.GetEnvironmentVariable("R_HOME");
             if (Directory.Exists(rHome))
             {
                 var start = new ProcessStartInfo

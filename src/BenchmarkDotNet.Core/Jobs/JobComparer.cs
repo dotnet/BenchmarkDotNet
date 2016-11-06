@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using BenchmarkDotNet.Characteristics;
 
 namespace BenchmarkDotNet.Jobs
 {
@@ -10,25 +10,43 @@ namespace BenchmarkDotNet.Jobs
 
         public int Compare(Job x, Job y)
         {
-            var xp = x.ToSet().GetValues().ToArray();
-            var yp = y.ToSet().GetValues().ToArray();
-            if (xp.Length != yp.Length)
-                throw new InvalidOperationException("xJob.Length != yJob.Length");
-            for (int i = 0; i < xp.Length; i++)
+            if (ReferenceEquals(x, y))
+                return 0;
+
+            if (x == null)
+                return -1;
+
+            if (y == null)
+                return 1;
+
+            if (x.GetType()!=y.GetType())
+                throw new InvalidOperationException($"The type of xJob ({x.GetType()}) != type of yJob ({y.GetType()})");
+
+            var presenter = CharacteristicPresenter.DefaultPresenter;
+
+            foreach (var characteristic in x.GetAllCharacteristics())
             {
-                if (xp[i].Id != yp[i].Id)
-                    throw new InvalidOperationException($"xJob[{i}].Id != yJob[{i}].Id");
-                if (xp[i].IsDefault && yp[i].IsDefault)
+                if (!x.HasValue(characteristic))
+                {
+                    if (y.HasValue(characteristic))
+                        return -1;
                     continue;
-                if (xp[i].IsDefault && !yp[i].IsDefault)
-                    return 1;
-                if (!xp[i].IsDefault && yp[i].IsDefault)
-                    return -1;
-                var jobCompare = string.CompareOrdinal(xp[i].ObjectValue.ToString(), yp[i].ObjectValue.ToString());
-                if (jobCompare != 0)
-                    return jobCompare;
+                }
+                if (!y.HasValue(characteristic))
+                {
+                    if (x.HasValue(characteristic))
+                        return 1;
+                    continue;
+                }
+
+                var compare = string.CompareOrdinal(
+                    presenter.ToPresentation(x, characteristic),
+                    presenter.ToPresentation(y, characteristic));
+                if (compare != 0)
+                    return compare;
             }
-            return string.CompareOrdinal(x.DisplayInfo, y.DisplayInfo);
+
+            return 0;
         }
     }
 }

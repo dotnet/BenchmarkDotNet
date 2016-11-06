@@ -108,7 +108,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         {
             string template = ResourceHelper.LoadTemplate("BenchmarkProject.json");
 
-            string content = SetPlatform(template, PlatformProvider(benchmark.Job.Env.Platform.Resolve(resolver)));
+            string content = SetPlatform(template, PlatformProvider(benchmark.Job.ResolveValue(EnvMode.PlatformCharacteristic, resolver)));
             content = SetCodeFileName(content, Path.GetFileName(artifactsPaths.ProgramCodePath));
             content = SetDependencyToExecutingAssembly(content, benchmark.Target.Type);
             content = SetTargetFrameworkMoniker(content, TargetFrameworkMoniker);
@@ -152,12 +152,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         private static string SetGcMode(string content, GcMode gcMode, IResolver resolver)
         {
-            if (gcMode.ToSet().GetValues().All(c => c.IsDefault))
+            if (!gcMode.HasChanges)
                 return content.Replace("$GC$", null);
 
             return content.Replace(
                 "$GC$",
-                $"\"runtimeOptions\": {{ \"configProperties\": {{ \"System.GC.Concurrent\": {gcMode.Concurrent.Resolve(resolver).ToLowerCase()}, \"System.GC.Server\": {gcMode.Server.Resolve(resolver).ToLowerCase()} }} }}, ");
+                $"\"runtimeOptions\": {{ \"configProperties\": {{ " +
+                $"\"System.GC.Concurrent\": {gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver).ToLowerCase()}, " +
+                $"\"System.GC.Server\": {gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase()} }} }}, ");
         }
 
         private static string GetPackageVersion(AssemblyName assemblyName)

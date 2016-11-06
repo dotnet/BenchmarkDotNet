@@ -1,5 +1,4 @@
 ﻿using System;
-using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 
@@ -9,9 +8,9 @@ namespace BenchmarkDotNet.Toolchains
     {
         internal static IToolchain GetToolchain(this Job job)
         {
-            return job.Infrastructure.Toolchain.IsDefault
-                ? GetToolchain(job.Env.Runtime.Resolve(EnvResolver.Instance))
-                : job.Infrastructure.Toolchain.SpecifiedValue;
+            return job.HasValue(InfrastructureMode.ToolchainCharacteristic)
+                ? job.Infrastructure.Toolchain
+                : GetToolchain(job.ResolveValue(EnvMode.RuntimeCharacteristic, EnvResolver.Instance));
         }
 
         internal static IToolchain GetToolchain(this Runtime runtime)

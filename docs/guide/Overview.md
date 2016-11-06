@@ -98,13 +98,12 @@ public class Md5VsSha256
     {
         public Config()
         {
-            Add(Job.Default.
-                With(Platform.X86).
-                With(Jit.LegacyJit).
-                With(Runtime.Clr).
-                WithLaunchCount(3).
-                WithWarmupCount(5).
-                WithTargetCount(10));
+            Add(new Job(EnvMode.LegacyJitX86, EnvMode.Clr, RunMode.Dry)
+                {
+                    Env = { Runtime = Runtime.Core },
+                    Run = { LaunchCount = 3, WarmupCount = 5, TargetCount = 10 },
+                    Accuracy = { MaxStdErrRelative = 0.01 }
+                }));
         }
     }
 ```

@@ -1,65 +1,102 @@
 ﻿using System;
+using System.Linq.Expressions;
+
+using static BenchmarkDotNet.Characteristics.CharacteristicHelper;
 
 namespace BenchmarkDotNet.Characteristics
 {
-    public class Characteristic<T> : ICharacteristic<T>
+    public abstract class Characteristic
     {
-        public static Characteristic<T> Create(params string[] id) => new Characteristic<T>(id);
+        public static readonly object EmptyValue = new object();
+
+        #region Factory methods
+        public static Characteristic<T> Create<TOwner, T>(
+            Expression<Func<TOwner, T>> propertyGetterExpression)
+            where TOwner : JobMode =>
+            new Characteristic<T>(
+                GetMemberName(propertyGetterExpression),
+                GetDeclaringType(propertyGetterExpression),
+                null, default(T),
+                false);
+
+        public static Characteristic<T> Create<TOwner, T>(
+            Expression<Func<TOwner, T>> propertyGetterExpression,
+            T fallbackValue)
+            where TOwner : JobMode =>
+            new Characteristic<T>(
+                GetMemberName(propertyGetterExpression),
+                GetDeclaringType(propertyGetterExpression),
+                null, fallbackValue,
+                false);
+
+        public static Characteristic<T> Create<TOwner, T>(
+            Expression<Func<TOwner, T>> propertyGetterExpression,
+            Func<JobMode, T, T> resolver,
+            T fallbackValue)
+            where TOwner : JobMode =>
+            new Characteristic<T>(
+                GetMemberName(propertyGetterExpression),
+                GetDeclaringType(propertyGetterExpression),
+                resolver, fallbackValue,
+                false);
+
+        public static Characteristic<T> Create<TOwner, T>(
+            Expression<Func<TOwner, T>> propertyGetterExpression,
+            Func<JobMode, T, T> resolver,
+            T fallbackValue,
+            bool ignoreOnApply)
+            where TOwner : JobMode =>
+            new Characteristic<T>(
+                GetMemberName(propertyGetterExpression),
+                GetDeclaringType(propertyGetterExpression),
+                resolver, fallbackValue,
+                ignoreOnApply);
+        #endregion
+
+        protected Characteristic(
+            string id,
+            Type characteristicType,
+            Type declaringType,
+            object fallbackValue,
+            bool ignoreOnApply)
+        {
+            if (string.IsNullOrEmpty(id))
+                throw new ArgumentNullException(nameof(id));
+            if (characteristicType == null)
+                throw new ArgumentNullException(nameof(characteristicType));
+            if (declaringType == null)
+                throw new ArgumentNullException(nameof(declaringType));
+
+            Id = id;
+            CharacteristicType = characteristicType;
+            DeclaringType = declaringType;
+            FallbackValue = fallbackValue;
+            IgnoreOnApply = ignoreOnApply;
+        }
 
         public string Id { get; }
-        public bool IsDefault { get; }
+        public string FullId => DeclaringType.Name + "." + Id;
 
-        private readonly T specifiedValue;
+        // TODO: better naming. As it is for now this property used for Id only and has meaning "if set, will not transfer to others nor be cleared".
+        public bool IgnoreOnApply { get; }
 
-        public T SpecifiedValue
+        public Type CharacteristicType { get; }
+
+        public Type DeclaringType { get; }
+
+        public object FallbackValue { get; }
+
+        public object this[JobMode obj]
         {
-            get
-            {
-                if (IsDefault)
-                    throw new InvalidOperationException("There is no a specified value for default");
-                return specifiedValue;
-            }
+            get { return obj.GetValue(this); }
+            set { obj.SetValue(this, value); }
         }
 
-        public object ObjectValue => SpecifiedValue;
+        public bool HasChildCharacteristics => IsJobModeSubclass(CharacteristicType);
 
-        private Characteristic(params string[] id)
-        {
-            Id = string.Join(CharacteristicHelper.IdSeparator, id);
-            IsDefault = true;
-        }
+        internal virtual object ResolveValueCore(JobMode obj, object currentValue) =>
+            ReferenceEquals(currentValue, EmptyValue) ? FallbackValue : currentValue;
 
-        private Characteristic(string id, T specifiedValue)
-        {
-            Id = id;
-            IsDefault = false;
-            this.specifiedValue = specifiedValue;
-        }
-
-        public ICharacteristic<T> MakeDefault() => new Characteristic<T>(Id);
-
-        public ICharacteristic<T> Mutate(T value) => new Characteristic<T>(Id, value);
-
-        public ICharacteristic Mutate(object value)
-        {
-            if (value is T)
-                return Mutate((T) value);
-            throw new ArgumentException($"value should be an instance of {typeof(T).FullName}", nameof(value));
-        }
-
-        public ICharacteristic<T> Mutate(CharacteristicSet set)
-        {
-            var generic = set.Get(Id);
-            if (generic != null)
-            {
-                if (generic.IsDefault)
-                    return Create(Id);
-                var value = generic.ObjectValue;
-                if (value is T)
-                    return Mutate((T) value);
-                throw new InvalidOperationException($"CharacteristicSet contains an element with id = {Id} but the value isn't an instance of {typeof(T).Name}");
-            }
-            return this;
-        }
+        public override string ToString() => Id;
     }
 }

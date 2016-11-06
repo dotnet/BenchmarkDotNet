@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public PlatformConfig(Platform platform)
             {
-                Add(Job.Dry.With(platform));
+                Add(new Job(Job.Dry) { Env = { Platform = platform } });
             }
         }
 

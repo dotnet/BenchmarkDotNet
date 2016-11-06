@@ -1,7 +1,6 @@
-﻿using System.Linq;
+﻿using System;
 using BenchmarkDotNet.Core.Helpers;
-using SimpleJson.Reflection;
-using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.Characteristics
@@ -13,32 +12,41 @@ namespace BenchmarkDotNet.Characteristics
         public static readonly CharacteristicPresenter SummaryPresenter = new DefaultCharacteristicPresenter();
         public static readonly CharacteristicPresenter SourceCodePresenter = new SourceCodeCharacteristicPresenter();
 
-        public abstract string ToPresentation(ICharacteristic characteristic);
+        public abstract string ToPresentation(JobMode jobMode, Characteristic characteristic);
 
         private class DefaultCharacteristicPresenter : CharacteristicPresenter
         {
-            public override string ToPresentation(ICharacteristic characteristic)
+            public override string ToPresentation(JobMode jobMode, Characteristic characteristic)
             {
-                return characteristic.IsDefault ? "Default" : characteristic.ObjectValue.ToString();
+                if (!jobMode.HasValue(characteristic))
+                    return "Default";
+
+                var value = characteristic[jobMode];
+                return (value as IFormattable)?.ToString(null, HostEnvironmentInfo.MainCultureInfo)
+                    ?? value?.ToString() 
+                    ?? "";
             }
         }
 
         private class SourceCodeCharacteristicPresenter : CharacteristicPresenter
         {
-            public override string ToPresentation(ICharacteristic characteristic)
+            public override string ToPresentation(JobMode jobMode, Characteristic characteristic)
             {
-                var valueType = ReflectionUtils.GetGenericTypeArguments(characteristic.GetType()).First().GetCorrectTypeName();
+                // TODO: DO NOT hardcode Characteristic suffix
                 var id = characteristic.Id;
-                var value = SourceCodeHelper.ToSourceCode(characteristic.ObjectValue);
-                return $"Characteristic<{valueType}>.Create(\"{id}\").Mutate({value})";
+                var type = characteristic.DeclaringType.FullName;
+                var value = SourceCodeHelper.ToSourceCode(characteristic[jobMode]);
+                return $"{type}.{id}Characteristic[job] = {value}";
             }
         }
 
         private class FolderCharacteristicPresenter : CharacteristicPresenter
         {
-            public override string ToPresentation(ICharacteristic characteristic)
+            public override string ToPresentation(JobMode jobMode, Characteristic characteristic)
             {
-                return characteristic.IsDefault ? "Default" : FolderNameHelper.ToFolderName(characteristic.ObjectValue);
+                return jobMode.HasValue(characteristic)
+                    ? FolderNameHelper.ToFolderName(characteristic[jobMode])
+                    : "Default";
             }
         }
     }

@@ -1,42 +1,37 @@
-﻿using BenchmarkDotNet.Characteristics;
+﻿using System;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Toolchains;
 
+// ReSharper disable once CheckNamespace
 namespace BenchmarkDotNet.Jobs
 {
-    public sealed class InfrastructureMode
+    public sealed class InfrastructureMode : JobMode<InfrastructureMode>
     {
-        public static readonly InfrastructureMode Default = new InfrastructureMode();
+        public static readonly Characteristic<IToolchain> ToolchainCharacteristic = Characteristic.Create((InfrastructureMode i) => i.Toolchain);
+        public static readonly Characteristic<IClock> ClockCharacteristic = Characteristic.Create((InfrastructureMode i) => i.Clock);
+        public static readonly Characteristic<IEngineFactory> EngineFactoryCharacteristic = Characteristic.Create((InfrastructureMode i) => i.EngineFactory);
 
-        private InfrastructureMode()
+        public IToolchain Toolchain
         {
+            get { return ToolchainCharacteristic[this]; }
+            set { ToolchainCharacteristic[this] = value; }
         }
-
-        private static ICharacteristic<T> Create<T>(string id) => Characteristic<T>.Create("Infrastructure", id);
-
-        public ICharacteristic<IToolchain> Toolchain { get; private set; } = Create<IToolchain>(nameof(Toolchain));
-        public ICharacteristic<IClock> Clock { get; private set; } = Create<IClock>(nameof(Clock));
+        public IClock Clock
+        {
+            get { return ClockCharacteristic[this]; }
+            set { ClockCharacteristic[this] = value; }
+        }
 
         /// <summary>
         /// this type will be used in the auto-generated program to create engine in separate process
         /// <remarks>it must have parameterless constructor</remarks>
         /// </summary>
-        public ICharacteristic<IEngineFactory> EngineFactory { get; private set; } = Create<IEngineFactory>(nameof(EngineFactory));
-
-        public static InfrastructureMode Parse(CharacteristicSet set)
+        public IEngineFactory EngineFactory
         {
-            var mode = new InfrastructureMode();
-            mode.Toolchain = mode.Toolchain.Mutate(set);
-            mode.Clock = mode.Clock.Mutate(set);
-            mode.EngineFactory = mode.EngineFactory.Mutate(set);
-            return mode;
+            get { return EngineFactoryCharacteristic[this]; }
+            set { EngineFactoryCharacteristic[this] = value; }
         }
-
-        public CharacteristicSet ToSet() => new CharacteristicSet(
-            Toolchain,
-            Clock,
-            EngineFactory
-        );
     }
 }

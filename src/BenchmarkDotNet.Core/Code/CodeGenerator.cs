@@ -10,6 +10,7 @@ using BenchmarkDotNet.Core.Helpers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Code
@@ -40,7 +41,7 @@ namespace BenchmarkDotNet.Code
                 Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark)). 
                 ToString();
 
-            text = Unroll(text, benchmark.Job.Run.UnrollFactor.Resolve(EnvResolver.Instance));
+            text = Unroll(text, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvResolver.Instance));
 
             return text;
         }
@@ -67,9 +68,8 @@ namespace BenchmarkDotNet.Code
         private static string GetJobsSetDefinition(Benchmark benchmark)
         {
             return CharacteristicSetPresenter.SourceCode.
-                ToPresentation(benchmark.Job.ToSet()).
-                Replace("new CharacteristicSet(", "new CharacteristicSet(\n                    ").
-                Replace(", ", ",\n                    ");
+                ToPresentation(benchmark.Job).
+                Replace("; ", ";\n                ");
         }
 
         private static DeclarationsProvider GetDeclarationsProvider(Target target)
@@ -127,7 +127,7 @@ namespace BenchmarkDotNet.Code
 
         private static string GetEngineFactoryTypeName(Benchmark benchmark)
         {
-            var factory = benchmark.Job.Infrastructure.EngineFactory.Resolve(InfrastructureResolver.Instance);
+            var factory = benchmark.Job.ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance);
             var factoryType = factory.GetType();
 
             if (!factoryType.GetTypeInfo().DeclaredConstructors.Any(ctor => ctor.IsPublic && !ctor.GetParameters().Any()))

@@ -98,6 +98,7 @@ namespace BenchmarkDotNet.Configs
                 { "csvmeasurements", new[] { CsvMeasurementsExporter.Default } },
                 { "html", new[] { HtmlExporter.Default } },
                 { "markdown", new [] { MarkdownExporter.Default } },
+                { "atlassian", new[] { MarkdownExporter.Atlassian } },
                 { "stackoverflow", new[] { MarkdownExporter.StackOverflow } },
                 { "github", new[] { MarkdownExporter.GitHub } },
                 { "plain", new[] { PlainExporter.Default } },

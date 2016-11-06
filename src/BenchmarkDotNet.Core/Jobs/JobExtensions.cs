@@ -9,47 +9,53 @@ namespace BenchmarkDotNet.Jobs
 {
     public static class JobExtensions
     {
-        // General
-        public static Job With<T>(this Job job, ICharacteristic<T> characteristic) => Job.Parse(job.ToSet().Mutate(characteristic));
+        private static Job WithCore(this Job job, Action<Job> updateCallback)
+        {
+            job = new Job(job);
+            updateCallback(job);
+            return job;
+        }
+        public static Job With(this Job job, Platform platform) => job.WithCore(j => j.Env.Platform = platform);
+
+        public static Job WithId(this Job job, string id) => new Job(id, job);
 
         // Env
-        public static Job With(this Job job, Platform platform) => job.With(job.Env.Platform.Mutate(platform));
-        public static Job With(this Job job, Jit jit) => job.With(job.Env.Jit.Mutate(jit));
-        public static Job With(this Job job, Runtime runtime) => job.With(job.Env.Runtime.Mutate(runtime));
-        public static Job WithAffinity(this Job job, IntPtr affinity) => job.With(job.Env.Affinity.Mutate(affinity));
-        public static Job WithGcServer(this Job job, bool value) => job.With(job.Env.Gc.Server.Mutate(value));
-        public static Job WithGcConcurrent(this Job job, bool value) => job.With(job.Env.Gc.Concurrent.Mutate(value));
-        public static Job WithGcCpuGroups(this Job job, bool value) => job.With(job.Env.Gc.CpuGroups.Mutate(value));
-        public static Job WithGcForce(this Job job, bool value) => job.With(job.Env.Gc.Force.Mutate(value));
-        public static Job WithGcAllowVeryLargeObjects(this Job job, bool value) => job.With(job.Env.Gc.AllowVeryLargeObjects.Mutate(value));
-        public static Job With(this Job job, GcMode gc) => job.Mutate(gc.ToMutator());
+        public static Job With(this Job job, Jit jit) => job.WithCore(j => j.Env.Jit = jit);
+        public static Job With(this Job job, Runtime runtime) => job.WithCore(j => j.Env.Runtime = runtime);
+        public static Job WithAffinity(this Job job, IntPtr affinity) => job.WithCore(j => j.Env.Affinity = affinity);
+        public static Job WithGcServer(this Job job, bool value) => job.WithCore(j => j.Env.Gc.Server = value);
+        public static Job WithGcConcurrent(this Job job, bool value) => job.WithCore(j => j.Env.Gc.Concurrent = value);
+        public static Job WithGcCpuGroups(this Job job, bool value) => job.WithCore(j => j.Env.Gc.CpuGroups = value);
+        public static Job WithGcForce(this Job job, bool value) => job.WithCore(j => j.Env.Gc.Force = value);
+        public static Job WithGcAllowVeryLargeObjects(this Job job, bool value) => job.WithCore(j => j.Env.Gc.AllowVeryLargeObjects = value);
+        public static Job With(this Job job, GcMode gc) => job.WithCore(j => EnvMode.GcCharacteristic[j] = gc);
 
         // Run
-        public static Job With(this Job job, RunStrategy strategy) => job.With(job.Run.RunStrategy.Mutate(strategy));
-        public static Job WithLaunchCount(this Job job, int count) => job.With(job.Run.LaunchCount.Mutate(count));
-        public static Job WithWarmupCount(this Job job, int count) => job.With(job.Run.WarmupCount.Mutate(count));
-        public static Job WithTargetCount(this Job job, int count) => job.With(job.Run.TargetCount.Mutate(count));
-        public static Job WithIterationTime(this Job job, TimeInterval time) => job.With(job.Run.IterationTime.Mutate(time));
-        public static Job WithInvocationCount(this Job job, int count) => job.With(job.Run.InvocationCount.Mutate(count));
-        public static Job WithUnrollFactor(this Job job, int factor) => job.With(job.Run.UnrollFactor.Mutate(factor));
+        public static Job With(this Job job, RunStrategy strategy) => job.WithCore(j => j.Run.RunStrategy = strategy);
+        public static Job WithLaunchCount(this Job job, int count) => job.WithCore(j => j.Run.LaunchCount = count);
+        public static Job WithWarmupCount(this Job job, int count) => job.WithCore(j => j.Run.WarmupCount = count);
+        public static Job WithTargetCount(this Job job, int count) => job.WithCore(j => j.Run.TargetCount = count);
+        public static Job WithIterationTime(this Job job, TimeInterval time) => job.WithCore(j => j.Run.IterationTime = time);
+        public static Job WithInvocationCount(this Job job, int count) => job.WithCore(j => j.Run.InvocationCount = count);
+        public static Job WithUnrollFactor(this Job job, int factor) => job.WithCore(j => j.Run.UnrollFactor = factor);
 
         // Infrastructure
-        public static Job With(this Job job, IToolchain toolchain) => job.With(job.Infrastructure.Toolchain.Mutate(toolchain));
-        public static Job With(this Job job, IClock clock) => job.With(job.Infrastructure.Clock.Mutate(clock));
-        public static Job With(this Job job, IEngineFactory engineFactory) => job.With(job.Infrastructure.EngineFactory.Mutate(engineFactory));
+        public static Job With(this Job job, IToolchain toolchain) => job.WithCore(j => j.Infrastructure.Toolchain = toolchain);
+        public static Job With(this Job job, IClock clock) => job.WithCore(j => j.Infrastructure.Clock = clock);
+        public static Job With(this Job job, IEngineFactory engineFactory) => job.WithCore(j => j.Infrastructure.EngineFactory = engineFactory);
 
         // Accuracy
-        public static Job WithMaxStdErrRelative(this Job job, double value) => job.With(job.Accuracy.MaxStdErrRelative.Mutate(value));
-        public static Job WithMinIterationTime(this Job job, TimeInterval value) => job.With(job.Accuracy.MinIterationTime.Mutate(value));
-        public static Job WithMinInvokeCount(this Job job, int value) => job.With(job.Accuracy.MinInvokeCount.Mutate(value));
-        public static Job WithEvaluateOverhead(this Job job, bool value) => job.With(job.Accuracy.EvaluateOverhead.Mutate(value));
-        public static Job WithRemoveOutliers(this Job job, bool value) => job.With(job.Accuracy.RemoveOutliers.Mutate(value));
-        public static Job WithAnaylyzeLaunchVariance(this Job job, bool value) => job.With(job.Accuracy.AnaylyzeLaunchVariance.Mutate(value));
+        public static Job WithMaxStdErrRelative(this Job job, double value) => job.WithCore(j => j.Accuracy.MaxStdErrRelative = value);
+        public static Job WithMinIterationTime(this Job job, TimeInterval value) => job.WithCore(j => j.Accuracy.MinIterationTime = value);
+        public static Job WithMinInvokeCount(this Job job, int value) => job.WithCore(j => j.Accuracy.MinInvokeCount = value);
+        public static Job WithEvaluateOverhead(this Job job, bool value) => job.WithCore(j => j.Accuracy.EvaluateOverhead = value);
+        public static Job WithRemoveOutliers(this Job job, bool value) => job.WithCore(j => j.Accuracy.RemoveOutliers = value);
+        public static Job WithAnalyzeLaunchVariance(this Job job, bool value) => job.WithCore(j => j.Accuracy.AnalyzeLaunchVariance = value);
 
         // Info
         [Obsolete]
         public static string GetShortInfo(this Job job) => job.ResolvedId;
         [Obsolete]
-        public static string GetFullInfo(this Job job) => CharacteristicSetPresenter.Default.ToPresentation(job.ToSet());
+        public static string GetFullInfo(this Job job) => CharacteristicSetPresenter.Default.ToPresentation(job);
     }
 }

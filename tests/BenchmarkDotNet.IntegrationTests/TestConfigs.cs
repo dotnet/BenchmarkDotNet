@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public SingleRunMediumConfig()
         {
-            Add(Job.Dry.WithTargetCount(5));
+            Add(new Job(Job.Dry) { Run = { TargetCount = 5 } });
         }
     }
 
@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public ThroughputFastConfig()
         {
-            Add(Job.Dry.With(RunStrategy.Throughput).WithTargetCount(1));
+            Add(new Job(Job.Dry) { Run = { RunStrategy = RunStrategy.Throughput, TargetCount = 1 } });
         }
     }
 
@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public DiagnoserConfig()
         {
             // Diagnosers need enough runs to collects the statistics!
-            Add(Job.Default.WithLaunchCount(1).WithWarmupCount(1).WithTargetCount(50));
+            Add(new Job { Run = { LaunchCount = 1, WarmupCount = 1, TargetCount = 50 } });
         }
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis;
 using System;
 using System.Linq;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Jobs;
 using OurPlatform = BenchmarkDotNet.Environments.Platform;
 
 namespace BenchmarkDotNet.Toolchains.Classic
@@ -25,7 +26,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 outputKind: OutputKind.ConsoleApplication,
                 optimizationLevel: OptimizationLevel.Release,
                 allowUnsafe: true,
-                platform: GetPlatform(benchmark.Job.Env.Platform.Resolve(resolver)),
+                platform: GetPlatform(benchmark.Job.ResolveValue(EnvMode.PlatformCharacteristic, resolver)),
                 deterministic: true);
 
             var references = RoslynGenerator

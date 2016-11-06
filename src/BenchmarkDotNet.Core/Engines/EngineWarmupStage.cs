@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Engines
@@ -11,31 +12,28 @@ namespace BenchmarkDotNet.Engines
         internal const int MaxIterationCount = 50;
         internal const int MaxIdleItertaionCount = 10;
 
-        private readonly ICharacteristic<int> warmupCount;
-        private readonly List<Measurement> measurements;
+        private readonly int? warmupCount;
 
         public EngineWarmupStage(IEngine engine) : base(engine)
         {
-            warmupCount = engine.TargetJob.Run.WarmupCount;
-            var maxSize = ShouldRunAuto(warmupCount) ? MaxIterationCount : warmupCount.SpecifiedValue;
-            measurements = new List<Measurement>(maxSize);
+            warmupCount = engine.TargetJob.ResolveValueAsNullable(RunMode.WarmupCountCharacteristic);
         }
 
-        public void RunIdle(long invokeCount, int unrollFactor) 
+        public void RunIdle(long invokeCount, int unrollFactor)
             => RunAuto(invokeCount, IterationMode.IdleWarmup, unrollFactor);
 
-        public void RunMain(long invokeCount, int unrollFactor) 
-            => Run(invokeCount, IterationMode.MainWarmup, warmupCount, unrollFactor);
+        public void RunMain(long invokeCount, int unrollFactor)
+            => Run(invokeCount, IterationMode.MainWarmup, false, unrollFactor);
 
-        internal List<Measurement> Run(long invokeCount, IterationMode iterationMode, ICharacteristic<int> iterationCount, int unrollFactor)
-        {
-            return ShouldRunAuto(iterationCount)
+        internal List<Measurement> Run(long invokeCount, IterationMode iterationMode, bool runAuto, int unrollFactor)
+            => runAuto || warmupCount == null
                 ? RunAuto(invokeCount, iterationMode, unrollFactor)
-                : RunSpecific(invokeCount, iterationMode, iterationCount.SpecifiedValue, unrollFactor);
-        }
+                : RunSpecific(invokeCount, iterationMode, warmupCount.Value, unrollFactor);
+
 
         private List<Measurement> RunAuto(long invokeCount, IterationMode iterationMode, int unrollFactor)
         {
+            var measurements = new List<Measurement>(MaxIterationCount);
             int iterationCounter = 0;
             while (true)
             {
@@ -44,17 +42,20 @@ namespace BenchmarkDotNet.Engines
                 if (IsWarmupFinished(measurements, iterationMode))
                     break;
             }
-            if (!IsDiagnoserAttached) WriteLine();
+            if (!IsDiagnoserAttached)
+                WriteLine();
 
             return measurements;
         }
 
         private List<Measurement> RunSpecific(long invokeCount, IterationMode iterationMode, int iterationCount, int unrollFactor)
         {
+            var measurements = new List<Measurement>(MaxIterationCount);
             for (int i = 0; i < iterationCount; i++)
                 measurements.Add(RunIteration(iterationMode, i + 1, invokeCount, unrollFactor));
 
-            if (!IsDiagnoserAttached) WriteLine();
+            if (!IsDiagnoserAttached)
+                WriteLine();
 
             return measurements;
         }
@@ -65,7 +66,7 @@ namespace BenchmarkDotNet.Engines
             if (n >= MaxIterationCount || (iterationMode.IsIdle() && n >= MaxIdleItertaionCount))
                 return true;
             if (n < MinIterationCount)
-                return false;                        
+                return false;
 
             int dir = -1, changeCount = 0;
             for (int i = 1; i < n; i++)

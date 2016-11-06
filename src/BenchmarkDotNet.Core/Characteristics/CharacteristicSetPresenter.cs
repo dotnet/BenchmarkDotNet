@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace BenchmarkDotNet.Characteristics
 {
@@ -9,16 +10,22 @@ namespace BenchmarkDotNet.Characteristics
         public static readonly CharacteristicSetPresenter Folder = new FolderPresenter();
         public static readonly CharacteristicSetPresenter SourceCode = new SourceCodePresenter();
 
-        public abstract string ToPresentation(CharacteristicSet set);
+        public abstract string ToPresentation(JobMode jobMode);
+
+        protected virtual IEnumerable<Characteristic> GetPresentableCharacteristics(JobMode jobMode, bool includeIgnoreOnApply = false) =>
+            jobMode
+                .GetCharacteristicsWithValues()
+                .Where(c => c.IsPresentableCharacteristic(includeIgnoreOnApply));
 
         private class DefaultPresenter : CharacteristicSetPresenter
         {
             private const string Separator = "&";
             private static readonly CharacteristicPresenter CharacteristicPresenter = CharacteristicPresenter.DefaultPresenter;
 
-            public override string ToPresentation(CharacteristicSet set)
+            public override string ToPresentation(JobMode jobMode)
             {
-                var values = set.GetValues().Where(c => !c.IsDefault).Select(c => c.Id + "=" + CharacteristicPresenter.ToPresentation(c));
+                var values = GetPresentableCharacteristics(jobMode)
+                    .Select(c => c.FullId + "=" + CharacteristicPresenter.ToPresentation(jobMode, c));
                 return string.Join(Separator, values);
             }
         }
@@ -29,12 +36,10 @@ namespace BenchmarkDotNet.Characteristics
             private const string EqualsSeparator = "-";
             private static readonly CharacteristicPresenter CharacteristicPresenter = CharacteristicPresenter.FolderPresenter;
 
-            public override string ToPresentation(CharacteristicSet set)
+            public override string ToPresentation(JobMode jobMode)
             {
-                var values = set.
-                    GetValues().
-                    Where(c => !c.IsDefault).
-                    Select(c => c.GetDisplayId() + EqualsSeparator + CharacteristicPresenter.ToPresentation(c));
+                var values = GetPresentableCharacteristics(jobMode)
+                    .Select(c => c.Id + EqualsSeparator + CharacteristicPresenter.ToPresentation(jobMode, c));
                 return string.Join(Separator, values);
             }
         }
@@ -44,22 +49,24 @@ namespace BenchmarkDotNet.Characteristics
             private const string Separator = ", ";
             private static readonly CharacteristicPresenter CharacteristicPresenter = CharacteristicPresenter.DefaultPresenter;
 
-            public override string ToPresentation(CharacteristicSet set)
+            public override string ToPresentation(JobMode jobMode)
             {
-                var values = set.GetValues().Where(c => !c.IsDefault).Select(c => c.GetDisplayId() + "=" + CharacteristicPresenter.ToPresentation(c));
+                var values = GetPresentableCharacteristics(jobMode)
+                    .Select(c => c.Id + "=" + CharacteristicPresenter.ToPresentation(jobMode, c));
                 return string.Join(Separator, values);
             }
         }
 
         private class SourceCodePresenter : CharacteristicSetPresenter
         {
-            private const string Separator = ", ";
+            private const string Separator = "; ";
             private static readonly CharacteristicPresenter CharacteristicPresenter = CharacteristicPresenter.SourceCodePresenter;
 
-            public override string ToPresentation(CharacteristicSet set)
+            public override string ToPresentation(JobMode jobMode)
             {
-                var values = set.GetValues().Where(c => !c.IsDefault).Select(c => CharacteristicPresenter.ToPresentation(c));
-                return "new CharacteristicSet(" + string.Join(Separator, values) + ")";
+                var values = GetPresentableCharacteristics(jobMode, includeIgnoreOnApply: true)
+                    .Select(c => CharacteristicPresenter.ToPresentation(jobMode, c));
+                return string.Join(Separator, values);
             }
         }
     }

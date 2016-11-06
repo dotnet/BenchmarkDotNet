@@ -18,22 +18,24 @@ namespace BenchmarkDotNet.Engines
 
         public EnginePilotStage(IEngine engine) : base(engine)
         {
-            unrollFactor = engine.TargetJob.Run.UnrollFactor.Resolve(engine.Resolver);
-            minInvokeCount = engine.TargetJob.Accuracy.MinInvokeCount.Resolve(engine.Resolver);
-            maxStdErrRelative = engine.TargetJob.Accuracy.MaxStdErrRelative.Resolve(engine.Resolver);
-            targetIterationTime = engine.TargetJob.Run.IterationTime.Resolve(engine.Resolver).ToNanoseconds();
-            resolution =  engine.TargetJob.Infrastructure.Clock.Resolve(engine.Resolver).GetResolution().Nanoseconds;
+            unrollFactor = engine.TargetJob.ResolveValue(RunMode.UnrollFactorCharacteristic, engine.Resolver);
+            minInvokeCount = engine.TargetJob.ResolveValue(AccuracyMode.MinInvokeCountCharacteristic, engine.Resolver);
+            maxStdErrRelative = engine.TargetJob.ResolveValue(AccuracyMode.MaxStdErrRelativeCharacteristic, engine.Resolver);
+            targetIterationTime = engine.TargetJob.ResolveValue(RunMode.IterationTimeCharacteristic, engine.Resolver).ToNanoseconds();
+            resolution =  engine.TargetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, engine.Resolver).GetResolution().Nanoseconds;
         }
 
         /// <returns>Perfect invocation count</returns>
         public long Run()
         {
             // If InvocationCount is specified, pilot stage should be skipped
-            if (!TargetJob.Run.InvocationCount.IsDefault)
-                return TargetJob.Run.InvocationCount.SpecifiedValue;
+            if (TargetJob.HasValue(RunMode.InvocationCountCharacteristic))
+                return TargetJob.Run.InvocationCount;
 
             // Here we want to guess "perfect" amount of invocation
-            return TargetJob.Run.IterationTime.IsDefault ? RunAuto() : RunSpecific();
+            return TargetJob.HasValue(RunMode.IterationTimeCharacteristic)
+                ? RunSpecific()
+                : RunAuto();
         }
 
         /// <summary>

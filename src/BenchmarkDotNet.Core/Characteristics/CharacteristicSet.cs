@@ -1,43 +1,25 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using BenchmarkDotNet.Extensions;
+﻿using System;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Characteristics
 {
-    public class CharacteristicSet
+    public sealed class CharacteristicSet : JobMode<CharacteristicSet>
     {
-        private readonly Dictionary<string, ICharacteristic> characteristics = new Dictionary<string, ICharacteristic>();
-
-        public CharacteristicSet(params ICharacteristic[] characteristics)
+        public CharacteristicSet()
         {
-            foreach (var characteristic in characteristics.Where(c => c != null))
-                this.characteristics[characteristic.Id] = characteristic;
+            Apply();
         }
 
-        private CharacteristicSet(params CharacteristicSet[] sets)
+        public CharacteristicSet(JobMode other)
         {
-            Mutate(sets);
+            Apply(other);
         }
 
-        public CharacteristicSet Mutate(params CharacteristicSet[] sets)
+        public CharacteristicSet(params JobMode[] others)
         {
-            foreach (var set in sets)
-                foreach (var characteristic in set.GetValues())
-                    characteristics[characteristic.Id] = characteristic;
-            return this;
+            Apply(others);
         }
 
-        public CharacteristicSet Mutate<T>(ICharacteristic<T> characteristic)
-        {
-            characteristics[characteristic.Id] = characteristic;
-            return this;
-        }
-
-        public IEnumerable<ICharacteristic> GetValues() => characteristics.Values;
-
-        public ICharacteristic Get(string id) => characteristics.GetValueOrDefault(id);
-
-        public static CharacteristicSet Merge(params CharacteristicSet[] sets) => new CharacteristicSet(sets);
-
+        protected override bool IsPropertyBag => true;
     }
 }

@@ -28,18 +28,17 @@ namespace BenchmarkDotNet.Attributes.Jobs
 
         private static Job CreateJob(string id, int launchCount, int warmupCount, int targetCount, RunStrategy? runStrategy)
         {
-            var job = Job.Default;
+            var job = new Job(id);
             if (launchCount != DefaultValue)
-                job = job.WithLaunchCount(launchCount);
+                job.Run.LaunchCount = launchCount;
             if (warmupCount != DefaultValue)
-                job = job.WithWarmupCount(warmupCount);
+                job.Run.WarmupCount = warmupCount;
             if (targetCount != DefaultValue)
-                job = job.WithTargetCount(targetCount);
+                job.Run.TargetCount = targetCount;
             if (runStrategy != null)
-                job = job.With(runStrategy.Value);
-            if (id != null)
-                job = job.WithId(id);
-            return job;
+                job.Run.RunStrategy = runStrategy.Value;
+
+            return job.Freeze();
         }
     }
 }
