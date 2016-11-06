@@ -100,7 +100,9 @@ namespace BenchmarkDotNet.Engines
 
             var main = targetStage.RunMain(invokeCount, UnrollFactor);
 
-            return new RunResults(idle, main);
+            bool removeOutliers = TargetJob.ResolveValue(AccuracyMode.RemoveOutliersCharacteristic, Resolver);
+
+            return new RunResults(idle, main, removeOutliers);
         }
 
         public Measurement RunIteration(IterationData data)

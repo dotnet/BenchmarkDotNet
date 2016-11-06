@@ -71,7 +71,8 @@ namespace BenchmarkDotNet.IntegrationTests
 
                 return new RunResults(
                     new List<Measurement>() { default(Measurement) }, 
-                    new List<Measurement>() { default(Measurement) });
+                    new List<Measurement>() { default(Measurement) },
+                    false);
             }
 
             public Job TargetJob { get; }
