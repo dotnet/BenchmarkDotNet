@@ -13,13 +13,10 @@ namespace BenchmarkDotNet.Engines
         internal const int MaxIdleItertaionCount = 10;
 
         private readonly int? warmupCount;
-        private readonly List<Measurement> measurements;
 
         public EngineWarmupStage(IEngine engine) : base(engine)
         {
             warmupCount = engine.TargetJob.ResolveValueAsNullable(RunMode.WarmupCountCharacteristic);
-            var maxSize = warmupCount ?? MaxIterationCount;
-            measurements = new List<Measurement>(maxSize);
         }
 
         public void RunIdle(long invokeCount, int unrollFactor)
@@ -36,6 +33,7 @@ namespace BenchmarkDotNet.Engines
 
         private List<Measurement> RunAuto(long invokeCount, IterationMode iterationMode, int unrollFactor)
         {
+            var measurements = new List<Measurement>(MaxIterationCount);
             int iterationCounter = 0;
             while (true)
             {
@@ -52,6 +50,7 @@ namespace BenchmarkDotNet.Engines
 
         private List<Measurement> RunSpecific(long invokeCount, IterationMode iterationMode, int iterationCount, int unrollFactor)
         {
+            var measurements = new List<Measurement>(MaxIterationCount);
             for (int i = 0; i < iterationCount; i++)
                 measurements.Add(RunIteration(iterationMode, i + 1, invokeCount, unrollFactor));
 
