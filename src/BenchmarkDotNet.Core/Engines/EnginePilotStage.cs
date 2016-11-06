@@ -5,6 +5,7 @@ using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Engines
 {
+    // TODO: use clockResolution
     internal class EnginePilotStage : EngineStage
     {
         internal const long MaxInvokeCount = (long.MaxValue / 2 + 1) / 2;
@@ -13,7 +14,6 @@ namespace BenchmarkDotNet.Engines
         private readonly int minInvokeCount;
         private readonly double maxStdErrRelative;
         private readonly double targetIterationTime;
-        private readonly TimeInterval clockResolution;
         private readonly double resolution;
 
         public EnginePilotStage(IEngine engine) : base(engine)

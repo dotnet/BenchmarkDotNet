@@ -14,8 +14,6 @@ namespace BenchmarkDotNet.Loggers
         private readonly Benchmark benchmark;
         private readonly IDiagnoser diagnoser;
 
-        private bool diagnosticsAlreadyRun = false;
-
         public SynchronousProcessOutputLoggerWithDiagnoser(ILogger logger, Process process, IDiagnoser diagnoser, Benchmark benchmark)
         {
             if (!process.StartInfo.RedirectStandardOutput)
