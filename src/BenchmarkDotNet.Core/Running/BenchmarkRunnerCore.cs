@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Running
 
         internal static readonly IResolver DefaultResolver = new CompositeResolver(EnvResolver.Instance, InfrastructureResolver.Instance);
 
-        internal static Summary Run(Benchmark[] benchmarks, IConfig config, Func<Job, IToolchain> toolchainProvider)
+        public static Summary Run(Benchmark[] benchmarks, IConfig config, Func<Job, IToolchain> toolchainProvider)
         {
             var resolver = DefaultResolver;
             config = BenchmarkConverter.GetFullConfig(benchmarks.FirstOrDefault()?.Target.Type, config);
@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Running
             return $"BenchmarkRun-{benchmarkRunIndex:##000}-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}";
         }
 
-        private static Summary Run(Benchmark[] benchmarks, ILogger logger, string title, IConfig config, string rootArtifactsFolderPath, Func<Job, IToolchain> toolchainProvider, IResolver resolver)
+        public static Summary Run(Benchmark[] benchmarks, ILogger logger, string title, IConfig config, string rootArtifactsFolderPath, Func<Job, IToolchain> toolchainProvider, IResolver resolver)
         {
             logger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
             logger.WriteLineInfo("// Found benchmarks:");
@@ -144,7 +144,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineStatistic($"{message}: {time.ToFormattedTotalTime()}");
         }
 
-        private static BenchmarkReport Run(Benchmark benchmark, ILogger logger, IConfig config, string rootArtifactsFolderPath, Func<Job, IToolchain> toolchainProvider, IResolver resolver)
+        public static BenchmarkReport Run(Benchmark benchmark, ILogger logger, IConfig config, string rootArtifactsFolderPath, Func<Job, IToolchain> toolchainProvider, IResolver resolver)
         {
             var toolchain = toolchainProvider(benchmark.Job);
 
