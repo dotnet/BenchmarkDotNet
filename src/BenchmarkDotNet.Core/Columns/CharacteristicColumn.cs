@@ -17,11 +17,18 @@ namespace BenchmarkDotNet.Columns
         public CharacteristicColumn(Characteristic characteristic)
         {
             this.characteristic = characteristic;
+            Id = "Job." + characteristic.Id;
+            ColumnName = characteristic.Id;
+
+            // The 'Id' characteristic is a special case:
+            // here we just print 'Job'
+            if (characteristic.Id == "Id")
+                ColumnName = "Job";
         }
 
 
-        public string Id => "Job." + characteristic.Id;
-        public string ColumnName => characteristic.Id;
+        public string Id { get; }
+        public string ColumnName { get; }
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => false;
         public ColumnCategory Category => ColumnCategory.Job;
