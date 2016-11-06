@@ -1,5 +1,6 @@
 ﻿using System;
 using BenchmarkDotNet.Core.Helpers;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.Characteristics
@@ -17,9 +18,13 @@ namespace BenchmarkDotNet.Characteristics
         {
             public override string ToPresentation(JobMode jobMode, Characteristic characteristic)
             {
-                return jobMode.HasValue(characteristic) 
-                    ? characteristic[jobMode]?.ToString() ?? "" 
-                    : "Default";
+                if (!jobMode.HasValue(characteristic))
+                    return "Default";
+
+                var value = characteristic[jobMode];
+                return (value as IFormattable)?.ToString(null, HostEnvironmentInfo.MainCultureInfo)
+                    ?? value?.ToString() 
+                    ?? "";
             }
         }
 
