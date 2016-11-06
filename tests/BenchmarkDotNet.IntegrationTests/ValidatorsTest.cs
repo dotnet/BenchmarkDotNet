@@ -17,6 +17,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private readonly IExporter[] AllKnownExportersThatSupportExportToLog =
             {
+                MarkdownExporter.Atlassian,
                 MarkdownExporter.Console,
                 MarkdownExporter.Default,
                 MarkdownExporter.GitHub,
