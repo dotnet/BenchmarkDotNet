@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
@@ -108,14 +109,7 @@ namespace BenchmarkDotNet.Running
             MarkdownExporter.Console.ExportToLog(summary, logger);
 
             // TODO: make exporter
-            var warnings = config.GetCompositeAnalyser().Analyse(summary).ToList();
-            if (warnings.Any())
-            {
-                logger.WriteLine();
-                logger.WriteLineError("// * Warnings * ");
-                foreach (var warning in warnings)
-                    logger.WriteLineError($"{warning.Message}");
-            }
+            ConclusionHelper.Print(logger, config.GetCompositeAnalyser().Analyse(summary).ToList());
 
             if (config.GetDiagnosers().Any())
             {

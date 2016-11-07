@@ -7,12 +7,15 @@ namespace BenchmarkDotNet.Analysers
     public class CompositeAnalyser : IAnalyser
     {
         private readonly IAnalyser[] analysers;
+        private static int counter = 0; // TODO: improve
 
         public CompositeAnalyser(IAnalyser[] analysers)
         {
             this.analysers = analysers;
+            Id = "Composite-" + (++counter);
         }
 
-        public IEnumerable<IWarning> Analyse(Summary summary) => analysers.SelectMany(analyser => analyser.Analyse(summary));
+        public string Id { get; }
+        public IEnumerable<Conclusion> Analyse(Summary summary) => analysers.SelectMany(analyser => analyser.Analyse(summary));
     }
 }

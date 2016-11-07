@@ -48,7 +48,8 @@ namespace BenchmarkDotNet.Loggers
                 { LogKind.Result, ConsoleColor.DarkCyan },
                 { LogKind.Statistic, ConsoleColor.Cyan },
                 { LogKind.Info, ConsoleColor.DarkYellow },
-                { LogKind.Error, ConsoleColor.Red }
+                { LogKind.Error, ConsoleColor.Red },
+                { LogKind.Hint, ConsoleColor.DarkBlue }
             };
 
         public static Dictionary<LogKind, ConsoleColor> CreateGrayScheme()
