@@ -20,7 +20,8 @@ using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Running
 {
-    internal static class BenchmarkRunnerCore
+    // TODO: Find a better name
+    public static class BenchmarkRunnerCore
     {
         private static int benchmarkRunIndex;
 
