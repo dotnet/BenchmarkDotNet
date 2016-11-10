@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Mathematics
             list = values.ToList();
             N = list.Count;
             if (N == 0)
-                throw new InvalidOperationException("StatSummary: Sequence contains no elements");
+                throw new InvalidOperationException("Sequence of values contains no elements, Statistics can't be calculated");
             list.Sort();
 
             if (N == 1)
