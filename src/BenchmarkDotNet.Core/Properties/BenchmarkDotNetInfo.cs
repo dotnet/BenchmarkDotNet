@@ -6,8 +6,8 @@
         public const string Title = TitleBase + (IsDevelopVersion ? "-Dev" : "");
         public const string Description = "Powerful .NET library for benchmarking";
         public const string Copyright = "Copyright © .NET Foundation and contributors 2013–2016";
-        public const string Version = "0.9.9";
-        public const string FullVersion = "0.9.9" + (IsDevelopVersion ? "-develop" : "");
+        public const string Version = "0.10.0";
+        public const string FullVersion = "0.10.0" + (IsDevelopVersion ? "-develop" : "");
         public const string FullTitle = Title + " v" + FullVersion;
 
         public const bool IsDevelopVersion = true; // Set to false for NuGet publishing

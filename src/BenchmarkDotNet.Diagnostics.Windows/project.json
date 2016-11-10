@@ -1,6 +1,6 @@
 {
   "title": "BenchmarkDotNet.Diagnostics.Windows",
-  "version": "0.9.9-develop",
+  "version": "0.10.0-develop",
   "authors": [ ".NET Foundation and contributors" ],
   "description": "Powerful .NET library for benchmarking (Diagnostic Tools for Windows)",
   "copyright": ".NET Foundation and contributors",
