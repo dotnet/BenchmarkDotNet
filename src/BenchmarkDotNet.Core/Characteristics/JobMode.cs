@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Characteristics
 {
@@ -325,12 +326,13 @@ namespace BenchmarkDotNet.Characteristics
                 GetCharacteristicsToApply(other));
 
         private JobMode ApplyCore(
-            JobMode other,
-            IEnumerable<Characteristic> characteristicsToApply)
+            [CanBeNull] JobMode other,
+            [NotNull] IEnumerable<Characteristic> characteristicsToApply)
         {
-            if (other == null)
-                throw new ArgumentNullException(nameof(other));
             AssertNotFrozen();
+
+            if (other == null)
+                return this;
 
             foreach (var characteristic in characteristicsToApply)
             {
