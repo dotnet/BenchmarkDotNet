@@ -19,6 +19,8 @@ namespace BenchmarkDotNet.Analysers
         public override IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report)
         {
             var actual = report.AllMeasurements.Where(m => m.IterationMode == IterationMode.MainTarget).ToArray();
+            if (actual.IsEmpty())
+                yield break;
             var result = report.AllMeasurements.Where(m => m.IterationMode == IterationMode.Result).ToArray();
             var actualOutliers = actual.GetStatistics().Outliers;
             bool removeOutliers = report.Benchmark.Job.ResolveValue(AccuracyMode.RemoveOutliersCharacteristic, EngineResolver.Instance); // TODO: improve
