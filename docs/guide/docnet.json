@@ -3,7 +3,7 @@
     "Source" : ".",
     "Destination" : "..\\guidehtml",
     "Theme" : "Default",
-    "Footer" : "BenchmarkDotNet Documentation. &copy;2013-2016. <a href='https://github.com/PerfDotNet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.",
+    "Footer" : "BenchmarkDotNet Documentation. &copy;2013-2016. <a href='https://github.com/dotnet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.",
     "SourceFoldersToCopy" : ["Images"],
     "Pages" : 
     {

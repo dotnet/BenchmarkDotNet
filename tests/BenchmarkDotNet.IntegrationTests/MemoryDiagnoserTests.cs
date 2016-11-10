@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.IntegrationTests
             output = outputHelper;
         }
 
-        [Fact(Skip = "Temporarily suppressed, see https://github.com/PerfDotNet/BenchmarkDotNet/issues/208")]
+        [Fact(Skip = "Temporarily suppressed, see https://github.com/dotnet/BenchmarkDotNet/issues/208")]
         public void MemoryDiagnoserTracksHeapMemoryAllocation()
         {
             var memoryDiagnoser = new MemoryDiagnoser();
@@ -111,13 +111,13 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Fact(Skip = "Temporarily suppressed, see https://github.com/PerfDotNet/BenchmarkDotNet/issues/208")]
+        [Fact(Skip = "Temporarily suppressed, see https://github.com/dotnet/BenchmarkDotNet/issues/208")]
         public void MemoryDiagnoserDoesNotIncludeAllocationsFromSetupAndCleanup()
         {
             AssertZeroAllocations(typeof(AllocatingSetupAndCleanup), "AllocateNothing", targetCount: 50);
         }
 
-        [Fact(Skip = "Temporarily suppressed, see https://github.com/PerfDotNet/BenchmarkDotNet/issues/208")]
+        [Fact(Skip = "Temporarily suppressed, see https://github.com/dotnet/BenchmarkDotNet/issues/208")]
         public void EngineShouldNotInterfereAllocationResults()
         {
             AssertZeroAllocations(typeof(NoAllocationsAtAll), "EmptyMethod", targetCount: 5000); // we need a lot of iterations to be sure!!

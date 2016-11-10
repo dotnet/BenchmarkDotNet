@@ -7,7 +7,7 @@ using Xunit;
 
 namespace BenchmarkDotNet.Tests
 {
-    // See https://github.com/PerfDotNet/BenchmarkDotNet/issues/172
+    // See https://github.com/dotnet/BenchmarkDotNet/issues/172
     public class ExporterDependancyTests
     {
         [Fact]

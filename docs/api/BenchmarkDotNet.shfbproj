@@ -28,7 +28,7 @@
     <NamingMethod>HashedMemberName</NamingMethod>
     <HelpTitle>BenchmarkDotNet Reference Manual</HelpTitle>
     <CopyrightText>%28c%29 2013-2016 BenchmarkDotNet</CopyrightText>
-    <CopyrightHref>https://github.com/PerfDotNet/BenchmarkDotNet</CopyrightHref>
+    <CopyrightHref>https://github.com/dotnet/BenchmarkDotNet</CopyrightHref>
     <ContentPlacement>AboveNamespaces</ContentPlacement>
     <BuildAssemblerVerbosity>OnlyWarningsAndErrors</BuildAssemblerVerbosity>
     <HelpFileFormat>Website</HelpFileFormat>

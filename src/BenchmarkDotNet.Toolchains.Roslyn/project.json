@@ -1,18 +1,18 @@
 ﻿{
   "title": "BenchmarkDotNet.Toolchains.Roslyn",
   "version": "0.9.9-develop",
-  "authors": [ "Andrey Akinshin", "Jon Skeet", "Matt Warren" ],
+  "authors": [ ".NET Foundation and contributors" ],
   "description": "Powerful .NET library for benchmarking",
-  "copyright": "Andrey Akinshin, Jon Skeet, Matt Warren",
+  "copyright": ".NET Foundation and contributors",
   "packOptions": {
-    "owners": [ "Andrey Akinshin", "Jon Skeet", "Matt Warren" ],
-    "licenseUrl": "https://github.com/PerfDotNet/BenchmarkDotNet/blob/master/LICENSE.md",
-    "projectUrl": "https://github.com/PerfDotNet/BenchmarkDotNet",
-    "iconUrl": "https://raw.githubusercontent.com/PerfDotNet/BenchmarkDotNet/master/docs/guide/logo.png",
+    "owners": [ ".NET Foundation and contributors" ],
+    "licenseUrl": "https://github.com/dotnet/BenchmarkDotNet/blob/master/LICENSE.md",
+    "projectUrl": "https://github.com/dotnet/BenchmarkDotNet",
+    "iconUrl": "https://raw.githubusercontent.com/dotnet/BenchmarkDotNet/master/docs/guide/logo.png",
     "requireLicenseAcceptance": false,
     "repository": {
       "type": "git",
-      "url": "https://github.com/PerfDotNet/BenchmarkDotNet"
+      "url": "https://github.com/dotnet/BenchmarkDotNet"
     },
     "tags": [ "benchmark benchmarking performance" ]
   },
