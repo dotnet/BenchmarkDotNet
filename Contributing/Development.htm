@@ -36,7 +36,7 @@
 <li class="tocentry"><a href="../GettingStarted.htm">Getting Started</a>
 </li>
 <li class="tocentry">
-<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Configuration.htm">Configuration</a></span>
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Configs.htm">Configs</a></span>
 </li>
 <li class="tocentry"><a href="../HowToRun.htm">How to run your benchmarks</a>
 </li>
@@ -48,8 +48,6 @@
 <li class="tocentry"><a href="../RulesOfBenchmarking.htm">Rules of benchmarking</a>
 </li>
 <li class="tocentry"><a href="../NuGet.htm">NuGet Packages</a>
-</li>
-<li class="tocentry"><a href="../faq.htm">FAQ</a>
 </li>
 <li class="tocentry"><a href="../Team.htm">Team</a>
 </li>
@@ -64,7 +62,6 @@
 </li>
 <li class="tocentry current"><a class="current" href="../Contributing/Development.htm">Development</a>
 <ul class="currentrelative">
-<li class="tocentry"><a href="#branches">Branches</a></li>
 <li class="tocentry"><a href="#new-project-files">New project files</a></li>
 <li class="tocentry"><a href="#new-dependencies">New dependencies</a></li>
 </ul>
@@ -101,10 +98,8 @@
                 <div role="main">
                     <div class="section">
 <h1 id="development">Development<a class="headerlink" href="#development" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
-<h2 id="branches">Branches<a class="headerlink" href="#branches" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
-<p>Please, use the <code>develop</code> branch for developing. The <code>master</code> branch should correspond the latest NuGet package of the library.</p>
 <h2 id="new-project-files">New project files<a class="headerlink" href="#new-project-files" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
-<p>.csproj and package.config files have been replaced with .xproj and project.json files. project.json automatically references all .cs files so you 
+<p><code>.csproj</code> and <code>packages.config</code> files have been replaced with <code>.xproj</code> and <code>project.json</code> files. <code>project.json</code> automatically references all <code>.cs</code> files so you 
 don’t have to update it with every new class/interface/enum added (number of git conflicts has just dropped). It also has some side efects. 
 For example if you create some subfolder in any of the folders that contain project.json file and put some .cs files there, then these files are 
 going to be compiled as part of parent project by default. </p>
@@ -161,15 +156,16 @@ going to be compiled as part of parent project by default. </p>
 <p>Project.json.lock tells the compiler exactly where to look for our dependencies. You can produce it with „dotnet restore”. Sometimes VS will do this for you, sometimes you will have to do this on your own.</p>
 <h2 id="new-dependencies">New dependencies<a class="headerlink" href="#new-dependencies" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <p>There are at least 3 types of dependencies. Project, package and build. Sample:</p>
-<p><code>json
- &quot;dependencies&quot;: {
+<pre><code class="json"> &quot;dependencies&quot;: {
     &quot;BenchmarkDotNet&quot;: {
       &quot;target&quot;: &quot;project&quot;,
       &quot;version&quot;: &quot;1.0.0-*&quot;
     }
-  }</code></p>
+  }
+</code></pre>
+
 <p>When you want to add some dependency then you just add in in the right place in project.json. It depends on which platforms the library that you would like use supports.</p>
-<h3 id="nohighlight">If it supports all frameworks<a class="headerlink" href="#nohighlight" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<h3 id="if-it-supports-all-frameworks">If it supports all frameworks<a class="headerlink" href="#if-it-supports-all-frameworks" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
 <p>Just to move the dependencies to common dependencies (same level as frameworks, same thing applies to frameworkAssemblies).</p>
 <pre><code class="json">  &quot;frameworks&quot;: {
     &quot;net40&quot;: { },
@@ -248,7 +244,7 @@ namespace BenchmarkDotNet.Loggers
                 <footer>
                     <hr />
                     <div role="contentinfo">
-BenchmarkDotNet Documentation. &copy;2013-2016. <a href='https://github.com/PerfDotNet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.
+BenchmarkDotNet Documentation. &copy;2013-2016. <a href='https://github.com/dotnet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.
                     </div>
                 </footer>
             </div>

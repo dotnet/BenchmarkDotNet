@@ -36,7 +36,7 @@
 <li class="tocentry"><a href="GettingStarted.htm">Getting Started</a>
 </li>
 <li class="tocentry">
-<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="Configuration.htm">Configuration</a></span>
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="Configs.htm">Configs</a></span>
 </li>
 <li class="tocentry"><a href="HowToRun.htm">How to run your benchmarks</a>
 </li>
@@ -48,8 +48,6 @@
 <li class="tocentry"><a href="RulesOfBenchmarking.htm">Rules of benchmarking</a>
 </li>
 <li class="tocentry"><a href="NuGet.htm">NuGet Packages</a>
-</li>
-<li class="tocentry"><a href="faq.htm">FAQ</a>
 </li>
 <li class="tocentry"><a href="Team.htm">Team</a>
 </li>
@@ -83,19 +81,19 @@
                 </div>
                 <div role="main">
                     <div class="section">
-<h1 id="welcome-to-the-benchmarkdotnet-documentation-v0.9.9">Welcome to the BenchmarkDotNet documentation (v0.9.9)<a class="headerlink" href="#welcome-to-the-benchmarkdotnet-documentation-v0.9.9" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<h1 id="welcome-to-the-benchmarkdotnet-documentation-v0.10.0">Welcome to the BenchmarkDotNet documentation (v0.10.0)<a class="headerlink" href="#welcome-to-the-benchmarkdotnet-documentation-v0.10.0" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
 <p><strong>BenchmarkDotNet</strong> is a powerful .NET library for benchmarking. </p>
-<p>Source code is available at <a href="https://github.com/PerfDotNet/BenchmarkDotNet" target="_blank"><i class="fa fa-github"></i> github.com/PerfDotNet/BenchmarkDotNet</a></p>
-<p><a href="https://www.nuget.org/packages/BenchmarkDotNet/" target="_blank"><img src="https://img.shields.io/nuget/v/BenchmarkDotNet.svg" alt="NuGet" /></a> <a href="https://gitter.im/PerfDotNet/BenchmarkDotNet" target="_blank"><img src="https://img.shields.io/gitter/room/PerfDotNet/BenchmarkDotNet.svg" alt="Gitter" /></a> <a href="https://ci.appveyor.com/project/PerfDotNet/benchmarkdotnet/branch/master" target="_blank"><img src="https://img.shields.io/appveyor/ci/perfdotnet/benchmarkdotnet/master.svg?label=appveyor" alt="Build status" /></a> <a href="LICENSE.md"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" /></a> <a href="https://perfdotnet.github.io/BenchmarkDotNet/Overview.htm" target="_blank"><img src="https://img.shields.io/badge/docs-Overview-green.svg?style=flat" alt="Overview" /></a> <a href="https://github.com/PerfDotNet/BenchmarkDotNet/wiki/ChangeLog" target="_blank"><img src="https://img.shields.io/badge/docs-ChangeLog-green.svg?style=flat" alt="ChangeLog" /></a></p>
+<p>Source code is available at <a href="https://github.com/dotnet/BenchmarkDotNet" target="_blank"><i class="fa fa-github"></i> github.com/dotnet/BenchmarkDotNet</a></p>
+<p><a href="https://www.nuget.org/packages/BenchmarkDotNet/" target="_blank"><img src="https://img.shields.io/nuget/v/BenchmarkDotNet.svg" alt="NuGet" /></a> <a href="https://gitter.im/dotnet/BenchmarkDotNet" target="_blank"><img src="https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet.svg" alt="Gitter" /></a> <a href="https://ci.appveyor.com/project/dotnet/benchmarkdotnet/branch/master" target="_blank"><img src="https://img.shields.io/appveyor/ci/dotnet/benchmarkdotnet/master.svg?label=appveyor" alt="Build status" /></a> <a href="LICENSE.md"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" /></a> <a href="http://benchmarkdotnet.org/Overview.htm" target="_blank"><img src="https://img.shields.io/badge/docs-Overview-green.svg?style=flat" alt="Overview" /></a> <a href="https://github.com/dotnet/BenchmarkDotNet/wiki/ChangeLog" target="_blank"><img src="https://img.shields.io/badge/docs-ChangeLog-green.svg?style=flat" alt="ChangeLog" /></a></p>
 <h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <ul>
 <li>Standard benchmarking routine: generating an isolated project per each benchmark method; auto-selection of iteration amount; warmup; overhead evaluation; statistics calculation; and so on.</li>
 <li>Supported runtimes: Full .NET Framework, .NET Core (RTM), Mono</li>
 <li>Supported languages: C#, F#, and Visual Basic</li>
 <li>Supported OS: Windows, Linux, MacOS</li>
-<li>Easy way to compare different environments (<code>x86</code> vs <code>x64</code>, <code>LegacyJit</code> vs <code>RyuJit</code>, and so on; see: <a href="https://perfdotnet.github.io/BenchmarkDotNet/Configuration/Jobs.htm" target="_blank">Jobs</a>)</li>
+<li>Easy way to compare different environments (<code>x86</code> vs <code>x64</code>, <code>LegacyJit</code> vs <code>RyuJit</code>, and so on; see: <a href="http://benchmarkdotnet.org/Configs/Jobs.htm" target="_blank">Jobs</a>)</li>
 <li>Reports: markdown, csv, html, plain text, png plots.</li>
-<li>Advanced features: <a href="https://perfdotnet.github.io/BenchmarkDotNet/Advanced/Baseline.htm" target="_blank">Baseline</a>, <a href="https://perfdotnet.github.io/BenchmarkDotNet/Advanced/Params.htm" target="_blank">Params</a></li>
+<li>Advanced features: <a href="http://benchmarkdotnet.org/Advanced/Baseline.htm" target="_blank">Baseline</a>, <a href="http://benchmarkdotnet.org/Advanced/Params.htm" target="_blank">Params</a></li>
 <li>Powerful diagnostics based on ETW events (see <a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/" target="_blank">BenchmarkDotNet.Diagnostics.Windows</a>)</li>
 </ul>
 
@@ -104,7 +102,7 @@
                 <footer>
                     <hr />
                     <div role="contentinfo">
-BenchmarkDotNet Documentation. &copy;2013-2016. <a href='https://github.com/PerfDotNet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.
+BenchmarkDotNet Documentation. &copy;2013-2016. <a href='https://github.com/dotnet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.
                     </div>
                 </footer>
             </div>

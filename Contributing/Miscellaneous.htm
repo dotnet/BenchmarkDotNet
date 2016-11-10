@@ -36,7 +36,7 @@
 <li class="tocentry"><a href="../GettingStarted.htm">Getting Started</a>
 </li>
 <li class="tocentry">
-<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Configuration.htm">Configuration</a></span>
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Configs.htm">Configs</a></span>
 </li>
 <li class="tocentry"><a href="../HowToRun.htm">How to run your benchmarks</a>
 </li>
@@ -48,8 +48,6 @@
 <li class="tocentry"><a href="../RulesOfBenchmarking.htm">Rules of benchmarking</a>
 </li>
 <li class="tocentry"><a href="../NuGet.htm">NuGet Packages</a>
-</li>
-<li class="tocentry"><a href="../faq.htm">FAQ</a>
 </li>
 <li class="tocentry"><a href="../Team.htm">Team</a>
 </li>
@@ -68,7 +66,8 @@
 <ul class="currentrelative">
 <li class="tocentry"><a href="#f">F#</a></li>
 <li class="tocentry"><a href="#chat-room">Chat room</a></li>
-<li class="tocentry"><a href="#nuget">NuGet</a></li>
+<li class="tocentry"><a href="#how-can-i-help">How can I help?</a></li>
+<li class="tocentry"><a href="#nightly-nuget-feed">Nightly NuGet feed</a></li>
 </ul>
 
 </ul>
@@ -104,9 +103,11 @@
 <h2 id="f">F#<a class="headerlink" href="#f" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <p>We have full F# support, all you have to do is to run <code>dotnet restore</code> to download the compilers etc.</p>
 <h2 id="chat-room">Chat room<a class="headerlink" href="#chat-room" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
-<p><a href="https://gitter.im/PerfDotNet/BenchmarkDotNet?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge" target="_blank"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Join the chat at https://gitter.im/PerfDotNet/BenchmarkDotNet" /></a></p>
-<h2 id="nuget">NuGet<a class="headerlink" href="#nuget" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
-<p>If you want to check the develop version of the BenchmarkDotNet NuGet package, add the following line in the <code>&lt;packageSources&gt;</code> section of your <code>NuGet.congig</code>:</p>
+<p><a href="https://gitter.im/dotnet/BenchmarkDotNet?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge" target="_blank"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Join the chat at https://gitter.im/dotnet/BenchmarkDotNet" /></a></p>
+<h2 id="how-can-i-help">How can I help?<a class="headerlink" href="#how-can-i-help" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p><a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=is%3Aissue+is%3Aopen+label%3Aup-for-grabs" target="_blank">Here is a list of up-for-grabs issues</a></p>
+<h2 id="nightly-nuget-feed">Nightly NuGet feed<a class="headerlink" href="#nightly-nuget-feed" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>If you want to check the develop version of the BenchmarkDotNet NuGet package, add the following line in the <code>&lt;packageSources&gt;</code> section of your <code>NuGet.config</code>:</p>
 <pre><code class="xml">&lt;add key=&quot;appveyor-bdn&quot; value=&quot;https://ci.appveyor.com/nuget/benchmarkdotnet&quot; /&gt;
 </code></pre>
 
@@ -117,7 +118,7 @@
                 <footer>
                     <hr />
                     <div role="contentinfo">
-BenchmarkDotNet Documentation. &copy;2013-2016. <a href='https://github.com/PerfDotNet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.
+BenchmarkDotNet Documentation. &copy;2013-2016. <a href='https://github.com/dotnet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.
                     </div>
                 </footer>
             </div>

@@ -37,25 +37,25 @@
 </li>
 <li class="tocentry">
 <ul>
-<li><span class="navigationgroup"><i class="fa fa-caret-down"></i> <a href="../Configuration.htm">Configuration</a></span></li>
-<li class="tocentry current"><a class="current" href="../Configuration/Configs.htm">Configs</a>
+<li><span class="navigationgroup"><i class="fa fa-caret-down"></i> <a href="../Configs.htm">Configs</a></span></li>
+<li class="tocentry current"><a class="current" href="../Configs/Configs.htm">Configs</a>
 <ul class="currentrelative">
 <li class="tocentry"><a href="#built-in-configuration">Built-in configuration</a></li>
 <li class="tocentry"><a href="#custom-configs">Custom configs</a></li>
 </ul>
-<li class="tocentry"><a href="../Configuration/Jobs.htm">Jobs</a>
+<li class="tocentry"><a href="../Configs/Jobs.htm">Jobs</a>
 </li>
-<li class="tocentry"><a href="../Configuration/Columns.htm">Columns</a>
+<li class="tocentry"><a href="../Configs/Columns.htm">Columns</a>
 </li>
-<li class="tocentry"><a href="../Configuration/Exporters.htm">Exporters</a>
+<li class="tocentry"><a href="../Configs/Exporters.htm">Exporters</a>
 </li>
-<li class="tocentry"><a href="../Configuration/Loggers.htm">Loggers</a>
+<li class="tocentry"><a href="../Configs/Loggers.htm">Loggers</a>
 </li>
-<li class="tocentry"><a href="../Configuration/Diagnosers.htm">Diagnosers</a>
+<li class="tocentry"><a href="../Configs/Diagnosers.htm">Diagnosers</a>
 </li>
-<li class="tocentry"><a href="../Configuration/Analyzers.htm">Analyzers</a>
+<li class="tocentry"><a href="../Configs/Analyzers.htm">Analyzers</a>
 </li>
-<li class="tocentry"><a href="../Configuration/Validators.htm">Validators</a>
+<li class="tocentry"><a href="../Configs/Validators.htm">Validators</a>
 </li>
 
 </ul>
@@ -70,8 +70,6 @@
 <li class="tocentry"><a href="../RulesOfBenchmarking.htm">Rules of benchmarking</a>
 </li>
 <li class="tocentry"><a href="../NuGet.htm">NuGet Packages</a>
-</li>
-<li class="tocentry"><a href="../faq.htm">FAQ</a>
 </li>
 <li class="tocentry"><a href="../Team.htm">Team</a>
 </li>
@@ -98,7 +96,7 @@
             <div class="nav-content">
                 <div role="navigation" aria-label="breadcrumbs navigation">
                     <div class="breadcrumbs">
-<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Configuration.htm">Configuration</a></li> / <li><a href="../Configuration/Configs.htm">Configs</a></li></ul>
+<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Configs.htm">Configs</a></li> / <li><a href="../Configs/Configs.htm">Configs</a></li></ul>
 					
                     </div>
                     <hr />
@@ -172,7 +170,7 @@ public class IntroConfigSource
 
         public MyConfigSourceAttribute(params Jit[] jits)
         {
-            var jobs = jits.Select(jit =&gt; Job.Dry.With(Platform.X64).With(jit)).ToArray();
+            var jobs = jits.Select(jit =&gt; new Job(Job.Dry) { Env = { Platform = Platform.X64, Jit = jit } }).ToArray();
             Config = ManualConfig.CreateEmpty().With(jobs);
         }
     }
@@ -202,7 +200,7 @@ public class IntroConfigSource
                 <footer>
                     <hr />
                     <div role="contentinfo">
-BenchmarkDotNet Documentation. &copy;2013-2016. <a href='https://github.com/PerfDotNet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.
+BenchmarkDotNet Documentation. &copy;2013-2016. <a href='https://github.com/dotnet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.
                     </div>
                 </footer>
             </div>
