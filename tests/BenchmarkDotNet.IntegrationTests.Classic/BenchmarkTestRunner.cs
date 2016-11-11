@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.IntegrationTests.Classic
 
             Assert.True(summary.Reports.Any());
             Assert.True(summary.Reports.All(report => report.ExecuteResults.All(executeResult => executeResult.FoundExecutable)));
-            Assert.True(summary.Reports.All(report => report.AllMeasurements.Any()), "There are no any available measurements");
+            Assert.True(summary.Reports.All(report => report.AllMeasurements.Any()), "There are no available measurements");
         }
 
         private class SingleRunFastConfig : ManualConfig
