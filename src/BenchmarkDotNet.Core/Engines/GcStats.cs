@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Engines
@@ -6,6 +7,8 @@ namespace BenchmarkDotNet.Engines
     public struct GcStats
     {
         internal const string ResultsLinePrefix = "GC: ";
+
+        private static readonly Func<long> getAllocatedBytesForCurrentThread = GetAllocatedBytesForCurrentThread();
 
         private GcStats(int gen0Collections, int gen1Collections, int gen2Collections, long allocatedBytes, long totalOperations)
         {
@@ -50,7 +53,7 @@ namespace BenchmarkDotNet.Engines
 
         internal static GcStats ReadInitial(bool isDiagnosticsEnabled)
         {
-            // this might force GC.Collect, so we want to do this before collecting collections counts
+            // this will force GC.Collect, so we want to do this before collecting collections counts
             long allocatedBytes = GetAllocatedBytes(isDiagnosticsEnabled); 
 
             return new GcStats(
@@ -68,7 +71,7 @@ namespace BenchmarkDotNet.Engines
                 GC.CollectionCount(1),
                 GC.CollectionCount(2),
 
-                // this might force GC.Collect, so we want to do this after collecting collections counts 
+                // this will force GC.Collect, so we want to do this after collecting collections counts 
                 // to exclude this single full forced collection from results
                 GetAllocatedBytes(isDiagnosticsEnabled), 
                 0);
@@ -79,20 +82,32 @@ namespace BenchmarkDotNet.Engines
 
         private static long GetAllocatedBytes(bool isDiagnosticsEnabled)
         {
-#if NETCOREAPP11 // when MS releases new version of .NET Runtime to nuget.org
-            return GC.GetAllocatedBytesForCurrentThread(); // https://github.com/dotnet/corefx/pull/12489
-#elif CLASSIC
-            if (!isDiagnosticsEnabled || RuntimeInformation.IsMono()) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-
+            if (!isDiagnosticsEnabled 
+                || RuntimeInformation.IsMono()) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-
                 return 0;
 
             // "This instance Int64 property returns the number of bytes that have been allocated by a specific 
             // AppDomain. The number is accurate as of the last garbage collection." - CLR via C#
             // so we enforce GC.Collect here just to make sure we get accurate results
             GC.Collect();
+#if CORE
+            return getAllocatedBytesForCurrentThread.Invoke();
+#elif CLASSIC
+
             return AppDomain.CurrentDomain.MonitoringTotalAllocatedMemorySize;
-#else
-            return 0; // currently for .NET Core
 #endif
+        }
+
+        private static Func<long> GetAllocatedBytesForCurrentThread()
+        {
+            // for some versions of .NET Core this method is internal, 
+            // for some public and for others public and exposed ;)
+            var method = typeof(GC).GetTypeInfo().GetMethod("GetAllocatedBytesForCurrentThread",
+                            BindingFlags.Public | BindingFlags.Static)
+                      ?? typeof(GC).GetTypeInfo().GetMethod("GetAllocatedBytesForCurrentThread",
+                            BindingFlags.NonPublic | BindingFlags.Static);
+
+            return () => (long)method.Invoke(null, null);
         }
 
         internal string ToOutputLine() 

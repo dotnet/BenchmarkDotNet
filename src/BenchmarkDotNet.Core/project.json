@@ -51,34 +51,18 @@
         "System.Threading.Tasks.Extensions": "4.0.0"
       }
     },
-    "netstandard1.5": {
+    "netcoreapp1.1": {
       "buildOptions": {
         "define": [ "CORE" ]
       },
       "dependencies": {
-        "System.Linq": "4.1.0",
-        "System.Resources.ResourceManager": "4.0.1",
-        "Microsoft.CSharp": "4.0.1",
-        "Microsoft.Win32.Primitives": "4.0.1",
-        "System.Console": "4.0.0",
-        "System.Text.RegularExpressions": "4.1.0",
-        "System.Threading": "4.0.11",
-        "System.Reflection": "4.1.0",
-        "System.Reflection.Primitives": "4.0.1",
-        "System.Reflection.TypeExtensions": "4.1.0",
-        "System.Threading.Tasks.Extensions": "4.0.0",
-        "System.Threading.Thread": "4.0.0",
-        "System.Diagnostics.Process": "4.1.0",
-        "System.IO.FileSystem": "4.0.1",
-        "System.Runtime.InteropServices.RuntimeInformation": "4.0.0",
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.1.0-preview1-001100-00"
+        },
         "System.Runtime.Serialization.Primitives": "4.1.1",
-        "System.Diagnostics.Tools": "4.0.1",
-        "System.Runtime.InteropServices": "4.1.0",
         "Microsoft.DotNet.InternalAbstractions": "1.0.0",
-        "System.Reflection.Extensions": "4.0.1",
-        "System.Diagnostics.Debug": "4.0.11",
-        "System.Xml.XPath.XmlDocument": "4.0.1",
-        "System.Collections.Concurrent": "4.0.12"
+        "System.Xml.XPath.XmlDocument": "4.0.1"
       }
     }
   }

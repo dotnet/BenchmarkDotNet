@@ -42,6 +42,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
                     // don't forget to call, otherwise logger will not get any events
                     process.BeginErrorReadLine();
+                    process.BeginOutputReadLine();
 
                     process.WaitForExit((int)timeout.TotalMilliseconds);
 

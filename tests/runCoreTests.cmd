@@ -15,7 +15,7 @@ echo -----------------------------
 echo Running Core tests
 echo -----------------------------
 
-call dotnet test "BenchmarkDotNet.IntegrationTests/" --configuration Release --framework netcoreapp1.0 2> failedCoreTests.txt
+call dotnet test "BenchmarkDotNet.IntegrationTests/" --configuration Release --framework netcoreapp1.1 2> failedCoreTests.txt
 
 if NOT %ERRORLEVEL% == 0 (
     echo CORE tests has failed

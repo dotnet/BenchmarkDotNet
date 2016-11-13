@@ -2,32 +2,21 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using Xunit;
 using Xunit.Abstractions;
-using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
     public class MemoryDiagnoserTests
     {
-        private const string SkipAllocationsTests
-#if CORE
-         = "Not supported for .NET Core yet";
-#else
-         = null;
-#endif
-
         private readonly ITestOutputHelper output;
 
         public MemoryDiagnoserTests(ITestOutputHelper outputHelper)
@@ -40,19 +29,17 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark]public void Empty() { }
             [Benchmark]public byte[] EightBytes() => new byte[8];
             [Benchmark]public byte[] SixtyFourBytes() => new byte[64];
-            [Benchmark]public byte[] ThousandBytes() => new byte[1000];
         }
 
-        [Fact(Skip = SkipAllocationsTests)]
+        [Fact]
         public void MemoryDiagnoserIsAccurate()
         {
-            double objectAllocationOverhead = IntPtr.Size * 3; // pointer to method table + object header word + pointer to the object 
-            AssertAllocations(typeof(AccurateAllocations), 100, new Dictionary<string, Predicate<double>>
+            long objectAllocationOverhead = IntPtr.Size * 3; // pointer to method table + object header word + pointer to the object 
+            AssertAllocations(typeof(AccurateAllocations), 200, new Dictionary<string, Predicate<long>>
             {
                 { "Empty", allocatedBytes => allocatedBytes == 0 },
                 { "EightBytes", allocatedBytes => allocatedBytes == 8 + objectAllocationOverhead },
                 { "SixtyFourBytes", allocatedBytes => allocatedBytes == 64 + objectAllocationOverhead },
-                { "ThousandBytes", allocatedBytes => allocatedBytes == 1000 + objectAllocationOverhead }
             });
         }
 
@@ -74,10 +61,10 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Fact(Skip = SkipAllocationsTests)]
+        [Fact]
         public void MemoryDiagnoserDoesNotIncludeAllocationsFromSetupAndCleanup()
         {
-            AssertAllocations(typeof(AllocatingSetupAndCleanup), 5, new Dictionary<string, Predicate<double>>
+            AssertAllocations(typeof(AllocatingSetupAndCleanup), 100, new Dictionary<string, Predicate<long>>
             {
                 { "AllocateNothing",  allocatedBytes => allocatedBytes == 0 }
             });
@@ -88,17 +75,17 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark]public void EmptyMethod() { }
         }
 
-        [Fact(Skip = SkipAllocationsTests)]
+        [Fact]
         public void EngineShouldNotInterfereAllocationResults()
         {
-            AssertAllocations(typeof(NoAllocationsAtAll), 100, new Dictionary<string, Predicate<double>>
+            AssertAllocations(typeof(NoAllocationsAtAll), 100, new Dictionary<string, Predicate<long>>
             {
                 { "EmptyMethod",  allocatedBytes => allocatedBytes == 0 }
             });
         }
 
         private void AssertAllocations(Type benchmarkType, int targetCount,
-            Dictionary<string, Predicate<double>> benchmarksAllocationsValidators)
+            Dictionary<string, Predicate<long>> benchmarksAllocationsValidators)
         {
             var memoryDiagnoser = MemoryDiagnoser.Default;
             var config = CreateConfig(memoryDiagnoser, targetCount);
@@ -140,10 +127,10 @@ namespace BenchmarkDotNet.IntegrationTests
         private static T[] GetColumns<T>(MemoryDiagnoser memoryDiagnoser)
             => memoryDiagnoser.GetColumnProvider().GetColumns(null).OfType<T>().ToArray();
 
-        private static void AssertParsed(string text, Predicate<double> condition)
+        private static void AssertParsed(string text, Predicate<long> condition)
         {
-            double value;
-            if (double.TryParse(text, NumberStyles.Number, HostEnvironmentInfo.MainCultureInfo, out value))
+            long value;
+            if (long.TryParse(text, NumberStyles.Number, HostEnvironmentInfo.MainCultureInfo, out value))
             {
                 Assert.True(condition(value), $"Failed for value {value}");
             }

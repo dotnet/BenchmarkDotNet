@@ -52,16 +52,12 @@ namespace BenchmarkDotNet.Diagnosers
 
             public string GetValue(Summary summary, Benchmark benchmark)
             {
-#if CORE
-                return "?";
-#else
                 if (RuntimeInformation.IsMono())
                     return "?";
                 if (!results.ContainsKey(benchmark))
                     return "N/A";
 
                 return results[benchmark].BytesAllocatedPerOperation.ToString("N0", HostEnvironmentInfo.MainCultureInfo);
-#endif
             }
         }
 
