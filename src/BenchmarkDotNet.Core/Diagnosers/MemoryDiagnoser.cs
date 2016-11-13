@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Loggers;
@@ -75,10 +76,17 @@ namespace BenchmarkDotNet.Diagnosers
             public bool IsDefault(Summary summary, Benchmark benchmark) => true;
             public string Id => $"{nameof(GCCollectionColumn)}{generation}";
             public string ColumnName => $"Gen {generation}";
-            public bool IsAvailable(Summary summary) => true;
-            public bool AlwaysShow => true;
+            public bool AlwaysShow => false;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
+
+            public bool IsAvailable(Summary summary)
+                => generation == 0 // Gen 0 must always be visible
+                    || summary
+                        .Reports
+                        .Any(report => generation == 1 
+                            ? report.GcStats.Gen1Collections != 0 
+                            : report.GcStats.Gen2Collections != 0);
 
             public string GetValue(Summary summary, Benchmark benchmark)
             {
