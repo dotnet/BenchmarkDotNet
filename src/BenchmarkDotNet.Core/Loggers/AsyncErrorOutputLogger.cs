@@ -3,12 +3,12 @@ using System.Diagnostics;
 
 namespace BenchmarkDotNet.Loggers
 {
-    internal class AsynchronousProcessOutputLogger : IDisposable
+    internal class AsyncErrorOutputLogger : IDisposable
     {
         private readonly Process process;
         private readonly ILogger logger;
 
-        public AsynchronousProcessOutputLogger(ILogger logger, Process process)
+        public AsyncErrorOutputLogger(ILogger logger, Process process)
         {
             if (process.StartInfo.UseShellExecute)
             {
@@ -18,10 +18,6 @@ namespace BenchmarkDotNet.Loggers
             this.logger = logger;
             this.process = process;
 
-            if (process.StartInfo.RedirectStandardOutput)
-            {
-                this.process.OutputDataReceived += ProcessOnOutputDataReceived;
-            }
             if (process.StartInfo.RedirectStandardError)
             {
                 this.process.ErrorDataReceived += ProcessOnErrorDataReceived;
@@ -30,13 +26,7 @@ namespace BenchmarkDotNet.Loggers
 
         public void Dispose()
         {
-            process.OutputDataReceived -= ProcessOnOutputDataReceived;
             process.ErrorDataReceived -= ProcessOnErrorDataReceived;
-        }
-
-        private void ProcessOnOutputDataReceived(object sender, DataReceivedEventArgs dataReceivedEventArgs)
-        {
-            logger.WriteLine(LogKind.Default, dataReceivedEventArgs.Data);
         }
 
         private void ProcessOnErrorDataReceived(object sender, DataReceivedEventArgs dataReceivedEventArgs)
