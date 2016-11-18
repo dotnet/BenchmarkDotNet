@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
@@ -19,7 +20,8 @@ using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Running
 {
-    internal static class BenchmarkRunnerCore
+    // TODO: Find a better name
+    public static class BenchmarkRunnerCore
     {
         private static int benchmarkRunIndex;
 
@@ -97,7 +99,11 @@ namespace BenchmarkDotNet.Running
             foreach (var report in reports)
             {
                 logger.WriteLineInfo(report.Benchmark.DisplayInfo);
-                logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr());
+                var resultRuns = report.GetResultRuns();
+                if (resultRuns.IsEmpty())
+                    logger.WriteLineError("There are no any results runs");
+                else
+                    logger.WriteLineStatistic(resultRuns.GetStatistics().ToTimeStr());
                 logger.WriteLine();
             }
 
@@ -108,14 +114,7 @@ namespace BenchmarkDotNet.Running
             MarkdownExporter.Console.ExportToLog(summary, logger);
 
             // TODO: make exporter
-            var warnings = config.GetCompositeAnalyser().Analyse(summary).ToList();
-            if (warnings.Any())
-            {
-                logger.WriteLine();
-                logger.WriteLineError("// * Warnings * ");
-                foreach (var warning in warnings)
-                    logger.WriteLineError($"{warning.Message}");
-            }
+            ConclusionHelper.Print(logger, config.GetCompositeAnalyser().Analyse(summary).ToList());
 
             if (config.GetDiagnosers().Any())
             {

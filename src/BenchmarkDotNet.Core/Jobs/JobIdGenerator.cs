@@ -7,7 +7,10 @@ namespace BenchmarkDotNet.Jobs
     {
         public static string GenerateRandomId(Job job)
         {
-            int seed = CharacteristicSetPresenter.Display.ToPresentation(job).GetHashCode();
+            string presentation = CharacteristicSetPresenter.Display.ToPresentation(job);
+            if (presentation == "")
+                return "DefaultJob";            
+            int seed = presentation.GetHashCode();
             var random = new Random(seed);
             string id = "";
             for (int i = 0; i < 6; i++)

@@ -61,8 +61,8 @@ namespace BenchmarkDotNet.IntegrationTests
             Equal(j.Env.Platform, Platform.AnyCpu);
             Equal(j.Run.RunStrategy, RunStrategy.Throughput); // set by default
             Equal(j.Id, "Default"); // id reset
-            True(j.DisplayInfo.StartsWith("Job-"));
-            True(j.ResolvedId.StartsWith("Job-"));
+            True(j.DisplayInfo == "DefaultJob", "DisplayInfo = " + j.DisplayInfo);
+            True(j.ResolvedId == "DefaultJob", "ResolvedId = " + j.ResolvedId);
             Equal(j.ResolvedId, j.FolderInfo);
             Equal(j.Env.Id, "Default");
 
@@ -75,8 +75,8 @@ namespace BenchmarkDotNet.IntegrationTests
             Equal(j.Env.Platform, Platform.AnyCpu);
             Equal(j.Run.RunStrategy, RunStrategy.Throughput); // set by default
             Equal(j.Id, "Default"); // id reset
-            True(j.DisplayInfo.StartsWith("Job-"));
-            True(j.ResolvedId.StartsWith("Job-"));
+            True(j.DisplayInfo == "DefaultJob", "DisplayInfo = " + j.DisplayInfo);
+            True(j.ResolvedId == "DefaultJob", "ResolvedId = " + j.ResolvedId);
             Equal(j.ResolvedId, j.FolderInfo);
             Equal(j.Env.Id, "Default");
         }

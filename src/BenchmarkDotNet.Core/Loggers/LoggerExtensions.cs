@@ -16,6 +16,8 @@
 
         public static void WriteLineError(this ILogger logger, string text) => logger.WriteLine(LogKind.Error, text);
 
+        public static void WriteLineHint(this ILogger logger, string text) => logger.WriteLine(LogKind.Hint, text);
+
         public static void Write(this ILogger logger, string text) =>  logger.Write(LogKind.Default, text);
 
         public static void WriteHelp(this ILogger logger, string text) => logger.Write(LogKind.Help, text);
@@ -29,5 +31,7 @@
         public static void WriteInfo(this ILogger logger, string text) => logger.Write(LogKind.Info, text);
 
         public static void WriteError(this ILogger logger, string text) => logger.Write(LogKind.Error, text);
+
+        public static void WriteHint(this ILogger logger, string text) => logger.Write(LogKind.Hint, text);
     }
 }

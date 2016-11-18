@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.IntegrationTests
             output = outputHelper;
         }
 
-        // See also: https://github.com/PerfDotNet/BenchmarkDotNet/issues/204
+        // See also: https://github.com/dotnet/BenchmarkDotNet/issues/204
         [Fact(Skip = "This test fails on AppVeyor")]
         public void Test()
         {

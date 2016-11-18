@@ -42,6 +42,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IAnalyser> GetAnalysers()
         {
             yield return EnvironmentAnalyser.Default;
+            yield return OutliersAnalyser.Default;
         }
 
         public IEnumerable<IValidator> GetValidators()

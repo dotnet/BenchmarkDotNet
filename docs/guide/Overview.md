@@ -108,7 +108,7 @@ public class Md5VsSha256
     }
 ```
 
-Read more:  [Jobs](Configuration/Jobs.htm), [Configs](Configuration/Configs.htm)
+Read more:  [Jobs](Configs/Jobs.htm), [Configs](Configs/Configs.htm)
 
 
 ## Columns
@@ -127,7 +127,7 @@ public class Md5VsSha256
 
 Of course, you can define own columns based on full benchmark summary.
 
-Read more:  [Columns](Configuration/Columns.htm)
+Read more:  [Columns](Configs/Columns.htm)
 
 ## Exporters
 
@@ -142,7 +142,7 @@ If you have installed R, `RPlotExporter` will generate a lot of nice plots:
 
 ![Overview-RPlot.png](Images/Overview-RPlot.png)
 
-Read more:  [Exporters](Configuration/Exporters.htm)
+Read more:  [Exporters](Configs/Exporters.htm)
 
 ## Baseline
 
@@ -253,7 +253,7 @@ Below is a sample output from the `GC and Memory Allocation` diagnoser, note the
       LINQ | Testing | 49.1154 ns | 0.5301 ns |   2.48 | 1,526.00 |     - |     - |              25.21 |
  Iterative | Testing | 19.8040 ns | 0.0456 ns |   1.00 |        - |     - |     - |               0.00 |
  
-Read more:  [Diagnosers](Configuration/Diagnosers.htm)
+Read more:  [Diagnosers](Configs/Diagnosers.htm)
 
 ## BenchmarkRunner
 

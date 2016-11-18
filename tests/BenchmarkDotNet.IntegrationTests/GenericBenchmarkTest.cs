@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
     }
 
-    // From https://github.com/PerfDotNet/BenchmarkDotNet/issues/44
+    // From https://github.com/dotnet/BenchmarkDotNet/issues/44
     public abstract class AbstractBenchmark<T>
     {
         private readonly T value;

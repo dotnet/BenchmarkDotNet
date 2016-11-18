@@ -10,8 +10,8 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    // See https://github.com/PerfDotNet/BenchmarkDotNet/issues/55
-    // https://github.com/PerfDotNet/BenchmarkDotNet/issues/59 is also related
+    // See https://github.com/dotnet/BenchmarkDotNet/issues/55
+    // https://github.com/dotnet/BenchmarkDotNet/issues/59 is also related
     public class InnerClassTest : BenchmarkTestExecutor
     {
         public InnerClassTest(ITestOutputHelper output) : base(output) { }

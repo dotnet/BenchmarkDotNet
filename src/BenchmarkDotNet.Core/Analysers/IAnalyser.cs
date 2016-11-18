@@ -5,6 +5,7 @@ namespace BenchmarkDotNet.Analysers
 {
     public interface IAnalyser
     {
-        IEnumerable<IWarning> Analyse(Summary summary);
+        string Id { get; }
+        IEnumerable<Conclusion> Analyse(Summary summary);
     }
 }

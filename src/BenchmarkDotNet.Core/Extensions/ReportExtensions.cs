@@ -26,10 +26,12 @@ namespace BenchmarkDotNet.Extensions
             return summary.GetReportFor<T>(actionExp).GetResultRuns().ToList();
         }
 
-        public static Statistics GetStatistics(this IList<Measurement> runs) =>
-            runs.Any()
-            ? new Statistics(runs.Select(r => r.GetAverageNanoseconds()))
-            : null;
+        public static Statistics GetStatistics(this IList<Measurement> runs)
+        {
+            if (runs.IsEmpty())
+                throw new InvalidOperationException("List of measurements contains no elements");
+            return new Statistics(runs.Select(r => r.GetAverageNanoseconds()));
+        }
 
         public static Statistics GetStatistics(this IEnumerable<Measurement> runs) =>
             GetStatistics(runs.ToList());

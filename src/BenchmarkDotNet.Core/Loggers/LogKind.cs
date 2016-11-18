@@ -2,6 +2,6 @@
 {
     public enum LogKind
     {
-        Default, Help, Header, Result, Statistic, Info, Error
+        Default, Help, Header, Result, Statistic, Info, Error, Hint
     }
 }
