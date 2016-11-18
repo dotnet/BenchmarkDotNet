@@ -14,14 +14,16 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class MemoryDiagnoser : IDiagnoser
     {
+        private const int Gen0 = 0, Gen1 = 1, Gen2 = 2;
+
         public static readonly MemoryDiagnoser Default = new MemoryDiagnoser();
 
         private readonly Dictionary<Benchmark, GcStats> results = new Dictionary<Benchmark, GcStats>();
 
         public IColumnProvider GetColumnProvider() => new SimpleColumnProvider(
-            new GCCollectionColumn(results, 0),
-            new GCCollectionColumn(results, 1),
-            new GCCollectionColumn(results, 2),
+            new GCCollectionColumn(results, Gen0),
+            new GCCollectionColumn(results, Gen1),
+            new GCCollectionColumn(results, Gen2),
             new AllocationColumn(results));
 
         // the following methods are left empty on purpose
@@ -30,9 +32,11 @@ namespace BenchmarkDotNet.Diagnosers
         public void AfterSetup(Process process, Benchmark benchmark) { }
         public void BeforeCleanup() { }
 
-        public void DisplayResults(ILogger logger) { } // no custom output
+        public void DisplayResults(ILogger logger)
+            => logger.WriteInfo("Note: the Gen 0/1/2/ Measurements are per 1k Operations");
 
-        public void ProcessResults(Benchmark benchmark, BenchmarkReport report) => results.Add(benchmark, report.GcStats);
+        public void ProcessResults(Benchmark benchmark, BenchmarkReport report) 
+            => results.Add(benchmark, report.GcStats);
 
         public class AllocationColumn : IColumn
         {
@@ -76,15 +80,16 @@ namespace BenchmarkDotNet.Diagnosers
             public bool IsDefault(Summary summary, Benchmark benchmark) => true;
             public string Id => $"{nameof(GCCollectionColumn)}{generation}";
             public string ColumnName => $"Gen {generation}";
-            public bool AlwaysShow => false;
+
+            public bool AlwaysShow => generation == Gen0; // Gen 0 must always be visible
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
 
             public bool IsAvailable(Summary summary)
-                => generation == 0 // Gen 0 must always be visible
+                => generation == Gen0
                     || summary
                         .Reports
-                        .Any(report => generation == 1 
+                        .Any(report => generation == Gen1 
                             ? report.GcStats.Gen1Collections != 0 
                             : report.GcStats.Gen2Collections != 0);
 
@@ -93,13 +98,13 @@ namespace BenchmarkDotNet.Diagnosers
                 if (results.ContainsKey(benchmark))
                 {
                     var gcStats = results[benchmark];
-                    var value = generation == 0 ? gcStats.Gen0Collections : 
-                                generation == 1 ? gcStats.Gen1Collections : gcStats.Gen2Collections;
+                    var value = generation == Gen0 ? gcStats.Gen0Collections : 
+                                generation == Gen1 ? gcStats.Gen1Collections : gcStats.Gen2Collections;
 
                     if (value == 0)
                         return "-"; // make zero more obvious
 
-                    return (value / (double)gcStats.TotalOperations).ToString("#0.000‰", HostEnvironmentInfo.MainCultureInfo);
+                    return ((value / (double)gcStats.TotalOperations) * 1000).ToString("#0.0000", HostEnvironmentInfo.MainCultureInfo);
                 }
                 return "N/A";
             }

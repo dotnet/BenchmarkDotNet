@@ -8,6 +8,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using Xunit;
@@ -93,7 +94,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var summary = BenchmarkRunner.Run((Benchmark[])benchmarks, config);
 
-            var allocationColumn = GetColumns<MemoryDiagnoser.AllocationColumn>(memoryDiagnoser).Single();
+            var allocationColumn = GetColumns<MemoryDiagnoser.AllocationColumn>(memoryDiagnoser, summary).Single();
 
             foreach (var benchmarkAllocationsValidator in benchmarksAllocationsValidators)
             {
@@ -124,8 +125,8 @@ namespace BenchmarkDotNet.IntegrationTests
                 .With(new OutputLogger(output));
         }
 
-        private static T[] GetColumns<T>(MemoryDiagnoser memoryDiagnoser)
-            => memoryDiagnoser.GetColumnProvider().GetColumns(null).OfType<T>().ToArray();
+        private static T[] GetColumns<T>(MemoryDiagnoser memoryDiagnoser, Summary summary)
+            => memoryDiagnoser.GetColumnProvider().GetColumns(summary).OfType<T>().ToArray();
 
         private static void AssertParsed(string text, Predicate<long> condition)
         {
