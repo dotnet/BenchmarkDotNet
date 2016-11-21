@@ -11,24 +11,26 @@ namespace BenchmarkDotNet.Reports
     public sealed class BenchmarkReport
     {
         public Benchmark Benchmark { get; }
-        public IList<Measurement> AllMeasurements { get; }
+        public IReadOnlyList<Measurement> AllMeasurements { get; }
 
         public GenerateResult GenerateResult { get; }
         public BuildResult BuildResult { get; }
 
         [NotNull]
-        public IList<ExecuteResult> ExecuteResults { get; }
+        public IReadOnlyList<ExecuteResult> ExecuteResults { get; }
 
-        public Statistics ResultStatistics => this.GetResultRuns().Any()
-            ? new Statistics(this.GetResultRuns().Select(r => r.GetAverageNanoseconds()))
-            : null;
+        public Statistics ResultStatistics => resultStatistics ?? (resultStatistics = GetResultRuns().Any()
+            ? new Statistics(GetResultRuns().Select(r => r.GetAverageNanoseconds()))
+            : null);
+
+        private Statistics resultStatistics;
 
         public BenchmarkReport(
             Benchmark benchmark,
             GenerateResult generateResult,
             BuildResult buildResult,
-            IList<ExecuteResult> executeResults,
-            IList<Measurement> allMeasurements)
+            IReadOnlyList<ExecuteResult> executeResults,
+            IReadOnlyList<Measurement> allMeasurements)
         {
             Benchmark = benchmark;
             GenerateResult = generateResult;
@@ -38,11 +40,7 @@ namespace BenchmarkDotNet.Reports
         }
 
         public override string ToString() => $"{Benchmark.DisplayInfo}, {AllMeasurements.Count} runs";
-    }
 
-    public static class BenchmarkReportExtensions
-    {
-        public static IList<Measurement> GetResultRuns(this BenchmarkReport report) =>
-            report.AllMeasurements.Where(r => r.IterationMode == IterationMode.Result).ToList();
+        public IReadOnlyList<Measurement> GetResultRuns() => AllMeasurements.Where(r => r.IterationMode == IterationMode.Result).ToList();
     }
 }

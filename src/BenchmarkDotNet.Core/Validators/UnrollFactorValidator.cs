@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -16,10 +14,10 @@ namespace BenchmarkDotNet.Validators
 
         public bool TreatsWarningsAsErrors => true;
 
-        public IEnumerable<ValidationError> Validate(IList<Benchmark> benchmarks)
+        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
         {
             var resolver = EnvResolver.Instance; // TODO: use specified resolver.
-            foreach (var benchmark in benchmarks)
+            foreach (var benchmark in validationParameters.Benchmarks)
             {
                 var run = benchmark.Job.Run;
                 int unrollFactor = run.ResolveValue(RunMode.UnrollFactorCharacteristic, resolver);

@@ -20,30 +20,30 @@ namespace BenchmarkDotNet.Validators
 
         public bool TreatsWarningsAsErrors { get; }
 
-        public IEnumerable<ValidationError> Validate(IList<Benchmark> benchmarks)
+        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
         {
             var errors = new List<ValidationError>();
 
-            foreach (var typeGroup in benchmarks.GroupBy(benchmark => benchmark.Target.Type))
+            foreach (var typeGroup in validationParameters.Benchmarks.GroupBy(benchmark => benchmark.Target.Type))
             {
                 object benchmarkTypeInstance = null;
-                if (!TryCreateBenchmarkTypeInstance(typeGroup.Key, typeGroup, errors, out benchmarkTypeInstance))
+                if (!TryCreateBenchmarkTypeInstance(typeGroup.Key, errors, out benchmarkTypeInstance))
                 {
                     continue;
                 }
 
-                if (!TryToSetParamsFields(benchmarkTypeInstance, typeGroup, errors))
+                if (!TryToSetParamsFields(benchmarkTypeInstance, errors))
                 {
                     continue;
                 }
 
-                if (!TryToSetParamsProperties(benchmarkTypeInstance, typeGroup, errors))
+                if (!TryToSetParamsProperties(benchmarkTypeInstance, errors))
                 {
                     continue;
                 }
 
 
-                if (!TryToCallSetup(benchmarkTypeInstance, typeGroup, errors))
+                if (!TryToCallSetup(benchmarkTypeInstance, errors))
                 {
                     continue;
                 }
@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Validators
             return errors;
         }
 
-        private bool TryCreateBenchmarkTypeInstance(Type type, IEnumerable<Benchmark> benchmarks, List<ValidationError> errors, out object instance)
+        private bool TryCreateBenchmarkTypeInstance(Type type, List<ValidationError> errors, out object instance)
         {
             try
             {
@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Validators
             }
         }
 
-        private bool TryToCallSetup(object benchmarkTypeInstance, IEnumerable<Benchmark> benchmarks, List<ValidationError> errors)
+        private bool TryToCallSetup(object benchmarkTypeInstance, List<ValidationError> errors)
         {
             var setupMethods = benchmarkTypeInstance
                 .GetType()
@@ -111,7 +111,7 @@ namespace BenchmarkDotNet.Validators
             return true;
         }
 
-        private bool TryToSetParamsFields(object benchmarkTypeInstance, IEnumerable<Benchmark> benchmarks, List<ValidationError> errors)
+        private bool TryToSetParamsFields(object benchmarkTypeInstance, List<ValidationError> errors)
         {
             var paramFields = benchmarkTypeInstance
                 .GetType()
@@ -162,7 +162,7 @@ namespace BenchmarkDotNet.Validators
             return true;
         }
 
-        private bool TryToSetParamsProperties(object benchmarkTypeInstance, IEnumerable<Benchmark> benchmarks, List<ValidationError> errors)
+        private bool TryToSetParamsProperties(object benchmarkTypeInstance, List<ValidationError> errors)
         {
             var paramProperties = benchmarkTypeInstance
                 .GetType()

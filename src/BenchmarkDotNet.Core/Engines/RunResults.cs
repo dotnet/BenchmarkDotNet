@@ -12,12 +12,12 @@ namespace BenchmarkDotNet.Engines
         private readonly bool removeOutliers;
 
         [CanBeNull]
-        public List<Measurement> Idle { get; }
+        public IReadOnlyList<Measurement> Idle { get; }
 
         [NotNull]
-        public List<Measurement> Main { get; }
+        public IReadOnlyList<Measurement> Main { get; }
 
-        public RunResults([CanBeNull] List<Measurement> idle, [NotNull] List<Measurement> main, bool removeOutliers)
+        public RunResults([CanBeNull] IReadOnlyList<Measurement> idle, [NotNull] IReadOnlyList<Measurement> main, bool removeOutliers)
         {
             this.removeOutliers = removeOutliers;
             Idle = idle;

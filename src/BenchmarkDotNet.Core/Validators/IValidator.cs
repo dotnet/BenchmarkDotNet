@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -7,6 +6,6 @@ namespace BenchmarkDotNet.Validators
     {
         bool TreatsWarningsAsErrors { get; }
 
-        IEnumerable<ValidationError> Validate(IList<Benchmark> benchmarks);
+        IEnumerable<ValidationError> Validate(ValidationParameters validationParameters);
     }
 }

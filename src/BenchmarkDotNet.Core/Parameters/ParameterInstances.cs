@@ -5,14 +5,14 @@ namespace BenchmarkDotNet.Parameters
 {
     public class ParameterInstances
     {
-        public IList<ParameterInstance> Items { get; }
+        public IReadOnlyList<ParameterInstance> Items { get; }
         public int Count => Items.Count;
         public ParameterInstance this[int index] => Items[index];
         public object this[string name] => Items.FirstOrDefault(item => item.Name == name)?.Value;
 
         private string printInfo;
 
-        public ParameterInstances(IList<ParameterInstance> items)
+        public ParameterInstances(IReadOnlyList<ParameterInstance> items)
         {
             Items = items;
         }

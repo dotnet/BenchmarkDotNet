@@ -6,16 +6,16 @@ namespace BenchmarkDotNet.Parameters
 {
     public class ParameterDefinitions
     {
-        public IList<ParameterDefinition> Items { get; }
+        public IReadOnlyList<ParameterDefinition> Items { get; }
 
-        public ParameterDefinitions(IList<ParameterDefinition> items)
+        public ParameterDefinitions(IReadOnlyList<ParameterDefinition> items)
         {
             Items = items;
         }
 
-        public IList<ParameterInstances> Expand() => Expand(new[] { new ParameterInstances(new List<ParameterInstance>()) }, Items);
+        public IReadOnlyList<ParameterInstances> Expand() => Expand(new[] { new ParameterInstances(new List<ParameterInstance>()) }, Items);
 
-        private static IList<ParameterInstances> Expand(IList<ParameterInstances> instancesList, IList<ParameterDefinition> definitions)
+        private static IReadOnlyList<ParameterInstances> Expand(IReadOnlyList<ParameterInstances> instancesList, IReadOnlyList<ParameterDefinition> definitions)
         {
             if (definitions.IsNullOrEmpty())
                 return instancesList;
