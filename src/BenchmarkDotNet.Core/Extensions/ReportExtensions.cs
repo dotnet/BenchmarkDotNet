@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Extensions
             return summary.GetReportFor<T>(actionExp).GetResultRuns().ToList();
         }
 
-        public static Statistics GetStatistics(this IList<Measurement> runs)
+        public static Statistics GetStatistics(this IReadOnlyCollection<Measurement> runs)
         {
             if (runs.IsEmpty())
                 throw new InvalidOperationException("List of measurements contains no elements");

@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.Engines
                 throw new Exception("You must call PreAllocate() and Jitting() first!");
 
             long invokeCount = InvocationCount;
-            List<Measurement> idle = null;
+            IReadOnlyList<Measurement> idle = null;
 
             if (Strategy != RunStrategy.ColdStart)
             {

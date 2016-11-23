@@ -27,13 +27,13 @@ namespace BenchmarkDotNet.Engines
             measurementsPool = MeasurementsPool.PreAllocate(10, MaxIterationCount, targetCount);
         }
 
-        public List<Measurement> RunIdle(long invokeCount, int unrollFactor) 
+        public IReadOnlyList<Measurement> RunIdle(long invokeCount, int unrollFactor) 
             => RunAuto(invokeCount, IterationMode.IdleTarget, unrollFactor);
 
-        public List<Measurement> RunMain(long invokeCount, int unrollFactor) 
+        public IReadOnlyList<Measurement> RunMain(long invokeCount, int unrollFactor) 
             => Run(invokeCount, IterationMode.MainTarget, false, unrollFactor);
 
-        internal List<Measurement> Run(long invokeCount, IterationMode iterationMode, bool runAuto, int unrollFactor)
+        internal IReadOnlyList<Measurement> Run(long invokeCount, IterationMode iterationMode, bool runAuto, int unrollFactor)
             => runAuto || targetCount == null
                 ? RunAuto(invokeCount, iterationMode, unrollFactor)
                 : RunSpecific(invokeCount, iterationMode, targetCount.Value, unrollFactor);

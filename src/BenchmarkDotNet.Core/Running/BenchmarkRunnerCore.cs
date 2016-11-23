@@ -127,10 +127,10 @@ namespace BenchmarkDotNet.Running
             return summary;
         }
 
-        private static ValidationError[] Validate(IList<Benchmark> benchmarks, ILogger logger, IConfig config)
+        private static ValidationError[] Validate(IReadOnlyList<Benchmark> benchmarks, ILogger logger, IConfig config)
         {
             logger.WriteLineInfo("// Validating benchmarks:");
-            var validationErrors = config.GetCompositeValidator().Validate(benchmarks).ToArray();
+            var validationErrors = config.GetCompositeValidator().Validate(new ValidationParameters(benchmarks, config)).ToArray();
             foreach (var validationError in validationErrors)
             {
                 logger.WriteLineError(validationError.Message);

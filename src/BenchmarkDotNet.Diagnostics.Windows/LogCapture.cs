@@ -5,11 +5,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 {
     public class LogCapture : ILogger
     {
-        public IList<OutputLine> CapturedOutput = new List<OutputLine>(100);
+        public IReadOnlyList<OutputLine> CapturedOutput => capturedOutput;
+
+        private List<OutputLine> capturedOutput = new List<OutputLine>(100);
 
         public void Write(LogKind logKind, string text)
         {
-            CapturedOutput.Add(new OutputLine
+            capturedOutput.Add(new OutputLine
             {
                 Kind = logKind,
                 Text = text
@@ -18,7 +20,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public void WriteLine()
         {
-            CapturedOutput.Add(new OutputLine
+            capturedOutput.Add(new OutputLine
             {
                 Kind = LogKind.Default,
                 Text = System.Environment.NewLine
@@ -31,10 +33,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             WriteLine();
         }
 
-        public void Clear()
-        {
-            CapturedOutput.Clear();
-        }
+        public void Clear() => capturedOutput.Clear();
     }
 
     public struct OutputLine

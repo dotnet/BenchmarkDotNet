@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.IntegrationTests.Classic
 #endif
         }
 
-        private IList<Benchmark> CreateBenchmarks(Type targetBenchmarkType)
+        private Benchmark[] CreateBenchmarks(Type targetBenchmarkType)
         {
             return BenchmarkConverter.TypeToBenchmarks(targetBenchmarkType);
         }

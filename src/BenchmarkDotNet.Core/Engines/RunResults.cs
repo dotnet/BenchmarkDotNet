@@ -13,15 +13,15 @@ namespace BenchmarkDotNet.Engines
         private readonly long totalOperationsCount;
 
         [CanBeNull]
-        public List<Measurement> Idle { get; }
+        public IReadOnlyList<Measurement> Idle { get; }
 
         [NotNull]
-        public List<Measurement> Main { get; }
+        public IReadOnlyList<Measurement> Main { get; }
 
         public GcStats GCStats { get; }
 
         public RunResults(
-            [CanBeNull] List<Measurement> idle, [NotNull] List<Measurement> main, bool removeOutliers, GcStats gcStats)
+            [CanBeNull] IReadOnlyList<Measurement> idle, [NotNull] IReadOnlyList<Measurement> main, bool removeOutliers, GcStats gcStats)
         {
             this.removeOutliers = removeOutliers;
             Idle = idle;
