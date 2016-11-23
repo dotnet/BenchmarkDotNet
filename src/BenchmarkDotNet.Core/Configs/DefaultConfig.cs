@@ -89,7 +89,7 @@ namespace BenchmarkDotNet.Configs
                 {
                     return new[]
                     {
-                        GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.Windows.MemoryDiagnoser"),
+                        MemoryDiagnoser.Default,
                         GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.Windows.InliningDiagnoser"),
                     };
                 }

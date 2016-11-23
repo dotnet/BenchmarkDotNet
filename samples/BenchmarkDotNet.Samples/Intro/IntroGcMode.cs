@@ -22,13 +22,13 @@ namespace BenchmarkDotNet.Samples.Intro
             }
         }
 
-        [Benchmark(Description = "new byte[10KB]")]
+        [Benchmark(Description = "new byte[10kB]")]
         public byte[] Allocate()
         {
             return new byte[10000];
         }
 
-        [Benchmark(Description = "stackalloc byte[10KB]")]
+        [Benchmark(Description = "stackalloc byte[10kB]")]
         public unsafe void AllocateWithStackalloc()
         {
             var array = stackalloc byte[10000];

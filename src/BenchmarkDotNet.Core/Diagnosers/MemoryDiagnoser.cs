@@ -8,6 +8,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Diagnosers
@@ -48,7 +49,7 @@ namespace BenchmarkDotNet.Diagnosers
             }
 
             public string Id => nameof(AllocationColumn);
-            public string ColumnName => "Bytes Allocated";
+            public string ColumnName => "Allocated";
             public bool IsDefault(Summary summary, Benchmark benchmark) => false;
             public bool IsAvailable(Summary summary) => true;
             public bool AlwaysShow => true;
@@ -62,7 +63,7 @@ namespace BenchmarkDotNet.Diagnosers
                 if (!results.ContainsKey(benchmark))
                     return "N/A";
 
-                return results[benchmark].BytesAllocatedPerOperation.ToString("N0", HostEnvironmentInfo.MainCultureInfo);
+                return results[benchmark].BytesAllocatedPerOperation.ToFormattedBytes();
             }
         }
 

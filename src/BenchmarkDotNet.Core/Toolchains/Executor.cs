@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Toolchains
                 {
                     var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmark);
                     
-                    return Execute(process, benchmark, loggerWithDiagnoser, diagnoser, logger);
+                    return Execute(process, benchmark, loggerWithDiagnoser, logger);
                 }
             }
             finally
@@ -57,8 +57,7 @@ namespace BenchmarkDotNet.Toolchains
             }
         }
 
-        private ExecuteResult Execute(Process process, Benchmark benchmark, SynchronousProcessOutputLoggerWithDiagnoser loggerWithDiagnoser,
-            IDiagnoser compositeDiagnoser, ILogger logger)
+        private ExecuteResult Execute(Process process, Benchmark benchmark, SynchronousProcessOutputLoggerWithDiagnoser loggerWithDiagnoser, ILogger logger)
         {
             consoleHandler.SetProcess(process);
 

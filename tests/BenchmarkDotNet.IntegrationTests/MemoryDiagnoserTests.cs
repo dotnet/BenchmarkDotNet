@@ -131,7 +131,7 @@ namespace BenchmarkDotNet.IntegrationTests
         private static void AssertParsed(string text, Predicate<long> condition)
         {
             long value;
-            if (long.TryParse(text, NumberStyles.Number, HostEnvironmentInfo.MainCultureInfo, out value))
+            if (long.TryParse(text.Replace(" B", string.Empty), NumberStyles.Number, HostEnvironmentInfo.MainCultureInfo, out value))
             {
                 Assert.True(condition(value), $"Failed for value {value}");
             }
