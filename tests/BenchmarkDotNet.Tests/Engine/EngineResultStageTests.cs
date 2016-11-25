@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Tests.Engine
 
         private static void CheckResults(int expectedResultCount, List<Measurement> measurements, bool removeOutliers)
         {
-            Assert.Equal(expectedResultCount, new RunResults(null, measurements, removeOutliers).GetMeasurements().Count());
+            Assert.Equal(expectedResultCount, new RunResults(null, measurements, removeOutliers, default(GcStats)).GetMeasurements().Count());
         }
 
         private static void Add(List<Measurement> measurements, int time)

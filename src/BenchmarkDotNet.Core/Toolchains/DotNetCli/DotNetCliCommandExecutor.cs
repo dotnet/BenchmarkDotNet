@@ -36,12 +36,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         {
             using (var process = new Process { StartInfo = BuildStartInfo(workingDirectory, commandWithArguments) })
             {
-                using (new AsynchronousProcessOutputLogger(logger, process))
+                using (new AsyncErrorOutputLogger(logger, process))
                 {
                     process.Start();
 
                     // don't forget to call, otherwise logger will not get any events
                     process.BeginErrorReadLine();
+                    process.BeginOutputReadLine();
 
                     process.WaitForExit((int)timeout.TotalMilliseconds);
 
@@ -59,7 +60,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 Arguments = arguments,
                 UseShellExecute = false,
                 CreateNoWindow = true,
-                RedirectStandardOutput = true, // we redirect it but never call process.BeginOutputReadLine() in order to ignore it
+                RedirectStandardOutput = true,
                 RedirectStandardError = true
             };
         }

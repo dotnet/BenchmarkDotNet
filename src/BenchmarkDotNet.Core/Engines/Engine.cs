@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
@@ -35,6 +36,7 @@ namespace BenchmarkDotNet.Engines
         private readonly EngineWarmupStage warmupStage;
         private readonly EngineTargetStage targetStage;
         private bool isJitted, isPreAllocated;
+        private int forcedFullGarbageCollections;
 
         internal Engine(Action<long> idleAction, Action<long> mainAction, Job targetJob, Action setupAction, Action cleanupAction, long operationsPerInvoke, bool isDiagnoserAttached)
         {
@@ -98,12 +100,19 @@ namespace BenchmarkDotNet.Engines
                 warmupStage.RunMain(invokeCount, UnrollFactor);
             }
 
+            // we enable monitoring after pilot & warmup, just to ignore the memory allocated by these runs
+            EnableMonitoring(); 
+            var initialGcStats = GcStats.ReadInitial(IsDiagnoserAttached);
+
             var main = targetStage.RunMain(invokeCount, UnrollFactor);
+
+            var finalGcStats = GcStats.ReadFinal(IsDiagnoserAttached);
+            var forcedCollections = GcStats.FromForced(forcedFullGarbageCollections);
+            var workGcHasDone = finalGcStats - forcedCollections - initialGcStats;
 
             bool removeOutliers = TargetJob.ResolveValue(AccuracyMode.RemoveOutliersCharacteristic, Resolver);
 
-            return new RunResults(idle, main, removeOutliers);
-        }
+            return new RunResults(idle, main, removeOutliers, workGcHasDone);        }
 
         public Measurement RunIteration(IterationData data)
         {
@@ -137,11 +146,13 @@ namespace BenchmarkDotNet.Engines
             ForceGcCollect();
         }
 
-        private static void ForceGcCollect()
+        private void ForceGcCollect()
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();
+
+            forcedFullGarbageCollections += 2;
         }
 
         public void WriteLine(string text)
@@ -156,6 +167,18 @@ namespace BenchmarkDotNet.Engines
             EnsureNothingIsPrintedWhenDiagnoserIsAttached();
 
             Console.WriteLine();
+        }
+
+        private void EnableMonitoring()
+        {
+            if(!IsDiagnoserAttached) // it could affect the results, we do this in separate, diagnostics-only run
+                return;
+#if CLASSIC
+            if(RuntimeInformation.IsMono()) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-in-mono
+                return;
+
+            AppDomain.MonitoringIsEnabled = true;
+#endif
         }
 
         private void EnsureNothingIsPrintedWhenDiagnoserIsAttached()

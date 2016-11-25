@@ -13,7 +13,7 @@
     "Microsoft.FSharp.Core.netcore": "1.0.0-*",
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.0"
+      "version": "1.1.0"
     },
     "BenchmarkDotNet": {
       "target": "project"
@@ -31,7 +31,7 @@
     }
   },
   "frameworks": {
-    "netcoreapp1.0": {
+    "netcoreapp1.1": {
       "imports": [
         "portable-net45+win8",
         "dnxcore50",

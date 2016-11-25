@@ -8,6 +8,10 @@ namespace BenchmarkDotNet.Extensions
 {
     internal static class CommonExtensions
     {
+        const int BytesInKiloByte = 1000; // 1000 vs 1024 thing..
+
+        static readonly string[] SizeSuffixes = { "B", "kB", "MB", "GB", "TB" };
+
         public static List<T> ToSortedList<T>(this IEnumerable<T> values)
         {
             var list = new List<T>();
@@ -22,6 +26,18 @@ namespace BenchmarkDotNet.Extensions
             var unitValue = TimeUnit.Convert(value, TimeUnit.Nanosecond, unit);
             var unitName = unit.Name.PadLeft(unitNameWidth);
             return $"{unitValue.ToStr("N4")} {unitName}";
+        }
+
+        internal static string ToFormattedBytes(this long bytes)
+        {
+            int i;
+            double dblSByte = bytes;
+            for (i = 0; i < SizeSuffixes.Length && bytes >= BytesInKiloByte; i++, bytes /= BytesInKiloByte)
+            {
+                dblSByte = bytes / (double)BytesInKiloByte;
+            }
+
+            return string.Format(HostEnvironmentInfo.MainCultureInfo, "{0:0.##} {1}", dblSByte, SizeSuffixes[i]);
         }
 
         public static string ToStr(this double value, string format = "0.##")

@@ -19,6 +19,8 @@ namespace BenchmarkDotNet.Portability
 {
     public class RuntimeInformation
     {
+        private static readonly bool isMono = Type.GetType("Mono.Runtime") != null; // it allocates a lot of memory, we need to check it once in order to keep Enging non-allocating!
+
         private const string Debug = "DEBUG";
         private const string Release = "RELEASE";
         internal const string Unknown = "?";
@@ -39,7 +41,7 @@ namespace BenchmarkDotNet.Portability
 #endif
         }
 
-        private static bool IsMono() => Type.GetType("Mono.Runtime") != null;
+        internal static bool IsMono() => isMono;
 
         internal static string GetOsVersion()
         {

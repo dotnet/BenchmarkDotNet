@@ -10,6 +10,7 @@ namespace BenchmarkDotNet.Engines
     public struct RunResults
     {
         private readonly bool removeOutliers;
+        private readonly long totalOperationsCount;
 
         [CanBeNull]
         public IReadOnlyList<Measurement> Idle { get; }
@@ -17,11 +18,22 @@ namespace BenchmarkDotNet.Engines
         [NotNull]
         public IReadOnlyList<Measurement> Main { get; }
 
-        public RunResults([CanBeNull] IReadOnlyList<Measurement> idle, [NotNull] IReadOnlyList<Measurement> main, bool removeOutliers)
+        public GcStats GCStats { get; }
+
+        public RunResults(
+            [CanBeNull] IReadOnlyList<Measurement> idle, [NotNull] IReadOnlyList<Measurement> main, bool removeOutliers, GcStats gcStats)
         {
             this.removeOutliers = removeOutliers;
             Idle = idle;
             Main = main;
+            GCStats = gcStats;
+
+            totalOperationsCount = 0;
+            foreach (var measurement in Main)
+            {
+                if (!measurement.IterationMode.IsIdle())
+                    totalOperationsCount += measurement.Operations;
+            }
         }
 
         // TODO: rewrite without allocations
@@ -52,6 +64,8 @@ namespace BenchmarkDotNet.Engines
         {
             foreach (var measurement in GetMeasurements())
                 WriteLine(measurement.ToOutputLine());
+
+            WriteLine(GCStats.WithTotalOperations(totalOperationsCount).ToOutputLine());
             WriteLine();
         }
 

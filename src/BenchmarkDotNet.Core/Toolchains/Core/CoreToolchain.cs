@@ -1,7 +1,5 @@
 ﻿using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -12,7 +10,7 @@ namespace BenchmarkDotNet.Toolchains.Core
 {
     public class CoreToolchain : Toolchain
     {
-        private const string TargetFrameworkMoniker = "netcoreapp1.0";
+        private const string TargetFrameworkMoniker = "netcoreapp1.1";
 
         public static readonly IToolchain Instance = new CoreToolchain();
 

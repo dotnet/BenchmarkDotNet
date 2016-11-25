@@ -66,6 +66,9 @@ namespace BenchmarkDotNet.Reports
         /// <returns>An instance of <see cref="Measurement"/> if parsed successfully. <c>Null</c> in case of any trouble.</returns>
         public static Measurement Parse(ILogger logger, string line, int processIndex)
         {
+            if (line != null && line.StartsWith(GcStats.ResultsLinePrefix))
+                return Error;
+
             try
             {
                 var lineSplit = line.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
