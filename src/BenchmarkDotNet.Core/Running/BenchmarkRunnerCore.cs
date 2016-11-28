@@ -161,17 +161,15 @@ namespace BenchmarkDotNet.Running
                 if (!buildResult.IsBuildSuccess)
                     return new BenchmarkReport(benchmark, generateResult, buildResult, null, null, default(GcStats));
 
-                var executeResults = Execute(logger, benchmark, toolchain, buildResult, config, resolver);
+                var gcStats = default(GcStats);
+                var executeResults = Execute(logger, benchmark, toolchain, buildResult, config, resolver, out gcStats);
 
                 var runs = new List<Measurement>();
-                GcStats gcStats = default(GcStats);
+                
                 for (int index = 0; index < executeResults.Count; index++)
                 {
                     var executeResult = executeResults[index];
                     runs.AddRange(executeResult.Data.Select(line => Measurement.Parse(logger, line, index + 1)).Where(r => r.IterationMode != IterationMode.Unknown));
-
-                    if (executeResult.Data.Any())
-                        gcStats = gcStats + GcStats.Parse(executeResult.Data.Last());
                 }
 
                 return new BenchmarkReport(benchmark, generateResult, buildResult, executeResults, runs, gcStats);
@@ -222,9 +220,10 @@ namespace BenchmarkDotNet.Running
             return buildResult;
         }
 
-        private static List<ExecuteResult> Execute(ILogger logger, Benchmark benchmark, IToolchain toolchain, BuildResult buildResult, IConfig config, IResolver resolver)
+        private static List<ExecuteResult> Execute(ILogger logger, Benchmark benchmark, IToolchain toolchain, BuildResult buildResult, IConfig config, IResolver resolver, out GcStats gcStats)
         {
             var executeResults = new List<ExecuteResult>();
+            gcStats = default(GcStats);
 
             logger.WriteLineInfo("// *** Execute ***");
             bool analyzeRunToRunVariance = benchmark.Job.ResolveValue(AccuracyMode.AnalyzeLaunchVarianceCharacteristic, resolver);
@@ -284,7 +283,7 @@ namespace BenchmarkDotNet.Running
                 var executeResult = toolchain.Executor.Execute(buildResult, benchmark, logger, resolver, compositeDiagnoser);
 
                 var allRuns = executeResult.Data.Select(line => Measurement.Parse(logger, line, 0)).Where(r => r.IterationMode != IterationMode.Unknown).ToList();
-                var gcStats = GcStats.Parse(executeResult.Data.Last());
+                gcStats = GcStats.Parse(executeResult.Data.Last());
                 var report = new BenchmarkReport(benchmark, null, null, new[] { executeResult }, allRuns, gcStats);
                 compositeDiagnoser.ProcessResults(benchmark, report);
 
