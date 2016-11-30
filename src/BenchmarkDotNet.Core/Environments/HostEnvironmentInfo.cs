@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Environments
             ProcessorCount = System.Environment.ProcessorCount;
             ChronometerFrequency = Chronometer.Frequency;
             HardwareTimerKind = Chronometer.HardwareTimerKind;
-            JitModules = RuntimeInformation.GetJitModules();
+            JitModules = RuntimeInformation.GetJitModulesInfo();
             DotNetCliVersion = new Lazy<string>(DotNetCliCommandExecutor.GetDotNetCliVersion);
         }
 
@@ -73,11 +73,6 @@ namespace BenchmarkDotNet.Environments
             yield return $"OS={OsVersion}";
             yield return $"Processor={ProcessorName.Value}, ProcessorCount={ProcessorCount}";
             yield return $"Frequency={ChronometerFrequency}, Resolution={GetChronometerResolution()}, Timer={HardwareTimerKind.ToString().ToUpper()}";
-            yield return $"Host Runtime={RuntimeVersion}, Arch={Architecture} {GetConfigurationFlag()}{GetDebuggerFlag()}{GetJitFlag()}";
-            yield return $"GC={GetGcConcurrentFlag()} {GetGcServerFlag()}";
-#if CLASSIC
-            yield return $"JitModules={JitModules}";
-#endif
 #if !CLASSIC
             yield return $"dotnet cli version={DotNetCliVersion.Value}";
 #endif
