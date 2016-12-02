@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Code
                 var type = Target.Method.ReturnType;
                 if (type.IsStruct())
                     value = "0";
-                else if (type.GetTypeInfo().IsClass)
+                else if (type.GetTypeInfo().IsClass || type.GetTypeInfo().IsInterface)
                     value = "null";
                 else
                     value = SourceCodeHelper.ToSourceCode(Activator.CreateInstance(type)) + ";";                                    
