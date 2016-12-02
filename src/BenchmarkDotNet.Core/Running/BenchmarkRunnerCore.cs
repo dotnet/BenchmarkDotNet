@@ -196,7 +196,7 @@ namespace BenchmarkDotNet.Running
             {
                 logger.WriteLineError("// Result = Failure");
                 if (generateResult.GenerateException != null)
-                    logger.WriteLineError($"// Exception: {generateResult.GenerateException.Message}");
+                    logger.WriteLineError($"// Exception: {generateResult.GenerateException}");
             }
             logger.WriteLine();
             return generateResult;
