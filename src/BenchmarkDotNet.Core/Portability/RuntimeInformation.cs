@@ -19,7 +19,7 @@ using System.Management;
 
 namespace BenchmarkDotNet.Portability
 {
-    public class RuntimeInformation
+    internal static class RuntimeInformation
     {
         private static readonly bool isMono = Type.GetType("Mono.Runtime") != null; // it allocates a lot of memory, we need to check it once in order to keep Enging non-allocating!
 
