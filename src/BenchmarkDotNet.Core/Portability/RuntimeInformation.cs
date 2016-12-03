@@ -157,6 +157,11 @@ namespace BenchmarkDotNet.Portability
             if (IsMono())
                 return ""; // There is no helpful information about JIT on Mono
 #if CORE
+            // For now, we can say that CoreCLR supports only RyuJIT because we allow our users to run only x64 benchmark for Core.
+            // However if we enable 32bit support for .NET Core 1.1 it won't be true, because right now .NET Core is using Legacy Jit for 32bit.
+            // And 32bit .NET Core has support for Windows now only.
+            // NET Core 1.2 will move from leagacy Jitr for 32bits to RyuJIT which will be used by default.
+            // Most probably then also other OSes will get 32bit support.
             return "RyuJIT"; // CoreCLR supports only RyuJIT
 #else
             // We are working on Full CLR, so there are only LegacyJIT and RyuJIT
