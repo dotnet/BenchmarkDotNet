@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Validators
                 {
                     var referencedAssembly = Assembly.Load(referencedAssemblyName);
 
-                    if (referencedAssembly.IsJITOptimizationDisabled().IsTrue())
+                    if (referencedAssembly.IsJitOptimizationDisabled().IsTrue())
                     {
                         yield return new ValidationError(
                             TreatsWarningsAsErrors,
@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Validators
                     }
                 }
 
-                if (group.Key.IsJITOptimizationDisabled().IsTrue())
+                if (group.Key.IsJitOptimizationDisabled().IsTrue())
                 {
                     yield return new ValidationError(
                         TreatsWarningsAsErrors,
