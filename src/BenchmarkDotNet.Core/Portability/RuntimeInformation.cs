@@ -141,10 +141,14 @@ namespace BenchmarkDotNet.Portability
 
         internal static bool HasRyuJit()
         {
+#if CORE
+            return true;
+#else
             return !IsMono()
                    && IntPtr.Size == 8
                    && GetConfiguration() != DebugConfigurationName
                    && !new JitHelper().IsMsX64();
+#endif
         }
 
         internal static Jit GetCurrentJit()
