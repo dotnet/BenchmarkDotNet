@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -15,8 +14,6 @@ namespace BenchmarkDotNet.Reports
 {
     public class Summary
     {
-        private const string DisplayedRuntimeInfoPrefix = "// " + BenchmarkEnvironmentInfo.RuntimeInfoPrefix;
-
         public string Title { get; }
         public Benchmark[] Benchmarks { get; }
         public BenchmarkReport[] Reports { get; }
@@ -27,7 +24,7 @@ namespace BenchmarkDotNet.Reports
         public SummaryTable Table { get; }
         public TimeSpan TotalTime { get; }
         public ValidationError[] ValidationErrors { get; }
-        public string JobRuntimes { get; }
+        public string AllRuntimes { get; }
 
         private readonly Dictionary<Job, string> shortInfos;
         private readonly Lazy<Job[]> jobs;
@@ -58,7 +55,7 @@ namespace BenchmarkDotNet.Reports
             Table = new SummaryTable(this);
             shortInfos = new Dictionary<Job, string>();
             jobs = new Lazy<Job[]>(() => Benchmarks.Select(b => b.Job).ToArray());
-            JobRuntimes = BuildJobRuntimes();
+            AllRuntimes = BuildAllRuntimes();
         }
 
         private Summary(string title, HostEnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, ValidationError[] validationErrors, Benchmark[] benchmarks, BenchmarkReport[] reports)
@@ -85,25 +82,33 @@ namespace BenchmarkDotNet.Reports
             return new Summary(title, hostEnvironmentInfo, config, resultsDirectoryPath, TimeSpan.Zero, validationErrors, benchmarks, new BenchmarkReport[0]);
         }
 
-        private string BuildJobRuntimes()
+        private string BuildAllRuntimes()
         {
-            var result = new StringBuilder("Job Runtime(s):");
-            var runtimes = new HashSet<string>();
+            var jobRuntimes = new Dictionary<string, string>(); // JobId -> Runtime
+            var orderedJobs = new List<string>();
+
+            orderedJobs.Add("[Host]");
+            jobRuntimes["[Host]"] = HostEnvironmentInfo.GetRuntimeInfo();
 
             foreach (var benchmarkReport in Reports)
-                if (benchmarkReport.ExecuteResults != null)
-                    foreach (var executeResults in benchmarkReport.ExecuteResults)
-                        foreach (var extraOutputLine in executeResults.ExtraOutput.Where(line => line.StartsWith(DisplayedRuntimeInfoPrefix)))
-                        {
-                            string runtime = extraOutputLine.Substring(DisplayedRuntimeInfoPrefix.Length);
+            {
+                string runtime = benchmarkReport.GetRuntimeInfo();
+                if (runtime != null)
+                {
+                    string jobId = benchmarkReport.Benchmark.Job.ResolvedId;
 
-                            if (runtimes.Add(runtime))
-                            {
-                                result.Append($"\n\t{runtime}");
-                            }
-                        }
+                    if (!jobRuntimes.ContainsKey(jobId))
+                    {
+                        orderedJobs.Add(jobId);
+                        jobRuntimes[jobId] = runtime;
+                    }
+                }
+            }
 
-            return result.ToString();
+            int jobIdMaxWidth = orderedJobs.Max(j => j.ToString().Length);
+
+            var lines = orderedJobs.Select(jobId => $"  {jobId.PadRight(jobIdMaxWidth)} : {jobRuntimes[jobId]}");
+            return string.Join(Environment.NewLine, lines);
         }
     }
 }

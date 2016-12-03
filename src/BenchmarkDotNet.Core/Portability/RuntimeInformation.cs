@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -21,15 +23,15 @@ namespace BenchmarkDotNet.Portability
     {
         private static readonly bool isMono = Type.GetType("Mono.Runtime") != null; // it allocates a lot of memory, we need to check it once in order to keep Enging non-allocating!
 
-        private const string Debug = "DEBUG";
-        private const string Release = "RELEASE";
+        private const string DebugConfigurationName = "DEBUG";
+        internal const string ReleaseConfigurationName = "RELEASE";
         internal const string Unknown = "?";
 
         internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
 
         internal static string ScriptFileExtension => IsWindows() ? ".bat" : ".sh";
 
-        internal static string GetArchitecture() => IntPtr.Size == 4 ? "32-bit" : "64-bit";
+        internal static string GetArchitecture() => IntPtr.Size == 4 ? "32bit" : "64bit";
 
         internal static bool IsWindows()
         {
@@ -115,14 +117,23 @@ namespace BenchmarkDotNet.Portability
 
         public static Platform GetCurrentPlatform() => IntPtr.Size == 4 ? Platform.X86 : Platform.X64;
 
-        internal static string GetJitModules()
+        internal static IEnumerable<JitModule> GetJitModules()
         {
 #if !CORE
-            return string.Join(";",
+            return
                 Process.GetCurrentProcess().Modules
                     .OfType<ProcessModule>()
                     .Where(module => module.ModuleName.Contains("jit"))
-                    .Select(module => Path.GetFileNameWithoutExtension(module.FileName) + "-v" + module.FileVersionInfo.ProductVersion));
+                    .Select(module => new JitModule(Path.GetFileNameWithoutExtension(module.FileName), module.FileVersionInfo.ProductVersion));
+#else
+            return Enumerable.Empty<JitModule>(); // TODO: verify if it is possible to get this for CORE
+#endif
+        }
+
+        internal static string GetJitModulesInfo()
+        {
+#if !CORE
+            return string.Join(";", GetJitModules().Select(m => m.Name + "-v" + m.Version));
 #else
             return Unknown; // TODO: verify if it is possible to get this for CORE
 #endif
@@ -132,13 +143,45 @@ namespace BenchmarkDotNet.Portability
         {
             return !IsMono()
                    && IntPtr.Size == 8
-                   && GetConfiguration() != Debug
+                   && GetConfiguration() != DebugConfigurationName
                    && !new JitHelper().IsMsX64();
         }
 
         internal static Jit GetCurrentJit()
         {
             return HasRyuJit() ? Jit.RyuJit : Jit.LegacyJit;
+        }
+
+        internal static string GetJitInfo()
+        {
+            if (IsMono())
+                return ""; // There is no helpful information about JIT on Mono
+#if CORE
+            // For now, we can say that CoreCLR supports only RyuJIT because we allow our users to run only x64 benchmark for Core.
+            // However if we enable 32bit support for .NET Core 1.1 it won't be true, because right now .NET Core is using Legacy Jit for 32bit.
+            // And 32bit .NET Core has support for Windows now only.
+            // NET Core 1.2 will move from leagacy Jitr for 32bits to RyuJIT which will be used by default.
+            // Most probably then also other OSes will get 32bit support.
+            return "RyuJIT"; // CoreCLR supports only RyuJIT
+#else
+            // We are working on Full CLR, so there are only LegacyJIT and RyuJIT
+            var modules = GetJitModules().ToArray();
+            string modulesInfo = GetJitModulesInfo();
+            if (HasRyuJit())
+            {
+                var targetModule = modules.FirstOrDefault(m => m.Name == "clrjit");
+                return targetModule != null
+                    ? "RyuJIT-v" + targetModule.Version
+                    : "RyuJIT/" + modulesInfo;
+            }
+            else
+            {
+                var targetModule = modules.FirstOrDefault(m => m.Name == "compatjit" || m.Name == "mscorjit");
+                return targetModule != null
+                    ? "LegacyJIT-v" + targetModule.Version
+                    : "LegacyJIT/" + modulesInfo;
+            }
+#endif
         }
 
         internal static IntPtr GetCurrentAffinity()
@@ -160,7 +203,7 @@ namespace BenchmarkDotNet.Portability
             {
                 return Unknown;
             }
-            return isDebug.Value ? Debug : Release;
+            return isDebug.Value ? DebugConfigurationName : ReleaseConfigurationName;
         }
 
         internal static string GetDotNetCliRuntimeIdentifier()
@@ -210,6 +253,18 @@ namespace BenchmarkDotNet.Portability
                         value = j + 10;
                 }
                 return value == 20 + step;
+            }
+        }
+
+        public class JitModule
+        {
+            public string Name { get; }
+            public string Version { get; }
+
+            public JitModule(string name, string version)
+            {
+                Name = name;
+                Version = version;
             }
         }
     }

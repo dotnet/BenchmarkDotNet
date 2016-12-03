@@ -99,6 +99,7 @@ namespace BenchmarkDotNet.Running
             foreach (var report in reports)
             {
                 logger.WriteLineInfo(report.Benchmark.DisplayInfo);
+                logger.WriteLineStatistic($"Runtime = {report.GetRuntimeInfo()}; GC = {report.GetGcInfo()}");
                 var resultRuns = report.GetResultRuns();
                 if (resultRuns.IsEmpty())
                     logger.WriteLineError("There are no any results runs");

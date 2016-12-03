@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Exporters
             {
                 logger.WriteLine(infoLine);
             }
-            logger.WriteLine(summary.JobRuntimes);
+            logger.WriteLine(summary.AllRuntimes);
             logger.Write("</code></pre>");
             logger.WriteLine();
 

@@ -50,8 +50,8 @@ namespace BenchmarkDotNet.IntegrationTests
                 .ExecuteResults
                 .All(executeResult => executeResult.Data.Contains("Core")));
 
-            Assert.Contains("Clr 4", summary.JobRuntimes);
-            Assert.Contains("Core", summary.JobRuntimes);
+            Assert.Contains("Clr 4", summary.AllRuntimes);
+            Assert.Contains("Core", summary.AllRuntimes);
         }
     }
 
