@@ -1,6 +1,6 @@
 ﻿{
   "title": "BenchmarkDotNet.Toolchains.Roslyn",
-  "version": "0.10.0-develop",
+  "version": "0.10.1-develop",
   "authors": [ ".NET Foundation and contributors" ],
   "description": "Powerful .NET library for benchmarking",
   "copyright": ".NET Foundation and contributors",
