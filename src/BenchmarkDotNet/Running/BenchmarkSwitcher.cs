@@ -38,6 +38,15 @@ namespace BenchmarkDotNet.Running
             typeParser = new TypeParser(types, logger);
         }
 
+        public static BenchmarkSwitcher FromTypes(Type[] types) => new BenchmarkSwitcher(types);
+
+        public static BenchmarkSwitcher FromAssembly(Assembly assembly) => new BenchmarkSwitcher(assembly);
+
+        /// <summary>
+        /// Run all available benchmarks.
+        /// </summary>
+        public IEnumerable<Summary> RunAll() => Run(new[] { "*" });
+
         public IEnumerable<Summary> Run(string[] args = null)
         {
             args = typeParser.ReadArgumentList(args ?? new string[0]);

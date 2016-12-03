@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Samples
     {
         static void Main(string[] args)
         {
-            new BenchmarkSwitcher(typeof(Program).GetTypeInfo().Assembly).Run(args);
+            BenchmarkSwitcher.FromAssembly(typeof(Program).GetTypeInfo().Assembly).Run(args);
         }
     }
 }
