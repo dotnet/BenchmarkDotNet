@@ -170,20 +170,16 @@ namespace BenchmarkDotNet.Portability
 #else
             // We are working on Full CLR, so there are only LegacyJIT and RyuJIT
             var modules = GetJitModules().ToArray();
-            string modulesInfo = GetJitModulesInfo();
-            if (HasRyuJit())
+            string jitName = HasRyuJit() ? "RyuJIT" : "LegacyJIT";
+            if (modules.Length == 1)
             {
-                var targetModule = modules.FirstOrDefault(m => m.Name == "clrjit");
-                return targetModule != null
-                    ? "RyuJIT-v" + targetModule.Version
-                    : "RyuJIT/" + modulesInfo;
+                // If we have only one JIT module, we know the version of the current JIT compiler
+                return jitName + "-v" + modules[0].Version;
             }
             else
             {
-                var targetModule = modules.FirstOrDefault(m => m.Name == "compatjit" || m.Name == "mscorjit");
-                return targetModule != null
-                    ? "LegacyJIT-v" + targetModule.Version
-                    : "LegacyJIT/" + modulesInfo;
+                // Otherwise, let's just print information about all modules
+                return jitName + "/" + GetJitModulesInfo();
             }
 #endif
         }
