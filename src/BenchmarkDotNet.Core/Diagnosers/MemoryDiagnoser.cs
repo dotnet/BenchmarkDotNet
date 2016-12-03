@@ -51,16 +51,17 @@ namespace BenchmarkDotNet.Diagnosers
             public string Id => nameof(AllocationColumn);
             public string ColumnName => "Allocated";
             public bool IsDefault(Summary summary, Benchmark benchmark) => false;
-            public bool IsAvailable(Summary summary) => true;
-            public bool AlwaysShow => true;
+
+            public bool IsAvailable(Summary summary) 
+                => !RuntimeInformation.IsMono() || results.Keys.Any(benchmark => benchmark.Job.Env.Runtime != Runtime.Mono);
+
+            public bool AlwaysShow => false;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
 
             public string GetValue(Summary summary, Benchmark benchmark)
             {
-                if (RuntimeInformation.IsMono())
-                    return "?";
-                if (!results.ContainsKey(benchmark))
+                if (!results.ContainsKey(benchmark) || benchmark.Job.Env.Runtime == Runtime.Mono)
                     return "N/A";
 
                 return results[benchmark].BytesAllocatedPerOperation.ToFormattedBytes();
@@ -78,29 +79,23 @@ namespace BenchmarkDotNet.Diagnosers
                 this.generation = generation;
             }
 
-            public bool IsDefault(Summary summary, Benchmark benchmark) => true;
+            public bool IsDefault(Summary summary, Benchmark benchmark) => false;
             public string Id => $"{nameof(GCCollectionColumn)}{generation}";
             public string ColumnName => $"Gen {generation}";
 
-            public bool AlwaysShow => generation == Gen0; // Gen 0 must always be visible
+            public bool AlwaysShow => false;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
 
             public bool IsAvailable(Summary summary)
-                => generation == Gen0
-                    || summary
-                        .Reports
-                        .Any(report => generation == Gen1 
-                            ? report.GcStats.Gen1Collections != 0 
-                            : report.GcStats.Gen2Collections != 0);
+                => summary.Reports.Any(report => report.GcStats.GetCollectionsCount(generation) != 0);
 
             public string GetValue(Summary summary, Benchmark benchmark)
             {
                 if (results.ContainsKey(benchmark))
                 {
                     var gcStats = results[benchmark];
-                    var value = generation == Gen0 ? gcStats.Gen0Collections : 
-                                generation == Gen1 ? gcStats.Gen1Collections : gcStats.Gen2Collections;
+                    var value = gcStats.GetCollectionsCount(generation);
 
                     if (value == 0)
                         return "-"; // make zero more obvious

@@ -51,6 +51,16 @@ namespace BenchmarkDotNet.Engines
         public GcStats WithTotalOperations(long totalOperationsCount)
             => this + new GcStats(0, 0, 0, 0, totalOperationsCount);
 
+        public int GetCollectionsCount(int generation)
+        {
+            if (generation == 0)
+                return Gen0Collections;
+            if (generation == 1)
+                return Gen1Collections;
+
+            return Gen2Collections;
+        }
+
         internal static GcStats ReadInitial(bool isDiagnosticsEnabled)
         {
             // this will force GC.Collect, so we want to do this before collecting collections counts
