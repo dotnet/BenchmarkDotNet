@@ -244,15 +244,23 @@ End Class
 
 ## Diagnostics
 
-A **diagnoser** can attach to your benchmark and get some useful info. There is a separated package with diagnosers for Windows ([BenchmarkDotNet.Diagnostics.Windows](https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/)). The current Diagnosers are: *GC and Memory Allocation* (`MemoryDiagnoser`) and *JIT Inlining Events* (`InliningDiagnoser`).
+A **diagnoser** can attach to your benchmark and get some useful info.
 
-Below is a sample output from the `GC and Memory Allocation` diagnoser, note the extra columns on the right-hand side (`Gen 0`, `Gen 1`, `Gen 2` and `Bytes Allocated/Op`):
+The current Diagnosers are:
 
-    Method |  Lookup |     Median |    StdDev | Scaled |    Gen 0 | Gen 1 | Gen 2 | Bytes Allocated/Op |
----------- |-------- |----------- |---------- |------- |--------- |------ |------ |------------------- |
-      LINQ | Testing | 49.1154 ns | 0.5301 ns |   2.48 | 1,526.00 |     - |     - |              25.21 |
- Iterative | Testing | 19.8040 ns | 0.0456 ns |   1.00 |        - |     - |     - |               0.00 |
- 
+- GC and Memory Allocation (`MemoryDiagnoser`) which is cross platform, built-in and enabled by default.
+- JIT Inlining Events (`InliningDiagnoser`). You can find this diagnoser in a separated package with diagnosers for Windows (`BenchmarkDotNet.Diagnostics.Windows`): [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/)
+
+
+Below is a sample output from the `MemoryDiagnoser`, note the extra columns on the right-hand side (`Gen 0` and `Allocated`):
+
+```
+    Method |       Mean |    StdDev |  Gen 0 | Allocated |
+---------- |----------- |---------- |------- |---------- |
+ Iterative | 31.0739 ns | 0.1091 ns |      - |       0 B |
+      LINQ | 83.0435 ns | 1.0103 ns | 0.0069 |      32 B | 
+```
+
 Read more:  [Diagnosers](Configs/Diagnosers.htm)
 
 ## BenchmarkRunner

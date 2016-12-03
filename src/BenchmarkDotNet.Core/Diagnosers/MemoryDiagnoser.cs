@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Diagnosers
         public void BeforeCleanup() { }
 
         public void DisplayResults(ILogger logger)
-            => logger.WriteInfo("Note: the Gen 0/1/2/ Measurements are per 1k Operations");
+            => logger.WriteInfo("Note: the Gen 0/1/2 Measurements are per 1k Operations");
 
         public void ProcessResults(Benchmark benchmark, BenchmarkReport report) 
             => results.Add(benchmark, report.GcStats);
