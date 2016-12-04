@@ -171,33 +171,34 @@ compare <a href="https://en.wikipedia.org/wiki/MD5" target="_blank">MD5</a> and 
 
 <h2 id="step-4.-view-results">Step 4. View results<a class="headerlink" href="#step-4.-view-results" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <p>View the results. Here is an example of output from the above benchmark:</p>
-<pre><code class="ini">BenchmarkDotNet=v0.9.0.0
-OS=Microsoft Windows NT 6.2.9200.0
-Processor=Intel(R) Core(TM) i7-4810MQ CPU @ 2.80GHz, ProcessorCount=8
-Frequency=2728067 ticks, Resolution=366.5599 ns
-HostCLR=MS.NET 4.0.30319.42000, Arch=64-bit RELEASE [RyuJIT]
-
-Type=Md5VsSha256  Mode=Throughput
+<pre><code class="ini">BenchmarkDotNet=v0.10.1, OS=Microsoft Windows NT 6.2.9200.0
+Processor=Intel(R) Core(TM) i7-4702MQ CPU 2.20GHz, ProcessorCount=8
+Frequency=2143476 Hz, Resolution=466.5319 ns, Timer=TSC
+  [Host]     : Clr 4.0.30319.42000, 64bit RyuJIT-v4.6.1586.0
+  DefaultJob : Clr 4.0.30319.42000, 64bit RyuJIT-v4.6.1586.0
 </code></pre>
 
 <table class="table table-bordered-all table-responsive">
 <thead>
 <tr>
 	<th>Method</th>
-	<th>Median</th>
+	<th>Mean</th>
 	<th>StdDev</th>
+	<th>Allocated</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-	<td>Md5</td>
-	<td>21.2912 us</td>
-	<td>0.4373 us</td>
+	<td>Sha256</td>
+	<td>130.5169 us</td>
+	<td>1.8489 us</td>
+	<td>188 B</td>
 </tr>
 <tr>
-	<td>Sha256</td>
-	<td>107.4124 us</td>
-	<td>1.8339 us</td>
+	<td>Md5</td>
+	<td>25.8010 us</td>
+	<td>0.1757 us</td>
+	<td>113 B</td>
 </tr>
 </tbody>
 </table>
@@ -205,9 +206,13 @@ Type=Md5VsSha256  Mode=Throughput
 <p>Analyze it. In your bin directory, you can find a lot of useful files with detailed information. For example:</p>
 <ul>
 <li>Csv reports with raw data: <code>Md5VsSha256-report.csv</code>, <code>Md5VsSha256-runs.csv</code></li>
-<li>Markdown reports:  <code>Md5VsSha256-report-default.md</code>, <code>Md5VsSha256-report-stackoverflow.md</code>, <code>Md5VsSha256-report-github.md</code></li>
+<li>
+Markdown reports:  <code>Md5VsSha256-report-default.md</code>, <code>Md5VsSha256-report-stackoverflow.md</code>, <code>Md5VsSha256-report-github.md</code>
+<ul>
 <li>Plain report and log: <code>Md5VsSha256-report.txt</code>, <code>Md5VsSha256.log</code></li>
 <li>Plots (if you have installed R): <code>Md5VsSha256-barplot.png</code>, <code>Md5VsSha256-boxplot.png</code>, and so on.</li>
+</ul>
+</li>
 </ul>
 
                     </div>
