@@ -4,7 +4,7 @@
 
 Create new console application and install the [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/) NuGet package. We support:
 
-* *Projects:* Classic (`*.csproj`), Modern (`*.xproj`/`project.json`)
+* *Projects:* `*.csproj`, `*.xproj`/`project.json`
 * *Runtimes:* Full .NET Framework, .NET Core, Mono
 * *OS:* Windows, Linux, MacOS
 * *Languages:* C#, F#, VB
@@ -47,21 +47,17 @@ Notice, that you should use only the `Release` configuration for your benchmarks
 ## Benchmark results
 
 ```
-Host Process Environment Information:
-BenchmarkDotNet-Dev.Core=v0.9.8.0
-OS=Microsoft Windows NT 6.2.9200.0
+BenchmarkDotNet=v0.10.1, OS=Microsoft Windows NT 6.2.9200.0
 Processor=Intel(R) Core(TM) i7-4702MQ CPU 2.20GHz, ProcessorCount=8
-Frequency=2143477 ticks, Resolution=466.5317 ns, Timer=TSC
-CLR=MS.NET 4.0.30319.42000, Arch=32-bit RELEASE
-GC=Concurrent Workstation
-JitModules=clrjit-v4.6.1586.0
+Frequency=2143476 Hz, Resolution=466.5319 ns, Timer=TSC
+  [Host]     : Clr 4.0.30319.42000, 64bit RyuJIT-v4.6.1586.0
+  DefaultJob : Clr 4.0.30319.42000, 64bit RyuJIT-v4.6.1586.0
 
-Type=Md5VsSha256  Mode=Throughput
 
- Method |      Median |    StdDev |
-------- |------------ |---------- |
- Sha256 | 129.9503 us | 2.0627 us |
-    Md5 |  26.1774 us | 0.6362 us |
+| Method |        Mean |    StdDev | Allocated |
+|------- |------------ |---------- |---------- |
+| Sha256 | 130.5169 us | 1.8489 us |     188 B |
+|    Md5 |  25.8010 us | 0.1757 us |     113 B |
 ```
 
 ## Jobs
@@ -73,16 +69,29 @@ You can check several environments at once. For example, you can compare perform
 public class Md5VsSha256
 ```
 
- Method | Toolchain | Runtime |      Median |    StdDev |
-------- |---------- |-------- |------------ |---------- |
-    Md5 |       Clr |     Clr |  25.6889 us | 1.1810 us |
- Sha256 |       Clr |     Clr | 129.6621 us | 3.2028 us |
-    Md5 |      Core |    Core |  24.0038 us | 0.1683 us |
- Sha256 |      Core |    Core |  57.5698 us | 0.5385 us |
-    Md5 |      Mono |    Mono |  53.8173 us | 0.4953 us |
- Sha256 |      Mono |    Mono | 205.7487 us | 2.8628 us |
+Example of the result:
 
-There are a lot of predefined jobs which you can use. For example, you can compare `LegacyJitX86` vs `LegacyJitX64` vs `RyuJITx64`:
+```ini
+BenchmarkDotNet=v0.10.1, OS=Microsoft Windows NT 6.2.9200.0
+Processor=Intel(R) Core(TM) i7-4702MQ CPU 2.20GHz, ProcessorCount=8
+Frequency=2143476 Hz, Resolution=466.5319 ns, Timer=TSC
+  [Host] : Clr 4.0.30319.42000, 64bit RyuJIT-v4.6.1586.0
+  Clr    : Clr 4.0.30319.42000, 64bit RyuJIT-v4.6.1586.0
+  Core   : .NET Core 4.6.24628.01, 64bit RyuJIT
+  Mono   : Mono 4.6.2 (Visual Studio built mono), 64bit
+
+
+ Method |  Job | Runtime |        Mean |    StdDev | Allocated |
+------- |----- |-------- |------------ |---------- |---------- |
+ Sha256 |  Clr |     Clr | 130.5169 us | 1.8489 us |     188 B |
+    Md5 |  Clr |     Clr |  25.8010 us | 0.1757 us |     113 B |
+ Sha256 | Core |    Core |  57.6534 us | 0.8210 us |     113 B |
+    Md5 | Core |    Core |  24.2675 us | 0.0687 us |      80 B |
+ Sha256 | Mono |    Mono | 182.8917 us | 7.5126 us |       N/A |
+    Md5 | Mono |    Mono |  46.0745 us | 1.4978 us |       N/A |
+```
+
+There are a lot of predefined jobs which you can use. For example, you can compare `LegacyJitX86` vs `LegacyJitX64` vs `RyuJitX64`:
 
 ```cs
 [LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
@@ -120,10 +129,10 @@ You can also add custom columns to the summary table:
 public class Md5VsSha256
 ```
 
- Method |      Median |    StdDev |         Min |         Max |
-------- |------------ |---------- |------------ |------------ |
- Sha256 | 131.3200 us | 4.6744 us | 129.8216 us | 147.7630 us |
-    Md5 |  26.2847 us | 0.4424 us |  25.8442 us |  27.4258 us |
+| Method | Median      | StdDev    | Min         | Max         |      |
+| ------ | ----------- | --------- | ----------- | ----------- | ---- |
+| Sha256 | 131.3200 us | 4.6744 us | 129.8216 us | 147.7630 us |      |
+| Md5    | 26.2847 us  | 0.4424 us | 25.8442 us  | 27.4258 us  |      |
 
 Of course, you can define own columns based on full benchmark summary.
 
@@ -164,12 +173,12 @@ public class Sleeps
 
 As a result, you will have additional column in the summary table:
 
-  Method |      Median |    StdDev | Scaled
--------- |------------ |---------- |-------
- Time100 | 100.2640 ms | 0.1238 ms |   1.00
- Time150 | 150.2093 ms | 0.1034 ms |   1.50
-  Time50 |  50.2509 ms | 0.1153 ms |   0.50
-  
+| Method  | Median      | StdDev    | Scaled |
+| ------- | ----------- | --------- | ------ |
+| Time100 | 100.2640 ms | 0.1238 ms | 1.00   |
+| Time150 | 150.2093 ms | 0.1034 ms | 1.50   |
+| Time50  | 50.2509 ms  | 0.1153 ms | 0.50   |
+
 Read more:  [Baseline](Advanced/Baseline.htm)
 
 ## Params
@@ -193,12 +202,12 @@ public class IntroParams
 }
 ```
 
-   Method  |      Median |    StdDev |   A |  B
----------- |------------ |---------- |---- |---
- Benchmark | 115.3325 ms | 0.0242 ms | 100 | 10
- Benchmark | 125.3282 ms | 0.0245 ms | 100 | 20
- Benchmark | 215.3024 ms | 0.0375 ms | 200 | 10
- Benchmark | 225.2710 ms | 0.0434 ms | 200 | 20
+| Method    | Median      | StdDev    | A    | B    |
+| --------- | ----------- | --------- | ---- | ---- |
+| Benchmark | 115.3325 ms | 0.0242 ms | 100  | 10   |
+| Benchmark | 125.3282 ms | 0.0245 ms | 100  | 20   |
+| Benchmark | 215.3024 ms | 0.0375 ms | 200  | 10   |
+| Benchmark | 225.2710 ms | 0.0434 ms | 200  | 20   |
 
 Read more:  [Params](Advanced/Params.htm)
 

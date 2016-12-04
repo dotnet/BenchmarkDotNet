@@ -55,26 +55,24 @@ var summary = BenchmarkRunner.Run<Md5VsSha256>();
 View the results. Here is an example of output from the above benchmark:
 
 ```ini
-BenchmarkDotNet=v0.9.0.0
-OS=Microsoft Windows NT 6.2.9200.0
-Processor=Intel(R) Core(TM) i7-4810MQ CPU @ 2.80GHz, ProcessorCount=8
-Frequency=2728067 ticks, Resolution=366.5599 ns
-HostCLR=MS.NET 4.0.30319.42000, Arch=64-bit RELEASE [RyuJIT]
-
-Type=Md5VsSha256  Mode=Throughput
+BenchmarkDotNet=v0.10.1, OS=Microsoft Windows NT 6.2.9200.0
+Processor=Intel(R) Core(TM) i7-4702MQ CPU 2.20GHz, ProcessorCount=8
+Frequency=2143476 Hz, Resolution=466.5319 ns, Timer=TSC
+  [Host]     : Clr 4.0.30319.42000, 64bit RyuJIT-v4.6.1586.0
+  DefaultJob : Clr 4.0.30319.42000, 64bit RyuJIT-v4.6.1586.0
 ```
 
- Method |      Median |    StdDev
-------- |------------ |----------
-    Md5 |  21.2912 us | 0.4373 us
- Sha256 | 107.4124 us | 1.8339 us
+| Method | Mean        | StdDev    | Allocated |
+| ------ | ----------- | --------- | --------- |
+| Sha256 | 130.5169 us | 1.8489 us | 188 B     |
+| Md5    | 25.8010 us  | 0.1757 us | 113 B     |
 
 
 ## Step 5. Analyze results
 
 Analyze it. In your bin directory, you can find a lot of useful files with detailed information. For example:
 
-  * Csv reports with raw data: `Md5VsSha256-report.csv`, `Md5VsSha256-runs.csv`
-  * Markdown reports:  `Md5VsSha256-report-default.md`, `Md5VsSha256-report-stackoverflow.md`, `Md5VsSha256-report-github.md`
-  * Plain report and log: `Md5VsSha256-report.txt`, `Md5VsSha256.log`
-  * Plots (if you have installed R): `Md5VsSha256-barplot.png`, `Md5VsSha256-boxplot.png`, and so on.
+* Csv reports with raw data: `Md5VsSha256-report.csv`, `Md5VsSha256-runs.csv`
+* Markdown reports:  `Md5VsSha256-report-default.md`, `Md5VsSha256-report-stackoverflow.md`, `Md5VsSha256-report-github.md`
+    * Plain report and log: `Md5VsSha256-report.txt`, `Md5VsSha256.log`
+    * Plots (if you have installed R): `Md5VsSha256-barplot.png`, `Md5VsSha256-boxplot.png`, and so on.
