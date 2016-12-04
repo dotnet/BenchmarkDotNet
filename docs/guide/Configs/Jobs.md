@@ -95,8 +95,8 @@ public class MyBenchmarks
                 .With(Runtime.Core)
                 .WithLaunchCount(5)
                 .WithIterationTime(TimeInterval.Millisecond * 200)
-                .WithMaxStdErrRelative(0.01))
-                .WithId("MySuperJob"); // IMPORTANT: Id assignment should be the last call in the chain or the id will be lost.
+                .WithMaxStdErrRelative(0.01)
+                .WithId("MySuperJob")); // IMPORTANT: Id assignment should be the last call in the chain or the id will be lost.
         }
     }
     // Benchmarks
