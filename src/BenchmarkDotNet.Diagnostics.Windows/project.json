@@ -41,7 +41,7 @@
     "Microsoft.Diagnostics.Tracing.TraceEvent": "1.0.41.0"
   },
   "buildOptions": {
-    "nowarn": [ "1591" ],
+    "nowarn": [ "1591", "3001", "3003" ],
     "xmlDoc": true
   }
 }
