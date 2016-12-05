@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 // ReSharper disable NotAccessedField.Local
@@ -24,18 +25,21 @@ namespace BenchmarkDotNet.Engines
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Consume(byte byteValue) => byteHolder = byteValue;
 
+        [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Consume(sbyte sbyteValue) => sbyteHolder = sbyteValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Consume(short shortValue) => shortHolder = shortValue;
 
+        [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Consume(ushort ushortValue) => ushortHolder = ushortValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Consume(int intValue) => intHolder = intValue;
 
+        [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Consume(uint uintValue) => uintHolder = uintValue;
 
@@ -54,6 +58,7 @@ namespace BenchmarkDotNet.Engines
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Consume(long longValue) => Volatile.Write(ref longHolder, longValue);
 
+        [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Consume(ulong ulongValue) => Volatile.Write(ref ulongHolder, ulongValue);
 
