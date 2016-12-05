@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Engines
             return Gen2Collections;
         }
 
-        internal static GcStats ReadInitial(bool isDiagnosticsEnabled)
+        public static GcStats ReadInitial(bool isDiagnosticsEnabled)
         {
             // this will force GC.Collect, so we want to do this before collecting collections counts
             long allocatedBytes = GetAllocatedBytes(isDiagnosticsEnabled); 
@@ -74,7 +74,7 @@ namespace BenchmarkDotNet.Engines
                 0);
         }
 
-        internal static GcStats ReadFinal(bool isDiagnosticsEnabled)
+        public static GcStats ReadFinal(bool isDiagnosticsEnabled)
         {
             return new GcStats(
                 GC.CollectionCount(0),
@@ -120,10 +120,10 @@ namespace BenchmarkDotNet.Engines
             return () => (long)method.Invoke(null, null);
         }
 
-        internal string ToOutputLine() 
+        public string ToOutputLine() 
             => $"{ResultsLinePrefix} {Gen0Collections} {Gen1Collections} {Gen2Collections} {AllocatedBytes} {TotalOperations}";
 
-        internal static GcStats Parse(string line)
+        public static GcStats Parse(string line)
         {
             if(!line.StartsWith(ResultsLinePrefix))
                 throw new NotSupportedException($"Line must start with {ResultsLinePrefix}");
