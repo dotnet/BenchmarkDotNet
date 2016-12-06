@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Linq;
+using System.Reflection;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
 using OurPlatform = BenchmarkDotNet.Environments.Platform;
@@ -86,7 +87,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
 
         private static string[] GetFrameworkAssembliesPaths()
         {
-            var frameworkAssembliesDirectory = Path.GetDirectoryName(typeof(object).Assembly.Location);
+            var frameworkAssembliesDirectory = Path.GetDirectoryName(typeof(object).GetTypeInfo().Assembly.Location);
             if (frameworkAssembliesDirectory == null)
             {
                 return new string[0];
