@@ -17,11 +17,13 @@ namespace BenchmarkDotNet.Toolchains
         {
             switch (runtime)
             {
+#if !UAP
                 case Runtime.Clr:
                 case Runtime.Mono:
                     return Classic.ClassicToolchain.Instance;
                 case Runtime.Core:
                     return Core.CoreToolchain.Instance;
+#endif
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtime), runtime, "Runtime not supported");
             }

@@ -57,6 +57,17 @@
           "target": "project"
         }
       }
+    },
+    "uap10.0": {
+      "buildOptions": {
+        "define": [ "CORE", "UAP" ]
+      },
+      "dependencies": {
+        "Microsoft.NETCore.UniversalWindowsPlatform": "5.1.0",
+        "BenchmarkDotNet.Core": {
+          "target": "project"
+        }
+      }
     }
   }
 }

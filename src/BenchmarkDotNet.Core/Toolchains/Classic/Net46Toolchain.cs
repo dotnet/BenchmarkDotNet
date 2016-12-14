@@ -3,6 +3,7 @@ using BenchmarkDotNet.Toolchains.DotNetCli;
 
 namespace BenchmarkDotNet.Toolchains.Classic
 {
+#if !UAP
     public class Net46Toolchain : Toolchain
     {
         // In case somebody calls ClassicToolchain from .NET Core process 
@@ -23,4 +24,5 @@ namespace BenchmarkDotNet.Toolchains.Classic
         {
         }
     }
+#endif
 }

@@ -56,12 +56,18 @@ namespace BenchmarkDotNet.Characteristics
 
         private static IReadOnlyList<Characteristic> GetThisTypeCharacteristicsCore(Type jobModeType)
         {
-            var fieldValues = jobModeType.GetTypeInfo()
+            var fieldValues = jobModeType
+#if !UAP
+                .GetTypeInfo()
+#endif
                 .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy | BindingFlags.Static)
                 .Where(f => IsCharacteristicSubclass(f.FieldType))
                 .Select(f => AssertHasValue(f, (Characteristic)f.GetValue(null)));
 
-            var propertyValues = jobModeType.GetTypeInfo()
+            var propertyValues = jobModeType
+#if !UAP
+                .GetTypeInfo()
+#endif
                 .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy | BindingFlags.Static)
                 .Where(p => p.GetMethod != null && IsCharacteristicSubclass(p.PropertyType))
                 .Select(p => AssertHasValue(p, (Characteristic)p.GetValue(null)));

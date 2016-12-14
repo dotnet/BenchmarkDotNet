@@ -17,6 +17,11 @@
         /// Cross-platform Core CLR runtime
         /// See also: https://docs.microsoft.com/en-us/dotnet/
         /// </summary>
-        Core
+        Core,
+
+        /// <summary>
+        /// Universal application platform 
+        /// </summary>
+        Uap
     }
 }

@@ -186,24 +186,30 @@ namespace BenchmarkDotNet.Portability
 
         internal static IntPtr GetCurrentAffinity()
         {
+#if !UAP
             try
             {
                 return Process.GetCurrentProcess().ProcessorAffinity;
             }
             catch (PlatformNotSupportedException)
-            {
-                return default(IntPtr);
+            {                
             }
+#endif
+            return default(IntPtr);
         }
 
         internal static string GetConfiguration()
         {
+#if !UAP
             bool? isDebug = Assembly.GetEntryAssembly().IsDebug();
             if (isDebug.HasValue == false)
             {
                 return Unknown;
             }
             return isDebug.Value ? DebugConfigurationName : ReleaseConfigurationName;
+#else
+            return Unknown;
+#endif
         }
 
         internal static string GetDotNetCliRuntimeIdentifier()

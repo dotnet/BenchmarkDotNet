@@ -112,10 +112,17 @@ namespace BenchmarkDotNet.Engines
         {
             // for some versions of .NET Core this method is internal, 
             // for some public and for others public and exposed ;)
-            var method = typeof(GC).GetTypeInfo().GetMethod("GetAllocatedBytesForCurrentThread",
-                            BindingFlags.Public | BindingFlags.Static)
-                      ?? typeof(GC).GetTypeInfo().GetMethod("GetAllocatedBytesForCurrentThread",
-                            BindingFlags.NonPublic | BindingFlags.Static);
+            var method = typeof(GC)
+#if !UAP
+                .GetTypeInfo()
+#endif
+                .GetMethod("GetAllocatedBytesForCurrentThread", BindingFlags.Public | BindingFlags.Static)
+                      ?? 
+                      typeof(GC)
+#if !UAP
+                      .GetTypeInfo()
+#endif
+                      .GetMethod("GetAllocatedBytesForCurrentThread", BindingFlags.NonPublic | BindingFlags.Static);
 
             return () => (long)method.Invoke(null, null);
         }

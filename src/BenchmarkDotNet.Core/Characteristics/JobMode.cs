@@ -84,11 +84,17 @@ namespace BenchmarkDotNet.Characteristics
 
                 return;
             }
-
+#if UAP
+            if (!characteristic.CharacteristicType.IsInstanceOfType(value))
+                throw new ArgumentException(
+                    $"The value {value} is not assignable to {characteristic} property.",
+                    characteristic.Id);
+#else
             if (!characteristic.CharacteristicType.GetTypeInfo().IsInstanceOfType(value))
                 throw new ArgumentException(
                     $"The value {value} is not assignable to {characteristic} property.",
                     characteristic.Id);
+#endif
         }
         #endregion
 

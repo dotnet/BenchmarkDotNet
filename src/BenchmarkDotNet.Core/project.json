@@ -64,6 +64,21 @@
         "Microsoft.DotNet.InternalAbstractions": "1.0.0",
         "System.Xml.XPath.XmlDocument": "4.0.1"
       }
+    },
+    "uap10.0": {
+      "buildOptions": {
+        "define": [ "CORE", "UAP" ]
+      },
+      "dependencies": {
+        "Microsoft.NETCore.UniversalWindowsPlatform": "5.1.0",
+        "System.Console": "4.3.0",
+        "System.Threading.Tasks.Extensions": "4.3.0",
+        "System.Reflection": "4.3.0",
+        "System.Threading": "4.3.0",
+        "System.Xml.XPath.XmlDocument": "4.3.0",
+        "System.Runtime.InteropServices.RuntimeInformation": "4.3.0",
+        "Microsoft.DotNet.InternalAbstractions": "1.0.500-preview2-1-003177"
+      }
     }
   }
 }

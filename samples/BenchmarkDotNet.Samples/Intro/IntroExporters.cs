@@ -15,7 +15,9 @@ namespace BenchmarkDotNet.Samples.Intro
     [CsvMeasurementsExporter]
     [HtmlExporter]
     [PlainExporter]
+#if !UAP
     [RPlotExporter]
+#endif
     [JsonExporterAttribute.Brief]
     [JsonExporterAttribute.BriefCompressed]
     [JsonExporterAttribute.Full]

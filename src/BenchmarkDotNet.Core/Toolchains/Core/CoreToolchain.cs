@@ -8,6 +8,7 @@ using BenchmarkDotNet.Toolchains.DotNetCli;
 
 namespace BenchmarkDotNet.Toolchains.Core
 {
+#if !UAP
     public class CoreToolchain : Toolchain
     {
         private const string TargetFrameworkMoniker = "netcoreapp1.1";
@@ -87,4 +88,5 @@ namespace BenchmarkDotNet.Toolchains.Core
             return string.Empty;
         }
     }
+#endif
 }
