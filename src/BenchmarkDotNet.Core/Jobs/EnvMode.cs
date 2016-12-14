@@ -17,6 +17,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly EnvMode Clr = new EnvMode(Runtime.Clr).Freeze();
         public static readonly EnvMode Core = new EnvMode(Runtime.Core).Freeze();
         public static readonly EnvMode Mono = new EnvMode(Runtime.Mono).Freeze();
+        public static readonly EnvMode Uap = new EnvMode(Runtime.Uap).Freeze();
         public static readonly EnvMode LegacyJitX86 = new EnvMode(
             nameof(LegacyJitX86), Jit.LegacyJit, Platform.X86)
             .Freeze();
