@@ -23,6 +23,8 @@ namespace BenchmarkDotNet.Toolchains
                     return Classic.ClassicToolchain.Instance;
                 case Runtime.Core:
                     return Core.CoreToolchain.Instance;
+                case Runtime.Uap:
+                    return Uap.UapToolchain.Instance;
 #endif
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtime), runtime, "Runtime not supported");
