@@ -100,6 +100,7 @@ namespace BenchmarkDotNet.Toolchains
             {
                 case Runtime.Clr:
                 case Runtime.Core:
+                case Runtime.Uap:
                     start.FileName = exeName;
                     start.Arguments = args;
                     break;

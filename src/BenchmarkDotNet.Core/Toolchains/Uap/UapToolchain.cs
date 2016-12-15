@@ -33,12 +33,18 @@ namespace BenchmarkDotNet.Toolchains.Uap
 
         private static string GetImports()
         {
-            return string.Empty;
+            return "[]";
             //return "[ \"dnxcore50\", \"portable-net45+win8\", \"dotnet5.6\", \"netcore50\" ]";
         }
 
         private static string GetRuntime()
         {
+            var currentRuntime = "win10-x64";
+            if (!string.IsNullOrEmpty(currentRuntime))
+            {
+                return $"\"runtimes\": {{ \"{currentRuntime}\": {{ }} }},";
+            }
+
             return string.Empty;
         }
     }

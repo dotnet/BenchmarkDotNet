@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Toolchains
 
         protected virtual string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath) => buildArtifactsDirectoryPath;
 
-        protected virtual string GetProjectFilePath(string binariesDirectoryPath) => string.Empty;
+        protected abstract string GetProjectFilePath(string binariesDirectoryPath);
 
         protected abstract void Cleanup(ArtifactsPaths artifactsPaths);
 
@@ -83,7 +83,7 @@ namespace BenchmarkDotNet.Toolchains
             return config.KeepBenchmarkFiles ? benchmark.FolderInfo : shortName;
         }
 
-        private static void GenerateCode(Benchmark benchmark, ArtifactsPaths artifactsPaths)
+        protected virtual void GenerateCode(Benchmark benchmark, ArtifactsPaths artifactsPaths)
         {
             File.WriteAllText(artifactsPaths.ProgramCodePath, CodeGenerator.Generate(benchmark));
         }
