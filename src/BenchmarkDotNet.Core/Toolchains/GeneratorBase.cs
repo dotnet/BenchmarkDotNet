@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Toolchains
 
         protected virtual string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath) => buildArtifactsDirectoryPath;
 
-        protected abstract string GetProjectFilePath(string binariesDirectoryPath);
+        protected virtual string GetProjectFilePath(string binariesDirectoryPath) => string.Empty;
 
         protected abstract void Cleanup(ArtifactsPaths artifactsPaths);
 

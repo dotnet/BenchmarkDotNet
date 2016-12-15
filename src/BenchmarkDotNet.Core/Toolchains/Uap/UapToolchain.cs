@@ -15,14 +15,9 @@ namespace BenchmarkDotNet.Toolchains.Uap
 
         private UapToolchain()
             : base("Core",
-                  new DotNetCliGenerator(
-                      TargetFrameworkMoniker,
-                      GetExtraDependencies(),
-                      platformProvider: _ => "x64", // dotnet cli supports only x64 compilation now
-                      imports: GetImports(),
-                      runtime: GetRuntime()),
-                  new DotNetCliBuilder(TargetFrameworkMoniker),
-                  new Executor())
+                  new UapGenerator(),
+                  new UapBuilder(),
+                  new UapExecutor())
         {
         }
 
