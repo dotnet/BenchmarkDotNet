@@ -33,18 +33,18 @@
         }
       }
     },
-    "netcoreapp1.1": {
-      "buildOptions": {
-        "define": [ "CORE" ]
-      },
-      "dependencies": {
-        "Microsoft.NETCore.App": {
-          "type": "platform",
-          "version": "1.1.0"
-        },
-        "System.ComponentModel.EventBasedAsync": "4.0.11"
-      }
-    },
+    //"netcoreapp1.1": {
+    //  "buildOptions": {
+    //    "define": [ "CORE" ]
+    //  },
+    //  "dependencies": {
+    //    "Microsoft.NETCore.App": {
+    //      "type": "platform",
+    //      "version": "1.1.0"
+    //    },
+    //    "System.ComponentModel.EventBasedAsync": "4.0.11"
+    //  }
+    //},
     "uap10.0": {
       "buildOptions": {
         "define": [ "CORE", "UAP" ]
@@ -61,6 +61,7 @@
     }
   },
   "runtimes": {
-    "win10-x64": {}
+    "win10-x64": {},
+    "win10-arm-aot": {}
   }
 }

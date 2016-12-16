@@ -5,7 +5,8 @@
   },
 
   "dependencies": {
-    "Microsoft.NETCore.UniversalWindowsPlatform": "5.1.0"
+    "Microsoft.NETCore.UniversalWindowsPlatform": "5.1.0",
+    "system.console": "4.3.0"
   },
   "frameworks": {
     "uap10.0": {

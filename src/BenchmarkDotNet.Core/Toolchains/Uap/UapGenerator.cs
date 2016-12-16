@@ -11,9 +11,11 @@ using BenchmarkDotNet.Helpers;
 using System.IO;
 using BenchmarkDotNet.Code;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace BenchmarkDotNet.Toolchains.Uap
 {
+#if !UAP
     internal class UapGenerator : GeneratorBase
     {
         private const string ProjectFileName = "UapBenchmarkProject.csproj";
@@ -25,8 +27,8 @@ namespace BenchmarkDotNet.Toolchains.Uap
             var assemblyName = benchmark.Target.Type.GetTypeInfo().Assembly.GetName();
             content = SetGuid(content)
                 .Replace("$BENCHMARKASSEMLYNAME$", assemblyName.Name)
-                .Replace("$BENCHMARKASSEMLYPATH$", assemblyName.Name + ".dll")
-                .Replace("$BDNCOREPATH$", "BenchmarkDotNet.Core.dll");
+                .Replace("$BENCHMARKASSEMLYPATH$", benchmark.Target.Type.GetTypeInfo().Assembly.Location)
+                .Replace("$BDNCOREPATH$", benchmark.GetType().GetTypeInfo().Assembly.Location);
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
         }
@@ -84,6 +86,7 @@ namespace BenchmarkDotNet.Toolchains.Uap
         protected override void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)
         {
             string content = $"dotnet restore{Environment.NewLine}" +
+                             $"call \"%VS140COMNTOOLS%VsDevCmd.bat\"{Environment.NewLine}" +
                              $"msbuild {ProjectFileName}";
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
@@ -140,4 +143,5 @@ namespace BenchmarkDotNet.Toolchains.Uap
             File.WriteAllBytes(Path.Combine(artifactsPaths.BinariesDirectoryPath, "project.json"), ResourceHelper.LoadBinaryFile(json));
         }
     }
+#endif
 }
