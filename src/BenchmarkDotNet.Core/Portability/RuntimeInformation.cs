@@ -101,6 +101,8 @@ namespace BenchmarkDotNet.Portability
             }
 #if CLASSIC
             return $"Clr {System.Environment.Version}";
+#elif UAP
+            return "Uap 10.0";
 #elif CORE
             return System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
 #endif

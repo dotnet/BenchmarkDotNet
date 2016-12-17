@@ -107,7 +107,9 @@
     <Content Include="Assets\Square150x150Logo.scale-200.png" />
     <Content Include="Assets\Square44x44Logo.scale-200.png" />
     <Content Include="Assets\StoreLogo.png" />
-    <Content Include="Properties\Default.rd.xml" />
+    <Content Include="Properties\Default.rd.xml">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -116,6 +118,9 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="BenchmarkDotNet">
+      <HintPath>$BDNPATH$</HintPath>
+    </Reference>
     <Reference Include="BenchmarkDotNet.Core">
       <HintPath>$BDNCOREPATH$</HintPath>
     </Reference>

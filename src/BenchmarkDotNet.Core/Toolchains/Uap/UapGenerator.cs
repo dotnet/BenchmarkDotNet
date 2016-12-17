@@ -27,8 +27,9 @@ namespace BenchmarkDotNet.Toolchains.Uap
             var assemblyName = benchmark.Target.Type.GetTypeInfo().Assembly.GetName();
             content = SetGuid(content)
                 .Replace("$BENCHMARKASSEMLYNAME$", assemblyName.Name)
-                .Replace("$BENCHMARKASSEMLYPATH$", benchmark.Target.Type.GetTypeInfo().Assembly.Location)
-                .Replace("$BDNCOREPATH$", benchmark.GetType().GetTypeInfo().Assembly.Location);
+                .Replace("$BENCHMARKASSEMLYPATH$", @"D:\Workshop\BenchmarkDotNet\samples\BenchmarkDotNet.Samples\bin\Release\uap10.0\BenchmarkDotNet.Samples.dll")
+                .Replace("$BDNCOREPATH$", @"D:\Workshop\BenchmarkDotNet\src\BenchmarkDotNet\bin\Release\uap10.0\BenchmarkDotNet.Core.dll")
+                .Replace("$BDNPATH$", @"D:\Workshop\BenchmarkDotNet\src\BenchmarkDotNet\bin\Release\uap10.0\BenchmarkDotNet.dll");
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
         }
@@ -141,6 +142,11 @@ namespace BenchmarkDotNet.Toolchains.Uap
 
             var json = "UapBenchmarkProject.json";
             File.WriteAllBytes(Path.Combine(artifactsPaths.BinariesDirectoryPath, "project.json"), ResourceHelper.LoadBinaryFile(json));
+
+            var rd = "Default.rd.xml";
+            var propertiesFolder = Path.Combine(artifactsPaths.BinariesDirectoryPath, "Properties");
+            Directory.CreateDirectory(propertiesFolder);
+            File.WriteAllBytes(Path.Combine(propertiesFolder, rd), ResourceHelper.LoadBinaryFile(rd));
         }
     }
 #endif

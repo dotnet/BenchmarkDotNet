@@ -70,7 +70,7 @@
         "define": [ "CORE", "UAP" ]
       },
       "dependencies": {
-        "Microsoft.NETCore.UniversalWindowsPlatform": "5.1.0",
+        "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
         "System.Console": "4.3.0",
         "System.Threading.Tasks.Extensions": "4.3.0",
         "System.Reflection": "4.3.0",
