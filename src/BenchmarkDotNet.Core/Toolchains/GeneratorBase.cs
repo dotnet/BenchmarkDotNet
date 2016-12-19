@@ -83,13 +83,14 @@ namespace BenchmarkDotNet.Toolchains
             return config.KeepBenchmarkFiles ? benchmark.FolderInfo : shortName;
         }
 
-        private static void GenerateCode(Benchmark benchmark, ArtifactsPaths artifactsPaths)
+        protected virtual void GenerateCode(Benchmark benchmark, ArtifactsPaths artifactsPaths)
         {
             File.WriteAllText(artifactsPaths.ProgramCodePath, CodeGenerator.Generate(benchmark));
         }
 
         private static void GenerateAppConfig(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)
         {
+#if !UAP
             string sourcePath = benchmark.Target.Type.GetTypeInfo().Assembly.Location + ".config";
 
             using (var source = File.Exists(sourcePath) ? new StreamReader(File.OpenRead(sourcePath)) : TextReader.Null)
@@ -97,6 +98,7 @@ namespace BenchmarkDotNet.Toolchains
             {
                 AppConfigGenerator.Generate(benchmark.Job, source, destination, resolver);
             }
+#endif
         }
     }
 }

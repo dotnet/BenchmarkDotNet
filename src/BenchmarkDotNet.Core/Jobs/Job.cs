@@ -16,6 +16,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Job Clr = new Job(nameof(Clr), EnvMode.Clr).Freeze();
         public static readonly Job Core = new Job(nameof(Core), EnvMode.Core).Freeze();
         public static readonly Job Mono = new Job(nameof(Mono), EnvMode.Mono).Freeze();
+        public static readonly Job Uap = new Job(nameof(Uap), EnvMode.Uap).Freeze();
 
         public static readonly Job LegacyJitX86 = new Job(nameof(LegacyJitX86), EnvMode.LegacyJitX86).Freeze();
         public static readonly Job LegacyJitX64 = new Job(nameof(LegacyJitX64), EnvMode.LegacyJitX64).Freeze();

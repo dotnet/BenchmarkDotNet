@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !UAP
+using System;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Linq;
@@ -85,3 +86,4 @@ namespace BenchmarkDotNet.Samples.Other
         }
     }
 }
+#endif

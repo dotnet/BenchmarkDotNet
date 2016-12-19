@@ -7,6 +7,7 @@ using BenchmarkDotNet.Toolchains.Results;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
+#if !UAP
     public class DotNetCliBuilder : IBuilder
     {
         internal const string RestoreCommand = "restore";
@@ -63,4 +64,5 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return $"build --framework {frameworkMoniker} --configuration {Configuration} --output {OutputDirectory}";
         }
     }
+#endif
 }

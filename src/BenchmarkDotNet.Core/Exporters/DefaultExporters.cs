@@ -11,7 +11,9 @@ namespace BenchmarkDotNet.Exporters
         public static IExporter Html = HtmlExporter.Default;
         public static IExporter Markdown = MarkdownExporter.Default;
         public static IExporter Plain = PlainExporter.Default;
+#if !UAP
         public static IExporter RPlot = RPlotExporter.Default;
+#endif
 
         public static IExporter Json = JsonExporter.Default;
         public static IExporter JsonBrief = JsonExporter.Brief;

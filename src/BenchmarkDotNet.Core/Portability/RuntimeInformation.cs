@@ -101,6 +101,8 @@ namespace BenchmarkDotNet.Portability
             }
 #if CLASSIC
             return $"Clr {System.Environment.Version}";
+#elif UAP
+            return "Uap 10.0";
 #elif CORE
             return System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
 #endif
@@ -186,24 +188,30 @@ namespace BenchmarkDotNet.Portability
 
         internal static IntPtr GetCurrentAffinity()
         {
+#if !UAP
             try
             {
                 return Process.GetCurrentProcess().ProcessorAffinity;
             }
             catch (PlatformNotSupportedException)
-            {
-                return default(IntPtr);
+            {                
             }
+#endif
+            return default(IntPtr);
         }
 
         internal static string GetConfiguration()
         {
+#if !UAP
             bool? isDebug = Assembly.GetEntryAssembly().IsDebug();
             if (isDebug.HasValue == false)
             {
                 return Unknown;
             }
             return isDebug.Value ? DebugConfigurationName : ReleaseConfigurationName;
+#else
+            return Unknown;
+#endif
         }
 
         internal static string GetDotNetCliRuntimeIdentifier()

@@ -1,0 +1,20 @@
+﻿{
+  "version": "1.0.0-*",
+  "buildOptions": {
+    "emitEntryPoint": true
+  },
+
+  "dependencies": {
+    "BenchmarkDotNet": "0.10.1-develop",
+    "BenchmarkDotNet.Samples": "1.0.0-*",
+    "System.Reflection": "4.3.0"
+  },
+
+  "frameworks": {
+    "net46": {
+    }
+  },
+  "runtimes": {
+    "win10-x64": {}
+  }
+}

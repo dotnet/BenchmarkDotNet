@@ -20,7 +20,9 @@ namespace BenchmarkDotNet.Samples.Intro
                 Add(Job.Dry);
                 Add(ConsoleLogger.Default);
                 Add(TargetMethodColumn.Method, StatisticColumn.Max);
+#if !UAP
                 Add(RPlotExporter.Default, CsvExporter.Default);
+#endif
                 Add(EnvironmentAnalyser.Default);
                 UnionRule = ConfigUnionRule.AlwaysUseLocal;
             }

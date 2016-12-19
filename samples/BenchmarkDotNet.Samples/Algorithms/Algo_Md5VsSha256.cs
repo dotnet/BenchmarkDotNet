@@ -1,10 +1,11 @@
-﻿using System;
+﻿#if !UAP
+using System;
 using System.Security.Cryptography;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Jobs;
 
 namespace BenchmarkDotNet.Samples.Algorithms
-{    
+{
     [ClrJob, MonoJob, CoreJob]
     public class Algo_Md5VsSha256
     {
@@ -33,3 +34,4 @@ namespace BenchmarkDotNet.Samples.Algorithms
         }
     }
 }
+#endif

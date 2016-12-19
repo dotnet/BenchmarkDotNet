@@ -21,6 +21,7 @@ namespace BenchmarkDotNet.Validators
         {
             foreach (var group in validationParameters.Benchmarks.GroupBy(benchmark => benchmark.Target.Type.GetTypeInfo().Assembly))
             {
+#if !UAP
                 foreach (var referencedAssemblyName in group.Key.GetReferencedAssemblies())
                 {
                     var referencedAssembly = Assembly.Load(referencedAssemblyName);
@@ -32,6 +33,7 @@ namespace BenchmarkDotNet.Validators
                             $"Assembly {group.Key} which defines benchmarks references non-optimized {referencedAssemblyName.Name}");
                     }
                 }
+#endif
 
                 if (group.Key.IsJitOptimizationDisabled().IsTrue())
                 {

@@ -19,9 +19,14 @@ namespace BenchmarkDotNet.Code
     {
         internal static string Generate(Benchmark benchmark)
         {
+            return Generate(benchmark, "BenchmarkProgram.txt");
+        }
+
+        internal static string Generate(Benchmark benchmark, string templateName)
+        {
             var provider = GetDeclarationsProvider(benchmark.Target);
 
-            string text = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt")).
+            string text = new SmartStringBuilder(ResourceHelper.LoadTemplate(templateName)).
                 Replace("$OperationsPerInvoke$", provider.OperationsPerInvoke).
                 Replace("$TargetTypeNamespace$", provider.TargetTypeNamespace).
                 Replace("$TargetMethodReturnTypeNamespace$", provider.TargetMethodReturnTypeNamespace).
