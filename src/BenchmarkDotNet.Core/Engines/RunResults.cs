@@ -62,15 +62,17 @@ namespace BenchmarkDotNet.Engines
 
         public void Print()
         {
-            foreach (var measurement in GetMeasurements())
-                WriteLine(measurement.ToOutputLine());
-
-            WriteLine(GCStats.WithTotalOperations(totalOperationsCount).ToOutputLine());
-            WriteLine();
+            this.Print(line => Console.WriteLine(line));
         }
 
-        private void WriteLine() => Console.WriteLine();
-        private void WriteLine(string line) => Console.WriteLine(line);
+        public void Print(Action<string> printAction)
+        {
+            foreach (var measurement in GetMeasurements())
+                printAction(measurement.ToOutputLine());
+
+            printAction(GCStats.WithTotalOperations(totalOperationsCount).ToOutputLine());
+            printAction("\r\n");
+        }
 
         // TODO: improve
         // If we get value < 0.1ns, it's probably a random noise, the actual value is 0.0ns.

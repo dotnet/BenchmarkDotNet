@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
@@ -18,12 +19,19 @@ namespace BenchmarkDotNet.Toolchains.Uap
             DevicePortalApiWrapper.PackageStruct app = null;
             try
             {
-                dpClient = new DevicePortalApiWrapper("zEMTyPRdx8hi664vnp9Qq8rWH9D3coMc", "4812916714250432482004543481302430336069675778629049400138865675", "https://192.168.1.51");
+                dpClient = new DevicePortalApiWrapper("tsNwc9d5WOvuRpqSHL0Yr4iXaAnhEMrk", "1079552595942511295369298866917553000457380973401454626786566684", "https://192.168.1.51");
                 app = dpClient.DeployApplication(Path.Combine(buildResult.ArtifactsPaths.BinariesDirectoryPath, @"AppPackages\UapBenchmarkProject_1.0.0.0_ARM_Test\UapBenchmarkProject_1.0.0.0_ARM.appx"));
 
-                dpClient.RunApplication(app);
+                dpClient.DeleteApplication(app);
+                app = dpClient.DeployApplication(Path.Combine(buildResult.ArtifactsPaths.BinariesDirectoryPath, @"AppPackages\UapBenchmarkProject_1.0.0.0_ARM_Test\UapBenchmarkProject_1.0.0.0_ARM.appx"));
 
-                return new ExecuteResult(true, 0, new string[0], new string[0]);
+                var ct = dpClient.StartListening();
+                dpClient.RunApplication(app);
+                string[] allStrings = dpClient.StopListening(ct);
+
+                string[] resultStrings = allStrings.Where(x => !x.StartsWith("//")).ToArray();
+                string[] extraStrings = allStrings.Where(x => x.StartsWith("//")).ToArray();
+                return new ExecuteResult(true, 0, resultStrings, allStrings);
             }
             catch (Exception)
             {

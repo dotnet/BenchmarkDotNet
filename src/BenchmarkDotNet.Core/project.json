@@ -64,7 +64,8 @@
         "System.Runtime.Serialization.Primitives": "4.1.1",
         "Microsoft.DotNet.InternalAbstractions": "1.0.0",
         "System.Xml.XPath.XmlDocument": "4.0.1",
-        "RestSharp.NetCore": "105.2.3"
+        "RestSharp.NetCore": "105.2.3",
+        "System.Net.WebSockets.Client": "4.0.0"
       }
     },
     "uap10.0": {
@@ -79,7 +80,8 @@
         "System.Threading": "4.3.0",
         "System.Xml.XPath.XmlDocument": "4.3.0",
         "System.Runtime.InteropServices.RuntimeInformation": "4.3.0",
-        "Microsoft.DotNet.InternalAbstractions": "1.0.500-preview2-1-003177"
+        "Microsoft.DotNet.InternalAbstractions": "1.0.500-preview2-1-003177",
+        "System.Net.WebSockets.Client": "4.0.0"
       }
     }
   }

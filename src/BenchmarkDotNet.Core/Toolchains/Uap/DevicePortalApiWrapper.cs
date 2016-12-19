@@ -8,6 +8,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Net.WebSockets;
 
 namespace BenchmarkDotNet.Toolchains.Uap
 {
@@ -46,6 +47,23 @@ namespace BenchmarkDotNet.Toolchains.Uap
 
     internal class DevicePortalApiWrapper
     {
+        public class Event
+        {
+            public int ID { get; set; }
+            public int Keyword { get; set; }
+            public int Level { get; set; }
+            public string ProviderName { get; set; }
+            public string StringMessage { get; set; }
+            public string TaskName { get; set; }
+            public object Timestamp { get; set; }
+        }
+
+        public class RootObject
+        {
+            public int Frequency { get; set; }
+            public List<Event> Events { get; set; }
+        }
+
         class ProgressStruct
         {
             public bool Success { get; set; }
@@ -65,7 +83,7 @@ namespace BenchmarkDotNet.Toolchains.Uap
             public string PackageRelativeId { get; set; }
             public string Name { get; set; }
         }
-        
+
         private RestResponseCookie csrfToken;
         private RestResponseCookie wmid;
         private readonly RestClient client;
@@ -82,7 +100,7 @@ namespace BenchmarkDotNet.Toolchains.Uap
                 Name = "WMID",
                 Value = wmid
             };
-            
+
             this.client = new RestClient(devicePortalAddress);
         }
 
@@ -114,9 +132,20 @@ namespace BenchmarkDotNet.Toolchains.Uap
             installRequest.AddFile(Path.GetFileName(fullPath), fullPath);
             installRequest.AddQueryParameter("package", Path.GetFileName(fullPath));
             installRequest.AddHeader("X-CSRF-Token", csrfToken.Value);
-            if (client.Execute(installRequest).StatusCode != HttpStatusCode.Accepted)
+            int i = 10;
+            for (;;)
             {
-                throw new InvalidOperationException("Install failed");
+                if (client.Execute(installRequest).StatusCode != HttpStatusCode.Accepted)
+                {
+                    if (--i == 0)
+                    {
+                        throw new InvalidOperationException("Install failed");
+                    }
+                }
+                else
+                {
+                    break;
+                }
             }
 
             IRestResponse<ProgressStruct> progress;
@@ -147,9 +176,24 @@ namespace BenchmarkDotNet.Toolchains.Uap
             packagesRequest.AddCookie(wmid.Name, wmid.Value);
             packagesRequest.AddQueryParameter("_", GetTime().ToString());
 
-            var response = client.Get<PackagesStruct>(packagesRequest);
+            i = 10;
+            for (;;)
+            {
+                var response = client.Get<PackagesStruct>(packagesRequest);
 
-            return response.Data.InstalledPackages.Single(x => x.Name.Contains("BenchmarkDotNet"));
+                var ret = response.Data.InstalledPackages.SingleOrDefault(x => x.Name.Contains("BenchmarkDotNet"));
+                if (ret == null)
+                {
+                    if (--i == 0)
+                    {
+                        throw new InvalidOperationException("Installation failed");
+                    }
+                }
+                else
+                {
+                    return ret;
+                }
+            }
         }
 
         public void RunApplication(PackageStruct id)
@@ -210,6 +254,69 @@ namespace BenchmarkDotNet.Toolchains.Uap
             TimeSpan t = (DateTime.Now.ToUniversalTime() - st);
             retval = (long)(t.TotalMilliseconds + 0.5);
             return retval;
+        }
+
+        internal ClientWebSocket StartListening()
+        {
+            var address = new Uri($"wss://{this.client.BaseUrl.Host}/api/etw/session/realtime");
+            ClientWebSocket ws = new ClientWebSocket();
+            ws.Options.Cookies = new CookieContainer();
+            ws.Options.SetRequestHeader("X-CSRF-Token", this.csrfToken.Value);
+
+            //ws.Options.SetRequestHeader("Host", address.Host);
+            ws.Options.SetRequestHeader("Pragma", "no-cache");
+            ws.Options.SetRequestHeader("Cache-Control", "no-cache");
+            ws.Options.SetRequestHeader("Origin", $"https://{address.Host}");
+            ws.Options.SetRequestHeader("Accept-Encoding", "gzip, deflate, sdch, br");
+            ws.Options.SetRequestHeader("Sec-WebSocket-Extensions", "permessage-deflate; client_max_window_bits");
+
+            ws.Options.Cookies.Add(this.client.BaseUrl, new Cookie("CSRF-Token", csrfToken.Value, "/", address.Host));
+            ws.Options.Cookies.Add(this.client.BaseUrl, new Cookie("WMID", wmid.Value, "/", address.Host));
+            ws.ConnectAsync(address, CancellationToken.None).Wait();
+
+            var command = Encoding.UTF8.GetBytes("provider 4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a enable 5");
+            ws.SendAsync(new ArraySegment<byte>(command), WebSocketMessageType.Text, true, CancellationToken.None).Wait();
+
+            return ws;
+        }
+
+        private static Task AsTask(CancellationToken cancellationToken)
+        {
+            var tcs = new TaskCompletionSource<object>();
+            cancellationToken.Register(() => tcs.TrySetCanceled(), useSynchronizationContext: false);
+            return tcs.Task;
+        }
+
+        internal string[] StopListening(ClientWebSocket ws)
+        {
+            List<string> ret = new List<string>();
+            var buffer = new byte[10240];
+            for (;;)
+            {
+                CancellationTokenSource cts = new CancellationTokenSource();
+                var resTask = ws.ReceiveAsync(new ArraySegment<byte>(buffer), cts.Token);
+                cts.CancelAfter(TimeSpan.FromSeconds(10));
+                try
+                {
+                    resTask.Wait();
+                    var str = Encoding.UTF8.GetString(buffer);
+                    var @object = SimpleJson.SimpleJson.DeserializeObject<RootObject>(str);
+                    ret.AddRange(@object.Events.Select(x => x.StringMessage));
+                }
+                catch(AggregateException ex)
+                {
+                    if (ex.InnerException is OperationCanceledException)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            return ret.Select(x => x.Trim()).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
         }
     }
 }
