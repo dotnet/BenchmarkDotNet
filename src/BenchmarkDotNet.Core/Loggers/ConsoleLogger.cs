@@ -6,9 +6,9 @@ namespace BenchmarkDotNet.Loggers
 {
     public sealed class ConsoleLogger : ILogger
     {
-        public static readonly ILogger Default = new ConsoleLogger();
-
         private const ConsoleColor DefaultColor = ConsoleColor.Gray;
+
+        public static readonly ILogger Default = new ConsoleLogger();
 
         private readonly Dictionary<LogKind, ConsoleColor> colorScheme;
 
@@ -17,23 +17,25 @@ namespace BenchmarkDotNet.Loggers
             this.colorScheme = colorScheme ?? CreateColorfulScheme();
         }
 
-        public void Write(LogKind logKind, string text)
-        {
-            Console.ForegroundColor = GetColor(logKind);
-            Console.Write(text);
-            Console.ForegroundColor = DefaultColor;
-        }
+        public void Write(LogKind logKind, string text) => Write(logKind, Console.Write, text);
 
-        public void WriteLine()
-        {
-            Console.WriteLine();
-        }
+        public void WriteLine() => Console.WriteLine();
 
-        public void WriteLine(LogKind logKind, string text)
+        public void WriteLine(LogKind logKind, string text) => Write(logKind, Console.WriteLine, text);
+
+        private void Write(LogKind logKind, Action<string> write, string text)
         {
-            Console.ForegroundColor = GetColor(logKind);
-            Console.WriteLine(text);
-            Console.ForegroundColor = DefaultColor;
+            var colorBefore = Console.ForegroundColor;
+
+            try
+            {
+                Console.ForegroundColor = GetColor(logKind);
+                write(text);
+            }
+            finally
+            {
+                Console.ForegroundColor = colorBefore;
+            }
         }
 
         private ConsoleColor GetColor(LogKind logKind) =>
