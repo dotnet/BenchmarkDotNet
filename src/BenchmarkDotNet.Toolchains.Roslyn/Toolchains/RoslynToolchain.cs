@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Toolchains.Classic;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains
 {
@@ -7,7 +8,8 @@ namespace BenchmarkDotNet.Toolchains
     /// </summary>
     public class RoslynToolchain : Toolchain
     {
-        internal RoslynToolchain() : base("Classic", new RoslynGenerator(), new RoslynBuilder(), new Executor())
+        [PublicAPI("Used in auto-generated .exe when this toolchain is set explicitly in Job definition")]
+        public RoslynToolchain() : base("Classic", new RoslynGenerator(), new RoslynBuilder(), new Executor())
         {
         }
     }
