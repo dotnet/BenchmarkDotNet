@@ -40,7 +40,21 @@ namespace BenchmarkDotNet.Running
         {
             string benchmarkContent = source;
             var cSharpCodeProvider = new CSharpCodeProvider();
-            var compilerParameters = new CompilerParameters(new[] { "mscorlib.dll", "System.dll", "System.Core.dll" }) { CompilerOptions = "/unsafe" };
+            var compilerParameters = new CompilerParameters(
+                new[]
+                {
+                    "mscorlib.dll",
+                    "System.dll",
+                    "System.Core.dll"
+                })
+            {
+                CompilerOptions = "/unsafe /optimize", 
+                GenerateInMemory = false,
+                OutputAssembly = Path.Combine(
+                    Path.GetDirectoryName(typeof(Benchmark).Assembly.Location), 
+                    $"{Path.GetFileNameWithoutExtension(Path.GetTempFileName())}.dll")
+            };
+            
             compilerParameters.ReferencedAssemblies.Add(typeof(Benchmark).Assembly.Location);
             var compilerResults = cSharpCodeProvider.CompileAssemblyFromSource(compilerParameters, benchmarkContent);
             if (compilerResults.Errors.HasErrors)
