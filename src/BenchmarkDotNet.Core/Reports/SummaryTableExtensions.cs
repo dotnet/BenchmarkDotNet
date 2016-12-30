@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Reports
         }
 
         public static void PrintLine(this SummaryTable table, string[] line, ILogger logger, string leftDel, string rightDel,
-                                     bool highlightRow, bool startOfGroup, bool startOfGroupInBold)
+                                     bool highlightRow, bool startOfGroup, bool startOfGroupInBold, string boldMarkupFormat)
         {
             for (int columnIndex = 0; columnIndex < table.ColumnCount; columnIndex++)
             {
@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.Reports
                 }
 
                 var text = (startOfGroup && startOfGroupInBold)
-                    ? BuildBoldText(table, line, leftDel, rightDel, columnIndex)
+                    ? BuildBoldText(table, line, leftDel, rightDel, columnIndex, boldMarkupFormat)
                     : BuildStandardText(table, line, leftDel, rightDel, columnIndex);
 
                 if (highlightRow) // write the row in an alternative colour
@@ -84,17 +84,13 @@ namespace BenchmarkDotNet.Reports
             return buffer.ToString();
         }
 
-        private static string BuildBoldText(SummaryTable table, string[] line, string leftDel, string rightDel, int columnIndex)
+        private static string BuildBoldText(SummaryTable table, string[] line, string leftDel, string rightDel, int columnIndex, string boldMarkupFormat)
         {
-            const string markdownBold = "**";
-
             var buffer = GetClearBuffer();
 
             buffer.Append(leftDel);
             PadLeft(table, line, leftDel, rightDel, columnIndex, buffer);
-            buffer.Append(markdownBold);
-            buffer.Append(line[columnIndex]);
-            buffer.Append(markdownBold);
+            buffer.AppendFormat(boldMarkupFormat, line[columnIndex]);
             buffer.Append(rightDel);
 
             return buffer.ToString();

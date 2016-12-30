@@ -48,7 +48,8 @@ namespace BenchmarkDotNet.Exporters
             columnsStartWithSeparator = true,
             useCodeBlocks = true,
             codeBlockStart = "{noformat}",
-            codeBlockEnd = "{noformat}"
+            codeBlockEnd = "{noformat}",
+            boldMarkupFormat = "*{0}*"
         };
 
         private string prefix = string.Empty;
@@ -60,6 +61,7 @@ namespace BenchmarkDotNet.Exporters
         private string tableColumnSeparator = " |";
         private bool useHeaderSeparatingRow = true;
         private bool columnsStartWithSeparator = false;
+        private string boldMarkupFormat = "**{0}**";
 
         private MarkdownExporter()
         {
@@ -148,7 +150,7 @@ namespace BenchmarkDotNet.Exporters
                     logger.Write(tableColumnSeparator);
                 }
 
-                table.PrintLine(line, logger, string.Empty, tableColumnSeparator, highlightRow, table.FullContentStartOfGroup[rowCounter], startOfGroupInBold);
+                table.PrintLine(line, logger, string.Empty, tableColumnSeparator, highlightRow, table.FullContentStartOfGroup[rowCounter], startOfGroupInBold, boldMarkupFormat);
                 rowCounter++;
             }
         }
