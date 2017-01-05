@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Reports;
 
@@ -36,33 +38,51 @@ namespace BenchmarkDotNet.Exporters
             lock (buildScriptLock)
                 File.WriteAllText(scriptFullPath, script);
 
-            // TODO: implement smart autodetection of the R bin folder
+            var rscriptExecutable = RuntimeInformation.IsWindows() ? "Rscript.exe" : "Rscript";
+            string rscriptPath;
             var rHome = Environment.GetEnvironmentVariable("R_HOME");
-            if (Directory.Exists(rHome))
+            if (rHome != null)
             {
-                var start = new ProcessStartInfo
+                rscriptPath = Path.Combine(rHome, "bin", rscriptExecutable);
+                if (!File.Exists(rscriptPath))
                 {
-                    UseShellExecute = false,
-                    RedirectStandardOutput = false,
-                    CreateNoWindow = true,
-                    FileName = Path.Combine(rHome, "Rscript.exe"),
-                    WorkingDirectory = summary.ResultsDirectoryPath,
-                    Arguments = $"\"{scriptFullPath}\" \"{fileNamePrefix}-measurements.csv\""
-                };
-                using (var process = Process.Start(start))
-                    process?.WaitForExit();
-                yield return fileNamePrefix + "-boxplot.png";
-                yield return fileNamePrefix + "-barplot.png";
+                    consoleLogger.WriteLineError($"RPlotExporter requires R_HOME to point to the directory containing bin{Path.DirectorySeparatorChar}{rscriptExecutable} (currently points to {rHome})");
+                    yield break;
+                }
             }
-            else
+            else // No R_HOME, try the path
             {
-                // TODO: print warning, if the folder is not found
+                rscriptPath = FindInPath(rscriptExecutable);
+                if (rscriptPath == null)
+                {
+                    consoleLogger.WriteLineError($"RPlotExporter couldn't find {rscriptExecutable} in your PATH and no R_HOME environment variable is defined");
+                    yield break;
+                }
             }
+
+            var start = new ProcessStartInfo
+            {
+                UseShellExecute = false,
+                RedirectStandardOutput = false,
+                CreateNoWindow = true,
+                FileName = rscriptPath,
+                WorkingDirectory = summary.ResultsDirectoryPath,
+                Arguments = $"\"{scriptFullPath}\" \"{fileNamePrefix}-measurements.csv\""
+            };
+            using (var process = Process.Start(start))
+                process?.WaitForExit();
+            yield return fileNamePrefix + "-boxplot.png";
+            yield return fileNamePrefix + "-barplot.png";
         }
 
         public void ExportToLog(Summary summary, ILogger logger)
         {
             throw new NotSupportedException();
         }
+
+        static string FindInPath(string name) => Environment.GetEnvironmentVariable("PATH")
+            .Split(Path.PathSeparator)
+            .Select(p => Path.Combine(p, name))
+            .FirstOrDefault(File.Exists);
     }
 }
