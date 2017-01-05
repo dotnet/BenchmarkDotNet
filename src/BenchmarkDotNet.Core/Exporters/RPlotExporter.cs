@@ -12,7 +12,7 @@ using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Exporters
 {
-    public class RPlotExporter : IExporter, IExporterDependancies
+    public class RPlotExporter : IExporter, IExporterDependencies
     {
         public static readonly IExporter Default = new RPlotExporter();
 

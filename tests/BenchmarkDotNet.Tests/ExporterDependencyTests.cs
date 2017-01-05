@@ -8,32 +8,32 @@ using Xunit;
 namespace BenchmarkDotNet.Tests
 {
     // See https://github.com/dotnet/BenchmarkDotNet/issues/172
-    public class ExporterDependancyTests
+    public class ExporterDependencyTests
     {
         [Fact]
-        public void MissingDependancyIsAdded()
+        public void MissingDependencyIsAdded()
         {
             var compositeExporter = new CompositeExporter(TestExporter.Default);
             Assert.Equal(2, compositeExporter.exporters.Count());
-            Assert.Equal(new IExporter[] { TestExporter.Default, TestExporterDependancy.Default }, compositeExporter.exporters);
+            Assert.Equal(new IExporter[] { TestExporter.Default, TestExporterDependency.Default }, compositeExporter.exporters);
         }
 
         [Fact]
-        public void MissingDependancyIsNotAddedWhenItIsAlreadyPresent()
+        public void MissingDependencyIsNotAddedWhenItIsAlreadyPresent()
         {
-            var compositeExporter = new CompositeExporter(TestExporter.Default, TestExporterDependancy.Default);
+            var compositeExporter = new CompositeExporter(TestExporter.Default, TestExporterDependency.Default);
             Assert.Equal(2, compositeExporter.exporters.Count());
-            Assert.Equal(new IExporter[] { TestExporter.Default, TestExporterDependancy.Default }, compositeExporter.exporters);
+            Assert.Equal(new IExporter[] { TestExporter.Default, TestExporterDependency.Default }, compositeExporter.exporters);
         }
     }
 
-    public class TestExporter : IExporter, IExporterDependancies
+    public class TestExporter : IExporter, IExporterDependencies
     {
         public static readonly TestExporter Default = new TestExporter();
 
         public IEnumerable<IExporter> Dependencies
         {
-            get { yield return TestExporterDependancy.Default; }
+            get { yield return TestExporterDependency.Default; }
         }
 
         public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger) => Enumerable.Empty<string>();
@@ -41,9 +41,9 @@ namespace BenchmarkDotNet.Tests
         public void ExportToLog(Summary summary, ILogger logger) { }
     }
 
-    public class TestExporterDependancy : IExporter
+    public class TestExporterDependency : IExporter
     {
-        public static readonly TestExporterDependancy Default = new TestExporterDependancy();
+        public static readonly TestExporterDependency Default = new TestExporterDependency();
 
         public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger) => Enumerable.Empty<string>();
 
