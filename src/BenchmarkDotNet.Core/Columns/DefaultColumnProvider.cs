@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Columns
 
         private class JobColumnProvider : IColumnProvider
         {
-            public IEnumerable<IColumn> GetColumns(Summary summary) => CharacteristicColumn.AllColumns;
+            public IEnumerable<IColumn> GetColumns(Summary summary) => JobCharacteristicColumn.AllColumns;
         }
 
         private class StatisticsColumnProvider : IColumnProvider

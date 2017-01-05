@@ -7,12 +7,12 @@ using JetBrains.Annotations;
 namespace BenchmarkDotNet.Characteristics
 {
     // TODO: better naming.
-    public abstract class JobMode
+    public abstract class CharacteristicObject
     {
         #region IdCharacteristic
         private const string IdSeparator = "&";
 
-        protected static string ResolveId(JobMode obj, string actual)
+        protected static string ResolveId(CharacteristicObject obj, string actual)
         {
             if (!string.IsNullOrEmpty(actual) && actual != IdCharacteristic.FallbackValue)
                 return actual;
@@ -26,22 +26,22 @@ namespace BenchmarkDotNet.Characteristics
         }
 
         public static readonly Characteristic<string> IdCharacteristic = Characteristic.Create(
-            (JobMode j) => j.Id,
+            (CharacteristicObject o) => o.Id,
             ResolveId, "Default", true);
         #endregion
 
         #region Fields & ctor
-        private JobMode owner;
+        private CharacteristicObject owner;
         private Dictionary<Characteristic, object> sharedValues;
         private bool frozen;
 
-        protected JobMode()
+        protected CharacteristicObject()
         {
             owner = null;
             sharedValues = new Dictionary<Characteristic, object>();
         }
 
-        protected JobMode(string id) : this()
+        protected CharacteristicObject(string id) : this()
         {
             if (!string.IsNullOrEmpty(id))
             {
@@ -93,9 +93,9 @@ namespace BenchmarkDotNet.Characteristics
         #endregion
 
         #region Properties
-        protected JobMode Owner => owner;
+        protected CharacteristicObject Owner => owner;
 
-        protected JobMode OwnerOrSelf => owner ?? this;
+        protected CharacteristicObject OwnerOrSelf => owner ?? this;
 
         public bool Frozen => Owner?.Frozen ?? frozen;
 
@@ -115,7 +115,7 @@ namespace BenchmarkDotNet.Characteristics
                 ? sharedValues.Keys.Where(c => !c.IgnoreOnApply).OrderBy(c => c.Id)
                 : this.GetAllCharacteristics().Where(c => !c.IgnoreOnApply);
 
-        private IEnumerable<Characteristic> GetCharacteristicsToApply(JobMode other)
+        private IEnumerable<Characteristic> GetCharacteristicsToApply(CharacteristicObject other)
         {
             var result = other.GetCharacteristicsToApply();
             if (GetType() != other.GetType() && !IsPropertyBag)
@@ -197,13 +197,13 @@ namespace BenchmarkDotNet.Characteristics
             {
                 AssertIsAssignable(characteristic, value);
 
-                var oldJobValue = (JobMode)GetValue(characteristic);
-                var newJobValue = (JobMode)ResolveCore(characteristic, value);
+                var oldObjectValue = (CharacteristicObject)GetValue(characteristic);
+                var newObjectValue = (CharacteristicObject)ResolveCore(characteristic, value);
 
-                if (!ReferenceEquals(oldJobValue, newJobValue))
+                if (!ReferenceEquals(oldObjectValue, newObjectValue))
                 {
-                    oldJobValue?.DetachFromOwner(characteristic);
-                    newJobValue?.AttachToOwner(OwnerOrSelf, characteristic);
+                    oldObjectValue?.DetachFromOwner(characteristic);
+                    newObjectValue?.AttachToOwner(OwnerOrSelf, characteristic);
                 }
             }
             else
@@ -229,10 +229,10 @@ namespace BenchmarkDotNet.Characteristics
                             $"The current node {this} has value for {characteristic} already.",
                             nameof(characteristic));
 
-                    var jobMode = (JobMode)ResolveCore(characteristic, value);
-                    jobMode.SetOwnerCore(OwnerOrSelf);
+                    var characteristicObject = (CharacteristicObject)ResolveCore(characteristic, value);
+                    characteristicObject.SetOwnerCore(OwnerOrSelf);
 
-                    sharedValues[characteristic] = jobMode;
+                    sharedValues[characteristic] = characteristicObject;
                 }
                 else
                 {
@@ -241,16 +241,16 @@ namespace BenchmarkDotNet.Characteristics
             }
         }
 
-        private void SetOwnerCore(JobMode newOwnerJob)
+        private void SetOwnerCore(CharacteristicObject newOwner)
         {
-            if (newOwnerJob == null)
-                throw new ArgumentNullException(nameof(newOwnerJob));
+            if (newOwner == null)
+                throw new ArgumentNullException(nameof(newOwner));
 
             AssertNotFrozen();
-            newOwnerJob.AssertIsNonFrozenRoot();
+            newOwner.AssertIsNonFrozenRoot();
 
-            owner = newOwnerJob;
-            sharedValues = newOwnerJob.sharedValues;
+            owner = newOwner;
+            sharedValues = newOwner.sharedValues;
             frozen = false;
         }
 
@@ -281,23 +281,23 @@ namespace BenchmarkDotNet.Characteristics
             }
         }
 
-        private void AttachToOwner(JobMode newOwnerJob, Characteristic thisCharacteristic)
+        private void AttachToOwner(CharacteristicObject newOwner, Characteristic thisCharacteristic)
         {
-            if (newOwnerJob == null)
-                throw new ArgumentNullException(nameof(newOwnerJob));
+            if (newOwner == null)
+                throw new ArgumentNullException(nameof(newOwner));
             if (IsPropertyBag)
                 throw new InvalidOperationException(
                     $"The property bag {this} cannot be used as characteristic's value.");
 
             AssertIsNonFrozenRoot();
-            newOwnerJob.AssertIsNonFrozenRoot();
+            newOwner.AssertIsNonFrozenRoot();
 
             var oldValues = sharedValues;
 
-            newOwnerJob.SetValueOnAttach(thisCharacteristic, this);
+            newOwner.SetValueOnAttach(thisCharacteristic, this);
             foreach (var pair in oldValues)
             {
-                newOwnerJob.SetValueOnAttach(pair.Key, pair.Value);
+                newOwner.SetValueOnAttach(pair.Key, pair.Value);
             }
         }
 
@@ -308,8 +308,8 @@ namespace BenchmarkDotNet.Characteristics
             if (characteristic.HasChildCharacteristics)
             {
                 // DONTTOUCH: workaround on case there were no parent characteristic.
-                var jobMode = (JobMode)GetValue(characteristic);
-                jobMode?.DetachFromOwner(characteristic);
+                var characteristicObject = (CharacteristicObject)GetValue(characteristic);
+                characteristicObject?.DetachFromOwner(characteristic);
             }
 
             SetValueCore(characteristic, value);
@@ -318,15 +318,15 @@ namespace BenchmarkDotNet.Characteristics
         #endregion
 
         #region Apply
-        public void Apply(JobMode other) => ApplyCore(other);
+        public void Apply(CharacteristicObject other) => ApplyCore(other);
 
-        protected JobMode ApplyCore(JobMode other) =>
+        protected CharacteristicObject ApplyCore(CharacteristicObject other) =>
             ApplyCore(
                 other,
                 GetCharacteristicsToApply(other));
 
-        private JobMode ApplyCore(
-            [CanBeNull] JobMode other,
+        private CharacteristicObject ApplyCore(
+            [CanBeNull] CharacteristicObject other,
             [NotNull] IEnumerable<Characteristic> characteristicsToApply)
         {
             AssertNotFrozen();
@@ -344,10 +344,10 @@ namespace BenchmarkDotNet.Characteristics
                 {
                     if (!HasValue(characteristic))
                     {
-                        var jobMode = (JobMode)ResolveCore(characteristic, value);
-                        if (jobMode != null)
+                        var characteristicObject = (CharacteristicObject)ResolveCore(characteristic, value);
+                        if (characteristicObject != null)
                         {
-                            value = Activator.CreateInstance(jobMode.GetType());
+                            value = Activator.CreateInstance(characteristicObject.GetType());
                         }
 
                         SetValueCore(characteristic, value);
@@ -366,7 +366,7 @@ namespace BenchmarkDotNet.Characteristics
         #region Freeze / unfreeze
         public void Freeze() => FreezeCore();
 
-        protected JobMode FreezeCore()
+        protected CharacteristicObject FreezeCore()
         {
             AssertIsRoot();
 
@@ -376,13 +376,13 @@ namespace BenchmarkDotNet.Characteristics
             return this;
         }
 
-        public JobMode UnfreezeCopy() => UnfreezeCopyCore();
+        public CharacteristicObject UnfreezeCopy() => (CharacteristicObject)UnfreezeCopyCore();
 
-        protected JobMode UnfreezeCopyCore()
+        protected CharacteristicObject UnfreezeCopyCore()
         {
             AssertIsRoot();
 
-            var newRoot = (JobMode)Activator.CreateInstance(GetType());
+            var newRoot = (CharacteristicObject)Activator.CreateInstance(GetType());
             newRoot.ApplyCore(this);
 
             return newRoot;

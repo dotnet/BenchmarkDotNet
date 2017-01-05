@@ -7,13 +7,13 @@ using System.Reflection;
 
 namespace BenchmarkDotNet.Characteristics
 {
-    internal static class CharacteristicHelper
+    public static class CharacteristicHelper
     {
         #region Helpers
-        public static bool IsJobModeSubclass(Type type) =>
-            type.GetTypeInfo().IsSubclassOf(typeof(JobMode));
+        internal static bool IsCharacteristicObjectSubclass(Type type) =>
+            type.GetTypeInfo().IsSubclassOf(typeof(CharacteristicObject));
 
-        public static bool IsCharacteristicSubclass(Type type) =>
+        internal static bool IsCharacteristicSubclass(Type type) =>
             type.GetTypeInfo().IsSubclassOf(typeof(Characteristic));
 
         private static Characteristic AssertHasValue(MemberInfo member, Characteristic value)
@@ -26,12 +26,12 @@ namespace BenchmarkDotNet.Characteristics
             return value;
         }
 
-        public static string GetMemberName<TOwner, T>(Expression<Func<TOwner, T>> propertyGetterExpression)
-            where TOwner : JobMode =>
+        internal static string GetMemberName<TOwner, T>(Expression<Func<TOwner, T>> propertyGetterExpression)
+            where TOwner : CharacteristicObject =>
                 ((MemberExpression)propertyGetterExpression.Body).Member.Name;
 
-        public static Type GetDeclaringType<TOwner, T>(Expression<Func<TOwner, T>> propertyGetterExpression)
-            where TOwner : JobMode =>
+        internal static Type GetDeclaringType<TOwner, T>(Expression<Func<TOwner, T>> propertyGetterExpression)
+            where TOwner : CharacteristicObject =>
                 ((MemberExpression)propertyGetterExpression.Body).Member.DeclaringType;
 
         public static bool IsPresentableCharacteristic(this Characteristic c, bool includeIgnoreOnApply = false) =>
@@ -44,24 +44,24 @@ namespace BenchmarkDotNet.Characteristics
         private static readonly ConcurrentDictionary<Type, IReadOnlyList<Characteristic>> thisTypeCharacteristics =
             new ConcurrentDictionary<Type, IReadOnlyList<Characteristic>>();
 
-        public static IReadOnlyList<Characteristic> GetThisTypeCharacteristics(this JobMode obj) =>
+        public static IReadOnlyList<Characteristic> GetThisTypeCharacteristics(this CharacteristicObject obj) =>
             GetThisTypeCharacteristics(obj.GetType());
 
-        public static IReadOnlyList<Characteristic> GetThisTypeCharacteristics(Type jobModeType)
+        public static IReadOnlyList<Characteristic> GetThisTypeCharacteristics(Type characteristicObjectType)
         {
-            if (!IsJobModeSubclass(jobModeType))
+            if (!IsCharacteristicObjectSubclass(characteristicObjectType))
                 return EmptyCharacteristics;
-            return thisTypeCharacteristics.GetOrAdd(jobModeType, t => GetThisTypeCharacteristicsCore(t));
+            return thisTypeCharacteristics.GetOrAdd(characteristicObjectType, t => GetThisTypeCharacteristicsCore(t));
         }
 
-        private static IReadOnlyList<Characteristic> GetThisTypeCharacteristicsCore(Type jobModeType)
+        private static IReadOnlyList<Characteristic> GetThisTypeCharacteristicsCore(Type characteristicObjectType)
         {
-            var fieldValues = jobModeType.GetTypeInfo()
+            var fieldValues = characteristicObjectType.GetTypeInfo()
                 .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy | BindingFlags.Static)
                 .Where(f => IsCharacteristicSubclass(f.FieldType))
                 .Select(f => AssertHasValue(f, (Characteristic)f.GetValue(null)));
 
-            var propertyValues = jobModeType.GetTypeInfo()
+            var propertyValues = characteristicObjectType.GetTypeInfo()
                 .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy | BindingFlags.Static)
                 .Where(p => p.GetMethod != null && IsCharacteristicSubclass(p.PropertyType))
                 .Select(p => AssertHasValue(p, (Characteristic)p.GetValue(null)));
@@ -78,31 +78,31 @@ namespace BenchmarkDotNet.Characteristics
         private static readonly ConcurrentDictionary<Type, IReadOnlyList<Characteristic>> allTypeCharacteristics =
             new ConcurrentDictionary<Type, IReadOnlyList<Characteristic>>();
 
-        public static IReadOnlyList<Characteristic> GetAllCharacteristics(this JobMode obj) =>
+        public static IReadOnlyList<Characteristic> GetAllCharacteristics(this CharacteristicObject obj) =>
             GetAllCharacteristics(obj.GetType());
 
-        public static IReadOnlyList<Characteristic> GetAllCharacteristics(Type jobModeType)
+        public static IReadOnlyList<Characteristic> GetAllCharacteristics(Type characteristicObjectType)
         {
-            if (!IsJobModeSubclass(jobModeType))
+            if (!IsCharacteristicObjectSubclass(characteristicObjectType))
                 return EmptyCharacteristics;
-            return allTypeCharacteristics.GetOrAdd(jobModeType, t => GetAllCharacteristicsCore(t));
+            return allTypeCharacteristics.GetOrAdd(characteristicObjectType, t => GetAllCharacteristicsCore(t));
         }
 
-        private static IReadOnlyList<Characteristic> GetAllCharacteristicsCore(Type jobModeType)
+        private static IReadOnlyList<Characteristic> GetAllCharacteristicsCore(Type characteristicObjectType)
         {
             var result = new List<Characteristic>();
 
-            FillAllCharacteristicsCore(jobModeType, result, new HashSet<Characteristic>());
+            FillAllCharacteristicsCore(characteristicObjectType, result, new HashSet<Characteristic>());
 
             return result.ToArray();
         }
 
         private static void FillAllCharacteristicsCore(
-            Type jobModeType, List<Characteristic> result, HashSet<Characteristic> visited)
+            Type characteristicObjectType, List<Characteristic> result, HashSet<Characteristic> visited)
         {
             // DONTOUCH: DO NOT change the order of characteristic as it may break logic of some operations.
 
-            var characteristics = GetThisTypeCharacteristics(jobModeType);
+            var characteristics = GetThisTypeCharacteristics(characteristicObjectType);
             foreach (var characteristic in characteristics.Where(c => !c.HasChildCharacteristics))
             {
                 if (!visited.Add(characteristic))
@@ -121,8 +121,8 @@ namespace BenchmarkDotNet.Characteristics
             }
         }
 
-        public static IReadOnlyList<Characteristic> GetAllPresentableCharacteristics(Type jobModeType, bool includeIgnoreOnApply = false) =>
-            GetAllCharacteristics(jobModeType)
+        public static IReadOnlyList<Characteristic> GetAllPresentableCharacteristics(Type characteristicObjectType, bool includeIgnoreOnApply = false) =>
+            GetAllCharacteristics(characteristicObjectType)
                 .Where(c => c.IsPresentableCharacteristic(includeIgnoreOnApply))
                 .ToArray();
         #endregion

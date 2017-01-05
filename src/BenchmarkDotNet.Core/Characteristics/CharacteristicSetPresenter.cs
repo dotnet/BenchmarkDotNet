@@ -10,10 +10,10 @@ namespace BenchmarkDotNet.Characteristics
         public static readonly CharacteristicSetPresenter Folder = new FolderPresenter();
         public static readonly CharacteristicSetPresenter SourceCode = new SourceCodePresenter();
 
-        public abstract string ToPresentation(JobMode jobMode);
+        public abstract string ToPresentation(CharacteristicObject obj);
 
-        protected virtual IEnumerable<Characteristic> GetPresentableCharacteristics(JobMode jobMode, bool includeIgnoreOnApply = false) =>
-            jobMode
+        protected virtual IEnumerable<Characteristic> GetPresentableCharacteristics(CharacteristicObject obj, bool includeIgnoreOnApply = false) =>
+            obj
                 .GetCharacteristicsWithValues()
                 .Where(c => c.IsPresentableCharacteristic(includeIgnoreOnApply));
 
@@ -22,10 +22,10 @@ namespace BenchmarkDotNet.Characteristics
             private const string Separator = "&";
             private static readonly CharacteristicPresenter CharacteristicPresenter = CharacteristicPresenter.DefaultPresenter;
 
-            public override string ToPresentation(JobMode jobMode)
+            public override string ToPresentation(CharacteristicObject obj)
             {
-                var values = GetPresentableCharacteristics(jobMode)
-                    .Select(c => c.FullId + "=" + CharacteristicPresenter.ToPresentation(jobMode, c));
+                var values = GetPresentableCharacteristics(obj)
+                    .Select(c => c.FullId + "=" + CharacteristicPresenter.ToPresentation(obj, c));
                 return string.Join(Separator, values);
             }
         }
@@ -36,10 +36,10 @@ namespace BenchmarkDotNet.Characteristics
             private const string EqualsSeparator = "-";
             private static readonly CharacteristicPresenter CharacteristicPresenter = CharacteristicPresenter.FolderPresenter;
 
-            public override string ToPresentation(JobMode jobMode)
+            public override string ToPresentation(CharacteristicObject obj)
             {
-                var values = GetPresentableCharacteristics(jobMode)
-                    .Select(c => c.Id + EqualsSeparator + CharacteristicPresenter.ToPresentation(jobMode, c));
+                var values = GetPresentableCharacteristics(obj)
+                    .Select(c => c.Id + EqualsSeparator + CharacteristicPresenter.ToPresentation(obj, c));
                 return string.Join(Separator, values);
             }
         }
@@ -49,10 +49,10 @@ namespace BenchmarkDotNet.Characteristics
             private const string Separator = ", ";
             private static readonly CharacteristicPresenter CharacteristicPresenter = CharacteristicPresenter.DefaultPresenter;
 
-            public override string ToPresentation(JobMode jobMode)
+            public override string ToPresentation(CharacteristicObject obj)
             {
-                var values = GetPresentableCharacteristics(jobMode)
-                    .Select(c => c.Id + "=" + CharacteristicPresenter.ToPresentation(jobMode, c));
+                var values = GetPresentableCharacteristics(obj)
+                    .Select(c => c.Id + "=" + CharacteristicPresenter.ToPresentation(obj, c));
                 return string.Join(Separator, values);
             }
         }
@@ -62,10 +62,10 @@ namespace BenchmarkDotNet.Characteristics
             private const string Separator = "; ";
             private static readonly CharacteristicPresenter CharacteristicPresenter = CharacteristicPresenter.SourceCodePresenter;
 
-            public override string ToPresentation(JobMode jobMode)
+            public override string ToPresentation(CharacteristicObject obj)
             {
-                var values = GetPresentableCharacteristics(jobMode, includeIgnoreOnApply: true)
-                    .Select(c => CharacteristicPresenter.ToPresentation(jobMode, c));
+                var values = GetPresentableCharacteristics(obj, includeIgnoreOnApply: true)
+                    .Select(c => CharacteristicPresenter.ToPresentation(obj, c));
                 return string.Join(Separator, values);
             }
         }

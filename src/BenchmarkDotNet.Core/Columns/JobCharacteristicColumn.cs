@@ -8,13 +8,13 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Columns
 {
-    public class CharacteristicColumn : IColumn
+    public class JobCharacteristicColumn : IColumn
     {
         private static readonly CharacteristicPresenter Presenter = CharacteristicPresenter.SummaryPresenter;
 
         private readonly Characteristic characteristic;
 
-        public CharacteristicColumn(Characteristic characteristic)
+        public JobCharacteristicColumn(Characteristic characteristic)
         {
             this.characteristic = characteristic;
             Id = "Job." + characteristic.Id;
@@ -25,7 +25,6 @@ namespace BenchmarkDotNet.Columns
             if (characteristic.Id == "Id")
                 ColumnName = "Job";
         }
-
 
         public string Id { get; }
         public string ColumnName { get; }
@@ -46,7 +45,7 @@ namespace BenchmarkDotNet.Columns
         private static readonly Lazy<IColumn[]> LazyAllColumns =
             new Lazy<IColumn[]>(() =>
                 CharacteristicHelper.GetAllPresentableCharacteristics(typeof(Job), true)
-                .Select(c => (IColumn)new CharacteristicColumn(c)).ToArray());
+                .Select(c => (IColumn)new JobCharacteristicColumn(c)).ToArray());
 
         public static IColumn[] AllColumns => LazyAllColumns.Value;
     }

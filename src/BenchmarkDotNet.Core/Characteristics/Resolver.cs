@@ -12,10 +12,10 @@ namespace BenchmarkDotNet.Characteristics
 
         public bool CanResolve(Characteristic characteristic) => resolvers.ContainsKey(characteristic);
 
-        public object Resolve(JobMode jobMode, Characteristic characteristic)
+        public object Resolve(CharacteristicObject obj, Characteristic characteristic)
         {
-            if (jobMode.HasValue(characteristic))
-                return characteristic[jobMode];
+            if (obj.HasValue(characteristic))
+                return characteristic[obj];
 
             Func<object> resolver;
             if (resolvers.TryGetValue(characteristic, out resolver))
@@ -23,10 +23,10 @@ namespace BenchmarkDotNet.Characteristics
             throw new InvalidOperationException($"There is no default resolver for {characteristic.FullId}");
         }
 
-        public T Resolve<T>(JobMode jobMode, Characteristic<T> characteristic)
+        public T Resolve<T>(CharacteristicObject obj, Characteristic<T> characteristic)
         {
-            if (jobMode.HasValue(characteristic))
-                return characteristic[jobMode];
+            if (obj.HasValue(characteristic))
+                return characteristic[obj];
 
             Func<object> resolver;
             if (resolvers.TryGetValue(characteristic, out resolver))

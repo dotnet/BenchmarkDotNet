@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Characteristics
         #region Factory methods
         public static Characteristic<T> Create<TOwner, T>(
             Expression<Func<TOwner, T>> propertyGetterExpression)
-            where TOwner : JobMode =>
+            where TOwner : CharacteristicObject =>
             new Characteristic<T>(
                 GetMemberName(propertyGetterExpression),
                 GetDeclaringType(propertyGetterExpression),
@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Characteristics
         public static Characteristic<T> Create<TOwner, T>(
             Expression<Func<TOwner, T>> propertyGetterExpression,
             T fallbackValue)
-            where TOwner : JobMode =>
+            where TOwner : CharacteristicObject =>
             new Characteristic<T>(
                 GetMemberName(propertyGetterExpression),
                 GetDeclaringType(propertyGetterExpression),
@@ -31,9 +31,9 @@ namespace BenchmarkDotNet.Characteristics
 
         public static Characteristic<T> Create<TOwner, T>(
             Expression<Func<TOwner, T>> propertyGetterExpression,
-            Func<JobMode, T, T> resolver,
+            Func<CharacteristicObject, T, T> resolver,
             T fallbackValue)
-            where TOwner : JobMode =>
+            where TOwner : CharacteristicObject =>
             new Characteristic<T>(
                 GetMemberName(propertyGetterExpression),
                 GetDeclaringType(propertyGetterExpression),
@@ -42,10 +42,10 @@ namespace BenchmarkDotNet.Characteristics
 
         public static Characteristic<T> Create<TOwner, T>(
             Expression<Func<TOwner, T>> propertyGetterExpression,
-            Func<JobMode, T, T> resolver,
+            Func<CharacteristicObject, T, T> resolver,
             T fallbackValue,
             bool ignoreOnApply)
-            where TOwner : JobMode =>
+            where TOwner : CharacteristicObject =>
             new Characteristic<T>(
                 GetMemberName(propertyGetterExpression),
                 GetDeclaringType(propertyGetterExpression),
@@ -86,15 +86,15 @@ namespace BenchmarkDotNet.Characteristics
 
         public object FallbackValue { get; }
 
-        public object this[JobMode obj]
+        public object this[CharacteristicObject obj]
         {
             get { return obj.GetValue(this); }
             set { obj.SetValue(this, value); }
         }
 
-        public bool HasChildCharacteristics => IsJobModeSubclass(CharacteristicType);
+        public bool HasChildCharacteristics => IsCharacteristicObjectSubclass(CharacteristicType);
 
-        internal virtual object ResolveValueCore(JobMode obj, object currentValue) =>
+        internal virtual object ResolveValueCore(CharacteristicObject obj, object currentValue) =>
             ReferenceEquals(currentValue, EmptyValue) ? FallbackValue : currentValue;
 
         public override string ToString() => Id;

@@ -7,8 +7,8 @@
     {
         bool CanResolve(Characteristic characteristic);
 
-        object Resolve(JobMode jobMode, Characteristic characteristic);
+        object Resolve(CharacteristicObject obj, Characteristic characteristic);
 
-        T Resolve<T>(JobMode jobMode, Characteristic<T> characteristic);
+        T Resolve<T>(CharacteristicObject obj, Characteristic<T> characteristic);
     }
 }

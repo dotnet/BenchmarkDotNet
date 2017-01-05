@@ -3,19 +3,19 @@ using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Characteristics
 {
-    public sealed class CharacteristicSet : JobMode<CharacteristicSet>
+    public sealed class CharacteristicSet : CharacteristicObject<CharacteristicSet>
     {
         public CharacteristicSet()
         {
             Apply();
         }
 
-        public CharacteristicSet(JobMode other)
+        public CharacteristicSet(CharacteristicObject other)
         {
             Apply(other);
         }
 
-        public CharacteristicSet(params JobMode[] others)
+        public CharacteristicSet(params CharacteristicObject[] others)
         {
             Apply(others);
         }
