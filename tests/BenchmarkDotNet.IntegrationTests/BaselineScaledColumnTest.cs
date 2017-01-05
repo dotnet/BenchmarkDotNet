@@ -95,7 +95,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             public void ExportToLog(Summary summary, BenchmarkDotNet.Loggers.ILogger logger) => ExportCalled = true;
 
-            public IEnumerable<string> ExportToFiles(Summary summary)
+            public IEnumerable<string> ExportToFiles(Summary summary, BenchmarkDotNet.Loggers.ILogger consoleLogger)
             {
                 ExportToFileCalled = true;
                 return Enumerable.Empty<string>();

@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Exporters
             get { yield return CsvMeasurementsExporter.Default; }
         }
 
-        public IEnumerable<string> ExportToFiles(Summary summary)
+        public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
         {
             const string scriptFileName = "BuildPlots.R";
             yield return scriptFileName;

@@ -33,9 +33,9 @@ namespace BenchmarkDotNet.Exporters
                 exporter.ExportToLog(summary, logger);
         }
 
-        public IEnumerable<string> ExportToFiles(Summary summary)
+        public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
         {
-            return exporters.SelectMany(exporter => exporter.ExportToFiles(summary));
+            return exporters.SelectMany(exporter => exporter.ExportToFiles(summary, consoleLogger));
         }
     }
 }

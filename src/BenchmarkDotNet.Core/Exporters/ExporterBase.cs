@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Exporters
 
         public abstract void ExportToLog(Summary summary, ILogger logger);
 
-        public IEnumerable<string> ExportToFiles(Summary summary)
+        public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
         {
             var filePath = $"{Path.Combine(summary.ResultsDirectoryPath, summary.Title)}-{FileCaption}{FileNameSuffix}.{FileExtension}";
             using (var stream = Portability.StreamWriter.FromPath(filePath))

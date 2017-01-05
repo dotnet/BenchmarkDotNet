@@ -7,6 +7,6 @@ namespace BenchmarkDotNet.Exporters
     public interface IExporter
     {
         void ExportToLog(Summary summary, ILogger logger);
-        IEnumerable<string> ExportToFiles(Summary summary);
+        IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger);
     }
 }
