@@ -77,6 +77,8 @@ namespace BenchmarkDotNet.Columns
                     return stdDev.ToStr("N2");
                 case DiffKind.WelchTTestPValue:
                 {
+                    if (baselineStat.N < 2 || targetStat.N < 2)
+                        return "NA";
                     double pvalue = WelchTTest.Calc(baselineStat, targetStat).PValue;
                     return pvalue > 0.0001 ? pvalue.ToStr("N4") : pvalue.ToStr("e2");
                 }
