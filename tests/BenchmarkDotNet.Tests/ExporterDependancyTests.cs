@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Tests
             get { yield return TestExporterDependancy.Default; }
         }
 
-        public IEnumerable<string> ExportToFiles(Summary summary) => Enumerable.Empty<string>();
+        public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger) => Enumerable.Empty<string>();
 
         public void ExportToLog(Summary summary, ILogger logger) { }
     }
@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Tests
     {
         public static readonly TestExporterDependancy Default = new TestExporterDependancy();
 
-        public IEnumerable<string> ExportToFiles(Summary summary) => Enumerable.Empty<string>();
+        public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger) => Enumerable.Empty<string>();
 
         public void ExportToLog(Summary summary, ILogger logger) { }
     }

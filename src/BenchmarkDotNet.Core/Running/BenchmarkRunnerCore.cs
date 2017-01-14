@@ -87,7 +87,7 @@ namespace BenchmarkDotNet.Running
 
             logger.WriteLineHeader("// * Export *");
             var currentDirectory = Directory.GetCurrentDirectory();
-            foreach (var file in config.GetCompositeExporter().ExportToFiles(summary))
+            foreach (var file in config.GetCompositeExporter().ExportToFiles(summary, logger))
             {
                 logger.WriteLineInfo($"  {file.Replace(currentDirectory, string.Empty).Trim('/', '\\')}");
             }

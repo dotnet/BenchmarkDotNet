@@ -207,8 +207,7 @@ Example of `IntroJsonExport-report-brief.json`:
 
 ## Plots
 
-If you have installed [R](https://www.r-project.org/), defined `%R_HOME%` variable and used `RPlotExporter.Default` and `CsvMeasurementsExporter.Default` 
-in your config, you will also get nice plots with help of the `BuildPlots.R` script in your bin directory. 
+You can install [R](https://www.r-project.org/) to automatically get nice plots of your benchmark results. First, make sure `Rscript.exe` or `Rscript` is in your path, or define an R_HOME environment variable pointing to the R installation directory (containing the `bin` directory). Use `RPlotExporter.Default` and `CsvMeasurementsExporter.Default` in your config, and the `BuildPlots.R` script in your bin directory will take care of the rest.
 
 ### Examples
 
