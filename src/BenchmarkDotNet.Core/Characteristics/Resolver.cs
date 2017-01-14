@@ -5,10 +5,13 @@ namespace BenchmarkDotNet.Characteristics
 {
     public class Resolver : IResolver
     {
-        private readonly Dictionary<Characteristic, Func<object>> resolvers = new Dictionary<Characteristic, Func<object>>();
+        private readonly Dictionary<Characteristic, Func<CharacteristicObject, object>> resolvers = new Dictionary<Characteristic, Func<CharacteristicObject, object>>();
 
         protected void Register<T>(Characteristic<T> characteristic, Func<T> resolver) =>
-            resolvers[characteristic] = () => resolver();
+            resolvers[characteristic] = obj => resolver();
+
+        protected void Register<T>(Characteristic<T> characteristic, Func<CharacteristicObject, T> resolver) =>
+            resolvers[characteristic] = obj => resolver(obj);
 
         public bool CanResolve(Characteristic characteristic) => resolvers.ContainsKey(characteristic);
 
@@ -17,9 +20,9 @@ namespace BenchmarkDotNet.Characteristics
             if (obj.HasValue(characteristic))
                 return characteristic[obj];
 
-            Func<object> resolver;
+            Func<CharacteristicObject, object> resolver;
             if (resolvers.TryGetValue(characteristic, out resolver))
-                return resolver();
+                return resolver(obj);
             throw new InvalidOperationException($"There is no default resolver for {characteristic.FullId}");
         }
 
@@ -28,9 +31,9 @@ namespace BenchmarkDotNet.Characteristics
             if (obj.HasValue(characteristic))
                 return characteristic[obj];
 
-            Func<object> resolver;
+            Func<CharacteristicObject, object> resolver;
             if (resolvers.TryGetValue(characteristic, out resolver))
-                return (T)resolver();
+                return (T)resolver(obj);
             throw new InvalidOperationException($"There is no default resolver for {characteristic.FullId}");
         }
     }

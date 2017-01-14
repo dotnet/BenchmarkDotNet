@@ -81,8 +81,10 @@ namespace BenchmarkDotNet.Engines
 
         public RunResults Run()
         {
-            if (!isJitted || !isPreAllocated)
-                throw new Exception("You must call PreAllocate() and Jitting() first!");
+            if (Strategy.NeedsJitting() != isJitted)
+                throw new Exception($"You must{(Strategy.NeedsJitting() ? "" : " not")} call Jitting() first (Strategy = {Strategy})!");
+            if (!isPreAllocated)
+                throw new Exception("You must call PreAllocate() first!");
 
             long invokeCount = InvocationCount;
             IReadOnlyList<Measurement> idle = null;
