@@ -8,6 +8,9 @@ namespace BenchmarkDotNet.Toolchains
     /// </summary>
     public class RoslynToolchain : Toolchain
     {
+        /// <summary>
+        /// Creates new instance of RoslynToolchain.
+        /// </summary>
         [PublicAPI("Used in auto-generated .exe when this toolchain is set explicitly in Job definition")]
         public RoslynToolchain() : base("Classic", new RoslynGenerator(), new RoslynBuilder(), new Executor())
         {
