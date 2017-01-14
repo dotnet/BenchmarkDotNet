@@ -40,20 +40,20 @@ namespace BenchmarkDotNet.Jobs
             AccuracyCharacteristic[this] = new AccuracyMode();
         }
 
-        public Job(JobMode other) : this((string)null, other)
+        public Job(CharacteristicObject other) : this((string)null, other)
         {
         }
 
-        public Job(params JobMode[] others) : this((string)null, others)
+        public Job(params CharacteristicObject[] others) : this((string)null, others)
         {
         }
 
-        public Job(string id, JobMode other) : this(id)
+        public Job(string id, CharacteristicObject other) : this(id)
         {
             Apply(other);
         }
 
-        public Job(string id, params JobMode[] others) : this(id)
+        public Job(string id, params CharacteristicObject[] others) : this(id)
         {
             Apply(others);
         }

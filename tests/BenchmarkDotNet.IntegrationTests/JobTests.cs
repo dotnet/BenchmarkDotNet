@@ -13,8 +13,8 @@ namespace BenchmarkDotNet.IntegrationTests
     [Trait("Category", "JobTests")]
     public static class JobTests
     {
-        private static void AssertProperties(JobMode obj, string properties) =>
-            Equal(JobMode.IdCharacteristic.ResolveValueCore(obj, null), properties);
+        private static void AssertProperties(CharacteristicObject obj, string properties) =>
+            Equal(CharacteristicObject.IdCharacteristic.ResolveValueCore(obj, null), properties);
 
         [Fact]
         public static void Test01Create()
@@ -202,20 +202,20 @@ namespace BenchmarkDotNet.IntegrationTests
         public static void Test03IdDoesNotFlow()
         {
             var j = new Job(EnvMode.LegacyJitX64, RunMode.Long); // id will not flow, new Job
-            False(j.HasValue(JobMode.IdCharacteristic));
-            False(j.Env.HasValue(JobMode.IdCharacteristic));
+            False(j.HasValue(CharacteristicObject.IdCharacteristic));
+            False(j.Env.HasValue(CharacteristicObject.IdCharacteristic));
 
             Job.EnvCharacteristic[j] = EnvMode.LegacyJitX86.UnfreezeCopy(); // id will not flow
-            False(j.HasValue(JobMode.IdCharacteristic));
-            False(j.Env.HasValue(JobMode.IdCharacteristic));
+            False(j.HasValue(CharacteristicObject.IdCharacteristic));
+            False(j.Env.HasValue(CharacteristicObject.IdCharacteristic));
 
             var c = new CharacteristicSet(EnvMode.LegacyJitX64, RunMode.Long); // id will not flow, new CharacteristicSet
-            False(c.HasValue(JobMode.IdCharacteristic));
+            False(c.HasValue(CharacteristicObject.IdCharacteristic));
 
             Job.EnvCharacteristic[c] = EnvMode.LegacyJitX86.UnfreezeCopy(); // id will not flow
-            False(c.HasValue(JobMode.IdCharacteristic));
+            False(c.HasValue(CharacteristicObject.IdCharacteristic));
 
-            JobMode.IdCharacteristic[c] = "MyId"; // id set explicitly
+            CharacteristicObject.IdCharacteristic[c] = "MyId"; // id set explicitly
             Equal(c.Id, "MyId");
 
             j = new Job("MyId", EnvMode.LegacyJitX64, RunMode.Long); // id set explicitly
@@ -227,7 +227,7 @@ namespace BenchmarkDotNet.IntegrationTests
             Equal(j.Env.Id, "MyId");
 
             j = j.With(Jit.RyuJit);  // id will not flow
-            False(j.HasValue(JobMode.IdCharacteristic));
+            False(j.HasValue(CharacteristicObject.IdCharacteristic));
         }
 
         [Fact]
