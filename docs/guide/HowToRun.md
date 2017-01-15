@@ -22,7 +22,7 @@ var summary = BenchmarkRunner.RunUrl(url);
 
 ```cs
 string benchmarkSource = "public class MyBenchmarkClass { ...";
-var summary = BenchmarkRUnner.RunSource(benchmarkSource);
+var summary = BenchmarkRunner.RunSource(benchmarkSource);
 ```
 
 ##BenchmarkSwitcher
