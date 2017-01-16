@@ -17,6 +17,9 @@ namespace BenchmarkDotNet.Engines
         public static readonly TimeInterval MinIterationTime = 200 * TimeInterval.Millisecond;
 
         public Action<long> MainAction { get; }
+        public Action Dummy1Action { get; }
+        public Action Dummy2Action { get; }
+        public Action Dummy3Action { get; }
         public Action<long> IdleAction { get; }
         public Job TargetJob { get; }
         public long OperationsPerInvoke { get; }
@@ -38,9 +41,12 @@ namespace BenchmarkDotNet.Engines
         private bool isJitted, isPreAllocated;
         private int forcedFullGarbageCollections;
 
-        internal Engine(Action<long> idleAction, Action<long> mainAction, Job targetJob, Action setupAction, Action cleanupAction, long operationsPerInvoke, bool isDiagnoserAttached)
+        internal Engine(Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> idleAction, Action<long> mainAction, Job targetJob, Action setupAction, Action cleanupAction, long operationsPerInvoke, bool isDiagnoserAttached)
         {
             IdleAction = idleAction;
+            Dummy1Action = dummy1Action;
+            Dummy2Action = dummy2Action;
+            Dummy3Action = dummy3Action;
             MainAction = mainAction;
             TargetJob = targetJob;
             SetupAction = setupAction;
@@ -74,8 +80,11 @@ namespace BenchmarkDotNet.Engines
         public void Jitting()
         {
             // first signal about jitting is raised from auto-generated Program.cs, look at BenchmarkProgram.txt
+            Dummy1Action.Invoke();
             MainAction.Invoke(1);
+            Dummy2Action.Invoke();
             IdleAction.Invoke(1);
+            Dummy3Action.Invoke();
             isJitted = true;
         }
 

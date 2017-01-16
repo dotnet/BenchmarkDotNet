@@ -49,6 +49,8 @@ namespace BenchmarkDotNet.Code
         private static string Unroll(string text, int factor)
         {
             const string unrollDirective = "@Unroll@";
+            const string dummyUnrollDirective = "@DummyUnroll@";
+            const int dummyUnrollFactor = 1 << 6;
             var oldLines = text.Split('\n');
             var newLines = new List<string>();
             foreach (string line in oldLines)
@@ -57,6 +59,12 @@ namespace BenchmarkDotNet.Code
                 {
                     string newLine = line.Replace(unrollDirective, "");
                     for (int i = 0; i < factor; i++)
+                        newLines.Add(newLine);
+                }
+                else if (line.Contains(dummyUnrollDirective))
+                {
+                    string newLine = line.Replace(dummyUnrollDirective, "");
+                    for (int i = 0; i < dummyUnrollFactor; i++)
                         newLines.Add(newLine);
                 }
                 else
