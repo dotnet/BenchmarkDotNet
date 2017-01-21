@@ -245,8 +245,8 @@ public class MyBenchmarks
                 .With(Runtime.Core)
                 .WithLaunchCount(5)
                 .WithIterationTime(TimeInterval.Millisecond * 200)
-                .WithMaxStdErrRelative(0.01))
-                .WithId(&quot;MySuperJob&quot;); // IMPORTANT: Id assignment should be the last call in the chain or the id will be lost.
+                .WithMaxStdErrRelative(0.01)
+                .WithId(&quot;MySuperJob&quot;)); // IMPORTANT: Id assignment should be the last call in the chain or the id will be lost.
         }
     }
     // Benchmarks
@@ -305,7 +305,7 @@ public class MyBenchmarks
                 <footer>
                     <hr />
                     <div role="contentinfo">
-BenchmarkDotNet Documentation. &copy;2013-2016. <a href='https://github.com/dotnet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.
+BenchmarkDotNet Documentation. &copy;2013-2017. <a href='https://github.com/dotnet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.
                     </div>
                 </footer>
             </div>
