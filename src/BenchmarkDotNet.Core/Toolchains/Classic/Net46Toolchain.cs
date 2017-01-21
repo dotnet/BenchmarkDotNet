@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
         // * from 4.6 you can target < 4.6
         private const string TargetFrameworkMoniker = "net46";
 
-        [PublicAPI("Used in auto-generated .exe when this toolchain is set explicitly in Job definition")]
+        [PublicAPI]
         public Net46Toolchain() : base(
             "Classic",
             new DotNetCliGenerator(

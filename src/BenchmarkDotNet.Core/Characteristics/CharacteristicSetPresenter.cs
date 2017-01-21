@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.Characteristics
 {
@@ -61,13 +64,19 @@ namespace BenchmarkDotNet.Characteristics
         {
             private const string Separator = "; ";
             private static readonly CharacteristicPresenter CharacteristicPresenter = CharacteristicPresenter.SourceCodePresenter;
+            private static readonly HashSet<Type> NonExportableTypes = new HashSet<Type>
+            {
+                typeof(IToolchain) // there is no need to set toolchain in child process, it was causing parameterless ctor requirement for all IToolchain implementations
+            };
 
             public override string ToPresentation(CharacteristicObject obj)
-            {
-                var values = GetPresentableCharacteristics(obj, includeIgnoreOnApply: true)
-                    .Select(c => CharacteristicPresenter.ToPresentation(obj, c));
-                return string.Join(Separator, values);
-            }
+                => string.Join(Separator, 
+                        GetPresentableCharacteristics(obj, includeIgnoreOnApply: true)
+                            .Select(c => CharacteristicPresenter.ToPresentation(obj, c)));
+
+            protected override IEnumerable<Characteristic> GetPresentableCharacteristics(CharacteristicObject obj, bool includeIgnoreOnApply = false)
+                => base.GetPresentableCharacteristics(obj, includeIgnoreOnApply)
+                       .Where(characteristic => !NonExportableTypes.Contains(characteristic.CharacteristicType));
         }
     }
 }
