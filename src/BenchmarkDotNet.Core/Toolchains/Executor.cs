@@ -59,6 +59,8 @@ namespace BenchmarkDotNet.Toolchains
 
         private ExecuteResult Execute(Process process, Benchmark benchmark, SynchronousProcessOutputLoggerWithDiagnoser loggerWithDiagnoser, ILogger logger)
         {
+            logger.WriteLineInfo("// Execute: " + process.StartInfo.FileName + " " + process.StartInfo.Arguments);
+
             consoleHandler.SetProcess(process);
 
             process.Start();
