@@ -1,31 +1,43 @@
-﻿using BenchmarkDotNet.Characteristics;
+﻿using System;
+using System.Reflection;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.Core
 {
     public class CoreToolchain : Toolchain
     {
-        private const string TargetFrameworkMoniker = "netcoreapp1.1";
+        public static readonly IToolchain NetCoreApp11 = From(NetCoreAppSettings.NetCoreApp11);
+        public static readonly IToolchain NetCoreApp12 = From(NetCoreAppSettings.NetCoreApp12);
+        public static readonly IToolchain NetCoreApp20 = From(NetCoreAppSettings.NetCoreApp20);
 
-        public static readonly IToolchain Instance = new CoreToolchain();
+        private static IToolchain Default => NetCoreApp11;
 
-        private CoreToolchain()
-            : base("Core",
-                  new DotNetCliGenerator(
-                      TargetFrameworkMoniker, 
-                      GetExtraDependencies(), 
-                      platformProvider: _ => "x64", // dotnet cli supports only x64 compilation now
-                      imports: GetImports(),
-                      runtime: GetRuntime()), 
-                  new DotNetCliBuilder(TargetFrameworkMoniker),
-                  new Executor())
+        public static readonly Lazy<IToolchain> Current = new Lazy<IToolchain>(GetCurrentVersion);
+
+        private CoreToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor) 
+            : base(name, generator, builder, executor)
         {
         }
+
+        [PublicAPI]
+        public static IToolchain From(NetCoreAppSettings settings) 
+            => new CoreToolchain(
+                "Core", 
+                new DotNetCliGenerator(
+                    settings.TargetFrameworkMoniker,
+                    GetExtraDependencies(settings),
+                    PlatformProvider,
+                    settings.Imports,
+                    GetRuntime()), 
+                new DotNetCliBuilder(settings.TargetFrameworkMoniker), 
+                new Executor());
 
         public override bool IsSupported(Benchmark benchmark, ILogger logger, IResolver resolver)
         {
@@ -64,16 +76,14 @@ namespace BenchmarkDotNet.Toolchains.Core
             return true;
         }
 
-        private static string GetExtraDependencies()
+        // dotnet cli supports only x64 compilation now
+        private static string PlatformProvider(Platform platform) => "x64";
+
+        private static string GetExtraDependencies(NetCoreAppSettings settings)
         {
             // do not set the type to platform in order to produce exe
             // https://github.com/dotnet/core/issues/77#issuecomment-219692312
-            return "\"dependencies\": { \"Microsoft.NETCore.App\": { \"version\": \"1.*\" } },";
-        }
-
-        private static string GetImports()
-        {
-            return "[ \"dnxcore50\", \"portable-net45+win8\", \"dotnet5.6\", \"netcore50\" ]";
+            return $"\"dependencies\": {{ \"Microsoft.NETCore.App\": {{ \"version\": \"{settings.MicrosoftNETCoreAppVersion}\" }} }},";
         }
 
         private static string GetRuntime()
@@ -85,6 +95,34 @@ namespace BenchmarkDotNet.Toolchains.Core
             }
 
             return string.Empty;
+        }
+
+        private static IToolchain GetCurrentVersion()
+        {
+#if CLASSIC
+            return Default;
+#else
+            try
+            {
+                // it's an experimental way to determine the .NET Core Runtime version
+                // based on dev packages available at https://dotnet.myget.org/feed/dotnet-core/package/nuget/Microsoft.NETCore.App
+                var assembly = Assembly.Load(new AssemblyName("System.Runtime"));
+                if (assembly.FullName.Contains("Version=4.1.1"))
+                    return NetCoreApp11;
+
+                // the problem is that both netcoreapp1.2 and netcoreapp2.0 have 
+                // "System.Runtime Version=1.2.0.0". 
+                // 2.0 was officialy announced name, so let's bet on it (1.2 was probably an internal dev thing)
+                if (assembly.FullName.Contains("Version=4.2"))
+                    return NetCoreApp20;
+            }
+            catch
+            {
+                return Default;
+            }
+
+            return Default;
+#endif
         }
     }
 }

@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Toolchains
                 case Runtime.Mono:
                     return Classic.ClassicToolchain.Instance;
                 case Runtime.Core:
-                    return Core.CoreToolchain.Instance;
+                    return Core.CoreToolchain.Current.Value;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtime), runtime, "Runtime not supported");
             }

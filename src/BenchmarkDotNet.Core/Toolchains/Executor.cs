@@ -12,10 +12,12 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains
 {
-    internal class Executor : IExecutor
+    [PublicAPI("Used by some of our Superusers that implement their own Toolchains (e.g. Kestrel team)")]
+    public class Executor : IExecutor
     {
         // This needs to be static, so that we can share a single handler amongst all instances of Executor's
         private static ConsoleHandler consoleHandler;

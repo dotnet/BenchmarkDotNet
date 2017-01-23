@@ -9,10 +9,12 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
-    internal class DotNetCliGenerator : GeneratorBase
+    [PublicAPI("Used by some of our Superusers that implement their own Toolchains (e.g. Kestrel team)")]
+    public class DotNetCliGenerator : GeneratorBase
     {
         private string TargetFrameworkMoniker { get; }
 
@@ -24,6 +26,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         private string Runtime { get; }
 
+        [PublicAPI("Used by some of our Superusers that implement their own Toolchains (e.g. Kestrel team)")]
         public DotNetCliGenerator(
             string targetFrameworkMoniker,
             string extraDependencies,
@@ -101,7 +104,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (!Directory.Exists(artifactsPaths.BinariesDirectoryPath))
             {
                 Directory.CreateDirectory(artifactsPaths.BinariesDirectoryPath);
-            }   
+            }
         }
 
         protected override void GenerateProject(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)

@@ -4,9 +4,11 @@ using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
+    [PublicAPI("Used by some of our Superusers that implement their own Toolchains (e.g. Kestrel team)")]
     public class DotNetCliBuilder : IBuilder
     {
         internal const string RestoreCommand = "restore";
