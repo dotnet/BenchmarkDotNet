@@ -181,7 +181,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             return directoryInfo
                 .GetFileSystemInfos()
-                .Any(fileInfo => fileInfo.Extension == "sln" || fileInfo.Name == "global.json");
+                .Any(fileInfo => fileInfo.Extension == ".sln" || fileInfo.Name == "global.json");
         }
     }
 }
