@@ -16,11 +16,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI("Used by some of our Superusers that implement their own Toolchains (e.g. Kestrel team)")]
     public class DotNetCliGenerator : GeneratorBase
     {
-        private string TargetFrameworkMoniker { get; }
+        protected string TargetFrameworkMoniker { get; }
+
+        protected Func<Platform, string> PlatformProvider { get; }
 
         private string ExtraDependencies { get; }
-
-        private Func<Platform, string> PlatformProvider { get; }
 
         private string Imports { get; }
 
@@ -131,11 +131,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
         }
 
-        private static string SetPlatform(string template, string platform) => template.Replace("$PLATFORM$", platform);
+        protected static string SetPlatform(string template, string platform) => template.Replace("$PLATFORM$", platform);
 
-        private static string SetCodeFileName(string template, string codeFileName) => template.Replace("$CODEFILENAME$", codeFileName);
+        protected static string SetCodeFileName(string template, string codeFileName) => template.Replace("$CODEFILENAME$", codeFileName);
 
-        private static string SetDependencyToExecutingAssembly(string template, Type benchmarkTarget)
+        protected virtual string SetDependencyToExecutingAssembly(string template, Type benchmarkTarget)
         {
             var assemblyName = benchmarkTarget.GetTypeInfo().Assembly.GetName();
             string packageVersion = GetPackageVersion(assemblyName);
@@ -145,7 +145,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 Replace("$EXECUTINGASSEMBLY$", assemblyName.Name);
         }
 
-        private static string SetTargetFrameworkMoniker(string content, string targetFrameworkMoniker) => content.Replace("$TFM$", targetFrameworkMoniker);
+        protected static string SetTargetFrameworkMoniker(string content, string targetFrameworkMoniker) => content.Replace("$TFM$", targetFrameworkMoniker);
 
         private static string SetExtraDependencies(string content, string extraDependencies) => content.Replace("$REQUIREDDEPENDENCY$", extraDependencies);
 

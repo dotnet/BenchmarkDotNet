@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        private static ProcessStartInfo BuildStartInfo(string workingDirectory, string arguments)
+        internal static ProcessStartInfo BuildStartInfo(string workingDirectory, string arguments)
         {
             return new ProcessStartInfo
             {
