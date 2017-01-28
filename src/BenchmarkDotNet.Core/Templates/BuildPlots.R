@@ -22,6 +22,7 @@ ends_with <- function(vars, match, ignore.case = TRUE) {
   substr(vars, pmax(1, length - n + 1), length) == match
 }
 std.error <- function(x) sqrt(var(x)/length(x))
+cummean <- function(x) cumsum(x)/(1:length(x))
 BenchmarkDotNetVersionGrob <- textGrob(BenchmarkDotNetVersion, gp = gpar(fontface=3, fontsize=10), hjust=1, x=1)
 nicePlot <- function(p) grid.arrange(p, bottom = BenchmarkDotNetVersionGrob)
 printNice <- function(p) print(nicePlot(p))
@@ -83,6 +84,8 @@ for (file in files) {
   for (target in unique(result$Target_Method)) {
     df <- result %>% filter(Target_Method == target)
     df$Launch <- factor(df$Measurement_LaunchIndex)
+    df <- df %>% group_by(Job_Id, Launch) %>% mutate(cm = cummean(Measurement_Value))
+
     densityPlot <- ggplot(df, aes(x=Measurement_Value, fill=Job_Id)) +
       ggtitle(paste(title, "/", target)) +
       xlab(paste("Time,", timeUnit)) +
@@ -108,6 +111,16 @@ for (file in files) {
       printNice(timelinePlotSmooth)
       ggsaveNice(gsub("-measurements.csv", paste0("-", target, "-", job, "-timelineSmooth.png"), file), timelinePlotSmooth)
 
+      cummeanPlot <- ggplot(jobDf, aes(x = Measurement_IterationIndex, y=cm, group=Launch, color=Launch)) +
+        ggtitle(paste(title, "/", target, "/", job)) +
+        xlab("IterationIndex") +
+        ylab(paste("Cumulative mean time,", timeUnit)) +
+        geom_line() +
+        geom_point()
+      printNice(cummeanPlot)
+      ggsaveNice(gsub("-measurements.csv", paste0("-", target, "-", job, "-cummean.png"), file), cummeanPlot)
+
+
       densityPlotJob <- ggplot(jobDf, aes(x=Measurement_Value, fill="red")) +
         ggtitle(paste(title, "/", target, "/", job)) +
         xlab(paste("Time,", timeUnit)) +
@@ -115,7 +128,7 @@ for (file in files) {
       printNice(densityPlotJob)
       ggsaveNice(gsub("-measurements.csv", paste0("-", target, "-", job, "-density.png"), file), densityPlotJob)
     }
-    
+
     timelinePlot <- ggplot(df, aes(x = Measurement_IterationIndex, y=Measurement_Value, group=Launch, color=Launch)) +
       ggtitle(paste(title, "/", target)) +
       xlab("IterationIndex") +
@@ -128,5 +141,15 @@ for (file in files) {
     timelinePlotSmooth <- timelinePlot + geom_smooth()
     printNice(timelinePlotSmooth)
     ggsaveNice(gsub("-measurements.csv", paste0("-", target, "-facetTimelineSmooth.png"), file), timelinePlotSmooth)
+
+    facetCummeanPlot <- ggplot(df, aes(x = Measurement_IterationIndex, y=cm, group=Launch, color=Launch)) +
+      ggtitle(paste(title, "/", target)) +
+      xlab("IterationIndex") +
+      ylab(paste("Cumulative mean time,", timeUnit)) +
+      geom_line() +
+      geom_point() +
+      facet_wrap(~Job_Id)
+    printNice(facetCummeanPlot)
+    ggsaveNice(gsub("-measurements.csv", paste0("-", target, "-cummean.png"), file), facetCummeanPlot)
   }
 }
