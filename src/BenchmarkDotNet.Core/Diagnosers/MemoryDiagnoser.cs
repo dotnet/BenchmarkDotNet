@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Diagnosers
             public bool IsAvailable(Summary summary) 
                 => !RuntimeInformation.IsMono() || results.Keys.Any(benchmark => benchmark.Job.Env.Runtime != Runtime.Mono);
 
-            public bool AlwaysShow => false;
+            public bool AlwaysShow => true;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
 
@@ -83,7 +83,7 @@ namespace BenchmarkDotNet.Diagnosers
             public string Id => $"{nameof(GCCollectionColumn)}{generation}";
             public string ColumnName => $"Gen {generation}";
 
-            public bool AlwaysShow => false;
+            public bool AlwaysShow => true;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
 
