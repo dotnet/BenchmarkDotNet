@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Tests
         {
             var compositeExporter = new CompositeExporter(TestExporter.Default);
             Assert.Equal(2, compositeExporter.exporters.Count());
-            Assert.Equal(new IExporter[] { TestExporter.Default, TestExporterDependency.Default }, compositeExporter.exporters);
+            Assert.Equal(new IExporter[] { TestExporterDependency.Default, TestExporter.Default }, compositeExporter.exporters);
         }
 
         [Fact]
@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Tests
         {
             var compositeExporter = new CompositeExporter(TestExporter.Default, TestExporterDependency.Default);
             Assert.Equal(2, compositeExporter.exporters.Count());
-            Assert.Equal(new IExporter[] { TestExporter.Default, TestExporterDependency.Default }, compositeExporter.exporters);
+            Assert.Equal(new IExporter[] { TestExporterDependency.Default, TestExporter.Default }, compositeExporter.exporters);
         }
     }
 
