@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -11,20 +12,25 @@ namespace BenchmarkDotNet.Exporters
 
         public CompositeExporter(params IExporter[] exporters)
         {
-            // Start with all the Exporters we were given
-            var tempList = new List<IExporter>(exporters);
+            var allExporters = new List<IExporter>(exporters.Length * 2);
 
-            // Now fetch their dependencies (if any) and add them if they AREN'T already present
-            foreach (var exporter in exporters.OfType<IExporterDependencies>())
+            Action<IExporter> addExporter = null;
+            addExporter = newExporter =>
             {
-                foreach (var dependency in exporter.Dependencies)
-                {
-                    if (exporters.Contains(dependency) == false)
-                        tempList.Add(dependency);
-                }
-            }
+                // All the exporter dependencies should be added before the exporter
+                var dependencies = (newExporter as IExporterDependencies)?.Dependencies;
+                if (dependencies != null)
+                    foreach (var dependency in dependencies)
+                        addExporter(dependency);
 
-            this.exporters = tempList;
+                if (!allExporters.Contains(newExporter)) // TODO: Exporters should be matched by Id
+                    allExporters.Add(newExporter);
+            };
+
+            foreach (var exporter in exporters)
+                addExporter(exporter);
+
+            this.exporters = allExporters;
         }
 
         public void ExportToLog(Summary summary, ILogger logger)
