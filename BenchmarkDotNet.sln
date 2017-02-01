@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26127.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D6597E3A-6892-4A68-8E14-042FC941FDA2}"
 EndProject
@@ -9,11 +9,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{14195214
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{602236FF-A83D-43BA-9EE7-A4B0BE2CA4B3}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BenchmarkDotNet", "src\BenchmarkDotNet\BenchmarkDotNet.xproj", "{AF1E6F8A-5C63-465F-96F4-5E5F183A33B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet", "src\BenchmarkDotNet\BenchmarkDotNet.csproj", "{AF1E6F8A-5C63-465F-96F4-5E5F183A33B9}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BenchmarkDotNet.Tests", "tests\BenchmarkDotNet.Tests\BenchmarkDotNet.Tests.xproj", "{7CFC4790-9A2F-4E34-98CB-4FDF4144FD6E}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BenchmarkDotNet.Diagnostics.Windows", "src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.xproj", "{B61A2815-4E2F-42F7-A87C-973C488B11CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Diagnostics.Windows", "src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj", "{B61A2815-4E2F-42F7-A87C-973C488B11CA}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BenchmarkDotNet.Samples", "samples\BenchmarkDotNet.Samples\BenchmarkDotNet.Samples.xproj", "{697AAA71-A681-41B2-AC13-ADF864C7212B}"
 EndProject
@@ -62,9 +62,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.Integration
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BenchmarkDotNet.Samples.FSharp.Core", "samples\BenchmarkDotNet.Samples.FSharp.Core\BenchmarkDotNet.Samples.FSharp.Core.xproj", "{24D62335-B878-4F00-8555-C6DC3E40FA70}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BenchmarkDotNet.Core", "src\BenchmarkDotNet.Core\BenchmarkDotNet.Core.xproj", "{95F5D645-19E3-432F-95D4-C5EA374DD15B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Core", "src\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj", "{95F5D645-19E3-432F-95D4-C5EA374DD15B}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BenchmarkDotNet.Toolchains.Roslyn", "src\BenchmarkDotNet.Toolchains.Roslyn\BenchmarkDotNet.Toolchains.Roslyn.xproj", "{F5785871-7E2C-4894-85DE-A28EACB1D9B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Toolchains.Roslyn", "src\BenchmarkDotNet.Toolchains.Roslyn\BenchmarkDotNet.Toolchains.Roslyn.csproj", "{F5785871-7E2C-4894-85DE-A28EACB1D9B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
