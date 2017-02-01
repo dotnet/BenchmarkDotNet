@@ -26,11 +26,6 @@
       },
       "frameworkAssemblies": {
         "System.Reflection": "4.0.0.0"
-      },
-      "dependencies": {
-        "BenchmarkDotNet.Diagnostics.Windows": {
-          "target": "project"
-        }
       }
     },
     "netcoreapp1.1": {
@@ -44,11 +39,6 @@
         },
         "System.ComponentModel.EventBasedAsync": "4.0.11"
       }
-    }
-  },
-  "dependencies": {
-    "BenchmarkDotNet": {
-      "target": "project"
     }
   }
 }
