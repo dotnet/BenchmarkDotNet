@@ -13,6 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\$EXECUTINGASSEMBLY$\$EXECUTINGASSEMBLY$.csproj" />
+    <ProjectReference Include="$CSPROJPATH$" />
   </ItemGroup>
 </Project>

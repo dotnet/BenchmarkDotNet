@@ -48,20 +48,32 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// </summary>
         protected override string GetBuildArtifactsDirectoryPath(Benchmark benchmark, string programName)
         {
-            var directoryInfo = new DirectoryInfo(Directory.GetCurrentDirectory());
-            while (directoryInfo != null)
+            if (GetSolutionRootDirectory(out var directoryInfo))
             {
-                if (IsRootSolutionFolder(directoryInfo))
-                {
-                    return Path.Combine(directoryInfo.FullName, programName);
-                }
-
-                directoryInfo = directoryInfo.Parent;
+                return Path.Combine(directoryInfo.FullName, programName);
             }
 
             // we did not find global.json or any Visual Studio solution file? 
             // let's return it in the old way and hope that it works ;)
             return Path.Combine(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.FullName, programName);
+        }
+
+        protected bool GetSolutionRootDirectory(out DirectoryInfo directoryInfo)
+        {
+            directoryInfo = new DirectoryInfo(Directory.GetCurrentDirectory());
+            int depth = 0;
+            while (directoryInfo != null && depth < 5)
+            {
+                if (IsRootSolutionFolder(directoryInfo))
+                {
+                    return true;
+                }
+
+                directoryInfo = directoryInfo.Parent;
+                depth++;
+            }
+
+            return false;
         }
 
         /// <summary>

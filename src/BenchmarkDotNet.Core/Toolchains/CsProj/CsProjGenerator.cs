@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
@@ -35,10 +36,20 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         protected override string SetDependencyToExecutingAssembly(string template, Type benchmarkTarget)
         {
-            var assemblyName = benchmarkTarget.GetTypeInfo().Assembly.GetName();
+            if (!GetSolutionRootDirectory(out var solutionRootDirectory))
+            {
+                throw new NotSupportedException("Unable to find .sln or global.json file, hence can not find the csproj path");
+            }
 
-            // todo: support custom path .csprojs, now it's <ProjectReference Include="..\$EXECUTINGASSEMBLY$\$EXECUTINGASSEMBLY$.csproj" />
-            return template.Replace("$EXECUTINGASSEMBLY$", assemblyName.Name);
+            var assemblyName = benchmarkTarget.GetTypeInfo().Assembly.GetName();
+            var csprojName = $"{assemblyName.Name}.csproj";
+            var csprojs = solutionRootDirectory.GetFiles(csprojName, SearchOption.AllDirectories);
+            if (csprojs.Length != 1)
+            {
+                throw new NotSupportedException($"Unable to find {csprojName} in {solutionRootDirectory}. Most probably the name of output exe is different than the name of the .csproj");
+            }
+
+            return template.Replace("$CSPROJPATH$", csprojs.Single().FullName);
         }
     }
 }
