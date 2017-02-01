@@ -32,10 +32,6 @@
     <EmbeddedResource Include="Templates\*" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="NETStandard.Library" Version="1.6.0" />
-  </ItemGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.0.0" />
     <Reference Include="System.Management" />

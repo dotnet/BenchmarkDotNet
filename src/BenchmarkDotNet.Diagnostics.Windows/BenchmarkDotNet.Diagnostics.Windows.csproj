@@ -31,7 +31,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NETStandard.Library" Version="1.6.0" />
     <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="1.0.41.0" />
   </ItemGroup>
 
