@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Environments
         public string JitModules { get; }
 
         /// <summary>
-        /// is expensive to call (creates new process)
+        /// is expensive to call (creates new process by calling dotnet --version)
         /// </summary>
         public Lazy<string> DotNetCliVersion { get; }
 

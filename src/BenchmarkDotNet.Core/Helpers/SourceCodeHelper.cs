@@ -32,6 +32,8 @@ namespace BenchmarkDotNet.Core.Helpers
                 return "System.Activator.CreateInstance<" + value.GetType().GetCorrectTypeName() + ">()";
             if (value is TimeInterval)
                 return "new BenchmarkDotNet.Horology.TimeInterval(" + ToSourceCode(((TimeInterval)value).Nanoseconds) + ")";
+            if (value is IntPtr)
+                return $"new System.IntPtr({value})";
             if (value is IFormattable)
                 return ((IFormattable)value).ToString(null, CultureInfo.InvariantCulture);
             return value.ToString();

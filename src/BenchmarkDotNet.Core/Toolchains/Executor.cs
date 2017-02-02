@@ -19,9 +19,6 @@ namespace BenchmarkDotNet.Toolchains
     [PublicAPI("Used by some of our Superusers that implement their own Toolchains (e.g. Kestrel team)")]
     public class Executor : IExecutor
     {
-        // This needs to be static, so that we can share a single handler amongst all instances of Executor's
-        private static ConsoleHandler consoleHandler;
-
         public ExecuteResult Execute(BuildResult buildResult, Benchmark benchmark, ILogger logger, IResolver resolver, IDiagnoser compositeDiagnoser = null)
         {
             var exePath = buildResult.ArtifactsPaths.ExecutablePath;
@@ -38,11 +35,7 @@ namespace BenchmarkDotNet.Toolchains
         private ExecuteResult Execute(Benchmark benchmark, ILogger logger, string exeName, string workingDirectory, string args, IDiagnoser diagnoser,
             IResolver resolver)
         {
-            if (consoleHandler == null)
-            {
-                consoleHandler = new ConsoleHandler(logger);
-                Console.CancelKeyPress += consoleHandler.EventHandler;
-            }
+            ConsoleHandler.EnsureInitialized(logger);
 
             try
             {
@@ -55,7 +48,7 @@ namespace BenchmarkDotNet.Toolchains
             }
             finally
             {
-                consoleHandler.ClearProcess();
+                ConsoleHandler.Instance.ClearProcess();
             }
         }
 
@@ -63,7 +56,7 @@ namespace BenchmarkDotNet.Toolchains
         {
             logger.WriteLineInfo("// Execute: " + process.StartInfo.FileName + " " + process.StartInfo.Arguments);
 
-            consoleHandler.SetProcess(process);
+            ConsoleHandler.Instance.SetProcess(process);
 
             process.Start();
 

@@ -8,13 +8,15 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using System.Reflection;
+using System.Text;
+using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Toolchains.CsProj
 {
     public class CsProjGenerator : DotNetCliGenerator
     {
         public CsProjGenerator(string targetFrameworkMoniker, Func<Platform, string> platformProvider) 
-            : base(targetFrameworkMoniker, null, platformProvider, null, null)
+            : base(targetFrameworkMoniker, null, platformProvider, null)
         {
         }
 
@@ -29,7 +31,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             content = SetCodeFileName(content, Path.GetFileName(artifactsPaths.ProgramCodePath));
             content = SetDependencyToExecutingAssembly(content, benchmark.Target.Type);
             content = SetTargetFrameworkMoniker(content, TargetFrameworkMoniker);
-            //content = SetGcMode(content, benchmark.Job.Env.Gc, resolver); todo: implement
+
+            SetGcMode(content, benchmark.Job.Env.Gc, resolver, artifactsPaths);
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
         }
@@ -46,10 +49,32 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             var csprojs = solutionRootDirectory.GetFiles(csprojName, SearchOption.AllDirectories);
             if (csprojs.Length != 1)
             {
-                throw new NotSupportedException($"Unable to find {csprojName} in {solutionRootDirectory}. Most probably the name of output exe is different than the name of the .csproj");
+                throw new NotSupportedException($"Unable to find single {csprojName} in {solutionRootDirectory} and it's subfolders. Most probably the name of output exe is different than the name of the .csproj");
             }
 
             return template.Replace("$CSPROJPATH$", csprojs.Single().FullName);
+        }
+
+        private void SetGcMode(string content, GcMode gcMode, IResolver resolver, ArtifactsPaths artifactsPaths)
+        {
+            if (!gcMode.HasChanges)
+                return;
+
+            var runtimeConfigContent = new StringBuilder(80)
+                .AppendLine("{")
+                    .AppendLine("\"configProperties\": {")
+                        .Append("\"System.GC.Server\": ")
+                            .Append(gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase())
+                            .AppendLine(",")
+                        .Append("\"System.GC.Concurrent\": ")
+                            .AppendLine(gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver).ToLowerCase())
+                    .AppendLine("}")
+                .AppendLine("}")
+                .ToString();
+
+            File.WriteAllText(
+                Path.Combine(artifactsPaths.BuildArtifactsDirectoryPath, "runtimeConfig.template.json"),
+                runtimeConfigContent);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
@@ -22,6 +23,12 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         public static readonly IToolchain NetCoreApp12 = From(NetCoreAppSettings.NetCoreApp12);
         public static readonly IToolchain NetCoreApp20 = From(NetCoreAppSettings.NetCoreApp20);
 
+        public static readonly IToolchain Net46 = 
+            new CsProjToolchain("Net46", 
+                new CsProjGenerator("net46", platform => platform.ToConfig()),
+                new DotNetCliBuilder("net46"), 
+                new DotNetCliExecutor());
+
         private CsProjToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor) 
             : base(name, generator, builder, executor)
         {
@@ -31,7 +38,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             => new CsProjToolchain("CsProjCore",
                 new CsProjGenerator(settings.TargetFrameworkMoniker, PlatformProvider), 
                 new DotNetCliBuilder(settings.TargetFrameworkMoniker), 
-                new DotNetRunExecutor());
+                new DotNetCliExecutor());
 
         // dotnet cli supports only x64 compilation now
         private static string PlatformProvider(Platform platform) => "x64";

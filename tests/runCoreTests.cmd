@@ -4,7 +4,7 @@ echo -----------------------------
 echo Running dotnet restore
 echo -----------------------------
 
-call dotnet restore
+call dotnet restore "BenchmarkDotNet.IntegrationTests\BenchmarkDotNet.IntegrationTests.csproj"
 
 if NOT %ERRORLEVEL% == 0 (
     echo Dotnet restore has failed
@@ -15,11 +15,10 @@ echo -----------------------------
 echo Running Core tests
 echo -----------------------------
 
-call dotnet test "BenchmarkDotNet.IntegrationTests/" --configuration Release --framework netcoreapp1.1 2> failedCoreTests.txt
+call dotnet test "BenchmarkDotNet.IntegrationTests\BenchmarkDotNet.IntegrationTests.csproj" --configuration Release --framework netcoreapp1.1
 
 if NOT %ERRORLEVEL% == 0 (
     echo CORE tests has failed
-	type failedCoreTests.txt
     goto end
 )
 
@@ -28,4 +27,3 @@ echo All tests has passed for Core
 echo -----------------------------
 
 :end
-del failedCoreTests.txt
