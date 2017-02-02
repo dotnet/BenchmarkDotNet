@@ -67,12 +67,11 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="BenchmarkDotNet" Condition="'$(Configuration)'=='Release'">
-      <HintPath>..\..\src\BenchmarkDotNet.Core\bin\Release\net45\BenchmarkDotNet.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="BenchmarkDotNet" Condition="'$(Configuration)'=='Debug'">
-      <HintPath>..\..\src\BenchmarkDotNet.Core\bin\Debug\net45\BenchmarkDotNet.Core.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj">
+      <Name>BenchmarkDotNet.Core</Name>
+      <Project>{95f5d645-19e3-432f-95d4-c5ea374dd15b}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
