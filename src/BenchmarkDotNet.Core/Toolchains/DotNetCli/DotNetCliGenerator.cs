@@ -20,11 +20,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         protected Func<Platform, string> PlatformProvider { get; }
 
+        protected string Runtime { get; }
+
         private string ExtraDependencies { get; }
 
         private string Imports { get; }
-
-        private string Runtime { get; }
 
         [PublicAPI("Used by some of our Superusers that implement their own Toolchains (e.g. Kestrel team)")]
         public DotNetCliGenerator(

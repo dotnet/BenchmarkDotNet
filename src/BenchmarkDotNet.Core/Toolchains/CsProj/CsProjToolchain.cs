@@ -24,10 +24,10 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         public static readonly IToolchain NetCoreApp20 = From(NetCoreAppSettings.NetCoreApp20);
 
         public static readonly IToolchain Net46 = 
-            new CsProjToolchain("Net46", 
-                new CsProjGenerator("net46", platform => platform.ToConfig()),
+            new CsProjToolchain("ClassicCsProj", 
+                new CsProjGenerator("net46", platform => platform.ToConfig(), "win7"),
                 new DotNetCliBuilder("net46"), 
-                new DotNetCliExecutor());
+                new Executor());
 
         private CsProjToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor) 
             : base(name, generator, builder, executor)
@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         }
 
         private static IToolchain From(NetCoreAppSettings settings)
-            => new CsProjToolchain("CsProjCore",
+            => new CsProjToolchain("CoreCsProj",
                 new CsProjGenerator(settings.TargetFrameworkMoniker, PlatformProvider), 
                 new DotNetCliBuilder(settings.TargetFrameworkMoniker), 
                 new DotNetCliExecutor());
