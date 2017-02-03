@@ -21,6 +21,8 @@ namespace BenchmarkDotNet.Tests.Mocks
             TargetJob = job;
         }
 
+        public IHost Host { get; }
+
         public Job TargetJob { get; set; }
         public long OperationsPerInvoke { get; set; } = 1;
         public Action SetupAction { get; set; }

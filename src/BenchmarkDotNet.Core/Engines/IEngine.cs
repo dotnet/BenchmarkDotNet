@@ -9,6 +9,15 @@ namespace BenchmarkDotNet.Engines
     public interface IEngine
     {
         [NotNull]
+        IHost Host { get; }
+
+        bool IsDiagnoserAttached { get; }
+
+        void WriteLine();
+
+        void WriteLine(string line);
+
+        [NotNull]
         Job TargetJob { get; }
 
         long OperationsPerInvoke { get; }
@@ -25,14 +34,9 @@ namespace BenchmarkDotNet.Engines
         [NotNull]
         Action<long> IdleAction { get; }
 
-        bool IsDiagnoserAttached { get; }
-
         IResolver Resolver { get; }
 
         Measurement RunIteration(IterationData data);
-
-        void WriteLine();
-        void WriteLine(string line);
 
         /// <summary>
         /// must provoke all static ctors and perform any other necessary allocations 

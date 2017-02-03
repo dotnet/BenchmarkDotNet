@@ -60,6 +60,10 @@ namespace BenchmarkDotNet.Loggers
                 {
                     diagnoser?.BeforeCleanup();
                 }
+                else if (line == Engine.Signals.AfterAnythingElse)
+                {
+                    // TODO: notify AfterAnythingElse
+                }
                 else
                 {
                     LinesWithExtraOutput.Add(line);

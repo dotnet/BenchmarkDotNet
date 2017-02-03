@@ -21,6 +21,7 @@ namespace BenchmarkDotNet.Engines
                 throw new ArgumentNullException(nameof(engineParameters.TargetJob));
 
             return new Engine(
+                engineParameters.Host,
                 engineParameters.Dummy1Action,
                 engineParameters.Dummy2Action,
                 engineParameters.Dummy3Action,
@@ -29,8 +30,7 @@ namespace BenchmarkDotNet.Engines
                 engineParameters.TargetJob,
                 engineParameters.SetupAction,
                 engineParameters.CleanupAction,
-                engineParameters.OperationsPerInvoke,
-                engineParameters.IsDiagnoserAttached);
+                engineParameters.OperationsPerInvoke);
         }
     }
 }

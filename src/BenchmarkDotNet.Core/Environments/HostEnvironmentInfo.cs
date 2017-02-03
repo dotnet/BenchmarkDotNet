@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Toolchains.DotNetCli;
@@ -16,6 +17,12 @@ namespace BenchmarkDotNet.Environments
         public const string BenchmarkDotNetCaption = "BenchmarkDotNet";
 
         public static readonly CultureInfo MainCultureInfo;
+
+        // TODO: API to setup the logger.
+        /// <summary>
+        /// Logger to use when there's no config available.
+        /// </summary>
+        public static ILogger FallbackLogger { get; } = ConsoleLogger.Default;
 
         private static HostEnvironmentInfo Current;
 
