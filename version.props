@@ -1,0 +1,7 @@
+<!-- This file may be overwritten by automation. Only values allowed here are VersionPrefix and VersionSuffix.  -->
+<Project>
+    <PropertyGroup>
+        <VersionPrefix>0.10.2</VersionPrefix>
+        <VersionSuffix>develop</VersionSuffix>
+    </PropertyGroup>
+</Project>

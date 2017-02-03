@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.Samples</AssemblyTitle>
     <TargetFrameworks>netcoreapp1.1;net45</TargetFrameworks>
@@ -8,12 +9,7 @@
     <AssemblyName>BenchmarkDotNet.Samples</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>BenchmarkDotNet.Samples</PackageId>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
@@ -24,19 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <DefineConstants>$(DefineConstants);CLASSIC</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
-    <DefineConstants>$(DefineConstants);CORE</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <AssemblyOriginatorKeyFile>../../src/strongNameKey.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-  </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
-    <PackageReference Include="Microsoft.NETCore.App" Version="1.1.0" />
     <PackageReference Include="System.ComponentModel.EventBasedAsync" Version="4.0.11" />
   </ItemGroup>
 </Project>

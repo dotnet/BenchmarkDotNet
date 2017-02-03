@@ -1,0 +1,46 @@
+<Project>
+  <Import Project="..\version.props" />
+
+  <PropertyGroup>
+    <Product>BenchmarkDotNet</Product>
+    <Description>Powerful .NET library for benchmarking</Description>
+    <Copyright>.NET Foundation and contributors</Copyright>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <Authors>.NET Foundation and contributors</Authors>
+    <PackageTags>benchmark;benchmarking;performance</PackageTags>
+    <PackageIconUrl>https://raw.githubusercontent.com/dotnet/BenchmarkDotNet/master/docs/guide/logo.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/dotnet/BenchmarkDotNet</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/dotnet/BenchmarkDotNet/blob/master/LICENSE.md</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/dotnet/BenchmarkDotNet</RepositoryUrl>
+
+    <VersionSuffix Condition="'$(VersionSuffix)'!='' AND '$(BuildNumber)' != ''">$(VersionSuffix)-$(BuildNumber)</VersionSuffix>
+
+    <CLSCompliant>true</CLSCompliant>
+    <ComVisible>false</ComVisible>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' Or '$(TargetFramework)' == 'net451' ">
+    <DefineConstants>$(DefineConstants);CLASSIC</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
+    <DefineConstants>$(DefineConstants);CORE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <AssemblyOriginatorKeyFile>..\..\build\strongNameKey.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <!-- does not work ;/
+  <ItemGroup>
+    <InternalsVisibleTo Include="BenchmarkDotNet.Toolchains.Roslyn" />
+    <InternalsVisibleTo Include="BenchmarkDotNet" />
+    <InternalsVisibleTo Include="BenchmarkDotNet.Tests" />
+    <InternalsVisibleTo Include="BenchmarkDotNet.IntegrationTests" />
+    <InternalsVisibleTo Include="BenchmarkDotNet.Samples" />
+  </ItemGroup>
+  -->
+</Project>

@@ -1,55 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  <Import Project="..\..\build\common.props" />
   <PropertyGroup>
-    <Description>Powerful .NET library for benchmarking</Description>
-    <Copyright>.NET Foundation and contributors</Copyright>
     <AssemblyTitle>BenchmarkDotNet</AssemblyTitle>
-    <NeutralLanguage>en-US</NeutralLanguage>
-    <VersionPrefix>0.10.2-develop</VersionPrefix>
-    <Authors>.NET Foundation and contributors</Authors>
     <TargetFrameworks>net45;netcoreapp1.1</TargetFrameworks>
     <NoWarn>$(NoWarn);1591</NoWarn>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>BenchmarkDotNet</AssemblyName>
     <PackageId>BenchmarkDotNet</PackageId>
-    <PackageTags>benchmark benchmarking performance</PackageTags>
-    <PackageIconUrl>https://raw.githubusercontent.com/dotnet/BenchmarkDotNet/master/docs/guide/logo.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/dotnet/BenchmarkDotNet</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/dotnet/BenchmarkDotNet/blob/master/LICENSE.md</PackageLicenseUrl>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/dotnet/BenchmarkDotNet</RepositoryUrl>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
   </PropertyGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <ProjectReference Include="..\BenchmarkDotNet.Toolchains.Roslyn\BenchmarkDotNet.Toolchains.Roslyn.csproj" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj" />
   </ItemGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <DefineConstants>$(DefineConstants);CLASSIC</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
-    <DefineConstants>$(DefineConstants);CORE</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <AssemblyOriginatorKeyFile>../strongNameKey.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-  </PropertyGroup>
-
 </Project>

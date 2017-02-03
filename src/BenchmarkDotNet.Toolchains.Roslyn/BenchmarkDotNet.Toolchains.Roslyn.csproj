@@ -1,31 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  <Import Project="..\..\build\common.props" />
   <PropertyGroup>
-    <Description>Powerful .NET library for benchmarking</Description>
-    <Copyright>.NET Foundation and contributors</Copyright>
     <AssemblyTitle>BenchmarkDotNet.Toolchains.Roslyn</AssemblyTitle>
-    <NeutralLanguage>en-US</NeutralLanguage>
-    <VersionPrefix>0.10.2-develop</VersionPrefix>
-    <Authors>.NET Foundation and contributors</Authors>
     <TargetFramework>net45</TargetFramework>
     <AssemblyName>BenchmarkDotNet.Toolchains.Roslyn</AssemblyName>
     <PackageId>BenchmarkDotNet.Toolchains.Roslyn</PackageId>
-    <PackageTags>benchmark benchmarking performance</PackageTags>
-    <PackageIconUrl>https://raw.githubusercontent.com/dotnet/BenchmarkDotNet/master/docs/guide/logo.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/dotnet/BenchmarkDotNet</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/dotnet/BenchmarkDotNet/blob/master/LICENSE.md</PackageLicenseUrl>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/dotnet/BenchmarkDotNet</RepositoryUrl>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
   </PropertyGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <ProjectReference Include="..\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="1.3.2" />
@@ -33,12 +13,4 @@
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyOriginatorKeyFile>../strongNameKey.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-  </PropertyGroup>
-
 </Project>

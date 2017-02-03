@@ -1,48 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <Description>Powerful .NET library for benchmarking (Diagnostic Tools for Windows)</Description>
-    <Copyright>.NET Foundation and contributors</Copyright>
     <AssemblyTitle>BenchmarkDotNet.Diagnostics.Windows</AssemblyTitle>
-    <VersionPrefix>0.10.2-develop</VersionPrefix>
-    <Authors>.NET Foundation and contributors</Authors>
     <TargetFramework>net45</TargetFramework>
     <NoWarn>$(NoWarn);1591;3001;3003</NoWarn>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>BenchmarkDotNet.Diagnostics.Windows</AssemblyName>
     <PackageId>BenchmarkDotNet.Diagnostics.Windows</PackageId>
-    <PackageIconUrl>https://raw.githubusercontent.com/dotnet/BenchmarkDotNet/master/docs/guide/logo.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/dotnet/BenchmarkDotNet</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/dotnet/BenchmarkDotNet/blob/master/LICENSE.md</PackageLicenseUrl>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/dotnet/BenchmarkDotNet</RepositoryUrl>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="1.0.41.0" />
   </ItemGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <AssemblyOriginatorKeyFile>../strongNameKey.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-  </PropertyGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-
 </Project>
