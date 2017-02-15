@@ -61,8 +61,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         protected bool GetSolutionRootDirectory(out DirectoryInfo directoryInfo)
         {
             directoryInfo = new DirectoryInfo(Directory.GetCurrentDirectory());
-            int depth = 0;
-            while (directoryInfo != null && depth < 5)
+            while (directoryInfo != null)
             {
                 if (IsRootSolutionFolder(directoryInfo))
                 {
@@ -70,7 +69,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 }
 
                 directoryInfo = directoryInfo.Parent;
-                depth++;
             }
 
             return false;
@@ -185,15 +183,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         private static bool IsRootSolutionFolder(DirectoryInfo directoryInfo)
-        {
-            if (directoryInfo == null)
-            {
-                return false;
-            }
-
-            return directoryInfo
+            => directoryInfo
                 .GetFileSystemInfos()
                 .Any(fileInfo => fileInfo.Extension == ".sln" || fileInfo.Name == "global.json");
-        }
     }
 }

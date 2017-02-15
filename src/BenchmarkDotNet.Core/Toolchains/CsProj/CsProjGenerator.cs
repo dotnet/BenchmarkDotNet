@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         {
             if (!GetSolutionRootDirectory(out var solutionRootDirectory))
             {
-                throw new NotSupportedException("Unable to find .sln or global.json file, hence can not find the csproj path");
+                throw new NotSupportedException($"Unable to find .sln or global.json file, hence can not find the csproj path, current directory was {Directory.GetCurrentDirectory()}");
             }
 
             var assemblyName = benchmarkTarget.GetTypeInfo().Assembly.GetName();
