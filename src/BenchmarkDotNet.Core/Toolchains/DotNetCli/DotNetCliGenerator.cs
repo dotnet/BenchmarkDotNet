@@ -172,6 +172,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 "$GC$",
                 $"\"runtimeOptions\": {{ \"configProperties\": {{ " +
                 $"\"System.GC.Concurrent\": {gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver).ToLowerCase()}, " +
+                $"\"System.GC.RetainVM\": {gcMode.ResolveValue(GcMode.RetainVmCharacteristic, resolver).ToLowerCase()}, " +
                 $"\"System.GC.Server\": {gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase()} }} }}, ");
         }
 
