@@ -10,6 +10,7 @@
     <OutputType>Exe</OutputType>
     <PackageId>BenchmarkDotNet.Samples</PackageId>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
