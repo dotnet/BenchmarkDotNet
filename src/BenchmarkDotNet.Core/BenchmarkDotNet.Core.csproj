@@ -6,6 +6,7 @@
     <NoWarn>$(NoWarn);1591</NoWarn>
     <AssemblyName>BenchmarkDotNet.Core</AssemblyName>
     <PackageId>BenchmarkDotNet.Core</PackageId>
+    <RootNamespace>BenchmarkDotNet</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\*" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
