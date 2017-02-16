@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -35,12 +33,12 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void MemoryDiagnoserIsAccurate()
         {
-            long objectAllocationOverhead = IntPtr.Size * 3; // pointer to method table + object header word + pointer to the object 
-            AssertAllocations(typeof(AccurateAllocations), 200, new Dictionary<string, Predicate<long>>
+            long objectAllocationOverhead = IntPtr.Size * 3; // pointer to method table + object header word + array length
+            AssertAllocations(typeof(AccurateAllocations), 200, new Dictionary<string, long>
             {
-                { "Empty", allocatedBytes => allocatedBytes == 0 },
-                { "EightBytes", allocatedBytes => allocatedBytes == 8 + objectAllocationOverhead },
-                { "SixtyFourBytes", allocatedBytes => allocatedBytes == 64 + objectAllocationOverhead },
+                { "Empty", 0 },
+                { "EightBytes", 8 + objectAllocationOverhead },
+                { "SixtyFourBytes", 64 + objectAllocationOverhead },
             });
         }
 
@@ -65,9 +63,9 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void MemoryDiagnoserDoesNotIncludeAllocationsFromSetupAndCleanup()
         {
-            AssertAllocations(typeof(AllocatingSetupAndCleanup), 100, new Dictionary<string, Predicate<long>>
+            AssertAllocations(typeof(AllocatingSetupAndCleanup), 100, new Dictionary<string, long>
             {
-                { "AllocateNothing",  allocatedBytes => allocatedBytes == 0 }
+                { "AllocateNothing", 0 }
             });
         }
 
@@ -79,22 +77,20 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void EngineShouldNotInterfereAllocationResults()
         {
-            AssertAllocations(typeof(NoAllocationsAtAll), 100, new Dictionary<string, Predicate<long>>
+            AssertAllocations(typeof(NoAllocationsAtAll), 100, new Dictionary<string, long>
             {
-                { "EmptyMethod",  allocatedBytes => allocatedBytes == 0 }
+                { "EmptyMethod", 0 }
             });
         }
 
         private void AssertAllocations(Type benchmarkType, int targetCount,
-            Dictionary<string, Predicate<long>> benchmarksAllocationsValidators)
+            Dictionary<string, long> benchmarksAllocationsValidators)
         {
             var memoryDiagnoser = MemoryDiagnoser.Default;
-            var config = CreateConfig(memoryDiagnoser, targetCount);
+            var config = CreateConfig(memoryDiagnoser);
             var benchmarks = BenchmarkConverter.TypeToBenchmarks(benchmarkType, config);
 
-            var summary = BenchmarkRunner.Run((Benchmark[])benchmarks, config);
-
-            var allocationColumn = GetColumns<MemoryDiagnoser.AllocationColumn>(memoryDiagnoser, summary).Single();
+            var summary = BenchmarkRunner.Run(benchmarks, config);
 
             foreach (var benchmarkAllocationsValidator in benchmarksAllocationsValidators)
             {
@@ -102,23 +98,17 @@ namespace BenchmarkDotNet.IntegrationTests
 
                 foreach (var benchmark in allocatingBenchmarks)
                 {
-                    var allocations = allocationColumn.GetValue(summary, benchmark);
+                    var benchmarkReport = summary.Reports.Single(report => report.Benchmark == benchmark);
 
-                    AssertParsed(allocations, benchmarkAllocationsValidator.Value);
+                    Assert.Equal(benchmarkAllocationsValidator.Value, benchmarkReport.GcStats.BytesAllocatedPerOperation);
                 }
             }
         }
 
-        private IConfig CreateConfig(IDiagnoser diagnoser, int targetCount)
+        private IConfig CreateConfig(IDiagnoser diagnoser)
         {
             return ManualConfig.CreateEmpty()
-                .With(
-                    Job.Dry
-                        .WithLaunchCount(1)
-                        .WithWarmupCount(1)
-                        .WithTargetCount(targetCount)
-                        .WithInvocationCount(100)
-                        .WithGcForce(false))
+                .With(Job.ShortRun.WithGcForce(false))
                 .With(DefaultConfig.Instance.GetLoggers().ToArray())
                 .With(DefaultColumnProviders.Instance)
                 .With(diagnoser)
@@ -127,18 +117,5 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private static T[] GetColumns<T>(MemoryDiagnoser memoryDiagnoser, Summary summary)
             => memoryDiagnoser.GetColumnProvider().GetColumns(summary).OfType<T>().ToArray();
-
-        private static void AssertParsed(string text, Predicate<long> condition)
-        {
-            long value;
-            if (long.TryParse(text.Replace(" B", string.Empty), NumberStyles.Number, HostEnvironmentInfo.MainCultureInfo, out value))
-            {
-                Assert.True(condition(value), $"Failed for value {value}");
-            }
-            else
-            {
-                Assert.True(false, $"Can't parse '{text}'");
-            }
-        }
     }
 }

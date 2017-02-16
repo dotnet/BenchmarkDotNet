@@ -26,7 +26,10 @@ namespace BenchmarkDotNet.Engines
         public long AllocatedBytes { get; }
         public long TotalOperations { get; }
 
-        public long BytesAllocatedPerOperation => AllocatedBytes / TotalOperations;
+        public long BytesAllocatedPerOperation 
+            => (long)Math.Round( // let's round it to reduce the side effects of Allocation quantum
+                (double)AllocatedBytes / TotalOperations, 
+                MidpointRounding.ToEven); 
 
         public static GcStats operator +(GcStats left, GcStats right)
         {
