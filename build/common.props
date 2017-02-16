@@ -34,13 +34,4 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
-  <!-- does not work ;/
-  <ItemGroup>
-    <InternalsVisibleTo Include="BenchmarkDotNet.Toolchains.Roslyn" />
-    <InternalsVisibleTo Include="BenchmarkDotNet" />
-    <InternalsVisibleTo Include="BenchmarkDotNet.Tests" />
-    <InternalsVisibleTo Include="BenchmarkDotNet.IntegrationTests" />
-    <InternalsVisibleTo Include="BenchmarkDotNet.Samples" />
-  </ItemGroup>
-  -->
 </Project>

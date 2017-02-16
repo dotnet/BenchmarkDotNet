@@ -76,46 +76,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj">
-      <Project>{95f5d645-19e3-432f-95d4-c5ea374dd15b}</Project>
-      <Name>BenchmarkDotNet.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj">
-      <Project>{b61a2815-4e2f-42f7-a87c-973c488b11ca}</Project>
-      <Name>BenchmarkDotNet.Diagnostics.Windows</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\BenchmarkDotNet.Toolchains.Roslyn\BenchmarkDotNet.Toolchains.Roslyn.csproj">
-      <Project>{f5785871-7e2c-4894-85de-a28eacb1d9b5}</Project>
-      <Name>BenchmarkDotNet.Toolchains.Roslyn</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj">
-      <Project>{af1e6f8a-5c63-465f-96f4-5e5f183a33b9}</Project>
-      <Name>BenchmarkDotNet</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.CustomPaths\BenchmarkDotNet.IntegrationTests.CustomPaths.csproj">
-      <Project>{0031728e-a5d4-47c1-9c1a-6c859a765c9d}</Project>
-      <Name>BenchmarkDotNet.IntegrationTests.CustomPaths</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.DifferentRuntime\BenchmarkDotNet.IntegrationTests.DifferentRuntime.csproj">
-      <Project>{19411154-3ac9-4689-bc2e-9646121ed63d}</Project>
-      <Name>BenchmarkDotNet.IntegrationTests.DifferentRuntime</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.DisabledOptimizations\BenchmarkDotNet.IntegrationTests.DisabledOptimizations.csproj">
-      <Project>{ac2188e5-a140-43e2-8a76-4bdabfe30aba}</Project>
-      <Name>BenchmarkDotNet.IntegrationTests.DisabledOptimizations</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.EnabledOptimizations\BenchmarkDotNet.IntegrationTests.EnabledOptimizations.csproj">
-      <Project>{873581ff-db9d-42e5-8f11-32a4b7bb28ec}</Project>
-      <Name>BenchmarkDotNet.IntegrationTests.EnabledOptimizations</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.FSharp\BenchmarkDotNet.IntegrationTests.FSharp.fsproj">
-      <Project>{367fafe1-a1c8-4aa1-9334-f4762e128dbb}</Project>
-      <Name>BenchmarkDotNet.IntegrationTests.FSharp</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.VisualBasic\BenchmarkDotNet.IntegrationTests.VisualBasic.vbproj">
-      <Project>{d8803eca-4abf-45b8-bd1d-7c637416c448}</Project>
-      <Name>BenchmarkDotNet.IntegrationTests.VisualBasic</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj" />
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Toolchains.Roslyn\BenchmarkDotNet.Toolchains.Roslyn.csproj" />
+    <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.CustomPaths\BenchmarkDotNet.IntegrationTests.CustomPaths.csproj" />
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.DifferentRuntime\BenchmarkDotNet.IntegrationTests.DifferentRuntime.csproj" />
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.DisabledOptimizations\BenchmarkDotNet.IntegrationTests.DisabledOptimizations.csproj" />
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.EnabledOptimizations\BenchmarkDotNet.IntegrationTests.EnabledOptimizations.csproj" />
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.FSharp\BenchmarkDotNet.IntegrationTests.FSharp.fsproj" />
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.VisualBasic\BenchmarkDotNet.IntegrationTests.VisualBasic.vbproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

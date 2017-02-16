@@ -16,4 +16,5 @@
   <ItemGroup>
     <ProjectReference Include="$CSPROJPATH$" />
   </ItemGroup>
+  $RUNTIMESETTINGS$
 </Project>

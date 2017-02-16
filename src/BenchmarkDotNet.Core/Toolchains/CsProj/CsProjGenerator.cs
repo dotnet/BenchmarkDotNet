@@ -1,15 +1,15 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
-using System.Reflection;
-using System.Text;
-using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Toolchains.CsProj
 {
@@ -35,8 +35,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             content = SetTargetFrameworkMoniker(content, TargetFrameworkMoniker);
             content = SetRuntimeIdentifier(content, platform);
             content = content.Replace("$PROGRAMNAME$", artifactsPaths.ProgramName);
-
-            SetGcMode(content, benchmark.Job.Env.Gc, resolver, artifactsPaths);
+            content = content.Replace("$RUNTIMESETTINGS$", GetRuntimeSettings(benchmark.Job.Env.Gc, resolver));
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
         }
@@ -53,32 +52,23 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             var csprojs = solutionRootDirectory.GetFiles(csprojName, SearchOption.AllDirectories);
             if (csprojs.Length != 1)
             {
-                throw new NotSupportedException($"Unable to find single {csprojName} in {solutionRootDirectory} and it's subfolders. Most probably the name of output exe is different than the name of the .csproj");
+                throw new NotSupportedException($"Unable to find single {csprojName} in {solutionRootDirectory} and its subfolders. Most probably the name of output exe is different than the name of the .csproj");
             }
 
             return template.Replace("$CSPROJPATH$", csprojs.Single().FullName);
         }
 
-        private void SetGcMode(string content, GcMode gcMode, IResolver resolver, ArtifactsPaths artifactsPaths)
+        private string GetRuntimeSettings(GcMode gcMode, IResolver resolver)
         {
             if (!gcMode.HasChanges)
-                return;
+                return string.Empty;
 
-            var runtimeConfigContent = new StringBuilder(80)
-                .AppendLine("{")
-                    .AppendLine("\"configProperties\": {")
-                        .Append("\"System.GC.Server\": ")
-                            .Append(gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase())
-                            .AppendLine(",")
-                        .Append("\"System.GC.Concurrent\": ")
-                            .AppendLine(gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver).ToLowerCase())
-                    .AppendLine("}")
-                .AppendLine("}")
+            return new StringBuilder(80)
+                .AppendLine("<PropertyGroup>")
+                    .AppendLine($"<ServerGarbageCollection>{gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase()}</ServerGarbageCollection>")
+                    .AppendLine($"<ConcurrentGarbageCollection>{gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver).ToLowerCase()}</ConcurrentGarbageCollection>")
+                .AppendLine("</PropertyGroup>")
                 .ToString();
-
-            File.WriteAllText(
-                Path.Combine(artifactsPaths.BuildArtifactsDirectoryPath, "runtimeConfig.template.json"),
-                runtimeConfigContent);
         }
 
         private string SetRuntimeIdentifier(string content, string platform)
