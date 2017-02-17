@@ -5,12 +5,12 @@ using System.Reflection;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Running;
 
-namespace BenchmarkDotNet.Toolchains.Classic
+namespace BenchmarkDotNet.Toolchains.Roslyn
 {
-    internal class RoslynGenerator : GeneratorBase
+    internal class Generator : GeneratorBase
     {
         protected override string GetBuildArtifactsDirectoryPath(Benchmark benchmark, string programName)
             => Path.GetDirectoryName(benchmark.Target.Type.GetTypeInfo().Assembly.Location);
@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
             list.Add("/unsafe");
             list.Add("/platform:" + benchmark.Job.ResolveValue(EnvMode.PlatformCharacteristic, resolver).ToConfig());
             list.Add("/appconfig:" + artifactsPaths.AppConfigPath.Escape());
-            var references = GetAllReferences(benchmark).Select(assembly => assembly.Location.Escape());
+            var references = GetAllReferences(benchmark).Select(assembly => StringAndTextExtensions.Escape(assembly.Location));
             list.Add("/reference:" + string.Join(",", references));
             list.Add(Path.GetFileName(artifactsPaths.ProgramCodePath));
 

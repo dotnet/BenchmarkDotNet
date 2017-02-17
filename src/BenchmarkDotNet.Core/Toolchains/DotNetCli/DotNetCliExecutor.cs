@@ -1,6 +1,4 @@
-﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Text;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Diagnosers;
@@ -9,11 +7,12 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.Results;
+using JetBrains.Annotations;
 
-namespace BenchmarkDotNet.Toolchains.CsProj
+namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
+    [PublicAPI]
     public class DotNetCliExecutor : IExecutor
     {
         public ExecuteResult Execute(BuildResult buildResult, Benchmark benchmark, ILogger logger, IResolver resolver, IDiagnoser diagnoser = null)

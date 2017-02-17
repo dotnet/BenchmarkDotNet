@@ -1,7 +1,8 @@
 ﻿using System;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains.Core;
+using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.ProjectJson;
 
 namespace BenchmarkDotNet.Toolchains
 {
@@ -21,12 +22,12 @@ namespace BenchmarkDotNet.Toolchains
                 case Runtime.Clr:
                 case Runtime.Mono:
 #if CLASSIC
-                    return new RoslynToolchain();
+                    return new Roslyn.RoslynToolchain();
 #else
-                    return IsUsingProjectJson() ? new Classic.Net46Toolchain() : CsProj.CsProjToolchain.Net46;
+                    return IsUsingProjectJson() ? ProjectJsonNet46Toolchain.Instance : CsProjNet46Toolchain.Instance;
 #endif
                 case Runtime.Core:
-                    return IsUsingProjectJson() ? CoreToolchain.NetCoreApp11 : CsProj.CsProjToolchain.NetCoreApp11;
+                    return IsUsingProjectJson() ? ProjectJsonCoreToolchain.Current.Value : CsProjCoreToolchain.Current.Value;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtime), runtime, "Runtime not supported");
             }

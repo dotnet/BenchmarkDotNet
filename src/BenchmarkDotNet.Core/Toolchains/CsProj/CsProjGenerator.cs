@@ -10,9 +10,11 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.CsProj
 {
+    [PublicAPI]
     public class CsProjGenerator : DotNetCliGenerator
     {
         public CsProjGenerator(
@@ -40,7 +42,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
         }
 
-        protected override string SetDependencyToExecutingAssembly(string template, Type benchmarkTarget)
+        private string SetDependencyToExecutingAssembly(string template, Type benchmarkTarget)
         {
             if (!GetSolutionRootDirectory(out var solutionRootDirectory))
             {

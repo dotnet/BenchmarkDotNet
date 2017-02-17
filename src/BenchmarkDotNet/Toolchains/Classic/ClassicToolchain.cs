@@ -1,12 +1,14 @@
-﻿namespace BenchmarkDotNet.Toolchains.Classic
+﻿using BenchmarkDotNet.Toolchains.ProjectJson;
+
+namespace BenchmarkDotNet.Toolchains.Classic
 {
     public class ClassicToolchain
     {
         public static readonly IToolchain Instance
 #if CLASSIC
-            = new RoslynToolchain();
+            = new Roslyn.RoslynToolchain();
 #else
-            = new Net46Toolchain();
+            = new ProjectJsonNet46Toolchain();
 #endif
     }
 }

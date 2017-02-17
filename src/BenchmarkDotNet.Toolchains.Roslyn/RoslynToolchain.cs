@@ -2,21 +2,17 @@
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.Classic;
 using JetBrains.Annotations;
 
-namespace BenchmarkDotNet.Toolchains
+namespace BenchmarkDotNet.Toolchains.Roslyn
 {
     /// <summary>
     /// Build a benchmark program with the Roslyn compiler.
     /// </summary>
     public class RoslynToolchain : Toolchain
     {
-        /// <summary>
-        /// Creates new instance of RoslynToolchain.
-        /// </summary>
         [PublicAPI]
-        public RoslynToolchain() : base("Classic", new RoslynGenerator(), new RoslynBuilder(), new Executor())
+        public RoslynToolchain() : base("Roslyn", new Generator(), new Builder(), new Executor())
         {
         }
 
