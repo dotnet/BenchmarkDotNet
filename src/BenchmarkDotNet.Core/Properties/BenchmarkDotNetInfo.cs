@@ -1,16 +1,12 @@
-﻿namespace BenchmarkDotNet.Properties
+﻿using System;
+using System.Reflection;
+
+namespace BenchmarkDotNet.Properties
 {
     public static class BenchmarkDotNetInfo
     {
-        public const string TitleBase = "BenchmarkDotNet";
-        public const string Title = TitleBase + (IsDevelopVersion ? "-Dev" : "");
-        public const string Description = "Powerful .NET library for benchmarking";
-        public const string Copyright = "Copyright © .NET Foundation and contributors 2013–2016";
-        public const string Version = "0.10.1";
-        public const string FullVersion = "0.10.1" + (IsDevelopVersion ? "-develop" : "");
-        public const string FullTitle = Title + " v" + FullVersion;
-
-        public const bool IsDevelopVersion = true; // Set to false for NuGet publishing
+        public static readonly Lazy<string> FullVersion = new Lazy<string>(() => typeof(BenchmarkDotNetInfo).GetTypeInfo().Assembly.GetName().Version.ToString());
+        public static readonly Lazy<string> FullTitle = new Lazy<string>(() => "BenchmarkDotNet v" + FullVersion.Value);
 
         internal const string PublicKey =
             "00240000048000009400000006020000002400005253413100040000010001002970bbdfca4d12" +

@@ -29,14 +29,6 @@ install:
   # remove this when nuget 3.5 will be available on appveyor
   - ps: Start-FileDownload "https://dist.nuget.org/win-x86-commandline/v3.5.0-beta/NuGet.exe"
 
-# enable patching of AssemblyInfo.* files
-assembly_info:
-  patch: true
-  file: AssemblyInfo.*
-  assembly_version: "{version}"
-  assembly_file_version: "{version}"
-  assembly_informational_version: "{version}"
-
 #---------------------------------#
 #       build configuration       #
 #---------------------------------#
@@ -58,10 +50,10 @@ build:
   project: BenchmarkDotNet.sln    # path to Visual Studio solution or project
 
 after_build:
-  - dotnet pack .\src\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj --configuration Release
-  - dotnet pack .\src\BenchmarkDotNet.Toolchains.Roslyn\BenchmarkDotNet.Toolchains.Roslyn.csproj --configuration Release
-  - dotnet pack .\src\BenchmarkDotNet\BenchmarkDotNet.csproj --configuration Release
-  - dotnet pack .\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj --configuration Release
+  - dotnet pack .\src\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj --configuration Release --version-suffix develop-{build}
+  - dotnet pack .\src\BenchmarkDotNet.Toolchains.Roslyn\BenchmarkDotNet.Toolchains.Roslyn.csproj --configuration Release --version-suffix develop-{build}
+  - dotnet pack .\src\BenchmarkDotNet\BenchmarkDotNet.csproj --configuration Release --version-suffix develop-{build}
+  - dotnet pack .\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj --configuration Release --version-suffix develop-{build}
   
 #---------------------------------#
 #       tests configuration       #
@@ -74,7 +66,7 @@ test_script:
 
 test:
   assemblies:
-    - tests\BenchmarkDotNet.IntegrationTests.Classic\bin\$(configuration)\BenchmarkDotNet.IntegrationTests.Classic.exe
+    - tests\BenchmarkDotNet.IntegrationTests.Classic\bin\$(configuration)\BenchmarkDotNet.IntegrationTests.Classic.dll
 
 artifacts:
   - path: '**\BenchmarkDotNet.*.nupkg' # find all NuGet packages recursively

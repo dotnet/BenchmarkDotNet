@@ -1,13 +1,5 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
-using BenchmarkDotNet.Properties;
-
-[assembly: AssemblyTitle(BenchmarkDotNetInfo.Title + ".IntegrationTests.EnabledOptimizations")]
-[assembly: AssemblyProduct(BenchmarkDotNetInfo.Title + ".IntegrationTests.EnabledOptimizations")]
-[assembly: AssemblyDescription(BenchmarkDotNetInfo.Description + " IntegrationTests.EnabledOptimizations")]
-[assembly: AssemblyCopyright(BenchmarkDotNetInfo.Copyright)]
-[assembly: AssemblyVersion(BenchmarkDotNetInfo.Version)]
-[assembly: AssemblyFileVersion(BenchmarkDotNetInfo.Version)]
 
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
