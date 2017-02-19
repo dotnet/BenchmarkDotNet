@@ -378,7 +378,7 @@ namespace BenchmarkDotNet.IntegrationTests
             Equal(string.Join(";", a), "Id;Accuracy;AnalyzeLaunchVariance;EvaluateOverhead;" +
                 "MaxStdErrRelative;MinInvokeCount;MinIterationTime;RemoveOutliers;Env;Affinity;" +
                 "Jit;Platform;Runtime;Gc;AllowVeryLargeObjects;Concurrent;CpuGroups;Force;" +
-                "Server;Infrastructure;Clock;EngineFactory;Toolchain;Run;InvocationCount;IterationTime;" +
+                "RetainVm;Server;Infrastructure;Clock;EngineFactory;Toolchain;Run;InvocationCount;IterationTime;" +
                 "LaunchCount;RunStrategy;TargetCount;UnrollFactor;WarmupCount");
         }
     }
