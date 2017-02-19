@@ -2,10 +2,7 @@
 
 For building the BenchmarkDotNet source-code, the following elements are required:
 
-* [Visual Studio 2015 Update **3**](https://go.microsoft.com/fwlink/?LinkId=691978)
-* [Latest NuGet Manager extension for Visual Studio](https://dist.nuget.org/visualstudio-2015-vsix/v3.5.0-beta/NuGet.Tools.vsix)
-* [.NET Core SDK **1.1**](https://go.microsoft.com/fwlink/?LinkID=835014)
-* [.NET Core 1.0.1 Tooling Preview 2 for Visual Studio 2015](https://go.microsoft.com/fwlink/?LinkID=827546)
+* [Visual Studio 2017 **RC4 or newer** with .NET Core development tools installed](https://www.visualstudio.com/vs/visual-studio-2017/)
 * Internet connection and disk space to download all the required packages
 
 If your build fails because some packages are not available, let say F#, then just disable these project and hope for nuget server to work later on ;)
