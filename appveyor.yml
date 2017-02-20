@@ -51,19 +51,19 @@ build:
   project: BenchmarkDotNet.sln    # path to Visual Studio solution or project
 
 after_build:
-  - dotnet pack .\src\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj --configuration Release --version-suffix develop-{build}
-  - dotnet pack .\src\BenchmarkDotNet.Toolchains.Roslyn\BenchmarkDotNet.Toolchains.Roslyn.csproj --configuration Release --version-suffix develop-{build}
-  - dotnet pack .\src\BenchmarkDotNet\BenchmarkDotNet.csproj --configuration Release --version-suffix develop-{build}
-  - dotnet pack .\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj --configuration Release --version-suffix develop-{build}
+  - dotnet pack .\src\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj --configuration Release
+  - dotnet pack .\src\BenchmarkDotNet.Toolchains.Roslyn\BenchmarkDotNet.Toolchains.Roslyn.csproj --configuration Release
+  - dotnet pack .\src\BenchmarkDotNet\BenchmarkDotNet.csproj --configuration Release
+  - dotnet pack .\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj --configuration Release
   
 #---------------------------------#
 #       tests configuration       #
 #---------------------------------#
 test_script:
-  - dotnet test .\tests\BenchmarkDotNet.Tests\BenchmarkDotNet.Tests.csproj --logger:trx --configuration Release -xml tests-results01.xml
-  - ps: .\build\uploadtests.ps1 "tests-results01.xml"
-  - dotnet test .\tests\BenchmarkDotNet.IntegrationTests\BenchmarkDotNet.IntegrationTests.csproj --logger:trx --configuration Release -xml tests-results02.xml
-  - ps: .\build\uploadtests.ps1 "tests-results02.xml"
+  - dotnet test .\tests\BenchmarkDotNet.Tests\BenchmarkDotNet.Tests.csproj --configuration Release --logger:trx;LogFileName=tests-results01.xml
+  - ps: .\build\uploadtests.ps1 ".\tests\BenchmarkDotNet.Tests\TestResults\tests-results01.xml"
+  - dotnet test .\tests\BenchmarkDotNet.IntegrationTests\BenchmarkDotNet.IntegrationTests.csproj --configuration Release --logger:trx;LogFileName=tests-results02.xml
+  - ps: .\build\uploadtests.ps1 ".\tests\BenchmarkDotNet.IntegrationTests\TestResults\tests-results02.xml"
 
 test:
   assemblies:

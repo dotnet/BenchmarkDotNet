@@ -4,7 +4,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 
@@ -13,7 +12,7 @@ namespace BenchmarkDotNet.Toolchains.ProjectJson
     [PublicAPI]
     public class ProjectJsonNet46Toolchain : Toolchain
     {
-        [PublicAPI] public static readonly IToolchain Instance = new CsProjNet46Toolchain();
+        [PublicAPI] public static readonly IToolchain Instance = new ProjectJsonNet46Toolchain();
 
         // In case somebody calls ClassicToolchain from .NET Core process 
         // we will build the project as 4.6 because it's the most safe way to do it:
