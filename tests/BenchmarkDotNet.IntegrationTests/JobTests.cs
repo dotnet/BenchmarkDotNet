@@ -4,7 +4,7 @@ using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains.Classic;
+using BenchmarkDotNet.Toolchains.CsProj;
 using Xunit;
 using static Xunit.Assert;
 
@@ -355,7 +355,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             a = InfrastructureMode.ToolchainCharacteristic;
             // will not throw:
-            a[j] = ClassicToolchain.Instance;
+            a[j] = new CsProjNet46Toolchain();
             a[j] = null;
             a[j] = Characteristic.EmptyValue;
             Throws<ArgumentException>(() => a[j] = new EnvMode()); // not assignable;

@@ -15,7 +15,7 @@ call dotnet msbuild ../BenchmarkDotNet.sln /t:build /property:Configuration=Rele
 if NOT %ERRORLEVEL% == 0 (	
     echo Error: Build has failed
 	echo Build the solution manually from VS, new msbuild is having problems with F# and VB paths..
-    rem exit /B TODO: uncomment when starts working
+    rem exit /B TODO: uncomment when starts working..
 )
 
 echo -----------------------------
@@ -33,10 +33,10 @@ call ../build/batchcopy.cmd "BenchmarkDotNet.IntegrationTests/bin/Release/net451
 call ../build/batchcopy.cmd "BenchmarkDotNet.Tests/bin/Release/net451/*.*" "output"
 call ../build/batchcopy.cmd "BenchmarkDotNet.IntegrationTests.Classic/bin/Release/*.*" "output"
 call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/Microsoft.Diagnostics.Tracing.TraceEvent/1.0.41/lib/net40" "output"
-call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.runner.console/2.2.0-rc4-build3536/tools" "output"
-call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.extensibility.execution/2.2.0-rc4-build3536/lib/net452" "output"
-call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.extensibility.core/2.2.0-rc4-build3536/lib/netstandard1.1" "output"
-call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.assert/2.2.0-rc4-build3536/lib/netstandard1.1" "output"
+call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.runner.console/2.2.0/tools" "output"
+call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.extensibility.execution/2.2.0/lib/net452" "output"
+call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.extensibility.core/2.2.0/lib/netstandard1.1" "output"
+call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.assert/2.2.0/lib/netstandard1.1" "output"
 
 echo -----------------------------
 echo Copying files ended

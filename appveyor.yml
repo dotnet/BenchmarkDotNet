@@ -44,6 +44,7 @@ os: Visual Studio 2017 RC
 before_build:
   - .\nuget.exe restore
   - dotnet --info
+  - dotnet restore  
 
 build:
   parallel: true                  # enable MSBuild parallel builds

@@ -16,8 +16,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0-preview-20170217-05" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0-rc4-build1270" />
-    <PackageReference Include="xunit" Version="2.2.0-rc4-build3536" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
+    <PackageReference Include="xunit" Version="2.2.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
     <PackageReference Include="System.ComponentModel.EventBasedAsync" Version="4.3.0" />
