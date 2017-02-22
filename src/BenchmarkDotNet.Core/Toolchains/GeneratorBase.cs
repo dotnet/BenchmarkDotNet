@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Toolchains
 
                 GenerateCode(benchmark, artifactsPaths);
                 GenerateAppConfig(benchmark, artifactsPaths, resolver);
-                GenerateProject(benchmark, artifactsPaths, resolver);
+                GenerateProject(benchmark, artifactsPaths, resolver, logger);
                 GenerateBuildScript(benchmark, artifactsPaths, resolver);
 
                 return GenerateResult.Success(artifactsPaths);
@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Toolchains
 
         protected virtual void CopyAllRequiredFiles(ArtifactsPaths artifactsPaths) { }
 
-        protected virtual void GenerateProject(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver) { }
+        protected virtual void GenerateProject(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver, ILogger logger) { }
 
         protected abstract void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver);
 

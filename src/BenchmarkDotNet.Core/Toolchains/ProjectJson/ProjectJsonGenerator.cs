@@ -8,6 +8,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using System.Reflection;
+using BenchmarkDotNet.Loggers;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.ProjectJson
@@ -23,7 +24,7 @@ namespace BenchmarkDotNet.Toolchains.ProjectJson
         protected override string GetProjectFilePath(string binariesDirectoryPath)
             => Path.Combine(binariesDirectoryPath, "project.json");
 
-        protected override void GenerateProject(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)
+        protected override void GenerateProject(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver, ILogger logger)
         {
             string template = ResourceHelper.LoadTemplate("BenchmarkProject.json");
 
