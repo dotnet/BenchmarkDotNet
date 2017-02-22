@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -49,15 +50,22 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 throw new NotSupportedException($"Unable to find .sln or global.json file, hence can not find the csproj path, current directory was {Directory.GetCurrentDirectory()}");
             }
 
-            var assemblyName = benchmarkTarget.GetTypeInfo().Assembly.GetName();
-            var csprojName = $"{assemblyName.Name}.csproj";
-            var csprojs = solutionRootDirectory.GetFiles(csprojName, SearchOption.AllDirectories);
-            if (csprojs.Length != 1)
+            // important assumption! project's file name === output dll name
+            var projectName = benchmarkTarget.GetTypeInfo().Assembly.GetName().Name;
+
+            // I was afraid of using .GetFiles with some smart search pattern due to the fact that the method was designed for Windows
+            // and now .NET is cross platform so who knows if the pattern would be supported for other OSes
+            var possibleNames = new HashSet<string> { $"{projectName}.csproj", $"{projectName}.fsproj" };
+            var projectFile = solutionRootDirectory
+                .EnumerateFiles("*.*", SearchOption.AllDirectories)
+                .FirstOrDefault(file => possibleNames.Contains(file.Name));
+
+            if (projectFile == default(FileInfo))
             {
-                throw new NotSupportedException($"Unable to find single {csprojName} in {solutionRootDirectory} and its subfolders. Most probably the name of output exe is different than the name of the .csproj");
+                throw new NotSupportedException($"Unable to find {projectName} in {solutionRootDirectory.FullName} and its subfolders. Most probably the name of output exe is different than the name of the .(c/f)sproj");
             }
 
-            return template.Replace("$CSPROJPATH$", csprojs.Single().FullName);
+            return template.Replace("$CSPROJPATH$", projectFile.FullName);
         }
 
         private string GetRuntimeSettings(GcMode gcMode, IResolver resolver)
