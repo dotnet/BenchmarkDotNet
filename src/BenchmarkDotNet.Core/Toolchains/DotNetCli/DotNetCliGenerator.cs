@@ -74,7 +74,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// we use custom output path in order to avoid any future problems related to dotnet cli ArtifactsPaths changes
         /// </summary>
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath)
-            => Path.Combine(buildArtifactsDirectoryPath, DotNetCliBuilder.OutputDirectory);
+            => Path.Combine(buildArtifactsDirectoryPath, "bin", DotNetCliBuilder.Configuration, TargetFrameworkMoniker);
 
         protected override void Cleanup(ArtifactsPaths artifactsPaths)
         {

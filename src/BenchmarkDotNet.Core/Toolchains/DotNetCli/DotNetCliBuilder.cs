@@ -13,9 +13,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     {
         internal const string RestoreCommand = "restore";
 
-        private const string Configuration = "Release";
-
-        internal const string OutputDirectory = "binaries";
+        internal const string Configuration = "Release";
 
         private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMinutes(2);
 
@@ -62,6 +60,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         public static string GetBuildCommand(string frameworkMoniker)
-            => $"build --framework {frameworkMoniker} --configuration {Configuration} --output {OutputDirectory}";
+            => $"build --framework {frameworkMoniker} --configuration {Configuration}";
     }
 }
