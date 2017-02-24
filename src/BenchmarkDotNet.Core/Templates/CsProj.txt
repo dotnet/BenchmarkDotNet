@@ -6,6 +6,7 @@
     <PlatformTarget>$PLATFORM$</PlatformTarget>
     <AssemblyName>$PROGRAMNAME$</AssemblyName>
     <OutputType>Exe</OutputType>
+    <OutputPath>bin\Release</OutputPath>
     $RUNTIMEID$
   </PropertyGroup>
 

@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             var buildResult = Build(generateResult);
 
-            logger.WriteLineInfo($"dotnet build took {restoreResult.ExecutionTime.TotalSeconds}s");
+            logger.WriteLineInfo($"dotnet build took {buildResult.ExecutionTime.TotalSeconds}s");
 
             if (!buildResult.IsSuccess)
             {

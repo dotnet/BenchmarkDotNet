@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             var executableName = $"{buildResult.ArtifactsPaths.ProgramName}.dll";
             if (!File.Exists(Path.Combine(buildResult.ArtifactsPaths.BinariesDirectoryPath, executableName)))
             {
-                logger.WriteError($"Did not find {executableName} in {buildResult.ArtifactsPaths.BinariesDirectoryPath}, but the folder contained:");
+                logger.WriteLineError($"Did not find {executableName} in {buildResult.ArtifactsPaths.BinariesDirectoryPath}, but the folder contained:");
                 foreach (var file in new DirectoryInfo(buildResult.ArtifactsPaths.BinariesDirectoryPath).GetFiles("*.*"))
                     logger.WriteLineError(file.Name);
                 
