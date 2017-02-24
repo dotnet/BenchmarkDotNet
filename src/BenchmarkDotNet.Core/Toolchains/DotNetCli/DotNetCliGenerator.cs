@@ -113,7 +113,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         protected override void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)
         {
             string content = $"call dotnet {DotNetCliBuilder.RestoreCommand}{Environment.NewLine}" +
-                             $"call dotnet {DotNetCliBuilder.GetBuildCommand(TargetFrameworkMoniker)}";
+                             $"call dotnet {DotNetCliBuilder.GetBuildCommand(TargetFrameworkMoniker, justTheProjectItself: false)}";
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
         }

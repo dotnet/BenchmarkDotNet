@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public class DotNetCliBuilder : IBuilder
     {
-        internal const string RestoreCommand = "restore";
+        internal const string RestoreCommand = "restore --no-dependencies";
 
         internal const string Configuration = "Release";
 
@@ -40,9 +40,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 return BuildResult.Failure(generateResult, new Exception(restoreResult.ProblemDescription));
             }
 
-            var buildResult = DotNetCliCommandExecutor.ExecuteCommand(
-                GetBuildCommand(TargetFrameworkMoniker),
-                generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
+            var buildResult = Build(generateResult);
 
             logger.WriteLineInfo($"dotnet build took {restoreResult.ExecutionTime.TotalSeconds}s");
 
@@ -61,7 +59,26 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return BuildResult.Success(generateResult);
         }
 
-        internal static string GetBuildCommand(string frameworkMoniker)
-            => $"build --framework {frameworkMoniker} --configuration {Configuration}";
+        private DotNetCliCommandExecutor.CommandResult Build(GenerateResult generateResult)
+        {
+            var withoutDependencies = DotNetCliCommandExecutor.ExecuteCommand(
+                GetBuildCommand(TargetFrameworkMoniker, justTheProjectItself: true),
+                generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
+
+            // at first we try to build the project without it's dependencies to save a LOT of time
+            // in 99% of the cases it will work (the host process is running so it must be compiled!)
+            if (withoutDependencies.IsSuccess)
+                return withoutDependencies;
+
+            // but the host process might have different runtime or was build in Debug, not Release, 
+            // which requires all dependencies to be build anyway
+            return DotNetCliCommandExecutor.ExecuteCommand(
+                GetBuildCommand(TargetFrameworkMoniker, justTheProjectItself: false),
+                generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
+        }
+
+        internal static string GetBuildCommand(string frameworkMoniker, bool justTheProjectItself)
+            => $"build --framework {frameworkMoniker} --configuration {Configuration}"
+                + (justTheProjectItself ? " --no-dependencies" : string.Empty);
     }
 }
