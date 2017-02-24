@@ -21,7 +21,10 @@ namespace BenchmarkDotNet.Environments
 
         public string BenchmarkDotNetVersion { get; }
 
-        public string OsVersion { get; }
+        /// <summary>
+        /// Could be expensive
+        /// </summary>
+        public Lazy<string> OsVersion { get; }
 
         /// <summary>
         /// is expensive to call (1s)
@@ -54,9 +57,9 @@ namespace BenchmarkDotNet.Environments
         {
             BenchmarkDotNetCaption = GetBenchmarkDotNetCaption();
             BenchmarkDotNetVersion = GetBenchmarkDotNetVersion();
-            OsVersion = RuntimeInformation.GetOsVersion();
+            OsVersion = new Lazy<string>(RuntimeInformation.GetOsVersion);
             ProcessorName = new Lazy<string>(RuntimeInformation.GetProcessorName);
-            ProcessorCount = System.Environment.ProcessorCount;
+            ProcessorCount = Environment.ProcessorCount;
             ChronometerFrequency = Chronometer.Frequency;
             HardwareTimerKind = Chronometer.HardwareTimerKind;
             JitModules = RuntimeInformation.GetJitModulesInfo();
