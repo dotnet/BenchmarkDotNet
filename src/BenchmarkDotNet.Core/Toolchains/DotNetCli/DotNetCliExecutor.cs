@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Diagnosers;
@@ -17,11 +18,21 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     {
         public ExecuteResult Execute(BuildResult buildResult, Benchmark benchmark, ILogger logger, IResolver resolver, IDiagnoser diagnoser = null)
         {
+            var executableName = $"{buildResult.ArtifactsPaths.ProgramName}.dll";
+            if (!File.Exists(Path.Combine(buildResult.ArtifactsPaths.BinariesDirectoryPath, executableName)))
+            {
+                logger.WriteError($"Did not find {executableName} in {buildResult.ArtifactsPaths.BinariesDirectoryPath}, but the folder contained:");
+                foreach (var file in new DirectoryInfo(buildResult.ArtifactsPaths.BinariesDirectoryPath).GetFiles("*.*"))
+                    logger.WriteLineError(file.Name);
+                
+                return new ExecuteResult(false, -1, new string[0], new string[0]);
+            }
+
             ConsoleHandler.EnsureInitialized(logger);
 
             try
             {
-                return Execute(benchmark, logger, buildResult.ArtifactsPaths, diagnoser);
+                return Execute(benchmark, logger, buildResult.ArtifactsPaths, diagnoser, executableName);
             }
             finally
             {
@@ -29,13 +40,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        private ExecuteResult Execute(Benchmark benchmark, ILogger logger, ArtifactsPaths artifactsPaths, IDiagnoser diagnoser)
+        private ExecuteResult Execute(Benchmark benchmark, ILogger logger, ArtifactsPaths artifactsPaths, IDiagnoser diagnoser, string executableName)
         {
             using (var process = new Process
             {
                 StartInfo = DotNetCliCommandExecutor.BuildStartInfo(
                     artifactsPaths.BinariesDirectoryPath, 
-                    BuildArgs(diagnoser, artifactsPaths))
+                    BuildArgs(diagnoser, executableName))
             })
             {
                 var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmark);
@@ -69,11 +80,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        private static string BuildArgs(IDiagnoser diagnoser, ArtifactsPaths artifactsPaths)
+        private static string BuildArgs(IDiagnoser diagnoser, string executableName)
         {
             var args = new StringBuilder(50);
 
-            args.AppendFormat("{0}.dll", artifactsPaths.ProgramName);
+            args.AppendFormat(executableName);
 
             if (diagnoser != null)
             {
