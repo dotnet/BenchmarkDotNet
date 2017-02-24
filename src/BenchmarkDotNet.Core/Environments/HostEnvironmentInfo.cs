@@ -13,11 +13,11 @@ namespace BenchmarkDotNet.Environments
     // you can finde the source code at Templates\BenchmarkProgram.txt
     public sealed class HostEnvironmentInfo : BenchmarkEnvironmentInfo
     {
+        public const string BenchmarkDotNetCaption = "BenchmarkDotNet";
+
         public static readonly CultureInfo MainCultureInfo;
 
         private static HostEnvironmentInfo Current;
-
-        public string BenchmarkDotNetCaption { get; }
 
         public string BenchmarkDotNetVersion { get; }
 
@@ -55,7 +55,6 @@ namespace BenchmarkDotNet.Environments
 
         private HostEnvironmentInfo()
         {
-            BenchmarkDotNetCaption = GetBenchmarkDotNetCaption();
             BenchmarkDotNetVersion = GetBenchmarkDotNetVersion();
             OsVersion = new Lazy<string>(RuntimeInformation.GetOsVersion);
             ProcessorName = new Lazy<string>(RuntimeInformation.GetProcessorName);
@@ -82,7 +81,6 @@ namespace BenchmarkDotNet.Environments
 
         internal bool IsDotNetCliInstalled() => !string.IsNullOrEmpty(DotNetCliVersion.Value);
 
-        private static string GetBenchmarkDotNetCaption() => "BenchmarkDotNet";
         private static string GetBenchmarkDotNetVersion() => BenchmarkDotNetInfo.FullVersion.Value;
     }
 }

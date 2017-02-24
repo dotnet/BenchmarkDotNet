@@ -5,7 +5,9 @@ namespace BenchmarkDotNet.Properties
 {
     public static class BenchmarkDotNetInfo
     {
-        public static readonly Lazy<string> FullVersion = new Lazy<string>(() => typeof(BenchmarkDotNetInfo).GetTypeInfo().Assembly.GetName().Version.ToString());
+        public const bool IsDevelopVersion = true; // Set to false for NuGet publishing
+
+        public static readonly Lazy<string> FullVersion = new Lazy<string>(() => typeof(BenchmarkDotNetInfo).GetTypeInfo().Assembly.GetName().Version.ToString() + (IsDevelopVersion ? "-develop" : ""));
         public static readonly Lazy<string> FullTitle = new Lazy<string>(() => "BenchmarkDotNet v" + FullVersion.Value);
 
         internal const string PublicKey =

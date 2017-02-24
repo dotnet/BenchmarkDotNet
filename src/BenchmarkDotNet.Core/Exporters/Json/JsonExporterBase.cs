@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Reports;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Environments;
 using JsonSerialiser = SimpleJson.SimpleJson;
 
 namespace BenchmarkDotNet.Exporters.Json
@@ -25,7 +26,7 @@ namespace BenchmarkDotNet.Exporters.Json
             // SimpleJson serialiser doesn't seem to have an enum String/Value option (to-be-fair, it is meant to be "Simple")
             var environmentInfo = new
             {
-                summary.HostEnvironmentInfo.BenchmarkDotNetCaption,
+                HostEnvironmentInfo.BenchmarkDotNetCaption,
                 summary.HostEnvironmentInfo.BenchmarkDotNetVersion,
                 summary.HostEnvironmentInfo.OsVersion,
                 summary.HostEnvironmentInfo.ProcessorName,

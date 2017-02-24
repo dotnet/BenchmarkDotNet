@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return Path.Combine(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.FullName, programName);
         }
 
-        protected bool GetSolutionRootDirectory(out DirectoryInfo directoryInfo)
+        internal static bool GetSolutionRootDirectory(out DirectoryInfo directoryInfo)
         {
             directoryInfo = new DirectoryInfo(Directory.GetCurrentDirectory());
             while (directoryInfo != null)

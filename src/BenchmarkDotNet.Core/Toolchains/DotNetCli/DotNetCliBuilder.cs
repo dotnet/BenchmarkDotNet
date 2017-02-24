@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 RestoreCommand,
                 generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
 
-            logger.WriteLineInfo($"dotnet restore took {restoreResult.ExecutionTime.TotalSeconds}s");
+            logger.WriteLineInfo($"// dotnet restore took {restoreResult.ExecutionTime.TotalSeconds:0.##}s");
 
             if (!restoreResult.IsSuccess)
             {
@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             var buildResult = Build(generateResult);
 
-            logger.WriteLineInfo($"dotnet build took {buildResult.ExecutionTime.TotalSeconds}s");
+            logger.WriteLineInfo($"// dotnet build took {buildResult.ExecutionTime.TotalSeconds:0.##}s");
 
             if (!buildResult.IsSuccess)
             {
