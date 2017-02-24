@@ -51,12 +51,18 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 }
 
                 loggerWithDiagnoser.ProcessInput();
+                string standardError = process.StandardError.ReadToEnd();
 
                 process.WaitForExit(); // should we add timeout here?
 
                 if (process.ExitCode == 0)
                 {
                     return new ExecuteResult(true, process.ExitCode, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
+                }
+
+                if (!string.IsNullOrEmpty(standardError))
+                {
+                    logger.WriteError(standardError);
                 }
 
                 return new ExecuteResult(true, process.ExitCode, new string[0], new string[0]);

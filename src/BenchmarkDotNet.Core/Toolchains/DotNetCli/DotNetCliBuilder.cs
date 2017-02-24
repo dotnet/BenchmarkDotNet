@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Loggers;
@@ -15,8 +15,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         internal const string Configuration = "Release";
 
-        private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMinutes(2);
-
         private string TargetFrameworkMoniker { get; }
 
         [PublicAPI]
@@ -31,20 +29,24 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// </summary>
         public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark, IResolver resolver)
         {
-            if (!DotNetCliCommandExecutor.ExecuteCommand(
+            var restoreResult = DotNetCliCommandExecutor.ExecuteCommand(
                 RestoreCommand,
-                generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath,
-                logger,
-                DefaultTimeout))
+                generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
+
+            logger.WriteLineInfo($"dotnet restore took {restoreResult.ExecutionTime.TotalSeconds}s");
+
+            if (!restoreResult.IsSuccess)
             {
-                return BuildResult.Failure(generateResult, new Exception("dotnet restore has failed"));
+                return BuildResult.Failure(generateResult, new Exception(restoreResult.ProblemDescription));
             }
 
-            if (!DotNetCliCommandExecutor.ExecuteCommand(
+            var buildResult = DotNetCliCommandExecutor.ExecuteCommand(
                 GetBuildCommand(TargetFrameworkMoniker),
-                generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath,
-                logger,
-                DefaultTimeout))
+                generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
+
+            logger.WriteLineInfo($"dotnet build took {restoreResult.ExecutionTime.TotalSeconds}s");
+
+            if (!buildResult.IsSuccess)
             {
                 // dotnet cli could have succesfully builded the program, but returned 1 as exit code because it had some warnings
                 // so we need to check whether the exe exists or not, if it does then it is OK
@@ -53,13 +55,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     return BuildResult.Success(generateResult);
                 }
 
-                return BuildResult.Failure(generateResult);
+                return BuildResult.Failure(generateResult, new Exception(buildResult.ProblemDescription));
             }
 
             return BuildResult.Success(generateResult);
         }
 
-        public static string GetBuildCommand(string frameworkMoniker)
+        internal static string GetBuildCommand(string frameworkMoniker)
             => $"build --framework {frameworkMoniker} --configuration {Configuration}";
     }
 }

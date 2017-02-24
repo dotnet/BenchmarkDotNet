@@ -1,33 +1,63 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
-using BenchmarkDotNet.Loggers;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
-    [PublicAPI]
-    public class DotNetCliCommandExecutor
+    internal class DotNetCliCommandExecutor
     {
-        [PublicAPI]
-        public static bool ExecuteCommand(string commandWithArguments, string workingDirectory, ILogger logger, TimeSpan timeout)
+        internal struct CommandResult
+        {
+            public bool IsSuccess { get; }
+
+            public TimeSpan ExecutionTime { get; }
+
+            public string StandardOutput { get; }
+
+            public string StandardError { get; }
+
+            /// <summary>
+            /// in theory, all errors should be reported to standard error, 
+            /// but sometimes they are not so we can at least return 
+            /// standard output which hopefully will contain some useful information
+            /// </summary>
+            public string ProblemDescription => HasNonEmptyErrorMessage ? StandardError : StandardOutput;
+
+            public bool HasNonEmptyErrorMessage => !string.IsNullOrEmpty(StandardError);
+
+            private CommandResult(bool isSuccess, TimeSpan executionTime, string standardOutput, string standardError)
+            {
+                IsSuccess = isSuccess;
+                ExecutionTime = executionTime;
+                StandardOutput = standardOutput;
+                StandardError = standardError;
+            }
+
+            public static CommandResult Success(TimeSpan time, string standardOutput)
+                => new CommandResult(true, time, standardOutput, string.Empty);
+
+            public static CommandResult Failure(TimeSpan time, string standardError, string standardOutput)
+                => new CommandResult(false, time, standardOutput, standardError);
+        }
+
+        internal static CommandResult ExecuteCommand(string commandWithArguments, string workingDirectory)
         {
             using (var process = new Process { StartInfo = BuildStartInfo(workingDirectory, commandWithArguments) })
             {
-                using (new AsyncErrorOutputLogger(logger, process))
-                {
-                    process.Start();
+                var stopwatch = Stopwatch.StartNew();
+                process.Start();
 
-                    // don't forget to call, otherwise logger will not get any events
-                    process.BeginErrorReadLine();
-                    process.BeginOutputReadLine();
+                var standardOutput = process.StandardOutput.ReadToEnd();
+                var standardError = process.StandardError.ReadToEnd();
 
-                    process.WaitForExit((int)timeout.TotalMilliseconds);
+                process.WaitForExit();
+                stopwatch.Stop();
 
-                    return process.ExitCode <= 0;
-                }
+                return process.ExitCode <= 0
+                    ? CommandResult.Success(stopwatch.Elapsed, standardOutput)
+                    : CommandResult.Failure(stopwatch.Elapsed, standardError, standardOutput);
             }
         }
 

@@ -32,8 +32,7 @@ namespace BenchmarkDotNet.IntegrationTests
                                 .With(new Job(Job.Dry, EnvMode.Core))
                                 .With(new Job(Job.Dry, EnvMode.Clr))
                                 .With(DefaultColumnProviders.Instance)
-                                .With(new OutputLogger(output))
-                                .KeepBenchmarkFiles());
+                                .With(new OutputLogger(output)));
 
             Assert.True(summary.Reports
                 .All(report => report.ExecuteResults
