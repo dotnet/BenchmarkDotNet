@@ -8,19 +8,18 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
-    [PublicAPI("Used by some of our Superusers that implement their own Toolchains (e.g. Kestrel team)")]
+    [PublicAPI]
     public class DotNetCliBuilder : IBuilder
     {
         internal const string RestoreCommand = "restore";
 
-        private const string Configuration = "Release";
-
-        internal const string OutputDirectory = "binaries";
+        internal const string Configuration = "Release";
 
         private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMinutes(2);
 
         private string TargetFrameworkMoniker { get; }
 
+        [PublicAPI]
         public DotNetCliBuilder(string targetFrameworkMoniker)
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
@@ -33,9 +32,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark, IResolver resolver)
         {
             if (!DotNetCliCommandExecutor.ExecuteCommand(
-                RestoreCommand, 
-                generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, 
-                logger, 
+                RestoreCommand,
+                generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath,
+                logger,
                 DefaultTimeout))
             {
                 return BuildResult.Failure(generateResult, new Exception("dotnet restore has failed"));
@@ -43,7 +42,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             if (!DotNetCliCommandExecutor.ExecuteCommand(
                 GetBuildCommand(TargetFrameworkMoniker),
-                generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, 
+                generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath,
                 logger,
                 DefaultTimeout))
             {
@@ -60,9 +59,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return BuildResult.Success(generateResult);
         }
 
-        internal static string GetBuildCommand(string frameworkMoniker)
-        {
-            return $"build --framework {frameworkMoniker} --configuration {Configuration} --output {OutputDirectory}";
-        }
+        public static string GetBuildCommand(string frameworkMoniker)
+            => $"build --framework {frameworkMoniker} --configuration {Configuration}";
     }
 }

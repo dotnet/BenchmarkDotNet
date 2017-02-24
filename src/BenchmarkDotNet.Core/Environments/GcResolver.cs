@@ -14,6 +14,7 @@ namespace BenchmarkDotNet.Environments
             Register(GcMode.CpuGroupsCharacteristic, () => false);
             Register(GcMode.ForceCharacteristic, () => true);
             Register(GcMode.AllowVeryLargeObjectsCharacteristic, () => false);
+            Register(GcMode.RetainVmCharacteristic, () => false); // Maoni0: "The default is false" https://github.com/dotnet/docs/issues/878#issuecomment-248986456
         }
     }
 }

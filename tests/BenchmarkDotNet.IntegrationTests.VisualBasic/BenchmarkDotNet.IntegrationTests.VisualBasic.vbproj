@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -10,7 +10,7 @@
     <AssemblyName>BenchmarkDotNet.IntegrationTests.VisualBasic</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -52,20 +52,6 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="BenchmarkDotNet.Core" Condition="'$(Configuration)'=='Release'">
-      <HintPath>..\..\src\BenchmarkDotNet.Core\bin\Release\net45\BenchmarkDotNet.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="BenchmarkDotNet.Core" Condition="'$(Configuration)'=='Debug'">
-      <HintPath>..\..\src\BenchmarkDotNet.Core\bin\Debug\net45\BenchmarkDotNet.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="BenchmarkDotNet" Condition="'$(Configuration)'=='Release'">
-      <HintPath>..\..\src\BenchmarkDotNet\bin\Release\net45\BenchmarkDotNet.dll</HintPath>
-    </Reference>
-    <Reference Include="BenchmarkDotNet" Condition="'$(Configuration)'=='Debug'">
-      <HintPath>..\..\src\BenchmarkDotNet\bin\Debug\net45\BenchmarkDotNet.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
     <Import Include="System" />
     <Import Include="System.Collections" />
@@ -79,6 +65,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Sample.vb" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj">
+      <Project>{95f5d645-19e3-432f-95d4-c5ea374dd15b}</Project>
+      <Name>BenchmarkDotNet.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj">
+      <Project>{af1e6f8a-5c63-465f-96f4-5e5f183a33b9}</Project>
+      <Name>BenchmarkDotNet</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

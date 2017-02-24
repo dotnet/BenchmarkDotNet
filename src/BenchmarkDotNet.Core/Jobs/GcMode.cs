@@ -11,6 +11,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<bool> CpuGroupsCharacteristic = Characteristic.Create((GcMode g) => g.CpuGroups);
         public static readonly Characteristic<bool> ForceCharacteristic = Characteristic.Create((GcMode g) => g.Force);
         public static readonly Characteristic<bool> AllowVeryLargeObjectsCharacteristic = Characteristic.Create((GcMode g) => g.AllowVeryLargeObjects);
+        public static readonly Characteristic<bool> RetainVmCharacteristic = Characteristic.Create((GcMode g) => g.RetainVm);
 
         /// <summary>
         /// Specifies whether the common language runtime runs server garbage collection.
@@ -65,6 +66,16 @@ namespace BenchmarkDotNet.Jobs
         {
             get { return AllowVeryLargeObjectsCharacteristic[this]; }
             set { AllowVeryLargeObjectsCharacteristic[this] = value; }
+        }
+
+        /// <summary>
+        /// Put segments that should be deleted on a standby list for future use instead of releasing them back to the OS
+        /// <remarks>The default is false</remarks>
+        /// </summary>
+        public bool RetainVm
+        {
+            get { return RetainVmCharacteristic[this]; }
+            set { RetainVmCharacteristic[this] = value; }
         }
     }
 }

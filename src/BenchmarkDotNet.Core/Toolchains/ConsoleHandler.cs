@@ -8,6 +8,9 @@ namespace BenchmarkDotNet.Toolchains
 {
     internal class ConsoleHandler
     {
+        // This needs to be static, so that we can share a single handler amongst all instances of Executor's
+        internal static ConsoleHandler Instance;
+
         public ConsoleCancelEventHandler EventHandler { get; private set; }
 
         private Process process;
@@ -17,6 +20,15 @@ namespace BenchmarkDotNet.Toolchains
         {
             this.logger = logger;
             EventHandler = new ConsoleCancelEventHandler(HandlerCallback);
+        }
+
+        public static void EnsureInitialized(ILogger logger)
+        {
+            if (Instance == null)
+            {
+                Instance = new ConsoleHandler(logger);
+                Console.CancelKeyPress += Instance.EventHandler;
+            }
         }
 
         public void SetProcess(Process process)

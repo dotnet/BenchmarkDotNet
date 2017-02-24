@@ -1,13 +1,5 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
-using BenchmarkDotNet.Properties;
-
-[assembly: AssemblyTitle(BenchmarkDotNetInfo.Title + ".IntegrationTests.DifferentRuntime")]
-[assembly: AssemblyProduct(BenchmarkDotNetInfo.Title + ".IntegrationTests.DifferentRuntime")]
-[assembly: AssemblyDescription(BenchmarkDotNetInfo.Description + " IntegrationTests.DifferentRuntime")]
-[assembly: AssemblyCopyright(BenchmarkDotNetInfo.Copyright)]
-[assembly: AssemblyVersion(BenchmarkDotNetInfo.Version)]
-[assembly: AssemblyFileVersion(BenchmarkDotNetInfo.Version)]
 
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]

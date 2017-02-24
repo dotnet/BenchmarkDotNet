@@ -1,18 +1,18 @@
-﻿using System.IO;
-using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.Results;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis;
-using System;
+﻿using System;
+using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.Results;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using OurPlatform = BenchmarkDotNet.Environments.Platform;
 
-namespace BenchmarkDotNet.Toolchains.Classic
+namespace BenchmarkDotNet.Toolchains.Roslyn
 {
-    internal class RoslynBuilder : IBuilder
+    internal class Builder : IBuilder
     {
         private static readonly Lazy<AssemblyMetadata[]> FrameworkAssembliesMetadata = new Lazy<AssemblyMetadata[]>(GetFrameworkAssembliesMetadata);
 
@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Toolchains.Classic
                 platform: GetPlatform(benchmark.Job.ResolveValue(EnvMode.PlatformCharacteristic, resolver)),
                 deterministic: true);
 
-            var references = RoslynGenerator
+            var references = Generator
                 .GetAllReferences(benchmark)
                 .Select(assembly => AssemblyMetadata.CreateFromFile(assembly.Location))
                 .Concat(FrameworkAssembliesMetadata.Value)

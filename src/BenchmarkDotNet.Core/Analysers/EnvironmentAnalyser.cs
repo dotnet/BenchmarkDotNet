@@ -16,8 +16,8 @@ namespace BenchmarkDotNet.Analysers
 
         public override IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report)
         {
-            if (report.Benchmark.Target.Type.GetTypeInfo().Assembly.IsDebug().IsTrue())
-                yield return CreateWarning("Benchmark was built in DEBUG configuration. Please, build it in RELEASE.", report);
+            if (report.Benchmark.Target.Type.GetTypeInfo().Assembly.IsJitOptimizationDisabled().IsTrue())
+                yield return CreateWarning("Benchmark was built without optimization enabled (most probably a DEBUG configuration). Please, build it in RELEASE.", report);
         }
 
         public override IEnumerable<Conclusion> AnalyseSummary(Summary summary)

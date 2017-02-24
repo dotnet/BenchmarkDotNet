@@ -29,14 +29,6 @@ install:
   # remove this when nuget 3.5 will be available on appveyor
   - ps: Start-FileDownload "https://dist.nuget.org/win-x86-commandline/v3.5.0-beta/NuGet.exe"
 
-# enable patching of AssemblyInfo.* files
-assembly_info:
-  patch: true
-  file: AssemblyInfo.*
-  assembly_version: "{version}"
-  assembly_file_version: "{version}"
-  assembly_informational_version: "{version}"
-
 #---------------------------------#
 #       build configuration       #
 #---------------------------------#
@@ -47,35 +39,35 @@ platform: Any CPU
 # build Configuration, i.e. Debug, Release, etc.
 configuration: Release
 
-os: Visual Studio 2015
+os: Visual Studio 2017 RC
 
 before_build:
-  - ps: .\build\version.ps1
   - .\nuget.exe restore
   - dotnet --info
+  - dotnet restore  
 
 build:
   parallel: true                  # enable MSBuild parallel builds
   project: BenchmarkDotNet.sln    # path to Visual Studio solution or project
 
 after_build:
-  - dotnet pack .\src\BenchmarkDotNet.Core\project.json --configuration Release
-  - dotnet pack .\src\BenchmarkDotNet.Toolchains.Roslyn\project.json --configuration Release
-  - dotnet pack .\src\BenchmarkDotNet\project.json --configuration Release
-  - dotnet pack .\src\BenchmarkDotNet.Diagnostics.Windows\project.json --configuration Release
+  - dotnet pack .\src\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj --configuration Release
+  - dotnet pack .\src\BenchmarkDotNet.Toolchains.Roslyn\BenchmarkDotNet.Toolchains.Roslyn.csproj --configuration Release
+  - dotnet pack .\src\BenchmarkDotNet\BenchmarkDotNet.csproj --configuration Release
+  - dotnet pack .\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj --configuration Release
   
 #---------------------------------#
 #       tests configuration       #
 #---------------------------------#
 test_script:
-  - dotnet test .\tests\BenchmarkDotNet.Tests\project.json --configuration Release -xml tests-results01.xml
-  - ps: .\build\uploadtests.ps1 "tests-results01.xml"
-  - dotnet test .\tests\BenchmarkDotNet.IntegrationTests\project.json --configuration Release -xml tests-results02.xml
-  - ps: .\build\uploadtests.ps1 "tests-results02.xml"
+  - dotnet test .\tests\BenchmarkDotNet.Tests\BenchmarkDotNet.Tests.csproj --configuration Release --logger:trx;LogFileName=tests-results01.xml
+  - ps: .\build\uploadtests.ps1 ".\tests\BenchmarkDotNet.Tests\TestResults\tests-results01.xml"
+  - dotnet test .\tests\BenchmarkDotNet.IntegrationTests\BenchmarkDotNet.IntegrationTests.csproj --configuration Release --logger:trx;LogFileName=tests-results02.xml
+  - ps: .\build\uploadtests.ps1 ".\tests\BenchmarkDotNet.IntegrationTests\TestResults\tests-results02.xml"
 
 test:
   assemblies:
-    - tests\BenchmarkDotNet.IntegrationTests.Classic\bin\$(configuration)\BenchmarkDotNet.IntegrationTests.Classic.exe
+    - tests\BenchmarkDotNet.IntegrationTests.Classic\bin\$(configuration)\BenchmarkDotNet.IntegrationTests.Classic.dll
 
 artifacts:
   - path: '**\BenchmarkDotNet.*.nupkg' # find all NuGet packages recursively

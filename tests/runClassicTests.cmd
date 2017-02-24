@@ -11,17 +11,11 @@ echo -----------------------------
 echo Starting Build
 echo -----------------------------
 
-set _msbuildexe="%ProgramFiles%\MSBuild\14.0\Bin\MSBuild.exe"
-if not exist %_msbuildexe% set _msbuildexe="%ProgramFiles(x86)%\MSBuild\14.0\Bin\MSBuild.exe"
-if not exist %_msbuildexe% (
-	echo Error: Could not find MSBuild.exe.
-	exit /B
-)
-
-call %_msbuildexe% ../BenchmarkDotNet.sln /t:build /property:Configuration=Release
+call dotnet msbuild ../BenchmarkDotNet.sln /t:build /property:Configuration=Release
 if NOT %ERRORLEVEL% == 0 (	
     echo Error: Build has failed
-    exit /B
+	echo Build the solution manually from VS, new msbuild is having problems with F# and VB paths..
+    rem exit /B TODO: uncomment when starts working..
 )
 
 echo -----------------------------
@@ -39,10 +33,10 @@ call ../build/batchcopy.cmd "BenchmarkDotNet.IntegrationTests/bin/Release/net451
 call ../build/batchcopy.cmd "BenchmarkDotNet.Tests/bin/Release/net451/*.*" "output"
 call ../build/batchcopy.cmd "BenchmarkDotNet.IntegrationTests.Classic/bin/Release/*.*" "output"
 call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/Microsoft.Diagnostics.Tracing.TraceEvent/1.0.41/lib/net40" "output"
-call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.runner.console/2.2.0-beta2-build3300/tools" "output"
-call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.extensibility.execution/2.2.0-beta2-build3300/lib/net45" "output"
-call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.extensibility.core/2.2.0-beta2-build3300/lib/net45" "output"
-call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.assert/2.2.0-beta2-build3300/lib/netstandard1.0" "output"
+call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.runner.console/2.2.0/tools" "output"
+call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.extensibility.execution/2.2.0/lib/net452" "output"
+call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.extensibility.core/2.2.0/lib/netstandard1.1" "output"
+call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.assert/2.2.0/lib/netstandard1.1" "output"
 
 echo -----------------------------
 echo Copying files ended

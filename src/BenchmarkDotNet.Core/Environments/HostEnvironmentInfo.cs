@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Environments
         public string JitModules { get; }
 
         /// <summary>
-        /// is expensive to call (creates new process)
+        /// is expensive to call (creates new process by calling dotnet --version)
         /// </summary>
         public Lazy<string> DotNetCliVersion { get; }
 
@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.Environments
 
         internal bool IsDotNetCliInstalled() => !string.IsNullOrEmpty(DotNetCliVersion.Value);
 
-        private static string GetBenchmarkDotNetCaption() => BenchmarkDotNetInfo.TitleBase;
-        private static string GetBenchmarkDotNetVersion() => BenchmarkDotNetInfo.FullVersion;
+        private static string GetBenchmarkDotNetCaption() => "BenchmarkDotNet";
+        private static string GetBenchmarkDotNetVersion() => BenchmarkDotNetInfo.FullVersion.Value;
     }
 }

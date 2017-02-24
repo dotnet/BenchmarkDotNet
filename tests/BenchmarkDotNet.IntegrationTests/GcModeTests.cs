@@ -16,6 +16,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public GcModeTests(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
         private IConfig CreateConfig(GcMode gc) => ManualConfig.CreateEmpty().With(new Job(Job.Dry, gc));
+
         [Fact]
         public void CanHostGcMode()
         {

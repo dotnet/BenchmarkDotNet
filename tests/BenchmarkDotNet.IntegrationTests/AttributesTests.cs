@@ -36,8 +36,8 @@ namespace BenchmarkDotNet.IntegrationTests
             [CustomBenchmark]
             public void Benchmark()
             {
-                Assert.Equal(ExpectedNumber, Number);
-                Assert.Equal(ExpectedText, Text);
+                if(ExpectedNumber != Number || ExpectedText != Text)
+                    throw new Exception("Custom attributes were not applied!");
             }
         }
 

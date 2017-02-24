@@ -19,9 +19,6 @@ namespace BenchmarkDotNet.Toolchains
     [PublicAPI("Used by some of our Superusers that implement their own Toolchains (e.g. Kestrel team)")]
     public class Executor : IExecutor
     {
-        // This needs to be static, so that we can share a single handler amongst all instances of Executor's
-        private static ConsoleHandler consoleHandler;
-
         public ExecuteResult Execute(BuildResult buildResult, Benchmark benchmark, ILogger logger, IResolver resolver, IDiagnoser compositeDiagnoser = null)
         {
             var exePath = buildResult.ArtifactsPaths.ExecutablePath;
@@ -35,18 +32,14 @@ namespace BenchmarkDotNet.Toolchains
             return Execute(benchmark, logger, exePath, null, args, compositeDiagnoser, resolver);
         }
 
-        private ExecuteResult Execute(Benchmark benchmark, ILogger logger, string exeName, string workingDirectory, string args, IDiagnoser diagnoser,
+        private ExecuteResult Execute(Benchmark benchmark, ILogger logger, string exePath, string workingDirectory, string args, IDiagnoser diagnoser,
             IResolver resolver)
         {
-            if (consoleHandler == null)
-            {
-                consoleHandler = new ConsoleHandler(logger);
-                Console.CancelKeyPress += consoleHandler.EventHandler;
-            }
+            ConsoleHandler.EnsureInitialized(logger);
 
             try
             {
-                using (var process = new Process { StartInfo = CreateStartInfo(benchmark, exeName, args, workingDirectory, resolver) })
+                using (var process = new Process { StartInfo = CreateStartInfo(benchmark, exePath, args, workingDirectory, resolver) })
                 {
                     var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmark);
                     
@@ -55,7 +48,7 @@ namespace BenchmarkDotNet.Toolchains
             }
             finally
             {
-                consoleHandler.ClearProcess();
+                ConsoleHandler.Instance.ClearProcess();
             }
         }
 
@@ -63,7 +56,7 @@ namespace BenchmarkDotNet.Toolchains
         {
             logger.WriteLineInfo("// Execute: " + process.StartInfo.FileName + " " + process.StartInfo.Arguments);
 
-            consoleHandler.SetProcess(process);
+            ConsoleHandler.Instance.SetProcess(process);
 
             process.Start();
 
@@ -85,7 +78,7 @@ namespace BenchmarkDotNet.Toolchains
             return new ExecuteResult(true, process.ExitCode, new string[0], new string[0]);
         }
 
-        private ProcessStartInfo CreateStartInfo(Benchmark benchmark, string exeName, string args, string workingDirectory, IResolver resolver)
+        private ProcessStartInfo CreateStartInfo(Benchmark benchmark, string exePath, string args, string workingDirectory, IResolver resolver)
         {
             var start = new ProcessStartInfo
             {
@@ -103,12 +96,12 @@ namespace BenchmarkDotNet.Toolchains
             {
                 case Runtime.Clr:
                 case Runtime.Core:
-                    start.FileName = exeName;
+                    start.FileName = exePath;
                     start.Arguments = args;
                     break;
                 case Runtime.Mono:
                     start.FileName = "mono";
-                    start.Arguments = GetMonoArguments(benchmark.Job, exeName, args, resolver);
+                    start.Arguments = GetMonoArguments(benchmark.Job, exePath, args, resolver);
                     break;
                 default:
                     throw new NotSupportedException("Runtime = " + runtime);
@@ -116,14 +109,14 @@ namespace BenchmarkDotNet.Toolchains
             return start;
         }
 
-        private string GetMonoArguments(Job job, string exeName, string args, IResolver resolver)
+        private string GetMonoArguments(Job job, string exePath, string args, IResolver resolver)
         {
             // from mono --help: "Usage is: mono [options] program [program-options]"
             return new StringBuilder(30)
                 .Append(job.ResolveValue(EnvMode.JitCharacteristic, resolver) == Jit.Llvm ? "--llvm" : "--nollvm")
-                .Append(' ')
-                .Append(exeName)
-                .Append(' ')
+                .Append(" \"")
+                .Append(exePath)
+                .Append("\" ")
                 .Append(args)
                 .ToString();
         }
