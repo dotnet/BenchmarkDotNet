@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Helpers
         /// In the case of any exception, null will be returned.
         /// </summary>
         [CanBeNull]
-        public static string RunAndReadOutput(string fileName, string arguments)
+        public static string RunAndReadOutput(string fileName, string arguments = "")
         {
             var processStartInfo = new ProcessStartInfo
             {
