@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 
@@ -22,14 +21,13 @@ namespace BenchmarkDotNet.Engines
         public void RunIdle(long invokeCount, int unrollFactor)
             => RunAuto(invokeCount, IterationMode.IdleWarmup, unrollFactor);
 
-        public void RunMain(long invokeCount, int unrollFactor)
-            => Run(invokeCount, IterationMode.MainWarmup, false, unrollFactor);
+        public void RunMain(long invokeCount, int unrollFactor, bool forceSpecific = false)
+            => Run(invokeCount, IterationMode.MainWarmup, false, unrollFactor, forceSpecific);
 
-        internal List<Measurement> Run(long invokeCount, IterationMode iterationMode, bool runAuto, int unrollFactor)
-            => runAuto || warmupCount == null
+        internal List<Measurement> Run(long invokeCount, IterationMode iterationMode, bool runAuto, int unrollFactor, bool forceSpecific = false)
+            => (runAuto || warmupCount == null) && !forceSpecific
                 ? RunAuto(invokeCount, iterationMode, unrollFactor)
-                : RunSpecific(invokeCount, iterationMode, warmupCount.Value, unrollFactor);
-
+                : RunSpecific(invokeCount, iterationMode, (warmupCount ?? 0), unrollFactor);
 
         private List<Measurement> RunAuto(long invokeCount, IterationMode iterationMode, int unrollFactor)
         {

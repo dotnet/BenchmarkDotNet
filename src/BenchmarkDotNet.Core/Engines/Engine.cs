@@ -41,7 +41,8 @@ namespace BenchmarkDotNet.Engines
         private bool isJitted, isPreAllocated;
         private int forcedFullGarbageCollections;
 
-        internal Engine(Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> idleAction, Action<long> mainAction, Job targetJob, Action setupAction, Action cleanupAction, long operationsPerInvoke, bool isDiagnoserAttached)
+        internal Engine(Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> idleAction, Action<long> mainAction, Job targetJob,
+            Action setupAction, Action cleanupAction, long operationsPerInvoke, bool isDiagnoserAttached)
         {
             IdleAction = idleAction;
             Dummy1Action = dummy1Action;
@@ -100,22 +101,25 @@ namespace BenchmarkDotNet.Engines
 
             if (Strategy != RunStrategy.ColdStart)
             {
-                invokeCount = pilotStage.Run();
-
-                if (EvaluateOverhead)
+                if (Strategy != RunStrategy.Monitoring)
                 {
-                    warmupStage.RunIdle(invokeCount, UnrollFactor);
-                    idle = targetStage.RunIdle(invokeCount, UnrollFactor);
+                    invokeCount = pilotStage.Run();
+
+                    if (EvaluateOverhead)
+                    {
+                        warmupStage.RunIdle(invokeCount, UnrollFactor);
+                        idle = targetStage.RunIdle(invokeCount, UnrollFactor);
+                    }
                 }
 
-                warmupStage.RunMain(invokeCount, UnrollFactor);
+                warmupStage.RunMain(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring);
             }
 
             // we enable monitoring after pilot & warmup, just to ignore the memory allocated by these runs
-            EnableMonitoring(); 
+            EnableMonitoring();
             var initialGcStats = GcStats.ReadInitial(IsDiagnoserAttached);
 
-            var main = targetStage.RunMain(invokeCount, UnrollFactor);
+            var main = targetStage.RunMain(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring);
 
             var finalGcStats = GcStats.ReadFinal(IsDiagnoserAttached);
             var forcedCollections = GcStats.FromForced(forcedFullGarbageCollections);
@@ -123,7 +127,8 @@ namespace BenchmarkDotNet.Engines
 
             bool removeOutliers = TargetJob.ResolveValue(AccuracyMode.RemoveOutliersCharacteristic, Resolver);
 
-            return new RunResults(idle, main, removeOutliers, workGcHasDone);        }
+            return new RunResults(idle, main, removeOutliers, workGcHasDone);
+        }
 
         public Measurement RunIteration(IterationData data)
         {
@@ -182,10 +187,11 @@ namespace BenchmarkDotNet.Engines
 
         private void EnableMonitoring()
         {
-            if(!IsDiagnoserAttached) // it could affect the results, we do this in separate, diagnostics-only run
+            if (!IsDiagnoserAttached) // it could affect the results, we do this in separate, diagnostics-only run
                 return;
 #if CLASSIC
-            if(RuntimeInformation.IsMono()) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-in-mono
+            if (RuntimeInformation.IsMono()
+            ) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-in-mono
                 return;
 
             AppDomain.MonitoringIsEnabled = true;

@@ -26,6 +26,7 @@ namespace BenchmarkDotNet.Engines
                     case RunStrategy.Throughput:
                         return true;
                     case RunStrategy.ColdStart:
+                    case RunStrategy.Monitoring:
                         return false;
                     default:
                         throw new NotSupportedException($"Unknown runStrategy: {strategy}");

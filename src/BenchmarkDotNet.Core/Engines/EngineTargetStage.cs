@@ -12,6 +12,7 @@ namespace BenchmarkDotNet.Engines
         internal const int MaxIterationCount = 100;
         internal const int MaxIdleIterationCount = 20;
         internal const double MaxIdleStdErrRelative = 0.05;
+        internal const int DefaultTargetCount = 10;
 
         private readonly int? targetCount;
         private readonly double maxStdErrRelative;
@@ -30,13 +31,13 @@ namespace BenchmarkDotNet.Engines
         public IReadOnlyList<Measurement> RunIdle(long invokeCount, int unrollFactor) 
             => RunAuto(invokeCount, IterationMode.IdleTarget, unrollFactor);
 
-        public IReadOnlyList<Measurement> RunMain(long invokeCount, int unrollFactor) 
-            => Run(invokeCount, IterationMode.MainTarget, false, unrollFactor);
+        public IReadOnlyList<Measurement> RunMain(long invokeCount, int unrollFactor, bool forceSpecific = false) 
+            => Run(invokeCount, IterationMode.MainTarget, false, unrollFactor, forceSpecific);
 
-        internal IReadOnlyList<Measurement> Run(long invokeCount, IterationMode iterationMode, bool runAuto, int unrollFactor)
-            => runAuto || targetCount == null
+        internal IReadOnlyList<Measurement> Run(long invokeCount, IterationMode iterationMode, bool runAuto, int unrollFactor, bool forceSpecific = false)
+            => (runAuto || targetCount == null) && !forceSpecific
                 ? RunAuto(invokeCount, iterationMode, unrollFactor)
-                : RunSpecific(invokeCount, iterationMode, targetCount.Value, unrollFactor);
+                : RunSpecific(invokeCount, iterationMode, (targetCount ?? DefaultTargetCount), unrollFactor);
 
         private List<Measurement> RunAuto(long invokeCount, IterationMode iterationMode, int unrollFactor)
         {

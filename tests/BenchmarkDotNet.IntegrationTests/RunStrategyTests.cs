@@ -23,15 +23,19 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = ManualConfig.CreateEmpty()
                 .With(DefaultColumnProviders.Instance)
                 .With(logger)
-                .With(new Job(Job.Dry) { Run = { RunStrategy = RunStrategy.ColdStart} })
+                .With(new Job(Job.Dry) { Run = { RunStrategy = RunStrategy.ColdStart } })
+                .With(new Job(Job.Dry) { Run = { RunStrategy = RunStrategy.Monitoring } })
                 .With(new Job(Job.Dry) { Run = { RunStrategy = RunStrategy.Throughput } });
 
             var results = CanExecute<ModeBenchmarks>(config);
 
-            Assert.Equal(4, results.Benchmarks.Count());
+            Assert.Equal(6, results.Benchmarks.Count());
 
             Assert.Equal(1, results.Benchmarks.Count(b => b.Job.Run.RunStrategy == RunStrategy.ColdStart && b.Target.Method.Name == "BenchmarkWithVoid"));
             Assert.Equal(1, results.Benchmarks.Count(b => b.Job.Run.RunStrategy == RunStrategy.ColdStart && b.Target.Method.Name == "BenchmarkWithReturnValue"));
+
+            Assert.Equal(1, results.Benchmarks.Count(b => b.Job.Run.RunStrategy == RunStrategy.Monitoring && b.Target.Method.Name == "BenchmarkWithVoid"));
+            Assert.Equal(1, results.Benchmarks.Count(b => b.Job.Run.RunStrategy == RunStrategy.Monitoring && b.Target.Method.Name == "BenchmarkWithReturnValue"));
 
             Assert.Equal(1, results.Benchmarks.Count(b => b.Job.Run.RunStrategy == RunStrategy.Throughput && b.Target.Method.Name == "BenchmarkWithVoid"));
             Assert.Equal(1, results.Benchmarks.Count(b => b.Job.Run.RunStrategy == RunStrategy.Throughput && b.Target.Method.Name == "BenchmarkWithReturnValue"));
