@@ -42,6 +42,7 @@
             "Development":"Contributing\\Development.md",
             "Miscellaneous topics":"Contributing\\Miscellaneous.md",
         },
+        "FAQ": "FAQ.md",
         "License": "license.md"
     }
 }
