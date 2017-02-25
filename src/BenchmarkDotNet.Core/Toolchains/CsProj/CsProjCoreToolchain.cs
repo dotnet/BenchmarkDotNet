@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         public static IToolchain From(NetCoreAppSettings settings)
             => new CsProjCoreToolchain("CoreCsProj",
                 new CsProjGenerator(settings.TargetFrameworkMoniker, PlatformProvider), 
-                new DotNetCliBuilder(settings.TargetFrameworkMoniker), 
+                new CsProjBuilder(settings.TargetFrameworkMoniker), 
                 new DotNetCliExecutor());
 
         // dotnet cli supports only x64 compilation now

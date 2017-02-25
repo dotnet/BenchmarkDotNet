@@ -9,19 +9,21 @@ using JetBrains.Annotations;
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     [PublicAPI]
-    public class DotNetCliBuilder : IBuilder
+    public abstract class DotNetCliBuilder : IBuilder
     {
-        internal const string RestoreCommand = "restore --no-dependencies";
-
         internal const string Configuration = "Release";
 
         private string TargetFrameworkMoniker { get; }
+
+        internal abstract string RestoreCommand { get; }
 
         [PublicAPI]
         public DotNetCliBuilder(string targetFrameworkMoniker)
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
         }
+
+        internal abstract string GetBuildCommand(string frameworkMoniker, bool justTheProjectItself);
 
         /// <summary>
         /// generates project.lock.json that tells compiler where to take dlls and source from
@@ -76,9 +78,5 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 GetBuildCommand(TargetFrameworkMoniker, justTheProjectItself: false),
                 generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
         }
-
-        internal static string GetBuildCommand(string frameworkMoniker, bool justTheProjectItself)
-            => $"build --framework {frameworkMoniker} --configuration {Configuration}"
-                + (justTheProjectItself ? " --no-dependencies" : string.Empty);
     }
 }

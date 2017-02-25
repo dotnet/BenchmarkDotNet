@@ -17,12 +17,18 @@ namespace BenchmarkDotNet.Toolchains.ProjectJson
     public class ProjectJsonGenerator : DotNetCliGenerator
     {
         public ProjectJsonGenerator(string targetFrameworkMoniker, string extraDependencies, Func<Platform, string> platformProvider, string imports, string runtime = null) 
-            : base(targetFrameworkMoniker, extraDependencies, platformProvider, imports, runtime)
+            : base(new ProjectJsonBuilder(targetFrameworkMoniker),  targetFrameworkMoniker, extraDependencies, platformProvider, imports, runtime)
         {
         }
 
         protected override string GetProjectFilePath(string binariesDirectoryPath)
             => Path.Combine(binariesDirectoryPath, "project.json");
+
+        /// <summary>
+        /// we use custom output path in order to avoid any future problems related to dotnet cli ArtifactsPaths changes
+        /// </summary>
+        protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath)
+            => Path.Combine(buildArtifactsDirectoryPath, ProjectJsonBuilder.OutputDirectory);
 
         protected override void GenerateProject(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver, ILogger logger)
         {

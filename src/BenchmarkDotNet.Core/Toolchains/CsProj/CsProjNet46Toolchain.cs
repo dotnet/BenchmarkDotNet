@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         public CsProjNet46Toolchain() 
             : base("CsProj",
                 new CsProjGenerator("net46", platform => platform.ToConfig(), "win7"),
-                new DotNetCliBuilder("net46"),
+                new CsProjBuilder("net46"),
                 new Executor())
         {
         }

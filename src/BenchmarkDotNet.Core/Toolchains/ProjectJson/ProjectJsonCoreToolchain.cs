@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Toolchains.ProjectJson
                     PlatformProvider,
                     settings.Imports,
                     GetRuntime()), 
-                new DotNetCliBuilder(settings.TargetFrameworkMoniker), 
+                new ProjectJsonBuilder(settings.TargetFrameworkMoniker), 
                 new Executor());
 
         public override bool IsSupported(Benchmark benchmark, ILogger logger, IResolver resolver)

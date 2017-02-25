@@ -22,14 +22,18 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         protected string Imports { get; }
 
+        private DotNetCliBuilder Builder { get; }
+
         [PublicAPI]
         protected DotNetCliGenerator(
+            DotNetCliBuilder builder,
             string targetFrameworkMoniker,
             string extraDependencies,
             Func<Platform, string> platformProvider,
             string imports,
             string runtime = null)
         {
+            Builder = builder;
             TargetFrameworkMoniker = targetFrameworkMoniker;
             ExtraDependencies = extraDependencies;
             PlatformProvider = platformProvider;
@@ -70,12 +74,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return false;
         }
 
-        /// <summary>
-        /// we use custom output path in order to avoid any future problems related to dotnet cli ArtifactsPaths changes
-        /// </summary>
-        protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath)
-            => Path.Combine(buildArtifactsDirectoryPath, "bin", DotNetCliBuilder.Configuration, TargetFrameworkMoniker);
-
         protected override void Cleanup(ArtifactsPaths artifactsPaths)
         {
             if (!Directory.Exists(artifactsPaths.BuildArtifactsDirectoryPath))
@@ -112,8 +110,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         protected override void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)
         {
-            string content = $"call dotnet {DotNetCliBuilder.RestoreCommand}{Environment.NewLine}" +
-                             $"call dotnet {DotNetCliBuilder.GetBuildCommand(TargetFrameworkMoniker, justTheProjectItself: false)}";
+            string content = $"call dotnet {Builder.RestoreCommand}{Environment.NewLine}" +
+                             $"call dotnet {Builder.GetBuildCommand(TargetFrameworkMoniker, justTheProjectItself: false)}";
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
         }

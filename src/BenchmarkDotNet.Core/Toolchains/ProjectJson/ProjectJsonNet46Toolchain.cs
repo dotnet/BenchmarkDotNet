@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Toolchains.ProjectJson
                 extraDependencies: "\"frameworkAssemblies\": { \"System.Runtime\": \"4.0.0.0\" },",
                 platformProvider: platform => platform.ToConfig(),
                 imports: "\"portable-net45+win8\""),
-            new DotNetCliBuilder(TargetFrameworkMoniker),
+            new ProjectJsonBuilder(TargetFrameworkMoniker), 
             new Executor())
         {
         }
