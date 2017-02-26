@@ -133,7 +133,21 @@ namespace BenchmarkDotNet.Portability
                 var monoRuntimeType = Type.GetType("Mono.Runtime");
                 var monoDisplayName = monoRuntimeType?.GetMethod("GetDisplayName", BindingFlags.NonPublic | BindingFlags.Static);
                 if (monoDisplayName != null)
-                    return "Mono " + monoDisplayName.Invoke(null, null);
+                {
+                    string version = monoDisplayName.Invoke(null, null)?.ToString();
+                    if (version != null)
+                    {
+                        int bracket1 = version.IndexOf('('), bracket2 = version.IndexOf(')');
+                        if (bracket1 != -1 && bracket2 != -1)
+                        {
+                            string comment = version.Substring(bracket1 + 1, bracket2 - bracket1 - 1);                            
+                            var commentParts = comment.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            if (commentParts.Length > 2)
+                                version = version.Substring(0, bracket1) + "(" + commentParts[0] + " " + commentParts[1] + ")";
+                        }
+                    }                    
+                    return "Mono " + version;
+                }
             }
 #if CLASSIC
             return $"Clr {System.Environment.Version}";
