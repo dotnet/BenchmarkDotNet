@@ -5,3 +5,9 @@
 BenchmarkDotNet requires NuGet 3.x+ and can't be installed in old versions of Visual Studio which use NuGet 2.x.
 Consider to use Visual Studio 2015/2017 or [Rider](http://jetbrains.com/rider/).
 See also: [BenchmarkDotNet#237](https://github.com/dotnet/BenchmarkDotNet/issues/237), [roslyn#12780](https://github.com/dotnet/roslyn/issues/12780).
+
+* **Q** Why I can't install BenchmarkDotNet in a new .NET Core Console App in Visual Studio 2017?  
+**A** BenchmarkDotNet supports only netcoreapp1.1+.
+By default, Visual Studio 2017 creates a new application which targets netcoreapp1.0.
+You should upgrade it up to 1.1.
+If your want to target netcoreapp1.0 in your main assembly, it's recommended to create a separated project for benchmarks.
