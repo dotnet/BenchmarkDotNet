@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Portability
 #endif
         }
 
-        internal static bool IsOSX()
+        internal static bool IsMacOSX()
         {
 #if !CORE
             return System.Environment.OSVersion.Platform == PlatformID.MacOSX;
@@ -80,7 +80,7 @@ namespace BenchmarkDotNet.Portability
             {
                 return "Linux";
             }
-            if (IsOSX())
+            if (IsMacOSX())
             {
                 return "OSX";
             }
@@ -109,41 +109,15 @@ namespace BenchmarkDotNet.Portability
             }
 #endif
             if (IsWindows())
-            {
-                // Output example:
-                //     Name
-                //     Intel(R) Core(TM) i7 - 6700HQ CPU @ 2.60GHz
-                string output = ProcessHelper.RunAndReadOutput("wmic", "cpu get name");
-                if (output != null)
-                {
-                    var outputLines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (outputLines.Length >= 2)
-                        return NiceString(outputLines[1]);
-                }
-            }
+                return NiceString(ExternalToolsHelper.Wmic.Value.GetValueOrDefault("Name") ?? "");
+
             if (IsLinux())
-            {
-                // Output example:
-                //     model name : Intel(R) Atom(TM) CPU N270   @ 1.60GHz
-                string output = ProcessHelper.RunAndReadOutput("cat", "/proc/cpuinfo");
-                if (output != null)
-                {
-                    var outputLines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                    const string modelNamePrefix = "model name :";
-                    string modelNameLine = outputLines.FirstOrDefault(line => line.StartsWith(modelNamePrefix));
-                    if (modelNameLine != null)
-                        return NiceString(modelNameLine.Substring(modelNamePrefix.Length));
-                }
-            }
-            if (IsOSX())
-            {
-                // Output example:
-                //     Intel(R) Core(TM) i7-3615QM CPU @ 2.30GHz
-                string output = ProcessHelper.RunAndReadOutput("sysctl", "-n machdep.cpu.brand_string");
-                if (output != null)
-                    return NiceString(output);
-            }
-            return Unknown; // TODO: verify if it is possible to get this for CORE
+                return NiceString(ExternalToolsHelper.ProcCpuInfo.Value.GetValueOrDefault("model name") ?? "");
+
+            if (IsMacOSX())
+                return NiceString(ExternalToolsHelper.Sysctl.Value.GetValueOrDefault("machdep.cpu.brand_string") ?? "");
+
+            return Unknown;
         }
 
         internal static string GetRuntimeVersion()
