@@ -2,8 +2,6 @@
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 
-// ReSharper disable once CheckNamespace
-
 namespace BenchmarkDotNet.Jobs
 {
     public sealed class EnvMode : JobMode<EnvMode>
@@ -27,7 +25,7 @@ namespace BenchmarkDotNet.Jobs
             nameof(RyuJitX64), Jit.RyuJit, Platform.X64)
             .Freeze();
 
-        public EnvMode() : this(null) { }
+        public EnvMode() : this(id: null) { }
 
         public EnvMode(Runtime runtime) : this(runtime.ToString())
         {

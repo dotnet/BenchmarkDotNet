@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Diagnosers
             public bool IsDefault(Summary summary, Benchmark benchmark) => false;
 
             public bool IsAvailable(Summary summary) 
-                => !RuntimeInformation.IsMono() || results.Keys.Any(benchmark => benchmark.Job.Env.Runtime != Runtime.Mono);
+                => !RuntimeInformation.IsMono() || results.Keys.Any(benchmark => !(benchmark.Job.Env.Runtime is MonoRuntime));
 
             public bool AlwaysShow => true;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Diagnosers
 
             public string GetValue(Summary summary, Benchmark benchmark)
             {
-                if (!results.ContainsKey(benchmark) || benchmark.Job.Env.Runtime == Runtime.Mono)
+                if (!results.ContainsKey(benchmark) || benchmark.Job.Env.Runtime is MonoRuntime)
                     return "N/A";
 
                 return results[benchmark].BytesAllocatedPerOperation.ToFormattedBytes();

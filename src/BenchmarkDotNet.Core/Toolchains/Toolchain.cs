@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Toolchains
         {
             var runtime = benchmark.Job.ResolveValue(EnvMode.RuntimeCharacteristic, resolver);
             var jit = benchmark.Job.ResolveValue(EnvMode.JitCharacteristic, resolver);
-            if (runtime != Runtime.Mono && jit == Jit.Llvm)
+            if (!(runtime is MonoRuntime) && jit == Jit.Llvm)
             {
                 logger.WriteLineError($"Llvm is supported only for Mono, benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;

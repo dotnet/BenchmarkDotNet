@@ -94,13 +94,13 @@ namespace BenchmarkDotNet.Toolchains
                 // TODO: use resolver
             switch (runtime)
             {
-                case Runtime.Clr:
-                case Runtime.Core:
+                case ClrRuntime clr:
+                case CoreRuntime core:
                     start.FileName = exePath;
                     start.Arguments = args;
                     break;
-                case Runtime.Mono:
-                    start.FileName = "mono";
+                case MonoRuntime mono:
+                    start.FileName = mono.CustomPath ?? "mono";
                     start.Arguments = GetMonoArguments(benchmark.Job, exePath, args, resolver);
                     break;
                 default:
