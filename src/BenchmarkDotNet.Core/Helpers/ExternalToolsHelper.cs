@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Helpers
                     {
                         var lineParts = line.Split(separator);
                         if (lineParts.Length >= 2)
-                            values[lineParts[0]] = lineParts[1].Trim();
+                            values[lineParts[0].Trim()] = lineParts[1].Trim();
                     }
             return values;
         }
