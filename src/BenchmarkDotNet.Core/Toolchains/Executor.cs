@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Diagnosers;
@@ -74,6 +75,9 @@ namespace BenchmarkDotNet.Toolchains
             {
                 return new ExecuteResult(true, process.ExitCode, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
             }
+
+            if (loggerWithDiagnoser.LinesWithResults.Any(line => line.Contains("BadImageFormatException")))
+                logger.WriteLineError("You are probably missing <PlatformTarget>AnyCPU</PlatformTarget> in your .csproj file.");
 
             return new ExecuteResult(true, process.ExitCode, new string[0], new string[0]);
         }
