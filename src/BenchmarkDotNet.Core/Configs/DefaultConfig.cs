@@ -61,10 +61,7 @@ namespace BenchmarkDotNet.Configs
 
         public bool KeepBenchmarkFiles => false;
 
-        public IEnumerable<IDiagnoser> GetDiagnosers()
-        {
-            yield return MemoryDiagnoser.Default;
-        }
+        public IEnumerable<IDiagnoser> GetDiagnosers() => Enumerable.Empty<IDiagnoser>();
 
         // Make the Diagnosers lazy-loaded, so they are only instantiated if neededs
         public static readonly Lazy<IDiagnoser[]> LazyLoadedDiagnosers =

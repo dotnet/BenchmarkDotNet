@@ -4,7 +4,7 @@ A **diagnoser** can attach to your benchmark and get some useful info.
 
 The current Diagnosers are:
 
-- GC and Memory Allocation (`MemoryDiagnoser`) which is cross platform, built-in and enabled by default.
+- GC and Memory Allocation (`MemoryDiagnoser`) which is cross platform, built-in and **is not enabled by default anymore**.
 - JIT Inlining Events (`InliningDiagnoser`). You can find this diagnoser in a separated package with diagnosers for Windows (`BenchmarkDotNet.Diagnostics.Windows`): [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/)
 
 

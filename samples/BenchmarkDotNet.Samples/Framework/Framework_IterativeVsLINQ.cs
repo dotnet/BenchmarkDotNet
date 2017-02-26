@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace BenchmarkDotNet.Samples.Framework
 {
+    [MemoryDiagnoser]
     public class Framework_IterativeVsLINQ
     {
         private string[] parameters = new[]
