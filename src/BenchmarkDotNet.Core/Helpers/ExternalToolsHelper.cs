@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Helpers
         /// Output of the `cat /proc/info` command.
         /// Linux only.
         /// </summary>
-        public static readonly Lazy<Dictionary<string, string>> ProcCpuInfo = LazyDic(RuntimeInformation.IsLinux, "cat", "/proc/info", ':');
+        public static readonly Lazy<Dictionary<string, string>> ProcCpuInfo = LazyDic(RuntimeInformation.IsLinux, "cat", "/proc/cpuinfo", ':');
 
         /// <summary>
         /// Output of the `lsb_release -a` command.
@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Helpers
                     {
                         var lineParts = line.Split(separator);
                         if (lineParts.Length >= 2)
-                            values[lineParts[0]] = lineParts[1];
+                            values[lineParts[0]] = lineParts[1].Trim();
                     }
             return values;
         }
