@@ -28,7 +28,8 @@
             "Setup":"Advanced\\Setup.md",
             "Baseline":"Advanced\\Baseline.md",
             "Percentiles": "Advanced\\Percentiles.md",
-            "STAThread": "Advanced\\STAThread.md"
+            "STAThread": "Advanced\\STAThread.md",
+            "Custom Mono Path": "Advanced\\CustomMonoPath.md"
         },
         "How it works": "HowItWorks.md",
         "Rules of benchmarking": "RulesOfBenchmarking.md",
