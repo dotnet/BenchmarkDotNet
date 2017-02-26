@@ -20,6 +20,12 @@ namespace BenchmarkDotNet.Helpers
         public static readonly Lazy<Dictionary<string, string>> ProcCpuInfo = LazyDic(RuntimeInformation.IsLinux, "cat", "/proc/info", ':');
 
         /// <summary>
+        /// Output of the `lsb_release -a` command.
+        /// Linux only.
+        /// </summary>
+        public static readonly Lazy<Dictionary<string, string>> LsbRelease = LazyDic(RuntimeInformation.IsLinux, "lsb_release", "-a", ':');
+
+        /// <summary>
         /// Output of the `sysctl -a` command.
         /// MacOSX only.
         /// </summary>

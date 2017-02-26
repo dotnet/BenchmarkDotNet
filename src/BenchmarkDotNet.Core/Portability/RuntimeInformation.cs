@@ -66,6 +66,12 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetOsVersion()
         {
+            if (IsLinux())
+            {
+                string os = ExternalToolsHelper.LsbRelease.Value.GetValueOrDefault("Description");
+                if (!string.IsNullOrWhiteSpace(os))
+                    return os;
+            }
 #if !CORE
             return System.Environment.OSVersion.ToString();
 #else
