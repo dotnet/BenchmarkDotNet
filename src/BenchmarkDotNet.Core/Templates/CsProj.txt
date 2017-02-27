@@ -8,6 +8,7 @@
     <OutputType>Exe</OutputType>
     <OutputPath>bin\Release</OutputPath>
     $RUNTIMEID$
+    $COPIEDSETTINGS$
   </PropertyGroup>
 
   <ItemGroup>
