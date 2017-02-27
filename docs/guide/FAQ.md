@@ -11,3 +11,15 @@ See also: [BenchmarkDotNet#237](https://github.com/dotnet/BenchmarkDotNet/issues
 By default, Visual Studio 2017 creates a new application which targets netcoreapp1.0.
 You should upgrade it up to 1.1.
 If your want to target netcoreapp1.0 in your main assembly, it's recommended to create a separated project for benchmarks.
+
+* **Q** I created a new .NET Core Console App in Visual Studio 2017. Now I want to run my code on CoreCLR, full .NET Framework, and Mono. How can I do it?  
+**A** Use the following lines in your `.csproj` file:
+```xml
+<TargetFrameworks>netcoreapp1.1;net45</TargetFrameworks>
+<RuntimeIdentifier Condition=" '$(TargetFramework)' == 'net45' ">win7-x86</RuntimeIdentifier>
+<PlatformTarget>AnyCPU</PlatformTarget>
+```
+And mark your benchmark class with the following attributes:
+```cs
+[CoreJob, ClrJob, MonoJob]
+```
