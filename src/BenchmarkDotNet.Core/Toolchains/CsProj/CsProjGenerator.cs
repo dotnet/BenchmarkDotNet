@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         private string GetSettingsThatNeedsToBeCopied(FileInfo projectFile)
         {
             var customSettings = new StringBuilder();
-            using (var file = new StreamReader(projectFile.FullName))
+            using (var file = new StreamReader(File.OpenRead(projectFile.FullName)))
             {
                 string line;
                 while ((line = file.ReadLine()) != null)
