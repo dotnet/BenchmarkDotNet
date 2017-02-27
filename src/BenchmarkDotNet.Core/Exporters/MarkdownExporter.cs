@@ -36,7 +36,8 @@ namespace BenchmarkDotNet.Exporters
             Dialect = nameof(GitHub),
             useCodeBlocks = true,
             codeBlockStart = "``` ini",
-            startOfGroupInBold = true
+            startOfGroupInBold = true,
+            columnsStartWithSeparator = true,
         };
 
         public static readonly IExporter Atlassian = new MarkdownExporter
@@ -133,6 +134,11 @@ namespace BenchmarkDotNet.Exporters
             table.PrintLine(table.FullHeader, logger, string.Empty, tableHeaderSeparator);
             if (useHeaderSeparatingRow)
             {
+                if (columnsStartWithSeparator)
+                {
+                    logger.Write(tableHeaderSeparator);
+                }
+
                 logger.WriteLineStatistic(string.Join("", table.Columns.Where(c => c.NeedToShow).Select(c => new string('-', c.Width) + " |")));
             }
             var rowCounter = 0;
