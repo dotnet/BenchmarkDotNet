@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Engines
             Register(RunMode.IterationTimeCharacteristic, () => TimeInterval.Millisecond * 200);
 
             Register(AccuracyMode.MaxStdErrRelativeCharacteristic, () => 0.01);
-            Register(AccuracyMode.MinIterationTimeCharacteristic, () => TimeInterval.Millisecond * 200);
+            Register(AccuracyMode.MinIterationTimeCharacteristic, () => TimeInterval.Millisecond * 500);
             Register(AccuracyMode.MinInvokeCountCharacteristic, () => 4);
             Register(AccuracyMode.EvaluateOverheadCharacteristic, () => true);
             Register(AccuracyMode.RemoveOutliersCharacteristic, job =>
