@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>STAThread - BenchmarkDotNet Documentation</title>
+    <title>Custom Mono Path - BenchmarkDotNet Documentation</title>
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../css/theme_colors.css" type="text/css" />
@@ -92,12 +92,12 @@
 </li>
 <li class="tocentry"><a href="../Advanced/Percentiles.htm">Percentiles</a>
 </li>
-<li class="tocentry current"><a class="current" href="../Advanced/STAThread.htm">STAThread</a>
-<ul class="currentrelative">
-<li class="tocentry"><a href="#example">Example</a></li>
-</ul>
-<li class="tocentry"><a href="../Advanced/CustomMonoPath.htm">Custom Mono Path</a>
+<li class="tocentry"><a href="../Advanced/STAThread.htm">STAThread</a>
 </li>
+<li class="tocentry current"><a class="current" href="../Advanced/CustomMonoPath.htm">Custom Mono Path</a>
+<ul class="currentrelative">
+<li class="tocentry"><a href="#sample-configuration">Sample configuration</a></li>
+</ul>
 
 </ul>
 </li>
@@ -134,26 +134,164 @@
             <div class="nav-content">
                 <div role="navigation" aria-label="breadcrumbs navigation">
                     <div class="breadcrumbs">
-<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Advancedfeatures.htm">Advanced features</a></li> / <li><a href="../Advanced/STAThread.htm">STAThread</a></li></ul>
+<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Advancedfeatures.htm">Advanced features</a></li> / <li><a href="../Advanced/CustomMonoPath.htm">Custom Mono Path</a></li></ul>
 					
                     </div>
                     <hr />
                 </div>
                 <div role="main">
                     <div class="section">
-<h1 id="stathread">STAThread<a class="headerlink" href="#stathread" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
-<p>If the code you want to benchmark requires <code>[System.STAThread]</code> then you need to apply this attribute to the benchmarked method. BenchmarkDotNet will generate executable with <code>[STAThread]</code> applied to it's <code>Main</code> method.</p>
-<h2 id="example">Example<a class="headerlink" href="#example" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
-<pre><code class="cs">[Benchmark, System.STAThread]
-public void CheckForSTA()
+<h1 id="custom-mono-paths">Custom Mono Path(s)<a class="headerlink" href="#custom-mono-paths" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<p>BenchmarkDotNet allows you to compare different runtimes, including Mono. If you apply <code>[MonoJob]</code> attribute to your class we use your default mono runtime. If you want to compare different versions of Mono you need to provide use the custom paths. You can do this today by using the overloaded ctor of MonoJob attribute or by specifying the runtime in a fluent way.</p>
+<h2 id="sample-configuration">Sample configuration<a class="headerlink" href="#sample-configuration" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<pre><code class="cs">[ClrJob, CoreJob]
+[MonoJob(&quot;Mono 4.8.0&quot;, @&quot;C:\Program Files\Mono\bin\mono.exe&quot;)]
+[MonoJob(&quot;Mono 4.6.2&quot;, @&quot;C:\Program Files (x86)\Mono\bin\mono.exe&quot;)]
+public class Algo_Md5VsSha256
 {
-    if (Thread.CurrentThread.GetApartmentState() != ApartmentState.STA)
-    {
-        throw new ThreadStateException(&quot;The current threads apartment state is not STA&quot;);
-    }
+   /* benchmarks removed for brevity */
+}   
+</code></pre>
+
+<pre><code class="cs">private IConfig CreateConfig()
+{
+    return ManualConfig.CreateEmpty()
+        .With(Job.ShortRun.With(new MonoRuntime(&quot;Mono 4.8.0&quot;, @&quot;C:\Program Files\Mono\bin\mono.exe&quot;))
+        .With(Job.ShortRun.With(new MonoRuntime(&quot;Mono 4.6.2&quot;, @&quot;C:\Program Files (x86)\Mono\bin\mono.exe&quot;));
 }
 </code></pre>
 
+<h3 id="sample-results">Sample results:<a class="headerlink" href="#sample-results" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<pre class="nocode">// ***** BenchmarkRunner: Start   *****
+// Found benchmarks:
+//   Algo_Md5VsSha256.Md5: Clr(Runtime=Clr)
+//   Algo_Md5VsSha256.Sha256: Clr(Runtime=Clr)
+//   Algo_Md5VsSha256.Md5: Core(Runtime=Core)
+//   Algo_Md5VsSha256.Sha256: Core(Runtime=Core)
+//   Algo_Md5VsSha256.Md5: Mono 4.6.2(Runtime=Mono 4.6.2)
+//   Algo_Md5VsSha256.Sha256: Mono 4.6.2(Runtime=Mono 4.6.2)
+//   Algo_Md5VsSha256.Md5: Mono 4.8.0(Runtime=Mono 4.8.0)
+//   Algo_Md5VsSha256.Sha256: Mono 4.8.0(Runtime=Mono 4.8.0)
+</pre><pre><code class="ini">
+BenchmarkDotNet=v0.10.2.0-develop, OS=Microsoft Windows 10.0.14393
+Processor=Intel(R) Core(TM) i7-6600U CPU 2.60GHz, ProcessorCount=4
+Frequency=2742190 Hz, Resolution=364.6720 ns, Timer=TSC
+dotnet cli version=1.0.0-rc4-004771
+  [Host]     : .NET Core 4.6.24628.01, 64bit RyuJIT
+  Clr        : Clr 4.0.30319.42000, 64bit RyuJIT-v4.6.1586.0
+  Core       : .NET Core 4.6.24628.01, 64bit RyuJIT
+  Mono 4.6.2 : Mono 4.6.2 (Visual Studio built mono), 32bit 
+  Mono 4.8.0 : Mono 4.8.0 (Visual Studio built mono), 64bit 
+
+
+</code></pre>
+
+<table class="table table-bordered-all table-responsive">
+<thead>
+<tr>
+	<th>Method</th>
+	<th>Job</th>
+	<th>Runtime</th>
+	<th>Mean</th>
+	<th>StdDev</th>
+	<th>Median</th>
+	<th>Scaled</th>
+	<th>Scaled-StdDev</th>
+	<th>Allocated</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>Md5</td>
+	<td>Clr</td>
+	<td>Clr</td>
+	<td>23.2459 us</td>
+	<td>0.9337 us</td>
+	<td>23.3425 us</td>
+	<td>1.00</td>
+	<td>0.00</td>
+	<td>112 B</td>
+</tr>
+<tr>
+	<td>Sha256</td>
+	<td>Clr</td>
+	<td>Clr</td>
+	<td>111.8421 us</td>
+	<td>2.4760 us</td>
+	<td>110.6653 us</td>
+	<td>4.82</td>
+	<td>0.21</td>
+	<td>188 B</td>
+</tr>
+<tr>
+	<td>Md5</td>
+	<td>Core</td>
+	<td>Core</td>
+	<td>21.4333 us</td>
+	<td>0.5074 us</td>
+	<td>21.1727 us</td>
+	<td>1.00</td>
+	<td>0.00</td>
+	<td>80 B</td>
+</tr>
+<tr>
+	<td>Sha256</td>
+	<td>Core</td>
+	<td>Core</td>
+	<td>50.1553 us</td>
+	<td>1.2729 us</td>
+	<td>49.7332 us</td>
+	<td>2.34</td>
+	<td>0.08</td>
+	<td>114 B</td>
+</tr>
+<tr>
+	<td>Md5</td>
+	<td>Mono 4.6.2</td>
+	<td>Mono 4.6.2</td>
+	<td>45.1584 us</td>
+	<td>1.0023 us</td>
+	<td>45.5757 us</td>
+	<td>1.00</td>
+	<td>0.00</td>
+	<td>N/A</td>
+</tr>
+<tr>
+	<td>Sha256</td>
+	<td>Mono 4.6.2</td>
+	<td>Mono 4.6.2</td>
+	<td>168.4400 us</td>
+	<td>3.7425 us</td>
+	<td>170.4372 us</td>
+	<td>3.73</td>
+	<td>0.11</td>
+	<td>N/A</td>
+</tr>
+<tr>
+	<td>Md5</td>
+	<td>Mono 4.8.0</td>
+	<td>Mono 4.8.0</td>
+	<td>40.4432 us</td>
+	<td>0.9094 us</td>
+	<td>40.2218 us</td>
+	<td>1.00</td>
+	<td>0.00</td>
+	<td>N/A</td>
+</tr>
+<tr>
+	<td>Sha256</td>
+	<td>Mono 4.8.0</td>
+	<td>Mono 4.8.0</td>
+	<td>155.5073 us</td>
+	<td>12.9351 us</td>
+	<td>151.4520 us</td>
+	<td>3.85</td>
+	<td>0.33</td>
+	<td>N/A</td>
+</tr>
+</tbody>
+</table>
+<p>```</p>
 
                     </div>
                 </div>

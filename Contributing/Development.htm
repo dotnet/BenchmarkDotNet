@@ -102,14 +102,13 @@
 <li class="tocentry"><a href="../Contributing/RunningTests.htm">Running tests</a>
 </li>
 <li class="tocentry current"><a class="current" href="../Contributing/Development.htm">Development</a>
-<ul class="currentrelative">
-<li class="tocentry"><a href="#new-project-files">New project files</a></li>
-<li class="tocentry"><a href="#new-dependencies">New dependencies</a></li>
-</ul>
+</li>
 <li class="tocentry"><a href="../Contributing/Miscellaneous.htm">Miscellaneous topics</a>
 </li>
 
 </ul>
+</li>
+<li class="tocentry"><a href="../FAQ.htm">FAQ</a>
 </li>
 <li class="tocentry"><a href="../license.htm">License</a>
 </li>
@@ -139,102 +138,22 @@
                 <div role="main">
                     <div class="section">
 <h1 id="development">Development<a class="headerlink" href="#development" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
-<h2 id="new-project-files">New project files<a class="headerlink" href="#new-project-files" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
-<p><code>.csproj</code> and <code>packages.config</code> files have been replaced with <code>.xproj</code> and <code>project.json</code> files. <code>project.json</code> automatically references all <code>.cs</code> files so you 
-don’t have to update it with every new class/interface/enum added (number of git conflicts has just dropped). It also has some side efects. 
-For example if you create some subfolder in any of the folders that contain project.json file and put some .cs files there, then these files are 
-going to be compiled as part of parent project by default. </p>
-<p>The other side effect is that xproj displays all files by default:
-<img src="/documentation/images/xprojDisplaysAllFilesByDefault.png?raw=true" alt="xproj displays all files by default" title="xproj displays all files by default" /></p>
-<p>But if you want to include some files as resources, you have to do this in explicit way: </p>
-<pre><code class="json">&quot;buildOptions&quot;: {
-    &quot;embed&quot;: [ &quot;Templates/*.txt&quot;, &quot;Templates/*.R&quot;, &quot;Templates/*.json&quot; ]
-}
-</code></pre>
-
-<p>Project.json allows us to target multiple frameworks with one file and manage all dependencies in single place. Simplicity over complexity! </p>
-<pre><code class="json"> &quot;frameworks&quot;: {
-    &quot;net40&quot;: {
-      &quot;compilationOptions&quot;: {
-        &quot;define&quot;: [ &quot;CLASSIC&quot; ]
-      },
-      &quot;frameworkAssemblies&quot;: {
-        &quot;System.Management&quot;: &quot;4.0.0.0&quot;,
-        &quot;System.Xml&quot;: &quot;4.0.0.0&quot;
-      }
-    },
-    &quot;netstandard1.5&quot;: {
-      &quot;buildOptions&quot;: {
-        &quot;define&quot;: [ &quot;CORE&quot;]
-      },
-      &quot;dependencies&quot;: {
-        &quot;System.Linq&quot;: &quot;4.1.0&quot;,
-        &quot;System.Resources.ResourceManager&quot;: &quot;4.0.1&quot;,
-        &quot;Microsoft.CSharp&quot;: &quot;4.0.1&quot;,
-        &quot;Microsoft.Win32.Primitives&quot;: &quot;4.0.1&quot;,
-        &quot;System.Console&quot;: &quot;4.0.0&quot;,
-        &quot;System.Text.RegularExpressions&quot;: &quot;4.1.0&quot;,
-        &quot;System.Threading&quot;: &quot;4.0.11&quot;,
-        &quot;System.Reflection&quot;: &quot;4.1.0&quot;,
-        &quot;System.Reflection.Primitives&quot;: &quot;4.0.1&quot;,
-        &quot;System.Reflection.TypeExtensions&quot;: &quot;4.1.0&quot;,
-        &quot;System.Threading.Thread&quot;: &quot;4.0.0&quot;,
-        &quot;System.Diagnostics.Process&quot;: &quot;4.1.0&quot;,
-        &quot;System.IO.FileSystem&quot;: &quot;4.0.1&quot;,
-        &quot;System.Runtime.InteropServices.RuntimeInformation&quot;: &quot;4.0.0&quot;,
-        &quot;System.Runtime.Serialization.Primitives&quot;: &quot;4.1.1&quot;,
-        &quot;System.Diagnostics.Tools&quot;: &quot;4.0.1&quot;,
-        &quot;System.Runtime.InteropServices&quot;: &quot;4.1.0&quot;,
-        &quot;Microsoft.DotNet.InternalAbstractions&quot;: &quot;1.0.0&quot;,
-        &quot;System.Reflection.Extensions&quot;: &quot;4.0.1&quot;,
-        &quot;System.Diagnostics.Debug&quot;: &quot;4.0.11&quot;,
-        &quot;System.Xml.XPath.XmlDocument&quot;: &quot;4.0.1&quot;
-      }
-    }
-  }
-</code></pre>
-
-<p>Project.json.lock tells the compiler exactly where to look for our dependencies. You can produce it with „dotnet restore”. Sometimes VS will do this for you, sometimes you will have to do this on your own.</p>
-<h2 id="new-dependencies">New dependencies<a class="headerlink" href="#new-dependencies" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
-<p>There are at least 3 types of dependencies. Project, package and build. Sample:</p>
-<pre><code class="json"> &quot;dependencies&quot;: {
-    &quot;BenchmarkDotNet&quot;: {
-      &quot;target&quot;: &quot;project&quot;,
-      &quot;version&quot;: &quot;1.0.0-*&quot;
-    }
-  }
-</code></pre>
-
-<p>When you want to add some dependency then you just add in in the right place in project.json. It depends on which platforms the library that you would like use supports.</p>
+<p>When you want to add some dependency then you just use the &quot;Add reference&quot; option avaiable in Visual Studio. However, sometimes it might be not enough.</p>
 <h3 id="if-it-supports-all-frameworks">If it supports all frameworks<a class="headerlink" href="#if-it-supports-all-frameworks" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
-<p>Just to move the dependencies to common dependencies (same level as frameworks, same thing applies to frameworkAssemblies).</p>
-<pre><code class="json">  &quot;frameworks&quot;: {
-    &quot;net40&quot;: { },
-    &quot;netstandard1.5&quot;: { }
-  },
-  &quot;dependencies&quot;: {
-    &quot;someCommonDependency&quot;: &quot;it's version&quot;
-  }
+<p>Just add it to the top level of csproj.</p>
+<pre><code class="xml">  &lt;ItemGroup&gt;
+    &lt;ProjectReference Include=&quot;..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj&quot; /&gt;
+  &lt;/ItemGroup&gt;
 </code></pre>
 
-<h3 id="if-there-are-few-different-packagesversion">If there are few different packages/version<a class="headerlink" href="#if-there-are-few-different-packagesversion" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
-<p>Specify both dependencies in explicit way:</p>
-<pre><code class="json">    &quot;frameworks&quot;: {
-    &quot;net40&quot;: { 
-        &quot;dependencies&quot;: {
-            &quot;someCommonDependency&quot;: &quot;exact version that supports net40&quot;
-      }
-    },
-    &quot;netstandard1.5&quot;: { 
-        &quot;dependencies&quot;: {
-            &quot;someCommonDependency&quot;: &quot;exact version that supports netstandard1.5&quot;
-      }
-    }
-  }
+<h3 id="if-the-packageproject-is-not-available-for-all-target-frameworks">If the package/project is not available for all target frameworks<a class="headerlink" href="#if-the-packageproject-is-not-available-for-all-target-frameworks" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>Specify a conditional dependency:</p>
+<pre><code class="xml">  &lt;ItemGroup Condition=&quot; '$(TargetFramework)' == 'net45' &quot;&gt;
+    &lt;ProjectReference Include=&quot;..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj&quot; /&gt;
+  &lt;/ItemGroup&gt;
 </code></pre>
 
-<h3 id="if-the-desired-package-does-not-support-all-frameworks">If the desired package does not support all frameworks<a class="headerlink" href="#if-the-desired-package-does-not-support-all-frameworks" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
-<p>Add it as dependency to specific framework, but in code you use ugly #if #endif to exclude it for other compilation targets. 
+<p>Once you add it as dependency to specific framework, you need to use ugly #if #endif to exclude it for other compilation targets. 
 We define #CLASSIC, #CORE. In other OSS projects you can meet more complex names like #NET40, #NET451, #DNXCORE50 or #NETCORE. </p>
 <pre><code class="cs">#if CLASSIC
 using Microsoft.Build.Framework;
@@ -263,20 +182,6 @@ namespace BenchmarkDotNet.Loggers
     }
 }
 #endif
-</code></pre>
-
-<h3 id="if-it-is-not-a-package-but-dllexe-file">If it is not a package, but dll/exe file<a class="headerlink" href="#if-it-is-not-a-package-but-dllexe-file" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
-<p>Create a wrap for it. You can do this for VS, but currently it will not work with dotnet cli, since it is going to produce wrong path. This is why I recommend to do this manually. You just need to create new folder in solution's root, then put project.json file there and <strong>add the folder to global.json file</strong>. Sample wrap file:</p>
-<pre><code class="json">{
-  &quot;version&quot;: &quot;1.0.0-*&quot;,
-  &quot;frameworks&quot;: {
-    &quot;net40&quot;: {
-      &quot;bin&quot;: {
-        &quot;assembly&quot;: &quot;../CLRMD/Dia2Lib.dll&quot;
-      }
-    }
-  }
-}
 </code></pre>
 
 

@@ -45,7 +45,7 @@
     {
       "location": "Configs/Diagnosers.htm",
       "breadcrumbs": "Home / Configs / Diagnosers",
-      "keywords": "0 1 10 100 10kB 1183 12489 2 245 2762 3528 40234948 4237 46 4896 776 884 a A about accurate Add affect allocated Allocated Allocation also and any api apply are attach attributes Below benchmark BenchmarkDotNet benchmarks Benchmarks built by byte bytes can class column columns com config Config contains corefx cross cs current currently default Default diagnoser diagnosers Diagnosers Diagnostics does dotnet enabled Events example Examples execute expose exposed extra find following for from GC Gen get GetAllocatedBytesForCurrentThread github got hand how http https if img in In info Inlining InliningDiagnoser io is it JIT job Job kB longer main ManualConfig Mean Median memory Memory MemoryDiagnoser Method might mono Mono more netcoreapp1 new not note ns nuget NuGet number of on one or order org our output package packages perform platform private public pull questions recently Restrictions results right run sample separate separated shields ShortRun side some stackoverflow StdDev StdErr support svg take that That the The this time to use used useful users using v version way we when which why will Windows with www You your",
+      "keywords": "0 1 10 100 10kB 1183 12489 2 245 2762 3528 40234948 4237 46 4896 776 884 a A about accurate Add affect allocated Allocated Allocation also and any anymore api apply are attach attributes Below benchmark BenchmarkDotNet benchmarks Benchmarks built by byte bytes can class column columns com config Config contains corefx cross cs current currently default Default diagnoser diagnosers Diagnosers Diagnostics does dotnet enabled Events example Examples execute expose exposed extra find following for from GC Gen get GetAllocatedBytesForCurrentThread github got hand how http https if img in In info Inlining InliningDiagnoser io is it JIT job Job kB longer main ManualConfig Mean Median memory Memory MemoryDiagnoser Method might mono Mono more netcoreapp1 new not note ns nuget NuGet number of on one or order org our output package packages perform platform private public pull questions recently Restrictions results right run sample separate separated shields ShortRun side some stackoverflow StdDev StdErr support svg take that That the The this time to use used useful users using v version way we when which why will Windows with www You your",
       "title": "Diagnosers"
     },
     {
@@ -97,6 +97,12 @@
       "title": "STAThread"
     },
     {
+      "location": "Advanced/CustomMonoPath.htm",
+      "breadcrumbs": "Home / Advanced features / Custom Mono Path",
+      "keywords": "0 00 0023 004771 01 08 1 10 11 110 111 112 114 12 14393 151 155 1553 1584 1586 168 170 1727 188 2 21 2218 23 2459 24628 2729 2742190 3 30319 32bit 33 34 3425 364 4 40 42000 4333 4372 4400 4432 45 4520 4760 49 50 5073 5074 5757 6 60GHz 64bit 6600U 6653 6720 73 7332 7425 8 80 82 8421 85 9094 9337 9351 a A Algo_Md5VsSha256 Allocated allows apply attribute B BenchmarkDotNet BenchmarkRunner benchmarks bin brevity built by C can class cli Clr ClrJob compare configuration Core CoreJob CPU CreateConfig CreateEmpty cs ctor custom Custom default develop different do dotnet exe Files fluent for Found Frequency Host Hz i7 IConfig If in including ini Intel Job ManualConfig Md5 Mean Median Method Microsoft mono Mono MonoJob MonoRuntime N need NET new ns of or OS overloaded Path paths private Processor ProcessorCount Program provide public R rc4 removed Resolution results return runtime Runtime runtimes RyuJIT s Sample Scaled Sha256 ShortRun specifying Start StdDev Studio the this Timer TM to today TSC us use using v0 v4 version versions Visual want way we Windows With x86 you You your",
+      "title": "Custom Mono Path"
+    },
+    {
       "location": "HowItWorks.htm",
       "breadcrumbs": "Home / How it works",
       "keywords": "1 2 3 4 a A about After all an An and AverageOverhead be before benchmark BenchmarkDotNet BenchmarkRunner benchmarks best between builds bunch but by chosen class combination contains count creates each evaluated files following follows formats generates have How human IdleTarget IdleWarmup If in information instance invocation invoked is isolated it iteration iterations its job LaunchCount launching machine main Main MainTarget MainWarmup measure measurements method mode Next not of operation operations overhead params per performance Pilot plots process project readable Release Result run runs set Setup several steps summary Summary take target that the The times to try type Warmup we We will works you your",
@@ -123,13 +129,13 @@
     {
       "location": "Contributing/Building.htm",
       "breadcrumbs": "Home / Contributing / Building",
-      "keywords": "0 1 2 2015 3 5 691978 827546 835014 all and are available because BenchmarkDotNet beta build building Building code com connection Core disable disk dist download elements extension F fails following for For fwlink go hope https If Internet just later Latest let LinkId LinkID Manager microsoft NET not nuget NuGet on org packages Preview project required say SDK server some source space Studio the then these to Tooling Tools Update v3 Visual visualstudio vsix work your",
+      "keywords": "2017 all and are available because BenchmarkDotNet build building Building code com connection Core development disable disk download elements F fails following for For hope https If installed Internet just later let NET newer not nuget on or packages project RC4 required say server some source space studio Studio the then these to tools visual Visual visualstudio vs with work www your",
       "title": "Building"
     },
     {
       "location": "Contributing/Debugging.htm",
       "breadcrumbs": "Home / Contributing / Debugging",
-      "keywords": "11e6 15627671 24eb 6011991 89f2405a 8bd1 are assets available c9d45613e0f6 cloud com debug Debug Debugging down drop githubusercontent https in png profiles There two VS",
+      "keywords": "1 11e6 15627671 19 2 2017 24eb 6011991 89f2405a 8bd1 always and as assets available be bug c9d45613e0f6 change choose cloud com csproj debug Debug Debugging down drop due edit file first framework githubusercontent However https If impossible in is it moniker net45 netcoreapp1 of order please png profiles project RC4 seems set should TargetFrameworks that the then There to two used VS want you your",
       "title": "Debugging"
     },
     {
@@ -141,7 +147,7 @@
     {
       "location": "Contributing/Development.htm",
       "breadcrumbs": "Home / Contributing / Development",
-      "keywords": "0 1 11 2 3 4 5 a add Add added all allows also and any applies are as assembly at automatically be been BenchmarkDotNet bin both build Build BuildErrorEventArgs buildOptions but But by By can class CLASSIC cli CLRMD code Code ColumnNumber common compilation compilationOptions compiled compiler complex complexity config conflicts Console contain CORE create Create cs CSharp csproj currently Debug default define dependencies dependency depends desired Development Dia2Lib Diagnostics different displays dll DNXCORE50 do documentation does don dotnet DotNet dropped e efects effect embed endif enum error ErrorRaised errors eventSource every exact exactly example exclude exe explicit Extensions few file File files FileSystem folder folders for For framework Framework frameworkAssemblies frameworks get git global going has have I IEventSource if If ILogger images in In include Initialize interface internal InternalAbstractions InteropServices IO is it It json just Just least level library like LineNumber Linq lock logger Logger Loggers look manage Management manually meet Message Microsoft more move MsBuildConsoleLogger multiple names namespace need net40 NET40 NET451 NETCORE netstandard1 new New not null number object of on one OnEventSourceErrorRaised or OSS other our over override own package packages parent part path place platforms png Primitives private Process produce project Project projects public put R raw recommend references Reflection RegularExpressions replaced ResourceManager resources Resources restore right root Runtime RuntimeInformation same Sample sender Serialization set show side Simplicity since single so solution some someCommonDependency sometimes Sometimes specific Specify subfolder support supports System t target targets tells Templates Text that the The then there There these thing this This Thread Threading to Tools true txt TypeExtensions types ugly update us use using Utilities version void VS want warnings way We When where which why will Win32 with work would wrap WriteLineError wrong Xml XmlDocument XPath xproj xprojDisplaysAllFilesByDefault you You your",
+      "keywords": "0 1 2 3 4 a add Add all as avaiable available be BenchmarkDotNet Build BuildErrorEventArgs By can class CLASSIC Code ColumnNumber compilation complex Condition conditional CORE cs csproj default define dependency Development Diagnostics DNXCORE50 e endif enough error ErrorRaised errors eventSource exclude File for framework Framework frameworks get However IEventSource if If ILogger in In Include Initialize internal is it ItemGroup just Just level like LineNumber logger Logger Loggers meet Message Microsoft might more MsBuildConsoleLogger names namespace need NET40 net45 NET451 NETCORE not null object of Once OnEventSourceErrorRaised option or OSS other override package private project ProjectReference projects public reference sender set show some sometimes specific Specify src Studio supports target TargetFramework targets the then to top ugly use using Utilities Visual void want warnings We When Windows WriteLineError xml you",
       "title": "Development"
     },
     {
@@ -149,6 +155,12 @@
       "breadcrumbs": "Home / Contributing / Miscellaneous topics",
       "keywords": "20Chat 3Aissue 3Aopen 3Aup a add all appveyor at badge badges bdn benchmarkdotnet BenchmarkDotNet can chat Chat check ci com compilers config develop do dotnet download etc F feed following for from full github gitter grabs have help Here How https I If im in install is issues Join key label line list Miscellaneous Nightly Now nuget NuGet of package packageSources pr q restore room run section support svg the to topics up utm_campaign utm_content utm_medium utm_source value version want We xml you your",
       "title": "Miscellaneous topics"
+    },
+    {
+      "location": "FAQ.htm",
+      "breadcrumbs": "Home / FAQ",
+      "keywords": "0 1 12780 2 2010 2012 2013 2015 2017 237 3 a A also and And AnyCPU App application asked assembly attributes be benchmark BenchmarkDotNet benchmarks By can class ClrJob code com Condition Consider Console Core CoreCLR CoreJob create created creates cs csproj default do dotnet FAQ file following for Framework Frequently full github How http https I If in install installed issues it jetbrains lines main mark Mono MonoJob my NET net45 netcoreapp1 new Now NuGet of old on only or PlatformTarget project Q questions recommended requires rider Rider roslyn run RuntimeIdentifier See separated should Studio supports target TargetFramework TargetFrameworks targets the to up upgrade use Use versions Visual want which Why win7 with x x86 xml You your",
+      "title": "FAQ"
     },
     {
       "location": "license.htm",

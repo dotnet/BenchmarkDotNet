@@ -8,12 +8,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>STAThread - BenchmarkDotNet Documentation</title>
-    <link rel="shortcut icon" href="../favicon.ico">
-    <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-    <link rel="stylesheet" href="../css/theme_colors.css" type="text/css" />
-    <link rel="stylesheet" href="../css/styles/vs.css">
-    <link rel="stylesheet" href="../css/font-awesome.4.5.0.min.css">
+    <title>FAQ - BenchmarkDotNet Documentation</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="css/theme_colors.css" type="text/css" />
+    <link rel="stylesheet" href="css/styles/vs.css">
+    <link rel="stylesheet" href="css/font-awesome.4.5.0.min.css">
 
     <!-- Google Analytics -->
     <script>
@@ -60,61 +60,44 @@
     <div class="grid-for-nav">
         <nav data-toggle="nav-shift" class="nav-side stickynav">
             <div class="side-nav-search">
-                <a href="../index.htm"><i class="fa fa-home"></i> BenchmarkDotNet Documentation</a>
+                <a href="index.htm"><i class="fa fa-home"></i> BenchmarkDotNet Documentation</a>
                 <div role="search">
-                    <form id="search-form" class="form" action="../Docnet_search.htm" method="get">
+                    <form id="search-form" class="form" action="Docnet_search.htm" method="get">
                         <input type="text" name="q" placeholder="Search docs" />
                     </form>
                 </div>
             </div>
             <div class="menu menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
 <ul>
-<li class="tocentry"><a href="../index.htm">Home</a>
+<li class="tocentry"><a href="index.htm">Home</a>
 </li>
 
-<li class="tocentry"><a href="../Overview.htm">Overview</a>
+<li class="tocentry"><a href="Overview.htm">Overview</a>
 </li>
-<li class="tocentry"><a href="../GettingStarted.htm">Getting Started</a>
-</li>
-<li class="tocentry">
-<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Configs.htm">Configs</a></span>
-</li>
-<li class="tocentry"><a href="../HowToRun.htm">How to run your benchmarks</a>
+<li class="tocentry"><a href="GettingStarted.htm">Getting Started</a>
 </li>
 <li class="tocentry">
-<ul>
-<li><span class="navigationgroup"><i class="fa fa-caret-down"></i> <a href="../Advancedfeatures.htm">Advanced features</a></span></li>
-<li class="tocentry"><a href="../Advanced/Params.htm">Params</a>
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="Configs.htm">Configs</a></span>
 </li>
-<li class="tocentry"><a href="../Advanced/Setup.htm">Setup</a>
-</li>
-<li class="tocentry"><a href="../Advanced/Baseline.htm">Baseline</a>
-</li>
-<li class="tocentry"><a href="../Advanced/Percentiles.htm">Percentiles</a>
-</li>
-<li class="tocentry current"><a class="current" href="../Advanced/STAThread.htm">STAThread</a>
-<ul class="currentrelative">
-<li class="tocentry"><a href="#example">Example</a></li>
-</ul>
-<li class="tocentry"><a href="../Advanced/CustomMonoPath.htm">Custom Mono Path</a>
-</li>
-
-</ul>
-</li>
-<li class="tocentry"><a href="../HowItWorks.htm">How it works</a>
-</li>
-<li class="tocentry"><a href="../RulesOfBenchmarking.htm">Rules of benchmarking</a>
-</li>
-<li class="tocentry"><a href="../NuGet.htm">NuGet Packages</a>
-</li>
-<li class="tocentry"><a href="../Team.htm">Team</a>
+<li class="tocentry"><a href="HowToRun.htm">How to run your benchmarks</a>
 </li>
 <li class="tocentry">
-<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Contributing.htm">Contributing</a></span>
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="Advancedfeatures.htm">Advanced features</a></span>
 </li>
-<li class="tocentry"><a href="../FAQ.htm">FAQ</a>
+<li class="tocentry"><a href="HowItWorks.htm">How it works</a>
 </li>
-<li class="tocentry"><a href="../license.htm">License</a>
+<li class="tocentry"><a href="RulesOfBenchmarking.htm">Rules of benchmarking</a>
+</li>
+<li class="tocentry"><a href="NuGet.htm">NuGet Packages</a>
+</li>
+<li class="tocentry"><a href="Team.htm">Team</a>
+</li>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="Contributing.htm">Contributing</a></span>
+</li>
+<li class="tocentry current"><a class="current" href="FAQ.htm">FAQ</a>
+</li>
+<li class="tocentry"><a href="license.htm">License</a>
 </li>
 </ul>
 				<div class="toc-footer">
@@ -129,29 +112,46 @@
         <section data-toggle="nav-shift" class="nav-content-wrap">
             <nav class="nav-top" role="navigation" aria-label="top navigation">
                 <i data-toggle="nav-top" class="fa fa-bars"></i>
-                <a href="../index.htm">BenchmarkDotNet Documentation</a>
+                <a href="index.htm">BenchmarkDotNet Documentation</a>
             </nav>
             <div class="nav-content">
                 <div role="navigation" aria-label="breadcrumbs navigation">
                     <div class="breadcrumbs">
-<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Advancedfeatures.htm">Advanced features</a></li> / <li><a href="../Advanced/STAThread.htm">STAThread</a></li></ul>
+<ul><li><a href="index.htm">Home</a></li> / <li><a href="FAQ.htm">FAQ</a></li></ul>
 					
                     </div>
                     <hr />
                 </div>
                 <div role="main">
                     <div class="section">
-<h1 id="stathread">STAThread<a class="headerlink" href="#stathread" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
-<p>If the code you want to benchmark requires <code>[System.STAThread]</code> then you need to apply this attribute to the benchmarked method. BenchmarkDotNet will generate executable with <code>[STAThread]</code> applied to it's <code>Main</code> method.</p>
-<h2 id="example">Example<a class="headerlink" href="#example" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
-<pre><code class="cs">[Benchmark, System.STAThread]
-public void CheckForSTA()
-{
-    if (Thread.CurrentThread.GetApartmentState() != ApartmentState.STA)
-    {
-        throw new ThreadStateException(&quot;The current threads apartment state is not STA&quot;);
-    }
-}
+<h1 id="faq-frequently-asked-questions">FAQ (Frequently asked questions)<a class="headerlink" href="#faq-frequently-asked-questions" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<ul>
+<li>
+<p><strong>Q</strong> Why I can't install BenchmarkDotNet in Visual Studio 2010/2012/2013?<br />
+ <strong>A</strong>
+BenchmarkDotNet requires NuGet 3.x+ and can't be installed in old versions of Visual Studio which use NuGet 2.x.
+Consider to use Visual Studio 2015/2017 or <a href="http://jetbrains.com/rider/" target="_blank">Rider</a>.
+See also: <a href="https://github.com/dotnet/BenchmarkDotNet/issues/237" target="_blank">BenchmarkDotNet#237</a>, <a href="https://github.com/dotnet/roslyn/issues/12780" target="_blank">roslyn#12780</a>.</p>
+</li>
+<li>
+<p><strong>Q</strong> Why I can't install BenchmarkDotNet in a new .NET Core Console App in Visual Studio 2017?<br />
+<strong>A</strong> BenchmarkDotNet supports only netcoreapp1.1+.
+By default, Visual Studio 2017 creates a new application which targets netcoreapp1.0.
+You should upgrade it up to 1.1.
+If your want to target netcoreapp1.0 in your main assembly, it's recommended to create a separated project for benchmarks.</p>
+</li>
+<li>
+<p><strong>Q</strong> I created a new .NET Core Console App in Visual Studio 2017. Now I want to run my code on CoreCLR, full .NET Framework, and Mono. How can I do it?<br />
+<strong>A</strong> Use the following lines in your <code>.csproj</code> file:</p>
+</li>
+</ul>
+<pre><code class="xml">&lt;TargetFrameworks&gt;netcoreapp1.1;net45&lt;/TargetFrameworks&gt;
+&lt;RuntimeIdentifier Condition=&quot; '$(TargetFramework)' == 'net45' &quot;&gt;win7-x86&lt;/RuntimeIdentifier&gt;
+&lt;PlatformTarget&gt;AnyCPU&lt;/PlatformTarget&gt;
+</code></pre>
+
+<p>And mark your benchmark class with the following attributes:</p>
+<pre><code class="cs">[CoreJob, ClrJob, MonoJob]
 </code></pre>
 
 
@@ -166,10 +166,10 @@ BenchmarkDotNet Documentation. &copy;2013-2017. <a href='https://github.com/dotn
             </div>
         </section>
     </div>
-    <script src="../js/jquery-2.1.1.min.js"></script>
-    <script src="../js/modernizr-2.8.3.min.js"></script>
-    <script src="../js/highlight.pack.js"></script>
-    <script src="../js/theme.js"></script>
+    <script src="js/jquery-2.1.1.min.js"></script>
+    <script src="js/modernizr-2.8.3.min.js"></script>
+    <script src="js/highlight.pack.js"></script>
+    <script src="js/theme.js"></script>
 
 </body>
 </html>
