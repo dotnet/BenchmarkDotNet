@@ -6,9 +6,6 @@ namespace BenchmarkDotNet.IntegrationTests.CustomPaths
     public class BenchmarksThatUseTypeFromCustomPathDll
     {
         [Benchmark]
-        public string Benchmark()
-        {
-            return new SingleClass().ToString();
-        }
+        public string Benchmark() => new SingleClass().ToString();
     }
 }

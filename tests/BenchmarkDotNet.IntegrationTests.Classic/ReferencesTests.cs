@@ -8,46 +8,26 @@ namespace BenchmarkDotNet.IntegrationTests.Classic
     public class ReferencesTests
     {
         private readonly ITestOutputHelper output;
-
-        public ReferencesTests(ITestOutputHelper output)
-        {
-            this.output = output;
-        }
+        public ReferencesTests(ITestOutputHelper output) => this.output = output;
 
         [Fact]
-        public void FSharpIsSupported()
-        {
-            BenchmarkTestRunner.CanCompileAndRun<FSharpBenchmark.Db>(output);
-        }
+        public void FSharpIsSupported() => Run<FSharpBenchmark.Db>();
 
         [Fact]
-        public void VisualBasicIsSupported()
-        {
-            BenchmarkTestRunner.CanCompileAndRun<VisualBasic.Sample>(output);
-        }
+        public void VisualBasicIsSupported() => Run<VisualBasic.Sample>();
 
         [Fact]
-        public void BenchmarksThatUseTypeFromCustomPathDllAreSupported()
-        {
-            BenchmarkTestRunner.CanCompileAndRun<BenchmarksThatUseTypeFromCustomPathDll>(output);
-        }
+        public void BenchmarksThatUseTypeFromCustomPathDllAreSupported() => Run<BenchmarksThatUseTypeFromCustomPathDll>();
 
         [Fact]
-        public void BenchmarksThatReturnTypeFromCustomPathDllAreSupported()
-        {
-            BenchmarkTestRunner.CanCompileAndRun<BenchmarksThatReturnTypeFromCustomPathDll>(output);
-        }
+        public void BenchmarksThatReturnTypeFromCustomPathDllAreSupported() => Run<BenchmarksThatReturnTypeFromCustomPathDll>();
 
         [Fact]
-        public void BenchmarksThatReturnTypeThatRequiresDifferentRuntimeAreSupported()
-        {
-            BenchmarkTestRunner.CanCompileAndRun<BenchmarksThatReturnTypeThatRequiresDifferentRuntime>(output);
-        }
+        public void BenchmarksThatReturnTypeThatRequiresDifferentRuntimeAreSupported() => Run<BenchmarksThatReturnTypeThatRequiresDifferentRuntime>();
 
         [Fact]
-        public void BenchmarksThatUseTypeThatRequiresDifferentRuntimeAreSupported()
-        {
-            BenchmarkTestRunner.CanCompileAndRun<BenchmarksThatUseTypeThatRequiresDifferentRuntime>(output);
-        }
+        public void BenchmarksThatUseTypeThatRequiresDifferentRuntimeAreSupported() => Run<BenchmarksThatUseTypeThatRequiresDifferentRuntime>();
+
+        private void Run<T>() => BenchmarkTestRunner.CanCompileAndRun<T>(output);
     }
 }
