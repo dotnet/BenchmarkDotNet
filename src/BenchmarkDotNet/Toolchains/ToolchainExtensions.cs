@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !UAP
+using System;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Environments;
@@ -6,6 +7,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.ProjectJson;
+using BenchmarkDotNet.Toolchains.Uap;
 
 namespace BenchmarkDotNet.Toolchains
 {
@@ -33,6 +35,8 @@ namespace BenchmarkDotNet.Toolchains
 #endif
                 case CoreRuntime core:
                     return isUsingProjectJson.Value ? ProjectJsonCoreToolchain.Current.Value : CsProjCoreToolchain.Current.Value;
+                case UapRuntime uap:
+                    return new UapToolchain(new UapToolchainConfig() { CSRFCookieValue = uap.CsfrCookie, DevicePortalUri = uap.DevicePortalUri, UAPBinariesFolder = uap.UapBinariesPath, WMIDCookieValue = uap.WmidCookie });
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtime), runtime, "Runtime not supported");
             }
@@ -53,3 +57,4 @@ namespace BenchmarkDotNet.Toolchains
         }
     }
 }
+#endif

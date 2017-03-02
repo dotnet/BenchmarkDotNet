@@ -18,6 +18,18 @@ namespace BenchmarkDotNet.Helpers
             }
         }
 
+        internal static byte[] LoadBinaryFile(string name)
+        {
+            var resourceName = "BenchmarkDotNet.Core.Templates." + name;
+            using (var stream = GetResouceStream(resourceName))
+            {
+                if (stream == null)
+                    throw new Exception($"Resource {resourceName} not found");
+                using (var reader = new BinaryReader(stream))
+                    return reader.ReadBytes((int)stream.Length);
+            }
+        }
+
         private static Stream GetResouceStream(string resourceName)
         {
             return typeof(ResourceHelper).GetTypeInfo().Assembly.GetManifestResourceStream(resourceName);

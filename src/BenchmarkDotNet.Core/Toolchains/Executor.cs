@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !UAP
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -101,6 +102,9 @@ namespace BenchmarkDotNet.Toolchains
                 case ClrRuntime clr:
                 case CoreRuntime core:
                     start.FileName = exePath;
+                    break;
+                case UapRuntime uap:
+                    start.FileName = exePath;
                     start.Arguments = args;
                     break;
                 case MonoRuntime mono:
@@ -126,3 +130,4 @@ namespace BenchmarkDotNet.Toolchains
         }
     }
 }
+#endif

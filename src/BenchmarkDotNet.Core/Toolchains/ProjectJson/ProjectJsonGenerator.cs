@@ -1,3 +1,4 @@
+#if !UAP
 using System;
 using System.IO;
 using BenchmarkDotNet.Characteristics;
@@ -83,3 +84,4 @@ namespace BenchmarkDotNet.Toolchains.ProjectJson
         }
     }
 }
+#endif

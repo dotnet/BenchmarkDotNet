@@ -102,7 +102,9 @@ namespace BenchmarkDotNet.Configs
                 { "stackoverflow", new[] { MarkdownExporter.StackOverflow } },
                 { "github", new[] { MarkdownExporter.GitHub } },
                 { "plain", new[] { PlainExporter.Default } },
+#if !UAP
                 { "rplot", new[] { RPlotExporter.Default } },
+#endif
                 { "json", new[] { JsonExporter.Default } },
                 { "briefjson", new[] { JsonExporter.Brief } },
                 { "fulljson", new[] { JsonExporter.Full } },

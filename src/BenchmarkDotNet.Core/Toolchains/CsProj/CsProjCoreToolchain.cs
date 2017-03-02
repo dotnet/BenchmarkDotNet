@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !UAP
+using System;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
@@ -71,3 +72,4 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         }
     }
 }
+#endif

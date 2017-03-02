@@ -1,3 +1,4 @@
+#if !UAP
 using BenchmarkDotNet.Exporters;
 
 namespace BenchmarkDotNet.Attributes.Exporters
@@ -9,3 +10,4 @@ namespace BenchmarkDotNet.Attributes.Exporters
         }
     }
 }
+#endif

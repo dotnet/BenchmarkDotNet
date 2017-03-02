@@ -1,3 +1,4 @@
+#if !UAP
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 
@@ -19,3 +20,4 @@ namespace BenchmarkDotNet.Toolchains.ProjectJson
         }
     }
 }
+#endif

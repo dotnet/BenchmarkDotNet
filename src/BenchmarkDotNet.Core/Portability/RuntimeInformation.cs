@@ -12,7 +12,7 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
-#if !CORE
+#if !CORE && !UAP
 using System.Management;
 
 #endif
@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static bool IsWindows()
         {
-#if !CORE
+#if !CORE && !UAP
             return new[] { PlatformID.Win32NT, PlatformID.Win32S, PlatformID.Win32Windows, PlatformID.WinCE }
                 .Contains(System.Environment.OSVersion.Platform);
 #else
@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static bool IsLinux()
         {
-#if !CORE
+#if !CORE && !UAP
             return System.Environment.OSVersion.Platform == PlatformID.Unix;
 #else
             return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static bool IsMacOSX()
         {
-#if !CORE
+#if !CORE && !UAP
             return System.Environment.OSVersion.Platform == PlatformID.MacOSX;
 #else
             return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
@@ -66,6 +66,9 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetOsVersion()
         {
+#if UAP
+            return "Windows";
+#else
             if (IsLinux())
             {
                 string os = ExternalToolsHelper.LsbRelease.Value.GetValueOrDefault("Description");
@@ -93,11 +96,12 @@ namespace BenchmarkDotNet.Portability
 
             return Unknown;
 #endif
+#endif
         }
 
         internal static string GetProcessorName()
         {
-#if !CORE
+#if !CORE && !UAP
             if (IsWindows() && !IsMono())
             {
                 try
@@ -114,6 +118,7 @@ namespace BenchmarkDotNet.Portability
                 }
             }
 #endif
+#if !UAP
             if (IsWindows())
                 return NiceString(ExternalToolsHelper.Wmic.Value.GetValueOrDefault("Name") ?? "");
 
@@ -122,7 +127,7 @@ namespace BenchmarkDotNet.Portability
 
             if (IsMacOSX())
                 return NiceString(ExternalToolsHelper.Sysctl.Value.GetValueOrDefault("machdep.cpu.brand_string") ?? "");
-
+#endif
             return Unknown;
         }
 
@@ -153,6 +158,10 @@ namespace BenchmarkDotNet.Portability
             return $"Clr {System.Environment.Version}";
 #elif CORE
             return System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
+#elif UAP
+            // System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription throws on UWP release build. TODO: fill issue in corefx
+            var attr = typeof(object).GetTypeInfo().Assembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute)).OfType<AssemblyFileVersionAttribute>().FirstOrDefault();
+            return $".NET Native {attr.Version}"; 
 #endif
         }
 
@@ -162,6 +171,8 @@ namespace BenchmarkDotNet.Portability
             return IsMono() ? Runtime.Mono : Runtime.Clr;
 #elif CORE
             return Runtime.Core;
+#elif UAP
+            return Runtime.Uap;
 #endif
         }
 
@@ -169,7 +180,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static IEnumerable<JitModule> GetJitModules()
         {
-#if !CORE
+#if !CORE && !UAP
             return
                 Process.GetCurrentProcess().Modules
                     .OfType<ProcessModule>()
@@ -182,7 +193,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetJitModulesInfo()
         {
-#if !CORE
+#if !CORE && !UAP
             return string.Join(";", GetJitModules().Select(m => m.Name + "-v" + m.Version));
 #else
             return Unknown; // TODO: verify if it is possible to get this for CORE
@@ -191,7 +202,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static bool HasRyuJit()
         {
-#if CORE
+#if (CORE || UAP)
             return true;
 #else
             return !IsMono()
@@ -210,7 +221,7 @@ namespace BenchmarkDotNet.Portability
         {
             if (IsMono())
                 return ""; // There is no helpful information about JIT on Mono
-#if CORE
+#if (CORE || UAP)
             // For now, we can say that CoreCLR supports only RyuJIT because we allow our users to run only x64 benchmark for Core.
             // However if we enable 32bit support for .NET Core 1.1 it won't be true, because right now .NET Core is using Legacy Jit for 32bit.
             // And 32bit .NET Core has support for Windows now only.
@@ -236,29 +247,35 @@ namespace BenchmarkDotNet.Portability
 
         internal static IntPtr GetCurrentAffinity()
         {
+            IntPtr ret = default(IntPtr);
+#if !UAP
             try
             {
-                return Process.GetCurrentProcess().ProcessorAffinity;
+                ret = Process.GetCurrentProcess().ProcessorAffinity;
             }
             catch (PlatformNotSupportedException)
             {
-                return default(IntPtr);
             }
+#endif
+            return ret;
         }
 
         internal static string GetConfiguration()
         {
+            string ret = Unknown;
+#if !UAP
             bool? isDebug = Assembly.GetEntryAssembly().IsDebug();
-            if (isDebug.HasValue == false)
+            if (isDebug.HasValue == true)
             {
-                return Unknown;
+                ret = isDebug.Value ? DebugConfigurationName : ReleaseConfigurationName; ;
             }
-            return isDebug.Value ? DebugConfigurationName : ReleaseConfigurationName;
+#endif
+            return ret;
         }
 
         internal static string GetDotNetCliRuntimeIdentifier()
         {
-#if CORE
+#if (CORE || UAP)
             return Microsoft.DotNet.InternalAbstractions.RuntimeEnvironment.GetRuntimeIdentifier();
 #else
 // the Microsoft.DotNet.InternalAbstractions has no .NET 4.0 support, so we have to build it on our own

@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Horology
             return value;
         }
 
-#if !CORE
+#if !CORE && !UAP
         [HandleProcessCorruptedStateExceptions] // #276
         [SecurityCritical]
 #endif

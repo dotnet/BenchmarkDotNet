@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Configs
 
         private static IDiagnoser[] LoadDiagnosers()
         {
-#if !CORE
+#if !CORE && !UAP
             var diagnosticAssembly = "BenchmarkDotNet.Diagnostics.Windows.dll";
             try
             {

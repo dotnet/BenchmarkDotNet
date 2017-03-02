@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Portability
     {
         internal static bool EqualsWithIgnoreCase(this string left, string right)
         {
-#if !CORE
+#if !CORE && !UAP
             return left.Equals(right, StringComparison.InvariantCultureIgnoreCase);
 #else
             // http://stackoverflow.com/questions/14600694/where-has-stringcomparison-invariantcultureignorecase-gone
