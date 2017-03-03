@@ -11,7 +11,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
     /// <summary>Helper class that creates <see cref="BenchmarkAction"/> instances. </summary>
     public static partial class BenchmarkActionFactory
     {
-        #region Factory core
         /// <summary>
         /// Dispatch method that creates <see cref="BenchmarkAction"/> using
         /// <paramref name="targetMethod"/> or <paramref name="fallbackIdleSignature"/> to find correct implementation.
@@ -92,7 +91,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <summary>Helper to enforce .ctor signature.</summary>
         private static BenchmarkActionBase Create(Type actionType, object instance, MethodInfo method, BenchmarkActionCodegen codegenMode, int unrollFactor) =>
             (BenchmarkActionBase)Activator.CreateInstance(actionType, instance, method, codegenMode, unrollFactor);
-        #endregion
 
         private static void FallbackMethod() { }
         private static readonly MethodInfo FallbackSignature = new Action(FallbackMethod).GetMethodInfo();

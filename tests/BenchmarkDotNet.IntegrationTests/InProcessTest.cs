@@ -21,49 +21,61 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class InProcessTest : BenchmarkTestExecutor
     {
-        public InProcessTest(ITestOutputHelper output) : base(output) { }
+        public InProcessTest(ITestOutputHelper output) : base(output)
+        {
+        }
 
         private const decimal DecimalResult = 42;
         private const string StringResult = "42";
 
-        #region Direct runs
         private const int UnrollFactor = 16;
 
         [Fact]
-        public void TestBenchmarkActionSetup() => TestInvoke(x => BenchmarkAllCases.Setup(), UnrollFactor);
-        [Fact]
-        public void TestBenchmarkActionCleanup() => TestInvoke(x => x.Cleanup(), UnrollFactor);
+        public void BenchmarkActionSetupSupported() => TestInvoke(x => BenchmarkAllCases.Setup(), UnrollFactor);
 
         [Fact]
-        public void TestBenchmarkActionVoid() => TestInvoke(x => x.InvokeOnceVoid(), UnrollFactor);
-        [Fact]
-        public void TestBenchmarkActionTask() => TestInvoke(x => x.InvokeOnceTaskAsync(), UnrollFactor, null);
-        [Fact]
-        public void TestBenchmarkActionRefType() => TestInvoke(x => x.InvokeOnceRefType(), UnrollFactor, StringResult);
-        [Fact]
-        public void TestBenchmarkActionValueType() => TestInvoke(x => x.InvokeOnceValueType(), UnrollFactor, DecimalResult);
-        [Fact]
-        public void TestBenchmarkActionTaskOfT() => TestInvoke(x => x.InvokeOnceTaskOfTAsync(), UnrollFactor, StringResult);
-        [Fact]
-        public void TestBenchmarkActionValueTaskOfT() => TestInvoke(x => x.InvokeOnceValueTaskOfT(), UnrollFactor, DecimalResult);
+        public void BenchmarkActionCleanupSupported() => TestInvoke(x => x.Cleanup(), UnrollFactor);
 
         [Fact]
-        public void TestBenchmarkActionStaticVoid() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticVoid(), UnrollFactor);
+        public void BenchmarkActionVoidSupported() => TestInvoke(x => x.InvokeOnceVoid(), UnrollFactor);
+
         [Fact]
-        public void TestBenchmarkActionStaticTask() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticTaskAsync(), UnrollFactor, null);
+        public void BenchmarkActionTaskSupported() => TestInvoke(x => x.InvokeOnceTaskAsync(), UnrollFactor, null);
+
         [Fact]
-        public void TestBenchmarkActionStaticRefType() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticRefType(), UnrollFactor, StringResult);
+        public void BenchmarkActionRefTypeSupported() => TestInvoke(x => x.InvokeOnceRefType(), UnrollFactor, StringResult);
+
         [Fact]
-        public void TestBenchmarkActionStaticValueType() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticValueType(), UnrollFactor, DecimalResult);
+        public void BenchmarkActionValueTypeSupported() => TestInvoke(x => x.InvokeOnceValueType(), UnrollFactor, DecimalResult);
+
         [Fact]
-        public void TestBenchmarkActionStaticTaskOfT() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticTaskOfTAsync(), UnrollFactor, StringResult);
+        public void BenchmarkActionTaskOfTSupported() => TestInvoke(x => x.InvokeOnceTaskOfTAsync(), UnrollFactor, StringResult);
+
         [Fact]
-        public void TestBenchmarkActionStaticValueTaskOfT() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticValueTaskOfT(), UnrollFactor, DecimalResult);
+        public void BenchmarkActionValueTaskOfTSupported() => TestInvoke(x => x.InvokeOnceValueTaskOfT(), UnrollFactor, DecimalResult);
+
+        [Fact]
+        public void BenchmarkActionStaticVoidSupported() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticVoid(), UnrollFactor);
+
+        [Fact]
+        public void BenchmarkActionStaticTaskSupported() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticTaskAsync(), UnrollFactor, null);
+
+        [Fact]
+        public void BenchmarkActionStaticRefTypeSupported() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticRefType(), UnrollFactor, StringResult);
+
+        [Fact]
+        public void BenchmarkActionStaticValueTypeSupported() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticValueType(), UnrollFactor, DecimalResult);
+
+        [Fact]
+        public void BenchmarkActionStaticTaskOfTSupported() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticTaskOfTAsync(), UnrollFactor, StringResult);
+
+        [Fact]
+        public void BenchmarkActionStaticValueTaskOfTSupported() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticValueTaskOfT(), UnrollFactor, DecimalResult);
 
         [AssertionMethod]
         private void TestInvoke(Expression<Action<BenchmarkAllCases>> methodCall, int unrollFactor)
         {
-            var targetMethod = ((MethodCallExpression)methodCall.Body).Method;
+            var targetMethod = ((MethodCallExpression) methodCall.Body).Method;
             var target = new Target(typeof(BenchmarkAllCases), targetMethod, targetMethod, targetMethod);
 
             // Run mode
@@ -101,7 +113,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [AssertionMethod]
         private void TestInvoke<T>(Expression<Func<BenchmarkAllCases, T>> methodCall, int unrollFactor, object expectedResult)
         {
-            var targetMethod = ((MethodCallExpression)methodCall.Body).Method;
+            var targetMethod = ((MethodCallExpression) methodCall.Body).Method;
             var target = new Target(typeof(BenchmarkAllCases), targetMethod);
 
             // Run mode
@@ -172,7 +184,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 BenchmarkAllCases.Counter = 0;
             }
         }
-        #endregion
 
         private IConfig CreateInProcessConfig(BenchmarkActionCodegen codegenMode, OutputLogger logger = null, IDiagnoser diagnoser = null)
         {
@@ -183,7 +194,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public void InProcessBenchmarkAllCasesReflectionEmitTest()
+        public void InProcessBenchmarkAllCasesReflectionEmitSupported()
         {
             var logger = new OutputLogger(Output);
             var config = CreateInProcessConfig(BenchmarkActionCodegen.ReflectionEmit, logger);
@@ -209,7 +220,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public void InProcessBenchmarkAllCasesDelegateCombineTest()
+        public void InProcessBenchmarkAllCasesDelegateCombineSupported()
         {
             var logger = new OutputLogger(Output);
             var config = CreateInProcessConfig(BenchmarkActionCodegen.DelegateCombine, logger);
@@ -237,7 +248,6 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void InProcessBenchmarkAllCasesDiagnoserTest()
         {
-
             var logger = new OutputLogger(Output);
             var config = new ManualConfig()
                 .With(Job.Default.With(InProcessToolchain.Instance))
@@ -296,7 +306,6 @@ namespace BenchmarkDotNet.IntegrationTests
             [Cleanup]
             public void Cleanup() => Interlocked.Increment(ref Counter);
 
-            #region Instance members
             [Benchmark]
             public void InvokeOnceVoid()
             {
@@ -338,9 +347,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 Interlocked.Increment(ref Counter);
                 return new ValueTask<decimal>(DecimalResult);
             }
-            #endregion
 
-            #region Static members
             [Benchmark]
             public static void InvokeOnceStaticVoid()
             {
@@ -382,7 +389,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 Interlocked.Increment(ref Counter);
                 return new ValueTask<decimal>(DecimalResult);
             }
-            #endregion
         }
     }
 }

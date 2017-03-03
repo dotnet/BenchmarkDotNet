@@ -30,8 +30,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <summary> Default timeout for in-process benchmarks. </summary>
         public static readonly TimeSpan DefaultTimeout = TimeSpan.FromMinutes(5);
 
-        #region .ctor & properties
-
         /// <summary>Initializes a new instance of the <see cref="InProcessExecutor" /> class.</summary>
         /// <param name="timeout">Timeout for the run.</param>
         /// <param name="codegenMode">Describes how benchmark action code is generated.</param>
@@ -58,8 +56,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <value><c>true</c> if the output should be logged; otherwise, <c>false</c>.</value>
         public bool LogOutput { get; }
 
-        #endregion
-
         /// <summary>Executes the specified benchmark.</summary>
         /// <param name="buildResult">The build result.</param>
         /// <param name="benchmark">The benchmark.</param>
@@ -71,7 +67,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             BuildResult buildResult, Benchmark benchmark, ILogger logger, IResolver resolver, IDiagnoser diagnoser = null)
         {
             // TODO: preallocate buffer for output (no direct logging)?
-            var host = new InProcessHost(benchmark, LogOutput ? logger : null, diagnoser);
+            var hostLogger = LogOutput ? logger : new CompositeLogger();
+            var host = new InProcessHost(benchmark, hostLogger, diagnoser);
 
             int exitCode = -1;
             var runThread = new Thread(() => exitCode = ExecuteCore(host, benchmark, logger));

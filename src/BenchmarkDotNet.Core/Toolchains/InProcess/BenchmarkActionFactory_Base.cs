@@ -44,8 +44,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 return (TDelegate)(object)mainMethod.CreateDelegate(typeof(TDelegate), targetInstance);
             }
 
-            #region FallbackMode
-
             protected static bool UseFallbackCode(BenchmarkActionCodegen codegenMode, int unrollFactor) =>
                 unrollFactor <= 1 || codegenMode == BenchmarkActionCodegen.DelegateCombine;
 
@@ -60,10 +58,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 return (TDelegate)(object)Delegate.Combine(
                     Enumerable.Repeat((Delegate)(object)callback, unrollFactor).ToArray());
             }
-
-            #endregion
-
-            #region Emit mode
 
             private const BindingFlags GetFieldFlags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
 
@@ -221,8 +215,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
                 g.Emit(OpCodes.Ret);
             }
-
-            #endregion
         }
     }
 }

@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 var dummy2 = BenchmarkActionFactory.CreateDummy();
                 var dummy3 = BenchmarkActionFactory.CreateDummy();
 
-                FillProperties(instance, benchmark);
+                FillMembers(instance, benchmark);
 
                 host.WriteLine();
                 foreach (var infoLine in BenchmarkEnvironmentInfo.GetCurrent().ToFormattedString())
@@ -110,7 +110,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             /// <summary>Fills the properties of the instance of the object used to run the benchmark.</summary>
             /// <param name="instance">The instance.</param>
             /// <param name="benchmark">The benchmark.</param>
-            private static void FillProperties(object instance, Benchmark benchmark)
+            private static void FillMembers(object instance, Benchmark benchmark)
             {
                 foreach (var parameter in benchmark.Parameters.Items)
                 {
@@ -120,16 +120,26 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     var targetType = benchmark.Target.Type;
                     var paramProperty = targetType.GetProperty(parameter.Name, flags);
 
-                    var setter = paramProperty?.GetSetMethod();
-                    if (setter == null)
-                        throw new InvalidOperationException(
-                            $"Type {targetType.FullName}: no settable property {parameter.Name} found.");
+                    if (paramProperty == null)
+                    {
+                        var paramField = targetType.GetField(parameter.Name, flags);
+                        if (paramField == null)
+                            throw new InvalidOperationException(
+                                $"Type {targetType.FullName}: no property or field {parameter.Name} found.");
 
-                    // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-                    if (setter.IsStatic)
-                        setter.Invoke(null, new[] { parameter.Value });
+                        var callInstance = paramField.IsStatic ? null : instance;
+                        paramField.SetValue(callInstance, parameter.Value);
+                    }
                     else
-                        setter.Invoke(instance, new[] { parameter.Value });
+                    {
+                        var setter = paramProperty.GetSetMethod();
+                        if (setter == null)
+                            throw new InvalidOperationException(
+                                $"Type {targetType.FullName}: no settable property {parameter.Name} found.");
+
+                        var callInstance = setter.IsStatic ? null : instance;
+                        setter.Invoke(callInstance, new[] { parameter.Value });
+                    }
                 }
             }
         }

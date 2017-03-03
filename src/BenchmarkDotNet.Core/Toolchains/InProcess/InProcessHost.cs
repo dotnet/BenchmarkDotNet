@@ -13,12 +13,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess
     /// <seealso cref="IHost"/>
     public sealed class InProcessHost : IHost
     {
-        #region Fields & .ctor
 
         [NotNull]
         private readonly Benchmark benchmark;
 
-        [CanBeNull]
+        [NotNull]
         private readonly ILogger logger;
 
         [CanBeNull]
@@ -29,12 +28,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
         /// <summary>Creates a new instance of <see cref="InProcessHost"/>.</summary>
         /// <param name="benchmark">Current benchmark.</param>
-        /// <param name="logger">Optional logger for informational output.</param>
+        /// <param name="logger">Logger for informational output.</param>
         /// <param name="diagnoser">Diagnosers, if attached.</param>
-        public InProcessHost([NotNull] Benchmark benchmark, [CanBeNull] ILogger logger, [CanBeNull] IDiagnoser diagnoser)
+        public InProcessHost([NotNull] Benchmark benchmark, [NotNull] ILogger logger, [CanBeNull] IDiagnoser diagnoser)
         {
             if (benchmark == null)
                 throw new ArgumentNullException(nameof(benchmark));
+            if (logger == null)
+                throw new ArgumentNullException(nameof(logger));
 
             this.benchmark = benchmark;
             this.logger = logger;
@@ -45,10 +46,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 currentProcess = Process.GetCurrentProcess();
         }
 
-        #endregion
-
-        #region Properties
-
         /// <summary><c>True</c> if there are diagnosers attached.</summary>
         /// <value><c>True</c> if there are diagnosers attached.</value>
         public bool IsDiagnoserAttached { get; }
@@ -57,18 +54,16 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <value>Results of the run.</value>
         public RunResults RunResults { get; private set; }
 
-        #endregion
-
         /// <summary>Passes text to the host.</summary>
         /// <param name="message">Text to write.</param>
-        public void Write(string message) => logger?.Write(message);
+        public void Write(string message) => logger.Write(message);
 
         /// <summary>Passes new line to the host.</summary>
-        public void WriteLine() => logger?.WriteLine();
+        public void WriteLine() => logger.WriteLine();
 
         /// <summary>Passes text (new line appended) to the host.</summary>
         /// <param name="message">Text to write.</param>
-        public void WriteLine(string message) => logger?.WriteLine(message);
+        public void WriteLine(string message) => logger.WriteLine(message);
 
         /// <summary>Sends notification signal to the host.</summary>
         /// <param name="hostSignal">The signal to send.</param>
@@ -102,13 +97,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         {
             RunResults = runResults;
 
-            if (logger != null)
+            using (var w = new StringWriter())
             {
-                using (var w = new StringWriter())
-                {
-                    runResults.Print(w);
-                    logger.Write(w.GetStringBuilder().ToString());
-                }
+                runResults.Print(w);
+                logger.Write(w.GetStringBuilder().ToString());
             }
         }
     }

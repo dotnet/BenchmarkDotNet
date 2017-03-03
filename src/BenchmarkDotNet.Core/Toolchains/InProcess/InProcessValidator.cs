@@ -17,8 +17,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
     [PublicAPI]
     public class InProcessValidator : IValidator
     {
-        #region Validation rules
-
         // ReSharper disable HeapView.DelegateAllocation
         private static readonly IReadOnlyDictionary<Characteristic, Func<Job, Characteristic, string>> ValidationRules =
             new Dictionary<Characteristic, Func<Job, Characteristic, string>>
@@ -76,8 +74,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             job.Infrastructure.Toolchain is InProcessToolchain
                 ? null
                 : $"should be instance of {nameof(InProcessToolchain)}.";
-
-        #endregion
 
         /// <summary>The instance of validator that does NOT fail on error.</summary>
         public static readonly IValidator DontFailOnError = new InProcessValidator(false);
