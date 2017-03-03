@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Running
         public static Summary RunSource(string source, IConfig config = null)
         {
 #if CLASSIC
-            return BenchmarkRunnerCore.Run(BenchmarkConverter.SourceToBenchmarks(source, config), config, ToolchainExtensions.GetToolchain);
+            return BenchmarkRunnerCore.Run(BenchmarkConverter.SourceToBenchmarks(source,  config), config, ToolchainExtensions.GetToolchain);
 #else
             throw new NotSupportedException();
 #endif

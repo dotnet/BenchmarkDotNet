@@ -6,6 +6,7 @@ namespace BenchmarkDotNet.Engines
 {
     public class EngineParameters
     {
+        public IHost Host { get; set; }
         public Action<long> MainAction { get; set; }
         public Action Dummy1Action { get; set; }
         public Action Dummy2Action { get; set; }
@@ -15,7 +16,6 @@ namespace BenchmarkDotNet.Engines
         public long OperationsPerInvoke { get; set; } = 1;
         public Action SetupAction { get; set; } = null;
         public Action CleanupAction { get; set; } = null;
-        public bool IsDiagnoserAttached { get; set; }
         public IResolver Resolver { get; set; }
     }
 }

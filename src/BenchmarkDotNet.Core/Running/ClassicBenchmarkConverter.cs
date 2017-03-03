@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Loggers;
 using Microsoft.CSharp;
 
 namespace BenchmarkDotNet.Running
@@ -13,6 +15,8 @@ namespace BenchmarkDotNet.Running
     {
         public static Benchmark[] UrlToBenchmarks(string url, IConfig config = null)
         {
+            var logger = config?.GetCompositeLogger() ?? HostEnvironmentInfo.FallbackLogger;
+
             url = GetRawUrl(url);
             string benchmarkContent;
             try
@@ -24,13 +28,13 @@ namespace BenchmarkDotNet.Running
                     benchmarkContent = reader.ReadToEnd();
                 if (string.IsNullOrWhiteSpace(benchmarkContent))
                 {
-                    Console.WriteLine($"content of '{url}' is empty.");
+                    logger.WriteLineHint($"content of '{url}' is empty.");
                     return new Benchmark[0];
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine("BuildException: " + e.Message);
+                logger.WriteLineError("BuildException: " + e.Message);
                 return new Benchmark[0];
             }
             return SourceToBenchmarks(benchmarkContent, config);
@@ -59,7 +63,9 @@ namespace BenchmarkDotNet.Running
             var compilerResults = cSharpCodeProvider.CompileAssemblyFromSource(compilerParameters, benchmarkContent);
             if (compilerResults.Errors.HasErrors)
             {
-                compilerResults.Errors.Cast<CompilerError>().ToList().ForEach(error => Console.WriteLine(error.ErrorText));
+                var logger = config?.GetCompositeLogger() ?? HostEnvironmentInfo.FallbackLogger;
+    
+                compilerResults.Errors.Cast<CompilerError>().ToList().ForEach(error => logger.WriteLineError(error.ErrorText));
                 return new Benchmark[0];
             }
             return (

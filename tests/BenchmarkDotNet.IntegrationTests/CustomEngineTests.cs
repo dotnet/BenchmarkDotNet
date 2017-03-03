@@ -76,18 +76,19 @@ namespace BenchmarkDotNet.IntegrationTests
                     default(GcStats));
             }
 
+            public IHost Host { get; }
+            public bool IsDiagnoserAttached { get; }
+            public void WriteLine() { }
+            public void WriteLine(string line) { }
             public Job TargetJob { get; }
             public long OperationsPerInvoke { get; }
             public Action SetupAction { get; set; }
             public Action CleanupAction { get; set; }
             public Action<long> MainAction { get; }
             public Action<long> IdleAction { get; }
-            public bool IsDiagnoserAttached { get; }
             public IResolver Resolver { get; }
 
             public Measurement RunIteration(IterationData data) { throw new NotImplementedException(); }
-            public void WriteLine() { }
-            public void WriteLine(string line) { }
             public void PreAllocate() { }
             public void Jitting() { }
         }

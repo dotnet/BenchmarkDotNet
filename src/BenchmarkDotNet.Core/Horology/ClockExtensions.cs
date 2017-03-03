@@ -1,15 +1,16 @@
 using System;
+using System.IO;
 
 namespace BenchmarkDotNet.Horology
 {
     public static class ClockExtensions
     {
-        public static void PrintInfo(this IClock clock)
+        public static void PrintInfo(this IClock clock, TextWriter textWriter)
         {
-            Console.WriteLine($"{clock.GetType().Name}");
-            Console.WriteLine($"  Frequency = {clock.Frequency}");
-            Console.WriteLine($"  Resolution = {clock.GetResolution().Nanoseconds} ns");
-            Console.WriteLine($"  Availability = {(clock.IsAvailable ? "Available" : "Not available")}");
+            textWriter.WriteLine($"{clock.GetType().Name}");
+            textWriter.WriteLine($"  Frequency = {clock.Frequency}");
+            textWriter.WriteLine($"  Resolution = {clock.GetResolution().Nanoseconds} ns");
+            textWriter.WriteLine($"  Availability = {(clock.IsAvailable ? "Available" : "Not available")}");
         }
 
         public static TimeInterval GetResolution(this IClock clock)

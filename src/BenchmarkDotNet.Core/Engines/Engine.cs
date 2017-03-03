@@ -16,6 +16,8 @@ namespace BenchmarkDotNet.Engines
         public const int MinInvokeCount = 4;
         public static readonly TimeInterval MinIterationTime = 200 * TimeInterval.Millisecond;
 
+        public IHost Host { get; }
+        public bool IsDiagnoserAttached { get; }
         public Action<long> MainAction { get; }
         public Action Dummy1Action { get; }
         public Action Dummy2Action { get; }
@@ -25,7 +27,6 @@ namespace BenchmarkDotNet.Engines
         public long OperationsPerInvoke { get; }
         public Action SetupAction { get; }
         public Action CleanupAction { get; }
-        public bool IsDiagnoserAttached { get; }
         public IResolver Resolver { get; }
 
         private IClock Clock { get; }
@@ -41,9 +42,13 @@ namespace BenchmarkDotNet.Engines
         private bool isJitted, isPreAllocated;
         private int forcedFullGarbageCollections;
 
-        internal Engine(Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> idleAction, Action<long> mainAction, Job targetJob,
-            Action setupAction, Action cleanupAction, long operationsPerInvoke, bool isDiagnoserAttached)
+        internal Engine(
+            IHost host,
+            Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> idleAction, Action<long> mainAction, Job targetJob,
+            Action setupAction, Action cleanupAction, long operationsPerInvoke)
         {
+            Host = host;
+            IsDiagnoserAttached = host.IsDiagnoserAttached;
             IdleAction = idleAction;
             Dummy1Action = dummy1Action;
             Dummy2Action = dummy2Action;
@@ -53,7 +58,6 @@ namespace BenchmarkDotNet.Engines
             SetupAction = setupAction;
             CleanupAction = cleanupAction;
             OperationsPerInvoke = operationsPerInvoke;
-            IsDiagnoserAttached = isDiagnoserAttached;
 
             Resolver = new CompositeResolver(BenchmarkRunnerCore.DefaultResolver, EngineResolver.Instance);
 
@@ -175,14 +179,14 @@ namespace BenchmarkDotNet.Engines
         {
             EnsureNothingIsPrintedWhenDiagnoserIsAttached();
 
-            Console.WriteLine(text);
+            Host.WriteLine(text);
         }
 
         public void WriteLine()
         {
             EnsureNothingIsPrintedWhenDiagnoserIsAttached();
 
-            Console.WriteLine();
+            Host.WriteLine();
         }
 
         private void EnableMonitoring()
@@ -212,6 +216,7 @@ namespace BenchmarkDotNet.Engines
             public const string BeforeAnythingElse = "// BeforeAnythingElse";
             public const string AfterSetup = "// AfterSetup";
             public const string BeforeCleanup = "// BeforeCleanup";
+            public const string AfterAnythingElse = "// AfterAnythingElse";
             public const string DiagnoserIsAttachedParam = "diagnoserAttached";
         }
     }

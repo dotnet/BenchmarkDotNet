@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
@@ -10,7 +11,6 @@ namespace BenchmarkDotNet.Engines
     public struct RunResults
     {
         private readonly bool removeOutliers;
-        private readonly long totalOperationsCount;
 
         [CanBeNull]
         public IReadOnlyList<Measurement> Idle { get; }
@@ -20,6 +20,8 @@ namespace BenchmarkDotNet.Engines
 
         public GcStats GCStats { get; }
 
+        public long TotalOperationsCount { get; }
+
         public RunResults(
             [CanBeNull] IReadOnlyList<Measurement> idle, [NotNull] IReadOnlyList<Measurement> main, bool removeOutliers, GcStats gcStats)
         {
@@ -28,12 +30,13 @@ namespace BenchmarkDotNet.Engines
             Main = main;
             GCStats = gcStats;
 
-            totalOperationsCount = 0;
+            var totalOperationsCount = 0L;
             foreach (var measurement in Main)
             {
                 if (!measurement.IterationMode.IsIdle())
                     totalOperationsCount += measurement.Operations;
             }
+            TotalOperationsCount = totalOperationsCount;
         }
 
         // TODO: rewrite without allocations
@@ -60,17 +63,14 @@ namespace BenchmarkDotNet.Engines
             }
         }
 
-        public void Print()
+        public void Print(TextWriter outWriter)
         {
             foreach (var measurement in GetMeasurements())
-                WriteLine(measurement.ToOutputLine());
+                outWriter.WriteLine(measurement.ToOutputLine());
 
-            WriteLine(GCStats.WithTotalOperations(totalOperationsCount).ToOutputLine());
-            WriteLine();
+            outWriter.WriteLine(GCStats.WithTotalOperations(TotalOperationsCount).ToOutputLine());
+            outWriter.WriteLine();
         }
-
-        private void WriteLine() => Console.WriteLine();
-        private void WriteLine(string line) => Console.WriteLine(line);
 
         // TODO: improve
         // If we get value < 0.1ns, it's probably a random noise, the actual value is 0.0ns.
