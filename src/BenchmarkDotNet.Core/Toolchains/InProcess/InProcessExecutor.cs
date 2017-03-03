@@ -72,18 +72,20 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
             int exitCode = -1;
             var runThread = new Thread(() => exitCode = ExecuteCore(host, benchmark, logger));
+
+#if CLASSIC
             if (benchmark.Target.Method.GetCustomAttributes<STAThreadAttribute>(false).Any())
             {
-                // TODO: runThread.SetApartmentState(ApartmentState.STA);
+                runThread.SetApartmentState(ApartmentState.STA);
             }
+#endif 
             runThread.IsBackground = true;
 
             var timeout = HostEnvironmentInfo.GetCurrent().HasAttachedDebugger ? UnderDebuggerTimeout : ExecutionTimeout;
 
             runThread.Start();
 
-            // TODO: to timespan overload (not available for .Net Core for now).
-            if (!runThread.Join((int) timeout.TotalMilliseconds))
+            if (!runThread.Join((int)timeout.TotalMilliseconds))
                 throw new InvalidOperationException(
                     $"Benchmark {benchmark.DisplayInfo} takes to long to run. " +
                     "Prefer to use out-of-process toolchains for long-running benchmarks.");
@@ -97,16 +99,22 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             var process = Process.GetCurrentProcess();
             var oldPriority = process.PriorityClass;
             var oldAffinity = process.ProcessorAffinity;
+#if CLASSIC
+            var thread = Thread.CurrentThread;
+            var oldThreadPriority = thread.Priority;
+#endif
 
             var affinity = benchmark.Job.ResolveValueAsNullable(EnvMode.AffinityCharacteristic);
             try
             {
                 process.TrySetPriority(ProcessPriorityClass.High, logger);
+#if CLASSIC
+                thread.TrySetPriority(ThreadPriority.Highest, logger);
+#endif
                 if (affinity != null)
                 {
                     process.TrySetAffinity(affinity.Value, logger);
                 }
-                // TODO: set thread priority to highest
 
                 exitCode = InProcessRunner.Run(host, benchmark, CodegenMode);
             }
@@ -116,9 +124,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             }
             finally
             {
-                // TODO: restore thread priority
-
                 process.TrySetPriority(oldPriority, logger);
+#if CLASSIC
+                thread.TrySetPriority(oldThreadPriority, logger);
+#endif
                 if (affinity != null)
                 {
                     process.EnsureProcessorAffinity(oldAffinity);

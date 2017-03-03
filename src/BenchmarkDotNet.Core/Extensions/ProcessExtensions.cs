@@ -36,7 +36,6 @@ namespace BenchmarkDotNet.Extensions
             process.ProcessorAffinity = FixAffinity(value);
         }
 
-        // TODO: Set thread priority method (not available for .net standard for now)
         public static bool TrySetPriority(
             [NotNull] this Process process,
             ProcessPriorityClass priority,
