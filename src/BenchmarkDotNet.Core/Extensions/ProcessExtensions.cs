@@ -22,9 +22,18 @@ namespace BenchmarkDotNet.Extensions
             }
         }
 
+        private static IntPtr FixAffinity(IntPtr processorAffinity)
+        {
+            int cpuMask = (1 << Environment.ProcessorCount) - 1;
+
+            return IntPtr.Size == sizeof(Int64) 
+                ? new IntPtr(processorAffinity.ToInt64() & cpuMask)
+                : new IntPtr(processorAffinity.ToInt32() & cpuMask);
+        }
+
         public static void EnsureProcessorAffinity(this Process process, IntPtr value)
         {
-            process.ProcessorAffinity = value;
+            process.ProcessorAffinity = FixAffinity(value);
         }
 
         // TODO: Set thread priority method (not available for .net standard for now)
@@ -64,8 +73,7 @@ namespace BenchmarkDotNet.Extensions
 
             try
             {
-                var cpuMask = (1 << Environment.ProcessorCount) - 1;
-                process.ProcessorAffinity = new IntPtr(processorAffinity.ToInt32() & cpuMask);
+                process.ProcessorAffinity = FixAffinity(processorAffinity);
                 return true;
             }
             catch (Exception ex)
