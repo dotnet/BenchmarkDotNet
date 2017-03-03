@@ -1,6 +1,8 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Toolchains.InProcess;
@@ -10,20 +12,23 @@ namespace BenchmarkDotNet.Samples.Intro
     [Config(typeof(Config))]
     [OrderProvider(SummaryOrderPolicy.FastestToSlowest)]
     [MemoryDiagnoser]
-    public class IntroInProcess
+    public class IntroInProcessWrongEnv
     {
         private class Config : ManualConfig
         {
             public Config()
             {
-                Add(Job.MediumRun
-                    .WithLaunchCount(1)
-                    .WithId("OutOfProc"));
+                var wrongPlatform = IntPtr.Size == sizeof(int)
+                    ? Platform.X64
+                    : Platform.X86;
 
                 Add(Job.MediumRun
                     .WithLaunchCount(1)
+                    .With(wrongPlatform)
                     .With(InProcessToolchain.Instance)
                     .WithId("InProcess"));
+
+                Add(InProcessValidator.DontFailOnError);
             }
         }
 

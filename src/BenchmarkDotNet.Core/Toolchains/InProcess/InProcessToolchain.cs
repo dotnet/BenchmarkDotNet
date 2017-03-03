@@ -44,7 +44,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <param name="logger">The logger.</param>
         /// <param name="resolver">The resolver.</param>
         /// <returns><c>true</c> if the benchmark can be run with the toolchain.</returns>
-        public bool IsSupported(Benchmark benchmark, ILogger logger, IResolver resolver) => true;
+        public bool IsSupported(Benchmark benchmark, ILogger logger, IResolver resolver) =>
+            InProcessValidator.IsSupported(benchmark, logger);
 
         /// <summary>Name of the toolchain.</summary>
         /// <value>The name of the toolchain.</value>

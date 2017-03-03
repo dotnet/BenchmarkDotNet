@@ -4,6 +4,8 @@ using System.Linq;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
@@ -81,6 +83,52 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <summary>The instance of validator that DOES fail on error.</summary>
         public static readonly IValidator FailOnError = new InProcessValidator(true);
 
+        public static bool IsSupported(Benchmark benchmark, ILogger logger)
+        {
+            var result = new List<ValidationError>();
+            ValidateJob(benchmark.Job, true, result);
+            if (result.Any())
+            {
+                logger.WriteLineInfo($"// Benchmark {benchmark.DisplayInfo}");
+                logger.WriteLineInfo("// cannot be run in-process. Validation errors:");
+                foreach (var validationError in result)
+                {
+                    logger.WriteLineInfo($"//    * {validationError.Message}");
+                }
+                logger.WriteLine();
+
+                return false;
+            }
+            return true;
+        }
+
+        private static void ValidateJob(Job job, bool isCritical, ICollection<ValidationError> validationResults)
+        {
+            foreach (var characteristic in job.GetCharacteristicsWithValues())
+            {
+                Func<Job, Characteristic, string> validationRule;
+                if (ValidationRules.TryGetValue(characteristic, out validationRule))
+                {
+                    var message = validationRule(job, characteristic);
+                    if (!string.IsNullOrEmpty(message))
+                        validationResults.Add(
+                            new ValidationError(
+                                isCritical,
+                                $"Job {job}, {characteristic.FullId} {message}"));
+                }
+#if DEBUG
+                else if (characteristic.IsPresentableCharacteristic())
+                {
+                    validationResults.Add(
+                        new ValidationError(
+                            false,
+                            $"Job {job}, {characteristic.FullId}: no validation rule specified."));
+                }
+#endif
+            }
+        }
+
+
         private InProcessValidator(bool failOnErrors)
         {
             TreatsWarningsAsErrors = failOnErrors;
@@ -91,8 +139,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         ///     <c>true</c> if the validator should treat warnings as errors; otherwise, <c>false</c>.
         /// </value>
         public bool TreatsWarningsAsErrors { get; }
-
-        // TODO: check for diagnosers that cannot be run in-process?
 
         /// <summary>Proofs that benchmarks' jobs match the environment.</summary>
         /// <param name="validationParameters">The validation parameters.</param>
@@ -113,26 +159,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
             foreach (var job in validationParameters.Config.GetJobs())
             {
-                foreach (var characteristic in job.GetCharacteristicsWithValues())
-                {
-                    Func<Job, Characteristic, string> validationRule;
-                    if (ValidationRules.TryGetValue(characteristic, out validationRule))
-                    {
-                        var message = validationRule(job, characteristic);
-                        if (!string.IsNullOrEmpty(message))
-                            result.Add(
-                                new ValidationError(
-                                    TreatsWarningsAsErrors,
-                                    $"Job {job}, {characteristic.FullId} {message}"));
-                    }
-#if DEBUG
-                    else if (characteristic.IsPresentableCharacteristic())
-                        result.Add(
-                            new ValidationError(
-                                false,
-                                $"Job {job}, {characteristic.FullId}: no validation rule specified."));
-#endif
-                }
+                ValidateJob(job, TreatsWarningsAsErrors, result);
             }
 
             return result.ToArray();
