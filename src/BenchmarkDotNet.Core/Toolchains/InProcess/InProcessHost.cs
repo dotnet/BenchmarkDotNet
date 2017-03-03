@@ -30,10 +30,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <param name="benchmark">Current benchmark.</param>
         /// <param name="logger">Logger for informational output.</param>
         /// <param name="diagnoser">Diagnosers, if attached.</param>
-        public InProcessHost([NotNull] Benchmark benchmark, [NotNull] ILogger logger, [CanBeNull] IDiagnoser diagnoser)
+        public InProcessHost(Benchmark benchmark, ILogger logger, IDiagnoser diagnoser)
         {
             if (benchmark == null)
                 throw new ArgumentNullException(nameof(benchmark));
+
             if (logger == null)
                 throw new ArgumentNullException(nameof(logger));
 

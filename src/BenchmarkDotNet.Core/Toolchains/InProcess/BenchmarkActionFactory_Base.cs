@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             protected static bool UseFallbackCode(BenchmarkActionCodegen codegenMode, int unrollFactor) =>
                 unrollFactor <= 1 || codegenMode == BenchmarkActionCodegen.DelegateCombine;
 
-            protected static TDelegate Unroll<TDelegate>([NotNull] TDelegate callback, int unrollFactor)
+            protected static TDelegate Unroll<TDelegate>(TDelegate callback, int unrollFactor)
             {
                 if (callback == null)
                     throw new ArgumentNullException(nameof(callback));
@@ -62,13 +62,16 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             private const BindingFlags GetFieldFlags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
 
             protected static Action<long> EmitInvokeMultiple(
-                [NotNull] BenchmarkActionBase instance,
-                [NotNull] string callbackFieldName,
-                [CanBeNull] string storeResultFieldName,
+                BenchmarkActionBase instance,
+                string callbackFieldName,
+                string storeResultFieldName,
                 int unrollFactor)
             {
                 if (instance == null)
                     throw new ArgumentNullException(nameof(instance));
+
+                if (callbackFieldName == null)
+                    throw new ArgumentNullException(nameof(callbackFieldName));
 
                 var instanceType = instance.GetType();
                 var callbackField = GetCallbackField(instanceType, callbackFieldName);
