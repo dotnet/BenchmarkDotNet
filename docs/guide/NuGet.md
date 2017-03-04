@@ -1,16 +1,47 @@
-# NuGet Packages
+# NuGet
+
+## Packages
 
 We have the following set of NuGet packages (you can install it directly from `nuget.org`):
 
 * `BenchmarkDotNet.Core`: basic BenchmarkDotNet infrastructure and logic. Doesn't have any dependencies.
-* `BenchmarkDotNet.Toolchains.Roslyn`: a package that includes `RoslynToolchain` which adds an ability to build your benchmarks with the Roslyn compiler. Denends on a set of additional NuGet packages.
+* `BenchmarkDotNet.Toolchains.Roslyn`: a package that includes `RoslynToolchain` which adds an ability to build your benchmarks with the Roslyn compiler. Depends on a set of additional NuGet packages.
 * `BenchmarkDotNet`: an ultimate package that depends on `BenchmarkDotNet.Core` and `BenchmarkDotNet.Toolchains.Roslyn`: provides the `BenchmarkRunner`. In 99% of situations, you should start with this package.
 * `BenchmarkDotNet.Diagnostics.Windows`: an additional optional package that provides a set of Windows diagnosers.
 
-## Nightly NuGet feed
+## Versioning system and feeds
+We have 3 kinds of versions: *stable*, *nightly*, and *develop*.
+You can get the current version from the source code via `BenchmarkDotNetInfo.FullVersion` and the full title via `BenchmarkDotNetInfo.FullTitle`.
 
-If you want to check the develop version of the BenchmarkDotNet NuGet packages, add the following line in the `<packageSources>` section of your `NuGet.config`:
+### Stable
+These versions are available from the official NuGet feed.
+
 ```xml
-<add key="appveyor-bdn" value="https://ci.appveyor.com/nuget/benchmarkdotnet" />
+<packageSources>
+  <add key="api.nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
+</packageSources>
 ```
-Now you can install the packages from the `appveyor-bdn` feed.
+
+* Example of the main NuGet package: `BenchmarkDotNet.0.10.3.nupkg`.
+* Example of `BenchmarkDotNetInfo.FullTitle`: `BenchmarkDotNet v0.10.3`.
+
+### Nightly
+If you want to check a nightly prerelease version of the BenchmarkDotNet, add the `https://ci.appveyor.com/nuget/benchmarkdotnet` feed in the `<packageSources>` section of your `NuGet.config`:
+
+```xml
+<packageSources>
+  <add key="bdn-nightly" value="https://ci.appveyor.com/nuget/benchmarkdotnet" />
+</packageSources>
+```
+
+Now you can install the packages from the `bdn-nightly` feed (don't forget to enable the "Include prerelease" checkbox).
+
+* Example of the main NuGet package: `BenchmarkDotNet.0.10.3.13-nightly.nupkg`.
+* Example of `BenchmarkDotNetInfo.FullTitle`: `BenchmarkDotNet v0.10.3.13-nightly`.
+
+### Develop
+You also can build BenchmarkDotNet from source code.
+The `.nupkg` files could be build with the help of `.\build\build-and-pack.cmd`.
+
+* Example of the main NuGet package: `BenchmarkDotNet.0.10.3-develop.nupkg`.
+* Example of `BenchmarkDotNetInfo.FullTitle`: `BenchmarkDotNet v0.10.3.20170304-develop`.

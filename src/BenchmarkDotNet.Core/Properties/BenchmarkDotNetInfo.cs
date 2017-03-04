@@ -5,10 +5,30 @@ namespace BenchmarkDotNet.Properties
 {
     public static class BenchmarkDotNetInfo
     {
-        public const bool IsDevelopVersion = true; // Set to false for NuGet publishing
+#if PRERELEASE_NIGHTLY
+        public const string PrereleaseLabel = "-nightly";
+#elif PRERELEASE_DEVELOP
+        public const string PrereleaseLabel = "-develop";
+#else
+        public const string PrereleaseLabel = "";
+#endif
 
-        public static readonly Lazy<string> FullVersion = new Lazy<string>(() => typeof(BenchmarkDotNetInfo).GetTypeInfo().Assembly.GetName().Version.ToString() + (IsDevelopVersion ? "-develop" : ""));
-        public static readonly Lazy<string> FullTitle = new Lazy<string>(() => "BenchmarkDotNet v" + FullVersion.Value);
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+        private static readonly Lazy<string> FullVersionLazy = new Lazy<string>(() =>
+        {
+            string version = typeof(BenchmarkDotNetInfo).GetTypeInfo().Assembly.GetName().Version.ToString();
+            if (version.EndsWith(".0") && PrereleaseLabel == "")
+                version = version.Substring(0, version.Length - 2);
+            if (version.EndsWith(".0") && PrereleaseLabel == "-develop")
+                version = version.Substring(0, version.Length - 1) + DateTime.Now.ToString("yyyyMMdd");
+            return version + PrereleaseLabel;
+        });
+
+        private static readonly Lazy<string> FullTitleLazy = new Lazy<string>(() => "BenchmarkDotNet v" + FullVersionLazy.Value);
+
+        public static string FullVersion => FullVersionLazy.Value;
+
+        public static string FullTitle => FullTitleLazy.Value;
 
         internal const string PublicKey =
             "00240000048000009400000006020000002400005253413100040000010001002970bbdfca4d12" +

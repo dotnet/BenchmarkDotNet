@@ -31,17 +31,27 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <BuildNumber Condition=" '$(APPVEYOR_BUILD_NUMBER)' != '' ">$(APPVEYOR_BUILD_NUMBER)</BuildNumber>
-    <BuildNumber Condition=" '$(BUILD_NUMBER)' != '' ">$(BUILD_NUMBER)</BuildNumber>
-    <BuildNumber Condition=" '$(BuildNumber)' == '' ">0</BuildNumber>
-    
     <Major>0</Major>
     <Minor>10</Minor>
     <Revision>3</Revision>
 
+    <BuildNumber Condition=" '$(APPVEYOR_BUILD_NUMBER)' != '' ">$(APPVEYOR_BUILD_NUMBER)</BuildNumber>
+    <BuildNumber Condition=" '$(BUILD_NUMBER)' != '' ">$(BUILD_NUMBER)</BuildNumber>
+    <BuildNumber Condition=" '$(BuildNumber)' == '' ">0</BuildNumber>
+
+    <PrereleaseLabel Condition=" '$(APPVEYOR_BUILD_NUMBER)' != '' ">-nightly</PrereleaseLabel>
+    <PrereleaseLabel Condition=" '$(PrereleaseLabel)' == '' ">-develop</PrereleaseLabel>
+    <!-- <PrereleaseLabel></PrereleaseLabel> --> <!-- For release versions only -->
+
+    <PrereleaseLabelConstants></PrereleaseLabelConstants>
+    <PrereleaseLabelConstants Condition=" '$(PrereleaseLabel)' == '-nightly' ">PRERELEASE_NIGHTLY</PrereleaseLabelConstants>
+    <PrereleaseLabelConstants Condition=" '$(PrereleaseLabel)' == '-develop' ">PRERELEASE_DEVELOP</PrereleaseLabelConstants>
+    <DefineConstants>$(DefineConstants);$(PrereleaseLabelConstants)</DefineConstants>
+
+
     <AssemblyVersion>$(Major).$(Minor).$(Revision).$(BuildNumber)</AssemblyVersion>
     <AssemblyFileVersion>$(Major).$(Minor).$(Revision).$(BuildNumber)</AssemblyFileVersion>
-    <AssemblyInformationalVersion>$(Major).$(Minor).$(Revision).$(BuildNumber)</AssemblyInformationalVersion>
-    <PackageVersion>$(Major).$(Minor).$(Revision).$(BuildNumber)</PackageVersion>
+    <AssemblyInformationalVersion>$(Major).$(Minor).$(Revision).$(BuildNumber)$(PrereleaseLabel)</AssemblyInformationalVersion>
+    <PackageVersion>$(Major).$(Minor).$(Revision).$(BuildNumber)$(PrereleaseLabel)</PackageVersion>
   </PropertyGroup>
 </Project>

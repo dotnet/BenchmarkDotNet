@@ -88,6 +88,6 @@ namespace BenchmarkDotNet.Environments
 
         internal bool IsDotNetCliInstalled() => !string.IsNullOrEmpty(DotNetCliVersion.Value);
 
-        private static string GetBenchmarkDotNetVersion() => BenchmarkDotNetInfo.FullVersion.Value;
+        private static string GetBenchmarkDotNetVersion() => BenchmarkDotNetInfo.FullVersion;
     }
 }
