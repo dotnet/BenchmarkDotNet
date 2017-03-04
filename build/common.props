@@ -50,7 +50,7 @@
 
     <AssemblyVersion>$(Major).$(Minor).$(Revision).$(BuildNumber)</AssemblyVersion>
     <AssemblyFileVersion>$(Major).$(Minor).$(Revision).$(BuildNumber)</AssemblyFileVersion>
-    <AssemblyInformationalVersion>$(Major).$(Minor).$(Revision).$(BuildNumber)$(PrereleaseLabel)</AssemblyInformationalVersion>
+    <InformationalVersion>$(Major).$(Minor).$(Revision).$(BuildNumber)$(PrereleaseLabel)</InformationalVersion>
     <PackageVersion>$(Major).$(Minor).$(Revision).$(BuildNumber)$(PrereleaseLabel)</PackageVersion>
   </PropertyGroup>
 </Project>
