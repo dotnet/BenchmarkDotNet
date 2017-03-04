@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using BenchmarkDotNet.Loggers;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -21,9 +22,66 @@ namespace BenchmarkDotNet.Extensions
             }
         }
 
+        private static IntPtr FixAffinity(IntPtr processorAffinity)
+        {
+            int cpuMask = (1 << Environment.ProcessorCount) - 1;
+
+            return IntPtr.Size == sizeof(Int64) 
+                ? new IntPtr(processorAffinity.ToInt64() & cpuMask)
+                : new IntPtr(processorAffinity.ToInt32() & cpuMask);
+        }
+
         public static void EnsureProcessorAffinity(this Process process, IntPtr value)
         {
-            process.ProcessorAffinity = value;
+            process.ProcessorAffinity = FixAffinity(value);
+        }
+
+        public static bool TrySetPriority(
+            [NotNull] this Process process,
+            ProcessPriorityClass priority,
+            [NotNull] ILogger logger)
+        {
+            if (process == null)
+                throw new ArgumentNullException(nameof(process));
+            if (logger == null)
+                throw new ArgumentNullException(nameof(logger));
+
+            try
+            {
+                process.PriorityClass = priority;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLineError(
+                    $"// ! Failed to set up priority {priority} for process {process}. Make sure you have the right permissions. Message: {ex.Message}");
+            }
+
+            return false;
+        }
+
+        public static bool TrySetAffinity(
+            [NotNull] this Process process,
+            IntPtr processorAffinity,
+            [NotNull] ILogger logger)
+        {
+            if (process == null)
+                throw new ArgumentNullException(nameof(process));
+            if (logger == null)
+                throw new ArgumentNullException(nameof(logger));
+
+            try
+            {
+                process.ProcessorAffinity = FixAffinity(processorAffinity);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLineError(
+                    $"// ! Failed to set up processor affinity 0x{(long)processorAffinity:X} for process {process}. Make sure you have the right permissions. Message: {ex.Message}");
+            }
+
+            return false;
         }
     }
 }

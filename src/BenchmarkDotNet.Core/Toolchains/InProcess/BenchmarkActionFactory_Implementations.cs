@@ -1,0 +1,203 @@
+﻿using System;
+using System.Reflection;
+using System.Threading.Tasks;
+
+namespace BenchmarkDotNet.Toolchains.InProcess
+{
+    /*
+        Design goals of the whole stuff: check the comments for BenchmarkActionBase.
+     */
+
+    // DONTTOUCH: Be VERY CAREFUL when changing the code.
+    // Please, ensure that the implementation is in sync with content of BenchmarkProgram.txt
+
+    /// <summary>Helper class that creates <see cref="BenchmarkAction"/> instances. </summary>
+    public static partial class BenchmarkActionFactory
+    {
+        internal class BenchmarkActionVoid : BenchmarkActionBase
+        {
+            private readonly Action callback;
+            private readonly Action unrolledCallback;
+
+            public BenchmarkActionVoid(object instance, MethodInfo method, BenchmarkActionCodegen codegenMode, int unrollFactor)
+            {
+                callback = CreateMainOrIdle<Action>(instance, method, IdleStatic, IdleInstance);
+                InvokeSingle = callback;
+
+                if (UseFallbackCode(codegenMode, unrollFactor))
+                {
+                    unrolledCallback = Unroll(callback, unrollFactor);
+                    InvokeMultiple = InvokeMultipleHardcoded;
+                }
+                else
+                {
+                    InvokeMultiple = EmitInvokeMultiple(this, nameof(callback), null, unrollFactor);
+                }
+            }
+
+            private static void IdleStatic() { }
+            private void IdleInstance() { }
+
+            private void InvokeMultipleHardcoded(long repeatCount)
+            {
+                for (long i = 0; i < repeatCount; i++)
+                    unrolledCallback();
+            }
+        }
+
+        internal class BenchmarkAction<T> : BenchmarkActionBase
+        {
+            private readonly Func<T> callback;
+            private readonly Func<T> unrolledCallback;
+            private T result;
+
+            public BenchmarkAction(object instance, MethodInfo method, BenchmarkActionCodegen codegenMode, int unrollFactor)
+            {
+                callback = CreateMainOrIdle<Func<T>>(instance, method, IdleStatic, IdleInstance);
+                InvokeSingle = InvokeSingleHardcoded;
+
+                if (UseFallbackCode(codegenMode, unrollFactor))
+                {
+                    unrolledCallback = Unroll(callback, unrollFactor);
+                    InvokeMultiple = InvokeMultipleHardcoded;
+                }
+                else
+                {
+                    InvokeMultiple = EmitInvokeMultiple(this, nameof(callback), nameof(result), unrollFactor);
+                }
+            }
+
+            private static T IdleStatic() => default(T);
+            private T IdleInstance() => default(T);
+
+            private void InvokeSingleHardcoded() => result = callback();
+
+            private void InvokeMultipleHardcoded(long repeatCount)
+            {
+                for (long i = 0; i < repeatCount; i++)
+                    result = unrolledCallback();
+            }
+
+            public override object LastRunResult => result;
+        }
+
+        internal class BenchmarkActionTask : BenchmarkActionBase
+        {
+            private readonly Func<Task> startTaskCallback;
+            private readonly Action callback;
+            private readonly Action unrolledCallback;
+
+            public BenchmarkActionTask(object instance, MethodInfo method, BenchmarkActionCodegen codegenMode, int unrollFactor)
+            {
+                startTaskCallback = CreateMainOrIdle<Func<Task>>(instance, method, IdleStatic, IdleInstance);
+                callback = ExecuteBlocking;
+                InvokeSingle = callback;
+
+                if (UseFallbackCode(codegenMode, unrollFactor))
+                {
+                    unrolledCallback = Unroll(callback, unrollFactor);
+                    InvokeMultiple = InvokeMultipleHardcoded;
+                }
+                else
+                {
+                    InvokeMultiple = EmitInvokeMultiple(this, nameof(callback), null, unrollFactor);
+                }
+            }
+
+            // can't use Task.CompletedTask here because it's new in .NET 4.6 (we target 4.5)
+            private static readonly Task Completed = Task.FromResult((object)null);
+
+            private static Task IdleStatic() => Completed;
+            private Task IdleInstance() => Completed;
+
+            private void ExecuteBlocking() => startTaskCallback.Invoke().GetAwaiter().GetResult();
+
+            private void InvokeMultipleHardcoded(long repeatCount)
+            {
+                for (long i = 0; i < repeatCount; i++)
+                    unrolledCallback();
+            }
+        }
+
+        internal class BenchmarkActionTask<T> : BenchmarkActionBase
+        {
+            private readonly Func<Task<T>> startTaskCallback;
+            private readonly Func<T> callback;
+            private readonly Func<T> unrolledCallback;
+            private T result;
+
+            public BenchmarkActionTask(object instance, MethodInfo method, BenchmarkActionCodegen codegenMode, int unrollFactor)
+            {
+                startTaskCallback = CreateMainOrIdle<Func<Task<T>>>(instance, method, IdleStatic, IdleInstance);
+                callback = ExecuteBlocking;
+                InvokeSingle = InvokeSingleHardcoded;
+
+                if (UseFallbackCode(codegenMode, unrollFactor))
+                {
+                    unrolledCallback = Unroll(callback, unrollFactor);
+                    InvokeMultiple = InvokeMultipleHardcoded;
+                }
+                else
+                {
+                    InvokeMultiple = EmitInvokeMultiple(this, nameof(callback), nameof(result), unrollFactor);
+                }
+            }
+
+            private static readonly Task<T> Completed = Task.FromResult(default(T));
+            private static Task<T> IdleStatic() => Completed;
+            private Task<T> IdleInstance() => Completed;
+
+            private T ExecuteBlocking() => startTaskCallback().GetAwaiter().GetResult();
+
+            private void InvokeSingleHardcoded() => result = callback();
+
+            private void InvokeMultipleHardcoded(long repeatCount)
+            {
+                for (long i = 0; i < repeatCount; i++)
+                    result = unrolledCallback();
+            }
+
+            public override object LastRunResult => result;
+        }
+
+        internal class BenchmarkActionValueTask<T> : BenchmarkActionBase
+        {
+            private readonly Func<ValueTask<T>> startTaskCallback;
+            private readonly Func<T> callback;
+            private readonly Func<T> unrolledCallback;
+            private T result;
+
+            public BenchmarkActionValueTask(object instance, MethodInfo method, BenchmarkActionCodegen codegenMode, int unrollFactor)
+            {
+                startTaskCallback = CreateMainOrIdle<Func<ValueTask<T>>>(instance, method, IdleStatic, IdleInstance);
+                callback = ExecuteBlocking;
+                InvokeSingle = InvokeSingleHardcoded;
+
+                if (UseFallbackCode(codegenMode, unrollFactor))
+                {
+                    unrolledCallback = Unroll(callback, unrollFactor);
+                    InvokeMultiple = InvokeMultipleHardcoded;
+                }
+                else
+                {
+                    InvokeMultiple = EmitInvokeMultiple(this, nameof(callback), nameof(result), unrollFactor);
+                }
+            }
+
+            private static ValueTask<T> IdleStatic() => new ValueTask<T>(default(T));
+            private ValueTask<T> IdleInstance() => new ValueTask<T>(default(T));
+
+            private T ExecuteBlocking() => startTaskCallback().GetAwaiter().GetResult();
+
+            private void InvokeSingleHardcoded() => result = callback();
+
+            private void InvokeMultipleHardcoded(long repeatCount)
+            {
+                for (long i = 0; i < repeatCount; i++)
+                    result = unrolledCallback();
+            }
+
+            public override object LastRunResult => result;
+        }
+    }
+}
