@@ -1,5 +1,4 @@
-﻿#if !UAP
-using System;
+﻿using System;
 using System.Diagnostics;
 using BenchmarkDotNet.Loggers;
 using JetBrains.Annotations;
@@ -86,4 +85,3 @@ namespace BenchmarkDotNet.Extensions
         }
     }
 }
-#endif

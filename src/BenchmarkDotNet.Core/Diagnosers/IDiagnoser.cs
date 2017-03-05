@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Diagnosers
     public interface IDiagnoser
     {
         IColumnProvider GetColumnProvider();
-#if !UAP
+
         /// <summary>
         /// before jitting, warmup
         /// </summary>
@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Diagnosers
         /// after setup, before run
         /// </summary>
         void AfterSetup(Process process, Benchmark benchmark);
-#endif
+
         /// <summary>
         /// after run, before cleanup
         /// </summary>

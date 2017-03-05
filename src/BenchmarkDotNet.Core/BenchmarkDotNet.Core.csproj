@@ -45,5 +45,6 @@
     <PackageReference Include="System.Threading" Value="4.3.0" />
     <PackageReference Include="System.Reflection" Value="4.3.0" />
     <PackageReference Include="System.Console" Value="4.3.0" />
+    <PackageReference Include="System.Reflection.Emit.Lightweight" Value="4.3.0" />
   </ItemGroup>
 </Project>

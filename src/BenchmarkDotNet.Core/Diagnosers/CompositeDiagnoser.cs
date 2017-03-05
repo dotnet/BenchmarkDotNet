@@ -19,13 +19,13 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IColumnProvider GetColumnProvider() 
             => new CompositeColumnProvider(diagnosers.Select(d => d.GetColumnProvider()).ToArray());
-#if !UAP
+
         public void BeforeAnythingElse(Process process, Benchmark benchmark) 
             => diagnosers.ForEach(diagnoser => diagnoser.BeforeAnythingElse(process, benchmark));
 
         public void AfterSetup(Process process, Benchmark benchmark) 
             => diagnosers.ForEach(diagnoser => diagnoser.AfterSetup(process, benchmark));
-#endif
+
         public void BeforeCleanup() => diagnosers.ForEach(diagnoser => diagnoser.BeforeCleanup());
 
         public void ProcessResults(Benchmark benchmark, BenchmarkReport report)

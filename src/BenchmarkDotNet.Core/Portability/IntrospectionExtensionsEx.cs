@@ -34,6 +34,16 @@ namespace System.Reflection
         {
             return typeInfo.GetDeclaredMethod(methodName);
         }
+
+        public static FieldInfo GetField(this TypeInfo typeInfo, string fieldName, BindingFlags bindingFlags)
+        {
+            return typeInfo.GetDeclaredField(fieldName);
+        }
+
+        public static MethodInfo GetMethod(this TypeInfo typeInfo, string methodName)
+        {
+            return typeInfo.GetDeclaredMethod(methodName);
+        }
     }
 }
 #endif

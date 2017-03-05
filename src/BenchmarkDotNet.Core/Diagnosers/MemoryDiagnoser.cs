@@ -26,12 +26,12 @@ namespace BenchmarkDotNet.Diagnosers
             new GCCollectionColumn(results, Gen1),
             new GCCollectionColumn(results, Gen2),
             new AllocationColumn(results));
-#if !UAP
+
         // the following methods are left empty on purpose
         // the action takes places in other process, and the values are gathered by Engine
         public void BeforeAnythingElse(Process process, Benchmark benchmark) { }
         public void AfterSetup(Process process, Benchmark benchmark) { }
-#endif
+
         public void BeforeCleanup() { }
 
         public void DisplayResults(ILogger logger)
