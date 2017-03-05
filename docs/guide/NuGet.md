@@ -26,7 +26,7 @@ These versions are available from the official NuGet feed.
 * Example of `BenchmarkDotNetInfo.FullTitle`: `BenchmarkDotNet v0.10.3`.
 
 ### Nightly
-If you want to check a nightly prerelease version of the BenchmarkDotNet, add the `https://ci.appveyor.com/nuget/benchmarkdotnet` feed in the `<packageSources>` section of your `NuGet.config`:
+If you want to use a nightly version of the BenchmarkDotNet, add the `https://ci.appveyor.com/nuget/benchmarkdotnet` feed in the `<packageSources>` section of your `NuGet.config`:
 
 ```xml
 <packageSources>
@@ -34,9 +34,9 @@ If you want to check a nightly prerelease version of the BenchmarkDotNet, add th
 </packageSources>
 ```
 
-Now you can install the packages from the `bdn-nightly` feed (don't forget to enable the "Include prerelease" checkbox).
+Now you can install the packages from the `bdn-nightly` feed.
 
-* Example of the main NuGet package: `BenchmarkDotNet.0.10.3.13-nightly.nupkg`.
+* Example of the main NuGet package: `BenchmarkDotNet.0.10.3.13.nupkg`.
 * Example of `BenchmarkDotNetInfo.FullTitle`: `BenchmarkDotNet v0.10.3.13-nightly`.
 
 ### Develop
