@@ -51,10 +51,10 @@ build:
   project: BenchmarkDotNet.sln    # path to Visual Studio solution or project
 
 after_build:
-  - dotnet pack .\src\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj --configuration Release
-  - dotnet pack .\src\BenchmarkDotNet.Toolchains.Roslyn\BenchmarkDotNet.Toolchains.Roslyn.csproj --configuration Release
-  - dotnet pack .\src\BenchmarkDotNet\BenchmarkDotNet.csproj --configuration Release
-  - dotnet pack .\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj --configuration Release
+  - msbuild /t:Pack .\src\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj --configuration Release
+  - msbuild /t:Pack .\src\BenchmarkDotNet.Toolchains.Roslyn\BenchmarkDotNet.Toolchains.Roslyn.csproj --configuration Release
+  - msbuild /t:Pack .\src\BenchmarkDotNet\BenchmarkDotNet.csproj --configuration Release
+  - msbuild /t:Pack .\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj --configuration Release
   
 #---------------------------------#
 #       tests configuration       #
