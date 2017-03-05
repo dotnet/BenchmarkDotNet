@@ -4,7 +4,6 @@
   
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.Toolchains.Uap</AssemblyTitle>
-    <VersionPrefix>0.10.1-develop</VersionPrefix>
     <TargetFrameworks>netcoreapp1.1;net45;uap10.0</TargetFrameworks>
     <AssemblyName>BenchmarkDotNet.Toolchains.Uap</AssemblyName>
     <PackageId>BenchmarkDotNet.Toolchains.Uap</PackageId>
