@@ -1,38 +1,12 @@
-﻿using System;
+﻿using BenchmarkDotNet.Helpers;
+using System;
 using System.IO;
 using System.Reflection;
 
 namespace BenchmarkDotNet.Toolchains.Uap.Helpers
 {
-    internal static class ResourceHelper
+    internal partial class ResourceHelperLocal
     {
-        internal static string LoadTemplate(string name)
-        {
-            var resourceName = "BenchmarkDotNet.Toolchains.Uap.Templates." + name;
-            using (var stream = GetResouceStream(resourceName))
-            {
-                if (stream == null)
-                    throw new Exception($"Resource {resourceName} not found");
-                using (var reader = new StreamReader(stream))
-                    return reader.ReadToEnd();
-            }
-        }
-
-        internal static byte[] LoadBinaryFile(string name)
-        {
-            var resourceName = "BenchmarkDotNet.Toolchains.Uap.Templates." + name;
-            using (var stream = GetResouceStream(resourceName))
-            {
-                if (stream == null)
-                    throw new Exception($"Resource {resourceName} not found");
-                using (var reader = new BinaryReader(stream))
-                    return reader.ReadBytes((int)stream.Length);
-            }
-        }
-
-        private static Stream GetResouceStream(string resourceName)
-        {
-            return typeof(ResourceHelper).GetTypeInfo().Assembly.GetManifestResourceStream(resourceName);
-        }
+        public static ResourceHelper UapHelper = new ResourceHelper("BenchmarkDotNet.Toolchains.Uap.Templates.", "BenchmarkDotNet.Toolchains.Uap.Templates.", typeof(ResourceHelperLocal).GetTypeInfo().Assembly);
     }
 }

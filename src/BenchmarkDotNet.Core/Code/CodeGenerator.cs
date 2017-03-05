@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Code
     {
         internal static string Generate(Benchmark benchmark)
         {
-            return Generate(benchmark, "BenchmarkProgram.txt", (name) => ResourceHelper.LoadTemplate(name));
+            return Generate(benchmark, "BenchmarkProgram.txt", (name) => ResourceHelper.CoreHelper.LoadTemplate(name));
         }
 
         internal static string Generate(Benchmark benchmark, string templateName, Func<string, string> loadTemplateFunc)

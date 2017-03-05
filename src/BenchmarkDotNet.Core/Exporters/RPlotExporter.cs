@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Exporters
 
             var fileNamePrefix = Path.Combine(summary.ResultsDirectoryPath, summary.Title);
             var scriptFullPath = Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
-            var script = ResourceHelper.
+            var script = ResourceHelper.CoreHelper.
                 LoadTemplate(scriptFileName).
                 Replace("$BenchmarkDotNetVersion$", BenchmarkDotNetInfo.FullTitle).
                 Replace("$CsvSeparator$", CsvMeasurementsExporter.Default.Separator);

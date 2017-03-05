@@ -5,7 +5,7 @@
     <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
     <AssemblyName>BenchmarkDotNet.Samples.Uap</AssemblyName>
     <OutputType>Exe</OutputType>
-    <PackageId>BenchmarkDotNet.Samples.Runner</PackageId>
+    <PackageId>BenchmarkDotNet.Samples.Uap</PackageId>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
