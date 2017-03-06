@@ -17,6 +17,7 @@ It's a single string characteristics. It allows to name your job. This name will
   * `Clr`: Full .NET Framework (available only on Windows)
   * `Core`: CoreCLR (x-plat)
   * `Mono`: Mono (x-plat)
+  * `Uap`: Universal Windows Application (mobile only)
 * `Jit`:
   * `LegacyJit` (available only for `Runtime.Clr`)
   * `RyuJit` (avaiable only for `Runtime.Clr` and `Runtime.Core`)
