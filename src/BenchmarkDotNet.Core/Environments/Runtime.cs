@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BenchmarkDotNet.Environments
+﻿namespace BenchmarkDotNet.Environments
 {
     public abstract class Runtime
     {

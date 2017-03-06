@@ -103,11 +103,10 @@ namespace BenchmarkDotNet.Engines
             // AppDomain. The number is accurate as of the last garbage collection." - CLR via C#
             // so we enforce GC.Collect here just to make sure we get accurate results
             GC.Collect();
-#if CORE || UAP
-            return getAllocatedBytesForCurrentThread.Invoke();
-#elif CLASSIC
-
+#if CLASSIC
             return AppDomain.CurrentDomain.MonitoringTotalAllocatedMemorySize;
+#else
+            return getAllocatedBytesForCurrentThread.Invoke();
 #endif
         }
 

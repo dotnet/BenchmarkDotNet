@@ -254,7 +254,6 @@ namespace BenchmarkDotNet.Toolchains.Uap
             ws.Options.Cookies = new CookieContainer();
             ws.Options.SetRequestHeader("X-CSRF-Token", this.csrfToken.Value);
 
-            //ws.Options.SetRequestHeader("Host", address.Host);
             ws.Options.SetRequestHeader("Pragma", "no-cache");
             ws.Options.SetRequestHeader("Cache-Control", "no-cache");
             ws.Options.SetRequestHeader("Origin", $"https://{address.Host}");

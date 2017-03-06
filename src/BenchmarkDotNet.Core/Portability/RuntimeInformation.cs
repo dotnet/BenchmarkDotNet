@@ -159,7 +159,8 @@ namespace BenchmarkDotNet.Portability
 #elif CORE
             return System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
 #elif UAP
-            // System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription throws on UWP release build. TODO: fill issue in corefx
+            // System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription throws on UWP release build.
+            // https://github.com/dotnet/corefx/issues/16769
             var attr = typeof(object).GetTypeInfo().Assembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute)).OfType<AssemblyFileVersionAttribute>().FirstOrDefault();
             return $".NET Native {attr.Version}"; 
 #endif

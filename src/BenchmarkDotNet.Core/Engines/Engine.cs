@@ -46,6 +46,7 @@ namespace BenchmarkDotNet.Engines
             Action setupAction, Action cleanupAction, long operationsPerInvoke)
         {
             Host = host;
+            IsDiagnoserAttached = host.IsDiagnoserAttached;
             IdleAction = idleAction;
             Dummy1Action = dummy1Action;
             Dummy2Action = dummy2Action;
