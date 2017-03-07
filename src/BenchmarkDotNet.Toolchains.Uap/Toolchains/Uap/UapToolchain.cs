@@ -1,13 +1,9 @@
 ﻿#if !UAP
-using BenchmarkDotNet.Toolchains.DotNetCli;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Toolchains.Uap
 {
-    public class UapToolchainConfig
+    internal class UapToolchainConfig
     {
         public string DevicePortalUri { get; set; }
         public string Pin { get; set; }
@@ -16,7 +12,7 @@ namespace BenchmarkDotNet.Toolchains.Uap
         public string UAPBinariesFolder { get; set; }
     }
 
-    public class UapToolchain : Toolchain, IFormattable
+    internal class UapToolchain : Toolchain, IFormattable
     {
         public UapToolchain(UapToolchainConfig config)
             : base("UAP",

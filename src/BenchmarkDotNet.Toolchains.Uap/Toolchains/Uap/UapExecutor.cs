@@ -48,10 +48,6 @@ namespace BenchmarkDotNet.Toolchains.Uap
                 string[] extraStrings = allStrings.Where(x => x.StartsWith("//")).ToArray();
                 return new ExecuteResult(true, 0, resultStrings, allStrings);
             }
-            catch (Exception)
-            {
-                return new ExecuteResult(false, -1, new string[0], new string[0]);
-            }
             finally
             {
                 if (app != null && dpClient != null)

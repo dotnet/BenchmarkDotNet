@@ -3,6 +3,10 @@ using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Attributes.Jobs
 {
+    /// <summary>
+    /// How to obtain these parameters is described in:
+    /// http://benchmarkdotnet.org/Advanced/UapJob.htm
+    /// </summary>
     public class UapJobAttribute : JobConfigBaseAttribute
     {
         public UapJobAttribute(string devicePortalUri, string csfrCookie, string wmidCookie, string uapBinariesPath)

@@ -5,8 +5,8 @@ using System.Reflection;
 
 namespace BenchmarkDotNet.Toolchains.Uap.Helpers
 {
-    internal partial class ResourceHelperLocal
+    internal class ResourceHelperLocal
     {
-        public static ResourceHelper UapHelper = new ResourceHelper("BenchmarkDotNet.Toolchains.Uap.Templates.", "BenchmarkDotNet.Toolchains.Uap.Templates.", typeof(ResourceHelperLocal).GetTypeInfo().Assembly);
+        public static ResourceHelper UapHelper = new ResourceHelper("BenchmarkDotNet.Toolchains.Uap.Templates.", typeof(ResourceHelperLocal).GetTypeInfo().Assembly);
     }
 }

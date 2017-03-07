@@ -24,37 +24,36 @@ namespace BenchmarkDotNet.Toolchains.Uap
         public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark,
             IResolver resolver)
         {
-            if (!ExecuteCommand("cmd /c \"" + generateResult.ArtifactsPaths.BuildScriptFilePath + "\"",
+            return ExecuteCommand("cmd", "/c \"" + generateResult.ArtifactsPaths.BuildScriptFilePath + "\"",
                 generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath,
-                DefaultTimeout))
-            {
-                return BuildResult.Failure(generateResult, new Exception(" failed"));
-            }
-
-            return BuildResult.Success(generateResult);
+                DefaultTimeout, generateResult);
         }
 
-        internal static bool ExecuteCommand(string commandWithArguments, string workingDirectory, TimeSpan timeout)
+        internal static BuildResult ExecuteCommand(string command, string arguments, string workingDirectory, 
+            TimeSpan timeout, GenerateResult generateResult)
         {
-            using (var process = new Process { StartInfo = BuildStartInfo(workingDirectory, commandWithArguments) })
+            using (var process = new Process { StartInfo = BuildStartInfo(workingDirectory, command, arguments) })
             {
                 process.Start();
 
                 process.WaitForExit((int)timeout.TotalMilliseconds);
 
-                return process.ExitCode <= 0;
+                var error = process.StandardError.ReadToEnd();
+
+                return process.ExitCode <= 0 ? BuildResult.Success(generateResult) : BuildResult.Failure(generateResult, new Exception(error));
             }
         }
 
-        private static ProcessStartInfo BuildStartInfo(string workingDirectory, string arguments)
+        private static ProcessStartInfo BuildStartInfo(string workingDirectory, string command, string arguments)
         {
             return new ProcessStartInfo
             {
-                FileName = arguments.Split(' ').First(),
+                FileName = command,
                 WorkingDirectory = workingDirectory,
-                Arguments = string.Join(" ", arguments.Split(' ').Skip(1)),
+                Arguments = arguments,
                 UseShellExecute = false,
-                CreateNoWindow = true
+                CreateNoWindow = true,
+                RedirectStandardError = true
             };
         }
     }

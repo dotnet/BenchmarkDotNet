@@ -172,7 +172,6 @@ namespace BenchmarkDotNet.Toolchains.Uap
             packagesRequest.AddHeader("X-CSRF-Token", csrfToken.Value);
             packagesRequest.AddCookie(csrfToken.Name, csrfToken.Value);
             packagesRequest.AddCookie(wmid.Name, wmid.Value);
-            packagesRequest.AddQueryParameter("_", GetTime().ToString());
 
             i = 10;
             PackageStruct ret;
@@ -236,15 +235,6 @@ namespace BenchmarkDotNet.Toolchains.Uap
             {
                 throw new InvalidOperationException("Failed to delete package: " + status);
             }
-        }
-
-        private static long GetTime()
-        {
-            long retval = 0;
-            var st = new DateTime(1970, 1, 1);
-            TimeSpan t = (DateTime.Now.ToUniversalTime() - st);
-            retval = (long)(t.TotalMilliseconds + 0.5);
-            return retval;
         }
 
         internal ClientWebSocket StartListening()

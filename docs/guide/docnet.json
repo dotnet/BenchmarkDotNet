@@ -30,6 +30,7 @@
             "Percentiles": "Advanced\\Percentiles.md",
             "STAThread": "Advanced\\STAThread.md",
             "Custom Mono Path": "Advanced\\CustomMonoPath.md"
+            "UAP runtime environment": "Advanced\\UapJob.md"
         },
         "How it works": "HowItWorks.md",
         "Rules of benchmarking": "RulesOfBenchmarking.md",

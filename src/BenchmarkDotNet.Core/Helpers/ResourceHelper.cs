@@ -6,22 +6,20 @@ namespace BenchmarkDotNet.Helpers
 {
     internal class ResourceHelper
     {
-        private readonly string prefix1;
-        private readonly string prefix2;
+        private readonly string resourcesNamespacePrefix;
         private readonly Assembly assembly;
 
-        public static ResourceHelper CoreHelper = new ResourceHelper("BenchmarkDotNet.Templates.", "BenchmarkDotNet.Core.Templates.", typeof(ResourceHelper).GetTypeInfo().Assembly);
+        public static ResourceHelper CoreHelper = new ResourceHelper("BenchmarkDotNet.Templates.", typeof(ResourceHelper).GetTypeInfo().Assembly);
 
-        internal ResourceHelper(string prefix1, string prefix2, Assembly assembly)
+        internal ResourceHelper(string prefix1, Assembly assembly)
         {
-            this.prefix1 = prefix1;
-            this.prefix2 = prefix2;
+            this.resourcesNamespacePrefix = prefix1;
             this.assembly = assembly;
         }
 
         internal string LoadTemplate(string name)
         {
-            var resourceName = prefix1 + name;
+            var resourceName = resourcesNamespacePrefix + name;
             using (var stream = GetResouceStream(resourceName))
             {
                 if (stream == null)
@@ -33,7 +31,7 @@ namespace BenchmarkDotNet.Helpers
 
         internal byte[] LoadBinaryFile(string name)
         {
-            var resourceName = prefix2 + name;
+            var resourceName = resourcesNamespacePrefix + name;
             using (var stream = GetResouceStream(resourceName))
             {
                 if (stream == null)
