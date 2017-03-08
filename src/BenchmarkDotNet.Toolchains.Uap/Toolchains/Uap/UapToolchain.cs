@@ -1,22 +1,26 @@
 ﻿#if !UAP
 using System;
+using BenchmarkDotNet.Environments;
 
 namespace BenchmarkDotNet.Toolchains.Uap
 {
     internal class UapToolchainConfig
     {
-        public string DevicePortalUri { get; set; }
-        public string Pin { get; set; }
-        public string CSRFCookieValue { get; set; }
-        public string WMIDCookieValue { get; set; }
-        public string UAPBinariesFolder { get; set; }
+        public string DevicePortalUri { get; internal set; }
+        public string Pin { get; internal set; }
+        public string CSRFCookieValue { get; internal set; }
+        public string WMIDCookieValue { get; internal set; }
+        public string UAPBinariesFolder { get; internal set; }
+        public string Username { get; internal set; }
+        public string Password { get; internal set; }
+        public Platform Platform { get; internal set; }
     }
 
     internal class UapToolchain : Toolchain, IFormattable
     {
         public UapToolchain(UapToolchainConfig config)
             : base("UAP",
-                  new UapGenerator(config.UAPBinariesFolder),
+                  new UapGenerator(config.UAPBinariesFolder, config.Platform),
                   new UapBuilder(),
                   new UapExecutor(config))
         {

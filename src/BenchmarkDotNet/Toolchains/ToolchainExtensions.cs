@@ -36,7 +36,14 @@ namespace BenchmarkDotNet.Toolchains
                 case CoreRuntime core:
                     return isUsingProjectJson.Value ? ProjectJsonCoreToolchain.Current.Value : CsProjCoreToolchain.Current.Value;
                 case UapRuntime uap:
-                    return new UapToolchain(new UapToolchainConfig() { CSRFCookieValue = uap.CsfrCookie, DevicePortalUri = uap.DevicePortalUri, UAPBinariesFolder = uap.UapBinariesPath, WMIDCookieValue = uap.WmidCookie });
+                    if (!string.IsNullOrEmpty(uap.CsfrCookie))
+                    {
+                        return new UapToolchain(new UapToolchainConfig() { CSRFCookieValue = uap.CsfrCookie, DevicePortalUri = uap.DevicePortalUri, UAPBinariesFolder = uap.UapBinariesPath, WMIDCookieValue = uap.WmidCookie, Platform = uap.Platform });
+                    }
+                    else
+                    {
+                        return new UapToolchain(new UapToolchainConfig() { Username = uap.Username, DevicePortalUri = uap.DevicePortalUri, Password = uap.Password, UAPBinariesFolder = uap.UapBinariesPath, Platform = uap.Platform });
+                    }
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtime), runtime, "Runtime not supported");
             }

@@ -1,4 +1,6 @@
-﻿namespace BenchmarkDotNet.Environments
+﻿using System;
+
+namespace BenchmarkDotNet.Environments
 {
     public abstract class Runtime
     {
@@ -61,6 +63,10 @@
 
     public class UapRuntime : Runtime
     {
+        public string Username { get; private set; }
+        public string Password { get; private set; }
+        public Platform Platform { get; private set; }
+
         public string DevicePortalUri { get; private set; }
         public string CsfrCookie { get; private set; }
         public string WmidCookie { get; private set; }
@@ -71,10 +77,25 @@
 
         public UapRuntime(string name, string devicePortalUri, string csfrCookie, string wmidCookie, string uapBinariesPath) : base(name)
         {
-            this.DevicePortalUri = devicePortalUri;
-            this.CsfrCookie = csfrCookie;
-            this.WmidCookie = wmidCookie;
-            this.UapBinariesPath = uapBinariesPath;
+            DevicePortalUri = devicePortalUri;
+            CsfrCookie = csfrCookie;
+            WmidCookie = wmidCookie;
+            UapBinariesPath = uapBinariesPath;
+            Platform = Platform.ARM;
+        }
+
+        public UapRuntime(string name, string devicePortalUri, string username, string password, string uapBinariesPath, Platform platform) : base(name)
+        {
+            if(platform == Platform.AnyCpu)
+            {
+                throw new ArgumentException("AnyCPU is not supported for UAP runtime", nameof(platform));
+            }
+
+            DevicePortalUri = devicePortalUri;
+            Username = username;
+            Password = password;
+            Platform = platform;
+            UapBinariesPath = uapBinariesPath;
         }
     }
 }

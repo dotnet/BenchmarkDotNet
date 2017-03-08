@@ -9,6 +9,7 @@ using System.IO;
 using BenchmarkDotNet.Code;
 using System.Reflection;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Environments;
 
 namespace BenchmarkDotNet.Toolchains.Uap
 {
@@ -17,10 +18,12 @@ namespace BenchmarkDotNet.Toolchains.Uap
         private const string ProjectFileName = "UapBenchmarkProject.csproj";
 
         private readonly string uapBinariesFolder;
+        private readonly Platform platform;
 
-        public UapGenerator(string uapBinariesFolder)
+        public UapGenerator(string uapBinariesFolder, Platform platform)
         {
             this.uapBinariesFolder = uapBinariesFolder;
+            this.platform = platform;
         }
 
         protected override void GenerateProject(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver, ILogger logger)
@@ -94,7 +97,7 @@ namespace BenchmarkDotNet.Toolchains.Uap
             string content = 
                              $"call \"%VS150COMNTOOLS%VsDevCmd.bat\"{Environment.NewLine}" +
                              $"msbuild /t:Restore{Environment.NewLine}" +
-                             $"msbuild {ProjectFileName} /p:Configuration=Release;Platform=ARM";
+                             $"msbuild {ProjectFileName} /p:Configuration=Release;Platform={platform}";
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
         }

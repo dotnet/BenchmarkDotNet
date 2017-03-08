@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net.WebSockets;
+using BenchmarkDotNet.Environments;
+using RestSharp.Authenticators;
 
 namespace BenchmarkDotNet.Toolchains.Uap
 {
@@ -84,9 +86,10 @@ namespace BenchmarkDotNet.Toolchains.Uap
             public string Name { get; set; }
         }
 
-        private RestResponseCookie csrfToken;
-        private RestResponseCookie wmid;
+        private readonly RestResponseCookie csrfToken;
+        private readonly RestResponseCookie wmid;
         private readonly RestClient client;
+        private readonly NetworkCredential credentials;
 
         public DevicePortalApiWrapper(string csrf, string wmid, string devicePortalAddress)
         {
@@ -102,6 +105,15 @@ namespace BenchmarkDotNet.Toolchains.Uap
             };
 
             this.client = new RestClient(devicePortalAddress);
+        }
+
+        public DevicePortalApiWrapper(string username, string password, string devicePortalAddress, bool dummy = false)
+        {
+            this.credentials = new NetworkCredential(string.Format("auto-{0}", username), password);
+            this.client = new RestClient(devicePortalAddress)
+            {
+                Authenticator = new NtlmAuthenticator(this.credentials)
+            };
         }
 
         public DevicePortalApiWrapper(string pin, string devicePortalAddress)
@@ -124,19 +136,37 @@ namespace BenchmarkDotNet.Toolchains.Uap
             }
         }
 
-        public PackageStruct DeployApplication(string fullPath)
+        private void AddAuthenticationCookiesIfNeeded(IRestRequest request)
         {
+            if (csrfToken != null)
+            {
+                request.AddCookie(csrfToken.Name, csrfToken.Value);
+                request.AddCookie(wmid.Name, wmid.Value);
+                request.AddHeader("X-CSRF-Token", csrfToken.Value);
+            }
+        }
+
+        public PackageStruct DeployApplication(string fullPath, Platform platform)
+        {
+            PackageStruct ret = this.GetBenchmarkDotnetPackage();
+            if(ret != null)
+            {
+                this.DeleteApplication(ret);
+            }
+
             var installRequest = new RestRequest("api/app/packagemanager/package", Method.POST);
-            installRequest.AddCookie(csrfToken.Name, csrfToken.Value);
-            installRequest.AddCookie(wmid.Name, wmid.Value);
+
+            AddAuthenticationCookiesIfNeeded(installRequest);
+
+            string certPath = Path.ChangeExtension(fullPath, ".cer");
+            installRequest.AddFile(Path.GetFileName(certPath), certPath);
             installRequest.AddFile(Path.GetFileName(fullPath), fullPath);
-            foreach(var dependency in Directory.EnumerateFiles(Path.Combine(Path.GetDirectoryName(fullPath), "Dependencies", "ARM")))
+            foreach(var dependency in Directory.EnumerateFiles(Path.Combine(Path.GetDirectoryName(fullPath), "Dependencies", platform.ToString())))
             {
                 installRequest.AddFile(Path.GetFileName(dependency), dependency);
             }
 
             installRequest.AddQueryParameter("package", Path.GetFileName(fullPath));
-            installRequest.AddHeader("X-CSRF-Token", csrfToken.Value);
             int i = 10;
             while (client.Execute(installRequest).StatusCode != HttpStatusCode.Accepted)
             {
@@ -151,48 +181,53 @@ namespace BenchmarkDotNet.Toolchains.Uap
             {
                 var progressRequest = new RestRequest("api/app/packagemanager/state", Method.GET);
 
-                installRequest.AddHeader("X-CSRF-Token", csrfToken.Value);
-                installRequest.AddCookie(csrfToken.Name, csrfToken.Value);
-                installRequest.AddCookie(wmid.Name, wmid.Value);
+                AddAuthenticationCookiesIfNeeded(progressRequest);
 
                 progress = client.Execute<ProgressStruct>(progressRequest);
-                if (progress.StatusCode != (HttpStatusCode)204)
+                if (progress.Data != null && progress.Data.Code != null)
                 {
                     break;
                 }
             }
 
-            if (progress.StatusCode != HttpStatusCode.OK)
+            if(progress.Data.Code != null && progress.Data.Code != 0)
             {
-                throw new InvalidOperationException("Install failed");
+                throw new InvalidOperationException($"Install failed. Error code {progress.Data.Code}. Error text {progress.Data.CodeText}");
             }
 
             var packagesRequest = new RestRequest("api/app/packagemanager/packages", Method.GET);
 
-            packagesRequest.AddHeader("X-CSRF-Token", csrfToken.Value);
-            packagesRequest.AddCookie(csrfToken.Name, csrfToken.Value);
-            packagesRequest.AddCookie(wmid.Name, wmid.Value);
+            AddAuthenticationCookiesIfNeeded(packagesRequest);
 
             i = 10;
-            PackageStruct ret;
-            while ((ret = client.Get<PackagesStruct>(packagesRequest).Data.InstalledPackages.SingleOrDefault(x => x.Name.Contains("BenchmarkDotNet"))) == null)
+            while ((ret = this.GetBenchmarkDotnetPackage()) == null)
             {
                 if (--i == 0)
                 {
-                    throw new InvalidOperationException("Installation failed");
+                    throw new InvalidOperationException("Installation failed. Package still not listed.");
                 }
+
+                Task.Delay(1000).Wait(); // Adding this because on local PC requests processed quite fast.
             }
 
             return ret;
+        }
+
+        PackageStruct GetBenchmarkDotnetPackage()
+        {
+           var packagesRequest = new RestRequest("api/app/packagemanager/packages", Method.GET);
+
+            AddAuthenticationCookiesIfNeeded(packagesRequest);
+
+            return client.Get<PackagesStruct>(packagesRequest)
+                .Data.InstalledPackages.SingleOrDefault(x => x.Name.Contains("BenchmarkDotNet"));
         }
 
         public void RunApplication(PackageStruct id)
         {
             var executeRequest = new RestRequest("api/taskmanager/app", Method.POST);
 
-            executeRequest.AddHeader("X-CSRF-Token", csrfToken.Value);
-            executeRequest.AddCookie(csrfToken.Name, csrfToken.Value);
-            executeRequest.AddCookie(wmid.Name, wmid.Value);
+            AddAuthenticationCookiesIfNeeded(executeRequest);
             executeRequest.AddQueryParameter("appid", Convert.ToBase64String(Encoding.UTF8.GetBytes(id.PackageRelativeId)));
             {
                 var response = client.Post<ProgressStruct>(executeRequest);
@@ -206,12 +241,10 @@ namespace BenchmarkDotNet.Toolchains.Uap
             {
                 var processesRequest = new RestRequest("/api/resourcemanager/processes", Method.GET);
 
-                processesRequest.AddHeader("X-CSRF-Token", csrfToken.Value);
-                processesRequest.AddCookie(csrfToken.Name, csrfToken.Value);
-                processesRequest.AddCookie(wmid.Name, wmid.Value);
+                AddAuthenticationCookiesIfNeeded(processesRequest);
                 {
                     var response = client.Execute(processesRequest);
-                    if (!response.Content.Contains("BenchmarkDotNet"))
+                    if (!response.Content.Contains(id.PackageFullName))
                     {
                         break;
                     }
@@ -225,10 +258,8 @@ namespace BenchmarkDotNet.Toolchains.Uap
         {
             var deleteRequest = new RestRequest("api/app/packagemanager/package", Method.DELETE);
             deleteRequest.AddQueryParameter("package", appId.PackageFullName);
-
-            deleteRequest.AddHeader("X-CSRF-Token", csrfToken.Value);
-            deleteRequest.AddCookie(csrfToken.Name, csrfToken.Value);
-            deleteRequest.AddCookie(wmid.Name, wmid.Value);
+            
+            AddAuthenticationCookiesIfNeeded(deleteRequest);
 
             HttpStatusCode status = client.Execute(deleteRequest).StatusCode;
             if (status != HttpStatusCode.OK)
@@ -239,19 +270,25 @@ namespace BenchmarkDotNet.Toolchains.Uap
 
         internal ClientWebSocket StartListening()
         {
-            var address = new Uri($"wss://{this.client.BaseUrl.Host}/api/etw/session/realtime");
+            var address = new Uri($"wss://{this.client.BaseUrl.Host}:{this.client.BaseUrl.Port}/api/etw/session/realtime");
             ClientWebSocket ws = new ClientWebSocket();
             ws.Options.Cookies = new CookieContainer();
-            ws.Options.SetRequestHeader("X-CSRF-Token", this.csrfToken.Value);
+            if (this.csrfToken != null)
+            {
+                ws.Options.SetRequestHeader("X-CSRF-Token", this.csrfToken.Value);
+                ws.Options.Cookies.Add(this.client.BaseUrl, new Cookie("CSRF-Token", csrfToken.Value, "/", address.Host));
+                ws.Options.Cookies.Add(this.client.BaseUrl, new Cookie("WMID", wmid.Value, "/", address.Host));
+            }
+            else
+            {
+                ws.Options.Credentials = this.credentials;
+            }
 
             ws.Options.SetRequestHeader("Pragma", "no-cache");
             ws.Options.SetRequestHeader("Cache-Control", "no-cache");
             ws.Options.SetRequestHeader("Origin", $"https://{address.Host}");
             ws.Options.SetRequestHeader("Accept-Encoding", "gzip, deflate, sdch, br");
             ws.Options.SetRequestHeader("Sec-WebSocket-Extensions", "permessage-deflate; client_max_window_bits");
-
-            ws.Options.Cookies.Add(this.client.BaseUrl, new Cookie("CSRF-Token", csrfToken.Value, "/", address.Host));
-            ws.Options.Cookies.Add(this.client.BaseUrl, new Cookie("WMID", wmid.Value, "/", address.Host));
             ws.ConnectAsync(address, CancellationToken.None).Wait();
 
             var command = Encoding.UTF8.GetBytes("provider 4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a enable 5");
@@ -270,32 +307,40 @@ namespace BenchmarkDotNet.Toolchains.Uap
         internal string[] StopListening(ClientWebSocket ws)
         {
             List<string> ret = new List<string>();
+            StringBuilder sb = new StringBuilder();
             var buffer = new byte[10240];
             for (;;)
             {
-                CancellationTokenSource cts = new CancellationTokenSource();
-                var resTask = ws.ReceiveAsync(new ArraySegment<byte>(buffer), cts.Token);
-                cts.CancelAfter(TimeSpan.FromSeconds(10));
-                try
+                using (CancellationTokenSource cts = new CancellationTokenSource())
                 {
-                    resTask.Wait();
-                    var str = Encoding.UTF8.GetString(buffer);
-                    var @object = SimpleJson.SimpleJson.DeserializeObject<RootObject>(str);
-                    ret.AddRange(@object.Events.Select(x => x.StringMessage));
-                }
-                catch (AggregateException ex)
-                {
-                    if (ex.InnerException is OperationCanceledException)
+                    var resTask = ws.ReceiveAsync(new ArraySegment<byte>(buffer), cts.Token);
+                    cts.CancelAfter(TimeSpan.FromMinutes(1));
+                    try
                     {
-                        break;
+                        var res = resTask.Result;
+                        var str = Encoding.UTF8.GetString(buffer, 0, res.Count);
+                        sb.Append(str);
+                        if (res.EndOfMessage)
+                        {
+                            var @object = SimpleJson.SimpleJson.DeserializeObject<RootObject>(sb.ToString());
+                            ret.AddRange(@object.Events.Select(x => x.StringMessage));
+                            sb.Clear();
+                        }
                     }
-                    else
+                    catch (AggregateException ex)
                     {
-                        throw;
+                        if (ex.InnerException is OperationCanceledException)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
                 }
             }
-
+            
             return ret.Select(x => x.Trim()).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
         }
     }

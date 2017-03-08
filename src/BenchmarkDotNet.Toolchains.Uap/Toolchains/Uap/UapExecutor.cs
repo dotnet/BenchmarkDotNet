@@ -30,17 +30,20 @@ namespace BenchmarkDotNet.Toolchains.Uap
                 {
                     dpClient = new DevicePortalApiWrapper(config.Pin, config.DevicePortalUri);
                 }
-                else
+                else if(config.CSRFCookieValue != null)
                 {
                     dpClient = new DevicePortalApiWrapper(config.CSRFCookieValue, config.WMIDCookieValue, config.DevicePortalUri);
                 }
-                
-                app = dpClient.DeployApplication(Path.Combine(buildResult.ArtifactsPaths.BinariesDirectoryPath, @"AppPackages\UapBenchmarkProject_1.0.0.0_ARM_Test\UapBenchmarkProject_1.0.0.0_ARM.appx"));
-
-                dpClient.DeleteApplication(app);
-                app = dpClient.DeployApplication(Path.Combine(buildResult.ArtifactsPaths.BinariesDirectoryPath, @"AppPackages\UapBenchmarkProject_1.0.0.0_ARM_Test\UapBenchmarkProject_1.0.0.0_ARM.appx"));
+                else
+                {
+                    dpClient = new DevicePortalApiWrapper(username: config.Username, password: config.Password, devicePortalAddress: config.DevicePortalUri);
+                }
 
                 var ct = dpClient.StartListening();
+
+                var appxFileName = $"AppPackages\\UapBenchmarkProject_1.0.0.0_{config.Platform}_Test\\UapBenchmarkProject_1.0.0.0_{config.Platform}.appx";
+                app = dpClient.DeployApplication(Path.Combine(buildResult.ArtifactsPaths.BinariesDirectoryPath, appxFileName), config.Platform);
+                
                 dpClient.RunApplication(app);
                 string[] allStrings = dpClient.StopListening(ct);
 

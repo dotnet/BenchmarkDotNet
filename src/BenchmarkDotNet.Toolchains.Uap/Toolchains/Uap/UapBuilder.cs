@@ -10,6 +10,7 @@ using BenchmarkDotNet.Toolchains.Results;
 using System.Diagnostics;
 using System.IO;
 using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Environments;
 
 namespace BenchmarkDotNet.Toolchains.Uap
 {
@@ -20,7 +21,7 @@ namespace BenchmarkDotNet.Toolchains.Uap
         internal const string OutputDirectory = "binaries";
 
         private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMinutes(10);
-
+        
         public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark,
             IResolver resolver)
         {
