@@ -4,6 +4,9 @@ using BenchmarkDotNet.Attributes;
 namespace BenchmarkDotNet.Samples.CPU
 {
     // See http://stackoverflow.com/questions/11227809/why-is-processing-a-sorted-array-faster-than-an-unsorted-array/11227902
+#if CLASSIC
+    [Diagnostics.Windows.Configs.PmcDiagnoser]
+#endif
     public class Cpu_BranchPerdictor
     {
         private const int N = 32767;

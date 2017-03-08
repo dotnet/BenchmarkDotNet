@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 {
     public abstract class JitDiagnoser : EtwDiagnoser<object>, IDiagnoser
     {
-        protected override ClrTraceEventParser.Keywords EventType => ClrTraceEventParser.Keywords.JitTracing;
+        protected override ulong EventType => (ulong)ClrTraceEventParser.Keywords.JitTracing;
 
         protected override string SessionNamePrefix => "JitTracing";
 
@@ -19,6 +19,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public void BeforeAnythingElse(Process process, Benchmark benchmark) => Start(process, benchmark);
 
         public void AfterSetup(Process process, Benchmark benchmark) { }
+
+        public void BeforeMainRun(Process process, Benchmark benchmark) { }
 
         public void BeforeCleanup() => Stop();
 

@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Engines
 {
-    public sealed class ConsoleHost: IHost
+    public sealed class ConsoleHost : IHost
     {
         private readonly TextWriter outWriter;
 
@@ -34,6 +34,9 @@ namespace BenchmarkDotNet.Engines
                 case HostSignal.AfterSetup:
                     WriteLine(Engine.Signals.AfterSetup);
                     break;
+                case HostSignal.BeforeMainRun:
+                    WriteLine(Engine.Signals.BeforeMainRun);
+                    break; ;
                 case HostSignal.BeforeCleanup:
                     WriteLine(Engine.Signals.BeforeCleanup);
                     break;

@@ -26,6 +26,9 @@ namespace BenchmarkDotNet.Diagnosers
         public void AfterSetup(Process process, Benchmark benchmark) 
             => diagnosers.ForEach(diagnoser => diagnoser.AfterSetup(process, benchmark));
 
+        public void BeforeMainRun(Process process, Benchmark benchmark) 
+            => diagnosers.ForEach(diagnoser => diagnoser.BeforeMainRun(process, benchmark));
+
         public void BeforeCleanup() => diagnosers.ForEach(diagnoser => diagnoser.BeforeCleanup());
 
         public void ProcessResults(Benchmark benchmark, BenchmarkReport report)

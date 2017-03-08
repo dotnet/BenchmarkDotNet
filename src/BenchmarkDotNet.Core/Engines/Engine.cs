@@ -122,6 +122,7 @@ namespace BenchmarkDotNet.Engines
             // we enable monitoring after pilot & warmup, just to ignore the memory allocated by these runs
             EnableMonitoring();
             var initialGcStats = GcStats.ReadInitial(IsDiagnoserAttached);
+            if(IsDiagnoserAttached) Host.BeforeMainRun();
 
             var main = targetStage.RunMain(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring);
 
@@ -215,6 +216,7 @@ namespace BenchmarkDotNet.Engines
         {
             public const string BeforeAnythingElse = "// BeforeAnythingElse";
             public const string AfterSetup = "// AfterSetup";
+            public const string BeforeMainRun = "// BeforeMainRun";
             public const string BeforeCleanup = "// BeforeCleanup";
             public const string AfterAnythingElse = "// AfterAnythingElse";
             public const string DiagnoserIsAttachedParam = "diagnoserAttached";

@@ -56,6 +56,10 @@ namespace BenchmarkDotNet.Loggers
                 {
                     diagnoser?.AfterSetup(process, benchmark);
                 }
+                else if (line == Engine.Signals.BeforeMainRun)
+                {
+                    diagnoser?.BeforeMainRun(process, benchmark);
+                }
                 else if (line == Engine.Signals.BeforeCleanup)
                 {
                     diagnoser?.BeforeCleanup();

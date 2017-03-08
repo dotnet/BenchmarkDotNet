@@ -21,6 +21,11 @@ namespace BenchmarkDotNet.Diagnosers
         void AfterSetup(Process process, Benchmark benchmark);
 
         /// <summary>
+        /// after setup, warmup and pilot but before the main run
+        /// </summary>
+        void BeforeMainRun(Process process, Benchmark benchmark);
+
+        /// <summary>
         /// after run, before cleanup
         /// </summary>
         void BeforeCleanup();

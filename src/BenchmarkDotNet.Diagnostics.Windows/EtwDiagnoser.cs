@@ -15,12 +15,12 @@ namespace BenchmarkDotNet.Diagnostics.Windows
     public abstract class EtwDiagnoser<TStats> where TStats : new()
     {
         protected readonly LogCapture Logger = new LogCapture();
-        protected readonly List<int> ProcessIdsUsedInRuns = new List<int>();
+        protected readonly Dictionary<Benchmark, int> BenchmarkToProcess = new Dictionary<Benchmark, int>();
         protected readonly ConcurrentDictionary<int, TStats> StatsPerProcess = new ConcurrentDictionary<int, TStats>();
 
-        private TraceEventSession session;
+        protected TraceEventSession Session { get; private set; }
 
-        protected abstract ClrTraceEventParser.Keywords EventType { get; }
+        protected abstract ulong EventType { get; }
 
         protected abstract string SessionNamePrefix { get; }
 
@@ -28,55 +28,53 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             Cleanup();
 
-            ProcessIdsUsedInRuns.Add(process.Id);
-            StatsPerProcess.TryAdd(process.Id, new TStats());
+            BenchmarkToProcess.Add(benchmark, process.Id);
+            StatsPerProcess.TryAdd(process.Id, GetInitializedStats());
 
-            AttachToEvents(CreateSession(benchmark), benchmark);
+            Session = CreateSession(benchmark);
 
             EnableProvider();
+
+            AttachToEvents(Session, benchmark);
 
             // The ETW collection thread starts receiving events immediately, but we only
             // start aggregating them after ProcessStarted is called and we know which process
             // (or processes) we should be monitoring. Communication between the benchmark thread
             // and the ETW collection thread is through the statsPerProcess concurrent dictionary
             // and through the TraceEventSession class, which is thread-safe.
-            var task = Task.Factory.StartNew((Action)(() => session.Source.Process()), TaskCreationOptions.LongRunning);
+            var task = Task.Factory.StartNew((Action)(() => Session.Source.Process()), TaskCreationOptions.LongRunning);
 
             // wait until the processing has started, block by then so we don't loose any 
             // information (very important for jit-related things)
-            WaitUntilStarted(task); 
+            WaitUntilStarted(task);
         }
+
+        protected virtual TStats GetInitializedStats() => new TStats();
+
+        protected virtual TraceEventSession CreateSession(Benchmark benchmark)
+             => new TraceEventSession(GetSessionName(SessionNamePrefix, benchmark, benchmark.Parameters));
+
+        protected virtual void EnableProvider()
+        {
+            Session.EnableProvider(
+                ClrTraceEventParser.ProviderGuid,
+                TraceEventLevel.Verbose,
+                EventType);
+        }
+
+        protected abstract void AttachToEvents(TraceEventSession traceEventSession, Benchmark benchmark);
 
         protected void Stop()
         {
             WaitForDelayedEvents();
 
-            session.Dispose();
+            Session.Dispose();
         }
-
-        protected abstract void AttachToEvents(TraceEventSession traceEventSession, Benchmark benchmark);
 
         private void Cleanup()
         {
-            ProcessIdsUsedInRuns.Clear();
+            BenchmarkToProcess.Clear();
             StatsPerProcess.Clear();
-        }
-
-        private TraceEventSession CreateSession(Benchmark benchmark)
-        {
-            var sessionName = GetSessionName(SessionNamePrefix, benchmark, benchmark.Parameters);
-
-            session = new TraceEventSession(sessionName);
-
-            return session;
-        }
-
-        private void EnableProvider()
-        {
-            session.EnableProvider(
-                ClrTraceEventParser.ProviderGuid,
-                TraceEventLevel.Verbose,
-                (ulong)(EventType));
         }
 
         private static string GetSessionName(string prefix, Benchmark benchmark, ParameterInstances parameters = null)
