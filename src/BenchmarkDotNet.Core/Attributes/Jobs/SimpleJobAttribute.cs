@@ -1,4 +1,6 @@
-﻿using BenchmarkDotNet.Engines;
+﻿using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using JetBrains.Annotations;
 
@@ -41,7 +43,12 @@ namespace BenchmarkDotNet.Attributes.Jobs
             if (targetCount != DefaultValue)
                 job.Run.TargetCount = targetCount;
             if (invocationCount != DefaultValue)
+            {
                 job.Run.InvocationCount = invocationCount;
+                int unrollFactor = job.Run.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvResolver.Instance);
+                if (invocationCount % unrollFactor != 0)
+                    job.Run.UnrollFactor = 1;
+            }
             if (runStrategy != null)
                 job.Run.RunStrategy = runStrategy.Value;
 
