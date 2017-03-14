@@ -34,6 +34,7 @@ namespace BenchmarkDotNet.Columns
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Custom;
+        public QuantityType QuantityType => QuantityType.None;
         public int PriorityInCategory => (int) system;
         public override string ToString() => ColumnName;
     }
