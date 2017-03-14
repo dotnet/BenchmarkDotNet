@@ -1,9 +1,12 @@
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Validators;
 using Microsoft.Diagnostics.Tracing.Parsers;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
@@ -25,6 +28,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public void BeforeCleanup() => Stop();
 
         public virtual void ProcessResults(Benchmark benchmark, BenchmarkReport report) { }
+
+        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Enumerable.Empty<ValidationError>();
 
         public void DisplayResults(ILogger outputLogger)
         {

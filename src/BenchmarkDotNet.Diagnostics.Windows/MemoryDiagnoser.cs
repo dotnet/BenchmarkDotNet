@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
@@ -44,6 +45,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         }
 
         public void DisplayResults(ILogger logger) { }
+
+        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Enumerable.Empty<ValidationError>();
 
         private Stats ProcessEtwEvents(Benchmark benchmark, long totalOperations)
         {

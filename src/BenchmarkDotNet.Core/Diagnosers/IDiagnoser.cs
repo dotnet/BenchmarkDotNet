@@ -1,8 +1,10 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -33,5 +35,7 @@ namespace BenchmarkDotNet.Diagnosers
         void ProcessResults(Benchmark benchmark, BenchmarkReport report);
 
         void DisplayResults(ILogger logger);
+
+        IEnumerable<ValidationError> Validate(ValidationParameters validationParameters);
     }
 }

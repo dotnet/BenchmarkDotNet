@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
 using BenchmarkDotNet.Core.Helpers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
@@ -22,9 +25,37 @@ namespace BenchmarkDotNet.Characteristics
                     return "Default";
 
                 var value = characteristic[obj];
+                var collection = value as IList;
+                if (collection != null)
+                    return ToPresentation(collection);
+
+                return ToPresentation(value);
+            }
+
+            // string.Join(separator, nonGenericCollection) is translated to string.Join(separator, params object[]) with single object!! (collection)
+            // and ends up with exact the same output as collection.ToString() (typeName[])
+            // so I needed to implement this on my own
+            private static string ToPresentation(IList collection)
+            {
+                if (collection.Count == 0)
+                    return "Empty";
+
+                var buffer = new StringBuilder(collection.Count * 10);
+                for (int i = 0; i < collection.Count - 1; i++)
+                {
+                    buffer.Append(ToPresentation(collection[i]));
+                    buffer.Append(',');
+                }
+                buffer.Append(ToPresentation(collection[collection.Count - 1]));
+
+                return buffer.ToString();
+            }
+
+            private static string ToPresentation(object value)
+            {
                 return (value as IFormattable)?.ToString(null, HostEnvironmentInfo.MainCultureInfo)
-                    ?? value?.ToString() 
-                    ?? "";
+                       ?? value?.ToString()
+                       ?? "";
             }
         }
 

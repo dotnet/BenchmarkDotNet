@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             Cleanup();
 
             BenchmarkToProcess.Add(benchmark, process.Id);
-            StatsPerProcess.TryAdd(process.Id, GetInitializedStats());
+            StatsPerProcess.TryAdd(process.Id, GetInitializedStats(benchmark));
 
             Session = CreateSession(benchmark);
 
@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             WaitUntilStarted(task);
         }
 
-        protected virtual TStats GetInitializedStats() => new TStats();
+        protected virtual TStats GetInitializedStats(Benchmark benchmark) => new TStats();
 
         protected virtual TraceEventSession CreateSession(Benchmark benchmark)
              => new TraceEventSession(GetSessionName(SessionNamePrefix, benchmark, benchmark.Parameters));

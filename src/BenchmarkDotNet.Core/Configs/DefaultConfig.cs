@@ -63,23 +63,25 @@ namespace BenchmarkDotNet.Configs
 
         public IEnumerable<IDiagnoser> GetDiagnosers() => Enumerable.Empty<IDiagnoser>();
 
-        // Make the Diagnosers lazy-loaded, so they are only instantiated if neededs
+        // Make the Diagnosers lazy-loaded, so they are only instantiated if needed
         public static readonly Lazy<IDiagnoser[]> LazyLoadedDiagnosers =
             new Lazy<IDiagnoser[]>(LoadDiagnosers, LazyThreadSafetyMode.ExecutionAndPublication);
 
         private static IDiagnoser[] LoadDiagnosers()
         {
 #if !CORE
-            var diagnosticAssembly = "BenchmarkDotNet.Diagnostics.Windows.dll";
+            const string diagnosticAssemblyFileName = "BenchmarkDotNet.Diagnostics.Windows.dll";
+            const string diagnosticAssemblyName = "BenchmarkDotNet.Diagnostics.Windows";
+            var assemblyName = Assembly.GetEntryAssembly().GetReferencedAssemblies().SingleOrDefault(name => name.Name == diagnosticAssemblyName);
             try
             {
-                var loadedAssembly = Assembly.LoadFrom(diagnosticAssembly);
+                var loadedAssembly = assemblyName != null ? Assembly.Load(assemblyName) : Assembly.LoadFrom(diagnosticAssemblyFileName);
                 var thisAssembly = typeof(DefaultConfig).GetTypeInfo().Assembly;
                 if (loadedAssembly.GetName().Version != thisAssembly.GetName().Version)
                 {
                     var errorMsg =
-                        $"Unable to load: {diagnosticAssembly} version {loadedAssembly.GetName().Version}" +
-                        System.Environment.NewLine +
+                        $"Unable to load: {diagnosticAssemblyFileName} version {loadedAssembly.GetName().Version}" +
+                        Environment.NewLine +
                         $"Does not match: {System.IO.Path.GetFileName(thisAssembly.Location)} version {thisAssembly.GetName().Version}";
                     ConsoleLogger.Default.WriteLineError(errorMsg);
                 }
@@ -89,15 +91,19 @@ namespace BenchmarkDotNet.Configs
                     {
                         MemoryDiagnoser.Default,
                         GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.Windows.InliningDiagnoser"),
+                        GetDiagnoser(loadedAssembly, "BenchmarkDotNet.Diagnostics.Windows.PmcDiagnoser"),
                     };
                 }
             }
             catch (Exception ex) // we're loading a plug-in, better to be safe rather than sorry
             {
-                ConsoleLogger.Default.WriteLineError($"Error loading {diagnosticAssembly}: {ex.GetType().Name} - {ex.Message}");
+                ConsoleLogger.Default.WriteLineError($"Error loading {diagnosticAssemblyFileName}: {ex.GetType().Name} - {ex.Message}");
             }
 #endif
-            return new IDiagnoser[0];
+            return new IDiagnoser[]
+            {
+                MemoryDiagnoser.Default
+            };
         }
 
         private static IDiagnoser GetDiagnoser(Assembly loadedAssembly, string typeName)

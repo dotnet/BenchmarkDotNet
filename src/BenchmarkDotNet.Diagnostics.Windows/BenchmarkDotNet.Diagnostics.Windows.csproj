@@ -4,7 +4,7 @@
     <Description>Powerful .NET library for benchmarking (Diagnostic Tools for Windows)</Description>
     <AssemblyTitle>BenchmarkDotNet.Diagnostics.Windows</AssemblyTitle>
     <TargetFramework>net45</TargetFramework>
-    <NoWarn>$(NoWarn);1591;3001;3003</NoWarn>
+    <NoWarn>1701;1702;1705;1591;3001;3003;3002</NoWarn>
     <AssemblyName>BenchmarkDotNet.Diagnostics.Windows</AssemblyName>
     <PackageId>BenchmarkDotNet.Diagnostics.Windows</PackageId>
   </PropertyGroup>

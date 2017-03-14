@@ -5,6 +5,7 @@ using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
@@ -26,7 +27,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;
         public IEnumerable<ILogger> GetLoggers() => loggers;
-        public IEnumerable<IDiagnoser> GetDiagnosers() => diagnosers;
+        
         public IEnumerable<IAnalyser> GetAnalysers() => analysers;
         public IEnumerable<IValidator> GetValidators() => validators;
         public IEnumerable<Job> GetJobs() => jobs;
@@ -58,6 +59,20 @@ namespace BenchmarkDotNet.Configs
             validators.AddRange(config.GetValidators());
             orderProvider = config.GetOrderProvider() ?? orderProvider;
             KeepBenchmarkFiles |= config.KeepBenchmarkFiles;
+        }
+
+        public IEnumerable<IDiagnoser> GetDiagnosers()
+        {
+            if (jobs.All(job => job.Diagnoser.HardwareCounters.IsNullOrEmpty()))
+                return diagnosers;
+
+            var hardwareCountersDiagnoser = DefaultConfig.LazyLoadedDiagnosers.Value
+                .SingleOrDefault(diagnoser => diagnoser is IHardwareCountersDiagnoser);
+
+            if(hardwareCountersDiagnoser != default(IDiagnoser))
+                return diagnosers.Union(new [] { hardwareCountersDiagnoser });
+
+            return diagnosers;
         }
 
         public static ManualConfig CreateEmpty() => new ManualConfig();

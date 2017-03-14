@@ -1,10 +1,12 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -45,5 +47,8 @@ namespace BenchmarkDotNet.Diagnosers
                 logger.WriteLine();
             }
         }
+
+        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) 
+            => diagnosers.SelectMany(diagnoser => diagnoser.Validate(validationParameters));
     }
 }

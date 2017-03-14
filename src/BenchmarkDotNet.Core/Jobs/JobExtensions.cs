@@ -1,6 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Horology;
@@ -9,14 +10,7 @@ namespace BenchmarkDotNet.Jobs
 {
     public static class JobExtensions
     {
-        private static Job WithCore(this Job job, Action<Job> updateCallback)
-        {
-            job = new Job(job);
-            updateCallback(job);
-            return job;
-        }
         public static Job With(this Job job, Platform platform) => job.WithCore(j => j.Env.Platform = platform);
-
         public static Job WithId(this Job job, string id) => new Job(id, job);
 
         // Env
@@ -53,10 +47,20 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithRemoveOutliers(this Job job, bool value) => job.WithCore(j => j.Accuracy.RemoveOutliers = value);
         public static Job WithAnalyzeLaunchVariance(this Job job, bool value) => job.WithCore(j => j.Accuracy.AnalyzeLaunchVariance = value);
 
+        // Diagnoser
+        public static Job WithHardwareCounters(this Job job, params HardwareCounter[] counters) => job.WithCore(j => j.Diagnoser.HardwareCounters = counters);
+
         // Info
         [Obsolete]
         public static string GetShortInfo(this Job job) => job.ResolvedId;
         [Obsolete]
         public static string GetFullInfo(this Job job) => CharacteristicSetPresenter.Default.ToPresentation(job);
+
+        private static Job WithCore(this Job job, Action<Job> updateCallback)
+        {
+            job = new Job(job);
+            updateCallback(job);
+            return job;
+        }
     }
 }
