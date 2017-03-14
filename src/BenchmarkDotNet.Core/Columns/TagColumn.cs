@@ -24,6 +24,7 @@ namespace BenchmarkDotNet.Columns
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Custom;
         public int PriorityInCategory => 0;
+        public QuantityType QuantityType => QuantityType.None;
         public override string ToString() => ColumnName;
     }
 }

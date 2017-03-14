@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Reports
             ColumnCount = columns.Length;
 
             FullHeader = columns.Select(c =>
-                style.PrintUnitsInHeader ? c.ColumnName + $" [{targetTimeUnit.Name}]" : c.ColumnName
+                style.PrintUnitsInHeader && c.QuantityType != QuantityType.None ? c.ColumnName + $" [{style.TimeUnit.Name}]" : c.ColumnName
             ).ToArray();
 
             var orderProvider = summary.Config.GetOrderProvider() ?? DefaultOrderProvider.Instance;

@@ -20,12 +20,19 @@ namespace BenchmarkDotNet.Extensions
             return list;
         }
 
-        public static string ToTimeStr(this double value, TimeUnit unit = null, int unitNameWidth = 1)
+        public static string ToTimeStr(this double value, TimeUnit unit = null, int unitNameWidth = 1, bool showUnit = true)
         {
             unit = unit ?? TimeUnit.GetBestTimeUnit(value);
             var unitValue = TimeUnit.Convert(value, TimeUnit.Nanosecond, unit);
-            var unitName = unit.Name.PadLeft(unitNameWidth);
-            return $"{unitValue.ToStr("N4")} {unitName}";
+            if (showUnit)
+            {
+                var unitName = unit.Name.PadLeft(unitNameWidth);
+                return $"{unitValue.ToStr("N4")} {unitName}";
+            }
+            else
+            {
+                return $"{unitValue.ToStr("N4")}";
+            }
         }
 
         internal static string ToFormattedBytes(this long bytes)

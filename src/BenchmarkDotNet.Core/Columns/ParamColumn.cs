@@ -23,5 +23,6 @@ namespace BenchmarkDotNet.Columns
         public ColumnCategory Category => ColumnCategory.Params;
         public int PriorityInCategory => 0;
         public override string ToString() => ColumnName;
+        public QuantityType QuantityType => QuantityType.None;
     }
 }
