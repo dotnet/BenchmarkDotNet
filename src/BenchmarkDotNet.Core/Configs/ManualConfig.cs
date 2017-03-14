@@ -10,6 +10,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Validators;
+using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -23,6 +24,7 @@ namespace BenchmarkDotNet.Configs
         private readonly List<IValidator> validators = new List<IValidator>();
         private readonly List<Job> jobs = new List<Job>();
         private IOrderProvider orderProvider = null;
+        private ISummaryStyle summaryStyle = null;
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;
@@ -31,6 +33,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IAnalyser> GetAnalysers() => analysers;
         public IEnumerable<IValidator> GetValidators() => validators;
         public IEnumerable<Job> GetJobs() => jobs;
+        public ISummaryStyle GetSummaryStyle() => summaryStyle;
 
         public IOrderProvider GetOrderProvider() => orderProvider;
 
@@ -47,6 +50,7 @@ namespace BenchmarkDotNet.Configs
         public void Add(params IValidator[] newValidators) => validators.AddRange(newValidators);
         public void Add(params Job[] newJobs) => jobs.AddRange(newJobs.Select(j => j.Freeze())); // DONTTOUCH: please DO NOT remove .Freeze() call.
         public void Set(IOrderProvider provider) => orderProvider = provider ?? orderProvider;
+        public void Set(ISummaryStyle style) => summaryStyle = style ?? summaryStyle;
 
         public void Add(IConfig config)
         {
@@ -59,6 +63,7 @@ namespace BenchmarkDotNet.Configs
             validators.AddRange(config.GetValidators());
             orderProvider = config.GetOrderProvider() ?? orderProvider;
             KeepBenchmarkFiles |= config.KeepBenchmarkFiles;
+            summaryStyle = summaryStyle ?? config.GetSummaryStyle();
         }
 
         public IEnumerable<IDiagnoser> GetDiagnosers()

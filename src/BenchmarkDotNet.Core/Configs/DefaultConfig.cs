@@ -12,6 +12,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Validators;
+using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -110,6 +111,11 @@ namespace BenchmarkDotNet.Configs
         {
             var diagnoserType = loadedAssembly.GetType(typeName);
             return (IDiagnoser) Activator.CreateInstance(diagnoserType);
+        }
+
+        public ISummaryStyle GetSummaryStyle()
+        {
+            return SummaryStyle.Default;
         }
     }
 }
