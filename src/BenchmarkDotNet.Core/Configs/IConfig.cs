@@ -7,6 +7,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Validators;
+using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -21,6 +22,7 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<IValidator> GetValidators();
 
         IOrderProvider GetOrderProvider();
+        ISummaryStyle GetSummaryStyle();
 
         ConfigUnionRule UnionRule { get; }
 

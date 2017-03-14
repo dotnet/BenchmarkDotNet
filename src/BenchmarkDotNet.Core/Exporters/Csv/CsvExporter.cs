@@ -14,7 +14,13 @@ namespace BenchmarkDotNet.Exporters.Csv
         {
             this.separator = separator.ToRealSeparator();
         }
-
+        /*
+        public override void ExportToLog(BenchmarkReport report, ISummaryStyle style, ILogger logger)
+        {
+            var summary = new Summary(reports, style);
+            ExportToLog(summary, logger);
+        }
+        */
         public override void ExportToLog(Summary summary, ILogger logger)
         {
             foreach (var line in summary.Table.FullContentWithHeader)

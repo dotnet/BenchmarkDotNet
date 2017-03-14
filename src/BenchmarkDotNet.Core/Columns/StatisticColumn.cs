@@ -60,20 +60,24 @@ namespace BenchmarkDotNet.Columns
             ColumnName = columnName;
         }
 
-        public string GetValue(Summary summary, Benchmark benchmark) =>
-            Format(summary[benchmark].ResultStatistics, summary.TimeUnit);
+        public string GetValue(Summary summary, Benchmark benchmark)
+        {
+            var style = summary.Config.GetSummaryStyle() ?? SummaryStyle.Default;
+            return Format(summary[benchmark].ResultStatistics, style.TimeUnit, style.PrintUnitsInContent);
+        }
 
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Statistics;
         public int PriorityInCategory => (int) priority;
 
-        private string Format(Statistics statistics, TimeUnit timeUnit)
+        private string Format(Statistics statistics, TimeUnit timeUnit, bool withUnit)
         {
             if (statistics == null)
                 return "NA";
             double value = calc(statistics);
-            return isTimeColumn ? value.ToTimeStr(timeUnit) : value.ToStr();
+            // todo: if isColumnWithUnits then format value using specific formatter (unit, multiplier)
+            return isTimeColumn ? value.ToTimeStr(withUnit ? timeUnit : null, 0) : value.ToStr();
         }
 
         public override string ToString() => ColumnName;

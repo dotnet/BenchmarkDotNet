@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Order;
+using BenchmarkDotNet.Horology;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -35,10 +36,16 @@ namespace BenchmarkDotNet.Reports
                 return;
             }
 
-            var columns = summary.GetColumns();
+            var style = summary.Config.GetSummaryStyle() ?? SummaryStyle.Default;
+            var targetTimeUnit = TimeUnit.GetBestTimeUnit(summary.Reports.Where(r => r.ResultStatistics != null).Select(r => r.ResultStatistics.Mean).ToArray());
+            style.WithCurrentOrNewTimeUnit(targetTimeUnit);
 
+            var columns = summary.GetColumns();
             ColumnCount = columns.Length;
-            FullHeader = columns.Select(c => c.ColumnName).ToArray();
+
+            FullHeader = columns.Select(c =>
+                style.PrintUnitsInHeader ? c.ColumnName + $" [{targetTimeUnit.Name}]" : c.ColumnName
+            ).ToArray();
 
             var orderProvider = summary.Config.GetOrderProvider() ?? DefaultOrderProvider.Instance;
             FullContent = summary.Reports.Select(r => columns.Select(c => c.GetValue(summary, r.Benchmark)).ToArray()).ToArray();

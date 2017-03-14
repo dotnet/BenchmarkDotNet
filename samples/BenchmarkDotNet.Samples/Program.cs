@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Exporters.Csv;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -7,7 +9,11 @@ namespace BenchmarkDotNet.Samples
     {
         static void Main(string[] args)
         {
-            BenchmarkSwitcher.FromAssembly(typeof(Program).GetTypeInfo().Assembly).Run(args);
+            var config = ManualConfig.Create(DefaultConfig.Instance);
+            config.Add(CsvMeasurementsExporter.Default);
+            config.Set(new Reports.SummaryStyle(true, false, Horology.TimeUnit.Second));
+            BenchmarkRunner.Run<Intro.IntroColumns>(config);
+            //BenchmarkSwitcher.FromAssembly(typeof(Program).GetTypeInfo().Assembly).Run(args);
         }
     }
 }
