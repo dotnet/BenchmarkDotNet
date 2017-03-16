@@ -19,6 +19,8 @@ namespace BenchmarkDotNet.Columns
         public ColumnCategory Category => ColumnCategory.Job;
         public int PriorityInCategory => 0;
         public QuantityType QuantityType => QuantityType.None;
+        public string GetName(ISummaryStyle style) => ColumnName;
+        public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
 
         private TargetMethodColumn(string columnName, Func<Benchmark, string> valueProvider, bool alwaysShow = false)
         {

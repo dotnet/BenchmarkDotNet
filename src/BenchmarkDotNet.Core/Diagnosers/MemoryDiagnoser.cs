@@ -62,7 +62,9 @@ namespace BenchmarkDotNet.Diagnosers
             public bool AlwaysShow => true;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
-            public QuantityType QuantityType => QuantityType.Size;
+            public QuantityType QuantityType => QuantityType.None;
+            public string GetName(ISummaryStyle style) => ColumnName;
+            public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
 
             public string GetValue(Summary summary, Benchmark benchmark)
             {
@@ -87,11 +89,13 @@ namespace BenchmarkDotNet.Diagnosers
             public bool IsDefault(Summary summary, Benchmark benchmark) => false;
             public string Id => $"{nameof(GCCollectionColumn)}{generation}";
             public string ColumnName => $"Gen {generation}";
-            public QuantityType QuantityType => QuantityType.Size;
 
             public bool AlwaysShow => true;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
+            public QuantityType QuantityType => QuantityType.None;
+            public string GetName(ISummaryStyle style) => ColumnName;
+            public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
 
             public bool IsAvailable(Summary summary)
                 => summary.Reports.Any(report => report.GcStats.GetCollectionsCount(generation) != 0);

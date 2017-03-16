@@ -25,6 +25,8 @@ namespace BenchmarkDotNet.Columns
         public ColumnCategory Category => ColumnCategory.Custom;
         public int PriorityInCategory => 0;
         public QuantityType QuantityType => QuantityType.None;
+        public string GetName(ISummaryStyle style) => ColumnName;
+        public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
         public override string ToString() => ColumnName;
     }
 }

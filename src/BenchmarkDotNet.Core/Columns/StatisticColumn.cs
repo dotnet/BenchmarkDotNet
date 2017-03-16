@@ -62,8 +62,11 @@ namespace BenchmarkDotNet.Columns
 
         public string GetValue(Summary summary, Benchmark benchmark)
         {
-            var style = summary.Config.GetSummaryStyle() ?? SummaryStyle.Default;
-            return Format(summary[benchmark].ResultStatistics, style.TimeUnit, style.PrintUnitsInContent);
+            return Format(summary[benchmark].ResultStatistics, SummaryStyle.Default);
+        }
+        public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style)
+        {
+            return Format(summary[benchmark].ResultStatistics, style);
         }
 
         public bool IsAvailable(Summary summary) => true;
@@ -71,14 +74,25 @@ namespace BenchmarkDotNet.Columns
         public ColumnCategory Category => ColumnCategory.Statistics;
         public int PriorityInCategory => (int) priority;
         public QuantityType QuantityType => type;
+        public string GetName(ISummaryStyle style)
+        {
+            if (style.PrintUnitsInHeader)
+            {
+                return $"{ColumnName} [{style.TimeUnit.Name}]";
+            }
+            else
+            {
+                return ColumnName;
+            }
+        }
 
-        private string Format(Statistics statistics, TimeUnit timeUnit, bool withUnit)
+        private string Format(Statistics statistics, ISummaryStyle style)
         {
             if (statistics == null)
                 return "NA";
             double value = calc(statistics);
             // todo: if isColumnWithUnits then format value using specific formatter (unit, multiplier)
-            return type == QuantityType.Time ? value.ToTimeStr(timeUnit, 1, withUnit) : value.ToStr();
+            return type == QuantityType.Time ? value.ToTimeStr(style.TimeUnit, 1, style.PrintUnitsInContent) : value.ToStr();
         }
 
         public override string ToString() => ColumnName;
