@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
@@ -12,15 +13,17 @@ namespace BenchmarkDotNet.Exporters.Csv
 {
     public class CsvMeasurementsExporter : ExporterBase
     {
-        public static readonly CsvMeasurementsExporter Default = new CsvMeasurementsExporter(CsvSeparator.CurrentCulture);
+        public static readonly CsvMeasurementsExporter Default = new CsvMeasurementsExporter(CsvSeparator.CurrentCulture, SummaryStyle.Default);
+        public static CsvMeasurementsExporter WithStyle(SummaryStyle style) => new CsvMeasurementsExporter(CsvSeparator.CurrentCulture, style);
 
         private static readonly CharacteristicPresenter Presenter = CharacteristicPresenter.SummaryPresenter;
 
         private static readonly Lazy<MeasurementColumn[]> Columns = new Lazy<MeasurementColumn[]>(BuildColumns);
 
-        public CsvMeasurementsExporter(CsvSeparator separator)
+        public CsvMeasurementsExporter(CsvSeparator separator = CsvSeparator.CurrentCulture, ISummaryStyle style = null)
         {
             Separator = separator.ToRealSeparator();
+            Style = style ?? SummaryStyle.Default;
         }
 
         public string Separator { get; }
@@ -28,6 +31,8 @@ namespace BenchmarkDotNet.Exporters.Csv
         protected override string FileExtension => "csv";
 
         protected override string FileCaption => "measurements";
+
+        public ISummaryStyle Style { get; private set; }
 
         public static Job[] GetJobs(Summary summary) => summary.Benchmarks.Select(b => b.Job).ToArray();
 
@@ -60,7 +65,7 @@ namespace BenchmarkDotNet.Exporters.Csv
                 return Columns.Value;
 
             var columns = new List<MeasurementColumn>(Columns.Value);
-            columns.Add(new MeasurementColumn("Gen_0", (_, report, __) => report.GcStats.Gen0Collections.ToString()));
+            columns.Add(new MeasurementColumn("Gen_0 XX", (_, report, __) => report.GcStats.Gen0Collections.ToString()));
             columns.Add(new MeasurementColumn("Gen_1", (_, report, __) => report.GcStats.Gen1Collections.ToString()));
             columns.Add(new MeasurementColumn("Gen_2", (_, report, __) => report.GcStats.Gen2Collections.ToString()));
             columns.Add(new MeasurementColumn("Allocated_Bytes", (_, report, __) => report.GcStats.BytesAllocatedPerOperation.ToString()));
@@ -87,7 +92,7 @@ namespace BenchmarkDotNet.Exporters.Csv
             columns.Add(new MeasurementColumn("Params", (summary, report, m) => report.Benchmark.Parameters.PrintInfo));
 
             // Measurements
-            columns.Add(new MeasurementColumn("Measurement_LaunchIndex", (summary, report, m) => m.LaunchIndex.ToString()));
+            columns.Add(new MeasurementColumn("Measurement_LaunchIndex YY", (summary, report, m) => m.LaunchIndex.ToString()));
             columns.Add(new MeasurementColumn("Measurement_IterationMode", (summary, report, m) => m.IterationMode.ToString()));
             columns.Add(new MeasurementColumn("Measurement_IterationIndex", (summary, report, m) => m.IterationIndex.ToString()));
             columns.Add(new MeasurementColumn("Measurement_Nanoseconds", (summary, report, m) => m.Nanoseconds.ToStr()));

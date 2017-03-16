@@ -21,6 +21,7 @@ namespace BenchmarkDotNet.Reports
         public HostEnvironmentInfo HostEnvironmentInfo { get; }
         public IConfig Config { get; }
         public string ResultsDirectoryPath { get; }
+
         public SummaryTable Table { get; }
         public TimeSpan TotalTime { get; }
         public ValidationError[] ValidationErrors { get; }
@@ -51,7 +52,7 @@ namespace BenchmarkDotNet.Reports
             Benchmarks = orderProvider.GetSummaryOrder(Benchmarks, this).ToArray();
             Reports = Benchmarks.Select(b => reportMap[b]).ToArray();
 
-            Table = new SummaryTable(this);
+            Table = new SummaryTable(this, SummaryStyle.Default);
             shortInfos = new Dictionary<Job, string>();
             jobs = new Lazy<Job[]>(() => Benchmarks.Select(b => b.Job).ToArray());
             AllRuntimes = BuildAllRuntimes();
@@ -61,7 +62,7 @@ namespace BenchmarkDotNet.Reports
             : this(title, hostEnvironmentInfo, config, resultsDirectoryPath, totalTime, validationErrors)
         {
             Benchmarks = benchmarks;
-            Table = new SummaryTable(this);
+            Table = new SummaryTable(this, SummaryStyle.Default);
             Reports = reports ?? new BenchmarkReport[0];
         }
 
@@ -74,6 +75,11 @@ namespace BenchmarkDotNet.Reports
             TotalTime = totalTime;
             ValidationErrors = validationErrors;
             Reports = new BenchmarkReport[0];
+        }
+
+        internal SummaryTable GetTable(ISummaryStyle style)
+        {
+            return new SummaryTable(this, style);
         }
 
         internal static Summary CreateFailed(Benchmark[] benchmarks, string title, HostEnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, ValidationError[] validationErrors)

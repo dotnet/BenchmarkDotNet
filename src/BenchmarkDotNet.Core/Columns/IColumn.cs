@@ -32,5 +32,8 @@ namespace BenchmarkDotNet.Columns
         int PriorityInCategory { get; }
 
         QuantityType QuantityType { get; }
+
+        string GetName(ISummaryStyle style);
+        string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style);
     }
 }
