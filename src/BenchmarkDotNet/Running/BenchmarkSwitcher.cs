@@ -47,13 +47,13 @@ namespace BenchmarkDotNet.Running
         /// </summary>
         public IEnumerable<Summary> RunAll() => Run(new[] { "*" });
 
-        public IEnumerable<Summary> Run(string[] args = null)
+        public IEnumerable<Summary> Run(string[] args = null, IConfig config = null)
         {
             args = typeParser.ReadArgumentList(args ?? new string[0]);
-            return RunBenchmarks(args);
+            return RunBenchmarks(args, config);
         }
 
-        private IEnumerable<Summary> RunBenchmarks(string[] args)
+        private IEnumerable<Summary> RunBenchmarks(string[] args, IConfig config)
         {
             var globalChronometer = Chronometer.Start();
             var summaries = new List<Summary>();
@@ -63,8 +63,8 @@ namespace BenchmarkDotNet.Running
                 DisplayOptions();
                 return Enumerable.Empty<Summary>();
             }
-
-            var config = ManualConfig.Union(DefaultConfig.Instance, ManualConfig.Parse(args));
+            
+            config = ManualConfig.Union(config ?? DefaultConfig.Instance, ManualConfig.Parse(args));
 
             foreach (var typeWithMethods in typeParser.MatchingTypesWithMethods(args))
             {
