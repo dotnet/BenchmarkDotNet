@@ -202,6 +202,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public bool AlwaysShow => false;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
+            public QuantityType QuantityType => QuantityType.None;
+            public string GetName(ISummaryStyle style) => ColumnName;
+            public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
 
             private Dictionary<Benchmark, PmcStats> Results { get; }
             private HardwareCounter Counter { get; }
