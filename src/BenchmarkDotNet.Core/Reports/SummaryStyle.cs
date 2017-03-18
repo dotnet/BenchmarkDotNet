@@ -9,35 +9,17 @@ namespace BenchmarkDotNet.Reports
 {
     public class SummaryStyle : ISummaryStyle
     {
-        public bool PrintUnitsInHeader { get; }
+        public bool PrintUnitsInHeader { get; set; }
 
-        public bool PrintUnitsInContent { get; }
+        public bool PrintUnitsInContent { get; set; }
 
-        public TimeUnit TimeUnit { get; }
+        public TimeUnit TimeUnit { get; set; }
 
-        public SummaryStyle(bool printUnitsInHeader, bool printUnitsInContent, TimeUnit timeUnit)
+        public static SummaryStyle Default => new SummaryStyle()
         {
-            PrintUnitsInHeader = printUnitsInHeader;
-            PrintUnitsInContent = printUnitsInContent;
-            TimeUnit = timeUnit;
-        }
-
-        public static SummaryStyle Default => new SummaryStyle(
-            printUnitsInHeader: false,
-            printUnitsInContent: true,
-            timeUnit: null
-        );
-
-        public ISummaryStyle WithCurrentOrNewTimeUnit(TimeUnit newTimeUnit)
-        {
-            if (this.TimeUnit != null)
-                return this;
-
-            return new SummaryStyle(
-                printUnitsInHeader: this.PrintUnitsInHeader,
-                printUnitsInContent: this.PrintUnitsInContent,
-                timeUnit: newTimeUnit
-            );
-        }
+            PrintUnitsInHeader = false,
+            PrintUnitsInContent = true,
+            TimeUnit = null
+        };
     }
 }

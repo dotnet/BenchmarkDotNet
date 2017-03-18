@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Samples
             var config = ManualConfig.Create(DefaultConfig.Instance);
             config.Add(new CsvExporter(
                 CsvSeparator.CurrentCulture,
-                new Reports.SummaryStyle(printUnitsInHeader: true, printUnitsInContent: false, timeUnit: Horology.TimeUnit.Second)
+                new Reports.SummaryStyle() { PrintUnitsInHeader = true, PrintUnitsInContent = false, TimeUnit = Horology.TimeUnit.Second }
             ));
             BenchmarkRunner.Run<Intro.IntroColumns>(config);
             //BenchmarkSwitcher.FromAssembly(typeof(Program).GetTypeInfo().Assembly).Run(args);
