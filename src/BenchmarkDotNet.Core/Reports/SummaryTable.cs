@@ -40,8 +40,10 @@ namespace BenchmarkDotNet.Reports
             
             // Ensure we have all required data for styling
             style = style ?? SummaryStyle.Default;
-            var targetTimeUnit = TimeUnit.GetBestTimeUnit(summary.Reports.Where(r => r.ResultStatistics != null).Select(r => r.ResultStatistics.Mean).ToArray());
-            style.WithCurrentOrNewTimeUnit(targetTimeUnit);
+            if (style.TimeUnit == null)
+            {
+                style.TimeUnit = TimeUnit.GetBestTimeUnit(summary.Reports.Where(r => r.ResultStatistics != null).Select(r => r.ResultStatistics.Mean).ToArray());
+            }
             // TODO: set size unit
             
             var columns = summary.GetColumns();
