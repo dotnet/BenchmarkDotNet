@@ -3,6 +3,12 @@ using BenchmarkDotNet.Running;
 using System.Linq;
 using BenchmarkDotNet.Attributes.Jobs;
 using Xunit;
+using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Reports;
+using System;
+using System.Collections.Generic;
+using BenchmarkDotNet.Configs;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -23,6 +29,19 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.True(results.Any(r => r.Benchmarks.Any(b => b.Target.Type.Name == "ClassA" && b.Target.Method.Name == "Method1")));
             Assert.True(results.Any(r => r.Benchmarks.Any(b => b.Target.Type.Name == "ClassA" && b.Target.Method.Name == "Method2")));
             Assert.True(results.Any(r => r.Benchmarks.Any(b => b.Target.Type.Name == "ClassB" && b.Target.Method.Name == "Method4")));
+        }
+
+        [Fact]
+        public void ConfigPassingTest()
+        {
+            var types = new[] { typeof(ClassB) };
+            var switcher = new BenchmarkSwitcher(types);
+            var config = ManualConfig.CreateEmpty();
+            MockExporter mockExporter = new MockExporter();
+            config.Add(mockExporter);
+            switcher.Run(new[] { "job=Dry", "class=ClassB", "methods=Method4" }, config);
+
+            Assert.True(mockExporter.exported);
         }
     }
 }
@@ -55,6 +74,15 @@ namespace BenchmarkDotNet.IntegrationTests
         public void Method1() { }
         public void Method2() { }
         public void Method3() { }
+    }
+
+    public class MockExporter : ExporterBase
+    {
+        public bool exported = false;
+        public override void ExportToLog(Summary summary, ILogger logger)
+        {
+            exported = true;
+        }
     }
 }
 
