@@ -25,16 +25,16 @@ echo Starting Copying files
 echo -----------------------------
 
 mkdir "output"
-call ../build/batchcopy.cmd "../src/BenchmarkDotNet/bin/Release/net45/*.*" "output"
-call ../build/batchcopy.cmd "../src/BenchmarkDotNet.Core/bin/Release/net45/*.*" "output"
-call ../build/batchcopy.cmd "../src/BenchmarkDotNet.Toolchains.Roslyn/bin/Release/net45/*.*" "output"
-call ../build/batchcopy.cmd "../src/BenchmarkDotNet.Diagnostics.Windows/bin/Release/net45/*.*" "output"
-call ../build/batchcopy.cmd "BenchmarkDotNet.IntegrationTests/bin/Release/net452/*.*" "output"
-call ../build/batchcopy.cmd "BenchmarkDotNet.Tests/bin/Release/net452/*.*" "output"
+call ../build/batchcopy.cmd "../src/BenchmarkDotNet/bin/Release/net46/*.*" "output"
+call ../build/batchcopy.cmd "../src/BenchmarkDotNet.Core/bin/Release/net46/*.*" "output"
+call ../build/batchcopy.cmd "../src/BenchmarkDotNet.Toolchains.Roslyn/bin/Release/net46/*.*" "output"
+call ../build/batchcopy.cmd "../src/BenchmarkDotNet.Diagnostics.Windows/bin/Release/net46/*.*" "output"
+call ../build/batchcopy.cmd "BenchmarkDotNet.IntegrationTests/bin/Release/net46/*.*" "output"
+call ../build/batchcopy.cmd "BenchmarkDotNet.Tests/bin/Release/net46/*.*" "output"
 call ../build/batchcopy.cmd "BenchmarkDotNet.IntegrationTests.Classic/bin/Release/*.*" "output"
 call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/Microsoft.Diagnostics.Tracing.TraceEvent/1.0.41/lib/net40" "output"
 call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.runner.console/2.2.0/tools" "output"
-call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.extensibility.execution/2.2.0/lib/net452" "output"
+call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.extensibility.execution/2.2.0/lib/netstandard1.1" "output"
 call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.extensibility.core/2.2.0/lib/netstandard1.1" "output"
 call ../build/batchcopy.cmd "%USERPROFILE%/.nuget/packages/xunit.assert/2.2.0/lib/netstandard1.1" "output"
 

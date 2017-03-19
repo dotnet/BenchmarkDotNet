@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>BenchmarkDotNet.IntegrationTests.FSharp</RootNamespace>
     <AssemblyName>BenchmarkDotNet.IntegrationTests.FSharp</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
     <Name>BenchmarkDotNet.IntegrationTests.FSharp</Name>

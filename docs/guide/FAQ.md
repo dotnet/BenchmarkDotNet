@@ -15,8 +15,8 @@ If your want to target netcoreapp1.0 in your main assembly, it's recommended to 
 * **Q** I created a new .NET Core Console App in Visual Studio 2017. Now I want to run my code on CoreCLR, full .NET Framework, and Mono. How can I do it?  
 **A** Use the following lines in your `.csproj` file:
 ```xml
-<TargetFrameworks>netcoreapp1.1;net45</TargetFrameworks>
-<RuntimeIdentifier Condition=" '$(TargetFramework)' == 'net45' ">win7-x86</RuntimeIdentifier>
+<TargetFrameworks>netcoreapp1.1;net46</TargetFrameworks>
+<RuntimeIdentifier Condition=" '$(TargetFramework)' == 'net46' ">win7-x86</RuntimeIdentifier>
 <PlatformTarget>AnyCPU</PlatformTarget>
 ```
 And mark your benchmark class with the following attributes:
