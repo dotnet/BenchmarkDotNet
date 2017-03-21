@@ -91,7 +91,6 @@ namespace BenchmarkDotNet.Columns
             if (statistics == null)
                 return "NA";
             double value = calc(statistics);
-            // todo: if isColumnWithUnits then format value using specific formatter (unit, multiplier)
             return type == QuantityType.Time ? value.ToTimeStr(style.TimeUnit, 1, style.PrintUnitsInContent) : value.ToStr();
         }
 
