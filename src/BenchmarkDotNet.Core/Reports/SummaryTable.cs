@@ -44,8 +44,11 @@ namespace BenchmarkDotNet.Reports
             {
                 style.TimeUnit = TimeUnit.GetBestTimeUnit(summary.Reports.Where(r => r.ResultStatistics != null).Select(r => r.ResultStatistics.Mean).ToArray());
             }
-            // TODO: set size unit
-            
+            if (style.SizeUnit == null)
+            {
+                style.SizeUnit = SizeUnit.GetBestSizeUnit(summary.Reports.Select(r => r.GcStats.AllocatedBytes).ToArray());
+            }
+
             var columns = summary.GetColumns();
             ColumnCount = columns.Length;
             FullHeader = columns.Select(c => c.GetName(style)).ToArray();

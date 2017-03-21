@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Columns;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -6,7 +7,7 @@ namespace BenchmarkDotNet.Reports
     {
         bool PrintUnitsInHeader { get; set; }
         bool PrintUnitsInContent { get; set; }
-        //MemoryUnit? MemoryUnit { get; set; }
+        SizeUnit SizeUnit { get; set; }
         TimeUnit TimeUnit { get; set; }
     }
 }

@@ -14,7 +14,13 @@ namespace BenchmarkDotNet.Samples
             config.Add(new MemoryDiagnoser());
             config.Add(new CsvExporter(
                 CsvSeparator.CurrentCulture,
-                new Reports.SummaryStyle() { PrintUnitsInHeader = true, PrintUnitsInContent = false, TimeUnit = Horology.TimeUnit.Second }
+                new Reports.SummaryStyle()
+                {
+                    PrintUnitsInHeader = true,
+                    PrintUnitsInContent = false,
+                    //TimeUnit = Horology.TimeUnit.Second,
+                    //SizeUnit = Columns.SizeUnit.B
+                }
             ));
             BenchmarkRunner.Run<Intro.IntroColumns>(config);
             //BenchmarkSwitcher.FromAssembly(typeof(Program).GetTypeInfo().Assembly).Run(args);
