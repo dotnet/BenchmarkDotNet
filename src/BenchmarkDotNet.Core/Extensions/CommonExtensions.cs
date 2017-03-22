@@ -7,7 +7,7 @@ using BenchmarkDotNet.Columns;
 
 namespace BenchmarkDotNet.Extensions
 {
-    internal static class CommonExtensions
+    public static class CommonExtensions
     {
         public static List<T> ToSortedList<T>(this IEnumerable<T> values)
         {
@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Extensions
             return list;
         }
 
-        public static string ToTimeStr(this double value, TimeUnit unit = null, int unitNameWidth = 1, bool showUnit = true) //XXX: default width should be 2
+        public static string ToTimeStr(this double value, TimeUnit unit = null, int unitNameWidth = 1, bool showUnit = true)
         {
             unit = unit ?? TimeUnit.GetBestTimeUnit(value);
             var unitValue = TimeUnit.Convert(value, TimeUnit.Nanosecond, unit);
@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Extensions
             }
         }
 
-        public static string ToSizeStr(this long value, SizeUnit unit = null, int unitNameWidth = 1, bool showUnit = true) //XXX: default width should be 2
+        public static string ToSizeStr(this long value, SizeUnit unit = null, int unitNameWidth = 1, bool showUnit = true)
         {
             unit = unit ?? SizeUnit.GetBestSizeUnit(value);
             var unitValue = SizeUnit.Convert(value, SizeUnit.B, unit);
