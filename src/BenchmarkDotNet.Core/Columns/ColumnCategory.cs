@@ -2,6 +2,6 @@
 {
     public enum ColumnCategory
     {
-        Job, Params, Statistics, Baseline, Custom, Diagnoser, StatisticsWithUnits
+        Job, Params, Statistics, Baseline, Custom, Diagnoser
     }
 }
