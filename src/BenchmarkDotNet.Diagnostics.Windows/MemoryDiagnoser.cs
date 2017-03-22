@@ -1,6 +1,8 @@
 ﻿using System;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -10,7 +12,6 @@ using Microsoft.Diagnostics.Tracing.Session;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using BenchmarkDotNet.Environments;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
@@ -107,19 +108,27 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public bool AlwaysShow => true;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
-            public QuantityType QuantityType => QuantityType.None;
-            public string GetName(ISummaryStyle style) => ColumnName;
-            public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
-
-            public string GetValue(Summary summary, Benchmark benchmark)
+            public QuantityType QuantityType => QuantityType.Size;
+            public string GetName(ISummaryStyle style)
             {
-                if (results.ContainsKey(benchmark) && results[benchmark] != null)
+                if (style.PrintUnitsInHeader)
                 {
-                    var result = results[benchmark];
-                    // TODO scale this based on the minimum value in the column, i.e. use B/KB/MB as appropriate
-                    return (result.AllocatedBytes / (double) result.TotalOperations).ToString("N2");
+                    return $"{ColumnName} [{style.SizeUnit.Name}]";
                 }
-                return "N/A";
+                else
+                {
+                    return ColumnName;
+                }
+            }
+            public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
+
+            public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style)
+            {
+                if (!results.ContainsKey(benchmark) || results[benchmark] == null)
+                    return "N/A";
+
+                var value = results[benchmark].AllocatedBytes / (double)results[benchmark].TotalOperations;
+                return QuantityType == QuantityType.Size ? ((long)value).ToSizeStr(style.SizeUnit, 1, style.PrintUnitsInContent) : value.ToStr();
             }
         }
 
