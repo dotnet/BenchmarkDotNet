@@ -139,7 +139,7 @@ namespace BenchmarkDotNet.Exporters
                     logger.Write(tableHeaderSeparator);
                 }
 
-                logger.WriteLineStatistic(string.Join("", table.Columns.Where(c => c.NeedToShow).Select(c => new string('-', c.Width) + " |")));
+                logger.WriteLineStatistic(string.Join("", table.Columns.Where(c => c.NeedToShow).Select(c => new string('-', c.Width) + (c.Index == 0 ? " |" : ":|"))));
             }
             var rowCounter = 0;
             var highlightRow = false;
