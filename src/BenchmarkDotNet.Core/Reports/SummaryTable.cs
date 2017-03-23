@@ -9,8 +9,6 @@ namespace BenchmarkDotNet.Reports
 {
     public class SummaryTable
     {
-        private ISummaryStyle style;
-
         public Summary Summary { get; }
 
         public SummaryTableColumn[] Columns { get; }
