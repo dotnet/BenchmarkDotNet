@@ -183,7 +183,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                    .Select(counter => new PmcColumn(results, counter))
                    .Union(new IColumn[] 
                    {
-                       new MisspredictRateColumn(results)
+                       new MispredictRateColumn(results)
                    })
                    .ToArray());
 
@@ -218,15 +218,15 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     : "-";
         }
 
-        public class MisspredictRateColumn : IColumn
+        public class MispredictRateColumn : IColumn
         {
-            public MisspredictRateColumn(Dictionary<Benchmark, PmcStats> results)
+            public MispredictRateColumn(Dictionary<Benchmark, PmcStats> results)
             {
                 Results = results;
             }
 
-            public string ColumnName => "Misspredict rate";
-            public string Id => "MisspredictRate";
+            public string ColumnName => "Mispredict rate";
+            public string Id => "MispredictRate";
             public bool IsDefault(Summary summary, Benchmark benchmark) => false;
             public bool AlwaysShow => false;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
