@@ -2,7 +2,7 @@
 
 [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/) [![Gitter](https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet.svg)](https://gitter.im/dotnet/BenchmarkDotNet) [![Build status](https://img.shields.io/appveyor/ci/dotnetfoundation/benchmarkdotnet/master.svg?label=appveyor)](https://ci.appveyor.com/project/dotnetfoundation/benchmarkdotnet/branch/master) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md) [![Overview](https://img.shields.io/badge/docs-Overview-green.svg?style=flat)](http://benchmarkdotnet.org/Overview.htm) [![ChangeLog](https://img.shields.io/badge/docs-ChangeLog-green.svg?style=flat)](https://github.com/dotnet/BenchmarkDotNet/wiki/ChangeLog)
 
-![](docs/guide/logo/logo.png)
+![](docs/guide/logo/logo-wide.png)
 
 Benchmarking is really hard (especially microbenchmarking), you can easily make a mistake during performance measurements.
 BenchmarkDotNet will protect you from the common pitfalls (even for experienced developers) because it does all the dirty work for you:
