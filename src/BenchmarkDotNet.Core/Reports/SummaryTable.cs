@@ -25,13 +25,13 @@ namespace BenchmarkDotNet.Reports
 
             if (summary.HasCriticalValidationErrors)
             {
-                Columns = new SummaryTableColumn[0];
+                Columns = Array.Empty<SummaryTableColumn>();
                 ColumnCount = 0;
-                FullHeader = new string[0];
-                FullContent = new string[0][];
-                FullContentStartOfGroup = new bool[0];
-                FullContentWithHeader = new string[0][];
-                IsDefault = new bool[0];
+                FullHeader = Array.Empty<string>();
+                FullContent = Array.Empty<string[]>();
+                FullContentStartOfGroup = Array.Empty<bool>();
+                FullContentWithHeader = Array.Empty<string[]>();
+                IsDefault = Array.Empty<bool>();
                 return;
             }
 

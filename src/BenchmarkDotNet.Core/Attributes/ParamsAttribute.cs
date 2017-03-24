@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Attributes
         // CLS-Compliant Code requires a constuctor without an array in the argument list
         public ParamsAttribute()
         {
-            Values = new object[0];
+            Values = Array.Empty<object>();
         }
 
         public ParamsAttribute(params object[] values)

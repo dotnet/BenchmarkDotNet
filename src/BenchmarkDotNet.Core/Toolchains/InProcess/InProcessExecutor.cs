@@ -141,7 +141,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         {
             if (exitCode != 0)
             {
-                return new ExecuteResult(true, exitCode, new string[0], new string[0]);
+                return new ExecuteResult(true, exitCode, Array.Empty<string>(), Array.Empty<string>());
             }
 
             var lines = new List<string>();
@@ -151,7 +151,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             }
             lines.Add(runResults.GCStats.WithTotalOperations(runResults.TotalOperationsCount).ToOutputLine());
 
-            return new ExecuteResult(true, 0, lines.ToArray(), new string[0]);
+            return new ExecuteResult(true, 0, lines.ToArray(), Array.Empty<string>());
         }
     }
 }

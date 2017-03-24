@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Parameters;
+﻿using System;
+using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
 using System.Linq;
 using Xunit;
@@ -12,7 +13,7 @@ namespace BenchmarkDotNet.Tests
         {
             var comparer = ParameterComparer.Instance;
 
-            var sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: new object[0]);
+            var sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: Array.Empty<object>());
             var originalData = new[]
             {
                 new ParameterInstances(new []
@@ -40,7 +41,7 @@ namespace BenchmarkDotNet.Tests
         {
             var comparer = ParameterComparer.Instance;
 
-            var sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: new object[0]);
+            var sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: Array.Empty<object>());
             var originalData = new []
             {
                 new ParameterInstances(new []
@@ -94,7 +95,7 @@ namespace BenchmarkDotNet.Tests
         {
             var comparer = ParameterComparer.Instance;
 
-            var sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: new object[0]);
+            var sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: Array.Empty<object>());
             var originalData = new[]
             {
                 new ParameterInstances(new []

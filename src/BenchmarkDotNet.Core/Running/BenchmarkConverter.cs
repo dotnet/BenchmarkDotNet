@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Running
             var parameterDefinitions = GetParameterDefinitions(containingType);
             var parameterInstancesList = parameterDefinitions.Expand();
 
-            var rawJobs = config?.GetJobs().ToArray() ?? new Job[0];
+            var rawJobs = config?.GetJobs().ToArray() ?? Array.Empty<Job>();
             if (rawJobs.IsEmpty())
                 rawJobs = new[] { Job.Default };
             var jobs = rawJobs.Distinct().ToArray();

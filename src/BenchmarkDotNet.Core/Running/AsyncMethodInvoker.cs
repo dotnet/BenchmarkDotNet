@@ -8,11 +8,8 @@ namespace BenchmarkDotNet.Running
     // ReSharper disable MemberCanBePrivate.Global
     public static class TaskMethodInvoker
     {
-        // can't use Task.CompletedTask here because it's new in .NET 4.6 (we target 4.5)
-        private static readonly Task Completed = Task.FromResult((object)null);
-
         [HideFromIntelliSense(System.ComponentModel.EditorBrowsableState.Never)]
-        public static void Idle() => ExecuteBlocking(() => Completed);
+        public static void Idle() => ExecuteBlocking(() => Task.CompletedTask);
 
         // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
         // and will eventually throw actual exception, not aggregated one

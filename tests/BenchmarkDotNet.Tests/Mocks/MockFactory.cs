@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Tests.Mocks
                 config,
                 "",
                 TimeSpan.FromMinutes(1),
-                new ValidationError[0]);
+                Array.Empty<ValidationError>());
         }
 
         private static Benchmark CreateBenchmark(IConfig config)
@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Tests.Mocks
         {
             var benchmark = CreateBenchmark(config);
             var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty));
-            var executeResult = new ExecuteResult(true, 0, new List<string>(), new string[0]);
+            var executeResult = new ExecuteResult(true, 0, Array.Empty<string>(), Array.Empty<string>());
             var measurements = new List<Measurement>
             {
                 new Measurement(1, IterationMode.Result, 1, 1, 1)

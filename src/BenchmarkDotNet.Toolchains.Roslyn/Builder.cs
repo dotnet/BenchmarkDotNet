@@ -89,7 +89,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             var frameworkAssembliesDirectory = Path.GetDirectoryName(typeof(object).Assembly.Location);
             if (frameworkAssembliesDirectory == null)
             {
-                return new string[0];
+                return Array.Empty<string>();
             }
 
             return new[]

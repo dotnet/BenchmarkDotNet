@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Toolchains
 
             if (!File.Exists(exePath))
             {
-                return new ExecuteResult(false, -1, new string[0], new string[0]);
+                return new ExecuteResult(false, -1, Array.Empty<string>(), Array.Empty<string>());
             }
 
             return Execute(benchmark, logger, exePath, null, args, compositeDiagnoser, resolver);
@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.Toolchains
             if (loggerWithDiagnoser.LinesWithResults.Any(line => line.Contains("BadImageFormatException")))
                 logger.WriteLineError("You are probably missing <PlatformTarget>AnyCPU</PlatformTarget> in your .csproj file.");
 
-            return new ExecuteResult(true, process.ExitCode, new string[0], new string[0]);
+            return new ExecuteResult(true, process.ExitCode, Array.Empty<string>(), Array.Empty<string>());
         }
 
         private ProcessStartInfo CreateStartInfo(Benchmark benchmark, string exePath, string args, string workingDirectory, IResolver resolver)
