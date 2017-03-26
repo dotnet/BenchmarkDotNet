@@ -236,7 +236,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public int PriorityInCategory => 1;
             public QuantityType QuantityType => QuantityType.None;
             public string GetName(ISummaryStyle style) => ColumnName;
-            public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
+            public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
 
             private Dictionary<Benchmark, PmcStats> Results { get; }
 
@@ -247,9 +247,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                         && benchmark.Job.Diagnoser.HardwareCounters.Contains(HardwareCounter.BranchInstructions)
                         && benchmark.Job.Diagnoser.HardwareCounters.Contains(HardwareCounter.BranchMispredictions));
 
-            public string GetValue(Summary summary, Benchmark benchmark)
+            public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style)
                 => Results.TryGetValue(benchmark, out var stats) && stats.Counters.ContainsKey(HardwareCounter.BranchMispredictions) && stats.Counters.ContainsKey(HardwareCounter.BranchInstructions)
-                    ? (stats.Counters[HardwareCounter.BranchMispredictions].Count / (double)stats.Counters[HardwareCounter.BranchInstructions].Count).ToString("P2")
+                    ? (stats.Counters[HardwareCounter.BranchMispredictions].Count / (double)stats.Counters[HardwareCounter.BranchInstructions].Count).ToString(style.PrintUnitsInContent ? "P2" : String.Empty)
                     : "-";
         }
     }
