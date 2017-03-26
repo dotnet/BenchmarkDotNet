@@ -113,9 +113,6 @@ namespace BenchmarkDotNet.Configs
             return (IDiagnoser) Activator.CreateInstance(diagnoserType);
         }
 
-        public ISummaryStyle GetSummaryStyle()
-        {
-            return SummaryStyle.Default;
-        }
+        public ISummaryStyle GetSummaryStyle() => SummaryStyle.Default;
     }
 }
