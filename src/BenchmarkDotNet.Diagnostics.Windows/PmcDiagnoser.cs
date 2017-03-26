@@ -202,7 +202,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public bool AlwaysShow => false;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
-            public QuantityType QuantityType => QuantityType.None;
+            public UnitType UnitType => UnitType.None;
             public string GetName(ISummaryStyle style) => ColumnName;
             public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
 
@@ -234,7 +234,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public bool AlwaysShow => false;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 1;
-            public QuantityType QuantityType => QuantityType.None;
+            public UnitType UnitType => UnitType.None;
             public string GetName(ISummaryStyle style) => ColumnName;
             public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
 

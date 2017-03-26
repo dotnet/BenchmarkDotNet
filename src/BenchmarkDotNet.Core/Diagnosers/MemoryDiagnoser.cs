@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Diagnosers
             public bool AlwaysShow => true;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
-            public QuantityType QuantityType => QuantityType.Size;
+            public UnitType UnitType => UnitType.Size;
             public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
 
             public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style)
@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.Diagnosers
                     return "N/A";
 
                 var value = results[benchmark].BytesAllocatedPerOperation;
-                return QuantityType == QuantityType.Size ? value.ToSizeStr(style.SizeUnit, 1, style.PrintUnitsInContent) : ((double)value).ToStr();
+                return UnitType == UnitType.Size ? value.ToSizeStr(style.SizeUnit, 1, style.PrintUnitsInContent) : ((double)value).ToStr();
             }
 
             public string GetName(ISummaryStyle style)
@@ -105,7 +105,7 @@ namespace BenchmarkDotNet.Diagnosers
             public bool AlwaysShow => true;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
-            public QuantityType QuantityType => QuantityType.None;
+            public UnitType UnitType => UnitType.None;
             public string GetName(ISummaryStyle style) => ColumnName;
             public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
 

@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Columns
         public bool AlwaysShow { get; }
         public ColumnCategory Category => ColumnCategory.Job;
         public int PriorityInCategory => 0;
-        public QuantityType QuantityType => QuantityType.None;
+        public UnitType UnitType => UnitType.None;
         public string GetName(ISummaryStyle style) => ColumnName;
         public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
 

@@ -53,6 +53,6 @@ namespace BenchmarkDotNet.Columns
         /// </summary>
         int PriorityInCategory { get; }
 
-        QuantityType QuantityType { get; }
+        UnitType UnitType { get; }
     }
 }

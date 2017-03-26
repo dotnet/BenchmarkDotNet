@@ -111,7 +111,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public bool AlwaysShow => true;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
-            public QuantityType QuantityType => QuantityType.Size;
+            public UnitType UnitType => UnitType.Size;
             public string GetName(ISummaryStyle style)
             {
                 if (style.PrintUnitsInHeader)
@@ -131,7 +131,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     return "N/A";
 
                 var value = results[benchmark].AllocatedBytes / (double)results[benchmark].TotalOperations;
-                return QuantityType == QuantityType.Size ? ((long)value).ToSizeStr(style.SizeUnit, 1, style.PrintUnitsInContent) : value.ToStr();
+                return UnitType == UnitType.Size ? ((long)value).ToSizeStr(style.SizeUnit, 1, style.PrintUnitsInContent) : value.ToStr();
             }
         }
 
@@ -157,7 +157,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public bool AlwaysShow => true;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
-            public QuantityType QuantityType => QuantityType.None;
+            public UnitType UnitType => UnitType.None;
             public string GetName(ISummaryStyle style) => ColumnName;
             public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
 

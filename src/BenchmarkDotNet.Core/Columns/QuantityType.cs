@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Columns
 {
-    public enum QuantityType
+    public enum UnitType
     {
         None,
         Time,

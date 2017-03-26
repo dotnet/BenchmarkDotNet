@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn StdErr = new StatisticColumn("StdErr", s => s.StandardError, Priority.Main);
         public static readonly IColumn StdDev = new StatisticColumn("StdDev", s => s.StandardDeviation, Priority.Main);
 
-        public static readonly IColumn OperationsPerSecond = new StatisticColumn("Op/s", s => 1.0 * 1000 * 1000 * 1000 / s.Mean, Priority.Additional, QuantityType.None);
+        public static readonly IColumn OperationsPerSecond = new StatisticColumn("Op/s", s => 1.0 * 1000 * 1000 * 1000 / s.Mean, Priority.Additional, UnitType.None);
 
         public static readonly IColumn Min = new StatisticColumn("Min", s => s.Min, Priority.Quartile);
         public static readonly IColumn Q1 = new StatisticColumn("Q1", s => s.Q1, Priority.Quartile);
@@ -26,8 +26,8 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn Q3 = new StatisticColumn("Q3", s => s.Q3, Priority.Quartile);
         public static readonly IColumn Max = new StatisticColumn("Max", s => s.Max, Priority.Quartile);
 
-        public static readonly IColumn Skewness = new StatisticColumn("Skewness", s => s.Skewness, Priority.Additional, QuantityType.None);
-        public static readonly IColumn Kurtosis = new StatisticColumn("Kurtosis", s => s.Kurtosis, Priority.Additional, QuantityType.None);
+        public static readonly IColumn Skewness = new StatisticColumn("Skewness", s => s.Skewness, Priority.Additional, UnitType.None);
+        public static readonly IColumn Kurtosis = new StatisticColumn("Kurtosis", s => s.Kurtosis, Priority.Additional, UnitType.None);
 
         public static readonly IColumn P0 = new StatisticColumn("P0", s => s.Percentiles.P0, Priority.Percentiles);
         public static readonly IColumn P25 = new StatisticColumn("P25", s => s.Percentiles.P25, Priority.Percentiles);
@@ -50,9 +50,9 @@ namespace BenchmarkDotNet.Columns
         public string Id => nameof(StatisticColumn) + "." + ColumnName;
         public string ColumnName { get; }
         private readonly Priority priority;
-        private readonly QuantityType type;
+        private readonly UnitType type;
 
-        private StatisticColumn(string columnName, Func<Statistics, double> calc, Priority priority, QuantityType type = QuantityType.Time)
+        private StatisticColumn(string columnName, Func<Statistics, double> calc, Priority priority, UnitType type = UnitType.Time)
         {
             this.calc = calc;
             this.priority = priority;
@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Columns
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Statistics;
         public int PriorityInCategory => (int) priority;
-        public QuantityType QuantityType => type;
+        public UnitType UnitType => type;
         public string GetName(ISummaryStyle style)
         {
             if (style.PrintUnitsInHeader)
@@ -91,7 +91,7 @@ namespace BenchmarkDotNet.Columns
             if (statistics == null)
                 return "NA";
             double value = calc(statistics);
-            return type == QuantityType.Time ? value.ToTimeStr(style.TimeUnit, 1, style.PrintUnitsInContent) : value.ToStr();
+            return type == UnitType.Time ? value.ToTimeStr(style.TimeUnit, 1, style.PrintUnitsInContent) : value.ToStr();
         }
 
         public override string ToString() => ColumnName;
