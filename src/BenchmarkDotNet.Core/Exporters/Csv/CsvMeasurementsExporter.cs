@@ -65,7 +65,7 @@ namespace BenchmarkDotNet.Exporters.Csv
                 return Columns.Value;
 
             var columns = new List<MeasurementColumn>(Columns.Value);
-            columns.Add(new MeasurementColumn("Gen_0 XX", (_, report, __) => report.GcStats.Gen0Collections.ToString()));
+            columns.Add(new MeasurementColumn("Gen_0", (_, report, __) => report.GcStats.Gen0Collections.ToString()));
             columns.Add(new MeasurementColumn("Gen_1", (_, report, __) => report.GcStats.Gen1Collections.ToString()));
             columns.Add(new MeasurementColumn("Gen_2", (_, report, __) => report.GcStats.Gen2Collections.ToString()));
             columns.Add(new MeasurementColumn("Allocated_Bytes", (_, report, __) => report.GcStats.BytesAllocatedPerOperation.ToString()));
@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.Exporters.Csv
             columns.Add(new MeasurementColumn("Params", (summary, report, m) => report.Benchmark.Parameters.PrintInfo));
 
             // Measurements
-            columns.Add(new MeasurementColumn("Measurement_LaunchIndex YY", (summary, report, m) => m.LaunchIndex.ToString()));
+            columns.Add(new MeasurementColumn("Measurement_LaunchIndex", (summary, report, m) => m.LaunchIndex.ToString()));
             columns.Add(new MeasurementColumn("Measurement_IterationMode", (summary, report, m) => m.IterationMode.ToString()));
             columns.Add(new MeasurementColumn("Measurement_IterationIndex", (summary, report, m) => m.IterationIndex.ToString()));
             columns.Add(new MeasurementColumn("Measurement_Nanoseconds", (summary, report, m) => m.Nanoseconds.ToStr()));
