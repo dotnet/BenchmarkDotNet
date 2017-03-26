@@ -16,7 +16,6 @@ If your want to target netcoreapp1.0 in your main assembly, it's recommended to 
 **A** Use the following lines in your `.csproj` file:
 ```xml
 <TargetFrameworks>netcoreapp1.1;net46</TargetFrameworks>
-<RuntimeIdentifier Condition=" '$(TargetFramework)' == 'net46' ">win7-x86</RuntimeIdentifier>
 <PlatformTarget>AnyCPU</PlatformTarget>
 ```
 And mark your benchmark class with the following attributes:

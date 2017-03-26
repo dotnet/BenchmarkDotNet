@@ -39,7 +39,7 @@ platform: Any CPU
 # build Configuration, i.e. Debug, Release, etc.
 configuration: Release
 
-os: Visual Studio 2017 RC
+os: Visual Studio 2017
 
 before_build:
   - .\nuget.exe restore

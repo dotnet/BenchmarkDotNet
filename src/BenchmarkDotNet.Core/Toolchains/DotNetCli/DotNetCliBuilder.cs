@@ -25,10 +25,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         internal abstract string GetBuildCommand(string frameworkMoniker, bool justTheProjectItself);
 
-        /// <summary>
-        /// generates project.lock.json that tells compiler where to take dlls and source from
-        /// and builds executable and copies all required dll's
-        /// </summary>
         public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark, IResolver resolver)
         {
             var restoreResult = DotNetCliCommandExecutor.ExecuteCommand(
