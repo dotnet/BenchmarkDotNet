@@ -166,7 +166,7 @@ namespace BenchmarkDotNet.Running
                 var executeResults = Execute(logger, benchmark, toolchain, buildResult, config, resolver, out gcStats);
 
                 var runs = new List<Measurement>();
-                
+
                 for (int index = 0; index < executeResults.Count; index++)
                 {
                     var executeResult = executeResults[index];
@@ -174,6 +174,11 @@ namespace BenchmarkDotNet.Running
                 }
 
                 return new BenchmarkReport(benchmark, generateResult, buildResult, executeResults, runs, gcStats);
+            }
+            catch (Exception e)
+            {
+                logger.WriteLineError("// Exception: " + e);
+                return new BenchmarkReport(benchmark, generateResult, BuildResult.Failure(generateResult, e), new List<ExecuteResult>(), new List<Measurement>(), GcStats.Empty);
             }
             finally
             {
