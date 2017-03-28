@@ -21,11 +21,11 @@ namespace BenchmarkDotNet.Columns
 
         public const long BytesInKiloByte = 1000L;
         public static readonly SizeUnit B = new SizeUnit("B", "Byte", 1L);
-        public static readonly SizeUnit kB = new SizeUnit("kB", "Kilobyte", BytesInKiloByte);
+        public static readonly SizeUnit KB = new SizeUnit("kB", "Kilobyte", BytesInKiloByte);
         public static readonly SizeUnit MB = new SizeUnit("MB", "Megabyte", BytesInKiloByte * BytesInKiloByte);
         public static readonly SizeUnit GB = new SizeUnit("GB", "Gigabyte", BytesInKiloByte * BytesInKiloByte * BytesInKiloByte);
         public static readonly SizeUnit TB = new SizeUnit("TB", "Terabyte", BytesInKiloByte * BytesInKiloByte * BytesInKiloByte * BytesInKiloByte);
-        public static readonly SizeUnit[] All = { B, kB, MB, GB, TB };
+        public static readonly SizeUnit[] All = { B, KB, MB, GB, TB };
 
         public static SizeUnit GetBestSizeUnit(params long[] values)
         {
