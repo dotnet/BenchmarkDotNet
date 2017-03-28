@@ -17,11 +17,6 @@ namespace BenchmarkDotNet.Columns
         string ColumnName { get; }
 
         /// <summary>
-        /// Column title formatted using the specified style.
-        /// </summary>
-        string GetName(ISummaryStyle style);
-
-        /// <summary>
         /// Value in this column formatted using the default style.
         /// </summary>
         string GetValue(Summary summary, Benchmark benchmark);

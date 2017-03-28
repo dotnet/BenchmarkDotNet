@@ -203,7 +203,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
             public UnitType UnitType => UnitType.Dimensionless;
-            public string GetName(ISummaryStyle style) => ColumnName;
             public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
 
             private Dictionary<Benchmark, PmcStats> Results { get; }
@@ -235,7 +234,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 1;
             public UnitType UnitType => UnitType.Dimensionless;
-            public string GetName(ISummaryStyle style) => ColumnName;
             public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
 
             private Dictionary<Benchmark, PmcStats> Results { get; }

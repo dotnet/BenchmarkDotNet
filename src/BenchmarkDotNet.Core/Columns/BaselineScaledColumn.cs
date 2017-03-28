@@ -92,7 +92,6 @@ namespace BenchmarkDotNet.Columns
         public ColumnCategory Category => ColumnCategory.Baseline;
         public int PriorityInCategory => (int) Kind;
         public UnitType UnitType => UnitType.Dimensionless;
-        public string GetName(ISummaryStyle style) => ColumnName;
         public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
         public override string ToString() => ColumnName;
         public bool IsDefault(Summary summary, Benchmark benchmark) => false;

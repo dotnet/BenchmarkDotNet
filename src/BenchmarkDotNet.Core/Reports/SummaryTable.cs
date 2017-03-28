@@ -4,6 +4,7 @@ using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -49,7 +50,7 @@ namespace BenchmarkDotNet.Reports
 
             var columns = summary.GetColumns();
             ColumnCount = columns.Length;
-            FullHeader = columns.Select(c => c.GetName(style)).ToArray();
+            FullHeader = columns.Select(c => c.GetColumnTitle(style)).ToArray();
 
             var orderProvider = summary.Config.GetOrderProvider() ?? DefaultOrderProvider.Instance;
             FullContent = summary.Reports.Select(r => columns.Select(c => c.GetValue(summary, r.Benchmark, style)).ToArray()).ToArray();

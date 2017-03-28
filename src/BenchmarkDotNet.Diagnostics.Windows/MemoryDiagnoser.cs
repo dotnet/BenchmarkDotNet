@@ -112,11 +112,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
             public UnitType UnitType => UnitType.Size;
-            public string GetName(ISummaryStyle style) =>
-                style.PrintUnitsInHeader
-                ? $"{ColumnName} [{style.SizeUnit.Name}]"
-                : ColumnName;
-
             public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
 
             public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style)
@@ -152,7 +147,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
             public UnitType UnitType => UnitType.Dimensionless;
-            public string GetName(ISummaryStyle style) => ColumnName;
             public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
 
             public string GetValue(Summary summary, Benchmark benchmark)

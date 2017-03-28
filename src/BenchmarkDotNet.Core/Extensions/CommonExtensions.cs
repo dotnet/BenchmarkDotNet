@@ -4,6 +4,7 @@ using System.Linq;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -58,6 +59,30 @@ namespace BenchmarkDotNet.Extensions
             // Unfortunately, Mono doesn't have the second overload (with object instead of params object[]).            
             var args = new object[] { value };
             return string.Format(HostEnvironmentInfo.MainCultureInfo, $"{{0:{format}}}", args);
+        }
+
+        /// <summary>
+        /// Gets column title formatted using the specified style
+        /// </summary>
+        public static string GetColumnTitle(this IColumn column, ISummaryStyle style)
+        {
+            if (!style.PrintUnitsInHeader)
+            {
+                return column.ColumnName;
+            }
+
+            if (column.UnitType == UnitType.Size)
+            {
+                return $"{column.ColumnName} [{style.SizeUnit.Name}]";
+            }
+            else if (column.UnitType == UnitType.Time)
+            {
+                return $"{column.ColumnName} [{style.TimeUnit.Name}]";
+            }
+            else //UnitType.Dimensionless
+            {
+                return column.ColumnName;
+            }
         }
 
         public static bool IsNullOrEmpty<T>(this IReadOnlyCollection<T> value) => value == null || value.Count == 0;

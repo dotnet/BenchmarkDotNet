@@ -73,11 +73,6 @@ namespace BenchmarkDotNet.Diagnosers
                 var value = results[benchmark].BytesAllocatedPerOperation;
                 return UnitType == UnitType.Size ? value.ToSizeStr(style.SizeUnit, 1, style.PrintUnitsInContent) : ((double)value).ToStr();
             }
-
-            public string GetName(ISummaryStyle style) =>
-                style.PrintUnitsInHeader
-                ? $"{ColumnName} [{style.SizeUnit.Name}]"
-                : ColumnName;
         }
 
         public class GCCollectionColumn : IColumn
@@ -99,7 +94,6 @@ namespace BenchmarkDotNet.Diagnosers
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
             public UnitType UnitType => UnitType.Dimensionless;
-            public string GetName(ISummaryStyle style) => ColumnName;
             public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
 
             public bool IsAvailable(Summary summary)
