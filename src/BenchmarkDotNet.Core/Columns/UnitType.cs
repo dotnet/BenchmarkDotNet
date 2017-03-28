@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Columns
 {
     public enum UnitType
     {
-        None,
+        Dimensionless,
         Time,
         Size
     }

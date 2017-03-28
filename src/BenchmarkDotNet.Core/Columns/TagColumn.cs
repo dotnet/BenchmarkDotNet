@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Columns
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Custom;
         public int PriorityInCategory => 0;
-        public UnitType UnitType => UnitType.None;
+        public UnitType UnitType => UnitType.Dimensionless;
         public string GetName(ISummaryStyle style) => ColumnName;
         public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
         public override string ToString() => ColumnName;

@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn StdErr = new StatisticColumn("StdErr", s => s.StandardError, Priority.Main);
         public static readonly IColumn StdDev = new StatisticColumn("StdDev", s => s.StandardDeviation, Priority.Main);
 
-        public static readonly IColumn OperationsPerSecond = new StatisticColumn("Op/s", s => 1.0 * 1000 * 1000 * 1000 / s.Mean, Priority.Additional, UnitType.None);
+        public static readonly IColumn OperationsPerSecond = new StatisticColumn("Op/s", s => 1.0 * 1000 * 1000 * 1000 / s.Mean, Priority.Additional, UnitType.Dimensionless);
 
         public static readonly IColumn Min = new StatisticColumn("Min", s => s.Min, Priority.Quartile);
         public static readonly IColumn Q1 = new StatisticColumn("Q1", s => s.Q1, Priority.Quartile);
@@ -26,8 +26,8 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn Q3 = new StatisticColumn("Q3", s => s.Q3, Priority.Quartile);
         public static readonly IColumn Max = new StatisticColumn("Max", s => s.Max, Priority.Quartile);
 
-        public static readonly IColumn Skewness = new StatisticColumn("Skewness", s => s.Skewness, Priority.Additional, UnitType.None);
-        public static readonly IColumn Kurtosis = new StatisticColumn("Kurtosis", s => s.Kurtosis, Priority.Additional, UnitType.None);
+        public static readonly IColumn Skewness = new StatisticColumn("Skewness", s => s.Skewness, Priority.Additional, UnitType.Dimensionless);
+        public static readonly IColumn Kurtosis = new StatisticColumn("Kurtosis", s => s.Kurtosis, Priority.Additional, UnitType.Dimensionless);
 
         public static readonly IColumn P0 = new StatisticColumn("P0", s => s.Percentiles.P0, Priority.Percentiles);
         public static readonly IColumn P25 = new StatisticColumn("P25", s => s.Percentiles.P25, Priority.Percentiles);
