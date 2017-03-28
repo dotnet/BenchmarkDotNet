@@ -67,21 +67,16 @@ namespace BenchmarkDotNet.Extensions
         public static string GetColumnTitle(this IColumn column, ISummaryStyle style)
         {
             if (!style.PrintUnitsInHeader)
-            {
                 return column.ColumnName;
-            }
 
-            if (column.UnitType == UnitType.Size)
+            switch (column.UnitType)
             {
-                return $"{column.ColumnName} [{style.SizeUnit.Name}]";
-            }
-            else if (column.UnitType == UnitType.Time)
-            {
-                return $"{column.ColumnName} [{style.TimeUnit.Name}]";
-            }
-            else //UnitType.Dimensionless
-            {
-                return column.ColumnName;
+                case UnitType.Size:
+                    return $"{column.ColumnName} [{style.SizeUnit.Name}]";
+                case UnitType.Time:
+                    return $"{column.ColumnName} [{style.TimeUnit.Name}]";
+                default:
+                    return column.ColumnName;
             }
         }
 
