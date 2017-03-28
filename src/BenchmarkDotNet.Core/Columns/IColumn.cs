@@ -19,25 +19,16 @@ namespace BenchmarkDotNet.Columns
         /// <summary>
         /// Column title formatted using the specified style.
         /// </summary>
-        /// <param name="style"></param>
-        /// <returns></returns>
         string GetName(ISummaryStyle style);
 
         /// <summary>
         /// Value in this column formatted using the default style.
         /// </summary>
-        /// <param name="summary"></param>
-        /// <param name="benchmark"></param>
-        /// <returns></returns>
         string GetValue(Summary summary, Benchmark benchmark);
 
         /// <summary>
         /// Value in this column formatted using the specified style.
         /// </summary>
-        /// <param name="summary"></param>
-        /// <param name="benchmark"></param>
-        /// <param name="style"></param>
-        /// <returns></returns>
         string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style);
 
         bool IsDefault(Summary summary, Benchmark benchmark);
@@ -53,6 +44,9 @@ namespace BenchmarkDotNet.Columns
         /// </summary>
         int PriorityInCategory { get; }
 
+        /// <summary>
+        /// Defines how to format column's value
+        /// </summary>
         UnitType UnitType { get; }
     }
 }
