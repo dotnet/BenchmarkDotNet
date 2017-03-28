@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Exporters.Csv
 
         public static readonly IExporter Default = new CsvExporter(CsvSeparator.CurrentCulture, SummaryStyle.Default);
 
-        public CsvExporter(CsvSeparator separator) : base(separator, SummaryStyle.Default)
+        public CsvExporter(CsvSeparator separator) : this (separator, SummaryStyle.Default)
         {
         }
 
