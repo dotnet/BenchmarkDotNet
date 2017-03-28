@@ -74,17 +74,10 @@ namespace BenchmarkDotNet.Diagnosers
                 return UnitType == UnitType.Size ? value.ToSizeStr(style.SizeUnit, 1, style.PrintUnitsInContent) : ((double)value).ToStr();
             }
 
-            public string GetName(ISummaryStyle style)
-            {
-                if (style.PrintUnitsInHeader)
-                {
-                    return $"{ColumnName} [{style.SizeUnit.Name}]";
-                }
-                else
-                {
-                    return ColumnName;
-                }
-            }
+            public string GetName(ISummaryStyle style) =>
+                style.PrintUnitsInHeader
+                ? $"{ColumnName} [{style.SizeUnit.Name}]"
+                : ColumnName;
         }
 
         public class GCCollectionColumn : IColumn

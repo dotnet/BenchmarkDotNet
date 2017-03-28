@@ -74,17 +74,10 @@ namespace BenchmarkDotNet.Columns
         public ColumnCategory Category => ColumnCategory.Statistics;
         public int PriorityInCategory => (int) priority;
         public UnitType UnitType => type;
-        public string GetName(ISummaryStyle style)
-        {
-            if (style.PrintUnitsInHeader)
-            {
-                return $"{ColumnName} [{style.TimeUnit.Name}]";
-            }
-            else
-            {
-                return ColumnName;
-            }
-        }
+        public string GetName(ISummaryStyle style) =>
+            style.PrintUnitsInHeader
+            ? $"{ColumnName} [{style.TimeUnit.Name}]"
+            : ColumnName;
 
         private string Format(Statistics statistics, ISummaryStyle style)
         {
