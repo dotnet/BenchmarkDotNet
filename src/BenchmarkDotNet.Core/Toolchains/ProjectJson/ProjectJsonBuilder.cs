@@ -3,6 +3,10 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.ProjectJson
 {
+    /// <summary>
+    /// generates project.lock.json that tells compiler where to take dlls and source from
+    /// and builds executable and copies all required dll's
+    /// </summary>
     [PublicAPI]
     public class ProjectJsonBuilder : DotNetCliBuilder
     {

@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Running
 
         public IEnumerable<Summary> Run(string[] args = null, IConfig config = null)
         {
-            args = typeParser.ReadArgumentList(args ?? new string[0]);
+            args = typeParser.ReadArgumentList(args ?? Array.Empty<string>());
             return RunBenchmarks(args, config);
         }
 

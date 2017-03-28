@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using BenchmarkDotNet.Validators;
 using Xunit;
 
@@ -24,7 +25,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void BaseLineValidatorIsMandatory()
         {
-            var compositeValidator = new CompositeValidator(new IValidator[0]);
+            var compositeValidator = new CompositeValidator(Array.Empty<IValidator>());
 
             Assert.Contains(BaselineValidator.FailOnError, compositeValidator.Validators);
         }

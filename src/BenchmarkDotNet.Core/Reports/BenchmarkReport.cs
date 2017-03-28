@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Engines;
@@ -37,8 +38,8 @@ namespace BenchmarkDotNet.Reports
             Benchmark = benchmark;
             GenerateResult = generateResult;
             BuildResult = buildResult;
-            ExecuteResults = executeResults ?? new ExecuteResult[0];
-            AllMeasurements = allMeasurements ?? new Measurement[0];
+            ExecuteResults = executeResults ?? Array.Empty<ExecuteResult>();
+            AllMeasurements = allMeasurements ?? Array.Empty<Measurement>();
             GcStats = gcStats;
         }
 

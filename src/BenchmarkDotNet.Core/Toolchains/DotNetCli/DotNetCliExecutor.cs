@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -25,7 +26,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 foreach (var file in new DirectoryInfo(buildResult.ArtifactsPaths.BinariesDirectoryPath).GetFiles("*.*"))
                     logger.WriteLineError(file.Name);
                 
-                return new ExecuteResult(false, -1, new string[0], new string[0]);
+                return new ExecuteResult(false, -1, Array.Empty<string>(), Array.Empty<string>());
             }
 
             ConsoleHandler.EnsureInitialized(logger);
@@ -76,7 +77,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     logger.WriteError(standardError);
                 }
 
-                return new ExecuteResult(true, process.ExitCode, new string[0], new string[0]);
+                return new ExecuteResult(true, process.ExitCode, Array.Empty<string>(), Array.Empty<string>());
             }
         }
 

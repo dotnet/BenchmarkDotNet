@@ -1292,7 +1292,7 @@ namespace SimpleJson
         internal IDictionary<Type, IDictionary<string, ReflectionUtils.GetDelegate>> GetCache;
         internal IDictionary<Type, IDictionary<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>>> SetCache;
 
-        internal static readonly Type[] EmptyTypes = new Type[0];
+        internal static readonly Type[] EmptyTypes = Array.Empty<Type>();
         internal static readonly Type[] ArrayConstructorParameterTypes = new Type[] { typeof(int) };
 
         private static readonly string[] Iso8601Format = new string[]
