@@ -33,7 +33,7 @@ BenchmarkDotNet doesn't just blindly run your code - it tries to help you to con
 ## Summary
 
 * Standard benchmarking routine: generating an isolated project per each benchmark method; auto-selection of iteration amount; warmup; overhead evaluation; statistics calculation; and so on.
-* Supported runtimes: Full .NET Framework, .NET Core (RTM), Mono
+* Supported runtimes: Full .NET Framework (4.6+), .NET Core (1.1+), Mono
 * Supported languages: C#, F#, and Visual Basic
 * Supported OS: Windows, Linux, MacOS
 * Easy way to compare different environments (`x86` vs `x64`, `LegacyJit` vs `RyuJit`, and so on; see: [Jobs](http://benchmarkdotnet.org/Configs/Jobs.htm))
