@@ -40,11 +40,11 @@ namespace BenchmarkDotNet.Reports
             style = style ?? SummaryStyle.Default;
             if (style.TimeUnit == null)
             {
-                style.TimeUnit = TimeUnit.GetBestTimeUnit(summary.Reports.Where(r => r.ResultStatistics != null).Select(r => r.ResultStatistics.Mean).ToArray());
+                style = style.WithTimeUnit(TimeUnit.GetBestTimeUnit(summary.Reports.Where(r => r.ResultStatistics != null).Select(r => r.ResultStatistics.Mean).ToArray()));
             }
             if (style.SizeUnit == null)
             {
-                style.SizeUnit = SizeUnit.GetBestSizeUnit(summary.Reports.Select(r => r.GcStats.AllocatedBytes).ToArray());
+                style = style.WithSizeUnit(SizeUnit.GetBestSizeUnit(summary.Reports.Select(r => r.GcStats.AllocatedBytes).ToArray()));
             }
 
             var columns = summary.GetColumns();

@@ -5,9 +5,12 @@ namespace BenchmarkDotNet.Reports
 {
     public interface ISummaryStyle
     {
-        bool PrintUnitsInHeader { get; set; }
-        bool PrintUnitsInContent { get; set; }
-        SizeUnit SizeUnit { get; set; }
-        TimeUnit TimeUnit { get; set; }
+        bool PrintUnitsInHeader { get; }
+        bool PrintUnitsInContent { get; }
+        SizeUnit SizeUnit { get; }
+        TimeUnit TimeUnit { get; }
+
+        ISummaryStyle WithTimeUnit(TimeUnit timeUnit);
+        ISummaryStyle WithSizeUnit(SizeUnit sizeUnit);
     }
 }

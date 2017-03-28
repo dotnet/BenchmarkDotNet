@@ -22,5 +22,27 @@ namespace BenchmarkDotNet.Reports
             SizeUnit = null,
             TimeUnit = null
         };
+
+        public ISummaryStyle WithTimeUnit(TimeUnit timeUnit)
+        {
+            return new SummaryStyle()
+            {
+                PrintUnitsInHeader = this.PrintUnitsInHeader,
+                PrintUnitsInContent = this.PrintUnitsInContent,
+                SizeUnit = this.SizeUnit,
+                TimeUnit = timeUnit
+            };
+        }
+
+        public ISummaryStyle WithSizeUnit(SizeUnit sizeUnit)
+        {
+            return new SummaryStyle()
+            {
+                PrintUnitsInHeader = this.PrintUnitsInHeader,
+                PrintUnitsInContent = this.PrintUnitsInContent,
+                SizeUnit = sizeUnit,
+                TimeUnit = this.TimeUnit
+            };
+        }
     }
 }
