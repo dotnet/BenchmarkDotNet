@@ -12,7 +12,7 @@ using OurPlatform = BenchmarkDotNet.Environments.Platform;
 
 namespace BenchmarkDotNet.Toolchains.Roslyn
 {
-    internal class Builder : IBuilder
+    public class Builder : IBuilder
     {
         private static readonly Lazy<AssemblyMetadata[]> FrameworkAssembliesMetadata = new Lazy<AssemblyMetadata[]>(GetFrameworkAssembliesMetadata);
 

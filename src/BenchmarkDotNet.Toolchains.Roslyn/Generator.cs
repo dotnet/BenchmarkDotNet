@@ -10,7 +10,7 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Toolchains.Roslyn
 {
-    internal class Generator : GeneratorBase
+    public class Generator : GeneratorBase
     {
         protected override string GetBuildArtifactsDirectoryPath(Benchmark benchmark, string programName)
             => Path.GetDirectoryName(benchmark.Target.Type.GetTypeInfo().Assembly.Location);
