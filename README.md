@@ -28,7 +28,13 @@ So it doesn't overload you with data, by default BenchmarkDotNet prints only the
   it allows you to keep summary small and simple for primitive cases but notify you about additional important area for complicated cases
   (of course you can request any numbers manually via additional attributes).
 
-BenchmarkDotNet doesn't just blindly run your code - it tries to help you to conduct a qualitative performance investigation. If you want to know more about BenchmarkDotNet features, checkout the [Overview](http://benchmarkdotnet.org/Overview.htm) page. If you want to use BenchmarkDotNet for the first time, the [Getting Started](http://benchmarkdotnet.org/GettingStarted.htm) will help you.
+BenchmarkDotNet doesn't just blindly run your code - it tries to help you to conduct a qualitative performance investigation.
+
+## Useful links
+* If you want to know more about BenchmarkDotNet features, checkout the [Overview](http://benchmarkdotnet.org/Overview.htm) page.
+* If you want to use BenchmarkDotNet for the first time, the [Getting Started](http://benchmarkdotnet.org/GettingStarted.htm) will help you.
+* If you want to contribute, checkout the [Contributing](http://benchmarkdotnet.org/Contributing.htm) and [up-for-grabs](https://github.com/dotnet/BenchmarkDotNet/issues?q=is%3Aopen+is%3Aissue+label%3Aup-for-grabs) issues.
+* If you want to ask quick question, use the [gitter](https://gitter.im/dotnet/BenchmarkDotNet) channel.
 
 ## Summary
 
