@@ -6,16 +6,19 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
+using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using OurPlatform = BenchmarkDotNet.Environments.Platform;
 
 namespace BenchmarkDotNet.Toolchains.Roslyn
 {
-    internal class Builder : IBuilder
+    [PublicAPI]
+    public class Builder : IBuilder
     {
         private static readonly Lazy<AssemblyMetadata[]> FrameworkAssembliesMetadata = new Lazy<AssemblyMetadata[]>(GetFrameworkAssembliesMetadata);
 
+        [PublicAPI]
         public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark, IResolver resolver)
         {
             logger.WriteLineInfo($"BuildScript: {generateResult.ArtifactsPaths.BuildScriptFilePath}");
