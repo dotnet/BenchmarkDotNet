@@ -9,6 +9,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
     /// <summary>
     /// Build a benchmark program with the Roslyn compiler.
     /// </summary>
+    [PublicAPI]
     public class RoslynToolchain : Toolchain
     {
         [PublicAPI]
@@ -16,6 +17,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
         {
         }
 
+        [PublicAPI]
         public override bool IsSupported(Benchmark benchmark, ILogger logger, IResolver resolver)
         {
             if (!base.IsSupported(benchmark, logger, resolver))
