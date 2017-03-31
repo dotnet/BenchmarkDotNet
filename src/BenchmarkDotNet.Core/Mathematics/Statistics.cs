@@ -73,17 +73,28 @@ namespace BenchmarkDotNet.Mathematics
             StandardError = StandardDeviation / Math.Sqrt(N);
             Skewness = CalcCentralMoment(3) / StandardDeviation.Pow(3);
             Kurtosis = CalcCentralMoment(4) / StandardDeviation.Pow(4);
-            ConfidenceInterval = new ConfidenceInterval(Mean, StandardError);
+            ConfidenceInterval = new ConfidenceInterval(Mean, StandardError, N);
             Percentiles = new PercentileValues(list);
         }
 
-        public ConfidenceInterval GetConfidenceInterval(ConfidenceLevel level) => new ConfidenceInterval(Mean, StandardError, level);
+        public ConfidenceInterval GetConfidenceInterval(ConfidenceLevel level, int n) => new ConfidenceInterval(Mean, StandardError, n, level);
         public bool IsOutlier(double value) => value < LowerFence || value > UpperFence;
         public double[] WithoutOutliers() => list.Where(value => !IsOutlier(value)).ToArray();
 
         public double CalcCentralMoment(int k) => list.Average(x => (x - Mean).Pow(k));
 
-        public override string ToString() => $"{Mean} +- {StandardError} (N = {N})";
+        public override string ToString()
+        {
+            switch (N)
+            {
+                case 1:
+                    return $"{list[0]} (N = 1)";
+                case 2:
+                    return $"{list[0]},{list[1]} (N = 2)";
+                default:
+                    return $"{Mean} +- {ConfidenceInterval.Margin} (N = {N})";
+            }
+        }
 
         /// <summary>
         /// Returns true, if this statistics can be inverted (see <see cref="Invert"/>).

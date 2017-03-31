@@ -147,11 +147,11 @@ namespace BenchmarkDotNet.Tests.Mathematics
         {
             var summary = new Statistics(Enumerable.Range(1, 30));
             Print(summary);
-            Assert.Equal(95, summary.ConfidenceInterval.Level.ToPercent());
+            Assert.Equal("99.9%", summary.ConfidenceInterval.Level.ToPercentStr());
             Assert.Equal(15.5, summary.ConfidenceInterval.Mean);
-            Assert.Equal(summary.StandardError, summary.ConfidenceInterval.Error);
-            Assert.Equal(12.34974, summary.ConfidenceInterval.Lower, 4);
-            Assert.Equal(18.65026, summary.ConfidenceInterval.Upper, 4);
+            Assert.Equal(summary.StandardError, summary.ConfidenceInterval.StandardError);
+            Assert.Equal(9.618329, summary.ConfidenceInterval.Lower, 4);
+            Assert.Equal(21.38167, summary.ConfidenceInterval.Upper, 4);
         }
 
         [Fact]

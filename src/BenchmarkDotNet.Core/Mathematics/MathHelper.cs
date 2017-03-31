@@ -69,5 +69,22 @@ namespace BenchmarkDotNet.Mathematics
             y = (((((-0.4 * y - 3.3) * y - 24.0) * y - 85.5) / (0.8 * y.Sqr() + 100.0 + b) + y + 3.0) / b + 1.0) * Sqrt(y);
             return 2.0 * Gauss(-y);
         }
+
+        // TODO: Optimize
+        public static double InverseStudent(double p, double n)
+        {
+            double lower = 0.0;
+            double upper = 1000.0;
+            while (upper - lower > 1e-9)
+            {
+                double t = (lower + upper) / 2;
+                double p2 = Student(t, n);
+                if (p2 < p)
+                    upper = t;
+                else
+                    lower = t;
+            }
+            return (lower + upper) / 2;
+        }
     }
 }
