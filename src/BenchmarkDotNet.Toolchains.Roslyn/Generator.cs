@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             => Path.GetDirectoryName(benchmark.Target.Type.GetTypeInfo().Assembly.Location);
 
         [PublicAPI]
-        protected override void Cleanup(ArtifactsPaths artifactsPaths)
+        protected override void Cleanup(Benchmark benchmark, ArtifactsPaths artifactsPaths)
         {
             DelteIfExists(artifactsPaths.ProgramCodePath);
             DelteIfExists(artifactsPaths.AppConfigPath);
