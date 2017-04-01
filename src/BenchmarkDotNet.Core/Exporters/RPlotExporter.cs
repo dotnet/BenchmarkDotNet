@@ -29,18 +29,18 @@ namespace BenchmarkDotNet.Exporters
             const string scriptFileName = "BuildPlots.R";
             yield return scriptFileName;
 
-            var fileNamePrefix = Path.Combine(summary.ResultsDirectoryPath, summary.Title);
-            var scriptFullPath = Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
-            var script = ResourceHelper.
+            string fileNamePrefix = Path.Combine(summary.ResultsDirectoryPath, summary.Title);
+            string scriptFullPath = Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
+            string script = ResourceHelper.
                 LoadTemplate(scriptFileName).
                 Replace("$BenchmarkDotNetVersion$", BenchmarkDotNetInfo.FullTitle).
                 Replace("$CsvSeparator$", CsvMeasurementsExporter.Default.Separator);
             lock (buildScriptLock)
                 File.WriteAllText(scriptFullPath, script);
 
-            var rscriptExecutable = RuntimeInformation.IsWindows() ? "Rscript.exe" : "Rscript";
+            string rscriptExecutable = RuntimeInformation.IsWindows() ? "Rscript.exe" : "Rscript";
             string rscriptPath;
-            var rHome = Environment.GetEnvironmentVariable("R_HOME");
+            string rHome = Environment.GetEnvironmentVariable("R_HOME");
             if (rHome != null)
             {
                 rscriptPath = Path.Combine(rHome, "bin", rscriptExecutable);
@@ -80,7 +80,7 @@ namespace BenchmarkDotNet.Exporters
             throw new NotSupportedException();
         }
 
-        static string FindInPath(string name) => Environment.GetEnvironmentVariable("PATH")
+        private static string FindInPath(string name) => Environment.GetEnvironmentVariable("PATH")
             .Split(Path.PathSeparator)
             .Select(p => Path.Combine(p, name))
             .FirstOrDefault(File.Exists);
