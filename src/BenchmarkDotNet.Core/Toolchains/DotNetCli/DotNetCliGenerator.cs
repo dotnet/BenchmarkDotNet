@@ -100,7 +100,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        protected override void CopyAllRequiredFiles(ArtifactsPaths artifactsPaths)
+        protected override void CopyAllRequiredFiles(Benchmark benchmark, ArtifactsPaths artifactsPaths)
         {
             if (!Directory.Exists(artifactsPaths.BinariesDirectoryPath))
             {

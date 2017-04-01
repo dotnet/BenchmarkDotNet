@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Toolchains
 
                 Cleanup(artifactsPaths);
 
-                CopyAllRequiredFiles(artifactsPaths);
+                CopyAllRequiredFiles(benchmark, artifactsPaths);
 
                 GenerateCode(benchmark, artifactsPaths);
                 GenerateAppConfig(benchmark, artifactsPaths, resolver);
@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Toolchains
 
         protected abstract void Cleanup(ArtifactsPaths artifactsPaths);
 
-        protected virtual void CopyAllRequiredFiles(ArtifactsPaths artifactsPaths) { }
+        protected virtual void CopyAllRequiredFiles(Benchmark benchmark, ArtifactsPaths artifactsPaths) { }
 
         protected virtual void GenerateProject(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver, ILogger logger) { }
 
