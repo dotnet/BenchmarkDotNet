@@ -7,6 +7,8 @@ namespace BenchmarkDotNet.Exporters
 {
     public abstract class ExporterBase : IExporter
     {
+        public string Name => $"{GetType().Name}{FileNameSuffix}";
+
         protected virtual string FileExtension => "txt";
         protected virtual string FileNameSuffix => string.Empty;
         protected virtual string FileCaption => "report";

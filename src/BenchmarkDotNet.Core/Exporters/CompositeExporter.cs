@@ -9,6 +9,7 @@ namespace BenchmarkDotNet.Exporters
     public class CompositeExporter : IExporter
     {
         internal readonly IEnumerable<IExporter> exporters;
+        public string Name => nameof(CompositeExporter);
 
         public CompositeExporter(params IExporter[] exporters)
         {

@@ -5,18 +5,19 @@ namespace BenchmarkDotNet.Exporters.Csv
 {
     public class CsvExporter : ExporterBase
     {
-        private readonly string separator;
+        private readonly CsvSeparator separator;
         protected override string FileExtension => "csv";
 
         public static readonly IExporter Default = new CsvExporter(CsvSeparator.CurrentCulture);
 
         public CsvExporter(CsvSeparator separator)
         {
-            this.separator = separator.ToRealSeparator();
+            this.separator = separator;
         }
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
+            string realSeparator = separator.ToRealSeparator();
             foreach (var line in summary.Table.FullContentWithHeader)
             {
                 for (int i = 0; i < line.Length;)
@@ -25,7 +26,7 @@ namespace BenchmarkDotNet.Exporters.Csv
 
                     if (++i < line.Length)
                     {
-                        logger.Write(separator);
+                        logger.Write(realSeparator);
                     }
                 }
 

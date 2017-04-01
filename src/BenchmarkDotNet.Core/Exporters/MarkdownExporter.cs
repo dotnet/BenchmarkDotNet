@@ -76,7 +76,7 @@ namespace BenchmarkDotNet.Exporters
             }
             logger = GetRightLogger(logger);
             logger.WriteLine();
-            foreach (var infoLine in HostEnvironmentInfo.GetCurrent().ToFormattedString())
+            foreach (string infoLine in summary.HostEnvironmentInfo.ToFormattedString())
             {
                 logger.WriteLineInfo(infoLine);
             }
