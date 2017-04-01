@@ -87,7 +87,7 @@ namespace BenchmarkDotNet.Toolchains.ProjectJson
 
         private static string GetRuntime()
         {
-            var currentRuntime = RuntimeInformation.GetDotNetCliRuntimeIdentifier();
+            var currentRuntime = Microsoft.DotNet.InternalAbstractions.RuntimeEnvironment.GetRuntimeIdentifier();
             if (!string.IsNullOrEmpty(currentRuntime))
             {
                 return $"\"runtimes\": {{ \"{currentRuntime}\": {{ }} }},";
