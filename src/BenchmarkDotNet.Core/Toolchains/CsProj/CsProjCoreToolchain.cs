@@ -3,6 +3,7 @@ using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
@@ -37,6 +38,12 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         {
             if (!base.IsSupported(benchmark, logger, resolver))
             {
+                return false;
+            }
+
+            if (RuntimeInformation.IsMono())
+            {
+                logger.WriteLineError($"BenchmarkDotNet does not support running .NET Core benchmarks when host process is Mono, benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;
             }
 

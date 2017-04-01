@@ -45,6 +45,12 @@ namespace BenchmarkDotNet.Toolchains.ProjectJson
                 return false;
             }
 
+            if (RuntimeInformation.IsMono())
+            {
+                logger.WriteLineError($"BenchmarkDotNet does not support running .NET Core benchmarks when host process is Mono, benchmark '{benchmark.DisplayInfo}' will not be executed");
+                return false;
+            }
+
             if (!HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled())
             {
                 logger.WriteLineError($"BenchmarkDotNet requires dotnet cli toolchain to be installed, benchmark '{benchmark.DisplayInfo}' will not be executed");
