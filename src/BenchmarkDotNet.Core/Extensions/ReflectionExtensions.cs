@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -86,6 +87,18 @@ namespace BenchmarkDotNet.Extensions
         {
             var typeInfo = type.GetTypeInfo();
             return typeInfo.IsValueType && !typeInfo.IsPrimitive;
+        }
+
+        internal static bool ContainsRunnableBenchmarks(this Type type)
+        {
+            var typeInfo = type.GetTypeInfo();
+
+            if (typeInfo.IsAbstract || typeInfo.IsSealed || typeInfo.IsGenericType)
+                return false;
+
+            return typeInfo
+                .GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                .Any(method => method.GetCustomAttributes(true).OfType<BenchmarkAttribute>().Any());
         }
     }
 }

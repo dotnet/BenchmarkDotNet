@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -29,12 +30,11 @@ namespace BenchmarkDotNet.Running
             // BenchmarkDotNet.Samples.IL, etc) then by name, so the output is easy to understand.
             var types = assembly
                 .GetTypes()
-                .Where(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Public)
-                             .Any(m => m.GetCustomAttributes(true).OfType<BenchmarkAttribute>().Any()))
-                .Where(t => !t.GetTypeInfo().IsGenericType)
+                .Where(type => type.ContainsRunnableBenchmarks())
                 .OrderBy(t => t.Namespace)
                 .ThenBy(t => t.Name)
                 .ToArray();
+
             typeParser = new TypeParser(types, logger);
         }
 

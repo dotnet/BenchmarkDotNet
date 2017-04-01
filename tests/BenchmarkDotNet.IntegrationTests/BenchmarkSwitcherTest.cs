@@ -6,8 +6,6 @@ using Xunit;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
-using System;
-using System.Collections.Generic;
 using BenchmarkDotNet.Configs;
 
 namespace BenchmarkDotNet.IntegrationTests
