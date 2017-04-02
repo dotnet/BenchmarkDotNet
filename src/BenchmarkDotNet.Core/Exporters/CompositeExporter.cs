@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
@@ -36,6 +37,9 @@ namespace BenchmarkDotNet.Exporters
 
         public void ExportToLog(Summary summary, ILogger logger)
         {
+            if(summary.GetColumns().IsNullOrEmpty())
+                logger.WriteLineHint("You haven't configured any columns, your results will be empty");
+
             foreach (var exporter in exporters)
                 exporter.ExportToLog(summary, logger);
         }
