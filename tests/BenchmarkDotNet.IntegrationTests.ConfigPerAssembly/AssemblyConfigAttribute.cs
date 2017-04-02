@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
 
-namespace BenchmarkDotNet.IntegrationTests.Classic
+namespace BenchmarkDotNet.IntegrationTests.ConfigPerAssembly
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
     public class AssemblyConfigAttribute : Attribute, IConfigSource

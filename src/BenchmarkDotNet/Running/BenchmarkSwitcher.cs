@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Running
         {
             foreach (var type in types.Where(type => !type.ContainsRunnableBenchmarks()).ToArray())
             {
-                logger.WriteLineError($"Type {type} is invalid. Only public, non-generic, non-abstract, non-sealed types with public instance [Benchmark] method(s) are uspported");
+                logger.WriteLineError($"Type {type} is invalid. Only public, non-generic, non-abstract, non-sealed types with public instance [Benchmark] method(s) are supported");
             }
 
             typeParser = new TypeParser(types.Where(type => type.ContainsRunnableBenchmarks()).ToArray(), logger);
