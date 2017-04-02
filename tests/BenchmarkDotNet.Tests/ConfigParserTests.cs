@@ -9,12 +9,14 @@ namespace BenchmarkDotNet.Tests
 {
     public class ConfigParserTests
     {
-        [Fact]
-        public void SimpleConfigParsedCorrectly()
+        [Theory]
+        [InlineData("--jobs=dry", "exporters=html,rplot")]
+        [InlineData("--jobs=dry", "exporters", "html,rplot")]
+        public void SimpleConfigParsedCorrectly(params string[] args)
         {
             var parser = new ConfigParser();
             // We allow args with and without the double dashes (i.e. '--jobs=' and 'jobs=')
-            var config = parser.Parse(new[] { "--jobs=dry", "exporters=html,rplot" });
+            var config = parser.Parse(args);
 
             Assert.Equal(1, config.GetJobs().Count());
             Assert.Contains(Job.Dry, config.GetJobs());
