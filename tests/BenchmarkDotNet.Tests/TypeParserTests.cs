@@ -36,9 +36,9 @@ namespace BenchmarkDotNet.Tests
 
             Assert.Equal(2, matches.Count());
             Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassA" &&
-                                                   match.Methods.Any(m => m.Name == "Method2")));
+                                                   match.Methods.All(m => m.Name == "Method2")));
             Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassB" &&
-                                                   match.Methods.Any(m => m.Name == "Method3")));
+                                                   match.Methods.All(m => m.Name == "Method3")));
         }
 
         [Fact]
@@ -80,8 +80,7 @@ namespace BenchmarkDotNet.Tests
             // Find entire classes or individual methods that have the [Run] attribute
             Assert.Equal(2, matches.Count());
             Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassA" && match.AllMethodsInType));
-            Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassD" &&
-                                                   match.Methods.Any(m => m.Name == "Method1")));
+            Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassD" && match.Methods.All(m => m.Name == "Method1")));
         }
 
         [Fact]
@@ -95,8 +94,7 @@ namespace BenchmarkDotNet.Tests
             // Find entire classes or individual methods that have the [DontRun] attribute
             Assert.Equal(2, matches.Count());
             Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassB" && match.AllMethodsInType));
-            Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassD" &&
-                                                   match.Methods.Any(m => m.Name == "Method2")));
+            Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassD" && match.Methods.All(m => m.Name == "Method2")));
         }
 
         [Fact]
@@ -123,25 +121,22 @@ namespace BenchmarkDotNet.Tests
             var matches = typeParser.MatchingTypesWithMethods(new[] { "classes=ClassC,ClassA", "methods=Method2" });
 
             // ClassC not matched as it has NO methods with the [Benchmark] attribute
-            Assert.Equal(3, matches.Count());
-            Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassA" && match.AllMethodsInType));
-            Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassB" && match.Methods.Any(m => m.Name == "Method2")));
-            Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassD" && match.Methods.Any(m => m.Name == "Method2")));
+            // ClassA only Method2 got matched because it it's classes AND methods #249
+            Assert.Equal(1, matches.Count());
+            Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassA" && match.Methods.All(m => m.Name == "Method2")));
         }
 
         [Fact]
-        public void EntireClassOverridesIndividualMethods()
+        public void ClassAndMethodShouldCombineAsAndFilters() // #249
         {
             var types = new[] { typeof(ClassA), typeof(ClassB), typeof(ClassC) };
             var typeParser = new TypeParser(types, ConsoleLogger.Default);
 
             var matches = typeParser.MatchingTypesWithMethods(new[] { "method=Method2,Method3", "class=ClassA" });
 
-            Assert.Equal(2, matches.Count());
-            Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassA" && match.AllMethodsInType));
-            Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassB" &&
-                                                   match.Methods.Any(m => m.Name == "Method2") &&
-                                                   match.Methods.Any(m => m.Name == "Method3")));
+            Assert.Equal(1, matches.Count());
+            Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassA" 
+                                                   && match.Methods.All(m => m.Name == "Method2")));
         }
     }
 }

@@ -22,17 +22,17 @@ namespace BenchmarkDotNet.Running
 
         internal TypeParser(Type[] types, ILogger logger)
         {
-            allTypes = types;
+            allTypes = types.Where(type => type.ContainsRunnableBenchmarks()).ToArray();
             this.logger = logger;
         }
 
         internal class TypeWithMethods
         {
             public Type Type { get; }
-            public MethodInfo [] Methods { get; }
+            public MethodInfo[] Methods { get; }
             public bool AllMethodsInType { get; }
 
-            public TypeWithMethods(Type type, MethodInfo [] methods = null)
+            public TypeWithMethods(Type type, MethodInfo[] methods = null)
             {
                 Type = type;
                 Methods = methods;
@@ -57,18 +57,119 @@ namespace BenchmarkDotNet.Running
 
         internal IEnumerable<TypeWithMethods> MatchingTypesWithMethods(string[] args)
         {
+            var filters = BuildPredicates(args);
+
             for (int i = 0; i < allTypes.Length; i++)
             {
                 var type = allTypes[i];
-                if (args.Any(arg => type.Name.ToLower().StartsWith(arg.ToLower())) || 
-                    args.Contains("#" + i) || args.Contains("" + i) || args.Contains("*"))
+                var typeInfo = type.GetTypeInfo();
+
+                if (args.Any(arg => type.Name.ToLower().StartsWith(arg.ToLower()))
+                    || args.Contains("#" + i)
+                    || args.Contains("" + i)
+                    || args.Contains("*"))
                 {
                     yield return new TypeWithMethods(type);
+                    continue;
                 }
+
+
+                if (!filters.typePredicates.All(filter => filter(typeInfo)))
+                    continue;
+
+                if (filters.methodPredicates.IsEmpty())
+                {
+                    yield return new TypeWithMethods(type);
+                    continue;
+                }
+
+                var allBenchmarks = typeInfo.GetBenchmarks();
+                var benchmarks = allBenchmarks
+                    .Where(method => filters.methodPredicates.All(rule => rule(method)))
+                    .ToArray();
+
+                if (benchmarks.IsEmpty())
+                    continue;
+
+                if(allBenchmarks.Length == benchmarks.Length)
+                    yield return new TypeWithMethods(type);
+                else
+                    yield return new TypeWithMethods(type, benchmarks);
+            }
+        }
+
+        private (List<Predicate<TypeInfo>> typePredicates, List<Predicate<MethodInfo>> methodPredicates) BuildPredicates(string[] args)
+        {
+            var rules = BuildRules(args);
+
+            var typePredicates = new List<Predicate<TypeInfo>>();
+            var methodPredicates = new List<Predicate<MethodInfo>>();
+
+            if (rules.namespaces.Any())
+                typePredicates.Add(type => rules.namespaces.Contains(type.Namespace));
+
+            if (rules.classes.Any())
+                typePredicates.Add(type => rules.classes.Contains(type.Name) || rules.classes.Contains(type.FullName));
+
+            if (rules.attributes.Any())
+            {
+                typePredicates.Add(type =>
+                {
+                    var customTypeAttributes =
+                        type.GetCustomAttributes(true)
+                            .Select(attribute => attribute.GetType().GetTypeInfo())
+                            .ToArray();
+
+                    var customMethodsAttributes =
+                        type.GetBenchmarks()
+                            .SelectMany(method => method.GetCustomAttributes(true)
+                                .Select(attribute => attribute.GetType().GetTypeInfo()))
+                            .ToArray();
+
+                    var allCustomAttributes = customTypeAttributes.Union(customMethodsAttributes).Distinct().ToArray();
+
+                    return
+                        allCustomAttributes.Any(
+                            attribute => rules.attributes.Contains(attribute.Name)
+                                         || rules.attributes.Contains(attribute.Name.Replace("Attribute", string.Empty)));
+                });
+
+                methodPredicates.Add(method =>
+                {
+                    var customTypeAttributes =
+                        method.DeclaringType.GetTypeInfo().GetCustomAttributes(true)
+                            .Select(attribute => attribute.GetType().GetTypeInfo())
+                            .ToArray();
+
+                    var customMethodsAttributes = method.GetCustomAttributes(true)
+                        .Select(attribute => attribute.GetType().GetTypeInfo())
+                        .ToArray();
+
+                    var allCustomAttributes = customTypeAttributes.Union(customMethodsAttributes).Distinct().ToArray();
+
+                    return allCustomAttributes.Any(
+                            attribute => rules.attributes.Contains(attribute.Name)
+                                         || rules.attributes.Contains(attribute.Name.Replace("Attribute", string.Empty)));
+                });
             }
 
-            var types = new List<Type>();
-            var methods = new List<TypeWithMethods>();
+            if (rules.methods.Any())
+            {
+                methodPredicates.Add(method =>
+                    rules.methods.Contains(method.Name)
+                    || rules.methods.Contains($"{method.DeclaringType.FullName}.{method.Name}"));
+            }
+
+            return (typePredicates, methodPredicates);
+        }
+
+        private (HashSet<string> methods, HashSet<string> classes, HashSet<string> namespaces, HashSet<string> attributes) BuildRules(string[] args)
+        {
+            var methods = new HashSet<string>();
+            var classes = new HashSet<string>();
+            var namespaces = new HashSet<string>();
+            var attributes = new HashSet<string>();
+
             foreach (var arg in args.Where(arg => arg.Contains("=")))
             {
                 var split = arg.Split('=');
@@ -77,67 +178,30 @@ namespace BenchmarkDotNet.Running
                 // Allow both "--arg=<value>" and "arg=<value>" (i.e. with and without the double dashes)
                 argument = argument.StartsWith(OptionPrefix) ? argument.Remove(0, 2) : argument;
 
-                var qualifyingTypes = allTypes.Where(t => t.GetMethods().Any(m => m.HasAttribute<BenchmarkAttribute>()));
                 switch (argument)
                 {
                     case "method":
                     case "methods":
-                        foreach (var type in allTypes)
-                        {
-                            var allTargetMethods = type.GetMethods().Where(method => method.HasAttribute<BenchmarkAttribute>());
-                            var typeWithNamespace = type.Namespace + "." + type.Name;
-                            var matchingMethods = allTargetMethods.Where(m => values.Any(v => v == m.Name || v == typeWithNamespace + "." + m.Name)).ToArray();
-                            if (matchingMethods.Length > 0)
-                            {
-                                methods.Add(new TypeWithMethods(type, matchingMethods));
-                            }
-                        }
+                        values.ForEach(methodName => methods.Add(methodName));
                         break;
                     case "class":
                     case "classes":
-                        types.AddRange(qualifyingTypes.Where(t => values.Any(v => v == t.Name || v == t.Namespace + "." + t.Name)));
-                        break;
-                    case "attribute":
-                    case "attributes":
-                        foreach (var type in allTypes)
-                        {
-                            // First see if the entire Type/Class has a matching attribute
-                            foreach (var attributeName in (type.GetTypeInfo().GetCustomAttributes(true))
-                                                              .Select(a => a.GetType().Name))
-                            {
-                                // Allow short and long version of the attributes to be specified, i.e. "Run" and "RunAttribute"
-                                if (values.Any(v => v == attributeName || v + "Attribute" == attributeName))
-                                {
-                                    types.Add(type);
-                                }
-                            }
-
-                            // Now see if any methods within the Type/Class have a matching attribute
-                            var allTargetMethods = type.GetMethods().Where(method => method.HasAttribute<BenchmarkAttribute>());
-                            var matchingMethods = allTargetMethods.Where(m => m.GetCustomAttributes(inherit: false)
-                                                                               .Select(a => a.GetType().Name)
-                                                                               .Any(a => values.Any(v => v == a || v + "Attribute" == a)))
-                                                                  .ToArray();
-                            if (matchingMethods.Length > 0)
-                            {
-                                methods.Add(new TypeWithMethods(type, matchingMethods));
-                            }
-                        }
+                        values.ForEach(typeName => classes.Add(typeName));
                         break;
                     case "namespace":
                     case "namespaces":
-                        types.AddRange(qualifyingTypes.Where(t => values.Any(v => v == t.Namespace)));
+                        values.ForEach(@namespace => namespaces.Add(@namespace));
+                        break;
+                    case "attribute":
+                    case "attributes":
+                        values.ForEach(attribute => attributes.Add(attribute));
                         break;
                 }
             }
 
-            // Have to normalise, i.e. if we matched some methods in TypeA, but also got "class=TypeA", 
-            // we want to use the super-set, i.e. the entire Type, rather than just individual methods
-            foreach (var method in methods.Where(m => types.Any(t => t.FullName == m.Type.FullName) == false))
-                yield return new TypeWithMethods(method.Type, method.Methods);
-            foreach (var type in types)
-                yield return new TypeWithMethods(type);
+            return (methods, classes, namespaces, attributes);
         }
+
 
         internal void PrintOptions(int prefixWidth, int outputWidth)
         {
@@ -193,6 +257,10 @@ namespace BenchmarkDotNet.Running
                 {
                     "namespace",
                     "run all methods in a given namespace (i.e. 'MyNamespace.MySubNamespace')"
+                },
+                {
+                    "attribute",
+                    "run all methods with given attribute (applied to class or method)"
                 }
             };
         }

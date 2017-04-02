@@ -104,9 +104,13 @@ namespace BenchmarkDotNet.Extensions
             if (typeInfo.IsAbstract || typeInfo.IsSealed || typeInfo.IsGenericType || typeInfo.IsNotPublic)
                 return false;
 
-            return typeInfo
-                .GetMethods(BindingFlags.Instance | BindingFlags.Public)
-                .Any(method => method.GetCustomAttributes(true).OfType<BenchmarkAttribute>().Any());
+            return typeInfo.GetBenchmarks().Any();
         }
+
+        internal static MethodInfo[] GetBenchmarks(this TypeInfo typeInfo)
+            => typeInfo
+                .GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                .Where(method => method.GetCustomAttributes(true).OfType<BenchmarkAttribute>().Any())
+                .ToArray();
     }
 }
