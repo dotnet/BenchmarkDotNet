@@ -9,46 +9,36 @@ using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Running
 {
-    public class TypeParser
+    internal class TypeParser
     {
-        public TypeParser(Type[] types, ILogger logger)
+        private const string OptionPrefix = "--";
+        private const string BreakText = ": ";
+
+        private static readonly Dictionary<string, string> Configuration = CreateConfiguration();
+        private static readonly char[] TrimChars = { ' ' };
+
+        private readonly Type[] allTypes;
+        private readonly ILogger logger;
+
+        internal TypeParser(Type[] types, ILogger logger)
         {
-            this.allTypes = types;
+            allTypes = types;
             this.logger = logger;
         }
 
-        public class TypeWithMethods
+        internal class TypeWithMethods
         {
-            public Type Type { get; private set; }
-            public MethodInfo [] Methods { get; private set; }
-            public bool AllMethodsInType { get; private set; }
+            public Type Type { get; }
+            public MethodInfo [] Methods { get; }
+            public bool AllMethodsInType { get; }
 
             public TypeWithMethods(Type type, MethodInfo [] methods = null)
             {
-                AllMethodsInType = methods == null;
                 Type = type;
                 Methods = methods;
+                AllMethodsInType = methods == null;
             }
         }
-
-        private static Dictionary<string, string> configuration = new Dictionary<string, string>
-        {
-            {
-                "method",
-                "run a given test method (just the method name, i.e. 'MyTestMethod', or can be fully specified, i.e. 'MyNamespace.MyClass.MyTestMethod')"
-            },
-            {
-                "class",
-                "run all methods in a given test class (just the class name, i.e. 'MyClass', or can be fully specified, i.e. 'MyNamespace.MyClass')"
-            },
-            {
-                "namespace",
-                "run all methods in a given namespace (i.e. 'MyNamespace.MySubNamespace')"
-            }
-        };
-
-        private Type[] allTypes;
-        private readonly ILogger logger;
 
         internal string[] ReadArgumentList(string[] args)
         {
@@ -85,7 +75,7 @@ namespace BenchmarkDotNet.Running
                 var values = split[1].Split(',');
                 var argument = split[0].ToLowerInvariant();
                 // Allow both "--arg=<value>" and "arg=<value>" (i.e. with and without the double dashes)
-                argument = argument.StartsWith(optionPrefix) ? argument.Remove(0, 2) : argument;
+                argument = argument.StartsWith(OptionPrefix) ? argument.Remove(0, 2) : argument;
 
                 var qualifyingTypes = allTypes.Where(t => t.GetMethods().Any(m => m.HasAttribute<BenchmarkAttribute>()));
                 switch (argument)
@@ -149,18 +139,14 @@ namespace BenchmarkDotNet.Running
                 yield return new TypeWithMethods(type);
         }
 
-        private string optionPrefix = "--";
-        private char[] trimChars = new[] { ' ' };
-        private const string breakText = ": ";
-
-        internal void PrintOptions(ILogger logger, int prefixWidth, int outputWidth)
+        internal void PrintOptions(int prefixWidth, int outputWidth)
         {
-            foreach (var option in configuration)
+            foreach (var option in Configuration)
             {
-                var optionText = $"  {optionPrefix}{option.Key} <{option.Key.ToUpperInvariant()}>";
+                var optionText = $"  {OptionPrefix}{option.Key} <{option.Key.ToUpperInvariant()}>";
                 logger.WriteResult($"{optionText.PadRight(prefixWidth)}");
 
-                var maxWidth = outputWidth - prefixWidth - System.Environment.NewLine.Length - breakText.Length;
+                var maxWidth = outputWidth - prefixWidth - System.Environment.NewLine.Length - BreakText.Length;
                 var lines = StringAndTextExtensions.Wrap(option.Value, maxWidth);
                 if (lines.Count == 0)
                 {
@@ -168,10 +154,10 @@ namespace BenchmarkDotNet.Running
                     continue;
                 }
 
-                logger.WriteLineInfo($"{breakText}{lines.First().Trim(trimChars)}");
+                logger.WriteLineInfo($"{BreakText}{lines.First().Trim(TrimChars)}");
                 var padding = new string(' ', prefixWidth);
                 foreach (var line in lines.Skip(1))
-                    logger.WriteLineInfo($"{padding}{breakText}{line.Trim(trimChars)}");
+                    logger.WriteLineInfo($"{padding}{BreakText}{line.Trim(TrimChars)}");
             }
         }
 
@@ -190,6 +176,25 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineHelp(string.Format(CultureInfo.InvariantCulture, "  #{0} {1}", i.ToString().PadRight(numberWidth), allTypes[i].Name));
             logger.WriteLine();
             logger.WriteLine();
+        }
+
+        private static Dictionary<string, string> CreateConfiguration()
+        {
+            return new Dictionary<string, string>
+            {
+                {
+                    "method",
+                    "run a given test method (just the method name, i.e. 'MyTestMethod', or can be fully specified, i.e. 'MyNamespace.MyClass.MyTestMethod')"
+                },
+                {
+                    "class",
+                    "run all methods in a given test class (just the class name, i.e. 'MyClass', or can be fully specified, i.e. 'MyNamespace.MyClass')"
+                },
+                {
+                    "namespace",
+                    "run all methods in a given namespace (i.e. 'MyNamespace.MySubNamespace')"
+                }
+            };
         }
     }
 }

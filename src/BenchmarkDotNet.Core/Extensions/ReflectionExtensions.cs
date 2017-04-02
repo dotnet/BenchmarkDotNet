@@ -89,11 +89,19 @@ namespace BenchmarkDotNet.Extensions
             return typeInfo.IsValueType && !typeInfo.IsPrimitive;
         }
 
+        internal static Type[] GetRunnableBenchmarks(this Assembly assembly)
+            => assembly
+                .GetTypes()
+                .Where(type => type.ContainsRunnableBenchmarks())
+                .OrderBy(t => t.Namespace)
+                .ThenBy(t => t.Name)
+                .ToArray();
+
         internal static bool ContainsRunnableBenchmarks(this Type type)
         {
             var typeInfo = type.GetTypeInfo();
 
-            if (typeInfo.IsAbstract || typeInfo.IsSealed || typeInfo.IsGenericType)
+            if (typeInfo.IsAbstract || typeInfo.IsSealed || typeInfo.IsGenericType || typeInfo.IsNotPublic)
                 return false;
 
             return typeInfo
