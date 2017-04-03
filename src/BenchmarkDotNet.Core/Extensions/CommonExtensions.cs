@@ -55,15 +55,13 @@ namespace BenchmarkDotNet.Extensions
 
         public static bool IsNullOrEmpty<T>(this IReadOnlyCollection<T> value) => value == null || value.Count == 0;
         public static bool IsEmpty<T>(this IReadOnlyCollection<T> value) => value.Count == 0;
+
         public static T Penult<T>(this IList<T> list) => list[list.Count - 2];
 
         public static bool IsOneOf<T>(this T value, params T[] values) => values.Contains(value);
 
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
-        {
-            TValue value;
-            return dictionary.TryGetValue(key, out value) ? value : default(TValue);
-        }
+            => dictionary.TryGetValue(key, out TValue value) ? value : default(TValue);
 
         public static double Sqr(this double x) => x * x;
         public static double Pow(this double x, double k) => Math.Pow(x, k);

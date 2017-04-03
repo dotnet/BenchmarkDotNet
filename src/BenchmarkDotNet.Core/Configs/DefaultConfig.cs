@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Configs
             yield return UnrollFactorValidator.Default;
         }
 
-        public IEnumerable<Job> GetJobs() => Enumerable.Empty<Job>();
+        public IEnumerable<Job> GetJobs() => Array.Empty<Job>();
 
         public IOrderProvider GetOrderProvider() => null;
 
@@ -61,7 +61,8 @@ namespace BenchmarkDotNet.Configs
 
         public bool KeepBenchmarkFiles => false;
 
-        public IEnumerable<IDiagnoser> GetDiagnosers() => Enumerable.Empty<IDiagnoser>();
+        public IEnumerable<IDiagnoser> GetDiagnosers() => Array.Empty<IDiagnoser>();
+
 
         // Make the Diagnosers lazy-loaded, so they are only instantiated if needed
         public static readonly Lazy<IDiagnoser[]> LazyLoadedDiagnosers =

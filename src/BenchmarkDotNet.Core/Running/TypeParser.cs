@@ -73,6 +73,8 @@ namespace BenchmarkDotNet.Running
                     continue;
                 }
 
+                if(filters.areEmpty)
+                    continue;
 
                 if (!filters.typePredicates.All(filter => filter(typeInfo)))
                     continue;
@@ -98,7 +100,7 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        private (List<Predicate<TypeInfo>> typePredicates, List<Predicate<MethodInfo>> methodPredicates) BuildPredicates(string[] args)
+        private (List<Predicate<TypeInfo>> typePredicates, List<Predicate<MethodInfo>> methodPredicates, bool areEmpty) BuildPredicates(string[] args)
         {
             var rules = BuildRules(args);
 
@@ -160,7 +162,7 @@ namespace BenchmarkDotNet.Running
                     || rules.methods.Contains($"{method.DeclaringType.FullName}.{method.Name}"));
             }
 
-            return (typePredicates, methodPredicates);
+            return (typePredicates, methodPredicates, typePredicates.IsEmpty() && methodPredicates.IsEmpty());
         }
 
         private (HashSet<string> methods, HashSet<string> classes, HashSet<string> namespaces, HashSet<string> attributes) BuildRules(string[] args)
