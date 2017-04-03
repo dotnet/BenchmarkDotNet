@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Exporters.Csv
         {
             string realSeparator = Separator;
             var columns = GetColumns(summary);
-            logger.WriteLine(string.Join(realSeparator, columns.Select(c => CsvHelper.Escape(c.Title))));
+            logger.WriteLine(string.Join(realSeparator, columns.Select(c => CsvHelper.Escape(c.Title, realSeparator))));
 
             foreach (var report in summary.Reports)
             {
@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Exporters.Csv
                 {
                     for (int i = 0; i < columns.Length; )
                     {
-                        logger.Write(CsvHelper.Escape(columns[i].GetValue(summary, report, measurement)));
+                        logger.Write(CsvHelper.Escape(columns[i].GetValue(summary, report, measurement), realSeparator));
 
                         if (++i < columns.Length)
                         {
