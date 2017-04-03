@@ -163,64 +163,44 @@ namespace BenchmarkDotNet.Tests
 
 namespace BenchmarkDotNet.Tests
 {
-    public class RunAttribute : Attribute
-    {
-    }
+    public class RunAttribute : Attribute { }
 
-    public class DontRunAttribute : Attribute
-    {
-    }
+    public class DontRunAttribute : Attribute { }
 
     [Run]
     public class ClassA
     {
         [Benchmark]
-        public void Method1()
-        {
-        }
+        public void Method1() { }
 
         [Benchmark]
-        public void Method2()
-        {
-        }
+        public void Method2() { }
     }
 
     [DontRun]
     public class ClassB
     {
         [Benchmark]
-        public void Method1()
-        {
-        }
+        public void Method1() { }
 
         [Benchmark]
-        public void Method2()
-        {
-        }
+        public void Method2() { }
 
         [Benchmark]
-        public void Method3()
-        {
-        }
+        public void Method3() { }
     }
 
     public class ClassC
     {
         // None of these methods are actually Benchmarks!!
         [UsedImplicitly]
-        public void Method1()
-        {
-        }
+        public void Method1() { }
 
         [UsedImplicitly]
-        public void Method2()
-        {
-        }
+        public void Method2() { }
 
         [UsedImplicitly]
-        public void Method3()
-        {
-        }
+        public void Method3() { }
     }
 }
 
@@ -230,14 +210,10 @@ namespace BenchmarkDotNet.NOTTests
     {
         [Run]
         [Benchmark]
-        public void Method1()
-        {
-        }
+        public void Method1() { }
 
         [DontRun]
         [Benchmark]
-        public void Method2()
-        {
-        }
+        public void Method2() { }
     }
 }

@@ -79,12 +79,12 @@ namespace BenchmarkDotNet.Tests.Mathematics
             Assert.Equal(1, summary.InterquartileRange);
             Assert.Equal(0.70711, summary.StandardDeviation, 4);
             Assert.Equal(Array.Empty<double>(), summary.Outliers);
-			Assert.Equal(1, summary.Percentiles.P0);
-			Assert.Equal(1.25, summary.Percentiles.P25);
-			Assert.Equal(1.5, summary.Percentiles.P50);
-			Assert.Equal(1.85, summary.Percentiles.P85);
-			Assert.Equal(1.95, summary.Percentiles.P95);
-			Assert.Equal(2, summary.Percentiles.P100);
+            Assert.Equal(1, summary.Percentiles.P0);
+            Assert.Equal(1.25, summary.Percentiles.P25);
+            Assert.Equal(1.5, summary.Percentiles.P50);
+            Assert.Equal(1.85, summary.Percentiles.P85);
+            Assert.Equal(1.95, summary.Percentiles.P95);
+            Assert.Equal(2, summary.Percentiles.P100);
         }
 
         [Fact]
@@ -103,12 +103,12 @@ namespace BenchmarkDotNet.Tests.Mathematics
             Assert.Equal(3, summary.InterquartileRange);
             Assert.Equal(1.52753, summary.StandardDeviation, 4);
             Assert.Equal(Array.Empty<double>(), summary.Outliers);
-			Assert.Equal(1, summary.Percentiles.P0);
-			Assert.Equal(1.5, summary.Percentiles.P25);
-			Assert.Equal(2, summary.Percentiles.P50);
-			Assert.Equal(3.4, summary.Percentiles.P85);
-			Assert.Equal(3.8, summary.Percentiles.P95);
-			Assert.Equal(4, summary.Percentiles.P100);
+            Assert.Equal(1, summary.Percentiles.P0);
+            Assert.Equal(1.5, summary.Percentiles.P25);
+            Assert.Equal(2, summary.Percentiles.P50);
+            Assert.Equal(3.4, summary.Percentiles.P85);
+            Assert.Equal(3.8, summary.Percentiles.P95);
+            Assert.Equal(4, summary.Percentiles.P100);
         }
 
         [Fact]
@@ -127,12 +127,12 @@ namespace BenchmarkDotNet.Tests.Mathematics
             Assert.Equal(30, summary.InterquartileRange);
             Assert.Equal(22.9378, summary.StandardDeviation, 4);
             Assert.Equal(Array.Empty<double>(), summary.Outliers);
-			Assert.Equal(1, summary.Percentiles.P0);
-			Assert.Equal(3, summary.Percentiles.P25);
-			Assert.Equal(8, summary.Percentiles.P50);
-			Assert.Equal(35.2, summary.Percentiles.P85, 4);
-			Assert.Equal(54.4, summary.Percentiles.P95, 4);
-			Assert.Equal(64, summary.Percentiles.P100);
+            Assert.Equal(1, summary.Percentiles.P0);
+            Assert.Equal(3, summary.Percentiles.P25);
+            Assert.Equal(8, summary.Percentiles.P50);
+            Assert.Equal(35.2, summary.Percentiles.P85, 4);
+            Assert.Equal(54.4, summary.Percentiles.P95, 4);
+            Assert.Equal(64, summary.Percentiles.P100);
         }
 
         [Fact]

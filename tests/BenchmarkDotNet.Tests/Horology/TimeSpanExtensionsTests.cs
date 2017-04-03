@@ -1,12 +1,14 @@
 ﻿using System;
 using BenchmarkDotNet.Horology;
+using JetBrains.Annotations;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Horology
 {
     public class TimeSpanExtensionsTests
     {
-        private void Check(string expected, TimeSpan time)
+        [AssertionMethod]
+        private static void Check(string expected, TimeSpan time)
         {
             Assert.Equal(expected, time.ToFormattedTotalTime());
         }

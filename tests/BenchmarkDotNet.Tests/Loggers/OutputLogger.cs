@@ -11,10 +11,7 @@ namespace BenchmarkDotNet.Tests.Loggers
 
         public OutputLogger(ITestOutputHelper testOutputHelper)
         {
-            if (testOutputHelper == null)
-                throw new ArgumentNullException(nameof(testOutputHelper));
-
-            this.testOutputHelper = testOutputHelper;
+            this.testOutputHelper = testOutputHelper ?? throw new ArgumentNullException(nameof(testOutputHelper));
         }
 
         public override void Write(LogKind logKind, string text)
@@ -38,18 +35,18 @@ namespace BenchmarkDotNet.Tests.Loggers
         }
 
         #region Xunit bug workaround
+
         /// <summary>
         /// Workaround for xunit bug: https://github.com/xunit/xunit/issues/876
         /// </summary>
         private static string RemoveInvalidChars(string text)
         {
             if (string.IsNullOrEmpty(text))
-            {
                 return string.Empty;
-            }
 
-            return text.Replace((char)0x1B, ' ');
+            return text.Replace((char) 0x1B, ' ');
         }
+
         #endregion
     }
 }
