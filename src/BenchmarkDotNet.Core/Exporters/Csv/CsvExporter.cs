@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Exporters.Csv
             {
                 for (int i = 0; i < line.Length;)
                 {
-                    logger.Write(CsvHelper.Escape(line[i]));
+                    logger.Write(CsvHelper.Escape(line[i], realSeparator));
 
                     if (++i < line.Length)
                     {
