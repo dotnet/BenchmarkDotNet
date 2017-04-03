@@ -101,6 +101,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private readonly Dictionary<Benchmark, PmcStats> results = new Dictionary<Benchmark, PmcStats>();
 
+        // ReSharper disable once EmptyConstructor parameterless ctor is mandatory for DiagnosersLoader.CreateDiagnoser
+        public PmcDiagnoser() { }
+
         protected override ulong EventType
             => unchecked((ulong)(KernelTraceEventParser.Keywords.PMCProfile | KernelTraceEventParser.Keywords.Profile));
 

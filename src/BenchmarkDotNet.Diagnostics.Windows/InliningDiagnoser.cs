@@ -8,6 +8,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
     {
         private static readonly string LogSeparator = new string('-', 20);
 
+        // ReSharper disable once EmptyConstructor parameterless ctor is mandatory for DiagnosersLoader.CreateDiagnoser
+        public InliningDiagnoser() { }
+
         protected override void AttachToEvents(TraceEventSession session, Benchmark benchmark)
         {
             var expected = benchmark.Target.Method.DeclaringType.Namespace + "." +

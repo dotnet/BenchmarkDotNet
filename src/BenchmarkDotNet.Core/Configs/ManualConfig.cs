@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Configs
             if (jobs.All(job => job.Diagnoser.HardwareCounters.IsNullOrEmpty()))
                 return diagnosers;
 
-            var hardwareCountersDiagnoser = DefaultConfig.LazyLoadedDiagnosers.Value
+            var hardwareCountersDiagnoser = DiagnosersLoader.LazyLoadedDiagnosers.Value
                 .SingleOrDefault(diagnoser => diagnoser is IHardwareCountersDiagnoser);
 
             if(hardwareCountersDiagnoser != default(IDiagnoser))

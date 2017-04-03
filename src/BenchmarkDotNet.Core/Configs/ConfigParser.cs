@@ -211,7 +211,7 @@ namespace BenchmarkDotNet.Configs
 
         private static IDiagnoser[] ParseDiagnosers(string value)
         {
-            foreach (var diagnoser in DefaultConfig.LazyLoadedDiagnosers.Value)
+            foreach (var diagnoser in DiagnosersLoader.LazyLoadedDiagnosers.Value)
             {
                 if (value == diagnoser.GetType().Name.Replace("Diagnoser", "").ToLowerInvariant())
                     return new[] { diagnoser };
