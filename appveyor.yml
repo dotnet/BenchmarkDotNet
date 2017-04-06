@@ -23,7 +23,7 @@ cache:
 # scripts that are called at very beginning, before repo cloning
 init:
   - git config --global core.autocrlf input
-  - dism /online /add-capability /capabilityName:Tools.DeveloperMode.Core~~~~0.0.1.0
+#  - dism /online /add-capability /capabilityName:Tools.DeveloperMode.Core~~~~0.0.1.0
   - webmanagement.exe -Credentials uap_integration uap_integration
 
 # scripts that run after cloning repository
