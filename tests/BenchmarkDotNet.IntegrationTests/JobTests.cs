@@ -371,12 +371,12 @@ namespace BenchmarkDotNet.IntegrationTests
             var a = CharacteristicHelper
                 .GetThisTypeCharacteristics(typeof(Job))
                 .Select(c => c.Id);
-            Equal(string.Join(";", a), "Id;Accuracy;Env;Infrastructure;Run");
+            Equal(string.Join(";", a), "Id;Accuracy;Diagnoser;Env;Infrastructure;Run");
             a = CharacteristicHelper
                 .GetAllCharacteristics(typeof(Job))
                 .Select(c => c.Id);
             Equal(string.Join(";", a), "Id;Accuracy;AnalyzeLaunchVariance;EvaluateOverhead;" +
-                "MaxStdErrRelative;MinInvokeCount;MinIterationTime;RemoveOutliers;Env;Affinity;" +
+                "MaxStdErrRelative;MinInvokeCount;MinIterationTime;RemoveOutliers;Diagnoser;HardwareCounters;Env;Affinity;" +
                 "Jit;Platform;Runtime;Gc;AllowVeryLargeObjects;Concurrent;CpuGroups;Force;" +
                 "RetainVm;Server;Infrastructure;Clock;EngineFactory;Toolchain;Run;InvocationCount;IterationTime;" +
                 "LaunchCount;RunStrategy;TargetCount;UnrollFactor;WarmupCount");

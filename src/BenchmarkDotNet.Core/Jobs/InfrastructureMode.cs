@@ -4,7 +4,6 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Toolchains;
 
-// ReSharper disable once CheckNamespace
 namespace BenchmarkDotNet.Jobs
 {
     public sealed class InfrastructureMode : JobMode<InfrastructureMode>
@@ -18,6 +17,7 @@ namespace BenchmarkDotNet.Jobs
             get { return ToolchainCharacteristic[this]; }
             set { ToolchainCharacteristic[this] = value; }
         }
+
         public IClock Clock
         {
             get { return ClockCharacteristic[this]; }

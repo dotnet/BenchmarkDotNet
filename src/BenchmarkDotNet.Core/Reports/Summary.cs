@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Reports
         {
             Benchmarks = benchmarks;
             Table = new SummaryTable(this);
-            Reports = reports ?? new BenchmarkReport[0];
+            Reports = reports ?? Array.Empty<BenchmarkReport>();
         }
 
         private Summary(string title, HostEnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, ValidationError[] validationErrors)
@@ -74,12 +74,12 @@ namespace BenchmarkDotNet.Reports
             ResultsDirectoryPath = resultsDirectoryPath;
             TotalTime = totalTime;
             ValidationErrors = validationErrors;
-            Reports = new BenchmarkReport[0];
+            Reports = Array.Empty<BenchmarkReport>();
         }
 
         internal static Summary CreateFailed(Benchmark[] benchmarks, string title, HostEnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, ValidationError[] validationErrors)
         {
-            return new Summary(title, hostEnvironmentInfo, config, resultsDirectoryPath, TimeSpan.Zero, validationErrors, benchmarks, new BenchmarkReport[0]);
+            return new Summary(title, hostEnvironmentInfo, config, resultsDirectoryPath, TimeSpan.Zero, validationErrors, benchmarks, Array.Empty<BenchmarkReport>());
         }
 
         private string BuildAllRuntimes()

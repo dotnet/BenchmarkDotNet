@@ -3,6 +3,7 @@ using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
+using JetBrains.Annotations;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests
@@ -12,7 +13,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void FailingConsturctorsAreDiscovered()
         {
-            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(FailingConsturctor)));
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(FailingConsturctor))).ToList();
 
             Assert.NotEmpty(validationErrors);
             Assert.True(validationErrors.Single().Message.StartsWith("Unable to create instance of FailingConsturctor"));
@@ -20,15 +21,19 @@ namespace BenchmarkDotNet.Tests
 
         public class FailingConsturctor
         {
-            public FailingConsturctor() { throw new Exception("This one fails"); }
+            public FailingConsturctor()
+            {
+                throw new Exception("This one fails");
+            }
 
-            [Benchmark] public void NonThrowing() { }
+            [Benchmark]
+            public void NonThrowing() { }
         }
 
         [Fact]
         public void FailingSetupsAreDiscovered()
         {
-            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(FailingSetup)));
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(FailingSetup))).ToList();
 
             Assert.NotEmpty(validationErrors);
             Assert.True(validationErrors.Single().Message.StartsWith("Failed to execute [Setup]"));
@@ -36,15 +41,20 @@ namespace BenchmarkDotNet.Tests
 
         public class FailingSetup
         {
-            [Setup] public void Failing() { throw new Exception("This one fails"); }
+            [Setup]
+            public void Failing()
+            {
+                throw new Exception("This one fails");
+            }
 
-            [Benchmark] public void NonThrowing() { }
+            [Benchmark]
+            public void NonThrowing() { }
         }
 
         [Fact]
         public void MultipleSetupsAreDiscovered()
         {
-            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(MultipleSetups)));
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(MultipleSetups))).ToList();
 
             Assert.NotEmpty(validationErrors);
             Assert.True(validationErrors.Single().Message.StartsWith("Only single [Setup] method is allowed per type"));
@@ -52,11 +62,14 @@ namespace BenchmarkDotNet.Tests
 
         public class MultipleSetups
         {
-            [Setup] public void First() { }
+            [Setup]
+            public void First() { }
 
-            [Setup] public void Second() { }
+            [Setup]
+            public void Second() { }
 
-            [Benchmark] public void NonThrowing() { }
+            [Benchmark]
+            public void NonThrowing() { }
         }
 
         [Fact]
@@ -71,16 +84,25 @@ namespace BenchmarkDotNet.Tests
 
         public class BaseClassWithThrowingSetup
         {
-            [Setup] public virtual void Setup() { throw new Exception("should not be executed when overridden"); }
+            [Setup]
+            public virtual void Setup()
+            {
+                throw new Exception("should not be executed when overridden");
+            }
 
-            [Benchmark] public void NonThrowing() { }
+            [Benchmark]
+            public void NonThrowing() { }
         }
 
         public class OverridesSetup : BaseClassWithThrowingSetup
         {
             public static bool WasCalled;
 
-            [Setup] public override void Setup() { WasCalled = true; }
+            [Setup]
+            public override void Setup()
+            {
+                WasCalled = true;
+            }
         }
 
         [Fact]
@@ -93,15 +115,15 @@ namespace BenchmarkDotNet.Tests
 
         public class SetupThatRequiresParamsToBeSetFirst
         {
-            [Params(100)] public int Field;
+            [Params(100)]
+            [UsedImplicitly]
+            public int Field;
 
             [Setup]
             public void Failing()
             {
                 if (Field == default(int))
-                {
                     throw new Exception("this should have never happened");
-                }
             }
 
             [Benchmark]
@@ -111,7 +133,9 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void MissingParamsAttributeThatMakesSetupsFailAreDiscovered()
         {
-            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(FailingSetupWhichShouldHaveHadParamsForField)));
+            var validationErrors = ExecutionValidator.FailOnError
+                .Validate(BenchmarkConverter.TypeToBenchmarks(typeof(FailingSetupWhichShouldHaveHadParamsForField)))
+                .ToList();
 
             Assert.NotEmpty(validationErrors);
             Assert.True(validationErrors.Single().Message.StartsWith("Failed to execute [Setup]"));
@@ -119,15 +143,14 @@ namespace BenchmarkDotNet.Tests
 
         public class FailingSetupWhichShouldHaveHadParamsForField
         {
+            [UsedImplicitly]
             public int Field;
 
             [Setup]
             public void Failing()
             {
                 if (Field == default(int))
-                {
                     throw new Exception("Field is missing Params attribute");
-                }
             }
 
             [Benchmark]
@@ -137,7 +160,9 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void NonPublicFieldsWithParamsAreDiscovered()
         {
-            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(NonPublicFieldWithParams)));
+            var validationErrors = ExecutionValidator.FailOnError
+                .Validate(BenchmarkConverter.TypeToBenchmarks(typeof(NonPublicFieldWithParams)))
+                .ToList();
 
             Assert.NotEmpty(validationErrors);
             Assert.True(validationErrors.Single().Message.StartsWith("Fields marked with [Params] must be public"));
@@ -146,7 +171,8 @@ namespace BenchmarkDotNet.Tests
         public class NonPublicFieldWithParams
         {
             [Params(1)]
-            internal int Field = 0;
+            [UsedImplicitly]
+            internal int Field;
 
             [Benchmark]
             public void NonThrowing() { }
@@ -155,12 +181,14 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void NonPublicPropertiesWithParamsAreDiscovered()
         {
-            Assert.Throws<InvalidOperationException>(() => ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(NonPublicPropertyWithParams))));
+            Assert.Throws<InvalidOperationException>(
+                () => ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(NonPublicPropertyWithParams))));
         }
 
         public class NonPublicPropertyWithParams
         {
             [Params(1)]
+            [UsedImplicitly]
             internal int Property { get; set; }
 
             [Benchmark]
@@ -170,12 +198,14 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void PropertyWithoutPublicSetterParamsAreDiscovered()
         {
-            Assert.Throws<InvalidOperationException>(() => ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(PropertyWithoutPublicSetterParams))));
+            Assert.Throws<InvalidOperationException>(
+                () => ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(PropertyWithoutPublicSetterParams))));
         }
 
         public class PropertyWithoutPublicSetterParams
         {
             [Params(1)]
+            [UsedImplicitly]
             internal int Property { get; }
 
             [Benchmark]
@@ -191,6 +221,7 @@ namespace BenchmarkDotNet.Tests
         public class FieldsWithoutParamsValues
         {
             [Params]
+            [UsedImplicitly]
             public int FieldWithoutValuesSpecified;
 
             [Benchmark]
@@ -222,7 +253,10 @@ namespace BenchmarkDotNet.Tests
         public class FailingBenchmark
         {
             [Benchmark]
-            public void Throwing() { throw new Exception("This benchmark throws");}
+            public void Throwing()
+            {
+                throw new Exception("This benchmark throws");
+            }
         }
 
         [Fact]
@@ -236,6 +270,7 @@ namespace BenchmarkDotNet.Tests
         public class MultipleParamsAndSingleSetup
         {
             [Params(1, 2)]
+            [UsedImplicitly]
             public int Field;
 
             [Setup]
@@ -244,6 +279,5 @@ namespace BenchmarkDotNet.Tests
             [Benchmark]
             public void NonThrowing() { }
         }
-
     }
 }

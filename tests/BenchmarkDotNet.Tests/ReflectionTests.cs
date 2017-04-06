@@ -1,5 +1,6 @@
 ﻿using System;
 using BenchmarkDotNet.Extensions;
+using JetBrains.Annotations;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests
@@ -17,6 +18,7 @@ namespace BenchmarkDotNet.Tests
             CheckCorrectTypeName("System.IEquatable<T>", typeof(IEquatable<>));
         }
 
+        [AssertionMethod]
         private static void CheckCorrectTypeName(string name, Type type)
         {
             Assert.Equal(name, type.GetCorrectTypeName());

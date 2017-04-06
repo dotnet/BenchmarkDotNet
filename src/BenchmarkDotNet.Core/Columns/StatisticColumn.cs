@@ -39,10 +39,14 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn P95 = new StatisticColumn("P95", s => s.Percentiles.P95, Priority.Percentiles);
         public static readonly IColumn P100 = new StatisticColumn("P100", s => s.Percentiles.P100, Priority.Percentiles);
 
-        public static IColumn CiLower(ConfidenceLevel level) => new StatisticColumn($"CI {level.ToPercent()}% Lower",
-            s => new ConfidenceInterval(s.Mean, s.StandardError, level).Lower, Priority.Additional);
-        public static IColumn CiUpper(ConfidenceLevel level) => new StatisticColumn($"CI {level.ToPercent()}% Upper",
-            s => new ConfidenceInterval(s.Mean, s.StandardError, level).Upper, Priority.Additional);
+        public static IColumn CiLower(ConfidenceLevel level) => new StatisticColumn($"CI{level.ToPercentStr()} Lower",
+            s => new ConfidenceInterval(s.Mean, s.StandardError, s.N, level).Lower, Priority.Additional);
+
+        public static IColumn CiUpper(ConfidenceLevel level) => new StatisticColumn($"CI{level.ToPercentStr()} Upper",
+            s => new ConfidenceInterval(s.Mean, s.StandardError, s.N, level).Upper, Priority.Additional);
+
+        public static IColumn CiError(ConfidenceLevel level) => new StatisticColumn($"CI{level.ToPercentStr()} Error",
+            s => new ConfidenceInterval(s.Mean, s.StandardError, s.N, level).Margin, Priority.Additional);
 
         public static readonly IColumn[] AllStatistics = { Mean, StdErr, StdDev, OperationsPerSecond, Min, Q1, Median, Q3, Max };
 

@@ -1,10 +1,12 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -26,6 +28,9 @@ namespace BenchmarkDotNet.Diagnosers
         public void AfterSetup(Process process, Benchmark benchmark) 
             => diagnosers.ForEach(diagnoser => diagnoser.AfterSetup(process, benchmark));
 
+        public void BeforeMainRun(Process process, Benchmark benchmark) 
+            => diagnosers.ForEach(diagnoser => diagnoser.BeforeMainRun(process, benchmark));
+
         public void BeforeCleanup() => diagnosers.ForEach(diagnoser => diagnoser.BeforeCleanup());
 
         public void ProcessResults(Benchmark benchmark, BenchmarkReport report)
@@ -42,5 +47,8 @@ namespace BenchmarkDotNet.Diagnosers
                 logger.WriteLine();
             }
         }
+
+        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) 
+            => diagnosers.SelectMany(diagnoser => diagnoser.Validate(validationParameters));
     }
 }

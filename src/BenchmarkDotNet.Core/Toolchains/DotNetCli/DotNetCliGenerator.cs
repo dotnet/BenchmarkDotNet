@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return false;
         }
 
-        protected override void Cleanup(ArtifactsPaths artifactsPaths)
+        protected override void Cleanup(Benchmark benchmark, ArtifactsPaths artifactsPaths)
         {
             if (!Directory.Exists(artifactsPaths.BuildArtifactsDirectoryPath))
             {
@@ -101,7 +101,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        protected override void CopyAllRequiredFiles(ArtifactsPaths artifactsPaths)
+        protected override void CopyAllRequiredFiles(Benchmark benchmark, ArtifactsPaths artifactsPaths)
         {
             if (!Directory.Exists(artifactsPaths.BinariesDirectoryPath))
             {

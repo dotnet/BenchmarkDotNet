@@ -1,16 +1,19 @@
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Validators;
 using Microsoft.Diagnostics.Tracing.Parsers;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
     public abstract class JitDiagnoser : EtwDiagnoser<object>, IDiagnoser
     {
-        protected override ClrTraceEventParser.Keywords EventType => ClrTraceEventParser.Keywords.JitTracing;
+        protected override ulong EventType => (ulong)ClrTraceEventParser.Keywords.JitTracing;
 
         protected override string SessionNamePrefix => "JitTracing";
 
@@ -20,9 +23,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public void AfterSetup(Process process, Benchmark benchmark) { }
 
+        public void BeforeMainRun(Process process, Benchmark benchmark) { }
+
         public void BeforeCleanup() => Stop();
 
         public virtual void ProcessResults(Benchmark benchmark, BenchmarkReport report) { }
+
+        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Enumerable.Empty<ValidationError>();
 
         public void DisplayResults(ILogger outputLogger)
         {

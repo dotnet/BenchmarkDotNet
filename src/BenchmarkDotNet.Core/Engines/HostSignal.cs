@@ -4,6 +4,7 @@
     {
         BeforeAnythingElse,
         AfterSetup,
+        BeforeMainRun,
         BeforeCleanup,
         AfterAnythingElse
     }

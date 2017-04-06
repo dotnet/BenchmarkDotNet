@@ -29,13 +29,13 @@ namespace BenchmarkDotNet.Running
                 if (string.IsNullOrWhiteSpace(benchmarkContent))
                 {
                     logger.WriteLineHint($"content of '{url}' is empty.");
-                    return new Benchmark[0];
+                    return Array.Empty<Benchmark>();
                 }
             }
             catch (Exception e)
             {
                 logger.WriteLineError("BuildException: " + e.Message);
-                return new Benchmark[0];
+                return Array.Empty<Benchmark>();
             }
             return SourceToBenchmarks(benchmarkContent, config);
         }
@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Running
                 var logger = config?.GetCompositeLogger() ?? HostEnvironmentInfo.FallbackLogger;
     
                 compilerResults.Errors.Cast<CompilerError>().ToList().ForEach(error => logger.WriteLineError(error.ErrorText));
-                return new Benchmark[0];
+                return Array.Empty<Benchmark>();
             }
             return (
                 from type in compilerResults.CompiledAssembly.GetTypes()

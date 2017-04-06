@@ -5,6 +5,7 @@ using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using JetBrains.Annotations;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Mocks
@@ -14,6 +15,7 @@ namespace BenchmarkDotNet.Tests.Mocks
         private readonly ITestOutputHelper output;
         private readonly Func<IterationData, TimeInterval> measure;
 
+        // ReSharper disable once NotNullMemberIsNotInitialized
         public MockEngine(ITestOutputHelper output, Job job, Func<IterationData, TimeInterval> measure)
         {
             this.output = output;
@@ -21,15 +23,25 @@ namespace BenchmarkDotNet.Tests.Mocks
             TargetJob = job;
         }
 
+        [UsedImplicitly]
         public IHost Host { get; }
 
-        public Job TargetJob { get; set; }
-        public long OperationsPerInvoke { get; set; } = 1;
+        public Job TargetJob { get; }
+        public long OperationsPerInvoke { get; } = 1;
+
+        [UsedImplicitly]
         public Action SetupAction { get; set; }
+
+        [UsedImplicitly]
         public Action CleanupAction { get; set; }
+
+        [UsedImplicitly]
         public bool IsDiagnoserAttached { get; set; }
-        public Action<long> MainAction { get;  } = _ => { };
+
+        public Action<long> MainAction { get; } = _ => { };
         public Action<long> IdleAction { get; } = _ => { };
+
+        [UsedImplicitly]
         public IEngineFactory Factory => null;
 
         public Measurement RunIteration(IterationData data)

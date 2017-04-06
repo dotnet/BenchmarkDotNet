@@ -80,6 +80,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     diagnoser?.AfterSetup(currentProcess, benchmark);
                     WriteLine(Engine.Signals.AfterSetup);
                     break;
+                case HostSignal.BeforeMainRun:
+                    diagnoser?.BeforeMainRun(currentProcess, benchmark);
+                    WriteLine(Engine.Signals.BeforeMainRun);
+                    break;
                 case HostSignal.BeforeCleanup:
                     diagnoser?.BeforeCleanup();
                     WriteLine(Engine.Signals.BeforeCleanup);

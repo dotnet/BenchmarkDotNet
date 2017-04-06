@@ -1,8 +1,10 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -21,6 +23,11 @@ namespace BenchmarkDotNet.Diagnosers
         void AfterSetup(Process process, Benchmark benchmark);
 
         /// <summary>
+        /// after setup, warmup and pilot but before the main run
+        /// </summary>
+        void BeforeMainRun(Process process, Benchmark benchmark);
+
+        /// <summary>
         /// after run, before cleanup
         /// </summary>
         void BeforeCleanup();
@@ -28,5 +35,7 @@ namespace BenchmarkDotNet.Diagnosers
         void ProcessResults(Benchmark benchmark, BenchmarkReport report);
 
         void DisplayResults(ILogger logger);
+
+        IEnumerable<ValidationError> Validate(ValidationParameters validationParameters);
     }
 }

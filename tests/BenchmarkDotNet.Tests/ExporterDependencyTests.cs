@@ -38,6 +38,7 @@ namespace BenchmarkDotNet.Tests
 
         public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger) => Enumerable.Empty<string>();
 
+        public string Name => nameof(TestExporter);
         public void ExportToLog(Summary summary, ILogger logger) { }
     }
 
@@ -47,6 +48,7 @@ namespace BenchmarkDotNet.Tests
 
         public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger) => Enumerable.Empty<string>();
 
+        public string Name => nameof(TestExporterDependency);
         public void ExportToLog(Summary summary, ILogger logger) { }
     }
 }

@@ -16,6 +16,7 @@ namespace BenchmarkDotNet.Exporters
     public class RPlotExporter : IExporter, IExporterDependencies
     {
         public static readonly IExporter Default = new RPlotExporter();
+        public string Name => nameof(RPlotExporter);
 
         private static object buildScriptLock = new object();
 
@@ -39,9 +40,9 @@ namespace BenchmarkDotNet.Exporters
             lock (buildScriptLock)
                 File.WriteAllText(scriptFullPath, script);
 
-            var rscriptExecutable = RuntimeInformation.IsWindows() ? "Rscript.exe" : "Rscript";
+            string rscriptExecutable = RuntimeInformation.IsWindows() ? "Rscript.exe" : "Rscript";
             string rscriptPath;
-            var rHome = Environment.GetEnvironmentVariable("R_HOME");
+            string rHome = Environment.GetEnvironmentVariable("R_HOME");
             if (rHome != null)
             {
                 rscriptPath = Path.Combine(rHome, "bin", rscriptExecutable);
@@ -81,7 +82,7 @@ namespace BenchmarkDotNet.Exporters
             throw new NotSupportedException();
         }
 
-        static string FindInPath(string name) => Environment.GetEnvironmentVariable("PATH")
+        private static string FindInPath(string name) => Environment.GetEnvironmentVariable("PATH")
             .Split(Path.PathSeparator)
             .Select(p => Path.Combine(p, name))
             .FirstOrDefault(File.Exists);

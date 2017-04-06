@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿using System;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
@@ -49,7 +50,7 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 logger.WriteLine("Executing");
                 Done = true;
-                return new ExecuteResult(true, 0, new string[0], new string[0]);
+                return new ExecuteResult(true, 0, Array.Empty<string>(), Array.Empty<string>());
             }
         }
 

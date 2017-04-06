@@ -12,7 +12,7 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
-#if CLASSIC
+#if !CORE
 using System.Management;
 
 #endif
@@ -37,8 +37,7 @@ namespace BenchmarkDotNet.Portability
         internal static bool IsWindows()
         {
 #if CLASSIC
-            return new[] { PlatformID.Win32NT, PlatformID.Win32S, PlatformID.Win32Windows, PlatformID.WinCE }
-                .Contains(System.Environment.OSVersion.Platform);
+            return System.Environment.OSVersion.Platform.ToString().Contains("Win");
 #else
             return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 #endif
@@ -66,42 +65,17 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetOsVersion()
         {
-#if UAP
-            return "Windows";
-#else
-            if (IsLinux())
-            {
-                string os = ExternalToolsHelper.LsbRelease.Value.GetValueOrDefault("Description");
-                if (!string.IsNullOrWhiteSpace(os))
-                    return os;
-            }
-#if !CORE
-            return System.Environment.OSVersion.ToString();
-#else
-            if (IsWindows())
-            {
-                string ver = ProcessHelper.RunAndReadOutput("cmd", "/c ver");
-                if (ver != null)
-                    return NiceString(ver.Replace("[", "").Replace("]", "").Replace("Version", ""));
-                return "Windows";
-            }
-            if (IsLinux())
-            {
-                return "Linux";
-            }
-            if (IsMacOSX())
-            {
-                return "OSX";
-            }
-
-            return Unknown;
+#if CLASSIC
+            if (IsMono())
+                return System.Environment.OSVersion.ToString();
 #endif
-#endif
+            return $"{Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem} {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion}";
         }
 
         internal static string GetProcessorName()
         {
-#if CLASSIC
+            string NiceString(string processorName) => Regex.Replace(processorName.Replace("@", "").Trim(), @"\s+", " ");
+#if !CORE
             if (IsWindows() && !IsMono())
             {
                 try
@@ -118,7 +92,6 @@ namespace BenchmarkDotNet.Portability
                 }
             }
 #endif
-#if !UAP
             if (IsWindows())
                 return NiceString(ExternalToolsHelper.Wmic.Value.GetValueOrDefault("Name") ?? "");
 
@@ -127,12 +100,13 @@ namespace BenchmarkDotNet.Portability
 
             if (IsMacOSX())
                 return NiceString(ExternalToolsHelper.Sysctl.Value.GetValueOrDefault("machdep.cpu.brand_string") ?? "");
-#endif
+
             return Unknown;
         }
 
         internal static string GetRuntimeVersion()
         {
+#if CLASSIC
             if (IsMono())
             {
                 var monoRuntimeType = Type.GetType("Mono.Runtime");
@@ -145,24 +119,19 @@ namespace BenchmarkDotNet.Portability
                         int bracket1 = version.IndexOf('('), bracket2 = version.IndexOf(')');
                         if (bracket1 != -1 && bracket2 != -1)
                         {
-                            string comment = version.Substring(bracket1 + 1, bracket2 - bracket1 - 1);                            
+                            string comment = version.Substring(bracket1 + 1, bracket2 - bracket1 - 1);
                             var commentParts = comment.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                             if (commentParts.Length > 2)
                                 version = version.Substring(0, bracket1) + "(" + commentParts[0] + " " + commentParts[1] + ")";
                         }
-                    }                    
+                    }
                     return "Mono " + version;
                 }
             }
-#if CLASSIC
+
             return $"Clr {System.Environment.Version}";
-#elif CORE
+#else
             return System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
-#elif UAP
-            // System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription throws on UWP release build.
-            // https://github.com/dotnet/corefx/issues/16769
-            var attr = typeof(object).GetTypeInfo().Assembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute)).OfType<AssemblyFileVersionAttribute>().FirstOrDefault();
-            return $".NET Native {attr.Version}"; 
 #endif
         }
 
@@ -172,8 +141,6 @@ namespace BenchmarkDotNet.Portability
             return IsMono() ? Runtime.Mono : Runtime.Clr;
 #elif CORE
             return Runtime.Core;
-#elif UAP
-            return Runtime.Uap;
 #endif
         }
 
@@ -181,7 +148,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static IEnumerable<JitModule> GetJitModules()
         {
-#if CLASSIC
+#if !CORE
             return
                 Process.GetCurrentProcess().Modules
                     .OfType<ProcessModule>()
@@ -194,7 +161,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetJitModulesInfo()
         {
-#if CLASSIC
+#if !CORE
             return string.Join(";", GetJitModules().Select(m => m.Name + "-v" + m.Version));
 #else
             return Unknown; // TODO: verify if it is possible to get this for CORE
@@ -203,7 +170,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static bool HasRyuJit()
         {
-#if !CLASSIC
+#if CORE
             return true;
 #else
             return !IsMono()
@@ -222,7 +189,7 @@ namespace BenchmarkDotNet.Portability
         {
             if (IsMono())
                 return ""; // There is no helpful information about JIT on Mono
-#if !CLASSIC
+#if CORE
             // For now, we can say that CoreCLR supports only RyuJIT because we allow our users to run only x64 benchmark for Core.
             // However if we enable 32bit support for .NET Core 1.1 it won't be true, because right now .NET Core is using Legacy Jit for 32bit.
             // And 32bit .NET Core has support for Windows now only.
@@ -248,65 +215,25 @@ namespace BenchmarkDotNet.Portability
 
         internal static IntPtr GetCurrentAffinity()
         {
-            IntPtr ret = default(IntPtr);
-#if !UAP
             try
             {
-                ret = Process.GetCurrentProcess().ProcessorAffinity;
+                return Process.GetCurrentProcess().ProcessorAffinity;
             }
             catch (PlatformNotSupportedException)
             {
+                return default(IntPtr);
             }
-#endif
-            return ret;
         }
 
         internal static string GetConfiguration()
         {
-            string ret = Unknown;
-#if !UAP
             bool? isDebug = Assembly.GetEntryAssembly().IsDebug();
-            if (isDebug.HasValue == true)
+            if (isDebug.HasValue == false)
             {
-                ret = isDebug.Value ? DebugConfigurationName : ReleaseConfigurationName; ;
+                return Unknown;
             }
-#endif
-            return ret;
+            return isDebug.Value ? DebugConfigurationName : ReleaseConfigurationName;
         }
-
-        internal static string GetDotNetCliRuntimeIdentifier()
-        {
-#if !CLASSIC
-            return Microsoft.DotNet.InternalAbstractions.RuntimeEnvironment.GetRuntimeIdentifier();
-#else
-// the Microsoft.DotNet.InternalAbstractions has no .NET 4.0 support, so we have to build it on our own
-// code based on https://github.com/dotnet/cli/blob/f8631fa4b731d4c903dbe8b0b5e5332eee40ecae/src/Microsoft.DotNet.InternalAbstractions/RuntimeEnvironment.cs
-            var version = System.Environment.OSVersion.Version;
-            if (version.Major == 6)
-            {
-                if (version.Minor == 1)
-                {
-                    return "win7-x64";
-                }
-                else if (version.Minor == 2)
-                {
-                    return "win8-x64";
-                }
-                else if (version.Minor == 3)
-                {
-                    return "win81-x64";
-                }
-            }
-            else if (version.Major == 10 && version.Minor == 0)
-            {
-                return "win10-x64";
-            }
-
-            return string.Empty; // Unknown version
-#endif
-        }
-
-        private static string NiceString(string processorName) => Regex.Replace(processorName.Replace("@", "").Trim(), @"\s+", " ");
 
         // See http://aakinshin.net/en/blog/dotnet/jit-version-determining-in-runtime/
         private class JitHelper

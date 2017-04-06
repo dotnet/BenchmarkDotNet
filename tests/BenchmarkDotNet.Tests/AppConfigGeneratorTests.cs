@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void RewritesCutomSettings()
         {
-            string customSettings =
+            const string customSettings =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<!--" +
                 "commentsAreSupported" +
@@ -76,7 +76,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(Jit.RyuJit, "<runtime><useLegacyJit enabled=\"0\" /></runtime>")]
         public void GeneratesRightJitSettings(Jit jit, string expectedRuntimeNode)
         {
-            string customSettings =
+            const string customSettings =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<configuration>" +
                 "<someConfig>withItsValue</someConfig>" +
@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.Tests
             using (var source = new StringReader(customSettings))
             using (var destination = new Utf8StringWriter())
             {
-                AppConfigGenerator.Generate(new Job { Env = { Jit = jit }}.Freeze(), source, destination, Resolver);
+                AppConfigGenerator.Generate(new Job { Env = { Jit = jit } }.Freeze(), source, destination, Resolver);
 
                 AssertAreEqualIgnoringWhitespacesAndCase(customSettingsAndJit, destination.ToString());
             }
@@ -101,7 +101,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void RewritesCutomAssemblyBindingRedirects()
         {
-            string settingsWithBindings =
+            const string settingsWithBindings =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<configuration>" +
                 "<runtime>" +
@@ -114,7 +114,7 @@ namespace BenchmarkDotNet.Tests
                 "</runtime>" +
                 "</configuration>";
 
-            string settingsWithBindingsAndJit =
+            const string settingsWithBindingsAndJit =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<configuration>" +
                 "<runtime>" +
@@ -137,10 +137,10 @@ namespace BenchmarkDotNet.Tests
             }
         }
 
-        private void AssertAreEqualIgnoringWhitespacesAndCase(string expectedXml, string actualXml)
+        private static void AssertAreEqualIgnoringWhitespacesAndCase(string expectedXml, string actualXml)
         {
-            var expected = RemoveWhiteSpaces(expectedXml);
-            var actual = RemoveWhiteSpaces(actualXml);
+            string expected = RemoveWhiteSpaces(expectedXml);
+            string actual = RemoveWhiteSpaces(actualXml);
 
             Assert.Equal(expected, actual, StringComparer.OrdinalIgnoreCase);
         }
@@ -149,7 +149,6 @@ namespace BenchmarkDotNet.Tests
         {
             var buffer = new StringBuilder(input.Length);
             foreach (char character in input)
-            {
                 switch (character)
                 {
                     case '\r':
@@ -161,7 +160,6 @@ namespace BenchmarkDotNet.Tests
                         buffer.Append(character);
                         break;
                 }
-            }
             return buffer.ToString();
         }
     }

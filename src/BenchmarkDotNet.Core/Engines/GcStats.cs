@@ -10,6 +10,8 @@ namespace BenchmarkDotNet.Engines
 
         private static readonly Func<long> getAllocatedBytesForCurrentThread = GetAllocatedBytesForCurrentThread();
 
+        public static readonly GcStats Empty = new GcStats(0, 0, 0, 0, 0);
+
         private GcStats(int gen0Collections, int gen1Collections, int gen2Collections, long allocatedBytes, long totalOperations)
         {
             Gen0Collections = gen0Collections;

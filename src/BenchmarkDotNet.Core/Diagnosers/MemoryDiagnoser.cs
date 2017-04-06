@@ -10,6 +10,7 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -31,6 +32,7 @@ namespace BenchmarkDotNet.Diagnosers
         // the action takes places in other process, and the values are gathered by Engine
         public void BeforeAnythingElse(Process process, Benchmark benchmark) { }
         public void AfterSetup(Process process, Benchmark benchmark) { }
+        public void BeforeMainRun(Process process, Benchmark benchmark) { }
         public void BeforeCleanup() { }
 
         public void DisplayResults(ILogger logger)
@@ -38,6 +40,8 @@ namespace BenchmarkDotNet.Diagnosers
 
         public void ProcessResults(Benchmark benchmark, BenchmarkReport report) 
             => results.Add(benchmark, report.GcStats);
+
+        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Enumerable.Empty<ValidationError>();
 
         public class AllocationColumn : IColumn
         {

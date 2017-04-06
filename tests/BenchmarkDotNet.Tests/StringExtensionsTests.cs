@@ -9,10 +9,8 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void AsValidFileNameReplacesAllInvalidFileNameCharactersWithTheirRepresentation()
         {
-            foreach (var invalidPathChar in Path.GetInvalidFileNameChars())
-            {
-                Assert.Equal($"char{(short)invalidPathChar}", invalidPathChar.ToString().AsValidFileName());
-            }
+            foreach (char invalidPathChar in Path.GetInvalidFileNameChars())
+                Assert.Equal($"char{(short) invalidPathChar}", invalidPathChar.ToString().AsValidFileName());
         }
 
         [Fact]

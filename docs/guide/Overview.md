@@ -4,8 +4,8 @@
 
 Create new console application and install the [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/) NuGet package. We support:
 
-* *Projects:* `*.csproj`, `*.xproj`/`project.json`
-* *Runtimes:* Full .NET Framework, .NET Core, Mono
+* *Projects:* `*.csproj` (classic and modern with PackageReferences), `*.xproj`/`project.json`
+* *Runtimes:* Full .NET Framework (4.6+), .NET Core (1.1+), Mono
 * *OS:* Windows, Linux, MacOS
 * *Languages:* C#, F#, VB
 

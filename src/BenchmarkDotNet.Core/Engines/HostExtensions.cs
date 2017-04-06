@@ -16,6 +16,9 @@ namespace BenchmarkDotNet.Engines
         public static void AfterSetup(this IHost host) =>
             host.SendSignal(HostSignal.AfterSetup);
 
+        public static void BeforeMainRun(this IHost host) =>
+            host.SendSignal(HostSignal.BeforeMainRun);
+
         public static void BeforeCleanup(this IHost host) =>
             host.SendSignal(HostSignal.BeforeCleanup);
 

@@ -162,11 +162,10 @@ namespace BenchmarkDotNet.Running
                 if (!buildResult.IsBuildSuccess)
                     return new BenchmarkReport(benchmark, generateResult, buildResult, null, null, default(GcStats));
 
-                var gcStats = default(GcStats);
-                var executeResults = Execute(logger, benchmark, toolchain, buildResult, config, resolver, out gcStats);
+                var executeResults = Execute(logger, benchmark, toolchain, buildResult, config, resolver, out GcStats gcStats);
 
                 var runs = new List<Measurement>();
-                
+
                 for (int index = 0; index < executeResults.Count; index++)
                 {
                     var executeResult = executeResults[index];
@@ -174,6 +173,11 @@ namespace BenchmarkDotNet.Running
                 }
 
                 return new BenchmarkReport(benchmark, generateResult, buildResult, executeResults, runs, gcStats);
+            }
+            catch (Exception e)
+            {
+                logger.WriteLineError("// Exception: " + e);
+                return new BenchmarkReport(benchmark, generateResult, BuildResult.Failure(generateResult, e), new List<ExecuteResult>(), new List<Measurement>(), GcStats.Empty);
             }
             finally
             {
@@ -291,6 +295,10 @@ namespace BenchmarkDotNet.Running
                 if (!executeResult.FoundExecutable)
                     logger.WriteLineError("Executable not found");
                 logger.WriteLine();
+            }
+            else if (!benchmark.Job.Diagnoser.HardwareCounters.IsNullOrEmpty())
+            {
+                logger.WriteLineError("Hardware Counters are not supported for your current platform yet");
             }
 
             return executeResults;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 
@@ -6,32 +7,106 @@ namespace BenchmarkDotNet.Mathematics
 {
     public enum ConfidenceLevel
     {
-        L70, L75, L80, L85, L90, L92, L95, L96, L98, L99
+        /// <summary>
+        /// 50.0% confidence interval
+        /// </summary>
+        L50,
+
+        /// <summary>
+        /// 70.0% confidence interval
+        /// </summary>
+        L70,
+
+        /// <summary>
+        /// 75.0% confidence interval
+        /// </summary>
+        L75,
+
+        /// <summary>
+        /// 80.0% confidence interval
+        /// </summary>
+        L80,
+
+        /// <summary>
+        /// 85.0% confidence interval
+        /// </summary>
+        L85,
+
+        /// <summary>
+        /// 90.0% confidence interval
+        /// </summary>
+        L90,
+
+        /// <summary>
+        /// 92.0% confidence interval
+        /// </summary>
+        L92,
+
+        /// <summary>
+        /// 95.0% confidence interval
+        /// </summary>
+        L95,
+
+        /// <summary>
+        /// 96.0% confidence interval
+        /// </summary>
+        L96,
+
+        /// <summary>
+        /// 97.0% confidence interval
+        /// </summary>
+        L97,
+
+        /// <summary>
+        /// 98.0% confidence interval
+        /// </summary>
+        L98,
+
+        /// <summary>
+        /// 99.0% confidence interval
+        /// </summary>
+        L99,
+
+        /// <summary>
+        /// 99.9% confidence interval
+        /// </summary>
+        L999
     }
 
     public static class ConfidenceLevelExtensions
     {
-        public static int ToPercent(this ConfidenceLevel level) => int.Parse(level.ToString().Substring(1));
+        /// <summary>
+        /// Calculates Z value (z-star) for confidence interval
+        /// </summary>
+        /// <param name="level">ConfidenceLevel for a confidence interval</param>
+        /// <param name="n">Sample size (n >= 3)</param>
+        public static double GetZValue(this ConfidenceLevel level, int n)
+        {
+            if (n <= 2)
+                throw new ArgumentOutOfRangeException(nameof(n), "n should be >= 3");
+            return MathHelper.InverseStudent(1 - level.ToPercent(), n - 1);
+        }
+
+        public static string ToPercentStr(this ConfidenceLevel level)
+        {
+            string s = level.ToString().Substring(1);
+            if (s.Length > 2)
+                s = s.Substring(0, 2) + "." + s.Substring(2);
+            return s + "%";
+        }
+
+        public static double ToPercent(this ConfidenceLevel level)
+        {
+            string s = level.ToString().Substring(1);
+            return int.Parse(s) / Math.Pow(10, s.Length);
+        }
     }
 
     public class ConfidenceInterval
     {
-        private static readonly Dictionary<ConfidenceLevel, double> ZValues = new Dictionary<ConfidenceLevel, double>
-        {
-            [ConfidenceLevel.L70] = 1.04,
-            [ConfidenceLevel.L75] = 1.15,
-            [ConfidenceLevel.L80] = 1.28,
-            [ConfidenceLevel.L85] = 1.44,
-            [ConfidenceLevel.L90] = 1.645,
-            [ConfidenceLevel.L92] = 1.75,
-            [ConfidenceLevel.L95] = 1.96,
-            [ConfidenceLevel.L96] = 2.05,
-            [ConfidenceLevel.L98] = 2.33,
-            [ConfidenceLevel.L99] = 2.58
-        };
-
+        public int N { get; }
         public double Mean { get; }
-        public double Error { get; }
+        public double StandardError { get; }
 
         public ConfidenceLevel Level { get; }
         public double Margin { get; }
@@ -39,19 +114,21 @@ namespace BenchmarkDotNet.Mathematics
         public double Lower { get; }
         public double Upper { get; }
 
-        public ConfidenceInterval(double mean, double error, ConfidenceLevel level = ConfidenceLevel.L95)
+        public ConfidenceInterval(double mean, double standardError, int n, ConfidenceLevel level = ConfidenceLevel.L999)
         {
             Mean = mean;
-            Error = error;
+            StandardError = standardError;
             Level = level;
-            Margin = error * ZValues[level];
+            Margin = n <= 2 ? double.NaN : standardError * level.GetZValue(n);
             Lower = mean - Margin;
             Upper = mean + Margin;
         }
 
         public bool Contains(double value) => Lower < value && value < Upper;
 
-        public string ToStr(bool showLevel = true) => $"[{Lower.ToStr()}; {Upper.ToStr()}] (CI {Level.ToPercent()}%)";
-        public string ToTimeStr(TimeUnit unit = null, bool showLevel = true) => $"[{Lower.ToTimeStr(unit)}; {Upper.ToTimeStr(unit)}] (CI {Level.ToPercent()}%)";
+        public string ToStr(bool showLevel = true) => $"[{Lower.ToStr()}; {Upper.ToStr()}] (CI {Level.ToPercentStr()})";
+
+        public string ToTimeStr(TimeUnit unit = null, bool showLevel = true) =>
+            $"[{Lower.ToTimeStr(unit)}; {Upper.ToTimeStr(unit)}] (CI {Level.ToPercentStr()})";
     }
 }

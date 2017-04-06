@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
@@ -25,29 +26,33 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             new GCCollectionColumn(results, 2),
             new AllocationColumn(results));
 
-        protected override ClrTraceEventParser.Keywords EventType => ClrTraceEventParser.Keywords.GC;
+        protected override ulong EventType => (ulong)ClrTraceEventParser.Keywords.GC;
 
         protected override string SessionNamePrefix => "GC";
 
         public void BeforeAnythingElse(Process process, Benchmark benchmark) { }
 
-        public void AfterSetup(Process process, Benchmark benchmark) => Start(process, benchmark);
+        public void AfterSetup(Process process, Benchmark benchmark) { }
+
+        public void BeforeMainRun(Process process, Benchmark benchmark) => Start(process, benchmark);
 
         public void BeforeCleanup() => Stop();
 
         public void ProcessResults(Benchmark benchmark, BenchmarkReport report)
         {
-            var stats = ProcessEtwEvents(report.AllMeasurements.Sum(m => m.Operations));
+            var stats = ProcessEtwEvents(benchmark, report.AllMeasurements.Sum(m => m.Operations));
             results.Add(benchmark, stats);
         }
 
         public void DisplayResults(ILogger logger) { }
 
-        private Stats ProcessEtwEvents(long totalOperations)
+        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Enumerable.Empty<ValidationError>();
+
+        private Stats ProcessEtwEvents(Benchmark benchmark, long totalOperations)
         {
-            if (ProcessIdsUsedInRuns.Count > 0)
+            if (BenchmarkToProcess.Count > 0)
             {
-                var processToReport = ProcessIdsUsedInRuns[0];
+                var processToReport = BenchmarkToProcess[benchmark];
                 Stats stats;
                 if (StatsPerProcess.TryGetValue(processToReport, out stats))
                 {

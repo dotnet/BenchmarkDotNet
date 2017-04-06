@@ -8,7 +8,8 @@ namespace BenchmarkDotNet.Validators
         private static readonly IValidator[] MandatoryValidators = 
         {
             BaselineValidator.FailOnError,
-            UnrollFactorValidator.Default
+            UnrollFactorValidator.Default,
+            DiagnosersValidator.Default
         };
 
         internal readonly IValidator[] Validators;

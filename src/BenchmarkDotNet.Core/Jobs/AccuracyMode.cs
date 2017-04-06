@@ -1,8 +1,6 @@
-﻿using System;
-using BenchmarkDotNet.Characteristics;
+﻿using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Horology;
 
-// ReSharper disable once CheckNamespace
 namespace BenchmarkDotNet.Jobs
 {
     public sealed class AccuracyMode : JobMode<AccuracyMode>
@@ -21,26 +19,31 @@ namespace BenchmarkDotNet.Jobs
             get { return MaxStdErrRelativeCharacteristic[this]; }
             set { MaxStdErrRelativeCharacteristic[this] = value; }
         }
+
         public TimeInterval MinIterationTime
         {
             get { return MinIterationTimeCharacteristic[this]; }
             set { MinIterationTimeCharacteristic[this] = value; }
         }
+
         public int MinInvokeCount
         {
             get { return MinInvokeCountCharacteristic[this]; }
             set { MinInvokeCountCharacteristic[this] = value; }
         }
+
         public bool EvaluateOverhead
         {
             get { return EvaluateOverheadCharacteristic[this]; }
             set { EvaluateOverheadCharacteristic[this] = value; }
         }
+
         public bool RemoveOutliers
         {
             get { return RemoveOutliersCharacteristic[this]; }
             set { RemoveOutliersCharacteristic[this] = value; }
         }
+
         // TODO: fix typo
         public bool AnalyzeLaunchVariance
         {
