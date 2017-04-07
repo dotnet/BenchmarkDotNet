@@ -296,7 +296,7 @@ namespace BenchmarkDotNet.Running
                     logger.WriteLineError("Executable not found");
                 logger.WriteLine();
             }
-            else if (!benchmark.Job.Diagnoser.HardwareCounters.IsNullOrEmpty())
+            else if (config.GetHardwareCounters().Any())
             {
                 logger.WriteLineError("Hardware Counters are not supported for your current platform yet");
             }

@@ -59,5 +59,7 @@ namespace BenchmarkDotNet.Configs
         public bool KeepBenchmarkFiles => false;
 
         public IEnumerable<IDiagnoser> GetDiagnosers() => Array.Empty<IDiagnoser>();
+
+        public IEnumerable<HardwareCounter> GetHardwareCounters() => Array.Empty<HardwareCounter>();
     }
 }

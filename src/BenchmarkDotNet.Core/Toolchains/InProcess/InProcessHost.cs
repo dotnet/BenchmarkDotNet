@@ -13,7 +13,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
     /// <seealso cref="IHost"/>
     public sealed class InProcessHost : IHost
     {
-
         [NotNull]
         private readonly Benchmark benchmark;
 

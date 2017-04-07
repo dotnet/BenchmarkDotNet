@@ -22,6 +22,7 @@ namespace BenchmarkDotNet.Configs
         private readonly List<IAnalyser> analysers = new List<IAnalyser>();
         private readonly List<IValidator> validators = new List<IValidator>();
         private readonly List<Job> jobs = new List<Job>();
+        private readonly List<HardwareCounter> hardwareCounters = new List<HardwareCounter>();
         private IOrderProvider orderProvider = null;
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
@@ -31,6 +32,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IAnalyser> GetAnalysers() => analysers;
         public IEnumerable<IValidator> GetValidators() => validators;
         public IEnumerable<Job> GetJobs() => jobs;
+        public IEnumerable<HardwareCounter> GetHardwareCounters() => hardwareCounters;
 
         public IOrderProvider GetOrderProvider() => orderProvider;
 
@@ -46,6 +48,7 @@ namespace BenchmarkDotNet.Configs
         public void Add(params IAnalyser[] newAnalysers) => analysers.AddRange(newAnalysers);
         public void Add(params IValidator[] newValidators) => validators.AddRange(newValidators);
         public void Add(params Job[] newJobs) => jobs.AddRange(newJobs.Select(j => j.Freeze())); // DONTTOUCH: please DO NOT remove .Freeze() call.
+        public void Add(params HardwareCounter[] newHardwareCounters) => hardwareCounters.AddRange(newHardwareCounters);
         public void Set(IOrderProvider provider) => orderProvider = provider ?? orderProvider;
 
         public void Add(IConfig config)
@@ -57,13 +60,14 @@ namespace BenchmarkDotNet.Configs
             analysers.AddRange(config.GetAnalysers());
             jobs.AddRange(config.GetJobs());
             validators.AddRange(config.GetValidators());
+            hardwareCounters.AddRange(config.GetHardwareCounters());
             orderProvider = config.GetOrderProvider() ?? orderProvider;
             KeepBenchmarkFiles |= config.KeepBenchmarkFiles;
         }
 
         public IEnumerable<IDiagnoser> GetDiagnosers()
         {
-            if (jobs.All(job => job.Diagnoser.HardwareCounters.IsNullOrEmpty()))
+            if (hardwareCounters.IsEmpty())
                 return diagnosers;
 
             var hardwareCountersDiagnoser = DiagnosersLoader.LazyLoadedDiagnosers.Value

@@ -131,26 +131,32 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
         {
+            if (!validationParameters.Config.GetHardwareCounters().Any())
+            {
+                yield return new ValidationError(true, "No Hardware Counters defined, probably a bug");
+                yield break;
+            }
+
             if (TraceEventSession.IsElevated() != true)
                 yield return new ValidationError(true, "Must be elevated (Admin) to use Hardware Counters to use ETW Kernel Session.");
 
             var availableCpuCounters = TraceEventProfileSources.GetInfo();
-            foreach (var benchmark in validationParameters.Benchmarks
-                .Where(benchmark => !benchmark.Job.Diagnoser.HardwareCounters.IsNullOrEmpty()))
+
+            foreach (var hardwareCounter in validationParameters.Config.GetHardwareCounters())
+            {
+                if (!EtwTranslations.TryGetValue(hardwareCounter, out var counterName))
+                    yield return new ValidationError(true, $"Counter {hardwareCounter} not recognized. Please make sure that you are using counter available on your machine. You can get the list of available counters by running `tracelog.exe -profilesources Help`");
+
+                if (!availableCpuCounters.ContainsKey(counterName))
+                    yield return new ValidationError(true, $"The counter {counterName} is not available. Please make sure you are Windows 8+ without Hyper-V");
+            }
+
+            foreach (var benchmark in validationParameters.Benchmarks)
             {
                 if (benchmark.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic)
                     && benchmark.Job.Infrastructure.Toolchain is InProcessToolchain)
                 {
                     yield return new ValidationError(true, "Hardware Counters are not supported for InProcessToolchain.", benchmark);
-                }
-
-                foreach (var hardwareCounter in benchmark.Job.Diagnoser.HardwareCounters)
-                {
-                    if (!EtwTranslations.TryGetValue(hardwareCounter, out var counterName))
-                        yield return new ValidationError(true, $"Counter {hardwareCounter} not recognized. Please make sure that you are using counter supported on Windows", benchmark);
-
-                    if (!availableCpuCounters.ContainsKey(counterName))
-                        yield return new ValidationError(true, $"The counter {counterName} is not available. Please make sure you are Windows 8+ without Hyper-V", benchmark);
                 }
             }
         }
@@ -218,10 +224,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             private HardwareCounter Counter { get; }
 
             public bool IsAvailable(Summary summary)
-                => summary.Benchmarks.Any(
-                    benchmark =>
-                        !benchmark.Job.Diagnoser.HardwareCounters.IsNullOrEmpty()
-                        && benchmark.Job.Diagnoser.HardwareCounters.Contains(Counter));
+                => summary.Config.GetHardwareCounters().Contains(Counter);
 
             public string GetValue(Summary summary, Benchmark benchmark)
                 => Results.TryGetValue(benchmark, out var stats) && stats.Counters.ContainsKey(Counter)
@@ -246,11 +249,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             private Dictionary<Benchmark, PmcStats> Results { get; }
 
             public bool IsAvailable(Summary summary)
-                => summary.Benchmarks.Any(
-                    benchmark =>
-                        !benchmark.Job.Diagnoser.HardwareCounters.IsNullOrEmpty()
-                        && benchmark.Job.Diagnoser.HardwareCounters.Contains(HardwareCounter.BranchInstructions)
-                        && benchmark.Job.Diagnoser.HardwareCounters.Contains(HardwareCounter.BranchMispredictions));
+                => summary.Config.GetHardwareCounters().Any()
+                        && summary.Config.GetHardwareCounters().Contains(HardwareCounter.BranchInstructions)
+                        && summary.Config.GetHardwareCounters().Contains(HardwareCounter.BranchMispredictions);
 
             public string GetValue(Summary summary, Benchmark benchmark)
                 => Results.TryGetValue(benchmark, out var stats) && stats.Counters.ContainsKey(HardwareCounter.BranchMispredictions) && stats.Counters.ContainsKey(HardwareCounter.BranchInstructions)
