@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Extensions
 {
-    internal static class CommonExtensions
+    public static class CommonExtensions
     {
-        const int BytesInKiloByte = 1000; // 1000 vs 1024 thing..
-
-        static readonly string[] SizeSuffixes = { "B", "kB", "MB", "GB", "TB" };
-
         public static List<T> ToSortedList<T>(this IEnumerable<T> values)
         {
             var list = new List<T>();
@@ -20,24 +18,34 @@ namespace BenchmarkDotNet.Extensions
             return list;
         }
 
-        public static string ToTimeStr(this double value, TimeUnit unit = null, int unitNameWidth = 1)
+        public static string ToTimeStr(this double value, TimeUnit unit = null, int unitNameWidth = 1, bool showUnit = true)
         {
             unit = unit ?? TimeUnit.GetBestTimeUnit(value);
             var unitValue = TimeUnit.Convert(value, TimeUnit.Nanosecond, unit);
-            var unitName = unit.Name.PadLeft(unitNameWidth);
-            return $"{unitValue.ToStr("N4")} {unitName}";
+            if (showUnit)
+            {
+                var unitName = unit.Name.PadLeft(unitNameWidth);
+                return $"{unitValue.ToStr("N4")} {unitName}";
+            }
+            else
+            {
+                return $"{unitValue.ToStr("N4")}";
+            }
         }
 
-        internal static string ToFormattedBytes(this long bytes)
+        public static string ToSizeStr(this long value, SizeUnit unit = null, int unitNameWidth = 1, bool showUnit = true)
         {
-            int i;
-            double dblSByte = bytes;
-            for (i = 0; i < SizeSuffixes.Length && bytes >= BytesInKiloByte; i++, bytes /= BytesInKiloByte)
+            unit = unit ?? SizeUnit.GetBestSizeUnit(value);
+            var unitValue = SizeUnit.Convert(value, SizeUnit.B, unit);
+            if (showUnit)
             {
-                dblSByte = bytes / (double)BytesInKiloByte;
+                var unitName = unit.Name.PadLeft(unitNameWidth);
+                return string.Format(HostEnvironmentInfo.MainCultureInfo, "{0:0.##} {1}", unitValue, unitName);
             }
-
-            return string.Format(HostEnvironmentInfo.MainCultureInfo, "{0:0.##} {1}", dblSByte, SizeSuffixes[i]);
+            else
+            {
+                return string.Format(HostEnvironmentInfo.MainCultureInfo, "{0:0.##}", unitValue);
+            }
         }
 
         public static string ToStr(this double value, string format = "0.##")
@@ -51,6 +59,25 @@ namespace BenchmarkDotNet.Extensions
             // Unfortunately, Mono doesn't have the second overload (with object instead of params object[]).            
             var args = new object[] { value };
             return string.Format(HostEnvironmentInfo.MainCultureInfo, $"{{0:{format}}}", args);
+        }
+
+        /// <summary>
+        /// Gets column title formatted using the specified style
+        /// </summary>
+        public static string GetColumnTitle(this IColumn column, ISummaryStyle style)
+        {
+            if (!style.PrintUnitsInHeader)
+                return column.ColumnName;
+
+            switch (column.UnitType)
+            {
+                case UnitType.Size:
+                    return $"{column.ColumnName} [{style.SizeUnit.Name}]";
+                case UnitType.Time:
+                    return $"{column.ColumnName} [{style.TimeUnit.Name}]";
+                default:
+                    return column.ColumnName;
+            }
         }
 
         public static bool IsNullOrEmpty<T>(this IReadOnlyCollection<T> value) => value == null || value.Count == 0;
