@@ -61,13 +61,10 @@ namespace BenchmarkDotNet.Columns
         }
 
         public string GetValue(Summary summary, Benchmark benchmark)
-        {
-            return Format(summary[benchmark].ResultStatistics, SummaryStyle.Default);
-        }
+            => Format(summary[benchmark].ResultStatistics, SummaryStyle.Default);
+
         public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style)
-        {
-            return Format(summary[benchmark].ResultStatistics, style);
-        }
+            => Format(summary[benchmark].ResultStatistics, style);
 
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;
