@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -19,23 +20,17 @@ namespace BenchmarkDotNet.Running
 
         public BenchmarkSwitcher(Type[] types)
         {
-            typeParser = new TypeParser(types, logger);
+            foreach (var type in types.Where(type => !type.ContainsRunnableBenchmarks()).ToArray())
+            {
+                logger.WriteLineError($"Type {type} is invalid. Only public, non-generic, non-abstract, non-sealed types with public instance [Benchmark] method(s) are supported");
+            }
+
+            typeParser = new TypeParser(types.Where(type => type.ContainsRunnableBenchmarks()).ToArray(), logger);
         }
 
         public BenchmarkSwitcher(Assembly assembly)
         {
-            // Use reflection for a more maintainable way of creating the benchmark switcher,
-            // Benchmarks are listed in namespace order first (e.g. BenchmarkDotNet.Samples.CPU,
-            // BenchmarkDotNet.Samples.IL, etc) then by name, so the output is easy to understand.
-            var types = assembly
-                .GetTypes()
-                .Where(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Public)
-                             .Any(m => m.GetCustomAttributes(true).OfType<BenchmarkAttribute>().Any()))
-                .Where(t => !t.GetTypeInfo().IsGenericType)
-                .OrderBy(t => t.Namespace)
-                .ThenBy(t => t.Name)
-                .ToArray();
-            typeParser = new TypeParser(types, logger);
+            typeParser = new TypeParser(assembly.GetRunnableBenchmarks(), logger);
         }
 
         public static BenchmarkSwitcher FromTypes(Type[] types) => new BenchmarkSwitcher(types);
@@ -92,10 +87,8 @@ namespace BenchmarkDotNet.Running
             return summaries;
         }
 
-        public bool ShouldDisplayOptions(string[] args)
-        {
-            return args.Select(a => a.ToLowerInvariant()).Any(a => a == "--help" || a == "-h");
-        }
+        public bool ShouldDisplayOptions(string[] args) 
+            => args.Select(a => a.ToLowerInvariant()).Any(a => a == "--help" || a == "-h");
 
         private void DisplayOptions()
         {
@@ -120,7 +113,7 @@ namespace BenchmarkDotNet.Running
 
             ManualConfig.PrintOptions(logger, prefixWidth: 30, outputWidth: consoleWidth);
             logger.WriteLine();
-            typeParser.PrintOptions(logger, prefixWidth: 30, outputWidth: consoleWidth);
+            typeParser.PrintOptions(prefixWidth: 30, outputWidth: consoleWidth);
         }
     }
 }

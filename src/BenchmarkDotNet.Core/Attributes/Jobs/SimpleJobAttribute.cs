@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Characteristics;
+﻿using System;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
@@ -6,6 +6,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes.Jobs
 {
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = true)]
     public class SimpleJobAttribute : JobConfigBaseAttribute
     {
         private const int DefaultValue = -1;

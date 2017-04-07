@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
@@ -49,9 +47,7 @@ namespace BenchmarkDotNet.Tests.Mocks
         public class MockBenchmarkClass
         {
             [Benchmark]
-            public void Foo()
-            {
-            }
+            public void Foo() { }
         }
     }
 }

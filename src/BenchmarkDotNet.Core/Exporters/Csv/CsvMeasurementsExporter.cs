@@ -20,13 +20,14 @@ namespace BenchmarkDotNet.Exporters.Csv
 
         private static readonly Lazy<MeasurementColumn[]> Columns = new Lazy<MeasurementColumn[]>(BuildColumns);
 
-        public CsvMeasurementsExporter(CsvSeparator separator = CsvSeparator.CurrentCulture, ISummaryStyle style = null)
+        private readonly CsvSeparator separator;
+        public CsvMeasurementsExporter(CsvSeparator separator, ISummaryStyle style = null)
         {
-            Separator = separator.ToRealSeparator();
+            this.separator = separator;
             Style = style ?? SummaryStyle.Default;
         }
 
-        public string Separator { get; }
+        public string Separator => separator.ToRealSeparator();
 
         protected override string FileExtension => "csv";
 
@@ -38,8 +39,9 @@ namespace BenchmarkDotNet.Exporters.Csv
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
+            string realSeparator = Separator;
             var columns = GetColumns(summary);
-            logger.WriteLine(string.Join(Separator, columns.Select(c => CsvHelper.Escape(c.Title))));
+            logger.WriteLine(string.Join(realSeparator, columns.Select(c => CsvHelper.Escape(c.Title, realSeparator))));
 
             foreach (var report in summary.Reports)
             {
@@ -47,11 +49,11 @@ namespace BenchmarkDotNet.Exporters.Csv
                 {
                     for (int i = 0; i < columns.Length; )
                     {
-                        logger.Write(CsvHelper.Escape(columns[i].GetValue(summary, report, measurement)));
+                        logger.Write(CsvHelper.Escape(columns[i].GetValue(summary, report, measurement), realSeparator));
 
                         if (++i < columns.Length)
                         {
-                            logger.Write(Separator);
+                            logger.Write(realSeparator);
                         }
                     }
                     logger.WriteLine();
@@ -59,7 +61,7 @@ namespace BenchmarkDotNet.Exporters.Csv
             }
         }
 
-        private MeasurementColumn[] GetColumns(Summary summary)
+        private static MeasurementColumn[] GetColumns(Summary summary)
         {
             if (!summary.Config.GetDiagnosers().Contains(MemoryDiagnoser.Default))
                 return Columns.Value;
@@ -75,14 +77,15 @@ namespace BenchmarkDotNet.Exporters.Csv
 
         private static MeasurementColumn[] BuildColumns()
         {
-            var columns = new List<MeasurementColumn>();
-
             // Target
-            columns.Add(new MeasurementColumn("Target", (summary, report, m) => report.Benchmark.Target.Type.Name + "." + report.Benchmark.Target.MethodDisplayInfo));
-            columns.Add(new MeasurementColumn("Target_Namespace", (summary, report, m) => report.Benchmark.Target.Type.Namespace));
-            columns.Add(new MeasurementColumn("Target_Type", (summary, report, m) => report.Benchmark.Target.Type.Name));
-            columns.Add(new MeasurementColumn("Target_Method", (summary, report, m) => report.Benchmark.Target.MethodDisplayInfo));
-
+            var columns = new List<MeasurementColumn>
+            {
+                new MeasurementColumn("Target", (summary, report, m) => report.Benchmark.Target.Type.Name + "." + report.Benchmark.Target.MethodDisplayInfo),
+                new MeasurementColumn("Target_Namespace", (summary, report, m) => report.Benchmark.Target.Type.Namespace),
+                new MeasurementColumn("Target_Type", (summary, report, m) => report.Benchmark.Target.Type.Name),
+                new MeasurementColumn("Target_Method", (summary, report, m) => report.Benchmark.Target.MethodDisplayInfo)
+            };
+            
             // Job
             foreach (var characteristic in CharacteristicHelper.GetAllPresentableCharacteristics(typeof(Job), true))
                 columns.Add(new MeasurementColumn("Job_" + characteristic.Id, (summary, report, m) => Presenter.ToPresentation(report.Benchmark.Job, characteristic)));

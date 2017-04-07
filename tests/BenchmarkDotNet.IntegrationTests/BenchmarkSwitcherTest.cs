@@ -6,8 +6,6 @@ using Xunit;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
-using System;
-using System.Collections.Generic;
 using BenchmarkDotNet.Configs;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -23,12 +21,10 @@ namespace BenchmarkDotNet.IntegrationTests
             var switcher = new BenchmarkSwitcher(types);
 
             // BenchmarkSwitcher only picks up config values via the args passed in, not via class annotations (e.g "[DryConfig]")
-            var results = switcher.Run(new[] { "job=Dry", "class=ClassA,ClassC", "methods=Method4" });
-            Assert.Equal(2, results.Count());
-            Assert.Equal(3, results.SelectMany(r => r.Benchmarks).Count());
-            Assert.True(results.Any(r => r.Benchmarks.Any(b => b.Target.Type.Name == "ClassA" && b.Target.Method.Name == "Method1")));
-            Assert.True(results.Any(r => r.Benchmarks.Any(b => b.Target.Type.Name == "ClassA" && b.Target.Method.Name == "Method2")));
-            Assert.True(results.Any(r => r.Benchmarks.Any(b => b.Target.Type.Name == "ClassB" && b.Target.Method.Name == "Method4")));
+            var results = switcher.Run(new[] { "job=Dry", "class=ClassA,ClassC,ClassB", "methods=Method4" });
+            Assert.Equal(1, results.Count());
+            Assert.Equal(1, results.SelectMany(r => r.Benchmarks).Count());
+            Assert.True(results.All(r => r.Benchmarks.All(b => b.Target.Type.Name == "ClassB" && b.Target.Method.Name == "Method4")));
         }
 
         [Fact]

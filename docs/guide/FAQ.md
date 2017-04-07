@@ -22,3 +22,16 @@ And mark your benchmark class with the following attributes:
 ```cs
 [CoreJob, ClrJob, MonoJob]
 ```
+
+* **Q** My source code targets old versions of .NET Framework or .NET Core, but BenchmarkDotNet requires `net46` and `netcoreapp1.1`. How can I run benchmarks in this case?  
+**A** It's a good practice to introduce an additional console application (e.g. `MyAwesomeLibrary.Benchmarks`) which will depend on your code and BenchmarkDotNet.
+Due to the fact that users usually run benchmarks in a develop environment and don't distribute benchmarks for users, it shouldn't be a problem.
+
+* **Q** I wrote small benchmark, but BenchmarkDotNet requires a lot of time for time measurements. How can I reduce this time?  
+**A** By default, BenchmarkDotNet automatically chooses a number of iterations which allows achieving the best precision.
+If you don't need such level of precision and just want to have a quick way to get approximated results, you can specify all parameters manually.
+For example, you can use the `SimpleJob` or `ShortRunJob` attributes:
+```cs
+[SimpleJob(launchCount: 1, warmupCount: 3, targetCount: 5, invocationCount:100, id: "QuickJob")]
+[ShortRunJob]
+```

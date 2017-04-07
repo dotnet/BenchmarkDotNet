@@ -7,8 +7,8 @@ namespace BenchmarkDotNet.Exporters.Csv
 {
     public class CsvExporter : ExporterBase
     {
-        private readonly string separator;
         private readonly ISummaryStyle style;
+        private readonly CsvSeparator separator;
         protected override string FileExtension => "csv";
 
         public static readonly IExporter Default = new CsvExporter(CsvSeparator.CurrentCulture, SummaryStyle.Default);
@@ -19,21 +19,22 @@ namespace BenchmarkDotNet.Exporters.Csv
 
         public CsvExporter(CsvSeparator separator, ISummaryStyle style)
         {
-            this.separator = separator.ToRealSeparator();
             this.style = style;
+            this.separator = separator;
         }
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
+            string realSeparator = separator.ToRealSeparator();
             foreach (var line in summary.GetTable(style).FullContentWithHeader)
             {
                 for (int i = 0; i < line.Length;)
                 {
-                    logger.Write(CsvHelper.Escape(line[i]));
+                    logger.Write(CsvHelper.Escape(line[i], realSeparator));
 
                     if (++i < line.Length)
                     {
-                        logger.Write(separator);
+                        logger.Write(realSeparator);
                     }
                 }
 

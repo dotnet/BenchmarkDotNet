@@ -7,15 +7,19 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.Roslyn
 {
-    internal class Generator : GeneratorBase
+    [PublicAPI]
+    public class Generator : GeneratorBase
     {
+        [PublicAPI]
         protected override string GetBuildArtifactsDirectoryPath(Benchmark benchmark, string programName)
             => Path.GetDirectoryName(benchmark.Target.Type.GetTypeInfo().Assembly.Location);
 
-        protected override void Cleanup(ArtifactsPaths artifactsPaths)
+        [PublicAPI]
+        protected override void Cleanup(Benchmark benchmark, ArtifactsPaths artifactsPaths)
         {
             DelteIfExists(artifactsPaths.ProgramCodePath);
             DelteIfExists(artifactsPaths.AppConfigPath);
@@ -23,6 +27,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             DelteIfExists(artifactsPaths.ExecutablePath);
         }
 
+        [PublicAPI]
         protected override void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)
         {
             var prefix = RuntimeInformation.IsWindows() ? "" : "#!/bin/bash\n";

@@ -127,13 +127,29 @@ namespace BenchmarkDotNet.Configs
         public IConfig Parse(string[] args)
         {
             var config = new ManualConfig();
-            foreach (var arg in args.Where(arg => arg.Contains("=")))
+
+            for (int i = 0; i < args.Length; i++)
             {
-                var split = arg.ToLowerInvariant().Split('=');
-                var values = split[1].Split(',');
+                var arg = args[i]
+                    .ToLowerInvariant() // normalize
+                    .Replace(optionPrefix, string.Empty); // Allow both "--arg=<value>" and "arg=<value>" (i.e. with and without the double dashes)
+
+                var containsEqualitySign = arg.Contains('=');
+                if (!containsEqualitySign && !arg.EndsWith("s"))
+                    arg += "s"; // make it plural
+
+                bool isArgument = containsEqualitySign 
+                    || (configuration.ContainsKey(arg) && i + 1 < args.Length); // make sure we know it and there is next value
+
+                if(!isArgument)
+                    continue;
+
+                var argumentName = containsEqualitySign ? arg.Split('=')[0] : arg;
+                var values = (containsEqualitySign ? arg.Split('=')[1] : args[++i]).Split(',');
+
                 // Delibrately allow both "job" and "jobs" to be specified, makes it easier for users!!
-                var argument = split[0].EndsWith("s") ? split[0] : split[0] + "s";
-                // Allow both "--arg=<value>" and "arg=<value>" (i.e. with and without the double dashes)
+                var argument = argumentName.EndsWith("s") ? argumentName : argumentName + "s";
+                
                 argument = argument.StartsWith(optionPrefix) ? argument.Remove(0, 2) : argument;
 
                 if (configuration.ContainsKey(argument) == false)
@@ -195,7 +211,7 @@ namespace BenchmarkDotNet.Configs
 
         private static IDiagnoser[] ParseDiagnosers(string value)
         {
-            foreach (var diagnoser in DefaultConfig.LazyLoadedDiagnosers.Value)
+            foreach (var diagnoser in DiagnosersLoader.LazyLoadedDiagnosers.Value)
             {
                 if (value == diagnoser.GetType().Name.Replace("Diagnoser", "").ToLowerInvariant())
                     return new[] { diagnoser };

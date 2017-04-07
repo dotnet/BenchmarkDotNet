@@ -20,9 +20,9 @@ namespace BenchmarkDotNet.Toolchains
             {
                 artifactsPaths = GetArtifactsPaths(benchmark, config, rootArtifactsFolderPath);
 
-                Cleanup(artifactsPaths);
+                Cleanup(benchmark, artifactsPaths);
 
-                CopyAllRequiredFiles(artifactsPaths);
+                CopyAllRequiredFiles(benchmark, artifactsPaths);
 
                 GenerateCode(benchmark, artifactsPaths);
                 GenerateAppConfig(benchmark, artifactsPaths, resolver);
@@ -43,9 +43,9 @@ namespace BenchmarkDotNet.Toolchains
 
         protected virtual string GetProjectFilePath(string binariesDirectoryPath) => string.Empty;
 
-        protected abstract void Cleanup(ArtifactsPaths artifactsPaths);
+        protected abstract void Cleanup(Benchmark benchmark, ArtifactsPaths artifactsPaths);
 
-        protected virtual void CopyAllRequiredFiles(ArtifactsPaths artifactsPaths) { }
+        protected virtual void CopyAllRequiredFiles(Benchmark benchmark, ArtifactsPaths artifactsPaths) { }
 
         protected virtual void GenerateProject(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver, ILogger logger) { }
 
@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Toolchains
             string executablePath = Path.Combine(binariesDirectoryPath, $"{programName}{RuntimeInformation.ExecutableExtension}");
 
             return new ArtifactsPaths(
-                cleanup: Cleanup,
+                cleanup: artifactsPaths => Cleanup(benchmark, artifactsPaths),
                 rootArtifactsFolderPath: rootArtifactsFolderPath,
                 buildArtifactsDirectoryPath: buildArtifactsDirectoryPath,
                 binariesDirectoryPath: binariesDirectoryPath,

@@ -6,9 +6,11 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.InProcess;
 using BenchmarkDotNet.Validators;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
@@ -99,6 +101,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private readonly Dictionary<Benchmark, PmcStats> results = new Dictionary<Benchmark, PmcStats>();
 
+        // ReSharper disable once EmptyConstructor parameterless ctor is mandatory for DiagnosersLoader.CreateDiagnoser
+        public PmcDiagnoser() { }
+
         protected override ulong EventType
             => unchecked((ulong)(KernelTraceEventParser.Keywords.PMCProfile | KernelTraceEventParser.Keywords.Profile));
 
@@ -133,6 +138,12 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             foreach (var benchmark in validationParameters.Benchmarks
                 .Where(benchmark => !benchmark.Job.Diagnoser.HardwareCounters.IsNullOrEmpty()))
             {
+                if (benchmark.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic)
+                    && benchmark.Job.Infrastructure.Toolchain is InProcessToolchain)
+                {
+                    yield return new ValidationError(true, "Hardware Counters are not supported for InProcessToolchain.", benchmark);
+                }
+
                 foreach (var hardwareCounter in benchmark.Job.Diagnoser.HardwareCounters)
                 {
                     if (!EtwTranslations.TryGetValue(hardwareCounter, out var counterName))

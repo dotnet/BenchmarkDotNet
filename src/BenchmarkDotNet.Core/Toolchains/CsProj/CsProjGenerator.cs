@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 .ToString();
         }
 
-        // the host project might contain some custom settings that needs to be copied, sth like
+        // the host project or one of the .props file that it imports might contain some custom settings that needs to be copied, sth like
         // <NetCoreAppImplicitPackageVersion>2.0.0-beta-001607-00</NetCoreAppImplicitPackageVersion>
 	    // <RuntimeFrameworkVersion>2.0.0-beta-001607-00</RuntimeFrameworkVersion>
         private string GetSettingsThatNeedsToBeCopied(FileInfo projectFile)
@@ -78,6 +78,18 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                     if (line.Contains("NetCoreAppImplicitPackageVersion") || line.Contains("RuntimeFrameworkVersion"))
                     {
                         customSettings.Append(line);
+                    }
+                    else if (line.Contains("<Import Project"))
+                    {
+                        var propsFilePath = line.Trim().Split('"')[1]; // its sth like   <Import Project="..\..\build\common.props" />
+                        var absolutePath = File.Exists(propsFilePath)
+                            ? propsFilePath // absolute path or relative to current dir
+                            : Path.Combine(projectFile.DirectoryName, propsFilePath); // relative to csproj
+
+                        if (File.Exists(absolutePath))
+                        {
+                            customSettings.Append(GetSettingsThatNeedsToBeCopied(new FileInfo(absolutePath)));
+                        }
                     }
                 }
             }

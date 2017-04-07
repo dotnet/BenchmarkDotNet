@@ -162,8 +162,7 @@ namespace BenchmarkDotNet.Running
                 if (!buildResult.IsBuildSuccess)
                     return new BenchmarkReport(benchmark, generateResult, buildResult, null, null, default(GcStats));
 
-                var gcStats = default(GcStats);
-                var executeResults = Execute(logger, benchmark, toolchain, buildResult, config, resolver, out gcStats);
+                var executeResults = Execute(logger, benchmark, toolchain, buildResult, config, resolver, out GcStats gcStats);
 
                 var runs = new List<Measurement>();
 

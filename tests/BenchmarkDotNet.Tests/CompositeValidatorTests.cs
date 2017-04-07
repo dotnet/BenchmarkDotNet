@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Tests
         public void ThreatWarningsAsErrorsOverridesDefaultBehaviour()
         {
             var compositeValidator = new CompositeValidator(
-                new[]
+                new IValidator[]
                 {
                     ExecutionValidator.DontFailOnError,
                     ExecutionValidator.FailOnError

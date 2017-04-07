@@ -1,6 +1,5 @@
 ﻿using System;
 using BenchmarkDotNet.Parameters;
-using BenchmarkDotNet.Reports;
 using System.Linq;
 using Xunit;
 
@@ -16,17 +15,17 @@ namespace BenchmarkDotNet.Tests
             var sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: Array.Empty<object>());
             var originalData = new[]
             {
-                new ParameterInstances(new []
+                new ParameterInstances(new[]
                 {
-                    new ParameterInstance(sharedDefinition, 5),
+                    new ParameterInstance(sharedDefinition, 5)
                 }),
-                new ParameterInstances(new []
+                new ParameterInstances(new[]
                 {
-                    new ParameterInstance(sharedDefinition, 1),
+                    new ParameterInstance(sharedDefinition, 1)
                 }),
-                new ParameterInstances(new []
+                new ParameterInstances(new[]
                 {
-                    new ParameterInstance(sharedDefinition, 3),
+                    new ParameterInstance(sharedDefinition, 3)
                 })
             };
             var sortedData = originalData.OrderBy(d => d, comparer).ToArray();
@@ -42,27 +41,27 @@ namespace BenchmarkDotNet.Tests
             var comparer = ParameterComparer.Instance;
 
             var sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: Array.Empty<object>());
-            var originalData = new []
+            var originalData = new[]
             {
-                new ParameterInstances(new []
+                new ParameterInstances(new[]
                 {
                     new ParameterInstance(sharedDefinition, 5),
                     new ParameterInstance(sharedDefinition, "z"),
-                    new ParameterInstance(sharedDefinition, 1.0),
+                    new ParameterInstance(sharedDefinition, 1.0)
                 }),
-                new ParameterInstances(new []
+                new ParameterInstances(new[]
                 {
                     new ParameterInstance(sharedDefinition, 5),
                     new ParameterInstance(sharedDefinition, "a"),
-                    new ParameterInstance(sharedDefinition, 0.0),
+                    new ParameterInstance(sharedDefinition, 0.0)
                 }),
-                new ParameterInstances(new []
+                new ParameterInstances(new[]
                 {
                     new ParameterInstance(sharedDefinition, 5),
                     new ParameterInstance(sharedDefinition, "a"),
-                    new ParameterInstance(sharedDefinition, 1.0),
+                    new ParameterInstance(sharedDefinition, 1.0)
                 }),
-                new ParameterInstances(new []
+                new ParameterInstances(new[]
                 {
                     new ParameterInstance(sharedDefinition, 3),
                     new ParameterInstance(sharedDefinition, "a"),
@@ -98,21 +97,21 @@ namespace BenchmarkDotNet.Tests
             var sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: Array.Empty<object>());
             var originalData = new[]
             {
-                new ParameterInstances(new []
+                new ParameterInstances(new[]
                 {
-                    new ParameterInstance(sharedDefinition, 100),
+                    new ParameterInstance(sharedDefinition, 100)
                 }),
-                new ParameterInstances(new []
+                new ParameterInstances(new[]
                 {
-                    new ParameterInstance(sharedDefinition, 1000),
+                    new ParameterInstance(sharedDefinition, 1000)
                 }),
-                new ParameterInstances(new []
+                new ParameterInstances(new[]
                 {
-                    new ParameterInstance(sharedDefinition, 2000),
+                    new ParameterInstance(sharedDefinition, 2000)
                 }),
-                new ParameterInstances(new []
+                new ParameterInstances(new[]
                 {
-                    new ParameterInstance(sharedDefinition, 500),
+                    new ParameterInstance(sharedDefinition, 500)
                 })
             };
 
