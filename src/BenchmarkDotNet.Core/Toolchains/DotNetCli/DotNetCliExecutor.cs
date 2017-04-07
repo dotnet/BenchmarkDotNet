@@ -3,12 +3,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 
@@ -17,23 +19,29 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public class DotNetCliExecutor : IExecutor
     {
-        public ExecuteResult Execute(BuildResult buildResult, Benchmark benchmark, ILogger logger, IResolver resolver, IDiagnoser diagnoser = null)
+        public ExecuteResult Execute(ExecuteParameters executeParameters)
         {
-            var executableName = $"{buildResult.ArtifactsPaths.ProgramName}.dll";
-            if (!File.Exists(Path.Combine(buildResult.ArtifactsPaths.BinariesDirectoryPath, executableName)))
+            var executableName = $"{executeParameters.BuildResult.ArtifactsPaths.ProgramName}.dll";
+            if (!File.Exists(Path.Combine(executeParameters.BuildResult.ArtifactsPaths.BinariesDirectoryPath, executableName)))
             {
-                logger.WriteLineError($"Did not find {executableName} in {buildResult.ArtifactsPaths.BinariesDirectoryPath}, but the folder contained:");
-                foreach (var file in new DirectoryInfo(buildResult.ArtifactsPaths.BinariesDirectoryPath).GetFiles("*.*"))
-                    logger.WriteLineError(file.Name);
+                executeParameters.Logger.WriteLineError($"Did not find {executableName} in {executeParameters.BuildResult.ArtifactsPaths.BinariesDirectoryPath}, but the folder contained:");
+                foreach (var file in new DirectoryInfo(executeParameters.BuildResult.ArtifactsPaths.BinariesDirectoryPath).GetFiles("*.*"))
+                    executeParameters.Logger.WriteLineError(file.Name);
                 
                 return new ExecuteResult(false, -1, Array.Empty<string>(), Array.Empty<string>());
             }
 
-            ConsoleHandler.EnsureInitialized(logger);
+            ConsoleHandler.EnsureInitialized(executeParameters.Logger);
 
             try
             {
-                return Execute(benchmark, logger, buildResult.ArtifactsPaths, diagnoser, executableName);
+                return Execute(
+                    executeParameters.Benchmark, 
+                    executeParameters.Logger, 
+                    executeParameters.BuildResult.ArtifactsPaths, 
+                    executeParameters.Diagnoser, 
+                    executableName, 
+                    executeParameters.Config);
             }
             finally
             {
@@ -41,7 +49,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        private ExecuteResult Execute(Benchmark benchmark, ILogger logger, ArtifactsPaths artifactsPaths, IDiagnoser diagnoser, string executableName)
+        private ExecuteResult Execute(Benchmark benchmark, ILogger logger, ArtifactsPaths artifactsPaths, IDiagnoser diagnoser, string executableName, IConfig config)
         {
             using (var process = new Process
             {
@@ -50,7 +58,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     BuildArgs(diagnoser, executableName))
             })
             {
-                var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmark);
+                var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmark, config);
 
                 ConsoleHandler.Instance.SetProcess(process);
 

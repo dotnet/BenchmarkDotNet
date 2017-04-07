@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Loggers;
@@ -14,22 +15,19 @@ namespace BenchmarkDotNet.Toolchains.InProcess
     public sealed class InProcessHost : IHost
     {
         [NotNull]
-        private readonly Benchmark benchmark;
-
-        [NotNull]
         private readonly ILogger logger;
 
         [CanBeNull]
         private readonly IDiagnoser diagnoser;
 
         [CanBeNull]
-        private readonly Process currentProcess;
+        private readonly DiagnoserActionParameters diagnoserActionParameters;
 
         /// <summary>Creates a new instance of <see cref="InProcessHost"/>.</summary>
         /// <param name="benchmark">Current benchmark.</param>
         /// <param name="logger">Logger for informational output.</param>
         /// <param name="diagnoser">Diagnosers, if attached.</param>
-        public InProcessHost(Benchmark benchmark, ILogger logger, IDiagnoser diagnoser)
+        public InProcessHost(Benchmark benchmark, ILogger logger, IDiagnoser diagnoser, IConfig config)
         {
             if (benchmark == null)
                 throw new ArgumentNullException(nameof(benchmark));
@@ -37,13 +35,15 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             if (logger == null)
                 throw new ArgumentNullException(nameof(logger));
 
-            this.benchmark = benchmark;
             this.logger = logger;
             this.diagnoser = diagnoser;
             IsDiagnoserAttached = diagnoser != null;
 
             if (diagnoser != null)
-                currentProcess = Process.GetCurrentProcess();
+                diagnoserActionParameters = new DiagnoserActionParameters(
+                    Process.GetCurrentProcess(),
+                    benchmark,
+                    config);
         }
 
         /// <summary><c>True</c> if there are diagnosers attached.</summary>
@@ -72,15 +72,15 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             switch (hostSignal)
             {
                 case HostSignal.BeforeAnythingElse:
-                    diagnoser?.BeforeAnythingElse(currentProcess, benchmark);
+                    diagnoser?.BeforeAnythingElse(diagnoserActionParameters);
                     WriteLine(Engine.Signals.BeforeAnythingElse);
                     break;
                 case HostSignal.AfterSetup:
-                    diagnoser?.AfterSetup(currentProcess, benchmark);
+                    diagnoser?.AfterSetup(diagnoserActionParameters);
                     WriteLine(Engine.Signals.AfterSetup);
                     break;
                 case HostSignal.BeforeMainRun:
-                    diagnoser?.BeforeMainRun(currentProcess, benchmark);
+                    diagnoser?.BeforeMainRun(diagnoserActionParameters);
                     WriteLine(Engine.Signals.BeforeMainRun);
                     break;
                 case HostSignal.BeforeCleanup:

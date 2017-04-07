@@ -15,6 +15,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
 
@@ -247,7 +248,8 @@ namespace BenchmarkDotNet.Running
                     : " / " + launchCount;
                 logger.WriteLineInfo($"// Launch: {launchIndex + 1}{printedLaunchCount}");
 
-                var executeResult = toolchain.Executor.Execute(buildResult, benchmark, logger, resolver);
+                var executeResult = toolchain.Executor.Execute(
+                    new ExecuteParameters(buildResult, benchmark, logger, resolver, config));
 
                 if (!executeResult.FoundExecutable)
                     logger.WriteLineError($"Executable {buildResult.ArtifactsPaths.ExecutablePath} not found");
@@ -285,7 +287,8 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineInfo("// Run, Diagnostic");
                 var compositeDiagnoser = config.GetCompositeDiagnoser();
 
-                var executeResult = toolchain.Executor.Execute(buildResult, benchmark, logger, resolver, compositeDiagnoser);
+                var executeResult = toolchain.Executor.Execute(
+                    new ExecuteParameters(buildResult, benchmark, logger, resolver, config, compositeDiagnoser));
 
                 var allRuns = executeResult.Data.Select(line => Measurement.Parse(logger, line, 0)).Where(r => r.IterationMode != IterationMode.Unknown).ToList();
                 gcStats = GcStats.Parse(executeResult.Data.Last());

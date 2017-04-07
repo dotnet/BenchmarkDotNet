@@ -112,10 +112,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             get { throw new NotImplementedException("Not needed for Kernel sessions (can be only one at a time"); }
         }
 
-        public void BeforeAnythingElse(Process process, Benchmark benchmark) { }
-        public void AfterSetup(Process process, Benchmark benchmark) { }
+        public void BeforeAnythingElse(DiagnoserActionParameters _) { }
+        public void AfterSetup(DiagnoserActionParameters _) { }
 
-        public void BeforeMainRun(Process process, Benchmark benchmark) => Start(process, benchmark);
+        public void BeforeMainRun(DiagnoserActionParameters parameters) => Start(parameters);
 
         public void BeforeCleanup() => Stop();
 
@@ -161,9 +161,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             }
         }
 
-        protected override PmcStats GetInitializedStats(Benchmark benchmark)
+        protected override PmcStats GetInitializedStats(DiagnoserActionParameters parameters)
         {
-            var stats = new PmcStats(benchmark.Job.Diagnoser.HardwareCounters);
+            var stats = new PmcStats(parameters.Config.GetHardwareCounters().ToArray());
 
             var counters = stats.Counters.Values;
 

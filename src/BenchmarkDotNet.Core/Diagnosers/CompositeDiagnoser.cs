@@ -22,14 +22,14 @@ namespace BenchmarkDotNet.Diagnosers
         public IColumnProvider GetColumnProvider() 
             => new CompositeColumnProvider(diagnosers.Select(d => d.GetColumnProvider()).ToArray());
 
-        public void BeforeAnythingElse(Process process, Benchmark benchmark) 
-            => diagnosers.ForEach(diagnoser => diagnoser.BeforeAnythingElse(process, benchmark));
+        public void BeforeAnythingElse(DiagnoserActionParameters parameters) 
+            => diagnosers.ForEach(diagnoser => diagnoser.BeforeAnythingElse(parameters));
 
-        public void AfterSetup(Process process, Benchmark benchmark) 
-            => diagnosers.ForEach(diagnoser => diagnoser.AfterSetup(process, benchmark));
+        public void AfterSetup(DiagnoserActionParameters parameters) 
+            => diagnosers.ForEach(diagnoser => diagnoser.AfterSetup(parameters));
 
-        public void BeforeMainRun(Process process, Benchmark benchmark) 
-            => diagnosers.ForEach(diagnoser => diagnoser.BeforeMainRun(process, benchmark));
+        public void BeforeMainRun(DiagnoserActionParameters parameters) 
+            => diagnosers.ForEach(diagnoser => diagnoser.BeforeMainRun(parameters));
 
         public void BeforeCleanup() => diagnosers.ForEach(diagnoser => diagnoser.BeforeCleanup());
 
