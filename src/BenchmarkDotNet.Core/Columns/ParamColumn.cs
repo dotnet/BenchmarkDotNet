@@ -23,5 +23,7 @@ namespace BenchmarkDotNet.Columns
         public ColumnCategory Category => ColumnCategory.Params;
         public int PriorityInCategory => 0;
         public override string ToString() => ColumnName;
+        public UnitType UnitType => UnitType.Dimensionless;
+        public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
     }
 }
