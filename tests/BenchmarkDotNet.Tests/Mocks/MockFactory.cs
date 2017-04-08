@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes.Jobs;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
@@ -21,7 +22,7 @@ namespace BenchmarkDotNet.Tests.Mocks
         {
             return new Summary(
                 "MockSummary",
-                new List<BenchmarkReport> { CreateReport(config) },
+                CreateReports(config),
                 HostEnvironmentInfo.GetCurrent(),
                 config,
                 "",
@@ -29,14 +30,18 @@ namespace BenchmarkDotNet.Tests.Mocks
                 Array.Empty<ValidationError>());
         }
 
-        private static Benchmark CreateBenchmark(IConfig config)
+        private static BenchmarkReport[] CreateReports(IConfig config)
         {
-            return BenchmarkConverter.TypeToBenchmarks(typeof(MockBenchmarkClass), config).First();
+            return CreateBenchmarks(config).Select(CreateReport).ToArray();
         }
 
-        private static BenchmarkReport CreateReport(IConfig config)
+        private static Benchmark[] CreateBenchmarks(IConfig config)
         {
-            var benchmark = CreateBenchmark(config);
+            return BenchmarkConverter.TypeToBenchmarks(typeof(MockBenchmarkClass), config);
+        }
+
+        private static BenchmarkReport CreateReport(Benchmark benchmark)
+        {
             var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty));
             var executeResult = new ExecuteResult(true, 0, Array.Empty<string>(), Array.Empty<string>());
             var measurements = new List<Measurement>
@@ -46,10 +51,16 @@ namespace BenchmarkDotNet.Tests.Mocks
             return new BenchmarkReport(benchmark, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default(GcStats));
         }
 
+        [LongRunJob]
         public class MockBenchmarkClass
         {
             [Benchmark]
             public void Foo()
+            {
+            }
+
+            [Benchmark]
+            public void Bar()
             {
             }
         }
