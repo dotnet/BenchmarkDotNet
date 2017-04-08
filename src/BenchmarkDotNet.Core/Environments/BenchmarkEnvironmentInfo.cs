@@ -10,21 +10,21 @@ namespace BenchmarkDotNet.Environments
         internal const string RuntimeInfoPrefix = "Runtime=";
         internal const string GcInfoPrefix = "GC=";
 
-        public string Architecture { get; }
+        public string Architecture { get; protected set; }
 
-        public string Configuration { get; }
+        public string Configuration { get; protected set; }
 
-        public string RuntimeVersion { get; }
+        public string RuntimeVersion { get; protected set; }
 
-        public bool HasAttachedDebugger => Debugger.IsAttached;
+        public bool HasAttachedDebugger { get; protected set; }
 
-        public bool HasRyuJit { get; }
+        public bool HasRyuJit { get; protected set; }
 
-        public string JitInfo { get; }
+        public string JitInfo { get; protected set; }
 
-        public bool IsServerGC { get; }
+        public bool IsServerGC { get; protected set; }
 
-        public bool IsConcurrentGC { get; }
+        public bool IsConcurrentGC { get; protected set; }
 
         protected BenchmarkEnvironmentInfo()
         {
@@ -35,6 +35,7 @@ namespace BenchmarkDotNet.Environments
             JitInfo = RuntimeInformation.GetJitInfo();
             IsServerGC = GCSettings.IsServerGC;
             IsConcurrentGC = GCSettings.LatencyMode != GCLatencyMode.Batch;
+            HasAttachedDebugger = Debugger.IsAttached;
         }
 
         public static BenchmarkEnvironmentInfo GetCurrent() => new BenchmarkEnvironmentInfo();

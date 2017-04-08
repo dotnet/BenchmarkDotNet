@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime;
 using BenchmarkDotNet.Attributes;
@@ -8,6 +9,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
@@ -23,7 +25,7 @@ namespace BenchmarkDotNet.Tests.Mocks
             return new Summary(
                 "MockSummary",
                 CreateReports(config),
-                HostEnvironmentInfo.GetCurrent(),
+                MockHostEnvironmentInfo.Default,
                 config,
                 "",
                 TimeSpan.FromMinutes(1),
@@ -61,6 +63,33 @@ namespace BenchmarkDotNet.Tests.Mocks
 
             [Benchmark]
             public void Bar()
+            {
+            }
+        }
+
+        public class MockHostEnvironmentInfo : HostEnvironmentInfo
+        {
+            public static MockHostEnvironmentInfo Default = new MockHostEnvironmentInfo
+            {
+                Architecture = "64bit",
+                BenchmarkDotNetVersion = "0.10.3.20170408-develop",
+                ChronometerFrequency = new Frequency(2531248),
+                Configuration = "RELEASE",
+                DotNetCliVersion = new Lazy<string>(() => "1.0.0"),
+                HardwareTimerKind = HardwareTimerKind.Tsc,
+                HasAttachedDebugger = false,
+                HasRyuJit = true,
+                IsConcurrentGC = false,
+                IsServerGC = false,
+                JitInfo = "RyuJIT-v4.6.1637.0",
+                JitModules = "clrjit-v4.6.1637.0",
+                OsVersion = new Lazy<string>(() => "Microsoft Windows NT 10.0.14393.0"),
+                ProcessorCount = 8,
+                ProcessorName = new Lazy<string>(() => "Intel(R) Core(TM) i7-6700HQ CPU 2.60GHz"),
+                RuntimeVersion = "Clr 4.0.30319.42000"
+            };
+
+            private MockHostEnvironmentInfo()
             {
             }
         }

@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Environments
     // this class is used by our auto-generated benchmark program, 
     // keep it in mind if you want to do some renaming
     // you can finde the source code at Templates\BenchmarkProgram.txt
-    public sealed class HostEnvironmentInfo : BenchmarkEnvironmentInfo
+    public class HostEnvironmentInfo : BenchmarkEnvironmentInfo
     {
         public const string BenchmarkDotNetCaption = "BenchmarkDotNet";
 
@@ -26,33 +26,34 @@ namespace BenchmarkDotNet.Environments
 
         private static HostEnvironmentInfo Current;
 
-        public string BenchmarkDotNetVersion { get; }
+        public string BenchmarkDotNetVersion { get; protected set; }
 
         /// <summary>
         /// Could be expensive
         /// </summary>
-        public Lazy<string> OsVersion { get; }
+        public Lazy<string> OsVersion { get; protected set; }
 
         /// <summary>
         /// is expensive to call (1s)
         /// </summary>
-        public Lazy<string> ProcessorName { get; }
+        public Lazy<string> ProcessorName { get; protected set; }
 
-        public int ProcessorCount { get; }
+        public int ProcessorCount { get; protected set; }
 
-        public string JitModules { get; }
+        public string JitModules { get; protected set; }
 
         /// <summary>
         /// is expensive to call (creates new process by calling dotnet --version)
         /// </summary>
-        public Lazy<string> DotNetCliVersion { get; }
+        public Lazy<string> DotNetCliVersion { get; protected set; }
 
         /// <summary>
         /// The frequency of the timer as the number of ticks per second.
         /// </summary>
-        public Frequency ChronometerFrequency { get; }
+        public Frequency ChronometerFrequency { get; protected set; }
+        public TimeInterval ChronometerResolution => ChronometerFrequency.ToResolution();
 
-        public HardwareTimerKind HardwareTimerKind { get; }
+        public HardwareTimerKind HardwareTimerKind { get; protected set; }
 
         static HostEnvironmentInfo()
         {
@@ -60,7 +61,7 @@ namespace BenchmarkDotNet.Environments
             MainCultureInfo.NumberFormat.NumberDecimalSeparator = ".";
         }
 
-        private HostEnvironmentInfo()
+        protected HostEnvironmentInfo()
         {
             BenchmarkDotNetVersion = GetBenchmarkDotNetVersion();
             OsVersion = new Lazy<string>(RuntimeInformation.GetOsVersion);
@@ -74,13 +75,11 @@ namespace BenchmarkDotNet.Environments
 
         public new static HostEnvironmentInfo GetCurrent() => Current ?? (Current = new HostEnvironmentInfo());
 
-        public TimeInterval GetChronometerResolution() => Chronometer.BestClock.GetResolution();
-
         public override IEnumerable<string> ToFormattedString()
         {
             yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}";
             yield return $"Processor={ProcessorName.Value}, ProcessorCount={ProcessorCount}";
-            yield return $"Frequency={ChronometerFrequency}, Resolution={GetChronometerResolution()}, Timer={HardwareTimerKind.ToString().ToUpper()}";
+            yield return $"Frequency={ChronometerFrequency}, Resolution={ChronometerResolution}, Timer={HardwareTimerKind.ToString().ToUpper()}";
 #if !CLASSIC
             yield return $"dotnet cli version={DotNetCliVersion.Value}";
 #endif
