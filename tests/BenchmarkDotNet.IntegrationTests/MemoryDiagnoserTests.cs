@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 { nameof(AccurateAllocations.EightBytesArray), 8 + arraySizeOverhead },
                 { nameof(AccurateAllocations.SixtyFourBytesArray), 64 + arraySizeOverhead },
 
-                { nameof(AccurateAllocations.AllocateTask), SizeOfAllFields<Task<int>>() + objectAllocationOverhead },
+                { nameof(AccurateAllocations.AllocateTask), CalculateRequiredSpace<Task<int>>() },
             });
         }
 
@@ -151,6 +151,21 @@ namespace BenchmarkDotNet.IntegrationTests
                 .With(DefaultColumnProviders.Instance)
                 .With(MemoryDiagnoser.Default)
                 .With(new OutputLogger(output));
+        }
+
+
+        // note: don't copy, never use in production systems (it should work but I am not 100% sure)
+        private int CalculateRequiredSpace<T>()
+        {
+            int total = SizeOfAllFields<T>();
+
+            if(!typeof(T).GetTypeInfo().IsValueType)
+                total += IntPtr.Size * 2; // pointer to method table + object header word
+
+            if (total % IntPtr.Size != 0) // aligning..
+                total += IntPtr.Size - (total % IntPtr.Size);
+
+            return total;
         }
 
         // note: don't copy, never use in production systems (it should work but I am not 100% sure)
