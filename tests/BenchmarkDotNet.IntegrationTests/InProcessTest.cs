@@ -245,53 +245,6 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Fact]
-        public void InProcessBenchmarkAllCasesDiagnoserTest()
-        {
-            var logger = new OutputLogger(Output);
-            var config = new ManualConfig()
-                .With(Job.Default.With(InProcessToolchain.Instance))
-                .With(MemoryDiagnoser.Default)
-                .With(logger)
-                .With(DefaultColumnProviders.Instance);
-            try
-            {
-                BenchmarkAllCases.Counter = 0;
-
-                var summary = CanExecute<BenchmarkAllocates>(config);
-
-                var testLog = logger.GetLog();
-                Assert.Contains("// Benchmark: BenchmarkAllocates.Allocates:", testLog);
-                Assert.DoesNotContain("No benchmarks found", logger.GetLog());
-
-                Assert.True(summary.Reports.Sum(r => r.GcStats.AllocatedBytes) > 0);
-            }
-            finally
-            {
-                BenchmarkAllCases.Counter = 0;
-            }
-        }
-
-        [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-        public class BenchmarkAllocates
-        {
-            private readonly int[] _values = Enumerable.Range(1, 1000).ToArray();
-
-            [Benchmark]
-            public int Allocates() => Enumerable.Range(1, 1000).ToArray().Sum();
-
-            [Benchmark]
-            public int NoAllocations()
-            {
-                var result = 0;
-                foreach (int value in _values)
-                {
-                    result += value;
-                }
-                return result;
-            }
-        }
-
         [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
         public class BenchmarkAllCases
         {

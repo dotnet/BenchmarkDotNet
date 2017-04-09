@@ -170,9 +170,11 @@ namespace BenchmarkDotNet.Tests
 
         public class NonPublicFieldWithParams
         {
+#pragma warning disable CS0649
             [Params(1)]
             [UsedImplicitly]
             internal int Field;
+#pragma warning restore CS0649
 
             [Benchmark]
             public void NonThrowing() { }

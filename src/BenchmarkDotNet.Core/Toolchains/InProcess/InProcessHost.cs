@@ -27,6 +27,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <param name="benchmark">Current benchmark.</param>
         /// <param name="logger">Logger for informational output.</param>
         /// <param name="diagnoser">Diagnosers, if attached.</param>
+        /// <param name="config">Current config.</param>
         public InProcessHost(Benchmark benchmark, ILogger logger, IDiagnoser diagnoser, IConfig config)
         {
             if (benchmark == null)
