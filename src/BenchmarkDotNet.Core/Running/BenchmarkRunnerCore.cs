@@ -13,8 +13,10 @@ using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.InProcess;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
@@ -152,6 +154,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineHeader("// **************************");
             logger.WriteLineHeader("// Benchmark: " + benchmark.DisplayInfo);
 
+            var assemblyResolveHelper = GetAssemblyResolveHelper(toolchain, logger);
             var generateResult = Generate(logger, toolchain, benchmark, rootArtifactsFolderPath, config, resolver);
 
             try
@@ -178,7 +181,7 @@ namespace BenchmarkDotNet.Running
             catch (Exception e)
             {
                 logger.WriteLineError("// Exception: " + e);
-                return new BenchmarkReport(benchmark, generateResult, BuildResult.Failure(generateResult, e), new List<ExecuteResult>(), new List<Measurement>(), GcStats.Empty);
+                return new BenchmarkReport(benchmark, generateResult, BuildResult.Failure(generateResult, e), Array.Empty<ExecuteResult>(), Array.Empty<Measurement>(), GcStats.Empty);
             }
             finally
             {
@@ -186,6 +189,8 @@ namespace BenchmarkDotNet.Running
                 {
                     generateResult.ArtifactsPaths?.RemoveBenchmarkFiles();
                 }
+
+                assemblyResolveHelper?.Dispose();
             }
         }
 
@@ -325,6 +330,18 @@ namespace BenchmarkDotNet.Running
             }
 
             return path;
+        }
+
+        private static IDisposable GetAssemblyResolveHelper(IToolchain toolchain, ILogger logger)
+        {
+#if CLASSIC
+            if (!(toolchain is InProcessToolchain) // we don't want to mess with assembly loading when running benchmarks in the same process (could produce wrong results)
+                && !RuntimeInformation.IsMono()) // so far it was never an issue for Mono
+            {
+                 return Helpers.DirtyAssemblyResolveHelper.Create(logger); 
+            }
+#endif
+            return null;
         }
     }
 }
