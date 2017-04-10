@@ -46,10 +46,8 @@ namespace BenchmarkDotNet.Helpers
             var guessedPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{simpleName}.dll");
 
             if (!File.Exists(guessedPath))
-            {
-                logger.WriteLine(LogKind.Error, $".NET Framework was unable to load {args.Name}, we couldn't find it neither, checked at {guessedPath}");
                 return null; // we can't help, and we also don't call Assembly.Load which if fails comes back here, creates endless loop and causes StackOverflow
-            }
+
             // the file is right there, but has most probably different version and there is no assembly redirect
             // so we just load it and ignore the version mismatch
             // we can at leat try because benchmarks are not executed in the Host process, 
