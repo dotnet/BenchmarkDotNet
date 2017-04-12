@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
@@ -12,16 +13,18 @@ namespace BenchmarkDotNet.Exporters.Csv
 {
     public class CsvMeasurementsExporter : ExporterBase
     {
-        public static readonly CsvMeasurementsExporter Default = new CsvMeasurementsExporter(CsvSeparator.CurrentCulture);
+        public static readonly CsvMeasurementsExporter Default = new CsvMeasurementsExporter(CsvSeparator.CurrentCulture, SummaryStyle.Default);
+        public static CsvMeasurementsExporter WithStyle(SummaryStyle style) => new CsvMeasurementsExporter(CsvSeparator.CurrentCulture, style);
 
         private static readonly CharacteristicPresenter Presenter = CharacteristicPresenter.SummaryPresenter;
 
         private static readonly Lazy<MeasurementColumn[]> Columns = new Lazy<MeasurementColumn[]>(BuildColumns);
 
         private readonly CsvSeparator separator;
-        public CsvMeasurementsExporter(CsvSeparator separator)
+        public CsvMeasurementsExporter(CsvSeparator separator, ISummaryStyle style = null)
         {
             this.separator = separator;
+            Style = style ?? SummaryStyle.Default;
         }
 
         public string Separator => separator.ToRealSeparator();
@@ -29,6 +32,8 @@ namespace BenchmarkDotNet.Exporters.Csv
         protected override string FileExtension => "csv";
 
         protected override string FileCaption => "measurements";
+
+        public ISummaryStyle Style { get; private set; }
 
         public static Job[] GetJobs(Summary summary) => summary.Benchmarks.Select(b => b.Job).ToArray();
 

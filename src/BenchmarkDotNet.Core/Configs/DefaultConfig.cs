@@ -9,6 +9,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Validators;
+using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -57,6 +58,8 @@ namespace BenchmarkDotNet.Configs
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
 
         public bool KeepBenchmarkFiles => false;
+
+        public ISummaryStyle GetSummaryStyle() => SummaryStyle.Default;
 
         public IEnumerable<IDiagnoser> GetDiagnosers() => Array.Empty<IDiagnoser>();
 

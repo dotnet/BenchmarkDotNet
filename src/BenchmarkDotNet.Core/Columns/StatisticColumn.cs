@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn StdErr = new StatisticColumn("StdErr", s => s.StandardError, Priority.Main);
         public static readonly IColumn StdDev = new StatisticColumn("StdDev", s => s.StandardDeviation, Priority.Main);
 
-        public static readonly IColumn OperationsPerSecond = new StatisticColumn("Op/s", s => 1.0 * 1000 * 1000 * 1000 / s.Mean, Priority.Additional, false);
+        public static readonly IColumn OperationsPerSecond = new StatisticColumn("Op/s", s => 1.0 * 1000 * 1000 * 1000 / s.Mean, Priority.Additional, UnitType.Dimensionless);
 
         public static readonly IColumn Min = new StatisticColumn("Min", s => s.Min, Priority.Quartile);
         public static readonly IColumn Q1 = new StatisticColumn("Q1", s => s.Q1, Priority.Quartile);
@@ -26,8 +26,8 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn Q3 = new StatisticColumn("Q3", s => s.Q3, Priority.Quartile);
         public static readonly IColumn Max = new StatisticColumn("Max", s => s.Max, Priority.Quartile);
 
-        public static readonly IColumn Skewness = new StatisticColumn("Skewness", s => s.Skewness, Priority.Additional ,false);
-        public static readonly IColumn Kurtosis = new StatisticColumn("Kurtosis", s => s.Kurtosis, Priority.Additional, false);
+        public static readonly IColumn Skewness = new StatisticColumn("Skewness", s => s.Skewness, Priority.Additional, UnitType.Dimensionless);
+        public static readonly IColumn Kurtosis = new StatisticColumn("Kurtosis", s => s.Kurtosis, Priority.Additional, UnitType.Dimensionless);
 
         public static readonly IColumn P0 = new StatisticColumn("P0", s => s.Percentiles.P0, Priority.Percentiles);
         public static readonly IColumn P25 = new StatisticColumn("P25", s => s.Percentiles.P25, Priority.Percentiles);
@@ -51,33 +51,37 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn[] AllStatistics = { Mean, StdErr, StdDev, OperationsPerSecond, Min, Q1, Median, Q3, Max };
 
         private readonly Func<Statistics, double> calc;
-        private readonly bool isTimeColumn;
         public string Id => nameof(StatisticColumn) + "." + ColumnName;
         public string ColumnName { get; }
         private readonly Priority priority;
+        private readonly UnitType type;
 
-        private StatisticColumn(string columnName, Func<Statistics, double> calc, Priority priority, bool isTimeColumn = true)
+        private StatisticColumn(string columnName, Func<Statistics, double> calc, Priority priority, UnitType type = UnitType.Time)
         {
             this.calc = calc;
             this.priority = priority;
-            this.isTimeColumn = isTimeColumn;
+            this.type = type;
             ColumnName = columnName;
         }
 
-        public string GetValue(Summary summary, Benchmark benchmark) =>
-            Format(summary[benchmark].ResultStatistics, summary.TimeUnit);
+        public string GetValue(Summary summary, Benchmark benchmark)
+            => Format(summary[benchmark].ResultStatistics, SummaryStyle.Default);
+
+        public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style)
+            => Format(summary[benchmark].ResultStatistics, style);
 
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Statistics;
         public int PriorityInCategory => (int) priority;
+        public UnitType UnitType => type;
 
-        private string Format(Statistics statistics, TimeUnit timeUnit)
+        private string Format(Statistics statistics, ISummaryStyle style)
         {
             if (statistics == null)
                 return "NA";
             double value = calc(statistics);
-            return isTimeColumn ? value.ToTimeStr(timeUnit) : value.ToStr();
+            return type == UnitType.Time ? value.ToTimeStr(style.TimeUnit, 1, style.PrintUnitsInContent) : value.ToStr();
         }
 
         public override string ToString() => ColumnName;

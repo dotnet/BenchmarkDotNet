@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Order;
+using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -19,7 +21,7 @@ namespace BenchmarkDotNet.Reports
         public string[][] FullContentWithHeader { get; }
         public bool[] IsDefault { get; }
 
-        internal SummaryTable(Summary summary)
+        internal SummaryTable(Summary summary, ISummaryStyle style = null)
         {
             Summary = summary;
 
@@ -34,14 +36,24 @@ namespace BenchmarkDotNet.Reports
                 IsDefault = Array.Empty<bool>();
                 return;
             }
+            
+            // Ensure we have all required data for styling
+            style = style ?? SummaryStyle.Default;
+            if (style.TimeUnit == null)
+            {
+                style = style.WithTimeUnit(TimeUnit.GetBestTimeUnit(summary.Reports.Where(r => r.ResultStatistics != null).Select(r => r.ResultStatistics.Mean).ToArray()));
+            }
+            if (style.SizeUnit == null)
+            {
+                style = style.WithSizeUnit(SizeUnit.GetBestSizeUnit(summary.Reports.Select(r => r.GcStats.AllocatedBytes).ToArray()));
+            }
 
             var columns = summary.GetColumns();
-
             ColumnCount = columns.Length;
-            FullHeader = columns.Select(c => c.ColumnName).ToArray();
+            FullHeader = columns.Select(c => c.GetColumnTitle(style)).ToArray();
 
             var orderProvider = summary.Config.GetOrderProvider() ?? DefaultOrderProvider.Instance;
-            FullContent = summary.Reports.Select(r => columns.Select(c => c.GetValue(summary, r.Benchmark)).ToArray()).ToArray();
+            FullContent = summary.Reports.Select(r => columns.Select(c => c.GetValue(summary, r.Benchmark, style)).ToArray()).ToArray();
             IsDefault = columns.Select(c => summary.Reports.All(r => c.IsDefault(summary, r.Benchmark))).ToArray();
             var groupKeys = summary.Benchmarks.Select(b => orderProvider.GetGroupKey(b, summary)).ToArray();
             FullContentStartOfGroup = new bool[summary.Reports.Length];
