@@ -20,7 +20,17 @@ namespace BenchmarkDotNet.Exporters
             var filePath = $"{Path.Combine(summary.ResultsDirectoryPath, summary.Title)}-{FileCaption}{FileNameSuffix}.{FileExtension}";
             if (File.Exists(filePath))
             {
-                File.Delete(filePath);
+                try
+                {
+                    File.Delete(filePath);
+                }
+                catch (IOException)
+                {
+                    var uniqueString = System.DateTime.Now.ToString("yyyyMMdd-HHmmss");
+                    var alternativeFilePath = $"{Path.Combine(summary.ResultsDirectoryPath, summary.Title)}-{FileCaption}{FileNameSuffix}-{uniqueString}.{FileExtension}";
+                    consoleLogger.WriteLineError($"Could not overwrite file {filePath}. Exporting to {alternativeFilePath}");
+                    filePath = alternativeFilePath;
+                }
             }
 
             using (var stream = Portability.StreamWriter.FromPath(filePath))
