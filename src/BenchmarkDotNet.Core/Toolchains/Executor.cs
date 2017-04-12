@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
@@ -12,6 +13,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 
@@ -20,21 +22,20 @@ namespace BenchmarkDotNet.Toolchains
     [PublicAPI("Used by some of our Superusers that implement their own Toolchains (e.g. Kestrel team)")]
     public class Executor : IExecutor
     {
-        public ExecuteResult Execute(BuildResult buildResult, Benchmark benchmark, ILogger logger, IResolver resolver, IDiagnoser compositeDiagnoser = null)
+        public ExecuteResult Execute(ExecuteParameters executeParameters)
         {
-            var exePath = buildResult.ArtifactsPaths.ExecutablePath;
-            var args = compositeDiagnoser == null ? string.Empty : Engine.Signals.DiagnoserIsAttachedParam;
+            var exePath = executeParameters.BuildResult.ArtifactsPaths.ExecutablePath;
+            var args = executeParameters.Diagnoser == null ? string.Empty : Engine.Signals.DiagnoserIsAttachedParam;
 
             if (!File.Exists(exePath))
             {
                 return new ExecuteResult(false, -1, Array.Empty<string>(), Array.Empty<string>());
             }
 
-            return Execute(benchmark, logger, exePath, null, args, compositeDiagnoser, resolver);
+            return Execute(executeParameters.Benchmark, executeParameters.Logger, exePath, null, args, executeParameters.Diagnoser, executeParameters.Resolver, executeParameters.Config);
         }
 
-        private ExecuteResult Execute(Benchmark benchmark, ILogger logger, string exePath, string workingDirectory, string args, IDiagnoser diagnoser,
-            IResolver resolver)
+        private ExecuteResult Execute(Benchmark benchmark, ILogger logger, string exePath, string workingDirectory, string args, IDiagnoser diagnoser, IResolver resolver, IConfig config)
         {
             ConsoleHandler.EnsureInitialized(logger);
 
@@ -42,7 +43,7 @@ namespace BenchmarkDotNet.Toolchains
             {
                 using (var process = new Process { StartInfo = CreateStartInfo(benchmark, exePath, args, workingDirectory, resolver) })
                 {
-                    var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmark);
+                    var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmark, config);
                     
                     return Execute(process, benchmark, loggerWithDiagnoser, logger);
                 }

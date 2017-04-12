@@ -8,6 +8,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using Xunit;
 using Xunit.Abstractions;
@@ -46,9 +47,9 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public bool Done { get; private set; }
 
-            public ExecuteResult Execute(BuildResult buildResult, Benchmark benchmark, ILogger logger, IResolver resolver, IDiagnoser diagnoser)
+            public ExecuteResult Execute(ExecuteParameters executeParameters)
             {
-                logger.WriteLine("Executing");
+                executeParameters.Logger.WriteLine("Executing");
                 Done = true;
                 return new ExecuteResult(true, 0, Array.Empty<string>(), Array.Empty<string>());
             }

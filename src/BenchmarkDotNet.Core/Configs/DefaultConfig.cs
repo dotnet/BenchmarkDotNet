@@ -62,5 +62,7 @@ namespace BenchmarkDotNet.Configs
         public ISummaryStyle GetSummaryStyle() => SummaryStyle.Default;
 
         public IEnumerable<IDiagnoser> GetDiagnosers() => Array.Empty<IDiagnoser>();
+
+        public IEnumerable<HardwareCounter> GetHardwareCounters() => Array.Empty<HardwareCounter>();
     }
 }

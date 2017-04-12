@@ -20,6 +20,7 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<IAnalyser> GetAnalysers();
         IEnumerable<Job> GetJobs();
         IEnumerable<IValidator> GetValidators();
+        IEnumerable<HardwareCounter> GetHardwareCounters();
 
         IOrderProvider GetOrderProvider();
         ISummaryStyle GetSummaryStyle();
