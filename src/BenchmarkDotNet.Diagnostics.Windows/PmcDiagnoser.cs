@@ -219,6 +219,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public bool AlwaysShow => false;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
+            public bool IsNumeric => true;
             public UnitType UnitType => UnitType.Dimensionless;
             public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
 
@@ -247,6 +248,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public bool AlwaysShow => false;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 1;
+            public bool IsNumeric => true;
             public UnitType UnitType => UnitType.Dimensionless;
             public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
 
