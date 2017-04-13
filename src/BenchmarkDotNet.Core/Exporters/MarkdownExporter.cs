@@ -139,7 +139,7 @@ namespace BenchmarkDotNet.Exporters
                     logger.Write(tableHeaderSeparator);
                 }
 
-                logger.WriteLineStatistic(string.Join("", table.Columns.Where(c => c.NeedToShow).Select(c => new string('-', c.Width) + " |")));
+                logger.WriteLineStatistic(string.Join("", table.Columns.Where(c => c.NeedToShow).Select(getDelimiterLineForColumn)));
             }
             var rowCounter = 0;
             var highlightRow = false;
@@ -159,6 +159,12 @@ namespace BenchmarkDotNet.Exporters
                 table.PrintLine(line, logger, string.Empty, tableColumnSeparator, highlightRow, table.FullContentStartOfGroup[rowCounter], startOfGroupInBold, boldMarkupFormat);
                 rowCounter++;
             }
+        }
+
+        private static string getDelimiterLineForColumn(SummaryTable.SummaryTableColumn column)
+        {
+            var justifier = column.Justify == SummaryTable.SummaryTableColumn.TextJustification.Left ? " " : ":";
+            return new string('-', column.Width) + justifier + "|";
         }
     }
 }
