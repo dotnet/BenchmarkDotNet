@@ -62,6 +62,7 @@ namespace BenchmarkDotNet.Diagnosers
             public bool AlwaysShow => true;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
+            public bool IsNumeric => true;
             public UnitType UnitType => UnitType.Size;
             public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
 
@@ -93,6 +94,7 @@ namespace BenchmarkDotNet.Diagnosers
             public bool AlwaysShow => true;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
+            public bool IsNumeric => true;
             public UnitType UnitType => UnitType.Dimensionless;
             public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
 
