@@ -139,7 +139,7 @@ namespace BenchmarkDotNet.Exporters
                     logger.Write(tableHeaderSeparator);
                 }
 
-                logger.WriteLineStatistic(string.Join("", table.Columns.Where(c => c.NeedToShow).Select(getDelimiterLineForColumn)));
+                logger.WriteLineStatistic(string.Join("", table.Columns.Where(c => c.NeedToShow).Select(column => new string('-', column.Width) + getJustificationIndicator(column.Justify) + "|")));
             }
             var rowCounter = 0;
             var highlightRow = false;
@@ -161,10 +161,17 @@ namespace BenchmarkDotNet.Exporters
             }
         }
 
-        private static string getDelimiterLineForColumn(SummaryTable.SummaryTableColumn column)
+        private static string getJustificationIndicator(SummaryTable.SummaryTableColumn.TextJustification textJustification)
         {
-            var justifier = column.Justify == SummaryTable.SummaryTableColumn.TextJustification.Left ? " " : ":";
-            return new string('-', column.Width) + justifier + "|";
+            switch (textJustification)
+            {
+                case SummaryTable.SummaryTableColumn.TextJustification.Left:
+                    return " ";
+                case SummaryTable.SummaryTableColumn.TextJustification.Right:
+                    return ":";
+                default:
+                    return " ";
+            }
         }
     }
 }
