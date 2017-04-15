@@ -74,6 +74,7 @@ namespace BenchmarkDotNet.Columns
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Statistics;
         public int PriorityInCategory => (int) priority;
+        public bool IsNumeric => true;
         public UnitType UnitType => type;
 
         private string Format(Statistics statistics, ISummaryStyle style)

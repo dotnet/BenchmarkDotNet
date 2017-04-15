@@ -40,6 +40,11 @@ namespace BenchmarkDotNet.Columns
         int PriorityInCategory { get; }
 
         /// <summary>
+        /// Defines if the column's value represents a number
+        /// </summary>
+        bool IsNumeric { get; }
+
+        /// <summary>
         /// Defines how to format column's value
         /// </summary>
         UnitType UnitType { get; }

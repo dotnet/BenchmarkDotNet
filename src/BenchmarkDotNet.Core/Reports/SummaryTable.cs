@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Reports
             full.AddRange(FullContent);
             FullContentWithHeader = full.ToArray();
 
-            Columns = Enumerable.Range(0, columns.Length).Select(i => new SummaryTableColumn(this, i, columns[i].AlwaysShow)).ToArray();
+            Columns = Enumerable.Range(0, columns.Length).Select(i => new SummaryTableColumn(this, i, columns[i])).ToArray();
         }
 
         public class SummaryTableColumn
@@ -80,18 +80,27 @@ namespace BenchmarkDotNet.Reports
             public bool NeedToShow { get; }
             public int Width { get; }
             public bool IsDefault { get; }
+            public TextJustification Justify { get; }
 
-            public SummaryTableColumn(SummaryTable table, int index, bool alwaysShow)
+            public SummaryTableColumn(SummaryTable table, int index, IColumn column)
             {
                 Index = index;
                 Header = table.FullHeader[index];
                 Content = table.FullContent.Select(line => line[index]).ToArray();
-                NeedToShow = alwaysShow || Content.Distinct().Count() > 1;
+                NeedToShow = column.AlwaysShow || Content.Distinct().Count() > 1;
                 Width = Math.Max(Header.Length, Content.Any() ? Content.Max(line => line.Length) : 0) + 1;
                 IsDefault = table.IsDefault[index];
+
+                Justify = column.IsNumeric ? TextJustification.Right : TextJustification.Left;
             }
 
             public override string ToString() => Header;
+
+            public enum TextJustification
+            {
+                Left,
+                Right
+            }
         }
     }
 }
