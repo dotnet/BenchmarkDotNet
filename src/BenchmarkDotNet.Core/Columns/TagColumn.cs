@@ -26,6 +26,7 @@ namespace BenchmarkDotNet.Columns
         public int PriorityInCategory => 0;
         public bool IsNumeric => false;
         public UnitType UnitType => UnitType.Dimensionless;
+        public string Legend => $"Custom '{ColumnName}' tag column";
         public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
         public override string ToString() => ColumnName;
     }

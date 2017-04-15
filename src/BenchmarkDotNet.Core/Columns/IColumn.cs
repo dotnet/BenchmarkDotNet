@@ -48,5 +48,10 @@ namespace BenchmarkDotNet.Columns
         /// Defines how to format column's value
         /// </summary>
         UnitType UnitType { get; }
+
+        /// <summary>
+        /// Column description.
+        /// </summary>
+        string Legend { get; }
     }
 }

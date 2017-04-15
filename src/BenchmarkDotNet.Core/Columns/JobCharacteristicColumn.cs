@@ -51,5 +51,7 @@ namespace BenchmarkDotNet.Columns
                 .Select(c => (IColumn)new JobCharacteristicColumn(c)).ToArray());
 
         public static IColumn[] AllColumns => LazyAllColumns.Value;
+
+        public string Legend => "";
     }
 }

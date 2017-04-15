@@ -81,6 +81,7 @@ namespace BenchmarkDotNet.Reports
             public int Width { get; }
             public bool IsDefault { get; }
             public TextJustification Justify { get; }
+            public IColumn OriginalColumn { get; }
 
             public SummaryTableColumn(SummaryTable table, int index, IColumn column)
             {
@@ -90,6 +91,7 @@ namespace BenchmarkDotNet.Reports
                 NeedToShow = column.AlwaysShow || Content.Distinct().Count() > 1;
                 Width = Math.Max(Header.Length, Content.Any() ? Content.Max(line => line.Length) : 0) + 1;
                 IsDefault = table.IsDefault[index];
+                OriginalColumn = column;
 
                 Justify = column.IsNumeric ? TextJustification.Right : TextJustification.Left;
             }

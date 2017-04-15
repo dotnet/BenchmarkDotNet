@@ -26,5 +26,7 @@ namespace BenchmarkDotNet.Columns
         public bool IsNumeric => false;
         public UnitType UnitType => UnitType.Dimensionless;
         public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
+
+        public string Legend => $"Value of the '{ColumnName}' parameter";
     }
 }

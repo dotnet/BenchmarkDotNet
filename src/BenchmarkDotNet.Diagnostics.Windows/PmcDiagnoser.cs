@@ -221,6 +221,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public int PriorityInCategory => 0;
             public bool IsNumeric => true;
             public UnitType UnitType => UnitType.Dimensionless;
+            public string Legend => $"Hardware counter '{Counter}' per operation";
             public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
 
             private Dictionary<Benchmark, PmcStats> Results { get; }
@@ -250,6 +251,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public int PriorityInCategory => 1;
             public bool IsNumeric => true;
             public UnitType UnitType => UnitType.Dimensionless;
+            public string Legend => $"Hardware counter '{Id}' per operation";
             public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
 
             private Dictionary<Benchmark, PmcStats> Results { get; }

@@ -113,6 +113,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public int PriorityInCategory => 0;
             public bool IsNumeric => true;
             public UnitType UnitType => UnitType.Size;
+            public string Legend => "";
             public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
 
             public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style)
@@ -149,6 +150,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public int PriorityInCategory => 0;
             public bool IsNumeric => true;
             public UnitType UnitType => UnitType.Dimensionless;
+            public string Legend => "";
             public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
 
             public string GetValue(Summary summary, Benchmark benchmark)

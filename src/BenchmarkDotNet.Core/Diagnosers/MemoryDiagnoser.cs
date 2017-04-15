@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Environments;
@@ -35,8 +33,7 @@ namespace BenchmarkDotNet.Diagnosers
         public void BeforeMainRun(DiagnoserActionParameters _) { }
         public void BeforeCleanup() { }
 
-        public void DisplayResults(ILogger logger)
-            => logger.WriteInfo("Note: the Gen 0/1/2 Measurements are per 1k Operations");
+        public void DisplayResults(ILogger logger) { }
 
         public void ProcessResults(Benchmark benchmark, BenchmarkReport report) 
             => results.Add(benchmark, report.GcStats);
@@ -64,6 +61,7 @@ namespace BenchmarkDotNet.Diagnosers
             public int PriorityInCategory => 0;
             public bool IsNumeric => true;
             public UnitType UnitType => UnitType.Size;
+            public string Legend => "Allocated memory per single operation";
             public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
 
             public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style)
@@ -96,6 +94,7 @@ namespace BenchmarkDotNet.Diagnosers
             public int PriorityInCategory => 0;
             public bool IsNumeric => true;
             public UnitType UnitType => UnitType.Dimensionless;
+            public string Legend => $"GC Generation {generation} collects per 1k Operations";
             public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
 
             public bool IsAvailable(Summary summary)
