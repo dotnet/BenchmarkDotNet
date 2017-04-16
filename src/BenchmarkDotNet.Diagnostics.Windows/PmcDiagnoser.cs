@@ -6,9 +6,11 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.InProcess;
 using BenchmarkDotNet.Validators;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
@@ -99,6 +101,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private readonly Dictionary<Benchmark, PmcStats> results = new Dictionary<Benchmark, PmcStats>();
 
+        // ReSharper disable once EmptyConstructor parameterless ctor is mandatory for DiagnosersLoader.CreateDiagnoser
+        public PmcDiagnoser() { }
+
         protected override ulong EventType
             => unchecked((ulong)(KernelTraceEventParser.Keywords.PMCProfile | KernelTraceEventParser.Keywords.Profile));
 
@@ -107,10 +112,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             get { throw new NotImplementedException("Not needed for Kernel sessions (can be only one at a time"); }
         }
 
-        public void BeforeAnythingElse(Process process, Benchmark benchmark) { }
-        public void AfterSetup(Process process, Benchmark benchmark) { }
+        public void BeforeAnythingElse(DiagnoserActionParameters _) { }
+        public void AfterSetup(DiagnoserActionParameters _) { }
 
-        public void BeforeMainRun(Process process, Benchmark benchmark) => Start(process, benchmark);
+        public void BeforeMainRun(DiagnoserActionParameters parameters) => Start(parameters);
 
         public void BeforeCleanup() => Stop();
 
@@ -126,27 +131,39 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
         {
+            if (!validationParameters.Config.GetHardwareCounters().Any())
+            {
+                yield return new ValidationError(true, "No Hardware Counters defined, probably a bug");
+                yield break;
+            }
+
             if (TraceEventSession.IsElevated() != true)
                 yield return new ValidationError(true, "Must be elevated (Admin) to use Hardware Counters to use ETW Kernel Session.");
 
             var availableCpuCounters = TraceEventProfileSources.GetInfo();
-            foreach (var benchmark in validationParameters.Benchmarks
-                .Where(benchmark => !benchmark.Job.Diagnoser.HardwareCounters.IsNullOrEmpty()))
-            {
-                foreach (var hardwareCounter in benchmark.Job.Diagnoser.HardwareCounters)
-                {
-                    if (!EtwTranslations.TryGetValue(hardwareCounter, out var counterName))
-                        yield return new ValidationError(true, $"Counter {hardwareCounter} not recognized. Please make sure that you are using counter supported on Windows", benchmark);
 
-                    if (!availableCpuCounters.ContainsKey(counterName))
-                        yield return new ValidationError(true, $"The counter {counterName} is not available. Please make sure you are Windows 8+ without Hyper-V", benchmark);
+            foreach (var hardwareCounter in validationParameters.Config.GetHardwareCounters())
+            {
+                if (!EtwTranslations.TryGetValue(hardwareCounter, out var counterName))
+                    yield return new ValidationError(true, $"Counter {hardwareCounter} not recognized. Please make sure that you are using counter available on your machine. You can get the list of available counters by running `tracelog.exe -profilesources Help`");
+
+                if (!availableCpuCounters.ContainsKey(counterName))
+                    yield return new ValidationError(true, $"The counter {counterName} is not available. Please make sure you are Windows 8+ without Hyper-V");
+            }
+
+            foreach (var benchmark in validationParameters.Benchmarks)
+            {
+                if (benchmark.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic)
+                    && benchmark.Job.Infrastructure.Toolchain is InProcessToolchain)
+                {
+                    yield return new ValidationError(true, "Hardware Counters are not supported for InProcessToolchain.", benchmark);
                 }
             }
         }
 
-        protected override PmcStats GetInitializedStats(Benchmark benchmark)
+        protected override PmcStats GetInitializedStats(DiagnoserActionParameters parameters)
         {
-            var stats = new PmcStats(benchmark.Job.Diagnoser.HardwareCounters);
+            var stats = new PmcStats(parameters.Config.GetHardwareCounters().ToArray());
 
             var counters = stats.Counters.Values;
 
@@ -202,15 +219,16 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public bool AlwaysShow => false;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
+            public bool IsNumeric => true;
+            public UnitType UnitType => UnitType.Dimensionless;
+            public string Legend => $"Hardware counter '{Counter}' per operation";
+            public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
 
             private Dictionary<Benchmark, PmcStats> Results { get; }
             private HardwareCounter Counter { get; }
 
             public bool IsAvailable(Summary summary)
-                => summary.Benchmarks.Any(
-                    benchmark =>
-                        !benchmark.Job.Diagnoser.HardwareCounters.IsNullOrEmpty()
-                        && benchmark.Job.Diagnoser.HardwareCounters.Contains(Counter));
+                => summary.Config.GetHardwareCounters().Contains(Counter);
 
             public string GetValue(Summary summary, Benchmark benchmark)
                 => Results.TryGetValue(benchmark, out var stats) && stats.Counters.ContainsKey(Counter)
@@ -231,19 +249,21 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public bool AlwaysShow => false;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 1;
+            public bool IsNumeric => true;
+            public UnitType UnitType => UnitType.Dimensionless;
+            public string Legend => $"Hardware counter '{Id}' per operation";
+            public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
 
             private Dictionary<Benchmark, PmcStats> Results { get; }
 
             public bool IsAvailable(Summary summary)
-                => summary.Benchmarks.Any(
-                    benchmark =>
-                        !benchmark.Job.Diagnoser.HardwareCounters.IsNullOrEmpty()
-                        && benchmark.Job.Diagnoser.HardwareCounters.Contains(HardwareCounter.BranchInstructions)
-                        && benchmark.Job.Diagnoser.HardwareCounters.Contains(HardwareCounter.BranchMispredictions));
+                => summary.Config.GetHardwareCounters().Any()
+                        && summary.Config.GetHardwareCounters().Contains(HardwareCounter.BranchInstructions)
+                        && summary.Config.GetHardwareCounters().Contains(HardwareCounter.BranchMispredictions);
 
-            public string GetValue(Summary summary, Benchmark benchmark)
+            public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style)
                 => Results.TryGetValue(benchmark, out var stats) && stats.Counters.ContainsKey(HardwareCounter.BranchMispredictions) && stats.Counters.ContainsKey(HardwareCounter.BranchInstructions)
-                    ? (stats.Counters[HardwareCounter.BranchMispredictions].Count / (double)stats.Counters[HardwareCounter.BranchInstructions].Count).ToString("P2")
+                    ? (stats.Counters[HardwareCounter.BranchMispredictions].Count / (double)stats.Counters[HardwareCounter.BranchInstructions].Count).ToString(style.PrintUnitsInContent ? "P2" : String.Empty)
                     : "-";
         }
     }

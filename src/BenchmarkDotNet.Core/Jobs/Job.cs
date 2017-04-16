@@ -9,7 +9,6 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<RunMode> RunCharacteristic = Characteristic.Create((Job j) => j.Run);
         public static readonly Characteristic<InfrastructureMode> InfrastructureCharacteristic = Characteristic.Create((Job j) => j.Infrastructure);
         public static readonly Characteristic<AccuracyMode> AccuracyCharacteristic = Characteristic.Create((Job j) => j.Accuracy);
-        public static readonly Characteristic<DiagnoserMode> DiagnoserCharacteristic = Characteristic.Create((Job j) => j.Diagnoser);
 
         // Env
         public static readonly Job Clr = new Job(nameof(Clr), EnvMode.Clr).Freeze();
@@ -35,7 +34,6 @@ namespace BenchmarkDotNet.Jobs
             RunCharacteristic[this] = new RunMode();
             InfrastructureCharacteristic[this] = new InfrastructureMode();
             AccuracyCharacteristic[this] = new AccuracyMode();
-            DiagnoserCharacteristic[this] = new DiagnoserMode();
         }
 
         public Job(CharacteristicObject other) : this((string)null, other)
@@ -60,7 +58,6 @@ namespace BenchmarkDotNet.Jobs
         public RunMode Run => RunCharacteristic[this];
         public InfrastructureMode Infrastructure => InfrastructureCharacteristic[this];
         public AccuracyMode Accuracy => AccuracyCharacteristic[this];
-        public DiagnoserMode Diagnoser => DiagnoserCharacteristic[this];
 
         public string ResolvedId => HasValue(IdCharacteristic) ? Id : JobIdGenerator.GenerateRandomId(this);
         public string FolderInfo => ResolvedId;

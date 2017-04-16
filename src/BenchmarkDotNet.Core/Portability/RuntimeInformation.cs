@@ -36,9 +36,8 @@ namespace BenchmarkDotNet.Portability
 
         internal static bool IsWindows()
         {
-#if !CORE
-            return new[] { PlatformID.Win32NT, PlatformID.Win32S, PlatformID.Win32Windows, PlatformID.WinCE }
-                .Contains(System.Environment.OSVersion.Platform);
+#if CLASSIC
+            return System.Environment.OSVersion.Platform.ToString().Contains("Win");
 #else
             return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 #endif
@@ -46,7 +45,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static bool IsLinux()
         {
-#if !CORE
+#if CLASSIC
             return System.Environment.OSVersion.Platform == PlatformID.Unix;
 #else
             return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
@@ -55,7 +54,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static bool IsMacOSX()
         {
-#if !CORE
+#if CLASSIC
             return System.Environment.OSVersion.Platform == PlatformID.MacOSX;
 #else
             return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
@@ -66,37 +65,16 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetOsVersion()
         {
-            if (IsLinux())
-            {
-                string os = ExternalToolsHelper.LsbRelease.Value.GetValueOrDefault("Description");
-                if (!string.IsNullOrWhiteSpace(os))
-                    return os;
-            }
-#if !CORE
-            return System.Environment.OSVersion.ToString();
-#else
-            if (IsWindows())
-            {
-                string ver = ProcessHelper.RunAndReadOutput("cmd", "/c ver");
-                if (ver != null)
-                    return NiceString(ver.Replace("[", "").Replace("]", "").Replace("Version", ""));
-                return "Windows";
-            }
-            if (IsLinux())
-            {
-                return "Linux";
-            }
-            if (IsMacOSX())
-            {
-                return "OSX";
-            }
-
-            return Unknown;
+#if CLASSIC
+            if (IsMono())
+                return System.Environment.OSVersion.ToString();
 #endif
+            return $"{Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem} {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion}";
         }
 
         internal static string GetProcessorName()
         {
+            string NiceString(string processorName) => Regex.Replace(processorName.Replace("@", "").Trim(), @"\s+", " ");
 #if !CORE
             if (IsWindows() && !IsMono())
             {
@@ -128,6 +106,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetRuntimeVersion()
         {
+#if CLASSIC
             if (IsMono())
             {
                 var monoRuntimeType = Type.GetType("Mono.Runtime");
@@ -140,18 +119,18 @@ namespace BenchmarkDotNet.Portability
                         int bracket1 = version.IndexOf('('), bracket2 = version.IndexOf(')');
                         if (bracket1 != -1 && bracket2 != -1)
                         {
-                            string comment = version.Substring(bracket1 + 1, bracket2 - bracket1 - 1);                            
+                            string comment = version.Substring(bracket1 + 1, bracket2 - bracket1 - 1);
                             var commentParts = comment.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                             if (commentParts.Length > 2)
                                 version = version.Substring(0, bracket1) + "(" + commentParts[0] + " " + commentParts[1] + ")";
                         }
-                    }                    
+                    }
                     return "Mono " + version;
                 }
             }
-#if CLASSIC
+
             return $"Clr {System.Environment.Version}";
-#elif CORE
+#else
             return System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
 #endif
         }
@@ -255,40 +234,6 @@ namespace BenchmarkDotNet.Portability
             }
             return isDebug.Value ? DebugConfigurationName : ReleaseConfigurationName;
         }
-
-        internal static string GetDotNetCliRuntimeIdentifier()
-        {
-#if CORE
-            return Microsoft.DotNet.InternalAbstractions.RuntimeEnvironment.GetRuntimeIdentifier();
-#else
-// the Microsoft.DotNet.InternalAbstractions has no .NET 4.0 support, so we have to build it on our own
-// code based on https://github.com/dotnet/cli/blob/f8631fa4b731d4c903dbe8b0b5e5332eee40ecae/src/Microsoft.DotNet.InternalAbstractions/RuntimeEnvironment.cs
-            var version = System.Environment.OSVersion.Version;
-            if (version.Major == 6)
-            {
-                if (version.Minor == 1)
-                {
-                    return "win7-x64";
-                }
-                else if (version.Minor == 2)
-                {
-                    return "win8-x64";
-                }
-                else if (version.Minor == 3)
-                {
-                    return "win81-x64";
-                }
-            }
-            else if (version.Major == 10 && version.Minor == 0)
-            {
-                return "win10-x64";
-            }
-
-            return string.Empty; // Unknown version
-#endif
-        }
-
-        private static string NiceString(string processorName) => Regex.Replace(processorName.Replace("@", "").Trim(), @"\s+", " ");
 
         // See http://aakinshin.net/en/blog/dotnet/jit-version-determining-in-runtime/
         private class JitHelper

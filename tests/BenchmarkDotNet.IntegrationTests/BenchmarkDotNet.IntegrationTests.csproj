@@ -17,11 +17,15 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.ConfigPerAssembly\BenchmarkDotNet.IntegrationTests.ConfigPerAssembly.csproj" />
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.DisabledOptimizations\BenchmarkDotNet.IntegrationTests.DisabledOptimizations.csproj" />
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.EnabledOptimizations\BenchmarkDotNet.IntegrationTests.EnabledOptimizations.csproj" />
     <ProjectReference Include="..\BenchmarkDotNet.Tests\BenchmarkDotNet.Tests.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0-preview-20170217-05" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.3.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
     <PackageReference Include="xunit" Version="2.2.0" />
   </ItemGroup>
@@ -30,10 +34,15 @@
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.CustomPaths\BenchmarkDotNet.IntegrationTests.CustomPaths.csproj" />
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="1.1.0" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.Threading.Tasks" />
     <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />

@@ -28,6 +28,7 @@ namespace BenchmarkDotNet.Configs
         public static IConfig With(this IConfig config, params IValidator[] validators) => config.With(m => m.Add(validators));
         public static IConfig With(this IConfig config, params Job[] jobs) => config.With(m => m.Add(jobs));
         public static IConfig With(this IConfig config, IOrderProvider provider) => config.With(m => m.Set(provider));
+        public static IConfig With(this IConfig config, params HardwareCounter[] counters) => config.With(c => c.Add(counters));
 
         public static IConfig KeepBenchmarkFiles(this IConfig config, bool value = true) => config.With(m => m.KeepBenchmarkFiles = value);
         public static IConfig RemoveBenchmarkFiles(this IConfig config) => config.KeepBenchmarkFiles(false);

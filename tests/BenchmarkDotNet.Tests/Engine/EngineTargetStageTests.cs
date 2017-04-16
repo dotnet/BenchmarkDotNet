@@ -1,5 +1,4 @@
 ﻿using System;
-using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
@@ -29,7 +28,8 @@ namespace BenchmarkDotNet.Tests.Engine
         public void AutoTest_InfiniteIncrease() => AutoTest(data => TimeInterval.Second * data.Index, MaxIterationCount);
 
         [Fact]
-        public void AutoTest_InfiniteIncreaseIdle() => AutoTest(data => TimeInterval.Second * data.Index, MaxIdleIterationCount, mode: IterationMode.IdleTarget);
+        public void AutoTest_InfiniteIncreaseIdle() => AutoTest(data => TimeInterval.Second * data.Index, MaxIdleIterationCount,
+            mode: IterationMode.IdleTarget);
 
         private void AutoTest(Func<IterationData, TimeInterval> measure, int min, int max = -1, IterationMode mode = IterationMode.MainTarget)
         {

@@ -63,7 +63,6 @@ namespace BenchmarkDotNet.Tests.Engine
             long invokeCount = stage.Run();
             output.WriteLine($"InvokeCount = {invokeCount} (Min= {minInvokeCount}, Max = {maxInvokeCount})");
             Assert.InRange(invokeCount, minInvokeCount, maxInvokeCount);
-
         }
 
         private EnginePilotStage CreateStage(Job job, Func<IterationData, TimeInterval> measure)

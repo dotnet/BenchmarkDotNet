@@ -1,17 +1,18 @@
 ﻿using System;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Validators;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Parsers.Clr;
 using Microsoft.Diagnostics.Tracing.Session;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
@@ -30,11 +31,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         protected override string SessionNamePrefix => "GC";
 
-        public void BeforeAnythingElse(Process process, Benchmark benchmark) { }
+        public void BeforeAnythingElse(DiagnoserActionParameters _) { }
 
-        public void AfterSetup(Process process, Benchmark benchmark) { }
+        public void AfterSetup(DiagnoserActionParameters _) { }
 
-        public void BeforeMainRun(Process process, Benchmark benchmark) => Start(process, benchmark);
+        public void BeforeMainRun(DiagnoserActionParameters parameters) => Start(parameters);
 
         public void BeforeCleanup() => Stop();
 
@@ -110,16 +111,18 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public bool AlwaysShow => true;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
+            public bool IsNumeric => true;
+            public UnitType UnitType => UnitType.Size;
+            public string Legend => "";
+            public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
 
-            public string GetValue(Summary summary, Benchmark benchmark)
+            public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style)
             {
-                if (results.ContainsKey(benchmark) && results[benchmark] != null)
-                {
-                    var result = results[benchmark];
-                    // TODO scale this based on the minimum value in the column, i.e. use B/KB/MB as appropriate
-                    return (result.AllocatedBytes / (double) result.TotalOperations).ToString("N2");
-                }
-                return "N/A";
+                if (!results.ContainsKey(benchmark) || results[benchmark] == null)
+                    return "N/A";
+
+                var value = results[benchmark].AllocatedBytes / (double)results[benchmark].TotalOperations;
+                return UnitType == UnitType.Size ? ((long)value).ToSizeStr(style.SizeUnit, 1, style.PrintUnitsInContent) : value.ToStr();
             }
         }
 
@@ -145,6 +148,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public bool AlwaysShow => true;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0;
+            public bool IsNumeric => true;
+            public UnitType UnitType => UnitType.Dimensionless;
+            public string Legend => "";
+            public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
 
             public string GetValue(Summary summary, Benchmark benchmark)
             {

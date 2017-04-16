@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Tests
 
         private void CheckConvertOneWay(double value1, TimeUnit unit1, double value2, TimeUnit unit2)
         {
-            var convertedValue2 = TimeUnit.Convert(value1, unit1, unit2);
+            double convertedValue2 = TimeUnit.Convert(value1, unit1, unit2);
             output.WriteLine($"Expected: {value1} {unit1.Name} = {value2} {unit2.Name}");
             output.WriteLine($"Actual: {value1} {unit1.Name} = {convertedValue2} {unit2.Name}");
             output.WriteLine("");

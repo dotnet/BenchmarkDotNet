@@ -10,6 +10,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Validators;
+using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -22,7 +23,9 @@ namespace BenchmarkDotNet.Configs
         private readonly List<IAnalyser> analysers = new List<IAnalyser>();
         private readonly List<IValidator> validators = new List<IValidator>();
         private readonly List<Job> jobs = new List<Job>();
+        private readonly List<HardwareCounter> hardwareCounters = new List<HardwareCounter>();
         private IOrderProvider orderProvider = null;
+        private ISummaryStyle summaryStyle = null;
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;
@@ -31,8 +34,9 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IAnalyser> GetAnalysers() => analysers;
         public IEnumerable<IValidator> GetValidators() => validators;
         public IEnumerable<Job> GetJobs() => jobs;
-
+        public IEnumerable<HardwareCounter> GetHardwareCounters() => hardwareCounters;
         public IOrderProvider GetOrderProvider() => orderProvider;
+        public ISummaryStyle GetSummaryStyle() => summaryStyle;
 
         public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
 
@@ -46,7 +50,9 @@ namespace BenchmarkDotNet.Configs
         public void Add(params IAnalyser[] newAnalysers) => analysers.AddRange(newAnalysers);
         public void Add(params IValidator[] newValidators) => validators.AddRange(newValidators);
         public void Add(params Job[] newJobs) => jobs.AddRange(newJobs.Select(j => j.Freeze())); // DONTTOUCH: please DO NOT remove .Freeze() call.
+        public void Add(params HardwareCounter[] newHardwareCounters) => hardwareCounters.AddRange(newHardwareCounters);
         public void Set(IOrderProvider provider) => orderProvider = provider ?? orderProvider;
+        public void Set(ISummaryStyle style) => summaryStyle = style ?? summaryStyle;
 
         public void Add(IConfig config)
         {
@@ -57,16 +63,18 @@ namespace BenchmarkDotNet.Configs
             analysers.AddRange(config.GetAnalysers());
             jobs.AddRange(config.GetJobs());
             validators.AddRange(config.GetValidators());
+            hardwareCounters.AddRange(config.GetHardwareCounters());
             orderProvider = config.GetOrderProvider() ?? orderProvider;
             KeepBenchmarkFiles |= config.KeepBenchmarkFiles;
+            summaryStyle = summaryStyle ?? config.GetSummaryStyle();
         }
 
         public IEnumerable<IDiagnoser> GetDiagnosers()
         {
-            if (jobs.All(job => job.Diagnoser.HardwareCounters.IsNullOrEmpty()))
+            if (hardwareCounters.IsEmpty())
                 return diagnosers;
 
-            var hardwareCountersDiagnoser = DefaultConfig.LazyLoadedDiagnosers.Value
+            var hardwareCountersDiagnoser = DiagnosersLoader.LazyLoadedDiagnosers.Value
                 .SingleOrDefault(diagnoser => diagnoser is IHardwareCountersDiagnoser);
 
             if(hardwareCountersDiagnoser != default(IDiagnoser))

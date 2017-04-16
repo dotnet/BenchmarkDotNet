@@ -2,6 +2,7 @@
 using System.Linq;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Reports;
+using JetBrains.Annotations;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Engine
@@ -23,6 +24,7 @@ namespace BenchmarkDotNet.Tests.Engine
             CheckResults(6, measurements, false);
         }
 
+        [AssertionMethod]
         private static void CheckResults(int expectedResultCount, List<Measurement> measurements, bool removeOutliers)
         {
             Assert.Equal(expectedResultCount, new RunResults(null, measurements, removeOutliers, default(GcStats)).GetMeasurements().Count());

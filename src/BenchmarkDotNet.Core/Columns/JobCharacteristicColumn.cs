@@ -32,6 +32,9 @@ namespace BenchmarkDotNet.Columns
         public bool AlwaysShow => false;
         public ColumnCategory Category => ColumnCategory.Job;
         public int PriorityInCategory => 0;
+        public bool IsNumeric => false;
+        public UnitType UnitType => UnitType.Dimensionless;
+        public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
 
         public bool IsDefault(Summary summary, Benchmark benchmark) => !benchmark.Job.HasValue(characteristic);
 
@@ -48,5 +51,7 @@ namespace BenchmarkDotNet.Columns
                 .Select(c => (IColumn)new JobCharacteristicColumn(c)).ToArray());
 
         public static IColumn[] AllColumns => LazyAllColumns.Value;
+
+        public string Legend => "";
     }
 }

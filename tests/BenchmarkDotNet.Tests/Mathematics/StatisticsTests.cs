@@ -17,6 +17,7 @@ namespace BenchmarkDotNet.Tests.Mathematics
 
         private void Print(Statistics summary)
         {
+            output.WriteLine("N = " + summary.N);
             output.WriteLine("Min = " + summary.Min);
             output.WriteLine("LowerFence = " + summary.LowerFence);
             output.WriteLine("Q1 = " + summary.Q1);
@@ -33,13 +34,13 @@ namespace BenchmarkDotNet.Tests.Mathematics
         }
 
         [Fact]
-        public void Test0()
+        public void StatisticsWithN0Test()
         {
             Assert.Throws<InvalidOperationException>(() => new Statistics());
         }
 
         [Fact]
-        public void Test1()
+        public void StatisticsWithN1Test()
         {
             var summary = new Statistics(1);
             Print(summary);
@@ -63,7 +64,7 @@ namespace BenchmarkDotNet.Tests.Mathematics
         }
 
         [Fact]
-        public void Test2()
+        public void StatisticsWithN2Test()
         {
             var summary = new Statistics(1, 2);
             Print(summary);
@@ -78,16 +79,16 @@ namespace BenchmarkDotNet.Tests.Mathematics
             Assert.Equal(1, summary.InterquartileRange);
             Assert.Equal(0.70711, summary.StandardDeviation, 4);
             Assert.Equal(Array.Empty<double>(), summary.Outliers);
-			Assert.Equal(1, summary.Percentiles.P0);
-			Assert.Equal(1.25, summary.Percentiles.P25);
-			Assert.Equal(1.5, summary.Percentiles.P50);
-			Assert.Equal(1.85, summary.Percentiles.P85);
-			Assert.Equal(1.95, summary.Percentiles.P95);
-			Assert.Equal(2, summary.Percentiles.P100);
+            Assert.Equal(1, summary.Percentiles.P0);
+            Assert.Equal(1.25, summary.Percentiles.P25);
+            Assert.Equal(1.5, summary.Percentiles.P50);
+            Assert.Equal(1.85, summary.Percentiles.P85);
+            Assert.Equal(1.95, summary.Percentiles.P95);
+            Assert.Equal(2, summary.Percentiles.P100);
         }
 
         [Fact]
-        public void Test3()
+        public void StatisticsWithN3Test()
         {
             var summary = new Statistics(1, 2, 4);
             Print(summary);
@@ -102,16 +103,16 @@ namespace BenchmarkDotNet.Tests.Mathematics
             Assert.Equal(3, summary.InterquartileRange);
             Assert.Equal(1.52753, summary.StandardDeviation, 4);
             Assert.Equal(Array.Empty<double>(), summary.Outliers);
-			Assert.Equal(1, summary.Percentiles.P0);
-			Assert.Equal(1.5, summary.Percentiles.P25);
-			Assert.Equal(2, summary.Percentiles.P50);
-			Assert.Equal(3.4, summary.Percentiles.P85);
-			Assert.Equal(3.8, summary.Percentiles.P95);
-			Assert.Equal(4, summary.Percentiles.P100);
+            Assert.Equal(1, summary.Percentiles.P0);
+            Assert.Equal(1.5, summary.Percentiles.P25);
+            Assert.Equal(2, summary.Percentiles.P50);
+            Assert.Equal(3.4, summary.Percentiles.P85);
+            Assert.Equal(3.8, summary.Percentiles.P95);
+            Assert.Equal(4, summary.Percentiles.P100);
         }
 
         [Fact]
-        public void Test7()
+        public void StatisticsWithN7Test()
         {
             var summary = new Statistics(1, 2, 4, 8, 16, 32, 64);
             Print(summary);
@@ -126,12 +127,12 @@ namespace BenchmarkDotNet.Tests.Mathematics
             Assert.Equal(30, summary.InterquartileRange);
             Assert.Equal(22.9378, summary.StandardDeviation, 4);
             Assert.Equal(Array.Empty<double>(), summary.Outliers);
-			Assert.Equal(1, summary.Percentiles.P0);
-			Assert.Equal(3, summary.Percentiles.P25);
-			Assert.Equal(8, summary.Percentiles.P50);
-			Assert.Equal(35.2, summary.Percentiles.P85, 4);
-			Assert.Equal(54.4, summary.Percentiles.P95, 4);
-			Assert.Equal(64, summary.Percentiles.P100);
+            Assert.Equal(1, summary.Percentiles.P0);
+            Assert.Equal(3, summary.Percentiles.P25);
+            Assert.Equal(8, summary.Percentiles.P50);
+            Assert.Equal(35.2, summary.Percentiles.P85, 4);
+            Assert.Equal(54.4, summary.Percentiles.P95, 4);
+            Assert.Equal(64, summary.Percentiles.P100);
         }
 
         [Fact]
@@ -155,7 +156,7 @@ namespace BenchmarkDotNet.Tests.Mathematics
         }
 
         [Fact]
-        public void PercentileValuesTest()
+        public void PercentileValuesWithN30Test()
         {
             var summary = new Statistics(Enumerable.Range(1, 30));
             Print(summary);
@@ -168,11 +169,15 @@ namespace BenchmarkDotNet.Tests.Mathematics
             Assert.Equal(27.1, summary.Percentiles.P90);
             Assert.Equal(28.55, summary.Percentiles.P95, 4);
             Assert.Equal(30, summary.Percentiles.P100);
+        }
 
+        [Fact]
+        public void PercentileValuesWithN90Test()
+        {
             var a = Enumerable.Range(1, 30);
             var b = Enumerable.Repeat(0, 30).Concat(a);
             var c = b.Concat(Enumerable.Repeat(31, 30));
-            summary = new Statistics(c);
+            var summary = new Statistics(c);
             Print(summary);
             Assert.Equal(0, summary.Percentiles.P0);
             Assert.Equal(0, summary.Percentiles.P25);

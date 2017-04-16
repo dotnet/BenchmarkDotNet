@@ -1,25 +1,19 @@
-﻿using System;
+﻿#if CLASSIC
+using System;
 using System.Configuration;
 using BenchmarkDotNet.Attributes;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace BenchmarkDotNet.IntegrationTests.Classic
+namespace BenchmarkDotNet.IntegrationTests
 {
-    public class AppConfigTests
+    public class AppConfigTests : BenchmarkTestExecutor
     {
-        private readonly ITestOutputHelper output;
-
-        public AppConfigTests(ITestOutputHelper output)
-        {
-            this.output = output;
-        }
+        public AppConfigTests(ITestOutputHelper output) : base(output) { }
 
         [Fact]
         public void CustomSettingsGetRewritten()
-        {
-            BenchmarkTestRunner.CanCompileAndRun<AppConfigConsumingBenchmark>(output);
-        }
+            => CanExecute<AppConfigConsumingBenchmark>();
     }
 
     public class AppConfigConsumingBenchmark
@@ -34,3 +28,4 @@ namespace BenchmarkDotNet.IntegrationTests.Classic
         }
     }
 }
+#endif

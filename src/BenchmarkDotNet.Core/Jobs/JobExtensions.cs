@@ -46,9 +46,7 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithEvaluateOverhead(this Job job, bool value) => job.WithCore(j => j.Accuracy.EvaluateOverhead = value);
         public static Job WithRemoveOutliers(this Job job, bool value) => job.WithCore(j => j.Accuracy.RemoveOutliers = value);
         public static Job WithAnalyzeLaunchVariance(this Job job, bool value) => job.WithCore(j => j.Accuracy.AnalyzeLaunchVariance = value);
-
-        // Diagnoser
-        public static Job WithHardwareCounters(this Job job, params HardwareCounter[] counters) => job.WithCore(j => j.Diagnoser.HardwareCounters = counters);
+        
 
         // Info
         [Obsolete]

@@ -27,7 +27,8 @@ namespace BenchmarkDotNet.Tests
         }
 
 
-        #pragma warning disable CS1998
+#pragma warning disable CS1998
+
         [Benchmark]
         public async void AsyncVoidMethod() { }
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Running;
@@ -13,8 +14,9 @@ namespace BenchmarkDotNet.Loggers
         private readonly Process process;
         private readonly Benchmark benchmark;
         private readonly IDiagnoser diagnoser;
+        private readonly DiagnoserActionParameters diagnoserActionParameters;
 
-        public SynchronousProcessOutputLoggerWithDiagnoser(ILogger logger, Process process, IDiagnoser diagnoser, Benchmark benchmark)
+        public SynchronousProcessOutputLoggerWithDiagnoser(ILogger logger, Process process, IDiagnoser diagnoser, Benchmark benchmark, IConfig config)
         {
             if (!process.StartInfo.RedirectStandardOutput)
             {
@@ -25,6 +27,10 @@ namespace BenchmarkDotNet.Loggers
             this.process = process;
             this.diagnoser = diagnoser;
             this.benchmark = benchmark;
+            diagnoserActionParameters = new DiagnoserActionParameters(
+                process,
+                benchmark,
+                config);
 
             LinesWithResults = new List<string>();
             LinesWithExtraOutput = new List<string>();
@@ -50,15 +56,15 @@ namespace BenchmarkDotNet.Loggers
                 }
                 else if (line == Engine.Signals.BeforeAnythingElse)
                 {
-                    diagnoser?.BeforeAnythingElse(process, benchmark);
+                    diagnoser?.BeforeAnythingElse(diagnoserActionParameters);
                 }
                 else if (line == Engine.Signals.AfterSetup)
                 {
-                    diagnoser?.AfterSetup(process, benchmark);
+                    diagnoser?.AfterSetup(diagnoserActionParameters);
                 }
                 else if (line == Engine.Signals.BeforeMainRun)
                 {
-                    diagnoser?.BeforeMainRun(process, benchmark);
+                    diagnoser?.BeforeMainRun(diagnoserActionParameters);
                 }
                 else if (line == Engine.Signals.BeforeCleanup)
                 {

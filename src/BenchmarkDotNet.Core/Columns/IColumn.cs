@@ -16,7 +16,15 @@ namespace BenchmarkDotNet.Columns
         /// </summary>
         string ColumnName { get; }
 
+        /// <summary>
+        /// Value in this column formatted using the default style.
+        /// </summary>
         string GetValue(Summary summary, Benchmark benchmark);
+
+        /// <summary>
+        /// Value in this column formatted using the specified style.
+        /// </summary>
+        string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style);
 
         bool IsDefault(Summary summary, Benchmark benchmark);
 
@@ -30,5 +38,20 @@ namespace BenchmarkDotNet.Columns
         /// Defines order of column in the same category.
         /// </summary>
         int PriorityInCategory { get; }
+
+        /// <summary>
+        /// Defines if the column's value represents a number
+        /// </summary>
+        bool IsNumeric { get; }
+
+        /// <summary>
+        /// Defines how to format column's value
+        /// </summary>
+        UnitType UnitType { get; }
+
+        /// <summary>
+        /// Column description.
+        /// </summary>
+        string Legend { get; }
     }
 }

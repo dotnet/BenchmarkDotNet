@@ -7,6 +7,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Validators;
+using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -19,8 +20,10 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<IAnalyser> GetAnalysers();
         IEnumerable<Job> GetJobs();
         IEnumerable<IValidator> GetValidators();
+        IEnumerable<HardwareCounter> GetHardwareCounters();
 
         IOrderProvider GetOrderProvider();
+        ISummaryStyle GetSummaryStyle();
 
         ConfigUnionRule UnionRule { get; }
 

@@ -91,7 +91,28 @@ namespace BenchmarkDotNet.Columns
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Baseline;
         public int PriorityInCategory => (int) Kind;
+        public bool IsNumeric => true;
+        public UnitType UnitType => UnitType.Dimensionless;
+        public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
         public override string ToString() => ColumnName;
         public bool IsDefault(Summary summary, Benchmark benchmark) => false;
+
+        public string Legend
+        {
+            get
+            {
+                switch (Kind)
+                {
+                    case DiffKind.Mean:
+                        return "Mean(CurrentBenchmark) / Mean(BaselineBenchmark)";
+                    case DiffKind.StdDev:
+                        return "Standard deviation of ratio of distibution of [CurrentBenchmark] and [BaselineBenchmark]";
+                    case DiffKind.WelchTTestPValue:
+                        return "p-value for Welch's t-test of [CurrentbBenchmark] and [BaselineBenchmark]";
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(Kind));
+                }
+            }
+        }
     }
 }

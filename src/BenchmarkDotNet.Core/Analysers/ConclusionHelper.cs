@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Analysers
             if (filtered.Any())
             {
                 printLine("");
-                printLine($"*** {title} ***");
+                printLine($"// * {title} *");
                 foreach (var group in filtered.GroupBy(c => c.AnalyserId))
                 {
                     printLine($"{group.Key}");
