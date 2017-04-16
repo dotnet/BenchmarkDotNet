@@ -1,0 +1,14 @@
+﻿{noformat}
+
+BenchmarkDotNet=v0.10.3.20170408-develop, OS=Microsoft Windows NT 10.0.14393.0
+Processor=Intel(R) Core(TM) i7-6700HQ CPU 2.60GHz, ProcessorCount=8
+Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
+  [Host] : Clr 4.0.30319.42000, 64bit RyuJIT-v4.6.1637.0
+
+Job=LongRun  LaunchCount=3  TargetCount=100  
+WarmupCount=15  
+
+{noformat}
+ ||Method ||     Mean ||   StdDev ||      P67 ||
+ |    Foo | 1.0000 ns | 0.0000 ns | 1.0000 ns |
+ |    Bar | 1.0000 ns | 0.0000 ns | 1.0000 ns |

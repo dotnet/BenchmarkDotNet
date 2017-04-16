@@ -8,9 +8,7 @@ using ApprovalTests.Namers;
 using ApprovalTests.Reporters;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
@@ -18,6 +16,7 @@ using Xunit;
 namespace BenchmarkDotNet.Tests.Exporters
 {
     [UseReporter(typeof(XUnit2Reporter))]
+    [UseApprovalSubdirectory("ApprovedFiles")]
     public class ApprovalTest : IDisposable
     {
         private readonly CultureInfo initCulture;
