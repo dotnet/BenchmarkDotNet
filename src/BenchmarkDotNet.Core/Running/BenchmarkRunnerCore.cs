@@ -124,6 +124,7 @@ namespace BenchmarkDotNet.Running
             var columnWithLegends = summary.Table.Columns.Select(c => c.OriginalColumn).Where(c => !string.IsNullOrEmpty(c.Legend)).ToList();
             if (columnWithLegends.Any())
             {
+                logger.WriteLine();
                 logger.WriteLineHeader("// * Legends *");
                 int maxNameWidth = columnWithLegends.Select(c => c.ColumnName.Length).Max();
                 foreach (var column in columnWithLegends)
