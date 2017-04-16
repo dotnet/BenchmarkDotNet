@@ -8,6 +8,6 @@ Job=LongRun  LaunchCount=3  TargetCount=100
 WarmupCount=15  
 
  Method |      Mean |    StdDev |       P67 |
-------- |---------- |---------- |---------- |
+------- |----------:|----------:|----------:|
     Foo | 1.0000 ns | 0.0000 ns | 1.0000 ns |
     Bar | 1.0000 ns | 0.0000 ns | 1.0000 ns |
