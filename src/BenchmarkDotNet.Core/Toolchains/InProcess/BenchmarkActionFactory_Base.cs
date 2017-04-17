@@ -31,6 +31,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <summary>Base class that provides reusable API for final implementations.</summary>
         internal abstract class BenchmarkActionBase : BenchmarkAction
         {
+            protected static TDelegate CreateMain<TDelegate>([CanBeNull] object targetInstance, MethodInfo mainMethod)
+            {
+                if (mainMethod.IsStatic)
+                    return (TDelegate)(object)mainMethod.CreateDelegate(typeof(TDelegate));
+
+                return (TDelegate)(object)mainMethod.CreateDelegate(typeof(TDelegate), targetInstance);
+            }
+
             protected static TDelegate CreateMainOrIdle<TDelegate>(
                 [CanBeNull] object targetInstance, [CanBeNull] MethodInfo mainMethod,
                 [NotNull] TDelegate idleStaticCallback, [NotNull] TDelegate idleInstanceCallback)
