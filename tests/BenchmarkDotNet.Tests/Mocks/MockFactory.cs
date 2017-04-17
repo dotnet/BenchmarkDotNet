@@ -69,22 +69,22 @@ namespace BenchmarkDotNet.Tests.Mocks
         {
             public static MockHostEnvironmentInfo Default = new MockHostEnvironmentInfo
             {
-                Architecture = "64bit",
-                BenchmarkDotNetVersion = "0.10.3.20170408-develop",
+                Architecture = "64mock",
+                BenchmarkDotNetVersion = "0.10.x-mock",
                 ChronometerFrequency = new Frequency(2531248),
-                Configuration = "RELEASE",
-                DotNetCliVersion = new Lazy<string>(() => "1.0.0"),
+                Configuration = "CONFIGURATION",
+                DotNetCliVersion = new Lazy<string>(() => "1.0.x.mock"),
                 HardwareTimerKind = HardwareTimerKind.Tsc,
                 HasAttachedDebugger = false,
                 HasRyuJit = true,
                 IsConcurrentGC = false,
                 IsServerGC = false,
-                JitInfo = "RyuJIT-v4.6.1637.0",
-                JitModules = "clrjit-v4.6.1637.0",
-                OsVersion = new Lazy<string>(() => "Microsoft Windows NT 10.0.14393.0"),
+                JitInfo = "RyuJIT-v4.6.x.mock",
+                JitModules = "clrjit-v4.6.x.mock",
+                OsVersion = new Lazy<string>(() => "Microsoft Windows NT 10.0.x.mock"),
                 ProcessorCount = 8,
-                ProcessorName = new Lazy<string>(() => "Intel(R) Core(TM) i7-6700HQ CPU 2.60GHz"),
-                RuntimeVersion = "Clr 4.0.30319.42000"
+                ProcessorName = new Lazy<string>(() => "MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz"),
+                RuntimeVersion = "Clr 4.0.x.mock"
             };
 
             private MockHostEnvironmentInfo()

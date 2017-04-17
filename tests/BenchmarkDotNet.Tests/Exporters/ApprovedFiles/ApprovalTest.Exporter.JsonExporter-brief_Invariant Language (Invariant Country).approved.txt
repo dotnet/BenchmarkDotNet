@@ -2,23 +2,23 @@
    "Title":"MockSummary",
    "HostEnvironmentInfo":{
       "BenchmarkDotNetCaption":"BenchmarkDotNet",
-      "BenchmarkDotNetVersion":"0.10.3.20170408-develop",
+      "BenchmarkDotNetVersion":"0.10.x-mock",
       "OsVersion":{
          "IsValueCreated":true,
-         "Value":"Microsoft Windows NT 10.0.14393.0"
+         "Value":"Microsoft Windows NT 10.0.x.mock"
       },
       "ProcessorName":{
          "IsValueCreated":true,
-         "Value":"Intel(R) Core(TM) i7-6700HQ CPU 2.60GHz"
+         "Value":"MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz"
       },
       "ProcessorCount":8,
-      "RuntimeVersion":"Clr 4.0.30319.42000",
-      "Architecture":"64bit",
+      "RuntimeVersion":"Clr 4.0.x.mock",
+      "Architecture":"64mock",
       "HasAttachedDebugger":false,
       "HasRyuJit":true,
-      "Configuration":"RELEASE",
-      "JitModules":"clrjit-v4.6.1637.0",
-      "DotNetCliVersion":"1.0.0",
+      "Configuration":"CONFIGURATION",
+      "JitModules":"clrjit-v4.6.x.mock",
+      "DotNetCliVersion":"1.0.x.mock",
       "ChronometerFrequency":{
          "Hertz":2531248
       },
