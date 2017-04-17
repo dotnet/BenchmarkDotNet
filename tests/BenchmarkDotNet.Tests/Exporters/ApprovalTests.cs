@@ -30,13 +30,20 @@ namespace BenchmarkDotNet.Tests.Exporters
         [MemberData(nameof(GetExporters))]
         public void Exporter(IExporter exporter, CultureInfo cultureInfo)
         {
-            NamerFactory.AdditionalInformation = $"{exporter.Name}_{cultureInfo.DisplayName}";
+            NamerFactory.AdditionalInformation = $"{exporter.Name}_{GetName(cultureInfo)}";
             Thread.CurrentThread.CurrentCulture = cultureInfo;
 
             var logger = new AccumulationLogger();
             exporter.ExportToLog(MockFactory.CreateSummary(config), logger);
 
             Approvals.Verify(logger.GetLog());
+        }
+
+        private static string GetName(CultureInfo cultureInfo)
+        {
+            if (cultureInfo.Name == string.Empty)
+                return "Invariant";
+            return cultureInfo.Name;
         }
 
         private static TheoryData<IExporter, CultureInfo> GetExporters()
