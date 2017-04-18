@@ -9,7 +9,6 @@ using BenchmarkDotNet.Attributes.Jobs;
 
 namespace BenchmarkDotNet.Samples.Framework
 {
-    [UapJob("<device_portal_uri>", "<csrf_cookie>", "<wmid_cookie>", @"<BDN_UAP10.0_build output>")]
     public class Framework_DateTime
     {
         [Benchmark]

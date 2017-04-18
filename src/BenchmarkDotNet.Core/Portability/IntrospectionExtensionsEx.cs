@@ -44,6 +44,11 @@ namespace System.Reflection
         {
             return typeInfo.GetDeclaredMethod(methodName);
         }
+
+        public static MethodInfo[] GetMethods(this TypeInfo typeInfo, BindingFlags bindingFlags)
+        {
+            return typeInfo.DeclaredMethods.ToArray();
+        }
     }
 }
 #endif

@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Toolchains.Uap
             return Path.Combine(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.FullName, programName);
         }
 
-        protected override void Cleanup(ArtifactsPaths artifactsPaths)
+        protected override void Cleanup(Benchmark benchmark, ArtifactsPaths artifactsPaths)
         {
             if (!Directory.Exists(artifactsPaths.BuildArtifactsDirectoryPath))
             {
@@ -95,6 +95,7 @@ namespace BenchmarkDotNet.Toolchains.Uap
         protected override void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)
         {
             string content = 
+                             $"SET VS150COMNTOOLS=C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\Tools\\{Environment.NewLine}" +
                              $"call \"%VS150COMNTOOLS%VsDevCmd.bat\"{Environment.NewLine}" +
                              $"msbuild /t:Restore{Environment.NewLine}" +
                              $"msbuild {ProjectFileName} /p:Configuration=Release;Platform={platform}";
@@ -124,7 +125,7 @@ namespace BenchmarkDotNet.Toolchains.Uap
             File.WriteAllText(Path.Combine(artifactsPaths.BinariesDirectoryPath, "App.xaml.cs"), CodeGenerator.Generate(benchmark, "UapBenchmarkProgram.txt", (name) => ResourceHelperLocal.UapHelper.LoadTemplate(name)));
         }
 
-        protected override void CopyAllRequiredFiles(ArtifactsPaths artifactsPaths)
+        protected override void CopyAllRequiredFiles(Benchmark benchmark, ArtifactsPaths artifactsPaths)
         {
             if (!Directory.Exists(artifactsPaths.BinariesDirectoryPath))
             {

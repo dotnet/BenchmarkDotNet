@@ -12,9 +12,8 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
-#if !CORE
+#if CLASSIC
 using System.Management;
-
 #endif
 
 namespace BenchmarkDotNet.Portability
@@ -74,6 +73,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetProcessorName()
         {
+#if !UAP
             string NiceString(string processorName) => Regex.Replace(processorName.Replace("@", "").Trim(), @"\s+", " ");
 #if !CORE
             if (IsWindows() && !IsMono())
@@ -100,7 +100,7 @@ namespace BenchmarkDotNet.Portability
 
             if (IsMacOSX())
                 return NiceString(ExternalToolsHelper.Sysctl.Value.GetValueOrDefault("machdep.cpu.brand_string") ?? "");
-
+#endif
             return Unknown;
         }
 
@@ -130,6 +130,11 @@ namespace BenchmarkDotNet.Portability
             }
 
             return $"Clr {System.Environment.Version}";
+#elif UAP
+            // System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription throws on UWP release build.
+            // https://github.com/dotnet/corefx/issues/16769
+            var attr = typeof(object).GetTypeInfo().Assembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute)).OfType<AssemblyFileVersionAttribute>().FirstOrDefault();
+            return $".NET Native {attr.Version}";
 #else
             return System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
 #endif
@@ -141,6 +146,8 @@ namespace BenchmarkDotNet.Portability
             return IsMono() ? Runtime.Mono : Runtime.Clr;
 #elif CORE
             return Runtime.Core;
+#elif UAP
+            return Runtime.Uap;
 #endif
         }
 
@@ -148,7 +155,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static IEnumerable<JitModule> GetJitModules()
         {
-#if !CORE
+#if !CORE && !UAP
             return
                 Process.GetCurrentProcess().Modules
                     .OfType<ProcessModule>()
@@ -170,7 +177,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static bool HasRyuJit()
         {
-#if CORE
+#if CORE || UAP
             return true;
 #else
             return !IsMono()
@@ -227,14 +234,17 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetConfiguration()
         {
+#if UAP
+            return Unknown;
+#else
             bool? isDebug = Assembly.GetEntryAssembly().IsDebug();
             if (isDebug.HasValue == false)
             {
                 return Unknown;
             }
             return isDebug.Value ? DebugConfigurationName : ReleaseConfigurationName;
+#endif
         }
-
         // See http://aakinshin.net/en/blog/dotnet/jit-version-determining-in-runtime/
         private class JitHelper
         {
