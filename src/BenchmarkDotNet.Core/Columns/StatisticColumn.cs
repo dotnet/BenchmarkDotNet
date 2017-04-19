@@ -111,6 +111,8 @@ namespace BenchmarkDotNet.Columns
             if (statistics == null)
                 return "NA";
             double value = calc(statistics);
+            if (double.IsNaN(value))
+                return "NA";
             return type == UnitType.Time ? value.ToTimeStr(style.TimeUnit, 1, style.PrintUnitsInContent) : value.ToStr();
         }
 
