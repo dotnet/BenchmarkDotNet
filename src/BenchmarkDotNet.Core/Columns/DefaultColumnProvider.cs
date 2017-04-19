@@ -38,9 +38,8 @@ namespace BenchmarkDotNet.Columns
             public IEnumerable<IColumn> GetColumns(Summary summary)
             {
                 yield return StatisticColumn.Mean;
+                yield return StatisticColumn.Error;
 
-                if (NeedToShow(summary, s => s.StandardError > s.Mean * 0.01)) // TODO: Use Accuracy.MaxStdErrRelative
-                    yield return StatisticColumn.StdErr;
                 if (NeedToShow(summary, s => s.Percentiles.P95 > s.Mean + 3 * s.StandardDeviation))
                     yield return StatisticColumn.P95;
                 if (NeedToShow(summary, s => s.N >= 3 && !s.GetConfidenceInterval(ConfidenceLevel.L99, s.N).Contains(s.Median)))

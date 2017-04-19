@@ -39,12 +39,12 @@ namespace BenchmarkDotNet.Tests.Engine
             64,
             128);
 
-        private void AutoTest(Frequency clockFrequency, TimeInterval operationTime, double maxStdErrRelative, long minInvokeCount)
+        private void AutoTest(Frequency clockFrequency, TimeInterval operationTime, double maxRelativeError, long minInvokeCount)
         {
             var job = new Job
             {
                 Infrastructure = { Clock = new MockClock(clockFrequency) },
-                Accuracy = { MaxStdErrRelative = maxStdErrRelative }
+                Accuracy = { MaxRelativeError = maxRelativeError }
             }.Freeze();
             var stage = CreateStage(job, data => data.InvokeCount * operationTime);
             long invokeCount = stage.Run();

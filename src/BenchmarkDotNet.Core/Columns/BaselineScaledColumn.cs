@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Columns
                     case DiffKind.Mean:
                         return "Scaled";
                     case DiffKind.StdDev:
-                        return "Scaled-StdDev";
+                        return "ScaledSD";
                     case DiffKind.WelchTTestPValue:
                         return "t-test p-value";
                     default:
@@ -80,7 +80,7 @@ namespace BenchmarkDotNet.Columns
                     if (baselineStat.N < 2 || targetStat.N < 2)
                         return "NA";
                     double pvalue = WelchTTest.Calc(baselineStat, targetStat).PValue;
-                    return pvalue > 0.0001 ? pvalue.ToStr("N4") : pvalue.ToStr("e2");
+                    return pvalue > 0.0001 || pvalue < 1e-9 ? pvalue.ToStr("N4") : pvalue.ToStr("e2");
                 }
                 default:
                     throw new NotSupportedException();

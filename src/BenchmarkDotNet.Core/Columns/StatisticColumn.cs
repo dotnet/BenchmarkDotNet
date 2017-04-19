@@ -26,6 +26,9 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn StdDev = new StatisticColumn("StdDev", "Standard deviation of all measurements",
             s => s.StandardDeviation, Priority.Main);
 
+        public static readonly IColumn Error = new StatisticColumn("Error", "Half of 99.9% confidence interval",
+            s => new ConfidenceInterval(s.Mean, s.StandardError, s.N, ConfidenceLevel.L999).Margin, Priority.Main);
+
         public static readonly IColumn OperationsPerSecond = new StatisticColumn("Op/s", "Operation per second",
             s => 1.0 * 1000 * 1000 * 1000 / s.Mean, Priority.Additional, UnitType.Dimensionless);
 
@@ -70,6 +73,7 @@ namespace BenchmarkDotNet.Columns
         public static IColumn CiError(ConfidenceLevel level) => new StatisticColumn(
             $"CI{level.ToPercentStr()} Margin", $"Half of {level.ToPercentStr()} confidence interval",
             s => new ConfidenceInterval(s.Mean, s.StandardError, s.N, level).Margin, Priority.Additional);
+
 
         public static readonly IColumn[] AllStatistics = { Mean, StdErr, StdDev, OperationsPerSecond, Min, Q1, Median, Q3, Max };
 

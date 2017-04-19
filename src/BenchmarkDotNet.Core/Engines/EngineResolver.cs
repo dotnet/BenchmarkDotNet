@@ -12,9 +12,9 @@ namespace BenchmarkDotNet.Engines
         private EngineResolver()
         {
             Register(RunMode.RunStrategyCharacteristic, () => RunStrategy.Throughput);
-            Register(RunMode.IterationTimeCharacteristic, () => TimeInterval.Millisecond * 200);
+            Register(RunMode.IterationTimeCharacteristic, () => TimeInterval.Millisecond * 500);
 
-            Register(AccuracyMode.MaxStdErrRelativeCharacteristic, () => 0.01);
+            Register(AccuracyMode.MaxRelativeErrorCharacteristic, () => 0.02);
             Register(AccuracyMode.MinIterationTimeCharacteristic, () => TimeInterval.Millisecond * 500);
             Register(AccuracyMode.MinInvokeCountCharacteristic, () => 4);
             Register(AccuracyMode.EvaluateOverheadCharacteristic, () => true);

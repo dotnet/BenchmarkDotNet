@@ -49,7 +49,7 @@ Usually, you shouldn't specify such characteristics like `LaunchCount`, `WarmupC
 ### Accuracy
 If you want to change the accuracy level, you should use the following characteristics instead of manual of values of `WarmupCount`, `TargetCount`, and so on.
 
-* `MaxStdErrRelative`: Maximum relative standard error (`StandardError`/`Mean`) which you want to achive.
+* `MaxRelativeError`, `MaxAbsoluteError`: Maximum accaptable error for a benchmark (by default, BenchmarkDotNet continue do iterations until the actual error will be less than the specified error). *In these two characteristics*, the error means half of 99.9% confidence interval. `MaxAbsoluteError` is an aboslute `TimeInterval`; doesn't have a default value. `MaxRelativeError` defines max accaptable (`(<half of CI 99.9%>) / Mean`).
 * `MinIterationTime`: Minimum time of a single iteration. Unlike `Run.IterationTime`, this characteristic specify only the lower limit. In case of need, BenchmarkDotNet can increase this value.
 * `MinInvokeCount`:  Minimum about of target method invocation. Default value if `4` but you can decrease this value for cases when single invocations takes a lot of time.
 * `EvaluateOverhead`: if you benchmark method takes nanoseconds, BenchmarkDotNet overhead can significantly affect measurements. If this characterics is enable, the overhead will be evaluated and substracted from the result measurements. Default value is `true`.

@@ -102,7 +102,7 @@ namespace BenchmarkDotNet.Mathematics
         }
     }
 
-    public class ConfidenceInterval
+    public struct ConfidenceInterval
     {
         public int N { get; }
         public double Mean { get; }
@@ -116,6 +116,7 @@ namespace BenchmarkDotNet.Mathematics
 
         public ConfidenceInterval(double mean, double standardError, int n, ConfidenceLevel level = ConfidenceLevel.L999)
         {
+            N = n;
             Mean = mean;
             StandardError = standardError;
             Level = level;
