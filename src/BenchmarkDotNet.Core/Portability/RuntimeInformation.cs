@@ -74,7 +74,6 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetProcessorName()
         {
-            string NiceString(string processorName) => Regex.Replace(processorName.Replace("@", "").Trim(), @"\s+", " ");
 #if !CORE
             if (IsWindows() && !IsMono())
             {
@@ -84,7 +83,7 @@ namespace BenchmarkDotNet.Portability
                     var mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
                     foreach (var moProcessor in mosProcessor.Get().Cast<ManagementObject>())
                         info += moProcessor["name"]?.ToString();
-                    return NiceString(info);
+                    return ProcessorBrandStringHelper.Prettify(info);
                 }
                 catch (Exception)
                 {
@@ -93,13 +92,13 @@ namespace BenchmarkDotNet.Portability
             }
 #endif
             if (IsWindows())
-                return NiceString(ExternalToolsHelper.Wmic.Value.GetValueOrDefault("Name") ?? "");
+                return ProcessorBrandStringHelper.Prettify(ExternalToolsHelper.Wmic.Value.GetValueOrDefault("Name") ?? "");
 
             if (IsLinux())
-                return NiceString(ExternalToolsHelper.ProcCpuInfo.Value.GetValueOrDefault("model name") ?? "");
+                return ProcessorBrandStringHelper.Prettify(ExternalToolsHelper.ProcCpuInfo.Value.GetValueOrDefault("model name") ?? "");
 
             if (IsMacOSX())
-                return NiceString(ExternalToolsHelper.Sysctl.Value.GetValueOrDefault("machdep.cpu.brand_string") ?? "");
+                return ProcessorBrandStringHelper.Prettify(ExternalToolsHelper.Sysctl.Value.GetValueOrDefault("machdep.cpu.brand_string") ?? "");
 
             return Unknown;
         }
