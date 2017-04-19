@@ -23,10 +23,10 @@ WarmupCount=15
 </code></pre>
 
 <table>
-<thead><tr><th>Method</th><th>Mean</th><th>StdDev</th><th>P67</th>
+<thead><tr><th>Method</th><th>Mean</th><th>Error</th><th>StdDev</th><th>P67</th>
 </tr>
-</thead><tbody><tr><td>Foo</td><td>1.0000 ns</td><td>0.0000 ns</td><td>1.0000 ns</td>
-</tr><tr><td>Bar</td><td>1.0000 ns</td><td>0.0000 ns</td><td>1.0000 ns</td>
+</thead><tbody><tr><td>Foo</td><td>1.0000 ns</td><td>NA</td><td>0.0000 ns</td><td>1.0000 ns</td>
+</tr><tr><td>Bar</td><td>1.0000 ns</td><td>NA</td><td>0.0000 ns</td><td>1.0000 ns</td>
 </tr></tbody></table>
 </body>
 </html>
