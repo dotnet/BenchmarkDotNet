@@ -1,9 +1,10 @@
 ﻿{
   "dependencies": {
-    "Microsoft.NETCore.UniversalWindowsPlatform": "5.3.0",
+    "Microsoft.NETCore.UniversalWindowsPlatform": "5.3.2",
     "System.Xml.XPath.XmlDocument": "4.3.0",
     "System.Runtime.InteropServices.RuntimeInformation": "4.3.0",
-    "Microsoft.DotNet.InternalAbstractions": "1.0.500-preview2-1-003177"
+    "Microsoft.DotNet.InternalAbstractions": "1.0.500-preview2-1-003177",
+    "System.Console": "4.3.0"
   },
   "frameworks": {
     "uap10.0": {}

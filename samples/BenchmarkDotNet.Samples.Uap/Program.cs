@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Samples.Uap
             Console.Write("attach");
             Console.ReadLine();
 
-            return summary.Reports.Count();
+            return summary.Reports.Count(x => x.ResultStatistics == null);
         }
     }
 }

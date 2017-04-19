@@ -323,7 +323,7 @@ namespace BenchmarkDotNet.Toolchains.Uap
                         if (res.EndOfMessage)
                         {
                             var @object = SimpleJson.SimpleJson.DeserializeObject<RootObject>(sb.ToString());
-                            ret.AddRange(@object.Events.Select(x => x.StringMessage));
+                            ret.AddRange(@object.Events.Select(x => x.TaskName));
                             sb.Clear();
                         }
                     }
