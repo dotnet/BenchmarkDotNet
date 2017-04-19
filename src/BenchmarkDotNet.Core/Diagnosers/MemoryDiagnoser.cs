@@ -30,9 +30,9 @@ namespace BenchmarkDotNet.Diagnosers
 
         // the following methods are left empty on purpose
         // the action takes places in other process, and the values are gathered by Engine
-        public void BeforeAnythingElse(Process process, Benchmark benchmark) { }
-        public void AfterSetup(Process process, Benchmark benchmark) { }
-        public void BeforeMainRun(Process process, Benchmark benchmark) { }
+        public void BeforeAnythingElse(DiagnoserActionParameters _) { }
+        public void AfterSetup(DiagnoserActionParameters _) { }
+        public void BeforeMainRun(DiagnoserActionParameters _) { }
         public void BeforeCleanup() { }
 
         public void DisplayResults(ILogger logger)

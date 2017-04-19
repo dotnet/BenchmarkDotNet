@@ -13,8 +13,11 @@ using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.InProcess;
+using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
 
@@ -151,6 +154,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineHeader("// **************************");
             logger.WriteLineHeader("// Benchmark: " + benchmark.DisplayInfo);
 
+            var assemblyResolveHelper = GetAssemblyResolveHelper(toolchain, logger);
             var generateResult = Generate(logger, toolchain, benchmark, rootArtifactsFolderPath, config, resolver);
 
             try
@@ -177,7 +181,7 @@ namespace BenchmarkDotNet.Running
             catch (Exception e)
             {
                 logger.WriteLineError("// Exception: " + e);
-                return new BenchmarkReport(benchmark, generateResult, BuildResult.Failure(generateResult, e), new List<ExecuteResult>(), new List<Measurement>(), GcStats.Empty);
+                return new BenchmarkReport(benchmark, generateResult, BuildResult.Failure(generateResult, e), Array.Empty<ExecuteResult>(), Array.Empty<Measurement>(), GcStats.Empty);
             }
             finally
             {
@@ -185,6 +189,8 @@ namespace BenchmarkDotNet.Running
                 {
                     generateResult.ArtifactsPaths?.RemoveBenchmarkFiles();
                 }
+
+                assemblyResolveHelper?.Dispose();
             }
         }
 
@@ -247,7 +253,8 @@ namespace BenchmarkDotNet.Running
                     : " / " + launchCount;
                 logger.WriteLineInfo($"// Launch: {launchIndex + 1}{printedLaunchCount}");
 
-                var executeResult = toolchain.Executor.Execute(buildResult, benchmark, logger, resolver);
+                var executeResult = toolchain.Executor.Execute(
+                    new ExecuteParameters(buildResult, benchmark, logger, resolver, config));
 
                 if (!executeResult.FoundExecutable)
                     logger.WriteLineError($"Executable {buildResult.ArtifactsPaths.ExecutablePath} not found");
@@ -285,7 +292,8 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineInfo("// Run, Diagnostic");
                 var compositeDiagnoser = config.GetCompositeDiagnoser();
 
-                var executeResult = toolchain.Executor.Execute(buildResult, benchmark, logger, resolver, compositeDiagnoser);
+                var executeResult = toolchain.Executor.Execute(
+                    new ExecuteParameters(buildResult, benchmark, logger, resolver, config, compositeDiagnoser));
 
                 var allRuns = executeResult.Data.Select(line => Measurement.Parse(logger, line, 0)).Where(r => r.IterationMode != IterationMode.Unknown).ToList();
                 gcStats = GcStats.Parse(executeResult.Data.Last());
@@ -296,7 +304,7 @@ namespace BenchmarkDotNet.Running
                     logger.WriteLineError("Executable not found");
                 logger.WriteLine();
             }
-            else if (!benchmark.Job.Diagnoser.HardwareCounters.IsNullOrEmpty())
+            else if (config.GetHardwareCounters().Any())
             {
                 logger.WriteLineError("Hardware Counters are not supported for your current platform yet");
             }
@@ -322,6 +330,18 @@ namespace BenchmarkDotNet.Running
             }
 
             return path;
+        }
+
+        private static IDisposable GetAssemblyResolveHelper(IToolchain toolchain, ILogger logger)
+        {
+#if CLASSIC
+            if (!(toolchain is InProcessToolchain) // we don't want to mess with assembly loading when running benchmarks in the same process (could produce wrong results)
+                && !RuntimeInformation.IsMono()) // so far it was never an issue for Mono
+            {
+                 return Helpers.DirtyAssemblyResolveHelper.Create(logger); 
+            }
+#endif
+            return null;
         }
     }
 }

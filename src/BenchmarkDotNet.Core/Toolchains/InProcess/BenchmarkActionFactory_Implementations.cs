@@ -104,12 +104,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 }
             }
 
-            // can't use Task.CompletedTask here because it's new in .NET 4.6 (we target 4.5)
-            private static readonly Task Completed = Task.FromResult((object)null);
+            private static Task IdleStatic() => Task.CompletedTask;
+            private Task IdleInstance() => Task.CompletedTask;
 
-            private static Task IdleStatic() => Completed;
-            private Task IdleInstance() => Completed;
-
+            // must be kept in sync with TaskDeclarationsProvider.TargetMethodDelegate
             private void ExecuteBlocking() => startTaskCallback.Invoke().GetAwaiter().GetResult();
 
             private void InvokeMultipleHardcoded(long repeatCount)
@@ -147,6 +145,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             private static Task<T> IdleStatic() => Completed;
             private Task<T> IdleInstance() => Completed;
 
+            // must be kept in sync with GenericTaskDeclarationsProvider.TargetMethodDelegate
             private T ExecuteBlocking() => startTaskCallback().GetAwaiter().GetResult();
 
             private void InvokeSingleHardcoded() => result = callback();
@@ -187,6 +186,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             private static ValueTask<T> IdleStatic() => new ValueTask<T>(default(T));
             private ValueTask<T> IdleInstance() => new ValueTask<T>(default(T));
 
+            // must be kept in sync with GenericTaskDeclarationsProvider.TargetMethodDelegate
             private T ExecuteBlocking() => startTaskCallback().GetAwaiter().GetResult();
 
             private void InvokeSingleHardcoded() => result = callback();

@@ -109,8 +109,10 @@ namespace BenchmarkDotNet.Code
     {
         public TaskDeclarationsProvider(Target target) : base(target) { }
 
+        // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
+        // and will eventually throw actual exception, not aggregated one
         public override string TargetMethodDelegate
-            => $"() => {{ BenchmarkDotNet.Running.TaskMethodInvoker.ExecuteBlocking({Target.Method.Name}); }}";        
+            => $"() => {{ {Target.Method.Name}().GetAwaiter().GetResult(); }}";        
 
         public override string IdleImplementation
             => $"BenchmarkDotNet.Running.TaskMethodInvoker.Idle();";
@@ -133,8 +135,10 @@ namespace BenchmarkDotNet.Code
         public override string TargetMethodReturnType
             => Target.Method.ReturnType.GetTypeInfo().GetGenericArguments().Single().GetCorrectTypeName();
 
+        // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
+        // and will eventually throw actual exception, not aggregated one
         public override string TargetMethodDelegate
-            => $"() => {{ return {invokerFullName}<{TargetMethodReturnType}>.ExecuteBlocking({Target.Method.Name}); }}";
+            => $"() => {{ return {Target.Method.Name}().GetAwaiter().GetResult(); }}";
 
         public override string IdleMethodReturnType => TargetMethodReturnType;
 

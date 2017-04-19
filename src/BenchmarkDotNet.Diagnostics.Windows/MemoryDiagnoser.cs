@@ -30,11 +30,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         protected override string SessionNamePrefix => "GC";
 
-        public void BeforeAnythingElse(Process process, Benchmark benchmark) { }
+        public void BeforeAnythingElse(DiagnoserActionParameters _) { }
 
-        public void AfterSetup(Process process, Benchmark benchmark) { }
+        public void AfterSetup(DiagnoserActionParameters _) { }
 
-        public void BeforeMainRun(Process process, Benchmark benchmark) => Start(process, benchmark);
+        public void BeforeMainRun(DiagnoserActionParameters parameters) => Start(parameters);
 
         public void BeforeCleanup() => Stop();
 

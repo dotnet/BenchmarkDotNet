@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
@@ -15,17 +14,17 @@ namespace BenchmarkDotNet.Diagnosers
         /// <summary>
         /// before jitting, warmup
         /// </summary>
-        void BeforeAnythingElse(Process process, Benchmark benchmark);
+        void BeforeAnythingElse(DiagnoserActionParameters parameters);
 
         /// <summary>
         /// after setup, before run
         /// </summary>
-        void AfterSetup(Process process, Benchmark benchmark);
+        void AfterSetup(DiagnoserActionParameters parameters);
 
         /// <summary>
         /// after setup, warmup and pilot but before the main run
         /// </summary>
-        void BeforeMainRun(Process process, Benchmark benchmark);
+        void BeforeMainRun(DiagnoserActionParameters parameters);
 
         /// <summary>
         /// after run, before cleanup

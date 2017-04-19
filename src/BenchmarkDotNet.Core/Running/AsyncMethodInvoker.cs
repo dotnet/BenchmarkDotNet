@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using HideFromIntelliSense = System.ComponentModel.EditorBrowsableAttribute; // we don't want people to use it
 
 namespace BenchmarkDotNet.Running
@@ -9,12 +8,7 @@ namespace BenchmarkDotNet.Running
     public static class TaskMethodInvoker
     {
         [HideFromIntelliSense(System.ComponentModel.EditorBrowsableState.Never)]
-        public static void Idle() => ExecuteBlocking(() => Task.CompletedTask);
-
-        // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
-        // and will eventually throw actual exception, not aggregated one
-        [HideFromIntelliSense(System.ComponentModel.EditorBrowsableState.Never)]
-        public static void ExecuteBlocking(Func<Task> future) => future.Invoke().GetAwaiter().GetResult();
+        public static void Idle() => Task.CompletedTask.GetAwaiter().GetResult();
     }
 
     public static class TaskMethodInvoker<T>
@@ -22,22 +16,15 @@ namespace BenchmarkDotNet.Running
         private static readonly Task<T> Completed = Task.FromResult(default(T));
 
         [HideFromIntelliSense(System.ComponentModel.EditorBrowsableState.Never)]
-        public static T Idle() => ExecuteBlocking(() => Completed);
-
-        // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
-        // and will eventually throw actual exception, not aggregated one
-        [HideFromIntelliSense(System.ComponentModel.EditorBrowsableState.Never)]
-        public static T ExecuteBlocking(Func<Task<T>> future) => future.Invoke().GetAwaiter().GetResult();
+        public static T Idle() => Completed.GetAwaiter().GetResult();
     }
 
     public static class ValueTaskMethodInvoker<T>
     {
-        [HideFromIntelliSense(System.ComponentModel.EditorBrowsableState.Never)]
-        public static T Idle() => ExecuteBlocking(() => new ValueTask<T>(default(T)));
+        private static readonly ValueTask<T> Completed = new ValueTask<T>(default(T));
 
-        // we use .Result instead of .GetAwaiter().GetResult() because it's faster
         [HideFromIntelliSense(System.ComponentModel.EditorBrowsableState.Never)]
-        public static T ExecuteBlocking(Func<ValueTask<T>> future) => future.Invoke().Result;
+        public static T Idle() => Completed.GetAwaiter().GetResult();
     }
     // ReSharper restore MemberCanBePrivate.Global
 }
