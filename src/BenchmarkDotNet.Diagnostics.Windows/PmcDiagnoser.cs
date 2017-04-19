@@ -218,7 +218,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public bool IsDefault(Summary summary, Benchmark benchmark) => false;
             public bool AlwaysShow => false;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
-            public int PriorityInCategory => 0;
+            public int PriorityInCategory => 1;
             public bool IsNumeric => true;
             public UnitType UnitType => UnitType.Dimensionless;
             public string Legend => $"Hardware counter '{Counter}' per operation";
@@ -248,10 +248,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public bool IsDefault(Summary summary, Benchmark benchmark) => false;
             public bool AlwaysShow => false;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
-            public int PriorityInCategory => 1;
+            public int PriorityInCategory => 0; // if present should be displayed as the first column (we sort in ascending way)
             public bool IsNumeric => true;
             public UnitType UnitType => UnitType.Dimensionless;
-            public string Legend => $"Hardware counter '{Id}' per operation";
+            public string Legend => $"Mispredict rate per operation";
             public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
 
             private Dictionary<Benchmark, PmcStats> Results { get; }

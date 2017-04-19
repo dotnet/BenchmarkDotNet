@@ -67,31 +67,33 @@ namespace BenchmarkDotNet.Code
         public NonVoidDeclarationsProvider(Target target) : base(target) { }
 
         public override string TargetMethodReturnTypeNamespace 
-            => Target.Method.ReturnType.Namespace == "System" // As "using System;" is always included in the template, don't emit it again
-                || string.IsNullOrWhiteSpace(Target.Method.ReturnType.Namespace) 
+            => TargetMethodReturnType.Namespace == "System" // As "using System;" is always included in the template, don't emit it again
+                || string.IsNullOrWhiteSpace(TargetMethodReturnType.Namespace) 
                     ? string.Empty 
-                    : $"using {Target.Method.ReturnType.Namespace};";
+                    : $"using {TargetMethodReturnType.Namespace};";
 
-        public virtual string TargetMethodReturnType => Target.Method.ReturnType.GetCorrectTypeName();
+        public virtual Type TargetMethodReturnType => Target.Method.ReturnType;
 
-        public override string TargetMethodDelegateType => $"Func<{TargetMethodReturnType}>";
+        public string TargetMethodReturnTypeName => TargetMethodReturnType.GetCorrectTypeName();
+
+        public override string TargetMethodDelegateType => $"Func<{TargetMethodReturnTypeName}>";
 
         public override string IdleMethodReturnType
-            => Target.Method.ReturnType.IsStruct()
+            => TargetMethodReturnType.IsStruct()
                 ? "int" // we return int because creating bigger ValueType could take longer than benchmarked method itself
-                : TargetMethodReturnType;
+                : TargetMethodReturnTypeName;
 
         public override string IdleMethodDelegateType
-            => Target.Method.ReturnType.IsStruct()
+            => TargetMethodReturnType.IsStruct()
                 ? "Func<int>" 
-                : $"Func<{TargetMethodReturnType}>";
+                : $"Func<{TargetMethodReturnTypeName}>";
 
         public override string IdleImplementation
         {
             get
             {
                 string value;
-                var type = Target.Method.ReturnType;
+                var type = TargetMethodReturnType;
                 if (type.IsStruct())
                     value = "0";
                 else if (type.GetTypeInfo().IsClass || type.GetTypeInfo().IsInterface)
@@ -113,38 +115,22 @@ namespace BenchmarkDotNet.Code
         // and will eventually throw actual exception, not aggregated one
         public override string TargetMethodDelegate
             => $"() => {{ {Target.Method.Name}().GetAwaiter().GetResult(); }}";        
-
-        public override string IdleImplementation
-            => $"BenchmarkDotNet.Running.TaskMethodInvoker.Idle();";
     }
 
     /// <summary>
-    /// declarations provider for <see cref="Task{TResult}" /> and <see cref="ValueTask{T}" />
+    /// declarations provider for <see cref="Task{TResult}" /> and <see cref="ValueTask{TResult}" />
     /// </summary>
     internal class GenericTaskDeclarationsProvider : NonVoidDeclarationsProvider
     {
-        private const char GenericArgumentSign = '`';
-
-        private readonly string invokerFullName;
-
-        public GenericTaskDeclarationsProvider(Target target, Type invoker) : base(target)
+        public GenericTaskDeclarationsProvider(Target target) : base(target)
         {
-            invokerFullName = invoker.GetTypeInfo().FullName.Split(GenericArgumentSign).First();
         }
 
-        public override string TargetMethodReturnType
-            => Target.Method.ReturnType.GetTypeInfo().GetGenericArguments().Single().GetCorrectTypeName();
+        public override Type TargetMethodReturnType => Target.Method.ReturnType.GetTypeInfo().GetGenericArguments().Single();
 
         // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
         // and will eventually throw actual exception, not aggregated one
         public override string TargetMethodDelegate
             => $"() => {{ return {Target.Method.Name}().GetAwaiter().GetResult(); }}";
-
-        public override string IdleMethodReturnType => TargetMethodReturnType;
-
-        public override string IdleMethodDelegateType => TargetMethodDelegateType;
-
-        public override string IdleImplementation 
-            => $"return {invokerFullName}<{TargetMethodReturnType}>.Idle();";
     }
 }

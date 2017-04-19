@@ -1,8 +1,8 @@
-﻿using System;
-using BenchmarkDotNet.Characteristics;
+﻿using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.InProcess;
 
 namespace BenchmarkDotNet.Jobs
 {
@@ -11,6 +11,16 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<IToolchain> ToolchainCharacteristic = Characteristic.Create((InfrastructureMode i) => i.Toolchain);
         public static readonly Characteristic<IClock> ClockCharacteristic = Characteristic.Create((InfrastructureMode i) => i.Clock);
         public static readonly Characteristic<IEngineFactory> EngineFactoryCharacteristic = Characteristic.Create((InfrastructureMode i) => i.EngineFactory);
+
+        public static readonly InfrastructureMode InProcess = new InfrastructureMode(InProcessToolchain.Instance);
+        public static readonly InfrastructureMode InProcessDontLogOutput = new InfrastructureMode(InProcessToolchain.DontLogOutput);
+
+        public InfrastructureMode() { }
+
+        private InfrastructureMode(IToolchain toolchain)
+        {
+            Toolchain = toolchain;
+        }
 
         public IToolchain Toolchain
         {

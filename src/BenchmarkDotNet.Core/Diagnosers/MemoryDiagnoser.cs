@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Diagnosers
             public int PriorityInCategory => 0;
             public bool IsNumeric => true;
             public UnitType UnitType => UnitType.Size;
-            public string Legend => "Allocated memory per single operation";
+            public string Legend => "Allocated memory per single operation (managed only, inclusive)";
             public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
 
             public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style)

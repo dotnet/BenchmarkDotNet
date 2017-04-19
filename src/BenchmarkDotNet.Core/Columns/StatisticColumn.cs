@@ -26,6 +26,9 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn StdDev = new StatisticColumn("StdDev", "Standard deviation of all measurements",
             s => s.StandardDeviation, Priority.Main);
 
+        public static readonly IColumn Error = new StatisticColumn("Error", "Half of 99.9% confidence interval",
+            s => new ConfidenceInterval(s.Mean, s.StandardError, s.N, ConfidenceLevel.L999).Margin, Priority.Main);
+
         public static readonly IColumn OperationsPerSecond = new StatisticColumn("Op/s", "Operation per second",
             s => 1.0 * 1000 * 1000 * 1000 / s.Mean, Priority.Additional, UnitType.Dimensionless);
 
@@ -71,6 +74,7 @@ namespace BenchmarkDotNet.Columns
             $"CI{level.ToPercentStr()} Margin", $"Half of {level.ToPercentStr()} confidence interval",
             s => new ConfidenceInterval(s.Mean, s.StandardError, s.N, level).Margin, Priority.Additional);
 
+
         public static readonly IColumn[] AllStatistics = { Mean, StdErr, StdDev, OperationsPerSecond, Min, Q1, Median, Q3, Max };
 
         private readonly Func<Statistics, double> calc;
@@ -107,6 +111,8 @@ namespace BenchmarkDotNet.Columns
             if (statistics == null)
                 return "NA";
             double value = calc(statistics);
+            if (double.IsNaN(value))
+                return "NA";
             return type == UnitType.Time ? value.ToTimeStr(style.TimeUnit, 1, style.PrintUnitsInContent) : value.ToStr();
         }
 

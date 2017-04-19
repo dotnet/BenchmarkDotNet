@@ -5,11 +5,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Configs
 {
     public class InliningDiagnoserAttribute : Attribute, IConfigSource
     {
-        public IConfig Config { get; }
-
-        public InliningDiagnoserAttribute()
+        /// <param name="logFailuresOnly">only the methods that failed to get inlined. True by default.</param>
+        /// <param name="filterByNamespace">only the methods from declaring type's namespace. Set to false if you want to see all Jit inlining events. True by default.</param>
+        public InliningDiagnoserAttribute(bool logFailuresOnly = true, bool filterByNamespace = true)
         {
-            Config = ManualConfig.CreateEmpty().With(new InliningDiagnoser());
+            Config = ManualConfig.CreateEmpty().With(new InliningDiagnoser(logFailuresOnly, filterByNamespace));
         }
+
+        public IConfig Config { get; }
     }
 }

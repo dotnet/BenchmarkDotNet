@@ -89,14 +89,10 @@ namespace BenchmarkDotNet.Code
                 return new TaskDeclarationsProvider(target);
             }
             if (method.ReturnType.GetTypeInfo().IsGenericType 
-                && method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(Task<>))
+                && (method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(Task<>)
+                    || method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(ValueTask<>)))
             {
-                return new GenericTaskDeclarationsProvider(target, typeof(TaskMethodInvoker<>));
-            }
-            if (method.ReturnType.GetTypeInfo().IsGenericType 
-                && method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(ValueTask<>))
-            {
-                return new GenericTaskDeclarationsProvider(target, typeof(ValueTaskMethodInvoker<>));
+                return new GenericTaskDeclarationsProvider(target);
             }
 
             if (method.ReturnType == typeof(void))

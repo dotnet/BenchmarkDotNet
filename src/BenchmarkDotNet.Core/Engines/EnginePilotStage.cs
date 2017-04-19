@@ -11,16 +11,20 @@ namespace BenchmarkDotNet.Engines
         internal const long MaxInvokeCount = (long.MaxValue / 2 + 1) / 2;
 
         private readonly int unrollFactor;
+        private readonly TimeInterval minIterationTime;
         private readonly int minInvokeCount;
-        private readonly double maxStdErrRelative;
+        private readonly double maxRelativeError;
+        private readonly TimeInterval? maxAbsoluteError;
         private readonly double targetIterationTime;
         private readonly double resolution;
 
         public EnginePilotStage(IEngine engine) : base(engine)
         {
             unrollFactor = engine.TargetJob.ResolveValue(RunMode.UnrollFactorCharacteristic, engine.Resolver);
+            minIterationTime = engine.TargetJob.ResolveValue(AccuracyMode.MinIterationTimeCharacteristic, engine.Resolver);
             minInvokeCount = engine.TargetJob.ResolveValue(AccuracyMode.MinInvokeCountCharacteristic, engine.Resolver);
-            maxStdErrRelative = engine.TargetJob.ResolveValue(AccuracyMode.MaxStdErrRelativeCharacteristic, engine.Resolver);
+            maxRelativeError = engine.TargetJob.ResolveValue(AccuracyMode.MaxRelativeErrorCharacteristic, engine.Resolver);
+            maxAbsoluteError = engine.TargetJob.ResolveValueAsNullable(AccuracyMode.MaxAbsoluteErrorCharacteristic);
             targetIterationTime = engine.TargetJob.ResolveValue(RunMode.IterationTimeCharacteristic, engine.Resolver).ToNanoseconds();
             resolution =  engine.TargetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, engine.Resolver).GetResolution().Nanoseconds;
         }
@@ -44,8 +48,6 @@ namespace BenchmarkDotNet.Engines
         private long RunAuto()
         {
             long invokeCount = Autocorrect(minInvokeCount);
-            double maxError = maxStdErrRelative; // TODO: introduce a StdErr factor
-            double minIterationTime = Engine.MinIterationTime.Nanoseconds;
 
             int iterationCounter = 0;
             while (true)
@@ -54,9 +56,13 @@ namespace BenchmarkDotNet.Engines
                 var measurement = RunIteration(IterationMode.Pilot, iterationCounter, invokeCount, unrollFactor);
                 double iterationTime = measurement.Nanoseconds;
                 double operationError = 2.0 * resolution / invokeCount; // An operation error which has arisen due to the Chronometer precision
-                double operationMaxError = iterationTime / invokeCount * maxError; // Max acceptable operation error
 
-                bool isFinished = operationError < operationMaxError && iterationTime >= minIterationTime;
+                // Max acceptable operation error
+                double operationMaxError1 = iterationTime / invokeCount * maxRelativeError;
+                double operationMaxError2 = maxAbsoluteError?.Nanoseconds ?? double.MaxValue;
+                double operationMaxError = Math.Min(operationMaxError1, operationMaxError2);
+
+                bool isFinished = operationError < operationMaxError && iterationTime >= minIterationTime.Nanoseconds;
                 if (isFinished)
                     break;
                 if (invokeCount >= MaxInvokeCount)
