@@ -22,8 +22,6 @@ namespace BenchmarkDotNet.Samples.Uap
             config.KeepBenchmarkFiles = true;
 
             var summary = BenchmarkRunner.Run(typeof(Framework_DateTime), config);
-            Console.Write("attach");
-            Console.ReadLine();
 
             return summary.Reports.Count(x => x.ResultStatistics == null);
         }
