@@ -23,7 +23,6 @@ cache:
 # scripts that are called at very beginning, before repo cloning
 init:
   - git config --global core.autocrlf input
-  - nuget sources add -Name https://dotnet.myget.org/F/dotnet-core/api/v3/index.json -Source https://dotnet.myget.org/F/dotnet-core/api/v3/index.json
 
 #---------------------------------#
 #       build configuration       #
