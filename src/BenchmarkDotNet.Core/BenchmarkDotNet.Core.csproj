@@ -45,6 +45,7 @@
     <PackageReference Include="System.Reflection" Value="4.3.0" />
     <PackageReference Include="System.Console" Value="4.3.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Value="4.3.0" />
+    <PackageReference Include="runtime.win8-arm.Microsoft.NETCore.Jit" Version="2.0.0-preview1-25220-51" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.0" />
