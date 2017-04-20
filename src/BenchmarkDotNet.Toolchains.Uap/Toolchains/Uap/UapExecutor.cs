@@ -7,6 +7,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using System.IO;
+using BenchmarkDotNet.Toolchains.Parameters;
 
 namespace BenchmarkDotNet.Toolchains.Uap
 {
@@ -19,8 +20,7 @@ namespace BenchmarkDotNet.Toolchains.Uap
             this.config = config;
         }
 
-        public ExecuteResult Execute(BuildResult buildResult, Benchmark benchmark, ILogger logger,
-            IResolver resolver, IDiagnoser diagnoser = null)
+        public ExecuteResult Execute(ExecuteParameters executeParameters)
         {
             DevicePortalApiWrapper dpClient = null;
             DevicePortalApiWrapper.PackageStruct app = null;
@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Toolchains.Uap
                 var ct = dpClient.StartListening();
 
                 var appxFileName = $"AppPackages\\UapBenchmarkProject_1.0.0.0_{config.Platform}_Test\\UapBenchmarkProject_1.0.0.0_{config.Platform}.appx";
-                app = dpClient.DeployApplication(Path.Combine(buildResult.ArtifactsPaths.BinariesDirectoryPath, appxFileName), config.Platform);
+                app = dpClient.DeployApplication(Path.Combine(executeParameters.BuildResult.ArtifactsPaths.BinariesDirectoryPath, appxFileName), config.Platform);
                 
                 dpClient.RunApplication(app);
                 string[] allStrings = dpClient.StopListening(ct);

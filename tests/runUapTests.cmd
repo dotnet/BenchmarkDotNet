@@ -27,7 +27,16 @@ echo -----------------------------
 pushd ..\samples
 
 msbuild /t:Restore "BenchmarkDotNet.Samples.Uap\BenchmarkDotNet.Samples.Uap.csproj"
+if NOT %ERRORLEVEL% == 0 (
+    echo Restore of UAP sample failed
+    goto end
+)
+
 msbuild /t:Build "BenchmarkDotNet.Samples.Uap\BenchmarkDotNet.Samples.Uap.csproj" /p:configuration=Release
+if NOT %ERRORLEVEL% == 0 (
+    echo Build of UAP sample has failed
+    goto end
+)
 
 popd
 
@@ -37,6 +46,11 @@ echo -----------------------------
 
 pushd ..\src
 msbuild /t:Build "BenchmarkDotNet\BenchmarkDotNet.csproj" /p:configuration=Release;TargetFramework=uap10.0
+if NOT %ERRORLEVEL% == 0 (
+    echo Build uap10.0 binaries failed
+    goto end
+)
+
 SET UAP_BIN=%CD%\BenchmarkDotNet\bin\Release\uap10.0
 popd
 
@@ -51,7 +65,7 @@ if NOT %ERRORLEVEL% == 0 (
     echo Running of samples has failed
     goto end
 )
-popd
 
 :end
+popd
 ENDLOCAL
