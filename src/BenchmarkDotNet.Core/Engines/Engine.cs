@@ -42,7 +42,9 @@ namespace BenchmarkDotNet.Engines
         private bool isJitted, isPreAllocated;
         private int forcedFullGarbageCollections;
 
-        internal Engine(IHost host, Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> idleAction, Action<long> mainAction, Job targetJob,
+        internal Engine(
+            IHost host,
+            Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> idleAction, Action<long> mainAction, Job targetJob,
             Action setupAction, Action cleanupAction, long operationsPerInvoke)
         {
             Host = host;

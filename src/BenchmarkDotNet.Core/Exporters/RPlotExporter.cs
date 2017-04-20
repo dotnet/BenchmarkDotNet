@@ -31,9 +31,9 @@ namespace BenchmarkDotNet.Exporters
             const string scriptFileName = "BuildPlots.R";
             yield return scriptFileName;
 
-            var fileNamePrefix = Path.Combine(summary.ResultsDirectoryPath, summary.Title);
-            var scriptFullPath = Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
-            var script = ResourceHelper.CoreHelper.
+            string fileNamePrefix = Path.Combine(summary.ResultsDirectoryPath, summary.Title);
+            string scriptFullPath = Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
+            string script = ResourceHelper.CoreHelper.
                 LoadTemplate(scriptFileName).
                 Replace("$BenchmarkDotNetVersion$", BenchmarkDotNetInfo.FullTitle).
                 Replace("$CsvSeparator$", CsvMeasurementsExporter.Default.Separator);
