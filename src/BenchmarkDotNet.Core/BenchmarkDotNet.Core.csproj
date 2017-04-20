@@ -17,7 +17,6 @@
     <TargetFrameworkIdentifier>.NETCore</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
     <DefineConstants>$(DefineConstants);WINDOWS_UWP;UAP</DefineConstants>
-    <LanguageTargets>$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets</LanguageTargets>
     <DefaultLanguage>en</DefaultLanguage>
   </PropertyGroup>
   <ItemGroup>
@@ -45,7 +44,6 @@
     <PackageReference Include="System.Reflection" Value="4.3.0" />
     <PackageReference Include="System.Console" Value="4.3.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Value="4.3.0" />
-    <PackageReference Include="runtime.win8-arm.Microsoft.NETCore.Jit" Version="2.0.0-preview1-25220-51" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.0" />

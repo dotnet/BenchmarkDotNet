@@ -39,11 +39,7 @@ os: Visual Studio 2017
 
 before_build:
   - dotnet --info
-  - msbuild /t:Restore .\src\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj
-  - msbuild /t:Restore .\src\BenchmarkDotNet.Toolchains.Roslyn\BenchmarkDotNet.Toolchains.Roslyn.csproj
-  - msbuild /t:Restore .\src\BenchmarkDotNet\BenchmarkDotNet.csproj
-  - msbuild /t:Restore .\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj
-  - msbuild /t:Restore .\src\BenchmarkDotNet.Toolchains.Uap\BenchmarkDotNet.Toolchains.Uap.csproj
+  - msbuild /t:Restore
 
 build:
   parallel: true                  # enable MSBuild parallel builds
