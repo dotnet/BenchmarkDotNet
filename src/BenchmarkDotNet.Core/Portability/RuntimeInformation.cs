@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.Portability
         internal static bool IsMacOSX()
         {
 #if CLASSIC
-            return System.Environment.OSVersion.Platform == PlatformID.MacOSX
+            return System.Environment.OSVersion.Platform == PlatformID.Unix
                    && GetSysnameFromUname().Equals("Darwin", StringComparison.InvariantCultureIgnoreCase);
 #else
             return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
