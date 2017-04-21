@@ -10,7 +10,7 @@ PM> Install-Package BenchmarkDotNet
 ```
 
 
-## Step 2. Write code to benchmark
+## Step 2. Design a benchmark
 Write a class with methods that you want to measure and mark them with the `Benchmark` attribute. In the following example, we 
 compare [MD5](https://en.wikipedia.org/wiki/MD5) and [SHA256](https://en.wikipedia.org/wiki/SHA-2) cryptographic hash functions:
 
@@ -41,17 +41,19 @@ public class Md5VsSha256
         return md5.ComputeHash(data);
     }
 }
+
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        var summary = BenchmarkRunner.Run<Md5VsSha256>();
+    }
+}
 ```
 
-## Step 3. Run the benchmark
+The `BenchmarkRunner.Run<Md5VsSha256>()` call runs your benchmarks and print results to console output.
 
-Run it:
-
-```cs
-var summary = BenchmarkRunner.Run<Md5VsSha256>();
-```
-
-## Step 4. View results
+## Step 3. View results
 View the results. Here is an example of output from the above benchmark:
 
 ```ini
@@ -68,7 +70,7 @@ Frequency=2143476 Hz, Resolution=466.5319 ns, Timer=TSC
 | Md5    | 25.8010 us  | 0.1757 us | 113 B     |
 
 
-## Step 5. Analyze results
+## Step 4. Analyze results
 
 Analyze it. In your bin directory, you can find a lot of useful files with detailed information. For example:
 
