@@ -67,10 +67,6 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetOsVersion()
         {
-#if CLASSIC
-            if (IsMono())
-                return System.Environment.OSVersion.ToString();
-#endif
             return $"{Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem} {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion}";
         }
 
