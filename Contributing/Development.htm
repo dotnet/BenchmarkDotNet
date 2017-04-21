@@ -72,9 +72,9 @@
 <li class="tocentry"><a href="../index.htm">Home</a>
 </li>
 
-<li class="tocentry"><a href="../Overview.htm">Overview</a>
-</li>
 <li class="tocentry"><a href="../GettingStarted.htm">Getting Started</a>
+</li>
+<li class="tocentry"><a href="../Overview.htm">Overview</a>
 </li>
 <li class="tocentry">
 <span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Configs.htm">Configs</a></span>
@@ -148,7 +148,7 @@
 
 <h3 id="if-the-packageproject-is-not-available-for-all-target-frameworks">If the package/project is not available for all target frameworks<a class="headerlink" href="#if-the-packageproject-is-not-available-for-all-target-frameworks" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
 <p>Specify a conditional dependency:</p>
-<pre><code class="xml">  &lt;ItemGroup Condition=&quot; '$(TargetFramework)' == 'net45' &quot;&gt;
+<pre><code class="xml">  &lt;ItemGroup Condition=&quot; '$(TargetFramework)' == 'net46' &quot;&gt;
     &lt;ProjectReference Include=&quot;..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj&quot; /&gt;
   &lt;/ItemGroup&gt;
 </code></pre>

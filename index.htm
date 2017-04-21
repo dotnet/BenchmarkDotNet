@@ -72,9 +72,9 @@
 <li class="tocentry"><a href="index.htm">Home</a>
 </li>
 
-<li class="tocentry"><a href="Overview.htm">Overview</a>
-</li>
 <li class="tocentry"><a href="GettingStarted.htm">Getting Started</a>
+</li>
+<li class="tocentry"><a href="Overview.htm">Overview</a>
 </li>
 <li class="tocentry">
 <span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="Configs.htm">Configs</a></span>
@@ -124,14 +124,36 @@
                 </div>
                 <div role="main">
                     <div class="section">
-<h1 id="welcome-to-the-benchmarkdotnet-documentation-v0.10.3">Welcome to the BenchmarkDotNet documentation (v0.10.3)<a class="headerlink" href="#welcome-to-the-benchmarkdotnet-documentation-v0.10.3" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
-<p><strong>BenchmarkDotNet</strong> is a powerful .NET library for benchmarking. </p>
+<h1 id="welcome-to-the-benchmarkdotnet-documentation-v0.10.4">Welcome to the BenchmarkDotNet documentation (v0.10.4)<a class="headerlink" href="#welcome-to-the-benchmarkdotnet-documentation-v0.10.4" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<img src="logo/logo-wide.png" width="600px" />
+<p><a href="https://www.nuget.org/packages/BenchmarkDotNet/" target="_blank"><img src="https://img.shields.io/nuget/v/BenchmarkDotNet.svg" alt="NuGet" /></a> <a href="https://gitter.im/dotnet/BenchmarkDotNet" target="_blank"><img src="https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet.svg" alt="Gitter" /></a> <a href="https://ci.appveyor.com/project/dotnetfoundation/benchmarkdotnet/branch/master" target="_blank"><img src="https://img.shields.io/appveyor/ci/dotnetfoundation/benchmarkdotnet/master.svg?label=appveyor" alt="Build status" /></a> <a href="LICENSE.md"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" /></a> <a href="http://benchmarkdotnet.org/Overview.htm" target="_blank"><img src="https://img.shields.io/badge/docs-Overview-green.svg?style=flat" alt="Overview" /></a> <a href="https://github.com/dotnet/BenchmarkDotNet/wiki/ChangeLog" target="_blank"><img src="https://img.shields.io/badge/docs-ChangeLog-green.svg?style=flat" alt="ChangeLog" /></a></p>
+<p><strong>BenchmarkDotNet</strong> is a powerful .NET library for benchmarking.</p>
 <p>Source code is available at <a href="https://github.com/dotnet/BenchmarkDotNet" target="_blank"><i class="fa fa-github"></i> github.com/dotnet/BenchmarkDotNet</a></p>
-<p><a href="https://www.nuget.org/packages/BenchmarkDotNet/" target="_blank"><img src="https://img.shields.io/nuget/v/BenchmarkDotNet.svg" alt="NuGet" /></a> <a href="https://gitter.im/dotnet/BenchmarkDotNet" target="_blank"><img src="https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet.svg" alt="Gitter" /></a> <a href="https://ci.appveyor.com/project/perfdotnet/benchmarkdotnet/branch/master" target="_blank"><img src="https://img.shields.io/appveyor/ci/perfdotnet/benchmarkdotnet/master.svg?label=appveyor" alt="Build status" /></a> <a href="LICENSE.md"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" /></a> <a href="http://benchmarkdotnet.org/Overview.htm" target="_blank"><img src="https://img.shields.io/badge/docs-Overview-green.svg?style=flat" alt="Overview" /></a> <a href="https://github.com/dotnet/BenchmarkDotNet/wiki/ChangeLog" target="_blank"><img src="https://img.shields.io/badge/docs-ChangeLog-green.svg?style=flat" alt="ChangeLog" /></a></p>
+<p>Benchmarking is really hard (especially microbenchmarking), you can easily make a mistake during performance measurements.
+BenchmarkDotNet will protect you from the common pitfalls (even for experienced developers) because it does all the dirty work for you:
+  it generates an isolated project per each benchmark method,
+  does several launches of this project,
+  run multiple iterations of the method (include warm-up), and so on.
+Usually, you even shouldn't care about a number of iterations because BenchmarkDotNet chooses it automatically to achieve the requested level of precision.</p>
+<p>It's really easy to design a performance experiment with BenchmarkDotNet.
+Just mark your method with the [Benchmark] attribute and the benchmark is ready.
+Want to run your code on CoreCLR, Mono, and the Full .NET Framework?
+No problem: a few more attributes and the corresponded projects will be generated; the results will be presented at the same summary table.
+In fact, you can compare any environment that you want:
+  you can check performance difference between processor architectures (x86/x64),
+  JIT versions (LegacyJIT/RyuJIT),
+  different sets of GC flags (like Server/Workstation),
+  and so on.
+You can also introduce one or several parameters and check the performance on different inputs at once.</p>
+<p>BenchmarkDotNet helps you not only run benchmarks but also analyze the results: it generates reports in different formats and renders nice plots.
+It calculates many statistics, allows you to run statistical tests, and compares results of different benchmark methods.
+So it doesn't overload you with data, by default BenchmarkDotNet prints only the really important statistical values depending on your results:
+  it allows you to keep summary small and simple for primitive cases but notify you about additional important area for complicated cases
+  (of course you can request any numbers manually via additional attributes).</p>
 <h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <ul>
 <li>Standard benchmarking routine: generating an isolated project per each benchmark method; auto-selection of iteration amount; warmup; overhead evaluation; statistics calculation; and so on.</li>
-<li>Supported runtimes: Full .NET Framework, .NET Core (RTM), Mono</li>
+<li>Supported runtimes: Full .NET Framework (4.6+), .NET Core (1.1+), Mono</li>
 <li>Supported languages: C#, F#, and Visual Basic</li>
 <li>Supported OS: Windows, Linux, MacOS</li>
 <li>Easy way to compare different environments (<code>x86</code> vs <code>x64</code>, <code>LegacyJit</code> vs <code>RyuJit</code>, and so on; see: <a href="http://benchmarkdotnet.org/Configs/Jobs.htm" target="_blank">Jobs</a>)</li>
@@ -139,6 +161,12 @@
 <li>Advanced features: <a href="http://benchmarkdotnet.org/Advanced/Baseline.htm" target="_blank">Baseline</a>, <a href="http://benchmarkdotnet.org/Advanced/Params.htm" target="_blank">Params</a></li>
 <li>Powerful diagnostics based on ETW events (see <a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/" target="_blank">BenchmarkDotNet.Diagnostics.Windows</a>)</li>
 </ul>
+<h2 id="code-of-conduct">Code of Conduct<a class="headerlink" href="#code-of-conduct" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>This project has adopted the code of conduct defined by the <a href="http://contributor-covenant.org/" target="_blank">Contributor Covenant</a>
+to clarify expected behavior in our community.
+For more information see the <a href="https://dotnetfoundation.org/code-of-conduct" target="_blank">.NET Foundation Code of Conduct</a>. </p>
+<h2 id="net-foundation">.NET Foundation<a class="headerlink" href="#net-foundation" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>This project is supported by the <a href="https://dotnetfoundation.org" target="_blank">.NET Foundation</a>.</p>
 
                     </div>
                 </div>

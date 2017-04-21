@@ -72,9 +72,9 @@
 <li class="tocentry"><a href="index.htm">Home</a>
 </li>
 
-<li class="tocentry"><a href="Overview.htm">Overview</a>
-</li>
 <li class="tocentry"><a href="GettingStarted.htm">Getting Started</a>
+</li>
+<li class="tocentry"><a href="Overview.htm">Overview</a>
 </li>
 <li class="tocentry">
 <span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="Configs.htm">Configs</a></span>
@@ -145,13 +145,29 @@ If your want to target netcoreapp1.0 in your main assembly, it's recommended to 
 <strong>A</strong> Use the following lines in your <code>.csproj</code> file:</p>
 </li>
 </ul>
-<pre><code class="xml">&lt;TargetFrameworks&gt;netcoreapp1.1;net45&lt;/TargetFrameworks&gt;
-&lt;RuntimeIdentifier Condition=&quot; '$(TargetFramework)' == 'net45' &quot;&gt;win7-x86&lt;/RuntimeIdentifier&gt;
+<pre><code class="xml">&lt;TargetFrameworks&gt;netcoreapp1.1;net46&lt;/TargetFrameworks&gt;
 &lt;PlatformTarget&gt;AnyCPU&lt;/PlatformTarget&gt;
 </code></pre>
 
 <p>And mark your benchmark class with the following attributes:</p>
 <pre><code class="cs">[CoreJob, ClrJob, MonoJob]
+</code></pre>
+
+<ul>
+<li>
+<p><strong>Q</strong> My source code targets old versions of .NET Framework or .NET Core, but BenchmarkDotNet requires <code>net46</code> and <code>netcoreapp1.1</code>. How can I run benchmarks in this case?<br />
+<strong>A</strong> It's a good practice to introduce an additional console application (e.g. <code>MyAwesomeLibrary.Benchmarks</code>) which will depend on your code and BenchmarkDotNet.
+Due to the fact that users usually run benchmarks in a develop environment and don't distribute benchmarks for users, it shouldn't be a problem.</p>
+</li>
+<li>
+<p><strong>Q</strong> I wrote small benchmark, but BenchmarkDotNet requires a lot of time for time measurements. How can I reduce this time?<br />
+<strong>A</strong> By default, BenchmarkDotNet automatically chooses a number of iterations which allows achieving the best precision.
+If you don't need such level of precision and just want to have a quick way to get approximated results, you can specify all parameters manually.
+For example, you can use the <code>SimpleJob</code> or <code>ShortRunJob</code> attributes:</p>
+</li>
+</ul>
+<pre><code class="cs">[SimpleJob(launchCount: 1, warmupCount: 3, targetCount: 5, invocationCount:100, id: &quot;QuickJob&quot;)]
+[ShortRunJob]
 </code></pre>
 
 

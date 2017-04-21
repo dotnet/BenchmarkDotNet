@@ -72,9 +72,9 @@
 <li class="tocentry"><a href="../index.htm">Home</a>
 </li>
 
-<li class="tocentry"><a href="../Overview.htm">Overview</a>
-</li>
 <li class="tocentry"><a href="../GettingStarted.htm">Getting Started</a>
+</li>
+<li class="tocentry"><a href="../Overview.htm">Overview</a>
 </li>
 <li class="tocentry">
 <span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Configs.htm">Configs</a></span>
@@ -144,7 +144,16 @@ that belong to the testing projects.</li>
 <li>To run &quot;Core&quot; tests you just need to open Test Explorer in Visual Studio and rebuild the solution. Then tests show up in Test Explorer and you can simply run them.</li>
 </ul>
 <div class="alert alert-warning"><span class="alert-title"><i class="fa fa-warning"></i> Important!</span><p>Remember to do both before pulling a PR or publishing new version</p>
-</div>
+</div><ul>
+<li>
+For some unit tests (e.g. for exporter tests) BenchmarkDotNet uses <a href="http://approvaltests.sourceforge.net/" target="_blank">approval tests'</a> implementation for .NET: <a href="https://github.com/approvals/ApprovalTests.Net" target="_blank">ApprovalTests.Net</a>.
+<ul>
+<li>The expected value for each test is stored in a <code>*.approved.txt</code> file located near the test source file in the repository. ApprovalTests.NET generates approved file's names automatically according test name and its parameters. This files must be added under the source control. </li>
+<li>It also creates a <code>*.received</code> file for each failed test. You can use different reporters for convenient file comparison. By default we use XUnit2Reporter, so you can find test run results on the test runner console as usual. You can add [UseReporter(typeof(KDiffReporter))] on test class and then ApprovalTests will open KDiff for each failed test. This way you can easily understand what's the difference between approved and received values and choose the correct one.</li>
+</ul>
+</li>
+</ul>
+
                     </div>
                 </div>
                 <footer>

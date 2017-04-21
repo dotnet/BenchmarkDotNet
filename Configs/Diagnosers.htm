@@ -72,9 +72,9 @@
 <li class="tocentry"><a href="../index.htm">Home</a>
 </li>
 
-<li class="tocentry"><a href="../Overview.htm">Overview</a>
-</li>
 <li class="tocentry"><a href="../GettingStarted.htm">Getting Started</a>
+</li>
+<li class="tocentry"><a href="../Overview.htm">Overview</a>
 </li>
 <li class="tocentry">
 <ul>
@@ -92,6 +92,7 @@
 <li class="tocentry current"><a class="current" href="../Configs/Diagnosers.htm">Diagnosers</a>
 <ul class="currentrelative">
 <li class="tocentry"><a href="#examples">Examples</a></li>
+<li class="tocentry"><a href="#hardware-counters-diagnoser">Hardware Counters Diagnoser</a></li>
 <li class="tocentry"><a href="#restrictions">Restrictions</a></li>
 </ul>
 <li class="tocentry"><a href="../Configs/Analyzers.htm">Analyzers</a>
@@ -150,8 +151,9 @@
 <p>A <strong>diagnoser</strong> can attach to your benchmark and get some useful info.</p>
 <p>The current Diagnosers are:</p>
 <ul>
-<li>GC and Memory Allocation (<code>MemoryDiagnoser</code>) which is cross platform, built-in and <strong>is not enabled by default anymore</strong>.</li>
+<li>GC and Memory Allocation (<code>MemoryDiagnoser</code>) which is cross platform, built-in and <strong>is not enabled by default anymore</strong>. Please see Adam Sitnik's <a href="http://adamsitnik.com/the-new-Memory-Diagnoser/" target="_blank">blog post</a> for all the details.</li>
 <li>JIT Inlining Events (<code>InliningDiagnoser</code>). You can find this diagnoser in a separated package with diagnosers for Windows (<code>BenchmarkDotNet.Diagnostics.Windows</code>): <a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/" target="_blank"><img src="https://img.shields.io/nuget/v/BenchmarkDotNet.svg" alt="NuGet" /></a></li>
+<li>Hardware Counter Diagnoser. You can find this diagnoser in a separated package with diagnosers for Windows (<code>BenchmarkDotNet.Diagnostics.Windows</code>): <a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/" target="_blank"><img src="https://img.shields.io/nuget/v/BenchmarkDotNet.svg" alt="NuGet" /></a>.  Please see Adam Sitnik's <a href="http://adamsitnik.com/Hardware-Counters-Diagnoser/" target="_blank">blog post</a> for all the details.</li>
 </ul>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <p>Below is a sample output from the <code>GC and Memory Allocation</code> diagnoser, note the extra columns on the right-hand side (&quot;Gen 0&quot;, &quot;Gen 1&quot;, &quot;Gen 2&quot; and &quot;Allocated&quot;):</p>
@@ -174,12 +176,85 @@
 [InliningDiagnoser]
 </code></pre>
 
-<h2 id="restrictions">Restrictions<a class="headerlink" href="#restrictions" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<h2 id="hardware-counters-diagnoser">Hardware Counters Diagnoser<a class="headerlink" href="#hardware-counters-diagnoser" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>This diagnoser is not enabled in explicit way as the other diagnosers. You need to specify <code>[HardwareCounters]</code> and we choose the right diagnoser in the runtime.</p>
+<pre><code class="cs">[HardwareCounters(HardwareCounter.BranchMispredictions, HardwareCounter.BranchInstructions)]
+public class Cpu_BranchPerdictor
+{
+    private const int N = 32767;
+    private readonly int[] sorted, unsorted;
+
+    public Cpu_BranchPerdictor()
+    {
+        var random = new Random(0);
+        unsorted = new int[N];
+        sorted = new int[N];
+        for (int i = 0; i &lt; N; i++)
+            sorted[i] = unsorted[i] = random.Next(256);
+        Array.Sort(sorted);
+    }
+
+    private static int Branch(int[] data)
+    {
+        int sum = 0;
+        for (int i = 0; i &lt; N; i++)
+            if (data[i] &gt;= 128)
+                sum += data[i];
+        return sum;
+    }
+
+    private static int Branchless(int[] data)
+    {
+        int sum = 0;
+        for (int i = 0; i &lt; N; i++)
+        {
+            int t = (data[i] - 128) &gt;&gt; 31;
+            sum += ~t &amp; data[i];
+        }
+        return sum;
+    }
+
+    [Benchmark]
+    public int SortedBranch() =&gt; Branch(sorted);
+
+    [Benchmark]
+    public int UnsortedBranch() =&gt; Branch(unsorted);
+
+    [Benchmark]
+    public int SortedBranchless() =&gt; Branchless(sorted);
+
+    [Benchmark]
+    public int UnsortedBranchless() =&gt; Branchless(unsorted);
+}
+</code></pre>
+
+<p>and the results:</p>
+<pre class="nocode"> |             Method |        Mean | Mispredict rate | BranchInstructions/Op | BranchMispredictions/Op |
+ |------------------- |------------ |---------------- |---------------------- |------------------------ |
+ |       SortedBranch |  21.4539 us |           0,04% |                 70121 |                      24 |
+ |     UnsortedBranch | 136.1139 us |          23,70% |                 68788 |                   16301 |
+ |   SortedBranchless |  28.6705 us |           0,06% |                 35711 |                      22 |
+ | UnsortedBranchless |  28.9336 us |           0,05% |                 35578 |                      17 |
+</pre><h2 id="restrictions">Restrictions<a class="headerlink" href="#restrictions" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<ul>
+<li>In order to not affect main results we perform a separate run if any diagnoser is used. That's why it might take more time to execute benchmarks.</li>
+<li>
+MemoryDiagnoser:
 <ul>
 <li>Mono currently <a href="http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-in-mono" target="_blank">does not</a> expose any api to get the number of allocated bytes. That's why our Mono users will get <code>?</code> in Allocated column.</li>
 <li>In order to get the number of allocated bytes in cross platform way we are using <code>GC.GetAllocatedBytesForCurrentThread</code> which recently got <a href="https://github.com/dotnet/corefx/pull/12489" target="_blank">exposed</a> for netcoreapp1.1. That's why BenchmarkDotNet does not support netcoreapp1.0 from version 0.10.1.</li>
-<li>In order to not affect main results we perform a separate run if any diagnoser is used. That's why it might take more time to execute benchmarks.</li>
-<li>MemoryDiagnoser is <code>100%</code> accurate about allocated memory when using Job.ShortRun or longer job.</li>
+<li>MemoryDiagnoser is <code>99.5%</code> accurate about allocated memory when using default settings or Job.ShortRun (or any longer job than it).</li>
+</ul>
+</li>
+<li>
+HardwareCounters:
+<ul>
+<li>Windows 8+ only (we plan to add Unix support in the future)</li>
+<li>No Hyper-V (Virtualization) support</li>
+<li>Requires to run as Admin (ETW Kernel Session)</li>
+<li>No <code>InProcessToolchain</code> support (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/394" target="_blank">#394</a>)</li>
+</ul>
+</li>
 </ul>
 
                     </div>
