@@ -46,7 +46,8 @@ namespace BenchmarkDotNet.Portability
         internal static bool IsLinux()
         {
 #if CLASSIC
-            return System.Environment.OSVersion.Platform == PlatformID.Unix;
+            return System.Environment.OSVersion.Platform == PlatformID.Unix
+                   && GetSysnameFromUname().Equals("Linux", StringComparison.InvariantCultureIgnoreCase);
 #else
             return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 #endif
@@ -55,7 +56,8 @@ namespace BenchmarkDotNet.Portability
         internal static bool IsMacOSX()
         {
 #if CLASSIC
-            return System.Environment.OSVersion.Platform == PlatformID.MacOSX;
+            return System.Environment.OSVersion.Platform == PlatformID.MacOSX
+                   && GetSysnameFromUname().Equals("Darwin", StringComparison.InvariantCultureIgnoreCase);
 #else
             return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 #endif
@@ -261,6 +263,32 @@ namespace BenchmarkDotNet.Portability
             {
                 Name = name;
                 Version = version;
+            }
+        }
+
+        [DllImport("libc", SetLastError=true)]
+        private static extern int uname(IntPtr buf);
+
+        private static string GetSysnameFromUname()
+        {
+            var buf = IntPtr.Zero;
+            try
+            {
+                buf = Marshal.AllocHGlobal(8192);
+                // This is a hacktastic way of getting sysname from uname ()
+                int rc = uname(buf);
+                if (rc != 0)
+                {
+                    throw new Exception("uname from libc returned " + rc);
+                }
+
+                string os = Marshal.PtrToStringAnsi(buf);
+                return os;
+            }
+            finally
+            {
+                if (buf != IntPtr.Zero)
+                    Marshal.FreeHGlobal(buf);
             }
         }
     }
