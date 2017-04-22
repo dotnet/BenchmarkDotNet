@@ -1,3 +1,4 @@
+#if !UAP
 using System;
 using System.IO;
 using BenchmarkDotNet.Characteristics;
@@ -32,7 +33,7 @@ namespace BenchmarkDotNet.Toolchains.ProjectJson
 
         protected override void GenerateProject(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver, ILogger logger)
         {
-            string template = ResourceHelper.LoadTemplate("BenchmarkProject.json");
+            string template = ResourceHelper.CoreHelper.LoadTemplate("BenchmarkProject.json");
 
             string content = SetPlatform(template, PlatformProvider(benchmark.Job.ResolveValue(EnvMode.PlatformCharacteristic, resolver)));
             content = SetCodeFileName(content, Path.GetFileName(artifactsPaths.ProgramCodePath));
@@ -83,3 +84,4 @@ namespace BenchmarkDotNet.Toolchains.ProjectJson
         }
     }
 }
+#endif

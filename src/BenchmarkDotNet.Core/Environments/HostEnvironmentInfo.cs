@@ -5,7 +5,6 @@ using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Properties;
-using BenchmarkDotNet.Toolchains.DotNetCli;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -70,7 +69,11 @@ namespace BenchmarkDotNet.Environments
             ChronometerFrequency = Chronometer.Frequency;
             HardwareTimerKind = Chronometer.HardwareTimerKind;
             JitModules = RuntimeInformation.GetJitModulesInfo();
-            DotNetCliVersion = new Lazy<string>(DotNetCliCommandExecutor.GetDotNetCliVersion);
+#if !UAP
+            DotNetCliVersion = new Lazy<string>(Toolchains.DotNetCli.DotNetCliCommandExecutor.GetDotNetCliVersion);
+#else
+            DotNetCliVersion = new Lazy<string>(() => string.Empty);
+#endif
         }
 
         public new static HostEnvironmentInfo GetCurrent() => Current ?? (Current = new HostEnvironmentInfo());

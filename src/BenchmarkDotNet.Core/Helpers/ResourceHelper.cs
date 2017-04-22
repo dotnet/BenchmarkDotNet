@@ -4,11 +4,22 @@ using System.Reflection;
 
 namespace BenchmarkDotNet.Helpers
 {
-    internal static class ResourceHelper
+    internal class ResourceHelper
     {
-        internal static string LoadTemplate(string name)
+        private readonly string resourcesNamespacePrefix;
+        private readonly Assembly assembly;
+
+        public static ResourceHelper CoreHelper = new ResourceHelper("BenchmarkDotNet.Templates.", typeof(ResourceHelper).GetTypeInfo().Assembly);
+
+        internal ResourceHelper(string prefix1, Assembly assembly)
         {
-            var resourceName = "BenchmarkDotNet.Templates." + name;
+            this.resourcesNamespacePrefix = prefix1;
+            this.assembly = assembly;
+        }
+
+        internal string LoadTemplate(string name)
+        {
+            var resourceName = resourcesNamespacePrefix + name;
             using (var stream = GetResouceStream(resourceName))
             {
                 if (stream == null)
@@ -18,9 +29,21 @@ namespace BenchmarkDotNet.Helpers
             }
         }
 
-        private static Stream GetResouceStream(string resourceName)
+        internal byte[] LoadBinaryFile(string name)
         {
-            return typeof(ResourceHelper).GetTypeInfo().Assembly.GetManifestResourceStream(resourceName);
+            var resourceName = resourcesNamespacePrefix + name;
+            using (var stream = GetResouceStream(resourceName))
+            {
+                if (stream == null)
+                    throw new Exception($"Resource {resourceName} not found");
+                using (var reader = new BinaryReader(stream))
+                    return reader.ReadBytes((int)stream.Length);
+            }
+        }
+
+        private Stream GetResouceStream(string resourceName)
+        {
+            return assembly.GetManifestResourceStream(resourceName);
         }
     }
 }

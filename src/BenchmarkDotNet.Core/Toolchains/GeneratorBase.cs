@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !UAP
+using System;
 using System.IO;
 using System.Reflection;
 using BenchmarkDotNet.Characteristics;
@@ -84,7 +85,7 @@ namespace BenchmarkDotNet.Toolchains
             return config.KeepBenchmarkFiles ? benchmark.FolderInfo : shortName;
         }
 
-        private static void GenerateCode(Benchmark benchmark, ArtifactsPaths artifactsPaths)
+        protected virtual void GenerateCode(Benchmark benchmark, ArtifactsPaths artifactsPaths)
         {
             File.WriteAllText(artifactsPaths.ProgramCodePath, CodeGenerator.Generate(benchmark));
         }
@@ -101,3 +102,4 @@ namespace BenchmarkDotNet.Toolchains
         }
     }
 }
+#endif

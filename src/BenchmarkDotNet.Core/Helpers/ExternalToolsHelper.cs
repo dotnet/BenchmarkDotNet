@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !UAP
+using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
@@ -57,3 +58,4 @@ namespace BenchmarkDotNet.Helpers
         }
     }
 }
+#endif

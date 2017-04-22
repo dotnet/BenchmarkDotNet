@@ -8,6 +8,7 @@ namespace BenchmarkDotNet.Running
 {
     public static class BenchmarkRunner
     {
+#if !UAP
         public static Summary Run<T>(IConfig config = null) =>
             BenchmarkRunnerCore.Run(BenchmarkConverter.TypeToBenchmarks(typeof(T), config), config, ToolchainExtensions.GetToolchain);
 
@@ -19,6 +20,7 @@ namespace BenchmarkDotNet.Running
 
         public static Summary Run(Benchmark[] benchmarks, IConfig config) =>
             BenchmarkRunnerCore.Run(benchmarks, config, ToolchainExtensions.GetToolchain);
+#endif
 
         public static Summary RunUrl(string url, IConfig config = null)
         {

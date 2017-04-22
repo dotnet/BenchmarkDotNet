@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !UAP
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -104,6 +105,10 @@ namespace BenchmarkDotNet.Toolchains
                     start.FileName = exePath;
                     start.Arguments = args;
                     break;
+                case UapRuntime uap:
+                    start.FileName = exePath;
+                    start.Arguments = args;
+                    break;
                 case MonoRuntime mono:
                     start.FileName = mono.CustomPath ?? "mono";
                     start.Arguments = GetMonoArguments(benchmark.Job, exePath, args, resolver);
@@ -127,3 +132,4 @@ namespace BenchmarkDotNet.Toolchains
         }
     }
 }
+#endif

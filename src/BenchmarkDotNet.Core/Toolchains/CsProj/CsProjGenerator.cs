@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !UAP
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -35,7 +36,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         protected override void GenerateProject(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver, ILogger logger)
         {
-            string template = ResourceHelper.LoadTemplate("CsProj.txt");
+            string template = ResourceHelper.CoreHelper.LoadTemplate("CsProj.txt");
             var projectFile = GetProjectFilePath(benchmark.Target.Type, logger);
 
             string platform = PlatformProvider(benchmark.Job.ResolveValue(EnvMode.PlatformCharacteristic, resolver));
@@ -125,3 +126,4 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         }
     }
 }
+#endif

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !UAP
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -32,7 +33,7 @@ namespace BenchmarkDotNet.Exporters
 
             string fileNamePrefix = Path.Combine(summary.ResultsDirectoryPath, summary.Title);
             string scriptFullPath = Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
-            string script = ResourceHelper.
+            string script = ResourceHelper.CoreHelper.
                 LoadTemplate(scriptFileName).
                 Replace("$BenchmarkDotNetVersion$", BenchmarkDotNetInfo.FullTitle).
                 Replace("$CsvSeparator$", CsvMeasurementsExporter.Default.Separator);
@@ -87,3 +88,4 @@ namespace BenchmarkDotNet.Exporters
             .FirstOrDefault(File.Exists);
     }
 }
+#endif

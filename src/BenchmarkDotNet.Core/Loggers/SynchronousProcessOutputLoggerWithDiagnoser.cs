@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !UAP
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using BenchmarkDotNet.Configs;
@@ -82,3 +83,4 @@ namespace BenchmarkDotNet.Loggers
         }
     }
 }
+#endif

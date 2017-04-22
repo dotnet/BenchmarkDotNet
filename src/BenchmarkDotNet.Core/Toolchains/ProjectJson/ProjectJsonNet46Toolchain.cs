@@ -1,3 +1,4 @@
+#if !UAP
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -67,3 +68,4 @@ namespace BenchmarkDotNet.Toolchains.ProjectJson
 
     }
 }
+#endif
