@@ -9,30 +9,44 @@ namespace BenchmarkDotNet.Mathematics
     /// </summary>
     internal struct MeasurementsStatistics
     {
+        /// <summary>
+        /// Standard error in nanoseconds.
+        /// </summary>
         public double StandardError { get; }
+
+        /// <summary>
+        /// Mean in nanoseconds.
+        /// </summary>
         public double Mean { get; }
 
-        private MeasurementsStatistics(double standardError, double mean)
+        /// <summary>
+        /// 99.9% confidence interval in nanoseconds.
+        /// </summary>
+        public ConfidenceInterval ConfidenceInterval { get; }
+
+        private MeasurementsStatistics(double standardError, double mean, ConfidenceInterval confidenceInterval)
         {
             StandardError = standardError;
             Mean = mean;
+            ConfidenceInterval = confidenceInterval;
         }
 
         public static MeasurementsStatistics Calculate(List<Measurement> measurements, bool removeOutliers)
         {
-            var n = measurements.Count;
+            int n = measurements.Count;
             if (n == 0)
                 throw new InvalidOperationException("StatSummary: Sequence contains no elements");
 
-            var sum = Sum(measurements);
-            var mean = sum / n;
+            double sum = Sum(measurements);
+            double mean = sum / n;
 
-            var variance = Variance(measurements, n, mean);
-            var standardDeviation = Math.Sqrt(variance);
-            var standardError = standardDeviation / Math.Sqrt(n);
+            double variance = Variance(measurements, n, mean);
+            double standardDeviation = Math.Sqrt(variance);
+            double standardError = standardDeviation / Math.Sqrt(n);
+            var confidenceInterval = new ConfidenceInterval(mean, standardError, n);
 
             if (!removeOutliers) // most simple scenario is done without allocations! but this is not the default case
-                return new MeasurementsStatistics(standardError, mean);
+                return new MeasurementsStatistics(standardError, mean, confidenceInterval);
 
             measurements.Sort(); // sort in place
 
@@ -47,9 +61,9 @@ namespace BenchmarkDotNet.Mathematics
                 q3 = GetQuartile(measurements, measurements.Count * 3 / 2);
             }
 
-            var interquartileRange = q3 - q1;
-            var lowerFence = q1 - 1.5 * interquartileRange;
-            var upperFence = q3 + 1.5 * interquartileRange;
+            double interquartileRange = q3 - q1;
+            double lowerFence = q1 - 1.5 * interquartileRange;
+            double upperFence = q3 + 1.5 * interquartileRange;
 
             SumWithoutOutliers(measurements, lowerFence, upperFence, out sum, out n); // updates sum and N
             mean = sum / n;
@@ -57,8 +71,9 @@ namespace BenchmarkDotNet.Mathematics
             variance = VarianceWithoutOutliers(measurements, n, mean, lowerFence, upperFence);
             standardDeviation = Math.Sqrt(variance);
             standardError = standardDeviation / Math.Sqrt(n);
+            confidenceInterval = new ConfidenceInterval(mean, standardError, n);
 
-            return new MeasurementsStatistics(standardError, mean);
+            return new MeasurementsStatistics(standardError, mean, confidenceInterval);
         }
 
         private static double Sum(List<Measurement> measurements)

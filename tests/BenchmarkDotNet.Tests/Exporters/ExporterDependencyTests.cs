@@ -5,7 +5,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using Xunit;
 
-namespace BenchmarkDotNet.Tests
+namespace BenchmarkDotNet.Tests.Exporters
 {
     // See https://github.com/dotnet/BenchmarkDotNet/issues/172
     public class ExporterDependencyTests

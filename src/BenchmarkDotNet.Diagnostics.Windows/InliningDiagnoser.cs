@@ -8,13 +8,26 @@ namespace BenchmarkDotNet.Diagnostics.Windows
     {
         private static readonly string LogSeparator = new string('-', 20);
 
+        private readonly bool logFailuresOnly = true;
+        private readonly bool filterByNamespace = true;
+
         // ReSharper disable once EmptyConstructor parameterless ctor is mandatory for DiagnosersLoader.CreateDiagnoser
         public InliningDiagnoser() { }
 
+        /// <summary>
+        /// creates new InliningDiagnoser
+        /// </summary>
+        /// <param name="logFailuresOnly">only the methods that failed to get inlined. True by default.</param>
+        /// <param name="filterByNamespace">only the methods from declaring type's namespace. Set to false if you want to see all Jit inlining events. True by default.</param>
+        public InliningDiagnoser(bool logFailuresOnly, bool filterByNamespace)
+        {
+            this.logFailuresOnly = logFailuresOnly;
+            this.filterByNamespace = filterByNamespace;
+        }
+
         protected override void AttachToEvents(TraceEventSession session, Benchmark benchmark)
         {
-            var expected = benchmark.Target.Method.DeclaringType.Namespace + "." +
-                           benchmark.Target.Method.DeclaringType.Name;
+            var expectedNamespace = benchmark.Target.Method.DeclaringType.Namespace;
 
             Logger.WriteLine();
             Logger.WriteLineHeader(LogSeparator);
@@ -28,8 +41,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 object ignored;
                 if (StatsPerProcess.TryGetValue(jitData.ProcessID, out ignored))
                 {
-                    var shouldPrint = jitData.InlinerNamespace == expected ||
-                                      jitData.InlineeNamespace == expected;
+                    var shouldPrint = !logFailuresOnly
+                        && (!filterByNamespace 
+                            || jitData.InlinerNamespace.StartsWith(expectedNamespace) 
+                            || jitData.InlineeNamespace.StartsWith(expectedNamespace));
+
                     if (shouldPrint)
                     {
                         Logger.WriteLineHelp($"Inliner: {jitData.InlinerNamespace}.{jitData.InlinerName} - {jitData.InlinerNameSignature}");
@@ -44,8 +60,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 object ignored;
                 if (StatsPerProcess.TryGetValue(jitData.ProcessID, out ignored))
                 {
-                    var shouldPrint = jitData.InlinerNamespace == expected ||
-                                      jitData.InlineeNamespace == expected;
+                    var shouldPrint = !filterByNamespace
+                                      || jitData.InlinerNamespace.StartsWith(expectedNamespace)
+                                      || jitData.InlineeNamespace.StartsWith(expectedNamespace);
+
                     if (shouldPrint)
                     {
                         Logger.WriteLineError($"Inliner: {jitData.InlinerNamespace}.{jitData.InlinerName} - {jitData.InlinerNameSignature}");

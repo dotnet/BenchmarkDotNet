@@ -46,8 +46,15 @@ namespace BenchmarkDotNet.Reports
             LaunchIndex = launchIndex;
         }
 
-        public string ToOutputLine() => $"{IterationMode} {IterationIndex}: {GetDisplayValue()}";
-        private string GetDisplayValue() => $"{Operations} op, {Nanoseconds.ToStr()} ns, {GetAverageTime()}";
+        public string ToOutputLine()
+        {
+            // Usually, a benchmarks takes more than 10 iterations (rarely more than 99)
+            // PadLeft(2, ' ') looks like a good trade-off between alignment and amount of characters
+            string alignedIterationIndex = IterationIndex.ToString().PadLeft(2, ' ');
+            return $"{IterationMode} {alignedIterationIndex}: {GetDisplayValue()}";
+        }
+
+        private string GetDisplayValue() => $"{Operations} op, {Nanoseconds.ToStr("0.00")} ns, {GetAverageTime()}";
         private string GetAverageTime() => $"{(Nanoseconds / Operations).ToTimeStr()}/op";
 
         /// <summary>

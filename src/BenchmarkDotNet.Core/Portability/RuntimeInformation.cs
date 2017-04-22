@@ -45,7 +45,8 @@ namespace BenchmarkDotNet.Portability
         internal static bool IsLinux()
         {
 #if CLASSIC
-            return System.Environment.OSVersion.Platform == PlatformID.Unix;
+            return System.Environment.OSVersion.Platform == PlatformID.Unix
+                   && GetSysnameFromUname().Equals("Linux", StringComparison.InvariantCultureIgnoreCase);
 #else
             return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 #endif
@@ -54,7 +55,8 @@ namespace BenchmarkDotNet.Portability
         internal static bool IsMacOSX()
         {
 #if CLASSIC
-            return System.Environment.OSVersion.Platform == PlatformID.MacOSX;
+            return System.Environment.OSVersion.Platform == PlatformID.Unix
+                   && GetSysnameFromUname().Equals("Darwin", StringComparison.InvariantCultureIgnoreCase);
 #else
             return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 #endif
@@ -64,18 +66,12 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetOsVersion()
         {
-#if CLASSIC
-            if (IsMono())
-                return System.Environment.OSVersion.ToString();
-#endif
             return $"{Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem} {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion}";
         }
 
         internal static string GetProcessorName()
         {
-#if !UAP
-            string NiceString(string processorName) => Regex.Replace(processorName.Replace("@", "").Trim(), @"\s+", " ");
-#if !CORE
+#if CLASSIC
             if (IsWindows() && !IsMono())
             {
                 try
@@ -84,22 +80,22 @@ namespace BenchmarkDotNet.Portability
                     var mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
                     foreach (var moProcessor in mosProcessor.Get().Cast<ManagementObject>())
                         info += moProcessor["name"]?.ToString();
-                    return NiceString(info);
+                    return ProcessorBrandStringHelper.Prettify(info);
                 }
                 catch (Exception)
                 {
                     // ignored
                 }
             }
-#endif
+#elif CORE
             if (IsWindows())
-                return NiceString(ExternalToolsHelper.Wmic.Value.GetValueOrDefault("Name") ?? "");
+                return ProcessorBrandStringHelper.Prettify(ExternalToolsHelper.Wmic.Value.GetValueOrDefault("Name") ?? "");
 
             if (IsLinux())
-                return NiceString(ExternalToolsHelper.ProcCpuInfo.Value.GetValueOrDefault("model name") ?? "");
+                return ProcessorBrandStringHelper.Prettify(ExternalToolsHelper.ProcCpuInfo.Value.GetValueOrDefault("model name") ?? "");
 
             if (IsMacOSX())
-                return NiceString(ExternalToolsHelper.Sysctl.Value.GetValueOrDefault("machdep.cpu.brand_string") ?? "");
+                return ProcessorBrandStringHelper.Prettify(ExternalToolsHelper.Sysctl.Value.GetValueOrDefault("machdep.cpu.brand_string") ?? "");
 #endif
             return Unknown;
         }
@@ -272,6 +268,32 @@ namespace BenchmarkDotNet.Portability
             {
                 Name = name;
                 Version = version;
+            }
+        }
+
+        [DllImport("libc", SetLastError=true)]
+        private static extern int uname(IntPtr buf);
+
+        private static string GetSysnameFromUname()
+        {
+            var buf = IntPtr.Zero;
+            try
+            {
+                buf = Marshal.AllocHGlobal(8192);
+                // This is a hacktastic way of getting sysname from uname ()
+                int rc = uname(buf);
+                if (rc != 0)
+                {
+                    throw new Exception("uname from libc returned " + rc);
+                }
+
+                string os = Marshal.PtrToStringAnsi(buf);
+                return os;
+            }
+            finally
+            {
+                if (buf != IntPtr.Zero)
+                    Marshal.FreeHGlobal(buf);
             }
         }
     }

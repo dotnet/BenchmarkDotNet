@@ -120,6 +120,17 @@ namespace BenchmarkDotNet.Running
             // TODO: make exporter
             ConclusionHelper.Print(logger, config.GetCompositeAnalyser().Analyse(summary).ToList());
 
+            // TODO: move to conclusions
+            var columnWithLegends = summary.Table.Columns.Select(c => c.OriginalColumn).Where(c => !string.IsNullOrEmpty(c.Legend)).ToList();
+            if (columnWithLegends.Any())
+            {
+                logger.WriteLine();
+                logger.WriteLineHeader("// * Legends *");
+                int maxNameWidth = columnWithLegends.Select(c => c.ColumnName.Length).Max();
+                foreach (var column in columnWithLegends)
+                    logger.WriteLineHint($"  {column.ColumnName.PadRight(maxNameWidth, ' ')} : {column.Legend}");
+            }
+
             if (config.GetDiagnosers().Any())
             {
                 logger.WriteLine();

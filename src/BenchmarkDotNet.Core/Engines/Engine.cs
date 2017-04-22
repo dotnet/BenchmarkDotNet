@@ -14,7 +14,6 @@ namespace BenchmarkDotNet.Engines
     public class Engine : IEngine
     {
         public const int MinInvokeCount = 4;
-        public static readonly TimeInterval MinIterationTime = 200 * TimeInterval.Millisecond;
 
         public IHost Host { get; }
         public bool IsDiagnoserAttached { get; }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
@@ -11,19 +12,20 @@ namespace BenchmarkDotNet.Engines
         internal const int MinIterationCount = 15;
         internal const int MaxIterationCount = 100;
         internal const int MaxIdleIterationCount = 20;
-        internal const double MaxIdleStdErrRelative = 0.05;
+        internal const double MaxIdleRelativeError = 0.05;
         internal const int DefaultTargetCount = 10;
 
         private readonly int? targetCount;
-        private readonly double maxStdErrRelative;
+        private readonly double maxRelativeError;
+        private readonly TimeInterval? maxAbsoluteError;
         private readonly bool removeOutliers;
         private readonly MeasurementsPool measurementsPool;
-
 
         public EngineTargetStage(IEngine engine) : base(engine)
         {
             targetCount = engine.TargetJob.ResolveValueAsNullable(RunMode.TargetCountCharacteristic);
-            maxStdErrRelative = engine.TargetJob.ResolveValue(AccuracyMode.MaxStdErrRelativeCharacteristic, engine.Resolver);
+            maxRelativeError = engine.TargetJob.ResolveValue(AccuracyMode.MaxRelativeErrorCharacteristic, engine.Resolver);
+            maxAbsoluteError = engine.TargetJob.ResolveValueAsNullable(AccuracyMode.MaxAbsoluteErrorCharacteristic);
             removeOutliers = engine.TargetJob.ResolveValue(AccuracyMode.RemoveOutliersCharacteristic, engine.Resolver);
             measurementsPool = MeasurementsPool.PreAllocate(10, MaxIterationCount, targetCount);
         }
@@ -46,7 +48,7 @@ namespace BenchmarkDotNet.Engines
 
             int iterationCounter = 0;
             bool isIdle = iterationMode.IsIdle();
-            double maxErrorRelative = isIdle ? MaxIdleStdErrRelative : maxStdErrRelative;
+            double effectiveMaxRelativeError = isIdle ? MaxIdleRelativeError : maxRelativeError;
             while (true)
             {
                 iterationCounter++;
@@ -55,8 +57,11 @@ namespace BenchmarkDotNet.Engines
                 measurementsForStatistics.Add(measurement);
 
                 var statistics = MeasurementsStatistics.Calculate(measurementsForStatistics, removeOutliers);
-                double actualError = statistics.StandardError;
-                double maxError = maxErrorRelative * statistics.Mean;
+                double actualError = statistics.ConfidenceInterval.Margin;
+
+                double maxError1 = effectiveMaxRelativeError * statistics.Mean;
+                double maxError2 = maxAbsoluteError?.Nanoseconds ?? double.MaxValue;
+                double maxError = Math.Min(maxError1, maxError2);
 
                 if (iterationCounter >= MinIterationCount && actualError < maxError)
                     break;

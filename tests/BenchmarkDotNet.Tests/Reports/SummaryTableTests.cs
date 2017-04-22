@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
@@ -41,6 +42,26 @@ namespace BenchmarkDotNet.Tests.Reports
         {
             var gcModeColumn = CreateColumn("Platform");
             Assert.Equal(true, gcModeColumn.IsDefault);
+        }
+
+        [Fact]
+        public void NumericColumnIsRightJustified()
+        {
+            var config = ManualConfig.Create(DefaultConfig.Instance).With(StatisticColumn.Mean);
+            var summary = MockFactory.CreateSummary(config);
+            var table = new SummaryTable(summary);
+
+            Assert.Equal(SummaryTable.SummaryTableColumn.TextJustification.Right, table.Columns.First(c => c.Header == "Mean").Justify);
+        }
+
+        [Fact]
+        public void TextColumnIsLeftJustified()
+        {
+            var config = ManualConfig.Create(DefaultConfig.Instance).With(new ParamColumn("Param"));
+            var summary = MockFactory.CreateSummary(config);
+            var table = new SummaryTable(summary);
+
+            Assert.Equal(SummaryTable.SummaryTableColumn.TextJustification.Left, table.Columns.First(c => c.Header == "Param").Justify);
         }
     }
 }

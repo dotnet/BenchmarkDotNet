@@ -5,50 +5,54 @@ namespace BenchmarkDotNet.Jobs
 {
     public sealed class AccuracyMode : JobMode<AccuracyMode>
     {
-        public static readonly Characteristic<double> MaxStdErrRelativeCharacteristic = Characteristic.Create((AccuracyMode a) => a.MaxStdErrRelative);
+        public static readonly Characteristic<double> MaxRelativeErrorCharacteristic = Characteristic.Create((AccuracyMode a) => a.MaxRelativeError);
+        public static readonly Characteristic<TimeInterval> MaxAbsoluteErrorCharacteristic = Characteristic.Create((AccuracyMode a) => a.MaxAbsoluteError);
         public static readonly Characteristic<TimeInterval> MinIterationTimeCharacteristic = Characteristic.Create((AccuracyMode a) => a.MinIterationTime);
         public static readonly Characteristic<int> MinInvokeCountCharacteristic = Characteristic.Create((AccuracyMode a) => a.MinInvokeCount);
         public static readonly Characteristic<bool> EvaluateOverheadCharacteristic = Characteristic.Create((AccuracyMode a) => a.EvaluateOverhead);
         public static readonly Characteristic<bool> RemoveOutliersCharacteristic = Characteristic.Create((AccuracyMode a) => a.RemoveOutliers);
-
-        // TODO: fix typo
         public static readonly Characteristic<bool> AnalyzeLaunchVarianceCharacteristic = Characteristic.Create((AccuracyMode a) => a.AnalyzeLaunchVariance);
 
-        public double MaxStdErrRelative
+        public double MaxRelativeError
         {
-            get { return MaxStdErrRelativeCharacteristic[this]; }
-            set { MaxStdErrRelativeCharacteristic[this] = value; }
+            get => MaxRelativeErrorCharacteristic[this];
+            set => MaxRelativeErrorCharacteristic[this] = value;
+        }
+
+        public TimeInterval MaxAbsoluteError
+        {
+            get => MaxAbsoluteErrorCharacteristic[this];
+            set => MaxAbsoluteErrorCharacteristic[this] = value;
         }
 
         public TimeInterval MinIterationTime
         {
-            get { return MinIterationTimeCharacteristic[this]; }
-            set { MinIterationTimeCharacteristic[this] = value; }
+            get => MinIterationTimeCharacteristic[this];
+            set => MinIterationTimeCharacteristic[this] = value;
         }
 
         public int MinInvokeCount
         {
-            get { return MinInvokeCountCharacteristic[this]; }
-            set { MinInvokeCountCharacteristic[this] = value; }
+            get => MinInvokeCountCharacteristic[this];
+            set => MinInvokeCountCharacteristic[this] = value;
         }
 
         public bool EvaluateOverhead
         {
-            get { return EvaluateOverheadCharacteristic[this]; }
-            set { EvaluateOverheadCharacteristic[this] = value; }
+            get => EvaluateOverheadCharacteristic[this];
+            set => EvaluateOverheadCharacteristic[this] = value;
         }
 
         public bool RemoveOutliers
         {
-            get { return RemoveOutliersCharacteristic[this]; }
-            set { RemoveOutliersCharacteristic[this] = value; }
+            get => RemoveOutliersCharacteristic[this];
+            set => RemoveOutliersCharacteristic[this] = value;
         }
 
-        // TODO: fix typo
         public bool AnalyzeLaunchVariance
         {
-            get { return AnalyzeLaunchVarianceCharacteristic[this]; }
-            set { AnalyzeLaunchVarianceCharacteristic[this] = value; }
+            get => AnalyzeLaunchVarianceCharacteristic[this];
+            set => AnalyzeLaunchVarianceCharacteristic[this] = value;
         }
     }
 }

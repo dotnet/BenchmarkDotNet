@@ -218,7 +218,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public bool IsDefault(Summary summary, Benchmark benchmark) => false;
             public bool AlwaysShow => false;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
-            public int PriorityInCategory => 0;
+            public int PriorityInCategory => 1;
+            public bool IsNumeric => true;
+            public UnitType UnitType => UnitType.Dimensionless;
+            public string Legend => $"Hardware counter '{Counter}' per operation";
+            public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
 
             private Dictionary<Benchmark, PmcStats> Results { get; }
             private HardwareCounter Counter { get; }
@@ -244,7 +248,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public bool IsDefault(Summary summary, Benchmark benchmark) => false;
             public bool AlwaysShow => false;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
-            public int PriorityInCategory => 1;
+            public int PriorityInCategory => 0; // if present should be displayed as the first column (we sort in ascending way)
+            public bool IsNumeric => true;
+            public UnitType UnitType => UnitType.Dimensionless;
+            public string Legend => $"Mispredict rate per operation";
+            public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
 
             private Dictionary<Benchmark, PmcStats> Results { get; }
 
@@ -253,9 +261,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                         && summary.Config.GetHardwareCounters().Contains(HardwareCounter.BranchInstructions)
                         && summary.Config.GetHardwareCounters().Contains(HardwareCounter.BranchMispredictions);
 
-            public string GetValue(Summary summary, Benchmark benchmark)
+            public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style)
                 => Results.TryGetValue(benchmark, out var stats) && stats.Counters.ContainsKey(HardwareCounter.BranchMispredictions) && stats.Counters.ContainsKey(HardwareCounter.BranchInstructions)
-                    ? (stats.Counters[HardwareCounter.BranchMispredictions].Count / (double)stats.Counters[HardwareCounter.BranchInstructions].Count).ToString("P2")
+                    ? (stats.Counters[HardwareCounter.BranchMispredictions].Count / (double)stats.Counters[HardwareCounter.BranchInstructions].Count).ToString(style.PrintUnitsInContent ? "P2" : String.Empty)
                     : "-";
         }
     }

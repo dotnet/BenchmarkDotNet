@@ -10,6 +10,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Validators;
+using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -24,6 +25,7 @@ namespace BenchmarkDotNet.Configs
         private readonly List<Job> jobs = new List<Job>();
         private readonly List<HardwareCounter> hardwareCounters = new List<HardwareCounter>();
         private IOrderProvider orderProvider = null;
+        private ISummaryStyle summaryStyle = null;
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;
@@ -33,8 +35,8 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IValidator> GetValidators() => validators;
         public IEnumerable<Job> GetJobs() => jobs;
         public IEnumerable<HardwareCounter> GetHardwareCounters() => hardwareCounters;
-
         public IOrderProvider GetOrderProvider() => orderProvider;
+        public ISummaryStyle GetSummaryStyle() => summaryStyle;
 
         public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
 
@@ -50,6 +52,7 @@ namespace BenchmarkDotNet.Configs
         public void Add(params Job[] newJobs) => jobs.AddRange(newJobs.Select(j => j.Freeze())); // DONTTOUCH: please DO NOT remove .Freeze() call.
         public void Add(params HardwareCounter[] newHardwareCounters) => hardwareCounters.AddRange(newHardwareCounters);
         public void Set(IOrderProvider provider) => orderProvider = provider ?? orderProvider;
+        public void Set(ISummaryStyle style) => summaryStyle = style ?? summaryStyle;
 
         public void Add(IConfig config)
         {
@@ -63,6 +66,7 @@ namespace BenchmarkDotNet.Configs
             hardwareCounters.AddRange(config.GetHardwareCounters());
             orderProvider = config.GetOrderProvider() ?? orderProvider;
             KeepBenchmarkFiles |= config.KeepBenchmarkFiles;
+            summaryStyle = summaryStyle ?? config.GetSummaryStyle();
         }
 
         public IEnumerable<IDiagnoser> GetDiagnosers()
