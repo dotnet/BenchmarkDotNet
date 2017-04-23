@@ -1,0 +1,437 @@
+﻿############################################
+AsciiDocExporter
+############################################
+....
+BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock
+Processor=MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz, ProcessorCount=8
+Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
+  [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mockCONFIGURATION
+
+Job=LongRun  LaunchCount=3  TargetCount=100  
+WarmupCount=15  
+....
+[options="header"]
+|===
+|  Method|       Mean|  Error|     StdDev|        P67
+|     Foo|  1.0000 ns|     NA|  0.0000 ns|  1.0000 ns
+|     Bar|  1.0000 ns|     NA|  0.0000 ns|  1.0000 ns
+|===
+############################################
+HtmlExporter
+############################################
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>MockSummary</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock
+Processor=MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz, ProcessorCount=8
+Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
+  [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mockCONFIGURATION
+</code></pre>
+<pre><code>Job=LongRun  LaunchCount=3  TargetCount=100  
+WarmupCount=15  
+</code></pre>
+
+<table>
+<thead><tr><th>Method</th><th>Mean</th><th>Error</th><th>StdDev</th><th>P67</th>
+</tr>
+</thead><tbody><tr><td>Foo</td><td>1.0000 ns</td><td>NA</td><td>0.0000 ns</td><td>1.0000 ns</td>
+</tr><tr><td>Bar</td><td>1.0000 ns</td><td>NA</td><td>0.0000 ns</td><td>1.0000 ns</td>
+</tr></tbody></table>
+</body>
+</html>
+############################################
+JsonExporter-brief
+############################################
+{
+   "Title":"MockSummary",
+   "HostEnvironmentInfo":{
+      "BenchmarkDotNetCaption":"BenchmarkDotNet",
+      "BenchmarkDotNetVersion":"0.10.x-mock",
+      "OsVersion":{
+         "IsValueCreated":true,
+         "Value":"Microsoft Windows NT 10.0.x.mock"
+      },
+      "ProcessorName":{
+         "IsValueCreated":true,
+         "Value":"MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz"
+      },
+      "ProcessorCount":8,
+      "RuntimeVersion":"Clr 4.0.x.mock",
+      "Architecture":"64mock",
+      "HasAttachedDebugger":false,
+      "HasRyuJit":true,
+      "Configuration":"CONFIGURATION",
+      "JitModules":"clrjit-v4.6.x.mock",
+      "DotNetCliVersion":"1.0.x.mock",
+      "ChronometerFrequency":{
+         "Hertz":2531248
+      },
+      "HardwareTimerKind":"Tsc"
+   },
+   "Benchmarks":[
+      {
+         "DisplayInfo":"MockBenchmarkClass.Foo: LongRun(LaunchCount=3, TargetCount=100, WarmupCount=15)",
+         "Namespace":"BenchmarkDotNet.Tests.Mocks",
+         "Type":"MockBenchmarkClass",
+         "Method":"Foo",
+         "MethodTitle":"Foo",
+         "Parameters":"",
+         "Statistics":{
+            "N":1,
+            "Min":1,
+            "LowerFence":1,
+            "Q1":1,
+            "Median":1,
+            "Mean":1,
+            "Q3":1,
+            "UpperFence":1,
+            "Max":1,
+            "InterquartileRange":0,
+            "Outliers":[
+               
+            ],
+            "StandardError":0,
+            "Variance":0,
+            "StandardDeviation":0,
+            "Skewness":NaN,
+            "Kurtosis":NaN,
+            "ConfidenceInterval":{
+               "N":1,
+               "Mean":1,
+               "StandardError":0,
+               "Level":12,
+               "Margin":NaN,
+               "Lower":NaN,
+               "Upper":NaN
+            },
+            "Percentiles":{
+               "P0":1,
+               "P25":1,
+               "P50":1,
+               "P67":1,
+               "P80":1,
+               "P85":1,
+               "P90":1,
+               "P95":1,
+               "P100":1
+            }
+         }
+      },{
+         "DisplayInfo":"MockBenchmarkClass.Bar: LongRun(LaunchCount=3, TargetCount=100, WarmupCount=15)",
+         "Namespace":"BenchmarkDotNet.Tests.Mocks",
+         "Type":"MockBenchmarkClass",
+         "Method":"Bar",
+         "MethodTitle":"Bar",
+         "Parameters":"",
+         "Statistics":{
+            "N":1,
+            "Min":1,
+            "LowerFence":1,
+            "Q1":1,
+            "Median":1,
+            "Mean":1,
+            "Q3":1,
+            "UpperFence":1,
+            "Max":1,
+            "InterquartileRange":0,
+            "Outliers":[
+               
+            ],
+            "StandardError":0,
+            "Variance":0,
+            "StandardDeviation":0,
+            "Skewness":NaN,
+            "Kurtosis":NaN,
+            "ConfidenceInterval":{
+               "N":1,
+               "Mean":1,
+               "StandardError":0,
+               "Level":12,
+               "Margin":NaN,
+               "Lower":NaN,
+               "Upper":NaN
+            },
+            "Percentiles":{
+               "P0":1,
+               "P25":1,
+               "P50":1,
+               "P67":1,
+               "P80":1,
+               "P85":1,
+               "P90":1,
+               "P95":1,
+               "P100":1
+            }
+         }
+      }
+   ]
+}############################################
+JsonExporter-brief-compressed
+############################################
+{"Title":"MockSummary","HostEnvironmentInfo":{"BenchmarkDotNetCaption":"BenchmarkDotNet","BenchmarkDotNetVersion":"0.10.x-mock","OsVersion":{"IsValueCreated":true,"Value":"Microsoft Windows NT 10.0.x.mock"},"ProcessorName":{"IsValueCreated":true,"Value":"MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz"},"ProcessorCount":8,"RuntimeVersion":"Clr 4.0.x.mock","Architecture":"64mock","HasAttachedDebugger":false,"HasRyuJit":true,"Configuration":"CONFIGURATION","JitModules":"clrjit-v4.6.x.mock","DotNetCliVersion":"1.0.x.mock","ChronometerFrequency":{"Hertz":2531248},"HardwareTimerKind":"Tsc"},"Benchmarks":[{"DisplayInfo":"MockBenchmarkClass.Foo: LongRun(LaunchCount=3, TargetCount=100, WarmupCount=15)","Namespace":"BenchmarkDotNet.Tests.Mocks","Type":"MockBenchmarkClass","Method":"Foo","MethodTitle":"Foo","Parameters":"","Statistics":{"N":1,"Min":1,"LowerFence":1,"Q1":1,"Median":1,"Mean":1,"Q3":1,"UpperFence":1,"Max":1,"InterquartileRange":0,"Outliers":[],"StandardError":0,"Variance":0,"StandardDeviation":0,"Skewness":NaN,"Kurtosis":NaN,"ConfidenceInterval":{"N":1,"Mean":1,"StandardError":0,"Level":12,"Margin":NaN,"Lower":NaN,"Upper":NaN},"Percentiles":{"P0":1,"P25":1,"P50":1,"P67":1,"P80":1,"P85":1,"P90":1,"P95":1,"P100":1}},"Measurements":[{"IterationMode":"Result","LaunchIndex":1,"IterationIndex":1,"Operations":1,"Nanoseconds":1}]},{"DisplayInfo":"MockBenchmarkClass.Bar: LongRun(LaunchCount=3, TargetCount=100, WarmupCount=15)","Namespace":"BenchmarkDotNet.Tests.Mocks","Type":"MockBenchmarkClass","Method":"Bar","MethodTitle":"Bar","Parameters":"","Statistics":{"N":1,"Min":1,"LowerFence":1,"Q1":1,"Median":1,"Mean":1,"Q3":1,"UpperFence":1,"Max":1,"InterquartileRange":0,"Outliers":[],"StandardError":0,"Variance":0,"StandardDeviation":0,"Skewness":NaN,"Kurtosis":NaN,"ConfidenceInterval":{"N":1,"Mean":1,"StandardError":0,"Level":12,"Margin":NaN,"Lower":NaN,"Upper":NaN},"Percentiles":{"P0":1,"P25":1,"P50":1,"P67":1,"P80":1,"P85":1,"P90":1,"P95":1,"P100":1}},"Measurements":[{"IterationMode":"Result","LaunchIndex":1,"IterationIndex":1,"Operations":1,"Nanoseconds":1}]}]}############################################
+JsonExporter-full
+############################################
+{
+   "Title":"MockSummary",
+   "HostEnvironmentInfo":{
+      "BenchmarkDotNetCaption":"BenchmarkDotNet",
+      "BenchmarkDotNetVersion":"0.10.x-mock",
+      "OsVersion":{
+         "IsValueCreated":true,
+         "Value":"Microsoft Windows NT 10.0.x.mock"
+      },
+      "ProcessorName":{
+         "IsValueCreated":true,
+         "Value":"MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz"
+      },
+      "ProcessorCount":8,
+      "RuntimeVersion":"Clr 4.0.x.mock",
+      "Architecture":"64mock",
+      "HasAttachedDebugger":false,
+      "HasRyuJit":true,
+      "Configuration":"CONFIGURATION",
+      "JitModules":"clrjit-v4.6.x.mock",
+      "DotNetCliVersion":"1.0.x.mock",
+      "ChronometerFrequency":{
+         "Hertz":2531248
+      },
+      "HardwareTimerKind":"Tsc"
+   },
+   "Benchmarks":[
+      {
+         "DisplayInfo":"MockBenchmarkClass.Foo: LongRun(LaunchCount=3, TargetCount=100, WarmupCount=15)",
+         "Namespace":"BenchmarkDotNet.Tests.Mocks",
+         "Type":"MockBenchmarkClass",
+         "Method":"Foo",
+         "MethodTitle":"Foo",
+         "Parameters":"",
+         "Statistics":{
+            "N":1,
+            "Min":1,
+            "LowerFence":1,
+            "Q1":1,
+            "Median":1,
+            "Mean":1,
+            "Q3":1,
+            "UpperFence":1,
+            "Max":1,
+            "InterquartileRange":0,
+            "Outliers":[
+               
+            ],
+            "StandardError":0,
+            "Variance":0,
+            "StandardDeviation":0,
+            "Skewness":NaN,
+            "Kurtosis":NaN,
+            "ConfidenceInterval":{
+               "N":1,
+               "Mean":1,
+               "StandardError":0,
+               "Level":12,
+               "Margin":NaN,
+               "Lower":NaN,
+               "Upper":NaN
+            },
+            "Percentiles":{
+               "P0":1,
+               "P25":1,
+               "P50":1,
+               "P67":1,
+               "P80":1,
+               "P85":1,
+               "P90":1,
+               "P95":1,
+               "P100":1
+            }
+         },
+         "Measurements":[
+            {
+               "IterationMode":"Result",
+               "LaunchIndex":1,
+               "IterationIndex":1,
+               "Operations":1,
+               "Nanoseconds":1
+            }
+         ]
+      },{
+         "DisplayInfo":"MockBenchmarkClass.Bar: LongRun(LaunchCount=3, TargetCount=100, WarmupCount=15)",
+         "Namespace":"BenchmarkDotNet.Tests.Mocks",
+         "Type":"MockBenchmarkClass",
+         "Method":"Bar",
+         "MethodTitle":"Bar",
+         "Parameters":"",
+         "Statistics":{
+            "N":1,
+            "Min":1,
+            "LowerFence":1,
+            "Q1":1,
+            "Median":1,
+            "Mean":1,
+            "Q3":1,
+            "UpperFence":1,
+            "Max":1,
+            "InterquartileRange":0,
+            "Outliers":[
+               
+            ],
+            "StandardError":0,
+            "Variance":0,
+            "StandardDeviation":0,
+            "Skewness":NaN,
+            "Kurtosis":NaN,
+            "ConfidenceInterval":{
+               "N":1,
+               "Mean":1,
+               "StandardError":0,
+               "Level":12,
+               "Margin":NaN,
+               "Lower":NaN,
+               "Upper":NaN
+            },
+            "Percentiles":{
+               "P0":1,
+               "P25":1,
+               "P50":1,
+               "P67":1,
+               "P80":1,
+               "P85":1,
+               "P90":1,
+               "P95":1,
+               "P100":1
+            }
+         },
+         "Measurements":[
+            {
+               "IterationMode":"Result",
+               "LaunchIndex":1,
+               "IterationIndex":1,
+               "Operations":1,
+               "Nanoseconds":1
+            }
+         ]
+      }
+   ]
+}############################################
+JsonExporter-full-compressed
+############################################
+{"Title":"MockSummary","HostEnvironmentInfo":{"BenchmarkDotNetCaption":"BenchmarkDotNet","BenchmarkDotNetVersion":"0.10.x-mock","OsVersion":{"IsValueCreated":true,"Value":"Microsoft Windows NT 10.0.x.mock"},"ProcessorName":{"IsValueCreated":true,"Value":"MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz"},"ProcessorCount":8,"RuntimeVersion":"Clr 4.0.x.mock","Architecture":"64mock","HasAttachedDebugger":false,"HasRyuJit":true,"Configuration":"CONFIGURATION","JitModules":"clrjit-v4.6.x.mock","DotNetCliVersion":"1.0.x.mock","ChronometerFrequency":{"Hertz":2531248},"HardwareTimerKind":"Tsc"},"Benchmarks":[{"DisplayInfo":"MockBenchmarkClass.Foo: LongRun(LaunchCount=3, TargetCount=100, WarmupCount=15)","Namespace":"BenchmarkDotNet.Tests.Mocks","Type":"MockBenchmarkClass","Method":"Foo","MethodTitle":"Foo","Parameters":"","Statistics":{"N":1,"Min":1,"LowerFence":1,"Q1":1,"Median":1,"Mean":1,"Q3":1,"UpperFence":1,"Max":1,"InterquartileRange":0,"Outliers":[],"StandardError":0,"Variance":0,"StandardDeviation":0,"Skewness":NaN,"Kurtosis":NaN,"ConfidenceInterval":{"N":1,"Mean":1,"StandardError":0,"Level":12,"Margin":NaN,"Lower":NaN,"Upper":NaN},"Percentiles":{"P0":1,"P25":1,"P50":1,"P67":1,"P80":1,"P85":1,"P90":1,"P95":1,"P100":1}},"Measurements":[{"IterationMode":"Result","LaunchIndex":1,"IterationIndex":1,"Operations":1,"Nanoseconds":1}]},{"DisplayInfo":"MockBenchmarkClass.Bar: LongRun(LaunchCount=3, TargetCount=100, WarmupCount=15)","Namespace":"BenchmarkDotNet.Tests.Mocks","Type":"MockBenchmarkClass","Method":"Bar","MethodTitle":"Bar","Parameters":"","Statistics":{"N":1,"Min":1,"LowerFence":1,"Q1":1,"Median":1,"Mean":1,"Q3":1,"UpperFence":1,"Max":1,"InterquartileRange":0,"Outliers":[],"StandardError":0,"Variance":0,"StandardDeviation":0,"Skewness":NaN,"Kurtosis":NaN,"ConfidenceInterval":{"N":1,"Mean":1,"StandardError":0,"Level":12,"Margin":NaN,"Lower":NaN,"Upper":NaN},"Percentiles":{"P0":1,"P25":1,"P50":1,"P67":1,"P80":1,"P85":1,"P90":1,"P95":1,"P100":1}},"Measurements":[{"IterationMode":"Result","LaunchIndex":1,"IterationIndex":1,"Operations":1,"Nanoseconds":1}]}]}############################################
+MarkdownExporter-default
+############################################
+
+BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock
+Processor=MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz, ProcessorCount=8
+Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
+  [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mockCONFIGURATION
+
+Job=LongRun  LaunchCount=3  TargetCount=100  
+WarmupCount=15  
+
+ Method |      Mean | Error |    StdDev |       P67 |
+------- |----------:|------:|----------:|----------:|
+    Foo | 1.0000 ns |    NA | 0.0000 ns | 1.0000 ns |
+    Bar | 1.0000 ns |    NA | 0.0000 ns | 1.0000 ns |
+############################################
+MarkdownExporter-atlassian
+############################################
+{noformat}
+
+BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock
+Processor=MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz, ProcessorCount=8
+Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
+  [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mockCONFIGURATION
+
+Job=LongRun  LaunchCount=3  TargetCount=100  
+WarmupCount=15  
+
+{noformat}
+ ||Method ||     Mean ||Error ||   StdDev ||      P67 ||
+ |    Foo | 1.0000 ns |    NA | 0.0000 ns | 1.0000 ns |
+ |    Bar | 1.0000 ns |    NA | 0.0000 ns | 1.0000 ns |
+############################################
+MarkdownExporter-console
+############################################
+
+BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock
+Processor=MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz, ProcessorCount=8
+Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
+  [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mockCONFIGURATION
+
+Job=LongRun  LaunchCount=3  TargetCount=100  
+WarmupCount=15  
+
+ Method |      Mean | Error |    StdDev |       P67 |
+------- |----------:|------:|----------:|----------:|
+    Foo | 1.0000 ns |    NA | 0.0000 ns | 1.0000 ns |
+    Bar | 1.0000 ns |    NA | 0.0000 ns | 1.0000 ns |
+############################################
+MarkdownExporter-github
+############################################
+``` ini
+
+BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock
+Processor=MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz, ProcessorCount=8
+Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
+  [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mockCONFIGURATION
+
+Job=LongRun  LaunchCount=3  TargetCount=100  
+WarmupCount=15  
+
+```
+ | Method |      Mean | Error |    StdDev |       P67 |
+ |------- |----------:|------:|----------:|----------:|
+ |    Foo | 1.0000 ns |    NA | 0.0000 ns | 1.0000 ns |
+ |    Bar | 1.0000 ns |    NA | 0.0000 ns | 1.0000 ns |
+############################################
+MarkdownExporter-stackoverflow
+############################################
+
+    BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock
+    Processor=MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz, ProcessorCount=8
+    Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
+      [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mockCONFIGURATION
+
+    Job=LongRun  LaunchCount=3  TargetCount=100  
+    WarmupCount=15  
+
+     Method |      Mean | Error |    StdDev |       P67 |
+    ------- |----------:|------:|----------:|----------:|
+        Foo | 1.0000 ns |    NA | 0.0000 ns | 1.0000 ns |
+        Bar | 1.0000 ns |    NA | 0.0000 ns | 1.0000 ns |
+############################################
+PlainExporter
+############################################
+*** MockBenchmarkClass.Foo: LongRun(LaunchCount=3, TargetCount=100, WarmupCount=15) ***
+* Raw *
+Result 1: 1 op, 1 ns, 1.0000 ns/op
+
+* Statistics for Result
+Mean = 1.0000 ns, StdErr = 0.0000 ns (0.00%); N = 1, StdDev = 0.0000 ns
+Min = 1.0000 ns, Q1 = 1.0000 ns, Median = 1.0000 ns, Q3 = 1.0000 ns, Max = 1.0000 ns
+IQR = 0.0000 ns, LowerFence = 1.0000 ns, UpperFence = 1.0000 ns
+ConfidenceInterval = [NaN ns; NaN ns] (CI 99.9%), Margin = NaN ns (NaN% of Mean)
+Skewness = NaN, Kurtosis = NaN
+
+*** MockBenchmarkClass.Bar: LongRun(LaunchCount=3, TargetCount=100, WarmupCount=15) ***
+* Raw *
+Result 1: 1 op, 1 ns, 1.0000 ns/op
+
+* Statistics for Result
+Mean = 1.0000 ns, StdErr = 0.0000 ns (0.00%); N = 1, StdDev = 0.0000 ns
+Min = 1.0000 ns, Q1 = 1.0000 ns, Median = 1.0000 ns, Q3 = 1.0000 ns, Max = 1.0000 ns
+IQR = 0.0000 ns, LowerFence = 1.0000 ns, UpperFence = 1.0000 ns
+ConfidenceInterval = [NaN ns; NaN ns] (CI 99.9%), Margin = NaN ns (NaN% of Mean)
+Skewness = NaN, Kurtosis = NaN
+
