@@ -44,9 +44,11 @@ namespace BenchmarkDotNet.Environments
                     model.Length > 4 &&
                     model[0] == 'i' &&
                     (model[1] == '3' || model[1] == '5' || model[1] == '7') &&
-                    model[2] == '-')
+                    (model[2] == '-' || model[2] == ' '))
                 {
                     string modelNumber = model.Substring(3);
+                    if (modelNumber.StartsWith("CPU"))
+                        modelNumber = modelNumber.Substring(3).Trim();
                     return ParseIntroCoreMicroarchitecture(modelNumber);
                 }
             }

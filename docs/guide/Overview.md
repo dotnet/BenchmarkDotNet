@@ -9,40 +9,54 @@ Create new console application and install the [BenchmarkDotNet](https://www.nug
 * *OS:* Windows, Linux, MacOS
 * *Languages:* C#, F#, VB
 
-## Create benchmark
-
-Write a class with methods that you want to measure and mark them with the `Benchmark` attribute. In the following example, we 
+## Design a benchmark
+Create a new console application, write a class with methods that you want to measure and mark them with the `Benchmark` attribute. In the following example, we 
 compare the [MD5](https://en.wikipedia.org/wiki/MD5) and [SHA256](https://en.wikipedia.org/wiki/SHA-2) cryptographic hash functions:
 
 ```cs
-public class Md5VsSha256
-{
-    private readonly byte[] data = new byte[10000];
-    private readonly SHA256 sha256 = SHA256.Create();
-    private readonly MD5 md5 = MD5.Create();
+using System;
+using System.Security.Cryptography;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
 
-    public Md5VsSha256()
+namespace MyBenchmarks
+{
+    public class Md5VsSha256
     {
-        new Random(42).NextBytes(data);
+        private const int N = 10000;
+        private readonly byte[] data;
+
+        private readonly SHA256 sha256 = SHA256.Create();
+        private readonly MD5 md5 = MD5.Create();
+
+        public Md5VsSha256()
+        {
+            data = new byte[N];
+            new Random(42).NextBytes(data);
+        }
+
+        [Benchmark]
+        public byte[] Sha256() => sha256.ComputeHash(data);
+
+        [Benchmark]
+        public byte[] Md5() => md5.ComputeHash(data);
     }
 
-    [Benchmark]
-    public byte[] Sha256() => sha256.ComputeHash(data);
-
-    [Benchmark]
-    public byte[] Md5() => md5.ComputeHash(data);
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var summary = BenchmarkRunner.Run<Md5VsSha256>();
+        }
+    }
 }
 ```
 
-## Run benchmark
+The `BenchmarkRunner.Run<Md5VsSha256>()` call runs your benchmarks and print results to console output.
 
-It's very simple, just call `BenchmarkRunner.Run`:
-
-```cs
-var summary = BenchmarkRunner.Run<Md5VsSha256>();
-```
-
-Notice, that you should use only the `Release` configuration for your benchmarks. Otherwise, the results will not correspond to reality. If you forgot to change the configuration, BenchmarkDotNet will print a warning.
+Notice, that you should use only the `Release` configuration for your benchmarks.
+Otherwise, the results will not correspond to reality.
+If you forgot to change the configuration, BenchmarkDotNet will print a warning.
 
 ## Benchmark results
 
@@ -62,7 +76,7 @@ Frequency=2143476 Hz, Resolution=466.5319 ns, Timer=TSC
 
 ## Jobs
 
-You can check several environments at once. For example, you can compare performance of Full .NET Framework, .NET Core, and Mono. Just add the `ClrJob`, `MonoJob`, `CoreJob` attributes before the class declaration (it requires a `project.json` based project, installed CoreCLR and Mono):
+You can check several environments at once. For example, you can compare performance of Full .NET Framework, .NET Core, and Mono. Just add the `ClrJob`, `MonoJob`, `CoreJob` attributes before the class declaration (it requires a .NETCore project, installed CoreCLR and Mono):
 
 ```cs
 [ClrJob, MonoJob, CoreJob]

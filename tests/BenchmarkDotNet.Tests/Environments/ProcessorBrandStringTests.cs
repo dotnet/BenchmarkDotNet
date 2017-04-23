@@ -7,6 +7,7 @@ namespace BenchmarkDotNet.Tests.Environments
     {
         [Theory]
         [InlineData("Intel(R) Pentium(TM) G4560 CPU @ 3.50GHz", "Intel Pentium G4560 CPU 3.50GHz")]
+        [InlineData("Intel(R) Core(TM) i7 CPU 970 @ 3.20GHz", "Intel Core i7 CPU 970 3.20GHz (Nehalem)")] // Nehalem/Westmere/Gulftown
         [InlineData("Intel(R) Core(TM) i7-920 CPU @ 2.67GHz", "Intel Core i7-920 CPU 2.67GHz (Nehalem)")]
         [InlineData("Intel(R) Core(TM) i7-2600 CPU @ 3.40GHz", "Intel Core i7-2600 CPU 3.40GHz (Sandy Bridge)")]
         [InlineData("Intel(R) Core(TM) i7-3770 CPU @ 3.40GHz", "Intel Core i7-3770 CPU 3.40GHz (Ivy Bridge)")]
