@@ -120,8 +120,8 @@ namespace BenchmarkDotNet.Engines
 
             // we enable monitoring after pilot & warmup, just to ignore the memory allocated by these runs
             EnableMonitoring();
-            var initialGcStats = GcStats.ReadInitial(IsDiagnoserAttached);
             if(IsDiagnoserAttached) Host.BeforeMainRun();
+            var initialGcStats = GcStats.ReadInitial(IsDiagnoserAttached);
 
             var main = targetStage.RunMain(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring);
 
