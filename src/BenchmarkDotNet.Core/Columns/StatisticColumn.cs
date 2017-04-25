@@ -114,6 +114,7 @@ namespace BenchmarkDotNet.Columns
 
             var allValues = summary
                 .Reports
+                .Where(r => r.ResultStatistics != null)
                 .Select(r => calc(r.ResultStatistics))
                 .Where(v => !double.IsNaN(v) && !double.IsInfinity(v))
                 .Select(v => type == UnitType.Time ? v / style.TimeUnit.NanosecondAmount : v)
