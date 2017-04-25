@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Mathematics;
@@ -93,10 +94,10 @@ namespace BenchmarkDotNet.Columns
         }
 
         public string GetValue(Summary summary, Benchmark benchmark)
-            => Format(summary[benchmark].ResultStatistics, SummaryStyle.Default);
+            => Format(summary, summary[benchmark].ResultStatistics, SummaryStyle.Default);
 
         public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style)
-            => Format(summary[benchmark].ResultStatistics, style);
+            => Format(summary, summary[benchmark].ResultStatistics, style);
 
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;
@@ -106,14 +107,25 @@ namespace BenchmarkDotNet.Columns
         public UnitType UnitType => type;
         public string Legend { get; }
 
-        private string Format(Statistics statistics, ISummaryStyle style)
+        private string Format(Summary summary, Statistics statistics, ISummaryStyle style)
         {
             if (statistics == null)
                 return "NA";
+
+            var allValues = summary
+                .Reports
+                .Select(r => calc(r.ResultStatistics))
+                .Where(v => !double.IsNaN(v) && !double.IsInfinity(v))
+                .Select(v => type == UnitType.Time ? v / style.TimeUnit.NanosecondAmount : v)
+                .ToList();
+            double minValue = allValues.Any() ? allValues.Min() : 0;
+            bool allValuesAreZeros = allValues.All(v => Math.Abs(v) < 1e-9);
+            string format = "N" + (allValuesAreZeros ? 1 : GetBestAmountOfDecimalDigits(minValue));
+
             double value = calc(statistics);
             if (double.IsNaN(value))
                 return "NA";
-            return type == UnitType.Time ? value.ToTimeStr(style.TimeUnit, 1, style.PrintUnitsInContent) : value.ToStr();
+            return type == UnitType.Time ? value.ToTimeStr(style.TimeUnit, 1, style.PrintUnitsInContent, format: format) : value.ToStr(format);
         }
 
         public override string ToString() => ColumnName;
@@ -122,5 +134,15 @@ namespace BenchmarkDotNet.Columns
 
         private static IColumn CreatePercentileColumn(int percentiles, Func<Statistics, double> calc) => new StatisticColumn(
             "P" + percentiles, "Percentile " + percentiles, calc, Priority.Percentiles);
+
+        // TODO: Move to a better place
+        public static int GetBestAmountOfDecimalDigits(double value)
+        {
+            if (double.IsNaN(value) || double.IsInfinity(value))
+                return 1;
+            if (value < 1 - 1e-9)
+                return 4;
+            return MathHelper.Clamp((int) Math.Truncate(-Math.Log10(value)) + 3, 1, 4);
+        }
     }
 }
