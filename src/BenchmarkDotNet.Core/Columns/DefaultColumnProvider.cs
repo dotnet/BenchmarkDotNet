@@ -47,8 +47,18 @@ namespace BenchmarkDotNet.Columns
                 if (NeedToShow(summary, s => s.StandardDeviation > 1e-9))
                     yield return StatisticColumn.StdDev;
 
-                yield return BaselineScaledColumn.Scaled;
-                yield return BaselineScaledColumn.ScaledStdDev; // TODO: make optional
+                if (summary.Reports != null && summary.Benchmarks.Any(b => b.Target.Baseline))
+                {
+                    yield return BaselineScaledColumn.Scaled;
+                    var stdDevColumn = BaselineScaledColumn.ScaledStdDev;
+                    var stdDevColumnValues = summary.Benchmarks.Select(b => stdDevColumn.GetValue(summary, b));
+
+                    // Hide ScaledSD column if values is small
+                    // TODO: rewrite and check raw values
+                    bool hide = stdDevColumnValues.All(value => value == "0.00" || value == "0.01");
+                    if (!hide)
+                        yield return BaselineScaledColumn.ScaledStdDev;
+                }
             }
 
             private static bool NeedToShow(Summary summary, Func<Statistics, bool> check)
@@ -59,22 +69,20 @@ namespace BenchmarkDotNet.Columns
 
         private class ParamsColumnProvider : IColumnProvider
         {
-            public IEnumerable<IColumn> GetColumns(Summary summary)
-            {
-                return summary.Benchmarks.
-                    SelectMany(b => b.Parameters.Items.Select(item => item.Name)).
-                    Distinct().
-                    Select(name => new ParamColumn(name));
-            }
+            public IEnumerable<IColumn> GetColumns(Summary summary) => summary
+                .Benchmarks
+                .SelectMany(b => b.Parameters.Items.Select(item => item.Name))
+                .Distinct()
+                .Select(name => new ParamColumn(name));
         }
 
         private class DiagnosersColumnProvider : IColumnProvider
         {
-            public IEnumerable<IColumn> GetColumns(Summary summary) =>
-                summary.Config.
-                    GetDiagnosers().
-                    Select(d => d.GetColumnProvider()).
-                    SelectMany(cp => cp.GetColumns(summary));
+            public IEnumerable<IColumn> GetColumns(Summary summary) => summary
+                .Config
+                .GetDiagnosers()
+                .Select(d => d.GetColumnProvider())
+                .SelectMany(cp => cp.GetColumns(summary));
         }
     }
 }
