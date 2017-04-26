@@ -176,6 +176,7 @@
 [InliningDiagnoser]
 </code></pre>
 
+<p>In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on.</p>
 <h2 id="hardware-counters-diagnoser">Hardware Counters Diagnoser<a class="headerlink" href="#hardware-counters-diagnoser" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <p>This diagnoser is not enabled in explicit way as the other diagnosers. You need to specify <code>[HardwareCounters]</code> and we choose the right diagnoser in the runtime.</p>
 <pre><code class="cs">[HardwareCounters(HardwareCounter.BranchMispredictions, HardwareCounter.BranchInstructions)]
