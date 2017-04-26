@@ -125,7 +125,7 @@ namespace BenchmarkDotNet.Mathematics
             Upper = mean + Margin;
         }
 
-        public bool Contains(double value) => Lower < value && value < Upper;
+        public bool Contains(double value) => Lower - 1e-9 < value && value < Upper + 1e-9;
 
         public string ToStr(bool showLevel = true) => $"[{Lower.ToStr()}; {Upper.ToStr()}] (CI {Level.ToPercentStr()})";
 

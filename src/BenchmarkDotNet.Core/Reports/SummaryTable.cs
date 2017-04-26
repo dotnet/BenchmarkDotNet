@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Reports
             }
             if (style.SizeUnit == null)
             {
-                style = style.WithSizeUnit(SizeUnit.GetBestSizeUnit(summary.Reports.Select(r => r.GcStats.AllocatedBytes).ToArray()));
+                style = style.WithSizeUnit(SizeUnit.GetBestSizeUnit(summary.Reports.Select(r => r.GcStats.BytesAllocatedPerOperation).ToArray()));
             }
 
             var columns = summary.GetColumns();

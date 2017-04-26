@@ -27,16 +27,44 @@ namespace BenchmarkDotNet.Tests.Exporters
         }
 
         [Theory]
-        [MemberData(nameof(GetExporters))]
-        public void Exporter(IExporter exporter, CultureInfo cultureInfo)
+        [MemberData(nameof(GetCultureInfos))]
+        public void Exporters(CultureInfo cultureInfo)
         {
-            NamerFactory.AdditionalInformation = $"{exporter.Name}_{GetName(cultureInfo)}";
+            NamerFactory.AdditionalInformation = $"{GetName(cultureInfo)}";
             Thread.CurrentThread.CurrentCulture = cultureInfo;
 
             var logger = new AccumulationLogger();
-            exporter.ExportToLog(MockFactory.CreateSummary(config), logger);
+
+            var exporters = GetExporters();
+            foreach (var exporter in exporters)
+            {
+                PrintTitle(logger, exporter);
+                exporter.ExportToLog(MockFactory.CreateSummary(config), logger);
+            }
 
             Approvals.Verify(logger.GetLog());
+        }
+
+        private static void PrintTitle(AccumulationLogger logger, IExporter exporter)
+        {
+            logger.WriteLine("############################################");
+            logger.WriteLine($"{exporter.Name}");
+            logger.WriteLine("############################################");
+        }
+
+        private static TheoryData<CultureInfo> GetCultureInfos()
+        {
+            var cultures = new List<CultureInfo>()
+            {
+                CultureInfo.InvariantCulture,
+                new CultureInfo("ru-RU"),
+                new CultureInfo("en-US")
+            };
+
+            var theoryData = new TheoryData<CultureInfo>();
+            foreach (var cultureInfo in cultures)
+                theoryData.Add(cultureInfo);
+            return theoryData;
         }
 
         private static string GetName(CultureInfo cultureInfo)
@@ -46,37 +74,21 @@ namespace BenchmarkDotNet.Tests.Exporters
             return cultureInfo.Name;
         }
 
-        private static TheoryData<IExporter, CultureInfo> GetExporters()
+        private static IEnumerable<IExporter> GetExporters()
         {
-            var exporters = new List<IExporter>()
-            {
-                AsciiDocExporter.Default,
-//              new CsvExporter(CsvSeparator.CurrentCulture), //not ready until RuntimeInformation will be mocked
-//              new CsvMeasurementsExporter(CsvSeparator.CurrentCulture), //need to be checked
-                HtmlExporter.Default,
-                JsonExporter.Brief,
-                JsonExporter.BriefCompressed,
-                JsonExporter.Full,
-                JsonExporter.FullCompressed,
-                MarkdownExporter.Default,
-                MarkdownExporter.Atlassian,
-                MarkdownExporter.Console,
-                MarkdownExporter.GitHub,
-                MarkdownExporter.StackOverflow,
-                PlainExporter.Default
-            };
-            var cultures = new List<CultureInfo>()
-            {
-                CultureInfo.InvariantCulture,
-                new CultureInfo("ru-RU"),
-                new CultureInfo("en-US")
-            };
-
-            var theoryData = new TheoryData<IExporter, CultureInfo>();
-            foreach (var exporter in exporters)
-            foreach (var cultureInfo in cultures)
-                theoryData.Add(exporter, cultureInfo);
-            return theoryData;
+            //todo add CsvExporter and CsvMeasurementsExporter (need to mock RuntimeInformation)
+            yield return AsciiDocExporter.Default;
+            yield return HtmlExporter.Default;
+            yield return JsonExporter.Brief;
+            yield return JsonExporter.BriefCompressed;
+            yield return JsonExporter.Full;
+            yield return JsonExporter.FullCompressed;
+            yield return MarkdownExporter.Default;
+            yield return MarkdownExporter.Atlassian;
+            yield return MarkdownExporter.Console;
+            yield return MarkdownExporter.GitHub;
+            yield return MarkdownExporter.StackOverflow;
+            yield return PlainExporter.Default;
         }
 
         private static readonly IConfig config = ManualConfig.Create(DefaultConfig.Instance)

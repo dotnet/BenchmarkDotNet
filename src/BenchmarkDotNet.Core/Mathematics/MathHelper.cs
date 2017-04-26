@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Extensions;
+﻿using System;
+using BenchmarkDotNet.Extensions;
 using static System.Math;
 
 namespace BenchmarkDotNet.Mathematics
@@ -86,5 +87,7 @@ namespace BenchmarkDotNet.Mathematics
             }
             return (lower + upper) / 2;
         }
+
+        public static int Clamp(int value, int min, int max) => Min(Max(value, min), max);
     }
 }

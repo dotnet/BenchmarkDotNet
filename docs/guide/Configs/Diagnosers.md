@@ -38,6 +38,8 @@ You can also use one of the following attributes (apply it on a class that conta
 [InliningDiagnoser]
 ```
 
+In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on.
+
 ## Hardware Counters Diagnoser
 
 This diagnoser is not enabled in explicit way as the other diagnosers. You need to specify `[HardwareCounters]` and we choose the right diagnoser in the runtime.

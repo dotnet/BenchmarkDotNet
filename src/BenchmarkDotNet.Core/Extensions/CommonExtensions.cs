@@ -18,18 +18,18 @@ namespace BenchmarkDotNet.Extensions
             return list;
         }
 
-        public static string ToTimeStr(this double value, TimeUnit unit = null, int unitNameWidth = 1, bool showUnit = true)
+        public static string ToTimeStr(this double value, TimeUnit unit = null, int unitNameWidth = 1, bool showUnit = true, string format = "N4")
         {
             unit = unit ?? TimeUnit.GetBestTimeUnit(value);
             var unitValue = TimeUnit.Convert(value, TimeUnit.Nanosecond, unit);
             if (showUnit)
             {
                 var unitName = unit.Name.PadLeft(unitNameWidth);
-                return $"{unitValue.ToStr("N4")} {unitName}";
+                return $"{unitValue.ToStr(format)} {unitName}";
             }
             else
             {
-                return $"{unitValue.ToStr("N4")}";
+                return $"{unitValue.ToStr(format)}";
             }
         }
 
