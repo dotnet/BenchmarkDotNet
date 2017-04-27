@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyTitle>BenchmarkDotNet.Runtime.Core</AssemblyTitle>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <AssemblyName>BenchmarkDotNet.Runtime.Core</AssemblyName>
+    <PackageId>BenchmarkDotNet.Runtime.Core</PackageId>
+    <RootNamespace>BenchmarkDotNet</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj" />
+  </ItemGroup>
+
+</Project>

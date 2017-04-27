@@ -126,7 +126,7 @@ namespace BenchmarkDotNet.Code
         {
         }
 
-        public override Type TargetMethodReturnType => Target.Method.ReturnType.GetTypeInfo().GetGenericArguments().Single();
+        public override Type TargetMethodReturnType => Target.Method.ReturnType.GetTypeInfo().GenericTypeArguments.Single();
 
         // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
         // and will eventually throw actual exception, not aggregated one

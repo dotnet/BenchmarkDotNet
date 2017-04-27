@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Engines
@@ -114,14 +116,11 @@ namespace BenchmarkDotNet.Engines
 
         private static Func<long> GetAllocatedBytesForCurrentThread()
         {
-            // for some versions of .NET Core this method is internal, 
-            // for some public and for others public and exposed ;)
-            var method = typeof(GC).GetTypeInfo().GetMethod("GetAllocatedBytesForCurrentThread",
-                            BindingFlags.Public | BindingFlags.Static)
-                      ?? typeof(GC).GetTypeInfo().GetMethod("GetAllocatedBytesForCurrentThread",
-                            BindingFlags.NonPublic | BindingFlags.Static);
+            // this method is not a part of .NET Standard, so it's not in the contracts
+            // but it's implemented so we need reflection hack to get it working
+            var methodInfo = typeof(GC).GetAllMethods().SingleOrDefault(method => method.IsStatic && method.Name == "GetAllocatedBytesForCurrentThread");
 
-            return () => (long)method.Invoke(null, null);
+            return () => (long)methodInfo.Invoke(null, null);
         }
 
         public string ToOutputLine() 

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Globalization;
+using System.Reflection;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
-using SimpleJson.Reflection;
 
 namespace BenchmarkDotNet.Helpers
 {
@@ -22,11 +22,11 @@ namespace BenchmarkDotNet.Helpers
                 return ((double)value).ToString("F", CultureInfo.InvariantCulture).Replace(".", "-");
             if (value is decimal)
                 return ((decimal)value).ToString("F", CultureInfo.InvariantCulture).Replace(".", "-");
-            if (ReflectionUtils.GetTypeInfo(value.GetType()).IsEnum)
+            if (value.GetType().GetTypeInfo().IsEnum)
                 return value.ToString();
             if (value is Type)
                 return ((Type)value).Name; // TODO
-            if (!ReflectionUtils.GetTypeInfo(value.GetType()).IsValueType)
+            if (!value.GetType().GetTypeInfo().IsValueType)
                 return value.GetType().Name; // TODO
             if (value is TimeInterval)
                 return ((TimeInterval) value).Nanoseconds + "ns";

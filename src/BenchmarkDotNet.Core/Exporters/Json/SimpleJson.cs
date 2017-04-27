@@ -19,50 +19,16 @@
 
 // VERSION:
 
-// NOTE: uncomment the following line to make SimpleJson class internal.
-#define SIMPLE_JSON_INTERNAL
-
-// NOTE: uncomment the following line to make JsonArray and JsonObject class internal.
-#define SIMPLE_JSON_OBJARRAYINTERNAL
-
-// NOTE: uncomment the following line to enable dynamic support.
-//#define SIMPLE_JSON_DYNAMIC
-
-// NOTE: uncomment the following line to enable DataContract support.
-//#define SIMPLE_JSON_DATACONTRACT
-
-// NOTE: uncomment the following line to enable IReadOnlyCollection<T> and IReadOnlyList<T> support.
-//#define SIMPLE_JSON_READONLY_COLLECTIONS
-
-// NOTE: uncomment the following line to disable linq expressions/compiled lambda (better performance) instead of method.invoke().
-// define if you are using .net framework <= 3.0 or < WP7.5
-//#define SIMPLE_JSON_NO_LINQ_EXPRESSION
-
-// NOTE: uncomment the following line if you are compiling under Window Metro style application/library.
-// usually already defined in properties
-//#define NETFX_CORE;
-
-// If you are targetting WinStore, WP8 and NET4.5+ PCL make sure to #define SIMPLE_JSON_TYPEINFO;
-
-// original json parsing code from http://techblog.procurios.nl/k/618/news/view/14605/14863/How-do-I-write-my-own-parser-for-JSON.html
-
-#if NETFX_CORE || CORE || UAP
-#define SIMPLE_JSON_TYPEINFO
-#endif
+// NOTE: I have removed all #defines to have .NET Standard friendly version of the Simple Json
 
 using System;
 using System.CodeDom.Compiler;
 using System.Collections;
 using System.Collections.Generic;
-#if !SIMPLE_JSON_NO_LINQ_EXPRESSION
-using System.Linq.Expressions;
-#endif
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-#if SIMPLE_JSON_DYNAMIC
-using System.Dynamic;
-#endif
 using System.Globalization;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
@@ -79,12 +45,7 @@ namespace SimpleJson
     [GeneratedCode("simple-json", "1.0.0")]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
-#if SIMPLE_JSON_OBJARRAYINTERNAL
-    internal
-#else
-    public
-#endif
- class JsonArray : List<object>
+    internal class JsonArray : List<object>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonArray"/> class. 
@@ -113,16 +74,7 @@ namespace SimpleJson
     [GeneratedCode("simple-json", "1.0.0")]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
-#if SIMPLE_JSON_OBJARRAYINTERNAL
-    internal
-#else
-    public
-#endif
- class JsonObject :
-#if SIMPLE_JSON_DYNAMIC
- DynamicObject,
-#endif
- IDictionary<string, object>
+    internal class JsonObject : IDictionary<string, object>
     {
         /// <summary>
         /// The internal member dictionary.
@@ -345,142 +297,6 @@ namespace SimpleJson
             return SimpleJson.SerializeObject(this);
         }
 
-#if SIMPLE_JSON_DYNAMIC
-        /// <summary>
-        /// Provides implementation for type conversion operations. Classes derived from the <see cref="T:System.Dynamic.DynamicObject"/> class can override this method to specify dynamic behavior for operations that convert an object from one type to another.
-        /// </summary>
-        /// <param name="binder">Provides information about the conversion operation. The binder.Type property provides the type to which the object must be converted. For example, for the statement (String)sampleObject in C# (CType(sampleObject, Type) in Visual Basic), where sampleObject is an instance of the class derived from the <see cref="T:System.Dynamic.DynamicObject"/> class, binder.Type returns the <see cref="T:System.String"/> type. The binder.Explicit property provides information about the kind of conversion that occurs. It returns true for explicit conversion and false for implicit conversion.</param>
-        /// <param name="result">The result of the type conversion operation.</param>
-        /// <returns>
-        /// Alwasy returns true.
-        /// </returns>
-        public override bool TryConvert(ConvertBinder binder, out object result)
-        {
-            // <pex>
-            if (binder == null)
-                throw new ArgumentNullException("binder");
-            // </pex>
-            Type targetType = binder.Type;
-
-            if ((targetType == typeof(IEnumerable)) ||
-                (targetType == typeof(IEnumerable<KeyValuePair<string, object>>)) ||
-                (targetType == typeof(IDictionary<string, object>)) ||
-                (targetType == typeof(IDictionary)))
-            {
-                result = this;
-                return true;
-            }
-
-            return base.TryConvert(binder, out result);
-        }
-
-        /// <summary>
-        /// Provides the implementation for operations that delete an object member. This method is not intended for use in C# or Visual Basic.
-        /// </summary>
-        /// <param name="binder">Provides information about the deletion.</param>
-        /// <returns>
-        /// Alwasy returns true.
-        /// </returns>
-        public override bool TryDeleteMember(DeleteMemberBinder binder)
-        {
-            // <pex>
-            if (binder == null)
-                throw new ArgumentNullException("binder");
-            // </pex>
-            return _members.Remove(binder.Name);
-        }
-
-        /// <summary>
-        /// Provides the implementation for operations that get a value by index. Classes derived from the <see cref="T:System.Dynamic.DynamicObject"/> class can override this method to specify dynamic behavior for indexing operations.
-        /// </summary>
-        /// <param name="binder">Provides information about the operation.</param>
-        /// <param name="indexes">The indexes that are used in the operation. For example, for the sampleObject[3] operation in C# (sampleObject(3) in Visual Basic), where sampleObject is derived from the DynamicObject class, <paramref name="indexes"/> is equal to 3.</param>
-        /// <param name="result">The result of the index operation.</param>
-        /// <returns>
-        /// Alwasy returns true.
-        /// </returns>
-        public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
-        {
-            if (indexes == null) throw new ArgumentNullException("indexes");
-            if (indexes.Length == 1)
-            {
-                result = ((IDictionary<string, object>)this)[(string)indexes[0]];
-                return true;
-            }
-            result = null;
-            return true;
-        }
-
-        /// <summary>
-        /// Provides the implementation for operations that get member values. Classes derived from the <see cref="T:System.Dynamic.DynamicObject"/> class can override this method to specify dynamic behavior for operations such as getting a value for a property.
-        /// </summary>
-        /// <param name="binder">Provides information about the object that called the dynamic operation. The binder.Name property provides the name of the member on which the dynamic operation is performed. For example, for the Console.WriteLine(sampleObject.SampleProperty) statement, where sampleObject is an instance of the class derived from the <see cref="T:System.Dynamic.DynamicObject"/> class, binder.Name returns "SampleProperty". The binder.IgnoreCase property specifies whether the member name is case-sensitive.</param>
-        /// <param name="result">The result of the get operation. For example, if the method is called for a property, you can assign the property value to <paramref name="result"/>.</param>
-        /// <returns>
-        /// Alwasy returns true.
-        /// </returns>
-        public override bool TryGetMember(GetMemberBinder binder, out object result)
-        {
-            object value;
-            if (_members.TryGetValue(binder.Name, out value))
-            {
-                result = value;
-                return true;
-            }
-            result = null;
-            return true;
-        }
-
-        /// <summary>
-        /// Provides the implementation for operations that set a value by index. Classes derived from the <see cref="T:System.Dynamic.DynamicObject"/> class can override this method to specify dynamic behavior for operations that access objects by a specified index.
-        /// </summary>
-        /// <param name="binder">Provides information about the operation.</param>
-        /// <param name="indexes">The indexes that are used in the operation. For example, for the sampleObject[3] = 10 operation in C# (sampleObject(3) = 10 in Visual Basic), where sampleObject is derived from the <see cref="T:System.Dynamic.DynamicObject"/> class, <paramref name="indexes"/> is equal to 3.</param>
-        /// <param name="value">The value to set to the object that has the specified index. For example, for the sampleObject[3] = 10 operation in C# (sampleObject(3) = 10 in Visual Basic), where sampleObject is derived from the <see cref="T:System.Dynamic.DynamicObject"/> class, <paramref name="value"/> is equal to 10.</param>
-        /// <returns>
-        /// true if the operation is successful; otherwise, false. If this method returns false, the run-time binder of the language determines the behavior. (In most cases, a language-specific run-time exception is thrown.
-        /// </returns>
-        public override bool TrySetIndex(SetIndexBinder binder, object[] indexes, object value)
-        {
-            if (indexes == null) throw new ArgumentNullException("indexes");
-            if (indexes.Length == 1)
-            {
-                ((IDictionary<string, object>)this)[(string)indexes[0]] = value;
-                return true;
-            }
-            return base.TrySetIndex(binder, indexes, value);
-        }
-
-        /// <summary>
-        /// Provides the implementation for operations that set member values. Classes derived from the <see cref="T:System.Dynamic.DynamicObject"/> class can override this method to specify dynamic behavior for operations such as setting a value for a property.
-        /// </summary>
-        /// <param name="binder">Provides information about the object that called the dynamic operation. The binder.Name property provides the name of the member to which the value is being assigned. For example, for the statement sampleObject.SampleProperty = "Test", where sampleObject is an instance of the class derived from the <see cref="T:System.Dynamic.DynamicObject"/> class, binder.Name returns "SampleProperty". The binder.IgnoreCase property specifies whether the member name is case-sensitive.</param>
-        /// <param name="value">The value to set to the member. For example, for sampleObject.SampleProperty = "Test", where sampleObject is an instance of the class derived from the <see cref="T:System.Dynamic.DynamicObject"/> class, the <paramref name="value"/> is "Test".</param>
-        /// <returns>
-        /// true if the operation is successful; otherwise, false. If this method returns false, the run-time binder of the language determines the behavior. (In most cases, a language-specific run-time exception is thrown.)
-        /// </returns>
-        public override bool TrySetMember(SetMemberBinder binder, object value)
-        {
-            // <pex>
-            if (binder == null)
-                throw new ArgumentNullException("binder");
-            // </pex>
-            _members[binder.Name] = value;
-            return true;
-        }
-
-        /// <summary>
-        /// Returns the enumeration of all dynamic member names.
-        /// </summary>
-        /// <returns>
-        /// A sequence that contains dynamic member names.
-        /// </returns>
-        public override IEnumerable<string> GetDynamicMemberNames()
-        {
-            foreach (var key in Keys)
-                yield return key;
-        }
-#endif
     }
 }
 
@@ -494,12 +310,7 @@ namespace SimpleJson
     /// All numbers are parsed to doubles.
     /// </summary>
     [GeneratedCode("simple-json", "1.0.0")]
-#if SIMPLE_JSON_INTERNAL
-    internal
-#else
-    public
-#endif
- static class SimpleJson
+    internal static class SimpleJson
     {
         private const int TOKEN_NONE = 0;
         private const int TOKEN_CURLY_OPEN = 1;
@@ -1227,13 +1038,7 @@ namespace SimpleJson
             get
             {
                 return _currentJsonSerializerStrategy ??
-                    (_currentJsonSerializerStrategy =
-#if SIMPLE_JSON_DATACONTRACT
- DataContractJsonSerializerStrategy
-#else
- PocoJsonSerializerStrategy
-#endif
-);
+                    (_currentJsonSerializerStrategy = PocoJsonSerializerStrategy);
             }
             set
             {
@@ -1250,29 +1055,10 @@ namespace SimpleJson
                 return _pocoJsonSerializerStrategy ?? (_pocoJsonSerializerStrategy = new PocoJsonSerializerStrategy());
             }
         }
-
-#if SIMPLE_JSON_DATACONTRACT
-
-        private static DataContractJsonSerializerStrategy _dataContractJsonSerializerStrategy;
-        [System.ComponentModel.EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static DataContractJsonSerializerStrategy DataContractJsonSerializerStrategy
-        {
-            get
-            {
-                return _dataContractJsonSerializerStrategy ?? (_dataContractJsonSerializerStrategy = new DataContractJsonSerializerStrategy());
-            }
-        }
-
-#endif
     }
     
     [GeneratedCode("simple-json", "1.0.0")]
-#if SIMPLE_JSON_INTERNAL
-    internal
-#else
-    public
-#endif
- interface IJsonSerializerStrategy
+    internal interface IJsonSerializerStrategy
     {
         [SuppressMessage("Microsoft.Design", "CA1007:UseGenericsWhereAppropriate", Justification="Need to support .NET 2")]
         bool TrySerializeNonPrimitiveObject(object input, out object output);
@@ -1281,12 +1067,7 @@ namespace SimpleJson
     }
 
     [GeneratedCode("simple-json", "1.0.0")]
-#if SIMPLE_JSON_INTERNAL
-    internal
-#else
-    public
-#endif
- class PocoJsonSerializerStrategy : IJsonSerializerStrategy
+    internal class PocoJsonSerializerStrategy : IJsonSerializerStrategy
     {
         internal IDictionary<Type, ReflectionUtils.ConstructorDelegate> ConstructorCache;
         internal IDictionary<Type, IDictionary<string, ReflectionUtils.GetDelegate>> GetCache;
@@ -1560,14 +1341,7 @@ namespace SimpleJson
         }
     }
 
-#if SIMPLE_JSON_DATACONTRACT
-    [GeneratedCode("simple-json", "1.0.0")]
-#if SIMPLE_JSON_INTERNAL
-    internal
-#else
-    public
-#endif
- class DataContractJsonSerializerStrategy : PocoJsonSerializerStrategy
+    internal class DataContractJsonSerializerStrategy : PocoJsonSerializerStrategy
     {
         public DataContractJsonSerializerStrategy()
         {
@@ -1637,19 +1411,12 @@ namespace SimpleJson
         }
     }
 
-#endif
-
     namespace Reflection
     {
         // This class is meant to be copied into other libraries. So we want to exclude it from Code Analysis rules
  	    // that might be in place in the target project.
         [GeneratedCode("reflection-utils", "1.0.0")]
-#if SIMPLE_JSON_REFLECTION_UTILS_PUBLIC
-        public
-#else
-        internal
-#endif
- class ReflectionUtils
+        internal class ReflectionUtils
         {
             private static readonly object[] EmptyObjects = new object[] { };
 
@@ -1659,39 +1426,22 @@ namespace SimpleJson
 
             public delegate TValue ThreadSafeDictionaryValueFactory<TKey, TValue>(TKey key);
 
-#if SIMPLE_JSON_TYPEINFO
             public static TypeInfo GetTypeInfo(Type type)
             {
                 return type.GetTypeInfo();
             }
-#else
-            public static Type GetTypeInfo(Type type)
-            {
-                return type;
-            }
-#endif
 
             public static Attribute GetAttribute(MemberInfo info, Type type)
             {
-#if SIMPLE_JSON_TYPEINFO
                 if (info == null || type == null || !info.IsDefined(type))
                     return null;
                 return info.GetCustomAttribute(type);
-#else
-                if (info == null || type == null || !Attribute.IsDefined(info, type))
-                    return null;
-                return Attribute.GetCustomAttribute(info, type);
-#endif
             }
 
             public static Type GetGenericListElementType(Type type)
             {
-                IEnumerable<Type> interfaces;
-#if SIMPLE_JSON_TYPEINFO
-                interfaces = type.GetTypeInfo().ImplementedInterfaces;
-#else
-                interfaces = type.GetInterfaces();
-#endif
+                IEnumerable<Type> interfaces = type.GetTypeInfo().ImplementedInterfaces;
+
                 foreach (Type implementedInterface in interfaces)
                 {
                     if (IsTypeGeneric(implementedInterface) &&
@@ -1706,30 +1456,14 @@ namespace SimpleJson
             public static Attribute GetAttribute(Type objectType, Type attributeType)
             {
 
-#if SIMPLE_JSON_TYPEINFO
                 if (objectType == null || attributeType == null || !objectType.GetTypeInfo().IsDefined(attributeType))
                     return null;
                 return objectType.GetTypeInfo().GetCustomAttribute(attributeType);
-#else
-                if (objectType == null || attributeType == null || !Attribute.IsDefined(objectType, attributeType))
-                    return null;
-                return Attribute.GetCustomAttribute(objectType, attributeType);
-#endif
             }
 
-            public static Type[] GetGenericTypeArguments(Type type)
-            {
-#if SIMPLE_JSON_TYPEINFO
-                return type.GetTypeInfo().GenericTypeArguments;
-#else
-                return type.GetGenericArguments();
-#endif
-            }
+            public static Type[] GetGenericTypeArguments(Type type) => type.GetTypeInfo().GenericTypeArguments;
 
-            public static bool IsTypeGeneric(Type type)
-            {
-                return GetTypeInfo(type).IsGenericType;
-            }
+            public static bool IsTypeGeneric(Type type) => type.GetTypeInfo().IsGenericType;
 
             public static bool IsTypeGenericeCollectionInterface(Type type)
             {
@@ -1741,28 +1475,18 @@ namespace SimpleJson
                 return (genericDefinition == typeof(IList<>)
                     || genericDefinition == typeof(ICollection<>)
                     || genericDefinition == typeof(IEnumerable<>)
-#if SIMPLE_JSON_READONLY_COLLECTIONS
                     || genericDefinition == typeof(IReadOnlyCollection<>)
-                    || genericDefinition == typeof(IReadOnlyList<>)
-#endif
-                    );
+                    || genericDefinition == typeof(IReadOnlyList<>));
             }
 
-            public static bool IsAssignableFrom(Type type1, Type type2)
-            {
-                return GetTypeInfo(type1).IsAssignableFrom(GetTypeInfo(type2));
-            }
+            public static bool IsAssignableFrom(Type type1, Type type2) => GetTypeInfo(type1).IsAssignableFrom(GetTypeInfo(type2));
 
             public static bool IsTypeDictionary(Type type)
             {
-#if SIMPLE_JSON_TYPEINFO
                 if (typeof(IDictionary<,>).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
                     return true;
-#else
-                if (typeof(System.Collections.IDictionary).IsAssignableFrom(type))
-                    return true;
-#endif
-                if (!GetTypeInfo(type).IsGenericType)
+
+                if (!type.GetTypeInfo().IsGenericType)
                     return false;
 
                 Type genericDefinition = type.GetGenericTypeDefinition();
@@ -1771,7 +1495,7 @@ namespace SimpleJson
 
             public static bool IsNullableType(Type type)
             {
-                return GetTypeInfo(type).IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+                return type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
             }
 
             public static object ToNullableType(object obj, Type nullableType)
@@ -1779,19 +1503,9 @@ namespace SimpleJson
                 return obj == null ? null : Convert.ChangeType(obj, Nullable.GetUnderlyingType(nullableType), CultureInfo.InvariantCulture);
             }
 
-            public static bool IsValueType(Type type)
-            {
-                return GetTypeInfo(type).IsValueType;
-            }
+            public static bool IsValueType(Type type) => type.GetTypeInfo().IsValueType;
 
-            public static IEnumerable<ConstructorInfo> GetConstructors(Type type)
-            {
-#if SIMPLE_JSON_TYPEINFO
-                return type.GetTypeInfo().DeclaredConstructors;
-#else
-                return type.GetConstructors();
-#endif
-            }
+            public static IEnumerable<ConstructorInfo> GetConstructors(Type type) => type.GetTypeInfo().DeclaredConstructors;
 
             public static ConstructorInfo GetConstructorInfo(Type type, params Type[] argsType)
             {
@@ -1822,72 +1536,25 @@ namespace SimpleJson
                 return null;
             }
 
-            public static IEnumerable<PropertyInfo> GetProperties(Type type)
-            {
-#if SIMPLE_JSON_TYPEINFO
-                return type.GetRuntimeProperties();
-#else
-                return type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-#endif
-            }
+            public static IEnumerable<PropertyInfo> GetProperties(Type type) => type.GetRuntimeProperties();
 
-            public static IEnumerable<FieldInfo> GetFields(Type type)
-            {
-#if SIMPLE_JSON_TYPEINFO
-                return type.GetRuntimeFields();
-#else
-                return type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-#endif
-            }
+            public static IEnumerable<FieldInfo> GetFields(Type type) => type.GetRuntimeFields();
 
-            public static MethodInfo GetGetterMethodInfo(PropertyInfo propertyInfo)
-            {
-#if SIMPLE_JSON_TYPEINFO
-                return propertyInfo.GetMethod;
-#else
-                return propertyInfo.GetGetMethod(true);
-#endif
-            }
+            public static MethodInfo GetGetterMethodInfo(PropertyInfo propertyInfo) => propertyInfo.GetMethod;
 
-            public static MethodInfo GetSetterMethodInfo(PropertyInfo propertyInfo)
-            {
-#if SIMPLE_JSON_TYPEINFO
-                return propertyInfo.SetMethod;
-#else
-                return propertyInfo.GetSetMethod(true);
-#endif
-            }
+            public static MethodInfo GetSetterMethodInfo(PropertyInfo propertyInfo) => propertyInfo.SetMethod;
 
-            public static ConstructorDelegate GetContructor(ConstructorInfo constructorInfo)
-            {
-#if SIMPLE_JSON_NO_LINQ_EXPRESSION
-                return GetConstructorByReflection(constructorInfo);
-#else
-                return GetConstructorByExpression(constructorInfo);
-#endif
-            }
+            public static ConstructorDelegate GetContructor(ConstructorInfo constructorInfo) => GetConstructorByExpression(constructorInfo);
 
-            public static ConstructorDelegate GetContructor(Type type, params Type[] argsType)
-            {
-#if SIMPLE_JSON_NO_LINQ_EXPRESSION
-                return GetConstructorByReflection(type, argsType);
-#else
-                return GetConstructorByExpression(type, argsType);
-#endif
-            }
+            public static ConstructorDelegate GetContructor(Type type, params Type[] argsType) => GetConstructorByExpression(type, argsType);
 
-            public static ConstructorDelegate GetConstructorByReflection(ConstructorInfo constructorInfo)
-            {
-                return delegate(object[] args) { return constructorInfo.Invoke(args); };
-            }
+            public static ConstructorDelegate GetConstructorByReflection(ConstructorInfo constructorInfo) => delegate(object[] args) { return constructorInfo.Invoke(args); };
 
             public static ConstructorDelegate GetConstructorByReflection(Type type, params Type[] argsType)
             {
                 ConstructorInfo constructorInfo = GetConstructorInfo(type, argsType);
                 return constructorInfo == null ? null : GetConstructorByReflection(constructorInfo);
             }
-
-#if !SIMPLE_JSON_NO_LINQ_EXPRESSION
 
             public static ConstructorDelegate GetConstructorByExpression(ConstructorInfo constructorInfo)
             {
@@ -1914,25 +1581,9 @@ namespace SimpleJson
                 return constructorInfo == null ? null : GetConstructorByExpression(constructorInfo);
             }
 
-#endif
+            public static GetDelegate GetGetMethod(PropertyInfo propertyInfo) => GetGetMethodByExpression(propertyInfo);
 
-            public static GetDelegate GetGetMethod(PropertyInfo propertyInfo)
-            {
-#if SIMPLE_JSON_NO_LINQ_EXPRESSION
-                return GetGetMethodByReflection(propertyInfo);
-#else
-                return GetGetMethodByExpression(propertyInfo);
-#endif
-            }
-
-            public static GetDelegate GetGetMethod(FieldInfo fieldInfo)
-            {
-#if SIMPLE_JSON_NO_LINQ_EXPRESSION
-                return GetGetMethodByReflection(fieldInfo);
-#else
-                return GetGetMethodByExpression(fieldInfo);
-#endif
-            }
+            public static GetDelegate GetGetMethod(FieldInfo fieldInfo) => GetGetMethodByExpression(fieldInfo);
 
             public static GetDelegate GetGetMethodByReflection(PropertyInfo propertyInfo)
             {
@@ -1944,8 +1595,6 @@ namespace SimpleJson
             {
                 return delegate(object source) { return fieldInfo.GetValue(source); };
             }
-
-#if !SIMPLE_JSON_NO_LINQ_EXPRESSION
 
             public static GetDelegate GetGetMethodByExpression(PropertyInfo propertyInfo)
             {
@@ -1964,25 +1613,9 @@ namespace SimpleJson
                 return delegate(object source) { return compiled(source); };
             }
 
-#endif
+            public static SetDelegate GetSetMethod(PropertyInfo propertyInfo) => GetSetMethodByExpression(propertyInfo);
 
-            public static SetDelegate GetSetMethod(PropertyInfo propertyInfo)
-            {
-#if SIMPLE_JSON_NO_LINQ_EXPRESSION
-                return GetSetMethodByReflection(propertyInfo);
-#else
-                return GetSetMethodByExpression(propertyInfo);
-#endif
-            }
-
-            public static SetDelegate GetSetMethod(FieldInfo fieldInfo)
-            {
-#if SIMPLE_JSON_NO_LINQ_EXPRESSION
-                return GetSetMethodByReflection(fieldInfo);
-#else
-                return GetSetMethodByExpression(fieldInfo);
-#endif
-            }
+            public static SetDelegate GetSetMethod(FieldInfo fieldInfo) => GetSetMethodByExpression(fieldInfo);
 
             public static SetDelegate GetSetMethodByReflection(PropertyInfo propertyInfo)
             {
@@ -1990,12 +1623,7 @@ namespace SimpleJson
                 return delegate(object source, object value) { methodInfo.Invoke(source, new object[] { value }); };
             }
 
-            public static SetDelegate GetSetMethodByReflection(FieldInfo fieldInfo)
-            {
-                return delegate(object source, object value) { fieldInfo.SetValue(source, value); };
-            }
-
-#if !SIMPLE_JSON_NO_LINQ_EXPRESSION
+            public static SetDelegate GetSetMethodByReflection(FieldInfo fieldInfo) => delegate(object source, object value) { fieldInfo.SetValue(source, value); };
 
             public static SetDelegate GetSetMethodByExpression(PropertyInfo propertyInfo)
             {
@@ -2019,24 +1647,8 @@ namespace SimpleJson
 
             public static BinaryExpression Assign(Expression left, Expression right)
             {
-#if SIMPLE_JSON_TYPEINFO
                 return Expression.Assign(left, right);
-#else
-                MethodInfo assign = typeof(Assigner<>).MakeGenericType(left.Type).GetMethod("Assign");
-                BinaryExpression assignExpr = Expression.Add(left, right, assign);
-                return assignExpr;
-#endif
             }
-
-            private static class Assigner<T>
-            {
-                public static T Assign(ref T left, T right)
-                {
-                    return (left = right);
-                }
-            }
-
-#endif
 
             public sealed class ThreadSafeDictionary<TKey, TValue> : IDictionary<TKey, TValue>
             {

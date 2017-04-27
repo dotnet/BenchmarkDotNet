@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  
+  <PropertyGroup>
+    <TargetFramework>net46</TargetFramework>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <AssemblyTitle>BenchmarkDotNet.Runtime.Classic</AssemblyTitle>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <AssemblyName>BenchmarkDotNet.Runtime.Classic</AssemblyName>
+    <PackageId>BenchmarkDotNet.Runtime.Classic</PackageId>
+    <RootNamespace>BenchmarkDotNet</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj" />
+  </ItemGroup>
+
+</Project>

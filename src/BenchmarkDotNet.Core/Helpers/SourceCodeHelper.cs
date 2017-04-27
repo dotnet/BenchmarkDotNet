@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Reflection;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 using SimpleJson.Reflection;
@@ -24,11 +25,11 @@ namespace BenchmarkDotNet.Core.Helpers
                 return ((double) value).ToString("G", CultureInfo.InvariantCulture) + "d";
             if (value is decimal)
                 return ((decimal) value).ToString("G", CultureInfo.InvariantCulture) + "m";
-            if (ReflectionUtils.GetTypeInfo(value.GetType()).IsEnum)
+            if (value.GetType().GetTypeInfo().IsEnum)
                 return value.GetType().GetCorrectTypeName() + "." + value;
             if (value is Type)
                 return "typeof(" + ((Type) value).GetCorrectTypeName() + ")";
-            if (!ReflectionUtils.GetTypeInfo(value.GetType()).IsValueType)
+            if (!value.GetType().GetTypeInfo().IsValueType)
                 return "System.Activator.CreateInstance<" + value.GetType().GetCorrectTypeName() + ">()";
             if (value is TimeInterval)
                 return "new BenchmarkDotNet.Horology.TimeInterval(" + ToSourceCode(((TimeInterval)value).Nanoseconds) + ")";

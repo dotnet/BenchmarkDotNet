@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Characteristics
 {
@@ -56,14 +57,14 @@ namespace BenchmarkDotNet.Characteristics
 
         private static IReadOnlyList<Characteristic> GetThisTypeCharacteristicsCore(Type characteristicObjectType)
         {
-            var fieldValues = characteristicObjectType.GetTypeInfo()
-                .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy | BindingFlags.Static)
+            var fieldValues = characteristicObjectType
+                .GetAllFields().Where(info => info.IsStatic)
                 .Where(f => IsCharacteristicSubclass(f.FieldType))
                 .Select(f => AssertHasValue(f, (Characteristic)f.GetValue(null)));
 
-            var propertyValues = characteristicObjectType.GetTypeInfo()
-                .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy | BindingFlags.Static)
-                .Where(p => p.GetMethod != null && IsCharacteristicSubclass(p.PropertyType))
+            var propertyValues = characteristicObjectType
+                .GetAllProperties()
+                .Where(p => p.GetMethod != null && p.GetMethod.IsStatic && IsCharacteristicSubclass(p.PropertyType))
                 .Select(p => AssertHasValue(p, (Characteristic)p.GetValue(null)));
 
             // DONTOUCH: DO NOT change the order of characteristic as it may break logic of some operations.

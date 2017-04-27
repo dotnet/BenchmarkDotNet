@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.Characteristics
                 return;
             }
 
-            if (!characteristic.CharacteristicType.GetTypeInfo().IsInstanceOfType(value))
+            if (!characteristic.CharacteristicType.IsInstanceOfType(value))
                 throw new ArgumentException(
                     $"The value {value} is not assignable to {characteristic} property.",
                     characteristic.Id);

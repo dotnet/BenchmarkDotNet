@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.InProcess
@@ -67,8 +68,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     Enumerable.Repeat((Delegate)(object)callback, unrollFactor).ToArray());
             }
 
-            private const BindingFlags GetFieldFlags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-
             protected static Action<long> EmitInvokeMultiple(
                 BenchmarkActionBase instance,
                 string callbackFieldName,
@@ -83,7 +82,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
                 var instanceType = instance.GetType();
                 var callbackField = GetCallbackField(instanceType, callbackFieldName);
-                var callbackInvokeMethod = callbackField.FieldType.GetTypeInfo().GetMethod(nameof(Action.Invoke));
+                var callbackInvokeMethod = callbackField.FieldType.GetTypeInfo().GetDeclaredMethod(nameof(Action.Invoke));
                 var storeResultField = GetStoreResultField(instanceType, storeResultFieldName, callbackInvokeMethod.ReturnType);
 
                 // void InvokeMultipleEmitted(long x) // instance method associated with instanceType
@@ -99,7 +98,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
             private static FieldInfo GetCallbackField(Type instanceType, string callbackFieldName)
             {
-                var callbackField = instanceType.GetTypeInfo().GetField(callbackFieldName, GetFieldFlags);
+                var callbackField = instanceType.GetDeclaredNonPublicInstanceField(callbackFieldName);
+
                 if (callbackField == null)
                     throw new ArgumentException($"Field {callbackFieldName} not found.", nameof(callbackFieldName));
 
@@ -119,7 +119,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 if (expectedFieldType == typeof(void) || storeResultFieldName == null)
                     return null;
 
-                var storeResultField = instanceType.GetTypeInfo().GetField(storeResultFieldName, GetFieldFlags);
+                var storeResultField = instanceType.GetDeclaredNonPublicInstanceField(storeResultFieldName);
 
                 if (expectedFieldType != storeResultField?.FieldType)
                     throw new ArgumentException(

@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+
+  <PropertyGroup>
+    <AssemblyTitle>BenchmarkDotNet.Runtime.Uap</AssemblyTitle>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <AssemblyName>BenchmarkDotNet.Runtime.Uap</AssemblyName>
+    <PackageId>BenchmarkDotNet.Runtime.Uap</PackageId>
+    <RootNamespace>BenchmarkDotNet</RootNamespace>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <TargetFramework>uap10.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <NugetTargetMoniker>UAP,Version=v10.0</NugetTargetMoniker>
+    <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
+    <TargetPlatformVersion>10.0.14393.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.14393.0</TargetPlatformMinVersion>
+    <TargetFrameworkIdentifier>.NETCore</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
+    <DefaultLanguage>en</DefaultLanguage>
+  </PropertyGroup>
+
+</Project>

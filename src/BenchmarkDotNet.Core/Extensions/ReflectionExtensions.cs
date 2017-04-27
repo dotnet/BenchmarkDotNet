@@ -109,8 +109,16 @@ namespace BenchmarkDotNet.Extensions
 
         internal static MethodInfo[] GetBenchmarks(this TypeInfo typeInfo)
             => typeInfo
-                .GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                .DeclaredMethods.Where(method => method.IsPublic && !method.IsStatic)
                 .Where(method => method.GetCustomAttributes(true).OfType<BenchmarkAttribute>().Any())
                 .ToArray();
+
+        internal static bool IsInstanceOfType(this Type type, object obj) 
+            => obj != null && type.GetTypeInfo().IsAssignableFrom(obj.GetType().GetTypeInfo());
+
+        internal static FieldInfo GetDeclaredNonPublicInstanceField(this Type type, string fieldName)
+            => type.GetTypeInfo()
+                           .DeclaredFields
+                           .Single(field => !field.IsPublic && !field.IsStatic && field.Name == fieldName);
     }
 }
