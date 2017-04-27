@@ -60,15 +60,15 @@ namespace BenchmarkDotNet.Environments
             MainCultureInfo.NumberFormat.NumberDecimalSeparator = ".";
         }
 
-        protected HostEnvironmentInfo()
+        protected HostEnvironmentInfo(RuntimeInformation runtimeInformation) : base(runtimeInformation)
         {
             BenchmarkDotNetVersion = GetBenchmarkDotNetVersion();
-            OsVersion = new Lazy<string>(RuntimeInformation.GetOsVersion);
-            ProcessorName = new Lazy<string>(RuntimeInformation.GetProcessorName);
+            OsVersion = new Lazy<string>(() => runtimeInformation.OsVersion);
+            ProcessorName = new Lazy<string>(runtimeInformation.GetProcessorName);
             ProcessorCount = Environment.ProcessorCount;
             ChronometerFrequency = Chronometer.Frequency;
             HardwareTimerKind = Chronometer.HardwareTimerKind;
-            JitModules = RuntimeInformation.GetJitModulesInfo();
+            JitModules = runtimeInformation.JitModulesInfo;
 #if !UAP
             DotNetCliVersion = new Lazy<string>(Toolchains.DotNetCli.DotNetCliCommandExecutor.GetDotNetCliVersion);
 #else
@@ -76,7 +76,7 @@ namespace BenchmarkDotNet.Environments
 #endif
         }
 
-        public new static HostEnvironmentInfo GetCurrent() => Current ?? (Current = new HostEnvironmentInfo());
+        public new static HostEnvironmentInfo GetCurrent(RuntimeInformation runtimeInformation) => Current ?? (Current = new HostEnvironmentInfo(runtimeInformation));
 
         public override IEnumerable<string> ToFormattedString()
         {

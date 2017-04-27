@@ -20,6 +20,11 @@
         /// <summary>
         /// ARM
         /// </summary>
-        ARM
+        ARM,
+
+        /// <summary>
+        /// ARM64
+        /// </summary>
+        ARM64
     }
 }

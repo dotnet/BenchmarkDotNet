@@ -26,19 +26,19 @@ namespace BenchmarkDotNet.Environments
 
         public bool IsConcurrentGC { get; protected set; }
 
-        protected BenchmarkEnvironmentInfo()
+        protected BenchmarkEnvironmentInfo(RuntimeInformation runtimeInformation)
         {
-            Architecture = RuntimeInformation.GetArchitecture();
-            RuntimeVersion = RuntimeInformation.GetRuntimeVersion();
-            Configuration = RuntimeInformation.GetConfiguration();
-            HasRyuJit = RuntimeInformation.HasRyuJit();
-            JitInfo = RuntimeInformation.GetJitInfo();
+            Architecture = runtimeInformation.Architecture;
+            RuntimeVersion = runtimeInformation.GetRuntimeVersion();
+            Configuration = runtimeInformation.GetConfiguration();
+            HasRyuJit = runtimeInformation.HasRyuJit;
+            JitInfo = runtimeInformation.JitInfo;
             IsServerGC = GCSettings.IsServerGC;
             IsConcurrentGC = GCSettings.LatencyMode != GCLatencyMode.Batch;
             HasAttachedDebugger = Debugger.IsAttached;
         }
 
-        public static BenchmarkEnvironmentInfo GetCurrent() => new BenchmarkEnvironmentInfo();
+        public static BenchmarkEnvironmentInfo GetCurrent(RuntimeInformation runtimeInformation) => new BenchmarkEnvironmentInfo(runtimeInformation);
 
         // ReSharper disable once UnusedMemberInSuper.Global
         public virtual IEnumerable<string> ToFormattedString()

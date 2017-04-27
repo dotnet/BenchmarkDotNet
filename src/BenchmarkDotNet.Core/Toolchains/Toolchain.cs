@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Toolchains
@@ -16,12 +17,15 @@ namespace BenchmarkDotNet.Toolchains
 
         public IExecutor Executor { get; }
 
-        public Toolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor)
+        public RuntimeInformation RuntimeInformation { get; }
+
+        public Toolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, RuntimeInformation runtimeInformation)
         {
             Name = name;
             Generator = generator;
             Builder = builder;
             Executor = executor;
+            RuntimeInformation = runtimeInformation;
         }
 
         public virtual bool IsSupported(Benchmark benchmark, ILogger logger, IResolver resolver)

@@ -1,5 +1,4 @@
-﻿#if !UAP
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Environments;
@@ -7,7 +6,6 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.ProjectJson;
-using BenchmarkDotNet.Toolchains.Uap;
 
 namespace BenchmarkDotNet.Toolchains
 {
@@ -31,10 +29,14 @@ namespace BenchmarkDotNet.Toolchains
 #if CLASSIC
                     return new Roslyn.RoslynToolchain();
 #else
-                    return isUsingProjectJson.Value ? ProjectJsonNet46Toolchain.Instance : CsProjNet46Toolchain.Instance;
+                    return isUsingProjectJson.Value
+                        ? (IToolchain)new ProjectJsonNet46Toolchain(RuntimeInformation.Instance)
+                        : new CsProjNet46Toolchain(RuntimeInformation.Instance);
 #endif
                 case CoreRuntime core:
-                    return isUsingProjectJson.Value ? ProjectJsonCoreToolchain.Current.Value : CsProjCoreToolchain.Current.Value;
+                    return isUsingProjectJson.Value 
+                        ? ProjectJsonCoreToolchain.GetCurrent(RuntimeInformation.Instance) 
+                        : CsProjCoreToolchain.GetCurrent(RuntimeInformation.Instance);
                 case UapRuntime uap:
                     if (!string.IsNullOrEmpty(uap.CsfrCookie))
                     {
@@ -50,7 +52,7 @@ namespace BenchmarkDotNet.Toolchains
         }
 
         private static bool IsUsingProjectJson() => 
-            HostEnvironmentInfo.GetCurrent().DotNetCliVersion.Value.Contains("preview") 
+            HostEnvironmentInfo.GetCurrent(RuntimeInformation.Instance).DotNetCliVersion.Value.Contains("preview") 
             && SolutionDirectoryContainsProjectJsonFiles();
 
         private static bool SolutionDirectoryContainsProjectJsonFiles()
@@ -64,4 +66,3 @@ namespace BenchmarkDotNet.Toolchains
         }
     }
 }
-#endif

@@ -14,6 +14,9 @@ using BenchmarkDotNet.Properties;
 [assembly: InternalsVisibleTo("BenchmarkDotNet.Samples,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.Diagnostics.Windows,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.Toolchains.Uap,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
+[assembly: InternalsVisibleTo("BenchmarkDotNet.Runtime.Uap,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
+[assembly: InternalsVisibleTo("BenchmarkDotNet.Runtime.Classic,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
+[assembly: InternalsVisibleTo("BenchmarkDotNet.Runtime.Core,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
 #else
 [assembly: InternalsVisibleTo("BenchmarkDotNet.Toolchains.Roslyn")]
 [assembly: InternalsVisibleTo("BenchmarkDotNet")]
@@ -22,4 +25,7 @@ using BenchmarkDotNet.Properties;
 [assembly: InternalsVisibleTo("BenchmarkDotNet.Samples")]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.Diagnostics.Windows")]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.Toolchains.Uap")]
+[assembly: InternalsVisibleTo("BenchmarkDotNet.Runtime.Uap")]
+[assembly: InternalsVisibleTo("BenchmarkDotNet.Runtime.Classic")]
+[assembly: InternalsVisibleTo("BenchmarkDotNet.Runtime.Core")]
 #endif

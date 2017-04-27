@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Diagnosers
             public bool IsDefault(Summary summary, Benchmark benchmark) => false;
 
             public bool IsAvailable(Summary summary) 
-                => !RuntimeInformation.IsMono() || results.Keys.Any(benchmark => !(benchmark.Job.Env.Runtime is MonoRuntime));
+                => results.Keys.Any(benchmark => !(benchmark.Job.Env.Runtime is MonoRuntime));
 
             public bool AlwaysShow => true;
             public ColumnCategory Category => ColumnCategory.Diagnoser;

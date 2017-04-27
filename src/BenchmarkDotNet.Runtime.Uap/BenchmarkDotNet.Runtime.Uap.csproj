@@ -2,15 +2,15 @@
   <Import Project="..\..\build\common.props" />
 
   <PropertyGroup>
+    <TargetFramework>uap10.0</TargetFramework>
+  </PropertyGroup>
+  
+  <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.Runtime.Uap</AssemblyTitle>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <AssemblyName>BenchmarkDotNet.Runtime.Uap</AssemblyName>
     <PackageId>BenchmarkDotNet.Runtime.Uap</PackageId>
     <RootNamespace>BenchmarkDotNet</RootNamespace>
-  </PropertyGroup>
-  
-  <PropertyGroup>
-    <TargetFramework>uap10.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -23,5 +23,9 @@
     <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
     <DefaultLanguage>en</DefaultLanguage>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj" />
+  </ItemGroup>
 
 </Project>

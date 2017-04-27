@@ -1,5 +1,4 @@
-﻿#if !UAP
-using System;
+﻿using System;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
@@ -14,23 +13,23 @@ namespace BenchmarkDotNet.Toolchains.CsProj
     [PublicAPI]
     public class CsProjCoreToolchain : Toolchain
     {
-        [PublicAPI] public static readonly IToolchain NetCoreApp11 = From(NetCoreAppSettings.NetCoreApp11);
-        [PublicAPI] public static readonly IToolchain NetCoreApp12 = From(NetCoreAppSettings.NetCoreApp12);
-        [PublicAPI] public static readonly IToolchain NetCoreApp20 = From(NetCoreAppSettings.NetCoreApp20);
+        [PublicAPI] public static IToolchain GetNetCoreApp11(RuntimeInformation runtimeInformation) => From(NetCoreAppSettings.NetCoreApp11, runtimeInformation);
+        [PublicAPI] public static IToolchain GetNetCoreApp20(RuntimeInformation runtimeInformation) => From(NetCoreAppSettings.NetCoreApp20, runtimeInformation);
 
-        [PublicAPI] public static readonly Lazy<IToolchain> Current = new Lazy<IToolchain>(() => From(NetCoreAppSettings.GetCurrentVersion()));
+        [PublicAPI] public static IToolchain GetCurrent(RuntimeInformation runtimeInformation) => From(NetCoreAppSettings.GetCurrentVersion(), runtimeInformation);
 
-        private CsProjCoreToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor) 
-            : base(name, generator, builder, executor)
+        private CsProjCoreToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, RuntimeInformation runtimeInformation) 
+            : base(name, generator, builder, executor, runtimeInformation)
         {
         }
 
         [PublicAPI]
-        public static IToolchain From(NetCoreAppSettings settings)
+        public static IToolchain From(NetCoreAppSettings settings, RuntimeInformation runtimeInformation)
             => new CsProjCoreToolchain("CoreCsProj",
                 new CsProjGenerator(settings.TargetFrameworkMoniker, PlatformProvider), 
                 new CsProjBuilder(settings.TargetFrameworkMoniker), 
-                new DotNetCliExecutor());
+                new DotNetCliExecutor(),
+                runtimeInformation);
 
         // dotnet cli supports only x64 compilation now
         private static string PlatformProvider(Platform platform) => "x64";
@@ -79,4 +78,3 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         }
     }
 }
-#endif

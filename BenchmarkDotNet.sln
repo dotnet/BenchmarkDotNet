@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet", "src\Benc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Diagnostics.Windows", "src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj", "{B61A2815-4E2F-42F7-A87C-973C488B11CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.IntegrationTests.CustomPaths", "tests\BenchmarkDotNet.IntegrationTests.CustomPaths\BenchmarkDotNet.IntegrationTests.CustomPaths.csproj", "{0031728E-A5D4-47C1-9C1A-6C859A765C9D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.IntegrationTests.CustomPaths", "tests\BenchmarkDotNet.IntegrationTests.CustomPaths\BenchmarkDotNet.IntegrationTests.CustomPaths.csproj", "{0031728E-A5D4-47C1-9C1A-6C859A765C9D}"
 	ProjectSection(ProjectDependencies) = postProject
 		{95F5D645-19E3-432F-95D4-C5EA374DD15B} = {95F5D645-19E3-432F-95D4-C5EA374DD15B}
 	EndProjectSection
@@ -33,12 +33,12 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BenchmarkDotNet.Integration
 		{95F5D645-19E3-432F-95D4-C5EA374DD15B} = {95F5D645-19E3-432F-95D4-C5EA374DD15B}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.IntegrationTests.DisabledOptimizations", "tests\BenchmarkDotNet.IntegrationTests.DisabledOptimizations\BenchmarkDotNet.IntegrationTests.DisabledOptimizations.csproj", "{AC2188E5-A140-43E2-8A76-4BDABFE30ABA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.IntegrationTests.DisabledOptimizations", "tests\BenchmarkDotNet.IntegrationTests.DisabledOptimizations\BenchmarkDotNet.IntegrationTests.DisabledOptimizations.csproj", "{AC2188E5-A140-43E2-8A76-4BDABFE30ABA}"
 	ProjectSection(ProjectDependencies) = postProject
 		{95F5D645-19E3-432F-95D4-C5EA374DD15B} = {95F5D645-19E3-432F-95D4-C5EA374DD15B}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.IntegrationTests.EnabledOptimizations", "tests\BenchmarkDotNet.IntegrationTests.EnabledOptimizations\BenchmarkDotNet.IntegrationTests.EnabledOptimizations.csproj", "{873581FF-DB9D-42E5-8F11-32A4B7BB28EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.IntegrationTests.EnabledOptimizations", "tests\BenchmarkDotNet.IntegrationTests.EnabledOptimizations\BenchmarkDotNet.IntegrationTests.EnabledOptimizations.csproj", "{873581FF-DB9D-42E5-8F11-32A4B7BB28EC}"
 	ProjectSection(ProjectDependencies) = postProject
 		{95F5D645-19E3-432F-95D4-C5EA374DD15B} = {95F5D645-19E3-432F-95D4-C5EA374DD15B}
 	EndProjectSection
@@ -53,17 +53,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Tests", "te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.IntegrationTests", "tests\BenchmarkDotNet.IntegrationTests\BenchmarkDotNet.IntegrationTests.csproj", "{6A3CBB07-E337-488E-BDAC-ED96AF8ED608}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.IntegrationTests.ConfigPerAssembly", "tests\BenchmarkDotNet.IntegrationTests.ConfigPerAssembly\BenchmarkDotNet.IntegrationTests.ConfigPerAssembly.csproj", "{043F1DA4-CD51-45FD-805E-6571D67AA661}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.IntegrationTests.ConfigPerAssembly", "tests\BenchmarkDotNet.IntegrationTests.ConfigPerAssembly\BenchmarkDotNet.IntegrationTests.ConfigPerAssembly.csproj", "{043F1DA4-CD51-45FD-805E-6571D67AA661}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Toolchains.Uap", "src\BenchmarkDotNet.Toolchains.Uap\BenchmarkDotNet.Toolchains.Uap.csproj", "{FDE49815-6C06-4A50-B6AF-7291668955D6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Samples.Uap", "samples\BenchmarkDotNet.Samples.Uap\BenchmarkDotNet.Samples.Uap.csproj", "{F24E8114-085F-44B4-AC3B-3D7D9955CE64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.Runtime.Classic", "src\BenchmarkDotNet.Runtime.Classic\BenchmarkDotNet.Runtime.Classic.csproj", "{90DE8AF4-E7C2-4191-8371-2AC44F2BD401}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Runtime.Classic", "src\BenchmarkDotNet.Runtime.Classic\BenchmarkDotNet.Runtime.Classic.csproj", "{90DE8AF4-E7C2-4191-8371-2AC44F2BD401}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.Runtime.Uap", "src\BenchmarkDotNet.Runtime.Uap\BenchmarkDotNet.Runtime.Uap.csproj", "{8E3F68EC-44AA-4F4E-AC62-6CFD2B12AD71}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Runtime.Core", "src\BenchmarkDotNet.Runtime.Core\BenchmarkDotNet.Runtime.Core.csproj", "{F2C99374-B819-4DE2-B6E4-16252A996F2C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.Runtime.Core", "src\BenchmarkDotNet.Runtime.Core\BenchmarkDotNet.Runtime.Core.csproj", "{F2C99374-B819-4DE2-B6E4-16252A996F2C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.Runtime.Uap", "src\BenchmarkDotNet.Runtime.Uap\BenchmarkDotNet.Runtime.Uap.csproj", "{6820C9A5-3DBA-4254-AB5E-5C24215967C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -279,18 +279,6 @@ Global
 		{90DE8AF4-E7C2-4191-8371-2AC44F2BD401}.Release|x64.Build.0 = Release|Any CPU
 		{90DE8AF4-E7C2-4191-8371-2AC44F2BD401}.Release|x86.ActiveCfg = Release|Any CPU
 		{90DE8AF4-E7C2-4191-8371-2AC44F2BD401}.Release|x86.Build.0 = Release|Any CPU
-		{8E3F68EC-44AA-4F4E-AC62-6CFD2B12AD71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8E3F68EC-44AA-4F4E-AC62-6CFD2B12AD71}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8E3F68EC-44AA-4F4E-AC62-6CFD2B12AD71}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{8E3F68EC-44AA-4F4E-AC62-6CFD2B12AD71}.Debug|x64.Build.0 = Debug|Any CPU
-		{8E3F68EC-44AA-4F4E-AC62-6CFD2B12AD71}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{8E3F68EC-44AA-4F4E-AC62-6CFD2B12AD71}.Debug|x86.Build.0 = Debug|Any CPU
-		{8E3F68EC-44AA-4F4E-AC62-6CFD2B12AD71}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8E3F68EC-44AA-4F4E-AC62-6CFD2B12AD71}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8E3F68EC-44AA-4F4E-AC62-6CFD2B12AD71}.Release|x64.ActiveCfg = Release|Any CPU
-		{8E3F68EC-44AA-4F4E-AC62-6CFD2B12AD71}.Release|x64.Build.0 = Release|Any CPU
-		{8E3F68EC-44AA-4F4E-AC62-6CFD2B12AD71}.Release|x86.ActiveCfg = Release|Any CPU
-		{8E3F68EC-44AA-4F4E-AC62-6CFD2B12AD71}.Release|x86.Build.0 = Release|Any CPU
 		{F2C99374-B819-4DE2-B6E4-16252A996F2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F2C99374-B819-4DE2-B6E4-16252A996F2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2C99374-B819-4DE2-B6E4-16252A996F2C}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -303,6 +291,18 @@ Global
 		{F2C99374-B819-4DE2-B6E4-16252A996F2C}.Release|x64.Build.0 = Release|Any CPU
 		{F2C99374-B819-4DE2-B6E4-16252A996F2C}.Release|x86.ActiveCfg = Release|Any CPU
 		{F2C99374-B819-4DE2-B6E4-16252A996F2C}.Release|x86.Build.0 = Release|Any CPU
+		{6820C9A5-3DBA-4254-AB5E-5C24215967C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6820C9A5-3DBA-4254-AB5E-5C24215967C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6820C9A5-3DBA-4254-AB5E-5C24215967C4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6820C9A5-3DBA-4254-AB5E-5C24215967C4}.Debug|x64.Build.0 = Debug|Any CPU
+		{6820C9A5-3DBA-4254-AB5E-5C24215967C4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6820C9A5-3DBA-4254-AB5E-5C24215967C4}.Debug|x86.Build.0 = Debug|Any CPU
+		{6820C9A5-3DBA-4254-AB5E-5C24215967C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6820C9A5-3DBA-4254-AB5E-5C24215967C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6820C9A5-3DBA-4254-AB5E-5C24215967C4}.Release|x64.ActiveCfg = Release|Any CPU
+		{6820C9A5-3DBA-4254-AB5E-5C24215967C4}.Release|x64.Build.0 = Release|Any CPU
+		{6820C9A5-3DBA-4254-AB5E-5C24215967C4}.Release|x86.ActiveCfg = Release|Any CPU
+		{6820C9A5-3DBA-4254-AB5E-5C24215967C4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -325,7 +325,7 @@ Global
 		{FDE49815-6C06-4A50-B6AF-7291668955D6} = {D6597E3A-6892-4A68-8E14-042FC941FDA2}
 		{F24E8114-085F-44B4-AC3B-3D7D9955CE64} = {602236FF-A83D-43BA-9EE7-A4B0BE2CA4B3}
 		{90DE8AF4-E7C2-4191-8371-2AC44F2BD401} = {D6597E3A-6892-4A68-8E14-042FC941FDA2}
-		{8E3F68EC-44AA-4F4E-AC62-6CFD2B12AD71} = {D6597E3A-6892-4A68-8E14-042FC941FDA2}
 		{F2C99374-B819-4DE2-B6E4-16252A996F2C} = {D6597E3A-6892-4A68-8E14-042FC941FDA2}
+		{6820C9A5-3DBA-4254-AB5E-5C24215967C4} = {D6597E3A-6892-4A68-8E14-042FC941FDA2}
 	EndGlobalSection
 EndGlobal

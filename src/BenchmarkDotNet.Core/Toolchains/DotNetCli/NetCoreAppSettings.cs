@@ -10,7 +10,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     public class NetCoreAppSettings
     {
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp11 = new NetCoreAppSettings("netcoreapp1.1", "1.1-*");
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp12 = new NetCoreAppSettings("netcoreapp1.2", "1.2-*");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp20 = new NetCoreAppSettings("netcoreapp2.0", "2.0-*");
 
         private static NetCoreAppSettings Default => NetCoreApp11;
