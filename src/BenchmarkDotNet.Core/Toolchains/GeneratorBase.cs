@@ -4,6 +4,7 @@ using System.Reflection;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -91,7 +92,7 @@ namespace BenchmarkDotNet.Toolchains
 
         private static void GenerateAppConfig(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)
         {
-            string sourcePath = benchmark.Target.Type.GetTypeInfo().Assembly.Location + ".config";
+            string sourcePath = benchmark.Target.Type.GetTypeInfo().Assembly.ReadProperty<Assembly, string>("Location") + ".config";
 
             using (var source = File.Exists(sourcePath) ? new StreamReader(File.OpenRead(sourcePath)) : TextReader.Null)
             using (var destination = new System.IO.StreamWriter(File.Create(artifactsPaths.AppConfigPath), System.Text.Encoding.UTF8))
