@@ -193,13 +193,8 @@ namespace BenchmarkDotNet.Engines
         {
             if (!IsDiagnoserAttached) // it could affect the results, we do this in separate, diagnostics-only run
                 return;
-#if CLASSIC
-            if (RuntimeInformation.IsMono()
-            ) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-in-mono
-                return;
 
-            AppDomain.MonitoringIsEnabled = true;
-#endif
+            ServicesProvider.ResourcesService.EnableMonitoring();
         }
 
         private void EnsureNothingIsPrintedWhenDiagnoserIsAttached()

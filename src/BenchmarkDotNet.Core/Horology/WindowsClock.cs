@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Horology
 
         private static bool Initialize(out long qpf)
         {
-            if (!Portability.RuntimeInformation.Current.IsWindows)
+            if (!Portability.ServicesProvider.RuntimeInformation.IsWindows)
             {
                 qpf = default(long);
                 return false;

@@ -4,7 +4,6 @@ using System.Reflection;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -60,7 +59,7 @@ namespace BenchmarkDotNet.Toolchains
             string programName = GetProgramName(benchmark, config);
             string buildArtifactsDirectoryPath = GetBuildArtifactsDirectoryPath(benchmark, programName);
             string binariesDirectoryPath = GetBinariesDirectoryPath(buildArtifactsDirectoryPath);
-            string executablePath = Path.Combine(binariesDirectoryPath, $"{programName}{RuntimeInformation.Current.ExecutableExtension}");
+            string executablePath = Path.Combine(binariesDirectoryPath, $"{programName}{ServicesProvider.RuntimeInformation.ExecutableExtension}");
 
             return new ArtifactsPaths(
                 cleanup: artifactsPaths => Cleanup(benchmark, artifactsPaths),
@@ -70,7 +69,7 @@ namespace BenchmarkDotNet.Toolchains
                 programCodePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{codeFileExtension}"),
                 appConfigPath: $"{executablePath}.config",
                 projectFilePath: GetProjectFilePath(buildArtifactsDirectoryPath),
-                buildScriptFilePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{RuntimeInformation.Current.ScriptFileExtension}"),
+                buildScriptFilePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{ServicesProvider.RuntimeInformation.ScriptFileExtension}"),
                 executablePath: executablePath,
                 programName: programName);
         }
@@ -92,7 +91,7 @@ namespace BenchmarkDotNet.Toolchains
 
         private static void GenerateAppConfig(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)
         {
-            string sourcePath = benchmark.Target.Type.GetTypeInfo().Assembly.ReadProperty<Assembly, string>("Location") + ".config";
+            string sourcePath = ServicesProvider.DoNetStandardWorkarounds.GetLocation(benchmark.Target.Type.GetTypeInfo().Assembly) + ".config";
 
             using (var source = File.Exists(sourcePath) ? new StreamReader(File.OpenRead(sourcePath)) : TextReader.Null)
             using (var destination = new System.IO.StreamWriter(File.Create(artifactsPaths.AppConfigPath), System.Text.Encoding.UTF8))

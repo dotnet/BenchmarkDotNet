@@ -30,9 +30,9 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
         [PublicAPI]
         protected override void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)
         {
-            var prefix = RuntimeInformation.Instance.IsWindows ? "" : "#!/bin/bash\n";
+            var prefix = ServicesProvider.RuntimeInformation.IsWindows ? "" : "#!/bin/bash\n";
             var list = new List<string>();
-            if (!RuntimeInformation.Instance.IsWindows)
+            if (!ServicesProvider.RuntimeInformation.IsWindows)
                 list.Add("mono");
             list.Add("csc");
             list.Add("/noconfig");

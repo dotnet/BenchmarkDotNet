@@ -5,21 +5,23 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.InProcess;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 
-namespace BenchmarkDotNet.Toolchains.InProcess
+namespace BenchmarkDotNet
 {
+    /*
+    * CAUTION: this file is referenced as link in multiple projects just to avoid copying of the code
+    */
     /// <summary>
     /// Implementation of <see cref="IExecutor" /> for in-process benchmarks.
     /// </summary>
@@ -29,9 +31,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
     {
         private static readonly TimeSpan UnderDebuggerTimeout = TimeSpan.FromDays(1);
 
-        /// <summary> Default timeout for in-process benchmarks. </summary>
-        public static readonly TimeSpan DefaultTimeout = TimeSpan.FromMinutes(5);
-
         /// <summary>Initializes a new instance of the <see cref="InProcessExecutor" /> class.</summary>
         /// <param name="timeout">Timeout for the run.</param>
         /// <param name="codegenMode">Describes how benchmark action code is generated.</param>
@@ -39,7 +38,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         public InProcessExecutor(TimeSpan timeout, BenchmarkActionCodegen codegenMode, bool logOutput)
         {
             if (timeout == TimeSpan.Zero)
-                timeout = DefaultTimeout;
+                timeout = InProcessToolchain.DefaultTimeout;
 
             ExecutionTimeout = timeout;
             CodegenMode = codegenMode;
@@ -76,7 +75,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 #endif 
             runThread.IsBackground = true;
 
-            var timeout = HostEnvironmentInfo.GetCurrent(RuntimeInformation.Current).HasAttachedDebugger ? UnderDebuggerTimeout : ExecutionTimeout;
+            var timeout = HostEnvironmentInfo.GetCurrent().HasAttachedDebugger ? UnderDebuggerTimeout : ExecutionTimeout;
 
             runThread.Start();
 
@@ -102,13 +101,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             var affinity = benchmark.Job.ResolveValueAsNullable(EnvMode.AffinityCharacteristic);
             try
             {
-                process.TrySetPriority(ProcessPriorityClass.High, logger);
+                ProcessExtensions.TrySetPriority(process, ProcessPriorityClass.High, logger);
 #if CLASSIC
                 thread.TrySetPriority(ThreadPriority.Highest, logger);
 #endif
                 if (affinity != null)
                 {
-                    process.TrySetAffinity(affinity.Value, logger);
+                    ProcessExtensions.TrySetAffinity(process, affinity.Value, logger);
                 }
 
                 exitCode = InProcessRunner.Run(host, benchmark, CodegenMode);
@@ -119,13 +118,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             }
             finally
             {
-                process.TrySetPriority(oldPriority, logger);
+                ProcessExtensions.TrySetPriority(process, oldPriority, logger);
 #if CLASSIC
                 thread.TrySetPriority(oldThreadPriority, logger);
 #endif
                 if (affinity != null)
                 {
-                    process.EnsureProcessorAffinity(oldAffinity);
+                    ProcessExtensions.EnsureProcessorAffinity(process, oldAffinity);
                 }
             }
 

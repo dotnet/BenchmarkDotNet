@@ -129,7 +129,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             }
         }
 
-
         private InProcessValidator(bool failOnErrors)
         {
             TreatsWarningsAsErrors = failOnErrors;

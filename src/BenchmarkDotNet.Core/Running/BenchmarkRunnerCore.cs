@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Running
             var validationErrors = Validate(benchmarks, logger, config);
             if (validationErrors.Any(validationError => validationError.IsCritical))
             {
-                return Summary.CreateFailed(benchmarks, title, HostEnvironmentInfo.GetCurrent(RuntimeInformation.Current), config, GetResultsFolderPath(rootArtifactsFolderPath), validationErrors);
+                return Summary.CreateFailed(benchmarks, title, HostEnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), validationErrors);
             }
 
             var globalChronometer = Chronometer.Start();
@@ -83,7 +83,7 @@ namespace BenchmarkDotNet.Running
             }
             var clockSpan = globalChronometer.Stop();
 
-            var summary = new Summary(title, reports, HostEnvironmentInfo.GetCurrent(RuntimeInformation.Current), config, GetResultsFolderPath(rootArtifactsFolderPath), clockSpan.GetTimeSpan(), validationErrors);
+            var summary = new Summary(title, reports, HostEnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), clockSpan.GetTimeSpan(), validationErrors);
 
             logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
             logger.WriteLine();
@@ -345,14 +345,11 @@ namespace BenchmarkDotNet.Running
 
         private static IDisposable GetAssemblyResolveHelper(IToolchain toolchain, ILogger logger)
         {
-#if CLASSIC
-            if (!(toolchain is InProcessToolchain) // we don't want to mess with assembly loading when running benchmarks in the same process (could produce wrong results)
-                && !RuntimeInformation.IsMono()) // so far it was never an issue for Mono
-            {
-                 return Helpers.DirtyAssemblyResolveHelper.Create(logger); 
-            }
-#endif
-            return null;
+            // we don't want to mess with assembly loading when running benchmarks in the same process (could produce wrong results)
+            if (toolchain is InProcessToolchain)
+                return null;
+
+            return ServicesProvider.AssemblyResolverFactory(logger);
         }
     }
 }

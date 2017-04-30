@@ -2,36 +2,22 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 
-namespace BenchmarkDotNet.Diagnosers
+namespace BenchmarkDotNet.Full
 {
-    internal static class DiagnosersLoader
+    public class ClassicDiagnosersLoader : IDiagnosersLoader
     {
         const string DiagnosticAssemblyFileName = "BenchmarkDotNet.Diagnostics.Windows.dll";
         const string DiagnosticAssemblyName = "BenchmarkDotNet.Diagnostics.Windows";
 
-        // Make the Diagnosers lazy-loaded, so they are only instantiated if needed
-        public static readonly Lazy<IDiagnoser[]> LazyLoadedDiagnosers = new Lazy<IDiagnoser[]>(LoadDiagnosers, LazyThreadSafetyMode.ExecutionAndPublication);
+        private static readonly Lazy<IDiagnoser[]> diagnosers = new Lazy<IDiagnoser[]>(Load);
 
-        private static IDiagnoser[] LoadDiagnosers()
-        {
-#if CLASSIC
-            return RuntimeInformation.IsMono() ? LoadMono() : LoadClassic();
-#else
-            return LoadCore();
-#endif
-        }
+        public IDiagnoser[] LoadDiagnosers() => diagnosers.Value;
 
-        private static IDiagnoser[] LoadCore() => new IDiagnoser[] { MemoryDiagnoser.Default };
-
-        private static IDiagnoser[] LoadMono() => new IDiagnoser[] { MemoryDiagnoser.Default }; // this method should return a IHardwareCountersDiagnoser when we implement Hardware Counters for Unix
-
-#if CLASSIC
-        private static IDiagnoser[] LoadClassic()
+        private static IDiagnoser[] Load()
         {
             try
             {
@@ -86,6 +72,5 @@ namespace BenchmarkDotNet.Diagnosers
 
         private static IDiagnoser CreateDiagnoser(Assembly loadedAssembly, string typeName)
             => (IDiagnoser)Activator.CreateInstance(loadedAssembly.GetType(typeName));
-#endif
     }
 }

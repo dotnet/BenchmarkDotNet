@@ -1,3 +1,4 @@
+using System;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
@@ -12,18 +13,19 @@ namespace BenchmarkDotNet.Toolchains.ProjectJson
     [PublicAPI]
     public class ProjectJsonCoreToolchain : Toolchain
     {
-        [PublicAPI] public static IToolchain GetNetCoreApp11(RuntimeInformation runtimeInformation) => From(NetCoreAppSettings.NetCoreApp11, runtimeInformation);
-        [PublicAPI] public static IToolchain GetNetCoreApp20(RuntimeInformation runtimeInformation) => From(NetCoreAppSettings.NetCoreApp20, runtimeInformation);
+        [PublicAPI] public static readonly IToolchain NetCoreApp11 = From(NetCoreAppSettings.NetCoreApp11);
+        [PublicAPI] public static readonly IToolchain NetCoreApp12 = From(NetCoreAppSettings.NetCoreApp12);
+        [PublicAPI] public static readonly IToolchain NetCoreApp20 = From(NetCoreAppSettings.NetCoreApp20);
 
-        [PublicAPI] public static IToolchain GetCurrent(RuntimeInformation runtimeInformation) => From(NetCoreAppSettings.GetCurrentVersion(), runtimeInformation);
+        [PublicAPI] public static readonly Lazy<IToolchain> Current = new Lazy<IToolchain>(() => From(NetCoreAppSettings.GetCurrentVersion()));
 
-        private ProjectJsonCoreToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, RuntimeInformation runtimeInformation) 
-            : base(name, generator, builder, executor, runtimeInformation)
+        private ProjectJsonCoreToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor) 
+            : base(name, generator, builder, executor)
         {
         }
 
         [PublicAPI]
-        public static IToolchain From(NetCoreAppSettings settings, RuntimeInformation runtimeInformation) 
+        public static IToolchain From(NetCoreAppSettings settings) 
             => new ProjectJsonCoreToolchain(
                 "Core", 
                 new ProjectJsonGenerator(
@@ -33,8 +35,7 @@ namespace BenchmarkDotNet.Toolchains.ProjectJson
                     settings.Imports,
                     GetRuntime()), 
                 new ProjectJsonBuilder(settings.TargetFrameworkMoniker), 
-                new Executor(),
-                runtimeInformation);
+                new Executor());
 
         public override bool IsSupported(Benchmark benchmark, ILogger logger, IResolver resolver)
         {
@@ -43,13 +44,13 @@ namespace BenchmarkDotNet.Toolchains.ProjectJson
                 return false;
             }
 
-            if (RuntimeInformation.IsMono)
+            if (ServicesProvider.RuntimeInformation.IsMono)
             {
                 logger.WriteLineError($"BenchmarkDotNet does not support running .NET Core benchmarks when host process is Mono, benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;
             }
 
-            if (!HostEnvironmentInfo.GetCurrent(RuntimeInformation).IsDotNetCliInstalled())
+            if (!HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled())
             {
                 logger.WriteLineError($"BenchmarkDotNet requires dotnet cli toolchain to be installed, benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;

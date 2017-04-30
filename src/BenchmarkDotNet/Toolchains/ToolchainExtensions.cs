@@ -30,13 +30,13 @@ namespace BenchmarkDotNet.Toolchains
                     return new Roslyn.RoslynToolchain();
 #else
                     return isUsingProjectJson.Value
-                        ? (IToolchain)new ProjectJsonNet46Toolchain(RuntimeInformation.Instance)
-                        : new CsProjNet46Toolchain(RuntimeInformation.Instance);
+                        ? (IToolchain)new ProjectJsonNet46Toolchain()
+                        : new CsProjNet46Toolchain();
 #endif
                 case CoreRuntime core:
-                    return isUsingProjectJson.Value 
-                        ? ProjectJsonCoreToolchain.GetCurrent(RuntimeInformation.Instance) 
-                        : CsProjCoreToolchain.GetCurrent(RuntimeInformation.Instance);
+                    return isUsingProjectJson.Value
+                        ? (IToolchain)ProjectJsonCoreToolchain.Current.Value
+                        : CsProjCoreToolchain.Current.Value;
                 //case UapRuntime uap:
                 // todo: move it to uap pkg
                 //    if (!string.IsNullOrEmpty(uap.CsfrCookie))
@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Toolchains
         }
 
         private static bool IsUsingProjectJson() => 
-            HostEnvironmentInfo.GetCurrent(RuntimeInformation.Instance).DotNetCliVersion.Value.Contains("preview") 
+            HostEnvironmentInfo.GetCurrent().DotNetCliVersion.Value.Contains("preview") 
             && SolutionDirectoryContainsProjectJsonFiles();
 
         private static bool SolutionDirectoryContainsProjectJsonFiles()

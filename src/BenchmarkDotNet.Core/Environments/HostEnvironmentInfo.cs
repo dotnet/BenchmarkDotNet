@@ -60,28 +60,28 @@ namespace BenchmarkDotNet.Environments
             MainCultureInfo.NumberFormat.NumberDecimalSeparator = ".";
         }
 
-        protected HostEnvironmentInfo(RuntimeInformation runtimeInformation) : base(runtimeInformation)
+        protected HostEnvironmentInfo()
         {
             BenchmarkDotNetVersion = GetBenchmarkDotNetVersion();
-            OsVersion = new Lazy<string>(() => runtimeInformation.OsVersion);
-            ProcessorName = new Lazy<string>(runtimeInformation.GetProcessorName);
+            OsVersion = new Lazy<string>(() => ServicesProvider.RuntimeInformation.OsVersion);
+            ProcessorName = new Lazy<string>(ServicesProvider.RuntimeInformation.GetProcessorName);
             ProcessorCount = Environment.ProcessorCount;
             ChronometerFrequency = Chronometer.Frequency;
             HardwareTimerKind = Chronometer.HardwareTimerKind;
-            JitModules = runtimeInformation.JitModulesInfo;
+            JitModules = ServicesProvider.RuntimeInformation.JitModulesInfo;
             DotNetCliVersion = new Lazy<string>(Toolchains.DotNetCli.DotNetCliCommandExecutor.GetDotNetCliVersion);
         }
 
-        public new static HostEnvironmentInfo GetCurrent(RuntimeInformation runtimeInformation) => Current ?? (Current = new HostEnvironmentInfo(runtimeInformation));
+        public new static HostEnvironmentInfo GetCurrent() => Current ?? (Current = new HostEnvironmentInfo());
 
         public override IEnumerable<string> ToFormattedString()
         {
             yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}";
             yield return $"Processor={ProcessorName.Value}, ProcessorCount={ProcessorCount}";
             yield return $"Frequency={ChronometerFrequency}, Resolution={ChronometerResolution}, Timer={HardwareTimerKind.ToString().ToUpper()}";
-#if !CLASSIC
-            yield return $"dotnet cli version={DotNetCliVersion.Value}";
-#endif
+
+            if(ServicesProvider.RuntimeInformation.CurrentRuntime is CoreRuntime)
+                yield return $"dotnet cli version={DotNetCliVersion.Value}";
         }
 
         internal bool IsDotNetCliInstalled() => !string.IsNullOrEmpty(DotNetCliVersion.Value);

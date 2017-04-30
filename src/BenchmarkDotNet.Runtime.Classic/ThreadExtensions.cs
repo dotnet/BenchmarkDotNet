@@ -1,10 +1,8 @@
-﻿#if CLASSIC
-
-using System;
+﻿using System;
 using System.Threading;
 using BenchmarkDotNet.Loggers;
 
-namespace BenchmarkDotNet.Extensions
+namespace BenchmarkDotNet
 {
     // we need it public to reuse it in the auto-generated dll
     // but we hide it from intellisense with following attribute
@@ -37,4 +35,3 @@ namespace BenchmarkDotNet.Extensions
         }
     }
 }
-#endif

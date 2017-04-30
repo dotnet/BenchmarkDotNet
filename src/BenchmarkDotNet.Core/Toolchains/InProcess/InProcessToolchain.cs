@@ -1,6 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
@@ -13,6 +14,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess
     [PublicAPI]
     public sealed class InProcessToolchain : IToolchain
     {
+        /// <summary> Default timeout for in-process benchmarks. </summary>
+        public static readonly TimeSpan DefaultTimeout = TimeSpan.FromMinutes(5);
+
         /// <summary>The default toolchain instance.</summary>
         public static readonly IToolchain Instance = new InProcessToolchain(true);
 
@@ -22,7 +26,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <summary>Initializes a new instance of the <see cref="InProcessToolchain" /> class.</summary>
         /// <param name="logOutput"><c>true</c> if the output should be logged.</param>
         public InProcessToolchain(bool logOutput) : this(
-            InProcessExecutor.DefaultTimeout,
+            DefaultTimeout,
             BenchmarkActionCodegen.ReflectionEmit,
             logOutput)
         {
@@ -36,7 +40,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         {
             Generator = new InProcessGenerator();
             Builder = new InProcessBuilder();
-            Executor = new InProcessExecutor(timeout, codegenMode, logOutput);
+            Executor = ServicesProvider.InProcessExecutorFactory(timeout, codegenMode, logOutput);
         }
 
         /// <summary>Determines whether the specified benchmark is supported.</summary>

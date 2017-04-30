@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 
-namespace BenchmarkDotNet
+namespace BenchmarkDotNet.Mono
 {
     internal class MonoRuntimeInformation : Portability.RuntimeInformation
     {

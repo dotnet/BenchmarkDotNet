@@ -9,6 +9,7 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Reports;
 
@@ -74,7 +75,7 @@ namespace BenchmarkDotNet.Configs
             if (hardwareCounters.IsEmpty())
                 return diagnosers;
 
-            var hardwareCountersDiagnoser = DiagnosersLoader.LazyLoadedDiagnosers.Value
+            var hardwareCountersDiagnoser = ServicesProvider.DiagnosersLoader.LoadDiagnosers()
                 .SingleOrDefault(diagnoser => diagnoser is IHardwareCountersDiagnoser);
 
             if(hardwareCountersDiagnoser != default(IDiagnoser))

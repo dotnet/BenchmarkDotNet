@@ -11,6 +11,7 @@ using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -211,7 +212,7 @@ namespace BenchmarkDotNet.Configs
 
         private static IDiagnoser[] ParseDiagnosers(string value)
         {
-            foreach (var diagnoser in DiagnosersLoader.LazyLoadedDiagnosers.Value)
+            foreach (var diagnoser in ServicesProvider.DiagnosersLoader.LoadDiagnosers())
             {
                 if (value == diagnoser.GetType().Name.Replace("Diagnoser", "").ToLowerInvariant())
                     return new[] { diagnoser };

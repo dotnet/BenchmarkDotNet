@@ -9,8 +9,6 @@ namespace BenchmarkDotNet
 {
     public class RuntimeInformation : Portability.RuntimeInformation
     {
-        public static readonly Portability.RuntimeInformation Instance = new RuntimeInformation();
-
         public override bool IsWindows => System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
         public override bool IsLinux => System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux);

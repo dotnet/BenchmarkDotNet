@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Portability
 {
@@ -14,29 +11,6 @@ namespace BenchmarkDotNet.Portability
         internal const string Unknown = "?";
         internal const string DebugConfigurationName = "DEBUG";
         internal const string ReleaseConfigurationName = "RELEASE";
-
-        public static readonly RuntimeInformation Current;
-
-        static RuntimeInformation()
-        {
-            var typeInfo = typeof(RuntimeInformation).GetTypeInfo();
-
-            var location = typeInfo.Assembly.ReadProperty<Assembly, string>("Location");
-
-            var directoryPath = Path.GetDirectoryName(location);
-
-            var runtimeSpecificDll = new DirectoryInfo(directoryPath).EnumerateFileSystemInfos("BenchmarkDotNet.Runtime*.dll").Single();
-
-            string assemblyQualifiedName = typeInfo.AssemblyQualifiedName
-                .Replace("BenchmarkDotNet.Core", Path.GetFileNameWithoutExtension(runtimeSpecificDll.Name))
-                .Replace("BenchmarkDotNet.Portability.RuntimeInformation", "BenchmarkDotNet.RuntimeInformation");
-
-            var runtimeSpecificImplementation = Type.GetType(assemblyQualifiedName);
-
-            var instanceField = runtimeSpecificImplementation.GetRuntimeFields().Single(field => field.IsStatic && field.Name == "Instance");
-
-            Current = (RuntimeInformation)instanceField.GetValue(null);
-        }
 
         public virtual bool IsMono => false;
 
@@ -100,7 +74,7 @@ namespace BenchmarkDotNet.Portability
             }
         }
 
-        public class JitModule
+        protected class JitModule
         {
             public string Name { get; }
             public string Version { get; }

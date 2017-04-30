@@ -8,7 +8,7 @@ using System.Reflection;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 
-namespace BenchmarkDotNet
+namespace BenchmarkDotNet.Full
 {
     internal class ClassicRuntimeInformation : Portability.RuntimeInformation
     {

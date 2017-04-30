@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 FillMembers(instance, benchmark);
 
                 host.WriteLine();
-                foreach (var infoLine in BenchmarkEnvironmentInfo.GetCurrent(RuntimeInformation.Current).ToFormattedString())
+                foreach (var infoLine in BenchmarkEnvironmentInfo.GetCurrent().ToFormattedString())
                     host.WriteLine("// {0}", infoLine);
                 host.WriteLine("// Job: {0}", job.DisplayInfo);
                 host.WriteLine();

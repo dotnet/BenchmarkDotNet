@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Exporters
             lock (buildScriptLock)
                 File.WriteAllText(scriptFullPath, script);
 
-            string rscriptExecutable = RuntimeInformation.Current.IsWindows ? "Rscript.exe" : "Rscript";
+            string rscriptExecutable = ServicesProvider.RuntimeInformation.IsWindows ? "Rscript.exe" : "Rscript";
             string rscriptPath;
             string rHome = Environment.GetEnvironmentVariable("R_HOME");
             if (rHome != null)

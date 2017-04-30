@@ -11,6 +11,8 @@
     <AssemblyName>BenchmarkDotNet.Runtime.Classic</AssemblyName>
     <PackageId>BenchmarkDotNet.Runtime.Classic</PackageId>
     <RootNamespace>BenchmarkDotNet</RootNamespace>
+
+    <DefineConstants>$(DefineConstants);CLASSIC</DefineConstants>
   </PropertyGroup>
   
   <ItemGroup>

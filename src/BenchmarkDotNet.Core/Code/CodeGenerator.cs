@@ -124,12 +124,10 @@ namespace BenchmarkDotNet.Code
 
         private static string GetExtraAttributes(Target target)
         {
-#if !CORE
             if (target.Method.GetCustomAttributes(false).OfType<System.STAThreadAttribute>().Any())
             {
                 return "[System.STAThreadAttribute]";
             }
-#endif
 
             return string.Empty;
         }

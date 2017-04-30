@@ -3,7 +3,6 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
@@ -12,13 +11,14 @@ namespace BenchmarkDotNet.Toolchains.CsProj
     [PublicAPI]
     public class CsProjNet46Toolchain : Toolchain
     {
+        [PublicAPI] public static readonly IToolchain Instance = new CsProjNet46Toolchain();
+
         [PublicAPI]
-        public CsProjNet46Toolchain(RuntimeInformation runtimeInformation) 
+        public CsProjNet46Toolchain() 
             : base("CsProj",
                 new CsProjGenerator("net46", platform => platform.ToConfig()),
                 new CsProjBuilder("net46"),
-                new Executor(),
-                runtimeInformation)
+                new Executor())
         {
         }
 
@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 return false;
             }
 
-            if (!HostEnvironmentInfo.GetCurrent(RuntimeInformation).IsDotNetCliInstalled())
+            if (!HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled())
             {
                 logger.WriteLineError($"BenchmarkDotNet requires dotnet cli toolchain to be installed, benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;

@@ -1,6 +1,5 @@
 ﻿using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -10,8 +9,8 @@ namespace BenchmarkDotNet.Environments
 
         private GcResolver()
         {
-            Register(GcMode.ServerCharacteristic, () => HostEnvironmentInfo.GetCurrent(RuntimeInformation.Current).IsServerGC);
-            Register(GcMode.ConcurrentCharacteristic, () => HostEnvironmentInfo.GetCurrent(RuntimeInformation.Current).IsConcurrentGC);
+            Register(GcMode.ServerCharacteristic, () => HostEnvironmentInfo.GetCurrent().IsServerGC);
+            Register(GcMode.ConcurrentCharacteristic, () => HostEnvironmentInfo.GetCurrent().IsConcurrentGC);
             Register(GcMode.CpuGroupsCharacteristic, () => false);
             Register(GcMode.ForceCharacteristic, () => true);
             Register(GcMode.AllowVeryLargeObjectsCharacteristic, () => false);

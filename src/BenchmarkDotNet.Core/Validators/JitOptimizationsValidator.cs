@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -21,7 +22,7 @@ namespace BenchmarkDotNet.Validators
         {
             foreach (var group in validationParameters.Benchmarks.GroupBy(benchmark => benchmark.Target.Type.GetTypeInfo().Assembly))
             {
-                foreach (var referencedAssemblyName in group.Key.ExecuteMethod<Assembly, AssemblyName[]>("GetReferencedAssemblies"))
+                foreach (var referencedAssemblyName in ServicesProvider.DoNetStandardWorkarounds.GetReferencedAssemblies(group.Key))
                 {
                     var referencedAssembly = Assembly.Load(referencedAssemblyName);
 

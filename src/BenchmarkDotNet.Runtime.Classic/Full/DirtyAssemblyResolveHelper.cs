@@ -1,10 +1,9 @@
-﻿#if CLASSIC
-using BenchmarkDotNet.Loggers;
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
+using BenchmarkDotNet.Loggers;
 
-namespace BenchmarkDotNet.Helpers
+namespace BenchmarkDotNet.Full
 {
     /// <summary>
     /// Sometimes NuGet/VS/other tool does not generate the right assembly binding redirects
@@ -62,4 +61,3 @@ namespace BenchmarkDotNet.Helpers
         }
     }
 }
-#endif

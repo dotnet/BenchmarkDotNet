@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.IntegrationTests
             return new Summary(
                 title: "bdn-test",
                 reports: new List<BenchmarkReport>(),
-                hostEnvironmentInfo: Environments.HostEnvironmentInfo.GetCurrent(RuntimeInformation.Instance),
+                hostEnvironmentInfo: Environments.HostEnvironmentInfo.GetCurrent(),
                 config: Configs.DefaultConfig.Instance,
                 resultsDirectoryPath: resultsDirectoryPath,
                 totalTime: System.TimeSpan.Zero,
