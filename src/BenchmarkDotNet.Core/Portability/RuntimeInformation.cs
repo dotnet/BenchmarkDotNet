@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Portability
 {
@@ -11,6 +16,27 @@ namespace BenchmarkDotNet.Portability
         internal const string Unknown = "?";
         internal const string DebugConfigurationName = "DEBUG";
         internal const string ReleaseConfigurationName = "RELEASE";
+
+        public static readonly RuntimeInformation Current;
+
+        static RuntimeInformation()
+        {
+            var typeInfo = typeof(RuntimeInformation).GetTypeInfo();
+
+            var location = typeInfo.Assembly.ReadProperty<Assembly, string>("Location");
+
+            var directoryPath = Path.GetDirectoryName(location);
+
+            var runtimeSpecificDll = new DirectoryInfo(directoryPath).EnumerateFileSystemInfos("BenchmarkDotNet.Runtime*.dll").Single();
+
+            string assemblyQualifiedName = typeInfo.AssemblyQualifiedName;
+
+            var runtimeSpecificImplementation = Type.GetType(assemblyQualifiedName.Replace("BenchmarkDotNet.Core", runtimeSpecificDll.Name));
+
+            var instanceField = runtimeSpecificImplementation.GetRuntimeFields().Single(field => field.IsStatic && field.Name == "Instance");
+
+            Current = (RuntimeInformation)instanceField.GetValue(null);
+        }
 
         public virtual bool IsMono => false;
 
