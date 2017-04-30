@@ -52,9 +52,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         internal static NetCoreAppSettings GetCurrentVersion()
         {
-#if CLASSIC
-            return Default;
-#else
             try
             {
                 // it's an experimental way to determine the .NET Core Runtime version
@@ -75,7 +72,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
 
             return Default;
-#endif
         }
     }
 }

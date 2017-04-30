@@ -69,11 +69,7 @@ namespace BenchmarkDotNet.Environments
             ChronometerFrequency = Chronometer.Frequency;
             HardwareTimerKind = Chronometer.HardwareTimerKind;
             JitModules = runtimeInformation.JitModulesInfo;
-#if !UAP
             DotNetCliVersion = new Lazy<string>(Toolchains.DotNetCli.DotNetCliCommandExecutor.GetDotNetCliVersion);
-#else
-            DotNetCliVersion = new Lazy<string>(() => string.Empty);
-#endif
         }
 
         public new static HostEnvironmentInfo GetCurrent(RuntimeInformation runtimeInformation) => Current ?? (Current = new HostEnvironmentInfo(runtimeInformation));

@@ -1,4 +1,3 @@
-#if !UAP
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -100,4 +99,3 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
     }
 }
-#endif

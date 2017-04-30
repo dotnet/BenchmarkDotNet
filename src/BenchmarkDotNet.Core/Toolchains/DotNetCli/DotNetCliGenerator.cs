@@ -1,5 +1,4 @@
-﻿#if !UAP
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -129,4 +128,3 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .Any(fileInfo => fileInfo.Extension == ".sln" || fileInfo.Name == "global.json");
     }
 }
-#endif

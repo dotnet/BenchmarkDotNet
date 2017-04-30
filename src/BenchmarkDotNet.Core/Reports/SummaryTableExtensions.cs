@@ -108,9 +108,7 @@ namespace BenchmarkDotNet.Reports
             return __buffer;
         }
 
-#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static void PadLeft(SummaryTable table, string[] line, string leftDel, string rightDel, int columnIndex, StringBuilder buffer)
         {
             const char space = ' ';

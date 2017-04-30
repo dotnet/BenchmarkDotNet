@@ -10,7 +10,7 @@ using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet
 {
-    internal class DesktopDotNetFrameworkRuntimeInformation : Portability.RuntimeInformation
+    internal class ClassicRuntimeInformation : Portability.RuntimeInformation
     {
         public override bool IsWindows => true;
 

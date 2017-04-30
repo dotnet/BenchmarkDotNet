@@ -10,6 +10,6 @@ namespace BenchmarkDotNet
         public static readonly Portability.RuntimeInformation Instance = 
             isMono 
                 ? (Portability.RuntimeInformation)new MonoRuntimeInformation() 
-                : new DesktopDotNetFrameworkRuntimeInformation();
+                : new ClassicRuntimeInformation();
     }
 }

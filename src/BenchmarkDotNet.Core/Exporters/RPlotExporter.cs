@@ -1,5 +1,4 @@
-﻿#if !UAP
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -88,4 +87,3 @@ namespace BenchmarkDotNet.Exporters
             .FirstOrDefault(File.Exists);
     }
 }
-#endif
