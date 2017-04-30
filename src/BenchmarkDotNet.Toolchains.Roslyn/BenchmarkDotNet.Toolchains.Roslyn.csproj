@@ -16,4 +16,7 @@
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BenchmarkDotNet.Runtime.Classic\BenchmarkDotNet.Runtime.Classic.csproj" />
+  </ItemGroup>
 </Project>

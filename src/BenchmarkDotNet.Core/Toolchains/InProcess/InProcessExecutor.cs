@@ -12,6 +12,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
@@ -75,7 +76,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 #endif 
             runThread.IsBackground = true;
 
-            var timeout = HostEnvironmentInfo.GetCurrent().HasAttachedDebugger ? UnderDebuggerTimeout : ExecutionTimeout;
+            var timeout = HostEnvironmentInfo.GetCurrent(RuntimeInformation.Current).HasAttachedDebugger ? UnderDebuggerTimeout : ExecutionTimeout;
 
             runThread.Start();
 

@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Toolchains
             string programName = GetProgramName(benchmark, config);
             string buildArtifactsDirectoryPath = GetBuildArtifactsDirectoryPath(benchmark, programName);
             string binariesDirectoryPath = GetBinariesDirectoryPath(buildArtifactsDirectoryPath);
-            string executablePath = Path.Combine(binariesDirectoryPath, $"{programName}{RuntimeInformation.ExecutableExtension}");
+            string executablePath = Path.Combine(binariesDirectoryPath, $"{programName}{RuntimeInformation.Current.ExecutableExtension}");
 
             return new ArtifactsPaths(
                 cleanup: artifactsPaths => Cleanup(benchmark, artifactsPaths),
@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Toolchains
                 programCodePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{codeFileExtension}"),
                 appConfigPath: $"{executablePath}.config",
                 projectFilePath: GetProjectFilePath(buildArtifactsDirectoryPath),
-                buildScriptFilePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{RuntimeInformation.ScriptFileExtension}"),
+                buildScriptFilePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{RuntimeInformation.Current.ScriptFileExtension}"),
                 executablePath: executablePath,
                 programName: programName);
         }

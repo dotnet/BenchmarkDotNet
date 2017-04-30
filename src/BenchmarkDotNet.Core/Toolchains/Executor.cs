@@ -95,7 +95,7 @@ namespace BenchmarkDotNet.Toolchains
             };
             var runtime = benchmark.Job.Env.HasValue(EnvMode.RuntimeCharacteristic)
                 ? benchmark.Job.Env.Runtime
-                : RuntimeInformation.GetCurrentRuntime();
+                : RuntimeInformation.Current.CurrentRuntime;
                 // TODO: use resolver
             switch (runtime)
             {

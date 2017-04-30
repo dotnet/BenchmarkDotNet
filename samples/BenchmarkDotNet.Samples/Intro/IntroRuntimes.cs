@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Samples.Intro
             [Benchmark]
             public void Benchmark()
             {
-                Console.WriteLine($"{AvoidParsingException} {RuntimeInformation.GetCurrentRuntime().GetToolchain()}");
+                Console.WriteLine($"{AvoidParsingException} {RuntimeInformation.Instance.CurrentRuntime.GetToolchain()}");
             }
         }
 
@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Samples.Intro
             [Benchmark]
             public void Benchmark()
             {
-                Console.WriteLine($"{AvoidParsingException} {RuntimeInformation.GetCurrentRuntime().GetToolchain()}");
+                Console.WriteLine($"{AvoidParsingException} {RuntimeInformation.Instance.CurrentRuntime.GetToolchain()}");
             }
         }
     }

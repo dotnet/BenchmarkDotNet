@@ -1,6 +1,4 @@
-using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
-using System.Security;
 
 namespace BenchmarkDotNet.Horology
 {
@@ -30,13 +28,9 @@ namespace BenchmarkDotNet.Horology
             return value;
         }
 
-#if CLASSIC
-        [HandleProcessCorruptedStateExceptions] // #276
-        [SecurityCritical]
-#endif
         private static bool Initialize(out long qpf)
         {
-            if (!Portability.RuntimeInformation.IsWindows())
+            if (!Portability.RuntimeInformation.Current.IsWindows)
             {
                 qpf = default(long);
                 return false;

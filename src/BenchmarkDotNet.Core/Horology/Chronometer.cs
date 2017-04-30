@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Horology
 
         static Chronometer()
         {
-            if (RuntimeInformation.IsWindows() && WindowsClock.IsAvailable)
+            if (RuntimeInformation.Current.IsWindows && WindowsClock.IsAvailable)
                 BestClock = WindowsClock;
             else
                 BestClock = Stopwatch;

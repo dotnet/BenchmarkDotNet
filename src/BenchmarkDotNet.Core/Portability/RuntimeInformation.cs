@@ -4,10 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Portability
 {
@@ -29,9 +27,11 @@ namespace BenchmarkDotNet.Portability
 
             var runtimeSpecificDll = new DirectoryInfo(directoryPath).EnumerateFileSystemInfos("BenchmarkDotNet.Runtime*.dll").Single();
 
-            string assemblyQualifiedName = typeInfo.AssemblyQualifiedName;
+            string assemblyQualifiedName = typeInfo.AssemblyQualifiedName
+                .Replace("BenchmarkDotNet.Core", Path.GetFileNameWithoutExtension(runtimeSpecificDll.Name))
+                .Replace("BenchmarkDotNet.Portability.RuntimeInformation", "BenchmarkDotNet.RuntimeInformation");
 
-            var runtimeSpecificImplementation = Type.GetType(assemblyQualifiedName.Replace("BenchmarkDotNet.Core", runtimeSpecificDll.Name));
+            var runtimeSpecificImplementation = Type.GetType(assemblyQualifiedName);
 
             var instanceField = runtimeSpecificImplementation.GetRuntimeFields().Single(field => field.IsStatic && field.Name == "Instance");
 

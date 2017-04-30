@@ -3,6 +3,7 @@ using System.Reflection;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
@@ -65,7 +66,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 FillMembers(instance, benchmark);
 
                 host.WriteLine();
-                foreach (var infoLine in BenchmarkEnvironmentInfo.GetCurrent().ToFormattedString())
+                foreach (var infoLine in BenchmarkEnvironmentInfo.GetCurrent(RuntimeInformation.Current).ToFormattedString())
                     host.WriteLine("// {0}", infoLine);
                 host.WriteLine("// Job: {0}", job.DisplayInfo);
                 host.WriteLine();

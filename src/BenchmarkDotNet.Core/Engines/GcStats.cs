@@ -100,7 +100,7 @@ namespace BenchmarkDotNet.Engines
         private static long GetAllocatedBytes(bool isDiagnosticsEnabled)
         {
             if (!isDiagnosticsEnabled 
-                || RuntimeInformation.IsMono()) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-
+                || RuntimeInformation.Current.IsMono) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-
                 return 0;
 
             // "This instance Int64 property returns the number of bytes that have been allocated by a specific 

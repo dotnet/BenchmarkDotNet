@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var generator = new MyGenerator();
             var builder = new MyBuilder();
             var executor = new MyExecutor();
-            var myToolchain = new Toolchain("My", generator, builder, executor);
+            var myToolchain = new Toolchain("My", generator, builder, executor, RuntimeInformation.Instance);
             var job = new Job(Job.Dry) { Infrastructure = { Toolchain = myToolchain} };
             var config = CreateSimpleConfig(logger).With(job);
 

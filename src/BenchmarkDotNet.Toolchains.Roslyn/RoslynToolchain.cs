@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
     public class RoslynToolchain : Toolchain
     {
         [PublicAPI]
-        public RoslynToolchain() : base("Roslyn", new Generator(), new Builder(), new Executor())
+        public RoslynToolchain() : base("Roslyn", new Generator(), new Builder(), new Executor(), BenchmarkDotNet.RuntimeInformation.Instance)
         {
         }
 

@@ -65,6 +65,21 @@ namespace BenchmarkDotNet.Tests.Mocks
             }
         }
 
+        public class MockRuntimeInformation : Portability.RuntimeInformation
+        {
+            public override string Architecture => "64mock";
+            public override string OsVersion => "Microsoft Windows NT 10.0.x.mock";
+            public override bool IsWindows => true;
+            public override bool IsLinux => false;
+            public override bool IsMac => false;
+            public override string GetProcessorName() => "MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz";
+            public override Runtime CurrentRuntime { get; }
+            public override string GetRuntimeVersion() => "Clr 4.0.x.mock";
+            public override bool HasRyuJit => true;
+            public override string JitInfo => "RyuJIT-v4.6.x.mock";
+            public override string GetConfiguration() => "CONFIGURATION";
+        }
+
         public class MockHostEnvironmentInfo : HostEnvironmentInfo
         {
             public static MockHostEnvironmentInfo Default = new MockHostEnvironmentInfo
@@ -87,7 +102,7 @@ namespace BenchmarkDotNet.Tests.Mocks
                 RuntimeVersion = "Clr 4.0.x.mock"
             };
 
-            private MockHostEnvironmentInfo()
+            private MockHostEnvironmentInfo() : base(new MockRuntimeInformation())
             {
             }
         }
