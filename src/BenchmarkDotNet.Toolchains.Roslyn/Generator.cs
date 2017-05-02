@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
@@ -67,9 +69,21 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
 
         private static void DelteIfExists(string filePath)
         {
-            if (File.Exists(filePath))
+            if (!File.Exists(filePath))
+                return;
+
+            int attempt = 0;
+            while (true)
             {
-                File.Delete(filePath);
+                try
+                {
+                    File.Delete(filePath);
+                    return;
+                }
+                catch (Exception) when (attempt++ < 5)
+                {
+                    Thread.Sleep(TimeSpan.FromMilliseconds(1000)); // Previous benchmark run didn't release some files
+                }
             }
         }
     }

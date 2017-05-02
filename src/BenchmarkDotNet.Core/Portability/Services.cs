@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static Func<TimeSpan, BenchmarkActionCodegen, bool, IExecutor> InProcessExecutorFactory => current.Value.InProcessExecutorFactory;
 
-        internal static IDoNetStandardWorkarounds DoNetStandardWorkarounds => current.Value.DoNetStandardWorkarounds;
+        internal static IDotNetStandardWorkarounds DotNetStandardWorkarounds => current.Value.DotNetStandardWorkarounds;
 
         private static Services Load()
         {
@@ -56,14 +56,14 @@ namespace BenchmarkDotNet.Portability
 
     internal class Services
     {
-        internal Services(RuntimeInformation runtimeInformation, IDiagnosersLoader diagnosersLoader, IResourcesService resourcesService, Func<ILogger, IDisposable> assemblyResolverFactory, Func<TimeSpan, BenchmarkActionCodegen, bool, IExecutor> inProcessExecutorFactory, IDoNetStandardWorkarounds doNetStandardWorkarounds)
+        internal Services(RuntimeInformation runtimeInformation, IDiagnosersLoader diagnosersLoader, IResourcesService resourcesService, Func<ILogger, IDisposable> assemblyResolverFactory, Func<TimeSpan, BenchmarkActionCodegen, bool, IExecutor> inProcessExecutorFactory, IDotNetStandardWorkarounds dotNetStandardWorkarounds)
         {
             RuntimeInformation = runtimeInformation;
             DiagnosersLoader = diagnosersLoader;
             ResourcesService = resourcesService;
             AssemblyResolverFactory = assemblyResolverFactory;
             InProcessExecutorFactory = inProcessExecutorFactory;
-            DoNetStandardWorkarounds = doNetStandardWorkarounds;
+            DotNetStandardWorkarounds = dotNetStandardWorkarounds;
         }
 
         internal RuntimeInformation RuntimeInformation { get; }
@@ -76,6 +76,6 @@ namespace BenchmarkDotNet.Portability
 
         internal Func<TimeSpan, BenchmarkActionCodegen, bool, IExecutor> InProcessExecutorFactory { get; }
 
-        internal IDoNetStandardWorkarounds DoNetStandardWorkarounds { get; }
+        internal IDotNetStandardWorkarounds DotNetStandardWorkarounds { get; }
     }
 }

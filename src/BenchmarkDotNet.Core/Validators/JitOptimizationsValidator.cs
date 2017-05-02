@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Validators
         {
             foreach (var group in validationParameters.Benchmarks.GroupBy(benchmark => benchmark.Target.Type.GetTypeInfo().Assembly))
             {
-                foreach (var referencedAssemblyName in ServicesProvider.DoNetStandardWorkarounds.GetReferencedAssemblies(group.Key))
+                foreach (var referencedAssemblyName in ServicesProvider.DotNetStandardWorkarounds.GetReferencedAssemblies(group.Key))
                 {
                     var referencedAssembly = Assembly.Load(referencedAssemblyName);
 

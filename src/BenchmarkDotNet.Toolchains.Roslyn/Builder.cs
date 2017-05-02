@@ -100,6 +100,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 Path.Combine(frameworkAssembliesDirectory, "mscorlib.dll"),
                 Path.Combine(frameworkAssembliesDirectory, "System.dll"),
                 Path.Combine(frameworkAssembliesDirectory, "System.Core.dll"),
+                Path.Combine(frameworkAssembliesDirectory, "System.IO.dll"),
                 Path.Combine(frameworkAssembliesDirectory, "System.Runtime.dll")
             };
         }

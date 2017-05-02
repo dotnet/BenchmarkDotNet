@@ -91,9 +91,20 @@ namespace BenchmarkDotNet.Toolchains
 
         private static void GenerateAppConfig(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)
         {
-            string sourcePath = ServicesProvider.DoNetStandardWorkarounds.GetLocation(benchmark.Target.Type.GetTypeInfo().Assembly) + ".config";
+            string configFilePath = ServicesProvider.DotNetStandardWorkarounds.GetLocation(benchmark.Target.Type.GetTypeInfo().Assembly) + ".config";
 
-            using (var source = File.Exists(sourcePath) ? new StreamReader(File.OpenRead(sourcePath)) : TextReader.Null)
+            if (!File.Exists(configFilePath)) // there might be other dll that executes benchmarks, has binding redirects and does not define benchmarks
+            {
+                // we try to search for other config files, which might contain precious assembly binding redirects 
+                var allConfigs = new DirectoryInfo(
+                        Path.GetDirectoryName(ServicesProvider.DotNetStandardWorkarounds.GetLocation(benchmark.Target.Type.GetTypeInfo().Assembly)))
+                    .GetFiles("*.config");
+
+                if (allConfigs.Length == 1) // if there is only one config, we will use it
+                    configFilePath = allConfigs[0].FullName;
+            }
+
+            using (var source = File.Exists(configFilePath) ? new StreamReader(File.OpenRead(configFilePath)) : TextReader.Null)
             using (var destination = new System.IO.StreamWriter(File.Create(artifactsPaths.AppConfigPath), System.Text.Encoding.UTF8))
             {
                 AppConfigGenerator.Generate(benchmark.Job, source, destination, resolver);

@@ -16,13 +16,13 @@ namespace BenchmarkDotNet
                     new MonoResourcesService(),
                     _ => null,
                     (timeout, codegenMode, logOutput) => new InProcessExecutor(timeout, codegenMode, logOutput),
-                    new DoNetStandardWorkarounds())
+                    new DotNetStandardWorkarounds())
                 : new Services(
                     new ClassicRuntimeInformation(),
                     new ClassicDiagnosersLoader(),
                     new ClassicResourcesService(),
                     DirtyAssemblyResolveHelper.Create,
                     (timeout, codegenMode, logOutput) => new InProcessExecutor(timeout, codegenMode, logOutput),
-                    new DoNetStandardWorkarounds());
+                    new DotNetStandardWorkarounds());
     }
 }

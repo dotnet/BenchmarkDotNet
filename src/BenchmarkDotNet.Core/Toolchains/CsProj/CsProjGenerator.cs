@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         protected override string GetBuildArtifactsDirectoryPath(Benchmark benchmark, string programName)
             => Path.Combine(
                     Path.GetDirectoryName(
-                        ServicesProvider.DoNetStandardWorkarounds.GetLocation(benchmark.Target.Type.GetTypeInfo().Assembly)),
+                        ServicesProvider.DotNetStandardWorkarounds.GetLocation(benchmark.Target.Type.GetTypeInfo().Assembly)),
                     programName);
 
         protected override string GetProjectFilePath(string binariesDirectoryPath)

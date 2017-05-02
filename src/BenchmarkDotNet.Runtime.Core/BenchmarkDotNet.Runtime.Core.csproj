@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\BenchmarkDotNet.Runtime.Classic\DoNetStandardWorkarounds.cs" Link="DoNetStandardWorkarounds.cs" />
+    <Compile Include="..\BenchmarkDotNet.Runtime.Classic\DotNetStandardWorkarounds.cs" Link="DotNetStandardWorkarounds.cs" />
     <Compile Include="..\BenchmarkDotNet.Runtime.Classic\InProcessExecutor.cs" Link="InProcessExecutor.cs" />
   </ItemGroup>
 
