@@ -4,14 +4,15 @@ using System.Linq;
 using System.Threading;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.Uap.Helpers;
+using BenchmarkDotNet.Uap.Helpers;
 using System.IO;
 using BenchmarkDotNet.Code;
 using System.Reflection;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Toolchains;
 
-namespace BenchmarkDotNet.Toolchains.Uap
+namespace BenchmarkDotNet.Uap
 {
     internal class UapGenerator : GeneratorBase
     {

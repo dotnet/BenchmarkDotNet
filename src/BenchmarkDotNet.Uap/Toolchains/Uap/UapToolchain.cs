@@ -1,8 +1,9 @@
 ﻿#if !UAP
 using System;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Toolchains;
 
-namespace BenchmarkDotNet.Toolchains.Uap
+namespace BenchmarkDotNet.Uap
 {
     internal class UapToolchainConfig
     {

@@ -3,10 +3,10 @@
   <Import Project="..\..\build\common.props" />
   
   <PropertyGroup>
-    <AssemblyTitle>BenchmarkDotNet.Toolchains.Uap</AssemblyTitle>
+    <AssemblyTitle>BenchmarkDotNet.Uap</AssemblyTitle>
     <TargetFrameworks>netcoreapp1.1;net46;uap10.0</TargetFrameworks>
-    <AssemblyName>BenchmarkDotNet.Toolchains.Uap</AssemblyName>
-    <PackageId>BenchmarkDotNet.Toolchains.Uap</PackageId>
+    <AssemblyName>BenchmarkDotNet.Uap</AssemblyName>
+    <PackageId>BenchmarkDotNet.Uap</PackageId>
     <CLSCompliant>true</CLSCompliant>
   </PropertyGroup>
 
@@ -37,7 +37,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
-    <ProjectReference Include="..\BenchmarkDotNet.Runtime.Classic\BenchmarkDotNet.Runtime.Classic.csproj" />
+    <ProjectReference Include="..\BenchmarkDotNet.Toolchains.Roslyn\BenchmarkDotNet.Toolchains.Roslyn.csproj" />
     <PackageReference Include="RestSharpSigned " Version="105.2.3" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />

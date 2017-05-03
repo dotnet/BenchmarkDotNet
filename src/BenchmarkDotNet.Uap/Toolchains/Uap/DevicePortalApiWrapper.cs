@@ -12,7 +12,7 @@ using System.Net.WebSockets;
 using BenchmarkDotNet.Environments;
 using RestSharp.Authenticators;
 
-namespace BenchmarkDotNet.Toolchains.Uap
+namespace BenchmarkDotNet.Uap
 {
 #if CORE
     internal static class RestClientExtensions

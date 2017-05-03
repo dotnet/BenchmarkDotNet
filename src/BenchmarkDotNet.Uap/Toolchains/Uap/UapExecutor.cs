@@ -1,15 +1,11 @@
 ﻿#if !UAP
-using System;
 using System.Linq;
-using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using System.IO;
 using BenchmarkDotNet.Toolchains.Parameters;
+using BenchmarkDotNet.Toolchains;
 
-namespace BenchmarkDotNet.Toolchains.Uap
+namespace BenchmarkDotNet.Uap
 {
     internal class UapExecutor : IExecutor
     {

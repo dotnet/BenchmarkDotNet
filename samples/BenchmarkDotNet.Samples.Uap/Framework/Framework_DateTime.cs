@@ -1,13 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains.Uap;
-using System.IO;
-using BenchmarkDotNet.Attributes.Jobs;
 
-namespace BenchmarkDotNet.Samples.Framework
+namespace BenchmarkDotNet.Samples.Uap.Framework
 {
     public class Framework_DateTime
     {

@@ -1,18 +1,13 @@
 ﻿#if !UAP
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using System.Diagnostics;
-using System.IO;
-using BenchmarkDotNet.Toolchains.DotNetCli;
-using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Toolchains;
 
-namespace BenchmarkDotNet.Toolchains.Uap
+namespace BenchmarkDotNet.Uap
 {
     internal class UapBuilder : IBuilder
     {

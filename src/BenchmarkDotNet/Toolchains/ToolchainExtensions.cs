@@ -37,16 +37,8 @@ namespace BenchmarkDotNet.Toolchains
                     return isUsingProjectJson.Value
                         ? (IToolchain)ProjectJsonCoreToolchain.Current.Value
                         : CsProjCoreToolchain.Current.Value;
-                //case UapRuntime uap:
-                // todo: move it to uap pkg
-                //    if (!string.IsNullOrEmpty(uap.CsfrCookie))
-                //    {
-                //        return new UapToolchain(new UapToolchainConfig() { CSRFCookieValue = uap.CsfrCookie, DevicePortalUri = uap.DevicePortalUri, UAPBinariesFolder = uap.UapBinariesPath, WMIDCookieValue = uap.WmidCookie, Platform = uap.Platform });
-                //    }
-                //    else
-                //    {
-                //        return new UapToolchain(new UapToolchainConfig() { Username = uap.Username, DevicePortalUri = uap.DevicePortalUri, Password = uap.Password, UAPBinariesFolder = uap.UapBinariesPath, Platform = uap.Platform });
-                //    }
+                case UapRuntime uap:
+                    throw new Exception("Please install BenchmarkDotNet.Uap package to run Uap benchmarks");
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtime), runtime, "Runtime not supported");
             }
