@@ -45,7 +45,7 @@ build:
   project: BenchmarkDotNet.sln    # path to Visual Studio solution or project
 
 after_build:
-  - msbuild /t:Pack .\src\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj /p:configuration=Release
+  - msbuild /t:Pack .\src\BenchmarkDotNet.Runtime\BenchmarkDotNet.Runtime.csproj /p:configuration=Release
   - msbuild /t:Pack .\src\BenchmarkDotNet.Runtime.Classic\BenchmarkDotNet.Runtime.Classic.csproj /p:configuration=Release
   - msbuild /t:Pack .\src\BenchmarkDotNet.Runtime.Core\BenchmarkDotNet.Runtime.Core.csproj /p:configuration=Release
   - msbuild /t:Pack .\src\BenchmarkDotNet.Runtime.Uap\BenchmarkDotNet.Runtime.Uap.csproj /p:configuration=Release
