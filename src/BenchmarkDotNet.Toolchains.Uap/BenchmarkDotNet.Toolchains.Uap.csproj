@@ -14,10 +14,6 @@
     <EmbeddedResource Include="Templates\*" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj" />
-  </ItemGroup>
-
   <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
     <NugetTargetMoniker>UAP,Version=v10.0</NugetTargetMoniker>
@@ -29,13 +25,19 @@
     <DefineConstants>$(DefineConstants);WINDOWS_UWP;UAP</DefineConstants>
     <DefaultLanguage>en</DefaultLanguage>
   </PropertyGroup>
-  
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'uap10.0' ">
+    <ProjectReference Include="..\BenchmarkDotNet.Runtime.Uap\BenchmarkDotNet.Runtime.Uap.csproj" />
+  </ItemGroup>
+
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
+    <ProjectReference Include="..\BenchmarkDotNet.Runtime.Core\BenchmarkDotNet.Runtime.Core.csproj" />
     <PackageReference Include="RestSharp.NetCore" Version="105.2.3" />
     <PackageReference Include="System.Net.WebSockets.Client" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <ProjectReference Include="..\BenchmarkDotNet.Runtime.Classic\BenchmarkDotNet.Runtime.Classic.csproj" />
     <PackageReference Include="RestSharpSigned " Version="105.2.3" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />

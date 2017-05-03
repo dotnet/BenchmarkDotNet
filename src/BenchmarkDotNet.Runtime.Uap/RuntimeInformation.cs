@@ -1,4 +1,6 @@
 ﻿using BenchmarkDotNet.Environments;
+using System.Linq;
+using System.Reflection;
 using AssemblyFileVersionAttribute = System.Reflection.AssemblyFileVersionAttribute;
 
 namespace BenchmarkDotNet
