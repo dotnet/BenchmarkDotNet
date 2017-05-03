@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj" />
+    <ProjectReference Include="..\BenchmarkDotNet.Runtime\BenchmarkDotNet.Runtime.csproj" />
   </ItemGroup>
 
 </Project>

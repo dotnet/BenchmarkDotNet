@@ -43,7 +43,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Integration
 		{95F5D645-19E3-432F-95D4-C5EA374DD15B} = {95F5D645-19E3-432F-95D4-C5EA374DD15B}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Core", "src\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj", "{95F5D645-19E3-432F-95D4-C5EA374DD15B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Runtime", "src\BenchmarkDotNet.Runtime\BenchmarkDotNet.Runtime.csproj", "{95F5D645-19E3-432F-95D4-C5EA374DD15B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Toolchains.Roslyn", "src\BenchmarkDotNet.Toolchains.Roslyn\BenchmarkDotNet.Toolchains.Roslyn.csproj", "{F5785871-7E2C-4894-85DE-A28EACB1D9B5}"
 EndProject

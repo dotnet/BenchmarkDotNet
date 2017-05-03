@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Uap
             content = SetGuid(content)
                 .Replace("$BENCHMARKASSEMLYNAME$", assemblyName.Name)
                 .Replace("$BENCHMARKASSEMLYPATH$", benchmark.Target.Type.GetTypeInfo().Assembly.Location)
-                .Replace("$BDNCOREPATH$", Path.Combine(this.uapBinariesFolder, "BenchmarkDotNet.Core.dll"))
+                .Replace("$BDNCOREPATH$", Path.Combine(this.uapBinariesFolder, "BenchmarkDotNet.Runtime.dll"))
                 .Replace("$BDNPATH$", Path.Combine(this.uapBinariesFolder, "BenchmarkDotNet.dll"));
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);

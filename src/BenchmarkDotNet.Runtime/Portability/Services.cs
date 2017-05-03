@@ -35,10 +35,10 @@ namespace BenchmarkDotNet.Portability
 
             var directoryPath = Path.GetDirectoryName(location);
 
-            var runtimeSpecificDll = new DirectoryInfo(directoryPath).EnumerateFileSystemInfos("BenchmarkDotNet.Runtime*.dll").Single();
+            var runtimeSpecificDll = new DirectoryInfo(directoryPath).EnumerateFileSystemInfos("BenchmarkDotNet.Runtime*.dll").OrderByDescending(file => file.Name.Length).First();
 
             string assemblyQualifiedName = typeInfo.AssemblyQualifiedName
-                                                   .Replace("BenchmarkDotNet.Core", Path.GetFileNameWithoutExtension(runtimeSpecificDll.Name))
+                                                   .Replace("BenchmarkDotNet.Runtime", Path.GetFileNameWithoutExtension(runtimeSpecificDll.Name))
                                                    .Replace("BenchmarkDotNet.Portability.ServicesProvider", "BenchmarkDotNet.ServicesProviderContract");
 
             var runtimeSpecificImplementation = Type.GetType(assemblyQualifiedName);

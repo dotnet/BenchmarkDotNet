@@ -2,11 +2,11 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <Description>Internal package, install BenchmarkDotNet instead</Description>
-    <AssemblyTitle>BenchmarkDotNet.Core</AssemblyTitle>
+    <AssemblyTitle>BenchmarkDotNet.Runtime</AssemblyTitle>
     <TargetFrameworks>netstandard1.3;net46</TargetFrameworks>
     <NoWarn>$(NoWarn);1591</NoWarn>
-    <AssemblyName>BenchmarkDotNet.Core</AssemblyName>
-    <PackageId>BenchmarkDotNet.Core</PackageId>
+    <AssemblyName>BenchmarkDotNet.Runtime</AssemblyName>
+    <PackageId>BenchmarkDotNet.Runtime</PackageId>
     <RootNamespace>BenchmarkDotNet</RootNamespace>
   </PropertyGroup>
   <ItemGroup>

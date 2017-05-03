@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using BenchmarkDotNet.Core.Helpers;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 

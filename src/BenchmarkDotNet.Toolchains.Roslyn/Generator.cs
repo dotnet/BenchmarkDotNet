@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                     new[]
                     {
                         benchmark.Target.Type.GetTypeInfo().Assembly, // this assembly does not has to have a reference to BenchmarkDotNet (e.g. custom framework for benchmarking that internally uses BenchmarkDotNet
-                        typeof(Benchmark).Assembly, // BenchmarkDotNet.Core
+                        typeof(Benchmark).Assembly, // BenchmarkDotNet.Runtime
                         typeof(RoslynToolchain).Assembly // BenchmarkDotNet.Toolchains.Roslyn
                     })
                 .Distinct();

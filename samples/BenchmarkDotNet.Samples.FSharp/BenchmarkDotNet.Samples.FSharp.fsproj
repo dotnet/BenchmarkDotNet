@@ -51,8 +51,8 @@
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj">
-      <Name>BenchmarkDotNet.Core</Name>
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Runtime\BenchmarkDotNet.Runtime.csproj">
+      <Name>BenchmarkDotNet.Runtime</Name>
       <Project>{95f5d645-19e3-432f-95d4-c5ea374dd15b}</Project>
       <Private>True</Private>
     </ProjectReference>

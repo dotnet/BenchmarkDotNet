@@ -2,9 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using BenchmarkDotNet.Core.Helpers;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Environments;
 
 namespace BenchmarkDotNet.Characteristics
 {
