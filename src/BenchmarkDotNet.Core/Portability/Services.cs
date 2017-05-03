@@ -25,6 +25,8 @@ namespace BenchmarkDotNet.Portability
 
         internal static IDotNetStandardWorkarounds DotNetStandardWorkarounds => current.Value.DotNetStandardWorkarounds;
 
+        internal static IBenchmarkConverter BenchmarkCoverter => current.Value.BenchmarkConverter;
+
         private static Services Load()
         {
             var typeInfo = typeof(ServicesProvider).GetTypeInfo();
@@ -56,7 +58,7 @@ namespace BenchmarkDotNet.Portability
 
     internal class Services
     {
-        internal Services(RuntimeInformation runtimeInformation, IDiagnosersLoader diagnosersLoader, IResourcesService resourcesService, Func<ILogger, IDisposable> assemblyResolverFactory, Func<TimeSpan, BenchmarkActionCodegen, bool, IExecutor> inProcessExecutorFactory, IDotNetStandardWorkarounds dotNetStandardWorkarounds)
+        internal Services(RuntimeInformation runtimeInformation, IDiagnosersLoader diagnosersLoader, IResourcesService resourcesService, Func<ILogger, IDisposable> assemblyResolverFactory, Func<TimeSpan, BenchmarkActionCodegen, bool, IExecutor> inProcessExecutorFactory, IDotNetStandardWorkarounds dotNetStandardWorkarounds, IBenchmarkConverter benchmarkConverter)
         {
             RuntimeInformation = runtimeInformation;
             DiagnosersLoader = diagnosersLoader;
@@ -64,6 +66,7 @@ namespace BenchmarkDotNet.Portability
             AssemblyResolverFactory = assemblyResolverFactory;
             InProcessExecutorFactory = inProcessExecutorFactory;
             DotNetStandardWorkarounds = dotNetStandardWorkarounds;
+            BenchmarkConverter = benchmarkConverter;
         }
 
         internal RuntimeInformation RuntimeInformation { get; }
@@ -77,5 +80,7 @@ namespace BenchmarkDotNet.Portability
         internal Func<TimeSpan, BenchmarkActionCodegen, bool, IExecutor> InProcessExecutorFactory { get; }
 
         internal IDotNetStandardWorkarounds DotNetStandardWorkarounds { get; }
+
+        internal IBenchmarkConverter BenchmarkConverter { get; }
     }
 }

@@ -1,5 +1,4 @@
-﻿#if CLASSIC
-using System;
+﻿using System;
 using System.CodeDom.Compiler;
 using System.IO;
 using System.Linq;
@@ -7,13 +6,15 @@ using System.Net;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Running;
 using Microsoft.CSharp;
 
-namespace BenchmarkDotNet.Running
+namespace BenchmarkDotNet
 {
-    public static partial class BenchmarkConverter
+    internal class BenchmarkConverter : IBenchmarkConverter
     {
-        public static Benchmark[] UrlToBenchmarks(string url, IConfig config = null)
+        public Benchmark[] UrlToBenchmarks(string url, IConfig config = null)
         {
             var logger = config?.GetCompositeLogger() ?? HostEnvironmentInfo.FallbackLogger;
 
@@ -40,7 +41,7 @@ namespace BenchmarkDotNet.Running
             return SourceToBenchmarks(benchmarkContent, config);
         }
 
-        public static Benchmark[] SourceToBenchmarks(string source, IConfig config = null)
+        public Benchmark[] SourceToBenchmarks(string source, IConfig config = null)
         {
             string benchmarkContent = source;
             var cSharpCodeProvider = new CSharpCodeProvider();
@@ -70,7 +71,7 @@ namespace BenchmarkDotNet.Running
             }
             return (
                 from type in compilerResults.CompiledAssembly.GetTypes()
-                from benchmark in TypeToBenchmarks(type, config)
+                from benchmark in Running.BenchmarkConverter.TypeToBenchmarks(type, config)
                 let target = benchmark.Target
                 select new Benchmark(
                     new Target(target.Type, target.Method, target.SetupMethod, target.CleanupMethod, target.MethodDisplayInfo, benchmarkContent, target.Baseline, target.OperationsPerInvoke),
@@ -88,4 +89,3 @@ namespace BenchmarkDotNet.Running
         }
     }
 }
-#endif

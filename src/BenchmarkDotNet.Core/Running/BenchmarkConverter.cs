@@ -8,10 +8,11 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Parameters;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Running
 {
-    public static partial class BenchmarkConverter
+    public static class BenchmarkConverter
     {
         public static Benchmark[] TypeToBenchmarks(Type type, IConfig config = null)
         {
@@ -61,9 +62,17 @@ namespace BenchmarkDotNet.Running
             return config;
         }
 
-        private static IEnumerable<Target> GetTargets(MethodInfo[] targetMethods, Type type, MethodInfo setupMethod, MethodInfo cleanupMethod) => targetMethods.
-            Where(m => m.HasAttribute<BenchmarkAttribute>()).
-            Select(methodInfo => CreateTarget(type, setupMethod, methodInfo, cleanupMethod, methodInfo.ResolveAttribute<BenchmarkAttribute>(), targetMethods));
+        public static Benchmark[] UrlToBenchmarks(string url, IConfig config = null)
+            => ServicesProvider.BenchmarkCoverter.UrlToBenchmarks(url, config);
+
+        public static Benchmark[] SourceToBenchmarks(string source, IConfig config = null)
+            => ServicesProvider.BenchmarkCoverter.SourceToBenchmarks(source, config);
+
+        private static IEnumerable<Target> GetTargets(MethodInfo[] targetMethods, Type type, MethodInfo setupMethod, MethodInfo cleanupMethod) 
+            => targetMethods
+                .Where(m => m.HasAttribute<BenchmarkAttribute>())
+                .Select(methodInfo => 
+                    CreateTarget(type, setupMethod, methodInfo, cleanupMethod, methodInfo.ResolveAttribute<BenchmarkAttribute>(), targetMethods));
 
         private static Target CreateTarget(Type type, MethodInfo setupMethod, MethodInfo methodInfo, MethodInfo cleanupMethod, BenchmarkAttribute attr, MethodInfo[] targetMethods)
         {

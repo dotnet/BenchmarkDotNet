@@ -12,6 +12,7 @@ namespace BenchmarkDotNet
                 new ResourcesService(), 
                 _ => null,
                 (timeout, codegenMode, logOutput) => new InProcessExecutor(timeout, codegenMode, logOutput),
-                new DotNetStandardWorkarounds());
+                new DotNetStandardWorkarounds(),
+                new BenchmarkConverter());
     }
 }

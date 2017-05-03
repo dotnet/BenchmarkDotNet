@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void FailingConsturctorsAreDiscovered()
         {
-            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(FailingConsturctor))).ToList();
+            var validationErrors = ExecutionValidator.FailOnError.Validate(Running.BenchmarkConverter.TypeToBenchmarks(typeof(FailingConsturctor))).ToList();
 
             Assert.NotEmpty(validationErrors);
             Assert.True(validationErrors.Single().Message.StartsWith("Unable to create instance of FailingConsturctor"));
@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void FailingSetupsAreDiscovered()
         {
-            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(FailingSetup))).ToList();
+            var validationErrors = ExecutionValidator.FailOnError.Validate(Running.BenchmarkConverter.TypeToBenchmarks(typeof(FailingSetup))).ToList();
 
             Assert.NotEmpty(validationErrors);
             Assert.True(validationErrors.Single().Message.StartsWith("Failed to execute [Setup]"));
@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void MultipleSetupsAreDiscovered()
         {
-            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(MultipleSetups))).ToList();
+            var validationErrors = ExecutionValidator.FailOnError.Validate(Running.BenchmarkConverter.TypeToBenchmarks(typeof(MultipleSetups))).ToList();
 
             Assert.NotEmpty(validationErrors);
             Assert.True(validationErrors.Single().Message.StartsWith("Only single [Setup] method is allowed per type"));
@@ -76,7 +76,7 @@ namespace BenchmarkDotNet.Tests
         public void VirtualSetupsAreSupported()
         {
             Assert.False(OverridesSetup.WasCalled);
-            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(OverridesSetup)));
+            var validationErrors = ExecutionValidator.FailOnError.Validate(Running.BenchmarkConverter.TypeToBenchmarks(typeof(OverridesSetup)));
 
             Assert.True(OverridesSetup.WasCalled);
             Assert.Empty(validationErrors);
@@ -108,7 +108,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void NonFailingSetupsAreOmmited()
         {
-            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(SetupThatRequiresParamsToBeSetFirst)));
+            var validationErrors = ExecutionValidator.FailOnError.Validate(Running.BenchmarkConverter.TypeToBenchmarks(typeof(SetupThatRequiresParamsToBeSetFirst)));
 
             Assert.Empty(validationErrors);
         }
@@ -134,7 +134,7 @@ namespace BenchmarkDotNet.Tests
         public void MissingParamsAttributeThatMakesSetupsFailAreDiscovered()
         {
             var validationErrors = ExecutionValidator.FailOnError
-                .Validate(BenchmarkConverter.TypeToBenchmarks(typeof(FailingSetupWhichShouldHaveHadParamsForField)))
+                .Validate(Running.BenchmarkConverter.TypeToBenchmarks(typeof(FailingSetupWhichShouldHaveHadParamsForField)))
                 .ToList();
 
             Assert.NotEmpty(validationErrors);
@@ -161,7 +161,7 @@ namespace BenchmarkDotNet.Tests
         public void NonPublicFieldsWithParamsAreDiscovered()
         {
             var validationErrors = ExecutionValidator.FailOnError
-                .Validate(BenchmarkConverter.TypeToBenchmarks(typeof(NonPublicFieldWithParams)))
+                .Validate(Running.BenchmarkConverter.TypeToBenchmarks(typeof(NonPublicFieldWithParams)))
                 .ToList();
 
             Assert.NotEmpty(validationErrors);
@@ -184,7 +184,7 @@ namespace BenchmarkDotNet.Tests
         public void NonPublicPropertiesWithParamsAreDiscovered()
         {
             Assert.Throws<InvalidOperationException>(
-                () => ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(NonPublicPropertyWithParams))));
+                () => ExecutionValidator.FailOnError.Validate(Running.BenchmarkConverter.TypeToBenchmarks(typeof(NonPublicPropertyWithParams))));
         }
 
         public class NonPublicPropertyWithParams
@@ -201,7 +201,7 @@ namespace BenchmarkDotNet.Tests
         public void PropertyWithoutPublicSetterParamsAreDiscovered()
         {
             Assert.Throws<InvalidOperationException>(
-                () => ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(PropertyWithoutPublicSetterParams))));
+                () => ExecutionValidator.FailOnError.Validate(Running.BenchmarkConverter.TypeToBenchmarks(typeof(PropertyWithoutPublicSetterParams))));
         }
 
         public class PropertyWithoutPublicSetterParams
@@ -217,7 +217,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void FieldsWithoutParamsValuesAreDiscovered()
         {
-            Assert.Empty(BenchmarkConverter.TypeToBenchmarks(typeof(FieldsWithoutParamsValues)));
+            Assert.Empty(Running.BenchmarkConverter.TypeToBenchmarks(typeof(FieldsWithoutParamsValues)));
         }
 
         public class FieldsWithoutParamsValues
@@ -233,7 +233,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void NonFailingBenchmarksAreOmmited()
         {
-            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(NonFailingBenchmark)));
+            var validationErrors = ExecutionValidator.FailOnError.Validate(Running.BenchmarkConverter.TypeToBenchmarks(typeof(NonFailingBenchmark)));
 
             Assert.Empty(validationErrors);
         }
@@ -247,7 +247,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void FailingBenchmarksAreDiscovered()
         {
-            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(FailingBenchmark)));
+            var validationErrors = ExecutionValidator.FailOnError.Validate(Running.BenchmarkConverter.TypeToBenchmarks(typeof(FailingBenchmark)));
 
             Assert.NotEmpty(validationErrors);
         }
@@ -264,7 +264,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void MultipleParamsDoNotMultiplySetup()
         {
-            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(MultipleParamsAndSingleSetup)));
+            var validationErrors = ExecutionValidator.FailOnError.Validate(Running.BenchmarkConverter.TypeToBenchmarks(typeof(MultipleParamsAndSingleSetup)));
 
             Assert.Empty(validationErrors);
         }

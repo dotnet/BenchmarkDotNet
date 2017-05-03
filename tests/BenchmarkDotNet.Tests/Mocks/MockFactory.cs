@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Tests.Mocks
 
         private static Benchmark[] CreateBenchmarks(IConfig config)
         {
-            return BenchmarkConverter.TypeToBenchmarks(typeof(MockBenchmarkClass), config);
+            return Running.BenchmarkConverter.TypeToBenchmarks(typeof(MockBenchmarkClass), config);
         }
 
         private static BenchmarkReport CreateReport(Benchmark benchmark)
