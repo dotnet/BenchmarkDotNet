@@ -2,7 +2,7 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.Core</AssemblyTitle>
-    <TargetFramework>netstandard1.3</TargetFramework>
+    <TargetFrameworks>netstandard1.3;net46</TargetFrameworks>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <AssemblyName>BenchmarkDotNet.Core</AssemblyName>
     <PackageId>BenchmarkDotNet.Core</PackageId>
