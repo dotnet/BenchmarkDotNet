@@ -6,6 +6,7 @@
   </PropertyGroup>
   
   <PropertyGroup>
+    <Description>Internal package, don't install manually</Description>
     <AssemblyTitle>BenchmarkDotNet.Runtime.Classic</AssemblyTitle>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <AssemblyName>BenchmarkDotNet.Runtime.Classic</AssemblyName>

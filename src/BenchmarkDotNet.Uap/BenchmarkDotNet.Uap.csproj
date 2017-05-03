@@ -3,6 +3,7 @@
   <Import Project="..\..\build\common.props" />
   
   <PropertyGroup>
+    <Description>Package with UAP support. Use instead of BenchmarkDotNet package.</Description>
     <AssemblyTitle>BenchmarkDotNet.Uap</AssemblyTitle>
     <TargetFrameworks>netcoreapp1.1;net46;uap10.0</TargetFrameworks>
     <AssemblyName>BenchmarkDotNet.Uap</AssemblyName>
