@@ -124,8 +124,11 @@
     <Reference Include="BenchmarkDotNet">
       <HintPath>$BDNPATH$</HintPath>
     </Reference>
-    <Reference Include="BenchmarkDotNet.Core">
+    <Reference Include="BenchmarkDotNet.Runtime">
       <HintPath>$BDNCOREPATH$</HintPath>
+    </Reference>
+    <Reference Include="BenchmarkDotNet.Runtime.Uap">
+      <HintPath>$BDNRUNTIMEUAPPATH$</HintPath>
     </Reference>
     <Reference Include="$BENCHMARKASSEMLYNAME$">
       <HintPath>$BENCHMARKASSEMLYPATH$</HintPath>

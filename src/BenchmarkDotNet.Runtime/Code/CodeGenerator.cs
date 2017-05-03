@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Code
         {
             var provider = GetDeclarationsProvider(benchmark.Target);
 
-            string text = new SmartStringBuilder(loadTemplateFunc(templateName)).
+            string text = new SmartStringBuilder(loadTemplateFunc(templateName).Replace("$CommonRunnableDefinition$", ResourceHelper.CoreHelper.LoadTemplate("CommonRunnableDefinition.txt"))). // it MUST BE the first inserted thing!
                 Replace("$OperationsPerInvoke$", provider.OperationsPerInvoke).
                 Replace("$TargetTypeNamespace$", provider.TargetTypeNamespace).
                 Replace("$TargetMethodReturnTypeNamespace$", provider.TargetMethodReturnTypeNamespace).

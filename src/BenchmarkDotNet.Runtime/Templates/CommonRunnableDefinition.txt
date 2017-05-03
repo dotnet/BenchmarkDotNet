@@ -1,0 +1,131 @@
+﻿    public class Runnable : global::$TargetTypeName$
+    {
+        public static void Run(IHost host)
+        {
+            Runnable instance = new Runnable();
+            $ParamsContent$
+
+            host.WriteLine();
+            foreach (var infoLine in BenchmarkEnvironmentInfo.GetCurrent().ToFormattedString())
+            {
+                host.WriteLine("// {0}", infoLine);
+            }
+            var job = new Job();
+            $JobSetDefinition$;
+            job.Freeze();
+            host.WriteLine("// Job: {0}", job.DisplayInfo);
+            host.WriteLine();
+
+            var engineParameters = new BenchmarkDotNet.Engines.EngineParameters()
+            {
+                Host = host,
+                MainAction = instance.MainMultiAction,
+                Dummy1Action = instance.Dummy1,
+                Dummy2Action = instance.Dummy2,
+                Dummy3Action = instance.Dummy3,
+                IdleAction = instance.IdleMultiAction,
+                SetupAction = instance.setupAction,
+                CleanupAction = instance.cleanupAction,
+                TargetJob = job,
+                OperationsPerInvoke = $OperationsPerInvoke$
+            };
+
+            var engine = new $EngineFactoryType$().Create(engineParameters);
+
+            engine.PreAllocate();
+
+            instance?.setupAction();
+
+            if (job.ResolveValue(RunMode.RunStrategyCharacteristic, EngineResolver.Instance).NeedsJitting())
+                engine.Jitting(); // does first call to main action, must be executed after setup()!
+            
+            if(host.IsDiagnoserAttached) 
+                host.AfterSetup();
+
+            var results = engine.Run();
+
+            if(host.IsDiagnoserAttached) 
+                host.BeforeCleanup();
+            instance?.cleanupAction();
+
+            host.ReportResults(results); // printing costs memory, do this after runs
+        }
+
+        public Runnable()
+        {
+            setupAction = $SetupMethodName$;
+            cleanupAction = $CleanupMethodName$;
+            idleAction = Idle;
+            mainAction = $TargetMethodDelegate$;
+        }
+
+        private Action setupAction;
+        private Action cleanupAction;
+        private $IdleMethodDelegateType$ idleAction;
+        private $TargetMethodDelegateType$ mainAction;
+
+        private int dummyVar;
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void Dummy1()
+        {
+            dummyVar++;@DummyUnroll@
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void Dummy2()
+        {
+            dummyVar++;@DummyUnroll@
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void Dummy3()
+        {
+            dummyVar++;@DummyUnroll@
+        }
+
+        private $IdleMethodReturnType$ Idle()
+        {
+            $IdleImplementation$
+        }
+
+#if $HasReturnValue$
+
+        private Consumer consumer = new Consumer();
+
+        private void IdleMultiAction(long invokeCount)
+        {
+            for (long i = 0; i < invokeCount; i++)
+            {
+                consumer.Consume(idleAction());@Unroll@
+            }
+        }
+
+        private void MainMultiAction(long invokeCount)
+        {
+            for (long i = 0; i < invokeCount; i++)
+            {
+                consumer.Consume(mainAction());@Unroll@
+            }
+        }
+
+#else
+
+        private void IdleMultiAction(long invokeCount)
+        {
+            for (long i = 0; i < invokeCount; i++)
+            {
+                idleAction();@Unroll@
+            }
+        }
+
+        private void MainMultiAction(long invokeCount)
+        {
+            for (long i = 0; i < invokeCount; i++)
+            {
+                mainAction();@Unroll@
+            }
+        }
+
+#endif
+    }
