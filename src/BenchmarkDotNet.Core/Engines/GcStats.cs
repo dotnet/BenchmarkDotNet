@@ -25,13 +25,20 @@ namespace BenchmarkDotNet.Engines
         public int Gen0Collections { get; }
         public int Gen1Collections { get; }
         public int Gen2Collections { get; }
-        public long AllocatedBytes { get; }
+
+        /// <summary>
+        /// Total per all runs
+        /// </summary>
+        internal long AllocatedBytes { get; }
+
         public long TotalOperations { get; }
 
         public long BytesAllocatedPerOperation 
-            => (long)Math.Round( // let's round it to reduce the side effects of Allocation quantum
-                (double)AllocatedBytes / TotalOperations, 
-                MidpointRounding.ToEven); 
+            => TotalOperations == 0 
+                ? 0 
+                : (long)Math.Round( // let's round it to reduce the side effects of Allocation quantum
+                    (double)AllocatedBytes / TotalOperations, 
+                    MidpointRounding.ToEven); 
 
         public static GcStats operator +(GcStats left, GcStats right)
         {
@@ -108,7 +115,6 @@ namespace BenchmarkDotNet.Engines
 #if CORE
             return getAllocatedBytesForCurrentThread.Invoke();
 #elif CLASSIC
-
             return AppDomain.CurrentDomain.MonitoringTotalAllocatedMemorySize;
 #endif
         }

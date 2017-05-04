@@ -121,6 +121,7 @@ namespace BenchmarkDotNet.Engines
             // we enable monitoring after pilot & warmup, just to ignore the memory allocated by these runs
             EnableMonitoring();
             if(IsDiagnoserAttached) Host.BeforeMainRun();
+            forcedFullGarbageCollections = 0; // zero it in case the Engine instance is reused (InProcessToolchain)
             var initialGcStats = GcStats.ReadInitial(IsDiagnoserAttached);
 
             var main = targetStage.RunMain(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring);
