@@ -45,13 +45,13 @@ echo Building UAP 10.0 libraries
 echo -----------------------------
 
 pushd ..\src
-msbuild /t:Build "BenchmarkDotNet\BenchmarkDotNet.csproj" /p:configuration=Release;TargetFramework=uap10.0
+msbuild /t:Build "BenchmarkDotNet.Runtime.Uap\BenchmarkDotNet.Runtime.Uap.csproj" /p:configuration=Release;TargetFramework=uap10.0
 if NOT %ERRORLEVEL% == 0 (
     echo Build uap10.0 binaries failed
     goto end
 )
 
-SET UAP_BIN=%CD%\BenchmarkDotNet\bin\Release\uap10.0
+SET UAP_BIN=%CD%\BenchmarkDotNet.Runtime.Uap\bin\Release\uap10.0
 popd
 
 echo -----------------------------

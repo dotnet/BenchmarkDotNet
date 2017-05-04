@@ -121,9 +121,6 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="BenchmarkDotNet">
-      <HintPath>$BDNPATH$</HintPath>
-    </Reference>
     <Reference Include="BenchmarkDotNet.Runtime">
       <HintPath>$BDNCOREPATH$</HintPath>
     </Reference>
