@@ -132,7 +132,7 @@ namespace BenchmarkDotNet.Engines
 
             bool removeOutliers = TargetJob.ResolveValue(AccuracyMode.RemoveOutliersCharacteristic, Resolver);
 
-            return new RunResults(idle, main, removeOutliers, workGcHasDone);
+            return new RunResults(idle, main, removeOutliers, workGcHasDone.ExcludeAllocationQuantumSideEffects());
         }
 
         public Measurement RunIteration(IterationData data)

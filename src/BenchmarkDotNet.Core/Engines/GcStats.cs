@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Engines
@@ -7,6 +8,8 @@ namespace BenchmarkDotNet.Engines
     public struct GcStats
     {
         internal const string ResultsLinePrefix = "GC: ";
+
+        private const long AllocationQuantum = 8 * SizeUnit.BytesInKiloByte; // 8kb https://github.com/dotnet/coreclr/blob/master/Documentation/botr/garbage-collection.md
 
         private static readonly Func<long> getAllocatedBytesForCurrentThread = GetAllocatedBytesForCurrentThread();
 
@@ -98,6 +101,16 @@ namespace BenchmarkDotNet.Engines
                 GetAllocatedBytes(isDiagnosticsEnabled), 
                 0);
         }
+
+        public GcStats ExcludeAllocationQuantumSideEffects()
+            => new GcStats(
+                Gen0Collections,
+                Gen1Collections,
+                Gen2Collections,
+                // Allocation quantum was affecting some of our nano-benchmarks in non-deterministic way
+                // when the number of all allocated bytes is less or equal AQ, we ignore it and put 0 to the results
+                AllocatedBytes <= AllocationQuantum ? 0L : AllocatedBytes, 
+                TotalOperations);
 
         public static GcStats FromForced(int forcedFullGarbageCollections)
             => new GcStats(forcedFullGarbageCollections, forcedFullGarbageCollections, forcedFullGarbageCollections, 0, 0);
