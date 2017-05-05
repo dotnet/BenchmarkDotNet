@@ -3,8 +3,10 @@
 namespace BenchmarkDotNet
 {
     // namespace, class name and field name MUST NOT be changed (see ServicesProvider.Load)
-    internal class ServicesProviderContract
+    public class ServicesProviderContract
     {
+        public static void Initialize() => ServicesProvider.Configure(Settings);
+
         internal static readonly Services Settings =
             new Services(
                 new RuntimeInformation(), 

@@ -11,21 +11,25 @@ namespace BenchmarkDotNet.Portability
 {
     internal static class ServicesProvider
     {
+        private static Services configured;
+
         private static readonly Lazy<Services> current = new Lazy<Services>(Load);
 
-        internal static RuntimeInformation RuntimeInformation => current.Value.RuntimeInformation;
+        internal static RuntimeInformation RuntimeInformation => (configured ?? current.Value).RuntimeInformation;
 
-        internal static IDiagnosersLoader DiagnosersLoader => current.Value.DiagnosersLoader;
+        internal static IDiagnosersLoader DiagnosersLoader => (configured ?? current.Value).DiagnosersLoader;
 
-        internal static Func<ILogger, IDisposable> AssemblyResolverFactory => current.Value.AssemblyResolverFactory;
+        internal static Func<ILogger, IDisposable> AssemblyResolverFactory => (configured ?? current.Value).AssemblyResolverFactory;
 
-        internal static IResourcesService ResourcesService => current.Value.ResourcesService;
+        internal static IResourcesService ResourcesService => (configured ?? current.Value).ResourcesService;
 
-        internal static Func<TimeSpan, BenchmarkActionCodegen, bool, IExecutor> InProcessExecutorFactory => current.Value.InProcessExecutorFactory;
+        internal static Func<TimeSpan, BenchmarkActionCodegen, bool, IExecutor> InProcessExecutorFactory => (configured ?? current.Value).InProcessExecutorFactory;
 
-        internal static IDotNetStandardWorkarounds DotNetStandardWorkarounds => current.Value.DotNetStandardWorkarounds;
+        internal static IDotNetStandardWorkarounds DotNetStandardWorkarounds => (configured ?? current.Value).DotNetStandardWorkarounds;
 
-        internal static IBenchmarkConverter BenchmarkCoverter => current.Value.BenchmarkConverter;
+        internal static IBenchmarkConverter BenchmarkCoverter => (configured ?? current.Value).BenchmarkConverter;
+
+        internal static void Configure(Services instance) => configured = instance;
 
         private static Services Load()
         {
