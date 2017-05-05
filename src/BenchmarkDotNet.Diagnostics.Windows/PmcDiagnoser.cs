@@ -200,7 +200,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                    .Select(counter => new PmcColumn(results, counter))
                    .Union(new IColumn[] 
                    {
-                       new MispredictRateColumn(results)
+                       new MispredictRateColumn(results),
+                       new InstructionRetiredPerCycleColumn(results) 
                    })
                    .ToArray());
 
@@ -266,5 +267,37 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     ? (stats.Counters[HardwareCounter.BranchMispredictions].Count / (double)stats.Counters[HardwareCounter.BranchInstructions].Count).ToString(style.PrintUnitsInContent ? "P2" : String.Empty)
                     : "-";
         }
+
+        public class InstructionRetiredPerCycleColumn : IColumn
+        {
+            public InstructionRetiredPerCycleColumn(Dictionary<Benchmark, PmcStats> results)
+            {
+                Results = results;
+            }
+
+            public string ColumnName => "IPC";
+            public string Id => "IPC";
+            public bool IsDefault(Summary summary, Benchmark benchmark) => false;
+            public bool AlwaysShow => false;
+            public ColumnCategory Category => ColumnCategory.Diagnoser;
+            public int PriorityInCategory => 0; // if present should be displayed as the first column (we sort in ascending way)
+            public bool IsNumeric => true;
+            public UnitType UnitType => UnitType.Dimensionless;
+            public string Legend => $"Instruction Retired per Cycle";
+            public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
+
+            private Dictionary<Benchmark, PmcStats> Results { get; }
+
+            public bool IsAvailable(Summary summary)
+                => summary.Config.GetHardwareCounters().Any()
+                    && summary.Config.GetHardwareCounters().Contains(HardwareCounter.InstructionRetired)
+                    && summary.Config.GetHardwareCounters().Contains(HardwareCounter.TotalCycles);
+
+            public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style)
+                => Results.TryGetValue(benchmark, out var stats) && stats.Counters.ContainsKey(HardwareCounter.InstructionRetired) && stats.Counters.ContainsKey(HardwareCounter.TotalCycles)
+                    ? (stats.Counters[HardwareCounter.InstructionRetired].Count / (double)stats.Counters[HardwareCounter.TotalCycles].Count).ToString("{0:N2}")
+                    : "-";
+        }
+
     }
 }
