@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 
@@ -75,6 +76,8 @@ namespace BenchmarkDotNet.Mathematics
 
     public static class ConfidenceLevelExtensions
     {
+        private static readonly Dictionary<ConfidenceLevel, (int value, int digits)> ConfidenceLevelDetails = CreateConfidenceLevelMapping();
+
         /// <summary>
         /// Calculates Z value (z-star) for confidence interval
         /// </summary>
@@ -97,45 +100,22 @@ namespace BenchmarkDotNet.Mathematics
 
         public static double ToPercent(this ConfidenceLevel level)
         {
-            (int value, int digits) = GetDetailsWithoutAllocation(level);
+            (int value, int digits) = ConfidenceLevelDetails[level];
 
             return value / Math.Pow(10, digits);
         }
 
-        private static (int value, int digits) GetDetailsWithoutAllocation(ConfidenceLevel level)
-        {
-            switch (level)
-            {
-                case ConfidenceLevel.L50:
-                    return (50, 2);
-                case ConfidenceLevel.L70:
-                    return (70, 2);
-                case ConfidenceLevel.L75:
-                    return (75, 2);
-                case ConfidenceLevel.L80:
-                    return (80, 2);
-                case ConfidenceLevel.L85:
-                    return (85, 2);
-                case ConfidenceLevel.L90:
-                    return (90, 2);
-                case ConfidenceLevel.L92:
-                    return (92, 2);
-                case ConfidenceLevel.L95:
-                    return (95, 2);
-                case ConfidenceLevel.L96:
-                    return (96, 2);
-                case ConfidenceLevel.L97:
-                    return (97, 2);
-                case ConfidenceLevel.L98:
-                    return (98, 2);
-                case ConfidenceLevel.L99:
-                    return (99, 2);
-                case ConfidenceLevel.L999:
-                    return (999, 3);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(level), level, null);
-            }
-        }
+        private static Dictionary<ConfidenceLevel, (int value, int length)> CreateConfidenceLevelMapping()
+            => Enum.GetValues(typeof(ConfidenceLevel))
+                   .Cast<ConfidenceLevel>()
+                   .ToDictionary(
+                       confidenceLevel => confidenceLevel,
+                       confidenceLevel =>
+                       {
+                           var textRepresentation = confidenceLevel.ToString().Substring(1);
+
+                           return (int.Parse(textRepresentation), textRepresentation.Length);
+                       });
     }
 
     public struct ConfidenceInterval

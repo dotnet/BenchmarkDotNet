@@ -147,7 +147,7 @@ namespace BenchmarkDotNet.IntegrationTests
                         if (toolchain is InProcessToolchain) 
                             continue;
 #endif
-                        Assert.Equal(0, benchmarkReport.GcStats.AllocatedBytes);
+                        Assert.Equal(0, benchmarkReport.GcStats.GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects: true));
                     }
                 }
             }

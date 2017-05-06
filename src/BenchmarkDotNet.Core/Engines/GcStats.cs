@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Engines
@@ -9,9 +8,9 @@ namespace BenchmarkDotNet.Engines
     {
         internal const string ResultsLinePrefix = "GC: ";
 
-        private const long AllocationQuantum = 8 * SizeUnit.BytesInKiloByte; // 8kb https://github.com/dotnet/coreclr/blob/master/Documentation/botr/garbage-collection.md
+        private static readonly long AllocationQuantum = CaluclateAllocationQuantumSize(); 
 
-        private static readonly Func<long> getAllocatedBytesForCurrentThread = GetAllocatedBytesForCurrentThread();
+        private static readonly Func<long> GetAllocatedBytesForCurrentThreadDelegate = GetAllocatedBytesForCurrentThread();
 
         public static readonly GcStats Empty = new GcStats(0, 0, 0, 0, 0);
 
@@ -32,15 +31,15 @@ namespace BenchmarkDotNet.Engines
         /// <summary>
         /// Total per all runs
         /// </summary>
-        internal long AllocatedBytes { get; }
+        private long AllocatedBytes { get; }
 
         public long TotalOperations { get; }
 
         public long BytesAllocatedPerOperation 
-            => TotalOperations == 0 
+            => GetTotalAllocatedBytes(true) == 0 
                 ? 0 
                 : (long)Math.Round( // let's round it to reduce the side effects of Allocation quantum
-                    (double)AllocatedBytes / TotalOperations, 
+                    (double)GetTotalAllocatedBytes(true) / TotalOperations, 
                     MidpointRounding.ToEven); 
 
         public static GcStats operator +(GcStats left, GcStats right)
@@ -76,6 +75,20 @@ namespace BenchmarkDotNet.Engines
             return Gen2Collections;
         }
 
+        /// <summary>
+        /// returns total allocated bytes (not per operation)
+        /// </summary>
+        /// <param name="excludeAllocationQuantumSideEffects">Allocation quantum can affecting some of our nano-benchmarks in non-deterministic way.
+        /// when this parameter is set to true and the number of all allocated bytes is less or equal AQ, we ignore AQ and put 0 to the results</param>
+        /// <returns></returns>
+        public long GetTotalAllocatedBytes(bool excludeAllocationQuantumSideEffects)
+        {
+            if (!excludeAllocationQuantumSideEffects)
+                return AllocatedBytes;
+
+            return AllocatedBytes <= AllocationQuantum ? 0L : AllocatedBytes;
+        }
+
         public static GcStats ReadInitial(bool isDiagnosticsEnabled)
         {
             // this will force GC.Collect, so we want to do this before collecting collections counts
@@ -102,16 +115,6 @@ namespace BenchmarkDotNet.Engines
                 0);
         }
 
-        public GcStats ExcludeAllocationQuantumSideEffects()
-            => new GcStats(
-                Gen0Collections,
-                Gen1Collections,
-                Gen2Collections,
-                // Allocation quantum was affecting some of our nano-benchmarks in non-deterministic way
-                // when the number of all allocated bytes is less or equal AQ, we ignore it and put 0 to the results
-                AllocatedBytes <= AllocationQuantum ? 0L : AllocatedBytes, 
-                TotalOperations);
-
         public static GcStats FromForced(int forcedFullGarbageCollections)
             => new GcStats(forcedFullGarbageCollections, forcedFullGarbageCollections, forcedFullGarbageCollections, 0, 0);
 
@@ -126,7 +129,7 @@ namespace BenchmarkDotNet.Engines
             // so we enforce GC.Collect here just to make sure we get accurate results
             GC.Collect();
 #if CORE
-            return getAllocatedBytesForCurrentThread.Invoke();
+            return GetAllocatedBytesForCurrentThreadDelegate.Invoke();
 #elif CLASSIC
             return AppDomain.CurrentDomain.MonitoringTotalAllocatedMemorySize;
 #endif
@@ -168,5 +171,34 @@ namespace BenchmarkDotNet.Engines
         }
 
         public override string ToString() => ToOutputLine();
+
+        /// <summary>
+        /// code copied from https://github.com/rsdn/CodeJam/blob/71a6542b6e5c52ea8dd92c601adad11e62796a98/PerfTests/src/%5BL4_Configuration%5D/Metrics/%5BMetricValuesProvider%5D/GcMetricValuesProvider.cs#L63-L89
+        /// </summary>
+        /// <returns></returns>
+        private static long CaluclateAllocationQuantumSize()
+        {
+            long result;
+            int retry = 0;
+            do
+            {
+                if (++retry > 10)
+                {
+                    result = 8192; // 8kb https://github.com/dotnet/coreclr/blob/master/Documentation/botr/garbage-collection.md
+                    break;
+                }
+
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+
+                result = GC.GetTotalMemory(false);
+                var tmp = new object();
+                result = GC.GetTotalMemory(false) - result;
+                GC.KeepAlive(tmp);
+            } while (result <= 0);
+
+            return result;
+        }
     }
 }
