@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Exporters.Json
             });
 
             JsonSerialiser.CurrentJsonSerializerStrategy.Indent = IndentJson;
-            logger.Write(JsonSerialiser.SerializeObject(new Dictionary<string, object>
+            logger.WriteLine(JsonSerialiser.SerializeObject(new Dictionary<string, object>
             {
                 { "Title", summary.Title },
                 { "HostEnvironmentInfo", environmentInfo },
