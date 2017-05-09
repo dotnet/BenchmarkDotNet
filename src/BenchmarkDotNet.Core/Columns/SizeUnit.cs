@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Columns
 
         public const long BytesInKiloByte = 1024L; // this value MUST NOT be changed
         public static readonly SizeUnit B = new SizeUnit("B", "Byte", 1L);
-        public static readonly SizeUnit KB = new SizeUnit("kB", "Kilobyte", BytesInKiloByte);
+        public static readonly SizeUnit KB = new SizeUnit("KB", "Kilobyte", BytesInKiloByte);
         public static readonly SizeUnit MB = new SizeUnit("MB", "Megabyte", BytesInKiloByte * BytesInKiloByte);
         public static readonly SizeUnit GB = new SizeUnit("GB", "Gigabyte", BytesInKiloByte * BytesInKiloByte * BytesInKiloByte);
         public static readonly SizeUnit TB = new SizeUnit("TB", "Terabyte", BytesInKiloByte * BytesInKiloByte * BytesInKiloByte * BytesInKiloByte);
