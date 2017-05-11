@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Benchmark]
         public void B()
         {
-            Console.WriteLine($"// {RuntimeInformation.GetCurrentRuntime().GetToolchain()}");
+            Console.WriteLine($"// {ServicesProvider.RuntimeInformation.CurrentRuntime.GetToolchain()}");
         }
     }
 }

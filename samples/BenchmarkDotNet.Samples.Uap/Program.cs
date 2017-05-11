@@ -1,9 +1,8 @@
 ﻿using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Samples.Framework;
-using System;
 using System.Linq;
+using BenchmarkDotNet.Samples.Uap.Framework;
+using BenchmarkDotNet.Uap.Running;
 
 namespace BenchmarkDotNet.Samples.Uap
 {

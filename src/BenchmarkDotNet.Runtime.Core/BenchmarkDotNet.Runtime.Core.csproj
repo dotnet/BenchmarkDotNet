@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Description>Internal package, don't install manually</Description>
+    <AssemblyTitle>BenchmarkDotNet.Runtime.Core</AssemblyTitle>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <AssemblyName>BenchmarkDotNet.Runtime.Core</AssemblyName>
+    <PackageId>BenchmarkDotNet.Runtime.Core</PackageId>
+    <RootNamespace>BenchmarkDotNet</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="1.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BenchmarkDotNet.Runtime\BenchmarkDotNet.Runtime.csproj" />
+  </ItemGroup>
+
+</Project>

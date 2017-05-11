@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
@@ -30,9 +32,9 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
         [PublicAPI]
         protected override void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)
         {
-            var prefix = RuntimeInformation.IsWindows() ? "" : "#!/bin/bash\n";
+            var prefix = ServicesProvider.RuntimeInformation.IsWindows ? "" : "#!/bin/bash\n";
             var list = new List<string>();
-            if (!RuntimeInformation.IsWindows())
+            if (!ServicesProvider.RuntimeInformation.IsWindows)
                 list.Add("mono");
             list.Add("csc");
             list.Add("/noconfig");
@@ -59,7 +61,8 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                     new[]
                     {
                         benchmark.Target.Type.GetTypeInfo().Assembly, // this assembly does not has to have a reference to BenchmarkDotNet (e.g. custom framework for benchmarking that internally uses BenchmarkDotNet
-                        typeof(Benchmark).Assembly, // BenchmarkDotNet.Core
+                        typeof(Benchmark).Assembly, // BenchmarkDotNet.Runtime
+                        typeof(ServicesProviderContract).Assembly, // BenchmarkDotNet.Runtime.Classic
                         typeof(RoslynToolchain).Assembly // BenchmarkDotNet.Toolchains.Roslyn
                     })
                 .Distinct();
@@ -67,9 +70,21 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
 
         private static void DelteIfExists(string filePath)
         {
-            if (File.Exists(filePath))
+            if (!File.Exists(filePath))
+                return;
+
+            int attempt = 0;
+            while (true)
             {
-                File.Delete(filePath);
+                try
+                {
+                    File.Delete(filePath);
+                    return;
+                }
+                catch (Exception) when (attempt++ < 5)
+                {
+                    Thread.Sleep(TimeSpan.FromMilliseconds(1000)); // Previous benchmark run didn't release some files
+                }
             }
         }
     }

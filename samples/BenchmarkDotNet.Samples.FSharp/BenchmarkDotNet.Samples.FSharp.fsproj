@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -51,9 +51,14 @@
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj">
-      <Name>BenchmarkDotNet.Core</Name>
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Runtime\BenchmarkDotNet.Runtime.csproj">
+      <Name>BenchmarkDotNet.Runtime</Name>
       <Project>{95f5d645-19e3-432f-95d4-c5ea374dd15b}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Runtime.Classic\BenchmarkDotNet.Runtime.Classic.csproj">
+      <Name>BenchmarkDotNet.Runtime.Classic</Name>
+      <Project>{90de8af4-e7c2-4191-8371-2ac44f2bd401}</Project>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj">

@@ -2,30 +2,16 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet</AssemblyTitle>
-    <TargetFrameworks>net46;netcoreapp1.1;uap10.0</TargetFrameworks>
+    <TargetFrameworks>net46;netcoreapp1.1;</TargetFrameworks>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <AssemblyName>BenchmarkDotNet</AssemblyName>
     <PackageId>BenchmarkDotNet</PackageId>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">
-    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
-    <NugetTargetMoniker>UAP,Version=v10.0</NugetTargetMoniker>
-    <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.14393.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.14393.0</TargetPlatformMinVersion>
-    <TargetFrameworkIdentifier>.NETCore</TargetFrameworkIdentifier>
-    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
-    <DefineConstants>$(DefineConstants);WINDOWS_UWP;UAP</DefineConstants>
-    <DefaultLanguage>en</DefaultLanguage>
-  </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <ProjectReference Include="..\BenchmarkDotNet.Toolchains.Roslyn\BenchmarkDotNet.Toolchains.Roslyn.csproj" />
+    <ProjectReference Include="..\BenchmarkDotNet.Runtime.Classic\BenchmarkDotNet.Runtime.Classic.csproj" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'uap10.0' ">
-    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="5.3.2" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj" />
-    <ProjectReference Include="..\BenchmarkDotNet.Toolchains.Uap\BenchmarkDotNet.Toolchains.Uap.csproj" />
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
+    <ProjectReference Include="..\BenchmarkDotNet.Runtime.Core\BenchmarkDotNet.Runtime.Core.csproj" />
   </ItemGroup>
 </Project>

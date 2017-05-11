@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  
+  <PropertyGroup>
+    <TargetFramework>net46</TargetFramework>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <Description>Internal package, don't install manually</Description>
+    <AssemblyTitle>BenchmarkDotNet.Runtime.Classic</AssemblyTitle>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <AssemblyName>BenchmarkDotNet.Runtime.Classic</AssemblyName>
+    <PackageId>BenchmarkDotNet.Runtime.Classic</PackageId>
+    <RootNamespace>BenchmarkDotNet</RootNamespace>
+
+    <DefineConstants>$(DefineConstants);CLASSIC</DefineConstants>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="1.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BenchmarkDotNet.Runtime\BenchmarkDotNet.Runtime.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Management" />
+  </ItemGroup>
+
+</Project>

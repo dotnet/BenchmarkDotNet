@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 config = config.With(DefaultColumnProviders.Instance);
 
             // Make sure we ALWAYS combine the Config (default or passed in) with any Config applied to the Type/Class
-            var summary = BenchmarkRunner.Run(type, BenchmarkConverter.GetFullConfig(type, config));
+            var summary = BenchmarkRunner.Run(type, Running.BenchmarkConverter.GetFullConfig(type, config));
 
             if (fullValidation)
             {
