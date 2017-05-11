@@ -11,27 +11,22 @@ namespace BenchmarkDotNet.Portability
 {
     internal static class ServicesProvider
     {
-        private static Services configured;
+        private static readonly Lazy<ServicesContainer> current = new Lazy<ServicesContainer>(Load);
+        private static ServicesContainer configured;
 
-        private static readonly Lazy<Services> current = new Lazy<Services>(Load);
+        internal static RuntimeInformation RuntimeInformation => (configured ?? current.Value).Resolve<RuntimeInformation>();
+        internal static IDiagnosersLoader DiagnosersLoader => (configured ?? current.Value).Resolve<IDiagnosersLoader>();
+        internal static Func<ILogger, IDisposable> AssemblyResolverFactory => (configured ?? current.Value).Resolve<Func<ILogger, IDisposable>>();
+        internal static IResourcesService ResourcesService => (configured ?? current.Value).Resolve<IResourcesService>();
+        internal static Func<TimeSpan, BenchmarkActionCodegen, bool, IExecutor> InProcessExecutorFactory => (configured ?? current.Value).Resolve<Func<TimeSpan, BenchmarkActionCodegen, bool, IExecutor>>();
+        internal static IDotNetStandardWorkarounds DotNetStandardWorkarounds => (configured ?? current.Value).Resolve<IDotNetStandardWorkarounds>();
+        internal static IBenchmarkConverter BenchmarkCoverter => (configured ?? current.Value).Resolve<IBenchmarkConverter>();
 
-        internal static RuntimeInformation RuntimeInformation => (configured ?? current.Value).RuntimeInformation;
+        internal static void Configure(ServicesContainer instance) => configured = instance;
 
-        internal static IDiagnosersLoader DiagnosersLoader => (configured ?? current.Value).DiagnosersLoader;
+        internal static T Resolve<T>() => (configured ?? current.Value).Resolve<T>();
 
-        internal static Func<ILogger, IDisposable> AssemblyResolverFactory => (configured ?? current.Value).AssemblyResolverFactory;
-
-        internal static IResourcesService ResourcesService => (configured ?? current.Value).ResourcesService;
-
-        internal static Func<TimeSpan, BenchmarkActionCodegen, bool, IExecutor> InProcessExecutorFactory => (configured ?? current.Value).InProcessExecutorFactory;
-
-        internal static IDotNetStandardWorkarounds DotNetStandardWorkarounds => (configured ?? current.Value).DotNetStandardWorkarounds;
-
-        internal static IBenchmarkConverter BenchmarkCoverter => (configured ?? current.Value).BenchmarkConverter;
-
-        internal static void Configure(Services instance) => configured = instance;
-
-        private static Services Load()
+        private static ServicesContainer Load()
         {
             var typeInfo = typeof(ServicesProvider).GetTypeInfo();
 
@@ -49,7 +44,7 @@ namespace BenchmarkDotNet.Portability
 
             var settingsField = runtimeSpecificImplementation.GetRuntimeFields().Single(field => field.IsStatic && field.Name == "Settings");
 
-            return (Services)settingsField.GetValue(null);
+            return (ServicesContainer)settingsField.GetValue(null);
         }
 
         private static TProperty ReadProperty<TType, TProperty>(this TType instance, string propertyName)
@@ -60,31 +55,22 @@ namespace BenchmarkDotNet.Portability
         }
     }
 
-    internal class Services
+    internal class ServicesContainer
     {
-        internal Services(RuntimeInformation runtimeInformation, IDiagnosersLoader diagnosersLoader, IResourcesService resourcesService, Func<ILogger, IDisposable> assemblyResolverFactory, Func<TimeSpan, BenchmarkActionCodegen, bool, IExecutor> inProcessExecutorFactory, IDotNetStandardWorkarounds dotNetStandardWorkarounds, IBenchmarkConverter benchmarkConverter)
+        private readonly object[] services;
+
+        internal ServicesContainer(params object[] services)
         {
-            RuntimeInformation = runtimeInformation;
-            DiagnosersLoader = diagnosersLoader;
-            ResourcesService = resourcesService;
-            AssemblyResolverFactory = assemblyResolverFactory;
-            InProcessExecutorFactory = inProcessExecutorFactory;
-            DotNetStandardWorkarounds = dotNetStandardWorkarounds;
-            BenchmarkConverter = benchmarkConverter;
+            this.services = services;
         }
 
-        internal RuntimeInformation RuntimeInformation { get; }
+        internal T Resolve<T>()
+        {
+            var found = services.SingleOrDefault(service => service is T);
 
-        internal IDiagnosersLoader DiagnosersLoader { get; }
-
-        internal IResourcesService ResourcesService { get; }
-
-        internal Func<ILogger, IDisposable> AssemblyResolverFactory { get; }
-
-        internal Func<TimeSpan, BenchmarkActionCodegen, bool, IExecutor> InProcessExecutorFactory { get; }
-
-        internal IDotNetStandardWorkarounds DotNetStandardWorkarounds { get; }
-
-        internal IBenchmarkConverter BenchmarkConverter { get; }
+            return found == default(object) 
+                ? default(T)
+                : (T)found;
+        } 
     }
 }

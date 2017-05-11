@@ -1,7 +1,10 @@
 using System;
 using BenchmarkDotNet.Full;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mono;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.InProcess;
 
 namespace BenchmarkDotNet
 {
@@ -10,22 +13,22 @@ namespace BenchmarkDotNet
     {
         public static void Initialize() => ServicesProvider.Configure(Settings);
 
-        internal static readonly Services Settings =
+        internal static readonly ServicesContainer Settings =
             Type.GetType("Mono.Runtime") != null
-                ? new Services(
+                ? new ServicesContainer(
                     new MonoRuntimeInformation(),
                     new MonoDiagnosersLoader(),
                     new MonoResourcesService(),
-                    _ => null,
-                    (timeout, codegenMode, logOutput) => new InProcessExecutor(timeout, codegenMode, logOutput),
+                    (Func<ILogger, IDisposable>)(_ => null),
+                    (Func<TimeSpan, BenchmarkActionCodegen, bool, IExecutor>)((timeout, codegenMode, logOutput) => new InProcessExecutor(timeout, codegenMode, logOutput)),
                     new DotNetStandardWorkarounds(),
                     new BenchmarkConverter())
-                : new Services(
+                : new ServicesContainer(
                     new ClassicRuntimeInformation(),
                     new ClassicDiagnosersLoader(),
                     new ClassicResourcesService(),
-                    DirtyAssemblyResolveHelper.Create,
-                    (timeout, codegenMode, logOutput) => new InProcessExecutor(timeout, codegenMode, logOutput),
+                    (Func<ILogger, IDisposable>)DirtyAssemblyResolveHelper.Create,
+                    (Func<TimeSpan, BenchmarkActionCodegen, bool, IExecutor>)((timeout, codegenMode, logOutput) => new InProcessExecutor(timeout, codegenMode, logOutput)),
                     new DotNetStandardWorkarounds(),
                     new BenchmarkConverter());
     }
