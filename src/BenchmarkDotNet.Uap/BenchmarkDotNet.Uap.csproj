@@ -9,6 +9,7 @@
     <AssemblyName>BenchmarkDotNet.Uap</AssemblyName>
     <PackageId>BenchmarkDotNet.Uap</PackageId>
     <CLSCompliant>true</CLSCompliant>
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

@@ -26,7 +26,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\BenchmarkDotNet.Runtime.Classic\InProcessExecutor.cs" Link="InProcessExecutor.cs" />
     <Compile Include="..\BenchmarkDotNet.Runtime.Core\BenchmarkConverter.cs" Link="BenchmarkConverter.cs" />
   </ItemGroup>
 

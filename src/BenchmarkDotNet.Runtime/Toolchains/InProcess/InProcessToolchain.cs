@@ -1,7 +1,6 @@
 ﻿using System;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
@@ -14,9 +13,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
     [PublicAPI]
     public sealed class InProcessToolchain : IToolchain
     {
-        /// <summary> Default timeout for in-process benchmarks. </summary>
-        public static readonly TimeSpan DefaultTimeout = TimeSpan.FromMinutes(5);
-
         /// <summary>The default toolchain instance.</summary>
         public static readonly IToolchain Instance = new InProcessToolchain(true);
 
@@ -26,7 +22,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <summary>Initializes a new instance of the <see cref="InProcessToolchain" /> class.</summary>
         /// <param name="logOutput"><c>true</c> if the output should be logged.</param>
         public InProcessToolchain(bool logOutput) : this(
-            DefaultTimeout,
+            InProcessExecutor.DefaultTimeout,
             BenchmarkActionCodegen.ReflectionEmit,
             logOutput)
         {
@@ -40,7 +36,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         {
             Generator = new InProcessGenerator();
             Builder = new InProcessBuilder();
-            Executor = ServicesProvider.InProcessExecutorFactory(timeout, codegenMode, logOutput);
+            Executor = new InProcessExecutor(timeout, codegenMode, logOutput);
         }
 
         /// <summary>Determines whether the specified benchmark is supported.</summary>
@@ -48,8 +44,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <param name="logger">The logger.</param>
         /// <param name="resolver">The resolver.</param>
         /// <returns><c>true</c> if the benchmark can be run with the toolchain.</returns>
-        public bool IsSupported(Benchmark benchmark, ILogger logger, IResolver resolver) =>
-            InProcessValidator.IsSupported(benchmark, logger);
+        public bool IsSupported(Benchmark benchmark, ILogger logger, IResolver resolver) 
+            => InProcessValidator.IsSupported(benchmark, logger);
 
         /// <summary>Name of the toolchain.</summary>
         /// <value>The name of the toolchain.</value>

@@ -10,18 +10,14 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.InProcess;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 
-namespace BenchmarkDotNet
+namespace BenchmarkDotNet.Toolchains.InProcess
 {
-    /*
-    * CAUTION: this file is referenced as link in multiple projects just to avoid copying of the code
-    */
     /// <summary>
     /// Implementation of <see cref="IExecutor" /> for in-process benchmarks.
     /// </summary>
@@ -29,7 +25,11 @@ namespace BenchmarkDotNet
     [SuppressMessage("ReSharper", "ArrangeBraces_using")]
     public class InProcessExecutor : IExecutor
     {
+        /// <summary> Default timeout for in-process benchmarks. </summary>
+        public static readonly TimeSpan DefaultTimeout = TimeSpan.FromMinutes(5);
+
         private static readonly TimeSpan UnderDebuggerTimeout = TimeSpan.FromDays(1);
+        private readonly IDotNetStandardWorkarounds dotNetStandardWorkarounds;
 
         /// <summary>Initializes a new instance of the <see cref="InProcessExecutor" /> class.</summary>
         /// <param name="timeout">Timeout for the run.</param>
@@ -38,11 +38,12 @@ namespace BenchmarkDotNet
         public InProcessExecutor(TimeSpan timeout, BenchmarkActionCodegen codegenMode, bool logOutput)
         {
             if (timeout == TimeSpan.Zero)
-                timeout = InProcessToolchain.DefaultTimeout;
+                timeout = DefaultTimeout;
 
             ExecutionTimeout = timeout;
             CodegenMode = codegenMode;
             LogOutput = logOutput;
+            dotNetStandardWorkarounds = ServicesProvider.DotNetStandardWorkarounds;
         }
 
         /// <summary>Timeout for the run.</summary>
@@ -67,12 +68,7 @@ namespace BenchmarkDotNet
             int exitCode = -1;
             var runThread = new Thread(() => exitCode = ExecuteCore(host, executeParameters.Benchmark, executeParameters.Logger));
 
-#if CLASSIC
-            if (executeParameters.Benchmark.Target.Method.GetCustomAttributes<STAThreadAttribute>(false).Any())
-            {
-                runThread.SetApartmentState(ApartmentState.STA);
-            }
-#endif 
+            dotNetStandardWorkarounds.SetApartmentState(runThread, executeParameters.Benchmark);
             runThread.IsBackground = true;
 
             var timeout = HostEnvironmentInfo.GetCurrent().HasAttachedDebugger ? UnderDebuggerTimeout : ExecutionTimeout;
@@ -93,18 +89,17 @@ namespace BenchmarkDotNet
             var process = Process.GetCurrentProcess();
             var oldPriority = process.PriorityClass;
             var oldAffinity = process.ProcessorAffinity;
-#if CLASSIC
-            var thread = Thread.CurrentThread;
-            var oldThreadPriority = thread.Priority;
-#endif
+
+            var thread = dotNetStandardWorkarounds.CurrentThread;
+            var oldThreadPriority = dotNetStandardWorkarounds.GetPriority(thread);
 
             var affinity = benchmark.Job.ResolveValueAsNullable(EnvMode.AffinityCharacteristic);
             try
             {
                 ProcessExtensions.TrySetPriority(process, ProcessPriorityClass.High, logger);
-#if CLASSIC
-                thread.TrySetPriority(ThreadPriority.Highest, logger);
-#endif
+
+                dotNetStandardWorkarounds.SetPriority(thread, dotNetStandardWorkarounds.ThreadPriorityHighest, logger);
+
                 if (affinity != null)
                 {
                     ProcessExtensions.TrySetAffinity(process, affinity.Value, logger);
@@ -119,9 +114,9 @@ namespace BenchmarkDotNet
             finally
             {
                 ProcessExtensions.TrySetPriority(process, oldPriority, logger);
-#if CLASSIC
-                thread.TrySetPriority(oldThreadPriority, logger);
-#endif
+
+                dotNetStandardWorkarounds.SetPriority(thread, oldThreadPriority, logger);
+
                 if (affinity != null)
                 {
                     ProcessExtensions.EnsureProcessorAffinity(process, oldAffinity);

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Threading;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -9,13 +8,13 @@ namespace BenchmarkDotNet
 {
     internal class DotNetStandardWorkarounds : IDotNetStandardWorkarounds
     {
-        public Thread CurrentThread => default(Thread);
+        public Thread CurrentThread => Thread.CurrentThread;
 
         public int ThreadPriorityHighest => default(int);
 
-        public string GetLocation(Assembly assembly) => string.Empty;
+        public string GetLocation(Assembly assembly) => assembly.Location;
 
-        public AssemblyName[] GetReferencedAssemblies(Assembly assembly) => Array.Empty<AssemblyName>();
+        public AssemblyName[] GetReferencedAssemblies(Assembly assembly) => assembly.GetReferencedAssemblies();
 
         public int GetPriority(Thread thread) => default(int);
 

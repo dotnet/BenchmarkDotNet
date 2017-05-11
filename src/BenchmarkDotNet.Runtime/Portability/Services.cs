@@ -4,8 +4,6 @@ using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.InProcess;
 
 namespace BenchmarkDotNet.Portability
 {
@@ -18,7 +16,6 @@ namespace BenchmarkDotNet.Portability
         internal static IDiagnosersLoader DiagnosersLoader => (configured ?? current.Value).Resolve<IDiagnosersLoader>();
         internal static Func<ILogger, IDisposable> AssemblyResolverFactory => (configured ?? current.Value).Resolve<Func<ILogger, IDisposable>>();
         internal static IResourcesService ResourcesService => (configured ?? current.Value).Resolve<IResourcesService>();
-        internal static Func<TimeSpan, BenchmarkActionCodegen, bool, IExecutor> InProcessExecutorFactory => (configured ?? current.Value).Resolve<Func<TimeSpan, BenchmarkActionCodegen, bool, IExecutor>>();
         internal static IDotNetStandardWorkarounds DotNetStandardWorkarounds => (configured ?? current.Value).Resolve<IDotNetStandardWorkarounds>();
         internal static IBenchmarkConverter BenchmarkCoverter => (configured ?? current.Value).Resolve<IBenchmarkConverter>();
 

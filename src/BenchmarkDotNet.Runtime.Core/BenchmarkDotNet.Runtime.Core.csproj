@@ -15,11 +15,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\BenchmarkDotNet.Runtime.Classic\DotNetStandardWorkarounds.cs" Link="DotNetStandardWorkarounds.cs" />
-    <Compile Include="..\BenchmarkDotNet.Runtime.Classic\InProcessExecutor.cs" Link="InProcessExecutor.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="1.1.1" />
   </ItemGroup>
 

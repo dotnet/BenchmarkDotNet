@@ -3,8 +3,6 @@ using BenchmarkDotNet.Full;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mono;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.InProcess;
 
 namespace BenchmarkDotNet
 {
@@ -20,7 +18,6 @@ namespace BenchmarkDotNet
                     new MonoDiagnosersLoader(),
                     new MonoResourcesService(),
                     (Func<ILogger, IDisposable>)(_ => null),
-                    (Func<TimeSpan, BenchmarkActionCodegen, bool, IExecutor>)((timeout, codegenMode, logOutput) => new InProcessExecutor(timeout, codegenMode, logOutput)),
                     new DotNetStandardWorkarounds(),
                     new BenchmarkConverter())
                 : new ServicesContainer(
@@ -28,7 +25,6 @@ namespace BenchmarkDotNet
                     new ClassicDiagnosersLoader(),
                     new ClassicResourcesService(),
                     (Func<ILogger, IDisposable>)DirtyAssemblyResolveHelper.Create,
-                    (Func<TimeSpan, BenchmarkActionCodegen, bool, IExecutor>)((timeout, codegenMode, logOutput) => new InProcessExecutor(timeout, codegenMode, logOutput)),
                     new DotNetStandardWorkarounds(),
                     new BenchmarkConverter());
     }
