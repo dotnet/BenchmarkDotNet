@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Running
@@ -58,5 +59,7 @@ namespace BenchmarkDotNet.Running
                 ? "'" + description + "'"
                 : description;
         }
+
+        public bool HasCategory(string category) => Categories.Any(c => c.EqualsWithIgnoreCase(category));
     }
 }

@@ -67,3 +67,11 @@ public class IntroCategories
     public void B2() => Thread.Sleep(10);
 }
 ```
+
+Command line examples:
+
+```
+--category=A
+--allCategories=A,B
+--anyCategories=A,B
+```

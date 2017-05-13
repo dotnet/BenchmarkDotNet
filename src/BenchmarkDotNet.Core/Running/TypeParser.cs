@@ -88,7 +88,7 @@ namespace BenchmarkDotNet.Running
                 var allBenchmarks = typeInfo.GetBenchmarks();
                 var benchmarks = allBenchmarks
                     .Where(method => filters.methodPredicates.All(rule => rule(method)))
-                    .ToArray();
+                    .ToArray();                               
 
                 if (benchmarks.IsEmpty())
                     continue;
