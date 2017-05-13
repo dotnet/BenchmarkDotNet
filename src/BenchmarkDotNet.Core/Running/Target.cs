@@ -39,7 +39,6 @@ namespace BenchmarkDotNet.Running
         {
             Type = type;
             Method = method;
-            Categories = categories;
             SetupMethod = setupMethod;
             CleanupMethod = cleanupMethod;
             OperationsPerInvoke = operationsPerInvoke;

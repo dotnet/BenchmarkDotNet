@@ -154,7 +154,7 @@ namespace BenchmarkDotNet.Running
             }
             if (attributes.Count == 0)
                 return Array.Empty<string>();
-            return attributes.SelectMany(attr => attr.Categories).ToArray();
+            return attributes.SelectMany(attr => attr.Categories).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
         }
 
         private static Benchmark[] GetFilteredBenchmarks(IList<Benchmark> benchmarks, IList<IFilter> filters)

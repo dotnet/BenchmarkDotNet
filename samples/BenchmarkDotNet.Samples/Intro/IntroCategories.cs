@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Samples.Intro
 {
     [DryJob]
     [CategoriesColumn]
-    [BenchmarkCategory("Aswesome")]
+    [BenchmarkCategory("Awesome")]
     [AnyCategoriesFilter("A", "1")]
     public class IntroCategories
     {
