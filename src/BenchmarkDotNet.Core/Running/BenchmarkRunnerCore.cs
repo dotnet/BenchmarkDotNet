@@ -44,9 +44,6 @@ namespace BenchmarkDotNet.Running
                 var logger = new CompositeLogger(config.GetCompositeLogger(), new StreamLogger(logStreamWriter));
                 benchmarks = GetSupportedBenchmarks(benchmarks, logger, toolchainProvider, resolver);
 
-                var filters = config.GetFilters().ToList();
-                benchmarks = GetFilteredBenchmarks(benchmarks, filters);
-
                 return Run(benchmarks, logger, title, config, rootArtifactsFolderPath, toolchainProvider, resolver);
             }
         }
@@ -330,11 +327,6 @@ namespace BenchmarkDotNet.Running
         private static Benchmark[] GetSupportedBenchmarks(IList<Benchmark> benchmarks, CompositeLogger logger, Func<Job, IToolchain> toolchainProvider, IResolver resolver)
         {
             return benchmarks.Where(benchmark => toolchainProvider(benchmark.Job).IsSupported(benchmark, logger, resolver)).ToArray();
-        }
-
-        private static Benchmark[] GetFilteredBenchmarks(IList<Benchmark> benchmarks, IList<IFilter> filters)
-        {
-            return benchmarks.Where(benchmark => filters.All(filter => filter.Predicate(benchmark))).ToArray();
         }
 
         private static string GetRootArtifactsFolderPath() => CombineAndCreate(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");

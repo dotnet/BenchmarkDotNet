@@ -5,6 +5,7 @@ using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Parameters;
@@ -42,6 +43,9 @@ namespace BenchmarkDotNet.Running
                 from job in jobs
                 from parameterInstance in parameterInstancesList
                 select new Benchmark(target, job, parameterInstance)).ToArray();
+            
+            var filters = config.GetFilters().ToList();
+            benchmarks = GetFilteredBenchmarks(benchmarks, filters);
 
             var orderProvider = config?.GetOrderProvider() ?? DefaultOrderProvider.Instance;
             return orderProvider.GetExecutionOrder(benchmarks).ToArray();
@@ -151,7 +155,12 @@ namespace BenchmarkDotNet.Running
             if (attributes.Count == 0)
                 return Array.Empty<string>();
             return attributes.SelectMany(attr => attr.Categories).ToArray();
-        } 
+        }
+
+        private static Benchmark[] GetFilteredBenchmarks(IList<Benchmark> benchmarks, IList<IFilter> filters)
+        {
+            return benchmarks.Where(benchmark => filters.All(filter => filter.Predicate(benchmark))).ToArray();
+        }
 
         private static void AssertMethodHasCorrectSignature(string methodType, MethodInfo methodInfo)
         {

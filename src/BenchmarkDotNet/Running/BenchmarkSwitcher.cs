@@ -8,6 +8,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Properties;
 
@@ -41,6 +42,11 @@ namespace BenchmarkDotNet.Running
         /// Run all available benchmarks.
         /// </summary>
         public IEnumerable<Summary> RunAll() => Run(new[] { "*" });
+        
+        /// <summary>
+        /// Run all available benchmarks and join them to a single summary
+        /// </summary>
+        public Summary RunAllJoined() => Run(new[] { "* --join" }).Single();
 
         public IEnumerable<Summary> Run(string[] args = null, IConfig config = null)
         {
@@ -59,16 +65,29 @@ namespace BenchmarkDotNet.Running
                 return Enumerable.Empty<Summary>();
             }
             
-            config = ManualConfig.Union(config ?? DefaultConfig.Instance, ManualConfig.Parse(args));
+            var effectiveConfig = ManualConfig.Union(config ?? DefaultConfig.Instance, ManualConfig.Parse(args));
+            bool join = args.Any(arg => arg.EqualsWithIgnoreCase("--join"));
 
-            foreach (var typeWithMethods in typeParser.MatchingTypesWithMethods(args))
+            if (join)
             {
-                logger.WriteLineHeader("Target type: " + typeWithMethods.Type.Name);
-                if (typeWithMethods.AllMethodsInType)
-                    summaries.Add(BenchmarkRunner.Run(typeWithMethods.Type, config));
-                else
-                    summaries.Add(BenchmarkRunner.Run(typeWithMethods.Type, typeWithMethods.Methods, config));
-                logger.WriteLine();
+                var typesWithMethods = typeParser.MatchingTypesWithMethods(args);
+                var benchmarks = typesWithMethods.SelectMany(typeWithMethods => 
+                    typeWithMethods.AllMethodsInType 
+                        ? BenchmarkConverter.TypeToBenchmarks(typeWithMethods.Type, effectiveConfig) 
+                        : BenchmarkConverter.MethodsToBenchmarks(typeWithMethods.Type, typeWithMethods.Methods, effectiveConfig)).ToArray();
+                summaries.Add(BenchmarkRunner.Run(benchmarks, effectiveConfig));
+            }
+            else
+            {
+                foreach (var typeWithMethods in typeParser.MatchingTypesWithMethods(args))
+                {
+                    logger.WriteLineHeader("Target type: " + typeWithMethods.Type.Name);
+                    if (typeWithMethods.AllMethodsInType)
+                        summaries.Add(BenchmarkRunner.Run(typeWithMethods.Type, effectiveConfig));
+                    else
+                        summaries.Add(BenchmarkRunner.Run(typeWithMethods.Type, typeWithMethods.Methods, effectiveConfig));
+                    logger.WriteLine();
+                }
             }
 
             // TODO: move this logic to the RunUrl method
@@ -78,7 +97,7 @@ namespace BenchmarkDotNet.Running
                 var url = args[0];
                 Uri uri = new Uri(url);
                 var name = uri.IsFile ? Path.GetFileName(uri.LocalPath) : "URL";
-                summaries.Add(BenchmarkRunner.RunUrl(url, config));
+                summaries.Add(BenchmarkRunner.RunUrl(url, effectiveConfig));
             }
 #endif
 

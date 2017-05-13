@@ -4,6 +4,7 @@ Sometimes you don't want to run all of your benchmarks.
 In this case, you can *filter* some of them with the help of *filters*.
 
 Predefined filters:
+
 * `SimpleFilter`
 * `NameFilter`
 * `DisjunctionFilter`
@@ -74,4 +75,10 @@ Command line examples:
 --category=A
 --allCategories=A,B
 --anyCategories=A,B
+```
+
+If you are using `BenchmarkSwitcher` and want to run all the benchmarks with a category from all types and join them into one summary table, use the `--join` option (or `BenchmarkSwitcher.RunAllJoined`):
+
+```
+* --join --category=MyAwesomeCategory
 ```
