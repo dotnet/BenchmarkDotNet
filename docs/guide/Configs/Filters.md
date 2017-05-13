@@ -2,8 +2,16 @@
 
 Sometimes you don't want to run all of your benchmarks.
 In this case, you can *filter* some of them with the help of *filters*.
-An example:
 
+Predefined filters:
+* `SimpleFilter`
+* `NameFilter`
+* `DisjunctionFilter`
+* `CategoryFilter`
+* `AnyCategoriesFilter`
+* `AllCategoriesFilter`
+
+Usage examples:
 
 ```cs
 [Config(typeof(Config))]
@@ -32,5 +40,30 @@ public class IntroFilters
     [Benchmark] public void C2() => Thread.Sleep(10);
     [Benchmark] public void C3() => Thread.Sleep(10);
     [Benchmark] public void Aaa() => Thread.Sleep(10);
+}
+```
+
+```cs
+[DryJob]
+[CategoriesColumn]
+[BenchmarkCategory("Aswesome")]
+[AnyCategoriesFilter("A", "1")]
+public class IntroCategories
+{
+    [Benchmark]
+    [BenchmarkCategory("A", "1")]
+    public void A1() => Thread.Sleep(10); // Will be benchmarked
+    
+    [Benchmark]
+    [BenchmarkCategory("A", "2")]
+    public void A2() => Thread.Sleep(10); // Will be benchmarked
+
+    [Benchmark]
+    [BenchmarkCategory("B", "1")]
+    public void B1() => Thread.Sleep(10); // Will be benchmarked
+    
+    [Benchmark]
+    [BenchmarkCategory("B", "2")]
+    public void B2() => Thread.Sleep(10);
 }
 ```
