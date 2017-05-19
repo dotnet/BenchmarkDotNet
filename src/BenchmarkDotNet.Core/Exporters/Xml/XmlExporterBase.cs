@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Exporters.Xml
                 xml = textWriter.ToString();
             }
 
-            logger.Write(xml);
+            logger.WriteLine(xml);
         }
     }
 
