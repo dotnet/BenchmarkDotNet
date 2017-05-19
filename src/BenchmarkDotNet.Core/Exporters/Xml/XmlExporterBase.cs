@@ -1,4 +1,6 @@
-﻿using System.Xml;
+﻿using System.IO;
+using System.Text;
+using System.Xml;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
@@ -23,7 +25,25 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
-            
+            string xml;
+
+            var serializer = new XmlSerializer(typeof(SummaryDto));
+            using (var textWriter = new Utf8StringWriter())
+            {
+                using (var writer = XmlWriter.Create(textWriter, settings))
+                {
+                    serializer.Serialize(writer, new SummaryDto(summary));
+                }
+
+                xml = textWriter.ToString();
+            }
+
+            logger.Write(xml);
         }
+    }
+
+    public class Utf8StringWriter : StringWriter
+    {
+        public override Encoding Encoding => Encoding.UTF8;
     }
 }
