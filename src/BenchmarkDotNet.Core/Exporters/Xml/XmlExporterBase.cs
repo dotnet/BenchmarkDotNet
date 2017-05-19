@@ -27,7 +27,13 @@ namespace BenchmarkDotNet.Exporters.Xml
         {
             string xml;
 
-            var serializer = new XmlSerializer(typeof(SummaryDto));
+            var serializer = new XmlSerializer(typeof(SummaryDto))
+                                    .WithRootName(nameof(Summary))
+                                    .WithCollectionItemName(typeof(Measurement),
+                                                            nameof(Measurement))
+                                    .WithCollectionItemName(typeof(BenchmarkReportDto),
+                                                            nameof(BenchmarkReport.Benchmark));
+
             using (var textWriter = new Utf8StringWriter())
             {
                 using (var writer = XmlWriter.Create(textWriter, settings))

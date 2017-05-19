@@ -5,131 +5,156 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
-using BenchmarkDotNet.Mathematics;
-using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Exporters.Xml
 {
     public class XmlSerializer
     {
         private readonly Type type;
+        private XmlWriter writer;
+        private Dictionary<Type, string> itemNames = new Dictionary<Type, string>();
+        private string rootName;
 
         public XmlSerializer(Type type)
         {
             this.type = type;
+            rootName = type.Name;
         }
 
-        public void Serialize(XmlWriter writer, SummaryDto summary)
+        public XmlSerializer WithRootName(string rootName)
         {
+            this.rootName = rootName;
+            return this;
+        }
+
+        public XmlSerializer WithCollectionItemName(Type type, string name)
+        {
+            itemNames.Add(type, name);
+            return this;
+        }
+
+        public void Serialize(XmlWriter writer, object source)
+        {
+            this.writer = writer;
+
             writer.WriteStartDocument();
 
-            WriteSummary(writer, summary);
+            WriteRoot(source, rootName);
 
             writer.WriteEndDocument();
         }
 
-        private void WriteSummary(XmlWriter writer, SummaryDto summary)
+        private void WriteProperty(object source, PropertyInfo property)
         {
-            writer.WriteStartElement(nameof(Summary));
-            writer.WriteElementString(nameof(Summary.Title), summary.Title.ToString());
+            if (source == null)
+                return;
 
-            WriteHostEnvironmentInfo(writer, summary.HostEnvironmentInfo);
-            WriteBenchmarks(writer, summary.Benchmarks);
-
-            writer.WriteEndElement();
-        }
-        
-        private void WriteHostEnvironmentInfo(XmlWriter writer,
-                                              HostEnvironmentInfoDto hei)
-        {
-            writer.WriteStartElement(nameof(Summary.HostEnvironmentInfo));
-
-            foreach (PropertyInfo property in hei.GetType().GetProperties())
+            if (IsSimple(property.PropertyType.GetTypeInfo()))
             {
-                if(property.PropertyType == typeof(ChronometerDto))
-                {
-                    writer.WriteStartElement(nameof(hei.ChronometerFrequency));
-                    writer.WriteElementString(nameof(ChronometerDto.Hertz),
-                        hei.ChronometerFrequency.Hertz.ToString(CultureInfo.InvariantCulture));
-                    writer.WriteEndElement();
-                }
-                else
-                {
-                    writer.WriteElementString(property.Name, 
-                        string.Format(CultureInfo.InvariantCulture, "{0}", property.GetValue(hei)));
-                }
+                WriteSimpleProperty(source, property);
+            }
+            else if (IsCollection(property))
+            {
+                WriteCollectionProperty(source, property);
+            }
+            else
+            {
+                WriteComplexProperty(property.GetValue(source), property);
+            }
+        }
+
+        private void WriteSimpleProperty(object source, PropertyInfo property)
+        {
+            string value = string.Format(
+                CultureInfo.InvariantCulture, "{0}", property.GetValue(source));
+
+            if (!string.IsNullOrEmpty(value))
+            {
+                writer.WriteElementString(property.Name, value);
+            }
+        }
+
+        private void WriteComplexProperty(object source, PropertyInfo propertyInfo)
+        {
+            writer.WriteStartElement(propertyInfo.Name);
+
+            foreach (var property in propertyInfo.PropertyType.GetProperties())
+            {
+                WriteProperty(source, property);
             }
 
             writer.WriteEndElement();
         }
 
-        private void WriteBenchmarks(XmlWriter writer,
-                                     IEnumerable<BenchmarkReportDto> benchmarks)
+        private void WriteRoot(object source, string elementName)
         {
-            writer.WriteStartElement(nameof(SummaryDto.Benchmarks));
+            writer.WriteStartElement(elementName);
 
-            foreach (BenchmarkReportDto benchmark in benchmarks)
+            foreach (var property in source.GetType().GetProperties())
             {
-                WriteBenchmark(writer, benchmark);
+                WriteProperty(source, property);
             }
 
             writer.WriteEndElement();
         }
 
-        private void WriteBenchmark(XmlWriter writer, BenchmarkReportDto benchmark)
+        private void WriteCollectionProperty(object source, PropertyInfo property)
         {
-            writer.WriteStartElement(nameof(BenchmarkReport.Benchmark));
+            IEnumerable collection = (IEnumerable)property.GetValue(source);
 
-            foreach (PropertyInfo property in benchmark.GetType().GetProperties())
+            if (IsCollectionWriteable(collection))
             {
-                if (property.PropertyType == typeof(Statistics))
-                {
-                    writer.WriteStartElement(nameof(benchmark.Statistics));
+                writer.WriteStartElement(property.Name);
 
-                    foreach (PropertyInfo statProperty in benchmark.Statistics.GetType().GetProperties())
+                string itemName = null;
+
+                foreach (var item in collection)
+                {
+                    if (itemName == null)
                     {
-                        writer.WriteElementString(statProperty.Name, 
-                            string.Format(CultureInfo.InvariantCulture, "{0}", 
-                                          statProperty.GetValue(benchmark.Statistics)));
+                        // Item name can be retrieved from the collection's source object
+                        itemName = itemNames[item.GetType()];
                     }
 
-                    writer.WriteEndElement();
-                }
-                else if(property.PropertyType == typeof(IEnumerable<Measurement>))
-                {
-                    foreach (Measurement measurement in benchmark.Measurements)
+                    if (IsSimple(item.GetType().GetTypeInfo()))
                     {
-                        writer.WriteStartElement(nameof(benchmark.Measurements));
-
-                        foreach (PropertyInfo measurementProperty in measurement.GetType().GetProperties())
-                        {
-                            writer.WriteElementString(measurementProperty.Name,
-                                string.Format(CultureInfo.InvariantCulture, "{0}",
-                                              measurementProperty.GetValue(measurement)));
-                        }
-
-                        writer.WriteEndElement();
+                        writer.WriteElementString(itemName,
+                            string.Format(CultureInfo.InvariantCulture, "{0}", item));
+                    }
+                    else
+                    {
+                        WriteComplexItem(item, itemName);
                     }
                 }
-                else
-                {
-                    object value = property.GetValue(benchmark);
 
-                    // Don't write empty text, empty collection or null value
-                    string text = value as string;
-                    IEnumerable collection = value as IEnumerable;
+                writer.WriteEndElement();
+            }
+        }
 
-                    if (!string.IsNullOrWhiteSpace(text) 
-                        && (collection == null || collection.Cast<object>().Any()) 
-                        && value != null)
-                    {
-                        writer.WriteElementString(property.Name,
-                            string.Format(CultureInfo.InvariantCulture, "{0}", value));
-                    }
-                }
+        private void WriteComplexItem(object item, string itemName)
+        {
+            writer.WriteStartElement(itemName);
+
+            foreach (var property in item.GetType().GetProperties())
+            {
+                WriteProperty(item, property);
             }
 
             writer.WriteEndElement();
         }
+
+        private static bool IsSimple(TypeInfo type)
+        {
+            return type.IsPrimitive
+                       || type.IsEnum
+                       || type.Equals(typeof(string))
+                       || type.Equals(typeof(decimal));
+        }
+
+        private static bool IsCollection(PropertyInfo property)
+            => typeof(IEnumerable).IsAssignableFrom(property.PropertyType);
+
+        private bool IsCollectionWriteable(IEnumerable collection)
+            => collection?.Cast<object>().FirstOrDefault() != null;
     }
 }
