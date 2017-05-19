@@ -17,31 +17,62 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         public XmlSerializer(Type type)
         {
+            if (type == null)
+                throw new NullReferenceException();
+
             this.type = type;
             rootName = type.Name;
         }
 
         public XmlSerializer WithRootName(string rootName)
         {
+            if (string.IsNullOrWhiteSpace(rootName))
+                throw new ArgumentException(nameof(rootName));
+
             this.rootName = rootName;
             return this;
         }
 
         public XmlSerializer WithCollectionItemName(Type type, string name)
         {
+            if (type == null)
+                throw new NullReferenceException(nameof(type));
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException(nameof(name));
+
             itemNames.Add(type, name);
             return this;
         }
 
         public void Serialize(XmlWriter writer, object source)
         {
+            if (writer == null)
+                throw new NullReferenceException(nameof(writer));
+            if (source == null)
+                throw new NullReferenceException(nameof(source));
+
             this.writer = writer;
 
+            Write(source);
+        }
+
+        private void Write(object source)
+        {
             writer.WriteStartDocument();
-
             WriteRoot(source, rootName);
-
             writer.WriteEndDocument();
+        }
+
+        private void WriteRoot(object source, string elementName)
+        {
+            writer.WriteStartElement(elementName);
+
+            foreach (var property in source.GetType().GetProperties())
+            {
+                WriteProperty(source, property);
+            }
+
+            writer.WriteEndElement();
         }
 
         private void WriteProperty(object source, PropertyInfo property)
@@ -85,50 +116,37 @@ namespace BenchmarkDotNet.Exporters.Xml
 
             writer.WriteEndElement();
         }
-
-        private void WriteRoot(object source, string elementName)
-        {
-            writer.WriteStartElement(elementName);
-
-            foreach (var property in source.GetType().GetProperties())
-            {
-                WriteProperty(source, property);
-            }
-
-            writer.WriteEndElement();
-        }
-
+        
         private void WriteCollectionProperty(object source, PropertyInfo property)
         {
             IEnumerable collection = (IEnumerable)property.GetValue(source);
 
-            if (IsCollectionWriteable(collection))
+            if (!IsCollectionWriteable(collection))
+                return;
+
+            writer.WriteStartElement(property.Name);
+
+            string itemName = null;
+
+            foreach (var item in collection)
             {
-                writer.WriteStartElement(property.Name);
-
-                string itemName = null;
-
-                foreach (var item in collection)
+                if (itemName == null)
                 {
-                    if (itemName == null)
-                    {
-                        // Item name can be retrieved from the collection's source object
-                        itemName = itemNames[item.GetType()];
-                    }
-
-                    if (IsSimple(item.GetType().GetTypeInfo()))
-                    {
-                        writer.WriteElementString(itemName,
-                            string.Format(CultureInfo.InvariantCulture, "{0}", item));
-                    }
-                    else
-                    {
-                        WriteComplexItem(item, itemName);
-                    }
+                    itemName = itemNames[item.GetType()];
                 }
 
-                writer.WriteEndElement();
+                if (IsSimple(item.GetType().GetTypeInfo()))
+                {
+                    writer.WriteElementString(itemName,
+                        string.Format(CultureInfo.InvariantCulture, "{0}", item));
+                }
+                else
+                {
+                    WriteComplexItem(item, itemName);
+                }
             }
+
+            writer.WriteEndElement();
         }
 
         private void WriteComplexItem(object item, string itemName)
