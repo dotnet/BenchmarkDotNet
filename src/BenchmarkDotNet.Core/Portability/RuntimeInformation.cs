@@ -65,10 +65,9 @@ namespace BenchmarkDotNet.Portability
 
         internal static bool IsMono() => isMono;
 
-        internal static string GetOsVersion()
-        {
-            return $"{Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem} {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion}";
-        }
+        internal static string GetOsVersion() => OsBrandStringHelper.Prettify(
+            Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem,
+            Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion);
 
         internal static string GetProcessorName()
         {

@@ -11,6 +11,7 @@ using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Filters;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -151,6 +152,17 @@ namespace BenchmarkDotNet.Configs
                 var argument = argumentName.EndsWith("s") ? argumentName : argumentName + "s";
                 
                 argument = argument.StartsWith(optionPrefix) ? argument.Remove(0, 2) : argument;
+
+                switch (argument)
+                {
+                    case "categorys": // for now all the argument names at the place end with "s"
+                    case "allcategories":
+                        config.Add(new AllCategoriesFilter(values));
+                        break;
+                    case "anycategories":
+                        config.Add(new AnyCategoriesFilter(values));
+                        break;
+                }
 
                 if (configuration.ContainsKey(argument) == false)
                     continue;

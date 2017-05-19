@@ -5,6 +5,7 @@ using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Parameters;
@@ -42,6 +43,9 @@ namespace BenchmarkDotNet.Running
                 from job in jobs
                 from parameterInstance in parameterInstancesList
                 select new Benchmark(target, job, parameterInstance)).ToArray();
+            
+            var filters = config.GetFilters().ToList();
+            benchmarks = GetFilteredBenchmarks(benchmarks, filters);
 
             var orderProvider = config?.GetOrderProvider() ?? DefaultOrderProvider.Instance;
             return orderProvider.GetExecutionOrder(benchmarks).ToArray();
@@ -65,15 +69,22 @@ namespace BenchmarkDotNet.Running
             Where(m => m.HasAttribute<BenchmarkAttribute>()).
             Select(methodInfo => CreateTarget(type, setupMethod, methodInfo, cleanupMethod, methodInfo.ResolveAttribute<BenchmarkAttribute>(), targetMethods));
 
-        private static Target CreateTarget(Type type, MethodInfo setupMethod, MethodInfo methodInfo, MethodInfo cleanupMethod, BenchmarkAttribute attr, MethodInfo[] targetMethods)
+        private static Target CreateTarget(
+            Type type, 
+            MethodInfo setupMethod, 
+            MethodInfo methodInfo, 
+            MethodInfo cleanupMethod, 
+            BenchmarkAttribute attr,            
+            MethodInfo[] targetMethods)
         {
             var target = new Target(
-                type, 
-                methodInfo, 
+                type,
+                methodInfo,
                 setupMethod,
                 cleanupMethod,
-                attr.Description, 
-                baseline: attr.Baseline, 
+                attr.Description,
+                baseline: attr.Baseline,
+                categories: GetCategories(methodInfo),
                 operationsPerInvoke: attr.OperationsPerInvoke, 
                 methodIndex: Array.IndexOf(targetMethods, methodInfo));
             AssertMethodHasCorrectSignature("Benchmark", methodInfo);
@@ -129,6 +140,26 @@ namespace BenchmarkDotNet.Running
                 AssertMethodIsNotGeneric(methodName, setupMethod);
             }
             return setupMethod;
+        }
+
+        private static string[] GetCategories(MethodInfo method)
+        {
+            var attributes = new List<BenchmarkCategoryAttribute>();
+            attributes.AddRange(method.GetCustomAttributes(typeof(BenchmarkCategoryAttribute), false).OfType<BenchmarkCategoryAttribute>());
+            var type = method.DeclaringType;
+            if (type != null)
+            {
+                attributes.AddRange(type.GetTypeInfo().GetCustomAttributes(typeof(BenchmarkCategoryAttribute), false).OfType<BenchmarkCategoryAttribute>());
+                attributes.AddRange(type.GetTypeInfo().Assembly.GetCustomAttributes().OfType<BenchmarkCategoryAttribute>());
+            }
+            if (attributes.Count == 0)
+                return Array.Empty<string>();
+            return attributes.SelectMany(attr => attr.Categories).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+        }
+
+        private static Benchmark[] GetFilteredBenchmarks(IList<Benchmark> benchmarks, IList<IFilter> filters)
+        {
+            return benchmarks.Where(benchmark => filters.All(filter => filter.Predicate(benchmark))).ToArray();
         }
 
         private static void AssertMethodHasCorrectSignature(string methodType, MethodInfo methodInfo)

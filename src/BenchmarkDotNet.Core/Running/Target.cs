@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Running
@@ -16,6 +17,7 @@ namespace BenchmarkDotNet.Running
         public string MethodDisplayInfo { get; }
         public int MethodIndex { get; }
         public bool Baseline { get; }
+        public string[] Categories { get; }
 
         private string TypeInfo => Type?.Name ?? "Untitled";
         private string MethodFolderInfo => Method?.Name ?? "Untitled";
@@ -25,12 +27,13 @@ namespace BenchmarkDotNet.Running
 
         public Target(
             Type type,
-            MethodInfo method,
+            MethodInfo method,              
             MethodInfo setupMethod = null,
             MethodInfo cleanupMethod = null,
             string description = null,
             string additionalLogic = null,
             bool baseline = false,
+            string[] categories = null,
             int operationsPerInvoke = 1,
             int methodIndex = 0)
         {
@@ -42,6 +45,7 @@ namespace BenchmarkDotNet.Running
             AdditionalLogic = additionalLogic ?? string.Empty;
             MethodDisplayInfo = FormatDescription(description) ?? method?.Name ?? "Untitled";
             Baseline = baseline;
+            Categories = categories ?? Array.Empty<string>();
             MethodIndex = methodIndex;
         }
 
@@ -54,5 +58,7 @@ namespace BenchmarkDotNet.Running
                 ? "'" + description + "'"
                 : description;
         }
+
+        public bool HasCategory(string category) => Categories.Any(c => c.EqualsWithIgnoreCase(category));
     }
 }

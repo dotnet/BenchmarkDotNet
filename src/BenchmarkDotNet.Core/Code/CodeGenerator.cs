@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -21,6 +22,8 @@ namespace BenchmarkDotNet.Code
         {
             var provider = GetDeclarationsProvider(benchmark.Target);
 
+            (bool useShadowCopy, string shadowCopyFolderPath) = GetShadowCopySettings();
+
             string text = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt")).
                 Replace("$OperationsPerInvoke$", provider.OperationsPerInvoke).
                 Replace("$TargetTypeNamespace$", provider.TargetTypeNamespace).
@@ -39,11 +42,31 @@ namespace BenchmarkDotNet.Code
                 Replace("$ParamsContent$", GetParamsContent(benchmark)).
                 Replace("$ExtraAttribute$", GetExtraAttributes(benchmark.Target)).
                 Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark)). 
+                Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : string.Empty).
+                Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath).
                 ToString();
 
             text = Unroll(text, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvResolver.Instance));
 
             return text;
+        }
+
+        private static (bool, string) GetShadowCopySettings()
+        {
+            var benchmarkDotNetLocation = Path.GetDirectoryName(typeof(CodeGenerator).GetTypeInfo().Assembly.Location);
+
+            if (benchmarkDotNetLocation != null && benchmarkDotNetLocation.ToUpper().Contains("LINQPAD"))
+            {
+                /* "LINQPad normally puts the compiled query into a different folder than the referenced assemblies 
+                 * - this allows for optimizations to reduce file I/O, which is important in the scratchpad scenario"
+                 * 
+                 * so in case we detect we are running from LINQPad, we give a hint to assembly loading to search also in this folder
+                 */
+
+                return (true, benchmarkDotNetLocation);
+            }
+
+            return (false, string.Empty);
         }
 
         private static string Unroll(string text, int factor)

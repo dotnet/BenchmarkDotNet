@@ -8,7 +8,9 @@ namespace BenchmarkDotNet.Engines
     {
         internal const string ResultsLinePrefix = "GC: ";
 
-        private static readonly Func<long> getAllocatedBytesForCurrentThread = GetAllocatedBytesForCurrentThread();
+        private static readonly long AllocationQuantum = CaluclateAllocationQuantumSize(); 
+
+        private static readonly Func<long> GetAllocatedBytesForCurrentThreadDelegate = GetAllocatedBytesForCurrentThread();
 
         public static readonly GcStats Empty = new GcStats(0, 0, 0, 0, 0);
 
@@ -25,13 +27,20 @@ namespace BenchmarkDotNet.Engines
         public int Gen0Collections { get; }
         public int Gen1Collections { get; }
         public int Gen2Collections { get; }
-        public long AllocatedBytes { get; }
+
+        /// <summary>
+        /// Total per all runs
+        /// </summary>
+        private long AllocatedBytes { get; }
+
         public long TotalOperations { get; }
 
         public long BytesAllocatedPerOperation 
-            => (long)Math.Round( // let's round it to reduce the side effects of Allocation quantum
-                (double)AllocatedBytes / TotalOperations, 
-                MidpointRounding.ToEven); 
+            => GetTotalAllocatedBytes(true) == 0 
+                ? 0 
+                : (long)Math.Round( // let's round it to reduce the side effects of Allocation quantum
+                    (double)GetTotalAllocatedBytes(true) / TotalOperations, 
+                    MidpointRounding.ToEven); 
 
         public static GcStats operator +(GcStats left, GcStats right)
         {
@@ -64,6 +73,20 @@ namespace BenchmarkDotNet.Engines
                 return Gen1Collections;
 
             return Gen2Collections;
+        }
+
+        /// <summary>
+        /// returns total allocated bytes (not per operation)
+        /// </summary>
+        /// <param name="excludeAllocationQuantumSideEffects">Allocation quantum can affecting some of our nano-benchmarks in non-deterministic way.
+        /// when this parameter is set to true and the number of all allocated bytes is less or equal AQ, we ignore AQ and put 0 to the results</param>
+        /// <returns></returns>
+        public long GetTotalAllocatedBytes(bool excludeAllocationQuantumSideEffects)
+        {
+            if (!excludeAllocationQuantumSideEffects)
+                return AllocatedBytes;
+
+            return AllocatedBytes <= AllocationQuantum ? 0L : AllocatedBytes;
         }
 
         public static GcStats ReadInitial(bool isDiagnosticsEnabled)
@@ -106,9 +129,8 @@ namespace BenchmarkDotNet.Engines
             // so we enforce GC.Collect here just to make sure we get accurate results
             GC.Collect();
 #if CORE
-            return getAllocatedBytesForCurrentThread.Invoke();
+            return GetAllocatedBytesForCurrentThreadDelegate.Invoke();
 #elif CLASSIC
-
             return AppDomain.CurrentDomain.MonitoringTotalAllocatedMemorySize;
 #endif
         }
@@ -149,5 +171,34 @@ namespace BenchmarkDotNet.Engines
         }
 
         public override string ToString() => ToOutputLine();
+
+        /// <summary>
+        /// code copied from https://github.com/rsdn/CodeJam/blob/71a6542b6e5c52ea8dd92c601adad11e62796a98/PerfTests/src/%5BL4_Configuration%5D/Metrics/%5BMetricValuesProvider%5D/GcMetricValuesProvider.cs#L63-L89
+        /// </summary>
+        /// <returns></returns>
+        private static long CaluclateAllocationQuantumSize()
+        {
+            long result;
+            int retry = 0;
+            do
+            {
+                if (++retry > 10)
+                {
+                    result = 8192; // 8kb https://github.com/dotnet/coreclr/blob/master/Documentation/botr/garbage-collection.md
+                    break;
+                }
+
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+
+                result = GC.GetTotalMemory(false);
+                var tmp = new object();
+                result = GC.GetTotalMemory(false) - result;
+                GC.KeepAlive(tmp);
+            } while (result <= 0);
+
+            return result;
+        }
     }
 }

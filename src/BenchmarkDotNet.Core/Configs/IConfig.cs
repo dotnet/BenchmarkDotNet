@@ -3,6 +3,7 @@ using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
@@ -21,6 +22,7 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<Job> GetJobs();
         IEnumerable<IValidator> GetValidators();
         IEnumerable<HardwareCounter> GetHardwareCounters();
+        IEnumerable<IFilter> GetFilters();        
 
         IOrderProvider GetOrderProvider();
         ISummaryStyle GetSummaryStyle();

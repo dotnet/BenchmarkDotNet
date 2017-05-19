@@ -139,6 +139,16 @@ namespace BenchmarkDotNet.IntegrationTests
                     var benchmarkReport = summary.Reports.Single(report => report.Benchmark == benchmark);
 
                     Assert.Equal(benchmarkAllocationsValidator.Value, benchmarkReport.GcStats.BytesAllocatedPerOperation);
+
+                    if (benchmarkAllocationsValidator.Value == 0)
+                    {
+#if CLASSIC
+                        // it's still not pefect for this case. We don't allocate memory, but the api that we use reports 3 * Allocation Quantum in this case
+                        if (toolchain is InProcessToolchain) 
+                            continue;
+#endif
+                        Assert.Equal(0, benchmarkReport.GcStats.GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects: true));
+                    }
                 }
             }
         }

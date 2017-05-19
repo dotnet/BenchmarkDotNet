@@ -19,7 +19,8 @@
             "Loggers":"Configs\\Loggers.md",
             "Diagnosers":"Configs\\Diagnosers.md",
             "Analyzers":"Configs\\Analyzers.md",
-            "Validators":"Configs\\Validators.md"
+            "Validators":"Configs\\Validators.md",
+            "Filters":"Configs\\Filters.md"
         },
         "How to run your benchmarks": "HowToRun.md",
         "Advanced features": 

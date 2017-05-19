@@ -81,9 +81,24 @@ namespace BenchmarkDotNet.Exporters
             throw new NotSupportedException();
         }
 
-        private static string FindInPath(string name) => Environment.GetEnvironmentVariable("PATH")
-            .Split(Path.PathSeparator)
-            .Select(p => Path.Combine(p, name))
-            .FirstOrDefault(File.Exists);
+        public static string FindInPath(string fileName)
+        {
+            var dirs = Environment.GetEnvironmentVariable("PATH").Split(Path.PathSeparator);
+            foreach (string dir in dirs)
+            {
+                string trimmedDir = dir.Trim('\'', '"');
+                try
+                {
+                    string filePath = Path.Combine(trimmedDir, fileName);
+                    if (File.Exists(filePath))
+                        return filePath;
+                }
+                catch (Exception)
+                {
+                    // Nevermind
+                }
+            }
+            return null;
+        }
     }
 }

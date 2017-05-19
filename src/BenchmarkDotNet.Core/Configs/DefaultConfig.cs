@@ -5,6 +5,7 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
+using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
@@ -64,5 +65,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IDiagnoser> GetDiagnosers() => Array.Empty<IDiagnoser>();
 
         public IEnumerable<HardwareCounter> GetHardwareCounters() => Array.Empty<HardwareCounter>();
+
+        public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
     }
 }

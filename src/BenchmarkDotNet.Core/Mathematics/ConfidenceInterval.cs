@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 
@@ -75,6 +76,8 @@ namespace BenchmarkDotNet.Mathematics
 
     public static class ConfidenceLevelExtensions
     {
+        private static readonly Dictionary<ConfidenceLevel, (int value, int digits)> ConfidenceLevelDetails = CreateConfidenceLevelMapping();
+
         /// <summary>
         /// Calculates Z value (z-star) for confidence interval
         /// </summary>
@@ -97,9 +100,22 @@ namespace BenchmarkDotNet.Mathematics
 
         public static double ToPercent(this ConfidenceLevel level)
         {
-            string s = level.ToString().Substring(1);
-            return int.Parse(s) / Math.Pow(10, s.Length);
+            (int value, int digits) = ConfidenceLevelDetails[level];
+
+            return value / Math.Pow(10, digits);
         }
+
+        private static Dictionary<ConfidenceLevel, (int value, int length)> CreateConfidenceLevelMapping()
+            => Enum.GetValues(typeof(ConfidenceLevel))
+                   .Cast<ConfidenceLevel>()
+                   .ToDictionary(
+                       confidenceLevel => confidenceLevel,
+                       confidenceLevel =>
+                       {
+                           var textRepresentation = confidenceLevel.ToString().Substring(1);
+
+                           return (int.Parse(textRepresentation), textRepresentation.Length);
+                       });
     }
 
     public struct ConfidenceInterval
