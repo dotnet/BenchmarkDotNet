@@ -11,8 +11,9 @@ namespace BenchmarkDotNet.Exporters.Xml
     public class XmlSerializer
     {
         private readonly Type type;
+        private readonly Dictionary<Type, string> itemNames = new Dictionary<Type, string>();
+        private readonly HashSet<string> excludedProperties = new HashSet<string>();
         private XmlWriter writer;
-        private Dictionary<Type, string> itemNames = new Dictionary<Type, string>();
         private string rootName;
 
         public XmlSerializer(Type type)
@@ -41,6 +42,15 @@ namespace BenchmarkDotNet.Exporters.Xml
                 throw new ArgumentException(nameof(name));
 
             itemNames.Add(type, name);
+            return this;
+        }
+
+        public XmlSerializer WithExcludedProperty(string propertyName)
+        {
+            if (string.IsNullOrWhiteSpace(propertyName))
+                throw new ArgumentException(nameof(propertyName));
+
+            excludedProperties.Add(propertyName);
             return this;
         }
 
@@ -77,9 +87,9 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         private void WriteProperty(object source, PropertyInfo property)
         {
-            if (source == null)
+            if (source == null || excludedProperties.Contains(property.Name))
                 return;
-
+            
             if (IsSimple(property.PropertyType.GetTypeInfo()))
             {
                 WriteSimpleProperty(source, property);

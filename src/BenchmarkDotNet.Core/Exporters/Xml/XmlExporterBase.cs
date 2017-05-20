@@ -34,6 +34,11 @@ namespace BenchmarkDotNet.Exporters.Xml
                                     .WithCollectionItemName(typeof(BenchmarkReportDto),
                                                             nameof(BenchmarkReport.Benchmark));
 
+            if (excludeMeasurements)
+            {
+                serializer.WithExcludedProperty(nameof(BenchmarkReportDto.Measurements));
+            }
+
             using (var textWriter = new Utf8StringWriter())
             {
                 using (var writer = XmlWriter.Create(textWriter, settings))
