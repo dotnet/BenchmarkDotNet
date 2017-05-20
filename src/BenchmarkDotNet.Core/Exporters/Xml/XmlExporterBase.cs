@@ -25,8 +25,6 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
-            string xml;
-
             var serializer = new XmlSerializer(typeof(SummaryDto))
                                     .WithRootName(nameof(Summary))
                                     .WithCollectionItemName(typeof(Measurement),
@@ -39,22 +37,24 @@ namespace BenchmarkDotNet.Exporters.Xml
                 serializer.WithExcludedProperty(nameof(BenchmarkReportDto.Measurements));
             }
 
-            using (var textWriter = new Utf8StringWriter())
+            // Use custom UTF-8 stringwriter because the default writes UTF-16
+            StringBuilder builder = new StringBuilder();
+            using (var textWriter = new Utf8StringWriter(builder))
             {
                 using (var writer = XmlWriter.Create(textWriter, settings))
                 {
                     serializer.Serialize(writer, new SummaryDto(summary));
                 }
-
-                xml = textWriter.ToString();
             }
 
-            logger.WriteLine(xml);
+            logger.WriteLine(builder.ToString());
         }
     }
 
     public class Utf8StringWriter : StringWriter
     {
         public override Encoding Encoding => Encoding.UTF8;
+
+        public Utf8StringWriter(StringBuilder builder) :base(builder) { }
     }
 }
