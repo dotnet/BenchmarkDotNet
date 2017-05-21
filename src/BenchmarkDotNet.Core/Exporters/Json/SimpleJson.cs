@@ -1212,13 +1212,13 @@ namespace SimpleJson
         private static void ResetIndentationLevel()
         {
             indentationLevel = 0;
-            indentationText = "\n" + new string(' ', indentationLevel * spacesPerIndent);
+            indentationText = Environment.NewLine + new string(' ', indentationLevel * spacesPerIndent);
         }
 
         private static void HandleIndent(int change)
         {
             indentationLevel += change;
-            indentationText = "\n" + new string(' ', indentationLevel * spacesPerIndent);
+            indentationText = Environment.NewLine + new string(' ', indentationLevel * spacesPerIndent);
         }
 
         private static IJsonSerializerStrategy _currentJsonSerializerStrategy;
