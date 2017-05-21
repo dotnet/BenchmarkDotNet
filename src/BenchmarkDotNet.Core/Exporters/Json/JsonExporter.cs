@@ -4,7 +4,7 @@
     {
         public static readonly IExporter Brief = new JsonExporter("-brief", indentJson: true, excludeMeasurements: true);
         public static readonly IExporter Full = new JsonExporter("-full", indentJson: true, excludeMeasurements: false);
-        public static readonly IExporter BriefCompressed = new JsonExporter("-brief-compressed", indentJson: false, excludeMeasurements: false);
+        public static readonly IExporter BriefCompressed = new JsonExporter("-brief-compressed", indentJson: false, excludeMeasurements: true);
         public static readonly IExporter FullCompressed = new JsonExporter("-full-compressed", indentJson: false, excludeMeasurements: false);
 
         public static readonly IExporter Default = FullCompressed;
