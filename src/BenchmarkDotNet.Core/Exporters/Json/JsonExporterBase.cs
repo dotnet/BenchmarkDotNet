@@ -28,8 +28,8 @@ namespace BenchmarkDotNet.Exporters.Json
             {
                 HostEnvironmentInfo.BenchmarkDotNetCaption,
                 summary.HostEnvironmentInfo.BenchmarkDotNetVersion,
-                summary.HostEnvironmentInfo.OsVersion,
-                summary.HostEnvironmentInfo.ProcessorName,
+                OsVersion = summary.HostEnvironmentInfo.OsVersion.Value,
+                ProcessorName = summary.HostEnvironmentInfo.ProcessorName.Value,
                 summary.HostEnvironmentInfo.ProcessorCount,
                 summary.HostEnvironmentInfo.RuntimeVersion,
                 summary.HostEnvironmentInfo.Architecture,
