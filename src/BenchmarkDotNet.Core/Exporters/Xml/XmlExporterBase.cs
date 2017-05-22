@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Exporters.Xml
         {
             settings = new XmlWriterSettings
             {
-                Indent = indentXml,
+                Indent = indentXml
             };
 
             this.excludeMeasurements = excludeMeasurements;

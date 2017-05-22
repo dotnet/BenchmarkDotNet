@@ -21,7 +21,8 @@ namespace BenchmarkDotNet.Exporters.Xml
         public SummaryDto(Summary summary, bool excludeMeasurements = false)
         {
             this.summary = summary;
-            Benchmarks = summary.Reports.Select(report => new BenchmarkReportDto(report, excludeMeasurements));
+            Benchmarks = summary.Reports.Select(
+                report => new BenchmarkReportDto(report, excludeMeasurements));
         }
     }
 
@@ -65,19 +66,12 @@ namespace BenchmarkDotNet.Exporters.Xml
     public class BenchmarkReportDto
     {
         public string DisplayInfo => report.Benchmark.DisplayInfo;
-
         public string Namespace => report.Benchmark.Target.Type.Namespace;
-
         public string Type => report.Benchmark.Target.Type.Name;
-
         public string Method => report.Benchmark.Target.Method.Name;
-
         public string MethodTitle => report.Benchmark.Target.MethodDisplayInfo;
-
         public string Parameters => report.Benchmark.Parameters.PrintInfo;
-
         public Statistics Statistics => report.ResultStatistics;
-
         public IEnumerable<Measurement> Measurements { get; }
 
         private readonly BenchmarkReport report;
