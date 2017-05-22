@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Exporters.Xml
         {
             writer.WriteStartElement(elementName);
 
-            foreach (var property in source.GetType().GetProperties())
+            foreach (var property in type.GetProperties())
             {
                 WriteProperty(source, property);
             }
