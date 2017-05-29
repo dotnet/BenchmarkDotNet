@@ -27,6 +27,8 @@ namespace BenchmarkDotNet.Running
             var globalSetupMethod = GetWrappingMethod<GlobalSetupAttribute>(methods, "GlobalSetup");
             var targetMethods = methods.Where(method => method.HasAttribute<BenchmarkAttribute>()).ToArray();
             var globalCleanupMethod = GetWrappingMethod<GlobalCleanupAttribute>(methods, "GlobalCleanup");
+            var iterationSetupMethod = GetWrappingMethod<IterationSetupAttribute>(methods, "IterationSetup");
+            var iterationCleanupMethod = GetWrappingMethod<IterationCleanupAttribute>(methods, "IterationCleanup");
 
             var parameterDefinitions = GetParameterDefinitions(containingType);
             var parameterInstancesList = parameterDefinitions.Expand();
@@ -36,7 +38,7 @@ namespace BenchmarkDotNet.Running
                 rawJobs = new[] { Job.Default };
             var jobs = rawJobs.Distinct().ToArray();
 
-            var targets = GetTargets(targetMethods, containingType, globalSetupMethod, globalCleanupMethod).ToArray();
+            var targets = GetTargets(targetMethods, containingType, globalSetupMethod, globalCleanupMethod, iterationSetupMethod, iterationCleanupMethod).ToArray();
 
             var benchmarks = (
                 from target in targets
@@ -65,15 +67,22 @@ namespace BenchmarkDotNet.Running
             return config;
         }
 
-        private static IEnumerable<Target> GetTargets(MethodInfo[] targetMethods, Type type, MethodInfo globalSetupMethod, MethodInfo globalCleanupMethod) => targetMethods.
-            Where(m => m.HasAttribute<BenchmarkAttribute>()).
-            Select(methodInfo => CreateTarget(type, globalSetupMethod, methodInfo, globalCleanupMethod, methodInfo.ResolveAttribute<BenchmarkAttribute>(), targetMethods));
+        private static IEnumerable<Target> GetTargets(MethodInfo[] targetMethods, Type type, MethodInfo globalSetupMethod, MethodInfo globalCleanupMethod, 
+            MethodInfo iterationSetupMethod, MethodInfo iterationCleanupMethod)
+        {
+            return targetMethods
+                .Where(m => m.HasAttribute<BenchmarkAttribute>())
+                .Select(methodInfo => CreateTarget(type, globalSetupMethod, methodInfo, globalCleanupMethod, iterationSetupMethod, iterationCleanupMethod,
+                    methodInfo.ResolveAttribute<BenchmarkAttribute>(), targetMethods));
+        }
 
         private static Target CreateTarget(
             Type type, 
             MethodInfo globalSetupMethod, 
             MethodInfo methodInfo, 
-            MethodInfo globalCleanupMethod, 
+            MethodInfo globalCleanupMethod,
+            MethodInfo iterationSetupMethod,
+            MethodInfo iterationCleanupMethod,
             BenchmarkAttribute attr,            
             MethodInfo[] targetMethods)
         {
@@ -82,6 +91,8 @@ namespace BenchmarkDotNet.Running
                 methodInfo,
                 globalSetupMethod,
                 globalCleanupMethod,
+                iterationSetupMethod,
+                iterationCleanupMethod,
                 attr.Description,
                 baseline: attr.Baseline,
                 categories: GetCategories(methodInfo),

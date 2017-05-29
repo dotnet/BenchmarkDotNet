@@ -30,6 +30,10 @@ namespace BenchmarkDotNet.Code
 
         public string GlobalCleanupMethodName => Target.GlobalCleanupMethod?.Name ?? EmptyAction;
 
+        public string IterationSetupMethodName => Target.IterationSetupMethod?.Name ?? EmptyAction;
+
+        public string IterationCleanupMethodName => Target.IterationCleanupMethod?.Name ?? EmptyAction;
+
         public virtual string TargetMethodDelegate => Target.Method.Name;
 
         public abstract string TargetMethodReturnTypeNamespace { get; }

@@ -26,6 +26,8 @@ namespace BenchmarkDotNet.Engines
         public long OperationsPerInvoke { get; }
         public Action GlobalSetupAction { get; }
         public Action GlobalCleanupAction { get; }
+        public Action IterationSetupAction { get; }
+        public Action IterationCleanupAction { get; }
         public IResolver Resolver { get; }
 
         private IClock Clock { get; }
@@ -44,7 +46,7 @@ namespace BenchmarkDotNet.Engines
         internal Engine(
             IHost host,
             Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> idleAction, Action<long> mainAction, Job targetJob,
-            Action globalSetupAction, Action globalCleanupAction, long operationsPerInvoke)
+            Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke)
         {
             Host = host;
             IsDiagnoserAttached = host.IsDiagnoserAttached;
@@ -56,6 +58,8 @@ namespace BenchmarkDotNet.Engines
             TargetJob = targetJob;
             GlobalSetupAction = globalSetupAction;
             GlobalCleanupAction = globalCleanupAction;
+            IterationSetupAction = iterationSetupAction;
+            IterationCleanupAction = iterationCleanupAction;
             OperationsPerInvoke = operationsPerInvoke;
 
             Resolver = new CompositeResolver(BenchmarkRunnerCore.DefaultResolver, EngineResolver.Instance);
@@ -76,6 +80,8 @@ namespace BenchmarkDotNet.Engines
         {
             var list = new List<Measurement> { new Measurement(), new Measurement() };
             list.Sort(); // provoke JIT, static ctors etc (was allocating 1740 bytes with first call)
+            
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (TimeUnit.All == null || list[0].Nanoseconds != default(double))
                 throw new Exception("just use this things here to provoke static ctor");
             isPreAllocated = true;
@@ -143,6 +149,7 @@ namespace BenchmarkDotNet.Engines
             long totalOperations = invokeCount * OperationsPerInvoke;
             var action = data.IterationMode.IsIdle() ? IdleAction : MainAction;
 
+            IterationSetupAction();
             GcCollect();
 
             // Measure
@@ -150,6 +157,7 @@ namespace BenchmarkDotNet.Engines
             action(invokeCount / unrollFactor);
             var clockSpan = clock.Stop();
 
+            IterationCleanupAction();
             GcCollect();
 
             // Results

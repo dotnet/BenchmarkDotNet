@@ -58,6 +58,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 var idleAction = BenchmarkActionFactory.CreateIdle(target, instance, codegenMode, unrollFactor);
                 var globalSetupAction = BenchmarkActionFactory.CreateGlobalSetup(target, instance);
                 var globalCleanupAction = BenchmarkActionFactory.CreateGlobalCleanup(target, instance);
+                var iterationSetupAction = BenchmarkActionFactory.CreateIterationSetup(target, instance);
+                var iterationCleanupAction = BenchmarkActionFactory.CreateIterationCleanup(target, instance);
                 var dummy1 = BenchmarkActionFactory.CreateDummy();
                 var dummy2 = BenchmarkActionFactory.CreateDummy();
                 var dummy3 = BenchmarkActionFactory.CreateDummy();
@@ -80,6 +82,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     IdleAction = idleAction.InvokeMultiple,
                     GlobalSetupAction = globalSetupAction.InvokeSingle,
                     GlobalCleanupAction = globalCleanupAction.InvokeSingle,
+                    IterationSetupAction = iterationSetupAction.InvokeSingle,
+                    IterationCleanupAction = iterationCleanupAction.InvokeSingle,
                     TargetJob = job,
                     OperationsPerInvoke = target.OperationsPerInvoke
                 };

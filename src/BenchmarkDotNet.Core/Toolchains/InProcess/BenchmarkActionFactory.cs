@@ -128,6 +128,20 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         public static BenchmarkAction CreateGlobalCleanup(Target target, object instance) =>
             CreateCore(instance, target.GlobalCleanupMethod, FallbackSignature, BenchmarkActionCodegen.DelegateCombine, 1);
 
+        /// <summary>Creates global setup benchmark action.</summary>
+        /// <param name="target">Target info.</param>
+        /// <param name="instance">Instance of target.</param>
+        /// <returns>Setup benchmark action.</returns>
+        public static BenchmarkAction CreateIterationSetup(Target target, object instance) =>
+            CreateCore(instance, target.IterationSetupMethod, FallbackSignature, BenchmarkActionCodegen.DelegateCombine, 1);
+
+        /// <summary>Creates global cleanup benchmark action.</summary>
+        /// <param name="target">Target info.</param>
+        /// <param name="instance">Instance of target.</param>
+        /// <returns>Cleanup benchmark action.</returns>
+        public static BenchmarkAction CreateIterationCleanup(Target target, object instance) =>
+            CreateCore(instance, target.IterationCleanupMethod, FallbackSignature, BenchmarkActionCodegen.DelegateCombine, 1);
+
         /// <summary>Creates a dummy benchmark action.</summary>
         /// <returns>Dummy benchmark action.</returns>
         public static BenchmarkAction CreateDummy() =>

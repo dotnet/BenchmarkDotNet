@@ -12,6 +12,8 @@ namespace BenchmarkDotNet.Running
         public MethodInfo Method { get; }
         public MethodInfo GlobalSetupMethod { get; }
         public MethodInfo GlobalCleanupMethod { get; }
+        public MethodInfo IterationSetupMethod { get; }
+        public MethodInfo IterationCleanupMethod { get; }
         public string AdditionalLogic { get; }
         public int OperationsPerInvoke { get; }
         public string MethodDisplayInfo { get; }
@@ -30,6 +32,8 @@ namespace BenchmarkDotNet.Running
             MethodInfo method,              
             MethodInfo globalSetupMethod = null,
             MethodInfo globalCleanupMethod = null,
+            MethodInfo iterationSetupMethod = null,
+            MethodInfo iterationCleanupMethod = null,
             string description = null,
             string additionalLogic = null,
             bool baseline = false,
@@ -41,6 +45,8 @@ namespace BenchmarkDotNet.Running
             Method = method;
             GlobalSetupMethod = globalSetupMethod;
             GlobalCleanupMethod = globalCleanupMethod;
+            IterationSetupMethod = iterationSetupMethod;
+            IterationCleanupMethod = iterationCleanupMethod;
             OperationsPerInvoke = operationsPerInvoke;
             AdditionalLogic = additionalLogic ?? string.Empty;
             MethodDisplayInfo = FormatDescription(description) ?? method?.Name ?? "Untitled";

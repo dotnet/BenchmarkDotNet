@@ -3,6 +3,7 @@ using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Tests.Loggers;
@@ -86,9 +87,10 @@ namespace BenchmarkDotNet.IntegrationTests
             return summary;
         }
 
-        protected IConfig CreateSimpleConfig(OutputLogger logger = null)
+        protected IConfig CreateSimpleConfig(OutputLogger logger = null, Job job = null)
         {
-            return new SingleRunFastConfig()
+            var baseConfig = job == null ? (IConfig)new SingleRunFastConfig() : new SingleJobConfig(job);
+            return baseConfig
                 .With(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default))
                 .With(DefaultColumnProviders.Instance);
         }

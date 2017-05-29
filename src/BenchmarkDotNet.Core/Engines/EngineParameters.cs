@@ -16,6 +16,8 @@ namespace BenchmarkDotNet.Engines
         public long OperationsPerInvoke { get; set; } = 1;
         public Action GlobalSetupAction { get; set; } = null;
         public Action GlobalCleanupAction { get; set; } = null;
+        public Action IterationSetupAction { get; set; } = null;
+        public Action IterationCleanupAction { get; set; } = null;
         public IResolver Resolver { get; set; }
     }
 }
