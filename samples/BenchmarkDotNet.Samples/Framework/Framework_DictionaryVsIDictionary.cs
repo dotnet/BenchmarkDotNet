@@ -9,8 +9,8 @@ namespace BenchmarkDotNet.Samples.Framework
         Dictionary<string, string> dict;
         IDictionary<string, string> idict;
 
-        [Setup]
-        public void Setup()
+        [GlobalSetup]
+        public void GlobalSetup()
         {
             dict = new Dictionary<string, string>();
             idict = (IDictionary<string, string>)dict;

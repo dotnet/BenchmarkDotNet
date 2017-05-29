@@ -56,8 +56,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 var instance = Activator.CreateInstance(benchmark.Target.Type);
                 var mainAction = BenchmarkActionFactory.CreateRun(target, instance, codegenMode, unrollFactor);
                 var idleAction = BenchmarkActionFactory.CreateIdle(target, instance, codegenMode, unrollFactor);
-                var setupAction = BenchmarkActionFactory.CreateSetup(target, instance);
-                var cleanupAction = BenchmarkActionFactory.CreateCleanup(target, instance);
+                var globalSetupAction = BenchmarkActionFactory.CreateGlobalSetup(target, instance);
+                var globalCleanupAction = BenchmarkActionFactory.CreateGlobalCleanup(target, instance);
                 var dummy1 = BenchmarkActionFactory.CreateDummy();
                 var dummy2 = BenchmarkActionFactory.CreateDummy();
                 var dummy3 = BenchmarkActionFactory.CreateDummy();
@@ -78,8 +78,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     Dummy2Action = dummy2.InvokeSingle,
                     Dummy3Action = dummy3.InvokeSingle,
                     IdleAction = idleAction.InvokeMultiple,
-                    SetupAction = setupAction.InvokeSingle,
-                    CleanupAction = cleanupAction.InvokeSingle,
+                    GlobalSetupAction = globalSetupAction.InvokeSingle,
+                    GlobalCleanupAction = globalCleanupAction.InvokeSingle,
                     TargetJob = job,
                     OperationsPerInvoke = target.OperationsPerInvoke
                 };
@@ -90,19 +90,19 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
                 engine.PreAllocate();
 
-                setupAction.InvokeSingle();
+                globalSetupAction.InvokeSingle();
 
                 if (job.ResolveValue(RunMode.RunStrategyCharacteristic, EngineResolver.Instance).NeedsJitting())
                     engine.Jitting(); // does first call to main action, must be executed after setup()!
 
                 if (host.IsDiagnoserAttached)
-                    host.AfterSetup();
+                    host.AfterGlobalSetup();
 
                 var results = engine.Run();
 
                 if (host.IsDiagnoserAttached)
-                    host.BeforeCleanup();
-                cleanupAction.InvokeSingle();
+                    host.BeforeGlobalCleanup();
+                globalCleanupAction.InvokeSingle();
 
                 host.ReportResults(results); // printing costs memory, do this after runs
             }

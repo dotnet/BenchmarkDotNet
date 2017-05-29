@@ -31,14 +31,14 @@ namespace BenchmarkDotNet.Engines
                 case HostSignal.BeforeAnythingElse:
                     WriteLine(Engine.Signals.BeforeAnythingElse);
                     break;
-                case HostSignal.AfterSetup:
-                    WriteLine(Engine.Signals.AfterSetup);
+                case HostSignal.AfterGlobalSetup:
+                    WriteLine(Engine.Signals.AfterGlobalSetup);
                     break;
                 case HostSignal.BeforeMainRun:
                     WriteLine(Engine.Signals.BeforeMainRun);
                     break; ;
-                case HostSignal.BeforeCleanup:
-                    WriteLine(Engine.Signals.BeforeCleanup);
+                case HostSignal.BeforeGlobalCleanup:
+                    WriteLine(Engine.Signals.BeforeGlobalCleanup);
                     break;
                 case HostSignal.AfterAnythingElse:
                     WriteLine(Engine.Signals.AfterAnythingElse);

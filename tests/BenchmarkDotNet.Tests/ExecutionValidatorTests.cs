@@ -31,17 +31,17 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void FailingSetupsAreDiscovered()
+        public void FailingGlobalSetupsAreDiscovered()
         {
-            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(FailingSetup))).ToList();
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(FailingGlobalSetup))).ToList();
 
             Assert.NotEmpty(validationErrors);
-            Assert.True(validationErrors.Single().Message.StartsWith("Failed to execute [Setup]"));
+            Assert.True(validationErrors.Single().Message.StartsWith("Failed to execute [GlobalSetup]"));
         }
 
-        public class FailingSetup
+        public class FailingGlobalSetup
         {
-            [Setup]
+            [GlobalSetup]
             public void Failing()
             {
                 throw new Exception("This one fails");
@@ -52,20 +52,20 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void MultipleSetupsAreDiscovered()
+        public void MultipleGlobalSetupsAreDiscovered()
         {
-            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(MultipleSetups))).ToList();
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(MultipleGlobalSetups))).ToList();
 
             Assert.NotEmpty(validationErrors);
-            Assert.True(validationErrors.Single().Message.StartsWith("Only single [Setup] method is allowed per type"));
+            Assert.True(validationErrors.Single().Message.StartsWith("Only single [GlobalSetup] method is allowed per type"));
         }
 
-        public class MultipleSetups
+        public class MultipleGlobalSetups
         {
-            [Setup]
+            [GlobalSetup]
             public void First() { }
 
-            [Setup]
+            [GlobalSetup]
             public void Second() { }
 
             [Benchmark]
@@ -73,19 +73,19 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void VirtualSetupsAreSupported()
+        public void VirtualGlobalSetupsAreSupported()
         {
-            Assert.False(OverridesSetup.WasCalled);
-            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(OverridesSetup)));
+            Assert.False(OverridesGlobalSetup.WasCalled);
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(OverridesGlobalSetup)));
 
-            Assert.True(OverridesSetup.WasCalled);
+            Assert.True(OverridesGlobalSetup.WasCalled);
             Assert.Empty(validationErrors);
         }
 
-        public class BaseClassWithThrowingSetup
+        public class BaseClassWithThrowingGlobalSetup
         {
-            [Setup]
-            public virtual void Setup()
+            [GlobalSetup]
+            public virtual void GlobalSetup()
             {
                 throw new Exception("should not be executed when overridden");
             }
@@ -94,32 +94,32 @@ namespace BenchmarkDotNet.Tests
             public void NonThrowing() { }
         }
 
-        public class OverridesSetup : BaseClassWithThrowingSetup
+        public class OverridesGlobalSetup : BaseClassWithThrowingGlobalSetup
         {
             public static bool WasCalled;
 
-            [Setup]
-            public override void Setup()
+            [GlobalSetup]
+            public override void GlobalSetup()
             {
                 WasCalled = true;
             }
         }
 
         [Fact]
-        public void NonFailingSetupsAreOmmited()
+        public void NonFailingGlobalSetupsAreOmmited()
         {
-            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(SetupThatRequiresParamsToBeSetFirst)));
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(GlobalSetupThatRequiresParamsToBeSetFirst)));
 
             Assert.Empty(validationErrors);
         }
 
-        public class SetupThatRequiresParamsToBeSetFirst
+        public class GlobalSetupThatRequiresParamsToBeSetFirst
         {
             [Params(100)]
             [UsedImplicitly]
             public int Field;
 
-            [Setup]
+            [GlobalSetup]
             public void Failing()
             {
                 if (Field == default(int))
@@ -131,22 +131,22 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void MissingParamsAttributeThatMakesSetupsFailAreDiscovered()
+        public void MissingParamsAttributeThatMakesGlobalSetupsFailAreDiscovered()
         {
             var validationErrors = ExecutionValidator.FailOnError
-                .Validate(BenchmarkConverter.TypeToBenchmarks(typeof(FailingSetupWhichShouldHaveHadParamsForField)))
+                .Validate(BenchmarkConverter.TypeToBenchmarks(typeof(FailingGlobalSetupWhichShouldHaveHadParamsForField)))
                 .ToList();
 
             Assert.NotEmpty(validationErrors);
-            Assert.True(validationErrors.Single().Message.StartsWith("Failed to execute [Setup]"));
+            Assert.True(validationErrors.Single().Message.StartsWith("Failed to execute [GlobalSetup]"));
         }
 
-        public class FailingSetupWhichShouldHaveHadParamsForField
+        public class FailingGlobalSetupWhichShouldHaveHadParamsForField
         {
             [UsedImplicitly]
             public int Field;
 
-            [Setup]
+            [GlobalSetup]
             public void Failing()
             {
                 if (Field == default(int))
@@ -262,20 +262,20 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void MultipleParamsDoNotMultiplySetup()
+        public void MultipleParamsDoNotMultiplyGlobalSetup()
         {
-            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(MultipleParamsAndSingleSetup)));
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(MultipleParamsAndSingleGlobalSetup)));
 
             Assert.Empty(validationErrors);
         }
 
-        public class MultipleParamsAndSingleSetup
+        public class MultipleParamsAndSingleGlobalSetup
         {
             [Params(1, 2)]
             [UsedImplicitly]
             public int Field;
 
-            [Setup]
+            [GlobalSetup]
             public void Single() { }
 
             [Benchmark]

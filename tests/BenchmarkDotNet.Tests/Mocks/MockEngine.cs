@@ -30,10 +30,10 @@ namespace BenchmarkDotNet.Tests.Mocks
         public long OperationsPerInvoke { get; } = 1;
 
         [UsedImplicitly]
-        public Action SetupAction { get; set; }
+        public Action GlobalSetupAction { get; set; }
 
         [UsedImplicitly]
-        public Action CleanupAction { get; set; }
+        public Action GlobalCleanupAction { get; set; }
 
         [UsedImplicitly]
         public bool IsDiagnoserAttached { get; set; }

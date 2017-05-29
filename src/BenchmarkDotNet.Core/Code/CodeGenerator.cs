@@ -33,8 +33,8 @@ namespace BenchmarkDotNet.Code
                 Replace("$TargetMethodDelegateType$", provider.TargetMethodDelegateType).
                 Replace("$IdleMethodDelegateType$", provider.IdleMethodDelegateType).
                 Replace("$IdleMethodReturnType$", provider.IdleMethodReturnType).
-                Replace("$SetupMethodName$", provider.SetupMethodName).
-                Replace("$CleanupMethodName$", provider.CleanupMethodName).
+                Replace("$GlobalSetupMethodName$", provider.GlobalSetupMethodName).
+                Replace("$GlobalCleanupMethodName$", provider.GlobalCleanupMethodName).
                 Replace("$IdleImplementation$", provider.IdleImplementation).
                 Replace("$HasReturnValue$", provider.HasReturnValue).
                 Replace("$AdditionalLogic$", benchmark.Target.AdditionalLogic).

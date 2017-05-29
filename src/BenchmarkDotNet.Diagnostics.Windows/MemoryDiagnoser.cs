@@ -33,11 +33,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public void BeforeAnythingElse(DiagnoserActionParameters _) { }
 
-        public void AfterSetup(DiagnoserActionParameters _) { }
+        public void AfterGlobalSetup(DiagnoserActionParameters _) { }
 
         public void BeforeMainRun(DiagnoserActionParameters parameters) => Start(parameters);
 
-        public void BeforeCleanup() => Stop();
+        public void BeforeGlobalCleanup() => Stop();
 
         public void ProcessResults(Benchmark benchmark, BenchmarkReport report)
         {

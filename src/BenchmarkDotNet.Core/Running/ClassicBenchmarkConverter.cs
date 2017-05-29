@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Running
                 from benchmark in TypeToBenchmarks(type, config)
                 let target = benchmark.Target
                 select new Benchmark(
-                    new Target(target.Type, target.Method, target.SetupMethod, target.CleanupMethod, target.MethodDisplayInfo, benchmarkContent, target.Baseline, target.Categories, target.OperationsPerInvoke),
+                    new Target(target.Type, target.Method, target.GlobalSetupMethod, target.GlobalCleanupMethod, target.MethodDisplayInfo, benchmarkContent, target.Baseline, target.Categories, target.OperationsPerInvoke),
                     benchmark.Job,
                     benchmark.Parameters)).ToArray();
         }

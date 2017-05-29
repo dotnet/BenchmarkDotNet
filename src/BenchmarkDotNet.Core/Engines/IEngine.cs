@@ -23,10 +23,10 @@ namespace BenchmarkDotNet.Engines
         long OperationsPerInvoke { get; }
 
         [CanBeNull]
-        Action SetupAction { get; }
+        Action GlobalSetupAction { get; }
 
         [CanBeNull]
-        Action CleanupAction { get; }
+        Action GlobalCleanupAction { get; }
 
         [NotNull]
         Action<long> MainAction { get; }
@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Engines
 
         /// <summary>
         /// must perform jitting via warmup calls
-        /// <remarks>is called after first call to Setup, from the auto-generated benchmark process</remarks>
+        /// <remarks>is called after first call to GlobalSetup, from the auto-generated benchmark process</remarks>
         /// </summary>
         void Jitting();
 

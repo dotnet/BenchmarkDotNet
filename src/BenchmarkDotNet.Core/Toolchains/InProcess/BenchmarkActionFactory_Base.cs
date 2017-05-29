@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         3. High data locality and no additional allocations / JIT where possible.
             This means NO closures allowed, no allocations but in .ctor and for LastCallResult boxing,
             all state should be stored explicitly as BenchmarkAction's fields.
-        4. There can be multiple benchmark actions per single target instance (target, setup, cleanup methods),
+        4. There can be multiple benchmark actions per single target instance (target, globalSetup, globalCleanup methods),
             so target instantiation is not a responsibility of the benchmark action.
         5. Implementation should match to the code in BenchmarkProgram.txt.
             As example, this code emits loop unroll only, task waiting is implemented as a delegate call.

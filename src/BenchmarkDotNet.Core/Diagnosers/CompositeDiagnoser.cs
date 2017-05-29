@@ -25,13 +25,13 @@ namespace BenchmarkDotNet.Diagnosers
         public void BeforeAnythingElse(DiagnoserActionParameters parameters) 
             => diagnosers.ForEach(diagnoser => diagnoser.BeforeAnythingElse(parameters));
 
-        public void AfterSetup(DiagnoserActionParameters parameters) 
-            => diagnosers.ForEach(diagnoser => diagnoser.AfterSetup(parameters));
+        public void AfterGlobalSetup(DiagnoserActionParameters parameters) 
+            => diagnosers.ForEach(diagnoser => diagnoser.AfterGlobalSetup(parameters));
 
         public void BeforeMainRun(DiagnoserActionParameters parameters) 
             => diagnosers.ForEach(diagnoser => diagnoser.BeforeMainRun(parameters));
 
-        public void BeforeCleanup() => diagnosers.ForEach(diagnoser => diagnoser.BeforeCleanup());
+        public void BeforeGlobalCleanup() => diagnosers.ForEach(diagnoser => diagnoser.BeforeGlobalCleanup());
 
         public void ProcessResults(Benchmark benchmark, BenchmarkReport report)
             => diagnosers.ForEach(diagnoser => diagnoser.ProcessResults(benchmark, report));

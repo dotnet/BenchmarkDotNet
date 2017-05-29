@@ -11,8 +11,8 @@ namespace BenchmarkDotNet.Samples.JIT
         [Params(false, true)]
         public bool CallStopwatchTimestamp { get; set; }
 
-        [Setup]
-        public void Setup()
+        [GlobalSetup]
+        public void GlobalSetup()
         {
             if (CallStopwatchTimestamp)
                 Stopwatch.GetTimestamp();

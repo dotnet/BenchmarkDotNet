@@ -24,8 +24,8 @@ namespace BenchmarkDotNet.Engines
         public Action<long> IdleAction { get; }
         public Job TargetJob { get; }
         public long OperationsPerInvoke { get; }
-        public Action SetupAction { get; }
-        public Action CleanupAction { get; }
+        public Action GlobalSetupAction { get; }
+        public Action GlobalCleanupAction { get; }
         public IResolver Resolver { get; }
 
         private IClock Clock { get; }
@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Engines
         internal Engine(
             IHost host,
             Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> idleAction, Action<long> mainAction, Job targetJob,
-            Action setupAction, Action cleanupAction, long operationsPerInvoke)
+            Action globalSetupAction, Action globalCleanupAction, long operationsPerInvoke)
         {
             Host = host;
             IsDiagnoserAttached = host.IsDiagnoserAttached;
@@ -54,8 +54,8 @@ namespace BenchmarkDotNet.Engines
             Dummy3Action = dummy3Action;
             MainAction = mainAction;
             TargetJob = targetJob;
-            SetupAction = setupAction;
-            CleanupAction = cleanupAction;
+            GlobalSetupAction = globalSetupAction;
+            GlobalCleanupAction = globalCleanupAction;
             OperationsPerInvoke = operationsPerInvoke;
 
             Resolver = new CompositeResolver(BenchmarkRunnerCore.DefaultResolver, EngineResolver.Instance);
@@ -215,9 +215,9 @@ namespace BenchmarkDotNet.Engines
         public class Signals
         {
             public const string BeforeAnythingElse = "// BeforeAnythingElse";
-            public const string AfterSetup = "// AfterSetup";
+            public const string AfterGlobalSetup = "// AfterGlobalSetup";
             public const string BeforeMainRun = "// BeforeMainRun";
-            public const string BeforeCleanup = "// BeforeCleanup";
+            public const string BeforeGlobalCleanup = "// BeforeGlobalCleanup";
             public const string AfterAnythingElse = "// AfterAnythingElse";
             public const string DiagnoserIsAttachedParam = "diagnoserAttached";
         }

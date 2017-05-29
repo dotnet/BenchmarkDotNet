@@ -9,8 +9,8 @@ namespace BenchmarkDotNet.Samples.IL
         private int[] initialValuesArray;
         private List<int> initialValuesList;
 
-        [Setup]
-        public void SetupData()
+        [GlobalSetup]
+        public void GlobalSetupData()
         {
             int MaxCounter = 1000;
             initialValuesArray = Enumerable.Range(0, MaxCounter).ToArray();

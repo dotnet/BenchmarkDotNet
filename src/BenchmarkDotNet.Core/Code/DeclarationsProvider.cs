@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Code
 {
     internal abstract class DeclarationsProvider
     {
-        // "Setup" or "Cleanup" methods are optional, so default to an empty delegate, so there is always something that can be invoked
+        // "GlobalSetup" or "GlobalCleanup" methods are optional, so default to an empty delegate, so there is always something that can be invoked
         private const string EmptyAction = "() => { }";
 
         protected readonly Target Target;
@@ -26,9 +26,9 @@ namespace BenchmarkDotNet.Code
 
         public string TargetTypeName => Target.Type.GetCorrectTypeName();
 
-        public string SetupMethodName => Target.SetupMethod?.Name ?? EmptyAction;
+        public string GlobalSetupMethodName => Target.GlobalSetupMethod?.Name ?? EmptyAction;
 
-        public string CleanupMethodName => Target.CleanupMethod?.Name ?? EmptyAction;
+        public string GlobalCleanupMethodName => Target.GlobalCleanupMethod?.Name ?? EmptyAction;
 
         public virtual string TargetMethodDelegate => Target.Method.Name;
 

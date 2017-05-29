@@ -76,17 +76,17 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     diagnoser?.BeforeAnythingElse(diagnoserActionParameters);
                     WriteLine(Engine.Signals.BeforeAnythingElse);
                     break;
-                case HostSignal.AfterSetup:
-                    diagnoser?.AfterSetup(diagnoserActionParameters);
-                    WriteLine(Engine.Signals.AfterSetup);
+                case HostSignal.AfterGlobalSetup:
+                    diagnoser?.AfterGlobalSetup(diagnoserActionParameters);
+                    WriteLine(Engine.Signals.AfterGlobalSetup);
                     break;
                 case HostSignal.BeforeMainRun:
                     diagnoser?.BeforeMainRun(diagnoserActionParameters);
                     WriteLine(Engine.Signals.BeforeMainRun);
                     break;
-                case HostSignal.BeforeCleanup:
-                    diagnoser?.BeforeCleanup();
-                    WriteLine(Engine.Signals.BeforeCleanup);
+                case HostSignal.BeforeGlobalCleanup:
+                    diagnoser?.BeforeGlobalCleanup();
+                    WriteLine(Engine.Signals.BeforeGlobalCleanup);
                     break;
                 case HostSignal.AfterAnythingElse:
                     WriteLine(Engine.Signals.AfterAnythingElse);

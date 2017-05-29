@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes
@@ -8,9 +8,8 @@ namespace BenchmarkDotNet.Attributes
     /// <remarks>It's going to be executed only once, after all benchmark runs.</remarks>
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    [MeansImplicitUse]
-    [Obsolete("Use GlobalCleanupAttribute")]
-    public class CleanupAttribute : GlobalCleanupAttribute
-    {
+    [MeansImplicitUse]    
+    public class GlobalCleanupAttribute: Attribute
+    {        
     }
 }

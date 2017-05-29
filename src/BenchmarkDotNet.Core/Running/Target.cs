@@ -10,8 +10,8 @@ namespace BenchmarkDotNet.Running
     {
         public Type Type { get; }
         public MethodInfo Method { get; }
-        public MethodInfo SetupMethod { get; }
-        public MethodInfo CleanupMethod { get; }
+        public MethodInfo GlobalSetupMethod { get; }
+        public MethodInfo GlobalCleanupMethod { get; }
         public string AdditionalLogic { get; }
         public int OperationsPerInvoke { get; }
         public string MethodDisplayInfo { get; }
@@ -28,8 +28,8 @@ namespace BenchmarkDotNet.Running
         public Target(
             Type type,
             MethodInfo method,              
-            MethodInfo setupMethod = null,
-            MethodInfo cleanupMethod = null,
+            MethodInfo globalSetupMethod = null,
+            MethodInfo globalCleanupMethod = null,
             string description = null,
             string additionalLogic = null,
             bool baseline = false,
@@ -39,8 +39,8 @@ namespace BenchmarkDotNet.Running
         {
             Type = type;
             Method = method;
-            SetupMethod = setupMethod;
-            CleanupMethod = cleanupMethod;
+            GlobalSetupMethod = globalSetupMethod;
+            GlobalCleanupMethod = globalCleanupMethod;
             OperationsPerInvoke = operationsPerInvoke;
             AdditionalLogic = additionalLogic ?? string.Empty;
             MethodDisplayInfo = FormatDescription(description) ?? method?.Name ?? "Untitled";

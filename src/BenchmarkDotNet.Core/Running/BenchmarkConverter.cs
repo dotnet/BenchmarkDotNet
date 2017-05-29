@@ -24,9 +24,9 @@ namespace BenchmarkDotNet.Running
 
         public static Benchmark[] MethodsToBenchmarks(Type containingType, MethodInfo[] methods, IConfig config = null)
         {
-            var setupMethod = GetWrappingMethod<SetupAttribute>(methods, "Setup");
+            var globalSetupMethod = GetWrappingMethod<GlobalSetupAttribute>(methods, "GlobalSetup");
             var targetMethods = methods.Where(method => method.HasAttribute<BenchmarkAttribute>()).ToArray();
-            var cleanupMethod = GetWrappingMethod<CleanupAttribute>(methods, "Cleanup");
+            var globalCleanupMethod = GetWrappingMethod<GlobalCleanupAttribute>(methods, "GlobalCleanup");
 
             var parameterDefinitions = GetParameterDefinitions(containingType);
             var parameterInstancesList = parameterDefinitions.Expand();
@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Running
                 rawJobs = new[] { Job.Default };
             var jobs = rawJobs.Distinct().ToArray();
 
-            var targets = GetTargets(targetMethods, containingType, setupMethod, cleanupMethod).ToArray();
+            var targets = GetTargets(targetMethods, containingType, globalSetupMethod, globalCleanupMethod).ToArray();
 
             var benchmarks = (
                 from target in targets
@@ -65,23 +65,23 @@ namespace BenchmarkDotNet.Running
             return config;
         }
 
-        private static IEnumerable<Target> GetTargets(MethodInfo[] targetMethods, Type type, MethodInfo setupMethod, MethodInfo cleanupMethod) => targetMethods.
+        private static IEnumerable<Target> GetTargets(MethodInfo[] targetMethods, Type type, MethodInfo globalSetupMethod, MethodInfo globalCleanupMethod) => targetMethods.
             Where(m => m.HasAttribute<BenchmarkAttribute>()).
-            Select(methodInfo => CreateTarget(type, setupMethod, methodInfo, cleanupMethod, methodInfo.ResolveAttribute<BenchmarkAttribute>(), targetMethods));
+            Select(methodInfo => CreateTarget(type, globalSetupMethod, methodInfo, globalCleanupMethod, methodInfo.ResolveAttribute<BenchmarkAttribute>(), targetMethods));
 
         private static Target CreateTarget(
             Type type, 
-            MethodInfo setupMethod, 
+            MethodInfo globalSetupMethod, 
             MethodInfo methodInfo, 
-            MethodInfo cleanupMethod, 
+            MethodInfo globalCleanupMethod, 
             BenchmarkAttribute attr,            
             MethodInfo[] targetMethods)
         {
             var target = new Target(
                 type,
                 methodInfo,
-                setupMethod,
-                cleanupMethod,
+                globalSetupMethod,
+                globalCleanupMethod,
                 attr.Description,
                 baseline: attr.Baseline,
                 categories: GetCategories(methodInfo),
@@ -131,15 +131,15 @@ namespace BenchmarkDotNet.Running
 
         private static MethodInfo GetWrappingMethod<T>(MethodInfo[] methods, string methodName) where T : Attribute
         {
-            var setupMethod = methods.FirstOrDefault(m => m.HasAttribute<T>());
-            if (setupMethod != null)
+            var globalSetupMethod = methods.FirstOrDefault(m => m.HasAttribute<T>());
+            if (globalSetupMethod != null)
             {
-                // "Setup" or "Cleanup" methods are optional, but if they're there, they must have the correct signature, accessibility, etc ...
-                AssertMethodHasCorrectSignature(methodName, setupMethod);
-                AssertMethodIsAccessible(methodName, setupMethod);
-                AssertMethodIsNotGeneric(methodName, setupMethod);
+                // "GlobalSetup" or "GlobalCleanup" methods are optional, but if they're there, they must have the correct signature, accessibility, etc ...
+                AssertMethodHasCorrectSignature(methodName, globalSetupMethod);
+                AssertMethodIsAccessible(methodName, globalSetupMethod);
+                AssertMethodIsNotGeneric(methodName, globalSetupMethod);
             }
-            return setupMethod;
+            return globalSetupMethod;
         }
 
         private static string[] GetCategories(MethodInfo method)

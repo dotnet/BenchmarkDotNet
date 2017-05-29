@@ -134,8 +134,8 @@ namespace BenchmarkDotNet.IntegrationTests
         int initialCollectionCountGen1;
         int initialCollectionCountGen2;
 
-        [Setup]
-        public void Setup()
+        [GlobalSetup]
+        public void GlobalSetup()
         {
             initialCollectionCountGen1 = GC.CollectionCount(1);
             initialCollectionCountGen2 = GC.CollectionCount(2);

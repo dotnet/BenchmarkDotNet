@@ -18,8 +18,8 @@ namespace BenchmarkDotNet.Samples.Intro
         [Params(16, 32, 64)]
         public int Size;
 
-        [Setup]
-        public void Setup()
+        [GlobalSetup]
+        public void GlobalSetup()
         {
             data = new byte[Size * 1024 * 1024];
         }

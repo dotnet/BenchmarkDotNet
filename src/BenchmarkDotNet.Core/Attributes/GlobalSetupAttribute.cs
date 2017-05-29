@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes
@@ -9,8 +9,7 @@ namespace BenchmarkDotNet.Attributes
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     [MeansImplicitUse]
-    [Obsolete("Use GlobalSetupAttribute")]
-    public class SetupAttribute : GlobalSetupAttribute
+    public class GlobalSetupAttribute: Attribute
     {
     }
 }

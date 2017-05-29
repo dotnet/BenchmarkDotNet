@@ -74,7 +74,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return false;
         }
 
-        protected override void Cleanup(Benchmark benchmark, ArtifactsPaths artifactsPaths)
+        protected override void ArtifactCleanup(Benchmark benchmark, ArtifactsPaths artifactsPaths)
         {
             if (!Directory.Exists(artifactsPaths.BuildArtifactsDirectoryPath))
             {

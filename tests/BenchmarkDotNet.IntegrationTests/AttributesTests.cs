@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             public string Text;
 
-            [CustomSetup]
+            [CustomGlobalSetup]
             public void Setup()
             {
                 Text = ExpectedText;
@@ -48,6 +48,6 @@ namespace BenchmarkDotNet.IntegrationTests
 
         class CustomBenchmarkAttribute : BenchmarkAttribute { }
 
-        class CustomSetupAttribute : SetupAttribute { }
+        class CustomGlobalSetupAttribute : GlobalSetupAttribute { }
     }
 }

@@ -22,8 +22,8 @@ type StringKeyComparison () =
     [<Params (100, 500, 1000, 2000)>] 
     member val public DictSize = 0 with get, set
 
-    [<Setup>]
-    member self.SetupData() =
+    [<GlobalSetup>]
+    member self.GlobalSetupData() =
         dict1.Clear(); dict2.Clear()
         arr <- getStrings self.DictSize
         arr |> Array.iter (fun x -> dict1.[x] <- true ; dict2.[x] <- true)
