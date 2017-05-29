@@ -3,8 +3,9 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Core.Helpers;
-using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Code
 {
@@ -34,19 +35,27 @@ namespace BenchmarkDotNet.Code
 
         public string IterationCleanupMethodName => Target.IterationCleanupMethod?.Name ?? EmptyAction;
 
-        public virtual string TargetMethodDelegate => Target.Method.Name;
+        public virtual string ExtraDefines => null;
 
         public abstract string TargetMethodReturnTypeNamespace { get; }
 
+        protected virtual Type TargetMethodReturnType => Target.Method.ReturnType;
+
+        public string TargetMethodReturnTypeName => TargetMethodReturnType.GetCorrectTypeName();
+
         public abstract string TargetMethodDelegateType { get; }
 
-        public abstract string IdleMethodReturnType { get; }
+        public virtual string TargetMethodDelegate => Target.Method.Name;
+
+        public virtual string ConsumeField => null;
+
+        protected abstract Type IdleMethodReturnType { get; }
+
+        public string IdleMethodReturnTypeName => IdleMethodReturnType.GetCorrectTypeName();
 
         public abstract string IdleMethodDelegateType { get; }
 
         public abstract string IdleImplementation { get; }
-
-        public abstract string HasReturnValue { get; }
     }
 
     internal class VoidDeclarationsProvider : DeclarationsProvider
@@ -57,13 +66,11 @@ namespace BenchmarkDotNet.Code
 
         public override string TargetMethodDelegateType => "Action";
 
-        public override string IdleMethodReturnType => "void";
+        protected override Type IdleMethodReturnType => typeof(void);
 
         public override string IdleMethodDelegateType => TargetMethodDelegateType;
 
         public override string IdleImplementation => string.Empty;
-
-        public override string HasReturnValue => "false";
     }
 
     internal class NonVoidDeclarationsProvider : DeclarationsProvider
@@ -76,30 +83,30 @@ namespace BenchmarkDotNet.Code
                     ? string.Empty 
                     : $"using {TargetMethodReturnType.Namespace};";
 
-        public virtual Type TargetMethodReturnType => Target.Method.ReturnType;
-
-        public string TargetMethodReturnTypeName => TargetMethodReturnType.GetCorrectTypeName();
-
         public override string TargetMethodDelegateType => $"Func<{TargetMethodReturnTypeName}>";
 
-        public override string IdleMethodReturnType
-            => TargetMethodReturnType.IsStruct()
-                ? "int" // we return int because creating bigger ValueType could take longer than benchmarked method itself
-                : TargetMethodReturnTypeName;
+        public override string ConsumeField
+            => !Consumer.IsConsumable(TargetMethodReturnType) && Consumer.HasConsumableField(TargetMethodReturnType, out var field)
+                ? $".{field.Name}"
+                : null;
 
-        public override string IdleMethodDelegateType
-            => TargetMethodReturnType.IsStruct()
-                ? "Func<int>" 
-                : $"Func<{TargetMethodReturnTypeName}>";
+        protected override Type IdleMethodReturnType
+            => Consumer.IsConsumable(TargetMethodReturnType)
+                ? TargetMethodReturnType
+                : (Consumer.HasConsumableField(TargetMethodReturnType, out var field)
+                    ? field.FieldType
+                    : typeof(int)); // we return this simple type because creating bigger ValueType could take longer than benchmarked method itself
+
+        public override string IdleMethodDelegateType => $"Func<{IdleMethodReturnTypeName}>";
 
         public override string IdleImplementation
         {
             get
             {
                 string value;
-                var type = TargetMethodReturnType;
-                if (type.IsStruct())
-                    value = "0";
+                var type = IdleMethodReturnType;
+                if (type.GetTypeInfo().IsPrimitive)
+                    value = $"default({type.GetCorrectTypeName()})";
                 else if (type.GetTypeInfo().IsClass || type.GetTypeInfo().IsInterface)
                     value = "null";
                 else
@@ -108,7 +115,10 @@ namespace BenchmarkDotNet.Code
             }
         }
 
-        public override string HasReturnValue => "true";
+        public override string ExtraDefines
+            => Consumer.IsConsumable(TargetMethodReturnType) || Consumer.HasConsumableField(TargetMethodReturnType, out var _)
+                ? "#define RETURNS_CONSUMABLE"
+                : "#define RETURNS_NON_CONSUMABLE_STRUCT";
     }
 
     internal class TaskDeclarationsProvider : VoidDeclarationsProvider
@@ -130,7 +140,7 @@ namespace BenchmarkDotNet.Code
         {
         }
 
-        public override Type TargetMethodReturnType => Target.Method.ReturnType.GetTypeInfo().GetGenericArguments().Single();
+        protected override Type TargetMethodReturnType => Target.Method.ReturnType.GetTypeInfo().GetGenericArguments().Single();
 
         // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
         // and will eventually throw actual exception, not aggregated one

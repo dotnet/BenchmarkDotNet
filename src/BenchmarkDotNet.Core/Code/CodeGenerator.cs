@@ -31,20 +31,22 @@ namespace BenchmarkDotNet.Code
                 Replace("$TargetTypeName$", provider.TargetTypeName).
                 Replace("$TargetMethodDelegate$", provider.TargetMethodDelegate).
                 Replace("$TargetMethodDelegateType$", provider.TargetMethodDelegateType).
+                Replace("$TargetMethodReturnType$", provider.TargetMethodReturnTypeName).
                 Replace("$IdleMethodDelegateType$", provider.IdleMethodDelegateType).
-                Replace("$IdleMethodReturnType$", provider.IdleMethodReturnType).
+                Replace("$IdleMethodReturnType$", provider.IdleMethodReturnTypeName).
                 Replace("$GlobalSetupMethodName$", provider.GlobalSetupMethodName).
                 Replace("$GlobalCleanupMethodName$", provider.GlobalCleanupMethodName).
                 Replace("$IterationSetupMethodName$", provider.IterationSetupMethodName).
                 Replace("$IterationCleanupMethodName$", provider.IterationCleanupMethodName).
                 Replace("$IdleImplementation$", provider.IdleImplementation).
-                Replace("$HasReturnValue$", provider.HasReturnValue).
+                Replace("$ExtraDefines$", provider.ExtraDefines).
+                Replace("$ConsumeField$", provider.ConsumeField).
                 Replace("$AdditionalLogic$", benchmark.Target.AdditionalLogic).
                 Replace("$JobSetDefinition$", GetJobsSetDefinition(benchmark)).
                 Replace("$ParamsContent$", GetParamsContent(benchmark)).
                 Replace("$ExtraAttribute$", GetExtraAttributes(benchmark.Target)).
                 Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark)). 
-                Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : string.Empty).
+                Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).
                 Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath).
                 ToString();
 

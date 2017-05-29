@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
@@ -7,6 +10,13 @@ namespace BenchmarkDotNet.Engines
 {
     public class Consumer
     {
+        private static readonly HashSet<Type> SupportedTypes
+            = new HashSet<Type>(
+                typeof(Consumer).GetTypeInfo()
+                                .DeclaredFields
+                                .Where(field => !field.IsStatic) // exclude this HashSet itself
+                                .Select(field => field.FieldType));
+
         private volatile byte byteHolder;
         private volatile sbyte sbyteHolder;
         private volatile short shortHolder;
@@ -69,6 +79,30 @@ namespace BenchmarkDotNet.Engines
         public void Consume(object objectValue) => Volatile.Write(ref objectHolder, objectValue);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Consume<T>(T objectValue) => Volatile.Write(ref objectHolder, objectValue);
+        public void Consume<T>(T objectValue) where T : class // class constraint prevents from boxing structs
+            => Volatile.Write(ref objectHolder, objectValue);
+
+        internal static bool IsConsumable(Type type)
+            => SupportedTypes.Contains(type) || type.GetTypeInfo().IsClass || type.GetTypeInfo().IsInterface;
+
+        internal static bool HasConsumableField(Type type, out FieldInfo consumableField)
+        {
+            var typeInfo = type.GetTypeInfo();
+
+            if (typeInfo.IsEnum)
+            {
+                // Enums are tricky bastards which report "value__" field, which is public for reflection, but inaccessible via C#
+                consumableField = null;
+                return false;
+            }
+
+            var publicInstanceFields = typeInfo.DeclaredFields
+                                               .Where(field => field.IsPublic && !field.IsStatic)
+                                               .ToArray();
+
+            consumableField = publicInstanceFields.FirstOrDefault(field => IsConsumable(field.FieldType));
+
+            return consumableField != null;
+        }
     }
 }

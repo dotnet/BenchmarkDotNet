@@ -101,6 +101,20 @@ namespace BenchmarkDotNet.IntegrationTests
             });
         }
 
+        public class NoBoxing
+        {
+            [Benchmark] public ValueTuple<int> ReturnsValueType() => new ValueTuple<int>(0);
+        }
+
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void EngineShouldNotIntroduceBoxing(IToolchain toolchain)
+        {
+            AssertAllocations(toolchain, typeof(NoBoxing), new Dictionary<string, long>
+            {
+                { nameof(NoBoxing.ReturnsValueType), 0 }
+            });
+        }
+
         public class NonAllocatingAsynchronousBenchmarks
         {
             private readonly Task<int> completedTaskOfT = Task.FromResult(default(int)); // we store it in the field, because Task<T> is reference type so creating it allocates heap memory

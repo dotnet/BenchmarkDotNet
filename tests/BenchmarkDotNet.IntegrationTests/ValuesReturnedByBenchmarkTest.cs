@@ -1,5 +1,6 @@
 ﻿using System;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Environments;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -48,6 +49,12 @@ namespace BenchmarkDotNet.IntegrationTests
 
             [Benchmark]
             public DateTime ReturnNonDefaultValueForValueType() => DateTime.UtcNow;
+
+            [Benchmark]
+            public ValueTuple<DateTime> ReturnGenericValueType() => new ValueTuple<DateTime>();
+
+            [Benchmark]
+            public Jit ReturnEnum() => Jit.RyuJit;
         }
     }
 }
