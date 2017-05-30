@@ -37,6 +37,7 @@ In this category, you can specifiy how to benchmark each method.
 * `RunStrategy`:
   * `Throughput`: default strategy which allows to get good precision level
   * `ColdStart`: should be used only for measuring cold start of the application or testing purpose
+  * `Monitoring`: A mode without overhead evaluating, with several target iterations
 * `LaunchCount`: how many times we should launch process with target benchmark
 * `WarmupCount`: how many warmup iterations should be performed
 * `TargetCount`: how many target iterations should be performed

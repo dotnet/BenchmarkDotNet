@@ -14,7 +14,8 @@
             "Getting Started" : "Guides\\GettingStarted.md",
             "How to run your benchmarks": "Guides\\HowToRun.md",
             "Good Practices": "Guides\\GoodPractices.md",
-            "Installing NuGet packages": "Guides\\NuGet.md"
+            "Installing NuGet packages": "Guides\\NuGet.md",
+            "Choosing RunStrategy": "Guides\\ChoosingRunStrategy.md"
         },
         "Configs" :
         {
@@ -31,7 +32,7 @@
         "Advanced features": 
         {
             "Params": "Advanced\\Params.md",
-            "Setup":"Advanced\\Setup.md",
+            "Setup And Cleanup": "Advanced\\SetupAndCleanup.md",
             "Baseline":"Advanced\\Baseline.md",
             "Percentiles": "Advanced\\Percentiles.md",
             "STAThread": "Advanced\\STAThread.md",
