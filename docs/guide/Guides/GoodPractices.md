@@ -1,4 +1,4 @@
-# Rules of benchmarking
+# Good Practices
 
 ##Use the Release build without an attached debugger
 
@@ -35,29 +35,6 @@ double Foo()
     return Math.Exp(1);
 }
 ```
-
-##Minimize work with memory
-
-If you don't measure efficiency of access to memory, efficiency of the CPU cache, efficiency of GC, you 
-shouldn't create big arrays and you shouldn't allocate big amount of memory. For example, you want to 
-measure performance of `ConvertAll(x => 2 * x).ToList()`. You can write code like this:
-
-```cs
-List<int> list = /* ??? */;
-public List<int> ConvertAll()
-{
-    return list.ConvertAll(x => 2 * x).ToList();
-}
-```
-
-In this case, you should create a small list like this:
-
-```cs
-List<int> list = new List<int> { 1, 2, 3, 4, 5 };
-```
-
-If you create a big list (with millions of elements), then you will also measure efficiency of the CPU cache 
-because you will have big amount of [cache miss](http://en.wikipedia.org/wiki/CPU_cache#Cache_miss) during the calculation.  
 
 ##Power settings and other applications
 

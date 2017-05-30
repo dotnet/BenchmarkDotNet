@@ -8,9 +8,15 @@
     "Pages" : 
     {
         "__index" : "index.md",
-        "Getting Started" : "GettingStarted.md",
         "Overview" : "Overview.md",
-        "Configs" : 
+        "Guides":
+        {
+            "Getting Started" : "Guides\\GettingStarted.md",
+            "How to run your benchmarks": "Guides\\HowToRun.md",
+            "Good Practices": "Guides\\GoodPractices.md",
+            "Installing NuGet packages": "Guides\\NuGet.md"
+        },
+        "Configs" :
         {
             "Configs": "Configs\\Configs.md",
             "Jobs": "Configs\\Jobs.md",
@@ -22,7 +28,6 @@
             "Validators":"Configs\\Validators.md",
             "Filters":"Configs\\Filters.md"
         },
-        "How to run your benchmarks": "HowToRun.md",
         "Advanced features": 
         {
             "Params": "Advanced\\Params.md",
@@ -32,19 +37,20 @@
             "STAThread": "Advanced\\STAThread.md",
             "Custom Mono Path": "Advanced\\CustomMonoPath.md"
         },
-        "How it works": "HowItWorks.md",
-        "Rules of benchmarking": "RulesOfBenchmarking.md",
-        "NuGet Packages": "NuGet.md",
-        "Team": "Team.md",
+        "Internals":
+        {
+            "How it works": "Internals\\HowItWorks.md"
+        },
         "Contributing": 
         {
             "Building":"Contributing\\Building.md",
             "Debugging":"Contributing\\Debugging.md",
             "Running tests":"Contributing\\RunningTests.md",
             "Development":"Contributing\\Development.md",
-            "Miscellaneous topics":"Contributing\\Miscellaneous.md",
+            "Miscellaneous topics":"Contributing\\Miscellaneous.md" 
         },
         "FAQ": "FAQ.md",
+        "Team": "Team.md",
         "License": "license.md"
     }
 }
