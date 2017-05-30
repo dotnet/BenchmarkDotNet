@@ -21,6 +21,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
     {
         private readonly Dictionary<Benchmark, Stats> results = new Dictionary<Benchmark, Stats>();
 
+        public const string DiagnoserId = nameof(MemoryDiagnoser) + "Obsolete";
+        public IEnumerable<string> Ids => new[] { DiagnoserId };
+
         public IColumnProvider GetColumnProvider() => new SimpleColumnProvider(
             new GCCollectionColumn(results, 0),
             new GCCollectionColumn(results, 1),

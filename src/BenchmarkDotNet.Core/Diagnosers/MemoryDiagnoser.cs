@@ -17,8 +17,11 @@ namespace BenchmarkDotNet.Diagnosers
         private const int Gen0 = 0, Gen1 = 1, Gen2 = 2;
 
         public static readonly MemoryDiagnoser Default = new MemoryDiagnoser();
+        public const string DiagnoserId = nameof(MemoryDiagnoser); 
 
         private readonly Dictionary<Benchmark, GcStats> results = new Dictionary<Benchmark, GcStats>();
+
+        public IEnumerable<string> Ids => new[] { DiagnoserId };
 
         public IColumnProvider GetColumnProvider() => new SimpleColumnProvider(
             new GCCollectionColumn(results, Gen0),

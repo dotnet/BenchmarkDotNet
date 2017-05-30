@@ -21,6 +21,7 @@ namespace BenchmarkDotNet.Reports
         [NotNull]
         public IReadOnlyList<ExecuteResult> ExecuteResults { get; }
 
+        [CanBeNull]
         public Statistics ResultStatistics => resultStatistics ?? (resultStatistics = GetResultRuns().Any()
             ? new Statistics(GetResultRuns().Select(r => r.GetAverageNanoseconds()))
             : null);

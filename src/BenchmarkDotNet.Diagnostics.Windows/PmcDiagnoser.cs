@@ -192,6 +192,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 stats.Handle(obj.ProfileSource);
         }
 
+        public const string DiagnoserId = nameof(InliningDiagnoser);
+        public IEnumerable<string> Ids => new[] { DiagnoserId };
+
         public IColumnProvider GetColumnProvider()
            => new SimpleColumnProvider(
                Enum.GetValues(typeof(HardwareCounter))

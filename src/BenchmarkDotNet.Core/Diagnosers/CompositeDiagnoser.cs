@@ -50,5 +50,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) 
             => diagnosers.SelectMany(diagnoser => diagnoser.Validate(validationParameters));
+
+        public IEnumerable<string> Ids => diagnosers.SelectMany(d => d.Ids);
     }
 }

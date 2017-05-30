@@ -9,6 +9,8 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public interface IDiagnoser
     {
+        IEnumerable<string> Ids { get; } 
+            
         IColumnProvider GetColumnProvider();
 
         /// <summary>

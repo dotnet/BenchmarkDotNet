@@ -14,12 +14,12 @@ namespace BenchmarkDotNet.Analysers
             foreach (var conclusion in AnalyseSummary(summary))
                 yield return conclusion;
             foreach (var report in summary.Reports)
-                foreach (var conclusion in AnalyseReport(report))
+                foreach (var conclusion in AnalyseReport(report, summary))
                     yield return conclusion;
         }
 
         public virtual IEnumerable<Conclusion> AnalyseSummary(Summary summary) => Enumerable.Empty<Conclusion>();
-        public virtual IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report) => Enumerable.Empty<Conclusion>();
+        public virtual IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary) => Enumerable.Empty<Conclusion>();
 
         public Conclusion CreateHint(string message, [CanBeNull] BenchmarkReport report = null) => Conclusion.CreateHint(Id, message, report);
         public Conclusion CreateWarning(string message, [CanBeNull] BenchmarkReport report = null) => Conclusion.CreateWarning(Id, message, report);
