@@ -9,7 +9,7 @@ using BenchmarkDotNet.Jobs;
 namespace BenchmarkDotNet.Samples.Other
 {
     /// <summary>
-    /// Example of reading all lines from file to string[], and usage of [ПдщифдCleanup] attribute.
+    /// Example of reading all lines from file to string[], and usage of the [GlobalSetup] and [GlobalCleanup] attributes.
     /// </summary>
     [Config(typeof(Config))]
     public class File_StreamVsMemoryMapperVewStream
