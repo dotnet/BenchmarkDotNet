@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace BenchmarkDotNet.Attributes
 {
     /// <summary>
-    /// Marks method to be executed after each benchmark iteration.
+    /// Marks method to be executed before each benchmark iteration.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     [MeansImplicitUse]
