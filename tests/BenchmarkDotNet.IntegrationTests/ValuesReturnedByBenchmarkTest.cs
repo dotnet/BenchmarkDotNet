@@ -51,10 +51,20 @@ namespace BenchmarkDotNet.IntegrationTests
             public DateTime ReturnNonDefaultValueForValueType() => DateTime.UtcNow;
 
             [Benchmark]
-            public ValueTuple<DateTime> ReturnGenericValueType() => new ValueTuple<DateTime>();
+            public Result<DateTime> ReturnGenericValueType() => new Result<DateTime>();
 
             [Benchmark]
             public Jit ReturnEnum() => Jit.RyuJit;
+
+            public struct Result<T>
+            {
+                public T Field;
+
+                public Result(T field)
+                {
+                    Field = field;
+                }
+            }
         }
     }
 }
