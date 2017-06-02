@@ -32,8 +32,18 @@ namespace BenchmarkDotNet.Extensions
             var prefix = "";
             if (!string.IsNullOrEmpty(type.Namespace))
                 prefix += type.Namespace + ".";
-            if (type.IsNested && type.DeclaringType != null)
-                prefix += type.DeclaringType.Name + ".";
+
+            var nestedTypes = "";
+            Type child = type, parent = type.DeclaringType;
+            while (child.IsNested && parent != null)
+            {
+                nestedTypes = parent.Name + "." + nestedTypes;
+
+                child = parent;
+                parent = parent.DeclaringType;
+            }
+            prefix += nestedTypes;
+                
 
             if (type.GetTypeInfo().IsGenericParameter)
                 return type.Name;
