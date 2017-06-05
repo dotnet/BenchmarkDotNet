@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Baseline - BenchmarkDotNet Documentation</title>
+    <title>Setup And Cleanup - BenchmarkDotNet Documentation</title>
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../css/theme_colors.css" type="text/css" />
@@ -85,12 +85,16 @@
 <li><span class="navigationgroup"><i class="fa fa-caret-down"></i> <a href="../Advancedfeatures.htm">Advanced features</a></span></li>
 <li class="tocentry"><a href="../Advanced/Params.htm">Params</a>
 </li>
-<li class="tocentry"><a href="../Advanced/SetupAndCleanup.htm">Setup And Cleanup</a>
-</li>
-<li class="tocentry current"><a class="current" href="../Advanced/Baseline.htm">Baseline</a>
+<li class="tocentry current"><a class="current" href="../Advanced/SetupAndCleanup.htm">Setup And Cleanup</a>
 <ul class="currentrelative">
-<li class="tocentry"><a href="#example">Example</a></li>
+<li class="tocentry"><a href="#globalsetup">GlobalSetup</a></li>
+<li class="tocentry"><a href="#globalcleanup">GlobalCleanup</a></li>
+<li class="tocentry"><a href="#iterationsetup">IterationSetup</a></li>
+<li class="tocentry"><a href="#iterationcleanup">IterationCleanup</a></li>
+<li class="tocentry"><a href="#an-example">An example</a></li>
 </ul>
+<li class="tocentry"><a href="../Advanced/Baseline.htm">Baseline</a>
+</li>
 <li class="tocentry"><a href="../Advanced/Percentiles.htm">Percentiles</a>
 </li>
 <li class="tocentry"><a href="../Advanced/STAThread.htm">STAThread</a>
@@ -130,79 +134,116 @@
             <div class="nav-content">
                 <div role="navigation" aria-label="breadcrumbs navigation">
                     <div class="breadcrumbs">
-<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Advancedfeatures.htm">Advanced features</a></li> / <li><a href="../Advanced/Baseline.htm">Baseline</a></li></ul>
+<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Advancedfeatures.htm">Advanced features</a></li> / <li><a href="../Advanced/SetupAndCleanup.htm">Setup And Cleanup</a></li></ul>
 					
                     </div>
                     <hr />
                 </div>
                 <div role="main">
                     <div class="section">
-<h1 id="baseline">Baseline<a class="headerlink" href="#baseline" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
-<p>In order to scale your results you need to mark one of your benchmark methods as a baseline. Only one method in class can have <code>Baseline = true</code> applied.</p>
-<h2 id="example">Example<a class="headerlink" href="#example" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
-<pre><code class="cs">public class Sleeps
+<h1 id="setup-and-cleanup">Setup And Cleanup<a class="headerlink" href="#setup-and-cleanup" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<p>Sometimes we want to write some logic which should be executed <em>before</em> or <em>after</em> a benchmark, but we don't want to measure it.
+For this purpose, BenchmarkDotNet provides a set of attributes: <code>[GlobalSetup]</code>, <code>[GlobalCleanup]</code>, <code>[IterationSetup]</code>, <code>[IterationCleanup]</code>.</p>
+<h2 id="globalsetup">GlobalSetup<a class="headerlink" href="#globalsetup" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>A method which is marked by the <code>[GlobalSetup]</code> attribute will be executed only once per a benchmarked method
+  after initialization of benchmark parameters and before all the benchmark method invocations.</p>
+<pre><code class="cs">public class GlobalSetupExample
 {
-    [Benchmark]
-    public void Time50()
+    [Params(10, 100, 1000)]
+    public int N;
+
+    private int[] data;
+
+    [GlobalSetup]
+    public void GlobalSetup()
     {
-        Thread.Sleep(50);
+        data = new int[N]; // executed once per each N value
     }
 
-    [Benchmark(Baseline = true)]
-    public void Time100()
-    {
-        Thread.Sleep(100);
-    }
-
     [Benchmark]
-    public void Time150()
+    public int Logic()
     {
-        Thread.Sleep(150);
+        int res = 0;
+        for (int i = 0; i &lt; N; i++)
+            res += data[i];
+        return res;
     }
 }
 </code></pre>
 
-<p>As a result, you will have additional column in the summary table:</p>
-<pre><code class="ini">BenchmarkDotNet=v0.9.0.0
-OS=Microsoft Windows NT 6.2.9200.0
-Processor=Intel(R) Core(TM) i7-4810MQ CPU @ 2.80GHz, ProcessorCount=8
-Frequency=2728067 ticks, Resolution=366.5599 ns
-HostCLR=MS.NET 4.0.30319.42000, Arch=64-bit RELEASE [RyuJIT]
-
-Type=Sleeps  Mode=Throughput
+<h2 id="globalcleanup">GlobalCleanup<a class="headerlink" href="#globalcleanup" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>A method which is marked by the <code>[GlobalCleanup]</code> attribute will be executed only once per a benchmarked method
+  after all the benchmark method invocations.
+If you are using some unmanaged resources (e.g., which were created in the <code>GlobalSetup</code> method), they can be disposed in the <code>GlobalCleanup</code> method.</p>
+<pre><code class="cs">public void GlobalCleanup()
+{
+    // Disposing logic
+}
 </code></pre>
 
-<table class="table table-bordered-all table-responsive">
-<thead>
-<tr>
-	<th>Method</th>
-	<th>Median</th>
-	<th>StdDev</th>
-	<th>Scaled</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-	<td>Time100</td>
-	<td>100.2640 ms</td>
-	<td>0.1238 ms</td>
-	<td>1.00</td>
-</tr>
-<tr>
-	<td>Time150</td>
-	<td>150.2093 ms</td>
-	<td>0.1034 ms</td>
-	<td>1.50</td>
-</tr>
-<tr>
-	<td>Time50</td>
-	<td>50.2509 ms</td>
-	<td>0.1153 ms</td>
-	<td>0.50</td>
-</tr>
-</tbody>
-</table>
+<h2 id="iterationsetup">IterationSetup<a class="headerlink" href="#iterationsetup" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>A method which is marked by the <code>[IterationSetup]</code> attribute will be executed only once <em>before each an iteration</em>.
+It's not recommended to use this attribute in microbenchmarks because it can spoil the results.
+However, if you are writing a macrobenchmark (e.g. a benchmark which takes at least 100ms) and
+  you want to prepare some data before each iteration, <code>[IterationSetup]</code> can be useful.
+BenchmarkDotNet doesn't support setup/cleanup method for a single method invocation (<em>an operation</em>), but you can perform only one operation per iteration.
+It's recommended to use <code>RunStrategy.Monitoring</code> for such cases.
+Be careful: if you allocate any objects in the <code>[IterationSetup]</code> method, the MemoryDiagnoser results can also be spoiled.</p>
+<h2 id="iterationcleanup">IterationCleanup<a class="headerlink" href="#iterationcleanup" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>A method which is marked by the <code>[IterationCleanup]</code> attribute will be executed only once <em>after each an iteration</em>.
+This attribute has the same set of constraint with <code>[IterationSetup]</code>: it's not recommended to use <code>[IterationCleanup]</code> in microbenchmarks or benchmark which also </p>
+<h2 id="an-example">An example<a class="headerlink" href="#an-example" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<pre><code class="cs">[SimpleJob(RunStrategy.Monitoring, launchCount: 1, warmupCount: 2, targetCount: 3)]
+public class SetupAndCleanupExample
+{
+  private int setupCounter;
+  private int cleanupCounter;
 
+  [IterationSetup]
+  public void IterationSetup() =&gt; Console.WriteLine(&quot;// &quot; + &quot;IterationSetup&quot; + &quot; (&quot; + ++setupCounter + &quot;)&quot;);
+
+  [IterationCleanup]
+  public void IterationCleanup() =&gt; Console.WriteLine(&quot;// &quot; + &quot;IterationCleanup&quot; + &quot; (&quot; + ++cleanupCounter + &quot;)&quot;);
+
+  [GlobalSetup]
+  public void GlobalSetup() =&gt; Console.WriteLine(&quot;// &quot; + &quot;GlobalSetup&quot;);
+
+  [GlobalCleanup]
+  public void GlobalCleanup() =&gt; Console.WriteLine(&quot;// &quot; + &quot;GlobalCleanup&quot;);
+
+  [Benchmark]
+  public void Benchmark() =&gt; Console.WriteLine(&quot;// &quot; + &quot;Benchmark&quot;);
+}
+</code></pre>
+
+<p>The order of method calls:</p>
+<pre class="nocode">// GlobalSetup
+
+// IterationSetup (1)    // IterationSetup Jitting
+// IterationCleanup (1)  // IterationCleanup Jitting
+
+// IterationSetup (2)    // MainWarmup1
+// Benchmark             // MainWarmup1
+// IterationCleanup (2)  // MainWarmup1
+
+// IterationSetup (3)    // MainWarmup2
+// Benchmark             // MainWarmup2
+// IterationCleanup (3)  // MainWarmup2
+
+// IterationSetup (4)    // MainTarget1
+// Benchmark             // MainTarget1
+// IterationCleanup (4)  // MainTarget1
+
+// IterationSetup (5)    // MainTarget2
+// Benchmark             // MainTarget2
+// IterationCleanup (5)  // MainTarget2
+
+// IterationSetup (6)    // MainTarget3
+// Benchmark             // MainTarget3
+// IterationCleanup (6)  // MainTarget3
+
+// GlobalCleanup
+</pre>
                     </div>
                 </div>
                 <footer>

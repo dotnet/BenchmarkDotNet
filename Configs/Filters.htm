@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Setup - BenchmarkDotNet Documentation</title>
+    <title>Filters - BenchmarkDotNet Documentation</title>
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../css/theme_colors.css" type="text/css" />
@@ -72,47 +72,47 @@
 <li class="tocentry"><a href="../index.htm">Home</a>
 </li>
 
-<li class="tocentry"><a href="../GettingStarted.htm">Getting Started</a>
-</li>
 <li class="tocentry"><a href="../Overview.htm">Overview</a>
 </li>
 <li class="tocentry">
-<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Configs.htm">Configs</a></span>
-</li>
-<li class="tocentry"><a href="../HowToRun.htm">How to run your benchmarks</a>
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Guides.htm">Guides</a></span>
 </li>
 <li class="tocentry">
 <ul>
-<li><span class="navigationgroup"><i class="fa fa-caret-down"></i> <a href="../Advancedfeatures.htm">Advanced features</a></span></li>
-<li class="tocentry"><a href="../Advanced/Params.htm">Params</a>
+<li><span class="navigationgroup"><i class="fa fa-caret-down"></i> <a href="../Configs.htm">Configs</a></span></li>
+<li class="tocentry"><a href="../Configs/Configs.htm">Configs</a>
 </li>
-<li class="tocentry current"><a class="current" href="../Advanced/Setup.htm">Setup</a>
-<ul class="currentrelative">
-<li class="tocentry"><a href="#example">Example</a></li>
-</ul>
-<li class="tocentry"><a href="../Advanced/Baseline.htm">Baseline</a>
+<li class="tocentry"><a href="../Configs/Jobs.htm">Jobs</a>
 </li>
-<li class="tocentry"><a href="../Advanced/Percentiles.htm">Percentiles</a>
+<li class="tocentry"><a href="../Configs/Columns.htm">Columns</a>
 </li>
-<li class="tocentry"><a href="../Advanced/STAThread.htm">STAThread</a>
+<li class="tocentry"><a href="../Configs/Exporters.htm">Exporters</a>
 </li>
-<li class="tocentry"><a href="../Advanced/CustomMonoPath.htm">Custom Mono Path</a>
+<li class="tocentry"><a href="../Configs/Loggers.htm">Loggers</a>
+</li>
+<li class="tocentry"><a href="../Configs/Diagnosers.htm">Diagnosers</a>
+</li>
+<li class="tocentry"><a href="../Configs/Analyzers.htm">Analyzers</a>
+</li>
+<li class="tocentry"><a href="../Configs/Validators.htm">Validators</a>
+</li>
+<li class="tocentry current"><a class="current" href="../Configs/Filters.htm">Filters</a>
 </li>
 
 </ul>
 </li>
-<li class="tocentry"><a href="../HowItWorks.htm">How it works</a>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Advancedfeatures.htm">Advanced features</a></span>
 </li>
-<li class="tocentry"><a href="../RulesOfBenchmarking.htm">Rules of benchmarking</a>
-</li>
-<li class="tocentry"><a href="../NuGet.htm">NuGet Packages</a>
-</li>
-<li class="tocentry"><a href="../Team.htm">Team</a>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Internals.htm">Internals</a></span>
 </li>
 <li class="tocentry">
 <span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Contributing.htm">Contributing</a></span>
 </li>
 <li class="tocentry"><a href="../FAQ.htm">FAQ</a>
+</li>
+<li class="tocentry"><a href="../Team.htm">Team</a>
 </li>
 <li class="tocentry"><a href="../license.htm">License</a>
 </li>
@@ -134,48 +134,86 @@
             <div class="nav-content">
                 <div role="navigation" aria-label="breadcrumbs navigation">
                     <div class="breadcrumbs">
-<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Advancedfeatures.htm">Advanced features</a></li> / <li><a href="../Advanced/Setup.htm">Setup</a></li></ul>
+<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Configs.htm">Configs</a></li> / <li><a href="../Configs/Filters.htm">Filters</a></li></ul>
 					
                     </div>
                     <hr />
                 </div>
                 <div role="main">
                     <div class="section">
-<h1 id="setup">Setup<a class="headerlink" href="#setup" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
-<p>If you have some data that you want to initialize, the <code>[Setup]</code> method is the best place for this. It will be invoked only once before each iteration.</p>
-<h2 id="example">Example<a class="headerlink" href="#example" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
-<pre><code class="cs">private int[] initialValuesArray;
-private List&lt;int&gt; initialValuesList;
-
-[Setup]
-public void SetupData()
+<h1 id="filters">Filters<a class="headerlink" href="#filters" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<p>Sometimes you don't want to run all of your benchmarks.
+In this case, you can <em>filter</em> some of them with the help of <em>filters</em>.</p>
+<p>Predefined filters:</p>
+<ul>
+<li><code>SimpleFilter</code></li>
+<li><code>NameFilter</code></li>
+<li><code>DisjunctionFilter</code></li>
+<li><code>CategoryFilter</code></li>
+<li><code>AnyCategoriesFilter</code></li>
+<li><code>AllCategoriesFilter</code></li>
+</ul>
+<p>Usage examples:</p>
+<pre><code class="cs">[Config(typeof(Config))]
+public class IntroFilters
 {
-    int MaxCounter = 1000;
-    initialValuesArray = Enumerable.Range(0, MaxCounter).ToArray();
-    initialValuesList = Enumerable.Range(0, MaxCounter).ToList();
-}
+    private class Config : ManualConfig
+    {
+        // We will benchmark ONLY method with names with names (which contains &quot;A&quot; OR &quot;1&quot;) AND (have length &lt; 3)
+        public Config()
+        {
+            Add(new DisjunctionFilter(
+                new NameFilter(name =&gt; name.Contains(&quot;A&quot;)),
+                new NameFilter(name =&gt; name.Contains(&quot;1&quot;))
+            )); // benchmark with names which contains &quot;A&quot; OR &quot;1&quot;
+            Add(new NameFilter(name =&gt; name.Length &lt; 3)); // benchmark with names with length &lt; 3
+        }
+    }
 
-[Benchmark]
-public int ForLoop()
-{
-    var counter = 0;
-    for (int i = 0; i &lt; initialValuesArray.Length; i++)
-        counter += initialValuesArray[i];
-    return counter;
+    [Benchmark] public void A1() =&gt; Thread.Sleep(10); // Will be benchmarked
+    [Benchmark] public void A2() =&gt; Thread.Sleep(10); // Will be benchmarked
+    [Benchmark] public void A3() =&gt; Thread.Sleep(10); // Will be benchmarked
+    [Benchmark] public void B1() =&gt; Thread.Sleep(10); // Will be benchmarked
+    [Benchmark] public void B2() =&gt; Thread.Sleep(10);
+    [Benchmark] public void B3() =&gt; Thread.Sleep(10);
+    [Benchmark] public void C1() =&gt; Thread.Sleep(10); // Will be benchmarked
+    [Benchmark] public void C2() =&gt; Thread.Sleep(10);
+    [Benchmark] public void C3() =&gt; Thread.Sleep(10);
+    [Benchmark] public void Aaa() =&gt; Thread.Sleep(10);
 }
-
-[Benchmark]
-public int ForEachList()
-{
-    var counter = 0;
-    foreach (var i in initialValuesList)
-        counter += i;
-    return counter;
-}
-
 </code></pre>
 
+<pre><code class="cs">[DryJob]
+[CategoriesColumn]
+[BenchmarkCategory(&quot;Aswesome&quot;)]
+[AnyCategoriesFilter(&quot;A&quot;, &quot;1&quot;)]
+public class IntroCategories
+{
+    [Benchmark]
+    [BenchmarkCategory(&quot;A&quot;, &quot;1&quot;)]
+    public void A1() =&gt; Thread.Sleep(10); // Will be benchmarked
+    
+    [Benchmark]
+    [BenchmarkCategory(&quot;A&quot;, &quot;2&quot;)]
+    public void A2() =&gt; Thread.Sleep(10); // Will be benchmarked
 
+    [Benchmark]
+    [BenchmarkCategory(&quot;B&quot;, &quot;1&quot;)]
+    public void B1() =&gt; Thread.Sleep(10); // Will be benchmarked
+    
+    [Benchmark]
+    [BenchmarkCategory(&quot;B&quot;, &quot;2&quot;)]
+    public void B2() =&gt; Thread.Sleep(10);
+}
+</code></pre>
+
+<p>Command line examples:</p>
+<pre class="nocode">--category=A
+--allCategories=A,B
+--anyCategories=A,B
+</pre><p>If you are using <code>BenchmarkSwitcher</code> and want to run all the benchmarks with a category from all types and join them into one summary table, use the <code>--join</code> option (or <code>BenchmarkSwitcher.RunAllJoined</code>):</p>
+<pre class="nocode">* --join --category=MyAwesomeCategory
+</pre>
                     </div>
                 </div>
                 <footer>

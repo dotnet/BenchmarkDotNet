@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Building - BenchmarkDotNet Documentation</title>
+    <title>Installing NuGet packages - BenchmarkDotNet Documentation</title>
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../css/theme_colors.css" type="text/css" />
@@ -75,7 +75,23 @@
 <li class="tocentry"><a href="../Overview.htm">Overview</a>
 </li>
 <li class="tocentry">
-<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Guides.htm">Guides</a></span>
+<ul>
+<li><span class="navigationgroup"><i class="fa fa-caret-down"></i> <a href="../Guides.htm">Guides</a></span></li>
+<li class="tocentry"><a href="../Guides/GettingStarted.htm">Getting Started</a>
+</li>
+<li class="tocentry"><a href="../Guides/HowToRun.htm">How to run your benchmarks</a>
+</li>
+<li class="tocentry"><a href="../Guides/GoodPractices.htm">Good Practices</a>
+</li>
+<li class="tocentry current"><a class="current" href="../Guides/NuGet.htm">Installing NuGet packages</a>
+<ul class="currentrelative">
+<li class="tocentry"><a href="#packages">Packages</a></li>
+<li class="tocentry"><a href="#versioning-system-and-feeds">Versioning system and feeds</a></li>
+</ul>
+<li class="tocentry"><a href="../Guides/ChoosingRunStrategy.htm">Choosing RunStrategy</a>
+</li>
+
+</ul>
 </li>
 <li class="tocentry">
 <span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Configs.htm">Configs</a></span>
@@ -87,20 +103,7 @@
 <span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Internals.htm">Internals</a></span>
 </li>
 <li class="tocentry">
-<ul>
-<li><span class="navigationgroup"><i class="fa fa-caret-down"></i> <a href="../Contributing.htm">Contributing</a></span></li>
-<li class="tocentry current"><a class="current" href="../Contributing/Building.htm">Building</a>
-</li>
-<li class="tocentry"><a href="../Contributing/Debugging.htm">Debugging</a>
-</li>
-<li class="tocentry"><a href="../Contributing/RunningTests.htm">Running tests</a>
-</li>
-<li class="tocentry"><a href="../Contributing/Development.htm">Development</a>
-</li>
-<li class="tocentry"><a href="../Contributing/Miscellaneous.htm">Miscellaneous topics</a>
-</li>
-
-</ul>
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Contributing.htm">Contributing</a></span>
 </li>
 <li class="tocentry"><a href="../FAQ.htm">FAQ</a>
 </li>
@@ -126,20 +129,55 @@
             <div class="nav-content">
                 <div role="navigation" aria-label="breadcrumbs navigation">
                     <div class="breadcrumbs">
-<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Contributing.htm">Contributing</a></li> / <li><a href="../Contributing/Building.htm">Building</a></li></ul>
+<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Guides.htm">Guides</a></li> / <li><a href="../Guides/NuGet.htm">Installing NuGet packages</a></li></ul>
 					
                     </div>
                     <hr />
                 </div>
                 <div role="main">
                     <div class="section">
-<h1 id="building">Building<a class="headerlink" href="#building" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
-<p>For building the BenchmarkDotNet source-code, the following elements are required:</p>
+<h1 id="installing-nuget-packages">Installing NuGet packages<a class="headerlink" href="#installing-nuget-packages" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<h2 id="packages">Packages<a class="headerlink" href="#packages" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>We have the following set of NuGet packages (you can install it directly from <code>nuget.org</code>):</p>
 <ul>
-<li><a href="https://www.visualstudio.com/vs/visual-studio-2017/" target="_blank">Visual Studio 2017 (Version 15.0.26228.9 or newer) with .NET Core development tools installed</a></li>
-<li>Internet connection and disk space to download all the required packages</li>
+<li><code>BenchmarkDotNet.Core</code>: basic BenchmarkDotNet infrastructure and logic. Doesn't have any dependencies.</li>
+<li><code>BenchmarkDotNet.Toolchains.Roslyn</code>: a package that includes <code>RoslynToolchain</code> which adds an ability to build your benchmarks with the Roslyn compiler. Depends on a set of additional NuGet packages.</li>
+<li><code>BenchmarkDotNet</code>: an ultimate package that depends on <code>BenchmarkDotNet.Core</code> and <code>BenchmarkDotNet.Toolchains.Roslyn</code>: provides the <code>BenchmarkRunner</code>. In 99% of situations, you should start with this package.</li>
+<li><code>BenchmarkDotNet.Diagnostics.Windows</code>: an additional optional package that provides a set of Windows diagnosers.</li>
 </ul>
-<p>If your build fails because some packages are not available, let say F#, then just disable these project and hope for nuget server to work later on ;)</p>
+<h2 id="versioning-system-and-feeds">Versioning system and feeds<a class="headerlink" href="#versioning-system-and-feeds" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>We have 3 kinds of versions: <em>stable</em>, <em>nightly</em>, and <em>develop</em>.
+You can get the current version from the source code via <code>BenchmarkDotNetInfo.FullVersion</code> and the full title via <code>BenchmarkDotNetInfo.FullTitle</code>.</p>
+<h3 id="stable">Stable<a class="headerlink" href="#stable" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>These versions are available from the official NuGet feed.</p>
+<pre><code class="xml">&lt;packageSources&gt;
+  &lt;add key=&quot;api.nuget.org&quot; value=&quot;https://api.nuget.org/v3/index.json&quot; protocolVersion=&quot;3&quot; /&gt;
+&lt;/packageSources&gt;
+</code></pre>
+
+<ul>
+<li>Example of the main NuGet package: <code>BenchmarkDotNet.0.10.3.nupkg</code>.</li>
+<li>Example of <code>BenchmarkDotNetInfo.FullTitle</code>: <code>BenchmarkDotNet v0.10.3</code>.</li>
+</ul>
+<h3 id="nightly">Nightly<a class="headerlink" href="#nightly" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>If you want to use a nightly version of the BenchmarkDotNet, add the <code>https://ci.appveyor.com/nuget/benchmarkdotnet</code> feed in the <code>&lt;packageSources&gt;</code> section of your <code>NuGet.config</code>:</p>
+<pre><code class="xml">&lt;packageSources&gt;
+  &lt;add key=&quot;bdn-nightly&quot; value=&quot;https://ci.appveyor.com/nuget/benchmarkdotnet&quot; /&gt;
+&lt;/packageSources&gt;
+</code></pre>
+
+<p>Now you can install the packages from the <code>bdn-nightly</code> feed.</p>
+<ul>
+<li>Example of the main NuGet package: <code>BenchmarkDotNet.0.10.3.13.nupkg</code>.</li>
+<li>Example of <code>BenchmarkDotNetInfo.FullTitle</code>: <code>BenchmarkDotNet v0.10.3.13-nightly</code>.</li>
+</ul>
+<h3 id="develop">Develop<a class="headerlink" href="#develop" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>You also can build BenchmarkDotNet from source code.
+The <code>.nupkg</code> files could be build with the help of <code>.\build\build-and-pack.cmd</code>.</p>
+<ul>
+<li>Example of the main NuGet package: <code>BenchmarkDotNet.0.10.3-develop.nupkg</code>.</li>
+<li>Example of <code>BenchmarkDotNetInfo.FullTitle</code>: <code>BenchmarkDotNet v0.10.3.20170304-develop</code>.</li>
+</ul>
 
                     </div>
                 </div>

@@ -72,9 +72,10 @@
 <li class="tocentry"><a href="../index.htm">Home</a>
 </li>
 
-<li class="tocentry"><a href="../GettingStarted.htm">Getting Started</a>
-</li>
 <li class="tocentry"><a href="../Overview.htm">Overview</a>
+</li>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Guides.htm">Guides</a></span>
 </li>
 <li class="tocentry">
 <ul>
@@ -99,26 +100,23 @@
 </li>
 <li class="tocentry"><a href="../Configs/Validators.htm">Validators</a>
 </li>
+<li class="tocentry"><a href="../Configs/Filters.htm">Filters</a>
+</li>
 
 </ul>
-</li>
-<li class="tocentry"><a href="../HowToRun.htm">How to run your benchmarks</a>
 </li>
 <li class="tocentry">
 <span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Advancedfeatures.htm">Advanced features</a></span>
 </li>
-<li class="tocentry"><a href="../HowItWorks.htm">How it works</a>
-</li>
-<li class="tocentry"><a href="../RulesOfBenchmarking.htm">Rules of benchmarking</a>
-</li>
-<li class="tocentry"><a href="../NuGet.htm">NuGet Packages</a>
-</li>
-<li class="tocentry"><a href="../Team.htm">Team</a>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Internals.htm">Internals</a></span>
 </li>
 <li class="tocentry">
 <span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Contributing.htm">Contributing</a></span>
 </li>
 <li class="tocentry"><a href="../FAQ.htm">FAQ</a>
+</li>
+<li class="tocentry"><a href="../Team.htm">Team</a>
 </li>
 <li class="tocentry"><a href="../license.htm">License</a>
 </li>
@@ -157,10 +155,10 @@
 </ul>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <p>Below is a sample output from the <code>GC and Memory Allocation</code> diagnoser, note the extra columns on the right-hand side (&quot;Gen 0&quot;, &quot;Gen 1&quot;, &quot;Gen 2&quot; and &quot;Allocated&quot;):</p>
-<p><code>Method |        Mean |     StdErr |      StdDev |      Median |  Gen 0 | Allocated |
+<pre class="nocode">           Method |        Mean |     StdErr |      StdDev |      Median |  Gen 0 | Allocated |
 ----------------- |------------ |----------- |------------ |------------ |------- |---------- |
- 'new byte[10kB]' | 884.4896 ns | 46.3528 ns | 245.2762 ns | 776.4237 ns | 0.1183 |     10 kB |</code></p>
-<p>A config example:</p>
+ 'new byte[10kB]' | 884.4896 ns | 46.3528 ns | 245.2762 ns | 776.4237 ns | 0.1183 |     10 kB |
+</pre><p>A config example:</p>
 <pre><code class="cs">private class Config : ManualConfig
 {
     public Config()

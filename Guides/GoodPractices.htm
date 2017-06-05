@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Building - BenchmarkDotNet Documentation</title>
+    <title>Good Practices - BenchmarkDotNet Documentation</title>
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../css/theme_colors.css" type="text/css" />
@@ -75,7 +75,25 @@
 <li class="tocentry"><a href="../Overview.htm">Overview</a>
 </li>
 <li class="tocentry">
-<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Guides.htm">Guides</a></span>
+<ul>
+<li><span class="navigationgroup"><i class="fa fa-caret-down"></i> <a href="../Guides.htm">Guides</a></span></li>
+<li class="tocentry"><a href="../Guides/GettingStarted.htm">Getting Started</a>
+</li>
+<li class="tocentry"><a href="../Guides/HowToRun.htm">How to run your benchmarks</a>
+</li>
+<li class="tocentry current"><a class="current" href="../Guides/GoodPractices.htm">Good Practices</a>
+<ul class="currentrelative">
+<li class="tocentry"><a href="#use-the-release-build-without-an-attached-debugger">Use the Release build without an attached debugger</a></li>
+<li class="tocentry"><a href="#try-different-environments">Try different environments</a></li>
+<li class="tocentry"><a href="#avoid-dead-code-elimination">Avoid dead code elimination</a></li>
+<li class="tocentry"><a href="#power-settings-and-other-applications">Power settings and other applications</a></li>
+</ul>
+<li class="tocentry"><a href="../Guides/NuGet.htm">Installing NuGet packages</a>
+</li>
+<li class="tocentry"><a href="../Guides/ChoosingRunStrategy.htm">Choosing RunStrategy</a>
+</li>
+
+</ul>
 </li>
 <li class="tocentry">
 <span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Configs.htm">Configs</a></span>
@@ -87,20 +105,7 @@
 <span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Internals.htm">Internals</a></span>
 </li>
 <li class="tocentry">
-<ul>
-<li><span class="navigationgroup"><i class="fa fa-caret-down"></i> <a href="../Contributing.htm">Contributing</a></span></li>
-<li class="tocentry current"><a class="current" href="../Contributing/Building.htm">Building</a>
-</li>
-<li class="tocentry"><a href="../Contributing/Debugging.htm">Debugging</a>
-</li>
-<li class="tocentry"><a href="../Contributing/RunningTests.htm">Running tests</a>
-</li>
-<li class="tocentry"><a href="../Contributing/Development.htm">Development</a>
-</li>
-<li class="tocentry"><a href="../Contributing/Miscellaneous.htm">Miscellaneous topics</a>
-</li>
-
-</ul>
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Contributing.htm">Contributing</a></span>
 </li>
 <li class="tocentry"><a href="../FAQ.htm">FAQ</a>
 </li>
@@ -126,20 +131,46 @@
             <div class="nav-content">
                 <div role="navigation" aria-label="breadcrumbs navigation">
                     <div class="breadcrumbs">
-<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Contributing.htm">Contributing</a></li> / <li><a href="../Contributing/Building.htm">Building</a></li></ul>
+<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Guides.htm">Guides</a></li> / <li><a href="../Guides/GoodPractices.htm">Good Practices</a></li></ul>
 					
                     </div>
                     <hr />
                 </div>
                 <div role="main">
                     <div class="section">
-<h1 id="building">Building<a class="headerlink" href="#building" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
-<p>For building the BenchmarkDotNet source-code, the following elements are required:</p>
+<h1 id="good-practices">Good Practices<a class="headerlink" href="#good-practices" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<h2 id="use-the-release-build-without-an-attached-debugger">Use the Release build without an attached debugger<a class="headerlink" href="#use-the-release-build-without-an-attached-debugger" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Never use the Debug build for benchmarking. <em>Never</em>. The debug version of the target method can run 10–100 times slower. 
+The release mode means that you should have <code>&lt;Optimize&gt;true&lt;/Optimize&gt;</code> in your csproj file 
+or use <a href="https://msdn.microsoft.com/en-us/library/t0hfscdc.aspx" target="_blank">/optimize</a> for <code>csc</code>. Also your never 
+should use an attached debugger (e.g. Visual Studio or WinDbg) during the benchmarking. The best way is 
+build our benchmark in the Release mode and run it from the command line.</p>
+<h2 id="try-different-environments">Try different environments<a class="headerlink" href="#try-different-environments" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Please, don't extrapolate your results. Or do it very carefully.
+I remind you again: the results in different environments may vary significantly. If a <code>Foo1</code> method is faster than 
+a <code>Foo2</code> method for CLR4, .NET Framework 4.5, x64, RyuJIT, Windows, it means that the <code>Foo1</code> method is faster than 
+the <code>Foo2</code> method for CLR4, .NET Framework 4.5, x64, RyuJIT, Windows and nothing else. And you can not say anything 
+about methods performance for CLR 2 or .NET Framework 4.6 or LegacyJIT-x64 or x86 or Linux+Mono until you try it. </p>
+<h2 id="avoid-dead-code-elimination">Avoid dead code elimination<a class="headerlink" href="#avoid-dead-code-elimination" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>You should also use the result of calculation. For example, if you run the following code:</p>
+<pre><code class="cs">void Foo()
+{
+    Math.Exp(1);
+}
+</code></pre>
+
+<p>then JIT can eliminate this code because the result of <code>Math.Exp</code> is not used. The better way is use it like this:</p>
+<pre><code class="cs">double Foo()
+{
+    return Math.Exp(1);
+}
+</code></pre>
+
+<h2 id="power-settings-and-other-applications">Power settings and other applications<a class="headerlink" href="#power-settings-and-other-applications" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <ul>
-<li><a href="https://www.visualstudio.com/vs/visual-studio-2017/" target="_blank">Visual Studio 2017 (Version 15.0.26228.9 or newer) with .NET Core development tools installed</a></li>
-<li>Internet connection and disk space to download all the required packages</li>
+<li>Turn off all of the applications except the benchmark process and the standard OS processes. If you run benchmark and work in the Visual Studio at the same time, it can negatively affect to benchmark results.</li>
+<li>If you use laptop for benchmarking, keep it plugged in and use the maximum performance mode.</li>
 </ul>
-<p>If your build fails because some packages are not available, let say F#, then just disable these project and hope for nuget server to work later on ;)</p>
 
                     </div>
                 </div>

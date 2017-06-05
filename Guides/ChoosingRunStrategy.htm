@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Building - BenchmarkDotNet Documentation</title>
+    <title>Choosing RunStrategy - BenchmarkDotNet Documentation</title>
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../css/theme_colors.css" type="text/css" />
@@ -75,7 +75,24 @@
 <li class="tocentry"><a href="../Overview.htm">Overview</a>
 </li>
 <li class="tocentry">
-<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Guides.htm">Guides</a></span>
+<ul>
+<li><span class="navigationgroup"><i class="fa fa-caret-down"></i> <a href="../Guides.htm">Guides</a></span></li>
+<li class="tocentry"><a href="../Guides/GettingStarted.htm">Getting Started</a>
+</li>
+<li class="tocentry"><a href="../Guides/HowToRun.htm">How to run your benchmarks</a>
+</li>
+<li class="tocentry"><a href="../Guides/GoodPractices.htm">Good Practices</a>
+</li>
+<li class="tocentry"><a href="../Guides/NuGet.htm">Installing NuGet packages</a>
+</li>
+<li class="tocentry current"><a class="current" href="../Guides/ChoosingRunStrategy.htm">Choosing RunStrategy</a>
+<ul class="currentrelative">
+<li class="tocentry"><a href="#throughput">Throughput</a></li>
+<li class="tocentry"><a href="#monitoring">Monitoring</a></li>
+<li class="tocentry"><a href="#coldstart">ColdStart</a></li>
+</ul>
+
+</ul>
 </li>
 <li class="tocentry">
 <span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Configs.htm">Configs</a></span>
@@ -87,20 +104,7 @@
 <span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Internals.htm">Internals</a></span>
 </li>
 <li class="tocentry">
-<ul>
-<li><span class="navigationgroup"><i class="fa fa-caret-down"></i> <a href="../Contributing.htm">Contributing</a></span></li>
-<li class="tocentry current"><a class="current" href="../Contributing/Building.htm">Building</a>
-</li>
-<li class="tocentry"><a href="../Contributing/Debugging.htm">Debugging</a>
-</li>
-<li class="tocentry"><a href="../Contributing/RunningTests.htm">Running tests</a>
-</li>
-<li class="tocentry"><a href="../Contributing/Development.htm">Development</a>
-</li>
-<li class="tocentry"><a href="../Contributing/Miscellaneous.htm">Miscellaneous topics</a>
-</li>
-
-</ul>
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Contributing.htm">Contributing</a></span>
 </li>
 <li class="tocentry"><a href="../FAQ.htm">FAQ</a>
 </li>
@@ -126,20 +130,44 @@
             <div class="nav-content">
                 <div role="navigation" aria-label="breadcrumbs navigation">
                     <div class="breadcrumbs">
-<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Contributing.htm">Contributing</a></li> / <li><a href="../Contributing/Building.htm">Building</a></li></ul>
+<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Guides.htm">Guides</a></li> / <li><a href="../Guides/ChoosingRunStrategy.htm">Choosing RunStrategy</a></li></ul>
 					
                     </div>
                     <hr />
                 </div>
                 <div role="main">
                     <div class="section">
-<h1 id="building">Building<a class="headerlink" href="#building" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
-<p>For building the BenchmarkDotNet source-code, the following elements are required:</p>
-<ul>
-<li><a href="https://www.visualstudio.com/vs/visual-studio-2017/" target="_blank">Visual Studio 2017 (Version 15.0.26228.9 or newer) with .NET Core development tools installed</a></li>
-<li>Internet connection and disk space to download all the required packages</li>
-</ul>
-<p>If your build fails because some packages are not available, let say F#, then just disable these project and hope for nuget server to work later on ;)</p>
+<h1 id="choosing-runstrategy">Choosing RunStrategy<a class="headerlink" href="#choosing-runstrategy" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<p>If you run a benchmark, you always (explicitly or implicitly) use a <a href="http://benchmarkdotnet.org/Configs/Jobs.htm" target="_blank">job</a>.
+Each <code>Job</code> has the <code>RunStrategy</code> parameter which allows switching between different benchmark modes.
+The default <code>RunStrategy</code> is <code>Throughput</code>, and it works fine for most cases.
+However, other strategies are also useful in some specific cases.</p>
+<h2 id="throughput">Throughput<a class="headerlink" href="#throughput" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p><code>Throughput</code> is the default <code>RunStrategy</code>, works perfectly for microbenchmarking.
+It's automatically choosing the amount of operation in main iterations based on a set of pilot iterations.
+The amount of iterations will also be chosen automatically based on accuracy job settings.
+A benchmark method should have a steady state.</p>
+<p>Of course, you can manually set all the characteristics. An example:</p>
+<pre><code class="cs">[SimpleJob(launchCount: 3, warmupCount: 10, targetCount: 30)]
+public class MyBenchmarkClass
+</code></pre>
+
+<h2 id="monitoring">Monitoring<a class="headerlink" href="#monitoring" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>If a benchmark method takes at least 100ms, you can also use the <code>Monitoring</code> strategy.
+In this case, the pilot stage will be omitted, by default you get 1 iteration = 1 operation (or you can manually set amount of operation in an iteration).
+Also you can use <code>[IterationSetup]</code> and <code>[IterationCleanup]</code> in this case: it shouldn't affect time measurements (but it can affect results of MemoryDiagnoser).
+It's a perfect mode for benchmarks which doesn't have a steady state and the performance distribution is tricky:
+  <code>Monitoring</code> will help you to collect a set of measurements and get statistics.</p>
+<pre><code class="cs">[SimpleJob(RunStrategy.Monitoring, launchCount: 10, warmupCount: 0, targetCount: 100)]
+public class MyBenchmarkClass
+</code></pre>
+
+<h2 id="coldstart">ColdStart<a class="headerlink" href="#coldstart" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>If you want to measure cold start (without the pilot and warmup stage), the <code>ColdStart</code> strategy is your choice.</p>
+<pre><code class="cs">[SimpleJob(RunStrategy.ColdStart, launchCount:50)]
+public class MyBenchmarkClass
+</code></pre>
+
 
                     </div>
                 </div>

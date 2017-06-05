@@ -72,8 +72,6 @@
 <li class="tocentry"><a href="index.htm">Home</a>
 </li>
 
-<li class="tocentry"><a href="GettingStarted.htm">Getting Started</a>
-</li>
 <li class="tocentry current"><a class="current" href="Overview.htm">Overview</a>
 <ul class="currentrelativeroot">
 <li class="tocentry"><a href="#install">Install</a></li>
@@ -89,25 +87,23 @@
 <li class="tocentry"><a href="#benchmarkrunner">BenchmarkRunner</a></li>
 </ul>
 <li class="tocentry">
-<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="Configs.htm">Configs</a></span>
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="Guides.htm">Guides</a></span>
 </li>
-<li class="tocentry"><a href="HowToRun.htm">How to run your benchmarks</a>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="Configs.htm">Configs</a></span>
 </li>
 <li class="tocentry">
 <span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="Advancedfeatures.htm">Advanced features</a></span>
 </li>
-<li class="tocentry"><a href="HowItWorks.htm">How it works</a>
-</li>
-<li class="tocentry"><a href="RulesOfBenchmarking.htm">Rules of benchmarking</a>
-</li>
-<li class="tocentry"><a href="NuGet.htm">NuGet Packages</a>
-</li>
-<li class="tocentry"><a href="Team.htm">Team</a>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="Internals.htm">Internals</a></span>
 </li>
 <li class="tocentry">
 <span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="Contributing.htm">Contributing</a></span>
 </li>
 <li class="tocentry"><a href="FAQ.htm">FAQ</a>
+</li>
+<li class="tocentry"><a href="Team.htm">Team</a>
 </li>
 <li class="tocentry"><a href="license.htm">License</a>
 </li>
@@ -415,8 +411,8 @@ public class Md5VsSha256
     [&lt;Params (100, 500, 1000, 2000)&gt;] 
     member val public DictSize = 0 with get, set
 
-    [&lt;Setup&gt;]
-    member self.SetupData() =
+    [&lt;GlobalSetup&gt;]
+    member self.GlobalSetupData() =
         dict1.Clear(); dict2.Clear()
         arr &lt;- getStrings self.DictSize
         arr |&gt; Array.iter (fun x -&gt; dict1.[x] &lt;- true ; dict2.[x] &lt;- true)
