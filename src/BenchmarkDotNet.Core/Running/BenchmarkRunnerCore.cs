@@ -128,7 +128,11 @@ namespace BenchmarkDotNet.Running
             {
                 logger.WriteLine();
                 logger.WriteLineHeader("// * Legends *");
-                int maxNameWidth = Math.Max(effectiveTimeUnit.Name.Length + 2, columnWithLegends.Select(c => c.ColumnName.Length).Max());
+                int maxNameWidth = 0;
+                if (columnWithLegends.Any())
+                    maxNameWidth = Math.Max(maxNameWidth, columnWithLegends.Select(c => c.ColumnName.Length).Max());
+                if (effectiveTimeUnit != null)
+                    maxNameWidth = Math.Max(maxNameWidth, effectiveTimeUnit.Name.Length + 2);
                 
                 foreach (var column in columnWithLegends)
                     logger.WriteLineHint($"  {column.ColumnName.PadRight(maxNameWidth, ' ')} : {column.Legend}");
