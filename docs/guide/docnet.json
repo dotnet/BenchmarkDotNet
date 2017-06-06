@@ -27,7 +27,8 @@
             "Diagnosers":"Configs\\Diagnosers.md",
             "Analyzers":"Configs\\Analyzers.md",
             "Validators":"Configs\\Validators.md",
-            "Filters":"Configs\\Filters.md"
+            "Filters":"Configs\\Filters.md",
+            "OrderProvider":"Configs\\OrderProvider.md"
         },
         "Advanced features": 
         {
