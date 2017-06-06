@@ -123,13 +123,19 @@ namespace BenchmarkDotNet.Running
 
             // TODO: move to conclusions
             var columnWithLegends = summary.Table.Columns.Select(c => c.OriginalColumn).Where(c => !string.IsNullOrEmpty(c.Legend)).ToList();
-            if (columnWithLegends.Any())
+            var effectiveTimeUnit = summary.Table.EffectiveSummaryStyle.TimeUnit;
+            if (columnWithLegends.Any() || effectiveTimeUnit != null)
             {
                 logger.WriteLine();
                 logger.WriteLineHeader("// * Legends *");
-                int maxNameWidth = columnWithLegends.Select(c => c.ColumnName.Length).Max();
+                int maxNameWidth = Math.Max(effectiveTimeUnit.Name.Length + 2, columnWithLegends.Select(c => c.ColumnName.Length).Max());
+                
                 foreach (var column in columnWithLegends)
                     logger.WriteLineHint($"  {column.ColumnName.PadRight(maxNameWidth, ' ')} : {column.Legend}");
+                
+                if (effectiveTimeUnit != null)
+                  logger.WriteLineHint($"  {("1 " + effectiveTimeUnit.Name).PadRight(maxNameWidth, ' ')} :" +
+                                       $" 1 {effectiveTimeUnit.Description} ({TimeUnit.Convert(1, effectiveTimeUnit, TimeUnit.Second).ToStr("0.#########")} sec)");
             }
 
             if (config.GetDiagnosers().Any())
