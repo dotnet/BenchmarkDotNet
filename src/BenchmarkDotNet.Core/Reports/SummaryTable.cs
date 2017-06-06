@@ -20,6 +20,7 @@ namespace BenchmarkDotNet.Reports
         public bool[] FullContentStartOfGroup { get; }
         public string[][] FullContentWithHeader { get; }
         public bool[] IsDefault { get; }
+        public ISummaryStyle EffectiveSummaryStyle { get; }
 
         internal SummaryTable(Summary summary, ISummaryStyle style = null)
         {
@@ -70,6 +71,7 @@ namespace BenchmarkDotNet.Reports
             FullContentWithHeader = full.ToArray();
 
             Columns = Enumerable.Range(0, columns.Length).Select(i => new SummaryTableColumn(this, i, columns[i])).ToArray();
+            EffectiveSummaryStyle = style;
         }
 
         public class SummaryTableColumn
