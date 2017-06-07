@@ -10,6 +10,7 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Json;
+using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
 using Xunit;
@@ -89,6 +90,10 @@ namespace BenchmarkDotNet.Tests.Exporters
             yield return MarkdownExporter.GitHub;
             yield return MarkdownExporter.StackOverflow;
             yield return PlainExporter.Default;
+            yield return XmlExporter.Brief;
+            yield return XmlExporter.BriefCompressed;
+            yield return XmlExporter.Full;
+            yield return XmlExporter.FullCompressed;
         }
 
         private static readonly IConfig config = ManualConfig.Create(DefaultConfig.Instance)
