@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Engines;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -26,6 +27,8 @@ namespace BenchmarkDotNet.Environments
 
         public bool IsConcurrentGC { get; protected set; }
 
+        public long GCAllocationQuantum { get; protected set; }
+
         protected BenchmarkEnvironmentInfo()
         {
             Architecture = RuntimeInformation.GetArchitecture();
@@ -36,7 +39,8 @@ namespace BenchmarkDotNet.Environments
             IsServerGC = GCSettings.IsServerGC;
             IsConcurrentGC = GCSettings.LatencyMode != GCLatencyMode.Batch;
             HasAttachedDebugger = Debugger.IsAttached;
-        }
+            GCAllocationQuantum = GcStats.AllocationQuantum;
+         }
 
         public static BenchmarkEnvironmentInfo GetCurrent() => new BenchmarkEnvironmentInfo();
 
