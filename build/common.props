@@ -33,7 +33,7 @@
   <PropertyGroup>
     <Major>0</Major>
     <Minor>10</Minor>
-    <Revision>7</Revision>
+    <Revision>8</Revision>
 
     <BuildNumber Condition=" '$(APPVEYOR_BUILD_NUMBER)' != '' ">$(APPVEYOR_BUILD_NUMBER)</BuildNumber>
     <BuildNumber Condition=" '$(BUILD_NUMBER)' != '' ">$(BUILD_NUMBER)</BuildNumber>
