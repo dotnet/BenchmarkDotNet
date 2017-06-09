@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Validators - BenchmarkDotNet Documentation</title>
+    <title>OrderProvider - BenchmarkDotNet Documentation</title>
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../css/theme_colors.css" type="text/css" />
@@ -94,11 +94,11 @@
 </li>
 <li class="tocentry"><a href="../Configs/Analyzers.htm">Analyzers</a>
 </li>
-<li class="tocentry current"><a class="current" href="../Configs/Validators.htm">Validators</a>
+<li class="tocentry"><a href="../Configs/Validators.htm">Validators</a>
 </li>
 <li class="tocentry"><a href="../Configs/Filters.htm">Filters</a>
 </li>
-<li class="tocentry"><a href="../Configs/OrderProvider.htm">OrderProvider</a>
+<li class="tocentry current"><a class="current" href="../Configs/OrderProvider.htm">OrderProvider</a>
 </li>
 
 </ul>
@@ -136,22 +136,55 @@
             <div class="nav-content">
                 <div role="navigation" aria-label="breadcrumbs navigation">
                     <div class="breadcrumbs">
-<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Configs.htm">Configs</a></li> / <li><a href="../Configs/Validators.htm">Validators</a></li></ul>
+<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Configs.htm">Configs</a></li> / <li><a href="../Configs/OrderProvider.htm">OrderProvider</a></li></ul>
 					
                     </div>
                     <hr />
                 </div>
                 <div role="main">
                     <div class="section">
-<h1 id="validators">Validators<a class="headerlink" href="#validators" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
-<p>A <strong>validator</strong> can validate your benchmarks before they are executed and produce validation errors. 
-If any of the validation errors is critical, then none of the benchmarks will get executed. </p>
-<p>Available validators are:</p>
-<ul>
-<li><code>BaselineValidator.FailOnError</code> - it checks if more than 1 Benchmark per class has <code>Baseline = true</code> applied. This validator is mandatory.</li>
-<li><code>JitOptimizationsValidator.(Dont)FailOnError</code> - it checks whether any of the referenced assemblies is non-optimized. DontFailOnError version is enabled by default.</li>
-<li><code>ExecutionValidator.(Dont)FailOnError</code> - it checks if it is possible to run your benchmarks by executing each of them once. Optional.</li>
-</ul>
+<h1 id="orderprovider">OrderProvider<a class="headerlink" href="#orderprovider" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<p>OrderProviders allows customizing the order of benchmark results in the summary table.</p>
+<p>A usage example:</p>
+<pre><code class="cs">[Config(typeof(Config))]
+[RankColumn]
+public class IntroOrderManual
+{
+    private class Config : ManualConfig
+    {
+        public Config()
+        {
+            Set(new FastestToSlowestOrderProvider());
+        }
+
+        private class FastestToSlowestOrderProvider : IOrderProvider
+        {
+            public IEnumerable&lt;Benchmark&gt; GetExecutionOrder(Benchmark[] benchmarks) =&gt;
+                from benchmark in benchmarks
+                orderby benchmark.Parameters[&quot;X&quot;] descending,
+                        benchmark.Target.MethodDisplayInfo
+                select benchmark;
+
+            public IEnumerable&lt;Benchmark&gt; GetSummaryOrder(Benchmark[] benchmarks, Summary summary) =&gt;
+                from benchmark in benchmarks
+                orderby summary[benchmark].ResultStatistics.Mean
+                select benchmark;
+
+            public string GetGroupKey(Benchmark benchmark, Summary summary) =&gt; null;
+        }
+    }
+
+    [Params(1, 2, 3)]
+    public int X { get; set; }
+
+    [Benchmark]
+    public void Fast() =&gt; Thread.Sleep(X * 50);
+
+    [Benchmark]
+    public void Slow() =&gt; Thread.Sleep(X * 100);
+}
+</code></pre>
+
 
                     </div>
                 </div>

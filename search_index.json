@@ -91,6 +91,12 @@
       "title": "Filters"
     },
     {
+      "location": "Configs/OrderProvider.htm",
+      "breadcrumbs": "Home / Configs / OrderProvider",
+      "keywords": "1 100 2 3 50 A allows benchmark Benchmark benchmarks class Config cs customizing descending example Fast FastestToSlowestOrderProvider from get GetExecutionOrder GetGroupKey GetSummaryOrder IEnumerable in int IntroOrderManual IOrderProvider ManualConfig Mean MethodDisplayInfo new null of order orderby OrderProvider OrderProviders Parameters Params private public RankColumn results ResultStatistics select set Set Sleep Slow string summary Summary table Target the Thread typeof usage void X",
+      "title": "OrderProvider"
+    },
+    {
       "location": "Advanced/Params.htm",
       "breadcrumbs": "Home / Advanced features / Params",
       "keywords": "0 0242 0245 0375 0434 10 100 115 125 20 200 215 225 2710 3024 3282 3325 5 a A As attribute B Benchmark by can class combination cs each Example fields for get in In int IntroParams mark Median Method ms of one or params Params properties public result results set several Sleep specify StdDev the this Thread values void will you You your",
