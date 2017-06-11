@@ -47,7 +47,7 @@ public class IntroFilters
 ```cs
 [DryJob]
 [CategoriesColumn]
-[BenchmarkCategory("Aswesome")]
+[BenchmarkCategory("Awesome")]
 [AnyCategoriesFilter("A", "1")]
 public class IntroCategories
 {
