@@ -1,7 +1,6 @@
 language: csharp
 os:
   - osx
-  - linux
 
 sudo: required
 dist: trusty
@@ -29,4 +28,4 @@ mono:
   - latest
 
 script:
-  - ./build.sh --verbosity diagnostic
+  - ./build.sh --target SlowTests
