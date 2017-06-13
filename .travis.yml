@@ -1,12 +1,11 @@
 language: csharp
 os:
   - osx
-
+  - linux
 sudo: required
 dist: trusty
-
-before_script:
- - chmod +x build.sh
+osx_image: xcode8.3
+mono: latest
 
 addons:
   apt:
@@ -17,15 +16,7 @@ addons:
     - libssl-dev
     - libunwind8
 
-osx_image: xcode8.3
-
-env:
-  global:
-    - DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
-    - DOTNET_CLI_TELEMETRY_OPTOUT: 1
-
-mono:  
-  - latest
-
+before_script:
+ - chmod +x build.sh
 script:
   - ./build.sh
