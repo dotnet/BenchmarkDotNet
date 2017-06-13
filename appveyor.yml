@@ -17,8 +17,6 @@ skip_tags: true
 #---------------------------------#
 #    environment configuration    #
 #---------------------------------#
-cache:
-  - packages
 
 # scripts that are called at very beginning, before repo cloning
 init:

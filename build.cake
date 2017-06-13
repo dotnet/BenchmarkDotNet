@@ -5,7 +5,7 @@ var configuration = Argument("configuration", "Release");
 // GLOBAL VARIABLES
 var artifactsDirectory = Directory("./artifacts"); 
 var solutionFile = "./BenchmarkDotNet.sln";
-var isWindows = IsRunningOnWindows();
+var isContinuousIntegrationBuild = !BuildSystem.IsLocalBuild;
 
 Setup(_ =>
 {
@@ -62,6 +62,7 @@ Task("SlowTests")
     });
 
 Task("Pack")
+    .WithCriteria(isContinuousIntegrationBuild)
     .IsDependentOn("FastTests")
     .Does(() =>
     {
