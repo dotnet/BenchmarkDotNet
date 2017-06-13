@@ -59,7 +59,7 @@ Task("Test")
             settings.Framework = netcore;
         }
 
-        var projects = GetFiles("./tests/**/*.csproj");
+        var projects = GetFiles("./tests/**/*Tests.csproj");
         foreach(var project in projects)
         {
             DotNetCoreTest(project.FullPath, settings);
