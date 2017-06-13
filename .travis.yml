@@ -28,4 +28,4 @@ mono:
   - latest
 
 script:
-  - ./build.sh --target SlowTests
+  - ./build.sh
