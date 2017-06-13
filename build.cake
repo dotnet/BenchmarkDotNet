@@ -76,7 +76,7 @@ Task("Pack")
     });
 
 Task("Default")
-    .IsDependentOn("SlowTests")
+    //.IsDependentOn("SlowTests")
     .IsDependentOn("Pack");
 
 RunTarget(target);

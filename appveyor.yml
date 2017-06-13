@@ -30,6 +30,7 @@ build_script:
 - ps: .\build.ps1
 
 test: off
+deploy: off
 
 artifacts:
   - path: '**\BenchmarkDotNet.*.nupkg' # find all NuGet packages recursively
