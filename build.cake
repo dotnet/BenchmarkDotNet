@@ -42,6 +42,8 @@ Task("Build")
     {
         if(!isRunningOnWindows)
         {
+            // create backup
+            CopyFile(solutionFile, solutionFileBackup);
             ExcludeVBProjectsFromSolution();
         }
 
@@ -59,7 +61,9 @@ Task("Build")
 
         if(!isRunningOnWindows && BuildSystem.IsLocalBuild)
         {
-            RevertBackSolutionFile();
+            // Revert back solution file
+            DeleteFile(solutionFile);
+            MoveFile(solutionFileBackup, solutionFile);
         }
     });
 
@@ -123,16 +127,8 @@ private DotNetCoreTestSettings GetTestSettings()
 
 private void ExcludeVBProjectsFromSolution()
 {
-    // create backup
-    CopyFile(solutionFile, solutionFileBackup);
     // exclude projects
     var vbProjects = GetFiles("./tests/**/*.vbproj");
     var projects = string.Join(" ", vbProjects.Select(x => string.Format("\"{0}\"", x))); // if path contains spaces
     StartProcess("dotnet", new ProcessSettings { Arguments = "sln remove " + projects });
-}
-
-private void RevertBackSolutionFile()
-{
-    DeleteFile(solutionFile);
-    MoveFile(solutionFileBackup, solutionFile);
 }
