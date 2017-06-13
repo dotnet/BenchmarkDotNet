@@ -6,6 +6,7 @@ var configuration = Argument("configuration", "Release");
 var artifactsDirectory = Directory("./artifacts"); 
 var solutionFile = "./BenchmarkDotNet.sln";
 var isContinuousIntegrationBuild = !BuildSystem.IsLocalBuild;
+var isRunningOnWindows = IsRunningOnWindows();
 
 Setup(_ =>
 {
@@ -35,7 +36,14 @@ Task("Build")
     .IsDependentOn("Restore")
     .Does(() =>
     {
-        MSBuild(solutionFile, configurator =>  configurator
+        var vbProjects = GetFiles("./tests/**/*.vbproj");
+        if(!isRunningOnWindows)
+        {
+            ExcludeVBProjectsFromSolution(vbProjects);
+        }
+
+        var path = MakeAbsolute(new DirectoryPath(solutionFile));
+        MSBuild(path.FullPath, configurator =>  configurator
             .SetConfiguration(configuration)
             .WithTarget("Rebuild")
             .SetVerbosity(Verbosity.Minimal)
@@ -45,6 +53,11 @@ Task("Build")
             .SetMaxCpuCount(0) // parallel
             .SetNodeReuse(true)
         );
+
+        if(!isRunningOnWindows && BuildSystem.IsLocalBuild)
+        {
+            IncludeVBProjectsToSolution(vbProjects);
+        }
     });
 
 Task("FastTests")
@@ -69,11 +82,11 @@ Task("Pack")
         var settings = new DotNetCorePackSettings
         {
             Configuration = configuration,
-            OutputDirectory = artifactsDirectory
+            OutputDirectory = artifactsDirectory,
+            NoBuild = true
         };
 
         var projects = GetFiles("./src/**/*.csproj");
-
         foreach(var project in projects)
         {
             DotNetCorePack(project.FullPath, settings);
@@ -102,4 +115,20 @@ private DotNetCoreTestSettings GetTestSettings()
     }
 
     return settings;
+}
+
+private void ExcludeVBProjectsFromSolution(FilePathCollection vbProjects)
+{
+    ProcessProjectFilesInSolution("remove", vbProjects);
+}
+
+private void IncludeVBProjectsToSolution(FilePathCollection vbProjects)
+{
+    ProcessProjectFilesInSolution("add", vbProjects);
+}
+
+private void ProcessProjectFilesInSolution(string action, FilePathCollection vbProjects)
+{
+    var projects = string.Join(" ", vbProjects.Select(x => $"\"{x}\"")); // if path contains spaces
+    StartProcess("dotnet", new ProcessSettings { Arguments = $"sln {action} {projects}" });
 }
