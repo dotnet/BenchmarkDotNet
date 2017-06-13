@@ -5,6 +5,7 @@ var configuration = Argument("configuration", "Release");
 // GLOBAL VARIABLES
 var artifactsDirectory = Directory("./artifacts"); 
 var solutionFile = "./BenchmarkDotNet.sln";
+var solutionFileBackup = "./BenchmarkDotNet.sln.build";
 var isRunningOnWindows = IsRunningOnWindows();
 
 Setup(_ =>
@@ -39,10 +40,9 @@ Task("Build")
     .IsDependentOn("Restore")
     .Does(() =>
     {
-        var vbProjects = GetFiles("./tests/**/*.vbproj");
         if(!isRunningOnWindows)
         {
-            ExcludeVBProjectsFromSolution(vbProjects);
+            ExcludeVBProjectsFromSolution();
         }
 
         var path = MakeAbsolute(new DirectoryPath(solutionFile));
@@ -59,7 +59,7 @@ Task("Build")
 
         if(!isRunningOnWindows && BuildSystem.IsLocalBuild)
         {
-            IncludeVBProjectsToSolution(vbProjects);
+            RevertBackSolutionFile();
         }
     });
 
@@ -121,18 +121,18 @@ private DotNetCoreTestSettings GetTestSettings()
     return settings;
 }
 
-private void ExcludeVBProjectsFromSolution(FilePathCollection vbProjects)
+private void ExcludeVBProjectsFromSolution()
 {
-    ProcessProjectFilesInSolution("remove", vbProjects);
-}
-
-private void IncludeVBProjectsToSolution(FilePathCollection vbProjects)
-{
-    ProcessProjectFilesInSolution("add", vbProjects);
-}
-
-private void ProcessProjectFilesInSolution(string action, FilePathCollection vbProjects)
-{
+    // create backup
+    CopyFile(solutionFile, solutionFileBackup);
+    // exclude projects
+    var vbProjects = GetFiles("./tests/**/*.vbproj");
     var projects = string.Join(" ", vbProjects.Select(x => string.Format("\"{0}\"", x))); // if path contains spaces
-    StartProcess("dotnet", new ProcessSettings { Arguments = string.Format("sln {0} {1}", action, projects) });
+    StartProcess("dotnet", new ProcessSettings { Arguments = "sln remove " + projects });
+}
+
+private void RevertBackSolutionFile()
+{
+    DeleteFile(solutionFile);
+    MoveFile(solutionFileBackup, solutionFile);
 }
