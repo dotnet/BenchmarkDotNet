@@ -71,7 +71,7 @@ Task("FastTests")
     });
 
 Task("SlowTests")
-    .WithCriteria(AppVeyor.IsRunningOnAppVeyor)
+    .WithCriteria(AppVeyor.IsRunningOnAppVeyor || (BuildSystem.IsLocalBuild && isRunningOnWindows))
     .IsDependentOn("Build")
     .Does(() =>
     {
