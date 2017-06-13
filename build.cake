@@ -129,6 +129,6 @@ private void IncludeVBProjectsToSolution(FilePathCollection vbProjects)
 
 private void ProcessProjectFilesInSolution(string action, FilePathCollection vbProjects)
 {
-    var projects = string.Join(" ", vbProjects.Select(x => $"\"{x}\"")); // if path contains spaces
-    StartProcess("dotnet", new ProcessSettings { Arguments = $"sln {action} {projects}" });
+    var projects = string.Join(" ", vbProjects.Select(x => string.Format("\"{0}\"", x))); // if path contains spaces
+    StartProcess("dotnet", new ProcessSettings { Arguments = string.Format("sln {0} {1}", action, projects) });
 }
