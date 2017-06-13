@@ -1,6 +1,7 @@
 language: csharp
 os:
   - linux
+  - osx
 sudo: required
 dist: trusty
 osx_image: xcode8.3
@@ -18,4 +19,4 @@ addons:
 before_script:
  - chmod +x build.sh
 script:
-  - ./build.sh --verbosity diagnostic
+  - ./build.sh
