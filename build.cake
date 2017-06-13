@@ -3,7 +3,7 @@ var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 
 // GLOBAL VARIABLES
-var artifactsDirectory = Directory("./artifacts"); 
+var artifactsDirectory = Directory("./artifacts");
 var solutionFile = "./BenchmarkDotNet.sln";
 var solutionFileBackup = "./BenchmarkDotNet.sln.build";
 var isRunningOnWindows = IsRunningOnWindows();
@@ -14,6 +14,23 @@ Setup(_ =>
     if(!isRunningOnWindows)
     {
         StartProcess("mono", new ProcessSettings { Arguments = "--version" });
+        
+        // create solution backup
+        CopyFile(solutionFile, solutionFileBackup);
+        // and exclude VB projects
+        ExcludeVBProjectsFromSolution();
+    }
+});
+
+Teardown(_ =>
+{
+    if(!isRunningOnWindows && BuildSystem.IsLocalBuild)
+    {
+        if(FileExists(solutionFileBackup)) // Revert back solution file
+        {
+            DeleteFile(solutionFile);
+            MoveFile(solutionFileBackup, solutionFile);
+        } 
     }
 });
 
@@ -46,16 +63,12 @@ Task("Build")
 
         if(!isRunningOnWindows)
         {
-            // create backup
-            CopyFile(solutionFile, solutionFileBackup);
-            ExcludeVBProjectsFromSolution();
-            
             // hack for Linux bug - missing MSBuild path
             if(new CakePlatform().Family == PlatformFamily.Linux)
             {
                 var monoVersion = GetMonoVersionMoniker();
-                var isMonoSupportsMsBuild = monoVersion != null && System.Text.RegularExpressions.Regex.IsMatch(monoVersion,@"([5-9]|\d{2,})\.\d+\.\d+(\.\d+)?");
-                if(isMonoSupportsMsBuild)
+                var isMSBuildSupported = monoVersion != null && System.Text.RegularExpressions.Regex.IsMatch(monoVersion,@"([5-9]|\d{2,})\.\d+\.\d+(\.\d+)?");
+                if(isMSBuildSupported)
                 {
                     buildSettings.ToolPath = new FilePath(@"/usr/lib/mono/msbuild/15.0/bin/MSBuild.dll");
                     Information(string.Format("Mono supports MSBuild. Override ToolPath value with `{0}`", buildSettings.ToolPath));
@@ -65,13 +78,6 @@ Task("Build")
 
         var path = MakeAbsolute(new DirectoryPath(solutionFile));
         MSBuild(path.FullPath, buildSettings);
-
-        if(!isRunningOnWindows && BuildSystem.IsLocalBuild)
-        {
-            // Revert back solution file
-            DeleteFile(solutionFile);
-            MoveFile(solutionFileBackup, solutionFile);
-        }
     });
 
 Task("FastTests")
