@@ -11,6 +11,10 @@ Setup(_ =>
 {
     Information("Started running tasks.");
     StartProcess("dotnet", new ProcessSettings { Arguments = "--info" });
+    if(!isRunningOnWindows)
+    {
+        StartProcess("mono", new ProcessSettings { Arguments = "--version" });
+    }
 });
 
 Teardown(_ =>
@@ -67,6 +71,7 @@ Task("FastTests")
     });
 
 Task("SlowTests")
+    .WithCriteria(AppVeyor.IsRunningOnAppVeyor)
     .IsDependentOn("Build")
     .Does(() =>
     {
@@ -93,7 +98,7 @@ Task("Pack")
     });
 
 Task("Default")
-    //.IsDependentOn("SlowTests")
+    .IsDependentOn("SlowTests")
     .IsDependentOn("Pack");
 
 RunTarget(target);
