@@ -2,9 +2,6 @@
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 
-// GLOBAL CONSTANTS
-const string netcore = "netcoreapp1.1";
-
 // GLOBAL VARIABLES
 var artifactsDirectory = Directory("./artifacts"); 
 var solutionFile = "./BenchmarkDotNet.sln";
@@ -13,6 +10,7 @@ var isWindows = IsRunningOnWindows();
 Setup(_ =>
 {
     Information("Started running tasks.");
+    StartProcess("dotnet", new ProcessSettings { Arguments = "--info" });
 });
 
 Teardown(_ =>
@@ -37,10 +35,16 @@ Task("Build")
     .IsDependentOn("Restore")
     .Does(() =>
     {
-       DotNetBuild(solutionFile, settings => settings
+        MSBuild(solutionFile, configurator =>  configurator
             .SetConfiguration(configuration)
             .WithTarget("Rebuild")
-            .SetVerbosity(Verbosity.Minimal));
+            .SetVerbosity(Verbosity.Minimal)
+            .UseToolVersion(MSBuildToolVersion.Default)
+            .SetMSBuildPlatform(MSBuildPlatform.Automatic)
+            .SetPlatformTarget(PlatformTarget.MSIL) // Any CPU
+            .SetMaxCpuCount(0) // parallel
+            .SetNodeReuse(true)
+        );
     });
 
 Task("FastTests")
@@ -86,14 +90,14 @@ private DotNetCoreTestSettings GetTestSettings()
 {
     var settings = new DotNetCoreTestSettings
     {
-        Configuration = configuration,
+        Configuration = "Release",
         NoBuild = true
     };
 
-    if (!isWindows)
+    if (!IsRunningOnWindows())
     {
         Information("Not running on Windows - skipping tests for full .NET Framework");
-        settings.Framework = netcore;
+        settings.Framework = "netcoreapp1.1";
     }
 
     return settings;
