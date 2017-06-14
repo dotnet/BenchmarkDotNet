@@ -236,16 +236,16 @@ public class Config : ManualConfig
 
 ## CSV
 
-CSV file format is often use to analyze the results programmatically. The CSV exporter may be configured to produce sanitized output, where cell values are numerals and their units are predefined. 
+The CSV file format is often used to graph the output or to analyze the results programmatically. The CSV exporter may be configured to produce sanitized output, where cell values are numerals and their units are predefined.
 
-The CSV exporter and other compatible exporters consume an instance of `ISummaryStyle` that defines how the output shood look like:
+The CSV exporter and other compatible exporters may consume an instance of `ISummaryStyle` that defines how the output should look like:
 
-| Property            | Remarks                                                    | Default |
-| ------------------- | ---------------------------------------------------------- | ------- |
-| PrintUnitsInHeader  | If true, column's unit will be displayed in the header row | false   |
-| PrintUnitsInContent | If true, measurement's unit will be appended to the value  | true    |
-| TimeUnit            | If null, it will be automatically selected                 | null    |
-| SizeUnit            | If null, it will be automatically selected                 | null    |
+| Property            | Remarks                                            | Default |
+| ------------------- | -------------------------------------------------- | ------- |
+| PrintUnitsInHeader  | If true, units will be displayed in the header row | false   |
+| PrintUnitsInContent | If true, units will be appended to the value       | true    |
+| TimeUnit            | If null, unit will be automatically selected       | null    |
+| SizeUnit            | If null, unit will be automatically selected       | null    |
 
 Example of CSV exporter configured to always use microseconds, kilobytes, and to render units only in column headers:
 
