@@ -5,7 +5,7 @@ var configuration = Argument("configuration", "Release");
 // GLOBAL VARIABLES
 var artifactsDirectory = Directory("./artifacts");
 var solutionFile = "./BenchmarkDotNet.sln";
-var solutionFileBackup = "./BenchmarkDotNet.sln.build";
+var solutionFileBackup = solutionFile + ".build.backup";
 var isRunningOnWindows = IsRunningOnWindows();
 
 Setup(_ =>
@@ -93,7 +93,7 @@ Task("FastTests")
     });
 
 Task("SlowTests")
-    .IsDependentOn("Build")
+    .IsDependentOn("FastTests")
     .Does(() =>
     {
         DotNetCoreTest("./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", GetTestSettings());
@@ -101,7 +101,7 @@ Task("SlowTests")
 
 Task("Pack")
     .WithCriteria(AppVeyor.IsRunningOnAppVeyor)
-    .IsDependentOn("FastTests")
+    .IsDependentOn("SlowTests")
     .Does(() =>
     {
         var settings = new DotNetCorePackSettings
@@ -119,7 +119,6 @@ Task("Pack")
     });
 
 Task("Default")
-    .IsDependentOn("SlowTests")
     .IsDependentOn("Pack");
 
 RunTarget(target);
