@@ -13,7 +13,6 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Toolchains.InProcess;
-using BenchmarkDotNet.IntegrationTests.Xunit;
 using JetBrains.Annotations;
 using Xunit;
 using Xunit.Abstractions;
@@ -194,7 +193,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .With(DefaultColumnProviders.Instance);
         }
 
-        [FactWindowsOnly("#474: PlatformNotSupportedException when reading ProcessorAffinity on non-Windows platforms")]
+        [Fact]
         public void InProcessBenchmarkAllCasesReflectionEmitSupported()
         {
             var logger = new OutputLogger(Output);
@@ -220,7 +219,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [FactWindowsOnly("#474: PlatformNotSupportedException when reading ProcessorAffinity on non-Windows platforms")]
+        [Fact]
         public void InProcessBenchmarkAllCasesDelegateCombineSupported()
         {
             var logger = new OutputLogger(Output);
