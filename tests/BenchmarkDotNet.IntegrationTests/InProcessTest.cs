@@ -13,6 +13,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Toolchains.InProcess;
+using BenchmarkDotNet.IntegrationTests.Xunit;
 using JetBrains.Annotations;
 using Xunit;
 using Xunit.Abstractions;
