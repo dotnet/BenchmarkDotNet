@@ -233,3 +233,41 @@ public class Config : ManualConfig
     }
 }
 ```
+
+## CSV
+
+The CSV file format is often used to graph the output or to analyze the results programmatically. The CSV exporter may be configured to produce sanitized output, where cell values are numerals and their units are predefined.
+
+The CSV exporter and other compatible exporters may consume an instance of `ISummaryStyle` that defines how the output should look like:
+
+| Property            | Remarks                                            | Default |
+| ------------------- | -------------------------------------------------- | ------- |
+| PrintUnitsInHeader  | If true, units will be displayed in the header row | false   |
+| PrintUnitsInContent | If true, units will be appended to the value       | true    |
+| TimeUnit            | If null, unit will be automatically selected       | null    |
+| SizeUnit            | If null, unit will be automatically selected       | null    |
+
+Example of CSV exporter configured to always use microseconds, kilobytes, and to render units only in column headers:
+
+```cs
+var config = ManualConfig.Create(DefaultConfig.Instance);
+config.Add(new CsvExporter(
+    CsvSeparator.CurrentCulture,
+    new BenchmarkDotNet.Reports.SummaryStyle
+    {
+        PrintUnitsInHeader = true,
+        PrintUnitsInContent = false,
+        TimeUnit = BenchmarkDotNet.Horology.TimeUnit.Microsecond,
+        SizeUnit = BenchmarkDotNet.Columns.SizeUnit.KB
+    }));
+```
+
+Excerpt from the resulting CSV file:
+
+```
+Method,...,Mean [us],Error [us],StdDev [us],Min [us],Max [us],Allocated [KB]
+Benchmark,...,"37,647.6","32,717.9","21,640.9","11,209.2","59,492.6",1.58
+```
+
+
+
