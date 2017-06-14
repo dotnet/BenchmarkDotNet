@@ -32,9 +32,7 @@ namespace BenchmarkDotNet.IntegrationTests
             => new[]
             {
                 new object[] { Job.Default.GetToolchain() },
-#if CLASSIC
                 new object[] { InProcessToolchain.Instance }
-#endif
             };
 
         public class AccurateAllocations

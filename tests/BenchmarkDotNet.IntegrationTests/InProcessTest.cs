@@ -31,46 +31,46 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private const int UnrollFactor = 16;
 
-        [FactWindowsOnly("#474: PlatformNotSupportedException when reading ProcessorAffinity on non-Windows platforms")]
+        [Fact]
         public void BenchmarkActionGlobalSetupSupported() => TestInvoke(x => BenchmarkAllCases.GlobalSetup(), UnrollFactor);
 
-        [FactWindowsOnly("#474: PlatformNotSupportedException when reading ProcessorAffinity on non-Windows platforms")]
+        [Fact]
         public void BenchmarkActionGlobalCleanupSupported() => TestInvoke(x => x.GlobalCleanup(), UnrollFactor);
 
-        [FactWindowsOnly("#474: PlatformNotSupportedException when reading ProcessorAffinity on non-Windows platforms")]
+        [Fact]
         public void BenchmarkActionVoidSupported() => TestInvoke(x => x.InvokeOnceVoid(), UnrollFactor);
 
-        [FactWindowsOnly("#474: PlatformNotSupportedException when reading ProcessorAffinity on non-Windows platforms")]
+        [Fact]
         public void BenchmarkActionTaskSupported() => TestInvoke(x => x.InvokeOnceTaskAsync(), UnrollFactor, null);
 
-        [FactWindowsOnly("#474: PlatformNotSupportedException when reading ProcessorAffinity on non-Windows platforms")]
+        [Fact]
         public void BenchmarkActionRefTypeSupported() => TestInvoke(x => x.InvokeOnceRefType(), UnrollFactor, StringResult);
 
-        [FactWindowsOnly("#474: PlatformNotSupportedException when reading ProcessorAffinity on non-Windows platforms")]
+        [Fact]
         public void BenchmarkActionValueTypeSupported() => TestInvoke(x => x.InvokeOnceValueType(), UnrollFactor, DecimalResult);
 
-        [FactWindowsOnly("#474: PlatformNotSupportedException when reading ProcessorAffinity on non-Windows platforms")]
+        [Fact]
         public void BenchmarkActionTaskOfTSupported() => TestInvoke(x => x.InvokeOnceTaskOfTAsync(), UnrollFactor, StringResult);
 
-        [FactWindowsOnly("#474: PlatformNotSupportedException when reading ProcessorAffinity on non-Windows platforms")]
+        [Fact]
         public void BenchmarkActionValueTaskOfTSupported() => TestInvoke(x => x.InvokeOnceValueTaskOfT(), UnrollFactor, DecimalResult);
 
-        [FactWindowsOnly("#474: PlatformNotSupportedException when reading ProcessorAffinity on non-Windows platforms")]
+        [Fact]
         public void BenchmarkActionStaticVoidSupported() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticVoid(), UnrollFactor);
 
-        [FactWindowsOnly("#474: PlatformNotSupportedException when reading ProcessorAffinity on non-Windows platforms")]
+        [Fact]
         public void BenchmarkActionStaticTaskSupported() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticTaskAsync(), UnrollFactor, null);
 
-        [FactWindowsOnly("#474: PlatformNotSupportedException when reading ProcessorAffinity on non-Windows platforms")]
+        [Fact]
         public void BenchmarkActionStaticRefTypeSupported() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticRefType(), UnrollFactor, StringResult);
 
-        [FactWindowsOnly("#474: PlatformNotSupportedException when reading ProcessorAffinity on non-Windows platforms")]
+        [Fact]
         public void BenchmarkActionStaticValueTypeSupported() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticValueType(), UnrollFactor, DecimalResult);
 
-        [FactWindowsOnly("#474: PlatformNotSupportedException when reading ProcessorAffinity on non-Windows platforms")]
+        [Fact]
         public void BenchmarkActionStaticTaskOfTSupported() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticTaskOfTAsync(), UnrollFactor, StringResult);
 
-        [FactWindowsOnly("#474: PlatformNotSupportedException when reading ProcessorAffinity on non-Windows platforms")]
+        [Fact]
         public void BenchmarkActionStaticValueTaskOfTSupported() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticValueTaskOfT(), UnrollFactor, DecimalResult);
 
         [AssertionMethod]
