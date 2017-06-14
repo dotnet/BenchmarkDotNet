@@ -209,17 +209,7 @@ namespace BenchmarkDotNet.Portability
 #endif
         }
 
-        internal static IntPtr GetCurrentAffinity()
-        {
-            try
-            {
-                return Process.GetCurrentProcess().ProcessorAffinity;
-            }
-            catch (PlatformNotSupportedException)
-            {
-                return default(IntPtr);
-            }
-        }
+        internal static IntPtr GetCurrentAffinity() => Process.GetCurrentProcess().TryGetAffinity() ?? default(IntPtr);
 
         internal static string GetConfiguration()
         {

@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             int exitCode = -1;
             var process = Process.GetCurrentProcess();
             var oldPriority = process.PriorityClass;
-            var oldAffinity = process.ProcessorAffinity;
+            var oldAffinity = process.TryGetAffinity();
 #if CLASSIC
             var thread = Thread.CurrentThread;
             var oldThreadPriority = thread.Priority;
@@ -122,9 +122,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 #if CLASSIC
                 thread.TrySetPriority(oldThreadPriority, logger);
 #endif
-                if (affinity != null)
+                if (affinity != null && oldAffinity != null)
                 {
-                    process.EnsureProcessorAffinity(oldAffinity);
+                    process.TrySetAffinity(oldAffinity.Value, logger);
                 }
             }
 
