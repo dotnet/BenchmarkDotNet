@@ -38,6 +38,11 @@ Task("Clean")
     .Does(() =>
     {
         CleanDirectory(artifactsDirectory);
+
+        if(BuildSystem.IsLocalBuild)
+        {
+            CleanDirectories(GetDirectories("./**/obj") + GetDirectories("./**/bin"));
+        }
     });
 
 Task("Restore")
@@ -88,7 +93,6 @@ Task("FastTests")
     });
 
 Task("SlowTests")
-    .WithCriteria(AppVeyor.IsRunningOnAppVeyor || (BuildSystem.IsLocalBuild && isRunningOnWindows))
     .IsDependentOn("Build")
     .Does(() =>
     {
@@ -131,7 +135,6 @@ private DotNetCoreTestSettings GetTestSettings()
 
     if (!IsRunningOnWindows())
     {
-        Information("Not running on Windows - skipping tests for full .NET Framework");
         settings.Framework = "netcoreapp1.1";
     }
 
