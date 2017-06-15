@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         protected void Start(DiagnoserActionParameters parameters)
         {
-            Cleanup();
+            Clear();
 
             BenchmarkToProcess.Add(parameters.Benchmark, parameters.Process.Id);
             StatsPerProcess.TryAdd(parameters.Process.Id, GetInitializedStats(parameters));
@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             Session.Dispose();
         }
 
-        private void Cleanup()
+        private void Clear()
         {
             BenchmarkToProcess.Clear();
             StatsPerProcess.Clear();

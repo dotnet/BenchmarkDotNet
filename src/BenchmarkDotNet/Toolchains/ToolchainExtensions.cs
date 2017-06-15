@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Toolchains
 #if CLASSIC
                     return new Roslyn.RoslynToolchain();
 #else
-                    return isUsingProjectJson.Value ? ProjectJsonNet46Toolchain.Instance : CsProjNet46Toolchain.Instance;
+                    return isUsingProjectJson.Value ? ProjectJsonNet46Toolchain.Instance : CsProjClassicNetToolchain.Current.Value;
 #endif
                 case CoreRuntime core:
                     return isUsingProjectJson.Value ? ProjectJsonCoreToolchain.Current.Value : CsProjCoreToolchain.Current.Value;

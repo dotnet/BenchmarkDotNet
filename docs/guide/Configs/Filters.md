@@ -20,7 +20,7 @@ public class IntroFilters
 {
     private class Config : ManualConfig
     {
-        // We will benchmark ONLY method with names with names (which contains "A" OR "1") AND (have length < 3)
+        // We will benchmark ONLY method with names (which contains "A" OR "1") AND (have length < 3)
         public Config()
         {
             Add(new DisjunctionFilter(
@@ -47,7 +47,7 @@ public class IntroFilters
 ```cs
 [DryJob]
 [CategoriesColumn]
-[BenchmarkCategory("Aswesome")]
+[BenchmarkCategory("Awesome")]
 [AnyCategoriesFilter("A", "1")]
 public class IntroCategories
 {

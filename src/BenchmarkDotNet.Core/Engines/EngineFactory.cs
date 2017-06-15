@@ -28,8 +28,10 @@ namespace BenchmarkDotNet.Engines
                 engineParameters.IdleAction,
                 engineParameters.MainAction,
                 engineParameters.TargetJob,
-                engineParameters.SetupAction,
-                engineParameters.CleanupAction,
+                engineParameters.GlobalSetupAction,
+                engineParameters.GlobalCleanupAction,
+                engineParameters.IterationSetupAction,
+                engineParameters.IterationCleanupAction,
                 engineParameters.OperationsPerInvoke);
         }
     }

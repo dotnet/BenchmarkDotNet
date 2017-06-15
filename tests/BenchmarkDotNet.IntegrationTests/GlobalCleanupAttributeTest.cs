@@ -11,29 +11,29 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class CleanupAttributeTest : BenchmarkTestExecutor
+    public class GlobalCleanupAttributeTest : BenchmarkTestExecutor
     {
-        private const string CleanupCalled = "// ### Cleanup called ###";
+        private const string GlobalCleanupCalled = "// ### GlobalCleanup called ###";
         private const string BenchmarkCalled = "// ### Benchmark called ###";
 
-        public CleanupAttributeTest(ITestOutputHelper output) : base(output) { }
+        public GlobalCleanupAttributeTest(ITestOutputHelper output) : base(output) { }
 
         [Fact]
-        public void CleanupMethodRunsTest()
+        public void GlobalCleanupMethodRunsTest()
         {
             var logger = new OutputLogger(Output);
             var config = CreateSimpleConfig(logger);
 
-            CanExecute<CleanupAttributeBenchmarks>(config);
+            CanExecute<GlobalCleanupAttributeBenchmarks>(config);
 
             string log = logger.GetLog();
-            Assert.Contains(CleanupCalled + System.Environment.NewLine, log);
+            Assert.Contains(GlobalCleanupCalled + System.Environment.NewLine, log);
             Assert.True(
-                log.IndexOf(CleanupCalled + System.Environment.NewLine) >
+                log.IndexOf(GlobalCleanupCalled + System.Environment.NewLine) >
                 log.IndexOf(BenchmarkCalled + System.Environment.NewLine));
         }
 
-        public class CleanupAttributeBenchmarks
+        public class GlobalCleanupAttributeBenchmarks
         {
             [Benchmark]
             public void Benchmark()
@@ -41,10 +41,10 @@ namespace BenchmarkDotNet.IntegrationTests
                 Console.WriteLine(BenchmarkCalled);
             }
 
-            [Cleanup]
-            public void Cleanup()
+            [GlobalCleanup]
+            public void GlobalCleanup()
             {
-                Console.WriteLine(CleanupCalled);
+                Console.WriteLine(GlobalCleanupCalled);
             }
         }
     }

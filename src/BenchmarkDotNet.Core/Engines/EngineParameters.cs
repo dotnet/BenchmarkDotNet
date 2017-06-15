@@ -14,8 +14,10 @@ namespace BenchmarkDotNet.Engines
         public Action<long> IdleAction { get; set; }
         public Job TargetJob { get; set; } = Job.Default;
         public long OperationsPerInvoke { get; set; } = 1;
-        public Action SetupAction { get; set; } = null;
-        public Action CleanupAction { get; set; } = null;
+        public Action GlobalSetupAction { get; set; } = null;
+        public Action GlobalCleanupAction { get; set; } = null;
+        public Action IterationSetupAction { get; set; } = null;
+        public Action IterationCleanupAction { get; set; } = null;
         public IResolver Resolver { get; set; }
     }
 }

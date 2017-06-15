@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Validators
                 }
 
 
-                if (!TryToCallSetup(benchmarkTypeInstance, errors))
+                if (!TryToCallGlobalSetup(benchmarkTypeInstance, errors))
                 {
                     continue;
                 }
@@ -73,37 +73,37 @@ namespace BenchmarkDotNet.Validators
             }
         }
 
-        private bool TryToCallSetup(object benchmarkTypeInstance, List<ValidationError> errors)
+        private bool TryToCallGlobalSetup(object benchmarkTypeInstance, List<ValidationError> errors)
         {
-            var setupMethods = benchmarkTypeInstance
+            var globalSetupMethods = benchmarkTypeInstance
                 .GetType()
                 .GetAllMethods()
-                .Where(methodInfo => methodInfo.GetCustomAttributes(false).OfType<SetupAttribute>().Any())
+                .Where(methodInfo => methodInfo.GetCustomAttributes(false).OfType<GlobalSetupAttribute>().Any())
                 .ToArray();
 
-            if (!setupMethods.Any())
+            if (!globalSetupMethods.Any())
             {
                 return true;
             }
 
-            if (setupMethods.Count(methodInfo => !methodInfo.IsVirtual) > 1)
+            if (globalSetupMethods.Count(methodInfo => !methodInfo.IsVirtual) > 1)
             {
                 errors.Add(new ValidationError(
                     TreatsWarningsAsErrors,
-                    $"Only single [Setup] method is allowed per type, type {benchmarkTypeInstance.GetType().Name} has few"));
+                    $"Only single [GlobalSetup] method is allowed per type, type {benchmarkTypeInstance.GetType().Name} has few"));
 
                 return false;
             }
 
             try
             {
-                setupMethods.First().Invoke(benchmarkTypeInstance, null);
+                globalSetupMethods.First().Invoke(benchmarkTypeInstance, null);
             }
             catch (Exception ex)
             {
                 errors.Add(new ValidationError(
                     TreatsWarningsAsErrors,
-                    $"Failed to execute [Setup] for {benchmarkTypeInstance.GetType().Name}, exception was {ex.Message}"));
+                    $"Failed to execute [GlobalSetup] for {benchmarkTypeInstance.GetType().Name}, exception was {ex.Message}"));
 
                 return false;
             }

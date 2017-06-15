@@ -21,6 +21,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
     {
         private readonly Dictionary<Benchmark, Stats> results = new Dictionary<Benchmark, Stats>();
 
+        public const string DiagnoserId = nameof(MemoryDiagnoser) + "Obsolete";
+        public IEnumerable<string> Ids => new[] { DiagnoserId };
+
         public IColumnProvider GetColumnProvider() => new SimpleColumnProvider(
             new GCCollectionColumn(results, 0),
             new GCCollectionColumn(results, 1),
@@ -33,11 +36,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public void BeforeAnythingElse(DiagnoserActionParameters _) { }
 
-        public void AfterSetup(DiagnoserActionParameters _) { }
+        public void AfterGlobalSetup(DiagnoserActionParameters _) { }
 
         public void BeforeMainRun(DiagnoserActionParameters parameters) => Start(parameters);
 
-        public void BeforeCleanup() => Stop();
+        public void BeforeGlobalCleanup() => Stop();
 
         public void ProcessResults(Benchmark benchmark, BenchmarkReport report)
         {

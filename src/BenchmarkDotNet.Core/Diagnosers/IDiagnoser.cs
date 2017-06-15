@@ -9,6 +9,8 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public interface IDiagnoser
     {
+        IEnumerable<string> Ids { get; } 
+            
         IColumnProvider GetColumnProvider();
 
         /// <summary>
@@ -17,19 +19,19 @@ namespace BenchmarkDotNet.Diagnosers
         void BeforeAnythingElse(DiagnoserActionParameters parameters);
 
         /// <summary>
-        /// after setup, before run
+        /// after globalSetup, before run
         /// </summary>
-        void AfterSetup(DiagnoserActionParameters parameters);
+        void AfterGlobalSetup(DiagnoserActionParameters parameters);
 
         /// <summary>
-        /// after setup, warmup and pilot but before the main run
+        /// after globalSetup, warmup and pilot but before the main run
         /// </summary>
         void BeforeMainRun(DiagnoserActionParameters parameters);
 
         /// <summary>
-        /// after run, before cleanup
+        /// after run, before globalSleanup
         /// </summary>
-        void BeforeCleanup();
+        void BeforeGlobalCleanup();
 
         void ProcessResults(Benchmark benchmark, BenchmarkReport report);
 

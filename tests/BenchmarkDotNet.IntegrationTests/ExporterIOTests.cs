@@ -1,8 +1,8 @@
-﻿﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using Xunit;
@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Fact]
+        [FactWindowsOnly("On Unix, it's possible to write to an opened file")]
         public void ExporterWorksWhenFileIsLocked()
         {
             string resultsDirectoryPath = Path.GetTempPath();

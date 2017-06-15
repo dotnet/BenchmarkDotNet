@@ -9,7 +9,7 @@ using BenchmarkDotNet.Jobs;
 namespace BenchmarkDotNet.Samples.Other
 {
     /// <summary>
-    /// Example of reading all lines from file to string[], and usage of [Cleanup] attribute.
+    /// Example of reading all lines from file to string[], and usage of the [GlobalSetup] and [GlobalCleanup] attributes.
     /// </summary>
     [Config(typeof(Config))]
     public class File_StreamVsMemoryMapperVewStream
@@ -30,8 +30,8 @@ namespace BenchmarkDotNet.Samples.Other
 
         private string fileName;
 
-        [Setup]
-        public void Setup()
+        [GlobalSetup]
+        public void GlobalSetup()
         {
             // Recreate file each time for the purpose of minimizing OS IO caching.
             fileName = Guid.NewGuid().ToString() + ".tmp";
@@ -78,8 +78,8 @@ namespace BenchmarkDotNet.Samples.Other
             }
         }
 
-        [Cleanup]
-        public void Cleanup()
+        [GlobalCleanup]
+        public void GlobalCleanup()
         {
             File.Delete(fileName);
         }

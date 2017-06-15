@@ -60,14 +60,14 @@ namespace BenchmarkDotNet.IntegrationTests
             });
         }
 
-        public class AllocatingSetupAndCleanup
+        public class AllocatingGlobalSetupAndCleanup
         {
             private List<int> list;
 
             [Benchmark] public void AllocateNothing() { }
 
-            [Setup] public void AllocatingSetUp() => AllocateUntilGcWakesUp();
-            [Cleanup] public void AllocatingCleanUp() => AllocateUntilGcWakesUp();
+            [GlobalSetup] public void AllocatingSetUp() => AllocateUntilGcWakesUp();
+            [GlobalCleanup] public void AllocatingCleanUp() => AllocateUntilGcWakesUp();
 
             private void AllocateUntilGcWakesUp()
             {
@@ -79,11 +79,11 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory, MemberData(nameof(GetToolchains))]
-        public void MemoryDiagnoserDoesNotIncludeAllocationsFromSetupAndCleanup(IToolchain toolchain)
+        public void MemoryDiagnoserDoesNotIncludeAllocationsFromGlobalSetupAndCleanup(IToolchain toolchain)
         {
-            AssertAllocations(toolchain, typeof(AllocatingSetupAndCleanup), new Dictionary<string, long>
+            AssertAllocations(toolchain, typeof(AllocatingGlobalSetupAndCleanup), new Dictionary<string, long>
             {
-                { nameof(AllocatingSetupAndCleanup.AllocateNothing), 0 }
+                { nameof(AllocatingGlobalSetupAndCleanup.AllocateNothing), 0 }
             });
         }
 
@@ -98,6 +98,20 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertAllocations(toolchain, typeof(NoAllocationsAtAll), new Dictionary<string, long>
             {
                 { nameof(NoAllocationsAtAll.EmptyMethod), 0 }
+            });
+        }
+
+        public class NoBoxing
+        {
+            [Benchmark] public ValueTuple<int> ReturnsValueType() => new ValueTuple<int>(0);
+        }
+
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void EngineShouldNotIntroduceBoxing(IToolchain toolchain)
+        {
+            AssertAllocations(toolchain, typeof(NoBoxing), new Dictionary<string, long>
+            {
+                { nameof(NoBoxing.ReturnsValueType), 0 }
             });
         }
 

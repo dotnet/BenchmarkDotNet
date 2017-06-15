@@ -11,34 +11,34 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class SetupAttributeTest : BenchmarkTestExecutor
+    public class GlobalSetupAttributeTest : BenchmarkTestExecutor
     {
-        private const string SetupCalled = "// ### Setup called ###";
+        private const string GlobalSetupCalled = "// ### GlobalSetup called ###";
         private const string BenchmarkCalled = "// ### Benchmark called ###";
 
-        public SetupAttributeTest(ITestOutputHelper output) : base(output) { }
+        public GlobalSetupAttributeTest(ITestOutputHelper output) : base(output) { }
 
         [Fact]
-        public void SetupMethodRunsTest()
+        public void GlobalSetupMethodRunsTest()
         {
             var logger = new OutputLogger(Output);
             var config = CreateSimpleConfig(logger);
 
-            CanExecute<SetupAttributeBenchmarks>(config);
+            CanExecute<GlobalSetupAttributeBenchmarks>(config);
 
             string log = logger.GetLog();
-            Assert.Contains(SetupCalled + Environment.NewLine, log);
+            Assert.Contains(GlobalSetupCalled + Environment.NewLine, log);
             Assert.True(
-                log.IndexOf(SetupCalled + Environment.NewLine) <
+                log.IndexOf(GlobalSetupCalled + Environment.NewLine) <
                 log.IndexOf(BenchmarkCalled + Environment.NewLine));
         }
 
-        public class SetupAttributeBenchmarks
+        public class GlobalSetupAttributeBenchmarks
         {
-            [Setup]
-            public void Setup()
+            [GlobalSetup]
+            public void GlobalSetup()
             {
-                Console.WriteLine(SetupCalled);
+                Console.WriteLine(GlobalSetupCalled);
             }
 
             [Benchmark]

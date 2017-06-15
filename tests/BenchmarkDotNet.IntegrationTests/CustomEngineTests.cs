@@ -15,9 +15,9 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class CustomEngineTests : BenchmarkTestExecutor
     {
-        private const string SetupMessage = "// Setup got called";
+        private const string GlobalSetupMessage = "// GlobalSetup got called";
         private const string EngineRunMessage = "// EngineRun got called";
-        private const string CleanupMessage = "// Cleanup got called";
+        private const string GlobalCleanupMessage = "// GlobalCleanup got called";
 
         public CustomEngineTests(ITestOutputHelper output) : base(output)
         {
@@ -31,9 +31,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var summary = CanExecute<SimpleBenchmark>(config, fullValidation: false);
 
-            AssertMessageGotDisplayed(summary, SetupMessage);
+            AssertMessageGotDisplayed(summary, GlobalSetupMessage);
             AssertMessageGotDisplayed(summary, EngineRunMessage);
-            AssertMessageGotDisplayed(summary, CleanupMessage);
+            AssertMessageGotDisplayed(summary, GlobalCleanupMessage);
         }
 
         private static void AssertMessageGotDisplayed(Summary summary, string message)
@@ -43,11 +43,11 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class SimpleBenchmark
         {
-            [Setup]
-            public void Setup() => Console.WriteLine(SetupMessage);
+            [GlobalSetup]
+            public void Setup() => Console.WriteLine(GlobalSetupMessage);
 
-            [Cleanup]
-            public void Cleanup() => Console.WriteLine(CleanupMessage);
+            [GlobalCleanup]
+            public void Cleanup() => Console.WriteLine(GlobalCleanupMessage);
 
             [Benchmark]
             public void Empty() { }
@@ -58,8 +58,8 @@ namespace BenchmarkDotNet.IntegrationTests
             public IEngine Create(EngineParameters engineParameters) 
                 => new CustomEngine
                 {
-                    CleanupAction = engineParameters.CleanupAction,
-                    SetupAction = engineParameters.SetupAction
+                    GlobalCleanupAction = engineParameters.GlobalCleanupAction,
+                    GlobalSetupAction = engineParameters.GlobalSetupAction
                 };
         }
 
@@ -82,8 +82,8 @@ namespace BenchmarkDotNet.IntegrationTests
             public void WriteLine(string line) { }
             public Job TargetJob { get; }
             public long OperationsPerInvoke { get; }
-            public Action SetupAction { get; set; }
-            public Action CleanupAction { get; set; }
+            public Action GlobalSetupAction { get; set; }
+            public Action GlobalCleanupAction { get; set; }
             public Action<long> MainAction { get; }
             public Action<long> IdleAction { get; }
             public IResolver Resolver { get; }

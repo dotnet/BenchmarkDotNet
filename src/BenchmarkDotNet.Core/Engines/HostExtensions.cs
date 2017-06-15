@@ -13,14 +13,14 @@ namespace BenchmarkDotNet.Engines
         public static void BeforeAnythingElse(this IHost host) =>
             host.SendSignal(HostSignal.BeforeAnythingElse);
 
-        public static void AfterSetup(this IHost host) =>
-            host.SendSignal(HostSignal.AfterSetup);
+        public static void AfterGlobalSetup(this IHost host) =>
+            host.SendSignal(HostSignal.AfterGlobalSetup);
 
         public static void BeforeMainRun(this IHost host) =>
             host.SendSignal(HostSignal.BeforeMainRun);
 
-        public static void BeforeCleanup(this IHost host) =>
-            host.SendSignal(HostSignal.BeforeCleanup);
+        public static void BeforeGlobalCleanup(this IHost host) =>
+            host.SendSignal(HostSignal.BeforeGlobalCleanup);
 
         public static void AfterAnythingElse(this IHost host) =>
             host.SendSignal(HostSignal.AfterAnythingElse);

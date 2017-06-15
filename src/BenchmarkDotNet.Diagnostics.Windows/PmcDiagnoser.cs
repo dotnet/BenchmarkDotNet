@@ -113,11 +113,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         }
 
         public void BeforeAnythingElse(DiagnoserActionParameters _) { }
-        public void AfterSetup(DiagnoserActionParameters _) { }
+        public void AfterGlobalSetup(DiagnoserActionParameters _) { }
 
         public void BeforeMainRun(DiagnoserActionParameters parameters) => Start(parameters);
 
-        public void BeforeCleanup() => Stop();
+        public void BeforeGlobalCleanup() => Stop();
 
         public void ProcessResults(Benchmark benchmark, BenchmarkReport report)
         {
@@ -191,6 +191,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             if (StatsPerProcess.TryGetValue(obj.ProcessID, out var stats))
                 stats.Handle(obj.ProfileSource);
         }
+
+        public const string DiagnoserId = nameof(InliningDiagnoser);
+        public IEnumerable<string> Ids => new[] { DiagnoserId };
 
         public IColumnProvider GetColumnProvider()
            => new SimpleColumnProvider(

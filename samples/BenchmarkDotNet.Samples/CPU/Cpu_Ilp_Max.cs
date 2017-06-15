@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Samples.CPU
 
         private int[] x = new int[32];
 
-        [Setup]
+        [GlobalSetup]
         public void Setup ()
         {
             var r = new Random(100);

@@ -58,17 +58,17 @@ namespace BenchmarkDotNet.Loggers
                 {
                     diagnoser?.BeforeAnythingElse(diagnoserActionParameters);
                 }
-                else if (line == Engine.Signals.AfterSetup)
+                else if (line == Engine.Signals.AfterGlobalSetup)
                 {
-                    diagnoser?.AfterSetup(diagnoserActionParameters);
+                    diagnoser?.AfterGlobalSetup(diagnoserActionParameters);
                 }
                 else if (line == Engine.Signals.BeforeMainRun)
                 {
                     diagnoser?.BeforeMainRun(diagnoserActionParameters);
                 }
-                else if (line == Engine.Signals.BeforeCleanup)
+                else if (line == Engine.Signals.BeforeGlobalCleanup)
                 {
-                    diagnoser?.BeforeCleanup();
+                    diagnoser?.BeforeGlobalCleanup();
                 }
                 else if (line == Engine.Signals.AfterAnythingElse)
                 {

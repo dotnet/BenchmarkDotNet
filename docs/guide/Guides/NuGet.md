@@ -1,4 +1,4 @@
-# NuGet
+# Installing NuGet packages
 
 ## Packages
 

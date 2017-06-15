@@ -114,19 +114,33 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         public static BenchmarkAction CreateIdle(Target target, object instance, BenchmarkActionCodegen codegenMode, int unrollFactor) =>
             CreateCore(instance, null, target.Method, codegenMode, unrollFactor);
 
-        /// <summary>Creates setup benchmark action.</summary>
+        /// <summary>Creates global setup benchmark action.</summary>
         /// <param name="target">Target info.</param>
         /// <param name="instance">Instance of target.</param>
         /// <returns>Setup benchmark action.</returns>
-        public static BenchmarkAction CreateSetup(Target target, object instance) =>
-            CreateCore(instance, target.SetupMethod, FallbackSignature, BenchmarkActionCodegen.DelegateCombine, 1);
+        public static BenchmarkAction CreateGlobalSetup(Target target, object instance) =>
+            CreateCore(instance, target.GlobalSetupMethod, FallbackSignature, BenchmarkActionCodegen.DelegateCombine, 1);
 
-        /// <summary>Creates cleanup benchmark action.</summary>
+        /// <summary>Creates global cleanup benchmark action.</summary>
         /// <param name="target">Target info.</param>
         /// <param name="instance">Instance of target.</param>
         /// <returns>Cleanup benchmark action.</returns>
-        public static BenchmarkAction CreateCleanup(Target target, object instance) =>
-            CreateCore(instance, target.CleanupMethod, FallbackSignature, BenchmarkActionCodegen.DelegateCombine, 1);
+        public static BenchmarkAction CreateGlobalCleanup(Target target, object instance) =>
+            CreateCore(instance, target.GlobalCleanupMethod, FallbackSignature, BenchmarkActionCodegen.DelegateCombine, 1);
+
+        /// <summary>Creates global setup benchmark action.</summary>
+        /// <param name="target">Target info.</param>
+        /// <param name="instance">Instance of target.</param>
+        /// <returns>Setup benchmark action.</returns>
+        public static BenchmarkAction CreateIterationSetup(Target target, object instance) =>
+            CreateCore(instance, target.IterationSetupMethod, FallbackSignature, BenchmarkActionCodegen.DelegateCombine, 1);
+
+        /// <summary>Creates global cleanup benchmark action.</summary>
+        /// <param name="target">Target info.</param>
+        /// <param name="instance">Instance of target.</param>
+        /// <returns>Cleanup benchmark action.</returns>
+        public static BenchmarkAction CreateIterationCleanup(Target target, object instance) =>
+            CreateCore(instance, target.IterationCleanupMethod, FallbackSignature, BenchmarkActionCodegen.DelegateCombine, 1);
 
         /// <summary>Creates a dummy benchmark action.</summary>
         /// <returns>Dummy benchmark action.</returns>

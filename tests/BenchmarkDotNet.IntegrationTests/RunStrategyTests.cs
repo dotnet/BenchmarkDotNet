@@ -50,8 +50,8 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public bool FirstTime { get; set; }
 
-            [Setup]
-            public void Setup()
+            [GlobalSetup]
+            public void GlobalSetup()
             {
                 // Ensure we only print the diagnostic messages once per run in the tests, otherwise it fills up the output log!!
                 FirstTime = true;

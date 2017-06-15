@@ -17,15 +17,16 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         protected override string SessionNamePrefix => "JitTracing";
 
+        public abstract IEnumerable<string> Ids { get; }
         public IColumnProvider GetColumnProvider() => EmptyColumnProvider.Instance;
 
         public void BeforeAnythingElse(DiagnoserActionParameters parameters) => Start(parameters);
 
-        public void AfterSetup(DiagnoserActionParameters _) { }
+        public void AfterGlobalSetup(DiagnoserActionParameters _) { }
 
         public void BeforeMainRun(DiagnoserActionParameters _) { }
 
-        public void BeforeCleanup() => Stop();
+        public void BeforeGlobalCleanup() => Stop();
 
         public virtual void ProcessResults(Benchmark benchmark, BenchmarkReport report) { }
 

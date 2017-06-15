@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Engines
     {
         internal const string ResultsLinePrefix = "GC: ";
 
-        private static readonly long AllocationQuantum = CaluclateAllocationQuantumSize(); 
+        public static readonly long AllocationQuantum = CalculateAllocationQuantumSize(); 
 
         private static readonly Func<long> GetAllocatedBytesForCurrentThreadDelegate = GetAllocatedBytesForCurrentThread();
 
@@ -176,7 +176,7 @@ namespace BenchmarkDotNet.Engines
         /// code copied from https://github.com/rsdn/CodeJam/blob/71a6542b6e5c52ea8dd92c601adad11e62796a98/PerfTests/src/%5BL4_Configuration%5D/Metrics/%5BMetricValuesProvider%5D/GcMetricValuesProvider.cs#L63-L89
         /// </summary>
         /// <returns></returns>
-        private static long CaluclateAllocationQuantumSize()
+        private static long CalculateAllocationQuantumSize()
         {
             long result;
             int retry = 0;

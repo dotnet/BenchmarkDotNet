@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Loggers;
+﻿using System.Collections.Generic;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using Microsoft.Diagnostics.Tracing.Session;
 
@@ -75,5 +76,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 }
             };
         }
+
+        public const string DiagnoserId = nameof(InliningDiagnoser);
+        public override IEnumerable<string> Ids => new[] { DiagnoserId };
     }
 }

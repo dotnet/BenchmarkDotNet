@@ -17,7 +17,7 @@ Below is a sample output from the `GC and Memory Allocation` diagnoser, note the
            Method |        Mean |     StdErr |      StdDev |      Median |  Gen 0 | Allocated |
 ----------------- |------------ |----------- |------------ |------------ |------- |---------- |
  'new byte[10kB]' | 884.4896 ns | 46.3528 ns | 245.2762 ns | 776.4237 ns | 0.1183 |     10 kB |
- ```
+```
 
 A config example:
 

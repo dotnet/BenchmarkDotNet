@@ -3,9 +3,9 @@
     public enum HostSignal
     {
         BeforeAnythingElse,
-        AfterSetup,
+        AfterGlobalSetup,
         BeforeMainRun,
-        BeforeCleanup,
+        BeforeGlobalCleanup,
         AfterAnythingElse
     }
 }

@@ -31,10 +31,10 @@ namespace BenchmarkDotNet.IntegrationTests
         private const int UnrollFactor = 16;
 
         [Fact]
-        public void BenchmarkActionSetupSupported() => TestInvoke(x => BenchmarkAllCases.Setup(), UnrollFactor);
+        public void BenchmarkActionGlobalSetupSupported() => TestInvoke(x => BenchmarkAllCases.GlobalSetup(), UnrollFactor);
 
         [Fact]
-        public void BenchmarkActionCleanupSupported() => TestInvoke(x => x.Cleanup(), UnrollFactor);
+        public void BenchmarkActionGlobalCleanupSupported() => TestInvoke(x => x.GlobalCleanup(), UnrollFactor);
 
         [Fact]
         public void BenchmarkActionVoidSupported() => TestInvoke(x => x.InvokeOnceVoid(), UnrollFactor);
@@ -90,17 +90,17 @@ namespace BenchmarkDotNet.IntegrationTests
             action = BenchmarkActionFactory.CreateIdle(target, new BenchmarkAllCases(), BenchmarkActionCodegen.DelegateCombine, unrollFactor);
             TestInvoke(action, unrollFactor, true, null);
 
-            // Setup/cleanup
-            action = BenchmarkActionFactory.CreateSetup(target, new BenchmarkAllCases());
+            // GlobalSetup/GlobalCleanup
+            action = BenchmarkActionFactory.CreateGlobalSetup(target, new BenchmarkAllCases());
             TestInvoke(action, 1, false, null);
-            action = BenchmarkActionFactory.CreateCleanup(target, new BenchmarkAllCases());
+            action = BenchmarkActionFactory.CreateGlobalCleanup(target, new BenchmarkAllCases());
             TestInvoke(action, 1, false, null);
 
-            // Setup/cleanup (empty)
+            // GlobalSetup/GlobalCleanup (empty)
             target = new Target(typeof(BenchmarkAllCases), targetMethod);
-            action = BenchmarkActionFactory.CreateSetup(target, new BenchmarkAllCases());
+            action = BenchmarkActionFactory.CreateGlobalSetup(target, new BenchmarkAllCases());
             TestInvoke(action, unrollFactor, true, null);
-            action = BenchmarkActionFactory.CreateCleanup(target, new BenchmarkAllCases());
+            action = BenchmarkActionFactory.CreateGlobalCleanup(target, new BenchmarkAllCases());
             TestInvoke(action, unrollFactor, true, null);
 
             // Dummy (just in case something may broke)
@@ -209,7 +209,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 Assert.Contains("// Benchmark: BenchmarkAllCases.InvokeOnceVoid:", testLog);
                 Assert.DoesNotContain("No benchmarks found", logger.GetLog());
 
-                // Operations + Setup + Cleanup
+                // Operations + GlobalSetup + GlobalCleanup
                 var expectedCount = summary.Reports.SelectMany(r => r.AllMeasurements).Sum(m => m.Operations + 2);
                 Assert.Equal(expectedCount, BenchmarkAllCases.Counter);
             }
@@ -235,7 +235,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 Assert.Contains("// Benchmark: BenchmarkAllCases.InvokeOnceVoid:", testLog);
                 Assert.DoesNotContain("No benchmarks found", logger.GetLog());
 
-                // Operations + Setup + Cleanup
+                // Operations + GlobalSetup + GlobalCleanup
                 var expectedCount = summary.Reports.SelectMany(r => r.AllMeasurements).Sum(m => m.Operations + 2);
                 Assert.Equal(expectedCount, BenchmarkAllCases.Counter);
             }
@@ -250,14 +250,14 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public static int Counter;
 
-            [Setup]
-            public static void Setup()
+            [GlobalSetup]
+            public static void GlobalSetup()
             {
                 Interlocked.Increment(ref Counter);
             }
 
-            [Cleanup]
-            public void Cleanup() => Interlocked.Increment(ref Counter);
+            [GlobalCleanup]
+            public void GlobalCleanup() => Interlocked.Increment(ref Counter);
 
             [Benchmark]
             public void InvokeOnceVoid()

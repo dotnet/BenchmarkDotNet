@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Environments
 
         public static readonly CultureInfo MainCultureInfo;
 
-        // TODO: API to setup the logger.
+        // TODO: API to GlobalSetup the logger.
         /// <summary>
         /// Logger to use when there's no config available.
         /// </summary>
