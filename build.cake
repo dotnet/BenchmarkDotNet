@@ -100,7 +100,7 @@ Task("SlowTests")
     });
 
 Task("Pack")
-    .WithCriteria(AppVeyor.IsRunningOnAppVeyor)
+    .WithCriteria(AppVeyor.IsRunningOnAppVeyor && !AppVeyor.Environment.PullRequest.IsPullRequest)
     .IsDependentOn("SlowTests")
     .Does(() =>
     {
