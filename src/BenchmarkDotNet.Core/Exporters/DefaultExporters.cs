@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Exporters.Json;
+using BenchmarkDotNet.Exporters.Xml;
 
 namespace BenchmarkDotNet.Exporters
 {
@@ -18,5 +19,11 @@ namespace BenchmarkDotNet.Exporters
         public static IExporter JsonBriefCompressed = JsonExporter.BriefCompressed;
         public static IExporter JsonFull = JsonExporter.Full;
         public static IExporter JsonFullCompressed = JsonExporter.FullCompressed;
+
+        public static IExporter Xml = XmlExporter.Default;
+        public static IExporter XmlBrief = XmlExporter.Brief;
+        public static IExporter XmlBriefCompressed = XmlExporter.BriefCompressed;
+        public static IExporter XmlFull = XmlExporter.Full;
+        public static IExporter XmlFullCompressed = XmlExporter.FullCompressed;
     }
 }
