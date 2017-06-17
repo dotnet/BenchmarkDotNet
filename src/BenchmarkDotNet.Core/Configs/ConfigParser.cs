@@ -12,6 +12,7 @@ using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
+using BenchmarkDotNet.Exporters.Xml;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -108,6 +109,9 @@ namespace BenchmarkDotNet.Configs
                 { "briefjson", new[] { JsonExporter.Brief } },
                 { "fulljson", new[] { JsonExporter.Full } },
                 { "asciidoc", new[] { AsciiDocExporter.Default } },
+                { "xml", new[] { XmlExporter.Default } },
+                { "briefxml", new[] { XmlExporter.Brief } },
+                { "fullxml", new[] { XmlExporter.Full } },
             };
         private static Lazy<IExporter[]> allExporters = new Lazy<IExporter[]>(() => availableExporters.SelectMany(e => e.Value).ToArray());
 

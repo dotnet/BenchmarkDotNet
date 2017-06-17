@@ -8,6 +8,8 @@ using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Loggers;
 using Xunit;
 using Xunit.Abstractions;
+using BenchmarkDotNet.Exporters.Json;
+using BenchmarkDotNet.Exporters.Xml;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -26,6 +28,8 @@ namespace BenchmarkDotNet.IntegrationTests
                 CsvMeasurementsExporter.Default,
                 HtmlExporter.Default,
                 PlainExporter.Default,
+                JsonExporter.Default,
+                XmlExporter.Default
             };
 
         [Fact]
