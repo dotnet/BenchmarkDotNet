@@ -84,6 +84,6 @@ Analyze it. In your bin directory, you can find a lot of useful files with detai
 ## Next steps
 
 BenchmarkDotNet provides a lot of features which help to high-quality performance research.
-If you want to know more about BenchmarkDotNet features, checkout the [Overview](Overview.htm) page.
-If you want have any questions, checkout the [FAQ](FAQ.htm) page.
+If you want to know more about BenchmarkDotNet features, checkout the [Overview](../Overview.htm) page.
+If you want have any questions, checkout the [FAQ](../FAQ.htm) page.
 If you didn't find answer for your question on this page, [ask it on gitter](https://gitter.im/dotnet/BenchmarkDotNet) or [create an issue](https://github.com/dotnet/BenchmarkDotNet/issues).
