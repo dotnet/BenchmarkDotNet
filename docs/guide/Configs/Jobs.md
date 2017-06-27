@@ -1,6 +1,6 @@
 # Jobs
 
-Basically, *job* describes how to run your benchmark. Practically, it's a set of characteristics which can be specified. You can set one or several jobs for your benchmarks.
+Basically, a *job* describes how to run your benchmark. Practically, it's a set of characteristics which can be specified. You can specify one or several jobs for your benchmarks.
 
 ## Characteristics
 
@@ -45,10 +45,10 @@ In this category, you can specifiy how to benchmark each method.
 * `UnrollFactor`: how many times the benchmark method will be invoked per one iteration of a generated loop
 * `InvocationCount`: count of invocation in a single iteration (if specified, `IterationTime` will be ignored), must be a multiple of `UnrollFactor`
 
-Usually, you shouldn't specify such characteristics like `LaunchCount`, `WarmupCount`, `TargetCount`, or `IterationTime` because BenchmarkDotNet has a smart algorithm to choose these values automatically based on recieved measurements. You can specify it for testing purposes or when you are damn sure that you know perfect characteristics for your benchmark (when you set `TargetCount` = `20` you should unserstand why `20` is a good value for your case).
+Usually, you shouldn't specify such characteristics like `LaunchCount`, `WarmupCount`, `TargetCount`, or `IterationTime` because BenchmarkDotNet has a smart algorithm to choose these values automatically based on recieved measurements. You can specify it for testing purposes or when you are damn sure that you know the right characteristics for your benchmark (when you set `TargetCount` = `20` you should unserstand why `20` is a good value for your case).
 
 ### Accuracy
-If you want to change the accuracy level, you should use the following characteristics instead of manual of values of `WarmupCount`, `TargetCount`, and so on.
+If you want to change the accuracy level, you should use the following characteristics instead of manually adjusting values of `WarmupCount`, `TargetCount`, and so on.
 
 * `MaxRelativeError`, `MaxAbsoluteError`: Maximum acceptable error for a benchmark (by default, BenchmarkDotNet continue iterations until the actual error is less than the specified error). *In these two characteristics*, the error means half of 99.9% confidence interval. `MaxAbsoluteError` is an absolute `TimeInterval`; doesn't have a default value. `MaxRelativeError` defines max acceptable (`(<half of CI 99.9%>) / Mean`).
 * `MinIterationTime`: Minimum time of a single iteration. Unlike `Run.IterationTime`, this characteristic specify only the lower limit. In case of need, BenchmarkDotNet can increase this value.
@@ -129,16 +129,16 @@ You can also add new jobs via attributes. Examples:
 ```cs
 [DryJob]
 [ClrJob, CoreJob, MonoJob]
-[LegacyJitX86Job, LegacyJitX64, RyuJitX64Job]
+[LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
 [SimpleJob(RunStrategy.ColdStart, launchCount: 1, warmupCount: 5, targetCount: 5, id: "FastAndDirtyJob")]
 public class MyBenchmarkClass
 ```
 
-Note that each of the attribute identifies a separate job, the sample above will result in 8 different jobs, not merged one.
+Note that each of the attributes identifies a separate job, the sample above will result in 8 different jobs, not a single merged job.
 
 #### Custom attributes
 
-You can also create own custom attribute with your favorite set of jobs. Example:
+You can also create your own custom attributes with your favorite set of jobs. Example:
 
 ```cs
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
