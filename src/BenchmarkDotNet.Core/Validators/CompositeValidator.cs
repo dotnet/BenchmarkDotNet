@@ -9,7 +9,8 @@ namespace BenchmarkDotNet.Validators
         {
             BaselineValidator.FailOnError,
             UnrollFactorValidator.Default,
-            DiagnosersValidator.Default
+            DiagnosersValidator.Default,
+            CompilationValidator.Default
         };
 
         internal readonly IValidator[] Validators;
