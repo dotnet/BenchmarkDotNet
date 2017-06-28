@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Tests
 
             var errors = CompilationValidator.Default.Validate(parameters);
 
-            Assert.Equal("Benchmarked method `Has Some Whitespaces` contains illegal characters (whitespaces). Please use `[<Benchmark(Description = \"Custom name\")>]` to set custom display name.", 
+            Assert.Equal("Benchmarked method `Has Some Whitespaces` contains illegal character(s). Please use `[<Benchmark(Description = \"Custom name\")>]` to set custom display name.", 
                 errors.Single().Message);
         }
 
