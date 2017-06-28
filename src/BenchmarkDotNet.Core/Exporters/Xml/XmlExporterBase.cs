@@ -1,6 +1,8 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Text;
 using System.Xml;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
@@ -30,13 +32,19 @@ namespace BenchmarkDotNet.Exporters.Xml
                                     .WithCollectionItemName(typeof(Measurement),
                                                             nameof(Measurement))
                                     .WithCollectionItemName(typeof(BenchmarkReportDto),
-                                                            nameof(BenchmarkReport.Benchmark));
+                                                            nameof(BenchmarkReport.Benchmark))
+                                    .WithCollectionItemName(typeof(double), "Outlier");
+
+            if (!summary.Config.GetDiagnosers().Any(diagnoser => diagnoser is MemoryDiagnoser))
+            {
+                serializer.WithExcludedProperty(nameof(BenchmarkReportDto.Memory));
+            }
 
             if (excludeMeasurements)
             {
                 serializer.WithExcludedProperty(nameof(BenchmarkReportDto.Measurements));
             }
-
+            
             // Use custom UTF-8 stringwriter because the default writes UTF-16
             StringBuilder builder = new StringBuilder();
             using (var textWriter = new Utf8StringWriter(builder))

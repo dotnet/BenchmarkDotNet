@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Mathematics;
@@ -72,6 +73,7 @@ namespace BenchmarkDotNet.Exporters.Xml
         public string MethodTitle => report.Benchmark.Target.MethodDisplayInfo;
         public string Parameters => report.Benchmark.Parameters.PrintInfo;
         public Statistics Statistics => report.ResultStatistics;
+        public GcStats Memory => report.GcStats;
         public IEnumerable<Measurement> Measurements { get; }
 
         private readonly BenchmarkReport report;
