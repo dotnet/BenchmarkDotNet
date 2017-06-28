@@ -8,6 +8,8 @@ namespace BenchmarkDotNet.Validators
 {
     public class CompilationValidator : IValidator
     {
+        private static readonly HashSet<char> ValidConnectors = new HashSet<char> { '-', '_' };
+
         public static readonly IValidator Default = new CompilationValidator();
 
         private CompilationValidator() { }
@@ -17,7 +19,7 @@ namespace BenchmarkDotNet.Validators
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
             => validationParameters
                 .Benchmarks
-                .Where(benchmark => HasInvalidCSharpName(benchmark.Target.Method))
+                .Where(benchmark => !IsValidCSharpIdentifier(benchmark.Target.Method.Name))
                 .Distinct(BenchmarkMethodEqualityComparer.Default) // we might have multiple jobs targeting same method. Single error should be enough ;)
                 .Select(benchmark
                     => new ValidationError(
@@ -26,8 +28,12 @@ namespace BenchmarkDotNet.Validators
                         benchmark
                     ));
 
-        private bool HasInvalidCSharpName(MethodInfo targetMethod)
-            => targetMethod.Name.Any(char.IsWhiteSpace); // F# allows to use whitespaces as names #479
+        private bool IsValidCSharpIdentifier(string identifier) // F# allows to use whitespaces as names #479
+            => !string.IsNullOrEmpty(identifier)
+               && (char.IsLetter(identifier[0]) || identifier[0] == '_') // An identifier must start with a letter or an underscore
+               && identifier
+                    .Skip(1)
+                    .All(character => char.IsLetterOrDigit(character) || ValidConnectors.Contains(character));
 
         private class BenchmarkMethodEqualityComparer : IEqualityComparer<Benchmark>
         {
