@@ -4,28 +4,29 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Xml;
 
 namespace BenchmarkDotNet.Exporters.Xml
 {
-    public class XmlSerializer
+    public class XmlSerializer : IXmlSerializer
     {
         private readonly Type type;
         private readonly Dictionary<Type, string> itemNames = new Dictionary<Type, string>();
         private readonly HashSet<string> excludedProperties = new HashSet<string>();
-        private XmlWriter writer;
+        private IXmlWriter writer;
         private string rootName;
+
+        public static string DefaultItemName { get; } = "Item";
 
         public XmlSerializer(Type type)
         {
             if (type == null)
-                throw new NullReferenceException();
+                throw new ArgumentNullException(nameof(type));
 
             this.type = type;
             rootName = type.Name;
         }
 
-        public XmlSerializer WithRootName(string rootName)
+        public IXmlSerializer WithRootName(string rootName)
         {
             if (string.IsNullOrWhiteSpace(rootName))
                 throw new ArgumentException(nameof(rootName));
@@ -34,10 +35,10 @@ namespace BenchmarkDotNet.Exporters.Xml
             return this;
         }
 
-        public XmlSerializer WithCollectionItemName(Type type, string name)
+        public IXmlSerializer WithCollectionItemName(Type type, string name)
         {
             if (type == null)
-                throw new NullReferenceException(nameof(type));
+                throw new ArgumentNullException(nameof(type));
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException(nameof(name));
 
@@ -45,7 +46,7 @@ namespace BenchmarkDotNet.Exporters.Xml
             return this;
         }
 
-        public XmlSerializer WithExcludedProperty(string propertyName)
+        public IXmlSerializer WithExcludedProperty(string propertyName)
         {
             if (string.IsNullOrWhiteSpace(propertyName))
                 throw new ArgumentException(nameof(propertyName));
@@ -54,12 +55,12 @@ namespace BenchmarkDotNet.Exporters.Xml
             return this;
         }
 
-        public void Serialize(XmlWriter writer, object source)
+        public void Serialize(IXmlWriter writer, object source)
         {
             if (writer == null)
-                throw new NullReferenceException(nameof(writer));
-            if (source == null)
-                throw new NullReferenceException(nameof(source));
+                throw new ArgumentNullException(nameof(writer));
+            if (source == null || source.GetType() != type)
+                throw new ArgumentNullException(nameof(source));
 
             this.writer = writer;
 
@@ -126,7 +127,7 @@ namespace BenchmarkDotNet.Exporters.Xml
 
             writer.WriteEndElement();
         }
-        
+
         private void WriteCollectionProperty(object source, PropertyInfo property)
         {
             IEnumerable collection = (IEnumerable)property.GetValue(source);
@@ -142,7 +143,15 @@ namespace BenchmarkDotNet.Exporters.Xml
             {
                 if (itemName == null)
                 {
-                    itemName = itemNames[item.GetType()];
+                    var itemType = item.GetType();
+                    if (itemNames.ContainsKey(itemType))
+                    {
+                        itemName = itemNames[itemType];
+                    }
+                    else
+                    {
+                        itemName = DefaultItemName;
+                    }
                 }
 
                 if (IsSimple(item.GetType().GetTypeInfo()))
