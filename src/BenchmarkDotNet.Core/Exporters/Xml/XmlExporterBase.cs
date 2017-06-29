@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Text;
-using System.Xml;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -12,28 +11,25 @@ namespace BenchmarkDotNet.Exporters.Xml
     {
         protected override string FileExtension => "xml";
 
-        private readonly XmlWriterSettings settings;
+        private readonly bool indentXml;
         private readonly bool excludeMeasurements;
 
         public XmlExporterBase(bool indentXml = false, bool excludeMeasurements = false)
         {
-            settings = new XmlWriterSettings
-            {
-                Indent = indentXml
-            };
-
+            this.indentXml = indentXml;
             this.excludeMeasurements = excludeMeasurements;
         }
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
-            var serializer = new XmlSerializer(typeof(SummaryDto))
-                                    .WithRootName(nameof(Summary))
-                                    .WithCollectionItemName(typeof(Measurement),
-                                                            nameof(Measurement))
-                                    .WithCollectionItemName(typeof(BenchmarkReportDto),
-                                                            nameof(BenchmarkReport.Benchmark))
-                                    .WithCollectionItemName(typeof(double), "Outlier");
+            IXmlSerializer serializer =
+                new XmlSerializer(typeof(SummaryDto))
+                    .WithRootName(nameof(Summary))
+                    .WithCollectionItemName(typeof(Measurement),
+                                            nameof(Measurement))
+                    .WithCollectionItemName(typeof(BenchmarkReportDto),
+                                            nameof(BenchmarkReport.Benchmark))
+                    .WithCollectionItemName(typeof(double), "Outlier");
 
             if (!summary.Config.GetDiagnosers().Any(diagnoser => diagnoser is MemoryDiagnoser))
             {
@@ -44,12 +40,12 @@ namespace BenchmarkDotNet.Exporters.Xml
             {
                 serializer.WithExcludedProperty(nameof(BenchmarkReportDto.Measurements));
             }
-            
+
             // Use custom UTF-8 stringwriter because the default writes UTF-16
-            StringBuilder builder = new StringBuilder();
+            var builder = new StringBuilder();
             using (var textWriter = new Utf8StringWriter(builder))
             {
-                using (var writer = XmlWriter.Create(textWriter, settings))
+                using (var writer = new SimpleXmlWriter(textWriter, indentXml))
                 {
                     serializer.Serialize(writer, new SummaryDto(summary));
                 }
