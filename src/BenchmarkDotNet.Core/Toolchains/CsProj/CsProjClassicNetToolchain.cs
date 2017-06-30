@@ -17,23 +17,25 @@ namespace BenchmarkDotNet.Toolchains.CsProj
     [PublicAPI]
     public class CsProjClassicNetToolchain : Toolchain
     {
-        [PublicAPI] public static readonly IToolchain Net46 = new CsProjClassicNetToolchain("net46");
-        [PublicAPI] public static readonly IToolchain Net461 = new CsProjClassicNetToolchain("net461");
-        [PublicAPI] public static readonly IToolchain Net462 = new CsProjClassicNetToolchain("net462");
-        [PublicAPI] public static readonly IToolchain Net47 = new CsProjClassicNetToolchain("net47");
+        internal const string DefaultConfiguration = "Release";
+
+        [PublicAPI] public static readonly IToolchain Net46 = new CsProjClassicNetToolchain("net46", DefaultConfiguration);
+        [PublicAPI] public static readonly IToolchain Net461 = new CsProjClassicNetToolchain("net461", DefaultConfiguration);
+        [PublicAPI] public static readonly IToolchain Net462 = new CsProjClassicNetToolchain("net462", DefaultConfiguration);
+        [PublicAPI] public static readonly IToolchain Net47 = new CsProjClassicNetToolchain("net47", DefaultConfiguration);
         private static readonly IToolchain Default = Net46; // the lowest version we support
 
         [PublicAPI]
         public static readonly Lazy<IToolchain> Current = new Lazy<IToolchain>(GetCurrentVersion);
 
-        private CsProjClassicNetToolchain(string targetFrameworkMoniker)
+        private CsProjClassicNetToolchain(string targetFrameworkMoniker, string configuration)
             : base($"CsProj{targetFrameworkMoniker}",
-                new CsProjGenerator(targetFrameworkMoniker, platform => platform.ToConfig()),
-                new CsProjBuilder(targetFrameworkMoniker),
+                new CsProjGenerator(targetFrameworkMoniker, platform => platform.ToConfig(), configuration),
+                new CsProjBuilder(targetFrameworkMoniker, configuration),
                 new Executor()) {}
 
-        public static IToolchain From(string targetFrameworkMoniker)
-            => new CsProjClassicNetToolchain(targetFrameworkMoniker);
+        public static IToolchain From(string targetFrameworkMoniker, string configuration)
+            => new CsProjClassicNetToolchain(targetFrameworkMoniker, configuration);
 
         public override bool IsSupported(Benchmark benchmark, ILogger logger, IResolver resolver)
         {

@@ -12,7 +12,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             => $"build --framework {frameworkMoniker} --configuration {Configuration}"
                + (justTheProjectItself ? " --no-dependencies" : string.Empty);
 
-        public CsProjBuilder(string targetFrameworkMoniker) : base(targetFrameworkMoniker)
+        public CsProjBuilder(string targetFrameworkMoniker, string configuration)
+            : base(targetFrameworkMoniker, configuration)
         {
         }
     }

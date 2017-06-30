@@ -16,8 +16,8 @@ namespace BenchmarkDotNet.Toolchains.ProjectJson
     [PublicAPI]
     public class ProjectJsonGenerator : DotNetCliGenerator
     {
-        public ProjectJsonGenerator(string targetFrameworkMoniker, string extraDependencies, Func<Platform, string> platformProvider, string imports, string runtime = null) 
-            : base(new ProjectJsonBuilder(targetFrameworkMoniker),  targetFrameworkMoniker, extraDependencies, platformProvider, imports, runtime)
+        public ProjectJsonGenerator(string targetFrameworkMoniker, string extraDependencies, Func<Platform, string> platformProvider, string imports, string configuration, string runtime = null) 
+            : base(new ProjectJsonBuilder(targetFrameworkMoniker, configuration),  targetFrameworkMoniker, extraDependencies, platformProvider, imports, runtime)
         {
         }
 
