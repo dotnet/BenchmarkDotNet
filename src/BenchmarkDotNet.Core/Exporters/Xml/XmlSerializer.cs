@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Exporters.Xml
     public class XmlSerializer : IXmlSerializer
     {
         private readonly Type type;
-        private readonly Dictionary<Type, string> itemNames = new Dictionary<Type, string>();
+        private readonly Dictionary<string, string> itemNames = new Dictionary<string, string>();
         private readonly HashSet<string> excludedProperties = new HashSet<string>();
         private IXmlWriter writer;
         private string rootName;
@@ -35,14 +35,14 @@ namespace BenchmarkDotNet.Exporters.Xml
             return this;
         }
 
-        public IXmlSerializer WithCollectionItemName(Type type, string name)
+        public IXmlSerializer WithCollectionItemName(string collectionName, string itemName)
         {
-            if (type == null)
-                throw new ArgumentNullException(nameof(type));
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException(nameof(name));
+            if (string.IsNullOrWhiteSpace(collectionName))
+                throw new ArgumentException(nameof(collectionName));
+            if (string.IsNullOrWhiteSpace(itemName))
+                throw new ArgumentException(nameof(itemName));
 
-            itemNames.Add(type, name);
+            itemNames.Add(collectionName, itemName);
             return this;
         }
 
@@ -143,10 +143,9 @@ namespace BenchmarkDotNet.Exporters.Xml
             {
                 if (itemName == null)
                 {
-                    var itemType = item.GetType();
-                    if (itemNames.ContainsKey(itemType))
+                    if (itemNames.ContainsKey(property.Name))
                     {
-                        itemName = itemNames[itemType];
+                        itemName = itemNames[property.Name];
                     }
                     else
                     {

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Exporters.Xml
@@ -25,11 +26,11 @@ namespace BenchmarkDotNet.Exporters.Xml
             IXmlSerializer serializer =
                 new XmlSerializer(typeof(SummaryDto))
                     .WithRootName(nameof(Summary))
-                    .WithCollectionItemName(typeof(Measurement),
+                    .WithCollectionItemName(nameof(BenchmarkReportDto.Measurements),
                                             nameof(Measurement))
-                    .WithCollectionItemName(typeof(BenchmarkReportDto),
+                    .WithCollectionItemName(nameof(SummaryDto.Benchmarks),
                                             nameof(BenchmarkReport.Benchmark))
-                    .WithCollectionItemName(typeof(double), "Outlier");
+                    .WithCollectionItemName(nameof(Statistics.Outliers), "Outlier");
 
             if (!summary.Config.GetDiagnosers().Any(diagnoser => diagnoser is MemoryDiagnoser))
             {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BenchmarkDotNet.Exporters.Xml
+﻿namespace BenchmarkDotNet.Exporters.Xml
 {
     public interface IXmlSerializer : IFluentXmlSerializer
     {
@@ -10,7 +8,7 @@ namespace BenchmarkDotNet.Exporters.Xml
     public interface IFluentXmlSerializer
     {
         IXmlSerializer WithRootName(string rootName);
-        IXmlSerializer WithCollectionItemName(Type type, string name);
+        IXmlSerializer WithCollectionItemName(string collectionName, string itemName);
         IXmlSerializer WithExcludedProperty(string propertyName);
     }
 
