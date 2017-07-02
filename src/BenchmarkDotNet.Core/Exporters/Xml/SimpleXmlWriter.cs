@@ -17,49 +17,20 @@ namespace BenchmarkDotNet.Exporters.Xml
         }
 
         public void WriteElementString(string localName, string value)
-        {
-            writer.WriteElementString(localName, value);
-        }
+            => writer.WriteElementString(localName, value);
 
         public void WriteEndDocument()
-        {
-            writer.WriteEndDocument();
-        }
+            => writer.WriteEndDocument();
 
         public void WriteEndElement()
-        {
-            writer.WriteEndElement();
-        }
+            => writer.WriteEndElement();
 
         public void WriteStartDocument()
-        {
-            writer.WriteStartDocument();
-        }
+            => writer.WriteStartDocument();
 
         public void WriteStartElement(string localName)
-        {
-            writer.WriteStartElement(localName);
-        }
+            => writer.WriteStartElement(localName);
 
-        // Dispose
-        private bool disposedValue = false;
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    writer.Dispose();
-                }
-
-                disposedValue = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-        }
+        public void Dispose() => writer.Dispose();
     }
 }
