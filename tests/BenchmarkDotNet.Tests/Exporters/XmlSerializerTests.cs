@@ -129,7 +129,7 @@ namespace BenchmarkDotNet.Tests.Exporters
 
         [Theory]
         [MemberData(nameof(SerializeTestData))]
-        public void SerializeThrowsGivenNullArguments(IXmlWriter writer, object source, Type exception)
+        public void SerializeThrowsGivenNullArguments(MockXmlWriter writer, object source, Type exception)
         {
             IXmlSerializer serializer = new XmlSerializer(typeof(MockSource));
             Assert.Throws(exception, () => serializer.Serialize(writer, source));

@@ -4,7 +4,7 @@ using System.Xml;
 
 namespace BenchmarkDotNet.Exporters.Xml
 {
-    public class SimpleXmlWriter : IXmlWriter, IDisposable
+    internal class SimpleXmlWriter : IXmlWriter, IDisposable
     {
         private XmlWriter writer;
 

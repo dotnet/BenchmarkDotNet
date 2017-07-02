@@ -1,6 +1,6 @@
 ﻿namespace BenchmarkDotNet.Exporters.Xml
 {
-    public interface IXmlSerializer
+    internal interface IXmlSerializer
     {
         void Serialize(IXmlWriter writer, object source);
         IXmlSerializer WithRootName(string rootName);
@@ -8,7 +8,7 @@
         IXmlSerializer WithExcludedProperty(string propertyName);
     }
 
-    public interface IXmlWriter
+    internal interface IXmlWriter
     {
         void WriteStartDocument();
         void WriteEndDocument();

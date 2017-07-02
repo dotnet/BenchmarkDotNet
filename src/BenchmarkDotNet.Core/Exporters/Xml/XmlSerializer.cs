@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace BenchmarkDotNet.Exporters.Xml
 {
-    public class XmlSerializer : IXmlSerializer
+    internal class XmlSerializer : IXmlSerializer
     {
         private readonly Type type;
         private readonly Dictionary<string, string> itemNames = new Dictionary<string, string>();
