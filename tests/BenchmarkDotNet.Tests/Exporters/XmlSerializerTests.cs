@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Tests.Exporters
                 "End";
             var source = new MockSource();
             var writer = new MockXmlWriter();
-            IXmlSerializer serializer = new XmlSerializer(typeof(MockSource));
+            IXmlSerializer serializer = XmlSerializer.GetBuilder(typeof(MockSource)).Build();
 
             serializer.Serialize(writer, source);
             string actual = writer.ToString();
@@ -46,8 +46,9 @@ namespace BenchmarkDotNet.Tests.Exporters
             var source = new MockSource();
             var writer = new MockXmlWriter();
             string rootName = "CustomRoot";
-            IXmlSerializer serializer = new XmlSerializer(typeof(MockSource))
-                                                .WithRootName(rootName);
+            IXmlSerializer serializer = XmlSerializer.GetBuilder(typeof(MockSource))
+                                                .WithRootName(rootName)
+                                                .Build();
 
             serializer.Serialize(writer, source);
             string actual = writer.ToString();
@@ -62,8 +63,9 @@ namespace BenchmarkDotNet.Tests.Exporters
             var source = new MockSource();
             var writer = new MockXmlWriter();
             var itemName = "CustomItem";
-            IXmlSerializer serializer = new XmlSerializer(typeof(MockSource))
-                                                .WithCollectionItemName(nameof(MockSource.Items), itemName);
+            IXmlSerializer serializer = XmlSerializer.GetBuilder(typeof(MockSource))
+                                                .WithCollectionItemName(nameof(MockSource.Items), itemName)
+                                                .Build();
 
             serializer.Serialize(writer, source);
             string actual = writer.ToString();
@@ -78,8 +80,9 @@ namespace BenchmarkDotNet.Tests.Exporters
             var source = new MockSource();
             var writer = new MockXmlWriter();
             var excludedProperty = nameof(MockSource.IntNumber);
-            IXmlSerializer serializer = new XmlSerializer(typeof(MockSource))
-                                                .WithExcludedProperty(excludedProperty);
+            IXmlSerializer serializer = XmlSerializer.GetBuilder(typeof(MockSource))
+                                                .WithExcludedProperty(excludedProperty)
+                                                .Build();
 
             serializer.Serialize(writer, source);
             string actual = writer.ToString();
@@ -90,7 +93,7 @@ namespace BenchmarkDotNet.Tests.Exporters
         [Fact]
         public void CtorThrowsWhenParameterIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new XmlSerializer(null));
+            Assert.Throws<ArgumentNullException>(() => XmlSerializer.GetBuilder(null).Build());
         }
 
         [Theory]
@@ -99,8 +102,9 @@ namespace BenchmarkDotNet.Tests.Exporters
         [InlineData("", typeof(ArgumentException))]
         public void WithRootNameThrowsGivenNameIsNullOrWhiteSpace(string name, Type exception)
         {
-            IXmlSerializer serializer = new XmlSerializer(typeof(MockSource));
-            Assert.Throws(exception, () => serializer.WithRootName(name));
+            Assert.Throws(exception, () => XmlSerializer.GetBuilder(typeof(MockSource))
+                                                    .WithRootName(name)
+                                                    .Build());
         }
 
         [Theory]
@@ -113,8 +117,9 @@ namespace BenchmarkDotNet.Tests.Exporters
         [InlineData("", "MockItem", typeof(ArgumentException))]
         public void WithCollectionItemNameThrowsGivenInvalidArguments(string collectionName, string itemName, Type exception)
         {
-            IXmlSerializer serializer = new XmlSerializer(typeof(MockSource));
-            Assert.Throws(exception, () => serializer.WithCollectionItemName(collectionName, itemName));
+            Assert.Throws(exception, () => XmlSerializer.GetBuilder(typeof(MockSource))
+                                                    .WithCollectionItemName(collectionName, itemName)
+                                                    .Build());
         }
 
         [Theory]
@@ -123,15 +128,16 @@ namespace BenchmarkDotNet.Tests.Exporters
         [InlineData("", typeof(ArgumentException))]
         public void WithExcludedPropertyThrowsGivenNameIsNullOrWhiteSpace(string name, Type exception)
         {
-            IXmlSerializer serializer = new XmlSerializer(typeof(MockSource));
-            Assert.Throws(exception, () => serializer.WithExcludedProperty(name));
+            Assert.Throws(exception, () => XmlSerializer.GetBuilder(typeof(MockSource))
+                                                    .WithExcludedProperty(name)
+                                                    .Build());
         }
 
         [Theory]
         [MemberData(nameof(SerializeTestData))]
         public void SerializeThrowsGivenNullArguments(MockXmlWriter writer, object source, Type exception)
         {
-            IXmlSerializer serializer = new XmlSerializer(typeof(MockSource));
+            IXmlSerializer serializer = XmlSerializer.GetBuilder(typeof(MockSource)).Build();
             Assert.Throws(exception, () => serializer.Serialize(writer, source));
         }
 
@@ -147,7 +153,7 @@ namespace BenchmarkDotNet.Tests.Exporters
         public void WritesElementStringGivenSimpleCollectionItem()
         {
             IXmlWriter writer = new MockXmlWriter();
-            var serializer = new XmlSerializer(typeof(SimpleItemSource));
+            IXmlSerializer serializer = XmlSerializer.GetBuilder(typeof(SimpleItemSource)).Build();
 
             serializer.Serialize(writer, new SimpleItemSource());
             string actual = writer.ToString();
@@ -160,7 +166,7 @@ namespace BenchmarkDotNet.Tests.Exporters
         public void DoesNotWriteUnwriteableCollection()
         {
             IXmlWriter writer = new MockXmlWriter();
-            IXmlSerializer serializer = new XmlSerializer(typeof(UnwriteableCollectionSource));
+            IXmlSerializer serializer = XmlSerializer.GetBuilder(typeof(UnwriteableCollectionSource)).Build();
 
             serializer.Serialize(writer, new UnwriteableCollectionSource());
             string actual = writer.ToString();

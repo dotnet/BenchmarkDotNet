@@ -23,28 +23,11 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
-            IXmlSerializer serializer =
-                new XmlSerializer(typeof(SummaryDto))
-                    .WithRootName(nameof(Summary))
-                    .WithCollectionItemName(nameof(BenchmarkReportDto.Measurements),
-                                            nameof(Measurement))
-                    .WithCollectionItemName(nameof(SummaryDto.Benchmarks),
-                                            nameof(BenchmarkReport.Benchmark))
-                    .WithCollectionItemName(nameof(Statistics.Outliers), "Outlier");
-
-            if (!summary.Config.GetDiagnosers().Any(diagnoser => diagnoser is MemoryDiagnoser))
-            {
-                serializer.WithExcludedProperty(nameof(BenchmarkReportDto.Memory));
-            }
-
-            if (excludeMeasurements)
-            {
-                serializer.WithExcludedProperty(nameof(BenchmarkReportDto.Measurements));
-            }
+            IXmlSerializer serializer = BuildSerializer(summary);
 
             // Use custom UTF-8 stringwriter because the default writes UTF-16
-            var builder = new StringBuilder();
-            using (var textWriter = new Utf8StringWriter(builder))
+            var stringBuilder = new StringBuilder();
+            using (var textWriter = new Utf8StringWriter(stringBuilder))
             {
                 using (var writer = new SimpleXmlWriter(textWriter, indentXml))
                 {
@@ -52,7 +35,31 @@ namespace BenchmarkDotNet.Exporters.Xml
                 }
             }
 
-            logger.WriteLine(builder.ToString());
+            logger.WriteLine(stringBuilder.ToString());
+        }
+
+        private IXmlSerializer BuildSerializer(Summary summary)
+        {
+            XmlSerializer.XmlSerializerBuilder builder =
+                XmlSerializer.GetBuilder(typeof(SummaryDto))
+                               .WithRootName(nameof(Summary))
+                               .WithCollectionItemName(nameof(BenchmarkReportDto.Measurements),
+                                                       nameof(Measurement))
+                               .WithCollectionItemName(nameof(SummaryDto.Benchmarks),
+                                                       nameof(BenchmarkReport.Benchmark))
+                               .WithCollectionItemName(nameof(Statistics.Outliers), "Outlier");
+
+            if (!summary.Config.GetDiagnosers().Any(diagnoser => diagnoser is MemoryDiagnoser))
+            {
+                builder.WithExcludedProperty(nameof(BenchmarkReportDto.Memory));
+            }
+
+            if (excludeMeasurements)
+            {
+                builder.WithExcludedProperty(nameof(BenchmarkReportDto.Measurements));
+            }
+
+            return builder.Build();
         }
     }
 

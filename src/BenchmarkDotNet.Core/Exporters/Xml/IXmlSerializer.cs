@@ -3,9 +3,6 @@
     internal interface IXmlSerializer
     {
         void Serialize(IXmlWriter writer, object source);
-        IXmlSerializer WithRootName(string rootName);
-        IXmlSerializer WithCollectionItemName(string collectionName, string itemName);
-        IXmlSerializer WithExcludedProperty(string propertyName);
     }
 
     internal interface IXmlWriter
