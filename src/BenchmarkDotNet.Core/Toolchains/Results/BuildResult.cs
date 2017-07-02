@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Toolchains.Results
         public Exception BuildException { get; }
 
         private BuildResult(GenerateResult generateResult, bool isBuildSuccess, Exception buildException)
-            : base(generateResult.ArtifactsPaths, generateResult.IsGenerateSuccess, generateResult.GenerateException)
+            : base(generateResult.ArtifactsPaths, generateResult.IsGenerateSuccess, generateResult.GenerateException, generateResult.ArtifactsToCleanup)
         {
             IsBuildSuccess = isBuildSuccess;
             BuildException = buildException;

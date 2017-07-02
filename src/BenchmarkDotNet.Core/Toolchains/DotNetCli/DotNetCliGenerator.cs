@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Running;
@@ -74,31 +73,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return false;
         }
 
-        protected override void ArtifactCleanup(Benchmark benchmark, ArtifactsPaths artifactsPaths)
-        {
-            if (!Directory.Exists(artifactsPaths.BuildArtifactsDirectoryPath))
-            {
-                return;
-            }
-
-            int attempt = 0;
-            while (true)
-            {
-                try
-                {
-                    Directory.Delete(artifactsPaths.BuildArtifactsDirectoryPath, recursive: true);
-                    return;
-                }
-                catch (DirectoryNotFoundException) // it's crazy but it happens ;)
-                {
-                    return;
-                }
-                catch (Exception) when (attempt++ < 5)
-                {
-                    Thread.Sleep(TimeSpan.FromMilliseconds(1000)); // Previous benchmark run didn't release some files
-                }
-            }
-        }
+        protected override string[] GetArtifactsToCleanup(Benchmark benchmark, ArtifactsPaths artifactsPaths)
+            => new[] { artifactsPaths.BuildArtifactsDirectoryPath };
 
         protected override void CopyAllRequiredFiles(Benchmark benchmark, ArtifactsPaths artifactsPaths)
         {
