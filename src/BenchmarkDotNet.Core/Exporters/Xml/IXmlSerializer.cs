@@ -1,12 +1,8 @@
 ﻿namespace BenchmarkDotNet.Exporters.Xml
 {
-    public interface IXmlSerializer : IFluentXmlSerializer
+    public interface IXmlSerializer
     {
         void Serialize(IXmlWriter writer, object source);
-    }
-
-    public interface IFluentXmlSerializer
-    {
         IXmlSerializer WithRootName(string rootName);
         IXmlSerializer WithCollectionItemName(string collectionName, string itemName);
         IXmlSerializer WithExcludedProperty(string propertyName);
