@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Mathematics;
@@ -7,7 +8,7 @@ using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Exporters.Xml
 {
-    public class SummaryDto
+    internal class SummaryDto
     {
         public string Title => summary.Title;
 
@@ -26,7 +27,7 @@ namespace BenchmarkDotNet.Exporters.Xml
         }
     }
 
-    public class HostEnvironmentInfoDto
+    internal class HostEnvironmentInfoDto
     {
         public string BenchmarkDotNetCaption => HostEnvironmentInfo.BenchmarkDotNetCaption;
         public string BenchmarkDotNetVersion => hei.BenchmarkDotNetVersion;
@@ -51,7 +52,7 @@ namespace BenchmarkDotNet.Exporters.Xml
         }
     }
 
-    public class ChronometerDto
+    internal class ChronometerDto
     {
         public double Hertz => frequency.Hertz;
 
@@ -63,7 +64,7 @@ namespace BenchmarkDotNet.Exporters.Xml
         }
     }
 
-    public class BenchmarkReportDto
+    internal class BenchmarkReportDto
     {
         public string DisplayInfo => report.Benchmark.DisplayInfo;
         public string Namespace => report.Benchmark.Target.Type.Namespace;
@@ -72,6 +73,7 @@ namespace BenchmarkDotNet.Exporters.Xml
         public string MethodTitle => report.Benchmark.Target.MethodDisplayInfo;
         public string Parameters => report.Benchmark.Parameters.PrintInfo;
         public Statistics Statistics => report.ResultStatistics;
+        public GcStats Memory => report.GcStats;
         public IEnumerable<Measurement> Measurements { get; }
 
         private readonly BenchmarkReport report;
