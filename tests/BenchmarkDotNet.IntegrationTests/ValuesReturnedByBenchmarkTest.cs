@@ -20,16 +20,10 @@ namespace BenchmarkDotNet.IntegrationTests
         {
 #if !CORE
             [Benchmark]
-            public System.Windows.Point? TypeFromCustomFrameworkAssembly()
-            {
-                return new System.Windows.Point();
-            }
+            public System.Windows.Point? TypeFromCustomFrameworkAssembly() => new System.Windows.Point();
 
             [Benchmark]
-            public Diagnostics.Windows.InliningDiagnoser TypeFromCustomDependency()
-            {
-                return new Diagnostics.Windows.InliningDiagnoser();
-            }
+            public Diagnostics.Windows.InliningDiagnoser TypeFromCustomDependency() => new Diagnostics.Windows.InliningDiagnoser();
 #endif
 
             [Benchmark]
@@ -55,6 +49,13 @@ namespace BenchmarkDotNet.IntegrationTests
 
             [Benchmark]
             public Jit ReturnEnum() => Jit.RyuJit;
+
+            private int field = 123;
+            [Benchmark]
+            public ref int ReturnByRef() => ref field;
+
+            [Benchmark]
+            public Span<byte> ReturnStackOnlyType() => new Span<byte>(Array.Empty<byte>());
 
             public struct Result<T>
             {

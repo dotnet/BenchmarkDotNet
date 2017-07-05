@@ -117,7 +117,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             // must be kept in sync with VoidDeclarationsProvider.IdleImplementation
             private void Idle() { }
 
-            // must be kept in sync with TaskDeclarationsProvider.TargetMethodDelegate
+            // must be kept in sync with TaskDeclarationsProvider.TargetMethodCall
             private void ExecuteBlocking() => startTaskCallback.Invoke().GetAwaiter().GetResult();
 
             private void InvokeMultipleHardcoded(long repeatCount)
@@ -162,7 +162,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
             private T Idle() => default(T);
 
-            // must be kept in sync with GenericTaskDeclarationsProvider.TargetMethodDelegate
+            // must be kept in sync with GenericTaskDeclarationsProvider.TargetMethodCall
             private T ExecuteBlocking() => startTaskCallback().GetAwaiter().GetResult();
 
             private void InvokeSingleHardcoded() => result = callback();
@@ -211,7 +211,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
             private T Idle() => default(T);
 
-            // must be kept in sync with GenericTaskDeclarationsProvider.TargetMethodDelegate
+            // must be kept in sync with GenericTaskDeclarationsProvider.TargetMethodCall
             private T ExecuteBlocking() => startTaskCallback().GetAwaiter().GetResult();
 
             private void InvokeSingleHardcoded() => result = callback();

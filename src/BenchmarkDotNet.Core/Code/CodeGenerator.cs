@@ -29,11 +29,9 @@ namespace BenchmarkDotNet.Code
                 Replace("$TargetTypeNamespace$", provider.TargetTypeNamespace).
                 Replace("$TargetMethodReturnTypeNamespace$", provider.TargetMethodReturnTypeNamespace).
                 Replace("$TargetTypeName$", provider.TargetTypeName).
-                Replace("$TargetMethodDelegate$", provider.TargetMethodDelegate).
-                Replace("$TargetMethodDelegateType$", provider.TargetMethodDelegateType).
+                Replace("$TargetMethodCall$", provider.TargetMethodCall).
                 Replace("$TargetMethodReturnType$", provider.TargetMethodReturnTypeName).
-                Replace("$IdleMethodDelegateType$", provider.IdleMethodDelegateType).
-                Replace("$IdleMethodReturnType$", provider.IdleMethodReturnTypeName).
+                Replace("$IdleMethodReturnTypeName$", provider.IdleMethodReturnTypeName).
                 Replace("$GlobalSetupMethodName$", provider.GlobalSetupMethodName).
                 Replace("$GlobalCleanupMethodName$", provider.GlobalCleanupMethodName).
                 Replace("$IterationSetupMethodName$", provider.IterationSetupMethodName).
@@ -48,6 +46,7 @@ namespace BenchmarkDotNet.Code
                 Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark)). 
                 Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).
                 Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath).
+                Replace("$Ref$", provider.UseRefKeyword ? "ref" : null).
                 ToString();
 
             text = Unroll(text, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvResolver.Instance));
@@ -132,6 +131,12 @@ namespace BenchmarkDotNet.Code
 
                 return new VoidDeclarationsProvider(target);
             }
+
+            if (method.ReturnType.IsByRef)
+            {
+                return new ByRefDeclarationsProvider(target);
+            }
+
             return new NonVoidDeclarationsProvider(target);
         }
 
