@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 logger.WriteLine("Generating");
                 Done = true;
-                return new GenerateResult(null, true, null);
+                return new GenerateResult(null, true, null, Array.Empty<string>());
             }
         }
 
