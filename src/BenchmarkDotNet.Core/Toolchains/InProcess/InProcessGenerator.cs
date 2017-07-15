@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Characteristics;
+﻿using System;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
@@ -21,7 +22,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         public GenerateResult GenerateProject(
             Benchmark benchmark, ILogger logger,
             string rootArtifactsFolderPath, IConfig config,
-            IResolver resolver) =>
-            GenerateResult.Success(null);
+            IResolver resolver) 
+            => GenerateResult.Success(null, Array.Empty<string>());
     }
 }

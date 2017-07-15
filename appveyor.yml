@@ -11,6 +11,9 @@ branches:
   except:
     - gh-pages
 
+pull_requests:
+  do_not_increment_build_number: true
+
 # Do not build on tags (GitHub only)
 skip_tags: true
 

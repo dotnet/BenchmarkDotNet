@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Environments;
 using JsonSerialiser = SimpleJson.SimpleJson;
+using BenchmarkDotNet.Diagnosers;
 
 namespace BenchmarkDotNet.Exporters.Json
 {
@@ -60,6 +61,12 @@ namespace BenchmarkDotNet.Exporters.Json
                     { "Statistics", r.ResultStatistics },
                 };
 
+                // We show MemoryDiagnoser's results only if it is being used
+                if(summary.Config.GetDiagnosers().Any(diagnoser => diagnoser is MemoryDiagnoser))
+                {
+                    data.Add("Memory", r.GcStats);
+                }
+                
                 if (ExcludeMeasurements == false)
                 {
                     // We construct Measurements manually, so that we can have the IterationMode enum as text, rather than an integer

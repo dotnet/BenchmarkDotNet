@@ -17,6 +17,7 @@ os:
   - osx
 sudo: required
 dist: trusty
+group: edge
 osx_image: xcode8.3
 mono: latest
 
@@ -28,6 +29,7 @@ addons:
     - libicu-dev
     - libssl-dev
     - libunwind8
+    - fsharp
 
 #---------------------------------#		
 #       build configuration       #		

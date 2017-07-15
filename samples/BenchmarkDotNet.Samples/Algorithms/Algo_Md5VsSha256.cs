@@ -21,15 +21,9 @@ namespace BenchmarkDotNet.Samples.Algorithms
         }
 
         [Benchmark(Baseline = true)]
-        public byte[] Md5()
-        {
-            return md5.ComputeHash(data);
-        }
+        public byte[] Md5() => md5.ComputeHash(data);
 
         [Benchmark]
-        public byte[] Sha256()
-        {
-            return sha256.ComputeHash(data);
-        }
+        public byte[] Sha256() => sha256.ComputeHash(data);
     }
 }

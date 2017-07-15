@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Tests.Mocks
 
         private static BenchmarkReport CreateReport(Benchmark benchmark)
         {
-            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty));
+            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
             var executeResult = new ExecuteResult(true, 0, Array.Empty<string>(), Array.Empty<string>());
             var measurements = new List<Measurement>
             {
