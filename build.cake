@@ -1,12 +1,14 @@
 // ARGUMENTS
-var target = Argument("target", "Default");
-var configuration = Argument("configuration", "Release");
+var target = Argument("Target", "Default");
+var configuration = Argument("Configuration", "Release");
+var skipTests = Argument("SkipTests", false);
 
 // GLOBAL VARIABLES
 var artifactsDirectory = Directory("./artifacts");
 var solutionFile = "./BenchmarkDotNet.sln";
 var solutionFileBackup = solutionFile + ".build.backup";
 var isRunningOnWindows = IsRunningOnWindows();
+var IsOnAppVeyorAndNotPR = AppVeyor.IsRunningOnAppVeyor && !AppVeyor.Environment.PullRequest.IsPullRequest;
 
 Setup(_ =>
 {
@@ -87,21 +89,23 @@ Task("Build")
 
 Task("FastTests")
     .IsDependentOn("Build")
+    .WithCriteria(!skipTests)
     .Does(() =>
     {
         DotNetCoreTest("./tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj", GetTestSettings());
     });
 
 Task("SlowTests")
-    .IsDependentOn("FastTests")
+    .IsDependentOn("Build")
+    .WithCriteria(!skipTests)
     .Does(() =>
     {
         DotNetCoreTest("./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", GetTestSettings());
     });
 
 Task("Pack")
-    .WithCriteria(AppVeyor.IsRunningOnAppVeyor && !AppVeyor.Environment.PullRequest.IsPullRequest)
-    .IsDependentOn("SlowTests")
+    .IsDependentOn("Build")
+    .WithCriteria(IsOnAppVeyorAndNotPR || string.Equals(target, "pack", StringComparison.OrdinalIgnoreCase))
     .Does(() =>
     {
         var settings = new DotNetCorePackSettings
@@ -119,6 +123,8 @@ Task("Pack")
     });
 
 Task("Default")
+    .IsDependentOn("FastTests")
+    .IsDependentOn("SlowTests")
     .IsDependentOn("Pack");
 
 RunTarget(target);
