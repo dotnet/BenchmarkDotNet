@@ -51,7 +51,7 @@ Task("Restore")
     .IsDependentOn("Clean")
     .Does(() =>
     {
-        NuGetRestore(solutionFile);
+        DotNetCoreRestore(solutionFile);
     });
 
 Task("Build")
