@@ -26,6 +26,9 @@ os: Visual Studio 2017
 # scripts that are called at very beginning, before repo cloning
 init:
   - git config --global core.autocrlf input
+  # Temporary solution to address connectivity issues to nuget.org https://appveyor.statuspage.io/incidents/m2vdvw39kdk8  
+  - ps: '[System.IO.File]::AppendAllText("C:\Windows\System32\drivers\etc\hosts", "`n93.184.221.200`tapi.nuget.org")'
+  - ps: '[System.IO.File]::AppendAllText("C:\Windows\System32\drivers\etc\hosts", "`n93.184.221.200`tdist.nuget.org")'
 
 #---------------------------------#
 #       build configuration       #
