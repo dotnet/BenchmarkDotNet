@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Engines;
@@ -40,7 +41,7 @@ namespace BenchmarkDotNet.Environments
             IsConcurrentGC = GCSettings.LatencyMode != GCLatencyMode.Batch;
             HasAttachedDebugger = Debugger.IsAttached;
             GCAllocationQuantum = GcStats.AllocationQuantum;
-         }
+        }
 
         public static BenchmarkEnvironmentInfo GetCurrent() => new BenchmarkEnvironmentInfo();
 
@@ -62,6 +63,10 @@ namespace BenchmarkDotNet.Environments
 
         protected string GetGcConcurrentFlag() => IsConcurrentGC ? "Concurrent" : "Non-concurrent";
 
-        internal string GetRuntimeInfo() => $"{RuntimeVersion}, {Architecture} {JitInfo}{GetConfigurationFlag()}{GetDebuggerFlag()}";
+        internal string GetRuntimeInfo()
+        {
+            string jitInfo = string.Join(" ", new[] { JitInfo, GetConfigurationFlag(), GetDebuggerFlag() }.Where(title => title != ""));
+            return $"{RuntimeVersion}, {Architecture} {jitInfo}";
+        }
     }
 }
