@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Exporters.Xml
         public bool HasRyuJit => hei.HasRyuJit;
         public string Configuration => hei.Configuration;
         public string JitModules => hei.JitModules;
-        public string DotNetCliVersion => hei.DotNetCliVersion.Value;
+        public string DotNetSdkVersion => hei.DotNetSdkVersion.Value;
         public ChronometerDto ChronometerFrequency => new ChronometerDto(hei.ChronometerFrequency);
         public string HardwareTimerKind => hei.HardwareTimerKind.ToString();
 

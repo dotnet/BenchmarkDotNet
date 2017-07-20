@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Toolchains
         }
 
         private static bool IsUsingProjectJson() => 
-            HostEnvironmentInfo.GetCurrent().DotNetCliVersion.Value.Contains("preview") 
+            HostEnvironmentInfo.GetCurrent().DotNetSdkVersion.Value.Contains("preview") 
             && SolutionDirectoryContainsProjectJsonFiles();
 
         private static bool SolutionDirectoryContainsProjectJsonFiles()

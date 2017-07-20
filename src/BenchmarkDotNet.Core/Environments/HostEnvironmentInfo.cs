@@ -43,9 +43,10 @@ namespace BenchmarkDotNet.Environments
         public string JitModules { get; protected set; }
 
         /// <summary>
-        /// is expensive to call (creates new process by calling dotnet --version)
+        /// .NET Core SDK version
+        /// <remarks>It's expensive to call (creates new process by calling `dotnet --version`)</remarks>
         /// </summary>
-        public Lazy<string> DotNetCliVersion { get; protected set; }
+        public Lazy<string> DotNetSdkVersion { get; protected set; }
 
         /// <summary>
         /// The frequency of the timer as the number of ticks per second.
@@ -70,7 +71,7 @@ namespace BenchmarkDotNet.Environments
             ChronometerFrequency = Chronometer.Frequency;
             HardwareTimerKind = Chronometer.HardwareTimerKind;
             JitModules = RuntimeInformation.GetJitModulesInfo();
-            DotNetCliVersion = new Lazy<string>(DotNetCliCommandExecutor.GetDotNetCliVersion);
+            DotNetSdkVersion = new Lazy<string>(DotNetCliCommandExecutor.GetDotNetSdkVersion);
         }
 
         public new static HostEnvironmentInfo GetCurrent() => Current ?? (Current = new HostEnvironmentInfo());
@@ -81,11 +82,11 @@ namespace BenchmarkDotNet.Environments
             yield return $"Processor={ProcessorName.Value}, ProcessorCount={ProcessorCount}";
             yield return $"Frequency={ChronometerFrequency}, Resolution={ChronometerResolution}, Timer={HardwareTimerKind.ToString().ToUpper()}";
 #if !CLASSIC
-            yield return $"dotnet cli version={DotNetCliVersion.Value}";
+            yield return $".NET Core SDK={DotNetSdkVersion.Value}";
 #endif
         }
 
-        internal bool IsDotNetCliInstalled() => !string.IsNullOrEmpty(DotNetCliVersion.Value);
+        internal bool IsDotNetCliInstalled() => !string.IsNullOrEmpty(DotNetSdkVersion.Value);
 
         private static string GetBenchmarkDotNetVersion() => BenchmarkDotNetInfo.FullVersion;
     }
