@@ -99,6 +99,16 @@ namespace BenchmarkDotNet.Portability
 
             return Unknown;
         }
+        
+        public static string GetNetCoreVersion()
+        {
+            var assembly = typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly;
+            var assemblyPath = assembly.CodeBase.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
+            int netCoreAppIndex = Array.IndexOf(assemblyPath, "Microsoft.NETCore.App");
+            if (netCoreAppIndex > 0 && netCoreAppIndex < assemblyPath.Length - 2)
+                return assemblyPath[netCoreAppIndex + 1];
+            return null;
+        }
 
         internal static string GetRuntimeVersion()
         {
@@ -127,7 +137,9 @@ namespace BenchmarkDotNet.Portability
 
             return $"Clr {System.Environment.Version}";
 #else
-            return System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
+            var runtimeVersion = GetNetCoreVersion() ?? "?";
+            string frameworkVersion = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.Replace(".NET Core ", "");
+            return $".NET Core {runtimeVersion} (Framework {frameworkVersion})";
 #endif
         }
 
