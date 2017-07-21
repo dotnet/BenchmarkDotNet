@@ -12,6 +12,7 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.CsProj;
 #if !CORE
 using System.Management;
 
@@ -135,7 +136,9 @@ namespace BenchmarkDotNet.Portability
                 }
             }
 
-            return $"Clr {System.Environment.Version}";
+            string frameworkVersion = CsProjClassicNetToolchain.GetCurrentNetFrameworkVersion();
+            string clrVersion = System.Environment.Version.ToString();
+            return $".NET Framework {frameworkVersion} (CLR {clrVersion})";
 #else
             var runtimeVersion = GetNetCoreVersion() ?? "?";
             string frameworkVersion = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.Replace(".NET Core ", "");
