@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Reports;
@@ -19,6 +19,11 @@ namespace BenchmarkDotNet.Diagnosers
             this.diagnosers = diagnosers.Distinct().ToArray();
         }
 
+        public IEnumerable<string> Ids => diagnosers.SelectMany(d => d.Ids);
+
+        public IEnumerable<IExporter> Exporters 
+            => diagnosers.SelectMany(diagnoser => diagnoser.Exporters);
+
         public IColumnProvider GetColumnProvider() 
             => new CompositeColumnProvider(diagnosers.Select(d => d.GetColumnProvider()).ToArray());
 
@@ -31,7 +36,8 @@ namespace BenchmarkDotNet.Diagnosers
         public void BeforeMainRun(DiagnoserActionParameters parameters) 
             => diagnosers.ForEach(diagnoser => diagnoser.BeforeMainRun(parameters));
 
-        public void BeforeGlobalCleanup() => diagnosers.ForEach(diagnoser => diagnoser.BeforeGlobalCleanup());
+        public void BeforeGlobalCleanup(DiagnoserActionParameters parameters) 
+            => diagnosers.ForEach(diagnoser => diagnoser.BeforeGlobalCleanup(parameters));
 
         public void ProcessResults(Benchmark benchmark, BenchmarkReport report)
             => diagnosers.ForEach(diagnoser => diagnoser.ProcessResults(benchmark, report));
@@ -50,7 +56,5 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) 
             => diagnosers.SelectMany(diagnoser => diagnoser.Validate(validationParameters));
-
-        public IEnumerable<string> Ids => diagnosers.SelectMany(d => d.Ids);
     }
 }

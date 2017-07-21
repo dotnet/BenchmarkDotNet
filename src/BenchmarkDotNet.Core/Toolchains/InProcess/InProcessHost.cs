@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     WriteLine(Engine.Signals.BeforeMainRun);
                     break;
                 case HostSignal.BeforeGlobalCleanup:
-                    diagnoser?.BeforeGlobalCleanup();
+                    diagnoser?.BeforeGlobalCleanup(diagnoserActionParameters);
                     WriteLine(Engine.Signals.BeforeGlobalCleanup);
                     break;
                 case HostSignal.AfterAnythingElse:

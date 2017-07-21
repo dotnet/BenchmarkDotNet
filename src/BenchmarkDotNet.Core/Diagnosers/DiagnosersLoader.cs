@@ -54,6 +54,7 @@ namespace BenchmarkDotNet.Diagnosers
                         MemoryDiagnoser.Default,
                         CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.InliningDiagnoser"),
                         CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.PmcDiagnoser"),
+                        CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.DisassemblyDiagnoser")
                     };
                 }
             }

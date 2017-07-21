@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Configs
         private ISummaryStyle summaryStyle = null;
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
-        public IEnumerable<IExporter> GetExporters() => exporters;
+        public IEnumerable<IExporter> GetExporters() => exporters.Union(diagnosers.SelectMany(diagnoser => diagnoser.Exporters));
         public IEnumerable<ILogger> GetLoggers() => loggers;
         
         public IEnumerable<IAnalyser> GetAnalysers() => analysers;

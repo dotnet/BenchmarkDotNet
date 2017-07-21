@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Reports;
@@ -10,6 +11,8 @@ namespace BenchmarkDotNet.Diagnosers
     public interface IDiagnoser
     {
         IEnumerable<string> Ids { get; } 
+
+        IEnumerable<IExporter> Exporters { get; }
             
         IColumnProvider GetColumnProvider();
 
@@ -31,7 +34,7 @@ namespace BenchmarkDotNet.Diagnosers
         /// <summary>
         /// after run, before globalSleanup
         /// </summary>
-        void BeforeGlobalCleanup();
+        void BeforeGlobalCleanup(DiagnoserActionParameters parameters);
 
         void ProcessResults(Benchmark benchmark, BenchmarkReport report);
 

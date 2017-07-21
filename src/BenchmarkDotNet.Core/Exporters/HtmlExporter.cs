@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Exporters
 {
     public class HtmlExporter : ExporterBase
     {
-        private const string CssDefinition = @"
+        internal const string CssDefinition = @"
 <style type=""text/css"">
 	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
 	td, th { padding: 6px 13px; border: 1px solid #ddd; }
