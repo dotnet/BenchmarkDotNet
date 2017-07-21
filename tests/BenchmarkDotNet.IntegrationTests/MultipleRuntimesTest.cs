@@ -51,8 +51,8 @@ namespace BenchmarkDotNet.IntegrationTests
                 .ExecuteResults
                 .Any());
 
-            Assert.Contains("Clr", summary.AllRuntimes);
-            Assert.Contains("Core", summary.AllRuntimes);
+            Assert.Contains(".NET Framework", summary.AllRuntimes);
+            Assert.Contains(".NET Core", summary.AllRuntimes);
         }
     }
 
