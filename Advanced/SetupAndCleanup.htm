@@ -92,6 +92,7 @@
 <li class="tocentry"><a href="#iterationsetup">IterationSetup</a></li>
 <li class="tocentry"><a href="#iterationcleanup">IterationCleanup</a></li>
 <li class="tocentry"><a href="#an-example">An example</a></li>
+<li class="tocentry"><a href="#target">Target</a></li>
 </ul>
 <li class="tocentry"><a href="../Advanced/Baseline.htm">Baseline</a>
 </li>
@@ -243,6 +244,45 @@ public class SetupAndCleanupExample
 // IterationCleanup (6)  // MainTarget3
 
 // GlobalCleanup
+</pre><h2 id="target">Target<a class="headerlink" href="#target" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Sometimes it's useful to run setup or cleanups for specific benchmarks. All four setup and cleanup attributes have a Target property that allow the setup/cleanup method to be run for one or more specific benchmark methods.   </p>
+<pre><code class="cs">[SimpleJob(RunStrategy.Monitoring, launchCount: 0, warmupCount: 0, targetCount: 1)]
+public class SetupAndCleanupExample
+{
+  [GlobalSetup(Target = nameof(BenchmarkA))]
+  public void GlobalSetupA() =&gt; Console.WriteLine(&quot;// &quot; + &quot;GlobalSetup A&quot;);
+  
+  [Benchmark]
+  public void BenchmarkA() =&gt; Console.WriteLine(&quot;// &quot; + &quot;Benchmark A&quot;);
+  
+  [GlobalSetup(Target = nameof(BenchmarkB) + &quot;,&quot; + nameof(BenchmarkC))]
+  public void GlobalSetupB() =&gt; Console.WriteLine(&quot;// &quot; + &quot;GlobalSetup B&quot;);
+  
+  [Benchmark]
+  public void BenchmarkB() =&gt; Console.WriteLine(&quot;// &quot; + &quot;Benchmark B&quot;);
+  
+  [Benchmark]
+  public void BenchmarkC() =&gt; Console.WriteLine(&quot;// &quot; + &quot;Benchmark C&quot;);
+  
+  [Benchmark]
+  public void BenchmarkD() =&gt; Console.WriteLine(&quot;// &quot; + &quot;Benchmark D&quot;);
+}
+</code></pre>
+
+<p>The order of method calls:</p>
+<pre class="nocode">// GlobalSetup A
+
+// Benchmark A
+
+// GlobalSetup B
+
+// Benchmark B
+
+// GlobalSetup B
+
+// Benchmark C
+
+// Benchmark D
 </pre>
                     </div>
                 </div>

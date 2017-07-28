@@ -123,18 +123,18 @@
 <h1 id="faq-frequently-asked-questions">FAQ (Frequently asked questions)<a class="headerlink" href="#faq-frequently-asked-questions" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
 <ul>
 <li>
-<p><strong>Q</strong> Why I can't install BenchmarkDotNet in Visual Studio 2010/2012/2013?<br />
+<p><strong>Q</strong> Why can't I install BenchmarkDotNet in Visual Studio 2010/2012/2013?<br />
  <strong>A</strong>
 BenchmarkDotNet requires NuGet 3.x+ and can't be installed in old versions of Visual Studio which use NuGet 2.x.
 Consider to use Visual Studio 2015/2017 or <a href="http://jetbrains.com/rider/" target="_blank">Rider</a>.
 See also: <a href="https://github.com/dotnet/BenchmarkDotNet/issues/237" target="_blank">BenchmarkDotNet#237</a>, <a href="https://github.com/dotnet/roslyn/issues/12780" target="_blank">roslyn#12780</a>.</p>
 </li>
 <li>
-<p><strong>Q</strong> Why I can't install BenchmarkDotNet in a new .NET Core Console App in Visual Studio 2017?<br />
+<p><strong>Q</strong> Why can't I install BenchmarkDotNet in a new .NET Core Console App in Visual Studio 2017?<br />
 <strong>A</strong> BenchmarkDotNet supports only netcoreapp1.1+.
 By default, Visual Studio 2017 creates a new application which targets netcoreapp1.0.
 You should upgrade it up to 1.1.
-If your want to target netcoreapp1.0 in your main assembly, it's recommended to create a separated project for benchmarks.</p>
+If you want to target netcoreapp1.0 in your main assembly, it's recommended to create a separated project for benchmarks.</p>
 </li>
 <li>
 <p><strong>Q</strong> I created a new .NET Core Console App in Visual Studio 2017. Now I want to run my code on CoreCLR, full .NET Framework, and Mono. How can I do it?<br />
@@ -156,7 +156,7 @@ If your want to target netcoreapp1.0 in your main assembly, it's recommended to 
 Due to the fact that users usually run benchmarks in a develop environment and don't distribute benchmarks for users, it shouldn't be a problem.</p>
 </li>
 <li>
-<p><strong>Q</strong> I wrote small benchmark, but BenchmarkDotNet requires a lot of time for time measurements. How can I reduce this time?<br />
+<p><strong>Q</strong> I wrote a small benchmark, but BenchmarkDotNet requires a lot of time for time measurements. How can I reduce this time?<br />
 <strong>A</strong> By default, BenchmarkDotNet automatically chooses a number of iterations which allows achieving the best precision.
 If you don't need such level of precision and just want to have a quick way to get approximated results, you can specify all parameters manually.
 For example, you can use the <code>SimpleJob</code> or <code>ShortRunJob</code> attributes:</p>

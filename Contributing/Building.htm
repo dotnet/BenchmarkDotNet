@@ -90,7 +90,10 @@
 <ul>
 <li><span class="navigationgroup"><i class="fa fa-caret-down"></i> <a href="../Contributing.htm">Contributing</a></span></li>
 <li class="tocentry current"><a class="current" href="../Contributing/Building.htm">Building</a>
-</li>
+<ul class="currentrelative">
+<li class="tocentry"><a href="#option-a-windows-only---visual-studio">Option A (Windows only) - Visual Studio</a></li>
+<li class="tocentry"><a href="#option-b-windows-linux-macos---cake-c-make">Option B (Windows, Linux, macOS) - Cake (C# Make)</a></li>
+</ul>
 <li class="tocentry"><a href="../Contributing/Debugging.htm">Debugging</a>
 </li>
 <li class="tocentry"><a href="../Contributing/RunningTests.htm">Running tests</a>
@@ -134,12 +137,76 @@
                 <div role="main">
                     <div class="section">
 <h1 id="building">Building<a class="headerlink" href="#building" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
-<p>For building the BenchmarkDotNet source-code, the following elements are required:</p>
+<p>There are two recommended options to build BenchmarkDotNet from source:</p>
+<h2 id="option-a-windows-only---visual-studio">Option A (Windows only) - Visual Studio<a class="headerlink" href="#option-a-windows-only---visual-studio" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <ul>
-<li><a href="https://www.visualstudio.com/vs/visual-studio-2017/" target="_blank">Visual Studio 2017 (Version 15.0.26228.9 or newer) with .NET Core development tools installed</a></li>
-<li>Internet connection and disk space to download all the required packages</li>
+<li>
+<p><a href="https://www.visualstudio.com/downloads/" target="_blank">Visual Studio 2017 version 15.2 or higher</a> (Community, Professional, Enterprise).</p>
+</li>
+<li>
+<p>Visual Studio 2017 should have installed the .NET Core SDK, but in case it did not you can get it from the <a href="https://www.microsoft.com/net/core" target="_blank">Installing the .Net Core SDK page</a>.</p>
+</li>
+<li>
+<p>Visual Studio 2017 should have installed “F# language support” feature. You can also install the support <a href="https://www.microsoft.com/en-us/download/details.aspx?id=48179" target="_blank">directly as a separate download</a>.</p>
+</li>
 </ul>
-<p>If your build fails because some packages are not available, let say F#, then just disable these project and hope for nuget server to work later on ;)</p>
+<p>Once all the necessary tools are in place, building is trivial. Simply open solution file <strong>BenchmarkDotNet.sln</strong> that lives at the base of the repository and run Build action.</p>
+<h2 id="option-b-windows-linux-macos---cake-c-make">Option B (Windows, Linux, macOS) - Cake (C# Make)<a class="headerlink" href="#option-b-windows-linux-macos---cake-c-make" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p><a href="http://cakebuild.net/" target="_blank">Cake (C# Make)</a> is a cross platform build automation system with a C# DSL to do things like compiling code, copy files/folders, running unit tests, compress files and build NuGet packages.</p>
+<p>The build currently depends on the following prerequisites:</p>
+<ul>
+<li>
+<p>Windows:</p>
+<ul>
+<li>PowerShell version 5 or higher</li>
+<li>MSBuild version 15.1 or higher</li>
+<li>.NET Framework 4.6 or higher</li>
+</ul>
+</li>
+<li>
+<p>Linux:</p>
+<ul>
+<li>Install <a href="http://www.mono-project.com/download/#download-lin" target="_blank">Mono version 5 or higher</a></li>
+<li>Install <a href="http://fsharp.org/use/linux/" target="_blank">fsharp package</a></li>
+<li>Install packages required to .NET Core SDK</li>
+<li>gettext</li>
+<li>libcurl4-openssl-dev</li>
+<li>libicu-dev</li>
+<li>libssl-dev</li>
+<li>libunwind8</li>
+</ul>
+</li>
+<li>
+<p>macOS</p>
+<ul>
+<li>Install <a href="http://www.mono-project.com/download/#download-mac" target="_blank">Mono version 5 or higher</a></li>
+<li>Install <a href="http://fsharp.org/use/mac/" target="_blank">fsharp package</a></li>
+<li>Install the latest version of <a href="https://www.microsoft.com/net/core#macos" target="_blank">OpenSSL</a>.</li>
+</ul>
+</li>
+</ul>
+<p>After you have installed these pre-requisites, you can build the BenchmarkDotNet by invoking the build script (<code>build.ps1</code> on Windows, or <code>build.sh</code> on Linux and macOS) at the base of the BenchmarkDotNet repository. By default the build process also run all the tests. There are quite a few tests, taking a significant amount of time that is not necessary if you just want to experiment with changes. You can skip the tests phase by adding the <code>skiptests</code> argument to the build script, e.g. <code>.\build.ps1 --SkipTests=True</code> or <code>./build.sh --skiptests=true</code>.</p>
+<p>Build has a number of options that you use. Some of the more important options are</p>
+<ul>
+<li>
+<p><strong>skiptests</strong> - do not run the tests. This can shorten build times quite a bit. On Windows: <code>.\build.ps1 --SkipTests=True</code> or <code>./build.sh --skiptests=true</code> on Linux/macOS.</p>
+</li>
+<li>
+<p><strong>configuration</strong> - build the 'Release' or 'Debug' build type. Default value is 'Release'. On Windows: <code>.\build.ps1 -Configuration Debug</code> or <code>./build.sh --configuration debug</code> on Linux/macOS.</p>
+</li>
+<li>
+<p><strong>target</strong> - with this parameter you can run a specific target from build pipeline. Default value is 'Default' target. On Windows: <code>.\build.ps1 -Target Default</code> or <code>./build.sh --target default</code> on Linux/macOS. Available targets:</p>
+<ul>
+<li><strong>Default</strong> - run all actions one by one.</li>
+<li><strong>Clean</strong> - clean all <code>obj</code>, <code>bin</code> and <code>artifacts</code> directories.</li>
+<li><strong>Restore</strong> - automatically execute <code>Clean</code> action and after that restore all NuGet dependencies.</li>
+<li><strong>Build</strong> - automatically execute <code>Restore</code> action, then run MSBuild for the solution file.</li>
+<li><strong>FastTests</strong> - automatically execute <code>Build</code> action, then run all tests from the BenchmarkDotNet.Tests project.</li>
+<li><strong>SlowTests</strong> - automatically execute <code>Build</code> action, then run all tests from the BenchmarkDotNet.IntegrationTests project.</li>
+<li><strong>Pack</strong> - automatically execute <code>Build</code> action and after that creates local NuGet packages.</li>
+</ul>
+</li>
+</ul>
 
                     </div>
                 </div>

@@ -147,7 +147,7 @@
                 <div role="main">
                     <div class="section">
 <h1 id="jobs">Jobs<a class="headerlink" href="#jobs" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
-<p>Basically, <em>job</em> describes how to run your benchmark. Practically, it's a set of characteristics which can be specified. You can set one or several jobs for your benchmarks.</p>
+<p>Basically, a <em>job</em> describes how to run your benchmark. Practically, it's a set of characteristics which can be specified. You can specify one or several jobs for your benchmarks.</p>
 <h2 id="characteristics">Characteristics<a class="headerlink" href="#characteristics" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <p>There are several categories of characteristics which you can specify. Let's consider each category in detail.</p>
 <h3 id="id">Id<a class="headerlink" href="#id" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
@@ -203,9 +203,9 @@
 <li><code>UnrollFactor</code>: how many times the benchmark method will be invoked per one iteration of a generated loop</li>
 <li><code>InvocationCount</code>: count of invocation in a single iteration (if specified, <code>IterationTime</code> will be ignored), must be a multiple of <code>UnrollFactor</code></li>
 </ul>
-<p>Usually, you shouldn't specify such characteristics like <code>LaunchCount</code>, <code>WarmupCount</code>, <code>TargetCount</code>, or <code>IterationTime</code> because BenchmarkDotNet has a smart algorithm to choose these values automatically based on recieved measurements. You can specify it for testing purposes or when you are damn sure that you know perfect characteristics for your benchmark (when you set <code>TargetCount</code> = <code>20</code> you should unserstand why <code>20</code> is a good value for your case).</p>
+<p>Usually, you shouldn't specify such characteristics like <code>LaunchCount</code>, <code>WarmupCount</code>, <code>TargetCount</code>, or <code>IterationTime</code> because BenchmarkDotNet has a smart algorithm to choose these values automatically based on recieved measurements. You can specify it for testing purposes or when you are damn sure that you know the right characteristics for your benchmark (when you set <code>TargetCount</code> = <code>20</code> you should unserstand why <code>20</code> is a good value for your case).</p>
 <h3 id="accuracy">Accuracy<a class="headerlink" href="#accuracy" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
-<p>If you want to change the accuracy level, you should use the following characteristics instead of manual of values of <code>WarmupCount</code>, <code>TargetCount</code>, and so on.</p>
+<p>If you want to change the accuracy level, you should use the following characteristics instead of manually adjusting values of <code>WarmupCount</code>, <code>TargetCount</code>, and so on.</p>
 <ul>
 <li><code>MaxRelativeError</code>, <code>MaxAbsoluteError</code>: Maximum acceptable error for a benchmark (by default, BenchmarkDotNet continue iterations until the actual error is less than the specified error). <em>In these two characteristics</em>, the error means half of 99.9% confidence interval. <code>MaxAbsoluteError</code> is an absolute <code>TimeInterval</code>; doesn't have a default value. <code>MaxRelativeError</code> defines max acceptable (<code>(&lt;half of CI 99.9%&gt;) / Mean</code>).</li>
 <li><code>MinIterationTime</code>: Minimum time of a single iteration. Unlike <code>Run.IterationTime</code>, this characteristic specify only the lower limit. In case of need, BenchmarkDotNet can increase this value.</li>
@@ -277,14 +277,14 @@ public class MyBenchmarks
 <p>You can also add new jobs via attributes. Examples:</p>
 <pre><code class="cs">[DryJob]
 [ClrJob, CoreJob, MonoJob]
-[LegacyJitX86Job, LegacyJitX64, RyuJitX64Job]
+[LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
 [SimpleJob(RunStrategy.ColdStart, launchCount: 1, warmupCount: 5, targetCount: 5, id: &quot;FastAndDirtyJob&quot;)]
 public class MyBenchmarkClass
 </code></pre>
 
-<p>Note that each of the attribute identifies a separate job, the sample above will result in 8 different jobs, not merged one.</p>
+<p>Note that each of the attributes identifies a separate job, the sample above will result in 8 different jobs, not a single merged job.</p>
 <h4 id="custom-attributes">Custom attributes<a class="headerlink" href="#custom-attributes" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h4>
-<p>You can also create own custom attribute with your favorite set of jobs. Example:</p>
+<p>You can also create your own custom attributes with your favorite set of jobs. Example:</p>
 <pre><code class="cs">[AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
 public class MySuperJobAttribute : Attribute, IConfigSource
 {

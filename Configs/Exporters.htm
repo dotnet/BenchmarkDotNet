@@ -91,6 +91,7 @@
 <li class="tocentry"><a href="#miscexporters">MiscExporters</a></li>
 <li class="tocentry"><a href="#json">Json</a></li>
 <li class="tocentry"><a href="#plots">Plots</a></li>
+<li class="tocentry"><a href="#csv">CSV</a></li>
 </ul>
 <li class="tocentry"><a href="../Configs/Loggers.htm">Loggers</a>
 </li>
@@ -364,7 +365,57 @@ public class IntroJsonExport2
 }
 </code></pre>
 
+<h2 id="csv">CSV<a class="headerlink" href="#csv" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>The CSV file format is often used to graph the output or to analyze the results programmatically. The CSV exporter may be configured to produce sanitized output, where cell values are numerals and their units are predefined.</p>
+<p>The CSV exporter and other compatible exporters may consume an instance of <code>ISummaryStyle</code> that defines how the output should look like:</p>
+<table class="table table-bordered-all table-responsive">
+<thead>
+<tr>
+	<th>Property</th>
+	<th>Remarks</th>
+	<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>PrintUnitsInHeader</td>
+	<td>If true, units will be displayed in the header row</td>
+	<td>false</td>
+</tr>
+<tr>
+	<td>PrintUnitsInContent</td>
+	<td>If true, units will be appended to the value</td>
+	<td>true</td>
+</tr>
+<tr>
+	<td>TimeUnit</td>
+	<td>If null, unit will be automatically selected</td>
+	<td>null</td>
+</tr>
+<tr>
+	<td>SizeUnit</td>
+	<td>If null, unit will be automatically selected</td>
+	<td>null</td>
+</tr>
+</tbody>
+</table>
+<p>Example of CSV exporter configured to always use microseconds, kilobytes, and to render units only in column headers:</p>
+<pre><code class="cs">var config = ManualConfig.Create(DefaultConfig.Instance);
+config.Add(new CsvExporter(
+    CsvSeparator.CurrentCulture,
+    new BenchmarkDotNet.Reports.SummaryStyle
+    {
+        PrintUnitsInHeader = true,
+        PrintUnitsInContent = false,
+        TimeUnit = BenchmarkDotNet.Horology.TimeUnit.Microsecond,
+        SizeUnit = BenchmarkDotNet.Columns.SizeUnit.KB
+    }));
+</code></pre>
 
+<p>Excerpt from the resulting CSV file:</p>
+<pre class="nocode">Method,...,Mean [us],Error [us],StdDev [us],Min [us],Max [us],Allocated [KB]
+Benchmark,...,&quot;37,647.6&quot;,&quot;32,717.9&quot;,&quot;21,640.9&quot;,&quot;11,209.2&quot;,&quot;59,492.6&quot;,1.58
+</pre>
                     </div>
                 </div>
                 <footer>

@@ -161,7 +161,7 @@ public class IntroFilters
 {
     private class Config : ManualConfig
     {
-        // We will benchmark ONLY method with names with names (which contains &quot;A&quot; OR &quot;1&quot;) AND (have length &lt; 3)
+        // We will benchmark ONLY method with names (which contains &quot;A&quot; OR &quot;1&quot;) AND (have length &lt; 3)
         public Config()
         {
             Add(new DisjunctionFilter(
@@ -187,7 +187,7 @@ public class IntroFilters
 
 <pre><code class="cs">[DryJob]
 [CategoriesColumn]
-[BenchmarkCategory(&quot;Aswesome&quot;)]
+[BenchmarkCategory(&quot;Awesome&quot;)]
 [AnyCategoriesFilter(&quot;A&quot;, &quot;1&quot;)]
 public class IntroCategories
 {
