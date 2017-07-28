@@ -117,3 +117,48 @@ The order of method calls:
 // GlobalCleanup
 ```
 
+## Target 
+
+Sometimes it's useful to run setup or cleanups for specific benchmarks. All four setup and cleanup attributes have a Target property that allow the setup/cleanup method to be run for one or more specific benchmark methods.   
+
+```cs
+[SimpleJob(RunStrategy.Monitoring, launchCount: 0, warmupCount: 0, targetCount: 1)]
+public class SetupAndCleanupExample
+{
+  [GlobalSetup(Target = nameof(BenchmarkA))]
+  public void GlobalSetupA() => Console.WriteLine("// " + "GlobalSetup A");
+  
+  [Benchmark]
+  public void BenchmarkA() => Console.WriteLine("// " + "Benchmark A");
+  
+  [GlobalSetup(Target = nameof(BenchmarkB) + "," + nameof(BenchmarkC))]
+  public void GlobalSetupB() => Console.WriteLine("// " + "GlobalSetup B");
+  
+  [Benchmark]
+  public void BenchmarkB() => Console.WriteLine("// " + "Benchmark B");
+  
+  [Benchmark]
+  public void BenchmarkC() => Console.WriteLine("// " + "Benchmark C");
+  
+  [Benchmark]
+  public void BenchmarkD() => Console.WriteLine("// " + "Benchmark D");
+}
+```
+
+The order of method calls:
+
+```
+// GlobalSetup A
+
+// Benchmark A
+
+// GlobalSetup B
+
+// Benchmark B
+
+// GlobalSetup B
+
+// Benchmark C
+
+// Benchmark D
+```

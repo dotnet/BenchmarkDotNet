@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Attributes
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     [MeansImplicitUse]    
-    public class GlobalCleanupAttribute: Attribute
-    {        
+    public class GlobalCleanupAttribute: TargetedAttribute
+    {
     }
 }
