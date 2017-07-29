@@ -15,7 +15,6 @@ using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CsProj;
 #if !CORE
 using System.Management;
-
 #endif
 
 namespace BenchmarkDotNet.Portability
@@ -100,7 +99,7 @@ namespace BenchmarkDotNet.Portability
 
             return Unknown;
         }
-        
+
         public static string GetNetCoreVersion()
         {
             var assembly = typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly;
@@ -266,7 +265,7 @@ namespace BenchmarkDotNet.Portability
             }
         }
 
-        [DllImport("libc", SetLastError=true)]
+        [DllImport("libc", SetLastError = true)]
         private static extern int uname(IntPtr buf);
 
         private static string GetSysnameFromUname()
@@ -290,6 +289,32 @@ namespace BenchmarkDotNet.Portability
                 if (buf != IntPtr.Zero)
                     Marshal.FreeHGlobal(buf);
             }
+        }
+
+        internal static ICollection<string> GetAntivirusProducts()
+        {
+#if !CORE
+            var products = new List<string>();
+            try
+            {
+                var wmi = new ManagementObjectSearcher(@"root\SecurityCenter2", "SELECT * FROM AntiVirusProduct");
+                ManagementObjectCollection data = wmi.Get();
+
+                foreach (ManagementBaseObject o in data)
+                {
+                    var av = (ManagementObject)o;
+                    if (av != null)
+                    {
+                        string avName = av["displayName"].ToString();
+                        products.Add(avName);
+                    }
+                }
+            }
+            catch { }
+            return products;
+#else
+            return Array.Empty<string>();
+#endif
         }
     }
 }
