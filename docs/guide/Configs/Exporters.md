@@ -24,9 +24,9 @@ BenchmarkDotNet has a set of json exporters. You can customize the following pro
 
 * `fileNameSuffix`: a string which be placed in the end of target file name.
 * `indentJson`=`false`/`true`: should we format json or not.
-* `excludeMeasurements`=`false`/`true`: should we excldue detailed information about measurements or not (the final summary with statistics will be in the json file anyway),
+* `excludeMeasurements`=`false`/`true`: should we exclude detailed information about measurements or not (the final summary with statistics will be in the json file anyway),
 
-Also there are a set of predefined json exporters. Example of usage:
+Also, there are a set of predefined json exporters. Example of usage:
 
 ```cs
 [JsonExporterAttribute.Brief]
