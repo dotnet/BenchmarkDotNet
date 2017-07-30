@@ -69,6 +69,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             logger.WriteLine("</table>");
         }
 
-        private string GetImportantInfo(Job job) => $"{job.Env.Jit} {job.Env.Platform} {job.Env.Runtime.Name} {job.Infrastructure.Toolchain?.Name}";
+        private string GetImportantInfo(Job job) => $"{job.Env.Jit} {job.Env.Platform} {job.Env.Runtime?.Name} {job.Infrastructure.Toolchain?.Name}";
     }
 }

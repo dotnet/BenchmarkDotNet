@@ -13,29 +13,33 @@ using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Toolchains.InProcess;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
     public class DisassemblyDiagnoser : IDiagnoser
     {
-        public static readonly IDiagnoser Asm = new DisassemblyDiagnoser(true, false, false, false);
-        public static readonly IDiagnoser IL = new DisassemblyDiagnoser(false, true, false, false);
-        public static readonly IDiagnoser AsmAndIL = new DisassemblyDiagnoser(true, true, false, false);
-        public static readonly IDiagnoser All = new DisassemblyDiagnoser(true, true, true, true);
+        public static readonly IDiagnoser Asm = new DisassemblyDiagnoser(printAsm: true);
+        public static readonly IDiagnoser AsmFullRecursive = new DisassemblyDiagnoser(printAsm: true, printPrologAndEpilog: true, printRecursive: true);
+        public static readonly IDiagnoser IL = new DisassemblyDiagnoser(printAsm: false, printIL: true);
+        public static readonly IDiagnoser AsmAndIL = new DisassemblyDiagnoser(printAsm: true, printIL: true);
+        public static readonly IDiagnoser All = new DisassemblyDiagnoser(true, true, true, true, true);
 
-        private readonly bool printAsm = true, printIL = false, printSource = false, printPrologAndEpilog = false;
+        private readonly bool printAsm = true, printIL = false, printSource = false, printPrologAndEpilog = false, printRecursive = false;
 
         private readonly Dictionary<Benchmark, string> results = new Dictionary<Benchmark, string>();
 
         // ReSharper disable once EmptyConstructor parameterless ctor is mandatory for DiagnosersLoader.CreateDiagnoser
         public DisassemblyDiagnoser() { }
 
-        public DisassemblyDiagnoser(bool printAsm = true, bool printIL = false, bool printSource = false, bool printPrologAndEpilog = false)
+        public DisassemblyDiagnoser(bool printAsm = true, bool printIL = false, bool printSource = false, bool printPrologAndEpilog = false, bool printRecursive = false)
         {
             this.printIL = printIL;
             this.printAsm = printAsm;
             this.printSource = printSource;
             this.printPrologAndEpilog = printPrologAndEpilog;
+            this.printRecursive = printRecursive;
         }
 
         public IEnumerable<string> Ids => new[] { nameof(DisassemblyDiagnoser) };
@@ -52,9 +56,19 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             => logger.WriteInfo("The results were exported to \".\\BenchmarkDotNet.Artifacts\\results\\*-disassembly-report.html\"");
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
-            => validationParameters.Benchmarks
-                .Where(benchmark => benchmark.Job.Env.Runtime is MonoRuntime)
-                .Select(benchmark => new ValidationError(true, "Mono is not supported by the DisassemblyDiagnoser yet.", benchmark));
+        {
+            foreach (var benchmark in validationParameters.Benchmarks)
+            {
+                if (benchmark.Job.Env.HasValue(EnvMode.RuntimeCharacteristic) && benchmark.Job.Env.Runtime is MonoRuntime)
+                    yield return new ValidationError(true, "Mono is not supported by the DisassemblyDiagnoser yet.", benchmark);
+
+                if (benchmark.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic)
+                    && benchmark.Job.Infrastructure.Toolchain is InProcessToolchain)
+                {
+                    yield return new ValidationError(true, "InProcessToolchain has no DisassemblyDiagnoser support", benchmark);
+                }
+            }
+        }
 
         public void AfterGlobalSetup(DiagnoserActionParameters parameters) // the benchmark is already compiled
         {
@@ -64,6 +78,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     GetDisassemblerPath(parameters.Process, parameters.Benchmark.Job.Env.Platform),
                     BuildArguments(parameters)));
         }
+
+        internal string GetOutput() => results.Single().Value;
 
         private string GetDisassemblerPath(Process process, Platform platform)
         {
@@ -85,6 +101,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private string GetDisassemblerPath(string architectureName)
         {
+            // one can only attach to a process of same target architecture, this is why we need exe for x64 and for x86
             var exeName = $"BenchmarkDotNet.Disassembler.{architectureName}.exe";
             var diagnosersAssembly = typeof(DisassemblyDiagnoser).Assembly;
 
@@ -112,7 +129,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         // must be kept in sync with BenchmarkDotNet.Disassembler.Program.Main
         private string BuildArguments(DiagnoserActionParameters parameters)
             => $"{parameters.Process.Id} \"{parameters.Benchmark.Target.Type.FullName}\" \"{parameters.Benchmark.Target.Method.Name}\""
-             + $" {printAsm} {printIL} {printSource} {printPrologAndEpilog}";
+             + $" {printAsm} {printIL} {printSource} {printPrologAndEpilog} {printRecursive}";
 
         // code copied from https://stackoverflow.com/a/33206186/5852046
         internal static class NativeMethods

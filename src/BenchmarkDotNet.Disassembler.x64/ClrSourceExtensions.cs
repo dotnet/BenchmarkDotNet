@@ -4,9 +4,6 @@ using Microsoft.Diagnostics.Runtime.Utilities.Pdb;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Microsoft.Diagnostics.RuntimeExt
 {
