@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains.InProcess;
 
@@ -27,10 +30,27 @@ namespace BenchmarkDotNet.Analysers
             if (summary.HostEnvironmentInfo.HasAttachedDebugger)
                 yield return CreateWarning("Benchmark was executed with attached debugger");
 
-            var antivirusProducts = summary.HostEnvironmentInfo.AntivirusProducts.Value;
-            if (antivirusProducts.Any())
-                yield return CreateWarning("Found antivirus products: " + $"{string.Join(", ", antivirusProducts)}. " +
-                                           $"In case of any problems or hang, use {nameof(InProcessToolchain)} to avoid new process creation.");
+            var unexpectedExit = summary.Reports.SelectMany(x => x.ExecuteResults).Any(x => x.ExitCode != 0);
+            if (unexpectedExit)
+            {
+                var avProducts = summary.HostEnvironmentInfo.AntivirusProducts.Value;
+                if (avProducts.Any())
+                    yield return CreateWarning(CreateWarningAboutAntivirus(avProducts));
+            }
+        }
+
+        private static string CreateWarningAboutAntivirus(ICollection<Antivirus> avProducts)
+        {
+            var sb = new StringBuilder("Detected error exit code from one of the benchmarks. " +
+                                       "It might be caused by following antivirus software:");
+            sb.AppendLine();
+
+            foreach (var av in avProducts)
+                sb.AppendLine($"\t - {av}");
+
+            sb.AppendLine($"Use {nameof(InProcessToolchain)} to avoid new process creation.");
+
+            return sb.ToString();
         }
     }
 }
