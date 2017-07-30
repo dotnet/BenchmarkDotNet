@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Toolchains.InProcess;
 
 namespace BenchmarkDotNet.Analysers
 {
@@ -24,6 +26,11 @@ namespace BenchmarkDotNet.Analysers
         {
             if (summary.HostEnvironmentInfo.HasAttachedDebugger)
                 yield return CreateWarning("Benchmark was executed with attached debugger");
+
+            var antivirusProducts = summary.HostEnvironmentInfo.AntivirusProducts.Value;
+            if (antivirusProducts.Any())
+                yield return CreateWarning("Found antivirus products: " + $"{string.Join(", ", antivirusProducts)}. " +
+                                           $"In case of any problems or hang, use {nameof(InProcessToolchain)} to avoid new process creation.");
         }
     }
 }

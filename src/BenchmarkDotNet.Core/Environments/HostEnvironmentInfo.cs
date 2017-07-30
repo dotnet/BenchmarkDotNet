@@ -56,6 +56,8 @@ namespace BenchmarkDotNet.Environments
 
         public HardwareTimerKind HardwareTimerKind { get; protected set; }
 
+        public Lazy<ICollection<Antivirus>> AntivirusProducts { get; protected set; }
+
         static HostEnvironmentInfo()
         {
             MainCultureInfo = (CultureInfo)CultureInfo.InvariantCulture.Clone();
@@ -72,6 +74,7 @@ namespace BenchmarkDotNet.Environments
             HardwareTimerKind = Chronometer.HardwareTimerKind;
             JitModules = RuntimeInformation.GetJitModulesInfo();
             DotNetSdkVersion = new Lazy<string>(DotNetCliCommandExecutor.GetDotNetSdkVersion);
+            AntivirusProducts = new Lazy<ICollection<Antivirus>>(RuntimeInformation.GetAntivirusProducts);
         }
 
         public new static HostEnvironmentInfo GetCurrent() => Current ?? (Current = new HostEnvironmentInfo());
