@@ -26,11 +26,16 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI]
         public static readonly Lazy<IToolchain> Current = new Lazy<IToolchain>(GetCurrentVersion);
 
+        private string targetFrameworkMoniker;
+
         private CsProjClassicNetToolchain(string targetFrameworkMoniker)
             : base($"CsProj{targetFrameworkMoniker}",
                 new CsProjGenerator(targetFrameworkMoniker, platform => platform.ToConfig()),
                 new CsProjBuilder(targetFrameworkMoniker),
-                new Executor()) {}
+                new Executor())
+        {
+            this.targetFrameworkMoniker = targetFrameworkMoniker;
+        }
 
         public static IToolchain From(string targetFrameworkMoniker)
             => new CsProjClassicNetToolchain(targetFrameworkMoniker);
@@ -92,6 +97,17 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
                 return Default;
             }
+        }
+
+        // TODO: Move to a better place
+        [NotNull]
+        internal static string GetCurrentNetFrameworkVersion()
+        {
+            var toolchain = GetCurrentVersionBasedOnWindowsRegistry() as CsProjClassicNetToolchain;
+            if (toolchain == null)
+                return "?";
+            string version = toolchain.targetFrameworkMoniker.Replace("net", "");
+            return string.Join(".", version.ToCharArray());
         }
     }
 }

@@ -4,62 +4,36 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Xml;
 
 namespace BenchmarkDotNet.Exporters.Xml
 {
-    public class XmlSerializer
+    internal class XmlSerializer : IXmlSerializer
     {
         private readonly Type type;
-        private readonly Dictionary<Type, string> itemNames = new Dictionary<Type, string>();
-        private readonly HashSet<string> excludedProperties = new HashSet<string>();
-        private XmlWriter writer;
-        private string rootName;
+        private readonly string rootName;
+        private readonly IReadOnlyDictionary<string, string> collectionItemNameMap;
+        private readonly IReadOnlyCollection<string> excludedPropertyNames;
 
-        public XmlSerializer(Type type)
+        private IXmlWriter writer;
+
+        public static string DefaultItemName { get; } = "Item";
+
+        private XmlSerializer(XmlSerializerBuilder builder)
         {
-            if (type == null)
-                throw new NullReferenceException();
-
-            this.type = type;
-            rootName = type.Name;
+            type = builder.Type;
+            rootName = builder.RootName;
+            collectionItemNameMap = builder.CollectionItemNameMap;
+            excludedPropertyNames = builder.ExcludedPropertyNames;
         }
 
-        public XmlSerializer WithRootName(string rootName)
-        {
-            if (string.IsNullOrWhiteSpace(rootName))
-                throw new ArgumentException(nameof(rootName));
+        public static XmlSerializerBuilder GetBuilder(Type type) => new XmlSerializerBuilder(type);
 
-            this.rootName = rootName;
-            return this;
-        }
-
-        public XmlSerializer WithCollectionItemName(Type type, string name)
-        {
-            if (type == null)
-                throw new NullReferenceException(nameof(type));
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException(nameof(name));
-
-            itemNames.Add(type, name);
-            return this;
-        }
-
-        public XmlSerializer WithExcludedProperty(string propertyName)
-        {
-            if (string.IsNullOrWhiteSpace(propertyName))
-                throw new ArgumentException(nameof(propertyName));
-
-            excludedProperties.Add(propertyName);
-            return this;
-        }
-
-        public void Serialize(XmlWriter writer, object source)
+        public void Serialize(IXmlWriter writer, object source)
         {
             if (writer == null)
-                throw new NullReferenceException(nameof(writer));
-            if (source == null)
-                throw new NullReferenceException(nameof(source));
+                throw new ArgumentNullException(nameof(writer));
+            if (source == null || source.GetType() != type)
+                throw new ArgumentNullException(nameof(source));
 
             this.writer = writer;
 
@@ -87,9 +61,9 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         private void WriteProperty(object source, PropertyInfo property)
         {
-            if (source == null || excludedProperties.Contains(property.Name))
+            if (source == null || excludedPropertyNames.Contains(property.Name))
                 return;
-            
+
             if (IsSimple(property.PropertyType.GetTypeInfo()))
             {
                 WriteSimpleProperty(source, property);
@@ -126,7 +100,7 @@ namespace BenchmarkDotNet.Exporters.Xml
 
             writer.WriteEndElement();
         }
-        
+
         private void WriteCollectionProperty(object source, PropertyInfo property)
         {
             IEnumerable collection = (IEnumerable)property.GetValue(source);
@@ -142,7 +116,14 @@ namespace BenchmarkDotNet.Exporters.Xml
             {
                 if (itemName == null)
                 {
-                    itemName = itemNames[item.GetType()];
+                    if (collectionItemNameMap.ContainsKey(property.Name))
+                    {
+                        itemName = collectionItemNameMap[property.Name];
+                    }
+                    else
+                    {
+                        itemName = DefaultItemName;
+                    }
                 }
 
                 if (IsSimple(item.GetType().GetTypeInfo()))
@@ -184,5 +165,56 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         private bool IsCollectionWriteable(IEnumerable collection)
             => collection?.Cast<object>().FirstOrDefault() != null;
+
+        internal class XmlSerializerBuilder
+        {
+            private Dictionary<string, string> collectionItemNameMap = new Dictionary<string, string>();
+            private HashSet<string> excludedPropertyNames = new HashSet<string>();
+
+            public Type Type { get; }
+            public string RootName { get; private set; }
+            public IReadOnlyDictionary<string, string> CollectionItemNameMap => collectionItemNameMap;
+            public IReadOnlyCollection<string> ExcludedPropertyNames => excludedPropertyNames;
+
+            public XmlSerializerBuilder(Type type)
+            {
+                if (type == null)
+                    throw new ArgumentNullException(nameof(type));
+
+                this.Type = type;
+                RootName = type.Name;
+            }
+
+            public XmlSerializerBuilder WithRootName(string rootName)
+            {
+                if (string.IsNullOrWhiteSpace(rootName))
+                    throw new ArgumentException(nameof(rootName));
+
+                RootName = rootName;
+                return this;
+            }
+
+            public XmlSerializerBuilder WithCollectionItemName(string collectionName, string itemName)
+            {
+                if (string.IsNullOrWhiteSpace(collectionName))
+                    throw new ArgumentException(nameof(collectionName));
+                if (string.IsNullOrWhiteSpace(itemName))
+                    throw new ArgumentException(nameof(itemName));
+
+                collectionItemNameMap.Add(collectionName, itemName);
+                return this;
+            }
+
+            public XmlSerializerBuilder WithExcludedProperty(string propertyName)
+            {
+                if (string.IsNullOrWhiteSpace(propertyName))
+                    throw new ArgumentException(nameof(propertyName));
+
+                excludedPropertyNames.Add(propertyName);
+                return this;
+            }
+
+            public IXmlSerializer Build() => new XmlSerializer(this);
+        }
     }
 }

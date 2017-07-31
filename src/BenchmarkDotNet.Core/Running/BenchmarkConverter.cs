@@ -24,11 +24,12 @@ namespace BenchmarkDotNet.Running
 
         public static Benchmark[] MethodsToBenchmarks(Type containingType, MethodInfo[] methods, IConfig config = null)
         {
-            var globalSetupMethod = GetWrappingMethod<GlobalSetupAttribute>(methods, "GlobalSetup");
+            var globalSetupMethods = GetAttributedMethods<GlobalSetupAttribute>(methods, "GlobalSetup");
+            var globalCleanupMethods = GetAttributedMethods<GlobalCleanupAttribute>(methods, "GlobalCleanup");
+            var iterationSetupMethods = GetAttributedMethods<IterationSetupAttribute>(methods, "IterationSetup");
+            var iterationCleanupMethods = GetAttributedMethods<IterationCleanupAttribute>(methods, "IterationCleanup");
+
             var targetMethods = methods.Where(method => method.HasAttribute<BenchmarkAttribute>()).ToArray();
-            var globalCleanupMethod = GetWrappingMethod<GlobalCleanupAttribute>(methods, "GlobalCleanup");
-            var iterationSetupMethod = GetWrappingMethod<IterationSetupAttribute>(methods, "IterationSetup");
-            var iterationCleanupMethod = GetWrappingMethod<IterationCleanupAttribute>(methods, "IterationCleanup");
 
             var parameterDefinitions = GetParameterDefinitions(containingType);
             var parameterInstancesList = parameterDefinitions.Expand();
@@ -38,14 +39,14 @@ namespace BenchmarkDotNet.Running
                 rawJobs = new[] { Job.Default };
             var jobs = rawJobs.Distinct().ToArray();
 
-            var targets = GetTargets(targetMethods, containingType, globalSetupMethod, globalCleanupMethod, iterationSetupMethod, iterationCleanupMethod).ToArray();
+            var targets = GetTargets(targetMethods, containingType, globalSetupMethods, globalCleanupMethods, iterationSetupMethods, iterationCleanupMethods).ToArray();
 
             var benchmarks = (
                 from target in targets
                 from job in jobs
                 from parameterInstance in parameterInstancesList
                 select new Benchmark(target, job, parameterInstance)).ToArray();
-            
+
             var filters = config.GetFilters().ToList();
             benchmarks = GetFilteredBenchmarks(benchmarks, filters);
 
@@ -67,23 +68,63 @@ namespace BenchmarkDotNet.Running
             return config;
         }
 
-        private static IEnumerable<Target> GetTargets(MethodInfo[] targetMethods, Type type, MethodInfo globalSetupMethod, MethodInfo globalCleanupMethod, 
-            MethodInfo iterationSetupMethod, MethodInfo iterationCleanupMethod)
+        private static IEnumerable<Target> GetTargets(
+            MethodInfo[] targetMethods,
+            Type type,
+            Tuple<MethodInfo, TargetedAttribute>[] globalSetupMethods,
+            Tuple<MethodInfo, TargetedAttribute>[] globalCleanupMethods,
+            Tuple<MethodInfo, TargetedAttribute>[] iterationSetupMethods,
+            Tuple<MethodInfo, TargetedAttribute>[] iterationCleanupMethods)
         {
             return targetMethods
                 .Where(m => m.HasAttribute<BenchmarkAttribute>())
-                .Select(methodInfo => CreateTarget(type, globalSetupMethod, methodInfo, globalCleanupMethod, iterationSetupMethod, iterationCleanupMethod,
-                    methodInfo.ResolveAttribute<BenchmarkAttribute>(), targetMethods));
+                .Select(methodInfo => CreateTarget(type,
+                                                   GetTargetedMatchingMethod(methodInfo, globalSetupMethods),
+                                                   methodInfo,
+                                                   GetTargetedMatchingMethod(methodInfo, globalCleanupMethods),
+                                                   GetTargetedMatchingMethod(methodInfo, iterationSetupMethods),
+                                                   GetTargetedMatchingMethod(methodInfo, iterationCleanupMethods),
+                                                   methodInfo.ResolveAttribute<BenchmarkAttribute>(),
+                                                   targetMethods));
+        }
+
+        private static MethodInfo GetTargetedMatchingMethod(MethodInfo benchmarkMethod, Tuple<MethodInfo, TargetedAttribute>[] methods)
+        {
+            foreach (var method in methods)
+            {
+                if (string.IsNullOrEmpty(method.Item2.Target))
+                    return method.Item1;
+
+                var targets = method.Item2.Target.Split(',');
+
+                if (targets.Contains(benchmarkMethod.Name))
+                    return method.Item1;
+            }
+
+            return null;
+        }
+
+        private static Tuple<MethodInfo, TargetedAttribute>[] GetAttributedMethods<T>(MethodInfo[] methods, string methodName) where T : TargetedAttribute
+        {
+            return methods.SelectMany(m => m.GetCustomAttributes<T>()
+                .Select(attr =>
+                {
+                    AssertMethodHasCorrectSignature(methodName, m);
+                    AssertMethodIsAccessible(methodName, m);
+                    AssertMethodIsNotGeneric(methodName, m);
+
+                    return new Tuple<MethodInfo, TargetedAttribute>(m, attr);
+                })).ToArray();
         }
 
         private static Target CreateTarget(
-            Type type, 
-            MethodInfo globalSetupMethod, 
-            MethodInfo methodInfo, 
+            Type type,
+            MethodInfo globalSetupMethod,
+            MethodInfo methodInfo,
             MethodInfo globalCleanupMethod,
             MethodInfo iterationSetupMethod,
             MethodInfo iterationCleanupMethod,
-            BenchmarkAttribute attr,            
+            BenchmarkAttribute attr,
             MethodInfo[] targetMethods)
         {
             var target = new Target(
@@ -96,7 +137,7 @@ namespace BenchmarkDotNet.Running
                 attr.Description,
                 baseline: attr.Baseline,
                 categories: GetCategories(methodInfo),
-                operationsPerInvoke: attr.OperationsPerInvoke, 
+                operationsPerInvoke: attr.OperationsPerInvoke,
                 methodIndex: Array.IndexOf(targetMethods, methodInfo));
             AssertMethodHasCorrectSignature("Benchmark", methodInfo);
             AssertMethodIsAccessible("Benchmark", methodInfo);
@@ -130,27 +171,14 @@ namespace BenchmarkDotNet.Running
                 throw new InvalidOperationException($"Member \"{firstPrivateMember.Name}\" must be public if it has the [Params(..)] attribute applied to it");
 
             var definitions = allParameterMembers
-                .Select(member => 
+                .Select(member =>
                     new ParameterDefinition(
-                        member.Name, 
-                        member.IsStatic, 
+                        member.Name,
+                        member.IsStatic,
                         GetValidValues(member.Attribute.Values, member.ParameterType)))
                 .ToArray();
 
             return new ParameterDefinitions(definitions);
-        }
-
-        private static MethodInfo GetWrappingMethod<T>(MethodInfo[] methods, string methodName) where T : Attribute
-        {
-            var globalSetupMethod = methods.FirstOrDefault(m => m.HasAttribute<T>());
-            if (globalSetupMethod != null)
-            {
-                // "GlobalSetup" or "GlobalCleanup" methods are optional, but if they're there, they must have the correct signature, accessibility, etc ...
-                AssertMethodHasCorrectSignature(methodName, globalSetupMethod);
-                AssertMethodIsAccessible(methodName, globalSetupMethod);
-                AssertMethodIsNotGeneric(methodName, globalSetupMethod);
-            }
-            return globalSetupMethod;
         }
 
         private static string[] GetCategories(MethodInfo method)

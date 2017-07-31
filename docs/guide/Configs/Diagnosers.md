@@ -116,5 +116,5 @@ and the results:
 * HardwareCounters:
 	* Windows 8+ only (we plan to add Unix support in the future)
     * No Hyper-V (Virtualization) support
-    * Requires to run as Admin (ETW Kernel Session)
+    * Requires running as Admin (ETW Kernel Session)
     * No `InProcessToolchain` support ([#394](https://github.com/dotnet/BenchmarkDotNet/issues/394))

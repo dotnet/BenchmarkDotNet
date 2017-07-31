@@ -19,13 +19,14 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             => Path.GetDirectoryName(benchmark.Target.Type.GetTypeInfo().Assembly.Location);
 
         [PublicAPI]
-        protected override void ArtifactCleanup(Benchmark benchmark, ArtifactsPaths artifactsPaths)
-        {
-            DelteIfExists(artifactsPaths.ProgramCodePath);
-            DelteIfExists(artifactsPaths.AppConfigPath);
-            DelteIfExists(artifactsPaths.BuildScriptFilePath);
-            DelteIfExists(artifactsPaths.ExecutablePath);
-        }
+        protected override string[] GetArtifactsToCleanup(Benchmark benchmark, ArtifactsPaths artifactsPaths)
+            => new[] 
+            {
+                artifactsPaths.ProgramCodePath,
+                artifactsPaths.AppConfigPath,
+                artifactsPaths.BuildScriptFilePath,
+                artifactsPaths.ExecutablePath
+            };
 
         [PublicAPI]
         protected override void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)
@@ -63,14 +64,6 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                         typeof(RoslynToolchain).Assembly // BenchmarkDotNet.Toolchains.Roslyn
                     })
                 .Distinct();
-        }
-
-        private static void DelteIfExists(string filePath)
-        {
-            if (File.Exists(filePath))
-            {
-                File.Delete(filePath);
-            }
         }
     }
 }
