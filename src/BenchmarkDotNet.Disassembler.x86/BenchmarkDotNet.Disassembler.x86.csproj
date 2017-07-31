@@ -13,6 +13,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\BenchmarkDotNet.Disassembler.x64\ClrSourceExtensions.cs" Link="ClrSourceExtensions.cs" />
+    <Compile Include="..\BenchmarkDotNet.Disassembler.x64\DataContracts.cs" Link="DataContracts.cs" />
     <Compile Include="..\BenchmarkDotNet.Disassembler.x64\Program.cs" Link="Program.cs" />
   </ItemGroup>
   <ItemGroup>

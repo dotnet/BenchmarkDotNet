@@ -10,6 +10,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace BenchmarkDotNet.Disassembler
 {
@@ -62,45 +64,73 @@ namespace BenchmarkDotNet.Disassembler
             {
                 var runtime = dataTarget.ClrVersions.Single().CreateRuntime();
 
+                ConfigureSymbols(dataTarget);
+
                 var state = new State(runtime, (IDebugControl)dataTarget.DebuggerInterface);
 
-                var typeWithBenchmark = runtime.Heap.GetTypeByName(settings.TypeName);
+                var disasembledMethods = Disassemble(settings, runtime, state);
 
-                state.Todo.Enqueue(typeWithBenchmark.Methods
-                    .Single(method => method.Name == settings.MethodName)); // benchmarks in BenchmarkDotNet are always parameterless, so check by name is enough as of today
-
-                while (state.Todo.Count != 0)
+                using (var stream = new FileStream(settings.ResultsPath, FileMode.Append, FileAccess.Write))
+                using (var writer = XmlWriter.Create(stream))
                 {
-                    var method = state.Todo.Dequeue();
+                    var serializer = new XmlSerializer(typeof(DisassemblyResult));
 
-                    if (!state.HandledMetadataTokens.Add(method.MetadataToken)) // add it now to avoid StackOverflow for recursive methods
-                        continue; // already handled
-
-                    DisassembleMethod(method, state, settings);
-
-                    if (!settings.PrintRecursive)
-                        return;
+                    serializer.Serialize(writer, new DisassemblyResult { Methods = disasembledMethods.ToArray() });
                 }
             }
         }
 
-        static void DisassembleMethod(ClrMethod method, State state, Settings settings)
+        static void ConfigureSymbols(DataTarget dataTarget)
         {
-            if (method.NativeCode == ulong.MaxValue) // no implementation or not compiled yet (not sure)
-                return;
+            // code copied from https://github.com/Microsoft/clrmd/issues/34#issuecomment-161926535
+            var symbols = dataTarget.DebuggerInterface as IDebugSymbols;
+            symbols?.SetSymbolPath("http://msdl.microsoft.com/download/symbols");
+            var control = dataTarget.DebuggerInterface as IDebugControl;
+            control?.Execute(DEBUG_OUTCTL.NOT_LOGGED, ".reload", DEBUG_EXECUTE.NOT_LOGGED);
+        }
 
-            Console.WriteLine($"Disassembly for {method.GetFullSignature()} ({method.NativeCode:X})"); // :X is for hex
+        private static List<DisassembledMethod> Disassemble(Settings settings, ClrRuntime runtime, State state)
+        {
+            var result = new List<DisassembledMethod>();
+
+            var typeWithBenchmark = runtime.Heap.GetTypeByName(settings.TypeName);
+
+            state.Todo.Enqueue(typeWithBenchmark.Methods
+                    .Single(method => method.Name == settings.MethodName)); // benchmarks in BenchmarkDotNet are always parameterless, so check by name is enough as of today
+
+            while (state.Todo.Count != 0)
+            {
+                var method = state.Todo.Dequeue();
+
+                if (!state.HandledMetadataTokens.Add(method.MetadataToken)) // add it now to avoid StackOverflow for recursive methods
+                    continue; // already handled
+
+                result.Add(DisassembleMethod(method, state, settings));
+
+                if (!settings.PrintRecursive)
+                    break;
+            }
+
+            return result;
+        }
+
+        static DisassembledMethod DisassembleMethod(ClrMethod method, State state, Settings settings)
+        {
+            if (method.NativeCode == ulong.MaxValue)
+                return DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, "Method got inlined");
 
             var module = method.Type.Module;
             string fileName = module.FileName;
 
             var assemblyDefinition = AssemblyDefinition.ReadAssembly(fileName);
-            var typeDefinition = assemblyDefinition.MainModule.GetType(method.Type.Name);
+            var typeDefinition = assemblyDefinition.MainModule.GetType(ClrmdNameToCecilName(method.Type.Name));
             var methodDefinition = typeDefinition.Methods.Single(m => m.MetadataToken.ToUInt32() == method.MetadataToken);
-            ICollection<Instruction> ilInstructions = methodDefinition.Body?.Instructions;
+            ICollection<Instruction> ilInstructions = methodDefinition.Body.Instructions;// ?? Array.Empty<Instruction>();
 
             if (method.ILOffsetMap == null)
-                return;
+                return DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, "No ILOffsetMap found");
+
+            var instructions = new List<Code>();
 
             var mapByILOffset = (from map in method.ILOffsetMap
                                  where map.ILOffset >= 0 // prolog is -2, epilog -3
@@ -111,12 +141,12 @@ namespace BenchmarkDotNet.Disassembler
             if (mapByILOffset.Length == 0 && settings.PrintIL)
             {
                 // The method doesn't have an offset map. Just print the whole thing.
-                PrintIL(ilInstructions);
+                instructions.AddRange(GetIL(ilInstructions));
             }
 
             var prolog = method.ILOffsetMap.First();
             if (prolog.ILOffset == -2 && settings.PrintPrologAndEpilog) // -2 is a magic number for prolog
-                PrintAsm(prolog, state, Array.Empty<Instruction>());
+                instructions.AddRange(GetAsm(prolog, state, Array.Empty<Instruction>()));
 
             for (int i = 0; i < mapByILOffset.Length; ++i)
             {
@@ -129,27 +159,35 @@ namespace BenchmarkDotNet.Disassembler
                     .Where(instr => instr.Offset >= map.ILOffset && instr.Offset < nextMap.ILOffset).ToArray();
 
                 if (settings.PrintSource)
-                    PrintSource(method, map);
+                    instructions.AddRange(GetSource(method, map));
 
                 if (settings.PrintIL)
-                    PrintIL(correspondingIL);
+                    instructions.AddRange(GetIL(correspondingIL));
 
                 if (settings.PrintAsm)
-                    PrintAsm(map, state, correspondingIL);
+                    instructions.AddRange(GetAsm(map, state, correspondingIL));
             }
 
             var epilog = method.ILOffsetMap.Last();
             if (epilog.ILOffset == -3 && settings.PrintPrologAndEpilog) // -3 is a magic number for epilog
-                PrintAsm(epilog, state, Array.Empty<Instruction>());
+                instructions.AddRange(GetAsm(epilog, state, Array.Empty<Instruction>()));
 
-            Console.WriteLine();
+            return new DisassembledMethod
+            {
+                Instructions = instructions.ToArray(),
+                Name = method.GetFullSignature(),
+                NativeCode = method.NativeCode
+            };
         }
 
-        static void PrintSource(ClrMethod method, ILToNativeMap map)
+        static IEnumerable<IL> GetIL(ICollection<Instruction> instructions)
+            => instructions.Select(instruction => new IL { TextRepresentation = instruction.ToString() });
+
+        static IEnumerable<Sharp> GetSource(ClrMethod method, ILToNativeMap map)
         {
             var sourceLocation = method.GetSourceLocation(map.ILOffset);
             if (sourceLocation == null)
-                return;
+                yield break;
 
             for (int line = sourceLocation.LineNumber; line <= sourceLocation.LineNumberEnd; ++line)
             {
@@ -157,9 +195,46 @@ namespace BenchmarkDotNet.Disassembler
 
                 if (sourceLine != null)
                 {
-                    Console.WriteLine(sourceLine);
-                    Console.WriteLine(new string(' ', sourceLocation.ColStart - 1) + new string('^', sourceLocation.ColEnd - sourceLocation.ColStart));
+                    yield return new Sharp
+                    {
+                        TextRepresentation = sourceLine + Environment.NewLine + new string(' ', sourceLocation.ColStart - 1) + new string('^', sourceLocation.ColEnd - sourceLocation.ColStart)
+                    };
                 }
+            }
+        }
+
+        static IEnumerable<Asm> GetAsm(ILToNativeMap map, State state, ICollection<Instruction> correspondingIL)
+        {
+            var disasmBuffer = new StringBuilder(512);
+            ulong disasmAddress = map.StartAddress;
+            while (true)
+            {
+                int hr = state.DebugControl.Disassemble(disasmAddress, 0,
+                    disasmBuffer, disasmBuffer.Capacity, out uint disasmSize,
+                    out ulong nextInstr);
+                if (hr != 0)
+                    break;
+
+                disasmBuffer.Replace("\n", string.Empty);
+
+                var textRepresentation = disasmBuffer.ToString();
+
+                string calledMethodName = null;
+
+                if (textRepresentation.Contains("call"))
+                    calledMethodName = TryEnqueueCalledMethod(textRepresentation, state, correspondingIL);
+
+                yield return new Asm
+                {
+                    TextRepresentation = disasmBuffer.ToString(),
+                    Comment = calledMethodName,
+                    InstructionPointer = disasmAddress
+                };
+
+                if (nextInstr >= map.EndAddress)
+                    break;
+
+                disasmAddress = nextInstr;
             }
         }
 
@@ -177,45 +252,6 @@ namespace BenchmarkDotNet.Disassembler
                 : null; // "nop" can have no corresponding c# code ;)
         }
 
-        static void PrintIL(ICollection<Instruction> instructions)
-        {
-            foreach (var instr in instructions)
-            {
-                Console.WriteLine(instr.ToString());
-            }
-        }
-
-        static void PrintAsm(ILToNativeMap map, State state, ICollection<Instruction> correspondingIL)
-        {
-            var disasmBuffer = new StringBuilder(512);
-            ulong disasmAddress = map.StartAddress;
-            while (true)
-            {
-                int hr = state.DebugControl.Disassemble(disasmAddress, 0,
-                    disasmBuffer, disasmBuffer.Capacity, out uint disasmSize,
-                    out ulong nextInstr);
-                if (hr != 0)
-                    break;
-
-                var textRepresentation = disasmBuffer.ToString();
-
-                if (textRepresentation.Contains("call"))
-                {
-                    var calledMethodName = TryEnqueueCalledMethod(textRepresentation, state, correspondingIL);
-
-                    disasmBuffer.Insert(
-                        (int)disasmSize - 2, // it always end with "\n"
-                        $"\t; {calledMethodName}");
-                }
-
-                Console.Write(disasmBuffer.ToString());
-
-                if (nextInstr >= map.EndAddress)
-                    break;
-                disasmAddress = nextInstr;
-            }
-        }
-
         static string TryEnqueueCalledMethod(string textRepresentation, State state, ICollection<Instruction> correspondingIL)
         {
             if (TryGetHexAdress(textRepresentation, out ulong address))
@@ -223,12 +259,12 @@ namespace BenchmarkDotNet.Disassembler
                 var method = state.Runtime.GetMethodByAddress(address);
 
                 if (method == null) // not managed method
-                    return "?? not managed method";
+                    return "not managed method";
 
                 if (!state.HandledMetadataTokens.Contains(method.MetadataToken))
                     state.Todo.Enqueue(method);
 
-                return $"{method.Type.Name}.{method.Name}";
+                return $"{method.Type.Name}.{method.Name}"; // method.GetFullSignature(); produces detailed, but too long string
             }
             else // call    qword ptr [rax+20h] 
             {
@@ -242,7 +278,8 @@ namespace BenchmarkDotNet.Disassembler
                 {
                     if (callInstruction.Operand is MethodReference methodReference)
                     {
-                        var declaringType = state.Runtime.Heap.GetTypeByName(methodReference.DeclaringType.FullName);
+                        var typeName = CecilNameToClrmdName(methodReference.DeclaringType.FullName);
+                        var declaringType = state.Runtime.Heap.GetTypeByName(typeName);
 
                         var calledMethod = declaringType.Methods
                             .SingleOrDefault(m => m.MetadataToken == methodReference.MetadataToken.ToUInt32());
@@ -291,7 +328,7 @@ namespace BenchmarkDotNet.Disassembler
             return ulong.TryParse(addressPart, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out address);
         }
 
-        private static string UnifyName(MethodReference method)
+        static string UnifyName(MethodReference method)
         {
             // Cecil returns sth like "System.Int32 System.Random::Next(System.Int32,System.Int32)"
             // Clrmd expects sth like "System.Random.Next(Int32, Int32)
@@ -299,11 +336,15 @@ namespace BenchmarkDotNet.Disassembler
 
             return $"{method.DeclaringType.Namespace}.{method.DeclaringType.Name}.{method.Name}({string.Join(", ", method.Parameters.Select(param => param.ParameterType.Name))})";
         }
+
+        // nested types contains `/` instead of `+` in the name..
+        static string CecilNameToClrmdName(string typeName) => typeName.Replace('/', '+');
+        static string ClrmdNameToCecilName(string typeName) => typeName.Replace('+', '/'); 
     }
 
     class Settings
     {
-        private Settings(int processId, string typeName, string methodName, bool printAsm, bool printIL, bool printSource, bool printPrologAndEpilog, bool printRecursive)
+        private Settings(int processId, string typeName, string methodName, bool printAsm, bool printIL, bool printSource, bool printPrologAndEpilog, bool printRecursive, string resultsPath)
         {
             ProcessId = processId;
             TypeName = typeName;
@@ -313,6 +354,7 @@ namespace BenchmarkDotNet.Disassembler
             PrintSource = printSource;
             PrintPrologAndEpilog = printPrologAndEpilog;
             PrintRecursive = printRecursive;
+            ResultsPath = resultsPath;
         }
 
         public int ProcessId { get; }
@@ -323,6 +365,7 @@ namespace BenchmarkDotNet.Disassembler
         public bool PrintSource { get; }
         public bool PrintPrologAndEpilog { get; }
         public bool PrintRecursive { get; }
+        public string ResultsPath { get; }
 
         public static Settings FromArgs(string[] args)
             => new Settings(
@@ -333,7 +376,8 @@ namespace BenchmarkDotNet.Disassembler
                 printIL: bool.Parse(args[4]),
                 printSource: bool.Parse(args[5]),
                 printPrologAndEpilog: bool.Parse(args[6]),
-                printRecursive: bool.Parse(args[7])
+                printRecursive: bool.Parse(args[7]),
+                resultsPath: args[8]
             );
     }
 

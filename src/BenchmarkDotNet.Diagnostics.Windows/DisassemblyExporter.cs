@@ -10,9 +10,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 {
     public class DisassemblyExporter : ExporterBase
     {
-        private readonly Dictionary<Benchmark, string> results;
+        private readonly Dictionary<Benchmark, DisassemblyResult> results;
 
-        public DisassemblyExporter(Dictionary<Benchmark, string> results)
+        public DisassemblyExporter(Dictionary<Benchmark, DisassemblyResult> results)
         {
             this.results = results;
         }
@@ -62,7 +62,29 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             logger.WriteLine("<tr>");
             foreach (var benchmark in benchmarks)
             {
-                logger.WriteLine($"<td style=\"vertical-align:top;\"><pre><code>{results[benchmark]}</code></pre></td>");
+                logger.WriteLine("<td style=\"vertical-align:top;\"><pre><code>");
+                foreach (var method in results[benchmark].Methods.Where(method => string.IsNullOrEmpty(method.Problem)))
+                {
+                    logger.WriteLine($"{method.NativeCode:X} {method.Name}");
+                    foreach (var instruction in method.Instructions)
+                    {
+                        logger.WriteLine($"{instruction.TextRepresentation} {instruction.Comment}");
+                    }
+                    logger.WriteLine();
+                }
+
+                foreach (var withProblems in results[benchmark].Methods
+                    .Where(method => !string.IsNullOrEmpty(method.Problem))
+                    .GroupBy(method => method.Problem))
+                {
+                    logger.WriteLine(withProblems.Key);
+                    foreach (var withProblem in withProblems)
+                    {
+                        logger.WriteLine(withProblem.Name);
+                    }
+                    logger.WriteLine();
+                }
+                logger.WriteLine("</code></pre></td>");
             }
             logger.WriteLine("</tr>");
             logger.WriteLine("</tbody>");

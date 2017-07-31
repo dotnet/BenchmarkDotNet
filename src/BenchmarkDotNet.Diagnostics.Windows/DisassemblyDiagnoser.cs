@@ -11,6 +11,9 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.IO;
 using System.Linq;
+using System.Xml;
+using System.Xml.Serialization;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
@@ -28,7 +31,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private readonly bool printAsm = true, printIL = false, printSource = false, printPrologAndEpilog = false, printRecursive = false;
 
-        private readonly Dictionary<Benchmark, string> results = new Dictionary<Benchmark, string>();
+        private readonly Dictionary<Benchmark, DisassemblyResult> results = new Dictionary<Benchmark, DisassemblyResult>();
 
         // ReSharper disable once EmptyConstructor parameterless ctor is mandatory for DiagnosersLoader.CreateDiagnoser
         public DisassemblyDiagnoser() { }
@@ -52,7 +55,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public void ProcessResults(Benchmark benchmark, BenchmarkReport report) { }
         public IColumnProvider GetColumnProvider() => EmptyColumnProvider.Instance;
 
-        public void DisplayResults(ILogger logger) 
+        public void DisplayResults(ILogger logger)
             => logger.WriteInfo("The results were exported to \".\\BenchmarkDotNet.Artifacts\\results\\*-disassembly-report.html\"");
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
@@ -72,14 +75,29 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public void AfterGlobalSetup(DiagnoserActionParameters parameters) // the benchmark is already compiled
         {
-            results.Add(
-                parameters.Benchmark,
-                ProcessHelper.RunAndReadOutput(
-                    GetDisassemblerPath(parameters.Process, parameters.Benchmark.Job.Env.Platform),
-                    BuildArguments(parameters)));
+            var resultsPath = Path.GetTempFileName();
+
+            var errors = ProcessHelper.RunAndReadOutput(
+                GetDisassemblerPath(parameters.Process, parameters.Benchmark.Job.Env.Platform),
+                BuildArguments(parameters, resultsPath));
+
+            if(!string.IsNullOrEmpty(errors))
+                parameters.Config.GetCompositeLogger().WriteError(errors);
+
+            using (var stream = new FileStream(resultsPath, FileMode.Open, FileAccess.Read))
+            using (var reader = XmlReader.Create(stream))
+            {
+                var serializer = new XmlSerializer(typeof(DisassemblyResult));
+
+                results.Add(
+                    parameters.Benchmark,
+                    (DisassemblyResult)serializer.Deserialize(reader));
+            }
+
+            File.Delete(resultsPath);
         }
 
-        internal string GetOutput() => results.Single().Value;
+        internal string GetOutput() => results.Single().Value.ToString();
 
         private string GetDisassemblerPath(Process process, Platform platform)
         {
@@ -127,9 +145,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         }
 
         // must be kept in sync with BenchmarkDotNet.Disassembler.Program.Main
-        private string BuildArguments(DiagnoserActionParameters parameters)
+        private string BuildArguments(DiagnoserActionParameters parameters, string resultsPath)
             => $"{parameters.Process.Id} \"{parameters.Benchmark.Target.Type.FullName}\" \"{parameters.Benchmark.Target.Method.Name}\""
-             + $" {printAsm} {printIL} {printSource} {printPrologAndEpilog} {printRecursive}";
+             + $" {printAsm} {printIL} {printSource} {printPrologAndEpilog} {printRecursive}"
+             + $" \"{resultsPath}\"";
 
         // code copied from https://stackoverflow.com/a/33206186/5852046
         internal static class NativeMethods
