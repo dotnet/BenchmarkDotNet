@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Analysers
             sb.AppendLine();
 
             foreach (var av in avProducts)
-                sb.AppendLine($"\t - {av}");
+                sb.AppendLine($"        - {av}");
 
             sb.AppendLine($"Use {nameof(InProcessToolchain)} to avoid new process creation.");
 
