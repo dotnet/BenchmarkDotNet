@@ -13,14 +13,23 @@ namespace BenchmarkDotNet.Tests.Running
         [Fact]
         public void ReadsAttributesFromBaseClass()
         {
-            Benchmark benchmark = BenchmarkConverter.TypeToBenchmarks(typeof(Derived)).Single();
+            var derivedType = typeof(Derived);
+            Benchmark benchmark = BenchmarkConverter.TypeToBenchmarks(derivedType).Single();
            
             Assert.NotNull(benchmark);
             Assert.NotNull(benchmark.Target);
+
             Assert.NotNull(benchmark.Target.IterationSetupMethod);
+            Assert.Equal(benchmark.Target.IterationSetupMethod.DeclaringType, derivedType);
+
             Assert.NotNull(benchmark.Target.IterationCleanupMethod);
+            Assert.Equal(benchmark.Target.IterationCleanupMethod.DeclaringType, derivedType);
+
             Assert.NotNull(benchmark.Target.GlobalCleanupMethod);
+            Assert.Equal(benchmark.Target.GlobalCleanupMethod.DeclaringType, derivedType);
+
             Assert.NotNull(benchmark.Target.GlobalSetupMethod);
+            Assert.Equal(benchmark.Target.GlobalSetupMethod.DeclaringType, derivedType);
         }
 
         public abstract class Base
