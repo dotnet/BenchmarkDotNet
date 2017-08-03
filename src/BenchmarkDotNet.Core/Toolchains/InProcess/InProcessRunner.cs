@@ -50,7 +50,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 var target = benchmark.Target;
                 var job = benchmark.Job; // TODO: filter job (same as SourceCodePresenter does)?
                 var unrollFactor = benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvResolver.Instance);
-                // var dummyUnrollFactor = 1 << 6; // TODO: as arg to CreateDummy()?
 
                 // DONTTOUCH: these should be allocated together
                 var instance = Activator.CreateInstance(benchmark.Target.Type);
@@ -95,9 +94,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 engine.PreAllocate();
 
                 globalSetupAction.InvokeSingle();
+                iterationSetupAction.InvokeSingle();
 
                 if (job.ResolveValue(RunMode.RunStrategyCharacteristic, EngineResolver.Instance).NeedsJitting())
                     engine.Jitting(); // does first call to main action, must be executed after setup()!
+
+                iterationCleanupAction.InvokeSingle();
 
                 if (host.IsDiagnoserAttached)
                     host.AfterGlobalSetup();
