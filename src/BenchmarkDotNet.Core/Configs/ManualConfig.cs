@@ -30,7 +30,6 @@ namespace BenchmarkDotNet.Configs
         private ISummaryStyle summaryStyle = null;
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
-        public IEnumerable<IExporter> GetExporters() => exporters.Union(diagnosers.SelectMany(diagnoser => diagnoser.Exporters));
         public IEnumerable<ILogger> GetLoggers() => loggers;
         
         public IEnumerable<IAnalyser> GetAnalysers() => analysers;
@@ -86,6 +85,24 @@ namespace BenchmarkDotNet.Configs
                 return diagnosers.Union(new [] { hardwareCountersDiagnoser });
 
             return diagnosers;
+        }
+
+        public IEnumerable<IExporter> GetExporters()
+        {
+            var allDiagnosers = GetDiagnosers().ToArray();
+
+            foreach (var exporter in exporters)
+                yield return exporter;
+
+            foreach (var diagnoser in allDiagnosers)
+                foreach (var exporter in diagnoser.Exporters)
+                    yield return exporter;
+
+            var hardwareCounterDiagnoser = allDiagnosers.OfType<IHardwareCountersDiagnoser>().SingleOrDefault();
+            var disassemblyDiagnoser = allDiagnosers.OfType<IDisassemblyDiagnoser>().SingleOrDefault();
+
+            if (hardwareCounterDiagnoser != null && disassemblyDiagnoser != null)
+                yield return new InstructionPointerExporter(hardwareCounterDiagnoser, disassemblyDiagnoser);
         }
 
         public static ManualConfig CreateEmpty() => new ManualConfig();

@@ -21,7 +21,7 @@ using BenchmarkDotNet.Toolchains.InProcess;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
-    public class DisassemblyDiagnoser : IDiagnoser
+    public class DisassemblyDiagnoser : IDisassemblyDiagnoser
     {
         public static readonly IDiagnoser Asm = new DisassemblyDiagnoser(printAsm: true);
         public static readonly IDiagnoser AsmFullRecursive = new DisassemblyDiagnoser(printAsm: true, printPrologAndEpilog: true, printRecursive: true);
@@ -44,6 +44,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             this.printPrologAndEpilog = printPrologAndEpilog;
             this.printRecursive = printRecursive;
         }
+
+        public IReadOnlyDictionary<Benchmark, DisassemblyResult> Results => results;
 
         public IEnumerable<string> Ids => new[] { nameof(DisassemblyDiagnoser) };
 

@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
-namespace BenchmarkDotNet.Diagnostics.Windows
+namespace BenchmarkDotNet.Exporters
 {
     public class DisassemblyExporter : ExporterBase
     {
@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             logger.WriteLine("<html lang='en'>");
             logger.WriteLine("<head>");
             logger.WriteLine("<meta charset='utf-8' />");
-            logger.WriteLine("<title> DisassemblyDiagnoser Output " + summary.Title + "</title>");
+            logger.WriteLine($"<title> DisassemblyDiagnoser Output {summary.Title}</title>");
             logger.WriteLine(HtmlExporter.CssDefinition);
             logger.WriteLine("</head>");
 

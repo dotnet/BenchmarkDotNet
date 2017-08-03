@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Xml.Serialization;
 
-namespace BenchmarkDotNet.Diagnostics.Windows
+namespace BenchmarkDotNet.Diagnosers
 {
     // keep it in sync with src\BenchmarkDotNet.Disassembler.x64\DataContracts.cs!
     public abstract class Code
