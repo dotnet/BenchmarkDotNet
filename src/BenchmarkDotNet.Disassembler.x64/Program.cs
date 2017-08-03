@@ -116,16 +116,19 @@ namespace BenchmarkDotNet.Disassembler
 
         static DisassembledMethod DisassembleMethod(ClrMethod method, State state, Settings settings)
         {
-            if (method.NativeCode == ulong.MaxValue)
-                return DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, "Method got inlined");
-
-            var module = method.Type.Module;
-            string fileName = module.FileName;
-
-            var assemblyDefinition = AssemblyDefinition.ReadAssembly(fileName);
+            var assemblyDefinition = AssemblyDefinition.ReadAssembly(method.Type.Module.FileName);
             var typeDefinition = assemblyDefinition.MainModule.GetType(ClrmdNameToCecilName(method.Type.Name));
             var methodDefinition = typeDefinition.Methods.Single(m => m.MetadataToken.ToUInt32() == method.MetadataToken);
-            ICollection<Instruction> ilInstructions = methodDefinition.Body.Instructions;// ?? Array.Empty<Instruction>();
+
+            ICollection<Instruction> ilInstructions =
+                methodDefinition.IsAbstract
+                    ? Array.Empty<Instruction>() // abstract methods have no implementation
+                    : (ICollection<Instruction>)methodDefinition.Body.Instructions;
+
+            EnqueueAllCalls(state, ilInstructions);
+
+            if (method.NativeCode == ulong.MaxValue)
+                return DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, "Method got inlined");
 
             if (method.ILOffsetMap == null)
                 return DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, "No ILOffsetMap found");
@@ -254,55 +257,18 @@ namespace BenchmarkDotNet.Disassembler
 
         static string TryEnqueueCalledMethod(string textRepresentation, State state, ICollection<Instruction> correspondingIL)
         {
-            if (TryGetHexAdress(textRepresentation, out ulong address))
-            {
-                var method = state.Runtime.GetMethodByAddress(address);
+            if (!TryGetHexAdress(textRepresentation, out ulong address))
+                return null; // call    qword ptr [rax+20h] = indirect calls handled by EnqueueIndirectCalls
 
-                if (method == null) // not managed method
-                    return "not managed method";
+            var method = state.Runtime.GetMethodByAddress(address);
 
-                if (!state.HandledMetadataTokens.Contains(method.MetadataToken))
-                    state.Todo.Enqueue(method);
+            if (method == null) // not managed method
+                return "not managed method";
 
-                return $"{method.Type.Name}.{method.Name}"; // method.GetFullSignature(); produces detailed, but too long string
-            }
-            else // call    qword ptr [rax+20h] 
-            {
-                // let's try to enqueue all method calls that we can find in IL and were not printed yet
-                var callInstructions = correspondingIL.Where(
-                    instruction => instruction.OpCode == OpCodes.Call
-                        || instruction.OpCode == OpCodes.Calli
-                        || instruction.OpCode == OpCodes.Callvirt);
+            if (!state.HandledMetadataTokens.Contains(method.MetadataToken))
+                state.Todo.Enqueue(method);
 
-                foreach (var callInstruction in callInstructions)
-                {
-                    if (callInstruction.Operand is MethodReference methodReference)
-                    {
-                        var typeName = CecilNameToClrmdName(methodReference.DeclaringType.FullName);
-                        var declaringType = state.Runtime.Heap.GetTypeByName(typeName);
-
-                        var calledMethod = declaringType.Methods
-                            .SingleOrDefault(m => m.MetadataToken == methodReference.MetadataToken.ToUInt32());
-
-                        if (calledMethod == default(ClrMethod))
-                        {
-                            // comparing metadata tokens does not work correctly for some NGENed types like Random.Next
-                            // Mono.Cecil reports different metadat token value than Clrmd for the same method 
-                            // so the last chance is to try to match them by... name (I don't like it, but I have no better idea for now)
-                            var unifiedSignature = UnifyName(methodReference);
-
-                            calledMethod = declaringType
-                                .Methods
-                                .SingleOrDefault(method => method.GetFullSignature() == unifiedSignature);
-                        }
-
-                        if (calledMethod != null && !state.HandledMetadataTokens.Contains(calledMethod.MetadataToken))
-                            state.Todo.Enqueue(calledMethod);
-                    }
-                }
-            }
-
-            return null; // todo: get the right name
+            return $"{method.Type.Name}.{method.Name}"; // method.GetFullSignature(); produces detailed, but too long string
         }
 
         static bool TryGetHexAdress(string textRepresentation, out ulong address)
@@ -328,6 +294,35 @@ namespace BenchmarkDotNet.Disassembler
             return ulong.TryParse(addressPart, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out address);
         }
 
+        static void EnqueueAllCalls(State state, ICollection<Instruction> ilInstructions)
+        {
+            // let's try to enqueue all method calls that we can find in IL and were not printed yet
+            foreach (var callInstruction in ilInstructions.Where(instruction => instruction.Operand is MethodReference))
+            {
+                MethodReference methodReference = (MethodReference)callInstruction.Operand;
+                var typeName = CecilNameToClrmdName(methodReference.DeclaringType.FullName);
+                var declaringType = state.Runtime.Heap.GetTypeByName(typeName);
+
+                var calledMethod = declaringType.Methods
+                    .SingleOrDefault(m => m.MetadataToken == methodReference.MetadataToken.ToUInt32());
+
+                if (calledMethod == default(ClrMethod))
+                {
+                    // comparing metadata tokens does not work correctly for some NGENed types like Random.Next
+                    // Mono.Cecil reports different metadata token value than ClrMD for the same method 
+                    // so the last chance is to try to match them by... name (I don't like it, but I have no better idea for now)
+                    var unifiedSignature = UnifyName(methodReference);
+
+                    calledMethod = declaringType
+                        .Methods
+                        .SingleOrDefault(method => method.GetFullSignature() == unifiedSignature);
+                }
+
+                if (calledMethod != null && !state.HandledMetadataTokens.Contains(calledMethod.MetadataToken))
+                    state.Todo.Enqueue(calledMethod);
+            }
+        }
+
         static string UnifyName(MethodReference method)
         {
             // Cecil returns sth like "System.Int32 System.Random::Next(System.Int32,System.Int32)"
@@ -339,7 +334,7 @@ namespace BenchmarkDotNet.Disassembler
 
         // nested types contains `/` instead of `+` in the name..
         static string CecilNameToClrmdName(string typeName) => typeName.Replace('/', '+');
-        static string ClrmdNameToCecilName(string typeName) => typeName.Replace('+', '/'); 
+        static string ClrmdNameToCecilName(string typeName) => typeName.Replace('+', '/');
     }
 
     class Settings
