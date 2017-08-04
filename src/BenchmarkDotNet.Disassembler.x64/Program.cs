@@ -117,13 +117,23 @@ namespace BenchmarkDotNet.Disassembler
         static DisassembledMethod DisassembleMethod(ClrMethod method, State state, Settings settings)
         {
             var assemblyDefinition = AssemblyDefinition.ReadAssembly(method.Type.Module.FileName);
-            var typeDefinition = assemblyDefinition.MainModule.GetType(ClrmdNameToCecilName(method.Type.Name));
+
+            // searching by fullName does not work for some generic types like 
+            //               System.Threading.Tasks.TaskCompletionSource<System.__Canon> 
+            // Cecil expects System.Threading.Tasks.TaskCompletionSource`1
+            // and for nested types (Cecil uses `/`, ClrMD `+`)
+            // so we search by runtimeName
+            var typeReference = assemblyDefinition.MainModule.GetType(method.Type.Name, runtimeName: true);
+
+            // typeReference.Resolve() fails for the same magic types, so to get the typeDefinition we compare metadata tokens
+            var typeDefinition =
+                assemblyDefinition.MainModule.GetTypes().SingleOrDefault(type => type.MetadataToken.ToUInt32() == method.Type.MetadataToken)
+                ?? assemblyDefinition.MainModule.GetTypes().Single(type => type.MetadataToken.ToUInt32() == typeReference.MetadataToken.RID);  
+
             var methodDefinition = typeDefinition.Methods.Single(m => m.MetadataToken.ToUInt32() == method.MetadataToken);
 
-            ICollection<Instruction> ilInstructions =
-                methodDefinition.IsAbstract
-                    ? Array.Empty<Instruction>() // abstract methods have no implementation
-                    : (ICollection<Instruction>)methodDefinition.Body.Instructions;
+            // some methods have no implementation (abstract & clr magic)
+            var ilInstructions = (ICollection<Instruction>)methodDefinition.Body?.Instructions ?? Array.Empty<Instruction>(); 
 
             EnqueueAllCalls(state, ilInstructions);
 
@@ -149,7 +159,7 @@ namespace BenchmarkDotNet.Disassembler
 
             var prolog = method.ILOffsetMap.First();
             if (prolog.ILOffset == -2 && settings.PrintPrologAndEpilog) // -2 is a magic number for prolog
-                instructions.AddRange(GetAsm(prolog, state, Array.Empty<Instruction>()));
+                instructions.AddRange(GetAsm(prolog, state));
 
             for (int i = 0; i < mapByILOffset.Length; ++i)
             {
@@ -168,12 +178,12 @@ namespace BenchmarkDotNet.Disassembler
                     instructions.AddRange(GetIL(correspondingIL));
 
                 if (settings.PrintAsm)
-                    instructions.AddRange(GetAsm(map, state, correspondingIL));
+                    instructions.AddRange(GetAsm(map, state));
             }
 
             var epilog = method.ILOffsetMap.Last();
             if (epilog.ILOffset == -3 && settings.PrintPrologAndEpilog) // -3 is a magic number for epilog
-                instructions.AddRange(GetAsm(epilog, state, Array.Empty<Instruction>()));
+                instructions.AddRange(GetAsm(epilog, state));
 
             return new DisassembledMethod
             {
@@ -206,7 +216,7 @@ namespace BenchmarkDotNet.Disassembler
             }
         }
 
-        static IEnumerable<Asm> GetAsm(ILToNativeMap map, State state, ICollection<Instruction> correspondingIL)
+        static IEnumerable<Asm> GetAsm(ILToNativeMap map, State state)
         {
             var disasmBuffer = new StringBuilder(512);
             ulong disasmAddress = map.StartAddress;
@@ -225,7 +235,7 @@ namespace BenchmarkDotNet.Disassembler
                 string calledMethodName = null;
 
                 if (textRepresentation.Contains("call"))
-                    calledMethodName = TryEnqueueCalledMethod(textRepresentation, state, correspondingIL);
+                    calledMethodName = TryEnqueueCalledMethod(textRepresentation, state);
 
                 yield return new Asm
                 {
@@ -255,10 +265,10 @@ namespace BenchmarkDotNet.Disassembler
                 : null; // "nop" can have no corresponding c# code ;)
         }
 
-        static string TryEnqueueCalledMethod(string textRepresentation, State state, ICollection<Instruction> correspondingIL)
+        static string TryEnqueueCalledMethod(string textRepresentation, State state)
         {
             if (!TryGetHexAdress(textRepresentation, out ulong address))
-                return null; // call    qword ptr [rax+20h] = indirect calls handled by EnqueueIndirectCalls
+                return null; // call    qword ptr [rax+20h] // needs further research
 
             var method = state.Runtime.GetMethodByAddress(address);
 
@@ -299,42 +309,61 @@ namespace BenchmarkDotNet.Disassembler
             // let's try to enqueue all method calls that we can find in IL and were not printed yet
             foreach (var callInstruction in ilInstructions.Where(instruction => instruction.Operand is MethodReference))
             {
-                MethodReference methodReference = (MethodReference)callInstruction.Operand;
-                var typeName = CecilNameToClrmdName(methodReference.DeclaringType.FullName);
-                var declaringType = state.Runtime.Heap.GetTypeByName(typeName);
+                var methodReference = (MethodReference)callInstruction.Operand;
 
-                var calledMethod = declaringType.Methods
-                    .SingleOrDefault(m => m.MetadataToken == methodReference.MetadataToken.ToUInt32());
+                var declaringType = 
+                    methodReference.DeclaringType.IsNested
+                        ? state.Runtime.Heap.GetTypeByName(methodReference.DeclaringType.FullName.Replace('/', '+')) // nested types contains `/` instead of `+` in the name..
+                        : state.Runtime.Heap.GetTypeByName(methodReference.DeclaringType.FullName);
 
-                if (calledMethod == default(ClrMethod))
-                {
-                    // comparing metadata tokens does not work correctly for some NGENed types like Random.Next
-                    // Mono.Cecil reports different metadata token value than ClrMD for the same method 
-                    // so the last chance is to try to match them by... name (I don't like it, but I have no better idea for now)
-                    var unifiedSignature = UnifyName(methodReference);
+                if(declaringType == null)
+                    continue; // todo: eliminate Cecil vs ClrMD differences in searching by name
 
-                    calledMethod = declaringType
-                        .Methods
-                        .SingleOrDefault(method => method.GetFullSignature() == unifiedSignature);
-                }
-
+                var calledMethod = GetMethod(methodReference, declaringType);
                 if (calledMethod != null && !state.HandledMetadataTokens.Contains(calledMethod.MetadataToken))
                     state.Todo.Enqueue(calledMethod);
             }
         }
 
-        static string UnifyName(MethodReference method)
+        static ClrMethod GetMethod(MethodReference methodReference, ClrType declaringType)
         {
-            // Cecil returns sth like "System.Int32 System.Random::Next(System.Int32,System.Int32)"
-            // Clrmd expects sth like "System.Random.Next(Int32, Int32)
-            // this method does not handle generic method/types and nested types
+            var methodsWithSameToken = declaringType.Methods
+                .Where(method => method.MetadataToken == methodReference.MetadataToken.ToUInt32()).ToArray();
 
-            return $"{method.DeclaringType.Namespace}.{method.DeclaringType.Name}.{method.Name}({string.Join(", ", method.Parameters.Select(param => param.ParameterType.Name))})";
+            if (methodsWithSameToken.Length == 1) // the most common case
+                return methodsWithSameToken[0];
+            if (methodsWithSameToken.Length > 1 && methodReference.MetadataToken.ToUInt32() != default(UInt32)) 
+                // usually one is NGened, the other one is not compiled (looks like a ClrMD bug to me)
+                return methodsWithSameToken.Single(method => method.CompilationType != MethodCompilationType.None);
+
+            // comparing metadata tokens does not work correctly for some NGENed types like Random.Next, System.Threading.Monitor & more
+            // Mono.Cecil reports different metadata token value than ClrMD for the same method 
+            // so the last chance is to try to match them by... name (I don't like it, but I have no better idea for now)
+            var unifiedSignature = CecilNameToClrmdName(methodReference);
+
+            return declaringType
+                .Methods
+                .SingleOrDefault(method => method.GetFullSignature() == unifiedSignature);
         }
 
-        // nested types contains `/` instead of `+` in the name..
-        static string CecilNameToClrmdName(string typeName) => typeName.Replace('/', '+');
-        static string ClrmdNameToCecilName(string typeName) => typeName.Replace('+', '/');
+
+        static string CecilNameToClrmdName(MethodReference method)
+        {
+            // Cecil returns sth like "System.Int32 System.Random::Next(System.Int32,System.Int32)"
+            // ClrMD expects sth like "System.Random.Next(Int32, Int32)
+            // this method does not handle generic method/types and nested types
+
+            return $"{method.DeclaringType.Namespace}.{method.DeclaringType.Name}.{method.Name}({string.Join(", ", method.Parameters.Select(CecilNameToClrmdName))})";
+        }
+
+        // Cecil returns sth like "Boolean&"
+        // ClrMD expects sth like "Boolean ByRef
+        static string CecilNameToClrmdName(ParameterDefinition param) 
+            => param.ParameterType.IsByReference 
+                ? param.ParameterType.Name.Replace("&", string.Empty) + " ByRef"
+                : param.ParameterType.Name;
+
+        
     }
 
     class Settings

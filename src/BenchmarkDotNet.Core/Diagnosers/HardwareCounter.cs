@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Diagnosers
                 case HardwareCounter.CacheMisses:
                     return "miss";
                 case HardwareCounter.BranchMispredictions:
-                    return "mispredict";
+                    return "mispred";
                 case HardwareCounter.TotalCycles:
                     return "cycles";
                 case HardwareCounter.UnhaltedCoreCycles:

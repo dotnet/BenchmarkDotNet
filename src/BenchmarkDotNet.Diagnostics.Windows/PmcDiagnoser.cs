@@ -237,7 +237,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public bool IsNumeric => true;
             public UnitType UnitType => UnitType.Dimensionless;
             public string Legend => $"Instruction Retired per Cycle";
-            public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
+            public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default); 
 
             private Dictionary<Benchmark, PmcStats> Results { get; }
 
@@ -248,7 +248,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style)
                 => Results.TryGetValue(benchmark, out var stats) && stats.Counters.ContainsKey(HardwareCounter.InstructionRetired) && stats.Counters.ContainsKey(HardwareCounter.TotalCycles)
-                    ? (stats.Counters[HardwareCounter.InstructionRetired].Count / (double)stats.Counters[HardwareCounter.TotalCycles].Count).ToString("{0:N2}")
+                    ? (stats.Counters[HardwareCounter.InstructionRetired].Count / (double)stats.Counters[HardwareCounter.TotalCycles].Count).ToString("0:N2")
                     : "-";
         }
 
