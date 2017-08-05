@@ -15,7 +15,8 @@ namespace BenchmarkDotNet.Disassembler
 
     public class Asm : Code
     {
-        public ulong InstructionPointer { get; set; }
+        public ulong InstructionPointerFrom { get; set; }
+        public ulong InstructionPointerTo { get; set; }
     }
 
     public class DisassembledMethod

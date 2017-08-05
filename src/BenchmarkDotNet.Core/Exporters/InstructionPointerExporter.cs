@@ -87,9 +87,18 @@ namespace BenchmarkDotNet.Exporters
                         foreach (var hardwareCounter in pmcStats.Counters)
                         {
                             var total = totals[hardwareCounter.Key];
+                            ulong forRange = 0;
 
-                            if (hardwareCounter.Value.PerInstructionPointer.TryGetValue(asm.InstructionPointer, out var value))
-                                logger.Write($"<td title=\"{value} of {total}\">{((double)value / total):P}</td>");
+                            // ETW's InstructionPoiner seems to be the EndOffset of ClrMD !!!
+                            for (ulong instructionPointer = asm.InstructionPointerTo; instructionPointer > asm.InstructionPointerFrom; instructionPointer--)
+                                if (hardwareCounter.Value.PerInstructionPointer.TryGetValue(instructionPointer, out var value))
+                                    checked
+                                    {
+                                        forRange += value;
+                                    }
+
+                            if (forRange != 0)
+                                logger.Write($"<td title=\"{forRange} of {total}\">{((double)forRange / total):P}</td>");
                             else
                                 logger.Write("<td></td>");
                         }
@@ -115,11 +124,17 @@ namespace BenchmarkDotNet.Exporters
         /// </summary>
         private static Dictionary<HardwareCounter, ulong> SumHardwareCountersStatsOfBenchmarkedCodeOnly(DisassemblyResult disassemblyResult, PmcStats pmcStats)
         {
+            IEnumerable<ulong> Range(Asm asm)
+            {
+                for (ulong instructionPointer = asm.InstructionPointerFrom; instructionPointer <= asm.InstructionPointerTo; instructionPointer++)
+                    yield return instructionPointer;
+            }
+
             var instructionPointers = new HashSet<ulong>(
                 disassemblyResult
                     .Methods.SelectMany(method => method.Instructions)
                     .OfType<Asm>()
-                    .Select(asm => asm.InstructionPointer)
+                    .SelectMany(Range)
                     .Distinct());
 
             return pmcStats.Counters.ToDictionary(data => data.Key, data =>

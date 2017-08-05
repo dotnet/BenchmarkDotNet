@@ -133,7 +133,7 @@ namespace BenchmarkDotNet.Disassembler
             var methodDefinition = typeDefinition.Methods.Single(m => m.MetadataToken.ToUInt32() == method.MetadataToken);
 
             // some methods have no implementation (abstract & clr magic)
-            var ilInstructions = (ICollection<Instruction>)methodDefinition.Body?.Instructions ?? Array.Empty<Instruction>(); 
+            var ilInstructions = (ICollection<Instruction>)methodDefinition.Body?.Instructions ?? Array.Empty<Instruction>();
 
             EnqueueAllCalls(state, ilInstructions);
 
@@ -224,7 +224,7 @@ namespace BenchmarkDotNet.Disassembler
             {
                 int hr = state.DebugControl.Disassemble(disasmAddress, 0,
                     disasmBuffer, disasmBuffer.Capacity, out uint disasmSize,
-                    out ulong nextInstr);
+                    out ulong endOffset);
                 if (hr != 0)
                     break;
 
@@ -241,13 +241,14 @@ namespace BenchmarkDotNet.Disassembler
                 {
                     TextRepresentation = disasmBuffer.ToString(),
                     Comment = calledMethodName,
-                    InstructionPointer = disasmAddress
+                    InstructionPointerFrom = disasmAddress,
+                    InstructionPointerTo = endOffset
                 };
 
-                if (nextInstr >= map.EndAddress)
+                if (endOffset >= map.EndAddress)
                     break;
 
-                disasmAddress = nextInstr;
+                disasmAddress = endOffset;
             }
         }
 

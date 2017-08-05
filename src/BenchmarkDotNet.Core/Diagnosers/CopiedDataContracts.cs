@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Xml.Serialization;
 
+#pragma warning disable CS3003 // I need ulong
 namespace BenchmarkDotNet.Diagnosers
 {
     // keep it in sync with src\BenchmarkDotNet.Disassembler.x64\DataContracts.cs!
@@ -16,7 +17,8 @@ namespace BenchmarkDotNet.Diagnosers
 
     public class Asm : Code
     {
-        public ulong InstructionPointer { get; set; }
+        public ulong InstructionPointerFrom { get; set; }
+        public ulong InstructionPointerTo { get; set; }
     }
 
     public class DisassembledMethod
@@ -56,3 +58,4 @@ namespace BenchmarkDotNet.Diagnosers
         }
     }
 }
+#pragma warning restore CS3003 // Type is not CLS-compliant
