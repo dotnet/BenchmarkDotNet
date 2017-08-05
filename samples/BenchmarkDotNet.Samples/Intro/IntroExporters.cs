@@ -24,6 +24,10 @@ namespace BenchmarkDotNet.Samples.Intro
     [MarkdownExporterAttribute.GitHub]
     [MarkdownExporterAttribute.StackOverflow]
     [MarkdownExporterAttribute.Atlassian]
+    [XmlExporterAttribute.Brief]
+    [XmlExporterAttribute.BriefCompressed]
+    [XmlExporterAttribute.Full]
+    [XmlExporterAttribute.FullCompressed]
     public class IntroExporters
     {
         private Random random = new Random(42);
