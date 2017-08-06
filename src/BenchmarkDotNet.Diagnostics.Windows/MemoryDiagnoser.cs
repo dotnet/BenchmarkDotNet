@@ -11,7 +11,6 @@ using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Parsers.Clr;
 using Microsoft.Diagnostics.Tracing.Session;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace BenchmarkDotNet.Diagnostics.Windows

@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private void Test<TBenchmark>(Jit jit, Platform platform, string benchmarkName, string calledMethodName)
         {
-            var disassemblyDiagnoser = new DisassemblyDiagnoser(printAsm: true, printRecursive: true);
+            var disassemblyDiagnoser = new DisassemblyDiagnoser(printAsm: true, recursiveDepth: 3);
 
             CanExecute<TBenchmark>(CreateConfig(jit, platform, disassemblyDiagnoser));
 

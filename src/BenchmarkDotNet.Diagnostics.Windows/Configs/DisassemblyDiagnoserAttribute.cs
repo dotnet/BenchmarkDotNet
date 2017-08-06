@@ -9,10 +9,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Configs
         /// <param name="printAsm">ASM will be printed. True by default.</param>
         /// <param name="printSource">C# source code will be printed. False by default.</param>
         /// <param name="printPrologAndEpilog">ASM for prolog and epilog will be printed. False by default.</param>
-        /// <param name="printRecursive">Includes called methods, not just the benchmark. False by default.</param>
-        public DisassemblyDiagnoserAttribute(bool printAsm = true, bool printIL = false, bool printSource = false, bool printPrologAndEpilog = false, bool printRecursive = false)
+        /// <param name="recursiveDepth">Includes called methods to given level. 1 by default, indexed from 1. To print just benchmark set to 0</param>
+        public DisassemblyDiagnoserAttribute(bool printAsm = true, bool printIL = false, bool printSource = false, bool printPrologAndEpilog = false, int recursiveDepth = 1)
         {
-            Config = ManualConfig.CreateEmpty().With(new DisassemblyDiagnoser(printAsm, printIL, printSource, printPrologAndEpilog, printRecursive));
+            Config = ManualConfig.CreateEmpty().With(new DisassemblyDiagnoser(printAsm, printIL, printSource, printPrologAndEpilog, recursiveDepth));
         }
 
         public IConfig Config { get; }

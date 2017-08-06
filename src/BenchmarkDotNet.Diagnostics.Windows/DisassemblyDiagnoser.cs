@@ -24,25 +24,31 @@ namespace BenchmarkDotNet.Diagnostics.Windows
     public class DisassemblyDiagnoser : IDisassemblyDiagnoser
     {
         public static readonly IDiagnoser Asm = new DisassemblyDiagnoser(printAsm: true);
-        public static readonly IDiagnoser AsmFullRecursive = new DisassemblyDiagnoser(printAsm: true, printPrologAndEpilog: true, printRecursive: true);
+        public static readonly IDiagnoser AsmFullRecursive = new DisassemblyDiagnoser(printAsm: true, printPrologAndEpilog: true, recursiveDepth: int.MaxValue);
         public static readonly IDiagnoser IL = new DisassemblyDiagnoser(printAsm: false, printIL: true);
         public static readonly IDiagnoser AsmAndIL = new DisassemblyDiagnoser(printAsm: true, printIL: true);
-        public static readonly IDiagnoser All = new DisassemblyDiagnoser(true, true, true, true, true);
+        public static readonly IDiagnoser All = new DisassemblyDiagnoser(true, true, true, true, int.MaxValue);
 
-        private readonly bool printAsm = true, printIL = false, printSource = false, printPrologAndEpilog = false, printRecursive = false;
+        private readonly bool printAsm = true, printIL = false, printSource = false, printPrologAndEpilog = false;
+        private readonly int recursiveDepth = 1;
 
         private readonly Dictionary<Benchmark, DisassemblyResult> results = new Dictionary<Benchmark, DisassemblyResult>();
 
         // ReSharper disable once EmptyConstructor parameterless ctor is mandatory for DiagnosersLoader.CreateDiagnoser
         public DisassemblyDiagnoser() { }
 
-        public DisassemblyDiagnoser(bool printAsm = true, bool printIL = false, bool printSource = false, bool printPrologAndEpilog = false, bool printRecursive = false)
+        /// <param name="printAsm">ASM will be printed. True by default.</param>
+        /// <param name="printIL">IL will be printed. False by default.</param>
+        /// <param name="printSource">C# source code will be printed. False by default.</param>
+        /// <param name="printPrologAndEpilog">ASM for prolog and epilog will be printed. False by default.</param>
+        /// <param name="recursiveDepth">Includes called methods to given level. 1 by default, indexed from 1. To print just benchmark set to 0</param>
+        public DisassemblyDiagnoser(bool printAsm = true, bool printIL = false, bool printSource = false, bool printPrologAndEpilog = false, int recursiveDepth = 1)
         {
             this.printIL = printIL;
             this.printAsm = printAsm;
             this.printSource = printSource;
             this.printPrologAndEpilog = printPrologAndEpilog;
-            this.printRecursive = printRecursive;
+            this.recursiveDepth = recursiveDepth;
         }
 
         public IReadOnlyDictionary<Benchmark, DisassemblyResult> Results => results;
@@ -149,7 +155,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         // must be kept in sync with BenchmarkDotNet.Disassembler.Program.Main
         private string BuildArguments(DiagnoserActionParameters parameters, string resultsPath)
             => $"{parameters.Process.Id} \"{parameters.Benchmark.Target.Type.FullName}\" \"{parameters.Benchmark.Target.Method.Name}\""
-             + $" {printAsm} {printIL} {printSource} {printPrologAndEpilog} {printRecursive}"
+             + $" {printAsm} {printIL} {printSource} {printPrologAndEpilog}"
+             + $" {recursiveDepth}"
              + $" \"{resultsPath}\"";
 
         // code copied from https://stackoverflow.com/a/33206186/5852046

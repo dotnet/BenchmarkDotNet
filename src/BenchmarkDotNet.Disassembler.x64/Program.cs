@@ -95,27 +95,26 @@ namespace BenchmarkDotNet.Disassembler
 
             var typeWithBenchmark = runtime.Heap.GetTypeByName(settings.TypeName);
 
-            state.Todo.Enqueue(typeWithBenchmark.Methods
-                    .Single(method => method.Name == settings.MethodName)); // benchmarks in BenchmarkDotNet are always parameterless, so check by name is enough as of today
+            // benchmarks in BenchmarkDotNet are always parameterless, so check by name is enough as of today
+            state.Todo.Enqueue(new MethodInfo(typeWithBenchmark.Methods.Single(method => method.Name == settings.MethodName), 0)); 
 
             while (state.Todo.Count != 0)
             {
                 var method = state.Todo.Dequeue();
 
-                if (!state.HandledMetadataTokens.Add(method.MetadataToken)) // add it now to avoid StackOverflow for recursive methods
+                if (!state.HandledMetadataTokens.Add(method.Method.MetadataToken)) // add it now to avoid StackOverflow for recursive methods
                     continue; // already handled
 
-                result.Add(DisassembleMethod(method, state, settings));
-
-                if (!settings.PrintRecursive)
-                    break;
+                if(settings.RecursiveDepth >= method.Depth)
+                    result.Add(DisassembleMethod(method, state, settings));
             }
 
             return result;
         }
 
-        static DisassembledMethod DisassembleMethod(ClrMethod method, State state, Settings settings)
+        static DisassembledMethod DisassembleMethod(MethodInfo methodInfo, State state, Settings settings)
         {
+            var method = methodInfo.Method;
             var assemblyDefinition = AssemblyDefinition.ReadAssembly(method.Type.Module.FileName);
             if (assemblyDefinition == null)
                 return DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, "Can't read assembly definition");
@@ -131,7 +130,7 @@ namespace BenchmarkDotNet.Disassembler
             // some methods have no implementation (abstract & CLR magic)
             var ilInstructions = (ICollection<Instruction>)methodDefinition.Body?.Instructions ?? Array.Empty<Instruction>();
 
-            EnqueueAllCalls(state, ilInstructions); 
+            EnqueueAllCalls(state, ilInstructions, methodInfo.Depth); 
 
             if (method.NativeCode == ulong.MaxValue)
                 return DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, "Method got inlined");
@@ -155,7 +154,7 @@ namespace BenchmarkDotNet.Disassembler
 
             var prolog = method.ILOffsetMap.First();
             if (prolog.ILOffset == -2 && settings.PrintPrologAndEpilog) // -2 is a magic number for prolog
-                instructions.AddRange(GetAsm(prolog, state));
+                instructions.AddRange(GetAsm(prolog, state, methodInfo.Depth));
 
             for (int i = 0; i < mapByILOffset.Length; ++i)
             {
@@ -174,12 +173,12 @@ namespace BenchmarkDotNet.Disassembler
                     instructions.AddRange(GetIL(correspondingIL));
 
                 if (settings.PrintAsm)
-                    instructions.AddRange(GetAsm(map, state));
+                    instructions.AddRange(GetAsm(map, state, methodInfo.Depth));
             }
 
             var epilog = method.ILOffsetMap.Last();
             if (epilog.ILOffset == -3 && settings.PrintPrologAndEpilog) // -3 is a magic number for epilog
-                instructions.AddRange(GetAsm(epilog, state));
+                instructions.AddRange(GetAsm(epilog, state, methodInfo.Depth));
 
             return new DisassembledMethod
             {
@@ -219,7 +218,7 @@ namespace BenchmarkDotNet.Disassembler
             }
         }
 
-        static IEnumerable<Asm> GetAsm(ILToNativeMap map, State state)
+        static IEnumerable<Asm> GetAsm(ILToNativeMap map, State state, int depth)
         {
             var disasmBuffer = new StringBuilder(512);
             ulong disasmAddress = map.StartAddress;
@@ -238,7 +237,7 @@ namespace BenchmarkDotNet.Disassembler
                 string calledMethodName = null;
 
                 if (textRepresentation.Contains("call"))
-                    calledMethodName = TryEnqueueCalledMethod(textRepresentation, state);
+                    calledMethodName = TryEnqueueCalledMethod(textRepresentation, state, depth);
 
                 yield return new Asm
                 {
@@ -269,7 +268,7 @@ namespace BenchmarkDotNet.Disassembler
                 : null; // "nop" can have no corresponding c# code ;)
         }
 
-        static string TryEnqueueCalledMethod(string textRepresentation, State state)
+        static string TryEnqueueCalledMethod(string textRepresentation, State state, int depth)
         {
             if (!TryGetHexAdress(textRepresentation, out ulong address))
                 return null; // call    qword ptr [rax+20h] // needs further research
@@ -280,7 +279,7 @@ namespace BenchmarkDotNet.Disassembler
                 return "not managed method";
 
             if (!state.HandledMetadataTokens.Contains(method.MetadataToken))
-                state.Todo.Enqueue(method);
+                state.Todo.Enqueue(new MethodInfo(method, depth + 1));
 
             return $"{method.Type.Name}.{method.Name}"; // method.GetFullSignature(); produces detailed, but too long string
         }
@@ -311,7 +310,7 @@ namespace BenchmarkDotNet.Disassembler
         /// <summary>
         /// for some calls we can not parse the method address from asm, so we just get it from IL
         /// </summary>
-        static void EnqueueAllCalls(State state, ICollection<Instruction> ilInstructions)
+        static void EnqueueAllCalls(State state, ICollection<Instruction> ilInstructions, int depth)
         {
             // let's try to enqueue all method calls that we can find in IL and were not printed yet
             foreach (var callInstruction in ilInstructions.Where(instruction => instruction.Operand is MethodReference)) // todo: handle CallSite
@@ -328,7 +327,7 @@ namespace BenchmarkDotNet.Disassembler
 
                 var calledMethod = GetMethod(methodReference, declaringType);
                 if (calledMethod != null && !state.HandledMetadataTokens.Contains(calledMethod.MetadataToken))
-                    state.Todo.Enqueue(calledMethod);
+                    state.Todo.Enqueue(new MethodInfo(calledMethod, depth + 1));
             }
         }
 
@@ -410,7 +409,7 @@ namespace BenchmarkDotNet.Disassembler
 
     class Settings
     {
-        private Settings(int processId, string typeName, string methodName, bool printAsm, bool printIL, bool printSource, bool printPrologAndEpilog, bool printRecursive, string resultsPath)
+        private Settings(int processId, string typeName, string methodName, bool printAsm, bool printIL, bool printSource, bool printPrologAndEpilog, int recursiveDepth, string resultsPath)
         {
             ProcessId = processId;
             TypeName = typeName;
@@ -419,21 +418,21 @@ namespace BenchmarkDotNet.Disassembler
             PrintIL = printIL;
             PrintSource = printSource;
             PrintPrologAndEpilog = printPrologAndEpilog;
-            PrintRecursive = printRecursive;
+            RecursiveDepth = recursiveDepth;
             ResultsPath = resultsPath;
         }
 
-        public int ProcessId { get; }
-        public string TypeName { get; }
-        public string MethodName { get; }
-        public bool PrintAsm { get; }
-        public bool PrintIL { get; }
-        public bool PrintSource { get; }
-        public bool PrintPrologAndEpilog { get; }
-        public bool PrintRecursive { get; }
-        public string ResultsPath { get; }
+        internal int ProcessId { get; }
+        internal string TypeName { get; }
+        internal string MethodName { get; }
+        internal bool PrintAsm { get; }
+        internal bool PrintIL { get; }
+        internal bool PrintSource { get; }
+        internal bool PrintPrologAndEpilog { get; }
+        internal int RecursiveDepth { get; }
+        internal string ResultsPath { get; }
 
-        public static Settings FromArgs(string[] args)
+        internal static Settings FromArgs(string[] args)
             => new Settings(
                 processId: int.Parse(args[0]),
                 typeName: args[1],
@@ -442,24 +441,36 @@ namespace BenchmarkDotNet.Disassembler
                 printIL: bool.Parse(args[4]),
                 printSource: bool.Parse(args[5]),
                 printPrologAndEpilog: bool.Parse(args[6]),
-                printRecursive: bool.Parse(args[7]),
+                recursiveDepth: int.Parse(args[7]),
                 resultsPath: args[8]
             );
     }
 
     class State
     {
-        public State(ClrRuntime runtime, IDebugControl debugControl)
+        internal State(ClrRuntime runtime, IDebugControl debugControl)
         {
             Runtime = runtime;
             DebugControl = debugControl;
-            Todo = new Queue<ClrMethod>();
+            Todo = new Queue<MethodInfo>();
             HandledMetadataTokens = new HashSet<uint>();
         }
 
-        public ClrRuntime Runtime { get; }
-        public IDebugControl DebugControl { get; }
-        public Queue<ClrMethod> Todo { get; }
-        public HashSet<uint> HandledMetadataTokens { get; }
+        internal ClrRuntime Runtime { get; }
+        internal IDebugControl DebugControl { get; }
+        internal Queue<MethodInfo> Todo { get; }
+        internal HashSet<uint> HandledMetadataTokens { get; }
+    }
+
+    struct MethodInfo // I am not using ValueTuple here (would be perfect) to keep the number of dependencies as low as possible
+    {
+        internal ClrMethod Method { get; }
+        internal int Depth { get; }
+
+        internal MethodInfo(ClrMethod method, int depth)
+        {
+            Method = method;
+            Depth = depth;
+        }
     }
 }
