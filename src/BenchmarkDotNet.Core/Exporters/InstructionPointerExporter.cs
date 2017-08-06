@@ -90,7 +90,7 @@ namespace BenchmarkDotNet.Exporters
                             ulong forRange = 0;
 
                             // ETW's InstructionPoiner seems to be the EndOffset of ClrMD !!!
-                            for (ulong instructionPointer = asm.InstructionPointerTo; instructionPointer > asm.InstructionPointerFrom; instructionPointer--)
+                            for (ulong instructionPointer = asm.EndAddress; instructionPointer > asm.StartAddress; instructionPointer--)
                                 if (hardwareCounter.Value.PerInstructionPointer.TryGetValue(instructionPointer, out var value))
                                     checked
                                     {
@@ -112,21 +112,21 @@ namespace BenchmarkDotNet.Exporters
                     logger.WriteLine($"<td><pre><code>{instruction.TextRepresentation}</pre></code></td><td>{instruction.Comment}</td>");
                     logger.WriteLine("</tr>");
                 }
+                logger.WriteLine($"<tr><td colspan=\"{columnsCount}\"></td></tr>");
             }
 
             logger.WriteLine("</tbody></table></body></html>");
         }
 
         /// <summary>
-        /// there might be some hardware counter events not belonging to the benchmarked code
-        /// but for example CLR or BenchmarkDotNet's Engine
+        /// there might be some hardware counter events not belonging to the benchmarked code (for example CLR or BenchmarkDotNet's Engine)
         /// to calculate the % per IP we need to know the total per benchmark, not per process
         /// </summary>
         private static Dictionary<HardwareCounter, ulong> SumHardwareCountersStatsOfBenchmarkedCodeOnly(DisassemblyResult disassemblyResult, PmcStats pmcStats)
         {
             IEnumerable<ulong> Range(Asm asm)
             {
-                for (ulong instructionPointer = asm.InstructionPointerFrom; instructionPointer <= asm.InstructionPointerTo; instructionPointer++)
+                for (ulong instructionPointer = asm.StartAddress; instructionPointer <= asm.EndAddress; instructionPointer++)
                     yield return instructionPointer;
             }
 

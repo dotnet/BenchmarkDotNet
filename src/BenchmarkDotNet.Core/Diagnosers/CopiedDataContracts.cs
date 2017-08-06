@@ -11,14 +11,28 @@ namespace BenchmarkDotNet.Diagnosers
         public string Comment { get; set; }
     }
 
-    public class Sharp : Code { }
+    public class Sharp : Code
+    {
+        public string FilePath { get; set; }
+        public int LineNumber { get; set; }
+    }
 
-    public class IL : Code { }
+    public class IL : Code
+    {
+        public int Offset { get; set; }
+    }
 
     public class Asm : Code
     {
-        public ulong InstructionPointerFrom { get; set; }
-        public ulong InstructionPointerTo { get; set; }
+        /// <summary>
+        /// The native start offset of this ASM representation
+        /// </summary>
+        public ulong StartAddress { get; set; }
+
+        /// <summary>
+        /// The native end offset of this ASM representation
+        /// </summary>
+        public ulong EndAddress { get; set; }
     }
 
     public class DisassembledMethod

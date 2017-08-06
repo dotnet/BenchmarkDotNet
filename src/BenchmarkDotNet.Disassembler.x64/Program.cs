@@ -89,7 +89,7 @@ namespace BenchmarkDotNet.Disassembler
             control?.Execute(DEBUG_OUTCTL.NOT_LOGGED, ".reload", DEBUG_EXECUTE.NOT_LOGGED);
         }
 
-        private static List<DisassembledMethod> Disassemble(Settings settings, ClrRuntime runtime, State state)
+        static List<DisassembledMethod> Disassemble(Settings settings, ClrRuntime runtime, State state)
         {
             var result = new List<DisassembledMethod>();
 
@@ -117,25 +117,21 @@ namespace BenchmarkDotNet.Disassembler
         static DisassembledMethod DisassembleMethod(ClrMethod method, State state, Settings settings)
         {
             var assemblyDefinition = AssemblyDefinition.ReadAssembly(method.Type.Module.FileName);
+            if (assemblyDefinition == null)
+                return DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, "Can't read assembly definition");
 
-            // searching by fullName does not work for some generic types like 
-            //               System.Threading.Tasks.TaskCompletionSource<System.__Canon> 
-            // Cecil expects System.Threading.Tasks.TaskCompletionSource`1
-            // and for nested types (Cecil uses `/`, ClrMD `+`)
-            // so we search by runtimeName
-            var typeReference = assemblyDefinition.MainModule.GetType(method.Type.Name, runtimeName: true);
-
-            // typeReference.Resolve() fails for the same magic types, so to get the typeDefinition we compare metadata tokens
-            var typeDefinition =
-                assemblyDefinition.MainModule.GetTypes().SingleOrDefault(type => type.MetadataToken.ToUInt32() == method.Type.MetadataToken)
-                ?? assemblyDefinition.MainModule.GetTypes().Single(type => type.MetadataToken.ToUInt32() == typeReference.MetadataToken.RID);  
+            var typeDefinition = assemblyDefinition.MainModule.GetTypes().SingleOrDefault(type => type.MetadataToken.ToUInt32() == method.Type.MetadataToken);
+            if (typeDefinition == null)
+                return DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, $"Can't find {method.Type.Name} in {assemblyDefinition.Name}");
 
             var methodDefinition = typeDefinition.Methods.Single(m => m.MetadataToken.ToUInt32() == method.MetadataToken);
+            if (methodDefinition == null)
+                return DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, $"Can't find {method.Name} of {typeDefinition.Name}");
 
-            // some methods have no implementation (abstract & clr magic)
+            // some methods have no implementation (abstract & CLR magic)
             var ilInstructions = (ICollection<Instruction>)methodDefinition.Body?.Instructions ?? Array.Empty<Instruction>();
 
-            EnqueueAllCalls(state, ilInstructions);
+            EnqueueAllCalls(state, ilInstructions); 
 
             if (method.NativeCode == ulong.MaxValue)
                 return DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, "Method got inlined");
@@ -187,14 +183,19 @@ namespace BenchmarkDotNet.Disassembler
 
             return new DisassembledMethod
             {
-                Instructions = instructions.ToArray(),
+                Instructions = EliminateDuplicates(instructions),
                 Name = method.GetFullSignature(),
                 NativeCode = method.NativeCode
             };
         }
 
         static IEnumerable<IL> GetIL(ICollection<Instruction> instructions)
-            => instructions.Select(instruction => new IL { TextRepresentation = instruction.ToString() });
+            => instructions.Select(instruction 
+                => new IL
+                {
+                    TextRepresentation = instruction.ToString(),
+                    Offset = instruction.Offset
+                });
 
         static IEnumerable<Sharp> GetSource(ClrMethod method, ILToNativeMap map)
         {
@@ -210,7 +211,9 @@ namespace BenchmarkDotNet.Disassembler
                 {
                     yield return new Sharp
                     {
-                        TextRepresentation = sourceLine + Environment.NewLine + new string(' ', sourceLocation.ColStart - 1) + new string('^', sourceLocation.ColEnd - sourceLocation.ColStart)
+                        TextRepresentation = sourceLine + Environment.NewLine + new string(' ', sourceLocation.ColStart - 1) + new string('^', sourceLocation.ColEnd - sourceLocation.ColStart),
+                        FilePath = sourceLocation.FilePath,
+                        LineNumber = line
                     };
                 }
             }
@@ -241,8 +244,8 @@ namespace BenchmarkDotNet.Disassembler
                 {
                     TextRepresentation = disasmBuffer.ToString(),
                     Comment = calledMethodName,
-                    InstructionPointerFrom = disasmAddress,
-                    InstructionPointerTo = endOffset
+                    StartAddress = disasmAddress,
+                    EndAddress = endOffset
                 };
 
                 if (endOffset >= map.EndAddress)
@@ -305,10 +308,13 @@ namespace BenchmarkDotNet.Disassembler
             return ulong.TryParse(addressPart, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out address);
         }
 
+        /// <summary>
+        /// for some calls we can not parse the method address from asm, so we just get it from IL
+        /// </summary>
         static void EnqueueAllCalls(State state, ICollection<Instruction> ilInstructions)
         {
             // let's try to enqueue all method calls that we can find in IL and were not printed yet
-            foreach (var callInstruction in ilInstructions.Where(instruction => instruction.Operand is MethodReference))
+            foreach (var callInstruction in ilInstructions.Where(instruction => instruction.Operand is MethodReference)) // todo: handle CallSite
             {
                 var methodReference = (MethodReference)callInstruction.Operand;
 
@@ -363,8 +369,43 @@ namespace BenchmarkDotNet.Disassembler
             => param.ParameterType.IsByReference 
                 ? param.ParameterType.Name.Replace("&", string.Empty) + " ByRef"
                 : param.ParameterType.Name;
-
         
+        static Code[] EliminateDuplicates(List<Code> instructions)
+            => instructions
+                .Distinct(CodeComparer.Instance)
+                .ToArray();
+
+        class CodeComparer : IEqualityComparer<Code>
+        {
+            internal static readonly IEqualityComparer<Code> Instance = new CodeComparer();
+
+            public bool Equals(Code x, Code y)
+            {
+                if (x.GetType() != y.GetType())
+                    return false;
+
+                // sometimes ClrMD reports same address range in two different ILToNativeMaps
+                // this happens usualy for prolog and the instruction after prolog
+                // and for the epilog and last instruction before epilog
+                if (x is Asm asmLeft && y is Asm asmRight)
+                    return asmLeft.StartAddress == asmRight.StartAddress && asmLeft.EndAddress == asmRight.EndAddress;
+
+                // sometimes some C# code lines are duplicated because the same line is the best match for multiple ILToNativeMaps
+                // we don't want to confuse the users, so this must also be removed
+                if (x is Sharp sharpLeft && y is Sharp sharpRight)
+                    return sharpLeft.TextRepresentation == sharpRight.TextRepresentation
+                        && sharpLeft.FilePath == sharpRight.FilePath
+                        && sharpLeft.LineNumber == sharpRight.LineNumber;
+
+                if (x is IL ilLeft && y is IL ilRight)
+                    return ilLeft.TextRepresentation == ilRight.TextRepresentation
+                        && ilLeft.Offset == ilRight.Offset;
+
+                throw new InvalidOperationException("Impossible");
+            }
+
+            public int GetHashCode(Code obj) => obj.TextRepresentation.GetHashCode();
+        }
     }
 
     class Settings

@@ -248,7 +248,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style)
                 => Results.TryGetValue(benchmark, out var stats) && stats.Counters.ContainsKey(HardwareCounter.InstructionRetired) && stats.Counters.ContainsKey(HardwareCounter.TotalCycles)
-                    ? (stats.Counters[HardwareCounter.InstructionRetired].Count / (double)stats.Counters[HardwareCounter.TotalCycles].Count).ToString("0:N2")
+                    ? (stats.Counters[HardwareCounter.InstructionRetired].Count / (double)stats.Counters[HardwareCounter.TotalCycles].Count).ToString("N2")
                     : "-";
         }
 
