@@ -38,10 +38,16 @@ namespace BenchmarkDotNet.Extensions
 
         private static Dictionary<string, string> BuildInvalidPathCharactersMappings()
         {
-            return Path.GetInvalidFileNameChars()
-                       .ToDictionary(
-                           character => character.ToString(),
-                           character => $"char{(short)character}");
+            var invalidFileNameChars = Path.GetInvalidFileNameChars().ToList();
+            
+            // '\\' is a valid file name char on Unix
+            // which can be a problem when we are working with MSBuild 
+            if (!invalidFileNameChars.Contains('\\'))
+                invalidFileNameChars.Add('\\');
+
+            return invalidFileNameChars.ToDictionary(
+                character => character.ToString(),
+                character => $"char{(short) character}");
         }
 
         /// <summary>

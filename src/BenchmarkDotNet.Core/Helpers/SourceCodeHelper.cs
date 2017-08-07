@@ -15,9 +15,9 @@ namespace BenchmarkDotNet.Core.Helpers
             if (value is bool)
                 return ((bool) value).ToLowerCase();
             if (value is string)
-                return $"\"{value}\"";
+                return $"\"{value.ToString().Replace("\\", "\\\\")}\"";
             if (value is char)
-                return $"'{value}'";
+                return (char) value == '\\' ? "'\\\\'" : $"'{value}'";
             if (value is float)
                 return ((float) value).ToString("G", CultureInfo.InvariantCulture) + "f";
             if (value is double)
