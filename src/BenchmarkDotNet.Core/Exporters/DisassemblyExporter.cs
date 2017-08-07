@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
@@ -30,30 +31,45 @@ namespace BenchmarkDotNet.Exporters
             logger.WriteLine("<html lang='en'>");
             logger.WriteLine("<head>");
             logger.WriteLine("<meta charset='utf-8' />");
-            logger.WriteLine($"<title> DisassemblyDiagnoser Output {summary.Title}</title>");
+            logger.WriteLine($"<title>DisassemblyDiagnoser Output {summary.Title}</title>");
             logger.WriteLine(HtmlExporter.CssDefinition);
             logger.WriteLine("</head>");
 
             logger.WriteLine("<body>");
 
-            foreach (var targetingSameMethod in benchmarksByTarget)
+            if (benchmarksByTarget.Any(group => group.Count() > 1)) // the user is comparing same method for different JITs
             {
-                PrintTable(targetingSameMethod.ToArray(), logger);
+                foreach (var targetingSameMethod in benchmarksByTarget)
+                {
+                    PrintTable(
+                        targetingSameMethod.ToArray(), 
+                        logger, 
+                        targetingSameMethod.First().Target.DisplayInfo, 
+                        benchmark => GetImportantInfo(benchmark.Job));
+                }
+            }
+            else // different methods, same JIT
+            {
+                PrintTable(
+                    summary.Benchmarks.Where(benchmark => results.ContainsKey(benchmark)).ToArray(), 
+                    logger, 
+                    summary.Title, 
+                    benchmark => $"{benchmark.Target.Method.Name} {GetImportantInfo(benchmark.Job)}");
             }
 
             logger.WriteLine("</body>");
             logger.WriteLine("</html>");
         }
 
-        private void PrintTable(Benchmark[] benchmarks, ILogger logger)
+        private void PrintTable(Benchmark[] benchmarks, ILogger logger, string title, Func<Benchmark, string> headerTitleProvider)
         {
             logger.WriteLine("<table>");
             logger.WriteLine("<thead>");
-            logger.WriteLine($"<tr><th colspan=\"{benchmarks.Length}\">{benchmarks[0].Target.DisplayInfo}</th></tr>");
+            logger.WriteLine($"<tr><th colspan=\"{benchmarks.Length}\">{title}</th></tr>");
             logger.WriteLine("<tr>");
             foreach (var benchmark in benchmarks)
             {
-                logger.WriteLine($"<th>{GetImportantInfo(benchmark.Job)}</th>");
+                logger.WriteLine($"<th>{headerTitleProvider(benchmark)}</th>");
             }
             logger.WriteLine("</tr>");
             logger.WriteLine("</thead>");

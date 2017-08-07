@@ -112,9 +112,16 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             var counters = stats.Counters.Values;
 
-            TraceEventProfileSources.Set( // it's a must have to get the events enabled!!
-                counters.Select(counter => counter.ProfileSourceId).ToArray(),
-                counters.Select(counter => counter.Interval).ToArray());
+            try
+            {
+                TraceEventProfileSources.Set( // it's a must have to get the events enabled!!
+                    counters.Select(counter => counter.ProfileSourceId).ToArray(),
+                    counters.Select(counter => counter.Interval).ToArray());
+            }
+            catch (System.Runtime.InteropServices.COMException ex) when (ex.Message.StartsWith("The WMI data block or event notification has already been enabled"))
+            {
+                // previous run was interrupted by ctrl+c and never stopped
+            }
 
             return stats;
         }

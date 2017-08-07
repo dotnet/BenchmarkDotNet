@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
@@ -44,7 +42,7 @@ namespace BenchmarkDotNet.Samples.JIT
             Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp11));
             Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp20));
 #if CLASSIC
-            Add(new Diagnostics.Windows.DisassemblyDiagnoser(printAsm: true, printPrologAndEpilog: true));
+            Add(new Diagnostics.Windows.DisassemblyDiagnoser(printAsm: true, printPrologAndEpilog: true, recursiveDepth: 3));
 #endif
         }
     }

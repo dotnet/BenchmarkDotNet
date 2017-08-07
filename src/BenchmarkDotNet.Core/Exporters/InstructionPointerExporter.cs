@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -14,7 +12,8 @@ namespace BenchmarkDotNet.Exporters
     {
         private const string CssStyle = @"
 <style type=""text/css"">
-	pre { margin: 0px; }
+    pre { margin: 0px; }
+    td.perMethod { border-top: 1px black solid; }
 </style>";
 
         private readonly IHardwareCountersDiagnoser hardwareCountersDiagnoser;
@@ -48,85 +47,31 @@ namespace BenchmarkDotNet.Exporters
             if (File.Exists(filePath))
                 File.Delete(filePath);
 
-            using (var stream = Portability.StreamWriter.FromPath(filePath))
+            checked
             {
-                Export(new StreamLogger(stream), benchmark, disassemblyResult, pmcStats);
+                var totals = SumHardwareCountersStatsOfBenchmarkedCode(disassemblyResult, pmcStats);
+                var perMethod = SumHardwareCountersPerMethod(disassemblyResult, pmcStats);
+
+                using (var stream = Portability.StreamWriter.FromPath(filePath))
+                {
+                    Export(new StreamLogger(stream), benchmark, totals, perMethod, pmcStats.Counters.Keys.ToArray());
+                }
             }
 
             return filePath;
-        }
-
-        private void Export(ILogger logger, Benchmark benchmark, DisassemblyResult disassemblyResult, PmcStats pmcStats)
-        {
-            logger.WriteLine("<!DOCTYPE html><html lang='en'><head><meta charset='utf-8' />");
-            logger.WriteLine($"<title>Combined Output of DisassemblyDiagnoser and HardwareCounters {benchmark.DisplayInfo}</title>");
-            logger.WriteLine(CssStyle);
-            logger.WriteLine("</head>");
-
-            logger.WriteLine("<body><table><thead><tr>");
-
-            foreach (var hardwareCounter in pmcStats.Counters)
-                logger.WriteLine($"<th>{hardwareCounter.Key.ToShortName()}</th>");
-
-            logger.WriteLine("<th></th><th></th></tr></thead>");
-
-            int countersCount = pmcStats.Counters.Count, columnsCount = countersCount + 2;
-
-            var totals = SumHardwareCountersStatsOfBenchmarkedCodeOnly(disassemblyResult, pmcStats);
-
-            logger.WriteLine("<tbody>");
-            foreach (var method in disassemblyResult.Methods.Where(method => string.IsNullOrEmpty(method.Problem)))
-            {
-                logger.WriteLine($"<tr><td colspan=\"{columnsCount}\">{method.Name}</th></tr>");
-
-                foreach (var instruction in method.Instructions)
-                {
-                    logger.WriteLine("<tr>");
-                    if (instruction is Asm asm)
-                    {
-                        foreach (var hardwareCounter in pmcStats.Counters)
-                        {
-                            var total = totals[hardwareCounter.Key];
-                            ulong forRange = 0;
-
-                            // ETW's InstructionPoiner seems to be the EndOffset of ClrMD !!!
-                            for (ulong instructionPointer = asm.EndAddress; instructionPointer > asm.StartAddress; instructionPointer--)
-                                if (hardwareCounter.Value.PerInstructionPointer.TryGetValue(instructionPointer, out var value))
-                                    checked
-                                    {
-                                        forRange += value;
-                                    }
-
-                            if (forRange != 0)
-                                logger.Write($"<td title=\"{forRange} of {total}\">{((double)forRange / total):P}</td>");
-                            else
-                                logger.Write("<td></td>");
-                        }
-                    }
-                    else
-                    {
-                        for (int i = 0; i < countersCount; i++)
-                            logger.Write("<td></td>");
-                    }
-
-                    logger.WriteLine($"<td><pre><code>{instruction.TextRepresentation}</pre></code></td><td>{instruction.Comment}</td>");
-                    logger.WriteLine("</tr>");
-                }
-                logger.WriteLine($"<tr><td colspan=\"{columnsCount}\"></td></tr>");
-            }
-
-            logger.WriteLine("</tbody></table></body></html>");
         }
 
         /// <summary>
         /// there might be some hardware counter events not belonging to the benchmarked code (for example CLR or BenchmarkDotNet's Engine)
         /// to calculate the % per IP we need to know the total per benchmark, not per process
         /// </summary>
-        private static Dictionary<HardwareCounter, ulong> SumHardwareCountersStatsOfBenchmarkedCodeOnly(DisassemblyResult disassemblyResult, PmcStats pmcStats)
+        private static Dictionary<HardwareCounter, (ulong withoutNoise, ulong total)> SumHardwareCountersStatsOfBenchmarkedCode(
+            DisassemblyResult disassemblyResult, PmcStats pmcStats)
         {
             IEnumerable<ulong> Range(Asm asm)
             {
-                for (ulong instructionPointer = asm.StartAddress; instructionPointer <= asm.EndAddress; instructionPointer++)
+                // most probably asm.StartAddress would be enough, but I don't want to miss any edge case
+                for (ulong instructionPointer = asm.StartAddress; instructionPointer < asm.EndAddress; instructionPointer++)
                     yield return instructionPointer;
             }
 
@@ -139,17 +84,159 @@ namespace BenchmarkDotNet.Exporters
 
             return pmcStats.Counters.ToDictionary(data => data.Key, data =>
             {
-                ulong sum = 0;
+                ulong withoutNoise = 0, total = 0;
 
                 foreach (var ipToCount in data.Value.PerInstructionPointer)
-                    if (instructionPointers.Contains(ipToCount.Key))
-                        checked
-                        {
-                            sum += ipToCount.Value;
-                        }
+                {
+                    total += ipToCount.Value;
 
-                return sum;
+                    if (instructionPointers.Contains(ipToCount.Key))
+                        withoutNoise += ipToCount.Value;
+                }
+
+                return (withoutNoise, total);
             });
+        }
+
+        private static IReadOnlyList<MethodWithCounters> SumHardwareCountersPerMethod(DisassemblyResult disassemblyResult, PmcStats pmcStats)
+        {
+            var model = new List<MethodWithCounters>(disassemblyResult.Methods.Length);
+
+            foreach (var method in disassemblyResult.Methods.Where(method => string.IsNullOrEmpty(method.Problem)))
+            {
+                var codeWithCounters = new List<CodeWithCounters>(method.Instructions.Length);
+
+                foreach (var instruction in method.Instructions)
+                {
+                    var totalsPerCounter = pmcStats.Counters.Keys.ToDictionary(key => key, _ => default(ulong));
+
+                    if (instruction is Asm asm)
+                    {
+                        foreach (var hardwareCounter in pmcStats.Counters)
+                        {
+                            // most probably asm.StartAddress would be enough, but I don't want to miss any edge case
+                            for (ulong instructionPointer = asm.StartAddress; instructionPointer < asm.EndAddress; instructionPointer++)
+                                if (hardwareCounter.Value.PerInstructionPointer.TryGetValue(instructionPointer, out var value))
+                                    totalsPerCounter[hardwareCounter.Key] = totalsPerCounter[hardwareCounter.Key] + value;
+                        }
+                    }
+
+                    codeWithCounters.Add(new CodeWithCounters
+                    {
+                        Code = instruction,
+                        SumPerCounter = totalsPerCounter,
+                    });
+                }
+
+                model.Add(new MethodWithCounters
+                {
+                    Method = method,
+                    Instructions = codeWithCounters,
+                    SumPerCounter = pmcStats.Counters.Keys.ToDictionary(
+                        hardwareCounter => hardwareCounter,
+                        hardwareCounter =>
+                        {
+                            ulong sum = 0;
+
+                            foreach (var codeWithCounter in codeWithCounters)
+                                sum += codeWithCounter.SumPerCounter[hardwareCounter];
+
+                            return sum;
+                        }
+                    )
+                });
+            }
+
+            return model;
+        }
+
+        private void Export(ILogger logger, Benchmark benchmark, Dictionary<HardwareCounter, (ulong withoutNoise, ulong total)> totals, IReadOnlyList<MethodWithCounters> model, HardwareCounter[] hardwareCounters)
+        {
+            int columnsCount = hardwareCounters.Length + 2;
+
+            logger.WriteLine("<!DOCTYPE html><html lang='en'><head><meta charset='utf-8' />");
+            logger.WriteLine($"<title>Combined Output of DisassemblyDiagnoser and HardwareCounters {benchmark.DisplayInfo}</title>");
+            logger.WriteLine(CssStyle);
+            logger.WriteLine("</head>");
+
+            logger.WriteLine("<body>");
+
+            logger.WriteLine("<!-- Generated with BenchmarkDotNet ");
+            foreach(var total in totals)
+            {
+                // this stats are mostly for me, the maintainer, who wants to know if removing nosie makes any sense
+                logger.WriteLine($"For {total.Key} we have {total.Value.total} in total, {total.Value.withoutNoise} without noise");
+            }
+            logger.WriteLine("-->");
+
+            logger.WriteLine("<table><thead><tr>");
+
+            foreach (var hardwareCounter in hardwareCounters)
+                logger.WriteLine($"<th>{hardwareCounter.ToShortName()}</th>");
+
+            logger.WriteLine("<th></th><th></th></tr></thead>");
+
+            logger.WriteLine("<tbody>");
+            foreach (var method in model.Where(data => data.HasCounters))
+            {
+                logger.WriteLine($"<tr><th colspan=\"{columnsCount}\">{method.Method.Name}</th></tr>");
+
+                foreach (var instruction in method.Instructions)
+                {
+                    logger.WriteLine("<tr>");
+                    foreach (var hardwareCounter in hardwareCounters)
+                    {
+                        var totalWithoutNoise = totals[hardwareCounter].withoutNoise;
+                        var forRange = instruction.SumPerCounter[hardwareCounter];
+
+                        if (forRange != 0)
+                            logger.Write($"<td title=\"{forRange} of {totalWithoutNoise}\">{((double)forRange / totalWithoutNoise):P}</td>");
+                        else
+                            logger.Write("<td>-</td>");
+                    }
+                    logger.WriteLine($"<td><pre><code>{instruction.Code.TextRepresentation}</pre></code></td><td>{instruction.Code.Comment}</td>");
+                    logger.WriteLine("</tr>");
+                }
+
+                logger.WriteLine("<tr>");
+                foreach (var hardwareCounter in hardwareCounters)
+                {
+                    var totalWithoutNoise = totals[hardwareCounter].withoutNoise;
+                    var forMethod = method.SumPerCounter[hardwareCounter];
+
+                    if (forMethod != 0)
+                        logger.Write($"<td class=\"perMethod\" title=\"{forMethod} of {totalWithoutNoise}\">{((double)forMethod / totalWithoutNoise):P}</td>");
+                    else
+                        logger.Write("<td  class=\"perMethod\">-</td>");
+                }
+                logger.WriteLine("<td></td><td></td></tr>");
+                logger.WriteLine($"<tr><td colspan=\"{columnsCount}\"></td></tr>");
+            }
+
+            if (model.Any(data => !data.HasCounters))
+            {
+                logger.WriteLine($"<tr><td colspan=\"{columnsCount}\">Method(s) without any hardware counters:</td></tr>");
+
+                foreach (var method in model.Where(data => !data.HasCounters))
+                    logger.WriteLine($"<tr><td colspan=\"{columnsCount}\">{method.Method.Name}</td></tr>");
+            }
+
+            logger.WriteLine("</tbody></table></body></html>");
+        }
+
+        class CodeWithCounters
+        {
+            internal Diagnosers.Code Code { get; set; }
+            internal IReadOnlyDictionary<HardwareCounter, ulong> SumPerCounter { get; set; }
+        }
+
+        class MethodWithCounters
+        {
+            internal DisassembledMethod Method { get; set; }
+            internal IReadOnlyList<CodeWithCounters> Instructions { get; set; }
+            internal IReadOnlyDictionary<HardwareCounter, ulong> SumPerCounter { get; set; }
+
+            internal bool HasCounters => SumPerCounter.Values.Any(value => value != default(ulong));
         }
     }
 }

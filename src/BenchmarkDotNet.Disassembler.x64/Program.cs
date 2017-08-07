@@ -117,15 +117,15 @@ namespace BenchmarkDotNet.Disassembler
             var method = methodInfo.Method;
             var assemblyDefinition = AssemblyDefinition.ReadAssembly(method.Type.Module.FileName);
             if (assemblyDefinition == null)
-                return DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, "Can't read assembly definition");
+                return CreateEmpty(method, "Can't read assembly definition");
 
             var typeDefinition = assemblyDefinition.MainModule.GetTypes().SingleOrDefault(type => type.MetadataToken.ToUInt32() == method.Type.MetadataToken);
             if (typeDefinition == null)
-                return DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, $"Can't find {method.Type.Name} in {assemblyDefinition.Name}");
+                return CreateEmpty(method, $"Can't find {method.Type.Name} in {assemblyDefinition.Name}");
 
             var methodDefinition = typeDefinition.Methods.Single(m => m.MetadataToken.ToUInt32() == method.MetadataToken);
             if (methodDefinition == null)
-                return DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, $"Can't find {method.Name} of {typeDefinition.Name}");
+                return CreateEmpty(method, $"Can't find {method.Name} of {typeDefinition.Name}");
 
             // some methods have no implementation (abstract & CLR magic)
             var ilInstructions = (ICollection<Instruction>)methodDefinition.Body?.Instructions ?? Array.Empty<Instruction>();
@@ -133,10 +133,12 @@ namespace BenchmarkDotNet.Disassembler
             EnqueueAllCalls(state, ilInstructions, methodInfo.Depth); 
 
             if (method.NativeCode == ulong.MaxValue)
-                return DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, "Method got inlined");
+                if(method.IsAbstract) return CreateEmpty(method, "Abstract method");
+                else if (method.IsVirtual) CreateEmpty(method, "Virtual method");
+                else return CreateEmpty(method, "Method got inlined");
 
             if (method.ILOffsetMap == null)
-                return DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, "No ILOffsetMap found");
+                return CreateEmpty(method, "No ILOffsetMap found");
 
             var instructions = new List<Code>();
 
@@ -373,6 +375,9 @@ namespace BenchmarkDotNet.Disassembler
             => instructions
                 .Distinct(CodeComparer.Instance)
                 .ToArray();
+
+        static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
+            => DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, reason);
 
         class CodeComparer : IEqualityComparer<Code>
         {
