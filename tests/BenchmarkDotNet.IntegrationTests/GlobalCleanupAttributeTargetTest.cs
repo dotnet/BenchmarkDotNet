@@ -10,11 +10,12 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class GlobalCleanupAttributeTargetTest : BenchmarkTestExecutor
     {
+        private const string BaselineGlobalCleanupCalled = "// ### Baseline GlobalCleanup called ###";
+        private const string BaselineBenchmarkCalled = "// ### Baseline Benchmark called ###";
         private const string FirstGlobalCleanupCalled = "// ### First GlobalCleanup called ###";
         private const string FirstBenchmarkCalled = "// ### First Benchmark called ###";
         private const string SecondGlobalCleanupCalled = "// ### Second GlobalCleanup called ###";
         private const string SecondBenchmarkCalled = "// ### Second Benchmark called ###";
-
 
         public GlobalCleanupAttributeTargetTest(ITestOutputHelper output) : base(output) { }
 
@@ -27,6 +28,11 @@ namespace BenchmarkDotNet.IntegrationTests
             CanExecute<GlobalCleanupAttributeTargetBenchmarks>(config);
 
             string log = logger.GetLog();
+
+            Assert.Contains(BaselineBenchmarkCalled + Environment.NewLine, log);
+            Assert.True(
+                log.IndexOf(BaselineBenchmarkCalled + Environment.NewLine) < 
+                log.IndexOf(BaselineGlobalCleanupCalled + Environment.NewLine));
 
             Assert.Contains(FirstGlobalCleanupCalled + Environment.NewLine, log);
             Assert.Contains(FirstBenchmarkCalled + Environment.NewLine, log);
@@ -44,6 +50,22 @@ namespace BenchmarkDotNet.IntegrationTests
         public class GlobalCleanupAttributeTargetBenchmarks
         {
             private int cleanupValue;
+
+            [Benchmark(Baseline = true)]
+            public void BaselineBenchmark()
+            {
+                cleanupValue = -1;
+
+                Console.WriteLine(BaselineBenchmarkCalled);
+            }
+
+            [GlobalCleanup]
+            public void BaselineCleanup()
+            {
+                Assert.Equal(-1, cleanupValue);
+
+                Console.WriteLine(BaselineGlobalCleanupCalled);
+            }
 
             [Benchmark]
             public void Benchmark1()

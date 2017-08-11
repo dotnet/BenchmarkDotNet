@@ -10,6 +10,8 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class GlobalSetupAttributeTargetTest : BenchmarkTestExecutor
     {
+        private const string BaselineGlobalSetupCalled = "// ### Baseline GlobalSetup called ###";
+        private const string BaselineBenchmarkCalled = "// ### Baseline Benchmark called ###";
         private const string FirstGlobalSetupCalled = "// ### First GlobalSetup called ###";
         private const string FirstBenchmarkCalled = "// ### First Benchmark called ###";
         private const string SecondGlobalSetupCalled = "// ### Second GlobalSetup called ###";
@@ -27,6 +29,11 @@ namespace BenchmarkDotNet.IntegrationTests
             
             string log = logger.GetLog();
 
+            Assert.Contains(BaselineGlobalSetupCalled + Environment.NewLine, log);
+            Assert.True(
+                log.IndexOf(BaselineGlobalSetupCalled + Environment.NewLine) < 
+                log.IndexOf(BaselineBenchmarkCalled + Environment.NewLine));
+
             Assert.Contains(FirstGlobalSetupCalled + Environment.NewLine, log);
             Assert.True(
                 log.IndexOf(FirstGlobalSetupCalled + Environment.NewLine) <
@@ -41,6 +48,22 @@ namespace BenchmarkDotNet.IntegrationTests
         public class GlobalSetupAttributeTargetBenchmarks
         {
             private int setupValue;
+
+            [GlobalSetup]
+            public void BaselineSetup()
+            {
+                setupValue = -1;
+
+                Console.WriteLine(BaselineGlobalSetupCalled);
+            }
+
+            [Benchmark(Baseline = true)]
+            public void BaselineBenchmark()
+            {
+                Assert.Equal(-1, setupValue);
+
+                Console.WriteLine(BaselineBenchmarkCalled);
+            }
 
             [GlobalSetup(Target = nameof(Benchmark1))]
             public void GlobalSetup1()
