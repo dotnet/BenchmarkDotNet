@@ -1,6 +1,6 @@
-﻿using System;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains.CsProj;
@@ -41,9 +41,8 @@ namespace BenchmarkDotNet.Samples.JIT
             Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Clr));
             Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp11));
             Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp20));
-#if CLASSIC
-            Add(new Diagnostics.Windows.DisassemblyDiagnoser(printAsm: true, printPrologAndEpilog: true, recursiveDepth: 3));
-#endif
+
+            Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(printAsm: true, printPrologAndEpilog: true, recursiveDepth: 3)));
         }
     }
 }

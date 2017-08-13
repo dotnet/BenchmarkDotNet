@@ -19,6 +19,8 @@ namespace BenchmarkDotNet.Diagnosers
             this.diagnosers = diagnosers.Distinct().ToArray();
         }
 
+        public bool IsExtraRunRequired => diagnosers.Any(diagnoser => diagnoser.IsExtraRunRequired);
+
         public IEnumerable<string> Ids => diagnosers.SelectMany(d => d.Ids);
 
         public IEnumerable<IExporter> Exporters 

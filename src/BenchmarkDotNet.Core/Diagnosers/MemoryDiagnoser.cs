@@ -23,6 +23,8 @@ namespace BenchmarkDotNet.Diagnosers
 
         private readonly Dictionary<Benchmark, GcStats> results = new Dictionary<Benchmark, GcStats>();
 
+        public bool IsExtraRunRequired => true;
+
         public IEnumerable<string> Ids => new[] { DiagnoserId };
 
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();

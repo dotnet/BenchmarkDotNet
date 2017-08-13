@@ -10,6 +10,8 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public interface IDiagnoser
     {
+        bool IsExtraRunRequired { get; }
+
         IEnumerable<string> Ids { get; } 
 
         IEnumerable<IExporter> Exporters { get; }
@@ -41,5 +43,10 @@ namespace BenchmarkDotNet.Diagnosers
         void DisplayResults(ILogger logger);
 
         IEnumerable<ValidationError> Validate(ValidationParameters validationParameters);
+    }
+
+    public interface IConfigurableDiagnoser<TConfig> : IDiagnoser
+    {
+        IConfigurableDiagnoser<TConfig> Configure(TConfig config);
     }
 }

@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
 
-namespace BenchmarkDotNet.Diagnostics.Windows.Configs
+namespace BenchmarkDotNet.Attributes
 {
     public class DisassemblyDiagnoserAttribute : Attribute, IConfigSource
     {
@@ -12,7 +13,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Configs
         /// <param name="recursiveDepth">Includes called methods to given level. 1 by default, indexed from 1. To print just benchmark set to 0</param>
         public DisassemblyDiagnoserAttribute(bool printAsm = true, bool printIL = false, bool printSource = false, bool printPrologAndEpilog = false, int recursiveDepth = 1)
         {
-            Config = ManualConfig.CreateEmpty().With(new DisassemblyDiagnoser(printAsm, printIL, printSource, printPrologAndEpilog, recursiveDepth));
+            Config = ManualConfig.CreateEmpty().With(
+                DisassemblyDiagnoser.Create(
+                    new DisassemblyDiagnoserConfig(printAsm, printIL, printSource, printPrologAndEpilog, recursiveDepth)));
         }
 
         public IConfig Config { get; }

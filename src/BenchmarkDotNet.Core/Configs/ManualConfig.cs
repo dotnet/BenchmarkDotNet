@@ -78,8 +78,7 @@ namespace BenchmarkDotNet.Configs
             if (hardwareCounters.IsEmpty())
                 return diagnosers;
 
-            var hardwareCountersDiagnoser = DiagnosersLoader.LazyLoadedDiagnosers.Value
-                .SingleOrDefault(diagnoser => diagnoser is IHardwareCountersDiagnoser);
+            var hardwareCountersDiagnoser = DiagnosersLoader.GetImplementation<IHardwareCountersDiagnoser>();
 
             if(hardwareCountersDiagnoser != default(IDiagnoser))
                 return diagnosers.Union(new [] { hardwareCountersDiagnoser });

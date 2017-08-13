@@ -318,7 +318,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteLine();
 
             // Do a "Diagnostic" run, but DISCARD the results, so that the overhead of Diagnostics doesn't skew the overall results
-            if (config.GetDiagnosers().Any())
+            if (config.GetDiagnosers().Any(diagnoser => diagnoser.IsExtraRunRequired))
             {
                 logger.WriteLineInfo("// Run, Diagnostic");
                 var compositeDiagnoser = config.GetCompositeDiagnoser();
@@ -334,10 +334,6 @@ namespace BenchmarkDotNet.Running
                 if (!executeResult.FoundExecutable)
                     logger.WriteLineError("Executable not found");
                 logger.WriteLine();
-            }
-            else if (config.GetHardwareCounters().Any())
-            {
-                logger.WriteLineError("Hardware Counters are not supported for your current platform yet");
             }
 
             return executeResults;
