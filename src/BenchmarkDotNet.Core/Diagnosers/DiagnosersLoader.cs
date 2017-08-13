@@ -41,7 +41,13 @@ namespace BenchmarkDotNet.Diagnosers
 
         private static IDiagnoser[] LoadCore() => new IDiagnoser[] { MemoryDiagnoser.Default };
 
-        private static IDiagnoser[] LoadMono() => new IDiagnoser[] { MemoryDiagnoser.Default }; // this method should return a IHardwareCountersDiagnoser when we implement Hardware Counters for Unix
+        private static IDiagnoser[] LoadMono() 
+            => new IDiagnoser[]
+            {
+                // this method should return a IHardwareCountersDiagnoser when we implement Hardware Counters for Unix
+                MemoryDiagnoser.Default,
+                new MonoDisassemblyDiagnoser(new DisassemblyDiagnoserConfig())
+            }; 
 
 #if CLASSIC
         private static IDiagnoser[] LoadClassic()

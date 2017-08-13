@@ -40,6 +40,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             recursiveDepth = config.RecursiveDepth;
         }
 
+        public bool IsExtraRunRequired => true;
+
         public IReadOnlyDictionary<Benchmark, DisassemblyResult> Results => results;
 
         public IEnumerable<string> Ids => new[] { nameof(DisassemblyDiagnoser) };

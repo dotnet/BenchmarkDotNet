@@ -142,13 +142,13 @@ namespace BenchmarkDotNet.Running
                     maxNameWidth = Math.Max(maxNameWidth, columnWithLegends.Select(c => c.ColumnName.Length).Max());
                 if (effectiveTimeUnit != null)
                     maxNameWidth = Math.Max(maxNameWidth, effectiveTimeUnit.Name.Length + 2);
-                
+
                 foreach (var column in columnWithLegends)
                     logger.WriteLineHint($"  {column.ColumnName.PadRight(maxNameWidth, ' ')} : {column.Legend}");
-                
+
                 if (effectiveTimeUnit != null)
-                  logger.WriteLineHint($"  {("1 " + effectiveTimeUnit.Name).PadRight(maxNameWidth, ' ')} :" +
-                                       $" 1 {effectiveTimeUnit.Description} ({TimeUnit.Convert(1, effectiveTimeUnit, TimeUnit.Second).ToStr("0.#########")} sec)");
+                    logger.WriteLineHint($"  {("1 " + effectiveTimeUnit.Name).PadRight(maxNameWidth, ' ')} :" +
+                                         $" 1 {effectiveTimeUnit.Description} ({TimeUnit.Convert(1, effectiveTimeUnit, TimeUnit.Second).ToStr("0.#########")} sec)");
             }
 
             if (config.GetDiagnosers().Any())
@@ -273,7 +273,7 @@ namespace BenchmarkDotNet.Running
             int defaultValue = analyzeRunToRunVariance ? 2 : 1;
             int launchCount = Math.Max(
                 1,
-                autoLaunchCount ? defaultValue: benchmark.Job.Run.LaunchCount);
+                autoLaunchCount ? defaultValue : benchmark.Job.Run.LaunchCount);
 
             for (int launchIndex = 0; launchIndex < launchCount; launchIndex++)
             {
@@ -336,6 +336,13 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLine();
             }
 
+            foreach (var diagnoser in config.GetDiagnosers().Where(diagnoser => !diagnoser.IsExtraRunRequired))
+            {
+                logger.WriteLineInfo("// Run, Diagnostic [IsExtraRunRequired=false]");
+
+                diagnoser.ProcessResults(benchmark, null);
+            }
+
             return executeResults;
         }
 
@@ -365,7 +372,7 @@ namespace BenchmarkDotNet.Running
             if (!(toolchain is InProcessToolchain) // we don't want to mess with assembly loading when running benchmarks in the same process (could produce wrong results)
                 && !RuntimeInformation.IsMono()) // so far it was never an issue for Mono
             {
-                 return Helpers.DirtyAssemblyResolveHelper.Create(logger); 
+                return Helpers.DirtyAssemblyResolveHelper.Create(logger);
             }
 #endif
             return null;

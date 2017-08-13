@@ -11,9 +11,9 @@ namespace BenchmarkDotNet.Exporters
 {
     public class DisassemblyExporter : ExporterBase
     {
-        private readonly Dictionary<Benchmark, DisassemblyResult> results;
+        private readonly IReadOnlyDictionary<Benchmark, DisassemblyResult> results;
 
-        public DisassemblyExporter(Dictionary<Benchmark, DisassemblyResult> results)
+        public DisassemblyExporter(IReadOnlyDictionary<Benchmark, DisassemblyResult> results)
         {
             this.results = results;
         }

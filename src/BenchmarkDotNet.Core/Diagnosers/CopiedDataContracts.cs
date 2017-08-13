@@ -5,7 +5,7 @@ using System.Xml.Serialization;
 namespace BenchmarkDotNet.Diagnosers
 {
     // keep it in sync with src\BenchmarkDotNet.Disassembler.x64\DataContracts.cs!
-    public abstract class Code
+    public class Code
     {
         public string TextRepresentation { get; set; }
         public string Comment { get; set; }
@@ -44,6 +44,7 @@ namespace BenchmarkDotNet.Diagnosers
         public string Problem { get; set; }
 
         [XmlArray("Instructions")]
+        [XmlArrayItem(nameof(Code), typeof(Code))]
         [XmlArrayItem(nameof(Sharp), typeof(Sharp))]
         [XmlArrayItem(nameof(IL), typeof(IL))]
         [XmlArrayItem(nameof(Asm), typeof(Asm))]
