@@ -114,7 +114,7 @@ namespace BenchmarkDotNet.Running
                     AssertMethodIsNotGeneric(methodName, m);
 
                     return new Tuple<MethodInfo, TargetedAttribute>(m, attr);
-                })).ToArray();
+                })).OrderByDescending(x => x.Item2.Target ?? "").ToArray();
         }
 
         private static Target CreateTarget(
