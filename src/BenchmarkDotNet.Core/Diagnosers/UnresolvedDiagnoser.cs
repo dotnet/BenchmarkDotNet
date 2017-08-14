@@ -25,7 +25,8 @@ namespace BenchmarkDotNet.Diagnosers
             this.unresolved = unresolved;
         }
 
-        public bool IsExtraRunRequired => false;
+        public RunMode GetRunMode(Benchmark benchmark) => RunMode.None;
+
         public IEnumerable<string> Ids => Array.Empty<string>();
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
         public IColumnProvider GetColumnProvider() => EmptyColumnProvider.Instance;

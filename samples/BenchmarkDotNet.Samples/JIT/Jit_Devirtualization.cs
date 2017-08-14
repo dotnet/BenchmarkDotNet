@@ -36,9 +36,13 @@ namespace BenchmarkDotNet.Samples.JIT
     {
         public MultipleJits()
         {
+            Add(Job.ShortRun.With(Runtime.Mono).With(Platform.X86));
+            Add(Job.ShortRun.With(Runtime.Mono).With(Platform.X64));
+
             Add(Job.ShortRun.With(Jit.LegacyJit).With(Platform.X86).With(Runtime.Clr));
             Add(Job.ShortRun.With(Jit.LegacyJit).With(Platform.X64).With(Runtime.Clr));
             Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Clr));
+
             Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp11));
             Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp20));
 

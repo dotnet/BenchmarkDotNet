@@ -318,10 +318,10 @@ namespace BenchmarkDotNet.Running
             logger.WriteLine();
 
             // Do a "Diagnostic" run, but DISCARD the results, so that the overhead of Diagnostics doesn't skew the overall results
-            if (config.GetDiagnosers().Any(diagnoser => diagnoser.IsExtraRunRequired))
+            if (config.GetDiagnosers().Any(diagnoser => diagnoser.GetRunMode(benchmark) == Diagnosers.RunMode.ExtraRun))
             {
                 logger.WriteLineInfo("// Run, Diagnostic");
-                var compositeDiagnoser = config.GetCompositeDiagnoser();
+                var compositeDiagnoser = config.GetCompositeDiagnoser(benchmark, Diagnosers.RunMode.ExtraRun);
 
                 var executeResult = toolchain.Executor.Execute(
                     new ExecuteParameters(buildResult, benchmark, logger, resolver, config, compositeDiagnoser));
@@ -336,9 +336,9 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLine();
             }
 
-            foreach (var diagnoser in config.GetDiagnosers().Where(diagnoser => !diagnoser.IsExtraRunRequired))
+            foreach (var diagnoser in config.GetDiagnosers().Where(diagnoser => diagnoser.GetRunMode(benchmark) == Diagnosers.RunMode.SeparateLogic))
             {
-                logger.WriteLineInfo("// Run, Diagnostic [IsExtraRunRequired=false]");
+                logger.WriteLineInfo("// Run, Diagnostic [SeparateLogic]");
 
                 diagnoser.ProcessResults(benchmark, null);
             }

@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 // this method should return a IHardwareCountersDiagnoser when we implement Hardware Counters for Unix
                 MemoryDiagnoser.Default,
-                new MonoDisassemblyDiagnoser(new DisassemblyDiagnoserConfig())
+                DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig()), 
             }; 
 
 #if CLASSIC
@@ -71,9 +71,9 @@ namespace BenchmarkDotNet.Diagnosers
                     return new[]
                     {
                         MemoryDiagnoser.Default,
+                        DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig()),
                         CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.InliningDiagnoser"),
                         CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.PmcDiagnoser"),
-                        CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.DisassemblyDiagnoser")
                     };
                 }
             }
@@ -84,11 +84,12 @@ namespace BenchmarkDotNet.Diagnosers
 
             return new IDiagnoser[]
             {
-                MemoryDiagnoser.Default
+                MemoryDiagnoser.Default,
+                DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig())
             };
         }
 
-        private static Assembly LoadDiagnosticsAssembly(Assembly benchmarkDotNetCoreAssembly)
+        internal static Assembly LoadDiagnosticsAssembly(Assembly benchmarkDotNetCoreAssembly)
         {
             // it not enough to just install NuGet to be "referenced", the project has to consume the dll for real to be on the referenced assembly list
             var referencedAssemblyName = Assembly.GetEntryAssembly().GetReferencedAssemblies().SingleOrDefault(name => name.Name == DiagnosticAssemblyName);

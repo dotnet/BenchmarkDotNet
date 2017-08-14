@@ -1,28 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
-using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Diagnosers
 {
-    public class MonoDisassemblyDiagnoser : IDisassemblyDiagnoser
+    internal class MonoDisassembler
     {
         private readonly bool printAsm, printIL, printSource, printPrologAndEpilog;
         private readonly int recursiveDepth = 1;
 
-        private readonly Dictionary<Benchmark, DisassemblyResult> results = new Dictionary<Benchmark, DisassemblyResult>();
-
-        public MonoDisassemblyDiagnoser(DisassemblyDiagnoserConfig config)
+        internal MonoDisassembler(DisassemblyDiagnoserConfig config)
         {
             printIL = config.PrintIL;
             printAsm = config.PrintAsm;
@@ -31,35 +23,10 @@ namespace BenchmarkDotNet.Diagnosers
             recursiveDepth = config.RecursiveDepth;
         }
 
-        public bool IsExtraRunRequired => false;
-
-        public IEnumerable<string> Ids => new[] { nameof(MonoDisassemblyDiagnoser) };
-
-        public IEnumerable<IExporter> Exporters => new[] { new DisassemblyExporter(Results) };
-
-        public IReadOnlyDictionary<Benchmark, DisassemblyResult> Results => results;
-
-        public IConfigurableDiagnoser<DisassemblyDiagnoserConfig> Configure(DisassemblyDiagnoserConfig config)
-            => new MonoDisassemblyDiagnoser(config);
-
-        public IColumnProvider GetColumnProvider() => EmptyColumnProvider.Instance;
-        public void BeforeAnythingElse(DiagnoserActionParameters parameters) { }
-        public void AfterGlobalSetup(DiagnoserActionParameters parameters) { }
-        public void BeforeMainRun(DiagnoserActionParameters parameters) { }
-        public void BeforeGlobalCleanup(DiagnoserActionParameters parameters) { }
-        public void DisplayResults(ILogger logger) { }
-
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
-            => Array.Empty<ValidationError>();
-
-        public void ProcessResults(Benchmark benchmark, BenchmarkReport report)
+        internal DisassemblyResult Disassemble(Benchmark benchmark, MonoRuntime mono)
         {
-            if (benchmark.Job.Env.Runtime is MonoRuntime mono)
-                results.Add(benchmark, Disassemble(benchmark, mono));
-        }
+            Debug.Assert(mono == null || !RuntimeInformation.IsMono(), "Must never be called for Non-Mono benchmarks");
 
-        private DisassemblyResult Disassemble(Benchmark benchmark, MonoRuntime mono)
-        {
             var monoMethodName = GetMethodName(benchmark.Target);
 
             var output = ProcessHelper.RunAndReadOutputLineByLine(

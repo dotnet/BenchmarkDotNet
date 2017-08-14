@@ -8,15 +8,31 @@ using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Diagnosers
 {
+    public enum RunMode : byte
+    {
+        /// <summary>
+        /// given diagnoser should not be executed for given benchmark
+        /// </summary>
+        None,
+        /// <summary>
+        /// needs extra run of the benchmark
+        /// </summary>
+        ExtraRun,
+        /// <summary>
+        /// implements some separate logic, that can be executed at any time
+        /// </summary>
+        SeparateLogic
+    }
+
     public interface IDiagnoser
     {
-        bool IsExtraRunRequired { get; }
-
         IEnumerable<string> Ids { get; } 
 
         IEnumerable<IExporter> Exporters { get; }
             
         IColumnProvider GetColumnProvider();
+
+        RunMode GetRunMode(Benchmark benchmark);
 
         /// <summary>
         /// before jitting, warmup

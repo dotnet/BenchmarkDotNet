@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         private readonly Dictionary<Benchmark, GcStats> results = new Dictionary<Benchmark, GcStats>();
 
-        public bool IsExtraRunRequired => true;
+        public RunMode GetRunMode(Benchmark benchmark) => RunMode.ExtraRun;
 
         public IEnumerable<string> Ids => new[] { DiagnoserId };
 
@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Diagnosers
             => results.Add(benchmark, report.GcStats);
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Enumerable.Empty<ValidationError>();
-
+        
         public class AllocationColumn : IColumn
         {
             private readonly Dictionary<Benchmark, GcStats> results;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Exporters;
@@ -19,7 +20,7 @@ namespace BenchmarkDotNet.Diagnosers
             this.diagnosers = diagnosers.Distinct().ToArray();
         }
 
-        public bool IsExtraRunRequired => diagnosers.Any(diagnoser => diagnoser.IsExtraRunRequired);
+        public RunMode GetRunMode(Benchmark benchmark) => throw new InvalidOperationException("Should never be called for Composite Diagnoser");
 
         public IEnumerable<string> Ids => diagnosers.SelectMany(d => d.Ids);
 
