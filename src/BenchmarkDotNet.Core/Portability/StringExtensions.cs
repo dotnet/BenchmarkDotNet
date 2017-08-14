@@ -13,5 +13,10 @@ namespace BenchmarkDotNet.Portability
             return left.Equals(right, StringComparison.OrdinalIgnoreCase);
 #endif
         }
+
+        internal static bool ContainsWithIgnoreCase(this string text, string word)
+        {
+            return text.IndexOf(word, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
     }
 }

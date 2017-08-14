@@ -321,5 +321,35 @@ namespace BenchmarkDotNet.Portability
             return Array.Empty<Antivirus>();
 #endif
         }
+
+
+        internal static VirtualMachineHypervisor GetVirtualMachineHypervisor()
+        {
+            VirtualMachineHypervisor[] hypervisors = { new HyperV() };
+
+            if (IsWindows())
+            {
+#if !CORE
+                try
+                {
+                    using (ManagementObjectSearcher searcher = new ManagementObjectSearcher("Select * from Win32_ComputerSystem"))
+                    {
+                        using (ManagementObjectCollection items = searcher.Get())
+                        {
+                            foreach (ManagementBaseObject item in items)
+                            {
+                                string manufacturer = item["Manufacturer"].ToString();
+                                string model = item["Model"].ToString();
+                                return hypervisors.FirstOrDefault(x => x.IsVirtualMachine(manufacturer, model));
+                            }
+                        }
+                    }
+                }
+                catch { }
+#endif
+            }
+
+            return null;
+        }
     }
 }
