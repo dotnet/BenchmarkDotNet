@@ -325,7 +325,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static VirtualMachineHypervisor GetVirtualMachineHypervisor()
         {
-            VirtualMachineHypervisor[] hypervisors = { new HyperV(), new VirtualBox() };
+            VirtualMachineHypervisor[] hypervisors = { new HyperV(), new VirtualBox(), new VMware() };
 
             if (IsWindows())
             {
