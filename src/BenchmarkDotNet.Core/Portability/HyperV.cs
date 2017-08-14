@@ -6,7 +6,8 @@ namespace BenchmarkDotNet.Portability
 
         public override bool IsVirtualMachine(string manufacturer, string model)
         {
-            return manufacturer.ContainsWithIgnoreCase("microsoft") && model.ContainsWithIgnoreCase("virtual");
+            return manufacturer != null && model != null && 
+                manufacturer.ContainsWithIgnoreCase("microsoft") && model.ContainsWithIgnoreCase("virtual");
         }
     }
 }

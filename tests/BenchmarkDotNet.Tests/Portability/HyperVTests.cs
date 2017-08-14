@@ -19,6 +19,8 @@ namespace BenchmarkDotNet.Tests.Portability
         [InlineData("microsoft", "virtual", true)]
         [InlineData("Dell", "virtual", false)]
         [InlineData("Dell", "ubuntu", false)]
+        [InlineData("microsoft corporation", null, false)]
+        [InlineData(null, "virtual machine", false)]
         public void DetectsVirtualMachine(string manufacturer, string model, bool expectedResult)
         {
             var hypervisor = new HyperV();
