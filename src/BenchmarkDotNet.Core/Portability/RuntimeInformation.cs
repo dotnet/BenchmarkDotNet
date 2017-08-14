@@ -325,7 +325,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static VirtualMachineHypervisor GetVirtualMachineHypervisor()
         {
-            VirtualMachineHypervisor[] hypervisors = { new HyperV() };
+            VirtualMachineHypervisor[] hypervisors = { new HyperV(), new VirtualBox() };
 
             if (IsWindows())
             {
@@ -338,8 +338,8 @@ namespace BenchmarkDotNet.Portability
                         {
                             foreach (ManagementBaseObject item in items)
                             {
-                                string manufacturer = item["Manufacturer"].ToString();
-                                string model = item["Model"].ToString();
+                                string manufacturer = item["Manufacturer"]?.ToString();
+                                string model = item["Model"]?.ToString();
                                 return hypervisors.FirstOrDefault(x => x.IsVirtualMachine(manufacturer, model));
                             }
                         }
