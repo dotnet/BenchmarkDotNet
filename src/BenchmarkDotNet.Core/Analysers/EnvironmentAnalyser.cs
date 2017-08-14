@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Analysers
             if (vmHypervisor != null)
             {
                 yield return CreateWarning($"Benchmark was executed on the virtual machine with {vmHypervisor.Name} hypervisor. " +
-                                           "Virtualizataion can affect the measurement result.");
+                                           "Virtualization can affect the measurement result.");
             }
         }
 
