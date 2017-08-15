@@ -140,7 +140,7 @@ namespace BenchmarkDotNet.Disassembler
             if (method.ILOffsetMap == null)
                 return CreateEmpty(method, "No ILOffsetMap found");
 
-            var instructions = new List<Code>();
+            var maps = new List<Map>();
 
             var mapByILOffset = (from map in method.ILOffsetMap
                                  where map.ILOffset >= 0 // prolog is -2, epilog -3
@@ -151,15 +151,16 @@ namespace BenchmarkDotNet.Disassembler
             if (mapByILOffset.Length == 0 && settings.PrintIL)
             {
                 // The method doesn't have an offset map. Just print the whole thing.
-                instructions.AddRange(GetIL(ilInstructions));
+                maps.Add(CreateMap(GetIL(ilInstructions)));
             }
 
             var prolog = method.ILOffsetMap.First();
             if (prolog.ILOffset == -2 && settings.PrintPrologAndEpilog) // -2 is a magic number for prolog
-                instructions.AddRange(GetAsm(prolog, state, methodInfo.Depth));
+                maps.Add(CreateMap(GetAsm(prolog, state, methodInfo.Depth)));
 
             for (int i = 0; i < mapByILOffset.Length; ++i)
             {
+                var group = new List<Code>();
                 var map = mapByILOffset[i];
                 var nextMap = i == mapByILOffset.Length - 1
                     ? new ILToNativeMap { ILOffset = int.MaxValue }
@@ -169,26 +170,30 @@ namespace BenchmarkDotNet.Disassembler
                     .Where(instr => instr.Offset >= map.ILOffset && instr.Offset < nextMap.ILOffset).ToArray();
 
                 if (settings.PrintSource)
-                    instructions.AddRange(GetSource(method, map));
+                    group.AddRange(GetSource(method, map));
 
                 if (settings.PrintIL)
-                    instructions.AddRange(GetIL(correspondingIL));
+                    group.AddRange(GetIL(correspondingIL));
 
                 if (settings.PrintAsm)
-                    instructions.AddRange(GetAsm(map, state, methodInfo.Depth));
+                    group.AddRange(GetAsm(map, state, methodInfo.Depth));
+
+                maps.Add(new Map { Instructions = group });
             }
 
             var epilog = method.ILOffsetMap.Last();
             if (epilog.ILOffset == -3 && settings.PrintPrologAndEpilog) // -3 is a magic number for epilog
-                instructions.AddRange(GetAsm(epilog, state, methodInfo.Depth));
+                maps.Add(CreateMap(GetAsm(epilog, state, methodInfo.Depth)));
 
             return new DisassembledMethod
             {
-                Instructions = EliminateDuplicates(instructions),
+                Maps = EliminateDuplicates(maps),
                 Name = method.GetFullSignature(),
                 NativeCode = method.NativeCode
             };
         }
+
+        static Map CreateMap(IEnumerable<Code> instructions) => new Map { Instructions = instructions.ToList()  };
 
         static IEnumerable<IL> GetIL(ICollection<Instruction> instructions)
             => instructions.Select(instruction 
@@ -370,11 +375,18 @@ namespace BenchmarkDotNet.Disassembler
             => param.ParameterType.IsByReference 
                 ? param.ParameterType.Name.Replace("&", string.Empty) + " ByRef"
                 : param.ParameterType.Name;
-        
-        static Code[] EliminateDuplicates(List<Code> instructions)
-            => instructions
-                .Distinct(CodeComparer.Instance)
-                .ToArray();
+
+        static Map[] EliminateDuplicates(List<Map> maps)
+        {
+            var unique = new HashSet<Code>(CodeComparer.Instance);
+
+            foreach (var map in maps)
+                for (int i = map.Instructions.Count - 1; i >= 0; i--)
+                    if(!unique.Add(map.Instructions[i]))
+                        map.Instructions.RemoveAt(i);
+
+            return maps.ToArray();
+        }
 
         static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
             => DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, reason);

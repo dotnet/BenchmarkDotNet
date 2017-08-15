@@ -1,5 +1,4 @@
-﻿using System.Text;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 #pragma warning disable CS3003 // I need ulong
 namespace BenchmarkDotNet.Diagnosers
@@ -35,14 +34,8 @@ namespace BenchmarkDotNet.Diagnosers
         public ulong EndAddress { get; set; }
     }
 
-    public class DisassembledMethod
+    public class Map
     {
-        public string Name { get; set; }
-
-        public ulong NativeCode { get; set; }
-
-        public string Problem { get; set; }
-
         [XmlArray("Instructions")]
         [XmlArrayItem(nameof(Code), typeof(Code))]
         [XmlArrayItem(nameof(Sharp), typeof(Sharp))]
@@ -51,26 +44,20 @@ namespace BenchmarkDotNet.Diagnosers
         public Code[] Instructions { get; set; }
     }
 
+    public class DisassembledMethod
+    {
+        public string Name { get; set; }
+
+        public ulong NativeCode { get; set; }
+
+        public string Problem { get; set; }
+
+        public Map[] Maps { get; set; }
+    }
+
     public class DisassemblyResult
     {
         public DisassembledMethod[] Methods { get; set; }
-
-        public override string ToString()
-        {
-            var buffer = new StringBuilder(20000);
-
-            foreach (var method in Methods)
-            {
-                buffer.AppendLine($"{method.Instructions} {method.Name}");
-
-                foreach (var instruction in method.Instructions)
-                {
-                    buffer.AppendLine(instruction.TextRepresentation);
-                }
-            }
-
-            return buffer.ToString();
-        }
     }
 }
 #pragma warning restore CS3003 // Type is not CLS-compliant

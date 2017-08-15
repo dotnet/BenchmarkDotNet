@@ -116,40 +116,47 @@ Method void BenchmarkDotNet.Samples.CPU.Cpu_Atomics:NoLock () emitted at 03AC11D
                     new DisassembledMethod()
                     {
                         Name = "NoLock",
-                        Instructions = new[]
+                        Maps = new Map[]
                         {
-                            new Diagnosers.Code { TextRepresentation = "loadi4_membase %eax <- [%edi + 0xc]" },
+                            new Map()
+                            {
+                                Instructions = new[]
+                                {
+                                    new Diagnosers.Code { TextRepresentation = "loadi4_membase %eax <- [%edi + 0xc]" },
 
-                            new Diagnosers.Code { TextRepresentation = "int_add_imm %eax <- %eax [1] clobbers: 1" },
-                            new Diagnosers.Code { TextRepresentation = "storei4_membase_reg [%edi + 0xc] <- %eax" },
-                            new Diagnosers.Code { TextRepresentation = "move %eax <- %eax" },
+                                    new Diagnosers.Code { TextRepresentation = "int_add_imm %eax <- %eax [1] clobbers: 1" },
+                                    new Diagnosers.Code { TextRepresentation = "storei4_membase_reg [%edi + 0xc] <- %eax" },
+                                    new Diagnosers.Code { TextRepresentation = "move %eax <- %eax" },
 
-                            new Diagnosers.Code { TextRepresentation = "int_add_imm %eax <- %eax [1] clobbers: 1" },
-                            new Diagnosers.Code { TextRepresentation = "storei4_membase_reg [%edi + 0xc] <- %eax" },
-                            new Diagnosers.Code { TextRepresentation = "move %eax <- %eax" },
+                                    new Diagnosers.Code { TextRepresentation = "int_add_imm %eax <- %eax [1] clobbers: 1" },
+                                    new Diagnosers.Code { TextRepresentation = "storei4_membase_reg [%edi + 0xc] <- %eax" },
+                                    new Diagnosers.Code { TextRepresentation = "move %eax <- %eax" },
 
-                            new Diagnosers.Code { TextRepresentation = "int_add_imm %eax <- %eax [1] clobbers: 1" },
-                            new Diagnosers.Code { TextRepresentation = "storei4_membase_reg [%edi + 0xc] <- %eax" },
-                            new Diagnosers.Code { TextRepresentation = "move %eax <- %eax" },
+                                    new Diagnosers.Code { TextRepresentation = "int_add_imm %eax <- %eax [1] clobbers: 1" },
+                                    new Diagnosers.Code { TextRepresentation = "storei4_membase_reg [%edi + 0xc] <- %eax" },
+                                    new Diagnosers.Code { TextRepresentation = "move %eax <- %eax" },
 
-                            new Diagnosers.Code { TextRepresentation = "int_add_imm %eax <- %eax [1] clobbers: 1" },
-                            new Diagnosers.Code { TextRepresentation = "storei4_membase_reg [%edi + 0xc] <- %eax" },
+                                    new Diagnosers.Code { TextRepresentation = "int_add_imm %eax <- %eax [1] clobbers: 1" },
+                                    new Diagnosers.Code { TextRepresentation = "storei4_membase_reg [%edi + 0xc] <- %eax" },
+                                }
+                            }
                         }
                     }
                 }
             };
 
             var disassemblyResult = MonoDisassembler.OutputParser.Parse(
-                input.Split(new string[] { "\r\n" }, StringSplitOptions.None), 
-                "BenchmarkDotNet.Samples.CPU.Cpu_Atomics:NoLock", 
+                input.Split(new string[] { "\r\n" }, StringSplitOptions.None),
+                "BenchmarkDotNet.Samples.CPU.Cpu_Atomics:NoLock",
                 "NoLock");
 
             Assert.Equal(expected.Methods.Single().Name, disassemblyResult.Methods.Single().Name);
-            Assert.Equal(expected.Methods[0].Instructions.Length, disassemblyResult.Methods[0].Instructions.Length);
+            Assert.Equal(expected.Methods[0].Maps[0].Instructions.Length, disassemblyResult.Methods[0].Maps[0].Instructions.Length);
 
-            for (int i = 0; i < expected.Methods[0].Instructions.Length; i++)
+            for (int i = 0; i < expected.Methods[0].Maps[0].Instructions.Length; i++)
             {
-                Assert.Equal(expected.Methods[0].Instructions[i].TextRepresentation, disassemblyResult.Methods[0].Instructions[i].TextRepresentation);
+                Assert.Equal(expected.Methods[0].Maps[0].Instructions[i].TextRepresentation, 
+                    disassemblyResult.Methods[0].Maps[0].Instructions[i].TextRepresentation);
             }
         }
     }

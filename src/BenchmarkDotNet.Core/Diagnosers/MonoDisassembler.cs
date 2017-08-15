@@ -74,7 +74,7 @@ namespace BenchmarkDotNet.Diagnosers
                         new DisassembledMethod
                         {
                             Name = methodName,
-                            Instructions = instructions.ToArray(),
+                            Maps = new [] { new Map { Instructions = instructions.ToArray() } }
                         }
                     }
                 };

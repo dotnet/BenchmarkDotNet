@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.IntegrationTests
             void AssertDisassembled(IDisassemblyDiagnoser diagnoser, string calledMethodName)
             {
                 Assert.True(diagnoser.Results.Single().Value
-                    .Methods.Any(method => method.Name.Contains(calledMethodName) && method.Instructions.Any()),
+                    .Methods.Any(method => method.Name.Contains(calledMethodName) && method.Maps.Any(map => map.Instructions.Any())),
                     $"{calledMethodName} is missing");
             }
 

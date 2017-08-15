@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace BenchmarkDotNet.Disassembler
@@ -33,6 +34,16 @@ namespace BenchmarkDotNet.Disassembler
         public ulong EndAddress { get; set; }
     }
 
+    public class Map
+    {
+        [XmlArray("Instructions")]
+        [XmlArrayItem(nameof(Code), typeof(Code))]
+        [XmlArrayItem(nameof(Sharp), typeof(Sharp))]
+        [XmlArrayItem(nameof(IL), typeof(IL))]
+        [XmlArrayItem(nameof(Asm), typeof(Asm))]
+        public List<Code> Instructions { get; set; }
+    }
+
     public class DisassembledMethod
     {
         public string Name { get; set; }
@@ -41,19 +52,14 @@ namespace BenchmarkDotNet.Disassembler
 
         public string Problem { get; set; }
 
-        [XmlArray("Instructions")]
-        [XmlArrayItem(nameof(Code), typeof(Code))]
-        [XmlArrayItem(nameof(Sharp), typeof(Sharp))]
-        [XmlArrayItem(nameof(IL), typeof(IL))]
-        [XmlArrayItem(nameof(Asm), typeof(Asm))]
-        public Code[] Instructions { get; set; }
+        public Map[] Maps { get; set; }
 
         public static DisassembledMethod Empty(string fullSignature, ulong nativeCode, string problem)
             => new DisassembledMethod
             {
                 Name = fullSignature,
                 NativeCode = nativeCode,
-                Instructions = Array.Empty<Code>(),
+                Maps = Array.Empty<Map>(),
                 Problem = problem
             };
     }

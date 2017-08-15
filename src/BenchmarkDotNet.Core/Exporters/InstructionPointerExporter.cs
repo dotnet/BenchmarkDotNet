@@ -13,7 +13,9 @@ namespace BenchmarkDotNet.Exporters
         private const string CssStyle = @"
 <style type=""text/css"">
     pre { margin: 0px; }
+    table { border-collapse:collapse; }
     td.perMethod { border-top: 1px black solid; }
+    tr.evenMap td { background-color: #F5F5F5; }  
 </style>";
 
         private readonly IHardwareCountersDiagnoser hardwareCountersDiagnoser;
@@ -77,7 +79,9 @@ namespace BenchmarkDotNet.Exporters
 
             var instructionPointers = new HashSet<ulong>(
                 disassemblyResult
-                    .Methods.SelectMany(method => method.Instructions)
+                    .Methods
+                    .SelectMany(method => method.Maps)
+                    .SelectMany(map => map.Instructions)
                     .OfType<Asm>()
                     .SelectMany(Range)
                     .Distinct());
@@ -104,42 +108,50 @@ namespace BenchmarkDotNet.Exporters
 
             foreach (var method in disassemblyResult.Methods.Where(method => string.IsNullOrEmpty(method.Problem)))
             {
-                var codeWithCounters = new List<CodeWithCounters>(method.Instructions.Length);
+                var groups = new List<List<CodeWithCounters>>();
 
-                foreach (var instruction in method.Instructions)
+                foreach (var map in method.Maps)
                 {
-                    var totalsPerCounter = pmcStats.Counters.Keys.ToDictionary(key => key, _ => default(ulong));
+                    var codeWithCounters = new List<CodeWithCounters>(map.Instructions.Length);
 
-                    if (instruction is Asm asm)
+                    foreach (var instruction in map.Instructions)
                     {
-                        foreach (var hardwareCounter in pmcStats.Counters)
+                        var totalsPerCounter = pmcStats.Counters.Keys.ToDictionary(key => key, _ => default(ulong));
+
+                        if (instruction is Asm asm)
                         {
-                            // most probably asm.StartAddress would be enough, but I don't want to miss any edge case
-                            for (ulong instructionPointer = asm.StartAddress; instructionPointer < asm.EndAddress; instructionPointer++)
-                                if (hardwareCounter.Value.PerInstructionPointer.TryGetValue(instructionPointer, out var value))
-                                    totalsPerCounter[hardwareCounter.Key] = totalsPerCounter[hardwareCounter.Key] + value;
+                            foreach (var hardwareCounter in pmcStats.Counters)
+                            {
+                                // most probably asm.StartAddress would be enough, but I don't want to miss any edge case
+                                for (ulong instructionPointer = asm.StartAddress; instructionPointer < asm.EndAddress; instructionPointer++)
+                                    if (hardwareCounter.Value.PerInstructionPointer.TryGetValue(instructionPointer, out var value))
+                                        totalsPerCounter[hardwareCounter.Key] = totalsPerCounter[hardwareCounter.Key] + value;
+                            }
                         }
+
+                        codeWithCounters.Add(new CodeWithCounters
+                        {
+                            Code = instruction,
+                            SumPerCounter = totalsPerCounter,
+                        });
                     }
 
-                    codeWithCounters.Add(new CodeWithCounters
-                    {
-                        Code = instruction,
-                        SumPerCounter = totalsPerCounter,
-                    });
+                    groups.Add(codeWithCounters);
                 }
 
                 model.Add(new MethodWithCounters
                 {
                     Method = method,
-                    Instructions = codeWithCounters,
+                    Instructions = groups,
                     SumPerCounter = pmcStats.Counters.Keys.ToDictionary(
                         hardwareCounter => hardwareCounter,
                         hardwareCounter =>
                         {
                             ulong sum = 0;
 
-                            foreach (var codeWithCounter in codeWithCounters)
-                                sum += codeWithCounter.SumPerCounter[hardwareCounter];
+                            foreach (var group in groups)
+                                foreach (var codeWithCounter in group)
+                                    sum += codeWithCounter.SumPerCounter[hardwareCounter];
 
                             return sum;
                         }
@@ -181,28 +193,35 @@ namespace BenchmarkDotNet.Exporters
             {
                 logger.WriteLine($"<tr><th colspan=\"{columnsCount}\">{method.Method.Name}</th></tr>");
 
-                foreach (var instruction in method.Instructions)
+                bool evenMap = true;
+                foreach (var map in method.Instructions)
                 {
-                    logger.WriteLine("<tr>");
-                    foreach (var hardwareCounter in hardwareCounters)
+                    foreach (var instruction in map)
                     {
-                        var totalWithoutNoise = totals[hardwareCounter].withoutNoise;
-                        var forRange = instruction.SumPerCounter[hardwareCounter];
+                        logger.WriteLine($"<tr class=\"{(evenMap ? "evenMap" : "oddMap")}\">");
 
-                        if (forRange != 0)
-                            logger.Write($"<td title=\"{forRange} of {totalWithoutNoise}\">{((double)forRange / totalWithoutNoise):P}</td>");
+                        foreach (var hardwareCounter in hardwareCounters)
+                        {
+                            var totalWithoutNoise = totals[hardwareCounter].withoutNoise;
+                            var forRange = instruction.SumPerCounter[hardwareCounter];
+
+                            if (forRange != 0)
+                                logger.Write($"<td title=\"{forRange} of {totalWithoutNoise}\">{((double) forRange / totalWithoutNoise):P}</td>");
+                            else
+                                logger.Write("<td>-</td>");
+                        }
+
+                        if (instruction.Code is Sharp sharp && !string.IsNullOrEmpty(sharp.FilePath))
+                            logger.Write($"<td title=\"{sharp.FilePath} line {sharp.LineNumber}\">");
                         else
-                            logger.Write("<td>-</td>");
+                            logger.Write("<td>");
+
+                        logger.WriteLine($"<pre><code>{instruction.Code.TextRepresentation}</pre></code></td>");
+                        logger.WriteLine($"<td>{instruction.Code.Comment}</td>");
+                        logger.WriteLine("</tr>");
                     }
 
-                    if (instruction.Code is Sharp sharp && !string.IsNullOrEmpty(sharp.FilePath))
-                        logger.Write($"<td title=\"{sharp.FilePath} line {sharp.LineNumber}\">");
-                    else
-                        logger.Write("<td>");
-
-                    logger.WriteLine($"<pre><code>{instruction.Code.TextRepresentation}</pre></code></td>");
-                    logger.WriteLine($"<td>{instruction.Code.Comment}</td>");
-                    logger.WriteLine("</tr>");
+                    evenMap = !evenMap;
                 }
 
                 logger.WriteLine("<tr>");
@@ -240,7 +259,7 @@ namespace BenchmarkDotNet.Exporters
         class MethodWithCounters
         {
             internal DisassembledMethod Method { get; set; }
-            internal IReadOnlyList<CodeWithCounters> Instructions { get; set; }
+            internal IReadOnlyList<IReadOnlyList<CodeWithCounters>> Instructions { get; set; }
             internal IReadOnlyDictionary<HardwareCounter, ulong> SumPerCounter { get; set; }
 
             internal bool HasCounters => SumPerCounter.Values.Any(value => value != default(ulong));

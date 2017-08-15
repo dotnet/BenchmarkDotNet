@@ -82,10 +82,11 @@ namespace BenchmarkDotNet.Exporters
                 foreach (var method in results[benchmark].Methods.Where(method => string.IsNullOrEmpty(method.Problem)))
                 {
                     logger.WriteLine($"{method.NativeCode:X} {method.Name}");
-                    foreach (var instruction in method.Instructions)
-                    {
-                        logger.WriteLine($"{instruction.TextRepresentation} {instruction.Comment}");
-                    }
+
+                    foreach (var map in method.Maps)
+                        foreach (var instruction in map.Instructions)
+                            logger.WriteLine($"{instruction.TextRepresentation} {instruction.Comment}");
+
                     logger.WriteLine();
                 }
 
