@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.Diagnosers
         internal static Assembly LoadDiagnosticsAssembly(Assembly benchmarkDotNetCoreAssembly)
         {
             // it not enough to just install NuGet to be "referenced", the project has to consume the dll for real to be on the referenced assembly list
-            var referencedAssemblyName = Assembly.GetEntryAssembly().GetReferencedAssemblies().SingleOrDefault(name => name.Name == DiagnosticAssemblyName);
+            var referencedAssemblyName = Assembly.GetEntryAssembly()?.GetReferencedAssemblies().SingleOrDefault(name => name.Name == DiagnosticAssemblyName);
             if (referencedAssemblyName != default(AssemblyName))
                 return Assembly.Load(referencedAssemblyName);
 

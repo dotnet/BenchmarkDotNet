@@ -1,5 +1,4 @@
-﻿#if CLASSIC
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -7,7 +6,6 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Diagnostics.Windows;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.Loggers;
@@ -25,74 +23,77 @@ namespace BenchmarkDotNet.IntegrationTests
         public static IEnumerable<object[]> GetAllJits()
             => new[]
             {
-                new object[] { Jit.LegacyJit, Platform.X86 },
-                new object[] { Jit.LegacyJit, Platform.X64 },
-                new object[] { Jit.RyuJit, Platform.X64 }
+                new object[] { Jit.LegacyJit, Platform.X86, Runtime.Clr }, // 32bit LegacyJit for desktop .NET
+                new object[] { Jit.LegacyJit, Platform.X64, Runtime.Clr }, // 64bit LegacyJit for desktop .NET
+
+                new object[] { Jit.RyuJit, Platform.X64, Runtime.Clr }, // RyuJit for desktop .NET
+
+                new object[] { Jit.RyuJit, Platform.X64, Runtime.Core }, // .NET Core
+
+                // we could add new object[] { Jit.Llvm, Platform.X64, Runtime.Mono } here but our CI would need to have Mono installed..
             };
 
-        public class StaticMethodCall
+        public class WithCalls
         {
-            [Benchmark] public void Benchmark() => StaticMethod();
-            [MethodImpl(MethodImplOptions.NoInlining)] public static void StaticMethod() { }
-        }
+            [Benchmark]
+            public void Benchmark()
+            {
+                // we should rather have test per use case
+                // but running so many tests for all JITs would take too much time
+                // so we have one method that does it all
+                Static();
+                Instance();
+                Recursive();
+                Virtual();
+            }
 
-        [Theory, MemberData(nameof(GetAllJits))]
-        public void CanDisassembleStaticMethodCall(Jit jit, Platform platform)
-            => Test<StaticMethodCall>(jit, platform, nameof(StaticMethodCall.Benchmark), nameof(StaticMethodCall.StaticMethod));
+            [MethodImpl(MethodImplOptions.NoInlining)] public static void Static() { }
 
-        public class InstanceMethodCall
-        {
-            [Benchmark] public void Benchmark() => InsanceMethod();
-            [MethodImpl(MethodImplOptions.NoInlining)] public void InsanceMethod() { }
-        }
+            [MethodImpl(MethodImplOptions.NoInlining)] public void Instance() { }
 
-        [Theory, MemberData(nameof(GetAllJits))]
-        public void CanDisassembleInstanceMethodCall(Jit jit, Platform platform)
-            => Test<InstanceMethodCall>(jit, platform, nameof(InstanceMethodCall.Benchmark), nameof(InstanceMethodCall.InsanceMethod));
-
-        public class RecursiveMethodCall
-        {
-            [Benchmark] public void Benchmark() => Recursive();
-
+            [MethodImpl(MethodImplOptions.NoInlining)] // legacy JIT x64 was able to inline this method ;)
             public void Recursive()
             {
                 if (new Random(123).Next(0, 10) == 11) // never true, but JIT does not know it
                     Recursive();
             }
+
+            public virtual void Virtual() { }
         }
 
-        [Theory, MemberData(nameof(GetAllJits))]
-        public void CanDisassembleRecursiveMethodCall(Jit jit, Platform platform)
-            => Test<RecursiveMethodCall>(jit, platform, nameof(RecursiveMethodCall.Benchmark), nameof(RecursiveMethodCall.Recursive));
-
-        private void Test<TBenchmark>(Jit jit, Platform platform, string benchmarkName, string calledMethodName)
+#if CORE
+        [Theory(Skip = "Disassembler has not .NET Core support yet")]
+#else
+        [Theory]
+#endif
+        [MemberData(nameof(GetAllJits))]
+        public void CanDisassembleAllMethodCalls(Jit jit, Platform platform, Runtime runtime)
         {
-            var disassemblyDiagnoser = DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(printAsm: true, recursiveDepth: 3));
+            var disassemblyDiagnoser = (IDisassemblyDiagnoser)DisassemblyDiagnoser.Create(
+                new DisassemblyDiagnoserConfig(printAsm: true, printIL: true, printSource: true, recursiveDepth: 3));
 
-            CanExecute<TBenchmark>(CreateConfig(jit, platform, disassemblyDiagnoser));
+            CanExecute<WithCalls>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser));
 
-            //AssertMethodsDisassembled(disassemblyDiagnoser, benchmarkName, calledMethodName);
+            void AssertDisassembled(IDisassemblyDiagnoser diagnoser, string calledMethodName)
+            {
+                Assert.True(diagnoser.Results.Single().Value
+                    .Methods.Any(method => method.Name.Contains(calledMethodName) && method.Instructions.Any()),
+                    $"{calledMethodName} is missing");
+            }
+
+            AssertDisassembled(disassemblyDiagnoser, nameof(WithCalls.Benchmark));
+            AssertDisassembled(disassemblyDiagnoser, nameof(WithCalls.Static));
+            AssertDisassembled(disassemblyDiagnoser, nameof(WithCalls.Instance));
+            AssertDisassembled(disassemblyDiagnoser, nameof(WithCalls.Recursive));
+            AssertDisassembled(disassemblyDiagnoser, nameof(WithCalls.Virtual));
         }
 
-        private void AssertMethodsDisassembled(IDisassemblyDiagnoser disassemblyDiagnoser, string benchmarkName, string calledMethodName)
-        {
-            //string output = disassemblyDiagnoser.Results;
-
-            //Assert.NotEmpty(output);
-
-            //Assert.Contains(benchmarkName, output);
-            //Assert.Contains(calledMethodName, output);
-        }
-
-        private IConfig CreateConfig(Jit jit, Platform platform, IDiagnoser disassemblyDiagnoser)
-        {
-            return ManualConfig.CreateEmpty()
-                .With(Job.ShortRun.With(jit).With(platform))
+        private IConfig CreateConfig(Jit jit, Platform platform, Runtime runtime, IDiagnoser disassemblyDiagnoser)
+            => ManualConfig.CreateEmpty()
+                .With(Job.ShortRun.With(jit).With(platform).With(runtime))
                 .With(DefaultConfig.Instance.GetLoggers().ToArray())
                 .With(DefaultColumnProviders.Instance)
                 .With(disassemblyDiagnoser)
                 .With(new OutputLogger(Output));
-        }
     }
 }
-#endif

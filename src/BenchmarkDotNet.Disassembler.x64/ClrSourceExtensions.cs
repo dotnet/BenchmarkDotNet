@@ -29,6 +29,9 @@ namespace Microsoft.Diagnostics.RuntimeExt
         public static SourceLocation GetSourceLocation(this ClrMethod method, int ilOffset)
         {
             PdbReader reader = GetReaderForMethod(method);
+            if (reader == null)
+                return null;
+
             PdbFunction function = reader.GetFunctionFromToken(method.MetadataToken);
             return FindNearestLine(function, ilOffset);
         }
