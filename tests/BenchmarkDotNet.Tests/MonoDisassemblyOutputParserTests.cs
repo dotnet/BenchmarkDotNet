@@ -146,7 +146,7 @@ Method void BenchmarkDotNet.Samples.CPU.Cpu_Atomics:NoLock () emitted at 03AC11D
             };
 
             var disassemblyResult = MonoDisassembler.OutputParser.Parse(
-                input.Split(new string[] { "\r\n" }, StringSplitOptions.None),
+                input.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None),
                 "BenchmarkDotNet.Samples.CPU.Cpu_Atomics:NoLock",
                 "NoLock");
 
