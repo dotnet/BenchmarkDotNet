@@ -3,7 +3,7 @@ using Xunit;
 
 namespace BenchmarkDotNet.Tests.Portability
 {
-    public class VmWareVTests
+    public class VMwareTests
     {
         [Fact]
         public void ContainsCorrectName()
