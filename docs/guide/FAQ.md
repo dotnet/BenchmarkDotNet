@@ -37,3 +37,6 @@ For example, you can use the `SimpleJob` or `ShortRunJob` attributes:
 ```
 * **Q** My benchmark unexpectedly stopped and I saw the information about error code. What can I do?  
 **A** BenchmarkDotNet generates, builds and runs new process for every benchmark. This behavior is sometimes interpreted by anti-virus as dangerous, and the process is killed. Use `EnvironmentAnalyser` to detect antivirus software and configure your benchmark to use `InProcessToolchain`.
+
+* **Q** Can I run benchmark on the virtual machine?  
+**A** Yes, of course. However, it can affect results because of the shared, physical machine, virtualization process and incorrect `Stopwatch.Frequency`. If you are unsure whether an application is running on virtual environment, use `EnvironmentAnalyser` to detect VM hypervisor.
