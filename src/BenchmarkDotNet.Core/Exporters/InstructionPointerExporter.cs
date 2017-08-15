@@ -164,7 +164,7 @@ namespace BenchmarkDotNet.Exporters
             logger.WriteLine("<!-- Generated with BenchmarkDotNet ");
             foreach(var total in totals)
             {
-                // this stats are mostly for me, the maintainer, who wants to know if removing nosie makes any sense
+                // this stats are mostly for me, the maintainer, who wants to know if removing noise makes any sense
                 logger.WriteLine($"For {total.Key} we have {total.Value.total} in total, {total.Value.withoutNoise} without noise");
             }
             logger.WriteLine("-->");
@@ -194,7 +194,14 @@ namespace BenchmarkDotNet.Exporters
                         else
                             logger.Write("<td>-</td>");
                     }
-                    logger.WriteLine($"<td><pre><code>{instruction.Code.TextRepresentation}</pre></code></td><td>{instruction.Code.Comment}</td>");
+
+                    if (instruction.Code is Sharp sharp && !string.IsNullOrEmpty(sharp.FilePath))
+                        logger.Write($"<td title=\"{sharp.FilePath} line {sharp.LineNumber}\">");
+                    else
+                        logger.Write("<td>");
+
+                    logger.WriteLine($"<pre><code>{instruction.Code.TextRepresentation}</pre></code></td>");
+                    logger.WriteLine($"<td>{instruction.Code.Comment}</td>");
                     logger.WriteLine("</tr>");
                 }
 
