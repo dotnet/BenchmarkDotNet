@@ -9,9 +9,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public class NetCoreAppSettings
     {
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp11 = new NetCoreAppSettings("netcoreapp1.1", "1.1-*");
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp12 = new NetCoreAppSettings("netcoreapp1.2", "1.2-*");
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp20 = new NetCoreAppSettings("netcoreapp2.0", "2.0-*");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp11 = new NetCoreAppSettings("netcoreapp1.1", "1.1-*", ".NET Core 1.1");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp12 = new NetCoreAppSettings("netcoreapp1.2", "1.2-*", ".NET Core 1.0");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp20 = new NetCoreAppSettings("netcoreapp2.0", "2.0-*", ".NET Core 2.0");
 
         private static NetCoreAppSettings Default => NetCoreApp11;
 
@@ -23,16 +23,19 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// used in the auto-generated project.json file, 
         /// "dependencies": { "Microsoft.NETCore.App": { "version": "HERE" } }
         /// </param>
+        /// <param name="name">display name used for showing the results</param>
         /// <param name="imports">the custom imports</param>
         /// </summary>
         [PublicAPI]
         public NetCoreAppSettings(
             string targetFrameworkMoniker, 
             string microsoftNetCoreAppVersion, 
+            string name,
             string imports = "[ \"dnxcore50\", \"portable-net45+win8\", \"dotnet5.6\", \"netcore50\" ]")
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
             MicrosoftNETCoreAppVersion = microsoftNetCoreAppVersion;
+            Name = name;
             Imports = imports;
         }
 
@@ -50,6 +53,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// the custom imports
         /// </summary>
         public string Imports { get; }
+
+        /// <summary>
+        /// display name used for showing the results
+        /// </summary>
+        public string Name { get; }
 
         internal static NetCoreAppSettings GetCurrentVersion()
         {

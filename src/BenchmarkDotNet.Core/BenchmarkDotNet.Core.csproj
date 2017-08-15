@@ -28,5 +28,6 @@
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="1.1.1" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.3.0" />
     <PackageReference Include="System.ValueTuple" Version="4.3.0" />
+    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
   </ItemGroup>
 </Project>
