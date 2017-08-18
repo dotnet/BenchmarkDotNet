@@ -199,4 +199,21 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
     }
+
+    public class InvalidFileNamesParamsTests : BenchmarkTestExecutor
+    {
+        public InvalidFileNamesParamsTests(ITestOutputHelper output) : base(output) { }
+
+        [Fact]
+        public void InvalidFileNamesInParamsAreSupported() => CanExecute<InvalidFileNamesInParams>();
+        
+        public class InvalidFileNamesInParams
+        {
+            [Params("/\\@#$%")]
+            public string Field;
+
+            [Benchmark]
+            public void Benchmark() => Console.WriteLine("// " + Field);
+        }
+    }
 }

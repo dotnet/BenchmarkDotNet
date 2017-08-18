@@ -82,6 +82,7 @@ namespace BenchmarkDotNet.Extensions
 
         public static bool IsNullOrEmpty<T>(this IReadOnlyCollection<T> value) => value == null || value.Count == 0;
         public static bool IsEmpty<T>(this IReadOnlyCollection<T> value) => value.Count == 0;
+        public static bool IsEmpty<T>(this IEnumerable<T> value) => !value.Any();
 
         public static T Penult<T>(this IList<T> list) => list[list.Count - 2];
 

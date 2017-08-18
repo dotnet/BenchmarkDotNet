@@ -1,0 +1,44 @@
+#---------------------------------#
+#      general configuration      #
+#---------------------------------#
+
+# branches to build
+branches:
+  # blacklist
+  except:
+    - gh-pages
+
+#---------------------------------#
+#    environment configuration    #
+#---------------------------------#
+language: csharp
+os:
+  - linux
+  - osx
+sudo: required
+dist: trusty
+group: edge
+osx_image: xcode8.3
+mono: latest
+
+addons:
+  apt:
+    packages: 
+    - gettext
+    - libcurl4-openssl-dev
+    - libicu-dev
+    - libssl-dev
+    - libunwind8
+    - fsharp
+
+#---------------------------------#		
+#       build configuration       #		
+#---------------------------------#
+
+before_install:  
+  - if test "$TRAVIS_OS_NAME" == "osx"; then brew update; brew install openssl; ln -s /usr/local/opt/openssl/lib/libcrypto.1.0.0.dylib /usr/local/lib/; ln -s /usr/local/opt/openssl/lib/libssl.1.0.0.dylib /usr/local/lib/; fi
+
+before_script:
+ - chmod +x build.sh
+script:
+  - ./build.sh

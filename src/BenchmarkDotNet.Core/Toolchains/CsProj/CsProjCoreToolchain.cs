@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         [PublicAPI]
         public static IToolchain From(NetCoreAppSettings settings, string configuration)
-            => new CsProjCoreToolchain("CoreCsProj",
+            => new CsProjCoreToolchain(settings.Name,
                 new CsProjGenerator(settings.TargetFrameworkMoniker, PlatformProvider, configuration), 
                 new CsProjBuilder(settings.TargetFrameworkMoniker, configuration), 
                 new DotNetCliExecutor());

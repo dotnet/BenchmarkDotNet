@@ -1,7 +1,9 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Text;
-using System.Xml;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Exporters.Xml
@@ -10,48 +12,58 @@ namespace BenchmarkDotNet.Exporters.Xml
     {
         protected override string FileExtension => "xml";
 
-        private readonly XmlWriterSettings settings;
+        private readonly bool indentXml;
         private readonly bool excludeMeasurements;
 
         public XmlExporterBase(bool indentXml = false, bool excludeMeasurements = false)
         {
-            settings = new XmlWriterSettings
-            {
-                Indent = indentXml
-            };
-
+            this.indentXml = indentXml;
             this.excludeMeasurements = excludeMeasurements;
         }
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
-            var serializer = new XmlSerializer(typeof(SummaryDto))
-                                    .WithRootName(nameof(Summary))
-                                    .WithCollectionItemName(typeof(Measurement),
-                                                            nameof(Measurement))
-                                    .WithCollectionItemName(typeof(BenchmarkReportDto),
-                                                            nameof(BenchmarkReport.Benchmark));
-
-            if (excludeMeasurements)
-            {
-                serializer.WithExcludedProperty(nameof(BenchmarkReportDto.Measurements));
-            }
+            IXmlSerializer serializer = BuildSerializer(summary);
 
             // Use custom UTF-8 stringwriter because the default writes UTF-16
-            StringBuilder builder = new StringBuilder();
-            using (var textWriter = new Utf8StringWriter(builder))
+            var stringBuilder = new StringBuilder();
+            using (var textWriter = new Utf8StringWriter(stringBuilder))
             {
-                using (var writer = XmlWriter.Create(textWriter, settings))
+                using (var writer = new SimpleXmlWriter(textWriter, indentXml))
                 {
                     serializer.Serialize(writer, new SummaryDto(summary));
                 }
             }
 
-            logger.WriteLine(builder.ToString());
+            logger.WriteLine(stringBuilder.ToString());
+        }
+
+        private IXmlSerializer BuildSerializer(Summary summary)
+        {
+            XmlSerializer.XmlSerializerBuilder builder =
+                XmlSerializer.GetBuilder(typeof(SummaryDto))
+                               .WithRootName(nameof(Summary))
+                               .WithCollectionItemName(nameof(BenchmarkReportDto.Measurements),
+                                                       nameof(Measurement))
+                               .WithCollectionItemName(nameof(SummaryDto.Benchmarks),
+                                                       nameof(BenchmarkReport.Benchmark))
+                               .WithCollectionItemName(nameof(Statistics.Outliers), "Outlier");
+
+            if (!summary.Config.GetDiagnosers().Any(diagnoser => diagnoser is MemoryDiagnoser))
+            {
+                builder.WithExcludedProperty(nameof(BenchmarkReportDto.Memory));
+            }
+
+            if (excludeMeasurements)
+            {
+                builder.WithExcludedProperty(nameof(BenchmarkReportDto.Measurements));
+            }
+
+            return builder.Build();
         }
     }
 
-    public class Utf8StringWriter : StringWriter
+    internal class Utf8StringWriter : StringWriter
     {
         public override Encoding Encoding => Encoding.UTF8;
 

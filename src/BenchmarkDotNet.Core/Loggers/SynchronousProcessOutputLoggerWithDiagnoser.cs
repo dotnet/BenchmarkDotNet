@@ -68,7 +68,7 @@ namespace BenchmarkDotNet.Loggers
                 }
                 else if (line == Engine.Signals.BeforeGlobalCleanup)
                 {
-                    diagnoser?.BeforeGlobalCleanup();
+                    diagnoser?.BeforeGlobalCleanup(diagnoserActionParameters);
                 }
                 else if (line == Engine.Signals.AfterAnythingElse)
                 {

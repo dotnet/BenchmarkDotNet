@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Tests.Mocks
 
         private static BenchmarkReport CreateReport(Benchmark benchmark)
         {
-            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty));
+            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
             var executeResult = new ExecuteResult(true, 0, Array.Empty<string>(), Array.Empty<string>());
             var measurements = new List<Measurement>
             {
@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Tests.Mocks
                 BenchmarkDotNetVersion = "0.10.x-mock",
                 ChronometerFrequency = new Frequency(2531248),
                 Configuration = "CONFIGURATION",
-                DotNetCliVersion = new Lazy<string>(() => "1.0.x.mock"),
+                DotNetSdkVersion = new Lazy<string>(() => "1.0.x.mock"),
                 HardwareTimerKind = HardwareTimerKind.Tsc,
                 HasAttachedDebugger = false,
                 HasRyuJit = true,

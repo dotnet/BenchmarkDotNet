@@ -12,9 +12,9 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.CsProj;
 #if !CORE
 using System.Management;
-
 #endif
 
 namespace BenchmarkDotNet.Portability
@@ -100,6 +100,16 @@ namespace BenchmarkDotNet.Portability
             return Unknown;
         }
 
+        public static string GetNetCoreVersion()
+        {
+            var assembly = typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly;
+            var assemblyPath = assembly.CodeBase.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
+            int netCoreAppIndex = Array.IndexOf(assemblyPath, "Microsoft.NETCore.App");
+            if (netCoreAppIndex > 0 && netCoreAppIndex < assemblyPath.Length - 2)
+                return assemblyPath[netCoreAppIndex + 1];
+            return null;
+        }
+
         internal static string GetRuntimeVersion()
         {
 #if CLASSIC
@@ -125,9 +135,13 @@ namespace BenchmarkDotNet.Portability
                 }
             }
 
-            return $"Clr {System.Environment.Version}";
+            string frameworkVersion = CsProjClassicNetToolchain.GetCurrentNetFrameworkVersion();
+            string clrVersion = System.Environment.Version.ToString();
+            return $".NET Framework {frameworkVersion} (CLR {clrVersion})";
 #else
-            return System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
+            var runtimeVersion = GetNetCoreVersion() ?? "?";
+            string frameworkVersion = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.Replace(".NET Core ", "");
+            return $".NET Core {runtimeVersion} (Framework {frameworkVersion})";
 #endif
         }
 
@@ -251,7 +265,7 @@ namespace BenchmarkDotNet.Portability
             }
         }
 
-        [DllImport("libc", SetLastError=true)]
+        [DllImport("libc", SetLastError = true)]
         private static extern int uname(IntPtr buf);
 
         private static string GetSysnameFromUname()
@@ -275,6 +289,37 @@ namespace BenchmarkDotNet.Portability
                 if (buf != IntPtr.Zero)
                     Marshal.FreeHGlobal(buf);
             }
+        }
+
+        internal static ICollection<Antivirus> GetAntivirusProducts()
+        {
+#if !CORE
+            var products = new List<Antivirus>();
+            if (IsWindows())
+            {
+                try
+                {
+                    var wmi = new ManagementObjectSearcher(@"root\SecurityCenter2", "SELECT * FROM AntiVirusProduct");
+                    ManagementObjectCollection data = wmi.Get();
+
+                    foreach (ManagementBaseObject o in data)
+                    {
+                        var av = (ManagementObject)o;
+                        if (av != null)
+                        {
+                            string name = av["displayName"].ToString();
+                            string path = av["pathToSignedProductExe"].ToString();
+                            products.Add(new Antivirus(name, path));
+                        }
+                    }
+                }
+                catch { }
+            }
+
+            return products;
+#else
+            return Array.Empty<Antivirus>();
+#endif
         }
     }
 }
