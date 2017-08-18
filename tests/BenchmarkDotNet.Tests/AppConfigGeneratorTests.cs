@@ -71,6 +71,28 @@ namespace BenchmarkDotNet.Tests
             }
         }
 
+        [Fact]
+        public void RewritesCutomRuntimeSettings()
+        {
+            const string customSettings =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<!--" +
+                "commentsAreSupported" +
+                "-->" +
+                "<configuration>" +
+                "<someConfig>withItsValue</someConfig>" +
+                "<runtime><AppContextSwitchOverrides value=\"Switch.System.IO.UseLegacyPathHandling=false\"/></runtime>" +
+                "</configuration>";
+
+            using (var source = new StringReader(customSettings))
+            using (var destination = new Utf8StringWriter())
+            {
+                AppConfigGenerator.Generate(Job.Default, source, destination, Resolver);
+
+                AssertAreEqualIgnoringWhitespacesAndCase(customSettings, destination.ToString());
+            }
+        }
+
         [Theory]
         [InlineData(Jit.LegacyJit, "<runtime><useLegacyJit enabled=\"1\" /></runtime>")]
         [InlineData(Jit.RyuJit, "<runtime><useLegacyJit enabled=\"0\" /></runtime>")]

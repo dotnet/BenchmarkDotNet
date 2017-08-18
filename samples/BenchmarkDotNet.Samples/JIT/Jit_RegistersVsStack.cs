@@ -6,6 +6,7 @@ namespace BenchmarkDotNet.Samples.JIT
 {
     // See http://stackoverflow.com/questions/32114308/weird-performance-increase-in-simple-benchmark
     [LegacyJitX86Job]
+    [DisassemblyDiagnoser(printAsm: true, printPrologAndEpilog: true, recursiveDepth: 0)]
     public class Jit_RegistersVsStack
     {
         [Params(false, true)]

@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Exporters;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
@@ -18,6 +19,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         protected readonly LogCapture Logger = new LogCapture();
         protected readonly Dictionary<Benchmark, int> BenchmarkToProcess = new Dictionary<Benchmark, int>();
         protected readonly ConcurrentDictionary<int, TStats> StatsPerProcess = new ConcurrentDictionary<int, TStats>();
+
+        public virtual RunMode GetRunMode(Benchmark benchmark) => RunMode.ExtraRun;
+
+        public virtual IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
 
         protected TraceEventSession Session { get; private set; }
 

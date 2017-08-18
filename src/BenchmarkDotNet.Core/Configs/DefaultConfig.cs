@@ -49,6 +49,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IValidator> GetValidators()
         {
             yield return BaselineValidator.FailOnError;
+            yield return SetupCleanupValidator.FailOnError;
             yield return JitOptimizationsValidator.DontFailOnError;
             yield return UnrollFactorValidator.Default;
         }

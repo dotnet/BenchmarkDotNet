@@ -1,6 +1,6 @@
 # Baseline
 
-In order to scale your results you need to mark one of your benchmark methods as a baseline. Only one method in class can have `Baseline = true` applied.
+In order to scale your results, you need to mark one of your benchmark methods as a baseline. Only one method in class can have `Baseline = true` applied.
 
 ## Example
 

@@ -1,15 +1,25 @@
 ﻿using BenchmarkDotNet.Jobs;
 using System.IO;
-using System.Linq;
 using System.Xml;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace BenchmarkDotNet.Toolchains
 {
     internal static class AppConfigGenerator
     {
+        private static readonly HashSet<string> JobRuntimeSettings = new HashSet<string>()
+        {
+            "useLegacyJit",
+            "gcConcurrent",
+            "gcServer",
+            "GCCpuGroup",
+            "gcAllowVeryLargeObjects"
+        };
+
         internal static void Generate(Job job, TextReader source, TextWriter destination, IResolver resolver)
         {
             var xmlReader = XmlReader.Create(source);
@@ -18,7 +28,7 @@ namespace BenchmarkDotNet.Toolchains
             var configurationElement = GetOrCreateConfigurationElement(xmlDocument, xmlReader);
             var runtimeElement = GetOrCreateRuntimeElement(xmlDocument, configurationElement);
 
-            ClearAllCustomRuntimeSettingsExceptRedirects(runtimeElement);
+            ClearAllRuntimeSettingsThatCanBeSetOnlyByJobConfiguration(runtimeElement);
 
             GenerateJitSettings(xmlDocument, runtimeElement, job.Env);
             GenerateGCSettings(xmlDocument, runtimeElement, job.Env.Gc, resolver);
@@ -46,11 +56,11 @@ namespace BenchmarkDotNet.Toolchains
                    ?? configurationElement.AppendChild(xmlDocument.CreateNode(XmlNodeType.Element, "runtime", string.Empty));
         }
 
-        private static void ClearAllCustomRuntimeSettingsExceptRedirects(XmlNode runtimeElement)
+        private static void ClearAllRuntimeSettingsThatCanBeSetOnlyByJobConfiguration(XmlNode runtimeElement)
         {
             foreach (XmlNode runtimeSetting in runtimeElement.ChildNodes)
             {
-                if (runtimeSetting.Name != "assemblyBinding")
+                if (JobRuntimeSettings.Contains(runtimeSetting.Name))
                 {
                     runtimeElement.RemoveChild(runtimeSetting);
                 }
@@ -84,6 +94,8 @@ namespace BenchmarkDotNet.Toolchains
             string attributeName,
             string attributeValue)
         {
+            Debug.Assert(JobRuntimeSettings.Contains(nodeName), "Please add the new setting to the JobRuntimeSettings list");
+
             var node = document.CreateNode(XmlNodeType.Element, nodeName, string.Empty);
             var attribute = document.CreateAttribute(attributeName);
             attribute.Value = attributeValue;

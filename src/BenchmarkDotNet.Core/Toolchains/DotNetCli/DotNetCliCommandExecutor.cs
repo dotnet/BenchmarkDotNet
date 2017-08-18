@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        internal static string GetDotNetCliVersion()
+        internal static string GetDotNetSdkVersion()
         {
             using (var process = new Process { StartInfo = BuildStartInfo(arguments: "--version", workingDirectory: string.Empty) })
             {

@@ -6,7 +6,7 @@ using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 using Xunit;
 
-namespace BenchmarkDotNet.Tests
+namespace BenchmarkDotNet.Tests.Validators
 {
     public class ExecutionValidatorTests
     {

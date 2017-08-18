@@ -43,8 +43,17 @@ namespace BenchmarkDotNet.Running
             {
                 var logger = new CompositeLogger(config.GetCompositeLogger(), new StreamLogger(logStreamWriter));
                 benchmarks = GetSupportedBenchmarks(benchmarks, logger, toolchainProvider, resolver);
+                var artifactsToCleanup = new List<string>();
 
-                return Run(benchmarks, logger, title, config, rootArtifactsFolderPath, toolchainProvider, resolver);
+                try
+                {
+                    return Run(benchmarks, logger, title, config, rootArtifactsFolderPath, toolchainProvider, resolver, artifactsToCleanup);
+                }
+                finally
+                {
+                    logger.WriteLineHeader("// * Artifacts cleanup *");
+                    Cleanup(artifactsToCleanup);
+                }
             }
         }
 
@@ -57,7 +66,7 @@ namespace BenchmarkDotNet.Running
             return $"BenchmarkRun-{benchmarkRunIndex:##000}-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}";
         }
 
-        public static Summary Run(Benchmark[] benchmarks, ILogger logger, string title, IConfig config, string rootArtifactsFolderPath, Func<Job, IToolchain> toolchainProvider, IResolver resolver)
+        public static Summary Run(Benchmark[] benchmarks, ILogger logger, string title, IConfig config, string rootArtifactsFolderPath, Func<Job, IToolchain> toolchainProvider, IResolver resolver, List<string> artifactsToCleanup)
         {
             logger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
             logger.WriteLineInfo("// Found benchmarks:");
@@ -75,7 +84,7 @@ namespace BenchmarkDotNet.Running
             var reports = new List<BenchmarkReport>();
             foreach (var benchmark in benchmarks)
             {
-                var report = Run(benchmark, logger, config, rootArtifactsFolderPath, toolchainProvider, resolver);
+                var report = Run(benchmark, logger, config, rootArtifactsFolderPath, toolchainProvider, resolver, artifactsToCleanup);
                 reports.Add(report);
                 if (report.GetResultRuns().Any())
                     logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr());
@@ -133,13 +142,13 @@ namespace BenchmarkDotNet.Running
                     maxNameWidth = Math.Max(maxNameWidth, columnWithLegends.Select(c => c.ColumnName.Length).Max());
                 if (effectiveTimeUnit != null)
                     maxNameWidth = Math.Max(maxNameWidth, effectiveTimeUnit.Name.Length + 2);
-                
+
                 foreach (var column in columnWithLegends)
                     logger.WriteLineHint($"  {column.ColumnName.PadRight(maxNameWidth, ' ')} : {column.Legend}");
-                
+
                 if (effectiveTimeUnit != null)
-                  logger.WriteLineHint($"  {("1 " + effectiveTimeUnit.Name).PadRight(maxNameWidth, ' ')} :" +
-                                       $" 1 {effectiveTimeUnit.Description} ({TimeUnit.Convert(1, effectiveTimeUnit, TimeUnit.Second).ToStr("0.#########")} sec)");
+                    logger.WriteLineHint($"  {("1 " + effectiveTimeUnit.Name).PadRight(maxNameWidth, ' ')} :" +
+                                         $" 1 {effectiveTimeUnit.Description} ({TimeUnit.Convert(1, effectiveTimeUnit, TimeUnit.Second).ToStr("0.#########")} sec)");
             }
 
             if (config.GetDiagnosers().Any())
@@ -169,7 +178,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineStatistic($"{message}: {time.ToFormattedTotalTime()}");
         }
 
-        public static BenchmarkReport Run(Benchmark benchmark, ILogger logger, IConfig config, string rootArtifactsFolderPath, Func<Job, IToolchain> toolchainProvider, IResolver resolver)
+        public static BenchmarkReport Run(Benchmark benchmark, ILogger logger, IConfig config, string rootArtifactsFolderPath, Func<Job, IToolchain> toolchainProvider, IResolver resolver, List<string> artifactsToCleanup)
         {
             var toolchain = toolchainProvider(benchmark.Job);
 
@@ -209,7 +218,7 @@ namespace BenchmarkDotNet.Running
             {
                 if (!config.KeepBenchmarkFiles)
                 {
-                    generateResult.ArtifactsPaths?.RemoveBenchmarkFiles();
+                    artifactsToCleanup.AddRange(generateResult.ArtifactsToCleanup);
                 }
 
                 assemblyResolveHelper?.Dispose();
@@ -264,7 +273,7 @@ namespace BenchmarkDotNet.Running
             int defaultValue = analyzeRunToRunVariance ? 2 : 1;
             int launchCount = Math.Max(
                 1,
-                autoLaunchCount ? defaultValue: benchmark.Job.Run.LaunchCount);
+                autoLaunchCount ? defaultValue : benchmark.Job.Run.LaunchCount);
 
             for (int launchIndex = 0; launchIndex < launchCount; launchIndex++)
             {
@@ -309,10 +318,10 @@ namespace BenchmarkDotNet.Running
             logger.WriteLine();
 
             // Do a "Diagnostic" run, but DISCARD the results, so that the overhead of Diagnostics doesn't skew the overall results
-            if (config.GetDiagnosers().Any())
+            if (config.GetDiagnosers().Any(diagnoser => diagnoser.GetRunMode(benchmark) == Diagnosers.RunMode.ExtraRun))
             {
                 logger.WriteLineInfo("// Run, Diagnostic");
-                var compositeDiagnoser = config.GetCompositeDiagnoser();
+                var compositeDiagnoser = config.GetCompositeDiagnoser(benchmark, Diagnosers.RunMode.ExtraRun);
 
                 var executeResult = toolchain.Executor.Execute(
                     new ExecuteParameters(buildResult, benchmark, logger, resolver, config, compositeDiagnoser));
@@ -326,9 +335,12 @@ namespace BenchmarkDotNet.Running
                     logger.WriteLineError("Executable not found");
                 logger.WriteLine();
             }
-            else if (config.GetHardwareCounters().Any())
+
+            foreach (var diagnoser in config.GetDiagnosers().Where(diagnoser => diagnoser.GetRunMode(benchmark) == Diagnosers.RunMode.SeparateLogic))
             {
-                logger.WriteLineError("Hardware Counters are not supported for your current platform yet");
+                logger.WriteLineInfo("// Run, Diagnostic [SeparateLogic]");
+
+                diagnoser.ProcessResults(benchmark, null);
             }
 
             return executeResults;
@@ -360,10 +372,25 @@ namespace BenchmarkDotNet.Running
             if (!(toolchain is InProcessToolchain) // we don't want to mess with assembly loading when running benchmarks in the same process (could produce wrong results)
                 && !RuntimeInformation.IsMono()) // so far it was never an issue for Mono
             {
-                 return Helpers.DirtyAssemblyResolveHelper.Create(logger); 
+                return Helpers.DirtyAssemblyResolveHelper.Create(logger);
             }
 #endif
             return null;
+        }
+
+        private static void Cleanup(List<string> artifactsToCleanup)
+        {
+            foreach (string path in artifactsToCleanup)
+            {
+                if (Directory.Exists(path))
+                {
+                    Directory.Delete(path, recursive: true);
+                }
+                else if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+            }
         }
     }
 }
