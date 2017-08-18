@@ -26,6 +26,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// "dependencies": { "Microsoft.NETCore.App": { "version": "HERE" } }
         /// </param>
         /// <param name="imports">the custom imports</param>
+        /// <param name="configuration">the custom configuration</param>
         /// </summary>
         [PublicAPI]
         public NetCoreAppSettings(

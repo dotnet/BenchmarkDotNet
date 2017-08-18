@@ -12,13 +12,15 @@ namespace BenchmarkDotNet.Samples.Other
     {
         private class Config : ManualConfig
         {
+            private const string Configuration = "CustomConfiguration";
+
             public Config()
             {
-                var toolchain = CsProjCoreToolchain.From(NetCoreAppSettings.NetCoreApp11, "CustomConfiguration");
+                var toolchain = CsProjCoreToolchain.From(NetCoreAppSettings.NetCoreApp11, Configuration);
 
                 Add(new Job
                 {
-                    Run = { LaunchCount = 3, TargetCount = 100 }
+                    Run = { LaunchCount = 3, TargetCount = 10 }
                 }.With(toolchain));
             }
         }
@@ -27,7 +29,7 @@ namespace BenchmarkDotNet.Samples.Other
         public void Sleep()
         {
 #if CUSTOMCONFIGURATION
-            Thread.Sleep(10);
+            Thread.Sleep(5);
 #else
             Thread.Sleep(1);
 #endif
