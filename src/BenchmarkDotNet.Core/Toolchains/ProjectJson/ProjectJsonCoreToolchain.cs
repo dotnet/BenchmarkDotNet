@@ -14,11 +14,13 @@ namespace BenchmarkDotNet.Toolchains.ProjectJson
     [PublicAPI]
     public class ProjectJsonCoreToolchain : Toolchain
     {
-        [PublicAPI] public static readonly IToolchain NetCoreApp11 = From(NetCoreAppSettings.NetCoreApp11);
-        [PublicAPI] public static readonly IToolchain NetCoreApp12 = From(NetCoreAppSettings.NetCoreApp12);
-        [PublicAPI] public static readonly IToolchain NetCoreApp20 = From(NetCoreAppSettings.NetCoreApp20);
+        internal const string DefaultConfiguration = "Release";
 
-        [PublicAPI] public static readonly Lazy<IToolchain> Current = new Lazy<IToolchain>(() => From(NetCoreAppSettings.GetCurrentVersion()));
+        [PublicAPI] public static readonly IToolchain NetCoreApp11 = From(NetCoreAppSettings.NetCoreApp11, DefaultConfiguration);
+        [PublicAPI] public static readonly IToolchain NetCoreApp12 = From(NetCoreAppSettings.NetCoreApp12, DefaultConfiguration);
+        [PublicAPI] public static readonly IToolchain NetCoreApp20 = From(NetCoreAppSettings.NetCoreApp20, DefaultConfiguration);
+
+        [PublicAPI] public static readonly Lazy<IToolchain> Current = new Lazy<IToolchain>(() => From(NetCoreAppSettings.GetCurrentVersion(), DefaultConfiguration));
 
         private ProjectJsonCoreToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor) 
             : base(name, generator, builder, executor)
@@ -26,7 +28,7 @@ namespace BenchmarkDotNet.Toolchains.ProjectJson
         }
 
         [PublicAPI]
-        public static IToolchain From(NetCoreAppSettings settings) 
+        public static IToolchain From(NetCoreAppSettings settings, string configuration) 
             => new ProjectJsonCoreToolchain(
                 "Core", 
                 new ProjectJsonGenerator(
@@ -34,8 +36,9 @@ namespace BenchmarkDotNet.Toolchains.ProjectJson
                     GetExtraDependencies(settings),
                     PlatformProvider,
                     settings.Imports,
+                    configuration,
                     GetRuntime()), 
-                new ProjectJsonBuilder(settings.TargetFrameworkMoniker), 
+                new ProjectJsonBuilder(settings.TargetFrameworkMoniker, configuration), 
                 new Executor());
 
         public override bool IsSupported(Benchmark benchmark, ILogger logger, IResolver resolver)

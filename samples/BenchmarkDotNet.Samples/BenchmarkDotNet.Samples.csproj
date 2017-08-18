@@ -12,6 +12,7 @@
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='CustomConfiguration|net46|AnyCPU'" />
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
     <Reference Include="System.Reflection" />

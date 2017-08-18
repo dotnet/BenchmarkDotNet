@@ -13,11 +13,13 @@ namespace BenchmarkDotNet.Toolchains.CsProj
     [PublicAPI]
     public class CsProjCoreToolchain : Toolchain
     {
-        [PublicAPI] public static readonly IToolchain NetCoreApp11 = From(NetCoreAppSettings.NetCoreApp11);
-        [PublicAPI] public static readonly IToolchain NetCoreApp12 = From(NetCoreAppSettings.NetCoreApp12);
-        [PublicAPI] public static readonly IToolchain NetCoreApp20 = From(NetCoreAppSettings.NetCoreApp20);
+        internal const string DefaultConfiguration = "Release";
 
-        [PublicAPI] public static readonly Lazy<IToolchain> Current = new Lazy<IToolchain>(() => From(NetCoreAppSettings.GetCurrentVersion()));
+        [PublicAPI] public static readonly IToolchain NetCoreApp11 = From(NetCoreAppSettings.NetCoreApp11, DefaultConfiguration);
+        [PublicAPI] public static readonly IToolchain NetCoreApp12 = From(NetCoreAppSettings.NetCoreApp12, DefaultConfiguration);
+        [PublicAPI] public static readonly IToolchain NetCoreApp20 = From(NetCoreAppSettings.NetCoreApp20, DefaultConfiguration);
+
+        [PublicAPI] public static readonly Lazy<IToolchain> Current = new Lazy<IToolchain>(() => From(NetCoreAppSettings.GetCurrentVersion(), DefaultConfiguration));
 
         private CsProjCoreToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor) 
             : base(name, generator, builder, executor)
@@ -25,10 +27,10 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         }
 
         [PublicAPI]
-        public static IToolchain From(NetCoreAppSettings settings)
+        public static IToolchain From(NetCoreAppSettings settings, string configuration)
             => new CsProjCoreToolchain("CoreCsProj",
-                new CsProjGenerator(settings.TargetFrameworkMoniker, PlatformProvider), 
-                new CsProjBuilder(settings.TargetFrameworkMoniker), 
+                new CsProjGenerator(settings.TargetFrameworkMoniker, PlatformProvider, configuration), 
+                new CsProjBuilder(settings.TargetFrameworkMoniker, configuration), 
                 new DotNetCliExecutor());
 
         // dotnet cli supports only x64 compilation now

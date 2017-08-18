@@ -18,7 +18,8 @@ namespace BenchmarkDotNet.Toolchains.ProjectJson
             => $"build --framework {frameworkMoniker} --configuration {Configuration} --output {OutputDirectory}"
                + (justTheProjectItself ? " --no-dependencies" : string.Empty);
 
-        public ProjectJsonBuilder(string targetFrameworkMoniker) : base(targetFrameworkMoniker)
+        public ProjectJsonBuilder(string targetFrameworkMoniker, string configuration) 
+            : base(targetFrameworkMoniker, configuration)
         {
         }
     }
