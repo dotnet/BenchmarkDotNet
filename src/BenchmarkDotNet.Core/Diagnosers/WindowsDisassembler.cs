@@ -9,6 +9,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
+using System.Linq;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -26,15 +27,15 @@ namespace BenchmarkDotNet.Diagnosers
             recursiveDepth = config.RecursiveDepth;
         }
 
-        internal DisassemblyResult Dissasemble(DiagnoserActionParameters parameters, Assembly windowsDiagnosticsAssembly) // the benchmark is already compiled
+        internal DisassemblyResult Dissasemble(DiagnoserActionParameters parameters)
         {
             var resultsPath = Path.GetTempFileName();
 
             var errors = ProcessHelper.RunAndReadOutput(
-                GetDisassemblerPath(parameters.Process, parameters.Benchmark.Job.Env.Platform, windowsDiagnosticsAssembly),
+                GetDisassemblerPath(parameters.Process, parameters.Benchmark.Job.Env.Platform),
                 BuildArguments(parameters, resultsPath));
 
-            if(!string.IsNullOrEmpty(errors))
+            if (!string.IsNullOrEmpty(errors))
                 parameters.Config.GetCompositeLogger().WriteError(errors);
 
             try
@@ -53,7 +54,7 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        private string GetDisassemblerPath(Process process, Platform platform, Assembly windowsDiagnosticsAssembly)
+        private string GetDisassemblerPath(Process process, Platform platform)
         {
             switch (platform)
             {
@@ -61,25 +62,25 @@ namespace BenchmarkDotNet.Diagnosers
                     return GetDisassemblerPath(process,
                         NativeMethods.Is64Bit(process)
                             ? Platform.X64
-                            : Platform.X86,
-                        windowsDiagnosticsAssembly);
+                            : Platform.X86);
                 case Platform.X86:
-                    return GetDisassemblerPath("x86", windowsDiagnosticsAssembly);
+                    return GetDisassemblerPath("x86");
                 case Platform.X64:
-                    return GetDisassemblerPath("x64", windowsDiagnosticsAssembly);
+                    return GetDisassemblerPath("x64");
                 default:
                     throw new NotSupportedException($"Platform {platform} not supported!");
             }
         }
 
-        private string GetDisassemblerPath(string architectureName, Assembly windowsDiagnosticsAssembly)
+        private string GetDisassemblerPath(string architectureName)
         {
             // one can only attach to a process of same target architecture, this is why we need exe for x64 and for x86
             var exeName = $"BenchmarkDotNet.Disassembler.{architectureName}.exe";
+            var assemblyWithDisassemblersInResources = typeof(WindowsDisassembler).GetTypeInfo().Assembly;
 
             var disassemblerPath =
                 Path.Combine(
-                    new FileInfo(windowsDiagnosticsAssembly.Location).Directory.FullName, // all required dependencies are there
+                    new FileInfo(assemblyWithDisassemblersInResources.Location).Directory.FullName,
                     (Properties.BenchmarkDotNetInfo.FullVersion // possible update
                     + exeName)); // separate process per architecture!!
 
@@ -87,15 +88,41 @@ namespace BenchmarkDotNet.Diagnosers
             if (File.Exists(disassemblerPath))
                 return disassemblerPath;
 #endif
-
             // the disassembler has not been yet retrived from the resources
-            using (var resourceStream = windowsDiagnosticsAssembly.GetManifestResourceStream($"BenchmarkDotNet.Diagnostics.Windows.Disassemblers.net46.win7_{architectureName}.{exeName}"))
-            using (var exeStream = File.Create(disassemblerPath))
+            CopyFromResources(
+                assemblyWithDisassemblersInResources,
+                $"BenchmarkDotNet.Disassemblers.net46.win7_{architectureName}.{exeName}",
+                disassemblerPath);
+
+            CopyAllRequiredDependencies(assemblyWithDisassemblersInResources, Path.GetDirectoryName(disassemblerPath));
+
+            return disassemblerPath;
+        }
+
+        private void CopyAllRequiredDependencies(Assembly assemblyWithDisassemblersInResources, string destinationFolder)
+        {
+            // ClrMD and Cecil are also embeded in the resources, we need to copy them as well
+            foreach (var dependency in assemblyWithDisassemblersInResources.GetManifestResourceNames().Where(name => name.EndsWith(".dll")))
+            {
+                // dependency is sth like "BenchmarkDotNet.Disassemblers.net46.win7_x64.Microsoft.Diagnostics.Runtime.dll"
+                var fileName = dependency.Replace("BenchmarkDotNet.Disassemblers.net46.win7_x64.", string.Empty);
+                var dllPath = Path.Combine(destinationFolder, fileName);
+
+                if (!File.Exists(dllPath))
+                    CopyFromResources(
+                        assemblyWithDisassemblersInResources,
+                        dependency,
+                        dllPath);
+            }
+        }
+
+        private void CopyFromResources(Assembly assembly, string resourceName, string destinationPath)
+        {
+            using (var resourceStream = assembly.GetManifestResourceStream(resourceName))
+            using (var exeStream = File.Create(destinationPath))
             {
                 resourceStream.CopyTo(exeStream);
             }
-
-            return disassemblerPath;
         }
 
         // must be kept in sync with BenchmarkDotNet.Disassembler.Program.Main
@@ -120,7 +147,7 @@ namespace BenchmarkDotNet.Diagnosers
                     throw new Exception("Not Windows");
                 return !isWow64;
 #else
-                throw new NotSupportedException();
+                return true; // .NET Core is 64 bit by default
 #endif
             }
 

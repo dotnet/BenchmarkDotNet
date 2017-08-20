@@ -10,8 +10,13 @@
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\*" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
+    <EmbeddedResource Include="Disassemblers\net46\win7-x86\BenchmarkDotNet.Disassembler.x86.exe" />
+    <EmbeddedResource Include="Disassemblers\net46\win7-x64\BenchmarkDotNet.Disassembler.x64.exe" />
+    <EmbeddedResource Include="Disassemblers\net46\win7-x64\*.dll" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <ProjectReference Include="..\BenchmarkDotNet.Disassembler.x64\BenchmarkDotNet.Disassembler.x64.csproj" />
+    <ProjectReference Include="..\BenchmarkDotNet.Disassembler.x86\BenchmarkDotNet.Disassembler.x86.csproj" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.3.0" />
     <Reference Include="System.Management" />
     <Reference Include="System.Xml" />

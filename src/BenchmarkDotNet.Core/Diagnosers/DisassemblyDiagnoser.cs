@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
@@ -54,14 +53,10 @@ namespace BenchmarkDotNet.Diagnosers
         // method was already compiled and executed for the Warmup, we can attach to the process and do the job
         public void AfterGlobalSetup(DiagnoserActionParameters parameters)
         {
-#if CLASSIC
             if (ShouldUseWindowsDissasembler(parameters.Benchmark))
                 results.Add(
                     parameters.Benchmark,
-                    windowsDisassembler.Dissasemble(
-                        parameters, 
-                        DiagnosersLoader.LoadDiagnosticsAssembly(typeof(DisassemblyDiagnoser).GetTypeInfo().Assembly)));
-#endif
+                    windowsDisassembler.Dissasemble(parameters));
         }
 
         // no need to run benchmarks once again, just do this after all runs
@@ -79,11 +74,6 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
         {
-#if CORE
-            yield return new ValidationError(false, "To use the classic Windows diagnosers for .NET Core you need to run the benchmarks for desktop .NET. More info: http://adamsitnik.com/Hardware-Counters-Diagnoser/#how-to-get-it-running-for-net-coremono-on-windows");
-            yield break;
-#endif
-
             foreach (var benchmark in validationParameters.Benchmarks)
             {
                 if (!RuntimeInformation.IsWindows() && !ShouldUseMonoDisassembler(benchmark))

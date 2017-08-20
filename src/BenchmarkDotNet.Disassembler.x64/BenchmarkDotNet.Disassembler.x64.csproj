@@ -8,7 +8,7 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup>
-    <OutputPath>..\BenchmarkDotNet.Diagnostics.Windows\Disassemblers</OutputPath>
+    <OutputPath>..\BenchmarkDotNet.Core\Disassemblers</OutputPath>
     <RootNamespace>BenchmarkDotNet.Disassembler</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
