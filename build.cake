@@ -65,7 +65,6 @@ Task("Build")
             .UseToolVersion(MSBuildToolVersion.Default)
             .SetMSBuildPlatform(MSBuildPlatform.Automatic)
             .SetPlatformTarget(PlatformTarget.MSIL) // Any CPU
-            .SetMaxCpuCount(0) // parallel
             .SetNodeReuse(true);
 
         if(!isRunningOnWindows)
