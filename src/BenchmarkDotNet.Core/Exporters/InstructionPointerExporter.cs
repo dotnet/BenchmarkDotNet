@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Exporters
 {
     public class InstructionPointerExporter : IExporter
     {
-        private const string CssStyle = @"
+        internal const string CssStyle = @"
 <style type=""text/css"">
     pre { margin: 0px; }
     table { border-collapse:collapse; }

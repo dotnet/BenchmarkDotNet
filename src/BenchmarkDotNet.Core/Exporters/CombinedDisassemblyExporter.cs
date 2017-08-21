@@ -9,11 +9,11 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Exporters
 {
-    public class DisassemblyExporter : ExporterBase
+    public class CombinedDisassemblyExporter : ExporterBase
     {
         private readonly IReadOnlyDictionary<Benchmark, DisassemblyResult> results;
 
-        public DisassemblyExporter(IReadOnlyDictionary<Benchmark, DisassemblyResult> results)
+        public CombinedDisassemblyExporter(IReadOnlyDictionary<Benchmark, DisassemblyResult> results)
         {
             this.results = results;
         }
@@ -81,11 +81,11 @@ namespace BenchmarkDotNet.Exporters
                 logger.WriteLine("<td style=\"vertical-align:top;\"><pre><code>");
                 foreach (var method in results[benchmark].Methods.Where(method => string.IsNullOrEmpty(method.Problem)))
                 {
-                    logger.WriteLine($"{method.NativeCode:X} {method.Name}");
+                    logger.WriteLine($"{SingleDisassemblyExporter.FormatMethodAddress(method.NativeCode)} {method.Name}");
 
                     foreach (var map in method.Maps)
                         foreach (var instruction in map.Instructions)
-                            logger.WriteLine($"{instruction.TextRepresentation} {instruction.Comment}");
+                            logger.WriteLine(instruction.TextRepresentation);
 
                     logger.WriteLine();
                 }

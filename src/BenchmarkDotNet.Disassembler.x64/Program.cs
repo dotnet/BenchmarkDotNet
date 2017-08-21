@@ -288,7 +288,7 @@ namespace BenchmarkDotNet.Disassembler
             if (!state.HandledMetadataTokens.Contains(method.MetadataToken))
                 state.Todo.Enqueue(new MethodInfo(method, depth + 1));
 
-            return $"{method.Type.Name}.{method.Name}"; // method.GetFullSignature(); produces detailed, but too long string
+            return method.GetFullSignature();
         }
 
         static bool TryGetHexAdress(string textRepresentation, out ulong address)
