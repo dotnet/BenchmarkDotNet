@@ -65,7 +65,6 @@ Task("Build")
             .UseToolVersion(MSBuildToolVersion.Default)
             .SetMSBuildPlatform(MSBuildPlatform.Automatic)
             .SetPlatformTarget(PlatformTarget.MSIL) // Any CPU
-            .SetMaxCpuCount(0) // parallel
             .SetNodeReuse(true);
 
         if(!isRunningOnWindows)
@@ -88,7 +87,7 @@ Task("Build")
     });
 
 Task("FastTests")
-    .IsDependentOn("Build")
+    .IsDependentOn("Restore")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
@@ -96,7 +95,7 @@ Task("FastTests")
     });
 
 Task("SlowTests")
-    .IsDependentOn("Build")
+    .IsDependentOn("Restore")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
@@ -104,15 +103,14 @@ Task("SlowTests")
     });
 
 Task("Pack")
-    .IsDependentOn("Build")
+    .IsDependentOn("Restore")
     .WithCriteria(IsOnAppVeyorAndNotPR || string.Equals(target, "pack", StringComparison.OrdinalIgnoreCase))
     .Does(() =>
     {
         var settings = new DotNetCorePackSettings
         {
             Configuration = configuration,
-            OutputDirectory = artifactsDirectory,
-            NoBuild = true
+            OutputDirectory = artifactsDirectory
         };
 
         var projects = GetFiles("./src/**/*.csproj");
@@ -123,6 +121,9 @@ Task("Pack")
     });
 
 Task("Default")
+    .IsDependentOn("Clean")
+    .IsDependentOn("Restore")
+    .IsDependentOn("Build")
     .IsDependentOn("FastTests")
     .IsDependentOn("SlowTests")
     .IsDependentOn("Pack");
@@ -134,8 +135,7 @@ private DotNetCoreTestSettings GetTestSettings()
 {
     var settings = new DotNetCoreTestSettings
     {
-        Configuration = "Release",
-        NoBuild = true
+        Configuration = "Release"
     };
 
     if (!IsRunningOnWindows())
