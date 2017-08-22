@@ -5,11 +5,11 @@ namespace BenchmarkDotNet.Tests.Portability
 {
     public class VMwareTests
     {
+        private readonly VirtualMachineHypervisor hypervisor = VMware.Default;
+
         [Fact]
         public void ContainsCorrectName()
         {
-            var hypervisor = new VMware();
-
             Assert.Equal("VMware", hypervisor.Name);
         }
 
@@ -22,8 +22,6 @@ namespace BenchmarkDotNet.Tests.Portability
         [InlineData("VMWare Inc", null, false)]
         public void DetectsVirtualMachine(string manufacturer, string model, bool expectedResult)
         {
-            var hypervisor = new VMware();
-
             bool result = hypervisor.IsVirtualMachine(manufacturer, model);
             Assert.Equal(expectedResult, result);
         }

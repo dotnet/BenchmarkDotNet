@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Portability
         internal static bool EqualsWithIgnoreCase(this string left, string right)
         {
 #if !CORE
-            return left.Equals(right, StringComparison.InvariantCultureIgnoreCase);
+            return left.Equals(right, IgnoreCaseStringComparison);
 #else
             // http://stackoverflow.com/questions/14600694/where-has-stringcomparison-invariantcultureignorecase-gone
             return left.Equals(right, StringComparison.OrdinalIgnoreCase);
@@ -16,7 +16,20 @@ namespace BenchmarkDotNet.Portability
 
         internal static bool ContainsWithIgnoreCase(this string text, string word)
         {
-            return text.IndexOf(word, StringComparison.OrdinalIgnoreCase) >= 0;
+            return text.IndexOf(word, IgnoreCaseStringComparison) >= 0;
+        }
+
+        private static StringComparison IgnoreCaseStringComparison
+        {
+            get
+            {
+#if !CORE
+                return StringComparison.InvariantCultureIgnoreCase;
+#else
+// http://stackoverflow.com/questions/14600694/where-has-stringcomparison-invariantcultureignorecase-gone
+                return StringComparison.OrdinalIgnoreCase;
+#endif
+            }
         }
     }
 }

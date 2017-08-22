@@ -5,11 +5,11 @@ namespace BenchmarkDotNet.Tests.Portability
 {
     public class VirtualBoxTests
     {
+        private readonly VirtualMachineHypervisor hypervisor = VirtualBox.Default;
+
         [Fact]
         public void ContainsCorrectName()
         {
-            var hypervisor = new VirtualBox();
-
             Assert.Equal("VirtualBox", hypervisor.Name);
         }
 
@@ -20,8 +20,6 @@ namespace BenchmarkDotNet.Tests.Portability
         [InlineData("redundant", null, false)]
         public void DetectsVirtualMachine(string manufacturer, string model, bool expectedResult)
         {
-            var hypervisor = new VirtualBox();
-
             bool result = hypervisor.IsVirtualMachine(manufacturer, model);
             Assert.Equal(expectedResult, result);
         }
