@@ -147,7 +147,7 @@ namespace BenchmarkDotNet.Diagnosers
                     throw new Exception("Not Windows");
                 return !isWow64;
 #else
-                return true; // .NET Core is 64 bit by default
+                return System.IntPtr.Size == 8; // todo: find the way to cover all scenarios for .NET Core
 #endif
             }
 

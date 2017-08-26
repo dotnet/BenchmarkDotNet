@@ -10,7 +10,7 @@
 
         /// <summary>
         /// RyuJIT
-        /// <remarks>Supported only for x64; Full Framework or CoreCLR</remarks>
+        /// <remarks>Full Framework or CoreCLR</remarks>
         /// </summary>
         RyuJit,
 

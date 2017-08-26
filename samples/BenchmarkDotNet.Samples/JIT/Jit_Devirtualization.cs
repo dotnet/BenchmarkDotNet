@@ -44,7 +44,9 @@ namespace BenchmarkDotNet.Samples.JIT
             Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Clr));
 
             Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp11));
+
             Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp20));
+            Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X86).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp20));
 
             Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(printAsm: true, printPrologAndEpilog: true, recursiveDepth: 3)));
         }

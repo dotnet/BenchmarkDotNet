@@ -18,6 +18,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Job LegacyJitX86 = new Job(nameof(LegacyJitX86), EnvMode.LegacyJitX86).Freeze();
         public static readonly Job LegacyJitX64 = new Job(nameof(LegacyJitX64), EnvMode.LegacyJitX64).Freeze();
         public static readonly Job RyuJitX64 = new Job(nameof(RyuJitX64), EnvMode.RyuJitX64).Freeze();
+        public static readonly Job RyuJitX86 = new Job(nameof(RyuJitX86), EnvMode.RyuJitX86).Freeze();
 
         // Run
         public static readonly Job Dry = new Job(nameof(Dry), RunMode.Dry).Freeze();

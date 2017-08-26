@@ -1,6 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -31,8 +32,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 new CsProjBuilder(settings.TargetFrameworkMoniker), 
                 new DotNetCliExecutor());
 
-        // dotnet cli supports only x64 compilation now
-        private static string PlatformProvider(Platform platform) => "x64";
+        private static string PlatformProvider(Platform platform) => platform.ToConfig();
 
         public override bool IsSupported(Benchmark benchmark, ILogger logger, IResolver resolver)
         {
@@ -53,11 +53,6 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 return false;
             }
 
-            if (benchmark.Job.HasValue(EnvMode.PlatformCharacteristic) && benchmark.Job.ResolveValue(EnvMode.PlatformCharacteristic, resolver) == Platform.X86)
-            {
-                logger.WriteLineError($"Currently dotnet cli toolchain supports only X64 compilation, benchmark '{benchmark.DisplayInfo}' will not be executed");
-                return false;
-            }
             if (benchmark.Job.HasValue(EnvMode.JitCharacteristic) && benchmark.Job.ResolveValue(EnvMode.JitCharacteristic, resolver) == Jit.LegacyJit)
             {
                 logger.WriteLineError($"Currently dotnet cli toolchain supports only RyuJit, benchmark '{benchmark.DisplayInfo}' will not be executed");
