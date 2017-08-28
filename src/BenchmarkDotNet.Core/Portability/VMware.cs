@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Portability
 
         public override bool IsVirtualMachine(string manufacturer, string model)
         {
-            return model != null && model.ContainsWithIgnoreCase("vmware");
+            return ContainsVmIdentifier(model, "vmware");
         }
     }
 }
