@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Tests.Portability
 {
     public class RuntimeInformationTests
     {
-        [AppveyorOnlyFact]
+        [AppVeyorWithClassicFrameworkOnlyFact]
         public void DetectsHyperVOnAppveyor()
         {
             VirtualMachineHypervisor hypervisor = RuntimeInformation.GetVirtualMachineHypervisor();
