@@ -351,5 +351,14 @@ namespace BenchmarkDotNet.Portability
 
             return null;
         }
+
+        public static bool IsClassic()
+        {
+#if CLASSIC
+            return true;
+#else
+            return false;
+#endif
+        }
     }
 }
