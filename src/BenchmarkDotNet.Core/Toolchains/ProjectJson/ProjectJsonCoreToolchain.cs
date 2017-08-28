@@ -1,7 +1,7 @@
-﻿using System;
+using System;
+using System.Reflection;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -9,10 +9,10 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 
-namespace BenchmarkDotNet.Toolchains.CsProj
+namespace BenchmarkDotNet.Toolchains.ProjectJson
 {
     [PublicAPI]
-    public class CsProjCoreToolchain : Toolchain
+    public class ProjectJsonCoreToolchain : Toolchain
     {
         internal const string DefaultConfiguration = "Release";
 
@@ -22,23 +22,28 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         [PublicAPI] public static readonly Lazy<IToolchain> Current = new Lazy<IToolchain>(() => From(NetCoreAppSettings.GetCurrentVersion(), DefaultConfiguration));
 
-        private CsProjCoreToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor) 
+        private ProjectJsonCoreToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor) 
             : base(name, generator, builder, executor)
         {
         }
 
         [PublicAPI]
-        public static IToolchain From(NetCoreAppSettings settings, string configuration)
-            => new CsProjCoreToolchain(settings.Name,
-                new CsProjGenerator(settings.TargetFrameworkMoniker, PlatformProvider, configuration), 
-                new CsProjBuilder(settings.TargetFrameworkMoniker, configuration), 
-                new DotNetCliExecutor());
-
-        private static string PlatformProvider(Platform platform) => platform.ToConfig();
+        public static IToolchain From(NetCoreAppSettings settings, string configuration) 
+            => new ProjectJsonCoreToolchain(
+                "Core", 
+                new ProjectJsonGenerator(
+                    settings.TargetFrameworkMoniker,
+                    GetExtraDependencies(settings),
+                    PlatformProvider,
+                    settings.Imports,
+                    configuration,
+                    GetRuntime()), 
+                new ProjectJsonBuilder(settings.TargetFrameworkMoniker, configuration), 
+                new Executor());
 
         public override bool IsSupported(Benchmark benchmark, ILogger logger, IResolver resolver)
         {
-            if (!base.IsSupported(benchmark, logger, resolver))
+            if(!base.IsSupported(benchmark, logger, resolver))
             {
                 return false;
             }
@@ -55,6 +60,11 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 return false;
             }
 
+            if (benchmark.Job.HasValue(EnvMode.PlatformCharacteristic) && benchmark.Job.ResolveValue(EnvMode.PlatformCharacteristic, resolver) == Platform.X86)
+            {
+                logger.WriteLineError($"Currently dotnet cli toolchain supports only X64 compilation, benchmark '{benchmark.DisplayInfo}' will not be executed");
+                return false;
+            }
             if (benchmark.Job.HasValue(EnvMode.JitCharacteristic) && benchmark.Job.ResolveValue(EnvMode.JitCharacteristic, resolver) == Jit.LegacyJit)
             {
                 logger.WriteLineError($"Currently dotnet cli toolchain supports only RyuJit, benchmark '{benchmark.DisplayInfo}' will not be executed");
@@ -72,6 +82,27 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             }
 
             return true;
+        }
+
+        // dotnet cli supports only x64 compilation now
+        private static string PlatformProvider(Platform platform) => "x64";
+
+        private static string GetExtraDependencies(NetCoreAppSettings settings)
+        {
+            // do not set the type to platform in order to produce exe
+            // https://github.com/dotnet/core/issues/77#issuecomment-219692312
+            return $"\"dependencies\": {{ \"Microsoft.NETCore.App\": {{ \"version\": \"{settings.MicrosoftNETCoreAppVersion}\" }} }},";
+        }
+
+        private static string GetRuntime()
+        {
+            var currentRuntime = Microsoft.DotNet.InternalAbstractions.RuntimeEnvironment.GetRuntimeIdentifier();
+            if (!string.IsNullOrEmpty(currentRuntime))
+            {
+                return $"\"runtimes\": {{ \"{currentRuntime}\": {{ }} }},";
+            }
+
+            return string.Empty;
         }
     }
 }

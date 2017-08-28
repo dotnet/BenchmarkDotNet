@@ -11,16 +11,16 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public abstract class DotNetCliBuilder : IBuilder
     {
-        internal const string Configuration = "Release";
-
-        private string TargetFrameworkMoniker { get; }
+        internal string TargetFrameworkMoniker { get; }
+        internal string Configuration { get; }
 
         internal abstract string RestoreCommand { get; }
 
         [PublicAPI]
-        public DotNetCliBuilder(string targetFrameworkMoniker)
+        public DotNetCliBuilder(string targetFrameworkMoniker, string configuration)
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
+            Configuration = configuration;
         }
 
         internal abstract string GetBuildCommand(string frameworkMoniker, bool justTheProjectItself);
