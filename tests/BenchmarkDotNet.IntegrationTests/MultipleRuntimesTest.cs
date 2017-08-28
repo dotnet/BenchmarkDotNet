@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var summary = BenchmarkRunner
                 .Run<C>(
                     ManualConfig.CreateEmpty()
-                                .With(new Job(Job.Dry, EnvMode.Core))
+                                .With(new Job(Job.Dry, EnvMode.Core).With(Platform.X64))
                                 .With(new Job(Job.Dry, EnvMode.Clr))
                                 .With(DefaultColumnProviders.Instance)
                                 .With(new OutputLogger(output)));
