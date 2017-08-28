@@ -6,17 +6,14 @@ namespace BenchmarkDotNet.Tests.XUnit
 {
     public class AppveyorOnlyFactAttribute : FactAttribute
     {
-        private const string message = "Test is available only on the AppVeyor";
+        private const string Message = "Test is available only on the AppVeyor";
         private static readonly string skip;
 
         static AppveyorOnlyFactAttribute()
         {
             string value = Environment.GetEnvironmentVariable("APPVEYOR");
-
-            if (!string.IsNullOrEmpty(value) && value.EqualsWithIgnoreCase("true"))
-                skip = null;
-            else
-                skip = message;
+            bool appVeyorDetected = !string.IsNullOrEmpty(value) && value.EqualsWithIgnoreCase("true");
+            skip = appVeyorDetected ? null : Message;
         }
 
         public override string Skip => skip;
