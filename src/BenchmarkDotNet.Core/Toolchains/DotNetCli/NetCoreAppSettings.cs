@@ -9,9 +9,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public class NetCoreAppSettings
     {
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp11 = new NetCoreAppSettings("netcoreapp1.1", "1.1-*", ".NET Core 1.1");
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp12 = new NetCoreAppSettings("netcoreapp1.2", "1.2-*", ".NET Core 1.0");
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp20 = new NetCoreAppSettings("netcoreapp2.0", "2.0-*", ".NET Core 2.0");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp11 = new NetCoreAppSettings("netcoreapp1.1", null, ".NET Core 1.1");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp12 = new NetCoreAppSettings("netcoreapp1.2", null, ".NET Core 1.0");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp20 = new NetCoreAppSettings("netcoreapp2.0", null, ".NET Core 2.0");
 
         private static NetCoreAppSettings Default => NetCoreApp11;
 
@@ -19,24 +19,21 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// <param name="targetFrameworkMoniker">
         /// sample values: netcoreapp1.1, netcoreapp1.2, netcoreapp2.0
         /// </param>
-        /// <param name="microsoftNetCoreAppVersion">
-        /// used in the auto-generated project.json file, 
-        /// "dependencies": { "Microsoft.NETCore.App": { "version": "HERE" } }
+        /// <param name="runtimeFrameworkVersion">
+        /// used in the auto-generated .csproj file
+        /// simply ignored if null or empty
         /// </param>
         /// <param name="name">display name used for showing the results</param>
-        /// <param name="imports">the custom imports</param>
         /// </summary>
         [PublicAPI]
         public NetCoreAppSettings(
             string targetFrameworkMoniker, 
-            string microsoftNetCoreAppVersion, 
-            string name,
-            string imports = "[ \"dnxcore50\", \"portable-net45+win8\", \"dotnet5.6\", \"netcore50\" ]")
+            string runtimeFrameworkVersion, 
+            string name)
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
-            MicrosoftNETCoreAppVersion = microsoftNetCoreAppVersion;
+            RuntimeFrameworkVersion = runtimeFrameworkVersion;
             Name = name;
-            Imports = imports;
         }
 
         /// <summary>
@@ -44,15 +41,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// </summary>
         public string TargetFrameworkMoniker { get; }
 
-        /// <summary>
-        /// "dependencies": { "Microsoft.NETCore.App": { "version": "THIS" } }
-        /// </summary>
-        public string MicrosoftNETCoreAppVersion { get; }
-
-        /// <summary>
-        /// the custom imports
-        /// </summary>
-        public string Imports { get; }
+        public string RuntimeFrameworkVersion { get; }
 
         /// <summary>
         /// display name used for showing the results

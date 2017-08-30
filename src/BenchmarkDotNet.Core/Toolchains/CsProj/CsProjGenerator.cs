@@ -19,9 +19,12 @@ namespace BenchmarkDotNet.Toolchains.CsProj
     [PublicAPI]
     public class CsProjGenerator : DotNetCliGenerator
     {
-        public CsProjGenerator(string targetFrameworkMoniker, Func<Platform, string> platformProvider)
+        public string RuntimeFrameworkVersion { get; }
+
+        public CsProjGenerator(string targetFrameworkMoniker, Func<Platform, string> platformProvider, string runtimeFrameworkVersion = null)
             : base(new CsProjBuilder(targetFrameworkMoniker), targetFrameworkMoniker, null, platformProvider, null)
         {
+            RuntimeFrameworkVersion = runtimeFrameworkVersion;
         }
 
         protected override string GetBuildArtifactsDirectoryPath(Benchmark benchmark, string programName)
@@ -69,6 +72,9 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 	    // <RuntimeFrameworkVersion>2.0.0-beta-001607-00</RuntimeFrameworkVersion>
         private string GetSettingsThatNeedsToBeCopied(FileInfo projectFile)
         {
+            if (!string.IsNullOrEmpty(RuntimeFrameworkVersion)) // some power users knows what to configure, just do it and copy nothing more
+                return $"<RuntimeFrameworkVersion>{RuntimeFrameworkVersion}</RuntimeFrameworkVersion>";
+
             var customSettings = new StringBuilder();
             using (var file = new StreamReader(File.OpenRead(projectFile.FullName)))
             {
