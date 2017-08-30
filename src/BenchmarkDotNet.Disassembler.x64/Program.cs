@@ -142,13 +142,13 @@ namespace BenchmarkDotNet.Disassembler
 
             var maps = new List<Map>();
 
-            var mapByILOffset = (from map in method.ILOffsetMap
+            var mapByStartAddress = (from map in method.ILOffsetMap
                                  where map.ILOffset >= 0 // prolog is -2, epilog -3
                                  where map.StartAddress <= map.EndAddress
-                                 orderby map.ILOffset
+                                 orderby map.StartAddress // we need to print in the machine code order, not IL! #536
                                  select map).ToArray();
 
-            if (mapByILOffset.Length == 0 && settings.PrintIL)
+            if (mapByStartAddress.Length == 0 && settings.PrintIL)
             {
                 // The method doesn't have an offset map. Just print the whole thing.
                 maps.Add(CreateMap(GetIL(ilInstructions)));
@@ -158,16 +158,18 @@ namespace BenchmarkDotNet.Disassembler
             if (prolog.ILOffset == -2 && settings.PrintPrologAndEpilog) // -2 is a magic number for prolog
                 maps.Add(CreateMap(GetAsm(prolog, state, methodInfo.Depth)));
 
-            for (int i = 0; i < mapByILOffset.Length; ++i)
+            for (int i = 0; i < mapByStartAddress.Length; ++i)
             {
                 var group = new List<Code>();
-                var map = mapByILOffset[i];
-                var nextMap = i == mapByILOffset.Length - 1
+                var map = mapByStartAddress[i];
+                var nextMap = i == mapByStartAddress.Length - 1
                     ? new ILToNativeMap { ILOffset = int.MaxValue }
-                    : mapByILOffset[i + 1];
+                    : mapByStartAddress[i + 1];
 
                 var correspondingIL = ilInstructions
-                    .Where(instr => instr.Offset >= map.ILOffset && instr.Offset < nextMap.ILOffset).ToArray();
+                    .Where(instr => instr.Offset >= map.ILOffset && instr.Offset < nextMap.ILOffset)
+                    .OrderBy(instr => instr.Offset) // just to make sure the Cecil instructions are also sorted in the right way
+                    .ToArray();
 
                 if (settings.PrintSource)
                     group.AddRange(GetSource(method, map));
