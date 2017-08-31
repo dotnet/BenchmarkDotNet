@@ -143,10 +143,16 @@ namespace BenchmarkDotNet.Disassembler
             var maps = new List<Map>();
 
             var mapByStartAddress = (from map in method.ILOffsetMap
-                                 where map.ILOffset >= 0 // prolog is -2, epilog -3
                                  where map.StartAddress <= map.EndAddress
                                  orderby map.StartAddress // we need to print in the machine code order, not IL! #536
                                  select map).ToArray();
+
+            var sortedUniqueILOffsets = method.ILOffsetMap
+                .Where(map => map.ILOffset >= 0 && map.StartAddress <= map.EndAddress)
+                .Select(map => map.ILOffset)
+                .Distinct() // there can be many maps with the same ILOffset
+                .OrderBy(ilOffset => ilOffset)
+                .ToArray();
 
             if (mapByStartAddress.Length == 0 && settings.PrintIL)
             {
@@ -154,27 +160,43 @@ namespace BenchmarkDotNet.Disassembler
                 maps.Add(CreateMap(GetIL(ilInstructions)));
             }
 
-            var prolog = method.ILOffsetMap.First();
-            if (prolog.ILOffset == -2 && settings.PrintPrologAndEpilog) // -2 is a magic number for prolog
-                maps.Add(CreateMap(GetAsm(prolog, state, methodInfo.Depth)));
+            // maps with negative ILOffset are not always part of the prolog or epilog
+            // so we don't exclude all maps with negative ILOffset
+            // but only the first ones and the last ones if PrintPrologAndEpilog == false
+            int startIndex = settings.PrintPrologAndEpilog 
+                ? 0 
+                : mapByStartAddress.TakeWhile(map => map.ILOffset < 0).Count();
+            int endIndex = settings.PrintPrologAndEpilog 
+                ? mapByStartAddress.Length
+                : mapByStartAddress.Length - mapByStartAddress.Reverse().TakeWhile(map => map.ILOffset < 0).Count();
 
-            for (int i = 0; i < mapByStartAddress.Length; ++i)
+            for (int i = startIndex; i < endIndex; ++i)
             {
                 var group = new List<Code>();
                 var map = mapByStartAddress[i];
-                var nextMap = i == mapByStartAddress.Length - 1
-                    ? new ILToNativeMap { ILOffset = int.MaxValue }
-                    : mapByStartAddress[i + 1];
 
-                var correspondingIL = ilInstructions
-                    .Where(instr => instr.Offset >= map.ILOffset && instr.Offset < nextMap.ILOffset)
-                    .OrderBy(instr => instr.Offset) // just to make sure the Cecil instructions are also sorted in the right way
-                    .ToArray();
+                var correspondingIL = Array.Empty<Instruction>();
 
-                if (settings.PrintSource)
+                if (map.ILOffset >= 0)
+                {
+                    var ilOffsetIndex = Array.IndexOf(sortedUniqueILOffsets, map.ILOffset);
+                    var nextILOffsetIndex = ilOffsetIndex + 1;
+
+                    // method.GetILOffset(map.EndAddress); is not enough to get the endILOffset (it returns startILOffset)
+                    var nextMapILOffset = nextILOffsetIndex < sortedUniqueILOffsets.Length
+                        ? sortedUniqueILOffsets[nextILOffsetIndex]
+                        : int.MaxValue;
+
+                    correspondingIL = ilInstructions
+                        .Where(instr => instr.Offset >= map.ILOffset && instr.Offset < nextMapILOffset)
+                        .OrderBy(instr => instr.Offset) // just to make sure the Cecil instructions are also sorted in the right way
+                        .ToArray();
+                }
+
+                if (settings.PrintSource && map.ILOffset >= 0)
                     group.AddRange(GetSource(method, map));
 
-                if (settings.PrintIL)
+                if (settings.PrintIL && map.ILOffset >= 0)
                     group.AddRange(GetIL(correspondingIL));
 
                 if (settings.PrintAsm)
@@ -182,10 +204,6 @@ namespace BenchmarkDotNet.Disassembler
 
                 maps.Add(new Map { Instructions = group });
             }
-
-            var epilog = method.ILOffsetMap.Last();
-            if (epilog.ILOffset == -3 && settings.PrintPrologAndEpilog) // -3 is a magic number for epilog
-                maps.Add(CreateMap(GetAsm(epilog, state, methodInfo.Depth)));
 
             return new DisassembledMethod
             {
@@ -387,7 +405,7 @@ namespace BenchmarkDotNet.Disassembler
                     if(!unique.Add(map.Instructions[i]))
                         map.Instructions.RemoveAt(i);
 
-            return maps.ToArray();
+            return maps.Where(map => map.Instructions.Any()).ToArray();
         }
 
         static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
