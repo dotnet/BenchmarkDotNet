@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -36,6 +35,13 @@ namespace BenchmarkDotNet.Analysers
                 var avProducts = summary.HostEnvironmentInfo.AntivirusProducts.Value;
                 if (avProducts.Any())
                     yield return CreateWarning(CreateWarningAboutAntivirus(avProducts));
+            }
+
+            var vmHypervisor = summary.HostEnvironmentInfo.VirtualMachineHypervisor.Value;
+            if (vmHypervisor != null)
+            {
+                yield return CreateWarning($"Benchmark was executed on the virtual machine with {vmHypervisor.Name} hypervisor. " +
+                                           "Virtualization can affect the measurement result.");
             }
         }
 

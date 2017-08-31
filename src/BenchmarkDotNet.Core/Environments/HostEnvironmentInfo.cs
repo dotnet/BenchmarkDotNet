@@ -58,6 +58,8 @@ namespace BenchmarkDotNet.Environments
 
         public Lazy<ICollection<Antivirus>> AntivirusProducts { get; protected set; }
 
+        public Lazy<VirtualMachineHypervisor> VirtualMachineHypervisor { get; protected set; }
+
         static HostEnvironmentInfo()
         {
             MainCultureInfo = (CultureInfo)CultureInfo.InvariantCulture.Clone();
@@ -75,6 +77,7 @@ namespace BenchmarkDotNet.Environments
             JitModules = RuntimeInformation.GetJitModulesInfo();
             DotNetSdkVersion = new Lazy<string>(DotNetCliCommandExecutor.GetDotNetSdkVersion);
             AntivirusProducts = new Lazy<ICollection<Antivirus>>(RuntimeInformation.GetAntivirusProducts);
+            VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(RuntimeInformation.GetVirtualMachineHypervisor);
         }
 
         public new static HostEnvironmentInfo GetCurrent() => Current ?? (Current = new HostEnvironmentInfo());
