@@ -163,10 +163,11 @@ namespace BenchmarkDotNet.Disassembler
             // maps with negative ILOffset are not always part of the prolog or epilog
             // so we don't exclude all maps with negative ILOffset
             // but only the first ones and the last ones if PrintPrologAndEpilog == false
-            int startIndex = settings.PrintPrologAndEpilog 
+            bool methodWithoutBody = method.ILOffsetMap.All(map => map.ILOffset < 0); // sth like [NoInlining] void Sample() { }
+            int startIndex = settings.PrintPrologAndEpilog || methodWithoutBody
                 ? 0 
                 : mapByStartAddress.TakeWhile(map => map.ILOffset < 0).Count();
-            int endIndex = settings.PrintPrologAndEpilog 
+            int endIndex = settings.PrintPrologAndEpilog || methodWithoutBody
                 ? mapByStartAddress.Length
                 : mapByStartAddress.Length - mapByStartAddress.Reverse().TakeWhile(map => map.ILOffset < 0).Count();
 

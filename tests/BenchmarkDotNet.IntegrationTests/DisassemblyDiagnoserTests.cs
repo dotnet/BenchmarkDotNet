@@ -23,11 +23,12 @@ namespace BenchmarkDotNet.IntegrationTests
         public static IEnumerable<object[]> GetAllJits()
             => new[]
             {
+#if CLASSIC
                 new object[] { Jit.LegacyJit, Platform.X86, Runtime.Clr }, // 32bit LegacyJit for desktop .NET
                 new object[] { Jit.LegacyJit, Platform.X64, Runtime.Clr }, // 64bit LegacyJit for desktop .NET
 
                 new object[] { Jit.RyuJit, Platform.X64, Runtime.Clr }, // RyuJit for desktop .NET
-
+#endif
                 new object[] { Jit.RyuJit, Platform.X64, Runtime.Core }, // .NET Core
 
                 // we could add new object[] { Jit.Llvm, Platform.X64, Runtime.Mono } here but our CI would need to have Mono installed..
@@ -61,11 +62,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public virtual void Virtual() { }
         }
 
-#if CORE
-        [Theory(Skip = "Disassembler has not .NET Core support yet")]
-#else
         [Theory]
-#endif
         [MemberData(nameof(GetAllJits))]
         public void CanDisassembleAllMethodCalls(Jit jit, Platform platform, Runtime runtime)
         {
