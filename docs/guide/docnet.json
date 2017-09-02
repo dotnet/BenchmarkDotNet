@@ -25,6 +25,7 @@
             "Exporters": "Configs\\Exporters.md",
             "Loggers":"Configs\\Loggers.md",
             "Diagnosers":"Configs\\Diagnosers.md",
+            "Toolchains":"Configs\\Toolchains.md",
             "Analyzers":"Configs\\Analyzers.md",
             "Validators":"Configs\\Validators.md",
             "Filters":"Configs\\Filters.md",
