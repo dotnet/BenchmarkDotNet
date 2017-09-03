@@ -19,8 +19,8 @@ namespace BenchmarkDotNet.IntegrationTests
         [FactClassicDotNetOnly("ProcessStartInfo.EnvironmentVariables is avaialable for .NET Core 2.0+")]
         public void UserCanSpecifyEnvironmentVariables()
         {
-            var variables = new Dictionary<string, string> { { Key, Value } };
-            var jobWithCustomConfiguration = Job.Dry.WithEnvironmentVariables(variables);
+            var variables = new [] { new EnvironmentVariable(Key, Value) };
+            var jobWithCustomConfiguration = JobExtensions.With(Job.Dry, variables);
             var config = CreateSimpleConfig(job: jobWithCustomConfiguration);
 
             CanExecute<WithEnvironmentVariables>(config);

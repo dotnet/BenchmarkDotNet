@@ -15,11 +15,11 @@ namespace BenchmarkDotNet.Environments
         {
             var infra = Job.Default.Infrastructure;
             Register(InfrastructureMode.ClockCharacteristic, () => Chronometer.BestClock);
-            Register(InfrastructureMode.EngineFactoryCharacteristic, () =>  new EngineFactory());
+            Register(InfrastructureMode.EngineFactoryCharacteristic, () => new EngineFactory());
             Register(InfrastructureMode.BuildConfigurationCharacteristic, () => InfrastructureMode.ReleaseConfigurationName);
 
-            Register(InfrastructureMode.ArgumentsCharacteristic, Array.Empty<IArgument>);
-            Register(InfrastructureMode.EnvironmentVariablesCharacteristic, () => new Dictionary<string, string>());
+            Register(InfrastructureMode.ArgumentsCharacteristic, Array.Empty<Argument>);
+            Register(InfrastructureMode.EnvironmentVariablesCharacteristic, Array.Empty<EnvironmentVariable>);
         }
     }
 }

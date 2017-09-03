@@ -2,16 +2,19 @@
 
 namespace BenchmarkDotNet.Jobs
 {
-    public interface IArgument
+    public abstract class Argument
     {
-        string TextRepresentation { get; }
+        public virtual string TextRepresentation { get; protected set; }
+
+        // CharacteristicPresenters call ToString(), this is why we need this override
+        public override string ToString() => TextRepresentation;
     }
 
     /// <summary>
     /// Argument passed directly to mono when executing benchmarks (mono [options])
     /// example: new MonoArgument("--gc=sgen")
     /// </summary>
-    public class MonoArgument : IArgument
+    public class MonoArgument : Argument
     {
         public MonoArgument(string value)
         {
@@ -20,18 +23,14 @@ namespace BenchmarkDotNet.Jobs
 
             TextRepresentation = value;
         }
-
-        public string TextRepresentation { get; }
     }
 
     /// <summary>
     /// Argument passed to dotnet cli when restoring and building the project
     /// example: new MsBuildArgument("/p:MyCustomSetting=123")
     /// </summary>
-    public class MsBuildArgument : IArgument
+    public class MsBuildArgument : Argument
     {
         public MsBuildArgument(string value) => TextRepresentation = value;
-
-        public string TextRepresentation { get; }
     }
 }

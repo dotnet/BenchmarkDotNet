@@ -15,8 +15,8 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<IClock> ClockCharacteristic = Characteristic.Create((InfrastructureMode i) => i.Clock);
         public static readonly Characteristic<IEngineFactory> EngineFactoryCharacteristic = Characteristic.Create((InfrastructureMode i) => i.EngineFactory);
         public static readonly Characteristic<string> BuildConfigurationCharacteristic = Characteristic.Create((InfrastructureMode i) => i.BuildConfiguration);
-        public static readonly Characteristic<IReadOnlyDictionary<string, string>> EnvironmentVariablesCharacteristic = Characteristic.Create((InfrastructureMode i) => i.EnvironmentVariables);
-        public static readonly Characteristic<IReadOnlyList<IArgument>> ArgumentsCharacteristic = Characteristic.Create((InfrastructureMode i) => i.Arguments);
+        public static readonly Characteristic<IReadOnlyList<EnvironmentVariable>> EnvironmentVariablesCharacteristic = Characteristic.Create((InfrastructureMode i) => i.EnvironmentVariables);
+        public static readonly Characteristic<IReadOnlyList<Argument>> ArgumentsCharacteristic = Characteristic.Create((InfrastructureMode i) => i.Arguments);
 
         public static readonly InfrastructureMode InProcess = new InfrastructureMode(InProcessToolchain.Instance);
         public static readonly InfrastructureMode InProcessDontLogOutput = new InfrastructureMode(InProcessToolchain.DontLogOutput);
@@ -56,13 +56,13 @@ namespace BenchmarkDotNet.Jobs
             set => BuildConfigurationCharacteristic[this] = value;
         }
 
-        public IReadOnlyDictionary<string, string> EnvironmentVariables
+        public IReadOnlyList<EnvironmentVariable> EnvironmentVariables
         {
             get => EnvironmentVariablesCharacteristic[this];
             set => EnvironmentVariablesCharacteristic[this] = value;
         }
 
-        public IReadOnlyList<IArgument> Arguments
+        public IReadOnlyList<Argument> Arguments
         {
             get => ArgumentsCharacteristic[this];
             set => ArgumentsCharacteristic[this] = value;

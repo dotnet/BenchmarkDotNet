@@ -70,8 +70,8 @@ namespace BenchmarkDotNet.Characteristics
             {
                 typeof(IToolchain), // there is no need to set toolchain in child process, it was causing parameterless ctor requirement for all IToolchain implementations
                 typeof(IReadOnlyCollection<HardwareCounter>), // we don't need to export this array to child process
-                typeof(IReadOnlyList<IArgument>),
-                typeof(IReadOnlyDictionary<string, string>)
+                typeof(IReadOnlyList<Argument>),
+                typeof(IReadOnlyList<EnvironmentVariable>)
             };
 
             public override string ToPresentation(CharacteristicObject obj)
