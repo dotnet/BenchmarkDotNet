@@ -87,8 +87,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         protected override void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)
         {
-            string content = $"call dotnet {Builder.RestoreCommand}{Environment.NewLine}" +
-                             $"call dotnet {Builder.GetBuildCommand(TargetFrameworkMoniker, false, benchmark.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, resolver))}";
+            string content = $"call dotnet {Builder.RestoreCommand} {GetCustomArguments(benchmark, resolver)}{Environment.NewLine}" +
+                             $"call dotnet {Builder.GetBuildCommand(TargetFrameworkMoniker, false, benchmark.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, resolver))} {GetCustomArguments(benchmark, resolver)}";
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
         }
@@ -103,5 +103,15 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             => directoryInfo
                 .GetFileSystemInfos()
                 .Any(fileInfo => fileInfo.Extension == ".sln" || fileInfo.Name == "global.json");
+
+        internal static string GetCustomArguments(Benchmark benchmark, IResolver resolver)
+        {
+            if (!benchmark.Job.HasValue(InfrastructureMode.ArgumentsCharacteristic))
+                return null;
+
+            var msBuildArguments = benchmark.Job.ResolveValue(InfrastructureMode.ArgumentsCharacteristic, resolver).OfType<MsBuildArgument>();
+
+            return string.Join(" ", msBuildArguments.Select(arg => arg.TextRepresentation));
+        }
     }
 }

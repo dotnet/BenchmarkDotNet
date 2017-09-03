@@ -40,6 +40,7 @@ namespace BenchmarkDotNet.Jobs
         public static Job With(this Job job, IEngineFactory engineFactory) => job.WithCore(j => j.Infrastructure.EngineFactory = engineFactory);
         public static Job WithCustomBuildConfiguration(this Job job, string buildConfiguraiton) => job.WithCore(j => j.Infrastructure.BuildConfiguration = buildConfiguraiton);
         public static Job WithEnvironmentVariables(this Job job, IReadOnlyDictionary<string, string> environmentVariables) => job.WithCore(j => j.Infrastructure.EnvironmentVariables = environmentVariables);
+        public static Job With(this Job job, IReadOnlyList<IArgument> arguments) => job.WithCore(j => j.Infrastructure.Arguments = arguments);
 
         // Accuracy
         public static Job WithMaxRelativeError(this Job job, double value) => job.WithCore(j => j.Accuracy.MaxRelativeError= value);

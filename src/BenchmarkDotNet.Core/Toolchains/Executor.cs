@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Toolchains
                 using (var process = new Process { StartInfo = CreateStartInfo(benchmark, exePath, args, workingDirectory, resolver) })
                 {
                     var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmark, config);
-                    
+
                     return Execute(process, benchmark, loggerWithDiagnoser, logger);
                 }
             }
@@ -100,7 +100,7 @@ namespace BenchmarkDotNet.Toolchains
             var runtime = benchmark.Job.Env.HasValue(EnvMode.RuntimeCharacteristic)
                 ? benchmark.Job.Env.Runtime
                 : RuntimeInformation.GetCurrentRuntime();
-                // TODO: use resolver
+            // TODO: use resolver
 
             switch (runtime)
             {
@@ -121,14 +121,22 @@ namespace BenchmarkDotNet.Toolchains
 
         private string GetMonoArguments(Job job, string exePath, string args, IResolver resolver)
         {
+            var arguments = job.HasValue(InfrastructureMode.ArgumentsCharacteristic)
+                ? job.ResolveValue(InfrastructureMode.ArgumentsCharacteristic, resolver).OfType<MonoArgument>().ToArray()
+                : Array.Empty<MonoArgument>();
+
             // from mono --help: "Usage is: mono [options] program [program-options]"
-            return new StringBuilder(30)
-                .Append(job.ResolveValue(EnvMode.JitCharacteristic, resolver) == Jit.Llvm ? "--llvm" : "--nollvm")
-                .Append(" \"")
-                .Append(exePath)
-                .Append("\" ")
-                .Append(args)
-                .ToString();
+            var builder = new StringBuilder(30);
+
+            builder.Append(job.ResolveValue(EnvMode.JitCharacteristic, resolver) == Jit.Llvm ? "--llvm" : "--nollvm");
+
+            foreach (var argument in arguments)
+                builder.Append($" {argument.TextRepresentation}");
+
+            builder.Append($" \"{exePath}\" ");
+            builder.Append(args);
+
+            return builder.ToString();
         }
     }
 }

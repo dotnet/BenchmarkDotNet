@@ -1,4 +1,6 @@
-﻿using BenchmarkDotNet.Characteristics;
+﻿using System;
+using System.Collections.Generic;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
@@ -15,6 +17,9 @@ namespace BenchmarkDotNet.Environments
             Register(InfrastructureMode.ClockCharacteristic, () => Chronometer.BestClock);
             Register(InfrastructureMode.EngineFactoryCharacteristic, () =>  new EngineFactory());
             Register(InfrastructureMode.BuildConfigurationCharacteristic, () => InfrastructureMode.ReleaseConfigurationName);
+
+            Register(InfrastructureMode.ArgumentsCharacteristic, Array.Empty<IArgument>);
+            Register(InfrastructureMode.EnvironmentVariablesCharacteristic, () => new Dictionary<string, string>());
         }
     }
 }
