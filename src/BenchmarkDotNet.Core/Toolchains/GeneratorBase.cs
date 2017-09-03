@@ -4,6 +4,7 @@ using System.Reflection;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -18,7 +19,7 @@ namespace BenchmarkDotNet.Toolchains
             ArtifactsPaths artifactsPaths = null;
             try
             {
-                artifactsPaths = GetArtifactsPaths(benchmark, config, rootArtifactsFolderPath);
+                artifactsPaths = GetArtifactsPaths(benchmark, config, rootArtifactsFolderPath, resolver);
 
                 CopyAllRequiredFiles(benchmark, artifactsPaths);
 
@@ -50,14 +51,14 @@ namespace BenchmarkDotNet.Toolchains
 
         protected abstract void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver);
 
-        private ArtifactsPaths GetArtifactsPaths(Benchmark benchmark, IConfig config, string rootArtifactsFolderPath)
+        private ArtifactsPaths GetArtifactsPaths(Benchmark benchmark, IConfig config, string rootArtifactsFolderPath, IResolver resolver)
         {
             // its not ".cs" in order to avoid VS from displaying and compiling it with xprojs/csprojs that include all *.cs by default
             const string codeFileExtension = ".notcs";
 
             string programName = GetProgramName(benchmark, config);
             string buildArtifactsDirectoryPath = GetBuildArtifactsDirectoryPath(benchmark, programName);
-            string binariesDirectoryPath = GetBinariesDirectoryPath(buildArtifactsDirectoryPath, benchmark.Job.Infrastructure.BuildConfiguration);
+            string binariesDirectoryPath = GetBinariesDirectoryPath(buildArtifactsDirectoryPath, benchmark.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, resolver));
             string executablePath = Path.Combine(binariesDirectoryPath, $"{programName}{RuntimeInformation.ExecutableExtension}");
 
             return new ArtifactsPaths(

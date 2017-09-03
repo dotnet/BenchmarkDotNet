@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
@@ -87,7 +88,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         protected override void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)
         {
             string content = $"call dotnet {Builder.RestoreCommand}{Environment.NewLine}" +
-                             $"call dotnet {Builder.GetBuildCommand(TargetFrameworkMoniker, false, benchmark.Job.Infrastructure.BuildConfiguration)}";
+                             $"call dotnet {Builder.GetBuildCommand(TargetFrameworkMoniker, false, benchmark.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, resolver))}";
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
         }

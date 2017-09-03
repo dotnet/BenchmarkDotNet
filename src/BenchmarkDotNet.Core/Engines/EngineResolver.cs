@@ -32,8 +32,6 @@ namespace BenchmarkDotNet.Engines
                         throw new NotSupportedException($"Unknown runStrategy: {strategy}");
                 }
             });
-
-            Register(InfrastructureMode.BuildConfigurationCharacteristic, () => InfrastructureMode.ReleaseConfigurationName);
         }
     }
 }

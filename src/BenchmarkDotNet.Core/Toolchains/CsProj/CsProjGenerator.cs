@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             content = content.Replace("$PROGRAMNAME$", artifactsPaths.ProgramName);
             content = content.Replace("$RUNTIMESETTINGS$", GetRuntimeSettings(benchmark.Job.Env.Gc, resolver));
             content = content.Replace("$COPIEDSETTINGS$", GetSettingsThatNeedsToBeCopied(projectFile));
-            content = content.Replace("$CONFIGURATIONNAME$", benchmark.Job.Infrastructure.BuildConfiguration);
+            content = content.Replace("$CONFIGURATIONNAME$", benchmark.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, resolver));
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
         }

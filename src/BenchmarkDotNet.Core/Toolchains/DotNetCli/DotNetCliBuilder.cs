@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
@@ -36,7 +37,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 return BuildResult.Failure(generateResult, new Exception(restoreResult.ProblemDescription));
             }
 
-            var buildResult = Build(generateResult, benchmark.Job.Infrastructure.BuildConfiguration);
+            var buildResult = Build(generateResult, benchmark.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, resolver));
 
             logger.WriteLineInfo($"// dotnet build took {buildResult.ExecutionTime.TotalSeconds:0.##}s");
 
