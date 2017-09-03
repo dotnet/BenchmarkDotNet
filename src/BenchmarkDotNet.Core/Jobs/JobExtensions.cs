@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
@@ -38,6 +39,7 @@ namespace BenchmarkDotNet.Jobs
         public static Job With(this Job job, IClock clock) => job.WithCore(j => j.Infrastructure.Clock = clock);
         public static Job With(this Job job, IEngineFactory engineFactory) => job.WithCore(j => j.Infrastructure.EngineFactory = engineFactory);
         public static Job WithCustomBuildConfiguration(this Job job, string buildConfiguraiton) => job.WithCore(j => j.Infrastructure.BuildConfiguration = buildConfiguraiton);
+        public static Job WithEnvironmentVariables(this Job job, IReadOnlyDictionary<string, string> environmentVariables) => job.WithCore(j => j.Infrastructure.EnvironmentVariables = environmentVariables);
 
         // Accuracy
         public static Job WithMaxRelativeError(this Job job, double value) => job.WithCore(j => j.Accuracy.MaxRelativeError= value);

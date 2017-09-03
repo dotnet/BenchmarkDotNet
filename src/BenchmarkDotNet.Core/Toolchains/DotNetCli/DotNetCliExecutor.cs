@@ -41,7 +41,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     executeParameters.BuildResult.ArtifactsPaths, 
                     executeParameters.Diagnoser, 
                     executableName, 
-                    executeParameters.Config);
+                    executeParameters.Config,
+                    executeParameters.Resolver);
             }
             finally
             {
@@ -49,14 +50,15 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        private ExecuteResult Execute(Benchmark benchmark, ILogger logger, ArtifactsPaths artifactsPaths, IDiagnoser diagnoser, string executableName, IConfig config)
+        private ExecuteResult Execute(Benchmark benchmark, ILogger logger, ArtifactsPaths artifactsPaths, IDiagnoser diagnoser, string executableName, IConfig config, IResolver resolver)
         {
-            using (var process = new Process
-            {
-                StartInfo = DotNetCliCommandExecutor.BuildStartInfo(
-                    artifactsPaths.BinariesDirectoryPath, 
-                    BuildArgs(diagnoser, executableName))
-            })
+            var startInfo = DotNetCliCommandExecutor.BuildStartInfo(
+                artifactsPaths.BinariesDirectoryPath,
+                BuildArgs(diagnoser, executableName));
+
+            startInfo.SetEnvironmentVariables(benchmark, resolver);
+
+            using (var process = new Process { StartInfo = startInfo })
             {
                 var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmark, config);
 

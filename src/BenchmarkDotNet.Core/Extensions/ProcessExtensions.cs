@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
+using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Extensions
@@ -93,6 +96,19 @@ namespace BenchmarkDotNet.Extensions
             {
                 return null;
             }
+        }
+
+        internal static void SetEnvironmentVariables(this ProcessStartInfo start, Benchmark benchmark, IResolver resolver)
+        {
+#if !CORE // ProcessStartInfo.EnvironmentVariables is avaialable for .NET Core 2.0+
+            if (!benchmark.Job.HasValue(InfrastructureMode.EnvironmentVariablesCharacteristic))
+                return;
+
+            foreach (var environmentVariable in benchmark.Job.Infrastructure.EnvironmentVariables)
+            {
+                start.EnvironmentVariables[environmentVariable.Key] = environmentVariable.Value;
+            }
+#endif
         }
     }
 }

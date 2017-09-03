@@ -68,6 +68,11 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 logger.WriteLineError($"Currently project.json does not support gcAllowVeryLargeObjects (app.config does), benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;
             }
+            if (!RuntimeInformation.IsClassic() && benchmark.Job.HasValue(InfrastructureMode.EnvironmentVariablesCharacteristic))
+            {
+                logger.WriteLineError($"ProcessStartInfo.EnvironmentVariables is avaialable for .NET Core 2.0, benchmark '{benchmark.DisplayInfo}' will not be executed");
+                return false;
+            }
 
             return true;
         }

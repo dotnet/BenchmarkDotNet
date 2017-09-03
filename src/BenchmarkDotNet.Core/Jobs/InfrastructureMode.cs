@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Characteristics;
+﻿using System.Collections.Generic;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Toolchains;
@@ -14,6 +15,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<IClock> ClockCharacteristic = Characteristic.Create((InfrastructureMode i) => i.Clock);
         public static readonly Characteristic<IEngineFactory> EngineFactoryCharacteristic = Characteristic.Create((InfrastructureMode i) => i.EngineFactory);
         public static readonly Characteristic<string> BuildConfigurationCharacteristic = Characteristic.Create((InfrastructureMode i) => i.BuildConfiguration);
+        public static readonly Characteristic<IReadOnlyDictionary<string, string>> EnvironmentVariablesCharacteristic = Characteristic.Create((InfrastructureMode i) => i.EnvironmentVariables);
 
         public static readonly InfrastructureMode InProcess = new InfrastructureMode(InProcessToolchain.Instance);
         public static readonly InfrastructureMode InProcessDontLogOutput = new InfrastructureMode(InProcessToolchain.DontLogOutput);
@@ -51,6 +53,12 @@ namespace BenchmarkDotNet.Jobs
         {
             get => BuildConfigurationCharacteristic[this];
             set => BuildConfigurationCharacteristic[this] = value;
+        }
+
+        public IReadOnlyDictionary<string, string> EnvironmentVariables
+        {
+            get => EnvironmentVariablesCharacteristic[this];
+            set => EnvironmentVariablesCharacteristic[this] = value;
         }
     }
 }

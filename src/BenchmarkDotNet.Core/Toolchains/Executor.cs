@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -93,10 +94,14 @@ namespace BenchmarkDotNet.Toolchains
                 CreateNoWindow = true,
                 WorkingDirectory = workingDirectory
             };
+
+            start.SetEnvironmentVariables(benchmark, resolver);
+
             var runtime = benchmark.Job.Env.HasValue(EnvMode.RuntimeCharacteristic)
                 ? benchmark.Job.Env.Runtime
                 : RuntimeInformation.GetCurrentRuntime();
                 // TODO: use resolver
+
             switch (runtime)
             {
                 case ClrRuntime clr:
