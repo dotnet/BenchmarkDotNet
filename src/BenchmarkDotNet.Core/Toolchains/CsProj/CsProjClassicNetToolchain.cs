@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 return false;
             }
 
-            if (benchmark.Job.ResolveValue(EnvMode.JitCharacteristic, resolver) == Jit.LegacyJit)
+            if (benchmark.Job.HasValue(EnvMode.JitCharacteristic) && benchmark.Job.Env.Jit == Jit.LegacyJit)
             {
                 logger.WriteLineError($"Currently dotnet cli toolchain supports only RyuJit, benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;

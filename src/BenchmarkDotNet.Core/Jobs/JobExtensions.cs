@@ -1,7 +1,6 @@
 ﻿using System;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Horology;
@@ -38,6 +37,7 @@ namespace BenchmarkDotNet.Jobs
         public static Job With(this Job job, IToolchain toolchain) => job.WithCore(j => j.Infrastructure.Toolchain = toolchain);
         public static Job With(this Job job, IClock clock) => job.WithCore(j => j.Infrastructure.Clock = clock);
         public static Job With(this Job job, IEngineFactory engineFactory) => job.WithCore(j => j.Infrastructure.EngineFactory = engineFactory);
+        public static Job WithCustomBuildConfiguration(this Job job, string buildConfiguraiton) => job.WithCore(j => j.Infrastructure.BuildConfiguration = buildConfiguraiton);
 
         // Accuracy
         public static Job WithMaxRelativeError(this Job job, double value) => job.WithCore(j => j.Accuracy.MaxRelativeError= value);
