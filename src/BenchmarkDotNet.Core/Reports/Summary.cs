@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Reports
 
         private readonly Dictionary<Job, string> shortInfos;
         private readonly Lazy<Job[]> jobs;
-        private readonly IDictionary<Benchmark, BenchmarkReport> reportMap = new Dictionary<Benchmark, BenchmarkReport>();
+        private readonly Dictionary<Benchmark, BenchmarkReport> reportMap = new Dictionary<Benchmark, BenchmarkReport>();
 
         public bool HasReport(Benchmark benchmark) => reportMap.ContainsKey(benchmark);
 

@@ -13,7 +13,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp12 = new NetCoreAppSettings("netcoreapp1.2", null, ".NET Core 1.0");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp20 = new NetCoreAppSettings("netcoreapp2.0", null, ".NET Core 2.0");
 
-        private static NetCoreAppSettings Default => NetCoreApp11;
+        private static NetCoreAppSettings Default =>
+#if NETCOREAPP2_0
+            NetCoreApp20;
+#else
+            NetCoreApp11;
+#endif
 
         /// <summary>
         /// <param name="targetFrameworkMoniker">
@@ -37,7 +42,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         /// <summary>
-        /// sample values: netcoreapp1.1, netcoreapp1.2, netcoreapp2.0
+        /// sample values: netcoreapp1.1, netcoreapp2.0, netcoreapp2.1
         /// </summary>
         public string TargetFrameworkMoniker { get; }
 

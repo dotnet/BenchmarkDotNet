@@ -100,7 +100,7 @@ namespace BenchmarkDotNet.Extensions
 
         internal static void SetEnvironmentVariables(this ProcessStartInfo start, Benchmark benchmark, IResolver resolver)
         {
-#if !CORE // ProcessStartInfo.EnvironmentVariables is avaialable for .NET Core 2.0+
+#if !NETCOREAPP1_1 // ProcessStartInfo.EnvironmentVariables is avaialable for .NET Core 2.0+
             if (!benchmark.Job.HasValue(InfrastructureMode.EnvironmentVariablesCharacteristic))
                 return;
 

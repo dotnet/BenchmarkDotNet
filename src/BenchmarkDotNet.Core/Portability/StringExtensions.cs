@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Portability
         {
             get
             {
-#if !CORE
+#if !NETCOREAPP1_1
                 return StringComparison.InvariantCultureIgnoreCase;
 #else
 // http://stackoverflow.com/questions/14600694/where-has-stringcomparison-invariantcultureignorecase-gone

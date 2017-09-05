@@ -1,6 +1,7 @@
-﻿using System.Threading;
+﻿#if !NETCOREAPP1_1
+using System.Threading;
 using BenchmarkDotNet.Attributes;
-#if !CORE
+using BenchmarkDotNet.IntegrationTests.Xunit;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -12,11 +13,8 @@ namespace BenchmarkDotNet.IntegrationTests
         {
         }
 
-        [Fact]
-        public void UserCanMarkBenchmarkAsRequiringSTA()
-        {
-            CanExecute<RequiresSTA>();
-        }
+        [FactClassicDotNetOnly("STAThread attribute is not respected in netcoreapp https://github.com/dotnet/coreclr/issues/13688")]
+        public void UserCanMarkBenchmarkAsRequiringSTA() => CanExecute<RequiresSTA>();
 
         public class RequiresSTA
         {

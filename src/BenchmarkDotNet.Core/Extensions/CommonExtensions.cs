@@ -88,8 +88,10 @@ namespace BenchmarkDotNet.Extensions
 
         public static bool IsOneOf<T>(this T value, params T[] values) => values.Contains(value);
 
+#if !NETCOREAPP2_0 //  this method was added to the .NET Core 2.0 framework itself ;)
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
             => dictionary.TryGetValue(key, out TValue value) ? value : default(TValue);
+#endif
 
         public static double Sqr(this double x) => x * x;
         public static double Pow(this double x, double k) => Math.Pow(x, k);

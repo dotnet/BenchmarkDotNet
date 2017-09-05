@@ -141,7 +141,7 @@ namespace BenchmarkDotNet.Diagnosers
                 if (Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE") == "x86")
                     return false;
 
-#if !CORE
+#if !NETCOREAPP1_1
                 bool isWow64;
                 if (!IsWow64Process(process.Handle, out isWow64))
                     throw new Exception("Not Windows");

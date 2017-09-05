@@ -146,7 +146,7 @@ namespace BenchmarkDotNet.Code
 
         private static string GetExtraAttributes(Target target)
         {
-#if !CORE
+#if !NETCOREAPP1_1
             if (target.Method.GetCustomAttributes(false).OfType<System.STAThreadAttribute>().Any())
             {
                 return "[System.STAThreadAttribute]";
