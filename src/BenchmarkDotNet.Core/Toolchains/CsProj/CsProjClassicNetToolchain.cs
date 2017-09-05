@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -96,11 +97,11 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
                 int releaseKey = Convert.ToInt32(ndpKey.GetValue("Release"));
                 // magic numbers come from https://msdn.microsoft.com/en-us/library/hh925568(v=vs.110).aspx
-                if (releaseKey >= 460798)
+                if (releaseKey >= 460798 && Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7"))
                     return Net47;
-                if (releaseKey >= 394802)
+                if (releaseKey >= 394802 && Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2"))
                     return Net462;
-                if (releaseKey >= 394254)
+                if (releaseKey >= 394254 && Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1"))
                     return Net461;
 
                 return Default;
