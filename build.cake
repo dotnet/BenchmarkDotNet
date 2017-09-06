@@ -94,13 +94,37 @@ Task("FastTests")
         DotNetCoreTest("./tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj", GetTestSettings());
     });
 
-Task("SlowTests")
+Task("BackwardCompatibilityTests")
     .IsDependentOn("Restore")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
-        DotNetCoreTest("./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", GetTestSettings());
+        DotNetCoreTest(
+            "./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", 
+            new DotNetCoreTestSettings
+            {
+                Configuration = "Release",
+                Framework = "netcoreapp1.1",
+                Filter = "Category=BackwardCompatibility"
+            };
+        );
     });
+    
+Task("SlowTestsNet46")
+    .IsDependentOn("Restore")
+    .WithCriteria(!skipTests && isRunningOnWindows)
+    .Does(() =>
+    {
+        DotNetCoreTest("./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", GetTestSettings("net46"));
+    });    
+    
+Task("SlowTestsNetCore2")
+    .IsDependentOn("Restore")
+    .WithCriteria(!skipTests)
+    .Does(() =>
+    {
+        DotNetCoreTest("./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", GetTestSettings("netcoreapp2.0"));
+    });       
 
 Task("Pack")
     .IsDependentOn("Restore")
@@ -125,13 +149,15 @@ Task("Default")
     .IsDependentOn("Restore")
     .IsDependentOn("Build")
     .IsDependentOn("FastTests")
-    .IsDependentOn("SlowTests")
+    .IsDependentOn("SlowTestsNet46")
+    .IsDependentOn("SlowTestsNetCore2")
+    .IsDependentOn("BackwardCompatibilityTests")
     .IsDependentOn("Pack");
 
 RunTarget(target);
 
 // HELPERS
-private DotNetCoreTestSettings GetTestSettings()
+private DotNetCoreTestSettings GetTestSettings(string tfm = null)
 {
     var settings = new DotNetCoreTestSettings
     {
@@ -140,7 +166,11 @@ private DotNetCoreTestSettings GetTestSettings()
 
     if (!IsRunningOnWindows())
     {
-        settings.Framework = "netcoreapp1.1";
+        settings.Framework = "netcoreapp2.0";
+    }
+    else if(tfm != null)
+    {
+        settings.Framework = tfm;
     }
 
     return settings;
