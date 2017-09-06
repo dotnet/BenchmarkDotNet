@@ -38,7 +38,8 @@
             "Baseline":"Advanced\\Baseline.md",
             "Percentiles": "Advanced\\Percentiles.md",
             "STAThread": "Advanced\\STAThread.md",
-            "Custom Mono Path": "Advanced\\CustomMonoPath.md"
+            "Customizing Mono": "Advanced\\CustomizingMono.md",
+            "Environment Variables": "Advanced\\EnvironmentVariables.md"
         },
         "Internals":
         {
