@@ -106,7 +106,7 @@ Task("BackwardCompatibilityTests")
                 Configuration = "Release",
                 Framework = "netcoreapp1.1",
                 Filter = "Category=BackwardCompatibility"
-            };
+            }
         );
     });
     
