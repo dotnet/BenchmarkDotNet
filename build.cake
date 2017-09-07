@@ -138,7 +138,7 @@ Task("Pack")
         };
 
         var projects = GetFiles("./src/**/*.csproj");
-        foreach(var project in projects.Where(p => !p.FullPath.Contains("Disassembler"))
+        foreach(var project in projects.Where(p => !p.FullPath.Contains("Disassembler")))
         {
             DotNetCorePack(project.FullPath, settings);
         }
