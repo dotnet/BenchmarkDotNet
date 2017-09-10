@@ -79,6 +79,9 @@ namespace BenchmarkDotNet.Diagnosers
                 if (!RuntimeInformation.IsWindows() && !ShouldUseMonoDisassembler(benchmark))
                     yield return new ValidationError(false, "No Disassebler support, only Mono is supported for non-Windows OS", benchmark);
 
+                if (IsVeryShortRun(benchmark) && !ShouldUseMonoDisassembler(benchmark))
+                    yield return new ValidationError(true, "No Job.Dry support for disassembler. Please use Job.Short");
+
                 if (benchmark.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic)
                     && benchmark.Job.Infrastructure.Toolchain is InProcessToolchain)
                 {
@@ -92,5 +95,11 @@ namespace BenchmarkDotNet.Diagnosers
 
         private bool ShouldUseWindowsDissasembler(Benchmark benchmark)
             => !(benchmark.Job.Env.Runtime is MonoRuntime) && RuntimeInformation.IsWindows();
+
+        private bool IsVeryShortRun(Benchmark benchmark)
+            => benchmark.Job.HasValue(Jobs.RunMode.LaunchCountCharacteristic)
+                && (benchmark.Job.Run.LaunchCount < Jobs.RunMode.Short.LaunchCount
+                 || benchmark.Job.Run.WarmupCount < Jobs.RunMode.Short.WarmupCount
+                 || benchmark.Job.Run.TargetCount < Jobs.RunMode.Short.TargetCount);
     }
 }
