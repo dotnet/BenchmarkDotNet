@@ -14,12 +14,15 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     {
         private string TargetFrameworkMoniker { get; }
 
+        private string CustomDotNetCliPath { get; }
+
         internal abstract string RestoreCommand { get; }
 
         [PublicAPI]
-        public DotNetCliBuilder(string targetFrameworkMoniker)
+        public DotNetCliBuilder(string targetFrameworkMoniker, string customDotNetCliPath = null)
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
+            CustomDotNetCliPath = customDotNetCliPath;
         }
 
         internal abstract string GetBuildCommand(string frameworkMoniker, bool justTheProjectItself, string configuration);
@@ -29,6 +32,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             var extraArguments = DotNetCliGenerator.GetCustomArguments(benchmark, resolver);
 
             var restoreResult = DotNetCliCommandExecutor.ExecuteCommand(
+                CustomDotNetCliPath,
                 $"{RestoreCommand} {extraArguments}",
                 generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
 
@@ -64,6 +68,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         private DotNetCliCommandExecutor.CommandResult Build(GenerateResult generateResult, string configuration, string extraArguments)
         {
             var withoutDependencies = DotNetCliCommandExecutor.ExecuteCommand(
+                CustomDotNetCliPath,
                 $"{GetBuildCommand(TargetFrameworkMoniker, true, configuration)} {extraArguments}",
                 generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
 
@@ -75,6 +80,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             // but the host process might have different runtime or was build in Debug, not Release, 
             // which requires all dependencies to be build anyway
             return DotNetCliCommandExecutor.ExecuteCommand(
+                CustomDotNetCliPath,
                 $"{GetBuildCommand(TargetFrameworkMoniker, false, configuration)} {extraArguments}",
                 generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
         }

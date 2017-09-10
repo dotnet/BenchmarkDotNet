@@ -29,16 +29,22 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// simply ignored if null or empty
         /// </param>
         /// <param name="name">display name used for showing the results</param>
+        /// <param name="customDotNetCliPath"/>
+        /// customize dotnet cli path if default is not desired
+        /// simply ignored if null
+        /// </param>
         /// </summary>
         [PublicAPI]
         public NetCoreAppSettings(
             string targetFrameworkMoniker, 
             string runtimeFrameworkVersion, 
-            string name)
+            string name,
+            string customDotNetCliPath = null)
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
             RuntimeFrameworkVersion = runtimeFrameworkVersion;
             Name = name;
+            CustomDotNetCliPath = customDotNetCliPath;
         }
 
         /// <summary>
@@ -52,6 +58,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// display name used for showing the results
         /// </summary>
         public string Name { get; }
+
+        public string CustomDotNetCliPath { get; }
+
+        public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName)
+            => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName, customDotNetCliPath);
 
         internal static NetCoreAppSettings GetCurrentVersion()
         {

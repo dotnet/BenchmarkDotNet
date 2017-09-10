@@ -19,6 +19,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public class DotNetCliExecutor : IExecutor
     {
+        public DotNetCliExecutor(string customDotNetCliPath) => CustomDotNetCliPath = customDotNetCliPath;
+
+        private string CustomDotNetCliPath { get; }
+
         public ExecuteResult Execute(ExecuteParameters executeParameters)
         {
             var executableName = $"{executeParameters.BuildResult.ArtifactsPaths.ProgramName}.dll";
@@ -53,6 +57,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         private ExecuteResult Execute(Benchmark benchmark, ILogger logger, ArtifactsPaths artifactsPaths, IDiagnoser diagnoser, string executableName, IConfig config, IResolver resolver)
         {
             var startInfo = DotNetCliCommandExecutor.BuildStartInfo(
+                CustomDotNetCliPath,
                 artifactsPaths.BinariesDirectoryPath,
                 BuildArgs(diagnoser, executableName));
 

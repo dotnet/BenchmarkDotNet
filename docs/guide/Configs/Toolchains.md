@@ -79,6 +79,41 @@ public class MyConfig : ManualConfig
 }
 ```
 
+## Custom dotnet cli path
+
+We internally use dotnet cli to build and run .NET Core executables. Sometimes it might be mandatory to use non-default dotnet cli path. An example scenario could be a comparison of RyuJit 32bit vs 64 bit. It required due this [limitation](https://github.com/dotnet/cli/issues/7532) of dotnet cli
+
+```cs
+public class CustomPathsConfig : ManualConfig
+{
+    public CustomPathsConfig() 
+    {
+        var dotnetCli32bit = NetCoreAppSettings
+            .NetCoreApp20
+            .WithCustomDotNetCliPath(@"C:\Program Files (x86)\dotnet\dotnet.exe", "32 bit cli");
+
+        var dotnetCli64bit = NetCoreAppSettings
+            .NetCoreApp20
+            .WithCustomDotNetCliPath(@"C:\Program Files\dotnet\dotnet.exe", "64 bit cli");
+
+        Add(Job.RyuJitX86.With(CsProjCoreToolchain.From(dotnetCli32bit)).WithId("32 bit cli"));
+        Add(Job.RyuJitX64.With(CsProjCoreToolchain.From(dotnetCli64bit)).WithId("64 bit cli"));
+    }
+}
+```
+
+``` ini
+BenchmarkDotNet=v0.10.9.20170910-develop, OS=Windows 10 Redstone 1 (10.0.14393)
+Processor=Intel Core i7-6600U CPU 2.60GHz (Skylake), ProcessorCount=4
+Frequency=2742185 Hz, Resolution=364.6727 ns, Timer=TSC
+.NET Core SDK=2.1.0-preview1-007074
+  [Host]     : .NET Core 2.0.0 (Framework 4.6.00001.0), 64bit RyuJIT
+  32 bit cli : .NET Core 2.0.0 (Framework 4.6.00001.0), 32bit RyuJIT
+  64 bit cli : .NET Core 2.0.0 (Framework 4.6.00001.0), 64bit RyuJIT
+
+Jit=RyuJit  
+```
+
 ## InProcessToolchain
 
 InProcessToolchain is our toolchain which does not generate any new executable. It emits IL on the fly and runs it from within the process itself. It can be usefull if want to run the benchmarks very fast or if you want to run them for framework which we don't support. An example could be a local build of CoreCLR.
