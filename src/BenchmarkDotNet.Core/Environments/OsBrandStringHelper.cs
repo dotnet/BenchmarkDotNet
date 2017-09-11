@@ -88,6 +88,9 @@ namespace BenchmarkDotNet.Environments
             { "10.0.14393", "10 Redstone 1" },
             { "10.0.14915", "10 Insider Preview" },
             { "10.0.15063", "10 Redstone 2" },
+            { "10.0.16241", "10 Redstone 3" },
+            { "10.0.16281", "10 Redstone 3" },
+            { "10.0.16353", "10 Redstone 4" },
         };
         
         /// <summary>
