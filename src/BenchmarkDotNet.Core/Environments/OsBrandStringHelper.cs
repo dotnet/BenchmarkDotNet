@@ -83,14 +83,14 @@ namespace BenchmarkDotNet.Environments
             { "10.0.9926", "10 Technical Preview 4" },
             { "10.0.10041", "10 Technical Preview 5" },
             { "10.0.10049", "10 Technical Preview 6" },
-            { "10.0.10240", "10 Threshold 1 (1507, RTM)" },
-            { "10.0.10586", "10 Threshold 2 (1511, November Update)" },
-            { "10.0.14393", "10 Redstone 1 (1607, Anniversary Update)" },
+            { "10.0.10240", "10 Threshold 1 [1507, RTM]" },
+            { "10.0.10586", "10 Threshold 2 [1511, November Update]" },
+            { "10.0.14393", "10 Redstone 1 [1607, Anniversary Update]" },
             { "10.0.14915", "10 Insider Preview" },
-            { "10.0.15063", "10 Redstone 2 (1703, Creators Update)" },
-            { "10.0.16241", "10 Redstone 3 (1709, Fall Creators Update)" },
-            { "10.0.16281", "10 Redstone 3 (1709, Fall Creators Update)" },
-            { "10.0.16353", "10 Redstone 4 (1803)" },
+            { "10.0.15063", "10 Redstone 2 [1703, Creators Update]" },
+            { "10.0.16241", "10 Redstone 3 [1709, Fall Creators Update]" },
+            { "10.0.16281", "10 Redstone 3 [1709, Fall Creators Update]" },
+            { "10.0.16353", "10 Redstone 4 [1803]" },
         };
         
         /// <summary>
