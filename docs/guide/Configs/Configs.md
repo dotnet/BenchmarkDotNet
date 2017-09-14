@@ -5,7 +5,7 @@ Config is a set of so called `jobs`, `columns`, `exporters`, `loggers`, `diagnos
 ## Built-in configuration
 There are two built-in ways to set your config:
 
-###Object style
+### Object style
 
 ```cs
 [Config(typeof(Config))]
@@ -37,7 +37,7 @@ public class MyClassWithBenchmarks
 }
 ```
 
-###Command style
+### Command style
 
 ```cs
 [Config("jobs=job1,job2 " +
@@ -60,7 +60,7 @@ public class MyClassWithBenchmarks
 }
 ```
 
-##Custom configs
+## Custom configs
 
 You can also define your own way to specify config parameters. 
 
@@ -91,7 +91,7 @@ public class IntroConfigSource
 }
 ```
 
-###Fluent config
+### Fluent config
 
 There is no need to create new Config type, you can simply use fluent interface:
 
