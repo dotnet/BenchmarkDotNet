@@ -28,8 +28,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// used in the auto-generated .csproj file
         /// simply ignored if null or empty
         /// </param>
-        /// <param name="name">display name used for showing the results</param>
-        /// <param name="customDotNetCliPath"/>
+        /// <param name="name">
+        /// display name used for showing the results
+        /// </param>
+        /// <param name="customDotNetCliPath">
         /// customize dotnet cli path if default is not desired
         /// simply ignored if null
         /// </param>
