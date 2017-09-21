@@ -5,6 +5,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -88,6 +89,48 @@ namespace BenchmarkDotNet.IntegrationTests
             public override void ExportToLog(Summary summary, ILogger logger)
             {
                 ExportCount++;
+            }
+        }
+
+        [Fact]
+        public void ExporterUsesFullyQualifiedTypeNameAsFileName()
+        {
+            var exporter = new MockExporter();
+            var summary = CanExecute<ClassA>();
+            var expectedFilePath = $"{Path.Combine(summary.ResultsDirectoryPath, typeof(ClassA).FullName)}-report.txt";
+            string actualFilePath = null;
+
+            try
+            {
+                actualFilePath = exporter.ExportToFiles(summary, NullLogger.Instance).First();
+
+                Assert.Equal(expectedFilePath, actualFilePath);
+            }
+            finally
+            {
+                if (File.Exists(actualFilePath))
+                    File.Delete(actualFilePath);
+            }
+        }
+
+        [Fact]
+        public void ExporterUsesSummaryTitleAsFileNameWhenBenchmarksJoinedToSingleSummary()
+        {
+            var exporter = new MockExporter();
+            var summary = new BenchmarkSwitcher(new[] { typeof(ClassA), typeof(ClassB) }).RunAllJoined();
+            var expectedFilePath = $"{Path.Combine(summary.ResultsDirectoryPath, summary.Title)}-report.txt";
+            string actualFilePath = null;
+
+            try
+            {
+                actualFilePath = exporter.ExportToFiles(summary, NullLogger.Instance).First();
+
+                Assert.Equal(expectedFilePath, actualFilePath);
+            }
+            finally
+            {
+                if (File.Exists(actualFilePath))
+                    File.Delete(actualFilePath);
             }
         }
     }
