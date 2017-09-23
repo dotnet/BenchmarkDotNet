@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using System.Linq;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Loggers;
@@ -69,40 +70,18 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private Summary GetMockSummary(string resultsDirectoryPath)
-        {
-            return new Summary(
-                title: "bdn-test",
-                reports: new List<BenchmarkReport>(),
-                hostEnvironmentInfo: Environments.HostEnvironmentInfo.GetCurrent(),
-                config: Configs.DefaultConfig.Instance,
-                resultsDirectoryPath: resultsDirectoryPath,
-                totalTime: System.TimeSpan.Zero,
-                validationErrors: new Validators.ValidationError[0]
-            );
-        }
-
-        private class MockExporter : ExporterBase
-        {
-            public int ExportCount = 0;
-
-            public override void ExportToLog(Summary summary, ILogger logger)
-            {
-                ExportCount++;
-            }
-        }
-
         [Fact]
         public void ExporterUsesFullyQualifiedTypeNameAsFileName()
         {
+            string resultsDirectoryPath = Path.GetTempPath();
             var exporter = new MockExporter();
-            var summary = CanExecute<ClassA>();
-            var expectedFilePath = $"{Path.Combine(summary.ResultsDirectoryPath, typeof(ClassA).FullName)}-report.txt";
+            var mockSummary = GetMockSummary(resultsDirectoryPath, typeof(ClassA));
+            var expectedFilePath = $"{Path.Combine(mockSummary.ResultsDirectoryPath, typeof(ClassA).FullName)}-report.txt";
             string actualFilePath = null;
 
             try
             {
-                actualFilePath = exporter.ExportToFiles(summary, NullLogger.Instance).First();
+                actualFilePath = exporter.ExportToFiles(mockSummary, NullLogger.Instance).First();
 
                 Assert.Equal(expectedFilePath, actualFilePath);
             }
@@ -116,15 +95,16 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void ExporterUsesSummaryTitleAsFileNameWhenBenchmarksJoinedToSingleSummary()
         {
+            string resultsDirectoryPath = Path.GetTempPath();
             var exporter = new MockExporter();
-            var summary = new BenchmarkSwitcher(new[] { typeof(ClassA), typeof(ClassB) }).RunAllJoined();
-            var expectedFilePath = $"{Path.Combine(summary.ResultsDirectoryPath, summary.Title)}-report.txt";
+            var mockSummary = GetMockSummary(resultsDirectoryPath, typeof(ClassA), typeof(ClassB));
+            var expectedFilePath = $"{Path.Combine(mockSummary.ResultsDirectoryPath, mockSummary.Title)}-report.txt";
             string actualFilePath = null;
 
             try
             {
-                actualFilePath = exporter.ExportToFiles(summary, NullLogger.Instance).First();
-
+                actualFilePath = exporter.ExportToFiles(mockSummary, NullLogger.Instance).First();
+                
                 Assert.Equal(expectedFilePath, actualFilePath);
             }
             finally
@@ -132,6 +112,49 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (File.Exists(actualFilePath))
                     File.Delete(actualFilePath);
             }
+        }
+        
+        private Summary GetMockSummary(string resultsDirectoryPath, params Type[] typesWithBenchmarks)
+        {
+            return new Summary(
+                title: "bdn-test",
+                reports: typesWithBenchmarks.Length > 0 ? CreateReports(typesWithBenchmarks) : Array.Empty<BenchmarkReport>(),
+                hostEnvironmentInfo: Environments.HostEnvironmentInfo.GetCurrent(),
+                config: Configs.DefaultConfig.Instance,
+                resultsDirectoryPath: resultsDirectoryPath,
+                totalTime: System.TimeSpan.Zero,
+                validationErrors: new Validators.ValidationError[0]
+            );
+        }
+        
+        private class MockExporter : ExporterBase
+        {
+            public int ExportCount = 0;
+
+            public override void ExportToLog(Summary summary, ILogger logger)
+            {
+                ExportCount++;
+            }
+        }
+
+        private BenchmarkReport[] CreateReports(Type[] types)
+        {
+            return CreateBenchmarks(types).Select(CreateReport).ToArray();
+        }
+
+        private Benchmark[] CreateBenchmarks(Type[] types)
+        {
+            return types.SelectMany(type => BenchmarkConverter.TypeToBenchmarks(type)).ToArray();
+        }
+
+        private BenchmarkReport CreateReport(Benchmark benchmark)
+        {
+            return new BenchmarkReport(benchmark: benchmark,
+                                       generateResult: null,
+                                       buildResult: null,
+                                       executeResults: null,
+                                       allMeasurements: null,
+                                       gcStats: default(GcStats));
         }
     }
 }
