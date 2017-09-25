@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using System.Linq;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -68,11 +70,55 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private Summary GetMockSummary(string resultsDirectoryPath)
+        [Fact]
+        public void ExporterUsesFullyQualifiedTypeNameAsFileName()
+        {
+            string resultsDirectoryPath = Path.GetTempPath();
+            var exporter = new MockExporter();
+            var mockSummary = GetMockSummary(resultsDirectoryPath, typeof(ClassA));
+            var expectedFilePath = $"{Path.Combine(mockSummary.ResultsDirectoryPath, typeof(ClassA).FullName)}-report.txt";
+            string actualFilePath = null;
+
+            try
+            {
+                actualFilePath = exporter.ExportToFiles(mockSummary, NullLogger.Instance).First();
+
+                Assert.Equal(expectedFilePath, actualFilePath);
+            }
+            finally
+            {
+                if (File.Exists(actualFilePath))
+                    File.Delete(actualFilePath);
+            }
+        }
+
+        [Fact]
+        public void ExporterUsesSummaryTitleAsFileNameWhenBenchmarksJoinedToSingleSummary()
+        {
+            string resultsDirectoryPath = Path.GetTempPath();
+            var exporter = new MockExporter();
+            var mockSummary = GetMockSummary(resultsDirectoryPath, typeof(ClassA), typeof(ClassB));
+            var expectedFilePath = $"{Path.Combine(mockSummary.ResultsDirectoryPath, mockSummary.Title)}-report.txt";
+            string actualFilePath = null;
+
+            try
+            {
+                actualFilePath = exporter.ExportToFiles(mockSummary, NullLogger.Instance).First();
+                
+                Assert.Equal(expectedFilePath, actualFilePath);
+            }
+            finally
+            {
+                if (File.Exists(actualFilePath))
+                    File.Delete(actualFilePath);
+            }
+        }
+        
+        private Summary GetMockSummary(string resultsDirectoryPath, params Type[] typesWithBenchmarks)
         {
             return new Summary(
                 title: "bdn-test",
-                reports: new List<BenchmarkReport>(),
+                reports: typesWithBenchmarks.Length > 0 ? CreateReports(typesWithBenchmarks) : Array.Empty<BenchmarkReport>(),
                 hostEnvironmentInfo: Environments.HostEnvironmentInfo.GetCurrent(),
                 config: Configs.DefaultConfig.Instance,
                 resultsDirectoryPath: resultsDirectoryPath,
@@ -80,7 +126,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 validationErrors: new Validators.ValidationError[0]
             );
         }
-
+        
         private class MockExporter : ExporterBase
         {
             public int ExportCount = 0;
@@ -89,6 +135,26 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 ExportCount++;
             }
+        }
+
+        private BenchmarkReport[] CreateReports(Type[] types)
+        {
+            return CreateBenchmarks(types).Select(CreateReport).ToArray();
+        }
+
+        private Benchmark[] CreateBenchmarks(Type[] types)
+        {
+            return types.SelectMany(type => BenchmarkConverter.TypeToBenchmarks(type)).ToArray();
+        }
+
+        private BenchmarkReport CreateReport(Benchmark benchmark)
+        {
+            return new BenchmarkReport(benchmark: benchmark,
+                                       generateResult: null,
+                                       buildResult: null,
+                                       executeResults: null,
+                                       allMeasurements: null,
+                                       gcStats: default(GcStats));
         }
     }
 }

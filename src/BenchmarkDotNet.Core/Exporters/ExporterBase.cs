@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
@@ -17,7 +18,8 @@ namespace BenchmarkDotNet.Exporters
 
         public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
         {
-            var filePath = $"{Path.Combine(summary.ResultsDirectoryPath, summary.Title)}-{FileCaption}{FileNameSuffix}.{FileExtension}";
+            var fileName = GetFileName(summary);
+            var filePath = $"{Path.Combine(summary.ResultsDirectoryPath, fileName)}-{FileCaption}{FileNameSuffix}.{FileExtension}";
             if (File.Exists(filePath))
             {
                 try
@@ -27,7 +29,7 @@ namespace BenchmarkDotNet.Exporters
                 catch (IOException)
                 {
                     var uniqueString = System.DateTime.Now.ToString("yyyyMMdd-HHmmss");
-                    var alternativeFilePath = $"{Path.Combine(summary.ResultsDirectoryPath, summary.Title)}-{FileCaption}{FileNameSuffix}-{uniqueString}.{FileExtension}";
+                    var alternativeFilePath = $"{Path.Combine(summary.ResultsDirectoryPath, fileName)}-{FileCaption}{FileNameSuffix}-{uniqueString}.{FileExtension}";
                     consoleLogger.WriteLineError($"Could not overwrite file {filePath}. Exporting to {alternativeFilePath}");
                     filePath = alternativeFilePath;
                 }
@@ -38,7 +40,24 @@ namespace BenchmarkDotNet.Exporters
                 ExportToLog(summary, new StreamLogger(stream));
             }
 
-            return new [] { filePath };
+            return new[] { filePath };
+        }
+
+        private static string GetFileName(Summary summary)
+        {
+            string fileName;
+
+            var benchmarkTypes = summary.Benchmarks.Select(b => b.Target.Type.FullName).Distinct().ToArray();
+            if (benchmarkTypes.Length == 1)
+            {
+                fileName = benchmarkTypes[0];
+            }
+            else
+            {
+                fileName = summary.Title;
+            }
+
+            return fileName;
         }
     }
 }
