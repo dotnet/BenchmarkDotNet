@@ -18,6 +18,8 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class DisassemblyDiagnoserTests : BenchmarkTestExecutor
     {
+        private const string WindowsOnly = "Disassembler supports only Windows";
+
         public DisassemblyDiagnoserTests(ITestOutputHelper output) : base(output)
         {
         }
@@ -64,7 +66,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public virtual void Virtual() { }
         }
 
-        [Theory]
+        [TheoryWindowsOnly(WindowsOnly)]
         [MemberData(nameof(GetAllJits))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleAllMethodCalls(Jit jit, Platform platform, Runtime runtime)
@@ -88,7 +90,7 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertDisassembled(disassemblyDiagnoser, nameof(WithCalls.Virtual));
         }
 
-        [Fact]
+        [FactWindowsOnly(WindowsOnly)]
         public void VeryShortJobsAreNotSupported()
         {
             var disassemblyDiagnoser = (IDisassemblyDiagnoser)DisassemblyDiagnoser.Create(
