@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
@@ -128,7 +127,7 @@ namespace BenchmarkDotNet.Exporters
 
             if (columnsStartWithSeparator)
             {
-                logger.Write(tableHeaderSeparator);
+                logger.Write(tableHeaderSeparator.TrimStart());
             }
 
             table.PrintLine(table.FullHeader, logger, string.Empty, tableHeaderSeparator);
@@ -136,10 +135,10 @@ namespace BenchmarkDotNet.Exporters
             {
                 if (columnsStartWithSeparator)
                 {
-                    logger.Write(tableHeaderSeparator);
+                    logger.Write(tableHeaderSeparator.TrimStart());
                 }
 
-                logger.WriteLineStatistic(string.Join("", table.Columns.Where(c => c.NeedToShow).Select(column => new string('-', column.Width) + getJustificationIndicator(column.Justify) + "|")));
+                logger.WriteLineStatistic(string.Join("", table.Columns.Where(c => c.NeedToShow).Select(column => new string('-', column.Width) + GetJustificationIndicator(column.Justify) + "|")));
             }
             var rowCounter = 0;
             var highlightRow = false;
@@ -153,7 +152,7 @@ namespace BenchmarkDotNet.Exporters
 
                 if (columnsStartWithSeparator)
                 {
-                    logger.Write(tableColumnSeparator);
+                    logger.Write(tableColumnSeparator.TrimStart());
                 }
 
                 table.PrintLine(line, logger, string.Empty, tableColumnSeparator, highlightRow, table.FullContentStartOfGroup[rowCounter], startOfGroupInBold, boldMarkupFormat);
@@ -161,7 +160,7 @@ namespace BenchmarkDotNet.Exporters
             }
         }
 
-        private static string getJustificationIndicator(SummaryTable.SummaryTableColumn.TextJustification textJustification)
+        private static string GetJustificationIndicator(SummaryTable.SummaryTableColumn.TextJustification textJustification)
         {
             switch (textJustification)
             {

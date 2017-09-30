@@ -349,9 +349,9 @@ Job=LongRun  LaunchCount=3  TargetCount=100
 WarmupCount=15  
 
 {noformat}
- ||Method ||    Mean ||Error ||StdDev ||     P67 ||
- |    Foo | 1.000 ns |    NA | 0.0 ns | 1.000 ns |
- |    Bar | 1.000 ns |    NA | 0.0 ns | 1.000 ns |
+||Method ||    Mean ||Error ||StdDev ||     P67 ||
+|    Foo | 1.000 ns |    NA | 0.0 ns | 1.000 ns |
+|    Bar | 1.000 ns |    NA | 0.0 ns | 1.000 ns |
 ############################################
 MarkdownExporter-console
 ############################################
@@ -382,10 +382,10 @@ Job=LongRun  LaunchCount=3  TargetCount=100
 WarmupCount=15  
 
 ```
- | Method |     Mean | Error | StdDev |      P67 |
- |------- |---------:|------:|-------:|---------:|
- |    Foo | 1.000 ns |    NA | 0.0 ns | 1.000 ns |
- |    Bar | 1.000 ns |    NA | 0.0 ns | 1.000 ns |
+| Method |     Mean | Error | StdDev |      P67 |
+|------- |---------:|------:|-------:|---------:|
+|    Foo | 1.000 ns |    NA | 0.0 ns | 1.000 ns |
+|    Bar | 1.000 ns |    NA | 0.0 ns | 1.000 ns |
 ############################################
 MarkdownExporter-stackoverflow
 ############################################
