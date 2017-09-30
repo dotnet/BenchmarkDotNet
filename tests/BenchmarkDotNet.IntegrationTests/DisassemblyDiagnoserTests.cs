@@ -50,6 +50,8 @@ namespace BenchmarkDotNet.IntegrationTests
                 Instance();
                 Recursive();
                 Virtual();
+
+                Benchmark(true);
             }
 
             [MethodImpl(MethodImplOptions.NoInlining)] public static void Static() { }
@@ -64,6 +66,8 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             public virtual void Virtual() { }
+
+            [MethodImpl(MethodImplOptions.NoInlining)] public void Benchmark(bool justAnOverload) { } // we need to test overloads (#562)
         }
 
         [TheoryWindowsOnly(WindowsOnly)]
@@ -76,18 +80,19 @@ namespace BenchmarkDotNet.IntegrationTests
 
             CanExecute<WithCalls>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser));
 
-            void AssertDisassembled(IDisassemblyDiagnoser diagnoser, string calledMethodName)
+            void AssertDisassembled(IDisassemblyDiagnoser diagnoser, string methodSignature)
             {
                 Assert.True(diagnoser.Results.Single().Value
-                    .Methods.Any(method => method.Name.Contains(calledMethodName) && method.Maps.Any(map => map.Instructions.Any())),
-                    $"{calledMethodName} is missing");
+                    .Methods.Any(method => method.Name.EndsWith(methodSignature) && method.Maps.Any(map => map.Instructions.Any())),
+                    $"{methodSignature} is missing");
             }
 
-            AssertDisassembled(disassemblyDiagnoser, nameof(WithCalls.Benchmark));
-            AssertDisassembled(disassemblyDiagnoser, nameof(WithCalls.Static));
-            AssertDisassembled(disassemblyDiagnoser, nameof(WithCalls.Instance));
-            AssertDisassembled(disassemblyDiagnoser, nameof(WithCalls.Recursive));
-            AssertDisassembled(disassemblyDiagnoser, nameof(WithCalls.Virtual));
+            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Benchmark)}()");
+            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Benchmark)}(Boolean)");
+            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Static)}()");
+            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Instance)}()");
+            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Recursive)}()");
+            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Virtual)}()");
         }
 
         [FactWindowsOnly(WindowsOnly)]

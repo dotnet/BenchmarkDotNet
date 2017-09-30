@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Disassembler
         // the goals of the existence of this process: 
         // 1. attach to benchmarked process
         // 2. disassemble the code
-        // 3. print it to std out
+        // 3. save it to xml file
         // 4. detach & shut down
         //
         // requirements: must not have any dependencies to BenchmarkDotNet itself, KISS
@@ -95,8 +95,11 @@ namespace BenchmarkDotNet.Disassembler
 
             var typeWithBenchmark = runtime.Heap.GetTypeByName(settings.TypeName);
 
-            // benchmarks in BenchmarkDotNet are always parameterless, so check by name is enough as of today
-            state.Todo.Enqueue(new MethodInfo(typeWithBenchmark.Methods.Single(method => method.Name == settings.MethodName), 0)); 
+            state.Todo.Enqueue(
+                new MethodInfo(
+                    // benchmarks in BenchmarkDotNet are always parameterless, so check by name is enough as of today
+                    typeWithBenchmark.Methods.Single(method => method.IsPublic && method.Name == settings.MethodName && method.GetFullSignature().EndsWith("()")), 
+                    0)); 
 
             while (state.Todo.Count != 0)
             {
