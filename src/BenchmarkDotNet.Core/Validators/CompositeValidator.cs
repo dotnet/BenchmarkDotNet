@@ -12,7 +12,8 @@ namespace BenchmarkDotNet.Validators
             UnrollFactorValidator.Default,
             DiagnosersValidator.Default,
             CompilationValidator.Default,
-            ConfigValidator.Default
+            ConfigValidator.Default,
+            ShadowCopyValidator.Default
         };
 
         internal readonly IValidator[] Validators;
