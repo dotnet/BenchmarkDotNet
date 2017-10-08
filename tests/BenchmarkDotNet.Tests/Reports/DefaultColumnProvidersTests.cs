@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Tests.Reports
         }
 
         private static IEnumerable<Benchmark> CreateBenchmarks(IConfig config) =>
-            BenchmarkConverter.TypeToBenchmarks(typeof(MockBenchmarkClass), config);
+            BenchmarkConverter.TypeToBenchmarks(typeof(MockBenchmarkClass), config).Benchmarks;
 
 
         [LongRunJob]

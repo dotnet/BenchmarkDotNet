@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Running
         /// Run all available benchmarks.
         /// </summary>
         public IEnumerable<Summary> RunAll() => Run(new[] { "*" });
-        
+
         /// <summary>
         /// Run all available benchmarks and join them to a single summary
         /// </summary>
@@ -64,18 +64,18 @@ namespace BenchmarkDotNet.Running
                 DisplayOptions();
                 return Enumerable.Empty<Summary>();
             }
-            
+
             var effectiveConfig = ManualConfig.Union(config ?? DefaultConfig.Instance, ManualConfig.Parse(args));
             bool join = args.Any(arg => arg.EqualsWithIgnoreCase("--join"));
 
             if (join)
             {
                 var typesWithMethods = typeParser.MatchingTypesWithMethods(args);
-                var benchmarks = typesWithMethods.SelectMany(typeWithMethods => 
-                    typeWithMethods.AllMethodsInType 
-                        ? BenchmarkConverter.TypeToBenchmarks(typeWithMethods.Type, effectiveConfig) 
+                var benchmarks = typesWithMethods.Select(typeWithMethods =>
+                    typeWithMethods.AllMethodsInType
+                        ? BenchmarkConverter.TypeToBenchmarks(typeWithMethods.Type, effectiveConfig)
                         : BenchmarkConverter.MethodsToBenchmarks(typeWithMethods.Type, typeWithMethods.Methods, effectiveConfig)).ToArray();
-                summaries.Add(BenchmarkRunner.Run(benchmarks, effectiveConfig));
+                summaries.Add(BenchmarkRunner.Run(benchmarks));
             }
             else
             {
@@ -106,7 +106,7 @@ namespace BenchmarkDotNet.Running
             return summaries;
         }
 
-        public bool ShouldDisplayOptions(string[] args) 
+        public bool ShouldDisplayOptions(string[] args)
             => args.Select(a => a.ToLowerInvariant()).Any(a => a == "--help" || a == "-h");
 
         private void DisplayOptions()

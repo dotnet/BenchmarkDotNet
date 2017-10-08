@@ -104,7 +104,7 @@ namespace BenchmarkDotNet.IntegrationTests
             try
             {
                 actualFilePath = exporter.ExportToFiles(mockSummary, NullLogger.Instance).First();
-                
+
                 Assert.Equal(expectedFilePath, actualFilePath);
             }
             finally
@@ -113,7 +113,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     File.Delete(actualFilePath);
             }
         }
-        
+
         private Summary GetMockSummary(string resultsDirectoryPath, params Type[] typesWithBenchmarks)
         {
             return new Summary(
@@ -126,7 +126,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 validationErrors: new Validators.ValidationError[0]
             );
         }
-        
+
         private class MockExporter : ExporterBase
         {
             public int ExportCount = 0;
@@ -144,7 +144,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private Benchmark[] CreateBenchmarks(Type[] types)
         {
-            return types.SelectMany(type => BenchmarkConverter.TypeToBenchmarks(type)).ToArray();
+            return types.SelectMany(type => BenchmarkConverter.TypeToBenchmarks(type).Benchmarks).ToArray();
         }
 
         private BenchmarkReport CreateReport(Benchmark benchmark)

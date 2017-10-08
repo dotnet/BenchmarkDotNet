@@ -38,6 +38,11 @@ namespace BenchmarkDotNet.Configs
         public static IConfig KeepBenchmarkFiles(this IConfig config, bool value = true) => config.With(m => m.KeepBenchmarkFiles = value);
         public static IConfig RemoveBenchmarkFiles(this IConfig config) => config.KeepBenchmarkFiles(false);
 
+        public static ReadOnlyConfig AsReadOnly(this IConfig config) =>
+            config is ReadOnlyConfig r
+                ? r
+                : new ReadOnlyConfig(config);
+
         private static IConfig With(this IConfig config, Action<ManualConfig> addAction)
         {
             var manualConfig = ManualConfig.Create(config);

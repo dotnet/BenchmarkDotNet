@@ -18,5 +18,6 @@ namespace BenchmarkDotNet.Validators
 
         // to have backward compatibility for people who implemented IValidator(Benchmark[] benchmarks)
         public static implicit operator ValidationParameters(Benchmark[] benchmarks) => new ValidationParameters(benchmarks, null);
+        public static implicit operator ValidationParameters(BenchmarkRunInfo benchmarkRunInfo) => new ValidationParameters(benchmarkRunInfo.Benchmarks, null);
     }
 }
