@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Code
 
         public virtual string TargetMethodReturnTypeName => TargetMethodReturnType.GetCorrectTypeName();
 
-        public virtual string TargetMethodCall => $"{Target.Method.Name}()";
+        public virtual string TargetMethodDelegate => Target.Method.Name;
 
         public virtual string ConsumeField => null;
 
@@ -134,7 +134,8 @@ namespace BenchmarkDotNet.Code
 
         // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
         // and will eventually throw actual exception, not aggregated one
-        public override string TargetMethodCall => $"{Target.Method.Name}().GetAwaiter().GetResult()";
+        public override string TargetMethodDelegate
+            => $"() => {{ {Target.Method.Name}().GetAwaiter().GetResult(); }}";
 
         protected override Type TargetMethodReturnType => typeof(void);
     }
@@ -152,6 +153,7 @@ namespace BenchmarkDotNet.Code
 
         // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
         // and will eventually throw actual exception, not aggregated one
-        public override string TargetMethodCall => $"{Target.Method.Name}().GetAwaiter().GetResult()";
+        public override string TargetMethodDelegate
+            => $"() => {{ return {Target.Method.Name}().GetAwaiter().GetResult(); }}";
     }
 }

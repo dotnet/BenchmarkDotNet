@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Code
                 Replace("$TargetTypeNamespace$", provider.TargetTypeNamespace).
                 Replace("$TargetMethodReturnTypeNamespace$", provider.TargetMethodReturnTypeNamespace).
                 Replace("$TargetTypeName$", provider.TargetTypeName).
-                Replace("$TargetMethodCall$", provider.TargetMethodCall).
+                Replace("$TargetMethodDelegate$", provider.TargetMethodDelegate).
                 Replace("$TargetMethodReturnType$", provider.TargetMethodReturnTypeName).
                 Replace("$IdleMethodReturnTypeName$", provider.IdleMethodReturnTypeName).
                 Replace("$GlobalSetupMethodName$", provider.GlobalSetupMethodName).

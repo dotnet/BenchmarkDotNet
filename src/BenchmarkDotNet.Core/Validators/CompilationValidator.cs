@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Validators
                 .Select(benchmark
                     => new ValidationError(
                         true,
-                        "Using \"__Main\" or \"__Idle\" for method names is prohibited. We are using them internally in our templates. Please rename your method"));
+                        "Using \"__Idle\" for method name is prohibited. We are using it internally in our templates. Please rename your method"));
 
         private bool IsValidCSharpIdentifier(string identifier) // F# allows to use whitespaces as names #479
             => !string.IsNullOrEmpty(identifier)
@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Validators
                     .All(character => char.IsLetterOrDigit(character) || character == Underscore);
 
         private bool IsUsingNameUsedInternallyByOurTemplate(string identifier)
-            => identifier == "__Main" || identifier == "__Idle";
+            => identifier == "__Idle";
 
         private class BenchmarkMethodEqualityComparer : IEqualityComparer<Benchmark>
         {
