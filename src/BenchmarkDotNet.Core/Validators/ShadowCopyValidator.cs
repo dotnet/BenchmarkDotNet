@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -15,7 +16,7 @@ namespace BenchmarkDotNet.Validators
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
             => validationParameters
                 .Benchmarks
-                .Select(benchmark => benchmark.Target.Type.Assembly)
+                .Select(benchmark => benchmark.Target.Type.GetTypeInfo().Assembly)
                 .Distinct()
                 .Where(assembly => assembly.Location.StartsWith(Path.GetTempPath()))
                 .Select(
