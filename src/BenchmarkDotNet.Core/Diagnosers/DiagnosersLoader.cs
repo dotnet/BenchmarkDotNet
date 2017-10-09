@@ -15,7 +15,20 @@ namespace BenchmarkDotNet.Diagnosers
         const string DiagnosticAssemblyName = "BenchmarkDotNet.Diagnostics.Windows";
 
         // Make the Diagnosers lazy-loaded, so they are only instantiated if needed
-        public static readonly Lazy<IDiagnoser[]> LazyLoadedDiagnosers = new Lazy<IDiagnoser[]>(LoadDiagnosers, LazyThreadSafetyMode.ExecutionAndPublication);
+        internal static readonly Lazy<IDiagnoser[]> LazyLoadedDiagnosers 
+            = new Lazy<IDiagnoser[]>(LoadDiagnosers, LazyThreadSafetyMode.ExecutionAndPublication);
+
+        internal static IDiagnoser GetImplementation<TDiagnoser>() where TDiagnoser : IDiagnoser
+            => LazyLoadedDiagnosers.Value
+                .SingleOrDefault(diagnoser => diagnoser is TDiagnoser)
+                ?? GetUnresolvedDiagnoser<TDiagnoser>();
+
+        internal static IDiagnoser GetImplementation<TDiagnoser, TConfig>(TConfig config) where TDiagnoser : IConfigurableDiagnoser<TConfig>
+            => LazyLoadedDiagnosers.Value
+                .OfType<TDiagnoser>().SingleOrDefault()?.Configure(config)
+                ?? GetUnresolvedDiagnoser<TDiagnoser>();
+
+        private static IDiagnoser GetUnresolvedDiagnoser<TDiagnoser>() => new UnresolvedDiagnoser(typeof(TDiagnoser));
 
         private static IDiagnoser[] LoadDiagnosers()
         {
@@ -28,7 +41,13 @@ namespace BenchmarkDotNet.Diagnosers
 
         private static IDiagnoser[] LoadCore() => new IDiagnoser[] { MemoryDiagnoser.Default };
 
-        private static IDiagnoser[] LoadMono() => new IDiagnoser[] { MemoryDiagnoser.Default }; // this method should return a IHardwareCountersDiagnoser when we implement Hardware Counters for Unix
+        private static IDiagnoser[] LoadMono() 
+            => new IDiagnoser[]
+            {
+                // this method should return a IHardwareCountersDiagnoser when we implement Hardware Counters for Unix
+                MemoryDiagnoser.Default,
+                DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig()), 
+            }; 
 
 #if CLASSIC
         private static IDiagnoser[] LoadClassic()
@@ -52,6 +71,7 @@ namespace BenchmarkDotNet.Diagnosers
                     return new[]
                     {
                         MemoryDiagnoser.Default,
+                        DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig()),
                         CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.InliningDiagnoser"),
                         CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.PmcDiagnoser"),
                     };
@@ -64,14 +84,15 @@ namespace BenchmarkDotNet.Diagnosers
 
             return new IDiagnoser[]
             {
-                MemoryDiagnoser.Default
+                MemoryDiagnoser.Default,
+                DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig())
             };
         }
 
         private static Assembly LoadDiagnosticsAssembly(Assembly benchmarkDotNetCoreAssembly)
         {
             // it not enough to just install NuGet to be "referenced", the project has to consume the dll for real to be on the referenced assembly list
-            var referencedAssemblyName = Assembly.GetEntryAssembly().GetReferencedAssemblies().SingleOrDefault(name => name.Name == DiagnosticAssemblyName);
+            var referencedAssemblyName = Assembly.GetEntryAssembly()?.GetReferencedAssemblies().SingleOrDefault(name => name.Name == DiagnosticAssemblyName);
             if (referencedAssemblyName != default(AssemblyName))
                 return Assembly.Load(referencedAssemblyName);
 

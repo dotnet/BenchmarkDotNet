@@ -6,7 +6,8 @@
     <PlatformTarget>$PLATFORM$</PlatformTarget>
     <AssemblyName>$PROGRAMNAME$</AssemblyName>
     <OutputType>Exe</OutputType>
-    <OutputPath>bin\Release</OutputPath>
+    <OutputPath>bin\$CONFIGURATIONNAME$</OutputPath>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     $COPIEDSETTINGS$
   </PropertyGroup>
 

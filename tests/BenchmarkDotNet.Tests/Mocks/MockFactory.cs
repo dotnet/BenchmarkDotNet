@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Tests.Mocks
                 BenchmarkDotNetVersion = "0.10.x-mock",
                 ChronometerFrequency = new Frequency(2531248),
                 Configuration = "CONFIGURATION",
-                DotNetCliVersion = new Lazy<string>(() => "1.0.x.mock"),
+                DotNetSdkVersion = new Lazy<string>(() => "1.0.x.mock"),
                 HardwareTimerKind = HardwareTimerKind.Tsc,
                 HasAttachedDebugger = false,
                 HasRyuJit = true,

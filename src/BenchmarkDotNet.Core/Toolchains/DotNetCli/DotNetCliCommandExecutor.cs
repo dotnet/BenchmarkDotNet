@@ -42,9 +42,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 => new CommandResult(false, time, standardOutput, standardError);
         }
 
-        internal static CommandResult ExecuteCommand(string commandWithArguments, string workingDirectory)
+        internal static CommandResult ExecuteCommand(
+            string customDotNetCliPath, string commandWithArguments, string workingDirectory)
         {
-            using (var process = new Process { StartInfo = BuildStartInfo(workingDirectory, commandWithArguments) })
+            using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath, workingDirectory, commandWithArguments) })
             {
                 var stopwatch = Stopwatch.StartNew();
                 process.Start();
@@ -61,9 +62,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        internal static string GetDotNetCliVersion()
+        internal static string GetDotNetSdkVersion()
         {
-            using (var process = new Process { StartInfo = BuildStartInfo(arguments: "--version", workingDirectory: string.Empty) })
+            using (var process = new Process { StartInfo = BuildStartInfo(arguments: "--version", workingDirectory: string.Empty, customDotNetCliPath: null) })
             {
                 try
                 {
@@ -84,11 +85,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        internal static ProcessStartInfo BuildStartInfo(string workingDirectory, string arguments)
+        internal static ProcessStartInfo BuildStartInfo(string customDotNetCliPath, string workingDirectory, string arguments)
         {
             return new ProcessStartInfo
             {
-                FileName = "dotnet",
+                FileName = customDotNetCliPath ?? "dotnet",
                 WorkingDirectory = workingDirectory,
                 Arguments = arguments,
                 UseShellExecute = false,

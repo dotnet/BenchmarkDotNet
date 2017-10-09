@@ -1,15 +1,14 @@
-﻿#if CLASSIC
+﻿#if !NETCOREAPP1_1
 using System;
 using System.Linq;
 using System.Reflection.Emit;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using Xunit;
 
-namespace BenchmarkDotNet.Tests
+namespace BenchmarkDotNet.Tests.Validators
 {
     public class CompilationValidatorTests
     {
@@ -19,7 +18,7 @@ namespace BenchmarkDotNet.Tests
             Delegate method = BuildDummyMethod<int>("Has Some Whitespaces");
 
             var parameters = new ValidationParameters(
-                new Benchmark[1]
+                new[]
                 {
                     new Benchmark(
                         new Target(

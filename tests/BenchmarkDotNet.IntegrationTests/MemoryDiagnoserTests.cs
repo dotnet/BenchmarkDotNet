@@ -9,6 +9,7 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
@@ -45,6 +46,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory, MemberData(nameof(GetToolchains))]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void MemoryDiagnoserIsAccurate(IToolchain toolchain)
         {
             long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
@@ -79,6 +81,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory, MemberData(nameof(GetToolchains))]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void MemoryDiagnoserDoesNotIncludeAllocationsFromGlobalSetupAndCleanup(IToolchain toolchain)
         {
             AssertAllocations(toolchain, typeof(AllocatingGlobalSetupAndCleanup), new Dictionary<string, long>
@@ -93,6 +96,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory, MemberData(nameof(GetToolchains))]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void EngineShouldNotInterfereAllocationResults(IToolchain toolchain)
         {
             AssertAllocations(toolchain, typeof(NoAllocationsAtAll), new Dictionary<string, long>
@@ -107,6 +111,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory, MemberData(nameof(GetToolchains))]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void EngineShouldNotIntroduceBoxing(IToolchain toolchain)
         {
             AssertAllocations(toolchain, typeof(NoBoxing), new Dictionary<string, long>
@@ -127,6 +132,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory, MemberData(nameof(GetToolchains))]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AwaitingTasksShouldNotInterfereAllocationResults(IToolchain toolchain)
         {
             AssertAllocations(toolchain, typeof(NonAllocatingAsynchronousBenchmarks), new Dictionary<string, long>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.Characteristics
@@ -68,7 +69,9 @@ namespace BenchmarkDotNet.Characteristics
             private static readonly HashSet<Type> NonExportableTypes = new HashSet<Type>
             {
                 typeof(IToolchain), // there is no need to set toolchain in child process, it was causing parameterless ctor requirement for all IToolchain implementations
-                typeof(IReadOnlyCollection<HardwareCounter>) // we don't need to export this array to child process
+                typeof(IReadOnlyCollection<HardwareCounter>), // we don't need to export this array to child process
+                typeof(IReadOnlyList<Argument>),
+                typeof(IReadOnlyList<EnvironmentVariable>)
             };
 
             public override string ToPresentation(CharacteristicObject obj)

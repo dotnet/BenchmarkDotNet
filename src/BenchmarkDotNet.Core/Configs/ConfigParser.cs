@@ -69,6 +69,7 @@ namespace BenchmarkDotNet.Configs
                 { "legacyjitx86", new[] { Job.LegacyJitX86 } },
                 { "legacyjitx64", new[] { Job.LegacyJitX64 } },
                 { "ryujitx64", new[] { Job.RyuJitX64 } },
+                { "ryujitx86", new[] { Job.RyuJitX86 } },
                 { "dry", new[] { Job.Dry } },
                 { "clr", new[] { Job.Clr } },
                 { "mono", new[] { Job.Mono } },

@@ -2,7 +2,7 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.Core</AssemblyTitle>
-    <TargetFrameworks>net46;netcoreapp1.1</TargetFrameworks>
+    <TargetFrameworks>net46;netcoreapp1.1;netcoreapp2.0</TargetFrameworks>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <AssemblyName>BenchmarkDotNet.Core</AssemblyName>
     <PackageId>BenchmarkDotNet.Core</PackageId>
@@ -10,15 +10,20 @@
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\*" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
+    <EmbeddedResource Include="Disassemblers\net46\win7-x86\BenchmarkDotNet.Disassembler.x86.exe" />
+    <EmbeddedResource Include="Disassemblers\net46\win7-x64\BenchmarkDotNet.Disassembler.x64.exe" />
+    <EmbeddedResource Include="Disassemblers\net46\win7-x64\*.dll" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
+  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
+    <ProjectReference Include="..\BenchmarkDotNet.Disassembler.x64\BenchmarkDotNet.Disassembler.x64.csproj" />
+    <ProjectReference Include="..\BenchmarkDotNet.Disassembler.x86\BenchmarkDotNet.Disassembler.x86.csproj" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.3.0" />
     <Reference Include="System.Management" />
     <Reference Include="System.Xml" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
+  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' ">
     <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
     <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
@@ -28,5 +33,6 @@
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="1.1.1" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.3.0" />
     <PackageReference Include="System.ValueTuple" Version="4.3.0" />
+    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
   </ItemGroup>
 </Project>

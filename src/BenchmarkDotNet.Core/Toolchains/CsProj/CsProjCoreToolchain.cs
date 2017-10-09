@@ -1,6 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -26,13 +27,12 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         [PublicAPI]
         public static IToolchain From(NetCoreAppSettings settings)
-            => new CsProjCoreToolchain("CoreCsProj",
-                new CsProjGenerator(settings.TargetFrameworkMoniker, PlatformProvider), 
-                new CsProjBuilder(settings.TargetFrameworkMoniker), 
-                new DotNetCliExecutor());
+            => new CsProjCoreToolchain(settings.Name,
+                new CsProjGenerator(settings.TargetFrameworkMoniker, PlatformProvider, settings.RuntimeFrameworkVersion), 
+                new CsProjBuilder(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath), 
+                new DotNetCliExecutor(settings.CustomDotNetCliPath));
 
-        // dotnet cli supports only x64 compilation now
-        private static string PlatformProvider(Platform platform) => "x64";
+        private static string PlatformProvider(Platform platform) => platform.ToConfig();
 
         public override bool IsSupported(Benchmark benchmark, ILogger logger, IResolver resolver)
         {
@@ -53,11 +53,6 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 return false;
             }
 
-            if (benchmark.Job.HasValue(EnvMode.PlatformCharacteristic) && benchmark.Job.ResolveValue(EnvMode.PlatformCharacteristic, resolver) == Platform.X86)
-            {
-                logger.WriteLineError($"Currently dotnet cli toolchain supports only X64 compilation, benchmark '{benchmark.DisplayInfo}' will not be executed");
-                return false;
-            }
             if (benchmark.Job.HasValue(EnvMode.JitCharacteristic) && benchmark.Job.ResolveValue(EnvMode.JitCharacteristic, resolver) == Jit.LegacyJit)
             {
                 logger.WriteLineError($"Currently dotnet cli toolchain supports only RyuJit, benchmark '{benchmark.DisplayInfo}' will not be executed");
@@ -73,6 +68,14 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 logger.WriteLineError($"Currently project.json does not support gcAllowVeryLargeObjects (app.config does), benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;
             }
+
+#if NETCOREAPP1_1
+            if (benchmark.Job.HasValue(InfrastructureMode.EnvironmentVariablesCharacteristic))
+            {
+                logger.WriteLineError($"ProcessStartInfo.EnvironmentVariables is avaialable for .NET Core 2.0, benchmark '{benchmark.DisplayInfo}' will not be executed");
+                return false;
+            }
+#endif
 
             return true;
         }

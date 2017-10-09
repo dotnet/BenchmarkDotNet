@@ -1,4 +1,4 @@
-﻿#if CLASSIC
+﻿#if !NETCOREAPP1_1
 
 using System;
 using System.Threading;

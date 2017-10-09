@@ -25,6 +25,7 @@
             "Exporters": "Configs\\Exporters.md",
             "Loggers":"Configs\\Loggers.md",
             "Diagnosers":"Configs\\Diagnosers.md",
+            "Toolchains":"Configs\\Toolchains.md",
             "Analyzers":"Configs\\Analyzers.md",
             "Validators":"Configs\\Validators.md",
             "Filters":"Configs\\Filters.md",
@@ -37,7 +38,8 @@
             "Baseline":"Advanced\\Baseline.md",
             "Percentiles": "Advanced\\Percentiles.md",
             "STAThread": "Advanced\\STAThread.md",
-            "Custom Mono Path": "Advanced\\CustomMonoPath.md"
+            "Customizing Mono": "Advanced\\CustomizingMono.md",
+            "Environment Variables": "Advanced\\EnvironmentVariables.md"
         },
         "Internals":
         {

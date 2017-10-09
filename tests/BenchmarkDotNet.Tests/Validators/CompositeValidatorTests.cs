@@ -3,7 +3,7 @@ using System.Linq;
 using BenchmarkDotNet.Validators;
 using Xunit;
 
-namespace BenchmarkDotNet.Tests
+namespace BenchmarkDotNet.Tests.Validators
 {
     public class CompositeValidatorTests
     {

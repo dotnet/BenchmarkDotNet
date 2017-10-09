@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -26,11 +27,16 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI]
         public static readonly Lazy<IToolchain> Current = new Lazy<IToolchain>(GetCurrentVersion);
 
+        private string targetFrameworkMoniker;
+
         private CsProjClassicNetToolchain(string targetFrameworkMoniker)
             : base($"CsProj{targetFrameworkMoniker}",
                 new CsProjGenerator(targetFrameworkMoniker, platform => platform.ToConfig()),
-                new CsProjBuilder(targetFrameworkMoniker),
-                new Executor()) {}
+                new CsProjBuilder(targetFrameworkMoniker, customDotNetCliPath: null),
+                new Executor())
+        {
+            this.targetFrameworkMoniker = targetFrameworkMoniker;
+        }
 
         public static IToolchain From(string targetFrameworkMoniker)
             => new CsProjClassicNetToolchain(targetFrameworkMoniker);
@@ -54,11 +60,19 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 return false;
             }
 
-            if (benchmark.Job.ResolveValue(EnvMode.JitCharacteristic, resolver) == Jit.LegacyJit)
+            if (benchmark.Job.HasValue(EnvMode.JitCharacteristic) && benchmark.Job.Env.Jit == Jit.LegacyJit)
             {
                 logger.WriteLineError($"Currently dotnet cli toolchain supports only RyuJit, benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;
             }
+
+#if NETCOREAPP1_1
+            if (benchmark.Job.HasValue(InfrastructureMode.EnvironmentVariablesCharacteristic))
+            {
+                logger.WriteLineError($"ProcessStartInfo.EnvironmentVariables is avaialable for .NET Core 2.0, benchmark '{benchmark.DisplayInfo}' will not be executed");
+                return false;
+            }
+#endif
 
             return true;
         }
@@ -83,15 +97,26 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
                 int releaseKey = Convert.ToInt32(ndpKey.GetValue("Release"));
                 // magic numbers come from https://msdn.microsoft.com/en-us/library/hh925568(v=vs.110).aspx
-                if (releaseKey >= 460798)
+                if (releaseKey >= 460798 && Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7"))
                     return Net47;
-                if (releaseKey >= 394802)
+                if (releaseKey >= 394802 && Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2"))
                     return Net462;
-                if (releaseKey >= 394254)
+                if (releaseKey >= 394254 && Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1"))
                     return Net461;
 
                 return Default;
             }
+        }
+
+        // TODO: Move to a better place
+        [NotNull]
+        internal static string GetCurrentNetFrameworkVersion()
+        {
+            var toolchain = GetCurrentVersionBasedOnWindowsRegistry() as CsProjClassicNetToolchain;
+            if (toolchain == null)
+                return "?";
+            string version = toolchain.targetFrameworkMoniker.Replace("net", "");
+            return string.Join(".", version.ToCharArray());
         }
     }
 }

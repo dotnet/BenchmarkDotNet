@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net46</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyTitle>BenchmarkDotNet.Disassembler.x86</AssemblyTitle>
+    <AssemblyName>BenchmarkDotNet.Disassembler.x86</AssemblyName>
+    <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OutputPath>..\BenchmarkDotNet.Core\Disassemblers</OutputPath>
+    <RootNamespace>BenchmarkDotNet.Disassembler</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\BenchmarkDotNet.Disassembler.x64\ClrSourceExtensions.cs" Link="ClrSourceExtensions.cs" />
+    <Compile Include="..\BenchmarkDotNet.Disassembler.x64\DataContracts.cs" Link="DataContracts.cs" />
+    <Compile Include="..\BenchmarkDotNet.Disassembler.x64\Program.cs" Link="Program.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="0.9.170626.1" />
+    <PackageReference Include="Mono.Cecil" Version="0.9.6.4" />
+  </ItemGroup>
+</Project>

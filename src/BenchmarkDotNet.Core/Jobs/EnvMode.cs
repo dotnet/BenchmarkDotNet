@@ -18,6 +18,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly EnvMode LegacyJitX86 = new EnvMode(nameof(LegacyJitX86), Jit.LegacyJit, Platform.X86).Freeze();
         public static readonly EnvMode LegacyJitX64 = new EnvMode(nameof(LegacyJitX64), Jit.LegacyJit, Platform.X64).Freeze();
         public static readonly EnvMode RyuJitX64 = new EnvMode(nameof(RyuJitX64), Jit.RyuJit, Platform.X64).Freeze();
+        public static readonly EnvMode RyuJitX86 = new EnvMode(nameof(RyuJitX86), Jit.RyuJit, Platform.X86).Freeze();
 
         public EnvMode() : this(id: null) { }
 

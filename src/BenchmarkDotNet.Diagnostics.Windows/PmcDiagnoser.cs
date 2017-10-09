@@ -18,67 +18,6 @@ using Microsoft.Diagnostics.Tracing.Session;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
-    public class PreciseMachineCounter
-    {
-        public int ProfileSourceId { get; }
-        public string Name { get; }
-        public HardwareCounter Counter { get; }
-        public int Interval { get; }
-
-        public ulong Count { get; private set; }
-
-        private PreciseMachineCounter(int profileSourceId, string name, HardwareCounter counter, int interval)
-        {
-            ProfileSourceId = profileSourceId;
-            Name = name;
-            Counter = counter;
-            Interval = interval;
-        }
-
-        public static PreciseMachineCounter FromCounter(HardwareCounter counter)
-        {
-            var profileSource = TraceEventProfileSources.GetInfo()[PmcDiagnoser.EtwTranslations[counter]]; // it can't fail, diagnoser validates that first
-
-            return new PreciseMachineCounter(profileSource.ID, profileSource.Name, counter,
-                profileSource.MinInterval); // we want the smallest interval to have best possible precision
-        }
-
-        public void OnSample()
-        {
-            checked // if we ever overflow ulong we need to throw!
-            {
-                Count += (ulong)Interval;
-            }
-        }
-    }
-
-    public class PmcStats
-    {
-        public long TotalOperations { get; set; }
-        public IReadOnlyDictionary<HardwareCounter, PreciseMachineCounter> Counters { get; }
-        private IReadOnlyDictionary<int, PreciseMachineCounter> CountersByProfileSourceId { get; }
-
-        public PmcStats() { throw new InvalidOperationException("should never be used"); }
-
-        public PmcStats(IReadOnlyCollection<HardwareCounter> hardwareCounters)
-        {
-            CountersByProfileSourceId = hardwareCounters
-                .Select(PreciseMachineCounter.FromCounter)
-                .ToDictionary
-                (
-                    counter => counter.ProfileSourceId,
-                    coounter => coounter
-                );
-            Counters = CountersByProfileSourceId.ToDictionary(c => c.Value.Counter, c => c.Value);
-        }
-
-        public void Handle(int profileSourceId)
-        {
-            if (CountersByProfileSourceId.TryGetValue(profileSourceId, out var counter))
-                counter.OnSample();
-        }
-    }
-
     public class PmcDiagnoser : EtwDiagnoser<PmcStats>, IHardwareCountersDiagnoser
     {
         internal static readonly Dictionary<HardwareCounter, string> EtwTranslations
@@ -104,6 +43,12 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         // ReSharper disable once EmptyConstructor parameterless ctor is mandatory for DiagnosersLoader.CreateDiagnoser
         public PmcDiagnoser() { }
 
+        public IReadOnlyDictionary<Benchmark, PmcStats> Results => results;
+
+        public const string DiagnoserId = nameof(InliningDiagnoser);
+
+        public IEnumerable<string> Ids => new[] { DiagnoserId };
+
         protected override ulong EventType
             => unchecked((ulong)(KernelTraceEventParser.Keywords.PMCProfile | KernelTraceEventParser.Keywords.Profile));
 
@@ -117,7 +62,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public void BeforeMainRun(DiagnoserActionParameters parameters) => Start(parameters);
 
-        public void BeforeGlobalCleanup() => Stop();
+        public void BeforeGlobalCleanup(DiagnoserActionParameters parameters) => Stop();
 
         public void ProcessResults(Benchmark benchmark, BenchmarkReport report)
         {
@@ -163,13 +108,20 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         protected override PmcStats GetInitializedStats(DiagnoserActionParameters parameters)
         {
-            var stats = new PmcStats(parameters.Config.GetHardwareCounters().ToArray());
+            var stats = new PmcStats(parameters.Config.GetHardwareCounters().ToArray(), FromCounter);
 
             var counters = stats.Counters.Values;
 
-            TraceEventProfileSources.Set( // it's a must have to get the events enabled!!
-                counters.Select(counter => counter.ProfileSourceId).ToArray(),
-                counters.Select(counter => counter.Interval).ToArray());
+            try
+            {
+                TraceEventProfileSources.Set( // it's a must have to get the events enabled!!
+                    counters.Select(counter => counter.ProfileSourceId).ToArray(),
+                    counters.Select(counter => counter.Interval).ToArray());
+            }
+            catch (System.Runtime.InteropServices.COMException ex) when (ex.Message.StartsWith("The WMI data block or event notification has already been enabled"))
+            {
+                // previous run was interrupted by ctrl+c and never stopped
+            }
 
             return stats;
         }
@@ -189,11 +141,16 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         private void OnPerfInfoPmcSample(PMCCounterProfTraceData obj)
         {
             if (StatsPerProcess.TryGetValue(obj.ProcessID, out var stats))
-                stats.Handle(obj.ProfileSource);
+                stats.Handle(obj.ProfileSource, obj.InstructionPointer);
         }
 
-        public const string DiagnoserId = nameof(InliningDiagnoser);
-        public IEnumerable<string> Ids => new[] { DiagnoserId };
+        private static PreciseMachineCounter FromCounter(HardwareCounter counter)
+        {
+            var profileSource = TraceEventProfileSources.GetInfo()[EtwTranslations[counter]]; // it can't fail, diagnoser validates that first
+
+            return new PreciseMachineCounter(profileSource.ID, profileSource.Name, counter,
+                profileSource.MinInterval); // we want the smallest interval to have best possible precision
+        }
 
         public IColumnProvider GetColumnProvider()
            => new SimpleColumnProvider(
@@ -287,7 +244,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public bool IsNumeric => true;
             public UnitType UnitType => UnitType.Dimensionless;
             public string Legend => $"Instruction Retired per Cycle";
-            public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
+            public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default); 
 
             private Dictionary<Benchmark, PmcStats> Results { get; }
 
@@ -298,7 +255,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style)
                 => Results.TryGetValue(benchmark, out var stats) && stats.Counters.ContainsKey(HardwareCounter.InstructionRetired) && stats.Counters.ContainsKey(HardwareCounter.TotalCycles)
-                    ? (stats.Counters[HardwareCounter.InstructionRetired].Count / (double)stats.Counters[HardwareCounter.TotalCycles].Count).ToString("{0:N2}")
+                    ? (stats.Counters[HardwareCounter.InstructionRetired].Count / (double)stats.Counters[HardwareCounter.TotalCycles].Count).ToString("N2")
                     : "-";
         }
 

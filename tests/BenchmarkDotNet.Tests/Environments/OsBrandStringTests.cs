@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Tests.Environments
     {
         [Theory]
         [InlineData("6.3.9600", "Windows 8.1 (6.3.9600)")]
-        [InlineData("10.0.14393", "Windows 10 Redstone 1 (10.0.14393)")]
+        [InlineData("10.0.14393", "Windows 10 Redstone 1 [1607, Anniversary Update] (10.0.14393)")]
         public void WindowsIsPrettified(string originalVersion, string prettifiedName) =>
             Assert.Equal(prettifiedName, OsBrandStringHelper.Prettify("Windows", originalVersion));
     }

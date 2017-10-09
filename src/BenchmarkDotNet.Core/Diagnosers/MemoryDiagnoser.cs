@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Environments;
@@ -6,6 +7,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Validators;
@@ -21,7 +23,11 @@ namespace BenchmarkDotNet.Diagnosers
 
         private readonly Dictionary<Benchmark, GcStats> results = new Dictionary<Benchmark, GcStats>();
 
+        public RunMode GetRunMode(Benchmark benchmark) => RunMode.ExtraRun;
+
         public IEnumerable<string> Ids => new[] { DiagnoserId };
+
+        public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
 
         public IColumnProvider GetColumnProvider() => new SimpleColumnProvider(
             new GCCollectionColumn(results, Gen0),
@@ -34,7 +40,7 @@ namespace BenchmarkDotNet.Diagnosers
         public void BeforeAnythingElse(DiagnoserActionParameters _) { }
         public void AfterGlobalSetup(DiagnoserActionParameters _) { }
         public void BeforeMainRun(DiagnoserActionParameters _) { }
-        public void BeforeGlobalCleanup() { }
+        public void BeforeGlobalCleanup(DiagnoserActionParameters parameters) { }
 
         public void DisplayResults(ILogger logger) { }
 
@@ -42,7 +48,7 @@ namespace BenchmarkDotNet.Diagnosers
             => results.Add(benchmark, report.GcStats);
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Enumerable.Empty<ValidationError>();
-
+        
         public class AllocationColumn : IColumn
         {
             private readonly Dictionary<Benchmark, GcStats> results;

@@ -167,7 +167,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 bool hasStoreField = !noReturnValue && storeResultField != null;
 
                 var g = dynamicMethod.GetILGenerator();
-                g.DeclareLocal(typeof(int));
+                g.DeclareLocal(typeof(long));
 
                 var loopStart = g.DefineLabel();
                 var loopCondition = g.DefineLabel();

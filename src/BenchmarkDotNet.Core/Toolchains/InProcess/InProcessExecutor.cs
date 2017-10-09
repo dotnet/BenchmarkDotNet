@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             int exitCode = -1;
             var runThread = new Thread(() => exitCode = ExecuteCore(host, executeParameters.Benchmark, executeParameters.Logger));
 
-#if CLASSIC
+#if !NETCOREAPP1_1
             if (executeParameters.Benchmark.Target.Method.GetCustomAttributes<STAThreadAttribute>(false).Any())
             {
                 runThread.SetApartmentState(ApartmentState.STA);
@@ -93,7 +93,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             var process = Process.GetCurrentProcess();
             var oldPriority = process.PriorityClass;
             var oldAffinity = process.TryGetAffinity();
-#if CLASSIC
+#if !NETCOREAPP1_1
             var thread = Thread.CurrentThread;
             var oldThreadPriority = thread.Priority;
 #endif
@@ -102,7 +102,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             try
             {
                 process.TrySetPriority(ProcessPriorityClass.High, logger);
-#if CLASSIC
+#if !NETCOREAPP1_1
                 thread.TrySetPriority(ThreadPriority.Highest, logger);
 #endif
                 if (affinity != null)
@@ -119,7 +119,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             finally
             {
                 process.TrySetPriority(oldPriority, logger);
-#if CLASSIC
+#if !NETCOREAPP1_1
                 thread.TrySetPriority(oldThreadPriority, logger);
 #endif
                 if (affinity != null && oldAffinity != null)

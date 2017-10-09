@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
@@ -11,24 +12,28 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public abstract class DotNetCliBuilder : IBuilder
     {
-        internal const string Configuration = "Release";
-
         private string TargetFrameworkMoniker { get; }
+
+        private string CustomDotNetCliPath { get; }
 
         internal abstract string RestoreCommand { get; }
 
         [PublicAPI]
-        public DotNetCliBuilder(string targetFrameworkMoniker)
+        public DotNetCliBuilder(string targetFrameworkMoniker, string customDotNetCliPath = null)
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
+            CustomDotNetCliPath = customDotNetCliPath;
         }
 
-        internal abstract string GetBuildCommand(string frameworkMoniker, bool justTheProjectItself);
+        internal abstract string GetBuildCommand(string frameworkMoniker, bool justTheProjectItself, string configuration);
 
         public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark, IResolver resolver)
         {
+            var extraArguments = DotNetCliGenerator.GetCustomArguments(benchmark, resolver);
+
             var restoreResult = DotNetCliCommandExecutor.ExecuteCommand(
-                RestoreCommand,
+                CustomDotNetCliPath,
+                $"{RestoreCommand} {extraArguments}",
                 generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
 
             logger.WriteLineInfo($"// dotnet restore took {restoreResult.ExecutionTime.TotalSeconds:0.##}s");
@@ -38,7 +43,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 return BuildResult.Failure(generateResult, new Exception(restoreResult.ProblemDescription));
             }
 
-            var buildResult = Build(generateResult);
+            var buildResult = Build(
+                generateResult, 
+                benchmark.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, resolver),
+                extraArguments);
 
             logger.WriteLineInfo($"// dotnet build took {buildResult.ExecutionTime.TotalSeconds:0.##}s");
 
@@ -57,10 +65,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return BuildResult.Success(generateResult);
         }
 
-        private DotNetCliCommandExecutor.CommandResult Build(GenerateResult generateResult)
+        private DotNetCliCommandExecutor.CommandResult Build(GenerateResult generateResult, string configuration, string extraArguments)
         {
             var withoutDependencies = DotNetCliCommandExecutor.ExecuteCommand(
-                GetBuildCommand(TargetFrameworkMoniker, justTheProjectItself: true),
+                CustomDotNetCliPath,
+                $"{GetBuildCommand(TargetFrameworkMoniker, true, configuration)} {extraArguments}",
                 generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
 
             // at first we try to build the project without it's dependencies to save a LOT of time
@@ -71,7 +80,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             // but the host process might have different runtime or was build in Debug, not Release, 
             // which requires all dependencies to be build anyway
             return DotNetCliCommandExecutor.ExecuteCommand(
-                GetBuildCommand(TargetFrameworkMoniker, justTheProjectItself: false),
+                CustomDotNetCliPath,
+                $"{GetBuildCommand(TargetFrameworkMoniker, false, configuration)} {extraArguments}",
                 generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
         }
     }

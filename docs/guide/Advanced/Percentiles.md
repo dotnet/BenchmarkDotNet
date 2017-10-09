@@ -1,6 +1,6 @@
 # Percentiles
 
-The percentile represents a higher boundary for specified percengage of a measurements.
+The percentile represents a higher boundary for specified percentage of the measurements.
 For example, 95th percentile = 500ms means that 95% of all samples are not slower than 500ms.
 This metric is not very useful in microbenchmarks, as the values from consequent runs have a very narrow distribution.
 However, real-world scenarios often have so-called long tail distribution (due to IO delays, locks, memory access latency and so on), so the average execution time 

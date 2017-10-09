@@ -4,7 +4,7 @@
     {
         internal static System.IO.StreamWriter FromPath(string path, bool append = false)
         {
-#if !CORE
+#if !NETCOREAPP1_1
             return new System.IO.StreamWriter(path, append);
 #else
             return new System.IO.StreamWriter(System.IO.File.OpenWrite(path));

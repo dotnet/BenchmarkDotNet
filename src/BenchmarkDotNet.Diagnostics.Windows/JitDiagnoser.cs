@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public void BeforeMainRun(DiagnoserActionParameters _) { }
 
-        public void BeforeGlobalCleanup() => Stop();
+        public void BeforeGlobalCleanup(DiagnoserActionParameters parameters) => Stop();
 
         public virtual void ProcessResults(Benchmark benchmark, BenchmarkReport report) { }
 
