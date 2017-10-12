@@ -13,6 +13,7 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CsProj;
+using JetBrains.Annotations;
 #if !CORE
 using System.Management;
 #endif
@@ -67,7 +68,39 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetOsVersion() => OsBrandStringHelper.Prettify(
             Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem,
-            Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion);
+            Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion,
+            GetWindowsUbr());
+
+        // TODO: Introduce a common util API for registry calls, use it also in BenchmarkDotNet.Toolchains.CsProj.GetCurrentVersionBasedOnWindowsRegistry
+        /// <summary>
+        /// On Windows, this method returns UBR (Update Build Revision) based on Registry.
+        /// Returns null if the value is not available
+        /// </summary>
+        /// <returns></returns>
+        [CanBeNull]
+        private static int? GetWindowsUbr()
+        {
+            if (IsWindows())
+            {
+                try
+                {
+                    using (var ndpKey = Microsoft.Win32.RegistryKey
+                        .OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry32)
+                        .OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion"))
+                    {
+                        if (ndpKey == null)
+                            return null;
+
+                        return Convert.ToInt32(ndpKey.GetValue("UBR"));
+                    }
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+            return null;
+        }
 
         internal static string GetProcessorName()
         {

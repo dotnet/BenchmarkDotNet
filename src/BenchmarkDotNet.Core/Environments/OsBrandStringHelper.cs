@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
 
@@ -98,20 +99,24 @@ namespace BenchmarkDotNet.Environments
         /// </summary>
         /// <param name="osName">Original operation system name</param>
         /// <param name="osVersion">Original operation system version</param>
+        /// <param name="windowsUbr">UBR (Update Build Revision), the revision number of Windows version (if available)</param>
         /// <returns>Prettified operation system title</returns>
         [NotNull]
-        public static string Prettify([NotNull] string osName, [NotNull] string osVersion)
+        public static string Prettify([NotNull] string osName, [NotNull] string osVersion, [CanBeNull] int? windowsUbr = null)
         {
             if (osName == "Windows")
-                return PrettifyWindows(osVersion);
+                return PrettifyWindows(osVersion, windowsUbr);
             return $"{osName} {osVersion}";
         }
 
         [NotNull]
-        private static string PrettifyWindows([NotNull] string osVersion)
+        private static string PrettifyWindows([NotNull] string osVersion, [CanBeNull] int? windowsUbr)
         {
             string brandVersion = WindowsBrandVersions.GetValueOrDefault(osVersion);
-            string fullVersion = brandVersion == null ? osVersion : brandVersion + " (" + osVersion + ")";
+            string completeOsVersion = windowsUbr != null && osVersion.Count(c => c == '.') == 2 
+                ? osVersion + "." + windowsUbr 
+                : osVersion;
+            string fullVersion = brandVersion == null ? osVersion : brandVersion + " (" + completeOsVersion + ")";
             return "Windows " + fullVersion;
         }        
     }
