@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Exporters
                         targetingSameMethod.ToArray(), 
                         logger, 
                         targetingSameMethod.First().Target.DisplayInfo, 
-                        benchmark => GetImportantInfo(benchmark.Job));
+                        benchmark => GetImportantInfo(summary[benchmark]));
                 }
             }
             else // different methods, same JIT
@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Exporters
                     summary.Benchmarks.Where(benchmark => results.ContainsKey(benchmark)).ToArray(), 
                     logger, 
                     summary.Title, 
-                    benchmark => $"{benchmark.Target.Method.Name} {GetImportantInfo(benchmark.Job)}");
+                    benchmark => $"{benchmark.Target.Method.Name} {GetImportantInfo(summary[benchmark])}");
             }
 
             logger.WriteLine("</body>");
@@ -108,6 +108,6 @@ namespace BenchmarkDotNet.Exporters
             logger.WriteLine("</table>");
         }
 
-        private string GetImportantInfo(Job job) => $"{job.Env.Jit} {job.Env.Platform} {job.Env.Runtime?.Name} {job.Infrastructure.Toolchain?.Name}";
+        private string GetImportantInfo(BenchmarkReport benchmarkReport) => benchmarkReport.GetRuntimeInfo();
     }
 }
