@@ -14,16 +14,26 @@ namespace BenchmarkDotNet.Running
 {
     public static partial class BenchmarkConverter
     {
-        public static Benchmark[] TypeToBenchmarks(Type type, IConfig config = null)
+        public static BenchmarkRunInfo TypeToBenchmarks(Type type, IConfig config = null)
         {
-            config = GetFullConfig(type, config);
+            var fullConfig = GetFullConfig(type, config);
 
             var allMethods = type.GetMethods();
-            return MethodsToBenchmarks(type, allMethods, config);
+            return MethodsToBenchmarksWithFullConfig(type, allMethods, fullConfig);
         }
 
-        public static Benchmark[] MethodsToBenchmarks(Type containingType, MethodInfo[] methods, IConfig config = null)
+        public static BenchmarkRunInfo MethodsToBenchmarks(Type containingType, MethodInfo[] methods, IConfig config = null)
         {
+            var fullConfig = GetFullConfig(containingType, config);
+
+            return MethodsToBenchmarksWithFullConfig(containingType, methods, fullConfig);
+        }
+
+        private static BenchmarkRunInfo MethodsToBenchmarksWithFullConfig(Type containingType, MethodInfo[] methods, ReadOnlyConfig fullConfig)
+        {
+            if (fullConfig == null)
+                throw new ArgumentNullException(nameof(fullConfig));
+
             var globalSetupMethods = GetAttributedMethods<GlobalSetupAttribute>(methods, "GlobalSetup");
             var globalCleanupMethods = GetAttributedMethods<GlobalCleanupAttribute>(methods, "GlobalCleanup");
             var iterationSetupMethods = GetAttributedMethods<IterationSetupAttribute>(methods, "IterationSetup");
@@ -34,7 +44,7 @@ namespace BenchmarkDotNet.Running
             var parameterDefinitions = GetParameterDefinitions(containingType);
             var parameterInstancesList = parameterDefinitions.Expand();
 
-            var rawJobs = config?.GetJobs().ToArray() ?? Array.Empty<Job>();
+            var rawJobs = fullConfig.GetJobs().ToArray();
             if (rawJobs.IsEmpty())
                 rawJobs = new[] { Job.Default };
             var jobs = rawJobs.Distinct().ToArray();
@@ -47,14 +57,18 @@ namespace BenchmarkDotNet.Running
                 from parameterInstance in parameterInstancesList
                 select new Benchmark(target, job, parameterInstance)).ToArray();
 
-            var filters = config.GetFilters().ToList();
+            var filters = fullConfig.GetFilters().ToList();
             benchmarks = GetFilteredBenchmarks(benchmarks, filters);
 
-            var orderProvider = config?.GetOrderProvider() ?? DefaultOrderProvider.Instance;
-            return orderProvider.GetExecutionOrder(benchmarks).ToArray();
+            var orderProvider = fullConfig.GetOrderProvider() ?? DefaultOrderProvider.Instance;
+
+            return new BenchmarkRunInfo(
+                orderProvider.GetExecutionOrder(benchmarks).ToArray(),
+                containingType,
+                fullConfig);
         }
 
-        public static IConfig GetFullConfig(Type type, IConfig config)
+        public static ReadOnlyConfig GetFullConfig(Type type, IConfig config)
         {
             config = config ?? DefaultConfig.Instance;
             if (type != null)
@@ -65,7 +79,7 @@ namespace BenchmarkDotNet.Running
                 foreach (var configSource in allAttributes)
                     config = ManualConfig.Union(config, configSource.Config);
             }
-            return config;
+            return config.AsReadOnly();
         }
 
         private static IEnumerable<Target> GetTargets(

@@ -9,7 +9,6 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -31,10 +30,21 @@ namespace BenchmarkDotNet.Running
 
         internal static readonly IResolver DefaultResolver = new CompositeResolver(EnvResolver.Instance, InfrastructureResolver.Instance);
 
-        public static Summary Run(Benchmark[] benchmarks, IConfig config, Func<Job, IToolchain> toolchainProvider)
+        public static Summary Run(BenchmarkRunInfo[] benchmarkRunInfos, Func<Job, IToolchain> toolchainProvider)
+        {
+            var temp = benchmarkRunInfos.FirstOrDefault();
+            var benchmarkRunInfo = new BenchmarkRunInfo(
+                benchmarkRunInfos.SelectMany(i => i.Benchmarks).ToArray(),
+                temp?.Type,
+                temp?.Config);
+            return Run(benchmarkRunInfo, toolchainProvider);
+        }
+
+        public static Summary Run(BenchmarkRunInfo benchmarkRunInfo, Func<Job, IToolchain> toolchainProvider)
         {
             var resolver = DefaultResolver;
-            config = BenchmarkConverter.GetFullConfig(benchmarks.FirstOrDefault()?.Target.Type, config);
+            var benchmarks = benchmarkRunInfo.Benchmarks;
+            var config = benchmarkRunInfo.Config;
 
             var title = GetTitle(benchmarks);
             var rootArtifactsFolderPath = GetRootArtifactsFolderPath();
@@ -47,7 +57,8 @@ namespace BenchmarkDotNet.Running
 
                 try
                 {
-                    return Run(benchmarks, logger, title, config, rootArtifactsFolderPath, toolchainProvider, resolver, artifactsToCleanup);
+                    var runInfo = new BenchmarkRunInfo(benchmarks, benchmarkRunInfo.Type, config);
+                    return Run(runInfo, logger, title, rootArtifactsFolderPath, toolchainProvider, resolver, artifactsToCleanup);
                 }
                 finally
                 {
@@ -66,8 +77,11 @@ namespace BenchmarkDotNet.Running
             return $"BenchmarkRun-{benchmarkRunIndex:##000}-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}";
         }
 
-        public static Summary Run(Benchmark[] benchmarks, ILogger logger, string title, IConfig config, string rootArtifactsFolderPath, Func<Job, IToolchain> toolchainProvider, IResolver resolver, List<string> artifactsToCleanup)
+        public static Summary Run(BenchmarkRunInfo benchmarkRunInfo, ILogger logger, string title, string rootArtifactsFolderPath, Func<Job, IToolchain> toolchainProvider, IResolver resolver, List<string> artifactsToCleanup)
         {
+            var benchmarks = benchmarkRunInfo.Benchmarks;
+            var config = benchmarkRunInfo.Config;
+
             logger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
             logger.WriteLineInfo("// Found benchmarks:");
             foreach (var benchmark in benchmarks)
@@ -84,7 +98,7 @@ namespace BenchmarkDotNet.Running
             var reports = new List<BenchmarkReport>();
             foreach (var benchmark in benchmarks)
             {
-                var report = Run(benchmark, logger, config, rootArtifactsFolderPath, toolchainProvider, resolver, artifactsToCleanup);
+                var report = RunCore(benchmark, logger, config, rootArtifactsFolderPath, toolchainProvider, resolver, artifactsToCleanup);
                 reports.Add(report);
                 if (report.GetResultRuns().Any())
                     logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr());
@@ -178,7 +192,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineStatistic($"{message}: {time.ToFormattedTotalTime()}");
         }
 
-        public static BenchmarkReport Run(Benchmark benchmark, ILogger logger, IConfig config, string rootArtifactsFolderPath, Func<Job, IToolchain> toolchainProvider, IResolver resolver, List<string> artifactsToCleanup)
+        private static BenchmarkReport RunCore(Benchmark benchmark, ILogger logger, ReadOnlyConfig config, string rootArtifactsFolderPath, Func<Job, IToolchain> toolchainProvider, IResolver resolver, List<string> artifactsToCleanup)
         {
             var toolchain = toolchainProvider(benchmark.Job);
 

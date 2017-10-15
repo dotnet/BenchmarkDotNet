@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<Job> GetJobs();
         IEnumerable<IValidator> GetValidators();
         IEnumerable<HardwareCounter> GetHardwareCounters();
-        IEnumerable<IFilter> GetFilters();        
+        IEnumerable<IFilter> GetFilters();
 
         IOrderProvider GetOrderProvider();
         ISummaryStyle GetSummaryStyle();

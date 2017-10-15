@@ -1,6 +1,7 @@
 ﻿#if CLASSIC
 using System;
 using System.CodeDom.Compiler;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -13,7 +14,7 @@ namespace BenchmarkDotNet.Running
 {
     public static partial class BenchmarkConverter
     {
-        public static Benchmark[] UrlToBenchmarks(string url, IConfig config = null)
+        public static BenchmarkRunInfo[] UrlToBenchmarks(string url, IConfig config = null)
         {
             var logger = config?.GetCompositeLogger() ?? HostEnvironmentInfo.FallbackLogger;
 
@@ -29,18 +30,18 @@ namespace BenchmarkDotNet.Running
                 if (string.IsNullOrWhiteSpace(benchmarkContent))
                 {
                     logger.WriteLineHint($"content of '{url}' is empty.");
-                    return Array.Empty<Benchmark>();
+                    return Array.Empty<BenchmarkRunInfo>();
                 }
             }
             catch (Exception e)
             {
                 logger.WriteLineError("BuildException: " + e.Message);
-                return Array.Empty<Benchmark>();
+                return Array.Empty<BenchmarkRunInfo>();
             }
             return SourceToBenchmarks(benchmarkContent, config);
         }
 
-        public static Benchmark[] SourceToBenchmarks(string source, IConfig config = null)
+        public static BenchmarkRunInfo[] SourceToBenchmarks(string source, IConfig config = null)
         {
             string benchmarkContent = source;
             var cSharpCodeProvider = new CSharpCodeProvider();
@@ -52,32 +53,44 @@ namespace BenchmarkDotNet.Running
                     "System.Core.dll"
                 })
             {
-                CompilerOptions = "/unsafe /optimize", 
+                CompilerOptions = "/unsafe /optimize",
                 GenerateInMemory = false,
                 OutputAssembly = Path.Combine(
-                    Path.GetDirectoryName(typeof(Benchmark).Assembly.Location), 
+                    Path.GetDirectoryName(typeof(Benchmark).Assembly.Location),
                     $"{Path.GetFileNameWithoutExtension(Path.GetTempFileName())}.dll")
             };
-            
+
             compilerParameters.ReferencedAssemblies.Add(typeof(Benchmark).Assembly.Location);
             var compilerResults = cSharpCodeProvider.CompileAssemblyFromSource(compilerParameters, benchmarkContent);
             if (compilerResults.Errors.HasErrors)
             {
                 var logger = config?.GetCompositeLogger() ?? HostEnvironmentInfo.FallbackLogger;
-    
+
                 compilerResults.Errors.Cast<CompilerError>().ToList().ForEach(error => logger.WriteLineError(error.ErrorText));
-                return Array.Empty<Benchmark>();
+                return Array.Empty<BenchmarkRunInfo>();
             }
-            return (
-                from type in compilerResults.CompiledAssembly.GetTypes()
-                from benchmark in TypeToBenchmarks(type, config)
-                let target = benchmark.Target
-                select new Benchmark(
-                    new Target(target.Type, target.Method, target.GlobalSetupMethod, target.GlobalCleanupMethod, 
-                        target.IterationSetupMethod, target.IterationCleanupMethod, 
-                        target.MethodDisplayInfo, benchmarkContent, target.Baseline, target.Categories, target.OperationsPerInvoke),
-                    benchmark.Job,
-                    benchmark.Parameters)).ToArray();
+
+            var types = compilerResults.CompiledAssembly.GetTypes();
+
+            var resultBenchmarks = new List<BenchmarkRunInfo>();
+            foreach (var type in types)
+            {
+                var runInfo = TypeToBenchmarks(type, config);
+                var benchmarks = runInfo.Benchmarks.Select(b =>
+                {
+                    var target = b.Target;
+                    return new Benchmark(
+                        new Target(target.Type, target.Method, target.GlobalSetupMethod, target.GlobalCleanupMethod,
+                            target.IterationSetupMethod, target.IterationCleanupMethod,
+                            target.MethodDisplayInfo, benchmarkContent, target.Baseline, target.Categories, target.OperationsPerInvoke),
+                        b.Job,
+                        b.Parameters);
+                });
+                resultBenchmarks.Add(
+                    new BenchmarkRunInfo(benchmarks.ToArray(), runInfo.Type, runInfo.Config));
+            }
+
+            return resultBenchmarks.ToArray();
         }
 
         private static string GetRawUrl(string url)

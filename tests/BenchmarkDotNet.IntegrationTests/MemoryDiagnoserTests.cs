@@ -148,11 +148,11 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = CreateConfig(toolchain);
             var benchmarks = BenchmarkConverter.TypeToBenchmarks(benchmarkType, config);
 
-            var summary = BenchmarkRunner.Run(benchmarks, config);
+            var summary = BenchmarkRunner.Run(benchmarks);
 
             foreach (var benchmarkAllocationsValidator in benchmarksAllocationsValidators)
             {
-                var allocatingBenchmarks = benchmarks.Where(benchmark => benchmark.DisplayInfo.Contains(benchmarkAllocationsValidator.Key));
+                var allocatingBenchmarks = benchmarks.Benchmarks.Where(benchmark => benchmark.DisplayInfo.Contains(benchmarkAllocationsValidator.Key));
 
                 foreach (var benchmark in allocatingBenchmarks)
                 {
@@ -189,7 +189,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             int total = SizeOfAllFields<T>();
 
-            if(!typeof(T).GetTypeInfo().IsValueType)
+            if (!typeof(T).GetTypeInfo().IsValueType)
                 total += IntPtr.Size * 2; // pointer to method table + object header word
 
             if (total % IntPtr.Size != 0) // aligning..

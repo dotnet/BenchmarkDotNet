@@ -14,8 +14,8 @@ namespace BenchmarkDotNet.Tests.Running
         public void ReadsAttributesFromBaseClass()
         {
             var derivedType = typeof(Derived);
-            Benchmark benchmark = BenchmarkConverter.TypeToBenchmarks(derivedType).Single();
-           
+            Benchmark benchmark = BenchmarkConverter.TypeToBenchmarks(derivedType).Benchmarks.Single();
+
             Assert.NotNull(benchmark);
             Assert.NotNull(benchmark.Target);
 
