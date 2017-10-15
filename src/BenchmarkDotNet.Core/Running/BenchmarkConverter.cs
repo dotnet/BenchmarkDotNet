@@ -22,24 +22,26 @@ namespace BenchmarkDotNet.Running
             return MethodsToBenchmarksWithFullConfig(type, allMethods, fullConfig);
         }
 
-        public static BenchmarkRunInfo MethodsToBenchmarks(Type containingType, MethodInfo[] methods, IConfig config = null)
+        public static BenchmarkRunInfo MethodsToBenchmarks(Type containingType, MethodInfo[] benchmarkMethods, IConfig config = null)
         {
             var fullConfig = GetFullConfig(containingType, config);
 
-            return MethodsToBenchmarksWithFullConfig(containingType, methods, fullConfig);
+            return MethodsToBenchmarksWithFullConfig(containingType, benchmarkMethods, fullConfig);
         }
 
-        private static BenchmarkRunInfo MethodsToBenchmarksWithFullConfig(Type containingType, MethodInfo[] methods, ReadOnlyConfig fullConfig)
+        private static BenchmarkRunInfo MethodsToBenchmarksWithFullConfig(Type containingType, MethodInfo[] benchmarkMethods, ReadOnlyConfig fullConfig)
         {
             if (fullConfig == null)
                 throw new ArgumentNullException(nameof(fullConfig));
 
-            var globalSetupMethods = GetAttributedMethods<GlobalSetupAttribute>(methods, "GlobalSetup");
-            var globalCleanupMethods = GetAttributedMethods<GlobalCleanupAttribute>(methods, "GlobalCleanup");
-            var iterationSetupMethods = GetAttributedMethods<IterationSetupAttribute>(methods, "IterationSetup");
-            var iterationCleanupMethods = GetAttributedMethods<IterationCleanupAttribute>(methods, "IterationCleanup");
+            var helperMethods = containingType.GetMethods(); // benchmarkMethods can be filtered, without Setups, look #564
 
-            var targetMethods = methods.Where(method => method.HasAttribute<BenchmarkAttribute>()).ToArray();
+            var globalSetupMethods = GetAttributedMethods<GlobalSetupAttribute>(helperMethods, "GlobalSetup");
+            var globalCleanupMethods = GetAttributedMethods<GlobalCleanupAttribute>(helperMethods, "GlobalCleanup");
+            var iterationSetupMethods = GetAttributedMethods<IterationSetupAttribute>(helperMethods, "IterationSetup");
+            var iterationCleanupMethods = GetAttributedMethods<IterationCleanupAttribute>(helperMethods, "IterationCleanup");
+
+            var targetMethods = benchmarkMethods.Where(method => method.HasAttribute<BenchmarkAttribute>()).ToArray();
 
             var parameterDefinitions = GetParameterDefinitions(containingType);
             var parameterInstancesList = parameterDefinitions.Expand();
