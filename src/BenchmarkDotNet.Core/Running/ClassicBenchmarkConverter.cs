@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Runtime.Remoting.Activation;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Loggers;
@@ -54,19 +53,19 @@ namespace BenchmarkDotNet.Running
                     "System.Core.dll"
                 })
             {
-                CompilerOptions = "/unsafe /optimize", 
+                CompilerOptions = "/unsafe /optimize",
                 GenerateInMemory = false,
                 OutputAssembly = Path.Combine(
-                    Path.GetDirectoryName(typeof(Benchmark).Assembly.Location), 
+                    Path.GetDirectoryName(typeof(Benchmark).Assembly.Location),
                     $"{Path.GetFileNameWithoutExtension(Path.GetTempFileName())}.dll")
             };
-            
+
             compilerParameters.ReferencedAssemblies.Add(typeof(Benchmark).Assembly.Location);
             var compilerResults = cSharpCodeProvider.CompileAssemblyFromSource(compilerParameters, benchmarkContent);
             if (compilerResults.Errors.HasErrors)
             {
                 var logger = config?.GetCompositeLogger() ?? HostEnvironmentInfo.FallbackLogger;
-    
+
                 compilerResults.Errors.Cast<CompilerError>().ToList().ForEach(error => logger.WriteLineError(error.ErrorText));
                 return Array.Empty<BenchmarkRunInfo>();
             }

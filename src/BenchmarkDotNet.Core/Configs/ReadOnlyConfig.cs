@@ -19,7 +19,6 @@ namespace BenchmarkDotNet.Configs
     [PublicAPI]
     public class ReadOnlyConfig : IConfig
     {
-        #region Fields & .ctor
         private readonly IConfig config;
 
         public ReadOnlyConfig([NotNull] IConfig config)
@@ -29,9 +28,7 @@ namespace BenchmarkDotNet.Configs
 
             this.config = config;
         }
-        #endregion
 
-        #region IConfig implementation
         public IEnumerable<IColumnProvider> GetColumnProviders() => config.GetColumnProviders();
         public IEnumerable<IExporter> GetExporters() => config.GetExporters();
         public IEnumerable<ILogger> GetLoggers() => config.GetLoggers();
@@ -48,7 +45,5 @@ namespace BenchmarkDotNet.Configs
         public ConfigUnionRule UnionRule => config.UnionRule;
 
         public bool KeepBenchmarkFiles => config.KeepBenchmarkFiles;
-
-        #endregion
     }
 }

@@ -26,15 +26,9 @@ namespace BenchmarkDotNet.Running
                 ToolchainExtensions.GetToolchain);
         }
 
-        public static Summary Run(BenchmarkRunInfo benchmarks)
-        {
-            return BenchmarkRunnerCore.Run(benchmarks, ToolchainExtensions.GetToolchain);
-        }
+        public static Summary Run(BenchmarkRunInfo benchmarks) => BenchmarkRunnerCore.Run(benchmarks, ToolchainExtensions.GetToolchain);
 
-        public static Summary Run(BenchmarkRunInfo[] benchmarks)
-        {
-            return BenchmarkRunnerCore.Run(benchmarks, ToolchainExtensions.GetToolchain);
-        }
+        public static Summary Run(BenchmarkRunInfo[] benchmarks) => BenchmarkRunnerCore.Run(benchmarks, ToolchainExtensions.GetToolchain);
 
         public static Summary RunUrl(string url, IConfig config = null)
         {
