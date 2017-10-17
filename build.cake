@@ -119,9 +119,7 @@ Task("SlowTestsNet46")
     .WithCriteria(!skipTests && isRunningOnWindows)
     .Does(() =>
     {
-        var testSettings = GetTestSettings("net46");
-        testSettings.Filter = "Category=!BackwardCompatibility";
-        DotNetCoreTest("./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", testSettings);
+        DotNetCoreTest("./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", GetTestSettings("net46"));
     });    
     
 Task("SlowTestsNetCore2")
@@ -129,9 +127,7 @@ Task("SlowTestsNetCore2")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
-        var testSettings = GetTestSettings("netcoreapp2.0");
-        testSettings.Filter = "Category=!BackwardCompatibility";
-        DotNetCoreTest("./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", testSettings);
+        DotNetCoreTest("./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", GetTestSettings("netcoreapp2.0"));
     });       
 
 Task("Pack")
