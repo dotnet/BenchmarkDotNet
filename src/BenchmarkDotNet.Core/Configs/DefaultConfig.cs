@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Configs
         {
             yield return BaselineValidator.FailOnError;
             yield return SetupCleanupValidator.FailOnError;
-            yield return JitOptimizationsValidator.DontFailOnError;
+            yield return JitOptimizationsValidator.FailOnError;
             yield return UnrollFactorValidator.Default;
         }
 
