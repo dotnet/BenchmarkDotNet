@@ -12,7 +12,6 @@ var IsOnAppVeyorAndNotPR = AppVeyor.IsRunningOnAppVeyor && !AppVeyor.Environment
 
 Setup(_ =>
 {
-    StartProcess("dotnet", new ProcessSettings { Arguments = "--info" });
     if(!isRunningOnWindows)
     {
         StartProcess("mono", new ProcessSettings { Arguments = "--version" });
@@ -43,7 +42,12 @@ Task("Clean")
 
         if(BuildSystem.IsLocalBuild)
         {
-            CleanDirectories(GetDirectories("./**/obj") + GetDirectories("./**/bin"));
+            DeleteDirectories(GetDirectories("./**/obj") + GetDirectories("./**/bin"), 
+                new DeleteDirectorySettings 
+                    {
+                        Recursive = true,
+                        Force = true
+                    });
         }
     });
 
@@ -87,7 +91,7 @@ Task("Build")
     });
 
 Task("FastTests")
-    .IsDependentOn("Restore")
+    .IsDependentOn("Clean")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
@@ -95,7 +99,7 @@ Task("FastTests")
     });
 
 Task("BackwardCompatibilityTests")
-    .IsDependentOn("Restore")
+    .IsDependentOn("Clean")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
@@ -111,24 +115,28 @@ Task("BackwardCompatibilityTests")
     });
     
 Task("SlowTestsNet46")
-    .IsDependentOn("Restore")
+    .IsDependentOn("Clean")
     .WithCriteria(!skipTests && isRunningOnWindows)
     .Does(() =>
     {
-        DotNetCoreTest("./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", GetTestSettings("net46"));
+        var testSettings = GetTestSettings("net46");
+        testSettings.Filter = "Category=!BackwardCompatibility";
+        DotNetCoreTest("./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", testSettings);
     });    
     
 Task("SlowTestsNetCore2")
-    .IsDependentOn("Restore")
+    .IsDependentOn("Clean")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
-        DotNetCoreTest("./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", GetTestSettings("netcoreapp2.0"));
+        var testSettings = GetTestSettings("netcoreapp2.0");
+        testSettings.Filter = "Category=!BackwardCompatibility";
+        DotNetCoreTest("./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", testSettings);
     });       
 
 Task("Pack")
-    .IsDependentOn("Restore")
-    .WithCriteria(IsOnAppVeyorAndNotPR || string.Equals(target, "pack", StringComparison.OrdinalIgnoreCase))
+    .IsDependentOn("Clean")
+    .WithCriteria((IsOnAppVeyorAndNotPR || string.Equals(target, "pack", StringComparison.OrdinalIgnoreCase)) && isRunningOnWindows)
     .Does(() =>
     {
         var settings = new DotNetCorePackSettings
