@@ -42,7 +42,7 @@ Task("Clean")
 
         if(BuildSystem.IsLocalBuild)
         {
-            DeleteDirectories(GetDirectories("./**/obj") + GetDirectories("./**/bin"), 
+            DeleteDirectories(GetDirectories("./**/obj") + GetDirectories("./**/bin") - GetDirectories("./**/netcoreapp*"), 
                 new DeleteDirectorySettings 
                     {
                         Recursive = true,
