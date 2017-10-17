@@ -91,7 +91,7 @@ Task("Build")
     });
 
 Task("FastTests")
-    .IsDependentOn("Clean")
+    .IsDependentOn("Build")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
@@ -99,7 +99,7 @@ Task("FastTests")
     });
 
 Task("BackwardCompatibilityTests")
-    .IsDependentOn("Clean")
+    .IsDependentOn("Build")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
@@ -115,7 +115,7 @@ Task("BackwardCompatibilityTests")
     });
     
 Task("SlowTestsNet46")
-    .IsDependentOn("Clean")
+    .IsDependentOn("Build")
     .WithCriteria(!skipTests && isRunningOnWindows)
     .Does(() =>
     {
@@ -123,7 +123,7 @@ Task("SlowTestsNet46")
     });    
     
 Task("SlowTestsNetCore2")
-    .IsDependentOn("Clean")
+    .IsDependentOn("Build")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
@@ -131,7 +131,7 @@ Task("SlowTestsNetCore2")
     });       
 
 Task("Pack")
-    .IsDependentOn("Clean")
+    .IsDependentOn("Build")
     .WithCriteria((IsOnAppVeyorAndNotPR || string.Equals(target, "pack", StringComparison.OrdinalIgnoreCase)) && isRunningOnWindows)
     .Does(() =>
     {
