@@ -80,6 +80,7 @@ Task("Build")
                 var isMSBuildSupported = monoVersion != null && System.Text.RegularExpressions.Regex.IsMatch(monoVersion,@"([5-9]|\d{2,})\.\d+\.\d+(\.\d+)?");
                 if(isMSBuildSupported)
                 {
+                    Information(string.Format("Auto-detected ToolPath value is `{0}`", buildSettings.ToolPath));
                     buildSettings.ToolPath = new FilePath(@"/usr/lib/mono/msbuild/15.0/bin/MSBuild.dll");
                     Information(string.Format("Mono supports MSBuild. Override ToolPath value with `{0}`", buildSettings.ToolPath));
                 }
