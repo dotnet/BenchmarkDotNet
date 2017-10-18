@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var table = summary.Table;
             var headerRow = table.FullHeader;
             foreach (var column in columns)
-                Assert.True(headerRow.Contains(column.ColumnName));
+                Assert.Contains(column.ColumnName, headerRow);
         }
 
         private static Job CreateJob() =>

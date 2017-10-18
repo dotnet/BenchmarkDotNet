@@ -18,17 +18,17 @@ namespace BenchmarkDotNet.Tests
             // We allow args with and without the double dashes (i.e. '--jobs=' and 'jobs=')
             var config = parser.Parse(args);
 
-            Assert.Equal(1, config.GetJobs().Count());
+            Assert.Single(config.GetJobs());
             Assert.Contains(Job.Dry, config.GetJobs());
 
             Assert.Equal(2, config.GetExporters().Count());
             Assert.Contains(HtmlExporter.Default, config.GetExporters());
             Assert.Contains(RPlotExporter.Default, config.GetExporters());
 
-            Assert.Equal(0, config.GetColumnProviders().Count());
-            Assert.Equal(0, config.GetDiagnosers().Count());
-            Assert.Equal(0, config.GetAnalysers().Count());
-            Assert.Equal(0, config.GetLoggers().Count());
+            Assert.Empty(config.GetColumnProviders());
+            Assert.Empty(config.GetDiagnosers());
+            Assert.Empty(config.GetAnalysers());
+            Assert.Empty(config.GetLoggers());
         }
 
         [Fact]
@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Tests
             // plus casing doesn't matter, so "Dry" and "dry" are both valid
             var config = parser.Parse(new[] { "job=Dry" });
 
-            Assert.Equal(1, config.GetJobs().Count());
+            Assert.Single(config.GetJobs());
             Assert.Contains(Job.Dry, config.GetJobs());
         }
 
