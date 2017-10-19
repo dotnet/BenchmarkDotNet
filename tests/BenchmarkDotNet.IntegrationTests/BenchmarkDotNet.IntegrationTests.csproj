@@ -29,6 +29,7 @@
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.3.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0" />
     <PackageReference Include="xunit" Version="2.3.0" />
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' ">
     <PackageReference Include="System.ComponentModel.EventBasedAsync" Version="4.3.0" />

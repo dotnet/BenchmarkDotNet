@@ -7,6 +7,7 @@ var skipTests = Argument("SkipTests", false);
 var artifactsDirectory = Directory("./artifacts");
 var solutionFile = "./BenchmarkDotNet.sln";
 var solutionFileBackup = solutionFile + ".build.backup";
+var integrationTestsProjectPath = "./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj";
 var isRunningOnWindows = IsRunningOnWindows();
 var IsOnAppVeyorAndNotPR = AppVeyor.IsRunningOnAppVeyor && !AppVeyor.Environment.PullRequest.IsPullRequest;
 
@@ -62,7 +63,7 @@ Task("Build")
             .SetConfiguration(configuration)
             .WithTarget("Rebuild")
             .SetVerbosity(Verbosity.Minimal)
-            .UseToolVersion(MSBuildToolVersion.Default)
+            .UseToolVersion(MSBuildToolVersion.VS2017)
             .SetMSBuildPlatform(MSBuildPlatform.Automatic)
             .SetPlatformTarget(PlatformTarget.MSIL) // Any CPU
             .SetNodeReuse(true);
@@ -100,7 +101,7 @@ Task("BackwardCompatibilityTests")
     .Does(() =>
     {
         DotNetCoreTest(
-            "./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", 
+            integrationTestsProjectPath, 
             new DotNetCoreTestSettings
             {
                 Configuration = "Release",
@@ -115,7 +116,8 @@ Task("SlowTestsNet46")
     .WithCriteria(!skipTests && isRunningOnWindows)
     .Does(() =>
     {
-        DotNetCoreTest("./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", GetTestSettings("net46"));
+        DotNetCoreTool(integrationTestsProjectPath, "xunit", "-configuration Release -framework net46 -stoponfail -maxthreads unlimited");
+        //DotNetCoreTest(integrationTestsProjectPath, GetTestSettings("net46"));
     });    
     
 Task("SlowTestsNetCore2")
@@ -123,7 +125,7 @@ Task("SlowTestsNetCore2")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
-        DotNetCoreTest("./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", GetTestSettings("netcoreapp2.0"));
+        DotNetCoreTest(integrationTestsProjectPath, GetTestSettings("netcoreapp2.0"));
     });       
 
 Task("Pack")
