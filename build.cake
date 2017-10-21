@@ -88,11 +88,11 @@ Task("Build")
     });
 
 Task("FastTests")
-    .IsDependentOn("Restore")
+    .IsDependentOn("Build")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
-        DotNetCoreTest("./tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj", GetTestSettings());
+        DotNetCoreTool("./tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj", "xunit", GetTestSettingsParameters());
     });
 
 Task("BackwardCompatibilityTests")
@@ -121,11 +121,11 @@ Task("SlowTestsNet46")
     });    
     
 Task("SlowTestsNetCore2")
-    .IsDependentOn("Restore")
+    .IsDependentOn("Build")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
-        DotNetCoreTest(integrationTestsProjectPath, GetTestSettings("netcoreapp2.0"));
+        DotNetCoreTool(integrationTestsProjectPath, "xunit", GetTestSettingsParameters("netcoreapp2.0"));
     });       
 
 Task("Pack")
@@ -173,6 +173,22 @@ private DotNetCoreTestSettings GetTestSettings(string tfm = null)
     else if(tfm != null)
     {
         settings.Framework = tfm;
+    }
+
+    return settings;
+}
+
+private string GetTestSettingsParameters(string tfm = null)
+{
+    var settings = "-configuration Release -stoponfail -maxthreads unlimited -nobuild";
+
+    if (!IsRunningOnWindows())
+    {
+        settings += " -framework netcoreapp2.0";
+    }
+    else if(!string.IsNullOrEmpty(tfm))
+    {
+        settings += $" -framework {tfm}";
     }
 
     return settings;
