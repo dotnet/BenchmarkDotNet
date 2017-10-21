@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -163,35 +164,23 @@ namespace BenchmarkDotNet.Running
 
         private static ParameterDefinitions GetParameterDefinitions(Type type)
         {
-            var reflectionFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-            var allFields = type.GetFields(reflectionFlags).Select(f => new
-            {
-                f.Name,
-                Attribute = f.ResolveAttribute<ParamsAttribute>(),
-                Private = f.IsPrivate,
-                IsStatic = f.IsStatic,
-                ParameterType = f.FieldType
-            });
-            var allProperties = type.GetProperties(reflectionFlags).Select(p => new
-            {
-                p.Name,
-                Attribute = p.ResolveAttribute<ParamsAttribute>(),
-                Private = p.GetSetMethod() == null,
-                IsStatic = p.GetSetMethod() != null && p.GetSetMethod().IsStatic,
-                ParameterType = p.PropertyType
-            });
-            var allParameterMembers = allFields.Concat(allProperties).Where(member => member.Attribute != null).ToArray();
+            const BindingFlags reflectionFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
-            var firstPrivateMember = allParameterMembers.FirstOrDefault(member => member.Private);
-            if (firstPrivateMember != null)
-                throw new InvalidOperationException($"Member \"{firstPrivateMember.Name}\" must be public if it has the [Params(..)] attribute applied to it");
+            var allParamsMembers = type.GetTypeMembersWithGivenAttribute<ParamsAttribute>(reflectionFlags);
 
-            var definitions = allParameterMembers
+            var allParamsSourceMembers = type.GetTypeMembersWithGivenAttribute<ParamsSourceAttribute>(reflectionFlags);
+
+            var definitions = allParamsMembers
                 .Select(member =>
                     new ParameterDefinition(
                         member.Name,
                         member.IsStatic,
                         GetValidValues(member.Attribute.Values, member.ParameterType)))
+                .Concat(allParamsSourceMembers.Select(member =>
+                    new ParameterDefinition(
+                        member.Name,
+                        member.IsStatic,
+                        GetValidValuesForParamsSource(type, member.Attribute.Name))))
                 .ToArray();
 
             return new ParameterDefinitions(definitions);
@@ -253,6 +242,39 @@ namespace BenchmarkDotNet.Running
             }
 
             return values;
+        }
+
+        private static object[] GetValidValuesForParamsSource(Type parentType, string sourceName)
+        {
+            var paramsSourceMethod = parentType.GetAllMethods().SingleOrDefault(method => method.Name == sourceName && method.IsPublic);
+
+            if (paramsSourceMethod != default(MethodInfo))
+                return ToArray(
+                    paramsSourceMethod.Invoke(paramsSourceMethod.IsStatic ? null : Activator.CreateInstance(parentType), null), 
+                    paramsSourceMethod, 
+                    parentType);
+
+            var paramsSourceProperty = parentType.GetAllProperties().SingleOrDefault(property => property.Name == sourceName && property.GetMethod.IsPublic);
+
+            if (paramsSourceProperty != default(PropertyInfo))
+                return ToArray(
+                    paramsSourceProperty.GetValue(paramsSourceProperty.GetMethod.IsStatic ? null : Activator.CreateInstance(parentType)),
+                    paramsSourceProperty,
+                    parentType);
+
+            throw new InvalidOperationException($"{parentType.Name} has no public, accessible method/property called {sourceName}, unable to read values for [ParamsSource]");
+        }
+
+        private static object[] ToArray(object sourceValue, MemberInfo memberInfo, Type type)
+        {
+            if(!(sourceValue is IEnumerable collection))
+                throw new InvalidOperationException($"{memberInfo.Name} of type {type.Name} does not implement IEnumerable, unable to read values for [ParamsSource]");
+
+            var values = new List<object>();
+            foreach (var value in collection)
+                values.Add(value);
+
+            return values.ToArray();
         }
     }
 }

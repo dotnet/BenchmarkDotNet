@@ -13,7 +13,6 @@ var IsOnAppVeyorAndNotPR = AppVeyor.IsRunningOnAppVeyor && !AppVeyor.Environment
 
 Setup(_ =>
 {
-    StartProcess("dotnet", new ProcessSettings { Arguments = "--info" });
     if(!isRunningOnWindows)
     {
         StartProcess("mono", new ProcessSettings { Arguments = "--version" });
@@ -44,7 +43,16 @@ Task("Clean")
 
         if(BuildSystem.IsLocalBuild)
         {
-            CleanDirectories(GetDirectories("./**/obj") + GetDirectories("./**/bin"));
+            var directoriesToClean = GetDirectories("./**/obj") 
+                                     + GetDirectories("./**/bin") 
+                                     - GetDirectories("./**/debug")
+                                     - GetDirectories("./**/release");
+            DeleteDirectories(directoriesToClean, 
+                new DeleteDirectorySettings 
+                    {
+                        Recursive = true,
+                        Force = true
+                    });
         }
     });
 
@@ -77,6 +85,7 @@ Task("Build")
                 var isMSBuildSupported = monoVersion != null && System.Text.RegularExpressions.Regex.IsMatch(monoVersion,@"([5-9]|\d{2,})\.\d+\.\d+(\.\d+)?");
                 if(isMSBuildSupported)
                 {
+                    Information(string.Format("Auto-detected ToolPath value is `{0}`", buildSettings.ToolPath));
                     buildSettings.ToolPath = new FilePath(@"/usr/lib/mono/msbuild/15.0/bin/MSBuild.dll");
                     Information(string.Format("Mono supports MSBuild. Override ToolPath value with `{0}`", buildSettings.ToolPath));
                 }
@@ -96,7 +105,7 @@ Task("FastTests")
     });
 
 Task("BackwardCompatibilityTests")
-    .IsDependentOn("Restore")
+    .IsDependentOn("Build")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
@@ -112,7 +121,7 @@ Task("BackwardCompatibilityTests")
     });
     
 Task("SlowTestsNet46")
-    .IsDependentOn("Restore")
+    .IsDependentOn("Build")
     .WithCriteria(!skipTests && isRunningOnWindows)
     .Does(() =>
     {
@@ -129,8 +138,8 @@ Task("SlowTestsNetCore2")
     });       
 
 Task("Pack")
-    .IsDependentOn("Restore")
-    .WithCriteria(IsOnAppVeyorAndNotPR || string.Equals(target, "pack", StringComparison.OrdinalIgnoreCase))
+    .IsDependentOn("Build")
+    .WithCriteria((IsOnAppVeyorAndNotPR || string.Equals(target, "pack", StringComparison.OrdinalIgnoreCase)) && isRunningOnWindows)
     .Does(() =>
     {
         var settings = new DotNetCorePackSettings
