@@ -17,8 +17,7 @@ os:
   - osx
 sudo: required
 dist: trusty
-group: edge
-osx_image: xcode8.3
+osx_image: xcode9.1 # OS X 10.12
 mono: latest
 
 addons:
@@ -34,11 +33,7 @@ addons:
 #---------------------------------#		
 #       build configuration       #		
 #---------------------------------#
-
-before_install:  
-  - if test "$TRAVIS_OS_NAME" == "osx"; then brew update; brew install openssl; ln -s /usr/local/opt/openssl/lib/libcrypto.1.0.0.dylib /usr/local/lib/; ln -s /usr/local/opt/openssl/lib/libssl.1.0.0.dylib /usr/local/lib/; fi
-
 before_script:
- - chmod +x build.sh
+  - chmod +x build.sh
 script:
   - ./build.sh
