@@ -7,7 +7,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Core.Helpers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -141,7 +140,7 @@ namespace BenchmarkDotNet.Code
                 string.Empty,
                 benchmark.Parameters.Items.Select(
                     parameter =>
-                        $"{(parameter.IsStatic ? "" : "instance.")}{parameter.Name} = {SourceCodeHelper.ToSourceCode(parameter.Value)};"));
+                        $"{(parameter.IsStatic ? "" : "instance.")}{parameter.Name} = {parameter.ToSourceCode()};"));
         }
 
         private static string GetExtraAttributes(Target target)

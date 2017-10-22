@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using BenchmarkDotNet.Core.Helpers;
+using BenchmarkDotNet.Helpers;
 using Xunit;
 using Xunit.Abstractions;
 

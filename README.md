@@ -44,7 +44,7 @@ BenchmarkDotNet doesn't just blindly run your code - it tries to help you to con
 * Supported OS: Windows, Linux, MacOS
 * Easy way to compare different environments (`x86` vs `x64`, `LegacyJit` vs `RyuJit`, and so on; see: [Jobs](http://benchmarkdotnet.org/Configs/Jobs.htm))
 * Reports: markdown, csv, html, plain text, png plots.
-* Advanced features: [Baseline](http://benchmarkdotnet.org/Advanced/Baseline.htm), [Params](http://benchmarkdotnet.org/Advanced/Params.htm)
+* Advanced features: [Baseline](http://benchmarkdotnet.org/Advanced/Baseline.htm), [Params, ParamsSource and IParam](http://benchmarkdotnet.org/Advanced/Params.htm)
 * Powerful diagnostics based on ETW events (see [BenchmarkDotNet.Diagnostics.Windows](https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/))
 
 ## Code of Conduct
