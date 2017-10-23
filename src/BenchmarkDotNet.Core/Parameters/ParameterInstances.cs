@@ -18,9 +18,9 @@ namespace BenchmarkDotNet.Parameters
             Items = items;
         }
 
-        public string FolderInfo => string.Join("_", Items.Select(p => $"{p.Name}-{p.Value}")).AsValidFileName();
-        public string DisplayInfo => Items.Any() ? "[" + string.Join(", ", Items.Select(p => $"{p.Name}={p.Value}")) + "]" : "";
+        public string FolderInfo => string.Join("_", Items.Select(p => $"{p.Name}-{p.ToDisplayText()}")).AsValidFileName();
+        public string DisplayInfo => Items.Any() ? "[" + string.Join(", ", Items.Select(p => $"{p.Name}={p.ToDisplayText()}")) + "]" : "";
 
-        public string PrintInfo => printInfo ?? (printInfo = string.Join("&", Items.Select(p => $"{p.Name}={p.Value}")));
+        public string PrintInfo => printInfo ?? (printInfo = string.Join("&", Items.Select(p => $"{p.Name}={p.ToDisplayText()}")));
     }
 }

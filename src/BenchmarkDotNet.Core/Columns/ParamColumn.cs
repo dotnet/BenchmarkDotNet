@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
@@ -16,7 +17,7 @@ namespace BenchmarkDotNet.Columns
 
         public bool IsDefault(Summary summary, Benchmark benchmark) => false;
         public string GetValue(Summary summary, Benchmark benchmark) =>
-            benchmark.Parameters.Items.FirstOrDefault(item => item.Name == ColumnName)?.Value?.ToString() ?? "?";
+            benchmark.Parameters.Items.FirstOrDefault(item => item.Name == ColumnName)?.ToDisplayText() ?? ParameterInstance.NullParameterTextRepresentation;
 
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;

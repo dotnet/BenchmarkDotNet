@@ -4,7 +4,7 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 using SimpleJson.Reflection;
 
-namespace BenchmarkDotNet.Core.Helpers
+namespace BenchmarkDotNet.Helpers
 {
     public class SourceCodeHelper
     {
