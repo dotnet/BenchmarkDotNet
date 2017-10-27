@@ -110,7 +110,7 @@ Task("BackwardCompatibilityTests")
     .Does(() =>
     {
         var testSettings = GetTestSettingsParameters("netcoreapp1.1");
-        testSettings += " -trait \"Category=BackwardCompatibility\" -fxversion 1.1.4";
+        testSettings += " -trait \"Category=BackwardCompatibility\"";
 
         DotNetCoreTool(integrationTestsProjectPath, "xunit", testSettings);
     });
