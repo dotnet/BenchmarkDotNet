@@ -109,15 +109,10 @@ Task("BackwardCompatibilityTests")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
-        DotNetCoreTest(
-            integrationTestsProjectPath, 
-            new DotNetCoreTestSettings
-            {
-                Configuration = "Release",
-                Framework = "netcoreapp1.1",
-                Filter = "Category=BackwardCompatibility"
-            }
-        );
+        var testSettings = GetTestSettingsParameters("netcoreapp1.1");
+        testSettings += " -trait \"Category=BackwardCompatibility\" -fxversion 1.1.4";
+
+        DotNetCoreTool(integrationTestsProjectPath, "xunit", testSettings);
     });
     
 Task("SlowTestsNet46")
@@ -125,8 +120,7 @@ Task("SlowTestsNet46")
     .WithCriteria(!skipTests && isRunningOnWindows)
     .Does(() =>
     {
-        DotNetCoreTool(integrationTestsProjectPath, "xunit", "-configuration Release -framework net46 -stoponfail -maxthreads unlimited");
-        //DotNetCoreTest(integrationTestsProjectPath, GetTestSettings("net46"));
+        DotNetCoreTool(integrationTestsProjectPath, "xunit", GetTestSettingsParameters("net46"));
     });    
     
 Task("SlowTestsNetCore2")
@@ -168,25 +162,6 @@ Task("Default")
 RunTarget(target);
 
 // HELPERS
-private DotNetCoreTestSettings GetTestSettings(string tfm = null)
-{
-    var settings = new DotNetCoreTestSettings
-    {
-        Configuration = "Release"
-    };
-
-    if (!IsRunningOnWindows())
-    {
-        settings.Framework = "netcoreapp2.0";
-    }
-    else if(tfm != null)
-    {
-        settings.Framework = tfm;
-    }
-
-    return settings;
-}
-
 private string GetTestSettingsParameters(string tfm = null)
 {
     var settings = "-configuration Release -stoponfail -maxthreads unlimited -nobuild";
