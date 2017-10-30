@@ -15,8 +15,12 @@
     <EmbeddedResource Include="Disassemblers\net46\win7-x64\*.dll" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
-    <ProjectReference Include="..\BenchmarkDotNet.Disassembler.x64\BenchmarkDotNet.Disassembler.x64.csproj" />
-    <ProjectReference Include="..\BenchmarkDotNet.Disassembler.x86\BenchmarkDotNet.Disassembler.x86.csproj" />
+    <ProjectReference Include="..\BenchmarkDotNet.Disassembler.x64\BenchmarkDotNet.Disassembler.x64.csproj" >
+        <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\BenchmarkDotNet.Disassembler.x86\BenchmarkDotNet.Disassembler.x86.csproj" >
+        <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.3.0" />
     <Reference Include="System.Management" />
     <Reference Include="System.Xml" />
