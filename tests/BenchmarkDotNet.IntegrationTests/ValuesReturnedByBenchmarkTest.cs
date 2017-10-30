@@ -30,6 +30,12 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 return new Diagnostics.Windows.InliningDiagnoser();
             }
+
+            [Benchmark]
+            public Diagnostics.Windows.TailCallDiagnoser TypeFromCustomDeoendency1()
+            {
+                return new Diagnostics.Windows.TailCallDiagnoser();
+            }
 #endif
 
             [Benchmark]
