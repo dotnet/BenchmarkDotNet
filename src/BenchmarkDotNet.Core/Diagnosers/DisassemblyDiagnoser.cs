@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Diagnosers
             foreach (var benchmark in validationParameters.Benchmarks)
             {
                 if (!RuntimeInformation.IsWindows() && !ShouldUseMonoDisassembler(benchmark))
-                    yield return new ValidationError(false, "No Disassebler support, only Mono is supported for non-Windows OS", benchmark);
+                    yield return new ValidationError(false, "No Disassembler support, only Mono is supported for non-Windows OS", benchmark);
 
                 if (IsVeryShortRun(benchmark) && !ShouldUseMonoDisassembler(benchmark))
                     yield return new ValidationError(true, "No Job.Dry support for disassembler. Please use Job.Short");
