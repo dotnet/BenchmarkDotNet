@@ -12,7 +12,11 @@
     <EmbeddedResource Include="Templates\*" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
     <EmbeddedResource Include="Disassemblers\net46\win7-x86\BenchmarkDotNet.Disassembler.x86.exe" />
     <EmbeddedResource Include="Disassemblers\net46\win7-x64\BenchmarkDotNet.Disassembler.x64.exe" />
-    <EmbeddedResource Include="Disassemblers\net46\win7-x64\*.dll" />
+    <EmbeddedResource Include="Disassemblers\net46\win7-x64\Microsoft.Diagnostics.Runtime.dll" />
+    <EmbeddedResource Include="Disassemblers\net46\win7-x64\Mono.Cecil.Mdb.dll" />
+    <EmbeddedResource Include="Disassemblers\net46\win7-x64\Mono.Cecil.Pdb.dll" />
+    <EmbeddedResource Include="Disassemblers\net46\win7-x64\Mono.Cecil.Rocks.dll" />
+    <EmbeddedResource Include="Disassemblers\net46\win7-x64\Mono.Cecil.dll" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
     <ProjectReference Include="..\BenchmarkDotNet.Disassembler.x64\BenchmarkDotNet.Disassembler.x64.csproj" >
