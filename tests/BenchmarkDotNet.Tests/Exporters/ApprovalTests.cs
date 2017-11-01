@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Tests.Exporters
         [UsedImplicitly]
         public static TheoryData<CultureInfo> GetCultureInfos()
         {
-            var cultures = new List<CultureInfo>()
+            var cultures = new List<CultureInfo>
             {
                 CultureInfo.InvariantCulture,
                 new CultureInfo("ru-RU"),

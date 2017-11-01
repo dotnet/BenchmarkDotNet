@@ -32,12 +32,9 @@ Param(
 )
 
 $CakeVersion = "0.23.0"
-$DotNetVersion = "2.0.0";
+$DotNetVersion = "2.0.2";
 $DotNetInstallerUri = "https://dot.net/v1/dotnet-install.ps1";
 $NugetUrl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
-
-# Temporarily skip verification and opt-in to new in-proc NuGet
-$ENV:CAKE_NUGET_USEINPROCESSCLIENT='true'
 
 # Make sure tools folder exists
 $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent
@@ -76,7 +73,7 @@ if (!(Test-Path $InstallPath)) {
 (New-Object System.Net.WebClient).DownloadFile($DotNetInstallerUri, "$InstallPath\dotnet-install.ps1");
 & $InstallPath\dotnet-install.ps1 -Version $DotNetVersion -InstallDir $InstallPath
 # We need to install the additional .NET Core runtime to run backward compatibility tests
-& $InstallPath\dotnet-install.ps1 -SharedRuntime -Version 1.1.2 -InstallDir $InstallPath;
+& $InstallPath\dotnet-install.ps1 -SharedRuntime -Version 1.1.4 -InstallDir $InstallPath;
 
 Remove-PathVariable "$InstallPath"
 $env:PATH = "$InstallPath;$env:PATH"

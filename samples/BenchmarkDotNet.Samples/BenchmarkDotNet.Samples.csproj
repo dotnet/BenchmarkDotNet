@@ -22,6 +22,6 @@
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' ">
-    <PackageReference Include="System.ComponentModel.EventBasedAsync" Version="4.0.11" />
+    <PackageReference Include="System.ComponentModel.EventBasedAsync" Version="4.3.0" />
   </ItemGroup>
 </Project>
