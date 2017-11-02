@@ -40,20 +40,6 @@ Task("Clean")
     .Does(() =>
     {
         CleanDirectory(artifactsDirectory);
-
-        if(BuildSystem.IsLocalBuild)
-        {
-            var directoriesToClean = GetDirectories("./**/obj") 
-                                     + GetDirectories("./**/bin") 
-                                     - GetDirectories("./**/debug")
-                                     - GetDirectories("./**/release");
-            DeleteDirectories(directoriesToClean, 
-                new DeleteDirectorySettings 
-                    {
-                        Recursive = true,
-                        Force = true
-                    });
-        }
     });
 
 Task("Restore")
