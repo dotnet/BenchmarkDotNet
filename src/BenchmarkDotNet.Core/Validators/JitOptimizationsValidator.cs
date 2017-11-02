@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -37,7 +38,8 @@ namespace BenchmarkDotNet.Validators
                 {
                     yield return new ValidationError(
                         TreatsWarningsAsErrors,
-                        $"Assembly {group.Key.GetName().Name} which defines benchmarks is non-optimized");
+                        $"Assembly {group.Key.GetName().Name} which defines benchmarks is non-optimized" + Environment.NewLine +
+                        "Benchmark was built without optimization enabled (most probably a DEBUG configuration). Please, build it in RELEASE.");
                 }
             }
         }
