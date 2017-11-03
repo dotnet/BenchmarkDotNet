@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>STAThread - BenchmarkDotNet Documentation</title>
+    <title>Environment Variables - BenchmarkDotNet Documentation</title>
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../css/theme_colors.css" type="text/css" />
@@ -91,14 +91,14 @@
 </li>
 <li class="tocentry"><a href="../Advanced/Percentiles.htm">Percentiles</a>
 </li>
-<li class="tocentry current"><a class="current" href="../Advanced/STAThread.htm">STAThread</a>
-<ul class="currentrelative">
-<li class="tocentry"><a href="#example">Example</a></li>
-</ul>
+<li class="tocentry"><a href="../Advanced/STAThread.htm">STAThread</a>
+</li>
 <li class="tocentry"><a href="../Advanced/CustomizingMono.htm">Customizing Mono</a>
 </li>
-<li class="tocentry"><a href="../Advanced/EnvironmentVariables.htm">Environment Variables</a>
-</li>
+<li class="tocentry current"><a class="current" href="../Advanced/EnvironmentVariables.htm">Environment Variables</a>
+<ul class="currentrelative">
+<li class="tocentry"><a href="#sample-configuration">Sample configuration</a></li>
+</ul>
 
 </ul>
 </li>
@@ -132,23 +132,25 @@
             <div class="nav-content">
                 <div role="navigation" aria-label="breadcrumbs navigation">
                     <div class="breadcrumbs">
-<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Advancedfeatures.htm">Advanced features</a></li> / <li><a href="../Advanced/STAThread.htm">STAThread</a></li></ul>
+<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Advancedfeatures.htm">Advanced features</a></li> / <li><a href="../Advanced/EnvironmentVariables.htm">Environment Variables</a></li></ul>
 					
                     </div>
                     <hr />
                 </div>
                 <div role="main">
                     <div class="section">
-<h1 id="stathread">STAThread<a class="headerlink" href="#stathread" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
-<p>If the code you want to benchmark requires <code>[System.STAThread]</code> then you need to apply this attribute to the benchmarked method. BenchmarkDotNet will generate executable with <code>[STAThread]</code> applied to it's <code>Main</code> method. </p>
-<p>Currently it does not work for .NET Core 2.0 due to <a href="https://github.com/dotnet/coreclr/issues/13688" target="_blank">this</a> bug.</p>
-<h2 id="example">Example<a class="headerlink" href="#example" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
-<pre><code class="cs">[Benchmark, System.STAThread]
-public void CheckForSTA()
+<h1 id="environment-variables">Environment Variables<a class="headerlink" href="#environment-variables" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<p>You can configure custom environment variables for the process that is running your benchmarks. One reason for doing this might be checking out how different <a href="https://github.com/dotnet/coreclr/blob/master/Documentation/project-docs/clr-configuration-knobs.md" target="_blank">runtime knobs</a> affect the performance of Core CLR.</p>
+<p><strong>Warning:</strong> This feature does not work for .NET Core 1.1 (<code>ProcessStartInfo.EnvironmentVariables</code> is available for .NET Core 2.0+)</p>
+<h2 id="sample-configuration">Sample configuration<a class="headerlink" href="#sample-configuration" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<pre><code class="cs">public class ConfigWithCustomEnvVars : ManualConfig
 {
-    if (Thread.CurrentThread.GetApartmentState() != ApartmentState.STA)
+    public ConfigWithCustomEnvVars()
     {
-        throw new ThreadStateException(&quot;The current threads apartment state is not STA&quot;);
+        Add(Job.Core.WithId(&quot;Inlining enabled&quot;));
+        Add(Job.Core.With(
+            new[] { new EnvironmentVariable(&quot;COMPlus_JitNoInline&quot;, &quot;1&quot;) })
+            .WithId(&quot;Inlining disabled&quot;));
     }
 }
 </code></pre>

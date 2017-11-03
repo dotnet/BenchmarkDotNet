@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Toolchains - BenchmarkDotNet Documentation</title>
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../css/theme_colors.css" type="text/css" />
+    <link rel="stylesheet" href="../css/styles/vs.css">
+    <link rel="stylesheet" href="../css/font-awesome.4.5.0.min.css">
+
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-41419012-6', 'auto');
+      ga('send', 'pageview');
+
+    </script>
+    <!-- /Google Analytics -->
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function (d, w, c) {
+            (w[c] = w[c] || []).push(function() {
+                try {
+                    w.yaCounter40812449 = new Ya.Metrika({
+                        id:40812449,
+                        clickmap:true,
+                        trackLinks:true,
+                        accurateTrackBounce:true
+                    });
+                } catch(e) { }
+            });
+
+            var n = d.getElementsByTagName("script")[0],
+                s = d.createElement("script"),
+                f = function () { n.parentNode.insertBefore(s, n); };
+            s.type = "text/javascript";
+            s.async = true;
+            s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+            if (w.opera == "[object Opera]") {
+                d.addEventListener("DOMContentLoaded", f, false);
+            } else { f(); }
+        })(document, window, "yandex_metrika_callbacks");
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+</head>
+<body role="document">
+    <div class="grid-for-nav">
+        <nav data-toggle="nav-shift" class="nav-side stickynav">
+            <div class="side-nav-search">
+                <a href="../index.htm"><i class="fa fa-home"></i> BenchmarkDotNet Documentation</a>
+                <div role="search">
+                    <form id="search-form" class="form" action="../Docnet_search.htm" method="get">
+                        <input type="text" name="q" placeholder="Search docs" />
+                    </form>
+                </div>
+            </div>
+            <div class="menu menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+<ul>
+<li class="tocentry"><a href="../index.htm">Home</a>
+</li>
+
+<li class="tocentry"><a href="../Overview.htm">Overview</a>
+</li>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Guides.htm">Guides</a></span>
+</li>
+<li class="tocentry">
+<ul>
+<li><span class="navigationgroup"><i class="fa fa-caret-down"></i> <a href="../Configs.htm">Configs</a></span></li>
+<li class="tocentry"><a href="../Configs/Configs.htm">Configs</a>
+</li>
+<li class="tocentry"><a href="../Configs/Jobs.htm">Jobs</a>
+</li>
+<li class="tocentry"><a href="../Configs/Columns.htm">Columns</a>
+</li>
+<li class="tocentry"><a href="../Configs/Exporters.htm">Exporters</a>
+</li>
+<li class="tocentry"><a href="../Configs/Loggers.htm">Loggers</a>
+</li>
+<li class="tocentry"><a href="../Configs/Diagnosers.htm">Diagnosers</a>
+</li>
+<li class="tocentry current"><a class="current" href="../Configs/Toolchains.htm">Toolchains</a>
+<ul class="currentrelative">
+<li class="tocentry"><a href="#multiple-frameworks-support">Multiple frameworks support</a></li>
+<li class="tocentry"><a href="#custom-.net-core-runtime">Custom .NET Core Runtime</a></li>
+<li class="tocentry"><a href="#custom-dotnet-cli-path">Custom dotnet cli path</a></li>
+<li class="tocentry"><a href="#inprocesstoolchain">InProcessToolchain</a></li>
+</ul>
+<li class="tocentry"><a href="../Configs/Analyzers.htm">Analyzers</a>
+</li>
+<li class="tocentry"><a href="../Configs/Validators.htm">Validators</a>
+</li>
+<li class="tocentry"><a href="../Configs/Filters.htm">Filters</a>
+</li>
+<li class="tocentry"><a href="../Configs/OrderProvider.htm">OrderProvider</a>
+</li>
+
+</ul>
+</li>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Advancedfeatures.htm">Advanced features</a></span>
+</li>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Internals.htm">Internals</a></span>
+</li>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Contributing.htm">Contributing</a></span>
+</li>
+<li class="tocentry"><a href="../FAQ.htm">FAQ</a>
+</li>
+<li class="tocentry"><a href="../Team.htm">Team</a>
+</li>
+<li class="tocentry"><a href="../license.htm">License</a>
+</li>
+</ul>
+				<div class="toc-footer">
+					<span class="text-small">
+						<hr/>
+						<a href="https://github.com/FransBouma/DocNet" target="_blank">Made with <i class="fa fa-github"></i> DocNet</a>
+					</span>
+				</div>	
+			</div>
+            &nbsp;
+        </nav>
+        <section data-toggle="nav-shift" class="nav-content-wrap">
+            <nav class="nav-top" role="navigation" aria-label="top navigation">
+                <i data-toggle="nav-top" class="fa fa-bars"></i>
+                <a href="../index.htm">BenchmarkDotNet Documentation</a>
+            </nav>
+            <div class="nav-content">
+                <div role="navigation" aria-label="breadcrumbs navigation">
+                    <div class="breadcrumbs">
+<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Configs.htm">Configs</a></li> / <li><a href="../Configs/Toolchains.htm">Toolchains</a></li></ul>
+					
+                    </div>
+                    <hr />
+                </div>
+                <div role="main">
+                    <div class="section">
+<h1 id="toolchains">Toolchains<a class="headerlink" href="#toolchains" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<p>In BenchmarkDotNet we generate, build and execute new console app per every benchmark. A <strong>toolchain</strong> contains generator, builder, and executor. </p>
+<p>When you run your benchmarks without specifying the toolchain in an explicit way, we use the default one. It works OOTB, you don't need to worry about anything.</p>
+<p>We use Roslyn for classic .NET and Mono, and <code>dotnet cli</code> for .NET Core.</p>
+<h2 id="multiple-frameworks-support">Multiple frameworks support<a class="headerlink" href="#multiple-frameworks-support" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>You can target multiple frameworks with single, modern csproj file:</p>
+<pre><code class="xml">&lt;TargetFrameworks&gt;netcoreapp2.0;net462&lt;/TargetFrameworks&gt;
+</code></pre>
+
+<p>BenchmarkDotNet allows you to take full advantage of that. With single config, we can execute the benchmarks for all the frameworks that you have listed in your csproj file.</p>
+<p>If you specify <code>Runtime</code> in explicit way, we just choose the right toolchain for you.</p>
+<pre><code class="cs">[ClrJob, MonoJob, CoreJob]
+public class Algo_Md5VsSha256
+{
+    // the benchmarks are going to be executed for classic .NET, Mono (default path) and .NET Core
+}
+</code></pre>
+
+<h3 id="tfm">TFM<a class="headerlink" href="#tfm" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>At some point of time we need to choose the target framework moniker (TFM).</p>
+<p>When you are running your app with benchmark as .NET Core app, we just check the version of the <code>System.Runtime.dll</code> which allows us to decide which version of .NET Core you are using.</p>
+<p>But when you are running your project as classic .NET (.NET 4.6.2 for example), we don't know which TFM to choose for your .NET Core Runtime, so we use the default one - <strong>netcoreapp1.1</strong>.</p>
+<p>If the default <code>netcoreapp1.1</code> is not OK for you, you must configure the toolchains in explicit way:</p>
+<pre><code class="cs">public class MultipleRuntimes : ManualConfig
+{
+    public MultipleRuntimes()
+    {
+        Add(Job.Default.With(CsProjCoreToolchain.NetCoreApp20)); // .NET Core 2.0
+
+        Add(Job.Default.With(CsProjClassicNetToolchain.Net462)); // NET 4.6.2
+    }
+}
+
+[Config(typeof(MultipleRuntimes))]
+public class TypeWithBenchmarks
+{
+}
+</code></pre>
+
+<p>After doing this, you can run your benchmarks via:</p>
+<ul>
+<li><code>dotnet run -c Release -f net462</code></li>
+<li><code>dotnet run -c Release -f netcoreapp2.0</code></li>
+</ul>
+<p>And they are going to be executed for both runtimes.</p>
+<h2 id="custom-.net-core-runtime">Custom .NET Core Runtime<a class="headerlink" href="#custom-.net-core-runtime" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>We can run your benchmarks for custom <code>&lt;RuntimeFrameworkVersion&gt;</code> if you want. All you need to do is to create custom toolchain by calling <code>CsProjCoreToolchain.From</code> method, which accepts <code>NetCoreAppSettings</code>.</p>
+<pre><code class="cs">public class MyConfig : ManualConfig
+{
+    public MyConfig()
+    {
+        Add(Job.Default.With(
+            CsProjCoreToolchain.From(
+                new NetCoreAppSettings(
+                    targetFrameworkMoniker: &quot;netcoreapp2.1&quot;, 
+                    runtimeFrameworkVersion: &quot;2.1.0-preview2-25628-01&quot;, 
+                    name: &quot;.NET Core 2.1&quot;))));
+    }
+}
+</code></pre>
+
+<h2 id="custom-dotnet-cli-path">Custom dotnet cli path<a class="headerlink" href="#custom-dotnet-cli-path" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>We internally use dotnet cli to build and run .NET Core executables. Sometimes it might be mandatory to use non-default dotnet cli path. An example scenario could be a comparison of RyuJit 32bit vs 64 bit. It required due this <a href="https://github.com/dotnet/cli/issues/7532" target="_blank">limitation</a> of dotnet cli</p>
+<pre><code class="cs">public class CustomPathsConfig : ManualConfig
+{
+    public CustomPathsConfig() 
+    {
+        var dotnetCli32bit = NetCoreAppSettings
+            .NetCoreApp20
+            .WithCustomDotNetCliPath(@&quot;C:\Program Files (x86)\dotnet\dotnet.exe&quot;, &quot;32 bit cli&quot;);
+
+        var dotnetCli64bit = NetCoreAppSettings
+            .NetCoreApp20
+            .WithCustomDotNetCliPath(@&quot;C:\Program Files\dotnet\dotnet.exe&quot;, &quot;64 bit cli&quot;);
+
+        Add(Job.RyuJitX86.With(CsProjCoreToolchain.From(dotnetCli32bit)).WithId(&quot;32 bit cli&quot;));
+        Add(Job.RyuJitX64.With(CsProjCoreToolchain.From(dotnetCli64bit)).WithId(&quot;64 bit cli&quot;));
+    }
+}
+</code></pre>
+
+<pre><code class="ini">BenchmarkDotNet=v0.10.9.20170910-develop, OS=Windows 10 Redstone 1 (10.0.14393)
+Processor=Intel Core i7-6600U CPU 2.60GHz (Skylake), ProcessorCount=4
+Frequency=2742185 Hz, Resolution=364.6727 ns, Timer=TSC
+.NET Core SDK=2.1.0-preview1-007074
+  [Host]     : .NET Core 2.0.0 (Framework 4.6.00001.0), 64bit RyuJIT
+  32 bit cli : .NET Core 2.0.0 (Framework 4.6.00001.0), 32bit RyuJIT
+  64 bit cli : .NET Core 2.0.0 (Framework 4.6.00001.0), 64bit RyuJIT
+
+Jit=RyuJit  
+</code></pre>
+
+<h2 id="inprocesstoolchain">InProcessToolchain<a class="headerlink" href="#inprocesstoolchain" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>InProcessToolchain is our toolchain which does not generate any new executable. It emits IL on the fly and runs it from within the process itself. It can be usefull if want to run the benchmarks very fast or if you want to run them for framework which we don't support. An example could be a local build of CoreCLR.</p>
+<pre><code class="cs">[Config(typeof(Config))]
+public class IntroInProcess
+{
+    private class Config : ManualConfig
+    {
+        public Config()
+        {
+            Add(Job.MediumRun
+                .WithLaunchCount(1)
+                .WithId(&quot;OutOfProc&quot;));
+
+            Add(Job.MediumRun
+                .WithLaunchCount(1)
+                .With(InProcessToolchain.Instance)
+                .WithId(&quot;InProcess&quot;));
+        }
+    }
+
+    [Benchmark(Description = &quot;new byte[10kB]&quot;)]
+    public byte[] Allocate() =&gt; new byte[10000];
+}
+</code></pre>
+
+<p>or just:</p>
+<pre><code class="cs">[InProcessAttribute]
+public class TypeWithBenchmarks
+{
+}
+</code></pre>
+
+
+                    </div>
+                </div>
+                <footer>
+                    <hr />
+                    <div role="contentinfo">
+BenchmarkDotNet Documentation. &copy;2013-2017. <a href='https://github.com/dotnet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.
+                    </div>
+                </footer>
+            </div>
+        </section>
+    </div>
+    <script src="../js/jquery-2.1.1.min.js"></script>
+    <script src="../js/modernizr-2.8.3.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>

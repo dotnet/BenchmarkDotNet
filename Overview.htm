@@ -441,7 +441,7 @@ End Class
 <p>A <strong>diagnoser</strong> can attach to your benchmark and get some useful info.</p>
 <p>The current Diagnosers are:</p>
 <ul>
-<li>GC and Memory Allocation (<code>MemoryDiagnoser</code>) which is cross platform, built-in and enabled by default.</li>
+<li>GC and Memory Allocation (<code>MemoryDiagnoser</code>) which is cross platform, built-in and <strong>is not enabled by default anymore</strong>.</li>
 <li>JIT Inlining Events (<code>InliningDiagnoser</code>). You can find this diagnoser in a separated package with diagnosers for Windows (<code>BenchmarkDotNet.Diagnostics.Windows</code>): <a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/" target="_blank"><img src="https://img.shields.io/nuget/v/BenchmarkDotNet.svg" alt="NuGet" /></a></li>
 </ul>
 <p>Below is a sample output from the <code>MemoryDiagnoser</code>, note the extra columns on the right-hand side (<code>Gen 0</code> and <code>Allocated</code>):</p>

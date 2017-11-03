@@ -94,8 +94,11 @@
 <ul class="currentrelative">
 <li class="tocentry"><a href="#examples">Examples</a></li>
 <li class="tocentry"><a href="#hardware-counters-diagnoser">Hardware Counters Diagnoser</a></li>
+<li class="tocentry"><a href="#disassembly-diagnoser">Disassembly Diagnoser</a></li>
 <li class="tocentry"><a href="#restrictions">Restrictions</a></li>
 </ul>
+<li class="tocentry"><a href="../Configs/Toolchains.htm">Toolchains</a>
+</li>
 <li class="tocentry"><a href="../Configs/Analyzers.htm">Analyzers</a>
 </li>
 <li class="tocentry"><a href="../Configs/Validators.htm">Validators</a>
@@ -154,6 +157,7 @@
 <li>GC and Memory Allocation (<code>MemoryDiagnoser</code>) which is cross platform, built-in and <strong>is not enabled by default anymore</strong>. Please see Adam Sitnik's <a href="http://adamsitnik.com/the-new-Memory-Diagnoser/" target="_blank">blog post</a> for all the details.</li>
 <li>JIT Inlining Events (<code>InliningDiagnoser</code>). You can find this diagnoser in a separated package with diagnosers for Windows (<code>BenchmarkDotNet.Diagnostics.Windows</code>): <a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/" target="_blank"><img src="https://img.shields.io/nuget/v/BenchmarkDotNet.svg" alt="NuGet" /></a></li>
 <li>Hardware Counter Diagnoser. You can find this diagnoser in a separated package with diagnosers for Windows (<code>BenchmarkDotNet.Diagnostics.Windows</code>): <a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/" target="_blank"><img src="https://img.shields.io/nuget/v/BenchmarkDotNet.svg" alt="NuGet" /></a>.  Please see Adam Sitnik's <a href="http://adamsitnik.com/Hardware-Counters-Diagnoser/" target="_blank">blog post</a> for all the details.</li>
+<li>Disassembly Diagnoser. It allows you to disassemble the benchmarked code to asm, IL and C#/F#. Please see Adam Sitnik's <a href="http://adamsitnik.com/Disassembly-Diagnoser/" target="_blank">blog post</a> for all the details.</li>
 </ul>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <p>Below is a sample output from the <code>GC and Memory Allocation</code> diagnoser, note the extra columns on the right-hand side (&quot;Gen 0&quot;, &quot;Gen 1&quot;, &quot;Gen 2&quot; and &quot;Allocated&quot;):</p>
@@ -236,7 +240,98 @@ public class Cpu_BranchPerdictor
  |     UnsortedBranch | 136.1139 us |          23,70% |                 68788 |                   16301 |
  |   SortedBranchless |  28.6705 us |           0,06% |                 35711 |                      22 |
  | UnsortedBranchless |  28.9336 us |           0,05% |                 35578 |                      17 |
-</pre><h2 id="restrictions">Restrictions<a class="headerlink" href="#restrictions" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+</pre><h2 id="disassembly-diagnoser">Disassembly Diagnoser<a class="headerlink" href="#disassembly-diagnoser" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>You need to use the <code>DisassemblyDiagnoser</code> attribute to configure it. The available options are:</p>
+<ul>
+<li>printIL: IL will be printed. False by default.</li>
+<li>printAsm: ASM will be printed. True by default.</li>
+<li>printSource: C# source code will be printed. False by default.</li>
+<li>printPrologAndEpilog: ASM for prolog and epilog will be printed. False by default.</li>
+<li>recursiveDepth: Includes called methods to given level. 1 by default, indexed from 1. To print just benchmark set to 0</li>
+</ul>
+<h3 id="sample">Sample<a class="headerlink" href="#sample" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<pre><code class="cs">[DisassemblyDiagnoser(printAsm: true, printSource: true)] // !!! use the new diagnoser!!
+[RyuJitX64Job]
+public class Simple
+{
+    int[] field = Enumerable.Range(0, 100).ToArray();
+
+    [Benchmark]
+    public int SumLocal()
+    {
+        var local = field; // we use local variable that points to the field
+
+        int sum = 0;
+        for (int i = 0; i &lt; local.Length; i++)
+            sum += local[i];
+
+        return sum;
+    }
+
+    [Benchmark]
+    public int SumField()
+    {
+        int sum = 0;
+        for (int i = 0; i &lt; field.Length; i++)
+            sum += field[i];
+
+        return sum;
+    }
+}
+</code></pre>
+
+<p><img src="Images/disasmDemo.png" alt="Disassembly result" /></p>
+<h3 id="all-jits">ALL JITs<a class="headerlink" href="#all-jits" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>You can use a single config to compare the generated assembly code for ALL JITs. </p>
+<pre><code class="cs">public class MultipleJits : ManualConfig
+{
+    public MultipleJits()
+    {
+        Add(Job.ShortRun.With(new MonoRuntime(name: &quot;Mono x86&quot;, customPath: @&quot;C:\Program Files (x86)\Mono\bin\mono.exe&quot;)).With(Platform.X86));
+        Add(Job.ShortRun.With(new MonoRuntime(name: &quot;Mono x64&quot;, customPath: @&quot;C:\Program Files\Mono\bin\mono.exe&quot;)).With(Platform.X64));
+
+        Add(Job.ShortRun.With(Jit.LegacyJit).With(Platform.X86).With(Runtime.Clr));
+        Add(Job.ShortRun.With(Jit.LegacyJit).With(Platform.X64).With(Runtime.Clr));
+
+        Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Clr));
+
+        // RyuJit for .NET Core 1.1
+        Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp11));
+
+        // RyuJit for .NET Core 2.0
+        Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp20));
+
+        Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(printAsm: true, printPrologAndEpilog: true, recursiveDepth: 3)));
+    }
+}
+
+[Config(typeof(MultipleJits))]
+public class Jit_Devirtualization
+{
+    private Increment increment = new Increment();
+
+    [Benchmark]
+    public int CallVirtualMethod() =&gt; increment.OperateTwice(10);
+
+    public abstract class Operation  // abstract unary integer operation
+    {
+        public abstract int Operate(int input);
+
+        public int OperateTwice(int input) =&gt; Operate(Operate(input)); // two virtual calls to Operate
+    }
+
+    public sealed class Increment : Operation // concrete, sealed operation: increment by fixed amount
+    {
+        public readonly int Amount;
+        public Increment(int amount = 1) { Amount = amount; }
+
+        public override int Operate(int input) =&gt; input + Amount;
+    }
+}
+</code></pre>
+
+<p>The disassembly result can be obtained <a href="http://adamsitnik.com/files/disasm/Jit_Devirtualization-disassembly-report.html" target="_blank">here</a>. The file was too big to embed it in this doc page.</p>
+<h2 id="restrictions">Restrictions<a class="headerlink" href="#restrictions" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <ul>
 <li>In order to not affect main results we perform a separate run if any diagnoser is used. That's why it might take more time to execute benchmarks.</li>
 <li>
@@ -252,11 +347,24 @@ HardwareCounters:
 <ul>
 <li>Windows 8+ only (we plan to add Unix support in the future)</li>
 <li>No Hyper-V (Virtualization) support</li>
-<li>Requires to run as Admin (ETW Kernel Session)</li>
+<li>Requires running as Admin (ETW Kernel Session)</li>
 <li>No <code>InProcessToolchain</code> support (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/394" target="_blank">#394</a>)</li>
 </ul>
 </li>
+<li>
+Disassembly Diagnoser:
+<ul>
+<li>.NET Core disassembler works only on Windows</li>
+<li>Mono disassembler does not support recursive disassembling and produces output without IL and C#.</li>
+<li>Indirect calls are not tracked.</li>
+<li>To get the corresponding C#/F# code from disassembler you need to configure your project in following way:</li>
 </ul>
+</li>
+</ul>
+<pre><code class="xml">&lt;DebugType&gt;pdbonly&lt;/DebugType&gt;
+&lt;DebugSymbols&gt;true&lt;/DebugSymbols&gt;
+</code></pre>
+
 
                     </div>
                 </div>

@@ -96,6 +96,8 @@
 </li>
 <li class="tocentry"><a href="../Configs/Diagnosers.htm">Diagnosers</a>
 </li>
+<li class="tocentry"><a href="../Configs/Toolchains.htm">Toolchains</a>
+</li>
 <li class="tocentry"><a href="../Configs/Analyzers.htm">Analyzers</a>
 </li>
 <li class="tocentry"><a href="../Configs/Validators.htm">Validators</a>
@@ -150,13 +152,13 @@
 <h1 id="columns">Columns<a class="headerlink" href="#columns" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
 <p>A <em>column</em> is a column in the summary table.</p>
 <h2 id="default-columns">Default columns<a class="headerlink" href="#default-columns" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
-<p>In this section, default columns (which be added to the Summary table by default) are presented. Some of columns are optional, i.e. they can be ommited (it depends on the measurements from the summary).</p>
+<p>In this section, default columns (which be added to the Summary table by default) are presented. Some of columns are optional, i.e. they can be omitted (it depends on the measurements from the summary).</p>
 <h3 id="target">Target<a class="headerlink" href="#target" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
-<p>There are 3 default columns which describes the target benchmark: <code>Namespace</code>, <code>Type</code>, <code>Method</code>. <code>Namespace</code> and <code>Type</code> will be ommited when all the benchmarks have the same namespace or type name. <code>Method</code> column always be a part of the summary table.</p>
+<p>There are 3 default columns which describes the target benchmark: <code>Namespace</code>, <code>Type</code>, <code>Method</code>. <code>Namespace</code> and <code>Type</code> will be omitted when all the benchmarks have the same namespace or type name. <code>Method</code> column always be a part of the summary table.</p>
 <h3 id="job">Job<a class="headerlink" href="#job" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
 <p>There are many different job characteristics, but the summary includes only characteristics which has at least one non-default value.</p>
 <h3 id="statistics">Statistics<a class="headerlink" href="#statistics" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
-<p>There are also a lot of different statistics which can be considered. It will be really hard to analyze the summary table, if all of the available statistics will be shown. Fortunally, BenchmarkDotNet has some heuristics for statistics columns and shows only important columns. For example, if all of the standard deviations is zero (we run our benchmarks against Dry job), this column will be omitted. The standard error will be shown only for cases when we are failed to achive required accurancy level.</p>
+<p>There are also a lot of different statistics which can be considered. It will be really hard to analyse the summary table, if all of the available statistics will be shown. Fortunately, BenchmarkDotNet has some heuristics for statistics columns and shows only important columns. For example, if all of the standard deviations are zero (we run our benchmarks against Dry job), this column will be omitted. The standard error will be shown only for cases when we are failed to achieve required accuracy level.</p>
 <p>Only <code>Mean</code> will be always shown. If the distribution looks strange, BenchmarkDotNet could also print additional columns like <code>Median</code> or <code>P95</code> (95th percentile).</p>
 <p>If you need specific statistics, you always could add them manually.</p>
 <h3 id="params">Params<a class="headerlink" href="#params" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>

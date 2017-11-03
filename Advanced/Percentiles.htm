@@ -95,7 +95,9 @@
 </ul>
 <li class="tocentry"><a href="../Advanced/STAThread.htm">STAThread</a>
 </li>
-<li class="tocentry"><a href="../Advanced/CustomMonoPath.htm">Custom Mono Path</a>
+<li class="tocentry"><a href="../Advanced/CustomizingMono.htm">Customizing Mono</a>
+</li>
+<li class="tocentry"><a href="../Advanced/EnvironmentVariables.htm">Environment Variables</a>
 </li>
 
 </ul>
@@ -138,7 +140,7 @@
                 <div role="main">
                     <div class="section">
 <h1 id="percentiles">Percentiles<a class="headerlink" href="#percentiles" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
-<p>The percentile represents a higher boundary for specified percengage of a measurements.
+<p>The percentile represents a higher boundary for specified percentage of the measurements.
 For example, 95th percentile = 500ms means that 95% of all samples are not slower than 500ms.
 This metric is not very useful in microbenchmarks, as the values from consequent runs have a very narrow distribution.
 However, real-world scenarios often have so-called long tail distribution (due to IO delays, locks, memory access latency and so on), so the average execution time 

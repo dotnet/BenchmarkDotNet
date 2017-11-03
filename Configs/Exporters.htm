@@ -92,10 +92,13 @@
 <li class="tocentry"><a href="#json">Json</a></li>
 <li class="tocentry"><a href="#plots">Plots</a></li>
 <li class="tocentry"><a href="#csv">CSV</a></li>
+<li class="tocentry"><a href="#xml">XML</a></li>
 </ul>
 <li class="tocentry"><a href="../Configs/Loggers.htm">Loggers</a>
 </li>
 <li class="tocentry"><a href="../Configs/Diagnosers.htm">Diagnosers</a>
+</li>
+<li class="tocentry"><a href="../Configs/Toolchains.htm">Toolchains</a>
 </li>
 <li class="tocentry"><a href="../Configs/Analyzers.htm">Analyzers</a>
 </li>
@@ -168,9 +171,9 @@ public class MyBenchmarkClass
 <ul>
 <li><code>fileNameSuffix</code>: a string which be placed in the end of target file name.</li>
 <li><code>indentJson</code>=<code>false</code>/<code>true</code>: should we format json or not.</li>
-<li><code>excludeMeasurements</code>=<code>false</code>/<code>true</code>: should we excldue detailed information about measurements or not (the final summary with statistics will be in the json file anyway),</li>
+<li><code>excludeMeasurements</code>=<code>false</code>/<code>true</code>: should we exclude detailed information about measurements or not (the final summary with statistics will be in the json file anyway).</li>
 </ul>
-<p>Also there are a set of predefined json exporters. Example of usage:</p>
+<p>Also, there are a set of predefined json exporters. Example of usage:</p>
 <pre><code class="cs">[JsonExporterAttribute.Brief]
 [JsonExporterAttribute.Full]
 [JsonExporterAttribute.BriefCompressed]
@@ -415,7 +418,98 @@ config.Add(new CsvExporter(
 <p>Excerpt from the resulting CSV file:</p>
 <pre class="nocode">Method,...,Mean [us],Error [us],StdDev [us],Min [us],Max [us],Allocated [KB]
 Benchmark,...,&quot;37,647.6&quot;,&quot;32,717.9&quot;,&quot;21,640.9&quot;,&quot;11,209.2&quot;,&quot;59,492.6&quot;,1.58
-</pre>
+</pre><h2 id="xml">XML<a class="headerlink" href="#xml" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>BenchmarkDotNet has a set of XML exporters. You can customize the following properties of these exporters:</p>
+<ul>
+<li><code>fileNameSuffix</code>: a string which be placed in the end of target file name.</li>
+<li><code>indentXml</code>=<code>false</code>/<code>true</code>: should we format xml or not.</li>
+<li><code>excludeMeasurements</code>=<code>false</code>/<code>true</code>: should we exclude detailed information about measurements or not (the final summary with statistics will be in the XML file anyway).</li>
+</ul>
+<p>Also, there are a set of predefined XML exporters. Example of usage:</p>
+<pre><code class="cs">[XmlExporterAttribute.Brief]
+[XmlExporterAttribute.Full]
+[XmlExporterAttribute.BriefCompressed]
+[XmlExporterAttribute.FullCompressed]
+[XmlExporter(&quot;-custom&quot;, indentXml: true, excludeMeasurements: true)]
+public class IntroXmlExport
+{
+    [Benchmark] public void Sleep10() =&gt; Thread.Sleep(10);
+    [Benchmark] public void Sleep20() =&gt; Thread.Sleep(20);
+}
+</code></pre>
+
+<p>Example of <code>IntroXmlExport-report-brief.xml</code>:</p>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;Summary&gt;
+  &lt;Title&gt;IntroXmlExport&lt;/Title&gt;
+  &lt;HostEnvironmentInfo&gt;
+    &lt;BenchmarkDotNetCaption&gt;BenchmarkDotNet&lt;/BenchmarkDotNetCaption&gt;
+    &lt;BenchmarkDotNetVersion&gt;0.10.9.20170805-develop&lt;/BenchmarkDotNetVersion&gt;
+    &lt;OsVersion&gt;Windows 10 Redstone 2 (10.0.15063)&lt;/OsVersion&gt;
+    &lt;ProcessorName&gt;Intel Core i7-3770K CPU 3.50GHz (Ivy Bridge)&lt;/ProcessorName&gt;
+    &lt;ProcessorCount&gt;8&lt;/ProcessorCount&gt;
+    &lt;RuntimeVersion&gt;.NET Framework 4.7 (CLR 4.0.30319.42000)&lt;/RuntimeVersion&gt;
+    &lt;Architecture&gt;64bit&lt;/Architecture&gt;
+    &lt;HasAttachedDebugger&gt;False&lt;/HasAttachedDebugger&gt;
+    &lt;HasRyuJit&gt;True&lt;/HasRyuJit&gt;
+    &lt;Configuration&gt;RELEASE&lt;/Configuration&gt;
+    &lt;JitModules&gt;clrjit-v4.7.2101.1&lt;/JitModules&gt;
+    &lt;DotNetSdkVersion&gt;1.0.4&lt;/DotNetSdkVersion&gt;
+    &lt;ChronometerFrequency&gt;
+      &lt;Hertz&gt;3410220&lt;/Hertz&gt;
+    &lt;/ChronometerFrequency&gt;
+    &lt;HardwareTimerKind&gt;Tsc&lt;/HardwareTimerKind&gt;
+  &lt;/HostEnvironmentInfo&gt;
+  &lt;Benchmarks&gt;
+    &lt;Benchmark&gt;
+      &lt;DisplayInfo&gt;IntroXmlExport.Sleep10: DefaultJob&lt;/DisplayInfo&gt;
+      &lt;Namespace&gt;BenchmarkDotNet.Samples.Intro&lt;/Namespace&gt;
+      &lt;Type&gt;IntroXmlExport&lt;/Type&gt;
+      &lt;Method&gt;Sleep10&lt;/Method&gt;
+      &lt;MethodTitle&gt;Sleep10&lt;/MethodTitle&gt;
+      &lt;Statistics&gt;
+        &lt;N&gt;15&lt;/N&gt;
+        &lt;Min&gt;10989865.8785938&lt;/Min&gt;
+        &lt;LowerFence&gt;10989836.0967969&lt;/LowerFence&gt;
+        &lt;Q1&gt;10990942.6053125&lt;/Q1&gt;
+        &lt;Median&gt;10991249.5870313&lt;/Median&gt;
+        &lt;Mean&gt;10991270.0524583&lt;/Mean&gt;
+        &lt;Q3&gt;10991680.2776563&lt;/Q3&gt;
+        &lt;UpperFence&gt;10992786.7861719&lt;/UpperFence&gt;
+        &lt;Max&gt;10992115.5501563&lt;/Max&gt;
+        &lt;InterquartileRange&gt;737.672343749553&lt;/InterquartileRange&gt;
+        &lt;StandardError&gt;148.484545262958&lt;/StandardError&gt;
+        &lt;Variance&gt;330714.902729213&lt;/Variance&gt;
+        &lt;StandardDeviation&gt;575.07817097262&lt;/StandardDeviation&gt;
+        &lt;Skewness&gt;-0.67759778074187&lt;/Skewness&gt;
+        &lt;Kurtosis&gt;3.14296703520386&lt;/Kurtosis&gt;
+        &lt;ConfidenceInterval&gt;
+          &lt;N&gt;15&lt;/N&gt;
+          &lt;Mean&gt;10991270.0524583&lt;/Mean&gt;
+          &lt;StandardError&gt;148.484545262958&lt;/StandardError&gt;
+          &lt;Level&gt;L999&lt;/Level&gt;
+          &lt;Margin&gt;614.793505974065&lt;/Margin&gt;
+          &lt;Lower&gt;10990655.2589524&lt;/Lower&gt;
+          &lt;Upper&gt;10991884.8459643&lt;/Upper&gt;
+        &lt;/ConfidenceInterval&gt;
+        &lt;Percentiles&gt;
+          &lt;P0&gt;10989865.8785938&lt;/P0&gt;
+          &lt;P25&gt;10991027.3689063&lt;/P25&gt;
+          &lt;P50&gt;10991249.5870313&lt;/P50&gt;
+          &lt;P67&gt;10991489.490875&lt;/P67&gt;
+          &lt;P80&gt;10991696.7722187&lt;/P80&gt;
+          &lt;P85&gt;10991754.5031875&lt;/P85&gt;
+          &lt;P90&gt;10991933.1939688&lt;/P90&gt;
+          &lt;P95&gt;10992067.441125&lt;/P95&gt;
+          &lt;P100&gt;10992115.5501563&lt;/P100&gt;
+        &lt;/Percentiles&gt;
+      &lt;/Statistics&gt;
+    &lt;/Benchmark&gt;
+  &lt;/Benchmarks&gt;
+&lt;/Summary&gt;
+</code></pre>
+
+
                     </div>
                 </div>
                 <footer>
