@@ -8,6 +8,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
@@ -84,7 +85,8 @@ namespace BenchmarkDotNet.Tests.Mocks
                 OsVersion = new Lazy<string>(() => "Microsoft Windows NT 10.0.x.mock"),
                 ProcessorCount = 8,
                 ProcessorName = new Lazy<string>(() => "MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz"),
-                RuntimeVersion = "Clr 4.0.x.mock"
+                RuntimeVersion = "Clr 4.0.x.mock",
+                VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(() => HyperV.Default)
             };
 
             private MockHostEnvironmentInfo()

@@ -84,13 +84,21 @@ namespace BenchmarkDotNet.Environments
 
         public override IEnumerable<string> ToFormattedString()
         {
-            yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}";
+            yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}, VM={GetInformationAboutHypervisor()}";
             yield return $"Processor={ProcessorName.Value}, ProcessorCount={ProcessorCount}";
             if (HardwareTimerKind != HardwareTimerKind.Unknown)
                 yield return $"Frequency={ChronometerFrequency}, Resolution={ChronometerResolution}, Timer={HardwareTimerKind.ToString().ToUpper()}";
 #if !CLASSIC
             yield return $".NET Core SDK={DotNetSdkVersion.Value}";
 #endif
+        }
+
+        private string GetInformationAboutHypervisor()
+        {
+            if (VirtualMachineHypervisor.Value != null)
+                return VirtualMachineHypervisor.Value.Name;
+
+            return "Not detected";
         }
 
         internal bool IsDotNetCliInstalled() => !string.IsNullOrEmpty(DotNetSdkVersion.Value);
