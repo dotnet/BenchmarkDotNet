@@ -54,19 +54,26 @@ namespace BenchmarkDotNet.Running
 
             var targets = GetTargets(targetMethods, containingType, globalSetupMethods, globalCleanupMethods, iterationSetupMethods, iterationCleanupMethods).ToArray();
 
-            var benchmarks = (
-                from target in targets
-                from job in jobs
-                from parameterInstance in parameterInstancesList
-                select new Benchmark(target, job, parameterInstance)).ToArray();
+            var benchmarks = new List<Benchmark>();
+            foreach (var target in targets)
+            {
+                var argumentsDefinitions = GetArgumentsDefinitions(target.Method, target.Type);
+                var parameters = argumentsDefinitions.Concat(parameterInstancesList);
+
+                benchmarks.AddRange(
+                        from job in jobs
+                        from parameterInstance in parameters
+                        select new Benchmark(target, job, parameterInstance)
+                    );
+            }
 
             var filters = fullConfig.GetFilters().ToList();
-            benchmarks = GetFilteredBenchmarks(benchmarks, filters);
+            var filteredBenchmarks = GetFilteredBenchmarks(benchmarks, filters);
 
             var orderProvider = fullConfig.GetOrderProvider() ?? DefaultOrderProvider.Instance;
 
             return new BenchmarkRunInfo(
-                orderProvider.GetExecutionOrder(benchmarks).ToArray(),
+                orderProvider.GetExecutionOrder(filteredBenchmarks).ToArray(),
                 containingType,
                 fullConfig);
         }
@@ -175,15 +182,55 @@ namespace BenchmarkDotNet.Running
                     new ParameterDefinition(
                         member.Name,
                         member.IsStatic,
-                        GetValidValues(member.Attribute.Values, member.ParameterType)))
+                        GetValidValues(member.Attribute.Values, member.ParameterType),
+                        false))
                 .Concat(allParamsSourceMembers.Select(member =>
                     new ParameterDefinition(
                         member.Name,
                         member.IsStatic,
-                        GetValidValuesForParamsSource(type, member.Attribute.Name))))
+                        GetValidValuesForParamsSource(type, member.Attribute.Name),
+                        false)))
                 .ToArray();
 
             return new ParameterDefinitions(definitions);
+        }
+
+        private static IEnumerable<ParameterInstances> GetArgumentsDefinitions(MethodInfo benchmark, Type target)
+        {
+            var parameterDefinitions = benchmark.GetParameters()
+                .Select(parameter => new ParameterDefinition(parameter.Name, false, Array.Empty<object>(), true))
+                .ToArray();
+
+            foreach (var argumentsAttribute in benchmark.GetCustomAttributes<ArgumentsAttribute>())
+            {
+                if (parameterDefinitions.Length != argumentsAttribute.Values.Length)
+                    throw new InvalidOperationException($"Benchmark {benchmark.Name} has invalid number of defined [Arguments]");
+
+                yield return new ParameterInstances(
+                    argumentsAttribute.Values.Select((value, index) => new ParameterInstance(parameterDefinitions[index], value)).ToArray());
+            }
+
+            if (!benchmark.HasAttribute<ArgumentsSourceAttribute>())
+                yield break;
+
+            var argumentsSourceAttribute = benchmark.GetCustomAttribute<ArgumentsSourceAttribute>();
+            foreach (var unwrappedValue in GetValidValuesForParamsSource(target, argumentsSourceAttribute.Name))
+            {
+                if (unwrappedValue is object[] array)
+                {
+                    if (parameterDefinitions.Length != array.Length)
+                        throw new InvalidOperationException($"Benchmark {benchmark.Name} has invalid number of arguments provided by [ArgumentsSource({argumentsSourceAttribute.Name})]");
+
+                    yield return new ParameterInstances(
+                        array.Select((value, index) => new ParameterInstance(parameterDefinitions[index], value)).ToArray());
+                }
+                else if (parameterDefinitions.Length == 1)
+                {
+                    yield return new ParameterInstances(
+                        new [] { new ParameterInstance(parameterDefinitions[0], unwrappedValue) });
+                }
+                else throw new NotSupportedException($"Benchmark {benchmark.Name} has invalid type of arguments provided by [ArgumentsSource({argumentsSourceAttribute.Name})]. It should be IEnumerable<object[]> or IEnumerable<object>");
+            }
         }
 
         private static string[] GetCategories(MethodInfo method)
@@ -208,7 +255,7 @@ namespace BenchmarkDotNet.Running
 
         private static void AssertMethodHasCorrectSignature(string methodType, MethodInfo methodInfo)
         {
-            if (methodInfo.GetParameters().Any())
+            if (methodInfo.GetParameters().Any() && !methodInfo.HasAttribute<ArgumentsAttribute>() && !methodInfo.HasAttribute<ArgumentsSourceAttribute>())
                 throw new InvalidOperationException($"{methodType} method {methodInfo.Name} has incorrect signature.\nMethod shouldn't have any arguments.");
         }
 
@@ -250,8 +297,8 @@ namespace BenchmarkDotNet.Running
 
             if (paramsSourceMethod != default(MethodInfo))
                 return ToArray(
-                    paramsSourceMethod.Invoke(paramsSourceMethod.IsStatic ? null : Activator.CreateInstance(parentType), null), 
-                    paramsSourceMethod, 
+                    paramsSourceMethod.Invoke(paramsSourceMethod.IsStatic ? null : Activator.CreateInstance(parentType), null),
+                    paramsSourceMethod,
                     parentType);
 
             var paramsSourceProperty = parentType.GetAllProperties().SingleOrDefault(property => property.Name == sourceName && property.GetMethod.IsPublic);
@@ -267,7 +314,7 @@ namespace BenchmarkDotNet.Running
 
         private static object[] ToArray(object sourceValue, MemberInfo memberInfo, Type type)
         {
-            if(!(sourceValue is IEnumerable collection))
+            if (!(sourceValue is IEnumerable collection))
                 throw new InvalidOperationException($"{memberInfo.Name} of type {type.Name} does not implement IEnumerable, unable to read values for [ParamsSource]");
 
             var values = new List<object>();

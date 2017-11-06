@@ -41,8 +41,11 @@ namespace BenchmarkDotNet.Code
                 Replace("$AdditionalLogic$", benchmark.Target.AdditionalLogic).
                 Replace("$JobSetDefinition$", GetJobsSetDefinition(benchmark)).
                 Replace("$ParamsContent$", GetParamsContent(benchmark)).
+                Replace("$ArgumentsDefinition$", GetArgumentsDefinition(benchmark)).
+                Replace("$ArgumentsContent$", GetArgumentsContent(benchmark)).
+                Replace("$ArgumentsList$", GetArgumentsList(benchmark)).
                 Replace("$ExtraAttribute$", GetExtraAttributes(benchmark.Target)).
-                Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark)). 
+                Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark)).
                 Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).
                 Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath).
                 Replace("$Ref$", provider.UseRefKeyword ? "ref" : null).
@@ -113,7 +116,7 @@ namespace BenchmarkDotNet.Code
             {
                 return new TaskDeclarationsProvider(target);
             }
-            if (method.ReturnType.GetTypeInfo().IsGenericType 
+            if (method.ReturnType.GetTypeInfo().IsGenericType
                 && (method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(Task<>)
                     || method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(ValueTask<>)))
             {
@@ -140,13 +143,29 @@ namespace BenchmarkDotNet.Code
         }
 
         private static string GetParamsContent(Benchmark benchmark)
-        {
-            return string.Join(
+            => string.Join(
                 string.Empty,
-                benchmark.Parameters.Items.Select(
-                    parameter =>
-                        $"{(parameter.IsStatic ? "" : "instance.")}{parameter.Name} = {parameter.ToSourceCode()};"));
-        }
+                benchmark.Parameters.Items
+                    .Where(parameter => !parameter.IsArgument)
+                    .Select(parameter => $"{(parameter.IsStatic ? "" : "instance.")}{parameter.Name} = {parameter.ToSourceCode()};"));
+
+        private static string GetArgumentsDefinition(Benchmark benchmark)
+            => string.Join(
+                ", ",
+                benchmark.Target.Method.GetParameters()
+                    .Select((parameter, index) => $"{parameter.ParameterType.GetCorrectTypeName()} arg{index}"));
+
+        private static string GetArgumentsContent(Benchmark benchmark)
+            => string.Join(
+                string.Empty,
+                benchmark.Target.Method.GetParameters()
+                         .Select((parameter, index) => $"{parameter.ParameterType.GetCorrectTypeName()} __arg{index} = {benchmark.Parameters.Items[index].ToSourceCode()}; "));
+
+        private static string GetArgumentsList(Benchmark benchmark)
+            => string.Join(
+                ", ",
+                benchmark.Target.Method.GetParameters()
+                    .Select((_, index) => $"__arg{index}"));
 
         private static string GetExtraAttributes(Target target)
         {

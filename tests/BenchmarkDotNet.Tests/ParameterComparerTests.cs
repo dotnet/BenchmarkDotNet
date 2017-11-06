@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Tests
         {
             var comparer = ParameterComparer.Instance;
 
-            var sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: Array.Empty<object>());
+            var sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: Array.Empty<object>(), isArgument: false);
             var originalData = new[]
             {
                 new ParameterInstances(new[]
@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Tests
         {
             var comparer = ParameterComparer.Instance;
 
-            var sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: Array.Empty<object>());
+            var sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: Array.Empty<object>(), isArgument: false);
             var originalData = new[]
             {
                 new ParameterInstances(new[]
@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Tests
         {
             var comparer = ParameterComparer.Instance;
 
-            var sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: Array.Empty<object>());
+            var sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: Array.Empty<object>(), isArgument: false);
             var originalData = new[]
             {
                 new ParameterInstances(new[]
