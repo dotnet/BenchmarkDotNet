@@ -21,6 +21,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
 
         }
+
         /// <summary>
         /// creates the new TailCallDiagnoser instace
         /// </summary>
@@ -34,7 +35,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         protected override void AttachToEvents(TraceEventSession traceEventSession, Benchmark benchmark)
         {
-            expectedNamespace = benchmark.Target.Method.DeclaringType.Namespace;
+            expectedNamespace = benchmark.Target.Method.DeclaringType.Namespace ?? benchmark.Target.Method.DeclaringType.FullName;
 
             Logger.WriteLine();
             Logger.WriteLineHeader(LogSeparator);
@@ -43,13 +44,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             traceEventSession.Source.Clr.MethodTailCallSucceeded += jitData =>
             {
-                if (!logFailuresOnly && ShouldPrintEventInfo(new Tuple<string, string>(jitData.CallerNamespace, jitData.CalleeNamespace)))
+                if (!logFailuresOnly && ShouldPrintEventInfo(jitData.CallerNamespace, jitData.CalleeNamespace))
                 {
                     if (StatsPerProcess.TryGetValue(jitData.ProcessID, out object ignored))
                     {
                         Logger.WriteLineHelp($"Caller: {jitData.CallerNamespace}.{jitData.CallerName} - {jitData.CallerNameSignature}");
                         Logger.WriteLineHelp($"Callee: {jitData.CalleeNamespace}.{jitData.CalleeName} - {jitData.CalleeNameSignature}");
-                        Logger.WriteLineHelp($"Tail prefix: {nameof(jitData.TailPrefix)}");
+                        Logger.WriteLineHelp($"Tail prefix: {jitData.TailPrefix}");
                         Logger.WriteLineHelp($"Tail call type: {jitData.TailCallType}");
                         Logger.WriteLineHeader(LogSeparator);
                     }
@@ -57,7 +58,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             };
             traceEventSession.Source.Clr.MethodTailCallFailed += jitData =>
             {
-                if (ShouldPrintEventInfo(new Tuple<string,string>(jitData.CallerNamespace, jitData.CalleeNamespace)))
+                if (ShouldPrintEventInfo(jitData.CallerNamespace, jitData.CalleeNamespace))
                 {
                     if (StatsPerProcess.TryGetValue(jitData.ProcessID, out object ignored))
                     {
@@ -70,6 +71,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             };
         }
 
-        private bool ShouldPrintEventInfo(Tuple<string, string> namespaces) => !filterByNamespace || namespaces.Item1.StartsWith(expectedNamespace) || namespaces.Item2.StartsWith(expectedNamespace);
+        private bool ShouldPrintEventInfo(string callerNamespace, string calleeNamespace) => 
+            !filterByNamespace
+                    || (!string.IsNullOrEmpty(callerNamespace) && callerNamespace.StartsWith(expectedNamespace))
+                    || (!string.IsNullOrEmpty(calleeNamespace) && calleeNamespace.StartsWith(expectedNamespace));
     }
 }
