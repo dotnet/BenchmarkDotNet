@@ -153,7 +153,7 @@ namespace BenchmarkDotNet.Code
             => string.Join(
                 ", ",
                 benchmark.Target.Method.GetParameters()
-                    .Select((parameter, index) => $"{parameter.ParameterType.GetCorrectTypeName()} arg{index}"));
+                    .Select((parameter, index) => $"{(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} {parameter.ParameterType.GetCorrectTypeName()} arg{index}"));
 
         private static string GetArgumentsContent(Benchmark benchmark)
             => string.Join(
@@ -165,7 +165,7 @@ namespace BenchmarkDotNet.Code
             => string.Join(
                 ", ",
                 benchmark.Target.Method.GetParameters()
-                    .Select((_, index) => $"__arg{index}"));
+                    .Select((param, index) => $"{(param.ParameterType.IsByRef ? "ref" : string.Empty)} __arg{index}"));
 
         private static string GetExtraAttributes(Target target)
         {
