@@ -7,6 +7,7 @@ var skipTests = Argument("SkipTests", false);
 var artifactsDirectory = Directory("./artifacts");
 var solutionFile = "./BenchmarkDotNet.sln";
 var solutionFileBackup = solutionFile + ".build.backup";
+var integrationTestsProjectPath = "./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj";
 var isRunningOnWindows = IsRunningOnWindows();
 var IsOnAppVeyorAndNotPR = AppVeyor.IsRunningOnAppVeyor && !AppVeyor.Environment.PullRequest.IsPullRequest;
 
@@ -39,20 +40,6 @@ Task("Clean")
     .Does(() =>
     {
         CleanDirectory(artifactsDirectory);
-
-        if(BuildSystem.IsLocalBuild)
-        {
-            var directoriesToClean = GetDirectories("./**/obj") 
-                                     + GetDirectories("./**/bin") 
-                                     - GetDirectories("./**/debug")
-                                     - GetDirectories("./**/release");
-            DeleteDirectories(directoriesToClean, 
-                new DeleteDirectorySettings 
-                    {
-                        Recursive = true,
-                        Force = true
-                    });
-        }
     });
 
 Task("Restore")
@@ -70,7 +57,7 @@ Task("Build")
             .SetConfiguration(configuration)
             .WithTarget("Rebuild")
             .SetVerbosity(Verbosity.Minimal)
-            .UseToolVersion(MSBuildToolVersion.Default)
+            .UseToolVersion(MSBuildToolVersion.VS2017)
             .SetMSBuildPlatform(MSBuildPlatform.Automatic)
             .SetPlatformTarget(PlatformTarget.MSIL) // Any CPU
             .SetNodeReuse(true);
@@ -100,7 +87,7 @@ Task("FastTests")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
-        DotNetCoreTest("./tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj", GetTestSettings());
+        DotNetCoreTool("./tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj", "xunit", GetTestSettingsParameters());
     });
 
 Task("BackwardCompatibilityTests")
@@ -108,15 +95,10 @@ Task("BackwardCompatibilityTests")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
-        DotNetCoreTest(
-            "./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", 
-            new DotNetCoreTestSettings
-            {
-                Configuration = "Release",
-                Framework = "netcoreapp1.1",
-                Filter = "Category=BackwardCompatibility"
-            }
-        );
+        var testSettings = GetTestSettingsParameters("netcoreapp1.1");
+        testSettings += " -trait \"Category=BackwardCompatibility\"";
+
+        DotNetCoreTool(integrationTestsProjectPath, "xunit", testSettings);
     });
     
 Task("SlowTestsNet46")
@@ -124,7 +106,7 @@ Task("SlowTestsNet46")
     .WithCriteria(!skipTests && isRunningOnWindows)
     .Does(() =>
     {
-        DotNetCoreTest("./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", GetTestSettings("net46"));
+        DotNetCoreTool(integrationTestsProjectPath, "xunit", GetTestSettingsParameters("net46"));
     });    
     
 Task("SlowTestsNetCore2")
@@ -132,7 +114,7 @@ Task("SlowTestsNetCore2")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
-        DotNetCoreTest("./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", GetTestSettings("netcoreapp2.0"));
+        DotNetCoreTool(integrationTestsProjectPath, "xunit", GetTestSettingsParameters("netcoreapp2.0"));
     });       
 
 Task("Pack")
@@ -166,20 +148,17 @@ Task("Default")
 RunTarget(target);
 
 // HELPERS
-private DotNetCoreTestSettings GetTestSettings(string tfm = null)
+private string GetTestSettingsParameters(string tfm = null)
 {
-    var settings = new DotNetCoreTestSettings
-    {
-        Configuration = "Release"
-    };
+    var settings = "-configuration Release -stoponfail -maxthreads unlimited -nobuild";
 
     if (!IsRunningOnWindows())
     {
-        settings.Framework = "netcoreapp2.0";
+        settings += " -framework netcoreapp2.0";
     }
-    else if(tfm != null)
+    else if(!string.IsNullOrEmpty(tfm))
     {
-        settings.Framework = tfm;
+        settings += $" -framework {tfm}";
     }
 
     return settings;

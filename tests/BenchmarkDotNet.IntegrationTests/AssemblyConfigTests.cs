@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             CanExecute<AssemblyConfigBenchmarks>();
 
-            Assert.Equal(true, AssemblyConfigAttribute.IsActivated);
+            Assert.True(AssemblyConfigAttribute.IsActivated);
         }
     }
 }

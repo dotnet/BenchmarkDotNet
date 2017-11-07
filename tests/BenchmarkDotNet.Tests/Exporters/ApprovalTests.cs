@@ -13,6 +13,7 @@ using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
+using JetBrains.Annotations;
 using Xunit;
 namespace BenchmarkDotNet.Tests.Exporters
 {
@@ -27,6 +28,22 @@ namespace BenchmarkDotNet.Tests.Exporters
         public ApprovalTest()
         {
             initCulture = Thread.CurrentThread.CurrentCulture;
+        }
+
+        [UsedImplicitly]
+        public static TheoryData<CultureInfo> GetCultureInfos()
+        {
+            var cultures = new List<CultureInfo>
+            {
+                CultureInfo.InvariantCulture,
+                new CultureInfo("ru-RU"),
+                new CultureInfo("en-US")
+            };
+
+            var theoryData = new TheoryData<CultureInfo>();
+            foreach (var cultureInfo in cultures)
+                theoryData.Add(cultureInfo);
+            return theoryData;
         }
 
         [Theory]
@@ -53,21 +70,6 @@ namespace BenchmarkDotNet.Tests.Exporters
             logger.WriteLine("############################################");
             logger.WriteLine($"{exporter.Name}");
             logger.WriteLine("############################################");
-        }
-
-        private static TheoryData<CultureInfo> GetCultureInfos()
-        {
-            var cultures = new List<CultureInfo>()
-            {
-                CultureInfo.InvariantCulture,
-                new CultureInfo("ru-RU"),
-                new CultureInfo("en-US")
-            };
-
-            var theoryData = new TheoryData<CultureInfo>();
-            foreach (var cultureInfo in cultures)
-                theoryData.Add(cultureInfo);
-            return theoryData;
         }
 
         private static string GetName(CultureInfo cultureInfo)

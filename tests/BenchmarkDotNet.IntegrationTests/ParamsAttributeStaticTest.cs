@@ -68,6 +68,7 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Throws<InvalidOperationException>(() => CanExecute<ParamsTestStaticPrivatePropertyError>());
         }
 
+#pragma warning disable xUnit1013 // Public method should be marked as test
         [Benchmark]
         public void Benchmark()
         {
@@ -77,6 +78,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 collectedParams.Add(StaticParamProperty);
             }
         }
+#pragma warning restore xUnit1013 // Public method should be marked as test
     }
 
     // Delibrately made everything "static" (as well as using a Field) to ensure that Params also work okay in this scenario
@@ -134,6 +136,7 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Throws<InvalidOperationException>(() => new BenchmarkTestExecutor().CanExecute<ParamsTestStaticPrivateFieldError>());
         }
 
+#pragma warning disable xUnit1013 // Public method should be marked as test
         [Benchmark]
         public static void Benchmark()
         {
@@ -143,5 +146,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 collectedParams.Add(StaticParamField);
             }
         }
+#pragma warning restore xUnit1013 // Public method should be marked as test
     }
 }

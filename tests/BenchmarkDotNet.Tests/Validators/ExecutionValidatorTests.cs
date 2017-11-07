@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Tests.Validators
             var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(FailingConsturctor))).ToList();
 
             Assert.NotEmpty(validationErrors);
-            Assert.True(validationErrors.Single().Message.StartsWith("Unable to create instance of FailingConsturctor"));
+            Assert.StartsWith("Unable to create instance of FailingConsturctor", validationErrors.Single().Message);
         }
 
         public class FailingConsturctor
@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Tests.Validators
             var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(FailingGlobalSetup))).ToList();
 
             Assert.NotEmpty(validationErrors);
-            Assert.True(validationErrors.Single().Message.StartsWith("Failed to execute [GlobalSetup]"));
+            Assert.StartsWith("Failed to execute [GlobalSetup]", validationErrors.Single().Message);
         }
 
         public class FailingGlobalSetup
@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Tests.Validators
             var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(MultipleGlobalSetups))).ToList();
 
             Assert.NotEmpty(validationErrors);
-            Assert.True(validationErrors.Single().Message.StartsWith("Only single [GlobalSetup] method is allowed per type"));
+            Assert.StartsWith("Only single [GlobalSetup] method is allowed per type", validationErrors.Single().Message);
         }
 
         public class MultipleGlobalSetups
@@ -138,7 +138,7 @@ namespace BenchmarkDotNet.Tests.Validators
                 .ToList();
 
             Assert.NotEmpty(validationErrors);
-            Assert.True(validationErrors.Single().Message.StartsWith("Failed to execute [GlobalSetup]"));
+            Assert.StartsWith("Failed to execute [GlobalSetup]", validationErrors.Single().Message);
         }
 
         public class FailingGlobalSetupWhichShouldHaveHadParamsForField
@@ -165,7 +165,7 @@ namespace BenchmarkDotNet.Tests.Validators
                 .ToList();
 
             Assert.NotEmpty(validationErrors);
-            Assert.True(validationErrors.Single().Message.StartsWith("Fields marked with [Params] must be public"));
+            Assert.StartsWith("Fields marked with [Params] must be public", validationErrors.Single().Message);
         }
 
         public class NonPublicFieldWithParams
