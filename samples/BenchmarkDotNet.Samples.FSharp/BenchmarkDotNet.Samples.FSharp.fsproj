@@ -56,6 +56,11 @@
       <Project>{95f5d645-19e3-432f-95d4-c5ea374dd15b}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj">
+      <Name>BenchmarkDotNet.Diagnostics.Windows</Name>
+      <Project>{b61a2815-4e2f-42f7-a87c-973c488b11ca}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj">
       <Name>BenchmarkDotNet</Name>
       <Project>{af1e6f8a-5c63-465f-96f4-5e5f183a33b9}</Project>
