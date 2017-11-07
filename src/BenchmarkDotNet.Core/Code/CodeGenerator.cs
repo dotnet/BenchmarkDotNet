@@ -42,8 +42,10 @@ namespace BenchmarkDotNet.Code
                 Replace("$JobSetDefinition$", GetJobsSetDefinition(benchmark)).
                 Replace("$ParamsContent$", GetParamsContent(benchmark)).
                 Replace("$ArgumentsDefinition$", GetArgumentsDefinition(benchmark)).
-                Replace("$ArgumentsContent$", GetArgumentsContent(benchmark)).
-                Replace("$ArgumentsList$", GetArgumentsList(benchmark)).
+                Replace("$DeclareArgumentFields$", GetDeclareArgumentFields(benchmark)).
+                Replace("$InitializeArgumentFields$", GetInitializeArgumentFields(benchmark)).
+                Replace("$LoadArguments$", GetLoadArguments(benchmark)).
+                Replace("$PassArguments$", GetPassArguments(benchmark)).
                 Replace("$ExtraAttribute$", GetExtraAttributes(benchmark.Target)).
                 Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark)).
                 Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).
@@ -153,19 +155,31 @@ namespace BenchmarkDotNet.Code
             => string.Join(
                 ", ",
                 benchmark.Target.Method.GetParameters()
-                    .Select((parameter, index) => $"{(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} {parameter.ParameterType.GetCorrectTypeName()} arg{index}"));
+                         .Select((parameter, index) => $"{GetParameterModifier(parameter)} {parameter.ParameterType.GetCorrectTypeName()} arg{index}"));
 
-        private static string GetArgumentsContent(Benchmark benchmark)
+        private static string GetDeclareArgumentFields(Benchmark benchmark)
             => string.Join(
-                string.Empty,
+                Environment.NewLine,
                 benchmark.Target.Method.GetParameters()
-                         .Select((parameter, index) => $"{parameter.ParameterType.GetCorrectTypeName()} __arg{index} = {benchmark.Parameters.Items.Single(param => param.IsArgument && param.Name == parameter.Name).ToSourceCode()}; "));
+                         .Select((parameter, index) => $"private {parameter.ParameterType.GetCorrectTypeName()} __argField{index};"));
 
-        private static string GetArgumentsList(Benchmark benchmark)
+        private static string GetInitializeArgumentFields(Benchmark benchmark)
+            => string.Join(
+                Environment.NewLine,
+                benchmark.Target.Method.GetParameters()
+                         .Select((parameter, index) => $"__argField{index} = {benchmark.Parameters.GetArgument(parameter.Name).ToSourceCode()};")); // we init the fields in ctor to provoke all possible allocations and overhead of other type
+
+        private static string GetLoadArguments(Benchmark benchmark)
+            => string.Join(
+                Environment.NewLine,
+                benchmark.Target.Method.GetParameters()
+                         .Select((parameter, index) => $"{(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} {parameter.ParameterType.GetCorrectTypeName()} arg{index} = {(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} __argField{index};"));
+
+        private static string GetPassArguments(Benchmark benchmark)
             => string.Join(
                 ", ",
                 benchmark.Target.Method.GetParameters()
-                    .Select((param, index) => $"{(param.ParameterType.IsByRef ? "ref" : string.Empty)} __arg{index}"));
+                    .Select((parameter, index) => $"{GetParameterModifier(parameter)} arg{index}"));
 
         private static string GetExtraAttributes(Target target)
         {
@@ -192,6 +206,12 @@ namespace BenchmarkDotNet.Code
             return factoryType.GetCorrectTypeName();
         }
 
+        private static string GetParameterModifier(ParameterInfo parameterInfo)
+            => parameterInfo.ParameterType.IsByRef
+                ? "ref"
+                : parameterInfo.IsOut
+                    ? "out"
+                    : string.Empty;
 
         private class SmartStringBuilder
         {
