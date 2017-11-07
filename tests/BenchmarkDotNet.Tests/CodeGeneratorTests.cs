@@ -28,8 +28,9 @@ namespace BenchmarkDotNet.Tests
 
 
 #pragma warning disable CS1998
-
+#pragma warning disable xUnit1013 // Public method should be marked as test
         [Benchmark]
         public async void AsyncVoidMethod() { }
+#pragma warning restore xUnit1013 // Public method should be marked as test
     }
 }

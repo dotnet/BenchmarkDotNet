@@ -83,7 +83,7 @@ namespace BenchmarkDotNet.Tests
             //var matches = typeParser.MatchingTypesWithMethods(new[] { "class = ClassC, ClassA" });
 
             // ClassC not matched as it has NO methods with the [Benchmark] attribute
-            Assert.Equal(1, matches.Count);
+            Assert.Single(matches);
             Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassA" && match.AllMethodsInType));
         }
 
@@ -94,8 +94,8 @@ namespace BenchmarkDotNet.Tests
             var matches = matcher.Match("class=BenchmarkDotNet.Tests.ClassC,BenchmarkDotNet.Tests.ClassA");
 
             // ClassC not matched as it has NO methods with the [Benchmark] attribute
-            Assert.Equal(1, matches.Count);
-            Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassA" && match.AllMethodsInType));
+            Assert.Single(matches);
+            Assert.Single(matches.Where(match => match.Type.Name == "ClassA" && match.AllMethodsInType));
         }
 
         [Fact]
@@ -144,7 +144,7 @@ namespace BenchmarkDotNet.Tests
 
             // ClassC not matched as it has NO methods with the [Benchmark] attribute
             // ClassA only Method2 got matched because it it's classes AND methods #249
-            Assert.Equal(1, matches.Count);
+            Assert.Single(matches);
             Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassA" && match.Methods.All(m => m.Name == "Method2")));
         }
 
@@ -154,7 +154,7 @@ namespace BenchmarkDotNet.Tests
             var matcher = new Matcher(output, typeof(ClassA), typeof(ClassB), typeof(ClassC));
             var matches = matcher.Match("method=Method2,Method3", "class=ClassA");
 
-            Assert.Equal(1, matches.Count);
+            Assert.Single(matches);
             Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassA"
                                                    && match.Methods.All(m => m.Name == "Method2")));
         }
