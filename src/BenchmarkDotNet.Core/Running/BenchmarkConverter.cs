@@ -57,14 +57,14 @@ namespace BenchmarkDotNet.Running
             var benchmarks = new List<Benchmark>();
             foreach (var target in targets)
             {
-                var argumentsDefinitions = GetArgumentsDefinitions(target.Method, target.Type);
-                var parameters = argumentsDefinitions.Concat(parameterInstancesList);
+                var argumentsDefinitions = GetArgumentsDefinitions(target.Method, target.Type).ToArray();
 
                 benchmarks.AddRange(
-                        from job in jobs
-                        from parameterInstance in parameters
-                        select new Benchmark(target, job, parameterInstance)
-                    );
+                    from job in jobs
+                    from parameterInstance in parameterInstancesList
+                    from argumentDefinition in argumentsDefinitions
+                    select new Benchmark(target, job, new ParameterInstances(parameterInstance.Items.Concat(argumentDefinition.Items).ToArray()))
+                );
             }
 
             var filters = fullConfig.GetFilters().ToList();
@@ -201,10 +201,16 @@ namespace BenchmarkDotNet.Running
                 .Select(parameter => new ParameterDefinition(parameter.Name, false, Array.Empty<object>(), true))
                 .ToArray();
 
+            if (parameterDefinitions.IsEmpty())
+            {
+                yield return new ParameterInstances(Array.Empty<ParameterInstance>());
+                yield break;
+            }
+
             foreach (var argumentsAttribute in benchmark.GetCustomAttributes<ArgumentsAttribute>())
             {
                 if (parameterDefinitions.Length != argumentsAttribute.Values.Length)
-                    throw new InvalidOperationException($"Benchmark {benchmark.Name} has invalid number of defined [Arguments]");
+                    throw new InvalidOperationException($"Benchmark {benchmark.Name} has invalid number of defined arguments provided with [Arguments]! {argumentsAttribute.Values.Length} instead of {parameterDefinitions.Length}.");
 
                 yield return new ParameterInstances(
                     argumentsAttribute.Values.Select((value, index) => new ParameterInstance(parameterDefinitions[index], value)).ToArray());
@@ -219,7 +225,7 @@ namespace BenchmarkDotNet.Running
                 if (unwrappedValue is object[] array)
                 {
                     if (parameterDefinitions.Length != array.Length)
-                        throw new InvalidOperationException($"Benchmark {benchmark.Name} has invalid number of arguments provided by [ArgumentsSource({argumentsSourceAttribute.Name})]");
+                        throw new InvalidOperationException($"Benchmark {benchmark.Name} has invalid number of arguments provided by [ArgumentsSource({argumentsSourceAttribute.Name})]! {array.Length} instead of {parameterDefinitions.Length}.");
 
                     yield return new ParameterInstances(
                         array.Select((value, index) => new ParameterInstance(parameterDefinitions[index], value)).ToArray());
@@ -229,7 +235,7 @@ namespace BenchmarkDotNet.Running
                     yield return new ParameterInstances(
                         new [] { new ParameterInstance(parameterDefinitions[0], unwrappedValue) });
                 }
-                else throw new NotSupportedException($"Benchmark {benchmark.Name} has invalid type of arguments provided by [ArgumentsSource({argumentsSourceAttribute.Name})]. It should be IEnumerable<object[]> or IEnumerable<object>");
+                else throw new NotSupportedException($"Benchmark {benchmark.Name} has invalid type of arguments provided by [ArgumentsSource({argumentsSourceAttribute.Name})]. It should be IEnumerable<object[]> or IEnumerable<object>.");
             }
         }
 

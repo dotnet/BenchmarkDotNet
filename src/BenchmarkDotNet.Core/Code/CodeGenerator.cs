@@ -159,7 +159,7 @@ namespace BenchmarkDotNet.Code
             => string.Join(
                 string.Empty,
                 benchmark.Target.Method.GetParameters()
-                         .Select((parameter, index) => $"{parameter.ParameterType.GetCorrectTypeName()} __arg{index} = {benchmark.Parameters.Items[index].ToSourceCode()}; "));
+                         .Select((parameter, index) => $"{parameter.ParameterType.GetCorrectTypeName()} __arg{index} = {benchmark.Parameters.Items.Single(param => param.IsArgument && param.Name == parameter.Name).ToSourceCode()}; "));
 
         private static string GetArgumentsList(Benchmark benchmark)
             => string.Join(
