@@ -50,14 +50,14 @@ type TailCallDetector () =
             | _ -> loop (i-1) (acc * i)
         loop n 1
         
-    let factorial2 x =
-        let rec tailCall x f =
-            if x <= 1 then
+    let factorial2 n =
+        let rec tailCall n f =
+            if n <= 1 then
                 f()
             else
-                tailCall (x - 1) (fun () -> x * f())
+                tailCall (n - 1) (fun () -> n * f())
  
-        tailCall x (fun () -> 1)
+        tailCall n (fun () -> 1)
 
     [<Params (7)>] 
     member val public facRank = 0 with get, set
