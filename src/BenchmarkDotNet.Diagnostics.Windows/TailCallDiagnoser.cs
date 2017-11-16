@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         }
 
         /// <summary>
-        /// creates the new TailCallDiagnoser instace
+        /// creates the new TailCallDiagnoser instance
         /// </summary>
         /// <param name="logFailuresOnly">only the methods that failed to get tail called. True by default.</param>
         /// <param name="filterByNamespace">only the methods from declaring type's namespace. Set to false if you want to see all Jit tail events. True by default.</param>
