@@ -19,8 +19,8 @@ It's a single string characteristic. It allows to name your job. This name will 
   * `Mono`: Mono (x-plat)
 * `Jit`:
   * `LegacyJit` (available only for `Runtime.Clr`)
-  * `RyuJit` (avaiable only for `Runtime.Clr` and `Runtime.Core`)
-  * `Llvm` (avaiable only for `Runtime.Mono`)
+  * `RyuJit` (available only for `Runtime.Clr` and `Runtime.Core`)
+  * `Llvm` (available only for `Runtime.Mono`)
 * `Affinity`: [Affinity](https://msdn.microsoft.com/library/system.diagnostics.process.processoraffinity.aspx) of a benchmark process
 * `GcMode`: settings of Garbage Collector
   * `Server`: `true` (Server mode) or `false` (Workstation mode)
