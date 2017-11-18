@@ -40,3 +40,29 @@ For example, you can use the `SimpleJob` or `ShortRunJob` attributes:
 
 * **Q** Can I run benchmark on the virtual machine?  
 **A** Yes, of course. However, it can affect results because of the shared, physical machine, virtualization process and incorrect `Stopwatch.Frequency`. If you are unsure whether an application is running on virtual environment, use `EnvironmentAnalyser` to detect VM hypervisor.
+
+* **Q** I have failed to run my benchmarks, I am getting following errors about non-optimized dll. What can I do?  
+
+```
+Assembly BenchmarkDotNet.Samples which defines benchmarks references non-optimized BenchmarkDotNet
+        If you own this dependency, please, build it in RELEASE.
+        If you don't, you can create custom config with DontFailOnError to disable our custom policy and allow this b
+Assembly BenchmarkDotNet.Samples which defines benchmarks is non-optimized
+Benchmark was built without optimization enabled (most probably a DEBUG configuration). Please, build it in RELEASE.
+```
+
+**A** You should always run your benchmarks in RELEASE mode with optimizations enabled (default setting for RELEASE). However if you have to use non-optimized 3rd party assembly you have to create custom config to disable our default policy.
+
+```cs
+public class AllowNonOptimized : ManualConfig
+{
+    public AllowNonOptimized()
+    {
+        Add(JitOptimizationsValidator.DontFailOnError); // ALLOW NON-OPTIMIZED DLLS
+
+        Add(DefaultConfig.Instance.GetLoggers().ToArray()); // manual config has no loggers by default
+        Add(DefaultConfig.Instance.GetExporters().ToArray()); // manual config has no exporters by default
+        Add(DefaultConfig.Instance.GetColumnProviders().ToArray()); // manual config has no columns by default
+    }
+}
+```
