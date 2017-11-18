@@ -66,3 +66,13 @@ public class AllowNonOptimized : ManualConfig
     }
 }
 ```
+
+* **Q** I have failed to run my benchmarks from LINQPad. How can I fix this problem?  
+
+```
+Assembly LINQPadQuery which defines benchmarks references non-optimized LINQPad
+Assembly LINQPadQuery which defines benchmarks is non-optimized
+Benchmark was built without optimization enabled (most probably a DEBUG configuration). Please, build it in RELEASE.
+```
+
+**A** You need to make sure that you are using **AnyCPU** 5.22.05+ build of LINQPad with optimizations enabled. To enable the optimizations you need to go to Preferences -> Query and select `compile with /optimize+`
