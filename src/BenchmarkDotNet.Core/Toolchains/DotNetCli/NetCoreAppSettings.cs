@@ -12,6 +12,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp11 = new NetCoreAppSettings("netcoreapp1.1", null, ".NET Core 1.1");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp12 = new NetCoreAppSettings("netcoreapp1.2", null, ".NET Core 1.0");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp20 = new NetCoreAppSettings("netcoreapp2.0", null, ".NET Core 2.0");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp21 = new NetCoreAppSettings("netcoreapp2.1", null, ".NET Core 2.1");
 
         private static NetCoreAppSettings Default =>
 #if NETCOREAPP2_0
@@ -82,8 +83,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 // the problem is that both netcoreapp1.2 and netcoreapp2.0 have 
                 // "System.Runtime Version=1.2.0.0". 
                 // 2.0 was officialy announced name, so let's bet on it (1.2 was probably an internal dev thing)
-                if (assembly.FullName.Contains("Version=4.2"))
+                if (assembly.FullName.Contains("Version=4.2.0"))
                     return NetCoreApp20;
+                if (assembly.FullName.Contains("Version=4.2.1"))
+                    return NetCoreApp21;
             }
             catch
             {
