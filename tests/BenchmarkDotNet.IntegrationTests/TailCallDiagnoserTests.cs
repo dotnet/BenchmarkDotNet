@@ -1,7 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
-#if !CORE
+#if NET46
 using BenchmarkDotNet.Diagnostics.Windows;
 using BenchmarkDotNet.Diagnostics.Windows.Configs;
 using BenchmarkDotNet.Environments;
@@ -18,7 +18,7 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-#if !CORE
+#if NET46
     public class TailCallDiagnoserTests : BenchmarkTestExecutor
     {
         private readonly ITestOutputHelper output;
