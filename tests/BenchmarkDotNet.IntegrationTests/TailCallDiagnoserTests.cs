@@ -21,8 +21,6 @@ namespace BenchmarkDotNet.IntegrationTests
 #if NET46
     public class TailCallDiagnoserTests : BenchmarkTestExecutor
     {
-        private readonly ITestOutputHelper output;
-
         public TailCallDiagnoserTests(ITestOutputHelper outputHelper) : base(outputHelper)
         {
 
@@ -75,7 +73,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var tailCallDiagnoser = new TailCallDiagnoser(false, true);
             CanExecute<TailCallBenchmarks>(CreateConfig(jit, platform, runtime, tailCallDiagnoser));
             var output = (LogCapture)(tailCallDiagnoser as EtwDiagnoser<object>).GetType().GetField("Logger", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(tailCallDiagnoser);
-            Assert.True(output.CapturedOutput.Any(x => x.Text.Contains("Tail call type")));
+            Assert.True(output.CapturedOutput.Where(x=>x.Text.Contains("Tail call type")).Count() > 0);
         }
 
         [Theory, MemberData(nameof(GetJits))]
@@ -85,7 +83,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var tailCallDiagnoser = new TailCallDiagnoser(false, true);
             CanExecute<NonTailCallBenchmarks>(CreateConfig(jit, platform, runtime, tailCallDiagnoser));
             var output = (LogCapture)(tailCallDiagnoser as EtwDiagnoser<object>).GetType().GetField("Logger", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(tailCallDiagnoser);
-            Assert.True(!output.CapturedOutput.Any(x => x.Text.Contains("Tail call type")));
+            Assert.True(output.CapturedOutput.Where(x => x.Text.Contains("Tail call type")).Count() == 0);
         }
 
         private IConfig CreateConfig(Jit jit, Platform platform, Runtime runtime, TailCallDiagnoser diagnoser) => ManualConfig.CreateEmpty()
