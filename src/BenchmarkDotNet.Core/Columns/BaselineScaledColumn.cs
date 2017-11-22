@@ -72,7 +72,11 @@ namespace BenchmarkDotNet.Columns
             switch (Kind)
             {
                 case DiffKind.Mean:
-                    if (mean < 0.01)
+                    var nonBaselines = summary.Benchmarks.
+                        Where(b => b.Job.DisplayInfo == benchmark.Job.DisplayInfo).
+                        Where(b => b.Parameters.DisplayInfo == benchmark.Parameters.DisplayInfo).
+                        Where(b => !b.Target.Baseline);
+                    if (nonBaselines.Any(x => Statistics.DivMean(summary[x].ResultStatistics, baselineStat) < 0.01))
                     {
                         return mean.ToStr("N3");
                     }
