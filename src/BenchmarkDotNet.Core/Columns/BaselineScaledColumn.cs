@@ -84,12 +84,12 @@ namespace BenchmarkDotNet.Columns
                 case DiffKind.StdDev:
                     return stdDev.ToStr("N2");
                 case DiffKind.WelchTTestPValue:
-                    {
-                        if (baselineStat.N < 2 || targetStat.N < 2)
-                            return "NA";
-                        double pvalue = WelchTTest.Calc(baselineStat, targetStat).PValue;
-                        return pvalue > 0.0001 || pvalue < 1e-9 ? pvalue.ToStr("N4") : pvalue.ToStr("e2");
-                    }
+                {
+                    if (baselineStat.N < 2 || targetStat.N < 2)
+                        return "NA";
+                    double pvalue = WelchTTest.Calc(baselineStat, targetStat).PValue;
+                    return pvalue > 0.0001 || pvalue < 1e-9 ? pvalue.ToStr("N4") : pvalue.ToStr("e2");
+                }
                 default:
                     throw new NotSupportedException();
             }
@@ -98,7 +98,7 @@ namespace BenchmarkDotNet.Columns
         public bool IsAvailable(Summary summary) => summary.Benchmarks.Any(b => b.Target.Baseline);
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Baseline;
-        public int PriorityInCategory => (int)Kind;
+        public int PriorityInCategory => (int) Kind;
         public bool IsNumeric => true;
         public UnitType UnitType => UnitType.Dimensionless;
         public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
