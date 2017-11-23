@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Tests.Reports
         [Theory]
         [InlineData(140)]
         [InlineData(50)]
-        public void ScaledPrecisionTests(int baselineValue)
+        public void ScaledPrecisionTestWithBaseline(int baselineValue)
         {
             var summary = CreateSummary(baselineValue);
             var scaledIndex = Array.FindIndex(summary.Table.FullHeader, c => c == "Scaled");
