@@ -29,27 +29,41 @@ namespace BenchmarkDotNet.Tests.Reports
         }
 
         [Theory]
-        [InlineData(140)]
-        [InlineData(50)]
-        public void ScaledPrecisionTestWithBaseline(int baselineValue)
+        [InlineData(new int[] { 140, 1, 50 })]
+        [InlineData(new int[] { 40, 1, 20 })]
+        [InlineData(new int[] { 0, 1, 20 })]
+        // First value is baseline, others are benchmark measurements
+        public void ScaledPrecisionTestWithBaseline(int[] values)
         {
-            var summary = CreateSummary(baselineValue);
+            var summary = CreateSummary(values);
             var scaledIndex = Array.FindIndex(summary.Table.FullHeader, c => c == "Scaled");
             var testNameColumn = Array.FindIndex(summary.Table.FullHeader, c => c == "Method");
             foreach (var row in summary.Table.FullContent)
             {
-                // check precision of scaled column to be 2 or 3 decimal places
-                Assert.Equal((1 / (double)baselineValue) < 0.01 ? 3 : 2, row[scaledIndex].Split('.')[1].Length);
+                // Check to see if scale value has a decimal point, otherwise its probably "?"
+                if (row[scaledIndex].Split('.').Count() > 0)
+                {
+                    // check precision of scaled column to be 2 or 3 decimal places
+                    Assert.Equal((1 / (double)values[0]) < 0.01 ? 3 : 2, row[scaledIndex].Split('.')[1].Length);
+                }
             }
         }
 
         // TODO: Union this with MockFactory
-        private Summary CreateSummary(int baselineValue)
+        private Summary CreateSummary(int[] values)
         {
             var logger = new AccumulationLogger();
+            var benchmarks = CreateBenchmarks(DefaultConfig.Instance).ToList();
+            var benchmarkReports = new List<BenchmarkReport>();
+            for (var x = 0; x < benchmarks.Count; x++)
+            {
+                var benchmark = benchmarks[x];
+                benchmarkReports.Add(CreateReport(benchmark, values[x]));
+            }
+
             var summary = new Summary(
                 "MockSummary",
-                CreateBenchmarks(DefaultConfig.Instance).Select(b => CreateReport(b, baselineValue)).ToArray(),
+                benchmarkReports,
                 MockFactory.MockHostEnvironmentInfo.Default,
                 DefaultConfig.Instance,
                 "",
@@ -60,35 +74,20 @@ namespace BenchmarkDotNet.Tests.Reports
             return summary;
         }
 
-        private static BenchmarkReport CreateReport(Benchmark benchmark, int baselineValue)
+        private static BenchmarkReport CreateReport(Benchmark benchmark, int measurementValue)
         {
             var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
             var executeResult = new ExecuteResult(true, 0, Array.Empty<string>(), Array.Empty<string>());
             var measurements = new List<Measurement>();
-            if (benchmark.Target.Baseline)
-            {
                 measurements = new List<Measurement>
                 {
-                    new Measurement(1, IterationMode.Result, 1, 1, baselineValue),
-                    new Measurement(1, IterationMode.Result, 2, 1, baselineValue),
-                    new Measurement(1, IterationMode.Result, 3, 1, baselineValue),
-                    new Measurement(1, IterationMode.Result, 4, 1, baselineValue),
-                    new Measurement(1, IterationMode.Result, 5, 1, baselineValue),
-                    new Measurement(1, IterationMode.Result, 6, 1, baselineValue),
+                    new Measurement(1, IterationMode.Result, 1, 1, measurementValue),
+                    new Measurement(1, IterationMode.Result, 2, 1, measurementValue),
+                    new Measurement(1, IterationMode.Result, 3, 1, measurementValue),
+                    new Measurement(1, IterationMode.Result, 4, 1, measurementValue),
+                    new Measurement(1, IterationMode.Result, 5, 1, measurementValue),
+                    new Measurement(1, IterationMode.Result, 6, 1, measurementValue),
                 };
-            }
-            else
-            {
-                measurements = new List<Measurement>
-                {
-                    new Measurement(1, IterationMode.Result, 1, 1, 1),
-                    new Measurement(1, IterationMode.Result, 2, 1, 1),
-                    new Measurement(1, IterationMode.Result, 3, 1, 1),
-                    new Measurement(1, IterationMode.Result, 4, 1, 1),
-                    new Measurement(1, IterationMode.Result, 5, 1, 1),
-                    new Measurement(1, IterationMode.Result, 6, 1, 1),
-                };
-            }
             return new BenchmarkReport(benchmark, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default(GcStats));
         }
 
@@ -103,6 +102,9 @@ namespace BenchmarkDotNet.Tests.Reports
 
             [Benchmark]
             public void Bar() { }
+
+            [Benchmark]
+            public void Foo() { }
         }
     }
 }
