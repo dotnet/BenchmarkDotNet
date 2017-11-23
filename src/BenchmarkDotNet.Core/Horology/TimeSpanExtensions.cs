@@ -19,9 +19,9 @@ namespace BenchmarkDotNet.Horology
         /// <returns></returns>
         public static string ToFormattedTotalTime(this TimeSpan time)
         {
-            var totalHours = time.Ticks / TimeSpan.TicksPerHour;
-            var hhMmSs = $"{totalHours:00}:{time:mm\\:ss}";
-            var totalSecs = $"{time.TotalSeconds.ToStr()} sec";
+            long totalHours = time.Ticks / TimeSpan.TicksPerHour;
+            string hhMmSs = $"{totalHours:00}:{time:mm\\:ss}";
+            string totalSecs = $"{time.TotalSeconds.ToStr()} sec";
             return $"{hhMmSs} ({totalSecs})";
         }
     }

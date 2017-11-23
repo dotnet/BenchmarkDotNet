@@ -36,15 +36,14 @@ namespace BenchmarkDotNet.Horology
             if (values.Length == 0)
                 return Nanosecond;
             // Use the largest unit to display the smallest recorded measurement without loss of precision.
-            var minValue = values.Min();
+            double minValue = values.Min();
             foreach (var timeUnit in All)
-            {
                 if (minValue < timeUnit.NanosecondAmount * 1000)
                     return timeUnit;
-            }
             return All.Last();
         }
 
-        public static double Convert(double value, TimeUnit from, TimeUnit to) => value * @from.NanosecondAmount / (to ?? GetBestTimeUnit(value)).NanosecondAmount;
+        public static double Convert(double value, TimeUnit from, TimeUnit to) =>
+            value * from.NanosecondAmount / (to ?? GetBestTimeUnit(value)).NanosecondAmount;
     }
 }
