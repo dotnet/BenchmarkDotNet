@@ -1,5 +1,5 @@
-﻿using JetBrains.Annotations;
-using BenchmarkDotNet.Extensions;
+﻿using BenchmarkDotNet.Extensions;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Horology
 {
@@ -7,14 +7,17 @@ namespace BenchmarkDotNet.Horology
     {
         public double Nanoseconds { get; }
 
-        public TimeInterval(double nanoseconds)
-        {
-            Nanoseconds = nanoseconds;
-        }
+        public TimeInterval(double nanoseconds) => Nanoseconds = nanoseconds;
 
-        public TimeInterval(double value, TimeUnit unit) : this(value * unit.NanosecondAmount)
-        {
-        }
+        public TimeInterval(double value, TimeUnit unit) : this(value * unit.NanosecondAmount) { }
+
+        public static readonly TimeInterval Nanosecond = TimeUnit.Nanosecond.ToInterval();
+        public static readonly TimeInterval Microsecond = TimeUnit.Microsecond.ToInterval();
+        public static readonly TimeInterval Millisecond = TimeUnit.Millisecond.ToInterval();
+        public static readonly TimeInterval Second = TimeUnit.Second.ToInterval();
+        public static readonly TimeInterval Minute = TimeUnit.Minute.ToInterval();
+        public static readonly TimeInterval Hour = TimeUnit.Hour.ToInterval();
+        public static readonly TimeInterval Day = TimeUnit.Day.ToInterval();
 
         [Pure] public Frequency ToFrequency() => new Frequency(Second / this);
 
@@ -26,31 +29,26 @@ namespace BenchmarkDotNet.Horology
         [Pure] public double ToHours() => this / Hour;
         [Pure] public double ToDays() => this / Day;
 
-        public static readonly TimeInterval Nanosecond = TimeUnit.Nanosecond.ToInterval();
-        public static readonly TimeInterval Microsecond = TimeUnit.Microsecond.ToInterval();
-        public static readonly TimeInterval Millisecond = TimeUnit.Millisecond.ToInterval();
-        public static readonly TimeInterval Second = TimeUnit.Second.ToInterval();
-        public static readonly TimeInterval Minute = TimeUnit.Minute.ToInterval();
-        public static readonly TimeInterval Hour = TimeUnit.Hour.ToInterval();
-        public static readonly TimeInterval Day = TimeUnit.Day.ToInterval();
+        [Pure] public static TimeInterval FromNanoseconds(double value) => Nanosecond * value;
+        [Pure] public static TimeInterval FromMicroseconds(double value) => Microsecond * value;
+        [Pure] public static TimeInterval FromMilliseconds(double value) => Millisecond * value;
+        [Pure] public static TimeInterval FromSeconds(double value) => Second * value;
+        [Pure] public static TimeInterval FromMinutes(double value) => Minute * value;
+        [Pure] public static TimeInterval FromHours(double value) => Hour * value;
+        [Pure] public static TimeInterval FromDays(double value) => Day * value;
 
-        public static TimeInterval FromNanoseconds(double value) => Nanosecond * value;
-        public static TimeInterval FromMicroseconds(double value) => Microsecond * value;
-        public static TimeInterval FromMilliseconds(double value) => Millisecond * value;
-        public static TimeInterval FromSeconds(double value) => Second * value;
-        public static TimeInterval FromMinutes(double value) => Minute * value;
-        public static TimeInterval FromHours(double value) => Hour * value;
-        public static TimeInterval FromDays(double value) => Day * value;
+        [Pure] public static double operator /(TimeInterval a, TimeInterval b) => 1.0 * a.Nanoseconds / b.Nanoseconds;
+        [Pure] public static TimeInterval operator /(TimeInterval a, double k) => new TimeInterval(a.Nanoseconds / k);
+        [Pure] public static TimeInterval operator /(TimeInterval a, int k) => new TimeInterval(a.Nanoseconds / k);
+        [Pure] public static TimeInterval operator *(TimeInterval a, double k) => new TimeInterval(a.Nanoseconds * k);
+        [Pure] public static TimeInterval operator *(TimeInterval a, int k) => new TimeInterval(a.Nanoseconds * k);
+        [Pure] public static TimeInterval operator *(double k, TimeInterval a) => new TimeInterval(a.Nanoseconds * k);
+        [Pure] public static TimeInterval operator *(int k, TimeInterval a) => new TimeInterval(a.Nanoseconds * k);
+        [Pure] public static bool operator <(TimeInterval a, TimeInterval b) => a.Nanoseconds < b.Nanoseconds;
+        [Pure] public static bool operator >(TimeInterval a, TimeInterval b) => a.Nanoseconds > b.Nanoseconds;
+        [Pure] public static bool operator <=(TimeInterval a, TimeInterval b) => a.Nanoseconds <= b.Nanoseconds;
+        [Pure] public static bool operator >=(TimeInterval a, TimeInterval b) => a.Nanoseconds >= b.Nanoseconds;
 
-        public static double operator /(TimeInterval a, TimeInterval b) => 1.0 * a.Nanoseconds / b.Nanoseconds;
-        public static TimeInterval operator /(TimeInterval a, double k) => new TimeInterval(a.Nanoseconds / k);
-        public static TimeInterval operator *(TimeInterval a, double k) => new TimeInterval(a.Nanoseconds * k);
-        public static TimeInterval operator *(double k, TimeInterval a) => new TimeInterval(a.Nanoseconds * k);
-        public static bool operator <(TimeInterval a, TimeInterval b) => a.Nanoseconds < b.Nanoseconds;
-        public static bool operator >(TimeInterval a, TimeInterval b) => a.Nanoseconds > b.Nanoseconds;
-        public static bool operator <=(TimeInterval a, TimeInterval b) => a.Nanoseconds <= b.Nanoseconds;
-        public static bool operator >=(TimeInterval a, TimeInterval b) => a.Nanoseconds >= b.Nanoseconds;
-
-        public override string ToString() => Nanoseconds.ToTimeStr();
+        [Pure] public override string ToString() => Nanoseconds.ToTimeStr();
     }
 }

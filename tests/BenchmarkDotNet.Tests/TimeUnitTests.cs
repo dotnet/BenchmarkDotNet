@@ -27,6 +27,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void GetBestTimeUnitTest()
         {
+            CheckGetBestTimeUnit(TimeUnit.Nanosecond);
             CheckGetBestTimeUnit(TimeUnit.Nanosecond, 1.0);
             CheckGetBestTimeUnit(TimeUnit.Nanosecond, 100.0);
             CheckGetBestTimeUnit(TimeUnit.Microsecond, 1.0 * 1000);
@@ -35,6 +36,7 @@ namespace BenchmarkDotNet.Tests
             CheckGetBestTimeUnit(TimeUnit.Millisecond, 100.0 * 1000 * 1000);
             CheckGetBestTimeUnit(TimeUnit.Second, 1.0 * 1000 * 1000 * 1000);
             CheckGetBestTimeUnit(TimeUnit.Second, 100.0 * 1000 * 1000 * 1000);
+            CheckGetBestTimeUnit(TimeUnit.Day, double.MaxValue);
         }
 
         private void CheckGetBestTimeUnit(TimeUnit timeUnit, params double[] values)
