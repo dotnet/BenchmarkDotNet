@@ -21,6 +21,8 @@ namespace BenchmarkDotNet.IntegrationTests
 #if NET46
     public class TailCallDiagnoserTests : BenchmarkTestExecutor
     {
+        private const string TAIL_CALL_MARK = "Tail call type";
+
         public TailCallDiagnoserTests(ITestOutputHelper outputHelper) : base(outputHelper)
         {
 
@@ -70,20 +72,24 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void TailCallDiagnoserCatchesTailCallEvents(Jit jit, Platform platform, Runtime runtime)
         {
-            var tailCallDiagnoser = new TailCallDiagnoser(false, true);
-            CanExecute<TailCallBenchmarks>(CreateConfig(jit, platform, runtime, tailCallDiagnoser));
-            var output = (LogCapture)(tailCallDiagnoser as EtwDiagnoser<object>).GetType().GetField("Logger", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(tailCallDiagnoser);
-            Assert.True(output.CapturedOutput.Where(x=>x.Text.Contains("Tail call type")).Count() > 0);
+            var output = Execute<TailCallBenchmarks>(jit, platform, runtime);
+            Assert.True(output.CapturedOutput.Where(x=>x.Text.Contains(TAIL_CALL_MARK)).Count() > 0);
         }
 
         [Theory, MemberData(nameof(GetJits))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void TailCallDiagnoserNotCatchesTailCallEvents(Jit jit, Platform platform, Runtime runtime)
         {
+            var output = Execute<NonTailCallBenchmarks>(jit, platform, runtime);
+            Assert.True(output.CapturedOutput.Where(x => x.Text.Contains(TAIL_CALL_MARK)).Count() == 0);
+        }
+
+        private LogCapture Execute<T>(Jit jit, Platform platform, Runtime runtime)
+        {
             var tailCallDiagnoser = new TailCallDiagnoser(false, true);
-            CanExecute<NonTailCallBenchmarks>(CreateConfig(jit, platform, runtime, tailCallDiagnoser));
+            CanExecute<T>(CreateConfig(jit, platform, runtime, tailCallDiagnoser));
             var output = (LogCapture)(tailCallDiagnoser as EtwDiagnoser<object>).GetType().GetField("Logger", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(tailCallDiagnoser);
-            Assert.True(output.CapturedOutput.Where(x => x.Text.Contains("Tail call type")).Count() == 0);
+            return output;
         }
 
         private IConfig CreateConfig(Jit jit, Platform platform, Runtime runtime, TailCallDiagnoser diagnoser) => ManualConfig.CreateEmpty()
