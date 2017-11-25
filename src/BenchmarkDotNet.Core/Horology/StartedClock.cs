@@ -2,18 +2,15 @@
 {
     public struct StartedClock
     {
-        public IClock Clock;
-        public long StartTimestamp;
+        private readonly IClock clock;
+        private readonly long startTimestamp;
 
         public StartedClock(IClock clock, long startTimestamp)
         {
-            Clock = clock;
-            StartTimestamp = startTimestamp;
+            this.clock = clock;
+            this.startTimestamp = startTimestamp;
         }
 
-        public ClockSpan Stop()
-        {
-            return new ClockSpan(StartTimestamp, Clock.GetTimestamp(), Clock.Frequency);
-        }
+        public ClockSpan GetElapsed() => new ClockSpan(startTimestamp, clock.GetTimestamp(), clock.Frequency);
     }
 }

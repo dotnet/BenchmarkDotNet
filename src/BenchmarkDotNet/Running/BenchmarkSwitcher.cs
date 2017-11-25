@@ -101,7 +101,7 @@ namespace BenchmarkDotNet.Running
             }
 #endif
 
-            var clockSpan = globalChronometer.Stop();
+            var clockSpan = globalChronometer.GetElapsed();
             BenchmarkRunnerCore.LogTotalTime(logger, clockSpan.GetTimeSpan(), "Global total time");
             return summaries;
         }

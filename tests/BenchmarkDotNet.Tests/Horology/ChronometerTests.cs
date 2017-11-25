@@ -9,10 +9,7 @@ namespace BenchmarkDotNet.Tests.Horology
     {
         private readonly ITestOutputHelper output;
 
-        public ChronometerTests(ITestOutputHelper output)
-        {
-            this.output = output;
-        }
+        public ChronometerTests(ITestOutputHelper output) => this.output = output;
 
         [Fact]
         public void HardwareTimerKindTest()

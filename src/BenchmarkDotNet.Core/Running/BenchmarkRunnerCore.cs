@@ -105,7 +105,7 @@ namespace BenchmarkDotNet.Running
 
                 logger.WriteLine();
             }
-            var clockSpan = globalChronometer.Stop();
+            var clockSpan = globalChronometer.GetElapsed();
 
             var summary = new Summary(title, reports, HostEnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), clockSpan.GetTimeSpan(), validationErrors);
 

@@ -155,7 +155,7 @@ namespace BenchmarkDotNet.Engines
             // Measure
             var clock = Clock.Start();
             action(invokeCount / unrollFactor);
-            var clockSpan = clock.Stop();
+            var clockSpan = clock.GetElapsed();
 
             IterationCleanupAction();
             GcCollect();

@@ -87,7 +87,15 @@ Task("FastTests")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
-        DotNetCoreTool("./tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj", "xunit", GetTestSettingsParameters());
+        string[] targetVersions = IsRunningOnWindows() ? 
+                new []{"net46", "netcoreapp1.1", "netcoreapp2.0"}
+                :
+                new []{"netcoreapp2.0"};
+
+        foreach(var version in targetVersions)
+        {
+            DotNetCoreTool("./tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj", "xunit", GetTestSettingsParameters(version));
+        }
     });
 
 Task("BackwardCompatibilityTests")
@@ -148,19 +156,14 @@ Task("Default")
 RunTarget(target);
 
 // HELPERS
-private string GetTestSettingsParameters(string tfm = null)
+private string GetTestSettingsParameters(string tfm)
 {
-    var settings = "-configuration Release -stoponfail -maxthreads unlimited -nobuild";
-
-    if (!IsRunningOnWindows())
+    var settings = $"-configuration Release -stoponfail -maxthreads unlimited -nobuild  -framework {tfm}";
+    if(string.Equals("netcoreapp2.0", tfm, StringComparison.OrdinalIgnoreCase))
     {
-        settings += " -framework netcoreapp2.0";
+        settings += " --fx-version 2.0.3";
     }
-    else if(!string.IsNullOrEmpty(tfm))
-    {
-        settings += $" -framework {tfm}";
-    }
-
+    
     return settings;
 }
 

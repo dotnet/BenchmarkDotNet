@@ -31,6 +31,13 @@ namespace BenchmarkDotNet.Helpers
         /// </summary>
         public static readonly Lazy<Dictionary<string, string>> Sysctl = LazyDic(RuntimeInformation.IsMacOSX, "sysctl", "-a", ':');
         
+        /// <summary>
+        /// Output of the `system_profiler SPSoftwareDataType` command.
+        /// MacOSX only.
+        /// </summary>
+        public static readonly Lazy<Dictionary<string, string>> MacSystemProfilerData = 
+            LazyDic(RuntimeInformation.IsMacOSX, "system_profiler", "SPSoftwareDataType", ':');
+
         private static Lazy<Dictionary<string, string>> LazyDic(Func<bool> isAvailable, string fileName, string arguments, char separator)
         {
             return new Lazy<Dictionary<string, string>>(() =>

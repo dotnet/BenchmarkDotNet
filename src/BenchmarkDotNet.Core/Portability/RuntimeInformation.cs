@@ -66,10 +66,21 @@ namespace BenchmarkDotNet.Portability
 
         internal static bool IsMono() => isMono;
 
-        internal static string GetOsVersion() => OsBrandStringHelper.Prettify(
-            Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem,
-            Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion,
-            GetWindowsUbr());
+        public static string GetOsVersion()
+        {
+            if (IsMacOSX())
+            {
+                string systemVersion = ExternalToolsHelper.MacSystemProfilerData.Value.GetValueOrDefault("System Version") ?? "";
+                string kernelVersion = ExternalToolsHelper.MacSystemProfilerData.Value.GetValueOrDefault("Kernel Version") ?? "";
+                if (!string.IsNullOrEmpty(systemVersion) && !string.IsNullOrEmpty(kernelVersion))
+                    return $"{systemVersion} [{kernelVersion}]";
+            }
+
+            return OsBrandStringHelper.Prettify(
+                Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem,
+                Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion,
+                GetWindowsUbr());
+        }
 
         // TODO: Introduce a common util API for registry calls, use it also in BenchmarkDotNet.Toolchains.CsProj.GetCurrentVersionBasedOnWindowsRegistry
         /// <summary>
