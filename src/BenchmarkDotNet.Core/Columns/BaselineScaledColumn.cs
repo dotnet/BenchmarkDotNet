@@ -87,7 +87,7 @@ namespace BenchmarkDotNet.Columns
             }
         }
 
-        public bool IsNonBaselinesPrecise (Summary summary, Statistics baselineStat, Benchmark benchmark)
+        public bool IsNonBaselinesPrecise(Summary summary, Statistics baselineStat, Benchmark benchmark)
         {
             var nonBaselines = summary.Benchmarks.
                         Where(b => b.Job.DisplayInfo == benchmark.Job.DisplayInfo).

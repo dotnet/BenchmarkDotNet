@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Jobs;
-using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -29,23 +28,26 @@ namespace BenchmarkDotNet.Tests.Reports
         }
 
         [Theory]
-        [InlineData(new int[] { 140, 1, 50 })]
-        [InlineData(new int[] { 40, 1, 20 })]
-        [InlineData(new int[] { 0, 1, 20 })]
+        [InlineData(new [] { 140, 1, 50 })]
+        [InlineData(new [] { 40, 1, 20 })]
+        [InlineData(new [] { 0, 1, 20 })]
         // First value is baseline, others are benchmark measurements
         public void ScaledPrecisionTestWithBaseline(int[] values)
         {
             var summary = CreateSummary(values);
             var scaledIndex = Array.FindIndex(summary.Table.FullHeader, c => c == "Scaled");
-            var testNameColumn = Array.FindIndex(summary.Table.FullHeader, c => c == "Method");
+
             foreach (var row in summary.Table.FullContent)
             {
-                // Check to see if scale value has a decimal point, otherwise its probably "?"
-                if (row[scaledIndex].Split('.').Count() > 0)
-                {
-                    // check precision of scaled column to be 2 or 3 decimal places
-                    Assert.Equal((1 / (double)values[0]) < 0.01 ? 3 : 2, row[scaledIndex].Split('.')[1].Length);
-                }
+                ContainsDecimalPointAndCheckDecimalPrecision(values, row[scaledIndex]);
+            }
+        }
+
+        private void ContainsDecimalPointAndCheckDecimalPrecision(int[] baseLineValues, string value)
+        {
+            if (value.Contains('.'))
+            {
+                Assert.Equal((1 / (double)baseLineValues[0]) < 0.01 ? 3 : 2, value.Split('.')[1].Length);
             }
         }
 
@@ -78,8 +80,7 @@ namespace BenchmarkDotNet.Tests.Reports
         {
             var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
             var executeResult = new ExecuteResult(true, 0, Array.Empty<string>(), Array.Empty<string>());
-            var measurements = new List<Measurement>();
-                measurements = new List<Measurement>
+            var measurements = new List<Measurement>
                 {
                     new Measurement(1, IterationMode.Result, 1, 1, measurementValue),
                     new Measurement(1, IterationMode.Result, 2, 1, measurementValue),
