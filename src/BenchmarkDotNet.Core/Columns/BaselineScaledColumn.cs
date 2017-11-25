@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Columns
             switch (Kind)
             {
                 case DiffKind.Mean:
-                    return mean.ToStr("N2");
+                    return IsNonBaselinesPrecise(summary, baselineStat, benchmark) ? mean.ToStr("N3") : mean.ToStr("N2");
                 case DiffKind.StdDev:
                     return stdDev.ToStr("N2");
                 case DiffKind.WelchTTestPValue:
@@ -85,6 +85,16 @@ namespace BenchmarkDotNet.Columns
                 default:
                     throw new NotSupportedException();
             }
+        }
+
+        public bool IsNonBaselinesPrecise(Summary summary, Statistics baselineStat, Benchmark benchmark)
+        {
+            var nonBaselines = summary.Benchmarks.
+                        Where(b => b.Job.DisplayInfo == benchmark.Job.DisplayInfo).
+                        Where(b => b.Parameters.DisplayInfo == benchmark.Parameters.DisplayInfo).
+                        Where(b => !b.Target.Baseline);
+
+            return nonBaselines.Any(x => Statistics.DivMean(summary[x].ResultStatistics, baselineStat) < 0.01);
         }
 
         public bool IsAvailable(Summary summary) => summary.Benchmarks.Any(b => b.Target.Baseline);
