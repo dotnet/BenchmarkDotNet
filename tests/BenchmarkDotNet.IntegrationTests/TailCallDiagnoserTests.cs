@@ -21,6 +21,7 @@ namespace BenchmarkDotNet.IntegrationTests
 #if NET46
     public class TailCallDiagnoserTests : BenchmarkTestExecutor
     {
+        private const string WindowsOnly = "Use JIT ETW Tail Call Event (Windows only)";
         private const string TAIL_CALL_MARK = "Tail call type";
 
         public TailCallDiagnoserTests(ITestOutputHelper outputHelper) : base(outputHelper)
@@ -67,8 +68,9 @@ namespace BenchmarkDotNet.IntegrationTests
                 return FactorialWithoutTailing(7);
             }
         }
-        
-        [Theory, MemberData(nameof(GetJits))]
+
+        [TheoryWindowsOnly(WindowsOnly)]
+        [MemberData(nameof(GetJits))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void TailCallDiagnoserCatchesTailCallEvents(Jit jit, Platform platform, Runtime runtime)
         {
@@ -76,7 +78,8 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.True(output.CapturedOutput.Where(x=>x.Text.Contains(TAIL_CALL_MARK)).Count() > 0);
         }
 
-        [Theory, MemberData(nameof(GetJits))]
+        [TheoryWindowsOnly(WindowsOnly)]
+        [MemberData(nameof(GetJits))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void TailCallDiagnoserNotCatchesTailCallEvents(Jit jit, Platform platform, Runtime runtime)
         {
@@ -93,7 +96,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         private IConfig CreateConfig(Jit jit, Platform platform, Runtime runtime, TailCallDiagnoser diagnoser) => ManualConfig.CreateEmpty()
-            .With(Job.ShortRun.With(jit).With(platform).With(runtime))
+            .With(Job.Dry.With(jit).With(platform).With(runtime))
             .With(DefaultConfig.Instance.GetLoggers().ToArray())
             .With(DefaultColumnProviders.Instance)
             .With(diagnoser)
