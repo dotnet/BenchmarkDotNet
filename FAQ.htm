@@ -175,7 +175,37 @@ For example, you can use the <code>SimpleJob</code> or <code>ShortRunJob</code> 
 <p><strong>Q</strong> Can I run benchmark on the virtual machine?<br />
 <strong>A</strong> Yes, of course. However, it can affect results because of the shared, physical machine, virtualization process and incorrect <code>Stopwatch.Frequency</code>. If you are unsure whether an application is running on virtual environment, use <code>EnvironmentAnalyser</code> to detect VM hypervisor.</p>
 </li>
+<li>
+<p><strong>Q</strong> I have failed to run my benchmarks, I am getting following errors about non-optimized dll. What can I do?  
+</p>
+</li>
 </ul>
+<pre class="nocode">Assembly BenchmarkDotNet.Samples which defines benchmarks references non-optimized BenchmarkDotNet
+        If you own this dependency, please, build it in RELEASE.
+        If you don't, you can create custom config with DontFailOnError to disable our custom policy and allow this b
+Assembly BenchmarkDotNet.Samples which defines benchmarks is non-optimized
+Benchmark was built without optimization enabled (most probably a DEBUG configuration). Please, build it in RELEASE.
+</pre><p><strong>A</strong> You should always run your benchmarks in RELEASE mode with optimizations enabled (default setting for RELEASE). However if you have to use non-optimized 3rd party assembly you have to create custom config to disable our default policy.</p>
+<pre><code class="cs">public class AllowNonOptimized : ManualConfig
+{
+    public AllowNonOptimized()
+    {
+        Add(JitOptimizationsValidator.DontFailOnError); // ALLOW NON-OPTIMIZED DLLS
+
+        Add(DefaultConfig.Instance.GetLoggers().ToArray()); // manual config has no loggers by default
+        Add(DefaultConfig.Instance.GetExporters().ToArray()); // manual config has no exporters by default
+        Add(DefaultConfig.Instance.GetColumnProviders().ToArray()); // manual config has no columns by default
+    }
+}
+</code></pre>
+
+<ul>
+<li><strong>Q</strong> I have failed to run my benchmarks from LINQPad. How can I fix this problem?  </li>
+</ul>
+<pre class="nocode">Assembly LINQPadQuery which defines benchmarks references non-optimized LINQPad
+Assembly LINQPadQuery which defines benchmarks is non-optimized
+Benchmark was built without optimization enabled (most probably a DEBUG configuration). Please, build it in RELEASE.
+</pre><p><strong>A</strong> You need to make sure that you are using <strong>AnyCPU</strong> 5.22.05+ build of LINQPad with optimizations enabled. To enable the optimizations you need to go to Preferences -&gt; Query and select <code>compile with /optimize+</code></p>
 
                     </div>
                 </div>
