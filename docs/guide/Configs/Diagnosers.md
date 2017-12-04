@@ -239,37 +239,30 @@ You need to use the `TailcallDiagnoser` attribute to configure it. The available
 * filterByNamespace : Track only the methods from declaring type's namespace. Set to false if you want to see all Jit tail events. True by default.
 
 ### Sample
+
 ```cs
-    [Diagnostics.Windows.Configs.TailCallDiagnoser]
-    [LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
-    public class Jit_TailCalling
-    {
-        [Benchmark]
-        public long Calc()
-        {
-            return FactorialWithoutTailing(7) - FactorialWithTailing(7);
-        }
+[Diagnostics.Windows.Configs.TailCallDiagnoser]
+[LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
+public class Jit_TailCalling
+{
+    [Benchmark]
+    public long Calc()
+        => FactorialWithoutTailing(7) - FactorialWithTailing(7);
 
-        private static long FactorialWithoutTailing(int depth)
-        {
-            return depth == 0 ? 1 : depth * FactorialWithoutTailing(depth - 1);
-        }
+    private static long FactorialWithoutTailing(int depth)
+        => depth == 0 ? 1 : depth * FactorialWithoutTailing(depth - 1);
 
-        private static long FactorialWithTailing(int pos, int depth)
-        {
-            return pos == 0 ? depth : FactorialWithTailing(pos - 1, depth * pos);
-        }
+    private static long FactorialWithTailing(int pos, int depth)
+        => pos == 0 ? depth : FactorialWithTailing(pos - 1, depth * pos);
 
-        private static long FactorialWithTailing(int depth)
-        {
-            return FactorialWithTailing(1, depth);
-        }
-    }
+    private static long FactorialWithTailing(int depth)
+        => FactorialWithTailing(1, depth);
+}
 ```
 
 ### The result
 
-#### the benchmarck results were omitted
+The benchmark results were omitted for brevity.
 
 ```
 // * Diagnostic Output - TailCallDiagnoser *
@@ -290,8 +283,7 @@ Caller: <null>.<null> - <null>
 Callee: BenchmarkDotNet.Samples.JIT.Jit_TailCalling.FactorialWithTailing - int64  (int32,int32)
 Tail prefix: False
 Tail call type: RecursiveLoop
---------------------
-
+-------------------
 ```
 
 ### Restrictions
