@@ -6,6 +6,7 @@ The current Diagnosers are:
 
 - GC and Memory Allocation (`MemoryDiagnoser`) which is cross platform, built-in and **is not enabled by default anymore**. Please see Adam Sitnik's [blog post](http://adamsitnik.com/the-new-Memory-Diagnoser/) for all the details.
 - JIT Inlining Events (`InliningDiagnoser`). You can find this diagnoser in a separated package with diagnosers for Windows (`BenchmarkDotNet.Diagnostics.Windows`): [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/)
+- JIT Tail Call Events (`TailCallDiagnoser`). You can find this diagnoser as well as the (`InliningDiagnoser`) in a separated package with diagnosers for Windows (`BenchmarkDotNet.Diagnostics.Windows`): [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/) Please see [this post](https://georgeplotnikov.github.io/articles/tale-tail-call-dotnet) for all the details.
 - Hardware Counter Diagnoser. You can find this diagnoser in a separated package with diagnosers for Windows (`BenchmarkDotNet.Diagnostics.Windows`): [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/).  Please see Adam Sitnik's [blog post](http://adamsitnik.com/Hardware-Counters-Diagnoser/) for all the details.
 - Disassembly Diagnoser. It allows you to disassemble the benchmarked code to asm, IL and C#/F#. Please see Adam Sitnik's [blog post](http://adamsitnik.com/Disassembly-Diagnoser/) for all the details.
 
@@ -37,6 +38,7 @@ You can also use one of the following attributes (apply it on a class that conta
 ```cs
 [MemoryDiagnoser]
 [InliningDiagnoser]
+[TailCallDiagnoser]
 ```
 
 In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on.
@@ -228,3 +230,71 @@ The disassembly result can be obtained [here](http://adamsitnik.com/files/disasm
 <DebugType>pdbonly</DebugType>
 <DebugSymbols>true</DebugSymbols>
 ```
+
+## Tailcall Diagnoser
+
+You need to use the `TailcallDiagnoser` attribute to configure it. The available options are:
+
+* logFailuresOnly: Track only the methods that failed to get tail called. True by default.
+* filterByNamespace : Track only the methods from declaring type's namespace. Set to false if you want to see all Jit tail events. True by default.
+
+### Sample
+```cs
+    [Diagnostics.Windows.Configs.TailCallDiagnoser]
+    [LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
+    public class Jit_TailCalling
+    {
+        [Benchmark]
+        public long Calc()
+        {
+            return FactorialWithoutTailing(7) - FactorialWithTailing(7);
+        }
+
+        private static long FactorialWithoutTailing(int depth)
+        {
+            return depth == 0 ? 1 : depth * FactorialWithoutTailing(depth - 1);
+        }
+
+        private static long FactorialWithTailing(int pos, int depth)
+        {
+            return pos == 0 ? depth : FactorialWithTailing(pos - 1, depth * pos);
+        }
+
+        private static long FactorialWithTailing(int depth)
+        {
+            return FactorialWithTailing(1, depth);
+        }
+    }
+```
+
+### The result
+
+#### the benchmarck results were omitted
+
+```
+// * Diagnostic Output - TailCallDiagnoser *
+--------------------
+
+--------------------
+Jit_TailCalling.Calc: LegacyJitX64(Jit=LegacyJit, Platform=X64, Runtime=Clr)
+--------------------
+
+--------------------
+Jit_TailCalling.Calc: LegacyJitX86(Jit=LegacyJit, Platform=X86, Runtime=Clr)
+--------------------
+
+--------------------
+Jit_TailCalling.Calc: RyuJitX64(Jit=RyuJit, Platform=X64)
+--------------------
+Caller: <null>.<null> - <null>
+Callee: BenchmarkDotNet.Samples.JIT.Jit_TailCalling.FactorialWithTailing - int64  (int32,int32)
+Tail prefix: False
+Tail call type: RecursiveLoop
+--------------------
+
+```
+
+### Restrictions
+
+* Windows only
+* x64
