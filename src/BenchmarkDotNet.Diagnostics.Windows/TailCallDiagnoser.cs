@@ -2,36 +2,35 @@
 using BenchmarkDotNet.Running;
 using Microsoft.Diagnostics.Tracing.Session;
 using BenchmarkDotNet.Loggers;
-using System;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
-    //See https://blogs.msdn.microsoft.com/clrcodegeneration/2009/05/11/jit-etw-tracing-in-net-framework-4/
+    /// <summary>
+    /// See <see href="https://blogs.msdn.microsoft.com/clrcodegeneration/2009/05/11/jit-etw-tracing-in-net-framework-4/">MSDN blog post about JIT tracing events</see>
+    /// and <see href="https://georgeplotnikov.github.io/articles/tale-tail-call-dotnet">detailed blog post by George Plotnikov</see> for more info
+    /// </summary>
     public class TailCallDiagnoser : JitDiagnoser
     {
         private static readonly string LogSeparator = new string('-', 20);
-        public const string DiagnoserId = nameof(TailCallDiagnoser);
-        public override IEnumerable<string> Ids => new[] { DiagnoserId };
 
         private readonly bool logFailuresOnly = true;
         private readonly bool filterByNamespace = true;
         private string expectedNamespace;
 
-        public TailCallDiagnoser()
-        {
-
-        }
+        public TailCallDiagnoser() { }
 
         /// <summary>
         /// creates the new TailCallDiagnoser instance
         /// </summary>
         /// <param name="logFailuresOnly">only the methods that failed to get tail called. True by default.</param>
         /// <param name="filterByNamespace">only the methods from declaring type's namespace. Set to false if you want to see all Jit tail events. True by default.</param>
-        public TailCallDiagnoser(bool logFailuresOnly, bool filterByNamespace)
+        public TailCallDiagnoser(bool logFailuresOnly = true, bool filterByNamespace = true)
         {
             this.logFailuresOnly = logFailuresOnly;
             this.filterByNamespace = filterByNamespace;
         }
+
+        public override IEnumerable<string> Ids => new[] { nameof(TailCallDiagnoser) };
 
         protected override void AttachToEvents(TraceEventSession traceEventSession, Benchmark benchmark)
         {
@@ -71,7 +70,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             };
         }
 
-        private bool ShouldPrintEventInfo(string callerNamespace, string calleeNamespace) => 
+        private bool ShouldPrintEventInfo(string callerNamespace, string calleeNamespace) =>
             !filterByNamespace
                     || (!string.IsNullOrEmpty(callerNamespace) && callerNamespace.StartsWith(expectedNamespace))
                     || (!string.IsNullOrEmpty(calleeNamespace) && calleeNamespace.StartsWith(expectedNamespace));
