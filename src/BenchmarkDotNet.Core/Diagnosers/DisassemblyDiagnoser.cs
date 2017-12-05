@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IReadOnlyDictionary<Benchmark, DisassemblyResult> Results => results;
         public IEnumerable<string> Ids => new[] { nameof(DisassemblyDiagnoser) };
-        public IEnumerable<IExporter> Exporters => new IExporter[] { new CombinedDisassemblyExporter(Results), new SingleDisassemblyExporter(Results) };
+        public IEnumerable<IExporter> Exporters => new IExporter[] { new CombinedDisassemblyExporter(Results), new RawDisassemblyExporter(Results), new PrettyDisassemblyExporter(Results)  };
 
         public IColumnProvider GetColumnProvider() => EmptyColumnProvider.Instance;
         public void BeforeAnythingElse(DiagnoserActionParameters parameters) { }

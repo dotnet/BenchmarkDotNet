@@ -59,5 +59,10 @@ namespace BenchmarkDotNet.Diagnosers
     {
         public DisassembledMethod[] Methods { get; set; }
     }
+
+    public static class Errors
+    {
+        public const string NotManagedMethod = "not managed method";
+    }
 }
 #pragma warning restore CS3003 // Type is not CLS-compliant

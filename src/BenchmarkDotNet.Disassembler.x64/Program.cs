@@ -310,7 +310,7 @@ namespace BenchmarkDotNet.Disassembler
             var method = state.Runtime.GetMethodByAddress(address);
 
             if (method == null) // not managed method
-                return "not managed method";
+                return Errors.NotManagedMethod;
 
             if (!state.HandledMetadataTokens.Contains(method.MetadataToken))
                 state.Todo.Enqueue(new MethodInfo(method, depth + 1));
