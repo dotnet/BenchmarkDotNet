@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Environments;
+﻿using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
@@ -76,6 +76,19 @@ namespace BenchmarkDotNet.Exporters
             logger.Write("</tbody>");
 
             logger.WriteLine("</table>");
+        }
+
+        public void PrintLine(SummaryTable table, string[] line, ILogger logger, string leftDel, string rightDel)
+        {
+            for (int columnIndex = 0; columnIndex < table.ColumnCount; columnIndex++)
+            {
+                if (table.Columns[columnIndex].NeedToShow)
+                {
+                    logger.WriteStatistic(leftDel + line[columnIndex].HtmlEncode() + rightDel);
+                }
+            }
+
+            logger.WriteLine();
         }
     }
 }
