@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Exporters
             foreach (var line in table.FullContent)
             {
                 logger.Write("<tr>");
-                table.PrintLine(line, logger, "<td>", "</td>");
+                PrintLine(table, line, logger, "<td>", "</td>");
                 logger.Write("</tr>");
             }
             logger.Write("</tbody>");
