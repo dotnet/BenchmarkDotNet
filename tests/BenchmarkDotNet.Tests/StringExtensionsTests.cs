@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Tests
             string expectedHtml = "&lt;&#39;&gt;&quot;&amp;shouldntchange";
             string html = "<'>\"&shouldntchange";
 
-            Assert.Equal(html.HtmlEncode(), expectedHtml);
+            Assert.Equal(expectedHtml, html.HtmlEncode());
         }
     }
 }

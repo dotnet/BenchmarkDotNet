@@ -102,8 +102,7 @@ namespace BenchmarkDotNet.Extensions
 
             StringBuilder sb = new StringBuilder(s.Length);
 
-            int len = s.Length;
-            for (int i = 0; i < len; i++)
+            for (int i = 0; i < s.Length; i++)
             {
                 switch (s[i])
                 {

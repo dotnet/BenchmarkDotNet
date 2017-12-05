@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Exporters
             logger.WriteLine("</table>");
         }
 
-        public void PrintLine(SummaryTable table, string[] line, ILogger logger, string leftDel, string rightDel)
+        private void PrintLine(SummaryTable table, string[] line, ILogger logger, string leftDel, string rightDel)
         {
             for (int columnIndex = 0; columnIndex < table.ColumnCount; columnIndex++)
             {
