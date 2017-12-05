@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,16 +9,13 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Exporters
 {
-    public class SingleDisassemblyExporter : IExporter
+    public class RawDisassemblyExporter : IExporter
     {
         private readonly IReadOnlyDictionary<Benchmark, DisassemblyResult> results;
 
-        public SingleDisassemblyExporter(IReadOnlyDictionary<Benchmark, DisassemblyResult> results)
-        {
-            this.results = results;
-        }
+        public RawDisassemblyExporter(IReadOnlyDictionary<Benchmark, DisassemblyResult> results) => this.results = results;
 
-        public string Name => nameof(SingleDisassemblyExporter);
+        public string Name => nameof(RawDisassemblyExporter);
 
         public void ExportToLog(Summary summary, ILogger logger) { }
 
@@ -30,7 +26,7 @@ namespace BenchmarkDotNet.Exporters
 
         private string Export(Summary summary, Benchmark benchmark)
         {
-            var filePath = $"{Path.Combine(summary.ResultsDirectoryPath, benchmark.FolderInfo)}-asm.html";
+            var filePath = $"{Path.Combine(summary.ResultsDirectoryPath, benchmark.FolderInfo)}-asm.raw.html";
             if (File.Exists(filePath))
                 File.Delete(filePath);
 

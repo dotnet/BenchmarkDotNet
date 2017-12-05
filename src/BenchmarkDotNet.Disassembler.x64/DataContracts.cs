@@ -68,4 +68,9 @@ namespace BenchmarkDotNet.Disassembler
     {
         public DisassembledMethod[] Methods { get; set; }
     }
+
+    public static class Errors
+    {
+        public const string NotManagedMethod = "not managed method";
+    }
 }
