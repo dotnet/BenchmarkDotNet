@@ -5,7 +5,6 @@ open System.IO
 open System.Collections.Concurrent
 open BenchmarkDotNet.Attributes
 open BenchmarkDotNet.Running
-open BenchmarkDotNet.Diagnostics.Windows.Configs;
 
 let getStrings len = Array.init len (fun _ -> Path.GetRandomFileName())
 
@@ -35,7 +34,9 @@ type StringKeyComparison () =
     [<Benchmark>]
     member self.OrdinalLookup () = lookup arr dict2
 
-[<TailCallDiagnoser>]
+#if !NETCOREAPP2_0
+[<BenchmarkDotNet.Diagnostics.Windows.Configs.TailCallDiagnoser>]
+#endif
 type TailCallDetector () =
     
     let rec factorial n =
