@@ -30,7 +30,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   
-  <PropertyGroup>
+  <PropertyGroup Condition=" '$(IsVisualBasic)' != 'true' ">
     <Major>0</Major>
     <Minor>10</Minor>
     <Revision>11</Revision>
