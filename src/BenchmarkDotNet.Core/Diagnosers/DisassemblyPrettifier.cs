@@ -10,46 +10,55 @@ namespace BenchmarkDotNet.Diagnosers
         {
             internal string TextRepresentation { get; }
 
-            public Element(string textRepresentation) => TextRepresentation = textRepresentation;
+            internal Code Source { get; }
+
+            public Element(string textRepresentation, Code source)
+            {
+                TextRepresentation = textRepresentation;
+                Source = source;
+            }
         }
 
         internal class Reference : Element
         {
             internal string Id { get; }
 
-            public Reference(string textRepresentation, string id) : base(textRepresentation) => Id = id;
+            public Reference(string textRepresentation, string id, Code source) : base(textRepresentation, source) => Id = id;
         }
 
         internal class Label : Element
         {
             internal string Id { get; }
 
-            public Label(string textRepresentation, string id) : base(textRepresentation) => Id = id;
+            public Label(string textRepresentation, string id) : base(textRepresentation, null) => Id = id;
         }
 
         internal static IReadOnlyList<Element> Prettify(DisassembledMethod method, string labelPrefix)
         {
-            var parsed = method.Maps.SelectMany(map => map.Instructions.OfType<Asm>().Select(Parse)).ToArray();
+            var parsed = method.Maps.SelectMany(map => map.Instructions.Select(Parse)).ToArray();
 
             // if somebody is using given address as arugment, the address is "used" and should have it's own label
-            var usedAddresses = new HashSet<string>(parsed
+            var usedArguments = new HashSet<string>(parsed
                 .Select(
                     a => string.IsNullOrEmpty(a.extraArguments)
                         ? a.arguments
                         : a.extraArguments)
-                .Where(a => !string.IsNullOrEmpty(a)).Distinct());
+                .Where(arguments => !string.IsNullOrEmpty(arguments)).Distinct());
 
             var addressesToLabels = new Dictionary<string, string>();
-            var prettified = new List<Element>();
-
             int currentLabelIndex = 0;
             foreach (var instruction in parsed)
-                if (usedAddresses.Contains(instruction.address) && !addressesToLabels.ContainsKey(instruction.address))
+                if (usedArguments.Contains(instruction.address) && !addressesToLabels.ContainsKey(instruction.address))
                     addressesToLabels.Add(instruction.address, $"{labelPrefix}_L{currentLabelIndex++:00}");
 
-            for (int i = 0; i < parsed.Length; i++)
+            var prettified = new List<Element>();
+            foreach (var instruction in parsed)
             {
-                var instruction = parsed[i];
+                if (!(instruction.source is Asm))
+                {
+                    prettified.Add(new Element(instruction.source.TextRepresentation, instruction.source));
+                    continue;
+                }
 
                 if (addressesToLabels.TryGetValue(instruction.address, out var label))
                     prettified.Add(new Label(label, label));
@@ -59,32 +68,22 @@ namespace BenchmarkDotNet.Diagnosers
                     : instruction.extraArguments;
 
                 if (addressesToLabels.TryGetValue(argument, out var reference)) // it's sth like 00007ff7`ffbfd320 7cba jl      00007ff7`ffbfd2dc
-                    prettified.Add(new Reference($"{PadRight(instruction.instruction)} {reference}", reference));
+                    prettified.Add(new Reference($"{PadRight(instruction.instruction)} {reference}", reference, instruction.source));
                 else if (!string.IsNullOrEmpty(instruction.extraArguments) && !instruction.extraArguments.StartsWith("("))
-                    prettified.Add(new Element($"{PadRight(instruction.instruction)} {instruction.arguments} {WithoutAddress(instruction.extraArguments)}"));
+                    prettified.Add(new Element($"{PadRight(instruction.instruction)} {instruction.arguments} {WithoutAddress(instruction.extraArguments)}", instruction.source));
                 else if (!string.IsNullOrEmpty(instruction.arguments))
-                    prettified.Add(new Element($"{PadRight(instruction.instruction)} {instruction.arguments}"));
+                    prettified.Add(new Element($"{PadRight(instruction.instruction)} {instruction.arguments}", instruction.source));
                 else // sth like "ret"
-                    prettified.Add(new Element(instruction.instruction));
+                    prettified.Add(new Element(instruction.instruction, instruction.source));
             }
 
             return prettified;
         }
 
-        private static (string address, string byteRepresentation, string instruction, string arguments, string extraArguments) Parse(Asm asm)
+        private static (Code source, string address, string byteRepresentation, string instruction, string arguments, string extraArguments) Parse(Code code)
         {
-            string NextWord(string text, ref int index)
-            {
-                var buffer = new StringBuilder();
-
-                while (index < text.Length && !char.IsWhiteSpace(text[index]))
-                    buffer.Append(text[index++]);
-
-                while (index < text.Length && char.IsWhiteSpace(text[index]))
-                    ++index; // ignore next whitespaces
-
-                return buffer.ToString();
-            }
+            if (!(code is Asm asm))
+                return (code, null, null, null, null, null);
 
             int i = 0;
 
@@ -96,7 +95,7 @@ namespace BenchmarkDotNet.Diagnosers
             // 00007ff7`ffbfd320 7cba jl      00007ff7`ffbfd2dc
             // 
             // so it's always something like
-            // address byteRepresentation instruction   arguments [methodName]
+            // address byteRepresentation instruction   [arguments] [extraArguments]
             string address = NextWord(asm.TextRepresentation, ref i);
             string byteRepresentation = NextWord(asm.TextRepresentation, ref i);
             string instruction = NextWord(asm.TextRepresentation, ref i);
@@ -105,7 +104,7 @@ namespace BenchmarkDotNet.Diagnosers
             // call    System_Private_CoreLib+0x577460 (00007ff8`59ae7460)
             // and we can not get managed method for this address
             if (!string.IsNullOrEmpty(asm.Comment) && asm.Comment != Errors.NotManagedMethod)
-                return (address, byteRepresentation, instruction, asm.Comment, null);
+                return (asm, address, byteRepresentation, instruction, asm.Comment, null);
 
             string arguments = NextWord(asm.TextRepresentation, ref i);
             string extraArguments =
@@ -113,7 +112,20 @@ namespace BenchmarkDotNet.Diagnosers
                     ? asm.TextRepresentation.Substring(startIndex: i).Trim()
                     : null;
 
-            return (address, byteRepresentation, instruction, arguments, extraArguments);
+            return (asm, address, byteRepresentation, instruction, arguments, extraArguments);
+        }
+
+        private static string NextWord(string text, ref int index)
+        {
+            var buffer = new StringBuilder();
+
+            while (index < text.Length && !char.IsWhiteSpace(text[index]))
+                buffer.Append(text[index++]);
+
+            while (index < text.Length && char.IsWhiteSpace(text[index]))
+                ++index; // ignore next whitespaces
+
+            return buffer.ToString();
         }
 
         private static string PadRight(string instruction)
