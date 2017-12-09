@@ -153,5 +153,42 @@ namespace BenchmarkDotNet.Tests
                 Assert.Equal(expectedOutput[i], prettyOutput[i].TextRepresentation);
         }
 
+        [Fact]
+        public void CallInsideMethodCanBePrettifiedToo()
+        {
+            var method = new DisassembledMethod
+            {
+                Maps = new[]
+                {
+                    new Map
+                    {
+                        Instructions = new Diagnosers.Code[]
+                        {
+                            new Asm { TextRepresentation = "00007ffe`2f9bd341 e828000000      call    00007ffe`2f9bd36e" },
+                            new Asm { TextRepresentation = "00007ffe`2f9bd346 90              nop" },
+                            new Asm { TextRepresentation = "00007ffe`2f9bd36c 5d              pop     rbp" },
+                            new Asm { TextRepresentation = "00007ffe`2f9bd36d c3              ret" },
+                            new Asm { TextRepresentation = "00007ffe`2f9bd36e 55              push    rbp" }
+                        }
+                    }
+                },
+                Name = "Test"
+            };
+
+            var expectedOutput = new[] {
+                "call    M00_L00",
+                "nop",
+                "pop     rbp",
+                "ret",
+
+                "M00_L00",
+                "push    rbp"
+            };
+
+            var prettyOutput = DisassemblyPrettifier.Prettify(method, "M00");
+
+            for (int i = 0; i < expectedOutput.Length; i++)
+                Assert.Equal(expectedOutput[i], prettyOutput[i].TextRepresentation);
+        }
     }
 }
