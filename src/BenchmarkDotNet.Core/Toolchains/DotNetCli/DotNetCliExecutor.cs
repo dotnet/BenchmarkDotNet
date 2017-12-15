@@ -59,7 +59,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             var startInfo = DotNetCliCommandExecutor.BuildStartInfo(
                 CustomDotNetCliPath,
                 artifactsPaths.BinariesDirectoryPath,
-                BuildArgs(diagnoser, executableName));
+                BuildArgs(diagnoser, executableName),
+                redirectStandardInput: true);
 
             startInfo.SetEnvironmentVariables(benchmark, resolver);
 

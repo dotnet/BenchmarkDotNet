@@ -94,8 +94,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
                 engine.PreAllocate();
 
+                globalSetupAction.InvokeSingle();
+                iterationSetupAction.InvokeSingle();
+
                 if (job.ResolveValue(RunMode.RunStrategyCharacteristic, EngineResolver.Instance).NeedsJitting())
                     engine.Jitting(); // does first call to main action, must be executed after setup()!
+
+                iterationCleanupAction.InvokeSingle();
 
                 var results = engine.Run();
 

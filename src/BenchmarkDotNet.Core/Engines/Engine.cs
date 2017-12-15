@@ -90,9 +90,6 @@ namespace BenchmarkDotNet.Engines
 
         public void Jitting()
         {
-            GlobalSetupAction?.Invoke();
-            IterationSetupAction?.Invoke();
-
             // first signal about jitting is raised from auto-generated Program.cs, look at BenchmarkProgram.txt
             Dummy1Action.Invoke();
             MainAction.Invoke(1);
@@ -100,8 +97,6 @@ namespace BenchmarkDotNet.Engines
             IdleAction.Invoke(1);
             Dummy3Action.Invoke();
             isJitted = true;
-
-            IterationCleanupAction?.Invoke();
         }
 
         public RunResults Run()
