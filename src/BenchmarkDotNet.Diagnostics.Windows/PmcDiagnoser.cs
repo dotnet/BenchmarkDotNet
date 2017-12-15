@@ -63,12 +63,12 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 Stop();
         }
 
-        public void ProcessResults(Benchmark benchmark, BenchmarkReport report)
+        public void ProcessResults(DiagnoserResults results)
         {
-            var processId = BenchmarkToProcess[benchmark];
+            var processId = BenchmarkToProcess[results.Benchmark];
             var stats = StatsPerProcess[processId];
-            stats.TotalOperations = report.AllMeasurements.Where(measurement => !measurement.IterationMode.IsIdle()).Sum(m => m.Operations);
-            results.Add(benchmark, stats);
+            stats.TotalOperations = results.TotalOperations;
+            this.results.Add(results.Benchmark, stats);
         }
 
         public void DisplayResults(ILogger logger) { }

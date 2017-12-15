@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Diagnosers
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
         public IColumnProvider GetColumnProvider() => EmptyColumnProvider.Instance;
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
-        public void ProcessResults(Benchmark benchmark, BenchmarkReport report) { }
+        public void ProcessResults(DiagnoserResults results) { }
 
         public void DisplayResults(ILogger logger) => logger.WriteLineError(GetErrorMessage());
 

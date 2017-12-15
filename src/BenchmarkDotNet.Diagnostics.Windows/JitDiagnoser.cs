@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 Stop();
         }
 
-        public virtual void ProcessResults(Benchmark benchmark, BenchmarkReport report) { }
+        public virtual void ProcessResults(DiagnoserResults results) { }
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Enumerable.Empty<ValidationError>();
 

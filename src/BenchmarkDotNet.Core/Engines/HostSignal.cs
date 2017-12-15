@@ -20,6 +20,11 @@
         /// <summary>
         /// after all (the last thing the benchmarking engine does is to fire this signal)
         /// </summary>
-        AfterAll
+        AfterAll,
+
+        /// <summary>
+        /// used to run some code independent to the benchmarked process
+        /// </summary>
+        SeparateLogic
     }
 }

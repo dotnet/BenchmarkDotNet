@@ -44,6 +44,7 @@ namespace BenchmarkDotNet.Diagnosers
             };
 
         public IColumnProvider GetColumnProvider() => EmptyColumnProvider.Instance;
+        public void ProcessResults(DiagnoserResults _) { }
 
         public RunMode GetRunMode(Benchmark benchmark)
         {
@@ -57,16 +58,11 @@ namespace BenchmarkDotNet.Diagnosers
 
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {
-            if (signal == HostSignal.AfterAll && ShouldUseWindowsDissasembler(parameters.Benchmark))
-                results.Add(
-                    parameters.Benchmark,
-                    windowsDisassembler.Dissasemble(parameters));
-        }
+            var benchmark = parameters.Benchmark;
 
-        // no need to run benchmarks once again, just do this after all runs
-        public void ProcessResults(Benchmark benchmark, BenchmarkReport report)
-        {
-            if (ShouldUseMonoDisassembler(benchmark))
+            if (signal == HostSignal.AfterAll && ShouldUseWindowsDissasembler(benchmark))
+                results.Add(benchmark, windowsDisassembler.Dissasemble(parameters));
+            else if (signal == HostSignal.SeparateLogic && ShouldUseMonoDisassembler(benchmark))
                 results.Add(benchmark, monoDisassembler.Disassemble(benchmark, benchmark.Job.Env.Runtime as MonoRuntime));
         }
 

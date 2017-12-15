@@ -5,6 +5,7 @@ using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
@@ -20,6 +21,7 @@ using BenchmarkDotNet.Toolchains.InProcess;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
+using RunMode = BenchmarkDotNet.Jobs.RunMode;
 
 namespace BenchmarkDotNet.Running
 {
@@ -211,7 +213,7 @@ namespace BenchmarkDotNet.Running
                 if (!buildResult.IsBuildSuccess)
                     return new BenchmarkReport(benchmark, generateResult, buildResult, null, null, default(GcStats));
 
-                var executeResults = Execute(logger, benchmark, toolchain, buildResult, config, resolver, out GcStats gcStats);
+                var (executeResults, gcStats) = Execute(logger, benchmark, toolchain, buildResult, config, resolver);
 
                 var runs = new List<Measurement>();
 
@@ -276,10 +278,11 @@ namespace BenchmarkDotNet.Running
             return buildResult;
         }
 
-        private static List<ExecuteResult> Execute(ILogger logger, Benchmark benchmark, IToolchain toolchain, BuildResult buildResult, IConfig config, IResolver resolver, out GcStats gcStats)
+        private static (List<ExecuteResult> executeResults, GcStats gcStats) Execute(
+            ILogger logger, Benchmark benchmark, IToolchain toolchain, BuildResult buildResult, IConfig config, IResolver resolver)
         {
             var executeResults = new List<ExecuteResult>();
-            gcStats = default(GcStats);
+            var gcStats = default(GcStats);
 
             logger.WriteLineInfo("// *** Execute ***");
             bool analyzeRunToRunVariance = benchmark.Job.ResolveValue(AccuracyMode.AnalyzeLaunchVarianceCharacteristic, resolver);
@@ -289,30 +292,39 @@ namespace BenchmarkDotNet.Running
                 1,
                 autoLaunchCount ? defaultValue : benchmark.Job.Run.LaunchCount);
 
-            for (int launchIndex = 0; launchIndex < launchCount; launchIndex++)
+            var noOverheadCompositeDiagnoser = config.GetCompositeDiagnoser(benchmark, Diagnosers.RunMode.NoOverhead);
+
+            for (int launchIndex = 1; launchIndex <= launchCount; launchIndex++)
             {
-                string printedLaunchCount = (analyzeRunToRunVariance &&
-                    autoLaunchCount &&
-                    launchIndex < 2)
+                string printedLaunchCount = (analyzeRunToRunVariance && autoLaunchCount && launchIndex <= 2)
                     ? ""
                     : " / " + launchCount;
-                logger.WriteLineInfo($"// Launch: {launchIndex + 1}{printedLaunchCount}");
+                logger.WriteLineInfo($"// Launch: {launchIndex}{printedLaunchCount}");
 
-                var noOverheadDiagnoser = config.GetCompositeDiagnoser(benchmark, Diagnosers.RunMode.NoOverhead);
+                // use diagnoser only for the last run (we need single result, not many)
+                bool useDiagnoser = launchIndex == launchCount && noOverheadCompositeDiagnoser != null;
+
                 var executeResult = toolchain.Executor.Execute(
-                    new ExecuteParameters(buildResult, benchmark, logger, resolver, config, noOverheadDiagnoser));
+                    new ExecuteParameters(
+                        buildResult,
+                        benchmark,
+                        logger,
+                        resolver,
+                        config,
+                        useDiagnoser ? noOverheadCompositeDiagnoser : null));
 
                 if (!executeResult.FoundExecutable)
                     logger.WriteLineError($"Executable {buildResult.ArtifactsPaths.ExecutablePath} not found");
                 if (executeResult.ExitCode != 0)
                     logger.WriteLineError("ExitCode != 0");
+
                 executeResults.Add(executeResult);
 
                 var measurements = executeResults
-                        .SelectMany(r => r.Data)
-                        .Select(line => Measurement.Parse(logger, line, 0))
-                        .Where(r => r.IterationMode != IterationMode.Unknown)
-                        .ToArray();
+                    .SelectMany(r => r.Data)
+                    .Select(line => Measurement.Parse(logger, line, 0))
+                    .Where(r => r.IterationMode != IterationMode.Unknown)
+                    .ToArray();
 
                 if (!measurements.Any())
                 {
@@ -321,7 +333,15 @@ namespace BenchmarkDotNet.Running
                     break;
                 }
 
-                if (autoLaunchCount && launchIndex == 1 && analyzeRunToRunVariance)
+                if (useDiagnoser)
+                {
+                    gcStats = GcStats.Parse(executeResult.Data.Last());
+
+                    noOverheadCompositeDiagnoser.ProcessResults(
+                        new DiagnoserResults(benchmark, measurements.Where(measurement => !measurement.IterationMode.IsIdle()).Sum(m => m.Operations), gcStats));
+                }
+
+                if (autoLaunchCount && launchIndex == 2 && analyzeRunToRunVariance)
                 {
                     // TODO: improve this logic
                     var idleApprox = new Statistics(measurements.Where(m => m.IterationMode == IterationMode.IdleTarget).Select(m => m.Nanoseconds)).Median;
@@ -333,32 +353,34 @@ namespace BenchmarkDotNet.Running
             logger.WriteLine();
 
             // Do a "Diagnostic" run, but DISCARD the results, so that the overhead of Diagnostics doesn't skew the overall results
-            if (config.GetDiagnosers().Any(diagnoser => diagnoser.GetRunMode(benchmark) == Diagnosers.RunMode.ExtraRun))
+            var extraRunCompositeDiagnoser = config.GetCompositeDiagnoser(benchmark, Diagnosers.RunMode.ExtraRun);
+            if (extraRunCompositeDiagnoser != null)
             {
                 logger.WriteLineInfo("// Run, Diagnostic");
-                var compositeDiagnoser = config.GetCompositeDiagnoser(benchmark, Diagnosers.RunMode.ExtraRun);
 
                 var executeResult = toolchain.Executor.Execute(
-                    new ExecuteParameters(buildResult, benchmark, logger, resolver, config, compositeDiagnoser));
+                    new ExecuteParameters(buildResult, benchmark, logger, resolver, config, extraRunCompositeDiagnoser));
 
                 var allRuns = executeResult.Data.Select(line => Measurement.Parse(logger, line, 0)).Where(r => r.IterationMode != IterationMode.Unknown).ToList();
                 gcStats = GcStats.Parse(executeResult.Data.Last());
-                var report = new BenchmarkReport(benchmark, null, null, new[] { executeResult }, allRuns, gcStats);
-                compositeDiagnoser.ProcessResults(benchmark, report);
+
+                extraRunCompositeDiagnoser.ProcessResults(
+                    new DiagnoserResults(benchmark, allRuns.Where(measurement => !measurement.IterationMode.IsIdle()).Sum(m => m.Operations), gcStats));
 
                 if (!executeResult.FoundExecutable)
                     logger.WriteLineError("Executable not found");
                 logger.WriteLine();
             }
 
-            foreach (var diagnoser in config.GetDiagnosers().Where(diagnoser => diagnoser.GetRunMode(benchmark) == Diagnosers.RunMode.SeparateLogic))
+            var separateLogicCompositeDiagnoser = config.GetCompositeDiagnoser(benchmark, Diagnosers.RunMode.SeparateLogic);
+            if(separateLogicCompositeDiagnoser != null)
             {
                 logger.WriteLineInfo("// Run, Diagnostic [SeparateLogic]");
 
-                diagnoser.ProcessResults(benchmark, null);
+                separateLogicCompositeDiagnoser.Handle(HostSignal.AfterAll, new DiagnoserActionParameters(null, benchmark, config));
             }
 
-            return executeResults;
+            return (executeResults, gcStats);
         }
 
         private static Benchmark[] GetSupportedBenchmarks(IList<Benchmark> benchmarks, CompositeLogger logger, Func<Job, IToolchain> toolchainProvider, IResolver resolver)

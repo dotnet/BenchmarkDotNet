@@ -42,10 +42,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 Stop();
         }
 
-        public void ProcessResults(Benchmark benchmark, BenchmarkReport report)
+        public void ProcessResults(DiagnoserResults results)
         {
-            var stats = ProcessEtwEvents(benchmark, report.AllMeasurements.Sum(m => m.Operations));
-            results.Add(benchmark, stats);
+            var stats = ProcessEtwEvents(results.Benchmark, results.TotalOperations);
+            this.results.Add(results.Benchmark, stats);
         }
 
         public void DisplayResults(ILogger logger) { }
