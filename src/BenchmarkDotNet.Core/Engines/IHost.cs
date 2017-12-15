@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BenchmarkDotNet.Engines
+﻿namespace BenchmarkDotNet.Engines
 {
     public interface IHost
     {

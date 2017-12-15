@@ -12,25 +12,20 @@ namespace BenchmarkDotNet.Loggers
     {
         private readonly ILogger logger;
         private readonly Process process;
-        private readonly Benchmark benchmark;
         private readonly IDiagnoser diagnoser;
         private readonly DiagnoserActionParameters diagnoserActionParameters;
 
         public SynchronousProcessOutputLoggerWithDiagnoser(ILogger logger, Process process, IDiagnoser diagnoser, Benchmark benchmark, IConfig config)
         {
             if (!process.StartInfo.RedirectStandardOutput)
-            {
                 throw new NotSupportedException("set RedirectStandardOutput to true first");
-            }
+            if (!process.StartInfo.RedirectStandardInput)
+                throw new NotSupportedException("set RedirectStandardInput to true first");
 
             this.logger = logger;
             this.process = process;
             this.diagnoser = diagnoser;
-            this.benchmark = benchmark;
-            diagnoserActionParameters = new DiagnoserActionParameters(
-                process,
-                benchmark,
-                config);
+            diagnoserActionParameters = new DiagnoserActionParameters(process, benchmark, config);
 
             LinesWithResults = new List<string>();
             LinesWithExtraOutput = new List<string>();
@@ -51,33 +46,14 @@ namespace BenchmarkDotNet.Loggers
                     continue;
 
                 if (!line.StartsWith("//"))
-                {
                     LinesWithResults.Add(line);
-                }
-                else if (line == Engine.Signals.BeforeAnythingElse)
+                else if (Engine.Signals.TryGetSignal(line, out var signal))
                 {
-                    diagnoser?.BeforeAnythingElse(diagnoserActionParameters);
-                }
-                else if (line == Engine.Signals.AfterGlobalSetup)
-                {
-                    diagnoser?.AfterGlobalSetup(diagnoserActionParameters);
-                }
-                else if (line == Engine.Signals.BeforeMainRun)
-                {
-                    diagnoser?.BeforeMainRun(diagnoserActionParameters);
-                }
-                else if (line == Engine.Signals.BeforeGlobalCleanup)
-                {
-                    diagnoser?.BeforeGlobalCleanup(diagnoserActionParameters);
-                }
-                else if (line == Engine.Signals.AfterAnythingElse)
-                {
-                    // TODO: notify AfterAnythingElse
+                    diagnoser.Handle(signal, diagnoserActionParameters);
+                    process.StandardInput.WriteLine(Engine.Signals.Acknowledgment);
                 }
                 else
-                {
                     LinesWithExtraOutput.Add(line);
-                }
             }
         }
     }

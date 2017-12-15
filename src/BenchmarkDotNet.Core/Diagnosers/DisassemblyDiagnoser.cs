@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
@@ -33,27 +34,30 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IReadOnlyDictionary<Benchmark, DisassemblyResult> Results => results;
         public IEnumerable<string> Ids => new[] { nameof(DisassemblyDiagnoser) };
-        public IEnumerable<IExporter> Exporters => new IExporter[] { new CombinedDisassemblyExporter(Results), new RawDisassemblyExporter(Results), new PrettyDisassemblyExporter(Results)  };
+
+        public IEnumerable<IExporter> Exporters 
+            => new IExporter[]
+            {
+                new CombinedDisassemblyExporter(Results),
+                new RawDisassemblyExporter(Results),
+                new PrettyDisassemblyExporter(Results)
+            };
 
         public IColumnProvider GetColumnProvider() => EmptyColumnProvider.Instance;
-        public void BeforeAnythingElse(DiagnoserActionParameters parameters) { }
-        public void BeforeMainRun(DiagnoserActionParameters parameters) { }
-        public void BeforeGlobalCleanup(DiagnoserActionParameters parameters) { }
 
         public RunMode GetRunMode(Benchmark benchmark)
         {
             if (ShouldUseWindowsDissasembler(benchmark))
-                return RunMode.ExtraRun;
+                return RunMode.NoOverhead;
             if (ShouldUseMonoDisassembler(benchmark))
                 return RunMode.SeparateLogic;
 
             return RunMode.None;
         }
 
-        // method was already compiled and executed for the Warmup, we can attach to the process and do the job
-        public void AfterGlobalSetup(DiagnoserActionParameters parameters)
+        public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {
-            if (ShouldUseWindowsDissasembler(parameters.Benchmark))
+            if (signal == HostSignal.AfterAll && ShouldUseWindowsDissasembler(parameters.Benchmark))
                 results.Add(
                     parameters.Benchmark,
                     windowsDisassembler.Dissasemble(parameters));
@@ -79,9 +83,6 @@ namespace BenchmarkDotNet.Diagnosers
                 if (!RuntimeInformation.IsWindows() && !ShouldUseMonoDisassembler(benchmark))
                     yield return new ValidationError(false, "No Disassembler support, only Mono is supported for non-Windows OS", benchmark);
 
-                if (IsVeryShortRun(benchmark) && !ShouldUseMonoDisassembler(benchmark))
-                    yield return new ValidationError(true, "No Job.Dry support for disassembler. Please use Job.Short");
-
                 if (benchmark.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic)
                     && benchmark.Job.Infrastructure.Toolchain is InProcessToolchain)
                 {
@@ -95,11 +96,5 @@ namespace BenchmarkDotNet.Diagnosers
 
         private bool ShouldUseWindowsDissasembler(Benchmark benchmark)
             => !(benchmark.Job.Env.Runtime is MonoRuntime) && RuntimeInformation.IsWindows();
-
-        private bool IsVeryShortRun(Benchmark benchmark)
-            => benchmark.Job.HasValue(Jobs.RunMode.LaunchCountCharacteristic)
-                && (benchmark.Job.Run.LaunchCount < Jobs.RunMode.Short.LaunchCount
-                 || benchmark.Job.Run.WarmupCount < Jobs.RunMode.Short.WarmupCount
-                 || benchmark.Job.Run.TargetCount < Jobs.RunMode.Short.TargetCount);
     }
 }

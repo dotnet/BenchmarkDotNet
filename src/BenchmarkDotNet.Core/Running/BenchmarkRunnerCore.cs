@@ -298,8 +298,9 @@ namespace BenchmarkDotNet.Running
                     : " / " + launchCount;
                 logger.WriteLineInfo($"// Launch: {launchIndex + 1}{printedLaunchCount}");
 
+                var noOverheadDiagnoser = config.GetCompositeDiagnoser(benchmark, Diagnosers.RunMode.NoOverhead);
                 var executeResult = toolchain.Executor.Execute(
-                    new ExecuteParameters(buildResult, benchmark, logger, resolver, config));
+                    new ExecuteParameters(buildResult, benchmark, logger, resolver, config, noOverheadDiagnoser));
 
                 if (!executeResult.FoundExecutable)
                     logger.WriteLineError($"Executable {buildResult.ArtifactsPaths.ExecutablePath} not found");
@@ -310,8 +311,8 @@ namespace BenchmarkDotNet.Running
                 var measurements = executeResults
                         .SelectMany(r => r.Data)
                         .Select(line => Measurement.Parse(logger, line, 0))
-                        .Where(r => r.IterationMode != IterationMode.Unknown).
-                        ToArray();
+                        .Where(r => r.IterationMode != IterationMode.Unknown)
+                        .ToArray();
 
                 if (!measurements.Any())
                 {

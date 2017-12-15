@@ -90,6 +90,7 @@ namespace BenchmarkDotNet.Toolchains
             {
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
+                RedirectStandardInput = true,
                 RedirectStandardError = true,
                 CreateNoWindow = true,
                 WorkingDirectory = workingDirectory

@@ -37,17 +37,15 @@ namespace BenchmarkDotNet.Diagnosers
 
         // the following methods are left empty on purpose
         // the action takes places in other process, and the values are gathered by Engine
-        public void BeforeAnythingElse(DiagnoserActionParameters _) { }
-        public void AfterGlobalSetup(DiagnoserActionParameters _) { }
-        public void BeforeMainRun(DiagnoserActionParameters _) { }
-        public void BeforeGlobalCleanup(DiagnoserActionParameters parameters) { }
+        public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
 
         public void DisplayResults(ILogger logger) { }
 
         public void ProcessResults(Benchmark benchmark, BenchmarkReport report) 
             => results.Add(benchmark, report.GcStats);
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Enumerable.Empty<ValidationError>();
+        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) 
+            => Array.Empty<ValidationError>();
         
         public class AllocationColumn : IColumn
         {
