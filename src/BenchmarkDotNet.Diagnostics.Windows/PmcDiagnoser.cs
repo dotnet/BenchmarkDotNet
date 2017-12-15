@@ -53,16 +53,15 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             => unchecked((ulong)(KernelTraceEventParser.Keywords.PMCProfile | KernelTraceEventParser.Keywords.Profile));
 
         protected override string SessionNamePrefix
+            => throw new NotImplementedException("Not needed for Kernel sessions (can be only one at a time");
+
+        public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {
-            get { throw new NotImplementedException("Not needed for Kernel sessions (can be only one at a time"); }
+            if (signal == HostSignal.BeforeMainRun)
+                Start(parameters);
+            else if (signal == HostSignal.AfterMainRun)
+                Stop();
         }
-
-        public void BeforeAnythingElse(DiagnoserActionParameters _) { }
-        public void AfterGlobalSetup(DiagnoserActionParameters _) { }
-
-        public void BeforeMainRun(DiagnoserActionParameters parameters) => Start(parameters);
-
-        public void BeforeGlobalCleanup(DiagnoserActionParameters parameters) => Stop();
 
         public void ProcessResults(Benchmark benchmark, BenchmarkReport report)
         {
@@ -158,10 +157,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                    .OfType<HardwareCounter>()
                    .Where(counter => counter != HardwareCounter.NotSet)
                    .Select(counter => new PmcColumn(results, counter))
-                   .Union(new IColumn[] 
+                   .Union(new IColumn[]
                    {
                        new MispredictRateColumn(results),
-                       new InstructionRetiredPerCycleColumn(results) 
+                       new InstructionRetiredPerCycleColumn(results)
                    })
                    .ToArray());
 
@@ -193,7 +192,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             public string GetValue(Summary summary, Benchmark benchmark)
                 => Results.TryGetValue(benchmark, out var stats) && stats.Counters.ContainsKey(Counter)
-                    ? (stats.Counters[Counter].Count / (ulong)stats.TotalOperations).ToString() 
+                    ? (stats.Counters[Counter].Count / (ulong)stats.TotalOperations).ToString()
                     : "-";
         }
 
@@ -244,7 +243,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public bool IsNumeric => true;
             public UnitType UnitType => UnitType.Dimensionless;
             public string Legend => $"Instruction Retired per Cycle";
-            public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default); 
+            public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
 
             private Dictionary<Benchmark, PmcStats> Results { get; }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
@@ -89,6 +90,9 @@ namespace BenchmarkDotNet.Engines
 
         public void Jitting()
         {
+            GlobalSetupAction?.Invoke();
+            IterationSetupAction?.Invoke();
+
             // first signal about jitting is raised from auto-generated Program.cs, look at BenchmarkProgram.txt
             Dummy1Action.Invoke();
             MainAction.Invoke(1);
@@ -96,6 +100,8 @@ namespace BenchmarkDotNet.Engines
             IdleAction.Invoke(1);
             Dummy3Action.Invoke();
             isJitted = true;
+
+            IterationCleanupAction?.Invoke();
         }
 
         public RunResults Run()
@@ -126,7 +132,9 @@ namespace BenchmarkDotNet.Engines
 
             // we enable monitoring after pilot & warmup, just to ignore the memory allocated by these runs
             EnableMonitoring();
-            if(IsDiagnoserAttached) Host.BeforeMainRun();
+
+            Host.BeforeMainRun();
+
             forcedFullGarbageCollections = 0; // zero it in case the Engine instance is reused (InProcessToolchain)
             var initialGcStats = GcStats.ReadInitial(IsDiagnoserAttached);
 
@@ -135,6 +143,8 @@ namespace BenchmarkDotNet.Engines
             var finalGcStats = GcStats.ReadFinal(IsDiagnoserAttached);
             var forcedCollections = GcStats.FromForced(forcedFullGarbageCollections);
             var workGcHasDone = finalGcStats - forcedCollections - initialGcStats;
+
+            Host.AfterMainRun();
 
             bool removeOutliers = TargetJob.ResolveValue(AccuracyMode.RemoveOutliersCharacteristic, Resolver);
 
@@ -220,14 +230,27 @@ namespace BenchmarkDotNet.Engines
         }
 
         [UsedImplicitly]
-        public class Signals
+        public static class Signals
         {
-            public const string BeforeAnythingElse = "// BeforeAnythingElse";
-            public const string AfterGlobalSetup = "// AfterGlobalSetup";
-            public const string BeforeMainRun = "// BeforeMainRun";
-            public const string BeforeGlobalCleanup = "// BeforeGlobalCleanup";
-            public const string AfterAnythingElse = "// AfterAnythingElse";
             public const string DiagnoserIsAttachedParam = "diagnoserAttached";
+            public const string Acknowledgment = "Acknowledgment";
+
+            private static readonly Dictionary<HostSignal, string> SignalsToMessages
+                = new Dictionary<HostSignal, string>
+                {
+                    { HostSignal.BeforeAnythingElse, "// BeforeAnythingElse" },
+                    { HostSignal.BeforeMainRun, "// BeforeMainRun" },
+                    { HostSignal.AfterMainRun, "// AfterMainRun" },
+                    { HostSignal.AfterAll, "// AfterAll" }
+                };
+
+            private static readonly Dictionary<string, HostSignal> MessagesToSignals 
+                = SignalsToMessages.ToDictionary(p => p.Value, p => p.Key);
+
+            public static string ToMessage(HostSignal signal) => SignalsToMessages[signal];
+
+            public static bool TryGetSignal(string message, out HostSignal signal) 
+                => MessagesToSignals.TryGetValue(message, out signal);
         }
     }
 }

@@ -12,12 +12,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess
     {
         public static int Run(IHost host, Benchmark benchmark, BenchmarkActionCodegen codegenMode)
         {
-            bool isDiagnoserAttached = host.IsDiagnoserAttached;
-
             // the first thing to do is to let diagnosers hook in before anything happens
             // so all jit-related diagnosers can catch first jit compilation!
-            if (isDiagnoserAttached)
-                host.BeforeAnythingElse();
+            host.BeforeAnythingElse();
 
             try
             {
@@ -39,6 +36,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             {
                 host.WriteLine(ex.ToString());
                 return -1;
+            }
+            finally
+            {
+                host.AfterAll();
             }
         }
 
@@ -93,21 +94,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
                 engine.PreAllocate();
 
-                globalSetupAction.InvokeSingle();
-                iterationSetupAction.InvokeSingle();
-
                 if (job.ResolveValue(RunMode.RunStrategyCharacteristic, EngineResolver.Instance).NeedsJitting())
                     engine.Jitting(); // does first call to main action, must be executed after setup()!
 
-                iterationCleanupAction.InvokeSingle();
-
-                if (host.IsDiagnoserAttached)
-                    host.AfterGlobalSetup();
-
                 var results = engine.Run();
 
-                if (host.IsDiagnoserAttached)
-                    host.BeforeGlobalCleanup();
                 globalCleanupAction.InvokeSingle();
 
                 host.ReportResults(results); // printing costs memory, do this after runs

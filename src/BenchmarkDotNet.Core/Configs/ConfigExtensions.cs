@@ -19,7 +19,12 @@ namespace BenchmarkDotNet.Configs
         public static ILogger GetCompositeLogger(this IConfig config) => new CompositeLogger(config.GetLoggers().ToArray());
         public static IExporter GetCompositeExporter(this IConfig config) => new CompositeExporter(config.GetExporters().ToArray());
         public static IDiagnoser GetCompositeDiagnoser(this IConfig config) => new CompositeDiagnoser(config.GetDiagnosers().ToArray());
-        public static IDiagnoser GetCompositeDiagnoser(this IConfig config, Benchmark benchmark, RunMode runMode) => new CompositeDiagnoser(config.GetDiagnosers().Where(d => d.GetRunMode(benchmark) == runMode).ToArray());
+
+        public static IDiagnoser GetCompositeDiagnoser(this IConfig config, Benchmark benchmark, RunMode runMode)
+            => config.GetDiagnosers().Any(d => d.GetRunMode(benchmark) == runMode)
+                ? new CompositeDiagnoser(config.GetDiagnosers().Where(d => d.GetRunMode(benchmark) == runMode).ToArray())
+                : null;
+
         public static IAnalyser GetCompositeAnalyser(this IConfig config) => new CompositeAnalyser(config.GetAnalysers().ToArray());
         public static IValidator GetCompositeValidator(this IConfig config) => new CompositeValidator(config.GetValidators().ToArray());
 

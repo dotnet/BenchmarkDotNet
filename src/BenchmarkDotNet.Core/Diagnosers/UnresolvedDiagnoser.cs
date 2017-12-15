@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -20,21 +21,14 @@ namespace BenchmarkDotNet.Diagnosers
 
         private readonly Type unresolved;
 
-        public UnresolvedDiagnoser(Type unresolved)
-        {
-            this.unresolved = unresolved;
-        }
+        public UnresolvedDiagnoser(Type unresolved) => this.unresolved = unresolved;
 
         public RunMode GetRunMode(Benchmark benchmark) => RunMode.None;
 
         public IEnumerable<string> Ids => Array.Empty<string>();
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
         public IColumnProvider GetColumnProvider() => EmptyColumnProvider.Instance;
-
-        public void BeforeAnythingElse(DiagnoserActionParameters parameters) { }
-        public void AfterGlobalSetup(DiagnoserActionParameters parameters) { }
-        public void BeforeMainRun(DiagnoserActionParameters parameters) { }
-        public void BeforeGlobalCleanup(DiagnoserActionParameters parameters) { }
+        public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
         public void ProcessResults(Benchmark benchmark, BenchmarkReport report) { }
 
         public void DisplayResults(ILogger logger) => logger.WriteLineError(GetErrorMessage());

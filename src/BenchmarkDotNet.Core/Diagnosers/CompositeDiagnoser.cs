@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
@@ -15,10 +16,7 @@ namespace BenchmarkDotNet.Diagnosers
     {
         private readonly IDiagnoser[] diagnosers;
 
-        public CompositeDiagnoser(params IDiagnoser[] diagnosers)
-        {
-            this.diagnosers = diagnosers.Distinct().ToArray();
-        }
+        public CompositeDiagnoser(params IDiagnoser[] diagnosers) => this.diagnosers = diagnosers.Distinct().ToArray();
 
         public RunMode GetRunMode(Benchmark benchmark) => throw new InvalidOperationException("Should never be called for Composite Diagnoser");
 
@@ -30,17 +28,8 @@ namespace BenchmarkDotNet.Diagnosers
         public IColumnProvider GetColumnProvider() 
             => new CompositeColumnProvider(diagnosers.Select(d => d.GetColumnProvider()).ToArray());
 
-        public void BeforeAnythingElse(DiagnoserActionParameters parameters) 
-            => diagnosers.ForEach(diagnoser => diagnoser.BeforeAnythingElse(parameters));
-
-        public void AfterGlobalSetup(DiagnoserActionParameters parameters) 
-            => diagnosers.ForEach(diagnoser => diagnoser.AfterGlobalSetup(parameters));
-
-        public void BeforeMainRun(DiagnoserActionParameters parameters) 
-            => diagnosers.ForEach(diagnoser => diagnoser.BeforeMainRun(parameters));
-
-        public void BeforeGlobalCleanup(DiagnoserActionParameters parameters) 
-            => diagnosers.ForEach(diagnoser => diagnoser.BeforeGlobalCleanup(parameters));
+        public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
+            => diagnosers.ForEach(diagnoser => diagnoser.Handle(signal, parameters));
 
         public void ProcessResults(Benchmark benchmark, BenchmarkReport report)
             => diagnosers.ForEach(diagnoser => diagnoser.ProcessResults(benchmark, report));
