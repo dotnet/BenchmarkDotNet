@@ -129,7 +129,7 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineStatistic($"Runtime = {report.GetRuntimeInfo()}; GC = {report.GetGcInfo()}");
                 var resultRuns = report.GetResultRuns();
                 if (resultRuns.IsEmpty())
-                    logger.WriteLineError("There are no any results runs");
+                    logger.WriteLineError("There are not any results runs");
                 else
                     logger.WriteLineStatistic(resultRuns.GetStatistics().ToTimeStr());
                 logger.WriteLine();
