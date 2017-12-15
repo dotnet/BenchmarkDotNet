@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         void Handle(HostSignal signal, DiagnoserActionParameters parameters);
 
-        void ProcessResults(Benchmark benchmark, BenchmarkReport report);
+        void ProcessResults(DiagnoserResults results);
 
         void DisplayResults(ILogger logger);
 

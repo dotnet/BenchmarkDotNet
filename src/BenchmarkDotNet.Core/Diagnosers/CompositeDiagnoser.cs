@@ -31,8 +31,8 @@ namespace BenchmarkDotNet.Diagnosers
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
             => diagnosers.ForEach(diagnoser => diagnoser.Handle(signal, parameters));
 
-        public void ProcessResults(Benchmark benchmark, BenchmarkReport report)
-            => diagnosers.ForEach(diagnoser => diagnoser.ProcessResults(benchmark, report));
+        public void ProcessResults(DiagnoserResults results)
+            => diagnosers.ForEach(diagnoser => diagnoser.ProcessResults(results));
 
         public void DisplayResults(ILogger logger)
         {
