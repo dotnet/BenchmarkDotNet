@@ -32,7 +32,8 @@ namespace BenchmarkDotNet.Engines
                 engineParameters.GlobalCleanupAction,
                 engineParameters.IterationSetupAction,
                 engineParameters.IterationCleanupAction,
-                engineParameters.OperationsPerInvoke);
+                engineParameters.OperationsPerInvoke,
+                engineParameters.MeasureGcStats);
         }
     }
 }

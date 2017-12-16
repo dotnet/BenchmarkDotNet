@@ -7,17 +7,20 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
+using RunMode = BenchmarkDotNet.Jobs.RunMode;
 
 namespace BenchmarkDotNet.Code
 {
     internal static class CodeGenerator
     {
-        internal static string Generate(Benchmark benchmark)
+        internal static string Generate(Benchmark benchmark, IConfig config)
         {
             var provider = GetDeclarationsProvider(benchmark.Target);
 
@@ -46,6 +49,7 @@ namespace BenchmarkDotNet.Code
                 Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).
                 Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath).
                 Replace("$Ref$", provider.UseRefKeyword ? "ref" : null).
+                Replace("$MeasureGcStats$", config.HasMemoryDiagnoser() ? "true" : "false").
                 ToString();
 
             text = Unroll(text, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvResolver.Instance));

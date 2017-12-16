@@ -9,7 +9,6 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Validators;
 
@@ -40,18 +39,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public void DisplayResults(ILogger logger) { }
 
-        public RunMode GetRunMode(Benchmark benchmark)
-        {
-            // for .NET Core we don't need to enable any kind of monitoring
-            // the allocated memory is available via GC's API
-            // so we don't need to perform any extra run
-            if (benchmark.Job.ResolveValue(EnvMode.RuntimeCharacteristic, EnvResolver.Instance) is CoreRuntime)
-                return RunMode.NoOverhead;
-
-            // for classic .NET we need to enable AppDomain.MonitoringIsEnabled
-            // which may cause overhead, so we perform an extra run to collect stats about allocated memory
-            return RunMode.ExtraRun; 
-        }
+        public RunMode GetRunMode(Benchmark benchmark) => RunMode.NoOverhead; 
 
         public void ProcessResults(DiagnoserResults results) 
             => this.results.Add(results.Benchmark, results.GcStats);
@@ -63,10 +51,7 @@ namespace BenchmarkDotNet.Diagnosers
         {
             private readonly Dictionary<Benchmark, GcStats> results;
 
-            public AllocationColumn(Dictionary<Benchmark, GcStats> results)
-            {
-                this.results = results;
-            }
+            public AllocationColumn(Dictionary<Benchmark, GcStats> results) => this.results = results;
 
             public string Id => nameof(AllocationColumn);
             public string ColumnName => "Allocated";

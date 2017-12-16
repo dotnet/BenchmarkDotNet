@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Loggers
                     LinesWithResults.Add(line);
                 else if (Engine.Signals.TryGetSignal(line, out var signal))
                 {
-                    diagnoser.Handle(signal, diagnoserActionParameters);
+                    diagnoser?.Handle(signal, diagnoserActionParameters);
                     process.StandardInput.WriteLine(Engine.Signals.Acknowledgment);
                 }
                 else

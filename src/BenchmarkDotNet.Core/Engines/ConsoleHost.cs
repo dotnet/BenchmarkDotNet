@@ -9,14 +9,11 @@ namespace BenchmarkDotNet.Engines
         private readonly TextWriter outWriter;
         private readonly TextReader inReader;
 
-        public ConsoleHost([NotNull]TextWriter outWriter, [NotNull]TextReader inReader, bool hasDiagnoserAttached)
+        public ConsoleHost([NotNull]TextWriter outWriter, [NotNull]TextReader inReader)
         {
             this.outWriter = outWriter ?? throw new ArgumentNullException(nameof(outWriter));
             this.inReader = inReader ?? throw new ArgumentNullException(nameof(inReader));
-            IsDiagnoserAttached = hasDiagnoserAttached;
         }
-
-        public bool IsDiagnoserAttached { get; }
 
         public void Write(string message) => outWriter.Write(message);
 
@@ -26,9 +23,6 @@ namespace BenchmarkDotNet.Engines
 
         public void SendSignal(HostSignal hostSignal)
         {
-            if(!IsDiagnoserAttached) // no need to send the signal, nobody is listening for it
-                return;
-
             WriteLine(Engine.Signals.ToMessage(hostSignal));
 
             // read the response from Parent process, make the communication blocking
