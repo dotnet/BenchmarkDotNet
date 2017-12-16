@@ -19,7 +19,6 @@ namespace BenchmarkDotNet.Engines
         private readonly double maxRelativeError;
         private readonly TimeInterval? maxAbsoluteError;
         private readonly bool removeOutliers;
-        private readonly MeasurementsPool measurementsPool;
 
         public EngineTargetStage(IEngine engine) : base(engine)
         {
@@ -27,7 +26,6 @@ namespace BenchmarkDotNet.Engines
             maxRelativeError = engine.TargetJob.ResolveValue(AccuracyMode.MaxRelativeErrorCharacteristic, engine.Resolver);
             maxAbsoluteError = engine.TargetJob.ResolveValueAsNullable(AccuracyMode.MaxAbsoluteErrorCharacteristic);
             removeOutliers = engine.TargetJob.ResolveValue(AccuracyMode.RemoveOutliersCharacteristic, engine.Resolver);
-            measurementsPool = MeasurementsPool.PreAllocate(10, MaxIterationCount, targetCount);
         }
 
         public IReadOnlyList<Measurement> RunIdle(long invokeCount, int unrollFactor) 
@@ -43,8 +41,8 @@ namespace BenchmarkDotNet.Engines
 
         private List<Measurement> RunAuto(long invokeCount, IterationMode iterationMode, int unrollFactor)
         {
-            var measurements = measurementsPool.Next();
-            var measurementsForStatistics = measurementsPool.Next();
+            var measurements = new List<Measurement>(MaxIterationCount);
+            var measurementsForStatistics = new List<Measurement>(MaxIterationCount);
 
             int iterationCounter = 0;
             bool isIdle = iterationMode.IsIdle();
@@ -69,18 +67,19 @@ namespace BenchmarkDotNet.Engines
                 if (iterationCounter >= MaxIterationCount || (isIdle && iterationCounter >= MaxIdleIterationCount))
                     break;
             }
-            if (!IsDiagnoserAttached) WriteLine();
+            WriteLine();
+
             return measurements;
         }
 
         private List<Measurement> RunSpecific(long invokeCount, IterationMode iterationMode, int iterationCount, int unrollFactor)
         {
-            var measurements = measurementsPool.Next();
+            var measurements = new List<Measurement>(MaxIterationCount);
 
             for (int i = 0; i < iterationCount; i++)
                 measurements.Add(RunIteration(iterationMode, i + 1, invokeCount, unrollFactor));
 
-            if (!IsDiagnoserAttached) WriteLine();
+            WriteLine();
 
             return measurements;
         }

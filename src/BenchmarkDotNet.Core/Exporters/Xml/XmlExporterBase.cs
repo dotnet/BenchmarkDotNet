@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Text;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
@@ -49,7 +50,7 @@ namespace BenchmarkDotNet.Exporters.Xml
                                                        nameof(BenchmarkReport.Benchmark))
                                .WithCollectionItemName(nameof(Statistics.Outliers), "Outlier");
 
-            if (!summary.Config.GetDiagnosers().Any(diagnoser => diagnoser is MemoryDiagnoser))
+            if (!summary.Config.HasMemoryDiagnoser())
             {
                 builder.WithExcludedProperty(nameof(BenchmarkReportDto.Memory));
             }

@@ -11,8 +11,6 @@ namespace BenchmarkDotNet.Engines
         [NotNull]
         IHost Host { get; }
 
-        bool IsDiagnoserAttached { get; }
-
         void WriteLine();
 
         void WriteLine(string line);
@@ -37,12 +35,6 @@ namespace BenchmarkDotNet.Engines
         IResolver Resolver { get; }
 
         Measurement RunIteration(IterationData data);
-
-        /// <summary>
-        /// must provoke all static ctors and perform any other necessary allocations 
-        /// so Run() has 0 exclusive allocations and our Memory Diagnostics is 100% accurate!
-        /// </summary>
-        void PreAllocate();
 
         /// <summary>
         /// must perform jitting via warmup calls

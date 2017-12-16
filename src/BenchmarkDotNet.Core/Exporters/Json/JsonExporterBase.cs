@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Reports;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using JsonSerialiser = SimpleJson.SimpleJson;
 using BenchmarkDotNet.Diagnosers;
@@ -62,7 +63,7 @@ namespace BenchmarkDotNet.Exporters.Json
                 };
 
                 // We show MemoryDiagnoser's results only if it is being used
-                if(summary.Config.GetDiagnosers().Any(diagnoser => diagnoser is MemoryDiagnoser))
+                if(summary.Config.HasMemoryDiagnoser())
                 {
                     data.Add("Memory", r.GcStats);
                 }

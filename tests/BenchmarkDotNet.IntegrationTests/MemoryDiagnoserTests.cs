@@ -24,10 +24,7 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         private readonly ITestOutputHelper output;
 
-        public MemoryDiagnoserTests(ITestOutputHelper outputHelper)
-        {
-            output = outputHelper;
-        }
+        public MemoryDiagnoserTests(ITestOutputHelper outputHelper) => output = outputHelper;
 
         public static IEnumerable<object[]> GetToolchains()
             => new[]
@@ -68,8 +65,13 @@ namespace BenchmarkDotNet.IntegrationTests
 
             [Benchmark] public void AllocateNothing() { }
 
-            [GlobalSetup] public void AllocatingSetUp() => AllocateUntilGcWakesUp();
-            [GlobalCleanup] public void AllocatingCleanUp() => AllocateUntilGcWakesUp();
+            [IterationSetup]
+            [GlobalSetup]
+            public void AllocatingSetUp() => AllocateUntilGcWakesUp();
+
+            [IterationCleanup]
+            [GlobalCleanup]
+            public void AllocatingCleanUp() => AllocateUntilGcWakesUp();
 
             private void AllocateUntilGcWakesUp()
             {
@@ -82,7 +84,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         [Theory, MemberData(nameof(GetToolchains))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
-        public void MemoryDiagnoserDoesNotIncludeAllocationsFromGlobalSetupAndCleanup(IToolchain toolchain)
+        public void MemoryDiagnoserDoesNotIncludeAllocationsFromSetupAndCleanup(IToolchain toolchain)
         {
             AssertAllocations(toolchain, typeof(AllocatingGlobalSetupAndCleanup), new Dictionary<string, long>
             {

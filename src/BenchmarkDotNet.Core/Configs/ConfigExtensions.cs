@@ -44,9 +44,11 @@ namespace BenchmarkDotNet.Configs
         public static IConfig RemoveBenchmarkFiles(this IConfig config) => config.KeepBenchmarkFiles(false);
 
         public static ReadOnlyConfig AsReadOnly(this IConfig config) =>
-            config is ReadOnlyConfig r
-                ? r
+            config is ReadOnlyConfig readOnly
+                ? readOnly
                 : new ReadOnlyConfig(config);
+
+        public static bool HasMemoryDiagnoser(this IConfig config) => config.GetDiagnosers().Any(diagnoser => diagnoser is MemoryDiagnoser);
 
         private static IConfig With(this IConfig config, Action<ManualConfig> addAction)
         {

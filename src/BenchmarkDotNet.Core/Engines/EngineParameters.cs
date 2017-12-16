@@ -19,5 +19,6 @@ namespace BenchmarkDotNet.Engines
         public Action IterationSetupAction { get; set; } = null;
         public Action IterationCleanupAction { get; set; } = null;
         public IResolver Resolver { get; set; }
+        public bool MeasureGcStats { get; set; }
     }
 }

@@ -335,7 +335,8 @@ namespace BenchmarkDotNet.Running
 
                 if (useDiagnoser)
                 {
-                    gcStats = GcStats.Parse(executeResult.Data.Last());
+                    if (config.HasMemoryDiagnoser())
+                        gcStats = GcStats.Parse(executeResult.Data.Last());
 
                     noOverheadCompositeDiagnoser.ProcessResults(
                         new DiagnoserResults(benchmark, measurements.Where(measurement => !measurement.IterationMode.IsIdle()).Sum(m => m.Operations), gcStats));
@@ -362,7 +363,6 @@ namespace BenchmarkDotNet.Running
                     new ExecuteParameters(buildResult, benchmark, logger, resolver, config, extraRunCompositeDiagnoser));
 
                 var allRuns = executeResult.Data.Select(line => Measurement.Parse(logger, line, 0)).Where(r => r.IterationMode != IterationMode.Unknown).ToList();
-                gcStats = GcStats.Parse(executeResult.Data.Last());
 
                 extraRunCompositeDiagnoser.ProcessResults(
                     new DiagnoserResults(benchmark, allRuns.Where(measurement => !measurement.IterationMode.IsIdle()).Sum(m => m.Operations), gcStats));
@@ -373,7 +373,7 @@ namespace BenchmarkDotNet.Running
             }
 
             var separateLogicCompositeDiagnoser = config.GetCompositeDiagnoser(benchmark, Diagnosers.RunMode.SeparateLogic);
-            if(separateLogicCompositeDiagnoser != null)
+            if (separateLogicCompositeDiagnoser != null)
             {
                 logger.WriteLineInfo("// Run, Diagnostic [SeparateLogic]");
 

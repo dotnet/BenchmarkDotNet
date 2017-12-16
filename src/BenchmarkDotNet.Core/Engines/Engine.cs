@@ -17,7 +17,6 @@ namespace BenchmarkDotNet.Engines
         public const int MinInvokeCount = 4;
 
         public IHost Host { get; }
-        public bool IsDiagnoserAttached { get; }
         public Action<long> MainAction { get; }
         public Action Dummy1Action { get; }
         public Action Dummy2Action { get; }
@@ -41,16 +40,17 @@ namespace BenchmarkDotNet.Engines
         private readonly EnginePilotStage pilotStage;
         private readonly EngineWarmupStage warmupStage;
         private readonly EngineTargetStage targetStage;
-        private bool isJitted, isPreAllocated;
-        private int forcedFullGarbageCollections;
+        private readonly bool includeMemoryStats;
+        private bool isJitted;
 
         internal Engine(
             IHost host,
             Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> idleAction, Action<long> mainAction, Job targetJob,
-            Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke)
+            Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
+            bool includeMemoryStats)
         {
+            
             Host = host;
-            IsDiagnoserAttached = host.IsDiagnoserAttached;
             IdleAction = idleAction;
             Dummy1Action = dummy1Action;
             Dummy2Action = dummy2Action;
@@ -62,6 +62,7 @@ namespace BenchmarkDotNet.Engines
             IterationSetupAction = iterationSetupAction;
             IterationCleanupAction = iterationCleanupAction;
             OperationsPerInvoke = operationsPerInvoke;
+            this.includeMemoryStats = includeMemoryStats;
 
             Resolver = new CompositeResolver(BenchmarkRunnerCore.DefaultResolver, EngineResolver.Instance);
 
@@ -75,17 +76,6 @@ namespace BenchmarkDotNet.Engines
             warmupStage = new EngineWarmupStage(this);
             pilotStage = new EnginePilotStage(this);
             targetStage = new EngineTargetStage(this);
-        }
-
-        public void PreAllocate()
-        {
-            var list = new List<Measurement> { new Measurement(), new Measurement() };
-            list.Sort(); // provoke JIT, static ctors etc (was allocating 1740 bytes with first call)
-            
-            // ReSharper disable once CompareOfFloatsByEqualityOperator
-            if (TimeUnit.All == null || list[0].Nanoseconds != default(double))
-                throw new Exception("just use this things here to provoke static ctor");
-            isPreAllocated = true;
         }
 
         public void Jitting()
@@ -103,8 +93,6 @@ namespace BenchmarkDotNet.Engines
         {
             if (Strategy.NeedsJitting() != isJitted)
                 throw new Exception($"You must{(Strategy.NeedsJitting() ? "" : " not")} call Jitting() first (Strategy = {Strategy})!");
-            if (!isPreAllocated)
-                throw new Exception("You must call PreAllocate() first!");
 
             long invokeCount = InvocationCount;
             IReadOnlyList<Measurement> idle = null;
@@ -125,21 +113,15 @@ namespace BenchmarkDotNet.Engines
                 warmupStage.RunMain(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring);
             }
 
-            // we enable monitoring after pilot & warmup, just to ignore the memory allocated by these runs
-            EnableMonitoring();
-
             Host.BeforeMainRun();
-
-            forcedFullGarbageCollections = 0; // zero it in case the Engine instance is reused (InProcessToolchain)
-            var initialGcStats = GcStats.ReadInitial(IsDiagnoserAttached);
 
             var main = targetStage.RunMain(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring);
 
-            var finalGcStats = GcStats.ReadFinal(IsDiagnoserAttached);
-            var forcedCollections = GcStats.FromForced(forcedFullGarbageCollections);
-            var workGcHasDone = finalGcStats - forcedCollections - initialGcStats;
-
             Host.AfterMainRun();
+
+            var workGcHasDone = includeMemoryStats 
+                ? MeasureGcStats(new IterationData(IterationMode.MainTarget, 0, invokeCount, UnrollFactor)) 
+                : GcStats.Empty;
 
             bool removeOutliers = TargetJob.ResolveValue(AccuracyMode.RemoveOutliersCharacteristic, Resolver);
 
@@ -167,9 +149,29 @@ namespace BenchmarkDotNet.Engines
 
             // Results
             var measurement = new Measurement(0, data.IterationMode, data.Index, totalOperations, clockSpan.GetNanoseconds());
-            if (!IsDiagnoserAttached) WriteLine(measurement.ToOutputLine());
+            WriteLine(measurement.ToOutputLine());
 
             return measurement;
+        }
+
+        private GcStats MeasureGcStats(IterationData data)
+        {
+            // we enable monitoring after main target run, for this single iteration which is executed at the end
+            // so even if we enable AppDomain monitoring in separate process
+            // it does not matter, because we have already obtained the results!
+            EnableMonitoring();
+
+            IterationSetupAction(); // we run iteration setup first, so even if it allocates, it is not included in the results
+
+            var initialGcStats = GcStats.ReadInitial();
+
+            MainAction(data.InvokeCount / data.UnrollFactor);
+
+            var finalGcStats = GcStats.ReadFinal();
+
+            IterationCleanupAction(); // we run iteration cleanup after collecting GC stats 
+
+            return (finalGcStats - initialGcStats).WithTotalOperations(data.InvokeCount);
         }
 
         private void GcCollect()
@@ -185,43 +187,20 @@ namespace BenchmarkDotNet.Engines
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();
-
-            forcedFullGarbageCollections += 2;
         }
 
-        public void WriteLine(string text)
-        {
-            EnsureNothingIsPrintedWhenDiagnoserIsAttached();
+        public void WriteLine(string text) => Host.WriteLine(text);
 
-            Host.WriteLine(text);
-        }
-
-        public void WriteLine()
-        {
-            EnsureNothingIsPrintedWhenDiagnoserIsAttached();
-
-            Host.WriteLine();
-        }
+        public void WriteLine() => Host.WriteLine();
 
         private void EnableMonitoring()
         {
-            if (!IsDiagnoserAttached) // it could affect the results, we do this in separate, diagnostics-only run
-                return;
 #if CLASSIC
-            if (RuntimeInformation.IsMono()
-            ) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-in-mono
+            if (RuntimeInformation.IsMono()) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-in-mono
                 return;
 
             AppDomain.MonitoringIsEnabled = true;
 #endif
-        }
-
-        private void EnsureNothingIsPrintedWhenDiagnoserIsAttached()
-        {
-            if (IsDiagnoserAttached)
-            {
-                throw new InvalidOperationException("to avoid memory allocations we must not print anything when diagnoser is still attached");
-            }
         }
 
         [UsedImplicitly]

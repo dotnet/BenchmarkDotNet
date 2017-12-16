@@ -4,6 +4,7 @@ using System.Reflection;
 using Xunit;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Code;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 
@@ -23,7 +24,7 @@ namespace BenchmarkDotNet.Tests
             var target = new Target(typeof(CodeGeneratorTests), asyncVoidMethod);
             var benchmark = new Benchmark(target, Job.Default, null);
 
-            Assert.Throws<NotSupportedException>(() => CodeGenerator.Generate(benchmark));
+            Assert.Throws<NotSupportedException>(() => CodeGenerator.Generate(benchmark, ManualConfig.CreateEmpty()));
         }
 
 
