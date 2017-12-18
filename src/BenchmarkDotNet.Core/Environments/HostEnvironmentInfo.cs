@@ -37,8 +37,12 @@ namespace BenchmarkDotNet.Environments
         /// is expensive to call (1s)
         /// </summary>
         public Lazy<string> ProcessorName { get; protected set; }
+        
+        public Lazy<int?> PhysicalCoresCount { get; protected set; }
+        
+        public Lazy<int?> PhysicalProcessorsCount { get; protected set; }
 
-        public int ProcessorCount { get; protected set; }
+        public int LogicalCoresCount { get; protected set; }
 
         public string JitModules { get; protected set; }
 
@@ -71,7 +75,9 @@ namespace BenchmarkDotNet.Environments
             BenchmarkDotNetVersion = GetBenchmarkDotNetVersion();
             OsVersion = new Lazy<string>(RuntimeInformation.GetOsVersion);
             ProcessorName = new Lazy<string>(RuntimeInformation.GetProcessorName);
-            ProcessorCount = Environment.ProcessorCount;
+            LogicalCoresCount = Environment.ProcessorCount;
+            PhysicalCoresCount = new Lazy<int?>(RuntimeInformation.GetPhysicalCoresCount);
+            PhysicalProcessorsCount = new Lazy<int?>(RuntimeInformation.GetPhysicalProcessorsCount);
             ChronometerFrequency = Chronometer.Frequency;
             HardwareTimerKind = Chronometer.HardwareTimerKind;
             JitModules = RuntimeInformation.GetJitModulesInfo();
@@ -85,7 +91,7 @@ namespace BenchmarkDotNet.Environments
         public override IEnumerable<string> ToFormattedString()
         {
             yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}";
-            yield return $"Processor={ProcessorName.Value}, ProcessorCount={ProcessorCount}";
+            yield return $"Processor={ProcessorName.Value}, LogicalCoresCount={LogicalCoresCount}, PhysicalCoresCount={PhysicalCoresCount.Value?.ToString() ?? RuntimeInformation.Unknown}, PhysicalProcessorsCount={PhysicalProcessorsCount.Value?.ToString() ?? RuntimeInformation.Unknown}";
             if (HardwareTimerKind != HardwareTimerKind.Unknown)
                 yield return $"Frequency={ChronometerFrequency}, Resolution={ChronometerResolution}, Timer={HardwareTimerKind.ToString().ToUpper()}";
 #if !CLASSIC

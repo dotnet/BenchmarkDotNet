@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.Tests.Mocks
                 JitInfo = "RyuJIT-v4.6.x.mock",
                 JitModules = "clrjit-v4.6.x.mock",
                 OsVersion = new Lazy<string>(() => "Microsoft Windows NT 10.0.x.mock"),
-                ProcessorCount = 8,
+                LogicalCoresCount = 8,
                 ProcessorName = new Lazy<string>(() => "MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz"),
                 RuntimeVersion = "Clr 4.0.x.mock"
             };

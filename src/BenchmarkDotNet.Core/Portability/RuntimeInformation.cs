@@ -136,12 +136,70 @@ namespace BenchmarkDotNet.Portability
                 return ProcessorBrandStringHelper.Prettify(ExternalToolsHelper.Wmic.Value.GetValueOrDefault("Name") ?? "");
 
             if (IsLinux())
-                return ProcessorBrandStringHelper.Prettify(ExternalToolsHelper.ProcCpuInfo.Value.GetValueOrDefault("model name") ?? "");
+                return ProcessorBrandStringHelper.Prettify(ExternalToolsHelper.ProcCpuInfo.Value.ProcessorName);
 
             if (IsMacOSX())
                 return ProcessorBrandStringHelper.Prettify(ExternalToolsHelper.Sysctl.Value.GetValueOrDefault("machdep.cpu.brand_string") ?? "");
 
             return Unknown;
+        }
+
+        internal static int? GetPhysicalCoresCount()
+        {
+#if !CORE
+            if (IsWindows() && !IsMono())
+            {
+                try
+                {
+                    uint physicalCoresCount = 0;
+                    var mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
+                    foreach (var moProcessor in mosProcessor.Get().Cast<ManagementObject>())
+                        physicalCoresCount += (uint) moProcessor["NumberOfCores"];
+                    return physicalCoresCount == 0 ? (int?) null : (int) physicalCoresCount;
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+            }
+#endif
+
+            if (IsLinux())
+                return ExternalToolsHelper.ProcCpuInfo.Value.PhysicalCoresCount;
+            
+            if (IsMacOSX())
+                return  int.TryParse(ExternalToolsHelper.Sysctl.Value.GetValueOrDefault("hw.physicalcpu"), out int hwPhysicalcpu) ? hwPhysicalcpu : (int?) null;
+            
+            return null;
+        }
+
+        internal static int? GetPhysicalProcessorsCount()
+        {
+#if !CORE
+            if (IsWindows() && !IsMono())
+            {
+                try
+                {
+                    uint physicalProcessorsCount = 0;
+                    var mosComputerSystem = new ManagementObjectSearcher("Select * from Win32_ComputerSystem");
+                    foreach (var moComputerSystem in mosComputerSystem.Get().Cast<ManagementObject>())
+                        physicalProcessorsCount += (uint)moComputerSystem["NumberOfProcessors"];
+                    return physicalProcessorsCount == 0 ? (int?) null : (int) physicalProcessorsCount;
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+            }
+#endif
+            
+            if (IsLinux())
+                return ExternalToolsHelper.ProcCpuInfo.Value.PhysicalProcessorsCount;
+            
+            if (IsMacOSX())
+                return int.TryParse(ExternalToolsHelper.Sysctl.Value.GetValueOrDefault("hw.packages"), out int hwPackages) ? hwPackages : (int?) null;            
+
+            return null;
         }
 
         public static string GetNetCoreVersion()
