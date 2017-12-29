@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Jobs;
@@ -11,6 +10,7 @@ using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Tests.Builders;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Tests.Mocks
             return new Summary(
                 "MockSummary",
                 CreateReports(config),
-                MockHostEnvironmentInfo.Default,
+                new HostEnvironmentInfoBuilder().Build(),
                 config,
                 "",
                 TimeSpan.FromMinutes(1),
@@ -68,29 +68,29 @@ namespace BenchmarkDotNet.Tests.Mocks
 
         public class MockHostEnvironmentInfo : HostEnvironmentInfo
         {
-            public static MockHostEnvironmentInfo Default = new MockHostEnvironmentInfo
+            public MockHostEnvironmentInfo(
+                string architecture, string benchmarkDotNetVersion, Frequency chronometerFrequency, string configuration, string dotNetSdkVersion,
+                HardwareTimerKind hardwareTimerKind, bool hasAttachedDebugger, bool hasRyuJit, bool isConcurrentGC, bool isServerGC,
+                string jitInfo, string jitModules, string osVersion, int processorCount,
+                string processorName, string runtimeVersion, VirtualMachineHypervisor virtualMachineHypervisor)
             {
-                Architecture = "64mock",
-                BenchmarkDotNetVersion = "0.10.x-mock",
-                ChronometerFrequency = new Frequency(2531248),
-                Configuration = "CONFIGURATION",
-                DotNetSdkVersion = new Lazy<string>(() => "1.0.x.mock"),
-                HardwareTimerKind = HardwareTimerKind.Tsc,
-                HasAttachedDebugger = false,
-                HasRyuJit = true,
-                IsConcurrentGC = false,
-                IsServerGC = false,
-                JitInfo = "RyuJIT-v4.6.x.mock",
-                JitModules = "clrjit-v4.6.x.mock",
-                OsVersion = new Lazy<string>(() => "Microsoft Windows NT 10.0.x.mock"),
-                ProcessorCount = 8,
-                ProcessorName = new Lazy<string>(() => "MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz"),
-                RuntimeVersion = "Clr 4.0.x.mock",
-                VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(() => HyperV.Default)
-            };
-
-            private MockHostEnvironmentInfo()
-            {
+                Architecture = architecture;
+                BenchmarkDotNetVersion = benchmarkDotNetVersion;
+                ChronometerFrequency = chronometerFrequency;
+                Configuration = configuration;
+                DotNetSdkVersion = new Lazy<string>(() => dotNetSdkVersion);
+                HardwareTimerKind = hardwareTimerKind;
+                HasAttachedDebugger = hasAttachedDebugger;
+                HasRyuJit = hasRyuJit;
+                IsConcurrentGC = isConcurrentGC;
+                IsServerGC = isServerGC;
+                JitInfo = jitInfo;
+                JitModules = jitModules;
+                OsVersion = new Lazy<string>(() => osVersion);
+                ProcessorCount = processorCount;
+                ProcessorName = new Lazy<string>(() => processorName);
+                RuntimeVersion = runtimeVersion;
+                VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(() => virtualMachineHypervisor);
             }
         }
     }
