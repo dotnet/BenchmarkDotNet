@@ -25,10 +25,23 @@ namespace BenchmarkDotNet.Tests.Builders
         private string runtimeVersion = "Clr 4.0.x.mock";
         private VirtualMachineHypervisor virtualMachineHypervisor = HyperV.Default;
 
+        
+        public HostEnvironmentInfoBuilder WithVMHypervisor(VirtualMachineHypervisor hypervisor)
+        {
+            virtualMachineHypervisor = hypervisor;
+            return this;
+        }
+
+        public HostEnvironmentInfoBuilder WithoutVMHypervisor()
+        {
+            virtualMachineHypervisor = null;
+            return this;
+        }
+
         public HostEnvironmentInfo Build()
         {
-            return new MockFactory.MockHostEnvironmentInfo(architecture, benchmarkDotNetVersion, chronometerFrequency, configuration, 
-                dotNetSdkVersion, hardwareTimerKind, hasAttachedDebugger, hasRyuJit, isConcurrentGC, isServerGC, 
+            return new MockFactory.MockHostEnvironmentInfo(architecture, benchmarkDotNetVersion, chronometerFrequency, configuration,
+                dotNetSdkVersion, hardwareTimerKind, hasAttachedDebugger, hasRyuJit, isConcurrentGC, isServerGC,
                 jitInfo, jitModules, osVersion, processorCount, processorName, runtimeVersion, virtualMachineHypervisor);
         }
     }
