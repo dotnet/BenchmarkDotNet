@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Tests.Environments
             Assert.Equal(expected, line);
         }
 
-        private static IEnumerable<object[]> Hypervisors()
+        public static IEnumerable<object[]> Hypervisors()
         {
             yield return new object[] { HyperV.Default };
             yield return new object[] { VirtualBox.Default };
