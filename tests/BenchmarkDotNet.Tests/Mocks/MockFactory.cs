@@ -5,9 +5,6 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Jobs;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Builders;
@@ -63,34 +60,6 @@ namespace BenchmarkDotNet.Tests.Mocks
             [Benchmark]
             public void Bar()
             {
-            }
-        }
-
-        public class MockHostEnvironmentInfo : HostEnvironmentInfo
-        {
-            public MockHostEnvironmentInfo(
-                string architecture, string benchmarkDotNetVersion, Frequency chronometerFrequency, string configuration, string dotNetSdkVersion,
-                HardwareTimerKind hardwareTimerKind, bool hasAttachedDebugger, bool hasRyuJit, bool isConcurrentGC, bool isServerGC,
-                string jitInfo, string jitModules, string osVersion, int processorCount,
-                string processorName, string runtimeVersion, VirtualMachineHypervisor virtualMachineHypervisor)
-            {
-                Architecture = architecture;
-                BenchmarkDotNetVersion = benchmarkDotNetVersion;
-                ChronometerFrequency = chronometerFrequency;
-                Configuration = configuration;
-                DotNetSdkVersion = new Lazy<string>(() => dotNetSdkVersion);
-                HardwareTimerKind = hardwareTimerKind;
-                HasAttachedDebugger = hasAttachedDebugger;
-                HasRyuJit = hasRyuJit;
-                IsConcurrentGC = isConcurrentGC;
-                IsServerGC = isServerGC;
-                JitInfo = jitInfo;
-                JitModules = jitModules;
-                OsVersion = new Lazy<string>(() => osVersion);
-                ProcessorCount = processorCount;
-                ProcessorName = new Lazy<string>(() => processorName);
-                RuntimeVersion = runtimeVersion;
-                VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(() => virtualMachineHypervisor);
             }
         }
     }

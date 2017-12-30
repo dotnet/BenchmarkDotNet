@@ -1,7 +1,7 @@
-﻿using BenchmarkDotNet.Environments;
+﻿using System;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Tests.Mocks;
 
 namespace BenchmarkDotNet.Tests.Builders
 {
@@ -25,7 +25,6 @@ namespace BenchmarkDotNet.Tests.Builders
         private string runtimeVersion = "Clr 4.0.x.mock";
         private VirtualMachineHypervisor virtualMachineHypervisor = HyperV.Default;
 
-        
         public HostEnvironmentInfoBuilder WithVMHypervisor(VirtualMachineHypervisor hypervisor)
         {
             virtualMachineHypervisor = hypervisor;
@@ -40,9 +39,37 @@ namespace BenchmarkDotNet.Tests.Builders
 
         public HostEnvironmentInfo Build()
         {
-            return new MockFactory.MockHostEnvironmentInfo(architecture, benchmarkDotNetVersion, chronometerFrequency, configuration,
+            return new MockHostEnvironmentInfo(architecture, benchmarkDotNetVersion, chronometerFrequency, configuration,
                 dotNetSdkVersion, hardwareTimerKind, hasAttachedDebugger, hasRyuJit, isConcurrentGC, isServerGC,
                 jitInfo, jitModules, osVersion, processorCount, processorName, runtimeVersion, virtualMachineHypervisor);
+        }
+    }
+
+    internal class MockHostEnvironmentInfo : HostEnvironmentInfo
+    {
+        public MockHostEnvironmentInfo(
+            string architecture, string benchmarkDotNetVersion, Frequency chronometerFrequency, string configuration, string dotNetSdkVersion,
+            HardwareTimerKind hardwareTimerKind, bool hasAttachedDebugger, bool hasRyuJit, bool isConcurrentGC, bool isServerGC,
+            string jitInfo, string jitModules, string osVersion, int processorCount,
+            string processorName, string runtimeVersion, VirtualMachineHypervisor virtualMachineHypervisor)
+        {
+            Architecture = architecture;
+            BenchmarkDotNetVersion = benchmarkDotNetVersion;
+            ChronometerFrequency = chronometerFrequency;
+            Configuration = configuration;
+            DotNetSdkVersion = new Lazy<string>(() => dotNetSdkVersion);
+            HardwareTimerKind = hardwareTimerKind;
+            HasAttachedDebugger = hasAttachedDebugger;
+            HasRyuJit = hasRyuJit;
+            IsConcurrentGC = isConcurrentGC;
+            IsServerGC = isServerGC;
+            JitInfo = jitInfo;
+            JitModules = jitModules;
+            OsVersion = new Lazy<string>(() => osVersion);
+            ProcessorCount = processorCount;
+            ProcessorName = new Lazy<string>(() => processorName);
+            RuntimeVersion = runtimeVersion;
+            VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(() => virtualMachineHypervisor);
         }
     }
 }
