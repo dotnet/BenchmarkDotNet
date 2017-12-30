@@ -84,7 +84,12 @@ namespace BenchmarkDotNet.Environments
 
         public override IEnumerable<string> ToFormattedString()
         {
-            yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}";
+            string vmName = VirtualMachineHypervisor.Value?.Name;
+            if (vmName == null)
+                yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}";
+            else
+                yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}, VM={vmName}";
+
             yield return $"Processor={ProcessorName.Value}, ProcessorCount={ProcessorCount}";
             if (HardwareTimerKind != HardwareTimerKind.Unknown)
                 yield return $"Frequency={ChronometerFrequency}, Resolution={ChronometerResolution}, Timer={HardwareTimerKind.ToString().ToUpper()}";
