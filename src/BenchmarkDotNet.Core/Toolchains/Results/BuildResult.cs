@@ -18,6 +18,6 @@ namespace BenchmarkDotNet.Toolchains.Results
 
         public static BuildResult Failure(GenerateResult generateResult, Exception exception = null) => new BuildResult(generateResult, false, exception);
 
-        public override string ToString() => "BuildResult: " + (IsBuildSuccess ? "Success" : "Fail");
+        public override string ToString() => "BuildResult: " + (IsBuildSuccess ? "Success" : "Failure");
     }
 }
