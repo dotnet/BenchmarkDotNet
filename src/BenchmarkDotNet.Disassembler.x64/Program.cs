@@ -384,9 +384,13 @@ namespace BenchmarkDotNet.Disassembler
             // so the last chance is to try to match them by... name (I don't like it, but I have no better idea for now)
             var unifiedSignature = CecilNameToClrmdName(methodReference);
 
-            return declaringType
-                .Methods
-                .SingleOrDefault(method => method.GetFullSignature() == unifiedSignature);
+            var methodsMatchingSignature = declaringType.Methods
+                .Where(method => method.GetFullSignature() == unifiedSignature).ToArray();
+            if (methodsMatchingSignature.Length == 1)
+            {
+                return methodsMatchingSignature[0];
+            }
+            return null;
         }
 
 
