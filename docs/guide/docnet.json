@@ -51,7 +51,8 @@
             "Debugging":"Contributing\\Debugging.md",
             "Running tests":"Contributing\\RunningTests.md",
             "Development":"Contributing\\Development.md",
-            "Miscellaneous topics":"Contributing\\Miscellaneous.md" 
+            "Miscellaneous topics":"Contributing\\Miscellaneous.md",
+            "Disassembler":"Contributing\\Disassembler.md"
         },
         "FAQ": "FAQ.md",
         "Team": "Team.md",
