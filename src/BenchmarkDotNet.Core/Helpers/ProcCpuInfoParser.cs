@@ -23,14 +23,14 @@ namespace BenchmarkDotNet.Helpers
                     processorModelNames.Add(modelName);
             }
 
-            PhysicalProcessorsCount = processorsToPhysicalCoresCount.Count == 0 ? (int?) null : processorsToPhysicalCoresCount.Count;
-            PhysicalCoresCount = processorsToPhysicalCoresCount.Count == 0 ? (int?) null : processorsToPhysicalCoresCount.Values.Sum();
+            PhysicalProcessorCount = processorsToPhysicalCoresCount.Count == 0 ? (int?) null : processorsToPhysicalCoresCount.Count;
+            PhysicalCoreCount = processorsToPhysicalCoresCount.Count == 0 ? (int?) null : processorsToPhysicalCoresCount.Values.Sum();
             ProcessorName = processorModelNames.Count == 0 ? null : string.Join(", ", processorModelNames);
         }
 
-        public int? PhysicalCoresCount { get; }
+        public int? PhysicalCoreCount { get; }
 
-        public int? PhysicalProcessorsCount { get; }
+        public int? PhysicalProcessorCount { get; }
 
         public string ProcessorName { get; }
 
@@ -56,5 +56,6 @@ namespace BenchmarkDotNet.Helpers
                     units = null;
             return items;
         }
+
     }
 }

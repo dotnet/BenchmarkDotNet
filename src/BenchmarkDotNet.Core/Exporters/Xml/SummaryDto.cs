@@ -33,9 +33,9 @@ namespace BenchmarkDotNet.Exporters.Xml
         public string BenchmarkDotNetVersion => hei.BenchmarkDotNetVersion;
         public string OsVersion => hei.OsVersion.Value;
         public string ProcessorName => hei.ProcessorName.Value;
-        public int LogicalCoresCount => hei.LogicalCoresCount;
-        public string PhysicalCoresCount => hei.PhysicalCoresCount.Value?.ToString();
-        public string PhysicalProcessorsCount => hei.PhysicalProcessorsCount?.ToString();
+        public int LogicalCoresCount => hei.LogicalCoreCount;
+        public string PhysicalCoresCount => hei.PhysicalCoreCount.Value?.ToString();
+        public string PhysicalProcessorsCount => hei.PhysicalProcessorCount?.ToString();
         public string RuntimeVersion => hei.RuntimeVersion;
         public string Architecture => hei.Architecture;
         public bool HasAttachedDebugger => hei.HasAttachedDebugger;

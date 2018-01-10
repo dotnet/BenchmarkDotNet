@@ -28,6 +28,7 @@ namespace BenchmarkDotNet.Portability
         private const string DebugConfigurationName = "DEBUG";
         internal const string ReleaseConfigurationName = "RELEASE";
         internal const string Unknown = "?";
+        internal const string UnknownProcessor = "Unknown processor";
 
         internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
 
@@ -144,18 +145,18 @@ namespace BenchmarkDotNet.Portability
             return Unknown;
         }
 
-        internal static int? GetPhysicalCoresCount()
+        internal static int? GetPhysicalCoreCount()
         {
 #if !CORE
             if (IsWindows() && !IsMono())
             {
                 try
                 {
-                    uint physicalCoresCount = 0;
+                    uint physicalCoreCount = 0;
                     var mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
                     foreach (var moProcessor in mosProcessor.Get().Cast<ManagementObject>())
-                        physicalCoresCount += (uint) moProcessor["NumberOfCores"];
-                    return physicalCoresCount == 0 ? (int?) null : (int) physicalCoresCount;
+                        physicalCoreCount += (uint) moProcessor["NumberOfCores"];
+                    return physicalCoreCount == 0 ? (int?) null : (int) physicalCoreCount;
                 }
                 catch (Exception)
                 {
@@ -165,26 +166,26 @@ namespace BenchmarkDotNet.Portability
 #endif
 
             if (IsLinux())
-                return ExternalToolsHelper.ProcCpuInfo.Value.PhysicalCoresCount;
+                return ExternalToolsHelper.ProcCpuInfo.Value.PhysicalCoreCount;
             
             if (IsMacOSX())
-                return  int.TryParse(ExternalToolsHelper.Sysctl.Value.GetValueOrDefault("hw.physicalcpu"), out int hwPhysicalcpu) ? hwPhysicalcpu : (int?) null;
+                return int.TryParse(ExternalToolsHelper.Sysctl.Value.GetValueOrDefault("hw.physicalcpu"), out int hwPhysicalcpu) ? hwPhysicalcpu : (int?) null;
             
             return null;
         }
 
-        internal static int? GetPhysicalProcessorsCount()
+        internal static int? GetPhysicalProcessorCount()
         {
 #if !CORE
             if (IsWindows() && !IsMono())
             {
                 try
                 {
-                    uint physicalProcessorsCount = 0;
+                    uint physicalProcessorCount = 0;
                     var mosComputerSystem = new ManagementObjectSearcher("Select * from Win32_ComputerSystem");
                     foreach (var moComputerSystem in mosComputerSystem.Get().Cast<ManagementObject>())
-                        physicalProcessorsCount += (uint)moComputerSystem["NumberOfProcessors"];
-                    return physicalProcessorsCount == 0 ? (int?) null : (int) physicalProcessorsCount;
+                        physicalProcessorCount += (uint)moComputerSystem["NumberOfProcessors"];
+                    return physicalProcessorCount == 0 ? (int?) null : (int) physicalProcessorCount;
                 }
                 catch (Exception)
                 {
@@ -194,7 +195,7 @@ namespace BenchmarkDotNet.Portability
 #endif
             
             if (IsLinux())
-                return ExternalToolsHelper.ProcCpuInfo.Value.PhysicalProcessorsCount;
+                return ExternalToolsHelper.ProcCpuInfo.Value.PhysicalProcessorCount;
             
             if (IsMacOSX())
                 return int.TryParse(ExternalToolsHelper.Sysctl.Value.GetValueOrDefault("hw.packages"), out int hwPackages) ? hwPackages : (int?) null;            

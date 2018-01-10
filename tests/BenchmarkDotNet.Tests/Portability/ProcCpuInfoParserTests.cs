@@ -6,27 +6,29 @@ namespace BenchmarkDotNet.Tests.Portability
     public class ProcCpuInfoParserTests
     {
         [Fact]
-        public void TestEmpty()
+        public void EmptyTest()
         {
             var parser = new ProcCpuInfoParser(string.Empty);
-            Assert.Equal(null, parser.PhysicalProcessorsCount);
-            Assert.Equal(null, parser.PhysicalCoresCount);
+            Assert.Equal(null, parser.PhysicalProcessorCount);
+            Assert.Equal(null, parser.PhysicalCoreCount);
             Assert.Equal(null, parser.ProcessorName);
         }
 
         [Fact]
-        public void TestBad()
+        public void MalformedTest()
         {
-            var parser = new ProcCpuInfoParser("badkey: badvalue\n\nbadkey2: badvalue2");
-            Assert.Equal(null, parser.PhysicalProcessorsCount);
-            Assert.Equal(null, parser.PhysicalCoresCount);
+            var parser = new ProcCpuInfoParser("malformedkey: malformedvalue\n\nmalformedkey2: malformedvalue2");
+            Assert.Equal(null, parser.PhysicalProcessorCount);
+            Assert.Equal(null, parser.PhysicalCoreCount);
             Assert.Equal(null, parser.ProcessorName);
         }
 
         [Fact]
-        public void TestTwoProcessorWithDifferentCoresCount()
+        public void TwoProcessorWithDifferentCoresCountTest()
         {
-            var cpuinfo = @"processor	: 0
+            #region cpuInfo
+
+            string cpuinfo = @"processor	: 0
 physical id	: 0
 model name  : Unknown processor with 2 cores and hyper threading
 core id		: 0
@@ -74,15 +76,18 @@ physical id	: 3
 core id		: 2
 cpu cores	: 4
 ";
+
+            #endregion
+
             var parser = new ProcCpuInfoParser(cpuinfo);
-            Assert.Equal(2, parser.PhysicalProcessorsCount);
-            Assert.Equal(6, parser.PhysicalCoresCount);
+            Assert.Equal(2, parser.PhysicalProcessorCount);
+            Assert.Equal(6, parser.PhysicalCoreCount);
             Assert.Equal("Unknown processor with 2 cores and hyper threading, Unknown processor with 4 cores", parser.ProcessorName);
         }
 
 
         [Fact]
-        public void TestRealOneProcessorTwoCores()
+        public void RealOneProcessorTwoCoresTest()
         {
             #region cpuinfo
 
@@ -197,13 +202,13 @@ power management:";
             #endregion
 
             var parser = new ProcCpuInfoParser(cpuInfo);
-            Assert.Equal(1, parser.PhysicalProcessorsCount);
-            Assert.Equal(2, parser.PhysicalCoresCount);
+            Assert.Equal(1, parser.PhysicalProcessorCount);
+            Assert.Equal(2, parser.PhysicalCoreCount);
             Assert.Equal("Intel(R) Core(TM) i5-6200U CPU @ 2.30GHz", parser.ProcessorName);
         }
 
         [Fact]
-        public void TestRealOneProcessorFourCores()
+        public void RealOneProcessorFourCoresTest()
         {
             #region cpuinfo
 
@@ -428,9 +433,11 @@ power management:
             #endregion
 
             var parser = new ProcCpuInfoParser(cpuInfo);
-            Assert.Equal(1, parser.PhysicalProcessorsCount);
-            Assert.Equal(4, parser.PhysicalCoresCount);
+            Assert.Equal(1, parser.PhysicalProcessorCount);
+            Assert.Equal(4, parser.PhysicalCoreCount);
             Assert.Equal("Intel(R) Core(TM) i7-4710MQ CPU @ 2.50GHz", parser.ProcessorName);
         }
     }
+    
+
 }
