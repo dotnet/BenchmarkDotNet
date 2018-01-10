@@ -1,46 +1,51 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Helpers
 {
-    public class ProcCpuInfoParser : ICpuInfo
+    public class WmicCpuInfoParser : ICpuInfo
     {
-        public ProcCpuInfoParser(string content)
+        public WmicCpuInfoParser(string content)
         {
-            var logicalCores = Parse(content, ':');
-            var logicalCoreCount = 0;
-            var processorsToPhysicalCoresCount = new Dictionary<string, int>();
-            var processorModelNames = new HashSet<string>();
-            foreach (var logicalCore in logicalCores)
-            {
-                if (logicalCore.TryGetValue(ProcCpuInfoKeyNames.PhysicalId, out string physicalId) &&
-                    logicalCore.TryGetValue(ProcCpuInfoKeyNames.CpuCores, out string cpuCoresValue) &&
-                    int.TryParse(cpuCoresValue, out int cpuCoresCount))
-                    processorsToPhysicalCoresCount[physicalId] = cpuCoresCount;
+            var processors = Parse(content, '=');
 
-                if (logicalCore.TryGetValue(ProcCpuInfoKeyNames.ModelName, out string modelName))
+            var processorModelNames = new HashSet<string>();
+            int physicalCoreCount = 0;
+            int logicalCoreCount = 0;
+            int processorsCount = 0;
+            foreach (var processor in processors)
+            {
+
+                if (processor.TryGetValue(WmicCpuInfoKeyNames.NumberOfCores, out string numberOfCoresValue) &&
+                    int.TryParse(numberOfCoresValue, out int numberOfCores) &&
+                    numberOfCores > 0)
+                    physicalCoreCount += numberOfCores;
+                
+                if (processor.TryGetValue(WmicCpuInfoKeyNames.NumberOfLogicalProcessors, out string numberOfLogicalValue) &&
+                    int.TryParse(numberOfLogicalValue, out int numberOfLogical) &&
+                    numberOfLogical > 0)
+                    logicalCoreCount += numberOfLogical;
+
+                if (processor.TryGetValue(WmicCpuInfoKeyNames.Name, out string name))
                 {
-                    processorModelNames.Add(modelName);
-                    logicalCoreCount++;
+                    processorModelNames.Add(name);
+                    processorsCount++;
                 }
+
             }
 
-            PhysicalProcessorCount = processorsToPhysicalCoresCount.Count == 0 ? (int?) null : processorsToPhysicalCoresCount.Count;
-            PhysicalCoreCount = processorsToPhysicalCoresCount.Count == 0 ? (int?) null : processorsToPhysicalCoresCount.Values.Sum();
+            PhysicalProcessorCount = processorsCount > 0 ? processorsCount : (int?) null;
+            PhysicalCoreCount = physicalCoreCount > 0 ? physicalCoreCount : (int?) null;
+            LogicalCoreCount = logicalCoreCount > 0 ? logicalCoreCount : (int?) null;
             ProcessorName = processorModelNames.Count == 0 ? null : string.Join(", ", processorModelNames);
-            LogicalCoreCount = logicalCoreCount == 0 ? (int?) null : logicalCoreCount;
         }
-
-        public int? PhysicalCoreCount { get; }
-
-        public int? PhysicalProcessorCount { get; }
         
+        public int? PhysicalCoreCount { get; }
+        public int? PhysicalProcessorCount { get; }
         public int? LogicalCoreCount { get; }
-
         public string ProcessorName { get; }
-
+        
         [NotNull]
         private static List<Dictionary<string, string>> Parse([CanBeNull] string content, char separator)
         {
