@@ -1,7 +1,7 @@
-﻿using BenchmarkDotNet.Helpers;
+﻿using BenchmarkDotNet.Portability.Cpu;
 using Xunit;
 
-namespace BenchmarkDotNet.Tests.Portability
+namespace BenchmarkDotNet.Tests.Portability.Cpu
 {
     public class WmicCpuInfoParserTests
     {

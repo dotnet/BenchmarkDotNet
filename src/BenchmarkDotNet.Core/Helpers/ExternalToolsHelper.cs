@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Portability;
-using JetBrains.Annotations;
+using BenchmarkDotNet.Portability.Cpu;
 
 namespace BenchmarkDotNet.Helpers
 {
@@ -25,7 +25,8 @@ namespace BenchmarkDotNet.Helpers
         /// Output of the `lsb_release -a` command.
         /// Linux only.
         /// </summary>
-        public static readonly Lazy<Dictionary<string, string>> LsbRelease = LazyDic(RuntimeInformation.IsLinux, "lsb_release", "-a", ':');
+        public static readonly Lazy<Dictionary<string, string>> LsbRelease = LazyParse(RuntimeInformation.IsLinux, "lsb_release", "-a",
+            s => StringHelper.Parse(s, ':'));
 
         /// <summary>
         /// Output of the `sysctl -a` command.
@@ -38,16 +39,7 @@ namespace BenchmarkDotNet.Helpers
         /// MacOSX only.
         /// </summary>
         public static readonly Lazy<Dictionary<string, string>> MacSystemProfilerData =
-            LazyDic(RuntimeInformation.IsMacOSX, "system_profiler", "SPSoftwareDataType", ':');
-
-        private static Lazy<Dictionary<string, string>> LazyDic(Func<bool> isAvailable, string fileName, string arguments, char separator)
-        {
-            return new Lazy<Dictionary<string, string>>(() =>
-            {
-                string content = isAvailable() ? ProcessHelper.RunAndReadOutput(fileName, arguments) : "";
-                return ParseList(content, separator);
-            });
-        }
+            LazyParse(RuntimeInformation.IsMacOSX, "system_profiler", "SPSoftwareDataType", s => StringHelper.Parse(s, ':'));
 
         private static Lazy<T> LazyParse<T>(Func<bool> isAvailable, string fileName, string arguments, Func<string, T> parseFunc)
         {
@@ -58,20 +50,6 @@ namespace BenchmarkDotNet.Helpers
             });
         }
 
-        [NotNull]
-        private static Dictionary<string, string> ParseList([CanBeNull] string content, char separator)
-        {
-            var values = new Dictionary<string, string>();
-            var list = content?.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-            if (list != null)
-                foreach (string line in list)
-                    if (line.IndexOf(separator) != -1)
-                    {
-                        var lineParts = line.Split(separator);
-                        if (lineParts.Length >= 2)
-                            values[lineParts[0].Trim()] = lineParts[1].Trim();
-                    }
-            return values;
-        }
+
     }
 }

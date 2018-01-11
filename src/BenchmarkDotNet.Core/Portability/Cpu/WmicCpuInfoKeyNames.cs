@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Helpers
+﻿namespace BenchmarkDotNet.Portability.Cpu
 {
     internal static class WmicCpuInfoKeyNames
     {

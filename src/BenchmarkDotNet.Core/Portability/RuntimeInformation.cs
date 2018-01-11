@@ -11,6 +11,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability.Cpu;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CsProj;
 using JetBrains.Annotations;

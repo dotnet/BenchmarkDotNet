@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Environments;
 
-namespace BenchmarkDotNet.Helpers
+namespace BenchmarkDotNet.Portability.Cpu
 {
     public static class CpuInfoFormatter
     {

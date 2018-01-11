@@ -5,6 +5,7 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Portability.Cpu;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 

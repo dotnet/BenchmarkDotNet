@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
 
-namespace BenchmarkDotNet.Helpers
+namespace BenchmarkDotNet.Portability.Cpu
 {
     public class SysctlCpuInfoParser : ICpuInfo
     {
         public SysctlCpuInfoParser(string content)
         {
-            var sysctl = ParseList(content, ':');
+            var sysctl = StringHelper.Parse(content, ':');
             PhysicalProcessorCount = GetPositiveIntValue(sysctl, "hw.packages");
             PhysicalCoreCount = GetPositiveIntValue(sysctl, "hw.logicalcpu");
             LogicalCoreCount = GetPositiveIntValue(sysctl, "hw.physicalcpu");
@@ -29,22 +30,6 @@ namespace BenchmarkDotNet.Helpers
                 result > 0)
                 return result;
             return null;
-        }
-
-        [NotNull]
-        private static Dictionary<string, string> ParseList([CanBeNull] string content, char separator)
-        {
-            var values = new Dictionary<string, string>();
-            var list = content?.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-            if (list != null)
-                foreach (string line in list)
-                    if (line.IndexOf(separator) != -1)
-                    {
-                        var lineParts = line.Split(separator);
-                        if (lineParts.Length >= 2)
-                            values[lineParts[0].Trim()] = lineParts[1].Trim();
-                    }
-            return values;
         }
     }
 }

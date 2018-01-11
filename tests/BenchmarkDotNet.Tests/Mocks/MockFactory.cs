@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Jobs;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Portability.Cpu;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
@@ -97,14 +96,6 @@ namespace BenchmarkDotNet.Tests.Mocks
             private MockHostEnvironmentInfo()
             {
             }
-        }
-
-        public class MockCpuInfo : ICpuInfo
-        {
-            public int? PhysicalCoreCount { get; set; }
-            public int? PhysicalProcessorCount { get; set; }
-            public int? LogicalCoreCount { get; set; }
-            public string ProcessorName { get; set; }
         }
     }
 }

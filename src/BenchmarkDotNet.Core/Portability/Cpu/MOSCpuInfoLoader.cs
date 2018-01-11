@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Management;
 
-namespace BenchmarkDotNet.Helpers
+namespace BenchmarkDotNet.Portability.Cpu
 {
     public class MOSCpuInfoLoader : ICpuInfo
     {
@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Helpers
             PhysicalProcessorCount = processorsCount > 0 ? processorsCount : (int?) null;
             PhysicalCoreCount = physicalCoreCount > 0 ? (int?) physicalCoreCount : null;
             LogicalCoreCount = logicalCoreCount > 0 ? (int?) logicalCoreCount : null;
-            ProcessorName = processorModelNames.Count == 0 ? null : string.Join(", ", processorModelNames);
+            ProcessorName = processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null;
         }
 
         public int? PhysicalCoreCount { get; }
