@@ -51,7 +51,10 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithRemoveOutliers(this Job job, bool value) => job.WithCore(j => j.Accuracy.RemoveOutliers = value);
         public static Job WithAnalyzeLaunchVariance(this Job job, bool value) => job.WithCore(j => j.Accuracy.AnalyzeLaunchVariance = value);
         
-
+        // Meta
+        public static Job AsBaseline(this Job job) => job.WithCore(j => j.Meta.IsBaseline = true);
+        public static Job WithIsBaseline(this Job job, bool value) => value ? job.AsBaseline() : job;
+        
         // Info
         [Obsolete]
         public static string GetShortInfo(this Job job) => job.ResolvedId;

@@ -23,5 +23,7 @@ namespace BenchmarkDotNet.Running
         }
 
         public int CompareTo(Benchmark other) => string.Compare(FolderInfo, other.FolderInfo, StringComparison.Ordinal);
+
+        public bool IsBaseline() => Target.Baseline || Job.Meta.IsBaseline;
     }
 }

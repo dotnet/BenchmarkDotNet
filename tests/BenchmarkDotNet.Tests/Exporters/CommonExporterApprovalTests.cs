@@ -22,11 +22,11 @@ namespace BenchmarkDotNet.Tests.Exporters
     [Collection("ApprovalTests")]
     [UseReporter(typeof(XUnit2Reporter))]
     [UseApprovalSubdirectory("ApprovedFiles")]
-    public class ApprovalTest : IDisposable
+    public class CommonExporterApprovalTests : IDisposable
     {
         private readonly CultureInfo initCulture;
 
-        public ApprovalTest()
+        public CommonExporterApprovalTests()
         {
             initCulture = Thread.CurrentThread.CurrentCulture;
         }

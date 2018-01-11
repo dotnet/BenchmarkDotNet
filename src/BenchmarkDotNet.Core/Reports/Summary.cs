@@ -9,6 +9,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -29,6 +30,7 @@ namespace BenchmarkDotNet.Reports
         private readonly Dictionary<Job, string> shortInfos;
         private readonly Lazy<Job[]> jobs;
         private readonly Dictionary<Benchmark, BenchmarkReport> reportMap = new Dictionary<Benchmark, BenchmarkReport>();
+        private readonly IOrderProvider orderProvider;
 
         public bool HasReport(Benchmark benchmark) => reportMap.ContainsKey(benchmark);
 
@@ -39,6 +41,9 @@ namespace BenchmarkDotNet.Reports
 
         public bool HasCriticalValidationErrors => ValidationErrors.Any(validationError => validationError.IsCritical);
 
+        [CanBeNull]
+        public string GetLogicalGroupKey(Benchmark benchmark) => orderProvider.GetLogicalGroupKey(Config, Benchmarks, benchmark);
+
         public Summary(string title, IList<BenchmarkReport> reports, HostEnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, ValidationError[] validationErrors)
             : this(title, hostEnvironmentInfo, config, resultsDirectoryPath, totalTime, validationErrors)
         {
@@ -47,7 +52,7 @@ namespace BenchmarkDotNet.Reports
                 reportMap[report.Benchmark] = report;
             Reports = Benchmarks.Select(b => reportMap[b]).ToArray();
 
-            var orderProvider = config.GetOrderProvider() ?? DefaultOrderProvider.Instance;
+            orderProvider = config.GetOrderProvider() ?? DefaultOrderProvider.Instance;
             Benchmarks = orderProvider.GetSummaryOrder(Benchmarks, this).ToArray();
             Reports = Benchmarks.Select(b => reportMap[b]).ToArray();
 
