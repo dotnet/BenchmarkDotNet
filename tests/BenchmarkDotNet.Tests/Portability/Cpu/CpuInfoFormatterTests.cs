@@ -8,7 +8,8 @@ using BenchmarkDotNet.Tests.Mocks;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Portability.Cpu
-{
+{   
+    [Collection("ApprovalTests")]
     [UseReporter(typeof(XUnit2Reporter))]
     [UseApprovalSubdirectory("ApprovedFiles")]
     public class CpuInfoFormatterTests

@@ -28,8 +28,6 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
         [Fact]
         public void RealTwoProcessorEightCoresTest()
         {
-            #region cpuinfo
-
             var cpuInfo = @"
 
 Name=Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
@@ -42,9 +40,6 @@ NumberOfCores=8
 NumberOfLogicalProcessors=16
 
 ";
-
-            #endregion
-
             var parser = new WmicCpuInfoParser(cpuInfo);
             Assert.Equal("Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz", parser.ProcessorName);
             Assert.Equal(2, parser.PhysicalProcessorCount);
@@ -55,8 +50,6 @@ NumberOfLogicalProcessors=16
         [Fact]
         public void RealOneProcessorFourCoresTest()
         {
-            #region cpuinfo
-
             var cpuInfo = @"
 
 Name=Intel(R) Core(TM) i7-4710MQ CPU @ 2.50GHz
@@ -64,8 +57,6 @@ NumberOfCores=4
 NumberOfLogicalProcessors=8
 
 ";
-
-            #endregion
 
             var parser = new WmicCpuInfoParser(cpuInfo);
             Assert.Equal("Intel(R) Core(TM) i7-4710MQ CPU @ 2.50GHz", parser.ProcessorName);
