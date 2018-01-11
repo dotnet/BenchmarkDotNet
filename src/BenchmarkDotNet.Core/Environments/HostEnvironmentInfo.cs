@@ -94,7 +94,8 @@ namespace BenchmarkDotNet.Environments
             if (HardwareTimerKind != HardwareTimerKind.Unknown)
                 yield return $"Frequency={ChronometerFrequency}, Resolution={ChronometerResolution}, Timer={HardwareTimerKind.ToString().ToUpper()}";
 #if !CLASSIC
-            yield return $".NET Core SDK={DotNetSdkVersion.Value}";
+            if (IsDotNetCliInstalled())
+                yield return $".NET Core SDK={DotNetSdkVersion.Value}";
 #endif
         }
 

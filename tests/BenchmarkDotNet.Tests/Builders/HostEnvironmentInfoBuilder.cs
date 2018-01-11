@@ -37,6 +37,12 @@ namespace BenchmarkDotNet.Tests.Builders
             return this;
         }
 
+        public HostEnvironmentInfoBuilder WithoutDotNetSdkVersion()
+        {
+            dotNetSdkVersion = null;
+            return this;
+        }
+
         public HostEnvironmentInfo Build()
         {
             return new MockHostEnvironmentInfo(architecture, benchmarkDotNetVersion, chronometerFrequency, configuration,
