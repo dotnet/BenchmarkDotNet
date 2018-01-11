@@ -1,5 +1,7 @@
-﻿using BenchmarkDotNet.Columns;
+﻿using System.Collections.Generic;
+using BenchmarkDotNet.Columns;
 using System.Linq;
+using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -15,5 +17,11 @@ namespace BenchmarkDotNet.Reports
                 OrderBy(column => column.Category).
                 ThenBy(column => column.PriorityInCategory).
                 ToArray();
+
+        public static IEnumerable<Benchmark> GetLogicalGroupForBenchmark(this Summary summary, Benchmark benchmark)
+        {
+            string logicalGroupKey = summary.GetLogicalGroupKey(benchmark);
+            return summary.Benchmarks.Where(b => summary.GetLogicalGroupKey(b) == logicalGroupKey);
+        }
     }
 }

@@ -42,6 +42,7 @@ namespace BenchmarkDotNet.Configs
 
         public static IConfig KeepBenchmarkFiles(this IConfig config, bool value = true) => config.With(m => m.KeepBenchmarkFiles = value);
         public static IConfig RemoveBenchmarkFiles(this IConfig config) => config.KeepBenchmarkFiles(false);
+        public static IConfig With(this IConfig config, params BenchmarkLogicalGroupRule[] rules) => config.With(c => c.Add(rules));
 
         public static ReadOnlyConfig AsReadOnly(this IConfig config) =>
             config is ReadOnlyConfig readOnly

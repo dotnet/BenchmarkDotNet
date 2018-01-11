@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Columns
                 if (NeedToShow(summary, s => s.StandardDeviation > 1e-9))
                     yield return StatisticColumn.StdDev;
 
-                if (summary.Reports != null && summary.Benchmarks.Any(b => b.Target.Baseline))
+                if (summary.Reports != null && summary.Benchmarks.Any(b => b.IsBaseline()))
                 {
                     yield return BaselineScaledColumn.Scaled;
                     var stdDevColumn = BaselineScaledColumn.ScaledStdDev;
