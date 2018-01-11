@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Exporters.Json
                 HostEnvironmentInfo.BenchmarkDotNetCaption,
                 summary.HostEnvironmentInfo.BenchmarkDotNetVersion,
                 OsVersion = summary.HostEnvironmentInfo.OsVersion.Value,
-                summary.HostEnvironmentInfo.CpuInfo.Value?.ProcessorName,
+                ProcessorName = ProcessorBrandStringHelper.Prettify(summary.HostEnvironmentInfo.CpuInfo.Value?.ProcessorName ?? ""),
                 summary.HostEnvironmentInfo.CpuInfo.Value?.PhysicalProcessorCount,
                 summary.HostEnvironmentInfo.CpuInfo.Value?.PhysicalCoreCount,
                 summary.HostEnvironmentInfo.LogicalCoreCount,

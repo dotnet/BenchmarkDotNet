@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Portability.Cpu
     {
         public SysctlCpuInfoParser(string content)
         {
-            var sysctl = StringHelper.Parse(content, ':');
+            var sysctl = SectionsHelper.ParseSection(content, ':');
             ProcessorName = sysctl.GetValueOrDefault("machdep.cpu.brand_string");
             PhysicalProcessorCount = GetPositiveIntValue(sysctl, "hw.packages");
             PhysicalCoreCount = GetPositiveIntValue(sysctl, "hw.logicalcpu");

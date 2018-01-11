@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Portability.Cpu
 {
@@ -10,7 +9,7 @@ namespace BenchmarkDotNet.Portability.Cpu
     {
         public ProcCpuInfoParser(string content)
         {
-            var logicalCores = StringHelper.ParseList(content, ':');
+            var logicalCores = SectionsHelper.ParseSections(content, ':');
             var processorModelNames = new HashSet<string>();
             var processorsToPhysicalCoreCount = new Dictionary<string, int>();
             var logicalCoreCount = 0;

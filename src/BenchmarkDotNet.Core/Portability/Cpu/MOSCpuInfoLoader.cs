@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Management;
+using BenchmarkDotNet.Environments;
 
 namespace BenchmarkDotNet.Portability.Cpu
 {

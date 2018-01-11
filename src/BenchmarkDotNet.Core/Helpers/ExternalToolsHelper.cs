@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Helpers
         /// Linux only.
         /// </summary>
         public static readonly Lazy<Dictionary<string, string>> LsbRelease = LazyParse(RuntimeInformation.IsLinux, "lsb_release", "-a",
-            s => StringHelper.Parse(s, ':'));
+            s => SectionsHelper.ParseSection(s, ':'));
 
         /// <summary>
         /// Output of the `sysctl -a` command.
@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Helpers
         /// MacOSX only.
         /// </summary>
         public static readonly Lazy<Dictionary<string, string>> MacSystemProfilerData =
-            LazyParse(RuntimeInformation.IsMacOSX, "system_profiler", "SPSoftwareDataType", s => StringHelper.Parse(s, ':'));
+            LazyParse(RuntimeInformation.IsMacOSX, "system_profiler", "SPSoftwareDataType", s => SectionsHelper.ParseSection(s, ':'));
 
         private static Lazy<T> LazyParse<T>(Func<bool> isAvailable, string fileName, string arguments, Func<string, T> parseFunc)
         {

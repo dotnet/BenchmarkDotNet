@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Portability.Cpu
 {
@@ -9,13 +8,13 @@ namespace BenchmarkDotNet.Portability.Cpu
     {
         public WmicCpuInfoParser(string content)
         {
-            var processors = StringHelper.ParseList(content, '=');
+            var processors = SectionsHelper.ParseSections(content, '=');
 
             var processorModelNames = new HashSet<string>();
             int physicalCoreCount = 0;
             int logicalCoreCount = 0;
             int processorsCount = 0;
-            
+
             foreach (var processor in processors)
             {
                 if (processor.TryGetValue(WmicCpuInfoKeyNames.NumberOfCores, out string numberOfCoresValue) &&
