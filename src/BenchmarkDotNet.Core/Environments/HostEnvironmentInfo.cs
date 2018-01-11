@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -33,14 +34,7 @@ namespace BenchmarkDotNet.Environments
         /// </summary>
         public Lazy<string> OsVersion { get; protected set; }
 
-        /// <summary>
-        /// is expensive to call (1s)
-        /// </summary>
-        public Lazy<string> ProcessorName { get; protected set; }
-        
-        public Lazy<int?> PhysicalCoreCount { get; protected set; }
-        
-        public Lazy<int?> PhysicalProcessorCount { get; protected set; }
+        public Lazy<ICpuInfo> CpuInfo { get; protected set; }
 
         public int LogicalCoreCount { get; protected set; }
 
@@ -74,10 +68,8 @@ namespace BenchmarkDotNet.Environments
         {
             BenchmarkDotNetVersion = GetBenchmarkDotNetVersion();
             OsVersion = new Lazy<string>(RuntimeInformation.GetOsVersion);
-            ProcessorName = new Lazy<string>(RuntimeInformation.GetProcessorName);
+            CpuInfo = new Lazy<ICpuInfo>(RuntimeInformation.GetCpuInfo);
             LogicalCoreCount = Environment.ProcessorCount;
-            PhysicalCoreCount = new Lazy<int?>(RuntimeInformation.GetPhysicalCoreCount);
-            PhysicalProcessorCount = new Lazy<int?>(RuntimeInformation.GetPhysicalProcessorCount);
             ChronometerFrequency = Chronometer.Frequency;
             HardwareTimerKind = Chronometer.HardwareTimerKind;
             JitModules = RuntimeInformation.GetJitModulesInfo();
@@ -86,14 +78,13 @@ namespace BenchmarkDotNet.Environments
             VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(RuntimeInformation.GetVirtualMachineHypervisor);
         }
 
+
         public new static HostEnvironmentInfo GetCurrent() => Current ?? (Current = new HostEnvironmentInfo());
 
         public override IEnumerable<string> ToFormattedString()
         {
             yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}";
-            string physicalCoreCount = PhysicalCoreCount.Value?.ToString() ?? RuntimeInformation.Unknown;
-            string physicalProcessorCount = PhysicalProcessorCount.Value?.ToString() ?? RuntimeInformation.Unknown;
-            yield return $"Processor={ProcessorName.Value}, LogicalCoresCount={LogicalCoreCount}, PhysicalCoresCount={physicalCoreCount}, PhysicalProcessorsCount={physicalProcessorCount}";
+            yield return CpuInfoFormatter.Format(CpuInfo.Value);
             if (HardwareTimerKind != HardwareTimerKind.Unknown)
                 yield return $"Frequency={ChronometerFrequency}, Resolution={ChronometerResolution}, Timer={HardwareTimerKind.ToString().ToUpper()}";
 #if !CLASSIC

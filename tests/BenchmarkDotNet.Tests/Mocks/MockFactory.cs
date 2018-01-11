@@ -7,6 +7,7 @@ using BenchmarkDotNet.Attributes.Jobs;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -83,15 +84,27 @@ namespace BenchmarkDotNet.Tests.Mocks
                 JitModules = "clrjit-v4.6.x.mock",
                 OsVersion = new Lazy<string>(() => "Microsoft Windows NT 10.0.x.mock"),
                 LogicalCoreCount = 8,
-                PhysicalCoreCount = new Lazy<int?>(() => 4),
-                PhysicalProcessorCount = new Lazy<int?>(() => 1),
-                ProcessorName = new Lazy<string>(() => "MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz"),
+                CpuInfo = new Lazy<ICpuInfo>(() => new MockCpuInfo
+                {
+                    PhysicalCoreCount = 4,
+                    PhysicalProcessorCount = 1,
+                    LogicalCoreCount = 8,
+                    ProcessorName = "MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz",
+                }),
                 RuntimeVersion = "Clr 4.0.x.mock"
             };
 
             private MockHostEnvironmentInfo()
             {
             }
+        }
+
+        public class MockCpuInfo : ICpuInfo
+        {
+            public int? PhysicalCoreCount { get; set; }
+            public int? PhysicalProcessorCount { get; set; }
+            public int? LogicalCoreCount { get; set; }
+            public string ProcessorName { get; set; }
         }
     }
 }

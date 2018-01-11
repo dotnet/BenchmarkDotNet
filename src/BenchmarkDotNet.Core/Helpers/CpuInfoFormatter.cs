@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using BenchmarkDotNet.Environments;
 
 namespace BenchmarkDotNet.Helpers
 {
@@ -6,29 +7,36 @@ namespace BenchmarkDotNet.Helpers
     {
         public static string Format(ICpuInfo cpuInfo)
         {
+            if (cpuInfo != null)
+                return Format(cpuInfo.ProcessorName, cpuInfo.PhysicalProcessorCount, cpuInfo.PhysicalCoreCount, cpuInfo.LogicalCoreCount);
+            return "Unknown processor";
+        }
+
+        private static string Format(string processorName, int? physicalProcessorCount, int? physicalCoreCount, int? logicalCoreCount)
+        {
             var parts = new List<string>();
-            if (!string.IsNullOrWhiteSpace(cpuInfo.ProcessorName))
-                parts.Add(cpuInfo.ProcessorName);
+            if (!string.IsNullOrWhiteSpace(processorName))
+                parts.Add(ProcessorBrandStringHelper.Prettify(processorName));
             else
                 parts.Add("Unknown processor");
-            
-            if (cpuInfo.PhysicalProcessorCount > 0)
-                parts.Add($", {cpuInfo.PhysicalProcessorCount} CPU");
-            
-            if (cpuInfo.LogicalCoreCount == 1)
+
+            if (physicalProcessorCount > 0)
+                parts.Add($", {physicalProcessorCount} CPU");
+
+            if (logicalCoreCount == 1)
                 parts.Add(", 1 logical core");
-            if (cpuInfo.LogicalCoreCount > 1)
-                parts.Add($", {cpuInfo.LogicalCoreCount} logical cores");
-            
-            if (cpuInfo.LogicalCoreCount > 0 && cpuInfo.PhysicalCoreCount > 0)
+            if (logicalCoreCount > 1)
+                parts.Add($", {logicalCoreCount} logical cores");
+
+            if (logicalCoreCount > 0 && physicalCoreCount > 0)
                 parts.Add(" and ");
-            else if (cpuInfo.PhysicalCoreCount > 0)
+            else if (physicalCoreCount > 0)
                 parts.Add(", ");
-            
-            if (cpuInfo.PhysicalCoreCount == 1)
+
+            if (physicalCoreCount == 1)
                 parts.Add("1 physical core");
-            if (cpuInfo.PhysicalCoreCount > 1)
-                parts.Add($"{cpuInfo.PhysicalCoreCount} physical cores");
+            if (physicalCoreCount > 1)
+                parts.Add($"{physicalCoreCount} physical cores");
 
             return string.Join("", parts);
         }
