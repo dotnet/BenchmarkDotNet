@@ -1,4 +1,4 @@
-﻿#if CLASSIC
+﻿#if CLASSIC || NETCOREAPP2_0
 using System.Text;
 using ApprovalTests;
 using ApprovalTests.Namers;

@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Tests.Mocks
             return new Summary(
                 "MockSummary",
                 CreateReports(config),
-                new HostEnvironmentInfoBuilder().Build(),
+                new HostEnvironmentInfoBuilder().WithoutDotNetSdkVersion().Build(),
                 config,
                 "",
                 TimeSpan.FromMinutes(1),
