@@ -2,12 +2,9 @@
 {
     public interface ICpuInfo
     {
-        int? PhysicalCoreCount { get; }
-
-        int? PhysicalProcessorCount { get; }
-        
-        int? LogicalCoreCount { get; }
-
         string ProcessorName { get; }
+        int? PhysicalProcessorCount { get; }
+        int? PhysicalCoreCount { get; }
+        int? LogicalCoreCount { get; }
     }
 }

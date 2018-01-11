@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Helpers
     public static class ExternalToolsHelper
     {
         /// <summary>
-        /// Output of the `wmic cpu list full` command.
+        /// Output of the `wmic get Name, NumberOfCores, NumberOfLogicalProcessors /Format:List` command.
         /// Windows only.
         /// </summary>
         public static readonly Lazy<WmicCpuInfoParser> Wmic = LazyParse(RuntimeInformation.IsWindows, "wmic",
@@ -49,7 +49,5 @@ namespace BenchmarkDotNet.Helpers
                 return parseFunc(content);
             });
         }
-
-
     }
 }

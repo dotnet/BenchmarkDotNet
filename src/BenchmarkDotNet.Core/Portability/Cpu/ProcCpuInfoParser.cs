@@ -11,15 +11,16 @@ namespace BenchmarkDotNet.Portability.Cpu
         public ProcCpuInfoParser(string content)
         {
             var logicalCores = StringHelper.ParseList(content, ':');
-            var logicalCoreCount = 0;
-            var processorsToPhysicalCoresCount = new Dictionary<string, int>();
             var processorModelNames = new HashSet<string>();
+            var processorsToPhysicalCoreCount = new Dictionary<string, int>();
+            var logicalCoreCount = 0;
             foreach (var logicalCore in logicalCores)
             {
                 if (logicalCore.TryGetValue(ProcCpuInfoKeyNames.PhysicalId, out string physicalId) &&
                     logicalCore.TryGetValue(ProcCpuInfoKeyNames.CpuCores, out string cpuCoresValue) &&
-                    int.TryParse(cpuCoresValue, out int cpuCoresCount))
-                    processorsToPhysicalCoresCount[physicalId] = cpuCoresCount;
+                    int.TryParse(cpuCoresValue, out int cpuCoreCount) &&
+                    cpuCoreCount > 0)
+                    processorsToPhysicalCoreCount[physicalId] = cpuCoreCount;
 
                 if (logicalCore.TryGetValue(ProcCpuInfoKeyNames.ModelName, out string modelName))
                 {
@@ -28,18 +29,15 @@ namespace BenchmarkDotNet.Portability.Cpu
                 }
             }
 
-            PhysicalProcessorCount = processorsToPhysicalCoresCount.Count > 0 ? processorsToPhysicalCoresCount.Count : (int?) null;
-            PhysicalCoreCount = processorsToPhysicalCoresCount.Count > 0 ? processorsToPhysicalCoresCount.Values.Sum() : (int?) null;
             ProcessorName = processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null;
+            PhysicalProcessorCount = processorsToPhysicalCoreCount.Count > 0 ? processorsToPhysicalCoreCount.Count : (int?) null;
+            PhysicalCoreCount = processorsToPhysicalCoreCount.Count > 0 ? processorsToPhysicalCoreCount.Values.Sum() : (int?) null;
             LogicalCoreCount = logicalCoreCount > 0 ? logicalCoreCount : (int?) null;
         }
 
-        public int? PhysicalCoreCount { get; }
-
-        public int? PhysicalProcessorCount { get; }
-
-        public int? LogicalCoreCount { get; }
-
         public string ProcessorName { get; }
+        public int? PhysicalProcessorCount { get; }
+        public int? PhysicalCoreCount { get; }
+        public int? LogicalCoreCount { get; }
     }
 }

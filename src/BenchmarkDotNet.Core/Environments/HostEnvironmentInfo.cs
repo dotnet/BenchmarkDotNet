@@ -35,6 +35,9 @@ namespace BenchmarkDotNet.Environments
         /// </summary>
         public Lazy<string> OsVersion { get; protected set; }
 
+        /// <summary>
+        /// is expensive to call (1s)
+        /// </summary>
         public Lazy<ICpuInfo> CpuInfo { get; protected set; }
 
         public int LogicalCoreCount { get; protected set; }
@@ -78,7 +81,6 @@ namespace BenchmarkDotNet.Environments
             AntivirusProducts = new Lazy<ICollection<Antivirus>>(RuntimeInformation.GetAntivirusProducts);
             VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(RuntimeInformation.GetVirtualMachineHypervisor);
         }
-
 
         public new static HostEnvironmentInfo GetCurrent() => Current ?? (Current = new HostEnvironmentInfo());
 

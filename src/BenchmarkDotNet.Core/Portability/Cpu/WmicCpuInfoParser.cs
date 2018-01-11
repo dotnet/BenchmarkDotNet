@@ -35,15 +35,15 @@ namespace BenchmarkDotNet.Portability.Cpu
                 }
             }
 
+            ProcessorName = processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null;
             PhysicalProcessorCount = processorsCount > 0 ? processorsCount : (int?) null;
             PhysicalCoreCount = physicalCoreCount > 0 ? physicalCoreCount : (int?) null;
             LogicalCoreCount = logicalCoreCount > 0 ? logicalCoreCount : (int?) null;
-            ProcessorName = processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null;
         }
 
+        public string ProcessorName { get; }
         public int? PhysicalCoreCount { get; }
         public int? PhysicalProcessorCount { get; }
         public int? LogicalCoreCount { get; }
-        public string ProcessorName { get; }
     }
 }

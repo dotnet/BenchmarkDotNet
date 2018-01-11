@@ -6,11 +6,7 @@ namespace BenchmarkDotNet.Portability.Cpu
     public static class CpuInfoFormatter
     {
         public static string Format(ICpuInfo cpuInfo)
-        {
-            if (cpuInfo != null)
-                return Format(cpuInfo.ProcessorName, cpuInfo.PhysicalProcessorCount, cpuInfo.PhysicalCoreCount, cpuInfo.LogicalCoreCount);
-            return "Unknown processor";
-        }
+            => Format(cpuInfo?.ProcessorName, cpuInfo?.PhysicalProcessorCount, cpuInfo?.PhysicalCoreCount, cpuInfo?.LogicalCoreCount);
 
         private static string Format(string processorName, int? physicalProcessorCount, int? physicalCoreCount, int? logicalCoreCount)
         {

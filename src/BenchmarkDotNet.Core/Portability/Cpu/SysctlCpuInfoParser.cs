@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
@@ -11,16 +10,16 @@ namespace BenchmarkDotNet.Portability.Cpu
         public SysctlCpuInfoParser(string content)
         {
             var sysctl = StringHelper.Parse(content, ':');
+            ProcessorName = sysctl.GetValueOrDefault("machdep.cpu.brand_string");
             PhysicalProcessorCount = GetPositiveIntValue(sysctl, "hw.packages");
             PhysicalCoreCount = GetPositiveIntValue(sysctl, "hw.logicalcpu");
             LogicalCoreCount = GetPositiveIntValue(sysctl, "hw.physicalcpu");
-            ProcessorName = sysctl.GetValueOrDefault("machdep.cpu.brand_string");
         }
 
-        public int? PhysicalCoreCount { get; }
-        public int? PhysicalProcessorCount { get; }
-        public int? LogicalCoreCount { get; }
         public string ProcessorName { get; }
+        public int? PhysicalProcessorCount { get; }
+        public int? PhysicalCoreCount { get; }
+        public int? LogicalCoreCount { get; }
 
         [CanBeNull]
         private static int? GetPositiveIntValue([NotNull] Dictionary<string, string> sysctl, string keyName)

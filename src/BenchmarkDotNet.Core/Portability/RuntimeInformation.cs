@@ -29,7 +29,6 @@ namespace BenchmarkDotNet.Portability
         private const string DebugConfigurationName = "DEBUG";
         internal const string ReleaseConfigurationName = "RELEASE";
         internal const string Unknown = "?";
-        internal const string UnknownProcessor = "Unknown processor";
 
         internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
 
@@ -121,7 +120,6 @@ namespace BenchmarkDotNet.Portability
             if (IsWindows() && !IsMono())
                 return new MOSCpuInfoLoader();
 #endif            
-
             if (IsWindows())
                 return ExternalToolsHelper.Wmic.Value;
 
