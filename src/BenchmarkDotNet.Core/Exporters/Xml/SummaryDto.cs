@@ -32,8 +32,10 @@ namespace BenchmarkDotNet.Exporters.Xml
         public string BenchmarkDotNetCaption => HostEnvironmentInfo.BenchmarkDotNetCaption;
         public string BenchmarkDotNetVersion => hei.BenchmarkDotNetVersion;
         public string OsVersion => hei.OsVersion.Value;
-        public string ProcessorName => hei.ProcessorName.Value;
-        public int ProcessorCount => hei.ProcessorCount;
+        public string ProcessorName => ProcessorBrandStringHelper.Prettify(hei.CpuInfo.Value?.ProcessorName ?? "");
+        public string PhysicalProcessorCount => hei.CpuInfo.Value?.PhysicalProcessorCount?.ToString();
+        public string PhysicalCoreCount => hei.CpuInfo.Value?.PhysicalCoreCount?.ToString();
+        public int LogicalCoreCount => hei.LogicalCoreCount;
         public string RuntimeVersion => hei.RuntimeVersion;
         public string Architecture => hei.Architecture;
         public bool HasAttachedDebugger => hei.HasAttachedDebugger;

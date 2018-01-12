@@ -19,6 +19,7 @@ namespace BenchmarkDotNet.Tests.Exporters
 {
     // In case of failed approval tests, use the following reporter:
     // [UseReporter(typeof(KDiffReporter))]
+    [Collection("ApprovalTests")]
     [UseReporter(typeof(XUnit2Reporter))]
     [UseApprovalSubdirectory("ApprovedFiles")]
     public class ApprovalTest : IDisposable
