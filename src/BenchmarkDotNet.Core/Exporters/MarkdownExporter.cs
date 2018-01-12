@@ -52,6 +52,16 @@ namespace BenchmarkDotNet.Exporters
             boldMarkupFormat = "*{0}*"
         };
 
+        public static readonly IExporter HtmlReady = new MarkdownExporter
+        {
+            Dialect = nameof(HtmlReady),
+            useCodeBlocks = true,
+            codeBlockStart = "``` ini",
+            startOfGroupInBold = true,
+            columnsStartWithSeparator = true,
+            escapeHtml = true
+        };
+
         private string prefix = string.Empty;
         private bool useCodeBlocks = false;
         private string codeBlockStart = "```";
@@ -62,6 +72,7 @@ namespace BenchmarkDotNet.Exporters
         private bool useHeaderSeparatingRow = true;
         private bool columnsStartWithSeparator = false;
         private string boldMarkupFormat = "**{0}**";
+        private bool escapeHtml = false;
 
         private MarkdownExporter()
         {
@@ -155,7 +166,7 @@ namespace BenchmarkDotNet.Exporters
                     logger.Write(tableColumnSeparator.TrimStart());
                 }
 
-                table.PrintLine(line, logger, string.Empty, tableColumnSeparator, highlightRow, table.FullContentStartOfGroup[rowCounter], startOfGroupInBold, boldMarkupFormat);
+                table.PrintLine(line, logger, string.Empty, tableColumnSeparator, highlightRow, table.FullContentStartOfGroup[rowCounter], startOfGroupInBold, boldMarkupFormat, escapeHtml);
                 rowCounter++;
             }
         }

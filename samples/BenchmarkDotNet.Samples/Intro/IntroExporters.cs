@@ -24,6 +24,7 @@ namespace BenchmarkDotNet.Samples.Intro
     [MarkdownExporterAttribute.GitHub]
     [MarkdownExporterAttribute.StackOverflow]
     [MarkdownExporterAttribute.Atlassian]
+    [MarkdownExporterAttribute.HtmlReady]
     [XmlExporterAttribute.Brief]
     [XmlExporterAttribute.BriefCompressed]
     [XmlExporterAttribute.Full]
