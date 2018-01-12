@@ -9,6 +9,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Reports;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -24,6 +25,7 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<HardwareCounter> GetHardwareCounters();
         IEnumerable<IFilter> GetFilters();
 
+        [CanBeNull]
         IOrderProvider GetOrderProvider();
         ISummaryStyle GetSummaryStyle();
 
@@ -33,5 +35,7 @@ namespace BenchmarkDotNet.Configs
         /// determines if all auto-generated files should be kept or removed after running benchmarks
         /// </summary>
         bool KeepBenchmarkFiles { get; }
+
+        IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules();
     }
 }

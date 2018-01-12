@@ -1,0 +1,24 @@
+﻿=== NoBasline_MethodsParamsJobs ===
+
+BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
+MockIntel Core i7-6700HQ CPU 2.60GHz, 1 CPU, 8 logical cores and 4 physical cores
+Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
+  [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
+
+
+ Method |  Job | Param |       Mean |    Error |   StdDev | Rank | LogicalGroup | IsBaseline |
+------- |----- |------ |-----------:|---------:|---------:|-----:|------------- |----------- |
+   Base | Job1 |     1 |   102.0 ns | 6.087 ns | 1.581 ns |    1 |            * |         No | ^
+    Foo | Job1 |     1 |   202.0 ns | 6.087 ns | 1.581 ns |    2 |            * |         No |
+    Bar | Job1 |     1 |   302.0 ns | 6.087 ns | 1.581 ns |    3 |            * |         No |
+   Base | Job2 |     1 |   402.0 ns | 6.087 ns | 1.581 ns |    4 |            * |         No |
+    Foo | Job2 |     1 |   502.0 ns | 6.087 ns | 1.581 ns |    5 |            * |         No |
+    Bar | Job2 |     1 |   602.0 ns | 6.087 ns | 1.581 ns |    6 |            * |         No |
+   Base | Job1 |     2 |   702.0 ns | 6.087 ns | 1.581 ns |    7 |            * |         No | ^
+    Foo | Job1 |     2 |   802.0 ns | 6.087 ns | 1.581 ns |    8 |            * |         No |
+    Bar | Job1 |     2 |   902.0 ns | 6.087 ns | 1.581 ns |    9 |            * |         No |
+   Base | Job2 |     2 | 1,002.0 ns | 6.087 ns | 1.581 ns |   10 |            * |         No |
+    Foo | Job2 |     2 | 1,102.0 ns | 6.087 ns | 1.581 ns |   11 |            * |         No |
+    Bar | Job2 |     2 | 1,202.0 ns | 6.087 ns | 1.581 ns |   12 |            * |         No |
+
+Errors: 0

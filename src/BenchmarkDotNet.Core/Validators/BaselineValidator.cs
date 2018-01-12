@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Order;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -16,18 +14,35 @@ namespace BenchmarkDotNet.Validators
 
         public IEnumerable<ValidationError> Validate(ValidationParameters input)
         {
-            foreach (var groupByType in input.Benchmarks.GroupBy(benchmark => benchmark.Target.Type))
+            var allBenchmarks = input.Benchmarks.ToArray();
+            var orderProvider = input.Config.GetOrderProvider() ?? DefaultOrderProvider.Instance;
+            
+            var benchmarkLogicalGroups = allBenchmarks
+                .Select(benchmark => orderProvider.GetLogicalGroupKey(input.Config, allBenchmarks, benchmark))
+                .ToArray();
+            
+            var logicalGroups = benchmarkLogicalGroups.Distinct().ToArray();
+            foreach (var logicalGroup in logicalGroups)
             {
-                var allMethods = groupByType.Key.GetAllMethods();
-                var count = allMethods.Count(method => method.GetCustomAttributes(false).OfType<BenchmarkAttribute>()
-                                                             .Any(benchmarkAttribute => benchmarkAttribute.Baseline));
-                if (count > 1)
-                {
-                    yield return new ValidationError(
-                        TreatsWarningsAsErrors,
-                        $"Only 1 [Benchmark] in a class can have \"Baseline = true\" applied to it, class {groupByType.Key.Name} has {count}");
-                }
+                var benchmarks = allBenchmarks.Where((benchmark, index) => benchmarkLogicalGroups[index] == logicalGroup).ToArray();
+                var methodBaselineCount = benchmarks.Count(b => b.Target.Baseline);
+                var jobBaselineCount = benchmarks.Count(b => b.Job.Meta.IsBaseline);
+                var className = benchmarks.First().Target.Type.Name;
+
+                if (methodBaselineCount > 1) 
+                    yield return CreateError("benchmark method", "Baseline = true", logicalGroup, className, methodBaselineCount.ToString());
+
+                if (jobBaselineCount > 1) 
+                    yield return CreateError("job", "IsBaseline = true", logicalGroup, className, jobBaselineCount.ToString());
+
+                if (methodBaselineCount > 0 && jobBaselineCount > 1)
+                    yield return CreateError("job-benchmark pair", "Baseline property", logicalGroup, className, "both");
             }
         }
+
+        private ValidationError CreateError(string subject, string property, string groupName, string className, string actual) => 
+            new ValidationError(
+                TreatsWarningsAsErrors, 
+                $"Only 1 {subject} in a group can have \"{property}\" applied to it, group {groupName} in class {className} has {actual}");
     }
 }

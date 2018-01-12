@@ -1,0 +1,19 @@
+﻿=== Invalid_MethodAndJobBaselines ===
+
+BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
+MockIntel Core i7-6700HQ CPU 2.60GHz, 1 CPU, 8 logical cores and 4 physical cores
+Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
+  [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
+
+
+ Method |  Job | IsBaseline |     Mean |    Error |   StdDev | Scaled | ScaledSD | Rank |                                            LogicalGroup | IsBaseline |
+------- |----- |----------- |---------:|---------:|---------:|-------:|---------:|-----:|-------------------------------------------------------- |----------- |
+    Bar | Job1 |       True | 202.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 | Invalid_MethodAndJobBaselines.Bar-Job1(IsBaseline=True) |        Yes |
+        |      |            |          |          |          |        |          |      |                                                         |            |
+    Bar | Job2 |    Default | 402.0 ns | 6.087 ns | 1.581 ns |      ? |        ? |    1 |                  Invalid_MethodAndJobBaselines.Bar-Job2 |         No |
+        |      |            |          |          |          |        |          |      |                                                         |            |
+    Foo | Job1 |       True | 102.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 | Invalid_MethodAndJobBaselines.Foo-Job1(IsBaseline=True) |        Yes |
+        |      |            |          |          |          |        |          |      |                                                         |            |
+    Foo | Job2 |    Default | 302.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 |                  Invalid_MethodAndJobBaselines.Foo-Job2 |        Yes |
+
+Errors: 0

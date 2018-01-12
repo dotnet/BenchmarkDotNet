@@ -1,0 +1,43 @@
+﻿=== NoBasline_MethodsParamsJobs_GroupByAll ===
+
+BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
+MockIntel Core i7-6700HQ CPU 2.60GHz, 1 CPU, 8 logical cores and 4 physical cores
+Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
+  [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
+
+
+ Method |  Job | Param |       Mean |    Error |   StdDev | Scaled | ScaledSD | Rank |                                                  LogicalGroup | IsBaseline |
+------- |----- |------ |-----------:|---------:|---------:|-------:|---------:|-----:|-------------------------------------------------------------- |----------- |
+     A1 | Job1 |     1 |   102.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 | NoBasline_MethodsParamsJobs_GroupByAll.A1-Job1-[Param=1]-CatA |        Yes | ^
+        |      |       |            |          |          |        |          |      |                                                               |            |
+     A1 | Job1 |     2 |   902.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 | NoBasline_MethodsParamsJobs_GroupByAll.A1-Job1-[Param=2]-CatA |        Yes | ^
+        |      |       |            |          |          |        |          |      |                                                               |            |
+     A1 | Job2 |     1 |   502.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 | NoBasline_MethodsParamsJobs_GroupByAll.A1-Job2-[Param=1]-CatA |        Yes | ^
+        |      |       |            |          |          |        |          |      |                                                               |            |
+     A1 | Job2 |     2 | 1,302.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 | NoBasline_MethodsParamsJobs_GroupByAll.A1-Job2-[Param=2]-CatA |        Yes | ^
+        |      |       |            |          |          |        |          |      |                                                               |            |
+     A2 | Job1 |     1 |   202.0 ns | 6.087 ns | 1.581 ns |      ? |        ? |    1 | NoBasline_MethodsParamsJobs_GroupByAll.A2-Job1-[Param=1]-CatA |         No | ^
+        |      |       |            |          |          |        |          |      |                                                               |            |
+     A2 | Job1 |     2 | 1,002.0 ns | 6.087 ns | 1.581 ns |      ? |        ? |    1 | NoBasline_MethodsParamsJobs_GroupByAll.A2-Job1-[Param=2]-CatA |         No | ^
+        |      |       |            |          |          |        |          |      |                                                               |            |
+     A2 | Job2 |     1 |   602.0 ns | 6.087 ns | 1.581 ns |      ? |        ? |    1 | NoBasline_MethodsParamsJobs_GroupByAll.A2-Job2-[Param=1]-CatA |         No | ^
+        |      |       |            |          |          |        |          |      |                                                               |            |
+     A2 | Job2 |     2 | 1,402.0 ns | 6.087 ns | 1.581 ns |      ? |        ? |    1 | NoBasline_MethodsParamsJobs_GroupByAll.A2-Job2-[Param=2]-CatA |         No | ^
+        |      |       |            |          |          |        |          |      |                                                               |            |
+     B1 | Job1 |     1 |   302.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 | NoBasline_MethodsParamsJobs_GroupByAll.B1-Job1-[Param=1]-CatB |        Yes | ^
+        |      |       |            |          |          |        |          |      |                                                               |            |
+     B1 | Job1 |     2 | 1,102.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 | NoBasline_MethodsParamsJobs_GroupByAll.B1-Job1-[Param=2]-CatB |        Yes | ^
+        |      |       |            |          |          |        |          |      |                                                               |            |
+     B1 | Job2 |     1 |   702.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 | NoBasline_MethodsParamsJobs_GroupByAll.B1-Job2-[Param=1]-CatB |        Yes | ^
+        |      |       |            |          |          |        |          |      |                                                               |            |
+     B1 | Job2 |     2 | 1,502.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 | NoBasline_MethodsParamsJobs_GroupByAll.B1-Job2-[Param=2]-CatB |        Yes | ^
+        |      |       |            |          |          |        |          |      |                                                               |            |
+     B2 | Job1 |     1 |   402.0 ns | 6.087 ns | 1.581 ns |      ? |        ? |    1 | NoBasline_MethodsParamsJobs_GroupByAll.B2-Job1-[Param=1]-CatB |         No | ^
+        |      |       |            |          |          |        |          |      |                                                               |            |
+     B2 | Job1 |     2 | 1,202.0 ns | 6.087 ns | 1.581 ns |      ? |        ? |    1 | NoBasline_MethodsParamsJobs_GroupByAll.B2-Job1-[Param=2]-CatB |         No | ^
+        |      |       |            |          |          |        |          |      |                                                               |            |
+     B2 | Job2 |     1 |   802.0 ns | 6.087 ns | 1.581 ns |      ? |        ? |    1 | NoBasline_MethodsParamsJobs_GroupByAll.B2-Job2-[Param=1]-CatB |         No | ^
+        |      |       |            |          |          |        |          |      |                                                               |            |
+     B2 | Job2 |     2 | 1,602.0 ns | 6.087 ns | 1.581 ns |      ? |        ? |    1 | NoBasline_MethodsParamsJobs_GroupByAll.B2-Job2-[Param=2]-CatB |         No | ^
+
+Errors: 0

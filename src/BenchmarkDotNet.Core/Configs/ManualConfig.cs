@@ -28,6 +28,7 @@ namespace BenchmarkDotNet.Configs
         private readonly List<IFilter> filters = new List<IFilter>();
         private IOrderProvider orderProvider = null;
         private ISummaryStyle summaryStyle = null;
+        private readonly HashSet<BenchmarkLogicalGroupRule> logicalGroupRules = new HashSet<BenchmarkLogicalGroupRule>();
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<ILogger> GetLoggers() => loggers;
@@ -39,6 +40,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IFilter> GetFilters() => filters;
         public IOrderProvider GetOrderProvider() => orderProvider;
         public ISummaryStyle GetSummaryStyle() => summaryStyle;
+        public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => logicalGroupRules;
 
         public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
 
@@ -56,6 +58,7 @@ namespace BenchmarkDotNet.Configs
         public void Add(params IFilter[] newFilters) => filters.AddRange(newFilters);
         public void Set(IOrderProvider provider) => orderProvider = provider ?? orderProvider;
         public void Set(ISummaryStyle style) => summaryStyle = style ?? summaryStyle;
+        public void Add(params BenchmarkLogicalGroupRule[] rules) => AddRules(rules);
 
         public void Add(IConfig config)
         {
@@ -71,6 +74,13 @@ namespace BenchmarkDotNet.Configs
             orderProvider = config.GetOrderProvider() ?? orderProvider;
             KeepBenchmarkFiles |= config.KeepBenchmarkFiles;
             summaryStyle = summaryStyle ?? config.GetSummaryStyle();
+            AddRules(config.GetLogicalGroupRules());
+        }
+
+        private void AddRules(IEnumerable<BenchmarkLogicalGroupRule> rules)
+        {
+            foreach (var rule in rules)
+                logicalGroupRules.Add(rule);
         }
 
         public IEnumerable<IDiagnoser> GetDiagnosers()
