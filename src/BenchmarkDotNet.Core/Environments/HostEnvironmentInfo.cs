@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Portability.Cpu;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 
@@ -36,9 +38,9 @@ namespace BenchmarkDotNet.Environments
         /// <summary>
         /// is expensive to call (1s)
         /// </summary>
-        public Lazy<string> ProcessorName { get; protected set; }
+        public Lazy<CpuInfo> CpuInfo { get; protected set; }
 
-        public int ProcessorCount { get; protected set; }
+        public int LogicalCoreCount { get; protected set; }
 
         public string JitModules { get; protected set; }
 
@@ -70,8 +72,8 @@ namespace BenchmarkDotNet.Environments
         {
             BenchmarkDotNetVersion = GetBenchmarkDotNetVersion();
             OsVersion = new Lazy<string>(RuntimeInformation.GetOsVersion);
-            ProcessorName = new Lazy<string>(RuntimeInformation.GetProcessorName);
-            ProcessorCount = Environment.ProcessorCount;
+            CpuInfo = new Lazy<CpuInfo>(RuntimeInformation.GetCpuInfo);
+            LogicalCoreCount = Environment.ProcessorCount;
             ChronometerFrequency = Chronometer.Frequency;
             HardwareTimerKind = Chronometer.HardwareTimerKind;
             JitModules = RuntimeInformation.GetJitModulesInfo();
@@ -90,7 +92,7 @@ namespace BenchmarkDotNet.Environments
             else
                 yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}, VM={vmName}";
 
-            yield return $"Processor={ProcessorName.Value}, ProcessorCount={ProcessorCount}";
+            yield return CpuInfoFormatter.Format(CpuInfo.Value);
             if (HardwareTimerKind != HardwareTimerKind.Unknown)
                 yield return $"Frequency={ChronometerFrequency}, Resolution={ChronometerResolution}, Timer={HardwareTimerKind.ToString().ToUpper()}";
 #if !CLASSIC

@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Portability.Cpu;
 
 namespace BenchmarkDotNet.Tests.Builders
 {
@@ -20,9 +21,11 @@ namespace BenchmarkDotNet.Tests.Builders
         private string jitInfo = "RyuJIT-v4.6.x.mock";
         private string jitModules = "clrjit-v4.6.x.mock";
         private string osVersion = "Microsoft Windows NT 10.0.x.mock";
-        private int processorCount = 8;
-        private string processorName = "MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz";
         private string runtimeVersion = "Clr 4.0.x.mock";
+        private int logicalCoreCount = 8;
+        private CpuInfo cpuInfo = new CpuInfo("MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz",
+            physicalProcessorCount: 1, physicalCoreCount: 4, logicalCoreCount: 8);
+
         private VirtualMachineHypervisor virtualMachineHypervisor = HyperV.Default;
 
         public HostEnvironmentInfoBuilder WithVMHypervisor(VirtualMachineHypervisor hypervisor)
@@ -47,7 +50,7 @@ namespace BenchmarkDotNet.Tests.Builders
         {
             return new MockHostEnvironmentInfo(architecture, benchmarkDotNetVersion, chronometerFrequency, configuration,
                 dotNetSdkVersion, hardwareTimerKind, hasAttachedDebugger, hasRyuJit, isConcurrentGC, isServerGC,
-                jitInfo, jitModules, osVersion, processorCount, processorName, runtimeVersion, virtualMachineHypervisor);
+                jitInfo, jitModules, osVersion, logicalCoreCount, cpuInfo, runtimeVersion, virtualMachineHypervisor);
         }
     }
 
@@ -56,8 +59,8 @@ namespace BenchmarkDotNet.Tests.Builders
         public MockHostEnvironmentInfo(
             string architecture, string benchmarkDotNetVersion, Frequency chronometerFrequency, string configuration, string dotNetSdkVersion,
             HardwareTimerKind hardwareTimerKind, bool hasAttachedDebugger, bool hasRyuJit, bool isConcurrentGC, bool isServerGC,
-            string jitInfo, string jitModules, string osVersion, int processorCount,
-            string processorName, string runtimeVersion, VirtualMachineHypervisor virtualMachineHypervisor)
+            string jitInfo, string jitModules, string osVersion, int logicalCoreCount, CpuInfo cpuInfo, 
+            string runtimeVersion, VirtualMachineHypervisor virtualMachineHypervisor)
         {
             Architecture = architecture;
             BenchmarkDotNetVersion = benchmarkDotNetVersion;
@@ -72,8 +75,8 @@ namespace BenchmarkDotNet.Tests.Builders
             JitInfo = jitInfo;
             JitModules = jitModules;
             OsVersion = new Lazy<string>(() => osVersion);
-            ProcessorCount = processorCount;
-            ProcessorName = new Lazy<string>(() => processorName);
+            CpuInfo = new Lazy<CpuInfo>(() => cpuInfo);
+            LogicalCoreCount = logicalCoreCount;
             RuntimeVersion = runtimeVersion;
             VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(() => virtualMachineHypervisor);
         }
