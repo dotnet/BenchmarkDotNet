@@ -37,6 +37,7 @@ namespace BenchmarkDotNet.Exporters
             codeBlockStart = "``` ini",
             startOfGroupInBold = true,
             columnsStartWithSeparator = true,
+            escapeHtml = true
         };
 
         public static readonly IExporter Atlassian = new MarkdownExporter
@@ -50,16 +51,6 @@ namespace BenchmarkDotNet.Exporters
             codeBlockStart = "{noformat}",
             codeBlockEnd = "{noformat}",
             boldMarkupFormat = "*{0}*"
-        };
-
-        public static readonly IExporter HtmlReady = new MarkdownExporter
-        {
-            Dialect = nameof(HtmlReady),
-            useCodeBlocks = true,
-            codeBlockStart = "``` ini",
-            startOfGroupInBold = true,
-            columnsStartWithSeparator = true,
-            escapeHtml = true
         };
 
         private string prefix = string.Empty;

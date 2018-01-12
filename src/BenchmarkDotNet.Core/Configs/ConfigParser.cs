@@ -102,7 +102,6 @@ namespace BenchmarkDotNet.Configs
                 { "html", new[] { HtmlExporter.Default } },
                 { "markdown", new [] { MarkdownExporter.Default } },
                 { "atlassian", new[] { MarkdownExporter.Atlassian } },
-                { "htmlready", new[] { MarkdownExporter.HtmlReady } },
                 { "stackoverflow", new[] { MarkdownExporter.StackOverflow } },
                 { "github", new[] { MarkdownExporter.GitHub } },
                 { "plain", new[] { PlainExporter.Default } },
