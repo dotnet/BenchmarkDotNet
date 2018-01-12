@@ -36,12 +36,5 @@ namespace BenchmarkDotNet.Attributes.Exporters
             {
             }
         }
-        
-        public class HtmlReady : ExporterConfigBaseAttribute
-        {
-            public HtmlReady() : base(MarkdownExporter.HtmlReady)
-            {
-            }
-        }
     }
 }
