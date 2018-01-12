@@ -3,7 +3,6 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Portability.Cpu;
-using BenchmarkDotNet.Tests.Mocks;
 
 namespace BenchmarkDotNet.Tests.Builders
 {
@@ -24,13 +23,8 @@ namespace BenchmarkDotNet.Tests.Builders
         private string osVersion = "Microsoft Windows NT 10.0.x.mock";
         private string runtimeVersion = "Clr 4.0.x.mock";
         private int logicalCoreCount = 8;
-        private ICpuInfo cpuInfo = new MockCpuInfo
-        {
-            PhysicalCoreCount = 4,
-            PhysicalProcessorCount = 1,
-            LogicalCoreCount = 8,
-            ProcessorName = "MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz",
-        };
+        private CpuInfo cpuInfo = new CpuInfo("MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz",
+            physicalProcessorCount: 1, physicalCoreCount: 4, logicalCoreCount: 8);
 
         private VirtualMachineHypervisor virtualMachineHypervisor = HyperV.Default;
 
@@ -65,7 +59,7 @@ namespace BenchmarkDotNet.Tests.Builders
         public MockHostEnvironmentInfo(
             string architecture, string benchmarkDotNetVersion, Frequency chronometerFrequency, string configuration, string dotNetSdkVersion,
             HardwareTimerKind hardwareTimerKind, bool hasAttachedDebugger, bool hasRyuJit, bool isConcurrentGC, bool isServerGC,
-            string jitInfo, string jitModules, string osVersion, int logicalCoreCount, ICpuInfo cpuInfo, 
+            string jitInfo, string jitModules, string osVersion, int logicalCoreCount, CpuInfo cpuInfo, 
             string runtimeVersion, VirtualMachineHypervisor virtualMachineHypervisor)
         {
             Architecture = architecture;
@@ -81,7 +75,7 @@ namespace BenchmarkDotNet.Tests.Builders
             JitInfo = jitInfo;
             JitModules = jitModules;
             OsVersion = new Lazy<string>(() => osVersion);
-            CpuInfo = new Lazy<ICpuInfo>(() => cpuInfo);
+            CpuInfo = new Lazy<CpuInfo>(() => cpuInfo);
             LogicalCoreCount = logicalCoreCount;
             RuntimeVersion = runtimeVersion;
             VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(() => virtualMachineHypervisor);

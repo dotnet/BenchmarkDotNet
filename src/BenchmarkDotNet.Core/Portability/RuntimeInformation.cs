@@ -114,21 +114,21 @@ namespace BenchmarkDotNet.Portability
             return null;
         }
 
-        internal static ICpuInfo GetCpuInfo()
+        internal static CpuInfo GetCpuInfo()
         {
 #if !CORE
             if (IsWindows() && !IsMono())
-                return new MOSCpuInfoLoader();
-#endif            
+                return MosCpuInfoProvider.MosCpuInfo.Value;
+#endif
             if (IsWindows())
-                return ExternalToolsHelper.Wmic.Value;
+                return WmicCpuInfoProvider.WmicCpuInfo.Value;
 
             if (IsLinux())
-                return ExternalToolsHelper.ProcCpuInfo.Value;
+                return ProcCpuInfoProvider.ProcCpuInfo.Value;
 
             if (IsMacOSX())
-                return ExternalToolsHelper.Sysctl.Value;
-            
+                return SysctlCpuInfoProvider.SysctlCpuInfo.Value;
+
             return null;
         }
 
@@ -331,7 +331,7 @@ namespace BenchmarkDotNet.Portability
 
                     foreach (ManagementBaseObject o in data)
                     {
-                        var av = (ManagementObject)o;
+                        var av = (ManagementObject) o;
                         if (av != null)
                         {
                             string name = av["displayName"].ToString();

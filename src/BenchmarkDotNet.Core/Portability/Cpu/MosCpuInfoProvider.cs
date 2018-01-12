@@ -1,14 +1,18 @@
 ﻿#if !CORE
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Management;
-using BenchmarkDotNet.Environments;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Portability.Cpu
 {
-    public class MOSCpuInfoLoader : ICpuInfo
+    internal static class MosCpuInfoProvider
     {
-        public MOSCpuInfoLoader()
+        internal static Lazy<CpuInfo> MosCpuInfo = new Lazy<CpuInfo>(Load);
+
+        [NotNull]
+        private static CpuInfo Load()
         {
             var processorModelNames = new HashSet<string>();
             uint physicalCoreCount = 0;
@@ -28,16 +32,12 @@ namespace BenchmarkDotNet.Portability.Cpu
                 }
             }
 
-            ProcessorName = processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null;
-            PhysicalProcessorCount = processorsCount > 0 ? processorsCount : (int?) null;
-            PhysicalCoreCount = physicalCoreCount > 0 ? (int?) physicalCoreCount : null;
-            LogicalCoreCount = logicalCoreCount > 0 ? (int?) logicalCoreCount : null;
+            return new CpuInfo(
+                processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null,
+                processorsCount > 0 ? processorsCount : (int?) null,
+                physicalCoreCount > 0 ? (int?) physicalCoreCount : null,
+                logicalCoreCount > 0 ? (int?) logicalCoreCount : null);
         }
-
-        public string ProcessorName { get; }
-        public int? PhysicalProcessorCount { get; }
-        public int? PhysicalCoreCount { get; }
-        public int? LogicalCoreCount { get; }
     }
 }
 #endif

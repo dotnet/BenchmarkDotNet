@@ -8,31 +8,11 @@ namespace BenchmarkDotNet.Helpers
     public static class ExternalToolsHelper
     {
         /// <summary>
-        /// Output of the `wmic get Name, NumberOfCores, NumberOfLogicalProcessors /Format:List` command.
-        /// Windows only.
-        /// </summary>
-        public static readonly Lazy<WmicCpuInfoParser> Wmic = LazyParse(RuntimeInformation.IsWindows, "wmic",
-            "cpu get Name, NumberOfCores, NumberOfLogicalProcessors /Format:List", s => new WmicCpuInfoParser(s));
-
-        /// <summary>
-        /// Output of the `cat /proc/info` command.
-        /// Linux only.
-        /// </summary>
-        public static readonly Lazy<ProcCpuInfoParser> ProcCpuInfo = LazyParse(RuntimeInformation.IsLinux, "cat", "/proc/cpuinfo",
-            s => new ProcCpuInfoParser(s));
-
-        /// <summary>
         /// Output of the `lsb_release -a` command.
         /// Linux only.
         /// </summary>
         public static readonly Lazy<Dictionary<string, string>> LsbRelease = LazyParse(RuntimeInformation.IsLinux, "lsb_release", "-a",
             s => SectionsHelper.ParseSection(s, ':'));
-
-        /// <summary>
-        /// Output of the `sysctl -a` command.
-        /// MacOSX only.
-        /// </summary>
-        public static readonly Lazy<SysctlCpuInfoParser> Sysctl = LazyParse(RuntimeInformation.IsMacOSX, "sysctl", "-a", s => new SysctlCpuInfoParser(s));
 
         /// <summary>
         /// Output of the `system_profiler SPSoftwareDataType` command.

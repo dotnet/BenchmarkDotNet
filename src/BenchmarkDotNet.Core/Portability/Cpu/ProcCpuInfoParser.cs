@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Portability.Cpu
 {
-    public class ProcCpuInfoParser : ICpuInfo
+    internal static class ProcCpuInfoParser
     {
-        public ProcCpuInfoParser(string content)
+        [NotNull]
+        internal static CpuInfo ParseOutput([CanBeNull] string content)
         {
             var logicalCores = SectionsHelper.ParseSections(content, ':');
             var processorModelNames = new HashSet<string>();
@@ -28,15 +29,11 @@ namespace BenchmarkDotNet.Portability.Cpu
                 }
             }
 
-            ProcessorName = processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null;
-            PhysicalProcessorCount = processorsToPhysicalCoreCount.Count > 0 ? processorsToPhysicalCoreCount.Count : (int?) null;
-            PhysicalCoreCount = processorsToPhysicalCoreCount.Count > 0 ? processorsToPhysicalCoreCount.Values.Sum() : (int?) null;
-            LogicalCoreCount = logicalCoreCount > 0 ? logicalCoreCount : (int?) null;
+            return new CpuInfo(
+                processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null,
+                processorsToPhysicalCoreCount.Count > 0 ? processorsToPhysicalCoreCount.Count : (int?) null,
+                processorsToPhysicalCoreCount.Count > 0 ? processorsToPhysicalCoreCount.Values.Sum() : (int?) null,
+                logicalCoreCount > 0 ? logicalCoreCount : (int?) null);
         }
-
-        public string ProcessorName { get; }
-        public int? PhysicalProcessorCount { get; }
-        public int? PhysicalCoreCount { get; }
-        public int? LogicalCoreCount { get; }
     }
 }

@@ -5,24 +5,21 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Portability.Cpu
 {
-    public class SysctlCpuInfoParser : ICpuInfo
+    internal static class SysctlCpuInfoParser
     {
-        public SysctlCpuInfoParser(string content)
+        [NotNull]
+        internal static CpuInfo ParseOutput([CanBeNull] string content)
         {
             var sysctl = SectionsHelper.ParseSection(content, ':');
-            ProcessorName = sysctl.GetValueOrDefault("machdep.cpu.brand_string");
-            PhysicalProcessorCount = GetPositiveIntValue(sysctl, "hw.packages");
-            PhysicalCoreCount = GetPositiveIntValue(sysctl, "hw.logicalcpu");
-            LogicalCoreCount = GetPositiveIntValue(sysctl, "hw.physicalcpu");
+            string processorName = sysctl.GetValueOrDefault("machdep.cpu.brand_string");
+            var physicalProcessorCount = GetPositiveIntValue(sysctl, "hw.packages");
+            var physicalCoreCount = GetPositiveIntValue(sysctl, "hw.physicalcpu");
+            var logicalCoreCount = GetPositiveIntValue(sysctl, "hw.logicalcpu");
+            return new CpuInfo(processorName, physicalProcessorCount, physicalCoreCount, logicalCoreCount);
         }
 
-        public string ProcessorName { get; }
-        public int? PhysicalProcessorCount { get; }
-        public int? PhysicalCoreCount { get; }
-        public int? LogicalCoreCount { get; }
-
         [CanBeNull]
-        private static int? GetPositiveIntValue([NotNull] Dictionary<string, string> sysctl, string keyName)
+        private static int? GetPositiveIntValue([NotNull] Dictionary<string, string> sysctl, [NotNull] string keyName)
         {
             if (sysctl.TryGetValue(keyName, out string value) &&
                 int.TryParse(value, out int result) &&

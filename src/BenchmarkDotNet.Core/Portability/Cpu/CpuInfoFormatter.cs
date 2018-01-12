@@ -5,7 +5,7 @@ namespace BenchmarkDotNet.Portability.Cpu
 {
     public static class CpuInfoFormatter
     {
-        public static string Format(ICpuInfo cpuInfo)
+        public static string Format(CpuInfo cpuInfo)
             => Format(cpuInfo?.ProcessorName, cpuInfo?.PhysicalProcessorCount, cpuInfo?.PhysicalCoreCount, cpuInfo?.LogicalCoreCount);
 
         private static string Format(string processorName, int? physicalProcessorCount, int? physicalCoreCount, int? logicalCoreCount)

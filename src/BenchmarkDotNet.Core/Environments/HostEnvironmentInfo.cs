@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Environments
         /// <summary>
         /// is expensive to call (1s)
         /// </summary>
-        public Lazy<ICpuInfo> CpuInfo { get; protected set; }
+        public Lazy<CpuInfo> CpuInfo { get; protected set; }
 
         public int LogicalCoreCount { get; protected set; }
 
@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Environments
         {
             BenchmarkDotNetVersion = GetBenchmarkDotNetVersion();
             OsVersion = new Lazy<string>(RuntimeInformation.GetOsVersion);
-            CpuInfo = new Lazy<ICpuInfo>(RuntimeInformation.GetCpuInfo);
+            CpuInfo = new Lazy<CpuInfo>(RuntimeInformation.GetCpuInfo);
             LogicalCoreCount = Environment.ProcessorCount;
             ChronometerFrequency = Chronometer.Frequency;
             HardwareTimerKind = Chronometer.HardwareTimerKind;

@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
         [Fact]
         public void EmptyTest()
         {
-            var parser = new ProcCpuInfoParser(string.Empty);
+            var parser = ProcCpuInfoParser.ParseOutput(string.Empty);
             Assert.Equal(null, parser.ProcessorName);
             Assert.Equal(null, parser.PhysicalProcessorCount);
             Assert.Equal(null, parser.PhysicalCoreCount);
@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
         [Fact]
         public void MalformedTest()
         {
-            var parser = new ProcCpuInfoParser("malformedkey: malformedvalue\n\nmalformedkey2: malformedvalue2");
+            var parser = ProcCpuInfoParser.ParseOutput("malformedkey: malformedvalue\n\nmalformedkey2: malformedvalue2");
             Assert.Equal(null, parser.ProcessorName);
             Assert.Equal(null, parser.PhysicalProcessorCount);
             Assert.Equal(null, parser.PhysicalCoreCount);
@@ -81,7 +81,7 @@ cpu cores	: 4
 
             #endregion
 
-            var parser = new ProcCpuInfoParser(cpuinfo);
+            var parser = ProcCpuInfoParser.ParseOutput(cpuinfo);
             Assert.Equal("Unknown processor with 2 cores and hyper threading, Unknown processor with 4 cores", parser.ProcessorName);
             Assert.Equal(2, parser.PhysicalProcessorCount);
             Assert.Equal(6, parser.PhysicalCoreCount);
@@ -204,7 +204,7 @@ power management:";
 
             #endregion
 
-            var parser = new ProcCpuInfoParser(cpuInfo);
+            var parser = ProcCpuInfoParser.ParseOutput(cpuInfo);
             Assert.Equal("Intel(R) Core(TM) i5-6200U CPU @ 2.30GHz", parser.ProcessorName);
             Assert.Equal(1, parser.PhysicalProcessorCount);
             Assert.Equal(2, parser.PhysicalCoreCount);
@@ -436,7 +436,7 @@ power management:
 
             #endregion
 
-            var parser = new ProcCpuInfoParser(cpuInfo);
+            var parser = ProcCpuInfoParser.ParseOutput(cpuInfo);
             Assert.Equal("Intel(R) Core(TM) i7-4710MQ CPU @ 2.50GHz", parser.ProcessorName);
             Assert.Equal(1, parser.PhysicalProcessorCount);
             Assert.Equal(4, parser.PhysicalCoreCount);
