@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Reports
@@ -46,7 +47,7 @@ namespace BenchmarkDotNet.Reports
         }
 
         public static void PrintLine(this SummaryTable table, string[] line, ILogger logger, string leftDel, string rightDel,
-                                     bool highlightRow, bool startOfGroup, bool startOfGroupInBold, string boldMarkupFormat)
+                                     bool highlightRow, bool startOfGroup, bool startOfGroupInBold, string boldMarkupFormat, bool escapeHtml)
         {
             for (int columnIndex = 0; columnIndex < table.ColumnCount; columnIndex++)
             {
@@ -58,6 +59,8 @@ namespace BenchmarkDotNet.Reports
                 var text = (startOfGroup && startOfGroupInBold)
                     ? BuildBoldText(table, line, leftDel, rightDel, columnIndex, boldMarkupFormat)
                     : BuildStandardText(table, line, leftDel, rightDel, columnIndex);
+                if (escapeHtml)
+                    text = text.HtmlEncode();
 
                 if (highlightRow) // write the row in an alternative colour
                 {
