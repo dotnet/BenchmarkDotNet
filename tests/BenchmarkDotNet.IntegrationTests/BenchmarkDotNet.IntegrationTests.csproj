@@ -30,6 +30,7 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="System.Memory" Version="4.4.0-preview1-25305-02" />
+    <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
   </ItemGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
