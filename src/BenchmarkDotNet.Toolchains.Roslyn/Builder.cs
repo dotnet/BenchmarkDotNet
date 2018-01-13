@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
@@ -17,6 +19,8 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
     [PublicAPI]
     public class Builder : IBuilder
     {
+        private const string MissingReferenceError = "CS0012";
+
         private static readonly Lazy<AssemblyMetadata[]> FrameworkAssembliesMetadata = new Lazy<AssemblyMetadata[]>(GetFrameworkAssembliesMetadata);
 
         [PublicAPI]
@@ -40,6 +44,19 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 .Distinct()
                 .Select(uniqueMetadata => uniqueMetadata.GetReference());
 
+            (var result, var missingReferences) = Build(generateResult, benchmark, syntaxTree, compilationOptions, references);
+
+            if (result.IsBuildSuccess || !missingReferences.Any())
+                return result;
+
+            var withMissingReferences = references.Union(missingReferences.Select(assemblyMetadata => assemblyMetadata.GetReference()));
+
+            return Build(generateResult, benchmark, syntaxTree, compilationOptions, withMissingReferences).result;
+        }
+
+        private static (BuildResult result, AssemblyMetadata[] missingReference) Build(GenerateResult generateResult, Benchmark benchmark, SyntaxTree syntaxTree, 
+            CSharpCompilationOptions compilationOptions, IEnumerable<PortableExecutableReference> references)
+        {
             var compilation = CSharpCompilation
                 .Create(assemblyName: Path.GetFileName(generateResult.ArtifactsPaths.ExecutablePath))
                 .AddSyntaxTrees(syntaxTree)
@@ -51,18 +68,19 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 var emitResult = compilation.Emit(executable);
 
                 if (emitResult.Success)
-                {
-                    return BuildResult.Success(generateResult);
-                }
+                    return (BuildResult.Success(generateResult), default);
 
-                var errors = new StringBuilder("The build has failed!");
-                foreach (var diagnostic in emitResult.Diagnostics
-                    .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error))
-                {
+                var compilationErrors = emitResult.Diagnostics
+                    .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error)
+                    .ToArray();
+                
+                var errors = new StringBuilder("The build has failed!").AppendLine();
+                foreach (var diagnostic in compilationErrors)
                     errors.AppendLine($"{diagnostic.Id}: {diagnostic.GetMessage()}");
-                }
 
-                return BuildResult.Failure(generateResult, new Exception(errors.ToString()));
+                var missingReferences = GetMissingReferences(compilationErrors);
+
+                return (BuildResult.Failure(generateResult, new Exception(errors.ToString())), missingReferences);
             }
         }
 
@@ -82,20 +100,16 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
         }
 
         private static AssemblyMetadata[] GetFrameworkAssembliesMetadata()
-        {
-            return GetFrameworkAssembliesPaths()
+            => GetFrameworkAssembliesPaths()
                 .Where(File.Exists)
                 .Select(AssemblyMetadata.CreateFromFile)
                 .ToArray();
-        }
 
         private static string[] GetFrameworkAssembliesPaths()
         {
             var frameworkAssembliesDirectory = Path.GetDirectoryName(typeof(object).Assembly.Location);
             if (frameworkAssembliesDirectory == null)
-            {
                 return Array.Empty<string>();
-            }
 
             return new[]
             {
@@ -104,6 +118,27 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 Path.Combine(frameworkAssembliesDirectory, "System.Core.dll"),
                 Path.Combine(frameworkAssembliesDirectory, "System.Runtime.dll")
             };
+        }
+
+        private static AssemblyMetadata[] GetMissingReferences(Diagnostic[] compilationErrors)
+            => compilationErrors
+                    .Where(diagnostic => diagnostic.Id == MissingReferenceError)
+                    .Select(diagnostic => GetAssemblyName(diagnostic))
+                    .Where(assemblyName => assemblyName != default)
+                    .Distinct()
+                    .Select(assemblyName => Assembly.Load(new AssemblyName(assemblyName)))
+                    .Where(assembly => assembly != default)
+                    .Select(assembly => AssemblyMetadata.CreateFromFile(assembly.Location))
+                    .ToArray();
+
+        private static string GetAssemblyName(Diagnostic diagnostic)
+        {
+            if (diagnostic.Id != MissingReferenceError || !diagnostic.GetMessage().Contains("You must add a reference to assembly"))
+                return default;
+
+            // there is no nice property which would expose the reference name, so we need to to some parsing..
+            // CS0012: The type 'ValueType' is defined in an assembly that is not referenced. You must add a reference to assembly 'netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51'
+            return diagnostic.GetMessage().Split('\'').SingleOrDefault(text => text.Contains("Version="));
         }
     }
 }

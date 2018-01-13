@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Environments;
 using Xunit;
@@ -56,6 +57,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
             [Benchmark]
             public Span<byte> ReturnStackOnlyType() => new Span<byte>(Array.Empty<byte>());
+
+            [Benchmark]
+            public ImmutableArray<int> TypeFromNetStandardNuGetPackage() => ImmutableArray<int>.Empty;
 
             public struct Result<T>
             {
