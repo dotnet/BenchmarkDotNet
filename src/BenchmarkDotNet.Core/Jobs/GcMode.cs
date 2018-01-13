@@ -12,6 +12,9 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<bool> ForceCharacteristic = Characteristic.Create((GcMode g) => g.Force);
         public static readonly Characteristic<bool> AllowVeryLargeObjectsCharacteristic = Characteristic.Create((GcMode g) => g.AllowVeryLargeObjects);
         public static readonly Characteristic<bool> RetainVmCharacteristic = Characteristic.Create((GcMode g) => g.RetainVm);
+        public static readonly Characteristic<bool> NoAffinitizeCharacteristic = Characteristic.Create((GcMode g) => g.NoAffinitize);
+        public static readonly Characteristic<int> HeapAffinitizeMaskCharacteristic = Characteristic.Create((GcMode g) => g.HeapAffinitizeMask);
+        public static readonly Characteristic<int> HeapCountCharacteristic = Characteristic.Create((GcMode g) => g.HeapCount);
 
         /// <summary>
         /// Specifies whether the common language runtime runs server garbage collection.
@@ -76,6 +79,35 @@ namespace BenchmarkDotNet.Jobs
         {
             get { return RetainVmCharacteristic[this]; }
             set { RetainVmCharacteristic[this] = value; }
+        }
+
+        /// <summary>
+        /// specify true to disable hard affinity of Server GC threads to CPUs
+        /// </summary>
+        public bool NoAffinitize
+        {
+            get { return NoAffinitizeCharacteristic[this]; }
+            set { NoAffinitizeCharacteristic[this] = value; }
+        }
+
+        /// <summary>
+        /// process mask, see <see href="https://support.microsoft.com/en-us/help/4014604/may-2017-description-of-the-quality-rollup-for-the-net-framework-4-6-4">MSDN</see> for more.
+        /// </summary>
+        public int HeapAffinitizeMask
+        {
+            get { return HeapAffinitizeMaskCharacteristic[this]; }
+            set { HeapAffinitizeMaskCharacteristic[this] = value; }
+        }
+
+        /// <summary>
+        ///  specify the # of Server GC threads/heaps, must be smaller than the # of logical CPUs the process is allowed to run on, 
+        ///  ie, if you don't specifically affinitize your process it means the # of total logical CPUs on the machine; 
+        ///  otherwise this is the # of logical CPUs you affinitized your process to.
+        /// </summary>
+        public int HeapCount
+        {
+            get { return HeapCountCharacteristic[this]; }
+            set { HeapCountCharacteristic[this] = value; }
         }
     }
 }

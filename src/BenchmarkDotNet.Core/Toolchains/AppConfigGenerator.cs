@@ -17,7 +17,10 @@ namespace BenchmarkDotNet.Toolchains
             "gcConcurrent",
             "gcServer",
             "GCCpuGroup",
-            "gcAllowVeryLargeObjects"
+            "gcAllowVeryLargeObjects",
+            "GCHeapCount",
+            "GCNoAffinitize",
+            "GCHeapAffinitizeMask"
         };
 
         internal static void Generate(Job job, TextReader source, TextWriter destination, IResolver resolver)
@@ -85,6 +88,12 @@ namespace BenchmarkDotNet.Toolchains
             CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcServer", "enabled", gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase());
             CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCCpuGroup", "enabled", gcMode.ResolveValue(GcMode.CpuGroupsCharacteristic, resolver).ToLowerCase());
             CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcAllowVeryLargeObjects", "enabled", gcMode.ResolveValue(GcMode.AllowVeryLargeObjectsCharacteristic, resolver).ToLowerCase());
+            CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCNoAffinitize", "enabled", gcMode.ResolveValue(GcMode.NoAffinitizeCharacteristic, resolver).ToLowerCase());
+
+            if (gcMode.HasValue(GcMode.HeapAffinitizeMaskCharacteristic))
+                CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCHeapAffinitizeMask", "enabled", gcMode.ResolveValue(GcMode.HeapAffinitizeMaskCharacteristic, resolver).ToString());
+            if (gcMode.HasValue(GcMode.HeapCountCharacteristic))
+                CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCHeapCount", "enabled", gcMode.ResolveValue(GcMode.HeapCountCharacteristic, resolver).ToString());
         }
 
         private static void CreateNodeWithAttribute(
