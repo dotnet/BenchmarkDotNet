@@ -40,11 +40,12 @@ Let's look at an example:
 [RPlotExporter, RankColumn]
 public class Md5VsSha256
 {
-    private const int N = 10000;
-
     private SHA256 sha256 = SHA256.Create();
     private MD5 md5 = MD5.Create();
     private byte[] data;
+
+    [Params(1000, 10000)]
+    public int N;
 
     [GlobalSetup]
     public void Setup()
@@ -69,20 +70,28 @@ BenchmarkDotNet=v0.10.12, OS=Windows 10 Redstone 3 [1709, Fall Creators Update] 
 Intel Core i7-6700HQ CPU 2.60GHz (Skylake), 1 CPU, 8 logical cores and 4 physical cores
 Frequency=2531249 Hz, Resolution=395.0619 ns, Timer=TSC
 .NET Core SDK=2.0.3
-  [Host]  : .NET Core 2.0.3 (Framework 4.6.25815.02), 64bit RyuJIT
-  Clr     : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2600.0
-  CoreJob : .NET Core 2.0.3 (Framework 4.6.25815.02), 64bit RyuJIT
-  Mono    : Mono 5.4.0 (Visual Studio), 64bit
+  [Host] : .NET Core 2.0.3 (Framework 4.6.25815.02), 64bit RyuJIT
+  Clr    : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2600.0
+  Core   : .NET Core 2.0.3 (Framework 4.6.25815.02), 64bit RyuJIT
+  Mono   : Mono 5.4.0 (Visual Studio), 64bit
 
- Method | Runtime |      Mean |     Error |    StdDev | Scaled | Rank |
-------- |-------- |----------:|----------:|----------:|-------:|-----:|
-    Md5 |     Clr |  25.91 us | 0.2587 us | 0.3872 us |   1.00 |    2 |
-    Md5 |    Core |  24.06 us | 0.1438 us | 0.2152 us |   0.93 |    1 |
-    Md5 |    Mono |  47.09 us | 0.4642 us | 0.6804 us |   1.82 |    3 |
-        |         |           |           |           |        |      |
- Sha256 |     Clr | 106.40 us | 3.4788 us | 5.2070 us |   1.00 |    2 |
- Sha256 |    Core |  55.53 us | 0.2158 us | 0.3163 us |   0.52 |    1 |
- Sha256 |    Mono | 177.28 us | 1.4367 us | 2.1503 us |   1.67 |    3 |
+ Method | Runtime |     N |       Mean |     Error |    StdDev | Scaled | Rank |
+------- |-------- |------ |-----------:|----------:|----------:|-------:|-----:|
+    Md5 |     Clr |  1000 |   3.935 us | 0.0164 us | 0.0246 us |   1.00 |    2 |
+    Md5 |    Core |  1000 |   2.642 us | 0.0079 us | 0.0115 us |   0.67 |    1 |
+    Md5 |    Mono |  1000 |   5.039 us | 0.0230 us | 0.0322 us |   1.28 |    3 |
+        |         |       |            |           |           |        |      |
+    Md5 |     Clr | 10000 |  25.215 us | 0.2003 us | 0.2937 us |   1.00 |    2 |
+    Md5 |    Core | 10000 |  24.245 us | 0.0621 us | 0.0929 us |   0.96 |    1 |
+    Md5 |    Mono | 10000 |  47.378 us | 0.2729 us | 0.4000 us |   1.88 |    3 |
+        |         |       |            |           |           |        |      |
+ Sha256 |     Clr |  1000 |  10.275 us | 0.0426 us | 0.0611 us |   1.00 |    2 |
+ Sha256 |    Core |  1000 |   6.023 us | 0.0387 us | 0.0579 us |   0.59 |    1 |
+ Sha256 |    Mono |  1000 |  18.654 us | 0.1073 us | 0.1469 us |   1.82 |    3 |
+        |         |       |            |           |           |        |      |
+ Sha256 |     Clr | 10000 |  97.840 us | 0.7013 us | 1.0497 us |   1.00 |    2 |
+ Sha256 |    Core | 10000 |  54.643 us | 0.2193 us | 0.3282 us |   0.56 |    1 |
+ Sha256 |    Mono | 10000 | 186.854 us | 2.1350 us | 3.0620 us |   1.91 |    3 |
 ```
 
 In artifacts, you can also find detailed information about each iteration.
