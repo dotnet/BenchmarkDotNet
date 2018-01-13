@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
@@ -32,6 +31,8 @@ namespace BenchmarkDotNet.Exporters
             yield return scriptFileName;
 
             string fileNamePrefix = Path.Combine(summary.ResultsDirectoryPath, summary.Title);
+            string csvFullPath = CsvMeasurementsExporter.Default.GetAtrifactFullName(summary);
+            
             string scriptFullPath = Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
             string logFullPath = Path.Combine(summary.ResultsDirectoryPath, logFileName);
             string script = ResourceHelper.
@@ -71,7 +72,7 @@ namespace BenchmarkDotNet.Exporters
                 CreateNoWindow = true,
                 FileName = rscriptPath,
                 WorkingDirectory = summary.ResultsDirectoryPath,
-                Arguments = $"\"{scriptFullPath}\" \"{fileNamePrefix}-measurements.csv\""
+                Arguments = $"\"{scriptFullPath}\" \"{csvFullPath}\""
             };
             using (var process = Process.Start(start))
             {

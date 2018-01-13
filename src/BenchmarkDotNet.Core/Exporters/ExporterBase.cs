@@ -18,8 +18,8 @@ namespace BenchmarkDotNet.Exporters
 
         public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
         {
-            var fileName = GetFileName(summary);
-            var filePath = $"{Path.Combine(summary.ResultsDirectoryPath, fileName)}-{FileCaption}{FileNameSuffix}.{FileExtension}";
+            string fileName = GetFileName(summary);
+            string filePath = GetAtrifactFullName(summary);
             if (File.Exists(filePath))
             {
                 try
@@ -58,6 +58,12 @@ namespace BenchmarkDotNet.Exporters
             }
 
             return fileName;
+        }
+
+        internal string GetAtrifactFullName(Summary summary)
+        {
+            string fileName = GetFileName(summary);
+            return $"{Path.Combine(summary.ResultsDirectoryPath, fileName)}-{FileCaption}{FileNameSuffix}.{FileExtension}";
         }
     }
 }
