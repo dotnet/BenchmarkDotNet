@@ -106,7 +106,7 @@ BenchmarkDotNet has a lot of awesome features for deep performance investigation
 * **Standard benchmarking routine:** generating an isolated project per each benchmark method; auto-selection of iteration amount; warmup; overhead evaluation; and so on
 * **Execution control:** BenchmarkDotNet tries to choose the best possible way to evaluate performance, but you can also manually control amount of iterations, switch between cold start and warmed state, set the accuracy level, tune GC parameters, change environment variables, and more
 * **Statistics:** by default, you will see the most important statistics like mean and standard deviation; but you can also manually ask for min/max values, confidence intervals, skewness, kurtosis, quartile, percentiles, or define own metrics
-* **Comparing environments:** [Easy way](http://benchmarkdotnet.org/Configs/Jobs.htm) to compare different environments (`x86` vs `x64`, `LegacyJit` vs `RyuJit`, and so on)
+* **Comparing environments:** [Easy way](http://benchmarkdotnet.org/Configs/Jobs.htm) to compare different environments (x86 vs x64, LegacyJit vs RyuJit, Mono vs .NET Core, and so on)
 * **Relative performance:** you can [easily]((http://benchmarkdotnet.org/Advanced/Baseline.htm)) evaluate difference between different methods of environments
 * **Memory diagnostics:** the library not only measure performance of your code, but also prints information about memory traffic and amount of GC collections
 * **Disassembly diagnostics:** you can ask for an assembly listing with the help of single additional attribute
@@ -134,8 +134,8 @@ BenchmarkDotNet supports all kinds of .NET stacks:
 The library is used by huge is used by a large number of projects for performance discussion or as a part of the codebase:
 
 * [CoreCLR](https://github.com/dotnet/coreclr/issues?utf8=✓&q=BenchmarkDotNet) (.NET Core runtime)
-* [CoreFX](https://github.com/dotnet/corefx/issues?utf8=✓&q=BenchmarkDotNet) (.NET Core foundational libraries),
-  see also [benchmarking guide](https://github.com/dotnet/corefx/blob/master/Documentation/project-docs/benchmarking.md)
+* [CoreFX](https://github.com/dotnet/corefx/issues?utf8=✓&q=BenchmarkDotNet) (.NET Core foundational libraries;
+  see also [official benchmarking guide](https://github.com/dotnet/corefx/blob/master/Documentation/project-docs/benchmarking.md)),
 * [Roslyn](https://github.com/dotnet/roslyn/search?q=BenchmarkDotNet&type=Issues&utf8=✓) (C# and Visual Basic compiler)
 * [KestrelHttpServer](https://github.com/aspnet/KestrelHttpServer/tree/dev/benchmarks/Kestrel.Performance) (A cross platform web server for ASP.NET Core)
 * [SignalR](https://github.com/aspnet/SignalR/tree/dev/benchmarks/Microsoft.AspNetCore.SignalR.Microbenchmarks)
