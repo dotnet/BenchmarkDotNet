@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -54,13 +55,14 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                     return BuildResult.Success(generateResult);
                 }
 
+                var errors = new StringBuilder("The build has failed!");
                 foreach (var diagnostic in emitResult.Diagnostics
                     .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error))
                 {
-                    logger.WriteError($"{diagnostic.Id}: {diagnostic.GetMessage()}");
+                    errors.AppendLine($"{diagnostic.Id}: {diagnostic.GetMessage()}");
                 }
 
-                return BuildResult.Failure(generateResult);
+                return BuildResult.Failure(generateResult, new Exception(errors.ToString()));
             }
         }
 
