@@ -89,7 +89,9 @@
 </li>
 <li class="tocentry current"><a class="current" href="../Advanced/Baseline.htm">Baseline</a>
 <ul class="currentrelative">
-<li class="tocentry"><a href="#example">Example</a></li>
+<li class="tocentry"><a href="#example-1-methods">Example 1: Methods</a></li>
+<li class="tocentry"><a href="#example-2-methods-with-categories">Example 2: Methods with categories</a></li>
+<li class="tocentry"><a href="#example-3-jobs">Example 3: Jobs</a></li>
 </ul>
 <li class="tocentry"><a href="../Advanced/Percentiles.htm">Percentiles</a>
 </li>
@@ -140,67 +142,211 @@
                 <div role="main">
                     <div class="section">
 <h1 id="baseline">Baseline<a class="headerlink" href="#baseline" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
-<p>In order to scale your results, you need to mark one of your benchmark methods as a baseline. Only one method in class can have <code>Baseline = true</code> applied.</p>
-<h2 id="example">Example<a class="headerlink" href="#example" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>In order to scale your results, you can mark a benchmark method or a job as a baseline.
+Let's learn this feature by examples.</p>
+<h2 id="example-1-methods">Example 1: Methods<a class="headerlink" href="#example-1-methods" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>You can mark a method as a baseline with the help of <code>[Benchmark(Baseline = true)]</code>. </p>
 <pre><code class="cs">public class Sleeps
 {
     [Benchmark]
-    public void Time50()
-    {
-        Thread.Sleep(50);
-    }
+    public void Time50() =&gt; Thread.Sleep(50);
 
     [Benchmark(Baseline = true)]
-    public void Time100()
-    {
-        Thread.Sleep(100);
-    }
+    public void Time100() =&gt; Thread.Sleep(100);
 
     [Benchmark]
-    public void Time150()
-    {
-        Thread.Sleep(150);
-    }
+    public void Time150() =&gt; Thread.Sleep(150);
 }
 </code></pre>
 
-<p>As a result, you will have additional column in the summary table:</p>
-<pre><code class="ini">BenchmarkDotNet=v0.9.0.0
-OS=Microsoft Windows NT 6.2.9200.0
-Processor=Intel(R) Core(TM) i7-4810MQ CPU @ 2.80GHz, ProcessorCount=8
-Frequency=2728067 ticks, Resolution=366.5599 ns
-HostCLR=MS.NET 4.0.30319.42000, Arch=64-bit RELEASE [RyuJIT]
-
-Type=Sleeps  Mode=Throughput
+<p>As a result, you will have additional <code>Scaled</code> column in the summary table:</p>
+<pre><code class="ini">BenchmarkDotNet=v0.10.12, OS=Windows 10 Redstone 3 [1709, Fall Creators Update] (10.0.16299.192)
+Processor=Intel Core i7-6700HQ CPU 2.60GHz (Skylake), ProcessorCount=8
+Frequency=2531249 Hz, Resolution=395.0619 ns, Timer=TSC
+.NET Core SDK=2.0.3
+  [Host]     : .NET Core 2.0.3 (Framework 4.6.25815.02), 64bit RyuJIT
+  DefaultJob : .NET Core 2.0.3 (Framework 4.6.25815.02), 64bit RyuJIT
 </code></pre>
 
 <table class="table table-bordered-all table-responsive">
 <thead>
 <tr>
 	<th>Method</th>
-	<th>Median</th>
-	<th>StdDev</th>
-	<th>Scaled</th>
+	<th align="right">Mean</th>
+	<th align="right">Error</th>
+	<th align="right">StdDev</th>
+	<th align="right">Scaled</th>
 </tr>
 </thead>
 <tbody>
 <tr>
+	<td>Time50</td>
+	<td align="right">50.46 ms</td>
+	<td align="right">0.0779 ms</td>
+	<td align="right">0.0729 ms</td>
+	<td align="right">0.50</td>
+</tr>
+<tr>
 	<td>Time100</td>
-	<td>100.2640 ms</td>
-	<td>0.1238 ms</td>
-	<td>1.00</td>
+	<td align="right">100.39 ms</td>
+	<td align="right">0.0762 ms</td>
+	<td align="right">0.0713 ms</td>
+	<td align="right">1.00</td>
 </tr>
 <tr>
 	<td>Time150</td>
-	<td>150.2093 ms</td>
-	<td>0.1034 ms</td>
-	<td>1.50</td>
+	<td align="right">150.48 ms</td>
+	<td align="right">0.0986 ms</td>
+	<td align="right">0.0922 ms</td>
+	<td align="right">1.50</td>
 </tr>
+</tbody>
+</table>
+<h2 id="example-2-methods-with-categories">Example 2: Methods with categories<a class="headerlink" href="#example-2-methods-with-categories" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>The only way to have several baselines in the same class is to separate them by categories
+  and mark the class with <code>[GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]</code>.</p>
+<pre><code class="cs">[GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
+[CategoriesColumn]
+public class Sleeps
+{
+    [BenchmarkCategory(&quot;Fast&quot;), Benchmark(Baseline = true)]        
+    public void Time50() =&gt; Thread.Sleep(50);
+
+    [BenchmarkCategory(&quot;Fast&quot;), Benchmark]
+    public void Time100() =&gt; Thread.Sleep(100);
+    
+    [BenchmarkCategory(&quot;Slow&quot;), Benchmark(Baseline = true)]        
+    public void Time550() =&gt; Thread.Sleep(550);
+
+    [BenchmarkCategory(&quot;Slow&quot;), Benchmark]
+    public void Time600() =&gt; Thread.Sleep(600);
+}
+</code></pre>
+
+<pre><code class="ini">BenchmarkDotNet=v0.10.12, OS=Windows 10 Redstone 3 [1709, Fall Creators Update] (10.0.16299.192)
+Processor=Intel Core i7-6700HQ CPU 2.60GHz (Skylake), ProcessorCount=8
+Frequency=2531249 Hz, Resolution=395.0619 ns, Timer=TSC
+.NET Core SDK=2.0.3
+  [Host]     : .NET Core 2.0.3 (Framework 4.6.25815.02), 64bit RyuJIT
+  DefaultJob : .NET Core 2.0.3 (Framework 4.6.25815.02), 64bit RyuJIT
+</code></pre>
+
+<table class="table table-bordered-all table-responsive">
+<thead>
+<tr>
+	<th>Method</th>
+	<th>Categories</th>
+	<th align="right">Mean</th>
+	<th align="right">Error</th>
+	<th align="right">StdDev</th>
+	<th align="right">Scaled</th>
+</tr>
+</thead>
+<tbody>
 <tr>
 	<td>Time50</td>
-	<td>50.2509 ms</td>
-	<td>0.1153 ms</td>
-	<td>0.50</td>
+	<td>Fast</td>
+	<td align="right">50.46 ms</td>
+	<td align="right">0.0745 ms</td>
+	<td align="right">0.0697 ms</td>
+	<td align="right">1.00</td>
+</tr>
+<tr>
+	<td>Time100</td>
+	<td>Fast</td>
+	<td align="right">100.47 ms</td>
+	<td align="right">0.0955 ms</td>
+	<td align="right">0.0893 ms</td>
+	<td align="right">1.99</td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td align="right"></td>
+	<td align="right"></td>
+	<td align="right"></td>
+	<td align="right"></td>
+</tr>
+<tr>
+	<td>Time550</td>
+	<td>Slow</td>
+	<td align="right">550.48 ms</td>
+	<td align="right">0.0525 ms</td>
+	<td align="right">0.0492 ms</td>
+	<td align="right">1.00</td>
+</tr>
+<tr>
+	<td>Time600</td>
+	<td>Slow</td>
+	<td align="right">600.45 ms</td>
+	<td align="right">0.0396 ms</td>
+	<td align="right">0.0331 ms</td>
+	<td align="right">1.09</td>
+</tr>
+</tbody>
+</table>
+<h2 id="example-3-jobs">Example 3: Jobs<a class="headerlink" href="#example-3-jobs" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>If you want to compare several runtime configuration,
+  you can mark one of your jobs with <code>isBaseline = true</code>.</p>
+<pre><code class="cs">[ClrJob(isBaseline: true)]
+[MonoJob]
+[CoreJob]
+public class RuntimeCompetition
+{
+    [Benchmark]
+    public int SplitJoin() =&gt; string.Join(&quot;,&quot;, new string[1000]).Split(',').Length;
+}
+</code></pre>
+
+<pre><code class="ini">BenchmarkDotNet=v0.10.12, OS=Windows 10 Redstone 3 [1709, Fall Creators Update] (10.0.16299.192)
+Processor=Intel Core i7-6700HQ CPU 2.60GHz (Skylake), ProcessorCount=8
+Frequency=2531249 Hz, Resolution=395.0619 ns, Timer=TSC
+.NET Core SDK=2.0.3
+  [Host]     : .NET Core 2.0.3 (Framework 4.6.25815.02), 64bit RyuJIT
+  Job-MXFYPZ : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2600.0
+  Core       : .NET Core 2.0.3 (Framework 4.6.25815.02), 64bit RyuJIT
+  Mono       : Mono 5.4.0 (Visual Studio), 64bit 
+</code></pre>
+
+<table class="table table-bordered-all table-responsive">
+<thead>
+<tr>
+	<th>Method</th>
+	<th>Runtime</th>
+	<th align="right">Mean</th>
+	<th align="right">Error</th>
+	<th align="right">StdDev</th>
+	<th align="right">Scaled</th>
+	<th align="right">ScaledSD</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>SplitJoin</td>
+	<td>Clr</td>
+	<td align="right">19.42 us</td>
+	<td align="right">0.2447 us</td>
+	<td align="right">0.1910 us</td>
+	<td align="right">1.00</td>
+	<td align="right">0.00</td>
+</tr>
+<tr>
+	<td>SplitJoin</td>
+	<td>Core</td>
+	<td align="right">13.00 us</td>
+	<td align="right">0.2183 us</td>
+	<td align="right">0.1935 us</td>
+	<td align="right">0.67</td>
+	<td align="right">0.01</td>
+</tr>
+<tr>
+	<td>SplitJoin</td>
+	<td>Mono</td>
+	<td align="right">39.14 us</td>
+	<td align="right">0.7763 us</td>
+	<td align="right">1.3596 us</td>
+	<td align="right">2.02</td>
+	<td align="right">0.07</td>
 </tr>
 </tbody>
 </table>
@@ -210,7 +356,7 @@ Type=Sleeps  Mode=Throughput
                 <footer>
                     <hr />
                     <div role="contentinfo">
-BenchmarkDotNet Documentation. &copy;2013-2017. <a href='https://github.com/dotnet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.
+BenchmarkDotNet Documentation. &copy;2013-2018. <a href='https://github.com/dotnet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.
                     </div>
                 </footer>
             </div>

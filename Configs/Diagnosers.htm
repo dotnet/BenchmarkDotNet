@@ -96,6 +96,7 @@
 <li class="tocentry"><a href="#hardware-counters-diagnoser">Hardware Counters Diagnoser</a></li>
 <li class="tocentry"><a href="#disassembly-diagnoser">Disassembly Diagnoser</a></li>
 <li class="tocentry"><a href="#restrictions">Restrictions</a></li>
+<li class="tocentry"><a href="#tailcall-diagnoser">Tailcall Diagnoser</a></li>
 </ul>
 <li class="tocentry"><a href="../Configs/Toolchains.htm">Toolchains</a>
 </li>
@@ -156,6 +157,7 @@
 <ul>
 <li>GC and Memory Allocation (<code>MemoryDiagnoser</code>) which is cross platform, built-in and <strong>is not enabled by default anymore</strong>. Please see Adam Sitnik's <a href="http://adamsitnik.com/the-new-Memory-Diagnoser/" target="_blank">blog post</a> for all the details.</li>
 <li>JIT Inlining Events (<code>InliningDiagnoser</code>). You can find this diagnoser in a separated package with diagnosers for Windows (<code>BenchmarkDotNet.Diagnostics.Windows</code>): <a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/" target="_blank"><img src="https://img.shields.io/nuget/v/BenchmarkDotNet.svg" alt="NuGet" /></a></li>
+<li>JIT Tail Call Events (<code>TailCallDiagnoser</code>). You can find this diagnoser as well as the (<code>InliningDiagnoser</code>) in a separated package with diagnosers for Windows (<code>BenchmarkDotNet.Diagnostics.Windows</code>): <a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/" target="_blank"><img src="https://img.shields.io/nuget/v/BenchmarkDotNet.svg" alt="NuGet" /></a> Please see <a href="https://georgeplotnikov.github.io/articles/tale-tail-call-dotnet" target="_blank">this post</a> for all the details.</li>
 <li>Hardware Counter Diagnoser. You can find this diagnoser in a separated package with diagnosers for Windows (<code>BenchmarkDotNet.Diagnostics.Windows</code>): <a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/" target="_blank"><img src="https://img.shields.io/nuget/v/BenchmarkDotNet.svg" alt="NuGet" /></a>.  Please see Adam Sitnik's <a href="http://adamsitnik.com/Hardware-Counters-Diagnoser/" target="_blank">blog post</a> for all the details.</li>
 <li>Disassembly Diagnoser. It allows you to disassemble the benchmarked code to asm, IL and C#/F#. Please see Adam Sitnik's <a href="http://adamsitnik.com/Disassembly-Diagnoser/" target="_blank">blog post</a> for all the details.</li>
 </ul>
@@ -178,6 +180,7 @@
 <p>You can also use one of the following attributes (apply it on a class that contains Benchmarks):</p>
 <pre><code class="cs">[MemoryDiagnoser]
 [InliningDiagnoser]
+[TailCallDiagnoser]
 </code></pre>
 
 <p>In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on.</p>
@@ -365,13 +368,65 @@ Disassembly Diagnoser:
 &lt;DebugSymbols&gt;true&lt;/DebugSymbols&gt;
 </code></pre>
 
+<h2 id="tailcall-diagnoser">Tailcall Diagnoser<a class="headerlink" href="#tailcall-diagnoser" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>You need to use the <code>TailcallDiagnoser</code> attribute to configure it. The available options are:</p>
+<ul>
+<li>logFailuresOnly: Track only the methods that failed to get tail called. True by default.</li>
+<li>filterByNamespace : Track only the methods from declaring type's namespace. Set to false if you want to see all Jit tail events. True by default.</li>
+</ul>
+<h3 id="sample-1">Sample<a class="headerlink" href="#sample-1" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<pre><code class="cs">[Diagnostics.Windows.Configs.TailCallDiagnoser]
+[LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
+public class Jit_TailCalling
+{
+    [Benchmark]
+    public long Calc()
+        =&gt; FactorialWithoutTailing(7) - FactorialWithTailing(7);
+
+    private static long FactorialWithoutTailing(int depth)
+        =&gt; depth == 0 ? 1 : depth * FactorialWithoutTailing(depth - 1);
+
+    private static long FactorialWithTailing(int pos, int depth)
+        =&gt; pos == 0 ? depth : FactorialWithTailing(pos - 1, depth * pos);
+
+    private static long FactorialWithTailing(int depth)
+        =&gt; FactorialWithTailing(1, depth);
+}
+</code></pre>
+
+<h3 id="the-result">The result<a class="headerlink" href="#the-result" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>The benchmark results were omitted for brevity.</p>
+<pre class="nocode">// * Diagnostic Output - TailCallDiagnoser *
+--------------------
+
+--------------------
+Jit_TailCalling.Calc: LegacyJitX64(Jit=LegacyJit, Platform=X64, Runtime=Clr)
+--------------------
+
+--------------------
+Jit_TailCalling.Calc: LegacyJitX86(Jit=LegacyJit, Platform=X86, Runtime=Clr)
+--------------------
+
+--------------------
+Jit_TailCalling.Calc: RyuJitX64(Jit=RyuJit, Platform=X64)
+--------------------
+Caller: &lt;null&gt;.&lt;null&gt; - &lt;null&gt;
+Callee: BenchmarkDotNet.Samples.JIT.Jit_TailCalling.FactorialWithTailing - int64  (int32,int32)
+Tail prefix: False
+Tail call type: RecursiveLoop
+-------------------
+</pre><h3 id="restrictions-1">Restrictions<a class="headerlink" href="#restrictions-1" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<ul>
+<li>Windows only</li>
+<li>x64</li>
+</ul>
 
                     </div>
                 </div>
                 <footer>
                     <hr />
                     <div role="contentinfo">
-BenchmarkDotNet Documentation. &copy;2013-2017. <a href='https://github.com/dotnet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.
+BenchmarkDotNet Documentation. &copy;2013-2018. <a href='https://github.com/dotnet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.
                     </div>
                 </footer>
             </div>
