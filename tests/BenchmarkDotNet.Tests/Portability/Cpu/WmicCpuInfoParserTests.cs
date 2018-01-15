@@ -9,20 +9,20 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
         public void EmptyTest()
         {
             var parser = WmicCpuInfoParser.ParseOutput(string.Empty);
-            Assert.Equal(null, parser.ProcessorName);
-            Assert.Equal(null, parser.PhysicalProcessorCount);
-            Assert.Equal(null, parser.PhysicalCoreCount);
-            Assert.Equal(null, parser.LogicalCoreCount);
+            Assert.Null(parser.ProcessorName);
+            Assert.Null(parser.PhysicalProcessorCount);
+            Assert.Null(parser.PhysicalCoreCount);
+            Assert.Null(parser.LogicalCoreCount);
         }
 
         [Fact]
         public void MalformedTest()
         {
             var parser = WmicCpuInfoParser.ParseOutput("malformedkey=malformedvalue\n\nmalformedkey2=malformedvalue2");
-            Assert.Equal(null, parser.ProcessorName);
-            Assert.Equal(null, parser.PhysicalProcessorCount);
-            Assert.Equal(null, parser.PhysicalCoreCount);
-            Assert.Equal(null, parser.LogicalCoreCount);
+            Assert.Null(parser.ProcessorName);
+            Assert.Null(parser.PhysicalProcessorCount);
+            Assert.Null(parser.PhysicalCoreCount);
+            Assert.Null(parser.LogicalCoreCount);
         }
 
         [Fact]
