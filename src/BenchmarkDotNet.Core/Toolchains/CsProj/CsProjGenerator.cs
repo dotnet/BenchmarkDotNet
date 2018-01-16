@@ -118,7 +118,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
             // I was afraid of using .GetFiles with some smart search pattern due to the fact that the method was designed for Windows
             // and now .NET is cross platform so who knows if the pattern would be supported for other OSes
-            var possibleNames = new HashSet<string> { $"{projectName}.csproj", $"{projectName}.fsproj" };
+            var possibleNames = new HashSet<string> { $"{projectName}.csproj", $"{projectName}.fsproj", $"{projectName}.vbproj" };
             var projectFile = solutionRootDirectory
                 .EnumerateFiles("*.*", SearchOption.AllDirectories)
                 .FirstOrDefault(file => possibleNames.Contains(file.Name));
