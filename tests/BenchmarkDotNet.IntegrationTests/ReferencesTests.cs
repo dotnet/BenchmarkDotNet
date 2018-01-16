@@ -1,6 +1,4 @@
-﻿#if CLASSIC
-using BenchmarkDotNet.IntegrationTests.CustomPaths;
-using Xunit;
+﻿using Xunit;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -9,14 +7,15 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public ReferencesTests(ITestOutputHelper output) : base(output) { }
 
+#if CLASSIC
         [Fact]
         public void BenchmarksThatUseTypeFromCustomPathDllAreSupported() 
-            => CanExecute<BenchmarksThatUseTypeFromCustomPathDll>();
+            => CanExecute<BenchmarkDotNet.IntegrationTests.CustomPaths.BenchmarksThatUseTypeFromCustomPathDll>();
 
         [Fact]
         public void BenchmarksThatReturnTypeFromCustomPathDllAreSupported() 
-            => CanExecute<BenchmarksThatReturnTypeFromCustomPathDll>();
-
+            => CanExecute<BenchmarkDotNet.IntegrationTests.CustomPaths.BenchmarksThatReturnTypeFromCustomPathDll>();
+#endif
         [Fact]
         public void FSharpIsSupported() => CanExecute<FSharpBenchmark.Db>();
 
@@ -24,4 +23,3 @@ namespace BenchmarkDotNet.IntegrationTests
         public void VisualBasicIsSupported() => CanExecute<VisualBasic.Sample>();
     }
 }
-#endif
