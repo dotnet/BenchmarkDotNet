@@ -1,11 +1,39 @@
 ﻿using System;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.DotNetCli;
+
+#if NETCOREAPP2_1
+using System.Runtime.Intrinsics.X86;
+#endif
 
 namespace BenchmarkDotNet.Samples.Algorithms
 {
     // See http://en.wikipedia.org/wiki/Hamming_weight
+    [Config(typeof(Config))]
     public class Algo_BitCount
     {
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                Add(Job.Default.With(Runtime.Clr)
+                    .With(Jit.RyuJit)
+                    .With(Platform.X64)
+                    .WithId("NET4.7_RyuJIT-x64"));
+
+                Add(Job.Default.With(Runtime.Core)
+                    .With(CsProjCoreToolchain.NetCoreApp20)
+                    .WithId("Core2.0-x64"));
+
+                Add(Job.Default.With(Runtime.Core)
+                    .With(CsProjCoreToolchain.From(NetCoreAppSettings.NetCoreApp21))
+                    .WithId("Core2.1-x64"));
+            }
+        }
         private const int N = 1002;
         private readonly ulong[] numbers;
         private readonly Random random = new Random(42);
@@ -64,10 +92,43 @@ namespace BenchmarkDotNet.Samples.Algorithms
         public int PopCountParallel2()
         {
             int counter = 0;
-            for (int i = 0; i < N / 2; i++)
+            for (int i = 0; i + 2 <= N; i += 2)
                 counter += BitCountHelper.PopCountParallel2(numbers[i],numbers[i+1]);
             return counter;
         }
+
+#if NETCOREAPP2_1
+
+        [Benchmark]
+        public int PopCountIntrinsic()
+        {
+            long longResult = 0;
+            var data = numbers;
+            for (int i = 0; i < N; i++)
+            {
+                longResult += Popcnt.PopCount(data[i]);
+            }
+
+            return (int) longResult;
+        }
+
+        [Benchmark]
+        public int PopCountIntrinsicUnrolledThrice()
+        {
+            long longResult = 0;
+            long p1 = 0, p2 = 0, p3 = 0;
+            var data = numbers;
+            for (int i = 0; i + 3 <= N; i += 3)
+            {
+                p1 += Popcnt.PopCount(data[i]);
+                p2 += Popcnt.PopCount(data[i + 1]);
+                p3 += Popcnt.PopCount(data[i + 2]);
+            }
+
+            longResult += p1 + p2 + p3;
+            return (int) longResult;
+        }
+#endif
     }
 
     /// <summary>
