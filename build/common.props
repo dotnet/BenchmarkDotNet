@@ -38,6 +38,7 @@
     <Revision>12</Revision>
 
     <BuildNumber Condition=" '$(APPVEYOR_BUILD_NUMBER)' != '' ">$(APPVEYOR_BUILD_NUMBER)</BuildNumber>
+    <BuildNumber Condition=" '$(BuildNumber)' == '' ">0</BuildNumber>
 
     <PrereleaseLabel>-develop</PrereleaseLabel>
     <PrereleaseLabel Condition=" '$(APPVEYOR_BUILD_NUMBER)' != '' "></PrereleaseLabel>
