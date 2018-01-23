@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Exporters.Json
                 ProcessorName = ProcessorBrandStringHelper.Prettify(summary.HostEnvironmentInfo.CpuInfo.Value?.ProcessorName ?? ""),
                 summary.HostEnvironmentInfo.CpuInfo.Value?.PhysicalProcessorCount,
                 summary.HostEnvironmentInfo.CpuInfo.Value?.PhysicalCoreCount,
-                summary.HostEnvironmentInfo.LogicalCoreCount,
+                summary.HostEnvironmentInfo.CpuInfo.Value?.LogicalCoreCount,
                 summary.HostEnvironmentInfo.RuntimeVersion,
                 summary.HostEnvironmentInfo.Architecture,
                 summary.HostEnvironmentInfo.HasAttachedDebugger,
