@@ -40,8 +40,6 @@ namespace BenchmarkDotNet.Environments
         /// </summary>
         public Lazy<CpuInfo> CpuInfo { get; protected set; }
 
-        public int LogicalCoreCount { get; protected set; }
-
         public string JitModules { get; protected set; }
 
         /// <summary>
@@ -73,7 +71,6 @@ namespace BenchmarkDotNet.Environments
             BenchmarkDotNetVersion = GetBenchmarkDotNetVersion();
             OsVersion = new Lazy<string>(RuntimeInformation.GetOsVersion);
             CpuInfo = new Lazy<CpuInfo>(RuntimeInformation.GetCpuInfo);
-            LogicalCoreCount = Environment.ProcessorCount;
             ChronometerFrequency = Chronometer.Frequency;
             HardwareTimerKind = Chronometer.HardwareTimerKind;
             JitModules = RuntimeInformation.GetJitModulesInfo();
