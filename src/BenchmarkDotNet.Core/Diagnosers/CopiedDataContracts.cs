@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System.Text;
+using System.Xml.Serialization;
 
 #pragma warning disable CS3003 // I need ulong
 namespace BenchmarkDotNet.Diagnosers
@@ -53,11 +54,31 @@ namespace BenchmarkDotNet.Diagnosers
         public string Problem { get; set; }
 
         public Map[] Maps { get; set; }
+
+        public DisassembledMethodAnnotation Annotation { get; set; }
     }
 
     public class DisassemblyResult
     {
         public DisassembledMethod[] Methods { get; set; }
+    }
+
+    public class DisassembledMethodAnnotation
+    {
+        public int TotalBytesOfCode { get; set; }
+        public bool IsOptmizedCode { get; set; }
+        public bool IsFullyinterruptible { get; set; }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"{new string('=', 39)}Disassembly annotation{new string('=', 39)}");
+            sb.AppendLine($"total bytes of code {TotalBytesOfCode}");
+            sb.AppendLine((IsOptmizedCode ? "" : "non ") + "optimized code");
+            sb.AppendLine(IsFullyinterruptible ? "fully interruptible" : "partially interruptible");
+            sb.AppendLine(new string('=', 100));
+            return sb.ToString();
+        }
     }
 }
 #pragma warning restore CS3003 // Type is not CLS-compliant

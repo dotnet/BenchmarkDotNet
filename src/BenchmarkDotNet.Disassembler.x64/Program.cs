@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
@@ -66,10 +67,9 @@ namespace BenchmarkDotNet.Disassembler
 
                 ConfigureSymbols(dataTarget);
 
-                var state = new State(runtime, (IDebugControl)dataTarget.DebuggerInterface);
-
-                var disasembledMethods = Disassemble(settings, runtime, state);
-
+                var state = new State( runtime, (IDebugControl)dataTarget.DebuggerInterface);
+                List<DisassembledMethod> disasembledMethods = null;
+                disasembledMethods = Disassemble(settings, runtime, state);
                 using (var stream = new FileStream(settings.ResultsPath, FileMode.Append, FileAccess.Write))
                 using (var writer = XmlWriter.Create(stream))
                 {
@@ -210,7 +210,14 @@ namespace BenchmarkDotNet.Disassembler
             }
 
             return new DisassembledMethod
+
             {
+                Annotation = new DisassembledMethodAnnotation
+                {
+                    TotalBytesOfCode = methodDefinition.Body.CodeSize,
+                    IsOptmizedCode = !methodDefinition.NoOptimization,
+                    IsFullyinterruptible = CaclParametersSize(methodDefinition) > 256
+                },
                 Maps = EliminateDuplicates(maps),
                 Name = method.GetFullSignature(),
                 NativeCode = method.NativeCode
@@ -386,7 +393,6 @@ namespace BenchmarkDotNet.Disassembler
                 .SingleOrDefault(method => method.GetFullSignature() == unifiedSignature);
         }
 
-
         static string CecilNameToClrmdName(MethodReference method)
         {
             // Cecil returns sth like "System.Int32 System.Random::Next(System.Int32,System.Int32)"
@@ -417,6 +423,35 @@ namespace BenchmarkDotNet.Disassembler
 
         static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
             => DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, reason);
+
+        static int CaclParametersSize(MethodDefinition methodDefinition)
+        {
+            var res = 0;
+            if (methodDefinition.HasParameters || methodDefinition.HasGenericParameters)
+            {
+                try
+                {
+                    foreach (var p in methodDefinition.Parameters)
+                    {
+                        var typename = p.ParameterType.Resolve().FullName;
+                        var obj = Activator.CreateInstance(Type.GetType(typename));
+                        using (var ms = new MemoryStream())
+                        {
+                            var bf = new BinaryFormatter();
+                            bf.Serialize(ms, obj);
+                            res += (int)ms.Length;
+                        }
+                    }
+                    foreach (var p in methodDefinition.GenericParameters)
+                    {
+                        Console.WriteLine("packing size: " + p.Resolve().PackingSize);
+                        res += p.Resolve().PackingSize;
+                    }
+                }
+                catch (Exception ex) { }
+            }            
+            return res;
+        }
 
         class CodeComparer : IEqualityComparer<Code>
         {
@@ -450,7 +485,7 @@ namespace BenchmarkDotNet.Disassembler
             public int GetHashCode(Code obj) => obj.TextRepresentation.GetHashCode();
         }
     }
-
+    
     class Settings
     {
         private Settings(int processId, string typeName, string methodName, bool printAsm, bool printIL, bool printSource, bool printPrologAndEpilog, int recursiveDepth, string resultsPath)
