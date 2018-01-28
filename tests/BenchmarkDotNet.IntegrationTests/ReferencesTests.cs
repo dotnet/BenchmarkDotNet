@@ -1,6 +1,4 @@
-﻿#if CLASSIC
-using BenchmarkDotNet.IntegrationTests.CustomPaths;
-using Xunit;
+﻿using Xunit;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -9,23 +7,19 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public ReferencesTests(ITestOutputHelper output) : base(output) { }
 
+#if CLASSIC
         [Fact]
         public void BenchmarksThatUseTypeFromCustomPathDllAreSupported() 
-            => CanExecute<BenchmarksThatUseTypeFromCustomPathDll>();
+            => CanExecute<BenchmarkDotNet.IntegrationTests.CustomPaths.BenchmarksThatUseTypeFromCustomPathDll>();
 
         [Fact]
         public void BenchmarksThatReturnTypeFromCustomPathDllAreSupported() 
-            => CanExecute<BenchmarksThatReturnTypeFromCustomPathDll>();
-
-        /*
-         * as of 2nd of April 2017 VS 2017 can't handle it yet, as soon as this starts working we should uncomment it
-         * https://github.com/dotnet/project-system/pull/1670#issuecomment-289902007
+            => CanExecute<BenchmarkDotNet.IntegrationTests.CustomPaths.BenchmarksThatReturnTypeFromCustomPathDll>();
+#endif
         [Fact]
         public void FSharpIsSupported() => CanExecute<FSharpBenchmark.Db>();
 
         [Fact]
         public void VisualBasicIsSupported() => CanExecute<VisualBasic.Sample>();
-        */
     }
 }
-#endif

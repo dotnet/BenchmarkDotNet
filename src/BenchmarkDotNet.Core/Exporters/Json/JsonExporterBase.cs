@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Reports;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using JsonSerialiser = SimpleJson.SimpleJson;
 using BenchmarkDotNet.Diagnosers;
@@ -30,8 +31,10 @@ namespace BenchmarkDotNet.Exporters.Json
                 HostEnvironmentInfo.BenchmarkDotNetCaption,
                 summary.HostEnvironmentInfo.BenchmarkDotNetVersion,
                 OsVersion = summary.HostEnvironmentInfo.OsVersion.Value,
-                ProcessorName = summary.HostEnvironmentInfo.ProcessorName.Value,
-                summary.HostEnvironmentInfo.ProcessorCount,
+                ProcessorName = ProcessorBrandStringHelper.Prettify(summary.HostEnvironmentInfo.CpuInfo.Value?.ProcessorName ?? ""),
+                summary.HostEnvironmentInfo.CpuInfo.Value?.PhysicalProcessorCount,
+                summary.HostEnvironmentInfo.CpuInfo.Value?.PhysicalCoreCount,
+                summary.HostEnvironmentInfo.CpuInfo.Value?.LogicalCoreCount,
                 summary.HostEnvironmentInfo.RuntimeVersion,
                 summary.HostEnvironmentInfo.Architecture,
                 summary.HostEnvironmentInfo.HasAttachedDebugger,
@@ -62,7 +65,7 @@ namespace BenchmarkDotNet.Exporters.Json
                 };
 
                 // We show MemoryDiagnoser's results only if it is being used
-                if(summary.Config.GetDiagnosers().Any(diagnoser => diagnoser is MemoryDiagnoser))
+                if(summary.Config.HasMemoryDiagnoser())
                 {
                     data.Add("Memory", r.GcStats);
                 }

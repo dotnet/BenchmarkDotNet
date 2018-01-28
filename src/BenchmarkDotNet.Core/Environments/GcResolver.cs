@@ -15,6 +15,7 @@ namespace BenchmarkDotNet.Environments
             Register(GcMode.ForceCharacteristic, () => true);
             Register(GcMode.AllowVeryLargeObjectsCharacteristic, () => false);
             Register(GcMode.RetainVmCharacteristic, () => false); // Maoni0: "The default is false" https://github.com/dotnet/docs/issues/878#issuecomment-248986456
+            Register(GcMode.NoAffinitizeCharacteristic, () => false); // Maoni0: https://github.com/dotnet/coreclr/pull/6104/commits/d088712003e8d483872754d6b3c72aa2d4443a93
         }
     }
 }

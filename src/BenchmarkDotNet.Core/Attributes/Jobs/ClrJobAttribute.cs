@@ -4,7 +4,7 @@ namespace BenchmarkDotNet.Attributes.Jobs
 {
     public class ClrJobAttribute : JobConfigBaseAttribute
     {
-        public ClrJobAttribute() : base(Job.Clr)
+        public ClrJobAttribute(bool isBaseline = false) : base(Job.Clr.WithIsBaseline(isBaseline))
         {
         }
     }

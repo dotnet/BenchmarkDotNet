@@ -10,5 +10,12 @@ namespace BenchmarkDotNet.Engines
             // this method can't get inlined, so any value send to it
             // will not get eliminated by the dead code elimination
         }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public static void KeepAliveWithoutBoxing<T>(ref T value)
+        {
+            // this method can't get inlined, so any value send to it
+            // will not get eliminated by the dead code elimination
+        }
     }
 }

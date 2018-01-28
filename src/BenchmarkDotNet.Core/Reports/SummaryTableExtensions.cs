@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Reports
@@ -46,7 +48,7 @@ namespace BenchmarkDotNet.Reports
         }
 
         public static void PrintLine(this SummaryTable table, string[] line, ILogger logger, string leftDel, string rightDel,
-                                     bool highlightRow, bool startOfGroup, bool startOfGroupInBold, string boldMarkupFormat)
+                                     bool highlightRow, bool startOfGroup, MarkdownExporter.MarkdownHighlightStrategy startOfGroupHighlightStrategy, string boldMarkupFormat, bool escapeHtml)
         {
             for (int columnIndex = 0; columnIndex < table.ColumnCount; columnIndex++)
             {
@@ -55,9 +57,11 @@ namespace BenchmarkDotNet.Reports
                     continue;
                 }
 
-                var text = (startOfGroup && startOfGroupInBold)
+                var text = (startOfGroup && (startOfGroupHighlightStrategy == MarkdownExporter.MarkdownHighlightStrategy.Bold))
                     ? BuildBoldText(table, line, leftDel, rightDel, columnIndex, boldMarkupFormat)
                     : BuildStandardText(table, line, leftDel, rightDel, columnIndex);
+                if (escapeHtml)
+                    text = text.HtmlEncode();
 
                 if (highlightRow) // write the row in an alternative colour
                 {
@@ -68,6 +72,9 @@ namespace BenchmarkDotNet.Reports
                     logger.WriteStatistic(text);
                 }
             }
+            
+            if (startOfGroup && (startOfGroupHighlightStrategy == MarkdownExporter.MarkdownHighlightStrategy.Marker))
+                logger.Write(highlightRow ? LogKind.Header : LogKind.Statistic, " ^"); //
 
             logger.WriteLine();
         }

@@ -9,13 +9,9 @@ namespace BenchmarkDotNet.Engines
     {
         private readonly IEngine engine;
 
-        protected EngineStage(IEngine engine)
-        {
-            this.engine = engine;
-        }
+        protected EngineStage(IEngine engine) => this.engine = engine;
 
         protected Job TargetJob => engine.TargetJob;
-        protected bool IsDiagnoserAttached => engine.IsDiagnoserAttached;
 
         protected Measurement RunIteration(IterationMode mode, int index, long invokeCount, int unrollFactor)
         {

@@ -7,17 +7,20 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
+using RunMode = BenchmarkDotNet.Jobs.RunMode;
 
 namespace BenchmarkDotNet.Code
 {
     internal static class CodeGenerator
     {
-        internal static string Generate(Benchmark benchmark)
+        internal static string Generate(Benchmark benchmark, IConfig config)
         {
             var provider = GetDeclarationsProvider(benchmark.Target);
 
@@ -29,10 +32,8 @@ namespace BenchmarkDotNet.Code
                 Replace("$TargetMethodReturnTypeNamespace$", provider.TargetMethodReturnTypeNamespace).
                 Replace("$TargetTypeName$", provider.TargetTypeName).
                 Replace("$TargetMethodDelegate$", provider.TargetMethodDelegate).
-                Replace("$TargetMethodDelegateType$", provider.TargetMethodDelegateType).
                 Replace("$TargetMethodReturnType$", provider.TargetMethodReturnTypeName).
-                Replace("$IdleMethodDelegateType$", provider.IdleMethodDelegateType).
-                Replace("$IdleMethodReturnType$", provider.IdleMethodReturnTypeName).
+                Replace("$IdleMethodReturnTypeName$", provider.IdleMethodReturnTypeName).
                 Replace("$GlobalSetupMethodName$", provider.GlobalSetupMethodName).
                 Replace("$GlobalCleanupMethodName$", provider.GlobalCleanupMethodName).
                 Replace("$IterationSetupMethodName$", provider.IterationSetupMethodName).
@@ -47,6 +48,8 @@ namespace BenchmarkDotNet.Code
                 Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark)). 
                 Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).
                 Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath).
+                Replace("$Ref$", provider.UseRefKeyword ? "ref" : null).
+                Replace("$MeasureGcStats$", config.HasMemoryDiagnoser() ? "true" : "false").
                 ToString();
 
             text = Unroll(text, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvResolver.Instance));
@@ -131,6 +134,12 @@ namespace BenchmarkDotNet.Code
 
                 return new VoidDeclarationsProvider(target);
             }
+
+            if (method.ReturnType.IsByRef)
+            {
+                return new ByRefDeclarationsProvider(target);
+            }
+
             return new NonVoidDeclarationsProvider(target);
         }
 

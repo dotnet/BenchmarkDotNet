@@ -3,6 +3,7 @@ using System.Linq;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Columns
 {
@@ -10,22 +11,20 @@ namespace BenchmarkDotNet.Columns
     {
         private readonly NumeralSystem system;
 
-        public RankColumn(NumeralSystem system)
-        {
-            this.system = system;
-        }
+        public RankColumn(NumeralSystem system) => this.system = system;
 
-        public static readonly IColumn Arabic = new RankColumn(NumeralSystem.Arabic);
-        public static readonly IColumn Roman = new RankColumn(NumeralSystem.Roman);
-        public static readonly IColumn Stars = new RankColumn(NumeralSystem.Stars);
+        [PublicAPI] public static readonly IColumn Arabic = new RankColumn(NumeralSystem.Arabic);
+        [PublicAPI] public static readonly IColumn Roman = new RankColumn(NumeralSystem.Roman);
+        [PublicAPI] public static readonly IColumn Stars = new RankColumn(NumeralSystem.Stars);
 
         public string Id => nameof(RankColumn) + "." + system;
         public string ColumnName => "Rank";
 
         public string GetValue(Summary summary, Benchmark benchmark)
         {
-            var ranks = RankHelper.GetRanks(summary.Reports.Select(r => r.ResultStatistics).ToArray());
-            int index = Array.IndexOf(summary.Reports.Select(r => r.Benchmark).ToArray(), benchmark);
+            var logicalGroup = summary.GetLogicalGroupForBenchmark(benchmark).ToArray();
+            var ranks = RankHelper.GetRanks(logicalGroup.Select(b => summary[b].ResultStatistics).ToArray());
+            int index = Array.IndexOf(logicalGroup, benchmark);
             int rank = ranks[index];
             return system.ToPresentation(rank);
         }

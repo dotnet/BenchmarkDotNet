@@ -79,6 +79,10 @@ namespace BenchmarkDotNet.Diagnosers
             sb.AppendLine(new string('=', 100));
             return sb.ToString();
         }
+        
+    public static class Errors
+    {
+        public const string NotManagedMethod = "not managed method";
     }
 }
 #pragma warning restore CS3003 // Type is not CLS-compliant

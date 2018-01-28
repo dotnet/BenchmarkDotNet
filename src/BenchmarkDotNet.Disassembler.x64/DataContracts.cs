@@ -89,5 +89,9 @@ namespace BenchmarkDotNet.Disassembler
             sb.AppendLine(new string('=', 100));
             return sb.ToString();
         }
+      
+    public static class Errors
+    {
+        public const string NotManagedMethod = "not managed method";
     }
 }

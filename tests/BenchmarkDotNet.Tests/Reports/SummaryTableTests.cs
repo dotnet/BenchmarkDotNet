@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Tests.Reports
         public void PlatformTest()
         {
             var gcModeColumn = CreateColumn("Platform");
-            Assert.Equal(true, gcModeColumn.IsDefault);
+            Assert.True(gcModeColumn.IsDefault);
         }
 
         [Fact]

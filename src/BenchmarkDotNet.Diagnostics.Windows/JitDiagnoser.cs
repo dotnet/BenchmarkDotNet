@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -20,15 +21,15 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public abstract IEnumerable<string> Ids { get; }
         public IColumnProvider GetColumnProvider() => EmptyColumnProvider.Instance;
 
-        public void BeforeAnythingElse(DiagnoserActionParameters parameters) => Start(parameters);
+        public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
+        {
+            if (signal == HostSignal.BeforeAnythingElse)
+                Start(parameters);
+            else if (signal == HostSignal.AfterAll)
+                Stop();
+        }
 
-        public void AfterGlobalSetup(DiagnoserActionParameters _) { }
-
-        public void BeforeMainRun(DiagnoserActionParameters _) { }
-
-        public void BeforeGlobalCleanup(DiagnoserActionParameters parameters) => Stop();
-
-        public virtual void ProcessResults(Benchmark benchmark, BenchmarkReport report) { }
+        public virtual void ProcessResults(DiagnoserResults results) { }
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Enumerable.Empty<ValidationError>();
 

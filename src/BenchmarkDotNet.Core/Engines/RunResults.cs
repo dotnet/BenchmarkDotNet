@@ -20,8 +20,6 @@ namespace BenchmarkDotNet.Engines
 
         public GcStats GCStats { get; }
 
-        public long TotalOperationsCount { get; }
-
         public RunResults(
             [CanBeNull] IReadOnlyList<Measurement> idle, [NotNull] IReadOnlyList<Measurement> main, bool removeOutliers, GcStats gcStats)
         {
@@ -29,17 +27,8 @@ namespace BenchmarkDotNet.Engines
             Idle = idle;
             Main = main;
             GCStats = gcStats;
-
-            var totalOperationsCount = 0L;
-            foreach (var measurement in Main)
-            {
-                if (!measurement.IterationMode.IsIdle())
-                    totalOperationsCount += measurement.Operations;
-            }
-            TotalOperationsCount = totalOperationsCount;
         }
 
-        // TODO: rewrite without allocations
         public IEnumerable<Measurement> GetMeasurements()
         {
             double overhead = Idle == null ? 0.0 : new Statistics(Idle.Select(m => m.Nanoseconds)).Mean;
@@ -68,7 +57,7 @@ namespace BenchmarkDotNet.Engines
             foreach (var measurement in GetMeasurements())
                 outWriter.WriteLine(measurement.ToOutputLine());
 
-            outWriter.WriteLine(GCStats.WithTotalOperations(TotalOperationsCount).ToOutputLine());
+            outWriter.WriteLine(GCStats.ToOutputLine());
             outWriter.WriteLine();
         }
 

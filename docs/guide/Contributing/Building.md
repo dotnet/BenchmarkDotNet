@@ -4,7 +4,7 @@ There are two recommended options to build BenchmarkDotNet from source:
 
 ## Option A (Windows only) - Visual Studio
 
-- [Visual Studio 2017 version 15.2 or higher](https://www.visualstudio.com/downloads/) (Community, Professional, Enterprise).
+- [Visual Studio 2017 version 15.5 Preview 4 or higher](https://www.visualstudio.com/downloads/) (Community, Professional, Enterprise).
 
 - Visual Studio 2017 should have installed the .NET Core SDK, but in case it did not you can get it from the [Installing the .Net Core SDK page](https://www.microsoft.com/net/core).
 

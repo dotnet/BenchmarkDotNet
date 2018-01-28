@@ -7,6 +7,7 @@ var skipTests = Argument("SkipTests", false);
 var artifactsDirectory = Directory("./artifacts");
 var solutionFile = "./BenchmarkDotNet.sln";
 var solutionFileBackup = solutionFile + ".build.backup";
+var integrationTestsProjectPath = "./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj";
 var isRunningOnWindows = IsRunningOnWindows();
 var IsOnAppVeyorAndNotPR = AppVeyor.IsRunningOnAppVeyor && !AppVeyor.Environment.PullRequest.IsPullRequest;
 
@@ -39,20 +40,6 @@ Task("Clean")
     .Does(() =>
     {
         CleanDirectory(artifactsDirectory);
-
-        if(BuildSystem.IsLocalBuild)
-        {
-            var directoriesToClean = GetDirectories("./**/obj") 
-                                     + GetDirectories("./**/bin") 
-                                     - GetDirectories("./**/debug")
-                                     - GetDirectories("./**/release");
-            DeleteDirectories(directoriesToClean, 
-                new DeleteDirectorySettings 
-                    {
-                        Recursive = true,
-                        Force = true
-                    });
-        }
     });
 
 Task("Restore")
@@ -70,7 +57,7 @@ Task("Build")
             .SetConfiguration(configuration)
             .WithTarget("Rebuild")
             .SetVerbosity(Verbosity.Minimal)
-            .UseToolVersion(MSBuildToolVersion.Default)
+            .UseToolVersion(MSBuildToolVersion.VS2017)
             .SetMSBuildPlatform(MSBuildPlatform.Automatic)
             .SetPlatformTarget(PlatformTarget.MSIL) // Any CPU
             .SetNodeReuse(true);
@@ -100,7 +87,15 @@ Task("FastTests")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
-        DotNetCoreTest("./tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj", GetTestSettings());
+        string[] targetVersions = IsRunningOnWindows() ? 
+                new []{"net46", "netcoreapp1.1", "netcoreapp2.0"}
+                :
+                new []{"netcoreapp2.0"};
+
+        foreach(var version in targetVersions)
+        {
+            DotNetCoreTool("./tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj", "xunit", GetTestSettingsParameters(version));
+        }
     });
 
 Task("BackwardCompatibilityTests")
@@ -108,15 +103,10 @@ Task("BackwardCompatibilityTests")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
-        DotNetCoreTest(
-            "./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", 
-            new DotNetCoreTestSettings
-            {
-                Configuration = "Release",
-                Framework = "netcoreapp1.1",
-                Filter = "Category=BackwardCompatibility"
-            }
-        );
+        var testSettings = GetTestSettingsParameters("netcoreapp1.1");
+        testSettings += " -trait \"Category=BackwardCompatibility\"";
+
+        DotNetCoreTool(integrationTestsProjectPath, "xunit", testSettings);
     });
     
 Task("SlowTestsNet46")
@@ -124,7 +114,7 @@ Task("SlowTestsNet46")
     .WithCriteria(!skipTests && isRunningOnWindows)
     .Does(() =>
     {
-        DotNetCoreTest("./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", GetTestSettings("net46"));
+        DotNetCoreTool(integrationTestsProjectPath, "xunit", GetTestSettingsParameters("net46"));
     });    
     
 Task("SlowTestsNetCore2")
@@ -132,7 +122,7 @@ Task("SlowTestsNetCore2")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
-        DotNetCoreTest("./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", GetTestSettings("netcoreapp2.0"));
+        DotNetCoreTool(integrationTestsProjectPath, "xunit", GetTestSettingsParameters("netcoreapp2.0"));
     });       
 
 Task("Pack")
@@ -166,22 +156,18 @@ Task("Default")
 RunTarget(target);
 
 // HELPERS
-private DotNetCoreTestSettings GetTestSettings(string tfm = null)
+private string GetTestSettingsParameters(string tfm)
 {
-    var settings = new DotNetCoreTestSettings
+    var settings = $"-configuration Release -stoponfail -maxthreads unlimited -nobuild  -framework {tfm}";
+    if(string.Equals("netcoreapp2.0", tfm, StringComparison.OrdinalIgnoreCase))
     {
-        Configuration = "Release"
-    };
-
-    if (!IsRunningOnWindows())
-    {
-        settings.Framework = "netcoreapp2.0";
+        settings += " --fx-version 2.0.5";
     }
-    else if(tfm != null)
+    if(string.Equals("netcoreapp1.1", tfm, StringComparison.OrdinalIgnoreCase))
     {
-        settings.Framework = tfm;
+        settings += " --fx-version 1.1.6";
     }
-
+    
     return settings;
 }
 

@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 {
     public abstract class EtwDiagnoser<TStats> where TStats : new()
     {
-        protected readonly LogCapture Logger = new LogCapture();
+        internal readonly LogCapture Logger = new LogCapture();
         protected readonly Dictionary<Benchmark, int> BenchmarkToProcess = new Dictionary<Benchmark, int>();
         protected readonly ConcurrentDictionary<int, TStats> StatsPerProcess = new ConcurrentDictionary<int, TStats>();
 

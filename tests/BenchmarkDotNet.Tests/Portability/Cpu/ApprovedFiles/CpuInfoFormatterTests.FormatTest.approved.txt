@@ -1,0 +1,192 @@
+﻿Unknown processor
+Unknown processor
+Unknown processor, 1 logical core
+Unknown processor, 2 logical cores
+Unknown processor
+Unknown processor
+Unknown processor, 1 logical core
+Unknown processor, 2 logical cores
+Unknown processor, 1 physical core
+Unknown processor, 1 physical core
+Unknown processor, 1 logical core and 1 physical core
+Unknown processor, 2 logical cores and 1 physical core
+Unknown processor, 2 physical cores
+Unknown processor, 2 physical cores
+Unknown processor, 1 logical core and 2 physical cores
+Unknown processor, 2 logical cores and 2 physical cores
+Unknown processor
+Unknown processor
+Unknown processor, 1 logical core
+Unknown processor, 2 logical cores
+Unknown processor
+Unknown processor
+Unknown processor, 1 logical core
+Unknown processor, 2 logical cores
+Unknown processor, 1 physical core
+Unknown processor, 1 physical core
+Unknown processor, 1 logical core and 1 physical core
+Unknown processor, 2 logical cores and 1 physical core
+Unknown processor, 2 physical cores
+Unknown processor, 2 physical cores
+Unknown processor, 1 logical core and 2 physical cores
+Unknown processor, 2 logical cores and 2 physical cores
+Unknown processor, 1 CPU
+Unknown processor, 1 CPU
+Unknown processor, 1 CPU, 1 logical core
+Unknown processor, 1 CPU, 2 logical cores
+Unknown processor, 1 CPU
+Unknown processor, 1 CPU
+Unknown processor, 1 CPU, 1 logical core
+Unknown processor, 1 CPU, 2 logical cores
+Unknown processor, 1 CPU, 1 physical core
+Unknown processor, 1 CPU, 1 physical core
+Unknown processor, 1 CPU, 1 logical core and 1 physical core
+Unknown processor, 1 CPU, 2 logical cores and 1 physical core
+Unknown processor, 1 CPU, 2 physical cores
+Unknown processor, 1 CPU, 2 physical cores
+Unknown processor, 1 CPU, 1 logical core and 2 physical cores
+Unknown processor, 1 CPU, 2 logical cores and 2 physical cores
+Unknown processor, 2 CPU
+Unknown processor, 2 CPU
+Unknown processor, 2 CPU, 1 logical core
+Unknown processor, 2 CPU, 2 logical cores
+Unknown processor, 2 CPU
+Unknown processor, 2 CPU
+Unknown processor, 2 CPU, 1 logical core
+Unknown processor, 2 CPU, 2 logical cores
+Unknown processor, 2 CPU, 1 physical core
+Unknown processor, 2 CPU, 1 physical core
+Unknown processor, 2 CPU, 1 logical core and 1 physical core
+Unknown processor, 2 CPU, 2 logical cores and 1 physical core
+Unknown processor, 2 CPU, 2 physical cores
+Unknown processor, 2 CPU, 2 physical cores
+Unknown processor, 2 CPU, 1 logical core and 2 physical cores
+Unknown processor, 2 CPU, 2 logical cores and 2 physical cores
+Unknown processor
+Unknown processor
+Unknown processor, 1 logical core
+Unknown processor, 2 logical cores
+Unknown processor
+Unknown processor
+Unknown processor, 1 logical core
+Unknown processor, 2 logical cores
+Unknown processor, 1 physical core
+Unknown processor, 1 physical core
+Unknown processor, 1 logical core and 1 physical core
+Unknown processor, 2 logical cores and 1 physical core
+Unknown processor, 2 physical cores
+Unknown processor, 2 physical cores
+Unknown processor, 1 logical core and 2 physical cores
+Unknown processor, 2 logical cores and 2 physical cores
+Unknown processor
+Unknown processor
+Unknown processor, 1 logical core
+Unknown processor, 2 logical cores
+Unknown processor
+Unknown processor
+Unknown processor, 1 logical core
+Unknown processor, 2 logical cores
+Unknown processor, 1 physical core
+Unknown processor, 1 physical core
+Unknown processor, 1 logical core and 1 physical core
+Unknown processor, 2 logical cores and 1 physical core
+Unknown processor, 2 physical cores
+Unknown processor, 2 physical cores
+Unknown processor, 1 logical core and 2 physical cores
+Unknown processor, 2 logical cores and 2 physical cores
+Unknown processor, 1 CPU
+Unknown processor, 1 CPU
+Unknown processor, 1 CPU, 1 logical core
+Unknown processor, 1 CPU, 2 logical cores
+Unknown processor, 1 CPU
+Unknown processor, 1 CPU
+Unknown processor, 1 CPU, 1 logical core
+Unknown processor, 1 CPU, 2 logical cores
+Unknown processor, 1 CPU, 1 physical core
+Unknown processor, 1 CPU, 1 physical core
+Unknown processor, 1 CPU, 1 logical core and 1 physical core
+Unknown processor, 1 CPU, 2 logical cores and 1 physical core
+Unknown processor, 1 CPU, 2 physical cores
+Unknown processor, 1 CPU, 2 physical cores
+Unknown processor, 1 CPU, 1 logical core and 2 physical cores
+Unknown processor, 1 CPU, 2 logical cores and 2 physical cores
+Unknown processor, 2 CPU
+Unknown processor, 2 CPU
+Unknown processor, 2 CPU, 1 logical core
+Unknown processor, 2 CPU, 2 logical cores
+Unknown processor, 2 CPU
+Unknown processor, 2 CPU
+Unknown processor, 2 CPU, 1 logical core
+Unknown processor, 2 CPU, 2 logical cores
+Unknown processor, 2 CPU, 1 physical core
+Unknown processor, 2 CPU, 1 physical core
+Unknown processor, 2 CPU, 1 logical core and 1 physical core
+Unknown processor, 2 CPU, 2 logical cores and 1 physical core
+Unknown processor, 2 CPU, 2 physical cores
+Unknown processor, 2 CPU, 2 physical cores
+Unknown processor, 2 CPU, 1 logical core and 2 physical cores
+Unknown processor, 2 CPU, 2 logical cores and 2 physical cores
+Intel
+Intel
+Intel, 1 logical core
+Intel, 2 logical cores
+Intel
+Intel
+Intel, 1 logical core
+Intel, 2 logical cores
+Intel, 1 physical core
+Intel, 1 physical core
+Intel, 1 logical core and 1 physical core
+Intel, 2 logical cores and 1 physical core
+Intel, 2 physical cores
+Intel, 2 physical cores
+Intel, 1 logical core and 2 physical cores
+Intel, 2 logical cores and 2 physical cores
+Intel
+Intel
+Intel, 1 logical core
+Intel, 2 logical cores
+Intel
+Intel
+Intel, 1 logical core
+Intel, 2 logical cores
+Intel, 1 physical core
+Intel, 1 physical core
+Intel, 1 logical core and 1 physical core
+Intel, 2 logical cores and 1 physical core
+Intel, 2 physical cores
+Intel, 2 physical cores
+Intel, 1 logical core and 2 physical cores
+Intel, 2 logical cores and 2 physical cores
+Intel, 1 CPU
+Intel, 1 CPU
+Intel, 1 CPU, 1 logical core
+Intel, 1 CPU, 2 logical cores
+Intel, 1 CPU
+Intel, 1 CPU
+Intel, 1 CPU, 1 logical core
+Intel, 1 CPU, 2 logical cores
+Intel, 1 CPU, 1 physical core
+Intel, 1 CPU, 1 physical core
+Intel, 1 CPU, 1 logical core and 1 physical core
+Intel, 1 CPU, 2 logical cores and 1 physical core
+Intel, 1 CPU, 2 physical cores
+Intel, 1 CPU, 2 physical cores
+Intel, 1 CPU, 1 logical core and 2 physical cores
+Intel, 1 CPU, 2 logical cores and 2 physical cores
+Intel, 2 CPU
+Intel, 2 CPU
+Intel, 2 CPU, 1 logical core
+Intel, 2 CPU, 2 logical cores
+Intel, 2 CPU
+Intel, 2 CPU
+Intel, 2 CPU, 1 logical core
+Intel, 2 CPU, 2 logical cores
+Intel, 2 CPU, 1 physical core
+Intel, 2 CPU, 1 physical core
+Intel, 2 CPU, 1 logical core and 1 physical core
+Intel, 2 CPU, 2 logical cores and 1 physical core
+Intel, 2 CPU, 2 physical cores
+Intel, 2 CPU, 2 physical cores
+Intel, 2 CPU, 1 logical core and 2 physical cores
+Intel, 2 CPU, 2 logical cores and 2 physical cores

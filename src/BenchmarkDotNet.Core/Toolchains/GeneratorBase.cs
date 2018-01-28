@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Toolchains
 
                 CopyAllRequiredFiles(benchmark, artifactsPaths);
 
-                GenerateCode(benchmark, artifactsPaths);
+                GenerateCode(benchmark, artifactsPaths, config);
                 GenerateAppConfig(benchmark, artifactsPaths, resolver);
                 GenerateProject(benchmark, artifactsPaths, resolver, logger);
                 GenerateBuildScript(benchmark, artifactsPaths, resolver);
@@ -80,9 +80,9 @@ namespace BenchmarkDotNet.Toolchains
         private static string GetProgramName(Benchmark benchmark, IConfig config)
             => config.KeepBenchmarkFiles ? benchmark.FolderInfo : Guid.NewGuid().ToString();
 
-        private static void GenerateCode(Benchmark benchmark, ArtifactsPaths artifactsPaths)
+        private static void GenerateCode(Benchmark benchmark, ArtifactsPaths artifactsPaths, IConfig config)
         {
-            File.WriteAllText(artifactsPaths.ProgramCodePath, CodeGenerator.Generate(benchmark));
+            File.WriteAllText(artifactsPaths.ProgramCodePath, CodeGenerator.Generate(benchmark, config));
         }
 
         private static void GenerateAppConfig(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)

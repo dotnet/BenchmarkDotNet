@@ -23,10 +23,7 @@ namespace BenchmarkDotNet.Configs
 
         public ReadOnlyConfig([NotNull] IConfig config)
         {
-            if (config == null)
-                throw new ArgumentNullException(nameof(config));
-
-            this.config = config;
+            this.config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => config.GetColumnProviders();
@@ -45,5 +42,6 @@ namespace BenchmarkDotNet.Configs
         public ConfigUnionRule UnionRule => config.UnionRule;
 
         public bool KeepBenchmarkFiles => config.KeepBenchmarkFiles;
+        public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => config.GetLogicalGroupRules();
     }
 }

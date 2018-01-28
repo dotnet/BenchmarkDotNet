@@ -9,7 +9,6 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using Xunit;
 using Xunit.Abstractions;
@@ -95,27 +94,9 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Virtual)}()");
         }
 
-        [FactWindowsOnly(WindowsOnly)]
-        public void VeryShortJobsAreNotSupported()
-        {
-            var disassemblyDiagnoser = (IDisassemblyDiagnoser)DisassemblyDiagnoser.Create(
-                new DisassemblyDiagnoserConfig(printAsm: true, printIL: true, printSource: true, recursiveDepth: 3));
-
-            var config = ManualConfig.CreateEmpty()
-                        .With(Job.Dry)
-                        .With(DefaultConfig.Instance.GetLoggers().ToArray())
-                        .With(DefaultColumnProviders.Instance)
-                        .With(disassemblyDiagnoser)
-                        .With(new OutputLogger(Output));
-
-            var validationErrors = disassemblyDiagnoser.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(WithCalls), config)).ToArray();
-
-            Assert.Contains(validationErrors, error => error.IsCritical && error.Message == "No Job.Dry support for disassembler. Please use Job.Short");
-        }
-
         private IConfig CreateConfig(Jit jit, Platform platform, Runtime runtime, IDiagnoser disassemblyDiagnoser)
             => ManualConfig.CreateEmpty()
-                .With(Job.ShortRun.With(jit).With(platform).With(runtime))
+                .With(Job.Dry.With(jit).With(platform).With(runtime))
                 .With(DefaultConfig.Instance.GetLoggers().ToArray())
                 .With(DefaultColumnProviders.Instance)
                 .With(disassemblyDiagnoser)

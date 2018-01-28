@@ -16,10 +16,10 @@
     <ComVisible>false</ComVisible>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
+  <PropertyGroup Condition=" '$(IsVisualBasic)' != 'true' And '$(TargetFramework)' == 'net46' ">
     <DefineConstants>$(DefineConstants);CLASSIC</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' Or '$(TargetFramework)' == 'netcoreapp2.0' ">
+  <PropertyGroup Condition=" '$(IsVisualBasic)' != 'true' And ('$(TargetFramework)' == 'netcoreapp1.1' Or '$(TargetFramework)' == 'netcoreapp2.0') ">
     <DefineConstants>$(DefineConstants);CORE</DefineConstants>
   </PropertyGroup>
 
@@ -30,13 +30,14 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   
-  <PropertyGroup>
+  <PropertyGroup Condition=" '$(IsVisualBasic)' != 'true' ">
+    <LangVersion>7.1</LangVersion>
+    
     <Major>0</Major>
     <Minor>10</Minor>
-    <Revision>9</Revision>
+    <Revision>12</Revision>
 
     <BuildNumber Condition=" '$(APPVEYOR_BUILD_NUMBER)' != '' ">$(APPVEYOR_BUILD_NUMBER)</BuildNumber>
-    <BuildNumber Condition=" '$(BUILD_NUMBER)' != '' ">$(BUILD_NUMBER)</BuildNumber>
     <BuildNumber Condition=" '$(BuildNumber)' == '' ">0</BuildNumber>
 
     <PrereleaseLabel>-develop</PrereleaseLabel>

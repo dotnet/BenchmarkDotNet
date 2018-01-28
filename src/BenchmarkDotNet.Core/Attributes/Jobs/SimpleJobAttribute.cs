@@ -17,10 +17,9 @@ namespace BenchmarkDotNet.Attributes.Jobs
             int warmupCount = DefaultValue,
             int targetCount = DefaultValue,
             int invocationCount = DefaultValue,
-            string id = null
-        ) : base(CreateJob(id, launchCount, warmupCount, targetCount, invocationCount, null))
-        {
-        }
+            string id = null,
+            bool isBaseline = false
+        ) : base(CreateJob(id, launchCount, warmupCount, targetCount, invocationCount, null, isBaseline)) { }
 
         [PublicAPI]
         public SimpleJobAttribute(
@@ -29,12 +28,12 @@ namespace BenchmarkDotNet.Attributes.Jobs
             int warmupCount = DefaultValue,
             int targetCount = DefaultValue,
             int invocationCount = DefaultValue,
-            string id = null
-        ) : base(CreateJob(id, launchCount, warmupCount, targetCount, invocationCount, runStrategy))
-        {
-        }
+            string id = null,
+            bool isBaseline = false
+        ) : base(CreateJob(id, launchCount, warmupCount, targetCount, invocationCount, runStrategy, isBaseline)) { }
 
-        private static Job CreateJob(string id, int launchCount, int warmupCount, int targetCount, int invocationCount, RunStrategy? runStrategy)
+        private static Job CreateJob(string id, int launchCount, int warmupCount, int targetCount, int invocationCount, RunStrategy? runStrategy,
+            bool isBaseline)
         {
             var job = new Job(id);
             if (launchCount != DefaultValue)
@@ -50,8 +49,11 @@ namespace BenchmarkDotNet.Attributes.Jobs
                 if (invocationCount % unrollFactor != 0)
                     job.Run.UnrollFactor = 1;
             }
+
             if (runStrategy != null)
                 job.Run.RunStrategy = runStrategy.Value;
+            if (isBaseline)
+                job.Meta.IsBaseline = true;
 
             return job.Freeze();
         }

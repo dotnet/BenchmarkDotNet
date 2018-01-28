@@ -41,9 +41,7 @@ namespace BenchmarkDotNet.Code
 
         protected virtual Type TargetMethodReturnType => Target.Method.ReturnType;
 
-        public string TargetMethodReturnTypeName => TargetMethodReturnType.GetCorrectTypeName();
-
-        public abstract string TargetMethodDelegateType { get; }
+        public virtual string TargetMethodReturnTypeName => TargetMethodReturnType.GetCorrectTypeName();
 
         public virtual string TargetMethodDelegate => Target.Method.Name;
 
@@ -53,9 +51,9 @@ namespace BenchmarkDotNet.Code
 
         public string IdleMethodReturnTypeName => IdleMethodReturnType.GetCorrectTypeName();
 
-        public abstract string IdleMethodDelegateType { get; }
-
         public abstract string IdleImplementation { get; }
+
+        public virtual bool UseRefKeyword => false;
     }
 
     internal class VoidDeclarationsProvider : DeclarationsProvider
@@ -64,11 +62,7 @@ namespace BenchmarkDotNet.Code
 
         public override string TargetMethodReturnTypeNamespace => string.Empty;
 
-        public override string TargetMethodDelegateType => "Action";
-
         protected override Type IdleMethodReturnType => typeof(void);
-
-        public override string IdleMethodDelegateType => TargetMethodDelegateType;
 
         public override string IdleImplementation => string.Empty;
     }
@@ -83,8 +77,6 @@ namespace BenchmarkDotNet.Code
                     ? string.Empty 
                     : $"using {TargetMethodReturnType.Namespace};";
 
-        public override string TargetMethodDelegateType => $"Func<{TargetMethodReturnTypeName}>";
-
         public override string ConsumeField
             => !Consumer.IsConsumable(TargetMethodReturnType) && Consumer.HasConsumableField(TargetMethodReturnType, out var field)
                 ? $".{field.Name}"
@@ -96,8 +88,6 @@ namespace BenchmarkDotNet.Code
                 : (Consumer.HasConsumableField(TargetMethodReturnType, out var field)
                     ? field.FieldType
                     : typeof(int)); // we return this simple type because creating bigger ValueType could take longer than benchmarked method itself
-
-        public override string IdleMethodDelegateType => $"Func<{IdleMethodReturnTypeName}>";
 
         public override string IdleImplementation
         {
@@ -121,6 +111,23 @@ namespace BenchmarkDotNet.Code
                 : "#define RETURNS_NON_CONSUMABLE_STRUCT";
     }
 
+    internal class ByRefDeclarationsProvider : NonVoidDeclarationsProvider
+    {
+        public ByRefDeclarationsProvider(Target target) : base(target) { }
+
+        protected override Type IdleMethodReturnType => typeof(IntPtr);
+
+        public override string TargetMethodReturnTypeName => base.TargetMethodReturnTypeName.Replace("&", string.Empty);
+
+        public override string ConsumeField => null;
+
+        public override string IdleImplementation => $"return default({nameof(IntPtr)});";
+
+        public override string ExtraDefines => "#define RETURNS_BYREF";
+
+        public override bool UseRefKeyword => true;
+    }
+
     internal class TaskDeclarationsProvider : VoidDeclarationsProvider
     {
         public TaskDeclarationsProvider(Target target) : base(target) { }
@@ -128,7 +135,9 @@ namespace BenchmarkDotNet.Code
         // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
         // and will eventually throw actual exception, not aggregated one
         public override string TargetMethodDelegate
-            => $"() => {{ {Target.Method.Name}().GetAwaiter().GetResult(); }}";        
+            => $"() => {{ {Target.Method.Name}().GetAwaiter().GetResult(); }}";
+
+        protected override Type TargetMethodReturnType => typeof(void);
     }
 
     /// <summary>

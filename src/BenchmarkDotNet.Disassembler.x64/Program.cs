@@ -204,7 +204,7 @@ namespace BenchmarkDotNet.Disassembler
                     group.AddRange(GetIL(correspondingIL));
 
                 if (settings.PrintAsm)
-                    group.AddRange(GetAsm(map, state, methodInfo.Depth));
+                    group.AddRange(GetAsm(map, state, methodInfo.Depth, method));
 
                 maps.Add(new Map { Instructions = group });
             }
@@ -256,7 +256,7 @@ namespace BenchmarkDotNet.Disassembler
             }
         }
 
-        static IEnumerable<Asm> GetAsm(ILToNativeMap map, State state, int depth)
+        static IEnumerable<Asm> GetAsm(ILToNativeMap map, State state, int depth, ClrMethod currentMethod)
         {
             var disasmBuffer = new StringBuilder(512);
             ulong disasmAddress = map.StartAddress;
@@ -275,7 +275,7 @@ namespace BenchmarkDotNet.Disassembler
                 string calledMethodName = null;
 
                 if (textRepresentation.Contains("call"))
-                    calledMethodName = TryEnqueueCalledMethod(textRepresentation, state, depth);
+                    calledMethodName = TryEnqueueCalledMethod(textRepresentation, state, depth, currentMethod);
 
                 yield return new Asm
                 {
@@ -309,7 +309,7 @@ namespace BenchmarkDotNet.Disassembler
                 : null; // "nop" can have no corresponding c# code ;)
         }
 
-        static string TryEnqueueCalledMethod(string textRepresentation, State state, int depth)
+        static string TryEnqueueCalledMethod(string textRepresentation, State state, int depth, ClrMethod currentMethod)
         {
             if (!TryGetHexAdress(textRepresentation, out ulong address))
                 return null; // call    qword ptr [rax+20h] // needs further research
@@ -317,7 +317,10 @@ namespace BenchmarkDotNet.Disassembler
             var method = state.Runtime.GetMethodByAddress(address);
 
             if (method == null) // not managed method
-                return "not managed method";
+                return Errors.NotManagedMethod;
+
+            if (method.NativeCode == currentMethod.NativeCode && method.GetFullSignature() == currentMethod.GetFullSignature())
+                return null; // in case of call which is just a jump within the method
 
             if (!state.HandledMetadataTokens.Contains(method.MetadataToken))
                 state.Todo.Enqueue(new MethodInfo(method, depth + 1));
@@ -388,9 +391,13 @@ namespace BenchmarkDotNet.Disassembler
             // so the last chance is to try to match them by... name (I don't like it, but I have no better idea for now)
             var unifiedSignature = CecilNameToClrmdName(methodReference);
 
-            return declaringType
-                .Methods
-                .SingleOrDefault(method => method.GetFullSignature() == unifiedSignature);
+            var methodsMatchingSignature = declaringType.Methods
+                .Where(method => method.GetFullSignature() == unifiedSignature).ToArray();
+            if (methodsMatchingSignature.Length == 1)
+            {
+                return methodsMatchingSignature[0];
+            }
+            return null;
         }
 
         static string CecilNameToClrmdName(MethodReference method)

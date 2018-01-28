@@ -11,6 +11,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability.Cpu;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CsProj;
 using JetBrains.Annotations;
@@ -66,10 +67,21 @@ namespace BenchmarkDotNet.Portability
 
         internal static bool IsMono() => isMono;
 
-        internal static string GetOsVersion() => OsBrandStringHelper.Prettify(
-            Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem,
-            Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion,
-            GetWindowsUbr());
+        public static string GetOsVersion()
+        {
+            if (IsMacOSX())
+            {
+                string systemVersion = ExternalToolsHelper.MacSystemProfilerData.Value.GetValueOrDefault("System Version") ?? "";
+                string kernelVersion = ExternalToolsHelper.MacSystemProfilerData.Value.GetValueOrDefault("Kernel Version") ?? "";
+                if (!string.IsNullOrEmpty(systemVersion) && !string.IsNullOrEmpty(kernelVersion))
+                    return $"{systemVersion} [{kernelVersion}]";
+            }
+
+            return OsBrandStringHelper.Prettify(
+                Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem,
+                Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion,
+                GetWindowsUbr());
+        }
 
         // TODO: Introduce a common util API for registry calls, use it also in BenchmarkDotNet.Toolchains.CsProj.GetCurrentVersionBasedOnWindowsRegistry
         /// <summary>
@@ -102,35 +114,22 @@ namespace BenchmarkDotNet.Portability
             return null;
         }
 
-        internal static string GetProcessorName()
+        internal static CpuInfo GetCpuInfo()
         {
 #if !CORE
             if (IsWindows() && !IsMono())
-            {
-                try
-                {
-                    string info = string.Empty;
-                    var mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
-                    foreach (var moProcessor in mosProcessor.Get().Cast<ManagementObject>())
-                        info += moProcessor["name"]?.ToString();
-                    return ProcessorBrandStringHelper.Prettify(info);
-                }
-                catch (Exception)
-                {
-                    // ignored
-                }
-            }
+                return MosCpuInfoProvider.MosCpuInfo.Value;
 #endif
             if (IsWindows())
-                return ProcessorBrandStringHelper.Prettify(ExternalToolsHelper.Wmic.Value.GetValueOrDefault("Name") ?? "");
+                return WmicCpuInfoProvider.WmicCpuInfo.Value;
 
             if (IsLinux())
-                return ProcessorBrandStringHelper.Prettify(ExternalToolsHelper.ProcCpuInfo.Value.GetValueOrDefault("model name") ?? "");
+                return ProcCpuInfoProvider.ProcCpuInfo.Value;
 
             if (IsMacOSX())
-                return ProcessorBrandStringHelper.Prettify(ExternalToolsHelper.Sysctl.Value.GetValueOrDefault("machdep.cpu.brand_string") ?? "");
+                return SysctlCpuInfoProvider.SysctlCpuInfo.Value;
 
-            return Unknown;
+            return null;
         }
 
         public static string GetNetCoreVersion()
@@ -332,7 +331,7 @@ namespace BenchmarkDotNet.Portability
 
                     foreach (ManagementBaseObject o in data)
                     {
-                        var av = (ManagementObject)o;
+                        var av = (ManagementObject) o;
                         if (av != null)
                         {
                             string name = av["displayName"].ToString();
