@@ -27,45 +27,37 @@ namespace BenchmarkDotNet.Diagnosers
         {
             Debug.Assert(mono == null || !RuntimeInformation.IsMono(), "Must never be called for Non-Mono benchmarks");
 
-            var monoMethodName = GetMethodName(benchmark.Target);
-
-            var output = ProcessHelper.RunAndReadOutputLineByLine(
-                mono?.CustomPath ?? "mono",
-                "-v -v -v -v "
-                + $"--compile {monoMethodName} "
-                + (benchmark.Job.Env.Jit == Jit.Llvm ? "--llvm" : "--nollvm")
-                + $" \"{benchmark.Target.Type.GetTypeInfo().Assembly.Location}\"");
-
-            return OutputParser.Parse(output, monoMethodName, benchmark.Target.Method.Name);
+            var benchmarkTarget = benchmark.Target;
+            string fqnMethod = GetMethodName(benchmarkTarget);
+            string exePath = benchmarkTarget.Type.GetTypeInfo().Assembly.Location;
+            
+            var environmentVariables = new Dictionary<string, string> { ["MONO_VERBOSE_METHOD"] = fqnMethod };
+            string monoPath = mono?.CustomPath ?? "mono";
+            string arguments = $"--compile {fqnMethod} {exePath}";
+            
+            var output = ProcessHelper.RunAndReadOutputLineByLine(monoPath, arguments, environmentVariables);
+            string commandLine = $"{GetEnvironmentVariables(environmentVariables)} {monoPath} {arguments}";
+            
+            return OutputParser.Parse(output, benchmarkTarget.Method.Name, commandLine);
         }
 
-        static string GetMethodName(Target target)
+        private static string GetEnvironmentVariables(Dictionary<string, string> environmentVariables) 
+            => string.Join(" ", environmentVariables.Select(e => $"{e.Key}={e.Value}"));
+
+        private static string GetMethodName(Target target)
             => $"{target.Type.GetTypeInfo().Namespace}.{target.Type.GetTypeInfo().Name}:{target.Method.Name}";
 
         internal static class OutputParser
         {
-            internal static DisassemblyResult Parse(IReadOnlyList<string> input, string monoMethodName, string methodName)
+            internal static DisassemblyResult Parse(IReadOnlyList<string> input, string methodName, string commandLine)
             {
                 var instructions = new List<Code>();
 
-                bool found = false;
+                var listing = input.SkipWhile(i => !i.Contains("(__TEXT,__text) section")).Skip(2);
 
-                foreach (var line in input.Reverse())
-                {
-                    if (!found)
-                    {
-                        if (IsStartLine(line, monoMethodName))
-                            found = true;
-
-                        continue;
-                    }
-
-                    if (IsEndLine(line))
-                        break;
-
+                foreach (string line in listing)
                     if (TryParseInstruction(line, out var instruction))
                         instructions.Add(instruction);
-                }
 
                 return new DisassemblyResult
                 {
@@ -74,39 +66,24 @@ namespace BenchmarkDotNet.Diagnosers
                         new DisassembledMethod
                         {
                             Name = methodName,
-                            Maps = new [] { new Map { Instructions = instructions.ToArray() } }
+                            Maps = new [] { new Map { Instructions = instructions.ToArray() } },
+                            CommandLine = commandLine
                         }
                     }
                 };
             }
-
-            // the input is sth like "	4  storei4_membase_reg [%edi + 0xc] <- %eax"
+            
+            //line example: 0000000000000000	subq	$0x28, %rsp
             private static bool TryParseInstruction(string line, out Code instruction)
             {
                 instruction = null;
-
-                // in the future we could parse it, use Mono.Cecil and combine the il seq point with IL for given method as we do for regular .NET
-                if (line.Contains("il_seq_point"))
+                string trimmed = line?.Trim();
+                if (string.IsNullOrEmpty(trimmed))
                     return false;
-
-                var trimmed = line.Trim();
-                if (string.IsNullOrEmpty(trimmed) || !char.IsDigit(trimmed[0]))
-                    return false;
-
-                int startIndex = 0;
-                while (char.IsDigit(trimmed[startIndex]) || char.IsWhiteSpace(trimmed[startIndex]))
-                    startIndex++;
-
-                instruction = new Code { TextRepresentation = trimmed.Substring(startIndex) };
-
+                var splitted = trimmed.Split(new [] { '\t' }, 2);
+                instruction = new Code { TextRepresentation = splitted.Last() };
                 return true;
             }
-
-            private static bool IsEndLine(string line)
-                => string.IsNullOrWhiteSpace(line) || line.Contains("liveness");
-
-            private static bool IsStartLine(string line, string methodName)
-                => line != null && line.Contains(methodName) && line.Contains("emitted at");
         }
     }
 }

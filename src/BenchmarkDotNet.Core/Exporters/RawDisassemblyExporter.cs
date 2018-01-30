@@ -84,6 +84,9 @@ namespace BenchmarkDotNet.Exporters
 
                     evenMap = !evenMap;
                 }
+                
+                if(!string.IsNullOrEmpty(method.CommandLine))
+                    logger.WriteLine($"<tr><td colspan=\"2\">{method.CommandLine}</td></tr>");
 
                 logger.WriteLine("<tr><td colspan=\"{2}\">&nbsp;</td></tr>");
             }
