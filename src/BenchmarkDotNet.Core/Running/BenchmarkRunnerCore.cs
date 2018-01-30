@@ -366,7 +366,7 @@ namespace BenchmarkDotNet.Running
             {
                 logger.WriteLineInfo("// Run, Diagnostic [SeparateLogic]");
 
-                separateLogicCompositeDiagnoser.Handle(HostSignal.AfterAll, new DiagnoserActionParameters(null, benchmark, config));
+                separateLogicCompositeDiagnoser.Handle(HostSignal.SeparateLogic, new DiagnoserActionParameters(null, benchmark, config));
             }
 
             return (executeResults, gcStats);

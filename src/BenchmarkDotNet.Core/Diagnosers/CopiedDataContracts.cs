@@ -53,6 +53,8 @@ namespace BenchmarkDotNet.Diagnosers
         public string Problem { get; set; }
 
         public Map[] Maps { get; set; }
+
+        public string CommandLine { get; set; }
     }
 
     public class DisassemblyResult
