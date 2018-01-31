@@ -56,6 +56,8 @@ namespace BenchmarkDotNet.Diagnosers
         public Map[] Maps { get; set; }
 
         public DisassembledMethodAnnotation Annotation { get; set; }
+
+        public string CommandLine { get; set; }
     }
 
     public class DisassemblyResult
