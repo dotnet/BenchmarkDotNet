@@ -152,7 +152,7 @@ public class Simple
 }
 ```
 
-![Disassembly result](Images/disasmDemo.png)
+<img src="Images/disasmDemo.png" width="800px" />
 
 ### ALL JITs
 
