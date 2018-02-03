@@ -70,12 +70,17 @@ namespace BenchmarkDotNet.Disassembler
 
                 var disasembledMethods = Disassemble(settings, runtime, state);
 
+                // we don't want to export the disassembler entry point method which is just an artificial method added to get generic types working
+                var methodsToExport = disasembledMethods.Where(method => 
+                    disasembledMethods.Count == 1  // if there is only one method we want to return it (most probably benchmark got inlined)
+                    || !method.Name.Contains(DisassemblerConstants.DiassemblerEntryMethodName)).ToArray();
+
                 using (var stream = new FileStream(settings.ResultsPath, FileMode.Append, FileAccess.Write))
                 using (var writer = XmlWriter.Create(stream))
                 {
                     var serializer = new XmlSerializer(typeof(DisassemblyResult));
 
-                    serializer.Serialize(writer, new DisassemblyResult { Methods = disasembledMethods.ToArray() });
+                    serializer.Serialize(writer, new DisassemblyResult { Methods = methodsToExport });
                 }
             }
         }
@@ -133,15 +138,19 @@ namespace BenchmarkDotNet.Disassembler
             // some methods have no implementation (abstract & CLR magic)
             var ilInstructions = (ICollection<Instruction>)methodDefinition.Body?.Instructions ?? Array.Empty<Instruction>();
 
-            EnqueueAllCalls(state, ilInstructions, methodInfo.Depth); 
+            if (method.NativeCode == ulong.MaxValue || method.ILOffsetMap == null)
+            {
+                // we have no asm, so we are going to try to get the methods from IL
+                EnqueueAllCallsFromIL(state, ilInstructions, methodInfo.Depth);
 
-            if (method.NativeCode == ulong.MaxValue)
-                if(method.IsAbstract) return CreateEmpty(method, "Abstract method");
-                else if (method.IsVirtual) CreateEmpty(method, "Virtual method");
-                else return CreateEmpty(method, "Method got inlined");
+                if (method.NativeCode == ulong.MaxValue)
+                    if (method.IsAbstract) return CreateEmpty(method, "Abstract method");
+                    else if (method.IsVirtual) CreateEmpty(method, "Virtual method");
+                    else return CreateEmpty(method, "Method got most probably inlined");
 
-            if (method.ILOffsetMap == null)
-                return CreateEmpty(method, "No ILOffsetMap found");
+                if (method.ILOffsetMap == null)
+                    return CreateEmpty(method, "No ILOffsetMap found");
+            }
 
             var maps = new List<Map>();
 
@@ -208,6 +217,9 @@ namespace BenchmarkDotNet.Disassembler
 
                 maps.Add(new Map { Instructions = group });
             }
+
+            // after we read the asm we try to find some other methods which were not direct calls in asm
+            EnqueueAllCallsFromIL(state, ilInstructions, methodInfo.Depth);
 
             return new DisassembledMethod
             {
@@ -310,7 +322,7 @@ namespace BenchmarkDotNet.Disassembler
             var method = state.Runtime.GetMethodByAddress(address);
 
             if (method == null) // not managed method
-                return Errors.NotManagedMethod;
+                return DisassemblerConstants.NotManagedMethod;
 
             if (method.NativeCode == currentMethod.NativeCode && method.GetFullSignature() == currentMethod.GetFullSignature())
                 return null; // in case of call which is just a jump within the method
@@ -347,7 +359,7 @@ namespace BenchmarkDotNet.Disassembler
         /// <summary>
         /// for some calls we can not parse the method address from asm, so we just get it from IL
         /// </summary>
-        static void EnqueueAllCalls(State state, ICollection<Instruction> ilInstructions, int depth)
+        static void EnqueueAllCallsFromIL(State state, ICollection<Instruction> ilInstructions, int depth)
         {
             // let's try to enqueue all method calls that we can find in IL and were not printed yet
             foreach (var callInstruction in ilInstructions.Where(instruction => instruction.Operand is MethodReference)) // todo: handle CallSite
@@ -384,12 +396,14 @@ namespace BenchmarkDotNet.Disassembler
             // so the last chance is to try to match them by... name (I don't like it, but I have no better idea for now)
             var unifiedSignature = CecilNameToClrmdName(methodReference);
 
-            var methodsMatchingSignature = declaringType.Methods
-                .Where(method => method.GetFullSignature() == unifiedSignature).ToArray();
+            // the signature does not contain return type, so if there are few methods 
+            // with same name and arguments but different return type, we can do nothing
+            var methodsMatchingSignature = declaringType.Methods.Where(method => method.GetFullSignature() == unifiedSignature).ToArray();
+
+            // but if there is only one, we know that this is the method we are looking for
             if (methodsMatchingSignature.Length == 1)
-            {
                 return methodsMatchingSignature[0];
-            }
+
             return null;
         }
 
@@ -469,7 +483,7 @@ namespace BenchmarkDotNet.Disassembler
             PrintIL = printIL;
             PrintSource = printSource;
             PrintPrologAndEpilog = printPrologAndEpilog;
-            RecursiveDepth = recursiveDepth;
+            RecursiveDepth = methodName == DisassemblerConstants.DiassemblerEntryMethodName && recursiveDepth != int.MaxValue ? recursiveDepth + 1 : recursiveDepth;
             ResultsPath = resultsPath;
         }
 
