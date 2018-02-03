@@ -50,6 +50,8 @@ namespace BenchmarkDotNet.Code
                 Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath).
                 Replace("$Ref$", provider.UseRefKeyword ? "ref" : null).
                 Replace("$MeasureGcStats$", config.HasMemoryDiagnoser() ? "true" : "false").
+                Replace("$DiassemblerEntryMethodName$", DisassemblerConstants.DiassemblerEntryMethodName).
+                Replace("$TargetMethodCall$", provider.TargetMethodCall).
                 ToString();
 
             text = Unroll(text, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvResolver.Instance));
