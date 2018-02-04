@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var disassemblyDiagnoser = (IDisassemblyDiagnoser)DisassemblyDiagnoser.Create(
                 new DisassemblyDiagnoserConfig(printAsm: true, printIL: true, printSource: true, recursiveDepth: 3));
 
-            CanExecute<WithCalls>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser));
+            CanExecute<WithCalls>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.ColdStart));
 
             AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Benchmark)}()");
             AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Benchmark)}(Boolean)");
@@ -102,16 +102,16 @@ namespace BenchmarkDotNet.IntegrationTests
             var disassemblyDiagnoser = (IDisassemblyDiagnoser)DisassemblyDiagnoser.Create(
                 new DisassemblyDiagnoserConfig(printAsm: true, printIL: true, printSource: true, recursiveDepth: 3));
 
-            CanExecute<Generic<int>>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser));
+            CanExecute<Generic<int>>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.Monitoring));
 
             var result = disassemblyDiagnoser.Results.Values.Single();
 
             Assert.Contains(result.Methods, method => method.Maps.Any(map => map.Instructions.OfType<Asm>().Any()));
         }
 
-        private IConfig CreateConfig(Jit jit, Platform platform, Runtime runtime, IDiagnoser disassemblyDiagnoser)
+        private IConfig CreateConfig(Jit jit, Platform platform, Runtime runtime, IDiagnoser disassemblyDiagnoser, RunStrategy runStrategy)
             => ManualConfig.CreateEmpty()
-                .With(Job.Dry.With(jit).With(platform).With(runtime))
+                .With(Job.Dry.With(jit).With(platform).With(runtime).With(runStrategy))
                 .With(DefaultConfig.Instance.GetLoggers().ToArray())
                 .With(DefaultColumnProviders.Instance)
                 .With(disassemblyDiagnoser)
