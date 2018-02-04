@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
@@ -43,27 +46,25 @@ namespace BenchmarkDotNet.Exporters
             return new[] { filePath };
         }
 
-        private static string GetFileName(Summary summary)
-        {
-            string fileName;
-
-            var benchmarkTypes = summary.Benchmarks.Select(b => b.Target.Type.FullName).Distinct().ToArray();
-            if (benchmarkTypes.Length == 1)
-            {
-                fileName = benchmarkTypes[0];
-            }
-            else
-            {
-                fileName = summary.Title;
-            }
-
-            return fileName;
-        }
-
         internal string GetAtrifactFullName(Summary summary)
         {
             string fileName = GetFileName(summary);
             return $"{Path.Combine(summary.ResultsDirectoryPath, fileName)}-{FileCaption}{FileNameSuffix}.{FileExtension}";
         }
+
+        private static string GetFileName(Summary summary)
+        {
+            var benchmarkTypes = summary.Benchmarks.Select(b => b.Target.Type).Distinct().Select(type => GetTypeName(type)).ToArray();
+
+            return benchmarkTypes.Length == 1 ? benchmarkTypes[0] : summary.Title;
+        }
+
+        // we can't simply use type.FullName, because for generics it's tooo long
+        // example: typeof(List<int>).FullName => "System.Collections.Generic.List`1[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
+        private static string GetTypeName(Type type)
+            => new StringBuilder(type.GetCorrectTypeName())
+                .Replace('<', '_')
+                .Replace('>', '_')
+                .ToString();
     }
 }
