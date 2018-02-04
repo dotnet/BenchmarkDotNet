@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
@@ -223,6 +224,13 @@ namespace BenchmarkDotNet.Disassembler
 
             return new DisassembledMethod
             {
+                Annotation = new DisassembledMethodAnnotation
+                {
+                    TotalBytesOfCode = methodDefinition.Body.CodeSize,
+                    IsOptmizedCode = !methodDefinition.NoOptimization,
+                    IsFullyinterruptible = CaclParametersSize(methodDefinition) > 256,
+                    HasAVXSupport = Native.HasAvxSupport
+                },
                 Maps = EliminateDuplicates(maps),
                 Name = method.GetFullSignature(),
                 NativeCode = method.NativeCode
@@ -438,6 +446,35 @@ namespace BenchmarkDotNet.Disassembler
 
         static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
             => DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, reason);
+
+        static int CaclParametersSize(MethodDefinition methodDefinition)
+        {
+            var res = 0;
+            if (methodDefinition.HasParameters || methodDefinition.HasGenericParameters)
+            {
+                try
+                {
+                    foreach (var p in methodDefinition.Parameters)
+                    {
+                        var typename = p.ParameterType.Resolve().FullName;
+                        var obj = Activator.CreateInstance(Type.GetType(typename));
+                        using (var ms = new MemoryStream())
+                        {
+                            var bf = new BinaryFormatter();
+                            bf.Serialize(ms, obj);
+                            res += (int)ms.Length;
+                        }
+                    }
+                    foreach (var p in methodDefinition.GenericParameters)
+                    {
+                        Console.WriteLine("packing size: " + p.Resolve().PackingSize);
+                        res += p.Resolve().PackingSize;
+                    }
+                }
+                catch (Exception ex) { }
+            }            
+            return res;
+        }
 
         class CodeComparer : IEqualityComparer<Code>
         {

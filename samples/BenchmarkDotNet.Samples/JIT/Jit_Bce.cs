@@ -3,7 +3,8 @@ using BenchmarkDotNet.Attributes.Jobs;
 
 namespace BenchmarkDotNet.Samples.JIT
 {
-    [LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
+    //[LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
+    [DisassemblyDiagnoser]
     public class Jit_Bce
     {
         private const int N = 11;
