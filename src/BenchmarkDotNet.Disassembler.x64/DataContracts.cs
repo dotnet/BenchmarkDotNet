@@ -4,7 +4,7 @@ using System.Text;
 using System.Xml.Serialization;
 
 namespace BenchmarkDotNet.Disassembler
-{
+{    
     public class Code
     {
         public string TextRepresentation { get; set; }
@@ -72,12 +72,13 @@ namespace BenchmarkDotNet.Disassembler
     {
         public DisassembledMethod[] Methods { get; set; }
     }
-        
+
     public class DisassembledMethodAnnotation
     {
         public int TotalBytesOfCode { get; set; }
         public bool IsOptmizedCode { get; set; }
         public bool IsFullyinterruptible { get; set; }
+        public bool HasAVXSupport { get; set; }
 
         public override string ToString()
         {
@@ -86,12 +87,14 @@ namespace BenchmarkDotNet.Disassembler
             sb.AppendLine($"total bytes of code {TotalBytesOfCode}");
             sb.AppendLine((IsOptmizedCode ? "" : "non ") + "optimized code");
             sb.AppendLine(IsFullyinterruptible ? "fully interruptible" : "partially interruptible");
+            sb.AppendLine(HasAVXSupport ? "AXV supported" : "AVX not supported");
             sb.AppendLine(new string('=', 100));
             return sb.ToString();
         }
-      
-    public static class Errors
-    {
-        public const string NotManagedMethod = "not managed method";
+
+        public static class Errors
+        {
+            public const string NotManagedMethod = "not managed method";
+        }
     }
 }

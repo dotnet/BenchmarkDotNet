@@ -70,6 +70,7 @@ namespace BenchmarkDotNet.Diagnosers
         public int TotalBytesOfCode { get; set; }
         public bool IsOptmizedCode { get; set; }
         public bool IsFullyinterruptible { get; set; }
+        public bool HasAVXSupport { get; set; }
 
         public override string ToString()
         {
@@ -77,14 +78,16 @@ namespace BenchmarkDotNet.Diagnosers
             sb.AppendLine($"{new string('=', 39)}Disassembly annotation{new string('=', 39)}");
             sb.AppendLine($"total bytes of code {TotalBytesOfCode}");
             sb.AppendLine((IsOptmizedCode ? "" : "non ") + "optimized code");
+            sb.AppendLine(HasAVXSupport ? "AXV supported" : "AVX not supported");
             sb.AppendLine(IsFullyinterruptible ? "fully interruptible" : "partially interruptible");
             sb.AppendLine(new string('=', 100));
             return sb.ToString();
         }
-        
-    public static class Errors
-    {
-        public const string NotManagedMethod = "not managed method";
+
+        public static class Errors
+        {
+            public const string NotManagedMethod = "not managed method";
+        }
     }
 }
 #pragma warning restore CS3003 // Type is not CLS-compliant

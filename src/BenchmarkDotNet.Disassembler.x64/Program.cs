@@ -216,7 +216,8 @@ namespace BenchmarkDotNet.Disassembler
                 {
                     TotalBytesOfCode = methodDefinition.Body.CodeSize,
                     IsOptmizedCode = !methodDefinition.NoOptimization,
-                    IsFullyinterruptible = CaclParametersSize(methodDefinition) > 256
+                    IsFullyinterruptible = CaclParametersSize(methodDefinition) > 256,
+                    HasAVXSupport = Native.HasAvxSupport
                 },
                 Maps = EliminateDuplicates(maps),
                 Name = method.GetFullSignature(),
@@ -436,27 +437,23 @@ namespace BenchmarkDotNet.Disassembler
             var res = 0;
             if (methodDefinition.HasParameters || methodDefinition.HasGenericParameters)
             {
-                try
+                foreach (var p in methodDefinition.Parameters)
                 {
-                    foreach (var p in methodDefinition.Parameters)
+                    var typename = p.ParameterType.Resolve().FullName;
+                    var obj = Activator.CreateInstance(Type.GetType(typename));
+                    using (var ms = new MemoryStream())
                     {
-                        var typename = p.ParameterType.Resolve().FullName;
-                        var obj = Activator.CreateInstance(Type.GetType(typename));
-                        using (var ms = new MemoryStream())
-                        {
-                            var bf = new BinaryFormatter();
-                            bf.Serialize(ms, obj);
-                            res += (int)ms.Length;
-                        }
-                    }
-                    foreach (var p in methodDefinition.GenericParameters)
-                    {
-                        Console.WriteLine("packing size: " + p.Resolve().PackingSize);
-                        res += p.Resolve().PackingSize;
+                        var bf = new BinaryFormatter();
+                        bf.Serialize(ms, obj);
+                        res += (int)ms.Length;
                     }
                 }
-                catch (Exception ex) { }
-            }            
+                foreach (var p in methodDefinition.GenericParameters)
+                {
+                    Console.WriteLine("packing size: " + p.Resolve().PackingSize);
+                    res += p.Resolve().PackingSize;
+                }
+            }
             return res;
         }
 
