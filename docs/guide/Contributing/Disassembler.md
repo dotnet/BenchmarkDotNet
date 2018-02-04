@@ -37,7 +37,7 @@ namespace Sample
             var result = Benchmark(); // execute the benchmark do method gets jitted
 
             Console.WriteLine($"{Process.GetCurrentProcess().Id} " + // process Id
-                $"{typeof(Program).FullName} " + // full type name
+                $"\"{typeof(Program).FullName}\" " + // full type name
                 $"{nameof(Benchmark)} " + // benchmarked method name
                 $"{bool.TrueString} " + // printAsm
                 $"{bool.FalseString} " + // printIL

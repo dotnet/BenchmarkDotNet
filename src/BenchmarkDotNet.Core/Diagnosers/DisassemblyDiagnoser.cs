@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
@@ -83,6 +84,13 @@ namespace BenchmarkDotNet.Diagnosers
                     && benchmark.Job.Infrastructure.Toolchain is InProcessToolchain)
                 {
                     yield return new ValidationError(true, "InProcessToolchain has no DisassemblyDiagnoser support", benchmark);
+                }
+
+                if (RuntimeInformation.IsWindows() && !ShouldUseMonoDisassembler(benchmark)
+                    && benchmark.Target.Type.GetTypeInfo().IsGenericType
+                    && benchmark.Job.Run.HasValue(Jobs.RunMode.RunStrategyCharacteristic) && !benchmark.Job.Run.RunStrategy.NeedsJitting())
+                {
+                    yield return new ValidationError(true, "Generic benchmark types with ColdStart strategy have no DisassemblyDiagnoser support", benchmark);
                 }
             }
         }

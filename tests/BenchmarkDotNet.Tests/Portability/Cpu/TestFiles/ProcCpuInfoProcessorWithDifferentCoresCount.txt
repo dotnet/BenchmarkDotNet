@@ -1,0 +1,47 @@
+processor	: 0
+physical id	: 0
+model name  : Unknown processor with 2 cores and hyper threading
+core id		: 0
+cpu cores	: 2
+
+processor	: 1
+physical id	: 0
+model name  : Unknown processor with 2 cores and hyper threading
+core id		: 0
+cpu cores	: 2
+
+processor	: 2
+model name  : Unknown processor with 4 cores
+physical id	: 3
+core id		: 0
+cpu cores	: 4
+
+processor	: 3
+model name  : Unknown processor with 2 cores and hyper threading
+physical id	: 0
+core id		: 1
+cpu cores	: 2
+
+processor	: 4
+model name  : Unknown processor with 2 cores and hyper threading
+physical id	: 0
+core id		: 1
+cpu cores	: 2
+
+processor	: 5
+model name  : Unknown processor with 4 cores
+physical id	: 3
+core id		: 1
+cpu cores	: 4
+
+processor	: 6
+model name  : Unknown processor with 4 cores
+physical id	: 3
+core id		: 2
+cpu cores	: 4
+
+processor	: 7
+model name  : Unknown processor with 4 cores
+physical id	: 3
+core id		: 2
+cpu cores	: 4
