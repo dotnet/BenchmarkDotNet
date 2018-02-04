@@ -53,6 +53,8 @@ namespace BenchmarkDotNet.Disassembler
         public string Problem { get; set; }
 
         public Map[] Maps { get; set; }
+        
+        public string CommandLine { get; set; }
 
         public static DisassembledMethod Empty(string fullSignature, ulong nativeCode, string problem)
             => new DisassembledMethod
