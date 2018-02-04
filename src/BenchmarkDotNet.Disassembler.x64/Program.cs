@@ -110,7 +110,7 @@ namespace BenchmarkDotNet.Disassembler
             {
                 var method = state.Todo.Dequeue();
 
-                if (!state.HandledMetadataTokens.Add(method.Method.MetadataToken)) // add it now to avoid StackOverflow for recursive methods
+                if (!state.HandledMethods.Add(new MethodId(method.Method.MetadataToken, method.Method.Type.MetadataToken))) // add it now to avoid StackOverflow for recursive methods
                     continue; // already handled
 
                 if(settings.RecursiveDepth >= method.Depth)
@@ -327,7 +327,7 @@ namespace BenchmarkDotNet.Disassembler
             if (method.NativeCode == currentMethod.NativeCode && method.GetFullSignature() == currentMethod.GetFullSignature())
                 return null; // in case of call which is just a jump within the method
 
-            if (!state.HandledMetadataTokens.Contains(method.MetadataToken))
+            if (!state.HandledMethods.Contains(new MethodId(method.MetadataToken, method.Type.MetadataToken)))
                 state.Todo.Enqueue(new MethodInfo(method, depth + 1));
 
             return method.GetFullSignature();
@@ -375,7 +375,7 @@ namespace BenchmarkDotNet.Disassembler
                     continue; // todo: eliminate Cecil vs ClrMD differences in searching by name
 
                 var calledMethod = GetMethod(methodReference, declaringType);
-                if (calledMethod != null && !state.HandledMetadataTokens.Contains(calledMethod.MetadataToken))
+                if (calledMethod != null && !state.HandledMethods.Contains(new MethodId(calledMethod.MetadataToken, declaringType.MetadataToken)))
                     state.Todo.Enqueue(new MethodInfo(calledMethod, depth + 1));
             }
         }
@@ -518,13 +518,13 @@ namespace BenchmarkDotNet.Disassembler
             Runtime = runtime;
             DebugControl = debugControl;
             Todo = new Queue<MethodInfo>();
-            HandledMetadataTokens = new HashSet<uint>();
+            HandledMethods = new HashSet<MethodId>();
         }
 
         internal ClrRuntime Runtime { get; }
         internal IDebugControl DebugControl { get; }
         internal Queue<MethodInfo> Todo { get; }
-        internal HashSet<uint> HandledMetadataTokens { get; }
+        internal HashSet<MethodId> HandledMethods { get; }
     }
 
     struct MethodInfo // I am not using ValueTuple here (would be perfect) to keep the number of dependencies as low as possible
@@ -537,5 +537,21 @@ namespace BenchmarkDotNet.Disassembler
             Method = method;
             Depth = depth;
         }
+    }
+
+    struct MethodId : IEquatable<MethodId>
+    {
+        internal uint MethodMetatadataTokenId { get; }
+        internal uint TypeMetatadataTokenId { get; }
+
+        public MethodId(uint methodMetatadataTokenId, uint typeMetatadataTokenId) : this()
+        {
+            MethodMetatadataTokenId = methodMetatadataTokenId;
+            TypeMetatadataTokenId = typeMetatadataTokenId;
+        }
+
+        public bool Equals(MethodId other) => MethodMetatadataTokenId == other.MethodMetatadataTokenId && TypeMetatadataTokenId == other.TypeMetatadataTokenId;
+        public override bool Equals(object other) => other is MethodId methodId && Equals(methodId);
+        public override int GetHashCode() => (int)(MethodMetatadataTokenId ^ TypeMetatadataTokenId);
     }
 }
