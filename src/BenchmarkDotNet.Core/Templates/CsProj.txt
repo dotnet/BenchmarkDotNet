@@ -8,6 +8,8 @@
     <OutputType>Exe</OutputType>
     <OutputPath>bin\$CONFIGURATIONNAME$</OutputPath>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
     $COPIEDSETTINGS$
   </PropertyGroup>
 

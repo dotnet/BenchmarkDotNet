@@ -85,13 +85,6 @@ namespace BenchmarkDotNet.Diagnosers
                 {
                     yield return new ValidationError(true, "InProcessToolchain has no DisassemblyDiagnoser support", benchmark);
                 }
-
-                if (RuntimeInformation.IsWindows() && !ShouldUseMonoDisassembler(benchmark)
-                    && benchmark.Target.Type.GetTypeInfo().IsGenericType
-                    && benchmark.Job.Run.HasValue(Jobs.RunMode.RunStrategyCharacteristic) && !benchmark.Job.Run.RunStrategy.NeedsJitting())
-                {
-                    yield return new ValidationError(true, "Generic benchmark types with ColdStart strategy have no DisassemblyDiagnoser support", benchmark);
-                }
             }
         }
 
