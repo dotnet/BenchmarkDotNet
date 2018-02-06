@@ -195,7 +195,7 @@ namespace BenchmarkDotNet.Configs
         {
             foreach (var option in configuration)
             {
-                var optionText = $"  {optionPrefix}{option.Key} <{option.Key.ToUpperInvariant()}>";
+                var optionText = $"  {optionPrefix}{option.Key}=<{option.Key.ToUpperInvariant()}>";
                 logger.WriteResult($"{optionText.PadRight(prefixWidth)}");
 
                 var parameters = string.Join(", ", option.Value.GetAllOptions.Value);

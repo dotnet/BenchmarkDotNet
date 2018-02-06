@@ -209,7 +209,7 @@ namespace BenchmarkDotNet.Running
         {
             foreach (var option in Configuration)
             {
-                var optionText = $"  {OptionPrefix}{option.Key} <{option.Key.ToUpperInvariant()}>";
+                var optionText = $"  {OptionPrefix}{option.Key}=<{option.Key.ToUpperInvariant()}>";
                 logger.WriteResult($"{optionText.PadRight(prefixWidth)}");
 
                 var maxWidth = outputWidth - prefixWidth - System.Environment.NewLine.Length - BreakText.Length;
