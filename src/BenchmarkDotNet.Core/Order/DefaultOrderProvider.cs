@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
@@ -53,15 +53,25 @@ namespace BenchmarkDotNet.Order
                     return benchmarks.OrderBy(b => summary[b].ResultStatistics.Mean);
                 case SummaryOrderPolicy.SlowestToFastest:
                     return benchmarks.OrderByDescending(b => summary[b].ResultStatistics.Mean);
+                case SummaryOrderPolicy.Method:
+                    return benchmarks.OrderBy(b => b.Target.MethodDisplayInfo);
                 default:
                     return GetExecutionOrder(benchmarks);
             }
         }
 
-        public string GetHighlightGroupKey(Benchmark benchmark) =>
-            summaryOrderPolicy == SummaryOrderPolicy.Default
-            ? benchmark.Parameters.DisplayInfo
-            : null;
+        public string GetHighlightGroupKey(Benchmark benchmark)
+        {
+            switch (summaryOrderPolicy)
+            {
+                case SummaryOrderPolicy.Default:
+                    return benchmark.Parameters.DisplayInfo;
+                case SummaryOrderPolicy.Method:
+                    return benchmark.Target.MethodDisplayInfo;
+                default:
+                    return null;
+            }
+        }
 
         public string GetLogicalGroupKey(IConfig config, Benchmark[] allBenchmarks, Benchmark benchmark)
         {
