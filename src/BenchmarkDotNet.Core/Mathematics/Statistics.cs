@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Mathematics
@@ -80,6 +81,7 @@ namespace BenchmarkDotNet.Mathematics
         public ConfidenceInterval GetConfidenceInterval(ConfidenceLevel level, int n) => new ConfidenceInterval(Mean, StandardError, n, level);
         public bool IsOutlier(double value) => value < LowerFence || value > UpperFence;
         public double[] WithoutOutliers() => list.Where(value => !IsOutlier(value)).ToArray();
+        public IEnumerable<double> GetValues() => list;
 
         public double CalcCentralMoment(int k) => list.Average(x => (x - Mean).Pow(k));
 

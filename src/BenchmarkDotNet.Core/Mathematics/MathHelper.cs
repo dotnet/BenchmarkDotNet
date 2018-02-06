@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Mathematics.Histograms;
+using JetBrains.Annotations;
 using static System.Math;
 
 namespace BenchmarkDotNet.Mathematics
@@ -42,6 +46,7 @@ namespace BenchmarkDotNet.Mathematics
                           0.002141268741) * y + 0.000535310849) * y + 0.999936657524;
                 }
             }
+
             return x > 0.0 ? (z + 1.0) / 2 : (1.0 - z) / 2;
         }
 
@@ -85,7 +90,47 @@ namespace BenchmarkDotNet.Mathematics
                 else
                     lower = t;
             }
+
             return (lower + upper) / 2;
+        }
+
+        // See http://www.brendangregg.com/FrequencyTrails/modes.html
+        [PublicAPI]
+        public static double CalculateMValue([NotNull] Statistics originalStatistics)
+        {
+            try
+            {
+                var s = new Statistics(originalStatistics.WithoutOutliers());
+
+                double mValue = 0;
+
+                double binSize = s.GetOptimalBinSize();
+                if (Abs(binSize) < 1e-9)
+                    binSize = 1;
+                while (true)
+                {
+                    var histogram = HistogramBuilder.Adaptive.BuildWithFixedBinSize(s.GetValues(), binSize);
+                    var x = new List<int>();
+                    x.Add(0);
+                    x.AddRange(histogram.Bins.Select(bin => bin.Count));
+                    x.Add(0);
+
+                    int sum = 0;
+                    for (int i = 1; i < x.Count; i++)
+                        sum += Abs(x[i] - x[i - 1]);
+                    mValue = Max(mValue, sum * 1.0 / x.Max());
+
+                    if (binSize > s.Max - s.Min)
+                        break;
+                    binSize *= 2.0;
+                }
+
+                return mValue;
+            }
+            catch (Exception)
+            {
+                return 1; // In case of any bugs, we return 1 because it's an invalud value (mvalue is always >= 2)
+            }
         }
 
         public static int Clamp(int value, int min, int max) => Min(Max(value, min), max);

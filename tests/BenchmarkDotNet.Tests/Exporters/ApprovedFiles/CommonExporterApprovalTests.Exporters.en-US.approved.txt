@@ -418,8 +418,10 @@ Mean = 1.0000 ns, StdErr = 0.0000 ns (0.00%); N = 1, StdDev = 0.0000 ns
 Min = 1.0000 ns, Q1 = 1.0000 ns, Median = 1.0000 ns, Q3 = 1.0000 ns, Max = 1.0000 ns
 IQR = 0.0000 ns, LowerFence = 1.0000 ns, UpperFence = 1.0000 ns
 ConfidenceInterval = [NaN ns; NaN ns] (CI 99.9%), Margin = NaN ns (NaN% of Mean)
-Skewness = NaN, Kurtosis = NaN
-
+Skewness = NaN, Kurtosis = NaN, MValue = 2
+-------------------- Histogram --------------------
+[0.500 ns ; 1.500 ns) | @
+---------------------------------------------------
 *** MockBenchmarkClass.Bar: LongRun(LaunchCount=3, TargetCount=100, WarmupCount=15) ***
 * Raw *
 Result 1: 1 op, 1 ns, 1.0000 ns/op
@@ -429,8 +431,10 @@ Mean = 1.0000 ns, StdErr = 0.0000 ns (0.00%); N = 1, StdDev = 0.0000 ns
 Min = 1.0000 ns, Q1 = 1.0000 ns, Median = 1.0000 ns, Q3 = 1.0000 ns, Max = 1.0000 ns
 IQR = 0.0000 ns, LowerFence = 1.0000 ns, UpperFence = 1.0000 ns
 ConfidenceInterval = [NaN ns; NaN ns] (CI 99.9%), Margin = NaN ns (NaN% of Mean)
-Skewness = NaN, Kurtosis = NaN
-
+Skewness = NaN, Kurtosis = NaN, MValue = 2
+-------------------- Histogram --------------------
+[0.500 ns ; 1.500 ns) | @
+---------------------------------------------------
 ############################################
 XmlExporter-brief
 ############################################

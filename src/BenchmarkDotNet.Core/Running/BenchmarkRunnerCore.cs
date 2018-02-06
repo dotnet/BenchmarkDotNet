@@ -154,7 +154,7 @@ namespace BenchmarkDotNet.Running
                 if (resultRuns.IsEmpty())
                     logger.WriteLineError("There are not any results runs");
                 else
-                    logger.WriteLineStatistic(resultRuns.GetStatistics().ToTimeStr());
+                    logger.WriteLineStatistic(resultRuns.GetStatistics().ToTimeStr(calcHistogram: true));
                 logger.WriteLine();
             }
 
