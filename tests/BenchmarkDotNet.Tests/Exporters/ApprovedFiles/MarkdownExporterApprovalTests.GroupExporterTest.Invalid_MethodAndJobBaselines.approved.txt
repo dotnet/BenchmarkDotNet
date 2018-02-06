@@ -8,12 +8,12 @@ Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
 
  Method |  Job | IsBaseline |     Mean |    Error |   StdDev | Scaled | ScaledSD | Rank |                                            LogicalGroup | IsBaseline |
 ------- |----- |----------- |---------:|---------:|---------:|-------:|---------:|-----:|-------------------------------------------------------- |----------- |
-    Bar | Job1 |       True | 202.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 | Invalid_MethodAndJobBaselines.Bar-Job1(IsBaseline=True) |        Yes |
-        |      |            |          |          |          |        |          |      |                                                         |            |
-    Bar | Job2 |    Default | 402.0 ns | 6.087 ns | 1.581 ns |      ? |        ? |    1 |                  Invalid_MethodAndJobBaselines.Bar-Job2 |         No |
-        |      |            |          |          |          |        |          |      |                                                         |            |
     Foo | Job1 |       True | 102.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 | Invalid_MethodAndJobBaselines.Foo-Job1(IsBaseline=True) |        Yes |
         |      |            |          |          |          |        |          |      |                                                         |            |
+    Bar | Job1 |       True | 202.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 | Invalid_MethodAndJobBaselines.Bar-Job1(IsBaseline=True) |        Yes |
+        |      |            |          |          |          |        |          |      |                                                         |            |
     Foo | Job2 |    Default | 302.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 |                  Invalid_MethodAndJobBaselines.Foo-Job2 |        Yes |
+        |      |            |          |          |          |        |          |      |                                                         |            |
+    Bar | Job2 |    Default | 402.0 ns | 6.087 ns | 1.581 ns |      ? |        ? |    1 |                  Invalid_MethodAndJobBaselines.Bar-Job2 |         No |
 
 Errors: 0

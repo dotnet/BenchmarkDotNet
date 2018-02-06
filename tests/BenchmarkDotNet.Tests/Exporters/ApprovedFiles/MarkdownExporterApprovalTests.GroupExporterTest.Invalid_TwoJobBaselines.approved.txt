@@ -9,12 +9,12 @@ IsBaseline=True
 
  Method |  Job |     Mean |    Error |   StdDev | Scaled | Rank |                LogicalGroup | IsBaseline |
 ------- |----- |---------:|---------:|---------:|-------:|-----:|---------------------------- |----------- |
-    Bar | Job1 | 202.0 ns | 6.087 ns | 1.581 ns |   1.00 |    1 | Invalid_TwoJobBaselines.Bar |        Yes |
-    Bar | Job2 | 402.0 ns | 6.087 ns | 1.581 ns |   1.00 |    2 | Invalid_TwoJobBaselines.Bar |        Yes |
-        |      |          |          |          |        |      |                             |            |
     Foo | Job1 | 102.0 ns | 6.087 ns | 1.581 ns |   1.00 |    1 | Invalid_TwoJobBaselines.Foo |        Yes |
     Foo | Job2 | 302.0 ns | 6.087 ns | 1.581 ns |   1.00 |    2 | Invalid_TwoJobBaselines.Foo |        Yes |
+        |      |          |          |          |        |      |                             |            |
+    Bar | Job1 | 202.0 ns | 6.087 ns | 1.581 ns |   1.00 |    1 | Invalid_TwoJobBaselines.Bar |        Yes |
+    Bar | Job2 | 402.0 ns | 6.087 ns | 1.581 ns |   1.00 |    2 | Invalid_TwoJobBaselines.Bar |        Yes |
 
 Errors: 2
-* Only 1 job in a group can have "IsBaseline = true" applied to it, group Invalid_TwoJobBaselines.Bar in class Invalid_TwoJobBaselines has 2
 * Only 1 job in a group can have "IsBaseline = true" applied to it, group Invalid_TwoJobBaselines.Foo in class Invalid_TwoJobBaselines has 2
+* Only 1 job in a group can have "IsBaseline = true" applied to it, group Invalid_TwoJobBaselines.Bar in class Invalid_TwoJobBaselines has 2

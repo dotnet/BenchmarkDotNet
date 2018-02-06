@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             [SimpleJob(id: "Job1"), SimpleJob(id: "Job2")]
             public class NoBasline_MethodsParamsJobs
             {
-                [Params(1, 2), UsedImplicitly] public int Param;
+                [Params(2, 10), UsedImplicitly] public int Param;
 
                 [Benchmark] public void Base() { }
                 [Benchmark] public void Foo() { }
@@ -89,7 +89,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByMethod)]
             public class NoBasline_MethodsParamsJobs_GroupByMethod
             {
-                [Params(1, 2), UsedImplicitly] public int Param;
+                [Params(2, 10), UsedImplicitly] public int Param;
 
                 [Benchmark, BenchmarkCategory("CatA")] public void Base() { }
                 [Benchmark, BenchmarkCategory("CatB")] public void Foo() { }
@@ -101,7 +101,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByJob)]
             public class NoBasline_MethodsParamsJobs_GroupByJob
             {
-                [Params(1, 2), UsedImplicitly] public int Param;
+                [Params(2, 10), UsedImplicitly] public int Param;
 
                 [Benchmark, BenchmarkCategory("CatA")] public void Base() { }
                 [Benchmark, BenchmarkCategory("CatB")] public void Foo() { }
@@ -113,7 +113,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByParams)]
             public class NoBasline_MethodsParamsJobs_GroupByParams
             {
-                [Params(1, 2), UsedImplicitly] public int Param;
+                [Params(2, 10), UsedImplicitly] public int Param;
 
                 [Benchmark, BenchmarkCategory("CatA")] public void Base() { }
                 [Benchmark, BenchmarkCategory("CatB")] public void Foo() { }
@@ -125,7 +125,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
             public class NoBasline_MethodsParamsJobs_GroupByCategory
             {
-                [Params(1, 2), UsedImplicitly] public int Param;
+                [Params(2, 10), UsedImplicitly] public int Param;
 
                 [Benchmark(Baseline = true), BenchmarkCategory("CatA")]
                 public void A1() { }
@@ -147,7 +147,7 @@ namespace BenchmarkDotNet.Tests.Exporters
                 BenchmarkLogicalGroupRule.ByCategory)]
             public class NoBasline_MethodsParamsJobs_GroupByAll
             {
-                [Params(1, 2), UsedImplicitly] public int Param;
+                [Params(2, 10), UsedImplicitly] public int Param;
 
                 [Benchmark(Baseline = true), BenchmarkCategory("CatA")]
                 public void A1() { }
@@ -173,7 +173,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             [RankColumn, LogicalGroupColumn, IsBaselineColumn]
             public class MethodBasline_MethodsParams
             {
-                [Params(1, 2), UsedImplicitly] public int Param;
+                [Params(2, 10), UsedImplicitly] public int Param;
 
                 [Benchmark(Baseline = true)] public void Base() { }
                 [Benchmark] public void Foo() { }
@@ -193,7 +193,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             [SimpleJob(id: "Job1"), SimpleJob(id: "Job2")]
             public class MethodBasline_MethodsParamsJobs
             {
-                [Params(1, 2), UsedImplicitly] public int Param;
+                [Params(2, 10), UsedImplicitly] public int Param;
 
                 [Benchmark(Baseline = true)] public void Base() { }
                 [Benchmark] public void Foo() { }
@@ -215,7 +215,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             [SimpleJob(id: "Job1", isBaseline: true), SimpleJob(id: "Job2")]
             public class JobBasline_MethodsParamsJobs
             {
-                [Params(1, 2), UsedImplicitly] public int Param;
+                [Params(2, 10), UsedImplicitly] public int Param;
 
                 [Benchmark] public void Base() { }
                 [Benchmark] public void Foo() { }

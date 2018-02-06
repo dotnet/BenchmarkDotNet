@@ -42,7 +42,8 @@ namespace BenchmarkDotNet.Samples.Intro
                 public string GetLogicalGroupKey(IConfig config, Benchmark[] allBenchmarks, Benchmark benchmark) =>
                     benchmark.Job.DisplayInfo + "_" + benchmark.Parameters.DisplayInfo;
 
-                public IEnumerable<string> GetLogicalGroupOrder(IEnumerable<string> logicalGroups) => logicalGroups.OrderBy(s => s);
+                public IEnumerable<IGrouping<string, Benchmark>> GetLogicalGroupOrder(IEnumerable<IGrouping<string, Benchmark>> logicalGroups) => 
+                    logicalGroups.OrderBy(it => it.Key);
 
                 public bool SeparateLogicalGroups => true;
             }

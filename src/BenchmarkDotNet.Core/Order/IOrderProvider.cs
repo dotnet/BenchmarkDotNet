@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -8,21 +9,22 @@ namespace BenchmarkDotNet.Order
 {
     public interface IOrderProvider
     {
-        [NotNull]
+        [PublicAPI, NotNull]
         IEnumerable<Benchmark> GetExecutionOrder([NotNull] Benchmark[] benchmarks);
 
-        [NotNull]
+        [PublicAPI, NotNull]
         IEnumerable<Benchmark> GetSummaryOrder([NotNull] Benchmark[] benchmarks, [NotNull] Summary summary);
 
-        [CanBeNull]
+        [PublicAPI, CanBeNull]
         string GetHighlightGroupKey([NotNull] Benchmark benchmark);
 
-        [CanBeNull]
+        [PublicAPI, CanBeNull]
         string GetLogicalGroupKey(IConfig config, [NotNull] Benchmark[] allBenchmarks, [NotNull] Benchmark benchmark);
 
-        [NotNull]
-        IEnumerable<string> GetLogicalGroupOrder([NotNull] IEnumerable<string> logicalGroups);
+        [PublicAPI, NotNull]
+        IEnumerable<IGrouping<string, Benchmark>> GetLogicalGroupOrder(IEnumerable<IGrouping<string, Benchmark>> logicalGroups);
         
+        [PublicAPI]
         bool SeparateLogicalGroups { get; }
     }
 }

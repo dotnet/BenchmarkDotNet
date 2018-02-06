@@ -6,24 +6,24 @@ Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
   [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 
 
- Method |  Job | IsBaseline | Param |       Mean |    Error |   StdDev | Scaled | ScaledSD | Rank |                                LogicalGroup | IsBaseline |
-------- |----- |----------- |------ |-----------:|---------:|---------:|-------:|---------:|-----:|-------------------------------------------- |----------- |
-    Bar | Job1 |       True |     1 |   302.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 |  JobBasline_MethodsParamsJobs.Bar-[Param=1] |        Yes | ^
-    Bar | Job2 |    Default |     1 |   602.0 ns | 6.087 ns | 1.581 ns |   1.99 |     0.01 |    2 |  JobBasline_MethodsParamsJobs.Bar-[Param=1] |         No |
-        |      |            |       |            |          |          |        |          |      |                                             |            |
-    Bar | Job1 |       True |     2 |   902.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 |  JobBasline_MethodsParamsJobs.Bar-[Param=2] |        Yes | ^
-    Bar | Job2 |    Default |     2 | 1,202.0 ns | 6.087 ns | 1.581 ns |   1.33 |     0.00 |    2 |  JobBasline_MethodsParamsJobs.Bar-[Param=2] |         No |
-        |      |            |       |            |          |          |        |          |      |                                             |            |
-   Base | Job1 |       True |     1 |   102.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 | JobBasline_MethodsParamsJobs.Base-[Param=1] |        Yes | ^
-   Base | Job2 |    Default |     1 |   402.0 ns | 6.087 ns | 1.581 ns |   3.94 |     0.06 |    2 | JobBasline_MethodsParamsJobs.Base-[Param=1] |         No |
-        |      |            |       |            |          |          |        |          |      |                                             |            |
-   Base | Job1 |       True |     2 |   702.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 | JobBasline_MethodsParamsJobs.Base-[Param=2] |        Yes | ^
-   Base | Job2 |    Default |     2 | 1,002.0 ns | 6.087 ns | 1.581 ns |   1.43 |     0.00 |    2 | JobBasline_MethodsParamsJobs.Base-[Param=2] |         No |
-        |      |            |       |            |          |          |        |          |      |                                             |            |
-    Foo | Job1 |       True |     1 |   202.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 |  JobBasline_MethodsParamsJobs.Foo-[Param=1] |        Yes | ^
-    Foo | Job2 |    Default |     1 |   502.0 ns | 6.087 ns | 1.581 ns |   2.49 |     0.02 |    2 |  JobBasline_MethodsParamsJobs.Foo-[Param=1] |         No |
-        |      |            |       |            |          |          |        |          |      |                                             |            |
-    Foo | Job1 |       True |     2 |   802.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 |  JobBasline_MethodsParamsJobs.Foo-[Param=2] |        Yes | ^
-    Foo | Job2 |    Default |     2 | 1,102.0 ns | 6.087 ns | 1.581 ns |   1.37 |     0.00 |    2 |  JobBasline_MethodsParamsJobs.Foo-[Param=2] |         No |
+ Method |  Job | IsBaseline | Param |       Mean |    Error |   StdDev | Scaled | ScaledSD | Rank |                                 LogicalGroup | IsBaseline |
+------- |----- |----------- |------ |-----------:|---------:|---------:|-------:|---------:|-----:|--------------------------------------------- |----------- |
+   Base | Job1 |       True |     2 |   102.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 |  JobBasline_MethodsParamsJobs.Base-[Param=2] |        Yes | ^
+   Base | Job2 |    Default |     2 |   402.0 ns | 6.087 ns | 1.581 ns |   3.94 |     0.06 |    2 |  JobBasline_MethodsParamsJobs.Base-[Param=2] |         No |
+        |      |            |       |            |          |          |        |          |      |                                              |            |
+    Foo | Job1 |       True |     2 |   202.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 |   JobBasline_MethodsParamsJobs.Foo-[Param=2] |        Yes |
+    Foo | Job2 |    Default |     2 |   502.0 ns | 6.087 ns | 1.581 ns |   2.49 |     0.02 |    2 |   JobBasline_MethodsParamsJobs.Foo-[Param=2] |         No |
+        |      |            |       |            |          |          |        |          |      |                                              |            |
+    Bar | Job1 |       True |     2 |   302.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 |   JobBasline_MethodsParamsJobs.Bar-[Param=2] |        Yes |
+    Bar | Job2 |    Default |     2 |   602.0 ns | 6.087 ns | 1.581 ns |   1.99 |     0.01 |    2 |   JobBasline_MethodsParamsJobs.Bar-[Param=2] |         No |
+        |      |            |       |            |          |          |        |          |      |                                              |            |
+   Base | Job1 |       True |    10 |   702.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 | JobBasline_MethodsParamsJobs.Base-[Param=10] |        Yes | ^
+   Base | Job2 |    Default |    10 | 1,002.0 ns | 6.087 ns | 1.581 ns |   1.43 |     0.00 |    2 | JobBasline_MethodsParamsJobs.Base-[Param=10] |         No |
+        |      |            |       |            |          |          |        |          |      |                                              |            |
+    Foo | Job1 |       True |    10 |   802.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 |  JobBasline_MethodsParamsJobs.Foo-[Param=10] |        Yes |
+    Foo | Job2 |    Default |    10 | 1,102.0 ns | 6.087 ns | 1.581 ns |   1.37 |     0.00 |    2 |  JobBasline_MethodsParamsJobs.Foo-[Param=10] |         No |
+        |      |            |       |            |          |          |        |          |      |                                              |            |
+    Bar | Job1 |       True |    10 |   902.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 |  JobBasline_MethodsParamsJobs.Bar-[Param=10] |        Yes |
+    Bar | Job2 |    Default |    10 | 1,202.0 ns | 6.087 ns | 1.581 ns |   1.33 |     0.00 |    2 |  JobBasline_MethodsParamsJobs.Bar-[Param=10] |         No |
 
 Errors: 0
