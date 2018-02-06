@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 string line;
                 while ((line = file.ReadLine()) != null)
                 {
-                    if (line.Contains("NetCoreAppImplicitPackageVersion") || line.Contains("RuntimeFrameworkVersion") || line.Contains("PackageTargetFallback"))
+                    if (line.Contains("NetCoreAppImplicitPackageVersion") || line.Contains("RuntimeFrameworkVersion") || line.Contains("PackageTargetFallback") || line.Contains("LangVersion"))
                     {
                         customSettings.Append(line);
                     }
