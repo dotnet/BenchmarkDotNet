@@ -74,7 +74,7 @@ namespace Sample
 }
 ```
 
-**Important**: Please remember that every new classic .NET project in VS compiles as 32 bit. If you want to check the asm produced for x64 you need to go to the properites of the console app (Alt+Enter) and uncheck "Prefer 32 bit" in the "Buid" tab.
+**Important**: Please remember that every new classic .NET project in VS compiles as 32 bit. If you want to check the asm produced for x64 you need to go to the properites of the console app (Alt+Enter) and uncheck "Prefer 32 bit" in the "Build" tab.
 
 Once you configure your app, you should run it. It will give you an output similar to this:
 
