@@ -11,6 +11,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Reports;
+using System.IO;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -61,11 +62,10 @@ namespace BenchmarkDotNet.Configs
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
 
         public bool KeepBenchmarkFiles => false;
-        
-        public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules()
-        {
-            return Array.Empty<BenchmarkLogicalGroupRule>();
-        }
+
+        public string ArtifactsPath => Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");
+
+        public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => Array.Empty<BenchmarkLogicalGroupRule>();
 
         public ISummaryStyle GetSummaryStyle() => SummaryStyle.Default;
 

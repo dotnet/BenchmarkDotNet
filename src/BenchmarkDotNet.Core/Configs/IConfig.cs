@@ -36,6 +36,11 @@ namespace BenchmarkDotNet.Configs
         /// </summary>
         bool KeepBenchmarkFiles { get; }
 
+        /// <summary>
+        /// the default value is "./BenchmarkDotNet.Artifacts"
+        /// </summary>
+        string ArtifactsPath { get; }
+
         IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules();
     }
 }

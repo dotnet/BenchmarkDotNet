@@ -42,6 +42,9 @@ namespace BenchmarkDotNet.Configs
         public ConfigUnionRule UnionRule => config.UnionRule;
 
         public bool KeepBenchmarkFiles => config.KeepBenchmarkFiles;
+
+        public string ArtifactsPath => config.ArtifactsPath;
+
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => config.GetLogicalGroupRules();
     }
 }

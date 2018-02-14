@@ -46,6 +46,8 @@ namespace BenchmarkDotNet.Configs
 
         public bool KeepBenchmarkFiles { get; set; }
 
+        public string ArtifactsPath { get; set; }
+
         public void Add(params IColumn[] newColumns) => columnProviders.AddRange(newColumns.Select(c => c.ToProvider()));
         public void Add(params IColumnProvider[] newColumnProviders) => columnProviders.AddRange(newColumnProviders);
         public void Add(params IExporter[] newExporters) => exporters.AddRange(newExporters);
@@ -73,6 +75,7 @@ namespace BenchmarkDotNet.Configs
             filters.AddRange(config.GetFilters());
             orderProvider = config.GetOrderProvider() ?? orderProvider;
             KeepBenchmarkFiles |= config.KeepBenchmarkFiles;
+            ArtifactsPath = config.ArtifactsPath ?? ArtifactsPath;
             summaryStyle = summaryStyle ?? config.GetSummaryStyle();
             AddRules(config.GetLogicalGroupRules());
         }

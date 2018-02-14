@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Running
             var config = benchmarkRunInfo.Config;
 
             var title = GetTitle(benchmarks);
-            var rootArtifactsFolderPath = GetRootArtifactsFolderPath();
+            var rootArtifactsFolderPath = (config?.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath).CreateIfNotExists();
 
             using (var logStreamWriter = Portability.StreamWriter.FromPath(Path.Combine(rootArtifactsFolderPath, title + ".log")))
             {
@@ -377,20 +377,7 @@ namespace BenchmarkDotNet.Running
         private static Benchmark[] GetSupportedBenchmarks(IList<Benchmark> benchmarks, CompositeLogger logger, Func<Job, IToolchain> toolchainProvider, IResolver resolver)
             => benchmarks.Where(benchmark => toolchainProvider(benchmark.Job).IsSupported(benchmark, logger, resolver)).ToArray();
 
-        private static string GetRootArtifactsFolderPath() => CombineAndCreate(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");
-
-        private static string GetResultsFolderPath(string rootArtifactsFolderPath) => CombineAndCreate(rootArtifactsFolderPath, "results");
-
-        private static string CombineAndCreate(string rootFolderPath, string childFolderName)
-        {
-            var path = Path.Combine(rootFolderPath, childFolderName);
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-
-            return path;
-        }
+        private static string GetResultsFolderPath(string rootArtifactsFolderPath) => Path.Combine(rootArtifactsFolderPath, "results").CreateIfNotExists();
 
         private static IDisposable GetAssemblyResolveHelper(IToolchain toolchain, ILogger logger)
         {

@@ -60,6 +60,10 @@ namespace BenchmarkDotNet.Configs
                 // TODO does it make sense to allows Loggers to be configured on the cmd-line?
                 ProcessOption = (config, value) => { throw new InvalidOperationException($"{value} is an unrecognised Logger"); },
             } },
+            { "artifacts", new ConfigOption {
+                ProcessOption = (config, value) => config.ArtifactsPath = value,
+                GetAllOptions = new Lazy<IEnumerable<string>>(() => new [] { "Any valid path to accessible directory" })
+            } },
         };
 
         private static Dictionary<string, Job[]> availableJobs =
@@ -136,9 +140,11 @@ namespace BenchmarkDotNet.Configs
 
             for (int i = 0; i < args.Length; i++)
             {
-                var arg = args[i]
-                    .ToLowerInvariant() // normalize
-                    .Replace(optionPrefix, string.Empty); // Allow both "--arg=<value>" and "arg=<value>" (i.e. with and without the double dashes)
+                var arg = args[i].Contains("artifacts")
+                    ? args[i] // path is case sensitive
+                    : args[i].ToLowerInvariant(); // normalize
+
+                arg = arg.Replace(optionPrefix, string.Empty); // Allow both "--arg=<value>" and "arg=<value>" (i.e. with and without the double dashes)
 
                 var containsEqualitySign = arg.Contains('=');
                 if (!containsEqualitySign && !arg.EndsWith("s"))
