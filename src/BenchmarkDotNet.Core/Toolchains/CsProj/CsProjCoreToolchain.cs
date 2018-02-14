@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -20,17 +21,21 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         [PublicAPI] public static readonly Lazy<IToolchain> Current = new Lazy<IToolchain>(() => From(NetCoreAppSettings.GetCurrentVersion()));
 
-        private CsProjCoreToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor) 
+        private CsProjCoreToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath) 
             : base(name, generator, builder, executor)
         {
+            CustomDotNetCliPath = customDotNetCliPath;
         }
+
+        private string CustomDotNetCliPath { get; }
 
         [PublicAPI]
         public static IToolchain From(NetCoreAppSettings settings)
             => new CsProjCoreToolchain(settings.Name,
                 new CsProjGenerator(settings.TargetFrameworkMoniker, PlatformProvider, settings.RuntimeFrameworkVersion), 
                 new CsProjBuilder(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath), 
-                new DotNetCliExecutor(settings.CustomDotNetCliPath));
+                new DotNetCliExecutor(settings.CustomDotNetCliPath),
+                settings.CustomDotNetCliPath);
 
         private static string PlatformProvider(Platform platform) => platform.ToConfig();
 
@@ -47,9 +52,15 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 return false;
             }
 
-            if (!HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled())
+            if (string.IsNullOrEmpty(CustomDotNetCliPath) && !HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled())
             {
                 logger.WriteLineError($"BenchmarkDotNet requires dotnet cli toolchain to be installed, benchmark '{benchmark.DisplayInfo}' will not be executed");
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(CustomDotNetCliPath) && !File.Exists(CustomDotNetCliPath))
+            {
+                logger.WriteLineError($"Povided custom dotnet cli path does not exist, benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;
             }
 
