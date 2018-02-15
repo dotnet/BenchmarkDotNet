@@ -185,6 +185,14 @@ Frequency=2533308 Hz, Resolution=394.7408 ns, Timer=TSC
   Job-CTQFFQ : .NET Core ? (CoreCLR 4.6.26214.07, CoreFX 4.6.26313.0), 64bit RyuJIT
 ```
 
+To support two most common scenarios we provide following methods: `CreateForLocalCoreFxBuild` and `CreateForNightlyCoreFxBuild`. Both methods allow to target custom CoreFX builds running on the default installed .NET Runtime.
+
+```cs
+CustomCoreClrToolchain.CreateForNightlyCoreFxBuild("4.5.0-preview2-26215-01");
+
+CustomCoreClrToolchain.CreateForLocalCoreFxBuild(@"C:\Projects\forks\corefx\bin\packages\Release", "4.5.0-preview2-26313-0");
+``
+
 ## InProcessToolchain
 
 InProcessToolchain is our toolchain which does not generate any new executable. It emits IL on the fly and runs it from within the process itself. It can be usefull if want to run the benchmarks very fast or if you want to run them for framework which we don't support. An example could be a local build of CoreCLR.

@@ -27,6 +27,10 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
             string runtimeIdentifier = null)
             : base(targetFrameworkMoniker, platform => platform.ToString())
         {
+            if (!((!string.IsNullOrEmpty(coreClrNuGetFeed) && !string.IsNullOrEmpty(coreClrVersion)) 
+                || (!string.IsNullOrEmpty(coreFxNuGetFeed) && !string.IsNullOrEmpty(coreFxVersion))))
+                throw new ArgumentNullException("At least one thing (CLR/FX) has to be configured");
+
             CoreClrNuGetFeed = coreClrNuGetFeed;
             CoreClrVersion = coreClrVersion;
             CoreFxNuGetFeed = coreFxNuGetFeed;
@@ -40,8 +44,11 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         private string CoreFxVersion { get; }
         private string RuntimeIdentifier { get; }
 
-        private bool IsLocalCoreClr => Directory.Exists(CoreClrNuGetFeed);
-        private bool IsLocalCoreFx => Directory.Exists(CoreFxNuGetFeed);
+        private bool IsUsingCustomCoreClr => !string.IsNullOrEmpty(CoreClrNuGetFeed) && !string.IsNullOrEmpty(CoreClrVersion);
+        private bool IsUsingCustomCoreFx => !string.IsNullOrEmpty(CoreFxNuGetFeed) && !string.IsNullOrEmpty(CoreFxVersion);
+
+        private bool IsLocalCoreClr => IsUsingCustomCoreClr && Directory.Exists(CoreClrNuGetFeed);
+        private bool IsLocalCoreFx => IsUsingCustomCoreFx && Directory.Exists(CoreFxNuGetFeed);
 
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
             => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, RuntimeIdentifier, "publish");
@@ -96,18 +103,23 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
         private IEnumerable<string> GetReferences(Benchmark benchmark, ILogger logger)
         {
-            var coreClrPackagesPrefix = IsLocalCoreClr ? $"runtime.{RuntimeIdentifier}." : null;
-            var coreFxPackagesPrefix = IsLocalCoreFx ? $"runtime.{RuntimeIdentifier}." : null;
+            if (IsUsingCustomCoreClr)
+            {
+                var coreClrPackagesPrefix = IsLocalCoreClr ? $"runtime.{RuntimeIdentifier}." : null;
+                yield return $@"<PackageReference Include=""{coreClrPackagesPrefix}Microsoft.NETCore.Runtime.CoreCLR"" Version=""{CoreClrVersion}"" />";
+                yield return $@"<PackageReference Include=""{coreClrPackagesPrefix}Microsoft.NETCore.Jit"" Version=""{CoreClrVersion}"" />";
+            }
 
-            yield return $@"<PackageReference Include=""{coreClrPackagesPrefix}Microsoft.NETCore.Runtime.CoreCLR"" Version=""{CoreClrVersion}"" />";
-            yield return $@"<PackageReference Include=""{coreClrPackagesPrefix}Microsoft.NETCore.Jit"" Version=""{CoreClrVersion}"" />";
-            
-            yield return $@"<PackageReference Include=""{coreFxPackagesPrefix}Microsoft.Private.CoreFx.NETCoreApp"" Version=""{CoreFxVersion}"" />";
+            if (IsUsingCustomCoreFx)
+            {
+                var coreFxPackagesPrefix = IsLocalCoreFx ? $"runtime.{RuntimeIdentifier}." : null;
+                yield return $@"<PackageReference Include=""{coreFxPackagesPrefix}Microsoft.Private.CoreFx.NETCoreApp"" Version=""{CoreFxVersion}"" />";
+            }
 
             yield return $@"<ProjectReference Include=""{GetProjectFilePath(benchmark.Target.Type, logger).FullName}"" />";
         }
 
-        private static string GetPortableRuntimeIdentifier()
+        internal static string GetPortableRuntimeIdentifier()
         {
             // Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.GetRuntimeIdentifier()
             // returns win10-x64, we want the simpler form win-x64
