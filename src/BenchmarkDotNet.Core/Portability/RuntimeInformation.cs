@@ -172,8 +172,11 @@ namespace BenchmarkDotNet.Portability
             return $".NET Framework {frameworkVersion} (CLR {clrVersion})";
 #else
             var runtimeVersion = GetNetCoreVersion() ?? "?";
-            string frameworkVersion = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.Replace(".NET Core ", "");
-            return $".NET Core {runtimeVersion} (Framework {frameworkVersion})";
+            
+            var coreclrAssemblyInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(typeof(object).GetTypeInfo().Assembly.Location);
+            var corefxAssemblyInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(typeof(System.Text.RegularExpressions.Regex).GetTypeInfo().Assembly.Location);
+
+            return $".NET Core {runtimeVersion} (CoreCLR {coreclrAssemblyInfo.FileVersion}, CoreFX {corefxAssemblyInfo.FileVersion})";
 #endif
         }
 

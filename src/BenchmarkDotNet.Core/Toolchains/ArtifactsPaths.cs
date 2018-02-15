@@ -4,7 +4,7 @@ namespace BenchmarkDotNet.Toolchains
 {
     public class ArtifactsPaths
     {
-        public static ArtifactsPaths Empty = new ArtifactsPaths("", "", "", "", "", "", "", "", "");
+        public static ArtifactsPaths Empty = new ArtifactsPaths("", "", "", "", "", "", "", "", "", "");
 
         public string RootArtifactsFolderPath { get; }
 
@@ -15,6 +15,8 @@ namespace BenchmarkDotNet.Toolchains
         public string ProgramCodePath { get; }
 
         public string AppConfigPath { get; }
+
+        public string NuGetConfigPath { get; }
 
         public string ProjectFilePath { get; }
 
@@ -30,6 +32,7 @@ namespace BenchmarkDotNet.Toolchains
             string binariesDirectoryPath,
             string programCodePath,
             string appConfigPath,
+            string nugetConfigPath,
             string projectFilePath,
             string buildScriptFilePath,
             string executablePath,
@@ -40,6 +43,7 @@ namespace BenchmarkDotNet.Toolchains
             BinariesDirectoryPath = binariesDirectoryPath;
             ProgramCodePath = programCodePath;
             AppConfigPath = appConfigPath;
+            NuGetConfigPath = nugetConfigPath;
             ProjectFilePath = projectFilePath;
             BuildScriptFilePath = buildScriptFilePath;
             ExecutablePath = executablePath;

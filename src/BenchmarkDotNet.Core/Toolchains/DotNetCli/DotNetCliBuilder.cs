@@ -31,16 +31,19 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         {
             var extraArguments = DotNetCliGenerator.GetCustomArguments(benchmark, resolver);
 
-            var restoreResult = DotNetCliCommandExecutor.ExecuteCommand(
-                CustomDotNetCliPath,
-                $"{RestoreCommand} {extraArguments}",
-                generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
-
-            logger.WriteLineInfo($"// dotnet restore took {restoreResult.ExecutionTime.TotalSeconds:0.##}s");
-
-            if (!restoreResult.IsSuccess)
+            if (!string.IsNullOrEmpty(RestoreCommand))
             {
-                return BuildResult.Failure(generateResult, new Exception(restoreResult.ProblemDescription));
+                var restoreResult = DotNetCliCommandExecutor.ExecuteCommand(
+                    CustomDotNetCliPath,
+                    $"{RestoreCommand} {extraArguments}",
+                    generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
+
+                logger.WriteLineInfo($"// dotnet restore took {restoreResult.ExecutionTime.TotalSeconds:0.##}s");
+
+                if (!restoreResult.IsSuccess)
+                {
+                    return BuildResult.Failure(generateResult, new Exception(restoreResult.ProblemDescription));
+                }
             }
 
             var buildResult = Build(
@@ -48,7 +51,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 benchmark.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, resolver),
                 extraArguments);
 
-            logger.WriteLineInfo($"// dotnet build took {buildResult.ExecutionTime.TotalSeconds:0.##}s");
+            logger.WriteLineInfo($"// dotnet build/publish took {buildResult.ExecutionTime.TotalSeconds:0.##}s");
 
             if (!buildResult.IsSuccess)
             {

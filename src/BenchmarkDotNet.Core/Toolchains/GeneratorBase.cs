@@ -25,6 +25,7 @@ namespace BenchmarkDotNet.Toolchains
 
                 GenerateCode(benchmark, artifactsPaths, config);
                 GenerateAppConfig(benchmark, artifactsPaths, resolver);
+                GenerateNuGetConfig(benchmark, artifactsPaths);
                 GenerateProject(benchmark, artifactsPaths, resolver, logger);
                 GenerateBuildScript(benchmark, artifactsPaths, resolver);
 
@@ -47,6 +48,8 @@ namespace BenchmarkDotNet.Toolchains
 
         protected virtual void CopyAllRequiredFiles(Benchmark benchmark, ArtifactsPaths artifactsPaths) { }
 
+        protected virtual void GenerateNuGetConfig(Benchmark benchmark, ArtifactsPaths artifactsPaths) { }
+
         protected virtual void GenerateProject(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver, ILogger logger) { }
 
         protected abstract void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver);
@@ -67,6 +70,7 @@ namespace BenchmarkDotNet.Toolchains
                 binariesDirectoryPath: binariesDirectoryPath,
                 programCodePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{codeFileExtension}"),
                 appConfigPath: $"{executablePath}.config",
+                nugetConfigPath: Path.Combine(buildArtifactsDirectoryPath, "NuGet.config"),
                 projectFilePath: GetProjectFilePath(buildArtifactsDirectoryPath),
                 buildScriptFilePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{RuntimeInformation.ScriptFileExtension}"),
                 executablePath: executablePath,

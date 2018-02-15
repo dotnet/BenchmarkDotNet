@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
         }
 
-        private string GetRuntimeSettings(GcMode gcMode, IResolver resolver)
+        protected string GetRuntimeSettings(GcMode gcMode, IResolver resolver)
         {
             if (!gcMode.HasChanges)
                 return string.Empty;
@@ -104,7 +104,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             return customSettings.ToString();
         }
 
-        private static FileInfo GetProjectFilePath(Type benchmarkTarget, ILogger logger)
+        protected static FileInfo GetProjectFilePath(Type benchmarkTarget, ILogger logger)
         {
             if (!GetSolutionRootDirectory(out var solutionRootDirectory))
             {
