@@ -142,6 +142,7 @@ The library is used by a large number of projects for performance discussions or
 * [EntityFrameworkCore](https://github.com/aspnet/EntityFrameworkCore/tree/dev/benchmarks)
 * [F#](https://github.com/fsharp/fsharp/blob/master/tests/scripts/array-perf/array-perf.fs)
 * [Orleans](https://github.com/dotnet/orleans/tree/master/test/Benchmarks)
+* [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json/tree/master/Src/Newtonsoft.Json.Tests/Benchmarks)
 * [Elasticsearch.Net](https://www.elastic.co/guide/en/elasticsearch/client/net-api/current/bool-queries.html#_perfomance_considerations)
 * [Dapper](https://github.com/StackExchange/Dapper/tree/master/Dapper.Tests.Performance)
 * [Expecto](https://github.com/haf/expecto/tree/master/Expecto.BenchmarkDotNet)
