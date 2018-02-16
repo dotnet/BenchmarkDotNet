@@ -1,17 +1,54 @@
-﻿using BenchmarkDotNet.Toolchains.DotNetCli;
+﻿using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Toolchains.Results;
+using System;
+using System.IO;
 
 namespace BenchmarkDotNet.Toolchains.CustomCoreClr
 {
-    public class Publisher : DotNetCliBuilder
+    public class Publisher : IBuilder
     {
-        public Publisher(string targetFrameworkMoniker, string customDotNetCliPath = null) 
-            : base(targetFrameworkMoniker, customDotNetCliPath)
+        public Publisher(string targetFrameworkMoniker, string customDotNetCliPath = null, string[] filesToCopy = null) 
         {
+            TargetFrameworkMoniker = targetFrameworkMoniker;
+            CustomDotNetCliPath = customDotNetCliPath;
+            FilesToCopy = filesToCopy;
         }
 
-        internal override string RestoreCommand => null; // don't run restore, dotnet publish will
+        private string TargetFrameworkMoniker { get; }
+        private string CustomDotNetCliPath { get; }
+        private string[] FilesToCopy { get; }
 
-        internal override string GetBuildCommand(string frameworkMoniker, bool justTheProjectItself, string configuration)
-            => $"publish -c {configuration}";
+        public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark, IResolver resolver)
+        {
+            var extraArguments = DotNetCliGenerator.GetCustomArguments(benchmark, resolver);
+
+            var configurationName = benchmark.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, resolver);
+
+            var publishResult = DotNetCliCommandExecutor.ExecuteCommand(
+                CustomDotNetCliPath,
+                $"publish -c {configurationName} {extraArguments}",
+                generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
+
+            if (!publishResult.IsSuccess &&
+                !File.Exists(generateResult.ArtifactsPaths.ExecutablePath)) // dotnet cli could have succesfully builded the program, but returned 1 as exit code because it had some warnings
+            {
+                return BuildResult.Failure(generateResult, new Exception(publishResult.ProblemDescription));
+            }
+
+            if (FilesToCopy != null)
+            {
+                var destinationFolder = Path.GetDirectoryName(generateResult.ArtifactsPaths.ExecutablePath);
+                foreach (var fileToCopy in FilesToCopy)
+                {
+                    File.Copy(fileToCopy, Path.Combine(destinationFolder, Path.GetFileName(fileToCopy)), overwrite: true);
+                }
+            }
+
+            return BuildResult.Success(generateResult);
+        }
     }
 }

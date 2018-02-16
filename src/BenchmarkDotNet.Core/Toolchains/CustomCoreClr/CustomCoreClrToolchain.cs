@@ -17,6 +17,7 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         /// <param name="targetFrameworkMoniker">TFM, netcoreapp2.1 is the default</param>
         /// <param name="runtimeIdentifier">if not provided, portable OS-arch will be used (example: "win-x64", "linux-x86")</param>
         /// <param name="customDotNetCliPath">if not provided, the default will be used</param>
+        /// <param name="filesToCopy">files that should be copied to the published self-contained app. </param>
         /// <returns></returns>
         public CustomCoreClrToolchain(
             string displayName,
@@ -24,10 +25,11 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
             string coreFxNuGetFeed, string coreFxVersion,
             string targetFrameworkMoniker = "netcoreapp2.1",
             string runtimeIdentifier = null, 
-            string customDotNetCliPath = null)
+            string customDotNetCliPath = null,
+            string[] filesToCopy = null)
             : base(displayName, 
                   new Generator(coreClrNuGetFeed, coreClrVersion, coreFxNuGetFeed, coreFxVersion, targetFrameworkMoniker, runtimeIdentifier),
-                  new Publisher(targetFrameworkMoniker, customDotNetCliPath),
+                  new Publisher(targetFrameworkMoniker, customDotNetCliPath, filesToCopy),
                   new DotNetCliExecutor(customDotNetCliPath))
         {
         }
@@ -42,9 +44,12 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         /// <param name="runtimeIdentifier">if not provided, portable OS-arch will be used (example: "win-x64", "linux-x86")</param>
         /// <param name="customDotNetCliPath">if not provided, the default will be used</param>
         /// <param name="displayName">the name of the toolchain to be displayed in results, the default is "localCoreFX"</param>
+        /// <param name="filesToCopy">files that should be copied to the published self-contained app. 
+        /// If you don't want to rebuild entire CoreFX then just provide the paths to files which you have changed here</param>
         /// <returns></returns>
         public static IToolchain CreateForLocalCoreFxBuild(string pathToNuGetFolder, string privateCoreFxNetCoreAppVersion, 
-            string targetFrameworkMoniker = "netcoreapp2.1", string displayName = "localCoreFX", string runtimeIdentifier = null, string customDotNetCliPath = null)
+            string targetFrameworkMoniker = "netcoreapp2.1", string displayName = "localCoreFX", string runtimeIdentifier = null, string customDotNetCliPath = null,
+            string[] filesToCopy = null)
         {
             if (!Directory.Exists(pathToNuGetFolder))
                 throw new ArgumentException($"Directory {pathToNuGetFolder} does not exist");
@@ -55,7 +60,12 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
             if (!File.Exists(Path.Combine(pathToNuGetFolder, expectedPackageFileName)))
                 throw new ArgumentException($"Expected package {expectedPackageFileName} was not found in {pathToNuGetFolder}. Please make sure you have provided the right version number");
 
-            return new CustomCoreClrToolchain(displayName, null, null, pathToNuGetFolder, privateCoreFxNetCoreAppVersion, targetFrameworkMoniker, runtimeIdentifier, customDotNetCliPath);
+            if (filesToCopy != null)
+                foreach (var fileToCopy in filesToCopy)
+                    if (!File.Exists(fileToCopy))
+                        throw new ArgumentException($"File {fileToCopy} does not exist!");
+
+            return new CustomCoreClrToolchain(displayName, null, null, pathToNuGetFolder, privateCoreFxNetCoreAppVersion, targetFrameworkMoniker, runtimeIdentifier, customDotNetCliPath, filesToCopy);
         }
 
         /// <summary>
