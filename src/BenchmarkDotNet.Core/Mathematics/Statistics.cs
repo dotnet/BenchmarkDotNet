@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Mathematics
 
         public Statistics(IEnumerable<double> values)
         {
-            list = values.ToList();
+            list = values.Where(d => !double.IsNaN(d)).ToList();
             N = list.Count;
             if (N == 0)
                 throw new InvalidOperationException("Sequence of values contains no elements, Statistics can't be calculated");

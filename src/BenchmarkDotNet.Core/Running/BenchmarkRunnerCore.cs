@@ -112,6 +112,8 @@ namespace BenchmarkDotNet.Running
                 if (buildResult.IsBuildSuccess)
                 {
                     var report = RunCore(benchmark, logger, config, rootArtifactsFolderPath, toolchainProvider, resolver, buildResult);
+                    if (report.AllMeasurements.Any(m => m.Operations == 0))
+                        throw new InvalidOperationException("An iteration with 'Operations == 0' detected");
                     reports.Add(report);
                     if (report.GetResultRuns().Any())
                         logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr());
