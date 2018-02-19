@@ -71,12 +71,12 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public void ExporterUsesFullyQualifiedTypeNameAsFileName()
+        public void ExporterUsesSimpleTypeNameAsFileNameIfTypeNamesDoNotDuplicate()
         {
             string resultsDirectoryPath = Path.GetTempPath();
             var exporter = new MockExporter();
             var mockSummary = GetMockSummary(resultsDirectoryPath, typeof(ClassA));
-            var expectedFilePath = $"{Path.Combine(mockSummary.ResultsDirectoryPath, typeof(ClassA).FullName)}-report.txt";
+            var expectedFilePath = $"{Path.Combine(mockSummary.ResultsDirectoryPath, typeof(ClassA).Name)}-report.txt";
             string actualFilePath = null;
 
             try

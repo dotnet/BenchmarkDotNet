@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
 
@@ -21,10 +23,10 @@ namespace BenchmarkDotNet.Running
         public bool Baseline { get; }
         public string[] Categories { get; }
 
-        private string TypeInfo => Type?.Name ?? "Untitled";
+        private string TypeInfo => Type?.GetDisplayName() ?? "Untitled";
         private string MethodFolderInfo => Method?.Name ?? "Untitled";
 
-        public string FolderInfo => TypeInfo + "_" + MethodFolderInfo;
+        public string FolderInfo => (Type != null ? FolderNameHelper.ToFolderName(Type) : "Untitled") + "_" + MethodFolderInfo;
         public string DisplayInfo => TypeInfo + "." + MethodDisplayInfo;
 
         public Target(

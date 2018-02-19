@@ -176,7 +176,7 @@ namespace BenchmarkDotNet.Code
                 throw new NotSupportedException("Custom factory must have a public parameterless constructor");
             }
 
-            return factoryType.GetCorrectTypeName();
+            return factoryType.GetCorrectCSharpTypeName();
         }
 
 

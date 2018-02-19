@@ -11,6 +11,7 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -73,9 +74,13 @@ namespace BenchmarkDotNet.Running
 
         private static string GetTitle(IList<Benchmark> benchmarks)
         {
-            var types = benchmarks.Select(b => b.Target.Type.Name).Distinct().ToArray();
-            if (types.Length == 1)
-                return types[0];
+            // few types might have the same name: A.Name and B.Name will both report "Name"
+            // in that case, we can not use the type name as file name because they would be getting overwritten #529
+            var typeNames = benchmarks.Select(b => b.Target.Type).Distinct().GroupBy(type => type.Name);
+
+            if (typeNames.Count() == 1 && typeNames.Single().Count() == 1)
+                return FolderNameHelper.ToFolderName(benchmarks.Select(b => b.Target.Type).First());
+
             benchmarkRunIndex++;
             return $"BenchmarkRun-{benchmarkRunIndex:##000}-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}";
         }

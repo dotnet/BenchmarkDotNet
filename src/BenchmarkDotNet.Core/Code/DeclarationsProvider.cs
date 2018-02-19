@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Code
 
         public string TargetTypeNamespace => string.IsNullOrWhiteSpace(Target.Type.Namespace) ? string.Empty : $"using {Target.Type.Namespace};";
 
-        public string TargetTypeName => Target.Type.GetCorrectTypeName();
+        public string TargetTypeName => Target.Type.GetCorrectCSharpTypeName();
 
         public string GlobalSetupMethodName => Target.GlobalSetupMethod?.Name ?? EmptyAction;
 
@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Code
 
         protected virtual Type TargetMethodReturnType => Target.Method.ReturnType;
 
-        public virtual string TargetMethodReturnTypeName => TargetMethodReturnType.GetCorrectTypeName();
+        public virtual string TargetMethodReturnTypeName => TargetMethodReturnType.GetCorrectCSharpTypeName();
 
         public virtual string TargetMethodDelegate => Target.Method.Name;
 
@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Code
 
         protected abstract Type IdleMethodReturnType { get; }
 
-        public string IdleMethodReturnTypeName => IdleMethodReturnType.GetCorrectTypeName();
+        public string IdleMethodReturnTypeName => IdleMethodReturnType.GetCorrectCSharpTypeName();
 
         public abstract string IdleImplementation { get; }
 
@@ -98,7 +98,7 @@ namespace BenchmarkDotNet.Code
                 string value;
                 var type = IdleMethodReturnType;
                 if (type.GetTypeInfo().IsPrimitive)
-                    value = $"default({type.GetCorrectTypeName()})";
+                    value = $"default({type.GetCorrectCSharpTypeName()})";
                 else if (type.GetTypeInfo().IsClass || type.GetTypeInfo().IsInterface)
                     value = "null";
                 else

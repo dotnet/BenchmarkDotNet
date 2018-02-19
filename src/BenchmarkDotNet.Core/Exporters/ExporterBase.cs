@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
@@ -54,17 +55,14 @@ namespace BenchmarkDotNet.Exporters
 
         private static string GetFileName(Summary summary)
         {
-            var benchmarkTypes = summary.Benchmarks.Select(b => b.Target.Type).Distinct().Select(type => GetTypeName(type)).ToArray();
+            // few types might have the same name: A.Name and B.Name will both report "Name"
+            // in that case, we can not use the type name as file name because they would be getting overwritten #529
+            var typeNames = summary.Benchmarks.Select(b => b.Target.Type).Distinct().GroupBy(type => type.Name);
 
-            return benchmarkTypes.Length == 1 ? benchmarkTypes[0] : summary.Title;
+            if (typeNames.Count() == 1 && typeNames.First().Count() == 1)
+                return FolderNameHelper.ToFolderName(summary.Benchmarks.Select(b => b.Target.Type).First());
+
+            return summary.Title;
         }
-
-        // we can't simply use type.FullName, because for generics it's tooo long
-        // example: typeof(List<int>).FullName => "System.Collections.Generic.List`1[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
-        private static string GetTypeName(Type type)
-            => new StringBuilder(type.GetCorrectTypeName())
-                .Replace('<', '_')
-                .Replace('>', '_')
-                .ToString();
     }
 }
