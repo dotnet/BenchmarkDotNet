@@ -9,24 +9,30 @@ namespace BenchmarkDotNet.Columns
 {
     public class RankColumn : IColumn
     {
-        private readonly NumeralSystem system;
+        private readonly NumeralSystem numeralSystem;
 
-        public RankColumn(NumeralSystem system) => this.system = system;
+        public RankColumn(NumeralSystem system) => numeralSystem = system;
 
         [PublicAPI] public static readonly IColumn Arabic = new RankColumn(NumeralSystem.Arabic);
         [PublicAPI] public static readonly IColumn Roman = new RankColumn(NumeralSystem.Roman);
         [PublicAPI] public static readonly IColumn Stars = new RankColumn(NumeralSystem.Stars);
 
-        public string Id => nameof(RankColumn) + "." + system;
+        public string Id => nameof(RankColumn) + "." + numeralSystem;
         public string ColumnName => "Rank";
 
         public string GetValue(Summary summary, Benchmark benchmark)
         {
-            var logicalGroup = summary.GetLogicalGroupForBenchmark(benchmark).ToArray();
-            var ranks = RankHelper.GetRanks(logicalGroup.Select(b => summary[b].ResultStatistics).ToArray());
+            var logicalGroup = summary
+                .GetLogicalGroupForBenchmark(benchmark)
+                .Where(b => summary[b].ResultStatistics != null)
+                .ToArray();
             int index = Array.IndexOf(logicalGroup, benchmark);
+            if (index == -1)
+                return "?";
+            
+            var ranks = RankHelper.GetRanks(logicalGroup.Select(b => summary[b].ResultStatistics).ToArray());
             int rank = ranks[index];
-            return system.ToPresentation(rank);
+            return numeralSystem.ToPresentation(rank);
         }
 
         public bool IsDefault(Summary summary, Benchmark benchmark) => false;
@@ -36,8 +42,8 @@ namespace BenchmarkDotNet.Columns
         public bool IsNumeric => true;
         public UnitType UnitType => UnitType.Dimensionless;
         public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
-        public int PriorityInCategory => (int) system;
+        public int PriorityInCategory => (int) numeralSystem;
         public override string ToString() => ColumnName;
-        public string Legend => $"Relative position of current benchmark mean among all benchmarks ({system} style)";
+        public string Legend => $"Relative position of current benchmark mean among all benchmarks ({numeralSystem} style)";
     }
 }
