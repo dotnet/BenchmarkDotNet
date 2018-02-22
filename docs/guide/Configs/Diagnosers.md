@@ -152,7 +152,7 @@ public class Simple
 }
 ```
 
-<img src="Images/disasmDemo.png" width="800px" />
+<img src="../Images/disasmDemo.png" width="800px" />
 
 ### ALL JITs
 
