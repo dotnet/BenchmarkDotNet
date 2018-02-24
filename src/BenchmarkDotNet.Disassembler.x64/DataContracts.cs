@@ -4,7 +4,7 @@ using System.Text;
 using System.Xml.Serialization;
 
 namespace BenchmarkDotNet.Disassembler
-{    
+{
     public class Code
     {
         public string TextRepresentation { get; set; }
@@ -102,6 +102,18 @@ namespace BenchmarkDotNet.Disassembler
             sb.AppendLine(HasAVXSupport ? "AXV supported" : "AVX not supported");
             sb.AppendLine(new string('=', 100));
             return sb.ToString();
+        }
+
+        public static class Errors
+        {
+            public const string NotManagedMethod = "not managed method";
+        }
+
+        public static class DisassemblerConstants
+        {
+            public const string NotManagedMethod = "not managed method";
+
+            public const string DiassemblerEntryMethodName = "__ForDisassemblyDiagnoser__";
         }
     }
 }
