@@ -65,6 +65,7 @@ namespace BenchmarkDotNet.Diagnosers
         public DisassembledMethod[] Methods { get; set; }
     }
 
+
     public class DisassembledMethodAnnotation
     {
         public int TotalBytesOfCode { get; set; }
@@ -89,12 +90,12 @@ namespace BenchmarkDotNet.Diagnosers
             public const string NotManagedMethod = "not managed method";
         }
 
-        public static class DisassemblerConstants
-        {
-            public const string NotManagedMethod = "not managed method";
+    public static class DisassemblerConstants
+    {
+        public const string NotManagedMethod = "not managed method";
 
-            public const string DiassemblerEntryMethodName = "__ForDisassemblyDiagnoser__";
-        }
+        public const string DiassemblerEntryMethodName = "__ForDisassemblyDiagnoser__";
+
     }
 }
 #pragma warning restore CS3003 // Type is not CLS-compliant

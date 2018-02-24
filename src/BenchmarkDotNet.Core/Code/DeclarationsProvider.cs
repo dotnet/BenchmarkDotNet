@@ -45,6 +45,8 @@ namespace BenchmarkDotNet.Code
 
         public virtual string TargetMethodDelegate => Target.Method.Name;
 
+        public virtual string TargetMethodCall => $"{Target.Method.Name}()";
+
         public virtual string ConsumeField => null;
 
         protected abstract Type IdleMethodReturnType { get; }
@@ -137,6 +139,8 @@ namespace BenchmarkDotNet.Code
         public override string TargetMethodDelegate
             => $"() => {{ {Target.Method.Name}().GetAwaiter().GetResult(); }}";
 
+        public override string TargetMethodCall => $"{Target.Method.Name}().GetAwaiter().GetResult()";
+
         protected override Type TargetMethodReturnType => typeof(void);
     }
 
@@ -145,9 +149,7 @@ namespace BenchmarkDotNet.Code
     /// </summary>
     internal class GenericTaskDeclarationsProvider : NonVoidDeclarationsProvider
     {
-        public GenericTaskDeclarationsProvider(Target target) : base(target)
-        {
-        }
+        public GenericTaskDeclarationsProvider(Target target) : base(target) { }
 
         protected override Type TargetMethodReturnType => Target.Method.ReturnType.GetTypeInfo().GetGenericArguments().Single();
 
@@ -155,5 +157,7 @@ namespace BenchmarkDotNet.Code
         // and will eventually throw actual exception, not aggregated one
         public override string TargetMethodDelegate
             => $"() => {{ return {Target.Method.Name}().GetAwaiter().GetResult(); }}";
+
+        public override string TargetMethodCall => $"{Target.Method.Name}().GetAwaiter().GetResult()";
     }
 }

@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
         [Fact]
         public void RealTwoProcessorEightCoresTest()
         {
-            var cpuInfo = @"
+            const string cpuInfo = @"
 
 Name=Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
 NumberOfCores=8
@@ -50,7 +50,7 @@ NumberOfLogicalProcessors=16
         [Fact]
         public void RealOneProcessorFourCoresTest()
         {
-            var cpuInfo = @"
+            const string cpuInfo = @"
 
 Name=Intel(R) Core(TM) i7-4710MQ CPU @ 2.50GHz
 NumberOfCores=4

@@ -103,7 +103,7 @@ namespace BenchmarkDotNet.Diagnosers
             // it's sth like 
             // call    System_Private_CoreLib+0x577460 (00007ff8`59ae7460)
             // and we can not get managed method for this address
-            if (!string.IsNullOrEmpty(asm.Comment) && asm.Comment != Errors.NotManagedMethod)
+            if (!string.IsNullOrEmpty(asm.Comment) && asm.Comment != DisassemblerConstants.NotManagedMethod)
                 return (asm, address, byteRepresentation, instruction, asm.Comment, null);
 
             string arguments = NextWord(asm.TextRepresentation, ref i);
