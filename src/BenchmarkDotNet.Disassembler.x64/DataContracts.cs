@@ -4,7 +4,7 @@ using System.Text;
 using System.Xml.Serialization;
 
 namespace BenchmarkDotNet.Disassembler
-{    
+{
     public class Code
     {
         public string TextRepresentation { get; set; }
@@ -96,11 +96,12 @@ namespace BenchmarkDotNet.Disassembler
         {
             public const string NotManagedMethod = "not managed method";
         }
-      
-    public static class DisassemblerConstants
-    {
-        public const string NotManagedMethod = "not managed method";
 
-        public const string DiassemblerEntryMethodName = "__ForDisassemblyDiagnoser__";
+        public static class DisassemblerConstants
+        {
+            public const string NotManagedMethod = "not managed method";
+
+            public const string DiassemblerEntryMethodName = "__ForDisassemblyDiagnoser__";
+        }
     }
 }
