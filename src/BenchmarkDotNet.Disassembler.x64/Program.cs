@@ -67,9 +67,10 @@ namespace BenchmarkDotNet.Disassembler
 
                 ConfigureSymbols(dataTarget);
 
-                var state = new State(runtime, (IDebugControl)dataTarget.DebuggerInterface);
 
-                var disasembledMethods = Disassemble(settings, runtime, state);
+                var state = new State( runtime, (IDebugControl)dataTarget.DebuggerInterface);
+                List<DisassembledMethod> disasembledMethods = null;
+                disasembledMethods = Disassemble(settings, runtime, state);
 
                 // we don't want to export the disassembler entry point method which is just an artificial method added to get generic types working
                 var methodsToExport = disasembledMethods.Where(method => 
@@ -223,6 +224,7 @@ namespace BenchmarkDotNet.Disassembler
             EnqueueAllCallsFromIL(state, ilInstructions, methodInfo.Depth);
 
             return new DisassembledMethod
+
             {
                 Annotation = new DisassembledMethodAnnotation
                 {
@@ -415,7 +417,6 @@ namespace BenchmarkDotNet.Disassembler
             return null;
         }
 
-
         static string CecilNameToClrmdName(MethodReference method)
         {
             // Cecil returns sth like "System.Int32 System.Random::Next(System.Int32,System.Int32)"
@@ -508,7 +509,7 @@ namespace BenchmarkDotNet.Disassembler
             public int GetHashCode(Code obj) => obj.TextRepresentation.GetHashCode();
         }
     }
-
+    
     class Settings
     {
         private Settings(int processId, string typeName, string methodName, bool printAsm, bool printIL, bool printSource, bool printPrologAndEpilog, int recursiveDepth, string resultsPath)
