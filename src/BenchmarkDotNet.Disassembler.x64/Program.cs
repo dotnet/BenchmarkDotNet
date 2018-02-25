@@ -466,11 +466,6 @@ namespace BenchmarkDotNet.Disassembler
                             res += (int)ms.Length;
                         }
                     }
-                    foreach (var p in methodDefinition.GenericParameters)
-                    {
-                        Console.WriteLine("packing size: " + p.Resolve().PackingSize);
-                        res += p.Resolve().PackingSize;
-                    }
                 }
                 catch (Exception ex) { }
             }            
