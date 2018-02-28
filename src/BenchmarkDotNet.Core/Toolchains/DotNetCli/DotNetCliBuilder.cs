@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         private string CustomDotNetCliPath { get; }
 
-        internal abstract string RestoreCommand { get; }
+        public abstract string RestoreCommand { get; }
 
         [PublicAPI]
         public DotNetCliBuilder(string targetFrameworkMoniker, string customDotNetCliPath = null)
@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             CustomDotNetCliPath = customDotNetCliPath;
         }
 
-        internal abstract string GetBuildCommand(string frameworkMoniker, bool justTheProjectItself, string configuration);
+        public abstract string GetBuildCommand(string frameworkMoniker, bool justTheProjectItself, string configuration);
 
         public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark, IResolver resolver)
         {

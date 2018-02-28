@@ -6,9 +6,9 @@ namespace BenchmarkDotNet.Toolchains.CsProj
     [PublicAPI]
     public class CsProjBuilder : DotNetCliBuilder
     {
-        internal override string RestoreCommand => "restore --no-dependencies";
+        public override string RestoreCommand => "restore --no-dependencies";
 
-        internal override string GetBuildCommand(string frameworkMoniker, bool justTheProjectItself, string configuration)
+        public override string GetBuildCommand(string frameworkMoniker, bool justTheProjectItself, string configuration)
             => $"build --framework {frameworkMoniker} --configuration {configuration} --no-restore"
                + (justTheProjectItself ? " --no-dependencies" : string.Empty);
 
