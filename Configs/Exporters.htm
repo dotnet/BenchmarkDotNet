@@ -357,7 +357,7 @@ public class IntroJsonExport2
 &lt;BenchmarkName&gt;-&lt;MethodName&gt;-facetTimelineSmooth.png
 &lt;BenchmarkName&gt;-&lt;MethodName&gt;-&lt;JobName&gt;-timelineSmooth.png
 &lt;BenchmarkName&gt;-&lt;MethodName&gt;-&lt;JobName&gt;-timelineSmooth.png
-</pre><p>A config example:</p>
+</pre><p>A config example in C#:</p>
 <pre><code class="cs">public class Config : ManualConfig
 {
     public Config()
@@ -366,6 +366,35 @@ public class IntroJsonExport2
         Add(RPlotExporter.Default);
     }
 }
+</code></pre>
+
+<p>A config example in F#:</p>
+<pre><code class="fs">module MyBenchmark
+
+open BenchmarkDotNet.Attributes
+open BenchmarkDotNet.Configs
+open BenchmarkDotNet.Exporters
+open BenchmarkDotNet.Exporters.Csv
+open MyProjectUnderTest
+
+type MyConfig() as this =
+    inherit ManualConfig()
+    do
+        this.Add(CsvMeasurementsExporter.Default)
+        this.Add(RPlotExporter.Default)
+
+[&lt;
+  MemoryDiagnoser; 
+  Config(typeof&lt;MyConfig&gt;);
+  RPlotExporter
+&gt;]
+type MyPerformanceTests() =
+
+    let someTestData = getTestDataAsList ()
+
+    [&lt;Benchmark&gt;]
+    member __.SomeTestCase() = 
+        someTestData |&gt; myFunctionUnderTest
 </code></pre>
 
 <h2 id="csv">CSV<a class="headerlink" href="#csv" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>

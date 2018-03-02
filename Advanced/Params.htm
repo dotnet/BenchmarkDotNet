@@ -267,49 +267,48 @@ As a result, you will get results for each combination of params values.</p>
 <h1 id="iparam">IParam<a class="headerlink" href="#iparam" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
 <p>In case you want to use values which are not compile-time constants, you have to create a type which implements <code>IParam</code> interface. This is required because internally BenchmarkDotNet generates and compiles code for every benchmark. We know how to deal with primitive types, but we don't want to implement complex logic for creating complex types. This responsibility is transferred to the users ;)</p>
 <h2 id="example-iparam">Example (IParam)<a class="headerlink" href="#example-iparam" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
-<p>```cs
- public class IntroIParam
+<pre><code class="cs">public class IntroIParam
 {
     public struct VeryCustomStruct
     {
-        public readonly int X, Y;</p>
-<pre><code>    public VeryCustomStruct(int x, int y)
-    {
-        X = x;
-        Y = y;
+        public readonly int X, Y;
+
+        public VeryCustomStruct(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
     }
+
+    public class CustomParam : IParam
+    {
+        private readonly VeryCustomStruct value;
+
+        public CustomParam(VeryCustomStruct value) =&gt; this.value = value;
+
+        public object Value =&gt; value;
+
+        public string DisplayText =&gt; $&quot;({value.X},{value.Y})&quot;;
+
+        public string ToSourceCode() =&gt; $&quot;new VeryCustomStruct({value.X}, {value.Y})&quot;;
+    }
+
+    [ParamsSource(nameof(Parameters))]
+    public VeryCustomStruct Field;
+
+    public IEnumerable&lt;IParam&gt; Parameters()
+    {
+        yield return new CustomParam(new VeryCustomStruct(100, 10));
+        yield return new CustomParam(new VeryCustomStruct(100, 20));
+        yield return new CustomParam(new VeryCustomStruct(200, 10));
+        yield return new CustomParam(new VeryCustomStruct(200, 20));
+    }
+
+    [Benchmark]
+    public void Benchmark() =&gt; Thread.Sleep(Field.X + Field.Y);
 }
-
-public class CustomParam : IParam
-{
-    private readonly VeryCustomStruct value;
-
-    public CustomParam(VeryCustomStruct value) =&gt; this.value = value;
-
-    public object Value =&gt; value;
-
-    public string DisplayText =&gt; $&quot;({value.X},{value.Y})&quot;;
-
-    public string ToSourceCode() =&gt; $&quot;new VeryCustomStruct({value.X}, {value.Y})&quot;;
-}
-
-[ParamsSource(nameof(Parameters))]
-public VeryCustomStruct Field;
-
-public IEnumerable&lt;IParam&gt; Parameters()
-{
-    yield return new CustomParam(new VeryCustomStruct(100, 10));
-    yield return new CustomParam(new VeryCustomStruct(100, 20));
-    yield return new CustomParam(new VeryCustomStruct(200, 10));
-    yield return new CustomParam(new VeryCustomStruct(200, 20));
-}
-
-[Benchmark]
-public void Benchmark() =&gt; Thread.Sleep(Field.X + Field.Y);
 </code></pre>
 
-<p>}
-```</p>
 <table class="table table-bordered-all table-responsive">
 <thead>
 <tr>

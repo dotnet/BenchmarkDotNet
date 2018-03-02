@@ -97,7 +97,8 @@
 <li class="tocentry"><a href="#multiple-frameworks-support">Multiple frameworks support</a></li>
 <li class="tocentry"><a href="#custom-.net-core-runtime">Custom .NET Core Runtime</a></li>
 <li class="tocentry"><a href="#custom-dotnet-cli-path">Custom dotnet cli path</a></li>
-<li class="tocentry"><a href="#inprocesstoolchain">InProcessToolchain</a></li>
+<li class="tocentry"><a href="#custom-coreclr-and-corefx">Custom CoreCLR and CoreFX</a></li>
+<li class="tocentry"><a href="#cs">InProcessToolchain</a></li>
 </ul>
 <li class="tocentry"><a href="../Configs/Analyzers.htm">Analyzers</a>
 </li>
@@ -242,7 +243,75 @@ Frequency=2742185 Hz, Resolution=364.6727 ns, Timer=TSC
 Jit=RyuJit  
 </code></pre>
 
-<h2 id="inprocesstoolchain">InProcessToolchain<a class="headerlink" href="#inprocesstoolchain" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<h2 id="custom-coreclr-and-corefx">Custom CoreCLR and CoreFX<a class="headerlink" href="#custom-coreclr-and-corefx" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>BenchmarkDotNet allows the users to run their benchmarks against ANY CoreCLR and CoreFX builds. You can compare your local build vs MyGet feed or Debug vs Release or one version vs another.</p>
+<p>Sample config:</p>
+<pre><code class="cs">public class LocalCoreClrConfig : ManualConfig
+{
+    public LocalCoreClrConfig()
+    {
+        Add(Job.ShortRun.With(
+            new CustomCoreClrToolchain(
+                &quot;local builds&quot;,
+                coreClrNuGetFeed: @&quot;C:\Projects\forks\coreclr\bin\Product\Windows_NT.x64.Release\.nuget\pkg&quot;,
+                coreClrVersion: &quot;2.1.0-preview2-26313-0&quot;,
+                coreFxNuGetFeed: @&quot;C:\Projects\forks\corefx\bin\packages\Release&quot;,
+                coreFxVersion: &quot;4.5.0-preview2-26313-0&quot;)
+        ));
+
+        Add(Job.ShortRun.With(
+            new CustomCoreClrToolchain(
+                &quot;local coreclr myget corefx&quot;,
+                coreClrNuGetFeed: @&quot;C:\Projects\forks\coreclr\bin\Product\Windows_NT.x64.Release\.nuget\pkg&quot;,
+                coreClrVersion: &quot;2.1.0-preview2-26313-0&quot;,
+                coreFxNuGetFeed: &quot;https://dotnet.myget.org/F/dotnet-core/api/v3/index.json&quot;,
+                coreFxVersion: &quot;4.5.0-preview2-26215-01&quot;)
+        ));
+
+        Add(Job.ShortRun.With(
+            new CustomCoreClrToolchain(
+                &quot;myget coreclr local corefx&quot;,
+                coreClrNuGetFeed: &quot;https://dotnet.myget.org/F/dotnet-core/api/v3/index.json&quot;,
+                coreClrVersion: &quot;2.1.0-preview2-26214-07&quot;,
+                coreFxNuGetFeed: @&quot;C:\Projects\forks\corefx\bin\packages\Release&quot;,
+                coreFxVersion: &quot;4.5.0-preview2-26313-0&quot;)
+        ));
+
+        Add(Job.ShortRun.With(
+            new CustomCoreClrToolchain(
+                &quot;myget builds&quot;,
+                coreClrNuGetFeed: &quot;https://dotnet.myget.org/F/dotnet-core/api/v3/index.json&quot;,
+                coreClrVersion: &quot;2.1.0-preview2-26214-07&quot;,
+                coreFxNuGetFeed: &quot;https://dotnet.myget.org/F/dotnet-core/api/v3/index.json&quot;,
+                coreFxVersion: &quot;4.5.0-preview2-26215-01&quot;)
+        ));
+
+
+        Add(DefaultConfig.Instance.GetExporters().ToArray());
+        Add(DefaultConfig.Instance.GetLoggers().ToArray());
+        Add(DefaultConfig.Instance.GetColumnProviders().ToArray());
+
+        Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(printAsm: true, recursiveDepth: 2)));
+    }
+}
+</code></pre>
+
+<p>To make sure that you are running against the expected version of CoreCLR and CoreFX you just need to check the CoreCLR and CoreFX version numbers in the output:</p>
+<pre class="nocode">BenchmarkDotNet=v0.10.12.20180215-develop, OS=Windows 10 Redstone 3 [1709, Fall Creators Update] (10.0.16299.192)
+Intel Core i7-3687U CPU 2.10GHz (Ivy Bridge), 1 CPU, 4 logical cores and 2 physical cores
+Frequency=2533308 Hz, Resolution=394.7408 ns, Timer=TSC
+.NET Core SDK=2.1.300-preview2-008162
+  [Host]     : .NET Core 2.0.5 (CoreCLR 4.6.26020.03, CoreFX 4.6.26018.01), 64bit RyuJIT
+  Job-DHYYZE : .NET Core ? (CoreCLR 4.6.26313.0, CoreFX 4.6.26313.0), 64bit RyuJIT
+  Job-VGTPFY : .NET Core ? (CoreCLR 4.6.26313.0, CoreFX 4.6.26215.01), 64bit RyuJIT
+  Job-IYZFNW : .NET Core ? (CoreCLR 4.6.26214.07, CoreFX 4.6.26215.01), 64bit RyuJIT
+  Job-CTQFFQ : .NET Core ? (CoreCLR 4.6.26214.07, CoreFX 4.6.26313.0), 64bit RyuJIT
+</pre><p>To support two most common scenarios we provide following methods: <code>CreateForLocalCoreFxBuild</code> and <code>CreateForNightlyCoreFxBuild</code>. Both methods allow to target custom CoreFX builds running on the default installed .NET Runtime.</p>
+<p>```cs
+CustomCoreClrToolchain.CreateForNightlyCoreFxBuild(&quot;4.5.0-preview2-26215-01&quot;);</p>
+<p>CustomCoreClrToolchain.CreateForLocalCoreFxBuild(@&quot;C:\Projects\forks\corefx\bin\packages\Release&quot;, &quot;4.5.0-preview2-26313-0&quot;);
+``</p>
+<h2 id="cs">InProcessToolchain<a class="headerlink" href="#cs" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <p>InProcessToolchain is our toolchain which does not generate any new executable. It emits IL on the fly and runs it from within the process itself. It can be usefull if want to run the benchmarks very fast or if you want to run them for framework which we don't support. An example could be a local build of CoreCLR.</p>
 <pre><code class="cs">[Config(typeof(Config))]
 public class IntroInProcess

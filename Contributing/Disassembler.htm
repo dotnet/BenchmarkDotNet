@@ -163,7 +163,7 @@ In this app, you need to run the desired code (to get it jitted) and just don't 
             var result = Benchmark(); // execute the benchmark do method gets jitted
 
             Console.WriteLine($&quot;{Process.GetCurrentProcess().Id} &quot; + // process Id
-                $&quot;{typeof(Program).FullName} &quot; + // full type name
+                $&quot;\&quot;{typeof(Program).FullName}\&quot; &quot; + // full type name
                 $&quot;{nameof(Benchmark)} &quot; + // benchmarked method name
                 $&quot;{bool.TrueString} &quot; + // printAsm
                 $&quot;{bool.FalseString} &quot; + // printIL
@@ -200,7 +200,7 @@ In this app, you need to run the desired code (to get it jitted) and just don't 
 }
 </code></pre>
 
-<p><strong>Important</strong>: Please remember that every new classic .NET project in VS compiles as 32 bit. If you want to check the asm produced for x64 you need to go to the properites of the console app (Alt+Enter) and uncheck &quot;Prefer 32 bit&quot; in the &quot;Buid&quot; tab.</p>
+<p><strong>Important</strong>: Please remember that every new classic .NET project in VS compiles as 32 bit. If you want to check the asm produced for x64 you need to go to the properites of the console app (Alt+Enter) and uncheck &quot;Prefer 32 bit&quot; in the &quot;Build&quot; tab.</p>
 <p>Once you configure your app, you should run it. It will give you an output similar to this:</p>
 <p><code>13672 ConsoleApp1.RandomSort ArraySort True True True True 7 C:\Users\adsitnik\AppData\Local\Temp\tmpDCB9.tmp.xml</code></p>
 <p>Now you go to BenchmarkDotNet solution, select desired Disassembler project in the Solution Explorer and Set it as Startup project. After this you go to the project's properties and in the Debug tab copy-paste the arguments for the disassembler. Now when you start debugging, your IDE will spawn new process of the disassembler with the right arguments to attach to the desired exe. You should be able to debug it like any othe app.</p>

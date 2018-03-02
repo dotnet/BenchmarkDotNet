@@ -123,24 +123,21 @@
 <h1 id="faq-frequently-asked-questions">FAQ (Frequently asked questions)<a class="headerlink" href="#faq-frequently-asked-questions" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
 <ul>
 <li>
-<p><strong>Q</strong> Why can't I install BenchmarkDotNet in Visual Studio 2010/2012/2013?<br />
- <strong>A</strong>
-BenchmarkDotNet requires NuGet 3.x+ and can't be installed in old versions of Visual Studio which use NuGet 2.x.
+<p><strong>Q</strong> Why can't I install BenchmarkDotNet in Visual Studio 2010/2012/2013?</p>
+<p><strong>A</strong> BenchmarkDotNet requires NuGet 3.x+ and can't be installed in old versions of Visual Studio which use NuGet 2.x.
 Consider to use Visual Studio 2015/2017 or <a href="http://jetbrains.com/rider/" target="_blank">Rider</a>.
 See also: <a href="https://github.com/dotnet/BenchmarkDotNet/issues/237" target="_blank">BenchmarkDotNet#237</a>, <a href="https://github.com/dotnet/roslyn/issues/12780" target="_blank">roslyn#12780</a>.</p>
 </li>
 <li>
-<p><strong>Q</strong> Why can't I install BenchmarkDotNet in a new .NET Core Console App in Visual Studio 2017?<br />
-<strong>A</strong> BenchmarkDotNet supports only netcoreapp1.1+.
+<p><strong>Q</strong> Why can't I install BenchmarkDotNet in a new .NET Core Console App in Visual Studio 2017?</p>
+<p><strong>A</strong> BenchmarkDotNet supports only netcoreapp1.1+.
 By default, Visual Studio 2017 creates a new application which targets netcoreapp1.0.
 You should upgrade it up to 1.1.
 If you want to target netcoreapp1.0 in your main assembly, it's recommended to create a separated project for benchmarks.</p>
 </li>
 <li>
-<p><strong>Q</strong> I created a new .NET Core Console App in Visual Studio 2017. Now I want to run my code on CoreCLR, full .NET Framework, and Mono. How can I do it?<br />
-<strong>A</strong> Use the following lines in your <code>.csproj</code> file:</p>
-</li>
-</ul>
+<p><strong>Q</strong> I created a new .NET Core Console App in Visual Studio 2017. Now I want to run my code on CoreCLR, full .NET Framework, and Mono. How can I do it?</p>
+<p><strong>A</strong> Use the following lines in your <code>.csproj</code> file:</p>
 <pre><code class="xml">&lt;TargetFrameworks&gt;netcoreapp1.1;net46&lt;/TargetFrameworks&gt;
 &lt;PlatformTarget&gt;AnyCPU&lt;/PlatformTarget&gt;
 </code></pre>
@@ -149,37 +146,33 @@ If you want to target netcoreapp1.0 in your main assembly, it's recommended to c
 <pre><code class="cs">[CoreJob, ClrJob, MonoJob]
 </code></pre>
 
-<ul>
+</li>
 <li>
-<p><strong>Q</strong> My source code targets old versions of .NET Framework or .NET Core, but BenchmarkDotNet requires <code>net46</code> and <code>netcoreapp1.1</code>. How can I run benchmarks in this case?<br />
-<strong>A</strong> It's a good practice to introduce an additional console application (e.g. <code>MyAwesomeLibrary.Benchmarks</code>) which will depend on your code and BenchmarkDotNet.
+<p><strong>Q</strong> My source code targets old versions of .NET Framework or .NET Core, but BenchmarkDotNet requires <code>net46</code> and <code>netcoreapp1.1</code>. How can I run benchmarks in this case?</p>
+<p><strong>A</strong> It's a good practice to introduce an additional console application (e.g. <code>MyAwesomeLibrary.Benchmarks</code>) which will depend on your code and BenchmarkDotNet.
 Due to the fact that users usually run benchmarks in a develop environment and don't distribute benchmarks for users, it shouldn't be a problem.</p>
 </li>
 <li>
-<p><strong>Q</strong> I wrote a small benchmark, but BenchmarkDotNet requires a lot of time for time measurements. How can I reduce this time?<br />
-<strong>A</strong> By default, BenchmarkDotNet automatically chooses a number of iterations which allows achieving the best precision.
+<p><strong>Q</strong> I wrote a small benchmark, but BenchmarkDotNet requires a lot of time for time measurements. How can I reduce this time?</p>
+<p><strong>A</strong> By default, BenchmarkDotNet automatically chooses a number of iterations which allows achieving the best precision.
 If you don't need such level of precision and just want to have a quick way to get approximated results, you can specify all parameters manually.
 For example, you can use the <code>SimpleJob</code> or <code>ShortRunJob</code> attributes:</p>
-</li>
-</ul>
 <pre><code class="cs">[SimpleJob(launchCount: 1, warmupCount: 3, targetCount: 5, invocationCount:100, id: &quot;QuickJob&quot;)]
 [ShortRunJob]
 </code></pre>
 
-<ul>
-<li>
-<p><strong>Q</strong> My benchmark unexpectedly stopped and I saw the information about error code. What can I do?<br />
-<strong>A</strong> BenchmarkDotNet generates, builds and runs new process for every benchmark. This behavior is sometimes interpreted by anti-virus as dangerous, and the process is killed. Use <code>EnvironmentAnalyser</code> to detect antivirus software and configure your benchmark to use <code>InProcessToolchain</code>.</p>
 </li>
 <li>
-<p><strong>Q</strong> Can I run benchmark on the virtual machine?<br />
-<strong>A</strong> Yes, of course. However, it can affect results because of the shared, physical machine, virtualization process and incorrect <code>Stopwatch.Frequency</code>. If you are unsure whether an application is running on virtual environment, use <code>EnvironmentAnalyser</code> to detect VM hypervisor.</p>
+<p><strong>Q</strong> My benchmark unexpectedly stopped and I saw the information about error code. What can I do?</p>
+<p><strong>A</strong> BenchmarkDotNet generates, builds and runs new process for every benchmark. This behavior is sometimes interpreted by anti-virus as dangerous, and the process is killed. Use <code>EnvironmentAnalyser</code> to detect antivirus software and configure your benchmark to use <code>InProcessToolchain</code>.</p>
+</li>
+<li>
+<p><strong>Q</strong> Can I run benchmark on the virtual machine?</p>
+<p><strong>A</strong> Yes, of course. However, it can affect results because of the shared, physical machine, virtualization process and incorrect <code>Stopwatch.Frequency</code>. If you are unsure whether an application is running on virtual environment, use <code>EnvironmentAnalyser</code> to detect VM hypervisor.</p>
 </li>
 <li>
 <p><strong>Q</strong> I have failed to run my benchmarks, I am getting following errors about non-optimized dll. What can I do?  
 </p>
-</li>
-</ul>
 <pre class="nocode">Assembly BenchmarkDotNet.Samples which defines benchmarks references non-optimized BenchmarkDotNet
         If you own this dependency, please, build it in RELEASE.
         If you don't, you can create custom config with DontFailOnError to disable our custom policy and allow this b
@@ -199,13 +192,16 @@ Benchmark was built without optimization enabled (most probably a DEBUG configur
 }
 </code></pre>
 
-<ul>
-<li><strong>Q</strong> I have failed to run my benchmarks from LINQPad. How can I fix this problem?  </li>
-</ul>
+</li>
+<li>
+<p><strong>Q</strong> I have failed to run my benchmarks from LINQPad. How can I fix this problem?  
+</p>
 <pre class="nocode">Assembly LINQPadQuery which defines benchmarks references non-optimized LINQPad
 Assembly LINQPadQuery which defines benchmarks is non-optimized
 Benchmark was built without optimization enabled (most probably a DEBUG configuration). Please, build it in RELEASE.
 </pre><p><strong>A</strong> You need to make sure that you are using <strong>AnyCPU</strong> 5.22.05+ build of LINQPad with optimizations enabled. To enable the optimizations you need to go to Preferences -&gt; Query and select <code>compile with /optimize+</code></p>
+</li>
+</ul>
 
                     </div>
                 </div>
