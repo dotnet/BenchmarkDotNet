@@ -116,7 +116,7 @@ namespace BenchmarkDotNet.Columns
                     case DiffKind.Mean:
                         return "Mean(CurrentBenchmark) / Mean(BaselineBenchmark)";
                     case DiffKind.StdDev:
-                        return "Standard deviation of ratio of distibution of [CurrentBenchmark] and [BaselineBenchmark]";
+                        return "Standard deviation of ratio of distribution of [CurrentBenchmark] and [BaselineBenchmark]";
                     case DiffKind.WelchTTestPValue:
                         return "p-value for Welch's t-test of [CurrentbBenchmark] and [BaselineBenchmark]";
                     default:
