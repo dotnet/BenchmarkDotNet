@@ -20,8 +20,7 @@ namespace BenchmarkDotNet.Characteristics
             if (obj.HasValue(characteristic))
                 return characteristic[obj];
 
-            Func<CharacteristicObject, object> resolver;
-            if (resolvers.TryGetValue(characteristic, out resolver))
+            if (resolvers.TryGetValue(characteristic, out var resolver))
                 return resolver(obj);
             throw new InvalidOperationException($"There is no default resolver for {characteristic.FullId}");
         }
@@ -31,8 +30,7 @@ namespace BenchmarkDotNet.Characteristics
             if (obj.HasValue(characteristic))
                 return characteristic[obj];
 
-            Func<CharacteristicObject, object> resolver;
-            if (resolvers.TryGetValue(characteristic, out resolver))
+            if (resolvers.TryGetValue(characteristic, out var resolver))
                 return (T)resolver(obj);
             throw new InvalidOperationException($"There is no default resolver for {characteristic.FullId}");
         }

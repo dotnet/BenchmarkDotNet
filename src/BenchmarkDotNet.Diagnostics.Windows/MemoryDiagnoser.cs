@@ -57,8 +57,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             if (BenchmarkToProcess.Count > 0)
             {
                 var processToReport = BenchmarkToProcess[benchmark];
-                Stats stats;
-                if (StatsPerProcess.TryGetValue(processToReport, out stats))
+                if (StatsPerProcess.TryGetValue(processToReport, out Stats stats))
                 {
                     stats.TotalOperations = totalOperations;
                     return stats;
@@ -71,15 +70,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             session.Source.Clr.GCAllocationTick += gcData =>
             {
-                Stats stats;
-                if (StatsPerProcess.TryGetValue(gcData.ProcessID, out stats))
+                if (StatsPerProcess.TryGetValue(gcData.ProcessID, out Stats stats))
                     stats.AllocatedBytes += gcData.AllocationAmount64;
             };
 
             session.Source.Clr.GCStart += gcData =>
             {
-                Stats stats;
-                if (StatsPerProcess.TryGetValue(gcData.ProcessID, out stats))
+                if (StatsPerProcess.TryGetValue(gcData.ProcessID, out Stats stats))
                 {
                     var genCounts = stats.GenCounts;
                     if (gcData.Depth >= 0 && gcData.Depth < genCounts.Length)

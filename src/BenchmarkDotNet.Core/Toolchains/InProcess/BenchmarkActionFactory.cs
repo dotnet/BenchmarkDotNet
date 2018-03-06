@@ -23,9 +23,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             BenchmarkActionCodegen codegenMode,
             int unrollFactor)
         {
-            Type resultType;
-            object resultInstance;
-            PrepareInstanceAndResultType(instance, targetMethod, fallbackIdleSignature, out resultInstance, out resultType);
+            PrepareInstanceAndResultType(instance, targetMethod, fallbackIdleSignature, out object resultInstance, out Type resultType);
 
             if (resultType == typeof(void))
                 return new BenchmarkActionVoid(resultInstance, targetMethod, codegenMode, unrollFactor);

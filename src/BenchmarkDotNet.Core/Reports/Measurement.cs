@@ -83,8 +83,7 @@ namespace BenchmarkDotNet.Reports
                 var iterationInfo = lineSplit[0];
                 var iterationInfoSplit = iterationInfo.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 var iterationMode = ParseIterationMode(iterationInfoSplit[0]);
-                var iterationIndex = 0;
-                int.TryParse(iterationInfoSplit[1], out iterationIndex);
+                int.TryParse(iterationInfoSplit[1], out int iterationIndex);
 
                 var measurementsInfo = lineSplit[1];
                 var measurementsInfoSplit = measurementsInfo.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
@@ -117,8 +116,7 @@ namespace BenchmarkDotNet.Reports
 
         private static IterationMode ParseIterationMode(string name)
         {
-            IterationMode mode;
-            return Enum.TryParse(name, out mode) ? mode : IterationMode.Unknown;
+            return Enum.TryParse(name, out IterationMode mode) ? mode : IterationMode.Unknown;
         }
 
         public int CompareTo(Measurement other) => Nanoseconds.CompareTo(other.Nanoseconds);

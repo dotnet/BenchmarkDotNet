@@ -299,8 +299,7 @@ namespace BenchmarkDotNet.Disassembler
 
         static string ReadSourceLine(string file, int line)
         {
-            string[] contents;
-            if (!SourceFileCache.TryGetValue(file, out contents))
+            if (!SourceFileCache.TryGetValue(file, out string[] contents))
             {
                 if (!File.Exists(file)) // sometimes the symbols report some disk location from MS CI machine like "E:\A\_work\308\s\src\mscorlib\shared\System\Random.cs" for .NET Core 2.0
                     return null;

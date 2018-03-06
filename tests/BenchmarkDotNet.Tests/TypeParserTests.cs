@@ -143,7 +143,7 @@ namespace BenchmarkDotNet.Tests
             var matches = matcher.Match("classes=ClassC,ClassA", "methods=Method2");
 
             // ClassC not matched as it has NO methods with the [Benchmark] attribute
-            // ClassA only Method2 got matched because it it's classes AND methods #249
+            // ClassA only Method2 got matched because we're matching classes AND methods #249
             Assert.Single(matches);
             Assert.Equal(1, matches.Count(match => match.Type.Name == "ClassA" && match.Methods.All(m => m.Name == "Method2")));
         }
