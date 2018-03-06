@@ -120,7 +120,7 @@ namespace BenchmarkDotNet.Exporters
         // we want to get sth like "00007ffb`a90f4560"
         internal static string FormatMethodAddress(ulong nativeCode)
         {
-            if(nativeCode == default(ulong))
+            if(nativeCode == default)
                 return string.Empty;
 
             var buffer = new StringBuilder(nativeCode.ToString("x"));

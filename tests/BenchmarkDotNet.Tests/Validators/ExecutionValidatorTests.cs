@@ -122,7 +122,7 @@ namespace BenchmarkDotNet.Tests.Validators
             [GlobalSetup]
             public void Failing()
             {
-                if (Field == default(int))
+                if (Field == default)
                     throw new Exception("this should have never happened");
             }
 
@@ -149,7 +149,7 @@ namespace BenchmarkDotNet.Tests.Validators
             [GlobalSetup]
             public void Failing()
             {
-                if (Field == default(int))
+                if (Field == default)
                     throw new Exception("Field is missing Params attribute");
             }
 

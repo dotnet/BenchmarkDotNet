@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Horology
         {
             if (!Portability.RuntimeInformation.IsWindows())
             {
-                qpf = default(long);
+                qpf = default;
                 return false;
             }
 
@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Horology
             }
             catch
             {
-                qpf = default(long);
+                qpf = default;
                 return false;
             }
         }
