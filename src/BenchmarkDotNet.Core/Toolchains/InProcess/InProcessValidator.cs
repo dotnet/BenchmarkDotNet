@@ -110,8 +110,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         {
             foreach (var characteristic in job.GetCharacteristicsWithValues())
             {
-                Func<Job, Characteristic, string> validationRule;
-                if (ValidationRules.TryGetValue(characteristic, out validationRule))
+                if (ValidationRules.TryGetValue(characteristic, out var validationRule))
                 {
                     var message = validationRule(job, characteristic);
                     if (!string.IsNullOrEmpty(message))
