@@ -70,10 +70,10 @@ namespace BenchmarkDotNet.IntegrationTests
                 Console.WriteLine(EngineRunMessage);
 
                 return new RunResults(
-                    new List<Measurement>() { default(Measurement) }, 
-                    new List<Measurement>() { default(Measurement) },
+                    new List<Measurement>() { default }, 
+                    new List<Measurement>() { default },
                     false,
-                    default(GcStats));
+                    default);
             }
 
             public IHost Host { get; }

@@ -262,7 +262,7 @@ namespace BenchmarkDotNet.Exporters
             internal IReadOnlyList<IReadOnlyList<CodeWithCounters>> Instructions { get; set; }
             internal IReadOnlyDictionary<HardwareCounter, ulong> SumPerCounter { get; set; }
 
-            internal bool HasCounters => SumPerCounter.Values.Any(value => value != default(ulong));
+            internal bool HasCounters => SumPerCounter.Values.Any(value => value != default);
         }
     }
 }

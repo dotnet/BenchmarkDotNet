@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Tests.Mocks
             var measurements = Enumerable.Range(0, n)
                 .Select(index => new Measurement(1, IterationMode.Result, index + 1, 1, nanoseconds + index))
                 .ToList();
-            return new BenchmarkReport(benchmark, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default(GcStats));
+            return new BenchmarkReport(benchmark, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default);
         }
 
         [LongRunJob]
