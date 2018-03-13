@@ -49,12 +49,12 @@ This diagnoser is not enabled in explicit way as the other diagnosers. You need 
 
 ```cs
 [HardwareCounters(HardwareCounter.BranchMispredictions, HardwareCounter.BranchInstructions)]
-public class Cpu_BranchPerdictor
+public class Cpu_BranchPredictor
 {
     private const int N = 32767;
     private readonly int[] sorted, unsorted;
 
-    public Cpu_BranchPerdictor()
+    public Cpu_BranchPredictor()
     {
         var random = new Random(0);
         unsorted = new int[N];
@@ -152,7 +152,7 @@ public class Simple
 }
 ```
 
-<img src="Images/disasmDemo.png" width="800px" />
+<img src="../Images/disasmDemo.png" width="800px" />
 
 ### ALL JITs
 

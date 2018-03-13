@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Tests.Mocks
 
         public void Jitting() { }
 
-        public RunResults Run() => default(RunResults);
+        public RunResults Run() => default;
 
         public void WriteLine() => output.WriteLine("");
         public void WriteLine(string line) => output.WriteLine(line);

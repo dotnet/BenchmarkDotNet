@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Running
         {
             foreach (var type in types.Where(type => !type.ContainsRunnableBenchmarks()).ToArray())
             {
-                logger.WriteLineError($"Type {type} is invalid. Only public, non-generic, non-abstract, non-sealed types with public instance [Benchmark] method(s) are supported");
+                logger.WriteLineError($"Type {type} is invalid. Only public, non-generic (closed generic types with public parameterless ctors are supported), non-abstract, non-sealed types with public instance [Benchmark] method(s) are supported.");
             }
 
             typeParser = new TypeParser(types.Where(type => type.ContainsRunnableBenchmarks()).ToArray(), logger);
@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.Running
             {
                 foreach (var typeWithMethods in typeParser.MatchingTypesWithMethods(args))
                 {
-                    logger.WriteLineHeader("Target type: " + typeWithMethods.Type.Name);
+                    logger.WriteLineHeader("Target type: " + typeWithMethods.Type.GetDisplayName());
                     if (typeWithMethods.AllMethodsInType)
                         summaries.Add(BenchmarkRunner.Run(typeWithMethods.Type, effectiveConfig));
                     else

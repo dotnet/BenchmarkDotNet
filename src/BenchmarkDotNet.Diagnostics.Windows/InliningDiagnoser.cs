@@ -41,8 +41,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             {
                 // Inliner = the parent method (the inliner calls the inlinee)
                 // Inlinee = the method that is going to be "inlined" inside the inliner (it's caller)                
-                object ignored;
-                if (StatsPerProcess.TryGetValue(jitData.ProcessID, out ignored))
+                if (StatsPerProcess.TryGetValue(jitData.ProcessID, out object ignored))
                 {
                     var shouldPrint = !logFailuresOnly
                         && (!filterByNamespace
@@ -60,8 +59,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             session.Source.Clr.MethodInliningFailed += jitData =>
             {
-                object ignored;
-                if (StatsPerProcess.TryGetValue(jitData.ProcessID, out ignored))
+                if (StatsPerProcess.TryGetValue(jitData.ProcessID, out object ignored))
                 {
                     var shouldPrint = !filterByNamespace
                                       || jitData.InlinerNamespace.StartsWith(expectedNamespace)

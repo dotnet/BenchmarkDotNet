@@ -68,8 +68,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 }
             }
 
-            private static T IdleStatic() => default(T);
-            private T IdleInstance() => default(T);
+            private static T IdleStatic() => default;
+            private T IdleInstance() => default;
 
             private void InvokeSingleHardcoded() => result = callback();
 
@@ -160,7 +160,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 }
             }
 
-            private T Idle() => default(T);
+            private T Idle() => default;
 
             // must be kept in sync with GenericTaskDeclarationsProvider.TargetMethodDelegate
             private T ExecuteBlocking() => startTaskCallback().GetAwaiter().GetResult();
@@ -209,7 +209,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 }
             }
 
-            private T Idle() => default(T);
+            private T Idle() => default;
 
             // must be kept in sync with GenericTaskDeclarationsProvider.TargetMethodDelegate
             private T ExecuteBlocking() => startTaskCallback().GetAwaiter().GetResult();

@@ -91,7 +91,7 @@ namespace BenchmarkDotNet.Extensions
 
 #if !NETCOREAPP2_0 //  this method was added to the .NET Core 2.0 framework itself ;)
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
-            => dictionary.TryGetValue(key, out TValue value) ? value : default(TValue);
+            => dictionary.TryGetValue(key, out TValue value) ? value : default;
 #endif
 
         public static double Sqr(this double x) => x * x;

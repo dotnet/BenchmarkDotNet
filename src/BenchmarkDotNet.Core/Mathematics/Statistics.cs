@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using BenchmarkDotNet.Extensions;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Mathematics
 {
@@ -121,8 +122,10 @@ namespace BenchmarkDotNet.Mathematics
         /// <summary>
         /// Mean for [X/Y].
         /// </summary>        
-        public static double DivMean(Statistics x, Statistics y)
+        public static double DivMean([CanBeNull] Statistics x, [CanBeNull] Statistics y)
         {
+            if (x == null || y == null)
+                return double.NaN;
             var yInvert = y.Invert();
             if (yInvert == null)
                 throw new DivideByZeroException();
@@ -140,8 +143,10 @@ namespace BenchmarkDotNet.Mathematics
         /// <summary>
         /// Variance for [X/Y].
         /// </summary>        
-        public static double DivVariance(Statistics x, Statistics y)
+        public static double DivVariance([CanBeNull] Statistics x, [CanBeNull] Statistics y)
         {
+            if (x == null || y == null)
+                return double.NaN;
             var yInvert = y.Invert();
             if (yInvert == null)
                 throw new DivideByZeroException();

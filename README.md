@@ -1,6 +1,7 @@
 ![](docs/guide/logo/logo-wide.png)
 
-[![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/) [![Gitter](https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet.svg)](https://gitter.im/dotnet/BenchmarkDotNet) [![Build status](https://img.shields.io/appveyor/ci/dotnetfoundation/benchmarkdotnet/master.svg?label=appveyor)](https://ci.appveyor.com/project/dotnetfoundation/benchmarkdotnet/branch/master) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md) [![Overview](https://img.shields.io/badge/docs-Overview-green.svg?style=flat)](http://benchmarkdotnet.org/Overview.htm) [![ChangeLog](https://img.shields.io/badge/docs-ChangeLog-green.svg?style=flat)](https://github.com/dotnet/BenchmarkDotNet/wiki/ChangeLog)
+
+[![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/) [![Gitter](https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet.svg)](https://gitter.im/dotnet/BenchmarkDotNet) [![AppVeyor](https://img.shields.io/appveyor/ci/dotnetfoundation/benchmarkdotnet/master.svg?label=appveyor)](https://ci.appveyor.com/project/dotnetfoundation/benchmarkdotnet/branch/master) [![Travis](https://travis-ci.org/dotnet/BenchmarkDotNet.svg?branch=master)](https://travis-ci.org/dotnet/BenchmarkDotNet) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md) [![Overview](https://img.shields.io/badge/docs-Overview-green.svg?style=flat)](http://benchmarkdotnet.org/Overview.htm) [![ChangeLog](https://img.shields.io/badge/docs-ChangeLog-green.svg?style=flat)](https://github.com/dotnet/BenchmarkDotNet/wiki/ChangeLog)
 
 **BenchmarkDotNet** is a powerful .NET library for benchmarking.
 
@@ -36,29 +37,48 @@ It's very easy to start using BenchmarkDotNet.
 Let's look at an example:
 
 ```cs
-[ClrJob(isBaseline: true), CoreJob, MonoJob]
-[RPlotExporter, RankColumn]
-public class Md5VsSha256
+using System;
+using System.Security.Cryptography;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes.Columns;
+using BenchmarkDotNet.Attributes.Exporters;
+using BenchmarkDotNet.Attributes.Jobs;
+using BenchmarkDotNet.Running;
+
+namespace MyBenchmarks
 {
-    private SHA256 sha256 = SHA256.Create();
-    private MD5 md5 = MD5.Create();
-    private byte[] data;
-
-    [Params(1000, 10000)]
-    public int N;
-
-    [GlobalSetup]
-    public void Setup()
+    [ClrJob(isBaseline: true), CoreJob, MonoJob]
+    [RPlotExporter, RankColumn]
+    public class Md5VsSha256
     {
-        data = new byte[N];
-        new Random(42).NextBytes(data);
+        private SHA256 sha256 = SHA256.Create();
+        private MD5 md5 = MD5.Create();
+        private byte[] data;
+
+        [Params(1000, 10000)]
+        public int N;
+
+        [GlobalSetup]
+        public void Setup()
+        {
+            data = new byte[N];
+            new Random(42).NextBytes(data);
+        }
+
+        [Benchmark]
+        public byte[] Sha256() => sha256.ComputeHash(data);
+
+        [Benchmark]
+        public byte[] Md5() => md5.ComputeHash(data);
     }
 
-    [Benchmark]
-    public byte[] Sha256() => sha256.ComputeHash(data);
-
-    [Benchmark]
-    public byte[] Md5() => md5.ComputeHash(data);
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var summary = BenchmarkRunner.Run<Md5VsSha256>();
+        }
+    }
 }
 ```
 
@@ -149,7 +169,7 @@ The library is used by a large number of projects for performance discussions or
 * [Accord.NET Framework](https://github.com/accord-net/framework/tree/development/Tools/Performance)
 * [ImageSharp](https://github.com/SixLabors/ImageSharp/tree/master/tests/ImageSharp.Benchmarks)
 * [RavenDB](https://github.com/ravendb/ravendb/tree/v4.0/bench)
-* [NodeTime](https://github.com/nodatime/nodatime/tree/master/src/NodaTime.Benchmarks)
+* [NodaTime](https://github.com/nodatime/nodatime/tree/master/src/NodaTime.Benchmarks)
 * [Jint](https://github.com/sebastienros/jint/tree/dev/Jint.Benchmark)
 * [NServiceBus](https://github.com/Particular/NServiceBus/issues?utf8=✓&q=+BenchmarkDotNet+)
 * [Serilog](https://github.com/serilog/serilog/tree/dev/test/Serilog.PerformanceTests)

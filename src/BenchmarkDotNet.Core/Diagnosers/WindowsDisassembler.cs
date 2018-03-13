@@ -151,8 +151,7 @@ namespace BenchmarkDotNet.Diagnosers
                     return false;
 
 #if !NETCOREAPP1_1
-                bool isWow64;
-                if (!IsWow64Process(process.Handle, out isWow64))
+                if (!IsWow64Process(process.Handle, out bool isWow64))
                     throw new Exception("Not Windows");
                 return !isWow64;
 #else

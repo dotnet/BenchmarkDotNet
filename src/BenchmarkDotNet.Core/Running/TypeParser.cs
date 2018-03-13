@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Running
             while (args.Length == 0)
             {
                 PrintAvailable();
-                var benchmarkCaptionExample = allTypes.Length == 0 ? "Intro_00" : allTypes.First().Name;
+                var benchmarkCaptionExample = allTypes.Length == 0 ? "Intro_00" : allTypes.First().GetDisplayName();
                 logger.WriteLineHelp(
                     $"You should select the target benchmark. Please, print a number of a benchmark (e.g. '0') or a benchmark caption (e.g. '{benchmarkCaptionExample}'):");
                 var line = Console.ReadLine() ?? "";
@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Running
                 var type = allTypes[i];
                 var typeInfo = type.GetTypeInfo();
 
-                if (args.Any(arg => type.Name.ToLower().StartsWith(arg.ToLower()))
+                if (args.Any(arg => type.GetDisplayName().ToLower().StartsWith(arg.ToLower()))
                     || args.Contains("#" + i)
                     || args.Contains("" + i)
                     || args.Contains("*"))
@@ -111,7 +111,7 @@ namespace BenchmarkDotNet.Running
                 typePredicates.Add(type => rules.namespaces.Contains(type.Namespace));
 
             if (rules.classes.Any())
-                typePredicates.Add(type => rules.classes.Contains(type.Name) || rules.classes.Contains(type.FullName));
+                typePredicates.Add(type => rules.classes.Contains(type.GetDisplayName()) || rules.classes.Contains(type.FullName));
 
             if (rules.attributes.Any())
             {
@@ -239,7 +239,7 @@ namespace BenchmarkDotNet.Running
 
             int numberWidth = allTypes.Length.ToString().Length;
             for (int i = 0; i < allTypes.Length; i++)
-                logger.WriteLineHelp(string.Format(CultureInfo.InvariantCulture, "  #{0} {1}", i.ToString().PadRight(numberWidth), allTypes[i].Name));
+                logger.WriteLineHelp(string.Format(CultureInfo.InvariantCulture, "  #{0} {1}", i.ToString().PadRight(numberWidth), allTypes[i].GetDisplayName()));
             logger.WriteLine();
             logger.WriteLine();
         }

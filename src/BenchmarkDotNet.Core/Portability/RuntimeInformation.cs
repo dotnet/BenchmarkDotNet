@@ -253,7 +253,7 @@ namespace BenchmarkDotNet.Portability
 #endif
         }
 
-        internal static IntPtr GetCurrentAffinity() => Process.GetCurrentProcess().TryGetAffinity() ?? default(IntPtr);
+        internal static IntPtr GetCurrentAffinity() => Process.GetCurrentProcess().TryGetAffinity() ?? default;
 
         internal static string GetConfiguration()
         {

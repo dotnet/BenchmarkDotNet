@@ -28,8 +28,7 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 Count += (ulong)Interval;
 
-                ulong currentValue = 0;
-                PerInstructionPointer.TryGetValue(instructionPointer, out currentValue);
+                PerInstructionPointer.TryGetValue(instructionPointer, out ulong currentValue);
                 PerInstructionPointer[instructionPointer] = currentValue + (ulong)Interval;
             }
         }

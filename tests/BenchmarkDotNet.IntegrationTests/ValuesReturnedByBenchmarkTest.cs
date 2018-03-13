@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public DateTime? ReturnNotNullForNullableType() => DateTime.UtcNow;
 
             [Benchmark]
-            public DateTime ReturnDefaultValueForValueType() => default(DateTime);
+            public DateTime ReturnDefaultValueForValueType() => default;
 
             [Benchmark]
             public DateTime ReturnNonDefaultValueForValueType() => DateTime.UtcNow;

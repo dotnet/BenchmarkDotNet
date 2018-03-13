@@ -129,8 +129,7 @@ namespace BenchmarkDotNet.Characteristics
         #region Get value
         public bool HasValue(Characteristic characteristic)
         {
-            object result;
-            if (sharedValues.TryGetValue(characteristic, out result))
+            if (sharedValues.TryGetValue(characteristic, out object result))
                 return !ReferenceEquals(result, Characteristic.EmptyValue);
 
             return false;
@@ -143,8 +142,7 @@ namespace BenchmarkDotNet.Characteristics
 
         internal object GetValue(Characteristic characteristic)
         {
-            object result;
-            if (!sharedValues.TryGetValue(characteristic, out result))
+            if (!sharedValues.TryGetValue(characteristic, out object result))
                 result = Characteristic.EmptyValue;
 
             return ResolveCore(characteristic, result);
@@ -272,8 +270,7 @@ namespace BenchmarkDotNet.Characteristics
             oldValues.Remove(thisCharacteristic);
             foreach (var characteristic in GetCharacteristicsToApply())
             {
-                object value;
-                if (oldValues.TryGetValue(characteristic, out value))
+                if (oldValues.TryGetValue(characteristic, out object value))
                 {
                     oldValues.Remove(characteristic);
                     SetValueCore(characteristic, value);
@@ -336,8 +333,7 @@ namespace BenchmarkDotNet.Characteristics
 
             foreach (var characteristic in characteristicsToApply)
             {
-                object value;
-                if (!other.sharedValues.TryGetValue(characteristic, out value))
+                if (!other.sharedValues.TryGetValue(characteristic, out object value))
                     continue;
 
                 if (characteristic.HasChildCharacteristics)
