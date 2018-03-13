@@ -10,7 +10,10 @@ var integrationTestsProjectPath = "./tests/BenchmarkDotNet.IntegrationTests/Benc
 var isRunningOnWindows = IsRunningOnWindows();
 var IsOnAppVeyorAndNotPR = AppVeyor.IsRunningOnAppVeyor && !AppVeyor.Environment.PullRequest.IsPullRequest;
 
-var msBuildSettings = new DotNetCoreMSBuildSettings();
+var msBuildSettings = new DotNetCoreMSBuildSettings
+{
+    MaxCpuCount = 1
+};
 
 Setup(_ =>
 {
