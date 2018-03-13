@@ -22,8 +22,6 @@ Setup(_ =>
         frameworkPathOverride = System.IO.Path.Combine(System.IO.Directory.GetParent(frameworkPathOverride).FullName, "4.6-api/");
         Information("Build will use FrameworkPathOverride={0} since not building on Windows.", frameworkPathOverride);
         msBuildSettings.WithProperty("FrameworkPathOverride", frameworkPathOverride);
-
-        configuration = "Debug"; // strong naming fails with F# project
     }
 });
 
@@ -37,10 +35,7 @@ Task("Restore")
     .IsDependentOn("Clean")
     .Does(() =>
     {
-        DotNetCoreRestore(solutionFile, new DotNetCoreRestoreSettings
-        {
-            Verbosity = DotNetCoreVerbosity.Minimal
-        });
+        DotNetCoreRestore(solutionFile);
     });
 
 Task("Build")
