@@ -6,12 +6,11 @@ var skipTests = Argument("SkipTests", false);
 // GLOBAL VARIABLES
 var artifactsDirectory = Directory("./artifacts");
 var solutionFile = "./BenchmarkDotNet.sln";
-var solutionFileBackup = solutionFile + ".build.backup";
 var integrationTestsProjectPath = "./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj";
 var isRunningOnWindows = IsRunningOnWindows();
 var IsOnAppVeyorAndNotPR = AppVeyor.IsRunningOnAppVeyor && !AppVeyor.Environment.PullRequest.IsPullRequest;
 
-DotNetCoreMSBuildSettings msBuildSettings = new DotNetCoreMSBuildSettings();
+var msBuildSettings = new DotNetCoreMSBuildSettings();
 
 Setup(_ =>
 {
@@ -23,6 +22,8 @@ Setup(_ =>
         frameworkPathOverride = System.IO.Path.Combine(System.IO.Directory.GetParent(frameworkPathOverride).FullName, "4.6-api/");
         Information("Build will use FrameworkPathOverride={0} since not building on Windows.", frameworkPathOverride);
         msBuildSettings.WithProperty("FrameworkPathOverride", frameworkPathOverride);
+
+        configuration = "Debug"; // strong naming fails with F# project
     }
 });
 
@@ -36,7 +37,10 @@ Task("Restore")
     .IsDependentOn("Clean")
     .Does(() =>
     {
-        DotNetCoreRestore(solutionFile);
+        DotNetCoreRestore(solutionFile, new DotNetCoreRestoreSettings
+        {
+            Verbosity = DotNetCoreVerbosity.Minimal
+        });
     });
 
 Task("Build")
@@ -44,11 +48,12 @@ Task("Build")
     .Does(() =>
     {
         var path = MakeAbsolute(new DirectoryPath(solutionFile));
-        DotNetCoreBuild(path.FullPath, new DotNetCoreBuildSettings()
+        DotNetCoreBuild(path.FullPath, new DotNetCoreBuildSettings
         {
             Configuration = configuration,
             NoRestore = true,
             DiagnosticOutput = true,
+            //NoIncremental = true,
             MSBuildSettings = msBuildSettings,
             Verbosity = DotNetCoreVerbosity.Minimal
         });
