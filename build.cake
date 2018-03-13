@@ -53,7 +53,6 @@ Task("Build")
             Configuration = configuration,
             NoRestore = true,
             DiagnosticOutput = true,
-            //NoIncremental = true,
             MSBuildSettings = msBuildSettings,
             Verbosity = DotNetCoreVerbosity.Minimal
         });
@@ -135,7 +134,7 @@ RunTarget(target);
 // HELPERS
 private string GetTestSettingsParameters(string tfm)
 {
-    var settings = $"-configuration Release -stoponfail -maxthreads unlimited -nobuild  -framework {tfm}";
+    var settings = $"-configuration {configuration} -stoponfail -maxthreads unlimited -nobuild  -framework {tfm}";
     if(string.Equals("netcoreapp2.0", tfm, StringComparison.OrdinalIgnoreCase))
     {
         settings += " --fx-version 2.0.5";
