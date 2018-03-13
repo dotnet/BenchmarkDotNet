@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
 
@@ -41,7 +42,7 @@ namespace BenchmarkDotNet.Mathematics
 
         public Statistics(IEnumerable<double> values)
         {
-            list = values.ToList();
+            list = values.Where(d => !double.IsNaN(d)).ToList();
             N = list.Count;
             if (N == 0)
                 throw new InvalidOperationException("Sequence of values contains no elements, Statistics can't be calculated");
@@ -81,6 +82,7 @@ namespace BenchmarkDotNet.Mathematics
         public ConfidenceInterval GetConfidenceInterval(ConfidenceLevel level, int n) => new ConfidenceInterval(Mean, StandardError, n, level);
         public bool IsOutlier(double value) => value < LowerFence || value > UpperFence;
         public double[] WithoutOutliers() => list.Where(value => !IsOutlier(value)).ToArray();
+        public IEnumerable<double> GetValues() => list;
 
         public double CalcCentralMoment(int k) => list.Average(x => (x - Mean).Pow(k));
 

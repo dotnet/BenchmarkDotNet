@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Exporters
                 {
                     logger.WriteLine();
                     logger.WriteLineHeader($"* Statistics for {mode}");
-                    logger.WriteLineStatistic(runs.Where(it => it.IterationMode == mode).GetStatistics().ToTimeStr());
+                    logger.WriteLineStatistic(runs.Where(it => it.IterationMode == mode).GetStatistics().ToTimeStr(calcHistogram: true));
                 }
             }
         }

@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Columns
             Percentiles,
             Additional
         }
-
+        
         public static readonly IColumn Mean = new StatisticColumn("Mean", "Arithmetic mean of all measurements",
             s => s.Mean, Priority.Main);
 
@@ -52,6 +52,15 @@ namespace BenchmarkDotNet.Columns
 
         public static readonly IColumn Kurtosis = new StatisticColumn("Kurtosis", "Measure of the tailedness ( fourth standardized moment)",
             s => s.Kurtosis, Priority.Additional, UnitType.Dimensionless);
+
+        /// <summary>
+        /// See http://www.brendangregg.com/FrequencyTrails/modes.html
+        /// </summary>
+        public static readonly IColumn MValue = new StatisticColumn("MValue", "Modal value, see http://www.brendangregg.com/FrequencyTrails/modes.html",
+            MathHelper.CalculateMValue, Priority.Additional, UnitType.Dimensionless);
+        
+        public static readonly IColumn Iterations = new StatisticColumn("Iterations", "Number of target iterations",
+            s => s.N, Priority.Additional, UnitType.Dimensionless);
 
         public static readonly IColumn P0 = CreatePercentileColumn(0, s => s.Percentiles.P0);
         public static readonly IColumn P25 = CreatePercentileColumn(25, s => s.Percentiles.P25);
