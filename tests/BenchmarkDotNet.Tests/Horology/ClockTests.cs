@@ -2,6 +2,7 @@
 using System.Threading;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Tests.XUnit;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -47,7 +48,7 @@ namespace BenchmarkDotNet.Tests.Horology
             }
         }
 
-        [Fact]
+        [NotTravisFactAttribute] // #684
         public void ChronometerTest()
         {
             var clock = Chronometer.BestClock;
