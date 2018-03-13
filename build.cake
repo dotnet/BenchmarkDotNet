@@ -11,28 +11,18 @@ var integrationTestsProjectPath = "./tests/BenchmarkDotNet.IntegrationTests/Benc
 var isRunningOnWindows = IsRunningOnWindows();
 var IsOnAppVeyorAndNotPR = AppVeyor.IsRunningOnAppVeyor && !AppVeyor.Environment.PullRequest.IsPullRequest;
 
+DotNetCoreMSBuildSettings msBuildSettings = new DotNetCoreMSBuildSettings();
+
 Setup(_ =>
 {
     if(!isRunningOnWindows)
     {
         StartProcess("mono", new ProcessSettings { Arguments = "--version" });
-        
-        // create solution backup
-        CopyFile(solutionFile, solutionFileBackup);
-        // and exclude VB projects
-        ExcludeVBProjectsFromSolution();
-    }
-});
-
-Teardown(_ =>
-{
-    if(!isRunningOnWindows && BuildSystem.IsLocalBuild)
-    {
-        if(FileExists(solutionFileBackup)) // Revert back solution file
-        {
-            DeleteFile(solutionFile);
-            MoveFile(solutionFileBackup, solutionFile);
-        } 
+        var frameworkPathOverride = new FilePath(typeof(object).Assembly.Location).GetDirectory().FullPath;
+        // setup correct version
+        frameworkPathOverride = System.IO.Path.Combine(System.IO.Directory.GetParent(frameworkPathOverride).FullName, "4.6-api/");
+        Information("Build will use FrameworkPathOverride={0} since not building on Windows.", frameworkPathOverride);
+        msBuildSettings.WithProperty("FrameworkPathOverride", frameworkPathOverride);
     }
 });
 
@@ -53,33 +43,15 @@ Task("Build")
     .IsDependentOn("Restore")
     .Does(() =>
     {
-        var buildSettings = new MSBuildSettings()
-            .SetConfiguration(configuration)
-            .WithTarget("Rebuild")
-            .SetVerbosity(Verbosity.Minimal)
-            .UseToolVersion(MSBuildToolVersion.VS2017)
-            .SetMSBuildPlatform(MSBuildPlatform.Automatic)
-            .SetPlatformTarget(PlatformTarget.MSIL) // Any CPU
-            .SetNodeReuse(true);
-
-        if(!isRunningOnWindows)
-        {
-            // hack for Linux bug - missing MSBuild path
-            if(new CakePlatform().Family == PlatformFamily.Linux)
-            {
-                var monoVersion = GetMonoVersionMoniker();
-                var isMSBuildSupported = monoVersion != null && System.Text.RegularExpressions.Regex.IsMatch(monoVersion,@"([5-9]|\d{2,})\.\d+\.\d+(\.\d+)?");
-                if(isMSBuildSupported)
-                {
-                    Information(string.Format("Auto-detected ToolPath value is `{0}`", buildSettings.ToolPath));
-                    buildSettings.ToolPath = new FilePath(@"/usr/lib/mono/msbuild/15.0/bin/MSBuild.dll");
-                    Information(string.Format("Mono supports MSBuild. Override ToolPath value with `{0}`", buildSettings.ToolPath));
-                }
-            }
-        }
-
         var path = MakeAbsolute(new DirectoryPath(solutionFile));
-        MSBuild(path.FullPath, buildSettings);
+        DotNetCoreBuild(path.FullPath, new DotNetCoreBuildSettings()
+        {
+            Configuration = configuration,
+            NoRestore = true,
+            DiagnosticOutput = true,
+            MSBuildSettings = msBuildSettings,
+            Verbosity = DotNetCoreVerbosity.Minimal
+        });
     });
 
 Task("FastTests")
@@ -169,26 +141,4 @@ private string GetTestSettingsParameters(string tfm)
     }
     
     return settings;
-}
-
-private void ExcludeVBProjectsFromSolution()
-{
-    // exclude projects
-    var vbProjects = GetFiles("./tests/**/*.vbproj");
-    var projects = string.Join(" ", vbProjects.Select(x => string.Format("\"{0}\"", x))); // if path contains spaces
-    StartProcess("dotnet", new ProcessSettings { Arguments = "sln remove " + projects });
-}
-
-private string GetMonoVersionMoniker()
-{
-    var type = Type.GetType("Mono.Runtime");
-    if (type != null)
-    {
-        var displayName = type.GetMethod("GetDisplayName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-        if (displayName != null)
-        {
-            return displayName.Invoke(null, null).ToString();
-        }
-    }
-    return null;
 }
