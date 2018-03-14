@@ -20,5 +20,7 @@ namespace BenchmarkDotNet.Horology
         [Pure] public long GetDateTimeTicks() => (long) Math.Round(GetSeconds() * TimeSpan.TicksPerSecond);
         [Pure] public TimeSpan GetTimeSpan() => new TimeSpan(GetDateTimeTicks());
         [Pure] public TimeInterval GetTimeInterval() => new TimeInterval(GetNanoseconds());
+
+        public override string ToString() => $"ClockSpan({startTimestamp} ticks, {endTimestamp} ticks, {frequency.Hertz} Hz)";
     }
 }

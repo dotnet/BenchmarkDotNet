@@ -12,5 +12,7 @@
         }
 
         public ClockSpan GetElapsed() => new ClockSpan(startTimestamp, clock.GetTimestamp(), clock.Frequency);
+
+        public override string ToString() => $"StartedClock({clock.Title}, {startTimestamp} ticks)";
     }
 }

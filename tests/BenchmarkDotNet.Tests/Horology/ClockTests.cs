@@ -48,25 +48,39 @@ namespace BenchmarkDotNet.Tests.Horology
             }
         }
 
-        [NotTravisFactAttribute] // #684
+        [Fact]
         public void ChronometerTest()
         {
             var clock = Chronometer.BestClock;
+            output.WriteLine($"Chronometer.BestClock = {clock.Title} ({clock.Frequency.Hertz} Hz)");
+            output.WriteLine("-----");
 
             long chronometerTimestamp1 = Chronometer.GetTimestamp();
             long clockTimestamp1 = clock.GetTimestamp();
             long clockTimestamp2 = clock.GetTimestamp();
             long chronometerTimestamp2 = Chronometer.GetTimestamp();
-
-            Assert.True(chronometerTimestamp2 - chronometerTimestamp1 > clockTimestamp2 - clockTimestamp1);
+            output.WriteLine($"chronometerTimestamp1 = {chronometerTimestamp1}");
+            output.WriteLine($"clockTimestamp1       = {clockTimestamp1}");
+            output.WriteLine($"clockTimestamp2       = {clockTimestamp2}");
+            output.WriteLine($"chronometerTimestamp2 = {chronometerTimestamp2}");
+            output.WriteLine("-----");
+            Assert.True(chronometerTimestamp2 - chronometerTimestamp1 >= clockTimestamp2 - clockTimestamp1);
 
             var chronometerStared = Chronometer.Start();
             var clockStarted = clock.Start();
             var clockElapsed = clockStarted.GetElapsed();
             var chronometerElapsed = chronometerStared.GetElapsed();
-
+            output.WriteLine($"chronometerStared                    = {chronometerStared}");
+            output.WriteLine($"clockStarted                         = {clockStarted}");
+            output.WriteLine($"clockElapsed                         = {clockElapsed}");
+            output.WriteLine($"chronometerElapsed                   = {chronometerElapsed}");
+            output.WriteLine($"chronometerElapsed.GetTimeInterval() = {chronometerElapsed.GetTimeInterval()}");
+            output.WriteLine($"clockElapsed.GetTimeInterval()       = {clockElapsed.GetTimeInterval()}");
+            output.WriteLine("-----");
             Assert.True(chronometerElapsed.GetTimeInterval() >= clockElapsed.GetTimeInterval());
 
+            output.WriteLine($"Chronometer.GetResolution().Nanoseconds = {Chronometer.GetResolution().Nanoseconds}");
+            output.WriteLine($"clock.GetResolution().Nanoseconds       = {clock.GetResolution().Nanoseconds}");
             Assert.Equal(Chronometer.GetResolution().Nanoseconds, clock.GetResolution().Nanoseconds, 5);
         }
     }
