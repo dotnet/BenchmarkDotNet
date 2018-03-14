@@ -118,3 +118,49 @@ public class IntroIParam
 | Benchmark | (100,20) | 120.4 ms | 0.0843 ms | 0.0788 ms |
 | Benchmark | (200,10) | 210.4 ms | 0.0892 ms | 0.0834 ms |
 | Benchmark | (200,20) | 220.4 ms | 0.0949 ms | 0.0887 ms |
+
+# ParamsAllValues
+
+If you want to use all possible values of an `enum` or another type with a small number of values, you can use `ParamsAllValues`, instead of listing all the values by hand. The types supported by this attribute are:
+
+* `bool`
+* any `enum` that is not marked with `[Flags]`
+* `Nullable<T>`, where `T` is a supported type
+
+## Example (ParamsAllValues)
+
+```c#
+public class IntroParamsAllValues
+{
+    public enum CustomEnum
+    {
+        A,
+        BB,
+        CCC
+    }
+
+    [ParamsAllValues]
+    public CustomEnum E { get; set; }
+
+    [ParamsAllValues]
+    public bool? B { get; set; }
+
+    [Benchmark]
+    public void Benchmark()
+    {
+        Thread.Sleep(E.ToString().Length * 100 + (B == true ? 20 : B == false ? 10 : 0));
+    }
+}
+```
+
+|    Method |   E |     B |     Mean |     Error |    StdDev |
+|---------- |---- |------ |---------:|----------:|----------:|
+| Benchmark |   A |     ? | 100.3 ms | 0.0364 ms | 0.0341 ms |
+| Benchmark |   A | False | 110.3 ms | 0.0563 ms | 0.0527 ms |
+| Benchmark |   A |  True | 120.3 ms | 0.0448 ms | 0.0419 ms |
+| Benchmark |  BB |     ? | 200.3 ms | 0.0386 ms | 0.0342 ms |
+| Benchmark |  BB | False | 210.3 ms | 0.0554 ms | 0.0518 ms |
+| Benchmark |  BB |  True | 220.3 ms | 0.0517 ms | 0.0458 ms |
+| Benchmark | CCC |     ? | 300.3 ms | 0.0213 ms | 0.0178 ms |
+| Benchmark | CCC | False | 310.3 ms | 0.0457 ms | 0.0428 ms |
+| Benchmark | CCC |  True | 320.3 ms | 0.0390 ms | 0.0345 ms |

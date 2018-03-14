@@ -164,24 +164,26 @@ namespace BenchmarkDotNet.Running
 
         private static ParameterDefinitions GetParameterDefinitions(Type type)
         {
-            const BindingFlags reflectionFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+            IEnumerable<ParameterDefinition> GetDefinitions<TAttribute>(Func<TAttribute, Type, object[]> getValidValues) where TAttribute : Attribute
+            {
+                const BindingFlags reflectionFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
-            var allParamsMembers = type.GetTypeMembersWithGivenAttribute<ParamsAttribute>(reflectionFlags);
+                var allMembers = type.GetTypeMembersWithGivenAttribute<TAttribute>(reflectionFlags);
 
-            var allParamsSourceMembers = type.GetTypeMembersWithGivenAttribute<ParamsSourceAttribute>(reflectionFlags);
-
-            var definitions = allParamsMembers
-                .Select(member =>
+                return allMembers.Select(member =>
                     new ParameterDefinition(
                         member.Name,
                         member.IsStatic,
-                        GetValidValues(member.Attribute.Values, member.ParameterType)))
-                .Concat(allParamsSourceMembers.Select(member =>
-                    new ParameterDefinition(
-                        member.Name,
-                        member.IsStatic,
-                        GetValidValuesForParamsSource(type, member.Attribute.Name))))
-                .ToArray();
+                        getValidValues(member.Attribute, member.ParameterType)));
+            }
+
+            var paramsDefinitions = GetDefinitions<ParamsAttribute>((attribute, parameterType) => GetValidValues(attribute.Values, parameterType));
+
+            var paramsSourceDefinitions = GetDefinitions<ParamsSourceAttribute>((attribute, _) => GetValidValuesForParamsSource(type, attribute.Name));
+
+            var paramsAllValuesDefinitions = GetDefinitions<ParamsAllValuesAttribute>((_, paramaterType) => GetAllValidValues(paramaterType));
+
+            var definitions = paramsDefinitions.Concat(paramsSourceDefinitions).Concat(paramsAllValuesDefinitions).ToArray();
 
             return new ParameterDefinitions(definitions);
         }
@@ -275,6 +277,27 @@ namespace BenchmarkDotNet.Running
                 values.Add(value);
 
             return values.ToArray();
+        }
+
+        private static object[] GetAllValidValues(Type parameterType)
+        {
+            if (parameterType == typeof(bool))
+                return new object[] { false, true };
+
+            if (parameterType.GetTypeInfo().IsEnum)
+            {
+                if (parameterType.GetTypeInfo().IsDefined(typeof(FlagsAttribute)))
+                    throw new InvalidOperationException($"Unable to use {parameterType.Name} with [ParamsAllValues], because it's flags enum.");
+
+                return Enum.GetValues(parameterType).Cast<object>().ToArray();
+            }
+
+            var nullableUnderlyingType = Nullable.GetUnderlyingType(parameterType);
+            if (nullableUnderlyingType != null)
+                return new object[] { null }.Concat(GetAllValidValues(nullableUnderlyingType)).ToArray();
+
+            throw new InvalidOperationException(
+                $"Type {parameterType.Name} cannot be used with [ParamsAllValues], allowed types are: bool, enum types and nullable type for another allowed type.");
         }
     }
 }
