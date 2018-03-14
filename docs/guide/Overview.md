@@ -131,7 +131,7 @@ public class Md5VsSha256
     }
 ```
 
-Read more:  [Jobs](Configs/Jobs.htm), [Configs](Configs/Configs.htm)
+Read more:  [Jobs](Configs/Jobs.md), [Configs](Configs/Configs.md)
 
 
 ## Columns
@@ -150,7 +150,7 @@ public class Md5VsSha256
 
 Of course, you can define own columns based on full benchmark summary.
 
-Read more:  [Columns](Configs/Columns.htm)
+Read more:  [Columns](Configs/Columns.md)
 
 ## Exporters
 
@@ -165,7 +165,7 @@ If you have installed R, `RPlotExporter` will generate a lot of nice plots:
 
 <img src="Images/Overview-RPlot.png" width="800px" />
 
-Read more:  [Exporters](Configs/Exporters.htm)
+Read more:  [Exporters](Configs/Exporters.md)
 
 ## Baseline
 
@@ -193,7 +193,7 @@ As a result, you will have additional column in the summary table:
 | Time150 | 150.2093 ms | 0.1034 ms | 1.50   |
 | Time50  | 50.2509 ms  | 0.1153 ms | 0.50   |
 
-Read more:  [Baseline](Advanced/Baseline.htm)
+Read more:  [Baseline](Advanced/Baseline.md)
 
 ## Params
 
@@ -223,7 +223,7 @@ public class IntroParams
 | Benchmark | 215.3024 ms | 0.0375 ms | 200  | 10   |
 | Benchmark | 225.2710 ms | 0.0434 ms | 200  | 20   |
 
-Read more:  [Params](Advanced/Params.htm)
+Read more:  [Params](Advanced/Params.md)
 
 ## Languages
 
@@ -284,7 +284,7 @@ Below is a sample output from the `MemoryDiagnoser`, note the extra columns on t
       LINQ | 83.0435 ns | 1.0103 ns | 0.0069 |      32 B | 
 ```
 
-Read more:  [Diagnosers](Configs/Diagnosers.htm)
+Read more:  [Diagnosers](Configs/Diagnosers.md)
 
 ## BenchmarkRunner
 
@@ -301,4 +301,4 @@ string benchmarkSource = "public class MyBenchmarkClass { ...";
 var summary = BenchmarkRunner.RunSource(benchmarkSource);
 ```
 
-Read more:  [HowToRun](HowToRun.htm)
+Read more:  [HowToRun](HowToRun.md)
