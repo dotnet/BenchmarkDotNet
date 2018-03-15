@@ -1,6 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.CsProj;
 
 namespace BenchmarkDotNet.Toolchains
@@ -18,11 +19,10 @@ namespace BenchmarkDotNet.Toolchains
             {
                 case ClrRuntime clr:
                 case MonoRuntime mono:
-#if CLASSIC
+                    if(RuntimeInformation.IsNetCore)
+                        return CsProjClassicNetToolchain.Current.Value;
+
                     return new Roslyn.RoslynToolchain();
-#else
-                    return CsProjClassicNetToolchain.Current.Value;
-#endif
                 case CoreRuntime core:
                     return CsProjCoreToolchain.Current.Value;
                 default:
