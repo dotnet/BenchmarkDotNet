@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Parameters;
 
@@ -25,5 +26,7 @@ namespace BenchmarkDotNet.Running
         public int CompareTo(Benchmark other) => string.Compare(FolderInfo, other.FolderInfo, StringComparison.Ordinal);
 
         public bool IsBaseline() => Target.Baseline || Job.Meta.IsBaseline;
+
+        public bool HasArguments => Parameters != null && Parameters.Items.Any(parameter => parameter.IsArgument);
     }
 }
