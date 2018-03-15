@@ -72,8 +72,6 @@ if (!(Test-Path $InstallPath)) {
 }
 (New-Object System.Net.WebClient).DownloadFile($DotNetInstallerUri, "$InstallPath\dotnet-install.ps1");
 & $InstallPath\dotnet-install.ps1 -Version $DotNetVersion -InstallDir $InstallPath
-# We need to install the additional .NET Core runtime to run backward compatibility tests
-& $InstallPath\dotnet-install.ps1 -SharedRuntime -Version 1.1.6 -InstallDir $InstallPath;
 
 Remove-PathVariable "$InstallPath"
 $env:PATH = "$InstallPath;$env:PATH"
