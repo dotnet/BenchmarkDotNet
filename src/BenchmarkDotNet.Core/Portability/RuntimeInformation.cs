@@ -24,10 +24,29 @@ namespace BenchmarkDotNet.Portability
         internal const string ReleaseConfigurationName = "RELEASE";
         internal const string Unknown = "?";
 
-        public static bool IsFullFramework => System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase);
-        public static bool IsNetNative => System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Native", StringComparison.OrdinalIgnoreCase);
-        public static bool IsNetCore => System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase);
         public static bool IsMono => isMono;
+
+        public static bool IsFullFramework =>
+#if CLASSIC
+            true;
+#else
+            System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase);
+#endif
+
+        public static bool IsNetNative =>
+#if CLASSIC
+            false;
+#else
+            System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Native", StringComparison.OrdinalIgnoreCase);
+#endif
+
+        public static bool IsNetCore =>
+#if CLASSIC
+            false;
+#else
+            System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase);
+#endif
+        
 
         internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
 
@@ -35,11 +54,34 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetArchitecture() => IntPtr.Size == 4 ? "32bit" : "64bit";
 
-        internal static bool IsWindows() => System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        internal static bool IsWindows()
+        {
+#if CLASSIC
+            return System.Environment.OSVersion.Platform.ToString().Contains("Win");
+#else
+            return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+#endif
+        }
 
-        internal static bool IsLinux() => System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+        internal static bool IsLinux()
+        {
+#if CLASSIC
+            return System.Environment.OSVersion.Platform == PlatformID.Unix
+                   && GetSysnameFromUname().Equals("Linux", StringComparison.InvariantCultureIgnoreCase);
+#else
+            return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+#endif
+        }
 
-        internal static bool IsMacOSX() => System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+        internal static bool IsMacOSX()
+        {
+#if CLASSIC
+            return System.Environment.OSVersion.Platform == PlatformID.Unix
+                   && GetSysnameFromUname().Equals("Darwin", StringComparison.InvariantCultureIgnoreCase);
+#else
+            return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+#endif
+        }
 
         public static string GetOsVersion()
         {
