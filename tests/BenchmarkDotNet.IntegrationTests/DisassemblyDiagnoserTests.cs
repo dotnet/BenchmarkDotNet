@@ -41,8 +41,12 @@ namespace BenchmarkDotNet.IntegrationTests
         public class WithCalls
         {
             [Benchmark]
-            public void Benchmark()
+            [Arguments(int.MaxValue)]
+            public void Benchmark(int someArgument)
             {
+                if (someArgument != int.MaxValue)
+                    throw new InvalidOperationException("Wrong value of the argument!!");
+
                 // we should rather have test per use case
                 // but running so many tests for all JITs would take too much time
                 // so we have one method that does it all
@@ -80,7 +84,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             CanExecute<WithCalls>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.ColdStart));
 
-            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Benchmark)}()");
+            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Benchmark)}(Int32)");
             AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Benchmark)}(Boolean)");
             AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Static)}()");
             AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Instance)}()");

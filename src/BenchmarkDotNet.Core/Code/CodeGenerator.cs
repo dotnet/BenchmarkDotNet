@@ -26,6 +26,8 @@ namespace BenchmarkDotNet.Code
 
             (bool useShadowCopy, string shadowCopyFolderPath) = GetShadowCopySettings();
 
+            string passArguments = GetPassArguments(benchmark);
+
             string text = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt")).
                 Replace("$OperationsPerInvoke$", provider.OperationsPerInvoke).
                 Replace("$TargetTypeNamespace$", provider.TargetTypeNamespace).
@@ -48,7 +50,7 @@ namespace BenchmarkDotNet.Code
                 Replace("$DeclareArgumentFields$", GetDeclareArgumentFields(benchmark)).
                 Replace("$InitializeArgumentFields$", GetInitializeArgumentFields(benchmark)).
                 Replace("$LoadArguments$", GetLoadArguments(benchmark)).
-                Replace("$PassArguments$", GetPassArguments(benchmark)).
+                Replace("$PassArguments$", passArguments).
                 Replace("$ExtraAttribute$", GetExtraAttributes(benchmark.Target)).
                 Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark)).
                 Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).
@@ -56,7 +58,7 @@ namespace BenchmarkDotNet.Code
                 Replace("$Ref$", provider.UseRefKeyword ? "ref" : null).
                 Replace("$MeasureGcStats$", config.HasMemoryDiagnoser() ? "true" : "false").
                 Replace("$DiassemblerEntryMethodName$", DisassemblerConstants.DiassemblerEntryMethodName).
-                Replace("$TargetMethodCall$", provider.TargetMethodCall).
+                Replace("$TargetMethodCall$", provider.GetTargetMethodCall(passArguments)).
                 ToString();
 
             text = Unroll(text, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvResolver.Instance));
