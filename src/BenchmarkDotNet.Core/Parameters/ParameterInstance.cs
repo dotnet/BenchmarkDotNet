@@ -19,6 +19,7 @@ namespace BenchmarkDotNet.Parameters
 
         public string Name => Definition.Name;
         public bool IsStatic => Definition.IsStatic;
+        public bool IsArgument => Definition.IsArgument;
 
         public object Value => value is IParam parameter ? parameter.Value : value;
 

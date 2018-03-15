@@ -33,6 +33,7 @@
         },
         "Advanced features": 
         {
+            "Arguments": "Advanced\\Arguments.md",
             "Params": "Advanced\\Params.md",
             "Setup And Cleanup": "Advanced\\SetupAndCleanup.md",
             "Baseline":"Advanced\\Baseline.md",

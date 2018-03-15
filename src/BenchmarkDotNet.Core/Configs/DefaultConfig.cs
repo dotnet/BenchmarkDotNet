@@ -52,7 +52,9 @@ namespace BenchmarkDotNet.Configs
         {
             yield return BaselineValidator.FailOnError;
             yield return SetupCleanupValidator.FailOnError;
+#if !DEBUG
             yield return JitOptimizationsValidator.FailOnError;
+#endif
             yield return UnrollFactorValidator.Default;
         }
 

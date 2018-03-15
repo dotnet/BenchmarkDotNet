@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Code
 
         public virtual string TargetMethodDelegate => Target.Method.Name;
 
-        public virtual string TargetMethodCall => $"{Target.Method.Name}()";
+        public virtual string GetTargetMethodCall(string passArguments) => $"{Target.Method.Name}({passArguments})";
 
         public virtual string ConsumeField => null;
 
@@ -139,7 +139,7 @@ namespace BenchmarkDotNet.Code
         public override string TargetMethodDelegate
             => $"() => {{ {Target.Method.Name}().GetAwaiter().GetResult(); }}";
 
-        public override string TargetMethodCall => $"{Target.Method.Name}().GetAwaiter().GetResult()";
+        public override string GetTargetMethodCall(string passArguments) => $"{Target.Method.Name}({passArguments}).GetAwaiter().GetResult()";
 
         protected override Type TargetMethodReturnType => typeof(void);
     }
@@ -158,6 +158,6 @@ namespace BenchmarkDotNet.Code
         public override string TargetMethodDelegate
             => $"() => {{ return {Target.Method.Name}().GetAwaiter().GetResult(); }}";
 
-        public override string TargetMethodCall => $"{Target.Method.Name}().GetAwaiter().GetResult()";
+        public override string GetTargetMethodCall(string passArguments) => $"{Target.Method.Name}({passArguments}).GetAwaiter().GetResult()";
     }
 }

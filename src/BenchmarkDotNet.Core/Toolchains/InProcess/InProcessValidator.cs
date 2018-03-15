@@ -90,7 +90,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         public static bool IsSupported(Benchmark benchmark, ILogger logger)
         {
             var result = new List<ValidationError>();
-            ValidateJob(benchmark.Job, true, result);
+            result.AddRange(ValidateJob(benchmark.Job, true));
+            if (benchmark.HasArguments)
+                result.Add(new ValidationError(true, "Arguments are not supported by the InProcessToolchain yet, see #687 for more details"));
+
             if (result.Any())
             {
                 logger.WriteLineInfo($"// Benchmark {benchmark.DisplayInfo}");
@@ -106,7 +109,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             return true;
         }
 
-        private static void ValidateJob(Job job, bool isCritical, ICollection<ValidationError> validationResults)
+        private static IEnumerable<ValidationError> ValidateJob(Job job, bool isCritical)
         {
             foreach (var characteristic in job.GetCharacteristicsWithValues())
             {
@@ -114,18 +117,16 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 {
                     var message = validationRule(job, characteristic);
                     if (!string.IsNullOrEmpty(message))
-                        validationResults.Add(
-                            new ValidationError(
+                        yield return new ValidationError(
                                 isCritical,
-                                $"Job {job}, {characteristic.FullId} {message}"));
+                                $"Job {job}, {characteristic.FullId} {message}");
                 }
 #if DEBUG
                 else if (characteristic.IsPresentableCharacteristic())
                 {
-                    validationResults.Add(
-                        new ValidationError(
-                            false,
-                            $"Job {job}, {characteristic.FullId}: no validation rule specified."));
+                    yield return new ValidationError(
+                        false,
+                        $"Job {job}, {characteristic.FullId}: no validation rule specified.");
                 }
 #endif
             }
@@ -148,24 +149,21 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <returns>Enumerable of validation errors.</returns>
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
         {
-            var result = new List<ValidationError>();
-
-            var targets = validationParameters.Benchmarks.Select(b => b.Target).Distinct();
-            foreach (var target in targets)
+            foreach (var target in validationParameters.Benchmarks
+                .Where(benchmark => !string.IsNullOrEmpty(benchmark.Target.AdditionalLogic))
+                .Select(b => b.Target)
+                .Distinct())
             {
-                if (!string.IsNullOrEmpty(target.AdditionalLogic))
-                    result.Add(
-                        new ValidationError(
-                            false,
-                            $"Target {target} has {nameof(target.AdditionalLogic)} filled. AdditionalLogic is not supported by in-process toolchain."));
+                yield return new ValidationError(
+                    false,
+                    $"Target {target} has {nameof(target.AdditionalLogic)} filled. AdditionalLogic is not supported by in-process toolchain.");
             }
 
-            foreach (var job in validationParameters.Config.GetJobs())
-            {
-                ValidateJob(job, TreatsWarningsAsErrors, result);
-            }
+            foreach (var benchmarkWithArguments in validationParameters.Benchmarks.Where(benchmark => benchmark.HasArguments))
+                yield return new ValidationError(true, "Arguments are not supported by the InProcessToolchain yet, see #687 for more details", benchmarkWithArguments);
 
-            return result.ToArray();
+            foreach (var validationError in validationParameters.Config.GetJobs().SelectMany(job => ValidateJob(job, TreatsWarningsAsErrors)))
+                yield return validationError;
         }
     }
 }
