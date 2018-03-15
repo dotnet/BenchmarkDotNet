@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -92,10 +91,9 @@ namespace BenchmarkDotNet.Environments
             yield return CpuInfoFormatter.Format(CpuInfo.Value);
             if (HardwareTimerKind != HardwareTimerKind.Unknown)
                 yield return $"Frequency={ChronometerFrequency}, Resolution={ChronometerResolution}, Timer={HardwareTimerKind.ToString().ToUpper()}";
-#if !CLASSIC
-            if (IsDotNetCliInstalled())
+
+            if (RuntimeInformation.IsNetCore && IsDotNetCliInstalled())
                 yield return $".NET Core SDK={DotNetSdkVersion.Value}";
-#endif
         }
 
         internal bool IsDotNetCliInstalled() => !string.IsNullOrEmpty(DotNetSdkVersion.Value);

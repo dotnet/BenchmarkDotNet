@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         internal DisassemblyResult Disassemble(Benchmark benchmark, MonoRuntime mono)
         {
-            Debug.Assert(mono == null || !RuntimeInformation.IsMono(), "Must never be called for Non-Mono benchmarks");
+            Debug.Assert(mono == null || !RuntimeInformation.IsMono, "Must never be called for Non-Mono benchmarks");
 
             var benchmarkTarget = benchmark.Target;
             string fqnMethod = GetMethodName(benchmarkTarget);

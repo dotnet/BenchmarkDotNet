@@ -4,7 +4,7 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 
@@ -12,13 +12,6 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class UnresolvedDiagnoser : IDiagnoser
     {
-        private const string ErrorMessage =
-#if CLASSIC
-            "Please make sure that you have installed the latest BenchmarkDotNet.Diagnostics.Windows package.";
-#else
-            "To use the classic Windows diagnosers for .NET Core you need to run the benchmarks for desktop .NET. More info: http://adamsitnik.com/Hardware-Counters-Diagnoser/#how-to-get-it-running-for-net-coremono-on-windows";
-#endif
-
         private readonly Type unresolved;
 
         public UnresolvedDiagnoser(Type unresolved) => this.unresolved = unresolved;
@@ -36,6 +29,9 @@ namespace BenchmarkDotNet.Diagnosers
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
             => new[] { new ValidationError(false, GetErrorMessage()) };
 
-        private string GetErrorMessage() => $"Unable to resolve {unresolved.Name} diagnoser. {ErrorMessage}";
+        private string GetErrorMessage() => $@"Unable to resolve {unresolved.Name} diagnoser. 
+            {(RuntimeInformation.IsFullFramework 
+                ? "Please make sure that you have installed the latest BenchmarkDotNet.Diagnostics.Windows package." 
+                : "To use the classic Windows diagnosers for .NET Core you need to run the benchmarks for desktop .NET. More info: http://adamsitnik.com/Hardware-Counters-Diagnoser/#how-to-get-it-running-for-net-coremono-on-windows")}";
     }
 }

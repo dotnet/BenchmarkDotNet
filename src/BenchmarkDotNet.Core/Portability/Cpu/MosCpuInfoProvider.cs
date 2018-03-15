@@ -1,5 +1,4 @@
-﻿#if !CORE
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Management;
@@ -40,4 +39,3 @@ namespace BenchmarkDotNet.Portability.Cpu
         }
     }
 }
-#endif

@@ -1,4 +1,5 @@
 using System.Reflection;
+using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
@@ -9,21 +10,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public class NetCoreAppSettings
     {
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp11 = new NetCoreAppSettings("netcoreapp1.1", null, ".NET Core 1.1");
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp12 = new NetCoreAppSettings("netcoreapp1.2", null, ".NET Core 1.0");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp20 = new NetCoreAppSettings("netcoreapp2.0", null, ".NET Core 2.0");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp21 = new NetCoreAppSettings("netcoreapp2.1", null, ".NET Core 2.1");
 
-        private static NetCoreAppSettings Default =>
-#if NETCOREAPP2_0
-            NetCoreApp20;
-#else
-            NetCoreApp11;
-#endif
+        private static NetCoreAppSettings Default => NetCoreApp20;
 
         /// <summary>
         /// <param name="targetFrameworkMoniker">
-        /// sample values: netcoreapp1.1, netcoreapp1.2, netcoreapp2.0
+        /// sample values: netcoreapp2.0, netcoreapp2.1
         /// </param>
         /// <param name="runtimeFrameworkVersion">
         /// used in the auto-generated .csproj file
@@ -69,20 +63,15 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         internal static NetCoreAppSettings GetCurrentVersion()
         {
-#if CLASSIC
-            return Default;
-#else
+            if (RuntimeInformation.IsFullFramework)
+                return Default;
+
             try
             {
                 // it's an experimental way to determine the .NET Core Runtime version
                 // based on dev packages available at https://dotnet.myget.org/feed/dotnet-core/package/nuget/Microsoft.NETCore.App
                 var assembly = Assembly.Load(new AssemblyName("System.Runtime"));
-                if (assembly.FullName.Contains("Version=4.1.1"))
-                    return NetCoreApp11;
 
-                // the problem is that both netcoreapp1.2 and netcoreapp2.0 have 
-                // "System.Runtime Version=1.2.0.0". 
-                // 2.0 was officialy announced name, so let's bet on it (1.2 was probably an internal dev thing)
                 if (assembly.FullName.Contains("Version=4.2.0"))
                     return NetCoreApp20;
                 if (assembly.FullName.Contains("Version=4.2.1"))
@@ -94,7 +83,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
 
             return Default;
-#endif
         }
     }
 }

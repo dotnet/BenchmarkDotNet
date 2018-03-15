@@ -32,11 +32,12 @@ namespace BenchmarkDotNet.Diagnosers
 
         private static IDiagnoser[] LoadDiagnosers()
         {
-#if CLASSIC
-            return RuntimeInformation.IsMono() ? LoadMono() : LoadClassic();
-#else
+            if (RuntimeInformation.IsMono)
+                return LoadMono();
+            if (RuntimeInformation.IsFullFramework)
+                return LoadClassic();
+
             return LoadCore();
-#endif
         }
 
         private static IDiagnoser[] LoadCore() => new IDiagnoser[] { MemoryDiagnoser.Default };
@@ -49,7 +50,6 @@ namespace BenchmarkDotNet.Diagnosers
                 DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig()), 
             }; 
 
-#if CLASSIC
         private static IDiagnoser[] LoadClassic()
         {
             try
@@ -107,6 +107,5 @@ namespace BenchmarkDotNet.Diagnosers
 
         private static IDiagnoser CreateDiagnoser(Assembly loadedAssembly, string typeName)
             => (IDiagnoser)Activator.CreateInstance(loadedAssembly.GetType(typeName));
-#endif
     }
 }

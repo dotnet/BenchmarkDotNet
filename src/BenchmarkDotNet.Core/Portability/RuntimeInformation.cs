@@ -5,30 +5,29 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability.Cpu;
-using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CsProj;
 using JetBrains.Annotations;
-#if !CORE
 using System.Management;
-#endif
 
 namespace BenchmarkDotNet.Portability
 {
     internal static class RuntimeInformation
     {
-        private static readonly bool isMono =
-            Type.GetType("Mono.Runtime") != null; // it allocates a lot of memory, we need to check it once in order to keep Enging non-allocating!
+        private static readonly bool isMono = Type.GetType("Mono.Runtime") != null; // it allocates a lot of memory, we need to check it once in order to keep Enging non-allocating!
 
         private const string DebugConfigurationName = "DEBUG";
         internal const string ReleaseConfigurationName = "RELEASE";
         internal const string Unknown = "?";
+
+        public static bool IsFullFramework => System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase);
+        public static bool IsNetNative => System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Native", StringComparison.OrdinalIgnoreCase);
+        public static bool IsNetCore => System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase);
+        public static bool IsMono => isMono;
 
         internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
 
@@ -36,36 +35,11 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetArchitecture() => IntPtr.Size == 4 ? "32bit" : "64bit";
 
-        internal static bool IsWindows()
-        {
-#if CLASSIC
-            return System.Environment.OSVersion.Platform.ToString().Contains("Win");
-#else
-            return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-#endif
-        }
+        internal static bool IsWindows() => System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
-        internal static bool IsLinux()
-        {
-#if CLASSIC
-            return System.Environment.OSVersion.Platform == PlatformID.Unix
-                   && GetSysnameFromUname().Equals("Linux", StringComparison.InvariantCultureIgnoreCase);
-#else
-            return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-#endif
-        }
+        internal static bool IsLinux() => System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
-        internal static bool IsMacOSX()
-        {
-#if CLASSIC
-            return System.Environment.OSVersion.Platform == PlatformID.Unix
-                   && GetSysnameFromUname().Equals("Darwin", StringComparison.InvariantCultureIgnoreCase);
-#else
-            return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
-#endif
-        }
-
-        internal static bool IsMono() => isMono;
+        internal static bool IsMacOSX() => System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 
         public static string GetOsVersion()
         {
@@ -116,16 +90,12 @@ namespace BenchmarkDotNet.Portability
 
         internal static CpuInfo GetCpuInfo()
         {
-#if !CORE
-            if (IsWindows() && !IsMono())
+            if (IsWindows() && IsFullFramework && !IsMono)
                 return MosCpuInfoProvider.MosCpuInfo.Value;
-#endif
             if (IsWindows())
                 return WmicCpuInfoProvider.WmicCpuInfo.Value;
-
             if (IsLinux())
                 return ProcCpuInfoProvider.ProcCpuInfo.Value;
-
             if (IsMacOSX())
                 return SysctlCpuInfoProvider.SysctlCpuInfo.Value;
 
@@ -144,8 +114,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetRuntimeVersion()
         {
-#if CLASSIC
-            if (IsMono())
+            if (IsMono)
             {
                 var monoRuntimeType = Type.GetType("Mono.Runtime");
                 var monoDisplayName = monoRuntimeType?.GetMethod("GetDisplayName", BindingFlags.NonPublic | BindingFlags.Static);
@@ -163,80 +132,71 @@ namespace BenchmarkDotNet.Portability
                                 version = version.Substring(0, bracket1) + "(" + commentParts[0] + " " + commentParts[1] + ")";
                         }
                     }
+
                     return "Mono " + version;
                 }
             }
+            else if (IsFullFramework)
+            {
+                string frameworkVersion = CsProjClassicNetToolchain.GetCurrentNetFrameworkVersion();
+                string clrVersion = Environment.Version.ToString();
+                return $".NET Framework {frameworkVersion} (CLR {clrVersion})";
+            }
 
-            string frameworkVersion = CsProjClassicNetToolchain.GetCurrentNetFrameworkVersion();
-            string clrVersion = System.Environment.Version.ToString();
-            return $".NET Framework {frameworkVersion} (CLR {clrVersion})";
-#else
             var runtimeVersion = GetNetCoreVersion() ?? "?";
-            
-            var coreclrAssemblyInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(typeof(object).GetTypeInfo().Assembly.Location);
-            var corefxAssemblyInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(typeof(System.Text.RegularExpressions.Regex).GetTypeInfo().Assembly.Location);
+
+            var coreclrAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(object).GetTypeInfo().Assembly.Location);
+            var corefxAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(Regex).GetTypeInfo().Assembly.Location);
 
             return $".NET Core {runtimeVersion} (CoreCLR {coreclrAssemblyInfo.FileVersion}, CoreFX {corefxAssemblyInfo.FileVersion})";
-#endif
         }
 
         internal static Runtime GetCurrentRuntime()
         {
-#if CLASSIC
-            return IsMono() ? Runtime.Mono : Runtime.Clr;
-#elif CORE
-            return Runtime.Core;
-#endif
+            if (IsFullFramework)
+                return Runtime.Clr;
+            if (IsNetCore)
+                return Runtime.Core;
+            if (IsMono)
+                return Runtime.Mono;
+            
+            throw new NotSupportedException("Unknown .NET Framework"); // todo: adam sitnik fix it
         }
 
         public static Platform GetCurrentPlatform() => IntPtr.Size == 4 ? Platform.X86 : Platform.X64;
 
         internal static IEnumerable<JitModule> GetJitModules()
         {
-#if !CORE
             return
                 Process.GetCurrentProcess().Modules
                     .OfType<ProcessModule>()
                     .Where(module => module.ModuleName.Contains("jit"))
                     .Select(module => new JitModule(Path.GetFileNameWithoutExtension(module.FileName), module.FileVersionInfo.ProductVersion));
-#else
-            return Enumerable.Empty<JitModule>(); // TODO: verify if it is possible to get this for CORE
-#endif
         }
 
-        internal static string GetJitModulesInfo()
-        {
-#if !CORE
-            return string.Join(";", GetJitModules().Select(m => m.Name + "-v" + m.Version));
-#else
-            return Unknown; // TODO: verify if it is possible to get this for CORE
-#endif
-        }
+        internal static string GetJitModulesInfo() => string.Join(";", GetJitModules().Select(m => m.Name + "-v" + m.Version));
 
         internal static bool HasRyuJit()
         {
-#if CORE
-            return true;
-#else
-            return !IsMono()
-                   && IntPtr.Size == 8
+            if (IsMono)
+                return false;
+            if (IsNetCore)
+                return true;
+
+            return IntPtr.Size == 8
                    && GetConfiguration() != DebugConfigurationName
                    && !new JitHelper().IsMsX64();
-#endif
         }
 
-        internal static Jit GetCurrentJit()
-        {
-            return HasRyuJit() ? Jit.RyuJit : Jit.LegacyJit;
-        }
+        internal static Jit GetCurrentJit() => HasRyuJit() ? Jit.RyuJit : Jit.LegacyJit;
 
         internal static string GetJitInfo()
         {
-            if (IsMono())
+            if (IsMono)
                 return ""; // There is no helpful information about JIT on Mono
-#if CORE
-            return "RyuJIT"; // CoreCLR supports only RyuJIT
-#else
+            if (IsNetCore)
+                return "RyuJIT"; // CoreCLR supports only RyuJIT
+
             // We are working on Full CLR, so there are only LegacyJIT and RyuJIT
             var modules = GetJitModules().ToArray();
             string jitName = HasRyuJit() ? "RyuJIT" : "LegacyJIT";
@@ -250,7 +210,6 @@ namespace BenchmarkDotNet.Portability
                 // Otherwise, let's just print information about all modules
                 return jitName + "/" + GetJitModulesInfo();
             }
-#endif
         }
 
         internal static IntPtr GetCurrentAffinity() => Process.GetCurrentProcess().TryGetAffinity() ?? default;
@@ -323,7 +282,6 @@ namespace BenchmarkDotNet.Portability
 
         internal static ICollection<Antivirus> GetAntivirusProducts()
         {
-#if !CORE
             var products = new List<Antivirus>();
             if (IsWindows())
             {
@@ -334,7 +292,7 @@ namespace BenchmarkDotNet.Portability
 
                     foreach (ManagementBaseObject o in data)
                     {
-                        var av = (ManagementObject) o;
+                        var av = (ManagementObject)o;
                         if (av != null)
                         {
                             string name = av["displayName"].ToString();
@@ -347,11 +305,7 @@ namespace BenchmarkDotNet.Portability
             }
 
             return products;
-#else
-            return Array.Empty<Antivirus>();
-#endif
         }
-
 
         internal static VirtualMachineHypervisor GetVirtualMachineHypervisor()
         {
@@ -359,7 +313,6 @@ namespace BenchmarkDotNet.Portability
 
             if (IsWindows())
             {
-#if !CORE
                 try
                 {
                     using (ManagementObjectSearcher searcher = new ManagementObjectSearcher("Select * from Win32_ComputerSystem"))
@@ -376,19 +329,9 @@ namespace BenchmarkDotNet.Portability
                     }
                 }
                 catch { }
-#endif
             }
 
             return null;
-        }
-
-        public static bool IsClassic()
-        {
-#if CLASSIC
-            return true;
-#else
-            return false;
-#endif
         }
     }
 }

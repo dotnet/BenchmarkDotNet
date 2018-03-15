@@ -5,7 +5,6 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
@@ -15,8 +14,6 @@ namespace BenchmarkDotNet.Toolchains.CsProj
     [PublicAPI]
     public class CsProjCoreToolchain : Toolchain
     {
-        [PublicAPI] public static readonly IToolchain NetCoreApp11 = From(NetCoreAppSettings.NetCoreApp11);
-        [PublicAPI] public static readonly IToolchain NetCoreApp12 = From(NetCoreAppSettings.NetCoreApp12);
         [PublicAPI] public static readonly IToolchain NetCoreApp20 = From(NetCoreAppSettings.NetCoreApp20);
         [PublicAPI] public static readonly IToolchain NetCoreApp21 = From(NetCoreAppSettings.NetCoreApp21);
 
@@ -74,14 +71,6 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 logger.WriteLineError($"Currently project.json does not support gcAllowVeryLargeObjects (app.config does), benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;
             }
-
-#if NETCOREAPP1_1
-            if (benchmark.Job.HasValue(InfrastructureMode.EnvironmentVariablesCharacteristic))
-            {
-                logger.WriteLineError($"ProcessStartInfo.EnvironmentVariables is avaialable for .NET Core 2.0, benchmark '{benchmark.DisplayInfo}' will not be executed");
-                return false;
-            }
-#endif
 
             return true;
         }

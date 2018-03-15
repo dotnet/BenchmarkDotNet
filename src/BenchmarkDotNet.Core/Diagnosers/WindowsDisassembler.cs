@@ -11,7 +11,6 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using System.Linq;
 using System.Text;
-using BenchmarkDotNet.Engines;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -150,13 +149,14 @@ namespace BenchmarkDotNet.Diagnosers
                 if (Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE") == "x86")
                     return false;
 
-#if !NETCOREAPP1_1
-                if (!IsWow64Process(process.Handle, out bool isWow64))
-                    throw new Exception("Not Windows");
-                return !isWow64;
-#else
-                return System.IntPtr.Size == 8; // todo: find the way to cover all scenarios for .NET Core
-#endif
+                if (Portability.RuntimeInformation.IsWindows())
+                {
+                    IsWow64Process(process.Handle, out bool isWow64);
+
+                    return !isWow64;
+                }
+
+                return IntPtr.Size == 8; // todo: find the way to cover all scenarios for .NET Core
             }
 
             [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
