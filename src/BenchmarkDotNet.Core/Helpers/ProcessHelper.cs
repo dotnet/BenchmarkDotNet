@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Helpers
             }
         }
 
-        internal static IReadOnlyList<string> RunAndReadOutputLineByLine(string fileName, string arguments = "")
+        internal static IReadOnlyList<string> RunAndReadOutputLineByLine(string fileName, string arguments = "", Dictionary<string, string> environmentVariables = null)
         {
             var output = new List<string>(20000);
 
@@ -54,6 +54,10 @@ namespace BenchmarkDotNet.Helpers
                 RedirectStandardOutput = true,
                 RedirectStandardError = true
             };
+
+            if(environmentVariables != null)
+                foreach (var environmentVariable in environmentVariables)
+                    processStartInfo.Environment[environmentVariable.Key] = environmentVariable.Value;
 
             using (var process = new Process { StartInfo = processStartInfo })
             {

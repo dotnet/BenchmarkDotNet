@@ -17,10 +17,12 @@ namespace BenchmarkDotNet.Reports
 
         public string[] FullHeader { get; }
         public string[][] FullContent { get; }
-        public bool[] FullContentStartOfGroup { get; }
+        public bool[] FullContentStartOfHighlightGroup { get; }
+        public bool[] FullContentStartOfLogicalGroup { get; }
         public string[][] FullContentWithHeader { get; }
         public bool[] IsDefault { get; }
         public ISummaryStyle EffectiveSummaryStyle { get; }
+        public bool SeparateLogicalGroups { get; }
 
         internal SummaryTable(Summary summary, ISummaryStyle style = null)
         {
@@ -32,18 +34,20 @@ namespace BenchmarkDotNet.Reports
                 ColumnCount = 0;
                 FullHeader = Array.Empty<string>();
                 FullContent = Array.Empty<string[]>();
-                FullContentStartOfGroup = Array.Empty<bool>();
+                FullContentStartOfHighlightGroup = Array.Empty<bool>();
                 FullContentWithHeader = Array.Empty<string[]>();
                 IsDefault = Array.Empty<bool>();
                 return;
             }
-            
+
             // Ensure we have all required data for styling
             style = style ?? SummaryStyle.Default;
             if (style.TimeUnit == null)
             {
-                style = style.WithTimeUnit(TimeUnit.GetBestTimeUnit(summary.Reports.Where(r => r.ResultStatistics != null).Select(r => r.ResultStatistics.Mean).ToArray()));
+                style = style.WithTimeUnit(TimeUnit.GetBestTimeUnit(summary.Reports.Where(r => r.ResultStatistics != null).Select(r => r.ResultStatistics.Mean)
+                    .ToArray()));
             }
+
             if (style.SizeUnit == null)
             {
                 style = style.WithSizeUnit(SizeUnit.GetBestSizeUnit(summary.Reports.Select(r => r.GcStats.BytesAllocatedPerOperation).ToArray()));
@@ -56,15 +60,28 @@ namespace BenchmarkDotNet.Reports
             var orderProvider = summary.Config.GetOrderProvider() ?? DefaultOrderProvider.Instance;
             FullContent = summary.Reports.Select(r => columns.Select(c => c.GetValue(summary, r.Benchmark, style)).ToArray()).ToArray();
             IsDefault = columns.Select(c => summary.Reports.All(r => c.IsDefault(summary, r.Benchmark))).ToArray();
-            var groupKeys = summary.Benchmarks.Select(b => orderProvider.GetGroupKey(b, summary)).ToArray();
-            FullContentStartOfGroup = new bool[summary.Reports.Length];
 
-            if (groupKeys.Distinct().Count() > 1 && FullContentStartOfGroup.Length > 0)
+            var highlightGroupKeys = summary.Benchmarks.Select(b => orderProvider.GetHighlightGroupKey(b)).ToArray();
+            FullContentStartOfHighlightGroup = new bool[summary.Reports.Length];
+            if (highlightGroupKeys.Distinct().Count() > 1 && FullContentStartOfHighlightGroup.Length > 0)
             {
-                FullContentStartOfGroup[0] = true;
+                FullContentStartOfHighlightGroup[0] = true;
                 for (int i = 1; i < summary.Reports.Length; i++)
-                    FullContentStartOfGroup[i] = groupKeys[i] != groupKeys[i - 1];
-            }            
+                    FullContentStartOfHighlightGroup[i] = highlightGroupKeys[i] != highlightGroupKeys[i - 1];
+            }
+
+            var logicalGroupKeys = summary.Benchmarks
+                .Select(b => orderProvider.GetLogicalGroupKey(summary.Config, summary.Benchmarks, b))
+                .ToArray();
+            FullContentStartOfLogicalGroup = new bool[summary.Reports.Length];
+            if (logicalGroupKeys.Distinct().Count() > 1 && FullContentStartOfLogicalGroup.Length > 0)
+            {
+                FullContentStartOfLogicalGroup[0] = true;
+                for (int i = 1; i < summary.Reports.Length; i++)
+                    FullContentStartOfLogicalGroup[i] = logicalGroupKeys[i] != logicalGroupKeys[i - 1];
+            }
+
+            SeparateLogicalGroups = orderProvider.SeparateLogicalGroups;
 
             var full = new List<string[]> { FullHeader };
             full.AddRange(FullContent);

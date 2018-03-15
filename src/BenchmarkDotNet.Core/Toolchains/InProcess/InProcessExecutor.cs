@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
@@ -65,7 +66,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             var host = new InProcessHost(executeParameters.Benchmark, hostLogger, executeParameters.Diagnoser, executeParameters.Config);
 
             int exitCode = -1;
-            var runThread = new Thread(() => exitCode = ExecuteCore(host, executeParameters.Benchmark, executeParameters.Logger));
+            var runThread = new Thread(() => exitCode = ExecuteCore(host, executeParameters));
 
 #if !NETCOREAPP1_1
             if (executeParameters.Benchmark.Target.Method.GetCustomAttributes<STAThreadAttribute>(false).Any())
@@ -87,7 +88,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             return GetExecutionResult(host.RunResults, exitCode, executeParameters.Logger);
         }
 
-        private int ExecuteCore(IHost host, Benchmark benchmark, ILogger logger)
+        private int ExecuteCore(IHost host, ExecuteParameters parameters)
         {
             int exitCode = -1;
             var process = Process.GetCurrentProcess();
@@ -98,33 +99,33 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             var oldThreadPriority = thread.Priority;
 #endif
 
-            var affinity = benchmark.Job.ResolveValueAsNullable(EnvMode.AffinityCharacteristic);
+            var affinity = parameters.Benchmark.Job.ResolveValueAsNullable(EnvMode.AffinityCharacteristic);
             try
             {
-                process.TrySetPriority(ProcessPriorityClass.High, logger);
+                process.TrySetPriority(ProcessPriorityClass.High, parameters.Logger);
 #if !NETCOREAPP1_1
-                thread.TrySetPriority(ThreadPriority.Highest, logger);
+                thread.TrySetPriority(ThreadPriority.Highest, parameters.Logger);
 #endif
                 if (affinity != null)
                 {
-                    process.TrySetAffinity(affinity.Value, logger);
+                    process.TrySetAffinity(affinity.Value, parameters.Logger);
                 }
 
-                exitCode = InProcessRunner.Run(host, benchmark, CodegenMode);
+                exitCode = InProcessRunner.Run(host, parameters.Benchmark, CodegenMode, parameters.Config);
             }
             catch (Exception ex)
             {
-                logger.WriteLineError($"// ! {GetType().Name}, exception: {ex}");
+                parameters.Logger.WriteLineError($"// ! {GetType().Name}, exception: {ex}");
             }
             finally
             {
-                process.TrySetPriority(oldPriority, logger);
+                process.TrySetPriority(oldPriority, parameters.Logger);
 #if !NETCOREAPP1_1
-                thread.TrySetPriority(oldThreadPriority, logger);
+                thread.TrySetPriority(oldThreadPriority, parameters.Logger);
 #endif
                 if (affinity != null && oldAffinity != null)
                 {
-                    process.TrySetAffinity(oldAffinity.Value, logger);
+                    process.TrySetAffinity(oldAffinity.Value, parameters.Logger);
                 }
             }
 
@@ -143,7 +144,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             {
                 lines.Add(measurement.ToOutputLine());
             }
-            lines.Add(runResults.GCStats.WithTotalOperations(runResults.TotalOperationsCount).ToOutputLine());
+            lines.Add(runResults.GCStats.ToOutputLine());
 
             return new ExecuteResult(true, 0, lines.ToArray(), Array.Empty<string>());
         }

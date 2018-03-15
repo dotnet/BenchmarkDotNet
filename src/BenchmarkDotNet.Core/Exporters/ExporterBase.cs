@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
@@ -18,8 +22,8 @@ namespace BenchmarkDotNet.Exporters
 
         public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
         {
-            var fileName = GetFileName(summary);
-            var filePath = $"{Path.Combine(summary.ResultsDirectoryPath, fileName)}-{FileCaption}{FileNameSuffix}.{FileExtension}";
+            string fileName = GetFileName(summary);
+            string filePath = GetAtrifactFullName(summary);
             if (File.Exists(filePath))
             {
                 try
@@ -43,21 +47,22 @@ namespace BenchmarkDotNet.Exporters
             return new[] { filePath };
         }
 
+        internal string GetAtrifactFullName(Summary summary)
+        {
+            string fileName = GetFileName(summary);
+            return $"{Path.Combine(summary.ResultsDirectoryPath, fileName)}-{FileCaption}{FileNameSuffix}.{FileExtension}";
+        }
+
         private static string GetFileName(Summary summary)
         {
-            string fileName;
+            // few types might have the same name: A.Name and B.Name will both report "Name"
+            // in that case, we can not use the type name as file name because they would be getting overwritten #529
+            var typeNames = summary.Benchmarks.Select(b => b.Target.Type).Distinct().GroupBy(type => type.Name);
 
-            var benchmarkTypes = summary.Benchmarks.Select(b => b.Target.Type.FullName).Distinct().ToArray();
-            if (benchmarkTypes.Length == 1)
-            {
-                fileName = benchmarkTypes[0];
-            }
-            else
-            {
-                fileName = summary.Title;
-            }
+            if (typeNames.Count() == 1 && typeNames.First().Count() == 1)
+                return FolderNameHelper.ToFolderName(summary.Benchmarks.Select(b => b.Target.Type).First());
 
-            return fileName;
+            return summary.Title;
         }
     }
 }

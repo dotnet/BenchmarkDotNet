@@ -20,5 +20,14 @@ namespace BenchmarkDotNet.Tests
 
             Assert.Equal(validFileName, validFileName.AsValidFileName());
         }
+
+        [Fact]
+        public void HtmlEncodeCharacters()
+        {
+            string expectedHtml = "&lt;&#39;&gt;&quot;&amp;shouldntchange";
+            string html = "<'>\"&shouldntchange";
+
+            Assert.Equal(expectedHtml, html.HtmlEncode());
+        }
     }
 }

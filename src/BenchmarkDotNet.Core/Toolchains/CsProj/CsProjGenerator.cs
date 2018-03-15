@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
         }
 
-        private string GetRuntimeSettings(GcMode gcMode, IResolver resolver)
+        protected string GetRuntimeSettings(GcMode gcMode, IResolver resolver)
         {
             if (!gcMode.HasChanges)
                 return string.Empty;
@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 string line;
                 while ((line = file.ReadLine()) != null)
                 {
-                    if (line.Contains("NetCoreAppImplicitPackageVersion") || line.Contains("RuntimeFrameworkVersion") || line.Contains("PackageTargetFallback"))
+                    if (line.Contains("NetCoreAppImplicitPackageVersion") || line.Contains("RuntimeFrameworkVersion") || line.Contains("PackageTargetFallback") || line.Contains("LangVersion"))
                     {
                         customSettings.Append(line);
                     }
@@ -104,7 +104,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             return customSettings.ToString();
         }
 
-        private static FileInfo GetProjectFilePath(Type benchmarkTarget, ILogger logger)
+        protected static FileInfo GetProjectFilePath(Type benchmarkTarget, ILogger logger)
         {
             if (!GetSolutionRootDirectory(out var solutionRootDirectory))
             {
@@ -118,7 +118,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
             // I was afraid of using .GetFiles with some smart search pattern due to the fact that the method was designed for Windows
             // and now .NET is cross platform so who knows if the pattern would be supported for other OSes
-            var possibleNames = new HashSet<string> { $"{projectName}.csproj", $"{projectName}.fsproj" };
+            var possibleNames = new HashSet<string> { $"{projectName}.csproj", $"{projectName}.fsproj", $"{projectName}.vbproj" };
             var projectFile = solutionRootDirectory
                 .EnumerateFiles("*.*", SearchOption.AllDirectories)
                 .FirstOrDefault(file => possibleNames.Contains(file.Name));

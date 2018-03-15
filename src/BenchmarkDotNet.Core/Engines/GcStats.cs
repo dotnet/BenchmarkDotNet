@@ -89,10 +89,10 @@ namespace BenchmarkDotNet.Engines
             return AllocatedBytes <= AllocationQuantum ? 0L : AllocatedBytes;
         }
 
-        public static GcStats ReadInitial(bool isDiagnosticsEnabled)
+        public static GcStats ReadInitial()
         {
             // this will force GC.Collect, so we want to do this before collecting collections counts
-            long allocatedBytes = GetAllocatedBytes(isDiagnosticsEnabled); 
+            long allocatedBytes = GetAllocatedBytes(); 
 
             return new GcStats(
                 GC.CollectionCount(0),
@@ -102,7 +102,7 @@ namespace BenchmarkDotNet.Engines
                 0);
         }
 
-        public static GcStats ReadFinal(bool isDiagnosticsEnabled)
+        public static GcStats ReadFinal()
         {
             return new GcStats(
                 GC.CollectionCount(0),
@@ -111,17 +111,16 @@ namespace BenchmarkDotNet.Engines
 
                 // this will force GC.Collect, so we want to do this after collecting collections counts 
                 // to exclude this single full forced collection from results
-                GetAllocatedBytes(isDiagnosticsEnabled), 
+                GetAllocatedBytes(), 
                 0);
         }
 
         public static GcStats FromForced(int forcedFullGarbageCollections)
             => new GcStats(forcedFullGarbageCollections, forcedFullGarbageCollections, forcedFullGarbageCollections, 0, 0);
 
-        private static long GetAllocatedBytes(bool isDiagnosticsEnabled)
+        private static long GetAllocatedBytes()
         {
-            if (!isDiagnosticsEnabled 
-                || RuntimeInformation.IsMono()) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-
+            if (RuntimeInformation.IsMono()) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-
                 return 0;
 
             // "This instance Int64 property returns the number of bytes that have been allocated by a specific 
@@ -157,14 +156,12 @@ namespace BenchmarkDotNet.Engines
             if(!line.StartsWith(ResultsLinePrefix))
                 throw new NotSupportedException($"Line must start with {ResultsLinePrefix}");
 
-            int gen0, gen1, gen2;
-            long allocatedBytes, totalOperationsCount;
             var measurementSplit = line.Remove(0, ResultsLinePrefix.Length).Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            if (!int.TryParse(measurementSplit[0], out gen0)
-                || !int.TryParse(measurementSplit[1], out gen1)
-                || !int.TryParse(measurementSplit[2], out gen2)
-                || !long.TryParse(measurementSplit[3], out allocatedBytes)
-                || !long.TryParse(measurementSplit[4], out totalOperationsCount))
+            if (!int.TryParse(measurementSplit[0], out int gen0)
+                || !int.TryParse(measurementSplit[1], out int gen1)
+                || !int.TryParse(measurementSplit[2], out int gen2)
+                || !long.TryParse(measurementSplit[3], out long allocatedBytes)
+                || !long.TryParse(measurementSplit[4], out long totalOperationsCount))
             {
                 throw new NotSupportedException("Invalid string");
             }

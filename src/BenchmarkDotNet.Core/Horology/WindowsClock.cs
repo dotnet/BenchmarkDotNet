@@ -1,34 +1,23 @@
+#if !CORE
 using System.Runtime.ExceptionServices;
-using System.Runtime.InteropServices;
 using System.Security;
+#endif
+using System.Runtime.InteropServices;
 
 namespace BenchmarkDotNet.Horology
 {
-    public class WindowsClock : IClock
+    internal class WindowsClock : IClock
     {
-        private static readonly bool isAvailable;
-        private static readonly long frequency;
-        
-        static WindowsClock()
-        {
-            isAvailable = Initialize(out frequency);
-        }
+        private static readonly bool GlobalIsAvailable;
+        private static readonly long GlobalFrequency;
+
+        static WindowsClock() => GlobalIsAvailable = Initialize(out GlobalFrequency);
 
         [DllImport("kernel32.dll")]
         private static extern bool QueryPerformanceCounter(out long value);
 
         [DllImport("kernel32.dll")]
         private static extern bool QueryPerformanceFrequency(out long value);
-
-        public bool IsAvailable => isAvailable;
-        public Frequency Frequency => new Frequency(frequency);
-        
-        public long GetTimestamp()
-        {
-            long value;
-            QueryPerformanceCounter(out value);
-            return value;
-        }
 
 #if !CORE
         [HandleProcessCorruptedStateExceptions] // #276
@@ -38,21 +27,29 @@ namespace BenchmarkDotNet.Horology
         {
             if (!Portability.RuntimeInformation.IsWindows())
             {
-                qpf = default(long);
+                qpf = default;
                 return false;
             }
+
             try
             {
-                long counter;
-                return 
-                    QueryPerformanceFrequency(out qpf) &&
-                    QueryPerformanceCounter(out counter);
+                return QueryPerformanceFrequency(out qpf) && QueryPerformanceCounter(out _);
             }
             catch
             {
-                qpf = default(long);
+                qpf = default;
                 return false;
             }
+        }
+
+        public string Title => "Windows";
+        public bool IsAvailable => GlobalIsAvailable;
+        public Frequency Frequency => new Frequency(GlobalFrequency);
+
+        public long GetTimestamp()
+        {
+            QueryPerformanceCounter(out long value);
+            return value;
         }
     }
 }

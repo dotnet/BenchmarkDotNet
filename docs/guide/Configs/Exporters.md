@@ -221,7 +221,7 @@ You can install [R](https://www.r-project.org/) to automatically get nice plots 
 <BenchmarkName>-<MethodName>-<JobName>-timelineSmooth.png
 ```
 
-A config example:
+A config example in C#:
 
 ```cs
 public class Config : ManualConfig
@@ -232,6 +232,37 @@ public class Config : ManualConfig
         Add(RPlotExporter.Default);
     }
 }
+```
+
+A config example in F#:
+
+```fs
+module MyBenchmark
+
+open BenchmarkDotNet.Attributes
+open BenchmarkDotNet.Configs
+open BenchmarkDotNet.Exporters
+open BenchmarkDotNet.Exporters.Csv
+open MyProjectUnderTest
+
+type MyConfig() as this =
+    inherit ManualConfig()
+    do
+        this.Add(CsvMeasurementsExporter.Default)
+        this.Add(RPlotExporter.Default)
+
+[<
+  MemoryDiagnoser; 
+  Config(typeof<MyConfig>);
+  RPlotExporter
+>]
+type MyPerformanceTests() =
+
+    let someTestData = getTestDataAsList ()
+
+    [<Benchmark>]
+    member __.SomeTestCase() = 
+        someTestData |> myFunctionUnderTest
 ```
 
 ## CSV

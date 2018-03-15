@@ -5,6 +5,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Reports;
+using System.IO;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -90,7 +91,7 @@ namespace BenchmarkDotNet.Extensions
 
 #if !NETCOREAPP2_0 //  this method was added to the .NET Core 2.0 framework itself ;)
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
-            => dictionary.TryGetValue(key, out TValue value) ? value : default(TValue);
+            => dictionary.TryGetValue(key, out TValue value) ? value : default;
 #endif
 
         public static double Sqr(this double x) => x * x;
@@ -105,6 +106,14 @@ namespace BenchmarkDotNet.Extensions
             {
                 command(item);
             }
+        }
+
+        internal static string CreateIfNotExists(this string directoryPath)
+        {
+            if (!Directory.Exists(directoryPath))
+                Directory.CreateDirectory(directoryPath);
+
+            return directoryPath;
         }
     }
 }

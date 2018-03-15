@@ -1,11 +1,7 @@
-﻿using System;
-
-namespace BenchmarkDotNet.Engines
+﻿namespace BenchmarkDotNet.Engines
 {
     public interface IHost
     {
-        bool IsDiagnoserAttached { get; }
-
         void Write(string message);
         void WriteLine();
         void WriteLine(string message);

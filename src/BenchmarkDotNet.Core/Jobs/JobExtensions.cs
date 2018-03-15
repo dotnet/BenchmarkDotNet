@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Jobs
         public static Job With(this Job job, IToolchain toolchain) => job.WithCore(j => j.Infrastructure.Toolchain = toolchain);
         public static Job With(this Job job, IClock clock) => job.WithCore(j => j.Infrastructure.Clock = clock);
         public static Job With(this Job job, IEngineFactory engineFactory) => job.WithCore(j => j.Infrastructure.EngineFactory = engineFactory);
-        public static Job WithCustomBuildConfiguration(this Job job, string buildConfiguraiton) => job.WithCore(j => j.Infrastructure.BuildConfiguration = buildConfiguraiton);
+        public static Job WithCustomBuildConfiguration(this Job job, string buildConfiguration) => job.WithCore(j => j.Infrastructure.BuildConfiguration = buildConfiguration);
         public static Job With(this Job job, IReadOnlyList<EnvironmentVariable> environmentVariables) => job.WithCore(j => j.Infrastructure.EnvironmentVariables = environmentVariables);
         public static Job With(this Job job, IReadOnlyList<Argument> arguments) => job.WithCore(j => j.Infrastructure.Arguments = arguments);
 
@@ -51,7 +51,10 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithRemoveOutliers(this Job job, bool value) => job.WithCore(j => j.Accuracy.RemoveOutliers = value);
         public static Job WithAnalyzeLaunchVariance(this Job job, bool value) => job.WithCore(j => j.Accuracy.AnalyzeLaunchVariance = value);
         
-
+        // Meta
+        public static Job AsBaseline(this Job job) => job.WithCore(j => j.Meta.IsBaseline = true);
+        public static Job WithIsBaseline(this Job job, bool value) => value ? job.AsBaseline() : job;
+        
         // Info
         [Obsolete]
         public static string GetShortInfo(this Job job) => job.ResolvedId;

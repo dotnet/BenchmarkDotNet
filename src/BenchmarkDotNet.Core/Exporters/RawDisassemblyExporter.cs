@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,16 +9,13 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Exporters
 {
-    public class SingleDisassemblyExporter : IExporter
+    public class RawDisassemblyExporter : IExporter
     {
         private readonly IReadOnlyDictionary<Benchmark, DisassemblyResult> results;
 
-        public SingleDisassemblyExporter(IReadOnlyDictionary<Benchmark, DisassemblyResult> results)
-        {
-            this.results = results;
-        }
+        public RawDisassemblyExporter(IReadOnlyDictionary<Benchmark, DisassemblyResult> results) => this.results = results;
 
-        public string Name => nameof(SingleDisassemblyExporter);
+        public string Name => nameof(RawDisassemblyExporter);
 
         public void ExportToLog(Summary summary, ILogger logger) { }
 
@@ -30,7 +26,7 @@ namespace BenchmarkDotNet.Exporters
 
         private string Export(Summary summary, Benchmark benchmark)
         {
-            var filePath = $"{Path.Combine(summary.ResultsDirectoryPath, benchmark.FolderInfo)}-asm.html";
+            var filePath = $"{Path.Combine(summary.ResultsDirectoryPath, benchmark.FolderInfo)}-asm.raw.html";
             if (File.Exists(filePath))
                 File.Delete(filePath);
 
@@ -88,6 +84,9 @@ namespace BenchmarkDotNet.Exporters
 
                     evenMap = !evenMap;
                 }
+                
+                if(!string.IsNullOrEmpty(method.CommandLine))
+                    logger.WriteLine($"<tr><td colspan=\"2\">{method.CommandLine}</td></tr>");
 
                 logger.WriteLine("<tr><td colspan=\"{2}\">&nbsp;</td></tr>");
             }
@@ -121,7 +120,7 @@ namespace BenchmarkDotNet.Exporters
         // we want to get sth like "00007ffb`a90f4560"
         internal static string FormatMethodAddress(ulong nativeCode)
         {
-            if(nativeCode == default(ulong))
+            if(nativeCode == default)
                 return string.Empty;
 
             var buffer = new StringBuilder(nativeCode.ToString("x"));

@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Samples.Intro
                 public IEnumerable<Benchmark> GetExecutionOrder(Benchmark[] benchmarks) =>
                     from benchmark in benchmarks
                     orderby benchmark.Parameters["X"] descending,
-                            benchmark.Target.MethodDisplayInfo
+                        benchmark.Target.MethodDisplayInfo
                     select benchmark;
 
                 public IEnumerable<Benchmark> GetSummaryOrder(Benchmark[] benchmarks, Summary summary) =>
@@ -37,7 +37,15 @@ namespace BenchmarkDotNet.Samples.Intro
                     orderby summary[benchmark].ResultStatistics.Mean
                     select benchmark;
 
-                public string GetGroupKey(Benchmark benchmark, Summary summary) => null;
+                public string GetHighlightGroupKey(Benchmark benchmark) => null;
+
+                public string GetLogicalGroupKey(IConfig config, Benchmark[] allBenchmarks, Benchmark benchmark) =>
+                    benchmark.Job.DisplayInfo + "_" + benchmark.Parameters.DisplayInfo;
+
+                public IEnumerable<IGrouping<string, Benchmark>> GetLogicalGroupOrder(IEnumerable<IGrouping<string, Benchmark>> logicalGroups) => 
+                    logicalGroups.OrderBy(it => it.Key);
+
+                public bool SeparateLogicalGroups => true;
             }
         }
 

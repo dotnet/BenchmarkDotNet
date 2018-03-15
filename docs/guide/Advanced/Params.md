@@ -69,8 +69,8 @@ public class IntroParamsSource
 
 ## Example (IParam)
 
- ```cs
- public class IntroIParam
+```cs
+public class IntroIParam
 {
     public struct VeryCustomStruct
     {

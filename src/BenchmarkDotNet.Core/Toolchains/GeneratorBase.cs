@@ -23,8 +23,9 @@ namespace BenchmarkDotNet.Toolchains
 
                 CopyAllRequiredFiles(benchmark, artifactsPaths);
 
-                GenerateCode(benchmark, artifactsPaths);
+                GenerateCode(benchmark, artifactsPaths, config);
                 GenerateAppConfig(benchmark, artifactsPaths, resolver);
+                GenerateNuGetConfig(benchmark, artifactsPaths);
                 GenerateProject(benchmark, artifactsPaths, resolver, logger);
                 GenerateBuildScript(benchmark, artifactsPaths, resolver);
 
@@ -47,6 +48,8 @@ namespace BenchmarkDotNet.Toolchains
 
         protected virtual void CopyAllRequiredFiles(Benchmark benchmark, ArtifactsPaths artifactsPaths) { }
 
+        protected virtual void GenerateNuGetConfig(Benchmark benchmark, ArtifactsPaths artifactsPaths) { }
+
         protected virtual void GenerateProject(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver, ILogger logger) { }
 
         protected abstract void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver);
@@ -67,6 +70,7 @@ namespace BenchmarkDotNet.Toolchains
                 binariesDirectoryPath: binariesDirectoryPath,
                 programCodePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{codeFileExtension}"),
                 appConfigPath: $"{executablePath}.config",
+                nugetConfigPath: Path.Combine(buildArtifactsDirectoryPath, "NuGet.config"),
                 projectFilePath: GetProjectFilePath(buildArtifactsDirectoryPath),
                 buildScriptFilePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{RuntimeInformation.ScriptFileExtension}"),
                 executablePath: executablePath,
@@ -80,9 +84,9 @@ namespace BenchmarkDotNet.Toolchains
         private static string GetProgramName(Benchmark benchmark, IConfig config)
             => config.KeepBenchmarkFiles ? benchmark.FolderInfo : Guid.NewGuid().ToString();
 
-        private static void GenerateCode(Benchmark benchmark, ArtifactsPaths artifactsPaths)
+        private static void GenerateCode(Benchmark benchmark, ArtifactsPaths artifactsPaths, IConfig config)
         {
-            File.WriteAllText(artifactsPaths.ProgramCodePath, CodeGenerator.Generate(benchmark));
+            File.WriteAllText(artifactsPaths.ProgramCodePath, CodeGenerator.Generate(benchmark, config));
         }
 
         private static void GenerateAppConfig(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)

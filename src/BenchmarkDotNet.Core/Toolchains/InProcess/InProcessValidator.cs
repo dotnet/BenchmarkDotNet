@@ -30,6 +30,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 { GcMode.ServerCharacteristic, ValidateEnvironment },
                 { GcMode.ConcurrentCharacteristic, ValidateEnvironment },
                 { GcMode.CpuGroupsCharacteristic, ValidateEnvironment },
+                { GcMode.NoAffinitizeCharacteristic, ValidateEnvironment },
+                { GcMode.HeapAffinitizeMaskCharacteristic, DontValidate },
+                { GcMode.HeapCountCharacteristic, DontValidate },
                 { GcMode.ForceCharacteristic, DontValidate },
                 { GcMode.AllowVeryLargeObjectsCharacteristic, DontValidate },
                 { RunMode.LaunchCountCharacteristic, DontValidate },
@@ -107,8 +110,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         {
             foreach (var characteristic in job.GetCharacteristicsWithValues())
             {
-                Func<Job, Characteristic, string> validationRule;
-                if (ValidationRules.TryGetValue(characteristic, out validationRule))
+                if (ValidationRules.TryGetValue(characteristic, out var validationRule))
                 {
                     var message = validationRule(job, characteristic);
                     if (!string.IsNullOrEmpty(message))

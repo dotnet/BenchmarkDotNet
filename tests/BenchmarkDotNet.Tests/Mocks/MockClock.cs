@@ -9,6 +9,7 @@ namespace BenchmarkDotNet.Tests.Mocks
             Frequency = frequency;
         }
 
+        public string Title => "Mock";
         public bool IsAvailable => true;
         public Frequency Frequency { get; }
 

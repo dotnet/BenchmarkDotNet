@@ -1,25 +1,24 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Horology
 {
     public struct ClockSpan
     {
-        public long StartTimestamp, EndTimestamp;
-        public Frequency Frequency;
+        private readonly long startTimestamp, endTimestamp;
+        private readonly Frequency frequency;
 
         public ClockSpan(long startTimestamp, long endTimestamp, Frequency frequency)
         {
-            StartTimestamp = startTimestamp;
-            EndTimestamp = endTimestamp;
-            Frequency = frequency;
+            this.startTimestamp = startTimestamp;
+            this.endTimestamp = endTimestamp;
+            this.frequency = frequency;
         }
 
-        public double GetSeconds() => 1.0 * Math.Max(0, EndTimestamp - StartTimestamp) / Frequency;
-
-        public double GetNanoseconds() => GetSeconds() * TimeUnit.Second.NanosecondAmount;
-
-        public long GetDateTimeTicks() => (long)Math.Round(GetSeconds() * TimeSpan.TicksPerSecond);
-
-        public TimeSpan GetTimeSpan() => new TimeSpan(GetDateTimeTicks());
+        [Pure] public double GetSeconds() => 1.0 * Math.Max(0, endTimestamp - startTimestamp) / frequency;
+        [Pure] public double GetNanoseconds() => GetSeconds() * TimeUnit.Second.NanosecondAmount;
+        [Pure] public long GetDateTimeTicks() => (long) Math.Round(GetSeconds() * TimeSpan.TicksPerSecond);
+        [Pure] public TimeSpan GetTimeSpan() => new TimeSpan(GetDateTimeTicks());
+        [Pure] public TimeInterval GetTimeInterval() => new TimeInterval(GetNanoseconds());
     }
 }

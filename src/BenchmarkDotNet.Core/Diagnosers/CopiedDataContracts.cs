@@ -53,11 +53,20 @@ namespace BenchmarkDotNet.Diagnosers
         public string Problem { get; set; }
 
         public Map[] Maps { get; set; }
+
+        public string CommandLine { get; set; }
     }
 
     public class DisassemblyResult
     {
         public DisassembledMethod[] Methods { get; set; }
+    }
+
+    public static class DisassemblerConstants
+    {
+        public const string NotManagedMethod = "not managed method";
+
+        public const string DiassemblerEntryMethodName = "__ForDisassemblyDiagnoser__";
     }
 }
 #pragma warning restore CS3003 // Type is not CLS-compliant

@@ -85,9 +85,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        internal static ProcessStartInfo BuildStartInfo(string customDotNetCliPath, string workingDirectory, string arguments)
-        {
-            return new ProcessStartInfo
+        internal static ProcessStartInfo BuildStartInfo(string customDotNetCliPath, string workingDirectory, string arguments, bool redirectStandardInput = false) 
+            => new ProcessStartInfo
             {
                 FileName = customDotNetCliPath ?? "dotnet",
                 WorkingDirectory = workingDirectory,
@@ -95,8 +94,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
-                RedirectStandardError = true
+                RedirectStandardError = true,
+                RedirectStandardInput = redirectStandardInput
             };
-        }
     }
 }

@@ -161,18 +161,18 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (isIdle)
                 {
                     benchmarkAction.InvokeSingle();
-                    Assert.Equal(BenchmarkAllCases.Counter, 0);
+                    Assert.Equal(0, BenchmarkAllCases.Counter);
                     benchmarkAction.InvokeMultiple(0);
-                    Assert.Equal(BenchmarkAllCases.Counter, 0);
+                    Assert.Equal(0, BenchmarkAllCases.Counter);
                     benchmarkAction.InvokeMultiple(11);
-                    Assert.Equal(BenchmarkAllCases.Counter, 0);
+                    Assert.Equal(0, BenchmarkAllCases.Counter);
                 }
                 else
                 {
                     benchmarkAction.InvokeSingle();
-                    Assert.Equal(BenchmarkAllCases.Counter, 1);
+                    Assert.Equal(1, BenchmarkAllCases.Counter);
                     benchmarkAction.InvokeMultiple(0);
-                    Assert.Equal(BenchmarkAllCases.Counter, 1);
+                    Assert.Equal(1, BenchmarkAllCases.Counter);
                     benchmarkAction.InvokeMultiple(11);
                     Assert.Equal(BenchmarkAllCases.Counter, 1 + unrollFactor * 11);
                 }

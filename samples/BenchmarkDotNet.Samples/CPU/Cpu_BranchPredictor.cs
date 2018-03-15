@@ -7,12 +7,12 @@ namespace BenchmarkDotNet.Samples.CPU
     // See http://stackoverflow.com/questions/11227809/why-is-processing-a-sorted-array-faster-than-an-unsorted-array/11227902
     [HardwareCounters(HardwareCounter.BranchMispredictions, HardwareCounter.BranchInstructions)]
     [DisassemblyDiagnoser(printAsm: true, printSource: true)]
-    public class Cpu_BranchPerdictor
+    public class Cpu_BranchPredictor
     {
         private const int N = 32767;
         private readonly int[] sorted, unsorted;
 
-        public Cpu_BranchPerdictor()
+        public Cpu_BranchPredictor()
         {
             var random = new Random(0);
             unsorted = new int[N];

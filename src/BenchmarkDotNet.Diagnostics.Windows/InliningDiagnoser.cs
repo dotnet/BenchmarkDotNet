@@ -20,11 +20,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         /// </summary>
         /// <param name="logFailuresOnly">only the methods that failed to get inlined. True by default.</param>
         /// <param name="filterByNamespace">only the methods from declaring type's namespace. Set to false if you want to see all Jit inlining events. True by default.</param>
-        public InliningDiagnoser(bool logFailuresOnly, bool filterByNamespace)
+        public InliningDiagnoser(bool logFailuresOnly = true, bool filterByNamespace = true)
         {
             this.logFailuresOnly = logFailuresOnly;
             this.filterByNamespace = filterByNamespace;
         }
+
+        public override IEnumerable<string> Ids => new[] { nameof(InliningDiagnoser) };
 
         protected override void AttachToEvents(TraceEventSession session, Benchmark benchmark)
         {
@@ -39,12 +41,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             {
                 // Inliner = the parent method (the inliner calls the inlinee)
                 // Inlinee = the method that is going to be "inlined" inside the inliner (it's caller)                
-                object ignored;
-                if (StatsPerProcess.TryGetValue(jitData.ProcessID, out ignored))
+                if (StatsPerProcess.TryGetValue(jitData.ProcessID, out object ignored))
                 {
                     var shouldPrint = !logFailuresOnly
-                        && (!filterByNamespace 
-                            || jitData.InlinerNamespace.StartsWith(expectedNamespace) 
+                        && (!filterByNamespace
+                            || jitData.InlinerNamespace.StartsWith(expectedNamespace)
                             || jitData.InlineeNamespace.StartsWith(expectedNamespace));
 
                     if (shouldPrint)
@@ -58,8 +59,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             session.Source.Clr.MethodInliningFailed += jitData =>
             {
-                object ignored;
-                if (StatsPerProcess.TryGetValue(jitData.ProcessID, out ignored))
+                if (StatsPerProcess.TryGetValue(jitData.ProcessID, out object ignored))
                 {
                     var shouldPrint = !filterByNamespace
                                       || jitData.InlinerNamespace.StartsWith(expectedNamespace)
@@ -76,8 +76,5 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 }
             };
         }
-
-        public const string DiagnoserId = nameof(InliningDiagnoser);
-        public override IEnumerable<string> Ids => new[] { DiagnoserId };
     }
 }

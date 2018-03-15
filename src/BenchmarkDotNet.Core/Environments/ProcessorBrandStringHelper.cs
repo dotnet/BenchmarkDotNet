@@ -80,6 +80,12 @@ namespace BenchmarkDotNet.Environments
                         return "Skylake";
                     case '7':
                         return "Kaby Lake";
+                    case '8':
+                    {
+                        if (modelNumber.Length >= 5 && modelNumber[4] == 'U')
+                            return "Kaby Lake R";
+                        return "Coffee Lake";
+                    }
                     default:
                         return null;
                 }

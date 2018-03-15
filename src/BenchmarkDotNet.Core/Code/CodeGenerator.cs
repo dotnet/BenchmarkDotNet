@@ -7,17 +7,20 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
+using RunMode = BenchmarkDotNet.Jobs.RunMode;
 
 namespace BenchmarkDotNet.Code
 {
     internal static class CodeGenerator
     {
-        internal static string Generate(Benchmark benchmark)
+        internal static string Generate(Benchmark benchmark, IConfig config)
         {
             var provider = GetDeclarationsProvider(benchmark.Target);
 
@@ -51,6 +54,9 @@ namespace BenchmarkDotNet.Code
                 Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).
                 Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath).
                 Replace("$Ref$", provider.UseRefKeyword ? "ref" : null).
+                Replace("$MeasureGcStats$", config.HasMemoryDiagnoser() ? "true" : "false").
+                Replace("$DiassemblerEntryMethodName$", DisassemblerConstants.DiassemblerEntryMethodName).
+                Replace("$TargetMethodCall$", provider.TargetMethodCall).
                 ToString();
 
             text = Unroll(text, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvResolver.Instance));
@@ -155,13 +161,13 @@ namespace BenchmarkDotNet.Code
             => string.Join(
                 ", ",
                 benchmark.Target.Method.GetParameters()
-                         .Select((parameter, index) => $"{GetParameterModifier(parameter)} {parameter.ParameterType.GetCorrectTypeName()} arg{index}"));
+                         .Select((parameter, index) => $"{GetParameterModifier(parameter)} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index}"));
 
         private static string GetDeclareArgumentFields(Benchmark benchmark)
             => string.Join(
                 Environment.NewLine,
                 benchmark.Target.Method.GetParameters()
-                         .Select((parameter, index) => $"private {parameter.ParameterType.GetCorrectTypeName()} __argField{index};"));
+                         .Select((parameter, index) => $"private {parameter.ParameterType.GetCorrectCSharpTypeName()} __argField{index};"));
 
         private static string GetInitializeArgumentFields(Benchmark benchmark)
             => string.Join(
@@ -173,7 +179,7 @@ namespace BenchmarkDotNet.Code
             => string.Join(
                 Environment.NewLine,
                 benchmark.Target.Method.GetParameters()
-                         .Select((parameter, index) => $"{(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} {parameter.ParameterType.GetCorrectTypeName()} arg{index} = {(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} __argField{index};"));
+                         .Select((parameter, index) => $"{(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index} = {(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} __argField{index};"));
 
         private static string GetPassArguments(Benchmark benchmark)
             => string.Join(
@@ -203,7 +209,7 @@ namespace BenchmarkDotNet.Code
                 throw new NotSupportedException("Custom factory must have a public parameterless constructor");
             }
 
-            return factoryType.GetCorrectTypeName();
+            return factoryType.GetCorrectCSharpTypeName();
         }
 
         private static string GetParameterModifier(ParameterInfo parameterInfo)

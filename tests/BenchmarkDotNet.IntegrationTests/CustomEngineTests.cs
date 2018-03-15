@@ -70,14 +70,13 @@ namespace BenchmarkDotNet.IntegrationTests
                 Console.WriteLine(EngineRunMessage);
 
                 return new RunResults(
-                    new List<Measurement>() { default(Measurement) }, 
-                    new List<Measurement>() { default(Measurement) },
+                    new List<Measurement>() { default }, 
+                    new List<Measurement>() { default },
                     false,
-                    default(GcStats));
+                    default);
             }
 
             public IHost Host { get; }
-            public bool IsDiagnoserAttached { get; }
             public void WriteLine() { }
             public void WriteLine(string line) { }
             public Job TargetJob { get; }
@@ -89,7 +88,6 @@ namespace BenchmarkDotNet.IntegrationTests
             public IResolver Resolver { get; }
 
             public Measurement RunIteration(IterationData data) { throw new NotImplementedException(); }
-            public void PreAllocate() { }
             public void Jitting() { }
         }
     }

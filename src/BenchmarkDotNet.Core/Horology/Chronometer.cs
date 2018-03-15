@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Horology
 
         public static HardwareTimerKind GetHardwareTimerKind(Frequency frequency)
         {
-            long freqKHz = (long)Math.Round(frequency / Frequency.KHz);
+            long freqKHz = (long) Math.Round(frequency / Frequency.KHz);
             if (14300 <= freqKHz && freqKHz <= 14400)
                 return HardwareTimerKind.Hpet;
             if (3579500 <= frequency && frequency <= 3579600)

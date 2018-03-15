@@ -1,4 +1,4 @@
-﻿#if CLASSIC
+﻿#if CLASSIC || NETCOREAPP2_0
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,20 +13,38 @@ using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
+using JetBrains.Annotations;
 using Xunit;
 namespace BenchmarkDotNet.Tests.Exporters
 {
     // In case of failed approval tests, use the following reporter:
     // [UseReporter(typeof(KDiffReporter))]
+    [Collection("ApprovalTests")]
     [UseReporter(typeof(XUnit2Reporter))]
     [UseApprovalSubdirectory("ApprovedFiles")]
-    public class ApprovalTest : IDisposable
+    public class CommonExporterApprovalTests : IDisposable
     {
         private readonly CultureInfo initCulture;
 
-        public ApprovalTest()
+        public CommonExporterApprovalTests()
         {
             initCulture = Thread.CurrentThread.CurrentCulture;
+        }
+
+        [UsedImplicitly]
+        public static TheoryData<CultureInfo> GetCultureInfos()
+        {
+            var cultures = new List<CultureInfo>
+            {
+                CultureInfo.InvariantCulture,
+                new CultureInfo("ru-RU"),
+                new CultureInfo("en-US")
+            };
+
+            var theoryData = new TheoryData<CultureInfo>();
+            foreach (var cultureInfo in cultures)
+                theoryData.Add(cultureInfo);
+            return theoryData;
         }
 
         [Theory]
@@ -53,21 +71,6 @@ namespace BenchmarkDotNet.Tests.Exporters
             logger.WriteLine("############################################");
             logger.WriteLine($"{exporter.Name}");
             logger.WriteLine("############################################");
-        }
-
-        private static TheoryData<CultureInfo> GetCultureInfos()
-        {
-            var cultures = new List<CultureInfo>()
-            {
-                CultureInfo.InvariantCulture,
-                new CultureInfo("ru-RU"),
-                new CultureInfo("en-US")
-            };
-
-            var theoryData = new TheoryData<CultureInfo>();
-            foreach (var cultureInfo in cultures)
-                theoryData.Add(cultureInfo);
-            return theoryData;
         }
 
         private static string GetName(CultureInfo cultureInfo)

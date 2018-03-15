@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
@@ -28,10 +27,14 @@ namespace BenchmarkDotNet.Exporters
         public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
         {
             const string scriptFileName = "BuildPlots.R";
+            const string logFileName = "BuildPlots.log";
             yield return scriptFileName;
 
             string fileNamePrefix = Path.Combine(summary.ResultsDirectoryPath, summary.Title);
+            string csvFullPath = CsvMeasurementsExporter.Default.GetAtrifactFullName(summary);
+            
             string scriptFullPath = Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
+            string logFullPath = Path.Combine(summary.ResultsDirectoryPath, logFileName);
             string script = ResourceHelper.
                 LoadTemplate(scriptFileName).
                 Replace("$BenchmarkDotNetVersion$", BenchmarkDotNetInfo.FullTitle).
@@ -64,14 +67,21 @@ namespace BenchmarkDotNet.Exporters
             var start = new ProcessStartInfo
             {
                 UseShellExecute = false,
-                RedirectStandardOutput = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
                 CreateNoWindow = true,
                 FileName = rscriptPath,
                 WorkingDirectory = summary.ResultsDirectoryPath,
-                Arguments = $"\"{scriptFullPath}\" \"{fileNamePrefix}-measurements.csv\""
+                Arguments = $"\"{scriptFullPath}\" \"{csvFullPath}\""
             };
             using (var process = Process.Start(start))
+            {
+                string output = process?.StandardOutput.ReadToEnd() ?? "";
+                string error = process?.StandardError.ReadToEnd() ?? "";
+                File.WriteAllText(logFullPath, output + Environment.NewLine + error);
                 process?.WaitForExit();
+            }
+
             yield return fileNamePrefix + "-boxplot.png";
             yield return fileNamePrefix + "-barplot.png";
         }

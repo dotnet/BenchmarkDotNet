@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 using SimpleJson.Reflection;
@@ -24,8 +25,8 @@ namespace BenchmarkDotNet.Helpers
                 return ((decimal)value).ToString("F", CultureInfo.InvariantCulture).Replace(".", "-");
             if (ReflectionUtils.GetTypeInfo(value.GetType()).IsEnum)
                 return value.ToString();
-            if (value is Type)
-                return ((Type)value).Name; // TODO
+            if (value is Type type)
+                return ToFolderName(type: type);
             if (!ReflectionUtils.GetTypeInfo(value.GetType()).IsValueType)
                 return value.GetType().Name; // TODO
             if (value is TimeInterval)
@@ -37,5 +38,13 @@ namespace BenchmarkDotNet.Helpers
         {
             return value; // TODO: escape special symbols
         }
+
+        // we can't simply use type.FullName, because for generics it's tooo long
+        // example: typeof(List<int>).FullName => "System.Collections.Generic.List`1[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
+        public static string ToFolderName(Type type)
+            => new StringBuilder(type.GetDisplayName())
+                .Replace('<', '_')
+                .Replace('>', '_')
+                .ToString();
     }
 }

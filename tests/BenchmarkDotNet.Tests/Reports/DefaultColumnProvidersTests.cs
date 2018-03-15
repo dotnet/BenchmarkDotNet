@@ -10,7 +10,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Tests.Mocks;
+using BenchmarkDotNet.Tests.Builders;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Tests.Reports
             var summary = new Summary(
                 "MockSummary",
                 CreateBenchmarks(DefaultConfig.Instance).Select(b => CreateReport(b, hugeSd)).ToArray(),
-                MockFactory.MockHostEnvironmentInfo.Default,
+                new HostEnvironmentInfoBuilder().Build(),
                 DefaultConfig.Instance,
                 "",
                 TimeSpan.FromMinutes(1),
@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.Tests.Reports
                 new Measurement(1, IterationMode.Result, 5, 1, 1),
                 new Measurement(1, IterationMode.Result, 6, 1, 1),
             };
-            return new BenchmarkReport(benchmark, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default(GcStats));
+            return new BenchmarkReport(benchmark, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default);
         }
 
         private static IEnumerable<Benchmark> CreateBenchmarks(IConfig config) =>

@@ -12,6 +12,7 @@ using Microsoft.Diagnostics.Tracing.Parsers.Clr;
 using Microsoft.Diagnostics.Tracing.Session;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Engines;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
@@ -33,18 +34,18 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         protected override string SessionNamePrefix => "GC";
 
-        public void BeforeAnythingElse(DiagnoserActionParameters _) { }
-
-        public void AfterGlobalSetup(DiagnoserActionParameters _) { }
-
-        public void BeforeMainRun(DiagnoserActionParameters parameters) => Start(parameters);
-
-        public void BeforeGlobalCleanup(DiagnoserActionParameters parameters) => Stop();
-
-        public void ProcessResults(Benchmark benchmark, BenchmarkReport report)
+        public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {
-            var stats = ProcessEtwEvents(benchmark, report.AllMeasurements.Sum(m => m.Operations));
-            results.Add(benchmark, stats);
+            if (signal == HostSignal.BeforeMainRun)
+                Start(parameters);
+            else if(signal == HostSignal.AfterMainRun)
+                Stop();
+        }
+
+        public void ProcessResults(DiagnoserResults results)
+        {
+            var stats = ProcessEtwEvents(results.Benchmark, results.TotalOperations);
+            this.results.Add(results.Benchmark, stats);
         }
 
         public void DisplayResults(ILogger logger) { }
@@ -56,8 +57,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             if (BenchmarkToProcess.Count > 0)
             {
                 var processToReport = BenchmarkToProcess[benchmark];
-                Stats stats;
-                if (StatsPerProcess.TryGetValue(processToReport, out stats))
+                if (StatsPerProcess.TryGetValue(processToReport, out Stats stats))
                 {
                     stats.TotalOperations = totalOperations;
                     return stats;
@@ -70,15 +70,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             session.Source.Clr.GCAllocationTick += gcData =>
             {
-                Stats stats;
-                if (StatsPerProcess.TryGetValue(gcData.ProcessID, out stats))
+                if (StatsPerProcess.TryGetValue(gcData.ProcessID, out Stats stats))
                     stats.AllocatedBytes += gcData.AllocationAmount64;
             };
 
             session.Source.Clr.GCStart += gcData =>
             {
-                Stats stats;
-                if (StatsPerProcess.TryGetValue(gcData.ProcessID, out stats))
+                if (StatsPerProcess.TryGetValue(gcData.ProcessID, out Stats stats))
                 {
                     var genCounts = stats.GenCounts;
                     if (gcData.Depth >= 0 && gcData.Depth < genCounts.Length)

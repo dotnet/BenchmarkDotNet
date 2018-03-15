@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
 using Xunit;
@@ -8,7 +10,7 @@ namespace BenchmarkDotNet.Tests
     public class ReflectionTests
     {
         [Fact]
-        public void GetCorrectTypeNameReturnCSharpFriendlyTypeName()
+        public void GetCorrectCSharpTypeNameReturnsCSharpFriendlyTypeName()
         {
             CheckCorrectTypeName("System.Int32", typeof(int));
             CheckCorrectTypeName("System.Int32[]", typeof(int[]));
@@ -21,15 +23,51 @@ namespace BenchmarkDotNet.Tests
         }
 
         [AssertionMethod]
-        private static void CheckCorrectTypeName(string name, Type type)
+        private static void CheckCorrectTypeName(string expectedName, Type type)
         {
-            Assert.Equal(name, type.GetCorrectTypeName());
+            Assert.Equal(expectedName, type.GetCorrectCSharpTypeName());
         }
 
         public class NestedNonGeneric1
         {
             public class NestedNonGeneric2 { }
             public class NestedGeneric2<TA, TB, TC> { }
+        }
+
+        [Fact]
+        public void GetDisplayNameReturnsTypeNameWithGenericArguments()
+        {
+            CheckCorrectDisplayName("Int32", typeof(int));
+            CheckCorrectDisplayName("List<Int32>", typeof(List<int>));
+            CheckCorrectDisplayName("List<ReflectionTests>", typeof(List<ReflectionTests>));
+        }
+
+        [AssertionMethod]
+        private static void CheckCorrectDisplayName(string expectedName, Type type)
+        {
+            Assert.Equal(expectedName, type.GetDisplayName());
+        }
+
+        [Fact]
+        public void OnlyClosedGenericsWithPublicParameterlessCtorsAreSupported()
+        {
+            Assert.False(typeof(Generic<>).ContainsRunnableBenchmarks());
+            Assert.False(typeof(GenericNoPublicCtor<>).ContainsRunnableBenchmarks());
+            Assert.False(typeof(GenericNoPublicCtor<int>).ContainsRunnableBenchmarks());
+
+            Assert.True(typeof(Generic<int>).ContainsRunnableBenchmarks());
+        }
+
+        public class Generic<T>
+        {
+            [Benchmark] public T Create() => default;
+        }
+
+        public class GenericNoPublicCtor<T>
+        {
+            private GenericNoPublicCtor() { }
+
+            [Benchmark] public T Create() => default;
         }
     }
 }

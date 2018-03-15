@@ -49,10 +49,10 @@ namespace BenchmarkDotNet.Columns
 
         public string GetValue(Summary summary, Benchmark benchmark)
         {
-            var baseline = summary.Benchmarks.
-                Where(b => b.Job.DisplayInfo == benchmark.Job.DisplayInfo).
-                Where(b => b.Parameters.DisplayInfo == benchmark.Parameters.DisplayInfo).
-                FirstOrDefault(b => b.Target.Baseline);
+            string logicalGroupKey = summary.GetLogicalGroupKey(benchmark);
+            var baseline = summary.Benchmarks
+                .Where(b => summary.GetLogicalGroupKey(b) == logicalGroupKey)
+                .FirstOrDefault(b => b.IsBaseline());
             bool invalidResults = baseline == null ||
                                  summary[baseline] == null ||
                                  summary[baseline].ResultStatistics == null ||
@@ -66,13 +66,13 @@ namespace BenchmarkDotNet.Columns
             var baselineStat = summary[baseline].ResultStatistics;
             var targetStat = summary[benchmark].ResultStatistics;
 
-            double mean = benchmark.Target.Baseline ? 1 : Statistics.DivMean(targetStat, baselineStat);
-            double stdDev = benchmark.Target.Baseline ? 0 : Math.Sqrt(Statistics.DivVariance(targetStat, baselineStat));
+            double mean = benchmark.IsBaseline() ? 1 : Statistics.DivMean(targetStat, baselineStat);
+            double stdDev = benchmark.IsBaseline() ? 0 : Math.Sqrt(Statistics.DivVariance(targetStat, baselineStat));
 
             switch (Kind)
             {
                 case DiffKind.Mean:
-                    return mean.ToStr("N2");
+                    return IsNonBaselinesPrecise(summary, baselineStat, benchmark) ? mean.ToStr("N3") : mean.ToStr("N2");
                 case DiffKind.StdDev:
                     return stdDev.ToStr("N2");
                 case DiffKind.WelchTTestPValue:
@@ -87,7 +87,17 @@ namespace BenchmarkDotNet.Columns
             }
         }
 
-        public bool IsAvailable(Summary summary) => summary.Benchmarks.Any(b => b.Target.Baseline);
+        public bool IsNonBaselinesPrecise(Summary summary, Statistics baselineStat, Benchmark benchmark)
+        {
+            string logicalGroupKey = summary.GetLogicalGroupKey(benchmark);
+            var nonBaselines = summary.Benchmarks
+                        .Where(b => summary.GetLogicalGroupKey(b) == logicalGroupKey)
+                        .Where(b => !b.IsBaseline());
+
+            return nonBaselines.Any(x => Statistics.DivMean(summary[x].ResultStatistics, baselineStat) < 0.01);
+        }
+
+        public bool IsAvailable(Summary summary) => summary.Benchmarks.Any(b => b.IsBaseline());
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Baseline;
         public int PriorityInCategory => (int) Kind;
@@ -106,7 +116,7 @@ namespace BenchmarkDotNet.Columns
                     case DiffKind.Mean:
                         return "Mean(CurrentBenchmark) / Mean(BaselineBenchmark)";
                     case DiffKind.StdDev:
-                        return "Standard deviation of ratio of distibution of [CurrentBenchmark] and [BaselineBenchmark]";
+                        return "Standard deviation of ratio of distribution of [CurrentBenchmark] and [BaselineBenchmark]";
                     case DiffKind.WelchTTestPValue:
                         return "p-value for Welch's t-test of [CurrentbBenchmark] and [BaselineBenchmark]";
                     default:

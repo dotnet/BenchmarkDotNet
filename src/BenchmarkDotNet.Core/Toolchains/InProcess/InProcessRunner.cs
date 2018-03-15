@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
@@ -10,14 +11,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 {
     internal class InProcessRunner
     {
-        public static int Run(IHost host, Benchmark benchmark, BenchmarkActionCodegen codegenMode)
+        public static int Run(IHost host, Benchmark benchmark, BenchmarkActionCodegen codegenMode, IConfig config)
         {
-            bool isDiagnoserAttached = host.IsDiagnoserAttached;
-
             // the first thing to do is to let diagnosers hook in before anything happens
             // so all jit-related diagnosers can catch first jit compilation!
-            if (isDiagnoserAttached)
-                host.BeforeAnythingElse();
+            host.BeforeAnythingElse();
 
             try
             {
@@ -31,7 +29,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     throw new InvalidOperationException($"Bug: type {inProcessRunnableTypeName} not found.");
 
                 type.GetMethod(nameof(Runnable.RunCore), BindingFlags.Public | BindingFlags.Static)
-                    .Invoke(null, new object[] { host, benchmark, codegenMode });
+                    .Invoke(null, new object[] { host, benchmark, codegenMode, config });
 
                 return 0;
             }
@@ -40,12 +38,16 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 host.WriteLine(ex.ToString());
                 return -1;
             }
+            finally
+            {
+                host.AfterAll();
+            }
         }
 
         [UsedImplicitly]
         private static class Runnable
         {
-            public static void RunCore(IHost host, Benchmark benchmark, BenchmarkActionCodegen codegenMode)
+            public static void RunCore(IHost host, Benchmark benchmark, BenchmarkActionCodegen codegenMode, IConfig config)
             {
                 var target = benchmark.Target;
                 var job = benchmark.Job; // TODO: filter job (same as SourceCodePresenter does)?
@@ -84,14 +86,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     IterationSetupAction = iterationSetupAction.InvokeSingle,
                     IterationCleanupAction = iterationCleanupAction.InvokeSingle,
                     TargetJob = job,
-                    OperationsPerInvoke = target.OperationsPerInvoke
+                    OperationsPerInvoke = target.OperationsPerInvoke,
+                    MeasureGcStats = config.HasMemoryDiagnoser()
                 };
 
                 var engine = job
                     .ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)
                     .Create(engineParameters);
-
-                engine.PreAllocate();
 
                 globalSetupAction.InvokeSingle();
                 iterationSetupAction.InvokeSingle();
@@ -101,13 +102,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
                 iterationCleanupAction.InvokeSingle();
 
-                if (host.IsDiagnoserAttached)
-                    host.AfterGlobalSetup();
-
                 var results = engine.Run();
 
-                if (host.IsDiagnoserAttached)
-                    host.BeforeGlobalCleanup();
                 globalCleanupAction.InvokeSingle();
 
                 host.ReportResults(results); // printing costs memory, do this after runs

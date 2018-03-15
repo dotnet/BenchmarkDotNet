@@ -88,5 +88,45 @@ namespace BenchmarkDotNet.Extensions
 
             return lines;
         }
+
+        /// <summary>
+        /// Returns an HTML encoded string
+        /// </summary>
+        /// <param name="s">string to encode</param>
+        internal static string HtmlEncode(this string s)
+        {
+            if (s == null)
+            {
+                return null;
+            }
+
+            StringBuilder sb = new StringBuilder(s.Length);
+
+            for (int i = 0; i < s.Length; i++)
+            {
+                switch (s[i])
+                {
+                    case '<':
+                        sb.Append("&lt;");
+                        break;
+                    case '>':
+                        sb.Append("&gt;");
+                        break;
+                    case '"':
+                        sb.Append("&quot;");
+                        break;
+                    case '\'':
+                        sb.Append("&#39;");
+                        break;
+                    case '&':
+                        sb.Append("&amp;");
+                        break;
+                    default:
+                        sb.Append(s[i]);
+                        break;
+                }
+            }
+            return sb.ToString();
+        }
     }
 }

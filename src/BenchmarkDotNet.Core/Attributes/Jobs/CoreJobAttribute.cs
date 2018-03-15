@@ -4,7 +4,7 @@ namespace BenchmarkDotNet.Attributes.Jobs
 {
     public class CoreJobAttribute : JobConfigBaseAttribute
     {
-        public CoreJobAttribute() : base(Job.Core)
+        public CoreJobAttribute(bool isBaseline = false) : base(Job.Core.WithIsBaseline(isBaseline))
         {
         }
     }

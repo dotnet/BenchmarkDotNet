@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Code
 
         public string TargetTypeNamespace => string.IsNullOrWhiteSpace(Target.Type.Namespace) ? string.Empty : $"using {Target.Type.Namespace};";
 
-        public string TargetTypeName => Target.Type.GetCorrectTypeName();
+        public string TargetTypeName => Target.Type.GetCorrectCSharpTypeName();
 
         public string GlobalSetupMethodName => Target.GlobalSetupMethod?.Name ?? EmptyAction;
 
@@ -41,15 +41,17 @@ namespace BenchmarkDotNet.Code
 
         protected virtual Type TargetMethodReturnType => Target.Method.ReturnType;
 
-        public virtual string TargetMethodReturnTypeName => TargetMethodReturnType.GetCorrectTypeName();
+        public virtual string TargetMethodReturnTypeName => TargetMethodReturnType.GetCorrectCSharpTypeName();
 
         public virtual string TargetMethodDelegate => Target.Method.Name;
+
+        public virtual string TargetMethodCall => $"{Target.Method.Name}()";
 
         public virtual string ConsumeField => null;
 
         protected abstract Type IdleMethodReturnType { get; }
 
-        public string IdleMethodReturnTypeName => IdleMethodReturnType.GetCorrectTypeName();
+        public string IdleMethodReturnTypeName => IdleMethodReturnType.GetCorrectCSharpTypeName();
 
         public abstract string IdleImplementation { get; }
 
@@ -96,7 +98,7 @@ namespace BenchmarkDotNet.Code
                 string value;
                 var type = IdleMethodReturnType;
                 if (type.GetTypeInfo().IsPrimitive)
-                    value = $"default({type.GetCorrectTypeName()})";
+                    value = $"default({type.GetCorrectCSharpTypeName()})";
                 else if (type.GetTypeInfo().IsClass || type.GetTypeInfo().IsInterface)
                     value = "null";
                 else
@@ -137,6 +139,8 @@ namespace BenchmarkDotNet.Code
         public override string TargetMethodDelegate
             => $"() => {{ {Target.Method.Name}().GetAwaiter().GetResult(); }}";
 
+        public override string TargetMethodCall => $"{Target.Method.Name}().GetAwaiter().GetResult()";
+
         protected override Type TargetMethodReturnType => typeof(void);
     }
 
@@ -145,9 +149,7 @@ namespace BenchmarkDotNet.Code
     /// </summary>
     internal class GenericTaskDeclarationsProvider : NonVoidDeclarationsProvider
     {
-        public GenericTaskDeclarationsProvider(Target target) : base(target)
-        {
-        }
+        public GenericTaskDeclarationsProvider(Target target) : base(target) { }
 
         protected override Type TargetMethodReturnType => Target.Method.ReturnType.GetTypeInfo().GetGenericArguments().Single();
 
@@ -155,5 +157,7 @@ namespace BenchmarkDotNet.Code
         // and will eventually throw actual exception, not aggregated one
         public override string TargetMethodDelegate
             => $"() => {{ return {Target.Method.Name}().GetAwaiter().GetResult(); }}";
+
+        public override string TargetMethodCall => $"{Target.Method.Name}().GetAwaiter().GetResult()";
     }
 }

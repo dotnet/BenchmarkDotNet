@@ -25,11 +25,11 @@ namespace BenchmarkDotNet.Helpers
             if (value is decimal)
                 return ((decimal) value).ToString("G", CultureInfo.InvariantCulture) + "m";
             if (ReflectionUtils.GetTypeInfo(value.GetType()).IsEnum)
-                return value.GetType().GetCorrectTypeName() + "." + value;
+                return value.GetType().GetCorrectCSharpTypeName() + "." + value;
             if (value is Type)
-                return "typeof(" + ((Type) value).GetCorrectTypeName() + ")";
+                return "typeof(" + ((Type) value).GetCorrectCSharpTypeName() + ")";
             if (!ReflectionUtils.GetTypeInfo(value.GetType()).IsValueType)
-                return "System.Activator.CreateInstance<" + value.GetType().GetCorrectTypeName() + ">()";
+                return "System.Activator.CreateInstance<" + value.GetType().GetCorrectCSharpTypeName() + ">()";
             if (value is TimeInterval)
                 return "new BenchmarkDotNet.Horology.TimeInterval(" + ToSourceCode(((TimeInterval)value).Nanoseconds) + ")";
             if (value is IntPtr)

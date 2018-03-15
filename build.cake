@@ -6,32 +6,25 @@ var skipTests = Argument("SkipTests", false);
 // GLOBAL VARIABLES
 var artifactsDirectory = Directory("./artifacts");
 var solutionFile = "./BenchmarkDotNet.sln";
-var solutionFileBackup = solutionFile + ".build.backup";
+var integrationTestsProjectPath = "./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj";
 var isRunningOnWindows = IsRunningOnWindows();
 var IsOnAppVeyorAndNotPR = AppVeyor.IsRunningOnAppVeyor && !AppVeyor.Environment.PullRequest.IsPullRequest;
+
+var msBuildSettings = new DotNetCoreMSBuildSettings
+{
+    MaxCpuCount = 1
+};
 
 Setup(_ =>
 {
     if(!isRunningOnWindows)
     {
         StartProcess("mono", new ProcessSettings { Arguments = "--version" });
-        
-        // create solution backup
-        CopyFile(solutionFile, solutionFileBackup);
-        // and exclude VB projects
-        ExcludeVBProjectsFromSolution();
-    }
-});
-
-Teardown(_ =>
-{
-    if(!isRunningOnWindows && BuildSystem.IsLocalBuild)
-    {
-        if(FileExists(solutionFileBackup)) // Revert back solution file
-        {
-            DeleteFile(solutionFile);
-            MoveFile(solutionFileBackup, solutionFile);
-        } 
+        var frameworkPathOverride = new FilePath(typeof(object).Assembly.Location).GetDirectory().FullPath;
+        // setup correct version
+        frameworkPathOverride = System.IO.Path.Combine(System.IO.Directory.GetParent(frameworkPathOverride).FullName, "4.6-api/");
+        Information("Build will use FrameworkPathOverride={0} since not building on Windows.", frameworkPathOverride);
+        msBuildSettings.WithProperty("FrameworkPathOverride", frameworkPathOverride);
     }
 });
 
@@ -39,20 +32,6 @@ Task("Clean")
     .Does(() =>
     {
         CleanDirectory(artifactsDirectory);
-
-        if(BuildSystem.IsLocalBuild)
-        {
-            var directoriesToClean = GetDirectories("./**/obj") 
-                                     + GetDirectories("./**/bin") 
-                                     - GetDirectories("./**/debug")
-                                     - GetDirectories("./**/release");
-            DeleteDirectories(directoriesToClean, 
-                new DeleteDirectorySettings 
-                    {
-                        Recursive = true,
-                        Force = true
-                    });
-        }
     });
 
 Task("Restore")
@@ -66,33 +45,15 @@ Task("Build")
     .IsDependentOn("Restore")
     .Does(() =>
     {
-        var buildSettings = new MSBuildSettings()
-            .SetConfiguration(configuration)
-            .WithTarget("Rebuild")
-            .SetVerbosity(Verbosity.Minimal)
-            .UseToolVersion(MSBuildToolVersion.Default)
-            .SetMSBuildPlatform(MSBuildPlatform.Automatic)
-            .SetPlatformTarget(PlatformTarget.MSIL) // Any CPU
-            .SetNodeReuse(true);
-
-        if(!isRunningOnWindows)
-        {
-            // hack for Linux bug - missing MSBuild path
-            if(new CakePlatform().Family == PlatformFamily.Linux)
-            {
-                var monoVersion = GetMonoVersionMoniker();
-                var isMSBuildSupported = monoVersion != null && System.Text.RegularExpressions.Regex.IsMatch(monoVersion,@"([5-9]|\d{2,})\.\d+\.\d+(\.\d+)?");
-                if(isMSBuildSupported)
-                {
-                    Information(string.Format("Auto-detected ToolPath value is `{0}`", buildSettings.ToolPath));
-                    buildSettings.ToolPath = new FilePath(@"/usr/lib/mono/msbuild/15.0/bin/MSBuild.dll");
-                    Information(string.Format("Mono supports MSBuild. Override ToolPath value with `{0}`", buildSettings.ToolPath));
-                }
-            }
-        }
-
         var path = MakeAbsolute(new DirectoryPath(solutionFile));
-        MSBuild(path.FullPath, buildSettings);
+        DotNetCoreBuild(path.FullPath, new DotNetCoreBuildSettings
+        {
+            Configuration = configuration,
+            NoRestore = true,
+            DiagnosticOutput = true,
+            MSBuildSettings = msBuildSettings,
+            Verbosity = DotNetCoreVerbosity.Minimal
+        });
     });
 
 Task("FastTests")
@@ -100,7 +61,15 @@ Task("FastTests")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
-        DotNetCoreTest("./tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj", GetTestSettings());
+        string[] targetVersions = IsRunningOnWindows() ? 
+                new []{"net46", "netcoreapp1.1", "netcoreapp2.0"}
+                :
+                new []{"netcoreapp2.0"};
+
+        foreach(var version in targetVersions)
+        {
+            DotNetCoreTool("./tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj", "xunit", GetTestSettingsParameters(version));
+        }
     });
 
 Task("BackwardCompatibilityTests")
@@ -108,15 +77,10 @@ Task("BackwardCompatibilityTests")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
-        DotNetCoreTest(
-            "./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", 
-            new DotNetCoreTestSettings
-            {
-                Configuration = "Release",
-                Framework = "netcoreapp1.1",
-                Filter = "Category=BackwardCompatibility"
-            }
-        );
+        var testSettings = GetTestSettingsParameters("netcoreapp1.1");
+        testSettings += " -trait \"Category=BackwardCompatibility\"";
+
+        DotNetCoreTool(integrationTestsProjectPath, "xunit", testSettings);
     });
     
 Task("SlowTestsNet46")
@@ -124,7 +88,7 @@ Task("SlowTestsNet46")
     .WithCriteria(!skipTests && isRunningOnWindows)
     .Does(() =>
     {
-        DotNetCoreTest("./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", GetTestSettings("net46"));
+        DotNetCoreTool(integrationTestsProjectPath, "xunit", GetTestSettingsParameters("net46"));
     });    
     
 Task("SlowTestsNetCore2")
@@ -132,7 +96,7 @@ Task("SlowTestsNetCore2")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
-        DotNetCoreTest("./tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj", GetTestSettings("netcoreapp2.0"));
+        DotNetCoreTool(integrationTestsProjectPath, "xunit", GetTestSettingsParameters("netcoreapp2.0"));
     });       
 
 Task("Pack")
@@ -166,43 +130,17 @@ Task("Default")
 RunTarget(target);
 
 // HELPERS
-private DotNetCoreTestSettings GetTestSettings(string tfm = null)
+private string GetTestSettingsParameters(string tfm)
 {
-    var settings = new DotNetCoreTestSettings
+    var settings = $"-configuration {configuration} -stoponfail -maxthreads unlimited -nobuild  -framework {tfm}";
+    if(string.Equals("netcoreapp2.0", tfm, StringComparison.OrdinalIgnoreCase))
     {
-        Configuration = "Release"
-    };
-
-    if (!IsRunningOnWindows())
-    {
-        settings.Framework = "netcoreapp2.0";
+        settings += " --fx-version 2.0.5";
     }
-    else if(tfm != null)
+    if(string.Equals("netcoreapp1.1", tfm, StringComparison.OrdinalIgnoreCase))
     {
-        settings.Framework = tfm;
+        settings += " --fx-version 1.1.6";
     }
-
+    
     return settings;
-}
-
-private void ExcludeVBProjectsFromSolution()
-{
-    // exclude projects
-    var vbProjects = GetFiles("./tests/**/*.vbproj");
-    var projects = string.Join(" ", vbProjects.Select(x => string.Format("\"{0}\"", x))); // if path contains spaces
-    StartProcess("dotnet", new ProcessSettings { Arguments = "sln remove " + projects });
-}
-
-private string GetMonoVersionMoniker()
-{
-    var type = Type.GetType("Mono.Runtime");
-    if (type != null)
-    {
-        var displayName = type.GetMethod("GetDisplayName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-        if (displayName != null)
-        {
-            return displayName.Invoke(null, null).ToString();
-        }
-    }
-    return null;
 }

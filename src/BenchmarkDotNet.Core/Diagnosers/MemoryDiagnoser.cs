@@ -23,8 +23,6 @@ namespace BenchmarkDotNet.Diagnosers
 
         private readonly Dictionary<Benchmark, GcStats> results = new Dictionary<Benchmark, GcStats>();
 
-        public RunMode GetRunMode(Benchmark benchmark) => RunMode.ExtraRun;
-
         public IEnumerable<string> Ids => new[] { DiagnoserId };
 
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
@@ -37,26 +35,23 @@ namespace BenchmarkDotNet.Diagnosers
 
         // the following methods are left empty on purpose
         // the action takes places in other process, and the values are gathered by Engine
-        public void BeforeAnythingElse(DiagnoserActionParameters _) { }
-        public void AfterGlobalSetup(DiagnoserActionParameters _) { }
-        public void BeforeMainRun(DiagnoserActionParameters _) { }
-        public void BeforeGlobalCleanup(DiagnoserActionParameters parameters) { }
+        public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
 
         public void DisplayResults(ILogger logger) { }
 
-        public void ProcessResults(Benchmark benchmark, BenchmarkReport report) 
-            => results.Add(benchmark, report.GcStats);
+        public RunMode GetRunMode(Benchmark benchmark) => RunMode.NoOverhead; 
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Enumerable.Empty<ValidationError>();
+        public void ProcessResults(DiagnoserResults results) 
+            => this.results.Add(results.Benchmark, results.GcStats);
+
+        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) 
+            => Array.Empty<ValidationError>();
         
         public class AllocationColumn : IColumn
         {
             private readonly Dictionary<Benchmark, GcStats> results;
 
-            public AllocationColumn(Dictionary<Benchmark, GcStats> results)
-            {
-                this.results = results;
-            }
+            public AllocationColumn(Dictionary<Benchmark, GcStats> results) => this.results = results;
 
             public string Id => nameof(AllocationColumn);
             public string ColumnName => "Allocated";

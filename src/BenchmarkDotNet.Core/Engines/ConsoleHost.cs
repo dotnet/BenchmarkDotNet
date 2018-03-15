@@ -7,16 +7,13 @@ namespace BenchmarkDotNet.Engines
     public sealed class ConsoleHost : IHost
     {
         private readonly TextWriter outWriter;
+        private readonly TextReader inReader;
 
-        public ConsoleHost([NotNull] TextWriter outWriter, bool hasDiagnoserAttached)
+        public ConsoleHost([NotNull]TextWriter outWriter, [NotNull]TextReader inReader)
         {
-            if (outWriter == null)
-                throw new ArgumentNullException(nameof(outWriter));
-            this.outWriter = outWriter;
-            IsDiagnoserAttached = hasDiagnoserAttached;
+            this.outWriter = outWriter ?? throw new ArgumentNullException(nameof(outWriter));
+            this.inReader = inReader ?? throw new ArgumentNullException(nameof(inReader));
         }
-
-        public bool IsDiagnoserAttached { get; }
 
         public void Write(string message) => outWriter.Write(message);
 
@@ -26,26 +23,14 @@ namespace BenchmarkDotNet.Engines
 
         public void SendSignal(HostSignal hostSignal)
         {
-            switch (hostSignal)
-            {
-                case HostSignal.BeforeAnythingElse:
-                    WriteLine(Engine.Signals.BeforeAnythingElse);
-                    break;
-                case HostSignal.AfterGlobalSetup:
-                    WriteLine(Engine.Signals.AfterGlobalSetup);
-                    break;
-                case HostSignal.BeforeMainRun:
-                    WriteLine(Engine.Signals.BeforeMainRun);
-                    break; ;
-                case HostSignal.BeforeGlobalCleanup:
-                    WriteLine(Engine.Signals.BeforeGlobalCleanup);
-                    break;
-                case HostSignal.AfterAnythingElse:
-                    WriteLine(Engine.Signals.AfterAnythingElse);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(hostSignal), hostSignal, null);
-            }
+            WriteLine(Engine.Signals.ToMessage(hostSignal));
+
+            // read the response from Parent process, make the communication blocking
+            // I did not use Mutexes because they are not supported for Linux/MacOs for .NET Core
+            // this solution is stupid simple and it works
+            var acknowledgment = inReader.ReadLine(); 
+            if(acknowledgment != Engine.Signals.Acknowledgment)
+                throw new NotSupportedException($"Unknown Acknowledgment: {acknowledgment}");
         }
 
         public void ReportResults(RunResults runResults) => runResults.Print(outWriter);

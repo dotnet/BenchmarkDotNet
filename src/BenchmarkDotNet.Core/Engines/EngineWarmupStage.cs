@@ -40,8 +40,7 @@ namespace BenchmarkDotNet.Engines
                 if (IsWarmupFinished(measurements, iterationMode))
                     break;
             }
-            if (!IsDiagnoserAttached)
-                WriteLine();
+            WriteLine();
 
             return measurements;
         }
@@ -52,8 +51,7 @@ namespace BenchmarkDotNet.Engines
             for (int i = 0; i < iterationCount; i++)
                 measurements.Add(RunIteration(iterationMode, i + 1, invokeCount, unrollFactor));
 
-            if (!IsDiagnoserAttached)
-                WriteLine();
+            WriteLine();
 
             return measurements;
         }

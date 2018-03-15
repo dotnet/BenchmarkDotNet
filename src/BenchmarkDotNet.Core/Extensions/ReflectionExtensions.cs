@@ -25,7 +25,10 @@ namespace BenchmarkDotNet.Extensions
 
         internal static bool IsNullable(this Type type) => Nullable.GetUnderlyingType(type) != null;
 
-        internal static string GetCorrectTypeName(this Type type)
+        /// <summary>
+        /// returns type name which can be used in generated C# code
+        /// </summary>
+        internal static string GetCorrectCSharpTypeName(this Type type)
         {
             if (type == typeof(void))
                 return "void";
@@ -50,14 +53,34 @@ namespace BenchmarkDotNet.Extensions
             if (type.GetTypeInfo().IsGenericType)
             {
                 var mainName = type.Name.Substring(0, type.Name.IndexOf('`'));
-                string args = string.Join(", ", type.GetGenericArguments().Select(GetCorrectTypeName).ToArray());
+                string args = string.Join(", ", type.GetGenericArguments().Select(GetCorrectCSharpTypeName).ToArray());
                 return $"{prefix}{mainName}<{args}>";
             }
 
             if (type.IsArray)
-                return GetCorrectTypeName(type.GetElementType()) + "[" + new string(',', type.GetArrayRank() - 1) + "]";
+                return GetCorrectCSharpTypeName(type.GetElementType()) + "[" + new string(',', type.GetArrayRank() - 1) + "]";
 
             return prefix + type.Name;
+        }
+
+        /// <summary>
+        /// returns simple, human friendly display name
+        /// </summary>
+        internal static string GetDisplayName(this Type type) => GetDisplayName(type.GetTypeInfo());
+
+        /// <summary>
+        /// returns simple, human friendly display name
+        /// </summary>
+        internal static string GetDisplayName(this TypeInfo typeInfo)
+        {
+            if (!typeInfo.IsGenericType)
+                return typeInfo.Name;
+            if (typeInfo.IsGenericTypeDefinition)
+                throw new NotSupportedException("Open generics are not supported");
+
+            var mainName = typeInfo.Name.Substring(0, typeInfo.Name.IndexOf('`'));
+            string args = string.Join(", ", typeInfo.GetGenericArguments().Select(GetDisplayName).ToArray());
+            return $"{mainName}<{args}>";
         }
 
         internal static IEnumerable<MethodInfo> GetAllMethods(this Type type)
@@ -111,7 +134,7 @@ namespace BenchmarkDotNet.Extensions
         {
             var typeInfo = type.GetTypeInfo();
 
-            if (typeInfo.IsAbstract || typeInfo.IsSealed || typeInfo.IsGenericType || typeInfo.IsNotPublic)
+            if (typeInfo.IsAbstract || typeInfo.IsSealed || typeInfo.IsNotPublic || (typeInfo.IsGenericType && !IsRunnableGenericType(typeInfo)))
                 return false;
 
             return typeInfo.GetBenchmarks().Any();
@@ -149,5 +172,9 @@ namespace BenchmarkDotNet.Extensions
 
             return joined;
         }
+
+        private static bool IsRunnableGenericType(TypeInfo typeInfo)
+            => !typeInfo.IsGenericTypeDefinition // is not an open generic
+            && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it
     }
 }

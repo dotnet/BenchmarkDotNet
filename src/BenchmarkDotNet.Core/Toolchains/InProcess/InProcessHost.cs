@@ -70,30 +70,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <param name="hostSignal">The signal to send.</param>
         public void SendSignal(HostSignal hostSignal)
         {
-            switch (hostSignal)
-            {
-                case HostSignal.BeforeAnythingElse:
-                    diagnoser?.BeforeAnythingElse(diagnoserActionParameters);
-                    WriteLine(Engine.Signals.BeforeAnythingElse);
-                    break;
-                case HostSignal.AfterGlobalSetup:
-                    diagnoser?.AfterGlobalSetup(diagnoserActionParameters);
-                    WriteLine(Engine.Signals.AfterGlobalSetup);
-                    break;
-                case HostSignal.BeforeMainRun:
-                    diagnoser?.BeforeMainRun(diagnoserActionParameters);
-                    WriteLine(Engine.Signals.BeforeMainRun);
-                    break;
-                case HostSignal.BeforeGlobalCleanup:
-                    diagnoser?.BeforeGlobalCleanup(diagnoserActionParameters);
-                    WriteLine(Engine.Signals.BeforeGlobalCleanup);
-                    break;
-                case HostSignal.AfterAnythingElse:
-                    WriteLine(Engine.Signals.AfterAnythingElse);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(hostSignal), hostSignal, null);
-            }
+            if (!IsDiagnoserAttached) // no need to send the signal, nobody is listening for it
+                return;
+
+            diagnoser.Handle(hostSignal, diagnoserActionParameters);
         }
 
         /// <summary>Submits run results to the host.</summary>

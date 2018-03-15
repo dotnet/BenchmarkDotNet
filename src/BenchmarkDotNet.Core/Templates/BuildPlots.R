@@ -26,7 +26,11 @@ cummean <- function(x) cumsum(x)/(1:length(x))
 BenchmarkDotNetVersionGrob <- textGrob(BenchmarkDotNetVersion, gp = gpar(fontface=3, fontsize=10), hjust=1, x=1)
 nicePlot <- function(p) grid.arrange(p, bottom = BenchmarkDotNetVersionGrob)
 printNice <- function(p) print(nicePlot(p))
-ggsaveNice <- function(fileName, p, ...) ggsave(fileName, plot = nicePlot(p), ...)
+ggsaveNice <- function(fileName, p, ...) {
+  cat(paste0("*** Plot: ", fileName, " ***\n"))
+  ggsave(fileName, plot = nicePlot(p), ...)
+  cat("------------------------------\n")
+}
 
 args <- commandArgs(trailingOnly = TRUE)
 files <- if (length(args) > 0) args else list.files()[list.files() %>% ends_with("-measurements.csv")]
@@ -96,6 +100,21 @@ for (file in files) {
     facetDensityPlot <- densityPlot + facet_wrap(~Job_Id)
     printNice(facetDensityPlot)
     ggsaveNice(gsub("-measurements.csv", paste0("-", target, "-facetDensity.png"), file), facetDensityPlot)
+
+    for (params in unique(df$Params)) {
+      paramsDf <- df %>% filter(Params == params)
+
+      paramsDensityPlot <- ggplot(paramsDf, aes(x=Measurement_Value, fill=Job_Id)) +
+        ggtitle(paste(title, "/", target, "/", params)) +
+        xlab(paste("Time,", timeUnit)) +
+        geom_density(alpha=.5)
+      printNice(paramsDensityPlot)
+      ggsaveNice(gsub("-measurements.csv", paste0("-", target, "-", params, "-density.png"), file), paramsDensityPlot)
+
+      paramsFacetDensityPlot <- paramsDensityPlot + facet_wrap(~Job_Id)
+      printNice(paramsFacetDensityPlot)
+      ggsaveNice(gsub("-measurements.csv", paste0("-", target, "-", params, "-facetDensity.png"), file), paramsFacetDensityPlot)
+    }
 
     for (job in unique(df$Job_Id)) {
       jobDf <- df %>% filter(Job_Id == job)

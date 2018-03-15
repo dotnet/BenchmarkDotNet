@@ -50,6 +50,9 @@ namespace Microsoft.Diagnostics.RuntimeExt
 
         private static SourceLocation FindNearestLine(PdbFunction function, int ilOffset)
         {
+            if (function == null || function.SequencePoints == null)
+                return null;
+
             int distance = int.MaxValue;
             SourceLocation nearest = null;
 

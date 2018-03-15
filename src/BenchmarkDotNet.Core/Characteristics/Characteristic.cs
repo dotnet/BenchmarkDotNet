@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Characteristics
             new Characteristic<T>(
                 GetMemberName(propertyGetterExpression),
                 GetDeclaringType(propertyGetterExpression),
-                null, default(T),
+                null, default,
                 false);
 
         public static Characteristic<T> Create<TOwner, T>(

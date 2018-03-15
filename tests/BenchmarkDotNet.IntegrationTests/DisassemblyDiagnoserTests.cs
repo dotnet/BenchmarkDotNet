@@ -6,10 +6,10 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using Xunit;
 using Xunit.Abstractions;
@@ -78,14 +78,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var disassemblyDiagnoser = (IDisassemblyDiagnoser)DisassemblyDiagnoser.Create(
                 new DisassemblyDiagnoserConfig(printAsm: true, printIL: true, printSource: true, recursiveDepth: 3));
 
-            CanExecute<WithCalls>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser));
-
-            void AssertDisassembled(IDisassemblyDiagnoser diagnoser, string methodSignature)
-            {
-                Assert.True(diagnoser.Results.Single().Value
-                    .Methods.Any(method => method.Name.EndsWith(methodSignature) && method.Maps.Any(map => map.Instructions.Any())),
-                    $"{methodSignature} is missing");
-            }
+            CanExecute<WithCalls>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.ColdStart));
 
             AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Benchmark)}()");
             AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Benchmark)}(Boolean)");
@@ -95,30 +88,40 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Virtual)}()");
         }
 
-        [FactWindowsOnly(WindowsOnly)]
-        public void VeryShortJobsAreNotSupported()
+        public class Generic<T> where T : new()
+        {
+            [Benchmark]
+            public T Create() => new T();
+        }
+
+        [TheoryWindowsOnly(WindowsOnly)]
+        [MemberData(nameof(GetAllJits))]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
+        public void CanDisassembleGenericTypes(Jit jit, Platform platform, Runtime runtime)
         {
             var disassemblyDiagnoser = (IDisassemblyDiagnoser)DisassemblyDiagnoser.Create(
                 new DisassemblyDiagnoserConfig(printAsm: true, printIL: true, printSource: true, recursiveDepth: 3));
 
-            var config = ManualConfig.CreateEmpty()
-                        .With(Job.Dry)
-                        .With(DefaultConfig.Instance.GetLoggers().ToArray())
-                        .With(DefaultColumnProviders.Instance)
-                        .With(disassemblyDiagnoser)
-                        .With(new OutputLogger(Output));
+            CanExecute<Generic<int>>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.Monitoring));
 
-            var validationErrors = disassemblyDiagnoser.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(WithCalls), config)).ToArray();
+            var result = disassemblyDiagnoser.Results.Values.Single();
 
-            Assert.Contains(validationErrors, error => error.IsCritical && error.Message == "No Job.Dry support for disassembler. Please use Job.Short");
+            Assert.Contains(result.Methods, method => method.Maps.Any(map => map.Instructions.OfType<Asm>().Any()));
         }
 
-        private IConfig CreateConfig(Jit jit, Platform platform, Runtime runtime, IDiagnoser disassemblyDiagnoser)
+        private IConfig CreateConfig(Jit jit, Platform platform, Runtime runtime, IDiagnoser disassemblyDiagnoser, RunStrategy runStrategy)
             => ManualConfig.CreateEmpty()
-                .With(Job.ShortRun.With(jit).With(platform).With(runtime))
+                .With(Job.Dry.With(jit).With(platform).With(runtime).With(runStrategy))
                 .With(DefaultConfig.Instance.GetLoggers().ToArray())
                 .With(DefaultColumnProviders.Instance)
                 .With(disassemblyDiagnoser)
                 .With(new OutputLogger(Output));
+
+        private void AssertDisassembled(IDisassemblyDiagnoser diagnoser, string methodSignature)
+        {
+            Assert.True(diagnoser.Results.Single().Value
+                .Methods.Any(method => method.Name.EndsWith(methodSignature) && method.Maps.Any(map => map.Instructions.Any())),
+                $"{methodSignature} is missing");
+        }
     }
 }
