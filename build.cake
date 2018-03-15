@@ -113,7 +113,6 @@ Task("Default")
     .IsDependentOn("FastTests")
     .IsDependentOn("SlowTestsNet46")
     .IsDependentOn("SlowTestsNetCore2")
-    .IsDependentOn("BackwardCompatibilityTests")
     .IsDependentOn("Pack");
 
 RunTarget(target);
