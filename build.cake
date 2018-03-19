@@ -64,7 +64,7 @@ Task("FastTests")
         string[] targetVersions = IsRunningOnWindows() ? 
                 new []{"net46", "netcoreapp1.1", "netcoreapp2.0"}
                 :
-                new []{"netcoreapp2.0"};
+                new []{"netcoreapp1.1", "netcoreapp2.0"};
 
         foreach(var version in targetVersions)
         {
@@ -135,11 +135,11 @@ private string GetTestSettingsParameters(string tfm)
     var settings = $"-configuration {configuration} -stoponfail -maxthreads unlimited -nobuild  -framework {tfm}";
     if(string.Equals("netcoreapp2.0", tfm, StringComparison.OrdinalIgnoreCase))
     {
-        settings += " --fx-version 2.0.5";
+        settings += " --fx-version 2.0.6";
     }
     if(string.Equals("netcoreapp1.1", tfm, StringComparison.OrdinalIgnoreCase))
     {
-        settings += " --fx-version 1.1.6";
+        settings += " --fx-version 1.1.7";
     }
     
     return settings;
