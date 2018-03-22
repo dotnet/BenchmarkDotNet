@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Portability;
@@ -53,7 +54,9 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 var instructions = new List<Code>();
 
-                var listing = input.SkipWhile(i => !i.Contains("(__TEXT,__text) section")).Skip(2);
+                var listing = input.SkipWhile(i => !i.Contains("(__TEXT,__text) section") && !i.Contains("Disassembly of section .text:"))
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .Skip(2);
 
                 foreach (string line in listing)
                     if (TryParseInstruction(line, out var instruction))
@@ -66,22 +69,25 @@ namespace BenchmarkDotNet.Diagnosers
                         new DisassembledMethod
                         {
                             Name = methodName,
-                            Maps = new [] { new Map { Instructions = instructions.ToArray() } },
+                            Maps = new[] { new Map { Instructions = instructions.ToArray() } },
                             CommandLine = commandLine
                         }
                     }
                 };
             }
             
-            //line example: 0000000000000000	subq	$0x28, %rsp
-            private static bool TryParseInstruction(string line, out Code instruction)
+            //line example 1:  0:	48 83 ec 28          	sub    $0x28,%rsp
+            //line example 2: 0000000000000000	subq	$0x28, %rsp
+            private static Regex instructionRegex = new Regex(@"\s*(?<address>[0-9a-f]+)(\:\s+([0-9a-f]{2}\s+)+)?\s+(?<instruction>.*)\s*");
+
+            public static bool TryParseInstruction(string line, out Code instruction)
             {
                 instruction = null;
-                string trimmed = line?.Trim();
-                if (string.IsNullOrEmpty(trimmed))
+                var match = instructionRegex.Match(line);
+                if (!match.Success)
                     return false;
-                var splitted = trimmed.Split(new [] { '\t' }, 2);
-                instruction = new Code { TextRepresentation = splitted.Last() };
+
+                instruction = new Code { TextRepresentation = match.Groups["instruction"].ToString() };
                 return true;
             }
         }
