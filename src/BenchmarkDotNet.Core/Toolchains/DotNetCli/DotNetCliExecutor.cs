@@ -25,10 +25,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         public ExecuteResult Execute(ExecuteParameters executeParameters)
         {
-            var executableName = $"{executeParameters.BuildResult.ArtifactsPaths.ProgramName}.dll";
-            if (!File.Exists(Path.Combine(executeParameters.BuildResult.ArtifactsPaths.BinariesDirectoryPath, executableName)))
+            if (!File.Exists(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath))
             {
-                executeParameters.Logger.WriteLineError($"Did not find {executableName} in {executeParameters.BuildResult.ArtifactsPaths.BinariesDirectoryPath}, but the folder contained:");
+                executeParameters.Logger.WriteLineError($"Did not find {executeParameters.BuildResult.ArtifactsPaths.ExecutablePath}, but the folder contained:");
                 foreach (var file in new DirectoryInfo(executeParameters.BuildResult.ArtifactsPaths.BinariesDirectoryPath).GetFiles("*.*"))
                     executeParameters.Logger.WriteLineError(file.Name);
                 
@@ -44,7 +43,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     executeParameters.Logger, 
                     executeParameters.BuildResult.ArtifactsPaths, 
                     executeParameters.Diagnoser, 
-                    executableName, 
+                    Path.GetFileName(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath), 
                     executeParameters.Config,
                     executeParameters.Resolver);
             }
