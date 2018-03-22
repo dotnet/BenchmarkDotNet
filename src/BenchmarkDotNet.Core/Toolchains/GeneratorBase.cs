@@ -42,6 +42,8 @@ namespace BenchmarkDotNet.Toolchains
         protected virtual string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration) 
             => buildArtifactsDirectoryPath;
 
+        protected virtual string GetExecutableExtension() => RuntimeInformation.ExecutableExtension;
+
         protected virtual string GetProjectFilePath(string binariesDirectoryPath) => string.Empty;
 
         protected abstract string[] GetArtifactsToCleanup(Benchmark benchmark, ArtifactsPaths artifactsPaths);
@@ -62,7 +64,7 @@ namespace BenchmarkDotNet.Toolchains
             string programName = GetProgramName(benchmark, config);
             string buildArtifactsDirectoryPath = GetBuildArtifactsDirectoryPath(benchmark, programName);
             string binariesDirectoryPath = GetBinariesDirectoryPath(buildArtifactsDirectoryPath, benchmark.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, resolver));
-            string executablePath = Path.Combine(binariesDirectoryPath, $"{programName}{RuntimeInformation.ExecutableExtension}");
+            string executablePath = Path.Combine(binariesDirectoryPath, $"{programName}{GetExecutableExtension()}");
 
             return new ArtifactsPaths(
                 rootArtifactsFolderPath: rootArtifactsFolderPath,

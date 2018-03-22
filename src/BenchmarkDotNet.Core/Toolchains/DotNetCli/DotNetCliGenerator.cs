@@ -41,6 +41,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             Runtime = runtime;
         }
 
+        protected override string GetExecutableExtension() => TargetFrameworkMoniker.Contains("core") ? ".dll" : ".exe";
+
         /// <summary>
         /// we need our folder to be on the same level as the project that we want to reference
         /// we are limited by xprojs (by default compiles all .cs files in all subfolders, Program.cs could be doubled and fail the build)

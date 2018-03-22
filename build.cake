@@ -123,7 +123,7 @@ private string GetTestSettingsParameters(string tfm)
     var settings = $"-configuration {configuration} -stoponfail -maxthreads unlimited -nobuild  -framework {tfm}";
     if(string.Equals("netcoreapp2.0", tfm, StringComparison.OrdinalIgnoreCase))
     {
-        settings += " --fx-version 2.0.5";
+        settings += " --fx-version 2.0.6";
     }
     
     return settings;
