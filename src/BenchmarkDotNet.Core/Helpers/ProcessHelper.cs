@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Helpers
 
             using (var process = new Process { StartInfo = processStartInfo })
             {
-                process.OutputDataReceived += (sender, args) => output.Add(args.Data);
+                process.OutputDataReceived += (sender, args) => output.Add(args.Data ?? "");
                 process.ErrorDataReceived += (_, __) => { };
 
                 process.Start();
