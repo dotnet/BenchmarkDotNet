@@ -46,7 +46,7 @@
 
 // original json parsing code from http://techblog.procurios.nl/k/618/news/view/14605/14863/How-do-I-write-my-own-parser-for-JSON.html
 
-#if NETFX_CORE || CORE
+#if NETFX_CORE
 #define SIMPLE_JSON_TYPEINFO
 #endif
 

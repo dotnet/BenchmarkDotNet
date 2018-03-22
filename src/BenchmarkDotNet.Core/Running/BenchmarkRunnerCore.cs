@@ -388,13 +388,13 @@ namespace BenchmarkDotNet.Running
 
         private static IDisposable GetAssemblyResolveHelper(IToolchain toolchain, ILogger logger)
         {
-#if CLASSIC
-            if (!(toolchain is InProcessToolchain) // we don't want to mess with assembly loading when running benchmarks in the same process (could produce wrong results)
-                && !RuntimeInformation.IsMono()) // so far it was never an issue for Mono
+            if (RuntimeInformation.IsFullFramework 
+                && !(toolchain is InProcessToolchain) // we don't want to mess with assembly loading when running benchmarks in the same process (could produce wrong results)
+                && !RuntimeInformation.IsMono) // so far it was never an issue for Mono
             {
-                return Helpers.DirtyAssemblyResolveHelper.Create(logger);
+                return DirtyAssemblyResolveHelper.Create(logger);
             }
-#endif
+
             return null;
         }
 

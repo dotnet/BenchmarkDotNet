@@ -1,6 +1,4 @@
-﻿#if !NETCOREAPP1_1
-
-using System;
+﻿using System;
 using System.Threading;
 using BenchmarkDotNet.Loggers;
 
@@ -37,4 +35,3 @@ namespace BenchmarkDotNet.Extensions
         }
     }
 }
-#endif

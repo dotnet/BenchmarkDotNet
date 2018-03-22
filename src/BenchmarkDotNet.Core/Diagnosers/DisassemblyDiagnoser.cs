@@ -89,7 +89,7 @@ namespace BenchmarkDotNet.Diagnosers
         }
 
         private bool ShouldUseMonoDisassembler(Benchmark benchmark)
-            => benchmark.Job.Env.Runtime is MonoRuntime || RuntimeInformation.IsMono();
+            => benchmark.Job.Env.Runtime is MonoRuntime || RuntimeInformation.IsMono;
 
         private bool ShouldUseWindowsDissasembler(Benchmark benchmark)
             => !(benchmark.Job.Env.Runtime is MonoRuntime) && RuntimeInformation.IsWindows();

@@ -62,25 +62,14 @@ Task("FastTests")
     .Does(() =>
     {
         string[] targetVersions = IsRunningOnWindows() ? 
-                new []{"net46", "netcoreapp1.1", "netcoreapp2.0"}
+                new []{"net46", "netcoreapp2.0"}
                 :
-                new []{"netcoreapp1.1", "netcoreapp2.0"};
+                new []{"netcoreapp2.0"};
 
         foreach(var version in targetVersions)
         {
             DotNetCoreTool("./tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj", "xunit", GetTestSettingsParameters(version));
         }
-    });
-
-Task("BackwardCompatibilityTests")
-    .IsDependentOn("Build")
-    .WithCriteria(!skipTests)
-    .Does(() =>
-    {
-        var testSettings = GetTestSettingsParameters("netcoreapp1.1");
-        testSettings += " -trait \"Category=BackwardCompatibility\"";
-
-        DotNetCoreTool(integrationTestsProjectPath, "xunit", testSettings);
     });
     
 Task("SlowTestsNet46")
@@ -124,7 +113,6 @@ Task("Default")
     .IsDependentOn("FastTests")
     .IsDependentOn("SlowTestsNet46")
     .IsDependentOn("SlowTestsNetCore2")
-    .IsDependentOn("BackwardCompatibilityTests")
     .IsDependentOn("Pack");
 
 RunTarget(target);
@@ -136,10 +124,6 @@ private string GetTestSettingsParameters(string tfm)
     if(string.Equals("netcoreapp2.0", tfm, StringComparison.OrdinalIgnoreCase))
     {
         settings += " --fx-version 2.0.6";
-    }
-    if(string.Equals("netcoreapp1.1", tfm, StringComparison.OrdinalIgnoreCase))
-    {
-        settings += " --fx-version 1.1.7";
     }
     
     return settings;

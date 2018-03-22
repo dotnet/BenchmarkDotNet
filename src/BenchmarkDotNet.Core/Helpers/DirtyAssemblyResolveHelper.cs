@@ -1,5 +1,4 @@
-﻿#if CLASSIC
-using BenchmarkDotNet.Loggers;
+﻿using BenchmarkDotNet.Loggers;
 using System;
 using System.IO;
 using System.Reflection;
@@ -62,4 +61,3 @@ namespace BenchmarkDotNet.Helpers
         }
     }
 }
-#endif

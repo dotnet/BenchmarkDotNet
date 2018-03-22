@@ -120,20 +120,19 @@ namespace BenchmarkDotNet.Engines
 
         private static long GetAllocatedBytes()
         {
-            if (RuntimeInformation.IsMono()) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-
+            if (RuntimeInformation.IsMono) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-
                 return 0;
 
             // "This instance Int64 property returns the number of bytes that have been allocated by a specific 
             // AppDomain. The number is accurate as of the last garbage collection." - CLR via C#
             // so we enforce GC.Collect here just to make sure we get accurate results
             GC.Collect();
-#if NETCOREAPP1_1
+
+            if (RuntimeInformation.IsFullFramework)
+                return AppDomain.CurrentDomain.MonitoringTotalAllocatedMemorySize;
+
+            // https://apisof.net/catalog/System.GC.GetAllocatedBytesForCurrentThread() is not part of the .NET Standard, so we use reflection to call it..
             return GetAllocatedBytesForCurrentThreadDelegate.Invoke();
-#elif NETCOREAPP2_0
-            return GC.GetAllocatedBytesForCurrentThread();
-#elif CLASSIC
-            return AppDomain.CurrentDomain.MonitoringTotalAllocatedMemorySize;
-#endif
         }
 
         private static Func<long> GetAllocatedBytesForCurrentThread()

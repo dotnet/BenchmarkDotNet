@@ -1,7 +1,5 @@
-#if !CORE
 using System.Runtime.ExceptionServices;
 using System.Security;
-#endif
 using System.Runtime.InteropServices;
 
 namespace BenchmarkDotNet.Horology
@@ -19,10 +17,8 @@ namespace BenchmarkDotNet.Horology
         [DllImport("kernel32.dll")]
         private static extern bool QueryPerformanceFrequency(out long value);
 
-#if !CORE
         [HandleProcessCorruptedStateExceptions] // #276
         [SecurityCritical]
-#endif
         private static bool Initialize(out long qpf)
         {
             if (!Portability.RuntimeInformation.IsWindows())
