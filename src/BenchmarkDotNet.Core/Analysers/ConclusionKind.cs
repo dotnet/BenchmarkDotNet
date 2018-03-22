@@ -2,6 +2,6 @@
 {
     public enum ConclusionKind
     {
-        Warning, Hint
+        Error, Warning, Hint
     }
 }

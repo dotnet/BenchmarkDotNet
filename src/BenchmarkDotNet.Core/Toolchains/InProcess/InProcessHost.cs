@@ -6,6 +6,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.InProcess
@@ -75,6 +76,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
             diagnoser.Handle(hostSignal, diagnoserActionParameters);
         }
+
+        public void SendError(string message) => logger.WriteLine(LogKind.Error, $"{ValidationHelper.ConsoleErrorPrefix} {message}");
 
         /// <summary>Submits run results to the host.</summary>
         /// <param name="runResults">The run results.</param>
