@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Toolchains
                     if(RuntimeInformation.IsNetCore)
                         return CsProjClassicNetToolchain.Current.Value;
 
-                    return new Roslyn.RoslynToolchain();
+                    return Roslyn.RoslynToolchain.Instance;
                 case CoreRuntime core:
                     return CsProjCoreToolchain.Current.Value;
                 default:

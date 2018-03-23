@@ -18,11 +18,6 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <PackageReference Include="xunit" Version="2.3.1" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' ">
-    <PackageReference Include="System.ComponentModel.EventBasedAsync" Version="4.3.0" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' Or '$(TargetFramework)' == 'netcoreapp2.0' ">
     <PackageReference Include="ApprovalTests" Version="3.0.13" />
   </ItemGroup>
   <PropertyGroup>

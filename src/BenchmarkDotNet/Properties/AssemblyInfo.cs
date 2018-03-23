@@ -11,8 +11,10 @@ using BenchmarkDotNet.Properties;
 [assembly: InternalsVisibleTo("BenchmarkDotNet.Tests,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.IntegrationTests,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.Samples,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
+[assembly: InternalsVisibleTo("BenchmarkDotNet.Diagnostics.Windows,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
 #else
 [assembly: InternalsVisibleTo("BenchmarkDotNet.Tests")]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.IntegrationTests")]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.Samples")]
+[assembly: InternalsVisibleTo("BenchmarkDotNet.Diagnostics.Windows")]
 #endif

@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Engines
             OperationsPerInvoke = operationsPerInvoke;
             this.includeMemoryStats = includeMemoryStats;
 
-            Resolver = new CompositeResolver(BenchmarkRunnerCore.DefaultResolver, EngineResolver.Instance);
+            Resolver = new CompositeResolver(BenchmarkRunner.DefaultResolver, EngineResolver.Instance);
 
             Clock = targetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, Resolver);
             ForceAllocations = targetJob.ResolveValue(GcMode.ForceCharacteristic, Resolver);
