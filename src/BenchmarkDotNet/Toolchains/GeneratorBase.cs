@@ -1,10 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
-using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Code;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -14,56 +10,55 @@ namespace BenchmarkDotNet.Toolchains
 {
     public abstract class GeneratorBase : IGenerator
     {
-        public GenerateResult GenerateProject(Benchmark benchmark, ILogger logger, string rootArtifactsFolderPath, IConfig config, IResolver resolver)
+        public GenerateResult GenerateProject(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath)
         {
             ArtifactsPaths artifactsPaths = null;
             try
             {
-                artifactsPaths = GetArtifactsPaths(benchmark, config, rootArtifactsFolderPath, resolver);
+                artifactsPaths = GetArtifactsPaths(buildPartition, rootArtifactsFolderPath);
 
-                CopyAllRequiredFiles(benchmark, artifactsPaths);
+                CopyAllRequiredFiles(artifactsPaths);
 
-                GenerateCode(benchmark, artifactsPaths, config);
-                GenerateAppConfig(benchmark, artifactsPaths, resolver);
-                GenerateNuGetConfig(benchmark, artifactsPaths);
-                GenerateProject(benchmark, artifactsPaths, resolver, logger);
-                GenerateBuildScript(benchmark, artifactsPaths, resolver);
+                GenerateCode(buildPartition, artifactsPaths);
+                GenerateAppConfig(buildPartition, artifactsPaths);
+                GenerateNuGetConfig(artifactsPaths);
+                GenerateProject(buildPartition, artifactsPaths, logger);
+                GenerateBuildScript(buildPartition, artifactsPaths);
 
-                return GenerateResult.Success(artifactsPaths, GetArtifactsToCleanup(benchmark, artifactsPaths));
+                return GenerateResult.Success(artifactsPaths, GetArtifactsToCleanup(artifactsPaths));
             }
             catch (Exception ex)
             {
-                return GenerateResult.Failure(artifactsPaths, GetArtifactsToCleanup(benchmark, artifactsPaths), ex);
+                return GenerateResult.Failure(artifactsPaths, GetArtifactsToCleanup(artifactsPaths), ex);
             }
         }
 
-        protected abstract string GetBuildArtifactsDirectoryPath(Benchmark benchmark, string programName);
+        protected abstract string GetBuildArtifactsDirectoryPath(BuildPartition assemblyLocation, string programName);
 
-        protected virtual string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration) 
-            => buildArtifactsDirectoryPath;
+        protected virtual string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration) => buildArtifactsDirectoryPath;
 
         protected virtual string GetExecutableExtension() => RuntimeInformation.ExecutableExtension;
 
         protected virtual string GetProjectFilePath(string binariesDirectoryPath) => string.Empty;
 
-        protected abstract string[] GetArtifactsToCleanup(Benchmark benchmark, ArtifactsPaths artifactsPaths);
+        protected abstract string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths);
 
-        protected virtual void CopyAllRequiredFiles(Benchmark benchmark, ArtifactsPaths artifactsPaths) { }
+        protected virtual void CopyAllRequiredFiles(ArtifactsPaths artifactsPaths) { }
 
-        protected virtual void GenerateNuGetConfig(Benchmark benchmark, ArtifactsPaths artifactsPaths) { }
+        protected virtual void GenerateNuGetConfig(ArtifactsPaths artifactsPaths) { }
 
-        protected virtual void GenerateProject(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver, ILogger logger) { }
+        protected virtual void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) { }
 
-        protected abstract void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver);
+        protected abstract void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths);
 
-        private ArtifactsPaths GetArtifactsPaths(Benchmark benchmark, IConfig config, string rootArtifactsFolderPath, IResolver resolver)
+        private ArtifactsPaths GetArtifactsPaths(BuildPartition buildPartition, string rootArtifactsFolderPath)
         {
             // its not ".cs" in order to avoid VS from displaying and compiling it with xprojs/csprojs that include all *.cs by default
             const string codeFileExtension = ".notcs";
 
-            string programName = GetProgramName(benchmark, config);
-            string buildArtifactsDirectoryPath = GetBuildArtifactsDirectoryPath(benchmark, programName);
-            string binariesDirectoryPath = GetBinariesDirectoryPath(buildArtifactsDirectoryPath, benchmark.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, resolver));
+            string programName = buildPartition.ProgramName;
+            string buildArtifactsDirectoryPath = GetBuildArtifactsDirectoryPath(buildPartition, programName);
+            string binariesDirectoryPath = GetBinariesDirectoryPath(buildArtifactsDirectoryPath, buildPartition.BuildConfiguration);
             string executablePath = Path.Combine(binariesDirectoryPath, $"{programName}{GetExecutableExtension()}");
 
             return new ArtifactsPaths(
@@ -79,26 +74,17 @@ namespace BenchmarkDotNet.Toolchains
                 programName: programName);
         }
 
-        /// <summary>
-        /// when config is set to KeepBenchmarkFiles we use benchmark.ShortInfo as name (some human might want to use it's content),
-        /// otherwise (default) new Guid to reduce the chance for UnauthorizedAccessException
-        /// </summary>
-        private static string GetProgramName(Benchmark benchmark, IConfig config)
-            => config.KeepBenchmarkFiles ? benchmark.FolderInfo : Guid.NewGuid().ToString();
+        private static void GenerateCode(BuildPartition buildPartition, ArtifactsPaths artifactsPaths) 
+            => File.WriteAllText(artifactsPaths.ProgramCodePath, CodeGenerator.Generate(buildPartition));
 
-        private static void GenerateCode(Benchmark benchmark, ArtifactsPaths artifactsPaths, IConfig config)
+        private static void GenerateAppConfig(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
-            File.WriteAllText(artifactsPaths.ProgramCodePath, CodeGenerator.Generate(benchmark, config));
-        }
-
-        private static void GenerateAppConfig(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)
-        {
-            string sourcePath = benchmark.Target.Type.GetTypeInfo().Assembly.Location + ".config";
+            string sourcePath = buildPartition.AssemblyLocation + ".config";
 
             using (var source = File.Exists(sourcePath) ? new StreamReader(File.OpenRead(sourcePath)) : TextReader.Null)
             using (var destination = new System.IO.StreamWriter(File.Create(artifactsPaths.AppConfigPath), System.Text.Encoding.UTF8))
             {
-                AppConfigGenerator.Generate(benchmark.Job, source, destination, resolver);
+                AppConfigGenerator.Generate(buildPartition.RepresentativeBenchmark.Job, source, destination, buildPartition.Resolver);
             }
         }
     }

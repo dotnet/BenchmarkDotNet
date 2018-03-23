@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// we are limited by xprojs (by default compiles all .cs files in all subfolders, Program.cs could be doubled and fail the build)
         /// and also by nuget internal implementation like looking for global.json file in parent folders
         /// </summary>
-        protected override string GetBuildArtifactsDirectoryPath(Benchmark benchmark, string programName)
+        protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programName)
         {
             if (GetSolutionRootDirectory(out var directoryInfo))
             {
@@ -76,10 +76,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return false;
         }
 
-        protected override string[] GetArtifactsToCleanup(Benchmark benchmark, ArtifactsPaths artifactsPaths)
+        protected override string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths)
             => new[] { artifactsPaths.BuildArtifactsDirectoryPath };
 
-        protected override void CopyAllRequiredFiles(Benchmark benchmark, ArtifactsPaths artifactsPaths)
+        protected override void CopyAllRequiredFiles(ArtifactsPaths artifactsPaths)
         {
             if (!Directory.Exists(artifactsPaths.BinariesDirectoryPath))
             {
@@ -87,10 +87,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        protected override void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)
+        protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
-            string content = $"call dotnet {Builder.RestoreCommand} {GetCustomArguments(benchmark, resolver)}{Environment.NewLine}" +
-                             $"call dotnet {Builder.GetBuildCommand(TargetFrameworkMoniker, false, benchmark.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, resolver))} {GetCustomArguments(benchmark, resolver)}";
+            string content = $"call dotnet {Builder.RestoreCommand} {GetCustomArguments(buildPartition.RepresentativeBenchmark, buildPartition.Resolver)}{Environment.NewLine}" +
+                             $"call dotnet {Builder.GetBuildCommand(TargetFrameworkMoniker, false, buildPartition.BuildConfiguration)} {GetCustomArguments(buildPartition.RepresentativeBenchmark, buildPartition.Resolver)}";
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
         }

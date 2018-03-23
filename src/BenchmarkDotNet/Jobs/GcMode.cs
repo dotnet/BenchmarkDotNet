@@ -4,7 +4,7 @@ using BenchmarkDotNet.Characteristics;
 // ReSharper disable once CheckNamespace
 namespace BenchmarkDotNet.Jobs
 {
-    public sealed class GcMode : JobMode<GcMode>
+    public sealed class GcMode : JobMode<GcMode>, IEquatable<GcMode>
     {
         public static readonly Characteristic<bool> ServerCharacteristic = Characteristic.Create((GcMode g) => g.Server);
         public static readonly Characteristic<bool> ConcurrentCharacteristic = Characteristic.Create((GcMode g) => g.Concurrent);
@@ -109,5 +109,15 @@ namespace BenchmarkDotNet.Jobs
             get { return HeapCountCharacteristic[this]; }
             set { HeapCountCharacteristic[this] = value; }
         }
+
+        public bool Equals(GcMode other)
+            => other != null
+                && other.AllowVeryLargeObjects == AllowVeryLargeObjects
+                && other.Concurrent == Concurrent
+                && other.CpuGroups == CpuGroups
+                && other.Force == Force
+                && other.NoAffinitize == NoAffinitize
+                && other.RetainVm == RetainVm
+                && other.Server == Server;
     }
 }

@@ -34,23 +34,22 @@ namespace BenchmarkDotNet.Running
 
         internal static readonly IResolver DefaultResolver = new CompositeResolver(EnvResolver.Instance, InfrastructureResolver.Instance);
 
-        public static Summary Run<T>(IConfig config = null) => Run(BenchmarkConverter.TypeToBenchmarks(typeof(T), config));
+        public static Summary Run<T>(IConfig config = null) => Run(BenchmarkConverter.TypeToBenchmarks(typeof(T), config), summaryPerType: true);
 
-        public static Summary Run(Type type, IConfig config = null) => Run(BenchmarkConverter.TypeToBenchmarks(type, config));
+        public static Summary Run(Type type, IConfig config = null) => Run(BenchmarkConverter.TypeToBenchmarks(type, config), summaryPerType: true);
 
-        public static Summary Run(Type type, MethodInfo[] methods, IConfig config = null) => Run(BenchmarkConverter.MethodsToBenchmarks(type, methods, config));
+        public static Summary Run(Type type, MethodInfo[] methods, IConfig config = null) => Run(BenchmarkConverter.MethodsToBenchmarks(type, methods, config), summaryPerType: true);
 
-        public static Summary Run(Benchmark[] benchmarks, IConfig config)
-        {
-            var targetType = benchmarks?.FirstOrDefault()?.Target.Type;
-            return Run(
-                new BenchmarkRunInfo(benchmarks, targetType, BenchmarkConverter.GetFullConfig(targetType, config)));
-        }
+        public static Summary[] Run(Assembly assembly, bool summaryPerType, IConfig config = null) 
+            => Run(
+                assembly.GetRunnableBenchmarks().Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray(),
+                config,
+                summaryPerType);
 
         public static Summary RunUrl(string url, IConfig config = null)
         {
 #if CLASSIC
-            return Run(BenchmarkConverter.UrlToBenchmarks(url, config));
+            return Run(BenchmarkConverter.UrlToBenchmarks(url, config), config, summaryPerType: false).Single();
 #else
             throw new NotSupportedException();
 #endif
@@ -59,205 +58,233 @@ namespace BenchmarkDotNet.Running
         public static Summary RunSource(string source, IConfig config = null)
         {
 #if CLASSIC
-            return Run(BenchmarkConverter.SourceToBenchmarks(source, config));
+            return Run(BenchmarkConverter.SourceToBenchmarks(source, config), config, summaryPerType: false).Single();
 #else
             throw new NotSupportedException();
 #endif
         }
 
-        public static Summary Run(BenchmarkRunInfo[] benchmarkRunInfos)
-        {
-            var temp = benchmarkRunInfos.FirstOrDefault();
-            var benchmarkRunInfo = new BenchmarkRunInfo(
-                benchmarkRunInfos.SelectMany(i => i.Benchmarks).ToArray(),
-                temp?.Type,
-                temp?.Config);
-            return Run(benchmarkRunInfo);
-        }
+        public static Summary Run(BenchmarkRunInfo benchmarkRunInfo, bool summaryPerType) 
+            => Run(new[] { benchmarkRunInfo }, benchmarkRunInfo.Config, summaryPerType).Single();
 
-        public static Summary Run(BenchmarkRunInfo benchmarkRunInfo)
+        public static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos, IConfig commonSettingsConfig, bool summaryPerType)
         {
             var resolver = DefaultResolver;
-            var benchmarks = benchmarkRunInfo.Benchmarks;
-            var config = benchmarkRunInfo.Config;
 
-            var title = GetTitle(benchmarks);
-            var rootArtifactsFolderPath = (config?.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath).CreateIfNotExists();
+            var title = GetTitle(benchmarkRunInfos);
+
+            var rootArtifactsFolderPath = (commonSettingsConfig?.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath).CreateIfNotExists();
+
+            var globalChronometer = Chronometer.Start();
 
             using (var logStreamWriter = Portability.StreamWriter.FromPath(Path.Combine(rootArtifactsFolderPath, title + ".log")))
             {
-                var logger = new CompositeLogger(config.GetCompositeLogger(), new StreamLogger(logStreamWriter));
-                benchmarks = GetSupportedBenchmarks(benchmarks, logger, resolver);
-                var artifactsToCleanup = new List<string>();
+                var logger = new CompositeLogger(commonSettingsConfig.GetCompositeLogger(), new StreamLogger(logStreamWriter));
 
-                try
+                var supportedBenchmarks = GetSupportedBenchmarks(benchmarkRunInfos, logger, resolver);
+
+                var validationErrors = Validate(supportedBenchmarks, logger);
+                if (validationErrors.Any(validationError => validationError.IsCritical))
                 {
-                    var runInfo = new BenchmarkRunInfo(benchmarks, benchmarkRunInfo.Type, config);
-                    return Run(runInfo, logger, title, rootArtifactsFolderPath, resolver, artifactsToCleanup);
+                    //return  new [] { Summary.CreateFailed(supportedBenchmarks.SelectMany(b => b.Benchmarks).ToArray(), title, HostEnvironmentInfo.GetCurrent(), commonSettingsConfig, GetResultsFolderPath(rootArtifactsFolderPath), validationErrors) };
                 }
-                finally
-                {
-                    logger.WriteLineHeader("// * Artifacts cleanup *");
-                    Cleanup(artifactsToCleanup);
-                }
+
+                var buildPartitions = BenchmarkPartitioner.CreateForBuild(supportedBenchmarks, resolver);
+
+                var buildResults = BuildInParallel(logger, rootArtifactsFolderPath, resolver, buildPartitions, ref globalChronometer);
             }
+
+            return null;
         }
 
-        private static string GetTitle(IList<Benchmark> benchmarks)
+        //public static Summary RunOld(BenchmarkRunInfo benchmarkRunInfo)
+        //{
+        //    var resolver = DefaultResolver;
+        //    var benchmarks = benchmarkRunInfo.Benchmarks;
+        //    var config = benchmarkRunInfo.Config;
+
+        //    var title = "";//GetTitle(benchmarks);
+        //    var rootArtifactsFolderPath = (config?.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath).CreateIfNotExists();
+
+        //    using (var logStreamWriter = Portability.StreamWriter.FromPath(Path.Combine(rootArtifactsFolderPath, title + ".log")))
+        //    {
+        //        var logger = new CompositeLogger(config.GetCompositeLogger(), new StreamLogger(logStreamWriter));
+        //        //benchmarks = BenchmarkSwitcher GetSupportedBenchmarks(benchmarks, logger, resolver);
+        //        var artifactsToCleanup = new List<string>();
+
+        //        try
+        //        {
+        //            var runInfo = new BenchmarkRunInfo(benchmarks, benchmarkRunInfo.Type, config);
+        //            return Run(runInfo, logger, title, rootArtifactsFolderPath, resolver, artifactsToCleanup);
+        //        }
+        //        finally
+        //        {
+        //            logger.WriteLineHeader("// * Artifacts cleanup *");
+        //            Cleanup(artifactsToCleanup);
+        //        }
+        //    }
+        //}
+
+        private static string GetTitle(BenchmarkRunInfo[] benchmarkRunInfos)
         {
             // few types might have the same name: A.Name and B.Name will both report "Name"
             // in that case, we can not use the type name as file name because they would be getting overwritten #529
-            var typeNames = benchmarks.Select(b => b.Target.Type).Distinct().GroupBy(type => type.Name);
+            var uniqueTargetTypes = benchmarkRunInfos.SelectMany(info => info.Benchmarks.Select(benchmark => benchmark.Target.Type)).Distinct().ToArray();
 
-            if (typeNames.Count() == 1 && typeNames.Single().Count() == 1)
-                return FolderNameHelper.ToFolderName(benchmarks.Select(b => b.Target.Type).First());
+            if (uniqueTargetTypes.Length == 1)
+                return FolderNameHelper.ToFolderName(uniqueTargetTypes[0]);
 
             benchmarkRunIndex++;
+
             return $"BenchmarkRun-{benchmarkRunIndex:##000}-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}";
         }
 
-        public static Summary Run(BenchmarkRunInfo benchmarkRunInfo, ILogger logger, string title, string rootArtifactsFolderPath, IResolver resolver, List<string> artifactsToCleanup)
-        {
-            var benchmarks = benchmarkRunInfo.Benchmarks;
-            var config = benchmarkRunInfo.Config;
+        //public static Summary Run(BenchmarkRunInfo benchmarkRunInfo, ILogger logger, string title, string rootArtifactsFolderPath, IResolver resolver, List<string> artifactsToCleanup)
+        //{
+        //    var benchmarks = benchmarkRunInfo.Benchmarks;
+        //    var config = benchmarkRunInfo.Config;
 
-            logger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
-            logger.WriteLineInfo("// Found benchmarks:");
-            foreach (var benchmark in benchmarks)
-                logger.WriteLineInfo($"//   {benchmark.DisplayInfo}");
-            logger.WriteLine();
+        //    logger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
+        //    logger.WriteLineInfo("// Found benchmarks:");
+        //    foreach (var benchmark in benchmarks)
+        //        logger.WriteLineInfo($"//   {benchmark.DisplayInfo}");
+        //    logger.WriteLine();
 
-            var validationErrors = Validate(benchmarks, logger, config);
-            if (validationErrors.Any(validationError => validationError.IsCritical))
-            {
-                return Summary.CreateFailed(benchmarks, title, HostEnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), validationErrors);
-            }
+        //    //var validationErrors = Validate(benchmarks, logger, config);
+        //    //if (validationErrors.Any(validationError => validationError.IsCritical))
+        //    //{
+        //    //    return Summary.CreateFailed(benchmarks, title, HostEnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), validationErrors);
+        //    //}
 
-            var globalChronometer = Chronometer.Start();
-            var reports = new List<BenchmarkReport>();
+        //    var globalChronometer = Chronometer.Start();
+        //    var reports = new List<BenchmarkReport>();
 
-            var buildResults = BuildInParallel(logger, rootArtifactsFolderPath, resolver, benchmarks, config, ref globalChronometer);
+        //    var buildResults = BuildInParallel(logger, rootArtifactsFolderPath, resolver, benchmarks, config, ref globalChronometer);
 
-            foreach (var benchmark in benchmarks)
-            {
-                var buildResult = buildResults[benchmark];
+        //    foreach (var benchmark in benchmarks)
+        //    {
+        //        var buildResult = buildResults[benchmark];
 
-                if (!config.KeepBenchmarkFiles)
-                    artifactsToCleanup.AddRange(buildResult.ArtifactsToCleanup);
+        //        if (!config.KeepBenchmarkFiles)
+        //            artifactsToCleanup.AddRange(buildResult.ArtifactsToCleanup);
 
-                if (buildResult.IsBuildSuccess)
-                {
-                    var report = RunCore(benchmark, logger, config, resolver, buildResult);
-                    if (report.AllMeasurements.Any(m => m.Operations == 0))
-                        throw new InvalidOperationException("An iteration with 'Operations == 0' detected");
-                    reports.Add(report);
-                    if (report.GetResultRuns().Any())
-                        logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr());
-                }
-                else
-                {
-                    reports.Add(new BenchmarkReport(benchmark, buildResult, buildResult, null, null, default));
+        //        if (buildResult.IsBuildSuccess)
+        //        {
+        //            var report = RunCore(benchmark, logger, config, resolver, buildResult);
+        //            if (report.AllMeasurements.Any(m => m.Operations == 0))
+        //                throw new InvalidOperationException("An iteration with 'Operations == 0' detected");
+        //            reports.Add(report);
+        //            if (report.GetResultRuns().Any())
+        //                logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr());
+        //        }
+        //        else
+        //        {
+        //            reports.Add(new BenchmarkReport(benchmark, buildResult, buildResult, null, null, default));
 
-                    if (buildResult.GenerateException != null)
-                        logger.WriteLineError($"// Generate Exception: {buildResult.GenerateException.Message}");
-                    if (buildResult.BuildException != null)
-                        logger.WriteLineError($"// Build Exception: {buildResult.BuildException.Message}");
-                }
+        //            if (buildResult.GenerateException != null)
+        //                logger.WriteLineError($"// Generate Exception: {buildResult.GenerateException.Message}");
+        //            if (buildResult.BuildException != null)
+        //                logger.WriteLineError($"// Build Exception: {buildResult.BuildException.Message}");
+        //        }
 
-                logger.WriteLine();
-            }
-            var clockSpan = globalChronometer.GetElapsed();
+        //        logger.WriteLine();
+        //    }
+        //    var clockSpan = globalChronometer.GetElapsed();
 
-            var summary = new Summary(title, reports, HostEnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), clockSpan.GetTimeSpan(), validationErrors);
+        //    var summary = new Summary(title, reports, HostEnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), clockSpan.GetTimeSpan(), null);
 
-            logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
-            logger.WriteLine();
+        //    logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
+        //    logger.WriteLine();
 
-            logger.WriteLineHeader("// * Export *");
-            var currentDirectory = Directory.GetCurrentDirectory();
-            foreach (var file in config.GetCompositeExporter().ExportToFiles(summary, logger))
-            {
-                logger.WriteLineInfo($"  {file.Replace(currentDirectory, string.Empty).Trim('/', '\\')}");
-            }
-            logger.WriteLine();
+        //    logger.WriteLineHeader("// * Export *");
+        //    var currentDirectory = Directory.GetCurrentDirectory();
+        //    foreach (var file in config.GetCompositeExporter().ExportToFiles(summary, logger))
+        //    {
+        //        logger.WriteLineInfo($"  {file.Replace(currentDirectory, string.Empty).Trim('/', '\\')}");
+        //    }
+        //    logger.WriteLine();
 
-            logger.WriteLineHeader("// * Detailed results *");
+        //    logger.WriteLineHeader("// * Detailed results *");
 
-            // TODO: make exporter
-            foreach (var report in reports)
-            {
-                logger.WriteLineInfo(report.Benchmark.DisplayInfo);
-                logger.WriteLineStatistic($"Runtime = {report.GetRuntimeInfo()}; GC = {report.GetGcInfo()}");
-                var resultRuns = report.GetResultRuns();
-                if (resultRuns.IsEmpty())
-                    logger.WriteLineError("There are not any results runs");
-                else
-                    logger.WriteLineStatistic(resultRuns.GetStatistics().ToTimeStr(calcHistogram: true));
-                logger.WriteLine();
-            }
+        //    // TODO: make exporter
+        //    foreach (var report in reports)
+        //    {
+        //        logger.WriteLineInfo(report.Benchmark.DisplayInfo);
+        //        logger.WriteLineStatistic($"Runtime = {report.GetRuntimeInfo()}; GC = {report.GetGcInfo()}");
+        //        var resultRuns = report.GetResultRuns();
+        //        if (resultRuns.IsEmpty())
+        //            logger.WriteLineError("There are not any results runs");
+        //        else
+        //            logger.WriteLineStatistic(resultRuns.GetStatistics().ToTimeStr(calcHistogram: true));
+        //        logger.WriteLine();
+        //    }
 
-            LogTotalTime(logger, clockSpan.GetTimeSpan());
-            logger.WriteLine();
+        //    LogTotalTime(logger, clockSpan.GetTimeSpan());
+        //    logger.WriteLine();
 
-            logger.WriteLineHeader("// * Summary *");
-            MarkdownExporter.Console.ExportToLog(summary, logger);
+        //    logger.WriteLineHeader("// * Summary *");
+        //    MarkdownExporter.Console.ExportToLog(summary, logger);
 
-            // TODO: make exporter
-            ConclusionHelper.Print(logger, config.GetCompositeAnalyser().Analyse(summary).ToList());
+        //    // TODO: make exporter
+        //    ConclusionHelper.Print(logger, config.GetCompositeAnalyser().Analyse(summary).ToList());
 
-            // TODO: move to conclusions
-            var columnWithLegends = summary.Table.Columns.Select(c => c.OriginalColumn).Where(c => !string.IsNullOrEmpty(c.Legend)).ToList();
-            var effectiveTimeUnit = summary.Table.EffectiveSummaryStyle.TimeUnit;
-            if (columnWithLegends.Any() || effectiveTimeUnit != null)
-            {
-                logger.WriteLine();
-                logger.WriteLineHeader("// * Legends *");
-                int maxNameWidth = 0;
-                if (columnWithLegends.Any())
-                    maxNameWidth = Math.Max(maxNameWidth, columnWithLegends.Select(c => c.ColumnName.Length).Max());
-                if (effectiveTimeUnit != null)
-                    maxNameWidth = Math.Max(maxNameWidth, effectiveTimeUnit.Name.Length + 2);
+        //    // TODO: move to conclusions
+        //    var columnWithLegends = summary.Table.Columns.Select(c => c.OriginalColumn).Where(c => !string.IsNullOrEmpty(c.Legend)).ToList();
+        //    var effectiveTimeUnit = summary.Table.EffectiveSummaryStyle.TimeUnit;
+        //    if (columnWithLegends.Any() || effectiveTimeUnit != null)
+        //    {
+        //        logger.WriteLine();
+        //        logger.WriteLineHeader("// * Legends *");
+        //        int maxNameWidth = 0;
+        //        if (columnWithLegends.Any())
+        //            maxNameWidth = Math.Max(maxNameWidth, columnWithLegends.Select(c => c.ColumnName.Length).Max());
+        //        if (effectiveTimeUnit != null)
+        //            maxNameWidth = Math.Max(maxNameWidth, effectiveTimeUnit.Name.Length + 2);
 
-                foreach (var column in columnWithLegends)
-                    logger.WriteLineHint($"  {column.ColumnName.PadRight(maxNameWidth, ' ')} : {column.Legend}");
+        //        foreach (var column in columnWithLegends)
+        //            logger.WriteLineHint($"  {column.ColumnName.PadRight(maxNameWidth, ' ')} : {column.Legend}");
 
-                if (effectiveTimeUnit != null)
-                    logger.WriteLineHint($"  {("1 " + effectiveTimeUnit.Name).PadRight(maxNameWidth, ' ')} :" +
-                                         $" 1 {effectiveTimeUnit.Description} ({TimeUnit.Convert(1, effectiveTimeUnit, TimeUnit.Second).ToStr("0.#########")} sec)");
-            }
+        //        if (effectiveTimeUnit != null)
+        //            logger.WriteLineHint($"  {("1 " + effectiveTimeUnit.Name).PadRight(maxNameWidth, ' ')} :" +
+        //                                 $" 1 {effectiveTimeUnit.Description} ({TimeUnit.Convert(1, effectiveTimeUnit, TimeUnit.Second).ToStr("0.#########")} sec)");
+        //    }
 
-            if (config.GetDiagnosers().Any())
-            {
-                logger.WriteLine();
-                config.GetCompositeDiagnoser().DisplayResults(logger);
-            }
+        //    if (config.GetDiagnosers().Any())
+        //    {
+        //        logger.WriteLine();
+        //        config.GetCompositeDiagnoser().DisplayResults(logger);
+        //    }
 
-            logger.WriteLine();
-            logger.WriteLineHeader("// ***** BenchmarkRunner: End *****");
-            return summary;
-        }
+        //    logger.WriteLine();
+        //    logger.WriteLineHeader("// ***** BenchmarkRunner: End *****");
+        //    return summary;
+        //}
 
-        private static ValidationError[] Validate(IReadOnlyList<Benchmark> benchmarks, ILogger logger, IConfig config)
+        private static ValidationError[] Validate(BenchmarkRunInfo[] benchmarks, ILogger logger)
         {
             logger.WriteLineInfo("// Validating benchmarks:");
-            var validationErrors = config.GetCompositeValidator().Validate(new ValidationParameters(benchmarks, config)).ToArray();
+
+            var validationErrors = new List<ValidationError>();
+
+            foreach (var benchmarkRunInfo in benchmarks)
+                validationErrors.AddRange(benchmarkRunInfo.Config.GetCompositeValidator().Validate(new ValidationParameters(benchmarkRunInfo.Benchmarks, benchmarkRunInfo.Config)));
+
             foreach (var validationError in validationErrors)
-            {
                 logger.WriteLineError(validationError.Message);
-            }
-            return validationErrors;
+
+            return validationErrors.ToArray();
         }
 
-        private static Dictionary<Benchmark, BuildResult> BuildInParallel(ILogger logger, string rootArtifactsFolderPath, IResolver resolver, Benchmark[] benchmarks, ReadOnlyConfig config, ref StartedClock globalChronometer)
+        private static Dictionary<BuildPartition, BuildResult> BuildInParallel(ILogger logger, string rootArtifactsFolderPath, IResolver resolver, BuildPartition[] buildPartitions, ref StartedClock globalChronometer)
         {
-            using (benchmarks.Select(benchmark => GetAssemblyResolveHelper(benchmark.Job.GetToolchain(), logger)).FirstOrDefault(helper => helper != null))
+            using (buildPartitions.Select(partition=> GetAssemblyResolveHelper(partition.RepresentativeBenchmark.Job.GetToolchain(), logger)).FirstOrDefault(helper => helper != null))
             {
-                logger.WriteLineHeader($"// ***** Building {benchmarks.Length} benchmark(s) in Parallel: Start   *****");
+                logger.WriteLineHeader($"// ***** Building {buildPartitions.Length} exe(s) in Parallel: Start   *****");
 
-                var buildResults = benchmarks
+                var buildResults = buildPartitions
                     .AsParallel()
-                    .Select(benchmark => { return (benchmark, buildResult: Build(benchmark, config, rootArtifactsFolderPath, resolver)); })
-                    .ToDictionary(result => result.benchmark, result => result.buildResult);
+                    .Select(buildPartition => (buildPartition, buildResult: Build(buildPartition, rootArtifactsFolderPath)))
+                    .ToDictionary(result => result.buildPartition, result => result.buildResult);
 
                 logger.WriteLineHeader($"// ***** Done, took {globalChronometer.GetElapsed().GetTimeSpan().ToFormattedTotalTime()}   *****");
 
@@ -265,24 +292,26 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        private static BuildResult Build(Benchmark benchmark, ReadOnlyConfig config, string rootArtifactsFolderPath, IResolver resolver)
+        private static BuildResult Build(BuildPartition buildPartition, string rootArtifactsFolderPath)
         {
-            var toolchain = benchmark.Job.GetToolchain();
+            var toolchain = buildPartition.RepresentativeBenchmark.Job.GetToolchain(); // it's guaranteed that all the benchmarks in single partition have same toolchain
 
-            var generateResult = toolchain.Generator.GenerateProject(benchmark, NullLogger.Instance, rootArtifactsFolderPath, config, resolver);
+            var generateResult = toolchain.Generator.GenerateProject(buildPartition, NullLogger.Instance, rootArtifactsFolderPath);
 
             try
             {
                 if (!generateResult.IsGenerateSuccess)
                     return BuildResult.Failure(generateResult);
 
-                return toolchain.Builder.Build(generateResult, NullLogger.Instance, benchmark, resolver);
+                //return toolchain.Builder.Build(generateResult, NullLogger.Instance, benchmark, resolver);
 
             }
             catch (Exception e)
             {
                 return BuildResult.Failure(generateResult, e);
             }
+
+            return BuildResult.Failure(generateResult);
         }
 
         private static BenchmarkReport RunCore(Benchmark benchmark, ILogger logger, ReadOnlyConfig config, IResolver resolver, BuildResult buildResult)
@@ -412,8 +441,13 @@ namespace BenchmarkDotNet.Running
 
         internal static void LogTotalTime(ILogger logger, TimeSpan time, string message = "Total time") => logger.WriteLineStatistic($"{message}: {time.ToFormattedTotalTime()}");
 
-        private static Benchmark[] GetSupportedBenchmarks(IList<Benchmark> benchmarks, CompositeLogger logger, IResolver resolver)
-            => benchmarks.Where(benchmark => benchmark.Job.GetToolchain().IsSupported(benchmark, logger, resolver)).ToArray();
+        private static BenchmarkRunInfo[] GetSupportedBenchmarks(BenchmarkRunInfo[] benchmarkRunInfos, CompositeLogger logger, IResolver resolver)
+            => benchmarkRunInfos.Select(info => new BenchmarkRunInfo(
+                    info.Benchmarks.Where(benchmark => benchmark.Job.GetToolchain().IsSupported(benchmark, logger, resolver)).ToArray(),
+                    info.Type,
+                    info.Config))
+                .Where(infos => infos.Benchmarks.Any())
+                .ToArray();
 
         private static string GetResultsFolderPath(string rootArtifactsFolderPath) => Path.Combine(rootArtifactsFolderPath, "results").CreateIfNotExists();
 

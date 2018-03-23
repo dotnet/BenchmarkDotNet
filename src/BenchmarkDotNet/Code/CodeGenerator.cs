@@ -84,6 +84,11 @@ namespace BenchmarkDotNet.Code
             return (false, string.Empty);
         }
 
+        internal static string Generate(BuildPartition buildPartition)
+        {
+            throw new NotImplementedException();
+        }
+
         private static string Unroll(string text, int factor)
         {
             const string unrollDirective = "@Unroll@";

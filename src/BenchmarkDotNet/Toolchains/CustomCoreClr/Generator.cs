@@ -53,10 +53,10 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
             => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, RuntimeIdentifier, "publish");
 
-        protected override void GenerateBuildScript(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver)
+        protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
             => File.WriteAllText(artifactsPaths.BuildScriptFilePath, $"dotnet publish -c Release"); // publish does the restore
 
-        protected override void GenerateNuGetConfig(Benchmark benchmark, ArtifactsPaths artifactsPaths)
+        protected override void GenerateNuGetConfig(ArtifactsPaths artifactsPaths)
         {
             string content =
 $@"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -73,7 +73,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             File.WriteAllText(artifactsPaths.NuGetConfigPath, content);
         }
 
-        protected override void GenerateProject(Benchmark benchmark, ArtifactsPaths artifactsPaths, IResolver resolver, ILogger logger)
+        protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
             string csProj = $@"
 <Project Sdk=""Microsoft.NET.Sdk"">
@@ -89,12 +89,12 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <DebugSymbols>true</DebugSymbols>
     <PackageConflictPreferredPackages>Microsoft.Private.CoreFx.NETCoreApp;runtime.{RuntimeIdentifier}.Microsoft.Private.CoreFx.NETCoreApp;Microsoft.NETCore.App;$(PackageConflictPreferredPackages)</PackageConflictPreferredPackages>
   </PropertyGroup>
-  {GetRuntimeSettings(benchmark.Job.Env.Gc, resolver)}
+  {GetRuntimeSettings(buildPartition.RepresentativeBenchmark.Job.Env.Gc, buildPartition.Resolver)}
   <ItemGroup>
     <Compile Include=""{Path.GetFileName(artifactsPaths.ProgramCodePath)}"" Exclude=""bin\**;obj\**;**\*.xproj;packages\**"" />
   </ItemGroup>
   <ItemGroup>
-    {string.Join(Environment.NewLine, GetReferences(benchmark, logger))}
+    {string.Join(Environment.NewLine, GetReferences(buildPartition.RepresentativeBenchmark, logger))}
   </ItemGroup>
 </Project>";
 
