@@ -2,7 +2,7 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.Core</AssemblyTitle>
-    <TargetFrameworks>netstandard2.0;net46</TargetFrameworks>
+    <TargetFrameworks>net46;netstandard2.0</TargetFrameworks>
     <NoWarn>$(NoWarn);1701;1702;1705;1591</NoWarn>
     <AssemblyName>BenchmarkDotNet.Core</AssemblyName>
     <PackageId>BenchmarkDotNet.Core</PackageId>
@@ -18,7 +18,7 @@
     <EmbeddedResource Include="Disassemblers\net46\win7-x64\Mono.Cecil.Rocks.dll" />
     <EmbeddedResource Include="Disassemblers\net46\win7-x64\Mono.Cecil.dll" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <ProjectReference Include="..\BenchmarkDotNet.Disassembler.x64\BenchmarkDotNet.Disassembler.x64.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
