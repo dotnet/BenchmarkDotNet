@@ -9,8 +9,7 @@ namespace BenchmarkDotNet.Toolchains.Parameters
 {
     public class ExecuteParameters
     {
-        public ExecuteParameters(BuildResult buildResult, Benchmark benchmark, BenchmarkId benchmarkId, ILogger logger, IResolver resolver, IConfig config,
-            IDiagnoser diagnoser = null)
+        public ExecuteParameters(BuildResult buildResult, Benchmark benchmark, BenchmarkId benchmarkId, ILogger logger, IResolver resolver, IConfig config, IDiagnoser diagnoser = null)
         {
             BuildResult = buildResult;
             Benchmark = benchmark;

@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Linq;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.Running
 {
@@ -13,9 +11,9 @@ namespace BenchmarkDotNet.Running
         public BuildPartition(BenchmarkBuildInfo[] benchmarks, IResolver resolver)
         {
             Resolver = resolver;
-            RepresentativeBenchmark = benchmarks.Select(info => info.Benchmark).FirstOrDefault();
+            RepresentativeBenchmark = benchmarks[0].Benchmark;
             Benchmarks = benchmarks;
-            ProgramName = Guid.NewGuid().ToString(); // todo: figure out some nice name (first job.Folder?)
+            ProgramName = benchmarks[0].Config.KeepBenchmarkFiles ? RepresentativeBenchmark.Job.FolderInfo : Guid.NewGuid().ToString();
         }
 
         public BenchmarkBuildInfo[] Benchmarks { get; }
@@ -24,7 +22,7 @@ namespace BenchmarkDotNet.Running
 
         /// <summary>
         /// the benchmarks are groupped by the build settings
-        /// so you can use this benchmark to get the settings
+        /// so you can use this benchmark to get the runtime settings
         /// </summary>
         public Benchmark RepresentativeBenchmark { get; }
 
@@ -42,6 +40,6 @@ namespace BenchmarkDotNet.Running
                 ? RepresentativeBenchmark.Job.Env.Runtime
                 : RuntimeInformation.GetCurrentRuntime();
 
-        public override string ToString() => $"{Runtime}-{Platform}-{Jit}-{RepresentativeBenchmark.Job.GetToolchain()}";
+        public override string ToString() => RepresentativeBenchmark.Job.DisplayInfo;
     }
 }
