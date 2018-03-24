@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public bool Done { get; private set; }
 
-            public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark, IResolver resolver)
+            public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
             {
                 logger.WriteLine("Building");
                 Done = true;

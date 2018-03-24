@@ -303,15 +303,13 @@ namespace BenchmarkDotNet.Running
                 if (!generateResult.IsGenerateSuccess)
                     return BuildResult.Failure(generateResult);
 
-                //return toolchain.Builder.Build(generateResult, NullLogger.Instance, benchmark, resolver);
+                return toolchain.Builder.Build(generateResult, buildPartition, NullLogger.Instance);
 
             }
             catch (Exception e)
             {
                 return BuildResult.Failure(generateResult, e);
             }
-
-            return BuildResult.Failure(generateResult);
         }
 
         private static BenchmarkReport RunCore(Benchmark benchmark, ILogger logger, ReadOnlyConfig config, IResolver resolver, BuildResult buildResult)

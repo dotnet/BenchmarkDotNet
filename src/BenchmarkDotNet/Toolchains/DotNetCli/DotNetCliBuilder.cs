@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
@@ -27,9 +26,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         public abstract string GetBuildCommand(string frameworkMoniker, bool justTheProjectItself, string configuration);
 
-        public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark, IResolver resolver)
+        public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
         {
-            var extraArguments = DotNetCliGenerator.GetCustomArguments(benchmark, resolver);
+            var extraArguments = DotNetCliGenerator.GetCustomArguments(buildPartition.RepresentativeBenchmark, buildPartition.Resolver);
 
             var restoreResult = DotNetCliCommandExecutor.ExecuteCommand(
                 CustomDotNetCliPath,
@@ -43,10 +42,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 return BuildResult.Failure(generateResult, new Exception(restoreResult.ProblemDescription));
             }
 
-            var buildResult = Build(
-                generateResult,
-                benchmark.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, resolver),
-                extraArguments);
+            var buildResult = Build(generateResult, buildPartition.BuildConfiguration, extraArguments);
 
             logger.WriteLineInfo($"// dotnet build/publish took {buildResult.ExecutionTime.TotalSeconds:0.##}s");
 

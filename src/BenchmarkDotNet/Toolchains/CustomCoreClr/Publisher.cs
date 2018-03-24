@@ -22,11 +22,11 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         private string CustomDotNetCliPath { get; }
         private string[] FilesToCopy { get; }
 
-        public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark, IResolver resolver)
+        public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
         {
-            var extraArguments = DotNetCliGenerator.GetCustomArguments(benchmark, resolver);
+            var extraArguments = DotNetCliGenerator.GetCustomArguments(buildPartition.RepresentativeBenchmark, buildPartition.Resolver);
 
-            var configurationName = benchmark.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, resolver);
+            var configurationName = buildPartition.BuildConfiguration;
 
             var publishResult = DotNetCliCommandExecutor.ExecuteCommand(
                 CustomDotNetCliPath,

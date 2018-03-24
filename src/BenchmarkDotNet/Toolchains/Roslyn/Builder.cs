@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
         private static readonly Lazy<AssemblyMetadata[]> FrameworkAssembliesMetadata = new Lazy<AssemblyMetadata[]>(GetFrameworkAssembliesMetadata);
 
         [PublicAPI]
-        public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark, IResolver resolver)
+        public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
         {
             logger.WriteLineInfo($"BuildScript: {generateResult.ArtifactsPaths.BuildScriptFilePath}");
 
@@ -34,27 +34,27 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 outputKind: OutputKind.ConsoleApplication,
                 optimizationLevel: OptimizationLevel.Release,
                 allowUnsafe: true,
-                platform: GetPlatform(benchmark.Job.ResolveValue(EnvMode.PlatformCharacteristic, resolver)),
+                platform: GetPlatform(buildPartition.Platform),
                 deterministic: true);
 
             var references = Generator
-                .GetAllReferences(benchmark)
+                .GetAllReferences(buildPartition.RepresentativeBenchmark)
                 .Select(assembly => AssemblyMetadata.CreateFromFile(assembly.Location))
                 .Concat(FrameworkAssembliesMetadata.Value)
                 .Distinct()
                 .Select(uniqueMetadata => uniqueMetadata.GetReference());
 
-            (var result, var missingReferences) = Build(generateResult, benchmark, syntaxTree, compilationOptions, references);
+            (var result, var missingReferences) = Build(generateResult, syntaxTree, compilationOptions, references);
 
             if (result.IsBuildSuccess || !missingReferences.Any())
                 return result;
 
             var withMissingReferences = references.Union(missingReferences.Select(assemblyMetadata => assemblyMetadata.GetReference()));
 
-            return Build(generateResult, benchmark, syntaxTree, compilationOptions, withMissingReferences).result;
+            return Build(generateResult, syntaxTree, compilationOptions, withMissingReferences).result;
         }
 
-        private static (BuildResult result, AssemblyMetadata[] missingReference) Build(GenerateResult generateResult, Benchmark benchmark, SyntaxTree syntaxTree, 
+        private static (BuildResult result, AssemblyMetadata[] missingReference) Build(GenerateResult generateResult, SyntaxTree syntaxTree, 
             CSharpCompilationOptions compilationOptions, IEnumerable<PortableExecutableReference> references)
         {
             var compilation = CSharpCompilation
