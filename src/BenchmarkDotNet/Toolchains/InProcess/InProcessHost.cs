@@ -44,6 +44,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 diagnoserActionParameters = new DiagnoserActionParameters(
                     Process.GetCurrentProcess(),
                     benchmark,
+                    default,
                     config);
         }
 

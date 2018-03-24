@@ -8,13 +8,13 @@ namespace BenchmarkDotNet.Running
         {
             Benchmark = benchmark;
             Config = config;
-            Id = id;
+            Id = new BenchmarkId(id);
         }
 
         public Benchmark Benchmark { get; }
 
         public ReadOnlyConfig Config { get; }
 
-        public int Id { get; }
+        public BenchmarkId Id { get; }
     }
 }

@@ -39,7 +39,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             try
             {
                 return Execute(
-                    executeParameters.Benchmark, 
+                    executeParameters.Benchmark,
+                    executeParameters.BenchmarkId,
                     executeParameters.Logger, 
                     executeParameters.BuildResult.ArtifactsPaths, 
                     executeParameters.Diagnoser, 
@@ -53,19 +54,19 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        private ExecuteResult Execute(Benchmark benchmark, ILogger logger, ArtifactsPaths artifactsPaths, IDiagnoser diagnoser, string executableName, IConfig config, IResolver resolver)
+        private ExecuteResult Execute(Benchmark benchmark, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths, IDiagnoser diagnoser, string executableName, IConfig config, IResolver resolver)
         {
             var startInfo = DotNetCliCommandExecutor.BuildStartInfo(
                 CustomDotNetCliPath,
                 artifactsPaths.BinariesDirectoryPath,
-                BuildArgs(diagnoser, executableName),
+                $"{executableName} {benchmarkId.ToArgument()}",
                 redirectStandardInput: true);
 
             startInfo.SetEnvironmentVariables(benchmark, resolver);
 
             using (var process = new Process { StartInfo = startInfo })
             {
-                var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmark, config);
+                var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmark, benchmarkId, config);
 
                 ConsoleHandler.Instance.SetProcess(process);
 
@@ -94,20 +95,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
                 return new ExecuteResult(true, process.ExitCode, Array.Empty<string>(), Array.Empty<string>());
             }
-        }
-
-        private static string BuildArgs(IDiagnoser diagnoser, string executableName)
-        {
-            var args = new StringBuilder(50);
-
-            args.AppendFormat(executableName);
-
-            if (diagnoser != null)
-            {
-                args.Append($" {Engine.Signals.DiagnoserIsAttachedParam}");
-            }
-
-            return args.ToString();
         }
     }
 }

@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Loggers
         private readonly IDiagnoser diagnoser;
         private readonly DiagnoserActionParameters diagnoserActionParameters;
 
-        public SynchronousProcessOutputLoggerWithDiagnoser(ILogger logger, Process process, IDiagnoser diagnoser, Benchmark benchmark, IConfig config)
+        public SynchronousProcessOutputLoggerWithDiagnoser(ILogger logger, Process process, IDiagnoser diagnoser, Benchmark benchmark, BenchmarkId benchmarkId, IConfig config)
         {
             if (!process.StartInfo.RedirectStandardOutput)
                 throw new NotSupportedException("set RedirectStandardOutput to true first");
@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Loggers
             this.logger = logger;
             this.process = process;
             this.diagnoser = diagnoser;
-            diagnoserActionParameters = new DiagnoserActionParameters(process, benchmark, config);
+            diagnoserActionParameters = new DiagnoserActionParameters(process, benchmark, benchmarkId, config);
 
             LinesWithResults = new List<string>();
             LinesWithExtraOutput = new List<string>();

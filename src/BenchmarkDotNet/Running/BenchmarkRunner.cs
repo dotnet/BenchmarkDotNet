@@ -70,12 +70,10 @@ namespace BenchmarkDotNet.Running
         public static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos, IConfig commonSettingsConfig, bool summaryPerType)
         {
             var resolver = DefaultResolver;
-
+            var artifactsToCleanup = new List<string>();
             var title = GetTitle(benchmarkRunInfos);
 
             var rootArtifactsFolderPath = (commonSettingsConfig?.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath).CreateIfNotExists();
-
-            var globalChronometer = Chronometer.Start();
 
             using (var logStreamWriter = Portability.StreamWriter.FromPath(Path.Combine(rootArtifactsFolderPath, title + ".log")))
             {
@@ -85,45 +83,37 @@ namespace BenchmarkDotNet.Running
 
                 var validationErrors = Validate(supportedBenchmarks, logger);
                 if (validationErrors.Any(validationError => validationError.IsCritical))
-                {
-                    //return  new [] { Summary.CreateFailed(supportedBenchmarks.SelectMany(b => b.Benchmarks).ToArray(), title, HostEnvironmentInfo.GetCurrent(), commonSettingsConfig, GetResultsFolderPath(rootArtifactsFolderPath), validationErrors) };
-                }
+                    return  new [] { Summary.CreateFailed(
+                        supportedBenchmarks.SelectMany(b => b.Benchmarks).ToArray(), 
+                        title, HostEnvironmentInfo.GetCurrent(), commonSettingsConfig, GetResultsFolderPath(rootArtifactsFolderPath), validationErrors) };
 
                 var buildPartitions = BenchmarkPartitioner.CreateForBuild(supportedBenchmarks, resolver);
 
+                logger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
+                var globalChronometer = Chronometer.Start();
+
                 var buildResults = BuildInParallel(logger, rootArtifactsFolderPath, resolver, buildPartitions, ref globalChronometer);
+
+                try
+                {
+                    var results = new List<Summary>();
+
+                    var benchmarkToBuildResult = buildResults
+                        .SelectMany(buildResult => buildResult.Key.Benchmarks.Select(buildInfo => (buildInfo.Benchmark, buildInfo.Id, buildResult.Value)))
+                        .ToDictionary(info => info.Benchmark, info => (info.Id, info.Value));
+
+                    foreach (var benchmarkRunInfo in supportedBenchmarks) // we run them in the old order now using the new build artifacts
+                        results.Add(Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, logger, artifactsToCleanup, rootArtifactsFolderPath, ref globalChronometer));
+
+                    return results.ToArray();
+                }
+                finally
+                {
+                    logger.WriteLineHeader("// * Artifacts cleanup *");
+                    Cleanup(new HashSet<string>(artifactsToCleanup.Distinct()));
+                }
             }
-
-            return null;
         }
-
-        //public static Summary RunOld(BenchmarkRunInfo benchmarkRunInfo)
-        //{
-        //    var resolver = DefaultResolver;
-        //    var benchmarks = benchmarkRunInfo.Benchmarks;
-        //    var config = benchmarkRunInfo.Config;
-
-        //    var title = "";//GetTitle(benchmarks);
-        //    var rootArtifactsFolderPath = (config?.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath).CreateIfNotExists();
-
-        //    using (var logStreamWriter = Portability.StreamWriter.FromPath(Path.Combine(rootArtifactsFolderPath, title + ".log")))
-        //    {
-        //        var logger = new CompositeLogger(config.GetCompositeLogger(), new StreamLogger(logStreamWriter));
-        //        //benchmarks = BenchmarkSwitcher GetSupportedBenchmarks(benchmarks, logger, resolver);
-        //        var artifactsToCleanup = new List<string>();
-
-        //        try
-        //        {
-        //            var runInfo = new BenchmarkRunInfo(benchmarks, benchmarkRunInfo.Type, config);
-        //            return Run(runInfo, logger, title, rootArtifactsFolderPath, resolver, artifactsToCleanup);
-        //        }
-        //        finally
-        //        {
-        //            logger.WriteLineHeader("// * Artifacts cleanup *");
-        //            Cleanup(artifactsToCleanup);
-        //        }
-        //    }
-        //}
 
         private static string GetTitle(BenchmarkRunInfo[] benchmarkRunInfos)
         {
@@ -139,126 +129,125 @@ namespace BenchmarkDotNet.Running
             return $"BenchmarkRun-{benchmarkRunIndex:##000}-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}";
         }
 
-        //public static Summary Run(BenchmarkRunInfo benchmarkRunInfo, ILogger logger, string title, string rootArtifactsFolderPath, IResolver resolver, List<string> artifactsToCleanup)
-        //{
-        //    var benchmarks = benchmarkRunInfo.Benchmarks;
-        //    var config = benchmarkRunInfo.Config;
+        private static Summary Run(
+            BenchmarkRunInfo benchmarkRunInfo, 
+            Dictionary<Benchmark, (BenchmarkId benchmarkId, BuildResult buildResult)> buildResults, 
+            IResolver resolver,
+            ILogger logger, 
+            List<string> artifactsToCleanup, 
+            string rootArtifactsFolderPath,
+            ref StartedClock globalChronometer)
+        {
+            var benchmarks = benchmarkRunInfo.Benchmarks;
+            var config = benchmarkRunInfo.Config;
+            var reports = new List<BenchmarkReport>();
+            var title = GetTitle(new[] { benchmarkRunInfo });
 
-        //    logger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
-        //    logger.WriteLineInfo("// Found benchmarks:");
-        //    foreach (var benchmark in benchmarks)
-        //        logger.WriteLineInfo($"//   {benchmark.DisplayInfo}");
-        //    logger.WriteLine();
+            logger.WriteLineInfo("// Found benchmarks:");
+            foreach (var benchmark in benchmarks)
+                logger.WriteLineInfo($"//   {benchmark.DisplayInfo}");
+            logger.WriteLine();
 
-        //    //var validationErrors = Validate(benchmarks, logger, config);
-        //    //if (validationErrors.Any(validationError => validationError.IsCritical))
-        //    //{
-        //    //    return Summary.CreateFailed(benchmarks, title, HostEnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), validationErrors);
-        //    //}
+            foreach (var benchmark in benchmarks)
+            {
+                var info = buildResults[benchmark];
+                var buildResult = info.buildResult;
 
-        //    var globalChronometer = Chronometer.Start();
-        //    var reports = new List<BenchmarkReport>();
+                if (!config.KeepBenchmarkFiles)
+                    artifactsToCleanup.AddRange(buildResult.ArtifactsToCleanup);
 
-        //    var buildResults = BuildInParallel(logger, rootArtifactsFolderPath, resolver, benchmarks, config, ref globalChronometer);
+                if (buildResult.IsBuildSuccess)
+                {
+                    var report = RunCore(benchmark, info.benchmarkId, logger, config, resolver, buildResult);
+                    if (report.AllMeasurements.Any(m => m.Operations == 0))
+                        throw new InvalidOperationException("An iteration with 'Operations == 0' detected");
+                    reports.Add(report);
+                    if (report.GetResultRuns().Any())
+                        logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr());
+                }
+                else
+                {
+                    reports.Add(new BenchmarkReport(benchmark, buildResult, buildResult, null, null, default));
 
-        //    foreach (var benchmark in benchmarks)
-        //    {
-        //        var buildResult = buildResults[benchmark];
+                    if (buildResult.GenerateException != null)
+                        logger.WriteLineError($"// Generate Exception: {buildResult.GenerateException.Message}");
+                    if (buildResult.BuildException != null)
+                        logger.WriteLineError($"// Build Exception: {buildResult.BuildException.Message}");
+                }
 
-        //        if (!config.KeepBenchmarkFiles)
-        //            artifactsToCleanup.AddRange(buildResult.ArtifactsToCleanup);
+                logger.WriteLine();
+            }
+            var clockSpan = globalChronometer.GetElapsed();
 
-        //        if (buildResult.IsBuildSuccess)
-        //        {
-        //            var report = RunCore(benchmark, logger, config, resolver, buildResult);
-        //            if (report.AllMeasurements.Any(m => m.Operations == 0))
-        //                throw new InvalidOperationException("An iteration with 'Operations == 0' detected");
-        //            reports.Add(report);
-        //            if (report.GetResultRuns().Any())
-        //                logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr());
-        //        }
-        //        else
-        //        {
-        //            reports.Add(new BenchmarkReport(benchmark, buildResult, buildResult, null, null, default));
+            var summary = new Summary(title, reports, HostEnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), clockSpan.GetTimeSpan(), 
+                Validate(new[] {benchmarkRunInfo }, NullLogger.Instance)); // validate them once again, but don't print the output
 
-        //            if (buildResult.GenerateException != null)
-        //                logger.WriteLineError($"// Generate Exception: {buildResult.GenerateException.Message}");
-        //            if (buildResult.BuildException != null)
-        //                logger.WriteLineError($"// Build Exception: {buildResult.BuildException.Message}");
-        //        }
+            logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
+            logger.WriteLine();
 
-        //        logger.WriteLine();
-        //    }
-        //    var clockSpan = globalChronometer.GetElapsed();
+            logger.WriteLineHeader("// * Export *");
+            var currentDirectory = Directory.GetCurrentDirectory();
+            foreach (var file in config.GetCompositeExporter().ExportToFiles(summary, logger))
+            {
+                logger.WriteLineInfo($"  {file.Replace(currentDirectory, string.Empty).Trim('/', '\\')}");
+            }
+            logger.WriteLine();
 
-        //    var summary = new Summary(title, reports, HostEnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), clockSpan.GetTimeSpan(), null);
+            logger.WriteLineHeader("// * Detailed results *");
 
-        //    logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
-        //    logger.WriteLine();
+            // TODO: make exporter
+            foreach (var report in reports)
+            {
+                logger.WriteLineInfo(report.Benchmark.DisplayInfo);
+                logger.WriteLineStatistic($"Runtime = {report.GetRuntimeInfo()}; GC = {report.GetGcInfo()}");
+                var resultRuns = report.GetResultRuns();
+                if (resultRuns.IsEmpty())
+                    logger.WriteLineError("There are not any results runs");
+                else
+                    logger.WriteLineStatistic(resultRuns.GetStatistics().ToTimeStr(calcHistogram: true));
+                logger.WriteLine();
+            }
 
-        //    logger.WriteLineHeader("// * Export *");
-        //    var currentDirectory = Directory.GetCurrentDirectory();
-        //    foreach (var file in config.GetCompositeExporter().ExportToFiles(summary, logger))
-        //    {
-        //        logger.WriteLineInfo($"  {file.Replace(currentDirectory, string.Empty).Trim('/', '\\')}");
-        //    }
-        //    logger.WriteLine();
+            LogTotalTime(logger, clockSpan.GetTimeSpan());
+            logger.WriteLine();
 
-        //    logger.WriteLineHeader("// * Detailed results *");
+            logger.WriteLineHeader("// * Summary *");
+            MarkdownExporter.Console.ExportToLog(summary, logger);
 
-        //    // TODO: make exporter
-        //    foreach (var report in reports)
-        //    {
-        //        logger.WriteLineInfo(report.Benchmark.DisplayInfo);
-        //        logger.WriteLineStatistic($"Runtime = {report.GetRuntimeInfo()}; GC = {report.GetGcInfo()}");
-        //        var resultRuns = report.GetResultRuns();
-        //        if (resultRuns.IsEmpty())
-        //            logger.WriteLineError("There are not any results runs");
-        //        else
-        //            logger.WriteLineStatistic(resultRuns.GetStatistics().ToTimeStr(calcHistogram: true));
-        //        logger.WriteLine();
-        //    }
+            // TODO: make exporter
+            ConclusionHelper.Print(logger, config.GetCompositeAnalyser().Analyse(summary).ToList());
 
-        //    LogTotalTime(logger, clockSpan.GetTimeSpan());
-        //    logger.WriteLine();
+            // TODO: move to conclusions
+            var columnWithLegends = summary.Table.Columns.Select(c => c.OriginalColumn).Where(c => !string.IsNullOrEmpty(c.Legend)).ToList();
+            var effectiveTimeUnit = summary.Table.EffectiveSummaryStyle.TimeUnit;
+            if (columnWithLegends.Any() || effectiveTimeUnit != null)
+            {
+                logger.WriteLine();
+                logger.WriteLineHeader("// * Legends *");
+                int maxNameWidth = 0;
+                if (columnWithLegends.Any())
+                    maxNameWidth = Math.Max(maxNameWidth, columnWithLegends.Select(c => c.ColumnName.Length).Max());
+                if (effectiveTimeUnit != null)
+                    maxNameWidth = Math.Max(maxNameWidth, effectiveTimeUnit.Name.Length + 2);
 
-        //    logger.WriteLineHeader("// * Summary *");
-        //    MarkdownExporter.Console.ExportToLog(summary, logger);
+                foreach (var column in columnWithLegends)
+                    logger.WriteLineHint($"  {column.ColumnName.PadRight(maxNameWidth, ' ')} : {column.Legend}");
 
-        //    // TODO: make exporter
-        //    ConclusionHelper.Print(logger, config.GetCompositeAnalyser().Analyse(summary).ToList());
+                if (effectiveTimeUnit != null)
+                    logger.WriteLineHint($"  {("1 " + effectiveTimeUnit.Name).PadRight(maxNameWidth, ' ')} :" +
+                                         $" 1 {effectiveTimeUnit.Description} ({TimeUnit.Convert(1, effectiveTimeUnit, TimeUnit.Second).ToStr("0.#########")} sec)");
+            }
 
-        //    // TODO: move to conclusions
-        //    var columnWithLegends = summary.Table.Columns.Select(c => c.OriginalColumn).Where(c => !string.IsNullOrEmpty(c.Legend)).ToList();
-        //    var effectiveTimeUnit = summary.Table.EffectiveSummaryStyle.TimeUnit;
-        //    if (columnWithLegends.Any() || effectiveTimeUnit != null)
-        //    {
-        //        logger.WriteLine();
-        //        logger.WriteLineHeader("// * Legends *");
-        //        int maxNameWidth = 0;
-        //        if (columnWithLegends.Any())
-        //            maxNameWidth = Math.Max(maxNameWidth, columnWithLegends.Select(c => c.ColumnName.Length).Max());
-        //        if (effectiveTimeUnit != null)
-        //            maxNameWidth = Math.Max(maxNameWidth, effectiveTimeUnit.Name.Length + 2);
+            if (config.GetDiagnosers().Any())
+            {
+                logger.WriteLine();
+                config.GetCompositeDiagnoser().DisplayResults(logger);
+            }
 
-        //        foreach (var column in columnWithLegends)
-        //            logger.WriteLineHint($"  {column.ColumnName.PadRight(maxNameWidth, ' ')} : {column.Legend}");
-
-        //        if (effectiveTimeUnit != null)
-        //            logger.WriteLineHint($"  {("1 " + effectiveTimeUnit.Name).PadRight(maxNameWidth, ' ')} :" +
-        //                                 $" 1 {effectiveTimeUnit.Description} ({TimeUnit.Convert(1, effectiveTimeUnit, TimeUnit.Second).ToStr("0.#########")} sec)");
-        //    }
-
-        //    if (config.GetDiagnosers().Any())
-        //    {
-        //        logger.WriteLine();
-        //        config.GetCompositeDiagnoser().DisplayResults(logger);
-        //    }
-
-        //    logger.WriteLine();
-        //    logger.WriteLineHeader("// ***** BenchmarkRunner: End *****");
-        //    return summary;
-        //}
+            logger.WriteLine();
+            logger.WriteLineHeader("// ***** BenchmarkRunner: End *****");
+            return summary;
+        }
 
         private static ValidationError[] Validate(BenchmarkRunInfo[] benchmarks, ILogger logger)
         {
@@ -304,7 +293,6 @@ namespace BenchmarkDotNet.Running
                     return BuildResult.Failure(generateResult);
 
                 return toolchain.Builder.Build(generateResult, buildPartition, NullLogger.Instance);
-
             }
             catch (Exception e)
             {
@@ -312,14 +300,14 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        private static BenchmarkReport RunCore(Benchmark benchmark, ILogger logger, ReadOnlyConfig config, IResolver resolver, BuildResult buildResult)
+        private static BenchmarkReport RunCore(Benchmark benchmark, BenchmarkId benchmarkId, ILogger logger, ReadOnlyConfig config, IResolver resolver, BuildResult buildResult)
         {
             var toolchain = benchmark.Job.GetToolchain();
 
             logger.WriteLineHeader("// **************************");
             logger.WriteLineHeader("// Benchmark: " + benchmark.DisplayInfo);
 
-            var (executeResults, gcStats) = Execute(logger, benchmark, toolchain, buildResult, config, resolver);
+            var (executeResults, gcStats) = Execute(logger, benchmark, benchmarkId, toolchain, buildResult, config, resolver);
 
             var runs = new List<Measurement>();
 
@@ -332,8 +320,8 @@ namespace BenchmarkDotNet.Running
             return new BenchmarkReport(benchmark, buildResult, buildResult, executeResults, runs, gcStats);
         }
 
-        private static (List<ExecuteResult> executeResults, GcStats gcStats) Execute(
-            ILogger logger, Benchmark benchmark, IToolchain toolchain, BuildResult buildResult, IConfig config, IResolver resolver)
+        private static (List<ExecuteResult> executeResults, GcStats gcStats) Execute(ILogger logger, Benchmark benchmark, BenchmarkId benchmarkId, IToolchain toolchain,
+            BuildResult buildResult, IConfig config, IResolver resolver)
         {
             var executeResults = new List<ExecuteResult>();
             var gcStats = default(GcStats);
@@ -362,6 +350,7 @@ namespace BenchmarkDotNet.Running
                     new ExecuteParameters(
                         buildResult,
                         benchmark,
+                        benchmarkId,
                         logger,
                         resolver,
                         config,
@@ -414,7 +403,7 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineInfo("// Run, Diagnostic");
 
                 var executeResult = toolchain.Executor.Execute(
-                    new ExecuteParameters(buildResult, benchmark, logger, resolver, config, extraRunCompositeDiagnoser));
+                    new ExecuteParameters(buildResult, benchmark, benchmarkId, logger, resolver, config, extraRunCompositeDiagnoser));
 
                 var allRuns = executeResult.Data.Select(line => Measurement.Parse(logger, line, 0)).Where(r => r.IterationMode != IterationMode.Unknown).ToList();
 
@@ -431,7 +420,7 @@ namespace BenchmarkDotNet.Running
             {
                 logger.WriteLineInfo("// Run, Diagnostic [SeparateLogic]");
 
-                separateLogicCompositeDiagnoser.Handle(HostSignal.SeparateLogic, new DiagnoserActionParameters(null, benchmark, config));
+                separateLogicCompositeDiagnoser.Handle(HostSignal.SeparateLogic, new DiagnoserActionParameters(null, benchmark, benchmarkId, config));
             }
 
             return (executeResults, gcStats);
@@ -461,7 +450,7 @@ namespace BenchmarkDotNet.Running
             return null;
         }
 
-        private static void Cleanup(List<string> artifactsToCleanup)
+        private static void Cleanup(HashSet<string> artifactsToCleanup)
         {
             foreach (string path in artifactsToCleanup)
             {

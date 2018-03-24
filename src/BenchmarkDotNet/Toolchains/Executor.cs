@@ -26,17 +26,17 @@ namespace BenchmarkDotNet.Toolchains
         public ExecuteResult Execute(ExecuteParameters executeParameters)
         {
             var exePath = executeParameters.BuildResult.ArtifactsPaths.ExecutablePath;
-            var args = executeParameters.Diagnoser == null ? string.Empty : Engine.Signals.DiagnoserIsAttachedParam;
+            var args = executeParameters.BenchmarkId.ToArgument();
 
             if (!File.Exists(exePath))
             {
                 return new ExecuteResult(false, -1, Array.Empty<string>(), Array.Empty<string>());
             }
 
-            return Execute(executeParameters.Benchmark, executeParameters.Logger, exePath, null, args, executeParameters.Diagnoser, executeParameters.Resolver, executeParameters.Config);
+            return Execute(executeParameters.Benchmark, executeParameters.BenchmarkId, executeParameters.Logger, exePath, null, args, executeParameters.Diagnoser, executeParameters.Resolver, executeParameters.Config);
         }
 
-        private ExecuteResult Execute(Benchmark benchmark, ILogger logger, string exePath, string workingDirectory, string args, IDiagnoser diagnoser, IResolver resolver, IConfig config)
+        private ExecuteResult Execute(Benchmark benchmark, BenchmarkId benchmarkId, ILogger logger, string exePath, string workingDirectory, string args, IDiagnoser diagnoser, IResolver resolver, IConfig config)
         {
             ConsoleHandler.EnsureInitialized(logger);
 
@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Toolchains
             {
                 using (var process = new Process { StartInfo = CreateStartInfo(benchmark, exePath, args, workingDirectory, resolver) })
                 {
-                    var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmark, config);
+                    var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmark, benchmarkId, config);
 
                     return Execute(process, benchmark, loggerWithDiagnoser, logger);
                 }
