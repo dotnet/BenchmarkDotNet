@@ -3,6 +3,8 @@ using System.Linq;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.Running
 {
@@ -33,5 +35,13 @@ namespace BenchmarkDotNet.Running
         public string BuildConfiguration => RepresentativeBenchmark.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, Resolver);
 
         public Platform Platform => RepresentativeBenchmark.Job.ResolveValue(EnvMode.PlatformCharacteristic, Resolver);
+
+        public Jit Jit => RepresentativeBenchmark.Job.ResolveValue(EnvMode.JitCharacteristic, Resolver);
+
+        private Runtime Runtime => RepresentativeBenchmark.Job.Env.HasValue(EnvMode.RuntimeCharacteristic)
+                ? RepresentativeBenchmark.Job.Env.Runtime
+                : RuntimeInformation.GetCurrentRuntime();
+
+        public override string ToString() => $"{Runtime}-{Platform}-{Jit}-{RepresentativeBenchmark.Job.GetToolchain()}";
     }
 }

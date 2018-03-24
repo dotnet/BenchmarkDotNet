@@ -20,50 +20,78 @@ namespace BenchmarkDotNet.Code
 {
     internal static class CodeGenerator
     {
-        internal static string Generate(Benchmark benchmark, IConfig config)
+        internal static string Generate(BuildPartition buildPartition)
         {
-            var provider = GetDeclarationsProvider(benchmark.Target);
-
             (bool useShadowCopy, string shadowCopyFolderPath) = GetShadowCopySettings();
 
-            string passArguments = GetPassArguments(benchmark);
+            var benchmarksCode = new List<string>(buildPartition.Benchmarks.Length);
 
-            string text = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt")).
-                Replace("$OperationsPerInvoke$", provider.OperationsPerInvoke).
-                Replace("$TargetTypeNamespace$", provider.TargetTypeNamespace).
-                Replace("$TargetMethodReturnTypeNamespace$", provider.TargetMethodReturnTypeNamespace).
-                Replace("$TargetTypeName$", provider.TargetTypeName).
-                Replace("$TargetMethodDelegate$", provider.TargetMethodDelegate).
-                Replace("$TargetMethodReturnType$", provider.TargetMethodReturnTypeName).
-                Replace("$IdleMethodReturnTypeName$", provider.IdleMethodReturnTypeName).
-                Replace("$GlobalSetupMethodName$", provider.GlobalSetupMethodName).
-                Replace("$GlobalCleanupMethodName$", provider.GlobalCleanupMethodName).
-                Replace("$IterationSetupMethodName$", provider.IterationSetupMethodName).
-                Replace("$IterationCleanupMethodName$", provider.IterationCleanupMethodName).
-                Replace("$IdleImplementation$", provider.IdleImplementation).
-                Replace("$ExtraDefines$", provider.ExtraDefines).
-                Replace("$ConsumeField$", provider.ConsumeField).
-                Replace("$AdditionalLogic$", benchmark.Target.AdditionalLogic).
-                Replace("$JobSetDefinition$", GetJobsSetDefinition(benchmark)).
-                Replace("$ParamsContent$", GetParamsContent(benchmark)).
-                Replace("$ArgumentsDefinition$", GetArgumentsDefinition(benchmark)).
-                Replace("$DeclareArgumentFields$", GetDeclareArgumentFields(benchmark)).
-                Replace("$InitializeArgumentFields$", GetInitializeArgumentFields(benchmark)).
-                Replace("$LoadArguments$", GetLoadArguments(benchmark)).
-                Replace("$PassArguments$", passArguments).
-                Replace("$ExtraAttribute$", GetExtraAttributes(benchmark.Target)).
-                Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark)).
-                Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).
-                Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath).
-                Replace("$Ref$", provider.UseRefKeyword ? "ref" : null).
-                Replace("$MeasureGcStats$", config.HasMemoryDiagnoser() ? "true" : "false").
-                Replace("$DiassemblerEntryMethodName$", DisassemblerConstants.DiassemblerEntryMethodName).
-                Replace("$TargetMethodCall$", provider.GetTargetMethodCall(passArguments)).
-                ToString();
+            var extraDefines = new List<string>();
+            var targetTypeNamespaces = new HashSet<string>();
+            var targetMethodReturnTypeNamespace = new HashSet<string>();
+            var additionalLogic = new HashSet<string>();
 
-            text = Unroll(text, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvResolver.Instance));
+            foreach (var buildInfo in buildPartition.Benchmarks)
+            {
+                var benchmark = buildInfo.Benchmark;
 
-            return text;
+                var provider = GetDeclarationsProvider(benchmark.Target);
+
+                string passArguments = GetPassArguments(benchmark);
+
+                extraDefines.Add($"{provider.ExtraDefines}_{buildInfo.Id}");
+
+                AddNonEmptyUnique(targetTypeNamespaces, provider.TargetTypeNamespace);
+                AddNonEmptyUnique(targetMethodReturnTypeNamespace, provider.TargetMethodReturnTypeNamespace);
+                AddNonEmptyUnique(additionalLogic, benchmark.Target.AdditionalLogic);
+
+                string benchmarkTypeCode = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkType.txt"))
+                    .Replace("$ID$", buildInfo.Id.ToString())
+                    .Replace("$OperationsPerInvoke$", provider.OperationsPerInvoke)
+                    .Replace("$TargetTypeName$", provider.TargetTypeName)
+                    .Replace("$TargetMethodDelegate$", provider.TargetMethodDelegate)
+                    .Replace("$TargetMethodReturnType$", provider.TargetMethodReturnTypeName)
+                    .Replace("$IdleMethodReturnTypeName$", provider.IdleMethodReturnTypeName)
+                    .Replace("$GlobalSetupMethodName$", provider.GlobalSetupMethodName)
+                    .Replace("$GlobalCleanupMethodName$", provider.GlobalCleanupMethodName)
+                    .Replace("$IterationSetupMethodName$", provider.IterationSetupMethodName)
+                    .Replace("$IterationCleanupMethodName$", provider.IterationCleanupMethodName)
+                    .Replace("$IdleImplementation$", provider.IdleImplementation)
+                    .Replace("$ConsumeField$", provider.ConsumeField)
+                    .Replace("$JobSetDefinition$", GetJobsSetDefinition(benchmark))
+                    .Replace("$ParamsContent$", GetParamsContent(benchmark))
+                    .Replace("$ArgumentsDefinition$", GetArgumentsDefinition(benchmark))
+                    .Replace("$DeclareArgumentFields$", GetDeclareArgumentFields(benchmark))
+                    .Replace("$InitializeArgumentFields$", GetInitializeArgumentFields(benchmark)).Replace("$LoadArguments$", GetLoadArguments(benchmark))
+                    .Replace("$PassArguments$", passArguments)
+                    .Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark))
+                    .Replace("$Ref$", provider.UseRefKeyword ? "ref" : null)
+                    .Replace("$MeasureGcStats$", buildInfo.Config.HasMemoryDiagnoser() ? "true" : "false")
+                    .Replace("$DiassemblerEntryMethodName$", DisassemblerConstants.DiassemblerEntryMethodName)
+                    .Replace("$TargetMethodCall$", provider.GetTargetMethodCall(passArguments)).ToString();
+
+                benchmarkTypeCode = Unroll(benchmarkTypeCode, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvResolver.Instance));
+
+                benchmarksCode.Add(benchmarkTypeCode);
+            }
+
+            string benchmarkProgramContent = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt"))
+                .Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath)
+                .Replace("$ExtraDefines$", string.Join(Environment.NewLine, extraDefines))
+                .Replace("$TargetTypeNamespace$", string.Join(Environment.NewLine, targetTypeNamespaces))
+                .Replace("$TargetMethodReturnTypeNamespace$", string.Join(Environment.NewLine, targetMethodReturnTypeNamespace))
+                .Replace("$AdditionalLogic$", string.Join(Environment.NewLine, additionalLogic))
+                .Replace("$DerivedTypes$", string.Join(Environment.NewLine, benchmarksCode))
+                .Replace("$ExtraAttribute$", GetExtraAttributes(buildPartition.RepresentativeBenchmark.Target))
+                .ToString();
+
+            return benchmarkProgramContent;
+        }
+
+        private static void AddNonEmptyUnique(HashSet<string> items, string value)
+        {
+            if (!string.IsNullOrEmpty(value) && !items.Contains(value))
+                items.Add(value);
         }
 
         private static (bool, string) GetShadowCopySettings()
@@ -82,11 +110,6 @@ namespace BenchmarkDotNet.Code
             }
 
             return (false, string.Empty);
-        }
-
-        internal static string Generate(BuildPartition buildPartition)
-        {
-            throw new NotImplementedException();
         }
 
         private static string Unroll(string text, int factor)
@@ -194,15 +217,8 @@ namespace BenchmarkDotNet.Code
                 benchmark.Target.Method.GetParameters()
                     .Select((parameter, index) => $"{GetParameterModifier(parameter)} arg{index}"));
 
-        private static string GetExtraAttributes(Target target)
-        {
-            if (target.Method.GetCustomAttributes(false).OfType<System.STAThreadAttribute>().Any())
-            {
-                return "[System.STAThreadAttribute]";
-            }
-
-            return string.Empty;
-        }
+        private static string GetExtraAttributes(Target target) 
+            => target.Method.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any() ? "[System.STAThreadAttribute]" : string.Empty;
 
         private static string GetEngineFactoryTypeName(Benchmark benchmark)
         {

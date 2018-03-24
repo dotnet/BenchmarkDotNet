@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Code
 
         public string IterationCleanupMethodName => Target.IterationCleanupMethod?.Name ?? EmptyAction;
 
-        public virtual string ExtraDefines => null;
+        public abstract string ExtraDefines { get; }
 
         public abstract string TargetMethodReturnTypeNamespace { get; }
 
@@ -61,6 +61,8 @@ namespace BenchmarkDotNet.Code
     internal class VoidDeclarationsProvider : DeclarationsProvider
     {
         public VoidDeclarationsProvider(Target target) : base(target) { }
+
+        public override string ExtraDefines => "#define RETURNS_VOID";
 
         public override string TargetMethodReturnTypeNamespace => string.Empty;
 

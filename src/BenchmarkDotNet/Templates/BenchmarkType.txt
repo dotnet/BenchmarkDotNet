@@ -1,0 +1,256 @@
+    // the type name must be in sync with WindowsDisassembler.BuildArguments
+    public class Runnable_$ID$ : global::$TargetTypeName$
+    {
+        public static void Run(IHost host)
+        {
+            Runnable_$ID$ instance = new Runnable_$ID$();
+            $ParamsContent$
+
+            host.WriteLine();
+            foreach (var infoLine in BenchmarkEnvironmentInfo.GetCurrent().ToFormattedString())
+            {
+                host.WriteLine("// {0}", infoLine);
+            }
+            var job = new Job();
+            $JobSetDefinition$;
+            job.Freeze();
+            host.WriteLine("// Job: {0}", job.DisplayInfo);
+            host.WriteLine();
+
+            var engineParameters = new BenchmarkDotNet.Engines.EngineParameters()
+            {
+                Host = host,
+                MainAction = instance.MainMultiAction,
+                Dummy1Action = instance.Dummy1,
+                Dummy2Action = instance.Dummy2,
+                Dummy3Action = instance.Dummy3,
+                IdleAction = instance.IdleMultiAction,
+                GlobalSetupAction = instance.globalSetupAction,
+                GlobalCleanupAction = instance.globalCleanupAction,
+                IterationSetupAction = instance.iterationSetupAction,
+                IterationCleanupAction = instance.iterationCleanupAction,
+                TargetJob = job,
+                OperationsPerInvoke = $OperationsPerInvoke$,
+                MeasureGcStats = $MeasureGcStats$
+            };
+
+            var engine = new $EngineFactoryType$().Create(engineParameters);
+
+            instance?.globalSetupAction();
+            instance?.iterationSetupAction();
+
+            if (job.ResolveValue(RunMode.RunStrategyCharacteristic, EngineResolver.Instance).NeedsJitting())
+				engine.Jitting(); // does first call to main action, must be executed after globalSetup() and iterationSetup()!
+
+            instance?.iterationCleanupAction();
+
+            var results = engine.Run();
+
+            instance?.globalCleanupAction();
+
+            host.ReportResults(results); // printing costs memory, do this after runs
+
+			instance.__TrickTheJIT__(); // compile the method for disassembler, but without actual run of the benchmark ;)
+        }
+
+        public delegate $IdleMethodReturnTypeName$ IdleDelegate($ArgumentsDefinition$);
+
+        public delegate $Ref$ $TargetMethodReturnType$ TargetDelegate($ArgumentsDefinition$);
+
+        public Runnable_$ID$()
+        {
+            globalSetupAction = $GlobalSetupMethodName$;
+            globalCleanupAction = $GlobalCleanupMethodName$;
+            iterationSetupAction = $IterationSetupMethodName$;
+            iterationCleanupAction = $IterationCleanupMethodName$;
+            idleDelegate = __Idle;
+            targetDelegate = $TargetMethodDelegate$;
+            $InitializeArgumentFields$
+        }
+
+        private Action globalSetupAction;
+        private Action globalCleanupAction;
+        private Action iterationSetupAction;
+        private Action iterationCleanupAction;
+        private IdleDelegate idleDelegate;
+        private TargetDelegate targetDelegate;
+        $DeclareArgumentFields$
+
+        // this method is used only for the disassembly diagnoser purposes
+		// the goal is to get this and the benchmarked method jitted, but without executing the benchmarked method itself
+		public int NotEleven;
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+		public void __TrickTheJIT__()
+		{
+			NotEleven = new Random(123).Next(0, 10);
+            $DiassemblerEntryMethodName$();
+		}
+
+        private int dummyVar;
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void Dummy1()
+        {
+            dummyVar++;@DummyUnroll@
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void Dummy2()
+        {
+            dummyVar++;@DummyUnroll@
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void Dummy3()
+        {
+            dummyVar++;@DummyUnroll@
+        }
+
+        private $IdleMethodReturnTypeName$ __Idle($ArgumentsDefinition$) // __ is to avoid possible name conflict
+        {
+            $IdleImplementation$
+        }
+
+#if RETURNS_CONSUMABLE_$ID$
+
+        private Consumer consumer = new Consumer();
+
+        private void IdleMultiAction(long invokeCount)
+        {
+            $LoadArguments$
+            for (long i = 0; i < invokeCount; i++)
+            {
+                consumer.Consume(idleDelegate($PassArguments$));@Unroll@
+            }
+        }
+
+        private void MainMultiAction(long invokeCount)
+        {
+            $LoadArguments$
+            for (long i = 0; i < invokeCount; i++)
+            {
+                consumer.Consume(targetDelegate($PassArguments$)$ConsumeField$);@Unroll@
+            }
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        public $TargetMethodReturnType$ $DiassemblerEntryMethodName$()
+        {
+            if (NotEleven == 11)
+            {
+                $LoadArguments$
+                return $TargetMethodCall$;
+            }
+            
+            return default($TargetMethodReturnType$);
+        }
+
+#elif RETURNS_NON_CONSUMABLE_STRUCT_$ID$
+
+        private void IdleMultiAction(long invokeCount)
+        {
+            $LoadArguments$
+            $IdleMethodReturnTypeName$ result = default($IdleMethodReturnTypeName$);
+            for (long i = 0; i < invokeCount; i++)
+            {
+                result = idleDelegate($PassArguments$);@Unroll@
+            }
+            DeadCodeEliminationHelper.KeepAliveWithoutBoxing(result);
+        }
+
+        private void MainMultiAction(long invokeCount)
+        {
+            $LoadArguments$
+            $TargetMethodReturnType$ result = default($TargetMethodReturnType$);
+            for (long i = 0; i < invokeCount; i++)
+            {
+                result = targetDelegate($PassArguments$);@Unroll@
+            }
+            NonGenericKeepAliveWithoutBoxing(result);
+        }
+
+        // we must not simply use DeadCodeEliminationHelper.KeepAliveWithoutBoxing<T> because it's generic method
+        // and stack-only types like Span<T> can not be generic type arguments http://adamsitnik.com/Span/#span-must-not-be-a-generic-type-argument
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void NonGenericKeepAliveWithoutBoxing($TargetMethodReturnType$ _) { }
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        public $TargetMethodReturnType$ $DiassemblerEntryMethodName$()
+        {
+            if (NotEleven == 11)
+            {
+                $LoadArguments$
+                return $TargetMethodCall$;
+            }
+            
+            return default($TargetMethodReturnType$);
+        }
+
+#elif RETURNS_BYREF_$ID$
+
+        private void IdleMultiAction(long invokeCount)
+        {
+            $LoadArguments$
+            $IdleMethodReturnTypeName$ value = default($IdleMethodReturnTypeName$);
+            for (long i = 0; i < invokeCount; i++)
+            {
+                value = idleDelegate($PassArguments$);@Unroll@
+            }
+            DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
+        }
+
+        private $TargetMethodReturnType$ mainDefaultValueHolder = default($TargetMethodReturnType$);
+
+        private void MainMultiAction(long invokeCount)
+        {
+            $LoadArguments$
+            ref $TargetMethodReturnType$ alias = ref mainDefaultValueHolder;
+            for (long i = 0; i < invokeCount; i++)
+            {
+                alias = targetDelegate($PassArguments$);@Unroll@
+            }
+            DeadCodeEliminationHelper.KeepAliveWithoutBoxing(ref alias);
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        public ref $TargetMethodReturnType$ $DiassemblerEntryMethodName$()
+        {
+            if (NotEleven == 11)
+            {
+                $LoadArguments$
+                return ref $TargetMethodCall$;
+            }
+            
+            return ref mainDefaultValueHolder;
+        }
+#elif RETURNS_VOID_$ID$
+
+        private void IdleMultiAction(long invokeCount)
+        {
+            $LoadArguments$
+            for (long i = 0; i < invokeCount; i++)
+            {
+                idleDelegate($PassArguments$);@Unroll@
+            }
+        }
+
+        private void MainMultiAction(long invokeCount)
+        {
+            $LoadArguments$
+            for (long i = 0; i < invokeCount; i++)
+            {
+                targetDelegate($PassArguments$);@Unroll@
+            }
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        public void $DiassemblerEntryMethodName$()
+        {
+            if (NotEleven == 11)
+            {
+                $LoadArguments$
+                $TargetMethodCall$;
+            }
+        }
+#endif
+    }
