@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
@@ -6,6 +6,7 @@ using Microsoft.DotNet.PlatformAbstractions;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace BenchmarkDotNet.Toolchains.CustomCoreClr
 {
@@ -50,11 +51,27 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         private bool IsLocalCoreClr => IsUsingCustomCoreClr && Directory.Exists(CoreClrNuGetFeed);
         private bool IsLocalCoreFx => IsUsingCustomCoreFx && Directory.Exists(CoreFxNuGetFeed);
 
+        protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programName)
+            => Path.Combine(Path.GetTempPath(), programName); // store everything in temp to avoid collisions with IDE
+
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
             => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, RuntimeIdentifier, "publish");
 
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
-            => File.WriteAllText(artifactsPaths.BuildScriptFilePath, $"dotnet publish -c Release"); // publish does the restore
+            => File.WriteAllText(artifactsPaths.BuildScriptFilePath, 
+                $"dotnet restore --packages {artifactsPaths.PackagesDirectoryName} --no-dependencies" + Environment.NewLine +
+                $"dotnet build -c {buildPartition.BuildConfiguration} --no-restore --no-dependencies" + Environment.NewLine +
+                $"dotnet publish -c {buildPartition.BuildConfiguration} --no-restore --no-dependencies");
+
+        // we always want to have a new directory for NuGet packages restore 
+        // to avoid this https://github.com/dotnet/coreclr/blob/master/Documentation/workflow/UsingDotNetCli.md#update-coreclr-using-runtime-nuget-package
+        // some of the packages are going to contain source code, so they can not be in the subfolder of current solution
+        // otherwise they would be compiled too (new .csproj include all .cs files from subfolders by default
+        protected override string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath)
+            => Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+        protected override string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths)
+            => base.GetArtifactsToCleanup(artifactsPaths).Concat(new[] { artifactsPaths.PackagesDirectoryName }).ToArray();
 
         protected override void GenerateNuGetConfig(ArtifactsPaths artifactsPaths)
         {
@@ -62,9 +79,6 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
 $@"<?xml version=""1.0"" encoding=""utf-8""?>
 <configuration>
   <packageSources>
-    <!--To inherit the global NuGet package sources remove the <clear/> line below -->
-    <clear />
-
     <add key=""{nameof(CoreClrNuGetFeed)}"" value=""{CoreClrNuGetFeed}"" />
     <add key=""{nameof(CoreFxNuGetFeed)}"" value=""{CoreFxNuGetFeed}"" />
   </packageSources>

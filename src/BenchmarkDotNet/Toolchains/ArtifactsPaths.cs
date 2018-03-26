@@ -1,10 +1,8 @@
-using System;
-
 namespace BenchmarkDotNet.Toolchains
 {
     public class ArtifactsPaths
     {
-        public static ArtifactsPaths Empty = new ArtifactsPaths("", "", "", "", "", "", "", "", "", "");
+        public static ArtifactsPaths Empty = new ArtifactsPaths("", "", "", "", "", "", "", "", "", "", "");
 
         public string RootArtifactsFolderPath { get; }
 
@@ -26,6 +24,8 @@ namespace BenchmarkDotNet.Toolchains
 
         public string ProgramName { get; }
 
+        public string PackagesDirectoryName { get; }
+
         public ArtifactsPaths(
             string rootArtifactsFolderPath,
             string buildArtifactsDirectoryPath,
@@ -36,7 +36,8 @@ namespace BenchmarkDotNet.Toolchains
             string projectFilePath,
             string buildScriptFilePath,
             string executablePath,
-            string programName)
+            string programName,
+            string packagesDirectoryName)
         {
             RootArtifactsFolderPath = rootArtifactsFolderPath;
             BuildArtifactsDirectoryPath = buildArtifactsDirectoryPath;
@@ -48,6 +49,7 @@ namespace BenchmarkDotNet.Toolchains
             BuildScriptFilePath = buildScriptFilePath;
             ExecutablePath = executablePath;
             ProgramName = programName;
+            PackagesDirectoryName = packagesDirectoryName;
         }
     }
 }

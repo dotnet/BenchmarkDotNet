@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Toolchains
     {
         public GenerateResult GenerateProject(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath)
         {
-            ArtifactsPaths artifactsPaths = null;
+            ArtifactsPaths artifactsPaths = ArtifactsPaths.Empty;
             try
             {
                 artifactsPaths = GetArtifactsPaths(buildPartition, rootArtifactsFolderPath);
@@ -51,6 +51,8 @@ namespace BenchmarkDotNet.Toolchains
 
         protected abstract void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths);
 
+        protected virtual string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath) => Path.Combine(buildArtifactsDirectoryPath, "packages");
+
         private ArtifactsPaths GetArtifactsPaths(BuildPartition buildPartition, string rootArtifactsFolderPath)
         {
             // its not ".cs" in order to avoid VS from displaying and compiling it with xprojs/csprojs that include all *.cs by default
@@ -71,7 +73,8 @@ namespace BenchmarkDotNet.Toolchains
                 projectFilePath: GetProjectFilePath(buildArtifactsDirectoryPath),
                 buildScriptFilePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{RuntimeInformation.ScriptFileExtension}"),
                 executablePath: executablePath,
-                programName: programName);
+                programName: programName,
+                packagesDirectoryName: GetPackagesDirectoryPath(buildArtifactsDirectoryPath));
         }
 
         private static void GenerateCode(BuildPartition buildPartition, ArtifactsPaths artifactsPaths) 
