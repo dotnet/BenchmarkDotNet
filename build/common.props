@@ -19,7 +19,7 @@
   <PropertyGroup Condition=" '$(IsVisualBasic)' != 'true' And '$(TargetFramework)' == 'net46' ">
     <DefineConstants>$(DefineConstants);CLASSIC</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(IsVisualBasic)' != 'true' And '$(TargetFramework)' == 'netcoreapp2.0' ">
+  <PropertyGroup Condition=" '$(IsVisualBasic)' != 'true' And ('$(TargetFramework)' == 'netcoreapp2.0' Or '$(TargetFramework)' == 'netcoreapp2.1') ">
     <DefineConstants>$(DefineConstants);CORE</DefineConstants>
   </PropertyGroup>
 

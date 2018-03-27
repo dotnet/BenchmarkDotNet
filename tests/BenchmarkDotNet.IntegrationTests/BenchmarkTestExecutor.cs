@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.IntegrationTests
         /// <param name="config">Optional custom config to be used instead of the default</param>
         /// <param name="fullValidation">Optional: disable validation (default = true/enabled)</param>
         /// <returns>The summary from the benchmark run</returns>
-        internal Reports.Summary CanExecute<TBenchmark>(IConfig config = null, bool fullValidation = true)
+        public Reports.Summary CanExecute<TBenchmark>(IConfig config = null, bool fullValidation = true)
         {
             return CanExecute(typeof(TBenchmark), config, fullValidation);
         }

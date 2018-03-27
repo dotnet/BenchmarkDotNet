@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
@@ -43,8 +44,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         internal static CommandResult ExecuteCommand(
-            string customDotNetCliPath, string commandWithArguments, string workingDirectory)
+            string customDotNetCliPath, string commandWithArguments, string workingDirectory, ILogger logger, bool useSharedCompilation = false)
         {
+            commandWithArguments = $"{commandWithArguments} /p:UseSharedCompilation={useSharedCompilation.ToString().ToLowerInvariant()}";
+
             using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath, workingDirectory, commandWithArguments) })
             {
                 var stopwatch = Stopwatch.StartNew();
@@ -55,6 +58,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
                 process.WaitForExit();
                 stopwatch.Stop();
+
+                logger.WriteLineInfo($"// {commandWithArguments} took {stopwatch.Elapsed.TotalSeconds:0.##}s and exited with {process.ExitCode}");
 
                 return process.ExitCode <= 0
                     ? CommandResult.Success(stopwatch.Elapsed, standardOutput)

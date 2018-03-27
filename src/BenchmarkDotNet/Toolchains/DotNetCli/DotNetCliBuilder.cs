@@ -35,18 +35,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             var restoreResult = DotNetCliCommandExecutor.ExecuteCommand(
                 CustomDotNetCliPath,
                 $"{RestoreCommand} {extraArguments}",
-                generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
-
-            logger.WriteLineInfo($"// dotnet restore took {restoreResult.ExecutionTime.TotalSeconds:0.##}s");
+                generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath,
+                logger);
 
             if (!restoreResult.IsSuccess)
-            {
                 return BuildResult.Failure(generateResult, new Exception(restoreResult.ProblemDescription));
-            }
 
-            var buildResult = Build(generateResult, buildPartition.BuildConfiguration, extraArguments);
-
-            logger.WriteLineInfo($"// dotnet build took {buildResult.ExecutionTime.TotalSeconds:0.##}s");
+            var buildResult = Build(generateResult, buildPartition.BuildConfiguration, extraArguments, logger);
 
             if (!buildResult.IsSuccess)
             {
@@ -63,12 +58,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return BuildResult.Success(generateResult);
         }
 
-        private DotNetCliCommandExecutor.CommandResult Build(GenerateResult generateResult, string configuration, string extraArguments)
+        private DotNetCliCommandExecutor.CommandResult Build(GenerateResult generateResult, string configuration, string extraArguments, ILogger logger)
         {
             var withoutDependencies = DotNetCliCommandExecutor.ExecuteCommand(
                 CustomDotNetCliPath,
                 $"{GetBuildCommand(TargetFrameworkMoniker, true, configuration)} {extraArguments}",
-                generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
+                generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath,
+                logger);
 
             // at first we try to build the project without it's dependencies to save a LOT of time
             // in 99% of the cases it will work (the host process is running so it must be compiled!)
@@ -80,7 +76,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return DotNetCliCommandExecutor.ExecuteCommand(
                 CustomDotNetCliPath,
                 $"{GetBuildCommand(TargetFrameworkMoniker, false, configuration)} {extraArguments}",
-                generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
+                generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath,
+                logger);
         }
     }
 }

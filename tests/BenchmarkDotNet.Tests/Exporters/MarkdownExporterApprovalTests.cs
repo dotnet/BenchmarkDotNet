@@ -1,5 +1,4 @@
-﻿#if CLASSIC || NETCOREAPP2_0
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -249,4 +248,3 @@ namespace BenchmarkDotNet.Tests.Exporters
         }
     }
 }
-#endif

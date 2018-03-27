@@ -1,5 +1,4 @@
-﻿#if CLASSIC || NETCOREAPP2_0
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
@@ -112,4 +111,3 @@ namespace BenchmarkDotNet.Tests.Exporters
         }
     }
 }
-#endif

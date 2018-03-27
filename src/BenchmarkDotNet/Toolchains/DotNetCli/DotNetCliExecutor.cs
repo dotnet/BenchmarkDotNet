@@ -1,11 +1,9 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;

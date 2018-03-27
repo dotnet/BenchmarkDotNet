@@ -1,5 +1,4 @@
-﻿#if !NETCOREAPP1_1
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples.Framework
@@ -19,4 +18,3 @@ namespace BenchmarkDotNet.Samples.Framework
         }
     }
 }
-#endif
