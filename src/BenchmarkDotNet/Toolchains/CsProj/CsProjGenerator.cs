@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         public string RuntimeFrameworkVersion { get; }
 
         public CsProjGenerator(string targetFrameworkMoniker, Func<Platform, string> platformProvider, string runtimeFrameworkVersion = null)
-            : base(new CsProjBuilder(targetFrameworkMoniker, null), targetFrameworkMoniker, null, platformProvider, null)
+            : base(new DotNetCliBuilder(targetFrameworkMoniker, null), targetFrameworkMoniker, null, platformProvider, null)
         {
             RuntimeFrameworkVersion = runtimeFrameworkVersion;
         }

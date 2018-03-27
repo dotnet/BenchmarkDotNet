@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
                 var globalChronometer = Chronometer.Start();
 
-                var buildResults = BuildInParallel(logger, rootArtifactsFolderPath, resolver, buildPartitions, ref globalChronometer);
+                var buildResults = BuildInParallel(logger, rootArtifactsFolderPath, buildPartitions, ref globalChronometer);
 
                 try
                 {
@@ -264,15 +264,17 @@ namespace BenchmarkDotNet.Running
             return validationErrors.ToArray();
         }
 
-        private static Dictionary<BuildPartition, BuildResult> BuildInParallel(ILogger logger, string rootArtifactsFolderPath, IResolver resolver, BuildPartition[] buildPartitions, ref StartedClock globalChronometer)
+        private static Dictionary<BuildPartition, BuildResult> BuildInParallel(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, ref StartedClock globalChronometer)
         {
             using (buildPartitions.Select(partition=> GetAssemblyResolveHelper(partition.RepresentativeBenchmark.Job.GetToolchain(), logger)).FirstOrDefault(helper => helper != null))
             {
                 logger.WriteLineHeader($"// ***** Building {buildPartitions.Length} exe(s) in Parallel: Start   *****");
 
+                var buildLogger = buildPartitions.Length == 1 ? logger : NullLogger.Instance; // when we have just one partition we can print to std out
+
                 var buildResults = buildPartitions
                     .AsParallel()
-                    .Select(buildPartition => (buildPartition, buildResult: Build(buildPartition, rootArtifactsFolderPath)))
+                    .Select(buildPartition => (buildPartition, buildResult: Build(buildPartition, rootArtifactsFolderPath, buildLogger)))
                     .ToDictionary(result => result.buildPartition, result => result.buildResult);
 
                 logger.WriteLineHeader($"// ***** Done, took {globalChronometer.GetElapsed().GetTimeSpan().ToFormattedTotalTime()}   *****");
@@ -281,18 +283,18 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        private static BuildResult Build(BuildPartition buildPartition, string rootArtifactsFolderPath)
+        private static BuildResult Build(BuildPartition buildPartition, string rootArtifactsFolderPath, ILogger buildLogger)
         {
             var toolchain = buildPartition.RepresentativeBenchmark.Job.GetToolchain(); // it's guaranteed that all the benchmarks in single partition have same toolchain
 
-            var generateResult = toolchain.Generator.GenerateProject(buildPartition, NullLogger.Instance, rootArtifactsFolderPath);
+            var generateResult = toolchain.Generator.GenerateProject(buildPartition, buildLogger, rootArtifactsFolderPath);
 
             try
             {
                 if (!generateResult.IsGenerateSuccess)
                     return BuildResult.Failure(generateResult);
 
-                return toolchain.Builder.Build(generateResult, buildPartition, NullLogger.Instance);
+                return toolchain.Builder.Build(generateResult, buildPartition, buildLogger);
             }
             catch (Exception e)
             {

@@ -9,13 +9,13 @@ using JetBrains.Annotations;
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     [PublicAPI]
-    public abstract class DotNetCliBuilder : IBuilder
+    public class DotNetCliBuilder : IBuilder
     {
+        public string RestoreCommand => "restore --no-dependencies";
+
         private string TargetFrameworkMoniker { get; }
 
         private string CustomDotNetCliPath { get; }
-
-        public abstract string RestoreCommand { get; }
 
         [PublicAPI]
         public DotNetCliBuilder(string targetFrameworkMoniker, string customDotNetCliPath = null)
@@ -24,7 +24,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             CustomDotNetCliPath = customDotNetCliPath;
         }
 
-        public abstract string GetBuildCommand(string frameworkMoniker, bool justTheProjectItself, string configuration);
+        public string GetBuildCommand(string frameworkMoniker, bool justTheProjectItself, string configuration)
+            => $"build --framework {frameworkMoniker} --configuration {configuration} --no-restore"
+               + (justTheProjectItself ? " --no-dependencies" : string.Empty);
 
         public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
         {
@@ -44,7 +46,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             var buildResult = Build(generateResult, buildPartition.BuildConfiguration, extraArguments);
 
-            logger.WriteLineInfo($"// dotnet build/publish took {buildResult.ExecutionTime.TotalSeconds:0.##}s");
+            logger.WriteLineInfo($"// dotnet build took {buildResult.ExecutionTime.TotalSeconds:0.##}s");
 
             if (!buildResult.IsSuccess)
             {

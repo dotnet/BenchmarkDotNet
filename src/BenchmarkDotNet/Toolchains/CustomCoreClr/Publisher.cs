@@ -45,6 +45,8 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
                 $"restore --packages {generateResult.ArtifactsPaths.PackagesDirectoryName} --no-dependencies {extraArguments}",
                 generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
 
+            logger.WriteLineInfo($"// dotnet restore took {restoreResult.ExecutionTime.TotalSeconds:0.##}s");
+
             if (!restoreResult.IsSuccess)
                 return BuildResult.Failure(generateResult, new Exception(restoreResult.ProblemDescription));
 
@@ -53,6 +55,8 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
                 $"build -c {buildPartition.BuildConfiguration} --no-restore --no-dependencies {extraArguments}",
                 generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
 
+            logger.WriteLineInfo($"// dotnet build took {buildResult.ExecutionTime.TotalSeconds:0.##}s");
+
             if (!buildResult.IsSuccess)
                 return BuildResult.Failure(generateResult, new Exception(buildResult.ProblemDescription));
 
@@ -60,6 +64,8 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
                 CustomDotNetCliPath,
                 $"publish -c {buildPartition.BuildConfiguration} --no-restore --no-dependencies {extraArguments}",
                 generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
+
+            logger.WriteLineInfo($"// dotnet publish took {publishResult.ExecutionTime.TotalSeconds:0.##}s");
 
             if (!publishResult.IsSuccess &&
                 !File.Exists(generateResult.ArtifactsPaths.ExecutablePath)) // dotnet cli could have succesfully builded the program, but returned 1 as exit code because it had some warnings

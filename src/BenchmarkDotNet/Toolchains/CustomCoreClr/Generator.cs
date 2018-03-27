@@ -1,4 +1,3 @@
-using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
