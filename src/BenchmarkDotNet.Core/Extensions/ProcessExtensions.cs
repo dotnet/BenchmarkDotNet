@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
@@ -107,6 +108,11 @@ namespace BenchmarkDotNet.Extensions
             foreach (var environmentVariable in benchmark.Job.Infrastructure.EnvironmentVariables)
             {
                 start.EnvironmentVariables[environmentVariable.Key] = environmentVariable.Value;
+            }
+
+            if (benchmark.Job.Env.Runtime is ClrRuntime clrRuntime && !string.IsNullOrEmpty(clrRuntime.Version))
+            {
+                start.EnvironmentVariables["COMPLUS_Version"] = clrRuntime.Version;
             }
 #endif
         }

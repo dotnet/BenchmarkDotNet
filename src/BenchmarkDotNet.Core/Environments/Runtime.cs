@@ -31,8 +31,17 @@
 
     public class ClrRuntime : Runtime
     {
-        public ClrRuntime() : base("Clr")
+        public string Version { get; }
+
+        public ClrRuntime() : base("Clr") { }
+
+        /// <param name="version">YOU PROBABLY DON'T NEED IT, but if you are a .NET Runtime developer..
+        /// please set it to particular .NET Runtime version if you want to benchmark it.
+        /// BenchmarkDotNet in going to pass `COMPLUS_Version` env var to the process for you.
+        /// </param>
+        public ClrRuntime(string version) : base("Clr")
         {
+            Version = version;
         }
     }
 

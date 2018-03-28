@@ -79,6 +79,20 @@ public class MyConfig : ManualConfig
 }
 ```
 
+## Custom .NET Runtime
+
+It's possible to benchmark a private build of .NET Runtime. All you need to do is to define a job with the right version of `ClrRuntime`.
+
+```cs
+BenchmarkSwitcher
+    .FromAssembly(typeof(Program).Assembly)
+    .Run(args, 
+        DefaultConfig.Instance.With(
+            Job.ShortRun.With(new ClrRuntime(version: "4.0"))));
+```
+
+This sends the provided version as a `COMPLUS_Version` env var to the benchmarked process.
+
 ## Custom dotnet cli path
 
 We internally use dotnet cli to build and run .NET Core executables. Sometimes it might be mandatory to use non-default dotnet cli path. An example scenario could be a comparison of RyuJit 32bit vs 64 bit. It required due this [limitation](https://github.com/dotnet/cli/issues/7532) of dotnet cli

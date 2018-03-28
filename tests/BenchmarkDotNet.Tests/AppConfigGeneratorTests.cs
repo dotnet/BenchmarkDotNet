@@ -121,6 +121,55 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
+        public void RemovesStartupSettingsForPrivateBuildsOfClr()
+        {
+            const string input =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<configuration>" +
+                "<startup><supportedRuntime version=\"v4.0\" sku=\".NETFramework,Version=v4.6.1\" /></startup>" +
+                "</configuration>";
+
+            string withoutStartup =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<configuration>" +
+                "<runtime/>" +
+                "</configuration>" + Environment.NewLine;
+
+            using (var source = new StringReader(input))
+            using (var destination = new Utf8StringWriter())
+            {
+                AppConfigGenerator.Generate(new Job { Env = { Runtime = new ClrRuntime(version: "4.0")} }.Freeze(), source, destination, Resolver);
+
+                AssertAreEqualIgnoringWhitespacesAndCase(withoutStartup, destination.ToString());
+            }
+        }
+
+        [Fact]
+        public void LeavsStartupSettingsIntactForNonPrivateBuildsOfClr()
+        {
+            const string input =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<configuration>" +
+                "<startup><supportedRuntime version=\"v4.0\" sku=\".NETFramework,Version=v4.6.1\" /></startup>" +
+                "</configuration>";
+
+            string withoutStartup =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<configuration>" +
+                "<startup><supportedRuntime version=\"v4.0\" sku=\".NETFramework,Version=v4.6.1\" /></startup>" +
+                "<runtime/>" +
+                "</configuration>" + Environment.NewLine;
+
+            using (var source = new StringReader(input))
+            using (var destination = new Utf8StringWriter())
+            {
+                AppConfigGenerator.Generate(new Job { Env = { Runtime = new ClrRuntime() } }.Freeze(), source, destination, Resolver);
+
+                AssertAreEqualIgnoringWhitespacesAndCase(withoutStartup, destination.ToString());
+            }
+        }
+
+        [Fact]
         public void RewritesCutomAssemblyBindingRedirects()
         {
             const string settingsWithBindings =
