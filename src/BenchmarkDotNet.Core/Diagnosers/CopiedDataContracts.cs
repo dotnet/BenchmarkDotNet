@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System.Text;
+using System.Xml.Serialization;
 
 #pragma warning disable CS3003 // I need ulong
 namespace BenchmarkDotNet.Diagnosers
@@ -54,6 +55,8 @@ namespace BenchmarkDotNet.Diagnosers
 
         public Map[] Maps { get; set; }
 
+        public DisassembledMethodAnnotation Annotation { get; set; }
+
         public string CommandLine { get; set; }
     }
 
@@ -62,11 +65,37 @@ namespace BenchmarkDotNet.Diagnosers
         public DisassembledMethod[] Methods { get; set; }
     }
 
+
+    public static class Errors
+    {
+        public const string NotManagedMethod = "not managed method";
+    }
+
     public static class DisassemblerConstants
     {
         public const string NotManagedMethod = "not managed method";
 
         public const string DiassemblerEntryMethodName = "__ForDisassemblyDiagnoser__";
+    }
+
+    public class DisassembledMethodAnnotation
+    {
+        public int TotalBytesOfCode { get; set; }
+        public bool IsOptmizedCode { get; set; }
+        public bool IsFullyinterruptible { get; set; }
+        public bool HasAVXSupport { get; set; }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"{new string('=', 39)}Disassembly annotation{new string('=', 39)}");
+            sb.AppendLine($"total bytes of code {TotalBytesOfCode}");
+            sb.AppendLine((IsOptmizedCode ? "" : "non ") + "optimized code");
+            sb.AppendLine(HasAVXSupport ? "AXV supported" : "AVX not supported");
+            sb.AppendLine(IsFullyinterruptible ? "fully interruptible" : "partially interruptible");
+            sb.AppendLine(new string('=', 100));
+            return sb.ToString();
+        }
     }
 }
 #pragma warning restore CS3003 // Type is not CLS-compliant

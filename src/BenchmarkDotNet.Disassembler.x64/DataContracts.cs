@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Xml.Serialization;
 
 namespace BenchmarkDotNet.Disassembler
@@ -56,13 +57,16 @@ namespace BenchmarkDotNet.Disassembler
         
         public string CommandLine { get; set; }
 
+        public DisassembledMethodAnnotation Annotation { get; set; }
+
         public static DisassembledMethod Empty(string fullSignature, ulong nativeCode, string problem)
             => new DisassembledMethod
             {
                 Name = fullSignature,
                 NativeCode = nativeCode,
                 Maps = Array.Empty<Map>(),
-                Problem = problem
+                Problem = problem,
+                Annotation = new DisassembledMethodAnnotation()
             };
     }
 
@@ -71,10 +75,35 @@ namespace BenchmarkDotNet.Disassembler
         public DisassembledMethod[] Methods { get; set; }
     }
 
+    public static class Errors
+    {
+        public const string NotManagedMethod = "not managed method";
+    }
+
     public static class DisassemblerConstants
     {
         public const string NotManagedMethod = "not managed method";
 
         public const string DiassemblerEntryMethodName = "__ForDisassemblyDiagnoser__";
+    }
+
+    public class DisassembledMethodAnnotation
+    {
+        public int TotalBytesOfCode { get; set; }
+        public bool IsOptmizedCode { get; set; }
+        public bool IsFullyinterruptible { get; set; }
+        public bool HasAVXSupport { get; set; }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"{new string('=', 39)}Disassembly annotation{new string('=', 39)}");
+            sb.AppendLine($"total bytes of code {TotalBytesOfCode}");
+            sb.AppendLine((IsOptmizedCode ? "" : "non ") + "optimized code");
+            sb.AppendLine(IsFullyinterruptible ? "fully interruptible" : "partially interruptible");
+            sb.AppendLine(HasAVXSupport ? "AXV supported" : "AVX not supported");
+            sb.AppendLine(new string('=', 100));
+            return sb.ToString();
+        }
     }
 }
