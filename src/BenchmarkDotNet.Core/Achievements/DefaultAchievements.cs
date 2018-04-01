@@ -1,9 +1,6 @@
 ﻿
 using System.Collections.Generic;
-using System.Reflection.Metadata;
 using System.Text;
-using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Achievements
