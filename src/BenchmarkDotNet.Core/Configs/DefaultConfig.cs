@@ -12,6 +12,7 @@ using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Reports;
 using System.IO;
+using BenchmarkDotNet.Achievements;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -46,6 +47,7 @@ namespace BenchmarkDotNet.Configs
             yield return MinIterationTimeAnalyser.Default;
             yield return IterationSetupCleanupAnalyser.Default;
             yield return MultimodalDistributionAnalyzer.Default;
+            yield return new AchievementAnalyser();
         }
 
         public IEnumerable<IValidator> GetValidators()
