@@ -1,6 +1,9 @@
 ﻿using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Jobs;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using Xunit;
 
@@ -56,6 +59,29 @@ namespace BenchmarkDotNet.Tests.Running
         {
             [Benchmark] public void M1() { }
             [Benchmark] public void M2() { }
+        }
+
+        [Fact]
+        public void CustomClrBuildJobsAreGrouppedByVersion()
+        {
+            const string version = "abcd";
+
+            var config = ManualConfig.Create(DefaultConfig.Instance)
+                .With(Job.Default.With(new ClrRuntime(version: version)))
+                .With(Job.Default.With(new ClrRuntime(version: "it's a different version")))
+                .With(Job.Clr);
+
+            var benchmarks1 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain1), config);
+            var benchmarks2 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain2), config);
+
+            var groupped = benchmarks1.Benchmarks.Union(benchmarks2.Benchmarks)
+                .GroupBy(benchmark => benchmark, new BenchmarkPartitioner.BenchmarkRuntimePropertiesComparer())
+                .ToArray();
+
+            Assert.Equal(3, groupped.Length); // Job.Clr + Job.Clr(version) + Job.Clr(different)
+
+            foreach (var grouping in groupped)
+                Assert.Equal(3 * 2, grouping.Count()); // (M1 + M2 + M3) * (Plain1 + Plain2)
         }
     }
 }

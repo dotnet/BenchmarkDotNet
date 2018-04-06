@@ -87,3 +87,7 @@ For example, you can use the `SimpleJob` or `ShortRunJob` attributes:
     ```
 
     **A** You need to make sure that you are using **AnyCPU** 5.22.05+ build of LINQPad with optimizations enabled. To enable the optimizations you need to go to Preferences -> Query and select `compile with /optimize+`
+
+* **Q** I'm trying to use `RPlotExporter` but there are no any images in the `results` folder
+
+    **A** Try to specify `R_LIBS_USER` (e.g. `R_LIBS_USER=/usr/local/lib/R/` on Linux/macOS, see also: [#692](https://github.com/dotnet/BenchmarkDotNet/issues/692))

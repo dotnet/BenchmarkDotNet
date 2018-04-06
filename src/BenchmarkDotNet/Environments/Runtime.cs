@@ -34,11 +34,23 @@ namespace BenchmarkDotNet.Environments
         public override int GetHashCode() => Name.GetHashCode();
     }
 
-    public class ClrRuntime : Runtime
+    public class ClrRuntime : Runtime, IEquatable<ClrRuntime>
     {
-        public ClrRuntime() : base("Clr")
-        {
-        }
+        public string Version { get; }
+
+        public ClrRuntime() : base("Clr") { }
+
+        /// <param name="version">YOU PROBABLY DON'T NEED IT, but if you are a .NET Runtime developer..
+        /// please set it to particular .NET Runtime version if you want to benchmark it.
+        /// BenchmarkDotNet in going to pass `COMPLUS_Version` env var to the process for you.
+        /// </param>
+        public ClrRuntime(string version) : this() => Version = version;
+
+        public override bool Equals(object obj) => obj is ClrRuntime other && Equals(other);
+
+        public bool Equals(ClrRuntime other) => other != null && Name == other.Name && Version == other.Version;
+
+        public override int GetHashCode() => Name.GetHashCode() ^ (Version?.GetHashCode() ?? 0);
     }
 
     public class CoreRuntime : Runtime

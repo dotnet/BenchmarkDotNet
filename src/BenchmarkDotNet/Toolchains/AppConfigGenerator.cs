@@ -31,6 +31,7 @@ namespace BenchmarkDotNet.Toolchains
             var configurationElement = GetOrCreateConfigurationElement(xmlDocument, xmlReader);
             var runtimeElement = GetOrCreateRuntimeElement(xmlDocument, configurationElement);
 
+            ClearStartupSettingsForCustomClr(configurationElement, job.Env.Runtime);
             ClearAllRuntimeSettingsThatCanBeSetOnlyByJobConfiguration(runtimeElement);
 
             GenerateJitSettings(xmlDocument, runtimeElement, job.Env);
@@ -66,6 +67,20 @@ namespace BenchmarkDotNet.Toolchains
                 if (JobRuntimeSettings.Contains(runtimeSetting.Name))
                 {
                     runtimeElement.RemoveChild(runtimeSetting);
+                }
+            }
+        }
+
+        private static void ClearStartupSettingsForCustomClr(XmlNode configurationElement, Runtime runtime)
+        {
+            if (!(runtime is ClrRuntime clrRuntime) || string.IsNullOrEmpty(clrRuntime.Version))
+                return;
+
+            foreach (XmlNode configurationChild in configurationElement.ChildNodes)
+            {
+                if (configurationChild.Name == "startup")
+                {
+                    configurationElement.RemoveChild(configurationChild);
                 }
             }
         }

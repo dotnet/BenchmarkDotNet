@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
@@ -100,6 +101,9 @@ namespace BenchmarkDotNet.Extensions
 
         internal static void SetEnvironmentVariables(this ProcessStartInfo start, Benchmark benchmark, IResolver resolver)
         {
+            if (benchmark.Job.Env.Runtime is ClrRuntime clrRuntime && !string.IsNullOrEmpty(clrRuntime.Version))
+                start.EnvironmentVariables["COMPLUS_Version"] = clrRuntime.Version;
+
             if (!benchmark.Job.HasValue(InfrastructureMode.EnvironmentVariablesCharacteristic))
                 return;
 
