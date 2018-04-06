@@ -168,7 +168,8 @@ The `CustomCoreClrToolchainBuilder` offers some extra customization features for
 
 * `UseCoreClrDefault()` tells the toolchain to use the default CoreClr (for given dotnet cli and moniker), emits no direct dependency to NETCore.Runtime.CoreCLR package
 * `UseCoreFxDefault()` tells the toolchain to use the default CoreFx (for given dotnet cli and moniker), emits no direct dependency to NetCore.App package
-* `UseNuGetClearTag(bool)` emits clear tag in the auto-generated NuGet.config file, by default true for local builds
+* `AdditionalNuGetFeed(string, string)` it allows you to define an additional NuGet feed
+* `UseNuGetClearTag(bool)` emits clear tag in the auto-generated NuGet.config file
 * `TargetFrameworkMoniker(string)` TFM, netcoreapp2.1 is the default
 * `DotNetCli(string)` if not provided, the one from PATH will be used
 * `RuntimeIdentifier(string)` if not provided, portable OS-arch will be used (example: "win-x64", "linux-x86")

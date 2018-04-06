@@ -56,7 +56,6 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
             feeds[Generator.LocalCoreClrPackages] = packagesPath;
 
             isCoreClrConfigured = true;
-            useNuGetClearTag = true;
             useTempFolderForRestore = true;
 
             return this;
@@ -138,8 +137,21 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
             return this;
         }
 
+        /// <summary>it allows you to define an additional NuGet feed, you can seal the feeds list by using the UseNuGetClearTag() method</summary>
+        /// <param name="feedName">the name of the feed, will be used in the auto-generated NuGet.config file</param>
+        /// <param name="feedAddress">the address of the feed, will be used in the auto-generated NuGet.config file</param>
+        public CustomCoreClrToolchainBuilder AdditionalNuGetFeed(string feedName, string feedAddress)
+        {
+            if (string.IsNullOrEmpty(feedName)) throw new ArgumentException("Value cannot be null or empty.", nameof(feedName));
+            if (string.IsNullOrEmpty(feedAddress)) throw new ArgumentException("Value cannot be null or empty.", nameof(feedAddress));
+
+            feeds[feedName] = feedAddress;
+
+            return this;
+        }
+
         /// <summary>
-        /// emits clear tag in the auto-generated NuGet.config file, by default true for local builds
+        /// emits clear tag in the auto-generated NuGet.config file
         /// </summary>
         public CustomCoreClrToolchainBuilder UseNuGetClearTag(bool value)
         {
@@ -186,7 +198,7 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         /// <param name="displayName">the name of the toolchain to be displayed in results</param>
         public CustomCoreClrToolchainBuilder DisplayName(string displayName)
         {
-            if (String.IsNullOrEmpty(displayName)) throw new ArgumentException("Value cannot be null or empty.", nameof(displayName));
+            if (string.IsNullOrEmpty(displayName)) throw new ArgumentException("Value cannot be null or empty.", nameof(displayName));
 
             this.displayName = displayName;
 
