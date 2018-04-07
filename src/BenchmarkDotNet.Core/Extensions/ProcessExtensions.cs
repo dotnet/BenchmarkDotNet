@@ -102,18 +102,14 @@ namespace BenchmarkDotNet.Extensions
         internal static void SetEnvironmentVariables(this ProcessStartInfo start, Benchmark benchmark, IResolver resolver)
         {
 #if !NETCOREAPP1_1 // ProcessStartInfo.EnvironmentVariables is avaialable for .NET Core 2.0+
+            if (benchmark.Job.Env.Runtime is ClrRuntime clrRuntime && !string.IsNullOrEmpty(clrRuntime.Version))
+                start.EnvironmentVariables["COMPLUS_Version"] = clrRuntime.Version;
+
             if (!benchmark.Job.HasValue(InfrastructureMode.EnvironmentVariablesCharacteristic))
                 return;
 
             foreach (var environmentVariable in benchmark.Job.Infrastructure.EnvironmentVariables)
-            {
                 start.EnvironmentVariables[environmentVariable.Key] = environmentVariable.Value;
-            }
-
-            if (benchmark.Job.Env.Runtime is ClrRuntime clrRuntime && !string.IsNullOrEmpty(clrRuntime.Version))
-            {
-                start.EnvironmentVariables["COMPLUS_Version"] = clrRuntime.Version;
-            }
 #endif
         }
     }
