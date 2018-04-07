@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -11,10 +12,12 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public interface IDiagnoser
     {
-        IEnumerable<string> Ids { get; } 
+        IEnumerable<string> Ids { get; }
 
         IEnumerable<IExporter> Exporters { get; }
-            
+
+        IEnumerable<IAnalyser> Analysers { get; }
+
         IColumnProvider GetColumnProvider();
 
         RunMode GetRunMode(Benchmark benchmark);

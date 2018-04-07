@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Loggers;
@@ -26,6 +27,8 @@ namespace BenchmarkDotNet.Diagnosers
         public IEnumerable<string> Ids => new[] { DiagnoserId };
 
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
+
+        public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
 
         public IColumnProvider GetColumnProvider() => new SimpleColumnProvider(
             new GCCollectionColumn(results, Gen0),

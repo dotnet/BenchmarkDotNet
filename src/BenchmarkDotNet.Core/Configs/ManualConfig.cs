@@ -33,7 +33,6 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<ILogger> GetLoggers() => loggers;
         
-        public IEnumerable<IAnalyser> GetAnalysers() => analysers;
         public IEnumerable<IValidator> GetValidators() => validators;
         public IEnumerable<Job> GetJobs() => jobs;
         public IEnumerable<HardwareCounter> GetHardwareCounters() => hardwareCounters;
@@ -117,6 +116,19 @@ namespace BenchmarkDotNet.Configs
                 yield return new InstructionPointerExporter(hardwareCounterDiagnoser, disassemblyDiagnoser);
         }
 
+
+        public IEnumerable<IAnalyser> GetAnalysers()
+        {
+            var allDiagnosers = GetDiagnosers().ToArray();
+
+            foreach (var analyser in analysers)
+                yield return analyser;
+
+            foreach (var diagnoser in allDiagnosers)
+            foreach (var analyser in diagnoser.Analysers)
+                yield return analyser;
+        }
+        
         public static ManualConfig CreateEmpty() => new ManualConfig();
 
         public static ManualConfig Create(IConfig config)

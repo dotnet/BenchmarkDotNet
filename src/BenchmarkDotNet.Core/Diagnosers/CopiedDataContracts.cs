@@ -1,4 +1,5 @@
 ﻿using System.Xml.Serialization;
+using BenchmarkDotNet.Analysers;
 
 #pragma warning disable CS3003 // I need ulong
 namespace BenchmarkDotNet.Diagnosers
@@ -60,6 +61,13 @@ namespace BenchmarkDotNet.Diagnosers
     public class DisassemblyResult
     {
         public DisassembledMethod[] Methods { get; set; }
+        public string[] Errors { get; set; }
+
+        public DisassemblyResult()
+        {
+            Methods = new DisassembledMethod[0];
+            Errors = new string[0];
+        }
     }
 
     public static class DisassemblerConstants

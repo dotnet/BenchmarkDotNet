@@ -69,6 +69,13 @@ namespace BenchmarkDotNet.Disassembler
     public class DisassemblyResult
     {
         public DisassembledMethod[] Methods { get; set; }
+        public string[] Errors { get; set; }
+
+        public DisassemblyResult()
+        {
+            Methods = new DisassembledMethod[0];
+            Errors = new string[0];
+        }
     }
 
     public static class DisassemblerConstants

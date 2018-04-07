@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
 using Xunit;
@@ -193,6 +193,90 @@ Disassembly of section .text:
             Check(input, expected, "NoLock");
         }
 
+        [Fact]
+        public void CanParseMonoDisassemblyOutputFromWindowsWithoutTools()
+        {
+            const string input = @"
+Basic block 0 starting at offset 0xd
+Basic block 3 starting at offset 0xd
+Basic block 5 starting at offset 0x18
+Basic block 4 starting at offset 0x1c
+Basic block 6 starting at offset 0x21
+Basic block 1 starting at offset 0x24
+CFA: [31] def_cfa: %rsp+0x8
+Method int BenchmarkDotNet.Samples.Intro.IntroDisasm:Foo () emitted at 0000027E7E4E12E0 to 0000027E7E4E1312 (code length 50) [BenchmarkDotNet.Samples.dll]
+'as' is not recognized as an internal or external command,
+operable program or batch file.
+'x86_64-w64-mingw32-objdump.exe' is not recognized as an internal or external command,
+operable program or batch file.
+";
+
+            var expected = new DisassemblyResult
+            {
+                Methods = new[]
+                {
+                    new DisassembledMethod
+                    {
+                        Name = "Foo",
+                        Maps = new[]
+                        {
+                            new Map
+                            {
+                                Instructions = input
+                                    .Split('\r', '\n')
+                                    .Where(line => !string.IsNullOrWhiteSpace(line))
+                                    .Select(line => new Diagnosers.Code { TextRepresentation = line })
+                                    .ToArray()
+                            }
+                        }
+                    }
+                },
+                Errors = new[]
+                {
+                    @"It's impossible to get Mono disasm because you don't have some required tools:
+'as' is not recognized as an internal or external command
+'x86_64-w64-mingw32-objdump.exe' is not recognized as an internal or external command"
+                }
+            };
+
+            Check(input, expected, "Foo");
+        }
+        
+        [Fact]
+        public void CanParseInvalidMonoDisassemblyOutput()
+        {
+            const string input = @"lalala";
+
+            var expected = new DisassemblyResult
+            {
+                Methods = new[]
+                {
+                    new DisassembledMethod
+                    {
+                        Name = "Foo",
+                        Maps = new[]
+                        {
+                            new Map
+                            {
+                                Instructions = input
+                                    .Split('\r', '\n')
+                                    .Where(line => !string.IsNullOrWhiteSpace(line))
+                                    .Select(line => new Diagnosers.Code { TextRepresentation = line })
+                                    .ToArray()
+                            }
+                        }
+                    }
+                },
+                Errors = new[]
+                {
+                    @"It's impossible to find assembly instructions in the mono output"
+                }
+            };
+
+            Check(input, expected, "Foo");
+        }
+
+
         private static void Check(string input, DisassemblyResult expected, string methodName)
         {
             var disassemblyResult = MonoDisassembler.OutputParser.Parse(
@@ -205,6 +289,10 @@ Disassembly of section .text:
             for (int i = 0; i < expected.Methods[0].Maps[0].Instructions.Length; i++)
                 Assert.Equal(expected.Methods[0].Maps[0].Instructions[i].TextRepresentation,
                     disassemblyResult.Methods[0].Maps[0].Instructions[i].TextRepresentation);
+            
+            Assert.Equal(expected.Errors.Length, disassemblyResult.Errors.Length);
+            for (int i = 0; i < expected.Errors.Length; i++)
+                Assert.Equal(expected.Errors[i].Replace("\r", "").Replace("\n", ""), disassemblyResult.Errors[i].Replace("\r", "").Replace("\n", ""));
         }
     }
 }
