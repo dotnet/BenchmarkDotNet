@@ -34,7 +34,15 @@ namespace BenchmarkDotNet.Portability.Cpu
             if (physicalCoreCount > 1)
                 parts.Add($"{physicalCoreCount} physical cores");
 
-            return string.Join("", parts);
+            string result = string.Join("", parts);
+            // The line with ProcessorBrandString is one of the longest lines in the summary.
+            // When people past in on GitHub, it can be a reason of an ugly horizontal scrollbar.
+            // To avoid this, we are trying to minimize this line and use the minimum possible number of characters.
+            // Here we are removing the repetitive "cores" word.
+            if (result.Contains("logical cores") && result.Contains("physical cores"))
+                result = result.Replace("logical cores", "logical");
+
+            return result;
         }
     }
 }
