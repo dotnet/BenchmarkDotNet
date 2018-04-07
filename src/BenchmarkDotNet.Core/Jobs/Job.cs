@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Environments;
 
 namespace BenchmarkDotNet.Jobs
 {
@@ -23,6 +24,9 @@ namespace BenchmarkDotNet.Jobs
 
         // Run
         public static readonly Job Dry = new Job(nameof(Dry), RunMode.Dry).Freeze();
+        public static readonly Job DryClr = Dry.With(Runtime.Clr).WithId("DryClr").Freeze();
+        public static readonly Job DryCore = Dry.With(Runtime.Core).WithId("DryCore").Freeze();
+        public static readonly Job DryMono = Dry.With(Runtime.Mono).WithId("DryMono").Freeze();
         public static readonly Job ShortRun = new Job(nameof(ShortRun), RunMode.Short).Freeze();
         public static readonly Job MediumRun = new Job(nameof(MediumRun), RunMode.Medium).Freeze();
         public static readonly Job LongRun = new Job(nameof(LongRun), RunMode.Long).Freeze();
