@@ -94,17 +94,15 @@ namespace BenchmarkDotNet.Environments
 
         private class Windows10Version
         {
-            public int Version { get; }
+            private int Version { get; }
+            [NotNull] private string CodeName { get; }
+            [NotNull] private string MarketingName { get; }
+            private int BuildNumber { get; }
 
-            [NotNull]
-            public string CodeName { get; }
+            [NotNull] private string ShortifiedCodeName => CodeName.Replace(" ", "");
+            [NotNull] private string ShortifiedMarketingName => MarketingName.Replace(" ", "");
 
-            [NotNull]
-            public string MarketingName { get; }
-
-            public int BuildNumber { get; }
-
-            public Windows10Version(int version, [NotNull] string codeName, [NotNull] string marketingName, int buildNumber)
+            private Windows10Version(int version, [NotNull] string codeName, [NotNull] string marketingName, int buildNumber)
             {
                 Version = version;
                 CodeName = codeName;
@@ -115,11 +113,14 @@ namespace BenchmarkDotNet.Environments
             private string ToFullVersion([CanBeNull] int? ubr = null)
                 => ubr == null ? $"10.0.{BuildNumber}" : $"10.0.{BuildNumber}.{ubr}";
 
+            // The line with OsBrandString is one of the longest lines in the summary.
+            // When people past in on GitHub, it can be a reason of an ugly horizontal scrollbar.
+            // To avoid this, we are trying to minimize this line and use the minimum possible number of characters.
             public string ToPrettifiedString([CanBeNull] int? ubr)
-                => $"10 {CodeName} [{Version}, {MarketingName}] ({ToFullVersion(ubr)})";
+                => $"{ToFullVersion(ubr)} ({Version}/{ShortifiedMarketingName}/{ShortifiedCodeName})";
 
             // See https://en.wikipedia.org/wiki/Windows_10_version_history
-            public static readonly List<Windows10Version> WellKnownVersions = new List<Windows10Version>
+            private static readonly List<Windows10Version> WellKnownVersions = new List<Windows10Version>
             {
                 new Windows10Version(1507, "Threshold 1", "RTM", 10240),
                 new Windows10Version(1511, "Threshold 2", "November Update", 10586),
