@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
 using Xunit;
@@ -137,6 +137,8 @@ Disassembly of section .text:
   5b:	4c 8b 7c 24 10       	mov    0x10(%rsp),%r15
   60:	48 83 c4 28          	add    $0x28,%rsp
   64:	c3                   	retq
+  65:   90                      nop
+  66:   90                      nop
 ";
 
             var expected = new DisassemblyResult()

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -61,6 +61,9 @@ namespace BenchmarkDotNet.Diagnosers
                 foreach (string line in listing)
                     if (TryParseInstruction(line, out var instruction))
                         instructions.Add(instruction);
+
+                while (instructions.Any() && instructions.Last().TextRepresentation == "nop")
+                    instructions.RemoveAt(instructions.Count - 1);
 
                 return new DisassemblyResult
                 {
