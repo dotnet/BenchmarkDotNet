@@ -164,5 +164,70 @@ namespace BenchmarkDotNet.Environments
             string fullVersion = brandVersion == null ? osVersion : brandVersion + " (" + completeOsVersion + ")";
             return "Windows " + fullVersion;
         }
+
+        private class MacOSXVersion
+        {
+            private int DarwinVersion { get; }
+            [NotNull]private string CodeName { get; }
+
+            private MacOSXVersion(int darwinVersion, [NotNull] string codeName)
+            {
+                DarwinVersion = darwinVersion;
+                CodeName = codeName;
+            }
+
+            private static readonly List<MacOSXVersion> WellKnownVersions = new List<MacOSXVersion>
+            {
+                new MacOSXVersion(6, "Jaguar"),
+                new MacOSXVersion(7, "Panther"),
+                new MacOSXVersion(8, "Tiger"),
+                new MacOSXVersion(9, "Leopard"),
+                new MacOSXVersion(10, "Snow Leopard"),
+                new MacOSXVersion(11, "Lion"),
+                new MacOSXVersion(12, "Mountain Lion"),
+                new MacOSXVersion(13, "Mavericks"),
+                new MacOSXVersion(14, "Yosemite"),
+                new MacOSXVersion(15, "El Capitan"),
+                new MacOSXVersion(16, "Sierra"),
+                new MacOSXVersion(17, "High Sierra")
+            };
+
+            [CanBeNull]
+            public static string ResolveCodeName([NotNull] string kernelVerion)
+            {
+                if (string.IsNullOrWhiteSpace(kernelVerion))
+                    return null;
+
+                kernelVerion = kernelVerion.ToLowerInvariant().Trim();
+                if (kernelVerion.StartsWith("darwin"))
+                    kernelVerion = kernelVerion.Substring(6).Trim();
+                var numbers = kernelVerion.Split('.');
+                if (numbers.Length == 0)
+                    return null;
+
+                string majorVersionStr = numbers[0];
+                if (int.TryParse(majorVersionStr, out int majorVerion))
+                    return WellKnownVersions.FirstOrDefault(v => v.DarwinVersion == majorVerion)?.CodeName;
+                return null;
+            }
+        }
+
+        [NotNull]
+        public static string PrettifyMacOSX([NotNull] string systemVersion, [NotNull] string kernelVersion)
+        {
+            string codeName = MacOSXVersion.ResolveCodeName(kernelVersion);
+            if (codeName != null)
+            {
+                int firstDigitIndex = systemVersion.IndexOfAny("0123456789".ToCharArray());
+                if (firstDigitIndex == -1)
+                    return $"{systemVersion} {codeName} [{kernelVersion}]";
+
+                string systemVersionTitle = systemVersion.Substring(0, firstDigitIndex).Trim();
+                string systemVersionNumbers = systemVersion.Substring(firstDigitIndex).Trim();
+                return $"{systemVersionTitle} {codeName} {systemVersionNumbers} [{kernelVersion}]";
+            }
+            
+            return $"{systemVersion} [{kernelVersion}]";
+        }
     }
 }

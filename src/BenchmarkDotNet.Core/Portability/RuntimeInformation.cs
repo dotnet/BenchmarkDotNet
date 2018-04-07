@@ -74,7 +74,7 @@ namespace BenchmarkDotNet.Portability
                 string systemVersion = ExternalToolsHelper.MacSystemProfilerData.Value.GetValueOrDefault("System Version") ?? "";
                 string kernelVersion = ExternalToolsHelper.MacSystemProfilerData.Value.GetValueOrDefault("Kernel Version") ?? "";
                 if (!string.IsNullOrEmpty(systemVersion) && !string.IsNullOrEmpty(kernelVersion))
-                    return $"{systemVersion} [{kernelVersion}]";
+                    return OsBrandStringHelper.PrettifyMacOSX(systemVersion, kernelVersion);
             }
 
             return OsBrandStringHelper.Prettify(
