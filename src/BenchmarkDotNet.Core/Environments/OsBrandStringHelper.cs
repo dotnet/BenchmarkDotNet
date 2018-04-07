@@ -89,9 +89,51 @@ namespace BenchmarkDotNet.Environments
             { "10.0.14393", "10 Redstone 1 [1607, Anniversary Update]" },
             { "10.0.15063", "10 Redstone 2 [1703, Creators Update]" },
             { "10.0.16299", "10 Redstone 3 [1709, Fall Creators Update]" },
-            { "10.0.16353", "10 Redstone 4 [1803]" },
+            { "10.0.17133", "10 Redstone 4 [1803]" },
         };
-        
+
+        private class Windows10Version
+        {
+            public int Version { get; }
+
+            [NotNull]
+            public string CodeName { get; }
+
+            [NotNull]
+            public string MarketingName { get; }
+
+            public int BuildNumber { get; }
+
+            public Windows10Version(int version, [NotNull] string codeName, [NotNull] string marketingName, int buildNumber)
+            {
+                Version = version;
+                CodeName = codeName;
+                MarketingName = marketingName;
+                BuildNumber = buildNumber;
+            }
+
+            private string ToFullVersion([CanBeNull] int? ubr = null)
+                => ubr == null ? $"10.0.{BuildNumber}" : $"10.0.{BuildNumber}.{ubr}";
+
+            public string ToPrettifiedString([CanBeNull] int? ubr)
+                => $"10 {CodeName} [{Version}, {MarketingName}] ({ToFullVersion(ubr)})";
+
+            // See https://en.wikipedia.org/wiki/Windows_10_version_history
+            public static readonly List<Windows10Version> WellKnownVersions = new List<Windows10Version>
+            {
+                new Windows10Version(1507, "Threshold 1", "RTM", 10240),
+                new Windows10Version(1511, "Threshold 2", "November Update", 10586),
+                new Windows10Version(1607, "Redstone 1", "Anniversary Update", 14393),
+                new Windows10Version(1703, "Redstone 2", "Creators Update", 15063),
+                new Windows10Version(1709, "Redstone 3", "Fall Creators Update", 16299),
+                new Windows10Version(1803, "Redstone 4", "Spring Creators Update", 17133)
+            };
+
+            [CanBeNull]
+            public static Windows10Version Resolve([NotNull] string osVersion)
+                => WellKnownVersions.FirstOrDefault(v => osVersion == $"10.0.{v.BuildNumber}");
+        }
+
         /// <summary>
         /// Transform an operation system name and version to a nice form for summary.
         /// </summary>
@@ -110,12 +152,16 @@ namespace BenchmarkDotNet.Environments
         [NotNull]
         private static string PrettifyWindows([NotNull] string osVersion, [CanBeNull] int? windowsUbr)
         {
+            var windows10Version = Windows10Version.Resolve(osVersion);
+            if (windows10Version != null)
+                return "Windows " + windows10Version.ToPrettifiedString(windowsUbr);
+
             string brandVersion = WindowsBrandVersions.GetValueOrDefault(osVersion);
-            string completeOsVersion = windowsUbr != null && osVersion.Count(c => c == '.') == 2 
-                ? osVersion + "." + windowsUbr 
+            string completeOsVersion = windowsUbr != null && osVersion.Count(c => c == '.') == 2
+                ? osVersion + "." + windowsUbr
                 : osVersion;
             string fullVersion = brandVersion == null ? osVersion : brandVersion + " (" + completeOsVersion + ")";
             return "Windows " + fullVersion;
-        }        
+        }
     }
 }
