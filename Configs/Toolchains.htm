@@ -96,6 +96,7 @@
 <ul class="currentrelative">
 <li class="tocentry"><a href="#multiple-frameworks-support">Multiple frameworks support</a></li>
 <li class="tocentry"><a href="#custom-.net-core-runtime">Custom .NET Core Runtime</a></li>
+<li class="tocentry"><a href="#custom-.net-runtime">Custom .NET Runtime</a></li>
 <li class="tocentry"><a href="#custom-dotnet-cli-path">Custom dotnet cli path</a></li>
 <li class="tocentry"><a href="#custom-coreclr-and-corefx">Custom CoreCLR and CoreFX</a></li>
 <li class="tocentry"><a href="#cs">InProcessToolchain</a></li>
@@ -212,6 +213,16 @@ public class TypeWithBenchmarks
 }
 </code></pre>
 
+<h2 id="custom-.net-runtime">Custom .NET Runtime<a class="headerlink" href="#custom-.net-runtime" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>It's possible to benchmark a private build of .NET Runtime. All you need to do is to define a job with the right version of <code>ClrRuntime</code>.</p>
+<pre><code class="cs">BenchmarkSwitcher
+    .FromAssembly(typeof(Program).Assembly)
+    .Run(args, 
+        DefaultConfig.Instance.With(
+            Job.ShortRun.With(new ClrRuntime(version: &quot;4.0&quot;))));
+</code></pre>
+
+<p>This sends the provided version as a <code>COMPLUS_Version</code> env var to the benchmarked process.</p>
 <h2 id="custom-dotnet-cli-path">Custom dotnet cli path<a class="headerlink" href="#custom-dotnet-cli-path" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <p>We internally use dotnet cli to build and run .NET Core executables. Sometimes it might be mandatory to use non-default dotnet cli path. An example scenario could be a comparison of RyuJit 32bit vs 64 bit. It required due this <a href="https://github.com/dotnet/cli/issues/7532" target="_blank">limitation</a> of dotnet cli</p>
 <pre><code class="cs">public class CustomPathsConfig : ManualConfig

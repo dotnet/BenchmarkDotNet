@@ -201,6 +201,10 @@ Assembly LINQPadQuery which defines benchmarks is non-optimized
 Benchmark was built without optimization enabled (most probably a DEBUG configuration). Please, build it in RELEASE.
 </pre><p><strong>A</strong> You need to make sure that you are using <strong>AnyCPU</strong> 5.22.05+ build of LINQPad with optimizations enabled. To enable the optimizations you need to go to Preferences -&gt; Query and select <code>compile with /optimize+</code></p>
 </li>
+<li>
+<p><strong>Q</strong> I'm trying to use <code>RPlotExporter</code> but there are no any images in the <code>results</code> folder</p>
+<p><strong>A</strong> Try to specify <code>R_LIBS_USER</code> (e.g. <code>R_LIBS_USER=/usr/local/lib/R/</code> on Linux/macOS, see also: <a href="https://github.com/dotnet/BenchmarkDotNet/issues/692" target="_blank">#692</a>)</p>
+</li>
 </ul>
 
                     </div>
