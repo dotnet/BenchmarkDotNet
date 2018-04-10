@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -20,6 +21,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<string> Ids => Array.Empty<string>();
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
+        public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
         public IColumnProvider GetColumnProvider() => EmptyColumnProvider.Instance;
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
         public void ProcessResults(DiagnoserResults results) { }

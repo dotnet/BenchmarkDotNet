@@ -40,7 +40,8 @@ namespace BenchmarkDotNet.Helpers
             }
         }
 
-        internal static IReadOnlyList<string> RunAndReadOutputLineByLine(string fileName, string arguments = "", Dictionary<string, string> environmentVariables = null)
+        internal static IReadOnlyList<string> RunAndReadOutputLineByLine(string fileName, string arguments = "", 
+            Dictionary<string, string> environmentVariables = null, bool includeErros = false)
         {
             var output = new List<string>(20000);
 
@@ -62,7 +63,11 @@ namespace BenchmarkDotNet.Helpers
             using (var process = new Process { StartInfo = processStartInfo })
             {
                 process.OutputDataReceived += (sender, args) => output.Add(args.Data);
-                process.ErrorDataReceived += (_, __) => { };
+                process.ErrorDataReceived += (sender, args) =>
+                {
+                    if (includeErros)
+                        output.Add(args.Data);
+                };
 
                 process.Start();
 

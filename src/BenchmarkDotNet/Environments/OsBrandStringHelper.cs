@@ -89,9 +89,52 @@ namespace BenchmarkDotNet.Environments
             { "10.0.14393", "10 Redstone 1 [1607, Anniversary Update]" },
             { "10.0.15063", "10 Redstone 2 [1703, Creators Update]" },
             { "10.0.16299", "10 Redstone 3 [1709, Fall Creators Update]" },
-            { "10.0.16353", "10 Redstone 4 [1803]" },
+            { "10.0.17133", "10 Redstone 4 [1803]" },
         };
-        
+
+        private class Windows10Version
+        {
+            private int Version { get; }
+            [NotNull] private string CodeName { get; }
+            [NotNull] private string MarketingName { get; }
+            private int BuildNumber { get; }
+
+            [NotNull] private string ShortifiedCodeName => CodeName.Replace(" ", "");
+            [NotNull] private string ShortifiedMarketingName => MarketingName.Replace(" ", "");
+
+            private Windows10Version(int version, [NotNull] string codeName, [NotNull] string marketingName, int buildNumber)
+            {
+                Version = version;
+                CodeName = codeName;
+                MarketingName = marketingName;
+                BuildNumber = buildNumber;
+            }
+
+            private string ToFullVersion([CanBeNull] int? ubr = null)
+                => ubr == null ? $"10.0.{BuildNumber}" : $"10.0.{BuildNumber}.{ubr}";
+
+            // The line with OsBrandString is one of the longest lines in the summary.
+            // When people past in on GitHub, it can be a reason of an ugly horizontal scrollbar.
+            // To avoid this, we are trying to minimize this line and use the minimum possible number of characters.
+            public string ToPrettifiedString([CanBeNull] int? ubr)
+                => $"{ToFullVersion(ubr)} ({Version}/{ShortifiedMarketingName}/{ShortifiedCodeName})";
+
+            // See https://en.wikipedia.org/wiki/Windows_10_version_history
+            private static readonly List<Windows10Version> WellKnownVersions = new List<Windows10Version>
+            {
+                new Windows10Version(1507, "Threshold 1", "RTM", 10240),
+                new Windows10Version(1511, "Threshold 2", "November Update", 10586),
+                new Windows10Version(1607, "Redstone 1", "Anniversary Update", 14393),
+                new Windows10Version(1703, "Redstone 2", "Creators Update", 15063),
+                new Windows10Version(1709, "Redstone 3", "Fall Creators Update", 16299),
+                new Windows10Version(1803, "Redstone 4", "Spring Creators Update", 17133)
+            };
+
+            [CanBeNull]
+            public static Windows10Version Resolve([NotNull] string osVersion)
+                => WellKnownVersions.FirstOrDefault(v => osVersion == $"10.0.{v.BuildNumber}");
+        }
+
         /// <summary>
         /// Transform an operation system name and version to a nice form for summary.
         /// </summary>
@@ -110,12 +153,81 @@ namespace BenchmarkDotNet.Environments
         [NotNull]
         private static string PrettifyWindows([NotNull] string osVersion, [CanBeNull] int? windowsUbr)
         {
+            var windows10Version = Windows10Version.Resolve(osVersion);
+            if (windows10Version != null)
+                return "Windows " + windows10Version.ToPrettifiedString(windowsUbr);
+
             string brandVersion = WindowsBrandVersions.GetValueOrDefault(osVersion);
-            string completeOsVersion = windowsUbr != null && osVersion.Count(c => c == '.') == 2 
-                ? osVersion + "." + windowsUbr 
+            string completeOsVersion = windowsUbr != null && osVersion.Count(c => c == '.') == 2
+                ? osVersion + "." + windowsUbr
                 : osVersion;
             string fullVersion = brandVersion == null ? osVersion : brandVersion + " (" + completeOsVersion + ")";
             return "Windows " + fullVersion;
-        }        
+        }
+
+        private class MacOSXVersion
+        {
+            private int DarwinVersion { get; }
+            [NotNull]private string CodeName { get; }
+
+            private MacOSXVersion(int darwinVersion, [NotNull] string codeName)
+            {
+                DarwinVersion = darwinVersion;
+                CodeName = codeName;
+            }
+
+            private static readonly List<MacOSXVersion> WellKnownVersions = new List<MacOSXVersion>
+            {
+                new MacOSXVersion(6, "Jaguar"),
+                new MacOSXVersion(7, "Panther"),
+                new MacOSXVersion(8, "Tiger"),
+                new MacOSXVersion(9, "Leopard"),
+                new MacOSXVersion(10, "Snow Leopard"),
+                new MacOSXVersion(11, "Lion"),
+                new MacOSXVersion(12, "Mountain Lion"),
+                new MacOSXVersion(13, "Mavericks"),
+                new MacOSXVersion(14, "Yosemite"),
+                new MacOSXVersion(15, "El Capitan"),
+                new MacOSXVersion(16, "Sierra"),
+                new MacOSXVersion(17, "High Sierra")
+            };
+
+            [CanBeNull]
+            public static string ResolveCodeName([NotNull] string kernelVerion)
+            {
+                if (string.IsNullOrWhiteSpace(kernelVerion))
+                    return null;
+
+                kernelVerion = kernelVerion.ToLowerInvariant().Trim();
+                if (kernelVerion.StartsWith("darwin"))
+                    kernelVerion = kernelVerion.Substring(6).Trim();
+                var numbers = kernelVerion.Split('.');
+                if (numbers.Length == 0)
+                    return null;
+
+                string majorVersionStr = numbers[0];
+                if (int.TryParse(majorVersionStr, out int majorVerion))
+                    return WellKnownVersions.FirstOrDefault(v => v.DarwinVersion == majorVerion)?.CodeName;
+                return null;
+            }
+        }
+
+        [NotNull]
+        public static string PrettifyMacOSX([NotNull] string systemVersion, [NotNull] string kernelVersion)
+        {
+            string codeName = MacOSXVersion.ResolveCodeName(kernelVersion);
+            if (codeName != null)
+            {
+                int firstDigitIndex = systemVersion.IndexOfAny("0123456789".ToCharArray());
+                if (firstDigitIndex == -1)
+                    return $"{systemVersion} {codeName} [{kernelVersion}]";
+
+                string systemVersionTitle = systemVersion.Substring(0, firstDigitIndex).Trim();
+                string systemVersionNumbers = systemVersion.Substring(firstDigitIndex).Trim();
+                return $"{systemVersionTitle} {codeName} {systemVersionNumbers} [{kernelVersion}]";
+            }
+            
+            return $"{systemVersion} [{kernelVersion}]";
+        }
     }
 }

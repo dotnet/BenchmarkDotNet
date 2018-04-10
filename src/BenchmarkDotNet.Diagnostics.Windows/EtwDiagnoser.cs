@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using Microsoft.Diagnostics.Tracing;
@@ -23,6 +24,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public virtual RunMode GetRunMode(Benchmark benchmark) => RunMode.ExtraRun;
 
         public virtual IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
+        public virtual IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
 
         protected TraceEventSession Session { get; private set; }
 

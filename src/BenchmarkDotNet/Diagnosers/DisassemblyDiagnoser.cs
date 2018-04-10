@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
@@ -43,6 +44,8 @@ namespace BenchmarkDotNet.Diagnosers
                 new RawDisassemblyExporter(Results),
                 new PrettyDisassemblyExporter(Results)
             };
+
+        public IEnumerable<IAnalyser> Analysers => new IAnalyser[] { new DisassemblyAnalyzer(Results) };
 
         public IColumnProvider GetColumnProvider() => EmptyColumnProvider.Instance;
         public void ProcessResults(DiagnoserResults _) { }

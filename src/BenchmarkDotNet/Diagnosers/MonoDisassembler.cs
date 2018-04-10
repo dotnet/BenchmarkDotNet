@@ -1,12 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -36,7 +39,7 @@ namespace BenchmarkDotNet.Diagnosers
             string monoPath = mono?.CustomPath ?? "mono";
             string arguments = $"--compile {fqnMethod} {exePath}";
             
-            var output = ProcessHelper.RunAndReadOutputLineByLine(monoPath, arguments, environmentVariables);
+            var output = ProcessHelper.RunAndReadOutputLineByLine(monoPath, arguments, environmentVariables, includeErros: true);
             string commandLine = $"{GetEnvironmentVariables(environmentVariables)} {monoPath} {arguments}";
             
             return OutputParser.Parse(output, benchmarkTarget.Method.Name, commandLine);
@@ -50,17 +53,42 @@ namespace BenchmarkDotNet.Diagnosers
 
         internal static class OutputParser
         {
-            internal static DisassemblyResult Parse(IReadOnlyList<string> input, string methodName, string commandLine)
+            internal static DisassemblyResult Parse([ItemCanBeNull] IReadOnlyList<string> input, string methodName, string commandLine)
             {
                 var instructions = new List<Code>();
 
-                var listing = input.SkipWhile(i => !i.Contains("(__TEXT,__text) section") && !i.Contains("Disassembly of section .text:"))
-                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                const string windowsHeader = "Disassembly of section .text:";
+                const string macOSXHeader = "(__TEXT,__text) section";
+                const string windowsWarning = "is not recognized as an internal or external command";
+
+                var warningLines = input
+                    .Where(line => line != null)
+                    .Where(line => line.Contains(windowsWarning))
+                    .Select(line => line.Trim(' ', '.', ','))
+                    .ToList();
+                if (warningLines.Any())
+                {
+                    string message = "It's impossible to get Mono disasm because you don't have some required tools:"
+                                     + Environment.NewLine
+                                     + string.Join(Environment.NewLine, warningLines);
+                    return CreateErrorResult(input, methodName, commandLine, message);
+                }
+
+                if (!input.Any(line => line != null && (line.Contains(windowsHeader) || line.Contains(macOSXHeader))))
+                    return CreateErrorResult(input, methodName, commandLine, "It's impossible to find assembly instructions in the mono output");
+
+                var listing = input
+                    .Where(line => line != null)
+                    .SkipWhile(line => !line.Contains(macOSXHeader) && !line.Contains(windowsHeader))
+                    .Where(line => !string.IsNullOrWhiteSpace(line))
                     .Skip(2);
 
                 foreach (string line in listing)
                     if (TryParseInstruction(line, out var instruction))
                         instructions.Add(instruction);
+
+                while (instructions.Any() && instructions.Last().TextRepresentation == "nop")
+                    instructions.RemoveAt(instructions.Count - 1);
 
                 return new DisassemblyResult
                 {
@@ -75,7 +103,31 @@ namespace BenchmarkDotNet.Diagnosers
                     }
                 };
             }
-            
+
+            private static DisassemblyResult CreateErrorResult([ItemCanBeNull] IReadOnlyList<string> input, 
+                string methodName, string commandLine, string message)
+            {
+                return new DisassemblyResult
+                {
+                    Methods = new[]
+                    {
+                        new DisassembledMethod
+                        {
+                            Name = methodName,
+                            Maps = new[] { new Map
+                            {
+                                Instructions = input
+                                    .Where(line => !string.IsNullOrWhiteSpace(line))
+                                    .Select(line => new Code { TextRepresentation = line })
+                                    .ToArray()
+                            } },
+                            CommandLine = commandLine
+                        }
+                    },
+                    Errors = new[] { message }
+                };
+            }
+
             //line example 1:  0:	48 83 ec 28          	sub    $0x28,%rsp
             //line example 2: 0000000000000000	subq	$0x28, %rsp
             private static Regex instructionRegex = new Regex(@"\s*(?<address>[0-9a-f]+)(\:\s+([0-9a-f]{2}\s+)+)?\s+(?<instruction>.*)\s*");

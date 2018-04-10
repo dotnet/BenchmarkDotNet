@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -24,6 +25,9 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<IExporter> Exporters 
             => diagnosers.SelectMany(diagnoser => diagnoser.Exporters);
+
+        public IEnumerable<IAnalyser> Analysers
+            => diagnosers.SelectMany(diagnoser => diagnoser.Analysers);
 
         public IColumnProvider GetColumnProvider() 
             => new CompositeColumnProvider(diagnosers.Select(d => d.GetColumnProvider()).ToArray());

@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public class DotNetCliBuilder : IBuilder
     {
-        public string RestoreCommand => "restore --no-dependencies";
+        public virtual string RestoreCommand => "restore --no-dependencies";
 
         private string TargetFrameworkMoniker { get; }
 
@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             CustomDotNetCliPath = customDotNetCliPath;
         }
 
-        public string GetBuildCommand(string frameworkMoniker, bool justTheProjectItself, string configuration)
+        public virtual string GetBuildCommand(string frameworkMoniker, bool justTheProjectItself, string configuration)
             => $"build --framework {frameworkMoniker} --configuration {configuration} --no-restore"
                + (justTheProjectItself ? " --no-dependencies" : string.Empty);
 
