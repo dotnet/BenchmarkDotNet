@@ -26,10 +26,8 @@ Setup(_ =>
         Information("Build will use FrameworkPathOverride={0} since not building on Windows.", frameworkPathOverride);
         msBuildSettings.WithProperty("FrameworkPathOverride", frameworkPathOverride);
     }
-    else
-    {
-        msBuildSettings.WithProperty("UseSharedCompilation", "false");
-    }
+    
+    msBuildSettings.WithProperty("UseSharedCompilation", "false");
 });
 
 Task("Clean")

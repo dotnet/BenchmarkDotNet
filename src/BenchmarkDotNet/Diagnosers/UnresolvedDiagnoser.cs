@@ -32,8 +32,8 @@ namespace BenchmarkDotNet.Diagnosers
             => new[] { new ValidationError(false, GetErrorMessage()) };
 
         private string GetErrorMessage() => $@"Unable to resolve {unresolved.Name} diagnoser. 
-            {(RuntimeInformation.IsFullFramework 
+            {(RuntimeInformation.IsFullFramework || RuntimeInformation.IsWindows()
                 ? "Please make sure that you have installed the latest BenchmarkDotNet.Diagnostics.Windows package." 
-                : "To use the classic Windows diagnosers for .NET Core you need to run the benchmarks for desktop .NET. More info: http://adamsitnik.com/Hardware-Counters-Diagnoser/#how-to-get-it-running-for-net-coremono-on-windows")}";
+                : $"Please make sure that it's supported on {RuntimeInformation.GetOsVersion()}")}";
     }
 }
