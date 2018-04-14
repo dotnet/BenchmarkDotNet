@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Code
                 benchmarksCode.Add(benchmarkTypeCode);
             }
 
-            if (buildPartition.Runtime is CoreRtRuntime)
+            if (buildPartition.IsCoreRT)
                 extraDefines.Add("#define CORERT");
 
             string benchmarkProgramContent = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt"))
@@ -249,7 +249,7 @@ namespace BenchmarkDotNet.Code
         /// </summary>
         private static string GetCoreRtSwitch(BuildPartition buildPartition)
         {
-            if (!(buildPartition.Runtime is CoreRtRuntime))
+            if (!buildPartition.IsCoreRT)
                 return default;
 
             var @switch = new StringBuilder(buildPartition.Benchmarks.Length * 30);

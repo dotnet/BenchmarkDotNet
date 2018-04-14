@@ -3,6 +3,7 @@ using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Toolchains.CoreRt;
 
 namespace BenchmarkDotNet.Running
 {
@@ -36,7 +37,10 @@ namespace BenchmarkDotNet.Running
 
         public Jit Jit => RepresentativeBenchmark.Job.ResolveValue(EnvMode.JitCharacteristic, Resolver);
 
-        public Runtime Runtime => RepresentativeBenchmark.Job.Env.HasValue(EnvMode.RuntimeCharacteristic)
+        public bool IsCoreRT => Runtime is CoreRtRuntime
+            || (RepresentativeBenchmark.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic) && RepresentativeBenchmark.Job.Infrastructure.Toolchain is CoreRtToolchain); // given job can have CoreRT toolchain set, but Runtime == default ;)
+
+        private Runtime Runtime => RepresentativeBenchmark.Job.Env.HasValue(EnvMode.RuntimeCharacteristic)
                 ? RepresentativeBenchmark.Job.Env.Runtime
                 : RuntimeInformation.GetCurrentRuntime();
 

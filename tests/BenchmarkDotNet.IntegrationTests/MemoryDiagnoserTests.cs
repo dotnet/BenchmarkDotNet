@@ -8,12 +8,14 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.InProcess;
 using Xunit;
 using Xunit.Abstractions;
@@ -30,7 +32,12 @@ namespace BenchmarkDotNet.IntegrationTests
             => new[]
             {
                 new object[] { Job.Default.GetToolchain() },
-                new object[] { InProcessToolchain.Instance }
+                new object[] { InProcessToolchain.Instance },
+#if NETCOREAPP2_1 
+                // we don't want to test CoreRT twice (for .NET 4.6 and Core 2.1) when running the integration tests (these tests take a lot of time)
+                // we test against specific version to keep this test stable
+                new object[] { CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-26412-02").ToToolchain() }
+#endif
             };
 
         public class AccurateAllocations
@@ -47,13 +54,13 @@ namespace BenchmarkDotNet.IntegrationTests
         public void MemoryDiagnoserIsAccurate(IToolchain toolchain)
         {
             long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
-            long arraySizeOverhead = objectAllocationOverhead + IntPtr.Size; // + array length
+            long arraySizeOverhead = IntPtr.Size; // array length
 
             AssertAllocations(toolchain, typeof(AccurateAllocations), new Dictionary<string, long>
             {
                 { nameof(AccurateAllocations.Nothing), 0 },
-                { nameof(AccurateAllocations.EightBytesArray), 8 + arraySizeOverhead },
-                { nameof(AccurateAllocations.SixtyFourBytesArray), 64 + arraySizeOverhead },
+                { nameof(AccurateAllocations.EightBytesArray), 8 + objectAllocationOverhead + arraySizeOverhead },
+                { nameof(AccurateAllocations.SixtyFourBytesArray), 64 + + objectAllocationOverhead + arraySizeOverhead },
 
                 { nameof(AccurateAllocations.AllocateTask), CalculateRequiredSpace<Task<int>>() },
             });
@@ -154,6 +161,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
             foreach (var benchmarkAllocationsValidator in benchmarksAllocationsValidators)
             {
+                if (benchmarkAllocationsValidator.Key == nameof(AccurateAllocations.AllocateTask) && toolchain is CoreRtToolchain)
+                    continue; // https://github.com/dotnet/corert/issues/5705
+
                 var allocatingBenchmarks = benchmarks.Benchmarks.Where(benchmark => benchmark.DisplayInfo.Contains(benchmarkAllocationsValidator.Key));
 
                 foreach (var benchmark in allocatingBenchmarks)
@@ -175,16 +185,13 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private IConfig CreateConfig(IToolchain toolchain)
-        {
-            return ManualConfig.CreateEmpty()
+        private IConfig CreateConfig(IToolchain toolchain) 
+            => ManualConfig.CreateEmpty()
                 .With(Job.ShortRun.WithGcForce(false).With(toolchain))
                 .With(DefaultConfig.Instance.GetLoggers().ToArray())
                 .With(DefaultColumnProviders.Instance)
                 .With(MemoryDiagnoser.Default)
                 .With(new OutputLogger(output));
-        }
-
 
         // note: don't copy, never use in production systems (it should work but I am not 100% sure)
         private int CalculateRequiredSpace<T>()
@@ -203,18 +210,18 @@ namespace BenchmarkDotNet.IntegrationTests
         // note: don't copy, never use in production systems (it should work but I am not 100% sure)
         private int SizeOfAllFields<T>()
         {
-            Func<Type, int> getSize = type =>
+            int GetSize(Type type)
             {
                 var sizeOf = typeof(Unsafe).GetTypeInfo().GetMethod(nameof(Unsafe.SizeOf));
 
                 return (int)sizeOf.MakeGenericMethod(type).Invoke(null, null);
-            };
+            }
 
             return typeof(T)
                 .GetAllFields()
                 .Where(field => !field.IsStatic && !field.IsLiteral)
                 .Distinct()
-                .Sum(field => getSize(field.FieldType));
+                .Sum(field => GetSize(field.FieldType));
         }
     }
 }

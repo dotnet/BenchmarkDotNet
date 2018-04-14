@@ -128,11 +128,19 @@ namespace BenchmarkDotNet.Engines
             // so we enforce GC.Collect here just to make sure we get accurate results
             GC.Collect();
 
-            if (RuntimeInformation.IsFullFramework)
+#if CLASSIC
+            return AppDomain.CurrentDomain.MonitoringTotalAllocatedMemorySize;
+#elif NETSTANDARD2_0
+            if (RuntimeInformation.IsFullFramework) // it can be a .NET app consuming our .NET Standard package
                 return AppDomain.CurrentDomain.MonitoringTotalAllocatedMemorySize;
 
             // https://apisof.net/catalog/System.GC.GetAllocatedBytesForCurrentThread() is not part of the .NET Standard, so we use reflection to call it..
             return GetAllocatedBytesForCurrentThreadDelegate.Invoke();
+#elif NETCOREAPP2_1
+            // but CoreRT does not support the reflection yet, so only because of that we have to target .NET Core 2.1
+            // to be able to call this method without reflection and get MemoryDiagnoser support for CoreRT ;)
+            return System.GC.GetAllocatedBytesForCurrentThread();
+#endif
         }
 
         private static Func<long> GetAllocatedBytesForCurrentThread()

@@ -89,9 +89,10 @@ namespace BenchmarkDotNet.Extensions
 
         public static bool IsOneOf<T>(this T value, params T[] values) => values.Contains(value);
 
+#if !NETCOREAPP2_1 // method with the same name was added to Dictionary in .NET Core 2.1, so we need this ulgy hack to get compiler happy
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
             => dictionary.TryGetValue(key, out TValue value) ? value : default;
-
+#endif
         public static double Sqr(this double x) => x * x;
         public static double Pow(this double x, double k) => Math.Pow(x, k);
 
