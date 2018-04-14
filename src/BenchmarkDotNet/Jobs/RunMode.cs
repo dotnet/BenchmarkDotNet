@@ -9,15 +9,14 @@ namespace BenchmarkDotNet.Jobs
 {
     public sealed class RunMode : JobMode<RunMode>
     {
-        public static readonly Characteristic<RunStrategy> RunStrategyCharacteristic = Characteristic.Create(
-            (RunMode r) => r.RunStrategy,
-            RunStrategy.Throughput);
-        public static readonly Characteristic<int> LaunchCountCharacteristic = Characteristic.Create((RunMode r) => r.LaunchCount);
-        public static readonly Characteristic<int> WarmupCountCharacteristic = Characteristic.Create((RunMode r) => r.WarmupCount);
-        public static readonly Characteristic<int> TargetCountCharacteristic = Characteristic.Create((RunMode r) => r.TargetCount);
-        public static readonly Characteristic<TimeInterval> IterationTimeCharacteristic = Characteristic.Create((RunMode r) => r.IterationTime);
-        public static readonly Characteristic<int> InvocationCountCharacteristic = Characteristic.Create((RunMode r) => r.InvocationCount);
-        public static readonly Characteristic<int> UnrollFactorCharacteristic = Characteristic.Create((RunMode r) => r.UnrollFactor);
+        public static readonly Characteristic<RunStrategy> RunStrategyCharacteristic = Characteristic.Create<RunMode, RunStrategy>(nameof(RunStrategy), RunStrategy.Throughput);
+
+        public static readonly Characteristic<int> LaunchCountCharacteristic = CreateCharacteristic<int>(nameof(LaunchCount));
+        public static readonly Characteristic<int> WarmupCountCharacteristic = CreateCharacteristic<int>(nameof(WarmupCount));
+        public static readonly Characteristic<int> TargetCountCharacteristic = CreateCharacteristic<int>(nameof(TargetCount));
+        public static readonly Characteristic<TimeInterval> IterationTimeCharacteristic = CreateCharacteristic<TimeInterval>(nameof(IterationTime));
+        public static readonly Characteristic<int> InvocationCountCharacteristic = CreateCharacteristic<int>(nameof(InvocationCount));
+        public static readonly Characteristic<int> UnrollFactorCharacteristic = CreateCharacteristic<int>(nameof(UnrollFactor));
 
         public static readonly RunMode Dry = new RunMode(nameof(Dry))
         {

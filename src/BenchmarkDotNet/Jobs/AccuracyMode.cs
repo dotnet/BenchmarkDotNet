@@ -5,13 +5,13 @@ namespace BenchmarkDotNet.Jobs
 {
     public sealed class AccuracyMode : JobMode<AccuracyMode>
     {
-        public static readonly Characteristic<double> MaxRelativeErrorCharacteristic = Characteristic.Create((AccuracyMode a) => a.MaxRelativeError);
-        public static readonly Characteristic<TimeInterval> MaxAbsoluteErrorCharacteristic = Characteristic.Create((AccuracyMode a) => a.MaxAbsoluteError);
-        public static readonly Characteristic<TimeInterval> MinIterationTimeCharacteristic = Characteristic.Create((AccuracyMode a) => a.MinIterationTime);
-        public static readonly Characteristic<int> MinInvokeCountCharacteristic = Characteristic.Create((AccuracyMode a) => a.MinInvokeCount);
-        public static readonly Characteristic<bool> EvaluateOverheadCharacteristic = Characteristic.Create((AccuracyMode a) => a.EvaluateOverhead);
-        public static readonly Characteristic<bool> RemoveOutliersCharacteristic = Characteristic.Create((AccuracyMode a) => a.RemoveOutliers);
-        public static readonly Characteristic<bool> AnalyzeLaunchVarianceCharacteristic = Characteristic.Create((AccuracyMode a) => a.AnalyzeLaunchVariance);
+        public static readonly Characteristic<double> MaxRelativeErrorCharacteristic = CreateCharacteristic<double>(nameof(MaxRelativeError));
+        public static readonly Characteristic<TimeInterval> MaxAbsoluteErrorCharacteristic = CreateCharacteristic<TimeInterval>(nameof(MaxAbsoluteError));
+        public static readonly Characteristic<TimeInterval> MinIterationTimeCharacteristic = CreateCharacteristic<TimeInterval>(nameof(MinIterationTime));
+        public static readonly Characteristic<int> MinInvokeCountCharacteristic = CreateCharacteristic<int>(nameof(MinInvokeCount));
+        public static readonly Characteristic<bool> EvaluateOverheadCharacteristic = CreateCharacteristic<bool>(nameof(EvaluateOverhead));
+        public static readonly Characteristic<bool> RemoveOutliersCharacteristic = CreateCharacteristic<bool>(nameof(RemoveOutliers));
+        public static readonly Characteristic<bool> AnalyzeLaunchVarianceCharacteristic = CreateCharacteristic<bool>(nameof(AnalyzeLaunchVariance));
 
         public double MaxRelativeError
         {

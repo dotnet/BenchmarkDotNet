@@ -4,7 +4,7 @@ namespace BenchmarkDotNet.Jobs
 {
     public class MetaMode : JobMode<MetaMode>
     {
-        public static readonly Characteristic<bool> IsBaselineCharacteristic = Characteristic.Create((MetaMode a) => a.IsBaseline);
+        public static readonly Characteristic<bool> IsBaselineCharacteristic = CreateCharacteristic<bool>(nameof(IsBaseline));
 
         public bool IsBaseline
         {

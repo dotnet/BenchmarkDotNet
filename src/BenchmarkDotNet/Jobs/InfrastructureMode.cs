@@ -11,12 +11,12 @@ namespace BenchmarkDotNet.Jobs
     {
         public const string ReleaseConfigurationName = "Release";
 
-        public static readonly Characteristic<IToolchain> ToolchainCharacteristic = Characteristic.Create((InfrastructureMode i) => i.Toolchain);
-        public static readonly Characteristic<IClock> ClockCharacteristic = Characteristic.Create((InfrastructureMode i) => i.Clock);
-        public static readonly Characteristic<IEngineFactory> EngineFactoryCharacteristic = Characteristic.Create((InfrastructureMode i) => i.EngineFactory);
-        public static readonly Characteristic<string> BuildConfigurationCharacteristic = Characteristic.Create((InfrastructureMode i) => i.BuildConfiguration);
-        public static readonly Characteristic<IReadOnlyList<EnvironmentVariable>> EnvironmentVariablesCharacteristic = Characteristic.Create((InfrastructureMode i) => i.EnvironmentVariables);
-        public static readonly Characteristic<IReadOnlyList<Argument>> ArgumentsCharacteristic = Characteristic.Create((InfrastructureMode i) => i.Arguments);
+        public static readonly Characteristic<IToolchain> ToolchainCharacteristic = CreateCharacteristic<IToolchain>(nameof(Toolchain));
+        public static readonly Characteristic<IClock> ClockCharacteristic = CreateCharacteristic<IClock>(nameof(Clock));
+        public static readonly Characteristic<IEngineFactory> EngineFactoryCharacteristic = CreateCharacteristic<IEngineFactory>(nameof(EngineFactory));
+        public static readonly Characteristic<string> BuildConfigurationCharacteristic = CreateCharacteristic<string>(nameof(BuildConfiguration));
+        public static readonly Characteristic<IReadOnlyList<EnvironmentVariable>> EnvironmentVariablesCharacteristic = CreateCharacteristic<IReadOnlyList<EnvironmentVariable>>(nameof(EnvironmentVariables));
+        public static readonly Characteristic<IReadOnlyList<Argument>> ArgumentsCharacteristic = CreateCharacteristic<IReadOnlyList<Argument>>(nameof(Arguments));
 
         public static readonly InfrastructureMode InProcess = new InfrastructureMode(InProcessToolchain.Instance);
         public static readonly InfrastructureMode InProcessDontLogOutput = new InfrastructureMode(InProcessToolchain.DontLogOutput);

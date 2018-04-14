@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 
 namespace BenchmarkDotNet.Characteristics
@@ -25,14 +24,6 @@ namespace BenchmarkDotNet.Characteristics
 
             return value;
         }
-
-        internal static string GetMemberName<TOwner, T>(Expression<Func<TOwner, T>> propertyGetterExpression)
-            where TOwner : CharacteristicObject =>
-                ((MemberExpression)propertyGetterExpression.Body).Member.Name;
-
-        internal static Type GetDeclaringType<TOwner, T>(Expression<Func<TOwner, T>> propertyGetterExpression)
-            where TOwner : CharacteristicObject =>
-                ((MemberExpression)propertyGetterExpression.Body).Member.DeclaringType;
 
         public static bool IsPresentableCharacteristic(this Characteristic c, bool includeIgnoreOnApply = false) =>
             !c.HasChildCharacteristics && (includeIgnoreOnApply || !c.IgnoreOnApply);

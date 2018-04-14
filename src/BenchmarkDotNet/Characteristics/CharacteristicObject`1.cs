@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using JetBrains.Annotations;
-
-namespace BenchmarkDotNet.Characteristics
+﻿namespace BenchmarkDotNet.Characteristics
 {
     public abstract class CharacteristicObject<T> : CharacteristicObject
         where T : CharacteristicObject<T>, new()
@@ -32,5 +26,7 @@ namespace BenchmarkDotNet.Characteristics
         public new T Freeze() => (T)FreezeCore();
 
         public new T UnfreezeCopy() => (T)UnfreezeCopyCore();
+
+        protected static Characteristic<TC> CreateCharacteristic<TC>(string memberName) => Characteristic.Create<T, TC>(memberName);
     }
 }

@@ -1,21 +1,21 @@
 ﻿using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 
 namespace BenchmarkDotNet.Jobs
 {
     public sealed class Job : JobMode<Job>
     {
-        public static readonly Characteristic<EnvMode> EnvCharacteristic = Characteristic.Create((Job j) => j.Env);
-        public static readonly Characteristic<RunMode> RunCharacteristic = Characteristic.Create((Job j) => j.Run);
-        public static readonly Characteristic<InfrastructureMode> InfrastructureCharacteristic = Characteristic.Create((Job j) => j.Infrastructure);
-        public static readonly Characteristic<AccuracyMode> AccuracyCharacteristic = Characteristic.Create((Job j) => j.Accuracy);
-        public static readonly Characteristic<MetaMode> MetaCharacteristic = Characteristic.Create((Job j) => j.Meta);
+        public static readonly Characteristic<EnvMode> EnvCharacteristic = CreateCharacteristic<EnvMode>(nameof(Env));
+        public static readonly Characteristic<RunMode> RunCharacteristic = CreateCharacteristic<RunMode>(nameof(Run));
+        public static readonly Characteristic<InfrastructureMode> InfrastructureCharacteristic = CreateCharacteristic<InfrastructureMode>(nameof(Infrastructure));
+        public static readonly Characteristic<AccuracyMode> AccuracyCharacteristic = CreateCharacteristic<AccuracyMode>(nameof(Accuracy));
+        public static readonly Characteristic<MetaMode> MetaCharacteristic = CreateCharacteristic<MetaMode>(nameof(Meta));
 
         // Env
         public static readonly Job Clr = new Job(nameof(Clr), EnvMode.Clr).Freeze();
         public static readonly Job Core = new Job(nameof(Core), EnvMode.Core).Freeze();
         public static readonly Job Mono = new Job(nameof(Mono), EnvMode.Mono).Freeze();
+        public static readonly Job CoreRT = new Job(nameof(CoreRT), EnvMode.CoreRT).Freeze();
 
         public static readonly Job LegacyJitX86 = new Job(nameof(LegacyJitX86), EnvMode.LegacyJitX86).Freeze();
         public static readonly Job LegacyJitX64 = new Job(nameof(LegacyJitX64), EnvMode.LegacyJitX64).Freeze();
@@ -27,6 +27,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Job DryClr = Dry.With(Runtime.Clr).WithId("DryClr").Freeze();
         public static readonly Job DryCore = Dry.With(Runtime.Core).WithId("DryCore").Freeze();
         public static readonly Job DryMono = Dry.With(Runtime.Mono).WithId("DryMono").Freeze();
+        public static readonly Job DryCoreRT = Dry.With(Runtime.CoreRT).WithId("DryCoreRT").Freeze();
         public static readonly Job ShortRun = new Job(nameof(ShortRun), RunMode.Short).Freeze();
         public static readonly Job MediumRun = new Job(nameof(MediumRun), RunMode.Medium).Freeze();
         public static readonly Job LongRun = new Job(nameof(LongRun), RunMode.Long).Freeze();

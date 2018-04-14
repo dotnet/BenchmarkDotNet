@@ -6,15 +6,16 @@ namespace BenchmarkDotNet.Jobs
 {
     public sealed class EnvMode : JobMode<EnvMode>
     {
-        public static readonly Characteristic<Platform> PlatformCharacteristic = Characteristic.Create((EnvMode e) => e.Platform);
-        public static readonly Characteristic<Jit> JitCharacteristic = Characteristic.Create((EnvMode e) => e.Jit);
-        public static readonly Characteristic<Runtime> RuntimeCharacteristic = Characteristic.Create((EnvMode e) => e.Runtime);
-        public static readonly Characteristic<IntPtr> AffinityCharacteristic = Characteristic.Create((EnvMode e) => e.Affinity);
-        public static readonly Characteristic<GcMode> GcCharacteristic = Characteristic.Create((EnvMode e) => e.Gc);
+        public static readonly Characteristic<Platform> PlatformCharacteristic = CreateCharacteristic<Platform>(nameof(Platform));
+        public static readonly Characteristic<Jit> JitCharacteristic = CreateCharacteristic<Jit>(nameof(Jit));
+        public static readonly Characteristic<Runtime> RuntimeCharacteristic = CreateCharacteristic<Runtime>(nameof(Runtime));
+        public static readonly Characteristic<IntPtr> AffinityCharacteristic = CreateCharacteristic<IntPtr>(nameof(Affinity));
+        public static readonly Characteristic<GcMode> GcCharacteristic = CreateCharacteristic<GcMode>(nameof(Gc));
 
         public static readonly EnvMode Clr = new EnvMode(Runtime.Clr).Freeze();
         public static readonly EnvMode Core = new EnvMode(Runtime.Core).Freeze();
         public static readonly EnvMode Mono = new EnvMode(Runtime.Mono).Freeze();
+        public static readonly EnvMode CoreRT = new EnvMode(Runtime.CoreRT).Freeze();
         public static readonly EnvMode LegacyJitX86 = new EnvMode(nameof(LegacyJitX86), Jit.LegacyJit, Platform.X86).Freeze();
         public static readonly EnvMode LegacyJitX64 = new EnvMode(nameof(LegacyJitX64), Jit.LegacyJit, Platform.X64).Freeze();
         public static readonly EnvMode RyuJitX64 = new EnvMode(nameof(RyuJitX64), Jit.RyuJit, Platform.X64).Freeze();

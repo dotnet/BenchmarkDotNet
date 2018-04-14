@@ -6,15 +6,15 @@ namespace BenchmarkDotNet.Jobs
 {
     public sealed class GcMode : JobMode<GcMode>, IEquatable<GcMode>
     {
-        public static readonly Characteristic<bool> ServerCharacteristic = Characteristic.Create((GcMode g) => g.Server);
-        public static readonly Characteristic<bool> ConcurrentCharacteristic = Characteristic.Create((GcMode g) => g.Concurrent);
-        public static readonly Characteristic<bool> CpuGroupsCharacteristic = Characteristic.Create((GcMode g) => g.CpuGroups);
-        public static readonly Characteristic<bool> ForceCharacteristic = Characteristic.Create((GcMode g) => g.Force);
-        public static readonly Characteristic<bool> AllowVeryLargeObjectsCharacteristic = Characteristic.Create((GcMode g) => g.AllowVeryLargeObjects);
-        public static readonly Characteristic<bool> RetainVmCharacteristic = Characteristic.Create((GcMode g) => g.RetainVm);
-        public static readonly Characteristic<bool> NoAffinitizeCharacteristic = Characteristic.Create((GcMode g) => g.NoAffinitize);
-        public static readonly Characteristic<int> HeapAffinitizeMaskCharacteristic = Characteristic.Create((GcMode g) => g.HeapAffinitizeMask);
-        public static readonly Characteristic<int> HeapCountCharacteristic = Characteristic.Create((GcMode g) => g.HeapCount);
+        public static readonly Characteristic<bool> ServerCharacteristic = CreateCharacteristic<bool>(nameof(Server));
+        public static readonly Characteristic<bool> ConcurrentCharacteristic = CreateCharacteristic<bool>(nameof(Concurrent));
+        public static readonly Characteristic<bool> CpuGroupsCharacteristic = CreateCharacteristic<bool>(nameof(CpuGroups));
+        public static readonly Characteristic<bool> ForceCharacteristic = CreateCharacteristic<bool>(nameof(Force));
+        public static readonly Characteristic<bool> AllowVeryLargeObjectsCharacteristic = CreateCharacteristic<bool>(nameof(AllowVeryLargeObjects));
+        public static readonly Characteristic<bool> RetainVmCharacteristic = CreateCharacteristic<bool>(nameof(RetainVm));
+        public static readonly Characteristic<bool> NoAffinitizeCharacteristic = CreateCharacteristic<bool>(nameof(NoAffinitize));
+        public static readonly Characteristic<int> HeapAffinitizeMaskCharacteristic = CreateCharacteristic<int>(nameof(HeapAffinitizeMask));
+        public static readonly Characteristic<int> HeapCountCharacteristic = CreateCharacteristic<int>(nameof(HeapCount));
 
         /// <summary>
         /// Specifies whether the common language runtime runs server garbage collection.

@@ -25,9 +25,7 @@ namespace BenchmarkDotNet.Characteristics
             return result;
         }
 
-        public static readonly Characteristic<string> IdCharacteristic = Characteristic.Create(
-            (CharacteristicObject o) => o.Id,
-            ResolveId, "Default", true);
+        public static readonly Characteristic<string> IdCharacteristic = Characteristic.Create<CharacteristicObject, string>(nameof(Id), ResolveId, "Default", true);
         #endregion
 
         #region Fields & ctor

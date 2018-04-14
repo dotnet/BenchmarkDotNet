@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq.Expressions;
-
 using static BenchmarkDotNet.Characteristics.CharacteristicHelper;
 
 namespace BenchmarkDotNet.Characteristics
@@ -9,49 +7,29 @@ namespace BenchmarkDotNet.Characteristics
     {
         public static readonly object EmptyValue = new object();
 
-        #region Factory methods
-        public static Characteristic<T> Create<TOwner, T>(
-            Expression<Func<TOwner, T>> propertyGetterExpression)
-            where TOwner : CharacteristicObject =>
-            new Characteristic<T>(
-                GetMemberName(propertyGetterExpression),
-                GetDeclaringType(propertyGetterExpression),
+        public static Characteristic<T> Create<TOwner, T>(string memberName)
+            where TOwner : CharacteristicObject 
+            => new Characteristic<T>(
+                memberName,
+                typeof(TOwner),
                 null, default,
                 false);
 
-        public static Characteristic<T> Create<TOwner, T>(
-            Expression<Func<TOwner, T>> propertyGetterExpression,
-            T fallbackValue)
-            where TOwner : CharacteristicObject =>
-            new Characteristic<T>(
-                GetMemberName(propertyGetterExpression),
-                GetDeclaringType(propertyGetterExpression),
+        public static Characteristic<T> Create<TOwner, T>(string memberName, T fallbackValue)
+            where TOwner : CharacteristicObject 
+            => new Characteristic<T>(
+                memberName, 
+                typeof(TOwner),
                 null, fallbackValue,
                 false);
 
-        public static Characteristic<T> Create<TOwner, T>(
-            Expression<Func<TOwner, T>> propertyGetterExpression,
-            Func<CharacteristicObject, T, T> resolver,
-            T fallbackValue)
-            where TOwner : CharacteristicObject =>
-            new Characteristic<T>(
-                GetMemberName(propertyGetterExpression),
-                GetDeclaringType(propertyGetterExpression),
-                resolver, fallbackValue,
-                false);
-
-        public static Characteristic<T> Create<TOwner, T>(
-            Expression<Func<TOwner, T>> propertyGetterExpression,
-            Func<CharacteristicObject, T, T> resolver,
-            T fallbackValue,
-            bool ignoreOnApply)
-            where TOwner : CharacteristicObject =>
-            new Characteristic<T>(
-                GetMemberName(propertyGetterExpression),
-                GetDeclaringType(propertyGetterExpression),
+        public static Characteristic<T> Create<TOwner, T>(string memberName, Func<CharacteristicObject, T, T> resolver, T fallbackValue, bool ignoreOnApply)
+            where TOwner : CharacteristicObject 
+            => new Characteristic<T>(
+                memberName,
+                typeof(TOwner),
                 resolver, fallbackValue,
                 ignoreOnApply);
-        #endregion
 
         protected Characteristic(
             string id,
