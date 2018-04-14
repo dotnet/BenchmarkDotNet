@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Running
 
         public Jit Jit => RepresentativeBenchmark.Job.ResolveValue(EnvMode.JitCharacteristic, Resolver);
 
-        private Runtime Runtime => RepresentativeBenchmark.Job.Env.HasValue(EnvMode.RuntimeCharacteristic)
+        public Runtime Runtime => RepresentativeBenchmark.Job.Env.HasValue(EnvMode.RuntimeCharacteristic)
                 ? RepresentativeBenchmark.Job.Env.Runtime
                 : RuntimeInformation.GetCurrentRuntime();
 

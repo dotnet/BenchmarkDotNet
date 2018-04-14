@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet</AssemblyTitle>
     <TargetFrameworks>net46;netstandard2.0</TargetFrameworks>
-    <NoWarn>$(NoWarn);1701;1702;1705;1591</NoWarn>
+    <NoWarn>$(NoWarn);1701;1702;1705;1591;3005</NoWarn>
     <AssemblyName>BenchmarkDotNet</AssemblyName>
     <PackageId>BenchmarkDotNet</PackageId>
     <RootNamespace>BenchmarkDotNet</RootNamespace>

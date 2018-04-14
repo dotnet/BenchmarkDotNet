@@ -1,33 +1,41 @@
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.Results;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using BenchmarkDotNet.Jobs;
 
-namespace BenchmarkDotNet.Toolchains.CustomCoreClr
+namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
-    public class Publisher : IBuilder
+    public class DotNetCliPublisher : IBuilder
     {
-        public Publisher(string customDotNetCliPath = null) => CustomDotNetCliPath = customDotNetCliPath;
+        public DotNetCliPublisher(string customDotNetCliPath = null) => CustomDotNetCliPath = customDotNetCliPath;
 
         private string CustomDotNetCliPath { get; }
 
         public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
         {
-            var extraArguments = DotNetCliGenerator.GetCustomArguments(buildPartition.RepresentativeBenchmark, buildPartition.Resolver);
+            var extraArguments = GetExtraArguments(buildPartition);
+            var environmentVariables = GetEnvironmentVariables();
 
-            var publishNoDependencies = CheckResult(generateResult, Build(generateResult, buildPartition, logger, $"--no-dependencies {extraArguments}"));
+            var publishNoDependencies = CheckResult(generateResult, Build(generateResult, buildPartition, logger, $"--no-dependencies {extraArguments}", environmentVariables));
 
             // at first we try to build the project without it's dependencies to save a LOT of time
             // in 99% of the cases it will work (the host process is running so something can be compiled!)
             if (publishNoDependencies.IsBuildSuccess)
                 return publishNoDependencies;
 
-            return CheckResult(generateResult, Build(generateResult, buildPartition, logger, extraArguments));
+            return CheckResult(generateResult, Build(generateResult, buildPartition, logger, extraArguments, environmentVariables));
         }
 
-        private DotNetCliCommandExecutor.CommandResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger, string extraArguments)
+        protected virtual string GetExtraArguments(BuildPartition buildPartition)
+            => DotNetCliGenerator.GetCustomArguments(buildPartition.RepresentativeBenchmark, buildPartition.Resolver);
+
+        protected virtual IReadOnlyList<EnvironmentVariable> GetEnvironmentVariables()
+            => Array.Empty<EnvironmentVariable>();
+
+        private DotNetCliCommandExecutor.CommandResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger, string extraArguments, IReadOnlyList<EnvironmentVariable> environmentVariables)
         {
             bool needsIsolatedFolderForRestore = !string.IsNullOrEmpty(generateResult.ArtifactsPaths.PackagesDirectoryName);
 
@@ -52,7 +60,8 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
                     ? $"restore --packages {generateResult.ArtifactsPaths.PackagesDirectoryName} {extraArguments}"
                     : $"restore {extraArguments}",
                 generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath,
-                logger);
+                logger,
+                environmentVariables);
 
             if (!restoreResult.IsSuccess)
                 return restoreResult;
@@ -61,7 +70,8 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
                 CustomDotNetCliPath,
                 $"build -c {buildPartition.BuildConfiguration} --no-restore {extraArguments}",
                 generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath,
-                logger);
+                logger,
+                environmentVariables);
 
             if (!buildResult.IsSuccess)
                 return buildResult;
@@ -70,7 +80,8 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
                 CustomDotNetCliPath,
                 $"publish -c {buildPartition.BuildConfiguration} --no-restore {extraArguments}",
                 generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath,
-                logger);
+                logger,
+                environmentVariables);
         }
 
         private static BuildResult CheckResult(GenerateResult generateResult, DotNetCliCommandExecutor.CommandResult commandResult) 

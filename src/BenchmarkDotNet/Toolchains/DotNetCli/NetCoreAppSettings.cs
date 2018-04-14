@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         /// <summary>
-        /// sample values: netcoreapp1.1, netcoreapp2.0, netcoreapp2.1
+        /// sample values: netcoreapp2.0, netcoreapp2.1
         /// </summary>
         public string TargetFrameworkMoniker { get; }
 

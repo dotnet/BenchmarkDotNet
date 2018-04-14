@@ -44,9 +44,18 @@ namespace BenchmarkDotNet.Portability
 #if CLASSIC
             false;
 #else
-            System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase);
+            System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase)
+                && !string.IsNullOrEmpty(typeof(object).Assembly.Location);
 #endif
-        
+
+        public static bool IsCoreRT =>
+#if CLASSIC
+            false;
+#else
+            // "The north star for CoreRT is to be a flavor of .NET Core" -> CoreRT reports .NET Core everywhere
+            System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase)
+                && string.IsNullOrEmpty(typeof(object).Assembly.Location); // but it's merged to a single .exe and .Location returns null here ;)
+#endif
 
         internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
 
@@ -184,13 +193,23 @@ namespace BenchmarkDotNet.Portability
                 string clrVersion = Environment.Version.ToString();
                 return $".NET Framework {frameworkVersion} (CLR {clrVersion})";
             }
+            else if (IsNetCore)
+            {
+                var runtimeVersion = GetNetCoreVersion() ?? "?";
 
-            var runtimeVersion = GetNetCoreVersion() ?? "?";
+                var coreclrAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(object).GetTypeInfo().Assembly.Location);
+                var corefxAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(Regex).GetTypeInfo().Assembly.Location);
 
-            var coreclrAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(object).GetTypeInfo().Assembly.Location);
-            var corefxAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(Regex).GetTypeInfo().Assembly.Location);
+                return $".NET Core {runtimeVersion} (CoreCLR {coreclrAssemblyInfo.FileVersion}, CoreFX {corefxAssemblyInfo.FileVersion})";
+            }
+            else if (IsCoreRT)
+            {
+#if !CLASSIC
+                return System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.Replace("Core ", "CoreRT ");
+#endif
+            }
 
-            return $".NET Core {runtimeVersion} (CoreCLR {coreclrAssemblyInfo.FileVersion}, CoreFX {corefxAssemblyInfo.FileVersion})";
+            return Unknown;
         }
 
         internal static Runtime GetCurrentRuntime()
@@ -201,6 +220,8 @@ namespace BenchmarkDotNet.Portability
                 return Runtime.Core;
             if (IsMono)
                 return Runtime.Mono;
+            if (IsCoreRT)
+                return Runtime.CoreRT;
             
             throw new NotSupportedException("Unknown .NET Framework"); // todo: adam sitnik fix it
         }
@@ -234,6 +255,8 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetJitInfo()
         {
+            if (IsCoreRT)
+                return "AOT";
             if (IsMono)
                 return ""; // There is no helpful information about JIT on Mono
             if (IsNetCore)

@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CsProj;
 
 namespace BenchmarkDotNet.Toolchains
@@ -25,6 +26,8 @@ namespace BenchmarkDotNet.Toolchains
                     return Roslyn.RoslynToolchain.Instance;
                 case CoreRuntime core:
                     return CsProjCoreToolchain.Current.Value;
+                case CoreRtRuntime coreRt:
+                    return CoreRtToolchain.LatestMyGetBuild;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtime), runtime, "Runtime not supported");
             }

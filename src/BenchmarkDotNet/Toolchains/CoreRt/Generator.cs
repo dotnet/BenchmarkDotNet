@@ -8,26 +8,23 @@ using System.Linq;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Portability;
 
-namespace BenchmarkDotNet.Toolchains.CustomCoreClr
+namespace BenchmarkDotNet.Toolchains.CoreRt
 {
     /// <summary>
-    /// generates new csproj file for self-contained .NET Core app which uses given CoreCLR NuGet packages
-    /// based on https://github.com/dotnet/coreclr/blob/master/Documentation/workflow/UsingDotNetCli.md and https://github.com/dotnet/corefx/blob/master/Documentation/project-docs/dogfooding.md
+    /// generates new csproj file for self-contained .NET Core RT app
+    /// based on https://github.com/dotnet/corert/blob/master/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md and https://github.com/dotnet/corert/tree/master/samples/HelloWorld#add-corert-to-your-project
     /// </summary>
     public class Generator : CsProjGenerator
     {
-        internal const string LocalCoreClrPackagesBin = "localCoreClrPackagesBin";
-        internal const string LocalCoreClrPackages = "localCoreClrPackages";
-        internal const string CoreClrNuGetFeed = "coreClrNuGetFeed";
-        internal const string LocalCoreFxPacakgesBin = "localCoreFxPacakgesBin";
-        internal const string CoreFxNuGetFeed = "coreFxNuGetFeed";
+        internal const string CoreRtNuGetFeed = "coreRtNuGetFeed";
 
-        internal Generator(string coreClrVersion, string coreFxVersion, string runtimeFrameworkVersion, string targetFrameworkMoniker,
+        internal Generator(string coreRtVersion, bool useCppCodeGenerator,
+            string runtimeFrameworkVersion, string targetFrameworkMoniker,
             string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag, bool useTempFolderForRestore)
             : base(targetFrameworkMoniker, platfrom => platfrom.ToConfig(), runtimeFrameworkVersion)
         {
-            this.coreClrVersion = coreClrVersion;
-            this.coreFxVersion = coreFxVersion;
+            this.coreRtVersion = coreRtVersion;
+            this.useCppCodeGenerator = useCppCodeGenerator;
             this.targetFrameworkMoniker = targetFrameworkMoniker;
             this.runtimeIdentifier = runtimeIdentifier;
             this.feeds = feeds;
@@ -35,16 +32,15 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
             this.useTempFolderForRestore = useTempFolderForRestore;
         }
 
-        private readonly string coreClrVersion;
-        private readonly string coreFxVersion;
+        private readonly string coreRtVersion;
+        private readonly bool useCppCodeGenerator;
         private readonly string targetFrameworkMoniker;
         private readonly string runtimeIdentifier;
         private readonly IReadOnlyDictionary<string, string> feeds;
         private readonly bool useNuGetClearTag;
         private readonly bool useTempFolderForRestore;
 
-        private bool IsUsingCustomCoreClr => feeds.ContainsKey(LocalCoreClrPackagesBin) || feeds.ContainsKey(CoreClrNuGetFeed);
-        private bool IsUsingCustomCoreFx => feeds.ContainsKey(LocalCoreFxPacakgesBin) || feeds.ContainsKey(CoreFxNuGetFeed);
+        private bool IsNuGetCoreRt => feeds.ContainsKey(CoreRtNuGetFeed) && !string.IsNullOrWhiteSpace(coreRtVersion);
 
         protected override string GetExecutableExtension() => RuntimeInformation.ExecutableExtension;
 
@@ -54,20 +50,22 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
                 : base.GetBuildArtifactsDirectoryPath(buildPartition, programName);
 
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
-            => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, runtimeIdentifier);   
+            => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, runtimeIdentifier, "native");
 
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
+            var extraArguments = useCppCodeGenerator ? $"-r {runtimeIdentifier} /p:NativeCodeGen=cpp" : $"-r {runtimeIdentifier}";
+
             if (useTempFolderForRestore)
             {
                 File.WriteAllText(artifactsPaths.BuildScriptFilePath,
-                    $"dotnet restore --packages {artifactsPaths.PackagesDirectoryName} --no-dependencies" + Environment.NewLine +
-                    $"dotnet build -c {buildPartition.BuildConfiguration} --no-restore --no-dependencies" + Environment.NewLine +
-                    $"dotnet publish -c {buildPartition.BuildConfiguration} --no-restore --no-dependencies");
+                    $"dotnet restore --packages {artifactsPaths.PackagesDirectoryName} {extraArguments} --no-dependencies" + Environment.NewLine +
+                    $"dotnet build -c {buildPartition.BuildConfiguration} {extraArguments} --no-restore --no-dependencies" + Environment.NewLine +
+                    $"dotnet publish -c {buildPartition.BuildConfiguration} {extraArguments} --no-restore --no-dependencies");
             }
             else
             {
-                File.WriteAllText(artifactsPaths.BuildScriptFilePath, $"dotnet publish -c {buildPartition.BuildConfiguration}");
+                File.WriteAllText(artifactsPaths.BuildScriptFilePath, $"dotnet publish -c {buildPartition.BuildConfiguration} {extraArguments}");
             }
         }
 
@@ -87,6 +85,9 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
 
         protected override void GenerateNuGetConfig(ArtifactsPaths artifactsPaths)
         {
+            if (!feeds.Any())
+                return;
+
             string content =
 $@"<?xml version=""1.0"" encoding=""utf-8""?>
 <configuration>
@@ -100,8 +101,12 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         }
 
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
-        {
-            string csProj = $@"
+            => File.WriteAllText(artifactsPaths.ProjectFilePath, 
+                    IsNuGetCoreRt 
+                        ? GenerateProjectForNuGetBuild(buildPartition, artifactsPaths, logger) 
+                        : GenerateProjectForLocalBuild(buildPartition, artifactsPaths, logger));
+
+        private string GenerateProjectForNuGetBuild(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $@"
 <Project Sdk=""Microsoft.NET.Sdk"">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -114,34 +119,42 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <PackageConflictPreferredPackages>runtime.{runtimeIdentifier}.Microsoft.NETCore.Runtime.CoreCLR;runtime.{runtimeIdentifier}.Microsoft.NETCore.Jit;runtime.{runtimeIdentifier}.Microsoft.Private.CoreFx.NETCoreApp;Microsoft.Private.CoreFx.NETCoreApp;Microsoft.NETCore.App;$(PackageConflictPreferredPackages)</PackageConflictPreferredPackages>
   </PropertyGroup>
   {GetRuntimeSettings(buildPartition.RepresentativeBenchmark.Job.Env.Gc, buildPartition.Resolver)}
   <ItemGroup>
     <Compile Include=""{Path.GetFileName(artifactsPaths.ProgramCodePath)}"" Exclude=""bin\**;obj\**;**\*.xproj;packages\**"" />
   </ItemGroup>
   <ItemGroup>
-    {string.Join(Environment.NewLine, GetReferences(buildPartition.RepresentativeBenchmark, logger))}
+    <PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{coreRtVersion}"" />
+    <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmark.Target.Type, logger).FullName}"" />
   </ItemGroup>
 </Project>";
 
-            File.WriteAllText(artifactsPaths.ProjectFilePath, csProj);
-        }
+        private string GenerateProjectForLocalBuild(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $@"
+<Project>
+  <Import Project=""$(MSBuildSDKsPath)\Microsoft.NET.Sdk\Sdk\Sdk.props"" />
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>{TargetFrameworkMoniker}</TargetFramework>
+    <RuntimeIdentifier>{runtimeIdentifier}</RuntimeIdentifier>
+    <RuntimeFrameworkVersion>{RuntimeFrameworkVersion}</RuntimeFrameworkVersion>
+    <AssemblyName>{artifactsPaths.ProgramName}</AssemblyName>
+    <AssemblyTitle>{artifactsPaths.ProgramName}</AssemblyTitle>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <Import Project=""$(MSBuildSDKsPath)\Microsoft.NET.Sdk\Sdk\Sdk.targets"" />
+  <Import Project=""$(IlcPath)\build\Microsoft.NETCore.Native.targets"" />
+  {GetRuntimeSettings(buildPartition.RepresentativeBenchmark.Job.Env.Gc, buildPartition.Resolver)}
+  <ItemGroup>
+    <Compile Include=""{Path.GetFileName(artifactsPaths.ProgramCodePath)}"" Exclude=""bin\**;obj\**;**\*.xproj;packages\**"" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmark.Target.Type, logger).FullName}"" />
+  </ItemGroup>
+</Project>";
 
-        private IEnumerable<string> GetReferences(Benchmark benchmark, ILogger logger)
-        {
-            if (IsUsingCustomCoreClr)
-            {
-                yield return $@"<PackageReference Include=""runtime.{runtimeIdentifier}.Microsoft.NETCore.Runtime.CoreCLR"" Version=""{coreClrVersion}"" />";
-                yield return $@"<PackageReference Include=""runtime.{runtimeIdentifier}.Microsoft.NETCore.Jit"" Version=""{coreClrVersion}"" />";
-            }
-
-            if (IsUsingCustomCoreFx)
-            {
-                yield return $@"<PackageReference Include=""runtime.{runtimeIdentifier}.Microsoft.Private.CoreFx.NETCoreApp"" Version=""{coreFxVersion}"" />";
-            }
-
-            yield return $@"<ProjectReference Include=""{GetProjectFilePath(benchmark.Target.Type, logger).FullName}"" />";
-        }
     }
 }

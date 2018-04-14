@@ -21,6 +21,12 @@ namespace BenchmarkDotNet.Environments
         /// </summary>
         public static readonly Runtime Core = new CoreRuntime();
 
+        /// <summary>
+        /// Cross-platform .NET Core runtime optimized for ahead of time compilation
+        /// See also: https://github.com/dotnet/corert
+        /// </summary>
+        public static readonly Runtime CoreRT = new CoreRtRuntime();
+
         public string Name { get; }
 
         protected Runtime(string name) => Name = name;
@@ -56,6 +62,13 @@ namespace BenchmarkDotNet.Environments
     public class CoreRuntime : Runtime
     {
         public CoreRuntime() : base("Core")
+        {
+        }
+    }
+
+    public class CoreRtRuntime : Runtime
+    {
+        public CoreRtRuntime() : base("CoreRT")
         {
         }
     }

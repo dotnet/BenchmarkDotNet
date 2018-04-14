@@ -4,7 +4,7 @@ In BenchmarkDotNet we generate, build and execute new console app per every benc
 
 When you run your benchmarks without specifying the toolchain in an explicit way, we use the default one. It works OOTB, you don't need to worry about anything.
 
-We use Roslyn for classic .NET and Mono, and `dotnet cli` for .NET Core.
+We use Roslyn for classic .NET and Mono, and `dotnet cli` for .NET Core and CoreRT.
 
 ## Multiple frameworks support
 
@@ -19,10 +19,10 @@ BenchmarkDotNet allows you to take full advantage of that. With single config, w
 If you specify `Runtime` in explicit way, we just choose the right toolchain for you.
 
 ```cs
-[ClrJob, MonoJob, CoreJob]
+[ClrJob, MonoJob, CoreJob, CoreRtJob]
 public class Algo_Md5VsSha256
 {
-    // the benchmarks are going to be executed for classic .NET, Mono (default path) and .NET Core
+    // the benchmarks are going to be executed for classic .NET, Mono (default path), .NET Core and CoreRT (latest version)
 }
 ```
 
@@ -32,16 +32,16 @@ At some point of time we need to choose the target framework moniker (TFM).
 
 When you are running your app with benchmark as .NET Core app, we just check the version of the `System.Runtime.dll` which allows us to decide which version of .NET Core you are using.
 
-But when you are running your project as classic .NET (.NET 4.6.2 for example), we don't know which TFM to choose for your .NET Core Runtime, so we use the default one - **netcoreapp1.1**.
+But when you are running your project as classic .NET (.NET 4.6.2 for example), we don't know which TFM to choose for your .NET Core Runtime, so we use the default one - **netcoreapp2.0**.
 
-If the default `netcoreapp1.1` is not OK for you, you must configure the toolchains in explicit way:
+If the default `netcoreapp2.0` is not OK for you, you must configure the toolchains in explicit way:
 
 ```cs
 public class MultipleRuntimes : ManualConfig
 {
     public MultipleRuntimes()
     {
-        Add(Job.Default.With(CsProjCoreToolchain.NetCoreApp20)); // .NET Core 2.0
+        Add(Job.Default.With(CsProjCoreToolchain.NetCoreApp21)); // .NET Core 2.1
 
         Add(Job.Default.With(CsProjClassicNetToolchain.Net462)); // NET 4.6.2
     }

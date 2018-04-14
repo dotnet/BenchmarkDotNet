@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
@@ -44,11 +46,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         internal static CommandResult ExecuteCommand(
-            string customDotNetCliPath, string commandWithArguments, string workingDirectory, ILogger logger, bool useSharedCompilation = false)
+            string customDotNetCliPath, string commandWithArguments, string workingDirectory, ILogger logger, 
+            IReadOnlyList<EnvironmentVariable> environmentVariables = null, bool useSharedCompilation = false)
         {
             commandWithArguments = $"{commandWithArguments} /p:UseSharedCompilation={useSharedCompilation.ToString().ToLowerInvariant()}";
 
-            using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath, workingDirectory, commandWithArguments) })
+            using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath, workingDirectory, commandWithArguments, environmentVariables) })
             {
                 var stopwatch = Stopwatch.StartNew();
                 process.Start();
@@ -69,7 +72,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         internal static string GetDotNetSdkVersion()
         {
-            using (var process = new Process { StartInfo = BuildStartInfo(arguments: "--version", workingDirectory: string.Empty, customDotNetCliPath: null) })
+            using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath: null, workingDirectory: string.Empty, arguments: "--version") })
             {
                 try
                 {
@@ -90,8 +93,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        internal static ProcessStartInfo BuildStartInfo(string customDotNetCliPath, string workingDirectory, string arguments, bool redirectStandardInput = false) 
-            => new ProcessStartInfo
+        internal static ProcessStartInfo BuildStartInfo(string customDotNetCliPath, string workingDirectory, string arguments,
+            IReadOnlyList<EnvironmentVariable> environmentVariables = null, bool redirectStandardInput = false)
+        {
+            var startInfo = new ProcessStartInfo
             {
                 FileName = customDotNetCliPath ?? "dotnet",
                 WorkingDirectory = workingDirectory,
@@ -102,5 +107,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 RedirectStandardError = true,
                 RedirectStandardInput = redirectStandardInput
             };
+
+            if (environmentVariables != null)
+                foreach (var environmentVariable in environmentVariables)
+                    startInfo.EnvironmentVariables[environmentVariable.Key] = environmentVariable.Value;
+
+            return startInfo;
+        }
     }
 }
