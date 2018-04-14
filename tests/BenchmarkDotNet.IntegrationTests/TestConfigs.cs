@@ -1,13 +1,12 @@
 ﻿using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
     public class SingleJobConfig : ManualConfig
     {
-        public SingleJobConfig([NotNull] Job job)
+        public SingleJobConfig(Job job)
         {
             Add(job);
         }
