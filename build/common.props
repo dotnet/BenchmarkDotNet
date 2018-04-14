@@ -14,6 +14,8 @@
 
     <CLSCompliant>true</CLSCompliant>
     <ComVisible>false</ComVisible>
+	
+    <UseSharedCompilation>false</UseSharedCompilation>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(IsVisualBasic)' != 'true' And '$(TargetFramework)' == 'net46' ">

@@ -279,6 +279,17 @@ namespace BenchmarkDotNet.Running
 
                 logger.WriteLineHeader($"// ***** Done, took {globalChronometer.GetElapsed().GetTimeSpan().ToFormattedTotalTime()}   *****");
 
+                if (buildPartitions.Length <= 1 || !buildResults.Values.Any(result => !result.IsBuildSuccess && result.BuildException.Message.Contains("cannot access")))
+                    return buildResults;
+
+                logger.WriteLineHeader("// ***** Failed to build in Parallel, switching to sequential build..   *****");
+
+                foreach (var buildPartition in buildPartitions)
+                    if(!buildResults[buildPartition].IsBuildSuccess && buildResults[buildPartition].BuildException.Message.Contains("cannot access"))
+                        buildResults[buildPartition] = Build(buildPartition, rootArtifactsFolderPath, buildLogger);
+
+                logger.WriteLineHeader($"// ***** Done, took {globalChronometer.GetElapsed().GetTimeSpan().ToFormattedTotalTime()}   *****");
+
                 return buildResults;
             }
         }
