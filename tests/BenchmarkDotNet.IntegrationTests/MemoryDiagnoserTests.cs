@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.IntegrationTests
 #if NETCOREAPP2_1 
                 // we don't want to test CoreRT twice (for .NET 4.6 and Core 2.1) when running the integration tests (these tests take a lot of time)
                 // we test against specific version to keep this test stable
-                new object[] { CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-26412-02").ToToolchain() }
+                new object[] { CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-26414-01").ToToolchain() }
 #endif
             };
 

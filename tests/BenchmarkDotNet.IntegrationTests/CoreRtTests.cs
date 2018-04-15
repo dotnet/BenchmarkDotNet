@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .With(Job.Dry
                     .With(Runtime.CoreRT)
                     .With(CoreRtToolchain.CreateBuilder()
-                        .UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-26412-02") // we test against specific version to keep this test stable
+                        .UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-26414-01") // we test against specific version to keep this test stable
                         .ToToolchain()));
 
             CanExecute<CoreRtBenchmark>(config);
