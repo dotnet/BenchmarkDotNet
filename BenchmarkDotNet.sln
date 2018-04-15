@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.6
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D6597E3A-6892-4A68-8E14-042FC941FDA2}"
 EndProject
@@ -25,10 +25,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Integration
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.IntegrationTests.EnabledOptimizations", "tests\BenchmarkDotNet.IntegrationTests.EnabledOptimizations\BenchmarkDotNet.IntegrationTests.EnabledOptimizations.csproj", "{873581FF-DB9D-42E5-8F11-32A4B7BB28EC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Core", "src\BenchmarkDotNet.Core\BenchmarkDotNet.Core.csproj", "{95F5D645-19E3-432F-95D4-C5EA374DD15B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Toolchains.Roslyn", "src\BenchmarkDotNet.Toolchains.Roslyn\BenchmarkDotNet.Toolchains.Roslyn.csproj", "{F5785871-7E2C-4894-85DE-A28EACB1D9B5}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Samples", "samples\BenchmarkDotNet.Samples\BenchmarkDotNet.Samples.csproj", "{EB38672B-12AB-465E-8132-B0E323A510C8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Tests", "tests\BenchmarkDotNet.Tests\BenchmarkDotNet.Tests.csproj", "{45FE17A7-0E04-48C0-8CDC-493CDA449F7A}"
@@ -40,6 +36,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Disassembler.x64", "src\BenchmarkDotNet.Disassembler.x64\BenchmarkDotNet.Disassembler.x64.csproj", "{E5A0833C-B633-4D62-B645-A927CEBFEEBB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Disassembler.x86", "src\BenchmarkDotNet.Disassembler.x86\BenchmarkDotNet.Disassembler.x86.csproj", "{D189AAB3-46B4-4437-8E9C-72F021AB2B6E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.IntegrationTests.ManualRunning", "tests\BenchmarkDotNet.IntegrationTests.ManualRunning\BenchmarkDotNet.IntegrationTests.ManualRunning.csproj", "{9816D316-95C4-42E6-9E7B-A256C7E5D4BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,14 +77,6 @@ Global
 		{873581FF-DB9D-42E5-8F11-32A4B7BB28EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{873581FF-DB9D-42E5-8F11-32A4B7BB28EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{873581FF-DB9D-42E5-8F11-32A4B7BB28EC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{95F5D645-19E3-432F-95D4-C5EA374DD15B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{95F5D645-19E3-432F-95D4-C5EA374DD15B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{95F5D645-19E3-432F-95D4-C5EA374DD15B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{95F5D645-19E3-432F-95D4-C5EA374DD15B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F5785871-7E2C-4894-85DE-A28EACB1D9B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F5785871-7E2C-4894-85DE-A28EACB1D9B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F5785871-7E2C-4894-85DE-A28EACB1D9B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F5785871-7E2C-4894-85DE-A28EACB1D9B5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EB38672B-12AB-465E-8132-B0E323A510C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EB38672B-12AB-465E-8132-B0E323A510C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB38672B-12AB-465E-8132-B0E323A510C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -111,6 +101,10 @@ Global
 		{D189AAB3-46B4-4437-8E9C-72F021AB2B6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D189AAB3-46B4-4437-8E9C-72F021AB2B6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D189AAB3-46B4-4437-8E9C-72F021AB2B6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9816D316-95C4-42E6-9E7B-A256C7E5D4BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9816D316-95C4-42E6-9E7B-A256C7E5D4BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9816D316-95C4-42E6-9E7B-A256C7E5D4BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9816D316-95C4-42E6-9E7B-A256C7E5D4BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -124,13 +118,15 @@ Global
 		{D8803ECA-4ABF-45B8-BD1D-7C637416C448} = {14195214-591A-45B7-851A-19D3BA2413F9}
 		{AC2188E5-A140-43E2-8A76-4BDABFE30ABA} = {14195214-591A-45B7-851A-19D3BA2413F9}
 		{873581FF-DB9D-42E5-8F11-32A4B7BB28EC} = {14195214-591A-45B7-851A-19D3BA2413F9}
-		{95F5D645-19E3-432F-95D4-C5EA374DD15B} = {D6597E3A-6892-4A68-8E14-042FC941FDA2}
-		{F5785871-7E2C-4894-85DE-A28EACB1D9B5} = {D6597E3A-6892-4A68-8E14-042FC941FDA2}
 		{EB38672B-12AB-465E-8132-B0E323A510C8} = {602236FF-A83D-43BA-9EE7-A4B0BE2CA4B3}
 		{45FE17A7-0E04-48C0-8CDC-493CDA449F7A} = {14195214-591A-45B7-851A-19D3BA2413F9}
 		{6A3CBB07-E337-488E-BDAC-ED96AF8ED608} = {14195214-591A-45B7-851A-19D3BA2413F9}
 		{043F1DA4-CD51-45FD-805E-6571D67AA661} = {14195214-591A-45B7-851A-19D3BA2413F9}
 		{E5A0833C-B633-4D62-B645-A927CEBFEEBB} = {D6597E3A-6892-4A68-8E14-042FC941FDA2}
 		{D189AAB3-46B4-4437-8E9C-72F021AB2B6E} = {D6597E3A-6892-4A68-8E14-042FC941FDA2}
+		{9816D316-95C4-42E6-9E7B-A256C7E5D4BF} = {14195214-591A-45B7-851A-19D3BA2413F9}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4D9AF12B-1F7F-45A7-9E8C-E4E46ADCBD1F}
 	EndGlobalSection
 EndGlobal

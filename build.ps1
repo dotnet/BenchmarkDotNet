@@ -32,7 +32,7 @@ Param(
 )
 
 $CakeVersion = "0.26.1"
-$DotNetVersion = "2.1.101";
+$DotNetVersion = "2.1.300-preview1-008174";
 $DotNetInstallerUri = "https://dot.net/v1/dotnet-install.ps1";
 $NugetUrl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
 
@@ -72,8 +72,6 @@ if (!(Test-Path $InstallPath)) {
 }
 (New-Object System.Net.WebClient).DownloadFile($DotNetInstallerUri, "$InstallPath\dotnet-install.ps1");
 & $InstallPath\dotnet-install.ps1 -Version $DotNetVersion -InstallDir $InstallPath
-# We need to install the additional .NET Core runtime to run backward compatibility tests
-& $InstallPath\dotnet-install.ps1 -SharedRuntime -Version 1.1.7 -InstallDir $InstallPath;
 
 Remove-PathVariable "$InstallPath"
 $env:PATH = "$InstallPath;$env:PATH"

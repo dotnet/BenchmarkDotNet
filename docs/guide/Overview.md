@@ -5,7 +5,7 @@
 Create new console application and install the [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/) NuGet package. We support:
 
 * *Projects:* `*.csproj` (classic and modern with PackageReferences), `*.xproj`/`project.json`
-* *Runtimes:* Full .NET Framework (4.6+), .NET Core (1.1+), Mono
+* *Runtimes:* Full .NET Framework (4.6+), .NET Core (2.0+), Mono, CoreRT
 * *OS:* Windows, Linux, MacOS
 * *Languages:* C#, F#, VB
 
@@ -76,33 +76,37 @@ Frequency=2143476 Hz, Resolution=466.5319 ns, Timer=TSC
 
 ## Jobs
 
-You can check several environments at once. For example, you can compare performance of Full .NET Framework, .NET Core, and Mono. Just add the `ClrJob`, `MonoJob`, `CoreJob` attributes before the class declaration (it requires a .NETCore project, installed CoreCLR and Mono):
+You can check several environments at once. For example, you can compare performance of Full .NET Framework, .NET Core, Mono and CoreRT. Just add the `ClrJob`, `MonoJob`, `CoreJob`, `CoreRtJob` attributes before the class declaration (it requires a .NETCore project, installed CoreCLR and Mono):
 
 ```cs
-[ClrJob, MonoJob, CoreJob]
+[ClrJob, MonoJob, CoreJob, CoreRtJob]
 public class Md5VsSha256
 ```
 
 Example of the result:
 
 ```ini
-BenchmarkDotNet=v0.10.1, OS=Microsoft Windows NT 6.2.9200.0
-Processor=Intel(R) Core(TM) i7-4702MQ CPU 2.20GHz, ProcessorCount=8
-Frequency=2143476 Hz, Resolution=466.5319 ns, Timer=TSC
-  [Host] : Clr 4.0.30319.42000, 64bit RyuJIT-v4.6.1586.0
-  Clr    : Clr 4.0.30319.42000, 64bit RyuJIT-v4.6.1586.0
-  Core   : .NET Core 4.6.24628.01, 64bit RyuJIT
-  Mono   : Mono 4.6.2 (Visual Studio built mono), 64bit
+BenchmarkDotNet=v0.11.0, OS=Windows 10.0.16299.309 (1709/FallCreatorsUpdate/Redstone3)
+Intel Xeon CPU E5-1650 v4 3.60GHz, 1 CPU, 12 logical and 6 physical cores
+Frequency=3507504 Hz, Resolution=285.1030 ns, Timer=TSC
+.NET Core SDK=2.1.300-preview1-008174
+  [Host]     : .NET Core 2.1.0-preview1-26216-03 (CoreCLR 4.6.26216.04, CoreFX 4.6.26216.02), 64bit RyuJIT
+  Job-YRHGTP : .NET Framework 4.7.1 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2633.0
+  Core       : .NET Core 2.1.0-preview1-26216-03 (CoreCLR 4.6.26216.04, CoreFX 4.6.26216.02), 64bit RyuJIT
+  CoreRT     : .NET CoreRT 1.0.26414.01, 64bit AOT
+  Mono       : Mono 5.10.0 (Visual Studio), 64bit 
 
-
- Method |  Job | Runtime |        Mean |    StdDev | Allocated |
-------- |----- |-------- |------------ |---------- |---------- |
- Sha256 |  Clr |     Clr | 130.5169 us | 1.8489 us |     188 B |
-    Md5 |  Clr |     Clr |  25.8010 us | 0.1757 us |     113 B |
- Sha256 | Core |    Core |  57.6534 us | 0.8210 us |     113 B |
-    Md5 | Core |    Core |  24.2675 us | 0.0687 us |      80 B |
- Sha256 | Mono |    Mono | 182.8917 us | 7.5126 us |       N/A |
-    Md5 | Mono |    Mono |  46.0745 us | 1.4978 us |       N/A |
+| Method | Runtime |       Mean |     Error |    StdDev |
+|------- |-------- |-----------:|----------:|----------:|
+| Sha256 |     Clr |  75.780 us | 1.0445 us | 0.9771 us |
+| Sha256 |    Core |  41.134 us | 0.2185 us | 0.1937 us |
+| Sha256 |  CoreRT |  40.895 us | 0.0804 us | 0.0628 us |
+| Sha256 |    Mono | 141.377 us | 0.5598 us | 0.5236 us |
+|        |         |            |           |           |
+|    Md5 |     Clr |  18.575 us | 0.0727 us | 0.0644 us |
+|    Md5 |    Core |  17.562 us | 0.0436 us | 0.0408 us |
+|    Md5 |  CoreRT |  17.447 us | 0.0293 us | 0.0244 us |
+|    Md5 |    Mono |  34.500 us | 0.1553 us | 0.1452 us |
 ```
 
 There are a lot of predefined jobs which you can use. For example, you can compare `LegacyJitX86` vs `LegacyJitX64` vs `RyuJitX64`:
@@ -123,7 +127,7 @@ public class Md5VsSha256
         {
             Add(new Job(EnvMode.LegacyJitX86, EnvMode.Clr, RunMode.Dry)
                 {
-                    Env = { Runtime = Runtime.Core },
+                    Env = { Runtime = Runtime.Clr },
                     Run = { LaunchCount = 3, WarmupCount = 5, TargetCount = 10 },
                     Accuracy = { MaxStdErrRelative = 0.01 }
                 }));
@@ -143,10 +147,10 @@ You can also add custom columns to the summary table:
 public class Md5VsSha256
 ```
 
-| Method | Median      | StdDev    | Min         | Max         |      |
-| ------ | ----------- | --------- | ----------- | ----------- | ---- |
-| Sha256 | 131.3200 us | 4.6744 us | 129.8216 us | 147.7630 us |      |
-| Md5    | 26.2847 us  | 0.4424 us | 25.8442 us  | 27.4258 us  |      |
+| Method | Median      | StdDev    | Min         | Max         |
+| ------ | ----------- | --------- | ----------- | ----------- |
+| Sha256 | 131.3200 us | 4.6744 us | 129.8216 us | 147.7630 us |
+| Md5    | 26.2847 us  | 0.4424 us | 25.8442 us  | 27.4258 us  |
 
 Of course, you can define own columns based on full benchmark summary.
 

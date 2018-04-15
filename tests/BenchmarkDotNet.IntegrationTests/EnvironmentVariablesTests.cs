@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using Xunit;
@@ -16,9 +15,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
         }
 
-#if !NETCOREAPP1_1 // ProcessStartInfo.EnvironmentVariables is avaialable for .NET Core 2.0+
         [Fact]
-#endif
         public void UserCanSpecifyEnvironmentVariables()
         {
             var variables = new [] { new EnvironmentVariable(Key, Value) };

@@ -2,7 +2,7 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests.DisabledOptimizations</AssemblyTitle>
-    <TargetFrameworks>net46;netcoreapp1.1;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>net46;netcoreapp2.0;netcoreapp2.1</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BenchmarkDotNet.IntegrationTests.DisabledOptimizations</AssemblyName>
     <PackageId>BenchmarkDotNet.IntegrationTests.DisabledOptimizations</PackageId>
@@ -14,9 +14,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' ">
-    <PackageReference Include="System.ComponentModel.EventBasedAsync" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="2.0.0" />

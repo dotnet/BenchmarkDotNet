@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void UserCanSpecifyCustomBuildConfiguration()
         {
-            var toolchain = RuntimeInformation.IsClassic()
+            var toolchain = RuntimeInformation.IsFullFramework
                 ? CsProjClassicNetToolchain.Net46 // no support for Roslyn toolchain for this feature
                 : CsProjCoreToolchain.Current.Value;
 

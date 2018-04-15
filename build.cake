@@ -26,6 +26,8 @@ Setup(_ =>
         Information("Build will use FrameworkPathOverride={0} since not building on Windows.", frameworkPathOverride);
         msBuildSettings.WithProperty("FrameworkPathOverride", frameworkPathOverride);
     }
+    
+    msBuildSettings.WithProperty("UseSharedCompilation", "false");
 });
 
 Task("Clean")
@@ -62,25 +64,14 @@ Task("FastTests")
     .Does(() =>
     {
         string[] targetVersions = IsRunningOnWindows() ? 
-                new []{"net46", "netcoreapp1.1", "netcoreapp2.0"}
+                new []{"net46", "netcoreapp2.1"}
                 :
-                new []{"netcoreapp1.1", "netcoreapp2.0"};
+                new []{"netcoreapp2.1"};
 
         foreach(var version in targetVersions)
         {
             DotNetCoreTool("./tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj", "xunit", GetTestSettingsParameters(version));
         }
-    });
-
-Task("BackwardCompatibilityTests")
-    .IsDependentOn("Build")
-    .WithCriteria(!skipTests)
-    .Does(() =>
-    {
-        var testSettings = GetTestSettingsParameters("netcoreapp1.1");
-        testSettings += " -trait \"Category=BackwardCompatibility\"";
-
-        DotNetCoreTool(integrationTestsProjectPath, "xunit", testSettings);
     });
     
 Task("SlowTestsNet46")
@@ -96,7 +87,7 @@ Task("SlowTestsNetCore2")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
-        DotNetCoreTool(integrationTestsProjectPath, "xunit", GetTestSettingsParameters("netcoreapp2.0"));
+        DotNetCoreTool(integrationTestsProjectPath, "xunit", GetTestSettingsParameters("netcoreapp2.1"));
     });       
 
 Task("Pack")
@@ -122,9 +113,8 @@ Task("Default")
     .IsDependentOn("Restore")
     .IsDependentOn("Build")
     .IsDependentOn("FastTests")
-    .IsDependentOn("SlowTestsNet46")
     .IsDependentOn("SlowTestsNetCore2")
-    .IsDependentOn("BackwardCompatibilityTests")
+    .IsDependentOn("SlowTestsNet46")
     .IsDependentOn("Pack");
 
 RunTarget(target);
@@ -132,14 +122,10 @@ RunTarget(target);
 // HELPERS
 private string GetTestSettingsParameters(string tfm)
 {
-    var settings = $"-configuration {configuration} -stoponfail -maxthreads unlimited -nobuild  -framework {tfm}";
-    if(string.Equals("netcoreapp2.0", tfm, StringComparison.OrdinalIgnoreCase))
+    var settings = $"-configuration {configuration} -parallel none -nobuild  -framework {tfm}";
+    if(string.Equals("netcoreapp2.1", tfm, StringComparison.OrdinalIgnoreCase))
     {
-        settings += " --fx-version 2.0.6";
-    }
-    if(string.Equals("netcoreapp1.1", tfm, StringComparison.OrdinalIgnoreCase))
-    {
-        settings += " --fx-version 1.1.7";
+        settings += " --fx-version 2.1.0-preview1-26216-03";
     }
     
     return settings;

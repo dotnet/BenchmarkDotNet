@@ -2,7 +2,7 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests</AssemblyTitle>
-    <TargetFrameworks>net46;netcoreapp1.1;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>net46;netcoreapp2.0;netcoreapp2.1</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BenchmarkDotNet.IntegrationTests</AssemblyName>
     <PackageId>BenchmarkDotNet.IntegrationTests</PackageId>
@@ -38,9 +38,6 @@
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' ">
-    <PackageReference Include="System.ComponentModel.EventBasedAsync" Version="4.3.0" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.4.1" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">

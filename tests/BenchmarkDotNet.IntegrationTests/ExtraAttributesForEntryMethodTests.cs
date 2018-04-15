@@ -1,8 +1,6 @@
-﻿#if !NETCOREAPP1_1
-using System.Threading;
+﻿using System.Threading;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.IntegrationTests.Xunit;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -29,4 +27,3 @@ namespace BenchmarkDotNet.IntegrationTests
         }
     }
 }
-#endif

@@ -5,7 +5,7 @@ using BenchmarkDotNet.Attributes.Jobs;
 
 namespace BenchmarkDotNet.Samples.Algorithms
 {    
-    [ClrJob, MonoJob, CoreJob]
+    [ClrJob, MonoJob, CoreJob, CoreRtJob]
     public class Algo_Md5VsSha256
     {
         private const int N = 10000;

@@ -68,41 +68,17 @@ namespace BenchmarkDotNet.Running
             var effectiveConfig = ManualConfig.Union(config ?? DefaultConfig.Instance, ManualConfig.Parse(args));
             bool join = args.Any(arg => arg.EqualsWithIgnoreCase("--join"));
 
-            if (join)
-            {
-                var typesWithMethods = typeParser.MatchingTypesWithMethods(args);
-                var benchmarks = typesWithMethods.Select(typeWithMethods =>
+            var benchmarks = typeParser.MatchingTypesWithMethods(args)
+                .Select(typeWithMethods =>
                     typeWithMethods.AllMethodsInType
                         ? BenchmarkConverter.TypeToBenchmarks(typeWithMethods.Type, effectiveConfig)
-                        : BenchmarkConverter.MethodsToBenchmarks(typeWithMethods.Type, typeWithMethods.Methods, effectiveConfig)).ToArray();
-                summaries.Add(BenchmarkRunner.Run(benchmarks));
-            }
-            else
-            {
-                foreach (var typeWithMethods in typeParser.MatchingTypesWithMethods(args))
-                {
-                    logger.WriteLineHeader("Target type: " + typeWithMethods.Type.GetDisplayName());
-                    if (typeWithMethods.AllMethodsInType)
-                        summaries.Add(BenchmarkRunner.Run(typeWithMethods.Type, effectiveConfig));
-                    else
-                        summaries.Add(BenchmarkRunner.Run(typeWithMethods.Type, typeWithMethods.Methods, effectiveConfig));
-                    logger.WriteLine();
-                }
-            }
+                        : BenchmarkConverter.MethodsToBenchmarks(typeWithMethods.Type, typeWithMethods.Methods, effectiveConfig))
+                .ToArray();
 
-            // TODO: move this logic to the RunUrl method
-#if CLASSIC
-            if (args.Length > 0 && (args[0].StartsWith("http://") || args[0].StartsWith("https://")))
-            {
-                var url = args[0];
-                Uri uri = new Uri(url);
-                var name = uri.IsFile ? Path.GetFileName(uri.LocalPath) : "URL";
-                summaries.Add(BenchmarkRunner.RunUrl(url, effectiveConfig));
-            }
-#endif
+            summaries.AddRange(BenchmarkRunner.Run(benchmarks, effectiveConfig, summaryPerType: !join));
 
             var clockSpan = globalChronometer.GetElapsed();
-            BenchmarkRunnerCore.LogTotalTime(logger, clockSpan.GetTimeSpan(), "Global total time");
+            BenchmarkRunner.LogTotalTime(logger, clockSpan.GetTimeSpan(), "Global total time");
             return summaries;
         }
 

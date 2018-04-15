@@ -1,5 +1,4 @@
-﻿#if !NETCOREAPP1_1
-using System;
+﻿using System;
 using System.Configuration;
 using BenchmarkDotNet.Attributes;
 using Xunit;
@@ -28,4 +27,3 @@ namespace BenchmarkDotNet.IntegrationTests
         }
     }
 }
-#endif

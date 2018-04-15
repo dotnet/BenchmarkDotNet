@@ -6,6 +6,6 @@ namespace BenchmarkDotNet.Tests.XUnit
     {
         private const string Message = "Test requires CLR";
 
-        public override string Skip => base.Skip ?? (RuntimeInformation.IsClassic() ? null : Message);
+        public override string Skip => base.Skip ?? (RuntimeInformation.IsFullFramework ? null : Message);
     }
 }
