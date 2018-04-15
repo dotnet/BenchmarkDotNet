@@ -12,7 +12,8 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
 {
     /// <summary>
     /// generates new csproj file for self-contained .NET Core RT app
-    /// based on https://github.com/dotnet/corert/blob/master/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md and https://github.com/dotnet/corert/tree/master/samples/HelloWorld#add-corert-to-your-project
+    /// based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built 
+    /// and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project
     /// </summary>
     public class Generator : CsProjGenerator
     {

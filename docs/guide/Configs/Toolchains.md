@@ -240,3 +240,79 @@ public class TypeWithBenchmarks
 {
 }
 ```
+
+## CoreRT
+
+BenchmarkDotNet supports [CoreRT](https://github.com/dotnet/corert)! However, you might want to know how it works to get a better understanding of the results that you get.
+
+* CoreRT is a flavor of .NET Core. Which means that:
+  *  you have to target .NET Core to be able to build CoreRT benchmarks (`<TargetFramework>netcoreapp2.1</TargetFramework>` in the .csproj file)
+  *  you have to specify the CoreRT runtime in an explicit way, either by using `[CoreRtJob]` attribute or by using the fluent Job config API `Job.ShortRun.With(Runtime.CoreRT)`
+  *  to run CoreRT benchmark you run the app as a .NET Core/.NET process (`dotnet run -c Release -f netcoreapp2.1`) and BenchmarkDotNet does all the CoreRT compilation for you. If you want to check what files are generated you need to apply `[KeepBenchmarkFiles]` attribute to the class which defines benchmarks.
+
+By default BenchmarkDotNet uses the latest version of `Microsoft.DotNet.ILCompiler` to build the CoreRT benchmark according to [this instructions](https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project).
+
+```cs
+var config = DefaultConfig.Instance
+    .With(Job.Default.With(Runtime.CoreRT)); // uses the latest CoreRT version
+
+BenchmarkSwitcher
+    .FromAssembly(typeof(Program).Assembly)
+    .Run(args, config);
+```
+
+```cs
+[CoreRtJob] // uses the latest CoreRT version
+public class TheTypeWithBenchmarks
+{
+   [Benchmark] // the benchmarks go here
+}
+```
+
+**Note**: BenchmarkDotNet is going to run `dotnet restore` on the auto-generated project. The first time it does so, it's going to take a **LOT** of time to download all the dependencies (few minutes). Just give it some time and don't press `Ctrl+C` too fast ;)
+
+If you want to benchmark some particular version of CoreRT you have to specify it in an explicit way:
+
+```cs
+var config = DefaultConfig.Instance
+    .With(Job.ShortRun
+        .With(Runtime.CoreRT)
+        .With(CoreRtToolchain.CreateBuilder()
+            .UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-26412-02") // the version goes here
+            .DisplayName("CoreRT NuGet")
+            .ToToolchain()));
+```
+
+### Compiling source to native code using the ILCompiler you built
+
+If you are an CoreRT contributor and you want to benchmark your local build of CoreRT you have to provide necessary info (IlcPath):
+
+```cs
+var config = DefaultConfig.Instance
+    .With(Job.ShortRun
+        .With(Runtime.CoreRT)
+        .With(CoreRtToolchain.CreateBuilder()
+            .UseCoreRtLocal(@"C:\Projects\corert\bin\Windows_NT.x64.Release") // IlcPath
+            .DisplayName("Core RT RyuJit")
+            .ToToolchain()));
+```
+
+BenchmarkDotNet is going to follow [these instructrions](https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built) to get it working for you.
+
+### Using CPP Code Generator
+
+> This approach uses transpiler to convert IL to C++, and then uses platform specific C++ compiler and linker for compiling/linking the application. The transpiler is a lot less mature than the RyuJIT path. If you came here to give CoreRT a try on your .NET Core program, use the RyuJIT option above.
+
+If you want to test [CPP Code Generator](https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#using-cpp-code-generator) you have to use `UseCppCodeGenerator` method:
+
+```cs
+var config = DefaultConfig.Instance
+    .With(Job.CoreRT.With(
+        CoreRtToolchain.CreateBuilder()
+            .UseCoreRtLocal(@"C:\Projects\corert\bin\Windows_NT.x64.Release") // IlcPath
+            .UseCppCodeGenerator() // ENABLE IT
+            .DisplayName("CPP")
+            .ToToolchain()));
+```
+
+**Note**: You might get some `The method or operation is not implemented.` errors as of today if the code that you are trying to benchmark is using some features that are not implemented by CoreRT/transpiler yet...

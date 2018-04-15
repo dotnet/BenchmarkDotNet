@@ -74,7 +74,7 @@ BenchmarkDotNet allows designing a performance experiment in a user-friendly dec
 At the end of an experiment, it will generate a summary table which contains only important data in a compact and understandable form:
 
 ```
-BenchmarkDotNet=v0.10.14.20180414-develop, OS=Windows 10.0.16299.309 (1709/FallCreatorsUpdate/Redstone3)
+BenchmarkDotNet=v0.11.0, OS=Windows 10.0.16299.309 (1709/FallCreatorsUpdate/Redstone3)
 Intel Xeon CPU E5-1650 v4 3.60GHz, 1 CPU, 12 logical and 6 physical cores
 Frequency=3507504 Hz, Resolution=285.1030 ns, Timer=TSC
 .NET Core SDK=2.1.300-preview1-008174

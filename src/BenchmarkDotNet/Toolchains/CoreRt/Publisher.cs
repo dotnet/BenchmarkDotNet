@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
             return $"{extraArguments} {base.GetExtraArguments(buildPartition)}";
         }
 
-        // https://github.com/dotnet/corert/blob/master/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built
+        // https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built
         // we have to pass IlcPath env var to get it working
         protected override IReadOnlyList<EnvironmentVariable> GetEnvironmentVariables()
             => IlcPath == null

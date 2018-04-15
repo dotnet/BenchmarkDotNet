@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
                 .With(Job.DryCoreRT.With(
                     CoreRtToolchain.CreateBuilder()
                         .UseCoreRtLocal(IlcPath)
-                        .UseCppCodeGenerator() // https://github.com/dotnet/corert/blob/master/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#using-cpp-code-generator
+                        .UseCppCodeGenerator() // https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#using-cpp-code-generator
                         .ToToolchain()));
 
             CanExecute<CoreRtBenchmark>(config);

@@ -161,8 +161,10 @@ namespace BenchmarkDotNet.IntegrationTests
 
             foreach (var benchmarkAllocationsValidator in benchmarksAllocationsValidators)
             {
+                // CoreRT is missing some of the CoreCLR threading/task related perf improvements, so sizeof(Task<int>) calculated for CoreCLR < sizeof(Task<int>) on CoreRT
+                // see https://github.com/dotnet/corert/issues/5705 for more
                 if (benchmarkAllocationsValidator.Key == nameof(AccurateAllocations.AllocateTask) && toolchain is CoreRtToolchain)
-                    continue; // https://github.com/dotnet/corert/issues/5705
+                    continue; 
 
                 var allocatingBenchmarks = benchmarks.Benchmarks.Where(benchmark => benchmark.DisplayInfo.Contains(benchmarkAllocationsValidator.Key));
 
@@ -187,7 +189,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private IConfig CreateConfig(IToolchain toolchain) 
             => ManualConfig.CreateEmpty()
-                .With(Job.ShortRun.WithGcForce(false).With(toolchain))
+                .With(Job.ShortRun.WithEvaluateOverhead(false).WithWarmupCount(0).WithGcForce(false).With(toolchain)) // don't run warmup to save some time for our CI runs
                 .With(DefaultConfig.Instance.GetLoggers().ToArray())
                 .With(DefaultColumnProviders.Instance)
                 .With(MemoryDiagnoser.Default)
