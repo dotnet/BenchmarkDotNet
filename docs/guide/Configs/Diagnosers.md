@@ -117,7 +117,22 @@ You need to use the `DisassemblyDiagnoser` attribute to configure it. The availa
 * printAsm: ASM will be printed. True by default.
 * printSource: C# source code will be printed. False by default.
 * printPrologAndEpilog: ASM for prolog and epilog will be printed. False by default.
-* recursiveDepth: Includes called methods to given level. 1 by default, indexed from 1. To print just benchmark set to 0
+* recursiveDepth: Includes called methods to given level. 1 by default, indexed from 1. To print just benchmark set to 0 
+
+### Requirements
+
+Disassembly Diagnoser requires following settings in your `.csproj` file:
+
+```xml
+<PropertyGroup>
+  <PlatformTarget>AnyCPU</PlatformTarget>
+  <DebugType>pdbonly</DebugType>
+  <DebugSymbols>true</DebugSymbols>
+</PropertyGroup>
+```
+
+To get the source code we need to locate and read the `.pdb` files. This is why we need `DebugType` and `DebugSymbols` settings.
+To compare different platforms the project which defines benchmarks has to target `AnyCPU`.
 
 ### Sample
 
@@ -178,6 +193,14 @@ The easiest way to get these tools:
 
 You can use a single config to compare the generated assembly code for ALL JITs. 
 
+But to allow benchmarking any target platform architecture the project which defines benchmarks has to target **AnyCPU**. 
+
+```xml
+<PropertyGroup>
+  <PlatformTarget>AnyCPU</PlatformTarget>
+</PropertyGroup>
+```
+
 ```cs
 public class MultipleJits : ManualConfig
 {
@@ -191,11 +214,11 @@ public class MultipleJits : ManualConfig
 
         Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Clr));
 
-        // RyuJit for .NET Core 1.1
-        Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp11));
-
         // RyuJit for .NET Core 2.0
         Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp20));
+
+        // RyuJit for .NET Core 2.1
+        Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp21));
 
         Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(printAsm: true, printPrologAndEpilog: true, recursiveDepth: 3)));
     }
@@ -228,6 +251,23 @@ public class Jit_Devirtualization
 
 The disassembly result can be obtained [here](http://adamsitnik.com/files/disasm/Jit_Devirtualization-disassembly-report.html). The file was too big to embed it in this doc page.
 
+### Getting only the Disassembly without running the benchmarks for a long time
+
+Sometimes you might be interested only in the disassembly, not the results of the benchmarks. In that case you can use **Job.Dry** which runs the benchmark only **once**.
+
+```cs
+public class JustDisassembly : ManualConfig
+{
+    public JustDisassembly()
+    {
+        Add(Job.Dry.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp20));
+        Add(Job.Dry.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp21));
+
+        Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(printAsm: true, printPrologAndEpilog: true, recursiveDepth: 3)));
+    }
+}
+```
+
 ## Restrictions
 
 * In order to not affect main results we perform a separate run if any diagnoser is used. That's why it might take more time to execute benchmarks.
@@ -244,6 +284,7 @@ The disassembly result can be obtained [here](http://adamsitnik.com/files/disasm
     * .NET Core disassembler works only on Windows
     * Mono disassembler does not support recursive disassembling and produces output without IL and C#.
     * Indirect calls are not tracked.
+    * To be able to compare different platforms, you need to target AnyCPU `<PlatformTarget>AnyCPU</PlatformTarget>`
     * To get the corresponding C#/F# code from disassembler you need to configure your project in following way:
 
 ```xml
