@@ -38,6 +38,9 @@ namespace BenchmarkDotNet.Running
 
         public static BenchmarkSwitcher FromAssembly(Assembly assembly) => new BenchmarkSwitcher(assembly);
 
+        public static BenchmarkSwitcher FromAssemblyAndTypes(Assembly assembly, Type[] types) 
+            => new BenchmarkSwitcher(assembly.GetRunnableBenchmarks().Concat(types).ToArray());
+
         /// <summary>
         /// Run all available benchmarks.
         /// </summary>
