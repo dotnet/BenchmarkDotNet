@@ -152,6 +152,31 @@ namespace BenchmarkDotNet.IntegrationTests
             });
         }
 
+        public class WithOperationsPerInvokeBenchmarks
+        {
+            [Benchmark(OperationsPerInvoke = 4)]
+            public void WithOperationsPerInvoke()
+            {
+                DoNotInline(new object(), new object());
+                DoNotInline(new object(), new object());
+            }
+
+            [MethodImpl(MethodImplOptions.NoInlining)]
+            private void DoNotInline(object left, object right) { }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains))]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
+        public void AllocatedMemoryShouldBeScaledForOperationsPerInvoke(IToolchain toolchain)
+        {
+            long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
+
+            AssertAllocations(toolchain, typeof(WithOperationsPerInvokeBenchmarks), new Dictionary<string, long>
+            {
+                { nameof(WithOperationsPerInvokeBenchmarks.WithOperationsPerInvoke), objectAllocationOverhead + IntPtr.Size }
+            });
+        }
+
         private void AssertAllocations(IToolchain toolchain, Type benchmarkType, Dictionary<string, long> benchmarksAllocationsValidators)
         {
             var config = CreateConfig(toolchain);

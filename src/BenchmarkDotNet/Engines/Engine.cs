@@ -171,7 +171,7 @@ namespace BenchmarkDotNet.Engines
 
             IterationCleanupAction(); // we run iteration cleanup after collecting GC stats 
 
-            return (finalGcStats - initialGcStats).WithTotalOperations(data.InvokeCount);
+            return (finalGcStats - initialGcStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
         }
 
         private void GcCollect()
