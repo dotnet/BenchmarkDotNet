@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.Characteristics
@@ -25,32 +26,9 @@ namespace BenchmarkDotNet.Characteristics
 
                 var value = characteristic[obj];
                 if (!(value is string) && value is IEnumerable collection)
-                    return ToPresentation(collection);
+                    return collection.Join(ToPresentation, ",", "Empty");
 
                 return ToPresentation(value);
-            }
-
-            // string.Join(separator, nonGenericCollection) is translated to string.Join(separator, params object[]) with single object!! (collection)
-            // and ends up with exact the same output as collection.ToString() (typeName[])
-            // so I needed to implement this on my own
-            private static string ToPresentation(IEnumerable collection)
-            {
-                var buffer = new StringBuilder();
-                bool first = true;
-                foreach (var item in collection)
-                {
-                    if (!first)
-                        buffer.Append(',');
-                    else
-                        first = false;
-
-                    buffer.Append(ToPresentation(item));
-                }
-
-                if (buffer.Length == 0)
-                    return "Empty";
-
-                return buffer.ToString();
             }
 
             private static string ToPresentation(object value)
