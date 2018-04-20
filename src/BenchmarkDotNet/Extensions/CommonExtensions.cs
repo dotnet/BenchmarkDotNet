@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Environments;
@@ -7,7 +6,6 @@ using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Reports;
 using System.IO;
-using System.Text;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -115,29 +113,6 @@ namespace BenchmarkDotNet.Extensions
                 Directory.CreateDirectory(directoryPath);
 
             return directoryPath;
-        }
-
-        // string.Join(separator, nonGenericCollection) is translated to string.Join(separator, params object[]) with single object!! (collection)
-        // and ends up with exact the same output as collection.ToString() (typeName[])
-        // so I needed to implement this on my own
-        internal static string Join(this IEnumerable collection, Func<object, string> map, string delimiter, string defaultValue)
-        {
-            var buffer = new StringBuilder();
-            bool first = true;
-            foreach (var item in collection)
-            {
-                if (!first)
-                    buffer.Append(delimiter);
-                else
-                    first = false;
-
-                buffer.Append(map(item));
-            }
-
-            if (buffer.Length == 0)
-                return defaultValue;
-
-            return buffer.ToString();
         }
     }
 }

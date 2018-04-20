@@ -1,16 +1,41 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Exporters
 {
-    public class BenchViewExporter
+    public class BenchViewExporter : JsonExporterBase
     {
-        public static string GetBenchmarkName(Benchmark benchmark)
+        /// <summary>
+        /// Utf8 with indent JSON
+        /// </summary>
+        public static readonly IExporter Default = new BenchViewExporter();
+
+        /// <param name="encoding">if not provided, Utf8 will be used</param>
+        /// <param name="benchmarkNameProvider">if not provided, the default implementation will be used</param>
+        /// <param name="indentJson">true by default</param>
+        public BenchViewExporter(Encoding encoding = null, Func<Benchmark, string> benchmarkNameProvider = null, bool indentJson = true) : base(indentJson, excludeMeasurements: false)
+        {
+            Encoding = encoding ?? Encoding.UTF8;
+            BenchmarkNameProvider = benchmarkNameProvider ?? GetBenchmarkName;
+        }
+
+        protected override void BeforeSerialize(Dictionary<string, object> data, Benchmark benchmark) 
+            => data["xUnitName"] = BenchmarkNameProvider(benchmark);
+
+        protected override string FileNameSuffix => "-xunit";
+
+        protected override Encoding Encoding { get; }
+
+        private Func<Benchmark, string> BenchmarkNameProvider { get; }
+
+        internal static string GetBenchmarkName(Benchmark benchmark)
         {
             var type = benchmark.Target.Type;
             var method = benchmark.Target.Method;
@@ -78,9 +103,36 @@ namespace BenchmarkDotNet.Exporters
                 return time.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss.fffffffK");
 
             if (argumentType != null && argumentType.IsArray)
-                return $"[{((IEnumerable) argumentValue).Join(value => GetArgument(value, null), ", ", string.Empty)}]";
+                return GetArray((IEnumerable)argumentValue);
 
             return argumentValue.ToString();
+        }
+
+        // it's not generic so I can't simply use .Skip and all other LINQ goodness
+        private static string GetArray(IEnumerable collection)
+        {
+            var buffer = new StringBuilder().Append('[');
+
+            int index = 0;
+            foreach (var item in collection)
+            {
+                if (index > 0)
+                    buffer.Append(", ");
+
+                if (index > 4)
+                {
+                    buffer.Append("..."); // [0, 1, 2, 3, 4, ...]
+                    break;
+                }
+
+                buffer.Append(GetArgument(item, item.GetType()));
+
+                ++index;
+            }
+
+            buffer.Append(']');
+
+            return buffer.ToString();
         }
     }
 }

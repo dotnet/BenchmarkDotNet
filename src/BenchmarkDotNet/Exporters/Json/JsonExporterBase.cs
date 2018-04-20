@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Running;
 using JsonSerialiser = SimpleJson.SimpleJson;
-using BenchmarkDotNet.Diagnosers;
 
 namespace BenchmarkDotNet.Exporters.Json
 {
@@ -64,6 +64,8 @@ namespace BenchmarkDotNet.Exporters.Json
                     { "Statistics", r.ResultStatistics },
                 };
 
+                BeforeSerialize(data, r.Benchmark);
+
                 // We show MemoryDiagnoser's results only if it is being used
                 if(summary.Config.HasMemoryDiagnoser())
                 {
@@ -95,5 +97,12 @@ namespace BenchmarkDotNet.Exporters.Json
                 { "Benchmarks", benchmarks }
             }));
         }
+
+        /// <summary>
+        /// override this method if you want to add/remove/update something in derived serializer
+        /// </summary>
+        /// <param name="data">predefined data, before serialization</param>
+        /// <param name="benchmark">benchmark which is being serialized</param>
+        protected virtual void BeforeSerialize(Dictionary<string, object> data, Benchmark benchmark) { }
     }
 }

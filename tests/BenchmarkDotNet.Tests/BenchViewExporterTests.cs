@@ -69,6 +69,10 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void UnicodeIsSupported() 
             => AssertBenchmarkName<WithCrazyUnicodeCharacters>("BenchmarkDotNet.Tests.WithCrazyUnicodeCharacters.Method(arg1: \"" + "FOO" + "\", arg2: \""+ "\u03C3" + "\", arg3: \"" + "x\u0305" + "\")");
+
+        [Fact]
+        public void VeryLongArraysAreSupported()
+            => AssertBenchmarkName<WithBigArray>("BenchmarkDotNet.Tests.WithBigArray.Method(array: [0, 1, 2, 3, 4, ...])");
     }
 
     public class Level0
@@ -178,6 +182,18 @@ namespace BenchmarkDotNet.Tests
         public IEnumerable<object[]> Data()
         {
             yield return new object[] { "FOO", "\u03C3", "x\u0305" }; // https://github.com/Microsoft/xunit-performance/blob/f1d1d62a934694d8cd19063e60e04c590711d904/tests/simpleharness/Program.cs#L29
+        }
+    }
+
+    public class WithBigArray
+    {
+        [Benchmark]
+        [ArgumentsSource(nameof(Data))]
+        public void Method(int[] array) { }
+
+        public IEnumerable<object[]> Data()
+        {
+            yield return new object[] { ArrayParam<int>.ForPrimitives(Enumerable.Range(0, 100).ToArray()) };
         }
     }
 }
