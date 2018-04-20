@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Attributes
 
         public ParamsAttribute(params object[] values)
         {
-            Values = values;
+            Values = values ?? new object[] { null }; // when users do Params(null) they mean one, null argument
         }
     }
 }
