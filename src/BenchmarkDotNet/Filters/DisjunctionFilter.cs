@@ -7,10 +7,7 @@ namespace BenchmarkDotNet.Filters
     {
         private readonly IFilter[] filters;
 
-        public DisjunctionFilter(params IFilter[] filters)
-        {
-            this.filters = filters;
-        }
+        public DisjunctionFilter(params IFilter[] filters) => this.filters = filters;
 
         public bool Predicate(Benchmark benchmark) => filters.Any(filter => filter.Predicate(benchmark));
     }

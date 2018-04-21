@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Running
 {
@@ -40,170 +40,53 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        internal string[] ReadArgumentList(string[] args)
+        internal IEnumerable<TypeWithMethods> GetAll() => allTypes.Select(type => new TypeWithMethods(type));
+
+        internal IEnumerable<TypeWithMethods> AskUser()
         {
-            while (args.Length == 0)
+            if (allTypes.IsEmpty())
+            {
+                logger.WriteError("No benchmarks to choose from. Make sure you provided public types with public [Benchmark] methods.");
+                return Array.Empty<TypeWithMethods>();
+            }
+
+            var selectedTypes = new List<TypeWithMethods>();
+            var benchmarkCaptionExample = allTypes.First().GetDisplayName();
+
+            while (selectedTypes.Count == 0)
             {
                 PrintAvailable();
-                var benchmarkCaptionExample = allTypes.Length == 0 ? "Intro_00" : allTypes.First().GetDisplayName();
-                logger.WriteLineHelp(
-                    $"You should select the target benchmark. Please, print a number of a benchmark (e.g. '0') or a benchmark caption (e.g. '{benchmarkCaptionExample}'):");
-                var line = Console.ReadLine() ?? "";
-                args = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                
+                logger.WriteLineHelp($"You should select the target benchmark(s). Please, print a number of a benchmark (e.g. '0') or a contained benchmark caption (e.g. '{benchmarkCaptionExample}'):");
+                logger.WriteLineHelp("If you want to select few, please separate them with space ` ` (e.g. `1 2 3`)");
+
+                var userInput = Console.ReadLine() ?? "";
+
+                selectedTypes.AddRange(GetMatching(userInput.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)));
                 logger.WriteLine();
             }
-            return args;
+
+            return selectedTypes;
         }
 
-        internal IEnumerable<TypeWithMethods> MatchingTypesWithMethods(string[] args)
+        internal IEnumerable<TypeWithMethods> GetMatching(string[] userInput)
         {
-            var filters = BuildPredicates(args);
+            if (userInput.IsEmpty())
+                yield break;
 
             for (int i = 0; i < allTypes.Length; i++)
             {
                 var type = allTypes[i];
-                var typeInfo = type.GetTypeInfo();
 
-                if (args.Any(arg => type.GetDisplayName().ToLower().StartsWith(arg.ToLower()))
-                    || args.Contains("#" + i)
-                    || args.Contains("" + i)
-                    || args.Contains("*"))
+                if (userInput.Any(arg => type.GetDisplayName().ContainsWithIgnoreCase(arg))
+                    || userInput.Contains("#" + i)
+                    || userInput.Contains("" + i)
+                    || userInput.Contains("*"))
                 {
                     yield return new TypeWithMethods(type);
-                    continue;
-                }
-
-                if(filters.areEmpty)
-                    continue;
-
-                if (!filters.typePredicates.All(filter => filter(typeInfo)))
-                    continue;
-
-                if (filters.methodPredicates.IsEmpty())
-                {
-                    yield return new TypeWithMethods(type);
-                    continue;
-                }
-
-                var allBenchmarks = typeInfo.GetBenchmarks();
-                var benchmarks = allBenchmarks
-                    .Where(method => filters.methodPredicates.All(rule => rule(method)))
-                    .ToArray();
-
-                if (benchmarks.IsEmpty())
-                    continue;
-
-                if(allBenchmarks.Length == benchmarks.Length)
-                    yield return new TypeWithMethods(type);
-                else
-                    yield return new TypeWithMethods(type, benchmarks);
-            }
-        }
-
-        private (List<Predicate<TypeInfo>> typePredicates, List<Predicate<MethodInfo>> methodPredicates, bool areEmpty) BuildPredicates(string[] args)
-        {
-            var rules = BuildRules(args);
-
-            var typePredicates = new List<Predicate<TypeInfo>>();
-            var methodPredicates = new List<Predicate<MethodInfo>>();
-
-            if (rules.namespaces.Any())
-                typePredicates.Add(type => rules.namespaces.Contains(type.Namespace));
-
-            if (rules.classes.Any())
-                typePredicates.Add(type => rules.classes.Contains(type.GetDisplayName()) || rules.classes.Contains(type.FullName));
-
-            if (rules.attributes.Any())
-            {
-                typePredicates.Add(type =>
-                {
-                    var customTypeAttributes =
-                        type.GetCustomAttributes(true)
-                            .Select(attribute => attribute.GetType().GetTypeInfo())
-                            .ToArray();
-
-                    var customMethodsAttributes =
-                        type.GetBenchmarks()
-                            .SelectMany(method => method.GetCustomAttributes(true)
-                                .Select(attribute => attribute.GetType().GetTypeInfo()))
-                            .ToArray();
-
-                    var allCustomAttributes = customTypeAttributes.Union(customMethodsAttributes).Distinct().ToArray();
-
-                    return
-                        allCustomAttributes.Any(
-                            attribute => rules.attributes.Contains(attribute.Name)
-                                         || rules.attributes.Contains(attribute.Name.Replace("Attribute", string.Empty)));
-                });
-
-                methodPredicates.Add(method =>
-                {
-                    var customTypeAttributes =
-                        method.DeclaringType.GetTypeInfo().GetCustomAttributes(true)
-                            .Select(attribute => attribute.GetType().GetTypeInfo())
-                            .ToArray();
-
-                    var customMethodsAttributes = method.GetCustomAttributes(true)
-                        .Select(attribute => attribute.GetType().GetTypeInfo())
-                        .ToArray();
-
-                    var allCustomAttributes = customTypeAttributes.Union(customMethodsAttributes).Distinct().ToArray();
-
-                    return allCustomAttributes.Any(
-                            attribute => rules.attributes.Contains(attribute.Name)
-                                         || rules.attributes.Contains(attribute.Name.Replace("Attribute", string.Empty)));
-                });
-            }
-
-            if (rules.methods.Any())
-            {
-                methodPredicates.Add(method =>
-                    rules.methods.Contains(method.Name)
-                    || rules.methods.Contains($"{method.DeclaringType.FullName}.{method.Name}"));
-            }
-
-            return (typePredicates, methodPredicates, typePredicates.IsEmpty() && methodPredicates.IsEmpty());
-        }
-
-        private (HashSet<string> methods, HashSet<string> classes, HashSet<string> namespaces, HashSet<string> attributes) BuildRules(string[] args)
-        {
-            var methods = new HashSet<string>();
-            var classes = new HashSet<string>();
-            var namespaces = new HashSet<string>();
-            var attributes = new HashSet<string>();
-
-            foreach (var arg in args.Where(arg => arg.Contains("=")))
-            {
-                var split = arg.Split('=');
-                var values = split[1].Split(',');
-                var argument = split[0].ToLowerInvariant();
-                // Allow both "--arg=<value>" and "arg=<value>" (i.e. with and without the double dashes)
-                argument = argument.StartsWith(OptionPrefix) ? argument.Remove(0, 2) : argument;
-
-                switch (argument)
-                {
-                    case "method":
-                    case "methods":
-                        values.ForEach(methodName => methods.Add(methodName));
-                        break;
-                    case "class":
-                    case "classes":
-                        values.ForEach(typeName => classes.Add(typeName));
-                        break;
-                    case "namespace":
-                    case "namespaces":
-                        values.ForEach(@namespace => namespaces.Add(@namespace));
-                        break;
-                    case "attribute":
-                    case "attributes":
-                        values.ForEach(attribute => attributes.Add(attribute));
-                        break;
                 }
             }
-
-            return (methods, classes, namespaces, attributes);
         }
-
 
         internal void PrintOptions(int prefixWidth, int outputWidth)
         {
