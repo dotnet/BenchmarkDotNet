@@ -4,9 +4,9 @@ There are two recommended options to build BenchmarkDotNet from source:
 
 ## Option A (Windows only) - Visual Studio
 
-- [Visual Studio 2017 version 15.5 Preview 4 or higher](https://www.visualstudio.com/downloads/) (Community, Professional, Enterprise).
+- [Visual Studio 2017 version 15.7 Preview 4 or higher](https://www.visualstudio.com/downloads/) (Community, Professional, Enterprise).
 
-- Visual Studio 2017 should have installed the .NET Core SDK, but in case it did not you can get it from the [Installing the .Net Core SDK page](https://www.microsoft.com/net/core).
+- Visual Studio 2017 doesn't have installed necessary the .NET Core SDK 2.1 Preview 1, but you can get it from the [Installing the .Net Core SDK page](https://www.microsoft.com/net/download/dotnet-core/sdk-2.1.300-preview1). You may also need [.NET Core Runtime 2.1 Preview 1](https://www.microsoft.com/net/download/dotnet-core/runtime-2.1.0-preview1).
 
 - Visual Studio 2017 should have installed “F# language support” feature. You can also install the support [directly as a separate download](https://www.microsoft.com/en-us/download/details.aspx?id=48179).
 
