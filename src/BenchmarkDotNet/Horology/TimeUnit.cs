@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Horology
         public TimeInterval ToInterval(long value = 1) => new TimeInterval(value, this);
 
         public static readonly TimeUnit Nanosecond = new TimeUnit("ns", "Nanosecond", 1);
-        public static readonly TimeUnit Microsecond = new TimeUnit("us", "Microsecond", 1000);
+        public static readonly TimeUnit Microsecond = new TimeUnit("us", "Microsecond", 1000); // TODO \u03BC
         public static readonly TimeUnit Millisecond = new TimeUnit("ms", "Millisecond", 1000 * 1000);
         public static readonly TimeUnit Second = new TimeUnit("s", "Second", 1000 * 1000 * 1000);
         public static readonly TimeUnit Minute = new TimeUnit("m", "Minute", Second.NanosecondAmount * 60);
