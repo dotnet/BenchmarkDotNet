@@ -34,6 +34,8 @@ namespace BenchmarkDotNet.Encodings
         
         public override string ToString() => GetString();
 
+        public string ToString(Encoding encoding) => GetStringByEncoding(encoding);
+
         public string GetString() => GetStringByEncoding(EncodingInfo.CurrentEncoding);
 
         private string GetStringByEncoding(Encoding encoding)
