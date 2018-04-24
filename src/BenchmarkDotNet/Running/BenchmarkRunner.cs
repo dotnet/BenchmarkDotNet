@@ -179,8 +179,13 @@ namespace BenchmarkDotNet.Running
             }
             var clockSpan = globalChronometer.GetElapsed();
 
-            var summary = new Summary(title, reports, HostEnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), clockSpan.GetTimeSpan(), 
-                Validate(new[] {benchmarkRunInfo }, NullLogger.Instance)); // validate them once again, but don't print the output
+            var summary = new Summary(title,
+                                      reports,
+                                      HostEnvironmentInfo.GetCurrent(),
+                                      config,
+                                      GetResultsFolderPath(rootArtifactsFolderPath),
+                                      clockSpan.GetTimeSpan(), 
+                                      Validate(new[] {benchmarkRunInfo }, NullLogger.Instance)); // validate them once again, but don't print the output
 
             logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
             logger.WriteLine();
@@ -195,18 +200,7 @@ namespace BenchmarkDotNet.Running
 
             logger.WriteLineHeader("// * Detailed results *");
 
-            // TODO: make exporter
-            foreach (var report in reports)
-            {
-                logger.WriteLineInfo(report.Benchmark.DisplayInfo);
-                logger.WriteLineStatistic($"Runtime = {report.GetRuntimeInfo()}; GC = {report.GetGcInfo()}");
-                var resultRuns = report.GetResultRuns();
-                if (resultRuns.IsEmpty())
-                    logger.WriteLineError("There are not any results runs");
-                else
-                    logger.WriteLineStatistic(resultRuns.GetStatistics().ToTimeStr(calcHistogram: true));
-                logger.WriteLine();
-            }
+            BenchmarkReportExporter.Default.ExportToLog(summary, logger);
 
             LogTotalTime(logger, clockSpan.GetTimeSpan());
             logger.WriteLine();
