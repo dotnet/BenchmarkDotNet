@@ -15,6 +15,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
         [Fact]
         public void ArgumentsFromSourceArePassedToBenchmarks() => CanExecute<WithArgumentsSource>();
+
+        [Fact]
+        public void ArgumentsCanBePassedByReferenceToBenchmark() => CanExecute<WithRefArguments>();
     }
 
     public class WithArguments
@@ -43,6 +46,18 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             yield return new object[] { true, 1};
             yield return new object[] { false, 2 };
+        }
+    }
+
+    public class WithRefArguments
+    {
+        [Benchmark]
+        [Arguments(true, 1)]
+        [Arguments(false, 2)]
+        public void Simple(ref bool boolean, ref int number)
+        {
+            if (boolean && number != 1 || !boolean && number != 2)
+                throw new InvalidOperationException("Incorrect values were passed");
         }
     }
 

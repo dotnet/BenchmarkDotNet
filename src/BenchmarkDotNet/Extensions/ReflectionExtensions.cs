@@ -26,6 +26,12 @@ namespace BenchmarkDotNet.Extensions
         internal static bool IsNullable(this Type type) => Nullable.GetUnderlyingType(type) != null;
 
         /// <summary>
+        /// returns type name which can be used in generated C# code without `&` in the type name for by-ref
+        /// </summary>
+        internal static string GetCorrectCSharpTypeNameWithoutRef(this Type type)
+            => GetCorrectCSharpTypeName(type).Replace("&", string.Empty);
+
+        /// <summary>
         /// returns type name which can be used in generated C# code
         /// </summary>
         internal static string GetCorrectCSharpTypeName(this Type type)
