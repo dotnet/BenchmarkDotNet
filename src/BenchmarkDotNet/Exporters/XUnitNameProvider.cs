@@ -1,40 +1,14 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using BenchmarkDotNet.Exporters.Json;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Exporters
 {
-    public class BenchViewExporter : JsonExporterBase
+    internal class XUnitNameProvider 
     {
-        /// <summary>
-        /// Utf8 with indent JSON
-        /// </summary>
-        public static readonly IExporter Default = new BenchViewExporter();
-
-        /// <param name="encoding">if not provided, Utf8 will be used</param>
-        /// <param name="benchmarkNameProvider">if not provided, the default implementation will be used</param>
-        /// <param name="indentJson">true by default</param>
-        public BenchViewExporter(Encoding encoding = null, Func<Benchmark, string> benchmarkNameProvider = null, bool indentJson = true) : base(indentJson, excludeMeasurements: false)
-        {
-            Encoding = encoding ?? Encoding.UTF8;
-            BenchmarkNameProvider = benchmarkNameProvider ?? GetBenchmarkName;
-        }
-
-        protected override void BeforeSerialize(Dictionary<string, object> data, Benchmark benchmark) 
-            => data["xUnitName"] = BenchmarkNameProvider(benchmark);
-
-        protected override string FileNameSuffix => "-xunit";
-
-        protected override Encoding Encoding { get; }
-
-        private Func<Benchmark, string> BenchmarkNameProvider { get; }
-
         internal static string GetBenchmarkName(Benchmark benchmark)
         {
             var type = benchmark.Target.Type;

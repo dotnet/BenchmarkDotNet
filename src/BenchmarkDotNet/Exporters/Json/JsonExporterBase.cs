@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Running;
 using JsonSerialiser = SimpleJson.SimpleJson;
 
 namespace BenchmarkDotNet.Exporters.Json
@@ -60,11 +59,10 @@ namespace BenchmarkDotNet.Exporters.Json
                     { "Method", r.Benchmark.Target.Method.Name },
                     { "MethodTitle", r.Benchmark.Target.MethodDisplayInfo },
                     { "Parameters", r.Benchmark.Parameters.PrintInfo },
+                    { "FullName", XUnitNameProvider.GetBenchmarkName(r.Benchmark) }, // do NOT remove this property, it is used for xunit-performance migration
                     // { "Properties", r.Benchmark.Job.ToSet().ToDictionary(p => p.Name, p => p.Value) }, // TODO
                     { "Statistics", r.ResultStatistics },
                 };
-
-                BeforeSerialize(data, r.Benchmark);
 
                 // We show MemoryDiagnoser's results only if it is being used
                 if(summary.Config.HasMemoryDiagnoser())
@@ -97,12 +95,5 @@ namespace BenchmarkDotNet.Exporters.Json
                 { "Benchmarks", benchmarks }
             }));
         }
-
-        /// <summary>
-        /// override this method if you want to add/remove/update something in derived serializer
-        /// </summary>
-        /// <param name="data">predefined data, before serialization</param>
-        /// <param name="benchmark">benchmark which is being serialized</param>
-        protected virtual void BeforeSerialize(Dictionary<string, object> data, Benchmark benchmark) { }
     }
 }

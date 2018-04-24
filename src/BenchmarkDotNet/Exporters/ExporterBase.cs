@@ -17,7 +17,6 @@ namespace BenchmarkDotNet.Exporters
         protected virtual string FileExtension => "txt";
         protected virtual string FileNameSuffix => string.Empty;
         protected virtual string FileCaption => "report";
-        protected virtual Encoding Encoding => null;
 
         public abstract void ExportToLog(Summary summary, ILogger logger);
 
@@ -39,8 +38,8 @@ namespace BenchmarkDotNet.Exporters
                     filePath = alternativeFilePath;
                 }
             }
-            
-            using (var stream = Portability.StreamWriter.FromPath(filePath, encoding: Encoding))
+
+            using (var stream = Portability.StreamWriter.FromPath(filePath))
             {
                 ExportToLog(summary, new StreamLogger(stream));
             }

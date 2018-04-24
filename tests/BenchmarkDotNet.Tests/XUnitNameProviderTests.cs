@@ -10,13 +10,13 @@ using Xunit;
 
 namespace BenchmarkDotNet.Tests
 {
-    public class BenchViewExporterTests
+    public class XUnitNameProviderTests
     {
         private void AssertBenchmarkName<T>(string expectedBenchmarkName)
         {
             var benchmark = BenchmarkConverter.TypeToBenchmarks(typeof(T)).Benchmarks.Single();
 
-            Assert.Equal(expectedBenchmarkName, BenchViewExporter.GetBenchmarkName(benchmark));
+            Assert.Equal(expectedBenchmarkName, XUnitNameProvider.GetBenchmarkName(benchmark));
         }
 
         [Fact]
