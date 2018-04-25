@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Tests
 
         [Fact]
         public void GenericArgumentsAreSupported() 
-            => AssertBenchmarkName<SimpleGeneric<int>>("BenchmarkDotNet.Tests.SimpleGeneric`1.Method"); // generics use `
+            => AssertBenchmarkName<SimpleGeneric<int>>("BenchmarkDotNet.Tests.SimpleGeneric<Int32>.Method");
 
         [Fact]
         public void ArraysAreSupported() 

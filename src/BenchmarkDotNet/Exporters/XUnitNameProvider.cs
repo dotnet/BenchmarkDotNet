@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using BenchmarkDotNet.Parameters;
@@ -22,7 +23,7 @@ namespace BenchmarkDotNet.Exporters
 
             name.Append(GetNestedTypes(type));
 
-            name.Append(type.Name).Append('.');
+            name.Append(GetTypeName(type)).Append('.');
 
             name.Append(method.Name);
 
@@ -45,6 +46,17 @@ namespace BenchmarkDotNet.Exporters
             }
 
             return nestedTypes;
+        }
+
+        private static string GetTypeName(Type type)
+        {
+            if (!type.IsGenericType)
+                return type.Name;
+
+            var mainName = type.Name.Substring(0, type.Name.IndexOf('`'));
+            var args = string.Join(", ", type.GetGenericArguments().Select(GetTypeName).ToArray());
+
+            return $"{mainName}<{args}>";
         }
 
         private static string GetMethodArguments(MethodInfo method, ParameterInstances benchmarkParameters)
