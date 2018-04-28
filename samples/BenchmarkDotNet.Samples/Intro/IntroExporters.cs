@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Samples.Intro
     [XmlExporterAttribute.FullCompressed]
     public class IntroExporters
     {
-        private Random random = new Random(42);
+        private readonly Random random = new Random(42);
 
         [Benchmark(Baseline = true)]
         public void Sleep10() => Thread.Sleep(10);

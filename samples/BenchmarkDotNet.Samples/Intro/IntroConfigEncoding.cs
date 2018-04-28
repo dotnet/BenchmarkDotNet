@@ -3,35 +3,42 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes.Exporters;
+using BenchmarkDotNet.Attributes.Jobs;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Samples.Algorithms;
 
 namespace BenchmarkDotNet.Samples.Intro
 {
-    [MyConfigSource(Jit.LegacyJit, Jit.RyuJit)]
     public class IntroConfigEncoding
     {
-        /// <summary>
-        /// Dry-x64 jobs for specific jits
-        /// </summary>
-        private class MyConfigSourceAttribute : Attribute, IConfigSource
+        private const int N = 1002;
+        private readonly ulong[] numbers;
+        private readonly Random random = new Random(42);
+        
+        public IntroConfigEncoding()
         {
-            public IConfig Config { get; private set; }
-
-            public MyConfigSourceAttribute(params Jit[] jits)
-            {
-                var jobs = jits
-                    .Select(jit => new Job(Job.Dry) { Env = { Jit = jit, Platform = Platform.X64 } })
-                    .ToArray();
-                Config = ManualConfig.CreateEmpty().With(jobs).With(Encoding.Unicode);
-            }
+            numbers = new ulong[N];
+            for (int i = 0; i < N; i++)
+                numbers[i] = NextUInt64();
+        }
+        
+        public ulong NextUInt64()
+        {
+            var buffer = new byte[sizeof(long)];
+            random.NextBytes(buffer);
+            return BitConverter.ToUInt64(buffer, 0);
         }
 
         [Benchmark]
         public double Foo()
         {
-            return Math.Sqrt(2);
+            int counter = 0;
+            for (int i = 0; i < N / 2; i++)
+                counter += BitCountHelper.PopCountParallel2(numbers[i],numbers[i+1]);
+            return counter;
         }
     }
 }

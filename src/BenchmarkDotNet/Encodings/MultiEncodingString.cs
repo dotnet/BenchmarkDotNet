@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -40,8 +41,7 @@ namespace BenchmarkDotNet.Encodings
 
         private string GetStringByEncoding(Encoding encoding)
         {
-            string encodedString;
-            if (_encodedStrings.TryGetValue(encoding.EncodingName, out encodedString))
+            if (_encodedStrings.TryGetValue(encoding.EncodingName, out string encodedString))
                 return encodedString;
             
             return _encodedStrings.TryGetValue(GetFallback().EncodingName, out encodedString)

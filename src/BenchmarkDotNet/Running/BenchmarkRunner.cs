@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Running
             var artifactsToCleanup = new List<string>();
             var title = GetTitle(benchmarkRunInfos);
             
-            EncodingInfo.CurrentEncoding = commonSettingsConfig.Encoding;
+            EncodingInfo.CurrentEncoding = commonSettingsConfig.Encoding ?? EncodingInfo.DefaultEncoding;
 
             var rootArtifactsFolderPath = (commonSettingsConfig?.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath).CreateIfNotExists();
 
