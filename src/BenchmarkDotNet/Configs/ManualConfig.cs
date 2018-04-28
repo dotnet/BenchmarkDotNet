@@ -63,6 +63,7 @@ namespace BenchmarkDotNet.Configs
         public void Add(params IFilter[] newFilters) => filters.AddRange(newFilters);
         public void Set(IOrderProvider provider) => orderProvider = provider ?? orderProvider;
         public void Set(ISummaryStyle style) => summaryStyle = style ?? summaryStyle;
+        public void Set(Encoding encoding) => Encoding = encoding;
         public void Add(params BenchmarkLogicalGroupRule[] rules) => AddRules(rules);
 
         public void Add(IConfig config)

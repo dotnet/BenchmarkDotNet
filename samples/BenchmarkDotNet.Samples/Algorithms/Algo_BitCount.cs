@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Samples.Algorithms
             return counter;
         }
 
-        //[Benchmark]
+        [Benchmark]
         public int PopCount2()
         {
             int counter = 0;
@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Samples.Algorithms
             return counter;
         }
 
-        //[Benchmark]
+        [Benchmark]
         public int PopCount3()
         {
             int counter = 0;
@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Samples.Algorithms
             return counter;
         }
 
-        //[Benchmark]
+        [Benchmark]
         public int PopCount4()
         {
             int counter = 0;
@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Samples.Algorithms
             return counter;
         }
 
-        //[Benchmark]
+        [Benchmark]
         public int PopCountParallel2()
         {
             int counter = 0;
