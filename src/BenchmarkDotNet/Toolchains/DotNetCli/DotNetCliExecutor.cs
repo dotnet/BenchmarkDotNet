@@ -52,7 +52,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        private ExecuteResult Execute(Benchmark benchmark, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths, IDiagnoser diagnoser, string executableName, IConfig config, IResolver resolver)
+        private ExecuteResult Execute(Benchmark benchmark,
+                                      BenchmarkId benchmarkId,
+                                      ILogger logger,
+                                      ArtifactsPaths artifactsPaths,
+                                      IDiagnoser diagnoser,
+                                      string executableName,
+                                      IConfig config,
+                                      IResolver resolver)
         {
             var startInfo = DotNetCliCommandExecutor.BuildStartInfo(
                 CustomDotNetCliPath,

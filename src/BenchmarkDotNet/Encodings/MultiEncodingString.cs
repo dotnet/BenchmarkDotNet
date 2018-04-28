@@ -51,7 +51,6 @@ namespace BenchmarkDotNet.Encodings
 
         private Encoding GetFallback() => Encoding.ASCII;
         
-        
         public override bool Equals(object obj)
         {
             if (!(obj is MultiEncodingString otherMes))

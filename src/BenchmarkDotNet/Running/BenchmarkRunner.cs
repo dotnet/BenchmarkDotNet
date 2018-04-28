@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Characteristics;
@@ -24,6 +25,7 @@ using BenchmarkDotNet.Toolchains.InProcess;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
+using EncodingInfo = BenchmarkDotNet.Encodings.EncodingInfo;
 using RunMode = BenchmarkDotNet.Jobs.RunMode;
 
 namespace BenchmarkDotNet.Running
@@ -72,6 +74,8 @@ namespace BenchmarkDotNet.Running
             var resolver = DefaultResolver;
             var artifactsToCleanup = new List<string>();
             var title = GetTitle(benchmarkRunInfos);
+            
+            EncodingInfo.CurrentEncoding = commonSettingsConfig.Encoding;
 
             var rootArtifactsFolderPath = (commonSettingsConfig?.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath).CreateIfNotExists();
 

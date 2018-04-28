@@ -6,6 +6,8 @@
             Runnable_$ID$ instance = new Runnable_$ID$();
             $ParamsContent$
 
+            BenchmarkDotNet.Encodings.EncodingInfo.CurrentEncoding = $Encoding$;
+
             host.WriteLine();
             foreach (var infoLine in BenchmarkEnvironmentInfo.GetCurrent().ToFormattedString())
             {

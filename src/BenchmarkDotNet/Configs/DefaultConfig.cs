@@ -12,6 +12,8 @@ using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Reports;
 using System.IO;
+using System.Text;
+using EncodingInfo = BenchmarkDotNet.Encodings.EncodingInfo;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -67,6 +69,8 @@ namespace BenchmarkDotNet.Configs
         public bool KeepBenchmarkFiles => false;
 
         public string ArtifactsPath => Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");
+
+        public Encoding Encoding => EncodingInfo.DefaultEncoding;
 
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => Array.Empty<BenchmarkLogicalGroupRule>();
 
