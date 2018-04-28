@@ -273,7 +273,7 @@ namespace BenchmarkDotNet.Running
 
                 logger.WriteLineHeader($"// ***** Done, took {globalChronometer.GetElapsed().GetTimeSpan().ToFormattedTotalTime()}   *****");
 
-                if (buildPartitions.Length <= 1 || !buildResults.Values.Any(result => !result.IsBuildSuccess && result.BuildException.Message.Contains("cannot access")))
+                if (buildPartitions.Length <= 1 || !buildResults.Values.Any(result => result.FailedToAccess))
                     return buildResults;
 
                 logger.WriteLineHeader("// ***** Failed to build in Parallel, switching to sequential build..   *****");
