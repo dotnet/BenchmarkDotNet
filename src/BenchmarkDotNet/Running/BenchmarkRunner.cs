@@ -461,13 +461,21 @@ namespace BenchmarkDotNet.Running
         {
             foreach (string path in artifactsToCleanup)
             {
-                if (Directory.Exists(path))
+                try
                 {
-                    Directory.Delete(path, recursive: true);
+                    if (Directory.Exists(path))
+                    {
+                        Directory.Delete(path, recursive: true);
+                    }
+                    else if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                    }
                 }
-                else if (File.Exists(path))
+                catch
                 {
-                    File.Delete(path);
+                    // sth is locking our auto-generated files
+                    // there is very little we can do about it
                 }
             }
         }
