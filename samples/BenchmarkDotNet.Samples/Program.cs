@@ -16,13 +16,7 @@ namespace BenchmarkDotNet.Samples
     {
         static void Main(string[] args)
         {
-            BenchmarkRunner.Run<IntroConfigEncoding>(ManualConfig
-                .Create(DefaultConfig.Instance)
-                .With(Job.RyuJitX64)
-                .With(Job.Core)
-                .With(ExecutionValidator.FailOnError)
-                .With(Encoding.Unicode));
-            //BenchmarkSwitcher.FromAssembly(typeof(Program).GetTypeInfo().Assembly).Run(args);
+            BenchmarkSwitcher.FromAssembly(typeof(Program).GetTypeInfo().Assembly).Run(args);
             Console.Read();
         }
     }

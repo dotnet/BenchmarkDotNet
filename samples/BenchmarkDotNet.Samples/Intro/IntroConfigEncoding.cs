@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Attributes.Exporters;
-using BenchmarkDotNet.Attributes.Jobs;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Samples.Algorithms;
 
 namespace BenchmarkDotNet.Samples.Intro
 {
+    [EncodingAttribute.Unicode]
     public class IntroConfigEncoding
     {
         private const int N = 1002;
