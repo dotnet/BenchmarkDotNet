@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -48,6 +49,12 @@ namespace BenchmarkDotNet.Environments
         public Lazy<string> DotNetSdkVersion { get; protected set; }
 
         /// <summary>
+        /// checks if Mono is installed
+        /// <remarks>It's expensive to call (creates new process by calling `mono --version`)</remarks>
+        /// </summary>
+        public Lazy<bool> IsMonoInstalled { get; protected set; }
+
+        /// <summary>
         /// The frequency of the timer as the number of ticks per second.
         /// </summary>
         public Frequency ChronometerFrequency { get; protected set; }
@@ -74,6 +81,7 @@ namespace BenchmarkDotNet.Environments
             HardwareTimerKind = Chronometer.HardwareTimerKind;
             JitModules = RuntimeInformation.GetJitModulesInfo();
             DotNetSdkVersion = new Lazy<string>(DotNetCliCommandExecutor.GetDotNetSdkVersion);
+            IsMonoInstalled = new Lazy<bool>(() => !string.IsNullOrEmpty(ProcessHelper.RunAndReadOutput("mono", "--version")));
             AntivirusProducts = new Lazy<ICollection<Antivirus>>(RuntimeInformation.GetAntivirusProducts);
             VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(RuntimeInformation.GetVirtualMachineHypervisor);
         }

@@ -1,7 +1,9 @@
-﻿using BenchmarkDotNet.Characteristics;
+﻿using System.IO;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Toolchains
@@ -32,6 +34,21 @@ namespace BenchmarkDotNet.Toolchains
             {
                 logger.WriteLineError($"Llvm is supported only for Mono, benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;
+            }
+
+            if (runtime is MonoRuntime mono)
+            {
+                if (string.IsNullOrEmpty(mono.CustomPath) && !HostEnvironmentInfo.GetCurrent().IsMonoInstalled.Value)
+                {
+                    logger.WriteLineError($"Mono is not installed or added to PATH, benchmark '{benchmark.DisplayInfo}' will not be executed");
+                    return false;
+                }
+
+                if (!string.IsNullOrEmpty(mono.CustomPath) && !File.Exists(mono.CustomPath))
+                {
+                    logger.WriteLineError($"We could not find Mono in provided path ({mono.CustomPath}), benchmark '{benchmark.DisplayInfo}' will not be executed");
+                    return false;
+                }
             }
 
             return true;

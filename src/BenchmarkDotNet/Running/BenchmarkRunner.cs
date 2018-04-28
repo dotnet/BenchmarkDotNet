@@ -277,7 +277,7 @@ namespace BenchmarkDotNet.Running
 
                 logger.WriteLineHeader($"// ***** Done, took {globalChronometer.GetElapsed().GetTimeSpan().ToFormattedTotalTime()}   *****");
 
-                if (buildPartitions.Length <= 1 || !buildResults.Values.Any(result => !result.IsBuildSuccess && result.BuildException.Message.Contains("cannot access")))
+                if (buildPartitions.Length <= 1 || !buildResults.Values.Any(result => result.FailedToAccess))
                     return buildResults;
 
                 logger.WriteLineHeader("// ***** Failed to build in Parallel, switching to sequential build..   *****");
@@ -468,13 +468,21 @@ namespace BenchmarkDotNet.Running
         {
             foreach (string path in artifactsToCleanup)
             {
-                if (Directory.Exists(path))
+                try
                 {
-                    Directory.Delete(path, recursive: true);
+                    if (Directory.Exists(path))
+                    {
+                        Directory.Delete(path, recursive: true);
+                    }
+                    else if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                    }
                 }
-                else if (File.Exists(path))
+                catch
                 {
-                    File.Delete(path);
+                    // sth is locking our auto-generated files
+                    // there is very little we can do about it
                 }
             }
         }
