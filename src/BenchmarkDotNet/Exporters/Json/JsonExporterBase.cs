@@ -5,7 +5,6 @@ using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using JsonSerialiser = SimpleJson.SimpleJson;
-using BenchmarkDotNet.Diagnosers;
 
 namespace BenchmarkDotNet.Exporters.Json
 {

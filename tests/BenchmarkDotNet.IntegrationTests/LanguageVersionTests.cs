@@ -1,6 +1,4 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Toolchains.CsProj;
 using Xunit;
 using Xunit.Abstractions;
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Mathematics;
 
 namespace BenchmarkDotNet.Attributes.Columns
 {

@@ -6,7 +6,6 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.Loggers;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests

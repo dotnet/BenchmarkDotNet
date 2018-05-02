@@ -7,7 +7,6 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Validators;
 

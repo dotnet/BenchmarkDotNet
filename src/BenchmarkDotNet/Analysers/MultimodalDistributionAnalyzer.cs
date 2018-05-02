@@ -1,8 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
