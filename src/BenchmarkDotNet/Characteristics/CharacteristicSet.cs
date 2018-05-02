@@ -1,7 +1,4 @@
-﻿using System;
-using BenchmarkDotNet.Jobs;
-
-namespace BenchmarkDotNet.Characteristics
+﻿namespace BenchmarkDotNet.Characteristics
 {
     public sealed class CharacteristicSet : CharacteristicObject<CharacteristicSet>
     {

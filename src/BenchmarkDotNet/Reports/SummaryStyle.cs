@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Horology;
+﻿using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Columns;
 
 namespace BenchmarkDotNet.Reports

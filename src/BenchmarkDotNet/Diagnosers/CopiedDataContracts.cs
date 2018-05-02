@@ -1,5 +1,4 @@
 ﻿using System.Xml.Serialization;
-using BenchmarkDotNet.Analysers;
 
 #pragma warning disable CS3003 // I need ulong
 namespace BenchmarkDotNet.Diagnosers

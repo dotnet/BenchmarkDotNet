@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Analysers;
