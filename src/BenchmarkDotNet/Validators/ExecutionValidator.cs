@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Validators
@@ -24,7 +25,7 @@ namespace BenchmarkDotNet.Validators
                 {
                     errors.Add(new ValidationError(
                         TreatsWarningsAsErrors,
-                        $"Failed to execute benchmark '{benchmark.DisplayInfo}', exception was: '{ex.Message}'",
+                        $"Failed to execute benchmark '{benchmark.DisplayInfo}', exception was: '{GetDisplayExceptionMessage(ex)}'",
                         benchmark));
                 }
             }

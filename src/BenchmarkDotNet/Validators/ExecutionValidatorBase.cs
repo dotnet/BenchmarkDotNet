@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
@@ -60,7 +61,7 @@ namespace BenchmarkDotNet.Validators
             {
                 errors.Add(new ValidationError(
                     TreatsWarningsAsErrors,
-                    $"Unable to create instance of {type.Name}, exception was: {ex.Message}"));
+                    $"Unable to create instance of {type.Name}, exception was: {GetDisplayExceptionMessage(ex)}"));
 
                 instance = null;
                 return false;
@@ -97,7 +98,7 @@ namespace BenchmarkDotNet.Validators
             {
                 errors.Add(new ValidationError(
                     TreatsWarningsAsErrors,
-                    $"Failed to execute [GlobalSetup] for {benchmarkTypeInstance.GetType().Name}, exception was {ex.Message}"));
+                    $"Failed to execute [GlobalSetup] for {benchmarkTypeInstance.GetType().Name}, exception was {GetDisplayExceptionMessage(ex)}"));
 
                 return false;
             }
@@ -147,7 +148,7 @@ namespace BenchmarkDotNet.Validators
                 {
                     errors.Add(new ValidationError(
                         TreatsWarningsAsErrors,
-                        $"Failed to set {paramField.Name} of {benchmarkTypeInstance.GetType().Name} to {values.First()}, exception was: {ex.Message}"));
+                        $"Failed to set {paramField.Name} of {benchmarkTypeInstance.GetType().Name} to {values.First()}, exception was: {GetDisplayExceptionMessage(ex)}"));
 
                     return false;
                 }
@@ -199,13 +200,21 @@ namespace BenchmarkDotNet.Validators
                 {
                     errors.Add(new ValidationError(
                         TreatsWarningsAsErrors,
-                        $"Failed to set {paramProperty.Name} of {benchmarkTypeInstance.GetType().Name} to {values.First()}, exception was: {ex.Message}"));
+                        $"Failed to set {paramProperty.Name} of {benchmarkTypeInstance.GetType().Name} to {values.First()}, exception was: {GetDisplayExceptionMessage(ex)}"));
 
                     return false;
                 }
             }
 
             return true;
+        }
+
+        protected static string GetDisplayExceptionMessage(Exception ex)
+        {
+            if (ex is TargetInvocationException targetInvocationException)
+                ex = targetInvocationException.InnerException;
+
+            return ex?.Message ?? "Unknown error";
         }
 
         protected abstract void ExecuteBenchmarks(object benchmarkTypeInstance, IEnumerable<Benchmark> benchmarks, List<ValidationError> errors);

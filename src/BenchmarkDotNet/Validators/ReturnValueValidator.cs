@@ -28,12 +28,9 @@ namespace BenchmarkDotNet.Validators
                 }
                 catch (Exception ex)
                 {
-                    if (ex is TargetInvocationException targetInvocationException)
-                        ex = targetInvocationException.InnerException;
-
                     errors.Add(new ValidationError(
                         TreatsWarningsAsErrors,
-                        $"Failed to set benchmark parameters: '{parameterGroup.First().Parameters.DisplayInfo}', exception was: '{ex.Message}'"));
+                        $"Failed to set benchmark parameters: '{parameterGroup.First().Parameters.DisplayInfo}', exception was: '{GetDisplayExceptionMessage(ex)}'"));
                 }
 
                 var results = new List<(Benchmark benchmark, object returnValue)>();
@@ -52,12 +49,9 @@ namespace BenchmarkDotNet.Validators
                     {
                         hasErrorsInGroup = true;
 
-                        if (ex is TargetInvocationException targetInvocationException)
-                            ex = targetInvocationException.InnerException;
-
                         errors.Add(new ValidationError(
                             TreatsWarningsAsErrors,
-                            $"Failed to execute benchmark '{benchmark.DisplayInfo}', exception was: '{ex.Message}'",
+                            $"Failed to execute benchmark '{benchmark.DisplayInfo}', exception was: '{GetDisplayExceptionMessage(ex)}'",
                             benchmark));
                     }
                 }
