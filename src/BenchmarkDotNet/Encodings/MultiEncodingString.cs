@@ -9,26 +9,26 @@ namespace BenchmarkDotNet.Encodings
     /// <remarks> Contains different variants of string for different encoding </remarks>
     public class MultiEncodingString
     {
-        private readonly Dictionary<string, string> _encodedStrings;
+        private readonly Dictionary<string, string> encodedStrings;
 
         
         public MultiEncodingString(string unicodePresentation, string asciiPresentation)
         {
-            var encodedStrings = new[]
+            var pairs = new[]
             {
                 new KeyValuePair<Encoding, string>(Encoding.Unicode, unicodePresentation),
                 new KeyValuePair<Encoding, string>(Encoding.ASCII, asciiPresentation)
             };
             
-            _encodedStrings = encodedStrings.ToDictionary(_ => _.Key.EncodingName,
-                                                          _ => _.Value);
+            encodedStrings = pairs.ToDictionary(_ => _.Key.EncodingName,
+                                                _ => _.Value);
         }
 
         public MultiEncodingString(IEnumerable<KeyValuePair<Encoding, string>> encodedStrings)
         {
             var sourceStrings = encodedStrings ?? new KeyValuePair<Encoding, string>[] { };
             
-            _encodedStrings = sourceStrings.Where(kvp => kvp.Value != null)
+            this.encodedStrings = sourceStrings.Where(kvp => kvp.Value != null)
                                            .ToDictionary(_ => _.Key.EncodingName, _ => _.Value);
         }
 
@@ -41,10 +41,10 @@ namespace BenchmarkDotNet.Encodings
 
         private string GetStringByEncoding(Encoding encoding)
         {
-            if (_encodedStrings.TryGetValue(encoding.EncodingName, out string encodedString))
+            if (encodedStrings.TryGetValue(encoding.EncodingName, out string encodedString))
                 return encodedString;
             
-            return _encodedStrings.TryGetValue(GetFallback().EncodingName, out encodedString)
+            return encodedStrings.TryGetValue(GetFallback().EncodingName, out encodedString)
                 ? encodedString
                 : null;
         }
@@ -56,14 +56,14 @@ namespace BenchmarkDotNet.Encodings
             if (!(obj is MultiEncodingString otherMes))
                 return false;
 
-            return _encodedStrings.Count == otherMes._encodedStrings.Count
-                   && _encodedStrings.All(p => otherMes._encodedStrings.ContainsKey(p.Key)
-                                               && otherMes._encodedStrings[p.Key] == p.Value);
+            return encodedStrings.Count == otherMes.encodedStrings.Count
+                   && encodedStrings.All(p => otherMes.encodedStrings.ContainsKey(p.Key)
+                                               && otherMes.encodedStrings[p.Key] == p.Value);
         }
         
         public override int GetHashCode()
         {
-            return _encodedStrings
+            return encodedStrings
                 .Aggregate(0, (current, encodedString) =>
                                current ^ encodedString.Key.GetHashCode() + encodedString.Value.GetHashCode());
         }
