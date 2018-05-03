@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess;
@@ -25,6 +28,9 @@ namespace BenchmarkDotNet.Validators
                 }
                 catch (Exception ex)
                 {
+                    if (ex is TargetInvocationException targetInvocationException)
+                        ex = targetInvocationException.InnerException;
+
                     errors.Add(new ValidationError(
                         TreatsWarningsAsErrors,
                         $"Failed to set benchmark parameters: '{parameterGroup.First().Parameters.DisplayInfo}', exception was: '{ex.Message}'"));
@@ -46,6 +52,9 @@ namespace BenchmarkDotNet.Validators
                     {
                         hasErrorsInGroup = true;
 
+                        if (ex is TargetInvocationException targetInvocationException)
+                            ex = targetInvocationException.InnerException;
+
                         errors.Add(new ValidationError(
                             TreatsWarningsAsErrors,
                             $"Failed to execute benchmark '{benchmark.DisplayInfo}', exception was: '{ex.Message}'",
@@ -56,7 +65,7 @@ namespace BenchmarkDotNet.Validators
                 if (hasErrorsInGroup || results.Count == 0)
                     continue;
 
-                if (results.Any(result => !Equals(result.returnValue, results[0].returnValue)))
+                if (results.Any(result => !InDepthEqualityComparer.Instance.Equals(result.returnValue, results[0].returnValue)))
                 {
                     errors.Add(new ValidationError(
                         TreatsWarningsAsErrors,
@@ -101,6 +110,72 @@ namespace BenchmarkDotNet.Validators
                     return result;
                 }
             }
+        }
+
+        private class InDepthEqualityComparer : IEqualityComparer
+        {
+            public static InDepthEqualityComparer Instance { get; } = new InDepthEqualityComparer();
+
+            [SuppressMessage("ReSharper", "MemberHidesStaticFromOuterClass")]
+            public new bool Equals(object x, object y)
+            {
+                if (ReferenceEquals(x, y) || object.Equals(x, y))
+                    return true;
+
+                if (x == null || y == null)
+                    return false;
+
+                return CompareEquatable(x, y) || CompareEquatable(y, x) || CompareStructural(x, y) || CompareStructural(y, x);
+            }
+
+            private static bool CompareEquatable(object x, object y)
+            {
+                var yType = y.GetType();
+
+                var equatableInterface = x.GetType().GetInterfaces().FirstOrDefault(i => i.IsGenericType
+                                                                                         && i.GetGenericTypeDefinition() == typeof(IEquatable<>)
+                                                                                         && i.GetGenericArguments().Single().IsAssignableFrom(yType));
+
+                if (equatableInterface == null)
+                    return false;
+
+                var method = equatableInterface.GetMethod(nameof(IEquatable<object>.Equals), BindingFlags.Public | BindingFlags.Instance);
+                return (bool?) method?.Invoke(x, new[] { y }) ?? false;
+            }
+
+            private bool CompareStructural(object x, object y)
+            {
+                if (x is IStructuralEquatable xStructuralEquatable)
+                    return xStructuralEquatable.Equals(y, this);
+
+                var xArray = ToStructuralEquatable(x);
+                var yArray = ToStructuralEquatable(y);
+
+                if (xArray != null && yArray != null)
+                    return Equals(xArray, yArray);
+
+                return false;
+
+                Array ToStructuralEquatable(object obj)
+                {
+                    switch (obj)
+                    {
+                        case Array array:
+                            return array;
+
+                        case IDictionary dict:
+                            return dict.Keys.Cast<object>().OrderBy(k => k).Select(k => (k, dict[k])).ToArray();
+
+                        case IEnumerable enumerable:
+                            return enumerable.Cast<object>().ToArray();
+
+                        default:
+                            return null;
+                    }
+                }
+            }
+
+            public int GetHashCode(object obj) => StructuralComparisons.StructuralEqualityComparer.GetHashCode(obj);
         }
     }
 }
