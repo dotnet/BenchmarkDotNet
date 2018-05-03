@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess;
@@ -36,7 +37,7 @@ namespace BenchmarkDotNet.Validators
                 var results = new List<(Benchmark benchmark, object returnValue)>();
                 bool hasErrorsInGroup = false;
 
-                foreach (var benchmark in parameterGroup)
+                foreach (var benchmark in parameterGroup.DistinctBy(i => i.Target.Method))
                 {
                     try
                     {

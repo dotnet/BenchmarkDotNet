@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using Xunit;
@@ -35,6 +37,26 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         public class InconsistentResults
+        {
+            [Benchmark]
+            public int Foo() => 42;
+
+            [Benchmark]
+            public int Bar() => 41;
+        }
+
+        [Fact]
+        public void NoDuplicateResultsArePrinted()
+        {
+            var validationErrors = AssertInconsistent<InconsistentResultsWithMultipleJobs>();
+            Assert.Single(validationErrors);
+
+            var allInstancesOfFoo = Regex.Matches(validationErrors.Single().Message, @"\bFoo\b");
+            Assert.Single(allInstancesOfFoo);
+        }
+
+        [DryJob, InProcess]
+        public class InconsistentResultsWithMultipleJobs
         {
             [Benchmark]
             public int Foo() => 42;
