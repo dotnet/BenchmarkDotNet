@@ -16,7 +16,6 @@ namespace BenchmarkDotNet.Samples
     {
         static void Main(string[] args)
         {
-            //BenchmarkRunner.Run<IntroConfigEncoding>();
             BenchmarkSwitcher.FromAssembly(typeof(Program).GetTypeInfo().Assembly).Run(args);
         }
     }
