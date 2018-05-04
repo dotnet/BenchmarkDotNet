@@ -77,11 +77,12 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             if (!RuntimeInformation.IsWindows())
                 return Net46; // we return .NET 4.6 which during validaiton will tell the user about lack of support
 
-            return GetCurrentVersionBasedOnWindowsRegistry();
+            return GetCurrentVersionBasedOnWindowsRegistry(true);
         }
 
         // this logic is put to a separate method to avoid any assembly loading issues on non Windows systems
-        private static IToolchain GetCurrentVersionBasedOnWindowsRegistry()
+        // Reference Assemblies exists when Developer Pack is installed
+        private static IToolchain GetCurrentVersionBasedOnWindowsRegistry(bool withRefAssemblies)
         {   
             using (var ndpKey = Microsoft.Win32.RegistryKey
                 .OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry32)
@@ -92,15 +93,15 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
                 int releaseKey = Convert.ToInt32(ndpKey.GetValue("Release"));
                 // magic numbers come from https://docs.microsoft.com/en-us/dotnet/framework/migration-guide/how-to-determine-which-versions-are-installed
-                if (releaseKey >= 461808 && Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2"))
+                if (releaseKey >= 461808 && (!withRefAssemblies || Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2")))
                     return Net472;
-                if (releaseKey >= 461308 && Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.1"))
+                if (releaseKey >= 461308 && (!withRefAssemblies || Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.1")))
                     return Net471;
-                if (releaseKey >= 460798 && Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7"))
+                if (releaseKey >= 460798 && (!withRefAssemblies || Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7")))
                     return Net47;
-                if (releaseKey >= 394802 && Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2"))
+                if (releaseKey >= 394802 && (!withRefAssemblies || Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2")))
                     return Net462;
-                if (releaseKey >= 394254 && Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1"))
+                if (releaseKey >= 394254 && (!withRefAssemblies || Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1")))
                     return Net461;
 
                 return Default;
@@ -111,7 +112,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [NotNull]
         internal static string GetCurrentNetFrameworkVersion()
         {
-            var toolchain = GetCurrentVersionBasedOnWindowsRegistry() as CsProjClassicNetToolchain;
+            var toolchain = GetCurrentVersionBasedOnWindowsRegistry(false) as CsProjClassicNetToolchain;
             if (toolchain == null)
                 return "?";
             string version = toolchain.targetFrameworkMoniker.Replace("net", "");
