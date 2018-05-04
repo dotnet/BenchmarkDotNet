@@ -53,7 +53,14 @@ namespace BenchmarkDotNet.Helpers
         
         // Reference Assemblies exists when Developer Pack is installed
         private static bool IsDeveloperPackInstalled(string version) => Directory.Exists(Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"Reference Assemblies\Microsoft\Framework\.NETFramework", 'v' + version));
+            GetProgramFilesX86DirectoryPath(), @"Reference Assemblies\Microsoft\Framework\.NETFramework", 'v' + version));
 
+        private static string GetProgramFilesX86DirectoryPath()
+        {
+            var folder = Environment.Is64BitOperatingSystem
+                ? Environment.SpecialFolder.ProgramFilesX86
+                : Environment.SpecialFolder.ProgramFiles;
+            return Environment.GetFolderPath(folder);
+        }
     }
 }
