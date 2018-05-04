@@ -238,6 +238,22 @@ namespace BenchmarkDotNet.Tests.Validators
             public override int GetHashCode() => 0;
         }
 
+        [Fact]
+        public void ConsistentBenchmarksAlteringParameterAreOmitted()
+            => AssertConsistent<ConsistentAlterParam>();
+
+        public class ConsistentAlterParam
+        {
+            [Params(10, 20, 30)]
+            public int Value { get; set; }
+
+            [Benchmark]
+            public int Foo() => ++Value;
+
+            [Benchmark]
+            public int Bar() => ++Value;
+        }
+
         private static void AssertConsistent<TBenchmark>()
         {
             var validationErrors = ReturnValueValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(TBenchmark))).ToList();

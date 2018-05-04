@@ -23,17 +23,6 @@ namespace BenchmarkDotNet.Validators
         {
             foreach (var parameterGroup in benchmarks.GroupBy(i => i.Parameters, ParameterInstancesEqualityComparer.Instance))
             {
-                try
-                {
-                    InProcessRunner.FillMembers(benchmarkTypeInstance, parameterGroup.First());
-                }
-                catch (Exception ex)
-                {
-                    errors.Add(new ValidationError(
-                        TreatsWarningsAsErrors,
-                        $"Failed to set benchmark parameters: '{parameterGroup.First().Parameters.DisplayInfo}', exception was: '{GetDisplayExceptionMessage(ex)}'"));
-                }
-
                 var results = new List<(Benchmark benchmark, object returnValue)>();
                 bool hasErrorsInGroup = false;
 
@@ -41,6 +30,7 @@ namespace BenchmarkDotNet.Validators
                 {
                     try
                     {
+                        InProcessRunner.FillMembers(benchmarkTypeInstance, benchmark);
                         var result = benchmark.Target.Method.Invoke(benchmarkTypeInstance, null);
 
                         if (benchmark.Target.Method.ReturnType != typeof(void))
