@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         // this logic is put to a separate method to avoid any assembly loading issues on non Windows systems
         // Reference Assemblies exists when Developer Pack is installed
-        private static IToolchain GetCurrentVersionBasedOnWindowsRegistry(bool withRefAssemblies)
+        private static IToolchain GetCurrentVersionBasedOnWindowsRegistry(bool withDeveloperPack)
         {   
             using (var ndpKey = Microsoft.Win32.RegistryKey
                 .OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry32)
@@ -93,20 +93,23 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
                 int releaseKey = Convert.ToInt32(ndpKey.GetValue("Release"));
                 // magic numbers come from https://docs.microsoft.com/en-us/dotnet/framework/migration-guide/how-to-determine-which-versions-are-installed
-                if (releaseKey >= 461808 && (!withRefAssemblies || Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2")))
+                if (releaseKey >= 461808 && (!withDeveloperPack || IsDeveloperPackInstalled(@"4.7.2")))
                     return Net472;
-                if (releaseKey >= 461308 && (!withRefAssemblies || Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.1")))
+                if (releaseKey >= 461308 && (!withDeveloperPack || IsDeveloperPackInstalled(@"4.7.1")))
                     return Net471;
-                if (releaseKey >= 460798 && (!withRefAssemblies || Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7")))
+                if (releaseKey >= 460798 && (!withDeveloperPack || IsDeveloperPackInstalled(@"4.7")))
                     return Net47;
-                if (releaseKey >= 394802 && (!withRefAssemblies || Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2")))
+                if (releaseKey >= 394802 && (!withDeveloperPack || IsDeveloperPackInstalled(@"4.6.2")))
                     return Net462;
-                if (releaseKey >= 394254 && (!withRefAssemblies || Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1")))
+                if (releaseKey >= 394254 && (!withDeveloperPack || IsDeveloperPackInstalled(@"4.6.1")))
                     return Net461;
 
                 return Default;
             }
         }
+
+        private static bool IsDeveloperPackInstalled(string version) => Directory.Exists(Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"Reference Assemblies\Microsoft\Framework\.NETFramework", 'v' + version));
 
         // TODO: Move to a better place
         [NotNull]
