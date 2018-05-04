@@ -24,6 +24,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI] public static readonly IToolchain Net462 = new CsProjClassicNetToolchain("net462");
         [PublicAPI] public static readonly IToolchain Net47 = new CsProjClassicNetToolchain("net47");
         [PublicAPI] public static readonly IToolchain Net471 = new CsProjClassicNetToolchain("net471");
+        [PublicAPI] public static readonly IToolchain Net472 = new CsProjClassicNetToolchain("net472");
         private static readonly IToolchain Default = Net46; // the lowest version we support
 
         [PublicAPI]
@@ -91,6 +92,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
                 int releaseKey = Convert.ToInt32(ndpKey.GetValue("Release"));
                 // magic numbers come from https://msdn.microsoft.com/en-us/library/hh925568(v=vs.110).aspx
+                if (releaseKey >= 461808 && Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2"))
+                    return Net472;
                 if (releaseKey >= 461308 && Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.1"))
                     return Net471;
                 if (releaseKey >= 460798 && Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7"))
