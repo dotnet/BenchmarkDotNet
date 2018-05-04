@@ -99,10 +99,10 @@ namespace BenchmarkDotNet.Extensions
         public static int RoundToInt(this double x) => (int) Math.Round(x);
         public static long RoundToLong(this double x) => (long) Math.Round(x);
 
-        public static IEnumerable<TItem> DistinctBy<TItem, TValue>(this IEnumerable<TItem> items, Func<TItem, TValue> selector)
+        internal static IEnumerable<TItem> DistinctBy<TItem, TValue>(this IEnumerable<TItem> items, Func<TItem, TValue> selector)
             => DistinctBy(items, selector, EqualityComparer<TValue>.Default);
 
-        public static IEnumerable<TItem> DistinctBy<TItem, TValue>(this IEnumerable<TItem> items, Func<TItem, TValue> selector, IEqualityComparer<TValue> equalityComparer)
+        internal static IEnumerable<TItem> DistinctBy<TItem, TValue>(this IEnumerable<TItem> items, Func<TItem, TValue> selector, IEqualityComparer<TValue> equalityComparer)
         {
             var seen = new HashSet<TValue>(equalityComparer);
 
