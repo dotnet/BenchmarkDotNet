@@ -91,7 +91,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                     return Default;
 
                 int releaseKey = Convert.ToInt32(ndpKey.GetValue("Release"));
-                // magic numbers come from https://msdn.microsoft.com/en-us/library/hh925568(v=vs.110).aspx
+                // magic numbers come from https://docs.microsoft.com/en-us/dotnet/framework/migration-guide/how-to-determine-which-versions-are-installed
                 if (releaseKey >= 461808 && Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2"))
                     return Net472;
                 if (releaseKey >= 461308 && Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.1"))
