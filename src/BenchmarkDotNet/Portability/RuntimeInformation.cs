@@ -189,7 +189,7 @@ namespace BenchmarkDotNet.Portability
             }
             else if (IsFullFramework)
             {
-                string frameworkVersion = CsProjClassicNetToolchain.GetCurrentNetFrameworkVersion();
+                string frameworkVersion = FrameworkVersionHelper.GetCurrentNetFrameworkVersion();
                 string clrVersion = Environment.Version.ToString();
                 return $".NET Framework {frameworkVersion} (CLR {clrVersion})";
             }

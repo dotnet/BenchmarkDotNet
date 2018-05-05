@@ -1,8 +1,9 @@
 ﻿using System;
-using System.IO;
+using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -24,7 +25,18 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI] public static readonly IToolchain Net462 = new CsProjClassicNetToolchain("net462");
         [PublicAPI] public static readonly IToolchain Net47 = new CsProjClassicNetToolchain("net47");
         [PublicAPI] public static readonly IToolchain Net471 = new CsProjClassicNetToolchain("net471");
+        [PublicAPI] public static readonly IToolchain Net472 = new CsProjClassicNetToolchain("net472");
         private static readonly IToolchain Default = Net46; // the lowest version we support
+
+        private static readonly Dictionary<string, IToolchain> Toolchains = new Dictionary<string, IToolchain>
+        {
+            { "4.6", Net46 },
+            { "4.6.1", Net461 },
+            { "4.6.2", Net462 },
+            { "4.7", Net47 },
+            { "4.7.1", Net471 },
+            { "4.7.2", Net472 }
+        };
 
         [PublicAPI]
         public static readonly Lazy<IToolchain> Current = new Lazy<IToolchain>(GetCurrentVersion);
@@ -75,44 +87,10 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         {
             if (!RuntimeInformation.IsWindows())
                 return Net46; // we return .NET 4.6 which during validaiton will tell the user about lack of support
-
-            return GetCurrentVersionBasedOnWindowsRegistry();
-        }
-
-        // this logic is put to a separate method to avoid any assembly loading issues on non Windows systems
-        private static IToolchain GetCurrentVersionBasedOnWindowsRegistry()
-        {   
-            using (var ndpKey = Microsoft.Win32.RegistryKey
-                .OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry32)
-                .OpenSubKey("SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v4\\Full\\"))
-            {
-                if (ndpKey == null)
-                    return Default;
-
-                int releaseKey = Convert.ToInt32(ndpKey.GetValue("Release"));
-                // magic numbers come from https://msdn.microsoft.com/en-us/library/hh925568(v=vs.110).aspx
-                if (releaseKey >= 461308 && Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.1"))
-                    return Net471;
-                if (releaseKey >= 460798 && Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7"))
-                    return Net47;
-                if (releaseKey >= 394802 && Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2"))
-                    return Net462;
-                if (releaseKey >= 394254 && Directory.Exists(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1"))
-                    return Net461;
-
-                return Default;
-            }
-        }
-
-        // TODO: Move to a better place
-        [NotNull]
-        internal static string GetCurrentNetFrameworkVersion()
-        {
-            var toolchain = GetCurrentVersionBasedOnWindowsRegistry() as CsProjClassicNetToolchain;
-            if (toolchain == null)
-                return "?";
-            string version = toolchain.targetFrameworkMoniker.Replace("net", "");
-            return string.Join(".", version.ToCharArray());
+            
+            // this logic is put to a separate method to avoid any assembly loading issues on non Windows systems
+            var version = FrameworkVersionHelper.GetLatestNetDeveloperPackVersion();
+            return Toolchains.TryGetValue(version, out var toolchain) ? toolchain : Default;
         }
     }
 }
