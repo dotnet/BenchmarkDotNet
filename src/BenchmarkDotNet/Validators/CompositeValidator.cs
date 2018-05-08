@@ -14,8 +14,7 @@ namespace BenchmarkDotNet.Validators
             CompilationValidator.Default,
             ConfigValidator.Default,
             ShadowCopyValidator.Default,
-            JitOptimizationsValidator.DontFailOnError,
-            BenchmarkClassValidator.Default
+            JitOptimizationsValidator.DontFailOnError
         };
 
         internal readonly IValidator[] Validators;
