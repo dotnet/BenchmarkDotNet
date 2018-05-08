@@ -4,6 +4,7 @@ using System.Reflection.Emit;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Validators;
 using Xunit;
 
@@ -33,7 +34,33 @@ namespace BenchmarkDotNet.Tests.Validators
                 errors.Single().Message);
         }
 
-        public static Delegate BuildDummyMethod<T>(string name)
+        
+        [Theory]
+        [InlineData(typeof(PublicClass), false)]
+        [InlineData(typeof(PublicClass.PublicNestedClass), false)]
+        [InlineData(typeof(PrivateClass), true)]
+        [InlineData(typeof(PrivateNestedClass), true)]
+        [InlineData(typeof(InternalClass), true)]
+        [InlineData(typeof(InternalClass.InternalNestedClass), true)]
+        [InlineData(typeof(PrivateProtectedClass), true)]
+        [InlineData(typeof(PrivateProtectedNestedClass), true)]
+        [InlineData(typeof(ProtectedInternalClass), true)]
+        [InlineData(typeof(ProtectedInternalClass.ProtectedInternalNestedClass), true)]
+        public void Benchmark_Class_Generic_Argument_Must_Be_Public(Type type, bool hasErrors)
+        {
+            // Arrange
+            var generic = typeof(BenchmarkClass<>);
+            var constructed = generic.MakeGenericType(type);
+            
+            // Act
+            var validationErrors = CompilationValidator.Default.Validate(BenchmarkConverter.TypeToBenchmarks(constructed))
+                                                               .ToList();
+            
+            // Assert
+            Assert.Equal(validationErrors.Any(), hasErrors);
+        }
+      
+        private static Delegate BuildDummyMethod<T>(string name)
         {
             var dynamicMethod = new DynamicMethod(
                 name,
@@ -46,5 +73,32 @@ namespace BenchmarkDotNet.Tests.Validators
 
             return dynamicMethod.CreateDelegate(typeof(Func<T, T>));
         }
+        
+        private class PrivateNestedClass { }
+        private protected class PrivateProtectedNestedClass { }
+        private class PrivateClass { }
+        private protected class PrivateProtectedClass { }
+        protected internal class ProtectedInternalClass
+        {
+            protected internal class ProtectedInternalNestedClass { }
+        }
     }
+    
+    public class BenchmarkClass<T> where T : new()
+    {
+        [Benchmark]
+        public T New() => new T();
+    }
+
+    public class PublicClass
+    {
+        public class PublicNestedClass { }
+    }
+
+    internal class InternalClass
+    {
+        internal class InternalNestedClass { }
+    }
+        
+    
 }
