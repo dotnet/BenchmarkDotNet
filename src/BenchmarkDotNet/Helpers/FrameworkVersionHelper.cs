@@ -33,7 +33,8 @@ namespace BenchmarkDotNet.Helpers
         [NotNull]
         internal static string GetCurrentNetFrameworkVersion()
         {
-            if (!(GetReleaseNumberFromWindowsRegistry() is int releaseNumber))
+            var releaseNumber = GetReleaseNumberFromWindowsRegistry();
+            if (!releaseNumber.HasValue)
                 return "?";
 
             return FrameworkVersions
