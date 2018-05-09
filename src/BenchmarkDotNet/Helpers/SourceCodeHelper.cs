@@ -14,8 +14,8 @@ namespace BenchmarkDotNet.Helpers
                 return "null";
             if (value is bool)
                 return ((bool) value).ToLowerCase();
-            if (value is string)
-                return $"\"{value.ToString().Replace("\\", "\\\\")}\"";
+            if (value is string text)
+                return $"$@\"{value.ToString().Replace("\"", "\"\"").Replace("{", "{{").Replace("}", "}}")}\"";
             if (value is char)
                 return (char) value == '\\' ? "'\\\\'" : $"'{value}'";
             if (value is float)
