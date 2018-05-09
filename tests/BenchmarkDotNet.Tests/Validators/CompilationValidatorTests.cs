@@ -49,8 +49,7 @@ namespace BenchmarkDotNet.Tests.Validators
         public void Benchmark_Class_Generic_Argument_Must_Be_Public(Type type, bool hasErrors)
         {
             // Arrange
-            var generic = typeof(BenchmarkClass<>);
-            var constructed = generic.MakeGenericType(type);
+            var constructed = typeof(BenchmarkClass<>).MakeGenericType(type);
             
             // Act
             var validationErrors = CompilationValidator.Default.Validate(BenchmarkConverter.TypeToBenchmarks(constructed))
