@@ -181,7 +181,8 @@ namespace BenchmarkDotNet.IntegrationTests
                 .With(Platform.X64)
                 .WithLaunchCount(2);
 
-            Assert.Equal("Platform=X64, LaunchCount=2", j.Id); // id lost
+            Assert.Equal("NewId", j.Id); // id not lost
+            Assert.Equal("NewId(Platform=X64, LaunchCount=2)", j.DisplayInfo);
             Assert.Equal(Platform.X64, j.Env.Platform);
             Assert.Equal(2, j.Run.LaunchCount);
 
@@ -193,9 +194,7 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertProperties(j, "Platform=X64, LaunchCount=2");
             AssertProperties(j.Env, "Platform=X64");
             AssertProperties(j.Run, "LaunchCount=2");
-
         }
-
 
         [Fact]
         public static void Test03IdDoesNotFlow()
@@ -225,8 +224,32 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Equal("MyId", j.Id);
             Assert.Equal("MyId", j.Env.Id);
 
-            j = j.With(Jit.RyuJit);  // id will not flow
-            Assert.False(j.HasValue(CharacteristicObject.IdCharacteristic));
+            j = j.With(Jit.RyuJit);  // custom id will flow
+            Assert.Equal("MyId", j.Id);
+        }
+
+        [Fact]
+        public static void CustomJobIdIsPreserved()
+        {
+            const string id = "theId";
+
+            var jobWithId = Job.Default.WithId(id);
+
+            Assert.Equal(id, jobWithId.Id);
+
+            var shouldHaveSameId = jobWithId.AsBaseline();
+
+            Assert.Equal(id, shouldHaveSameId.Id);
+        }
+
+        [Fact]
+        public static void PredefinedJobIdIsNotPreserved()
+        {
+            var predefinedJob = Job.Default;
+
+            var customJob = predefinedJob.AsBaseline();
+
+            Assert.NotEqual(predefinedJob.Id, customJob.Id);
         }
 
         [Fact]
