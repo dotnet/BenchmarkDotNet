@@ -38,7 +38,7 @@ Result ActualRun(Method method)
 
     long perfectInvocationCount = Pilot(method);
 
-    Warmup(EMPTY_METHOD, perfectInvocationCount); // EMPTY_METHOD has same return type and aruguments as benchmark
+    Warmup(EMPTY_METHOD, perfectInvocationCount); // EMPTY_METHOD has same return type and arguments as benchmark
     var overhead = Target(EMPTY_METHOD, perfectInvocationCount);
 
     Warmup(method, perfectInvocationCount);
