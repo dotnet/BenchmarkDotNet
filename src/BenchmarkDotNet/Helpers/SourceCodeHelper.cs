@@ -38,5 +38,37 @@ namespace BenchmarkDotNet.Helpers
                 return ((IFormattable)value).ToString(null, CultureInfo.InvariantCulture);
             return value.ToString();
         }
+
+        public static bool IsCompilationTimeConstant(object value)
+        {
+            if (value == null)
+                return true;
+            if (value is bool)
+                return true;
+            if (value is string text)
+                return true;
+            if (value is char)
+                return true;
+            if (value is float)
+                return true;
+            if (value is double)
+                return true;
+            if (value is decimal)
+                return true;
+            if (ReflectionUtils.GetTypeInfo(value.GetType()).IsEnum)
+                return true;
+            if (value is Type)
+                return true;
+            if (!ReflectionUtils.GetTypeInfo(value.GetType()).IsValueType) // the difference!!
+                return false;
+            if (value is TimeInterval)
+                return true;
+            if (value is IntPtr)
+                return true;
+            if (value is IFormattable)
+                return true;
+
+            return false;
+        }
     }
 }
