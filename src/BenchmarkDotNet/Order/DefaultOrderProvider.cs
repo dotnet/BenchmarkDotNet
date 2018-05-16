@@ -32,12 +32,12 @@ namespace BenchmarkDotNet.Order
 
         public virtual IEnumerable<Benchmark> GetExecutionOrder(Benchmark[] benchmarks)
         {
-            var list = benchmarks.ToList();
             if (summaryOrderPolicy == SummaryOrderPolicy.Defined)
             {
                 return benchmarks;
             }
-
+            
+            var list = benchmarks.ToList();
             list.Sort(benchmarkComparer);
             return list;
         }
