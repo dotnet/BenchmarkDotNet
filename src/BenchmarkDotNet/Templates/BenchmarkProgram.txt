@@ -2,7 +2,7 @@ $ShadowCopyDefines$
 $ExtraDefines$
 using System;
 using System.Diagnostics;
-using System.Linq;
+using System.Linq; // must not be removed, used by SmartParameter and SmartArgument
 using System.Threading;
 using System.Reflection;
 using System.Runtime.CompilerServices;

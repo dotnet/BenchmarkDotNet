@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
@@ -185,11 +186,15 @@ namespace BenchmarkDotNet.Running
                         GetValidValues(member.Attribute.Values, member.ParameterType),
                         false))
                 .Concat(allParamsSourceMembers.Select(member =>
-                    new ParameterDefinition(
-                        member.Name,
-                        member.IsStatic,
-                        GetValidValuesForParamsSource(type, member.Attribute.Name),
-                        false)))
+                {
+                    var paramsValues = GetValidValuesForParamsSource(type, member.Attribute.Name);
+                    return new ParameterDefinition(
+                       member.Name,
+                       member.IsStatic,
+                       SmartParamBuilder.CreateForParams(paramsValues.source, paramsValues.values),
+                       false);
+                    
+                }))
                 .ToArray();
 
             return new ParameterDefinitions(definitions);
@@ -220,23 +225,10 @@ namespace BenchmarkDotNet.Running
                 yield break;
 
             var argumentsSourceAttribute = benchmark.GetCustomAttribute<ArgumentsSourceAttribute>();
-            foreach (var unwrappedValue in GetValidValuesForParamsSource(target, argumentsSourceAttribute.Name))
-            {
-                if (unwrappedValue is object[] array)
-                {
-                    if (parameterDefinitions.Length != array.Length)
-                        throw new InvalidOperationException($"Benchmark {benchmark.Name} has invalid number of arguments provided by [ArgumentsSource({argumentsSourceAttribute.Name})]! {array.Length} instead of {parameterDefinitions.Length}.");
 
-                    yield return new ParameterInstances(
-                        array.Select((value, index) => new ParameterInstance(parameterDefinitions[index], value)).ToArray());
-                }
-                else if (parameterDefinitions.Length == 1)
-                {
-                    yield return new ParameterInstances(
-                        new [] { new ParameterInstance(parameterDefinitions[0], unwrappedValue) });
-                }
-                else throw new NotSupportedException($"Benchmark {benchmark.Name} has invalid type of arguments provided by [ArgumentsSource({argumentsSourceAttribute.Name})]. It should be IEnumerable<object[]> or IEnumerable<object>.");
-            }
+            var valuesInfo = GetValidValuesForParamsSource(target, argumentsSourceAttribute.Name);
+            for (int sourceIndex = 0; sourceIndex < valuesInfo.values.Length; sourceIndex++)
+                yield return SmartParamBuilder.CreateForArguments(benchmark, parameterDefinitions, valuesInfo, sourceIndex);
         }
 
         private static string[] GetCategories(MethodInfo method)
@@ -297,23 +289,23 @@ namespace BenchmarkDotNet.Running
             return values;
         }
 
-        private static object[] GetValidValuesForParamsSource(Type parentType, string sourceName)
+        private static (MemberInfo source, object[] values) GetValidValuesForParamsSource(Type parentType, string sourceName)
         {
             var paramsSourceMethod = parentType.GetAllMethods().SingleOrDefault(method => method.Name == sourceName && method.IsPublic);
 
             if (paramsSourceMethod != default(MethodInfo))
-                return ToArray(
+                return (paramsSourceMethod, ToArray(
                     paramsSourceMethod.Invoke(paramsSourceMethod.IsStatic ? null : Activator.CreateInstance(parentType), null),
                     paramsSourceMethod,
-                    parentType);
+                    parentType));
 
             var paramsSourceProperty = parentType.GetAllProperties().SingleOrDefault(property => property.Name == sourceName && property.GetMethod.IsPublic);
 
             if (paramsSourceProperty != default(PropertyInfo))
-                return ToArray(
+                return (paramsSourceProperty, ToArray(
                     paramsSourceProperty.GetValue(paramsSourceProperty.GetMethod.IsStatic ? null : Activator.CreateInstance(parentType)),
                     paramsSourceProperty,
-                    parentType);
+                    parentType));
 
             throw new InvalidOperationException($"{parentType.Name} has no public, accessible method/property called {sourceName}, unable to read values for [ParamsSource]");
         }
