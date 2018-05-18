@@ -22,7 +22,9 @@ namespace BenchmarkDotNet.Running
 
         internal TypeParser(Type[] types, ILogger logger)
         {
-            allTypes = types.Where(type => type.ContainsRunnableBenchmarks()).ToArray();
+            allTypes = types.Where(type => type.ContainsRunnableBenchmarks())
+                            .SelectMany(t => t.BuildGenericsIfNeeded())
+                            .ToArray();
             this.logger = logger;
         }
 

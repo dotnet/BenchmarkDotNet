@@ -81,8 +81,6 @@ namespace BenchmarkDotNet.Extensions
         {
             if (!typeInfo.IsGenericType)
                 return typeInfo.Name;
-            if (typeInfo.IsGenericTypeDefinition)
-                throw new NotSupportedException("Open generics are not supported");
 
             var mainName = typeInfo.Name.Substring(0, typeInfo.Name.IndexOf('`'));
             string args = string.Join(", ", typeInfo.GetGenericArguments().Select(GetDisplayName).ToArray());
@@ -146,6 +144,18 @@ namespace BenchmarkDotNet.Extensions
             return typeInfo.GetBenchmarks().Any();
         }
 
+        internal static Type[] BuildGenericsIfNeeded(this Type type)
+        {
+            var buildAbleTypes = type.GetCustomAttributes(true).OfType<GenericBenchmarkAttribute>()
+                                                               .Select(x => x.GenericType)
+                                                               .ToList();
+            if (buildAbleTypes.Any())
+            {
+                return type.BuildGenericTypes(buildAbleTypes).ToArray();
+            }
+            return new[] { type };
+        }
+
         internal static MethodInfo[] GetBenchmarks(this TypeInfo typeInfo)
             => typeInfo
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public)
@@ -180,7 +190,12 @@ namespace BenchmarkDotNet.Extensions
         }
 
         private static bool IsRunnableGenericType(TypeInfo typeInfo)
-            => !typeInfo.IsGenericTypeDefinition // is not an open generic
-            && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it
+            => // if it is an open generic - there must be GenericBenchmark attributes
+                (!typeInfo.IsGenericTypeDefinition
+                 || (typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericBenchmarkAttribute>().Any()))
+                && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it
+
+        private static List<Type> BuildGenericTypes(this Type type, List<Type> genericArg)
+            => genericArg.Select(arg => type.MakeGenericType(arg)).ToList();
     }
 }
