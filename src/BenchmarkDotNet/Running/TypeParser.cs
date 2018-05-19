@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Running
@@ -24,7 +25,6 @@ namespace BenchmarkDotNet.Running
         {
             this.logger = logger;
             allTypes = GetRunnableBenchmarks(types);
-
         }
 
         internal class TypeWithMethods
@@ -247,24 +247,20 @@ namespace BenchmarkDotNet.Running
 
         private Type[] GetRunnableBenchmarks(Type[] types)
         {
-            var pairs = types.Where(type => type.ContainsRunnableBenchmarks())
-                             .Select(t => t.BuildGenericsIfNeeded())
-                             .ToList();
-
-            if (pairs.Any(x => !x.isSuccesed))
-                PrintGenericsBuildErrors(pairs.Where(x => !x.isSuccesed)
-                                              .SelectMany(p => p.result));
-
-            return pairs.Where(x => x.isSuccesed)
-                        .SelectMany(x => x.result)
-                        .ToArray();
+            var benchmarks = GenericBuilderHelper.GetRunnableBenchmarks(types);
+            var diff = types.Except(benchmarks).ToList();
+            
+            if (diff.Any())
+                PrintGenericsBuildErrors(diff);
+            
+            return benchmarks;
         }
         
         private void PrintGenericsBuildErrors(IEnumerable<Type> types)
         {
             foreach (var type in types)
             {
-                logger.WriteLineError($"Genetic type {type.Name} failed to build due to wrong type argument, ignoring");
+                logger.WriteLineError($"Genetic type {type.Name} failed to build due to wrong type argument or arguments count, ignoring");
             }
         }
         
