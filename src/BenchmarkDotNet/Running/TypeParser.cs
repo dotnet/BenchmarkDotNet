@@ -22,10 +22,9 @@ namespace BenchmarkDotNet.Running
 
         internal TypeParser(Type[] types, ILogger logger)
         {
-            allTypes = types.Where(type => type.ContainsRunnableBenchmarks())
-                            .SelectMany(t => t.BuildGenericsIfNeeded())
-                            .ToArray();
             this.logger = logger;
+            allTypes = GetRunnableBenchmarks(types);
+
         }
 
         internal class TypeWithMethods
@@ -246,6 +245,29 @@ namespace BenchmarkDotNet.Running
             logger.WriteLine();
         }
 
+        private Type[] GetRunnableBenchmarks(Type[] types)
+        {
+            var pairs = types.Where(type => type.ContainsRunnableBenchmarks())
+                             .Select(t => t.BuildGenericsIfNeeded())
+                             .ToList();
+
+            if (pairs.Any(x => !x.isSuccesed))
+                PrintGenericsBuildErrors(pairs.Where(x => !x.isSuccesed)
+                                              .SelectMany(p => p.result));
+
+            return pairs.Where(x => x.isSuccesed)
+                        .SelectMany(x => x.result)
+                        .ToArray();
+        }
+        
+        private void PrintGenericsBuildErrors(IEnumerable<Type> types)
+        {
+            foreach (var type in types)
+            {
+                logger.WriteLineError($"Genetic type {type.Name} failed to build due to wrong type argument, ignoring");
+            }
+        }
+        
         private static Dictionary<string, string> CreateConfiguration()
         {
             return new Dictionary<string, string>

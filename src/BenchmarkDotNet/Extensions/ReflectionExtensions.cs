@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -137,23 +138,27 @@ namespace BenchmarkDotNet.Extensions
         internal static bool ContainsRunnableBenchmarks(this Type type)
         {
             var typeInfo = type.GetTypeInfo();
-
-            if (typeInfo.IsAbstract || typeInfo.IsSealed || typeInfo.IsNotPublic || (typeInfo.IsGenericType && !IsRunnableGenericType(typeInfo)))
+            
+            if (typeInfo.IsAbstract 
+                || typeInfo.IsSealed 
+                || typeInfo.IsNotPublic 
+                || (typeInfo.IsGenericType && !IsRunnableGenericType(typeInfo)))
                 return false;
 
             return typeInfo.GetBenchmarks().Any();
         }
 
-        internal static Type[] BuildGenericsIfNeeded(this Type type)
+        internal static (bool isSuccesed, Type[] result) BuildGenericsIfNeeded(this Type type)
         {
             var buildAbleTypes = type.GetCustomAttributes(true).OfType<GenericBenchmarkAttribute>()
                                                                .Select(x => x.GenericType)
                                                                .ToList();
             if (buildAbleTypes.Any())
             {
-                return type.BuildGenericTypes(buildAbleTypes).ToArray();
+                var buildResult = type.TryMakeGenericTypes(buildAbleTypes, out var result);
+                return (buildResult, result);
             }
-            return new[] { type };
+            return (true, new[] { type });
         }
 
         internal static MethodInfo[] GetBenchmarks(this TypeInfo typeInfo)
@@ -194,8 +199,20 @@ namespace BenchmarkDotNet.Extensions
                 (!typeInfo.IsGenericTypeDefinition
                  || (typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericBenchmarkAttribute>().Any()))
                 && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it
-
-        private static List<Type> BuildGenericTypes(this Type type, List<Type> genericArg)
-            => genericArg.Select(arg => type.MakeGenericType(arg)).ToList();
+        
+        private static bool TryMakeGenericTypes(this Type type, List<Type> genericArg, out Type[] result)
+        {
+            try
+            {
+                result = genericArg.Select(arg => type.MakeGenericType(arg))
+                                   .ToArray();
+                return true;
+            }
+            catch (ArgumentException e)
+            {
+                result = new[] { type };
+                return false;
+            }
+        }
     }
 }
