@@ -1,8 +1,6 @@
 ﻿using System;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
@@ -23,7 +21,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public bool Done { get; private set; }
 
-            public GenerateResult GenerateProject(Benchmark benchmark, ILogger logger, string rootArtifactsFolderPath, IConfig config, IResolver resolver)
+            public GenerateResult GenerateProject(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath)
             {
                 logger.WriteLine("Generating");
                 Done = true;
@@ -35,7 +33,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public bool Done { get; private set; }
 
-            public BuildResult Build(GenerateResult generateResult, ILogger logger, Benchmark benchmark, IResolver resolver)
+            public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
             {
                 logger.WriteLine("Building");
                 Done = true;

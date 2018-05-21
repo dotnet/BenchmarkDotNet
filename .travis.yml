@@ -22,6 +22,8 @@ mono: latest
 
 addons:
   apt:
+    sources:
+      - llvm-toolchain-trusty-3.9
     packages: 
     - gettext
     - libcurl4-openssl-dev
@@ -29,6 +31,7 @@ addons:
     - libssl-dev
     - libunwind8
     - fsharp
+    - clang-3.9
 
 #---------------------------------#		
 #       build configuration       #		

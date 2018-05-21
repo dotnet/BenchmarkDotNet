@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;

@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  <PropertyGroup>
+    <AssemblyTitle>BenchmarkDotNet.IntegrationTests.ManualRunning</AssemblyTitle>
+    <TargetFrameworks>net46;netcoreapp2.1</TargetFrameworks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>BenchmarkDotNet.IntegrationTests.ManualRunning</AssemblyName>
+    <PackageId>BenchmarkDotNet.IntegrationTests.ManualRunning</PackageId>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\BenchmarkTestExecutor.cs" Link="BenchmarkTestExecutor.cs" />
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\CheckCoreClrAndCoreFxVersions.cs" Link="CheckCoreClrAndCoreFxVersions.cs" />
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\TestConfigs.cs" Link="TestConfigs.cs" />
+    <Compile Include="..\BenchmarkDotNet.Tests\Loggers\OutputLogger.cs" Link="OutputLogger.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.4.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+    <PackageReference Include="xunit" Version="2.3.1" />
+    <PackageReference Include="System.Memory" Version="4.4.0-preview1-25305-02" />
+    <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+  </ItemGroup>
+</Project>

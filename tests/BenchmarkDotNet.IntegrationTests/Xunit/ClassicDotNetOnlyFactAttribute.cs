@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.IntegrationTests.Xunit
         public FactClassicDotNetOnlyAttribute(string skipReason)
         {
             // ReSharper disable once VirtualMemberCallInConstructor
-            if (!RuntimeInformation.IsClassic())
+            if (!RuntimeInformation.IsFullFramework)
                 Skip = skipReason;
         }
     }

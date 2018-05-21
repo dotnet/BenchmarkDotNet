@@ -4,7 +4,6 @@ using System.Threading;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Jobs;
 using BenchmarkDotNet.Attributes.Columns;
-using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;

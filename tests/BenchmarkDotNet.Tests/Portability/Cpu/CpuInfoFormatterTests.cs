@@ -1,5 +1,4 @@
-﻿#if CLASSIC || NETCOREAPP2_0
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using System.Text;
 using ApprovalTests;
 using ApprovalTests.Namers;
@@ -32,4 +31,3 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
         }
     }
 }
-#endif

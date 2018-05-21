@@ -4,9 +4,7 @@
 
 We have the following set of NuGet packages (you can install it directly from `nuget.org`):
 
-* `BenchmarkDotNet.Core`: basic BenchmarkDotNet infrastructure and logic. Doesn't have any dependencies.
-* `BenchmarkDotNet.Toolchains.Roslyn`: a package that includes `RoslynToolchain` which adds an ability to build your benchmarks with the Roslyn compiler. Depends on a set of additional NuGet packages.
-* `BenchmarkDotNet`: an ultimate package that depends on `BenchmarkDotNet.Core` and `BenchmarkDotNet.Toolchains.Roslyn`: provides the `BenchmarkRunner`. In 99% of situations, you should start with this package.
+* `BenchmarkDotNet`: Basic BenchmarkDotNet infrastructure and logic. Doesn't have any dependencies. This is all you need to run benchmarks.
 * `BenchmarkDotNet.Diagnostics.Windows`: an additional optional package that provides a set of Windows diagnosers.
 
 ## Versioning system and feeds

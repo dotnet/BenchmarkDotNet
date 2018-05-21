@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;

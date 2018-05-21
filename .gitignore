@@ -48,7 +48,7 @@ tests/output/*
 artifacts/*
 BDN.Generated
 BenchmarkDotNet.Samples/Properties/launchSettings.json
-src/BenchmarkDotNet.Core/Disassemblers/*
+src/BenchmarkDotNet/Disassemblers/*
 
 # Visual Studio 2015 cache/options directory
 .vs/
@@ -56,3 +56,4 @@ src/BenchmarkDotNet.Core/Disassemblers/*
 # Cake
 tools/**
 .dotnet
+/src/BenchmarkDotNet/Disassemblers/*
