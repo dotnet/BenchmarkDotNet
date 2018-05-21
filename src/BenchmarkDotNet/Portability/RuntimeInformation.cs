@@ -214,12 +214,12 @@ namespace BenchmarkDotNet.Portability
 
         internal static Runtime GetCurrentRuntime()
         {
+            if (IsMono)
+                return Runtime.Mono;
             if (IsFullFramework)
                 return Runtime.Clr;
             if (IsNetCore)
                 return Runtime.Core;
-            if (IsMono)
-                return Runtime.Mono;
             if (IsCoreRT)
                 return Runtime.CoreRT;
             

@@ -3,6 +3,12 @@
     public enum Jit
     {
         /// <summary>
+        /// Undefined
+        /// <remarks>By default</remarks>
+        /// </summary>
+        Undefined,
+        
+        /// <summary>
         /// LegacyJIT
         /// <remarks>Supported only for Full Framework</remarks>
         /// </summary>
