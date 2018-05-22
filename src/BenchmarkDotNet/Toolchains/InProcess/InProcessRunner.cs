@@ -112,10 +112,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 var engineParameters = new EngineParameters
                 {
                     Host = host,
+                    MainSingleAction = _ => mainAction.InvokeSingle(),
                     MainMultiAction = mainAction.InvokeMultiple,
                     Dummy1Action = dummy1.InvokeSingle,
                     Dummy2Action = dummy2.InvokeSingle,
                     Dummy3Action = dummy3.InvokeSingle,
+                    IdleSingleAction = _ => idleAction.InvokeSingle(),
                     IdleMultiAction = idleAction.InvokeMultiple,
                     GlobalSetupAction = globalSetupAction.InvokeSingle,
                     GlobalCleanupAction = globalCleanupAction.InvokeSingle,
