@@ -214,6 +214,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static Runtime GetCurrentRuntime()
         {
+            //do not change the order of conditions because it may cause incorrect determination of runtime
             if (IsMono)
                 return Runtime.Mono;
             if (IsFullFramework)
