@@ -40,6 +40,6 @@
         /// <summary>
         /// executing benchmark for the purpose of JIT wamup
         /// </summary>
-        Jit, IdleJit
+        MainJitting, IdleJitting
     }
 }

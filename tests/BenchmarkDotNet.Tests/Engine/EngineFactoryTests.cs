@@ -71,6 +71,32 @@ namespace BenchmarkDotNet.Tests.Engine
 
             Assert.Equal(1, timesGlobalCleanupCalled);
         }
+
+        [Fact]
+        public void ForJobsWithExplicitUnrollFactorTheGlobalSetupIsCalledAndMultiActionCodeGetsJitted()
+            => AssertGlobalSetupWasCalledAndMultiActionGotJitted(Job.Default.WithUnrollFactor(16));
+
+        [Fact]
+        public void ForJobsThatDontRequirePilotTheGlobalSetupIsCalledAndMultiActionCodeGetsJitted() 
+            => AssertGlobalSetupWasCalledAndMultiActionGotJitted(Job.Default.WithInvocationCount(100));
+
+        public void AssertGlobalSetupWasCalledAndMultiActionGotJitted(Job job)
+        {
+            var engineParameters = CreateEngineParameters(mainSingleAction: Throwing, mainMultiAction: Instant16, job: job);
+
+            var engine = new EngineFactory().CreateReadyToRun(engineParameters);
+
+            Assert.Equal(1, timesGlobalSetupCalled);
+            Assert.Equal(2, timesIterationSetupCalled);
+            Assert.Equal(16, timesBenchmarkCalled);
+            Assert.Equal(16, timesIdleCalled);
+            Assert.Equal(2, timesIterationCleanupCalled);
+            Assert.Equal(0, timesGlobalCleanupCalled); 
+
+            engine.Dispose();
+
+            Assert.Equal(1, timesGlobalCleanupCalled);
+        }
         
         [Fact]
         public void NonVeryTimeConsumingBenchmarksAreExecutedMoreThanOncePerIterationWithUnrollFactorForDefaultSettings()

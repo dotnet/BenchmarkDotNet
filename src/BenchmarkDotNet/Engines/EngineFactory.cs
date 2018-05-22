@@ -41,7 +41,9 @@ namespace BenchmarkDotNet.Engines
             }
 
             var needsPilot = !engineParameters.TargetJob.HasValue(RunMode.InvocationCountCharacteristic);
-            if (needsPilot) 
+            var hasUnrollFactorDefined = engineParameters.TargetJob.HasValue(RunMode.UnrollFactorCharacteristic);
+            
+            if (needsPilot && !hasUnrollFactorDefined) 
             {
                 var singleActionEngine = CreateEngine(engineParameters, resolver, engineParameters.TargetJob, engineParameters.IdleSingleAction, engineParameters.MainSingleAction);
 
@@ -70,9 +72,13 @@ namespace BenchmarkDotNet.Engines
 
         private static Measurement Jit(Engine engine, int unrollFactor)
         {
-            DeadCodeEliminationHelper.KeepAliveWithoutBoxing(engine.RunIteration(new IterationData(IterationMode.IdleJit, index: -1, invokeCount: unrollFactor, unrollFactor: unrollFactor))); // don't forget to JIT idle
+            DeadCodeEliminationHelper.KeepAliveWithoutBoxing(engine.RunIteration(new IterationData(IterationMode.IdleJitting, index: 1, invokeCount: unrollFactor, unrollFactor: unrollFactor))); // don't forget to JIT idle
             
-            return engine.RunIteration(new IterationData(IterationMode.Jit, index: -1, invokeCount: unrollFactor, unrollFactor: unrollFactor));
+            var result = engine.RunIteration(new IterationData(IterationMode.MainJitting, index: 1, invokeCount: unrollFactor, unrollFactor: unrollFactor));
+
+            engine.WriteLine();
+            
+            return result;
         }
 
         private static Engine CreateEngine(EngineParameters engineParameters, IResolver resolver, Job job, Action<long> idle, Action<long> main)
