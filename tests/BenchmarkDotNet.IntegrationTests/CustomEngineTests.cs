@@ -54,12 +54,18 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class CustomFactory : IEngineFactory
         {
-            public IEngine CreateReadyToRun(EngineParameters engineParameters) 
-                => new CustomEngine
+            public IEngine CreateReadyToRun(EngineParameters engineParameters)
+            {
+                var engine = new CustomEngine
                 {
                     GlobalCleanupAction = engineParameters.GlobalCleanupAction,
                     GlobalSetupAction = engineParameters.GlobalSetupAction
                 };
+                
+                engine.GlobalSetupAction?.Invoke(); // engine factory is now supposed to create an engine which is ready to run (hence the method name change) 
+
+                return engine;
+            }
         }
 
         public class CustomEngine : IEngine
