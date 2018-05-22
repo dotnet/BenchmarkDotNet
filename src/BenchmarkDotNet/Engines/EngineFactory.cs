@@ -1,7 +1,9 @@
 using System;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Engines
 {
@@ -25,32 +27,34 @@ namespace BenchmarkDotNet.Engines
                 throw new ArgumentNullException(nameof(engineParameters.IdleMultiAction));
             if(engineParameters.TargetJob == null)
                 throw new ArgumentNullException(nameof(engineParameters.TargetJob));
+
+            var resolver = new CompositeResolver(BenchmarkRunner.DefaultResolver, EngineResolver.Instance);
             
             engineParameters.GlobalSetupAction?.Invoke();
 
-            var needsJitting = engineParameters.TargetJob.ResolveValue(RunMode.RunStrategyCharacteristic, engineParameters.Resolver).NeedsJitting();
+            var needsJitting = engineParameters.TargetJob.ResolveValue(RunMode.RunStrategyCharacteristic, resolver).NeedsJitting();
             if (!needsJitting)
             {
                 // whatever it is, we can not interfere
-                return CreateEngine(engineParameters, engineParameters.TargetJob, engineParameters.IdleMultiAction, engineParameters.MainMultiAction);
+                return CreateEngine(engineParameters, resolver, engineParameters.TargetJob, engineParameters.IdleMultiAction, engineParameters.MainMultiAction);
             }
 
             var needsPilot = !engineParameters.TargetJob.HasValue(RunMode.InvocationCountCharacteristic);
             if (needsPilot) 
             {
-                var singleActionEngine = CreateEngine(engineParameters, engineParameters.TargetJob, engineParameters.IdleSingleAction, engineParameters.MainSingleAction);
+                var singleActionEngine = CreateEngine(engineParameters, resolver, engineParameters.TargetJob, engineParameters.IdleSingleAction, engineParameters.MainSingleAction);
 
-                var iterationTime = engineParameters.Resolver.Resolve(engineParameters.TargetJob, RunMode.IterationTimeCharacteristic);
+                var iterationTime = resolver.Resolve(engineParameters.TargetJob, RunMode.IterationTimeCharacteristic);
                 if (ShouldExecuteOncePerIteration(Jit(singleActionEngine), iterationTime))
                 {
                     var reconfiguredJob = engineParameters.TargetJob.WithInvocationCount(1).WithUnrollFactor(1); // todo: consider if we should set the warmup count to 1!
 
-                    return CreateEngine(engineParameters, reconfiguredJob, engineParameters.IdleSingleAction, engineParameters.MainSingleAction);
+                    return CreateEngine(engineParameters, resolver, reconfiguredJob, engineParameters.IdleSingleAction, engineParameters.MainSingleAction);
                 }
             }
 
             // it's either a job with explicit configuration or not-very time consuming benchmark, just create the engine, Jit and return
-            var multiActionEngine = CreateEngine(engineParameters, engineParameters.TargetJob, engineParameters.IdleMultiAction, engineParameters.MainMultiAction);
+            var multiActionEngine = CreateEngine(engineParameters, resolver, engineParameters.TargetJob, engineParameters.IdleMultiAction, engineParameters.MainMultiAction);
                 
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(Jit(multiActionEngine));
 
@@ -66,9 +70,10 @@ namespace BenchmarkDotNet.Engines
         private static Measurement Jit(Engine engine)
             => engine.RunIteration(new IterationData(IterationMode.Jit, index: -1, invokeCount: 1, unrollFactor: 1));
 
-        private static Engine CreateEngine(EngineParameters engineParameters, Job job, Action<long> idle, Action<long> main)
+        private static Engine CreateEngine(EngineParameters engineParameters, IResolver resolver, Job job, Action<long> idle, Action<long> main)
             => new Engine(
                 engineParameters.Host,
+                resolver,
                 engineParameters.Dummy1Action,
                 engineParameters.Dummy2Action,
                 engineParameters.Dummy3Action,

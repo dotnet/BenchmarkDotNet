@@ -44,6 +44,7 @@ namespace BenchmarkDotNet.Engines
 
         internal Engine(
             IHost host,
+            IResolver resolver,
             Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> idleAction, Action<long> mainAction, Job targetJob,
             Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
             bool includeMemoryStats)
@@ -63,7 +64,7 @@ namespace BenchmarkDotNet.Engines
             OperationsPerInvoke = operationsPerInvoke;
             this.includeMemoryStats = includeMemoryStats;
 
-            Resolver = new CompositeResolver(BenchmarkRunner.DefaultResolver, EngineResolver.Instance);
+            Resolver = resolver;
 
             Clock = targetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, Resolver);
             ForceAllocations = targetJob.ResolveValue(GcMode.ForceCharacteristic, Resolver);
