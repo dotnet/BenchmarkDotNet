@@ -17,6 +17,9 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void CoreRtIsSupported()
         {
+            if (IntPtr.Size == sizeof(int)) // CoreRT does not support 32bit yet
+                return;
+            
             var config = ManualConfig.CreateEmpty()
                 .With(Job.Dry
                     .With(Runtime.CoreRT)
