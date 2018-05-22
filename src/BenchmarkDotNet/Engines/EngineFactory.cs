@@ -29,6 +29,7 @@ namespace BenchmarkDotNet.Engines
                 throw new ArgumentNullException(nameof(engineParameters.TargetJob));
 
             var resolver = new CompositeResolver(BenchmarkRunner.DefaultResolver, EngineResolver.Instance);
+            var unrollFactor = engineParameters.TargetJob.ResolveValue(RunMode.UnrollFactorCharacteristic, resolver);
             
             engineParameters.GlobalSetupAction?.Invoke();
 
@@ -45,7 +46,7 @@ namespace BenchmarkDotNet.Engines
                 var singleActionEngine = CreateEngine(engineParameters, resolver, engineParameters.TargetJob, engineParameters.IdleSingleAction, engineParameters.MainSingleAction);
 
                 var iterationTime = resolver.Resolve(engineParameters.TargetJob, RunMode.IterationTimeCharacteristic);
-                if (ShouldExecuteOncePerIteration(Jit(singleActionEngine), iterationTime))
+                if (ShouldExecuteOncePerIteration(Jit(singleActionEngine, unrollFactor: 1), iterationTime))
                 {
                     var reconfiguredJob = engineParameters.TargetJob.WithInvocationCount(1).WithUnrollFactor(1); // todo: consider if we should set the warmup count to 1!
 
@@ -56,7 +57,7 @@ namespace BenchmarkDotNet.Engines
             // it's either a job with explicit configuration or not-very time consuming benchmark, just create the engine, Jit and return
             var multiActionEngine = CreateEngine(engineParameters, resolver, engineParameters.TargetJob, engineParameters.IdleMultiAction, engineParameters.MainMultiAction);
                 
-            DeadCodeEliminationHelper.KeepAliveWithoutBoxing(Jit(multiActionEngine));
+            DeadCodeEliminationHelper.KeepAliveWithoutBoxing(Jit(multiActionEngine, unrollFactor));
 
             return multiActionEngine;
         }
@@ -67,11 +68,11 @@ namespace BenchmarkDotNet.Engines
         private static bool ShouldExecuteOncePerIteration(Measurement jit, TimeInterval iterationTime)
             => TimeInterval.FromNanoseconds(jit.GetAverageNanoseconds()) > iterationTime;
 
-        private static Measurement Jit(Engine engine)
+        private static Measurement Jit(Engine engine, int unrollFactor)
         {
-            DeadCodeEliminationHelper.KeepAliveWithoutBoxing(engine.RunIteration(new IterationData(IterationMode.IdleJit, index: -1, invokeCount: 1, unrollFactor: 1))); // don't forget to JIT idle
+            DeadCodeEliminationHelper.KeepAliveWithoutBoxing(engine.RunIteration(new IterationData(IterationMode.IdleJit, index: -1, invokeCount: unrollFactor, unrollFactor: unrollFactor))); // don't forget to JIT idle
             
-            return engine.RunIteration(new IterationData(IterationMode.Jit, index: -1, invokeCount: 1, unrollFactor: 1));
+            return engine.RunIteration(new IterationData(IterationMode.Jit, index: -1, invokeCount: unrollFactor, unrollFactor: unrollFactor));
         }
 
         private static Engine CreateEngine(EngineParameters engineParameters, IResolver resolver, Job job, Action<long> idle, Action<long> main)
