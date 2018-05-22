@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class CustomFactory : IEngineFactory
         {
-            public IEngine Create(EngineParameters engineParameters) 
+            public IEngine CreateReadyToRun(EngineParameters engineParameters) 
                 => new CustomEngine
                 {
                     GlobalCleanupAction = engineParameters.GlobalCleanupAction,
@@ -75,6 +75,8 @@ namespace BenchmarkDotNet.IntegrationTests
                     default);
             }
 
+            public void Dispose() => GlobalCleanupAction?.Invoke();
+            
             public IHost Host { get; }
             public void WriteLine() { }
             public void WriteLine(string line) { }
@@ -87,7 +89,6 @@ namespace BenchmarkDotNet.IntegrationTests
             public IResolver Resolver { get; }
 
             public Measurement RunIteration(IterationData data) { throw new NotImplementedException(); }
-            public void Jitting() { }
         }
     }
 }

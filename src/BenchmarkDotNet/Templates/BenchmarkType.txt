@@ -34,23 +34,14 @@
                 MeasureGcStats = $MeasureGcStats$
             };
 
-            var engine = new $EngineFactoryType$().Create(engineParameters);
+            using (var engine = new $EngineFactoryType$().CreateReadyToRun(engineParameters))
+            {
+                var results = engine.Run();
 
-            instance?.globalSetupAction();
-            instance?.iterationSetupAction();
+                host.ReportResults(results); // printing costs memory, do this after runs
 
-            if (job.ResolveValue(RunMode.RunStrategyCharacteristic, EngineResolver.Instance).NeedsJitting())
-				engine.Jitting(); // does first call to main action, must be executed after globalSetup() and iterationSetup()!
-
-            instance?.iterationCleanupAction();
-
-            var results = engine.Run();
-
-            instance?.globalCleanupAction();
-
-            host.ReportResults(results); // printing costs memory, do this after runs
-
-			instance.__TrickTheJIT__(); // compile the method for disassembler, but without actual run of the benchmark ;)
+                instance.__TrickTheJIT__(); // compile the method for disassembler, but without actual run of the benchmark ;)
+			}
         }
 
         public delegate $IdleMethodReturnTypeName$ IdleDelegate($ArgumentsDefinition$);

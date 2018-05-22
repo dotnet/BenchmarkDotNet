@@ -41,7 +41,6 @@ namespace BenchmarkDotNet.Engines
         private readonly EngineWarmupStage warmupStage;
         private readonly EngineTargetStage targetStage;
         private readonly bool includeMemoryStats;
-        private bool isJitted;
 
         internal Engine(
             IHost host,
@@ -78,22 +77,10 @@ namespace BenchmarkDotNet.Engines
             targetStage = new EngineTargetStage(this);
         }
 
-        public void Jitting()
-        {
-            // first signal about jitting is raised from auto-generated Program.cs, look at BenchmarkProgram.txt
-            Dummy1Action.Invoke();
-            MainAction.Invoke(1);
-            Dummy2Action.Invoke();
-            IdleAction.Invoke(1);
-            Dummy3Action.Invoke();
-            isJitted = true;
-        }
+        public void Dispose() => GlobalCleanupAction?.Invoke();
 
         public RunResults Run()
         {
-            if (Strategy.NeedsJitting() != isJitted)
-                throw new Exception($"You must{(Strategy.NeedsJitting() ? "" : " not")} call Jitting() first (Strategy = {Strategy})!");
-
             long invokeCount = InvocationCount;
             IReadOnlyList<Measurement> idle = null;
 
