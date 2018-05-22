@@ -9,7 +9,8 @@ namespace BenchmarkDotNet.Tests.Engine
 {
     public class EngineFactoryTests
     {
-        int timesBenchmarkCalled = 0, timesGlobalSetupCalled = 0, timesGlobalCleanupCalled = 0, timesIterationSetupCalled = 0, timesIterationCleanupCalled = 0;
+        int timesBenchmarkCalled = 0, timesIdleCalled = 0;
+        int timesGlobalSetupCalled = 0, timesGlobalCleanupCalled = 0, timesIterationSetupCalled = 0, timesIterationCleanupCalled = 0;
 
         void GlobalSetup() => timesGlobalSetupCalled++;
         void IterationSetup() => timesIterationSetupCalled++;
@@ -25,19 +26,22 @@ namespace BenchmarkDotNet.Tests.Engine
         }
         
         void InstantSingle(long _) => timesBenchmarkCalled++;
-
         void Instant16(long _) => timesBenchmarkCalled += 16;
+        
+        void IdleSingle(long _) => timesIdleCalled++;
+        void Idle16(long _) => timesIdleCalled += 16;
 
         [Fact]
         public void VeryTimeConsumingBenchmarksAreExecutedOncePerIterationForDefaultSettings()
         {
-            var engineParameters = CreateEngineParameters(singleAction: VeryTimeConsumingSingle, multiAction: Throwing, job: Job.Default);
+            var engineParameters = CreateEngineParameters(mainSingleAction: VeryTimeConsumingSingle, mainMultiAction: Throwing, job: Job.Default);
 
             var engine = new EngineFactory().CreateReadyToRun(engineParameters);
 
             Assert.Equal(1, timesGlobalSetupCalled);
             Assert.Equal(1, timesIterationSetupCalled);
             Assert.Equal(1, timesBenchmarkCalled);
+            Assert.Equal(1, timesIdleCalled);
             Assert.Equal(1, timesIterationCleanupCalled);
             Assert.Equal(0, timesGlobalCleanupCalled); // cleanup is called as part of dispode
 
@@ -52,13 +56,14 @@ namespace BenchmarkDotNet.Tests.Engine
         [Fact]
         public void ForJobsThatDontRequireJittingOnlyGlobalSetupIsCalled()
         {
-            var engineParameters = CreateEngineParameters(singleAction: Throwing, multiAction: Throwing, job: Job.Dry);
+            var engineParameters = CreateEngineParameters(mainSingleAction: Throwing, mainMultiAction: Throwing, job: Job.Dry);
 
             var engine = new EngineFactory().CreateReadyToRun(engineParameters);
 
             Assert.Equal(1, timesGlobalSetupCalled);
             Assert.Equal(0, timesIterationSetupCalled);
             Assert.Equal(0, timesBenchmarkCalled);
+            Assert.Equal(0, timesIdleCalled);
             Assert.Equal(0, timesIterationCleanupCalled);
             Assert.Equal(0, timesGlobalCleanupCalled); 
 
@@ -70,13 +75,14 @@ namespace BenchmarkDotNet.Tests.Engine
         [Fact]
         public void NonVeryTimeConsumingBenchmarksAreExecutedMoreThanOncePerIterationWithUnrollFactorForDefaultSettings()
         {
-            var engineParameters = CreateEngineParameters(singleAction: InstantSingle, multiAction: Instant16, job: Job.Default);
+            var engineParameters = CreateEngineParameters(mainSingleAction: InstantSingle, mainMultiAction: Instant16, job: Job.Default);
 
             var engine = new EngineFactory().CreateReadyToRun(engineParameters);
 
             Assert.Equal(1, timesGlobalSetupCalled);
             Assert.Equal(2, timesIterationSetupCalled); // once for single and & once for 16
             Assert.Equal(1 + 16, timesBenchmarkCalled);
+            Assert.Equal(1 + 16, timesIdleCalled);
             Assert.Equal(2, timesIterationCleanupCalled); // once for single and & once for 16
             Assert.Equal(0, timesGlobalCleanupCalled);
 
@@ -87,7 +93,7 @@ namespace BenchmarkDotNet.Tests.Engine
             Assert.Equal(1, timesGlobalCleanupCalled);
         }
 
-        private EngineParameters CreateEngineParameters(Action<long> singleAction, Action<long> multiAction, Job job)
+        private EngineParameters CreateEngineParameters(Action<long> mainSingleAction, Action<long> mainMultiAction, Job job)
             => new EngineParameters
             {
                 Dummy1Action = () => { },
@@ -96,13 +102,12 @@ namespace BenchmarkDotNet.Tests.Engine
                 GlobalSetupAction = GlobalSetup,
                 GlobalCleanupAction = GlobalCleanup,
                 Host = new ConsoleHost(TextWriter.Null, TextReader.Null),
-                IdleMultiAction = _ => { },
-                IdleSingleAction = _ => { },
+                IdleMultiAction = Idle16,
+                IdleSingleAction = IdleSingle,
                 IterationCleanupAction = IterationCleanup,
                 IterationSetupAction = IterationSetup,
-                MainMultiAction = multiAction,
-                MainSingleAction = singleAction,
-                Resolver = EngineResolver.Instance,
+                MainMultiAction = mainMultiAction,
+                MainSingleAction = mainSingleAction,
                 TargetJob = job
             };
     }

@@ -68,7 +68,11 @@ namespace BenchmarkDotNet.Engines
             => TimeInterval.FromNanoseconds(jit.GetAverageNanoseconds()) > iterationTime;
 
         private static Measurement Jit(Engine engine)
-            => engine.RunIteration(new IterationData(IterationMode.Jit, index: -1, invokeCount: 1, unrollFactor: 1));
+        {
+            DeadCodeEliminationHelper.KeepAliveWithoutBoxing(engine.RunIteration(new IterationData(IterationMode.IdleJit, index: -1, invokeCount: 1, unrollFactor: 1))); // don't forget to JIT idle
+            
+            return engine.RunIteration(new IterationData(IterationMode.Jit, index: -1, invokeCount: 1, unrollFactor: 1));
+        }
 
         private static Engine CreateEngine(EngineParameters engineParameters, IResolver resolver, Job job, Action<long> idle, Action<long> main)
             => new Engine(
