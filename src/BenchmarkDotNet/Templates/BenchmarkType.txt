@@ -20,11 +20,13 @@
             var engineParameters = new BenchmarkDotNet.Engines.EngineParameters()
             {
                 Host = host,
-                MainAction = instance.MainMultiAction,
+                MainMultiAction = instance.MainMultiAction,
+                MainSingleAction = instance.MainSingleAction,
                 Dummy1Action = instance.Dummy1,
                 Dummy2Action = instance.Dummy2,
                 Dummy3Action = instance.Dummy3,
-                IdleAction = instance.IdleMultiAction,
+                IdleSingleAction = instance.IdleSingleAction,
+                IdleMultiAction = instance.IdleMultiAction,
                 GlobalSetupAction = instance.globalSetupAction,
                 GlobalCleanupAction = instance.globalCleanupAction,
                 IterationSetupAction = instance.iterationSetupAction,
@@ -115,6 +117,12 @@
             }
         }
 
+        private void IdleSingleAction(long _)
+        {
+            $LoadArguments$
+            consumer.Consume(idleDelegate($PassArguments$));
+        }
+        
         private void MainMultiAction(long invokeCount)
         {
             $LoadArguments$
@@ -124,6 +132,12 @@
             }
         }
 
+        private void MainSingleAction(long _)
+        {
+            $LoadArguments$
+            consumer.Consume(targetDelegate($PassArguments$)$ConsumeField$);
+        }
+        
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         public $TargetMethodReturnType$ $DiassemblerEntryMethodName$()
         {
@@ -149,6 +163,14 @@
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(result);
         }
 
+        private void IdleSingleAction(long _)
+        {
+            $LoadArguments$
+            $IdleMethodReturnTypeName$ result = default($IdleMethodReturnTypeName$);
+            result = idleDelegate($PassArguments$);
+            DeadCodeEliminationHelper.KeepAliveWithoutBoxing(result);
+        }
+
         private void MainMultiAction(long invokeCount)
         {
             $LoadArguments$
@@ -157,6 +179,14 @@
             {
                 result = targetDelegate($PassArguments$);@Unroll@
             }
+            NonGenericKeepAliveWithoutBoxing(result);
+        }
+
+        private void MainSingleAction(long _)
+        {
+            $LoadArguments$
+            $TargetMethodReturnType$ result = default($TargetMethodReturnType$);
+            result = targetDelegate($PassArguments$);
             NonGenericKeepAliveWithoutBoxing(result);
         }
 
@@ -189,6 +219,14 @@
             }
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
         }
+        
+        private void IdleSingleAction(long _)
+        {
+            $LoadArguments$
+            $IdleMethodReturnTypeName$ value = default($IdleMethodReturnTypeName$);
+            value = idleDelegate($PassArguments$);
+            DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
+        }
 
         private $TargetMethodReturnType$ mainDefaultValueHolder = default($TargetMethodReturnType$);
 
@@ -200,6 +238,14 @@
             {
                 alias = targetDelegate($PassArguments$);@Unroll@
             }
+            DeadCodeEliminationHelper.KeepAliveWithoutBoxing(ref alias);
+        }
+        
+        private void MainSingleAction(long _)
+        {
+            $LoadArguments$
+            ref $TargetMethodReturnType$ alias = ref mainDefaultValueHolder;
+            alias = targetDelegate($PassArguments$);
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(ref alias);
         }
 
@@ -225,6 +271,12 @@
             }
         }
 
+        private void IdleSingleAction(long _)
+        {
+            $LoadArguments$
+            idleDelegate($PassArguments$);
+        }
+        
         private void MainMultiAction(long invokeCount)
         {
             $LoadArguments$
@@ -232,6 +284,12 @@
             {
                 targetDelegate($PassArguments$);@Unroll@
             }
+        }
+        
+        private void MainSingleAction(long _)
+        {
+            $LoadArguments$
+            targetDelegate($PassArguments$);
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
