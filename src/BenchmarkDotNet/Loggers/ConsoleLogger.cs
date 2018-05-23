@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.Loggers
 {
@@ -25,16 +26,17 @@ namespace BenchmarkDotNet.Loggers
 
         private void Write(LogKind logKind, Action<string> write, string text)
         {
-            var colorBefore = Console.ForegroundColor;
+            ConsoleHandler.EnsureInitialized(this);
 
             try
             {
-                Console.ForegroundColor = GetColor(logKind);
+                ConsoleHandler.SetForegroundColor(GetColor(logKind));
+                
                 write(text);
             }
             finally
             {
-                Console.ForegroundColor = colorBefore;
+                ConsoleHandler.RestoreForegroundColor();
             }
         }
 

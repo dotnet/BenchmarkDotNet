@@ -17,8 +17,12 @@ namespace BenchmarkDotNet.Running
         private static readonly Dictionary<string, string> Configuration = CreateConfiguration();
         private static readonly char[] TrimChars = { ' ' };
 
+        private static bool consoleCancelKeyPressed = false;
+        
         private readonly Type[] allTypes;
         private readonly ILogger logger;
+
+        static TypeParser() => Console.CancelKeyPress += (_, __) => consoleCancelKeyPressed = true; 
 
         internal TypeParser(Type[] types, ILogger logger)
         {
@@ -42,9 +46,13 @@ namespace BenchmarkDotNet.Running
 
         internal string[] ReadArgumentList(string[] args)
         {
-            while (args.Length == 0)
+            while (args.Length == 0 && !consoleCancelKeyPressed)
             {
                 PrintAvailable();
+                
+                if (consoleCancelKeyPressed)
+                    break;
+                
                 var benchmarkCaptionExample = allTypes.Length == 0 ? "Intro_00" : allTypes.First().GetDisplayName();
                 logger.WriteLineHelp(
                     $"You should select the target benchmark. Please, print a number of a benchmark (e.g. '0') or a benchmark caption (e.g. '{benchmarkCaptionExample}'):");
@@ -237,10 +245,14 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineHelp($"Available Benchmark{(allTypes.Length > 1 ? "s" : "")}:");
 
             int numberWidth = allTypes.Length.ToString().Length;
-            for (int i = 0; i < allTypes.Length; i++)
+            for (int i = 0; i < allTypes.Length && !consoleCancelKeyPressed; i++)
                 logger.WriteLineHelp(string.Format(CultureInfo.InvariantCulture, "  #{0} {1}", i.ToString().PadRight(numberWidth), allTypes[i].GetDisplayName()));
-            logger.WriteLine();
-            logger.WriteLine();
+
+            if (!consoleCancelKeyPressed)
+            {
+                logger.WriteLine();
+                logger.WriteLine();
+            }
         }
         
         private static Dictionary<string, string> CreateConfiguration()
