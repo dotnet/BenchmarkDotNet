@@ -72,9 +72,15 @@ namespace BenchmarkDotNet.Engines
 
         private static Measurement Jit(Engine engine, int unrollFactor)
         {
+            engine.Dummy1Action.Invoke();
+
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(engine.RunIteration(new IterationData(IterationMode.IdleJitting, index: 1, invokeCount: unrollFactor, unrollFactor: unrollFactor))); // don't forget to JIT idle
             
+            engine.Dummy2Action.Invoke();
+
             var result = engine.RunIteration(new IterationData(IterationMode.MainJitting, index: 1, invokeCount: unrollFactor, unrollFactor: unrollFactor));
+
+            engine.Dummy3Action.Invoke();
 
             engine.WriteLine();
             
