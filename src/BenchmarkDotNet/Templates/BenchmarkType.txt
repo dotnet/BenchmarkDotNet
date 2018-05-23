@@ -18,7 +18,7 @@
             host.WriteLine();
 
             var errors = BenchmarkEnvironmentInfo.Validate(job);
-            if (ValidationHelper.CheckForErrors(errors, host))
+            if (ValidationErrorReporter.ReportIfAny(errors, host))
                 return;
 
             var engineParameters = new BenchmarkDotNet.Engines.EngineParameters()

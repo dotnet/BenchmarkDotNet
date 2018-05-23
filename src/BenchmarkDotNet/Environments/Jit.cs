@@ -3,10 +3,10 @@
     public enum Jit
     {
         /// <summary>
-        /// Undefined
+        /// Default
         /// <remarks>By default</remarks>
         /// </summary>
-        Undefined,
+        Default,
         
         /// <summary>
         /// LegacyJIT

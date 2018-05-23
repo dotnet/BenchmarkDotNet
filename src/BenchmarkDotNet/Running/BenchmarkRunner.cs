@@ -371,8 +371,8 @@ namespace BenchmarkDotNet.Running
 
                 var errors = executeResults.SelectMany(r => r.Data)
                     .Union(executeResults.SelectMany(r => r.ExtraOutput))
-                    .Where(line => line.Contains(ValidationHelper.ConsoleErrorPrefix))
-                    .Select(line => line.Substring(ValidationHelper.ConsoleErrorPrefix.Length).Trim())
+                    .Where(line => line.StartsWith(ValidationErrorReporter.ConsoleErrorPrefix))
+                    .Select(line => line.Substring(ValidationErrorReporter.ConsoleErrorPrefix.Length).Trim())
                     .ToArray();
 
                 if (errors.Any())

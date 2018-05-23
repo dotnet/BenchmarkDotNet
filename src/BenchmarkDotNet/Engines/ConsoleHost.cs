@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Engines
                 throw new NotSupportedException($"Unknown Acknowledgment: {acknowledgment}");
         }
 
-        public void SendError(string message) => outWriter.WriteLine($"{ValidationHelper.ConsoleErrorPrefix} {message}");
+        public void SendError(string message) => outWriter.WriteLine($"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
 
         public void ReportResults(RunResults runResults) => runResults.Print(outWriter);
     }

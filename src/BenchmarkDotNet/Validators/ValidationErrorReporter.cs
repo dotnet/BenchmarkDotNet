@@ -3,11 +3,11 @@ using BenchmarkDotNet.Engines;
 
 namespace BenchmarkDotNet.Validators
 {
-    public static class ValidationHelper
+    public static class ValidationErrorReporter
     {
         public const string ConsoleErrorPrefix = "// ERROR: ";
         
-        public static bool CheckForErrors(IEnumerable<ValidationError> validationErrors, IHost host)
+        public static bool ReportIfAny(IEnumerable<ValidationError> validationErrors, IHost host)
         {
             bool hasErrors = false;
             foreach (var validationError in validationErrors)

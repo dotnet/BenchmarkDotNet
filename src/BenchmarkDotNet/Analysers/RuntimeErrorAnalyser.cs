@@ -18,8 +18,8 @@ namespace BenchmarkDotNet.Analysers
         {
             var errors = report.ExecuteResults.SelectMany(r => r.Data)
                 .Union(report.ExecuteResults.SelectMany(r => r.ExtraOutput))
-                .Where(line => line.Contains(ValidationHelper.ConsoleErrorPrefix))
-                .Select(line => line.Substring(ValidationHelper.ConsoleErrorPrefix.Length).Trim());
+                .Where(line => line.Contains(ValidationErrorReporter.ConsoleErrorPrefix))
+                .Select(line => line.Substring(ValidationErrorReporter.ConsoleErrorPrefix.Length).Trim());
 
             foreach (string error in errors)
                 yield return CreateError(error, report);
