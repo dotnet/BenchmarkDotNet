@@ -18,8 +18,10 @@ namespace BenchmarkDotNet.Running
     {
         public static BenchmarkRunInfo TypeToBenchmarks(Type type, IConfig config = null)
         {
+            if (type.IsGenericTypeDefinition)
+                throw new ArgumentException($"{type.Name} is generic type definition, use BenchmarkSwitcher for it"); // for "open generic types" should be used BenchmarkSwitcher
+            
             var fullConfig = GetFullConfig(type, config);
-
             var allMethods = type.GetMethods();
             return MethodsToBenchmarksWithFullConfig(type, allMethods, fullConfig);
         }

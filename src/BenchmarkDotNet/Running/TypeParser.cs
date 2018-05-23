@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Running
@@ -21,8 +22,8 @@ namespace BenchmarkDotNet.Running
 
         internal TypeParser(Type[] types, ILogger logger)
         {
-            allTypes = types.Where(type => type.ContainsRunnableBenchmarks()).ToArray();
             this.logger = logger;
+            allTypes = GetRunnableBenchmarks(types);
         }
 
         internal class TypeWithMethods
@@ -243,6 +244,25 @@ namespace BenchmarkDotNet.Running
             logger.WriteLine();
         }
 
+        private Type[] GetRunnableBenchmarks(Type[] types)
+        {
+            var benchmarks = GenericBuilderHelper.GetRunnableBenchmarks(types);
+            var diff = types.Except(benchmarks).ToList();
+            
+            if (diff.Any())
+                PrintGenericsBuildErrors(diff);
+            
+            return benchmarks;
+        }
+        
+        private void PrintGenericsBuildErrors(IEnumerable<Type> types)
+        {
+            foreach (var type in types)
+            {
+                logger.WriteLineError($"Genetic type {type.Name} failed to build due to wrong type argument or arguments count, ignoring");
+            }
+        }
+        
         private static Dictionary<string, string> CreateConfiguration()
         {
             return new Dictionary<string, string>
