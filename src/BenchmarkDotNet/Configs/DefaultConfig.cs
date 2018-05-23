@@ -56,6 +56,7 @@ namespace BenchmarkDotNet.Configs
             yield return JitOptimizationsValidator.FailOnError;
 #endif
             yield return UnrollFactorValidator.Default;
+            yield return GenericBenchmarksValidator.DontFailOnError;
         }
 
         public IEnumerable<Job> GetJobs() => Array.Empty<Job>();

@@ -10,118 +10,117 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void TestBuildGenericWithOneArgument()
         {
-            // Arrange & Act
-            var types = GenericBuilderHelper.GetRunnableBenchmarks(new [] {typeof(OneArgGenericBenchmark<>)});
+            var types = GenericBenchmarksBuilder.GetRunnableBenchmarks(new [] {typeof(OneArgGenericBenchmark<>)});
             
-            // Assert
-            Assert.Equal(types.Length, 2);
+            Assert.Equal(2, types.Length);
+            Assert.Single(types, typeof(OneArgGenericBenchmark<int>));
+            Assert.Single(types, typeof(OneArgGenericBenchmark<char>));
+        }
+        
+        [GenericTypeArguments(typeof(int))]
+        [GenericTypeArguments(typeof(char))]
+        public class OneArgGenericBenchmark<T>
+        {
+            [Benchmark] public T CreateT() => Activator.CreateInstance<T>();
         }
         
         [Fact]
         public void TestBuildGenericWithTwoArguments()
         {
-            // Arrange & Act
-            var types = GenericBuilderHelper.GetRunnableBenchmarks(new [] {typeof(TwoArgGenericBenchmark<,>)});
+            var types = GenericBenchmarksBuilder.GetRunnableBenchmarks(new [] {typeof(TwoArgGenericBenchmark<,>)});
             
-            // Assert
-            Assert.Equal(types.Length, 2);
+            Assert.Equal(2, types.Length);
+            Assert.Single(types, typeof(TwoArgGenericBenchmark<int, char>));
+            Assert.Single(types, typeof(TwoArgGenericBenchmark<char, string>));
+        }
+        
+        [GenericTypeArguments(typeof(int), typeof(char))]
+        [GenericTypeArguments(typeof(char), typeof(string))]
+        public class TwoArgGenericBenchmark<T1, T2>
+        {
+            [Benchmark] public T1 CreateT1() => Activator.CreateInstance<T1>();
+
+            [Benchmark] public T2 CreateT2() => Activator.CreateInstance<T2>();
         }
         
         [Fact]
         public void TestBuildGenericWithThreeArguments()
         {
-            // Arrange & Act
-            var types = GenericBuilderHelper.GetRunnableBenchmarks(new [] {typeof(ThreeArgGenericBenchmark<,,>)});
+            var types = GenericBenchmarksBuilder.GetRunnableBenchmarks(new [] {typeof(ThreeArgGenericBenchmark<,,>)});
             
-            // Assert
-            Assert.Equal(types.Length, 2);
+            Assert.Equal(2, types.Length);
+            Assert.Single(types, typeof(ThreeArgGenericBenchmark<int, char, string>));
+            Assert.Single(types, typeof(ThreeArgGenericBenchmark<char, string, byte>));
+        }
+        
+        [GenericTypeArguments(typeof(int), typeof(char),  typeof(string))]
+        [GenericTypeArguments(typeof(char), typeof(string), typeof(byte))]
+        public class ThreeArgGenericBenchmark<T1, T2, T3>
+        {
+            [Benchmark] public T1 CreateT1() => Activator.CreateInstance<T1>();
+
+            [Benchmark] public T2 CreateT2() => Activator.CreateInstance<T2>();
+        
+            [Benchmark] public T3 CreateT3() => Activator.CreateInstance<T3>();
         }
         
         [Fact]
         public void TestBuildGenericWithWrongAttributes()
         {
-            // Arrange & Act
-            var types = GenericBuilderHelper.GetRunnableBenchmarks(new [] {typeof(GenericBenchmarkWithWrongAttribute<,>)});
+            var types = GenericBenchmarksBuilder.GetRunnableBenchmarks(new [] {typeof(GenericBenchmarkWithWrongAttribute<,>)});
             
-            // Assert
-            Assert.Equal(types.Length, 2);
+            Assert.Equal(2, types.Length);
+            Assert.Single(types, typeof(GenericBenchmarkWithWrongAttribute<int, char>));
+            Assert.Single(types, typeof(GenericBenchmarkWithWrongAttribute<char, string>));
+        }
+        
+        [GenericTypeArguments(typeof(int), typeof(char))]
+        [GenericTypeArguments(typeof(char), typeof(string))]
+        [GenericTypeArguments(typeof(char))]
+        public class GenericBenchmarkWithWrongAttribute<T1, T2>
+        {
+            [Benchmark] public T1 CreateT1() => Activator.CreateInstance<T1>();
+
+            [Benchmark] public T2 CreateT2() => Activator.CreateInstance<T2>();
         }
         
         [Fact]
         public void TestBuildGenericWithConstraints()
         {
-            // Arrange & Act
-            var types = GenericBuilderHelper.GetRunnableBenchmarks(new [] {typeof(GenericBenchmarkWithConstraints<,>)});
+            var types = GenericBenchmarksBuilder.GetRunnableBenchmarks(new [] {typeof(GenericBenchmarkWithConstraints<,>)});
             
-            // Assert
-            Assert.Equal(types.Length, 2);
+            Assert.Equal(2, types.Length);
+            Assert.Single(types, typeof(GenericBenchmarkWithConstraints<int, char>));
+            Assert.Single(types, typeof(GenericBenchmarkWithConstraints<char, byte>));
+        }
+        
+        [GenericTypeArguments(typeof(int), typeof(char))]
+        [GenericTypeArguments(typeof(char), typeof(byte))]
+        public class GenericBenchmarkWithConstraints<T1, T2> where T1 : struct
+            where T2 : struct 
+        {
+            [Benchmark] public T1 CreateT1() => Activator.CreateInstance<T1>();
+
+            [Benchmark] public T2 CreateT2() => Activator.CreateInstance<T2>();
         }
         
         [Fact]
         public void TestBuildGenericWithConstraintsWrongArgs()
         {
-            // Arrange & Act
-            var types = GenericBuilderHelper.GetRunnableBenchmarks(new [] {typeof(GenericBenchmarkWithConstraintsWrongArgs<,>)});
+            var types = GenericBenchmarksBuilder.GetRunnableBenchmarks(new [] {typeof(GenericBenchmarkWithConstraintsWrongArgs<,>)});
             
-            // Assert
-            Assert.Equal(types.Length, 1);
+            Assert.Single(types);
+            Assert.Single(types, typeof(GenericBenchmarkWithConstraintsWrongArgs<int, char>));
         }
-    }
-    
-    [GenericBenchmark(typeof(int))]
-    [GenericBenchmark(typeof(char))]
-    public class OneArgGenericBenchmark<T>
-    {
-        [Benchmark] public T CreateT() => Activator.CreateInstance<T>();
-    }
-    
-    [GenericBenchmark(typeof(int), typeof(char))]
-    [GenericBenchmark(typeof(char), typeof(string))]
-    public class TwoArgGenericBenchmark<T1, T2>
-    {
-        [Benchmark] public T1 CreateT1() => Activator.CreateInstance<T1>();
-
-        [Benchmark] public T2 CreateT2() => Activator.CreateInstance<T2>();
-    }
-    
-    [GenericBenchmark(typeof(int), typeof(char),  typeof(string))]
-    [GenericBenchmark(typeof(char), typeof(string), typeof(byte))]
-    public class ThreeArgGenericBenchmark<T1, T2, T3>
-    {
-        [Benchmark] public T1 CreateT1() => Activator.CreateInstance<T1>();
-
-        [Benchmark] public T2 CreateT2() => Activator.CreateInstance<T2>();
         
-        [Benchmark] public T3 CreateT3() => Activator.CreateInstance<T3>();
-    }
-    
-    [GenericBenchmark(typeof(int), typeof(char))]
-    [GenericBenchmark(typeof(char), typeof(string))]
-    [GenericBenchmark(typeof(char))]
-    public class GenericBenchmarkWithWrongAttribute<T1, T2>
-    {
-        [Benchmark] public T1 CreateT1() => Activator.CreateInstance<T1>();
+        [GenericTypeArguments(typeof(int), typeof(char))]
+        [GenericTypeArguments(typeof(char), typeof(string))]
+        public class GenericBenchmarkWithConstraintsWrongArgs<T1, T2> where T1 : struct
+            where T2 : struct 
+        {
+            [Benchmark] public T1 CreateT1() => Activator.CreateInstance<T1>();
 
-        [Benchmark] public T2 CreateT2() => Activator.CreateInstance<T2>();
-    }
-    
-    [GenericBenchmark(typeof(int), typeof(char))]
-    [GenericBenchmark(typeof(char), typeof(byte))]
-    public class GenericBenchmarkWithConstraints<T1, T2> where T1 : struct
-                                                         where T2 : struct 
-    {
-        [Benchmark] public T1 CreateT1() => Activator.CreateInstance<T1>();
-
-        [Benchmark] public T2 CreateT2() => Activator.CreateInstance<T2>();
-    }
-    
-    [GenericBenchmark(typeof(int), typeof(char))]
-    [GenericBenchmark(typeof(char), typeof(string))]
-    public class GenericBenchmarkWithConstraintsWrongArgs<T1, T2> where T1 : struct
-                                                                  where T2 : struct 
-    {
-        [Benchmark] public T1 CreateT1() => Activator.CreateInstance<T1>();
-
-        [Benchmark] public T2 CreateT2() => Activator.CreateInstance<T2>();
+            [Benchmark] public T2 CreateT2() => Activator.CreateInstance<T2>();
+        }
     }
 }

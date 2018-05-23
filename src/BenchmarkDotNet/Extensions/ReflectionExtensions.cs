@@ -121,12 +121,6 @@ namespace BenchmarkDotNet.Extensions
             }
         }
 
-        internal static bool IsStruct(this Type type)
-        {
-            var typeInfo = type.GetTypeInfo();
-            return typeInfo.IsValueType && !typeInfo.IsPrimitive;
-        }
-
         internal static Type[] GetRunnableBenchmarks(this Assembly assembly)
             => assembly
                 .GetTypes()
@@ -148,44 +142,6 @@ namespace BenchmarkDotNet.Extensions
             return typeInfo.GetBenchmarks().Any();
         }
 
-        internal static List<(bool isSuccesed, Type result)> BuildGenericsIfNeeded(this Type type)
-        {
-            var genericArgs = type.GetCustomAttributes(true).OfType<GenericBenchmarkAttribute>()
-                                                            .Select(x => x.GenericType)
-                                                            .ToList();
-            if (genericArgs.Any())
-                return BuildGenericType(type, genericArgs);
-
-            return new List<(bool isSuccesed, Type result)> { (true,  type) };
-        }
-
-        private static List<(bool isSuccesed, Type result)> BuildGenericType(Type type, List<Type[]> genericArgs)
-        {
-            var result = new List<(bool isSuccesed, Type result)>();
-            
-            foreach (var genericArg in genericArgs)
-            {
-                var buildResult = type.TryMakeGenericType(genericArg, out var builtType);
-                result.Add((buildResult, builtType));
-            }
-            
-            return result;
-        }
-        
-        private static bool TryMakeGenericType(this Type type, Type[] genericArg, out Type result)
-        {
-            try
-            {
-                result = type.MakeGenericType(genericArg);
-                return true;
-            }
-            catch (ArgumentException e)
-            {
-                result = type;
-                return false;
-            }
-        }
-        
         internal static MethodInfo[] GetBenchmarks(this TypeInfo typeInfo)
             => typeInfo
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public)
@@ -222,7 +178,7 @@ namespace BenchmarkDotNet.Extensions
         private static bool IsRunnableGenericType(TypeInfo typeInfo)
             => // if it is an open generic - there must be GenericBenchmark attributes
                 (!typeInfo.IsGenericTypeDefinition
-                 || (typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericBenchmarkAttribute>().Any()))
+                 || (typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any()))
                 && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it       
     }
 }

@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Running
         internal TypeParser(Type[] types, ILogger logger)
         {
             this.logger = logger;
-            allTypes = GetRunnableBenchmarks(types);
+            allTypes = GenericBenchmarksBuilder.GetRunnableBenchmarks(types);
         }
 
         internal class TypeWithMethods
@@ -204,7 +204,6 @@ namespace BenchmarkDotNet.Running
             return (methods, classes, namespaces, attributes);
         }
 
-
         internal void PrintOptions(int prefixWidth, int outputWidth)
         {
             foreach (var option in Configuration)
@@ -242,25 +241,6 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineHelp(string.Format(CultureInfo.InvariantCulture, "  #{0} {1}", i.ToString().PadRight(numberWidth), allTypes[i].GetDisplayName()));
             logger.WriteLine();
             logger.WriteLine();
-        }
-
-        private Type[] GetRunnableBenchmarks(Type[] types)
-        {
-            var benchmarks = GenericBuilderHelper.GetRunnableBenchmarks(types);
-            var diff = types.Except(benchmarks).ToList();
-            
-            if (diff.Any())
-                PrintGenericsBuildErrors(diff);
-            
-            return benchmarks;
-        }
-        
-        private void PrintGenericsBuildErrors(IEnumerable<Type> types)
-        {
-            foreach (var type in types)
-            {
-                logger.WriteLineError($"Genetic type {type.Name} failed to build due to wrong type argument or arguments count, ignoring");
-            }
         }
         
         private static Dictionary<string, string> CreateConfiguration()

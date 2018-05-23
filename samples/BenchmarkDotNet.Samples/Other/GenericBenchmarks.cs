@@ -4,8 +4,8 @@ using BenchmarkDotNet.Attributes.Jobs;
 
 namespace BenchmarkDotNet.Samples.Other
 {
-    [GenericBenchmark(typeof(int))]
-    [GenericBenchmark(typeof(char))]
+    [GenericTypeArguments(typeof(int))]
+    [GenericTypeArguments(typeof(char))]
     public class GenericBenchmarks<T>
     {
         [Benchmark] public T Create() => Activator.CreateInstance<T>();

@@ -2,6 +2,6 @@
 {
     public enum SummaryOrderPolicy
     {
-        Default, FastestToSlowest, SlowestToFastest, Method, Defined
+        Default, FastestToSlowest, SlowestToFastest, Method, Declared
     }
 }

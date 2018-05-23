@@ -32,11 +32,6 @@ namespace BenchmarkDotNet.Order
 
         public virtual IEnumerable<Benchmark> GetExecutionOrder(Benchmark[] benchmarks)
         {
-            if (summaryOrderPolicy == SummaryOrderPolicy.Defined)
-            {
-                return benchmarks;
-            }
-            
             var list = benchmarks.ToList();
             list.Sort(benchmarkComparer);
             return list;
@@ -60,6 +55,8 @@ namespace BenchmarkDotNet.Order
                     return benchmarks.OrderByDescending(b => summary[b].ResultStatistics.Mean);
                 case SummaryOrderPolicy.Method:
                     return benchmarks.OrderBy(b => b.Target.MethodDisplayInfo);
+                case SummaryOrderPolicy.Declared:
+                    return benchmarks;
                 default:
                     return GetExecutionOrder(benchmarks);
             }
