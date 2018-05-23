@@ -28,10 +28,10 @@ namespace BenchmarkDotNet.Loggers
         {
             ConsoleHandler.EnsureInitialized(this);
 
-            ConsoleHandler.SetForegroundColor(GetColor(logKind));
-            
             try
             {
+                ConsoleHandler.SetForegroundColor(GetColor(logKind));
+                
                 write(text);
             }
             finally

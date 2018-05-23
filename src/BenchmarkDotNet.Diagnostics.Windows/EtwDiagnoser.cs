@@ -42,6 +42,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             Console.CancelKeyPress += OnConsoleCancelKeyPress;
 
+            NativeWindowsConsoleHelper.OnExit += OnConsoleCancelKeyPress;
+
             EnableProvider();
 
             AttachToEvents(Session, parameters.Benchmark);
@@ -80,6 +82,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             Session.Dispose();
 
             Console.CancelKeyPress -= OnConsoleCancelKeyPress;
+            NativeWindowsConsoleHelper.OnExit -= OnConsoleCancelKeyPress;
         }
 
         private void Clear()
