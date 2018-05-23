@@ -25,14 +25,13 @@ namespace BenchmarkDotNet.Analysers
             Report = report;
         }
 
-        public static Conclusion CreateHint(string analyserId, string message, [CanBeNull] BenchmarkReport report = null)
-        {
-            return new Conclusion(analyserId, ConclusionKind.Hint, message, report);
-        }
+        public static Conclusion CreateHint(string analyserId, string message, [CanBeNull] BenchmarkReport report = null) 
+            => new Conclusion(analyserId, ConclusionKind.Hint, message, report);
 
-        public static Conclusion CreateWarning(string analyserId, string message, [CanBeNull] BenchmarkReport report = null)
-        {
-            return new Conclusion(analyserId, ConclusionKind.Warning, message, report);
-        }
+        public static Conclusion CreateWarning(string analyserId, string message, [CanBeNull] BenchmarkReport report = null) 
+            => new Conclusion(analyserId, ConclusionKind.Warning, message, report);
+
+        public static Conclusion CreateError(string analyserId, string message, [CanBeNull] BenchmarkReport report = null) 
+            => new Conclusion(analyserId, ConclusionKind.Error, message, report);
     }
 }

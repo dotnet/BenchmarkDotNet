@@ -17,6 +17,10 @@
             host.WriteLine("// Job: {0}", job.DisplayInfo);
             host.WriteLine();
 
+            var errors = BenchmarkEnvironmentInfo.Validate(job);
+            if (ValidationErrorReporter.ReportIfAny(errors, host))
+                return;
+
             var engineParameters = new BenchmarkDotNet.Engines.EngineParameters()
             {
                 Host = host,

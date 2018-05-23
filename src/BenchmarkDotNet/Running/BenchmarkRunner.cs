@@ -369,6 +369,19 @@ namespace BenchmarkDotNet.Running
 
                 executeResults.Add(executeResult);
 
+                var errors = executeResults.SelectMany(r => r.Data)
+                    .Union(executeResults.SelectMany(r => r.ExtraOutput))
+                    .Where(line => line.StartsWith(ValidationErrorReporter.ConsoleErrorPrefix))
+                    .Select(line => line.Substring(ValidationErrorReporter.ConsoleErrorPrefix.Length).Trim())
+                    .ToArray();
+
+                if (errors.Any())
+                {
+                    foreach (string error in errors)
+                        logger.WriteLineError(error);
+                    break;
+                }
+
                 var measurements = executeResults
                     .SelectMany(r => r.Data)
                     .Select(line => Measurement.Parse(logger, line, 0))
