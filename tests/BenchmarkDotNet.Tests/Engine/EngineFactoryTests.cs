@@ -80,7 +80,7 @@ namespace BenchmarkDotNet.Tests.Engine
         public void ForJobsThatDontRequirePilotTheGlobalSetupIsCalledAndMultiActionCodeGetsJitted() 
             => AssertGlobalSetupWasCalledAndMultiActionGotJitted(Job.Default.WithInvocationCount(100));
 
-        public void AssertGlobalSetupWasCalledAndMultiActionGotJitted(Job job)
+        private void AssertGlobalSetupWasCalledAndMultiActionGotJitted(Job job)
         {
             var engineParameters = CreateEngineParameters(mainSingleAction: Throwing, mainMultiAction: Instant16, job: job);
 
