@@ -7,9 +7,9 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class ParamsTestPropertyTest : BenchmarkTestExecutor
+    public class ParamsTests : BenchmarkTestExecutor
     {
-        public ParamsTestPropertyTest(ITestOutputHelper output) : base(output) { }
+        public ParamsTests(ITestOutputHelper output) : base(output) { }
 
         [Fact]
         public void ParamsSupportPropertyWithPublicSetter()
@@ -40,11 +40,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 }
             }
         }
-    }
-
-    public class ParamsTestPrivatePropertyErrorTest : BenchmarkTestExecutor
-    {
-        public ParamsTestPrivatePropertyErrorTest(ITestOutputHelper output) : base(output) { }
 
         [Fact]
         public void ParamsDoesNotSupportPropertyWithoutPublicSetter()
@@ -70,11 +65,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 }
             }
         }
-    }
-
-    public class ParamsTestFieldTest : BenchmarkTestExecutor
-    {
-        public ParamsTestFieldTest(ITestOutputHelper output) : base(output) { }
 
         [Fact]
         public void ParamsSupportPublicFields()
@@ -106,11 +96,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 }
             }
         }
-    }
-
-    public class ParamsTestPrivateFieldErrorTest : BenchmarkTestExecutor
-    {
-        public ParamsTestPrivateFieldErrorTest(ITestOutputHelper output) : base(output) { }
 
         [Fact]
         public void ParamsDoesNotSupportPrivateFields()
@@ -136,11 +121,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 }
             }
         }
-    }
-
-    public class NestedEnumsAsParamsTest : BenchmarkTestExecutor
-    {
-        public NestedEnumsAsParamsTest(ITestOutputHelper output) : base(output) { }
 
         public enum NestedOne
         {
@@ -158,11 +138,6 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark]
             public NestedOne Benchmark() => Field;
         }
-    }
-
-    public class CharactersAsParamsTest : BenchmarkTestExecutor
-    {
-        public CharactersAsParamsTest(ITestOutputHelper output) : base(output) { }
 
         [Fact]
         public void CharactersAsParamsAreSupported() => CanExecute<CharactersAsParams>();
@@ -175,11 +150,6 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark]
             public char Benchmark() => Field;
         }
-    }
-
-    public class NullableTypesAsParamsTest : BenchmarkTestExecutor
-    {
-        public NullableTypesAsParamsTest(ITestOutputHelper output) : base(output) { }
 
         [Fact]
         public void NullableTypesAsParamsAreSupported() => CanExecute<NullableTypesAsParams>();
@@ -195,11 +165,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 if(Field != null) { throw new Exception("Field should be initialized in ctor with 1 and then set to null by Engine"); }
             }
         }
-    }
-
-    public class InvalidFileNamesParamsTests : BenchmarkTestExecutor
-    {
-        public InvalidFileNamesParamsTests(ITestOutputHelper output) : base(output) { }
 
         [Fact]
         public void InvalidFileNamesInParamsAreSupported() => CanExecute<InvalidFileNamesInParams>();
@@ -211,6 +176,25 @@ namespace BenchmarkDotNet.IntegrationTests
 
             [Benchmark]
             public void Benchmark() => Console.WriteLine("// " + Field);
+        }
+
+        [Fact]
+        public void ParamsMustBeEscapedProperly() => CanExecute<NeedEscaping>();
+
+        public class NeedEscaping
+        {
+            private const string Json = "{ \"message\": \"Hello, World!\" }";
+
+            [Params(Json)]
+            public string Field;
+
+            [Benchmark]
+            [Arguments(Json)]
+            public void Benchmark(string argument)
+            {
+                if (Field != Json || argument != Json)
+                    throw new InvalidOperationException("Wrong character escaping!");
+            }
         }
     }
 }

@@ -7,6 +7,7 @@
         void WriteLine(string message);
 
         void SendSignal(HostSignal hostSignal);
+        void SendError(string message);
 
         void ReportResults(RunResults runResults);
     }

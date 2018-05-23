@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -81,8 +82,6 @@ namespace BenchmarkDotNet.Extensions
         {
             if (!typeInfo.IsGenericType)
                 return typeInfo.Name;
-            if (typeInfo.IsGenericTypeDefinition)
-                throw new NotSupportedException("Open generics are not supported");
 
             var mainName = typeInfo.Name.Substring(0, typeInfo.Name.IndexOf('`'));
             string args = string.Join(", ", typeInfo.GetGenericArguments().Select(GetDisplayName).ToArray());
@@ -122,12 +121,6 @@ namespace BenchmarkDotNet.Extensions
             }
         }
 
-        internal static bool IsStruct(this Type type)
-        {
-            var typeInfo = type.GetTypeInfo();
-            return typeInfo.IsValueType && !typeInfo.IsPrimitive;
-        }
-
         internal static Type[] GetRunnableBenchmarks(this Assembly assembly)
             => assembly
                 .GetTypes()
@@ -139,8 +132,11 @@ namespace BenchmarkDotNet.Extensions
         internal static bool ContainsRunnableBenchmarks(this Type type)
         {
             var typeInfo = type.GetTypeInfo();
-
-            if (typeInfo.IsAbstract || typeInfo.IsSealed || typeInfo.IsNotPublic || (typeInfo.IsGenericType && !IsRunnableGenericType(typeInfo)))
+            
+            if (typeInfo.IsAbstract 
+                || typeInfo.IsSealed 
+                || typeInfo.IsNotPublic 
+                || (typeInfo.IsGenericType && !IsRunnableGenericType(typeInfo)))
                 return false;
 
             return typeInfo.GetBenchmarks().Any();
@@ -180,7 +176,9 @@ namespace BenchmarkDotNet.Extensions
         }
 
         private static bool IsRunnableGenericType(TypeInfo typeInfo)
-            => !typeInfo.IsGenericTypeDefinition // is not an open generic
-            && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it
+            => // if it is an open generic - there must be GenericBenchmark attributes
+                (!typeInfo.IsGenericTypeDefinition
+                 || (typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any()))
+                && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it       
     }
 }

@@ -44,6 +44,42 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             }
         }
 
+        /// <summary>Fills the properties of the instance of the object used to run the benchmark.</summary>
+        /// <param name="instance">The instance.</param>
+        /// <param name="benchmark">The benchmark.</param>
+        internal static void FillMembers(object instance, Benchmark benchmark)
+        {
+            foreach (var parameter in benchmark.Parameters.Items)
+            {
+                var flags = BindingFlags.Public;
+                flags |= parameter.IsStatic ? BindingFlags.Static : BindingFlags.Instance;
+
+                var targetType = benchmark.Target.Type;
+                var paramProperty = targetType.GetProperty(parameter.Name, flags);
+
+                if (paramProperty == null)
+                {
+                    var paramField = targetType.GetField(parameter.Name, flags);
+                    if (paramField == null)
+                        throw new InvalidOperationException(
+                            $"Type {targetType.FullName}: no property or field {parameter.Name} found.");
+
+                    var callInstance = paramField.IsStatic ? null : instance;
+                    paramField.SetValue(callInstance, parameter.Value);
+                }
+                else
+                {
+                    var setter = paramProperty.GetSetMethod();
+                    if (setter == null)
+                        throw new InvalidOperationException(
+                            $"Type {targetType.FullName}: no settable property {parameter.Name} found.");
+
+                    var callInstance = setter.IsStatic ? null : instance;
+                    setter.Invoke(callInstance, new[] { parameter.Value });
+                }
+            }
+        }
+
         [UsedImplicitly]
         private static class Runnable
         {
@@ -107,42 +143,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 globalCleanupAction.InvokeSingle();
 
                 host.ReportResults(results); // printing costs memory, do this after runs
-            }
-
-            /// <summary>Fills the properties of the instance of the object used to run the benchmark.</summary>
-            /// <param name="instance">The instance.</param>
-            /// <param name="benchmark">The benchmark.</param>
-            private static void FillMembers(object instance, Benchmark benchmark)
-            {
-                foreach (var parameter in benchmark.Parameters.Items)
-                {
-                    var flags = BindingFlags.Public;
-                    flags |= parameter.IsStatic ? BindingFlags.Static : BindingFlags.Instance;
-
-                    var targetType = benchmark.Target.Type;
-                    var paramProperty = targetType.GetProperty(parameter.Name, flags);
-
-                    if (paramProperty == null)
-                    {
-                        var paramField = targetType.GetField(parameter.Name, flags);
-                        if (paramField == null)
-                            throw new InvalidOperationException(
-                                $"Type {targetType.FullName}: no property or field {parameter.Name} found.");
-
-                        var callInstance = paramField.IsStatic ? null : instance;
-                        paramField.SetValue(callInstance, parameter.Value);
-                    }
-                    else
-                    {
-                        var setter = paramProperty.GetSetMethod();
-                        if (setter == null)
-                            throw new InvalidOperationException(
-                                $"Type {targetType.FullName}: no settable property {parameter.Name} found.");
-
-                        var callInstance = setter.IsStatic ? null : instance;
-                        setter.Invoke(callInstance, new[] { parameter.Value });
-                    }
-                }
             }
         }
     }

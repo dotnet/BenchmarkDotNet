@@ -17,6 +17,7 @@ namespace BenchmarkDotNet.Tests.Validators
 
             Assert.NotEmpty(validationErrors);
             Assert.StartsWith("Unable to create instance of FailingConsturctor", validationErrors.Single().Message);
+            Assert.Contains("This one fails", validationErrors.Single().Message);
         }
 
         public class FailingConsturctor
@@ -37,6 +38,7 @@ namespace BenchmarkDotNet.Tests.Validators
 
             Assert.NotEmpty(validationErrors);
             Assert.StartsWith("Failed to execute [GlobalSetup]", validationErrors.Single().Message);
+            Assert.Contains("This one fails", validationErrors.Single().Message);
         }
 
         public class FailingGlobalSetup
@@ -247,9 +249,10 @@ namespace BenchmarkDotNet.Tests.Validators
         [Fact]
         public void FailingBenchmarksAreDiscovered()
         {
-            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(FailingBenchmark)));
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(FailingBenchmark))).ToList();
 
             Assert.NotEmpty(validationErrors);
+            Assert.Contains(validationErrors, error => error.Message.Contains("This benchmark throws"));
         }
 
         public class FailingBenchmark

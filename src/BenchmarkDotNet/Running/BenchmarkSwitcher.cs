@@ -32,9 +32,17 @@ namespace BenchmarkDotNet.Running
             typeParser = new TypeParser(assembly.GetRunnableBenchmarks(), logger);
         }
 
+        public BenchmarkSwitcher(Assembly[] assemblies)
+        {
+            var runnableBenchmarkTypes = assemblies.SelectMany(a => a.GetRunnableBenchmarks()).ToArray();
+            typeParser = new TypeParser(runnableBenchmarkTypes, logger);
+        }
+
         public static BenchmarkSwitcher FromTypes(Type[] types) => new BenchmarkSwitcher(types);
 
         public static BenchmarkSwitcher FromAssembly(Assembly assembly) => new BenchmarkSwitcher(assembly);
+
+        public static BenchmarkSwitcher FromAssemblies(Assembly[] assemblies) => new BenchmarkSwitcher(assemblies);
 
         public static BenchmarkSwitcher FromAssemblyAndTypes(Assembly assembly, Type[] types) 
             => new BenchmarkSwitcher(assembly.GetRunnableBenchmarks().Concat(types).ToArray());

@@ -189,7 +189,7 @@ namespace BenchmarkDotNet.Portability
             }
             else if (IsFullFramework)
             {
-                string frameworkVersion = CsProjClassicNetToolchain.GetCurrentNetFrameworkVersion();
+                string frameworkVersion = FrameworkVersionHelper.GetCurrentNetFrameworkVersion();
                 string clrVersion = Environment.Version.ToString();
                 return $".NET Framework {frameworkVersion} (CLR {clrVersion})";
             }
@@ -214,12 +214,13 @@ namespace BenchmarkDotNet.Portability
 
         internal static Runtime GetCurrentRuntime()
         {
+            //do not change the order of conditions because it may cause incorrect determination of runtime
+            if (IsMono)
+                return Runtime.Mono;
             if (IsFullFramework)
                 return Runtime.Clr;
             if (IsNetCore)
                 return Runtime.Core;
-            if (IsMono)
-                return Runtime.Mono;
             if (IsCoreRT)
                 return Runtime.CoreRT;
             

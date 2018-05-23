@@ -55,6 +55,8 @@ namespace BenchmarkDotNet.Order
                     return benchmarks.OrderByDescending(b => summary[b].ResultStatistics.Mean);
                 case SummaryOrderPolicy.Method:
                     return benchmarks.OrderBy(b => b.Target.MethodDisplayInfo);
+                case SummaryOrderPolicy.Declared:
+                    return benchmarks;
                 default:
                     return GetExecutionOrder(benchmarks);
             }

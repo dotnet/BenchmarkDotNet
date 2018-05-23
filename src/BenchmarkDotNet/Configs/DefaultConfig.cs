@@ -48,6 +48,7 @@ namespace BenchmarkDotNet.Configs
             yield return MinIterationTimeAnalyser.Default;
             yield return IterationSetupCleanupAnalyser.Default;
             yield return MultimodalDistributionAnalyzer.Default;
+            yield return RuntimeErrorAnalyser.Default;
         }
 
         public IEnumerable<IValidator> GetValidators()
@@ -58,6 +59,7 @@ namespace BenchmarkDotNet.Configs
             yield return JitOptimizationsValidator.FailOnError;
 #endif
             yield return UnrollFactorValidator.Default;
+            yield return GenericBenchmarksValidator.DontFailOnError;
         }
 
         public IEnumerable<Job> GetJobs() => Array.Empty<Job>();

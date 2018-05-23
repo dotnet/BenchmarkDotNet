@@ -63,9 +63,11 @@ namespace BenchmarkDotNet.Jobs
 
         private static Job WithCore(this Job job, Action<Job> updateCallback)
         {
-            job = new Job(job);
-            updateCallback(job);
-            return job;
+            var hasId = job.HasValue(Job.IdCharacteristic);
+
+            var newJob = hasId ? new Job(job.Id, job) : new Job(job);
+            updateCallback(newJob);
+            return newJob;
         }
     }
 }

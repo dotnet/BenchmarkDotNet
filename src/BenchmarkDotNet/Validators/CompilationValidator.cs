@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
@@ -17,7 +18,8 @@ namespace BenchmarkDotNet.Validators
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
             => ValidateCSharpNaming(validationParameters.Benchmarks)
-                    .Union(ValidateNamingConflicts(validationParameters.Benchmarks));
+                    .Union(ValidateNamingConflicts(validationParameters.Benchmarks))
+                    .Union(ValidateAccessModifiers(validationParameters.Benchmarks));
 
         private IEnumerable<ValidationError> ValidateCSharpNaming(IEnumerable<Benchmark> benchmarks)
             => benchmarks
@@ -40,6 +42,11 @@ namespace BenchmarkDotNet.Validators
                         true,
                         "Using \"__Idle\" for method name is prohibited. We are using it internally in our templates. Please rename your method"));
 
+        private IEnumerable<ValidationError> ValidateAccessModifiers(IEnumerable<Benchmark> benchmarks)
+            => benchmarks.Where(x => x.Target.Type.IsGenericType
+                                     && HasPrivateGenericArguments(x.Target.Type))
+                         .Select(benchmark => new ValidationError(true, $"Generic class {benchmark.Target.Type.GetDisplayName()} has non public generic argument(s)"));
+        
         private bool IsValidCSharpIdentifier(string identifier) // F# allows to use whitespaces as names #479
             => !string.IsNullOrEmpty(identifier)
                && (char.IsLetter(identifier[0]) || identifier[0] == Underscore) // An identifier must start with a letter or an underscore
@@ -50,6 +57,9 @@ namespace BenchmarkDotNet.Validators
         private bool IsUsingNameUsedInternallyByOurTemplate(string identifier)
             => identifier == "__Idle";
 
+        private bool HasPrivateGenericArguments(Type type) => type.GetGenericArguments().Any(a => !(a.IsPublic
+                                                                                                 || a.IsNestedPublic));
+        
         private class BenchmarkMethodEqualityComparer : IEqualityComparer<Benchmark>
         {
             internal static readonly IEqualityComparer<Benchmark> Instance = new BenchmarkMethodEqualityComparer();

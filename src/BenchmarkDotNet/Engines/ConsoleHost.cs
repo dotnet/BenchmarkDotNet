@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Engines
@@ -32,6 +33,8 @@ namespace BenchmarkDotNet.Engines
             if(acknowledgment != Engine.Signals.Acknowledgment)
                 throw new NotSupportedException($"Unknown Acknowledgment: {acknowledgment}");
         }
+
+        public void SendError(string message) => outWriter.WriteLine($"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
 
         public void ReportResults(RunResults runResults) => runResults.Print(outWriter);
     }
