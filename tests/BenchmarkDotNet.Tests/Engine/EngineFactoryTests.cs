@@ -146,7 +146,7 @@ namespace BenchmarkDotNet.Tests.Engine
         public void DontRunThePilotIfThePilotRequirementIsMetDuringWarmup()
         {
             var unrollFactor = Job.Default.ResolveValue(RunMode.UnrollFactorCharacteristic, DefaultResolver);
-            var mediumTime =  TimeSpan.FromMilliseconds(IterationTime.TotalMilliseconds / unrollFactor);
+            var mediumTime =  TimeSpan.FromMilliseconds((IterationTime.TotalMilliseconds / unrollFactor) * 2);
             
             void MediumSingle(long _)
             {
