@@ -16,6 +16,8 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<TimeInterval> IterationTimeCharacteristic = CreateCharacteristic<TimeInterval>(nameof(IterationTime));
         public static readonly Characteristic<int> InvocationCountCharacteristic = CreateCharacteristic<int>(nameof(InvocationCount));
         public static readonly Characteristic<int> UnrollFactorCharacteristic = CreateCharacteristic<int>(nameof(UnrollFactor));
+        public static readonly Characteristic<int> MinTargetIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MinTargetIterationCount));
+        public static readonly Characteristic<int> MaxTargetIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MaxTargetIterationCount));
 
         public static readonly RunMode Dry = new RunMode(nameof(Dry))
         {
@@ -94,6 +96,8 @@ namespace BenchmarkDotNet.Jobs
 
         /// <summary>
         /// How many target iterations should be performed
+        /// If specified, <see cref="MinTargetIterationCount"/> will be ignored.
+        /// If specified, <see cref="MaxTargetIterationCount"/> will be ignored.
         /// </summary>
         public int TargetCount
         {
@@ -128,6 +132,26 @@ namespace BenchmarkDotNet.Jobs
         {
             get { return UnrollFactorCharacteristic[this]; }
             set { UnrollFactorCharacteristic[this] = value; }
+        }
+        
+        /// <summary>
+        /// Minimum count of target iterations that should be performed
+        /// The default is 15
+        /// </summary>
+        public int MinTargetIterationCount
+        {
+            get { return MinTargetIterationCountCharacteristic[this]; }
+            set { MinTargetIterationCountCharacteristic[this] = value; }
+        }
+
+        /// <summary>
+        /// Maximum count of target iterations that should be performed
+        /// The default is 100 
+        /// </summary>
+        public int MaxTargetIterationCount
+        {
+            get { return MaxTargetIterationCountCharacteristic[this]; }
+            set { MaxTargetIterationCountCharacteristic[this] = value; }
         }
     }
 }
