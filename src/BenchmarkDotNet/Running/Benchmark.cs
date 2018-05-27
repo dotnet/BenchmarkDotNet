@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Running
 
         public override string ToString() => DisplayInfo;
 
-        public Benchmark(Target target, Job job, ParameterInstances parameters)
+        private Benchmark(Target target, Job job, ParameterInstances parameters)
         {
             Target = target;
             Job = job;
@@ -28,5 +28,8 @@ namespace BenchmarkDotNet.Running
         public bool IsBaseline() => Target.Baseline || Job.Meta.IsBaseline;
 
         public bool HasArguments => Parameters != null && Parameters.Items.Any(parameter => parameter.IsArgument);
+
+        public static Benchmark Create(Target target, Job job, ParameterInstances parameters)
+            => new Benchmark(target, job.MakeSettingsUserFriendly(target), parameters);
     }
 }
