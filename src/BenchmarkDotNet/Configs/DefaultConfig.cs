@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.Configs
 #if !DEBUG
             yield return JitOptimizationsValidator.FailOnError;
 #endif
-            yield return UnrollFactorValidator.Default;
+            yield return RunModeValidator.FailOnError;
             yield return GenericBenchmarksValidator.DontFailOnError;
         }
 

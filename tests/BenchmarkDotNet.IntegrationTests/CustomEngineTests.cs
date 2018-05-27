@@ -54,12 +54,18 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class CustomFactory : IEngineFactory
         {
-            public IEngine Create(EngineParameters engineParameters) 
-                => new CustomEngine
+            public IEngine CreateReadyToRun(EngineParameters engineParameters)
+            {
+                var engine = new CustomEngine
                 {
                     GlobalCleanupAction = engineParameters.GlobalCleanupAction,
                     GlobalSetupAction = engineParameters.GlobalSetupAction
                 };
+                
+                engine.GlobalSetupAction?.Invoke(); // engine factory is now supposed to create an engine which is ready to run (hence the method name change) 
+
+                return engine;
+            }
         }
 
         public class CustomEngine : IEngine
@@ -75,6 +81,8 @@ namespace BenchmarkDotNet.IntegrationTests
                     default);
             }
 
+            public void Dispose() => GlobalCleanupAction?.Invoke();
+            
             public IHost Host { get; }
             public void WriteLine() { }
             public void WriteLine(string line) { }
@@ -87,7 +95,6 @@ namespace BenchmarkDotNet.IntegrationTests
             public IResolver Resolver { get; }
 
             public Measurement RunIteration(IterationData data) { throw new NotImplementedException(); }
-            public void Jitting() { }
         }
     }
 }

@@ -7,12 +7,18 @@ namespace BenchmarkDotNet.Engines
 {
     public class EngineResolver : Resolver
     {
+        internal const int DefaultMinTargetIterationCount = 15;
+        internal const int DefaultMaxTargetIterationCount = 100;
+        
         public static readonly IResolver Instance = new EngineResolver();
 
         private EngineResolver()
         {
             Register(RunMode.RunStrategyCharacteristic, () => RunStrategy.Throughput);
             Register(RunMode.IterationTimeCharacteristic, () => TimeInterval.Millisecond * 500);
+
+            Register(RunMode.MinTargetIterationCountCharacteristic, () => DefaultMinTargetIterationCount);
+            Register(RunMode.MaxTargetIterationCountCharacteristic, () => DefaultMaxTargetIterationCount);
 
             Register(AccuracyMode.MaxRelativeErrorCharacteristic, () => 0.02);
             Register(AccuracyMode.MinIterationTimeCharacteristic, () => TimeInterval.Millisecond * 500);

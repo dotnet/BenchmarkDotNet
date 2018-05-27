@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Characteristics;
+﻿using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Horology;
 
@@ -16,6 +17,8 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<TimeInterval> IterationTimeCharacteristic = CreateCharacteristic<TimeInterval>(nameof(IterationTime));
         public static readonly Characteristic<int> InvocationCountCharacteristic = CreateCharacteristic<int>(nameof(InvocationCount));
         public static readonly Characteristic<int> UnrollFactorCharacteristic = CreateCharacteristic<int>(nameof(UnrollFactor));
+        public static readonly Characteristic<int> MinTargetIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MinTargetIterationCount));
+        public static readonly Characteristic<int> MaxTargetIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MaxTargetIterationCount));
 
         public static readonly RunMode Dry = new RunMode(nameof(Dry))
         {
@@ -94,6 +97,8 @@ namespace BenchmarkDotNet.Jobs
 
         /// <summary>
         /// How many target iterations should be performed
+        /// If specified, <see cref="MinTargetIterationCount"/> will be ignored.
+        /// If specified, <see cref="MaxTargetIterationCount"/> will be ignored.
         /// </summary>
         public int TargetCount
         {
@@ -128,6 +133,28 @@ namespace BenchmarkDotNet.Jobs
         {
             get { return UnrollFactorCharacteristic[this]; }
             set { UnrollFactorCharacteristic[this] = value; }
+        }
+        
+        /// <summary>
+        /// Minimum count of target iterations that should be performed
+        /// The default value is 15
+        /// <remarks>If you set this value to below 15, then <see cref="MultimodalDistributionAnalyzer"/> is not going to work</remarks>
+        /// </summary>
+        public int MinTargetIterationCount
+        {
+            get { return MinTargetIterationCountCharacteristic[this]; }
+            set { MinTargetIterationCountCharacteristic[this] = value; }
+        }
+
+        /// <summary>
+        /// Maximum count of target iterations that should be performed
+        /// The default value is 100
+        /// <remarks>If you set this value to below 15, then <see cref="MultimodalDistributionAnalyzer"/>  is not going to work</remarks>
+        /// </summary>
+        public int MaxTargetIterationCount
+        {
+            get { return MaxTargetIterationCountCharacteristic[this]; }
+            set { MaxTargetIterationCountCharacteristic[this] = value; }
         }
     }
 }

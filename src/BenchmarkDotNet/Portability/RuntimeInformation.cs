@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static string ScriptFileExtension => IsWindows() ? ".bat" : ".sh";
 
-        internal static string GetArchitecture() => IntPtr.Size == 4 ? "32bit" : "64bit";
+        internal static string GetArchitecture() => GetCurrentPlatform() == Platform.X86 ? "32bit" : "64bit";
 
         internal static bool IsWindows()
         {
@@ -247,7 +247,7 @@ namespace BenchmarkDotNet.Portability
             if (IsNetCore)
                 return true;
 
-            return IntPtr.Size == 8
+            return GetCurrentPlatform() == Platform.X64
                    && GetConfiguration() != DebugConfigurationName
                    && !new JitHelper().IsMsX64();
         }

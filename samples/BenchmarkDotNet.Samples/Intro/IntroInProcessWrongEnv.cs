@@ -5,6 +5,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.InProcess;
 
 namespace BenchmarkDotNet.Samples.Intro
@@ -18,7 +19,7 @@ namespace BenchmarkDotNet.Samples.Intro
         {
             public Config()
             {
-                var wrongPlatform = IntPtr.Size == sizeof(int)
+                var wrongPlatform = RuntimeInformation.GetCurrentPlatform() == Platform.X86
                     ? Platform.X64
                     : Platform.X86;
 
