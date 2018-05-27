@@ -208,7 +208,7 @@ namespace BenchmarkDotNet.Running
             MarkdownExporter.Console.ExportToLog(summary, logger);
 
             // TODO: make exporter
-            ConclusionHelper.Print(logger, config.GetCompositeAnalyser().Analyse(summary).ToList());
+            ConclusionHelper.Print(logger, config.GetCompositeAnalyser().Analyse(summary).Distinct().ToList());
 
             // TODO: move to conclusions
             var columnWithLegends = summary.Table.Columns.Select(c => c.OriginalColumn).Where(c => !string.IsNullOrEmpty(c.Legend)).ToList();

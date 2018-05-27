@@ -1,10 +1,11 @@
-﻿using BenchmarkDotNet.Reports;
+﻿using System;
+using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Analysers
 {
     // TODO: Find a better name
-    public sealed class Conclusion
+    public sealed class Conclusion : IEquatable<Conclusion>
     {
         [NotNull]
         public string AnalyserId { get; }
@@ -33,5 +34,34 @@ namespace BenchmarkDotNet.Analysers
 
         public static Conclusion CreateError(string analyserId, string message, [CanBeNull] BenchmarkReport report = null) 
             => new Conclusion(analyserId, ConclusionKind.Error, message, report);
+
+        public bool Equals(Conclusion other)
+        {
+            if (ReferenceEquals(null, other))
+                return false;
+            if (ReferenceEquals(this, other))
+                return true;
+            return string.Equals(AnalyserId, other.AnalyserId) && Kind == other.Kind && string.Equals(Message, other.Message);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+                return false;
+            if (ReferenceEquals(this, obj))
+                return true;
+            return obj is Conclusion && Equals((Conclusion) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hashCode = AnalyserId.GetHashCode();
+                hashCode = (hashCode * 397) ^ (int) Kind;
+                hashCode = (hashCode * 397) ^ Message.GetHashCode();
+                return hashCode;
+            }
+        }
     }
 }

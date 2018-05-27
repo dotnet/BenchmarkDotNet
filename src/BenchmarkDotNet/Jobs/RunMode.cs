@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Characteristics;
+﻿using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Horology;
 
@@ -136,7 +137,8 @@ namespace BenchmarkDotNet.Jobs
         
         /// <summary>
         /// Minimum count of target iterations that should be performed
-        /// The default is 15
+        /// The default value is 15
+        /// <remarks>If you set this value to below 15, then <see cref="MultimodalDistributionAnalyzer"/> is not going to work</remarks>
         /// </summary>
         public int MinTargetIterationCount
         {
@@ -146,7 +148,8 @@ namespace BenchmarkDotNet.Jobs
 
         /// <summary>
         /// Maximum count of target iterations that should be performed
-        /// The default is 100 
+        /// The default value is 100
+        /// <remarks>If you set this value to below 15, then <see cref="MultimodalDistributionAnalyzer"/>  is not going to work</remarks>
         /// </summary>
         public int MaxTargetIterationCount
         {
