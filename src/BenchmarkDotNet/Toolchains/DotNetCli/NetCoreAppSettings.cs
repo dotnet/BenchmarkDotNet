@@ -12,6 +12,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     {
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp20 = new NetCoreAppSettings("netcoreapp2.0", null, ".NET Core 2.0");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp21 = new NetCoreAppSettings("netcoreapp2.1", null, ".NET Core 2.1");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp22 = new NetCoreAppSettings("netcoreapp2.2", null, ".NET Core 2.2");
 
         private static NetCoreAppSettings Default => NetCoreApp20;
 
@@ -76,6 +77,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     return NetCoreApp20;
                 if (assembly.FullName.Contains("Version=4.2.1"))
                     return NetCoreApp21;
+                if (assembly.FullName.Contains("Version=4.2.2"))
+                    return NetCoreApp22;
             }
             catch
             {
