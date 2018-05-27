@@ -220,7 +220,7 @@ namespace BenchmarkDotNet.Running
                     throw new InvalidOperationException($"Benchmark {benchmark.Name} has invalid number of defined arguments provided with [Arguments]! {argumentsAttribute.Values.Length} instead of {parameterDefinitions.Length}.");
 
                 yield return new ParameterInstances(
-                    argumentsAttribute.Values.Select((value, index) => new ParameterInstance(parameterDefinitions[index], value)).ToArray());
+                    argumentsAttribute.Values.Select((value, index) => new ParameterInstance(parameterDefinitions[index], Map(value))).ToArray());
             }
 
             if (!benchmark.HasAttribute<ArgumentsSourceAttribute>())
@@ -288,7 +288,15 @@ namespace BenchmarkDotNet.Running
                 return new object[] { null };
             }
 
-            return values;
+            return values?.Select(Map).ToArray();
+        }
+
+        private static object Map(object providedValue)
+        {
+            if (providedValue == null)
+                return providedValue;
+
+            return providedValue.GetType().IsArray ? ArrayParam<IParam>.FromObject(providedValue) : providedValue;
         }
 
         private static (MemberInfo source, object[] values) GetValidValuesForParamsSource(Type parentType, string sourceName)

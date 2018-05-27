@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.Code
@@ -35,5 +36,18 @@ namespace BenchmarkDotNet.Code
         /// example: point => $"new Point2d({point.X}, {point.Y})"
         /// </param>
         public static ArrayParam<T> ForComplexTypes(T[] array, Func<T, string> toSourceCode) => new ArrayParam<T>(array, toSourceCode);
+
+        internal static IParam FromObject(object array)
+        {
+            var type = array.GetType();
+            if (!type.IsArray)
+                throw new InvalidOperationException("The argument must be an array");
+            if (!SourceCodeHelper.IsCompilationTimeConstant(Activator.CreateInstance(type.GetElementType())))
+                throw new InvalidOperationException("The argument must be an array of primitives");
+            
+            var arrayParamType = typeof(ArrayParam<>).MakeGenericType(type.GetElementType());
+
+            return (IParam)arrayParamType.GetMethod(nameof(ForPrimitives), BindingFlags.Public | BindingFlags.Static).Invoke(null, new []{ array});
+        }
     }
 }
