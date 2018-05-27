@@ -74,10 +74,10 @@ namespace BenchmarkDotNet.Tests.Engine
             var engine = new EngineFactory().CreateReadyToRun(engineParameters);
 
             Assert.Equal(1, timesGlobalSetupCalled);
-            Assert.Equal(1 + 1, timesIterationSetupCalled); // 1x for Idle, 1x for Target
+            Assert.Equal(1, timesIterationSetupCalled); // 1x for Target
             Assert.Equal(1, timesBenchmarkCalled);
             Assert.Equal(1, timesIdleCalled);
-            Assert.Equal(1 + 1, timesIterationCleanupCalled); // 1x for Idle, 1x for Target
+            Assert.Equal(1, timesIterationCleanupCalled); // 1x for Target
             Assert.Equal(0, timesGlobalCleanupCalled); // cleanup is called as part of dispode
 
             Assert.Equal(1, engine.TargetJob.Run.InvocationCount); // call the benchmark once per iteration
@@ -106,10 +106,10 @@ namespace BenchmarkDotNet.Tests.Engine
             var engine = new EngineFactory().CreateReadyToRun(engineParameters);
 
             Assert.Equal(1, timesGlobalSetupCalled);
-            Assert.Equal(2, timesIterationSetupCalled);
+            Assert.Equal(1, timesIterationSetupCalled);
             Assert.Equal(16, timesBenchmarkCalled);
             Assert.Equal(16, timesIdleCalled);
-            Assert.Equal(2, timesIterationCleanupCalled);
+            Assert.Equal(1, timesIterationCleanupCalled);
             Assert.Equal(0, timesGlobalCleanupCalled); 
             
             Assert.False(engine.TargetJob.Run.HasValue(AccuracyMode.EvaluateOverheadCharacteristic)); // remains untouched
@@ -127,10 +127,10 @@ namespace BenchmarkDotNet.Tests.Engine
             var engine = new EngineFactory().CreateReadyToRun(engineParameters);
 
             Assert.Equal(1, timesGlobalSetupCalled);
-            Assert.Equal((1+1) * (1+1), timesIterationSetupCalled); // (once for single and & once for 16) x (1x for Idle + 1x for Target)
+            Assert.Equal(1+1, timesIterationSetupCalled); // once for single and & once for 16
             Assert.Equal(1 + 16, timesBenchmarkCalled);
             Assert.Equal(1 + 16, timesIdleCalled);
-            Assert.Equal((1+1) * (1+1), timesIterationCleanupCalled); // (once for single and & once for 16) x (1x for Idle + 1x for Target)
+            Assert.Equal(1+1, timesIterationCleanupCalled); // once for single and & once for 16
             Assert.Equal(0, timesGlobalCleanupCalled);
             
             Assert.False(engine.TargetJob.Run.HasValue(AccuracyMode.EvaluateOverheadCharacteristic)); // remains untouched
@@ -168,10 +168,10 @@ namespace BenchmarkDotNet.Tests.Engine
             var engine = new EngineFactory().CreateReadyToRun(engineParameters);
 
             Assert.Equal(1, timesGlobalSetupCalled);
-            Assert.Equal((1+1) * (1+1), timesIterationSetupCalled); // (once for single and & once for 16) x (1x for Idle + 1x for Target)
+            Assert.Equal(1+1, timesIterationSetupCalled);
             Assert.Equal(1 + unrollFactor, timesBenchmarkCalled);
             Assert.Equal(1 + unrollFactor, timesIdleCalled);
-            Assert.Equal((1+1) * (1+1), timesIterationCleanupCalled); // (once for single and & once for 16) x (1x for Idle + 1x for Target)
+            Assert.Equal(1+1, timesIterationCleanupCalled);
             Assert.Equal(0, timesGlobalCleanupCalled);
             
             Assert.Equal(unrollFactor, engine.TargetJob.Run.InvocationCount); // no need to run pilot!

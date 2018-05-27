@@ -122,9 +122,12 @@ namespace BenchmarkDotNet.Engines
             long invokeCount = data.InvokeCount;
             int unrollFactor = data.UnrollFactor;
             long totalOperations = invokeCount * OperationsPerInvoke;
-            var action = data.IterationMode.IsIdle() ? IdleAction : MainAction;
+            bool isIdle = data.IterationMode.IsIdle();
+            var action = isIdle ? IdleAction : MainAction;
 
-            IterationSetupAction();
+            if(!isIdle)
+                IterationSetupAction();
+
             GcCollect();
 
             // Measure
@@ -132,7 +135,9 @@ namespace BenchmarkDotNet.Engines
             action(invokeCount / unrollFactor);
             var clockSpan = clock.GetElapsed();
 
-            IterationCleanupAction();
+            if(!isIdle)
+                IterationCleanupAction();
+
             GcCollect();
 
             // Results
