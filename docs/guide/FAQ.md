@@ -91,3 +91,34 @@ For example, you can use the `SimpleJob` or `ShortRunJob` attributes:
 * **Q** I'm trying to use `RPlotExporter` but there are no any images in the `results` folder
 
     **A** Try to specify `R_LIBS_USER` (e.g. `R_LIBS_USER=/usr/local/lib/R/` on Linux/macOS, see also: [#692](https://github.com/dotnet/BenchmarkDotNet/issues/692))
+
+* **Q** My benchmark failed with OutOfMemoryException. How can I fix this problem? 
+
+    **A** BenchmarkDotNet continues to run additional iterations until desired accuracy level is achieved. It's possible only if the benchmark method doesn't have any side-effects. 
+    If your benchmark allocates memory and keeps it alive, you are creating a memory leak. 
+    
+    You should redesign your benchmark and remove the side-effects. You can use `OperationsPerInvoke`, `IterationSetup` and `IterationCleanup` to do that.
+    
+    An example:
+    
+```cs
+public class OOM
+{
+    private StringBuilder buffer = new StringBuilder();
+    
+    [Benchmark]
+    public void HasSideEffects()
+    {
+        buffer.Append('a'); // This method is growing the buffer to infinity because it's executed millions of times
+    }
+    
+    [Benchmark(OperationsPerInvoke = 16)]
+    public void HasNoSideEffects()
+    {
+        buffer.Clear();
+
+        for (int i = 0; i < 1024; i++)
+            buffer.Append('a');
+    }
+}
+```    
