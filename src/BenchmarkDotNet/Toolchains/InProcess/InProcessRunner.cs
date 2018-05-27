@@ -112,11 +112,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 var engineParameters = new EngineParameters
                 {
                     Host = host,
-                    MainAction = mainAction.InvokeMultiple,
+                    MainSingleAction = _ => mainAction.InvokeSingle(),
+                    MainMultiAction = mainAction.InvokeMultiple,
                     Dummy1Action = dummy1.InvokeSingle,
                     Dummy2Action = dummy2.InvokeSingle,
                     Dummy3Action = dummy3.InvokeSingle,
-                    IdleAction = idleAction.InvokeMultiple,
+                    IdleSingleAction = _ => idleAction.InvokeSingle(),
+                    IdleMultiAction = idleAction.InvokeMultiple,
                     GlobalSetupAction = globalSetupAction.InvokeSingle,
                     GlobalCleanupAction = globalCleanupAction.InvokeSingle,
                     IterationSetupAction = iterationSetupAction.InvokeSingle,
@@ -126,23 +128,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     MeasureGcStats = config.HasMemoryDiagnoser()
                 };
 
-                var engine = job
+                using (var engine = job
                     .ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)
-                    .Create(engineParameters);
+                    .CreateReadyToRun(engineParameters))
+                {
+                    var results = engine.Run();
 
-                globalSetupAction.InvokeSingle();
-                iterationSetupAction.InvokeSingle();
-
-                if (job.ResolveValue(RunMode.RunStrategyCharacteristic, EngineResolver.Instance).NeedsJitting())
-                    engine.Jitting(); // does first call to main action, must be executed after setup()!
-
-                iterationCleanupAction.InvokeSingle();
-
-                var results = engine.Run();
-
-                globalCleanupAction.InvokeSingle();
-
-                host.ReportResults(results); // printing costs memory, do this after runs
+                    host.ReportResults(results); // printing costs memory, do this after runs
+                }
             }
         }
     }

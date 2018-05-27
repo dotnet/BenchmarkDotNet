@@ -22,6 +22,8 @@ namespace BenchmarkDotNet.Tests.Mocks
             this.measure = measure;
             TargetJob = job;
         }
+        
+        public void Dispose() => GlobalSetupAction?.Invoke();
 
         [UsedImplicitly]
         public IHost Host { get; }
@@ -51,8 +53,6 @@ namespace BenchmarkDotNet.Tests.Mocks
             WriteLine(measurement.ToOutputLine());
             return measurement;
         }
-
-        public void Jitting() { }
 
         public RunResults Run() => default;
 

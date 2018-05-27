@@ -4,6 +4,7 @@ using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
@@ -31,7 +32,7 @@ namespace BenchmarkDotNet.Extensions
         {
             int cpuMask = (1 << Environment.ProcessorCount) - 1;
 
-            return IntPtr.Size == sizeof(Int64) 
+            return RuntimeInformation.GetCurrentPlatform() == Platform.X64
                 ? new IntPtr(processorAffinity.ToInt64() & cpuMask)
                 : new IntPtr(processorAffinity.ToInt32() & cpuMask);
         }

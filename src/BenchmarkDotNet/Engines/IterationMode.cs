@@ -35,6 +35,11 @@
         /// <summary>
         /// Unknown 
         /// </summary>
-        Unknown
+        Unknown,
+        
+        /// <summary>
+        /// executing benchmark for the purpose of JIT wamup
+        /// </summary>
+        MainJitting, IdleJitting
     }
 }

@@ -11,7 +11,6 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class AllSetupAndCleanupTargetSpecificBenchmarkTest : BenchmarkTestExecutor
     {
-
         private const string FirstPrefix = "// ### First Called: ";
         private const string FirstGlobalSetupCalled = FirstPrefix + "GlobalSetup";
         private const string FirstGlobalCleanupCalled = FirstPrefix + "GlobalCleanup";
@@ -31,25 +30,22 @@ namespace BenchmarkDotNet.IntegrationTests
         private readonly string[] firstExpectedLogLines = {
             "// ### First Called: GlobalSetup",
 
-            "// ### First Called: IterationSetup (1)", // IterationSetup Jitting
-            "// ### First Called: IterationCleanup (1)", // IterationCleanup Jitting
-            
-            "// ### First Called: IterationSetup (2)", // MainWarmup1
+            "// ### First Called: IterationSetup (1)", // MainWarmup1
             "// ### First Called: Benchmark", // MainWarmup1
-            "// ### First Called: IterationCleanup (2)", // MainWarmup1
-            "// ### First Called: IterationSetup (3)", // MainWarmup2
+            "// ### First Called: IterationCleanup (1)", // MainWarmup1
+            "// ### First Called: IterationSetup (2)", // MainWarmup2
             "// ### First Called: Benchmark", // MainWarmup2
-            "// ### First Called: IterationCleanup (3)", // MainWarmup2
+            "// ### First Called: IterationCleanup (2)", // MainWarmup2
             
-            "// ### First Called: IterationSetup (4)", // MainTarget1
+            "// ### First Called: IterationSetup (3)", // MainTarget1
             "// ### First Called: Benchmark", // MainTarget1
-            "// ### First Called: IterationCleanup (4)", // MainTarget1
-            "// ### First Called: IterationSetup (5)", // MainTarget2
+            "// ### First Called: IterationCleanup (3)", // MainTarget1
+            "// ### First Called: IterationSetup (4)", // MainTarget2
             "// ### First Called: Benchmark", // MainTarget2
-            "// ### First Called: IterationCleanup (5)", // MainTarget2
-            "// ### First Called: IterationSetup (6)", // MainTarget3
+            "// ### First Called: IterationCleanup (4)", // MainTarget2
+            "// ### First Called: IterationSetup (5)", // MainTarget3
             "// ### First Called: Benchmark", // MainTarget3
-            "// ### First Called: IterationCleanup (6)", // MainTarget3
+            "// ### First Called: IterationCleanup (5)", // MainTarget3
             
             "// ### First Called: GlobalCleanup"
         };
@@ -57,25 +53,22 @@ namespace BenchmarkDotNet.IntegrationTests
         private readonly string[] secondExpectedLogLines = {
             "// ### Second Called: GlobalSetup",
 
-            "// ### Second Called: IterationSetup (1)", // IterationSetup Jitting
-            "// ### Second Called: IterationCleanup (1)", // IterationCleanup Jitting
-            
-            "// ### Second Called: IterationSetup (2)", // MainWarmup1
+            "// ### Second Called: IterationSetup (1)", // MainWarmup1
             "// ### Second Called: Benchmark", // MainWarmup1
-            "// ### Second Called: IterationCleanup (2)", // MainWarmup1
-            "// ### Second Called: IterationSetup (3)", // MainWarmup2
+            "// ### Second Called: IterationCleanup (1)", // MainWarmup1
+            "// ### Second Called: IterationSetup (2)", // MainWarmup2
             "// ### Second Called: Benchmark", // MainWarmup2
-            "// ### Second Called: IterationCleanup (3)", // MainWarmup2
+            "// ### Second Called: IterationCleanup (2)", // MainWarmup2
             
-            "// ### Second Called: IterationSetup (4)", // MainTarget1
+            "// ### Second Called: IterationSetup (3)", // MainTarget1
             "// ### Second Called: Benchmark", // MainTarget1
-            "// ### Second Called: IterationCleanup (4)", // MainTarget1
-            "// ### Second Called: IterationSetup (5)", // MainTarget2
+            "// ### Second Called: IterationCleanup (3)", // MainTarget1
+            "// ### Second Called: IterationSetup (4)", // MainTarget2
             "// ### Second Called: Benchmark", // MainTarget2
-            "// ### Second Called: IterationCleanup (5)", // MainTarget2
-            "// ### Second Called: IterationSetup (6)", // MainTarget3
+            "// ### Second Called: IterationCleanup (4)", // MainTarget2
+            "// ### Second Called: IterationSetup (5)", // MainTarget3
             "// ### Second Called: Benchmark", // MainTarget3
-            "// ### Second Called: IterationCleanup (6)", // MainTarget3
+            "// ### Second Called: IterationCleanup (5)", // MainTarget3
             
             "// ### Second Called: GlobalCleanup"
         };
