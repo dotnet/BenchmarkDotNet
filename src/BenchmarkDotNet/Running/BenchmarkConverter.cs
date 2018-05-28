@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Running
                     from job in jobs
                     from parameterInstance in parameterInstancesList
                     from argumentDefinition in argumentsDefinitions
-                    select new Benchmark(target, job, new ParameterInstances(parameterInstance.Items.Concat(argumentDefinition.Items).ToArray()))
+                    select Benchmark.Create(target, job, new ParameterInstances(parameterInstance.Items.Concat(argumentDefinition.Items).ToArray()))
                 );
             }
 

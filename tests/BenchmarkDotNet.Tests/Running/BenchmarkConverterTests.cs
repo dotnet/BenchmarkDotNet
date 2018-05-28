@@ -1,5 +1,7 @@
 ﻿using System.Linq;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using Xunit;
 
@@ -69,6 +71,43 @@ namespace BenchmarkDotNet.Tests.Running
             public override void Cleanup()
             {
             }
+        }
+
+        [Fact]
+        public void IfIterationSetupIsProvidedTheBenchmarkShouldRunOncePerIteration()
+        {
+            var benchmark = BenchmarkConverter.TypeToBenchmarks(typeof(Derived)).Benchmarks.Single();
+            
+            Assert.Equal(1, benchmark.Job.Run.InvocationCount);
+            Assert.Equal(1, benchmark.Job.Run.UnrollFactor);
+        }
+        
+        [Fact]
+        public void InvocationCountIsRespectedForBenchmarksWithIterationSetup()
+        {
+            const int InvocationCount = 100;
+            
+            var benchmark = BenchmarkConverter.TypeToBenchmarks(typeof(Derived), 
+                DefaultConfig.Instance.With(Job.Default
+                    .WithInvocationCount(InvocationCount)))
+                .Benchmarks.Single();
+            
+            Assert.Equal(InvocationCount, benchmark.Job.Run.InvocationCount);
+            Assert.NotNull(benchmark.Target.IterationSetupMethod);
+        }
+        
+        [Fact]
+        public void UnrollFactorIsRespectedForBenchmarksWithIterationSetup()
+        {
+            const int UnrollFactor = 13;
+            
+            var benchmark = BenchmarkConverter.TypeToBenchmarks(typeof(Derived), 
+                    DefaultConfig.Instance.With(Job.Default
+                        .WithUnrollFactor(UnrollFactor)))
+                .Benchmarks.Single();
+            
+            Assert.Equal(UnrollFactor, benchmark.Job.Run.UnrollFactor);
+            Assert.NotNull(benchmark.Target.IterationSetupMethod);
         }
     }
 }

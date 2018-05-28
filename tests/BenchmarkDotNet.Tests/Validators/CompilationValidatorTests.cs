@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Tests.Validators
             var parameters = new ValidationParameters(
                 new[]
                 {
-                    new Benchmark(
+                    Benchmark.Create(
                         new Target(
                             typeof(CompilationValidatorTests),
                             method.Method),
