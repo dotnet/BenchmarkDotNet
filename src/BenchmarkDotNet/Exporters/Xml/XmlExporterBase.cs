@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Exporters.Xml
                                                        nameof(Measurement))
                                .WithCollectionItemName(nameof(SummaryDto.Benchmarks),
                                                        nameof(BenchmarkReport.Benchmark))
-                               .WithCollectionItemName(nameof(Statistics.Outliers), "Outlier");
+                               .WithCollectionItemName(nameof(Statistics.AllOutliers), "Outlier");
 
             if (!summary.Config.HasMemoryDiagnoser())
             {

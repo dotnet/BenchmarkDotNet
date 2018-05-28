@@ -4,6 +4,7 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Analysers
 {
@@ -12,9 +13,7 @@ namespace BenchmarkDotNet.Analysers
         public override string Id => "Outliers";
         public static readonly IAnalyser Default = new OutliersAnalyser();
 
-        private OutliersAnalyser()
-        {
-        }
+        private OutliersAnalyser() { }
 
         public override IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary)
         {
@@ -22,27 +21,50 @@ namespace BenchmarkDotNet.Analysers
             if (actual.IsEmpty())
                 yield break;
             var result = report.AllMeasurements.Where(m => m.IterationMode == IterationMode.Result).ToArray();
-            var actualOutliers = actual.GetStatistics().Outliers;
-            bool removeOutliers = report.Benchmark.Job.ResolveValue(AccuracyMode.RemoveOutliersCharacteristic, EngineResolver.Instance); // TODO: improve
+            var outlierMode = report.Benchmark.Job.ResolveValue(AccuracyMode.OutlierModeCharacteristic, EngineResolver.Instance); // TODO: improve            
+            var statistics = actual.GetStatistics();
+            var allOutliers = statistics.AllOutliers;
+            var actualOutliers = statistics.GetActualOutliers(outlierMode);
 
-            if (result.Length + (actualOutliers.Length * (removeOutliers ? 1 : 0)) != actual.Length)
+            if (result.Length + actualOutliers.Length != actual.Length)
             {
                 // This should never happen
                 yield return CreateHint(
-                    string.Format(
-                        "Something went wrong with outliers: Size(MainTarget) = {0}, Size(MainTarget/Outliers) = {1}, Size(Result) = {2}), RemoveOutliers = {3}",
-                        actual.Length, actualOutliers.Length, result.Length, removeOutliers),
+                    $"Something went wrong with outliers: " +
+                    $"Size(MainTarget) = {actual.Length}, " +
+                    $"Size(MainTarget/Outliers) = {actualOutliers.Length}, " +
+                    $"Size(Result) = {result.Length}), " +
+                    $"OutlierMode = {outlierMode}",
                     report);
                 yield break;
             }
 
-            if (actualOutliers.Any())
+            if (allOutliers.Any())
+                yield return CreateHint(GetMessage(actualOutliers.Length, allOutliers.Length), report);
+        }
+
+        /// <summary>
+        /// Returns a nice message which can be displayed in the summary.
+        /// </summary>
+        /// <param name="actualOutliers">Actual outliers which were removed from the statistics</param>
+        /// <param name="allOutliers">All outliers which present in the distribution (lower and upper)</param>
+        /// <returns>The message</returns>
+        [PublicAPI, NotNull, Pure]
+        public static string GetMessage(int actualOutliers, int allOutliers)
+        {
+            string Format(int n, string verb)
             {
-                int n = actualOutliers.Length;
                 string words = n == 1 ? "outlier  was " : "outliers were";
-                string verb = removeOutliers ? "removed" : "detected";
-                yield return CreateHint($"{n} {words} {verb}", report);
+                return $"{n} {words} {verb}";
             }
+
+            if (allOutliers == 0)
+                return string.Empty;
+            if (actualOutliers == allOutliers)
+                return Format(actualOutliers, "removed");
+            if (actualOutliers == 0)
+                return Format(allOutliers, "detected");
+            return Format(actualOutliers, "removed") + ", " + Format(allOutliers, "detected");
         }
     }
 }
