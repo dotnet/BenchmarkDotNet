@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
@@ -34,6 +35,6 @@ namespace BenchmarkDotNet.Analysers
 
         [NotNull]
         private Conclusion Create([NotNull] string kind, double mValue, [CanBeNull] BenchmarkReport report)
-            => CreateWarning($"It seems that the distribution {kind} (mValue = {mValue})", report);
+            => CreateWarning($"It seems that the distribution {kind} (mValue = {mValue.ToStr()})", report);
     }
 }
