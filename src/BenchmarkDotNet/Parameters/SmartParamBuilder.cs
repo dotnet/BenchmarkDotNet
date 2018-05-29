@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Code;
@@ -7,7 +8,7 @@ using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.Parameters
 {
-    static internal class SmartParamBuilder
+    internal static class SmartParamBuilder
     {
         internal static object[] CreateForParams(MemberInfo source, object[] values)
         {
@@ -21,7 +22,7 @@ namespace BenchmarkDotNet.Parameters
         {
             var unwrappedValue = valuesInfo.values[sourceIndex];
 
-            if (unwrappedValue is object[] array)
+            if (unwrappedValue is object[] array && !IsJagged(array))
             {
                 if (parameterDefinitions.Length != array.Length)
                     throw new InvalidOperationException($"Benchmark {benchmark.Name} has invalid number of arguments provided by [ArgumentsSource({valuesInfo.source.Name})]! {array.Length} instead of {parameterDefinitions.Length}.");
@@ -43,6 +44,13 @@ namespace BenchmarkDotNet.Parameters
                 return new ParameterInstance(parameterDefinitions[argumentIndex], value);
 
             return new ParameterInstance(parameterDefinitions[argumentIndex], new SmartArgument(parameterDefinitions, value, source, sourceIndex, argumentIndex));
+        }
+
+        private static bool IsJagged(object[] array)
+        {
+            var uniqueTypes = array.Select(element => element.GetType()).Distinct().ToArray();
+
+            return uniqueTypes.Length == 1 && uniqueTypes[0].IsArray;
         }
     }
 

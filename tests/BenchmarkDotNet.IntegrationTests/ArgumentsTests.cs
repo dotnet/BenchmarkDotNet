@@ -7,9 +7,9 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class ArgumentsAttributeTests : BenchmarkTestExecutor
+    public class ArgumentsTests : BenchmarkTestExecutor
     {
-        public ArgumentsAttributeTests(ITestOutputHelper output) : base(output) { }
+        public ArgumentsTests(ITestOutputHelper output) : base(output) { }
 
         [Fact]
         public void ArgumentsArePassedToBenchmarks() => CanExecute<WithArguments>();
@@ -133,6 +133,42 @@ namespace BenchmarkDotNet.IntegrationTests
                 for (int i = 0; i < 3; i++)
                     if (array[i] != i)
                         throw new InvalidOperationException($"Incorrect array element at index {i}, was {array[i]} instead of {i}");
+            }
+        }
+
+        [Fact]
+        public void JaggedArrayCanBeUsedAnArgument() => CanExecute<WithJaggedArray>();
+
+        public class WithJaggedArray
+        {
+            [Benchmark]
+            [ArgumentsSource(nameof(CreateMatrix))]
+            public void Test(int[][] array)
+            {
+                if(array == null)
+                    throw new ArgumentNullException(nameof(array));
+
+                for (int i = 0; i < 10; i++)
+                    for (int j = 0; j < i; j++)
+                        if(array[i][j] != i)
+                            throw new ArgumentException("Invalid value");
+            }
+
+            public IEnumerable<object> CreateMatrix()
+            {
+                int[][] jagged = new int[10][];
+
+                for (int i = 0; i < jagged.Length; i++)
+                {
+                    int[] row = new int[i];
+
+                    for (int j = 0; j < i; j++)
+                        row[j] = i;
+
+                    jagged[i] = row;
+                }
+                
+                yield return jagged;
             }
         }
     }
