@@ -173,47 +173,39 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public void ValueTupleCanBePassedByRefAsArgument() => CanExecute<WithValueTupleByRef>();
+        public void GenericTypeCanBePassedByRefAsArgument() => CanExecute<WithGenericByRef>();
         
-        public class WithValueTupleByRef 
+        public class WithGenericByRef 
         {
-            public enum E
+            public class Generic<T1, T2>
             {
-                RED = 1,
-                BLUE = 2
+                public T1 Item1;
+                public T2 Item2;
+                
+                public Generic(T1 item1, T2 item2)
+                {
+                    Item1 = item1;
+                    Item2 = item2;
+                }
             }
 
             [Benchmark]
             [ArgumentsSource(nameof(GetInputData))]
-            public bool ValueTupleCompareNoOpt(EqualityComparerFixture<ValueTuple<byte, E, int>> valueTupleFixture, ref ValueTuple<byte, E, int> v0)
+            public bool ValueTupleCompareNoOpt(ref Generic<int, string> byRef)
             {
-                if (valueTupleFixture == null)
-                    throw new ArgumentNullException(nameof(valueTupleFixture));
+                if (byRef == null)
+                    throw new ArgumentNullException(nameof(byRef));
                 
-                if(v0.Item1 != 3 || v0.Item2 != E.RED || v0.Item3 != 11)
-                    throw new ArgumentException("Wrong values for value tuple");
+                if(byRef.Item1 != 3 || byRef.Item2 != "red")
+                    throw new ArgumentException("Wrong values");
                 
                 return true;
             }
             
-            public IEnumerable<object[]> GetInputData()
+            public IEnumerable<object> GetInputData()
             {
-                yield return new object[]
-                {
-                    new EqualityComparerFixture<ValueTuple<byte, E, int>>(),
-                    new ValueTuple<byte, E, int>(3, E.RED, 11)
-                };
+                yield return new Generic<int, string>(3, "red");
             }
-        }
-    }
-
-    public class EqualityComparerFixture<T> where T : IEquatable<T>
-    {
-        IEqualityComparer<T> comparer;
-
-        public EqualityComparerFixture(IEqualityComparer<T> customComparer = null)
-        {
-            comparer = customComparer ?? EqualityComparer<T>.Default;
         }
     }
 }
