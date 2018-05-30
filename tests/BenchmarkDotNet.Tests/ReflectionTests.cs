@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
@@ -14,12 +15,27 @@ namespace BenchmarkDotNet.Tests
         {
             CheckCorrectTypeName("System.Int32", typeof(int));
             CheckCorrectTypeName("System.Int32[]", typeof(int[]));
+            CheckCorrectTypeName("System.Int32[][]", typeof(int[][]));
             CheckCorrectTypeName("System.Int32[,]", typeof(int[,]));
             CheckCorrectTypeName("System.Tuple<System.Int32, System.Int32>[]", typeof(Tuple<int, int>[]));
+            CheckCorrectTypeName("System.ValueTuple<System.Int32, System.Int32>[]", typeof(ValueTuple<int, int>[]));
             CheckCorrectTypeName("void", typeof(void));
             CheckCorrectTypeName("System.IEquatable<T>", typeof(IEquatable<>));
             CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedNonGeneric1.NestedNonGeneric2", typeof(NestedNonGeneric1.NestedNonGeneric2));
             CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedNonGeneric1.NestedGeneric2<System.Int16, System.Boolean, System.Decimal>", typeof(NestedNonGeneric1.NestedGeneric2<short, bool, decimal>));
+        }
+
+        [Fact]
+        public void GetCorrectCSharpTypeNameSupportsGenericTypesPassedByReference()
+        {
+            var byRefGenericType = typeof(GenericByRef).GetMethod(nameof(GenericByRef.TheMethod)).GetParameters().Single().ParameterType;
+            
+            CheckCorrectTypeName("System.ValueTuple<System.Int32, System.Int16>", byRefGenericType);
+        }
+
+        public class GenericByRef
+        {
+            public void TheMethod(ref ValueTuple<int, short> _) { }
         }
 
         [AssertionMethod]

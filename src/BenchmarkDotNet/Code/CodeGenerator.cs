@@ -195,13 +195,13 @@ namespace BenchmarkDotNet.Code
             => string.Join(
                 ", ",
                 benchmark.Target.Method.GetParameters()
-                         .Select((parameter, index) => $"{GetParameterModifier(parameter)} {parameter.ParameterType.GetCorrectCSharpTypeNameWithoutRef()} arg{index}"));
+                         .Select((parameter, index) => $"{GetParameterModifier(parameter)} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index}"));
 
         private static string GetDeclareArgumentFields(Benchmark benchmark)
             => string.Join(
                 Environment.NewLine,
                 benchmark.Target.Method.GetParameters()
-                         .Select((parameter, index) => $"private {parameter.ParameterType.GetCorrectCSharpTypeNameWithoutRef()} __argField{index};"));
+                         .Select((parameter, index) => $"private {parameter.ParameterType.GetCorrectCSharpTypeName()} __argField{index};"));
 
         private static string GetInitializeArgumentFields(Benchmark benchmark)
             => string.Join(
@@ -213,7 +213,7 @@ namespace BenchmarkDotNet.Code
             => string.Join(
                 Environment.NewLine,
                 benchmark.Target.Method.GetParameters()
-                         .Select((parameter, index) => $"{(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} {parameter.ParameterType.GetCorrectCSharpTypeNameWithoutRef()} arg{index} = {(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} __argField{index};"));
+                         .Select((parameter, index) => $"{(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index} = {(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} __argField{index};"));
 
         private static string GetPassArguments(Benchmark benchmark)
             => string.Join(

@@ -137,7 +137,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public void JaggedArrayCanBeUsedAnArgument() => CanExecute<WithJaggedArray>();
+        public void JaggedArrayCanBeUsedAsArgument() => CanExecute<WithJaggedArray>();
 
         public class WithJaggedArray
         {
@@ -170,6 +170,50 @@ namespace BenchmarkDotNet.IntegrationTests
                 
                 yield return jagged;
             }
+        }
+
+        [Fact]
+        public void ValueTupleCanBePassedByRefAsArgument() => CanExecute<WithValueTupleByRef>();
+        
+        public class WithValueTupleByRef 
+        {
+            public enum E
+            {
+                RED = 1,
+                BLUE = 2
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetInputData))]
+            public bool ValueTupleCompareNoOpt(EqualityComparerFixture<ValueTuple<byte, E, int>> valueTupleFixture, ref ValueTuple<byte, E, int> v0)
+            {
+                if (valueTupleFixture == null)
+                    throw new ArgumentNullException(nameof(valueTupleFixture));
+                
+                if(v0.Item1 != 3 || v0.Item2 != E.RED || v0.Item3 != 11)
+                    throw new ArgumentException("Wrong values for value tuple");
+                
+                return true;
+            }
+            
+            public IEnumerable<object[]> GetInputData()
+            {
+                yield return new object[]
+                {
+                    new EqualityComparerFixture<ValueTuple<byte, E, int>>(),
+                    new ValueTuple<byte, E, int>(3, E.RED, 11)
+                };
+            }
+        }
+    }
+
+    public class EqualityComparerFixture<T> where T : IEquatable<T>
+    {
+        IEqualityComparer<T> comparer;
+
+        public EqualityComparerFixture(IEqualityComparer<T> customComparer = null)
+        {
+            comparer = customComparer ?? EqualityComparer<T>.Default;
         }
     }
 }

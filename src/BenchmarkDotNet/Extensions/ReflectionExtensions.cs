@@ -27,16 +27,13 @@ namespace BenchmarkDotNet.Extensions
         internal static bool IsNullable(this Type type) => Nullable.GetUnderlyingType(type) != null;
 
         /// <summary>
-        /// returns type name which can be used in generated C# code without &amp; in the type name for by-ref
-        /// </summary>
-        internal static string GetCorrectCSharpTypeNameWithoutRef(this Type type)
-            => GetCorrectCSharpTypeName(type).Replace("&", string.Empty);
-
-        /// <summary>
         /// returns type name which can be used in generated C# code
         /// </summary>
         internal static string GetCorrectCSharpTypeName(this Type type)
         {
+            if (NeedsUglyHackForByGenericByRefTypes(type))
+                return UglyHack(type);
+
             if (type == typeof(void))
                 return "void";
             var prefix = "";
@@ -56,7 +53,7 @@ namespace BenchmarkDotNet.Extensions
                 
 
             if (type.GetTypeInfo().IsGenericParameter)
-                return type.Name;
+                return type.Name.Replace("&", string.Empty);
             if (type.GetTypeInfo().IsGenericType)
             {
                 var mainName = type.Name.Substring(0, type.Name.IndexOf('`'));
@@ -177,8 +174,29 @@ namespace BenchmarkDotNet.Extensions
 
         private static bool IsRunnableGenericType(TypeInfo typeInfo)
             => // if it is an open generic - there must be GenericBenchmark attributes
-                (!typeInfo.IsGenericTypeDefinition
-                 || (typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any()))
-                && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it       
+                (!typeInfo.IsGenericTypeDefinition || (typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any()))
+                    && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it       
+
+        private static bool NeedsUglyHackForByGenericByRefTypes(Type type)
+        {
+            // the reflection is missing information about types passed by ref (ie ref ValuTuple<int> is reported as NON generic type)
+            // more info https://github.com/dotnet/corefx/issues/29975
+
+            return type.IsByRef && !type.IsGenericType && type.Name.Contains('`');
+        }
+
+        private static string UglyHack(Type byRefGeneric) // I hate myslef for writing this piece of crap
+        {
+            // it is sth like System.ValueTuple`2[[System.Int32, System.Private.CoreLib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int16, System.Private.CoreLib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]&
+            var fullName = byRefGeneric.FullName;
+            var mainName = fullName.Substring(0, fullName.IndexOf('`'));
+            var arguments = fullName.Split('[')
+                .Skip(2) // System.ValueTuple`2[
+                .Select(argFullName => argFullName.Substring(0, argFullName.IndexOf(',')))
+                .Select(argumentName => argumentName.Replace('+', '.')) // for nested things...
+                .ToArray();
+
+            return $"{mainName}<{string.Join(", ", arguments)}>";
+        }
     }
 }

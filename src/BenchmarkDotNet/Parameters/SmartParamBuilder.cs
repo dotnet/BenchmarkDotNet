@@ -76,7 +76,7 @@ namespace BenchmarkDotNet.Parameters
 
         public string ToSourceCode()
         {
-            var cast = $"({Value.GetType().GetCorrectCSharpTypeNameWithoutRef()})"; // it's an object so we need to cast it to the right type
+            var cast = $"({Value.GetType().GetCorrectCSharpTypeName()})"; // it's an object so we need to cast it to the right type
 
             var callPostfix = source is PropertyInfo ? string.Empty : "()";
 
@@ -110,9 +110,9 @@ namespace BenchmarkDotNet.Parameters
 
         public string ToSourceCode()
         {
-            var cast = $"({Value.GetType().GetCorrectCSharpTypeNameWithoutRef()})";
+            var cast = $"({Value.GetType().GetCorrectCSharpTypeName()})";
 
-            var instancePrefix = method.IsStatic ? source.DeclaringType.GetCorrectCSharpTypeNameWithoutRef() : "instance";
+            var instancePrefix = method.IsStatic ? source.DeclaringType.GetCorrectCSharpTypeName() : "instance";
 
             var callPostfix = source is PropertyInfo ? string.Empty : "()";
 
