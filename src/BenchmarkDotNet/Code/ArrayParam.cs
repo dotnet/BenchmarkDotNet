@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.Code
@@ -21,7 +22,7 @@ namespace BenchmarkDotNet.Code
         public string DisplayText => $"Array[{array.Length}]";
 
         public string ToSourceCode()
-            => $"new[] {{ {string.Join(", ", array.Select(item => toSourceCode?.Invoke(item) ?? SourceCodeHelper.ToSourceCode(item)))} }}";
+            => $"new {typeof(T).GetCorrectCSharpTypeName()}[] {{ {string.Join(", ", array.Select(item => toSourceCode?.Invoke(item) ?? SourceCodeHelper.ToSourceCode(item)))} }}";
 
         /// <summary>
         /// for types where calling .ToString() will be enough to re-create them in auto-generated source code file (integers, strings and other primitives)
@@ -42,7 +43,7 @@ namespace BenchmarkDotNet.Code
             var type = array.GetType();
             if (!type.IsArray)
                 throw new InvalidOperationException("The argument must be an array");
-            if (!SourceCodeHelper.IsCompilationTimeConstant(Activator.CreateInstance(type.GetElementType())))
+            if (!SourceCodeHelper.IsCompilationTimeConstant(type.GetElementType()))
                 throw new InvalidOperationException("The argument must be an array of primitives");
             
             var arrayParamType = typeof(ArrayParam<>).MakeGenericType(type.GetElementType());

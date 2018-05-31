@@ -174,7 +174,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         [Fact]
         public void GenericTypeCanBePassedByRefAsArgument() => CanExecute<WithGenericByRef>();
-        
+
         public class WithGenericByRef 
         {
             public class Generic<T1, T2>
@@ -205,6 +205,22 @@ namespace BenchmarkDotNet.IntegrationTests
             public IEnumerable<object> GetInputData()
             {
                 yield return new Generic<int, string>(3, "red");
+            }
+        }
+
+        [Fact]
+        public void AnArrayOfTypeWithNoParameterlessCtorCanBePassedAsArgument() => CanExecute<WithArrayOfStringAsArgument>();
+
+        public class WithArrayOfStringAsArgument
+        {
+            [Benchmark]
+            [Arguments(new object[1] { new string[0] })] // arguments accept "params object[]", when we pass just a string[] it's recognized as an array of params
+            public void TypeReflectionArrayGetType(object anArray)
+            {
+                string[] strings = (string[])anArray;
+                
+                if (strings.Length != 0)
+                    throw new ArgumentException("The array should be empty");
             }
         }
     }
