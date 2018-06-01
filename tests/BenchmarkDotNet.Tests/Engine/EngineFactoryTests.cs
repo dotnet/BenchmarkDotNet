@@ -4,7 +4,6 @@ using System.IO;
 using System.Threading;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using Xunit;
@@ -143,7 +142,7 @@ namespace BenchmarkDotNet.Tests.Engine
         }
 
         [Fact]
-        public void RespectIterationTimeForBenchmarksWhichShouldBeInvokedLessThanDefaultUnrollFactorTimesPerIteration()
+        public void MediumTimeConsumingBenchmarksShouldStartPilotFrom2AndIcrementItWithEveryStep()
         {
             var unrollFactor = Job.Default.ResolveValue(RunMode.UnrollFactorCharacteristic, DefaultResolver);
 
@@ -180,8 +179,9 @@ namespace BenchmarkDotNet.Tests.Engine
             Assert.Equal(1, timesIterationCleanupCalled);
             Assert.Equal(0, timesGlobalCleanupCalled);
             
-            Assert.Equal(times, engine.TargetJob.Run.InvocationCount); // no need to run pilot!
+            Assert.False(engine.TargetJob.Run.HasValue(RunMode.InvocationCountCharacteristic)); // we need to run the pilot!
             Assert.Equal(1, engine.TargetJob.Run.UnrollFactor);  // no unroll factor!
+            Assert.Equal(2, engine.TargetJob.Accuracy.MinInvokeCount);  // we start from two (we know that 1 is not enough, the default is 4 so we need to override it)
             
             Assert.True(engine.TargetJob.Run.HasValue(AccuracyMode.EvaluateOverheadCharacteristic)); // is set to false in explicit way
             Assert.False(engine.TargetJob.Accuracy.EvaluateOverhead); // don't evaluate overhead in that case

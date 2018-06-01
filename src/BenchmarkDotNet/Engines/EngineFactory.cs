@@ -60,10 +60,12 @@ namespace BenchmarkDotNet.Engines
             
             if (roundedUpTimesPerIteration < defaultUnrollFactor) // if we run it defaultUnrollFactor times per iteration, it's going to take longer than IterationTime
             {
-                var fewTimesPerIterationButNotMoreThanUnrollFactor = CreateJobWhichDoesNotNeedPilotAndOverheadEvaluation(engineParameters.TargetJob, 
-                    invocationCount: roundedUpTimesPerIteration, unrollFactor: 1); // run the benchmark exactly that many times to fit in iteration time
+                var needsPilot = engineParameters.TargetJob
+                    .WithUnrollFactor(1) // we don't want to use unroll factor!
+                    .WithMinInvokeCount(2) // the minimum is 2 (not the default 4 which can be too much and not 1 which we already know is not enough)
+                    .WithEvaluateOverhead(false); // it's something very time consuming, it overhead is too small compared to total time
                 
-                return CreateEngine(engineParameters, fewTimesPerIterationButNotMoreThanUnrollFactor, engineParameters.IdleActionNoUnroll, engineParameters.MainActionNoUnroll);
+                return CreateEngine(engineParameters, needsPilot, engineParameters.IdleActionNoUnroll, engineParameters.MainActionNoUnroll);
             }
             
             var multiActionEngine = CreateMultiActionEngine(engineParameters);
@@ -96,15 +98,12 @@ namespace BenchmarkDotNet.Engines
 
         private static Engine CreateSingleActionEngine(EngineParameters engineParameters) 
             => CreateEngine(engineParameters,
-                CreateJobWhichDoesNotNeedPilotAndOverheadEvaluation(engineParameters.TargetJob, invocationCount: 1, unrollFactor: 1), // run the benchmark exactly once per iteration
+                engineParameters.TargetJob
+                    .WithInvocationCount(1).WithUnrollFactor(1) // run the benchmark exactly once per iteration 
+                    .WithEvaluateOverhead(false), // it's something very time consuming, it overhead is too small compared to total time
+                    // todo: consider if we should set the warmup count to 2
                 engineParameters.IdleActionNoUnroll, 
                 engineParameters.MainActionNoUnroll);
-        
-        private static Job CreateJobWhichDoesNotNeedPilotAndOverheadEvaluation(Job sourceJob, int invocationCount, int unrollFactor)
-            => sourceJob
-                .WithInvocationCount(invocationCount).WithUnrollFactor(unrollFactor) 
-                .WithEvaluateOverhead(false); // it's very time consuming, don't evaluate the overhead which would be 0,000025% of the target run or even less
-                // todo: consider if we should set the warmup count to 2
 
         private static Engine CreateEngine(EngineParameters engineParameters, Job job, Action<long> idle, Action<long> main)
             => new Engine(
