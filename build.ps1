@@ -78,6 +78,7 @@ $env:PATH = "$InstallPath;$env:PATH"
 
 $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 $env:DOTNET_CLI_TELEMETRY_OPTOUT=1
+$env:DOTNET_MULTILEVEL_LOOKUP=0
 
 ###########################################################################
 # INSTALL NUGET
