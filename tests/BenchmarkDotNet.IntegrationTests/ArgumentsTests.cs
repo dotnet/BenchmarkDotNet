@@ -146,13 +146,13 @@ namespace BenchmarkDotNet.IntegrationTests
             [ArgumentsSource(nameof(CreateMatrix))]
             public void Test(int[][] array)
             {
-                if(array == null)
+                if (array == null)
                     throw new ArgumentNullException(nameof(array));
 
                 for (int i = 0; i < 10; i++)
-                    for (int j = 0; j < i; j++)
-                        if(array[i][j] != i)
-                            throw new ArgumentException("Invalid value");
+                for (int j = 0; j < i; j++)
+                    if (array[i][j] != i)
+                        throw new ArgumentException("Invalid value");
             }
 
             public IEnumerable<object> CreateMatrix()
@@ -168,7 +168,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
                     jagged[i] = row;
                 }
-                
+
                 yield return jagged;
             }
         }
@@ -176,13 +176,13 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void GenericTypeCanBePassedByRefAsArgument() => CanExecute<WithGenericByRef>();
 
-        public class WithGenericByRef 
+        public class WithGenericByRef
         {
             public class Generic<T1, T2>
             {
                 public T1 Item1;
                 public T2 Item2;
-                
+
                 public Generic(T1 item1, T2 item2)
                 {
                     Item1 = item1;
@@ -196,13 +196,13 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 if (byRef == null)
                     throw new ArgumentNullException(nameof(byRef));
-                
-                if(byRef.Item1 != 3 || byRef.Item2 != "red")
+
+                if (byRef.Item1 != 3 || byRef.Item2 != "red")
                     throw new ArgumentException("Wrong values");
-                
+
                 return true;
             }
-            
+
             public IEnumerable<object> GetInputData()
             {
                 yield return new Generic<int, string>(3, "red");
@@ -215,11 +215,12 @@ namespace BenchmarkDotNet.IntegrationTests
         public class WithArrayOfStringAsArgument
         {
             [Benchmark]
-            [Arguments(new object[1] { new string[0] })] // arguments accept "params object[]", when we pass just a string[] it's recognized as an array of params
+            [Arguments(new object[1] { new string[0] })]
+            // arguments accept "params object[]", when we pass just a string[] it's recognized as an array of params
             public void TypeReflectionArrayGetType(object anArray)
             {
-                string[] strings = (string[])anArray;
-                
+                string[] strings = (string[]) anArray;
+
                 if (strings.Length != 0)
                     throw new ArgumentException("The array should be empty");
             }
@@ -231,7 +232,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public class WithArrayToSpan
         {
             [Benchmark]
-            [Arguments(new [] {0, 1, 2})]
+            [Arguments(new[] { 0, 1, 2 })]
             public void AcceptsSpan(Span<int> span)
             {
                 if (span.Length != 3)
@@ -244,20 +245,68 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [FactDotNetCoreOnly("portable span has no implicit cast operator to string https://github.com/dotnet/corefx/issues/30121")]
-        public void AStringCanBePassedToBenchmarkAsReadOnlySpan() => CanExecute<WithStringToReadOnlySpan>();
+        public void StringCanBePassedToBenchmarkAsReadOnlySpan() => CanExecute<WithStringToReadOnlySpan>();
 
         public class WithStringToReadOnlySpan
         {
-            private const string expectedString = "very nice string"; 
-            
+            private const string expectedString = "very nice string";
+
             [Benchmark]
             [Arguments(expectedString)]
             public void AcceptsReadOnlySpan(ReadOnlySpan<char> notString)
             {
                 string aString = notString.ToString();
-                
-                if(aString != expectedString)
+
+                if (aString != expectedString)
                     throw new ArgumentException("Invalid value");
+            }
+        }
+
+        [Fact]
+        public void AnArrayOfStringsCanBeUsedAsArgument() => CanExecute<WithArrayOfStringFromArgumentSource>();
+
+        public class WithArrayOfStringFromArgumentSource
+        {
+            public IEnumerable<object> GetArrayOfString()
+            {
+                yield return new string[123];
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetArrayOfString))]
+            public void TypeReflectionArrayGetType(string[] array)
+            {
+                if (array.Length != 123)
+                    throw new ArgumentException("The array was empty");
+            }
+        }
+
+        [Fact]
+        public void BenchmarkCanAcceptFewArrays() => CanExecute<FewArrays>();
+
+        public class FewArrays
+        {
+            public IEnumerable<object[]> GetArrays()
+            {
+                yield return new object[2]
+                {
+                    new int[] { 0, 2, 4 },
+                    new int[] { 1, 3, 5 },
+                };
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetArrays))]
+            public void AcceptsArrays(int[] even, int[] notEven)
+            {
+                if (even.Length != 3 || notEven.Length != 3)
+                    throw new ArgumentException("Incorrect length");
+                
+                if (!even.All(n => n % 2 == 0))
+                    throw new ArgumentException("Not even");
+                
+                if (!notEven.All(n => n % 2 != 0))
+                    throw new ArgumentException("Even");
             }
         }
     }

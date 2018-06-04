@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Parameters
         {
             var unwrappedValue = valuesInfo.values[sourceIndex];
 
-            if (unwrappedValue is object[] array && !IsJagged(array))
+            if (unwrappedValue is object[] array && parameterDefinitions.Length > 1)
             {
                 if (parameterDefinitions.Length != array.Length)
                     throw new InvalidOperationException($"Benchmark {benchmark.Name} has invalid number of arguments provided by [ArgumentsSource({valuesInfo.source.Name})]! {array.Length} instead of {parameterDefinitions.Length}.");
@@ -44,13 +44,6 @@ namespace BenchmarkDotNet.Parameters
                 return new ParameterInstance(parameterDefinitions[argumentIndex], value);
 
             return new ParameterInstance(parameterDefinitions[argumentIndex], new SmartArgument(parameterDefinitions, value, source, sourceIndex, argumentIndex));
-        }
-
-        private static bool IsJagged(object[] array)
-        {
-            var uniqueTypes = array.Select(element => element.GetType()).Distinct().ToArray();
-
-            return uniqueTypes.Length == 1 && uniqueTypes[0].IsArray;
         }
     }
 
