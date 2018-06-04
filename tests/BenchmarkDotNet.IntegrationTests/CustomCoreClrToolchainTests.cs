@@ -21,15 +21,15 @@ namespace BenchmarkDotNet.IntegrationTests
                 .With(Job.Dry.With(
                     CustomCoreClrToolchain.CreateBuilder()
                         .UseCoreClrDefault()
-                        .UseCoreFxNuGet("4.5.0-preview3-26328-01")
+                        .UseCoreFxNuGet("4.5.0-rtm-26531-02")
                         .ToToolchain()));
 
-            CanExecute<Check_4_6_26328_01_CoreFxVersion>(config);
+            CanExecute<Check_4_6_26531_02_CoreFxVersion>(config);
         }
 
-        public class Check_4_6_26328_01_CoreFxVersion : CheckCoreClrAndCoreFxVersions
+        public class Check_4_6_26531_02_CoreFxVersion : CheckCoreClrAndCoreFxVersions
         {
-            public Check_4_6_26328_01_CoreFxVersion() : base(expectedCoreFxVersion: "4.6.26328.01") { }
+            public Check_4_6_26531_02_CoreFxVersion() : base(expectedCoreFxVersion: "4.6.26531.02") { }
         }
 
         [FactDotNetCoreOnly(skipReason: WeRunTheseTestsForNetCoreOnlyBecauseTheyTakeALotOfTime)]
@@ -39,15 +39,15 @@ namespace BenchmarkDotNet.IntegrationTests
                 .With(Job.Dry.With(
                     CustomCoreClrToolchain.CreateBuilder()
                         .UseCoreFxDefault()
-                        .UseCoreClrNuGet("2.1.0-preview3-26329-08")
+                        .UseCoreClrNuGet("2.1.0-rtm-26528-02")
                         .ToToolchain()));
 
-            CanExecute<Check_4_6_26329_08_CoreClrVersion>(config);
+            CanExecute<Check_4_6_26528_02_CoreClrVersion>(config);
         }
 
-        public class Check_4_6_26329_08_CoreClrVersion : CheckCoreClrAndCoreFxVersions
+        public class Check_4_6_26528_02_CoreClrVersion : CheckCoreClrAndCoreFxVersions
         {
-            public Check_4_6_26329_08_CoreClrVersion() : base(expectedCoreClrVersion: "4.6.26329.08") { }
+            public Check_4_6_26528_02_CoreClrVersion() : base(expectedCoreClrVersion: "4.6.26528.02") { }
         }
 
         [FactDotNetCoreOnly(skipReason: WeRunTheseTestsForNetCoreOnlyBecauseTheyTakeALotOfTime)]
@@ -56,16 +56,16 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = ManualConfig.CreateEmpty()
                 .With(Job.Dry.With(
                     CustomCoreClrToolchain.CreateBuilder()
-                        .UseCoreFxNuGet("4.5.0-preview3-26330-06")
-                        .UseCoreClrNuGet("2.1.0-preview3-26329-08")
+                        .UseCoreFxNuGet("4.5.0-rtm-26531-02")
+                        .UseCoreClrNuGet("2.1.0-rtm-26528-02")
                         .ToToolchain()));
 
-            CanExecute<Check_4_6_26329_08_CoreClrAnd_4_6_26330_06_CoreFxVersions>(config);
+            CanExecute<Check_4_6_6528_02_CoreClrAnd_4_6_26531_02_CoreFxVersions>(config);
         }
 
-        public class Check_4_6_26329_08_CoreClrAnd_4_6_26330_06_CoreFxVersions : CheckCoreClrAndCoreFxVersions
+        public class Check_4_6_6528_02_CoreClrAnd_4_6_26531_02_CoreFxVersions : CheckCoreClrAndCoreFxVersions
         {
-            public Check_4_6_26329_08_CoreClrAnd_4_6_26330_06_CoreFxVersions() : base(expectedCoreClrVersion: "4.6.26329.08", expectedCoreFxVersion: "4.6.26330.06") { }
+            public Check_4_6_6528_02_CoreClrAnd_4_6_26531_02_CoreFxVersions() : base(expectedCoreClrVersion: "4.6.26528.02", expectedCoreFxVersion: "4.6.26531.02") { }
         }
     }
 }
