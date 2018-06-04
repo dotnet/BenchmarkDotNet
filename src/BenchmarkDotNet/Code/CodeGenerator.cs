@@ -13,6 +13,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using RunMode = BenchmarkDotNet.Jobs.RunMode;
 
@@ -201,7 +202,7 @@ namespace BenchmarkDotNet.Code
             => string.Join(
                 Environment.NewLine,
                 benchmark.Target.Method.GetParameters()
-                         .Select((parameter, index) => $"private {parameter.ParameterType.GetCorrectCSharpTypeName()} __argField{index};"));
+                         .Select((parameter, index) => $"private {GetFieldType(parameter.ParameterType, benchmark.Parameters.GetArgument(parameter.Name)).GetCorrectCSharpTypeName()} __argField{index};"));
 
         private static string GetInitializeArgumentFields(Benchmark benchmark)
             => string.Join(
@@ -262,6 +263,18 @@ namespace BenchmarkDotNet.Code
             @switch.AppendLine("}");
 
             return @switch.ToString();
+        }
+
+        private static Type GetFieldType(Type argumentType, ParameterInstance argument)
+        {
+            // #774 we can't store Span in a field, so we store an array (which is later casted to Span when we load the arguments)
+            if (argument.Value != null && argument.Value.GetType().IsArray 
+                && argumentType.IsGenericType 
+                && (argumentType == typeof(Span<>).MakeGenericType(argumentType.GetGenericArguments()[0])
+                    || argumentType == typeof(ReadOnlySpan<>).MakeGenericType(argumentType.GetGenericArguments()[0])))
+                return argument.Value.GetType();
+
+            return argumentType;
         }
 
         private class SmartStringBuilder

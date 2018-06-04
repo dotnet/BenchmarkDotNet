@@ -223,5 +223,23 @@ namespace BenchmarkDotNet.IntegrationTests
                     throw new ArgumentException("The array should be empty");
             }
         }
+
+        [Fact]
+        public void AnArrayCanBePassedToBenchmarkAsSpan() => CanExecute<WithArrayToSpan>();
+        
+        public class WithArrayToSpan
+        {
+            [Benchmark]
+            [Arguments(new [] {0, 1, 2})]
+            public void GetValue(Span<int> span)
+            {
+                if (span.Length != 3)
+                    throw new ArgumentException("Invalid length");
+
+                for (int i = 0; i < 3; i++)
+                    if (span[i] != i)
+                        throw new ArgumentException("Invalid value");
+            }
+        }
     }
 }
