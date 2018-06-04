@@ -173,6 +173,29 @@ namespace BenchmarkDotNet.Extensions
             return joined;
         }
 
+        internal static bool IsStackOnlyWithImplicitCast(this Type argumentType, object argumentInstance)
+        {
+            if (argumentInstance == null)
+                return false;
+            
+            // IsByRefLikeAttribute is not exposed for older runtimes, so we need to check it in an ugly way ;)
+            var isByRefLike = argumentType.GetCustomAttributes().Any(attribute => attribute.ToString().Contains("IsByRefLike"));
+            if (!isByRefLike)
+                return false;
+
+            var instanceType = argumentInstance.GetType();
+
+            var implicitCastsDefinedInArgumentInstance = instanceType.GetMethods().Where(method => method.Name == "op_Implicit" && method.GetParameters().Any()).ToArray();
+            if (implicitCastsDefinedInArgumentInstance.Any(implicitCast => implicitCast.ReturnType == argumentType && implicitCast.GetParameters().All(p => p.ParameterType == instanceType)))
+                return true;
+                
+            var implicitCastsDefinedInArgumentType = argumentType.GetMethods().Where(method => method.Name == "op_Implicit" && method.GetParameters().Any()).ToArray();
+            if (implicitCastsDefinedInArgumentType.Any(implicitCast => implicitCast.ReturnType == argumentType && implicitCast.GetParameters().All(p => p.ParameterType == instanceType)))
+                return true;
+
+            return false;
+        }
+
         private static bool IsRunnableGenericType(TypeInfo typeInfo)
             => // if it is an open generic - there must be GenericBenchmark attributes
                 (!typeInfo.IsGenericTypeDefinition || (typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any()))

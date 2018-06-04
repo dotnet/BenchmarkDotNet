@@ -268,10 +268,7 @@ namespace BenchmarkDotNet.Code
         private static Type GetFieldType(Type argumentType, ParameterInstance argument)
         {
             // #774 we can't store Span in a field, so we store an array (which is later casted to Span when we load the arguments)
-            if (argument.Value != null && argument.Value.GetType().IsArray 
-                && argumentType.IsGenericType 
-                && (argumentType == typeof(Span<>).MakeGenericType(argumentType.GetGenericArguments()[0])
-                    || argumentType == typeof(ReadOnlySpan<>).MakeGenericType(argumentType.GetGenericArguments()[0])))
+            if(argumentType.IsStackOnlyWithImplicitCast(argument.Value))
                 return argument.Value.GetType();
 
             return argumentType;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.IntegrationTests.Xunit;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -226,12 +227,12 @@ namespace BenchmarkDotNet.IntegrationTests
 
         [Fact]
         public void AnArrayCanBePassedToBenchmarkAsSpan() => CanExecute<WithArrayToSpan>();
-        
+
         public class WithArrayToSpan
         {
             [Benchmark]
             [Arguments(new [] {0, 1, 2})]
-            public void GetValue(Span<int> span)
+            public void AcceptsSpan(Span<int> span)
             {
                 if (span.Length != 3)
                     throw new ArgumentException("Invalid length");
@@ -239,6 +240,24 @@ namespace BenchmarkDotNet.IntegrationTests
                 for (int i = 0; i < 3; i++)
                     if (span[i] != i)
                         throw new ArgumentException("Invalid value");
+            }
+        }
+
+        [FactDotNetCoreOnly("portable span has no implicit cast operator to string https://github.com/dotnet/corefx/issues/30121")]
+        public void AStringCanBePassedToBenchmarkAsReadOnlySpan() => CanExecute<WithStringToReadOnlySpan>();
+
+        public class WithStringToReadOnlySpan
+        {
+            private const string expectedString = "very nice string"; 
+            
+            [Benchmark]
+            [Arguments(expectedString)]
+            public void AcceptsReadOnlySpan(ReadOnlySpan<char> notString)
+            {
+                string aString = notString.ToString();
+                
+                if(aString != expectedString)
+                    throw new ArgumentException("Invalid value");
             }
         }
     }
