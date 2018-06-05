@@ -79,7 +79,7 @@
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
 		public void __TrickTheJIT__()
 		{
-			NotEleven = new Random(123).Next(0, 10);
+			NotEleven = new System.Random(123).Next(0, 10);
             $DiassemblerEntryMethodName$();
 		}
 
@@ -110,7 +110,7 @@
 
 #if RETURNS_CONSUMABLE_$ID$
 
-        private Consumer consumer = new Consumer();
+        private BenchmarkDotNet.Engines.Consumer consumer = new BenchmarkDotNet.Engines.Consumer();
 
         private void IdleActionUnroll(long invokeCount)
         {
