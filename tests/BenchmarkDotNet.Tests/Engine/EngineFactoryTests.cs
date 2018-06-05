@@ -4,7 +4,6 @@ using System.IO;
 using System.Threading;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using Xunit;
@@ -33,11 +32,11 @@ namespace BenchmarkDotNet.Tests.Engine
             Thread.Sleep(IterationTime);
         }
         
-        void InstantSingle(long _) => timesBenchmarkCalled++;
-        void Instant16(long _) => timesBenchmarkCalled += 16;
+        void InstantNoUnroll(long invocationCount) => timesBenchmarkCalled += (int)invocationCount;
+        void InstantUnroll(long _) => timesBenchmarkCalled += 16;
         
-        void IdleSingle(long _) => timesIdleCalled++;
-        void Idle16(long _) => timesIdleCalled += 16;
+        void IdleNoUnroll(long invocationCount) => timesIdleCalled += (int)invocationCount;
+        void IdleUnroll(long _) => timesIdleCalled += 16;
 
         public static IEnumerable<object[]> JobsWhichDontRequireJitting()
         {
@@ -50,7 +49,7 @@ namespace BenchmarkDotNet.Tests.Engine
         [MemberData(nameof(JobsWhichDontRequireJitting))]
         public void ForJobsThatDontRequireJittingOnlyGlobalSetupIsCalled(Job job)
         {
-            var engineParameters = CreateEngineParameters(mainSingleAction: Throwing, mainMultiAction: Throwing, job: job);
+            var engineParameters = CreateEngineParameters(mainNoUnroll: Throwing, mainUnroll: Throwing, job: job);
 
             var engine = new EngineFactory().CreateReadyToRun(engineParameters);
 
@@ -69,7 +68,7 @@ namespace BenchmarkDotNet.Tests.Engine
         [Fact]
         public void ForDefaultSettingsVeryTimeConsumingBenchmarksAreExecutedOncePerIterationWithoutOverheadDeduction()
         {
-            var engineParameters = CreateEngineParameters(mainSingleAction: VeryTimeConsumingSingle, mainMultiAction: Throwing, job: Job.Default);
+            var engineParameters = CreateEngineParameters(mainNoUnroll: VeryTimeConsumingSingle, mainUnroll: Throwing, job: Job.Default);
 
             var engine = new EngineFactory().CreateReadyToRun(engineParameters);
 
@@ -101,7 +100,7 @@ namespace BenchmarkDotNet.Tests.Engine
 
         private void AssertGlobalSetupWasCalledAndMultiActionGotJitted(Job job)
         {
-            var engineParameters = CreateEngineParameters(mainSingleAction: Throwing, mainMultiAction: Instant16, job: job);
+            var engineParameters = CreateEngineParameters(mainNoUnroll: Throwing, mainUnroll: InstantUnroll, job: job);
 
             var engine = new EngineFactory().CreateReadyToRun(engineParameters);
 
@@ -122,7 +121,7 @@ namespace BenchmarkDotNet.Tests.Engine
         [Fact]
         public void NonVeryTimeConsumingBenchmarksAreExecutedMoreThanOncePerIterationWithUnrollFactorForDefaultSettings()
         {
-            var engineParameters = CreateEngineParameters(mainSingleAction: InstantSingle, mainMultiAction: Instant16, job: Job.Default);
+            var engineParameters = CreateEngineParameters(mainNoUnroll: InstantNoUnroll, mainUnroll: InstantUnroll, job: Job.Default);
 
             var engine = new EngineFactory().CreateReadyToRun(engineParameters);
 
@@ -143,19 +142,25 @@ namespace BenchmarkDotNet.Tests.Engine
         }
 
         [Fact]
-        public void DontRunThePilotIfThePilotRequirementIsMetDuringWarmup()
+        public void MediumTimeConsumingBenchmarksShouldStartPilotFrom2AndIcrementItWithEveryStep()
         {
             var unrollFactor = Job.Default.ResolveValue(RunMode.UnrollFactorCharacteristic, DefaultResolver);
-            var mediumTime =  TimeSpan.FromMilliseconds((IterationTime.TotalMilliseconds / unrollFactor) * 2);
-            
-            void MediumSingle(long _)
-            {
-                timesBenchmarkCalled++;
 
-                Thread.Sleep(mediumTime);
+            const int times = 5; // how many times we should invoke the benchmark per iteration
+            
+            var mediumTime = TimeSpan.FromMilliseconds(IterationTime.TotalMilliseconds / times);
+            
+            void MediumNoUnroll(long invocationCount)
+            {
+                for (int i = 0; i < invocationCount; i++)
+                {
+                    timesBenchmarkCalled++;
+
+                    Thread.Sleep(mediumTime);
+                }
             }
         
-            void MediumMultiple(long _)
+            void MediumUnroll(long _)
             {
                 timesBenchmarkCalled += unrollFactor;
             
@@ -163,19 +168,20 @@ namespace BenchmarkDotNet.Tests.Engine
                     Thread.Sleep(mediumTime);
             }
             
-            var engineParameters = CreateEngineParameters(mainSingleAction: MediumSingle, mainMultiAction: MediumMultiple, job: Job.Default);
+            var engineParameters = CreateEngineParameters(mainNoUnroll: MediumNoUnroll, mainUnroll: MediumUnroll, job: Job.Default);
             
             var engine = new EngineFactory().CreateReadyToRun(engineParameters);
 
             Assert.Equal(1, timesGlobalSetupCalled);
-            Assert.Equal(1+1, timesIterationSetupCalled);
-            Assert.Equal(1 + unrollFactor, timesBenchmarkCalled);
-            Assert.Equal(1 + unrollFactor, timesIdleCalled);
-            Assert.Equal(1+1, timesIterationCleanupCalled);
+            Assert.Equal(1, timesIterationSetupCalled);
+            Assert.Equal(1, timesBenchmarkCalled); // we run it just once and we know how many times it should be invoked
+            Assert.Equal(1, timesIdleCalled);
+            Assert.Equal(1, timesIterationCleanupCalled);
             Assert.Equal(0, timesGlobalCleanupCalled);
             
-            Assert.Equal(unrollFactor, engine.TargetJob.Run.InvocationCount); // no need to run pilot!
-            Assert.Equal(unrollFactor, engine.TargetJob.Run.UnrollFactor);  // remains the same!
+            Assert.False(engine.TargetJob.Run.HasValue(RunMode.InvocationCountCharacteristic)); // we need to run the pilot!
+            Assert.Equal(1, engine.TargetJob.Run.UnrollFactor);  // no unroll factor!
+            Assert.Equal(2, engine.TargetJob.Accuracy.MinInvokeCount);  // we start from two (we know that 1 is not enough, the default is 4 so we need to override it)
             
             Assert.True(engine.TargetJob.Run.HasValue(AccuracyMode.EvaluateOverheadCharacteristic)); // is set to false in explicit way
             Assert.False(engine.TargetJob.Accuracy.EvaluateOverhead); // don't evaluate overhead in that case
@@ -185,7 +191,7 @@ namespace BenchmarkDotNet.Tests.Engine
             Assert.Equal(1, timesGlobalCleanupCalled);
         }
 
-        private EngineParameters CreateEngineParameters(Action<long> mainSingleAction, Action<long> mainMultiAction, Job job)
+        private EngineParameters CreateEngineParameters(Action<long> mainNoUnroll, Action<long> mainUnroll, Job job)
             => new EngineParameters
             {
                 Dummy1Action = () => { },
@@ -194,12 +200,12 @@ namespace BenchmarkDotNet.Tests.Engine
                 GlobalSetupAction = GlobalSetup,
                 GlobalCleanupAction = GlobalCleanup,
                 Host = new ConsoleHost(TextWriter.Null, TextReader.Null),
-                IdleMultiAction = Idle16,
-                IdleSingleAction = IdleSingle,
+                IdleActionUnroll = IdleUnroll,
+                IdleActionNoUnroll = IdleNoUnroll,
                 IterationCleanupAction = IterationCleanup,
                 IterationSetupAction = IterationSetup,
-                MainMultiAction = mainMultiAction,
-                MainSingleAction = mainSingleAction,
+                MainActionUnroll = mainUnroll,
+                MainActionNoUnroll = mainNoUnroll,
                 TargetJob = job
             };
     }
