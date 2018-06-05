@@ -89,7 +89,7 @@ namespace BenchmarkDotNet.Environments
             { "10.0.14393", "10 Redstone 1 [1607, Anniversary Update]" },
             { "10.0.15063", "10 Redstone 2 [1703, Creators Update]" },
             { "10.0.16299", "10 Redstone 3 [1709, Fall Creators Update]" },
-            { "10.0.17133", "10 Redstone 4 [1803]" },
+            { "10.0.17134", "10 Redstone 4 [1803, April 2018 Update]" }
         };
 
         private class Windows10Version
@@ -127,7 +127,7 @@ namespace BenchmarkDotNet.Environments
                 new Windows10Version(1607, "Redstone 1", "Anniversary Update", 14393),
                 new Windows10Version(1703, "Redstone 2", "Creators Update", 15063),
                 new Windows10Version(1709, "Redstone 3", "Fall Creators Update", 16299),
-                new Windows10Version(1803, "Redstone 4", "Spring Creators Update", 17133)
+                new Windows10Version(1803, "Redstone 4", "April 2018 Update", 17134)
             };
 
             [CanBeNull]
