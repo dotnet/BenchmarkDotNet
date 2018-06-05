@@ -217,6 +217,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     .WithEvaluateOverhead(false) // no need to run idle for this test
                     .WithWarmupCount(0) // don't run warmup to save some time for our CI runs
                     .WithTargetCount(1) // single iteration is enough for us
+                    .WithInvocationCount(16000) // should be enough to be accurate and save us a lot of time ;)
                     .WithGcForce(false).With(toolchain)) 
                 .With(DefaultConfig.Instance.GetLoggers().ToArray())
                 .With(DefaultColumnProviders.Instance)
