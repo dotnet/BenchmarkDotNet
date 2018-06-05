@@ -35,6 +35,8 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 platform: GetPlatform(buildPartition.Platform),
                 deterministic: true);
 
+            compilationOptions = compilationOptions.WithIgnoreCorLibraryDuplicatedTypes();
+
             var references = Generator
                 .GetAllReferences(buildPartition.RepresentativeBenchmark)
                 .Select(assembly => AssemblyMetadata.CreateFromFile(assembly.Location))
