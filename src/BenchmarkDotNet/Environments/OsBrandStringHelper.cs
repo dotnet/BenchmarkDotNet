@@ -189,7 +189,8 @@ namespace BenchmarkDotNet.Environments
                 new MacOSXVersion(14, "Yosemite"),
                 new MacOSXVersion(15, "El Capitan"),
                 new MacOSXVersion(16, "Sierra"),
-                new MacOSXVersion(17, "High Sierra")
+                new MacOSXVersion(17, "High Sierra"),
+                new MacOSXVersion(18, "Mojave")
             };
 
             [CanBeNull]
