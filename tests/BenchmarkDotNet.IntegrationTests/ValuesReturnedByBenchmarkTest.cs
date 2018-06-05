@@ -12,10 +12,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public ValuesReturnedByBenchmarkTest(ITestOutputHelper output) : base(output) { }
 
         [Fact]
-        public void AnyValueCanBeReturned()
-        {
-            CanExecute<ValuesReturnedByBenchmark>();
-        }
+        public void AnyValueCanBeReturned() => CanExecute<ValuesReturnedByBenchmark>();
 
         public class ValuesReturnedByBenchmark
         {
@@ -60,6 +57,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
             [Benchmark]
             public ImmutableArray<int> TypeFromNetStandardNuGetPackage() => ImmutableArray<int>.Empty;
+            
+            [Benchmark]
+            public ValueTuple<int> TypeInTwoDlls() => new ValueTuple<int>();
 
             public struct Result<T>
             {
