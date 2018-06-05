@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Tests.Mathematics.Histograms
             output.WriteLine(histogram.ToTimeStr());
             output.WriteLine($"=== {title}:Full (BinSize={histogram.BinSize.ToTimeStr()}, mValue={mValue.ToStr()}) ===");
             output.WriteLine(histogram.ToTimeStr(full: true));
-            output.WriteLine("OUTLIERS: ", string.Join(", ", s.Outliers.Select(it => it.ToTimeStr())));
+            output.WriteLine("OUTLIERS: ", string.Join(", ", s.AllOutliers.Select(it => it.ToTimeStr())));
         }
     }
 }

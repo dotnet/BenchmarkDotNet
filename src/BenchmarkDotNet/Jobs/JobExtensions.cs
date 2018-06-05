@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Jobs
@@ -52,7 +52,9 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithMinIterationTime(this Job job, TimeInterval value) => job.WithCore(j => j.Accuracy.MinIterationTime = value);
         public static Job WithMinInvokeCount(this Job job, int value) => job.WithCore(j => j.Accuracy.MinInvokeCount = value);
         public static Job WithEvaluateOverhead(this Job job, bool value) => job.WithCore(j => j.Accuracy.EvaluateOverhead = value);
-        public static Job WithRemoveOutliers(this Job job, bool value) => job.WithCore(j => j.Accuracy.RemoveOutliers = value);
+        public static Job WithOutlierMode(this Job job, OutlierMode value) => job.WithCore(j => j.Accuracy.OutlierMode = value);
+        [Obsolete("Please use the new WithOutlierMode instead")]
+        public static Job WithRemoveOutliers(this Job job, bool value) => job.WithCore(j => j.Accuracy.OutlierMode = value ? OutlierMode.OnlyUpper : OutlierMode.None);
         public static Job WithAnalyzeLaunchVariance(this Job job, bool value) => job.WithCore(j => j.Accuracy.AnalyzeLaunchVariance = value);
         
         // Meta

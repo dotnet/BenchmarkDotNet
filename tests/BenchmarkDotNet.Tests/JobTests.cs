@@ -398,7 +398,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .GetAllCharacteristics(typeof(Job))
                 .Select(c => c.Id);
             Assert.Equal(string.Join(";", a), "Id;Accuracy;AnalyzeLaunchVariance;EvaluateOverhead;" +
-                "MaxAbsoluteError;MaxRelativeError;MinInvokeCount;MinIterationTime;RemoveOutliers;Env;Affinity;" +
+                "MaxAbsoluteError;MaxRelativeError;MinInvokeCount;MinIterationTime;OutlierMode;Env;Affinity;" +
                 "Jit;Platform;Runtime;Gc;AllowVeryLargeObjects;Concurrent;CpuGroups;Force;HeapAffinitizeMask;HeapCount;NoAffinitize;" +
                 "RetainVm;Server;Infrastructure;Arguments;BuildConfiguration;Clock;EngineFactory;EnvironmentVariables;Toolchain;Meta;IsBaseline;Run;InvocationCount;IterationTime;" +
                 "LaunchCount;MaxTargetIterationCount;MinTargetIterationCount;RunStrategy;TargetCount;UnrollFactor;WarmupCount");

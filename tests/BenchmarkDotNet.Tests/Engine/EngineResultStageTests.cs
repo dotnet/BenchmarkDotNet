@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 using Xunit;
@@ -20,14 +21,17 @@ namespace BenchmarkDotNet.Tests.Engine
             Add(measurements, 104);
             Add(measurements, 500); // It's an outlier
 
-            CheckResults(5, measurements, true);
-            CheckResults(6, measurements, false);
+            CheckResults(5, measurements, OutlierMode.OnlyUpper);
+            CheckResults(5, measurements, OutlierMode.All);
+            
+            CheckResults(6, measurements, OutlierMode.None);
+            CheckResults(6, measurements, OutlierMode.OnlyLower);
         }
 
         [AssertionMethod]
-        private static void CheckResults(int expectedResultCount, List<Measurement> measurements, bool removeOutliers)
+        private static void CheckResults(int expectedResultCount, List<Measurement> measurements, OutlierMode outlierMode)
         {
-            Assert.Equal(expectedResultCount, new RunResults(null, measurements, removeOutliers, default).GetMeasurements().Count());
+            Assert.Equal(expectedResultCount, new RunResults(null, measurements, outlierMode, default).GetMeasurements().Count());
         }
 
         private static void Add(List<Measurement> measurements, int time)

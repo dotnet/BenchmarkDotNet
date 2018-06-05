@@ -9,6 +9,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Mathematics;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -77,7 +78,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 return new RunResults(
                     new List<Measurement> { new Measurement(1, IterationMode.IdleTarget, 1, 1, 1) }, 
                     new List<Measurement> { new Measurement(1, IterationMode.MainTarget, 1, 1, 1) },
-                    false,
+                    OutlierMode.None,
                     default);
             }
 

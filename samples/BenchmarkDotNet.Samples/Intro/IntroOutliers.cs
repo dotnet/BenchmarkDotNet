@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Mathematics;
 
 namespace BenchmarkDotNet.Samples.Intro
 {
@@ -13,8 +14,8 @@ namespace BenchmarkDotNet.Samples.Intro
             public Config()
             {
                 var jobBase = Job.Default.WithWarmupCount(0).WithTargetCount(10).WithInvocationCount(1).WithUnrollFactor(1);
-                Add(jobBase.WithRemoveOutliers(false).WithId("DontRemoveOutliers"));
-                Add(jobBase.WithRemoveOutliers(true).WithId("RemoveOutliers"));
+                Add(jobBase.WithOutlierMode(OutlierMode.None).WithId("DontRemoveOutliers"));
+                Add(jobBase.WithOutlierMode(OutlierMode.OnlyUpper).WithId("RemoveUpperOutliers"));
             }
         }
 

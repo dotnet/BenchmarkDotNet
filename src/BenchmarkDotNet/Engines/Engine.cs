@@ -6,7 +6,6 @@ using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Engines
@@ -111,9 +110,9 @@ namespace BenchmarkDotNet.Engines
                 ? MeasureGcStats(new IterationData(IterationMode.MainTarget, 0, invokeCount, UnrollFactor)) 
                 : GcStats.Empty;
 
-            bool removeOutliers = TargetJob.ResolveValue(AccuracyMode.RemoveOutliersCharacteristic, Resolver);
+            var outlierMode = TargetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, Resolver);
 
-            return new RunResults(idle, main, removeOutliers, workGcHasDone);
+            return new RunResults(idle, main, outlierMode, workGcHasDone);
         }
 
         public Measurement RunIteration(IterationData data)

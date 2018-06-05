@@ -20,7 +20,9 @@ namespace BenchmarkDotNet.Mathematics
         public double UpperFence { get; }
         public double Max { get; }
         public double InterquartileRange { get; }
-        public double[] Outliers { get; }
+        public double[] LowerOutliers { get; }
+        public double[] UpperOutliers { get; }
+        public double[] AllOutliers { get; }
         public double StandardError { get; }
         public double Variance { get; }
         public double StandardDeviation { get; }
@@ -67,7 +69,9 @@ namespace BenchmarkDotNet.Mathematics
             LowerFence = Q1 - 1.5 * InterquartileRange;
             UpperFence = Q3 + 1.5 * InterquartileRange;
 
-            Outliers = list.Where(IsOutlier).ToArray();
+            AllOutliers = list.Where(IsOutlier).ToArray();
+            LowerOutliers = list.Where(IsLowerOutlier).ToArray();
+            UpperOutliers = list.Where(IsUpperOutlier).ToArray();
 
             Variance = N == 1 ? 0 : list.Sum(d => Math.Pow(d - Mean, 2)) / (N - 1);
             StandardDeviation = Math.Sqrt(Variance);
@@ -79,11 +83,48 @@ namespace BenchmarkDotNet.Mathematics
         }
 
         public ConfidenceInterval GetConfidenceInterval(ConfidenceLevel level, int n) => new ConfidenceInterval(Mean, StandardError, n, level);
-        public bool IsOutlier(double value) => value < LowerFence || value > UpperFence;
+        public bool IsLowerOutlier(double value) => value < LowerFence;
+        public bool IsUpperOutlier(double value) => value > UpperFence;
+        public bool IsOutlier(double value) => value < LowerFence || value > UpperFence;        
         public double[] WithoutOutliers() => list.Where(value => !IsOutlier(value)).ToArray();
         public IEnumerable<double> GetValues() => list;
 
         public double CalcCentralMoment(int k) => list.Average(x => (x - Mean).Pow(k));
+
+        public bool IsActualOutlier(double value, OutlierMode outlierMode)
+        {
+            switch (outlierMode)
+            {
+                case OutlierMode.None:
+                    return false;
+                case OutlierMode.OnlyUpper:
+                    return IsUpperOutlier(value);
+                case OutlierMode.OnlyLower:
+                    return IsLowerOutlier(value);
+                case OutlierMode.All:
+                    return IsOutlier(value);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(outlierMode), outlierMode, null);
+            }
+        }
+
+        [PublicAPI, NotNull]
+        public double[] GetActualOutliers(OutlierMode outlierMode)
+        {
+            switch (outlierMode)
+            {
+                case OutlierMode.None:
+                    return Array.Empty<double>();
+                case OutlierMode.OnlyUpper:
+                    return UpperOutliers;
+                case OutlierMode.OnlyLower:
+                    return LowerOutliers;
+                case OutlierMode.All:
+                    return AllOutliers;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(outlierMode), outlierMode, null);
+            }    
+        }
 
         public override string ToString()
         {
