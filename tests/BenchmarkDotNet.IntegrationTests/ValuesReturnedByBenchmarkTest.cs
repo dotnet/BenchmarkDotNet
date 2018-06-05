@@ -70,6 +70,11 @@ namespace BenchmarkDotNet.IntegrationTests
                     Field = field;
                 }
             }
+
+            [Benchmark]
+            public Job TypeCalledJob() => new Job();
+
+            public class Job { }
         }
     }
 }
