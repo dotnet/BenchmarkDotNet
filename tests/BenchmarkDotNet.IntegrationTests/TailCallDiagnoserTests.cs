@@ -4,11 +4,12 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnostics.Windows;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.Loggers;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.IntegrationTests.Xunit;
+using BenchmarkDotNet.Tests.XUnit;
 using Xunit;
 using Xunit.Abstractions;
 

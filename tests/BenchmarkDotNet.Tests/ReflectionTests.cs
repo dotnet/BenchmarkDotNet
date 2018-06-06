@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Tests.XUnit;
 using JetBrains.Annotations;
 using Xunit;
 
@@ -87,15 +88,14 @@ namespace BenchmarkDotNet.Tests
 
             [Benchmark] public T Create() => default;
         }
+        
+        [FactDotNetCore21Only("the implicit cast operator is available only in .NET Core 2.1+ (See https://github.com/dotnet/corefx/issues/30121 for more)")]
+        public void StringCanBeUsedAsReadOnlySpanOfCharArgument() => Assert.True(typeof(ReadOnlySpan<char>).IsStackOnlyWithImplicitCast("a string"));
 
         [Fact]
         public void StackOnlyTypesWithImplicitCastOperatorAreSupportedAsArguments()
         {
             Assert.True(typeof(Span<byte>).IsStackOnlyWithImplicitCast(new byte[] { 1, 2, 3 }));
-
-#if !CLASSIC            
-            Assert.True(typeof(ReadOnlySpan<char>).IsStackOnlyWithImplicitCast("a string")); // portable span has no implicit cast operator to string.. https://github.com/dotnet/corefx/issues/30121
-#endif
             Assert.True(typeof(StackOnlyStruct<byte>).IsStackOnlyWithImplicitCast(new WithImplicitCastToStackOnlyStruct<byte>()));
 
             Assert.False(typeof(StackOnlyStruct<byte>).IsStackOnlyWithImplicitCast(new WithImplicitCastToStackOnlyStruct<bool>())); // different T

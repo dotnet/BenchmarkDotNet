@@ -1,6 +1,6 @@
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.CustomCoreClr;
 using Xunit.Abstractions;
 // ReSharper disable InconsistentNaming we use crazy names for the types to include the  version numbers

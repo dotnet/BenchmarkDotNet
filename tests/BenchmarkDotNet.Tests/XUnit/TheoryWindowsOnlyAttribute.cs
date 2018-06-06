@@ -1,7 +1,7 @@
 ﻿using BenchmarkDotNet.Portability;
 using Xunit;
 
-namespace BenchmarkDotNet.IntegrationTests.Xunit
+namespace BenchmarkDotNet.Tests.XUnit
 {
     public class TheoryWindowsOnlyAttribute : TheoryAttribute
     {

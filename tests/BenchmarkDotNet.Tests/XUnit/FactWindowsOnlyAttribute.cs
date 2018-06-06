@@ -1,7 +1,7 @@
 ﻿using Xunit;
 using RuntimeInformation=BenchmarkDotNet.Portability.RuntimeInformation;
 
-namespace BenchmarkDotNet.IntegrationTests.Xunit
+namespace BenchmarkDotNet.Tests.XUnit
 {
     public class FactWindowsOnlyAttribute : FactAttribute
     {

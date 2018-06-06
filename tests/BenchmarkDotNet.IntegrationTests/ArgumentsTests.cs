@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.IntegrationTests.Xunit;
+using BenchmarkDotNet.Tests.XUnit;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -244,7 +244,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [FactDotNetCoreOnly("portable span has no implicit cast operator to string https://github.com/dotnet/corefx/issues/30121")]
+        [FactDotNetCore21Only("the implicit cast operator is available only in .NET Core 2.1+ (See https://github.com/dotnet/corefx/issues/30121 for more)")]
         public void StringCanBePassedToBenchmarkAsReadOnlySpan() => CanExecute<WithStringToReadOnlySpan>();
 
         public class WithStringToReadOnlySpan
