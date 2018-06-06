@@ -1,16 +1,10 @@
-# Welcome to the BenchmarkDotNet documentation
+![](logo/logo-wide.png)
 
-<img src="logo/logo-wide.png" width="600px" />
-
-[![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/) [![Gitter](https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet.svg)](https://gitter.im/dotnet/BenchmarkDotNet)  [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md) [![Overview](https://img.shields.io/badge/docs-Overview-green.svg?style=flat)](http://benchmarkdotnet.org/Overview.htm) [![ChangeLog](https://img.shields.io/badge/docs-ChangeLog-green.svg?style=flat)](https://github.com/dotnet/BenchmarkDotNet/wiki/ChangeLog)
-
-| AppVeyor/Windows | Travis/Linux | Travis/macOS |
-|------------------|--------------|--------------|
-| [![AppVeyor/Windows](https://img.shields.io/appveyor/ci/dotnetfoundation/benchmarkdotnet/master.svg)](https://ci.appveyor.com/project/dotnetfoundation/benchmarkdotnet/branch/master) | [![Travis/Linux](https://travis-matrix-badges.herokuapp.com/repos/dotnet/BenchmarkDotNet/branches/master/1)](https://travis-ci.org/dotnet/BenchmarkDotNet) | [![Travis/macOS](https://travis-matrix-badges.herokuapp.com/repos/dotnet/BenchmarkDotNet/branches/master/2)](https://travis-ci.org/dotnet/BenchmarkDotNet) |
+[![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/) [![Gitter](https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet.svg)](https://gitter.im/dotnet/BenchmarkDotNet)  [![License](https://img.shields.io/badge/license-MIT-blue.svg)](articles/license.md) [![Overview](https://img.shields.io/badge/docs-Overview-green.svg?style=flat)](http://benchmarkdotnet.org/Overview.htm) [![ChangeLog](https://img.shields.io/badge/docs-ChangeLog-green.svg?style=flat)](https://github.com/dotnet/BenchmarkDotNet/wiki/ChangeLog)
 
 **BenchmarkDotNet** is a powerful .NET library for benchmarking.
 
-Source code is available at [@fa-github github.com/dotnet/BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet)
+Source code is available at [github.com/dotnet/BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet)
 
 Benchmarking is really hard (especially microbenchmarking), you can easily make a mistake during performance measurements.
 BenchmarkDotNet will protect you from the common pitfalls (even for experienced developers) because it does all the dirty work for you:
@@ -110,7 +104,7 @@ Frequency=3507504 Hz, Resolution=285.1030 ns, Timer=TSC
 In artifacts, you can also find detailed information about each iteration.
 You can export the data in different formats like (CSV, XML, JSON, and so on) or even generate beautiful plots:
 
-<img src="Images/Overview-RPlot.png" width="800px" />
+![](images/rplot.png)
 
 ## Main features
 

@@ -167,7 +167,7 @@ public class Simple
 }
 ```
 
-<img src="../Images/disasmDemo.png" width="800px" />
+![](../../images/disasm-demo.png)
 
 ### Disassembly Diagnoser for Mono on Windows
 
@@ -187,7 +187,7 @@ The easiest way to get these tools:
 3. Install `binutils` and `mingw64-x86_64-binutils`
 4. Add `cygwin64\bin\` (or `cygwin\bin\`) in `%PATH%`
 
-<img src="../Images/cygwin-binutils.png" width="800px" />
+![](../../images/cygwin-binutils.png)
 
 ### ALL JITs
 
@@ -316,6 +316,7 @@ public class Jit_TailCalling
     private static long FactorialWithTailing(int pos, int depth)
         => pos == 0 ? depth : FactorialWithTailing(pos - 1, depth * pos);
 
+    private static long FactorialWithTailing(int depth)
     private static long FactorialWithTailing(int depth)
         => FactorialWithTailing(1, depth);
 }
