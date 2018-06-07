@@ -1,10 +1,8 @@
-- name: Arguments
-  href: arguments.md
-- name: Params
-  href: params.md
+- name: Parameterization
+  href: parameterization.md
 - name: Setup And Cleanup
   href: setup-and-cleanup.md
-- name: Baselin
+- name: Baseline
   href: baseline.md
 - name: Percentiles
   href: percentiles.md

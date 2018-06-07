@@ -227,7 +227,7 @@ public class IntroParams
 | Benchmark | 215.3024 ms | 0.0375 ms | 200  | 10   |
 | Benchmark | 225.2710 ms | 0.0434 ms | 200  | 20   |
 
-Read more:  [Params](features/params.md)
+Read more:  [Parameterization](features/parameterization.md)
 
 ## Languages
 

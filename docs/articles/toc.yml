@@ -6,6 +6,8 @@
   href: configs/toc.yml
 - name: Features
   href: features/toc.yml
+- name: Samples
+  href: samples/toc.yml
 - name: Contributing
   href: contributing/toc.yml
 - name: FAQ
