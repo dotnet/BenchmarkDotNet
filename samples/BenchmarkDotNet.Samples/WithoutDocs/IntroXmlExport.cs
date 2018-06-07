@@ -1,7 +1,5 @@
 ﻿using System.Threading;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Attributes.Exporters;
-using BenchmarkDotNet.Attributes.Jobs;
 
 namespace BenchmarkDotNet.Samples
 {

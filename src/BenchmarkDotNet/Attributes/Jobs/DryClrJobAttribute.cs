@@ -2,7 +2,7 @@
 using BenchmarkDotNet.Jobs;
 using JetBrains.Annotations;
 
-namespace BenchmarkDotNet.Attributes.Jobs
+namespace BenchmarkDotNet.Attributes
 {
     [PublicAPI]
     public class DryClrJobAttribute : JobConfigBaseAttribute

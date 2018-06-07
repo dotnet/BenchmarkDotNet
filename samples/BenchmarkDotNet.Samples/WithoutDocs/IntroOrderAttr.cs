@@ -1,6 +1,5 @@
 ﻿using System.Threading;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Attributes.Jobs;
 using BenchmarkDotNet.Order;
 
 namespace BenchmarkDotNet.Samples

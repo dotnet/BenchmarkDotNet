@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Columns;
 
-namespace BenchmarkDotNet.Attributes.Columns
+namespace BenchmarkDotNet.Attributes
 {
     public class Q1ColumnAttribute : ColumnConfigBaseAttribute
     {

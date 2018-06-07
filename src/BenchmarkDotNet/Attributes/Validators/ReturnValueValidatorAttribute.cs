@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Validators;
 
-namespace BenchmarkDotNet.Attributes.Validators
+namespace BenchmarkDotNet.Attributes
 {
     public class ReturnValueValidatorAttribute : ValidatorConfigBaseAttribute
     {

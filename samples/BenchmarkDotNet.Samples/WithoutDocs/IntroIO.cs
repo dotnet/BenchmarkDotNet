@@ -1,7 +1,5 @@
 ﻿using System.IO;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Attributes.Exporters;
-using BenchmarkDotNet.Attributes.Jobs;
 using BenchmarkDotNet.Engines;
 
 namespace BenchmarkDotNet.Samples

@@ -2,7 +2,7 @@
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Validators;
 
-namespace BenchmarkDotNet.Attributes.Validators
+namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
     public abstract class ValidatorConfigBaseAttribute : Attribute, IConfigSource
