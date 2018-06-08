@@ -41,6 +41,9 @@ namespace BenchmarkDotNet.Encodings
 
         private string GetStringByEncoding(Encoding encoding)
         {
+            if (encoding == null)
+                encoding = GetFallback();
+                
             if (encodedStrings.TryGetValue(encoding.EncodingName, out string encodedString))
                 return encodedString;
             
