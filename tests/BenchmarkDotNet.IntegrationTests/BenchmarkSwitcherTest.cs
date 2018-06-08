@@ -1,7 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using System.Linq;
-using BenchmarkDotNet.Attributes.Jobs;
 using Xunit;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;

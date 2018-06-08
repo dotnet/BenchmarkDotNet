@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Engines
 {
     public struct RunResults
     {
-        private readonly bool removeOutliers;
+        private readonly OutlierMode outlierMode;
         private readonly Encoding encoding;
         [CanBeNull]
         public IReadOnlyList<Measurement> Idle { get; }
@@ -23,11 +23,11 @@ namespace BenchmarkDotNet.Engines
 
         public RunResults([CanBeNull] IReadOnlyList<Measurement> idle,
                           [NotNull] IReadOnlyList<Measurement> main,
-                          bool removeOutliers,
+                          OutlierMode outlierMode,
                           GcStats gcStats,
                           Encoding encoding)
         {
-            this.removeOutliers = removeOutliers;
+            this.outlierMode = outlierMode;
             this.encoding = encoding;
             Idle = idle;
             Main = main;
@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Engines
             int resultIndex = 0;
             foreach (var measurement in Main)
             {
-                if (removeOutliers && mainStats.IsOutlier(measurement.Nanoseconds))
+                if (mainStats.IsActualOutlier(measurement.Nanoseconds, outlierMode))
                     continue;
 
                 double value = Math.Max(0, measurement.Nanoseconds - overhead);

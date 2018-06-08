@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Running
                 var benchmarks = runInfo.Benchmarks.Select(b =>
                 {
                     var target = b.Target;
-                    return new Benchmark(
+                    return Benchmark.Create(
                         new Target(target.Type, target.Method, target.GlobalSetupMethod, target.GlobalCleanupMethod,
                             target.IterationSetupMethod, target.IterationCleanupMethod,
                             target.MethodDisplayInfo, benchmarkContent, target.Baseline, target.Categories, target.OperationsPerInvoke),

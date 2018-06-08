@@ -213,7 +213,11 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private IConfig CreateConfig(IToolchain toolchain) 
             => ManualConfig.CreateEmpty()
-                .With(Job.ShortRun.WithEvaluateOverhead(false).WithWarmupCount(0).WithGcForce(false).With(toolchain)) // don't run warmup to save some time for our CI runs
+                .With(Job.ShortRun
+                    .WithEvaluateOverhead(false) // no need to run idle for this test
+                    .WithWarmupCount(0) // don't run warmup to save some time for our CI runs
+                    .WithTargetCount(1) // single iteration is enough for us
+                    .WithGcForce(false).With(toolchain)) 
                 .With(DefaultConfig.Instance.GetLoggers().ToArray())
                 .With(DefaultColumnProviders.Instance)
                 .With(MemoryDiagnoser.Default)

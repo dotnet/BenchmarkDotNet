@@ -32,7 +32,7 @@ Param(
 )
 
 $CakeVersion = "0.26.1"
-$DotNetVersion = "2.1.300-preview1-008174";
+$DotNetVersion = "2.1.300-rc1-008673";
 $DotNetInstallerUri = "https://dot.net/v1/dotnet-install.ps1";
 $NugetUrl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
 
@@ -78,6 +78,7 @@ $env:PATH = "$InstallPath;$env:PATH"
 
 $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 $env:DOTNET_CLI_TELEMETRY_OPTOUT=1
+$env:DOTNET_MULTILEVEL_LOOKUP=0
 
 ###########################################################################
 # INSTALL NUGET

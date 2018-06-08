@@ -33,8 +33,21 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
                 return 0;
             }
+            catch (Exception oom) when (oom is OutOfMemoryException || oom is TargetInvocationException reflection && reflection.InnerException is OutOfMemoryException)
+            {
+                host.WriteLine();
+                host.WriteLine("OutOfMemoryException!");
+                host.WriteLine("BenchmarkDotNet continues to run additional iterations until desired accuracy level is achieved. It's possible only if the benchmark method doesn't have any side-effects.");
+                host.WriteLine("If your benchmark allocates memory and keeps it alive, you are creating a memory leak.");
+                host.WriteLine("You should redesign your benchmark and remove the side-effects. You can use `OperationsPerInvoke`, `IterationSetup` and `IterationCleanup` to do that.");
+                host.WriteLine();
+                host.WriteLine(oom.ToString());
+
+                return -1;
+            }
             catch (Exception ex)
             {
+                host.WriteLine();
                 host.WriteLine(ex.ToString());
                 return -1;
             }
@@ -112,13 +125,21 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 var engineParameters = new EngineParameters
                 {
                     Host = host,
-                    MainSingleAction = _ => mainAction.InvokeSingle(),
-                    MainMultiAction = mainAction.InvokeMultiple,
+                    MainActionNoUnroll = invocationCount =>
+                    {
+                        for (int i = 0; i < invocationCount; i++)
+                            mainAction.InvokeSingle();
+                    },
+                    MainActionUnroll = mainAction.InvokeMultiple,
                     Dummy1Action = dummy1.InvokeSingle,
                     Dummy2Action = dummy2.InvokeSingle,
                     Dummy3Action = dummy3.InvokeSingle,
-                    IdleSingleAction = _ => idleAction.InvokeSingle(),
-                    IdleMultiAction = idleAction.InvokeMultiple,
+                    IdleActionNoUnroll = invocationCount =>
+                    {
+                        for (int i = 0; i < invocationCount; i++)
+                            idleAction.InvokeSingle();
+                    },
+                    IdleActionUnroll = idleAction.InvokeMultiple,
                     GlobalSetupAction = globalSetupAction.InvokeSingle,
                     GlobalCleanupAction = globalCleanupAction.InvokeSingle,
                     IterationSetupAction = iterationSetupAction.InvokeSingle,

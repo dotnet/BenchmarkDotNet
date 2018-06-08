@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Code;
@@ -7,7 +8,7 @@ using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.Parameters
 {
-    static internal class SmartParamBuilder
+    internal static class SmartParamBuilder
     {
         internal static object[] CreateForParams(MemberInfo source, object[] values)
         {
@@ -21,7 +22,7 @@ namespace BenchmarkDotNet.Parameters
         {
             var unwrappedValue = valuesInfo.values[sourceIndex];
 
-            if (unwrappedValue is object[] array)
+            if (unwrappedValue is object[] array && parameterDefinitions.Length > 1)
             {
                 if (parameterDefinitions.Length != array.Length)
                     throw new InvalidOperationException($"Benchmark {benchmark.Name} has invalid number of arguments provided by [ArgumentsSource({valuesInfo.source.Name})]! {array.Length} instead of {parameterDefinitions.Length}.");
@@ -68,7 +69,7 @@ namespace BenchmarkDotNet.Parameters
 
         public string ToSourceCode()
         {
-            var cast = $"({Value.GetType().GetCorrectCSharpTypeNameWithoutRef()})"; // it's an object so we need to cast it to the right type
+            var cast = $"({Value.GetType().GetCorrectCSharpTypeName()})"; // it's an object so we need to cast it to the right type
 
             var callPostfix = source is PropertyInfo ? string.Empty : "()";
 
@@ -102,9 +103,9 @@ namespace BenchmarkDotNet.Parameters
 
         public string ToSourceCode()
         {
-            var cast = $"({Value.GetType().GetCorrectCSharpTypeNameWithoutRef()})";
+            var cast = $"({Value.GetType().GetCorrectCSharpTypeName()})";
 
-            var instancePrefix = method.IsStatic ? source.DeclaringType.GetCorrectCSharpTypeNameWithoutRef() : "instance";
+            var instancePrefix = method.IsStatic ? source.DeclaringType.GetCorrectCSharpTypeName() : "instance";
 
             var callPostfix = source is PropertyInfo ? string.Empty : "()";
 

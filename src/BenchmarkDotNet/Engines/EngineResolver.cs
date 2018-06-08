@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Mathematics;
 
 namespace BenchmarkDotNet.Engines
 {
@@ -24,16 +25,16 @@ namespace BenchmarkDotNet.Engines
             Register(AccuracyMode.MinIterationTimeCharacteristic, () => TimeInterval.Millisecond * 500);
             Register(AccuracyMode.MinInvokeCountCharacteristic, () => 4);
             Register(AccuracyMode.EvaluateOverheadCharacteristic, () => true);
-            Register(AccuracyMode.RemoveOutliersCharacteristic, job =>
+            Register(AccuracyMode.OutlierModeCharacteristic, job =>
             {
                 var strategy = job.ResolveValue(RunMode.RunStrategyCharacteristic, this);
                 switch (strategy)
                 {
                     case RunStrategy.Throughput:
-                        return true;
+                        return OutlierMode.OnlyUpper;
                     case RunStrategy.ColdStart:
                     case RunStrategy.Monitoring:
-                        return false;
+                        return OutlierMode.None;
                     default:
                         throw new NotSupportedException($"Unknown runStrategy: {strategy}");
                 }

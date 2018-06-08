@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Mathematics;
 
 namespace BenchmarkDotNet.Jobs
 {
@@ -10,7 +11,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<TimeInterval> MinIterationTimeCharacteristic = CreateCharacteristic<TimeInterval>(nameof(MinIterationTime));
         public static readonly Characteristic<int> MinInvokeCountCharacteristic = CreateCharacteristic<int>(nameof(MinInvokeCount));
         public static readonly Characteristic<bool> EvaluateOverheadCharacteristic = CreateCharacteristic<bool>(nameof(EvaluateOverhead));
-        public static readonly Characteristic<bool> RemoveOutliersCharacteristic = CreateCharacteristic<bool>(nameof(RemoveOutliers));
+        public static readonly Characteristic<OutlierMode> OutlierModeCharacteristic = CreateCharacteristic<OutlierMode>(nameof(OutlierMode));
         public static readonly Characteristic<bool> AnalyzeLaunchVarianceCharacteristic = CreateCharacteristic<bool>(nameof(AnalyzeLaunchVariance));
 
         public double MaxRelativeError
@@ -43,10 +44,10 @@ namespace BenchmarkDotNet.Jobs
             set => EvaluateOverheadCharacteristic[this] = value;
         }
 
-        public bool RemoveOutliers
+        public OutlierMode OutlierMode
         {
-            get => RemoveOutliersCharacteristic[this];
-            set => RemoveOutliersCharacteristic[this] = value;
+            get => OutlierModeCharacteristic[this];
+            set => OutlierModeCharacteristic[this] = value;
         }
 
         public bool AnalyzeLaunchVariance

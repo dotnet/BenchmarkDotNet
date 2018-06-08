@@ -1,0 +1,68 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": "src/BenchmarkDotNet/*.csproj",
+          "exclude": [
+            "**/obj/**",
+            "**/bin/**"
+          ],
+          "src": ".."
+        }
+      ],
+      "dest": "api",
+      "properties": {
+        "TargetFramework": "netstandard2.0"
+      },
+      "disableGitFeatures": true
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "api/**.yml",
+          "api/index.md"
+        ]
+      },
+      {
+        "files": [
+          "articles/**.md",
+          "articles/**/toc.yml",
+          "toc.yml",
+          "*.md"
+        ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [
+          "images/**",
+          "logo/**"
+        ]
+      }
+    ],
+    "dest": "_site",
+    "globalMetadataFiles": [],
+    "fileMetadataFiles": [],
+    "template": [
+      "default",
+      "template"
+    ],
+    "postProcessors": ["ExtractSearchIndex"],
+    "markdownEngineName": "markdig",
+    "noLangKeyword": false,
+    "keepFileLink": false,
+    "cleanupCacheHistory": false,
+    "disableGitFeatures": false,
+    "globalMetadata" :
+    {
+      "_appTitle" : "BenchmarkDotNet",
+      "_appFooter" : "Copyright &copy; 2013–2018 .NET Foundation and contributors",
+      "_appLogoPath" : "logo/icon.svg",
+      "_appFaviconPath": "logo/icon-32.png",
+      "_enableSearch": "true"
+    }
+  }
+}

@@ -2,7 +2,7 @@
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Xml;
 
-namespace BenchmarkDotNet.Attributes.Exporters
+namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = true)]
     public class XmlExporterAttribute : ExporterConfigBaseAttribute

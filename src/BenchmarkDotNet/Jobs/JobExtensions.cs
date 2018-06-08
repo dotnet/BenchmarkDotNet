@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Jobs
 {
@@ -33,6 +34,7 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithIterationTime(this Job job, TimeInterval time) => job.WithCore(j => j.Run.IterationTime = time);
         public static Job WithInvocationCount(this Job job, int count) => job.WithCore(j => j.Run.InvocationCount = count);
         public static Job WithUnrollFactor(this Job job, int factor) => job.WithCore(j => j.Run.UnrollFactor = factor);
+        public static Job RunOncePerIteration(this Job job) => job.WithInvocationCount(1).WithUnrollFactor(1);
         public static Job WithMinTargetIterationCount(this Job job, int count) => job.WithCore(j => j.Run.MinTargetIterationCount = count);
         public static Job WithMaxTargetIterationCount(this Job job, int count) => job.WithCore(j => j.Run.MaxTargetIterationCount = count);
 
@@ -50,18 +52,27 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithMinIterationTime(this Job job, TimeInterval value) => job.WithCore(j => j.Accuracy.MinIterationTime = value);
         public static Job WithMinInvokeCount(this Job job, int value) => job.WithCore(j => j.Accuracy.MinInvokeCount = value);
         public static Job WithEvaluateOverhead(this Job job, bool value) => job.WithCore(j => j.Accuracy.EvaluateOverhead = value);
-        public static Job WithRemoveOutliers(this Job job, bool value) => job.WithCore(j => j.Accuracy.RemoveOutliers = value);
+        public static Job WithOutlierMode(this Job job, OutlierMode value) => job.WithCore(j => j.Accuracy.OutlierMode = value);
+        [Obsolete("Please use the new WithOutlierMode instead")]
+        public static Job WithRemoveOutliers(this Job job, bool value) => job.WithCore(j => j.Accuracy.OutlierMode = value ? OutlierMode.OnlyUpper : OutlierMode.None);
         public static Job WithAnalyzeLaunchVariance(this Job job, bool value) => job.WithCore(j => j.Accuracy.AnalyzeLaunchVariance = value);
         
         // Meta
         public static Job AsBaseline(this Job job) => job.WithCore(j => j.Meta.IsBaseline = true);
         public static Job WithIsBaseline(this Job job, bool value) => value ? job.AsBaseline() : job;
-        
-        // Info
-        [Obsolete]
-        public static string GetShortInfo(this Job job) => job.ResolvedId;
-        [Obsolete]
-        public static string GetFullInfo(this Job job) => CharacteristicSetPresenter.Default.ToPresentation(job);
+
+        internal static Job MakeSettingsUserFriendly(this Job job, Target target)
+        {
+            // users expect that if IterationSetup is configured, it should be run before every benchmark invocation https://github.com/dotnet/BenchmarkDotNet/issues/730
+            if (target.IterationSetupMethod != null
+                && !job.HasValue(RunMode.InvocationCountCharacteristic)
+                && !job.HasValue(RunMode.UnrollFactorCharacteristic))
+            {
+                return job.RunOncePerIteration();
+            }
+
+            return job;
+        }
 
         private static Job WithCore(this Job job, Action<Job> updateCallback)
         {

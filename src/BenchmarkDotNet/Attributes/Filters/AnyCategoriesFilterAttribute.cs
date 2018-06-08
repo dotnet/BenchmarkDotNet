@@ -1,6 +1,6 @@
 using BenchmarkDotNet.Filters;
 
-namespace BenchmarkDotNet.Attributes.Filters
+namespace BenchmarkDotNet.Attributes
 {
     public class AnyCategoriesFilterAttribute : FilterConfigBaseAttribute
     {

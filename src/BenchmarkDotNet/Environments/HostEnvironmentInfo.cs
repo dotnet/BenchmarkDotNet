@@ -8,6 +8,7 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Portability.Cpu;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Toolchains.DotNetCli;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -104,7 +105,8 @@ namespace BenchmarkDotNet.Environments
                 yield return $".NET Core SDK={DotNetSdkVersion.Value}";
         }
 
-        internal bool IsDotNetCliInstalled() => !string.IsNullOrEmpty(DotNetSdkVersion.Value);
+        [PublicAPI]
+        public bool IsDotNetCliInstalled() => !string.IsNullOrEmpty(DotNetSdkVersion.Value);
 
         private static string GetBenchmarkDotNetVersion() => BenchmarkDotNetInfo.FullVersion;
     }

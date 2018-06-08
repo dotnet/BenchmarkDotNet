@@ -1,4 +1,5 @@
 ﻿using System;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 
@@ -67,7 +68,10 @@ namespace BenchmarkDotNet.Engines
                 if (invokeCount >= MaxInvokeCount)
                     break;
 
-                invokeCount *= 2;
+                if (unrollFactor == 1 && invokeCount < EnvResolver.DefaultUnrollFactorForThroughput)
+                    invokeCount += 1;
+                else
+                    invokeCount *= 2;
             }
             WriteLine();
 

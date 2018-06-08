@@ -2,10 +2,10 @@
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Tests.XUnit;
 using Xunit;
 using Xunit.Abstractions;
 

@@ -2,7 +2,7 @@
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 
-namespace BenchmarkDotNet.Attributes.Jobs
+namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
     public class JobConfigBaseAttribute : Attribute, IConfigSource

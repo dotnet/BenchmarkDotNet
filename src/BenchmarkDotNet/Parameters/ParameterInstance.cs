@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Parameters
     public class ParameterInstance
     {
         public const string NullParameterTextRepresentation = "?";
-        private const int MaxDisplayTextInnerLength = 15;
+        private const int MaxDisplayTextInnerLength = 15 + 5; // 5 is for postfix " [15]"
 
         public ParameterDefinition Definition { get; }
         

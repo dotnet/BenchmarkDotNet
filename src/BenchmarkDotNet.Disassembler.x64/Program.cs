@@ -386,9 +386,16 @@ namespace BenchmarkDotNet.Disassembler
 
             if (methodsWithSameToken.Length == 1) // the most common case
                 return methodsWithSameToken[0];
-            if (methodsWithSameToken.Length > 1 && methodReference.MetadataToken.ToUInt32() != default(UInt32)) 
+            if (methodsWithSameToken.Length > 1 && methodReference.MetadataToken.ToUInt32() != default(UInt32))
+            {
+                var compiled = methodsWithSameToken.Where(method => method.CompilationType != MethodCompilationType.None).ToArray();
+                
+                if (compiled.Length != 1) // very rare case where two different methods have the same metadata token ;)
+                    return compiled.Single(method => method.Name == methodReference.Name);;
+                
                 // usually one is NGened, the other one is not compiled (looks like a ClrMD bug to me)
-                return methodsWithSameToken.Single(method => method.CompilationType != MethodCompilationType.None);
+                return compiled[0];
+            }
 
             // comparing metadata tokens does not work correctly for some NGENed types like Random.Next, System.Threading.Monitor & more
             // Mono.Cecil reports different metadata token value than ClrMD for the same method 

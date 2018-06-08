@@ -27,16 +27,14 @@ namespace BenchmarkDotNet.Extensions
         internal static bool IsNullable(this Type type) => Nullable.GetUnderlyingType(type) != null;
 
         /// <summary>
-        /// returns type name which can be used in generated C# code without &amp; in the type name for by-ref
-        /// </summary>
-        internal static string GetCorrectCSharpTypeNameWithoutRef(this Type type)
-            => GetCorrectCSharpTypeName(type).Replace("&", string.Empty);
-
-        /// <summary>
         /// returns type name which can be used in generated C# code
         /// </summary>
         internal static string GetCorrectCSharpTypeName(this Type type)
         {
+            // the reflection is missing information about types passed by ref (ie ref ValuTuple<int> is reported as NON generic type)
+            if (type.IsByRef && !type.IsGenericType && type.Name.Contains('`'))
+                type = type.GetElementType(); // https://github.com/dotnet/corefx/issues/29975#issuecomment-393134330
+
             if (type == typeof(void))
                 return "void";
             var prefix = "";
@@ -67,7 +65,7 @@ namespace BenchmarkDotNet.Extensions
             if (type.IsArray)
                 return GetCorrectCSharpTypeName(type.GetElementType()) + "[" + new string(',', type.GetArrayRank() - 1) + "]";
 
-            return prefix + type.Name;
+            return prefix + type.Name.Replace("&", string.Empty);
         }
 
         /// <summary>
@@ -175,10 +173,33 @@ namespace BenchmarkDotNet.Extensions
             return joined;
         }
 
+        internal static bool IsStackOnlyWithImplicitCast(this Type argumentType, object argumentInstance)
+        {
+            if (argumentInstance == null)
+                return false;
+            
+            // IsByRefLikeAttribute is not exposed for older runtimes, so we need to check it in an ugly way ;)
+            var isByRefLike = argumentType.GetCustomAttributes().Any(attribute => attribute.ToString().Contains("IsByRefLike"));
+            if (!isByRefLike)
+                return false;
+
+            var instanceType = argumentInstance.GetType();
+
+            var implicitCastsDefinedInArgumentInstance = instanceType.GetMethods().Where(method => method.Name == "op_Implicit" && method.GetParameters().Any()).ToArray();
+            if (implicitCastsDefinedInArgumentInstance.Any(implicitCast => implicitCast.ReturnType == argumentType && implicitCast.GetParameters().All(p => p.ParameterType == instanceType)))
+                return true;
+                
+            var implicitCastsDefinedInArgumentType = argumentType.GetMethods().Where(method => method.Name == "op_Implicit" && method.GetParameters().Any()).ToArray();
+            if (implicitCastsDefinedInArgumentType.Any(implicitCast => implicitCast.ReturnType == argumentType && implicitCast.GetParameters().All(p => p.ParameterType == instanceType)))
+                return true;
+
+            return false;
+        }
+
         private static bool IsRunnableGenericType(TypeInfo typeInfo)
             => // if it is an open generic - there must be GenericBenchmark attributes
-                (!typeInfo.IsGenericTypeDefinition
-                 || (typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any()))
-                && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it       
+                (!typeInfo.IsGenericTypeDefinition || (typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any()))
+                    && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it       
+
     }
 }

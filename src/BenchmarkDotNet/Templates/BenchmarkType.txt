@@ -11,7 +11,7 @@
             {
                 host.WriteLine("// {0}", infoLine);
             }
-            var job = new Job();
+            var job = new BenchmarkDotNet.Jobs.Job(); // use full name to avoid naming conflicts, #778
             $JobSetDefinition$;
             job.Freeze();
             host.WriteLine("// Job: {0}", job.DisplayInfo);
@@ -24,13 +24,13 @@
             var engineParameters = new BenchmarkDotNet.Engines.EngineParameters()
             {
                 Host = host,
-                MainMultiAction = instance.MainMultiAction,
-                MainSingleAction = instance.MainSingleAction,
+                MainActionUnroll = instance.MainActionUnroll,
+                MainActionNoUnroll = instance.MainActionNoUnroll,
                 Dummy1Action = instance.Dummy1,
                 Dummy2Action = instance.Dummy2,
                 Dummy3Action = instance.Dummy3,
-                IdleSingleAction = instance.IdleSingleAction,
-                IdleMultiAction = instance.IdleMultiAction,
+                IdleActionNoUnroll = instance.IdleActionNoUnroll,
+                IdleActionUnroll = instance.IdleActionUnroll,
                 GlobalSetupAction = instance.globalSetupAction,
                 GlobalCleanupAction = instance.globalCleanupAction,
                 IterationSetupAction = instance.iterationSetupAction,
@@ -80,7 +80,7 @@
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
 		public void __TrickTheJIT__()
 		{
-			NotEleven = new Random(123).Next(0, 10);
+			NotEleven = new System.Random(123).Next(0, 10);
             $DiassemblerEntryMethodName$();
 		}
 
@@ -111,9 +111,9 @@
 
 #if RETURNS_CONSUMABLE_$ID$
 
-        private Consumer consumer = new Consumer();
+        private BenchmarkDotNet.Engines.Consumer consumer = new BenchmarkDotNet.Engines.Consumer();
 
-        private void IdleMultiAction(long invokeCount)
+        private void IdleActionUnroll(long invokeCount)
         {
             $LoadArguments$
             for (long i = 0; i < invokeCount; i++)
@@ -122,13 +122,16 @@
             }
         }
 
-        private void IdleSingleAction(long _)
+        private void IdleActionNoUnroll(long invokeCount)
         {
             $LoadArguments$
-            consumer.Consume(idleDelegate($PassArguments$));
+            for (long i = 0; i < invokeCount; i++)
+            {
+                consumer.Consume(idleDelegate($PassArguments$));
+            }
         }
         
-        private void MainMultiAction(long invokeCount)
+        private void MainActionUnroll(long invokeCount)
         {
             $LoadArguments$
             for (long i = 0; i < invokeCount; i++)
@@ -137,10 +140,13 @@
             }
         }
 
-        private void MainSingleAction(long _)
+        private void MainActionNoUnroll(long invokeCount)
         {
             $LoadArguments$
-            consumer.Consume(targetDelegate($PassArguments$)$ConsumeField$);
+            for (long i = 0; i < invokeCount; i++)
+            {
+                consumer.Consume(targetDelegate($PassArguments$)$ConsumeField$);
+            }
         }
         
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
@@ -157,7 +163,7 @@
 
 #elif RETURNS_NON_CONSUMABLE_STRUCT_$ID$
 
-        private void IdleMultiAction(long invokeCount)
+        private void IdleActionUnroll(long invokeCount)
         {
             $LoadArguments$
             $IdleMethodReturnTypeName$ result = default($IdleMethodReturnTypeName$);
@@ -168,15 +174,18 @@
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(result);
         }
 
-        private void IdleSingleAction(long _)
+        private void IdleActionNoUnroll(long invokeCount)
         {
             $LoadArguments$
             $IdleMethodReturnTypeName$ result = default($IdleMethodReturnTypeName$);
-            result = idleDelegate($PassArguments$);
+            for (long i = 0; i < invokeCount; i++)
+            {
+                result = idleDelegate($PassArguments$);
+            }
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(result);
         }
 
-        private void MainMultiAction(long invokeCount)
+        private void MainActionUnroll(long invokeCount)
         {
             $LoadArguments$
             $TargetMethodReturnType$ result = default($TargetMethodReturnType$);
@@ -187,11 +196,14 @@
             NonGenericKeepAliveWithoutBoxing(result);
         }
 
-        private void MainSingleAction(long _)
+        private void MainActionNoUnroll(long invokeCount)
         {
             $LoadArguments$
             $TargetMethodReturnType$ result = default($TargetMethodReturnType$);
-            result = targetDelegate($PassArguments$);
+            for (long i = 0; i < invokeCount; i++)
+            {
+                result = targetDelegate($PassArguments$);
+            }
             NonGenericKeepAliveWithoutBoxing(result);
         }
 
@@ -214,7 +226,7 @@
 
 #elif RETURNS_BYREF_$ID$
 
-        private void IdleMultiAction(long invokeCount)
+        private void IdleActionUnroll(long invokeCount)
         {
             $LoadArguments$
             $IdleMethodReturnTypeName$ value = default($IdleMethodReturnTypeName$);
@@ -225,17 +237,20 @@
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
         }
         
-        private void IdleSingleAction(long _)
+        private void IdleActionNoUnroll(long invokeCount)
         {
             $LoadArguments$
             $IdleMethodReturnTypeName$ value = default($IdleMethodReturnTypeName$);
-            value = idleDelegate($PassArguments$);
+            for (long i = 0; i < invokeCount; i++)
+            {
+                value = idleDelegate($PassArguments$);
+            }
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
         }
 
         private $TargetMethodReturnType$ mainDefaultValueHolder = default($TargetMethodReturnType$);
 
-        private void MainMultiAction(long invokeCount)
+        private void MainActionUnroll(long invokeCount)
         {
             $LoadArguments$
             ref $TargetMethodReturnType$ alias = ref mainDefaultValueHolder;
@@ -246,11 +261,14 @@
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(ref alias);
         }
         
-        private void MainSingleAction(long _)
+        private void MainActionNoUnroll(long invokeCount)
         {
             $LoadArguments$
             ref $TargetMethodReturnType$ alias = ref mainDefaultValueHolder;
-            alias = targetDelegate($PassArguments$);
+            for (long i = 0; i < invokeCount; i++)
+            {
+                alias = targetDelegate($PassArguments$);
+            }
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(ref alias);
         }
 
@@ -267,7 +285,7 @@
         }
 #elif RETURNS_VOID_$ID$
 
-        private void IdleMultiAction(long invokeCount)
+        private void IdleActionUnroll(long invokeCount)
         {
             $LoadArguments$
             for (long i = 0; i < invokeCount; i++)
@@ -276,13 +294,16 @@
             }
         }
 
-        private void IdleSingleAction(long _)
+        private void IdleActionNoUnroll(long invokeCount)
         {
             $LoadArguments$
-            idleDelegate($PassArguments$);
+            for (long i = 0; i < invokeCount; i++)
+            {
+                idleDelegate($PassArguments$);
+            }
         }
         
-        private void MainMultiAction(long invokeCount)
+        private void MainActionUnroll(long invokeCount)
         {
             $LoadArguments$
             for (long i = 0; i < invokeCount; i++)
@@ -291,10 +312,13 @@
             }
         }
         
-        private void MainSingleAction(long _)
+        private void MainActionNoUnroll(long invokeCount)
         {
             $LoadArguments$
-            targetDelegate($PassArguments$);
+            for (long i = 0; i < invokeCount; i++)
+            {
+                targetDelegate($PassArguments$);
+            }
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]

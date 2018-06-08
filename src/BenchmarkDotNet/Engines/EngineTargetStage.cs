@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Engines
         private readonly int? targetCount;
         private readonly double maxRelativeError;
         private readonly TimeInterval? maxAbsoluteError;
-        private readonly bool removeOutliers;
+        private readonly OutlierMode outlierMode;
         private readonly int minIterationCount;
         private readonly int maxIterationCount;
 
@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Engines
             targetCount = engine.TargetJob.ResolveValueAsNullable(RunMode.TargetCountCharacteristic);
             maxRelativeError = engine.TargetJob.ResolveValue(AccuracyMode.MaxRelativeErrorCharacteristic, engine.Resolver);
             maxAbsoluteError = engine.TargetJob.ResolveValueAsNullable(AccuracyMode.MaxAbsoluteErrorCharacteristic);
-            removeOutliers = engine.TargetJob.ResolveValue(AccuracyMode.RemoveOutliersCharacteristic, engine.Resolver);
+            outlierMode = engine.TargetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, engine.Resolver);
             minIterationCount = engine.TargetJob.ResolveValue(RunMode.MinTargetIterationCountCharacteristic, engine.Resolver);
             maxIterationCount = engine.TargetJob.ResolveValue(RunMode.MaxTargetIterationCountCharacteristic, engine.Resolver);
         }
@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.Engines
                 measurements.Add(measurement);
                 measurementsForStatistics.Add(measurement);
 
-                var statistics = MeasurementsStatistics.Calculate(measurementsForStatistics, removeOutliers);
+                var statistics = MeasurementsStatistics.Calculate(measurementsForStatistics, outlierMode);
                 double actualError = statistics.ConfidenceInterval.Margin;
 
                 double maxError1 = effectiveMaxRelativeError * statistics.Mean;

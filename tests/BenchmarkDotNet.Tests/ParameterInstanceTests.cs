@@ -31,5 +31,19 @@ namespace BenchmarkDotNet.Tests
 
             Assert.Equal(expectedDisplayText, parameter.ToDisplayText());
         }
+
+        [Theory]
+        [InlineData("0123456789012345", "0123456789012345")]
+        [InlineData("01234567890123456", "01234567890123456")]
+        [InlineData("012345678901234567", "012345678901234567")]
+        [InlineData("0123456789012345678", "0123456789012345678")]
+        [InlineData("01234567890123456789", "01234567890123456789")]
+        [InlineData("012345678901234567890", "01234(...)67890 [21]")]
+        public void TrimmingTheValuesMakesThemActuallyShorter(string initialLongText, string expectedDisplayText)
+        {
+            var parameter = new ParameterInstance(definition, initialLongText);
+            
+            Assert.Equal(expectedDisplayText, parameter.ToDisplayText());
+        }
     }
 }

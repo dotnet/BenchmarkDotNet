@@ -196,5 +196,25 @@ namespace BenchmarkDotNet.IntegrationTests
                     throw new InvalidOperationException("Wrong character escaping!");
             }
         }
+        
+        [Fact]
+        public void ArrayCanBeUsedAsParameter() => CanExecute<WithArray>();
+        
+        public class WithArray
+        {
+            [Params(new[] { 0, 1, 2 })]
+            public int[] Array;
+            
+            [Benchmark]
+            public void AcceptingArray()
+            {
+                if (Array.Length != 3)
+                    throw new InvalidOperationException("Incorrect array length");
+
+                for (int i = 0; i < 3; i++)
+                    if(Array[i] != i)
+                        throw new InvalidOperationException($"Incorrect array element at index {i}, was {Array[i]} instead of {i}");
+            }
+        }
     }
 }

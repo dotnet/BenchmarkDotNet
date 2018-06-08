@@ -1,6 +1,6 @@
 using BenchmarkDotNet.Jobs;
 
-namespace BenchmarkDotNet.Attributes.Jobs
+namespace BenchmarkDotNet.Attributes
 {
     public class InProcessAttribute : JobConfigBaseAttribute
     {

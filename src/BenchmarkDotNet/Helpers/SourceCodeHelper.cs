@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Helpers
             if (value is bool)
                 return ((bool) value).ToLowerCase();
             if (value is string text)
-                return $"$@\"{value.ToString().Replace("\"", "\"\"").Replace("{", "{{").Replace("}", "}}")}\"";
+                return $"$@\"{text.Replace("\"", "\"\"").Replace("{", "{{").Replace("}", "}}")}\"";
             if (value is char)
                 return (char) value == '\\' ? "'\\\\'" : $"'{value}'";
             if (value is float)
@@ -39,33 +39,34 @@ namespace BenchmarkDotNet.Helpers
             return value.ToString();
         }
 
-        public static bool IsCompilationTimeConstant(object value)
+        public static bool IsCompilationTimeConstant(object value) 
+            => value == null || IsCompilationTimeConstant(value.GetType());
+
+        public static bool IsCompilationTimeConstant(Type type)
         {
-            if (value == null)
+            if (type == typeof(bool))
                 return true;
-            if (value is bool)
+            if (type == typeof(string))
                 return true;
-            if (value is string text)
+            if (type == typeof(char))
                 return true;
-            if (value is char)
+            if (type == typeof(float))
                 return true;
-            if (value is float)
+            if (type == typeof(double))
                 return true;
-            if (value is double)
+            if (type == typeof(decimal))
                 return true;
-            if (value is decimal)
+            if (type.IsEnum)
                 return true;
-            if (ReflectionUtils.GetTypeInfo(value.GetType()).IsEnum)
+            if (type == typeof(Type))
                 return true;
-            if (value is Type)
-                return true;
-            if (!ReflectionUtils.GetTypeInfo(value.GetType()).IsValueType) // the difference!!
+            if (!type.IsValueType) // the difference!!
                 return false;
-            if (value is TimeInterval)
+            if (type == typeof(TimeInterval))
                 return true;
-            if (value is IntPtr)
+            if (type == typeof(IntPtr))
                 return true;
-            if (value is IFormattable)
+            if (typeof(IFormattable).IsAssignableFrom(type))
                 return true;
 
             return false;

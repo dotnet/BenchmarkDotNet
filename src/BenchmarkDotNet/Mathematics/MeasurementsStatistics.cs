@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Mathematics
             ConfidenceInterval = confidenceInterval;
         }
 
-        public static MeasurementsStatistics Calculate(List<Measurement> measurements, bool removeOutliers)
+        public static MeasurementsStatistics Calculate(List<Measurement> measurements, OutlierMode outlierMode)
         {
             int n = measurements.Count;
             if (n == 0)
@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Mathematics
             double standardError = standardDeviation / Math.Sqrt(n);
             var confidenceInterval = new ConfidenceInterval(mean, standardError, n);
 
-            if (!removeOutliers) // most simple scenario is done without allocations! but this is not the default case
+            if (outlierMode == OutlierMode.None) // most simple scenario is done without allocations! but this is not the default case
                 return new MeasurementsStatistics(standardError, mean, confidenceInterval);
 
             measurements.Sort(); // sort in place
@@ -65,10 +65,10 @@ namespace BenchmarkDotNet.Mathematics
             double lowerFence = q1 - 1.5 * interquartileRange;
             double upperFence = q3 + 1.5 * interquartileRange;
 
-            SumWithoutOutliers(measurements, lowerFence, upperFence, out sum, out n); // updates sum and N
+            SumWithoutOutliers(outlierMode, measurements, lowerFence, upperFence, out sum, out n); // updates sum and N
             mean = sum / n;
 
-            variance = VarianceWithoutOutliers(measurements, n, mean, lowerFence, upperFence);
+            variance = VarianceWithoutOutliers(outlierMode, measurements, n, mean, lowerFence, upperFence);
             standardDeviation = Math.Sqrt(variance);
             standardError = standardDeviation / Math.Sqrt(n);
             confidenceInterval = new ConfidenceInterval(mean, standardError, n);
@@ -84,14 +84,14 @@ namespace BenchmarkDotNet.Mathematics
             return sum;
         }
 
-        private static void SumWithoutOutliers(List<Measurement> measurements,
+        private static void SumWithoutOutliers(OutlierMode outlierMode, List<Measurement> measurements,
             double lowerFence, double upperFence, out double sum, out int n)
         {
             sum = 0;
             n = 0;
 
             for (int i = 0; i < measurements.Count; i++)
-                if (!IsOutlier(measurements[i].Nanoseconds, lowerFence, upperFence))
+                if (!IsOutlier(outlierMode, measurements[i].Nanoseconds, lowerFence, upperFence))
                 {
                     sum += measurements[i].Nanoseconds;
                     ++n;
@@ -110,14 +110,14 @@ namespace BenchmarkDotNet.Mathematics
             return variance;
         }
 
-        private static double VarianceWithoutOutliers(List<Measurement> measurements, int n, double mean, double lowerFence, double upperFence)
+        private static double VarianceWithoutOutliers(OutlierMode outlierMode, List<Measurement> measurements, int n, double mean, double lowerFence, double upperFence)
         {
             if (n == 1)
                 return 0;
 
             double variance = 0;
             for (int i = 0; i < measurements.Count; i++)
-                if (!IsOutlier(measurements[i].Nanoseconds, lowerFence, upperFence))
+                if (!IsOutlier(outlierMode, measurements[i].Nanoseconds, lowerFence, upperFence))
                     variance += (measurements[i].Nanoseconds - mean) * (measurements[i].Nanoseconds - mean) / (n - 1);
 
             return variance;
@@ -131,7 +131,21 @@ namespace BenchmarkDotNet.Mathematics
             return measurements[count / 2].Nanoseconds;
         }
 
-        private static bool IsOutlier(double value, double lowerFence, double upperFence)
-            => value < lowerFence || value > upperFence;
+        private static bool IsOutlier(OutlierMode outlierMode, double value, double lowerFence, double upperFence)
+        {
+            switch (outlierMode)
+            {
+                case OutlierMode.None:
+                    return false;
+                case OutlierMode.OnlyUpper:
+                    return value > upperFence;
+                case OutlierMode.OnlyLower:
+                    return value < lowerFence;
+                case OutlierMode.All:
+                    return value < lowerFence || value > upperFence;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(outlierMode), outlierMode, null);
+            }            
+        }
     }
 }

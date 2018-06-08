@@ -2,7 +2,7 @@
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 
-namespace BenchmarkDotNet.Attributes.Jobs
+namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = true)]
     public class MonoJobAttribute : JobConfigBaseAttribute

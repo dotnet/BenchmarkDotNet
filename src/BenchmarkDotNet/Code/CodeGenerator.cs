@@ -13,6 +13,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using RunMode = BenchmarkDotNet.Jobs.RunMode;
 
@@ -196,13 +197,13 @@ namespace BenchmarkDotNet.Code
             => string.Join(
                 ", ",
                 benchmark.Target.Method.GetParameters()
-                         .Select((parameter, index) => $"{GetParameterModifier(parameter)} {parameter.ParameterType.GetCorrectCSharpTypeNameWithoutRef()} arg{index}"));
+                         .Select((parameter, index) => $"{GetParameterModifier(parameter)} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index}"));
 
         private static string GetDeclareArgumentFields(Benchmark benchmark)
             => string.Join(
                 Environment.NewLine,
                 benchmark.Target.Method.GetParameters()
-                         .Select((parameter, index) => $"private {parameter.ParameterType.GetCorrectCSharpTypeNameWithoutRef()} __argField{index};"));
+                         .Select((parameter, index) => $"private {GetFieldType(parameter.ParameterType, benchmark.Parameters.GetArgument(parameter.Name)).GetCorrectCSharpTypeName()} __argField{index};"));
 
         private static string GetInitializeArgumentFields(Benchmark benchmark)
             => string.Join(
@@ -214,7 +215,7 @@ namespace BenchmarkDotNet.Code
             => string.Join(
                 Environment.NewLine,
                 benchmark.Target.Method.GetParameters()
-                         .Select((parameter, index) => $"{(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} {parameter.ParameterType.GetCorrectCSharpTypeNameWithoutRef()} arg{index} = {(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} __argField{index};"));
+                         .Select((parameter, index) => $"{(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index} = {(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} __argField{index};"));
 
         private static string GetPassArguments(Benchmark benchmark)
             => string.Join(
@@ -263,6 +264,15 @@ namespace BenchmarkDotNet.Code
             @switch.AppendLine("}");
 
             return @switch.ToString();
+        }
+
+        private static Type GetFieldType(Type argumentType, ParameterInstance argument)
+        {
+            // #774 we can't store Span in a field, so we store an array (which is later casted to Span when we load the arguments)
+            if(argumentType.IsStackOnlyWithImplicitCast(argument.Value))
+                return argument.Value.GetType();
+
+            return argumentType;
         }
 
         private class SmartStringBuilder
