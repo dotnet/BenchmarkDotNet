@@ -1,9 +1,9 @@
 - name: Parameterization
   href: parameterization.md
+- name: Baselines
+  href: baselines.md
 - name: Setup And Cleanup
   href: setup-and-cleanup.md
-- name: Baseline
-  href: baseline.md
 - name: Percentiles
   href: percentiles.md
 - name: STAThread

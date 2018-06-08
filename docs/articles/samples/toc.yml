@@ -10,3 +10,9 @@
   href: IntroArgumentsSource.md
 - name: IntroArrayParam
   href: IntroArrayParam.md
+- name: IntroBenchmarkBaseline
+  href: IntroBenchmarkBaseline.md
+- name: IntroCategoryBaseline
+  href: IntroCategoryBaseline.md
+- name: IntroJobBaseline
+  href: IntroJobBaseline.md

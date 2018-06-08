@@ -197,7 +197,7 @@ As a result, you will have additional column in the summary table:
 | Time150 | 150.2093 ms | 0.1034 ms | 1.50   |
 | Time50  | 50.2509 ms  | 0.1153 ms | 0.50   |
 
-Read more:  [Baseline](features/baseline.md)
+Read more:  [Baselines](features/baselines.md)
 
 ## Params
 
