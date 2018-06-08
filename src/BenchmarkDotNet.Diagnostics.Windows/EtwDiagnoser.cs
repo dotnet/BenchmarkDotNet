@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Analysers;
@@ -41,6 +40,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             Session = CreateSession(parameters.Benchmark);
 
+            Console.CancelKeyPress += OnConsoleCancelKeyPress;
+
+            NativeWindowsConsoleHelper.OnExit += OnConsoleCancelKeyPress;
+
             EnableProvider();
 
             AttachToEvents(Session, parameters.Benchmark);
@@ -77,6 +80,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             WaitForDelayedEvents();
 
             Session.Dispose();
+
+            Console.CancelKeyPress -= OnConsoleCancelKeyPress;
+            NativeWindowsConsoleHelper.OnExit -= OnConsoleCancelKeyPress;
         }
 
         private void Clear()
@@ -84,6 +90,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             BenchmarkToProcess.Clear();
             StatsPerProcess.Clear();
         }
+
+        private void OnConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e) => Session?.Dispose();
 
         private static string GetSessionName(string prefix, Benchmark benchmark, ParameterInstances parameters = null)
         {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
@@ -179,8 +178,13 @@ namespace BenchmarkDotNet.Running
             }
             var clockSpan = globalChronometer.GetElapsed();
 
-            var summary = new Summary(title, reports, HostEnvironmentInfo.GetCurrent(), config, GetResultsFolderPath(rootArtifactsFolderPath), clockSpan.GetTimeSpan(), 
-                Validate(new[] {benchmarkRunInfo }, NullLogger.Instance)); // validate them once again, but don't print the output
+            var summary = new Summary(title,
+                                      reports,
+                                      HostEnvironmentInfo.GetCurrent(),
+                                      config,
+                                      GetResultsFolderPath(rootArtifactsFolderPath),
+                                      clockSpan.GetTimeSpan(), 
+                                      Validate(new[] {benchmarkRunInfo }, NullLogger.Instance)); // validate them once again, but don't print the output
 
             logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
             logger.WriteLine();
@@ -195,18 +199,7 @@ namespace BenchmarkDotNet.Running
 
             logger.WriteLineHeader("// * Detailed results *");
 
-            // TODO: make exporter
-            foreach (var report in reports)
-            {
-                logger.WriteLineInfo(report.Benchmark.DisplayInfo);
-                logger.WriteLineStatistic($"Runtime = {report.GetRuntimeInfo()}; GC = {report.GetGcInfo()}");
-                var resultRuns = report.GetResultRuns();
-                if (resultRuns.IsEmpty())
-                    logger.WriteLineError("There are not any results runs");
-                else
-                    logger.WriteLineStatistic(resultRuns.GetStatistics().ToTimeStr(calcHistogram: true));
-                logger.WriteLine();
-            }
+            BenchmarkReportExporter.Default.ExportToLog(summary, logger);
 
             LogTotalTime(logger, clockSpan.GetTimeSpan());
             logger.WriteLine();
@@ -215,7 +208,7 @@ namespace BenchmarkDotNet.Running
             MarkdownExporter.Console.ExportToLog(summary, logger);
 
             // TODO: make exporter
-            ConclusionHelper.Print(logger, config.GetCompositeAnalyser().Analyse(summary).ToList());
+            ConclusionHelper.Print(logger, config.GetCompositeAnalyser().Analyse(summary).Distinct().ToList());
 
             // TODO: move to conclusions
             var columnWithLegends = summary.Table.Columns.Select(c => c.OriginalColumn).Where(c => !string.IsNullOrEmpty(c.Legend)).ToList();
@@ -279,7 +272,7 @@ namespace BenchmarkDotNet.Running
 
                 logger.WriteLineHeader($"// ***** Done, took {globalChronometer.GetElapsed().GetTimeSpan().ToFormattedTotalTime()}   *****");
 
-                if (buildPartitions.Length <= 1 || !buildResults.Values.Any(result => !result.IsBuildSuccess && result.BuildException.Message.Contains("cannot access")))
+                if (buildPartitions.Length <= 1 || !buildResults.Values.Any(result => result.FailedToAccess))
                     return buildResults;
 
                 logger.WriteLineHeader("// ***** Failed to build in Parallel, switching to sequential build..   *****");
@@ -376,6 +369,19 @@ namespace BenchmarkDotNet.Running
 
                 executeResults.Add(executeResult);
 
+                var errors = executeResults.SelectMany(r => r.Data)
+                    .Union(executeResults.SelectMany(r => r.ExtraOutput))
+                    .Where(line => line.StartsWith(ValidationErrorReporter.ConsoleErrorPrefix))
+                    .Select(line => line.Substring(ValidationErrorReporter.ConsoleErrorPrefix.Length).Trim())
+                    .ToArray();
+
+                if (errors.Any())
+                {
+                    foreach (string error in errors)
+                        logger.WriteLineError(error);
+                    break;
+                }
+
                 var measurements = executeResults
                     .SelectMany(r => r.Data)
                     .Select(line => Measurement.Parse(logger, line, 0))
@@ -467,13 +473,21 @@ namespace BenchmarkDotNet.Running
         {
             foreach (string path in artifactsToCleanup)
             {
-                if (Directory.Exists(path))
+                try
                 {
-                    Directory.Delete(path, recursive: true);
+                    if (Directory.Exists(path))
+                    {
+                        Directory.Delete(path, recursive: true);
+                    }
+                    else if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                    }
                 }
-                else if (File.Exists(path))
+                catch
                 {
-                    File.Delete(path);
+                    // sth is locking our auto-generated files
+                    // there is very little we can do about it
                 }
             }
         }

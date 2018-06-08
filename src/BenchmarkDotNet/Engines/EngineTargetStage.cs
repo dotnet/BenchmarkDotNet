@@ -9,8 +9,6 @@ namespace BenchmarkDotNet.Engines
 {
     public class EngineTargetStage : EngineStage
     {
-        internal const int MinIterationCount = 15;
-        internal const int MaxIterationCount = 100;
         internal const int MaxIdleIterationCount = 20;
         internal const double MaxIdleRelativeError = 0.05;
         internal const int DefaultTargetCount = 10;
@@ -18,14 +16,18 @@ namespace BenchmarkDotNet.Engines
         private readonly int? targetCount;
         private readonly double maxRelativeError;
         private readonly TimeInterval? maxAbsoluteError;
-        private readonly bool removeOutliers;
+        private readonly OutlierMode outlierMode;
+        private readonly int minIterationCount;
+        private readonly int maxIterationCount;
 
         public EngineTargetStage(IEngine engine) : base(engine)
         {
             targetCount = engine.TargetJob.ResolveValueAsNullable(RunMode.TargetCountCharacteristic);
             maxRelativeError = engine.TargetJob.ResolveValue(AccuracyMode.MaxRelativeErrorCharacteristic, engine.Resolver);
             maxAbsoluteError = engine.TargetJob.ResolveValueAsNullable(AccuracyMode.MaxAbsoluteErrorCharacteristic);
-            removeOutliers = engine.TargetJob.ResolveValue(AccuracyMode.RemoveOutliersCharacteristic, engine.Resolver);
+            outlierMode = engine.TargetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, engine.Resolver);
+            minIterationCount = engine.TargetJob.ResolveValue(RunMode.MinTargetIterationCountCharacteristic, engine.Resolver);
+            maxIterationCount = engine.TargetJob.ResolveValue(RunMode.MaxTargetIterationCountCharacteristic, engine.Resolver);
         }
 
         public IReadOnlyList<Measurement> RunIdle(long invokeCount, int unrollFactor) 
@@ -41,8 +43,8 @@ namespace BenchmarkDotNet.Engines
 
         private List<Measurement> RunAuto(long invokeCount, IterationMode iterationMode, int unrollFactor)
         {
-            var measurements = new List<Measurement>(MaxIterationCount);
-            var measurementsForStatistics = new List<Measurement>(MaxIterationCount);
+            var measurements = new List<Measurement>(maxIterationCount);
+            var measurementsForStatistics = new List<Measurement>(maxIterationCount);
 
             int iterationCounter = 0;
             bool isIdle = iterationMode.IsIdle();
@@ -54,17 +56,17 @@ namespace BenchmarkDotNet.Engines
                 measurements.Add(measurement);
                 measurementsForStatistics.Add(measurement);
 
-                var statistics = MeasurementsStatistics.Calculate(measurementsForStatistics, removeOutliers);
+                var statistics = MeasurementsStatistics.Calculate(measurementsForStatistics, outlierMode);
                 double actualError = statistics.ConfidenceInterval.Margin;
 
                 double maxError1 = effectiveMaxRelativeError * statistics.Mean;
                 double maxError2 = maxAbsoluteError?.Nanoseconds ?? double.MaxValue;
                 double maxError = Math.Min(maxError1, maxError2);
 
-                if (iterationCounter >= MinIterationCount && actualError < maxError)
+                if (iterationCounter >= minIterationCount && actualError < maxError)
                     break;
 
-                if (iterationCounter >= MaxIterationCount || (isIdle && iterationCounter >= MaxIdleIterationCount))
+                if (iterationCounter >= maxIterationCount || (isIdle && iterationCounter >= MaxIdleIterationCount))
                     break;
             }
             WriteLine();
@@ -74,7 +76,7 @@ namespace BenchmarkDotNet.Engines
 
         private List<Measurement> RunSpecific(long invokeCount, IterationMode iterationMode, int iterationCount, int unrollFactor)
         {
-            var measurements = new List<Measurement>(MaxIterationCount);
+            var measurements = new List<Measurement>(iterationCount);
 
             for (int i = 0; i < iterationCount; i++)
                 measurements.Add(RunIteration(iterationMode, i + 1, invokeCount, unrollFactor));

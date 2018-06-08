@@ -1,6 +1,6 @@
 using BenchmarkDotNet.Columns;
 
-namespace BenchmarkDotNet.Attributes.Columns
+namespace BenchmarkDotNet.Attributes
 {
     public class CategoriesColumnAttribute : ColumnConfigBaseAttribute
     {

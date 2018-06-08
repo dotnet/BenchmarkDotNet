@@ -2,7 +2,7 @@
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 
-namespace BenchmarkDotNet.Attributes.Exporters
+namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
     public class ExporterConfigBaseAttribute : Attribute, IConfigSource

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Running;
 using Xunit;
 using Xunit.Abstractions;
 

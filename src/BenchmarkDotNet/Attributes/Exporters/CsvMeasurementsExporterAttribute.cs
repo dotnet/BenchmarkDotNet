@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Exporters.Csv;
 
-namespace BenchmarkDotNet.Attributes.Exporters
+namespace BenchmarkDotNet.Attributes
 {
     public class CsvMeasurementsExporterAttribute : ExporterConfigBaseAttribute
     {

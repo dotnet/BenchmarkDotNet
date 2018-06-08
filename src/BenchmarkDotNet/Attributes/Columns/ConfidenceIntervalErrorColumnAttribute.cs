@@ -1,7 +1,7 @@
 ﻿using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Mathematics;
 
-namespace BenchmarkDotNet.Attributes.Columns
+namespace BenchmarkDotNet.Attributes
 {
     public class ConfidenceIntervalErrorColumnAttribute : ColumnConfigBaseAttribute
     {

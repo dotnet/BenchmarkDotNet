@@ -156,7 +156,7 @@ namespace BenchmarkDotNet.Diagnosers
                     return !isWow64;
                 }
 
-                return IntPtr.Size == 8; // todo: find the way to cover all scenarios for .NET Core
+                return Portability.RuntimeInformation.GetCurrentPlatform() == Platform.X64; // todo: find the way to cover all scenarios for .NET Core
             }
 
             [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]

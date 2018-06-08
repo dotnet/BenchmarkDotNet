@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Exporters;
 
-namespace BenchmarkDotNet.Attributes.Exporters
+namespace BenchmarkDotNet.Attributes
 {
     public class PlainExporterAttribute : ExporterConfigBaseAttribute
     {

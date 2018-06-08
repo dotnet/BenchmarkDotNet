@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using Xunit;
 using Xunit.Abstractions;
-using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Mathematics;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -55,12 +55,18 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class CustomFactory : IEngineFactory
         {
-            public IEngine Create(EngineParameters engineParameters) 
-                => new CustomEngine
+            public IEngine CreateReadyToRun(EngineParameters engineParameters)
+            {
+                var engine = new CustomEngine
                 {
                     GlobalCleanupAction = engineParameters.GlobalCleanupAction,
                     GlobalSetupAction = engineParameters.GlobalSetupAction
                 };
+                
+                engine.GlobalSetupAction?.Invoke(); // engine factory is now supposed to create an engine which is ready to run (hence the method name change) 
+
+                return engine;
+            }
         }
 
         public class CustomEngine : IEngine
@@ -72,10 +78,12 @@ namespace BenchmarkDotNet.IntegrationTests
                 return new RunResults(
                     new List<Measurement> { new Measurement(1, IterationMode.IdleTarget, 1, 1, 1) }, 
                     new List<Measurement> { new Measurement(1, IterationMode.MainTarget, 1, 1, 1) },
-                    false,
+                    OutlierMode.None,
                     default);
             }
 
+            public void Dispose() => GlobalCleanupAction?.Invoke();
+            
             public IHost Host { get; }
             public void WriteLine() { }
             public void WriteLine(string line) { }
@@ -88,7 +96,6 @@ namespace BenchmarkDotNet.IntegrationTests
             public IResolver Resolver { get; }
 
             public Measurement RunIteration(IterationData data) { throw new NotImplementedException(); }
-            public void Jitting() { }
         }
     }
 }

@@ -37,6 +37,7 @@ namespace BenchmarkDotNet.Tests.Environments
         [InlineData("10.0.14393", 2156, "Windows 10.0.14393.2156 (1607/AnniversaryUpdate/Redstone1)")]
         [InlineData("10.0.15063", 997, "Windows 10.0.15063.997 (1703/CreatorsUpdate/Redstone2)")]
         [InlineData("10.0.16299", 334, "Windows 10.0.16299.334 (1709/FallCreatorsUpdate/Redstone3)")]
+        [InlineData("10.0.17134", 48, "Windows 10.0.17134.48 (1803/April2018Update/Redstone4)")]
         public void WindowsWithUbrIsPrettified(string originalVersion, int ubr, string prettifiedName)
             => Check(OsBrandStringHelper.Prettify("Windows", originalVersion, ubr), prettifiedName);
 

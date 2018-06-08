@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Columns;
 
-namespace BenchmarkDotNet.Attributes.Columns
+namespace BenchmarkDotNet.Attributes
 {
     /// <summary>
     /// Add a column with the target method namespace.

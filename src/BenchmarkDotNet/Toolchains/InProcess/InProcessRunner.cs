@@ -33,14 +33,63 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
                 return 0;
             }
+            catch (Exception oom) when (oom is OutOfMemoryException || oom is TargetInvocationException reflection && reflection.InnerException is OutOfMemoryException)
+            {
+                host.WriteLine();
+                host.WriteLine("OutOfMemoryException!");
+                host.WriteLine("BenchmarkDotNet continues to run additional iterations until desired accuracy level is achieved. It's possible only if the benchmark method doesn't have any side-effects.");
+                host.WriteLine("If your benchmark allocates memory and keeps it alive, you are creating a memory leak.");
+                host.WriteLine("You should redesign your benchmark and remove the side-effects. You can use `OperationsPerInvoke`, `IterationSetup` and `IterationCleanup` to do that.");
+                host.WriteLine();
+                host.WriteLine(oom.ToString());
+
+                return -1;
+            }
             catch (Exception ex)
             {
+                host.WriteLine();
                 host.WriteLine(ex.ToString());
                 return -1;
             }
             finally
             {
                 host.AfterAll();
+            }
+        }
+
+        /// <summary>Fills the properties of the instance of the object used to run the benchmark.</summary>
+        /// <param name="instance">The instance.</param>
+        /// <param name="benchmark">The benchmark.</param>
+        internal static void FillMembers(object instance, Benchmark benchmark)
+        {
+            foreach (var parameter in benchmark.Parameters.Items)
+            {
+                var flags = BindingFlags.Public;
+                flags |= parameter.IsStatic ? BindingFlags.Static : BindingFlags.Instance;
+
+                var targetType = benchmark.Target.Type;
+                var paramProperty = targetType.GetProperty(parameter.Name, flags);
+
+                if (paramProperty == null)
+                {
+                    var paramField = targetType.GetField(parameter.Name, flags);
+                    if (paramField == null)
+                        throw new InvalidOperationException(
+                            $"Type {targetType.FullName}: no property or field {parameter.Name} found.");
+
+                    var callInstance = paramField.IsStatic ? null : instance;
+                    paramField.SetValue(callInstance, parameter.Value);
+                }
+                else
+                {
+                    var setter = paramProperty.GetSetMethod();
+                    if (setter == null)
+                        throw new InvalidOperationException(
+                            $"Type {targetType.FullName}: no settable property {parameter.Name} found.");
+
+                    var callInstance = setter.IsStatic ? null : instance;
+                    setter.Invoke(callInstance, new[] { parameter.Value });
+                }
             }
         }
 
@@ -76,11 +125,21 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 var engineParameters = new EngineParameters
                 {
                     Host = host,
-                    MainAction = mainAction.InvokeMultiple,
+                    MainActionNoUnroll = invocationCount =>
+                    {
+                        for (int i = 0; i < invocationCount; i++)
+                            mainAction.InvokeSingle();
+                    },
+                    MainActionUnroll = mainAction.InvokeMultiple,
                     Dummy1Action = dummy1.InvokeSingle,
                     Dummy2Action = dummy2.InvokeSingle,
                     Dummy3Action = dummy3.InvokeSingle,
-                    IdleAction = idleAction.InvokeMultiple,
+                    IdleActionNoUnroll = invocationCount =>
+                    {
+                        for (int i = 0; i < invocationCount; i++)
+                            idleAction.InvokeSingle();
+                    },
+                    IdleActionUnroll = idleAction.InvokeMultiple,
                     GlobalSetupAction = globalSetupAction.InvokeSingle,
                     GlobalCleanupAction = globalCleanupAction.InvokeSingle,
                     IterationSetupAction = iterationSetupAction.InvokeSingle,
@@ -90,58 +149,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     MeasureGcStats = config.HasMemoryDiagnoser()
                 };
 
-                var engine = job
+                using (var engine = job
                     .ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)
-                    .Create(engineParameters);
-
-                globalSetupAction.InvokeSingle();
-                iterationSetupAction.InvokeSingle();
-
-                if (job.ResolveValue(RunMode.RunStrategyCharacteristic, EngineResolver.Instance).NeedsJitting())
-                    engine.Jitting(); // does first call to main action, must be executed after setup()!
-
-                iterationCleanupAction.InvokeSingle();
-
-                var results = engine.Run();
-
-                globalCleanupAction.InvokeSingle();
-
-                host.ReportResults(results); // printing costs memory, do this after runs
-            }
-
-            /// <summary>Fills the properties of the instance of the object used to run the benchmark.</summary>
-            /// <param name="instance">The instance.</param>
-            /// <param name="benchmark">The benchmark.</param>
-            private static void FillMembers(object instance, Benchmark benchmark)
-            {
-                foreach (var parameter in benchmark.Parameters.Items)
+                    .CreateReadyToRun(engineParameters))
                 {
-                    var flags = BindingFlags.Public;
-                    flags |= parameter.IsStatic ? BindingFlags.Static : BindingFlags.Instance;
+                    var results = engine.Run();
 
-                    var targetType = benchmark.Target.Type;
-                    var paramProperty = targetType.GetProperty(parameter.Name, flags);
-
-                    if (paramProperty == null)
-                    {
-                        var paramField = targetType.GetField(parameter.Name, flags);
-                        if (paramField == null)
-                            throw new InvalidOperationException(
-                                $"Type {targetType.FullName}: no property or field {parameter.Name} found.");
-
-                        var callInstance = paramField.IsStatic ? null : instance;
-                        paramField.SetValue(callInstance, parameter.Value);
-                    }
-                    else
-                    {
-                        var setter = paramProperty.GetSetMethod();
-                        if (setter == null)
-                            throw new InvalidOperationException(
-                                $"Type {targetType.FullName}: no settable property {parameter.Name} found.");
-
-                        var callInstance = setter.IsStatic ? null : instance;
-                        setter.Invoke(callInstance, new[] { parameter.Value });
-                    }
+                    host.ReportResults(results); // printing costs memory, do this after runs
                 }
             }
         }

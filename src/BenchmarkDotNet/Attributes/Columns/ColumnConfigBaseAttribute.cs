@@ -2,7 +2,7 @@
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 
-namespace BenchmarkDotNet.Attributes.Columns
+namespace BenchmarkDotNet.Attributes
 {    
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
     public abstract class ColumnConfigBaseAttribute : Attribute, IConfigSource

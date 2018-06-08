@@ -22,25 +22,22 @@ namespace BenchmarkDotNet.IntegrationTests
         private readonly string[] expectedLogLines = {
             "// ### Called: GlobalSetup",
             
-            "// ### Called: IterationSetup (1)", // IterationSetup Jitting
-            "// ### Called: IterationCleanup (1)", // IterationCleanup Jitting
-            
-            "// ### Called: IterationSetup (2)", // MainWarmup1
+            "// ### Called: IterationSetup (1)", // MainWarmup1
             "// ### Called: Benchmark", // MainWarmup1
-            "// ### Called: IterationCleanup (2)", // MainWarmup1
-            "// ### Called: IterationSetup (3)", // MainWarmup2
+            "// ### Called: IterationCleanup (1)", // MainWarmup1
+            "// ### Called: IterationSetup (2)", // MainWarmup2
             "// ### Called: Benchmark", // MainWarmup2
-            "// ### Called: IterationCleanup (3)", // MainWarmup2
+            "// ### Called: IterationCleanup (2)", // MainWarmup2
             
-            "// ### Called: IterationSetup (4)", // MainTarget1
+            "// ### Called: IterationSetup (3)", // MainTarget1
             "// ### Called: Benchmark", // MainTarget1
-            "// ### Called: IterationCleanup (4)", // MainTarget1
-            "// ### Called: IterationSetup (5)", // MainTarget2
+            "// ### Called: IterationCleanup (3)", // MainTarget1
+            "// ### Called: IterationSetup (4)", // MainTarget2
             "// ### Called: Benchmark", // MainTarget2
-            "// ### Called: IterationCleanup (5)", // MainTarget2
-            "// ### Called: IterationSetup (6)", // MainTarget3
+            "// ### Called: IterationCleanup (4)", // MainTarget2
+            "// ### Called: IterationSetup (5)", // MainTarget3
             "// ### Called: Benchmark", // MainTarget3
-            "// ### Called: IterationCleanup (6)", // MainTarget3
+            "// ### Called: IterationCleanup (5)", // MainTarget3
             
             "// ### Called: GlobalCleanup"
         };

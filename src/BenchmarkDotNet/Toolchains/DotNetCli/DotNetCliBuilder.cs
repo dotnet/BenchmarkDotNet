@@ -72,9 +72,23 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             // but the host process might have different runtime or was build in Debug, not Release, 
             // which requires all dependencies to be build anyway
-            return DotNetCliCommandExecutor.ExecuteCommand(
+            var withDependencies = DotNetCliCommandExecutor.ExecuteCommand(
                 CustomDotNetCliPath,
                 $"{GetBuildCommand(TargetFrameworkMoniker, false, configuration)} {extraArguments}",
+                generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath,
+                logger);
+
+            if (withDependencies.IsSuccess)
+                return withDependencies;
+
+            // there are some crazy edge-cases, where executing dotnet build --no-restore AFTER dotnet restore will fail
+            // an example: ML.NET has default values like Configuration = Debug in Directory.Build.props file
+            // when we run dotnet restore for it, it restores for Debug. When we run dotnet build -c Release --no-restore, it fails because it can't find project.assets.json file
+            // The problem is that dotnet cli does not allow to set the configuration from console arguments
+            // But when we run dotnet build -c Release (without --no-restore) it's going to restore the right things for us ;)
+            return DotNetCliCommandExecutor.ExecuteCommand(
+                CustomDotNetCliPath,
+                $"{GetBuildCommand(TargetFrameworkMoniker, false, configuration)} {extraArguments}".Replace(" --no-restore", string.Empty),
                 generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath,
                 logger);
         }

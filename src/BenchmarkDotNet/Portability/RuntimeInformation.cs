@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static string ScriptFileExtension => IsWindows() ? ".bat" : ".sh";
 
-        internal static string GetArchitecture() => IntPtr.Size == 4 ? "32bit" : "64bit";
+        internal static string GetArchitecture() => GetCurrentPlatform() == Platform.X86 ? "32bit" : "64bit";
 
         internal static bool IsWindows()
         {
@@ -189,7 +189,7 @@ namespace BenchmarkDotNet.Portability
             }
             else if (IsFullFramework)
             {
-                string frameworkVersion = CsProjClassicNetToolchain.GetCurrentNetFrameworkVersion();
+                string frameworkVersion = FrameworkVersionHelper.GetCurrentNetFrameworkVersion();
                 string clrVersion = Environment.Version.ToString();
                 return $".NET Framework {frameworkVersion} (CLR {clrVersion})";
             }
@@ -214,12 +214,13 @@ namespace BenchmarkDotNet.Portability
 
         internal static Runtime GetCurrentRuntime()
         {
+            //do not change the order of conditions because it may cause incorrect determination of runtime
+            if (IsMono)
+                return Runtime.Mono;
             if (IsFullFramework)
                 return Runtime.Clr;
             if (IsNetCore)
                 return Runtime.Core;
-            if (IsMono)
-                return Runtime.Mono;
             if (IsCoreRT)
                 return Runtime.CoreRT;
             
@@ -246,7 +247,7 @@ namespace BenchmarkDotNet.Portability
             if (IsNetCore)
                 return true;
 
-            return IntPtr.Size == 8
+            return GetCurrentPlatform() == Platform.X64
                    && GetConfiguration() != DebugConfigurationName
                    && !new JitHelper().IsMsX64();
         }

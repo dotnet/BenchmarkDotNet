@@ -1,6 +1,4 @@
-﻿using System;
-using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Loggers;
+﻿using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Exporters.Csv

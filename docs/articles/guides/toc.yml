@@ -1,0 +1,12 @@
+- name: Getting Started
+  href: getting-started.md
+- name: How to run your benchmarks
+  href: how-to-run.md
+- name: Good Practices
+  href: good-practices.md
+- name: Installing NuGet packages
+  href: nuget.md
+- name: Choosing RunStrategy
+  href: choosing-run-strategy.md
+- name: How it works
+  href: how-it-works.md

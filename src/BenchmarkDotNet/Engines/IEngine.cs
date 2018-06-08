@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Engines
 {
-    public interface IEngine
+    public interface IEngine : IDisposable
     {
         [NotNull]
         IHost Host { get; }
@@ -35,12 +35,6 @@ namespace BenchmarkDotNet.Engines
         IResolver Resolver { get; }
 
         Measurement RunIteration(IterationData data);
-
-        /// <summary>
-        /// must perform jitting via warmup calls
-        /// <remarks>is called after first call to GlobalSetup, from the auto-generated benchmark process</remarks>
-        /// </summary>
-        void Jitting();
 
         RunResults Run();
     }

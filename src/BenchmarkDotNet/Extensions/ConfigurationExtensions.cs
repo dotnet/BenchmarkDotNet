@@ -1,9 +1,11 @@
 ﻿using BenchmarkDotNet.Environments;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Extensions
 {
-    internal static class ConfigurationExtensions
+    public static class ConfigurationExtensions
     {
+        [PublicAPI]
         public static string ToConfig(this Platform platform)
         {
             switch (platform)
@@ -19,9 +21,6 @@ namespace BenchmarkDotNet.Extensions
             }
         }
 
-        public static string ToConfig(this Jit jit)
-        {
-            return jit == Jit.LegacyJit ? "1" : "0";
-        }
+        public static string ToConfig(this Jit jit) => jit == Jit.LegacyJit ? "1" : "0";
     }
 }

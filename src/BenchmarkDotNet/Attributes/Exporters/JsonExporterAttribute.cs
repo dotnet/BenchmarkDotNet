@@ -2,7 +2,7 @@
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Json;
 
-namespace BenchmarkDotNet.Attributes.Exporters
+namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = true)]
     public class JsonExporterAttribute : ExporterConfigBaseAttribute

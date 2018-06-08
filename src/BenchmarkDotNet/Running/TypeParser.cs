@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 
@@ -17,13 +18,17 @@ namespace BenchmarkDotNet.Running
         private static readonly Dictionary<string, string> Configuration = CreateConfiguration();
         private static readonly char[] TrimChars = { ' ' };
 
+        private static bool consoleCancelKeyPressed = false;
+        
         private readonly Type[] allTypes;
         private readonly ILogger logger;
 
+        static TypeParser() => Console.CancelKeyPress += (_, __) => consoleCancelKeyPressed = true; 
+
         internal TypeParser(Type[] types, ILogger logger)
         {
-            allTypes = types.Where(type => type.ContainsRunnableBenchmarks()).ToArray();
             this.logger = logger;
+            allTypes = GenericBenchmarksBuilder.GetRunnableBenchmarks(types);
         }
 
         internal class TypeWithMethods
@@ -53,10 +58,13 @@ namespace BenchmarkDotNet.Running
             var selectedTypes = new List<TypeWithMethods>();
             var benchmarkCaptionExample = allTypes.First().GetDisplayName();
 
-            while (selectedTypes.Count == 0)
+            while (selectedTypes.Count == 0  && !consoleCancelKeyPressed)
             {
                 PrintAvailable();
                 
+                if (consoleCancelKeyPressed)
+                    break;
+
                 logger.WriteLineHelp($"You should select the target benchmark(s). Please, print a number of a benchmark (e.g. '0') or a contained benchmark caption (e.g. '{benchmarkCaptionExample}'):");
                 logger.WriteLineHelp("If you want to select few, please separate them with space ` ` (e.g. `1 2 3`)");
 
@@ -69,7 +77,7 @@ namespace BenchmarkDotNet.Running
             return selectedTypes;
         }
 
-        internal IEnumerable<TypeWithMethods> GetMatching(string[] userInput)
+        private IEnumerable<TypeWithMethods> GetMatching(string[] userInput)
         {
             if (userInput.IsEmpty())
                 yield break;
@@ -121,12 +129,16 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineHelp($"Available Benchmark{(allTypes.Length > 1 ? "s" : "")}:");
 
             int numberWidth = allTypes.Length.ToString().Length;
-            for (int i = 0; i < allTypes.Length; i++)
+            for (int i = 0; i < allTypes.Length && !consoleCancelKeyPressed; i++)
                 logger.WriteLineHelp(string.Format(CultureInfo.InvariantCulture, "  #{0} {1}", i.ToString().PadRight(numberWidth), allTypes[i].GetDisplayName()));
-            logger.WriteLine();
-            logger.WriteLine();
-        }
 
+            if (!consoleCancelKeyPressed)
+            {
+                logger.WriteLine();
+                logger.WriteLine();
+            }
+        }
+        
         private static Dictionary<string, string> CreateConfiguration()
         {
             return new Dictionary<string, string>
