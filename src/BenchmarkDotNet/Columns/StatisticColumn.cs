@@ -134,7 +134,7 @@ namespace BenchmarkDotNet.Columns
             double value = calc(statistics);
             if (double.IsNaN(value))
                 return "NA";
-            return type == UnitType.Time ? value.ToTimeStr(style.TimeUnit, 1, style.PrintUnitsInContent, format: format) : value.ToStr(format);
+            return type == UnitType.Time ? value.ToTimeStr(style.TimeUnit, 1, style.PrintUnitsInContent, format: format, summary.Config.Encoding) : value.ToStr(format);
         }
 
         public override string ToString() => ColumnName;

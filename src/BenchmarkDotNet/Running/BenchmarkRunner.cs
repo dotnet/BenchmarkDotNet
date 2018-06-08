@@ -73,6 +73,7 @@ namespace BenchmarkDotNet.Running
             var artifactsToCleanup = new List<string>();
             var title = GetTitle(benchmarkRunInfos);
             
+            //TODO MUST BE REMOVED
             EncodingInfo.CurrentEncoding = commonSettingsConfig.Encoding ?? EncodingInfo.DefaultEncoding;
 
             var rootArtifactsFolderPath = (commonSettingsConfig?.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath).CreateIfNotExists();
@@ -164,7 +165,7 @@ namespace BenchmarkDotNet.Running
                         throw new InvalidOperationException("An iteration with 'Operations == 0' detected");
                     reports.Add(report);
                     if (report.GetResultRuns().Any())
-                        logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr());
+                        logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr(config.Encoding));
                 }
                 else
                 {
@@ -223,7 +224,7 @@ namespace BenchmarkDotNet.Running
                 if (columnWithLegends.Any())
                     maxNameWidth = Math.Max(maxNameWidth, columnWithLegends.Select(c => c.ColumnName.Length).Max());
                 if (effectiveTimeUnit != null)
-                    maxNameWidth = Math.Max(maxNameWidth, effectiveTimeUnit.Name.Length + 2);
+                    maxNameWidth = Math.Max(maxNameWidth, effectiveTimeUnit.Name.ToString(config.Encoding).Length + 2);
 
                 foreach (var column in columnWithLegends)
                     logger.WriteLineHint($"  {column.ColumnName.PadRight(maxNameWidth, ' ')} : {column.Legend}");

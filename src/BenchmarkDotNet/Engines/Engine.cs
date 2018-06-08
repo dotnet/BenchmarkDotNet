@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
@@ -29,7 +30,8 @@ namespace BenchmarkDotNet.Engines
         public Action IterationSetupAction { get; }
         public Action IterationCleanupAction { get; }
         public IResolver Resolver { get; }
-
+        public Encoding Encoding { get; }
+        
         private IClock Clock { get; }
         private bool ForceAllocations { get; }
         private int UnrollFactor { get; }
@@ -47,7 +49,7 @@ namespace BenchmarkDotNet.Engines
             IResolver resolver,
             Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> idleAction, Action<long> mainAction, Job targetJob,
             Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
-            bool includeMemoryStats)
+            bool includeMemoryStats, Encoding encoding)
         {
             
             Host = host;
@@ -65,6 +67,7 @@ namespace BenchmarkDotNet.Engines
             this.includeMemoryStats = includeMemoryStats;
 
             Resolver = resolver;
+            Encoding = encoding;
 
             Clock = targetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, Resolver);
             ForceAllocations = targetJob.ResolveValue(GcMode.ForceCharacteristic, Resolver);
@@ -113,7 +116,7 @@ namespace BenchmarkDotNet.Engines
 
             bool removeOutliers = TargetJob.ResolveValue(AccuracyMode.RemoveOutliersCharacteristic, Resolver);
 
-            return new RunResults(idle, main, removeOutliers, workGcHasDone);
+            return new RunResults(idle, main, removeOutliers, workGcHasDone, Encoding);
         }
 
         public Measurement RunIteration(IterationData data)
@@ -136,7 +139,7 @@ namespace BenchmarkDotNet.Engines
             GcCollect();
 
             // Results
-            var measurement = new Measurement(0, data.IterationMode, data.Index, totalOperations, clockSpan.GetNanoseconds());
+            var measurement = new Measurement(0, data.IterationMode, data.Index, totalOperations, clockSpan.GetNanoseconds(), Encoding);
             WriteLine(measurement.ToOutputLine());
 
             return measurement;

@@ -78,6 +78,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     new List<Measurement> { new Measurement(1, IterationMode.IdleTarget, 1, 1, 1) }, 
                     new List<Measurement> { new Measurement(1, IterationMode.MainTarget, 1, 1, 1) },
                     false,
+                    default,
                     default);
             }
 

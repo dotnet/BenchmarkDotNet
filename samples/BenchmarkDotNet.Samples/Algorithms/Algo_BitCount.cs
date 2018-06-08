@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Samples.Algorithms
             return counter;
         }
 
-        [Benchmark]
+        /*[Benchmark]
         public int PopCount2()
         {
             int counter = 0;
@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Samples.Algorithms
             for (int i = 0; i < N / 2; i++)
                 counter += BitCountHelper.PopCountParallel2(numbers[i],numbers[i+1]);
             return counter;
-        }
+        }*/
     }
 
     /// <summary>

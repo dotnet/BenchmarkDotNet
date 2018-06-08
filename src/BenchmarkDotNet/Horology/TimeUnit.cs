@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Horology
     {
         private readonly MultiEncodingString name;
         
-        public string Name => name.ToString();
+        public MultiEncodingString Name => name;
         public string Description { get; }
         public long NanosecondAmount { get; }
 

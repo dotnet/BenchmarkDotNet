@@ -10,7 +10,6 @@ namespace BenchmarkDotNet.Encodings
     public class MultiEncodingString
     {
         private readonly Dictionary<string, string> encodedStrings;
-
         
         public MultiEncodingString(string unicodePresentation, string asciiPresentation)
         {
@@ -29,15 +28,16 @@ namespace BenchmarkDotNet.Encodings
             var sourceStrings = encodedStrings ?? new KeyValuePair<Encoding, string>[] { };
             
             this.encodedStrings = sourceStrings.Where(kvp => kvp.Value != null)
-                                           .ToDictionary(_ => _.Key.EncodingName, _ => _.Value);
+                                               .ToDictionary(_ => _.Key.EncodingName,
+                                                             _ => _.Value);
         }
 
         
-        public override string ToString() => GetString();
+        public override string ToString() => GetString(Encoding.ASCII);
 
         public string ToString(Encoding encoding) => GetStringByEncoding(encoding);
 
-        public string GetString() => GetStringByEncoding(EncodingInfo.CurrentEncoding);
+        public string GetString(Encoding encoding) => GetStringByEncoding(encoding);
 
         private string GetStringByEncoding(Encoding encoding)
         {
@@ -64,8 +64,8 @@ namespace BenchmarkDotNet.Encodings
         public override int GetHashCode()
         {
             return encodedStrings
-                .Aggregate(0, (current, encodedString) =>
-                               current ^ encodedString.Key.GetHashCode() + encodedString.Value.GetHashCode());
+                   .Aggregate(0, (current, encodedString)
+                                 => current ^ encodedString.Key.GetHashCode() + encodedString.Value.GetHashCode());
         }
     }
 }
