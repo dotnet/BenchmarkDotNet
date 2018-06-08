@@ -1,14 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Samples.Algorithms;
 using BenchmarkDotNet.Samples.Intro;
 using BenchmarkDotNet.Validators;
-using EncodingInfo = BenchmarkDotNet.Encodings.EncodingInfo;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -22,7 +23,8 @@ namespace BenchmarkDotNet.Samples
                                                 .With(Job.RyuJitX64)
                                                 .With(Job.Core)
                                                 .With(ExecutionValidator.FailOnError)
-                                                .With(Encoding.Unicode));
+                                                .With(Encoding.Unicode)
+                                                .With(JsonExporter.Default));
         }
     }
 }

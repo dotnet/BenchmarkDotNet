@@ -62,6 +62,7 @@ namespace BenchmarkDotNet.Tests.Exporters
                 exporter.ExportToLog(MockFactory.CreateSummary(config), logger);
             }
 
+            var a = logger.GetLog();
             Approvals.Verify(logger.GetLog());
         }
 

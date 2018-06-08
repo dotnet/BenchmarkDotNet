@@ -2,7 +2,6 @@
 using System.Text;
 using BenchmarkDotNet.Encodings;
 using Xunit;
-using EncodingInfo = BenchmarkDotNet.Encodings.EncodingInfo;
 
 namespace BenchmarkDotNet.Tests
 {
@@ -39,21 +38,6 @@ namespace BenchmarkDotNet.Tests
             
             Assert.Equal("string", otherMes.ToString(enc1));
             Assert.Equal("otherString", otherMes.ToString(enc2));
-        }
-
-        [Fact]
-        public void TestEncodingInfo()
-        {
-            var enc1 = Encoding.ASCII;
-            var enc2 = Encoding.Unicode;
-            
-            var mes = new MultiEncodingString("string", "otherString");
-
-            EncodingInfo.CurrentEncoding = enc1;
-            Assert.Equal("otherString", mes.ToString());
-            
-            EncodingInfo.CurrentEncoding = enc2;
-            Assert.Equal("string", mes.ToString());
         }
     }
 }

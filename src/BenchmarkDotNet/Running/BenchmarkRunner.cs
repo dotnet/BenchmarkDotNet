@@ -23,7 +23,6 @@ using BenchmarkDotNet.Toolchains.InProcess;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
-using EncodingInfo = BenchmarkDotNet.Encodings.EncodingInfo;
 using RunMode = BenchmarkDotNet.Jobs.RunMode;
 
 namespace BenchmarkDotNet.Running
@@ -73,9 +72,6 @@ namespace BenchmarkDotNet.Running
             var artifactsToCleanup = new List<string>();
             var title = GetTitle(benchmarkRunInfos);
             
-            //TODO MUST BE REMOVED
-            EncodingInfo.CurrentEncoding = commonSettingsConfig.Encoding ?? EncodingInfo.DefaultEncoding;
-
             var rootArtifactsFolderPath = (commonSettingsConfig?.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath).CreateIfNotExists();
 
             using (var logStreamWriter = Portability.StreamWriter.FromPath(Path.Combine(rootArtifactsFolderPath, title + ".log")))
