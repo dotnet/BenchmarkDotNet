@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
@@ -25,6 +26,8 @@ namespace BenchmarkDotNet.Engines
         public Action IterationSetupAction { get; set; }
         public Action IterationCleanupAction { get; set; }
         public bool MeasureGcStats { get; set; }
+        
+        public Encoding Encoding { get; set; }
         
         public bool NeedsJitting => TargetJob.ResolveValue(RunMode.RunStrategyCharacteristic, DefaultResolver).NeedsJitting();
 

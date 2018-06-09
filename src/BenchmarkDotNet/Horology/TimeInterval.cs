@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Extensions;
+﻿using System.Text;
+using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Horology
@@ -7,9 +8,12 @@ namespace BenchmarkDotNet.Horology
     {
         public double Nanoseconds { get; }
 
-        public TimeInterval(double nanoseconds) => Nanoseconds = nanoseconds;
+        public TimeInterval(double nanoseconds)
+        {
+            Nanoseconds = nanoseconds;
+        } 
 
-        public TimeInterval(double value, TimeUnit unit) : this(value * unit.NanosecondAmount) { }
+        public TimeInterval(double value, TimeUnit unit, Encoding encoding = null) : this(value * unit.NanosecondAmount) { }
 
         public static readonly TimeInterval Nanosecond = TimeUnit.Nanosecond.ToInterval();
         public static readonly TimeInterval Microsecond = TimeUnit.Microsecond.ToInterval();
@@ -49,6 +53,6 @@ namespace BenchmarkDotNet.Horology
         [Pure] public static bool operator <=(TimeInterval a, TimeInterval b) => a.Nanoseconds <= b.Nanoseconds;
         [Pure] public static bool operator >=(TimeInterval a, TimeInterval b) => a.Nanoseconds >= b.Nanoseconds;
 
-        [Pure] public override string ToString() => Nanoseconds.ToTimeStr();
+        [Pure] public override string ToString() => Nanoseconds.ToTimeStr(Encoding.ASCII);
     }
 }

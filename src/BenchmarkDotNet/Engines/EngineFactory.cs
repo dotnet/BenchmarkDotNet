@@ -120,6 +120,7 @@ namespace BenchmarkDotNet.Engines
                 engineParameters.IterationSetupAction,
                 engineParameters.IterationCleanupAction,
                 engineParameters.OperationsPerInvoke,
-                engineParameters.MeasureGcStats);
+                engineParameters.MeasureGcStats,
+                engineParameters.Encoding);
     }
 }

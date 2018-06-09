@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.Running
             var resolver = DefaultResolver;
             var artifactsToCleanup = new List<string>();
             var title = GetTitle(benchmarkRunInfos);
-
+            
             var rootArtifactsFolderPath = (commonSettingsConfig?.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath).CreateIfNotExists();
 
             using (var logStreamWriter = Portability.StreamWriter.FromPath(Path.Combine(rootArtifactsFolderPath, title + ".log")))
@@ -128,14 +128,13 @@ namespace BenchmarkDotNet.Running
             return $"BenchmarkRun-{benchmarkRunIndex:##000}-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}";
         }
 
-        private static Summary Run(
-            BenchmarkRunInfo benchmarkRunInfo, 
-            Dictionary<Benchmark, (BenchmarkId benchmarkId, BuildResult buildResult)> buildResults, 
-            IResolver resolver,
-            ILogger logger, 
-            List<string> artifactsToCleanup, 
-            string rootArtifactsFolderPath,
-            ref StartedClock globalChronometer)
+        private static Summary Run(BenchmarkRunInfo benchmarkRunInfo, 
+                                   Dictionary<Benchmark, (BenchmarkId benchmarkId, BuildResult buildResult)> buildResults, 
+                                   IResolver resolver,
+                                   ILogger logger, 
+                                   List<string> artifactsToCleanup, 
+                                   string rootArtifactsFolderPath,
+                                   ref StartedClock globalChronometer)
         {
             var benchmarks = benchmarkRunInfo.Benchmarks;
             var config = benchmarkRunInfo.Config;
@@ -162,7 +161,7 @@ namespace BenchmarkDotNet.Running
                         throw new InvalidOperationException("An iteration with 'Operations == 0' detected");
                     reports.Add(report);
                     if (report.GetResultRuns().Any())
-                        logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr());
+                        logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr(config.Encoding));
                 }
                 else
                 {
@@ -221,7 +220,7 @@ namespace BenchmarkDotNet.Running
                 if (columnWithLegends.Any())
                     maxNameWidth = Math.Max(maxNameWidth, columnWithLegends.Select(c => c.ColumnName.Length).Max());
                 if (effectiveTimeUnit != null)
-                    maxNameWidth = Math.Max(maxNameWidth, effectiveTimeUnit.Name.Length + 2);
+                    maxNameWidth = Math.Max(maxNameWidth, effectiveTimeUnit.Name.ToString(config.Encoding).Length + 2);
 
                 foreach (var column in columnWithLegends)
                     logger.WriteLineHint($"  {column.ColumnName.PadRight(maxNameWidth, ' ')} : {column.Legend}");
@@ -259,7 +258,8 @@ namespace BenchmarkDotNet.Running
 
         private static Dictionary<BuildPartition, BuildResult> BuildInParallel(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, ref StartedClock globalChronometer)
         {
-            using (buildPartitions.Select(partition=> GetAssemblyResolveHelper(partition.RepresentativeBenchmark.Job.GetToolchain(), logger)).FirstOrDefault(helper => helper != null))
+            using (buildPartitions.Select(partition=> GetAssemblyResolveHelper(partition.RepresentativeBenchmark.Job.GetToolchain(), logger))
+                                  .FirstOrDefault(helper => helper != null))
             {
                 logger.WriteLineHeader($"// ***** Building {buildPartitions.Length} exe(s) in Parallel: Start   *****");
 
@@ -445,7 +445,8 @@ namespace BenchmarkDotNet.Running
             return (executeResults, gcStats);
         }
 
-        internal static void LogTotalTime(ILogger logger, TimeSpan time, string message = "Total time") => logger.WriteLineStatistic($"{message}: {time.ToFormattedTotalTime()}");
+        internal static void LogTotalTime(ILogger logger, TimeSpan time, string message = "Total time")
+            => logger.WriteLineStatistic($"{message}: {time.ToFormattedTotalTime()}");
 
         private static BenchmarkRunInfo[] GetSupportedBenchmarks(BenchmarkRunInfo[] benchmarkRunInfos, CompositeLogger logger, IResolver resolver)
             => benchmarkRunInfos.Select(info => new BenchmarkRunInfo(
@@ -460,8 +461,10 @@ namespace BenchmarkDotNet.Running
         private static IDisposable GetAssemblyResolveHelper(IToolchain toolchain, ILogger logger)
         {
             if (RuntimeInformation.IsFullFramework 
-                && !(toolchain is InProcessToolchain) // we don't want to mess with assembly loading when running benchmarks in the same process (could produce wrong results)
-                && !RuntimeInformation.IsMono) // so far it was never an issue for Mono
+                // we don't want to mess with assembly loading when running benchmarks in the same process (could produce wrong results)
+                && !(toolchain is InProcessToolchain) 
+                // so far it was never an issue for Mono
+                && !RuntimeInformation.IsMono) 
             {
                 return DirtyAssemblyResolveHelper.Create(logger);
             }

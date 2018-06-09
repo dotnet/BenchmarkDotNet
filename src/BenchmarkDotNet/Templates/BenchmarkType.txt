@@ -37,7 +37,8 @@
                 IterationCleanupAction = instance.iterationCleanupAction,
                 TargetJob = job,
                 OperationsPerInvoke = $OperationsPerInvoke$,
-                MeasureGcStats = $MeasureGcStats$
+                MeasureGcStats = $MeasureGcStats$,
+                Encoding = $Encoding$
             };
 
             using (var engine = new $EngineFactoryType$().CreateReadyToRun(engineParameters))

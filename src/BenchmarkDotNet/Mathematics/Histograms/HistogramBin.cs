@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 
@@ -28,10 +29,13 @@ namespace BenchmarkDotNet.Mathematics.Histograms
             Math.Max(bin1.Upper, bin2.Upper),
             bin1.Values.Union(bin2.Values).OrderBy(value => value).ToArray());
 
-        public override string ToString()
+        public override string ToString() => ToString(Encoding.ASCII);
+        
+
+        public string ToString(Encoding encoding)
         {
             var unit = TimeUnit.GetBestTimeUnit(Values);
-            return $"[{Lower.ToTimeStr(unit)};{Upper.ToTimeStr(unit)}) {{{string.Join("; ", Values.Select(v => v.ToTimeStr(unit)))}}}";
+            return $"[{Lower.ToTimeStr(unit, encoding)};{Upper.ToTimeStr(unit, encoding)}) {{{string.Join("; ", Values.Select(v => v.ToTimeStr(unit, encoding)))}}}";
         }
     }
 }
