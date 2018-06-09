@@ -1,3 +1,8 @@
+---
+uid: docs.filters
+name: Filters
+---
+
 # Filters
 
 Sometimes you don't want to run all of your benchmarks.

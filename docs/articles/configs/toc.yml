@@ -12,11 +12,11 @@
   href: diagnosers.md
 - name: Toolchains
   href: toolchains.md
-- name: Analyzers
-  href: analyzers.md
+- name: Analysers
+  href: analysers.md
 - name: Validators
   href: validators.md
 - name: Filters
   href: filters.md
-- name: OrderProvider
-  href: order-provider.md
+- name: Order Providers
+  href: order-providers.md

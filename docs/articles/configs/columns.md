@@ -1,3 +1,8 @@
+---
+uid: docs.columns
+name: Columns
+---
+
 # Columns
 
 A *column* is a column in the summary table.

@@ -1,3 +1,8 @@
+---
+uid: docs.jobs
+name: Jobs
+---
+
 # Jobs
 
 Basically, a *job* describes how to run your benchmark. Practically, it's a set of characteristics which can be specified. You can specify one or several jobs for your benchmarks.
@@ -54,7 +59,7 @@ If you want to change the accuracy level, you should use the following character
 * `MinIterationTime`: Minimum time of a single iteration. Unlike `Run.IterationTime`, this characteristic specifies only the lower limit. In case of need, BenchmarkDotNet can increase this value.
 * `MinInvokeCount`:  Minimum about of target method invocation. Default value if `4` but you can decrease this value for cases when single invocations takes a lot of time.
 * `EvaluateOverhead`: if you benchmark method takes nanoseconds, BenchmarkDotNet overhead can significantly affect measurements. If this characterics is enable, the overhead will be evaluated and subtracted from the result measurements. Default value is `true`.
-* `WithOutlierMode`: sometimes you could have outliers in your measurements. Usually these are unexpected outliers which arose because of other processes activities. By default (`OutlierMode.OnlyUpper`), all upper outliers (which is larger than Q3) will be removed from the result measurements. However, some of benchmarks have *expected* outliers. In these situation, you expect that some of invocation can produce outliers measurements (e.g. in case of network activities, cache operations, and so on). If you want to see result statistics with these outliers, you should use `OutlierMode.None`. If you can also choose `OutlierMode.OnlyLower` (outliers which are smaller than Q1 will be removed) or `OutlierMode.All` (all outliers will be removed). See also: [OutlierMode](xref:BenchmarkDotNet.Mathematics.OutlierMode)
+* `WithOutlierMode`: sometimes you could have outliers in your measurements. Usually these are unexpected outliers which arose because of other processes activities. By default (`OutlierMode.OnlyUpper`), all upper outliers (which is larger than Q3) will be removed from the result measurements. However, some of benchmarks have *expected* outliers. In these situation, you expect that some of invocation can produce outliers measurements (e.g. in case of network activities, cache operations, and so on). If you want to see result statistics with these outliers, you should use `OutlierMode.None`. If you can also choose `OutlierMode.OnlyLower` (outliers which are smaller than Q1 will be removed) or `OutlierMode.All` (all outliers will be removed). See also: @BenchmarkDotNet.Mathematics.OutlierMode
 * `AnalyzeLaunchVariance`: this characteristic makes sense only if `Run.LaunchCount` is default. If this mode is enabled and, BenchmarkDotNet will try to perform several launches and detect if there is a veriance between launches. If this mode is disable, only one launch will be performed.
 
 ### Infrastructure
@@ -63,6 +68,7 @@ Usually, you shouldn't specify any characteristics from this section, it can be 
 * `Toolchain`: a toolchain which generate source code for target benchmark methods, build it, and execute it. BenchmarkDotNet has own toolchains for CoreCLR projects and classic projects (the last one is `RoslynToolchain`, you can find it in the [BenchmarkDotNet.Toolchains.Roslyn](https://www.nuget.org/packages/BenchmarkDotNet.Toolchains.Roslyn/) NuGet package). If you want, you can define own toolchain.
 * `Clock`: a clock which will be used for measurements. BenchmarkDotNet automatically choose the best available clock source, but you can specify own clock source.
 * `EngineFactory`: a provider for measurement engine which performs all the measurement magic. If you don't trust BenchmarkDotNet, you can define own engine and implement all the measurement stages manually.
+* `EnvironmentVariables`: customized environment variables for target benchmark. See also: @BenchmarkDotNet.Samples.IntroEnvVars
 
 ## Usage
 

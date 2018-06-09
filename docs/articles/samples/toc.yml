@@ -16,3 +16,5 @@
   href: IntroCategoryBaseline.md
 - name: IntroJobBaseline
   href: IntroJobBaseline.md
+- name: IntroEnvVars
+  href: IntroEnvVars.md

@@ -1,3 +1,8 @@
+---
+uid: docs.diagnosers
+name: Diagnosers
+---
+
 # Diagnosers
 
 A **diagnoser** can attach to your benchmark and get some useful info.
