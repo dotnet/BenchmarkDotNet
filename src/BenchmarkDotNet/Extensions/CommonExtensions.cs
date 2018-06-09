@@ -29,11 +29,15 @@ namespace BenchmarkDotNet.Extensions
                 var unitName = unit.Name.ToString(encoding ?? Encoding.ASCII).PadLeft(unitNameWidth);
                 return $"{unitValue.ToStr(format)} {unitName}";
             }
-            else
-            {
-                return $"{unitValue.ToStr(format)}";
-            }
+
+            return $"{unitValue.ToStr(format)}";
         }
+        
+        public static string ToTimeStr(this double value, TimeUnit unit, Encoding encoding, string format = "N4", int unitNameWidth = 1, bool showUnit = true)
+            => value.ToTimeStr(unit, unitNameWidth, showUnit, format, encoding);
+        
+        public static string ToTimeStr(this double value, Encoding encoding, TimeUnit unit = null, string format = "N4", int unitNameWidth = 1, bool showUnit = true)
+            => value.ToTimeStr(unit, unitNameWidth, showUnit, format, encoding);
 
         public static string ToSizeStr(this long value, SizeUnit unit = null, int unitNameWidth = 1, bool showUnit = true)
         {

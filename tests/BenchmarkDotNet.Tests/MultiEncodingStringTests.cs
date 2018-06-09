@@ -33,8 +33,8 @@ namespace BenchmarkDotNet.Tests
             var otherMes = new MultiEncodingString(new[] { new KeyValuePair<Encoding, string>(enc1, "string"),
                                                            new KeyValuePair<Encoding, string>(enc2, "otherString") });
             
-            Assert.Equal("string", mes.ToString(enc2));
-            Assert.Equal("otherString", mes.ToString(enc1));
+            Assert.Equal("string", mes.ToString(enc1));
+            Assert.Equal("otherString", mes.ToString(enc2));
             
             Assert.Equal("string", otherMes.ToString(enc1));
             Assert.Equal("otherString", otherMes.ToString(enc2));

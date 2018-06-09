@@ -44,6 +44,7 @@ namespace BenchmarkDotNet.Reports
         /// <param name="iterationIndex"></param>
         /// <param name="operations">The number of operations performed.</param>
         /// <param name="nanoseconds">The total number of nanoseconds it took to perform all operations.</param>
+        /// <param name="encoding">encoding to display value.</param>
         public Measurement(int launchIndex, IterationMode iterationMode, int iterationIndex, long operations, double nanoseconds, Encoding encoding = null)
         {
             Encoding = encoding;
@@ -66,7 +67,7 @@ namespace BenchmarkDotNet.Reports
         }
 
         private string GetDisplayValue() => $"{Operations} op, {Nanoseconds.ToStr("0.00")} ns, {GetAverageTime()}";
-        private string GetAverageTime() => $"{(Nanoseconds / Operations).ToTimeStr(encoding: Encoding)}/op";
+        private string GetAverageTime() => $"{(Nanoseconds / Operations).ToTimeStr(Encoding)}/op";
 
         /// <summary>
         /// Parses the benchmark statistics from the plain text line.
@@ -136,6 +137,6 @@ namespace BenchmarkDotNet.Reports
 
         public int CompareTo(Measurement other) => Nanoseconds.CompareTo(other.Nanoseconds);
 
-        public override string ToString() => $"#{LaunchIndex}/{IterationMode} {IterationIndex}: {Operations} op, {Nanoseconds.ToTimeStr(encoding: Encoding)}";
+        public override string ToString() => $"#{LaunchIndex}/{IterationMode} {IterationIndex}: {Operations} op, {Nanoseconds.ToTimeStr(Encoding)}";
     }
 }

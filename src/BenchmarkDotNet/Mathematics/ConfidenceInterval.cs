@@ -147,6 +147,6 @@ namespace BenchmarkDotNet.Mathematics
         public string ToStr(bool showLevel = true) => $"[{Lower.ToStr()}; {Upper.ToStr()}] (CI {Level.ToPercentStr()})";
 
         public string ToTimeStr(Encoding encoding, TimeUnit unit = null, bool showLevel = true) =>
-            $"[{Lower.ToTimeStr(unit, encoding: encoding)}; {Upper.ToTimeStr(unit, encoding: encoding)}] (CI {Level.ToPercentStr()})";
+            $"[{Lower.ToTimeStr(unit, encoding)}; {Upper.ToTimeStr(unit, encoding)}] (CI {Level.ToPercentStr()})";
     }
 }

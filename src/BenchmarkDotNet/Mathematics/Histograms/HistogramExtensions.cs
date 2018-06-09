@@ -32,8 +32,8 @@ namespace BenchmarkDotNet.Mathematics.Histograms
             var upper = new string[binCount];
             for (int i = 0; i < binCount; i++)
             {
-                lower[i] = bins[i].Lower.ToTimeStr(unit, encoding: encoding, format: format);
-                upper[i] = bins[i].Upper.ToTimeStr(unit, encoding: encoding, format: format);
+                lower[i] = bins[i].Lower.ToTimeStr(unit, encoding, format);
+                upper[i] = bins[i].Upper.ToTimeStr(unit, encoding, format);
             }
 
             int lowerWidth = lower.Max(it => it.Length);
@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Mathematics.Histograms
             {
                 string intervalStr = $"[{lower[i].PadLeft(lowerWidth)} ; {upper[i].PadLeft(upperWidth)})";
                 string barStr = full
-                    ? string.Join(", ", bins[i].Values.Select(it => it.ToTimeStr(unit, encoding: encoding, format: format)))
+                    ? string.Join(", ", bins[i].Values.Select(it => it.ToTimeStr(unit, encoding, format)))
                     : new string(binSymbol, bins[i].Count);
                 builder.AppendLine($"{intervalStr} | {barStr}");
             }

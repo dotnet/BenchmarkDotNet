@@ -9,11 +9,8 @@ namespace BenchmarkDotNet.Attributes
     {
         public IConfig Config { get; }
 
-        public EncodingAttribute(Encoding encoding)
-        {
-            Config = ManualConfig.CreateEmpty().With(encoding);
-        }
-        
+        public EncodingAttribute(Encoding encoding) => Config = ManualConfig.CreateEmpty().With(encoding);
+
         public class Unicode: EncodingAttribute
         {
             public Unicode() : base(Encoding.Unicode) { }

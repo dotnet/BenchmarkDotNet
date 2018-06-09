@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Mathematics.Histograms
         public string ToString(Encoding encoding)
         {
             var unit = TimeUnit.GetBestTimeUnit(Values);
-            return $"[{Lower.ToTimeStr(unit, encoding: encoding)};{Upper.ToTimeStr(unit, encoding: encoding)}) {{{string.Join("; ", Values.Select(v => v.ToTimeStr(unit, encoding: encoding)))}}}";
+            return $"[{Lower.ToTimeStr(unit, encoding)};{Upper.ToTimeStr(unit, encoding)}) {{{string.Join("; ", Values.Select(v => v.ToTimeStr(unit, encoding)))}}}";
         }
     }
 }

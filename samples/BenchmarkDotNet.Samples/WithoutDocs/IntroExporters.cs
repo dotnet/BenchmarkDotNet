@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Samples
     [XmlExporterAttribute.FullCompressed]
     public class IntroExporters
     {
-        private readonly Random random = new Random(42);
+        private Random random = new Random(42);
 
         [Benchmark(Baseline = true)]
         public void Sleep10() => Thread.Sleep(10);

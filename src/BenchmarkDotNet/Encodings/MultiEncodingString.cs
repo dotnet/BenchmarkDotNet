@@ -11,7 +11,20 @@ namespace BenchmarkDotNet.Encodings
     {
         private readonly Dictionary<string, string> encodedStrings;
         
-        public MultiEncodingString(string unicodePresentation, string asciiPresentation)
+        /// <summary>Ctor for ascii-only presentation</summary>
+        public MultiEncodingString(string asciiPresentation)
+        {
+            var pairs = new[]
+            {
+                new KeyValuePair<Encoding, string>(Encoding.ASCII, asciiPresentation)
+            };
+            
+            encodedStrings = pairs.ToDictionary(_ => _.Key.EncodingName,
+                _ => _.Value);
+        }
+        
+        /// <summary>Ctor for specified unicode and ascii presentations</summary>
+        public MultiEncodingString(string asciiPresentation, string unicodePresentation)
         {
             var pairs = new[]
             {
@@ -23,6 +36,7 @@ namespace BenchmarkDotNet.Encodings
                                                 _ => _.Value);
         }
 
+        /// <summary>Ctor for custom encoding presentations</summary>
         public MultiEncodingString(IEnumerable<KeyValuePair<Encoding, string>> encodedStrings)
         {
             var sourceStrings = encodedStrings ?? new KeyValuePair<Encoding, string>[] { };
@@ -31,7 +45,6 @@ namespace BenchmarkDotNet.Encodings
                                                .ToDictionary(_ => _.Key.EncodingName,
                                                              _ => _.Value);
         }
-
         
         public override string ToString() => GetString(Encoding.ASCII);
 
@@ -39,20 +52,10 @@ namespace BenchmarkDotNet.Encodings
 
         public string GetString(Encoding encoding) => GetStringByEncoding(encoding);
 
-        private string GetStringByEncoding(Encoding encoding)
-        {
-            if (encoding == null)
-                encoding = GetFallback();
-                
-            if (encodedStrings.TryGetValue(encoding.EncodingName, out string encodedString))
-                return encodedString;
-            
-            return encodedStrings.TryGetValue(GetFallback().EncodingName, out encodedString)
-                ? encodedString
-                : null;
-        }
-
-        private Encoding GetFallback() => Encoding.ASCII;
+        public static implicit operator MultiEncodingString(string s) => new MultiEncodingString(s);
+        
+        public static implicit operator MultiEncodingString((string unicodeString, string asciiString) tuple)
+            => new MultiEncodingString(tuple.unicodeString, tuple.asciiString);
         
         public override bool Equals(object obj)
         {
@@ -70,5 +73,20 @@ namespace BenchmarkDotNet.Encodings
                    .Aggregate(0, (current, encodedString)
                                  => current ^ encodedString.Key.GetHashCode() + encodedString.Value.GetHashCode());
         }
+        
+        private string GetStringByEncoding(Encoding encoding)
+        {
+            if (encoding == null)
+                encoding = GetFallback();
+                
+            if (encodedStrings.TryGetValue(encoding.EncodingName, out string encodedString))
+                return encodedString;
+            
+            return encodedStrings.TryGetValue(GetFallback().EncodingName, out encodedString)
+                ? encodedString
+                : null;
+        }
+        
+        private Encoding GetFallback() => Encoding.ASCII;
     }
 }

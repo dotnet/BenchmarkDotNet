@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Reports
 
         //TODO OPTIONAL ENCODING
         public static string ToStr(this Measurement run, Encoding encoding) =>
-            $"{run.IterationMode} {run.IterationIndex}: {run.Operations} op, {run.Nanoseconds.ToStr()} ns, {run.GetAverageNanoseconds().ToTimeStr(encoding:encoding ?? Encoding.ASCII)}/op";
+            $"{run.IterationMode} {run.IterationIndex}: {run.Operations} op, {run.Nanoseconds.ToStr()} ns, {run.GetAverageNanoseconds().ToTimeStr(encoding ?? Encoding.ASCII)}/op";
 
     }
 }
