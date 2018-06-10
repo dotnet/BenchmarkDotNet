@@ -20,3 +20,5 @@
   href: filters.md
 - name: Order Providers
   href: order-providers.md
+- name: Encoding
+  href: encoding.md

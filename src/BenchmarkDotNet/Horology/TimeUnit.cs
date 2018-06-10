@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using BenchmarkDotNet.Encodings;
+using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.Horology
 {
@@ -20,13 +20,13 @@ namespace BenchmarkDotNet.Horology
 
         public TimeInterval ToInterval(long value = 1) => new TimeInterval(value, this);
 
-        public static readonly TimeUnit Nanosecond = new TimeUnit(new MultiEncodingString("ns"), "Nanosecond", 1);
+        public static readonly TimeUnit Nanosecond = new TimeUnit("ns", "Nanosecond", 1);
         public static readonly TimeUnit Microsecond = new TimeUnit(new MultiEncodingString("us", "\u03BCs"), "Microsecond", 1000);
-        public static readonly TimeUnit Millisecond = new TimeUnit(new MultiEncodingString("ms"), "Millisecond", 1000 * 1000);
-        public static readonly TimeUnit Second = new TimeUnit(new MultiEncodingString("s"), "Second", 1000 * 1000 * 1000);
-        public static readonly TimeUnit Minute = new TimeUnit(new MultiEncodingString("m"), "Minute", Second.NanosecondAmount * 60);
-        public static readonly TimeUnit Hour = new TimeUnit(new MultiEncodingString("h"), "Hour", Minute.NanosecondAmount * 60);
-        public static readonly TimeUnit Day = new TimeUnit(new MultiEncodingString("d"), "Day", Hour.NanosecondAmount * 24);
+        public static readonly TimeUnit Millisecond = new TimeUnit("ms", "Millisecond", 1000 * 1000);
+        public static readonly TimeUnit Second = new TimeUnit("s", "Second", 1000 * 1000 * 1000);
+        public static readonly TimeUnit Minute = new TimeUnit("m", "Minute", Second.NanosecondAmount * 60);
+        public static readonly TimeUnit Hour = new TimeUnit("h", "Hour", Minute.NanosecondAmount * 60);
+        public static readonly TimeUnit Day = new TimeUnit("d", "Day", Hour.NanosecondAmount * 24);
         public static readonly TimeUnit[] All = { Nanosecond, Microsecond, Millisecond, Second, Minute, Hour, Day };
 
         /// <summary>

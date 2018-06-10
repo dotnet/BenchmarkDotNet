@@ -30,7 +30,6 @@ namespace BenchmarkDotNet.Mathematics.Histograms
             bin1.Values.Union(bin2.Values).OrderBy(value => value).ToArray());
 
         public override string ToString() => ToString(Encoding.ASCII);
-        
 
         public string ToString(Encoding encoding)
         {

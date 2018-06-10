@@ -12,11 +12,11 @@ namespace BenchmarkDotNet.Exporters
     {
         public string Name => $"{GetType().Name}{FileNameSuffix}";
         public Encoding Encoding { get; }
-        
+
         protected virtual string FileExtension => "txt";
         protected virtual string FileNameSuffix => string.Empty;
         protected virtual string FileCaption => "report";
-        
+
         public abstract void ExportToLog(Summary summary, ILogger logger);
 
         public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)

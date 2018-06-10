@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.Running
             var resolver = DefaultResolver;
             var artifactsToCleanup = new List<string>();
             var title = GetTitle(benchmarkRunInfos);
-            
+
             var rootArtifactsFolderPath = (commonSettingsConfig?.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath).CreateIfNotExists();
 
             using (var logStreamWriter = Portability.StreamWriter.FromPath(Path.Combine(rootArtifactsFolderPath, title + ".log")))

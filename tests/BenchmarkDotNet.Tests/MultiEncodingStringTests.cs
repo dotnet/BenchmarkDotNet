@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using BenchmarkDotNet.Encodings;
+using BenchmarkDotNet.Helpers;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests

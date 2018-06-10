@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using BenchmarkDotNet.Configs;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes
 {
@@ -9,13 +10,15 @@ namespace BenchmarkDotNet.Attributes
     {
         public IConfig Config { get; }
 
-        public EncodingAttribute(Encoding encoding) => Config = ManualConfig.CreateEmpty().With(encoding);
+        private EncodingAttribute(Encoding encoding) => Config = ManualConfig.CreateEmpty().With(encoding);
 
+        [PublicAPI]
         public class Unicode: EncodingAttribute
         {
             public Unicode() : base(Encoding.Unicode) { }
         }
         
+        [PublicAPI]
         public class ASCII: EncodingAttribute
         {
             public ASCII() : base(Encoding.ASCII) { }

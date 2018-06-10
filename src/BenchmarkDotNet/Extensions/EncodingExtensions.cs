@@ -2,9 +2,9 @@
 
 namespace BenchmarkDotNet.Extensions
 {
-    public static class EncodingExtensions
+    internal static class EncodingExtensions
     {
-        public static string ToTemplateString(this Encoding encoding)
+        internal static string ToTemplateString(this Encoding encoding)
         {
             const string result = "System.Text.Encoding.";
             switch (encoding)

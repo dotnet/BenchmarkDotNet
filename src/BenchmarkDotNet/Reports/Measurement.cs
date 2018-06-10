@@ -91,7 +91,7 @@ namespace BenchmarkDotNet.Reports
             
             if (line != null && line.StartsWith(GcStats.ResultsLinePrefix))
                 return Error(encoding);
-            
+
             try
             {
                 var lineSplit = line.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
