@@ -103,10 +103,15 @@ namespace BenchmarkDotNet.Running
 
                     foreach (var benchmarkRunInfo in supportedBenchmarks) // we run them in the old order now using the new build artifacts
                     {
-                        var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, logger, artifactsToCleanup, rootArtifactsFolderPath, ref globalChronometer);
+                        var runChronometer = Chronometer.Start();
+                        
+                        var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, logger, artifactsToCleanup, rootArtifactsFolderPath, ref runChronometer);
                         
                         if (summaryPerType)
-                            PrintSummary(logger, commonSettingsConfig, summary, globalChronometer.GetElapsed());
+                            PrintSummary(logger, commonSettingsConfig, summary);
+                        
+                        LogTotalTime(logger, runChronometer.GetElapsed().GetTimeSpan(), summary.GetNumberOfExecutedBenchmarks(), message: "Run time");
+                        logger.WriteLine();
                         
                         results.Add(summary);
                     }
@@ -115,7 +120,7 @@ namespace BenchmarkDotNet.Running
                     {
                         var joinedSummary = Summary.Join(results, commonSettingsConfig, globalChronometer.GetElapsed());
                         
-                        PrintSummary(logger, commonSettingsConfig, joinedSummary, globalChronometer.GetElapsed());
+                        PrintSummary(logger, commonSettingsConfig, joinedSummary);
                         
                         results.Clear();
                         results.Add(joinedSummary);
@@ -151,7 +156,7 @@ namespace BenchmarkDotNet.Running
                                    ILogger logger, 
                                    List<string> artifactsToCleanup, 
                                    string rootArtifactsFolderPath,
-                                   ref StartedClock globalChronometer)
+                                   ref StartedClock runChronometer)
         {
             var benchmarks = benchmarkRunInfo.Benchmarks;
             var config = benchmarkRunInfo.Config;
@@ -193,7 +198,7 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLine();
             }
             
-            var clockSpan = globalChronometer.GetElapsed();
+            var clockSpan = runChronometer.GetElapsed();
 
             return new Summary(title,
                 reports,
@@ -204,7 +209,7 @@ namespace BenchmarkDotNet.Running
                 Validate(new[] {benchmarkRunInfo }, NullLogger.Instance)); // validate them once again, but don't print the output
         }
 
-        private static void PrintSummary(ILogger logger, IConfig config, Summary summary, ClockSpan clockSpan)
+        private static void PrintSummary(ILogger logger, IConfig config, Summary summary)
         {
             logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
             logger.WriteLine();
@@ -221,9 +226,6 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineHeader("// * Detailed results *");
 
             BenchmarkReportExporter.Default.ExportToLog(summary, logger);
-
-            LogTotalTime(logger, clockSpan.GetTimeSpan());
-            logger.WriteLine();
 
             logger.WriteLineHeader("// * Summary *");
             MarkdownExporter.Console.ExportToLog(summary, logger);
@@ -466,8 +468,8 @@ namespace BenchmarkDotNet.Running
             return (executeResults, gcStats);
         }
 
-        internal static void LogTotalTime(ILogger logger, TimeSpan time, string message = "Total time")
-            => logger.WriteLineStatistic($"{message}: {time.ToFormattedTotalTime()}");
+        internal static void LogTotalTime(ILogger logger, TimeSpan time, int executedBenchmarksCount, string message = "Total time")
+            => logger.WriteLineStatistic($"{message}: {time.ToFormattedTotalTime()}, executed benchmarks: {executedBenchmarksCount}");
 
         private static BenchmarkRunInfo[] GetSupportedBenchmarks(BenchmarkRunInfo[] benchmarkRunInfos, CompositeLogger logger, IResolver resolver)
             => benchmarkRunInfos.Select(info => new BenchmarkRunInfo(

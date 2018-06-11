@@ -42,6 +42,8 @@ namespace BenchmarkDotNet.Reports
         [CanBeNull]
         public string GetLogicalGroupKey(Benchmark benchmark) => orderProvider.GetLogicalGroupKey(Config, Benchmarks, benchmark);
 
+        public int GetNumberOfExecutedBenchmarks() => Reports.Count(report => report.ExecuteResults.Any(result => result.FoundExecutable));
+
         public Summary(string title,
                        IList<BenchmarkReport> reports,
                        HostEnvironmentInfo hostEnvironmentInfo,
