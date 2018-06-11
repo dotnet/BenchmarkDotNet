@@ -1,3 +1,8 @@
+---
+uid: docs.validators
+name: Validators
+---
+
 # Validators
 
 A **validator** can validate your benchmarks before they are executed and produce validation errors. 

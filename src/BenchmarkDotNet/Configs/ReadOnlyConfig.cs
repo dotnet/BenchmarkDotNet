@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Text;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
@@ -21,10 +21,8 @@ namespace BenchmarkDotNet.Configs
     {
         private readonly IConfig config;
 
-        public ReadOnlyConfig([NotNull] IConfig config)
-        {
-            this.config = config ?? throw new ArgumentNullException(nameof(config));
-        }
+        public ReadOnlyConfig([NotNull] IConfig config) 
+            => this.config = config ?? throw new ArgumentNullException(nameof(config));
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => config.GetColumnProviders();
         public IEnumerable<IExporter> GetExporters() => config.GetExporters();
@@ -44,6 +42,8 @@ namespace BenchmarkDotNet.Configs
         public bool KeepBenchmarkFiles => config.KeepBenchmarkFiles;
 
         public string ArtifactsPath => config.ArtifactsPath;
+
+        public Encoding Encoding => config.Encoding;
 
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => config.GetLogicalGroupRules();
     }

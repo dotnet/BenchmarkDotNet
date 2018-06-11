@@ -68,6 +68,7 @@ namespace BenchmarkDotNet.Code
                     .Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark))
                     .Replace("$Ref$", provider.UseRefKeyword ? "ref" : null)
                     .Replace("$MeasureGcStats$", buildInfo.Config.HasMemoryDiagnoser() ? "true" : "false")
+                    .Replace("$Encoding$", buildInfo.Config.Encoding.ToTemplateString())
                     .Replace("$DiassemblerEntryMethodName$", DisassemblerConstants.DiassemblerEntryMethodName)
                     .Replace("$TargetMethodCall$", provider.GetTargetMethodCall(passArguments)).ToString();
 

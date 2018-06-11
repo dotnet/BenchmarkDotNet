@@ -43,7 +43,12 @@ namespace BenchmarkDotNet.Reports
         [CanBeNull]
         public string GetLogicalGroupKey(Benchmark benchmark) => orderProvider.GetLogicalGroupKey(Config, Benchmarks, benchmark);
 
-        public Summary(string title, IList<BenchmarkReport> reports, HostEnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, ValidationError[] validationErrors)
+        public Summary(string title,
+                       IList<BenchmarkReport> reports,
+                       HostEnvironmentInfo hostEnvironmentInfo,
+                       IConfig config, string resultsDirectoryPath,
+                       TimeSpan totalTime,
+                       ValidationError[] validationErrors)
             : this(title, hostEnvironmentInfo, config, resultsDirectoryPath, totalTime, validationErrors)
         {
             Benchmarks = reports.Select(r => r.Benchmark).ToArray();
@@ -61,7 +66,14 @@ namespace BenchmarkDotNet.Reports
             AllRuntimes = BuildAllRuntimes();
         }
 
-        private Summary(string title, HostEnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, ValidationError[] validationErrors, Benchmark[] benchmarks, BenchmarkReport[] reports)
+        private Summary(string title,
+                        HostEnvironmentInfo hostEnvironmentInfo,
+                        IConfig config,
+                        string resultsDirectoryPath,
+                        TimeSpan totalTime,
+                        ValidationError[] validationErrors,
+                        Benchmark[] benchmarks,
+                        BenchmarkReport[] reports)
             : this(title, hostEnvironmentInfo, config, resultsDirectoryPath, totalTime, validationErrors)
         {
             Benchmarks = benchmarks;
@@ -69,7 +81,12 @@ namespace BenchmarkDotNet.Reports
             Reports = reports ?? Array.Empty<BenchmarkReport>();
         }
 
-        private Summary(string title, HostEnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, TimeSpan totalTime, ValidationError[] validationErrors)
+        private Summary(string title,
+                        HostEnvironmentInfo hostEnvironmentInfo,
+                        IConfig config,
+                        string resultsDirectoryPath,
+                        TimeSpan totalTime,
+                        ValidationError[] validationErrors)
         {
             Title = title;
             HostEnvironmentInfo = hostEnvironmentInfo;
@@ -80,15 +97,15 @@ namespace BenchmarkDotNet.Reports
             Reports = Array.Empty<BenchmarkReport>();
         }
 
-        internal SummaryTable GetTable(ISummaryStyle style)
-        {
-            return new SummaryTable(this, style);
-        }
+        internal SummaryTable GetTable(ISummaryStyle style) => new SummaryTable(this, style);
 
-        internal static Summary CreateFailed(Benchmark[] benchmarks, string title, HostEnvironmentInfo hostEnvironmentInfo, IConfig config, string resultsDirectoryPath, ValidationError[] validationErrors)
-        {
-            return new Summary(title, hostEnvironmentInfo, config, resultsDirectoryPath, TimeSpan.Zero, validationErrors, benchmarks, Array.Empty<BenchmarkReport>());
-        }
+        internal static Summary CreateFailed(Benchmark[] benchmarks,
+                                             string title,
+                                             HostEnvironmentInfo hostEnvironmentInfo,
+                                             IConfig config,
+                                             string resultsDirectoryPath,
+                                             ValidationError[] validationErrors) 
+            => new Summary(title, hostEnvironmentInfo, config, resultsDirectoryPath, TimeSpan.Zero, validationErrors, benchmarks, Array.Empty<BenchmarkReport>());
 
         private string BuildAllRuntimes()
         {

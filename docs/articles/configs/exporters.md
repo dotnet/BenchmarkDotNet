@@ -1,3 +1,8 @@
+---
+uid: docs.exporters
+name: Exporters
+---
+
 # Exporters
 
 An *exporter* allows you to export results of your benchmark in different formats. By default, files with results will be located in 

@@ -1,3 +1,8 @@
+---
+uid: docs.toolchains
+name: Toolchains
+---
+
 # Toolchains
 
 In BenchmarkDotNet we generate, build and execute new console app per every benchmark. A **toolchain** contains generator, builder, and executor. 

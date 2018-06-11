@@ -18,20 +18,22 @@ namespace BenchmarkDotNet.Mathematics.Histograms
         public static IEnumerable<double> GetAllValues([NotNull] this Histogram histogram) => histogram.Bins.SelectMany(bin => bin.Values);
 
         [PublicAPI, Pure]
-        public static string ToTimeStr(this Histogram histogram, TimeUnit unit = null, char binSymbol = '@', bool full = false)
+        public static string ToTimeStr(this Histogram histogram, TimeUnit unit = null, char binSymbol = '@', bool full = false, Encoding encoding = null)
         {
             const string format = "0.000";
             var bins = histogram.Bins;
             int binCount = histogram.Bins.Length;
             if (unit == null)
                 unit = TimeUnit.GetBestTimeUnit(bins.SelectMany(bin => bin.Values).ToArray());
+            if (encoding == null)
+                encoding = Encoding.ASCII;
 
             var lower = new string[binCount];
             var upper = new string[binCount];
             for (int i = 0; i < binCount; i++)
             {
-                lower[i] = bins[i].Lower.ToTimeStr(unit, format: format);
-                upper[i] = bins[i].Upper.ToTimeStr(unit, format: format);
+                lower[i] = bins[i].Lower.ToTimeStr(unit, encoding, format);
+                upper[i] = bins[i].Upper.ToTimeStr(unit, encoding, format);
             }
 
             int lowerWidth = lower.Max(it => it.Length);
@@ -42,7 +44,7 @@ namespace BenchmarkDotNet.Mathematics.Histograms
             {
                 string intervalStr = $"[{lower[i].PadLeft(lowerWidth)} ; {upper[i].PadLeft(upperWidth)})";
                 string barStr = full
-                    ? string.Join(", ", bins[i].Values.Select(it => it.ToTimeStr(unit, format: format)))
+                    ? string.Join(", ", bins[i].Values.Select(it => it.ToTimeStr(unit, encoding, format)))
                     : new string(binSymbol, bins[i].Count);
                 builder.AppendLine($"{intervalStr} | {barStr}");
             }

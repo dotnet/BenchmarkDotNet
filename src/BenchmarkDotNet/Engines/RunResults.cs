@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
@@ -11,7 +12,7 @@ namespace BenchmarkDotNet.Engines
     public struct RunResults
     {
         private readonly OutlierMode outlierMode;
-
+        private readonly Encoding encoding;
         [CanBeNull]
         public IReadOnlyList<Measurement> Idle { get; }
 
@@ -20,10 +21,14 @@ namespace BenchmarkDotNet.Engines
 
         public GcStats GCStats { get; }
 
-        public RunResults(
-            [CanBeNull] IReadOnlyList<Measurement> idle, [NotNull] IReadOnlyList<Measurement> main, OutlierMode outlierMode, GcStats gcStats)
+        public RunResults([CanBeNull] IReadOnlyList<Measurement> idle,
+                          [NotNull] IReadOnlyList<Measurement> main,
+                          OutlierMode outlierMode,
+                          GcStats gcStats,
+                          Encoding encoding)
         {
             this.outlierMode = outlierMode;
+            this.encoding = encoding;
             Idle = idle;
             Main = main;
             GCStats = gcStats;
@@ -48,7 +53,8 @@ namespace BenchmarkDotNet.Engines
                     IterationMode.Result,
                     ++resultIndex,
                     measurement.Operations,
-                    value);
+                    value,
+                    encoding);
             }
         }
 

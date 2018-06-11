@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 
@@ -145,7 +146,7 @@ namespace BenchmarkDotNet.Mathematics
 
         public string ToStr(bool showLevel = true) => $"[{Lower.ToStr()}; {Upper.ToStr()}] (CI {Level.ToPercentStr()})";
 
-        public string ToTimeStr(TimeUnit unit = null, bool showLevel = true) =>
-            $"[{Lower.ToTimeStr(unit)}; {Upper.ToTimeStr(unit)}] (CI {Level.ToPercentStr()})";
+        public string ToTimeStr(Encoding encoding, TimeUnit unit = null, bool showLevel = true) =>
+            $"[{Lower.ToTimeStr(unit, encoding)}; {Upper.ToTimeStr(unit, encoding)}] (CI {Level.ToPercentStr()})";
     }
 }

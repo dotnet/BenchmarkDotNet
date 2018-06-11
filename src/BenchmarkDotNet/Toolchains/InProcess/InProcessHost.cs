@@ -40,6 +40,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             this.logger = logger;
             this.diagnoser = diagnoser;
             IsDiagnoserAttached = diagnoser != null;
+            Config = config;
 
             if (diagnoser != null)
                 diagnoserActionParameters = new DiagnoserActionParameters(
@@ -57,6 +58,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <value>Results of the run.</value>
         public RunResults RunResults { get; private set; }
 
+        /// <summary>Current config</summary>
+        public IConfig Config { get; set; }
+        
         /// <summary>Passes text to the host.</summary>
         /// <param name="message">Text to write.</param>
         public void Write(string message) => logger.Write(message);
@@ -67,7 +71,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <summary>Passes text (new line appended) to the host.</summary>
         /// <param name="message">Text to write.</param>
         public void WriteLine(string message) => logger.WriteLine(message);
-
+        
+        
         /// <summary>Sends notification signal to the host.</summary>
         /// <param name="hostSignal">The signal to send.</param>
         public void SendSignal(HostSignal hostSignal)

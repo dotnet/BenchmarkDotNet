@@ -1,3 +1,8 @@
+---
+uid: docs.configs
+name: Configs
+---
+
 # Configs
 
 Config is a set of so called `jobs`, `columns`, `exporters`, `loggers`, `diagnosers`, `analysers`, `validators` that help you to build your benchmark. 
