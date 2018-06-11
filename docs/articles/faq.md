@@ -1,3 +1,8 @@
+---
+uid: docs.faq
+name: FAQ
+---
+
 # FAQ (Frequently asked questions)
 
 * **Q** Why can't I install BenchmarkDotNet in Visual Studio 2010/2012/2013?
@@ -46,7 +51,7 @@ For example, you can use the `SimpleJob` or `ShortRunJob` attributes:
 
 * **Q** My benchmark unexpectedly stopped and I saw the information about error code. What can I do?
 
-    **A** BenchmarkDotNet generates, builds and runs new process for every benchmark. This behavior is sometimes interpreted by anti-virus as dangerous, and the process is killed. Use `EnvironmentAnalyser` to detect antivirus software and configure your benchmark to use `InProcessToolchain`.
+    **A** BenchmarkDotNet generates, builds and runs new process for every benchmark. This behavior is sometimes interpreted by anti-virus as dangerous, and the process is killed. Use `EnvironmentAnalyser` to detect antivirus software and configure your benchmark to use [`InProcessToolchain`](xref:docs.toolchains#inprocesstoolchain).
 
 * **Q** Can I run benchmark on the virtual machine?
  
