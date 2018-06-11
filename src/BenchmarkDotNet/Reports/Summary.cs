@@ -27,8 +27,6 @@ namespace BenchmarkDotNet.Reports
         public ValidationError[] ValidationErrors { get; }
         public string AllRuntimes { get; }
 
-        private readonly Dictionary<Job, string> shortInfos;
-        private readonly Lazy<Job[]> jobs;
         private readonly Dictionary<Benchmark, BenchmarkReport> reportMap = new Dictionary<Benchmark, BenchmarkReport>();
         private readonly IOrderProvider orderProvider;
 
@@ -61,9 +59,8 @@ namespace BenchmarkDotNet.Reports
             Benchmarks = orderProvider.GetSummaryOrder(Benchmarks, this).ToArray();
             Reports = Benchmarks.Select(b => reportMap[b]).ToArray();
 
-            Table = GetTable(config.GetSummaryStyle());
-            shortInfos = new Dictionary<Job, string>();
-            jobs = new Lazy<Job[]>(() => Benchmarks.Select(b => b.Job).ToArray());
+            Style = config.GetSummaryStyle();
+            Table = GetTable(Style);
             AllRuntimes = BuildAllRuntimes();
         }
 
