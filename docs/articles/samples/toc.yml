@@ -18,3 +18,9 @@
   href: IntroJobBaseline.md
 - name: IntroEnvVars
   href: IntroEnvVars.md
+- name: IntroSetupCleanupGlobal
+  href: IntroSetupCleanupGlobal.md
+- name: IntroSetupCleanupIteration
+  href: IntroSetupCleanupIteration.md
+- name: IntroSetupCleanupTarget
+  href: IntroSetupCleanupTarget.md
