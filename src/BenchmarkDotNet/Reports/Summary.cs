@@ -4,6 +4,7 @@ using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Running;
@@ -106,6 +107,16 @@ namespace BenchmarkDotNet.Reports
                                              string resultsDirectoryPath,
                                              ValidationError[] validationErrors) 
             => new Summary(title, hostEnvironmentInfo, config, resultsDirectoryPath, TimeSpan.Zero, validationErrors, benchmarks, Array.Empty<BenchmarkReport>());
+
+        internal static Summary Join(List<Summary> summaries, IConfig commonSettingsConfig, ClockSpan clockSpan) 
+            => new Summary(
+                $"BenchmarkRun-joined-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}",
+                summaries.SelectMany(summary => summary.Reports).ToArray(),
+                HostEnvironmentInfo.GetCurrent(), 
+                commonSettingsConfig,
+                summaries.First().ResultsDirectoryPath,
+                clockSpan.GetTimeSpan(),
+                summaries.SelectMany(summary => summary.ValidationErrors).ToArray());
 
         private string BuildAllRuntimes()
         {

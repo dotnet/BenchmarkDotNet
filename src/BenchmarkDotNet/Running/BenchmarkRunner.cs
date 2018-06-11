@@ -102,7 +102,24 @@ namespace BenchmarkDotNet.Running
                         .ToDictionary(info => info.Benchmark, info => (info.Id, info.Value));
 
                     foreach (var benchmarkRunInfo in supportedBenchmarks) // we run them in the old order now using the new build artifacts
-                        results.Add(Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, logger, artifactsToCleanup, rootArtifactsFolderPath, ref globalChronometer));
+                    {
+                        var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, logger, artifactsToCleanup, rootArtifactsFolderPath, ref globalChronometer);
+                        
+                        if (summaryPerType)
+                            PrintSummary(logger, commonSettingsConfig, summary, globalChronometer.GetElapsed());
+                        
+                        results.Add(summary);
+                    }
+
+                    if (!summaryPerType)
+                    {
+                        var joinedSummary = Summary.Join(results, commonSettingsConfig, globalChronometer.GetElapsed());
+                        
+                        PrintSummary(logger, commonSettingsConfig, joinedSummary, globalChronometer.GetElapsed());
+                        
+                        results.Clear();
+                        results.Add(joinedSummary);
+                    }
 
                     return results.ToArray();
                 }
@@ -175,16 +192,20 @@ namespace BenchmarkDotNet.Running
 
                 logger.WriteLine();
             }
+            
             var clockSpan = globalChronometer.GetElapsed();
 
-            var summary = new Summary(title,
-                                      reports,
-                                      HostEnvironmentInfo.GetCurrent(),
-                                      config,
-                                      GetResultsFolderPath(rootArtifactsFolderPath),
-                                      clockSpan.GetTimeSpan(), 
-                                      Validate(new[] {benchmarkRunInfo }, NullLogger.Instance)); // validate them once again, but don't print the output
+            return new Summary(title,
+                reports,
+                HostEnvironmentInfo.GetCurrent(),
+                config,
+                GetResultsFolderPath(rootArtifactsFolderPath),
+                clockSpan.GetTimeSpan(), 
+                Validate(new[] {benchmarkRunInfo }, NullLogger.Instance)); // validate them once again, but don't print the output
+        }
 
+        private static void PrintSummary(ILogger logger, IConfig config, Summary summary, ClockSpan clockSpan)
+        {
             logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
             logger.WriteLine();
 
@@ -194,6 +215,7 @@ namespace BenchmarkDotNet.Running
             {
                 logger.WriteLineInfo($"  {file.Replace(currentDirectory, string.Empty).Trim('/', '\\')}");
             }
+
             logger.WriteLine();
 
             logger.WriteLineHeader("// * Detailed results *");
@@ -238,7 +260,6 @@ namespace BenchmarkDotNet.Running
 
             logger.WriteLine();
             logger.WriteLineHeader("// ***** BenchmarkRunner: End *****");
-            return summary;
         }
 
         private static ValidationError[] Validate(BenchmarkRunInfo[] benchmarks, ILogger logger)
