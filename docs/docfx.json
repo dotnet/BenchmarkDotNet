@@ -30,6 +30,8 @@
         "files": [
           "articles/**.md",
           "articles/**/toc.yml",
+          "changelog/toc.yml",
+          "changelog/*.md",
           "toc.yml",
           "*.md"
         ]
