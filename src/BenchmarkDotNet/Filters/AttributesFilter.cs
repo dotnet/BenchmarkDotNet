@@ -4,6 +4,9 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Filters
 {
+    /// <summary>
+    /// filters benchmarks by provided attribute names
+    /// </summary>
     public class AttributesFilter : IFilter
     {
         private readonly string[] attributes;

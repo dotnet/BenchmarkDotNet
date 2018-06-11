@@ -5,6 +5,9 @@ using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Filters
 {
+    /// <summary>
+    /// filters benchmarks by provided type names
+    /// </summary>
     public class TypeNamesFilter : IFilter
     {
         private readonly string[] typeNames;

@@ -24,3 +24,9 @@
   href: IntroSetupCleanupIteration.md
 - name: IntroSetupCleanupTarget
   href: IntroSetupCleanupTarget.md
+- name: IntroCategories
+  href: IntroCategories.md
+- name: IntroFilters
+  href: IntroFilters.md
+- name: IntroJoin
+  href: IntroJoin.md  

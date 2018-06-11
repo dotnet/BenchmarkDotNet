@@ -4,6 +4,9 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Filters
 {
+    /// <summary>
+    /// filters benchmarks by provided method names
+    /// </summary>
     public class MethodNamesFilter : IFilter
     {
         private readonly string[] methodNames;

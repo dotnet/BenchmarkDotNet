@@ -4,6 +4,9 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Filters
 {
+    /// <summary>
+    /// filters benchmarks by provided namespaces
+    /// </summary>
     public class NamespacesFilter : IFilter
     {
         private readonly string[] namespaces;
