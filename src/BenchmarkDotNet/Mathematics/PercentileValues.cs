@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 
@@ -76,6 +77,10 @@ namespace BenchmarkDotNet.Mathematics
         }
 
         public string ToStr(bool showLevel = true) => $"[P95: {P95.ToStr()}] [P0: {P0.ToStr()}]; [P50: {P50.ToStr()}]; [P100: {P100.ToStr()}]";
-        public string ToTimeStr(TimeUnit unit = null, bool showLevel = true) => $"[P95: {P95.ToTimeStr(unit)}] [P0: {P0.ToTimeStr(unit)}]; [P50: {P50.ToTimeStr(unit)}]; [P100: {P100.ToTimeStr(unit)})]";
+        public string ToTimeStr(TimeUnit unit = null, bool showLevel = true, Encoding encoding = null)
+        {
+            encoding = encoding ?? Encoding.ASCII;
+            return $"[P95: {P95.ToTimeStr(unit, encoding)}] [P0: {P0.ToTimeStr(unit, encoding)}]; [P50: {P50.ToTimeStr(unit, encoding)}]; [P100: {P100.ToTimeStr(unit, encoding)})]";
+        }
     }
 }

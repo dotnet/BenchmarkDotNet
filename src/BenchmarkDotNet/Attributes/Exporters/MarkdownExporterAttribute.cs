@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Exporters;
 
-namespace BenchmarkDotNet.Attributes.Exporters
+namespace BenchmarkDotNet.Attributes
 {
     // TODO: Find a better way to introduce dialects in the attribute
     public class MarkdownExporterAttribute : ExporterConfigBaseAttribute

@@ -23,5 +23,6 @@ namespace BenchmarkDotNet.Analysers
 
         public Conclusion CreateHint(string message, [CanBeNull] BenchmarkReport report = null) => Conclusion.CreateHint(Id, message, report);
         public Conclusion CreateWarning(string message, [CanBeNull] BenchmarkReport report = null) => Conclusion.CreateWarning(Id, message, report);
+        public Conclusion CreateError(string message, [CanBeNull] BenchmarkReport report = null) => Conclusion.CreateError(Id, message, report);
     }
 }

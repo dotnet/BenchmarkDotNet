@@ -14,6 +14,8 @@ namespace BenchmarkDotNet.Toolchains.Results
             BuildException = buildException;
         }
 
+        public bool FailedToAccess => IsGenerateSuccess && !IsBuildSuccess && BuildException.Message.Contains("cannot access");
+
         public static BuildResult Success(GenerateResult generateResult) => new BuildResult(generateResult, true, null);
 
         public static BuildResult Failure(GenerateResult generateResult, Exception exception = null) => new BuildResult(generateResult, false, exception);

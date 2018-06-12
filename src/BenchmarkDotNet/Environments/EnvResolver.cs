@@ -8,6 +8,8 @@ namespace BenchmarkDotNet.Environments
 {
     public class EnvResolver : Resolver
     {
+        public const int DefaultUnrollFactorForThroughput = 16;
+
         public static readonly IResolver Instance = new CompositeResolver(new EnvResolver(), GcResolver.Instance);
 
         private EnvResolver()
@@ -26,7 +28,7 @@ namespace BenchmarkDotNet.Environments
                 switch (strategy)
                 {
                     case RunStrategy.Throughput:
-                        return 16;
+                        return DefaultUnrollFactorForThroughput;
                     case RunStrategy.ColdStart:
                     case RunStrategy.Monitoring:
                         return 1;

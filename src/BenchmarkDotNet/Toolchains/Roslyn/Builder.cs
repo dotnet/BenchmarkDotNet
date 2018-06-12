@@ -4,8 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
@@ -36,6 +34,8 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 allowUnsafe: true,
                 platform: GetPlatform(buildPartition.Platform),
                 deterministic: true);
+
+            compilationOptions = compilationOptions.WithIgnoreCorLibraryDuplicatedTypes();
 
             var references = Generator
                 .GetAllReferences(buildPartition.RepresentativeBenchmark)

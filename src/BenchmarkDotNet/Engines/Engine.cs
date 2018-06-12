@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Engines
@@ -29,7 +29,8 @@ namespace BenchmarkDotNet.Engines
         public Action IterationSetupAction { get; }
         public Action IterationCleanupAction { get; }
         public IResolver Resolver { get; }
-
+        public Encoding Encoding { get; }
+        
         private IClock Clock { get; }
         private bool ForceAllocations { get; }
         private int UnrollFactor { get; }
@@ -41,13 +42,13 @@ namespace BenchmarkDotNet.Engines
         private readonly EngineWarmupStage warmupStage;
         private readonly EngineTargetStage targetStage;
         private readonly bool includeMemoryStats;
-        private bool isJitted;
 
         internal Engine(
             IHost host,
+            IResolver resolver,
             Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> idleAction, Action<long> mainAction, Job targetJob,
             Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
-            bool includeMemoryStats)
+            bool includeMemoryStats, Encoding encoding)
         {
             
             Host = host;
@@ -64,7 +65,8 @@ namespace BenchmarkDotNet.Engines
             OperationsPerInvoke = operationsPerInvoke;
             this.includeMemoryStats = includeMemoryStats;
 
-            Resolver = new CompositeResolver(BenchmarkRunner.DefaultResolver, EngineResolver.Instance);
+            Resolver = resolver;
+            Encoding = encoding;
 
             Clock = targetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, Resolver);
             ForceAllocations = targetJob.ResolveValue(GcMode.ForceCharacteristic, Resolver);
@@ -78,22 +80,10 @@ namespace BenchmarkDotNet.Engines
             targetStage = new EngineTargetStage(this);
         }
 
-        public void Jitting()
-        {
-            // first signal about jitting is raised from auto-generated Program.cs, look at BenchmarkProgram.txt
-            Dummy1Action.Invoke();
-            MainAction.Invoke(1);
-            Dummy2Action.Invoke();
-            IdleAction.Invoke(1);
-            Dummy3Action.Invoke();
-            isJitted = true;
-        }
+        public void Dispose() => GlobalCleanupAction?.Invoke();
 
         public RunResults Run()
         {
-            if (Strategy.NeedsJitting() != isJitted)
-                throw new Exception($"You must{(Strategy.NeedsJitting() ? "" : " not")} call Jitting() first (Strategy = {Strategy})!");
-
             long invokeCount = InvocationCount;
             IReadOnlyList<Measurement> idle = null;
 
@@ -123,9 +113,9 @@ namespace BenchmarkDotNet.Engines
                 ? MeasureGcStats(new IterationData(IterationMode.MainTarget, 0, invokeCount, UnrollFactor)) 
                 : GcStats.Empty;
 
-            bool removeOutliers = TargetJob.ResolveValue(AccuracyMode.RemoveOutliersCharacteristic, Resolver);
+            var outlierMode = TargetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, Resolver);
 
-            return new RunResults(idle, main, removeOutliers, workGcHasDone);
+            return new RunResults(idle, main, outlierMode, workGcHasDone, Encoding);
         }
 
         public Measurement RunIteration(IterationData data)
@@ -134,9 +124,12 @@ namespace BenchmarkDotNet.Engines
             long invokeCount = data.InvokeCount;
             int unrollFactor = data.UnrollFactor;
             long totalOperations = invokeCount * OperationsPerInvoke;
-            var action = data.IterationMode.IsIdle() ? IdleAction : MainAction;
+            bool isIdle = data.IterationMode.IsIdle();
+            var action = isIdle ? IdleAction : MainAction;
 
-            IterationSetupAction();
+            if(!isIdle)
+                IterationSetupAction();
+
             GcCollect();
 
             // Measure
@@ -144,11 +137,13 @@ namespace BenchmarkDotNet.Engines
             action(invokeCount / unrollFactor);
             var clockSpan = clock.GetElapsed();
 
-            IterationCleanupAction();
+            if(!isIdle)
+                IterationCleanupAction();
+
             GcCollect();
 
             // Results
-            var measurement = new Measurement(0, data.IterationMode, data.Index, totalOperations, clockSpan.GetNanoseconds());
+            var measurement = new Measurement(0, data.IterationMode, data.Index, totalOperations, clockSpan.GetNanoseconds(), Encoding);
             WriteLine(measurement.ToOutputLine());
 
             return measurement;

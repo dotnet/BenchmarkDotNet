@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -30,6 +31,10 @@ namespace BenchmarkDotNet.Extensions
         /// </summary>
         internal static string GetCorrectCSharpTypeName(this Type type)
         {
+            // the reflection is missing information about types passed by ref (ie ref ValuTuple<int> is reported as NON generic type)
+            if (type.IsByRef && !type.IsGenericType && type.Name.Contains('`'))
+                type = type.GetElementType(); // https://github.com/dotnet/corefx/issues/29975#issuecomment-393134330
+
             if (type == typeof(void))
                 return "void";
             var prefix = "";
@@ -60,7 +65,7 @@ namespace BenchmarkDotNet.Extensions
             if (type.IsArray)
                 return GetCorrectCSharpTypeName(type.GetElementType()) + "[" + new string(',', type.GetArrayRank() - 1) + "]";
 
-            return prefix + type.Name;
+            return prefix + type.Name.Replace("&", string.Empty);
         }
 
         /// <summary>
@@ -75,8 +80,6 @@ namespace BenchmarkDotNet.Extensions
         {
             if (!typeInfo.IsGenericType)
                 return typeInfo.Name;
-            if (typeInfo.IsGenericTypeDefinition)
-                throw new NotSupportedException("Open generics are not supported");
 
             var mainName = typeInfo.Name.Substring(0, typeInfo.Name.IndexOf('`'));
             string args = string.Join(", ", typeInfo.GetGenericArguments().Select(GetDisplayName).ToArray());
@@ -116,12 +119,6 @@ namespace BenchmarkDotNet.Extensions
             }
         }
 
-        internal static bool IsStruct(this Type type)
-        {
-            var typeInfo = type.GetTypeInfo();
-            return typeInfo.IsValueType && !typeInfo.IsPrimitive;
-        }
-
         internal static Type[] GetRunnableBenchmarks(this Assembly assembly)
             => assembly
                 .GetTypes()
@@ -133,8 +130,11 @@ namespace BenchmarkDotNet.Extensions
         internal static bool ContainsRunnableBenchmarks(this Type type)
         {
             var typeInfo = type.GetTypeInfo();
-
-            if (typeInfo.IsAbstract || typeInfo.IsSealed || typeInfo.IsNotPublic || (typeInfo.IsGenericType && !IsRunnableGenericType(typeInfo)))
+            
+            if (typeInfo.IsAbstract 
+                || typeInfo.IsSealed 
+                || typeInfo.IsNotPublic 
+                || (typeInfo.IsGenericType && !IsRunnableGenericType(typeInfo)))
                 return false;
 
             return typeInfo.GetBenchmarks().Any();
@@ -173,8 +173,33 @@ namespace BenchmarkDotNet.Extensions
             return joined;
         }
 
+        internal static bool IsStackOnlyWithImplicitCast(this Type argumentType, object argumentInstance)
+        {
+            if (argumentInstance == null)
+                return false;
+            
+            // IsByRefLikeAttribute is not exposed for older runtimes, so we need to check it in an ugly way ;)
+            var isByRefLike = argumentType.GetCustomAttributes().Any(attribute => attribute.ToString().Contains("IsByRefLike"));
+            if (!isByRefLike)
+                return false;
+
+            var instanceType = argumentInstance.GetType();
+
+            var implicitCastsDefinedInArgumentInstance = instanceType.GetMethods().Where(method => method.Name == "op_Implicit" && method.GetParameters().Any()).ToArray();
+            if (implicitCastsDefinedInArgumentInstance.Any(implicitCast => implicitCast.ReturnType == argumentType && implicitCast.GetParameters().All(p => p.ParameterType == instanceType)))
+                return true;
+                
+            var implicitCastsDefinedInArgumentType = argumentType.GetMethods().Where(method => method.Name == "op_Implicit" && method.GetParameters().Any()).ToArray();
+            if (implicitCastsDefinedInArgumentType.Any(implicitCast => implicitCast.ReturnType == argumentType && implicitCast.GetParameters().All(p => p.ParameterType == instanceType)))
+                return true;
+
+            return false;
+        }
+
         private static bool IsRunnableGenericType(TypeInfo typeInfo)
-            => !typeInfo.IsGenericTypeDefinition // is not an open generic
-            && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it
+            => // if it is an open generic - there must be GenericBenchmark attributes
+                (!typeInfo.IsGenericTypeDefinition || (typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any()))
+                    && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it       
+
     }
 }

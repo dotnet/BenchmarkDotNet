@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;

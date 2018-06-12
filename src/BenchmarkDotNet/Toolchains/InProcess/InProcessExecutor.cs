@@ -4,16 +4,14 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading;
-using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
@@ -84,7 +82,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     $"Benchmark {executeParameters.Benchmark.DisplayInfo} takes to long to run. " +
                     "Prefer to use out-of-process toolchains for long-running benchmarks.");
 
-            return GetExecutionResult(host.RunResults, exitCode, executeParameters.Logger);
+            return GetExecutionResult(host.RunResults, exitCode, executeParameters.Logger, executeParameters.Config.Encoding);
         }
 
         private int ExecuteCore(IHost host, ExecuteParameters parameters)
@@ -127,7 +125,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             return exitCode;
         }
 
-        private ExecuteResult GetExecutionResult(RunResults runResults, int exitCode, ILogger logger)
+        private ExecuteResult GetExecutionResult(RunResults runResults, int exitCode, ILogger logger, Encoding encoding)
         {
             if (exitCode != 0)
             {

@@ -1,0 +1,2 @@
+Old versions of the NuGet package use `https://raw.githubusercontent.com/dotnet/BenchmarkDotNet/master/docs/guide/logo.png` as a logo url.
+So, we have to keep the `logo.png` file for backward compatibility.

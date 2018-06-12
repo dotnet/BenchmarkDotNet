@@ -22,12 +22,12 @@ namespace BenchmarkDotNet.Exporters
                 logger.WriteLineHeader($"*** {report.Benchmark.DisplayInfo} ***");
                 logger.WriteLineHeader("* Raw *");
                 foreach (var run in runs)
-                    logger.WriteLineResult(run.ToStr());
+                    logger.WriteLineResult(run.ToStr(summary.Config.Encoding));
                 foreach (var mode in modes)
                 {
                     logger.WriteLine();
                     logger.WriteLineHeader($"* Statistics for {mode}");
-                    logger.WriteLineStatistic(runs.Where(it => it.IterationMode == mode).GetStatistics().ToTimeStr(calcHistogram: true));
+                    logger.WriteLineStatistic(runs.Where(it => it.IterationMode == mode).GetStatistics().ToTimeStr(summary.Config.Encoding, calcHistogram: true));
                 }
             }
         }

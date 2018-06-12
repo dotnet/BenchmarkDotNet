@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
@@ -40,6 +41,11 @@ namespace BenchmarkDotNet.Configs
         /// the default value is "./BenchmarkDotNet.Artifacts"
         /// </summary>
         string ArtifactsPath { get; }
+        
+        /// <summary>
+        /// the default value is ASCII
+        /// </summary>
+        Encoding Encoding { get; }
 
         IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules();
     }

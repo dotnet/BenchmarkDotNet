@@ -12,6 +12,7 @@ using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Reports;
 using System.IO;
+using System.Text;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -46,6 +47,7 @@ namespace BenchmarkDotNet.Configs
             yield return MinIterationTimeAnalyser.Default;
             yield return IterationSetupCleanupAnalyser.Default;
             yield return MultimodalDistributionAnalyzer.Default;
+            yield return RuntimeErrorAnalyser.Default;
         }
 
         public IEnumerable<IValidator> GetValidators()
@@ -55,7 +57,8 @@ namespace BenchmarkDotNet.Configs
 #if !DEBUG
             yield return JitOptimizationsValidator.FailOnError;
 #endif
-            yield return UnrollFactorValidator.Default;
+            yield return RunModeValidator.FailOnError;
+            yield return GenericBenchmarksValidator.DontFailOnError;
         }
 
         public IEnumerable<Job> GetJobs() => Array.Empty<Job>();
@@ -67,6 +70,8 @@ namespace BenchmarkDotNet.Configs
         public bool KeepBenchmarkFiles => false;
 
         public string ArtifactsPath => Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");
+
+        public Encoding Encoding => Encoding.ASCII;
 
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => Array.Empty<BenchmarkLogicalGroupRule>();
 

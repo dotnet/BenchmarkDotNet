@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
@@ -39,6 +40,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IFilter> GetFilters() => filters;
         public IOrderProvider GetOrderProvider() => orderProvider;
         public ISummaryStyle GetSummaryStyle() => summaryStyle;
+        
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => logicalGroupRules;
 
         public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
@@ -47,6 +49,8 @@ namespace BenchmarkDotNet.Configs
 
         public string ArtifactsPath { get; set; }
 
+        public Encoding Encoding { get; set; }
+        
         public void Add(params IColumn[] newColumns) => columnProviders.AddRange(newColumns.Select(c => c.ToProvider()));
         public void Add(params IColumnProvider[] newColumnProviders) => columnProviders.AddRange(newColumnProviders);
         public void Add(params IExporter[] newExporters) => exporters.AddRange(newExporters);
@@ -59,6 +63,7 @@ namespace BenchmarkDotNet.Configs
         public void Add(params IFilter[] newFilters) => filters.AddRange(newFilters);
         public void Set(IOrderProvider provider) => orderProvider = provider ?? orderProvider;
         public void Set(ISummaryStyle style) => summaryStyle = style ?? summaryStyle;
+        public void Set(Encoding encoding) => Encoding = encoding;
         public void Add(params BenchmarkLogicalGroupRule[] rules) => AddRules(rules);
 
         public void Add(IConfig config)
@@ -75,6 +80,7 @@ namespace BenchmarkDotNet.Configs
             orderProvider = config.GetOrderProvider() ?? orderProvider;
             KeepBenchmarkFiles |= config.KeepBenchmarkFiles;
             ArtifactsPath = config.ArtifactsPath ?? ArtifactsPath;
+            Encoding = config.Encoding ?? Encoding;
             summaryStyle = summaryStyle ?? config.GetSummaryStyle();
             AddRules(config.GetLogicalGroupRules());
         }
@@ -145,9 +151,11 @@ namespace BenchmarkDotNet.Configs
             {
                 case ConfigUnionRule.AlwaysUseLocal:
                     manualConfig.Add(localConfig);
+                    manualConfig.Add(globalConfig.GetFilters().ToArray()); // the filters should be merged anyway
                     break;
                 case ConfigUnionRule.AlwaysUseGlobal:
                     manualConfig.Add(globalConfig);
+                    manualConfig.Add(localConfig.GetFilters().ToArray()); // the filters should be merged anyway
                     break;
                 case ConfigUnionRule.Union:
                     manualConfig.Add(globalConfig);

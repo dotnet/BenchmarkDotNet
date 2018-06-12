@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Validators
         {
             BaselineValidator.FailOnError,
             SetupCleanupValidator.FailOnError,
-            UnrollFactorValidator.Default,
+            RunModeValidator.FailOnError,
             DiagnosersValidator.Default,
             CompilationValidator.Default,
             ConfigValidator.Default,

@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Running
         public bool Baseline { get; }
         public string[] Categories { get; }
 
-        private string TypeInfo => Type?.GetDisplayName() ?? "Untitled";
+        internal string TypeInfo => Type?.GetDisplayName() ?? "Untitled";
         private string MethodFolderInfo => Method?.Name ?? "Untitled";
 
         public string FolderInfo => (Type != null ? FolderNameHelper.ToFolderName(Type) : "Untitled") + "_" + MethodFolderInfo;

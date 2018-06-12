@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Tests.XUnit;
 using JetBrains.Annotations;
 using Xunit;
 
@@ -14,12 +16,28 @@ namespace BenchmarkDotNet.Tests
         {
             CheckCorrectTypeName("System.Int32", typeof(int));
             CheckCorrectTypeName("System.Int32[]", typeof(int[]));
+            CheckCorrectTypeName("System.Int32[][]", typeof(int[][]));
             CheckCorrectTypeName("System.Int32[,]", typeof(int[,]));
             CheckCorrectTypeName("System.Tuple<System.Int32, System.Int32>[]", typeof(Tuple<int, int>[]));
+            CheckCorrectTypeName("System.ValueTuple<System.Int32, System.Int32>[]", typeof(ValueTuple<int, int>[]));
             CheckCorrectTypeName("void", typeof(void));
             CheckCorrectTypeName("System.IEquatable<T>", typeof(IEquatable<>));
             CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedNonGeneric1.NestedNonGeneric2", typeof(NestedNonGeneric1.NestedNonGeneric2));
-            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedNonGeneric1.NestedGeneric2<System.Int16, System.Boolean, System.Decimal>", typeof(NestedNonGeneric1.NestedGeneric2<short, bool, decimal>));
+            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedNonGeneric1.NestedGeneric2<System.Int16, System.Boolean, System.Decimal>",
+                typeof(NestedNonGeneric1.NestedGeneric2<short, bool, decimal>));
+        }
+
+        [Fact]
+        public void GetCorrectCSharpTypeNameSupportsGenericTypesPassedByReference()
+        {
+            var byRefGenericType = typeof(GenericByRef).GetMethod(nameof(GenericByRef.TheMethod)).GetParameters().Single().ParameterType;
+
+            CheckCorrectTypeName("System.ValueTuple<System.Int32, System.Int16>", byRefGenericType);
+        }
+
+        public class GenericByRef
+        {
+            public void TheMethod(ref ValueTuple<int, short> _) { }
         }
 
         [AssertionMethod]
@@ -31,6 +49,7 @@ namespace BenchmarkDotNet.Tests
         public class NestedNonGeneric1
         {
             public class NestedNonGeneric2 { }
+
             public class NestedGeneric2<TA, TB, TC> { }
         }
 
@@ -68,6 +87,33 @@ namespace BenchmarkDotNet.Tests
             private GenericNoPublicCtor() { }
 
             [Benchmark] public T Create() => default;
+        }
+        
+        [FactDotNetCore21Only("the implicit cast operator is available only in .NET Core 2.1+ (See https://github.com/dotnet/corefx/issues/30121 for more)")]
+        public void StringCanBeUsedAsReadOnlySpanOfCharArgument() => Assert.True(typeof(ReadOnlySpan<char>).IsStackOnlyWithImplicitCast("a string"));
+
+        [Fact]
+        public void StackOnlyTypesWithImplicitCastOperatorAreSupportedAsArguments()
+        {
+            Assert.True(typeof(Span<byte>).IsStackOnlyWithImplicitCast(new byte[] { 1, 2, 3 }));
+            Assert.True(typeof(StackOnlyStruct<byte>).IsStackOnlyWithImplicitCast(new WithImplicitCastToStackOnlyStruct<byte>()));
+
+            Assert.False(typeof(StackOnlyStruct<byte>).IsStackOnlyWithImplicitCast(new WithImplicitCastToStackOnlyStruct<bool>())); // different T
+
+            Assert.False(typeof(List<byte>).IsStackOnlyWithImplicitCast(new byte[] { 1, 3, 3 }));
+        }
+
+        public ref struct StackOnlyStruct<T>
+        {
+            public Span<T> Span;
+        }
+
+        public class WithImplicitCastToStackOnlyStruct<T>
+        {
+            public T[] Array;
+
+            public static implicit operator StackOnlyStruct<T>(WithImplicitCastToStackOnlyStruct<T> instance)
+                => new StackOnlyStruct<T> { Span = instance.Array };
         }
     }
 }

@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Tests.Mathematics
             output.WriteLine("Max = " + summary.Max);
             output.WriteLine("InterquartileRange = " + summary.InterquartileRange);
             output.WriteLine("StandardDeviation = " + summary.StandardDeviation);
-            output.WriteLine("Outlier = [" + string.Join("; ", summary.Outliers) + "]");
+            output.WriteLine("Outlier = [" + string.Join("; ", summary.AllOutliers) + "]");
             output.WriteLine("CI = " + summary.ConfidenceInterval.ToStr());
             output.WriteLine("Percentiles = " + summary.Percentiles.ToStr());
         }
@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Tests.Mathematics
             Assert.Equal(1, summary.Max);
             Assert.Equal(0, summary.InterquartileRange);
             Assert.Equal(0, summary.StandardDeviation);
-            Assert.Equal(Array.Empty<double>(), summary.Outliers);
+            Assert.Equal(Array.Empty<double>(), summary.AllOutliers);
             Assert.Equal(1, summary.Percentiles.P0);
             Assert.Equal(1, summary.Percentiles.P25);
             Assert.Equal(1, summary.Percentiles.P50);
@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Tests.Mathematics
             Assert.Equal(2, summary.Max);
             Assert.Equal(1, summary.InterquartileRange);
             Assert.Equal(0.70711, summary.StandardDeviation, 4);
-            Assert.Equal(Array.Empty<double>(), summary.Outliers);
+            Assert.Equal(Array.Empty<double>(), summary.AllOutliers);
             Assert.Equal(1, summary.Percentiles.P0);
             Assert.Equal(1.25, summary.Percentiles.P25);
             Assert.Equal(1.5, summary.Percentiles.P50);
@@ -102,7 +102,7 @@ namespace BenchmarkDotNet.Tests.Mathematics
             Assert.Equal(4, summary.Max);
             Assert.Equal(3, summary.InterquartileRange);
             Assert.Equal(1.52753, summary.StandardDeviation, 4);
-            Assert.Equal(Array.Empty<double>(), summary.Outliers);
+            Assert.Equal(Array.Empty<double>(), summary.AllOutliers);
             Assert.Equal(1, summary.Percentiles.P0);
             Assert.Equal(1.5, summary.Percentiles.P25);
             Assert.Equal(2, summary.Percentiles.P50);
@@ -126,7 +126,7 @@ namespace BenchmarkDotNet.Tests.Mathematics
             Assert.Equal(64, summary.Max);
             Assert.Equal(30, summary.InterquartileRange);
             Assert.Equal(22.9378, summary.StandardDeviation, 4);
-            Assert.Equal(Array.Empty<double>(), summary.Outliers);
+            Assert.Equal(Array.Empty<double>(), summary.AllOutliers);
             Assert.Equal(1, summary.Percentiles.P0);
             Assert.Equal(3, summary.Percentiles.P25);
             Assert.Equal(8, summary.Percentiles.P50);
@@ -140,7 +140,9 @@ namespace BenchmarkDotNet.Tests.Mathematics
         {
             var summary = new Statistics(1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 10, 10.1);
             Print(summary);
-            Assert.Equal(new[] { 10, 10.1 }, summary.Outliers);
+            Assert.Equal(new[] { 10, 10.1 }, summary.AllOutliers);
+            Assert.Equal(new[] { 10, 10.1 }, summary.UpperOutliers);
+            Assert.Equal(Array.Empty<double>(), summary.LowerOutliers);
         }
 
         [Fact]

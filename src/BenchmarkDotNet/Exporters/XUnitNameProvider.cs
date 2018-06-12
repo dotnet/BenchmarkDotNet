@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 
@@ -80,6 +81,12 @@ namespace BenchmarkDotNet.Exporters
         {
             if (argumentValue == null)
                 return "null";
+
+            if (argumentValue is IParam iparam)
+                return GetArgument(iparam.Value, argumentType);
+            
+            if (argumentValue is object[] array && array.Length == 1)
+                return GetArgument(array[0], argumentType);
 
             if (argumentValue is string text)
                 return $"\"{text}\"";

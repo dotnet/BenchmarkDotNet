@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Threading;
 using BenchmarkDotNet.Loggers;
@@ -15,6 +16,7 @@ namespace BenchmarkDotNet.Toolchains
 
         private Process process;
         private ILogger logger;
+        private ConsoleColor? colorBefore;
 
         public ConsoleHandler(ILogger logger)
         {
@@ -44,6 +46,8 @@ namespace BenchmarkDotNet.Toolchains
         // This method gives us a chance to make a "best-effort" to clean anything up after Ctrl-C is type in the Console
         private void HandlerCallback(object sender, ConsoleCancelEventArgs e)
         {
+            Console.ResetColor();
+
             if (e.SpecialKey != ConsoleSpecialKey.ControlC && e.SpecialKey != ConsoleSpecialKey.ControlBreak)
                 return;
 
@@ -109,6 +113,21 @@ namespace BenchmarkDotNet.Toolchains
                 // Swallow!!
             }
             return true;
+        }
+
+        public static void SetForegroundColor(ConsoleColor color)
+        {
+            Instance.colorBefore = Console.ForegroundColor;
+            Console.ForegroundColor = color;
+        }
+
+        public static void RestoreForegroundColor()
+        {
+            if (Instance.colorBefore.HasValue)
+            {
+                Console.ForegroundColor = Instance.colorBefore.Value;
+                Instance.colorBefore = null;
+            }
         }
     }
 }

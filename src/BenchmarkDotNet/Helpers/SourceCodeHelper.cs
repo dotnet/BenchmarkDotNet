@@ -14,8 +14,8 @@ namespace BenchmarkDotNet.Helpers
                 return "null";
             if (value is bool)
                 return ((bool) value).ToLowerCase();
-            if (value is string)
-                return $"\"{value.ToString().Replace("\\", "\\\\")}\"";
+            if (value is string text)
+                return $"$@\"{text.Replace("\"", "\"\"").Replace("{", "{{").Replace("}", "}}")}\"";
             if (value is char)
                 return (char) value == '\\' ? "'\\\\'" : $"'{value}'";
             if (value is float)
@@ -37,6 +37,39 @@ namespace BenchmarkDotNet.Helpers
             if (value is IFormattable)
                 return ((IFormattable)value).ToString(null, CultureInfo.InvariantCulture);
             return value.ToString();
+        }
+
+        public static bool IsCompilationTimeConstant(object value) 
+            => value == null || IsCompilationTimeConstant(value.GetType());
+
+        public static bool IsCompilationTimeConstant(Type type)
+        {
+            if (type == typeof(bool))
+                return true;
+            if (type == typeof(string))
+                return true;
+            if (type == typeof(char))
+                return true;
+            if (type == typeof(float))
+                return true;
+            if (type == typeof(double))
+                return true;
+            if (type == typeof(decimal))
+                return true;
+            if (type.IsEnum)
+                return true;
+            if (type == typeof(Type))
+                return true;
+            if (!type.IsValueType) // the difference!!
+                return false;
+            if (type == typeof(TimeInterval))
+                return true;
+            if (type == typeof(IntPtr))
+                return true;
+            if (typeof(IFormattable).IsAssignableFrom(type))
+                return true;
+
+            return false;
         }
     }
 }

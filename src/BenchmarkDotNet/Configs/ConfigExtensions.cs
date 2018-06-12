@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
@@ -39,6 +40,7 @@ namespace BenchmarkDotNet.Configs
         public static IConfig With(this IConfig config, IOrderProvider provider) => config.With(m => m.Set(provider));
         public static IConfig With(this IConfig config, params HardwareCounter[] counters) => config.With(c => c.Add(counters));
         public static IConfig With(this IConfig config, params IFilter[] filters) => config.With(c => c.Add(filters));
+        public static IConfig With(this IConfig config, Encoding encoding) => config.With(c => c.Set(encoding));
 
         public static IConfig KeepBenchmarkFiles(this IConfig config, bool value = true) => config.With(m => m.KeepBenchmarkFiles = value);
         public static IConfig RemoveBenchmarkFiles(this IConfig config) => config.KeepBenchmarkFiles(false);

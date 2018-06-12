@@ -10,8 +10,8 @@ namespace BenchmarkDotNet.Tests.Engine
 {
     public class EngineTargetStageTests
     {
-        private const int MinIterationCount = EngineTargetStage.MinIterationCount;
-        private const int MaxIterationCount = EngineTargetStage.MaxIterationCount;
+        private const int MinIterationCount = EngineResolver.DefaultMinTargetIterationCount;
+        private const int MaxIterationCount = EngineResolver.DefaultMaxTargetIterationCount;
         private const int MaxIdleIterationCount = EngineTargetStage.MaxIdleIterationCount;
 
         private readonly ITestOutputHelper output;

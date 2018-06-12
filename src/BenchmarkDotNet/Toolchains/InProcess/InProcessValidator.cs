@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 { AccuracyMode.MaxAbsoluteErrorCharacteristic, DontValidate },
                 { AccuracyMode.MinInvokeCountCharacteristic, DontValidate },
                 { AccuracyMode.MinIterationTimeCharacteristic, DontValidate },
-                { AccuracyMode.RemoveOutliersCharacteristic, DontValidate },
+                { AccuracyMode.OutlierModeCharacteristic, DontValidate },
                 { InfrastructureMode.ClockCharacteristic, DontValidate },
                 { InfrastructureMode.EngineFactoryCharacteristic, DontValidate },
                 { InfrastructureMode.ToolchainCharacteristic, ValidateToolchain }

@@ -89,7 +89,7 @@ namespace BenchmarkDotNet.Toolchains
         {
             if (envMode.HasValue(EnvMode.JitCharacteristic))
             {
-                string useLegacyJit = envMode.Jit == Jit.RyuJit ? "0" : "1";
+                string useLegacyJit = envMode.Jit.ToConfig();
                 CreateNodeWithAttribute(xmlDocument, runtimeElement, "useLegacyJit", "enabled", useLegacyJit);
             }
         }

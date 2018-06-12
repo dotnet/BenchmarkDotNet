@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Extensions;
+﻿using System.Text;
+using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -18,8 +19,9 @@ namespace BenchmarkDotNet.Reports
         public static double GetAverageNanoseconds(this Measurement report) =>
             report.Nanoseconds / report.Operations;
 
-        public static string ToStr(this Measurement run) =>
-            $"{run.IterationMode} {run.IterationIndex}: {run.Operations} op, {run.Nanoseconds.ToStr()} ns, {run.GetAverageNanoseconds().ToTimeStr()}/op";
+        //TODO OPTIONAL ENCODING
+        public static string ToStr(this Measurement run, Encoding encoding) =>
+            $"{run.IterationMode} {run.IterationIndex}: {run.Operations} op, {run.Nanoseconds.ToStr()} ns, {run.GetAverageNanoseconds().ToTimeStr(encoding ?? Encoding.ASCII)}/op";
 
     }
 }

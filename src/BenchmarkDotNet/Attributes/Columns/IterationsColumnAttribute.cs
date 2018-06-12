@@ -1,7 +1,7 @@
 ﻿using BenchmarkDotNet.Columns;
 using JetBrains.Annotations;
 
-namespace BenchmarkDotNet.Attributes.Columns
+namespace BenchmarkDotNet.Attributes
 {
     [PublicAPI]
     public class IterationsColumnAttribute : ColumnConfigBaseAttribute

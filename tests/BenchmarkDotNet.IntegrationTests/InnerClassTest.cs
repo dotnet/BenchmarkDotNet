@@ -1,9 +1,5 @@
-﻿using BenchmarkDotNet.Jobs;
-using System;
+﻿using System;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using Xunit;
 using Xunit.Abstractions;

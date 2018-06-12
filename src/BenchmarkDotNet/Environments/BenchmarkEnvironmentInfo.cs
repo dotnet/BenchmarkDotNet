@@ -4,6 +4,8 @@ using System.Linq;
 using System.Runtime;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -67,6 +69,15 @@ namespace BenchmarkDotNet.Environments
         {
             string jitInfo = string.Join(" ", new[] { JitInfo, GetConfigurationFlag(), GetDebuggerFlag() }.Where(title => title != ""));
             return $"{RuntimeVersion}, {Architecture} {jitInfo}";
+        }
+
+        public static IEnumerable<ValidationError> Validate(Job job)
+        {
+            if (job.Env.Jit == Jit.RyuJit && !RuntimeInformation.HasRyuJit())
+                yield return new ValidationError(true, "RyuJIT is requested but it is not available in current environment");
+            var currentRuntime = RuntimeInformation.GetCurrentRuntime();
+            if (job.Env.Jit == Jit.LegacyJit && !currentRuntime.Equals(Runtime.Clr))
+                yield return new ValidationError(true, $"LegacyJIT is requested but it is not available for {currentRuntime}");
         }
     }
 }

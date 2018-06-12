@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -135,7 +134,9 @@ namespace BenchmarkDotNet.Columns
             double value = calc(statistics);
             if (double.IsNaN(value))
                 return "NA";
-            return type == UnitType.Time ? value.ToTimeStr(style.TimeUnit, 1, style.PrintUnitsInContent, format: format) : value.ToStr(format);
+            return type == UnitType.Time
+                   ? value.ToTimeStr(style.TimeUnit, summary.Config.Encoding, format, 1, style.PrintUnitsInContent)
+                   : value.ToStr(format);
         }
 
         public override string ToString() => ColumnName;

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Portability.Cpu;
 
 namespace BenchmarkDotNet.Helpers
 {
