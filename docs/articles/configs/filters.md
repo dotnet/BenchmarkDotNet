@@ -8,82 +8,37 @@ name: Filters
 Sometimes you don't want to run all of your benchmarks.
 In this case, you can *filter* some of them with the help of *filters*.
 
-Predefined filters:
+Predefined filters:'
 
-* `SimpleFilter`
-* `NameFilter`
-* `DisjunctionFilter`
-* `CategoryFilter`
-* `AnyCategoriesFilter`
-* `AllCategoriesFilter`
-
-Usage examples:
-
-```cs
-[Config(typeof(Config))]
-public class IntroFilters
-{
-    private class Config : ManualConfig
-    {
-        // We will benchmark ONLY method with names (which contains "A" OR "1") AND (have length < 3)
-        public Config()
-        {
-            Add(new DisjunctionFilter(
-                new NameFilter(name => name.Contains("A")),
-                new NameFilter(name => name.Contains("1"))
-            )); // benchmark with names which contains "A" OR "1"
-            Add(new NameFilter(name => name.Length < 3)); // benchmark with names with length < 3
-        }
-    }
-
-    [Benchmark] public void A1() => Thread.Sleep(10); // Will be benchmarked
-    [Benchmark] public void A2() => Thread.Sleep(10); // Will be benchmarked
-    [Benchmark] public void A3() => Thread.Sleep(10); // Will be benchmarked
-    [Benchmark] public void B1() => Thread.Sleep(10); // Will be benchmarked
-    [Benchmark] public void B2() => Thread.Sleep(10);
-    [Benchmark] public void B3() => Thread.Sleep(10);
-    [Benchmark] public void C1() => Thread.Sleep(10); // Will be benchmarked
-    [Benchmark] public void C2() => Thread.Sleep(10);
-    [Benchmark] public void C3() => Thread.Sleep(10);
-    [Benchmark] public void Aaa() => Thread.Sleep(10);
-}
+```markdown
+| Filter Type         | Filters benchmarks by       | Console argument | Console example                 |
+|---------------------|-----------------------------|------------------|---------------------------------|
+| MethodNamesFilter   | Provided method names       | method(s)        | --methods=ToStream,ToString     |
+| TypeNamesFilter     | Provided type names         | class(s)         | --class=XmlSerializerBenchmarks |
+| NamespacesFilter    | Provided namespaces         | namespace(s)     | --namespace=System.Memory       |
+| AttributesFilter    | Provided attribute names    | attribute(s)     | --attribute=STAThread           |
+| AllCategoriesFilter | All Provided category names | category(s)      | --category=Priority1            |
+| AnyCategoriesFilter | Any provided category names | anycategories    | --anycategories=Json,Xml        |
+| SimpleFilter        | Provided lambda predicate   | -                |                                 |
+| NameFilter          | Provided lambda predicate   | -                |                                 |
+| UnionFilter         | Logical AND                 | -                |                                 |
+| DisjunctionFilter   | Logical OR                  | -                |                                 |
 ```
 
-```cs
-[DryJob]
-[CategoriesColumn]
-[BenchmarkCategory("Awesome")]
-[AnyCategoriesFilter("A", "1")]
-public class IntroCategories
-{
-    [Benchmark]
-    [BenchmarkCategory("A", "1")]
-    public void A1() => Thread.Sleep(10); // Will be benchmarked
-    
-    [Benchmark]
-    [BenchmarkCategory("A", "2")]
-    public void A2() => Thread.Sleep(10); // Will be benchmarked
+---
 
-    [Benchmark]
-    [BenchmarkCategory("B", "1")]
-    public void B1() => Thread.Sleep(10); // Will be benchmarked
-    
-    [Benchmark]
-    [BenchmarkCategory("B", "2")]
-    public void B2() => Thread.Sleep(10);
-}
-```
+[!include[IntroFilters](../samples/IntroFilters.md)]
 
-Command line examples:
+The link to this sample: @BenchmarkDotNet.Samples.IntroFilters
 
-```
---category=A
---allCategories=A,B
---anyCategories=A,B
-```
+---
 
-If you are using `BenchmarkSwitcher` and want to run all the benchmarks with a category from all types and join them into one summary table, use the `--join` option (or `BenchmarkSwitcher.RunAllJoined`):
+[!include[IntroCategories](../samples/IntroCategories.md)]
 
-```
-* --join --category=MyAwesomeCategory
-```
+The link to this sample: @BenchmarkDotNet.Samples.IntroCategories
+
+---
+
+[!include[IntroJoin](../samples/IntroJoin.md)]
+
+The link to this sample: @BenchmarkDotNet.Samples.IntroJoin

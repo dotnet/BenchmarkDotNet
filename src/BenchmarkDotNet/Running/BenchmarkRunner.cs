@@ -102,7 +102,29 @@ namespace BenchmarkDotNet.Running
                         .ToDictionary(info => info.Benchmark, info => (info.Id, info.Value));
 
                     foreach (var benchmarkRunInfo in supportedBenchmarks) // we run them in the old order now using the new build artifacts
-                        results.Add(Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, logger, artifactsToCleanup, rootArtifactsFolderPath, ref globalChronometer));
+                    {
+                        var runChronometer = Chronometer.Start();
+                        
+                        var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, logger, artifactsToCleanup, rootArtifactsFolderPath, ref runChronometer);
+                        
+                        if (summaryPerType)
+                            PrintSummary(logger, commonSettingsConfig, summary);
+                        
+                        LogTotalTime(logger, runChronometer.GetElapsed().GetTimeSpan(), summary.GetNumberOfExecutedBenchmarks(), message: "Run time");
+                        logger.WriteLine();
+                        
+                        results.Add(summary);
+                    }
+
+                    if (!summaryPerType)
+                    {
+                        var joinedSummary = Summary.Join(results, commonSettingsConfig, globalChronometer.GetElapsed());
+                        
+                        PrintSummary(logger, commonSettingsConfig, joinedSummary);
+                        
+                        results.Clear();
+                        results.Add(joinedSummary);
+                    }
 
                     return results.ToArray();
                 }
@@ -134,7 +156,7 @@ namespace BenchmarkDotNet.Running
                                    ILogger logger, 
                                    List<string> artifactsToCleanup, 
                                    string rootArtifactsFolderPath,
-                                   ref StartedClock globalChronometer)
+                                   ref StartedClock runChronometer)
         {
             var benchmarks = benchmarkRunInfo.Benchmarks;
             var config = benchmarkRunInfo.Config;
@@ -175,16 +197,20 @@ namespace BenchmarkDotNet.Running
 
                 logger.WriteLine();
             }
-            var clockSpan = globalChronometer.GetElapsed();
+            
+            var clockSpan = runChronometer.GetElapsed();
 
-            var summary = new Summary(title,
-                                      reports,
-                                      HostEnvironmentInfo.GetCurrent(),
-                                      config,
-                                      GetResultsFolderPath(rootArtifactsFolderPath),
-                                      clockSpan.GetTimeSpan(), 
-                                      Validate(new[] {benchmarkRunInfo }, NullLogger.Instance)); // validate them once again, but don't print the output
+            return new Summary(title,
+                reports,
+                HostEnvironmentInfo.GetCurrent(),
+                config,
+                GetResultsFolderPath(rootArtifactsFolderPath),
+                clockSpan.GetTimeSpan(), 
+                Validate(new[] {benchmarkRunInfo }, NullLogger.Instance)); // validate them once again, but don't print the output
+        }
 
+        private static void PrintSummary(ILogger logger, IConfig config, Summary summary)
+        {
             logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
             logger.WriteLine();
 
@@ -194,14 +220,12 @@ namespace BenchmarkDotNet.Running
             {
                 logger.WriteLineInfo($"  {file.Replace(currentDirectory, string.Empty).Trim('/', '\\')}");
             }
+
             logger.WriteLine();
 
             logger.WriteLineHeader("// * Detailed results *");
 
             BenchmarkReportExporter.Default.ExportToLog(summary, logger);
-
-            LogTotalTime(logger, clockSpan.GetTimeSpan());
-            logger.WriteLine();
 
             logger.WriteLineHeader("// * Summary *");
             MarkdownExporter.Console.ExportToLog(summary, logger);
@@ -238,7 +262,6 @@ namespace BenchmarkDotNet.Running
 
             logger.WriteLine();
             logger.WriteLineHeader("// ***** BenchmarkRunner: End *****");
-            return summary;
         }
 
         private static ValidationError[] Validate(BenchmarkRunInfo[] benchmarks, ILogger logger)
@@ -445,8 +468,8 @@ namespace BenchmarkDotNet.Running
             return (executeResults, gcStats);
         }
 
-        internal static void LogTotalTime(ILogger logger, TimeSpan time, string message = "Total time")
-            => logger.WriteLineStatistic($"{message}: {time.ToFormattedTotalTime()}");
+        internal static void LogTotalTime(ILogger logger, TimeSpan time, int executedBenchmarksCount, string message = "Total time")
+            => logger.WriteLineStatistic($"{message}: {time.ToFormattedTotalTime()}, executed benchmarks: {executedBenchmarksCount}");
 
         private static BenchmarkRunInfo[] GetSupportedBenchmarks(BenchmarkRunInfo[] benchmarkRunInfos, CompositeLogger logger, IResolver resolver)
             => benchmarkRunInfos.Select(info => new BenchmarkRunInfo(

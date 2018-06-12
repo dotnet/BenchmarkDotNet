@@ -137,6 +137,7 @@ namespace BenchmarkDotNet.Configs
         public IConfig Parse(string[] args)
         {
             var config = new ManualConfig();
+            var filters = new List<IFilter>();
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -168,10 +169,26 @@ namespace BenchmarkDotNet.Configs
                 {
                     case "categorys": // for now all the argument names at the place end with "s"
                     case "allcategories":
-                        config.Add(new AllCategoriesFilter(values));
+                        filters.Add(new AllCategoriesFilter(values));
                         break;
                     case "anycategories":
-                        config.Add(new AnyCategoriesFilter(values));
+                        filters.Add(new AnyCategoriesFilter(values));
+                        break;
+                    case "method":
+                    case "methods":
+                        filters.Add(new MethodNamesFilter(values));
+                        break;
+                    case "class":
+                    case "classes":
+                        filters.Add(new TypeNamesFilter(values));
+                        break;
+                    case "namespace":
+                    case "namespaces":
+                        filters.Add(new NamespacesFilter(values));
+                        break;
+                    case "attribute":
+                    case "attributes":
+                        filters.Add(new AttributesFilter(values));
                         break;
                 }
 
@@ -189,6 +206,12 @@ namespace BenchmarkDotNet.Configs
                         processOption(config, value);
                 }
             }
+
+            if (filters.Count > 1) // &&
+                config.Add(new UnionFilter(filters.ToArray()));
+            else if (filters.Count == 1)
+                config.Add(filters[0]);
+
             return config;
         }
 

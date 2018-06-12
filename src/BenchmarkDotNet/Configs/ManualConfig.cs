@@ -151,9 +151,11 @@ namespace BenchmarkDotNet.Configs
             {
                 case ConfigUnionRule.AlwaysUseLocal:
                     manualConfig.Add(localConfig);
+                    manualConfig.Add(globalConfig.GetFilters().ToArray()); // the filters should be merged anyway
                     break;
                 case ConfigUnionRule.AlwaysUseGlobal:
                     manualConfig.Add(globalConfig);
+                    manualConfig.Add(localConfig.GetFilters().ToArray()); // the filters should be merged anyway
                     break;
                 case ConfigUnionRule.Union:
                     manualConfig.Add(globalConfig);

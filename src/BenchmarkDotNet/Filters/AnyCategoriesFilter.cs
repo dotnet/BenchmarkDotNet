@@ -10,10 +10,7 @@ namespace BenchmarkDotNet.Filters
     {
         private readonly string[] targetCategories;
 
-        public AnyCategoriesFilter(string[] targetCategories)
-        {
-            this.targetCategories = targetCategories;
-        }
+        public AnyCategoriesFilter(string[] targetCategories) => this.targetCategories = targetCategories;
 
         public bool Predicate(Benchmark benchmark) => targetCategories.Any(c => benchmark.Target.HasCategory(c));
     }

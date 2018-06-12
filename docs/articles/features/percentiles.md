@@ -19,7 +19,7 @@ And last, don't forget to include the columns into the config. They are not incl
 There're predefined `StatisticColumn.P0`..`StatisticColumn.P100` for absolute timing percentiles and `BaselineDiffColumn.Scaled50`..`BaselineDiffColumn.Scaled95` 
 for relative percentiles.
 
-##Example
+## Example
 
 Run the IntroPercentiles sample. It contains three benchmark methods.
 

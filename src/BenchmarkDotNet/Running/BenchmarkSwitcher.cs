@@ -59,14 +59,7 @@ namespace BenchmarkDotNet.Running
 
         public IEnumerable<Summary> Run(string[] args = null, IConfig config = null)
         {
-            args = typeParser.ReadArgumentList(args ?? Array.Empty<string>());
-            return RunBenchmarks(args, config);
-        }
-
-        private IEnumerable<Summary> RunBenchmarks(string[] args, IConfig config)
-        {
-            var globalChronometer = Chronometer.Start();
-            var summaries = new List<Summary>();
+            args = args ?? Array.Empty<string>();
 
             if (ShouldDisplayOptions(args))
             {
@@ -74,25 +67,31 @@ namespace BenchmarkDotNet.Running
                 return Enumerable.Empty<Summary>();
             }
 
+            var globalChronometer = Chronometer.Start();
+            var summaries = new List<Summary>();
+
             var effectiveConfig = ManualConfig.Union(config ?? DefaultConfig.Instance, ManualConfig.Parse(args));
             bool join = args.Any(arg => arg.EqualsWithIgnoreCase("--join"));
 
-            var benchmarks = typeParser.MatchingTypesWithMethods(args)
+            var benchmarks = Filter(effectiveConfig);
+
+            summaries.AddRange(BenchmarkRunner.Run(benchmarks, effectiveConfig, summaryPerType: !join));
+
+            var totalNumberOfExecutedBenchmarks = summaries.Sum(summary => summary.GetNumberOfExecutedBenchmarks());
+            BenchmarkRunner.LogTotalTime(logger, globalChronometer.GetElapsed().GetTimeSpan(), totalNumberOfExecutedBenchmarks, "Global total time");
+            return summaries;
+        }
+
+        public bool ShouldDisplayOptions(string[] args) 
+            => args.Any(arg => arg.EqualsWithIgnoreCase("--help") || arg.EqualsWithIgnoreCase("-h"));
+
+        internal BenchmarkRunInfo[] Filter(IConfig effectiveConfig)
+            => (effectiveConfig.GetFilters().Any() ? typeParser.GetAll() : typeParser.AskUser()) // if user provided some filters via args or custom config , we don't ask for any input
                 .Select(typeWithMethods =>
                     typeWithMethods.AllMethodsInType
                         ? BenchmarkConverter.TypeToBenchmarks(typeWithMethods.Type, effectiveConfig)
                         : BenchmarkConverter.MethodsToBenchmarks(typeWithMethods.Type, typeWithMethods.Methods, effectiveConfig))
                 .ToArray();
-
-            summaries.AddRange(BenchmarkRunner.Run(benchmarks, effectiveConfig, summaryPerType: !join));
-
-            var clockSpan = globalChronometer.GetElapsed();
-            BenchmarkRunner.LogTotalTime(logger, clockSpan.GetTimeSpan(), "Global total time");
-            return summaries;
-        }
-
-        public bool ShouldDisplayOptions(string[] args)
-            => args.Select(a => a.ToLowerInvariant()).Any(a => a == "--help" || a == "-h");
 
         private void DisplayOptions()
         {
