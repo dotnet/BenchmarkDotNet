@@ -13,10 +13,15 @@ namespace BenchmarkDotNet.Samples
             {
                 // --optimize=MODE , -O=mode
                 // MODE is a comma separated list of optimizations. They also allow
-                // optimizations to be turned off by prefixing the optimization name with a minus sign.
+                // optimizations to be turned off by prefixing the optimization
+                // name with a minus sign.
 
-                Add(Job.Mono.With(new[] { new MonoArgument("--optimize=inline") }).WithId("Inlining enabled"));
-                Add(Job.Mono.With(new[] { new MonoArgument("--optimize=-inline") }).WithId("Inlining disabled"));
+                Add(Job.Mono
+                    .With(new[] { new MonoArgument("--optimize=inline") })
+                    .WithId("Inlining enabled"));
+                Add(Job.Mono
+                    .With(new[] { new MonoArgument("--optimize=-inline") })
+                    .WithId("Inlining disabled"));
             }
         }
 

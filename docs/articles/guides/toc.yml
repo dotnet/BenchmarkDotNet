@@ -8,5 +8,7 @@
   href: nuget.md
 - name: Choosing RunStrategy
   href: choosing-run-strategy.md
+- name: Customizing runtime
+  href: customizing-runtime.md
 - name: How it works
   href: how-it-works.md
