@@ -8,7 +8,7 @@ Combined together with `[BenchmarkCategory]` attribute, you can group the benchm
 
 ### Source code
 
-[!code-csharp[IntroFilters.cs](../../../samples/BenchmarkDotNet.Samples/IntroCategories.cs)]
+[!code-csharp[IntroCategories.cs](../../../samples/BenchmarkDotNet.Samples/IntroCategories.cs)]
 
 ### Command line examples:
     
