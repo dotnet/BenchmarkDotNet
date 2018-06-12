@@ -33,7 +33,7 @@ The link to this sample: @BenchmarkDotNet.Samples.IntroFilters
 
 ---
 
-[!include[IntroFilters](../samples/IntroCategories.md)]
+[!include[IntroCategories](../samples/IntroCategories.md)]
 
 The link to this sample: @BenchmarkDotNet.Samples.IntroCategories
 
