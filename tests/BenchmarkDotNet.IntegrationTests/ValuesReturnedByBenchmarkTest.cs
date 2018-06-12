@@ -75,6 +75,13 @@ namespace BenchmarkDotNet.IntegrationTests
             public Job TypeCalledJob() => new Job();
 
             public class Job { }
+            
+            [Benchmark]
+            public NoNamespace TypeWithoutNamespace() => new NoNamespace();
         }
     }
+}
+
+public class NoNamespace
+{
 }
