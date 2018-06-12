@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Exporters;
@@ -73,6 +74,10 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void VeryLongArraysAreSupported()
             => AssertBenchmarkName<WithBigArray>("BenchmarkDotNet.Tests.WithBigArray.Method(array: [0, 1, 2, 3, 4, ...])");
+
+        [Fact]
+        public void ArraysWithNullsAreSupported()
+            => AssertBenchmarkName<WithArrayOfNullStrings>("BenchmarkDotNet.Tests.WithArrayOfNullStrings.Method(array: [null, null])");
     }
 
     public class Level0
@@ -195,5 +200,17 @@ namespace BenchmarkDotNet.Tests
         {
             yield return new object[] { ArrayParam<int>.ForPrimitives(Enumerable.Range(0, 100).ToArray()) };
         }
+    }
+
+    public class WithArrayOfNullStrings
+    {
+        public IEnumerable<object> GetArrayOfStrings()
+        {
+            yield return new string[2];
+        }
+
+        [Benchmark]
+        [ArgumentsSource(nameof(GetArrayOfStrings))]
+        public int Method(string[] array) => array.Length;
     }
 }

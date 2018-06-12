@@ -118,7 +118,7 @@ namespace BenchmarkDotNet.Exporters
                     break;
                 }
 
-                buffer.Append(GetArgument(item, item.GetType()));
+                buffer.Append(GetArgument(item, item?.GetType()));
 
                 ++index;
             }
