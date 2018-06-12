@@ -21,8 +21,8 @@ if [ -f header/$1.md ]; then
   echo "" >> $FILENAME
 fi
 
-if [ -f _details/$1.md ]; then
-  cat _details/$1.md >> $FILENAME
+if [ -f details/$1.md ]; then
+  cat details/$1.md >> $FILENAME
   echo "" >> $FILENAME
   echo "" >> $FILENAME
 fi
