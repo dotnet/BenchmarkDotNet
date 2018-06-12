@@ -24,6 +24,10 @@
   href: IntroSetupCleanupIteration.md
 - name: IntroSetupCleanupTarget
   href: IntroSetupCleanupTarget.md
+- name: IntroCustomMono
+  href: IntroCustomMono.md
+- name: IntroCustomMonoArguments
+  href: IntroCustomMonoArguments.md
 - name: IntroCategories
   href: IntroCategories.md
 - name: IntroFilters

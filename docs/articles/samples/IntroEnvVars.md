@@ -7,7 +7,7 @@ uid: BenchmarkDotNet.Samples.IntroEnvVars
 You can configure custom environment variables for the process that is running your benchmarks.
 One reason for doing this might be checking out how different
   [runtime knobs](https://github.com/dotnet/coreclr/blob/master/Documentation/project-docs/clr-configuration-knobs.md)
-  affect the performance of Core CLR.
+  affect the performance of .NET Core.
 
 ### Source code
 
@@ -15,5 +15,6 @@ One reason for doing this might be checking out how different
 
 ### See also
 
+* @docs.customizing-runtime
 * @docs.configs
 * @docs.jobs

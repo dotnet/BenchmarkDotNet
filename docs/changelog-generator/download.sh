@@ -10,7 +10,7 @@ cd ..
 end=`date +%s`
 echo "$1: download fininshed ($((end-start)) seconds)"
 
-DETAILS=_details
+DETAILS=details
 
 if [ ! -d "$DETAILS" ]; then
   mkdir "$DETAILS"
