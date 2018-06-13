@@ -54,12 +54,13 @@ namespace BenchmarkDotNet.Exporters
 
         private static string GetFileName(Summary summary)
         {
-            // few types might have the same name: A.Name and B.Name will both report "Name"
-            // in that case, we can not use the type name as file name because they would be getting overwritten #529
-            var typeNames = summary.Benchmarks.Select(b => b.Target.Type).Distinct().GroupBy(type => type.Name);
+            // we can't use simple name here, because user might be running benchmarks for a library,  which defines few types with the same name
+            // and reports the results per type, so every summary is going to contain just single benchmark
+            // and we can't tell here if there is a name conflict or not
+            var targets = summary.Benchmarks.Select(b => b.Target.Type).Distinct().ToArray();
 
-            if (typeNames.Count() == 1 && typeNames.First().Count() == 1)
-                return FolderNameHelper.ToFolderName(summary.Benchmarks.Select(b => b.Target.Type).First());
+            if (targets.Length == 1)
+                return FolderNameHelper.ToFolderName(targets.Single());
 
             return summary.Title;
         }
