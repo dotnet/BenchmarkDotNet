@@ -2,7 +2,7 @@
 
 DOCFX_BIN=docfx-bin
 DOCFX_EXE=$DOCFX_BIN/docfx.exe
-DOCFX_VERSION=2.36.1
+DOCFX_VERSION=2.36.2
 DOCFX_URL=https://github.com/dotnet/docfx/releases/download/v$DOCFX_VERSION/docfx.zip
 
 if [ ! -d "$DOCFX_BIN" ]; then
