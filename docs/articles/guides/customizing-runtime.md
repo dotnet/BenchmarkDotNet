@@ -25,3 +25,9 @@ The link to this sample: @BenchmarkDotNet.Samples.IntroCustomMonoArguments
 [!include[IntroEnvVars](../samples/IntroEnvVars.md)]
 
 The link to this sample: @BenchmarkDotNet.Samples.IntroEnvVars
+
+---
+
+[!include[IntroStaThread](../samples/IntroStaThread.md)]
+
+The link to this sample: @BenchmarkDotNet.Samples.IntroStaThread

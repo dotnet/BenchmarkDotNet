@@ -8,9 +8,8 @@ name: Filters
 Sometimes you don't want to run all of your benchmarks.
 In this case, you can *filter* some of them with the help of *filters*.
 
-Predefined filters:'
+Predefined filters:
 
-```markdown
 | Filter Type         | Filters benchmarks by       | Console argument | Console example                 |
 |---------------------|-----------------------------|------------------|---------------------------------|
 | MethodNamesFilter   | Provided method names       | method(s)        | --methods=ToStream,ToString     |
@@ -23,7 +22,6 @@ Predefined filters:'
 | NameFilter          | Provided lambda predicate   | -                |                                 |
 | UnionFilter         | Logical AND                 | -                |                                 |
 | DisjunctionFilter   | Logical OR                  | -                |                                 |
-```
 
 ---
 

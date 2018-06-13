@@ -11,14 +11,18 @@ namespace BenchmarkDotNet.Samples
     {
         private class Config : ManualConfig
         {
-            // We will benchmark ONLY method with names (which contains "A" OR "1") AND (have length < 3)
+            // We will benchmark ONLY method with
+            // names (which contains "A" OR "1") AND (have length < 3)
             public Config()
             {
+                // benchmark with names which contains "A" OR "1"
                 Add(new DisjunctionFilter(
                     new NameFilter(name => name.Contains("A")),
                     new NameFilter(name => name.Contains("1"))
-                )); // benchmark with names which contains "A" OR "1"
-                Add(new NameFilter(name => name.Length < 3)); // benchmark with names with length < 3
+                ));
+                
+                // benchmark with names with length < 3
+                Add(new NameFilter(name => name.Length < 3));
             }
         }
     

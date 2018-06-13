@@ -6,5 +6,3 @@
   href: setup-and-cleanup.md
 - name: Statistics
   href: statistics.md
-- name: STAThread
-  href: sta-thread.md

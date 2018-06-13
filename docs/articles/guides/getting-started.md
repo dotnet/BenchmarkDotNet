@@ -3,12 +3,14 @@
 To get started with BenchmarkDotNet, please follow these steps. 
 
 ## Step 1. Installation
+
 Install BenchmarkDotNet via the NuGet package: [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/)
 
 ```
 PM> Install-Package BenchmarkDotNet
 ```
 
+Read more about BenchmarkDotNet NuGet packages: @docs.nuget
 
 ## Step 2. Design a benchmark
 Create a new console application, write a class with methods that you want to measure and mark them with the `Benchmark` attribute. In the following example, we 

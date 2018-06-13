@@ -44,9 +44,6 @@ Let's look at an example:
 using System;
 using System.Security.Cryptography;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Attributes.Columns;
-using BenchmarkDotNet.Attributes.Exporters;
-using BenchmarkDotNet.Attributes.Jobs;
 using BenchmarkDotNet.Running;
 
 namespace MyBenchmarks
