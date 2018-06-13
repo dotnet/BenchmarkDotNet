@@ -35,12 +35,19 @@ namespace BenchmarkDotNet.Engines
 
         public long TotalOperations { get; }
 
-        public long BytesAllocatedPerOperation 
-            => GetTotalAllocatedBytes(true) == 0 
-                ? 0 
-                : (long)Math.Round( // let's round it to reduce the side effects of Allocation quantum
-                    (double)GetTotalAllocatedBytes(true) / TotalOperations, 
-                    MidpointRounding.ToEven); 
+        public long BytesAllocatedPerOperation
+        {
+            get
+            {
+                bool excludeAllocationQuantumSideEffects = !RuntimeInformation.IsNetCore; // the issue got fixed for .NET Core 2.0 https://github.com/dotnet/coreclr/issues/10207
+                
+                return GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects) == 0
+                    ? 0
+                    : (long) Math.Round( // let's round it to reduce the side effects of Allocation quantum
+                        (double) GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects) / TotalOperations,
+                        MidpointRounding.ToEven);
+            }
+        }
 
         public static GcStats operator +(GcStats left, GcStats right)
         {

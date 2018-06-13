@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
@@ -13,6 +14,7 @@ using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
+using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.InProcess;
@@ -173,6 +175,36 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertAllocations(toolchain, typeof(WithOperationsPerInvokeBenchmarks), new Dictionary<string, long>
             {
                 { nameof(WithOperationsPerInvokeBenchmarks.WithOperationsPerInvoke), objectAllocationOverhead + IntPtr.Size }
+            });
+        }
+        
+        public class TimeConsuming
+        {
+            [Benchmark] 
+            public byte[] SixtyFourBytesArray()
+            {
+                // this benchmark should hit allocation quantum problem
+                // it allocates a little of memory, but it takes a lot of time to execute so we can't run in thousands of times!
+                
+                Thread.Sleep(TimeSpan.FromSeconds(0.5)); 
+                
+                return new byte[64];
+            }
+        }
+
+        [TheoryNetCoreOnly("Only .NET Core 2.0+ API is bug free for this case"), MemberData(nameof(GetToolchains))]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
+        public void AllocationQuantumIsNotAnIssueForNetCore(IToolchain toolchain)
+        {
+            if (toolchain is CoreRtToolchain) // the fix has not yet been backported to CoreRT
+                return;
+            
+            long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
+            long arraySizeOverhead = IntPtr.Size; // array length
+
+            AssertAllocations(toolchain, typeof(TimeConsuming), new Dictionary<string, long>
+            {
+                { nameof(TimeConsuming.SixtyFourBytesArray), 64 + + objectAllocationOverhead + arraySizeOverhead }
             });
         }
 
