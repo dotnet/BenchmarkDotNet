@@ -33,4 +33,14 @@
 - name: IntroFilters
   href: IntroFilters.md
 - name: IntroJoin
-  href: IntroJoin.md  
+  href: IntroJoin.md
+- name: IntroStatisticsColumns
+  href: IntroStatisticsColumns.md
+- name: IntroPercentiles
+  href: IntroPercentiles.md
+- name: IntroRankColumn
+  href: IntroRankColumn.md
+- name: IntroMultimodal
+  href: IntroMultimodal.md
+- name: IntroOutliers
+  href: IntroOutliers.md

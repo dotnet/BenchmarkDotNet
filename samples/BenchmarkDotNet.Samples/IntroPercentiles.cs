@@ -9,7 +9,8 @@ namespace BenchmarkDotNet.Samples
 {
     // Using percentiles for adequate timings representation
     [Config(typeof(Config))]
-    [SimpleJob(RunStrategy.ColdStart, launchCount: 4, warmupCount: 3, targetCount: 20, id: "MyJob")]
+    [SimpleJob(RunStrategy.ColdStart, launchCount: 4,
+        warmupCount: 3, targetCount: 20, id: "MyJob")]
     public class IntroPercentiles
     {
         // To share between runs.
@@ -47,6 +48,7 @@ namespace BenchmarkDotNet.Samples
             {
                 rndTime += 30;
             }
+
             Thread.Sleep(rndTime);
         }
     }
