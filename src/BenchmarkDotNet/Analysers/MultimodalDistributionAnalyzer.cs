@@ -18,11 +18,8 @@ namespace BenchmarkDotNet.Analysers
         public override IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary)
         {
             var statistics = report.ResultStatistics;
-            if (statistics == null)
+            if (statistics == null || statistics.N < EngineResolver.DefaultMinTargetIterationCount)
                 yield break;
-            if (statistics.N < EngineResolver.DefaultMinTargetIterationCount)
-                yield return CreateHint($"The number of iterations was set to less than {EngineResolver.DefaultMinTargetIterationCount}, " +
-                                        $"{nameof(MultimodalDistributionAnalyzer)} needs at least {EngineResolver.DefaultMinTargetIterationCount} iterations to work."); 
                     
             double mValue = MathHelper.CalculateMValue(statistics);
             if (mValue > 4.2)
