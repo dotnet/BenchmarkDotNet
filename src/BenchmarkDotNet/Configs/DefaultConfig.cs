@@ -48,6 +48,7 @@ namespace BenchmarkDotNet.Configs
             yield return IterationSetupCleanupAnalyser.Default;
             yield return MultimodalDistributionAnalyzer.Default;
             yield return RuntimeErrorAnalyser.Default;
+            yield return ConstantFoldingAnalyzer.Default;
         }
 
         public IEnumerable<IValidator> GetValidators()
