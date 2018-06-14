@@ -31,6 +31,24 @@ namespace ChangeLogBuilder
             var client = new GitHubClient(new ProductHeaderValue(config.ProductHeader));
             var tokenAuth = new Credentials(config.Token);
             client.Credentials = tokenAuth;
+
+            if (milestone == "_")
+            {
+                var allContributors = await client.Repository.GetAllContributors(repoOwner, repoName);
+                builder.AppendLine("# All contributors");
+                builder.AppendLine();
+                foreach (var contributor in allContributors)
+                {
+                    var user = await client.User.Get(contributor.Login);
+                    var name = user?.Name;
+                    builder.AppendLine("* " + (string.IsNullOrEmpty(name)
+                        ? contributor.ToLink()
+                        : contributor.ToLinkWithName(name)));
+                }
+
+                return builder.ToString();
+            }
+            
             var issueRequest = new RepositoryIssueRequest
             {
                 State = ItemStateFilter.Closed
