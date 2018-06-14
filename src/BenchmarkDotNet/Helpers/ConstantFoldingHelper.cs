@@ -17,6 +17,7 @@ namespace BenchmarkDotNet.Helpers
             var minTarget = measurementList.Where(x => x.IterationMode == IterationMode.MainTarget).DefaultIfEmpty().Min();
             var meanNs = measurementList.Where(x => x.IterationMode == IterationMode.Result)
                                         .Select(x => x.GetAverageNanoseconds())
+                                        .DefaultIfEmpty()
                                         .Average();
 
             if (maxIdle.Nanoseconds > minTarget.Nanoseconds && meanNs <= threshold)
