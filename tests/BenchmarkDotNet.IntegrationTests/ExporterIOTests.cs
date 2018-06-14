@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -70,12 +71,12 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public void ExporterUsesSimpleTypeNameAsFileNameIfTypeNamesDoNotDuplicate()
+        public void ExporterUsesFullyQualifiedTypeNameAsFileName()
         {
             string resultsDirectoryPath = Path.GetTempPath();
             var exporter = new MockExporter();
-            var mockSummary = GetMockSummary(resultsDirectoryPath, typeof(ClassA));
-            var expectedFilePath = $"{Path.Combine(mockSummary.ResultsDirectoryPath, typeof(ClassA).Name)}-report.txt";
+            var mockSummary = GetMockSummary(resultsDirectoryPath, typeof(Generic<int>));
+            var expectedFilePath = $"{Path.Combine(mockSummary.ResultsDirectoryPath, "BenchmarkDotNet.IntegrationTests.Generic_Int32_")}-report.txt";
             string actualFilePath = null;
 
             try
@@ -155,5 +156,11 @@ namespace BenchmarkDotNet.IntegrationTests
                                        allMeasurements: null,
                                        gcStats: default);
         }
+    }
+
+    public class Generic<T>
+    {
+        [Benchmark]
+        public void Method() { }
     }
 }

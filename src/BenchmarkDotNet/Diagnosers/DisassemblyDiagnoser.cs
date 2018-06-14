@@ -18,12 +18,20 @@ namespace BenchmarkDotNet.Diagnosers
     {
         private readonly WindowsDisassembler windowsDisassembler;
         private readonly MonoDisassembler monoDisassembler;
-        private readonly Dictionary<Benchmark, DisassemblyResult> results = new Dictionary<Benchmark, DisassemblyResult>();
+        private readonly Dictionary<Benchmark, DisassemblyResult> results;
 
         internal DisassemblyDiagnoser(WindowsDisassembler windowsDisassembler, MonoDisassembler monoDisassembler)
         {
             this.windowsDisassembler = windowsDisassembler;
             this.monoDisassembler = monoDisassembler;
+
+            results = new Dictionary<Benchmark, DisassemblyResult>();
+            Exporters = new IExporter[]
+            {
+                new CombinedDisassemblyExporter(results),
+                new RawDisassemblyExporter(results),
+                new PrettyDisassemblyExporter(results)
+            };
         }
 
         public static IConfigurableDiagnoser<DisassemblyDiagnoserConfig> Create(DisassemblyDiagnoserConfig config)
@@ -35,13 +43,7 @@ namespace BenchmarkDotNet.Diagnosers
         public IReadOnlyDictionary<Benchmark, DisassemblyResult> Results => results;
         public IEnumerable<string> Ids => new[] { nameof(DisassemblyDiagnoser) };
 
-        public IEnumerable<IExporter> Exporters 
-            => new IExporter[]
-            {
-                new CombinedDisassemblyExporter(Results),
-                new RawDisassemblyExporter(Results),
-                new PrettyDisassemblyExporter(Results)
-            };
+        public IEnumerable<IExporter> Exporters { get; }
 
         public IEnumerable<IAnalyser> Analysers => new IAnalyser[] { new DisassemblyAnalyzer(Results) };
 

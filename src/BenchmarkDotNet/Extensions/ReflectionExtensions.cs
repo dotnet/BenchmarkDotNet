@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Extensions
         /// <summary>
         /// returns type name which can be used in generated C# code
         /// </summary>
-        internal static string GetCorrectCSharpTypeName(this Type type)
+        internal static string GetCorrectCSharpTypeName(this Type type, bool includeNamespace = true, bool includeGenericArgumentsNamespace = true)
         {
             // the reflection is missing information about types passed by ref (ie ref ValuTuple<int> is reported as NON generic type)
             if (type.IsByRef && !type.IsGenericType && type.Name.Contains('`'))
@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Extensions
             if (type == typeof(void))
                 return "void";
             var prefix = "";
-            if (!string.IsNullOrEmpty(type.Namespace))
+            if (!string.IsNullOrEmpty(type.Namespace) && includeNamespace)
                 prefix += type.Namespace + ".";
 
             var nestedTypes = "";
@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.Extensions
             if (type.GetTypeInfo().IsGenericType)
             {
                 var mainName = type.Name.Substring(0, type.Name.IndexOf('`'));
-                string args = string.Join(", ", type.GetGenericArguments().Select(GetCorrectCSharpTypeName).ToArray());
+                string args = string.Join(", ", type.GetGenericArguments().Select(T => GetCorrectCSharpTypeName(T, includeGenericArgumentsNamespace, includeGenericArgumentsNamespace)).ToArray());
                 return $"{prefix}{mainName}<{args}>";
             }
 

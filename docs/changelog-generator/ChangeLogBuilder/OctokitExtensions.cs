@@ -19,6 +19,8 @@ namespace ChangeLogBuilder
             : "";
 
         public static string ToLink(this Author user) => $"[@{user.Login}]({user.HtmlUrl})";
+        
+        public static string ToLinkWithName(this Author user, string name) => $"[@{user.Login} ({name})]({user.HtmlUrl})";
 
         public static string ToCommitMessage(this Commit commit)
         {

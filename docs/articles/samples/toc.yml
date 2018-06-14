@@ -18,6 +18,8 @@
   href: IntroJobBaseline.md
 - name: IntroEnvVars
   href: IntroEnvVars.md
+- name: IntroStaThread
+  href: IntroStaThread.md
 - name: IntroSetupCleanupGlobal
   href: IntroSetupCleanupGlobal.md
 - name: IntroSetupCleanupIteration
@@ -33,4 +35,30 @@
 - name: IntroFilters
   href: IntroFilters.md
 - name: IntroJoin
-  href: IntroJoin.md  
+  href: IntroJoin.md
+- name: IntroStatisticsColumns
+  href: IntroStatisticsColumns.md
+- name: IntroPercentiles
+  href: IntroPercentiles.md
+- name: IntroRankColumn
+  href: IntroRankColumn.md
+- name: IntroMultimodal
+  href: IntroMultimodal.md
+- name: IntroOutliers
+  href: IntroOutliers.md
+- name: IntroHardwareCounters
+  href: IntroHardwareCounters.md
+- name: IntroDisassembly
+  href: IntroDisassembly.md
+- name: IntroDisassemblyRyuJit
+  href: IntroDisassemblyRyuJit.md
+- name: IntroDisassemblyAllJits
+  href: IntroDisassemblyAllJits.md
+- name: IntroDisassemblyDry
+  href: IntroDisassemblyDry.md
+- name: IntroTailcall
+  href: IntroTailcall.md
+- name: IntroColdStart
+  href: IntroColdStart.md
+- name: IntroMonitoring
+  href: IntroMonitoring.md

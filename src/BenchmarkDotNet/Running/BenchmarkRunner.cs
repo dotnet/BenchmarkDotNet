@@ -108,7 +108,7 @@ namespace BenchmarkDotNet.Running
                         var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, logger, artifactsToCleanup, rootArtifactsFolderPath, ref runChronometer);
                         
                         if (summaryPerType)
-                            PrintSummary(logger, commonSettingsConfig, summary);
+                            PrintSummary(logger, benchmarkRunInfo.Config, summary);
                         
                         LogTotalTime(logger, runChronometer.GetElapsed().GetTimeSpan(), summary.GetNumberOfExecutedBenchmarks(), message: "Run time");
                         logger.WriteLine();

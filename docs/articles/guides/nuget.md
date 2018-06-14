@@ -1,3 +1,8 @@
+---
+uid: docs.nuget
+name: Installing NuGet packages
+---
+
 # Installing NuGet packages
 
 ## Packages

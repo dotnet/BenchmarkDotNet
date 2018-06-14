@@ -9,4 +9,5 @@
 _site
 _exported_templates
 docfx-bin
-api
+api/*
+!api/index.md

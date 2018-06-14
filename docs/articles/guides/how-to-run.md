@@ -2,14 +2,14 @@
 
 There are several ways to run your benchmarks:
 
-##Types
+## Types
 
 ```cs
 var summary = BenchmarkRunner.Run<MyBenchmarkClass>();
 var summary = BenchmarkRunner.Run(typeof(MyBenchmarkClass));
 ```
 
-##Url
+## Url
 
 You can also run a benchmark directly from the internet:
 
@@ -18,14 +18,14 @@ string url = "<E.g. direct link to raw content of a gist>";
 var summary = BenchmarkRunner.RunUrl(url);
 ```
 
-##Source
+## Source
 
 ```cs
 string benchmarkSource = "public class MyBenchmarkClass { ...";
 var summary = BenchmarkRunner.RunSource(benchmarkSource);
 ```
 
-##BenchmarkSwitcher
+## BenchmarkSwitcher
 
 Or you can create a set of benchmarks and choose one from command line:
 

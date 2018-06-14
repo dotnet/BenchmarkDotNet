@@ -106,24 +106,26 @@ For example, you can use the `SimpleJob` or `ShortRunJob` attributes:
     
     An example:
     
-```cs
-public class OOM
-{
-    private StringBuilder buffer = new StringBuilder();
-    
-    [Benchmark]
-    public void HasSideEffects()
+    ```cs
+    public class OOM
     {
-        buffer.Append('a'); // This method is growing the buffer to infinity because it's executed millions of times
-    }
-    
-    [Benchmark(OperationsPerInvoke = 16)]
-    public void HasNoSideEffects()
-    {
-        buffer.Clear();
-
-        for (int i = 0; i < 1024; i++)
+        private StringBuilder buffer = new StringBuilder();
+        
+        [Benchmark]
+        public void HasSideEffects()
+        {
+            // This method is growing the buffer to infinity
+            // because it's executed millions of times
             buffer.Append('a');
+        }
+        
+        [Benchmark(OperationsPerInvoke = 16)]
+        public void HasNoSideEffects()
+        {
+            buffer.Clear();
+    
+            for (int i = 0; i < 1024; i++)
+                buffer.Append('a');
+        }
     }
-}
-```    
+    ```    
