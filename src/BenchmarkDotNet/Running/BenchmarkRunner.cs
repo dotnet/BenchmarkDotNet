@@ -343,7 +343,9 @@ namespace BenchmarkDotNet.Running
             for (int index = 0; index < executeResults.Count; index++)
             {
                 var executeResult = executeResults[index];
-                runs.AddRange(executeResult.Data.Select(line => Measurement.Parse(logger, line, index + 1)).Where(r => r.IterationMode != IterationMode.Unknown));
+                var measurements = ConstantFoldingHelper.HandleConstantFolding(executeResult.Data.Select(line => Measurement.Parse(logger, line, index + 1))
+                                                                                                 .Where(r => r.IterationMode != IterationMode.Unknown));
+                runs.AddRange(measurements);
             }
 
             return new BenchmarkReport(benchmark, buildResult, buildResult, executeResults, runs, gcStats);
@@ -410,7 +412,7 @@ namespace BenchmarkDotNet.Running
                     .Select(line => Measurement.Parse(logger, line, 0))
                     .Where(r => r.IterationMode != IterationMode.Unknown)
                     .ToArray();
-
+                
                 if (!measurements.Any())
                 {
                     // Something went wrong during the benchmark, don't bother doing more runs

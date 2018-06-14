@@ -55,6 +55,20 @@ namespace BenchmarkDotNet.Reports
             IterationIndex = iterationIndex;
         }
 
+        /// <summary>
+        /// Creates an instance of <see cref="Measurement"/> based on specified measurement with zero time value.
+        /// </summary>
+        /// <param name="measurement"></param>
+        public Measurement(Measurement measurement)
+        {
+            Encoding = measurement.Encoding;
+            Operations = measurement.Operations;
+            Nanoseconds = 0d;
+            LaunchIndex = measurement.LaunchIndex;
+            IterationMode = measurement.IterationMode;
+            IterationIndex = measurement.IterationIndex;
+        }
+
         public string ToOutputLine()
         {
             string alignedIterationMode = IterationMode.ToString().PadRight(IterationModeNameMaxWidth, ' ');
