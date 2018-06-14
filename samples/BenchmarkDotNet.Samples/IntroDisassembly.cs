@@ -5,7 +5,7 @@ namespace BenchmarkDotNet.Samples
 {
     [DryCoreJob, DryMonoJob, DryClrJob(Platform.X86)]
     [DisassemblyDiagnoser]
-    public class IntroDisasm
+    public class IntroDisassembly
     {
         [Benchmark]
         public double Sum()

@@ -6,3 +6,5 @@
   href: setup-and-cleanup.md
 - name: Statistics
   href: statistics.md
+- name: Disassembler
+  href: disassembler.md

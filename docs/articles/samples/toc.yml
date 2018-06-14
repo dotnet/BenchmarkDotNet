@@ -46,3 +46,15 @@
   href: IntroMultimodal.md
 - name: IntroOutliers
   href: IntroOutliers.md
+- name: IntroHardwareCounters
+  href: IntroHardwareCounters.md
+- name: IntroDisassembly
+  href: IntroDisassembly.md
+- name: IntroDisassemblyRyuJit
+  href: IntroDisassemblyRyuJit.md
+- name: IntroDisassemblyAllJits
+  href: IntroDisassemblyAllJits.md
+- name: IntroDisassemblyDry
+  href: IntroDisassemblyDry.md
+- name: IntroTailcall
+  href: IntroTailcall.md
