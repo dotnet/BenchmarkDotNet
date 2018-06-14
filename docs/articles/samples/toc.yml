@@ -58,3 +58,7 @@
   href: IntroDisassemblyDry.md
 - name: IntroTailcall
   href: IntroTailcall.md
+- name: IntroColdStart
+  href: IntroColdStart.md
+- name: IntroMonitoring
+  href: IntroMonitoring.md
