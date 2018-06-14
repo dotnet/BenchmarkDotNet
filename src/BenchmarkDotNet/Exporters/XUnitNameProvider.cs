@@ -28,8 +28,8 @@ namespace BenchmarkDotNet.Exporters
 
             name.Append(method.Name);
 
-            if (benchmark.HasArguments)
-                name.Append(GetMethodArguments(method, benchmark.Parameters));
+            if (benchmark.HasParameters)
+                name.Append(GetBenchmarkParameters(method, benchmark.Parameters));
 
             return name.ToString();
         }
@@ -60,21 +60,30 @@ namespace BenchmarkDotNet.Exporters
             return $"{mainName}<{args}>";
         }
 
-        private static string GetMethodArguments(MethodInfo method, ParameterInstances benchmarkParameters)
+        private static string GetBenchmarkParameters(MethodInfo method, ParameterInstances benchmarkParameters)
         {
             var methodParameters = method.GetParameters();
-            var arguments = new StringBuilder(methodParameters.Length * 20).Append('(');
+            var parametersBuilder = new StringBuilder(methodParameters.Length * 20).Append('(');
 
             for (int i = 0; i < methodParameters.Length; i++)
             {
                 if (i > 0)
-                    arguments.Append(", ");
+                    parametersBuilder.Append(", ");
 
-                arguments.Append(methodParameters[i].Name).Append(':').Append(' ');
-                arguments.Append(GetArgument(benchmarkParameters.GetArgument(methodParameters[i].Name).Value, methodParameters[i].ParameterType));
+                parametersBuilder.Append(methodParameters[i].Name).Append(':').Append(' ');
+                parametersBuilder.Append(GetArgument(benchmarkParameters.GetArgument(methodParameters[i].Name).Value, methodParameters[i].ParameterType));
             }
 
-            return arguments.Append(')').ToString();
+            foreach (var parameter in benchmarkParameters.Items.Where(parameter => !parameter.IsArgument))
+            {
+                if (methodParameters.Length > 0)
+                    parametersBuilder.Append(", ");
+                
+                parametersBuilder.Append(parameter.Name).Append(':').Append(' ');
+                parametersBuilder.Append(GetArgument(parameter.Value, parameter.Value?.GetType()));
+            }
+
+            return parametersBuilder.Append(')').ToString();
         }
 
         private static string GetArgument(object argumentValue, Type argumentType)

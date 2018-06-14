@@ -78,6 +78,14 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void ArraysWithNullsAreSupported()
             => AssertBenchmarkName<WithArrayOfNullStrings>("BenchmarkDotNet.Tests.WithArrayOfNullStrings.Method(array: [null, null])");
+        
+        [Fact]
+        public void ParamsAreSupported() 
+            => AssertBenchmarkName<WithParameters>("BenchmarkDotNet.Tests.WithParameters.Method(Field: 100)");
+        
+        [Fact]
+        public void ArgumentsAndParamsUsedTogetherAreSupported() 
+            => AssertBenchmarkName<WithArgumentsAndParameters>("BenchmarkDotNet.Tests.WithArgumentsAndParameters.Method(arg: \"anArgument\", Field: 100)");
     }
 
     public class Level0
@@ -212,5 +220,24 @@ namespace BenchmarkDotNet.Tests
         [Benchmark]
         [ArgumentsSource(nameof(GetArrayOfStrings))]
         public int Method(string[] array) => array.Length;
+    }
+
+    public class WithParameters
+    {
+        [Params(100)]
+        public int Field;
+
+        [Benchmark]
+        public int Method() => Field;
+    }
+    
+    public class WithArgumentsAndParameters
+    {
+        [Params(100)]
+        public int Field;
+
+        [Benchmark]
+        [Arguments("anArgument")]
+        public int Method(string arg) => Field;
     }
 }
