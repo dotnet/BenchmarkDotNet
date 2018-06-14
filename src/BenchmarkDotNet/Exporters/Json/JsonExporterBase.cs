@@ -59,6 +59,7 @@ namespace BenchmarkDotNet.Exporters.Json
                     { "Method", r.Benchmark.Target.Method.Name },
                     { "MethodTitle", r.Benchmark.Target.MethodDisplayInfo },
                     { "Parameters", r.Benchmark.Parameters.PrintInfo },
+                    { "FullName", XUnitNameProvider.GetBenchmarkName(r.Benchmark) }, // do NOT remove this property, it is used for xunit-performance migration
                     // { "Properties", r.Benchmark.Job.ToSet().ToDictionary(p => p.Name, p => p.Value) }, // TODO
                     { "Statistics", r.ResultStatistics },
                 };

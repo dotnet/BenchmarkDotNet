@@ -27,6 +27,8 @@ namespace BenchmarkDotNet.Running
 
         public bool IsBaseline() => Target.Baseline || Job.Meta.IsBaseline;
 
+        public bool HasParameters => Parameters != null && Parameters.Items.Any();
+
         public bool HasArguments => Parameters != null && Parameters.Items.Any(parameter => parameter.IsArgument);
 
         public static Benchmark Create(Target target, Job job, ParameterInstances parameters)
