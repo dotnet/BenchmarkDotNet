@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Samples
 {
     // You can add custom tags per each method using Columns
     [Config(typeof(Config))]
-    public class IntroTags
+    public class IntroTagColumn
     {
         private class Config : ManualConfig
         {
@@ -21,27 +21,15 @@ namespace BenchmarkDotNet.Samples
         }
 
         [Benchmark]
-        public void Foo1()
-        {
-            Thread.Sleep(10);
-        }
+        public void Foo1() => Thread.Sleep(10);
 
         [Benchmark]
-        public void Foo12()
-        {
-            Thread.Sleep(10);
-        }
+        public void Foo12() => Thread.Sleep(10);
 
         [Benchmark]
-        public void Bar3()
-        {
-            Thread.Sleep(10);
-        }
+        public void Bar3() => Thread.Sleep(10);
 
         [Benchmark]
-        public void Bar34()
-        {
-            Thread.Sleep(10);
-        }
+        public void Bar34() => Thread.Sleep(10);
     }
 }
