@@ -13,21 +13,10 @@ By default, files with results will be located in
 
 [!include[IntroExport](../samples/IntroExport.md)]
 
-The link to this sample: @BenchmarkDotNet.Samples.IntroExport
-
----
-
 [!include[IntroExportJson](../samples/IntroExportJson.md)]
-
-The link to this sample: @BenchmarkDotNet.Samples.IntroExportJson
-
----
 
 [!include[IntroExportXml](../samples/IntroExportXml.md)]
 
-The link to this sample: @BenchmarkDotNet.Samples.IntroExportXml
-
----
 
 ## Plots
 

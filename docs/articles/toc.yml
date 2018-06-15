@@ -2,10 +2,10 @@
   href: overview.md
 - name: Guides
   href: guides/toc.yml
-- name: Configs
-  href: configs/toc.yml
 - name: Features
   href: features/toc.yml
+- name: Configs
+  href: configs/toc.yml
 - name: Samples
   href: samples/toc.yml
 - name: Contributing
