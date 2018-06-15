@@ -10,7 +10,7 @@ var toolsDirectory = "./tools/";
 var docfxExe = toolsDirectory + "docfx/docfx.exe";
 var docfxVersion = "2.36.2";
 var changelogDir = "./docs/changelog/";
-var changelogGenDir = "./docs/changelog-generator/";
+var changelogGenDir = "./docs/_changelog/";
 var bdnAllVersions = new string[] {
 		"v0.7.0",
 		"v0.7.1",
