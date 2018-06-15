@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Samples
     [XmlExporterAttribute.BriefCompressed]
     [XmlExporterAttribute.Full]
     [XmlExporterAttribute.FullCompressed]
-    public class IntroExporters
+    public class IntroExport
     {
         private Random random = new Random(42);
 
