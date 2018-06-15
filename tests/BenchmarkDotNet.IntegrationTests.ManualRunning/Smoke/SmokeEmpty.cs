@@ -1,11 +1,11 @@
 ﻿using BenchmarkDotNet.Attributes;
 
-namespace BenchmarkDotNet.Samples
+namespace BenchmarkDotNet.IntegrationTests.ManualRunning.Smoke
 {
     [MedianColumn, Q3Column, MaxColumn]
     [LegacyJitX64Job, RyuJitX64Job, MonoJob]
     [KeepBenchmarkFiles]
-    public class IntroEmpty
+    public class SmokeEmpty
     {
         [Benchmark] public void Void1() {}
         [Benchmark] public void Void2() {}

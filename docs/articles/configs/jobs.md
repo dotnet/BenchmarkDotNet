@@ -163,3 +163,7 @@ public class MySuperJobAttribute : Attribute, IConfigSource
 [MySuperJob]
 public class MyBenchmarks
 ```
+
+---
+
+[!include[IntroGcMode](../samples/IntroGcMode.md)]

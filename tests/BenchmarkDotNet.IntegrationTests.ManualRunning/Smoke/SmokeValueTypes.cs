@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Environments;
 
-namespace BenchmarkDotNet.Samples
+namespace BenchmarkDotNet.IntegrationTests.ManualRunning.Smoke
 {
     // ReSharper disable InconsistentNaming
 
     [RyuJitX64Job, LegacyJitX64Job, LegacyJitX86Job]
     [MemoryDiagnoser]
-    public class IntroValueTypes
+    public class SmokeValueTypes
     {
         [Benchmark] public Jit ReturnEnum() => Jit.RyuJit;
 
