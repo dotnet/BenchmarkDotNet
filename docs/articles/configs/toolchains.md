@@ -209,42 +209,12 @@ Frequency=2533308 Hz, Resolution=394.7408 ns, Timer=TSC
   Job-CTQFFQ : .NET Core ? (CoreCLR 4.6.26214.07, CoreFX 4.6.26313.0), 64bit RyuJIT
 ```
 
-## InProcessToolchain
+---
 
-InProcessToolchain is our toolchain which does not generate any new executable. It emits IL on the fly and runs it from within the process itself. It can be usefull if want to run the benchmarks very fast or if you want to run them for framework which we don't support. An example could be a local build of CoreCLR.
+[!include[IntroInProcess](../samples/IntroInProcess.md)]
 
-```cs
-[Config(typeof(Config))]
-public class IntroInProcess
-{
-    private class Config : ManualConfig
-    {
-        public Config()
-        {
-            Add(Job.MediumRun
-                .WithLaunchCount(1)
-                .WithId("OutOfProc"));
+[!include[IntroInProcessWrongEnv](../samples/IntroInProcessWrongEnv.md)]
 
-            Add(Job.MediumRun
-                .WithLaunchCount(1)
-                .With(InProcessToolchain.Instance)
-                .WithId("InProcess"));
-        }
-    }
-
-    [Benchmark(Description = "new byte[10kB]")]
-    public byte[] Allocate() => new byte[10000];
-}
-```
-
-or just:
-
-```cs
-[InProcessAttribute]
-public class TypeWithBenchmarks
-{
-}
-```
 
 ## CoreRT
 

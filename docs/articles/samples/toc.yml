@@ -78,3 +78,7 @@
   href: IntroConfigUnion.md
 - name: IntroFluentConfigBuilder
   href: IntroFluentConfigBuilder.md
+- name: IntroInProcess
+  href: IntroInProcess.md
+- name: IntroInProcessWrongEnv
+  href: IntroInProcessWrongEnv.md
