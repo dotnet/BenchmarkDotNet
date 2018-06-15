@@ -27,16 +27,6 @@ Predefined filters:
 
 [!include[IntroFilters](../samples/IntroFilters.md)]
 
-The link to this sample: @BenchmarkDotNet.Samples.IntroFilters
-
----
-
 [!include[IntroCategories](../samples/IntroCategories.md)]
 
-The link to this sample: @BenchmarkDotNet.Samples.IntroCategories
-
----
-
 [!include[IntroJoin](../samples/IntroJoin.md)]
-
-The link to this sample: @BenchmarkDotNet.Samples.IntroJoin

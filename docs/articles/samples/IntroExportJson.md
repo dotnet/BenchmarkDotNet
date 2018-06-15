@@ -163,6 +163,9 @@ Example of `IntroJsonExport-report-brief.json`:
 }
 ```
 
-### See also
+### Links
 
 * @docs.exporters
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroExportJson
+
+---

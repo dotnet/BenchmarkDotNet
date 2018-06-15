@@ -30,6 +30,9 @@ All four setup and cleanup attributes have a Target property that allow
 // Benchmark D
 ```
 
-### See also
+### Links
 
 * @docs.setup-and-cleanup
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroSetupCleanupTarget
+
+---

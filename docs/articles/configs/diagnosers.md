@@ -85,34 +85,12 @@ In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on.
 
 [!include[IntroHardwareCounters](../samples/IntroHardwareCounters.md)]
 
-The link to this sample: @BenchmarkDotNet.Samples.IntroHardwareCounters
-
----
-
 [!include[IntroDisassemblyRyuJit](../samples/IntroDisassemblyRyuJit.md)]
-
-The link to this sample: @BenchmarkDotNet.Samples.IntroDisassemblyRyuJit
-
----
 
 [!include[IntroDisassembly](../samples/IntroDisassembly.md)]
 
-The link to this sample: @BenchmarkDotNet.Samples.IntroDisassembly
-
----
-
 [!include[IntroDisassemblyAllJits](../samples/IntroDisassemblyAllJits.md)]
-
-The link to this sample: @BenchmarkDotNet.Samples.IntroDisassemblyAllJits
-
----
 
 [!include[IntroDisassemblyDry](../samples/IntroDisassemblyDry.md)]
 
-The link to this sample: @BenchmarkDotNet.Samples.IntroDisassemblyDry
-
----
-
 [!include[IntroTailcall](../samples/IntroTailcall.md)]
-
-The link to this sample: @BenchmarkDotNet.Samples.IntroTailcall

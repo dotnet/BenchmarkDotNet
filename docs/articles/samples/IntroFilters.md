@@ -10,6 +10,9 @@ You can either use one of the predefined `Filter` types or create a custom type 
 
 [!code-csharp[IntroFilters.cs](../../../samples/BenchmarkDotNet.Samples/IntroFilters.cs)]
 
-### See also
+### Links
 
 * @docs.filters
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroFilters
+
+---

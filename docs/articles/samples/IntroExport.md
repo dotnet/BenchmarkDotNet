@@ -10,6 +10,9 @@ BenchmarkDotNet has a lot of predefined exporters.
 
 [!code-csharp[IntroExport.cs](../../../samples/BenchmarkDotNet.Samples/IntroExport.cs)]
 
-### See also
+### Links
 
 * @docs.exporters
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroExport
+
+---

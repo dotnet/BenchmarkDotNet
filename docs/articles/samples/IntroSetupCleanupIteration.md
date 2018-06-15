@@ -57,6 +57,9 @@ This attribute has the same set of constraint with `[IterationSetup]`: it's not 
 // GlobalCleanup
 ```
 
-### See also
+### Links
 
 * @docs.setup-and-cleanup
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroSetupCleanupIteration
+
+---

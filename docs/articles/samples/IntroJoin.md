@@ -25,6 +25,9 @@ If you are using `BenchmarkSwitcher` and want to run all the benchmarks with a c
 | IntroJoin2 |      A | 12.50 ms |    NA |
 ```
 
-### See also
+### Links
 
 * @docs.filters
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroJoin
+
+---

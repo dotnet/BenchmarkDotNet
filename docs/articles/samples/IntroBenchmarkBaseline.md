@@ -22,6 +22,9 @@ As a result, you will have additional `Scaled` column in the summary table:
 | Time150 | 150.48 ms | 0.0986 ms | 0.0922 ms |   1.50 |
 ```
 
-### See also
+### Links
 
 * @docs.baselines
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroBenchmarkBaseline
+
+---

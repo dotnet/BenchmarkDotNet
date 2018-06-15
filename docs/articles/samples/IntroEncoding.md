@@ -38,8 +38,11 @@ Skewness = 0.12, Kurtosis = 1.56, MValue = 2
     Foo | 1.027 μs | 0.0020 μs | 0.0018 μs |
 ```
 
-### See also
+### Links
 
 * @docs.encoding
 * @BenchmarkDotNet.Attributes.EncodingAttribute
 * @BenchmarkDotNet.Helpers.MultiEncodingString
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroEncoding
+
+---

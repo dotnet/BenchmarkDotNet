@@ -13,6 +13,9 @@ You can do this today by using the overloaded ctor of MonoJob attribute or by sp
 
 [!code-csharp[IntroCustomMono.cs](../../../samples/BenchmarkDotNet.Samples/IntroCustomMono.cs)]
 
-### See also
+### Links
 
 * @docs.customizing-runtime
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroCustomMono
+
+---

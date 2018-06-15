@@ -17,6 +17,9 @@ If you are using some unmanaged resources (e.g., which were created in the `Glob
 
 [!code-csharp[IntroSetupCleanupGlobal.cs](../../../samples/BenchmarkDotNet.Samples/IntroSetupCleanupGlobal.cs)]
 
-### See also
+### Links
 
 * @docs.setup-and-cleanup
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroSetupCleanupGlobal
+
+---

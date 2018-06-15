@@ -13,8 +13,11 @@ One reason for doing this might be checking out how different
 
 [!code-csharp[IntroEnvVars.cs](../../../samples/BenchmarkDotNet.Samples/IntroEnvVars.cs)]
 
-### See also
+### Links
 
 * @docs.customizing-runtime
 * @docs.configs
 * @docs.jobs
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroEnvVars
+
+---

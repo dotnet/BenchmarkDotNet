@@ -18,6 +18,9 @@ uid: BenchmarkDotNet.Samples.IntroCustomMonoArguments
 | Sample |  Inlining enabled |  --optimize=inline |  0.0000 ns | 0.0000 ns |
 ```
 
-### See also
+### Links
 
 * @docs.customizing-runtime
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroCustomMonoArguments
+
+---

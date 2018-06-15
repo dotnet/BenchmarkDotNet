@@ -25,6 +25,9 @@ As a result, you will get results for each combination of params values.
  Benchmark | 225.2710 ms | 0.0434 ms | 200 | 20
 ```
 
-### See also
+### Links
 
 * @docs.parameterization
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroParams
+
+---

@@ -78,6 +78,9 @@ public class WithNonPrimitiveArgumentsSource
 ```
 
 
-### See also
+### Links
 
 * @docs.parameterization
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroArgumentsSource
+
+---

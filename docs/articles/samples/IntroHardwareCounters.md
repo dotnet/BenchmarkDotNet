@@ -20,6 +20,9 @@ You need to specify `[HardwareCounters]` and we choose the right diagnoser in th
 |   SortedBranchless |  28.6705 us |           0,06% |                 35711 |                      22 |
 | UnsortedBranchless |  28.9336 us |           0,05% |                 35578 |                      17 |
 
-### See also
+### Links
 
 * @docs.diagnosers
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroHardwareCounters
+
+---

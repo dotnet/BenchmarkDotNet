@@ -33,6 +33,9 @@ Result       5: 1 op, 10449400.00 ns, 10.4494 ms/op
     Foo | 208.7 ms | 1,707.4 ms | 443.5 ms | 10.22 ms | 1,002.0 ms | 10.45 ms |
 ```
 
-### See also
+### Links
 
 * @docs.runstrategy
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroColdStart
+
+---

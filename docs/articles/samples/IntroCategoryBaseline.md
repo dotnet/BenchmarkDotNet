@@ -23,6 +23,9 @@ The only way to have several baselines in the same class is to separate them by 
 | Time600 |       Slow | 600.45 ms | 0.0396 ms | 0.0331 ms |   1.09 |
 ```
 
-### See also
+### Links
 
 * @docs.baselines
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroCategoryBaseline
+
+---

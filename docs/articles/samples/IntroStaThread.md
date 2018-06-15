@@ -14,6 +14,9 @@ Currently it does not work for .NET Core 2.0 due to [this](https://github.com/do
 
 [!code-csharp[IntroStaThread.cs](../../../samples/BenchmarkDotNet.Samples/IntroStaThread.cs)]
 
-### See also
+### Links
 
 * @docs.customizing-runtime
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroStaThread
+
+---

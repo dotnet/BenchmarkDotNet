@@ -18,6 +18,9 @@ uid: BenchmarkDotNet.Samples.IntroStatisticsColumns
 | Sha256 | 36.62 us | 0.6390 us | 0.9564 us |   1.1363 |    4.014 |   2.30 |     0.06 |         0.0000 |
 
 
-### See also
+### Links
 
 * @docs.statistics
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroStatisticsColumns
+
+---

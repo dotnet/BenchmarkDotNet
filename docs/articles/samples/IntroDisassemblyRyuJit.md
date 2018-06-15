@@ -12,7 +12,10 @@ uid: BenchmarkDotNet.Samples.IntroDisassemblyRyuJit
 
 ![](../../images/disasm-demo.png)
 
-### See also
+### Links
 
 * @docs.diagnosers
 * @docs.disassembler
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroDisassemblyRyuJit
+
+---

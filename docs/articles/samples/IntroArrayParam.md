@@ -27,6 +27,9 @@ So if you want to pass an array as an argument, we are going to allocate it befo
 | ManualIndexOf | Array[100] |   101 | 80.421 ns | 0.6391 ns | 0.5978 ns |       0 B |
 ```
 
-### See also
+### Links
 
 * @docs.parameterization
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroArrayParam
+
+---

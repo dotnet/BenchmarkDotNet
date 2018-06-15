@@ -99,7 +99,10 @@ add    $0x18,%rsp
 retq   
 ```
 
-### See also
+### Links
 
 * @docs.diagnosers
 * @docs.disassembler
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroDisassembly
+
+---

@@ -42,6 +42,9 @@ Tail call type: RecursiveLoop
 -------------------
 ```
 
-### See also
+### Links
 
 * @docs.diagnosers
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroTailcall
+
+---

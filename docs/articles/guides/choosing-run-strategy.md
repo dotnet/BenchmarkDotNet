@@ -28,10 +28,4 @@ public class MyBenchmarkClass
 
 [!include[IntroColdStart](../samples/IntroColdStart.md)]
 
-The link to this sample: @BenchmarkDotNet.Samples.IntroColdStart
-
----
-
 [!include[IntroColdStart](../samples/IntroColdStart.md)]
-
-The link to this sample: @BenchmarkDotNet.Samples.IntroColdStart

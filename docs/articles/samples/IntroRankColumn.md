@@ -20,6 +20,9 @@ uid: BenchmarkDotNet.Samples.IntroRankColumn
     Bar |      2 | 400.7 ms | 4.509 ms | 0.2548 ms |    3 |  III |  *** |
 ```
 
-### See also
+### Links
 
 * @docs.statistics
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroRankColumn
+
+---

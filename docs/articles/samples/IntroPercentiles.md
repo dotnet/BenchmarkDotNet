@@ -71,6 +71,9 @@ completely hides the peak values:
 
 [!code-csharp[IntroPercentiles.cs](../../../samples/BenchmarkDotNet.Samples/IntroPercentiles.cs)]
 
-### See also
+### Links
 
 * @docs.statistics
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroPercentiles
+
+---

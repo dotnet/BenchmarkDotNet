@@ -42,6 +42,9 @@ Result      10: 1 op, 70496300.00 ns, 70.4963 ms/op
 |------- |---------:|---------:|---------:|---------:|---------:|---------:|---------:|
 |    Foo | 36.57 ms | 40.03 ms | 26.47 ms | 10.14 ms | 10.48 ms | 61.55 ms | 70.50 ms |
 
-### See also
+### Links
 
 * @docs.runstrategy
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroMonitoring
+
+---

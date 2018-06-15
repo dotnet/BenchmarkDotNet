@@ -91,6 +91,9 @@ Example of `IntroXmlExport-report-brief.xml`:
 </Summary>
 ```
 
-### See also
+### Links
 
 * @docs.exporters
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroExportXml
+
+---

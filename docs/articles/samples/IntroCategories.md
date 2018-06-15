@@ -18,6 +18,9 @@ Combined together with `[BenchmarkCategory]` attribute, you can group the benchm
 --anyCategories=A,B
 ```
 
-### See also
+### Links
 
 * @docs.filters
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroCategories
+
+---

@@ -22,6 +22,9 @@ Outliers
   IntroOutliers.Foo: RemoveUpperOutliers -> 1 outlier  was  removed
 ```
 
-### See also
+### Links
 
 * @docs.statistics
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroOutliers
+
+---

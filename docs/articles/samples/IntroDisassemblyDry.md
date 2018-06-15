@@ -13,7 +13,10 @@ In that case you can use **Job.Dry** which runs the benchmark only **once**.
 
 [!code-csharp[IntroDisassemblyDry.cs](../../../samples/BenchmarkDotNet.Samples/IntroDisassemblyDry.cs)]
 
-### See also
+### Links
 
 * @docs.diagnosers
 * @docs.disassembler
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroDisassemblyDry
+
+---

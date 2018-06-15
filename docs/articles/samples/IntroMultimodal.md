@@ -26,6 +26,9 @@ MultimodalDistribution
   IntroMultimodal.Quadrimodal: MainJob -> It seems that the distribution is multimodal (mValue = 5.88)
 ```
 
-### See also
+### Links
 
 * @docs.statistics
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroMultimodal
+
+---

@@ -32,6 +32,9 @@ Frequency=2531249 Hz, Resolution=395.0619 ns, Timer=TSC
  SplitJoin |    Mono | 39.14 us | 0.7763 us | 1.3596 us |   2.02 |     0.07 |
 ```
 
-### See also
+### Links
 
 * @docs.baselines
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroJobBaseline
+
+---

@@ -53,22 +53,8 @@ The easiest way to get these tools:
 
 [!include[IntroDisassembly](../samples/IntroDisassembly.md)]
 
-The link to this sample: @BenchmarkDotNet.Samples.IntroDisassembly
-
----
-
 [!include[IntroDisassemblyRyuJit](../samples/IntroDisassemblyRyuJit.md)]
-
-The link to this sample: @BenchmarkDotNet.Samples.IntroDisassemblyRyuJit
-
----
 
 [!include[IntroDisassemblyAllJits](../samples/IntroDisassemblyAllJits.md)]
 
-The link to this sample: @BenchmarkDotNet.Samples.IntroDisassemblyAllJits
-
----
-
 [!include[IntroDisassemblyDry](../samples/IntroDisassemblyDry.md)]
-
-The link to this sample: @BenchmarkDotNet.Samples.IntroDisassemblyDry

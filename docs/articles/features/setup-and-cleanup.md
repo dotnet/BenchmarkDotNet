@@ -16,16 +16,6 @@ For this purpose, BenchmarkDotNet provides a set of attributes:
 
 [!include[IntroSetupCleanupGlobal](../samples/IntroSetupCleanupGlobal.md)]
 
-The link to this sample: @BenchmarkDotNet.Samples.IntroSetupCleanupGlobal
-
----
-
 [!include[IntroSetupCleanupIteration](../samples/IntroSetupCleanupIteration.md)]
 
-The link to this sample: @BenchmarkDotNet.Samples.IntroSetupCleanupIteration
-
----
-
 [!include[IntroSetupCleanupTarget](../samples/IntroSetupCleanupTarget.md)]
-
-The link to this sample: @BenchmarkDotNet.Samples.IntroSetupCleanupTarget

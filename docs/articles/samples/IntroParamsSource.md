@@ -35,6 +35,9 @@ You don't need to use `IParam` anymore since `0.11.0`.
 Just use complex types as you wish and override `ToString` method to change the display names used in the results.
 
 
-### See also
+### Links
 
 * @docs.parameterization
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroParamsSource
+
+---
