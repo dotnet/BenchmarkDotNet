@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Portability.Cpu
             var physicalProcessorCount = GetPositiveIntValue(sysctl, "hw.packages");
             var physicalCoreCount = GetPositiveIntValue(sysctl, "hw.physicalcpu");
             var logicalCoreCount = GetPositiveIntValue(sysctl, "hw.logicalcpu");
-            return new CpuInfo(processorName, physicalProcessorCount, physicalCoreCount, logicalCoreCount);
+            return new CpuInfo(processorName, physicalProcessorCount, physicalCoreCount, logicalCoreCount, null);
         }
 
         [CanBeNull]

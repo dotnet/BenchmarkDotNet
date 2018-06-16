@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
 
@@ -21,6 +22,43 @@ namespace BenchmarkDotNet.Portability.Cpu
                 return ProcCpuInfoParser.ParseOutput(content);
             }
             return null;
+        }
+
+        private static string GetProcessorSpeed()
+        {
+
+            return "";
+        }
+        
+        private static string CPUSpeedLinuxWithDummy()
+        {
+            var processStartInfo = new ProcessStartInfo
+            {
+                FileName = "/bin/bash",
+                WorkingDirectory = "",
+                Arguments = "-c \"while (( 1 )); do echo busy; done\"",
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+            
+            using (var process = new Process { StartInfo = processStartInfo })
+            {
+                try
+                {
+                    process.Start();
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+
+                var output = ProcessHelper.RunAndReadOutput("/bin/bash","-c \"lscpu | grep MHz\"");
+                
+                process.Close();
+                return output;
+            }
         }
     }
 }

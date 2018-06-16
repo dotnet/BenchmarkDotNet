@@ -6,9 +6,9 @@ namespace BenchmarkDotNet.Portability.Cpu
     public static class CpuInfoFormatter
     {
         public static string Format(CpuInfo cpuInfo)
-            => Format(cpuInfo?.ProcessorName, cpuInfo?.PhysicalProcessorCount, cpuInfo?.PhysicalCoreCount, cpuInfo?.LogicalCoreCount);
+            => Format(cpuInfo?.ProcessorName, cpuInfo?.PhysicalProcessorCount, cpuInfo?.PhysicalCoreCount, cpuInfo?.LogicalCoreCount, cpuInfo?.CurrentClockSpeed);
 
-        private static string Format(string processorName, int? physicalProcessorCount, int? physicalCoreCount, int? logicalCoreCount)
+        private static string Format(string processorName, int? physicalProcessorCount, int? physicalCoreCount, int? logicalCoreCount, int? processorFreq)
         {
             var parts = new List<string>();
             if (!string.IsNullOrWhiteSpace(processorName))
@@ -33,7 +33,8 @@ namespace BenchmarkDotNet.Portability.Cpu
                 parts.Add("1 physical core");
             if (physicalCoreCount > 1)
                 parts.Add($"{physicalCoreCount} physical cores");
-
+            if (processorFreq > 0)
+                parts.Add($", processor frequency = {processorFreq} MHz");
             string result = string.Join("", parts);
             // The line with ProcessorBrandString is one of the longest lines in the summary.
             // When people past in on GitHub, it can be a reason of an ugly horizontal scrollbar.

@@ -15,6 +15,7 @@ namespace BenchmarkDotNet.Portability.Cpu
             int physicalCoreCount = 0;
             int logicalCoreCount = 0;
             int processorsCount = 0;
+            int currentClockSpeed = 0;
 
             foreach (var processor in processors)
             {
@@ -33,13 +34,21 @@ namespace BenchmarkDotNet.Portability.Cpu
                     processorModelNames.Add(name);
                     processorsCount++;
                 }
+                
+                if (processor.TryGetValue(WmicCpuInfoKeyNames.CurrentClockSpeed, out string frequencyValue) 
+                    && int.TryParse(frequencyValue, out int frequency)
+                    && frequency > 0)
+                {
+                    currentClockSpeed += frequency;
+                }
             }
 
             return new CpuInfo(
                 processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null,
                 processorsCount > 0 ? processorsCount : (int?) null,
                 physicalCoreCount > 0 ? physicalCoreCount : (int?) null,
-                logicalCoreCount > 0 ? logicalCoreCount : (int?) null);
+                logicalCoreCount > 0 ? logicalCoreCount : (int?) null,
+                currentClockSpeed > 0 && processorsCount > 0 ? currentClockSpeed / processorsCount : (int?) null);
         }
     }
 }

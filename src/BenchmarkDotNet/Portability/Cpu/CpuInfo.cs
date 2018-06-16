@@ -6,13 +6,15 @@
         public int? PhysicalProcessorCount { get; }
         public int? PhysicalCoreCount { get; }
         public int? LogicalCoreCount { get; }
+        public int? CurrentClockSpeed { get; } //MHz
 
-        public CpuInfo(string processorName, int? physicalProcessorCount, int? physicalCoreCount, int? logicalCoreCount)
+        public CpuInfo(string processorName, int? physicalProcessorCount, int? physicalCoreCount, int? logicalCoreCount, int? currentClockSpeed)
         {
             ProcessorName = processorName;
             PhysicalProcessorCount = physicalProcessorCount;
             PhysicalCoreCount = physicalCoreCount;
             LogicalCoreCount = logicalCoreCount;
+            CurrentClockSpeed = currentClockSpeed;
         }
     }
 }

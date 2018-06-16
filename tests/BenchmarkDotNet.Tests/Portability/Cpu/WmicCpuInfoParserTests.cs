@@ -13,6 +13,7 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
             Assert.Null(parser.PhysicalProcessorCount);
             Assert.Null(parser.PhysicalCoreCount);
             Assert.Null(parser.LogicalCoreCount);
+            Assert.Null(parser.CurrentClockSpeed);
         }
 
         [Fact]
@@ -23,6 +24,7 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
             Assert.Null(parser.PhysicalProcessorCount);
             Assert.Null(parser.PhysicalCoreCount);
             Assert.Null(parser.LogicalCoreCount);
+            Assert.Null(parser.CurrentClockSpeed);
         }
 
         [Fact]
@@ -30,11 +32,13 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
         {
             const string cpuInfo = @"
 
+CurrentClockSpeed=2400
 Name=Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
 NumberOfCores=8
 NumberOfLogicalProcessors=16
 
 
+CurrentClockSpeed=2400
 Name=Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
 NumberOfCores=8
 NumberOfLogicalProcessors=16
@@ -45,6 +49,7 @@ NumberOfLogicalProcessors=16
             Assert.Equal(2, parser.PhysicalProcessorCount);
             Assert.Equal(16, parser.PhysicalCoreCount);
             Assert.Equal(32, parser.LogicalCoreCount);
+            Assert.Equal(2400, parser.CurrentClockSpeed);
         }
 
         [Fact]
@@ -52,6 +57,7 @@ NumberOfLogicalProcessors=16
         {
             const string cpuInfo = @"
 
+CurrentClockSpeed=2500
 Name=Intel(R) Core(TM) i7-4710MQ CPU @ 2.50GHz
 NumberOfCores=4
 NumberOfLogicalProcessors=8
@@ -63,6 +69,7 @@ NumberOfLogicalProcessors=8
             Assert.Equal(1, parser.PhysicalProcessorCount);
             Assert.Equal(4, parser.PhysicalCoreCount);
             Assert.Equal(8, parser.LogicalCoreCount);
+            Assert.Equal(2500, parser.CurrentClockSpeed);
         }
     }
 }
