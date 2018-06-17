@@ -15,6 +15,9 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
             Assert.Null(parser.PhysicalCoreCount);
             Assert.Null(parser.LogicalCoreCount);
             Assert.Null(parser.NominalFrequency);
+            
+            Assert.Null(parser.MaxFrequency);
+            Assert.Null(parser.MinFrequency);
         }
 
         [Fact]
@@ -26,6 +29,8 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
             Assert.Null(parser.PhysicalCoreCount);
             Assert.Null(parser.LogicalCoreCount);
             Assert.Null(parser.NominalFrequency);
+            Assert.Null(parser.MaxFrequency);
+            Assert.Null(parser.MinFrequency);
         }
 
         [Fact]
@@ -37,7 +42,9 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
             Assert.Equal(2, parser.PhysicalProcessorCount);
             Assert.Equal(6, parser.PhysicalCoreCount);
             Assert.Equal(8, parser.LogicalCoreCount);
-            Assert.Equal(2300, parser.NominalFrequency);
+            Assert.Equal(2500, parser.NominalFrequency);
+            Assert.Equal(800, parser.MinFrequency);
+            Assert.Equal(2500, parser.MaxFrequency);
         }
 
 
@@ -51,6 +58,8 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
             Assert.Equal(2, parser.PhysicalCoreCount);
             Assert.Equal(4, parser.LogicalCoreCount);
             Assert.Equal(2300, parser.NominalFrequency);
+            Assert.Equal(800, parser.MinFrequency);
+            Assert.Equal(2300, parser.MaxFrequency);
         }
 
         [Fact]
@@ -63,6 +72,8 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
             Assert.Equal(4, parser.PhysicalCoreCount);
             Assert.Equal(8, parser.LogicalCoreCount);
             Assert.Equal(2500, parser.NominalFrequency);
+            Assert.Equal(800, parser.MinFrequency);
+            Assert.Equal(2500, parser.MaxFrequency);
         }
     }
 }

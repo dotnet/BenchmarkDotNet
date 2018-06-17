@@ -29,11 +29,19 @@ namespace BenchmarkDotNet.Portability.Cpu
         
         private static string GetCpuSpeed()
         {
-            var output = ProcessHelper.RunAndReadOutput("/bin/bash","-c \"lscpu | grep \"max MHz\"\"")?
-                                      .Split('\n').First()
-                                      .Split(' ').Last();
+            var output = ProcessHelper.RunAndReadOutput("/bin/bash", "-c \"lscpu | grep MHz\"")?
+                                      .Split('\n')
+                                      .SelectMany(x => x.Split(':'))
+                                      .ToArray();
             
-            return $"\n{ProcCpuInfoKeyNames.CpuFreq}\t:{output}";
+            if (output == null || output.Length < 6)
+                return null;
+                
+            var current = double.TryParse(output[1].Trim(), out double currentValue);
+            var max = double.TryParse(output[3].Trim().Replace(',', '.'), out double maxValue);
+            var min = double.TryParse(output[5].Trim().Replace(',', '.'), out double minValue);
+            
+            return $"\n{ProcCpuInfoKeyNames.NominalFrequency}\t:{currentValue}\n{ProcCpuInfoKeyNames.MinFrequency}\t:{minValue}\n{ProcCpuInfoKeyNames.MaxFrequency}\t:{maxValue}\n";
         }
     }
 }

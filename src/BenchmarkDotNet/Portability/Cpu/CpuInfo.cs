@@ -7,14 +7,25 @@
         public int? PhysicalCoreCount { get; }
         public int? LogicalCoreCount { get; }
         public double? NominalFrequency { get; }
+        public double? MinFrequency { get; }
+        public double? MaxFrequency { get; }
+        
 
-        public CpuInfo(string processorName, int? physicalProcessorCount, int? physicalCoreCount, int? logicalCoreCount, double? nominalFrequency)
+        public CpuInfo(string processorName,
+                       int? physicalProcessorCount,
+                       int? physicalCoreCount,
+                       int? logicalCoreCount,
+                       double? nominalFrequency,
+                       double? minFrequency,
+                       double? maxFrequency)
         {
             ProcessorName = processorName;
             PhysicalProcessorCount = physicalProcessorCount;
             PhysicalCoreCount = physicalCoreCount;
             LogicalCoreCount = logicalCoreCount;
             NominalFrequency = nominalFrequency;
+            MinFrequency = minFrequency;
+            MaxFrequency = maxFrequency;
         }
     }
 }

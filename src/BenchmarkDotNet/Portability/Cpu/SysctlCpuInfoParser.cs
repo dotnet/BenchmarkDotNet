@@ -15,8 +15,10 @@ namespace BenchmarkDotNet.Portability.Cpu
             var physicalProcessorCount = GetPositiveIntValue(sysctl, "hw.packages");
             var physicalCoreCount = GetPositiveIntValue(sysctl, "hw.physicalcpu");
             var logicalCoreCount = GetPositiveIntValue(sysctl, "hw.logicalcpu");
-            var frequency = GetPositiveLongValue(sysctl, "hw.cpufrequency") / 1_000_000;
-            return new CpuInfo(processorName, physicalProcessorCount, physicalCoreCount, logicalCoreCount, frequency);
+            var nominalFrequency = GetPositiveLongValue(sysctl, "hw.cpufrequency") / 1_000_000;
+            var minFrequency = GetPositiveLongValue(sysctl, "hw.cpufrequency_min") / 1_000_000;
+            var maxFrequency = GetPositiveLongValue(sysctl, "hw.cpufrequency_max") / 1_000_000;
+            return new CpuInfo(processorName, physicalProcessorCount, physicalCoreCount, logicalCoreCount, nominalFrequency, minFrequency, maxFrequency);
         }
 
         [CanBeNull]

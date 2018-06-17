@@ -46,4 +46,6 @@ physical id	: 3
 core id		: 2
 cpu cores	: 4
 
-cpu freq : 2300
+nominal freq : 2500
+max freq : 2500
+min freq : 800

@@ -16,6 +16,8 @@ namespace BenchmarkDotNet.Portability.Cpu
             int logicalCoreCount = 0;
             int processorsCount = 0;
             int currentClockSpeed = 0;
+            int maxClockSpeed = 0;
+            int minClockSpeed = 0;
 
             foreach (var processor in processors)
             {
@@ -40,6 +42,8 @@ namespace BenchmarkDotNet.Portability.Cpu
                     && frequency > 0)
                 {
                     currentClockSpeed += frequency;
+                    maxClockSpeed += frequency;
+                    minClockSpeed += frequency;
                 }
             }
 
@@ -48,7 +52,9 @@ namespace BenchmarkDotNet.Portability.Cpu
                 processorsCount > 0 ? processorsCount : (int?) null,
                 physicalCoreCount > 0 ? physicalCoreCount : (int?) null,
                 logicalCoreCount > 0 ? logicalCoreCount : (int?) null,
-                currentClockSpeed > 0 && processorsCount > 0 ? currentClockSpeed / processorsCount : (double?) null);
+                currentClockSpeed > 0 && processorsCount > 0 ? currentClockSpeed / processorsCount : (double?) null,
+                maxClockSpeed > 0 && processorsCount > 0 ? maxClockSpeed / processorsCount : (double?) null,
+                minClockSpeed > 0 && processorsCount > 0 ? minClockSpeed / processorsCount : (double?) null);
         }
     }
 }

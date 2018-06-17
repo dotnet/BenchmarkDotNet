@@ -14,8 +14,12 @@ namespace BenchmarkDotNet.Portability.Cpu
             var logicalCores = SectionsHelper.ParseSections(content, ':');
             var processorModelNames = new HashSet<string>();
             var processorsToPhysicalCoreCount = new Dictionary<string, int>();
+            
             var logicalCoreCount = 0;
-            var cpuFrequency = 0d;
+            var nominalFrequency = 0d;
+            var minFrequency = 0d;
+            var maxFrequency = 0d;
+            
             foreach (var logicalCore in logicalCores)
             {
                 if (logicalCore.TryGetValue(ProcCpuInfoKeyNames.PhysicalId, out string physicalId) &&
@@ -30,10 +34,22 @@ namespace BenchmarkDotNet.Portability.Cpu
                     logicalCoreCount++;
                 }
 
-                if (logicalCore.TryGetValue(ProcCpuInfoKeyNames.CpuFreq, out string cpuFreqValue)
+                if (logicalCore.TryGetValue(ProcCpuInfoKeyNames.NominalFrequency, out string cpuFreqValue)
                     && double.TryParse(cpuFreqValue.Replace(',','.'), out double cpuFreq))
                 {
-                    cpuFrequency = cpuFreq;
+                    nominalFrequency = cpuFreq;
+                }
+                
+                if (logicalCore.TryGetValue(ProcCpuInfoKeyNames.MinFrequency, out string minCpuFreqValue)
+                    && double.TryParse(minCpuFreqValue.Replace(',','.'), out double minCpuFreq))
+                {
+                    minFrequency = minCpuFreq;
+                }
+                
+                if (logicalCore.TryGetValue(ProcCpuInfoKeyNames.MaxFrequency, out string maxCpuFreqValue)
+                     && double.TryParse(maxCpuFreqValue.Replace(',','.'), out double maxCpuFreq))
+                {
+                    maxFrequency = maxCpuFreq;
                 }
             }
 
@@ -42,7 +58,9 @@ namespace BenchmarkDotNet.Portability.Cpu
                 processorsToPhysicalCoreCount.Count > 0 ? processorsToPhysicalCoreCount.Count : (int?) null,
                 processorsToPhysicalCoreCount.Count > 0 ? processorsToPhysicalCoreCount.Values.Sum() : (int?) null,
                 logicalCoreCount > 0 ? logicalCoreCount : (int?) null,
-                cpuFrequency > 0 ? cpuFrequency : (double?) null);
+                nominalFrequency > 0 ? nominalFrequency : (double?) null,
+                minFrequency > 0 ? minFrequency : (double?) null,
+                maxFrequency > 0 ? maxFrequency : (double?) null);
         }
     }
 }
