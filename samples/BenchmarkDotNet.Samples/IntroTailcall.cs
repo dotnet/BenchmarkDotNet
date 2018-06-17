@@ -2,8 +2,8 @@
 
 namespace BenchmarkDotNet.Samples
 {
-    //[Diagnostics.Windows.Configs.TailCallDiagnoser]
-    //[LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
+    [Diagnostics.Windows.Configs.TailCallDiagnoser]
+    [LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
     public class IntroTailcall
     {
         [Benchmark]
