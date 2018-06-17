@@ -76,6 +76,8 @@ namespace BenchmarkDotNet.Configs
                 { "ryujitx86", new[] { Job.RyuJitX86 } },
                 { "dry", new[] { Job.Dry } },
                 { "clr", new[] { Job.Clr } },
+                { "core", new[] { Job.Core } },
+                { "corert", new[] { Job.CoreRT } },
                 { "mono", new[] { Job.Mono } },
                 { "longrun", new[] { Job.LongRun } }
             };
