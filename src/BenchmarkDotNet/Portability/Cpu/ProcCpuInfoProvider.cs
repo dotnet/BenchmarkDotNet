@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
 
@@ -19,46 +20,22 @@ namespace BenchmarkDotNet.Portability.Cpu
             if (RuntimeInformation.IsLinux())
             {
                 string content = ProcessHelper.RunAndReadOutput("cat", "/proc/cpuinfo");
+                var output = CpuSpeedLinuxWithDummy();
+                content = content + output;
                 return ProcCpuInfoParser.ParseOutput(content);
             }
             return null;
         }
-
-        private static string GetProcessorSpeed()
-        {
-
-            return "";
-        }
         
-        private static string CPUSpeedLinuxWithDummy()
+        private static string CpuSpeedLinuxWithDummy()
         {
-            var processStartInfo = new ProcessStartInfo
-            {
-                FileName = "/bin/bash",
-                WorkingDirectory = "",
-                Arguments = "-c \"while (( 1 )); do echo busy; done\"",
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            };
+            var output = ProcessHelper.RunAndReadOutput("/bin/bash","-c \"lscpu | grep \"max MHz\"\"")?
+                                      .Split('\n')
+                                      .First()
+                                      .Split(' ')
+                                      .Last();
             
-            using (var process = new Process { StartInfo = processStartInfo })
-            {
-                try
-                {
-                    process.Start();
-                }
-                catch (Exception)
-                {
-                    return null;
-                }
-
-                var output = ProcessHelper.RunAndReadOutput("/bin/bash","-c \"lscpu | grep MHz\"");
-                
-                process.Close();
-                return output;
-            }
+            return $"\ncpu freq\t:{output}";
         }
     }
 }

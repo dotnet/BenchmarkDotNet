@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
@@ -14,6 +15,7 @@ namespace BenchmarkDotNet.Portability.Cpu
             var processorModelNames = new HashSet<string>();
             var processorsToPhysicalCoreCount = new Dictionary<string, int>();
             var logicalCoreCount = 0;
+            var cpuFrequency = 0d;
             foreach (var logicalCore in logicalCores)
             {
                 if (logicalCore.TryGetValue(ProcCpuInfoKeyNames.PhysicalId, out string physicalId) &&
@@ -27,6 +29,12 @@ namespace BenchmarkDotNet.Portability.Cpu
                     processorModelNames.Add(modelName);
                     logicalCoreCount++;
                 }
+
+                if (logicalCore.TryGetValue(ProcCpuInfoKeyNames.CpuFreq, out string cpuFreqValue)
+                    && double.TryParse(cpuFreqValue.Replace(',','.'), out double cpuFreq))
+                {
+                    cpuFrequency = cpuFreq;
+                }
             }
 
             return new CpuInfo(
@@ -34,7 +42,7 @@ namespace BenchmarkDotNet.Portability.Cpu
                 processorsToPhysicalCoreCount.Count > 0 ? processorsToPhysicalCoreCount.Count : (int?) null,
                 processorsToPhysicalCoreCount.Count > 0 ? processorsToPhysicalCoreCount.Values.Sum() : (int?) null,
                 logicalCoreCount > 0 ? logicalCoreCount : (int?) null,
-                null);
+                cpuFrequency > 0 ? cpuFrequency : (double?) null);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Portability.Cpu
         public static string Format(CpuInfo cpuInfo)
             => Format(cpuInfo?.ProcessorName, cpuInfo?.PhysicalProcessorCount, cpuInfo?.PhysicalCoreCount, cpuInfo?.LogicalCoreCount, cpuInfo?.CurrentClockSpeed);
 
-        private static string Format(string processorName, int? physicalProcessorCount, int? physicalCoreCount, int? logicalCoreCount, int? processorFreq)
+        private static string Format(string processorName, int? physicalProcessorCount, int? physicalCoreCount, int? logicalCoreCount, double? processorFreq)
         {
             var parts = new List<string>();
             if (!string.IsNullOrWhiteSpace(processorName))

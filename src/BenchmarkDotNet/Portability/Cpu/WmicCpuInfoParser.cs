@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Portability.Cpu
                 processorsCount > 0 ? processorsCount : (int?) null,
                 physicalCoreCount > 0 ? physicalCoreCount : (int?) null,
                 logicalCoreCount > 0 ? logicalCoreCount : (int?) null,
-                currentClockSpeed > 0 && processorsCount > 0 ? currentClockSpeed / processorsCount : (int?) null);
+                currentClockSpeed > 0 && processorsCount > 0 ? currentClockSpeed / processorsCount : (double?) null);
         }
     }
 }
