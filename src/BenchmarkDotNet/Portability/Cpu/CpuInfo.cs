@@ -9,6 +9,7 @@
         public double? NominalFrequency { get; }
         public double? MinFrequency { get; }
         public double? MaxFrequency { get; }
+        public double? EffectiveFrequency { get; }
         
 
         public CpuInfo(string processorName,
@@ -17,7 +18,8 @@
                        int? logicalCoreCount,
                        double? nominalFrequency,
                        double? minFrequency,
-                       double? maxFrequency)
+                       double? maxFrequency,
+                       double? effectiveFrequency = null)
         {
             ProcessorName = processorName;
             PhysicalProcessorCount = physicalProcessorCount;
@@ -26,6 +28,7 @@
             NominalFrequency = nominalFrequency;
             MinFrequency = minFrequency;
             MaxFrequency = maxFrequency;
+            EffectiveFrequency = effectiveFrequency;
         }
     }
 }
