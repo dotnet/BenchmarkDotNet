@@ -45,3 +45,5 @@ model name  : Unknown processor with 4 cores
 physical id	: 3
 core id		: 2
 cpu cores	: 4
+
+cpu freq : 2300

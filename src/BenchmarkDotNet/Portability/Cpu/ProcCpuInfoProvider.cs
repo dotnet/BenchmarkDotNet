@@ -30,10 +30,8 @@ namespace BenchmarkDotNet.Portability.Cpu
         private static string CpuSpeedLinuxWithDummy()
         {
             var output = ProcessHelper.RunAndReadOutput("/bin/bash","-c \"lscpu | grep \"max MHz\"\"")?
-                                      .Split('\n')
-                                      .First()
-                                      .Split(' ')
-                                      .Last();
+                                      .Split('\n').First()
+                                      .Split(' ').Last();
             
             return $"\ncpu freq\t:{output}";
         }
