@@ -5,17 +5,14 @@ uid: BenchmarkDotNet.Samples.IntroSetupCleanupIteration
 ## Sample: IntroSetupCleanupIteration
 
 A method which is marked by the [`[IterationSetup]`](xref:BenchmarkDotNet.Attributes.IterationSetupAttribute)
-  attribute will be executed only once *before each an iteration*.
+  attribute will be executed exactly once *before each benchmark invocation* (we have changed that in 0.11.0).
 It's not recommended to use this attribute in microbenchmarks because it can spoil the results.
 However, if you are writing a macrobenchmark (e.g. a benchmark which takes at least 100ms) and
-  you want to prepare some data before each iteration,
+  you want to prepare some data before each invocation,
   [`[IterationSetup]`](xref:BenchmarkDotNet.Attributes.IterationSetupAttribute) can be useful.
-BenchmarkDotNet doesn't support setup/cleanup method for a single method invocation (*an operation*),
-  but you can perform only one operation per iteration.
-It's recommended to use `RunStrategy.Monitoring` for such cases.
 
 A method which is marked by the [`[IterationCleanup]`](xref:BenchmarkDotNet.Attributes.IterationCleanupAttribute)
-  attribute will be executed only once *after each an iteration*.
+  attribute will be executed exactly once *after each invocation*.
 This attribute has the same set of constraint with `[IterationSetup]`: it's not recommended to use
   [`[IterationCleanup]`](xref:BenchmarkDotNet.Attributes.IterationCleanupAttribute) in microbenchmarks.
 
