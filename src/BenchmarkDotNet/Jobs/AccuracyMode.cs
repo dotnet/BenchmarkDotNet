@@ -44,6 +44,9 @@ namespace BenchmarkDotNet.Jobs
             set => EvaluateOverheadCharacteristic[this] = value;
         }
 
+        /// <summary>
+        /// Specifies which outliers should be removed from the distribution
+        /// </summary>
         public OutlierMode OutlierMode
         {
             get => OutlierModeCharacteristic[this];

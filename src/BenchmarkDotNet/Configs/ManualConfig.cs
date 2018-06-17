@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Configs
         public void Set(IOrderProvider provider) => orderProvider = provider ?? orderProvider;
         public void Set(ISummaryStyle style) => summaryStyle = style ?? summaryStyle;
         public void Set(Encoding encoding) => Encoding = encoding;
-        public void Add(params BenchmarkLogicalGroupRule[] rules) => AddRules(rules);
+        public void Add(params BenchmarkLogicalGroupRule[] rules) => logicalGroupRules.AddRange(rules);
 
         public void Add(IConfig config)
         {
@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Configs
             loggers.AddRange(config.GetLoggers());
             diagnosers.AddRange(config.GetDiagnosers());
             analysers.AddRange(config.GetAnalysers());
-            jobs.AddRange(config.GetJobs());
+            AddJobs(config.GetJobs());
             validators.AddRange(config.GetValidators());
             hardwareCounters.AddRange(config.GetHardwareCounters());
             filters.AddRange(config.GetFilters());
@@ -82,13 +82,7 @@ namespace BenchmarkDotNet.Configs
             ArtifactsPath = config.ArtifactsPath ?? ArtifactsPath;
             Encoding = config.Encoding ?? Encoding;
             summaryStyle = summaryStyle ?? config.GetSummaryStyle();
-            AddRules(config.GetLogicalGroupRules());
-        }
-
-        private void AddRules(IEnumerable<BenchmarkLogicalGroupRule> rules)
-        {
-            foreach (var rule in rules)
-                logicalGroupRules.Add(rule);
+            logicalGroupRules.AddRange(config.GetLogicalGroupRules());
         }
 
         public IEnumerable<IDiagnoser> GetDiagnosers()
@@ -134,7 +128,7 @@ namespace BenchmarkDotNet.Configs
             foreach (var analyser in diagnoser.Analysers)
                 yield return analyser;
         }
-        
+
         public static ManualConfig CreateEmpty() => new ManualConfig();
 
         public static ManualConfig Create(IConfig config)
@@ -171,5 +165,28 @@ namespace BenchmarkDotNet.Configs
 
         public static void PrintOptions(ILogger logger, int prefixWidth, int outputWidth)
             => new ConfigParser().PrintOptions(logger, prefixWidth: prefixWidth, outputWidth: outputWidth);
+
+        private void AddJobs(IEnumerable<Job> toAdd)
+        {
+            foreach (var notMutator in toAdd.Where(job => !job.Meta.IsMutator))
+                jobs.Add(notMutator);
+            
+            var mutators = toAdd.Where(job => job.Meta.IsMutator).ToArray();
+            if (!mutators.Any())
+                return;
+            
+            if (!jobs.Any())
+                jobs.Add(Job.Default);
+
+            for (int i = 0; i < jobs.Count; i++)
+            {
+                var copy = jobs[i].UnfreezeCopy();
+
+                foreach (var mutator in mutators)
+                    copy.Apply(mutator);
+
+                jobs[i] = copy.Freeze();
+            }
+        }
     }
 }

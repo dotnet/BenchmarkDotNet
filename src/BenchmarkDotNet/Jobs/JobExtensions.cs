@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
@@ -26,16 +27,68 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithGcRetainVm(this Job job, bool value) => job.WithCore(j => j.Env.Gc.RetainVm = value);
         public static Job With(this Job job, GcMode gc) => job.WithCore(j => EnvMode.GcCharacteristic[j] = gc);
 
-        // Run
+    // Run
+        /// <summary>
+        /// Available values: Throughput and ColdStart.
+        ///     Throughput: default strategy which allows to get good precision level.
+        ///     ColdStart: should be used only for measuring cold start of the application or testing purpose.
+        ///     Monitoring: no overhead evaluating, with several target iterations. Perfect for macrobenchmarks without a steady state with high variance.
+        /// </summary>
         public static Job With(this Job job, RunStrategy strategy) => job.WithCore(j => j.Run.RunStrategy = strategy);
+
+        /// <summary>
+        /// How many times we should launch process with target benchmark.
+        /// </summary>
         public static Job WithLaunchCount(this Job job, int count) => job.WithCore(j => j.Run.LaunchCount = count);
+        
+        /// <summary>
+        /// How many warmup iterations should be performed.
+        /// </summary>
         public static Job WithWarmupCount(this Job job, int count) => job.WithCore(j => j.Run.WarmupCount = count);
+        
+        /// <summary>
+        /// How many target iterations should be performed
+        /// If specified, <see cref="RunMode.MinTargetIterationCount"/> will be ignored.
+        /// If specified, <see cref="RunMode.MaxTargetIterationCount"/> will be ignored.
+        /// </summary>
         public static Job WithTargetCount(this Job job, int count) => job.WithCore(j => j.Run.TargetCount = count);
+        
+        /// <summary>
+        /// Desired time of execution of an iteration. Used by Pilot stage to estimate the number of invocations per iteration.
+        /// The default value is 500 milliseconds.
+        /// </summary>
         public static Job WithIterationTime(this Job job, TimeInterval time) => job.WithCore(j => j.Run.IterationTime = time);
+        
+        /// <summary>
+        /// Invocation count in a single iteration.
+        /// If specified, <see cref="RunMode.IterationTime"/> will be ignored.
+        /// If specified, it must be a multiple of <see cref="RunMode.UnrollFactor"/>.
+        /// </summary>
         public static Job WithInvocationCount(this Job job, int count) => job.WithCore(j => j.Run.InvocationCount = count);
+        
+        /// <summary>
+        /// How many times the benchmark method will be invoked per one iteration of a generated loop.
+        /// The default value is 16.
+        /// </summary>
         public static Job WithUnrollFactor(this Job job, int factor) => job.WithCore(j => j.Run.UnrollFactor = factor);
+        
+        /// <summary>
+        /// Run the benchmark exactly once per iteration.
+        /// </summary>
         public static Job RunOncePerIteration(this Job job) => job.WithInvocationCount(1).WithUnrollFactor(1);
+        
+        /// <summary>
+        /// Minimum count of target iterations that should be performed
+        /// The default value is 15
+        /// <remarks>If you set this value to below 15, then <see cref="MultimodalDistributionAnalyzer"/> is not going to work</remarks>
+        /// </summary>
         public static Job WithMinTargetIterationCount(this Job job, int count) => job.WithCore(j => j.Run.MinTargetIterationCount = count);
+        
+        /// <summary>
+        /// Maximum count of target iterations that should be performed
+        /// The default value is 100
+        /// <remarks>If you set this value to below 15, then <see cref="MultimodalDistributionAnalyzer"/>  is not going to work</remarks>
+        /// </summary>
         public static Job WithMaxTargetIterationCount(this Job job, int count) => job.WithCore(j => j.Run.MaxTargetIterationCount = count);
 
         // Infrastructure
@@ -52,7 +105,12 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithMinIterationTime(this Job job, TimeInterval value) => job.WithCore(j => j.Accuracy.MinIterationTime = value);
         public static Job WithMinInvokeCount(this Job job, int value) => job.WithCore(j => j.Accuracy.MinInvokeCount = value);
         public static Job WithEvaluateOverhead(this Job job, bool value) => job.WithCore(j => j.Accuracy.EvaluateOverhead = value);
+        
+        /// <summary>
+        /// Specifies which outliers should be removed from the distribution
+        /// </summary>
         public static Job WithOutlierMode(this Job job, OutlierMode value) => job.WithCore(j => j.Accuracy.OutlierMode = value);
+        
         [Obsolete("Please use the new WithOutlierMode instead")]
         public static Job WithRemoveOutliers(this Job job, bool value) => job.WithCore(j => j.Accuracy.OutlierMode = value ? OutlierMode.OnlyUpper : OutlierMode.None);
         public static Job WithAnalyzeLaunchVariance(this Job job, bool value) => job.WithCore(j => j.Accuracy.AnalyzeLaunchVariance = value);
@@ -60,6 +118,11 @@ namespace BenchmarkDotNet.Jobs
         // Meta
         public static Job AsBaseline(this Job job) => job.WithCore(j => j.Meta.IsBaseline = true);
         public static Job WithIsBaseline(this Job job, bool value) => value ? job.AsBaseline() : job;
+        
+        /// <summary>
+        /// mutator job should not be added to the config, but instead applied to other jobs in given config
+        /// </summary>
+        public static Job AsMutator(this Job job) => job.WithCore(j => j.Meta.IsMutator = true);
 
         internal static Job MakeSettingsUserFriendly(this Job job, Target target)
         {

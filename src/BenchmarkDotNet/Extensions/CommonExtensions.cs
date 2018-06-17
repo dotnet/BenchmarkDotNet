@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Horology;
@@ -84,6 +85,12 @@ namespace BenchmarkDotNet.Extensions
         public static bool IsEmpty<T>(this IReadOnlyCollection<T> value) => value.Count == 0;
         public static bool IsEmpty<T>(this IEnumerable<T> value) => !value.Any();
 
+        public static void AddRange<T>(this HashSet<T> hashSet, IEnumerable<T> collection)
+        {
+            foreach (var item in collection)
+                hashSet.Add(item);
+        }
+        
 #if !NETCOREAPP2_1 // method with the same name was added to Dictionary in .NET Core 2.1, so we need this ulgy hack to get compiler happy
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
             => dictionary.TryGetValue(key, out var value) ? value : default;

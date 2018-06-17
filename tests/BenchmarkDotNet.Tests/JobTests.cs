@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
@@ -400,8 +400,26 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Equal(string.Join(";", a), "Id;Accuracy;AnalyzeLaunchVariance;EvaluateOverhead;" +
                 "MaxAbsoluteError;MaxRelativeError;MinInvokeCount;MinIterationTime;OutlierMode;Env;Affinity;" +
                 "Jit;Platform;Runtime;Gc;AllowVeryLargeObjects;Concurrent;CpuGroups;Force;HeapAffinitizeMask;HeapCount;NoAffinitize;" +
-                "RetainVm;Server;Infrastructure;Arguments;BuildConfiguration;Clock;EngineFactory;EnvironmentVariables;Toolchain;Meta;IsBaseline;Run;InvocationCount;IterationTime;" +
+                "RetainVm;Server;Infrastructure;Arguments;BuildConfiguration;Clock;EngineFactory;EnvironmentVariables;Toolchain;Meta;IsBaseline;IsMutator;Run;InvocationCount;IterationTime;" +
                 "LaunchCount;MaxTargetIterationCount;MinTargetIterationCount;RunStrategy;TargetCount;UnrollFactor;WarmupCount");
+        }
+        
+        [Fact]
+        public static void MutatorAppliedToOtherJobOverwritesOnlyTheConfiguredSettings()
+        {
+            var jobBefore = Job.Core; // this is a default job with Runtime set to Core
+            var copy = jobBefore.UnfreezeCopy();
+            
+            Assert.False(copy.HasValue(RunMode.MaxTargetIterationCountCharacteristic));
+
+            var mutator = Job.Default.WithMaxTargetIterationCount(20);
+
+            copy.Apply(mutator);
+            
+            Assert.True(copy.HasValue(RunMode.MaxTargetIterationCountCharacteristic));
+            Assert.Equal(20, copy.Run.MaxTargetIterationCount);
+            Assert.False(jobBefore.HasValue(RunMode.MaxTargetIterationCountCharacteristic));
+            Assert.True(copy.Env.Runtime is CoreRuntime);
         }
     }
 }
