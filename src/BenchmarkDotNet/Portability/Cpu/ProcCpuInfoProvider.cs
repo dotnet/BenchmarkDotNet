@@ -20,14 +20,14 @@ namespace BenchmarkDotNet.Portability.Cpu
             if (RuntimeInformation.IsLinux())
             {
                 string content = ProcessHelper.RunAndReadOutput("cat", "/proc/cpuinfo");
-                var output = CpuSpeedLinuxWithDummy();
+                var output = GetCpuSpeed();
                 content = content + output;
                 return ProcCpuInfoParser.ParseOutput(content);
             }
             return null;
         }
         
-        private static string CpuSpeedLinuxWithDummy()
+        private static string GetCpuSpeed()
         {
             var output = ProcessHelper.RunAndReadOutput("/bin/bash","-c \"lscpu | grep \"max MHz\"\"")?
                                       .Split('\n').First()
