@@ -98,7 +98,7 @@ namespace BenchmarkDotNet.Exporters
                 return GetArgument(array[0], argumentType);
 
             if (argumentValue is string text)
-                return $"\"{text}\"";
+                return $"\"{EscapeWhitespaces(text)}\"";
             if (argumentValue is char character)
                 return $"'{character}'";
             if (argumentValue is DateTime time)
@@ -136,5 +136,9 @@ namespace BenchmarkDotNet.Exporters
 
             return buffer.ToString();
         }
+
+        private static string EscapeWhitespaces(string text)
+            => text.Replace("\t", "\\t")
+                   .Replace("\r\n", "\\r\\n");
     }
 }

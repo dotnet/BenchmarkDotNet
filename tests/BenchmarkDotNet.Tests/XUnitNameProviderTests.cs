@@ -70,6 +70,10 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void UnicodeIsSupported() 
             => AssertBenchmarkName<WithCrazyUnicodeCharacters>("BenchmarkDotNet.Tests.WithCrazyUnicodeCharacters.Method(arg1: \"" + "FOO" + "\", arg2: \""+ "\u03C3" + "\", arg3: \"" + "x\u0305" + "\")");
+        
+        [Fact]
+        public void TabsAndEnters() 
+            => AssertBenchmarkName<WithTabAndEnter>("BenchmarkDotNet.Tests.WithTabAndEnter.Method(tab: \"1\\t2\", enter: \"3\\r\\n4\")");
 
         [Fact]
         public void VeryLongArraysAreSupported()
@@ -196,6 +200,13 @@ namespace BenchmarkDotNet.Tests
         {
             yield return new object[] { "FOO", "\u03C3", "x\u0305" }; // https://github.com/Microsoft/xunit-performance/blob/f1d1d62a934694d8cd19063e60e04c590711d904/tests/simpleharness/Program.cs#L29
         }
+    }
+    
+    public class WithTabAndEnter
+    {
+        [Benchmark]
+        [Arguments("1\t2", "3\r\n4")]
+        public void Method(string tab, string enter) { }
     }
 
     public class WithBigArray
