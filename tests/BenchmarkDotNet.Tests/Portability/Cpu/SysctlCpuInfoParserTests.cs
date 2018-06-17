@@ -13,6 +13,7 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
             Assert.Null(parser.PhysicalProcessorCount);
             Assert.Null(parser.PhysicalCoreCount);
             Assert.Null(parser.LogicalCoreCount);
+            Assert.Null(parser.NominalFrequency);
         }
 
         [Fact]
@@ -23,6 +24,7 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
             Assert.Null(parser.PhysicalProcessorCount);
             Assert.Null(parser.PhysicalCoreCount);
             Assert.Null(parser.LogicalCoreCount);
+            Assert.Null(parser.NominalFrequency);
         }
 
         [Fact]
@@ -34,6 +36,7 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
             Assert.Equal(1, parser.PhysicalProcessorCount);
             Assert.Equal(4, parser.PhysicalCoreCount);
             Assert.Equal(8, parser.LogicalCoreCount);
+            Assert.Equal(2200, parser.NominalFrequency);
         }
     }
 }

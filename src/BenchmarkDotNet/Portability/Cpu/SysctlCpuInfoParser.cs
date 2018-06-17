@@ -15,7 +15,8 @@ namespace BenchmarkDotNet.Portability.Cpu
             var physicalProcessorCount = GetPositiveIntValue(sysctl, "hw.packages");
             var physicalCoreCount = GetPositiveIntValue(sysctl, "hw.physicalcpu");
             var logicalCoreCount = GetPositiveIntValue(sysctl, "hw.logicalcpu");
-            return new CpuInfo(processorName, physicalProcessorCount, physicalCoreCount, logicalCoreCount, null);
+            var frequency = GetPositiveLongValue(sysctl, "hw.cpufrequency") / 1_000_000;
+            return new CpuInfo(processorName, physicalProcessorCount, physicalCoreCount, logicalCoreCount, frequency);
         }
 
         [CanBeNull]
@@ -23,6 +24,16 @@ namespace BenchmarkDotNet.Portability.Cpu
         {
             if (sysctl.TryGetValue(keyName, out string value) &&
                 int.TryParse(value, out int result) &&
+                result > 0)
+                return result;
+            return null;
+        }
+        
+        [CanBeNull]
+        private static long? GetPositiveLongValue([NotNull] Dictionary<string, string> sysctl, [NotNull] string keyName)
+        {
+            if (sysctl.TryGetValue(keyName, out string value) &&
+                long.TryParse(value, out long result) &&
                 result > 0)
                 return result;
             return null;

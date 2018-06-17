@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Portability.Cpu
                                       .Split('\n').First()
                                       .Split(' ').Last();
             
-            return $"\ncpu freq\t:{output}";
+            return $"\n{ProcCpuInfoKeyNames.CpuFreq}\t:{output}";
         }
     }
 }

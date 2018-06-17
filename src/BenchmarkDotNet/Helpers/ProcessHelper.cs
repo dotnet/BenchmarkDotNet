@@ -38,7 +38,6 @@ namespace BenchmarkDotNet.Helpers
                 process.WaitForExit();
                 return output;
             }
-            
         }
 
         internal static IReadOnlyList<string> RunAndReadOutputLineByLine(string fileName, string arguments = "", 

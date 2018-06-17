@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Portability.Cpu
             uint physicalCoreCount = 0;
             uint logicalCoreCount = 0;
             int processorsCount = 0;
-            int currentClockSpeed = 0;
+            uint currentClockSpeed = 0;
 
             var mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
             foreach (var moProcessor in mosProcessor.Get().Cast<ManagementObject>())
@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Portability.Cpu
                     processorsCount++;
                     physicalCoreCount += (uint) moProcessor[WmicCpuInfoKeyNames.NumberOfCores];
                     logicalCoreCount += (uint) moProcessor[WmicCpuInfoKeyNames.NumberOfLogicalProcessors];
-                    currentClockSpeed += (int) moProcessor[WmicCpuInfoKeyNames.CurrentClockSpeed];
+                    currentClockSpeed = (uint) moProcessor[WmicCpuInfoKeyNames.CurrentClockSpeed];
                 }
             }
 
@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Portability.Cpu
                 processorsCount > 0 ? processorsCount : (int?) null,
                 physicalCoreCount > 0 ? (int?) physicalCoreCount : null,
                 logicalCoreCount > 0 ? (int?) logicalCoreCount : null,
-                currentClockSpeed > 0 && logicalCoreCount > 0 ? (int?) currentClockSpeed : null);
+                currentClockSpeed > 0 && logicalCoreCount > 0 ? currentClockSpeed : 0);
         }
     }
 }
