@@ -13,9 +13,6 @@ However, if you are writing a macrobenchmark (e.g. a benchmark which takes at le
 BenchmarkDotNet doesn't support setup/cleanup method for a single method invocation (*an operation*),
   but you can perform only one operation per iteration.
 It's recommended to use `RunStrategy.Monitoring` for such cases.
-Be careful: if you allocate any objects in
-  the [`[IterationSetup]`](xref:BenchmarkDotNet.Attributes.IterationSetupAttribute) method,
-  the MemoryDiagnoser results can also be spoiled.
 
 A method which is marked by the [`[IterationCleanup]`](xref:BenchmarkDotNet.Attributes.IterationCleanupAttribute)
   attribute will be executed only once *after each an iteration*.
