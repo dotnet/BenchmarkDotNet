@@ -26,12 +26,9 @@ namespace BenchmarkDotNet.Samples
 
         public IEnumerable<object[]> Data()
         {
-            yield return CreateArrayAndValue(new[] { 1, 2, 3 }, 4);
-            yield return CreateArrayAndValue(Enumerable.Range(0, 100).ToArray(), 4);
-            yield return CreateArrayAndValue(Enumerable.Range(0, 100).ToArray(), 101);
+            yield return new object[] { new int[] { 1, 2, 3 }, 4 };
+            yield return new object[] { Enumerable.Range(0, 100).ToArray(), 4 };
+            yield return new object[] { Enumerable.Range(0, 100).ToArray(), 101 };
         }
-
-        private object[] CreateArrayAndValue(int[] array, int value)
-            => new object[] { ArrayParam<int>.ForPrimitives(array), value };
     }
 }

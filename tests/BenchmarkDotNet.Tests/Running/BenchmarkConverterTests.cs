@@ -1,7 +1,9 @@
 ﻿using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Running;
 using Xunit;
 
@@ -108,6 +110,74 @@ namespace BenchmarkDotNet.Tests.Running
             
             Assert.Equal(UnrollFactor, benchmark.Job.Run.UnrollFactor);
             Assert.NotNull(benchmark.Target.IterationSetupMethod);
+        }
+
+        [Fact]
+        public void JobMutatorsApplySettingsToAllNonMutatorJobs()
+        {
+            var info = BenchmarkConverter.TypeToBenchmarks(
+                    typeof(WithMutator), 
+                    DefaultConfig.Instance
+                        .With(Job.Clr)
+                        .With(Job.Core));
+            
+            Assert.Equal(2, info.Benchmarks.Length);
+            Assert.All(info.Benchmarks, benchmark => Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxTargetIterationCount));
+            Assert.Single(info.Benchmarks, benchmark => benchmark.Job.Env.Runtime is ClrRuntime);
+            Assert.Single(info.Benchmarks, benchmark => benchmark.Job.Env.Runtime is CoreRuntime);
+        }
+
+        [MaxIterationCount(int.MaxValue)]
+        public class WithMutator
+        {
+            [Benchmark] public void Method() { }
+        }
+        
+        [Fact]
+        public void JobMutatorsApplySettingsToDefaultJobIfNoneOfTheConfigsContainsJob()
+        {
+            var info = BenchmarkConverter.TypeToBenchmarks(typeof(WithMutator));
+            
+            var benchmark = info.Benchmarks.Single();
+            
+            Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxTargetIterationCount);
+        }
+        
+        [Fact]
+        public void OrderOfAppliedAttributesDoesNotAffectMutators()
+        {
+            var info = BenchmarkConverter.TypeToBenchmarks(typeof(WithMutatorAfterJobAttribute));
+            
+            var benchmark = info.Benchmarks.Single();
+            
+            Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxTargetIterationCount);
+            Assert.True(benchmark.Job.Env.Runtime is CoreRuntime);
+        }
+
+        [MaxIterationCount(int.MaxValue)] // mutator attribute is before job attribute
+        [CoreJob]
+        public class WithMutatorAfterJobAttribute
+        {
+            [Benchmark] public void Method() { }
+        }
+        
+        [Fact]
+        public void FewMutatorsCanBeAppliedToSameType()
+        {
+            var info = BenchmarkConverter.TypeToBenchmarks(typeof(WithFewMutators));
+            
+            var benchmark = info.Benchmarks.Single();
+            
+            Assert.Equal(1, benchmark.Job.Run.InvocationCount);
+            Assert.Equal(1, benchmark.Job.Run.UnrollFactor);
+            Assert.Equal(OutlierMode.None, benchmark.Job.Accuracy.OutlierMode);
+        }
+
+        [RunOncePerIteration]
+        [Outliers(OutlierMode.None)]
+        public class WithFewMutators
+        {
+            [Benchmark] public void Method() { }
         }
     }
 }

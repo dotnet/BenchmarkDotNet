@@ -70,6 +70,7 @@ namespace BenchmarkDotNet.Jobs
         /// Available values: Throughput and ColdStart.
         ///     Throughput: default strategy which allows to get good precision level.
         ///     ColdStart: should be used only for measuring cold start of the application or testing purpose.
+        ///     Monitoring: no overhead evaluating, with several target iterations. Perfect for macrobenchmarks without a steady state with high variance.
         /// </summary>
         public RunStrategy RunStrategy
         {
@@ -107,7 +108,8 @@ namespace BenchmarkDotNet.Jobs
         }
 
         /// <summary>
-        /// Desired time of execution of an iteration.
+        /// Desired time of execution of an iteration. Used by Pilot stage to estimate the number of invocations per iteration.
+        /// The default value is 500 milliseconds.
         /// </summary>
         public TimeInterval IterationTime
         {

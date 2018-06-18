@@ -3,6 +3,7 @@ using System.Text;
 using BenchmarkDotNet.Configs;
 using JetBrains.Annotations;
 
+#pragma warning disable CS3015 // no public ctor with CLS-compliant arguments
 namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = true)]
@@ -25,3 +26,4 @@ namespace BenchmarkDotNet.Attributes
         }
     }
 }
+#pragma warning restore CS3015

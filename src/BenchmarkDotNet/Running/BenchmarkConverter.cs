@@ -89,8 +89,11 @@ namespace BenchmarkDotNet.Running
                 var typeAttributes = type.GetTypeInfo().GetCustomAttributes(true).OfType<IConfigSource>();
                 var assemblyAttributes = type.GetTypeInfo().Assembly.GetCustomAttributes().OfType<IConfigSource>();
                 var allAttributes = typeAttributes.Concat(assemblyAttributes);
-                foreach (var configSource in allAttributes)
-                    config = ManualConfig.Union(config, configSource.Config);
+                var configs = allAttributes.Select(attribute => attribute.Config)
+                    .OrderBy(c => c.GetJobs().Count(job => job.Meta.IsMutator)); // configs with mutators must be the ones applied at the end
+                
+                foreach (var configFromAttrubute in configs)
+                    config = ManualConfig.Union(config, configFromAttrubute);
             }
             return config.AsReadOnly();
         }
