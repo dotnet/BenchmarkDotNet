@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Running
 {
-    public class Target
+    public class Descriptor
     {
         public Type Type { get; }
         public MethodInfo Method { get; }
@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Running
         public string FolderInfo => (Type != null ? FolderNameHelper.ToFolderName(Type) : "Untitled") + "_" + MethodFolderInfo;
         public string DisplayInfo => TypeInfo + "." + MethodDisplayInfo;
 
-        public Target(
+        public Descriptor(
             Type type,
             MethodInfo method,              
             MethodInfo globalSetupMethod = null,

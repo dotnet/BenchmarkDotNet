@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Samples
                 public IEnumerable<BenchmarkCase> GetExecutionOrder(BenchmarkCase[] benchmarksCase) =>
                     from benchmark in benchmarksCase
                     orderby benchmark.Parameters["X"] descending,
-                        benchmark.Target.MethodDisplayInfo
+                        benchmark.Descriptor.MethodDisplayInfo
                     select benchmark;
 
                 public IEnumerable<BenchmarkCase> GetSummaryOrder(BenchmarkCase[] benchmarksCase, Summary summary) =>

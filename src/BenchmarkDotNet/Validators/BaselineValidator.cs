@@ -25,9 +25,9 @@ namespace BenchmarkDotNet.Validators
             foreach (var logicalGroup in logicalGroups)
             {
                 var benchmarks = allBenchmarks.Where((benchmark, index) => benchmarkLogicalGroups[index] == logicalGroup).ToArray();
-                var methodBaselineCount = benchmarks.Count(b => b.Target.Baseline);
+                var methodBaselineCount = benchmarks.Count(b => b.Descriptor.Baseline);
                 var jobBaselineCount = benchmarks.Count(b => b.Job.Meta.IsBaseline);
-                var className = benchmarks.First().Target.Type.Name;
+                var className = benchmarks.First().Descriptor.Type.Name;
 
                 if (methodBaselineCount > 1) 
                     yield return CreateError("benchmark method", "Baseline = true", logicalGroup, className, methodBaselineCount.ToString());

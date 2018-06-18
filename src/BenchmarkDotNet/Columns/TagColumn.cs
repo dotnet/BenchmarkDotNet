@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Columns
         }
 
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
-        public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => getTag(benchmarkCase.Target.Method.Name);
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => getTag(benchmarkCase.Descriptor.Method.Name);
 
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;

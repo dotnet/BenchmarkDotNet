@@ -4,10 +4,10 @@ using BenchmarkDotNet.Order;
 
 namespace BenchmarkDotNet.Running
 {
-    internal class TargetComparer : IComparer<Target>
+    internal class TargetComparer : IComparer<Descriptor>
     {
-        public static readonly IComparer<Target> Alphabetical = new TargetComparer(MethodOrderPolicy.Alphabetical);
-        public static readonly IComparer<Target> Declared = new TargetComparer(MethodOrderPolicy.Declared);
+        public static readonly IComparer<Descriptor> Alphabetical = new TargetComparer(MethodOrderPolicy.Alphabetical);
+        public static readonly IComparer<Descriptor> Declared = new TargetComparer(MethodOrderPolicy.Declared);
 
         private readonly MethodOrderPolicy methodOrderPolicy;
 
@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Running
             this.methodOrderPolicy = methodOrderPolicy;
         }
 
-        public int Compare(Target x, Target y)
+        public int Compare(Descriptor x, Descriptor y)
         {
             switch (methodOrderPolicy)
             {

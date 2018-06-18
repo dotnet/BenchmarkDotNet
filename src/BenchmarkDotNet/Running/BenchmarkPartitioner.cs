@@ -44,14 +44,14 @@ namespace BenchmarkDotNet.Running
                 if (!jobX.Env.Gc.Equals(jobY.Env.Gc)) // GC settings are per .config/.csproj
                     return false;
 
-                if (x.Target.Type.Assembly.Location != y.Target.Type.Assembly.Location) // some toolchains produce the exe in the same folder as .dll (to get some scenarios like native dependencies work)
+                if (x.Descriptor.Type.Assembly.Location != y.Descriptor.Type.Assembly.Location) // some toolchains produce the exe in the same folder as .dll (to get some scenarios like native dependencies work)
                     return false;
 
-                if (x.Target.AdditionalLogic != y.Target.AdditionalLogic) // it can be anything
+                if (x.Descriptor.AdditionalLogic != y.Descriptor.AdditionalLogic) // it can be anything
                     return false;
 
-                if (x.Target.Method.GetCustomAttributes(false).OfType<STAThreadAttribute>().Count() !=
-                    y.Target.Method.GetCustomAttributes(false).OfType<STAThreadAttribute>().Count()) // STA vs STA
+                if (x.Descriptor.Method.GetCustomAttributes(false).OfType<STAThreadAttribute>().Count() !=
+                    y.Descriptor.Method.GetCustomAttributes(false).OfType<STAThreadAttribute>().Count()) // STA vs STA
                     return false;
 
                 return true;
@@ -65,7 +65,7 @@ namespace BenchmarkDotNet.Running
 
                 hashCode ^=  GetRuntime(job).GetType().MetadataToken;
 
-                hashCode ^= obj.Target.Type.Assembly.Location.GetHashCode();
+                hashCode ^= obj.Descriptor.Type.Assembly.Location.GetHashCode();
                 hashCode ^= (int)job.Env.Jit;
                 hashCode ^= (int)job.Env.Platform;
                 hashCode ^= job.Env.Gc.GetHashCode();
@@ -74,10 +74,10 @@ namespace BenchmarkDotNet.Running
                     hashCode ^= job.Infrastructure.BuildConfiguration.GetHashCode();
                 if (job.Infrastructure.Arguments != null && job.Infrastructure.Arguments.Any())
                     hashCode ^= job.Infrastructure.Arguments.GetHashCode();
-                if (!string.IsNullOrEmpty(obj.Target.AdditionalLogic))
-                    hashCode ^= obj.Target.AdditionalLogic.GetHashCode();
+                if (!string.IsNullOrEmpty(obj.Descriptor.AdditionalLogic))
+                    hashCode ^= obj.Descriptor.AdditionalLogic.GetHashCode();
 
-                hashCode ^= obj.Target.Method.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any().GetHashCode();
+                hashCode ^= obj.Descriptor.Method.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any().GetHashCode();
 
                 return hashCode;
             }

@@ -150,8 +150,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
         {
             foreach (var target in validationParameters.Benchmarks
-                .Where(benchmark => !string.IsNullOrEmpty(benchmark.Target.AdditionalLogic))
-                .Select(b => b.Target)
+                .Where(benchmark => !string.IsNullOrEmpty(benchmark.Descriptor.AdditionalLogic))
+                .Select(b => b.Descriptor)
                 .Distinct())
             {
                 yield return new ValidationError(

@@ -98,7 +98,7 @@ namespace BenchmarkDotNet.Running
             return config.AsReadOnly();
         }
 
-        private static IEnumerable<Target> GetTargets(
+        private static IEnumerable<Descriptor> GetTargets(
             MethodInfo[] targetMethods,
             Type type,
             Tuple<MethodInfo, TargetedAttribute>[] globalSetupMethods,
@@ -108,7 +108,7 @@ namespace BenchmarkDotNet.Running
         {
             return targetMethods
                 .Where(m => m.HasAttribute<BenchmarkAttribute>())
-                .Select(methodInfo => CreateTarget(type,
+                .Select(methodInfo => CreateDescriptor(type,
                                                    GetTargetedMatchingMethod(methodInfo, globalSetupMethods),
                                                    methodInfo,
                                                    GetTargetedMatchingMethod(methodInfo, globalCleanupMethods),
@@ -147,7 +147,7 @@ namespace BenchmarkDotNet.Running
                 })).OrderByDescending(x => x.Item2.Target ?? "").ToArray();
         }
 
-        private static Target CreateTarget(
+        private static Descriptor CreateDescriptor(
             Type type,
             MethodInfo globalSetupMethod,
             MethodInfo methodInfo,
@@ -157,7 +157,7 @@ namespace BenchmarkDotNet.Running
             BenchmarkAttribute attr,
             MethodInfo[] targetMethods)
         {
-            var target = new Target(
+            var target = new Descriptor(
                 type,
                 methodInfo,
                 globalSetupMethod,

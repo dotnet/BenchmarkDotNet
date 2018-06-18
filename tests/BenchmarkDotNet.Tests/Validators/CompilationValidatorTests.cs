@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Tests.Validators
                 new[]
                 {
                     BenchmarkCase.Create(
-                        new Target(
+                        new Descriptor(
                             typeof(CompilationValidatorTests),
                             method.Method),
                         Job.Dry,

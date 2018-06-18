@@ -20,9 +20,9 @@ namespace BenchmarkDotNet.Columns
         {
             public IEnumerable<IColumn> GetColumns(Summary summary)
             {
-                if (summary.BenchmarksCases.Select(b => b.Target.Type.Namespace).Distinct().Count() > 1)
+                if (summary.BenchmarksCases.Select(b => b.Descriptor.Type.Namespace).Distinct().Count() > 1)
                     yield return TargetMethodColumn.Namespace;
-                if (summary.BenchmarksCases.Select(b => b.Target.Type.Name).Distinct().Count() > 1)
+                if (summary.BenchmarksCases.Select(b => b.Descriptor.Type.Name).Distinct().Count() > 1)
                     yield return TargetMethodColumn.Type;
                 yield return TargetMethodColumn.Method;
             }

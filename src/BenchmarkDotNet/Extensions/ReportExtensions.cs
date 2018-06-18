@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Extensions
             if (methodExp == null)
                 throw new ArgumentException("Extend a MethodCallExpression, but got a " + actionExp.Body.GetType().Name, nameof(actionExp));
 
-            return summary.Reports.First(r => r.BenchmarkCase.Target.Method == methodExp.Method);
+            return summary.Reports.First(r => r.BenchmarkCase.Descriptor.Method == methodExp.Method);
         }
 
         public static IList<Measurement> GetRunsFor<T>(this Summary summary, Expression<Action<T>> actionExp)

@@ -23,18 +23,18 @@ namespace BenchmarkDotNet.Validators
 
         private IEnumerable<ValidationError> ValidateCSharpNaming(IEnumerable<BenchmarkCase> benchmarks)
             => benchmarks
-                .Where(benchmark => !IsValidCSharpIdentifier(benchmark.Target.Method.Name))
+                .Where(benchmark => !IsValidCSharpIdentifier(benchmark.Descriptor.Method.Name))
                 .Distinct(BenchmarkMethodEqualityComparer.Instance) // we might have multiple jobs targeting same method. Single error should be enough ;)
                 .Select(benchmark
                     => new ValidationError(
                         true,
-                        $"Benchmarked method `{benchmark.Target.Method.Name}` contains illegal character(s). Please use `[<Benchmark(Description = \"Custom name\")>]` to set custom display name.",
+                        $"Benchmarked method `{benchmark.Descriptor.Method.Name}` contains illegal character(s). Please use `[<Benchmark(Description = \"Custom name\")>]` to set custom display name.",
                         benchmark
                     ));
 
         private IEnumerable<ValidationError> ValidateNamingConflicts(IEnumerable<BenchmarkCase> benchmarks)
             => benchmarks
-                .Select(benchmark => benchmark.Target.Type)
+                .Select(benchmark => benchmark.Descriptor.Type)
                 .Distinct()
                 .Where(type => type.GetAllMethods().Any(method => IsUsingNameUsedInternallyByOurTemplate(method.Name)))
                 .Select(benchmark
@@ -43,9 +43,9 @@ namespace BenchmarkDotNet.Validators
                         "Using \"__Idle\" for method name is prohibited. We are using it internally in our templates. Please rename your method"));
 
         private IEnumerable<ValidationError> ValidateAccessModifiers(IEnumerable<BenchmarkCase> benchmarks)
-            => benchmarks.Where(x => x.Target.Type.IsGenericType
-                                     && HasPrivateGenericArguments(x.Target.Type))
-                         .Select(benchmark => new ValidationError(true, $"Generic class {benchmark.Target.Type.GetDisplayName()} has non public generic argument(s)"));
+            => benchmarks.Where(x => x.Descriptor.Type.IsGenericType
+                                     && HasPrivateGenericArguments(x.Descriptor.Type))
+                         .Select(benchmark => new ValidationError(true, $"Generic class {benchmark.Descriptor.Type.GetDisplayName()} has non public generic argument(s)"));
         
         private bool IsValidCSharpIdentifier(string identifier) // F# allows to use whitespaces as names #479
             => !string.IsNullOrEmpty(identifier)
@@ -65,10 +65,10 @@ namespace BenchmarkDotNet.Validators
             internal static readonly IEqualityComparer<BenchmarkCase> Instance = new BenchmarkMethodEqualityComparer();
 
             public bool Equals(BenchmarkCase x, BenchmarkCase y)
-                => x.Target.Method.Equals(y.Target.Method);
+                => x.Descriptor.Method.Equals(y.Descriptor.Method);
 
             public int GetHashCode(BenchmarkCase obj)
-                => obj.Target.Method.GetHashCode();
+                => obj.Descriptor.Method.GetHashCode();
         }
     }
 }

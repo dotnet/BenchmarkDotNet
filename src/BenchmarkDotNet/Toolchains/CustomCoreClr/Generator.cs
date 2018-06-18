@@ -141,7 +141,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 yield return $@"<PackageReference Include=""runtime.{runtimeIdentifier}.Microsoft.Private.CoreFx.NETCoreApp"" Version=""{coreFxVersion}"" />";
             }
 
-            yield return $@"<ProjectReference Include=""{GetProjectFilePath(benchmarkCase.Target.Type, logger).FullName}"" />";
+            yield return $@"<ProjectReference Include=""{GetProjectFilePath(benchmarkCase.Descriptor.Type, logger).FullName}"" />";
         }
     }
 }

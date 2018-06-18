@@ -76,31 +76,31 @@ namespace BenchmarkDotNet.IntegrationTests
         private void TestInvoke(Expression<Action<BenchmarkAllCases>> methodCall, int unrollFactor)
         {
             var targetMethod = ((MethodCallExpression) methodCall.Body).Method;
-            var target = new Target(typeof(BenchmarkAllCases), targetMethod, targetMethod, targetMethod);
+            var descriptor = new Descriptor(typeof(BenchmarkAllCases), targetMethod, targetMethod, targetMethod);
 
             // Run mode
-            var action = BenchmarkActionFactory.CreateRun(target, new BenchmarkAllCases(), BenchmarkActionCodegen.ReflectionEmit, unrollFactor);
+            var action = BenchmarkActionFactory.CreateRun(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.ReflectionEmit, unrollFactor);
             TestInvoke(action, unrollFactor, false, null);
-            action = BenchmarkActionFactory.CreateRun(target, new BenchmarkAllCases(), BenchmarkActionCodegen.DelegateCombine, unrollFactor);
+            action = BenchmarkActionFactory.CreateRun(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.DelegateCombine, unrollFactor);
             TestInvoke(action, unrollFactor, false, null);
 
             // Idle mode
-            action = BenchmarkActionFactory.CreateIdle(target, new BenchmarkAllCases(), BenchmarkActionCodegen.ReflectionEmit, unrollFactor);
+            action = BenchmarkActionFactory.CreateIdle(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.ReflectionEmit, unrollFactor);
             TestInvoke(action, unrollFactor, true, null);
-            action = BenchmarkActionFactory.CreateIdle(target, new BenchmarkAllCases(), BenchmarkActionCodegen.DelegateCombine, unrollFactor);
+            action = BenchmarkActionFactory.CreateIdle(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.DelegateCombine, unrollFactor);
             TestInvoke(action, unrollFactor, true, null);
 
             // GlobalSetup/GlobalCleanup
-            action = BenchmarkActionFactory.CreateGlobalSetup(target, new BenchmarkAllCases());
+            action = BenchmarkActionFactory.CreateGlobalSetup(descriptor, new BenchmarkAllCases());
             TestInvoke(action, 1, false, null);
-            action = BenchmarkActionFactory.CreateGlobalCleanup(target, new BenchmarkAllCases());
+            action = BenchmarkActionFactory.CreateGlobalCleanup(descriptor, new BenchmarkAllCases());
             TestInvoke(action, 1, false, null);
 
             // GlobalSetup/GlobalCleanup (empty)
-            target = new Target(typeof(BenchmarkAllCases), targetMethod);
-            action = BenchmarkActionFactory.CreateGlobalSetup(target, new BenchmarkAllCases());
+            descriptor = new Descriptor(typeof(BenchmarkAllCases), targetMethod);
+            action = BenchmarkActionFactory.CreateGlobalSetup(descriptor, new BenchmarkAllCases());
             TestInvoke(action, unrollFactor, true, null);
-            action = BenchmarkActionFactory.CreateGlobalCleanup(target, new BenchmarkAllCases());
+            action = BenchmarkActionFactory.CreateGlobalCleanup(descriptor, new BenchmarkAllCases());
             TestInvoke(action, unrollFactor, true, null);
 
             // Dummy (just in case something may broke)
@@ -114,12 +114,12 @@ namespace BenchmarkDotNet.IntegrationTests
         private void TestInvoke<T>(Expression<Func<BenchmarkAllCases, T>> methodCall, int unrollFactor, object expectedResult)
         {
             var targetMethod = ((MethodCallExpression) methodCall.Body).Method;
-            var target = new Target(typeof(BenchmarkAllCases), targetMethod);
+            var descriptor = new Descriptor(typeof(BenchmarkAllCases), targetMethod);
 
             // Run mode
-            var action = BenchmarkActionFactory.CreateRun(target, new BenchmarkAllCases(), BenchmarkActionCodegen.ReflectionEmit, unrollFactor);
+            var action = BenchmarkActionFactory.CreateRun(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.ReflectionEmit, unrollFactor);
             TestInvoke(action, unrollFactor, false, expectedResult);
-            action = BenchmarkActionFactory.CreateRun(target, new BenchmarkAllCases(), BenchmarkActionCodegen.DelegateCombine, unrollFactor);
+            action = BenchmarkActionFactory.CreateRun(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.DelegateCombine, unrollFactor);
             TestInvoke(action, unrollFactor, false, expectedResult);
 
             // Idle mode
@@ -136,9 +136,9 @@ namespace BenchmarkDotNet.IntegrationTests
             else
                 idleExpected = GetDefault(expectedResult.GetType());
 
-            action = BenchmarkActionFactory.CreateIdle(target, new BenchmarkAllCases(), BenchmarkActionCodegen.ReflectionEmit, unrollFactor);
+            action = BenchmarkActionFactory.CreateIdle(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.ReflectionEmit, unrollFactor);
             TestInvoke(action, unrollFactor, true, idleExpected);
-            action = BenchmarkActionFactory.CreateIdle(target, new BenchmarkAllCases(), BenchmarkActionCodegen.DelegateCombine, unrollFactor);
+            action = BenchmarkActionFactory.CreateIdle(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.DelegateCombine, unrollFactor);
             TestInvoke(action, unrollFactor, true, idleExpected);
         }
 

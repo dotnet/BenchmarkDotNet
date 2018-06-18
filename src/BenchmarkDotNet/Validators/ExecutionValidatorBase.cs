@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Validators
         {
             var errors = new List<ValidationError>();
 
-            foreach (var typeGroup in validationParameters.Benchmarks.GroupBy(benchmark => benchmark.Target.Type))
+            foreach (var typeGroup in validationParameters.Benchmarks.GroupBy(benchmark => benchmark.Descriptor.Type))
             {
                 if (!TryCreateBenchmarkTypeInstance(typeGroup.Key, errors, out object benchmarkTypeInstance))
                 {

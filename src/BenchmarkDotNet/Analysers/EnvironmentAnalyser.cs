@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Analysers
 
         public override IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary)
         {
-            if (report.BenchmarkCase.Target.Type.GetTypeInfo().Assembly.IsJitOptimizationDisabled().IsTrue())
+            if (report.BenchmarkCase.Descriptor.Type.GetTypeInfo().Assembly.IsJitOptimizationDisabled().IsTrue())
                 yield return CreateWarning("Benchmark was built without optimization enabled (most probably a DEBUG configuration). Please, build it in RELEASE.", report);
         }
 

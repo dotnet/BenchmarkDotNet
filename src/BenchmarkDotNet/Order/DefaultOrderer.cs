@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Order
 
         private readonly IComparer<ParameterInstances> paramsComparer = ParameterComparer.Instance;
         private readonly IComparer<Job> jobComparer = JobComparer.Instance;
-        private readonly IComparer<Target> targetComparer;
+        private readonly IComparer<Descriptor> targetComparer;
         private readonly IComparer<BenchmarkCase> benchmarkComparer;
         private readonly IComparer<IGrouping<string, BenchmarkCase>> logicalGroupComparer;
 
@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Order
                 case SummaryOrderPolicy.SlowestToFastest:
                     return benchmarksCase.OrderByDescending(b => summary[b].ResultStatistics.Mean);
                 case SummaryOrderPolicy.Method:
-                    return benchmarksCase.OrderBy(b => b.Target.MethodDisplayInfo);
+                    return benchmarksCase.OrderBy(b => b.Descriptor.MethodDisplayInfo);
                 case SummaryOrderPolicy.Declared:
                     return benchmarksCase;
                 default:
@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Order
                 case SummaryOrderPolicy.Default:
                     return benchmarkCase.Parameters.DisplayInfo;
                 case SummaryOrderPolicy.Method:
-                    return benchmarkCase.Target.MethodDisplayInfo;
+                    return benchmarkCase.Descriptor.MethodDisplayInfo;
                 default:
                     return null;
             }
@@ -83,7 +83,7 @@ namespace BenchmarkDotNet.Order
                 rules.Add(BenchmarkLogicalGroupRule.ByMethod);
                 rules.Add(BenchmarkLogicalGroupRule.ByParams);
             }
-            if (allBenchmarksCases.Any(b => b.Target.Baseline))
+            if (allBenchmarksCases.Any(b => b.Descriptor.Baseline))
             {
                 rules.Add(BenchmarkLogicalGroupRule.ByJob);
                 rules.Add(BenchmarkLogicalGroupRule.ByParams);
@@ -91,13 +91,13 @@ namespace BenchmarkDotNet.Order
 
             var keys = new List<string>();            
             if (rules.Contains(BenchmarkLogicalGroupRule.ByMethod))
-                keys.Add(benchmarkCase.Target.DisplayInfo);
+                keys.Add(benchmarkCase.Descriptor.DisplayInfo);
             if (rules.Contains(BenchmarkLogicalGroupRule.ByJob))
                 keys.Add(benchmarkCase.Job.DisplayInfo);
             if (rules.Contains(BenchmarkLogicalGroupRule.ByParams))
                 keys.Add(benchmarkCase.Parameters.DisplayInfo);
             if (rules.Contains(BenchmarkLogicalGroupRule.ByCategory))
-                keys.Add(string.Join(",", benchmarkCase.Target.Categories));
+                keys.Add(string.Join(",", benchmarkCase.Descriptor.Categories));
 
             string logicalGroupKey = string.Join("-", keys.Where(key => key != string.Empty));
             return logicalGroupKey == string.Empty ? "*" : logicalGroupKey;
@@ -116,9 +116,9 @@ namespace BenchmarkDotNet.Order
         {
             private readonly IComparer<ParameterInstances> paramsComparer;
             private readonly IComparer<Job> jobComparer;
-            private readonly IComparer<Target> targetComparer;
+            private readonly IComparer<Descriptor> targetComparer;
 
-            public BenchmarkComparer(IComparer<ParameterInstances> paramsComparer, IComparer<Job> jobComparer, IComparer<Target> targetComparer)
+            public BenchmarkComparer(IComparer<ParameterInstances> paramsComparer, IComparer<Job> jobComparer, IComparer<Descriptor> targetComparer)
             {
                 this.targetComparer = targetComparer;
                 this.jobComparer = jobComparer;
@@ -129,7 +129,7 @@ namespace BenchmarkDotNet.Order
             {
                 paramsComparer?.Compare(x.Parameters, y.Parameters) ?? 0,
                 jobComparer?.Compare(x.Job, y.Job) ?? 0,
-                targetComparer?.Compare(x.Target, y.Target) ?? 0,
+                targetComparer?.Compare(x.Descriptor, y.Descriptor) ?? 0,
                 string.CompareOrdinal(x.DisplayInfo, y.DisplayInfo)
             }.FirstOrDefault(c => c != 0);
         }

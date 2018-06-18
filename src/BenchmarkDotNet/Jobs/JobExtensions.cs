@@ -208,10 +208,10 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         public static Job AsMutator(this Job job) => job.WithCore(j => j.Meta.IsMutator = true);
 
-        internal static Job MakeSettingsUserFriendly(this Job job, Target target)
+        internal static Job MakeSettingsUserFriendly(this Job job, Descriptor descriptor)
         {
             // users expect that if IterationSetup is configured, it should be run before every benchmark invocation https://github.com/dotnet/BenchmarkDotNet/issues/730
-            if (target.IterationSetupMethod != null
+            if (descriptor.IterationSetupMethod != null
                 && !job.HasValue(RunMode.InvocationCountCharacteristic)
                 && !job.HasValue(RunMode.UnrollFactorCharacteristic))
             {

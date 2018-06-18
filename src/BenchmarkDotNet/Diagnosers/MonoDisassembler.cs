@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Diagnosers
         {
             Debug.Assert(mono == null || !RuntimeInformation.IsMono, "Must never be called for Non-Mono benchmarks");
 
-            var benchmarkTarget = benchmarkCase.Target;
+            var benchmarkTarget = benchmarkCase.Descriptor;
             string fqnMethod = GetMethodName(benchmarkTarget);
             string exePath = benchmarkTarget.Type.GetTypeInfo().Assembly.Location;
             
@@ -47,8 +47,8 @@ namespace BenchmarkDotNet.Diagnosers
         private static string GetEnvironmentVariables(Dictionary<string, string> environmentVariables) 
             => string.Join(" ", environmentVariables.Select(e => $"{e.Key}={e.Value}"));
 
-        private static string GetMethodName(Target target)
-            => $"{target.Type.GetTypeInfo().Namespace}.{target.Type.GetTypeInfo().Name}:{target.Method.Name}";
+        private static string GetMethodName(Descriptor descriptor)
+            => $"{descriptor.Type.GetTypeInfo().Namespace}.{descriptor.Type.GetTypeInfo().Name}:{descriptor.Method.Name}";
 
         internal static class OutputParser
         {

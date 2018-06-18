@@ -17,8 +17,8 @@ namespace BenchmarkDotNet.Filters
         public bool Predicate(BenchmarkCase benchmarkCase)
             => typeNames.Any(methodName =>
             {
-                var displayName = benchmarkCase.Target.Type.GetDisplayName();
-                var fullName = benchmarkCase.Target.Type.FullName;
+                var displayName = benchmarkCase.Descriptor.Type.GetDisplayName();
+                var fullName = benchmarkCase.Descriptor.Type.FullName;
 
                 return displayName.ContainsWithIgnoreCase(methodName) || fullName.ContainsWithIgnoreCase(methodName);
             });

@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         {
             string template = ResourceHelper.LoadTemplate("CsProj.txt");
             var benchmark = buildPartition.RepresentativeBenchmarkCase;
-            var projectFile = GetProjectFilePath(benchmark.Target.Type, logger);
+            var projectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
 
             string platform = PlatformProvider(buildPartition.Platform);
             string content = SetPlatform(template, platform);

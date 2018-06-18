@@ -21,19 +21,19 @@ namespace BenchmarkDotNet.Tests.Running
             BenchmarkCase benchmarkCase = BenchmarkConverter.TypeToBenchmarks(derivedType).BenchmarksCases.Single();
 
             Assert.NotNull(benchmarkCase);
-            Assert.NotNull(benchmarkCase.Target);
+            Assert.NotNull(benchmarkCase.Descriptor);
 
-            Assert.NotNull(benchmarkCase.Target.IterationSetupMethod);
-            Assert.Equal(benchmarkCase.Target.IterationSetupMethod.DeclaringType, derivedType);
+            Assert.NotNull(benchmarkCase.Descriptor.IterationSetupMethod);
+            Assert.Equal(benchmarkCase.Descriptor.IterationSetupMethod.DeclaringType, derivedType);
 
-            Assert.NotNull(benchmarkCase.Target.IterationCleanupMethod);
-            Assert.Equal(benchmarkCase.Target.IterationCleanupMethod.DeclaringType, derivedType);
+            Assert.NotNull(benchmarkCase.Descriptor.IterationCleanupMethod);
+            Assert.Equal(benchmarkCase.Descriptor.IterationCleanupMethod.DeclaringType, derivedType);
 
-            Assert.NotNull(benchmarkCase.Target.GlobalCleanupMethod);
-            Assert.Equal(benchmarkCase.Target.GlobalCleanupMethod.DeclaringType, derivedType);
+            Assert.NotNull(benchmarkCase.Descriptor.GlobalCleanupMethod);
+            Assert.Equal(benchmarkCase.Descriptor.GlobalCleanupMethod.DeclaringType, derivedType);
 
-            Assert.NotNull(benchmarkCase.Target.GlobalSetupMethod);
-            Assert.Equal(benchmarkCase.Target.GlobalSetupMethod.DeclaringType, derivedType);
+            Assert.NotNull(benchmarkCase.Descriptor.GlobalSetupMethod);
+            Assert.Equal(benchmarkCase.Descriptor.GlobalSetupMethod.DeclaringType, derivedType);
         }
 
         public abstract class Base
@@ -95,7 +95,7 @@ namespace BenchmarkDotNet.Tests.Running
                 .BenchmarksCases.Single();
             
             Assert.Equal(InvocationCount, benchmark.Job.Run.InvocationCount);
-            Assert.NotNull(benchmark.Target.IterationSetupMethod);
+            Assert.NotNull(benchmark.Descriptor.IterationSetupMethod);
         }
         
         [Fact]
@@ -109,7 +109,7 @@ namespace BenchmarkDotNet.Tests.Running
                 .BenchmarksCases.Single();
             
             Assert.Equal(UnrollFactor, benchmark.Job.Run.UnrollFactor);
-            Assert.NotNull(benchmark.Target.IterationSetupMethod);
+            Assert.NotNull(benchmark.Descriptor.IterationSetupMethod);
         }
 
         [Fact]

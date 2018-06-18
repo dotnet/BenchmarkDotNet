@@ -14,38 +14,38 @@ namespace BenchmarkDotNet.Code
         // "GlobalSetup" or "GlobalCleanup" methods are optional, so default to an empty delegate, so there is always something that can be invoked
         private const string EmptyAction = "() => { }";
 
-        protected readonly Target Target;
+        protected readonly Descriptor Descriptor;
 
-        internal DeclarationsProvider(Target target)
+        internal DeclarationsProvider(Descriptor descriptor)
         {
-            Target = target;
+            Descriptor = descriptor;
         }
 
-        public string OperationsPerInvoke => Target.OperationsPerInvoke.ToString();
+        public string OperationsPerInvoke => Descriptor.OperationsPerInvoke.ToString();
 
-        public string TargetTypeNamespace => string.IsNullOrWhiteSpace(Target.Type.Namespace) ? string.Empty : $"using {Target.Type.Namespace};";
+        public string TargetTypeNamespace => string.IsNullOrWhiteSpace(Descriptor.Type.Namespace) ? string.Empty : $"using {Descriptor.Type.Namespace};";
 
-        public string TargetTypeName => Target.Type.GetCorrectCSharpTypeName();
+        public string TargetTypeName => Descriptor.Type.GetCorrectCSharpTypeName();
 
-        public string GlobalSetupMethodName => Target.GlobalSetupMethod?.Name ?? EmptyAction;
+        public string GlobalSetupMethodName => Descriptor.GlobalSetupMethod?.Name ?? EmptyAction;
 
-        public string GlobalCleanupMethodName => Target.GlobalCleanupMethod?.Name ?? EmptyAction;
+        public string GlobalCleanupMethodName => Descriptor.GlobalCleanupMethod?.Name ?? EmptyAction;
 
-        public string IterationSetupMethodName => Target.IterationSetupMethod?.Name ?? EmptyAction;
+        public string IterationSetupMethodName => Descriptor.IterationSetupMethod?.Name ?? EmptyAction;
 
-        public string IterationCleanupMethodName => Target.IterationCleanupMethod?.Name ?? EmptyAction;
+        public string IterationCleanupMethodName => Descriptor.IterationCleanupMethod?.Name ?? EmptyAction;
 
         public abstract string ExtraDefines { get; }
 
         public abstract string TargetMethodReturnTypeNamespace { get; }
 
-        protected virtual Type TargetMethodReturnType => Target.Method.ReturnType;
+        protected virtual Type TargetMethodReturnType => Descriptor.Method.ReturnType;
 
         public virtual string TargetMethodReturnTypeName => TargetMethodReturnType.GetCorrectCSharpTypeName();
 
-        public virtual string TargetMethodDelegate => Target.Method.Name;
+        public virtual string TargetMethodDelegate => Descriptor.Method.Name;
 
-        public virtual string GetTargetMethodCall(string passArguments) => $"{Target.Method.Name}({passArguments})";
+        public virtual string GetTargetMethodCall(string passArguments) => $"{Descriptor.Method.Name}({passArguments})";
 
         public virtual string ConsumeField => null;
 
@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Code
 
     internal class VoidDeclarationsProvider : DeclarationsProvider
     {
-        public VoidDeclarationsProvider(Target target) : base(target) { }
+        public VoidDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
 
         public override string ExtraDefines => "#define RETURNS_VOID";
 
@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Code
 
     internal class NonVoidDeclarationsProvider : DeclarationsProvider
     {
-        public NonVoidDeclarationsProvider(Target target) : base(target) { }
+        public NonVoidDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
 
         public override string TargetMethodReturnTypeNamespace 
             => TargetMethodReturnType.Namespace == "System" // As "using System;" is always included in the template, don't emit it again
@@ -117,7 +117,7 @@ namespace BenchmarkDotNet.Code
 
     internal class ByRefDeclarationsProvider : NonVoidDeclarationsProvider
     {
-        public ByRefDeclarationsProvider(Target target) : base(target) { }
+        public ByRefDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
 
         protected override Type IdleMethodReturnType => typeof(IntPtr);
 
@@ -134,14 +134,14 @@ namespace BenchmarkDotNet.Code
 
     internal class TaskDeclarationsProvider : VoidDeclarationsProvider
     {
-        public TaskDeclarationsProvider(Target target) : base(target) { }
+        public TaskDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
 
         // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
         // and will eventually throw actual exception, not aggregated one
         public override string TargetMethodDelegate
-            => $"() => {{ {Target.Method.Name}().GetAwaiter().GetResult(); }}";
+            => $"() => {{ {Descriptor.Method.Name}().GetAwaiter().GetResult(); }}";
 
-        public override string GetTargetMethodCall(string passArguments) => $"{Target.Method.Name}({passArguments}).GetAwaiter().GetResult()";
+        public override string GetTargetMethodCall(string passArguments) => $"{Descriptor.Method.Name}({passArguments}).GetAwaiter().GetResult()";
 
         protected override Type TargetMethodReturnType => typeof(void);
     }
@@ -151,15 +151,15 @@ namespace BenchmarkDotNet.Code
     /// </summary>
     internal class GenericTaskDeclarationsProvider : NonVoidDeclarationsProvider
     {
-        public GenericTaskDeclarationsProvider(Target target) : base(target) { }
+        public GenericTaskDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
 
-        protected override Type TargetMethodReturnType => Target.Method.ReturnType.GetTypeInfo().GetGenericArguments().Single();
+        protected override Type TargetMethodReturnType => Descriptor.Method.ReturnType.GetTypeInfo().GetGenericArguments().Single();
 
         // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
         // and will eventually throw actual exception, not aggregated one
         public override string TargetMethodDelegate
-            => $"() => {{ return {Target.Method.Name}().GetAwaiter().GetResult(); }}";
+            => $"() => {{ return {Descriptor.Method.Name}().GetAwaiter().GetResult(); }}";
 
-        public override string GetTargetMethodCall(string passArguments) => $"{Target.Method.Name}({passArguments}).GetAwaiter().GetResult()";
+        public override string GetTargetMethodCall(string passArguments) => $"{Descriptor.Method.Name}({passArguments}).GetAwaiter().GetResult()";
     }
 }

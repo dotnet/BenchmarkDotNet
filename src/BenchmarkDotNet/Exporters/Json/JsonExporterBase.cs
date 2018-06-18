@@ -54,10 +54,10 @@ namespace BenchmarkDotNet.Exporters.Json
                 {
                     // We don't need Benchmark.ShortInfo, that info is available via Benchmark.Parameters below
                     { "DisplayInfo", r.BenchmarkCase.DisplayInfo },
-                    { "Namespace", r.BenchmarkCase.Target.Type.Namespace },
-                    { "Type", r.BenchmarkCase.Target.Type.Name },
-                    { "Method", r.BenchmarkCase.Target.Method.Name },
-                    { "MethodTitle", r.BenchmarkCase.Target.MethodDisplayInfo },
+                    { "Namespace", r.BenchmarkCase.Descriptor.Type.Namespace },
+                    { "Type", r.BenchmarkCase.Descriptor.Type.Name },
+                    { "Method", r.BenchmarkCase.Descriptor.Method.Name },
+                    { "MethodTitle", r.BenchmarkCase.Descriptor.MethodDisplayInfo },
                     { "Parameters", r.BenchmarkCase.Parameters.PrintInfo },
                     { "FullName", XUnitNameProvider.GetBenchmarkName(r.BenchmarkCase) }, // do NOT remove this property, it is used for xunit-performance migration
                     // { "Properties", r.Benchmark.Job.ToSet().ToDictionary(p => p.Name, p => p.Value) }, // TODO

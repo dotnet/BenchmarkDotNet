@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Analysers
             if (conclusion.Report == null)
                 return "Summary";
             var b = conclusion.Report?.BenchmarkCase;
-            return b != null ? $"{b.Target.DisplayInfo}: {b.Job.Id}" : "[Summary]";
+            return b != null ? $"{b.Descriptor.DisplayInfo}: {b.Job.Id}" : "[Summary]";
         }
     }
 }

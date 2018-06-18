@@ -13,8 +13,8 @@ namespace BenchmarkDotNet.Exporters
     {
         internal static string GetBenchmarkName(BenchmarkCase benchmarkCase)
         {
-            var type = benchmarkCase.Target.Type;
-            var method = benchmarkCase.Target.Method;
+            var type = benchmarkCase.Descriptor.Type;
+            var method = benchmarkCase.Descriptor.Method;
 
             // we can't just use type.FullName because we need sth different for generics (it reports SimpleGeneric`1[[System.Int32, mscorlib, Version=4.0.0.0)
             var name = new StringBuilder();

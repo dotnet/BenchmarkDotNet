@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         protected override void AttachToEvents(TraceEventSession traceEventSession, BenchmarkCase benchmarkCase)
         {
-            expectedNamespace = benchmarkCase.Target.Method.DeclaringType.Namespace ?? benchmarkCase.Target.Method.DeclaringType.FullName;
+            expectedNamespace = benchmarkCase.Descriptor.Method.DeclaringType.Namespace ?? benchmarkCase.Descriptor.Method.DeclaringType.FullName;
 
             Logger.WriteLine();
             Logger.WriteLineHeader(LogSeparator);

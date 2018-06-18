@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var results = switcher.Run(new[] { "job=Dry", "class=ClassA,ClassC,ClassB", "methods=Method4" });
             Assert.Single(results);
             Assert.Single(results.SelectMany(r => r.BenchmarksCases));
-            Assert.True(results.All(r => r.BenchmarksCases.All(b => b.Target.Type.Name == "ClassB" && b.Target.Method.Name == "Method4")));
+            Assert.True(results.All(r => r.BenchmarksCases.All(b => b.Descriptor.Type.Name == "ClassB" && b.Descriptor.Method.Name == "Method4")));
         }
 
         [Fact]

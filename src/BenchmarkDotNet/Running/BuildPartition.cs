@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Running
 
         public IResolver Resolver { get; }
 
-        public string AssemblyLocation => RepresentativeBenchmarkCase.Target.Type.Assembly.Location;
+        public string AssemblyLocation => RepresentativeBenchmarkCase.Descriptor.Type.Assembly.Location;
 
         public string BuildConfiguration => RepresentativeBenchmarkCase.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, Resolver);
 

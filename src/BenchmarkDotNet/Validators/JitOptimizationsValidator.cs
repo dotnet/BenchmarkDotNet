@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Validators
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
         {
-            foreach (var group in validationParameters.Benchmarks.GroupBy(benchmark => benchmark.Target.Type.GetTypeInfo().Assembly))
+            foreach (var group in validationParameters.Benchmarks.GroupBy(benchmark => benchmark.Descriptor.Type.GetTypeInfo().Assembly))
             {
                 foreach (var referencedAssemblyName in group.Key.GetReferencedAssemblies())
                 {

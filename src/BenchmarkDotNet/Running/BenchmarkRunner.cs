@@ -140,7 +140,7 @@ namespace BenchmarkDotNet.Running
         {
             // few types might have the same name: A.Name and B.Name will both report "Name"
             // in that case, we can not use the type name as file name because they would be getting overwritten #529
-            var uniqueTargetTypes = benchmarkRunInfos.SelectMany(info => info.BenchmarksCases.Select(benchmark => benchmark.Target.Type)).Distinct().ToArray();
+            var uniqueTargetTypes = benchmarkRunInfos.SelectMany(info => info.BenchmarksCases.Select(benchmark => benchmark.Descriptor.Type)).Distinct().ToArray();
 
             if (uniqueTargetTypes.Length == 1)
                 return FolderNameHelper.ToFolderName(uniqueTargetTypes[0]);

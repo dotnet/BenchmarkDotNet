@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Validators
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
             => validationParameters
                 .Benchmarks
-                .Select(benchmark => benchmark.Target.Type.Assembly)
+                .Select(benchmark => benchmark.Descriptor.Type.Assembly)
                 .Distinct()
                 .SelectMany(assembly => assembly.GetRunnableBenchmarks())
                 .SelectMany(GenericBenchmarksBuilder.BuildGenericsIfNeeded)

@@ -95,50 +95,50 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         private static readonly MethodInfo DummyMethod = typeof(DummyInstance).GetMethod(nameof(DummyInstance.Dummy));
 
         /// <summary>Creates run benchmark action.</summary>
-        /// <param name="target">Target info.</param>
+        /// <param name="descriptor">Descriptor info.</param>
         /// <param name="instance">Instance of target.</param>
         /// <param name="codegenMode">Describes how benchmark action code is generated.</param>
         /// <param name="unrollFactor">Unroll factor.</param>
         /// <returns>Run benchmark action.</returns>
-        public static BenchmarkAction CreateRun(Target target, object instance, BenchmarkActionCodegen codegenMode, int unrollFactor) =>
-            CreateCore(instance, target.Method, null, codegenMode, unrollFactor);
+        public static BenchmarkAction CreateRun(Descriptor descriptor, object instance, BenchmarkActionCodegen codegenMode, int unrollFactor) =>
+            CreateCore(instance, descriptor.Method, null, codegenMode, unrollFactor);
 
         /// <summary>Creates idle benchmark action.</summary>
-        /// <param name="target">Target info.</param>
+        /// <param name="descriptor">Descriptor info.</param>
         /// <param name="instance">Instance of target.</param>
         /// <param name="codegenMode">Describes how benchmark action code is generated.</param>
         /// <param name="unrollFactor">Unroll factor.</param>
         /// <returns>Idle benchmark action.</returns>
-        public static BenchmarkAction CreateIdle(Target target, object instance, BenchmarkActionCodegen codegenMode, int unrollFactor) =>
-            CreateCore(instance, null, target.Method, codegenMode, unrollFactor);
+        public static BenchmarkAction CreateIdle(Descriptor descriptor, object instance, BenchmarkActionCodegen codegenMode, int unrollFactor) =>
+            CreateCore(instance, null, descriptor.Method, codegenMode, unrollFactor);
 
         /// <summary>Creates global setup benchmark action.</summary>
-        /// <param name="target">Target info.</param>
+        /// <param name="descriptor">Descriptor info.</param>
         /// <param name="instance">Instance of target.</param>
         /// <returns>Setup benchmark action.</returns>
-        public static BenchmarkAction CreateGlobalSetup(Target target, object instance) =>
-            CreateCore(instance, target.GlobalSetupMethod, FallbackSignature, BenchmarkActionCodegen.DelegateCombine, 1);
+        public static BenchmarkAction CreateGlobalSetup(Descriptor descriptor, object instance) =>
+            CreateCore(instance, descriptor.GlobalSetupMethod, FallbackSignature, BenchmarkActionCodegen.DelegateCombine, 1);
 
         /// <summary>Creates global cleanup benchmark action.</summary>
-        /// <param name="target">Target info.</param>
+        /// <param name="descriptor">Descriptor info.</param>
         /// <param name="instance">Instance of target.</param>
         /// <returns>Cleanup benchmark action.</returns>
-        public static BenchmarkAction CreateGlobalCleanup(Target target, object instance) =>
-            CreateCore(instance, target.GlobalCleanupMethod, FallbackSignature, BenchmarkActionCodegen.DelegateCombine, 1);
+        public static BenchmarkAction CreateGlobalCleanup(Descriptor descriptor, object instance) =>
+            CreateCore(instance, descriptor.GlobalCleanupMethod, FallbackSignature, BenchmarkActionCodegen.DelegateCombine, 1);
 
         /// <summary>Creates global setup benchmark action.</summary>
-        /// <param name="target">Target info.</param>
+        /// <param name="descriptor">Descriptor info.</param>
         /// <param name="instance">Instance of target.</param>
         /// <returns>Setup benchmark action.</returns>
-        public static BenchmarkAction CreateIterationSetup(Target target, object instance) =>
-            CreateCore(instance, target.IterationSetupMethod, FallbackSignature, BenchmarkActionCodegen.DelegateCombine, 1);
+        public static BenchmarkAction CreateIterationSetup(Descriptor descriptor, object instance) =>
+            CreateCore(instance, descriptor.IterationSetupMethod, FallbackSignature, BenchmarkActionCodegen.DelegateCombine, 1);
 
         /// <summary>Creates global cleanup benchmark action.</summary>
-        /// <param name="target">Target info.</param>
+        /// <param name="descriptor">Descriptor info.</param>
         /// <param name="instance">Instance of target.</param>
         /// <returns>Cleanup benchmark action.</returns>
-        public static BenchmarkAction CreateIterationCleanup(Target target, object instance) =>
-            CreateCore(instance, target.IterationCleanupMethod, FallbackSignature, BenchmarkActionCodegen.DelegateCombine, 1);
+        public static BenchmarkAction CreateIterationCleanup(Descriptor descriptor, object instance) =>
+            CreateCore(instance, descriptor.IterationCleanupMethod, FallbackSignature, BenchmarkActionCodegen.DelegateCombine, 1);
 
         /// <summary>Creates a dummy benchmark action.</summary>
         /// <returns>Dummy benchmark action.</returns>

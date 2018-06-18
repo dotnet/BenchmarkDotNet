@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Validators
         {
             var validationErrors = new List<ValidationError>();
 
-            foreach (var groupByType in input.Benchmarks.GroupBy(benchmark => benchmark.Target.Type))
+            foreach (var groupByType in input.Benchmarks.GroupBy(benchmark => benchmark.Descriptor.Type))
             {
                 var allMethods = groupByType.Key.GetAllMethods().ToArray();
 

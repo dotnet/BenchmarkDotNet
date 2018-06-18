@@ -48,13 +48,13 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
         }
 
         internal static IEnumerable<Assembly> GetAllReferences(BenchmarkCase benchmarkCase) 
-            => benchmarkCase.Target.Type.GetTypeInfo().Assembly
+            => benchmarkCase.Descriptor.Type.GetTypeInfo().Assembly
                 .GetReferencedAssemblies()
                 .Select(Assembly.Load)
                 .Concat(
                     new[]
                     {
-                        benchmarkCase.Target.Type.GetTypeInfo().Assembly, // this assembly does not has to have a reference to BenchmarkDotNet (e.g. custom framework for benchmarking that internally uses BenchmarkDotNet
+                        benchmarkCase.Descriptor.Type.GetTypeInfo().Assembly, // this assembly does not has to have a reference to BenchmarkDotNet (e.g. custom framework for benchmarking that internally uses BenchmarkDotNet
                         typeof(BenchmarkCase).Assembly, // BenchmarkDotNet
                     })
                 .Distinct();

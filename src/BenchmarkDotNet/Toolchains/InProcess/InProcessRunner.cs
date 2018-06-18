@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 var flags = BindingFlags.Public;
                 flags |= parameter.IsStatic ? BindingFlags.Static : BindingFlags.Instance;
 
-                var targetType = benchmarkCase.Target.Type;
+                var targetType = benchmarkCase.Descriptor.Type;
                 var paramProperty = targetType.GetProperty(parameter.Name, flags);
 
                 if (paramProperty == null)
@@ -98,12 +98,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         {
             public static void RunCore(IHost host, BenchmarkCase benchmarkCase, BenchmarkActionCodegen codegenMode, IConfig config)
             {
-                var target = benchmarkCase.Target;
+                var target = benchmarkCase.Descriptor;
                 var job = benchmarkCase.Job; // TODO: filter job (same as SourceCodePresenter does)?
                 var unrollFactor = benchmarkCase.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvResolver.Instance);
 
                 // DONTTOUCH: these should be allocated together
-                var instance = Activator.CreateInstance(benchmarkCase.Target.Type);
+                var instance = Activator.CreateInstance(benchmarkCase.Descriptor.Type);
                 var mainAction = BenchmarkActionFactory.CreateRun(target, instance, codegenMode, unrollFactor);
                 var idleAction = BenchmarkActionFactory.CreateIdle(target, instance, codegenMode, unrollFactor);
                 var globalSetupAction = BenchmarkActionFactory.CreateGlobalSetup(target, instance);

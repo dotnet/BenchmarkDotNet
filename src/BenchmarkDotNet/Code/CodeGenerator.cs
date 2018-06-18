@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Code
             {
                 var benchmark = buildInfo.BenchmarkCase;
 
-                var provider = GetDeclarationsProvider(benchmark.Target);
+                var provider = GetDeclarationsProvider(benchmark.Descriptor);
 
                 string passArguments = GetPassArguments(benchmark);
 
@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Code
 
                 AddNonEmptyUnique(targetTypeNamespaces, provider.TargetTypeNamespace);
                 AddNonEmptyUnique(targetMethodReturnTypeNamespace, provider.TargetMethodReturnTypeNamespace);
-                AddNonEmptyUnique(additionalLogic, benchmark.Target.AdditionalLogic);
+                AddNonEmptyUnique(additionalLogic, benchmark.Descriptor.AdditionalLogic);
 
                 string benchmarkTypeCode = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkType.txt"))
                     .Replace("$ID$", buildInfo.Id.ToString())
@@ -87,7 +87,7 @@ namespace BenchmarkDotNet.Code
                 .Replace("$TargetMethodReturnTypeNamespace$", string.Join(Environment.NewLine, targetMethodReturnTypeNamespace))
                 .Replace("$AdditionalLogic$", string.Join(Environment.NewLine, additionalLogic))
                 .Replace("$DerivedTypes$", string.Join(Environment.NewLine, benchmarksCode))
-                .Replace("$ExtraAttribute$", GetExtraAttributes(buildPartition.RepresentativeBenchmarkCase.Target))
+                .Replace("$ExtraAttribute$", GetExtraAttributes(buildPartition.RepresentativeBenchmarkCase.Descriptor))
                 .Replace("$CoreRtSwitch$", GetCoreRtSwitch(buildPartition))
                 .ToString();
 
@@ -152,19 +152,19 @@ namespace BenchmarkDotNet.Code
                 Replace("; ", ";\n                ");
         }
 
-        private static DeclarationsProvider GetDeclarationsProvider(Target target)
+        private static DeclarationsProvider GetDeclarationsProvider(Descriptor descriptor)
         {
-            var method = target.Method;
+            var method = descriptor.Method;
 
             if (method.ReturnType == typeof(Task))
             {
-                return new TaskDeclarationsProvider(target);
+                return new TaskDeclarationsProvider(descriptor);
             }
             if (method.ReturnType.GetTypeInfo().IsGenericType
                 && (method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(Task<>)
                     || method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(ValueTask<>)))
             {
-                return new GenericTaskDeclarationsProvider(target);
+                return new GenericTaskDeclarationsProvider(descriptor);
             }
 
             if (method.ReturnType == typeof(void))
@@ -175,15 +175,15 @@ namespace BenchmarkDotNet.Code
                     throw new NotSupportedException("async void is not supported by design");
                 }
 
-                return new VoidDeclarationsProvider(target);
+                return new VoidDeclarationsProvider(descriptor);
             }
 
             if (method.ReturnType.IsByRef)
             {
-                return new ByRefDeclarationsProvider(target);
+                return new ByRefDeclarationsProvider(descriptor);
             }
 
-            return new NonVoidDeclarationsProvider(target);
+            return new NonVoidDeclarationsProvider(descriptor);
         }
 
         private static string GetParamsContent(BenchmarkCase benchmarkCase)
@@ -196,35 +196,35 @@ namespace BenchmarkDotNet.Code
         private static string GetArgumentsDefinition(BenchmarkCase benchmarkCase)
             => string.Join(
                 ", ",
-                benchmarkCase.Target.Method.GetParameters()
+                benchmarkCase.Descriptor.Method.GetParameters()
                          .Select((parameter, index) => $"{GetParameterModifier(parameter)} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index}"));
 
         private static string GetDeclareArgumentFields(BenchmarkCase benchmarkCase)
             => string.Join(
                 Environment.NewLine,
-                benchmarkCase.Target.Method.GetParameters()
+                benchmarkCase.Descriptor.Method.GetParameters()
                          .Select((parameter, index) => $"private {GetFieldType(parameter.ParameterType, benchmarkCase.Parameters.GetArgument(parameter.Name)).GetCorrectCSharpTypeName()} __argField{index};"));
 
         private static string GetInitializeArgumentFields(BenchmarkCase benchmarkCase)
             => string.Join(
                 Environment.NewLine,
-                benchmarkCase.Target.Method.GetParameters()
+                benchmarkCase.Descriptor.Method.GetParameters()
                          .Select((parameter, index) => $"__argField{index} = {benchmarkCase.Parameters.GetArgument(parameter.Name).ToSourceCode()};")); // we init the fields in ctor to provoke all possible allocations and overhead of other type
 
         private static string GetLoadArguments(BenchmarkCase benchmarkCase)
             => string.Join(
                 Environment.NewLine,
-                benchmarkCase.Target.Method.GetParameters()
+                benchmarkCase.Descriptor.Method.GetParameters()
                          .Select((parameter, index) => $"{(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index} = {(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} __argField{index};"));
 
         private static string GetPassArguments(BenchmarkCase benchmarkCase)
             => string.Join(
                 ", ",
-                benchmarkCase.Target.Method.GetParameters()
+                benchmarkCase.Descriptor.Method.GetParameters()
                     .Select((parameter, index) => $"{GetParameterModifier(parameter)} arg{index}"));
 
-        private static string GetExtraAttributes(Target target) 
-            => target.Method.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any() ? "[System.STAThreadAttribute]" : string.Empty;
+        private static string GetExtraAttributes(Descriptor descriptor) 
+            => descriptor.Method.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any() ? "[System.STAThreadAttribute]" : string.Empty;
 
         private static string GetEngineFactoryTypeName(BenchmarkCase benchmarkCase)
         {

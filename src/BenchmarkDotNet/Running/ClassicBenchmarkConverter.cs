@@ -77,9 +77,9 @@ namespace BenchmarkDotNet.Running
                 var runInfo = TypeToBenchmarks(type, config);
                 var benchmarks = runInfo.BenchmarksCases.Select(b =>
                 {
-                    var target = b.Target;
+                    var target = b.Descriptor;
                     return BenchmarkCase.Create(
-                        new Target(target.Type, target.Method, target.GlobalSetupMethod, target.GlobalCleanupMethod,
+                        new Descriptor(target.Type, target.Method, target.GlobalSetupMethod, target.GlobalCleanupMethod,
                             target.IterationSetupMethod, target.IterationCleanupMethod,
                             target.MethodDisplayInfo, benchmarkContent, target.Baseline, target.Categories, target.OperationsPerInvoke),
                         b.Job,

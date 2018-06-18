@@ -31,14 +31,14 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.Equal(6, results.BenchmarksCases.Count());
 
-            Assert.Equal(1, results.BenchmarksCases.Count(b => b.Job.Run.RunStrategy == RunStrategy.ColdStart && b.Target.Method.Name == "BenchmarkWithVoid"));
-            Assert.Equal(1, results.BenchmarksCases.Count(b => b.Job.Run.RunStrategy == RunStrategy.ColdStart && b.Target.Method.Name == "BenchmarkWithReturnValue"));
+            Assert.Equal(1, results.BenchmarksCases.Count(b => b.Job.Run.RunStrategy == RunStrategy.ColdStart && b.Descriptor.Method.Name == "BenchmarkWithVoid"));
+            Assert.Equal(1, results.BenchmarksCases.Count(b => b.Job.Run.RunStrategy == RunStrategy.ColdStart && b.Descriptor.Method.Name == "BenchmarkWithReturnValue"));
 
-            Assert.Equal(1, results.BenchmarksCases.Count(b => b.Job.Run.RunStrategy == RunStrategy.Monitoring && b.Target.Method.Name == "BenchmarkWithVoid"));
-            Assert.Equal(1, results.BenchmarksCases.Count(b => b.Job.Run.RunStrategy == RunStrategy.Monitoring && b.Target.Method.Name == "BenchmarkWithReturnValue"));
+            Assert.Equal(1, results.BenchmarksCases.Count(b => b.Job.Run.RunStrategy == RunStrategy.Monitoring && b.Descriptor.Method.Name == "BenchmarkWithVoid"));
+            Assert.Equal(1, results.BenchmarksCases.Count(b => b.Job.Run.RunStrategy == RunStrategy.Monitoring && b.Descriptor.Method.Name == "BenchmarkWithReturnValue"));
 
-            Assert.Equal(1, results.BenchmarksCases.Count(b => b.Job.Run.RunStrategy == RunStrategy.Throughput && b.Target.Method.Name == "BenchmarkWithVoid"));
-            Assert.Equal(1, results.BenchmarksCases.Count(b => b.Job.Run.RunStrategy == RunStrategy.Throughput && b.Target.Method.Name == "BenchmarkWithReturnValue"));
+            Assert.Equal(1, results.BenchmarksCases.Count(b => b.Job.Run.RunStrategy == RunStrategy.Throughput && b.Descriptor.Method.Name == "BenchmarkWithVoid"));
+            Assert.Equal(1, results.BenchmarksCases.Count(b => b.Job.Run.RunStrategy == RunStrategy.Throughput && b.Descriptor.Method.Name == "BenchmarkWithReturnValue"));
 
             string testLog = logger.GetLog();
             Assert.Contains("// ### Benchmark with void called ###", testLog);

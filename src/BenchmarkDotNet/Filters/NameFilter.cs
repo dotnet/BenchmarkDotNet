@@ -4,6 +4,6 @@ namespace BenchmarkDotNet.Filters
 {
     public class NameFilter : SimpleFilter
     {
-        public NameFilter(Func<string, bool> predicate) : base(b => predicate(b.Target.Method.Name)) { }
+        public NameFilter(Func<string, bool> predicate) : base(b => predicate(b.Descriptor.Method.Name)) { }
     }
 }

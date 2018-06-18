@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Exporters
 
         private string Export(Summary summary, BenchmarkCase benchmarkCase, DisassemblyResult disassemblyResult, PmcStats pmcStats)
         {
-            var filePath = $"{Path.Combine(summary.ResultsDirectoryPath, benchmarkCase.Target.Method.Name)}-{benchmarkCase.Job.Env.Jit}-{benchmarkCase.Job.Env.Platform}-instructionPointer.html";
+            var filePath = $"{Path.Combine(summary.ResultsDirectoryPath, benchmarkCase.Descriptor.Method.Name)}-{benchmarkCase.Job.Env.Jit}-{benchmarkCase.Job.Env.Platform}-instructionPointer.html";
             if (File.Exists(filePath))
                 File.Delete(filePath);
 
