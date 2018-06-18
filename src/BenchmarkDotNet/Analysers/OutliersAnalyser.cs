@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Analysers
             if (actual.IsEmpty())
                 yield break;
             var result = report.AllMeasurements.Where(m => m.IterationMode == IterationMode.Result).ToArray();
-            var outlierMode = report.Benchmark.Job.ResolveValue(AccuracyMode.OutlierModeCharacteristic, EngineResolver.Instance); // TODO: improve            
+            var outlierMode = report.BenchmarkCase.Job.ResolveValue(AccuracyMode.OutlierModeCharacteristic, EngineResolver.Instance); // TODO: improve            
             var statistics = actual.GetStatistics();
             var allOutliers = statistics.AllOutliers;
             var actualOutliers = statistics.GetActualOutliers(outlierMode);

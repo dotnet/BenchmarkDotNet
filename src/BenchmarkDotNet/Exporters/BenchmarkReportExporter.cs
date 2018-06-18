@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Exporters
         {
             foreach (var report in summary.Reports)
             {
-                logger.WriteLineInfo(report.Benchmark.DisplayInfo);
+                logger.WriteLineInfo(report.BenchmarkCase.DisplayInfo);
                 logger.WriteLineStatistic($"Runtime = {report.GetRuntimeInfo()}; GC = {report.GetGcInfo()}");
                 var resultRuns = report.GetResultRuns();
                 if (resultRuns.IsEmpty())

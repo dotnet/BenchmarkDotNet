@@ -55,22 +55,22 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         public static IToolchain From(string targetFrameworkMoniker)
             => new CsProjClassicNetToolchain(targetFrameworkMoniker);
 
-        public override bool IsSupported(Benchmark benchmark, ILogger logger, IResolver resolver)
+        public override bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver)
         {
-            if (!base.IsSupported(benchmark, logger, resolver))
+            if (!base.IsSupported(benchmarkCase, logger, resolver))
             {
                 return false;
             }
 
             if (!RuntimeInformation.IsWindows())
             {
-                logger.WriteLineError($"Classic .NET toolchain is supported only for Windows, benchmark '{benchmark.DisplayInfo}' will not be executed");
+                logger.WriteLineError($"Classic .NET toolchain is supported only for Windows, benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
                 return false;
             }
 
             if (!HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled())
             {
-                logger.WriteLineError($"BenchmarkDotNet requires dotnet cli toolchain to be installed, benchmark '{benchmark.DisplayInfo}' will not be executed");
+                logger.WriteLineError($"BenchmarkDotNet requires dotnet cli toolchain to be installed, benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
                 return false;
             }
 

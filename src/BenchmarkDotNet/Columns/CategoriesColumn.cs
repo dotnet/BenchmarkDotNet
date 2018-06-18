@@ -11,10 +11,10 @@ namespace BenchmarkDotNet.Columns
         
         public string Id => nameof(CategoriesColumn);
         public string ColumnName => "Categories";
-        public string GetValue(Summary summary, Benchmark benchmark) => string.Join(",", benchmark.Target.Categories);
-        public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
-        public bool IsDefault(Summary summary, Benchmark benchmark) => false;
-        public bool IsAvailable(Summary summary) => summary.Benchmarks.Any(b => !b.Target.Categories.IsEmpty());
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => string.Join(",", benchmarkCase.Target.Categories);
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style) => GetValue(summary, benchmarkCase);
+        public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
+        public bool IsAvailable(Summary summary) => summary.BenchmarksCases.Any(b => !b.Target.Categories.IsEmpty());
         public bool AlwaysShow => false;
         public ColumnCategory Category => ColumnCategory.Job;
         public int PriorityInCategory => 100;

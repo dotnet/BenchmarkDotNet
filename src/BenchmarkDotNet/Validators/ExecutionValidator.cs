@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Validators
         private ExecutionValidator(bool failOnError)
             : base(failOnError) { }
 
-        protected override void ExecuteBenchmarks(object benchmarkTypeInstance, IEnumerable<Benchmark> benchmarks, List<ValidationError> errors)
+        protected override void ExecuteBenchmarks(object benchmarkTypeInstance, IEnumerable<BenchmarkCase> benchmarks, List<ValidationError> errors)
         {
             foreach (var benchmark in benchmarks)
             {

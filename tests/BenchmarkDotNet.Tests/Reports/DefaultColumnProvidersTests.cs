@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Tests.Reports
             return summary;
         }
 
-        private static BenchmarkReport CreateReport(Benchmark benchmark, bool hugeSd)
+        private static BenchmarkReport CreateReport(BenchmarkCase benchmarkCase, bool hugeSd)
         {
             var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
             var executeResult = new ExecuteResult(true, 0, Array.Empty<string>(), Array.Empty<string>());
@@ -70,11 +70,11 @@ namespace BenchmarkDotNet.Tests.Reports
                 new Measurement(1, IterationMode.Result, 5, 1, 1),
                 new Measurement(1, IterationMode.Result, 6, 1, 1),
             };
-            return new BenchmarkReport(benchmark, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default);
+            return new BenchmarkReport(benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default);
         }
 
-        private static IEnumerable<Benchmark> CreateBenchmarks(IConfig config) =>
-            BenchmarkConverter.TypeToBenchmarks(typeof(MockBenchmarkClass), config).Benchmarks;
+        private static IEnumerable<BenchmarkCase> CreateBenchmarks(IConfig config) =>
+            BenchmarkConverter.TypeToBenchmarks(typeof(MockBenchmarkClass), config).BenchmarksCases;
 
 
         [LongRunJob]

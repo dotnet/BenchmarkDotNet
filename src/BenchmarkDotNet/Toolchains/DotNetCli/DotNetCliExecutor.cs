@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             try
             {
                 return Execute(
-                    executeParameters.Benchmark,
+                    executeParameters.BenchmarkCase,
                     executeParameters.BenchmarkId,
                     executeParameters.Logger, 
                     executeParameters.BuildResult.ArtifactsPaths, 
@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        private ExecuteResult Execute(Benchmark benchmark,
+        private ExecuteResult Execute(BenchmarkCase benchmarkCase,
                                       BenchmarkId benchmarkId,
                                       ILogger logger,
                                       ArtifactsPaths artifactsPaths,
@@ -67,20 +67,20 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 $"{executableName} {benchmarkId.ToArgument()}",
                 redirectStandardInput: true);
 
-            startInfo.SetEnvironmentVariables(benchmark, resolver);
+            startInfo.SetEnvironmentVariables(benchmarkCase, resolver);
 
             using (var process = new Process { StartInfo = startInfo })
             {
-                var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmark, benchmarkId, config);
+                var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId, config);
 
                 ConsoleHandler.Instance.SetProcess(process);
 
                 process.Start();
 
                 process.EnsureHighPriority(logger);
-                if (benchmark.Job.Env.HasValue(EnvMode.AffinityCharacteristic))
+                if (benchmarkCase.Job.Env.HasValue(EnvMode.AffinityCharacteristic))
                 {
-                    process.TrySetAffinity(benchmark.Job.Env.Affinity, logger);
+                    process.TrySetAffinity(benchmarkCase.Job.Env.Affinity, logger);
                 }
 
                 loggerWithDiagnoser.ProcessInput();

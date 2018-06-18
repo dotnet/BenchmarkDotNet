@@ -19,14 +19,14 @@ namespace BenchmarkDotNet.Columns
         /// <summary>
         /// Value in this column formatted using the default style.
         /// </summary>
-        string GetValue(Summary summary, Benchmark benchmark);
+        string GetValue(Summary summary, BenchmarkCase benchmarkCase);
 
         /// <summary>
         /// Value in this column formatted using the specified style.
         /// </summary>
-        string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style);
+        string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style);
 
-        bool IsDefault(Summary summary, Benchmark benchmark);
+        bool IsDefault(Summary summary, BenchmarkCase benchmarkCase);
 
         bool IsAvailable(Summary summary);
 

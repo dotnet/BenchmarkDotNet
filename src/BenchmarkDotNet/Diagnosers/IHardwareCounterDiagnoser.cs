@@ -5,6 +5,6 @@ namespace BenchmarkDotNet.Diagnosers
 {
     internal interface IHardwareCountersDiagnoser : IDiagnoser
     {
-        IReadOnlyDictionary<Benchmark, PmcStats> Results { get; }
+        IReadOnlyDictionary<BenchmarkCase, PmcStats> Results { get; }
     }
 }

@@ -10,9 +10,9 @@ namespace BenchmarkDotNet.Diagnosers
     {
         public string Id => "Disassembly";
 
-        private readonly IReadOnlyDictionary<Benchmark, DisassemblyResult> results;
+        private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
 
-        public DisassemblyAnalyzer(IReadOnlyDictionary<Benchmark, DisassemblyResult> results) => this.results = results;
+        public DisassemblyAnalyzer(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results) => this.results = results;
 
         public IEnumerable<Conclusion> Analyse(Summary summary)
             => from pair in results

@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Reports
 {
     public sealed class BenchmarkReport
     {
-        public Benchmark Benchmark { get; }
+        public BenchmarkCase BenchmarkCase { get; }
         public IReadOnlyList<Measurement> AllMeasurements { get; }
         public GcStats GcStats { get; }
 
@@ -29,14 +29,14 @@ namespace BenchmarkDotNet.Reports
         private Statistics resultStatistics;
 
         public BenchmarkReport(
-            Benchmark benchmark,
+            BenchmarkCase benchmarkCase,
             GenerateResult generateResult,
             BuildResult buildResult,
             IReadOnlyList<ExecuteResult> executeResults,
             IReadOnlyList<Measurement> allMeasurements, 
             GcStats gcStats)
         {
-            Benchmark = benchmark;
+            BenchmarkCase = benchmarkCase;
             GenerateResult = generateResult;
             BuildResult = buildResult;
             ExecuteResults = executeResults ?? Array.Empty<ExecuteResult>();
@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Reports
             GcStats = gcStats;
         }
 
-        public override string ToString() => $"{Benchmark.DisplayInfo}, {AllMeasurements.Count} runs";
+        public override string ToString() => $"{BenchmarkCase.DisplayInfo}, {AllMeasurements.Count} runs";
 
         public IReadOnlyList<Measurement> GetResultRuns() => AllMeasurements.Where(r => r.IterationMode == IterationMode.Result).ToList();
     }

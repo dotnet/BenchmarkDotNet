@@ -219,7 +219,7 @@ namespace BenchmarkDotNet.Tests.Validators
         [Fact]
         public void FieldsWithoutParamsValuesAreDiscovered()
         {
-            Assert.Empty(BenchmarkConverter.TypeToBenchmarks(typeof(FieldsWithoutParamsValues)).Benchmarks);
+            Assert.Empty(BenchmarkConverter.TypeToBenchmarks(typeof(FieldsWithoutParamsValues)).BenchmarksCases);
         }
 
         public class FieldsWithoutParamsValues

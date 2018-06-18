@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Exporters.Csv
 
         public ISummaryStyle Style { get; private set; }
 
-        public static Job[] GetJobs(Summary summary) => summary.Benchmarks.Select(b => b.Job).ToArray();
+        public static Job[] GetJobs(Summary summary) => summary.BenchmarksCases.Select(b => b.Job).ToArray();
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
@@ -79,19 +79,19 @@ namespace BenchmarkDotNet.Exporters.Csv
             // Target
             var columns = new List<MeasurementColumn>
             {
-                new MeasurementColumn("Target", (summary, report, m) => report.Benchmark.Target.Type.Name + "." + report.Benchmark.Target.MethodDisplayInfo),
-                new MeasurementColumn("Target_Namespace", (summary, report, m) => report.Benchmark.Target.Type.Namespace),
-                new MeasurementColumn("Target_Type", (summary, report, m) => report.Benchmark.Target.Type.Name),
-                new MeasurementColumn("Target_Method", (summary, report, m) => report.Benchmark.Target.MethodDisplayInfo)
+                new MeasurementColumn("Target", (summary, report, m) => report.BenchmarkCase.Target.Type.Name + "." + report.BenchmarkCase.Target.MethodDisplayInfo),
+                new MeasurementColumn("Target_Namespace", (summary, report, m) => report.BenchmarkCase.Target.Type.Namespace),
+                new MeasurementColumn("Target_Type", (summary, report, m) => report.BenchmarkCase.Target.Type.Name),
+                new MeasurementColumn("Target_Method", (summary, report, m) => report.BenchmarkCase.Target.MethodDisplayInfo)
             };
             
             // Job
             foreach (var characteristic in CharacteristicHelper.GetAllPresentableCharacteristics(typeof(Job), true))
-                columns.Add(new MeasurementColumn("Job_" + characteristic.Id, (summary, report, m) => Presenter.ToPresentation(report.Benchmark.Job, characteristic)));
-            columns.Add(new MeasurementColumn("Job_Display", (summary, report, m) => report.Benchmark.Job.DisplayInfo));
+                columns.Add(new MeasurementColumn("Job_" + characteristic.Id, (summary, report, m) => Presenter.ToPresentation(report.BenchmarkCase.Job, characteristic)));
+            columns.Add(new MeasurementColumn("Job_Display", (summary, report, m) => report.BenchmarkCase.Job.DisplayInfo));
 
             // Params
-            columns.Add(new MeasurementColumn("Params", (summary, report, m) => report.Benchmark.Parameters.PrintInfo));
+            columns.Add(new MeasurementColumn("Params", (summary, report, m) => report.BenchmarkCase.Parameters.PrintInfo));
 
             // Measurements
             columns.Add(new MeasurementColumn("Measurement_LaunchIndex", (summary, report, m) => m.LaunchIndex.ToString()));

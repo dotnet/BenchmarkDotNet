@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
         {
-            var extraArguments = DotNetCliGenerator.GetCustomArguments(buildPartition.RepresentativeBenchmark, buildPartition.Resolver);
+            var extraArguments = DotNetCliGenerator.GetCustomArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver);
 
             var restoreResult = DotNetCliCommandExecutor.ExecuteCommand(
                 CustomDotNetCliPath,

@@ -11,6 +11,6 @@ namespace BenchmarkDotNet.Toolchains
         IBuilder Builder { get; }
         IExecutor Executor { get; }
 
-        bool IsSupported(Benchmark benchmark, ILogger logger, IResolver resolver);
+        bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver);
     }
 }

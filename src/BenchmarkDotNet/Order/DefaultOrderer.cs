@@ -15,8 +15,8 @@ namespace BenchmarkDotNet.Order
         private readonly IComparer<ParameterInstances> paramsComparer = ParameterComparer.Instance;
         private readonly IComparer<Job> jobComparer = JobComparer.Instance;
         private readonly IComparer<Target> targetComparer;
-        private readonly IComparer<Benchmark> benchmarkComparer;
-        private readonly IComparer<IGrouping<string, Benchmark>> logicalGroupComparer;
+        private readonly IComparer<BenchmarkCase> benchmarkComparer;
+        private readonly IComparer<IGrouping<string, BenchmarkCase>> logicalGroupComparer;
 
         private readonly SummaryOrderPolicy summaryOrderPolicy;
 
@@ -30,60 +30,60 @@ namespace BenchmarkDotNet.Order
             logicalGroupComparer = new LogicalGroupComparer(benchmarkComparer);
         }
 
-        public virtual IEnumerable<Benchmark> GetExecutionOrder(Benchmark[] benchmarks)
+        public virtual IEnumerable<BenchmarkCase> GetExecutionOrder(BenchmarkCase[] benchmarksCase)
         {
-            var list = benchmarks.ToList();
+            var list = benchmarksCase.ToList();
             list.Sort(benchmarkComparer);
             return list;
         }
 
-        public virtual IEnumerable<Benchmark> GetSummaryOrder(Benchmark[] benchmarks, Summary summary)
+        public virtual IEnumerable<BenchmarkCase> GetSummaryOrder(BenchmarkCase[] benchmarksCase, Summary summary)
         {
-            var benchmarkLogicalGroups = benchmarks.GroupBy(b => GetLogicalGroupKey(summary.Config, benchmarks, b));
+            var benchmarkLogicalGroups = benchmarksCase.GroupBy(b => GetLogicalGroupKey(summary.Config, benchmarksCase, b));
             foreach (var logicalGroup in GetLogicalGroupOrder(benchmarkLogicalGroups))
             foreach (var benchmark in GetSummaryOrderForGroup(logicalGroup.ToArray(), summary))
                 yield return benchmark;
         }
         
-        protected virtual IEnumerable<Benchmark> GetSummaryOrderForGroup(Benchmark[] benchmarks, Summary summary)
+        protected virtual IEnumerable<BenchmarkCase> GetSummaryOrderForGroup(BenchmarkCase[] benchmarksCase, Summary summary)
         {            
             switch (summaryOrderPolicy)
             {
                 case SummaryOrderPolicy.FastestToSlowest:
-                    return benchmarks.OrderBy(b => summary[b].ResultStatistics.Mean);
+                    return benchmarksCase.OrderBy(b => summary[b].ResultStatistics.Mean);
                 case SummaryOrderPolicy.SlowestToFastest:
-                    return benchmarks.OrderByDescending(b => summary[b].ResultStatistics.Mean);
+                    return benchmarksCase.OrderByDescending(b => summary[b].ResultStatistics.Mean);
                 case SummaryOrderPolicy.Method:
-                    return benchmarks.OrderBy(b => b.Target.MethodDisplayInfo);
+                    return benchmarksCase.OrderBy(b => b.Target.MethodDisplayInfo);
                 case SummaryOrderPolicy.Declared:
-                    return benchmarks;
+                    return benchmarksCase;
                 default:
-                    return GetExecutionOrder(benchmarks);
+                    return GetExecutionOrder(benchmarksCase);
             }
         }
 
-        public string GetHighlightGroupKey(Benchmark benchmark)
+        public string GetHighlightGroupKey(BenchmarkCase benchmarkCase)
         {
             switch (summaryOrderPolicy)
             {
                 case SummaryOrderPolicy.Default:
-                    return benchmark.Parameters.DisplayInfo;
+                    return benchmarkCase.Parameters.DisplayInfo;
                 case SummaryOrderPolicy.Method:
-                    return benchmark.Target.MethodDisplayInfo;
+                    return benchmarkCase.Target.MethodDisplayInfo;
                 default:
                     return null;
             }
         }
 
-        public string GetLogicalGroupKey(IConfig config, Benchmark[] allBenchmarks, Benchmark benchmark)
+        public string GetLogicalGroupKey(IConfig config, BenchmarkCase[] allBenchmarksCases, BenchmarkCase benchmarkCase)
         {
             var rules = new HashSet<BenchmarkLogicalGroupRule>(config.GetLogicalGroupRules());
-            if (allBenchmarks.Any(b => b.Job.Meta.IsBaseline))
+            if (allBenchmarksCases.Any(b => b.Job.Meta.IsBaseline))
             {
                 rules.Add(BenchmarkLogicalGroupRule.ByMethod);
                 rules.Add(BenchmarkLogicalGroupRule.ByParams);
             }
-            if (allBenchmarks.Any(b => b.Target.Baseline))
+            if (allBenchmarksCases.Any(b => b.Target.Baseline))
             {
                 rules.Add(BenchmarkLogicalGroupRule.ByJob);
                 rules.Add(BenchmarkLogicalGroupRule.ByParams);
@@ -91,19 +91,19 @@ namespace BenchmarkDotNet.Order
 
             var keys = new List<string>();            
             if (rules.Contains(BenchmarkLogicalGroupRule.ByMethod))
-                keys.Add(benchmark.Target.DisplayInfo);
+                keys.Add(benchmarkCase.Target.DisplayInfo);
             if (rules.Contains(BenchmarkLogicalGroupRule.ByJob))
-                keys.Add(benchmark.Job.DisplayInfo);
+                keys.Add(benchmarkCase.Job.DisplayInfo);
             if (rules.Contains(BenchmarkLogicalGroupRule.ByParams))
-                keys.Add(benchmark.Parameters.DisplayInfo);
+                keys.Add(benchmarkCase.Parameters.DisplayInfo);
             if (rules.Contains(BenchmarkLogicalGroupRule.ByCategory))
-                keys.Add(string.Join(",", benchmark.Target.Categories));
+                keys.Add(string.Join(",", benchmarkCase.Target.Categories));
 
             string logicalGroupKey = string.Join("-", keys.Where(key => key != string.Empty));
             return logicalGroupKey == string.Empty ? "*" : logicalGroupKey;
         }
 
-        public virtual IEnumerable<IGrouping<string, Benchmark>> GetLogicalGroupOrder(IEnumerable<IGrouping<string, Benchmark>> logicalGroups)
+        public virtual IEnumerable<IGrouping<string, BenchmarkCase>> GetLogicalGroupOrder(IEnumerable<IGrouping<string, BenchmarkCase>> logicalGroups)
         {
             var list = logicalGroups.ToList();
             list.Sort(logicalGroupComparer);
@@ -112,7 +112,7 @@ namespace BenchmarkDotNet.Order
 
         public bool SeparateLogicalGroups => true;
 
-        private class BenchmarkComparer : IComparer<Benchmark>
+        private class BenchmarkComparer : IComparer<BenchmarkCase>
         {
             private readonly IComparer<ParameterInstances> paramsComparer;
             private readonly IComparer<Job> jobComparer;
@@ -125,7 +125,7 @@ namespace BenchmarkDotNet.Order
                 this.paramsComparer = paramsComparer;
             }
 
-            public int Compare(Benchmark x, Benchmark y) => new[]
+            public int Compare(BenchmarkCase x, BenchmarkCase y) => new[]
             {
                 paramsComparer?.Compare(x.Parameters, y.Parameters) ?? 0,
                 jobComparer?.Compare(x.Job, y.Job) ?? 0,
@@ -134,13 +134,13 @@ namespace BenchmarkDotNet.Order
             }.FirstOrDefault(c => c != 0);
         }
 
-        private class LogicalGroupComparer : IComparer<IGrouping<string, Benchmark>>
+        private class LogicalGroupComparer : IComparer<IGrouping<string, BenchmarkCase>>
         {
-            private IComparer<Benchmark> benchmarkComparer;
+            private IComparer<BenchmarkCase> benchmarkComparer;
 
-            public LogicalGroupComparer(IComparer<Benchmark> benchmarkComparer) => this.benchmarkComparer = benchmarkComparer;
+            public LogicalGroupComparer(IComparer<BenchmarkCase> benchmarkComparer) => this.benchmarkComparer = benchmarkComparer;
 
-            public int Compare(IGrouping<string, Benchmark> x, IGrouping<string, Benchmark> y) => benchmarkComparer.Compare(x.First(), y.First());
+            public int Compare(IGrouping<string, BenchmarkCase> x, IGrouping<string, BenchmarkCase> y) => benchmarkComparer.Compare(x.First(), y.First());
         }
     }
 }

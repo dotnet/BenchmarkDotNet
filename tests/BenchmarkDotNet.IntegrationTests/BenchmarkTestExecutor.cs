@@ -70,11 +70,11 @@ namespace BenchmarkDotNet.IntegrationTests
 
                 Assert.True(summary.Reports.All(r => r.BuildResult.IsBuildSuccess),
                     "The following benchmarks are failed to build: " +
-                    string.Join(", ", summary.Reports.Where(r => !r.BuildResult.IsBuildSuccess).Select(r => r.Benchmark.DisplayInfo)));
+                    string.Join(", ", summary.Reports.Where(r => !r.BuildResult.IsBuildSuccess).Select(r => r.BenchmarkCase.DisplayInfo)));
 
                 Assert.True(summary.Reports.All(r => r.ExecuteResults != null),
                     "The following benchmarks don't have any execution results: " +
-                    string.Join(", ", summary.Reports.Where(r => r.ExecuteResults == null).Select(r => r.Benchmark.DisplayInfo)));
+                    string.Join(", ", summary.Reports.Where(r => r.ExecuteResults == null).Select(r => r.BenchmarkCase.DisplayInfo)));
                 
                 Assert.True(summary.Reports.All(r => r.ExecuteResults.Any(er => er.FoundExecutable && er.Data.Any())),
                     "All reports should have at least one \"ExecuteResult\" with \"FoundExecutable\" = true and at least one \"Data\" item");

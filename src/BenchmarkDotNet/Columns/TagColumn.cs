@@ -17,8 +17,8 @@ namespace BenchmarkDotNet.Columns
             ColumnName = columnName;
         }
 
-        public bool IsDefault(Summary summary, Benchmark benchmark) => false;
-        public string GetValue(Summary summary, Benchmark benchmark) => getTag(benchmark.Target.Method.Name);
+        public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => getTag(benchmarkCase.Target.Method.Name);
 
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;
@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Columns
         public bool IsNumeric => false;
         public UnitType UnitType => UnitType.Dimensionless;
         public string Legend => $"Custom '{ColumnName}' tag column";
-        public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style) => GetValue(summary, benchmarkCase);
         public override string ToString() => ColumnName;
     }
 }

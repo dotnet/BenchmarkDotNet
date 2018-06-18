@@ -9,6 +9,6 @@ namespace BenchmarkDotNet.Filters
 
         public DisjunctionFilter(params IFilter[] filters) => this.filters = filters;
 
-        public bool Predicate(Benchmark benchmark) => filters.Any(filter => filter.Predicate(benchmark));
+        public bool Predicate(BenchmarkCase benchmarkCase) => filters.Any(filter => filter.Predicate(benchmarkCase));
     }
 }

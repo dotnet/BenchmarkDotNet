@@ -4,6 +4,6 @@ namespace BenchmarkDotNet.Filters
 {
     public interface IFilter
     {
-        bool Predicate(Benchmark benchmark);
+        bool Predicate(BenchmarkCase benchmarkCase);
     }
 }

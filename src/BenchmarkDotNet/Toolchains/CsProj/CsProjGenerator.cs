@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
             string template = ResourceHelper.LoadTemplate("CsProj.txt");
-            var benchmark = buildPartition.RepresentativeBenchmark;
+            var benchmark = buildPartition.RepresentativeBenchmarkCase;
             var projectFile = GetProjectFilePath(benchmark.Target.Type, logger);
 
             string platform = PlatformProvider(buildPartition.Platform);

@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Validators
                     .Union(ValidateNamingConflicts(validationParameters.Benchmarks))
                     .Union(ValidateAccessModifiers(validationParameters.Benchmarks));
 
-        private IEnumerable<ValidationError> ValidateCSharpNaming(IEnumerable<Benchmark> benchmarks)
+        private IEnumerable<ValidationError> ValidateCSharpNaming(IEnumerable<BenchmarkCase> benchmarks)
             => benchmarks
                 .Where(benchmark => !IsValidCSharpIdentifier(benchmark.Target.Method.Name))
                 .Distinct(BenchmarkMethodEqualityComparer.Instance) // we might have multiple jobs targeting same method. Single error should be enough ;)
@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Validators
                         benchmark
                     ));
 
-        private IEnumerable<ValidationError> ValidateNamingConflicts(IEnumerable<Benchmark> benchmarks)
+        private IEnumerable<ValidationError> ValidateNamingConflicts(IEnumerable<BenchmarkCase> benchmarks)
             => benchmarks
                 .Select(benchmark => benchmark.Target.Type)
                 .Distinct()
@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Validators
                         true,
                         "Using \"__Idle\" for method name is prohibited. We are using it internally in our templates. Please rename your method"));
 
-        private IEnumerable<ValidationError> ValidateAccessModifiers(IEnumerable<Benchmark> benchmarks)
+        private IEnumerable<ValidationError> ValidateAccessModifiers(IEnumerable<BenchmarkCase> benchmarks)
             => benchmarks.Where(x => x.Target.Type.IsGenericType
                                      && HasPrivateGenericArguments(x.Target.Type))
                          .Select(benchmark => new ValidationError(true, $"Generic class {benchmark.Target.Type.GetDisplayName()} has non public generic argument(s)"));
@@ -60,14 +60,14 @@ namespace BenchmarkDotNet.Validators
         private bool HasPrivateGenericArguments(Type type) => type.GetGenericArguments().Any(a => !(a.IsPublic
                                                                                                  || a.IsNestedPublic));
         
-        private class BenchmarkMethodEqualityComparer : IEqualityComparer<Benchmark>
+        private class BenchmarkMethodEqualityComparer : IEqualityComparer<BenchmarkCase>
         {
-            internal static readonly IEqualityComparer<Benchmark> Instance = new BenchmarkMethodEqualityComparer();
+            internal static readonly IEqualityComparer<BenchmarkCase> Instance = new BenchmarkMethodEqualityComparer();
 
-            public bool Equals(Benchmark x, Benchmark y)
+            public bool Equals(BenchmarkCase x, BenchmarkCase y)
                 => x.Target.Method.Equals(y.Target.Method);
 
-            public int GetHashCode(Benchmark obj)
+            public int GetHashCode(BenchmarkCase obj)
                 => obj.Target.Method.GetHashCode();
         }
     }

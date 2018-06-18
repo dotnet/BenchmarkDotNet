@@ -13,10 +13,10 @@ namespace BenchmarkDotNet.Filters
 
         public MethodNamesFilter(string[] methodNames) => this.methodNames = methodNames;
 
-        public bool Predicate(Benchmark benchmark)
+        public bool Predicate(BenchmarkCase benchmarkCase)
             => methodNames.Any(methodName =>
             {
-                var method = benchmark.Target.Method;
+                var method = benchmarkCase.Target.Method;
                 var fullName = $"{method.DeclaringType.FullName}.{method.Name}";
 
                 return method.Name.ContainsWithIgnoreCase(methodName) || fullName.ContainsWithIgnoreCase(methodName);

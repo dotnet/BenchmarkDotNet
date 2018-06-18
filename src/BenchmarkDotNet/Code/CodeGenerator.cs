@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Code
 
             foreach (var buildInfo in buildPartition.Benchmarks)
             {
-                var benchmark = buildInfo.Benchmark;
+                var benchmark = buildInfo.BenchmarkCase;
 
                 var provider = GetDeclarationsProvider(benchmark.Target);
 
@@ -87,7 +87,7 @@ namespace BenchmarkDotNet.Code
                 .Replace("$TargetMethodReturnTypeNamespace$", string.Join(Environment.NewLine, targetMethodReturnTypeNamespace))
                 .Replace("$AdditionalLogic$", string.Join(Environment.NewLine, additionalLogic))
                 .Replace("$DerivedTypes$", string.Join(Environment.NewLine, benchmarksCode))
-                .Replace("$ExtraAttribute$", GetExtraAttributes(buildPartition.RepresentativeBenchmark.Target))
+                .Replace("$ExtraAttribute$", GetExtraAttributes(buildPartition.RepresentativeBenchmarkCase.Target))
                 .Replace("$CoreRtSwitch$", GetCoreRtSwitch(buildPartition))
                 .ToString();
 
@@ -145,10 +145,10 @@ namespace BenchmarkDotNet.Code
             return string.Join("\n", newLines);
         }
 
-        private static string GetJobsSetDefinition(Benchmark benchmark)
+        private static string GetJobsSetDefinition(BenchmarkCase benchmarkCase)
         {
             return CharacteristicSetPresenter.SourceCode.
-                ToPresentation(benchmark.Job).
+                ToPresentation(benchmarkCase.Job).
                 Replace("; ", ";\n                ");
         }
 
@@ -186,49 +186,49 @@ namespace BenchmarkDotNet.Code
             return new NonVoidDeclarationsProvider(target);
         }
 
-        private static string GetParamsContent(Benchmark benchmark)
+        private static string GetParamsContent(BenchmarkCase benchmarkCase)
             => string.Join(
                 string.Empty,
-                benchmark.Parameters.Items
+                benchmarkCase.Parameters.Items
                     .Where(parameter => !parameter.IsArgument)
                     .Select(parameter => $"{(parameter.IsStatic ? "" : "instance.")}{parameter.Name} = {parameter.ToSourceCode()};"));
 
-        private static string GetArgumentsDefinition(Benchmark benchmark)
+        private static string GetArgumentsDefinition(BenchmarkCase benchmarkCase)
             => string.Join(
                 ", ",
-                benchmark.Target.Method.GetParameters()
+                benchmarkCase.Target.Method.GetParameters()
                          .Select((parameter, index) => $"{GetParameterModifier(parameter)} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index}"));
 
-        private static string GetDeclareArgumentFields(Benchmark benchmark)
+        private static string GetDeclareArgumentFields(BenchmarkCase benchmarkCase)
             => string.Join(
                 Environment.NewLine,
-                benchmark.Target.Method.GetParameters()
-                         .Select((parameter, index) => $"private {GetFieldType(parameter.ParameterType, benchmark.Parameters.GetArgument(parameter.Name)).GetCorrectCSharpTypeName()} __argField{index};"));
+                benchmarkCase.Target.Method.GetParameters()
+                         .Select((parameter, index) => $"private {GetFieldType(parameter.ParameterType, benchmarkCase.Parameters.GetArgument(parameter.Name)).GetCorrectCSharpTypeName()} __argField{index};"));
 
-        private static string GetInitializeArgumentFields(Benchmark benchmark)
+        private static string GetInitializeArgumentFields(BenchmarkCase benchmarkCase)
             => string.Join(
                 Environment.NewLine,
-                benchmark.Target.Method.GetParameters()
-                         .Select((parameter, index) => $"__argField{index} = {benchmark.Parameters.GetArgument(parameter.Name).ToSourceCode()};")); // we init the fields in ctor to provoke all possible allocations and overhead of other type
+                benchmarkCase.Target.Method.GetParameters()
+                         .Select((parameter, index) => $"__argField{index} = {benchmarkCase.Parameters.GetArgument(parameter.Name).ToSourceCode()};")); // we init the fields in ctor to provoke all possible allocations and overhead of other type
 
-        private static string GetLoadArguments(Benchmark benchmark)
+        private static string GetLoadArguments(BenchmarkCase benchmarkCase)
             => string.Join(
                 Environment.NewLine,
-                benchmark.Target.Method.GetParameters()
+                benchmarkCase.Target.Method.GetParameters()
                          .Select((parameter, index) => $"{(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index} = {(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} __argField{index};"));
 
-        private static string GetPassArguments(Benchmark benchmark)
+        private static string GetPassArguments(BenchmarkCase benchmarkCase)
             => string.Join(
                 ", ",
-                benchmark.Target.Method.GetParameters()
+                benchmarkCase.Target.Method.GetParameters()
                     .Select((parameter, index) => $"{GetParameterModifier(parameter)} arg{index}"));
 
         private static string GetExtraAttributes(Target target) 
             => target.Method.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any() ? "[System.STAThreadAttribute]" : string.Empty;
 
-        private static string GetEngineFactoryTypeName(Benchmark benchmark)
+        private static string GetEngineFactoryTypeName(BenchmarkCase benchmarkCase)
         {
-            var factory = benchmark.Job.ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance);
+            var factory = benchmarkCase.Job.ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance);
             var factoryType = factory.GetType();
 
             if (!factoryType.GetTypeInfo().DeclaredConstructors.Any(ctor => ctor.IsPublic && !ctor.GetParameters().Any()))

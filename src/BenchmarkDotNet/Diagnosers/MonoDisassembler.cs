@@ -26,11 +26,11 @@ namespace BenchmarkDotNet.Diagnosers
             recursiveDepth = config.RecursiveDepth;
         }
 
-        internal DisassemblyResult Disassemble(Benchmark benchmark, MonoRuntime mono)
+        internal DisassemblyResult Disassemble(BenchmarkCase benchmarkCase, MonoRuntime mono)
         {
             Debug.Assert(mono == null || !RuntimeInformation.IsMono, "Must never be called for Non-Mono benchmarks");
 
-            var benchmarkTarget = benchmark.Target;
+            var benchmarkTarget = benchmarkCase.Target;
             string fqnMethod = GetMethodName(benchmarkTarget);
             string exePath = benchmarkTarget.Type.GetTypeInfo().Assembly.Location;
             

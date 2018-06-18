@@ -4,14 +4,14 @@ namespace BenchmarkDotNet.Running
 {
     public class BenchmarkBuildInfo
     {
-        public BenchmarkBuildInfo(Benchmark benchmark, ReadOnlyConfig config, int id)
+        public BenchmarkBuildInfo(BenchmarkCase benchmarkCase, ReadOnlyConfig config, int id)
         {
-            Benchmark = benchmark;
+            BenchmarkCase = benchmarkCase;
             Config = config;
             Id = new BenchmarkId(id);
         }
 
-        public Benchmark Benchmark { get; }
+        public BenchmarkCase BenchmarkCase { get; }
 
         public ReadOnlyConfig Config { get; }
 

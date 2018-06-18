@@ -44,12 +44,12 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.True(summary.Reports.All(report => report.AllMeasurements.Any()));
 
             Assert.True(summary.Reports
-                .Single(report => report.Benchmark.Job.Env.Runtime is ClrRuntime)
+                .Single(report => report.BenchmarkCase.Job.Env.Runtime is ClrRuntime)
                 .ExecuteResults
                 .Any());
 
             Assert.True(summary.Reports
-                .Single(report => report.Benchmark.Job.Env.Runtime is CoreRuntime)
+                .Single(report => report.BenchmarkCase.Job.Env.Runtime is CoreRuntime)
                 .ExecuteResults
                 .Any());
 

@@ -13,18 +13,18 @@ namespace BenchmarkDotNet.Running
     {
         public static BuildPartition[] CreateForBuild(BenchmarkRunInfo[] supportedBenchmarks, IResolver resolver)
             => supportedBenchmarks
-                .SelectMany(info => info.Benchmarks.Select(benchmark => (benchmark, info.Config)))
+                .SelectMany(info => info.BenchmarksCases.Select(benchmark => (benchmark, info.Config)))
                 .GroupBy(tuple => tuple.benchmark, BenchmarkRuntimePropertiesComparer.Instance)
                 .Select(group => new BuildPartition(group.Select((item, index) => new BenchmarkBuildInfo(item.benchmark, item.Config, index)).ToArray(), resolver))
                 .ToArray();
 
-        internal class BenchmarkRuntimePropertiesComparer : IEqualityComparer<Benchmark>
+        internal class BenchmarkRuntimePropertiesComparer : IEqualityComparer<BenchmarkCase>
         {
-            internal static readonly IEqualityComparer<Benchmark> Instance = new BenchmarkRuntimePropertiesComparer();
+            internal static readonly IEqualityComparer<BenchmarkCase> Instance = new BenchmarkRuntimePropertiesComparer();
 
             private static readonly Runtime Current = RuntimeInformation.GetCurrentRuntime();
 
-            public bool Equals(Benchmark x, Benchmark y)
+            public bool Equals(BenchmarkCase x, BenchmarkCase y)
             {
                 Job jobX = x.Job;
                 Job jobY = y.Job;
@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Running
                 return true;
             }
 
-            public int GetHashCode(Benchmark obj)
+            public int GetHashCode(BenchmarkCase obj)
             {
                 var job = obj.Job;
 

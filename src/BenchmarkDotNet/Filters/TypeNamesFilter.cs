@@ -14,11 +14,11 @@ namespace BenchmarkDotNet.Filters
 
         public TypeNamesFilter(string[] typeNames) => this.typeNames = typeNames;
 
-        public bool Predicate(Benchmark benchmark)
+        public bool Predicate(BenchmarkCase benchmarkCase)
             => typeNames.Any(methodName =>
             {
-                var displayName = benchmark.Target.Type.GetDisplayName();
-                var fullName = benchmark.Target.Type.FullName;
+                var displayName = benchmarkCase.Target.Type.GetDisplayName();
+                var fullName = benchmarkCase.Target.Type.FullName;
 
                 return displayName.ContainsWithIgnoreCase(methodName) || fullName.ContainsWithIgnoreCase(methodName);
             });

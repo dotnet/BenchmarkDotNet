@@ -32,13 +32,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public override IEnumerable<string> Ids => new[] { nameof(TailCallDiagnoser) };
 
-        protected override void AttachToEvents(TraceEventSession traceEventSession, Benchmark benchmark)
+        protected override void AttachToEvents(TraceEventSession traceEventSession, BenchmarkCase benchmarkCase)
         {
-            expectedNamespace = benchmark.Target.Method.DeclaringType.Namespace ?? benchmark.Target.Method.DeclaringType.FullName;
+            expectedNamespace = benchmarkCase.Target.Method.DeclaringType.Namespace ?? benchmarkCase.Target.Method.DeclaringType.FullName;
 
             Logger.WriteLine();
             Logger.WriteLineHeader(LogSeparator);
-            Logger.WriteLineInfo($"{benchmark.DisplayInfo}");
+            Logger.WriteLineInfo($"{benchmarkCase.DisplayInfo}");
             Logger.WriteLineHeader(LogSeparator);
 
             traceEventSession.Source.Clr.MethodTailCallSucceeded += jitData =>

@@ -83,7 +83,7 @@ namespace BenchmarkDotNet.Running
                 var validationErrors = Validate(supportedBenchmarks, logger);
                 if (validationErrors.Any(validationError => validationError.IsCritical))
                     return  new [] { Summary.CreateFailed(
-                        supportedBenchmarks.SelectMany(b => b.Benchmarks).ToArray(), 
+                        supportedBenchmarks.SelectMany(b => b.BenchmarksCases).ToArray(), 
                         title, HostEnvironmentInfo.GetCurrent(), commonSettingsConfig, GetResultsFolderPath(rootArtifactsFolderPath), validationErrors) };
 
                 var buildPartitions = BenchmarkPartitioner.CreateForBuild(supportedBenchmarks, resolver);
@@ -98,8 +98,8 @@ namespace BenchmarkDotNet.Running
                     var results = new List<Summary>();
 
                     var benchmarkToBuildResult = buildResults
-                        .SelectMany(buildResult => buildResult.Key.Benchmarks.Select(buildInfo => (buildInfo.Benchmark, buildInfo.Id, buildResult.Value)))
-                        .ToDictionary(info => info.Benchmark, info => (info.Id, info.Value));
+                        .SelectMany(buildResult => buildResult.Key.Benchmarks.Select(buildInfo => (buildInfo.BenchmarkCase, buildInfo.Id, buildResult.Value)))
+                        .ToDictionary(info => info.BenchmarkCase, info => (info.Id, info.Value));
 
                     foreach (var benchmarkRunInfo in supportedBenchmarks) // we run them in the old order now using the new build artifacts
                     {
@@ -140,7 +140,7 @@ namespace BenchmarkDotNet.Running
         {
             // few types might have the same name: A.Name and B.Name will both report "Name"
             // in that case, we can not use the type name as file name because they would be getting overwritten #529
-            var uniqueTargetTypes = benchmarkRunInfos.SelectMany(info => info.Benchmarks.Select(benchmark => benchmark.Target.Type)).Distinct().ToArray();
+            var uniqueTargetTypes = benchmarkRunInfos.SelectMany(info => info.BenchmarksCases.Select(benchmark => benchmark.Target.Type)).Distinct().ToArray();
 
             if (uniqueTargetTypes.Length == 1)
                 return FolderNameHelper.ToFolderName(uniqueTargetTypes[0]);
@@ -151,14 +151,14 @@ namespace BenchmarkDotNet.Running
         }
 
         private static Summary Run(BenchmarkRunInfo benchmarkRunInfo, 
-                                   Dictionary<Benchmark, (BenchmarkId benchmarkId, BuildResult buildResult)> buildResults, 
+                                   Dictionary<BenchmarkCase, (BenchmarkId benchmarkId, BuildResult buildResult)> buildResults, 
                                    IResolver resolver,
                                    ILogger logger, 
                                    List<string> artifactsToCleanup, 
                                    string rootArtifactsFolderPath,
                                    ref StartedClock runChronometer)
         {
-            var benchmarks = benchmarkRunInfo.Benchmarks;
+            var benchmarks = benchmarkRunInfo.BenchmarksCases;
             var config = benchmarkRunInfo.Config;
             var reports = new List<BenchmarkReport>();
             var title = GetTitle(new[] { benchmarkRunInfo });
@@ -271,7 +271,7 @@ namespace BenchmarkDotNet.Running
             var validationErrors = new List<ValidationError>();
 
             foreach (var benchmarkRunInfo in benchmarks)
-                validationErrors.AddRange(benchmarkRunInfo.Config.GetCompositeValidator().Validate(new ValidationParameters(benchmarkRunInfo.Benchmarks, benchmarkRunInfo.Config)));
+                validationErrors.AddRange(benchmarkRunInfo.Config.GetCompositeValidator().Validate(new ValidationParameters(benchmarkRunInfo.BenchmarksCases, benchmarkRunInfo.Config)));
 
             foreach (var validationError in validationErrors)
                 logger.WriteLineError(validationError.Message);
@@ -281,7 +281,7 @@ namespace BenchmarkDotNet.Running
 
         private static Dictionary<BuildPartition, BuildResult> BuildInParallel(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, ref StartedClock globalChronometer)
         {
-            using (buildPartitions.Select(partition=> GetAssemblyResolveHelper(partition.RepresentativeBenchmark.Job.GetToolchain(), logger))
+            using (buildPartitions.Select(partition=> GetAssemblyResolveHelper(partition.RepresentativeBenchmarkCase.Job.GetToolchain(), logger))
                                   .FirstOrDefault(helper => helper != null))
             {
                 logger.WriteLineHeader($"// ***** Building {buildPartitions.Length} exe(s) in Parallel: Start   *****");
@@ -312,7 +312,7 @@ namespace BenchmarkDotNet.Running
 
         private static BuildResult Build(BuildPartition buildPartition, string rootArtifactsFolderPath, ILogger buildLogger)
         {
-            var toolchain = buildPartition.RepresentativeBenchmark.Job.GetToolchain(); // it's guaranteed that all the benchmarks in single partition have same toolchain
+            var toolchain = buildPartition.RepresentativeBenchmarkCase.Job.GetToolchain(); // it's guaranteed that all the benchmarks in single partition have same toolchain
 
             var generateResult = toolchain.Generator.GenerateProject(buildPartition, buildLogger, rootArtifactsFolderPath);
 
@@ -329,14 +329,14 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        private static BenchmarkReport RunCore(Benchmark benchmark, BenchmarkId benchmarkId, ILogger logger, ReadOnlyConfig config, IResolver resolver, BuildResult buildResult)
+        private static BenchmarkReport RunCore(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ReadOnlyConfig config, IResolver resolver, BuildResult buildResult)
         {
-            var toolchain = benchmark.Job.GetToolchain();
+            var toolchain = benchmarkCase.Job.GetToolchain();
 
             logger.WriteLineHeader("// **************************");
-            logger.WriteLineHeader("// Benchmark: " + benchmark.DisplayInfo);
+            logger.WriteLineHeader("// Benchmark: " + benchmarkCase.DisplayInfo);
 
-            var (executeResults, gcStats) = Execute(logger, benchmark, benchmarkId, toolchain, buildResult, config, resolver);
+            var (executeResults, gcStats) = Execute(logger, benchmarkCase, benchmarkId, toolchain, buildResult, config, resolver);
 
             var runs = new List<Measurement>();
 
@@ -346,24 +346,24 @@ namespace BenchmarkDotNet.Running
                 runs.AddRange(executeResult.Data.Select(line => Measurement.Parse(logger, line, index + 1)).Where(r => r.IterationMode != IterationMode.Unknown));
             }
 
-            return new BenchmarkReport(benchmark, buildResult, buildResult, executeResults, runs, gcStats);
+            return new BenchmarkReport(benchmarkCase, buildResult, buildResult, executeResults, runs, gcStats);
         }
 
-        private static (List<ExecuteResult> executeResults, GcStats gcStats) Execute(ILogger logger, Benchmark benchmark, BenchmarkId benchmarkId, IToolchain toolchain,
+        private static (List<ExecuteResult> executeResults, GcStats gcStats) Execute(ILogger logger, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, IToolchain toolchain,
             BuildResult buildResult, IConfig config, IResolver resolver)
         {
             var executeResults = new List<ExecuteResult>();
             var gcStats = default(GcStats);
 
             logger.WriteLineInfo("// *** Execute ***");
-            bool analyzeRunToRunVariance = benchmark.Job.ResolveValue(AccuracyMode.AnalyzeLaunchVarianceCharacteristic, resolver);
-            bool autoLaunchCount = !benchmark.Job.HasValue(RunMode.LaunchCountCharacteristic);
+            bool analyzeRunToRunVariance = benchmarkCase.Job.ResolveValue(AccuracyMode.AnalyzeLaunchVarianceCharacteristic, resolver);
+            bool autoLaunchCount = !benchmarkCase.Job.HasValue(RunMode.LaunchCountCharacteristic);
             int defaultValue = analyzeRunToRunVariance ? 2 : 1;
             int launchCount = Math.Max(
                 1,
-                autoLaunchCount ? defaultValue : benchmark.Job.Run.LaunchCount);
+                autoLaunchCount ? defaultValue : benchmarkCase.Job.Run.LaunchCount);
 
-            var noOverheadCompositeDiagnoser = config.GetCompositeDiagnoser(benchmark, Diagnosers.RunMode.NoOverhead);
+            var noOverheadCompositeDiagnoser = config.GetCompositeDiagnoser(benchmarkCase, Diagnosers.RunMode.NoOverhead);
 
             for (int launchIndex = 1; launchIndex <= launchCount; launchIndex++)
             {
@@ -378,7 +378,7 @@ namespace BenchmarkDotNet.Running
                 var executeResult = toolchain.Executor.Execute(
                     new ExecuteParameters(
                         buildResult,
-                        benchmark,
+                        benchmarkCase,
                         benchmarkId,
                         logger,
                         resolver,
@@ -424,7 +424,7 @@ namespace BenchmarkDotNet.Running
                         gcStats = GcStats.Parse(executeResult.Data.Last());
 
                     noOverheadCompositeDiagnoser.ProcessResults(
-                        new DiagnoserResults(benchmark, measurements.Where(measurement => !measurement.IterationMode.IsIdle()).Sum(m => m.Operations), gcStats));
+                        new DiagnoserResults(benchmarkCase, measurements.Where(measurement => !measurement.IterationMode.IsIdle()).Sum(m => m.Operations), gcStats));
                 }
 
                 if (autoLaunchCount && launchIndex == 2 && analyzeRunToRunVariance)
@@ -439,30 +439,30 @@ namespace BenchmarkDotNet.Running
             logger.WriteLine();
 
             // Do a "Diagnostic" run, but DISCARD the results, so that the overhead of Diagnostics doesn't skew the overall results
-            var extraRunCompositeDiagnoser = config.GetCompositeDiagnoser(benchmark, Diagnosers.RunMode.ExtraRun);
+            var extraRunCompositeDiagnoser = config.GetCompositeDiagnoser(benchmarkCase, Diagnosers.RunMode.ExtraRun);
             if (extraRunCompositeDiagnoser != null)
             {
                 logger.WriteLineInfo("// Run, Diagnostic");
 
                 var executeResult = toolchain.Executor.Execute(
-                    new ExecuteParameters(buildResult, benchmark, benchmarkId, logger, resolver, config, extraRunCompositeDiagnoser));
+                    new ExecuteParameters(buildResult, benchmarkCase, benchmarkId, logger, resolver, config, extraRunCompositeDiagnoser));
 
                 var allRuns = executeResult.Data.Select(line => Measurement.Parse(logger, line, 0)).Where(r => r.IterationMode != IterationMode.Unknown).ToList();
 
                 extraRunCompositeDiagnoser.ProcessResults(
-                    new DiagnoserResults(benchmark, allRuns.Where(measurement => !measurement.IterationMode.IsIdle()).Sum(m => m.Operations), gcStats));
+                    new DiagnoserResults(benchmarkCase, allRuns.Where(measurement => !measurement.IterationMode.IsIdle()).Sum(m => m.Operations), gcStats));
 
                 if (!executeResult.FoundExecutable)
                     logger.WriteLineError("Executable not found");
                 logger.WriteLine();
             }
 
-            var separateLogicCompositeDiagnoser = config.GetCompositeDiagnoser(benchmark, Diagnosers.RunMode.SeparateLogic);
+            var separateLogicCompositeDiagnoser = config.GetCompositeDiagnoser(benchmarkCase, Diagnosers.RunMode.SeparateLogic);
             if (separateLogicCompositeDiagnoser != null)
             {
                 logger.WriteLineInfo("// Run, Diagnostic [SeparateLogic]");
 
-                separateLogicCompositeDiagnoser.Handle(HostSignal.SeparateLogic, new DiagnoserActionParameters(null, benchmark, benchmarkId, config));
+                separateLogicCompositeDiagnoser.Handle(HostSignal.SeparateLogic, new DiagnoserActionParameters(null, benchmarkCase, benchmarkId, config));
             }
 
             return (executeResults, gcStats);
@@ -473,10 +473,10 @@ namespace BenchmarkDotNet.Running
 
         private static BenchmarkRunInfo[] GetSupportedBenchmarks(BenchmarkRunInfo[] benchmarkRunInfos, CompositeLogger logger, IResolver resolver)
             => benchmarkRunInfos.Select(info => new BenchmarkRunInfo(
-                    info.Benchmarks.Where(benchmark => benchmark.Job.GetToolchain().IsSupported(benchmark, logger, resolver)).ToArray(),
+                    info.BenchmarksCases.Where(benchmark => benchmark.Job.GetToolchain().IsSupported(benchmark, logger, resolver)).ToArray(),
                     info.Type,
                     info.Config))
-                .Where(infos => infos.Benchmarks.Any())
+                .Where(infos => infos.BenchmarksCases.Any())
                 .ToArray();
 
         private static string GetResultsFolderPath(string rootArtifactsFolderPath) => Path.Combine(rootArtifactsFolderPath, "results").CreateIfNotExists();

@@ -23,23 +23,23 @@ namespace BenchmarkDotNet.Samples
 
             private class FastestToSlowestOrderer : IOrderer
             {
-                public IEnumerable<Benchmark> GetExecutionOrder(Benchmark[] benchmarks) =>
-                    from benchmark in benchmarks
+                public IEnumerable<BenchmarkCase> GetExecutionOrder(BenchmarkCase[] benchmarksCase) =>
+                    from benchmark in benchmarksCase
                     orderby benchmark.Parameters["X"] descending,
                         benchmark.Target.MethodDisplayInfo
                     select benchmark;
 
-                public IEnumerable<Benchmark> GetSummaryOrder(Benchmark[] benchmarks, Summary summary) =>
-                    from benchmark in benchmarks
+                public IEnumerable<BenchmarkCase> GetSummaryOrder(BenchmarkCase[] benchmarksCase, Summary summary) =>
+                    from benchmark in benchmarksCase
                     orderby summary[benchmark].ResultStatistics.Mean
                     select benchmark;
 
-                public string GetHighlightGroupKey(Benchmark benchmark) => null;
+                public string GetHighlightGroupKey(BenchmarkCase benchmarkCase) => null;
 
-                public string GetLogicalGroupKey(IConfig config, Benchmark[] allBenchmarks, Benchmark benchmark) =>
-                    benchmark.Job.DisplayInfo + "_" + benchmark.Parameters.DisplayInfo;
+                public string GetLogicalGroupKey(IConfig config, BenchmarkCase[] allBenchmarksCases, BenchmarkCase benchmarkCase) =>
+                    benchmarkCase.Job.DisplayInfo + "_" + benchmarkCase.Parameters.DisplayInfo;
 
-                public IEnumerable<IGrouping<string, Benchmark>> GetLogicalGroupOrder(IEnumerable<IGrouping<string, Benchmark>> logicalGroups) => 
+                public IEnumerable<IGrouping<string, BenchmarkCase>> GetLogicalGroupOrder(IEnumerable<IGrouping<string, BenchmarkCase>> logicalGroups) => 
                     logicalGroups.OrderBy(it => it.Key);
 
                 public bool SeparateLogicalGroups => true;

@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Reports
     public class Summary
     {
         public string Title { get; }
-        public Benchmark[] Benchmarks { get; }
+        public BenchmarkCase[] BenchmarksCases { get; }
         public BenchmarkReport[] Reports { get; }
         public ISummaryStyle Style { get; }
         public HostEnvironmentInfo HostEnvironmentInfo { get; }
@@ -27,20 +27,20 @@ namespace BenchmarkDotNet.Reports
         public ValidationError[] ValidationErrors { get; }
         public string AllRuntimes { get; }
 
-        private readonly Dictionary<Benchmark, BenchmarkReport> reportMap = new Dictionary<Benchmark, BenchmarkReport>();
+        private readonly Dictionary<BenchmarkCase, BenchmarkReport> reportMap = new Dictionary<BenchmarkCase, BenchmarkReport>();
         private readonly IOrderer orderer;
 
-        public bool HasReport(Benchmark benchmark) => reportMap.ContainsKey(benchmark);
+        public bool HasReport(BenchmarkCase benchmarkCase) => reportMap.ContainsKey(benchmarkCase);
 
         /// <summary>
         /// Returns a report for the given benchmark or null if there is no a corresponded report.
         /// </summary>        
-        public BenchmarkReport this[Benchmark benchmark] => reportMap.GetValueOrDefault(benchmark);
+        public BenchmarkReport this[BenchmarkCase benchmarkCase] => reportMap.GetValueOrDefault(benchmarkCase);
 
         public bool HasCriticalValidationErrors => ValidationErrors.Any(validationError => validationError.IsCritical);
 
         [CanBeNull]
-        public string GetLogicalGroupKey(Benchmark benchmark) => orderer.GetLogicalGroupKey(Config, Benchmarks, benchmark);
+        public string GetLogicalGroupKey(BenchmarkCase benchmarkCase) => orderer.GetLogicalGroupKey(Config, BenchmarksCases, benchmarkCase);
 
         public int GetNumberOfExecutedBenchmarks() => Reports.Count(report => report.ExecuteResults.Any(result => result.FoundExecutable));
 
@@ -52,14 +52,14 @@ namespace BenchmarkDotNet.Reports
                        ValidationError[] validationErrors)
             : this(title, hostEnvironmentInfo, config, resultsDirectoryPath, totalTime, validationErrors)
         {
-            Benchmarks = reports.Select(r => r.Benchmark).ToArray();
+            BenchmarksCases = reports.Select(r => r.BenchmarkCase).ToArray();
             foreach (var report in reports)
-                reportMap[report.Benchmark] = report;
-            Reports = Benchmarks.Select(b => reportMap[b]).ToArray();
+                reportMap[report.BenchmarkCase] = report;
+            Reports = BenchmarksCases.Select(b => reportMap[b]).ToArray();
 
             orderer = config.GetOrderer() ?? DefaultOrderer.Instance;
-            Benchmarks = orderer.GetSummaryOrder(Benchmarks, this).ToArray();
-            Reports = Benchmarks.Select(b => reportMap[b]).ToArray();
+            BenchmarksCases = orderer.GetSummaryOrder(BenchmarksCases, this).ToArray();
+            Reports = BenchmarksCases.Select(b => reportMap[b]).ToArray();
 
             Style = config.GetSummaryStyle();
             Table = GetTable(Style);
@@ -72,11 +72,11 @@ namespace BenchmarkDotNet.Reports
                         string resultsDirectoryPath,
                         TimeSpan totalTime,
                         ValidationError[] validationErrors,
-                        Benchmark[] benchmarks,
+                        BenchmarkCase[] benchmarksCase,
                         BenchmarkReport[] reports)
             : this(title, hostEnvironmentInfo, config, resultsDirectoryPath, totalTime, validationErrors)
         {
-            Benchmarks = benchmarks;
+            BenchmarksCases = benchmarksCase;
             Table = GetTable(config.GetSummaryStyle());
             Reports = reports ?? Array.Empty<BenchmarkReport>();
         }
@@ -99,13 +99,13 @@ namespace BenchmarkDotNet.Reports
 
         internal SummaryTable GetTable(ISummaryStyle style) => new SummaryTable(this, style);
 
-        internal static Summary CreateFailed(Benchmark[] benchmarks,
+        internal static Summary CreateFailed(BenchmarkCase[] benchmarksCase,
                                              string title,
                                              HostEnvironmentInfo hostEnvironmentInfo,
                                              IConfig config,
                                              string resultsDirectoryPath,
                                              ValidationError[] validationErrors) 
-            => new Summary(title, hostEnvironmentInfo, config, resultsDirectoryPath, TimeSpan.Zero, validationErrors, benchmarks, Array.Empty<BenchmarkReport>());
+            => new Summary(title, hostEnvironmentInfo, config, resultsDirectoryPath, TimeSpan.Zero, validationErrors, benchmarksCase, Array.Empty<BenchmarkReport>());
 
         internal static Summary Join(List<Summary> summaries, IConfig commonSettingsConfig, ClockSpan clockSpan) 
             => new Summary(
@@ -130,7 +130,7 @@ namespace BenchmarkDotNet.Reports
                 string runtime = benchmarkReport.GetRuntimeInfo();
                 if (runtime != null)
                 {
-                    string jobId = benchmarkReport.Benchmark.Job.ResolvedId;
+                    string jobId = benchmarkReport.BenchmarkCase.Job.ResolvedId;
 
                     if (!jobRuntimes.ContainsKey(jobId))
                     {

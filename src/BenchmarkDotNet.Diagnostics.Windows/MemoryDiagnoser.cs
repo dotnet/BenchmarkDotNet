@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
     [Obsolete("Please use our new BenchmarkDotNet.Diagnosers.MemoryDiagnoser", true)]
     public class MemoryDiagnoser : EtwDiagnoser<MemoryDiagnoser.Stats>, IDiagnoser
     {
-        private readonly Dictionary<Benchmark, Stats> results = new Dictionary<Benchmark, Stats>();
+        private readonly Dictionary<BenchmarkCase, Stats> results = new Dictionary<BenchmarkCase, Stats>();
 
         public const string DiagnoserId = nameof(MemoryDiagnoser) + "Obsolete";
         public IEnumerable<string> Ids => new[] { DiagnoserId };
@@ -44,19 +44,19 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public void ProcessResults(DiagnoserResults results)
         {
-            var stats = ProcessEtwEvents(results.Benchmark, results.TotalOperations);
-            this.results.Add(results.Benchmark, stats);
+            var stats = ProcessEtwEvents(results.BenchmarkCase, results.TotalOperations);
+            this.results.Add(results.BenchmarkCase, stats);
         }
 
         public void DisplayResults(ILogger logger) { }
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Enumerable.Empty<ValidationError>();
 
-        private Stats ProcessEtwEvents(Benchmark benchmark, long totalOperations)
+        private Stats ProcessEtwEvents(BenchmarkCase benchmarkCase, long totalOperations)
         {
             if (BenchmarkToProcess.Count > 0)
             {
-                var processToReport = BenchmarkToProcess[benchmark];
+                var processToReport = BenchmarkToProcess[benchmarkCase];
                 if (StatsPerProcess.TryGetValue(processToReport, out Stats stats))
                 {
                     stats.TotalOperations = totalOperations;
@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             return null;
         }
 
-        protected override void AttachToEvents(TraceEventSession session, Benchmark benchmark)
+        protected override void AttachToEvents(TraceEventSession session, BenchmarkCase benchmarkCase)
         {
             session.Source.Clr.GCAllocationTick += gcData =>
             {
@@ -96,16 +96,16 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public class AllocationColumn : IColumn
         {
-            private Dictionary<Benchmark, Stats> results;
+            private Dictionary<BenchmarkCase, Stats> results;
 
-            public AllocationColumn(Dictionary<Benchmark, Stats> results)
+            public AllocationColumn(Dictionary<BenchmarkCase, Stats> results)
             {
                 this.results = results;
             }
 
             public string Id => nameof(AllocationColumn);
             public string ColumnName => "Bytes Allocated/Op";
-            public bool IsDefault(Summary summary, Benchmark benchmark) => false;
+            public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
 
             public bool IsAvailable(Summary summary) => true;
             public bool AlwaysShow => true;
@@ -114,26 +114,26 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public bool IsNumeric => true;
             public UnitType UnitType => UnitType.Size;
             public string Legend => "";
-            public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
+            public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => GetValue(summary, benchmarkCase, SummaryStyle.Default);
 
-            public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style)
+            public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style)
             {
-                if (!results.ContainsKey(benchmark) || results[benchmark] == null)
+                if (!results.ContainsKey(benchmarkCase) || results[benchmarkCase] == null)
                     return "N/A";
 
-                var value = results[benchmark].AllocatedBytes / (double)results[benchmark].TotalOperations;
+                var value = results[benchmarkCase].AllocatedBytes / (double)results[benchmarkCase].TotalOperations;
                 return UnitType == UnitType.Size ? ((long)value).ToSizeStr(style.SizeUnit, 1, style.PrintUnitsInContent) : value.ToStr();
             }
         }
 
         public class GCCollectionColumn : IColumn
         {
-            private Dictionary<Benchmark, Stats> results;
+            private Dictionary<BenchmarkCase, Stats> results;
             private int generation;
             // TODO also need to find a sensible way of including this in the column name?
             private long opsPerGCCount;
 
-            public GCCollectionColumn(Dictionary<Benchmark, Stats> results, int generation)
+            public GCCollectionColumn(Dictionary<BenchmarkCase, Stats> results, int generation)
             {
                 ColumnName = $"Gen {generation}";
                 this.results = results;
@@ -141,7 +141,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 opsPerGCCount = results.Min(r => r.Value?.TotalOperations ?? 0);
             }
 
-            public bool IsDefault(Summary summary, Benchmark benchmark) => false;
+            public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
             public string Id => nameof(GCCollectionColumn);
             public string ColumnName { get; private set; }
             public bool IsAvailable(Summary summary) => true;
@@ -151,13 +151,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public bool IsNumeric => true;
             public UnitType UnitType => UnitType.Dimensionless;
             public string Legend => "";
-            public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
+            public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style) => GetValue(summary, benchmarkCase);
 
-            public string GetValue(Summary summary, Benchmark benchmark)
+            public string GetValue(Summary summary, BenchmarkCase benchmarkCase)
             {
-                if (results.ContainsKey(benchmark) && results[benchmark] != null)
+                if (results.ContainsKey(benchmarkCase) && results[benchmarkCase] != null)
                 {
-                    var result = results[benchmark];
+                    var result = results[benchmarkCase];
                     if (result.GenCounts[generation] == 0)
                         return "-"; // make zero more obvious
                     return (result.GenCounts[generation] / (double) result.TotalOperations * opsPerGCCount).ToString("N2", HostEnvironmentInfo.MainCultureInfo);

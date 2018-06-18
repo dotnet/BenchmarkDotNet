@@ -31,20 +31,20 @@ namespace BenchmarkDotNet.Toolchains
                 return new ExecuteResult(false, -1, Array.Empty<string>(), Array.Empty<string>());
             }
 
-            return Execute(executeParameters.Benchmark, executeParameters.BenchmarkId, executeParameters.Logger, exePath, null, args, executeParameters.Diagnoser, executeParameters.Resolver, executeParameters.Config);
+            return Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, exePath, null, args, executeParameters.Diagnoser, executeParameters.Resolver, executeParameters.Config);
         }
 
-        private ExecuteResult Execute(Benchmark benchmark, BenchmarkId benchmarkId, ILogger logger, string exePath, string workingDirectory, string args, IDiagnoser diagnoser, IResolver resolver, IConfig config)
+        private ExecuteResult Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, string exePath, string workingDirectory, string args, IDiagnoser diagnoser, IResolver resolver, IConfig config)
         {
             ConsoleHandler.EnsureInitialized(logger);
 
             try
             {
-                using (var process = new Process { StartInfo = CreateStartInfo(benchmark, exePath, args, workingDirectory, resolver) })
+                using (var process = new Process { StartInfo = CreateStartInfo(benchmarkCase, exePath, args, workingDirectory, resolver) })
                 {
-                    var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmark, benchmarkId, config);
+                    var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId, config);
 
-                    return Execute(process, benchmark, loggerWithDiagnoser, logger);
+                    return Execute(process, benchmarkCase, loggerWithDiagnoser, logger);
                 }
             }
             finally
@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Toolchains
             }
         }
 
-        private ExecuteResult Execute(Process process, Benchmark benchmark, SynchronousProcessOutputLoggerWithDiagnoser loggerWithDiagnoser, ILogger logger)
+        private ExecuteResult Execute(Process process, BenchmarkCase benchmarkCase, SynchronousProcessOutputLoggerWithDiagnoser loggerWithDiagnoser, ILogger logger)
         {
             logger.WriteLineInfo("// Execute: " + process.StartInfo.FileName + " " + process.StartInfo.Arguments);
 
@@ -62,9 +62,9 @@ namespace BenchmarkDotNet.Toolchains
             process.Start();
 
             process.EnsureHighPriority(logger);
-            if (benchmark.Job.Env.HasValue(EnvMode.AffinityCharacteristic))
+            if (benchmarkCase.Job.Env.HasValue(EnvMode.AffinityCharacteristic))
             {
-                process.TrySetAffinity(benchmark.Job.Env.Affinity, logger);
+                process.TrySetAffinity(benchmarkCase.Job.Env.Affinity, logger);
             }
 
             loggerWithDiagnoser.ProcessInput();
@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.Toolchains
             return new ExecuteResult(true, process.ExitCode, Array.Empty<string>(), Array.Empty<string>());
         }
 
-        private ProcessStartInfo CreateStartInfo(Benchmark benchmark, string exePath, string args, string workingDirectory, IResolver resolver)
+        private ProcessStartInfo CreateStartInfo(BenchmarkCase benchmarkCase, string exePath, string args, string workingDirectory, IResolver resolver)
         {
             var start = new ProcessStartInfo
             {
@@ -94,10 +94,10 @@ namespace BenchmarkDotNet.Toolchains
                 WorkingDirectory = workingDirectory
             };
 
-            start.SetEnvironmentVariables(benchmark, resolver);
+            start.SetEnvironmentVariables(benchmarkCase, resolver);
 
-            var runtime = benchmark.Job.Env.HasValue(EnvMode.RuntimeCharacteristic)
-                ? benchmark.Job.Env.Runtime
+            var runtime = benchmarkCase.Job.Env.HasValue(EnvMode.RuntimeCharacteristic)
+                ? benchmarkCase.Job.Env.Runtime
                 : RuntimeInformation.GetCurrentRuntime();
             // TODO: use resolver
 
@@ -111,7 +111,7 @@ namespace BenchmarkDotNet.Toolchains
                     break;
                 case MonoRuntime mono:
                     start.FileName = mono.CustomPath ?? "mono";
-                    start.Arguments = GetMonoArguments(benchmark.Job, exePath, args, resolver);
+                    start.Arguments = GetMonoArguments(benchmarkCase.Job, exePath, args, resolver);
                     break;
                 default:
                     throw new NotSupportedException("Runtime = " + runtime);

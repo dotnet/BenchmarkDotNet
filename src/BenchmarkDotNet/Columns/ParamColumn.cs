@@ -15,9 +15,9 @@ namespace BenchmarkDotNet.Columns
             ColumnName = columnName;
         }
 
-        public bool IsDefault(Summary summary, Benchmark benchmark) => false;
-        public string GetValue(Summary summary, Benchmark benchmark) =>
-            benchmark.Parameters.Items.FirstOrDefault(item => item.Name == ColumnName)?.ToDisplayText() ?? ParameterInstance.NullParameterTextRepresentation;
+        public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase) =>
+            benchmarkCase.Parameters.Items.FirstOrDefault(item => item.Name == ColumnName)?.ToDisplayText() ?? ParameterInstance.NullParameterTextRepresentation;
 
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;
@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Columns
         public override string ToString() => ColumnName;
         public bool IsNumeric => false;
         public UnitType UnitType => UnitType.Dimensionless;
-        public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style) => GetValue(summary, benchmarkCase);
 
         public string Legend => $"Value of the '{ColumnName}' parameter";
     }

@@ -5,13 +5,13 @@ namespace BenchmarkDotNet.Filters
 {
     public class SimpleFilter : IFilter
     {
-        private readonly Func<Benchmark, bool> predicate;
+        private readonly Func<BenchmarkCase, bool> predicate;
 
-        public SimpleFilter(Func<Benchmark, bool> predicate)
+        public SimpleFilter(Func<BenchmarkCase, bool> predicate)
         {
             this.predicate = predicate;
         }
 
-        public bool Predicate(Benchmark benchmark) => predicate(benchmark);
+        public bool Predicate(BenchmarkCase benchmarkCase) => predicate(benchmarkCase);
     }
 }

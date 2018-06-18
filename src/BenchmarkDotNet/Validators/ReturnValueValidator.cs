@@ -19,11 +19,11 @@ namespace BenchmarkDotNet.Validators
         private ReturnValueValidator(bool failOnError)
             : base(failOnError) { }
 
-        protected override void ExecuteBenchmarks(object benchmarkTypeInstance, IEnumerable<Benchmark> benchmarks, List<ValidationError> errors)
+        protected override void ExecuteBenchmarks(object benchmarkTypeInstance, IEnumerable<BenchmarkCase> benchmarks, List<ValidationError> errors)
         {
             foreach (var parameterGroup in benchmarks.GroupBy(i => i.Parameters, ParameterInstancesEqualityComparer.Instance))
             {
-                var results = new List<(Benchmark benchmark, object returnValue)>();
+                var results = new List<(BenchmarkCase benchmark, object returnValue)>();
                 bool hasErrorsInGroup = false;
 
                 foreach (var benchmark in parameterGroup.DistinctBy(i => i.Target.Method))

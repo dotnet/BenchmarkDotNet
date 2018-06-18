@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Exporters
 
             var benchmarksWithTroubles = summary.Reports
                 .Where(r => !r.GetResultRuns().Any())
-                .Select(r => r.Benchmark)
+                .Select(r => r.BenchmarkCase)
                 .ToList();
 
             if (benchmarksWithTroubles.Count > 0)

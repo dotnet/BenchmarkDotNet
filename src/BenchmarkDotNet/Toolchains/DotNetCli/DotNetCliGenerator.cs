@@ -89,8 +89,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
-            string content = $"call dotnet {Builder.RestoreCommand} {GetCustomArguments(buildPartition.RepresentativeBenchmark, buildPartition.Resolver)}{Environment.NewLine}" +
-                             $"call dotnet {Builder.GetBuildCommand(TargetFrameworkMoniker, false, buildPartition.BuildConfiguration)} {GetCustomArguments(buildPartition.RepresentativeBenchmark, buildPartition.Resolver)}";
+            string content = $"call dotnet {Builder.RestoreCommand} {GetCustomArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver)}{Environment.NewLine}" +
+                             $"call dotnet {Builder.GetBuildCommand(TargetFrameworkMoniker, false, buildPartition.BuildConfiguration)} {GetCustomArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver)}";
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
         }
@@ -106,12 +106,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .GetFileSystemInfos()
                 .Any(fileInfo => fileInfo.Extension == ".sln" || fileInfo.Name == "global.json");
 
-        internal static string GetCustomArguments(Benchmark benchmark, IResolver resolver)
+        internal static string GetCustomArguments(BenchmarkCase benchmarkCase, IResolver resolver)
         {
-            if (!benchmark.Job.HasValue(InfrastructureMode.ArgumentsCharacteristic))
+            if (!benchmarkCase.Job.HasValue(InfrastructureMode.ArgumentsCharacteristic))
                 return null;
 
-            var msBuildArguments = benchmark.Job.ResolveValue(InfrastructureMode.ArgumentsCharacteristic, resolver).OfType<MsBuildArgument>();
+            var msBuildArguments = benchmarkCase.Job.ResolveValue(InfrastructureMode.ArgumentsCharacteristic, resolver).OfType<MsBuildArgument>();
 
             return string.Join(" ", msBuildArguments.Select(arg => arg.TextRepresentation));
         }

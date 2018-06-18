@@ -16,12 +16,12 @@ namespace BenchmarkDotNet.Tests.Running
             var benchmarks1 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain1));
             var benchmarks2 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain2));
 
-            var groupped = benchmarks1.Benchmarks.Union(benchmarks2.Benchmarks)
+            var groupped = benchmarks1.BenchmarksCases.Union(benchmarks2.BenchmarksCases)
                 .GroupBy(benchmark => benchmark, new BenchmarkPartitioner.BenchmarkRuntimePropertiesComparer())
                 .ToArray();
 
             Assert.Single(groupped); // we should have single exe!
-            Assert.Equal(benchmarks1.Benchmarks.Length + benchmarks2.Benchmarks.Length, groupped.Single().Count());
+            Assert.Equal(benchmarks1.BenchmarksCases.Length + benchmarks2.BenchmarksCases.Length, groupped.Single().Count());
         }
 
         public class Plain1
@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Tests.Running
         {
             var benchmarks = BenchmarkConverter.TypeToBenchmarks(typeof(AllRuntimes));
 
-            var groupped = benchmarks.Benchmarks
+            var groupped = benchmarks.BenchmarksCases
                 .GroupBy(benchmark => benchmark, new BenchmarkPartitioner.BenchmarkRuntimePropertiesComparer())
                 .ToArray();
 
@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Tests.Running
             var benchmarks1 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain1), config);
             var benchmarks2 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain2), config);
 
-            var groupped = benchmarks1.Benchmarks.Union(benchmarks2.Benchmarks)
+            var groupped = benchmarks1.BenchmarksCases.Union(benchmarks2.BenchmarksCases)
                 .GroupBy(benchmark => benchmark, new BenchmarkPartitioner.BenchmarkRuntimePropertiesComparer())
                 .ToArray();
 

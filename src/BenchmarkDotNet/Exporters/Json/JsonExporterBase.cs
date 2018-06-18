@@ -53,13 +53,13 @@ namespace BenchmarkDotNet.Exporters.Json
                 var data = new Dictionary<string, object>
                 {
                     // We don't need Benchmark.ShortInfo, that info is available via Benchmark.Parameters below
-                    { "DisplayInfo", r.Benchmark.DisplayInfo },
-                    { "Namespace", r.Benchmark.Target.Type.Namespace },
-                    { "Type", r.Benchmark.Target.Type.Name },
-                    { "Method", r.Benchmark.Target.Method.Name },
-                    { "MethodTitle", r.Benchmark.Target.MethodDisplayInfo },
-                    { "Parameters", r.Benchmark.Parameters.PrintInfo },
-                    { "FullName", XUnitNameProvider.GetBenchmarkName(r.Benchmark) }, // do NOT remove this property, it is used for xunit-performance migration
+                    { "DisplayInfo", r.BenchmarkCase.DisplayInfo },
+                    { "Namespace", r.BenchmarkCase.Target.Type.Namespace },
+                    { "Type", r.BenchmarkCase.Target.Type.Name },
+                    { "Method", r.BenchmarkCase.Target.Method.Name },
+                    { "MethodTitle", r.BenchmarkCase.Target.MethodDisplayInfo },
+                    { "Parameters", r.BenchmarkCase.Parameters.PrintInfo },
+                    { "FullName", XUnitNameProvider.GetBenchmarkName(r.BenchmarkCase) }, // do NOT remove this property, it is used for xunit-performance migration
                     // { "Properties", r.Benchmark.Job.ToSet().ToDictionary(p => p.Name, p => p.Value) }, // TODO
                     { "Statistics", r.ResultStatistics },
                 };

@@ -55,11 +55,11 @@ namespace BenchmarkDotNet.Running
                 CompilerOptions = "/unsafe /optimize",
                 GenerateInMemory = false,
                 OutputAssembly = Path.Combine(
-                    Path.GetDirectoryName(typeof(Benchmark).Assembly.Location),
+                    Path.GetDirectoryName(typeof(BenchmarkCase).Assembly.Location),
                     $"{Path.GetFileNameWithoutExtension(Path.GetTempFileName())}.dll")
             };
 
-            compilerParameters.ReferencedAssemblies.Add(typeof(Benchmark).Assembly.Location);
+            compilerParameters.ReferencedAssemblies.Add(typeof(BenchmarkCase).Assembly.Location);
             var compilerResults = cSharpCodeProvider.CompileAssemblyFromSource(compilerParameters, benchmarkContent);
             if (compilerResults.Errors.HasErrors)
             {
@@ -75,10 +75,10 @@ namespace BenchmarkDotNet.Running
             foreach (var type in types)
             {
                 var runInfo = TypeToBenchmarks(type, config);
-                var benchmarks = runInfo.Benchmarks.Select(b =>
+                var benchmarks = runInfo.BenchmarksCases.Select(b =>
                 {
                     var target = b.Target;
-                    return Benchmark.Create(
+                    return BenchmarkCase.Create(
                         new Target(target.Type, target.Method, target.GlobalSetupMethod, target.GlobalCleanupMethod,
                             target.IterationSetupMethod, target.IterationCleanupMethod,
                             target.MethodDisplayInfo, benchmarkContent, target.Baseline, target.Categories, target.OperationsPerInvoke),

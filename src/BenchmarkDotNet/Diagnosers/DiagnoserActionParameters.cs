@@ -6,17 +6,17 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class DiagnoserActionParameters
     {
-        public DiagnoserActionParameters(Process process, Benchmark benchmark, BenchmarkId benchmarkId, IConfig config)
+        public DiagnoserActionParameters(Process process, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, IConfig config)
         {
             Process = process;
-            Benchmark = benchmark;
+            BenchmarkCase = benchmarkCase;
             BenchmarkId = benchmarkId;
             Config = config;
         }
 
         public Process Process { get; }
 
-        public Benchmark Benchmark { get; }
+        public BenchmarkCase BenchmarkCase { get; }
 
         public BenchmarkId BenchmarkId { get; }
 

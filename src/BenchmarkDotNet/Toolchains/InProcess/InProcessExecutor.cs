@@ -61,12 +61,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         {
             // TODO: preallocate buffer for output (no direct logging)?
             var hostLogger = LogOutput ? executeParameters.Logger : NullLogger.Instance;
-            var host = new InProcessHost(executeParameters.Benchmark, hostLogger, executeParameters.Diagnoser, executeParameters.Config);
+            var host = new InProcessHost(executeParameters.BenchmarkCase, hostLogger, executeParameters.Diagnoser, executeParameters.Config);
 
             int exitCode = -1;
             var runThread = new Thread(() => exitCode = ExecuteCore(host, executeParameters));
 
-            if (executeParameters.Benchmark.Target.Method.GetCustomAttributes<STAThreadAttribute>(false).Any())
+            if (executeParameters.BenchmarkCase.Target.Method.GetCustomAttributes<STAThreadAttribute>(false).Any())
             {
                 runThread.SetApartmentState(ApartmentState.STA);
             }
@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
             if (!runThread.Join((int)timeout.TotalMilliseconds))
                 throw new InvalidOperationException(
-                    $"Benchmark {executeParameters.Benchmark.DisplayInfo} takes to long to run. " +
+                    $"Benchmark {executeParameters.BenchmarkCase.DisplayInfo} takes to long to run. " +
                     "Prefer to use out-of-process toolchains for long-running benchmarks.");
 
             return GetExecutionResult(host.RunResults, exitCode, executeParameters.Logger, executeParameters.Config.Encoding);
@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             var thread = Thread.CurrentThread;
             var oldThreadPriority = thread.Priority;
 
-            var affinity = parameters.Benchmark.Job.ResolveValueAsNullable(EnvMode.AffinityCharacteristic);
+            var affinity = parameters.BenchmarkCase.Job.ResolveValueAsNullable(EnvMode.AffinityCharacteristic);
             try
             {
                 process.TrySetPriority(ProcessPriorityClass.High, parameters.Logger);
@@ -105,7 +105,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     process.TrySetAffinity(affinity.Value, parameters.Logger);
                 }
 
-                exitCode = InProcessRunner.Run(host, parameters.Benchmark, CodegenMode, parameters.Config);
+                exitCode = InProcessRunner.Run(host, parameters.BenchmarkCase, CodegenMode, parameters.Config);
             }
             catch (Exception ex)
             {

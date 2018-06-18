@@ -142,14 +142,14 @@ namespace BenchmarkDotNet.IntegrationTests
             return CreateBenchmarks(types).Select(CreateReport).ToArray();
         }
 
-        private Benchmark[] CreateBenchmarks(Type[] types)
+        private BenchmarkCase[] CreateBenchmarks(Type[] types)
         {
-            return types.SelectMany(type => BenchmarkConverter.TypeToBenchmarks(type).Benchmarks).ToArray();
+            return types.SelectMany(type => BenchmarkConverter.TypeToBenchmarks(type).BenchmarksCases).ToArray();
         }
 
-        private BenchmarkReport CreateReport(Benchmark benchmark)
+        private BenchmarkReport CreateReport(BenchmarkCase benchmarkCase)
         {
-            return new BenchmarkReport(benchmark: benchmark,
+            return new BenchmarkReport(benchmarkCase: benchmarkCase,
                                        generateResult: null,
                                        buildResult: null,
                                        executeResults: null,

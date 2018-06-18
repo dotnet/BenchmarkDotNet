@@ -20,9 +20,9 @@ namespace BenchmarkDotNet.Columns
         {
             public IEnumerable<IColumn> GetColumns(Summary summary)
             {
-                if (summary.Benchmarks.Select(b => b.Target.Type.Namespace).Distinct().Count() > 1)
+                if (summary.BenchmarksCases.Select(b => b.Target.Type.Namespace).Distinct().Count() > 1)
                     yield return TargetMethodColumn.Namespace;
-                if (summary.Benchmarks.Select(b => b.Target.Type.Name).Distinct().Count() > 1)
+                if (summary.BenchmarksCases.Select(b => b.Target.Type.Name).Distinct().Count() > 1)
                     yield return TargetMethodColumn.Type;
                 yield return TargetMethodColumn.Method;
             }
@@ -47,11 +47,11 @@ namespace BenchmarkDotNet.Columns
                 if (NeedToShow(summary, s => s.StandardDeviation > 1e-9))
                     yield return StatisticColumn.StdDev;
 
-                if (summary.Reports != null && summary.Benchmarks.Any(b => b.IsBaseline()))
+                if (summary.Reports != null && summary.BenchmarksCases.Any(b => b.IsBaseline()))
                 {
                     yield return BaselineScaledColumn.Scaled;
                     var stdDevColumn = BaselineScaledColumn.ScaledStdDev;
-                    var stdDevColumnValues = summary.Benchmarks.Select(b => stdDevColumn.GetValue(summary, b));
+                    var stdDevColumnValues = summary.BenchmarksCases.Select(b => stdDevColumn.GetValue(summary, b));
 
                     // Hide ScaledSD column if values is small
                     // TODO: rewrite and check raw values
@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Columns
         private class ParamsColumnProvider : IColumnProvider
         {
             public IEnumerable<IColumn> GetColumns(Summary summary) => summary
-                .Benchmarks
+                .BenchmarksCases
                 .SelectMany(b => b.Parameters.Items.Select(item => item.Name))
                 .Distinct()
                 .Select(name => new ParamColumn(name));

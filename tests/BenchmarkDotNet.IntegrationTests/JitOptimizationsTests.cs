@@ -51,9 +51,9 @@ namespace BenchmarkDotNet.IntegrationTests
 #endif
         }
 
-        private Benchmark[] CreateBenchmarks(Type targetBenchmarkType)
+        private BenchmarkCase[] CreateBenchmarks(Type targetBenchmarkType)
         {
-            return BenchmarkConverter.TypeToBenchmarks(targetBenchmarkType).Benchmarks;
+            return BenchmarkConverter.TypeToBenchmarks(targetBenchmarkType).BenchmarksCases;
         }
     }
 }

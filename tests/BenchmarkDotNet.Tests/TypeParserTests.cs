@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Tests
     {
         private static HashSet<string> Filter(Type[] types, string[] args)
             => new HashSet<string>(new BenchmarkSwitcher(types).Filter(ManualConfig.Parse(args))
-                .SelectMany(runInfo => runInfo.Benchmarks)
+                .SelectMany(runInfo => runInfo.BenchmarksCases)
                 .Select(benchmark => $"{benchmark.Target.Type.Name}.{benchmark.Target.Method.Name}"));
 
         [Fact]

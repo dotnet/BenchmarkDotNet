@@ -13,10 +13,10 @@ namespace BenchmarkDotNet.Filters
 
         public AttributesFilter(string[] attributes) => this.attributes = attributes;
 
-        public bool Predicate(Benchmark benchmark)
+        public bool Predicate(BenchmarkCase benchmarkCase)
         {
-            var customTypeAttributes = benchmark.Target.Type.GetCustomAttributes(true).Select(attribute => attribute.GetType()).ToArray();
-            var customMethodsAttributes = benchmark.Target.Method.GetCustomAttributes(true).Select(attribute => attribute.GetType()).ToArray();
+            var customTypeAttributes = benchmarkCase.Target.Type.GetCustomAttributes(true).Select(attribute => attribute.GetType()).ToArray();
+            var customMethodsAttributes = benchmarkCase.Target.Method.GetCustomAttributes(true).Select(attribute => attribute.GetType()).ToArray();
 
             var allCustomAttributes = customTypeAttributes.Union(customMethodsAttributes).Distinct().ToArray();
 

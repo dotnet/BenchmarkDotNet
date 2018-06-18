@@ -58,10 +58,10 @@ namespace BenchmarkDotNet.Reports
             FullHeader = columns.Select(c => c.GetColumnTitle(style)).ToArray();
 
             var orderProvider = summary.Config.GetOrderer() ?? DefaultOrderer.Instance;
-            FullContent = summary.Reports.Select(r => columns.Select(c => c.GetValue(summary, r.Benchmark, style)).ToArray()).ToArray();
-            IsDefault = columns.Select(c => summary.Reports.All(r => c.IsDefault(summary, r.Benchmark))).ToArray();
+            FullContent = summary.Reports.Select(r => columns.Select(c => c.GetValue(summary, r.BenchmarkCase, style)).ToArray()).ToArray();
+            IsDefault = columns.Select(c => summary.Reports.All(r => c.IsDefault(summary, r.BenchmarkCase))).ToArray();
 
-            var highlightGroupKeys = summary.Benchmarks.Select(b => orderProvider.GetHighlightGroupKey(b)).ToArray();
+            var highlightGroupKeys = summary.BenchmarksCases.Select(b => orderProvider.GetHighlightGroupKey(b)).ToArray();
             FullContentStartOfHighlightGroup = new bool[summary.Reports.Length];
             if (highlightGroupKeys.Distinct().Count() > 1 && FullContentStartOfHighlightGroup.Length > 0)
             {
@@ -70,8 +70,8 @@ namespace BenchmarkDotNet.Reports
                     FullContentStartOfHighlightGroup[i] = highlightGroupKeys[i] != highlightGroupKeys[i - 1];
             }
 
-            var logicalGroupKeys = summary.Benchmarks
-                .Select(b => orderProvider.GetLogicalGroupKey(summary.Config, summary.Benchmarks, b))
+            var logicalGroupKeys = summary.BenchmarksCases
+                .Select(b => orderProvider.GetLogicalGroupKey(summary.Config, summary.BenchmarksCases, b))
                 .ToArray();
             FullContentStartOfLogicalGroup = new bool[summary.Reports.Length];
             if (logicalGroupKeys.Distinct().Count() > 1 && FullContentStartOfLogicalGroup.Length > 0)

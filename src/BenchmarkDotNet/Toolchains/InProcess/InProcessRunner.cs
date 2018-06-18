@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 {
     internal class InProcessRunner
     {
-        public static int Run(IHost host, Benchmark benchmark, BenchmarkActionCodegen codegenMode, IConfig config)
+        public static int Run(IHost host, BenchmarkCase benchmarkCase, BenchmarkActionCodegen codegenMode, IConfig config)
         {
             // the first thing to do is to let diagnosers hook in before anything happens
             // so all jit-related diagnosers can catch first jit compilation!
@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     throw new InvalidOperationException($"Bug: type {inProcessRunnableTypeName} not found.");
 
                 type.GetMethod(nameof(Runnable.RunCore), BindingFlags.Public | BindingFlags.Static)
-                    .Invoke(null, new object[] { host, benchmark, codegenMode, config });
+                    .Invoke(null, new object[] { host, benchmarkCase, codegenMode, config });
 
                 return 0;
             }
@@ -59,15 +59,15 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
         /// <summary>Fills the properties of the instance of the object used to run the benchmark.</summary>
         /// <param name="instance">The instance.</param>
-        /// <param name="benchmark">The benchmark.</param>
-        internal static void FillMembers(object instance, Benchmark benchmark)
+        /// <param name="benchmarkCase">The benchmark.</param>
+        internal static void FillMembers(object instance, BenchmarkCase benchmarkCase)
         {
-            foreach (var parameter in benchmark.Parameters.Items)
+            foreach (var parameter in benchmarkCase.Parameters.Items)
             {
                 var flags = BindingFlags.Public;
                 flags |= parameter.IsStatic ? BindingFlags.Static : BindingFlags.Instance;
 
-                var targetType = benchmark.Target.Type;
+                var targetType = benchmarkCase.Target.Type;
                 var paramProperty = targetType.GetProperty(parameter.Name, flags);
 
                 if (paramProperty == null)
@@ -96,14 +96,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         [UsedImplicitly]
         private static class Runnable
         {
-            public static void RunCore(IHost host, Benchmark benchmark, BenchmarkActionCodegen codegenMode, IConfig config)
+            public static void RunCore(IHost host, BenchmarkCase benchmarkCase, BenchmarkActionCodegen codegenMode, IConfig config)
             {
-                var target = benchmark.Target;
-                var job = benchmark.Job; // TODO: filter job (same as SourceCodePresenter does)?
-                var unrollFactor = benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvResolver.Instance);
+                var target = benchmarkCase.Target;
+                var job = benchmarkCase.Job; // TODO: filter job (same as SourceCodePresenter does)?
+                var unrollFactor = benchmarkCase.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvResolver.Instance);
 
                 // DONTTOUCH: these should be allocated together
-                var instance = Activator.CreateInstance(benchmark.Target.Type);
+                var instance = Activator.CreateInstance(benchmarkCase.Target.Type);
                 var mainAction = BenchmarkActionFactory.CreateRun(target, instance, codegenMode, unrollFactor);
                 var idleAction = BenchmarkActionFactory.CreateIdle(target, instance, codegenMode, unrollFactor);
                 var globalSetupAction = BenchmarkActionFactory.CreateGlobalSetup(target, instance);
@@ -114,7 +114,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 var dummy2 = BenchmarkActionFactory.CreateDummy();
                 var dummy3 = BenchmarkActionFactory.CreateDummy();
 
-                FillMembers(instance, benchmark);
+                FillMembers(instance, benchmarkCase);
 
                 host.WriteLine();
                 foreach (var infoLine in BenchmarkEnvironmentInfo.GetCurrent().ToFormattedString())

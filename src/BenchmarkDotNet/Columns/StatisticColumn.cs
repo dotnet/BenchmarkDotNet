@@ -101,11 +101,11 @@ namespace BenchmarkDotNet.Columns
             Legend = legend;
         }
 
-        public string GetValue(Summary summary, Benchmark benchmark)
-            => Format(summary, summary[benchmark].ResultStatistics, SummaryStyle.Default);
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase)
+            => Format(summary, summary[benchmarkCase].ResultStatistics, SummaryStyle.Default);
 
-        public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style)
-            => Format(summary, summary[benchmark].ResultStatistics, style);
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style)
+            => Format(summary, summary[benchmarkCase].ResultStatistics, style);
 
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;
@@ -141,7 +141,7 @@ namespace BenchmarkDotNet.Columns
 
         public override string ToString() => ColumnName;
 
-        public bool IsDefault(Summary summary, Benchmark benchmark) => false;
+        public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
 
         private static IColumn CreatePercentileColumn(int percentiles, Func<Statistics, double> calc) => new StatisticColumn(
             "P" + percentiles, "Percentile " + percentiles, calc, Priority.Percentiles);

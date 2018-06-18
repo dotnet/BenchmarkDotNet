@@ -11,9 +11,9 @@ namespace BenchmarkDotNet.Columns
         public string Id => nameof(LogicalGroupColumn);
         public string ColumnName => "LogicalGroup";
 
-        public string GetValue(Summary summary, Benchmark benchmark) => summary.GetLogicalGroupKey(benchmark);
-        public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
-        public bool IsDefault(Summary summary, Benchmark benchmark) => false;
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => summary.GetLogicalGroupKey(benchmarkCase);
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style) => GetValue(summary, benchmarkCase);
+        public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
         public bool IsAvailable(Summary summary) => true;
 
         public bool AlwaysShow => true;

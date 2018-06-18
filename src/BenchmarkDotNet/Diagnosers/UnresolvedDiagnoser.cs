@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public UnresolvedDiagnoser(Type unresolved) => this.unresolved = unresolved;
 
-        public RunMode GetRunMode(Benchmark benchmark) => RunMode.None;
+        public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.None;
 
         public IEnumerable<string> Ids => Array.Empty<string>();
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();

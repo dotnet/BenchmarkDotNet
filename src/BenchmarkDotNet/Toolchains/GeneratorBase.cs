@@ -87,7 +87,7 @@ namespace BenchmarkDotNet.Toolchains
             using (var source = File.Exists(sourcePath) ? new StreamReader(File.OpenRead(sourcePath)) : TextReader.Null)
             using (var destination = new System.IO.StreamWriter(File.Create(artifactsPaths.AppConfigPath), System.Text.Encoding.UTF8))
             {
-                AppConfigGenerator.Generate(buildPartition.RepresentativeBenchmark.Job, source, destination, buildPartition.Resolver);
+                AppConfigGenerator.Generate(buildPartition.RepresentativeBenchmarkCase.Job, source, destination, buildPartition.Resolver);
             }
         }
     }

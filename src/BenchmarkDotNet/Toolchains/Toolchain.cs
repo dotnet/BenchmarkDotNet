@@ -25,13 +25,13 @@ namespace BenchmarkDotNet.Toolchains
             Executor = executor;
         }
 
-        public virtual bool IsSupported(Benchmark benchmark, ILogger logger, IResolver resolver)
+        public virtual bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver)
         {
-            var runtime = benchmark.Job.ResolveValue(EnvMode.RuntimeCharacteristic, resolver);
-            var jit = benchmark.Job.ResolveValue(EnvMode.JitCharacteristic, resolver);
+            var runtime = benchmarkCase.Job.ResolveValue(EnvMode.RuntimeCharacteristic, resolver);
+            var jit = benchmarkCase.Job.ResolveValue(EnvMode.JitCharacteristic, resolver);
             if (!(runtime is MonoRuntime) && jit == Jit.Llvm)
             {
-                logger.WriteLineError($"Llvm is supported only for Mono, benchmark '{benchmark.DisplayInfo}' will not be executed");
+                logger.WriteLineError($"Llvm is supported only for Mono, benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
                 return false;
             }
 
@@ -39,13 +39,13 @@ namespace BenchmarkDotNet.Toolchains
             {
                 if (string.IsNullOrEmpty(mono.CustomPath) && !HostEnvironmentInfo.GetCurrent().IsMonoInstalled.Value)
                 {
-                    logger.WriteLineError($"Mono is not installed or added to PATH, benchmark '{benchmark.DisplayInfo}' will not be executed");
+                    logger.WriteLineError($"Mono is not installed or added to PATH, benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
                     return false;
                 }
 
                 if (!string.IsNullOrEmpty(mono.CustomPath) && !File.Exists(mono.CustomPath))
                 {
-                    logger.WriteLineError($"We could not find Mono in provided path ({mono.CustomPath}), benchmark '{benchmark.DisplayInfo}' will not be executed");
+                    logger.WriteLineError($"We could not find Mono in provided path ({mono.CustomPath}), benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
                     return false;
                 }
             }

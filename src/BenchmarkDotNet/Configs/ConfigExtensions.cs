@@ -21,9 +21,9 @@ namespace BenchmarkDotNet.Configs
         public static IExporter GetCompositeExporter(this IConfig config) => new CompositeExporter(config.GetExporters().ToArray());
         public static IDiagnoser GetCompositeDiagnoser(this IConfig config) => new CompositeDiagnoser(config.GetDiagnosers().ToArray());
 
-        public static IDiagnoser GetCompositeDiagnoser(this IConfig config, Benchmark benchmark, RunMode runMode)
-            => config.GetDiagnosers().Any(d => d.GetRunMode(benchmark) == runMode)
-                ? new CompositeDiagnoser(config.GetDiagnosers().Where(d => d.GetRunMode(benchmark) == runMode).ToArray())
+        public static IDiagnoser GetCompositeDiagnoser(this IConfig config, BenchmarkCase benchmarkCase, RunMode runMode)
+            => config.GetDiagnosers().Any(d => d.GetRunMode(benchmarkCase) == runMode)
+                ? new CompositeDiagnoser(config.GetDiagnosers().Where(d => d.GetRunMode(benchmarkCase) == runMode).ToArray())
                 : null;
 
         public static IAnalyser GetCompositeAnalyser(this IConfig config) => new CompositeAnalyser(config.GetAnalysers().ToArray());

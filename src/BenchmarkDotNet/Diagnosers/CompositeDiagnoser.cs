@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public CompositeDiagnoser(params IDiagnoser[] diagnosers) => this.diagnosers = diagnosers.Distinct().ToArray();
 
-        public RunMode GetRunMode(Benchmark benchmark) => throw new InvalidOperationException("Should never be called for Composite Diagnoser");
+        public RunMode GetRunMode(BenchmarkCase benchmarkCase) => throw new InvalidOperationException("Should never be called for Composite Diagnoser");
 
         public IEnumerable<string> Ids => diagnosers.SelectMany(d => d.Ids);
 

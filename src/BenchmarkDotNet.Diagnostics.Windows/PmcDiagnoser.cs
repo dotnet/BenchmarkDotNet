@@ -36,12 +36,12 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 { HardwareCounter.BranchMispredictsRetired, "BranchMispredictsRetired" }
             };
 
-        private readonly Dictionary<Benchmark, PmcStats> results = new Dictionary<Benchmark, PmcStats>();
+        private readonly Dictionary<BenchmarkCase, PmcStats> results = new Dictionary<BenchmarkCase, PmcStats>();
 
         // ReSharper disable once EmptyConstructor parameterless ctor is mandatory for DiagnosersLoader.CreateDiagnoser
         public PmcDiagnoser() { }
 
-        public IReadOnlyDictionary<Benchmark, PmcStats> Results => results;
+        public IReadOnlyDictionary<BenchmarkCase, PmcStats> Results => results;
 
         public const string DiagnoserId = nameof(InliningDiagnoser);
 
@@ -63,10 +63,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public void ProcessResults(DiagnoserResults results)
         {
-            var processId = BenchmarkToProcess[results.Benchmark];
+            var processId = BenchmarkToProcess[results.BenchmarkCase];
             var stats = StatsPerProcess[processId];
             stats.TotalOperations = results.TotalOperations;
-            this.results.Add(results.Benchmark, stats);
+            this.results.Add(results.BenchmarkCase, stats);
         }
 
         public void DisplayResults(ILogger logger) { }
@@ -123,13 +123,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             return stats;
         }
 
-        protected override TraceEventSession CreateSession(Benchmark benchmark)
+        protected override TraceEventSession CreateSession(BenchmarkCase benchmarkCase)
             => new TraceEventSession(KernelTraceEventParser.KernelSessionName);
 
         protected override void EnableProvider()
             => Session.EnableKernelProvider((KernelTraceEventParser.Keywords)EventType);
 
-        protected override void AttachToEvents(TraceEventSession traceEventSession, Benchmark benchmark)
+        protected override void AttachToEvents(TraceEventSession traceEventSession, BenchmarkCase benchmarkCase)
         {
             traceEventSession.Source.Kernel.PerfInfoCollectionStart += _ => { }; // we must subscribe to this event, otherwise the PerfInfoPMCSample is not raised ;)
             traceEventSession.Source.Kernel.PerfInfoPMCSample += OnPerfInfoPmcSample;
@@ -164,7 +164,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public class PmcColumn : IColumn
         {
-            public PmcColumn(Dictionary<Benchmark, PmcStats> results, HardwareCounter hardwareCounter)
+            public PmcColumn(Dictionary<BenchmarkCase, PmcStats> results, HardwareCounter hardwareCounter)
             {
                 Results = results;
                 Counter = hardwareCounter;
@@ -173,85 +173,85 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             public string ColumnName { get; }
             public string Id => nameof(PmcColumn) + ColumnName;
-            public bool IsDefault(Summary summary, Benchmark benchmark) => false;
+            public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
             public bool AlwaysShow => false;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 1;
             public bool IsNumeric => true;
             public UnitType UnitType => UnitType.Dimensionless;
             public string Legend => $"Hardware counter '{Counter}' per operation";
-            public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
+            public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style) => GetValue(summary, benchmarkCase);
 
-            private Dictionary<Benchmark, PmcStats> Results { get; }
+            private Dictionary<BenchmarkCase, PmcStats> Results { get; }
             private HardwareCounter Counter { get; }
 
             public bool IsAvailable(Summary summary)
                 => summary.Config.GetHardwareCounters().Contains(Counter);
 
-            public string GetValue(Summary summary, Benchmark benchmark)
-                => Results.TryGetValue(benchmark, out var stats) && stats.Counters.ContainsKey(Counter)
+            public string GetValue(Summary summary, BenchmarkCase benchmarkCase)
+                => Results.TryGetValue(benchmarkCase, out var stats) && stats.Counters.ContainsKey(Counter)
                     ? (stats.Counters[Counter].Count / (ulong)stats.TotalOperations).ToString()
                     : "-";
         }
 
         public class MispredictRateColumn : IColumn
         {
-            public MispredictRateColumn(Dictionary<Benchmark, PmcStats> results)
+            public MispredictRateColumn(Dictionary<BenchmarkCase, PmcStats> results)
             {
                 Results = results;
             }
 
             public string ColumnName => "Mispredict rate";
             public string Id => "MispredictRate";
-            public bool IsDefault(Summary summary, Benchmark benchmark) => false;
+            public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
             public bool AlwaysShow => false;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0; // if present should be displayed as the first column (we sort in ascending way)
             public bool IsNumeric => true;
             public UnitType UnitType => UnitType.Dimensionless;
             public string Legend => $"Mispredict rate per operation";
-            public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
+            public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => GetValue(summary, benchmarkCase, SummaryStyle.Default);
 
-            private Dictionary<Benchmark, PmcStats> Results { get; }
+            private Dictionary<BenchmarkCase, PmcStats> Results { get; }
 
             public bool IsAvailable(Summary summary)
                 => summary.Config.GetHardwareCounters().Any()
                         && summary.Config.GetHardwareCounters().Contains(HardwareCounter.BranchInstructions)
                         && summary.Config.GetHardwareCounters().Contains(HardwareCounter.BranchMispredictions);
 
-            public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style)
-                => Results.TryGetValue(benchmark, out var stats) && stats.Counters.ContainsKey(HardwareCounter.BranchMispredictions) && stats.Counters.ContainsKey(HardwareCounter.BranchInstructions)
+            public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style)
+                => Results.TryGetValue(benchmarkCase, out var stats) && stats.Counters.ContainsKey(HardwareCounter.BranchMispredictions) && stats.Counters.ContainsKey(HardwareCounter.BranchInstructions)
                     ? (stats.Counters[HardwareCounter.BranchMispredictions].Count / (double)stats.Counters[HardwareCounter.BranchInstructions].Count).ToString(style.PrintUnitsInContent ? "P2" : String.Empty)
                     : "-";
         }
 
         public class InstructionRetiredPerCycleColumn : IColumn
         {
-            public InstructionRetiredPerCycleColumn(Dictionary<Benchmark, PmcStats> results)
+            public InstructionRetiredPerCycleColumn(Dictionary<BenchmarkCase, PmcStats> results)
             {
                 Results = results;
             }
 
             public string ColumnName => "IPC";
             public string Id => "IPC";
-            public bool IsDefault(Summary summary, Benchmark benchmark) => false;
+            public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
             public bool AlwaysShow => false;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
             public int PriorityInCategory => 0; // if present should be displayed as the first column (we sort in ascending way)
             public bool IsNumeric => true;
             public UnitType UnitType => UnitType.Dimensionless;
             public string Legend => $"Instruction Retired per Cycle";
-            public string GetValue(Summary summary, Benchmark benchmark) => GetValue(summary, benchmark, SummaryStyle.Default);
+            public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => GetValue(summary, benchmarkCase, SummaryStyle.Default);
 
-            private Dictionary<Benchmark, PmcStats> Results { get; }
+            private Dictionary<BenchmarkCase, PmcStats> Results { get; }
 
             public bool IsAvailable(Summary summary)
                 => summary.Config.GetHardwareCounters().Any()
                     && summary.Config.GetHardwareCounters().Contains(HardwareCounter.InstructionRetired)
                     && summary.Config.GetHardwareCounters().Contains(HardwareCounter.TotalCycles);
 
-            public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style)
-                => Results.TryGetValue(benchmark, out var stats) && stats.Counters.ContainsKey(HardwareCounter.InstructionRetired) && stats.Counters.ContainsKey(HardwareCounter.TotalCycles)
+            public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style)
+                => Results.TryGetValue(benchmarkCase, out var stats) && stats.Counters.ContainsKey(HardwareCounter.InstructionRetired) && stats.Counters.ContainsKey(HardwareCounter.TotalCycles)
                     ? (stats.Counters[HardwareCounter.InstructionRetired].Count / (double)stats.Counters[HardwareCounter.TotalCycles].Count).ToString("N2")
                     : "-";
         }

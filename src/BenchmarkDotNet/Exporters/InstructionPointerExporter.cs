@@ -43,9 +43,9 @@ namespace BenchmarkDotNet.Exporters
             }
         }
 
-        private string Export(Summary summary, Benchmark benchmark, DisassemblyResult disassemblyResult, PmcStats pmcStats)
+        private string Export(Summary summary, BenchmarkCase benchmarkCase, DisassemblyResult disassemblyResult, PmcStats pmcStats)
         {
-            var filePath = $"{Path.Combine(summary.ResultsDirectoryPath, benchmark.Target.Method.Name)}-{benchmark.Job.Env.Jit}-{benchmark.Job.Env.Platform}-instructionPointer.html";
+            var filePath = $"{Path.Combine(summary.ResultsDirectoryPath, benchmarkCase.Target.Method.Name)}-{benchmarkCase.Job.Env.Jit}-{benchmarkCase.Job.Env.Platform}-instructionPointer.html";
             if (File.Exists(filePath))
                 File.Delete(filePath);
 
@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.Exporters
 
                 using (var stream = Portability.StreamWriter.FromPath(filePath))
                 {
-                    Export(new StreamLogger(stream), benchmark, totals, perMethod, pmcStats.Counters.Keys.ToArray());
+                    Export(new StreamLogger(stream), benchmarkCase, totals, perMethod, pmcStats.Counters.Keys.ToArray());
                 }
             }
 
@@ -162,12 +162,12 @@ namespace BenchmarkDotNet.Exporters
             return model;
         }
 
-        private void Export(ILogger logger, Benchmark benchmark, Dictionary<HardwareCounter, (ulong withoutNoise, ulong total)> totals, IReadOnlyList<MethodWithCounters> model, HardwareCounter[] hardwareCounters)
+        private void Export(ILogger logger, BenchmarkCase benchmarkCase, Dictionary<HardwareCounter, (ulong withoutNoise, ulong total)> totals, IReadOnlyList<MethodWithCounters> model, HardwareCounter[] hardwareCounters)
         {
             int columnsCount = hardwareCounters.Length + 2;
 
             logger.WriteLine("<!DOCTYPE html><html lang='en'><head><meta charset='utf-8' />");
-            logger.WriteLine($"<title>Combined Output of DisassemblyDiagnoser and HardwareCounters {benchmark.DisplayInfo}</title>");
+            logger.WriteLine($"<title>Combined Output of DisassemblyDiagnoser and HardwareCounters {benchmarkCase.DisplayInfo}</title>");
             logger.WriteLine(CssStyle);
             logger.WriteLine("</head>");
 

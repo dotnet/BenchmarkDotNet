@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Running
 
             var targets = GetTargets(targetMethods, containingType, globalSetupMethods, globalCleanupMethods, iterationSetupMethods, iterationCleanupMethods).ToArray();
 
-            var benchmarks = new List<Benchmark>();
+            var benchmarks = new List<BenchmarkCase>();
             foreach (var target in targets)
             {
                 var argumentsDefinitions = GetArgumentsDefinitions(target.Method, target.Type).ToArray();
@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Running
                     from job in jobs
                     from parameterInstance in parameterInstancesList
                     from argumentDefinition in argumentsDefinitions
-                    select Benchmark.Create(target, job, new ParameterInstances(parameterInstance.Items.Concat(argumentDefinition.Items).ToArray()))
+                    select BenchmarkCase.Create(target, job, new ParameterInstances(parameterInstance.Items.Concat(argumentDefinition.Items).ToArray()))
                 );
             }
 
@@ -251,7 +251,7 @@ namespace BenchmarkDotNet.Running
             return attributes.SelectMany(attr => attr.Categories).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
         }
 
-        private static Benchmark[] GetFilteredBenchmarks(IList<Benchmark> benchmarks, IList<IFilter> filters)
+        private static BenchmarkCase[] GetFilteredBenchmarks(IList<BenchmarkCase> benchmarks, IList<IFilter> filters)
         {
             return benchmarks.Where(benchmark => filters.All(filter => filter.Predicate(benchmark))).ToArray();
         }

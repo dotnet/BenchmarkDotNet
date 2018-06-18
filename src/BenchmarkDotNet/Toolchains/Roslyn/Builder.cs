@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             compilationOptions = compilationOptions.WithIgnoreCorLibraryDuplicatedTypes();
 
             var references = Generator
-                .GetAllReferences(buildPartition.RepresentativeBenchmark)
+                .GetAllReferences(buildPartition.RepresentativeBenchmarkCase)
                 .Select(assembly => AssemblyMetadata.CreateFromFile(assembly.Location))
                 .Concat(FrameworkAssembliesMetadata.Value)
                 .Distinct()

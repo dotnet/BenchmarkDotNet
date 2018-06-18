@@ -222,11 +222,11 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (benchmarkAllocationsValidator.Key == nameof(AccurateAllocations.AllocateTask) && toolchain is CoreRtToolchain)
                     continue; 
 
-                var allocatingBenchmarks = benchmarks.Benchmarks.Where(benchmark => benchmark.DisplayInfo.Contains(benchmarkAllocationsValidator.Key));
+                var allocatingBenchmarks = benchmarks.BenchmarksCases.Where(benchmark => benchmark.DisplayInfo.Contains(benchmarkAllocationsValidator.Key));
 
                 foreach (var benchmark in allocatingBenchmarks)
                 {
-                    var benchmarkReport = summary.Reports.Single(report => report.Benchmark == benchmark);
+                    var benchmarkReport = summary.Reports.Single(report => report.BenchmarkCase == benchmark);
 
                     Assert.Equal(benchmarkAllocationsValidator.Value, benchmarkReport.GcStats.BytesAllocatedPerOperation);
 

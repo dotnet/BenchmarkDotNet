@@ -217,6 +217,6 @@ namespace BenchmarkDotNet.Validators
             return ex?.Message ?? "Unknown error";
         }
 
-        protected abstract void ExecuteBenchmarks(object benchmarkTypeInstance, IEnumerable<Benchmark> benchmarks, List<ValidationError> errors);
+        protected abstract void ExecuteBenchmarks(object benchmarkTypeInstance, IEnumerable<BenchmarkCase> benchmarks, List<ValidationError> errors);
     }
 }

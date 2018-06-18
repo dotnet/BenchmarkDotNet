@@ -9,6 +9,6 @@ namespace BenchmarkDotNet.Filters
 
         public UnionFilter(params IFilter[] filters) => this.filters = filters;
 
-        public bool Predicate(Benchmark benchmark) => filters.All(filter => filter.Predicate(benchmark));
+        public bool Predicate(BenchmarkCase benchmarkCase) => filters.All(filter => filter.Predicate(benchmarkCase));
     }
 }

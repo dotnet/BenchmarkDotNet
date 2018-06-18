@@ -25,14 +25,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         private readonly DiagnoserActionParameters diagnoserActionParameters;
 
         /// <summary>Creates a new instance of <see cref="InProcessHost"/>.</summary>
-        /// <param name="benchmark">Current benchmark.</param>
+        /// <param name="benchmarkCase">Current benchmark.</param>
         /// <param name="logger">Logger for informational output.</param>
         /// <param name="diagnoser">Diagnosers, if attached.</param>
         /// <param name="config">Current config.</param>
-        public InProcessHost(Benchmark benchmark, ILogger logger, IDiagnoser diagnoser, IConfig config)
+        public InProcessHost(BenchmarkCase benchmarkCase, ILogger logger, IDiagnoser diagnoser, IConfig config)
         {
-            if (benchmark == null)
-                throw new ArgumentNullException(nameof(benchmark));
+            if (benchmarkCase == null)
+                throw new ArgumentNullException(nameof(benchmarkCase));
 
             if (logger == null)
                 throw new ArgumentNullException(nameof(logger));
@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             if (diagnoser != null)
                 diagnoserActionParameters = new DiagnoserActionParameters(
                     Process.GetCurrentProcess(),
-                    benchmark,
+                    benchmarkCase,
                     default,
                     config);
         }

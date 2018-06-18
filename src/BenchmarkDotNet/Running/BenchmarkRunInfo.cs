@@ -5,13 +5,13 @@ namespace BenchmarkDotNet.Running
 {
     public class BenchmarkRunInfo
     {
-        public BenchmarkRunInfo(Benchmark[] benchmarks, Type type, ReadOnlyConfig config)
+        public BenchmarkRunInfo(BenchmarkCase[] benchmarksCase, Type type, ReadOnlyConfig config)
         {
-            Benchmarks = benchmarks;
+            BenchmarksCases = benchmarksCase;
             Type = type;
             Config = config;
         }
-        public Benchmark[] Benchmarks { get; }
+        public BenchmarkCase[] BenchmarksCases { get; }
         public Type Type { get; }
         public ReadOnlyConfig Config { get; }
     }

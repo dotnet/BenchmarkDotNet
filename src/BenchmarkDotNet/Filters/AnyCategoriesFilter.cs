@@ -12,6 +12,6 @@ namespace BenchmarkDotNet.Filters
 
         public AnyCategoriesFilter(string[] targetCategories) => this.targetCategories = targetCategories;
 
-        public bool Predicate(Benchmark benchmark) => targetCategories.Any(c => benchmark.Target.HasCategory(c));
+        public bool Predicate(BenchmarkCase benchmarkCase) => targetCategories.Any(c => benchmarkCase.Target.HasCategory(c));
     }
 }

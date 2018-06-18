@@ -14,37 +14,37 @@ namespace BenchmarkDotNet.Exporters
     {
         private static readonly Lazy<string> HighlightingLabelsScript = new Lazy<string>(() => ResourceHelper.LoadTemplate("highlightingLabelsScript.js"));
 
-        private readonly IReadOnlyDictionary<Benchmark, DisassemblyResult> results;
+        private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
 
-        public PrettyDisassemblyExporter(IReadOnlyDictionary<Benchmark, DisassemblyResult> results) => this.results = results;
+        public PrettyDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results) => this.results = results;
 
         public string Name => nameof(RawDisassemblyExporter);
 
         public void ExportToLog(Summary summary, ILogger logger) { }
 
         public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
-            => summary.Benchmarks
+            => summary.BenchmarksCases
                       .Where(results.ContainsKey)
                       .Select(benchmark => Export(summary, benchmark));
 
-        private string Export(Summary summary, Benchmark benchmark)
+        private string Export(Summary summary, BenchmarkCase benchmarkCase)
         {
-            var filePath = $"{Path.Combine(summary.ResultsDirectoryPath, benchmark.FolderInfo)}-asm.pretty.html";
+            var filePath = $"{Path.Combine(summary.ResultsDirectoryPath, benchmarkCase.FolderInfo)}-asm.pretty.html";
             if (File.Exists(filePath))
                 File.Delete(filePath);
 
             using (var stream = Portability.StreamWriter.FromPath(filePath))
             {
-                Export(new StreamLogger(stream), results[benchmark], benchmark);
+                Export(new StreamLogger(stream), results[benchmarkCase], benchmarkCase);
             }
 
             return filePath;
         }
 
-        private void Export(ILogger logger, DisassemblyResult disassemblyResult, Benchmark benchmark)
+        private void Export(ILogger logger, DisassemblyResult disassemblyResult, BenchmarkCase benchmarkCase)
         {
             logger.WriteLine("<!DOCTYPE html><html lang='en'><head><meta charset='utf-8' /><head>");
-            logger.WriteLine($"<title>Pretty Output of DisassemblyDiagnoser for {benchmark.DisplayInfo}</title>");
+            logger.WriteLine($"<title>Pretty Output of DisassemblyDiagnoser for {benchmarkCase.DisplayInfo}</title>");
             logger.WriteLine(InstructionPointerExporter.CssStyle);
             logger.WriteLine(@"
 <style type='text/css'>

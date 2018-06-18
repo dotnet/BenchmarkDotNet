@@ -11,10 +11,10 @@ namespace BenchmarkDotNet.Exporters
 {
     internal class XUnitNameProvider 
     {
-        internal static string GetBenchmarkName(Benchmark benchmark)
+        internal static string GetBenchmarkName(BenchmarkCase benchmarkCase)
         {
-            var type = benchmark.Target.Type;
-            var method = benchmark.Target.Method;
+            var type = benchmarkCase.Target.Type;
+            var method = benchmarkCase.Target.Method;
 
             // we can't just use type.FullName because we need sth different for generics (it reports SimpleGeneric`1[[System.Int32, mscorlib, Version=4.0.0.0)
             var name = new StringBuilder();
@@ -28,8 +28,8 @@ namespace BenchmarkDotNet.Exporters
 
             name.Append(method.Name);
 
-            if (benchmark.HasParameters)
-                name.Append(GetBenchmarkParameters(method, benchmark.Parameters));
+            if (benchmarkCase.HasParameters)
+                name.Append(GetBenchmarkParameters(method, benchmarkCase.Parameters));
 
             return name.ToString();
         }

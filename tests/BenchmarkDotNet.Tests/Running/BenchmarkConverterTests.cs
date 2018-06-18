@@ -18,22 +18,22 @@ namespace BenchmarkDotNet.Tests.Running
         public void ReadsAttributesFromBaseClass()
         {
             var derivedType = typeof(Derived);
-            Benchmark benchmark = BenchmarkConverter.TypeToBenchmarks(derivedType).Benchmarks.Single();
+            BenchmarkCase benchmarkCase = BenchmarkConverter.TypeToBenchmarks(derivedType).BenchmarksCases.Single();
 
-            Assert.NotNull(benchmark);
-            Assert.NotNull(benchmark.Target);
+            Assert.NotNull(benchmarkCase);
+            Assert.NotNull(benchmarkCase.Target);
 
-            Assert.NotNull(benchmark.Target.IterationSetupMethod);
-            Assert.Equal(benchmark.Target.IterationSetupMethod.DeclaringType, derivedType);
+            Assert.NotNull(benchmarkCase.Target.IterationSetupMethod);
+            Assert.Equal(benchmarkCase.Target.IterationSetupMethod.DeclaringType, derivedType);
 
-            Assert.NotNull(benchmark.Target.IterationCleanupMethod);
-            Assert.Equal(benchmark.Target.IterationCleanupMethod.DeclaringType, derivedType);
+            Assert.NotNull(benchmarkCase.Target.IterationCleanupMethod);
+            Assert.Equal(benchmarkCase.Target.IterationCleanupMethod.DeclaringType, derivedType);
 
-            Assert.NotNull(benchmark.Target.GlobalCleanupMethod);
-            Assert.Equal(benchmark.Target.GlobalCleanupMethod.DeclaringType, derivedType);
+            Assert.NotNull(benchmarkCase.Target.GlobalCleanupMethod);
+            Assert.Equal(benchmarkCase.Target.GlobalCleanupMethod.DeclaringType, derivedType);
 
-            Assert.NotNull(benchmark.Target.GlobalSetupMethod);
-            Assert.Equal(benchmark.Target.GlobalSetupMethod.DeclaringType, derivedType);
+            Assert.NotNull(benchmarkCase.Target.GlobalSetupMethod);
+            Assert.Equal(benchmarkCase.Target.GlobalSetupMethod.DeclaringType, derivedType);
         }
 
         public abstract class Base
@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Tests.Running
         [Fact]
         public void IfIterationSetupIsProvidedTheBenchmarkShouldRunOncePerIteration()
         {
-            var benchmark = BenchmarkConverter.TypeToBenchmarks(typeof(Derived)).Benchmarks.Single();
+            var benchmark = BenchmarkConverter.TypeToBenchmarks(typeof(Derived)).BenchmarksCases.Single();
             
             Assert.Equal(1, benchmark.Job.Run.InvocationCount);
             Assert.Equal(1, benchmark.Job.Run.UnrollFactor);
@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.Tests.Running
             var benchmark = BenchmarkConverter.TypeToBenchmarks(typeof(Derived), 
                 DefaultConfig.Instance.With(Job.Default
                     .WithInvocationCount(InvocationCount)))
-                .Benchmarks.Single();
+                .BenchmarksCases.Single();
             
             Assert.Equal(InvocationCount, benchmark.Job.Run.InvocationCount);
             Assert.NotNull(benchmark.Target.IterationSetupMethod);
@@ -106,7 +106,7 @@ namespace BenchmarkDotNet.Tests.Running
             var benchmark = BenchmarkConverter.TypeToBenchmarks(typeof(Derived), 
                     DefaultConfig.Instance.With(Job.Default
                         .WithUnrollFactor(UnrollFactor)))
-                .Benchmarks.Single();
+                .BenchmarksCases.Single();
             
             Assert.Equal(UnrollFactor, benchmark.Job.Run.UnrollFactor);
             Assert.NotNull(benchmark.Target.IterationSetupMethod);
@@ -121,10 +121,10 @@ namespace BenchmarkDotNet.Tests.Running
                         .With(Job.Clr)
                         .With(Job.Core));
             
-            Assert.Equal(2, info.Benchmarks.Length);
-            Assert.All(info.Benchmarks, benchmark => Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxTargetIterationCount));
-            Assert.Single(info.Benchmarks, benchmark => benchmark.Job.Env.Runtime is ClrRuntime);
-            Assert.Single(info.Benchmarks, benchmark => benchmark.Job.Env.Runtime is CoreRuntime);
+            Assert.Equal(2, info.BenchmarksCases.Length);
+            Assert.All(info.BenchmarksCases, benchmark => Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxTargetIterationCount));
+            Assert.Single(info.BenchmarksCases, benchmark => benchmark.Job.Env.Runtime is ClrRuntime);
+            Assert.Single(info.BenchmarksCases, benchmark => benchmark.Job.Env.Runtime is CoreRuntime);
         }
 
         [MaxIterationCount(int.MaxValue)]
@@ -138,7 +138,7 @@ namespace BenchmarkDotNet.Tests.Running
         {
             var info = BenchmarkConverter.TypeToBenchmarks(typeof(WithMutator));
             
-            var benchmark = info.Benchmarks.Single();
+            var benchmark = info.BenchmarksCases.Single();
             
             Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxTargetIterationCount);
         }
@@ -148,7 +148,7 @@ namespace BenchmarkDotNet.Tests.Running
         {
             var info = BenchmarkConverter.TypeToBenchmarks(typeof(WithMutatorAfterJobAttribute));
             
-            var benchmark = info.Benchmarks.Single();
+            var benchmark = info.BenchmarksCases.Single();
             
             Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxTargetIterationCount);
             Assert.True(benchmark.Job.Env.Runtime is CoreRuntime);
@@ -166,11 +166,11 @@ namespace BenchmarkDotNet.Tests.Running
         {
             var info = BenchmarkConverter.TypeToBenchmarks(typeof(WithFewMutators));
             
-            var benchmark = info.Benchmarks.Single();
+            var benchmarkCase = info.BenchmarksCases.Single();
             
-            Assert.Equal(1, benchmark.Job.Run.InvocationCount);
-            Assert.Equal(1, benchmark.Job.Run.UnrollFactor);
-            Assert.Equal(OutlierMode.None, benchmark.Job.Accuracy.OutlierMode);
+            Assert.Equal(1, benchmarkCase.Job.Run.InvocationCount);
+            Assert.Equal(1, benchmarkCase.Job.Run.UnrollFactor);
+            Assert.Equal(OutlierMode.None, benchmarkCase.Job.Accuracy.OutlierMode);
         }
 
         [RunOncePerIteration]

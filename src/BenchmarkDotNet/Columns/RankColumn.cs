@@ -20,13 +20,13 @@ namespace BenchmarkDotNet.Columns
         public string Id => nameof(RankColumn) + "." + numeralSystem;
         public string ColumnName => "Rank";
 
-        public string GetValue(Summary summary, Benchmark benchmark)
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase)
         {
             var logicalGroup = summary
-                .GetLogicalGroupForBenchmark(benchmark)
+                .GetLogicalGroupForBenchmark(benchmarkCase)
                 .Where(b => summary[b].ResultStatistics != null)
                 .ToArray();
-            int index = Array.IndexOf(logicalGroup, benchmark);
+            int index = Array.IndexOf(logicalGroup, benchmarkCase);
             if (index == -1)
                 return "?";
             
@@ -35,13 +35,13 @@ namespace BenchmarkDotNet.Columns
             return numeralSystem.ToPresentation(rank);
         }
 
-        public bool IsDefault(Summary summary, Benchmark benchmark) => false;
+        public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Custom;
         public bool IsNumeric => true;
         public UnitType UnitType => UnitType.Dimensionless;
-        public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style) => GetValue(summary, benchmarkCase);
         public int PriorityInCategory => (int) numeralSystem;
         public override string ToString() => ColumnName;
         public string Legend => $"Relative position of current benchmark mean among all benchmarks ({numeralSystem} style)";

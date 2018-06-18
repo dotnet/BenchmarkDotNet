@@ -13,6 +13,6 @@ namespace BenchmarkDotNet.Filters
 
         public NamespacesFilter(string[] namespaces) => this.namespaces = namespaces;
 
-        public bool Predicate(Benchmark benchmark) => namespaces.Any(@namespace => benchmark.Target.Type.Namespace.ContainsWithIgnoreCase(@namespace));
+        public bool Predicate(BenchmarkCase benchmarkCase) => namespaces.Any(@namespace => benchmarkCase.Target.Type.Namespace.ContainsWithIgnoreCase(@namespace));
     }
 }

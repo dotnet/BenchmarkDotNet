@@ -47,32 +47,32 @@ namespace BenchmarkDotNet.Columns
             }
         }
 
-        public string GetValue(Summary summary, Benchmark benchmark)
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase)
         {
-            string logicalGroupKey = summary.GetLogicalGroupKey(benchmark);
-            var baseline = summary.Benchmarks
+            string logicalGroupKey = summary.GetLogicalGroupKey(benchmarkCase);
+            var baseline = summary.BenchmarksCases
                 .Where(b => summary.GetLogicalGroupKey(b) == logicalGroupKey)
                 .FirstOrDefault(b => b.IsBaseline());
             bool invalidResults = baseline == null ||
                                  summary[baseline] == null ||
                                  summary[baseline].ResultStatistics == null ||
                                  !summary[baseline].ResultStatistics.CanBeInverted() ||
-                                 summary[benchmark] == null ||
-                                 summary[benchmark].ResultStatistics == null;
+                                 summary[benchmarkCase] == null ||
+                                 summary[benchmarkCase].ResultStatistics == null;
 
             if (invalidResults)
                 return "?";
 
             var baselineStat = summary[baseline].ResultStatistics;
-            var targetStat = summary[benchmark].ResultStatistics;
+            var targetStat = summary[benchmarkCase].ResultStatistics;
 
-            double mean = benchmark.IsBaseline() ? 1 : Statistics.DivMean(targetStat, baselineStat);
-            double stdDev = benchmark.IsBaseline() ? 0 : Math.Sqrt(Statistics.DivVariance(targetStat, baselineStat));
+            double mean = benchmarkCase.IsBaseline() ? 1 : Statistics.DivMean(targetStat, baselineStat);
+            double stdDev = benchmarkCase.IsBaseline() ? 0 : Math.Sqrt(Statistics.DivVariance(targetStat, baselineStat));
 
             switch (Kind)
             {
                 case DiffKind.Mean:
-                    return IsNonBaselinesPrecise(summary, baselineStat, benchmark) ? mean.ToStr("N3") : mean.ToStr("N2");
+                    return IsNonBaselinesPrecise(summary, baselineStat, benchmarkCase) ? mean.ToStr("N3") : mean.ToStr("N2");
                 case DiffKind.StdDev:
                     return stdDev.ToStr("N2");
                 case DiffKind.WelchTTestPValue:
@@ -87,25 +87,25 @@ namespace BenchmarkDotNet.Columns
             }
         }
 
-        public bool IsNonBaselinesPrecise(Summary summary, Statistics baselineStat, Benchmark benchmark)
+        public bool IsNonBaselinesPrecise(Summary summary, Statistics baselineStat, BenchmarkCase benchmarkCase)
         {
-            string logicalGroupKey = summary.GetLogicalGroupKey(benchmark);
-            var nonBaselines = summary.Benchmarks
+            string logicalGroupKey = summary.GetLogicalGroupKey(benchmarkCase);
+            var nonBaselines = summary.BenchmarksCases
                         .Where(b => summary.GetLogicalGroupKey(b) == logicalGroupKey)
                         .Where(b => !b.IsBaseline());
 
             return nonBaselines.Any(x => Statistics.DivMean(summary[x].ResultStatistics, baselineStat) < 0.01);
         }
 
-        public bool IsAvailable(Summary summary) => summary.Benchmarks.Any(b => b.IsBaseline());
+        public bool IsAvailable(Summary summary) => summary.BenchmarksCases.Any(b => b.IsBaseline());
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Baseline;
         public int PriorityInCategory => (int) Kind;
         public bool IsNumeric => true;
         public UnitType UnitType => UnitType.Dimensionless;
-        public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style) => GetValue(summary, benchmarkCase);
         public override string ToString() => ColumnName;
-        public bool IsDefault(Summary summary, Benchmark benchmark) => false;
+        public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
 
         public string Legend
         {

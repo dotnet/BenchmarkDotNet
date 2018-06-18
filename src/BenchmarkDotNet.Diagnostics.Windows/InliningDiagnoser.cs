@@ -28,13 +28,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public override IEnumerable<string> Ids => new[] { nameof(InliningDiagnoser) };
 
-        protected override void AttachToEvents(TraceEventSession session, Benchmark benchmark)
+        protected override void AttachToEvents(TraceEventSession session, BenchmarkCase benchmarkCase)
         {
-            var expectedNamespace = benchmark.Target.Method.DeclaringType.Namespace;
+            var expectedNamespace = benchmarkCase.Target.Method.DeclaringType.Namespace;
 
             Logger.WriteLine();
             Logger.WriteLineHeader(LogSeparator);
-            Logger.WriteLineInfo($"{benchmark.DisplayInfo}");
+            Logger.WriteLineInfo($"{benchmarkCase.DisplayInfo}");
             Logger.WriteLineHeader(LogSeparator);
 
             session.Source.Clr.MethodInliningSucceeded += jitData =>

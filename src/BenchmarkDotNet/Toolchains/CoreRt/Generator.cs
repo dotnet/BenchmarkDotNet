@@ -121,13 +121,13 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
-  {GetRuntimeSettings(buildPartition.RepresentativeBenchmark.Job.Env.Gc, buildPartition.Resolver)}
+  {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Env.Gc, buildPartition.Resolver)}
   <ItemGroup>
     <Compile Include=""{Path.GetFileName(artifactsPaths.ProgramCodePath)}"" Exclude=""bin\**;obj\**;**\*.xproj;packages\**"" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{coreRtVersion}"" />
-    <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmark.Target.Type, logger).FullName}"" />
+    <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Target.Type, logger).FullName}"" />
   </ItemGroup>
 </Project>";
 
@@ -148,12 +148,12 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   </PropertyGroup>
   <Import Project=""$(MSBuildSDKsPath)\Microsoft.NET.Sdk\Sdk\Sdk.targets"" />
   <Import Project=""$(IlcPath)\build\Microsoft.NETCore.Native.targets"" />
-  {GetRuntimeSettings(buildPartition.RepresentativeBenchmark.Job.Env.Gc, buildPartition.Resolver)}
+  {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Env.Gc, buildPartition.Resolver)}
   <ItemGroup>
     <Compile Include=""{Path.GetFileName(artifactsPaths.ProgramCodePath)}"" Exclude=""bin\**;obj\**;**\*.xproj;packages\**"" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmark.Target.Type, logger).FullName}"" />
+    <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Target.Type, logger).FullName}"" />
   </ItemGroup>
 </Project>";
 

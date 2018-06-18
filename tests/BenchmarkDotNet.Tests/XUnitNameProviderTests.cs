@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Tests
     {
         private void AssertBenchmarkName<T>(string expectedBenchmarkName)
         {
-            var benchmark = BenchmarkConverter.TypeToBenchmarks(typeof(T)).Benchmarks.Single();
+            var benchmark = BenchmarkConverter.TypeToBenchmarks(typeof(T)).BenchmarksCases.Single();
 
             Assert.Equal(expectedBenchmarkName, XUnitNameProvider.GetBenchmarkName(benchmark));
         }

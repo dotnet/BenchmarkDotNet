@@ -87,16 +87,16 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <summary>The instance of validator that DOES fail on error.</summary>
         public static readonly IValidator FailOnError = new InProcessValidator(true);
 
-        public static bool IsSupported(Benchmark benchmark, ILogger logger)
+        public static bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger)
         {
             var result = new List<ValidationError>();
-            result.AddRange(ValidateJob(benchmark.Job, true));
-            if (benchmark.HasArguments)
+            result.AddRange(ValidateJob(benchmarkCase.Job, true));
+            if (benchmarkCase.HasArguments)
                 result.Add(new ValidationError(true, "Arguments are not supported by the InProcessToolchain yet, see #687 for more details"));
 
             if (result.Any())
             {
-                logger.WriteLineInfo($"// Benchmark {benchmark.DisplayInfo}");
+                logger.WriteLineInfo($"// Benchmark {benchmarkCase.DisplayInfo}");
                 logger.WriteLineInfo("// cannot be run in-process. Validation errors:");
                 foreach (var validationError in result)
                 {

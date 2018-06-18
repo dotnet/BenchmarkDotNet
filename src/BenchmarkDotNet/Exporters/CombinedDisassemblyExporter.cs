@@ -10,9 +10,9 @@ namespace BenchmarkDotNet.Exporters
 {
     public class CombinedDisassemblyExporter : ExporterBase
     {
-        private readonly IReadOnlyDictionary<Benchmark, DisassemblyResult> results;
+        private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
 
-        public CombinedDisassemblyExporter(IReadOnlyDictionary<Benchmark, DisassemblyResult> results)
+        public CombinedDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results)
         {
             this.results = results;
         }
@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Exporters
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
-            var benchmarksByTarget = summary.Benchmarks
+            var benchmarksByTarget = summary.BenchmarksCases
                 .Where(benchmark => results.ContainsKey(benchmark))
                 .GroupBy(benchmark => benchmark.Target.Method);
 
@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Exporters
             else // different methods, same JIT
             {
                 PrintTable(
-                    summary.Benchmarks.Where(benchmark => results.ContainsKey(benchmark)).ToArray(), 
+                    summary.BenchmarksCases.Where(benchmark => results.ContainsKey(benchmark)).ToArray(), 
                     logger, 
                     summary.Title, 
                     benchmark => $"{benchmark.Target.Method.Name} {GetImportantInfo(summary[benchmark])}");
@@ -60,13 +60,13 @@ namespace BenchmarkDotNet.Exporters
             logger.WriteLine("</html>");
         }
 
-        private void PrintTable(Benchmark[] benchmarks, ILogger logger, string title, Func<Benchmark, string> headerTitleProvider)
+        private void PrintTable(BenchmarkCase[] benchmarksCase, ILogger logger, string title, Func<BenchmarkCase, string> headerTitleProvider)
         {
             logger.WriteLine("<table>");
             logger.WriteLine("<thead>");
-            logger.WriteLine($"<tr><th colspan=\"{benchmarks.Length}\">{title}</th></tr>");
+            logger.WriteLine($"<tr><th colspan=\"{benchmarksCase.Length}\">{title}</th></tr>");
             logger.WriteLine("<tr>");
-            foreach (var benchmark in benchmarks)
+            foreach (var benchmark in benchmarksCase)
             {
                 logger.WriteLine($"<th>{headerTitleProvider(benchmark)}</th>");
             }
@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Exporters
             
             logger.WriteLine("<tbody>");
             logger.WriteLine("<tr>");
-            foreach (var benchmark in benchmarks)
+            foreach (var benchmark in benchmarksCase)
             {
                 logger.WriteLine("<td style=\"vertical-align:top;\"><pre><code>");
                 foreach (var method in results[benchmark].Methods.Where(method => string.IsNullOrEmpty(method.Problem)))

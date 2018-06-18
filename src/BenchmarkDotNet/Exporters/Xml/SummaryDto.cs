@@ -68,12 +68,12 @@ namespace BenchmarkDotNet.Exporters.Xml
 
     internal class BenchmarkReportDto
     {
-        public string DisplayInfo => report.Benchmark.DisplayInfo;
-        public string Namespace => report.Benchmark.Target.Type.Namespace;
-        public string Type => report.Benchmark.Target.Type.Name;
-        public string Method => report.Benchmark.Target.Method.Name;
-        public string MethodTitle => report.Benchmark.Target.MethodDisplayInfo;
-        public string Parameters => report.Benchmark.Parameters.PrintInfo;
+        public string DisplayInfo => report.BenchmarkCase.DisplayInfo;
+        public string Namespace => report.BenchmarkCase.Target.Type.Namespace;
+        public string Type => report.BenchmarkCase.Target.Type.Name;
+        public string Method => report.BenchmarkCase.Target.Method.Name;
+        public string MethodTitle => report.BenchmarkCase.Target.MethodDisplayInfo;
+        public string Parameters => report.BenchmarkCase.Parameters.PrintInfo;
         public Statistics Statistics => report.ResultStatistics;
         public GcStats Memory => report.GcStats;
         public IEnumerable<Measurement> Measurements { get; }

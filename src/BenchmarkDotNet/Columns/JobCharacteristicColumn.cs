@@ -34,15 +34,15 @@ namespace BenchmarkDotNet.Columns
         public int PriorityInCategory => 0;
         public bool IsNumeric => false;
         public UnitType UnitType => UnitType.Dimensionless;
-        public string GetValue(Summary summary, Benchmark benchmark, ISummaryStyle style) => GetValue(summary, benchmark);
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style) => GetValue(summary, benchmarkCase);
 
-        public bool IsDefault(Summary summary, Benchmark benchmark) => !benchmark.Job.HasValue(characteristic);
+        public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => !benchmarkCase.Job.HasValue(characteristic);
 
-        public string GetValue(Summary summary, Benchmark benchmark)
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase)
         {
-            if (!benchmark.Job.HasValue(characteristic) && EnvResolver.Instance.CanResolve(characteristic))
-                return benchmark.Job.ResolveValue(characteristic, EnvResolver.Instance).ToString();
-            return Presenter.ToPresentation(benchmark.Job, characteristic);
+            if (!benchmarkCase.Job.HasValue(characteristic) && EnvResolver.Instance.CanResolve(characteristic))
+                return benchmarkCase.Job.ResolveValue(characteristic, EnvResolver.Instance).ToString();
+            return Presenter.ToPresentation(benchmarkCase.Job, characteristic);
         }
 
         private static readonly Lazy<IColumn[]> LazyAllColumns =

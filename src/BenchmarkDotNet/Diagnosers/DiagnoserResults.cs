@@ -5,14 +5,14 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class DiagnoserResults
     {
-        public DiagnoserResults(Benchmark benchmark, long totalOperations, GcStats gcStats)
+        public DiagnoserResults(BenchmarkCase benchmarkCase, long totalOperations, GcStats gcStats)
         {
-            Benchmark = benchmark;
+            BenchmarkCase = benchmarkCase;
             TotalOperations = totalOperations;
             GcStats = gcStats;
         }
 
-        public Benchmark Benchmark { get; }
+        public BenchmarkCase BenchmarkCase { get; }
 
         public long TotalOperations { get; }
 

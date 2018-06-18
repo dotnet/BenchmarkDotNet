@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         IColumnProvider GetColumnProvider();
 
-        RunMode GetRunMode(Benchmark benchmark);
+        RunMode GetRunMode(BenchmarkCase benchmarkCase);
 
         void Handle(HostSignal signal, DiagnoserActionParameters parameters);
 

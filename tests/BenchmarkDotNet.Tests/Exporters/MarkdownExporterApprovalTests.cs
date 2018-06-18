@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             exporter.ExportToLog(summary, logger);
             
             var validator = BaselineValidator.FailOnError;
-            var errors = validator.Validate(new ValidationParameters(summary.Benchmarks, summary.Config)).ToList();
+            var errors = validator.Validate(new ValidationParameters(summary.BenchmarksCases, summary.Config)).ToList();
             logger.WriteLine();
             logger.WriteLine("Errors: " + errors.Count);
             foreach (var error in errors) 

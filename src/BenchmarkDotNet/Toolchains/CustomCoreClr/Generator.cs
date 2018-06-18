@@ -116,19 +116,19 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <DebugSymbols>true</DebugSymbols>
     <PackageConflictPreferredPackages>runtime.{runtimeIdentifier}.Microsoft.NETCore.Runtime.CoreCLR;runtime.{runtimeIdentifier}.Microsoft.NETCore.Jit;runtime.{runtimeIdentifier}.Microsoft.Private.CoreFx.NETCoreApp;Microsoft.Private.CoreFx.NETCoreApp;Microsoft.NETCore.App;$(PackageConflictPreferredPackages)</PackageConflictPreferredPackages>
   </PropertyGroup>
-  {GetRuntimeSettings(buildPartition.RepresentativeBenchmark.Job.Env.Gc, buildPartition.Resolver)}
+  {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Env.Gc, buildPartition.Resolver)}
   <ItemGroup>
     <Compile Include=""{Path.GetFileName(artifactsPaths.ProgramCodePath)}"" Exclude=""bin\**;obj\**;**\*.xproj;packages\**"" />
   </ItemGroup>
   <ItemGroup>
-    {string.Join(Environment.NewLine, GetReferences(buildPartition.RepresentativeBenchmark, logger))}
+    {string.Join(Environment.NewLine, GetReferences(buildPartition.RepresentativeBenchmarkCase, logger))}
   </ItemGroup>
 </Project>";
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, csProj);
         }
 
-        private IEnumerable<string> GetReferences(Benchmark benchmark, ILogger logger)
+        private IEnumerable<string> GetReferences(BenchmarkCase benchmarkCase, ILogger logger)
         {
             if (IsUsingCustomCoreClr)
             {
@@ -141,7 +141,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 yield return $@"<PackageReference Include=""runtime.{runtimeIdentifier}.Microsoft.Private.CoreFx.NETCoreApp"" Version=""{coreFxVersion}"" />";
             }
 
-            yield return $@"<ProjectReference Include=""{GetProjectFilePath(benchmark.Target.Type, logger).FullName}"" />";
+            yield return $@"<ProjectReference Include=""{GetProjectFilePath(benchmarkCase.Target.Type, logger).FullName}"" />";
         }
     }
 }

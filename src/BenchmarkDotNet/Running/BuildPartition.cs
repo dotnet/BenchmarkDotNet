@@ -12,9 +12,9 @@ namespace BenchmarkDotNet.Running
         public BuildPartition(BenchmarkBuildInfo[] benchmarks, IResolver resolver)
         {
             Resolver = resolver;
-            RepresentativeBenchmark = benchmarks[0].Benchmark;
+            RepresentativeBenchmarkCase = benchmarks[0].BenchmarkCase;
             Benchmarks = benchmarks;
-            ProgramName = benchmarks[0].Config.KeepBenchmarkFiles ? RepresentativeBenchmark.Job.FolderInfo : Guid.NewGuid().ToString();
+            ProgramName = benchmarks[0].Config.KeepBenchmarkFiles ? RepresentativeBenchmarkCase.Job.FolderInfo : Guid.NewGuid().ToString();
         }
 
         public BenchmarkBuildInfo[] Benchmarks { get; }
@@ -25,25 +25,25 @@ namespace BenchmarkDotNet.Running
         /// the benchmarks are groupped by the build settings
         /// so you can use this benchmark to get the runtime settings
         /// </summary>
-        public Benchmark RepresentativeBenchmark { get; }
+        public BenchmarkCase RepresentativeBenchmarkCase { get; }
 
         public IResolver Resolver { get; }
 
-        public string AssemblyLocation => RepresentativeBenchmark.Target.Type.Assembly.Location;
+        public string AssemblyLocation => RepresentativeBenchmarkCase.Target.Type.Assembly.Location;
 
-        public string BuildConfiguration => RepresentativeBenchmark.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, Resolver);
+        public string BuildConfiguration => RepresentativeBenchmarkCase.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, Resolver);
 
-        public Platform Platform => RepresentativeBenchmark.Job.ResolveValue(EnvMode.PlatformCharacteristic, Resolver);
+        public Platform Platform => RepresentativeBenchmarkCase.Job.ResolveValue(EnvMode.PlatformCharacteristic, Resolver);
 
-        public Jit Jit => RepresentativeBenchmark.Job.ResolveValue(EnvMode.JitCharacteristic, Resolver);
+        public Jit Jit => RepresentativeBenchmarkCase.Job.ResolveValue(EnvMode.JitCharacteristic, Resolver);
 
         public bool IsCoreRT => Runtime is CoreRtRuntime
-            || (RepresentativeBenchmark.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic) && RepresentativeBenchmark.Job.Infrastructure.Toolchain is CoreRtToolchain); // given job can have CoreRT toolchain set, but Runtime == default ;)
+            || (RepresentativeBenchmarkCase.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic) && RepresentativeBenchmarkCase.Job.Infrastructure.Toolchain is CoreRtToolchain); // given job can have CoreRT toolchain set, but Runtime == default ;)
 
-        private Runtime Runtime => RepresentativeBenchmark.Job.Env.HasValue(EnvMode.RuntimeCharacteristic)
-                ? RepresentativeBenchmark.Job.Env.Runtime
+        private Runtime Runtime => RepresentativeBenchmarkCase.Job.Env.HasValue(EnvMode.RuntimeCharacteristic)
+                ? RepresentativeBenchmarkCase.Job.Env.Runtime
                 : RuntimeInformation.GetCurrentRuntime();
 
-        public override string ToString() => RepresentativeBenchmark.Job.DisplayInfo;
+        public override string ToString() => RepresentativeBenchmarkCase.Job.DisplayInfo;
     }
 }

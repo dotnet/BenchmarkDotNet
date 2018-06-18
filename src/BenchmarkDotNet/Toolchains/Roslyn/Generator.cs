@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             list.Add("/unsafe");
             list.Add("/platform:" + buildPartition.Platform.ToConfig());
             list.Add("/appconfig:" + artifactsPaths.AppConfigPath.Escape());
-            var references = GetAllReferences(buildPartition.RepresentativeBenchmark).Select(assembly => StringAndTextExtensions.Escape(assembly.Location));
+            var references = GetAllReferences(buildPartition.RepresentativeBenchmarkCase).Select(assembly => StringAndTextExtensions.Escape(assembly.Location));
             list.Add("/reference:" + string.Join(",", references));
             list.Add(Path.GetFileName(artifactsPaths.ProgramCodePath));
 
@@ -47,15 +47,15 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 prefix + string.Join(" ", list));
         }
 
-        internal static IEnumerable<Assembly> GetAllReferences(Benchmark benchmark) 
-            => benchmark.Target.Type.GetTypeInfo().Assembly
+        internal static IEnumerable<Assembly> GetAllReferences(BenchmarkCase benchmarkCase) 
+            => benchmarkCase.Target.Type.GetTypeInfo().Assembly
                 .GetReferencedAssemblies()
                 .Select(Assembly.Load)
                 .Concat(
                     new[]
                     {
-                        benchmark.Target.Type.GetTypeInfo().Assembly, // this assembly does not has to have a reference to BenchmarkDotNet (e.g. custom framework for benchmarking that internally uses BenchmarkDotNet
-                        typeof(Benchmark).Assembly, // BenchmarkDotNet
+                        benchmarkCase.Target.Type.GetTypeInfo().Assembly, // this assembly does not has to have a reference to BenchmarkDotNet (e.g. custom framework for benchmarking that internally uses BenchmarkDotNet
+                        typeof(BenchmarkCase).Assembly, // BenchmarkDotNet
                     })
                 .Distinct();
     }

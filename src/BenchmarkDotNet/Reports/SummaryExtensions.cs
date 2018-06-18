@@ -18,10 +18,10 @@ namespace BenchmarkDotNet.Reports
                 ThenBy(column => column.PriorityInCategory).
                 ToArray();
 
-        public static IEnumerable<Benchmark> GetLogicalGroupForBenchmark(this Summary summary, Benchmark benchmark)
+        public static IEnumerable<BenchmarkCase> GetLogicalGroupForBenchmark(this Summary summary, BenchmarkCase benchmarkCase)
         {
-            string logicalGroupKey = summary.GetLogicalGroupKey(benchmark);
-            return summary.Benchmarks.Where(b => summary.GetLogicalGroupKey(b) == logicalGroupKey);
+            string logicalGroupKey = summary.GetLogicalGroupKey(benchmarkCase);
+            return summary.BenchmarksCases.Where(b => summary.GetLogicalGroupKey(b) == logicalGroupKey);
         }
     }
 }

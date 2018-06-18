@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         protected virtual string GetExtraArguments(BuildPartition buildPartition)
-            => DotNetCliGenerator.GetCustomArguments(buildPartition.RepresentativeBenchmark, buildPartition.Resolver);
+            => DotNetCliGenerator.GetCustomArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver);
 
         protected virtual IReadOnlyList<EnvironmentVariable> GetEnvironmentVariables()
             => Array.Empty<EnvironmentVariable>();

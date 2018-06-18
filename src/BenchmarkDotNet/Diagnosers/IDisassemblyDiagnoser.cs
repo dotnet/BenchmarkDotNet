@@ -5,6 +5,6 @@ namespace BenchmarkDotNet.Diagnosers
 {
     internal interface IDisassemblyDiagnoser : IConfigurableDiagnoser<DisassemblyDiagnoserConfig>
     {
-        IReadOnlyDictionary<Benchmark, DisassemblyResult> Results { get; }
+        IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> Results { get; }
     }
 }
