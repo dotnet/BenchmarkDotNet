@@ -12,78 +12,78 @@ namespace BenchmarkDotNet.Jobs
 {
     public static class JobExtensions
     {
-        public static Job With(this Job job, Platform platform) => job.WithCore(j => j.Env.Platform = platform);
+        public static Job With(this Job job, Platform platform) => job.WithCore(j => j.Environment.Platform = platform);
         public static Job WithId(this Job job, string id) => new Job(id, job);
 
     // Env
-        public static Job With(this Job job, Jit jit) => job.WithCore(j => j.Env.Jit = jit);
-        public static Job With(this Job job, Runtime runtime) => job.WithCore(j => j.Env.Runtime = runtime);
+        public static Job With(this Job job, Jit jit) => job.WithCore(j => j.Environment.Jit = jit);
+        public static Job With(this Job job, Runtime runtime) => job.WithCore(j => j.Environment.Runtime = runtime);
         
         /// <summary>
         /// ProcessorAffinity for the benchmark process.
         /// See also: https://msdn.microsoft.com/library/system.diagnostics.process.processoraffinity.aspx
         /// </summary>
-        public static Job WithAffinity(this Job job, IntPtr affinity) => job.WithCore(j => j.Env.Affinity = affinity);
+        public static Job WithAffinity(this Job job, IntPtr affinity) => job.WithCore(j => j.Environment.Affinity = affinity);
         
         /// <summary>
         /// Specifies whether the common language runtime runs server garbage collection.
         /// <value>false: Does not run server garbage collection. This is the default.</value>
         /// <value>true: Runs server garbage collection.</value>
         /// </summary>
-        public static Job WithGcServer(this Job job, bool value) => job.WithCore(j => j.Env.Gc.Server = value);
+        public static Job WithGcServer(this Job job, bool value) => job.WithCore(j => j.Environment.Gc.Server = value);
         
         /// <summary>
         /// Specifies whether the common language runtime runs garbage collection on a separate thread.
         /// <value>false: Does not run garbage collection concurrently.</value>
         /// <value>true: Runs garbage collection concurrently. This is the default.</value>
         /// </summary>
-        public static Job WithGcConcurrent(this Job job, bool value) => job.WithCore(j => j.Env.Gc.Concurrent = value);
+        public static Job WithGcConcurrent(this Job job, bool value) => job.WithCore(j => j.Environment.Gc.Concurrent = value);
         
         /// <summary>
         /// Specifies whether garbage collection supports multiple CPU groups.
         /// <value>false: Garbage collection does not support multiple CPU groups. This is the default.</value>
         /// <value>true: Garbage collection supports multiple CPU groups, if server garbage collection is enabled.</value>
         /// </summary>
-        public static Job WithGcCpuGroups(this Job job, bool value) => job.WithCore(j => j.Env.Gc.CpuGroups = value);
+        public static Job WithGcCpuGroups(this Job job, bool value) => job.WithCore(j => j.Environment.Gc.CpuGroups = value);
         
         /// <summary>
         /// Specifies whether the BenchmarkDotNet's benchmark runner forces full garbage collection after each benchmark invocation
         /// <value>false: Does not force garbage collection.</value>
         /// <value>true: Forces full garbage collection after each benchmark invocation. This is the default.</value>
         /// </summary>
-        public static Job WithGcForce(this Job job, bool value) => job.WithCore(j => j.Env.Gc.Force = value);
+        public static Job WithGcForce(this Job job, bool value) => job.WithCore(j => j.Environment.Gc.Force = value);
         
         /// <summary>
         /// On 64-bit platforms, enables arrays that are greater than 2 gigabytes (GB) in total size.
         /// <value>false: Arrays greater than 2 GB in total size are not enabled. This is the default.</value>
         /// <value>true: Arrays greater than 2 GB in total size are enabled on 64-bit platforms.</value>
         /// </summary>
-        public static Job WithGcAllowVeryLargeObjects(this Job job, bool value) => job.WithCore(j => j.Env.Gc.AllowVeryLargeObjects = value);
+        public static Job WithGcAllowVeryLargeObjects(this Job job, bool value) => job.WithCore(j => j.Environment.Gc.AllowVeryLargeObjects = value);
         
         /// <summary>
         /// Put segments that should be deleted on a standby list for future use instead of releasing them back to the OS
         /// <remarks>The default is false</remarks>
         /// </summary>
-        public static Job WithGcRetainVm(this Job job, bool value) => job.WithCore(j => j.Env.Gc.RetainVm = value);
+        public static Job WithGcRetainVm(this Job job, bool value) => job.WithCore(j => j.Environment.Gc.RetainVm = value);
 
         /// <summary>
         ///  specify the # of Server GC threads/heaps, must be smaller than the # of logical CPUs the process is allowed to run on, 
         ///  ie, if you don't specifically affinitize your process it means the # of total logical CPUs on the machine; 
         ///  otherwise this is the # of logical CPUs you affinitized your process to.
         /// </summary>
-        public static Job WithHeapCount(this Job job, int heapCount) => job.WithCore(j => j.Env.Gc.HeapCount = heapCount);
+        public static Job WithHeapCount(this Job job, int heapCount) => job.WithCore(j => j.Environment.Gc.HeapCount = heapCount);
 
         /// <summary>
         /// specify true to disable hard affinity of Server GC threads to CPUs
         /// </summary>
-        public static Job WithNoAffinitize(this Job job, bool value) => job.WithCore(j => j.Env.Gc.NoAffinitize = value);
+        public static Job WithNoAffinitize(this Job job, bool value) => job.WithCore(j => j.Environment.Gc.NoAffinitize = value);
 
         /// <summary>
         /// process mask, see <see href="https://support.microsoft.com/en-us/help/4014604/may-2017-description-of-the-quality-rollup-for-the-net-framework-4-6-4">MSDN</see> for more.
         /// </summary>
-        public static Job WithHeapAffinitizeMask(this Job job, int heapAffinitizeMask) => job.WithCore(j => j.Env.Gc.HeapAffinitizeMask = heapAffinitizeMask);
+        public static Job WithHeapAffinitizeMask(this Job job, int heapAffinitizeMask) => job.WithCore(j => j.Environment.Gc.HeapAffinitizeMask = heapAffinitizeMask);
         
-        public static Job With(this Job job, GcMode gc) => job.WithCore(j => EnvMode.GcCharacteristic[j] = gc);
+        public static Job With(this Job job, GcMode gc) => job.WithCore(j => EnvironmentMode.GcCharacteristic[j] = gc);
 
     // Run
         /// <summary>

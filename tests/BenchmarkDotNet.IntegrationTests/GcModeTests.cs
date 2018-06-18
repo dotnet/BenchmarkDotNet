@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = ManualConfig.CreateEmpty().With(
                 new Job(Job.Dry)
                 {
-                    Env =
+                    Environment =
                     {
                         Platform = Platform.X64,
                         Gc =

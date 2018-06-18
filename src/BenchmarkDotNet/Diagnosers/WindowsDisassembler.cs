@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Diagnosers
             var resultsPath = Path.GetTempFileName();
 
             var errors = ProcessHelper.RunAndReadOutput(
-                GetDisassemblerPath(parameters.Process, parameters.BenchmarkCase.Job.Env.Platform),
+                GetDisassemblerPath(parameters.Process, parameters.BenchmarkCase.Job.Environment.Platform),
                 BuildArguments(parameters, resultsPath));
 
             if (!string.IsNullOrEmpty(errors))

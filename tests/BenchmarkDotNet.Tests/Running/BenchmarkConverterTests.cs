@@ -123,8 +123,8 @@ namespace BenchmarkDotNet.Tests.Running
             
             Assert.Equal(2, info.BenchmarksCases.Length);
             Assert.All(info.BenchmarksCases, benchmark => Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxTargetIterationCount));
-            Assert.Single(info.BenchmarksCases, benchmark => benchmark.Job.Env.Runtime is ClrRuntime);
-            Assert.Single(info.BenchmarksCases, benchmark => benchmark.Job.Env.Runtime is CoreRuntime);
+            Assert.Single(info.BenchmarksCases, benchmark => benchmark.Job.Environment.Runtime is ClrRuntime);
+            Assert.Single(info.BenchmarksCases, benchmark => benchmark.Job.Environment.Runtime is CoreRuntime);
         }
 
         [MaxIterationCount(int.MaxValue)]
@@ -151,7 +151,7 @@ namespace BenchmarkDotNet.Tests.Running
             var benchmark = info.BenchmarksCases.Single();
             
             Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxTargetIterationCount);
-            Assert.True(benchmark.Job.Env.Runtime is CoreRuntime);
+            Assert.True(benchmark.Job.Environment.Runtime is CoreRuntime);
         }
 
         [MaxIterationCount(int.MaxValue)] // mutator attribute is before job attribute

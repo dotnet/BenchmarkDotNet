@@ -5,22 +5,22 @@ namespace BenchmarkDotNet.Jobs
 {
     public sealed class Job : JobMode<Job>
     {
-        public static readonly Characteristic<EnvMode> EnvCharacteristic = CreateCharacteristic<EnvMode>(nameof(Env));
+        public static readonly Characteristic<EnvironmentMode> EnvironmentCharacteristic = CreateCharacteristic<EnvironmentMode>(nameof(Environment));
         public static readonly Characteristic<RunMode> RunCharacteristic = CreateCharacteristic<RunMode>(nameof(Run));
         public static readonly Characteristic<InfrastructureMode> InfrastructureCharacteristic = CreateCharacteristic<InfrastructureMode>(nameof(Infrastructure));
         public static readonly Characteristic<AccuracyMode> AccuracyCharacteristic = CreateCharacteristic<AccuracyMode>(nameof(Accuracy));
         public static readonly Characteristic<MetaMode> MetaCharacteristic = CreateCharacteristic<MetaMode>(nameof(Meta));
 
         // Env
-        public static readonly Job Clr = new Job(nameof(Clr), EnvMode.Clr).Freeze();
-        public static readonly Job Core = new Job(nameof(Core), EnvMode.Core).Freeze();
-        public static readonly Job Mono = new Job(nameof(Mono), EnvMode.Mono).Freeze();
-        public static readonly Job CoreRT = new Job(nameof(CoreRT), EnvMode.CoreRT).Freeze();
+        public static readonly Job Clr = new Job(nameof(Clr), EnvironmentMode.Clr).Freeze();
+        public static readonly Job Core = new Job(nameof(Core), EnvironmentMode.Core).Freeze();
+        public static readonly Job Mono = new Job(nameof(Mono), EnvironmentMode.Mono).Freeze();
+        public static readonly Job CoreRT = new Job(nameof(CoreRT), EnvironmentMode.CoreRT).Freeze();
 
-        public static readonly Job LegacyJitX86 = new Job(nameof(LegacyJitX86), EnvMode.LegacyJitX86).Freeze();
-        public static readonly Job LegacyJitX64 = new Job(nameof(LegacyJitX64), EnvMode.LegacyJitX64).Freeze();
-        public static readonly Job RyuJitX64 = new Job(nameof(RyuJitX64), EnvMode.RyuJitX64).Freeze();
-        public static readonly Job RyuJitX86 = new Job(nameof(RyuJitX86), EnvMode.RyuJitX86).Freeze();
+        public static readonly Job LegacyJitX86 = new Job(nameof(LegacyJitX86), EnvironmentMode.LegacyJitX86).Freeze();
+        public static readonly Job LegacyJitX64 = new Job(nameof(LegacyJitX64), EnvironmentMode.LegacyJitX64).Freeze();
+        public static readonly Job RyuJitX64 = new Job(nameof(RyuJitX64), EnvironmentMode.RyuJitX64).Freeze();
+        public static readonly Job RyuJitX86 = new Job(nameof(RyuJitX86), EnvironmentMode.RyuJitX86).Freeze();
 
         // Run
         public static readonly Job Dry = new Job(nameof(Dry), RunMode.Dry).Freeze();
@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Jobs
 
         public Job(string id) : base(id)
         {
-            EnvCharacteristic[this] = new EnvMode();
+            EnvironmentCharacteristic[this] = new EnvironmentMode();
             RunCharacteristic[this] = new RunMode();
             InfrastructureCharacteristic[this] = new InfrastructureMode();
             AccuracyCharacteristic[this] = new AccuracyMode();
@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Jobs
             Apply(others);
         }
 
-        public EnvMode Env => EnvCharacteristic[this];
+        public EnvironmentMode Environment => EnvironmentCharacteristic[this];
         public RunMode Run => RunCharacteristic[this];
         public InfrastructureMode Infrastructure => InfrastructureCharacteristic[this];
         public AccuracyMode Accuracy => AccuracyCharacteristic[this];

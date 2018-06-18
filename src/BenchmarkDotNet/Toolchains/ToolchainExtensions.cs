@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Toolchains
         internal static IToolchain GetToolchain(this Job job)
             => job.HasValue(InfrastructureMode.ToolchainCharacteristic)
                 ? job.Infrastructure.Toolchain
-                : GetToolchain(job.ResolveValue(EnvMode.RuntimeCharacteristic, EnvResolver.Instance));
+                : GetToolchain(job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvResolver.Instance));
 
         internal static IToolchain GetToolchain(this Runtime runtime)
         {

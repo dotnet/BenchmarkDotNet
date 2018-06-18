@@ -31,11 +31,11 @@ namespace BenchmarkDotNet.Toolchains
             var configurationElement = GetOrCreateConfigurationElement(xmlDocument, xmlReader);
             var runtimeElement = GetOrCreateRuntimeElement(xmlDocument, configurationElement);
 
-            ClearStartupSettingsForCustomClr(configurationElement, job.Env.Runtime);
+            ClearStartupSettingsForCustomClr(configurationElement, job.Environment.Runtime);
             ClearAllRuntimeSettingsThatCanBeSetOnlyByJobConfiguration(runtimeElement);
 
-            GenerateJitSettings(xmlDocument, runtimeElement, job.Env);
-            GenerateGCSettings(xmlDocument, runtimeElement, job.Env.Gc, resolver);
+            GenerateJitSettings(xmlDocument, runtimeElement, job.Environment);
+            GenerateGCSettings(xmlDocument, runtimeElement, job.Environment.Gc, resolver);
 
             xmlDocument.Save(destination);
         }
@@ -85,11 +85,11 @@ namespace BenchmarkDotNet.Toolchains
             }
         }
 
-        private static void GenerateJitSettings(XmlDocument xmlDocument, XmlNode runtimeElement, EnvMode envMode)
+        private static void GenerateJitSettings(XmlDocument xmlDocument, XmlNode runtimeElement, EnvironmentMode environmentMode)
         {
-            if (envMode.HasValue(EnvMode.JitCharacteristic))
+            if (environmentMode.HasValue(EnvironmentMode.JitCharacteristic))
             {
-                string useLegacyJit = envMode.Jit.ToConfig();
+                string useLegacyJit = environmentMode.Jit.ToConfig();
                 CreateNodeWithAttribute(xmlDocument, runtimeElement, "useLegacyJit", "enabled", useLegacyJit);
             }
         }

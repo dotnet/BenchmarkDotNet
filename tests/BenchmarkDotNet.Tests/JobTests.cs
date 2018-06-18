@@ -20,16 +20,16 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var j = new Job("CustomId");
             Assert.False(j.Frozen);
-            Assert.False(j.Env.Frozen);
+            Assert.False(j.Environment.Frozen);
             Assert.False(j.Run.Frozen);
-            Assert.False(j.Env.Gc.AllowVeryLargeObjects);
-            Assert.Equal(Platform.AnyCpu, j.Env.Platform);
+            Assert.False(j.Environment.Gc.AllowVeryLargeObjects);
+            Assert.Equal(Platform.AnyCpu, j.Environment.Platform);
             Assert.Equal(RunStrategy.Throughput, j.Run.RunStrategy); // set by default
             Assert.Equal("CustomId", j.Id);
             Assert.Equal("CustomId", j.DisplayInfo);
             Assert.Equal("CustomId", j.ResolvedId);
             Assert.Equal(j.ResolvedId, j.FolderInfo);
-            Assert.Equal("CustomId", j.Env.Id);
+            Assert.Equal("CustomId", j.Environment.Id);
 
             // freeze
             var old = j;
@@ -38,46 +38,46 @@ namespace BenchmarkDotNet.IntegrationTests
             j = j.Freeze();
             Assert.Same(old, j);
             Assert.True(j.Frozen);
-            Assert.True(j.Env.Frozen);
+            Assert.True(j.Environment.Frozen);
             Assert.True(j.Run.Frozen);
-            Assert.False(j.Env.Gc.AllowVeryLargeObjects);
-            Assert.Equal(Platform.AnyCpu, j.Env.Platform);
+            Assert.False(j.Environment.Gc.AllowVeryLargeObjects);
+            Assert.Equal(Platform.AnyCpu, j.Environment.Platform);
             Assert.Equal(RunStrategy.Throughput, j.Run.RunStrategy); // set by default
             Assert.Equal("CustomId", j.Id);
             Assert.Equal("CustomId", j.DisplayInfo);
             Assert.Equal("CustomId", j.ResolvedId);
             Assert.Equal(j.ResolvedId, j.FolderInfo);
-            Assert.Equal("CustomId", j.Env.Id);
+            Assert.Equal("CustomId", j.Environment.Id);
 
             // unfreeze
             old = j;
             j = j.UnfreezeCopy();
             Assert.NotSame(old, j);
             Assert.False(j.Frozen);
-            Assert.False(j.Env.Frozen);
+            Assert.False(j.Environment.Frozen);
             Assert.False(j.Run.Frozen);
-            Assert.False(j.Env.Gc.AllowVeryLargeObjects);
-            Assert.Equal(Platform.AnyCpu, j.Env.Platform);
+            Assert.False(j.Environment.Gc.AllowVeryLargeObjects);
+            Assert.Equal(Platform.AnyCpu, j.Environment.Platform);
             Assert.Equal(RunStrategy.Throughput, j.Run.RunStrategy); // set by default
             Assert.Equal("Default", j.Id); // id reset
             Assert.True(j.DisplayInfo == "DefaultJob", "DisplayInfo = " + j.DisplayInfo);
             Assert.True(j.ResolvedId == "DefaultJob", "ResolvedId = " + j.ResolvedId);
             Assert.Equal(j.ResolvedId, j.FolderInfo);
-            Assert.Equal("Default", j.Env.Id);
+            Assert.Equal("Default", j.Environment.Id);
 
             // new job
             j = new Job(j.Freeze());
             Assert.False(j.Frozen);
-            Assert.False(j.Env.Frozen);
+            Assert.False(j.Environment.Frozen);
             Assert.False(j.Run.Frozen);
-            Assert.False(j.Env.Gc.AllowVeryLargeObjects);
-            Assert.Equal(Platform.AnyCpu, j.Env.Platform);
+            Assert.False(j.Environment.Gc.AllowVeryLargeObjects);
+            Assert.Equal(Platform.AnyCpu, j.Environment.Platform);
             Assert.Equal(RunStrategy.Throughput, j.Run.RunStrategy); // set by default
             Assert.Equal("Default", j.Id); // id reset
             Assert.True(j.DisplayInfo == "DefaultJob", "DisplayInfo = " + j.DisplayInfo);
             Assert.True(j.ResolvedId == "DefaultJob", "ResolvedId = " + j.ResolvedId);
             Assert.Equal(j.ResolvedId, j.FolderInfo);
-            Assert.Equal("Default", j.Env.Id);
+            Assert.Equal("Default", j.Environment.Id);
         }
 
         [Fact]
@@ -86,90 +86,90 @@ namespace BenchmarkDotNet.IntegrationTests
             var j = new Job("SomeId");
 
             Assert.Equal("SomeId", j.Id);
-            Assert.Equal(Platform.AnyCpu, j.Env.Platform);
+            Assert.Equal(Platform.AnyCpu, j.Environment.Platform);
             Assert.Equal(0, j.Run.LaunchCount);
 
-            Assert.False(j.HasValue(EnvMode.PlatformCharacteristic));
-            Assert.False(j.Env.HasValue(EnvMode.PlatformCharacteristic));
+            Assert.False(j.HasValue(EnvironmentMode.PlatformCharacteristic));
+            Assert.False(j.Environment.HasValue(EnvironmentMode.PlatformCharacteristic));
             Assert.False(j.HasValue(RunMode.LaunchCountCharacteristic));
             Assert.False(j.Run.HasValue(RunMode.LaunchCountCharacteristic));
 
             AssertProperties(j, "Default");
-            AssertProperties(j.Env, "Default");
+            AssertProperties(j.Environment, "Default");
 
             // 1. change values
-            j.Env.Platform = Platform.X64;
+            j.Environment.Platform = Platform.X64;
             j.Run.LaunchCount = 1;
 
             Assert.Equal("SomeId", j.Id);
-            Assert.Equal(Platform.X64, j.Env.Platform);
+            Assert.Equal(Platform.X64, j.Environment.Platform);
             Assert.Equal(1, j.Run.LaunchCount);
 
-            Assert.True(j.HasValue(EnvMode.PlatformCharacteristic));
-            Assert.True(j.Env.HasValue(EnvMode.PlatformCharacteristic));
+            Assert.True(j.HasValue(EnvironmentMode.PlatformCharacteristic));
+            Assert.True(j.Environment.HasValue(EnvironmentMode.PlatformCharacteristic));
             Assert.True(j.HasValue(RunMode.LaunchCountCharacteristic));
             Assert.True(j.Run.HasValue(RunMode.LaunchCountCharacteristic));
 
             AssertProperties(j, "Platform=X64, LaunchCount=1");
-            AssertProperties(j.Env, "Platform=X64");
+            AssertProperties(j.Environment, "Platform=X64");
             AssertProperties(j.Run, "LaunchCount=1");
 
             // 2. reset Env mode (hack via Characteristic setting)
-            var oldEnv = j.Env;
-            Job.EnvCharacteristic[j] = new EnvMode();
+            var oldEnv = j.Environment;
+            Job.EnvironmentCharacteristic[j] = new EnvironmentMode();
 
             Assert.Equal("SomeId", j.Id);
-            Assert.Equal(Platform.AnyCpu, j.Env.Platform);
+            Assert.Equal(Platform.AnyCpu, j.Environment.Platform);
             Assert.Equal(1, j.Run.LaunchCount);
 
-            Assert.False(j.HasValue(EnvMode.PlatformCharacteristic));
-            Assert.False(j.Env.HasValue(EnvMode.PlatformCharacteristic));
+            Assert.False(j.HasValue(EnvironmentMode.PlatformCharacteristic));
+            Assert.False(j.Environment.HasValue(EnvironmentMode.PlatformCharacteristic));
             Assert.True(j.HasValue(RunMode.LaunchCountCharacteristic));
             Assert.True(j.Run.HasValue(RunMode.LaunchCountCharacteristic));
 
             AssertProperties(j, "LaunchCount=1");
-            AssertProperties(j.Env, "Default");
+            AssertProperties(j.Environment, "Default");
             AssertProperties(j.Run, "LaunchCount=1");
 
             // 2.1 proof that oldEnv was the same
             Assert.Equal("SomeId", j.Id);
             Assert.Equal(Platform.X64, oldEnv.Platform);
-            Assert.True(oldEnv.HasValue(EnvMode.PlatformCharacteristic));
+            Assert.True(oldEnv.HasValue(EnvironmentMode.PlatformCharacteristic));
             Assert.Equal("Platform=X64", oldEnv.Id);
 
             // 3. update Env mode (hack via Characteristic setting)
-            Job.EnvCharacteristic[j] = new EnvMode()
+            Job.EnvironmentCharacteristic[j] = new EnvironmentMode()
             {
                 Platform = Platform.X86
             };
 
             Assert.Equal("SomeId", j.Id);
-            Assert.Equal(Platform.X86, j.Env.Platform);
+            Assert.Equal(Platform.X86, j.Environment.Platform);
             Assert.Equal(1, j.Run.LaunchCount);
 
-            Assert.True(j.HasValue(EnvMode.PlatformCharacteristic));
-            Assert.True(j.Env.HasValue(EnvMode.PlatformCharacteristic));
+            Assert.True(j.HasValue(EnvironmentMode.PlatformCharacteristic));
+            Assert.True(j.Environment.HasValue(EnvironmentMode.PlatformCharacteristic));
             Assert.True(j.HasValue(RunMode.LaunchCountCharacteristic));
             Assert.True(j.Run.HasValue(RunMode.LaunchCountCharacteristic));
 
             AssertProperties(j, "Platform=X86, LaunchCount=1");
-            AssertProperties(j.Env, "Platform=X86");
+            AssertProperties(j.Environment, "Platform=X86");
             AssertProperties(j.Run, "LaunchCount=1");
 
             // 4. Freeze-unfreeze:
             j = j.Freeze().UnfreezeCopy();
 
             Assert.Equal("Platform=X86, LaunchCount=1", j.Id);
-            Assert.Equal(Platform.X86, j.Env.Platform);
+            Assert.Equal(Platform.X86, j.Environment.Platform);
             Assert.Equal(1, j.Run.LaunchCount);
 
-            Assert.True(j.HasValue(EnvMode.PlatformCharacteristic));
-            Assert.True(j.Env.HasValue(EnvMode.PlatformCharacteristic));
+            Assert.True(j.HasValue(EnvironmentMode.PlatformCharacteristic));
+            Assert.True(j.Environment.HasValue(EnvironmentMode.PlatformCharacteristic));
             Assert.True(j.HasValue(RunMode.LaunchCountCharacteristic));
             Assert.True(j.Run.HasValue(RunMode.LaunchCountCharacteristic));
 
             AssertProperties(j, "Platform=X86, LaunchCount=1");
-            AssertProperties(j.Env, "Platform=X86");
+            AssertProperties(j.Environment, "Platform=X86");
             AssertProperties(j.Run, "LaunchCount=1");
 
             // 5. Test .With extensions
@@ -183,46 +183,46 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.Equal("NewId", j.Id); // id not lost
             Assert.Equal("NewId(Platform=X64, LaunchCount=2)", j.DisplayInfo);
-            Assert.Equal(Platform.X64, j.Env.Platform);
+            Assert.Equal(Platform.X64, j.Environment.Platform);
             Assert.Equal(2, j.Run.LaunchCount);
 
-            Assert.True(j.HasValue(EnvMode.PlatformCharacteristic));
-            Assert.True(j.Env.HasValue(EnvMode.PlatformCharacteristic));
+            Assert.True(j.HasValue(EnvironmentMode.PlatformCharacteristic));
+            Assert.True(j.Environment.HasValue(EnvironmentMode.PlatformCharacteristic));
             Assert.True(j.HasValue(RunMode.LaunchCountCharacteristic));
             Assert.True(j.Run.HasValue(RunMode.LaunchCountCharacteristic));
 
             AssertProperties(j, "Platform=X64, LaunchCount=2");
-            AssertProperties(j.Env, "Platform=X64");
+            AssertProperties(j.Environment, "Platform=X64");
             AssertProperties(j.Run, "LaunchCount=2");
         }
 
         [Fact]
         public static void Test03IdDoesNotFlow()
         {
-            var j = new Job(EnvMode.LegacyJitX64, RunMode.Long); // id will not flow, new Job
+            var j = new Job(EnvironmentMode.LegacyJitX64, RunMode.Long); // id will not flow, new Job
             Assert.False(j.HasValue(CharacteristicObject.IdCharacteristic));
-            Assert.False(j.Env.HasValue(CharacteristicObject.IdCharacteristic));
+            Assert.False(j.Environment.HasValue(CharacteristicObject.IdCharacteristic));
 
-            Job.EnvCharacteristic[j] = EnvMode.LegacyJitX86.UnfreezeCopy(); // id will not flow
+            Job.EnvironmentCharacteristic[j] = EnvironmentMode.LegacyJitX86.UnfreezeCopy(); // id will not flow
             Assert.False(j.HasValue(CharacteristicObject.IdCharacteristic));
-            Assert.False(j.Env.HasValue(CharacteristicObject.IdCharacteristic));
+            Assert.False(j.Environment.HasValue(CharacteristicObject.IdCharacteristic));
 
-            var c = new CharacteristicSet(EnvMode.LegacyJitX64, RunMode.Long); // id will not flow, new CharacteristicSet
+            var c = new CharacteristicSet(EnvironmentMode.LegacyJitX64, RunMode.Long); // id will not flow, new CharacteristicSet
             Assert.False(c.HasValue(CharacteristicObject.IdCharacteristic));
 
-            Job.EnvCharacteristic[c] = EnvMode.LegacyJitX86.UnfreezeCopy(); // id will not flow
+            Job.EnvironmentCharacteristic[c] = EnvironmentMode.LegacyJitX86.UnfreezeCopy(); // id will not flow
             Assert.False(c.HasValue(CharacteristicObject.IdCharacteristic));
 
             CharacteristicObject.IdCharacteristic[c] = "MyId"; // id set explicitly
             Assert.Equal("MyId", c.Id);
 
-            j = new Job("MyId", EnvMode.LegacyJitX64, RunMode.Long); // id set explicitly
+            j = new Job("MyId", EnvironmentMode.LegacyJitX64, RunMode.Long); // id set explicitly
             Assert.Equal("MyId", j.Id);
-            Assert.Equal("MyId", j.Env.Id);
+            Assert.Equal("MyId", j.Environment.Id);
 
-            Job.EnvCharacteristic[j] = EnvMode.LegacyJitX86.UnfreezeCopy(); // id will not flow
+            Job.EnvironmentCharacteristic[j] = EnvironmentMode.LegacyJitX86.UnfreezeCopy(); // id will not flow
             Assert.Equal("MyId", j.Id);
-            Assert.Equal("MyId", j.Env.Id);
+            Assert.Equal("MyId", j.Environment.Id);
 
             j = j.With(Jit.RyuJit);  // custom id will flow
             Assert.Equal("MyId", j.Id);
@@ -265,13 +265,13 @@ namespace BenchmarkDotNet.IntegrationTests
             j.Apply(
                 new Job
                 {
-                    Env = { Platform = Platform.X64 },
+                    Environment = { Platform = Platform.X64 },
                     Run = { TargetCount = 2 }
                 });
             AssertProperties(j, "Platform=X64, TargetCount=2");
 
             // filter by properties
-            j.Env.Apply(
+            j.Environment.Apply(
                 new Job()
                     .With(Jit.RyuJit)
                     .WithGcAllowVeryLargeObjects(true)
@@ -300,7 +300,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             set1
                 .Apply(
-                    new EnvMode
+                    new EnvironmentMode
                     {
                         Platform = Platform.X64
                     })
@@ -311,17 +311,17 @@ namespace BenchmarkDotNet.IntegrationTests
                         {
                             LaunchCount = 2
                         },
-                        Env =
+                        Environment =
                         {
                             Platform = Platform.X86
                         }
                     });
             AssertProperties(set1, "LaunchCount=2, Platform=X86");
-            Assert.Equal(Platform.X86, Job.EnvCharacteristic[set1].Platform);
-            Assert.True(set1.HasValue(Job.EnvCharacteristic));
-            Assert.Equal(Platform.X86, EnvMode.PlatformCharacteristic[set1]);
+            Assert.Equal(Platform.X86, Job.EnvironmentCharacteristic[set1].Platform);
+            Assert.True(set1.HasValue(Job.EnvironmentCharacteristic));
+            Assert.Equal(Platform.X86, EnvironmentMode.PlatformCharacteristic[set1]);
 
-            set2.Apply(EnvMode.RyuJitX64).Apply(new GcMode { Concurrent = true });
+            set2.Apply(EnvironmentMode.RyuJitX64).Apply(new GcMode { Concurrent = true });
             Assert.Null(Job.RunCharacteristic[set2]);
             Assert.False(set2.HasValue(Job.RunCharacteristic));
             AssertProperties(set2, "Concurrent=True, Jit=RyuJit, Platform=X64");
@@ -335,13 +335,13 @@ namespace BenchmarkDotNet.IntegrationTests
             var j = new Job();
             AssertProperties(j, "Default");
 
-            j.Env.Gc.Apply(set1);
+            j.Environment.Gc.Apply(set1);
             AssertProperties(j, "Concurrent=True");
 
             j.Run.Apply(set1);
             AssertProperties(j, "Concurrent=True, LaunchCount=2");
 
-            j.Env.Apply(set1);
+            j.Environment.Apply(set1);
             AssertProperties(j, "Jit=RyuJit, Platform=X64, Concurrent=True, LaunchCount=2");
 
             j.Apply(set1);
@@ -371,7 +371,7 @@ namespace BenchmarkDotNet.IntegrationTests
             a[j] = new RunMode();
             Assert.Throws<ArgumentNullException>(() => a[j] = null); // nulls for job nodes are not allowed;
             Assert.Throws<ArgumentNullException>(() => a[j] = Characteristic.EmptyValue);
-            Assert.Throws<ArgumentException>(() => a[j] = new EnvMode()); // not assignable;
+            Assert.Throws<ArgumentException>(() => a[j] = new EnvironmentMode()); // not assignable;
             Assert.Throws<ArgumentException>(() => a[j] = new CharacteristicSet()); // not assignable;
             Assert.Throws<ArgumentException>(() => a[j] = 123); // not assignable;
 
@@ -380,7 +380,7 @@ namespace BenchmarkDotNet.IntegrationTests
             a[j] = CsProjClassicNetToolchain.Net46;
             a[j] = null;
             a[j] = Characteristic.EmptyValue;
-            Assert.Throws<ArgumentException>(() => a[j] = new EnvMode()); // not assignable;
+            Assert.Throws<ArgumentException>(() => a[j] = new EnvironmentMode()); // not assignable;
             Assert.Throws<ArgumentException>(() => a[j] = new CharacteristicSet()); // not assignable;
             Assert.Throws<ArgumentException>(() => a[j] = 123); // not assignable;
         }
@@ -393,12 +393,12 @@ namespace BenchmarkDotNet.IntegrationTests
             var a = CharacteristicHelper
                 .GetThisTypeCharacteristics(typeof(Job))
                 .Select(c => c.Id);
-            Assert.Equal("Id;Accuracy;Env;Infrastructure;Meta;Run", string.Join(";", a));
+            Assert.Equal("Id;Accuracy;Environment;Infrastructure;Meta;Run", string.Join(";", a));
             a = CharacteristicHelper
                 .GetAllCharacteristics(typeof(Job))
                 .Select(c => c.Id);
             Assert.Equal(string.Join(";", a), "Id;Accuracy;AnalyzeLaunchVariance;EvaluateOverhead;" +
-                "MaxAbsoluteError;MaxRelativeError;MinInvokeCount;MinIterationTime;OutlierMode;Env;Affinity;" +
+                "MaxAbsoluteError;MaxRelativeError;MinInvokeCount;MinIterationTime;OutlierMode;Environment;Affinity;" +
                 "Jit;Platform;Runtime;Gc;AllowVeryLargeObjects;Concurrent;CpuGroups;Force;HeapAffinitizeMask;HeapCount;NoAffinitize;" +
                 "RetainVm;Server;Infrastructure;Arguments;BuildConfiguration;Clock;EngineFactory;EnvironmentVariables;Toolchain;Meta;IsBaseline;IsMutator;Run;InvocationCount;IterationTime;" +
                 "LaunchCount;MaxTargetIterationCount;MinTargetIterationCount;RunStrategy;TargetCount;UnrollFactor;WarmupCount");
@@ -419,7 +419,7 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.True(copy.HasValue(RunMode.MaxTargetIterationCountCharacteristic));
             Assert.Equal(20, copy.Run.MaxTargetIterationCount);
             Assert.False(jobBefore.HasValue(RunMode.MaxTargetIterationCountCharacteristic));
-            Assert.True(copy.Env.Runtime is CoreRuntime);
+            Assert.True(copy.Environment.Runtime is CoreRuntime);
         }
     }
 }

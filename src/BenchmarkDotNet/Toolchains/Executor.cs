@@ -62,9 +62,9 @@ namespace BenchmarkDotNet.Toolchains
             process.Start();
 
             process.EnsureHighPriority(logger);
-            if (benchmarkCase.Job.Env.HasValue(EnvMode.AffinityCharacteristic))
+            if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
             {
-                process.TrySetAffinity(benchmarkCase.Job.Env.Affinity, logger);
+                process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
             }
 
             loggerWithDiagnoser.ProcessInput();
@@ -96,8 +96,8 @@ namespace BenchmarkDotNet.Toolchains
 
             start.SetEnvironmentVariables(benchmarkCase, resolver);
 
-            var runtime = benchmarkCase.Job.Env.HasValue(EnvMode.RuntimeCharacteristic)
-                ? benchmarkCase.Job.Env.Runtime
+            var runtime = benchmarkCase.Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
+                ? benchmarkCase.Job.Environment.Runtime
                 : RuntimeInformation.GetCurrentRuntime();
             // TODO: use resolver
 
@@ -128,7 +128,7 @@ namespace BenchmarkDotNet.Toolchains
             // from mono --help: "Usage is: mono [options] program [program-options]"
             var builder = new StringBuilder(30);
 
-            builder.Append(job.ResolveValue(EnvMode.JitCharacteristic, resolver) == Jit.Llvm ? "--llvm" : "--nollvm");
+            builder.Append(job.ResolveValue(EnvironmentMode.JitCharacteristic, resolver) == Jit.Llvm ? "--llvm" : "--nollvm");
 
             foreach (var argument in arguments)
                 builder.Append($" {argument.TextRepresentation}");

@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Diagnosers
             public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
 
             public bool IsAvailable(Summary summary) 
-                => !RuntimeInformation.IsMono || results.Keys.Any(benchmark => !(benchmark.Job.Env.Runtime is MonoRuntime));
+                => !RuntimeInformation.IsMono || results.Keys.Any(benchmark => !(benchmark.Job.Environment.Runtime is MonoRuntime));
 
             public bool AlwaysShow => true;
             public ColumnCategory Category => ColumnCategory.Diagnoser;
@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Diagnosers
 
             public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style)
             {
-                if (!results.ContainsKey(benchmarkCase) || benchmarkCase.Job.Env.Runtime is MonoRuntime)
+                if (!results.ContainsKey(benchmarkCase) || benchmarkCase.Job.Environment.Runtime is MonoRuntime)
                     return "N/A";
 
                 var value = results[benchmarkCase].BytesAllocatedPerOperation;

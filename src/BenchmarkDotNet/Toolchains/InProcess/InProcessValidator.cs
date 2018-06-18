@@ -23,10 +23,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         private static readonly IReadOnlyDictionary<Characteristic, Func<Job, Characteristic, string>> ValidationRules =
             new Dictionary<Characteristic, Func<Job, Characteristic, string>>
             {
-                { EnvMode.AffinityCharacteristic, DontValidate },
-                { EnvMode.JitCharacteristic, ValidateEnvironment },
-                { EnvMode.PlatformCharacteristic, ValidatePlatform },
-                { EnvMode.RuntimeCharacteristic, ValidateEnvironment },
+                { EnvironmentMode.AffinityCharacteristic, DontValidate },
+                { EnvironmentMode.JitCharacteristic, ValidateEnvironment },
+                { EnvironmentMode.PlatformCharacteristic, ValidatePlatform },
+                { EnvironmentMode.RuntimeCharacteristic, ValidateEnvironment },
                 { GcMode.ServerCharacteristic, ValidateEnvironment },
                 { GcMode.ConcurrentCharacteristic, ValidateEnvironment },
                 { GcMode.CpuGroupsCharacteristic, ValidateEnvironment },
@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
         private static string ValidatePlatform(Job job, Characteristic characteristic)
         {
-            if (job.Env.Platform == Platform.AnyCpu)
+            if (job.Environment.Platform == Platform.AnyCpu)
                 return null;
 
             return ValidateEnvironment(job, characteristic);

@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             content = content.Replace("$CSPROJPATH$", projectFile.FullName);
             content = SetTargetFrameworkMoniker(content, TargetFrameworkMoniker);
             content = content.Replace("$PROGRAMNAME$", artifactsPaths.ProgramName);
-            content = content.Replace("$RUNTIMESETTINGS$", GetRuntimeSettings(benchmark.Job.Env.Gc, buildPartition.Resolver));
+            content = content.Replace("$RUNTIMESETTINGS$", GetRuntimeSettings(benchmark.Job.Environment.Gc, buildPartition.Resolver));
             content = content.Replace("$COPIEDSETTINGS$", GetSettingsThatNeedsToBeCopied(projectFile));
             content = content.Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration);
 

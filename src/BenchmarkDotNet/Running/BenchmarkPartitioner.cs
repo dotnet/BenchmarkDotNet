@@ -33,15 +33,15 @@ namespace BenchmarkDotNet.Running
                     return false;
                 if (AreDifferent(jobX.GetToolchain(), jobY.GetToolchain())) // Mono vs .NET vs Core vs InProcess
                     return false;
-                if (jobX.Env.Jit != jobY.Env.Jit) // Jit is set per exe in .config file
+                if (jobX.Environment.Jit != jobY.Environment.Jit) // Jit is set per exe in .config file
                     return false;
-                if (jobX.Env.Platform != jobY.Env.Platform) // platform is set in .csproj
+                if (jobX.Environment.Platform != jobY.Environment.Platform) // platform is set in .csproj
                     return false;
                 if (AreDifferent(jobX.Infrastructure.BuildConfiguration, jobY.Infrastructure.BuildConfiguration)) // Debug vs Release
                     return false;
                 if (AreDifferent(jobX.Infrastructure.Arguments, jobY.Infrastructure.Arguments)) // arguments can be anything (Mono runtime settings or MsBuild parameters)
                     return false;
-                if (!jobX.Env.Gc.Equals(jobY.Env.Gc)) // GC settings are per .config/.csproj
+                if (!jobX.Environment.Gc.Equals(jobY.Environment.Gc)) // GC settings are per .config/.csproj
                     return false;
 
                 if (x.Descriptor.Type.Assembly.Location != y.Descriptor.Type.Assembly.Location) // some toolchains produce the exe in the same folder as .dll (to get some scenarios like native dependencies work)
@@ -66,9 +66,9 @@ namespace BenchmarkDotNet.Running
                 hashCode ^=  GetRuntime(job).GetType().MetadataToken;
 
                 hashCode ^= obj.Descriptor.Type.Assembly.Location.GetHashCode();
-                hashCode ^= (int)job.Env.Jit;
-                hashCode ^= (int)job.Env.Platform;
-                hashCode ^= job.Env.Gc.GetHashCode();
+                hashCode ^= (int)job.Environment.Jit;
+                hashCode ^= (int)job.Environment.Platform;
+                hashCode ^= job.Environment.Gc.GetHashCode();
 
                 if (job.Infrastructure.BuildConfiguration != null)
                     hashCode ^= job.Infrastructure.BuildConfiguration.GetHashCode();
@@ -83,8 +83,8 @@ namespace BenchmarkDotNet.Running
             }
 
             private Runtime GetRuntime(Job job)
-                => job.Env.HasValue(EnvMode.RuntimeCharacteristic)
-                    ? job.Env.Runtime
+                => job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
+                    ? job.Environment.Runtime
                     : Current;
 
             private bool AreDifferent(object x, object y)

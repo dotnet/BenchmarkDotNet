@@ -78,9 +78,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 process.Start();
 
                 process.EnsureHighPriority(logger);
-                if (benchmarkCase.Job.Env.HasValue(EnvMode.AffinityCharacteristic))
+                if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
                 {
-                    process.TrySetAffinity(benchmarkCase.Job.Env.Affinity, logger);
+                    process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
                 }
 
                 loggerWithDiagnoser.ProcessInput();

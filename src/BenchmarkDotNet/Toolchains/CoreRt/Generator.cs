@@ -121,7 +121,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
-  {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Env.Gc, buildPartition.Resolver)}
+  {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc, buildPartition.Resolver)}
   <ItemGroup>
     <Compile Include=""{Path.GetFileName(artifactsPaths.ProgramCodePath)}"" Exclude=""bin\**;obj\**;**\*.xproj;packages\**"" />
   </ItemGroup>
@@ -148,7 +148,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   </PropertyGroup>
   <Import Project=""$(MSBuildSDKsPath)\Microsoft.NET.Sdk\Sdk\Sdk.targets"" />
   <Import Project=""$(IlcPath)\build\Microsoft.NETCore.Native.targets"" />
-  {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Env.Gc, buildPartition.Resolver)}
+  {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc, buildPartition.Resolver)}
   <ItemGroup>
     <Compile Include=""{Path.GetFileName(artifactsPaths.ProgramCodePath)}"" Exclude=""bin\**;obj\**;**\*.xproj;packages\**"" />
   </ItemGroup>

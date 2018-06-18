@@ -102,7 +102,7 @@ namespace BenchmarkDotNet.Extensions
 
         internal static void SetEnvironmentVariables(this ProcessStartInfo start, BenchmarkCase benchmarkCase, IResolver resolver)
         {
-            if (benchmarkCase.Job.Env.Runtime is ClrRuntime clrRuntime && !string.IsNullOrEmpty(clrRuntime.Version))
+            if (benchmarkCase.Job.Environment.Runtime is ClrRuntime clrRuntime && !string.IsNullOrEmpty(clrRuntime.Version))
                 start.EnvironmentVariables["COMPLUS_Version"] = clrRuntime.Version;
 
             if (!benchmarkCase.Job.HasValue(InfrastructureMode.EnvironmentVariablesCharacteristic))

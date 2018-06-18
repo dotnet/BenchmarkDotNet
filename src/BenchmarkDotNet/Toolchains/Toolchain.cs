@@ -27,8 +27,8 @@ namespace BenchmarkDotNet.Toolchains
 
         public virtual bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver)
         {
-            var runtime = benchmarkCase.Job.ResolveValue(EnvMode.RuntimeCharacteristic, resolver);
-            var jit = benchmarkCase.Job.ResolveValue(EnvMode.JitCharacteristic, resolver);
+            var runtime = benchmarkCase.Job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, resolver);
+            var jit = benchmarkCase.Job.ResolveValue(EnvironmentMode.JitCharacteristic, resolver);
             if (!(runtime is MonoRuntime) && jit == Jit.Llvm)
             {
                 logger.WriteLineError($"Llvm is supported only for Mono, benchmark '{benchmarkCase.DisplayInfo}' will not be executed");

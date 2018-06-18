@@ -4,7 +4,7 @@ using BenchmarkDotNet.Environments;
 
 namespace BenchmarkDotNet.Jobs
 {
-    public sealed class EnvMode : JobMode<EnvMode>
+    public sealed class EnvironmentMode : JobMode<EnvironmentMode>
     {
         public static readonly Characteristic<Platform> PlatformCharacteristic = CreateCharacteristic<Platform>(nameof(Platform));
         public static readonly Characteristic<Jit> JitCharacteristic = CreateCharacteristic<Jit>(nameof(Jit));
@@ -12,23 +12,23 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<IntPtr> AffinityCharacteristic = CreateCharacteristic<IntPtr>(nameof(Affinity));
         public static readonly Characteristic<GcMode> GcCharacteristic = CreateCharacteristic<GcMode>(nameof(Gc));
 
-        public static readonly EnvMode Clr = new EnvMode(Runtime.Clr).Freeze();
-        public static readonly EnvMode Core = new EnvMode(Runtime.Core).Freeze();
-        public static readonly EnvMode Mono = new EnvMode(Runtime.Mono).Freeze();
-        public static readonly EnvMode CoreRT = new EnvMode(Runtime.CoreRT).Freeze();
-        public static readonly EnvMode LegacyJitX86 = new EnvMode(nameof(LegacyJitX86), Jit.LegacyJit, Platform.X86).Freeze();
-        public static readonly EnvMode LegacyJitX64 = new EnvMode(nameof(LegacyJitX64), Jit.LegacyJit, Platform.X64).Freeze();
-        public static readonly EnvMode RyuJitX64 = new EnvMode(nameof(RyuJitX64), Jit.RyuJit, Platform.X64).Freeze();
-        public static readonly EnvMode RyuJitX86 = new EnvMode(nameof(RyuJitX86), Jit.RyuJit, Platform.X86).Freeze();
+        public static readonly EnvironmentMode Clr = new EnvironmentMode(Runtime.Clr).Freeze();
+        public static readonly EnvironmentMode Core = new EnvironmentMode(Runtime.Core).Freeze();
+        public static readonly EnvironmentMode Mono = new EnvironmentMode(Runtime.Mono).Freeze();
+        public static readonly EnvironmentMode CoreRT = new EnvironmentMode(Runtime.CoreRT).Freeze();
+        public static readonly EnvironmentMode LegacyJitX86 = new EnvironmentMode(nameof(LegacyJitX86), Jit.LegacyJit, Platform.X86).Freeze();
+        public static readonly EnvironmentMode LegacyJitX64 = new EnvironmentMode(nameof(LegacyJitX64), Jit.LegacyJit, Platform.X64).Freeze();
+        public static readonly EnvironmentMode RyuJitX64 = new EnvironmentMode(nameof(RyuJitX64), Jit.RyuJit, Platform.X64).Freeze();
+        public static readonly EnvironmentMode RyuJitX86 = new EnvironmentMode(nameof(RyuJitX86), Jit.RyuJit, Platform.X86).Freeze();
 
-        public EnvMode() : this(id: null) { }
+        public EnvironmentMode() : this(id: null) { }
 
-        public EnvMode(Runtime runtime) : this(runtime.ToString())
+        public EnvironmentMode(Runtime runtime) : this(runtime.ToString())
         {
             Runtime = runtime;
         }
 
-        public EnvMode(string id, Jit jit, Platform platform) : this(id)
+        public EnvironmentMode(string id, Jit jit, Platform platform) : this(id)
         {
             Jit = jit;
             Platform = platform;
@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Jobs
                 Runtime = Runtime.Clr;
         }
 
-        public EnvMode(string id) : base(id)
+        public EnvironmentMode(string id) : base(id)
         {
             GcCharacteristic[this] = new GcMode();
         }

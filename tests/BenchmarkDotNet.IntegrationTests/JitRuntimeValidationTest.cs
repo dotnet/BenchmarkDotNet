@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public PlatformConfig(Runtime runtime, Jit jit, Platform platform)
             {
-                Add(new Job(Job.Dry, new EnvMode()
+                Add(new Job(Job.Dry, new EnvironmentMode()
                 {
                     Runtime = runtime,
                     Jit = jit,

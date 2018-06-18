@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Attributes
         }
 
         public MonoJobAttribute(string name, string path, bool isBaseline = false) 
-            : base(new Job(name, new EnvMode(new MonoRuntime(name, path)).Freeze()).WithIsBaseline(isBaseline).Freeze())
+            : base(new Job(name, new EnvironmentMode(new MonoRuntime(name, path)).Freeze()).WithIsBaseline(isBaseline).Freeze())
         {
         }
     }

@@ -14,10 +14,10 @@ namespace BenchmarkDotNet.Environments
 
         private EnvResolver()
         {
-            Register(EnvMode.PlatformCharacteristic, RuntimeInformation.GetCurrentPlatform);
-            Register(EnvMode.RuntimeCharacteristic, RuntimeInformation.GetCurrentRuntime);
-            Register(EnvMode.JitCharacteristic, RuntimeInformation.GetCurrentJit);
-            Register(EnvMode.AffinityCharacteristic, RuntimeInformation.GetCurrentAffinity);
+            Register(EnvironmentMode.PlatformCharacteristic, RuntimeInformation.GetCurrentPlatform);
+            Register(EnvironmentMode.RuntimeCharacteristic, RuntimeInformation.GetCurrentRuntime);
+            Register(EnvironmentMode.JitCharacteristic, RuntimeInformation.GetCurrentJit);
+            Register(EnvironmentMode.AffinityCharacteristic, RuntimeInformation.GetCurrentAffinity);
 
             // TODO: find a better place
             Register(AccuracyMode.AnalyzeLaunchVarianceCharacteristic, () => false);

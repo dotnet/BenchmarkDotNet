@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             var thread = Thread.CurrentThread;
             var oldThreadPriority = thread.Priority;
 
-            var affinity = parameters.BenchmarkCase.Job.ResolveValueAsNullable(EnvMode.AffinityCharacteristic);
+            var affinity = parameters.BenchmarkCase.Job.ResolveValueAsNullable(EnvironmentMode.AffinityCharacteristic);
             try
             {
                 process.TrySetPriority(ProcessPriorityClass.High, parameters.Logger);

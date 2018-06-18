@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Diagnosers
             if (signal == HostSignal.AfterAll && ShouldUseWindowsDissasembler(benchmark))
                 results.Add(benchmark, windowsDisassembler.Dissasemble(parameters));
             else if (signal == HostSignal.SeparateLogic && ShouldUseMonoDisassembler(benchmark))
-                results.Add(benchmark, monoDisassembler.Disassemble(benchmark, benchmark.Job.Env.Runtime as MonoRuntime));
+                results.Add(benchmark, monoDisassembler.Disassemble(benchmark, benchmark.Job.Environment.Runtime as MonoRuntime));
         }
 
         public void DisplayResults(ILogger logger)
@@ -92,9 +92,9 @@ namespace BenchmarkDotNet.Diagnosers
         }
 
         private bool ShouldUseMonoDisassembler(BenchmarkCase benchmarkCase)
-            => benchmarkCase.Job.Env.Runtime is MonoRuntime || RuntimeInformation.IsMono;
+            => benchmarkCase.Job.Environment.Runtime is MonoRuntime || RuntimeInformation.IsMono;
 
         private bool ShouldUseWindowsDissasembler(BenchmarkCase benchmarkCase)
-            => !(benchmarkCase.Job.Env.Runtime is MonoRuntime) && RuntimeInformation.IsWindows();
+            => !(benchmarkCase.Job.Environment.Runtime is MonoRuntime) && RuntimeInformation.IsWindows();
     }
 }
