@@ -65,7 +65,7 @@ If you want to change the accuracy level, you should use the following character
 ### Infrastructure
 Usually, you shouldn't specify any characteristics from this section, it can be used for advanced cases only.
 
-* `Toolchain`: a toolchain which generate source code for target benchmark methods, build it, and execute it. BenchmarkDotNet has own toolchains for CoreCLR projects and classic projects (the last one is `RoslynToolchain`, you can find it in the [BenchmarkDotNet.Toolchains.Roslyn](https://www.nuget.org/packages/BenchmarkDotNet.Toolchains.Roslyn/) NuGet package). If you want, you can define own toolchain.
+* `Toolchain`: a toolchain which generates source code for target benchmark methods, builds it, and executes it. BenchmarkDotNet has own toolchains for .NET, .NET Core, Mono and CoreRT projects. If you want, you can define own toolchain.
 * `Clock`: a clock which will be used for measurements. BenchmarkDotNet automatically choose the best available clock source, but you can specify own clock source.
 * `EngineFactory`: a provider for measurement engine which performs all the measurement magic. If you don't trust BenchmarkDotNet, you can define own engine and implement all the measurement stages manually.
 * `EnvironmentVariables`: customized environment variables for target benchmark. See also: @BenchmarkDotNet.Samples.IntroEnvVars
@@ -76,7 +76,7 @@ There are several ways to specify a job.
 
 ### Object style
 
-You can create own jobs directly from the source code via a cusom config:
+You can create own jobs directly from the source code via a custom config:
 
 ```cs
 [Config(typeof(Config))]
@@ -103,7 +103,7 @@ public class MyBenchmarks
                 .WithLaunchCount(5)
                 .WithIterationTime(TimeInterval.Millisecond * 200)
                 .WithMaxStdErrRelative(0.01)
-                .WithId("MySuperJob")); // IMPORTANT: Id assignment should be the last call in the chain or the id will be lost.
+                .WithId("MySuperJob"));
         }
     }
     // Benchmarks
@@ -141,6 +141,44 @@ public class MyBenchmarkClass
 ```
 
 Note that each of the attributes identifies a separate job, the sample above will result in 8 different jobs, not a single merged job.
+
+### Attribute style for merging jobs
+
+Sometimes you want to apply some changes to other jobs, without adding a new job to a config (which results in one extra benchmark run).
+
+To do that you can use following predefined job mutator attributes:
+
+* `[EvaluateOverhead]`
+* `[GcConcurrent]`
+* `[GcForce]`
+* `[GcServer]`
+* `[InnerIterationCount]`
+* `[InvocationCount]`
+* `[IterationCount]`
+* `[IterationTime]`
+* `[MaxAbsoluteError]`
+* `[MaxIterationCount]`
+* `[MaxRelativeError]`
+* `[MinInvokeCount]`
+* `[MinIterationCount]`
+* `[MinIterationTime]`
+* `[Outliers]`
+* `[ProcessCount]`
+* `[RunOncePerIteration]`
+* `[WarmupCount]`
+
+So following example:
+
+```cs
+[ClrJob, CoreJob]
+[GcServer(true)]
+public class MyBenchmarkClass
+```
+
+Is going to be merged to a config with two jobs:
+
+* CoreJob with `GcServer=true`
+* ClrJob with `GcServer=true`
 
 #### Custom attributes
 
