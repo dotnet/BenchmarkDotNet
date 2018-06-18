@@ -14,8 +14,8 @@ There are several categories of characteristics which you can specify. Let's con
 ### Id
 It's a single string characteristic. It allows to name your job. This name will be used in logs and a part of a folder name with generated files for this job. `Id` doesn't affect benchmark results, but it can be useful for diagnostics. If you don't specify `Id`, random value will be chosen based on other characteristics
 
-### Env
-`Env` specifies an environment of the job. You can specify the following characteristics:
+### Environment
+`Environment` specifies an environment of the job. You can specify the following characteristics:
 
 * `Platform`: `x86` or `x64`
 * `Runtime`:
@@ -33,6 +33,7 @@ It's a single string characteristic. It allows to name your job. This name will 
   * `CpuGroups`:  Specifies whether garbage collection supports multiple CPU groups
   * `Force`: Specifies whether the BenchmarkDotNet's benchmark runner forces full garbage collection after each benchmark invocation
   * `AllowVeryLargeObjects`:  On 64-bit platforms, enables arrays that are greater than 2 gigabytes (GB) in total size
+* `EnvironmentVariables`: customized environment variables for target benchmark. See also: @BenchmarkDotNet.Samples.IntroEnvVars
 
 BenchmarkDotNet will use host process environment characteristics for non specified values.
 
@@ -68,7 +69,6 @@ Usually, you shouldn't specify any characteristics from this section, it can be 
 * `Toolchain`: a toolchain which generates source code for target benchmark methods, builds it, and executes it. BenchmarkDotNet has own toolchains for .NET, .NET Core, Mono and CoreRT projects. If you want, you can define own toolchain.
 * `Clock`: a clock which will be used for measurements. BenchmarkDotNet automatically choose the best available clock source, but you can specify own clock source.
 * `EngineFactory`: a provider for measurement engine which performs all the measurement magic. If you don't trust BenchmarkDotNet, you can define own engine and implement all the measurement stages manually.
-* `EnvironmentVariables`: customized environment variables for target benchmark. See also: @BenchmarkDotNet.Samples.IntroEnvVars
 
 ## Usage
 

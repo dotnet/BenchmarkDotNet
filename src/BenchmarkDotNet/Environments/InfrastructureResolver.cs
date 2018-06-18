@@ -17,8 +17,7 @@ namespace BenchmarkDotNet.Environments
             Register(InfrastructureMode.EngineFactoryCharacteristic, () => new EngineFactory());
             Register(InfrastructureMode.BuildConfigurationCharacteristic, () => InfrastructureMode.ReleaseConfigurationName);
 
-            Register(InfrastructureMode.ArgumentsCharacteristic, Array.Empty<Argument>);
-            Register(InfrastructureMode.EnvironmentVariablesCharacteristic, Array.Empty<EnvironmentVariable>);
+            Register(InfrastructureMode.ArgumentsCharacteristic, Array.Empty<Argument>);            
         }
     }
 }

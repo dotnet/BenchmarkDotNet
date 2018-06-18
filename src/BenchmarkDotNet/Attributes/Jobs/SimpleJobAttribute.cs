@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Attributes
             if (invocationCount != DefaultValue)
             {
                 job.Run.InvocationCount = invocationCount;
-                int unrollFactor = job.Run.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvResolver.Instance);
+                int unrollFactor = job.Run.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance);
                 if (invocationCount % unrollFactor != 0)
                     job.Run.UnrollFactor = 1;
             }

@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Running
     {
         private static int benchmarkRunIndex;
 
-        internal static readonly IResolver DefaultResolver = new CompositeResolver(EnvResolver.Instance, InfrastructureResolver.Instance);
+        internal static readonly IResolver DefaultResolver = new CompositeResolver(EnvironmentResolver.Instance, InfrastructureResolver.Instance);
 
         public static Summary Run<T>(IConfig config = null) => Run(BenchmarkConverter.TypeToBenchmarks(typeof(T), config), summaryPerType: true);
 

@@ -100,7 +100,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             {
                 var target = benchmarkCase.Descriptor;
                 var job = benchmarkCase.Job; // TODO: filter job (same as SourceCodePresenter does)?
-                var unrollFactor = benchmarkCase.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvResolver.Instance);
+                var unrollFactor = benchmarkCase.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance);
 
                 // DONTTOUCH: these should be allocated together
                 var instance = Activator.CreateInstance(benchmarkCase.Descriptor.Type);

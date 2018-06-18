@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
         private static string ValidateEnvironment(Job job, Characteristic characteristic)
         {
-            var resolver = EnvResolver.Instance;
+            var resolver = EnvironmentResolver.Instance;
             var actual = resolver.Resolve(Job.Default, characteristic);
             var expected = resolver.Resolve(job, characteristic);
             return Equals(actual, expected)

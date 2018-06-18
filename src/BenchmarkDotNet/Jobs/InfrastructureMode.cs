@@ -14,8 +14,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<IToolchain> ToolchainCharacteristic = CreateCharacteristic<IToolchain>(nameof(Toolchain));
         public static readonly Characteristic<IClock> ClockCharacteristic = CreateCharacteristic<IClock>(nameof(Clock));
         public static readonly Characteristic<IEngineFactory> EngineFactoryCharacteristic = CreateCharacteristic<IEngineFactory>(nameof(EngineFactory));
-        public static readonly Characteristic<string> BuildConfigurationCharacteristic = CreateCharacteristic<string>(nameof(BuildConfiguration));
-        public static readonly Characteristic<IReadOnlyList<EnvironmentVariable>> EnvironmentVariablesCharacteristic = CreateCharacteristic<IReadOnlyList<EnvironmentVariable>>(nameof(EnvironmentVariables));
+        public static readonly Characteristic<string> BuildConfigurationCharacteristic = CreateCharacteristic<string>(nameof(BuildConfiguration));        
         public static readonly Characteristic<IReadOnlyList<Argument>> ArgumentsCharacteristic = CreateCharacteristic<IReadOnlyList<Argument>>(nameof(Arguments));
 
         public static readonly InfrastructureMode InProcess = new InfrastructureMode(InProcessToolchain.Instance);
@@ -54,12 +53,6 @@ namespace BenchmarkDotNet.Jobs
         {
             get => BuildConfigurationCharacteristic[this];
             set => BuildConfigurationCharacteristic[this] = value;
-        }
-
-        public IReadOnlyList<EnvironmentVariable> EnvironmentVariables
-        {
-            get => EnvironmentVariablesCharacteristic[this];
-            set => EnvironmentVariablesCharacteristic[this] = value;
         }
 
         public IReadOnlyList<Argument> Arguments

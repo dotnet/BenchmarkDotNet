@@ -6,18 +6,19 @@ using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Environments
 {
-    public class EnvResolver : Resolver
+    public class EnvironmentResolver : Resolver
     {
         public const int DefaultUnrollFactorForThroughput = 16;
 
-        public static readonly IResolver Instance = new CompositeResolver(new EnvResolver(), GcResolver.Instance);
+        public static readonly IResolver Instance = new CompositeResolver(new EnvironmentResolver(), GcResolver.Instance);
 
-        private EnvResolver()
+        private EnvironmentResolver()
         {
             Register(EnvironmentMode.PlatformCharacteristic, RuntimeInformation.GetCurrentPlatform);
             Register(EnvironmentMode.RuntimeCharacteristic, RuntimeInformation.GetCurrentRuntime);
             Register(EnvironmentMode.JitCharacteristic, RuntimeInformation.GetCurrentJit);
             Register(EnvironmentMode.AffinityCharacteristic, RuntimeInformation.GetCurrentAffinity);
+            Register(EnvironmentMode.EnvironmentVariablesCharacteristic, Array.Empty<EnvironmentVariable>);
 
             // TODO: find a better place
             Register(AccuracyMode.AnalyzeLaunchVarianceCharacteristic, () => false);
@@ -36,7 +37,7 @@ namespace BenchmarkDotNet.Environments
                         throw new NotSupportedException($"Unknown runStrategy: {strategy}");
                 }
             });
-            Register(RunMode.InvocationCountCharacteristic, () => 1);
+            Register(RunMode.InvocationCountCharacteristic, () => 1);            
         }
     }
 }

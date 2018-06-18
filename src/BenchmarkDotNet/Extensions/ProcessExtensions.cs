@@ -105,10 +105,10 @@ namespace BenchmarkDotNet.Extensions
             if (benchmarkCase.Job.Environment.Runtime is ClrRuntime clrRuntime && !string.IsNullOrEmpty(clrRuntime.Version))
                 start.EnvironmentVariables["COMPLUS_Version"] = clrRuntime.Version;
 
-            if (!benchmarkCase.Job.HasValue(InfrastructureMode.EnvironmentVariablesCharacteristic))
+            if (!benchmarkCase.Job.HasValue(EnvironmentMode.EnvironmentVariablesCharacteristic))
                 return;
 
-            foreach (var environmentVariable in benchmarkCase.Job.Infrastructure.EnvironmentVariables)
+            foreach (var environmentVariable in benchmarkCase.Job.Environment.EnvironmentVariables)
                 start.EnvironmentVariables[environmentVariable.Key] = environmentVariable.Value;
         }
     }

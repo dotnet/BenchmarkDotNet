@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Validators
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
         {
-            var resolver = new CompositeResolver(EnvResolver.Instance, EngineResolver.Instance); // TODO: use specified resolver.
+            var resolver = new CompositeResolver(EnvironmentResolver.Instance, EngineResolver.Instance); // TODO: use specified resolver.
             foreach (var benchmark in validationParameters.Benchmarks)
             {
                 var run = benchmark.Job.Run;

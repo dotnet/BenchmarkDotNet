@@ -397,11 +397,11 @@ namespace BenchmarkDotNet.IntegrationTests
             a = CharacteristicHelper
                 .GetAllCharacteristics(typeof(Job))
                 .Select(c => c.Id);
-            Assert.Equal(string.Join(";", a), "Id;Accuracy;AnalyzeLaunchVariance;EvaluateOverhead;" +
-                "MaxAbsoluteError;MaxRelativeError;MinInvokeCount;MinIterationTime;OutlierMode;Environment;Affinity;" +
+            Assert.Equal("Id;Accuracy;AnalyzeLaunchVariance;EvaluateOverhead;" +
+                "MaxAbsoluteError;MaxRelativeError;MinInvokeCount;MinIterationTime;OutlierMode;Environment;Affinity;EnvironmentVariables;" +
                 "Jit;Platform;Runtime;Gc;AllowVeryLargeObjects;Concurrent;CpuGroups;Force;HeapAffinitizeMask;HeapCount;NoAffinitize;" +
-                "RetainVm;Server;Infrastructure;Arguments;BuildConfiguration;Clock;EngineFactory;EnvironmentVariables;Toolchain;Meta;IsBaseline;IsMutator;Run;InvocationCount;IterationTime;" +
-                "LaunchCount;MaxTargetIterationCount;MinTargetIterationCount;RunStrategy;TargetCount;UnrollFactor;WarmupCount");
+                "RetainVm;Server;Infrastructure;Arguments;BuildConfiguration;Clock;EngineFactory;Toolchain;Meta;IsBaseline;IsMutator;Run;InvocationCount;IterationTime;" +
+                "LaunchCount;MaxTargetIterationCount;MinTargetIterationCount;RunStrategy;TargetCount;UnrollFactor;WarmupCount", string.Join(";", a));
         }
         
         [Fact]

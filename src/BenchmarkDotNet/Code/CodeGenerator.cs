@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Code
                     .Replace("$DiassemblerEntryMethodName$", DisassemblerConstants.DiassemblerEntryMethodName)
                     .Replace("$TargetMethodCall$", provider.GetTargetMethodCall(passArguments)).ToString();
 
-                benchmarkTypeCode = Unroll(benchmarkTypeCode, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvResolver.Instance));
+                benchmarkTypeCode = Unroll(benchmarkTypeCode, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance));
 
                 benchmarksCode.Add(benchmarkTypeCode);
             }

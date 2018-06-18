@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 
@@ -11,6 +12,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<Runtime> RuntimeCharacteristic = CreateCharacteristic<Runtime>(nameof(Runtime));
         public static readonly Characteristic<IntPtr> AffinityCharacteristic = CreateCharacteristic<IntPtr>(nameof(Affinity));
         public static readonly Characteristic<GcMode> GcCharacteristic = CreateCharacteristic<GcMode>(nameof(Gc));
+        public static readonly Characteristic<IReadOnlyList<EnvironmentVariable>> EnvironmentVariablesCharacteristic = CreateCharacteristic<IReadOnlyList<EnvironmentVariable>>(nameof(EnvironmentVariables));
 
         public static readonly EnvironmentMode Clr = new EnvironmentMode(Runtime.Clr).Freeze();
         public static readonly EnvironmentMode Core = new EnvironmentMode(Runtime.Core).Freeze();
@@ -82,5 +84,12 @@ namespace BenchmarkDotNet.Jobs
         /// GcMode
         /// </summary>
         public GcMode Gc => GcCharacteristic[this];
+        
+        public IReadOnlyList<EnvironmentVariable> EnvironmentVariables
+        {
+            get => EnvironmentVariablesCharacteristic[this];
+            set => EnvironmentVariablesCharacteristic[this] = value;
+        }
+
     }
 }

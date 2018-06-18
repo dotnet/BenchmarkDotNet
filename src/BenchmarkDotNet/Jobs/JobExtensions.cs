@@ -154,7 +154,7 @@ namespace BenchmarkDotNet.Jobs
         public static Job With(this Job job, IClock clock) => job.WithCore(j => j.Infrastructure.Clock = clock);
         public static Job With(this Job job, IEngineFactory engineFactory) => job.WithCore(j => j.Infrastructure.EngineFactory = engineFactory);
         public static Job WithCustomBuildConfiguration(this Job job, string buildConfiguration) => job.WithCore(j => j.Infrastructure.BuildConfiguration = buildConfiguration);
-        public static Job With(this Job job, IReadOnlyList<EnvironmentVariable> environmentVariables) => job.WithCore(j => j.Infrastructure.EnvironmentVariables = environmentVariables);
+        public static Job With(this Job job, IReadOnlyList<EnvironmentVariable> environmentVariables) => job.WithCore(j => j.Environment.EnvironmentVariables = environmentVariables);
         public static Job With(this Job job, IReadOnlyList<Argument> arguments) => job.WithCore(j => j.Infrastructure.Arguments = arguments);
 
     // Accuracy

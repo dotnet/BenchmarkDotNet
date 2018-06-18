@@ -68,7 +68,7 @@ namespace BenchmarkDotNet.Engines
                 if (invokeCount >= MaxInvokeCount)
                     break;
 
-                if (unrollFactor == 1 && invokeCount < EnvResolver.DefaultUnrollFactorForThroughput)
+                if (unrollFactor == 1 && invokeCount < EnvironmentResolver.DefaultUnrollFactorForThroughput)
                     invokeCount += 1;
                 else
                     invokeCount *= 2;
