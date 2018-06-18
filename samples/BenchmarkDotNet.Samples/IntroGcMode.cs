@@ -7,7 +7,7 @@ using BenchmarkDotNet.Order;
 namespace BenchmarkDotNet.Samples
 {
     [Config(typeof(Config))]
-    [OrderProvider(SummaryOrderPolicy.FastestToSlowest)]
+    [Orderer(SummaryOrderPolicy.FastestToSlowest)]
     [MemoryDiagnoser]
     public class IntroGcMode
     {

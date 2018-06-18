@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Configs
         private readonly List<Job> jobs = new List<Job>();
         private readonly List<HardwareCounter> hardwareCounters = new List<HardwareCounter>();
         private readonly List<IFilter> filters = new List<IFilter>();
-        private IOrderProvider orderProvider = null;
+        private IOrderer orderer = null;
         private ISummaryStyle summaryStyle = null;
         private readonly HashSet<BenchmarkLogicalGroupRule> logicalGroupRules = new HashSet<BenchmarkLogicalGroupRule>();
 
@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<Job> GetJobs() => jobs;
         public IEnumerable<HardwareCounter> GetHardwareCounters() => hardwareCounters;
         public IEnumerable<IFilter> GetFilters() => filters;
-        public IOrderProvider GetOrderProvider() => orderProvider;
+        public IOrderer GetOrderer() => orderer;
         public ISummaryStyle GetSummaryStyle() => summaryStyle;
         
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => logicalGroupRules;
@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Configs
         public void Add(params Job[] newJobs) => jobs.AddRange(newJobs.Select(j => j.Freeze())); // DONTTOUCH: please DO NOT remove .Freeze() call.
         public void Add(params HardwareCounter[] newHardwareCounters) => hardwareCounters.AddRange(newHardwareCounters);
         public void Add(params IFilter[] newFilters) => filters.AddRange(newFilters);
-        public void Set(IOrderProvider provider) => orderProvider = provider ?? orderProvider;
+        public void Set(IOrderer provider) => orderer = provider ?? orderer;
         public void Set(ISummaryStyle style) => summaryStyle = style ?? summaryStyle;
         public void Set(Encoding encoding) => Encoding = encoding;
         public void Add(params BenchmarkLogicalGroupRule[] rules) => logicalGroupRules.AddRange(rules);
@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Configs
             validators.AddRange(config.GetValidators());
             hardwareCounters.AddRange(config.GetHardwareCounters());
             filters.AddRange(config.GetFilters());
-            orderProvider = config.GetOrderProvider() ?? orderProvider;
+            orderer = config.GetOrderer() ?? orderer;
             KeepBenchmarkFiles |= config.KeepBenchmarkFiles;
             ArtifactsPath = config.ArtifactsPath ?? ArtifactsPath;
             Encoding = config.Encoding ?? Encoding;

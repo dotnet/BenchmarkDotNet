@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Reports
             ColumnCount = columns.Length;
             FullHeader = columns.Select(c => c.GetColumnTitle(style)).ToArray();
 
-            var orderProvider = summary.Config.GetOrderProvider() ?? DefaultOrderProvider.Instance;
+            var orderProvider = summary.Config.GetOrderer() ?? DefaultOrderer.Instance;
             FullContent = summary.Reports.Select(r => columns.Select(c => c.GetValue(summary, r.Benchmark, style)).ToArray()).ToArray();
             IsDefault = columns.Select(c => summary.Reports.All(r => c.IsDefault(summary, r.Benchmark))).ToArray();
 

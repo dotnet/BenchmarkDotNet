@@ -10,7 +10,7 @@ uid: BenchmarkDotNet.Samples.IntroOrderManual
 
 ### Links
 
-* @docs.orderproviders
+* @docs.orderers
 * The permanent link to this sample: @BenchmarkDotNet.Samples.IntroOrderManual
 
 ---

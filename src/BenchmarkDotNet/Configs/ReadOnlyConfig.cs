@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<HardwareCounter> GetHardwareCounters() => config.GetHardwareCounters();
         public IEnumerable<IFilter> GetFilters() => config.GetFilters();
 
-        public IOrderProvider GetOrderProvider() => config.GetOrderProvider();
+        public IOrderer GetOrderer() => config.GetOrderer();
         public ISummaryStyle GetSummaryStyle() => config.GetSummaryStyle();
 
         public ConfigUnionRule UnionRule => config.UnionRule;

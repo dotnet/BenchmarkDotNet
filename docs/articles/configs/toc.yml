@@ -18,7 +18,7 @@
   href: validators.md
 - name: Filters
   href: filters.md
-- name: Order Providers
-  href: order-providers.md
+- name: Orderers
+  href: orderers.md
 - name: Encoding
   href: encoding.md

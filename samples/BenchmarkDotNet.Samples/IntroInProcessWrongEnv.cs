@@ -10,7 +10,7 @@ using BenchmarkDotNet.Toolchains.InProcess;
 namespace BenchmarkDotNet.Samples
 {
     [Config(typeof(Config))]
-    [OrderProvider(SummaryOrderPolicy.FastestToSlowest)]
+    [Orderer(SummaryOrderPolicy.FastestToSlowest)]
     [MemoryDiagnoser]
     public class IntroInProcessWrongEnv
     {

@@ -5,13 +5,13 @@ using BenchmarkDotNet.Order;
 namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
-    public class OrderProviderAttribute : Attribute, IConfigSource
+    public class OrdererAttribute : Attribute, IConfigSource
     {
-        public OrderProviderAttribute(
+        public OrdererAttribute(
             SummaryOrderPolicy summaryOrderPolicy = SummaryOrderPolicy.Default, 
             MethodOrderPolicy methodOrderPolicy = MethodOrderPolicy.Declared)
         {
-            Config = ManualConfig.CreateEmpty().With(new DefaultOrderProvider(summaryOrderPolicy, methodOrderPolicy));
+            Config = ManualConfig.CreateEmpty().With(new DefaultOrderer(summaryOrderPolicy, methodOrderPolicy));
         }
 
         public IConfig Config { get; }

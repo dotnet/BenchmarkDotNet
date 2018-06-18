@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Configs
 
         public IEnumerable<Job> GetJobs() => Array.Empty<Job>();
 
-        public IOrderProvider GetOrderProvider() => null;
+        public IOrderer GetOrderer() => null;
 
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
 

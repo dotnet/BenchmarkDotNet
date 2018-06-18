@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<IFilter> GetFilters();
 
         [CanBeNull]
-        IOrderProvider GetOrderProvider();
+        IOrderer GetOrderer();
         ISummaryStyle GetSummaryStyle();
 
         ConfigUnionRule UnionRule { get; }

@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Order
 {
-    public interface IOrderProvider
+    public interface IOrderer
     {
         [PublicAPI, NotNull]
         IEnumerable<Benchmark> GetExecutionOrder([NotNull] Benchmark[] benchmarks);

@@ -8,9 +8,9 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Order
 {
-    public class DefaultOrderProvider : IOrderProvider
+    public class DefaultOrderer : IOrderer
     {
-        public static readonly IOrderProvider Instance = new DefaultOrderProvider();
+        public static readonly IOrderer Instance = new DefaultOrderer();
 
         private readonly IComparer<ParameterInstances> paramsComparer = ParameterComparer.Instance;
         private readonly IComparer<Job> jobComparer = JobComparer.Instance;
@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Order
 
         private readonly SummaryOrderPolicy summaryOrderPolicy;
 
-        public DefaultOrderProvider(
+        public DefaultOrderer(
             SummaryOrderPolicy summaryOrderPolicy = SummaryOrderPolicy.Default, 
             MethodOrderPolicy methodOrderPolicy = MethodOrderPolicy.Declared)
         {

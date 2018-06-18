@@ -18,10 +18,10 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                Set(new FastestToSlowestOrderProvider());
+                Set(new FastestToSlowestOrderer());
             }
 
-            private class FastestToSlowestOrderProvider : IOrderProvider
+            private class FastestToSlowestOrderer : IOrderer
             {
                 public IEnumerable<Benchmark> GetExecutionOrder(Benchmark[] benchmarks) =>
                     from benchmark in benchmarks

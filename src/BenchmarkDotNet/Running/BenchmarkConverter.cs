@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Running
             var filters = fullConfig.GetFilters().ToList();
             var filteredBenchmarks = GetFilteredBenchmarks(benchmarks, filters);
 
-            var orderProvider = fullConfig.GetOrderProvider() ?? DefaultOrderProvider.Instance;
+            var orderProvider = fullConfig.GetOrderer() ?? DefaultOrderer.Instance;
 
             return new BenchmarkRunInfo(
                 orderProvider.GetExecutionOrder(filteredBenchmarks).ToArray(),

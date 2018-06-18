@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Reports
         public string AllRuntimes { get; }
 
         private readonly Dictionary<Benchmark, BenchmarkReport> reportMap = new Dictionary<Benchmark, BenchmarkReport>();
-        private readonly IOrderProvider orderProvider;
+        private readonly IOrderer orderer;
 
         public bool HasReport(Benchmark benchmark) => reportMap.ContainsKey(benchmark);
 
@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Reports
         public bool HasCriticalValidationErrors => ValidationErrors.Any(validationError => validationError.IsCritical);
 
         [CanBeNull]
-        public string GetLogicalGroupKey(Benchmark benchmark) => orderProvider.GetLogicalGroupKey(Config, Benchmarks, benchmark);
+        public string GetLogicalGroupKey(Benchmark benchmark) => orderer.GetLogicalGroupKey(Config, Benchmarks, benchmark);
 
         public int GetNumberOfExecutedBenchmarks() => Reports.Count(report => report.ExecuteResults.Any(result => result.FoundExecutable));
 
@@ -57,8 +57,8 @@ namespace BenchmarkDotNet.Reports
                 reportMap[report.Benchmark] = report;
             Reports = Benchmarks.Select(b => reportMap[b]).ToArray();
 
-            orderProvider = config.GetOrderProvider() ?? DefaultOrderProvider.Instance;
-            Benchmarks = orderProvider.GetSummaryOrder(Benchmarks, this).ToArray();
+            orderer = config.GetOrderer() ?? DefaultOrderer.Instance;
+            Benchmarks = orderer.GetSummaryOrder(Benchmarks, this).ToArray();
             Reports = Benchmarks.Select(b => reportMap[b]).ToArray();
 
             Style = config.GetSummaryStyle();

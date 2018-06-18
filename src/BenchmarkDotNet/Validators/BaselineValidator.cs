@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Validators
         public IEnumerable<ValidationError> Validate(ValidationParameters input)
         {
             var allBenchmarks = input.Benchmarks.ToArray();
-            var orderProvider = input.Config.GetOrderProvider() ?? DefaultOrderProvider.Instance;
+            var orderProvider = input.Config.GetOrderer() ?? DefaultOrderer.Instance;
             
             var benchmarkLogicalGroups = allBenchmarks
                 .Select(benchmark => orderProvider.GetLogicalGroupKey(input.Config, allBenchmarks, benchmark))

@@ -4,7 +4,7 @@ using BenchmarkDotNet.Order;
 
 namespace BenchmarkDotNet.Samples
 {
-    [OrderProvider(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
+    [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
     [DryJob]
     public class IntroOrderAttr
     {
