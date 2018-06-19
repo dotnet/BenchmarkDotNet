@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void AllSetupAndCleanupMethodRunsTest()
         {
             var logger = new OutputLogger(Output);
-            var miniJob = Job.Default.With(RunStrategy.Monitoring).WithWarmupCount(2).WithTargetCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
+            var miniJob = Job.Default.With(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
             var config = CreateSimpleConfig(logger, miniJob);
 
             CanExecute<AllSetupAndCleanupAttributeBenchmarks>(config);

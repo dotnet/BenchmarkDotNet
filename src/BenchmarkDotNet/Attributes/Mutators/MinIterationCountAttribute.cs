@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Attributes
     /// </summary>
     public class MinIterationCountAttribute : JobMutatorConfigBaseAttribute
     {
-        public MinIterationCountAttribute(int minTargetIterationCount) : base(Job.Default.WithMinTargetIterationCount(minTargetIterationCount))
+        public MinIterationCountAttribute(int minTargetIterationCount) : base(Job.Default.WithMinIterationCount(minTargetIterationCount))
         {
         }
     }

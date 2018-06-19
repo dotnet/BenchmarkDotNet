@@ -18,8 +18,8 @@ namespace BenchmarkDotNet.Engines
             Register(RunMode.RunStrategyCharacteristic, () => RunStrategy.Throughput);
             Register(RunMode.IterationTimeCharacteristic, () => TimeInterval.Millisecond * 500);
 
-            Register(RunMode.MinWorkloadIterationCountCharacteristic, () => DefaultMinWorkloadIterationCount);
-            Register(RunMode.MaxWorkloadIterationCountCharacteristic, () => DefaultMaxWorkloadIterationCount);
+            Register(RunMode.MinIterationCountCharacteristic, () => DefaultMinWorkloadIterationCount);
+            Register(RunMode.MaxIterationCountCharacteristic, () => DefaultMaxWorkloadIterationCount);
 
             Register(AccuracyMode.MaxRelativeErrorCharacteristic, () => 0.02);
             Register(AccuracyMode.MinIterationTimeCharacteristic, () => TimeInterval.Millisecond * 500);

@@ -13,18 +13,18 @@ namespace BenchmarkDotNet.Jobs
 
         public static readonly Characteristic<int> LaunchCountCharacteristic = CreateCharacteristic<int>(nameof(LaunchCount));
         public static readonly Characteristic<int> WarmupCountCharacteristic = CreateCharacteristic<int>(nameof(WarmupCount));
-        public static readonly Characteristic<int> TargetCountCharacteristic = CreateCharacteristic<int>(nameof(TargetCount));
+        public static readonly Characteristic<int> IterationCountCharacteristic = CreateCharacteristic<int>(nameof(IterationCount));
         public static readonly Characteristic<TimeInterval> IterationTimeCharacteristic = CreateCharacteristic<TimeInterval>(nameof(IterationTime));
         public static readonly Characteristic<int> InvocationCountCharacteristic = CreateCharacteristic<int>(nameof(InvocationCount));
         public static readonly Characteristic<int> UnrollFactorCharacteristic = CreateCharacteristic<int>(nameof(UnrollFactor));
-        public static readonly Characteristic<int> MinWorkloadIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MinTargetIterationCount));
-        public static readonly Characteristic<int> MaxWorkloadIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MaxTargetIterationCount));
+        public static readonly Characteristic<int> MinIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MinIterationCount));
+        public static readonly Characteristic<int> MaxIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MaxIterationCount));
 
         public static readonly RunMode Dry = new RunMode(nameof(Dry))
         {
             LaunchCount = 1,
             WarmupCount = 1,
-            TargetCount = 1,
+            IterationCount = 1,
             RunStrategy = RunStrategy.ColdStart,
             UnrollFactor = 1
         }.Freeze();
@@ -33,28 +33,28 @@ namespace BenchmarkDotNet.Jobs
         {
             LaunchCount = 1,
             WarmupCount = 3,
-            TargetCount = 3
+            IterationCount = 3
         }.Freeze();
 
         public static readonly RunMode Medium = new RunMode(nameof(Medium))
         {
             LaunchCount = 2,
             WarmupCount = 10,
-            TargetCount = 15
+            IterationCount = 15
         }.Freeze();
 
         public static readonly RunMode Long = new RunMode(nameof(Long))
         {
             LaunchCount = 3,
             WarmupCount = 15,
-            TargetCount = 100
+            IterationCount = 100
         }.Freeze();
 
         public static readonly RunMode VeryLong = new RunMode(nameof(VeryLong))
         {
             LaunchCount = 4,
             WarmupCount = 30,
-            TargetCount = 500
+            IterationCount = 500
         }.Freeze();
 
 
@@ -98,13 +98,13 @@ namespace BenchmarkDotNet.Jobs
 
         /// <summary>
         /// How many target iterations should be performed
-        /// If specified, <see cref="MinTargetIterationCount"/> will be ignored.
-        /// If specified, <see cref="MaxTargetIterationCount"/> will be ignored.
+        /// If specified, <see cref="MinIterationCount"/> will be ignored.
+        /// If specified, <see cref="MaxIterationCount"/> will be ignored.
         /// </summary>
-        public int TargetCount
+        public int IterationCount
         {
-            get { return TargetCountCharacteristic[this]; }
-            set { TargetCountCharacteristic[this] = value; }
+            get { return IterationCountCharacteristic[this]; }
+            set { IterationCountCharacteristic[this] = value; }
         }
 
         /// <summary>
@@ -142,10 +142,10 @@ namespace BenchmarkDotNet.Jobs
         /// The default value is 15
         /// <remarks>If you set this value to below 15, then <see cref="MultimodalDistributionAnalyzer"/> is not going to work</remarks>
         /// </summary>
-        public int MinTargetIterationCount
+        public int MinIterationCount
         {
-            get { return MinWorkloadIterationCountCharacteristic[this]; }
-            set { MinWorkloadIterationCountCharacteristic[this] = value; }
+            get { return MinIterationCountCharacteristic[this]; }
+            set { MinIterationCountCharacteristic[this] = value; }
         }
 
         /// <summary>
@@ -153,10 +153,10 @@ namespace BenchmarkDotNet.Jobs
         /// The default value is 100
         /// <remarks>If you set this value to below 15, then <see cref="MultimodalDistributionAnalyzer"/>  is not going to work</remarks>
         /// </summary>
-        public int MaxTargetIterationCount
+        public int MaxIterationCount
         {
-            get { return MaxWorkloadIterationCountCharacteristic[this]; }
-            set { MaxWorkloadIterationCountCharacteristic[this] = value; }
+            get { return MaxIterationCountCharacteristic[this]; }
+            set { MaxIterationCountCharacteristic[this] = value; }
         }
     }
 }

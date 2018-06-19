@@ -35,17 +35,17 @@ namespace BenchmarkDotNet.Validators
                     }
                 }
                 
-                int minTargetCount = run.ResolveValue(RunMode.MinWorkloadIterationCountCharacteristic, resolver);
-                int maxTargetCount = run.ResolveValue(RunMode.MaxWorkloadIterationCountCharacteristic, resolver);
+                int minTargetCount = run.ResolveValue(RunMode.MinIterationCountCharacteristic, resolver);
+                int maxTargetCount = run.ResolveValue(RunMode.MaxIterationCountCharacteristic, resolver);
 
                 if (minTargetCount <= 0)
-                    yield return new ValidationError(true, $"{nameof(RunMode.MinTargetIterationCount)} must be greater than zero (was {minTargetCount})", benchmark);
+                    yield return new ValidationError(true, $"{nameof(RunMode.MinIterationCount)} must be greater than zero (was {minTargetCount})", benchmark);
 
                 if (maxTargetCount <= 0)
-                    yield return new ValidationError(true, $"{nameof(RunMode.MaxTargetIterationCount)} must be greater than zero (was {maxTargetCount})", benchmark);
+                    yield return new ValidationError(true, $"{nameof(RunMode.MaxIterationCount)} must be greater than zero (was {maxTargetCount})", benchmark);
 
                 if (minTargetCount >= maxTargetCount)
-                    yield return new ValidationError(true, $"{nameof(RunMode.MaxTargetIterationCount)} must be greater than {nameof(RunMode.MinTargetIterationCount)} (was {maxTargetCount} and {minTargetCount})", benchmark);
+                    yield return new ValidationError(true, $"{nameof(RunMode.MaxIterationCount)} must be greater than {nameof(RunMode.MinIterationCount)} (was {maxTargetCount} and {minTargetCount})", benchmark);
             }
         }
     }

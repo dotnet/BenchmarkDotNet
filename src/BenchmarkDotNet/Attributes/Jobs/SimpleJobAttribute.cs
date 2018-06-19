@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Attributes
             if (warmupCount != DefaultValue)
                 job.Run.WarmupCount = warmupCount;
             if (targetCount != DefaultValue)
-                job.Run.TargetCount = targetCount;
+                job.Run.IterationCount = targetCount;
             if (invocationCount != DefaultValue)
             {
                 job.Run.InvocationCount = invocationCount;

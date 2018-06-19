@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
@@ -257,27 +258,27 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var j = new Job()
             {
-                Run = { TargetCount = 1 }
+                Run = { IterationCount = 1 }
             };
 
-            AssertProperties(j, "TargetCount=1");
+            AssertProperties(j, "IterationCount=1");
 
             j.Apply(
                 new Job
                 {
                     Environment = { Platform = Platform.X64 },
-                    Run = { TargetCount = 2 }
+                    Run = { IterationCount = 2 }
                 });
-            AssertProperties(j, "Platform=X64, TargetCount=2");
+            AssertProperties(j, "Platform=X64, IterationCount=2");
 
             // filter by properties
             j.Environment.Apply(
                 new Job()
                     .With(Jit.RyuJit)
                     .WithGcAllowVeryLargeObjects(true)
-                    .WithTargetCount(3)
+                    .WithIterationCount(3)
                     .WithLaunchCount(22));
-            AssertProperties(j, "Jit=RyuJit, Platform=X64, AllowVeryLargeObjects=True, TargetCount=2");
+            AssertProperties(j, "Jit=RyuJit, Platform=X64, AllowVeryLargeObjects=True, IterationCount=2");
 
             // apply subnode
             j.Apply(
@@ -285,11 +286,11 @@ namespace BenchmarkDotNet.IntegrationTests
                 {
                     AllowVeryLargeObjects = false
                 });
-            AssertProperties(j, "Jit=RyuJit, Platform=X64, AllowVeryLargeObjects=False, TargetCount=2");
+            AssertProperties(j, "Jit=RyuJit, Platform=X64, AllowVeryLargeObjects=False, IterationCount=2");
 
             // Apply empty
             j.Apply(Job.Default); // does nothing
-            AssertProperties(j, "Jit=RyuJit, Platform=X64, AllowVeryLargeObjects=False, TargetCount=2");
+            AssertProperties(j, "Jit=RyuJit, Platform=X64, AllowVeryLargeObjects=False, IterationCount=2");
         }
 
         [Fact]
@@ -352,19 +353,19 @@ namespace BenchmarkDotNet.IntegrationTests
         public static void Test06CharacteristicHacks()
         {
             var j = new Job();
-            Assert.Equal(0, j.Run.TargetCount);
+            Assert.Equal(0, j.Run.IterationCount);
 
-            RunMode.TargetCountCharacteristic[j] = 123;
-            Assert.Equal(123, j.Run.TargetCount);
+            RunMode.IterationCountCharacteristic[j] = 123;
+            Assert.Equal(123, j.Run.IterationCount);
 
             var old = j.Run;
             Job.RunCharacteristic[j] = new RunMode();
-            Assert.Equal(0, j.Run.TargetCount);
+            Assert.Equal(0, j.Run.IterationCount);
 
             Job.RunCharacteristic[j] = old;
-            old.TargetCount = 234;
-            Assert.Equal(234, j.Run.TargetCount);
-            Assert.Equal(234, RunMode.TargetCountCharacteristic[j]);
+            old.IterationCount = 234;
+            Assert.Equal(234, j.Run.IterationCount);
+            Assert.Equal(234, RunMode.IterationCountCharacteristic[j]);
 
             Characteristic a = Job.RunCharacteristic;
             // will not throw:
@@ -400,8 +401,8 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Equal("Id;Accuracy;AnalyzeLaunchVariance;EvaluateOverhead;" +
                 "MaxAbsoluteError;MaxRelativeError;MinInvokeCount;MinIterationTime;OutlierMode;Environment;Affinity;EnvironmentVariables;" +
                 "Jit;Platform;Runtime;Gc;AllowVeryLargeObjects;Concurrent;CpuGroups;Force;HeapAffinitizeMask;HeapCount;NoAffinitize;" +
-                "RetainVm;Server;Infrastructure;Arguments;BuildConfiguration;Clock;EngineFactory;Toolchain;Meta;IsBaseline;IsMutator;Run;InvocationCount;IterationTime;" +
-                "LaunchCount;MaxTargetIterationCount;MinTargetIterationCount;RunStrategy;TargetCount;UnrollFactor;WarmupCount", string.Join(";", a));
+                "RetainVm;Server;Infrastructure;Arguments;BuildConfiguration;Clock;EngineFactory;Toolchain;Meta;IsBaseline;IsMutator;Run;InvocationCount;IterationCount;IterationTime;" +
+                "LaunchCount;MaxIterationCount;MinIterationCount;RunStrategy;UnrollFactor;WarmupCount", string.Join(";", a));
         }
         
         [Fact]
@@ -410,16 +411,53 @@ namespace BenchmarkDotNet.IntegrationTests
             var jobBefore = Job.Core; // this is a default job with Runtime set to Core
             var copy = jobBefore.UnfreezeCopy();
             
-            Assert.False(copy.HasValue(RunMode.MaxWorkloadIterationCountCharacteristic));
+            Assert.False(copy.HasValue(RunMode.MaxIterationCountCharacteristic));
 
-            var mutator = Job.Default.WithMaxTargetIterationCount(20);
+            var mutator = Job.Default.WithMaxIterationCount(20);
 
             copy.Apply(mutator);
             
-            Assert.True(copy.HasValue(RunMode.MaxWorkloadIterationCountCharacteristic));
-            Assert.Equal(20, copy.Run.MaxTargetIterationCount);
-            Assert.False(jobBefore.HasValue(RunMode.MaxWorkloadIterationCountCharacteristic));
+            Assert.True(copy.HasValue(RunMode.MaxIterationCountCharacteristic));
+            Assert.Equal(20, copy.Run.MaxIterationCount);
+            Assert.False(jobBefore.HasValue(RunMode.MaxIterationCountCharacteristic));
             Assert.True(copy.Environment.Runtime is CoreRuntime);
+        }
+
+        [Fact]
+        public static void AllJobModesPropertyNamesMatchCharacteristicNames() // it't mandatory to generate the right c# code
+        {
+            var jobModes = typeof(JobMode<>)
+                .Assembly
+                .GetExportedTypes()
+                .Where(type => type.IsSubclassOf(typeof(CharacteristicObject)) && IsSubclassOfobModeOfItself(type))
+                .ToArray();
+
+            foreach (var jobMode in jobModes)
+            {
+                var properties = jobMode.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Where(property => property.CanRead && property.CanWrite);
+
+                foreach (var property in properties)
+                {
+                    string expectedPropertyName = $"{property.Name}Characteristic";
+                    Assert.True(null != jobMode.GetField(expectedPropertyName, BindingFlags.Static | BindingFlags.Public), $"{expectedPropertyName} in {jobMode.Name} does not exist");
+                }
+            }
+        }
+
+        private static bool IsSubclassOfobModeOfItself(Type type)
+        {
+            Type jobModeOfT;
+            
+            try
+            {
+                jobModeOfT = typeof(JobMode<>).MakeGenericType(type);
+            }
+            catch (ArgumentException) //  violates the constraint of type parameter 'T'.
+            {
+                return false;
+            }
+            
+            return type.IsSubclassOf(jobModeOfT);
         }
     }
 }

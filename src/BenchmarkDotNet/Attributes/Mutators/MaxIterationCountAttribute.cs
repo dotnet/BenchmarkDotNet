@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Attributes
     /// </summary>
     public class MaxIterationCountAttribute : JobMutatorConfigBaseAttribute
     {
-        public MaxIterationCountAttribute(int maxTargetIterationCount) : base(Job.Default.WithMaxTargetIterationCount(maxTargetIterationCount))
+        public MaxIterationCountAttribute(int maxTargetIterationCount) : base(Job.Default.WithMaxIterationCount(maxTargetIterationCount))
         {
         }
     }

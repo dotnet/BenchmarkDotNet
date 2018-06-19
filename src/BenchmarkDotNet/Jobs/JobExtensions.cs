@@ -104,12 +104,15 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         public static Job WithWarmupCount(this Job job, int count) => job.WithCore(j => j.Run.WarmupCount = count);
         
+        [Obsolete("Please use WithIterationCount instead (rename)")]
+        public static Job WithTargetCount(this Job job, int count) => job.WithCore(j => j.Run.IterationCount = count);
+        
         /// <summary>
         /// How many target iterations should be performed.
-        /// If specified, <see cref="RunMode.MinTargetIterationCount"/> will be ignored.
-        /// If specified, <see cref="RunMode.MaxTargetIterationCount"/> will be ignored.
+        /// If specified, <see cref="RunMode.MinIterationCount"/> will be ignored.
+        /// If specified, <see cref="RunMode.MaxIterationCount"/> will be ignored.
         /// </summary>
-        public static Job WithTargetCount(this Job job, int count) => job.WithCore(j => j.Run.TargetCount = count);
+        public static Job WithIterationCount(this Job job, int count) => job.WithCore(j => j.Run.IterationCount = count);
         
         /// <summary>
         /// Desired time of execution of an iteration. Used by Pilot stage to estimate the number of invocations per iteration.
@@ -140,14 +143,14 @@ namespace BenchmarkDotNet.Jobs
         /// The default value is 15.
         /// <remarks>If you set this value to below 15, then <see cref="MultimodalDistributionAnalyzer"/> is not going to work.</remarks>
         /// </summary>
-        public static Job WithMinTargetIterationCount(this Job job, int count) => job.WithCore(j => j.Run.MinTargetIterationCount = count);
+        public static Job WithMinIterationCount(this Job job, int count) => job.WithCore(j => j.Run.MinIterationCount = count);
         
         /// <summary>
         /// Maximum count of target iterations that should be performed.
         /// The default value is 100.
         /// <remarks>If you set this value to below 15, then <see cref="MultimodalDistributionAnalyzer"/>  is not going to work.</remarks>
         /// </summary>
-        public static Job WithMaxTargetIterationCount(this Job job, int count) => job.WithCore(j => j.Run.MaxTargetIterationCount = count);
+        public static Job WithMaxIterationCount(this Job job, int count) => job.WithCore(j => j.Run.MaxIterationCount = count);
 
     // Infrastructure
         public static Job With(this Job job, IToolchain toolchain) => job.WithCore(j => j.Infrastructure.Toolchain = toolchain);

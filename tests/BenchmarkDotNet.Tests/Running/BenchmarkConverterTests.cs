@@ -122,7 +122,7 @@ namespace BenchmarkDotNet.Tests.Running
                         .With(Job.Core));
             
             Assert.Equal(2, info.BenchmarksCases.Length);
-            Assert.All(info.BenchmarksCases, benchmark => Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxTargetIterationCount));
+            Assert.All(info.BenchmarksCases, benchmark => Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxIterationCount));
             Assert.Single(info.BenchmarksCases, benchmark => benchmark.Job.Environment.Runtime is ClrRuntime);
             Assert.Single(info.BenchmarksCases, benchmark => benchmark.Job.Environment.Runtime is CoreRuntime);
         }
@@ -140,7 +140,7 @@ namespace BenchmarkDotNet.Tests.Running
             
             var benchmark = info.BenchmarksCases.Single();
             
-            Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxTargetIterationCount);
+            Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxIterationCount);
         }
         
         [Fact]
@@ -150,7 +150,7 @@ namespace BenchmarkDotNet.Tests.Running
             
             var benchmark = info.BenchmarksCases.Single();
             
-            Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxTargetIterationCount);
+            Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxIterationCount);
             Assert.True(benchmark.Job.Environment.Runtime is CoreRuntime);
         }
 

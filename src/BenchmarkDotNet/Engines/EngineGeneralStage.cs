@@ -22,12 +22,12 @@ namespace BenchmarkDotNet.Engines
 
         public EngineGeneralStage(IEngine engine) : base(engine)
         {
-            targetCount = engine.TargetJob.ResolveValueAsNullable(RunMode.TargetCountCharacteristic);
+            targetCount = engine.TargetJob.ResolveValueAsNullable(RunMode.IterationCountCharacteristic);
             maxRelativeError = engine.TargetJob.ResolveValue(AccuracyMode.MaxRelativeErrorCharacteristic, engine.Resolver);
             maxAbsoluteError = engine.TargetJob.ResolveValueAsNullable(AccuracyMode.MaxAbsoluteErrorCharacteristic);
             outlierMode = engine.TargetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, engine.Resolver);
-            minIterationCount = engine.TargetJob.ResolveValue(RunMode.MinWorkloadIterationCountCharacteristic, engine.Resolver);
-            maxIterationCount = engine.TargetJob.ResolveValue(RunMode.MaxWorkloadIterationCountCharacteristic, engine.Resolver);
+            minIterationCount = engine.TargetJob.ResolveValue(RunMode.MinIterationCountCharacteristic, engine.Resolver);
+            maxIterationCount = engine.TargetJob.ResolveValue(RunMode.MaxIterationCountCharacteristic, engine.Resolver);
         }
 
         public IReadOnlyList<Measurement> RunOverhead(long invokeCount, int unrollFactor) 

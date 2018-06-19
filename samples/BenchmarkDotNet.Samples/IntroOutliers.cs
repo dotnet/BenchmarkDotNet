@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                var jobBase = Job.Default.WithWarmupCount(0).WithTargetCount(10).WithInvocationCount(1).WithUnrollFactor(1);
+                var jobBase = Job.Default.WithWarmupCount(0).WithIterationCount(10).WithInvocationCount(1).WithUnrollFactor(1);
                 Add(jobBase.WithOutlierMode(OutlierMode.None).WithId("DontRemoveOutliers"));
                 Add(jobBase.WithOutlierMode(OutlierMode.OnlyUpper).WithId("RemoveUpperOutliers"));
             }

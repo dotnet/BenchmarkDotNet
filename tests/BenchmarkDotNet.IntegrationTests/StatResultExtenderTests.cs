@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.IntegrationTests
         private static Job CreateJob() =>
             new Job("MainJob", Job.Dry)
             {
-                Run = { TargetCount = 10, IterationTime = TimeInterval.Millisecond * 10 }
+                Run = { IterationCount = 10, IterationTime = TimeInterval.Millisecond * 10 }
             };
 
         public class Benchmarks
