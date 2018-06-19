@@ -5,6 +5,7 @@ using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using Xunit;
 
@@ -35,7 +36,7 @@ namespace BenchmarkDotNet.Tests
             
             var column = new JobCharacteristicColumn(EnvironmentMode.AffinityCharacteristic);
             
-            var expected = "1".PadLeft(Environment.ProcessorCount, '1');
+            var expected = Convert.ToString((int)RuntimeInformation.GetCurrentAffinity(), 2).PadLeft(Environment.ProcessorCount, '1');
 
             var printed = column.GetValue(summary: null, benchmarkCase);
 
