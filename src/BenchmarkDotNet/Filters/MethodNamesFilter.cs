@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Filters
         public bool Predicate(BenchmarkCase benchmarkCase)
             => methodNames.Any(methodName =>
             {
-                var method = benchmarkCase.Descriptor.Method;
+                var method = benchmarkCase.Descriptor.WorkloadMethod;
                 var fullName = $"{method.DeclaringType.FullName}.{method.Name}";
 
                 return method.Name.ContainsWithIgnoreCase(methodName) || fullName.ContainsWithIgnoreCase(methodName);

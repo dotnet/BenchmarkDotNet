@@ -36,9 +36,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {
-            if (signal == HostSignal.BeforeMainRun)
+            if (signal == HostSignal.BeforeGeneralRun)
                 Start(parameters);
-            else if(signal == HostSignal.AfterMainRun)
+            else if(signal == HostSignal.AfterGeneralRun)
                 Stop();
         }
 

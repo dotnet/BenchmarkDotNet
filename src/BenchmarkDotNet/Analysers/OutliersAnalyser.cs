@@ -17,22 +17,22 @@ namespace BenchmarkDotNet.Analysers
 
         public override IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary)
         {
-            var actual = report.AllMeasurements.Where(m => m.IterationMode == IterationMode.MainTarget).ToArray();
-            if (actual.IsEmpty())
+            var workloadGeneral = report.AllMeasurements.Where(m => m.Is(IterationMode.Workload, IterationStage.General)).ToArray();
+            if (workloadGeneral.IsEmpty())
                 yield break;
-            var result = report.AllMeasurements.Where(m => m.IterationMode == IterationMode.Result).ToArray();
+            var result = report.AllMeasurements.Where(m => m.Is(IterationMode.Workload, IterationStage.Result)).ToArray();
             var outlierMode = report.BenchmarkCase.Job.ResolveValue(AccuracyMode.OutlierModeCharacteristic, EngineResolver.Instance); // TODO: improve            
-            var statistics = actual.GetStatistics();
+            var statistics = workloadGeneral.GetStatistics();
             var allOutliers = statistics.AllOutliers;
             var actualOutliers = statistics.GetActualOutliers(outlierMode);
 
-            if (result.Length + actualOutliers.Length != actual.Length)
+            if (result.Length + actualOutliers.Length != workloadGeneral.Length)
             {
                 // This should never happen
                 yield return CreateHint(
                     $"Something went wrong with outliers: " +
-                    $"Size(MainTarget) = {actual.Length}, " +
-                    $"Size(MainTarget/Outliers) = {actualOutliers.Length}, " +
+                    $"Size(WorkloadGeneral) = {workloadGeneral.Length}, " +
+                    $"Size(WorkloadGeneral/Outliers) = {actualOutliers.Length}, " +
                     $"Size(Result) = {result.Length}), " +
                     $"OutlierMode = {outlierMode}",
                     report);

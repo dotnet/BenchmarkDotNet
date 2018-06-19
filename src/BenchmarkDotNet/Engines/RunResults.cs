@@ -14,32 +14,32 @@ namespace BenchmarkDotNet.Engines
         private readonly OutlierMode outlierMode;
         private readonly Encoding encoding;
         [CanBeNull]
-        public IReadOnlyList<Measurement> Idle { get; }
+        public IReadOnlyList<Measurement> Overhead { get; }
 
         [NotNull]
-        public IReadOnlyList<Measurement> Main { get; }
+        public IReadOnlyList<Measurement> Workload { get; }
 
         public GcStats GCStats { get; }
 
-        public RunResults([CanBeNull] IReadOnlyList<Measurement> idle,
-                          [NotNull] IReadOnlyList<Measurement> main,
+        public RunResults([CanBeNull] IReadOnlyList<Measurement> overhead,
+                          [NotNull] IReadOnlyList<Measurement> workload,
                           OutlierMode outlierMode,
                           GcStats gcStats,
                           Encoding encoding)
         {
             this.outlierMode = outlierMode;
             this.encoding = encoding;
-            Idle = idle;
-            Main = main;
+            Overhead = overhead;
+            Workload = workload;
             GCStats = gcStats;
         }
 
         public IEnumerable<Measurement> GetMeasurements()
         {
-            double overhead = Idle == null ? 0.0 : new Statistics(Idle.Select(m => m.Nanoseconds)).Mean;
-            var mainStats = new Statistics(Main.Select(m => m.Nanoseconds));
+            double overhead = Overhead == null ? 0.0 : new Statistics(Overhead.Select(m => m.Nanoseconds)).Mean;
+            var mainStats = new Statistics(Workload.Select(m => m.Nanoseconds));
             int resultIndex = 0;
-            foreach (var measurement in Main)
+            foreach (var measurement in Workload)
             {
                 if (mainStats.IsActualOutlier(measurement.Nanoseconds, outlierMode))
                     continue;
@@ -50,7 +50,8 @@ namespace BenchmarkDotNet.Engines
 
                 yield return new Measurement(
                     measurement.LaunchIndex,
-                    IterationMode.Result,
+                    IterationMode.Workload,
+                    IterationStage.Result, 
                     ++resultIndex,
                     measurement.Operations,
                     value,

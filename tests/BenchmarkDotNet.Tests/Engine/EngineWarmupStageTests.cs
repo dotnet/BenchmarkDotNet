@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Tests.Engine
     {
         private const int MinIterationCount = EngineWarmupStage.MinIterationCount;
         private const int MaxIterationCount = EngineWarmupStage.MaxIterationCount;
-        private const int MaxIdleItertaionCount = EngineWarmupStage.MaxIdleItertaionCount;
+        private const int MaxOverheadItertaionCount = EngineWarmupStage.MaxOverheadItertaionCount;
 
         private readonly ITestOutputHelper output;
 
@@ -46,12 +46,12 @@ namespace BenchmarkDotNet.Tests.Engine
         }
 
         [Fact]
-        public void AutoTest_WithoutSteadyStateIdle()
+        public void AutoTest_WithoutSteadyStateOverhead()
         {
-            AutoTest(data => TimeInterval.Millisecond * data.Index, MaxIdleItertaionCount, mode: IterationMode.IdleWarmup);
+            AutoTest(data => TimeInterval.Millisecond * data.Index, MaxOverheadItertaionCount, mode: IterationMode.Overhead);
         }
 
-        private void AutoTest(Func<IterationData, TimeInterval> measure, int min, int max = -1, IterationMode mode = IterationMode.MainWarmup)
+        private void AutoTest(Func<IterationData, TimeInterval> measure, int min, int max = -1, IterationMode mode = IterationMode.Workload)
         {
             if (max == -1)
                 max = min;

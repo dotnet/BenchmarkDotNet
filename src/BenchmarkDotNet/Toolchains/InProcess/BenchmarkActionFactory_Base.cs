@@ -8,14 +8,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 {
     /*
         Design goals of the whole stuff:
-        0. Reusable API to call Setup/Clean/Idle/Run actions with arbitrary return value and store the result.
+        0. Reusable API to call Setup/Clean/Overhead/Workload actions with arbitrary return value and store the result.
             Supported ones are: void, T, Task, Task<T>, ValueTask<T>. No input args, same as for outofproc benchmarks.
-        1. Idle signature should match to the benchmark method signature (including static/instance modifier).
+        1. Overhead signature should match to the benchmark method signature (including static/instance modifier).
         2. Should work under .Net native. There's CodegenMode option to use Delegate.Combine instead of emitting the code.
         3. High data locality and no additional allocations / JIT where possible.
             This means NO closures allowed, no allocations but in .ctor and for LastCallResult boxing,
             all state should be stored explicitly as BenchmarkAction's fields.
-        4. There can be multiple benchmark actions per single target instance (target, globalSetup, globalCleanup methods),
+        4. There can be multiple benchmark actions per single target instance (workload, globalSetup, globalCleanup methods),
             so target instantiation is not a responsibility of the benchmark action.
         5. Implementation should match to the code in BenchmarkProgram.txt.
             As example, this code emits loop unroll only, task waiting is implemented as a delegate call.
@@ -31,25 +31,25 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <summary>Base class that provides reusable API for final implementations.</summary>
         internal abstract class BenchmarkActionBase : BenchmarkAction
         {
-            protected static TDelegate CreateMain<TDelegate>([CanBeNull] object targetInstance, MethodInfo mainMethod)
+            protected static TDelegate CreateWorkload<TDelegate>([CanBeNull] object targetInstance, MethodInfo workloadMethod)
             {
-                if (mainMethod.IsStatic)
-                    return (TDelegate)(object)mainMethod.CreateDelegate(typeof(TDelegate));
+                if (workloadMethod.IsStatic)
+                    return (TDelegate)(object)workloadMethod.CreateDelegate(typeof(TDelegate));
 
-                return (TDelegate)(object)mainMethod.CreateDelegate(typeof(TDelegate), targetInstance);
+                return (TDelegate)(object)workloadMethod.CreateDelegate(typeof(TDelegate), targetInstance);
             }
 
-            protected static TDelegate CreateMainOrIdle<TDelegate>(
-                [CanBeNull] object targetInstance, [CanBeNull] MethodInfo mainMethod,
-                [NotNull] TDelegate idleStaticCallback, [NotNull] TDelegate idleInstanceCallback)
+            protected static TDelegate CreateWorkloadOrOverhead<TDelegate>(
+                [CanBeNull] object targetInstance, [CanBeNull] MethodInfo workloadMethod,
+                [NotNull] TDelegate overheadStaticCallback, [NotNull] TDelegate overheadInstanceCallback)
             {
-                if (mainMethod == null)
-                    return targetInstance == null ? idleStaticCallback : idleInstanceCallback;
+                if (workloadMethod == null)
+                    return targetInstance == null ? overheadStaticCallback : overheadInstanceCallback;
 
-                if (mainMethod.IsStatic)
-                    return (TDelegate)(object)mainMethod.CreateDelegate(typeof(TDelegate));
+                if (workloadMethod.IsStatic)
+                    return (TDelegate)(object)workloadMethod.CreateDelegate(typeof(TDelegate));
 
-                return (TDelegate)(object)mainMethod.CreateDelegate(typeof(TDelegate), targetInstance);
+                return (TDelegate)(object)workloadMethod.CreateDelegate(typeof(TDelegate), targetInstance);
             }
 
             protected static bool UseFallbackCode(BenchmarkActionCodegen codegenMode, int unrollFactor) =>

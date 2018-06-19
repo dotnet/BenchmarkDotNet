@@ -8,15 +8,15 @@ namespace BenchmarkDotNet.Columns
 {
     public static class DefaultColumnProviders
     {
-        public static readonly IColumnProvider Target = new TargetColumnProvider();
+        public static readonly IColumnProvider Descriptor = new DescriptorColumnProvider();
         public static readonly IColumnProvider Job = new JobColumnProvider();
         public static readonly IColumnProvider Statistics = new StatisticsColumnProvider();
         public static readonly IColumnProvider Params = new ParamsColumnProvider();
         public static readonly IColumnProvider Diagnosers = new DiagnosersColumnProvider();
 
-        public static readonly IColumnProvider[] Instance = { Target, Job, Statistics, Params, Diagnosers };
+        public static readonly IColumnProvider[] Instance = { Descriptor, Job, Statistics, Params, Diagnosers };
 
-        private class TargetColumnProvider : IColumnProvider
+        private class DescriptorColumnProvider : IColumnProvider
         {
             public IEnumerable<IColumn> GetColumns(Summary summary)
             {

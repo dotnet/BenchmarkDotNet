@@ -410,15 +410,15 @@ namespace BenchmarkDotNet.IntegrationTests
             var jobBefore = Job.Core; // this is a default job with Runtime set to Core
             var copy = jobBefore.UnfreezeCopy();
             
-            Assert.False(copy.HasValue(RunMode.MaxTargetIterationCountCharacteristic));
+            Assert.False(copy.HasValue(RunMode.MaxWorkloadIterationCountCharacteristic));
 
             var mutator = Job.Default.WithMaxTargetIterationCount(20);
 
             copy.Apply(mutator);
             
-            Assert.True(copy.HasValue(RunMode.MaxTargetIterationCountCharacteristic));
+            Assert.True(copy.HasValue(RunMode.MaxWorkloadIterationCountCharacteristic));
             Assert.Equal(20, copy.Run.MaxTargetIterationCount);
-            Assert.False(jobBefore.HasValue(RunMode.MaxTargetIterationCountCharacteristic));
+            Assert.False(jobBefore.HasValue(RunMode.MaxWorkloadIterationCountCharacteristic));
             Assert.True(copy.Environment.Runtime is CoreRuntime);
         }
     }

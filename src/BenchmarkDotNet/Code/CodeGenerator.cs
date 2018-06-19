@@ -28,8 +28,8 @@ namespace BenchmarkDotNet.Code
             var benchmarksCode = new List<string>(buildPartition.Benchmarks.Length);
 
             var extraDefines = new List<string>();
-            var targetTypeNamespaces = new HashSet<string>();
-            var targetMethodReturnTypeNamespace = new HashSet<string>();
+            var workloadTypeNamespaces = new HashSet<string>();
+            var workloadMethodReturnTypeNamespace = new HashSet<string>();
             var additionalLogic = new HashSet<string>();
 
             foreach (var buildInfo in buildPartition.Benchmarks)
@@ -42,22 +42,22 @@ namespace BenchmarkDotNet.Code
 
                 extraDefines.Add($"{provider.ExtraDefines}_{buildInfo.Id}");
 
-                AddNonEmptyUnique(targetTypeNamespaces, provider.TargetTypeNamespace);
-                AddNonEmptyUnique(targetMethodReturnTypeNamespace, provider.TargetMethodReturnTypeNamespace);
+                AddNonEmptyUnique(workloadTypeNamespaces, provider.WorkloadTypeNamespace);
+                AddNonEmptyUnique(workloadMethodReturnTypeNamespace, provider.WorkloadMethodReturnTypeNamespace);
                 AddNonEmptyUnique(additionalLogic, benchmark.Descriptor.AdditionalLogic);
 
                 string benchmarkTypeCode = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkType.txt"))
                     .Replace("$ID$", buildInfo.Id.ToString())
                     .Replace("$OperationsPerInvoke$", provider.OperationsPerInvoke)
-                    .Replace("$TargetTypeName$", provider.TargetTypeName)
-                    .Replace("$TargetMethodDelegate$", provider.TargetMethodDelegate)
-                    .Replace("$TargetMethodReturnType$", provider.TargetMethodReturnTypeName)
-                    .Replace("$IdleMethodReturnTypeName$", provider.IdleMethodReturnTypeName)
+                    .Replace("$WorkloadTypeName$", provider.WorkloadTypeName)
+                    .Replace("$WorkloadMethodDelegate$", provider.WorkloadMethodDelegate)
+                    .Replace("$WorkloadMethodReturnType$", provider.WorkloadMethodReturnTypeName)
+                    .Replace("$OverheadMethodReturnTypeName$", provider.OverheadMethodReturnTypeName)
                     .Replace("$GlobalSetupMethodName$", provider.GlobalSetupMethodName)
                     .Replace("$GlobalCleanupMethodName$", provider.GlobalCleanupMethodName)
                     .Replace("$IterationSetupMethodName$", provider.IterationSetupMethodName)
                     .Replace("$IterationCleanupMethodName$", provider.IterationCleanupMethodName)
-                    .Replace("$IdleImplementation$", provider.IdleImplementation)
+                    .Replace("$OverheadImplementation$", provider.OverheadImplementation)
                     .Replace("$ConsumeField$", provider.ConsumeField)
                     .Replace("$JobSetDefinition$", GetJobsSetDefinition(benchmark))
                     .Replace("$ParamsContent$", GetParamsContent(benchmark))
@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Code
                     .Replace("$MeasureGcStats$", buildInfo.Config.HasMemoryDiagnoser() ? "true" : "false")
                     .Replace("$Encoding$", buildInfo.Config.Encoding.ToTemplateString())
                     .Replace("$DiassemblerEntryMethodName$", DisassemblerConstants.DiassemblerEntryMethodName)
-                    .Replace("$TargetMethodCall$", provider.GetTargetMethodCall(passArguments)).ToString();
+                    .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments)).ToString();
 
                 benchmarkTypeCode = Unroll(benchmarkTypeCode, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance));
 
@@ -83,8 +83,8 @@ namespace BenchmarkDotNet.Code
             string benchmarkProgramContent = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt"))
                 .Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath)
                 .Replace("$ExtraDefines$", string.Join(Environment.NewLine, extraDefines))
-                .Replace("$TargetTypeNamespace$", string.Join(Environment.NewLine, targetTypeNamespaces))
-                .Replace("$TargetMethodReturnTypeNamespace$", string.Join(Environment.NewLine, targetMethodReturnTypeNamespace))
+                .Replace("$WorkloadTypeNamespace$", string.Join(Environment.NewLine, workloadTypeNamespaces))
+                .Replace("$WorkloadMethodReturnTypeNamespace$", string.Join(Environment.NewLine, workloadMethodReturnTypeNamespace))
                 .Replace("$AdditionalLogic$", string.Join(Environment.NewLine, additionalLogic))
                 .Replace("$DerivedTypes$", string.Join(Environment.NewLine, benchmarksCode))
                 .Replace("$ExtraAttribute$", GetExtraAttributes(buildPartition.RepresentativeBenchmarkCase.Descriptor))
@@ -154,7 +154,7 @@ namespace BenchmarkDotNet.Code
 
         private static DeclarationsProvider GetDeclarationsProvider(Descriptor descriptor)
         {
-            var method = descriptor.Method;
+            var method = descriptor.WorkloadMethod;
 
             if (method.ReturnType == typeof(Task))
             {
@@ -196,35 +196,35 @@ namespace BenchmarkDotNet.Code
         private static string GetArgumentsDefinition(BenchmarkCase benchmarkCase)
             => string.Join(
                 ", ",
-                benchmarkCase.Descriptor.Method.GetParameters()
+                benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
                          .Select((parameter, index) => $"{GetParameterModifier(parameter)} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index}"));
 
         private static string GetDeclareArgumentFields(BenchmarkCase benchmarkCase)
             => string.Join(
                 Environment.NewLine,
-                benchmarkCase.Descriptor.Method.GetParameters()
+                benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
                          .Select((parameter, index) => $"private {GetFieldType(parameter.ParameterType, benchmarkCase.Parameters.GetArgument(parameter.Name)).GetCorrectCSharpTypeName()} __argField{index};"));
 
         private static string GetInitializeArgumentFields(BenchmarkCase benchmarkCase)
             => string.Join(
                 Environment.NewLine,
-                benchmarkCase.Descriptor.Method.GetParameters()
+                benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
                          .Select((parameter, index) => $"__argField{index} = {benchmarkCase.Parameters.GetArgument(parameter.Name).ToSourceCode()};")); // we init the fields in ctor to provoke all possible allocations and overhead of other type
 
         private static string GetLoadArguments(BenchmarkCase benchmarkCase)
             => string.Join(
                 Environment.NewLine,
-                benchmarkCase.Descriptor.Method.GetParameters()
+                benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
                          .Select((parameter, index) => $"{(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index} = {(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} __argField{index};"));
 
         private static string GetPassArguments(BenchmarkCase benchmarkCase)
             => string.Join(
                 ", ",
-                benchmarkCase.Descriptor.Method.GetParameters()
+                benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
                     .Select((parameter, index) => $"{GetParameterModifier(parameter)} arg{index}"));
 
         private static string GetExtraAttributes(Descriptor descriptor) 
-            => descriptor.Method.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any() ? "[System.STAThreadAttribute]" : string.Empty;
+            => descriptor.WorkloadMethod.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any() ? "[System.STAThreadAttribute]" : string.Empty;
 
         private static string GetEngineFactoryTypeName(BenchmarkCase benchmarkCase)
         {

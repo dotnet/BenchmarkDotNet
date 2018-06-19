@@ -12,13 +12,13 @@ namespace BenchmarkDotNet.Engines
         public static readonly IResolver DefaultResolver = new CompositeResolver(BenchmarkRunner.DefaultResolver, EngineResolver.Instance);
         
         public IHost Host { get; set; }
-        public Action<long> MainActionNoUnroll { get; set; }
-        public Action<long> MainActionUnroll { get; set; }
+        public Action<long> WorkloadActionNoUnroll { get; set; }
+        public Action<long> WorkloadActionUnroll { get; set; }
         public Action Dummy1Action { get; set; }
         public Action Dummy2Action { get; set; }
         public Action Dummy3Action { get; set; }
-        public Action<long> IdleActionNoUnroll { get; set; }
-        public Action<long> IdleActionUnroll { get; set; }
+        public Action<long> OverheadActionNoUnroll { get; set; }
+        public Action<long> OverheadActionUnroll { get; set; }
         public Job TargetJob { get; set; } = Job.Default;
         public long OperationsPerInvoke { get; set; } = 1;
         public Action GlobalSetupAction { get; set; }

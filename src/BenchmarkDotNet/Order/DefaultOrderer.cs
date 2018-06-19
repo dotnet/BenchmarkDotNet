@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Order
             MethodOrderPolicy methodOrderPolicy = MethodOrderPolicy.Declared)
         {
             this.summaryOrderPolicy = summaryOrderPolicy;
-            targetComparer = new TargetComparer(methodOrderPolicy);
+            targetComparer = new DescriptorComparer(methodOrderPolicy);
             benchmarkComparer = new BenchmarkComparer(paramsComparer, jobComparer, targetComparer);
             logicalGroupComparer = new LogicalGroupComparer(benchmarkComparer);
         }
@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Order
                 case SummaryOrderPolicy.SlowestToFastest:
                     return benchmarksCase.OrderByDescending(b => summary[b].ResultStatistics.Mean);
                 case SummaryOrderPolicy.Method:
-                    return benchmarksCase.OrderBy(b => b.Descriptor.MethodDisplayInfo);
+                    return benchmarksCase.OrderBy(b => b.Descriptor.WorkloadMethodDisplayInfo);
                 case SummaryOrderPolicy.Declared:
                     return benchmarksCase;
                 default:
@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Order
                 case SummaryOrderPolicy.Default:
                     return benchmarkCase.Parameters.DisplayInfo;
                 case SummaryOrderPolicy.Method:
-                    return benchmarkCase.Descriptor.MethodDisplayInfo;
+                    return benchmarkCase.Descriptor.WorkloadMethodDisplayInfo;
                 default:
                     return null;
             }

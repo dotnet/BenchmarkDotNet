@@ -18,16 +18,16 @@ namespace BenchmarkDotNet.Exporters
             foreach (var report in summary.Reports)
             {
                 var runs = report.AllMeasurements;
-                var modes = runs.Select(it => it.IterationMode).Distinct();
+                var modeStages = runs.Select(it => (it.IterationMode, it.IterationStage)).Distinct();
                 logger.WriteLineHeader($"*** {report.BenchmarkCase.DisplayInfo} ***");
                 logger.WriteLineHeader("* Raw *");
                 foreach (var run in runs)
                     logger.WriteLineResult(run.ToStr(summary.Config.Encoding));
-                foreach (var mode in modes)
+                foreach (var (mode, stage) in modeStages)
                 {
                     logger.WriteLine();
-                    logger.WriteLineHeader($"* Statistics for {mode}");
-                    logger.WriteLineStatistic(runs.Where(it => it.IterationMode == mode).GetStatistics().ToTimeStr(summary.Config.Encoding, calcHistogram: true));
+                    logger.WriteLineHeader($"* Statistics for {mode}{stage}");
+                    logger.WriteLineStatistic(runs.Where(it => it.Is(mode, stage)).GetStatistics().ToTimeStr(summary.Config.Encoding, calcHistogram: true));
                 }
             }
         }

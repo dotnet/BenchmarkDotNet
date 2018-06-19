@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Analysers
         public override IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary)
         {
             var statistics = report.ResultStatistics;
-            if (statistics == null || statistics.N < EngineResolver.DefaultMinTargetIterationCount)
+            if (statistics == null || statistics.N < EngineResolver.DefaultMinWorkloadIterationCount)
                 yield break;
                     
             double mValue = MathHelper.CalculateMValue(statistics);

@@ -1,5 +1,5 @@
     // the type name must be in sync with WindowsDisassembler.BuildArguments
-    public class Runnable_$ID$ : global::$TargetTypeName$
+    public class Runnable_$ID$ : global::$WorkloadTypeName$
     {
         public static void Run(IHost host)
         {
@@ -24,13 +24,13 @@
             var engineParameters = new BenchmarkDotNet.Engines.EngineParameters()
             {
                 Host = host,
-                MainActionUnroll = instance.MainActionUnroll,
-                MainActionNoUnroll = instance.MainActionNoUnroll,
+                WorkloadActionUnroll = instance.WorkloadActionUnroll,
+                WorkloadActionNoUnroll = instance.WorkloadActionNoUnroll,
                 Dummy1Action = instance.Dummy1,
                 Dummy2Action = instance.Dummy2,
                 Dummy3Action = instance.Dummy3,
-                IdleActionNoUnroll = instance.IdleActionNoUnroll,
-                IdleActionUnroll = instance.IdleActionUnroll,
+                OverheadActionNoUnroll = instance.OverheadActionNoUnroll,
+                OverheadActionUnroll = instance.OverheadActionUnroll,
                 GlobalSetupAction = instance.globalSetupAction,
                 GlobalCleanupAction = instance.globalCleanupAction,
                 IterationSetupAction = instance.iterationSetupAction,
@@ -51,9 +51,9 @@
 			}
         }
 
-        public delegate $IdleMethodReturnTypeName$ IdleDelegate($ArgumentsDefinition$);
+        public delegate $OverheadMethodReturnTypeName$ OverheadDelegate($ArgumentsDefinition$);
 
-        public delegate $Ref$ $TargetMethodReturnType$ TargetDelegate($ArgumentsDefinition$);
+        public delegate $Ref$ $WorkloadMethodReturnType$ WorkloadDelegate($ArgumentsDefinition$);
 
         public Runnable_$ID$()
         {
@@ -61,8 +61,8 @@
             globalCleanupAction = $GlobalCleanupMethodName$;
             iterationSetupAction = $IterationSetupMethodName$;
             iterationCleanupAction = $IterationCleanupMethodName$;
-            idleDelegate = __Idle;
-            targetDelegate = $TargetMethodDelegate$;
+            overheadDelegate = __Overhead;
+            workloadDelegate = $WorkloadMethodDelegate$;
             $InitializeArgumentFields$
         }
 
@@ -70,8 +70,8 @@
         private Action globalCleanupAction;
         private Action iterationSetupAction;
         private Action iterationCleanupAction;
-        private IdleDelegate idleDelegate;
-        private TargetDelegate targetDelegate;
+        private OverheadDelegate overheadDelegate;
+        private WorkloadDelegate workloadDelegate;
         $DeclareArgumentFields$
 
         // this method is used only for the disassembly diagnoser purposes
@@ -104,105 +104,105 @@
             dummyVar++;@DummyUnroll@
         }
 
-        private $IdleMethodReturnTypeName$ __Idle($ArgumentsDefinition$) // __ is to avoid possible name conflict
+        private $OverheadMethodReturnTypeName$ __Overhead($ArgumentsDefinition$) // __ is to avoid possible name conflict
         {
-            $IdleImplementation$
+            $OverheadImplementation$
         }
 
 #if RETURNS_CONSUMABLE_$ID$
 
         private BenchmarkDotNet.Engines.Consumer consumer = new BenchmarkDotNet.Engines.Consumer();
 
-        private void IdleActionUnroll(long invokeCount)
+        private void OverheadActionUnroll(long invokeCount)
         {
             $LoadArguments$
             for (long i = 0; i < invokeCount; i++)
             {
-                consumer.Consume(idleDelegate($PassArguments$));@Unroll@
+                consumer.Consume(overheadDelegate($PassArguments$));@Unroll@
             }
         }
 
-        private void IdleActionNoUnroll(long invokeCount)
+        private void OverheadActionNoUnroll(long invokeCount)
         {
             $LoadArguments$
             for (long i = 0; i < invokeCount; i++)
             {
-                consumer.Consume(idleDelegate($PassArguments$));
+                consumer.Consume(overheadDelegate($PassArguments$));
             }
         }
         
-        private void MainActionUnroll(long invokeCount)
+        private void WorkloadActionUnroll(long invokeCount)
         {
             $LoadArguments$
             for (long i = 0; i < invokeCount; i++)
             {
-                consumer.Consume(targetDelegate($PassArguments$)$ConsumeField$);@Unroll@
+                consumer.Consume(workloadDelegate($PassArguments$)$ConsumeField$);@Unroll@
             }
         }
 
-        private void MainActionNoUnroll(long invokeCount)
+        private void WorkloadActionNoUnroll(long invokeCount)
         {
             $LoadArguments$
             for (long i = 0; i < invokeCount; i++)
             {
-                consumer.Consume(targetDelegate($PassArguments$)$ConsumeField$);
+                consumer.Consume(workloadDelegate($PassArguments$)$ConsumeField$);
             }
         }
         
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public $TargetMethodReturnType$ $DiassemblerEntryMethodName$()
+        public $WorkloadMethodReturnType$ $DiassemblerEntryMethodName$()
         {
             if (NotEleven == 11)
             {
                 $LoadArguments$
-                return $TargetMethodCall$;
+                return $WorkloadMethodCall$;
             }
             
-            return default($TargetMethodReturnType$);
+            return default($WorkloadMethodReturnType$);
         }
 
 #elif RETURNS_NON_CONSUMABLE_STRUCT_$ID$
 
-        private void IdleActionUnroll(long invokeCount)
+        private void OverheadActionUnroll(long invokeCount)
         {
             $LoadArguments$
-            $IdleMethodReturnTypeName$ result = default($IdleMethodReturnTypeName$);
+            $OverheadMethodReturnTypeName$ result = default($OverheadMethodReturnTypeName$);
             for (long i = 0; i < invokeCount; i++)
             {
-                result = idleDelegate($PassArguments$);@Unroll@
+                result = overheadDelegate($PassArguments$);@Unroll@
             }
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(result);
         }
 
-        private void IdleActionNoUnroll(long invokeCount)
+        private void OverheadActionNoUnroll(long invokeCount)
         {
             $LoadArguments$
-            $IdleMethodReturnTypeName$ result = default($IdleMethodReturnTypeName$);
+            $OverheadMethodReturnTypeName$ result = default($OverheadMethodReturnTypeName$);
             for (long i = 0; i < invokeCount; i++)
             {
-                result = idleDelegate($PassArguments$);
+                result = overheadDelegate($PassArguments$);
             }
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(result);
         }
 
-        private void MainActionUnroll(long invokeCount)
+        private void WorkloadActionUnroll(long invokeCount)
         {
             $LoadArguments$
-            $TargetMethodReturnType$ result = default($TargetMethodReturnType$);
+            $WorkloadMethodReturnType$ result = default($WorkloadMethodReturnType$);
             for (long i = 0; i < invokeCount; i++)
             {
-                result = targetDelegate($PassArguments$);@Unroll@
+                result = workloadDelegate($PassArguments$);@Unroll@
             }
             NonGenericKeepAliveWithoutBoxing(result);
         }
 
-        private void MainActionNoUnroll(long invokeCount)
+        private void WorkloadActionNoUnroll(long invokeCount)
         {
             $LoadArguments$
-            $TargetMethodReturnType$ result = default($TargetMethodReturnType$);
+            $WorkloadMethodReturnType$ result = default($WorkloadMethodReturnType$);
             for (long i = 0; i < invokeCount; i++)
             {
-                result = targetDelegate($PassArguments$);
+                result = workloadDelegate($PassArguments$);
             }
             NonGenericKeepAliveWithoutBoxing(result);
         }
@@ -210,114 +210,114 @@
         // we must not simply use DeadCodeEliminationHelper.KeepAliveWithoutBoxing<T> because it's generic method
         // and stack-only types like Span<T> can not be generic type arguments http://adamsitnik.com/Span/#span-must-not-be-a-generic-type-argument
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private void NonGenericKeepAliveWithoutBoxing($TargetMethodReturnType$ _) { }
+        private void NonGenericKeepAliveWithoutBoxing($WorkloadMethodReturnType$ _) { }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public $TargetMethodReturnType$ $DiassemblerEntryMethodName$()
+        public $WorkloadMethodReturnType$ $DiassemblerEntryMethodName$()
         {
             if (NotEleven == 11)
             {
                 $LoadArguments$
-                return $TargetMethodCall$;
+                return $WorkloadMethodCall$;
             }
             
-            return default($TargetMethodReturnType$);
+            return default($WorkloadMethodReturnType$);
         }
 
 #elif RETURNS_BYREF_$ID$
 
-        private void IdleActionUnroll(long invokeCount)
+        private void OverheadActionUnroll(long invokeCount)
         {
             $LoadArguments$
-            $IdleMethodReturnTypeName$ value = default($IdleMethodReturnTypeName$);
+            $OverheadMethodReturnTypeName$ value = default($OverheadMethodReturnTypeName$);
             for (long i = 0; i < invokeCount; i++)
             {
-                value = idleDelegate($PassArguments$);@Unroll@
+                value = overheadDelegate($PassArguments$);@Unroll@
             }
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
         }
         
-        private void IdleActionNoUnroll(long invokeCount)
+        private void OverheadActionNoUnroll(long invokeCount)
         {
             $LoadArguments$
-            $IdleMethodReturnTypeName$ value = default($IdleMethodReturnTypeName$);
+            $OverheadMethodReturnTypeName$ value = default($OverheadMethodReturnTypeName$);
             for (long i = 0; i < invokeCount; i++)
             {
-                value = idleDelegate($PassArguments$);
+                value = overheadDelegate($PassArguments$);
             }
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
         }
 
-        private $TargetMethodReturnType$ mainDefaultValueHolder = default($TargetMethodReturnType$);
+        private $WorkloadMethodReturnType$ workloadDefaultValueHolder = default($WorkloadMethodReturnType$);
 
-        private void MainActionUnroll(long invokeCount)
+        private void WorkloadActionUnroll(long invokeCount)
         {
             $LoadArguments$
-            ref $TargetMethodReturnType$ alias = ref mainDefaultValueHolder;
+            ref $WorkloadMethodReturnType$ alias = ref workloadDefaultValueHolder;
             for (long i = 0; i < invokeCount; i++)
             {
-                alias = targetDelegate($PassArguments$);@Unroll@
+                alias = workloadDelegate($PassArguments$);@Unroll@
             }
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(ref alias);
         }
         
-        private void MainActionNoUnroll(long invokeCount)
+        private void WorkloadActionNoUnroll(long invokeCount)
         {
             $LoadArguments$
-            ref $TargetMethodReturnType$ alias = ref mainDefaultValueHolder;
+            ref $WorkloadMethodReturnType$ alias = ref workloadDefaultValueHolder;
             for (long i = 0; i < invokeCount; i++)
             {
-                alias = targetDelegate($PassArguments$);
+                alias = workloadDelegate($PassArguments$);
             }
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(ref alias);
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public ref $TargetMethodReturnType$ $DiassemblerEntryMethodName$()
+        public ref $WorkloadMethodReturnType$ $DiassemblerEntryMethodName$()
         {
             if (NotEleven == 11)
             {
                 $LoadArguments$
-                return ref $TargetMethodCall$;
+                return ref $WorkloadMethodCall$;
             }
             
-            return ref mainDefaultValueHolder;
+            return ref workloadDefaultValueHolder;
         }
 #elif RETURNS_VOID_$ID$
 
-        private void IdleActionUnroll(long invokeCount)
+        private void OverheadActionUnroll(long invokeCount)
         {
             $LoadArguments$
             for (long i = 0; i < invokeCount; i++)
             {
-                idleDelegate($PassArguments$);@Unroll@
+                overheadDelegate($PassArguments$);@Unroll@
             }
         }
 
-        private void IdleActionNoUnroll(long invokeCount)
+        private void OverheadActionNoUnroll(long invokeCount)
         {
             $LoadArguments$
             for (long i = 0; i < invokeCount; i++)
             {
-                idleDelegate($PassArguments$);
+                overheadDelegate($PassArguments$);
             }
         }
         
-        private void MainActionUnroll(long invokeCount)
+        private void WorkloadActionUnroll(long invokeCount)
         {
             $LoadArguments$
             for (long i = 0; i < invokeCount; i++)
             {
-                targetDelegate($PassArguments$);@Unroll@
+                workloadDelegate($PassArguments$);@Unroll@
             }
         }
         
-        private void MainActionNoUnroll(long invokeCount)
+        private void WorkloadActionNoUnroll(long invokeCount)
         {
             $LoadArguments$
             for (long i = 0; i < invokeCount; i++)
             {
-                targetDelegate($PassArguments$);
+                workloadDelegate($PassArguments$);
             }
         }
 
@@ -327,7 +327,7 @@
             if (NotEleven == 11)
             {
                 $LoadArguments$
-                $TargetMethodCall$;
+                $WorkloadMethodCall$;
             }
         }
 #endif

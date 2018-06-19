@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Exporters
         {
             var benchmarksByTarget = summary.BenchmarksCases
                 .Where(benchmark => results.ContainsKey(benchmark))
-                .GroupBy(benchmark => benchmark.Descriptor.Method);
+                .GroupBy(benchmark => benchmark.Descriptor.WorkloadMethod);
 
             logger.WriteLine("<!DOCTYPE html>");
             logger.WriteLine("<html lang='en'>");
@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Exporters
                     summary.BenchmarksCases.Where(benchmark => results.ContainsKey(benchmark)).ToArray(), 
                     logger, 
                     summary.Title, 
-                    benchmark => $"{benchmark.Descriptor.Method.Name} {GetImportantInfo(summary[benchmark])}");
+                    benchmark => $"{benchmark.Descriptor.WorkloadMethod.Name} {GetImportantInfo(summary[benchmark])}");
             }
 
             logger.WriteLine("</body>");

@@ -8,15 +8,15 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Engine
 {
-    public class EngineTargetStageTests
+    public class EngineGeneralStageTests
     {
-        private const int MinIterationCount = EngineResolver.DefaultMinTargetIterationCount;
-        private const int MaxIterationCount = EngineResolver.DefaultMaxTargetIterationCount;
-        private const int MaxIdleIterationCount = EngineTargetStage.MaxIdleIterationCount;
+        private const int MinIterationCount = EngineResolver.DefaultMinWorkloadIterationCount;
+        private const int MaxIterationCount = EngineResolver.DefaultMaxWorkloadIterationCount;
+        private const int MaxOverheadIterationCount = EngineGeneralStage.MaxOverheadIterationCount;
 
         private readonly ITestOutputHelper output;
 
-        public EngineTargetStageTests(ITestOutputHelper output)
+        public EngineGeneralStageTests(ITestOutputHelper output)
         {
             this.output = output;
         }
@@ -28,25 +28,25 @@ namespace BenchmarkDotNet.Tests.Engine
         public void AutoTest_InfiniteIncrease() => AutoTest(data => TimeInterval.Second * data.Index, MaxIterationCount);
 
         [Fact]
-        public void AutoTest_InfiniteIncreaseIdle() => AutoTest(data => TimeInterval.Second * data.Index, MaxIdleIterationCount,
-            mode: IterationMode.IdleTarget);
+        public void AutoTest_InfiniteIncreaseOverhead() => AutoTest(data => TimeInterval.Second * data.Index, MaxOverheadIterationCount,
+            iterationMode: IterationMode.Overhead);
 
-        private void AutoTest(Func<IterationData, TimeInterval> measure, int min, int max = -1, IterationMode mode = IterationMode.MainTarget)
+        private void AutoTest(Func<IterationData, TimeInterval> measure, int min, int max = -1, IterationMode iterationMode = IterationMode.Workload)
         {
             if (max == -1)
                 max = min;
             var job = Job.Default;
             var stage = CreateStage(job, measure);
-            var measurements = stage.Run(1, mode, true, 1);
+            var measurements = stage.Run(1, iterationMode, true, 1);
             int count = measurements.Count;
             output.WriteLine($"MeasurementCount = {count} (Min= {min}, Max = {max})");
             Assert.InRange(count, min, max);
         }
 
-        private EngineTargetStage CreateStage(Job job, Func<IterationData, TimeInterval> measure)
+        private EngineGeneralStage CreateStage(Job job, Func<IterationData, TimeInterval> measure)
         {
             var engine = new MockEngine(output, job, measure);
-            return new EngineTargetStage(engine);
+            return new EngineGeneralStage(engine);
         }
     }
 }

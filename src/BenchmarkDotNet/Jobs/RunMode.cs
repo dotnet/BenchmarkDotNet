@@ -17,8 +17,8 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<TimeInterval> IterationTimeCharacteristic = CreateCharacteristic<TimeInterval>(nameof(IterationTime));
         public static readonly Characteristic<int> InvocationCountCharacteristic = CreateCharacteristic<int>(nameof(InvocationCount));
         public static readonly Characteristic<int> UnrollFactorCharacteristic = CreateCharacteristic<int>(nameof(UnrollFactor));
-        public static readonly Characteristic<int> MinTargetIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MinTargetIterationCount));
-        public static readonly Characteristic<int> MaxTargetIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MaxTargetIterationCount));
+        public static readonly Characteristic<int> MinWorkloadIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MinTargetIterationCount));
+        public static readonly Characteristic<int> MaxWorkloadIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MaxTargetIterationCount));
 
         public static readonly RunMode Dry = new RunMode(nameof(Dry))
         {
@@ -144,8 +144,8 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         public int MinTargetIterationCount
         {
-            get { return MinTargetIterationCountCharacteristic[this]; }
-            set { MinTargetIterationCountCharacteristic[this] = value; }
+            get { return MinWorkloadIterationCountCharacteristic[this]; }
+            set { MinWorkloadIterationCountCharacteristic[this] = value; }
         }
 
         /// <summary>
@@ -155,8 +155,8 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         public int MaxTargetIterationCount
         {
-            get { return MaxTargetIterationCountCharacteristic[this]; }
-            set { MaxTargetIterationCountCharacteristic[this] = value; }
+            get { return MaxWorkloadIterationCountCharacteristic[this]; }
+            set { MaxWorkloadIterationCountCharacteristic[this] = value; }
         }
     }
 }

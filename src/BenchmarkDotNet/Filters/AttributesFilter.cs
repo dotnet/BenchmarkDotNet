@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Filters
         public bool Predicate(BenchmarkCase benchmarkCase)
         {
             var customTypeAttributes = benchmarkCase.Descriptor.Type.GetCustomAttributes(true).Select(attribute => attribute.GetType()).ToArray();
-            var customMethodsAttributes = benchmarkCase.Descriptor.Method.GetCustomAttributes(true).Select(attribute => attribute.GetType()).ToArray();
+            var customMethodsAttributes = benchmarkCase.Descriptor.WorkloadMethod.GetCustomAttributes(true).Select(attribute => attribute.GetType()).ToArray();
 
             var allCustomAttributes = customTypeAttributes.Union(customMethodsAttributes).Distinct().ToArray();
 

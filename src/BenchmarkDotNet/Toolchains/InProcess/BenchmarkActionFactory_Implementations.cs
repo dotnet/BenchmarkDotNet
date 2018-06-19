@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
             public BenchmarkActionVoid(object instance, MethodInfo method, BenchmarkActionCodegen codegenMode, int unrollFactor)
             {
-                callback = CreateMainOrIdle<Action>(instance, method, IdleStatic, IdleInstance);
+                callback = CreateWorkloadOrOverhead<Action>(instance, method, OverheadStatic, OverheadInstance);
                 InvokeSingle = callback;
 
                 if (UseFallbackCode(codegenMode, unrollFactor))
@@ -35,8 +35,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 }
             }
 
-            private static void IdleStatic() { }
-            private void IdleInstance() { }
+            private static void OverheadStatic() { }
+            private void OverheadInstance() { }
 
             private void InvokeMultipleHardcoded(long repeatCount)
             {
@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
             public BenchmarkAction(object instance, MethodInfo method, BenchmarkActionCodegen codegenMode, int unrollFactor)
             {
-                callback = CreateMainOrIdle<Func<T>>(instance, method, IdleStatic, IdleInstance);
+                callback = CreateWorkloadOrOverhead<Func<T>>(instance, method, OverheadStatic, OverheadInstance);
                 InvokeSingle = InvokeSingleHardcoded;
 
                 if (UseFallbackCode(codegenMode, unrollFactor))
@@ -67,8 +67,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 }
             }
 
-            private static T IdleStatic() => default;
-            private T IdleInstance() => default;
+            private static T OverheadStatic() => default;
+            private T OverheadInstance() => default;
 
             private void InvokeSingleHardcoded() => result = callback();
 
@@ -92,12 +92,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 bool isIdle = method == null;
                 if (!isIdle)
                 {
-                    startTaskCallback = CreateMain<Func<Task>>(instance, method);
+                    startTaskCallback = CreateWorkload<Func<Task>>(instance, method);
                     callback = ExecuteBlocking;
                 }
                 else
                 {
-                    callback = Idle;
+                    callback = Overhead;
                 }
 
                 InvokeSingle = callback;
@@ -114,7 +114,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             }
 
             // must be kept in sync with VoidDeclarationsProvider.IdleImplementation
-            private void Idle() { }
+            private void Overhead() { }
 
             // must be kept in sync with TaskDeclarationsProvider.TargetMethodDelegate
             private void ExecuteBlocking() => startTaskCallback.Invoke().GetAwaiter().GetResult();
@@ -135,15 +135,15 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
             public BenchmarkActionTask(object instance, MethodInfo method, BenchmarkActionCodegen codegenMode, int unrollFactor)
             {
-                bool isIdle = method == null;
-                if (!isIdle)
+                bool isOverhead = method == null;
+                if (!isOverhead)
                 {
-                    startTaskCallback = CreateMain<Func<Task<T>>>(instance, method);
+                    startTaskCallback = CreateWorkload<Func<Task<T>>>(instance, method);
                     callback = ExecuteBlocking;
                 }
                 else
                 {
-                    callback = Idle;
+                    callback = Overhead;
                 }
 
                 InvokeSingle = InvokeSingleHardcoded;
@@ -159,7 +159,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 }
             }
 
-            private T Idle() => default;
+            private T Overhead() => default;
 
             // must be kept in sync with GenericTaskDeclarationsProvider.TargetMethodDelegate
             private T ExecuteBlocking() => startTaskCallback().GetAwaiter().GetResult();
@@ -184,15 +184,15 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
             public BenchmarkActionValueTask(object instance, MethodInfo method, BenchmarkActionCodegen codegenMode, int unrollFactor)
             {
-                bool isIdle = method == null;
-                if (!isIdle)
+                bool isOverhead = method == null;
+                if (!isOverhead)
                 {
-                    startTaskCallback = CreateMain<Func<ValueTask<T>>>(instance, method);
+                    startTaskCallback = CreateWorkload<Func<ValueTask<T>>>(instance, method);
                     callback = ExecuteBlocking;
                 }
                 else
                 {
-                    callback = Idle;
+                    callback = Overhead;
                 }
 
                 InvokeSingle = InvokeSingleHardcoded;
@@ -208,7 +208,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 }
             }
 
-            private T Idle() => default;
+            private T Overhead() => default;
 
             // must be kept in sync with GenericTaskDeclarationsProvider.TargetMethodDelegate
             private T ExecuteBlocking() => startTaskCallback().GetAwaiter().GetResult();

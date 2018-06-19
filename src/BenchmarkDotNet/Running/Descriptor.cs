@@ -11,27 +11,27 @@ namespace BenchmarkDotNet.Running
     public class Descriptor
     {
         public Type Type { get; }
-        public MethodInfo Method { get; }
+        public MethodInfo WorkloadMethod { get; }
         public MethodInfo GlobalSetupMethod { get; }
         public MethodInfo GlobalCleanupMethod { get; }
         public MethodInfo IterationSetupMethod { get; }
         public MethodInfo IterationCleanupMethod { get; }
         public string AdditionalLogic { get; }
         public int OperationsPerInvoke { get; }
-        public string MethodDisplayInfo { get; }
+        public string WorkloadMethodDisplayInfo { get; }
         public int MethodIndex { get; }
         public bool Baseline { get; }
         public string[] Categories { get; }
 
         internal string TypeInfo => Type?.GetDisplayName() ?? "Untitled";
-        private string MethodFolderInfo => Method?.Name ?? "Untitled";
+        private string MethodFolderInfo => WorkloadMethod?.Name ?? "Untitled";
 
         public string FolderInfo => (Type != null ? FolderNameHelper.ToFolderName(Type) : "Untitled") + "_" + MethodFolderInfo;
-        public string DisplayInfo => TypeInfo + "." + MethodDisplayInfo;
+        public string DisplayInfo => TypeInfo + "." + WorkloadMethodDisplayInfo;
 
         public Descriptor(
             Type type,
-            MethodInfo method,              
+            MethodInfo workloadMethod,              
             MethodInfo globalSetupMethod = null,
             MethodInfo globalCleanupMethod = null,
             MethodInfo iterationSetupMethod = null,
@@ -44,14 +44,14 @@ namespace BenchmarkDotNet.Running
             int methodIndex = 0)
         {
             Type = type;
-            Method = method;
+            WorkloadMethod = workloadMethod;
             GlobalSetupMethod = globalSetupMethod;
             GlobalCleanupMethod = globalCleanupMethod;
             IterationSetupMethod = iterationSetupMethod;
             IterationCleanupMethod = iterationCleanupMethod;
             OperationsPerInvoke = operationsPerInvoke;
             AdditionalLogic = additionalLogic ?? string.Empty;
-            MethodDisplayInfo = FormatDescription(description) ?? method?.Name ?? "Untitled";
+            WorkloadMethodDisplayInfo = FormatDescription(description) ?? workloadMethod?.Name ?? "Untitled";
             Baseline = baseline;
             Categories = categories ?? Array.Empty<string>();
             MethodIndex = methodIndex;

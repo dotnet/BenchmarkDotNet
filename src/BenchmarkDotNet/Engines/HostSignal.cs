@@ -10,12 +10,12 @@
         /// <summary>
         /// after globalSetup, warmup and pilot but before the main run
         /// </summary>
-        BeforeMainRun,
+        BeforeGeneralRun,
 
         /// <summary>
         /// after main run, but before global Cleanup
         /// </summary>
-        AfterMainRun,
+        AfterGeneralRun,
 
         /// <summary>
         /// after all (the last thing the benchmarking engine does is to fire this signal)

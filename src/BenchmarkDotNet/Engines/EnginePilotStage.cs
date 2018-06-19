@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Engines
             while (true)
             {
                 iterationCounter++;
-                var measurement = RunIteration(IterationMode.Pilot, iterationCounter, invokeCount, unrollFactor);
+                var measurement = RunIteration(IterationMode.Workload, IterationStage.Pilot, iterationCounter, invokeCount, unrollFactor);
                 double iterationTime = measurement.Nanoseconds;
                 double operationError = 2.0 * resolution / invokeCount; // An operation error which has arisen due to the Chronometer precision
 
@@ -91,7 +91,7 @@ namespace BenchmarkDotNet.Engines
             while (true)
             {
                 iterationCounter++;
-                var measurement = RunIteration(IterationMode.Pilot, iterationCounter, invokeCount, unrollFactor);
+                var measurement = RunIteration(IterationMode.Workload, IterationStage.Pilot, iterationCounter, invokeCount, unrollFactor);
                 double actualIterationTime = measurement.Nanoseconds;
                 long newInvokeCount = Autocorrect(Math.Max(minInvokeCount, (long)Math.Round(invokeCount * targetIterationTime / actualIterationTime)));
 

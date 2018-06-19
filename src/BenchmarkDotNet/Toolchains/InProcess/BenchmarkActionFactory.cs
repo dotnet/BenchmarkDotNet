@@ -100,8 +100,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <param name="codegenMode">Describes how benchmark action code is generated.</param>
         /// <param name="unrollFactor">Unroll factor.</param>
         /// <returns>Run benchmark action.</returns>
-        public static BenchmarkAction CreateRun(Descriptor descriptor, object instance, BenchmarkActionCodegen codegenMode, int unrollFactor) =>
-            CreateCore(instance, descriptor.Method, null, codegenMode, unrollFactor);
+        public static BenchmarkAction CreateWorkload(Descriptor descriptor, object instance, BenchmarkActionCodegen codegenMode, int unrollFactor) =>
+            CreateCore(instance, descriptor.WorkloadMethod, null, codegenMode, unrollFactor);
 
         /// <summary>Creates idle benchmark action.</summary>
         /// <param name="descriptor">Descriptor info.</param>
@@ -109,8 +109,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <param name="codegenMode">Describes how benchmark action code is generated.</param>
         /// <param name="unrollFactor">Unroll factor.</param>
         /// <returns>Idle benchmark action.</returns>
-        public static BenchmarkAction CreateIdle(Descriptor descriptor, object instance, BenchmarkActionCodegen codegenMode, int unrollFactor) =>
-            CreateCore(instance, null, descriptor.Method, codegenMode, unrollFactor);
+        public static BenchmarkAction CreateOverhead(Descriptor descriptor, object instance, BenchmarkActionCodegen codegenMode, int unrollFactor) =>
+            CreateCore(instance, null, descriptor.WorkloadMethod, codegenMode, unrollFactor);
 
         /// <summary>Creates global setup benchmark action.</summary>
         /// <param name="descriptor">Descriptor info.</param>

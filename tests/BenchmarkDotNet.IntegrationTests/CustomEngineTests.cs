@@ -76,8 +76,8 @@ namespace BenchmarkDotNet.IntegrationTests
                 Console.WriteLine(EngineRunMessage);
 
                 return new RunResults(
-                    new List<Measurement> { new Measurement(1, IterationMode.IdleTarget, 1, 1, 1) }, 
-                    new List<Measurement> { new Measurement(1, IterationMode.MainTarget, 1, 1, 1) },
+                    new List<Measurement> { new Measurement(1, IterationMode.Overhead, IterationStage.General, 1, 1, 1) },
+                    new List<Measurement> { new Measurement(1, IterationMode.Workload, IterationStage.General, 1, 1, 1) },
                     OutlierMode.None,
                     default,
                     default);
@@ -92,8 +92,8 @@ namespace BenchmarkDotNet.IntegrationTests
             public long OperationsPerInvoke { get; }
             public Action GlobalSetupAction { get; set; }
             public Action GlobalCleanupAction { get; set; }
-            public Action<long> MainAction { get; }
-            public Action<long> IdleAction { get; }
+            public Action<long> WorkloadAction { get; }
+            public Action<long> OverheadAction { get; }
             public IResolver Resolver { get; }
 
             public Measurement RunIteration(IterationData data) { throw new NotImplementedException(); }

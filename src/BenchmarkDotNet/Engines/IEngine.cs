@@ -27,10 +27,10 @@ namespace BenchmarkDotNet.Engines
         Action GlobalCleanupAction { get; }
 
         [NotNull]
-        Action<long> MainAction { get; }
+        Action<long> WorkloadAction { get; }
 
         [NotNull]
-        Action<long> IdleAction { get; }
+        Action<long> OverheadAction { get; }
 
         IResolver Resolver { get; }
 

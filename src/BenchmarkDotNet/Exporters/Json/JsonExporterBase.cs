@@ -56,8 +56,8 @@ namespace BenchmarkDotNet.Exporters.Json
                     { "DisplayInfo", r.BenchmarkCase.DisplayInfo },
                     { "Namespace", r.BenchmarkCase.Descriptor.Type.Namespace },
                     { "Type", r.BenchmarkCase.Descriptor.Type.Name },
-                    { "Method", r.BenchmarkCase.Descriptor.Method.Name },
-                    { "MethodTitle", r.BenchmarkCase.Descriptor.MethodDisplayInfo },
+                    { "Method", r.BenchmarkCase.Descriptor.WorkloadMethod.Name },
+                    { "MethodTitle", r.BenchmarkCase.Descriptor.WorkloadMethodDisplayInfo },
                     { "Parameters", r.BenchmarkCase.Parameters.PrintInfo },
                     { "FullName", XUnitNameProvider.GetBenchmarkName(r.BenchmarkCase) }, // do NOT remove this property, it is used for xunit-performance migration
                     // { "Properties", r.Benchmark.Job.ToSet().ToDictionary(p => p.Name, p => p.Value) }, // TODO
@@ -77,6 +77,7 @@ namespace BenchmarkDotNet.Exporters.Json
                         r.AllMeasurements.Select(m => new
                         {
                             IterationMode = m.IterationMode.ToString(),
+                            IterationStage = m.IterationStage.ToString(),
                             m.LaunchIndex,
                             m.IterationIndex,
                             m.Operations,

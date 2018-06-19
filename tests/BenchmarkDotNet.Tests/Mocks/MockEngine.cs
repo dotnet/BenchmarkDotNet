@@ -40,8 +40,8 @@ namespace BenchmarkDotNet.Tests.Mocks
         [UsedImplicitly]
         public bool IsDiagnoserAttached { get; set; }
 
-        public Action<long> MainAction { get; } = _ => { };
-        public Action<long> IdleAction { get; } = _ => { };
+        public Action<long> WorkloadAction { get; } = _ => { };
+        public Action<long> OverheadAction { get; } = _ => { };
 
         [UsedImplicitly]
         public IEngineFactory Factory => null;
@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Tests.Mocks
         public Measurement RunIteration(IterationData data)
         {
             double nanoseconds = measure(data).Nanoseconds;
-            var measurement = new Measurement(1, data.IterationMode, data.Index, data.InvokeCount * OperationsPerInvoke, nanoseconds);
+            var measurement = new Measurement(1, data.IterationMode, data.IterationStage, data.Index, data.InvokeCount * OperationsPerInvoke, nanoseconds);
             WriteLine(measurement.ToOutputLine());
             return measurement;
         }

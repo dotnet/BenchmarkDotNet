@@ -17,11 +17,11 @@ namespace BenchmarkDotNet.Engines
         public const int MinInvokeCount = 4;
 
         public IHost Host { get; }
-        public Action<long> MainAction { get; }
+        public Action<long> WorkloadAction { get; }
         public Action Dummy1Action { get; }
         public Action Dummy2Action { get; }
         public Action Dummy3Action { get; }
-        public Action<long> IdleAction { get; }
+        public Action<long> OverheadAction { get; }
         public Job TargetJob { get; }
         public long OperationsPerInvoke { get; }
         public Action GlobalSetupAction { get; }
@@ -40,23 +40,23 @@ namespace BenchmarkDotNet.Engines
 
         private readonly EnginePilotStage pilotStage;
         private readonly EngineWarmupStage warmupStage;
-        private readonly EngineTargetStage targetStage;
+        private readonly EngineGeneralStage generalStage;
         private readonly bool includeMemoryStats;
 
         internal Engine(
             IHost host,
             IResolver resolver,
-            Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> idleAction, Action<long> mainAction, Job targetJob,
+            Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> overheadAction, Action<long> workloadAction, Job targetJob,
             Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
             bool includeMemoryStats, Encoding encoding)
         {
             
             Host = host;
-            IdleAction = idleAction;
+            OverheadAction = overheadAction;
             Dummy1Action = dummy1Action;
             Dummy2Action = dummy2Action;
             Dummy3Action = dummy3Action;
-            MainAction = mainAction;
+            WorkloadAction = workloadAction;
             TargetJob = targetJob;
             GlobalSetupAction = globalSetupAction;
             GlobalCleanupAction = globalCleanupAction;
@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Engines
 
             warmupStage = new EngineWarmupStage(this);
             pilotStage = new EnginePilotStage(this);
-            targetStage = new EngineTargetStage(this);
+            generalStage = new EngineGeneralStage(this);
         }
 
         public void Dispose() => GlobalCleanupAction?.Invoke();
@@ -95,22 +95,22 @@ namespace BenchmarkDotNet.Engines
 
                     if (EvaluateOverhead)
                     {
-                        warmupStage.RunIdle(invokeCount, UnrollFactor);
-                        idle = targetStage.RunIdle(invokeCount, UnrollFactor);
+                        warmupStage.RunOverhead(invokeCount, UnrollFactor);
+                        idle = generalStage.RunOverhead(invokeCount, UnrollFactor);
                     }
                 }
 
-                warmupStage.RunMain(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring);
+                warmupStage.RunWorkload(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring);
             }
 
             Host.BeforeMainRun();
 
-            var main = targetStage.RunMain(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring);
+            var main = generalStage.RunWorkload(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring);
 
             Host.AfterMainRun();
 
             var workGcHasDone = includeMemoryStats 
-                ? MeasureGcStats(new IterationData(IterationMode.MainTarget, 0, invokeCount, UnrollFactor)) 
+                ? MeasureGcStats(new IterationData(IterationMode.Workload, IterationStage.General, 0, invokeCount, UnrollFactor)) 
                 : GcStats.Empty;
 
             var outlierMode = TargetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, Resolver);
@@ -124,10 +124,10 @@ namespace BenchmarkDotNet.Engines
             long invokeCount = data.InvokeCount;
             int unrollFactor = data.UnrollFactor;
             long totalOperations = invokeCount * OperationsPerInvoke;
-            bool isIdle = data.IterationMode.IsIdle();
-            var action = isIdle ? IdleAction : MainAction;
+            bool isOverhead = data.IterationMode == IterationMode.Overhead;
+            var action = isOverhead ? OverheadAction : WorkloadAction;
 
-            if(!isIdle)
+            if(!isOverhead)
                 IterationSetupAction();
 
             GcCollect();
@@ -137,13 +137,13 @@ namespace BenchmarkDotNet.Engines
             action(invokeCount / unrollFactor);
             var clockSpan = clock.GetElapsed();
 
-            if(!isIdle)
+            if(!isOverhead)
                 IterationCleanupAction();
 
             GcCollect();
 
             // Results
-            var measurement = new Measurement(0, data.IterationMode, data.Index, totalOperations, clockSpan.GetNanoseconds(), Encoding);
+            var measurement = new Measurement(0, data.IterationMode, data.IterationStage, data.Index, totalOperations, clockSpan.GetNanoseconds(), Encoding);
             WriteLine(measurement.ToOutputLine());
 
             return measurement;
@@ -160,7 +160,7 @@ namespace BenchmarkDotNet.Engines
 
             var initialGcStats = GcStats.ReadInitial();
 
-            MainAction(data.InvokeCount / data.UnrollFactor);
+            WorkloadAction(data.InvokeCount / data.UnrollFactor);
 
             var finalGcStats = GcStats.ReadFinal();
 
@@ -207,8 +207,8 @@ namespace BenchmarkDotNet.Engines
                 = new Dictionary<HostSignal, string>
                 {
                     { HostSignal.BeforeAnythingElse, "// BeforeAnythingElse" },
-                    { HostSignal.BeforeMainRun, "// BeforeMainRun" },
-                    { HostSignal.AfterMainRun, "// AfterMainRun" },
+                    { HostSignal.BeforeGeneralRun, "// BeforeGeneralRun" },
+                    { HostSignal.AfterGeneralRun, "// AfterGeneralRun" },
                     { HostSignal.AfterAll, "// AfterAll" }
                 };
 

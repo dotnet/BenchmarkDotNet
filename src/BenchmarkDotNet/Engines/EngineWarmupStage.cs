@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Engines
     {
         internal const int MinIterationCount = 6;
         internal const int MaxIterationCount = 50;
-        internal const int MaxIdleItertaionCount = 10;
+        internal const int MaxOverheadItertaionCount = 10;
 
         private readonly int? warmupCount;
 
@@ -18,11 +18,11 @@ namespace BenchmarkDotNet.Engines
             warmupCount = engine.TargetJob.ResolveValueAsNullable(RunMode.WarmupCountCharacteristic);
         }
 
-        public void RunIdle(long invokeCount, int unrollFactor)
-            => RunAuto(invokeCount, IterationMode.IdleWarmup, unrollFactor);
+        public void RunOverhead(long invokeCount, int unrollFactor)
+            => RunAuto(invokeCount, IterationMode.Overhead, unrollFactor);
 
-        public void RunMain(long invokeCount, int unrollFactor, bool forceSpecific = false)
-            => Run(invokeCount, IterationMode.MainWarmup, false, unrollFactor, forceSpecific);
+        public void RunWorkload(long invokeCount, int unrollFactor, bool forceSpecific = false)
+            => Run(invokeCount, IterationMode.Workload, false, unrollFactor, forceSpecific);
 
         internal List<Measurement> Run(long invokeCount, IterationMode iterationMode, bool runAuto, int unrollFactor, bool forceSpecific = false)
             => (runAuto || warmupCount == null) && !forceSpecific
@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Engines
             while (true)
             {
                 iterationCounter++;
-                measurements.Add(RunIteration(iterationMode, iterationCounter, invokeCount, unrollFactor));
+                measurements.Add(RunIteration(iterationMode, IterationStage.Warmup, iterationCounter, invokeCount, unrollFactor));
                 if (IsWarmupFinished(measurements, iterationMode))
                     break;
             }
@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Engines
         {
             var measurements = new List<Measurement>(MaxIterationCount);
             for (int i = 0; i < iterationCount; i++)
-                measurements.Add(RunIteration(iterationMode, i + 1, invokeCount, unrollFactor));
+                measurements.Add(RunIteration(iterationMode,IterationStage.Warmup, i + 1, invokeCount, unrollFactor));
 
             WriteLine();
 
@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Engines
         private static bool IsWarmupFinished(List<Measurement> measurements, IterationMode iterationMode)
         {
             int n = measurements.Count;
-            if (n >= MaxIterationCount || (iterationMode.IsIdle() && n >= MaxIdleItertaionCount))
+            if (n >= MaxIterationCount || (iterationMode == IterationMode.Overhead && n >= MaxOverheadItertaionCount))
                 return true;
             if (n < MinIterationCount)
                 return false;

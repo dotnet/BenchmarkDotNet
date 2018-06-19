@@ -41,14 +41,14 @@ namespace BenchmarkDotNet.Diagnosers
             var output = ProcessHelper.RunAndReadOutputLineByLine(monoPath, arguments, environmentVariables, includeErros: true);
             string commandLine = $"{GetEnvironmentVariables(environmentVariables)} {monoPath} {arguments}";
             
-            return OutputParser.Parse(output, benchmarkTarget.Method.Name, commandLine);
+            return OutputParser.Parse(output, benchmarkTarget.WorkloadMethod.Name, commandLine);
         }
 
         private static string GetEnvironmentVariables(Dictionary<string, string> environmentVariables) 
             => string.Join(" ", environmentVariables.Select(e => $"{e.Key}={e.Value}"));
 
         private static string GetMethodName(Descriptor descriptor)
-            => $"{descriptor.Type.GetTypeInfo().Namespace}.{descriptor.Type.GetTypeInfo().Name}:{descriptor.Method.Name}";
+            => $"{descriptor.Type.GetTypeInfo().Namespace}.{descriptor.Type.GetTypeInfo().Name}:{descriptor.WorkloadMethod.Name}";
 
         internal static class OutputParser
         {

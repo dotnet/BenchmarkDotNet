@@ -13,11 +13,11 @@ namespace BenchmarkDotNet.Engines
 
         protected Job TargetJob => engine.TargetJob;
 
-        protected Measurement RunIteration(IterationMode mode, int index, long invokeCount, int unrollFactor)
+        protected Measurement RunIteration(IterationMode mode, IterationStage stage, int index, long invokeCount, int unrollFactor)
         {
             if (invokeCount % unrollFactor != 0)
                 throw new ArgumentOutOfRangeException($"InvokeCount({invokeCount}) should be a multiple of UnrollFactor({unrollFactor}).");
-            return engine.RunIteration(new IterationData(mode, index, invokeCount, unrollFactor));
+            return engine.RunIteration(new IterationData(mode, stage, index, invokeCount, unrollFactor));
         }
 
         protected bool ShouldRunAuto(RunMode runMode, Characteristic<int> iterationCount) => !runMode.HasValue(iterationCount);

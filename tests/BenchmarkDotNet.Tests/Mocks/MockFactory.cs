@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Tests.Mocks
             var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
             var executeResult = new ExecuteResult(true, 0, Array.Empty<string>(), Array.Empty<string>());
             var measurements = Enumerable.Range(0, n)
-                .Select(index => new Measurement(1, IterationMode.Result, index + 1, 1, nanoseconds + index))
+                .Select(index => new Measurement(1, IterationMode.Workload, IterationStage.Result, index + 1, 1, nanoseconds + index))
                 .ToList();
             return new BenchmarkReport(benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default);
         }

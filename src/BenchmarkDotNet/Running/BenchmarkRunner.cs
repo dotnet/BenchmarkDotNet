@@ -424,15 +424,15 @@ namespace BenchmarkDotNet.Running
                         gcStats = GcStats.Parse(executeResult.Data.Last());
 
                     noOverheadCompositeDiagnoser.ProcessResults(
-                        new DiagnoserResults(benchmarkCase, measurements.Where(measurement => !measurement.IterationMode.IsIdle()).Sum(m => m.Operations), gcStats));
+                        new DiagnoserResults(benchmarkCase, measurements.Where(measurement => measurement.IsWorklaod()).Sum(m => m.Operations), gcStats));
                 }
 
                 if (autoLaunchCount && launchIndex == 2 && analyzeRunToRunVariance)
                 {
                     // TODO: improve this logic
-                    var idleApprox = new Statistics(measurements.Where(m => m.IterationMode == IterationMode.IdleTarget).Select(m => m.Nanoseconds)).Median;
-                    var mainApprox = new Statistics(measurements.Where(m => m.IterationMode == IterationMode.MainTarget).Select(m => m.Nanoseconds)).Median;
-                    var percent = idleApprox / mainApprox * 100;
+                    double overheadApprox = new Statistics(measurements.Where(m => m.Is(IterationMode.Overhead, IterationStage.General)).Select(m => m.Nanoseconds)).Median;
+                    double workloadApprox = new Statistics(measurements.Where(m => m.Is(IterationMode.Workload, IterationStage.General)).Select(m => m.Nanoseconds)).Median;
+                    double percent = overheadApprox / workloadApprox * 100;
                     launchCount = (int)Math.Round(Math.Max(2, 2 + (percent - 1) / 3)); // an empirical formula
                 }
             }
@@ -450,7 +450,7 @@ namespace BenchmarkDotNet.Running
                 var allRuns = executeResult.Data.Select(line => Measurement.Parse(logger, line, 0)).Where(r => r.IterationMode != IterationMode.Unknown).ToList();
 
                 extraRunCompositeDiagnoser.ProcessResults(
-                    new DiagnoserResults(benchmarkCase, allRuns.Where(measurement => !measurement.IterationMode.IsIdle()).Sum(m => m.Operations), gcStats));
+                    new DiagnoserResults(benchmarkCase, allRuns.Where(measurement => measurement.IsWorklaod()).Sum(m => m.Operations), gcStats));
 
                 if (!executeResult.FoundExecutable)
                     logger.WriteLineError("Executable not found");

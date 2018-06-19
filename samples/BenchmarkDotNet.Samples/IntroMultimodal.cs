@@ -6,7 +6,7 @@ using BenchmarkDotNet.Engines;
 namespace BenchmarkDotNet.Samples
 {
     [MValueColumn]
-    [SimpleJob(RunStrategy.Throughput, 1, 0, -1, 1, "MainJob")]
+    [SimpleJob(RunStrategy.Throughput, 1, 0, -1, 1, "MyJob")]
     public class IntroMultimodal
     {
         private readonly Random rnd = new Random(42);

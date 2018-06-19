@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Analysers
 
         public override IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary)
         {
-            var target = report.AllMeasurements.Where(m => m.IterationMode == IterationMode.MainTarget).ToArray();
+            var target = report.AllMeasurements.Where(m => m.Is(IterationMode.Workload, IterationStage.General)).ToArray();
             if (target.IsEmpty())
                 yield break;
             var minActualIterationTime = TimeInterval.FromNanoseconds(target.Min(m => m.Nanoseconds));

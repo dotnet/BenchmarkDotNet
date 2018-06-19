@@ -63,12 +63,12 @@ namespace BenchmarkDotNet.Tests.Reports
             var executeResult = new ExecuteResult(true, 0, Array.Empty<string>(), Array.Empty<string>());
             var measurements = new List<Measurement>
             {
-                new Measurement(1, IterationMode.Result, 1, 1, 1),
-                new Measurement(1, IterationMode.Result, 2, 1, hugeSd ? 2 : 1),
-                new Measurement(1, IterationMode.Result, 3, 1, 1),
-                new Measurement(1, IterationMode.Result, 4, 1, hugeSd ? 2 : 1),
-                new Measurement(1, IterationMode.Result, 5, 1, 1),
-                new Measurement(1, IterationMode.Result, 6, 1, 1),
+                new Measurement(1, IterationMode.Workload, IterationStage.Result, 1, 1, 1),
+                new Measurement(1, IterationMode.Workload, IterationStage.Result, 2, 1, hugeSd ? 2 : 1),
+                new Measurement(1, IterationMode.Workload, IterationStage.Result, 3, 1, 1),
+                new Measurement(1, IterationMode.Workload, IterationStage.Result, 4, 1, hugeSd ? 2 : 1),
+                new Measurement(1, IterationMode.Workload, IterationStage.Result, 5, 1, 1),
+                new Measurement(1, IterationMode.Workload, IterationStage.Result, 6, 1, 1),
             };
             return new BenchmarkReport(benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default);
         }

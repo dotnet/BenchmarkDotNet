@@ -104,8 +104,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
                 // DONTTOUCH: these should be allocated together
                 var instance = Activator.CreateInstance(benchmarkCase.Descriptor.Type);
-                var mainAction = BenchmarkActionFactory.CreateRun(target, instance, codegenMode, unrollFactor);
-                var idleAction = BenchmarkActionFactory.CreateIdle(target, instance, codegenMode, unrollFactor);
+                var workloadAction = BenchmarkActionFactory.CreateWorkload(target, instance, codegenMode, unrollFactor);
+                var overheadAction = BenchmarkActionFactory.CreateOverhead(target, instance, codegenMode, unrollFactor);
                 var globalSetupAction = BenchmarkActionFactory.CreateGlobalSetup(target, instance);
                 var globalCleanupAction = BenchmarkActionFactory.CreateGlobalCleanup(target, instance);
                 var iterationSetupAction = BenchmarkActionFactory.CreateIterationSetup(target, instance);
@@ -125,21 +125,21 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 var engineParameters = new EngineParameters
                 {
                     Host = host,
-                    MainActionNoUnroll = invocationCount =>
+                    WorkloadActionNoUnroll = invocationCount =>
                     {
                         for (int i = 0; i < invocationCount; i++)
-                            mainAction.InvokeSingle();
+                            workloadAction.InvokeSingle();
                     },
-                    MainActionUnroll = mainAction.InvokeMultiple,
+                    WorkloadActionUnroll = workloadAction.InvokeMultiple,
                     Dummy1Action = dummy1.InvokeSingle,
                     Dummy2Action = dummy2.InvokeSingle,
                     Dummy3Action = dummy3.InvokeSingle,
-                    IdleActionNoUnroll = invocationCount =>
+                    OverheadActionNoUnroll = invocationCount =>
                     {
                         for (int i = 0; i < invocationCount; i++)
-                            idleAction.InvokeSingle();
+                            overheadAction.InvokeSingle();
                     },
-                    IdleActionUnroll = idleAction.InvokeMultiple,
+                    OverheadActionUnroll = overheadAction.InvokeMultiple,
                     GlobalSetupAction = globalSetupAction.InvokeSingle,
                     GlobalCleanupAction = globalCleanupAction.InvokeSingle,
                     IterationSetupAction = iterationSetupAction.InvokeSingle,

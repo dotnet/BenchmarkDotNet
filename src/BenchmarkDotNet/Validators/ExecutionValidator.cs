@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Validators
             {
                 try
                 {
-                    benchmark.Descriptor.Method.Invoke(benchmarkTypeInstance, null);
+                    benchmark.Descriptor.WorkloadMethod.Invoke(benchmarkTypeInstance, null);
                 }
                 catch (Exception ex)
                 {

@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Reports
@@ -21,7 +22,12 @@ namespace BenchmarkDotNet.Reports
 
         //TODO OPTIONAL ENCODING
         public static string ToStr(this Measurement run, Encoding encoding) =>
-            $"{run.IterationMode} {run.IterationIndex}: {run.Operations} op, {run.Nanoseconds.ToStr()} ns, {run.GetAverageNanoseconds().ToTimeStr(encoding ?? Encoding.ASCII)}/op";
+            $"{run.IterationMode}{run.IterationStage} {run.IterationIndex}: {run.Operations} op, {run.Nanoseconds.ToStr()} ns, {run.GetAverageNanoseconds().ToTimeStr(encoding ?? Encoding.ASCII)}/op";
 
+        public static bool Is(this Measurement measurement, IterationMode mode, IterationStage stage)
+            => measurement.IterationMode == mode && measurement.IterationStage == stage;
+
+        public static bool IsOverhead(this Measurement measurement) => measurement.IterationMode == IterationMode.Overhead;
+        public static bool IsWorklaod(this Measurement measurement) => measurement.IterationMode == IterationMode.Workload;
     }
 }

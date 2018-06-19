@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Tests.Engine
 {
     public class EngineFactoryTests
     {
-        int timesBenchmarkCalled = 0, timesIdleCalled = 0;
+        int timesBenchmarkCalled = 0, timesOverheadCalled = 0;
         int timesGlobalSetupCalled = 0, timesGlobalCleanupCalled = 0, timesIterationSetupCalled = 0, timesIterationCleanupCalled = 0;
         
         TimeSpan IterationTime => TimeSpan.FromMilliseconds(EngineResolver.Instance.Resolve(Job.Default, RunMode.IterationTimeCharacteristic).ToMilliseconds());
@@ -35,8 +35,8 @@ namespace BenchmarkDotNet.Tests.Engine
         void InstantNoUnroll(long invocationCount) => timesBenchmarkCalled += (int)invocationCount;
         void InstantUnroll(long _) => timesBenchmarkCalled += 16;
         
-        void IdleNoUnroll(long invocationCount) => timesIdleCalled += (int)invocationCount;
-        void IdleUnroll(long _) => timesIdleCalled += 16;
+        void OverheadNoUnroll(long invocationCount) => timesOverheadCalled += (int)invocationCount;
+        void OverheadUnroll(long _) => timesOverheadCalled += 16;
 
         public static IEnumerable<object[]> JobsWhichDontRequireJitting()
         {
@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.Tests.Engine
             Assert.Equal(1, timesGlobalSetupCalled);
             Assert.Equal(0, timesIterationSetupCalled);
             Assert.Equal(0, timesBenchmarkCalled);
-            Assert.Equal(0, timesIdleCalled);
+            Assert.Equal(0, timesOverheadCalled);
             Assert.Equal(0, timesIterationCleanupCalled);
             Assert.Equal(0, timesGlobalCleanupCalled); 
 
@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Tests.Engine
             Assert.Equal(1, timesGlobalSetupCalled);
             Assert.Equal(1, timesIterationSetupCalled); // 1x for Target
             Assert.Equal(1, timesBenchmarkCalled);
-            Assert.Equal(1, timesIdleCalled);
+            Assert.Equal(1, timesOverheadCalled);
             Assert.Equal(1, timesIterationCleanupCalled); // 1x for Target
             Assert.Equal(0, timesGlobalCleanupCalled); // cleanup is called as part of dispode
 
@@ -107,7 +107,7 @@ namespace BenchmarkDotNet.Tests.Engine
             Assert.Equal(1, timesGlobalSetupCalled);
             Assert.Equal(1, timesIterationSetupCalled);
             Assert.Equal(16, timesBenchmarkCalled);
-            Assert.Equal(16, timesIdleCalled);
+            Assert.Equal(16, timesOverheadCalled);
             Assert.Equal(1, timesIterationCleanupCalled);
             Assert.Equal(0, timesGlobalCleanupCalled); 
             
@@ -128,7 +128,7 @@ namespace BenchmarkDotNet.Tests.Engine
             Assert.Equal(1, timesGlobalSetupCalled);
             Assert.Equal(1+1, timesIterationSetupCalled); // once for single and & once for 16
             Assert.Equal(1 + 16, timesBenchmarkCalled);
-            Assert.Equal(1 + 16, timesIdleCalled);
+            Assert.Equal(1 + 16, timesOverheadCalled);
             Assert.Equal(1+1, timesIterationCleanupCalled); // once for single and & once for 16
             Assert.Equal(0, timesGlobalCleanupCalled);
             
@@ -175,7 +175,7 @@ namespace BenchmarkDotNet.Tests.Engine
             Assert.Equal(1, timesGlobalSetupCalled);
             Assert.Equal(1, timesIterationSetupCalled);
             Assert.Equal(1, timesBenchmarkCalled); // we run it just once and we know how many times it should be invoked
-            Assert.Equal(1, timesIdleCalled);
+            Assert.Equal(1, timesOverheadCalled);
             Assert.Equal(1, timesIterationCleanupCalled);
             Assert.Equal(0, timesGlobalCleanupCalled);
             
@@ -200,12 +200,12 @@ namespace BenchmarkDotNet.Tests.Engine
                 GlobalSetupAction = GlobalSetup,
                 GlobalCleanupAction = GlobalCleanup,
                 Host = new ConsoleHost(TextWriter.Null, TextReader.Null),
-                IdleActionUnroll = IdleUnroll,
-                IdleActionNoUnroll = IdleNoUnroll,
+                OverheadActionUnroll = OverheadUnroll,
+                OverheadActionNoUnroll = OverheadNoUnroll,
                 IterationCleanupAction = IterationCleanup,
                 IterationSetupAction = IterationSetup,
-                MainActionUnroll = mainUnroll,
-                MainActionNoUnroll = mainNoUnroll,
+                WorkloadActionUnroll = mainUnroll,
+                WorkloadActionNoUnroll = mainNoUnroll,
                 TargetJob = job
             };
     }

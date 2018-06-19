@@ -50,8 +50,8 @@ namespace BenchmarkDotNet.Running
                 if (x.Descriptor.AdditionalLogic != y.Descriptor.AdditionalLogic) // it can be anything
                     return false;
 
-                if (x.Descriptor.Method.GetCustomAttributes(false).OfType<STAThreadAttribute>().Count() !=
-                    y.Descriptor.Method.GetCustomAttributes(false).OfType<STAThreadAttribute>().Count()) // STA vs STA
+                if (x.Descriptor.WorkloadMethod.GetCustomAttributes(false).OfType<STAThreadAttribute>().Count() !=
+                    y.Descriptor.WorkloadMethod.GetCustomAttributes(false).OfType<STAThreadAttribute>().Count()) // STA vs STA
                     return false;
 
                 return true;
@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Running
                 if (!string.IsNullOrEmpty(obj.Descriptor.AdditionalLogic))
                     hashCode ^= obj.Descriptor.AdditionalLogic.GetHashCode();
 
-                hashCode ^= obj.Descriptor.Method.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any().GetHashCode();
+                hashCode ^= obj.Descriptor.WorkloadMethod.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any().GetHashCode();
 
                 return hashCode;
             }

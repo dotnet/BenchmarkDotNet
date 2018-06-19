@@ -10,20 +10,20 @@ namespace BenchmarkDotNet.Engines
     {
         public IEngine CreateReadyToRun(EngineParameters engineParameters)
         {
-            if (engineParameters.MainActionNoUnroll == null)
-                throw new ArgumentNullException(nameof(engineParameters.MainActionNoUnroll));
-            if (engineParameters.MainActionUnroll == null)
-                throw new ArgumentNullException(nameof(engineParameters.MainActionUnroll));
+            if (engineParameters.WorkloadActionNoUnroll == null)
+                throw new ArgumentNullException(nameof(engineParameters.WorkloadActionNoUnroll));
+            if (engineParameters.WorkloadActionUnroll == null)
+                throw new ArgumentNullException(nameof(engineParameters.WorkloadActionUnroll));
             if (engineParameters.Dummy1Action == null)
                 throw new ArgumentNullException(nameof(engineParameters.Dummy1Action));
             if (engineParameters.Dummy2Action == null)
                 throw new ArgumentNullException(nameof(engineParameters.Dummy2Action));
             if (engineParameters.Dummy3Action == null)
                 throw new ArgumentNullException(nameof(engineParameters.Dummy3Action));
-            if (engineParameters.IdleActionNoUnroll == null)
-                throw new ArgumentNullException(nameof(engineParameters.IdleActionNoUnroll));
-            if (engineParameters.IdleActionUnroll == null)
-                throw new ArgumentNullException(nameof(engineParameters.IdleActionUnroll));
+            if (engineParameters.OverheadActionNoUnroll == null)
+                throw new ArgumentNullException(nameof(engineParameters.OverheadActionNoUnroll));
+            if (engineParameters.OverheadActionUnroll == null)
+                throw new ArgumentNullException(nameof(engineParameters.OverheadActionUnroll));
             if(engineParameters.TargetJob == null)
                 throw new ArgumentNullException(nameof(engineParameters.TargetJob));
 
@@ -65,7 +65,7 @@ namespace BenchmarkDotNet.Engines
                     .WithMinInvokeCount(2) // the minimum is 2 (not the default 4 which can be too much and not 1 which we already know is not enough)
                     .WithEvaluateOverhead(false); // it's something very time consuming, it overhead is too small compared to total time
                 
-                return CreateEngine(engineParameters, needsPilot, engineParameters.IdleActionNoUnroll, engineParameters.MainActionNoUnroll);
+                return CreateEngine(engineParameters, needsPilot, engineParameters.OverheadActionNoUnroll, engineParameters.WorkloadActionNoUnroll);
             }
             
             var multiActionEngine = CreateMultiActionEngine(engineParameters);
@@ -80,11 +80,11 @@ namespace BenchmarkDotNet.Engines
         {
             engine.Dummy1Action.Invoke();
 
-            DeadCodeEliminationHelper.KeepAliveWithoutBoxing(engine.RunIteration(new IterationData(IterationMode.IdleJitting, jitIndex, invokeCount, unrollFactor))); // don't forget to JIT idle
+            DeadCodeEliminationHelper.KeepAliveWithoutBoxing(engine.RunIteration(new IterationData(IterationMode.Overhead, IterationStage.Jitting, jitIndex, invokeCount, unrollFactor))); // don't forget to JIT idle
             
             engine.Dummy2Action.Invoke();
 
-            var result = engine.RunIteration(new IterationData(IterationMode.MainJitting, jitIndex, invokeCount, unrollFactor));
+            var result = engine.RunIteration(new IterationData(IterationMode.Workload, IterationStage.Jitting, jitIndex, invokeCount, unrollFactor));
 
             engine.Dummy3Action.Invoke();
 
@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Engines
         }
 
         private static Engine CreateMultiActionEngine(EngineParameters engineParameters) 
-            => CreateEngine(engineParameters, engineParameters.TargetJob, engineParameters.IdleActionUnroll, engineParameters.MainActionUnroll);
+            => CreateEngine(engineParameters, engineParameters.TargetJob, engineParameters.OverheadActionUnroll, engineParameters.WorkloadActionUnroll);
 
         private static Engine CreateSingleActionEngine(EngineParameters engineParameters) 
             => CreateEngine(engineParameters,
@@ -102,8 +102,8 @@ namespace BenchmarkDotNet.Engines
                     .WithInvocationCount(1).WithUnrollFactor(1) // run the benchmark exactly once per iteration 
                     .WithEvaluateOverhead(false), // it's something very time consuming, it overhead is too small compared to total time
                     // todo: consider if we should set the warmup count to 2
-                engineParameters.IdleActionNoUnroll, 
-                engineParameters.MainActionNoUnroll);
+                engineParameters.OverheadActionNoUnroll, 
+                engineParameters.WorkloadActionNoUnroll);
 
         private static Engine CreateEngine(EngineParameters engineParameters, Job job, Action<long> idle, Action<long> main)
             => new Engine(

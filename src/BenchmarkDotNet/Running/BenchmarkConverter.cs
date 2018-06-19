@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Running
             var benchmarks = new List<BenchmarkCase>();
             foreach (var target in targets)
             {
-                var argumentsDefinitions = GetArgumentsDefinitions(target.Method, target.Type).ToArray();
+                var argumentsDefinitions = GetArgumentsDefinitions(target.WorkloadMethod, target.Type).ToArray();
 
                 benchmarks.AddRange(
                     from job in jobs

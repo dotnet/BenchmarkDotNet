@@ -26,14 +26,14 @@ namespace BenchmarkDotNet.Validators
                 var results = new List<(BenchmarkCase benchmark, object returnValue)>();
                 bool hasErrorsInGroup = false;
 
-                foreach (var benchmark in parameterGroup.DistinctBy(i => i.Descriptor.Method))
+                foreach (var benchmark in parameterGroup.DistinctBy(i => i.Descriptor.WorkloadMethod))
                 {
                     try
                     {
                         InProcessRunner.FillMembers(benchmarkTypeInstance, benchmark);
-                        var result = benchmark.Descriptor.Method.Invoke(benchmarkTypeInstance, null);
+                        var result = benchmark.Descriptor.WorkloadMethod.Invoke(benchmarkTypeInstance, null);
 
-                        if (benchmark.Descriptor.Method.ReturnType != typeof(void))
+                        if (benchmark.Descriptor.WorkloadMethod.ReturnType != typeof(void))
                             results.Add((benchmark, result));
                     }
                     catch (Exception ex)
@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Validators
                 {
                     errors.Add(new ValidationError(
                         TreatsWarningsAsErrors,
-                        $"Inconsistent benchmark return values in {results[0].benchmark.Descriptor.TypeInfo}: {string.Join(", ", results.Select(r => $"{r.benchmark.Descriptor.MethodDisplayInfo}: {r.returnValue}"))} {parameterGroup.Key.DisplayInfo}"));
+                        $"Inconsistent benchmark return values in {results[0].benchmark.Descriptor.TypeInfo}: {string.Join(", ", results.Select(r => $"{r.benchmark.Descriptor.WorkloadMethodDisplayInfo}: {r.returnValue}"))} {parameterGroup.Key.DisplayInfo}"));
                 }
             }
         }

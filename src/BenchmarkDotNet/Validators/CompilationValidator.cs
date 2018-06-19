@@ -23,12 +23,12 @@ namespace BenchmarkDotNet.Validators
 
         private IEnumerable<ValidationError> ValidateCSharpNaming(IEnumerable<BenchmarkCase> benchmarks)
             => benchmarks
-                .Where(benchmark => !IsValidCSharpIdentifier(benchmark.Descriptor.Method.Name))
+                .Where(benchmark => !IsValidCSharpIdentifier(benchmark.Descriptor.WorkloadMethod.Name))
                 .Distinct(BenchmarkMethodEqualityComparer.Instance) // we might have multiple jobs targeting same method. Single error should be enough ;)
                 .Select(benchmark
                     => new ValidationError(
                         true,
-                        $"Benchmarked method `{benchmark.Descriptor.Method.Name}` contains illegal character(s). Please use `[<Benchmark(Description = \"Custom name\")>]` to set custom display name.",
+                        $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` contains illegal character(s). Please use `[<Benchmark(Description = \"Custom name\")>]` to set custom display name.",
                         benchmark
                     ));
 
@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Validators
                 .Select(benchmark
                     => new ValidationError(
                         true,
-                        "Using \"__Idle\" for method name is prohibited. We are using it internally in our templates. Please rename your method"));
+                        "Using \"__Overhead\" for method name is prohibited. We are using it internally in our templates. Please rename your method"));
 
         private IEnumerable<ValidationError> ValidateAccessModifiers(IEnumerable<BenchmarkCase> benchmarks)
             => benchmarks.Where(x => x.Descriptor.Type.IsGenericType
@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Validators
                     .All(character => char.IsLetterOrDigit(character) || character == Underscore);
 
         private bool IsUsingNameUsedInternallyByOurTemplate(string identifier)
-            => identifier == "__Idle";
+            => identifier == "__Overhead";
 
         private bool HasPrivateGenericArguments(Type type) => type.GetGenericArguments().Any(a => !(a.IsPublic
                                                                                                  || a.IsNestedPublic));
@@ -65,10 +65,10 @@ namespace BenchmarkDotNet.Validators
             internal static readonly IEqualityComparer<BenchmarkCase> Instance = new BenchmarkMethodEqualityComparer();
 
             public bool Equals(BenchmarkCase x, BenchmarkCase y)
-                => x.Descriptor.Method.Equals(y.Descriptor.Method);
+                => x.Descriptor.WorkloadMethod.Equals(y.Descriptor.WorkloadMethod);
 
             public int GetHashCode(BenchmarkCase obj)
-                => obj.Descriptor.Method.GetHashCode();
+                => obj.Descriptor.WorkloadMethod.GetHashCode();
         }
     }
 }

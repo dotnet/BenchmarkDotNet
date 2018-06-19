@@ -10,9 +10,9 @@ namespace BenchmarkDotNet.Engines
 
         public static void BeforeAnythingElse(this IHost host) => host.SendSignal(HostSignal.BeforeAnythingElse);
 
-        public static void BeforeMainRun(this IHost host) => host.SendSignal(HostSignal.BeforeMainRun);
+        public static void BeforeMainRun(this IHost host) => host.SendSignal(HostSignal.BeforeGeneralRun);
 
-        public static void AfterMainRun(this IHost host) => host.SendSignal(HostSignal.AfterMainRun);
+        public static void AfterMainRun(this IHost host) => host.SendSignal(HostSignal.AfterGeneralRun);
 
         public static void AfterAll(this IHost host) => host.SendSignal(HostSignal.AfterAll);
     }
