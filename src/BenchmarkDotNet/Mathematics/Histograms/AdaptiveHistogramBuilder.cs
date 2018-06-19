@@ -39,6 +39,13 @@ namespace BenchmarkDotNet.Mathematics.Histograms
                 throw new ArgumentException("Values should be non-empty", nameof(values));
 
             list.Sort();
+            if (list.Last() - list.First() < binSize)
+            {
+                double center = (list.First() + list.Last()) / 2;
+                double lower = center - binSize / 2;
+                double upper = center + binSize / 2;
+                return new Histogram(binSize, new[] { new HistogramBin(lower, upper, list.ToArray()) });
+            }
 
             var points = new List<double> { NiceFloor(list.Min() - binSize / 2), NiceCeiling(list.Max() + binSize / 2) };
             int processedPointCount = 0;

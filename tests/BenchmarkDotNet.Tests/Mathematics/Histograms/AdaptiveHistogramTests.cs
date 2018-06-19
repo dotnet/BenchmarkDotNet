@@ -268,5 +268,32 @@ namespace BenchmarkDotNet.Tests.Mathematics.Histograms
                     true
                 });
         }
+
+        /// <summary>
+        /// <see cref="https://github.com/dotnet/BenchmarkDotNet/issues/802"/>
+        /// </summary>
+        [Fact]
+        public void Issue802()
+        {
+            var values = new[]
+            {
+                0.005203099569,
+                0.005206927083,
+                0.005208544515,
+                0.005213252157,
+                0.005220535482,
+                0.005223894246,
+                0.005225830282,
+                0.005232740072,
+                0.005235999349,
+                0.005237509969,
+                0.005241159871,
+                0.005241720174,
+                0.005243189901,
+                0.005251286214,
+                0.005253464559
+            };
+            HistogramTestHelper.DoHistogramTest(output, HistogramBuilder.Adaptive, values, 0.0001, new[] { values });
+        }
     }
 }
