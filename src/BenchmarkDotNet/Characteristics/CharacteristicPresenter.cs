@@ -3,6 +3,8 @@ using System.Collections;
 using System.Text;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Characteristics
 {
@@ -14,17 +16,23 @@ namespace BenchmarkDotNet.Characteristics
         public static readonly CharacteristicPresenter SourceCodePresenter = new SourceCodeCharacteristicPresenter();
 
         public abstract string ToPresentation(CharacteristicObject obj, Characteristic characteristic);
+        
+        public abstract string ToPresentation(object characteristicValue, Characteristic characteristic);
 
         private class DefaultCharacteristicPresenter : CharacteristicPresenter
         {
-            public override string ToPresentation(CharacteristicObject obj, Characteristic characteristic)
-            {
-                if (!obj.HasValue(characteristic))
-                    return "Default";
+            public override string ToPresentation(CharacteristicObject obj, Characteristic characteristic) 
+                => obj.HasValue(characteristic) 
+                    ? ToPresentation(characteristic[obj], characteristic) 
+                    : "Default";
 
-                var value = characteristic[obj];
+            public override string ToPresentation(object value, Characteristic characteristic)
+            {
                 if (!(value is string) && value is IEnumerable collection)
                     return ToPresentation(collection);
+
+                if (characteristic == EnvironmentMode.AffinityCharacteristic && value is IntPtr intPtr)
+                    return ToPresentation(intPtr);
 
                 return ToPresentation(value);
             }
@@ -52,34 +60,42 @@ namespace BenchmarkDotNet.Characteristics
                 return buffer.ToString();
             }
 
-            private static string ToPresentation(object value)
-            {
-                return (value as IFormattable)?.ToString(null, HostEnvironmentInfo.MainCultureInfo)
-                       ?? value?.ToString()
-                       ?? "";
-            }
+            private static string ToPresentation(object value) 
+                => (value as IFormattable)?.ToString(null, HostEnvironmentInfo.MainCultureInfo)
+                      ?? value?.ToString()
+                      ?? "";
+
+            private static string ToPresentation(IntPtr processorAffinity)
+                => (RuntimeInformation.GetCurrentPlatform() == Platform.X64
+                        ? Convert.ToString(processorAffinity.ToInt64(), 2)
+                        : Convert.ToString(processorAffinity.ToInt32(), 2))
+                   .PadLeft(Environment.ProcessorCount, '0');
         }
 
         private class SourceCodeCharacteristicPresenter : CharacteristicPresenter
         {
             public override string ToPresentation(CharacteristicObject obj, Characteristic characteristic)
+                => ToPresentation(characteristic[obj], characteristic);
+
+            public override string ToPresentation(object characteristicValue, Characteristic characteristic)
             {
                 // TODO: DO NOT hardcode Characteristic suffix
                 var id = characteristic.Id;
                 var type = characteristic.DeclaringType.FullName;
-                var value = SourceCodeHelper.ToSourceCode(characteristic[obj]);
+                var value = SourceCodeHelper.ToSourceCode(characteristicValue);
                 return $"{type}.{id}Characteristic[job] = {value}";
             }
         }
 
         private class FolderCharacteristicPresenter : CharacteristicPresenter
         {
-            public override string ToPresentation(CharacteristicObject obj, Characteristic characteristic)
-            {
-                return obj.HasValue(characteristic)
-                    ? FolderNameHelper.ToFolderName(characteristic[obj])
+            public override string ToPresentation(CharacteristicObject obj, Characteristic characteristic) 
+                => obj.HasValue(characteristic)
+                    ? ToPresentation(characteristic[obj], characteristic)
                     : "Default";
-            }
+
+            public override string ToPresentation(object characteristicValue, Characteristic characteristic)
+                => FolderNameHelper.ToFolderName(characteristicValue);
         }
     }
 }

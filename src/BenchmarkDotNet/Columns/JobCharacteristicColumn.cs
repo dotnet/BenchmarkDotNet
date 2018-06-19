@@ -41,7 +41,8 @@ namespace BenchmarkDotNet.Columns
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase)
         {
             if (!benchmarkCase.Job.HasValue(characteristic) && EnvironmentResolver.Instance.CanResolve(characteristic))
-                return benchmarkCase.Job.ResolveValue(characteristic, EnvironmentResolver.Instance).ToString();
+                return Presenter.ToPresentation(benchmarkCase.Job.ResolveValue(characteristic, EnvironmentResolver.Instance), characteristic);
+            
             return Presenter.ToPresentation(benchmarkCase.Job, characteristic);
         }
 
