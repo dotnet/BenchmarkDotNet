@@ -4,7 +4,7 @@ using BenchmarkDotNet.Portability.Cpu;
 
 namespace BenchmarkDotNet.Portability.EffectiveFrequency
 {
-    public class MacEffectiveCpuProvider
+    internal class MacEffectiveCpuProvider
     {
         internal static readonly Lazy<CpuInfo> MacEffectiveCpuInfo = new Lazy<CpuInfo>(GetInfo);
         

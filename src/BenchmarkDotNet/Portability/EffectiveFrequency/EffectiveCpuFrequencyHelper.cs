@@ -3,7 +3,7 @@
 namespace BenchmarkDotNet.Portability.EffectiveFrequency
 {
     /// <summary>Provides advanced CPU information</summary>
-    public class EffectiveCpuFrequencyHelper
+    public class EffectiveCpuFrequencyProvider
     {
         internal static CpuInfo GetEffectiveCpuInfo()
         {

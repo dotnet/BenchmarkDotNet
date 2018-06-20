@@ -7,7 +7,7 @@ using BenchmarkDotNet.Portability.Cpu;
 
 namespace BenchmarkDotNet.Portability.EffectiveFrequency
 {
-    public class LinuxEffectiveCpuProvider
+    internal class LinuxEffectiveCpuProvider
     {
         internal static readonly Lazy<CpuInfo> LinuxEffectiveCpuInfo = new Lazy<CpuInfo>(GetInfo);
         
@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Portability.EffectiveFrequency
         {
             var cpuInfo = ProcCpuInfoProvider.ProcCpuInfo.Value;
             var dummyMeasureResultList = CpuSpeedLinuxWithDummy();
-            var dummyMeasureResult = dummyMeasureResultList.Average();
+            var dummyMeasureResult = dummyMeasureResultList.Max();
             if (dummyMeasureResultList.Count > 0
                 && dummyMeasureResult > 0)
                 return new CpuInfo(cpuInfo.ProcessorName,
@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Portability.EffectiveFrequency
                                    cpuInfo.MinFrequency,
                                    cpuInfo.MaxFrequency,
                                    dummyMeasureResult);
-                
+            
             return null;
         }
         
@@ -58,11 +58,11 @@ namespace BenchmarkDotNet.Portability.EffectiveFrequency
                 for (int i = 0; i < 16; i++)
                 {
                     var output = ProcessHelper.RunAndReadOutput("/bin/bash", "-c \"lscpu | grep 'CPU MHz'\"")?.Split(':');
-                    if(double.TryParse(output[1].Trim(), out double currentValue))
+                    if (output != null && double.TryParse(output[1].Trim(), out double currentValue))
                         list.Add(currentValue);
                 }
                 
-                process.Close();
+                process.Kill();
                 return list;
             }
         }
