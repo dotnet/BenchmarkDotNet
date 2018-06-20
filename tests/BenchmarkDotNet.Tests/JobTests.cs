@@ -238,7 +238,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.Equal(id, jobWithId.Id);
 
-            var shouldHaveSameId = jobWithId.AsBaseline();
+            var shouldHaveSameId = jobWithId.With(Jit.RyuJit);
 
             Assert.Equal(id, shouldHaveSameId.Id);
         }
@@ -248,9 +248,23 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var predefinedJob = Job.Default;
 
-            var customJob = predefinedJob.AsBaseline();
+            var customJob = predefinedJob.With(Jit.RyuJit);
 
             Assert.NotEqual(predefinedJob.Id, customJob.Id);
+        }
+        
+        [Fact]
+        public static void BaselineDoesntChangeId()
+        {
+            const string id = "theId";
+            
+            var predefinedJob = Job.Default;
+            var customJob = predefinedJob.AsBaseline();
+            Assert.Equal(predefinedJob.Id, customJob.Id);
+
+            var jobWithId = predefinedJob.WithId(id);
+            var customJob2 = jobWithId.AsBaseline();
+            Assert.Equal(jobWithId.Id, customJob2.Id);
         }
 
         [Fact]
