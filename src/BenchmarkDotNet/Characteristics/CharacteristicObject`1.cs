@@ -28,5 +28,7 @@
         public new T UnfreezeCopy() => (T)UnfreezeCopyCore();
 
         protected static Characteristic<TC> CreateCharacteristic<TC>(string memberName) => Characteristic.Create<T, TC>(memberName);
+        
+        protected static Characteristic<TC> CreateHiddenCharacteristic<TC>(string memberName) => Characteristic.CreateHidden<T, TC>(memberName);
     }
 }

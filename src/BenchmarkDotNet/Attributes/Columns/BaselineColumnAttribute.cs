@@ -4,8 +4,8 @@ using BenchmarkDotNet.Columns;
 namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = true)]
-    public class IsBaselineColumnAttribute : ColumnConfigBaseAttribute
+    public class BaselineColumnAttribute : ColumnConfigBaseAttribute
     {
-        public IsBaselineColumnAttribute() : base(IsBaselineColumn.Default) { }
+        public BaselineColumnAttribute() : base(BaselineColumn.Default) { }
     }
 }

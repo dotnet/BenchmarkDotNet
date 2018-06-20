@@ -4,13 +4,13 @@ namespace BenchmarkDotNet.Jobs
 {
     public class MetaMode : JobMode<MetaMode>
     {
-        public static readonly Characteristic<bool> IsBaselineCharacteristic = CreateCharacteristic<bool>(nameof(IsBaseline));
+        public static readonly Characteristic<bool> BaselineCharacteristic = CreateHiddenCharacteristic<bool>(nameof(Baseline));
         public static readonly Characteristic<bool> IsMutatorCharacteristic = CreateCharacteristic<bool>(nameof(IsMutator));
 
-        public bool IsBaseline
+        public bool Baseline
         {
-            get => IsBaselineCharacteristic[this];
-            set => IsBaselineCharacteristic[this] = value;
+            get => BaselineCharacteristic[this];
+            set => BaselineCharacteristic[this] = value;
         }
         
         /// <summary>

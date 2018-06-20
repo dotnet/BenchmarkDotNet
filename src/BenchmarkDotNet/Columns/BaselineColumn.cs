@@ -4,12 +4,12 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Columns
 {
-    public class IsBaselineColumn: IColumn
+    public class BaselineColumn: IColumn
     {
-        [PublicAPI] public static readonly IColumn Default = new IsBaselineColumn();
+        [PublicAPI] public static readonly IColumn Default = new BaselineColumn();
 
-        public string Id => nameof(IsBaselineColumn);
-        public string ColumnName => "IsBaseline";
+        public string Id => nameof(BaselineColumn);
+        public string ColumnName => "Baseline";
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => benchmarkCase.IsBaseline() ? "Yes" : "No";
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style) => GetValue(summary, benchmarkCase);

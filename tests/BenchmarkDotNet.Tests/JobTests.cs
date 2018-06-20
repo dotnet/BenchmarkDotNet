@@ -401,7 +401,7 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Equal("Id;Accuracy;AnalyzeLaunchVariance;EvaluateOverhead;" +
                 "MaxAbsoluteError;MaxRelativeError;MinInvokeCount;MinIterationTime;OutlierMode;Environment;Affinity;EnvironmentVariables;" +
                 "Jit;Platform;Runtime;Gc;AllowVeryLargeObjects;Concurrent;CpuGroups;Force;HeapAffinitizeMask;HeapCount;NoAffinitize;" +
-                "RetainVm;Server;Infrastructure;Arguments;BuildConfiguration;Clock;EngineFactory;Toolchain;Meta;IsBaseline;IsMutator;Run;InvocationCount;IterationCount;IterationTime;" +
+                "RetainVm;Server;Infrastructure;Arguments;BuildConfiguration;Clock;EngineFactory;Toolchain;Meta;Baseline;IsMutator;Run;InvocationCount;IterationCount;IterationTime;" +
                 "LaunchCount;MaxIterationCount;MinIterationCount;RunStrategy;UnrollFactor;WarmupCount", string.Join(";", a));
         }
         

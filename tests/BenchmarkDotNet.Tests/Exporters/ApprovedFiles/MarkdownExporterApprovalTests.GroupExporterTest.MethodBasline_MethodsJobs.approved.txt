@@ -6,14 +6,14 @@ Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
   [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 
 
- Method |  Job |     Mean |    Error |   StdDev | Scaled | ScaledSD | Rank | LogicalGroup | IsBaseline |
-------- |----- |---------:|---------:|---------:|-------:|---------:|-----:|------------- |----------- |
-   Base | Job1 | 102.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 |         Job1 |        Yes |
-    Foo | Job1 | 202.0 ns | 6.087 ns | 1.581 ns |   1.98 |     0.03 |    2 |         Job1 |         No |
-    Bar | Job1 | 302.0 ns | 6.087 ns | 1.581 ns |   2.96 |     0.04 |    3 |         Job1 |         No |
-        |      |          |          |          |        |          |      |              |            |
-   Base | Job2 | 402.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 |         Job2 |        Yes |
-    Foo | Job2 | 502.0 ns | 6.087 ns | 1.581 ns |   1.25 |     0.01 |    2 |         Job2 |         No |
-    Bar | Job2 | 602.0 ns | 6.087 ns | 1.581 ns |   1.50 |     0.01 |    3 |         Job2 |         No |
+ Method |  Job |     Mean |    Error |   StdDev | Scaled | ScaledSD | Rank | LogicalGroup | Baseline |
+------- |----- |---------:|---------:|---------:|-------:|---------:|-----:|------------- |--------- |
+   Base | Job1 | 102.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 |         Job1 |      Yes |
+    Foo | Job1 | 202.0 ns | 6.087 ns | 1.581 ns |   1.98 |     0.03 |    2 |         Job1 |       No |
+    Bar | Job1 | 302.0 ns | 6.087 ns | 1.581 ns |   2.96 |     0.04 |    3 |         Job1 |       No |
+        |      |          |          |          |        |          |      |              |          |
+   Base | Job2 | 402.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 |         Job2 |      Yes |
+    Foo | Job2 | 502.0 ns | 6.087 ns | 1.581 ns |   1.25 |     0.01 |    2 |         Job2 |       No |
+    Bar | Job2 | 602.0 ns | 6.087 ns | 1.581 ns |   1.50 |     0.01 |    3 |         Job2 |       No |
 
 Errors: 0

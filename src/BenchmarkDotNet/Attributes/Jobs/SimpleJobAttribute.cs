@@ -18,8 +18,8 @@ namespace BenchmarkDotNet.Attributes
             int targetCount = DefaultValue,
             int invocationCount = DefaultValue,
             string id = null,
-            bool isBaseline = false
-        ) : base(CreateJob(id, launchCount, warmupCount, targetCount, invocationCount, null, isBaseline)) { }
+            bool baseline = false
+        ) : base(CreateJob(id, launchCount, warmupCount, targetCount, invocationCount, null, baseline)) { }
 
         [PublicAPI]
         public SimpleJobAttribute(
@@ -29,11 +29,11 @@ namespace BenchmarkDotNet.Attributes
             int targetCount = DefaultValue,
             int invocationCount = DefaultValue,
             string id = null,
-            bool isBaseline = false
-        ) : base(CreateJob(id, launchCount, warmupCount, targetCount, invocationCount, runStrategy, isBaseline)) { }
+            bool baseline = false
+        ) : base(CreateJob(id, launchCount, warmupCount, targetCount, invocationCount, runStrategy, baseline)) { }
 
         private static Job CreateJob(string id, int launchCount, int warmupCount, int targetCount, int invocationCount, RunStrategy? runStrategy,
-            bool isBaseline)
+            bool baseline)
         {
             var job = new Job(id);
             if (launchCount != DefaultValue)
@@ -52,8 +52,8 @@ namespace BenchmarkDotNet.Attributes
 
             if (runStrategy != null)
                 job.Run.RunStrategy = runStrategy.Value;
-            if (isBaseline)
-                job.Meta.IsBaseline = true;
+            if (baseline)
+                job.Meta.Baseline = true;
 
             return job.Freeze();
         }

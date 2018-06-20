@@ -9,8 +9,9 @@ namespace BenchmarkDotNet.Characteristics
             Type declaringType,
             Func<CharacteristicObject, T, T> resolver,
             T fallbackValue,
-            bool ignoreOnApply)
-            : base(id, typeof(T), declaringType, fallbackValue, ignoreOnApply)
+            bool ignoreOnApply,
+            bool dontShowInSummary = false)
+            : base(id, typeof(T), declaringType, fallbackValue, ignoreOnApply, dontShowInSummary)
         {
             Resolver = resolver;
             FallbackValue = fallbackValue;

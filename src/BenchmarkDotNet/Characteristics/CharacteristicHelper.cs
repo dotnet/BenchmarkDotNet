@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Characteristics
         }
 
         public static bool IsPresentableCharacteristic(this Characteristic c, bool includeIgnoreOnApply = false) =>
-            !c.HasChildCharacteristics && (includeIgnoreOnApply || !c.IgnoreOnApply);
+            !c.HasChildCharacteristics && !c.DontShowInSummary && (includeIgnoreOnApply || !c.IgnoreOnApply);
         #endregion
 
         #region Type characteristics

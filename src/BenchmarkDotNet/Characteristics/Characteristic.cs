@@ -31,12 +31,21 @@ namespace BenchmarkDotNet.Characteristics
                 resolver, fallbackValue,
                 ignoreOnApply);
 
+        public static Characteristic<T> CreateHidden<TOwner, T>(string memberName)
+            where TOwner : CharacteristicObject 
+            => new Characteristic<T>(
+                memberName,
+                typeof(TOwner),
+                null, default,
+                false, true);
+
         protected Characteristic(
             string id,
             Type characteristicType,
             Type declaringType,
             object fallbackValue,
-            bool ignoreOnApply)
+            bool ignoreOnApply,
+            bool dontShowInSummary = false)
         {
             if (string.IsNullOrEmpty(id))
                 throw new ArgumentNullException(nameof(id));
@@ -50,6 +59,7 @@ namespace BenchmarkDotNet.Characteristics
             DeclaringType = declaringType;
             FallbackValue = fallbackValue;
             IgnoreOnApply = ignoreOnApply;
+            DontShowInSummary = dontShowInSummary;
         }
 
         public string Id { get; }
@@ -57,6 +67,8 @@ namespace BenchmarkDotNet.Characteristics
 
         // TODO: better naming. As it is for now this property used for Id only and has meaning "if set, will not transfer to others nor be cleared".
         public bool IgnoreOnApply { get; }
+        
+        public bool DontShowInSummary { get; }
 
         public Type CharacteristicType { get; }
 

@@ -2,7 +2,7 @@
 
 namespace BenchmarkDotNet.Samples
 {
-    [ClrJob(isBaseline: true)]
+    [ClrJob(baseline: true)]
     [MonoJob]
     [CoreJob]
     public class IntroJobBaseline

@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Order
         public string GetLogicalGroupKey(IConfig config, BenchmarkCase[] allBenchmarksCases, BenchmarkCase benchmarkCase)
         {
             var rules = new HashSet<BenchmarkLogicalGroupRule>(config.GetLogicalGroupRules());
-            if (allBenchmarksCases.Any(b => b.Job.Meta.IsBaseline))
+            if (allBenchmarksCases.Any(b => b.Job.Meta.Baseline))
             {
                 rules.Add(BenchmarkLogicalGroupRule.ByMethod);
                 rules.Add(BenchmarkLogicalGroupRule.ByParams);

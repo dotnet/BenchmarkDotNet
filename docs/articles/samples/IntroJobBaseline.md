@@ -5,7 +5,7 @@ uid: BenchmarkDotNet.Samples.IntroJobBaseline
 ## Sample: IntroJobBaseline
 
 If you want to compare several runtime configuration,
-  you can mark one of your jobs with `isBaseline = true`.
+  you can mark one of your jobs with `baseline = true`.
 
 ### Source code
 

@@ -7,12 +7,12 @@ namespace BenchmarkDotNet.Attributes
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = true)]
     public class MonoJobAttribute : JobConfigBaseAttribute
     {
-        public MonoJobAttribute(bool isBaseline = false) : base(Job.Mono.WithIsBaseline(isBaseline))
+        public MonoJobAttribute(bool baseline = false) : base(Job.Mono.WithBaseline(baseline))
         {
         }
 
-        public MonoJobAttribute(string name, string path, bool isBaseline = false) 
-            : base(new Job(name, new EnvironmentMode(new MonoRuntime(name, path)).Freeze()).WithIsBaseline(isBaseline).Freeze())
+        public MonoJobAttribute(string name, string path, bool baseline = false) 
+            : base(new Job(name, new EnvironmentMode(new MonoRuntime(name, path)).Freeze()).WithBaseline(baseline).Freeze())
         {
         }
     }

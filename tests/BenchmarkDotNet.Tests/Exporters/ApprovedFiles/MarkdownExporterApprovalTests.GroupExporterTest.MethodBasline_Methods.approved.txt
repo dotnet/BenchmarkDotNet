@@ -6,10 +6,10 @@ Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
   [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 
 
- Method |     Mean |    Error |   StdDev | Scaled | ScaledSD | Rank | LogicalGroup | IsBaseline |
-------- |---------:|---------:|---------:|-------:|---------:|-----:|------------- |----------- |
-   Base | 102.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 |   DefaultJob |        Yes |
-    Foo | 202.0 ns | 6.087 ns | 1.581 ns |   1.98 |     0.03 |    2 |   DefaultJob |         No |
-    Bar | 302.0 ns | 6.087 ns | 1.581 ns |   2.96 |     0.04 |    3 |   DefaultJob |         No |
+ Method |     Mean |    Error |   StdDev | Scaled | ScaledSD | Rank | LogicalGroup | Baseline |
+------- |---------:|---------:|---------:|-------:|---------:|-----:|------------- |--------- |
+   Base | 102.0 ns | 6.087 ns | 1.581 ns |   1.00 |     0.00 |    1 |   DefaultJob |      Yes |
+    Foo | 202.0 ns | 6.087 ns | 1.581 ns |   1.98 |     0.03 |    2 |   DefaultJob |       No |
+    Bar | 302.0 ns | 6.087 ns | 1.581 ns |   2.96 |     0.04 |    3 |   DefaultJob |       No |
 
 Errors: 0
