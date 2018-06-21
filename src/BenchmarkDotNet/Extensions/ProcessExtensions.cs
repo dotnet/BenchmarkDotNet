@@ -27,6 +27,12 @@ namespace BenchmarkDotNet.Extensions
                 logger.WriteLineError($"Failed to set up high priority. Make sure you have the right permissions. Message: {ex.Message}");
             }
         }
+        
+        internal static string ToPresentation(this IntPtr processorAffinity, int processorCount)
+            => (RuntimeInformation.GetCurrentPlatform() == Platform.X64
+                    ? Convert.ToString(processorAffinity.ToInt64(), 2)
+                    : Convert.ToString(processorAffinity.ToInt32(), 2))
+                .PadLeft(processorCount, '0');
 
         private static IntPtr FixAffinity(IntPtr processorAffinity)
         {

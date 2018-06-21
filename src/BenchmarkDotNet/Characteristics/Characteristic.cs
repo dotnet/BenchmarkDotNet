@@ -38,6 +38,14 @@ namespace BenchmarkDotNet.Characteristics
                 typeof(TOwner),
                 null, default,
                 false, true);
+        
+        public static Characteristic<T> CreateIgnoreOnApply<TOwner, T>(string memberName)
+            where TOwner : CharacteristicObject 
+            => new Characteristic<T>(
+                memberName,
+                typeof(TOwner),
+                null, default,
+                true);
 
         protected Characteristic(
             string id,

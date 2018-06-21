@@ -435,6 +435,7 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Equal(20, copy.Run.MaxIterationCount);
             Assert.False(jobBefore.HasValue(RunMode.MaxIterationCountCharacteristic));
             Assert.True(copy.Environment.Runtime is CoreRuntime);
+            Assert.False(copy.Meta.IsMutator); // the job does not became a mutator itself, this config should not be copied
         }
 
         [Fact]
