@@ -13,7 +13,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Toolchains.CsProj;
 
 namespace BenchmarkDotNet.Samples
-
+{
     [Config(typeof(Config))]
     public class IntroNuget
     {
