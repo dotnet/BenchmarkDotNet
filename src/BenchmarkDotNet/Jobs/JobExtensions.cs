@@ -159,8 +159,33 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithCustomBuildConfiguration(this Job job, string buildConfiguration) => job.WithCore(j => j.Infrastructure.BuildConfiguration = buildConfiguration);
         public static Job With(this Job job, IReadOnlyList<EnvironmentVariable> environmentVariables) => job.WithCore(j => j.Environment.EnvironmentVariables = environmentVariables);
         public static Job With(this Job job, IReadOnlyList<Argument> arguments) => job.WithCore(j => j.Infrastructure.Arguments = arguments);
+        
+        /// <summary>
+        /// Runs the job with a specific Nuget dependency which will be resolved during the Job build process
+        /// </summary>
+        /// <param name="job"></param>
+        /// <param name="packageName">The Nuget package name</param>
+        /// <param name="packageVersion">The Nuget package version</param>
+        /// <returns></returns>
+        public static Job WithNuget(this Job job, string packageName, string packageVersion) => job.WithCore(j => j.Infrastructure.NugetReferences = new List<NugetReference> { new NugetReference(packageName, packageVersion) });
 
-    // Accuracy
+        /// <summary>
+        /// Runs the job with a specific Nuget dependency which will be resolved during the Job build process
+        /// </summary>
+        /// <param name="job"></param>
+        /// <param name="packageName">The Nuget package name, the latest version will be resolved</param>
+        /// <returns></returns>
+        public static Job WithNuget(this Job job, string packageName) => job.WithCore(j => j.Infrastructure.NugetReferences = new List<NugetReference> { new NugetReference(packageName, string.Empty) });
+
+        /// <summary>
+        /// Runs the job with a specific Nuget dependencies which will be resolved during the Job build process
+        /// </summary>
+        /// <param name="job"></param>
+        /// <param name="nugetReferences">A collection of Nuget dependencies</param>
+        /// <returns></returns>
+        public static Job WithNuget(this Job job, IReadOnlyList<NugetReference> nugetReferences) => job.WithCore(j => j.Infrastructure.NugetReferences = nugetReferences);
+
+        // Accuracy
         /// <summary>
         /// Maximum acceptable error for a benchmark (by default, BenchmarkDotNet continue iterations until the actual error is less than the specified error).
         /// The default value is 0.02.

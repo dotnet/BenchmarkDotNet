@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Characteristics;
@@ -89,8 +90,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
-            string content = $"call dotnet {Builder.RestoreCommand} {GetCustomArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver)}{Environment.NewLine}" +
-                             $"call dotnet {Builder.GetBuildCommand(TargetFrameworkMoniker, false, buildPartition.BuildConfiguration)} {GetCustomArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver)}";
+            //TODO: This build script isn't actually used, so this logic is also duplicated in the DotNetCliBuilder, see https://github.com/dotnet/BenchmarkDotNet/issues/804
+
+            var nugetPackages = string.Join("call dotnet ", GetNugetPackageCliCommands(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver));
+            string content = string.IsNullOrWhiteSpace(nugetPackages) ? string.Empty : (nugetPackages + Environment.NewLine) +
+                $"call dotnet {Builder.RestoreCommand} {GetCustomArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver)}{Environment.NewLine}" +
+                $"call dotnet {Builder.GetBuildCommand(TargetFrameworkMoniker, false, buildPartition.BuildConfiguration)} {GetCustomArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver)}";
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
         }
@@ -114,6 +119,16 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             var msBuildArguments = benchmarkCase.Job.ResolveValue(InfrastructureMode.ArgumentsCharacteristic, resolver).OfType<MsBuildArgument>();
 
             return string.Join(" ", msBuildArguments.Select(arg => arg.TextRepresentation));
+        }
+
+        internal static IEnumerable<string> GetNugetPackageCliCommands(BenchmarkCase benchmarkCase, IResolver resolver)
+        {
+            if (!benchmarkCase.Job.HasValue(InfrastructureMode.NugetReferencesCharacteristic))
+                return Enumerable.Empty<string>();
+
+            var nugetRefs = benchmarkCase.Job.ResolveValue(InfrastructureMode.NugetReferencesCharacteristic, resolver).OfType<NugetReference>();
+
+            return nugetRefs.Select(x => $"add package {x.PackageName}{(string.IsNullOrWhiteSpace(x.PackageVersion) ? string.Empty : " -v " + x.PackageVersion)}");
         }
     }
 }
