@@ -11,6 +11,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private readonly bool logFailuresOnly = true;
         private readonly bool filterByNamespace = true;
+        private string expectedNamespace;
 
         // ReSharper disable once EmptyConstructor parameterless ctor is mandatory for DiagnosersLoader.CreateDiagnoser
         public InliningDiagnoser() { }
@@ -30,7 +31,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         protected override void AttachToEvents(TraceEventSession session, BenchmarkCase benchmarkCase)
         {
-            var expectedNamespace = benchmarkCase.Descriptor.WorkloadMethod.DeclaringType.Namespace;
+            expectedNamespace = benchmarkCase.Descriptor.WorkloadMethod.DeclaringType.Namespace;
 
             Logger.WriteLine();
             Logger.WriteLineHeader(LogSeparator);
@@ -41,7 +42,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             {
                 // Inliner = the parent method (the inliner calls the inlinee)
                 // Inlinee = the method that is going to be "inlined" inside the inliner (it's caller)                
-                if (StatsPerProcess.TryGetValue(jitData.ProcessID, out object ignored))
+                if (StatsPerProcess.TryGetValue(jitData.ProcessID, out _))
                 {
                     var shouldPrint = !logFailuresOnly
                         && (!filterByNamespace
@@ -59,22 +60,32 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             session.Source.Clr.MethodInliningFailed += jitData =>
             {
-                if (StatsPerProcess.TryGetValue(jitData.ProcessID, out object ignored))
+                if (StatsPerProcess.TryGetValue(jitData.ProcessID, out _)
+                    && ShouldPrintEventInfo(jitData.InlinerNamespace, jitData.InlineeNamespace))
                 {
-                    var shouldPrint = !filterByNamespace
-                                      || jitData.InlinerNamespace.StartsWith(expectedNamespace)
-                                      || jitData.InlineeNamespace.StartsWith(expectedNamespace);
+                    Logger.WriteLineError($"Inliner: {jitData.InlinerNamespace}.{jitData.InlinerName} - {jitData.InlinerNameSignature}");
+                    Logger.WriteLineError($"Inlinee: {jitData.InlineeNamespace}.{jitData.InlineeName} - {jitData.InlineeNameSignature}");
+                    // See https://blogs.msdn.microsoft.com/clrcodegeneration/2009/10/21/jit-etw-inlining-event-fail-reasons/
+                    Logger.WriteLineError($"Fail Reason: {jitData.FailReason}");
+                    Logger.WriteLineHeader(LogSeparator);
+                }
+            };
 
-                    if (shouldPrint)
-                    {
-                        Logger.WriteLineError($"Inliner: {jitData.InlinerNamespace}.{jitData.InlinerName} - {jitData.InlinerNameSignature}");
-                        Logger.WriteLineError($"Inlinee: {jitData.InlineeNamespace}.{jitData.InlineeName} - {jitData.InlineeNameSignature}");
-                        // See https://blogs.msdn.microsoft.com/clrcodegeneration/2009/10/21/jit-etw-inlining-event-fail-reasons/
-                        Logger.WriteLineError($"Fail Reason: {jitData.FailReason}");
-                        Logger.WriteLineHeader(LogSeparator);
-                    }
+            session.Source.Clr.MethodInliningFailedAnsi += jitData => // this is new event exposed by .NET Core 2.2 https://github.com/dotnet/coreclr/commit/95a9055dbe5f6233f75ee2d7b6194e18cc4977fd
+            {
+                if (StatsPerProcess.TryGetValue(jitData.ProcessID, out _)
+                    && ShouldPrintEventInfo(jitData.InlinerNamespace, jitData.InlineeNamespace))
+                {
+                    Logger.WriteLineError($"Inliner: {jitData.InlinerNamespace}.{jitData.InlinerName} - {jitData.InlinerNameSignature}");
+                    Logger.WriteLineError($"Inlinee: {jitData.InlineeNamespace}.{jitData.InlineeName} - {jitData.InlineeNameSignature}");
+                    // See https://blogs.msdn.microsoft.com/clrcodegeneration/2009/10/21/jit-etw-inlining-event-fail-reasons/
+                    Logger.WriteLineError($"Fail Reason: {jitData.FailReason}");
+                    Logger.WriteLineHeader(LogSeparator);
                 }
             };
         }
+        
+        private bool ShouldPrintEventInfo(string inlinerNamespace, string inlineeNamespace)
+            => !filterByNamespace || inlinerNamespace.StartsWith(expectedNamespace) || inlineeNamespace.StartsWith(expectedNamespace);
     }
 }
