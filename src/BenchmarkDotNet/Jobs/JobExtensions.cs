@@ -104,6 +104,18 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         public static Job WithWarmupCount(this Job job, int count) => job.WithCore(j => j.Run.WarmupCount = count);
         
+        /// <summary>
+        /// Minimum count of warmup iterations that should be performed
+        /// The default value is 6
+        /// </summary>
+        public static Job WithMinWarmupCount(this Job job, int count) => job.WithCore(j => j.Run.MinWarmupIterationCount = count);
+        
+        /// <summary>
+        /// Maximum count of warmup iterations that should be performed
+        /// The default value is 50
+        /// </summary>
+        public static Job WithMaxWarmupCount(this Job job, int count) => job.WithCore(j => j.Run.MaxWarmupIterationCount = count);
+        
         [Obsolete("Please use WithIterationCount instead (rename)")]
         public static Job WithTargetCount(this Job job, int count) => job.WithCore(j => j.Run.IterationCount = count);
         

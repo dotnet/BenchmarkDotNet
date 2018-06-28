@@ -416,7 +416,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 "MaxAbsoluteError;MaxRelativeError;MinInvokeCount;MinIterationTime;OutlierMode;Environment;Affinity;EnvironmentVariables;" +
                 "Jit;Platform;Runtime;Gc;AllowVeryLargeObjects;Concurrent;CpuGroups;Force;HeapAffinitizeMask;HeapCount;NoAffinitize;" +
                 "RetainVm;Server;Infrastructure;Arguments;BuildConfiguration;Clock;EngineFactory;Toolchain;Meta;Baseline;IsMutator;Run;InvocationCount;IterationCount;IterationTime;" +
-                "LaunchCount;MaxIterationCount;MinIterationCount;RunStrategy;UnrollFactor;WarmupCount", string.Join(";", a));
+                "LaunchCount;MaxIterationCount;MaxWarmupIterationCount;MinIterationCount;MinWarmupIterationCount;RunStrategy;UnrollFactor;WarmupCount", string.Join(";", a));
         }
         
         [Fact]

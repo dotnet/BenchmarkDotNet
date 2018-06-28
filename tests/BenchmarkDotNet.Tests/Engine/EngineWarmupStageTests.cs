@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Linq;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Mocks;
 using Xunit;
 using Xunit.Abstractions;
@@ -10,9 +14,9 @@ namespace BenchmarkDotNet.Tests.Engine
 {
     public class EngineWarmupStageTests
     {
-        private const int MinIterationCount = EngineWarmupStage.MinIterationCount;
-        private const int MaxIterationCount = EngineWarmupStage.MaxIterationCount;
-        private const int MaxOverheadItertaionCount = EngineWarmupStage.MaxOverheadItertaionCount;
+        private const int MinIterationCount = EngineResolver.DefaultMinWarmupIterationCount;
+        private const int MaxIterationCount = EngineResolver.DefaultMaxWarmupIterationCount;
+        private const int MaxOverheadItertaionCount = EngineWarmupStage.MaxOverheadIterationCount;
 
         private readonly ITestOutputHelper output;
 
@@ -51,12 +55,37 @@ namespace BenchmarkDotNet.Tests.Engine
             AutoTest(data => TimeInterval.Millisecond * data.Index, MaxOverheadItertaionCount, mode: IterationMode.Overhead);
         }
 
-        private void AutoTest(Func<IterationData, TimeInterval> measure, int min, int max = -1, IterationMode mode = IterationMode.Workload)
+        [Fact]
+        public void MinAndMaxWarmupCountAttributesCanForceAutoWarmup()
+        {
+            const int explicitWarmupCount = 1;
+            
+            var warmupCountEqualOne = DefaultConfig.Instance.With(Job.Default.WithWarmupCount(explicitWarmupCount));
+
+            var benchmarkRunInfo = BenchmarkConverter.TypeToBenchmarks(typeof(WithForceAutoWarmup), warmupCountEqualOne);
+
+            var mergedJob = benchmarkRunInfo.BenchmarksCases.Single().Job;
+            
+            Assert.Equal(EngineResolver.ForceAutoWarmup, mergedJob.Run.WarmupCount);
+            Assert.Equal(2, mergedJob.Run.MinWarmupIterationCount);
+            Assert.Equal(4, mergedJob.Run.MaxWarmupIterationCount);
+            
+            AutoTest(data => TimeInterval.Millisecond * (data.Index % 2), 2, 4, job: mergedJob);
+        }
+        
+        [MinWarmupCount(2, forceAutoWarmup: true)]
+        [MaxWarmupCount(4, forceAutoWarmup: true)]
+        public class WithForceAutoWarmup
+        {
+            [Benchmark]
+            public void Method() { }
+        }
+
+        private void AutoTest(Func<IterationData, TimeInterval> measure, int min, int max = -1, IterationMode mode = IterationMode.Workload, Job job = null)
         {
             if (max == -1)
                 max = min;
-            var job = Job.Default;
-            var stage = CreateStage(job, measure);
+            var stage = CreateStage(job ?? Job.Default, measure);
             var measurements = stage.Run(1, mode, true, 1);
             int count = measurements.Count;
             output.WriteLine($"MeasurementCount = {count} (Min= {min}, Max = {max})");

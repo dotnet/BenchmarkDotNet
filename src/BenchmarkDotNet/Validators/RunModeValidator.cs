@@ -3,6 +3,7 @@ using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -35,18 +36,30 @@ namespace BenchmarkDotNet.Validators
                     }
                 }
                 
-                int minTargetCount = run.ResolveValue(RunMode.MinIterationCountCharacteristic, resolver);
-                int maxTargetCount = run.ResolveValue(RunMode.MaxIterationCountCharacteristic, resolver);
-
-                if (minTargetCount <= 0)
-                    yield return new ValidationError(true, $"{nameof(RunMode.MinIterationCount)} must be greater than zero (was {minTargetCount})", benchmark);
-
-                if (maxTargetCount <= 0)
-                    yield return new ValidationError(true, $"{nameof(RunMode.MaxIterationCount)} must be greater than zero (was {maxTargetCount})", benchmark);
-
-                if (minTargetCount >= maxTargetCount)
-                    yield return new ValidationError(true, $"{nameof(RunMode.MaxIterationCount)} must be greater than {nameof(RunMode.MinIterationCount)} (was {maxTargetCount} and {minTargetCount})", benchmark);
+                foreach (var validationError in ValidateMinMax(run, resolver, benchmark, RunMode.MinIterationCountCharacteristic, RunMode.MaxIterationCountCharacteristic))
+                    yield return validationError;
+                
+                foreach (var validationError in ValidateMinMax(run, resolver, benchmark, RunMode.MinWarmupIterationCountCharacteristic, RunMode.MaxWarmupIterationCountCharacteristic))
+                    yield return validationError;
             }
+        }
+
+        private static IEnumerable<ValidationError> ValidateMinMax(RunMode run, CompositeResolver resolver, BenchmarkCase benchmark,
+            Characteristic<int> minCharacteristic, Characteristic<int> maxCharacteristic)
+        {
+            string GetName(Characteristic characteristic) => $"{characteristic.DeclaringType.Name}.{characteristic.Id}";
+            
+            int minCount = run.ResolveValue(minCharacteristic, resolver);
+            int maxCount = run.ResolveValue(maxCharacteristic, resolver);
+            
+            if (minCount <= 0)
+                yield return new ValidationError(true, $"{GetName(minCharacteristic)} must be greater than zero (was {minCount})", benchmark);
+
+            if (maxCount <= 0)
+                yield return new ValidationError(true, $"{GetName(maxCharacteristic)} must be greater than zero (was {maxCount})", benchmark);
+
+            if (minCount >= maxCount)
+                yield return new ValidationError(true, $"{GetName(maxCharacteristic)} must be greater than {GetName(minCharacteristic)} (was {maxCount} and {minCount})", benchmark);
         }
     }
 }
