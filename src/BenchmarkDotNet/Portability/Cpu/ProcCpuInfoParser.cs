@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Helpers;
@@ -64,8 +65,8 @@ namespace BenchmarkDotNet.Portability.Cpu
             var matches = Regex.Matches(brandString, pattern, RegexOptions.IgnoreCase);
             if (matches.Count > 0 && matches[0].Groups.Count > 1)
             {
-                var match = Regex.Matches(brandString, pattern, RegexOptions.IgnoreCase)[0].Groups[1].ToString().Replace('.',',');
-                return double.TryParse(match, out double result) ? result : 0d;
+                var match = Regex.Matches(brandString, pattern, RegexOptions.IgnoreCase)[0].Groups[1].ToString();
+                return double.TryParse(match,NumberStyles.Any, CultureInfo.InvariantCulture, out double result) ? result : 0d;
             }
 
             return 0d;
