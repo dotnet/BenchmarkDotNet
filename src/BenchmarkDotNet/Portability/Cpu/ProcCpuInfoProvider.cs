@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Horology;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Portability.Cpu
@@ -38,9 +36,9 @@ namespace BenchmarkDotNet.Portability.Cpu
             if (output == null || output.Length < 6)
                 return null;
                 
-            var current = double.TryParse(output[1].Trim(), out double currentValue);
-            var max = double.TryParse(output[3].Trim().Replace(',', '.'), out double maxValue);
-            var min = double.TryParse(output[5].Trim().Replace(',', '.'), out double minValue);
+            double.TryParse(output[1].Trim(), out double currentValue);
+            double.TryParse(output[3].Trim().Replace(',', '.'), out double maxValue);
+            double.TryParse(output[5].Trim().Replace(',', '.'), out double minValue);
             
             return $"\n{ProcCpuInfoKeyNames.NominalFrequency}\t:{currentValue}\n{ProcCpuInfoKeyNames.MinFrequency}\t:{minValue}\n{ProcCpuInfoKeyNames.MaxFrequency}\t:{maxValue}\n";
         }
