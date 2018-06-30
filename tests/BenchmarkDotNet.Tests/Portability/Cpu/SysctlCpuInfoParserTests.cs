@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Portability.Cpu;
+﻿using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Portability.Cpu;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Portability.Cpu
@@ -36,7 +37,7 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
             Assert.Equal(1, parser.PhysicalProcessorCount);
             Assert.Equal(4, parser.PhysicalCoreCount);
             Assert.Equal(8, parser.LogicalCoreCount);
-            Assert.Equal(2200, parser.NominalFrequency);
+            Assert.Equal(2200 * Frequency.MHz, parser.NominalFrequency);
         }
     }
 }

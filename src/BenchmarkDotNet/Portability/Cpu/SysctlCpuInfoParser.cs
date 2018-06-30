@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿﻿using System.Collections.Generic;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;

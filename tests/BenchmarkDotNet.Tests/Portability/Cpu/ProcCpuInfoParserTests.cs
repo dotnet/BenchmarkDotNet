@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Portability.Cpu;
+﻿using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Portability.Cpu;
 using BenchmarkDotNet.Tests.Environments;
 using Xunit;
 
@@ -42,9 +43,9 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
             Assert.Equal(2, parser.PhysicalProcessorCount);
             Assert.Equal(6, parser.PhysicalCoreCount);
             Assert.Equal(8, parser.LogicalCoreCount);
-            Assert.Equal(2500, parser.NominalFrequency);
-            Assert.Equal(800, parser.MinFrequency);
-            Assert.Equal(2500, parser.MaxFrequency);
+            Assert.Equal(null, parser.NominalFrequency);
+            Assert.Equal(800 * Frequency.MHz, parser.MinFrequency);
+            Assert.Equal(2500 * Frequency.MHz, parser.MaxFrequency);
         }
 
 
@@ -57,9 +58,9 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
             Assert.Equal(1, parser.PhysicalProcessorCount);
             Assert.Equal(2, parser.PhysicalCoreCount);
             Assert.Equal(4, parser.LogicalCoreCount);
-            Assert.Equal(2300, parser.NominalFrequency);
-            Assert.Equal(800, parser.MinFrequency);
-            Assert.Equal(2300, parser.MaxFrequency);
+            Assert.Equal(2300 * Frequency.MHz, parser.NominalFrequency);
+            Assert.Equal(800 * Frequency.MHz, parser.MinFrequency);
+            Assert.Equal(2300 * Frequency.MHz, parser.MaxFrequency);
         }
 
         [Fact]
@@ -71,9 +72,9 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
             Assert.Equal(1, parser.PhysicalProcessorCount);
             Assert.Equal(4, parser.PhysicalCoreCount);
             Assert.Equal(8, parser.LogicalCoreCount);
-            Assert.Equal(2500, parser.NominalFrequency);
-            Assert.Equal(800, parser.MinFrequency);
-            Assert.Equal(2500, parser.MaxFrequency);
+            Assert.Equal(2500 * Frequency.MHz, parser.NominalFrequency);
+            Assert.Equal(800 * Frequency.MHz, parser.MinFrequency);
+            Assert.Equal(2500 * Frequency.MHz, parser.MaxFrequency);
         }
     }
 }

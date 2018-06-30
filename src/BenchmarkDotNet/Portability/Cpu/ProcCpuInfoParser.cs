@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Portability.Cpu
                 if (logicalCore.TryGetValue(ProcCpuInfoKeyNames.ModelName, out string modelName))
                 {
                     processorModelNames.Add(modelName);
-                    nominalFrequency = ParseFrequencyFromBrandString(modelName) * 1000;
+                    nominalFrequency = ParseFrequencyFromBrandString(modelName) * 1_000;
                     logicalCoreCount++;
                 }
                 
@@ -61,8 +61,14 @@ namespace BenchmarkDotNet.Portability.Cpu
         private static double ParseFrequencyFromBrandString(string brandString)
         {
             var pattern = "(\\d.\\d+)GHz";
-            var match = Regex.Matches(brandString, pattern, RegexOptions.IgnoreCase)[0].Groups[1].ToString();
-            return double.TryParse(match, out double result) ? result : 0d;
+            var matches = Regex.Matches(brandString, pattern, RegexOptions.IgnoreCase);
+            if (matches.Count > 0 && matches[0].Groups.Count > 1)
+            {
+                var match = Regex.Matches(brandString, pattern, RegexOptions.IgnoreCase)[0].Groups[1].ToString().Replace('.',',');
+                return double.TryParse(match, out double result) ? result : 0d;
+            }
+
+            return 0d;
         }
     }
 }

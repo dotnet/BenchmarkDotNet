@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Horology;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Environments
@@ -29,7 +30,7 @@ namespace BenchmarkDotNet.Tests.Environments
         [InlineData("Intel(R) Core(TM) i7-5775R CPU @ 3.30GHz", "Intel Core i7-5775R CPU 3.30GHz (Max: 3.40GHz) (Broadwell)", 3400)]
         public void CoreIsPrettifiedWithDiffFrequencies(string originalName, string prettifiedName, double actualFrequency)
         {
-            Assert.Equal(prettifiedName, ProcessorBrandStringHelper.Prettify(originalName, actualFrequency));
+            Assert.Equal(prettifiedName, ProcessorBrandStringHelper.Prettify(originalName, actualFrequency * Frequency.MHz));
         }
     }
 }
