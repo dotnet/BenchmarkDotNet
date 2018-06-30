@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Horology;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Portability.Cpu
@@ -15,9 +16,10 @@ namespace BenchmarkDotNet.Portability.Cpu
             int physicalCoreCount = 0;
             int logicalCoreCount = 0;
             int processorsCount = 0;
-            int currentClockSpeed = 0;
-            int maxClockSpeed = 0;
-            int minClockSpeed = 0;
+            
+            var currentClockSpeed = (Frequency)0d;
+            var maxClockSpeed = (Frequency)0d;
+            var minClockSpeed = (Frequency)0d;
 
             foreach (var processor in processors)
             {
@@ -52,9 +54,9 @@ namespace BenchmarkDotNet.Portability.Cpu
                 processorsCount > 0 ? processorsCount : (int?) null,
                 physicalCoreCount > 0 ? physicalCoreCount : (int?) null,
                 logicalCoreCount > 0 ? logicalCoreCount : (int?) null,
-                currentClockSpeed > 0 && processorsCount > 0 ? currentClockSpeed / processorsCount : (double?) null,
-                maxClockSpeed > 0 && processorsCount > 0 ? maxClockSpeed / processorsCount : (double?) null,
-                minClockSpeed > 0 && processorsCount > 0 ? minClockSpeed / processorsCount : (double?) null);
+                currentClockSpeed > 0 && processorsCount > 0 ? Frequency.FromMHz(currentClockSpeed / processorsCount) : (Frequency?) null,
+                maxClockSpeed > 0 && processorsCount > 0 ? Frequency.FromMHz(maxClockSpeed / processorsCount) : (Frequency?) null,
+                minClockSpeed > 0 && processorsCount > 0 ? Frequency.FromMHz(minClockSpeed / processorsCount) : (Frequency?) null);
         }
     }
 }

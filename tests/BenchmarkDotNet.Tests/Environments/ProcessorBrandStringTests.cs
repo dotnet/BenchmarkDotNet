@@ -22,15 +22,15 @@ namespace BenchmarkDotNet.Tests.Environments
             Assert.Equal(prettifiedName, ProcessorBrandStringHelper.Prettify(originalName));
 
         [Theory]
-        [InlineData("Intel(R) Pentium(TM) G4560 CPU @ 3.50GHz", "Intel Pentium G4560 CPU 3.50GHz (Max: 3.70GHz)", 3700)]
-        [InlineData("Intel(R) Core(TM) i5-2500 CPU @ 3.30GHz", "Intel Core i5-2500 CPU 3.30GHz (Max: 3.70GHz) (Sandy Bridge)", 3701)]
-        [InlineData("Intel(R) Core(TM) i7-2600 CPU @ 3.40GHz", "Intel Core i7-2600 CPU 3.40GHz (Max: 3.70GHz) (Sandy Bridge)", 3700)]
-        [InlineData("Intel(R) Core(TM) i7-3770 CPU @ 3.40GHz", "Intel Core i7-3770 CPU 3.40GHz (Max: 3.50GHz) (Ivy Bridge)", 3500)]
-        [InlineData("Intel(R) Core(TM) i7-4770K CPU @ 3.50GHz", "Intel Core i7-4770K CPU 3.50GHz (Max: 3.60GHz) (Haswell)", 3600)]
-        [InlineData("Intel(R) Core(TM) i7-5775R CPU @ 3.30GHz", "Intel Core i7-5775R CPU 3.30GHz (Max: 3.40GHz) (Broadwell)", 3400)]
+        [InlineData("Intel(R) Pentium(TM) G4560 CPU @ 3.50GHz", "Intel Pentium G4560 CPU 3.50GHz (Max: 3.70GHz)", 3.7)]
+        [InlineData("Intel(R) Core(TM) i5-2500 CPU @ 3.30GHz", "Intel Core i5-2500 CPU 3.30GHz (Max: 3.70GHz) (Sandy Bridge)", 3.7)]
+        [InlineData("Intel(R) Core(TM) i7-2600 CPU @ 3.40GHz", "Intel Core i7-2600 CPU 3.40GHz (Max: 3.70GHz) (Sandy Bridge)", 3.7)]
+        [InlineData("Intel(R) Core(TM) i7-3770 CPU @ 3.40GHz", "Intel Core i7-3770 CPU 3.40GHz (Max: 3.50GHz) (Ivy Bridge)", 3.5)]
+        [InlineData("Intel(R) Core(TM) i7-4770K CPU @ 3.50GHz", "Intel Core i7-4770K CPU 3.50GHz (Max: 3.60GHz) (Haswell)", 3.6)]
+        [InlineData("Intel(R) Core(TM) i7-5775R CPU @ 3.30GHz", "Intel Core i7-5775R CPU 3.30GHz (Max: 3.40GHz) (Broadwell)", 3.4)]
         public void CoreIsPrettifiedWithDiffFrequencies(string originalName, string prettifiedName, double actualFrequency)
         {
-            Assert.Equal(prettifiedName, ProcessorBrandStringHelper.Prettify(originalName, actualFrequency * Frequency.MHz));
+            Assert.Equal(prettifiedName, ProcessorBrandStringHelper.Prettify(originalName, Frequency.FromGHz(actualFrequency)));
         }
     }
 }

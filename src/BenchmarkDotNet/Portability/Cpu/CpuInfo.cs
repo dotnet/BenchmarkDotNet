@@ -16,17 +16,17 @@ namespace BenchmarkDotNet.Portability.Cpu
                        int? physicalProcessorCount,
                        int? physicalCoreCount,
                        int? logicalCoreCount,
-                       double? nominalFrequency,
-                       double? minFrequency,
-                       double? maxFrequency)
+                       Frequency? nominalFrequency,
+                       Frequency? minFrequency,
+                       Frequency? maxFrequency)
         {
             ProcessorName = processorName;
             PhysicalProcessorCount = physicalProcessorCount;
             PhysicalCoreCount = physicalCoreCount;
             LogicalCoreCount = logicalCoreCount;
-            NominalFrequency = nominalFrequency != null ? Frequency.FromMHz(nominalFrequency.Value) : (Frequency?)null;
-            MinFrequency = minFrequency != null ? Frequency.FromMHz(minFrequency.Value) : (Frequency?)null;
-            MaxFrequency = maxFrequency != null ? Frequency.FromMHz(maxFrequency.Value) : (Frequency?)null;
+            NominalFrequency = nominalFrequency;
+            MinFrequency = minFrequency;
+            MaxFrequency = maxFrequency;
         }
     }
 }

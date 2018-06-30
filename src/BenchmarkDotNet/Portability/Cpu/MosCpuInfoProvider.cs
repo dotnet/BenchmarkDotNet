@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Management;
+using BenchmarkDotNet.Horology;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Portability.Cpu
@@ -41,9 +42,9 @@ namespace BenchmarkDotNet.Portability.Cpu
                 processorsCount > 0 ? processorsCount : (int?) null,
                 physicalCoreCount > 0 ? (int?) physicalCoreCount : null,
                 logicalCoreCount > 0 ? (int?) logicalCoreCount : null,
-                nominalClockSpeed > 0 && logicalCoreCount > 0 ? nominalClockSpeed : 0,
-                maxClockSpeed > 0 && logicalCoreCount > 0 ? maxClockSpeed : 0,
-                minClockSpeed > 0 && logicalCoreCount > 0 ? minClockSpeed : 0);
+                nominalClockSpeed > 0 && logicalCoreCount > 0 ? Frequency.FromMHz(nominalClockSpeed) : 0,
+                maxClockSpeed > 0 && logicalCoreCount > 0 ? Frequency.FromMHz(maxClockSpeed) : 0,
+                minClockSpeed > 0 && logicalCoreCount > 0 ? Frequency.FromMHz(minClockSpeed) : 0);
         }
     }
 }

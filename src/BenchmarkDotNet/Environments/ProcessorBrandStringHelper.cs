@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 using JetBrains.Annotations;
 
@@ -42,7 +43,7 @@ namespace BenchmarkDotNet.Environments
         {
             if (frequency == null)
                 return null;
-            return $"{frequency.Value.ToGHz().ToString("N2").Replace(',','.')}GHz";
+            return $"{frequency.Value.ToGHz().ToStr("N2")}GHz";
         }
 
         /// <summary>

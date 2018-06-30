@@ -43,9 +43,9 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
             Assert.Equal(2, parser.PhysicalProcessorCount);
             Assert.Equal(6, parser.PhysicalCoreCount);
             Assert.Equal(8, parser.LogicalCoreCount);
-            Assert.Equal(null, parser.NominalFrequency);
-            Assert.Equal(800 * Frequency.MHz, parser.MinFrequency);
-            Assert.Equal(2500 * Frequency.MHz, parser.MaxFrequency);
+            Assert.Null(parser.NominalFrequency);
+            Assert.Equal(0.8 * Frequency.GHz, parser.MinFrequency);
+            Assert.Equal(2.5 * Frequency.GHz, parser.MaxFrequency);
         }
 
 
@@ -58,9 +58,9 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
             Assert.Equal(1, parser.PhysicalProcessorCount);
             Assert.Equal(2, parser.PhysicalCoreCount);
             Assert.Equal(4, parser.LogicalCoreCount);
-            Assert.Equal(2300 * Frequency.MHz, parser.NominalFrequency);
-            Assert.Equal(800 * Frequency.MHz, parser.MinFrequency);
-            Assert.Equal(2300 * Frequency.MHz, parser.MaxFrequency);
+            Assert.Equal(2.3 * Frequency.GHz, parser.NominalFrequency);
+            Assert.Equal(0.8 * Frequency.GHz, parser.MinFrequency);
+            Assert.Equal(2.3 * Frequency.GHz, parser.MaxFrequency);
         }
 
         [Fact]
@@ -72,9 +72,20 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
             Assert.Equal(1, parser.PhysicalProcessorCount);
             Assert.Equal(4, parser.PhysicalCoreCount);
             Assert.Equal(8, parser.LogicalCoreCount);
-            Assert.Equal(2500 * Frequency.MHz, parser.NominalFrequency);
-            Assert.Equal(800 * Frequency.MHz, parser.MinFrequency);
-            Assert.Equal(2500 * Frequency.MHz, parser.MaxFrequency);
+            Assert.Equal(2.5 * Frequency.GHz, parser.NominalFrequency);
+            Assert.Equal(0.8 * Frequency.GHz, parser.MinFrequency);
+            Assert.Equal(2.5 * Frequency.GHz, parser.MaxFrequency);
+        }
+
+        [Theory]
+        [InlineData("Intel(R) Core(TM) i7-4710MQ CPU @ 2.50GHz", 2.50)]
+        [InlineData("Intel(R) Core(TM) i5-6200U CPU @ 2.30GHz", 2.30)]
+        [InlineData("Unknown processor with 2 cores and hyper threading, Unknown processor with 4 cores", 0)]
+        [InlineData("Intel(R) Core(TM) i5-2500 CPU @ 3.30GHz", 3.30)]
+        public void ParseFrequencyFromBrandStringTests(string brandString, double expectedGHz)
+        {
+            var frequency = ProcCpuInfoParser.ParseFrequencyFromBrandString(brandString);
+            Assert.Equal(Frequency.FromGHz(expectedGHz), frequency);
         }
     }
 }
