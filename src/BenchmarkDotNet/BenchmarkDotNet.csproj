@@ -8,9 +8,6 @@
     <PackageId>BenchmarkDotNet</PackageId>
     <RootNamespace>BenchmarkDotNet</RootNamespace>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <Optimize>true</Optimize>
-  </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\*" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
     <EmbeddedResource Include="Disassemblers\net46\win7-x86\BenchmarkDotNet.Disassembler.x86.exe" />

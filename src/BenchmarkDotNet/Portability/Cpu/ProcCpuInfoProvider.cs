@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Horology;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Portability.Cpu

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
+using BenchmarkDotNet.Horology;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Environments
@@ -13,7 +14,7 @@ namespace BenchmarkDotNet.Environments
         /// <param name="frequency">processor actual frequency</param>
         /// <returns>Prettified version</returns>
         [NotNull]
-        public static string Prettify([NotNull] string processorName, double? frequency = null)
+        public static string Prettify([NotNull] string processorName, Frequency? frequency = null)
         {
             // Remove parts which don't provide any useful information for user
             processorName = processorName.Replace("@", "").Replace("(R)", "").Replace("(TM)", "");
@@ -37,12 +38,11 @@ namespace BenchmarkDotNet.Environments
         /// Presents actual processor's frequency into brand string format
         /// </summary>
         /// <param name="frequency"></param>
-        private static string GetBrandStyledActualFrequency(double? frequency)
+        private static string GetBrandStyledActualFrequency(Frequency? frequency)
         {
             if (frequency == null)
                 return null;
-            var a = frequency / 1000;
-            return $"{a.Value.ToString("N2").Replace(',','.')}GHz";
+            return $"{frequency.Value.ToGHz().ToString("N2").Replace(',','.')}GHz";
         }
 
         /// <summary>
