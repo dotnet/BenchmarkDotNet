@@ -18,9 +18,9 @@ namespace BenchmarkDotNet.Portability.Cpu
             var processorsToPhysicalCoreCount = new Dictionary<string, int>();
             
             var logicalCoreCount = 0;
-            var nominalFrequency = (Frequency)0d;
-            var minFrequency = (Frequency)0d;
-            var maxFrequency = (Frequency)0d;
+            var nominalFrequency = Frequency.Zero;
+            var minFrequency = Frequency.Zero;
+            var maxFrequency = Frequency.Zero;
             
             foreach (var logicalCore in logicalCores)
             {
@@ -38,15 +38,15 @@ namespace BenchmarkDotNet.Portability.Cpu
                 }
                 
                 if (logicalCore.TryGetValue(ProcCpuInfoKeyNames.MinFrequency, out string minCpuFreqValue)
-                    && double.TryParse(minCpuFreqValue.Replace(',','.'), out double minCpuFreq))
+                    && Frequency.TryParseMHz(minCpuFreqValue, out var minCpuFreq))
                 {
-                    minFrequency = Frequency.FromMHz(minCpuFreq);
+                    minFrequency = minCpuFreq;
                 }
                 
                 if (logicalCore.TryGetValue(ProcCpuInfoKeyNames.MaxFrequency, out string maxCpuFreqValue)
-                     && double.TryParse(maxCpuFreqValue.Replace(',','.'), out double maxCpuFreq))
+                     && Frequency.TryParseMHz(maxCpuFreqValue, out var maxCpuFreq))
                 {
-                    maxFrequency = Frequency.FromMHz(maxCpuFreq);
+                    maxFrequency = maxCpuFreq;
                 }
             }
 
@@ -67,9 +67,7 @@ namespace BenchmarkDotNet.Portability.Cpu
             if (matches.Count > 0 && matches[0].Groups.Count > 1)
             {
                 var match = Regex.Matches(brandString, pattern, RegexOptions.IgnoreCase)[0].Groups[1].ToString();
-                return double.TryParse(match, NumberStyles.Any, CultureInfo.InvariantCulture, out double result)
-                    ? Frequency.FromGHz(result)
-                    : (Frequency) 0d;
+                return Frequency.TryParseGHz(match, out var result) ? result : Frequency.Zero;
             }
 
             return 0d;

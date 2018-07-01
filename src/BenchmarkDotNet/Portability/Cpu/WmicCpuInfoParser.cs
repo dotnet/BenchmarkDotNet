@@ -17,9 +17,9 @@ namespace BenchmarkDotNet.Portability.Cpu
             int logicalCoreCount = 0;
             int processorsCount = 0;
             
-            var currentClockSpeed = (Frequency)0d;
-            var maxClockSpeed = (Frequency)0d;
-            var minClockSpeed = (Frequency)0d;
+            var currentClockSpeed = Frequency.Zero;
+            var maxClockSpeed = Frequency.Zero;
+            var minClockSpeed = Frequency.Zero;
 
             foreach (var processor in processors)
             {

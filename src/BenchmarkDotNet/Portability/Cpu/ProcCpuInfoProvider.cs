@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Horology;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Portability.Cpu
@@ -32,15 +34,26 @@ namespace BenchmarkDotNet.Portability.Cpu
                                       .Split('\n')
                                       .SelectMany(x => x.Split(':'))
                                       .ToArray();
-            
-            if (output == null || output.Length < 6)
+
+            return ParseCpuFrequencies(output);
+        }
+
+        private static string ParseCpuFrequencies(string[] input)
+        {
+            // Example of output we trying to parse:
+            //
+            // CPU MHz: 949.154
+            // CPU max MHz: 3200,0000
+            // CPU min MHz: 800,0000
+            //
+            // And we don't need "CPU MHz" line
+            if (input == null || input.Length < 6)
                 return null;
-                
-            double.TryParse(output[1].Trim(), out double currentValue);
-            double.TryParse(output[3].Trim().Replace(',', '.'), out double maxValue);
-            double.TryParse(output[5].Trim().Replace(',', '.'), out double minValue);
+
+            Frequency.TryParseMHz(input[3].Trim().Replace(',', '.'), out var minFrequency);
+            Frequency.TryParseMHz(input[5].Trim().Replace(',', '.'), out var maxFrequency);
             
-            return $"\n{ProcCpuInfoKeyNames.NominalFrequency}\t:{currentValue}\n{ProcCpuInfoKeyNames.MinFrequency}\t:{minValue}\n{ProcCpuInfoKeyNames.MaxFrequency}\t:{maxValue}\n";
+            return $"\n{ProcCpuInfoKeyNames.MinFrequency}\t:{minFrequency.ToMHz()}\n{ProcCpuInfoKeyNames.MaxFrequency}\t:{maxFrequency.ToMHz()}\n";
         }
     }
 }

@@ -12,15 +12,15 @@ namespace BenchmarkDotNet.Environments
         /// Transform a processor brand string to a nice form for summary.
         /// </summary>
         /// <param name="processorName">Original processor brand string</param>
-        /// <param name="frequency">processor actual frequency</param>
+        /// <param name="maxFrequency">processor actual frequency</param>
         /// <returns>Prettified version</returns>
         [NotNull]
-        public static string Prettify([NotNull] string processorName, Frequency? frequency = null)
+        public static string Prettify([NotNull] string processorName, Frequency? maxFrequency = null)
         {
             // Remove parts which don't provide any useful information for user
             processorName = processorName.Replace("@", "").Replace("(R)", "").Replace("(TM)", "");
 
-            string frequencyString = GetBrandStyledActualFrequency(frequency);
+            string frequencyString = GetBrandStyledActualFrequency(maxFrequency);
             if (frequencyString != null && !processorName.Contains(frequencyString))
                 processorName = $"{processorName} (Max: {frequencyString})";
             
