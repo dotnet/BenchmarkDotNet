@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Portability.Cpu
         {
             if (RuntimeInformation.IsWindows())
             {
-                string content = ProcessHelper.RunAndReadOutput("wmic", "cpu get Name, NumberOfCores, NumberOfLogicalProcessors /Format:List");
+                string content = ProcessHelper.RunAndReadOutput("wmic", "cpu get Name, NumberOfCores, NumberOfLogicalProcessors, CurrentClockSpeed /Format:List");
                 return WmicCpuInfoParser.ParseOutput(content);
             }
             return null;

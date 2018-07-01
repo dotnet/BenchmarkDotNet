@@ -12,7 +12,7 @@
             Description = description;
             HertzAmount = hertzAmount;
         }
-
+        
         public static readonly FrequencyUnit Hz = new FrequencyUnit("Hz", "Hertz", 1);
         public static readonly FrequencyUnit KHz = new FrequencyUnit("KHz", "Kilohertz", 1000);
         public static readonly FrequencyUnit MHz = new FrequencyUnit("MHz", "Megahertz", 1000 * 1000);

@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Linq;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Horology;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Portability.Cpu
@@ -18,9 +21,39 @@ namespace BenchmarkDotNet.Portability.Cpu
             if (RuntimeInformation.IsLinux())
             {
                 string content = ProcessHelper.RunAndReadOutput("cat", "/proc/cpuinfo");
+                var output = GetCpuSpeed();
+                content = content + output;
                 return ProcCpuInfoParser.ParseOutput(content);
             }
             return null;
+        }
+        
+        private static string GetCpuSpeed()
+        {
+            var output = ProcessHelper.RunAndReadOutput("/bin/bash", "-c \"lscpu | grep MHz\"")?
+                                      .Split('\n')
+                                      .SelectMany(x => x.Split(':'))
+                                      .ToArray();
+
+            return ParseCpuFrequencies(output);
+        }
+
+        private static string ParseCpuFrequencies(string[] input)
+        {
+            // Example of output we trying to parse:
+            //
+            // CPU MHz: 949.154
+            // CPU max MHz: 3200,0000
+            // CPU min MHz: 800,0000
+            //
+            // And we don't need "CPU MHz" line
+            if (input == null || input.Length < 6)
+                return null;
+
+            Frequency.TryParseMHz(input[3].Trim().Replace(',', '.'), out var minFrequency);
+            Frequency.TryParseMHz(input[5].Trim().Replace(',', '.'), out var maxFrequency);
+            
+            return $"\n{ProcCpuInfoKeyNames.MinFrequency}\t:{minFrequency.ToMHz()}\n{ProcCpuInfoKeyNames.MaxFrequency}\t:{maxFrequency.ToMHz()}\n";
         }
     }
 }

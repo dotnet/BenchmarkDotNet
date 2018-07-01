@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Horology;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Portability.Cpu
@@ -15,6 +16,10 @@ namespace BenchmarkDotNet.Portability.Cpu
             int physicalCoreCount = 0;
             int logicalCoreCount = 0;
             int processorsCount = 0;
+            
+            var currentClockSpeed = Frequency.Zero;
+            var maxClockSpeed = Frequency.Zero;
+            var minClockSpeed = Frequency.Zero;
 
             foreach (var processor in processors)
             {
@@ -33,13 +38,25 @@ namespace BenchmarkDotNet.Portability.Cpu
                     processorModelNames.Add(name);
                     processorsCount++;
                 }
+                
+                if (processor.TryGetValue(WmicCpuInfoKeyNames.CurrentClockSpeed, out string frequencyValue) 
+                    && int.TryParse(frequencyValue, out int frequency)
+                    && frequency > 0)
+                {
+                    currentClockSpeed += frequency;
+                    maxClockSpeed += frequency;
+                    minClockSpeed += frequency;
+                }
             }
 
             return new CpuInfo(
                 processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null,
                 processorsCount > 0 ? processorsCount : (int?) null,
                 physicalCoreCount > 0 ? physicalCoreCount : (int?) null,
-                logicalCoreCount > 0 ? logicalCoreCount : (int?) null);
+                logicalCoreCount > 0 ? logicalCoreCount : (int?) null,
+                currentClockSpeed > 0 && processorsCount > 0 ? Frequency.FromMHz(currentClockSpeed / processorsCount) : (Frequency?) null,
+                maxClockSpeed > 0 && processorsCount > 0 ? Frequency.FromMHz(maxClockSpeed / processorsCount) : (Frequency?) null,
+                minClockSpeed > 0 && processorsCount > 0 ? Frequency.FromMHz(minClockSpeed / processorsCount) : (Frequency?) null);
         }
     }
 }

@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
             foreach (var physicalCoreCount in new int?[] { null, 0, 1, 2 })
             foreach (var logicalCoreCount in new int?[] { null, 0, 1, 2 })
             {
-                var mockCpuInfo = new CpuInfo(processorName, physicalProcessorCount, physicalCoreCount, logicalCoreCount);
+                var mockCpuInfo = new CpuInfo(processorName, physicalProcessorCount, physicalCoreCount, logicalCoreCount, null, null, null);
                 captions.AppendLine(CpuInfoFormatter.Format(mockCpuInfo));
             }
 

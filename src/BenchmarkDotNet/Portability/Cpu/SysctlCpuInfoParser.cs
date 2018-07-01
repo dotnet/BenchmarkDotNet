@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿﻿using System.Collections.Generic;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
@@ -15,7 +15,10 @@ namespace BenchmarkDotNet.Portability.Cpu
             var physicalProcessorCount = GetPositiveIntValue(sysctl, "hw.packages");
             var physicalCoreCount = GetPositiveIntValue(sysctl, "hw.physicalcpu");
             var logicalCoreCount = GetPositiveIntValue(sysctl, "hw.logicalcpu");
-            return new CpuInfo(processorName, physicalProcessorCount, physicalCoreCount, logicalCoreCount);
+            var nominalFrequency = GetPositiveLongValue(sysctl, "hw.cpufrequency");
+            var minFrequency = GetPositiveLongValue(sysctl, "hw.cpufrequency_min");
+            var maxFrequency = GetPositiveLongValue(sysctl, "hw.cpufrequency_max");
+            return new CpuInfo(processorName, physicalProcessorCount, physicalCoreCount, logicalCoreCount, nominalFrequency, minFrequency, maxFrequency);
         }
 
         [CanBeNull]
@@ -23,6 +26,16 @@ namespace BenchmarkDotNet.Portability.Cpu
         {
             if (sysctl.TryGetValue(keyName, out string value) &&
                 int.TryParse(value, out int result) &&
+                result > 0)
+                return result;
+            return null;
+        }
+        
+        [CanBeNull]
+        private static long? GetPositiveLongValue([NotNull] Dictionary<string, string> sysctl, [NotNull] string keyName)
+        {
+            if (sysctl.TryGetValue(keyName, out string value) &&
+                long.TryParse(value, out long result) &&
                 result > 0)
                 return result;
             return null;

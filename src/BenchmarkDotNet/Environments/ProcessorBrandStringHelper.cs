@@ -1,5 +1,7 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
+using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Horology;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Environments
@@ -10,13 +12,18 @@ namespace BenchmarkDotNet.Environments
         /// Transform a processor brand string to a nice form for summary.
         /// </summary>
         /// <param name="processorName">Original processor brand string</param>
+        /// <param name="maxFrequency">processor actual frequency</param>
         /// <returns>Prettified version</returns>
         [NotNull]
-        public static string Prettify([NotNull] string processorName)
+        public static string Prettify([NotNull] string processorName, Frequency? maxFrequency = null)
         {
             // Remove parts which don't provide any useful information for user
             processorName = processorName.Replace("@", "").Replace("(R)", "").Replace("(TM)", "");
 
+            string frequencyString = GetBrandStyledActualFrequency(maxFrequency);
+            if (frequencyString != null && !processorName.Contains(frequencyString))
+                processorName = $"{processorName} (Max: {frequencyString})";
+            
             // Remove double spaces
             processorName = Regex.Replace(processorName.Trim(), @"\s+", " ");
 
@@ -26,6 +33,17 @@ namespace BenchmarkDotNet.Environments
                 processorName = $"{processorName} ({microarchitecture})";
 
             return processorName;
+        }
+
+        /// <summary>
+        /// Presents actual processor's frequency into brand string format
+        /// </summary>
+        /// <param name="frequency"></param>
+        private static string GetBrandStyledActualFrequency(Frequency? frequency)
+        {
+            if (frequency == null)
+                return null;
+            return $"{frequency.Value.ToGHz().ToStr("N2")}GHz";
         }
 
         /// <summary>
