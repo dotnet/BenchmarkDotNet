@@ -84,8 +84,8 @@ namespace BenchmarkDotNet.Tests
             => AssertBenchmarkName<WithArrayOfNullStrings>("BenchmarkDotNet.Tests.WithArrayOfNullStrings.Method(array: [null, null])");
         
         [Fact]
-        public void ParamsAreSupported() 
-            => AssertBenchmarkName<WithParameters>("BenchmarkDotNet.Tests.WithParameters.Method(Field: 100)");
+        public void MultipleParamsAreSupported() 
+            => AssertBenchmarkName<WithParameters>("BenchmarkDotNet.Tests.WithParameters.Method(Field1: 100, Field2: 200)");
         
         [Fact]
         public void ArgumentsAndParamsUsedTogetherAreSupported() 
@@ -236,10 +236,13 @@ namespace BenchmarkDotNet.Tests
     public class WithParameters
     {
         [Params(100)]
-        public int Field;
+        public int Field1;
+        
+        [Params(200)]
+        public int Field2;
 
         [Benchmark]
-        public int Method() => Field;
+        public int Method() => Field1 + Field2;
     }
     
     public class WithArgumentsAndParameters

@@ -62,21 +62,24 @@ namespace BenchmarkDotNet.Exporters
 
         private static string GetBenchmarkParameters(MethodInfo method, ParameterInstances benchmarkParameters)
         {
-            var methodParameters = method.GetParameters();
-            var parametersBuilder = new StringBuilder(methodParameters.Length * 20).Append('(');
+            var methodArguments = method.GetParameters();
+            var benchmarkParams = benchmarkParameters.Items.Where(parameter => !parameter.IsArgument).ToArray();
+            var parametersBuilder = new StringBuilder(methodArguments.Length * 20).Append('(');
 
-            for (int i = 0; i < methodParameters.Length; i++)
+            for (int i = 0; i < methodArguments.Length; i++)
             {
                 if (i > 0)
                     parametersBuilder.Append(", ");
 
-                parametersBuilder.Append(methodParameters[i].Name).Append(':').Append(' ');
-                parametersBuilder.Append(GetArgument(benchmarkParameters.GetArgument(methodParameters[i].Name).Value, methodParameters[i].ParameterType));
+                parametersBuilder.Append(methodArguments[i].Name).Append(':').Append(' ');
+                parametersBuilder.Append(GetArgument(benchmarkParameters.GetArgument(methodArguments[i].Name).Value, methodArguments[i].ParameterType));
             }
-
-            foreach (var parameter in benchmarkParameters.Items.Where(parameter => !parameter.IsArgument))
+            
+            for (int i = 0; i < benchmarkParams.Length; i++)
             {
-                if (methodParameters.Length > 0)
+                var parameter = benchmarkParams[i];
+                
+                if (methodArguments.Length > 0 || i > 0)
                     parametersBuilder.Append(", ");
                 
                 parametersBuilder.Append(parameter.Name).Append(':').Append(' ');
