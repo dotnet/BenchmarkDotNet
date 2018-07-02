@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using BenchmarkDotNet.Code;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 
@@ -11,6 +13,38 @@ namespace BenchmarkDotNet.Exporters
 {
     internal class XUnitNameProvider 
     {
+        private static readonly IReadOnlyDictionary<Type, string> Aliases = new Dictionary<Type, string>()
+        {
+            { typeof(byte), "byte" },
+            { typeof(sbyte), "sbyte" },
+            { typeof(short), "short" },
+            { typeof(ushort), "ushort" },
+            { typeof(int), "int" },
+            { typeof(uint), "uint" },
+            { typeof(long), "long" },
+            { typeof(ulong), "ulong" },
+            { typeof(float), "float" },
+            { typeof(double), "double" },
+            { typeof(decimal), "decimal" },
+            { typeof(object), "object" },
+            { typeof(bool), "bool" },
+            { typeof(char), "char" },
+            { typeof(string), "string" },
+            { typeof(byte?), "byte?" },
+            { typeof(sbyte?), "sbyte?" },
+            { typeof(short?), "short?" },
+            { typeof(ushort?), "ushort?" },
+            { typeof(int?), "int?" },
+            { typeof(uint?), "uint?" },
+            { typeof(long?), "long?" },
+            { typeof(ulong?), "ulong?" },
+            { typeof(float?), "float?" },
+            { typeof(double?), "double?" },
+            { typeof(decimal?), "decimal?" },
+            { typeof(bool?), "bool?" },
+            { typeof(char?), "char?" }
+        };
+        
         internal static string GetBenchmarkName(BenchmarkCase benchmarkCase)
         {
             var type = benchmarkCase.Descriptor.Type;
@@ -106,6 +140,8 @@ namespace BenchmarkDotNet.Exporters
                 return $"'{character}'";
             if (argumentValue is DateTime time)
                 return time.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss.fffffffK");
+            if (argumentValue is Type type)
+                return $"typeof({GetTypeArgumentName(type)})";
 
             if (argumentType != null && argumentType.IsArray)
                 return GetArray((IEnumerable)argumentValue);
@@ -143,5 +179,19 @@ namespace BenchmarkDotNet.Exporters
         private static string EscapeWhitespaces(string text)
             => text.Replace("\t", "\\t")
                    .Replace("\r\n", "\\r\\n");
+
+        private static string GetTypeArgumentName(Type type)
+        {
+            if (Aliases.TryGetValue(type, out string alias))
+                return alias;
+
+            if (type.IsNullable())
+                return $"{GetTypeArgumentName(Nullable.GetUnderlyingType(type))}?";
+            
+            if (!string.IsNullOrEmpty(type.Namespace))
+                return $"{type.Namespace}.{GetTypeName(type)}";
+
+            return GetTypeName(type);
+        }
     }
 }

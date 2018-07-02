@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -90,6 +91,18 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void ArgumentsAndParamsUsedTogetherAreSupported() 
             => AssertBenchmarkName<WithArgumentsAndParameters>("BenchmarkDotNet.Tests.WithArgumentsAndParameters.Method(arg: \"anArgument\", Field: 100)");
+
+        [Fact]
+        public void TypeArgumentsAreWrappedWithTypeofKeywordAndShortTypeNamesAreUsed()
+            => AssertBenchmarkName<WithTypesAsArguments>("BenchmarkDotNet.Tests.WithTypesAsArguments.GetConverter(typeToConvert: typeof(bool), expectedConverter: typeof(System.ComponentModel.BooleanConverter))");
+        
+        [Fact]
+        public void NullableTypesAsArgumentsAreSupported()
+            => AssertBenchmarkName<WithNullableTypeAsArgument>("BenchmarkDotNet.Tests.WithNullableTypeAsArgument.GetConverter(typeToConvert: typeof(BenchmarkDotNet.Tests.SomeValueType?), expectedConverter: typeof(System.ComponentModel.NullableConverter))");
+        
+        [Fact]
+        public void VoidTypeAsArgumentIsTransaltedToSystemDotVoid()
+            => AssertBenchmarkName<WithVoidTypeAsArgument>("BenchmarkDotNet.Tests.WithVoidTypeAsArgument.GetConverter(typeToConvert: typeof(System.Void), expectedConverter: typeof(System.ComponentModel.TypeConverter))");
     }
 
     public class Level0
@@ -253,5 +266,28 @@ namespace BenchmarkDotNet.Tests
         [Benchmark]
         [Arguments("anArgument")]
         public int Method(string arg) => Field;
+    }
+    
+    public class WithTypesAsArguments
+    {
+        [Benchmark]
+        [Arguments(typeof(bool), typeof(BooleanConverter))]
+        public TypeConverter GetConverter(Type typeToConvert, Type expectedConverter) => TypeDescriptor.GetConverter(typeToConvert);
+    }
+
+    public class WithNullableTypeAsArgument
+    {
+        [Benchmark]
+        [Arguments(typeof(SomeValueType?), typeof(NullableConverter))]
+        public TypeConverter GetConverter(Type typeToConvert, Type expectedConverter) => TypeDescriptor.GetConverter(typeToConvert);
+    }
+    
+    public struct SomeValueType { }
+
+    public class WithVoidTypeAsArgument
+    {
+        [Benchmark]
+        [Arguments(typeof(void), typeof(TypeConverter))]
+        public TypeConverter GetConverter(Type typeToConvert, Type expectedConverter) => TypeDescriptor.GetConverter(typeToConvert);
     }
 }
