@@ -45,5 +45,18 @@ namespace BenchmarkDotNet.Tests
             
             Assert.Equal(expectedDisplayText, parameter.ToDisplayText());
         }
+
+        [Theory]
+        [InlineData(typeof(ATypeWithAVeryVeryVeryVeryVeryVeryLongNameeeeeeeee), nameof(ATypeWithAVeryVeryVeryVeryVeryVeryLongNameeeeeeeee))]
+        [InlineData(typeof(Guid), nameof(Guid))]
+        [InlineData(typeof(Guid?), "Guid?")]
+        public void TypeParameterValuesDisplayNotTrmmedTypeNameWithoutNamespace(Type type, string expectedName)
+        {
+            var parameter = new ParameterInstance(definition, type);
+
+            Assert.Equal(expectedName, parameter.ToDisplayText());
+        }
     }
+    
+    public class ATypeWithAVeryVeryVeryVeryVeryVeryLongNameeeeeeeee { }
 }

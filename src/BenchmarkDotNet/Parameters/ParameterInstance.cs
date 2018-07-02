@@ -1,4 +1,6 @@
-﻿using BenchmarkDotNet.Code;
+﻿using System;
+using BenchmarkDotNet.Code;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.Parameters
@@ -30,11 +32,19 @@ namespace BenchmarkDotNet.Parameters
                 : SourceCodeHelper.ToSourceCode(value);
 
         public string ToDisplayText()
-            => Trim(value is IParam parameter
-                ? parameter.DisplayText
-                : value?.ToString() 
-                    ?? NullParameterTextRepresentation);
-        
+        {
+            if (value == null)
+                return NullParameterTextRepresentation;
+
+            if (value is IParam parameter)
+                return Trim(parameter.DisplayText);
+
+            if (value is Type type) // no trimming for types!
+                return type.IsNullable() ? $"{Nullable.GetUnderlyingType(type).Name}?" : type.Name;
+            
+            return Trim(value.ToString());
+        }
+
         public override string ToString() => ToDisplayText();
 
         private string Trim(string value) 
