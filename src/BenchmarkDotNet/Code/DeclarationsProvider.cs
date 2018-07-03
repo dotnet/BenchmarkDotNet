@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Code
 
         public virtual string WorkloadMethodReturnTypeName => WorkloadMethodReturnType.GetCorrectCSharpTypeName();
 
-        public virtual string WorkloadMethodDelegate => Descriptor.WorkloadMethod.Name;
+        public virtual string WorkloadMethodDelegate(string passArguments) => Descriptor.WorkloadMethod.Name;
 
         public virtual string GetWorkloadMethodCall(string passArguments) => $"{Descriptor.WorkloadMethod.Name}({passArguments})";
 
@@ -138,8 +138,8 @@ namespace BenchmarkDotNet.Code
 
         // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
         // and will eventually throw actual exception, not aggregated one
-        public override string WorkloadMethodDelegate
-            => $"() => {{ {Descriptor.WorkloadMethod.Name}().GetAwaiter().GetResult(); }}";
+        public override string WorkloadMethodDelegate(string passArguments)
+            => $"({passArguments}) => {{ {Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult(); }}";
 
         public override string GetWorkloadMethodCall(string passArguments) => $"{Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult()";
 
@@ -157,8 +157,8 @@ namespace BenchmarkDotNet.Code
 
         // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
         // and will eventually throw actual exception, not aggregated one
-        public override string WorkloadMethodDelegate
-            => $"() => {{ return {Descriptor.WorkloadMethod.Name}().GetAwaiter().GetResult(); }}";
+        public override string WorkloadMethodDelegate(string passArguments)
+            => $"({passArguments}) => {{ return {Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult(); }}";
 
         public override string GetWorkloadMethodCall(string passArguments) => $"{Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult()";
     }

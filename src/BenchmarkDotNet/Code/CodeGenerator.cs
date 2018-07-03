@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Code
                     .Replace("$ID$", buildInfo.Id.ToString())
                     .Replace("$OperationsPerInvoke$", provider.OperationsPerInvoke)
                     .Replace("$WorkloadTypeName$", provider.WorkloadTypeName)
-                    .Replace("$WorkloadMethodDelegate$", provider.WorkloadMethodDelegate)
+                    .Replace("$WorkloadMethodDelegate$", provider.WorkloadMethodDelegate(passArguments))
                     .Replace("$WorkloadMethodReturnType$", provider.WorkloadMethodReturnTypeName)
                     .Replace("$OverheadMethodReturnTypeName$", provider.OverheadMethodReturnTypeName)
                     .Replace("$GlobalSetupMethodName$", provider.GlobalSetupMethodName)

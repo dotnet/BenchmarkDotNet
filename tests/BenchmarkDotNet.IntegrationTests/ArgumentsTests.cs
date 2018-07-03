@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Tests.XUnit;
 using Xunit;
@@ -24,6 +25,28 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 if (boolean && number != 1 || !boolean && number != 2)
                     throw new InvalidOperationException("Incorrect values were passed");
+            }
+            
+            [Benchmark]
+            [Arguments(true, 1)]
+            [Arguments(false, 2)]
+            public Task SimpleAsync(bool boolean, int number)
+            {
+                if (boolean && number != 1 || !boolean && number != 2)
+                    throw new InvalidOperationException("Incorrect values were passed");
+                
+                return Task.CompletedTask;
+            }
+            
+            [Benchmark]
+            [Arguments(true, 1)]
+            [Arguments(false, 2)]
+            public ValueTask<int> SimpleValueTaskAsync(bool boolean, int number)
+            {
+                if (boolean && number != 1 || !boolean && number != 2)
+                    throw new InvalidOperationException("Incorrect values were passed");
+                
+                return new ValueTask<int>(0);
             }
         }
 
