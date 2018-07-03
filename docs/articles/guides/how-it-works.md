@@ -32,24 +32,29 @@ IEnumberable<Results> Run(Benchmark benchmark)
         yield return ParseResults(Process.Start(exe).Output); // calls ActualRun in a separate process
 }
 
-Result ActualRun(Method method)
+Result ActualRun(Method method, Job job)
 {
     GlobalSetup();
 
-    long perfectInvocationCount = Pilot(method);
+    int unrollFactor = job.Run.UnrollFactor; // 16 by default
 
-    Warmup(EMPTY_METHOD, perfectInvocationCount); // EMPTY_METHOD has same return type and arguments as benchmark
-    var overhead = Target(EMPTY_METHOD, perfectInvocationCount);
+    long perfectInvocationCount = Pilot(method, unrollFactor);
 
-    Warmup(method, perfectInvocationCount);
+    Warmup(EMPTY_METHOD, perfectInvocationCount, unrollFactor); // EMPTY_METHOD has same return type and arguments as benchmark
+    var overhead = Target(EMPTY_METHOD, perfectInvocationCount, unrollFactor);
+
+    Warmup(method, perfectInvocationCount, unrollFactor);
     var result = Target(method, perfectInvocationCount);
+
+    if (MemoryDiagnoser.IsEnabled)
+        var gcStats = MeasureGcStats(method, perfectInvocationCount, unrollFactor);
 
     GlobalCleanup(); 
 
-    return result - Avg(overhead);
+    return (result - Avg(overhead), gcStats);
 }
 
-long Pilot(Method method)
+long Pilot(Method method, int unrollFactor)
 {
     // invokeCount is the equivalent of InnerIterationCount from xunit-performance
     long invokeCount = minInvokeCount;
@@ -67,7 +72,7 @@ long Pilot(Method method)
     return invokeCount;
 }
 
-void Warmup(Method method, long invokeCount)
+void Warmup(Method method, long invokeCount, int unrollFactor)
 {
     while (true)
     {
@@ -78,7 +83,7 @@ void Warmup(Method method, long invokeCount)
     }
 }
 
-IEnumberable<Measurement> Target(Method method, long invokeCount)
+IEnumberable<Measurement> Target(Method method, long invokeCount, int unrollFactor)
 {
     while (true)
     {
@@ -116,5 +121,38 @@ Measurement RunIteration(Method method, long invokeCount, long unrollFactor)
     MemoryCleanup();
 
     return Measurement(clockSpan);
+}
+
+GcStats MeasureGcStats(Method method, long invokeCount, long unrollFacto)
+{
+    // we enable monitoring after main target run, for this single iteration which is executed at the end
+    // so even if we enable AppDomain monitoring in separate process
+    // it does not matter, because we have already obtained the results!
+    EnableMonitoring(); 
+
+    IterationSetup();
+
+    var initialGcStats = GcStats.ReadInitial();
+
+    // we do NOT start any clock here, because the enabled monitoring might have some overhead
+    // so we just get the gc stats and ignore the timing
+    // it's last thing the process does before it dies, so also enabled monitoring is not an issue for next benchmarks
+    // because each of them is going to be executed in a new process
+
+    for (long i = 0; i < invokeCount / unrollFactor; i++)
+    {
+        // we perform manuall loop unrolling!!
+        method(); // 1st call
+        method(); // 2nd call
+
+        method(); // (unrollFactor - 1)'th call
+        method(); // unrollFactor'th call
+    }
+
+    var finalGcStats = GcStats.ReadFinal();
+
+    IterationCleanup();
+
+    return finalGcStats - initialGcStats; // the result is the difference between the stats collected after and before running the extra iteration
 }
 ```
