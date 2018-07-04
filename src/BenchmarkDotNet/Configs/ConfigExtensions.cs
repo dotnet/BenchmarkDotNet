@@ -9,6 +9,7 @@ using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using RunMode = BenchmarkDotNet.Diagnosers.RunMode;
@@ -41,6 +42,7 @@ namespace BenchmarkDotNet.Configs
         public static IConfig With(this IConfig config, params HardwareCounter[] counters) => config.With(c => c.Add(counters));
         public static IConfig With(this IConfig config, params IFilter[] filters) => config.With(c => c.Add(filters));
         public static IConfig With(this IConfig config, Encoding encoding) => config.With(c => c.Set(encoding));
+        public static IConfig With(this IConfig config, ISummaryStyle summaryStyle) => config.With(c => c.Set(summaryStyle));
 
         public static IConfig KeepBenchmarkFiles(this IConfig config, bool value = true) => config.With(m => m.KeepBenchmarkFiles = value);
         public static IConfig RemoveBenchmarkFiles(this IConfig config) => config.KeepBenchmarkFiles(false);
