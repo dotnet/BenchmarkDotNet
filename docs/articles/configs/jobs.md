@@ -50,6 +50,10 @@ In this category, you can specifiy how to benchmark each method.
 * `IterationTime`: desired time of a single iteration
 * `UnrollFactor`: how many times the benchmark method will be invoked per one iteration of a generated loop
 * `InvocationCount`: count of invocation in a single iteration (if specified, `IterationTime` will be ignored), must be a multiple of `UnrollFactor`
+* `MinIterationCount`: Minimum count of target iterations that should be performed, the default value is 15
+* `MaxIterationCount`: Maximum count of target iterations that should be performed, the default value is 100
+* `MinWarmupIterationCount`: Minimum count of warmup iterations that should be performed, the default value is 6
+* `MaxWarmupIterationCount`: Maximum count of warmup iterations that should be performed, the default value is 50
 
 Usually, you shouldn't specify such characteristics like `LaunchCount`, `WarmupCount`, `TargetCount`, or `IterationTime` because BenchmarkDotNet has a smart algorithm to choose these values automatically based on received measurements. You can specify it for testing purposes or when you are damn sure that you know the right characteristics for your benchmark (when you set `TargetCount` = `20` you should understand why `20` is a good value for your case).
 
@@ -166,6 +170,8 @@ To do that you can use following predefined job mutator attributes:
 * `[ProcessCount]`
 * `[RunOncePerIteration]`
 * `[WarmupCount]`
+* `[MinWarmupCount]`
+* `[MaxWarmupCount]`
 
 So following example:
 
