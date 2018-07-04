@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Toolchains.DotNetCli;
 
 namespace BenchmarkDotNet.Engines
 {
@@ -39,7 +40,7 @@ namespace BenchmarkDotNet.Engines
         {
             get
             {
-                bool excludeAllocationQuantumSideEffects = !RuntimeInformation.IsNetCore; // the issue got fixed for .NET Core 2.0 https://github.com/dotnet/coreclr/issues/10207
+                bool excludeAllocationQuantumSideEffects = !RuntimeInformation.IsNetCore || NetCoreAppSettings.Current.Value == NetCoreAppSettings.NetCoreApp20; // the issue got fixed for .NET Core 2.0+ https://github.com/dotnet/coreclr/issues/10207
                 
                 return GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects) == 0
                     ? 0

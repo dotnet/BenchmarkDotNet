@@ -12,6 +12,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
@@ -30,16 +31,18 @@ namespace BenchmarkDotNet.IntegrationTests
         public MemoryDiagnoserTests(ITestOutputHelper outputHelper) => output = outputHelper;
 
         public static IEnumerable<object[]> GetToolchains()
-            => new[]
-            {
-                new object[] { Job.Default.GetToolchain() },
-                new object[] { InProcessToolchain.Instance },
-#if NETCOREAPP2_1 
-                // we don't want to test CoreRT twice (for .NET 4.6 and Core 2.1) when running the integration tests (these tests take a lot of time)
-                // we test against specific version to keep this test stable
-                new object[] { CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-26414-01").ToToolchain() }
-#endif
-            };
+            => RuntimeInformation.IsMono // https://github.com/mono/mono/issues/8397
+                ? Array.Empty<object[]>()
+                : new[]
+                {
+                    new object[] { Job.Default.GetToolchain() },
+                    new object[] { InProcessToolchain.Instance },
+    #if NETCOREAPP2_1 
+                    // we don't want to test CoreRT twice (for .NET 4.6 and Core 2.1) when running the integration tests (these tests take a lot of time)
+                    // we test against specific version to keep this test stable
+                    new object[] { CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-26414-01").ToToolchain() }
+    #endif
+                };
 
         public class AccurateAllocations
         {
@@ -192,9 +195,9 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [TheoryNetCoreOnly("Only .NET Core 2.0+ API is bug free for this case"), MemberData(nameof(GetToolchains))]
+        [TheoryNetCore21PlusOnly("Only .NET Core 2.0+ API is bug free for this case"), MemberData(nameof(GetToolchains))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
-        public void AllocationQuantumIsNotAnIssueForNetCore(IToolchain toolchain)
+        public void AllocationQuantumIsNotAnIssueForNetCore21Plus(IToolchain toolchain)
         {
             if (toolchain is CoreRtToolchain) // the fix has not yet been backported to CoreRT
                 return;

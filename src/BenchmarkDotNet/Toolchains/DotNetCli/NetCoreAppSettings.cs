@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
@@ -13,6 +14,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp20 = new NetCoreAppSettings("netcoreapp2.0", null, ".NET Core 2.0");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp21 = new NetCoreAppSettings("netcoreapp2.1", null, ".NET Core 2.1");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp22 = new NetCoreAppSettings("netcoreapp2.2", null, ".NET Core 2.2");
+        
+        public static readonly Lazy<NetCoreAppSettings> Current = new Lazy<NetCoreAppSettings>(GetCurrentVersion);
 
         private static NetCoreAppSettings Default => 
 #if NETCOREAPP2_1
