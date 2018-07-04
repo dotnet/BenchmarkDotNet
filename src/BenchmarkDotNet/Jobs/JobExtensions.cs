@@ -228,7 +228,7 @@ namespace BenchmarkDotNet.Jobs
         internal static Job MakeSettingsUserFriendly(this Job job, Descriptor descriptor)
         {
             // users expect that if IterationSetup is configured, it should be run before every benchmark invocation https://github.com/dotnet/BenchmarkDotNet/issues/730
-            if (descriptor.IterationSetupMethod != null
+            if ((descriptor.IterationSetupMethod != null || descriptor.IterationCleanupMethod != null) 
                 && !job.HasValue(RunMode.InvocationCountCharacteristic)
                 && !job.HasValue(RunMode.UnrollFactorCharacteristic))
             {

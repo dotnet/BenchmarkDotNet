@@ -83,6 +83,21 @@ namespace BenchmarkDotNet.Tests.Running
             Assert.Equal(1, benchmark.Job.Run.InvocationCount);
             Assert.Equal(1, benchmark.Job.Run.UnrollFactor);
         }
+
+        [Fact]
+        public void IfIterationCleanupIsProvidedTheBenchmarkShouldRunOncePerIteration()
+        {
+            var benchmark = BenchmarkConverter.TypeToBenchmarks(typeof(WithIterationCleanupOnly)).BenchmarksCases.Single();
+            
+            Assert.Equal(1, benchmark.Job.Run.InvocationCount);
+            Assert.Equal(1, benchmark.Job.Run.UnrollFactor);
+        }
+
+        public class WithIterationCleanupOnly
+        {
+            [IterationCleanup] public void Cleanup() { }
+            [Benchmark] public void Benchmark() { }
+        }
         
         [Fact]
         public void InvocationCountIsRespectedForBenchmarksWithIterationSetup()
