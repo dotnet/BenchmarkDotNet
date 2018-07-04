@@ -96,6 +96,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         internal static ProcessStartInfo BuildStartInfo(string customDotNetCliPath, string workingDirectory, string arguments,
             IReadOnlyList<EnvironmentVariable> environmentVariables = null, bool redirectStandardInput = false)
         {
+            const string dotnetMultiLevelLookupEnvVarName = "DOTNET_MULTILEVEL_LOOKUP";
+
             var startInfo = new ProcessStartInfo
             {
                 FileName = customDotNetCliPath ?? "dotnet",
@@ -111,6 +113,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (environmentVariables != null)
                 foreach (var environmentVariable in environmentVariables)
                     startInfo.EnvironmentVariables[environmentVariable.Key] = environmentVariable.Value;
+
+            if (!string.IsNullOrEmpty(customDotNetCliPath) && (environmentVariables == null || !environmentVariables.Any(envVar => envVar.Key == dotnetMultiLevelLookupEnvVarName)))
+                startInfo.EnvironmentVariables[dotnetMultiLevelLookupEnvVarName] = "0";
 
             return startInfo;
         }
