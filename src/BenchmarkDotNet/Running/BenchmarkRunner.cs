@@ -76,6 +76,11 @@ namespace BenchmarkDotNet.Running
 
                 var supportedBenchmarks = GetSupportedBenchmarks(benchmarkRunInfos, logger, resolver);
 
+                if (!supportedBenchmarks.Any(benchmarks => benchmarks.BenchmarksCases.Any()))
+                    return  new [] { Summary.CreateFailed(
+                        supportedBenchmarks.SelectMany(b => b.BenchmarksCases).ToArray(), 
+                        title, HostEnvironmentInfo.GetCurrent(), commonSettingsConfig, GetResultsFolderPath(rootArtifactsFolderPath), Array.Empty<ValidationError>()) };
+
                 var validationErrors = Validate(supportedBenchmarks, logger);
                 if (validationErrors.Any(validationError => validationError.IsCritical))
                     return  new [] { Summary.CreateFailed(
