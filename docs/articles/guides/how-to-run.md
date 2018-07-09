@@ -44,6 +44,6 @@ static void Main(string[] args)
 Also you can use the config command style to specify some config from command line:
 
 ```log
-dotnet run -c Release -- --job short --runtimes clr core --class BenchmarkClass1
+dotnet run -c Release -- --job short --runtimes clr core --filter BenchmarkClass1
 ```
 

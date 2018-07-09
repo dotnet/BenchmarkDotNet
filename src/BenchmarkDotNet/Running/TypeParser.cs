@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Running
 
                 logger.WriteLineHelp($"You should select the target benchmark(s). Please, print a number of a benchmark (e.g. '0') or a contained benchmark caption (e.g. '{benchmarkCaptionExample}'):");
                 logger.WriteLineHelp("If you want to select few, please separate them with space ` ` (e.g. `1 2 3`)");
-                logger.WriteLineHelp($"You can also provide the class name in console arguments by using --class. (e.g. '--class {benchmarkCaptionExample}'):");
+                logger.WriteLineHelp($"You can also provide the class name in console arguments by using --filter. (e.g. '--filter {benchmarkCaptionExample}'):");
 
                 var userInput = Console.ReadLine() ?? "";
 

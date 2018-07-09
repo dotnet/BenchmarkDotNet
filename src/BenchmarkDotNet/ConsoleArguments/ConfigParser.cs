@@ -172,22 +172,12 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         private static IEnumerable<IFilter> GetFilters(CommandLineOptions options)
         {
-            if (options.RunAllBenchmarks)
-            {
-                yield return new SimpleFilter(_ => true);
-                yield break;
-            }
-            
             if (options.AllCategories.Any())
                 yield return new AllCategoriesFilter(options.AllCategories.ToArray());
             if (options.AnyCategories.Any())
                 yield return new AnyCategoriesFilter(options.AnyCategories.ToArray());
-            if (options.Namespaces.Any())
-                yield return new NamespacesFilter(options.Namespaces.ToArray());
-            if (options.MethodNames.Any())
-                yield return new MethodNamesFilter(options.MethodNames.ToArray());
-            if (options.TypeNames.Any())
-                yield return new TypeNamesFilter(options.TypeNames.ToArray());
+            if (options.Filters.Any())
+                yield return new GlobFilter(options.Filters.ToArray());
             if (options.AttributeNames.Any())
                 yield return new AttributesFilter(options.AttributeNames.ToArray());
         }

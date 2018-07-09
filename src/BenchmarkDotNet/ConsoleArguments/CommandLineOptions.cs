@@ -22,6 +22,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option('d', "disassm", Required = false, Default = false, HelpText = "Gets diassembly for benchmarked code")]
         public bool UseDisassemblyDiagnoser { get; set; }
         
+        [Option('f', "filter", Required = false, HelpText = "Glob patterns")]
+        public IEnumerable<string> Filters { get; set; }
+
         [Option("outliers", Required = false, Default = OutlierMode.OnlyUpper, HelpText = "None/OnlyUpper/OnlyLower/All")]
         public OutlierMode Outliers { get; set; }
         
@@ -37,23 +40,11 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("artifacts", Required = false, HelpText = "Any valid path to accessible directory")]
         public DirectoryInfo ArtifactsDirectory{ get; set; }
         
-        [Option("all", Required = false, Default = false, HelpText = "Runs all benchmarks")]
-        public bool RunAllBenchmarks { get; set; }
-        
         [Option("categories", Required = false, HelpText = "Categories to run. If few are provided, only the benchmarks which belong to all of them are going to be executed")]
         public IEnumerable<string> AllCategories { get; set; }
         
         [Option("anyCategories", Required = false, HelpText = "Any Categories to run")]
         public IEnumerable<string> AnyCategories { get; set; }
-        
-        [Option("namespace", Required = false, HelpText = "Namespace(s) to run")]
-        public IEnumerable<string> Namespaces { get; set; }
-        
-        [Option("method", Required = false, HelpText = "Method(s) to run")]
-        public IEnumerable<string> MethodNames { get; set; }
-        
-        [Option("class", Required = false, HelpText = "Class(es) with benchmarks to run")]
-        public IEnumerable<string> TypeNames { get; set; }
         
         [Option("attribute", Required = false, HelpText = "Run all methods with given attribute (applied to class or method)")]
         public IEnumerable<string> AttributeNames { get; set; }

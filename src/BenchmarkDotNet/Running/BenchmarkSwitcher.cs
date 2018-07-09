@@ -50,12 +50,12 @@ namespace BenchmarkDotNet.Running
         /// <summary>
         /// Run all available benchmarks.
         /// </summary>
-        public IEnumerable<Summary> RunAll() => Run(new[] { "--all" });
+        public IEnumerable<Summary> RunAll() => Run(new[] { "--filter *" });
 
         /// <summary>
         /// Run all available benchmarks and join them to a single summary
         /// </summary>
-        public Summary RunAllJoined() => Run(new[] { "--all", "--join" }).Single();
+        public Summary RunAllJoined() => Run(new[] { "--filter *", "--join" }).Single();
 
         public IEnumerable<Summary> Run(string[] args = null, IConfig config = null)
         {
