@@ -12,11 +12,11 @@ Predefined filters:
 
 | Filter Type         | Filters benchmarks by       | Console argument | Console example                 |
 |---------------------|-----------------------------|------------------|---------------------------------|
-| MethodNamesFilter   | Provided method names       | method(s)        | --methods=ToStream,ToString     |
-| TypeNamesFilter     | Provided type names         | class(s)         | --class=XmlSerializerBenchmarks |
-| NamespacesFilter    | Provided namespaces         | namespace(s)     | --namespace=System.Memory       |
-| AttributesFilter    | Provided attribute names    | attribute(s)     | --attribute=STAThread           |
-| AllCategoriesFilter | All Provided category names | category(s)      | --category=Priority1            |
+| MethodNamesFilter   | Provided method names       | method           | --methods=ToStream,ToString     |
+| TypeNamesFilter     | Provided type names         | class            | --class=XmlSerializerBenchmarks |
+| NamespacesFilter    | Provided namespaces         | namespace        | --namespace=System.Memory       |
+| AttributesFilter    | Provided attribute names    | attribute        | --attribute=STAThread           |
+| AllCategoriesFilter | All Provided category names | categories       | --categories=Priority1          |
 | AnyCategoriesFilter | Any provided category names | anycategories    | --anycategories=Json,Xml        |
 | SimpleFilter        | Provided lambda predicate   | -                |                                 |
 | NameFilter          | Provided lambda predicate   | -                |                                 |

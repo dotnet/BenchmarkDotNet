@@ -27,6 +27,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CommandLineParser" Version="2.2.1" />
     <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.0" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="1.1.1" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.5.0" />

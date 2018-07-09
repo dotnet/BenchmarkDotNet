@@ -10,7 +10,6 @@ type File =
       Extension : string
       Length : int }
 
-[<Config("jobs=dry")>]
 type Db() = 
 
     let createDoc name = 

@@ -51,6 +51,4 @@ public class MyClassWithBenchmarks
 
 [!include[IntroConfigUnion](../samples/IntroConfigUnion.md)]
 
-[!include[IntroCommandStyle](../samples/IntroCommandStyle.md)]
-
 [!include[IntroFluentConfigBuilder](../samples/IntroFluentConfigBuilder.md)]

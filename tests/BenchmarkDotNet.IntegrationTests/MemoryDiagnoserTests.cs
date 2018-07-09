@@ -216,7 +216,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = CreateConfig(toolchain);
             var benchmarks = BenchmarkConverter.TypeToBenchmarks(benchmarkType, config);
 
-            var summary = BenchmarkRunner.Run(benchmarks, summaryPerType: true);
+            var summary = BenchmarkRunner.Run(benchmarks);
 
             foreach (var benchmarkAllocationsValidator in benchmarksAllocationsValidators)
             {

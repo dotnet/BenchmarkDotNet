@@ -8,14 +8,6 @@ namespace BenchmarkDotNet.Attributes
     {
         public IConfig Config { get; }
 
-        public ConfigAttribute(Type type)
-        {
-            Config = (IConfig)Activator.CreateInstance(type);
-        }
-
-        public ConfigAttribute(string command)
-        {
-            Config = new ConfigParser().Parse(command.Split(' '));
-        }
+        public ConfigAttribute(Type type) => Config = (IConfig)Activator.CreateInstance(type);
     }
 }

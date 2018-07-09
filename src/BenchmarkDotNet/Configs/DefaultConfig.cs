@@ -68,6 +68,8 @@ namespace BenchmarkDotNet.Configs
 
         public bool KeepBenchmarkFiles => false;
 
+        public bool SummaryPerType => true;
+
         public string ArtifactsPath => Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");
 
         public Encoding Encoding => Encoding.ASCII;

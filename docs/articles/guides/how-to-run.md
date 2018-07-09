@@ -41,9 +41,9 @@ static void Main(string[] args)
 }
 ```
 
-Also you can use the config command style to specify some config via switcher or even command line:
+Also you can use the config command style to specify some config from command line:
 
-```cs
-switcher.Run(new[] { "jobs=dry", "columns=min,max" });
+```log
+dotnet run -c Release -- --job short --runtimes clr core --class BenchmarkClass1
 ```
 
