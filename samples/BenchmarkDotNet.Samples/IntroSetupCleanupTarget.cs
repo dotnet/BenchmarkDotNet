@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Samples
         public void BenchmarkA() 
             => Console.WriteLine("// " + "Benchmark A");
 
-        [GlobalSetup(Target = nameof(BenchmarkB) + "," + nameof(BenchmarkC))]
+        [GlobalSetup(Targets = new[] { nameof(BenchmarkB), nameof(BenchmarkC) })]
         public void GlobalSetupB()
             => Console.WriteLine("// " + "GlobalSetup B");
 

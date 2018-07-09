@@ -119,20 +119,7 @@ namespace BenchmarkDotNet.Running
         }
 
         private static MethodInfo GetTargetedMatchingMethod(MethodInfo benchmarkMethod, Tuple<MethodInfo, TargetedAttribute>[] methods)
-        {
-            foreach (var method in methods)
-            {
-                if (string.IsNullOrEmpty(method.Item2.Target))
-                    return method.Item1;
-
-                var targets = method.Item2.Target.Split(',');
-
-                if (targets.Contains(benchmarkMethod.Name))
-                    return method.Item1;
-            }
-
-            return null;
-        }
+            => methods.Where(method => method.Item2.Match(benchmarkMethod)).Select(method => method.Item1).FirstOrDefault();
 
         private static Tuple<MethodInfo, TargetedAttribute>[] GetAttributedMethods<T>(MethodInfo[] methods, string methodName) where T : TargetedAttribute
         {
@@ -144,7 +131,7 @@ namespace BenchmarkDotNet.Running
                     AssertMethodIsNotGeneric(methodName, m);
 
                     return new Tuple<MethodInfo, TargetedAttribute>(m, attr);
-                })).OrderByDescending(x => x.Item2.Target ?? "").ToArray();
+                })).OrderByDescending(x => x.Item2.Targets?.Length ?? 0).ToArray();
         }
 
         private static Descriptor CreateDescriptor(

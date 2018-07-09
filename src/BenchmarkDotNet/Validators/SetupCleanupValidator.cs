@@ -42,15 +42,13 @@ namespace BenchmarkDotNet.Validators
 
                 foreach (var attribute in attributes)
                 {
-                    if (string.IsNullOrEmpty(attribute.Target))
+                    if (attribute.Targets.IsNullOrEmpty())
                     {
                         emptyTargetCount++;
                     }
                     else
                     {
-                        var targets = attribute.Target.Split(',');
-
-                        foreach (string target in targets)
+                        foreach (string target in attribute.Targets)
                         {
                             if (!targetCount.ContainsKey(target))
                             {
