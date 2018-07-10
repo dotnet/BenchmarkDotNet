@@ -12,6 +12,6 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         public override Encoding Encoding { get; }
 
-        public override void Write(string value) => logger.WriteLineError(value);
+        public override void Write(string value) => logger.WriteInfo(value);
     }
 }

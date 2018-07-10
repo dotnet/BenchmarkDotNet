@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
@@ -49,7 +48,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 { "stackoverflow", new[] { MarkdownExporter.StackOverflow } },
                 { "github", new[] { MarkdownExporter.GitHub } },
                 { "plain", new[] { PlainExporter.Default } },
-                { "rplot", new[] { CsvMeasurementsExporter.Default, RPlotExporter.Default } },
+                { "rplot", new[] { CsvMeasurementsExporter.Default, RPlotExporter.Default } }, // R Plots depends on having the full measurments available
                 { "json", new[] { JsonExporter.Default } },
                 { "briefjson", new[] { JsonExporter.Brief } },
                 { "fulljson", new[] { JsonExporter.Full } },
@@ -59,9 +58,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 { "fullxml", new[] { XmlExporter.Full } },
             };
         
-        public static (bool isSuccess, IConfig config) Parse(string[] args, ILogger logger)
+        public static (bool isSuccess, ReadOnlyConfig config) Parse(string[] args, ILogger logger)
         {
-            (bool isSuccess, IConfig options) result = default;
+            (bool isSuccess, ReadOnlyConfig config) result = default;
 
             using (var parser = CreateParser(logger))
             {
@@ -88,34 +87,28 @@ namespace BenchmarkDotNet.ConsoleArguments
         {
             if (!AvailableJobs.ContainsKey(options.BaseJob.ToLowerInvariant()))
             {
-                logger.WriteLineError($"Provided base job, [{options.BaseJob}] is invalid. Available options are: {string.Join(", ", AvailableJobs.Keys)}");
+                logger.WriteLineError($"The provided base job \"{options.BaseJob}\" is invalid. Available options are: {string.Join(", ", AvailableJobs.Keys)}.");
                 return false;
             }
 
             foreach (string runtime in options.Runtimes)
                 if (!AvailableRuntimes.ContainsKey(runtime.ToLowerInvariant()))
                 {
-                    logger.WriteLineError($"Provided runtime [{runtime}] is invalid. Available options are: {string.Join(", ", AvailableRuntimes.Keys)}");
+                    logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", AvailableRuntimes.Keys)}.");
                     return false;
                 }
             
             foreach (string exporter in options.Exporters)
                 if (!AvailableExporters.ContainsKey(exporter.ToLowerInvariant()))
                 {
-                    logger.WriteLineError($"Provided runtime [{exporter}] is invalid. Available options are: {string.Join(", ", AvailableExporters.Keys)}");
+                    logger.WriteLineError($"The provided exporter \"{exporter}\" is invalid. Available options are: {string.Join(", ", AvailableExporters.Keys)}.");
                     return false;
                 }
-            
-            if (options.ArtifactsDirectory != null && !options.ArtifactsDirectory.Exists)
-            {
-                logger.WriteLineError($"Provided directory, [{options.ArtifactsDirectory.FullName}] does NOT exist.");
-                return false;
-            }
 
             return true;
         }
 
-        private static IConfig CreateConfig(CommandLineOptions options)
+        private static ReadOnlyConfig CreateConfig(CommandLineOptions options)
         {
             var config = new ManualConfig();
 
@@ -142,7 +135,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             config.SummaryPerType = !options.Join;
 
-            return config;
+            return config.AsReadOnly();
         }
 
         private static Job GetBaseJob(CommandLineOptions options)
@@ -164,7 +157,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return baseJob.With(InProcessToolchain.Instance);
 
             foreach (string runtime in options.Runtimes)
-                yield return baseJob.With(AvailableRuntimes[runtime]);
+                yield return baseJob.With(AvailableRuntimes[runtime.ToLowerInvariant()]);
 
             if (!options.RunInProcess || !options.Runtimes.Any())
                 yield return baseJob;
@@ -172,12 +165,12 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         private static IEnumerable<IFilter> GetFilters(CommandLineOptions options)
         {
+            if (options.Filters.Any())
+                yield return new GlobFilter(options.Filters.ToArray());
             if (options.AllCategories.Any())
                 yield return new AllCategoriesFilter(options.AllCategories.ToArray());
             if (options.AnyCategories.Any())
                 yield return new AnyCategoriesFilter(options.AnyCategories.ToArray());
-            if (options.Filters.Any())
-                yield return new GlobFilter(options.Filters.ToArray());
             if (options.AttributeNames.Any())
                 yield return new AttributesFilter(options.AttributeNames.ToArray());
         }
