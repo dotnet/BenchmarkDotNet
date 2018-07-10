@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
@@ -19,6 +20,8 @@ namespace BenchmarkDotNet.ConsoleArguments
 {
     public static class ConfigParser
     {
+        private const int MinimumDisplayWidth = 80;
+
         private static readonly IReadOnlyDictionary<string, Job> AvailableJobs = new Dictionary<string, Job>()
         {
             { "default", Job.Default },
@@ -28,7 +31,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             { "long", Job.LongRun },
             { "verylong", Job.VeryLongRun }
         };
-        
+
         private static readonly IReadOnlyDictionary<string, Runtime> AvailableRuntimes = new Dictionary<string, Runtime>()
         {
             { "clr", Runtime.Clr },
@@ -36,14 +39,14 @@ namespace BenchmarkDotNet.ConsoleArguments
             { "mono", Runtime.Mono },
             { "corert", Runtime.CoreRT }
         };
-        
+
         private static readonly IReadOnlyDictionary<string, IExporter[]> AvailableExporters =
             new Dictionary<string, IExporter[]>
             {
-                { "csv", new [] { CsvExporter.Default } },
+                { "csv", new[] { CsvExporter.Default } },
                 { "csvmeasurements", new[] { CsvMeasurementsExporter.Default } },
                 { "html", new[] { HtmlExporter.Default } },
-                { "markdown", new [] { MarkdownExporter.Default } },
+                { "markdown", new[] { MarkdownExporter.Default } },
                 { "atlassian", new[] { MarkdownExporter.Atlassian } },
                 { "stackoverflow", new[] { MarkdownExporter.StackOverflow } },
                 { "github", new[] { MarkdownExporter.GitHub } },
@@ -57,7 +60,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 { "briefxml", new[] { XmlExporter.Brief } },
                 { "fullxml", new[] { XmlExporter.Full } },
             };
-        
+
         public static (bool isSuccess, ReadOnlyConfig config) Parse(string[] args, ILogger logger)
         {
             (bool isSuccess, ReadOnlyConfig config) result = default;
@@ -81,6 +84,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 settings.EnableDashDash = true;
                 settings.IgnoreUnknownArguments = false;
                 settings.HelpWriter = new LoggerWrapper(logger);
+                settings.MaximumDisplayWidth = Math.Max(MinimumDisplayWidth, GetMaximumDisplayWidth());
             });
 
         private static bool Validate(CommandLineOptions options, ILogger logger)
@@ -97,7 +101,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                     logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", AvailableRuntimes.Keys)}.");
                     return false;
                 }
-            
+
             foreach (string exporter in options.Exporters)
                 if (!AvailableExporters.ContainsKey(exporter.ToLowerInvariant()))
                 {
@@ -113,20 +117,20 @@ namespace BenchmarkDotNet.ConsoleArguments
             var config = new ManualConfig();
 
             config.Add(Expand(GetBaseJob(options), options).ToArray());
-            
+
             config.Add(options.Exporters.SelectMany(exporer => AvailableExporters[exporer]).ToArray());
-            
+
             if (options.UseMemoryDiagnoser)
                 config.Add(MemoryDiagnoser.Default);
             if (options.UseDisassemblyDiagnoser)
                 config.Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig()));
-            
+
             if (options.DisplayAllStatistics)
                 config.Add(StatisticColumn.AllStatistics);
 
             if (options.ArtifactsDirectory != null)
                 config.ArtifactsPath = options.ArtifactsDirectory.FullName;
-            
+
             var filters = GetFilters(options).ToArray();
             if (filters.Length > 1)
                 config.Add(new UnionFilter(filters));
@@ -147,7 +151,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             if (options.Affinity.HasValue)
                 baseJob = baseJob.WithAffinity((IntPtr) options.Affinity.Value);
-            
+
             return baseJob;
         }
 
@@ -173,6 +177,18 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return new AnyCategoriesFilter(options.AnyCategories.ToArray());
             if (options.AttributeNames.Any())
                 yield return new AttributesFilter(options.AttributeNames.ToArray());
+        }
+
+        private static int GetMaximumDisplayWidth()
+        {
+            try
+            {
+                return Console.WindowWidth;
+            }
+            catch (IOException)
+            {
+                return MinimumDisplayWidth;
+            }
         }
     }
 }
