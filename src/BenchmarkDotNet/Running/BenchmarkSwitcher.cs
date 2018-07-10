@@ -7,7 +7,6 @@ using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Running
@@ -50,23 +49,20 @@ namespace BenchmarkDotNet.Running
         /// <summary>
         /// Run all available benchmarks.
         /// </summary>
-        public IEnumerable<Summary> RunAll() => Run(new[] { "--filter *" });
+        public IEnumerable<Summary> RunAll() => Run(new[] { "--filter", ".*" });
 
         /// <summary>
         /// Run all available benchmarks and join them to a single summary
         /// </summary>
-        public Summary RunAllJoined() => Run(new[] { "--filter *", "--join" }).Single();
+        public Summary RunAllJoined() => Run(new[] { "--filter", ".*", "--join" }).Single();
 
         public IEnumerable<Summary> Run(string[] args = null, IConfig config = null)
         {
             args = args ?? Array.Empty<string>();
 
             (bool isParsingSuccess, var parsedConfig) = ConfigParser.Parse(args, ConsoleLogger.Default);
-            
             if (!isParsingSuccess)
-            {
                 return Enumerable.Empty<Summary>();
-            }
 
             var globalChronometer = Chronometer.Start();
             var summaries = new List<Summary>();
@@ -81,9 +77,6 @@ namespace BenchmarkDotNet.Running
             BenchmarkRunner.LogTotalTime(logger, globalChronometer.GetElapsed().GetTimeSpan(), totalNumberOfExecutedBenchmarks, "Global total time");
             return summaries;
         }
-
-        public bool ShouldDisplayOptions(string[] args) 
-            => args.Any(arg => arg.EqualsWithIgnoreCase("--help") || arg.EqualsWithIgnoreCase("-h"));
 
         internal BenchmarkRunInfo[] Filter(IConfig effectiveConfig)
             => (effectiveConfig.GetFilters().Any() ? typeParser.GetAll() : typeParser.AskUser()) // if user provided some filters via args or custom config , we don't ask for any input

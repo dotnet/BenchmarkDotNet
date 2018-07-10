@@ -12,7 +12,7 @@ Predefined filters:
 
 | Filter Type         | Filters benchmarks by       | Console argument | Console example                 |
 |---------------------|-----------------------------|------------------|---------------------------------|
-| GlobFilter          | Provided glob pattern       | filter           | --filter *Serializer*ToStream   |
+| GlobFilter          | Provided glob pattern       | filter           | --filter Serializer*.ToStream   |
 | AttributesFilter    | Provided attribute names    | attribute        | --attribute STAThread           |
 | AllCategoriesFilter | All Provided category names | categories       | --categories Priority1          |
 | AnyCategoriesFilter | Any provided category names | anycategories    | --anycategories Json Xml        |
