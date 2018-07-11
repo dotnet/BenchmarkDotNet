@@ -12,12 +12,6 @@ namespace BenchmarkDotNet.Running
 {
     internal class TypeParser
     {
-        private const string OptionPrefix = "--";
-        private const string BreakText = ": ";
-
-        private static readonly Dictionary<string, string> Configuration = CreateConfiguration();
-        private static readonly char[] TrimChars = { ' ' };
-
         private static bool consoleCancelKeyPressed = false;
         
         private readonly Type[] allTypes;
@@ -67,6 +61,7 @@ namespace BenchmarkDotNet.Running
 
                 logger.WriteLineHelp($"You should select the target benchmark(s). Please, print a number of a benchmark (e.g. '0') or a contained benchmark caption (e.g. '{benchmarkCaptionExample}'):");
                 logger.WriteLineHelp("If you want to select few, please separate them with space ` ` (e.g. `1 2 3`)");
+                logger.WriteLineHelp($"You can also provide the class name in console arguments by using --filter. (e.g. '--filter *{benchmarkCaptionExample}*'):");
 
                 var userInput = Console.ReadLine() ?? "";
 
@@ -87,34 +82,12 @@ namespace BenchmarkDotNet.Running
                 var type = allTypes[i];
 
                 if (userInput.Any(arg => type.GetDisplayName().ContainsWithIgnoreCase(arg))
-                    || userInput.Contains("#" + i)
-                    || userInput.Contains("" + i)
+                    || userInput.Contains($"#{i}")
+                    || userInput.Contains(i.ToString())
                     || userInput.Contains("*"))
                 {
                     yield return new TypeWithMethods(type);
                 }
-            }
-        }
-
-        internal void PrintOptions(int prefixWidth, int outputWidth)
-        {
-            foreach (var option in Configuration)
-            {
-                var optionText = $"  {OptionPrefix}{option.Key}=<{option.Key.ToUpperInvariant()}>";
-                logger.WriteResult($"{optionText.PadRight(prefixWidth)}");
-
-                var maxWidth = outputWidth - prefixWidth - System.Environment.NewLine.Length - BreakText.Length;
-                var lines = StringAndTextExtensions.Wrap(option.Value, maxWidth);
-                if (lines.Count == 0)
-                {
-                    logger.WriteLine();
-                    continue;
-                }
-
-                logger.WriteLineInfo($"{BreakText}{lines.First().Trim(TrimChars)}");
-                var padding = new string(' ', prefixWidth);
-                foreach (var line in lines.Skip(1))
-                    logger.WriteLineInfo($"{padding}{BreakText}{line.Trim(TrimChars)}");
             }
         }
 
@@ -137,29 +110,6 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLine();
                 logger.WriteLine();
             }
-        }
-        
-        private static Dictionary<string, string> CreateConfiguration()
-        {
-            return new Dictionary<string, string>
-            {
-                {
-                    "method",
-                    "run a given test method (just the method name, i.e. 'MyTestMethod', or can be fully specified, i.e. 'MyNamespace.MyClass.MyTestMethod')"
-                },
-                {
-                    "class",
-                    "run all methods in a given test class (just the class name, i.e. 'MyClass', or can be fully specified, i.e. 'MyNamespace.MyClass')"
-                },
-                {
-                    "namespace",
-                    "run all methods in a given namespace (i.e. 'MyNamespace.MySubNamespace')"
-                },
-                {
-                    "attribute",
-                    "run all methods with given attribute (applied to class or method)"
-                }
-            };
         }
     }
 }

@@ -38,6 +38,11 @@ namespace BenchmarkDotNet.Configs
         bool KeepBenchmarkFiles { get; }
 
         /// <summary>
+        /// determines if all benchmarks results should be joined into a single summary or not
+        /// </summary>
+        bool SummaryPerType { get; }
+
+        /// <summary>
         /// the default value is "./BenchmarkDotNet.Artifacts"
         /// </summary>
         string ArtifactsPath { get; }

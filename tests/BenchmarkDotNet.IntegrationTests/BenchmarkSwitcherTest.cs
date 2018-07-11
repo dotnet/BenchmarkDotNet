@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var switcher = new BenchmarkSwitcher(types);
 
             // BenchmarkSwitcher only picks up config values via the args passed in, not via class annotations (e.g "[DryConfig]")
-            var results = switcher.Run(new[] { "job=Dry", "class=ClassA,ClassC,ClassB", "methods=Method4" });
+            var results = switcher.Run(new[] { "-j", "Dry", "--filter", "*ClassB.Method4" });
             Assert.Single(results);
             Assert.Single(results.SelectMany(r => r.BenchmarksCases));
             Assert.True(results.All(r => r.BenchmarksCases.All(b => b.Descriptor.Type.Name == "ClassB" && b.Descriptor.WorkloadMethod.Name == "Method4")));
@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = ManualConfig.CreateEmpty();
             MockExporter mockExporter = new MockExporter();
             config.Add(mockExporter);
-            switcher.Run(new[] { "job=Dry", "class=ClassB", "methods=Method4" }, config);
+            switcher.Run(new[] { "--job", "Dry", "--filter", "*ClassB*" }, config);
 
             Assert.True(mockExporter.exported);
         }

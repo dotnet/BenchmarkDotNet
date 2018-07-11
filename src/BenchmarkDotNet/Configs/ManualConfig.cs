@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
@@ -47,6 +48,8 @@ namespace BenchmarkDotNet.Configs
 
         public bool KeepBenchmarkFiles { get; set; }
 
+        public bool SummaryPerType { get; set; } = true;
+
         public string ArtifactsPath { get; set; }
 
         public Encoding Encoding { get; set; }
@@ -79,6 +82,7 @@ namespace BenchmarkDotNet.Configs
             filters.AddRange(config.GetFilters());
             orderer = config.GetOrderer() ?? orderer;
             KeepBenchmarkFiles |= config.KeepBenchmarkFiles;
+            SummaryPerType &= config.SummaryPerType;
             ArtifactsPath = config.ArtifactsPath ?? ArtifactsPath;
             Encoding = config.Encoding ?? Encoding;
             summaryStyle = summaryStyle ?? config.GetSummaryStyle();
@@ -160,11 +164,6 @@ namespace BenchmarkDotNet.Configs
             }
             return manualConfig;
         }
-
-        public static IConfig Parse(string[] args) => new ConfigParser().Parse(args);
-
-        public static void PrintOptions(ILogger logger, int prefixWidth, int outputWidth)
-            => new ConfigParser().PrintOptions(logger, prefixWidth: prefixWidth, outputWidth: outputWidth);
 
         private void AddJobs(IEnumerable<Job> toAdd)
         {

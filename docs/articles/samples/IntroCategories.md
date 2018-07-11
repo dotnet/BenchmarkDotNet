@@ -13,7 +13,6 @@ Combined together with `[BenchmarkCategory]` attribute, you can group the benchm
 ### Command line examples:
     
 ```
---category=A
 --allCategories=A,B
 --anyCategories=A,B
 ```

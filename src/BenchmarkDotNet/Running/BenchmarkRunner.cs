@@ -33,22 +33,19 @@ namespace BenchmarkDotNet.Running
 
         internal static readonly IResolver DefaultResolver = new CompositeResolver(EnvironmentResolver.Instance, InfrastructureResolver.Instance);
 
-        public static Summary Run<T>(IConfig config = null) => Run(BenchmarkConverter.TypeToBenchmarks(typeof(T), config), summaryPerType: true);
+        public static Summary Run<T>(IConfig config = null) => Run(BenchmarkConverter.TypeToBenchmarks(typeof(T), config));
 
-        public static Summary Run(Type type, IConfig config = null) => Run(BenchmarkConverter.TypeToBenchmarks(type, config), summaryPerType: true);
+        public static Summary Run(Type type, IConfig config = null) => Run(BenchmarkConverter.TypeToBenchmarks(type, config));
 
-        public static Summary Run(Type type, MethodInfo[] methods, IConfig config = null) => Run(BenchmarkConverter.MethodsToBenchmarks(type, methods, config), summaryPerType: true);
+        public static Summary Run(Type type, MethodInfo[] methods, IConfig config = null) => Run(BenchmarkConverter.MethodsToBenchmarks(type, methods, config));
 
-        public static Summary[] Run(Assembly assembly, bool summaryPerType, IConfig config = null) 
-            => Run(
-                assembly.GetRunnableBenchmarks().Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray(),
-                config,
-                summaryPerType);
+        public static Summary[] Run(Assembly assembly, IConfig config = null) 
+            => Run(assembly.GetRunnableBenchmarks().Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray(), config);
 
         public static Summary RunUrl(string url, IConfig config = null)
         {
 #if CLASSIC
-            return Run(BenchmarkConverter.UrlToBenchmarks(url, config), config, summaryPerType: false).Single();
+            return Run(BenchmarkConverter.UrlToBenchmarks(url, config), config).Single();
 #else
             throw new NotSupportedException();
 #endif
@@ -57,16 +54,15 @@ namespace BenchmarkDotNet.Running
         public static Summary RunSource(string source, IConfig config = null)
         {
 #if CLASSIC
-            return Run(BenchmarkConverter.SourceToBenchmarks(source, config), config, summaryPerType: false).Single();
+            return Run(BenchmarkConverter.SourceToBenchmarks(source, config), config).Single();
 #else
             throw new NotSupportedException();
 #endif
         }
 
-        public static Summary Run(BenchmarkRunInfo benchmarkRunInfo, bool summaryPerType) 
-            => Run(new[] { benchmarkRunInfo }, benchmarkRunInfo.Config, summaryPerType).Single();
+        public static Summary Run(BenchmarkRunInfo benchmarkRunInfo) => Run(new[] { benchmarkRunInfo }, benchmarkRunInfo.Config).Single();
 
-        public static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos, IConfig commonSettingsConfig, bool summaryPerType)
+        public static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos, IConfig commonSettingsConfig)
         {
             var resolver = DefaultResolver;
             var artifactsToCleanup = new List<string>();
@@ -79,6 +75,11 @@ namespace BenchmarkDotNet.Running
                 var logger = new CompositeLogger(commonSettingsConfig.GetCompositeLogger(), new StreamLogger(logStreamWriter));
 
                 var supportedBenchmarks = GetSupportedBenchmarks(benchmarkRunInfos, logger, resolver);
+
+                if (!supportedBenchmarks.Any(benchmarks => benchmarks.BenchmarksCases.Any()))
+                    return  new [] { Summary.CreateFailed(
+                        supportedBenchmarks.SelectMany(b => b.BenchmarksCases).ToArray(), 
+                        title, HostEnvironmentInfo.GetCurrent(), commonSettingsConfig, GetResultsFolderPath(rootArtifactsFolderPath), Array.Empty<ValidationError>()) };
 
                 var validationErrors = Validate(supportedBenchmarks, logger);
                 if (validationErrors.Any(validationError => validationError.IsCritical))
@@ -107,7 +108,7 @@ namespace BenchmarkDotNet.Running
                         
                         var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, logger, artifactsToCleanup, rootArtifactsFolderPath, ref runChronometer);
                         
-                        if (summaryPerType)
+                        if (commonSettingsConfig.SummaryPerType)
                             PrintSummary(logger, benchmarkRunInfo.Config, summary);
                         
                         LogTotalTime(logger, runChronometer.GetElapsed().GetTimeSpan(), summary.GetNumberOfExecutedBenchmarks(), message: "Run time");
@@ -116,7 +117,7 @@ namespace BenchmarkDotNet.Running
                         results.Add(summary);
                     }
 
-                    if (!summaryPerType)
+                    if (!commonSettingsConfig.SummaryPerType)
                     {
                         var joinedSummary = Summary.Join(results, commonSettingsConfig, globalChronometer.GetElapsed());
                         

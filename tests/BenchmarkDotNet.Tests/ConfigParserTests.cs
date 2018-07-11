@@ -1,29 +1,35 @@
-﻿using System;
-using System.Linq;
-using BenchmarkDotNet.Configs;
+﻿using System.Linq;
+using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters.Csv;
+using BenchmarkDotNet.Tests.Loggers;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests
 {
     public class ConfigParserTests
     {
+        public ITestOutputHelper Output { get; }
+
+        public ConfigParserTests(ITestOutputHelper output) => Output = output;
+
         [Theory]
-        [InlineData("--jobs=dry", "exporters=html,rplot")]
-        [InlineData("--jobs=dry", "exporters", "html,rplot")]
+        [InlineData("--job=dry", "--exporters", "html", "rplot")]
+        [InlineData("--JOB=dry", "--EXPORTERS", "html", "rplot")] // case insensitive
+        [InlineData("-j", "dry", "-e", "html", "rplot")] // alias
         public void SimpleConfigParsedCorrectly(params string[] args)
         {
-            var parser = new ConfigParser();
-            // We allow args with and without the double dashes (i.e. '--jobs=' and 'jobs=')
-            var config = parser.Parse(args);
+            var config = ConfigParser.Parse(args, new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
             Assert.Contains(Job.Dry, config.GetJobs());
 
-            Assert.Equal(2, config.GetExporters().Count());
+            Assert.Equal(3, config.GetExporters().Count()); // rplot must come together with CsvMeasurementsExporter
             Assert.Contains(HtmlExporter.Default, config.GetExporters());
             Assert.Contains(RPlotExporter.Default, config.GetExporters());
+            Assert.Contains(CsvMeasurementsExporter.Default, config.GetExporters());
 
             Assert.Empty(config.GetColumnProviders());
             Assert.Empty(config.GetDiagnosers());
@@ -34,20 +40,16 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void SimpleConfigAlternativeVersionParserCorrectly()
         {
-            var parser = new ConfigParser();
-            // To make it easier, we allow "jobs" and "job", 
-            // plus casing doesn't matter, so "Dry" and "dry" are both valid
-            var config = parser.Parse(new[] { "job=Dry" });
+            var config = ConfigParser.Parse(new[] { "--job=Dry" }, new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
             Assert.Contains(Job.Dry, config.GetJobs());
         }
 
         [Fact]
-        public void UnknownConfigThrows()
+        public void UnknownConfigIsFailure()
         {
-            var parser = new ConfigParser();
-            Assert.Throws<InvalidOperationException>(() => parser.Parse(new[] { "jobs=unknown" }));
+            Assert.False(ConfigParser.Parse(new[] { "--unknown" }, new OutputLogger(Output)).isSuccess);
         }
     }
 }

@@ -40,6 +40,7 @@ namespace BenchmarkDotNet.Configs
         public ConfigUnionRule UnionRule => config.UnionRule;
 
         public bool KeepBenchmarkFiles => config.KeepBenchmarkFiles;
+        public bool SummaryPerType => config.SummaryPerType;
 
         public string ArtifactsPath => config.ArtifactsPath;
 
