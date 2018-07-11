@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Running
 
                 logger.WriteLineHelp($"You should select the target benchmark(s). Please, print a number of a benchmark (e.g. '0') or a contained benchmark caption (e.g. '{benchmarkCaptionExample}'):");
                 logger.WriteLineHelp("If you want to select few, please separate them with space ` ` (e.g. `1 2 3`)");
-                logger.WriteLineHelp($"You can also provide the class name in console arguments by using --filter. (e.g. '--filter {benchmarkCaptionExample}'):");
+                logger.WriteLineHelp($"You can also provide the class name in console arguments by using --filter. (e.g. '--filter *{benchmarkCaptionExample}*'):");
 
                 var userInput = Console.ReadLine() ?? "";
 
@@ -82,8 +82,8 @@ namespace BenchmarkDotNet.Running
                 var type = allTypes[i];
 
                 if (userInput.Any(arg => type.GetDisplayName().ContainsWithIgnoreCase(arg))
-                    || userInput.Contains("#" + i)
-                    || userInput.Contains("" + i)
+                    || userInput.Contains($"#{i}")
+                    || userInput.Contains(i.ToString())
                     || userInput.Contains("*"))
                 {
                     yield return new TypeWithMethods(type);

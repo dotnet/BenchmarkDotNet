@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option('d', "disassm", Required = false, Default = false, HelpText = "Gets diassembly of benchmarked code")]
         public bool UseDisassemblyDiagnoser { get; set; }
 
-        [Option('f', "filter", Required = false, HelpText = "Glob patterns (use .NET regular expressions)")]
+        [Option('f', "filter", Required = false, HelpText = "Glob patterns")]
         public IEnumerable<string> Filters { get; set; }
 
         [Option('i', "inProcess", Required = false, Default = false, HelpText = "Run benchmarks in Process")]
@@ -65,9 +65,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return new Example("Run benchmarks for Clr, Core and Mono", style, new CommandLineOptions { Runtimes = new[] { "Clr", "Core", "Mono" } });
                 yield return new Example("Use MemoryDiagnoser to get GC stats", style, new CommandLineOptions { UseMemoryDiagnoser = true });
                 yield return new Example("Use DisassemblyDiagnoser to get disassembly", style, new CommandLineOptions { UseDisassemblyDiagnoser = true });
-                yield return new Example("Run all benchmarks exactly once", style, new CommandLineOptions { BaseJob = "Dry", Filters = new[] { ".*" } });
-                yield return new Example("Run all benchmarks from System.Memory namespace", style, new CommandLineOptions { Filters = new[] { "System.Memory.*" } });
-                yield return new Example("Run all benchmarks from ClassA and ClassB and show the results in single summary", style, new CommandLineOptions { Join = true, Filters = new[] { "ClassA", "ClassB" } });
+                yield return new Example("Run all benchmarks exactly once", style, new CommandLineOptions { BaseJob = "Dry", Filters = new[] { "*" } });
+                yield return new Example("Run all benchmarks from System.Memory namespace", style, new CommandLineOptions { Filters = new[] { "System.Memory*" } });
+                yield return new Example("Run all benchmarks from ClassA and ClassB and show the results in single summary", style, new CommandLineOptions { Join = true, Filters = new[] { "*ClassA*", "*ClassB*" } });
             }
         }
     }

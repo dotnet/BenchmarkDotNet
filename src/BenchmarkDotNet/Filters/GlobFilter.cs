@@ -2,7 +2,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Filters
 {
@@ -13,16 +12,17 @@ namespace BenchmarkDotNet.Filters
     {
         private readonly Regex[] patterns;
 
-        public GlobFilter(string[] patterns)  => this.patterns = patterns.Select(pattern => new Regex(pattern)).ToArray();
+        public GlobFilter(string[] patterns)  => this.patterns = patterns.Select(pattern => new Regex(WildcardToRegex(pattern))).ToArray();
 
         public bool Predicate(BenchmarkCase benchmarkCase)
-            => patterns.Any(pattern =>
-            {
-                var method = benchmarkCase.Descriptor.WorkloadMethod;
-                var fullName = $"{method.DeclaringType.FullName}.{method.Name}";
-                var displayName = $"{method.DeclaringType.GetDisplayName()}.{method.Name}"; // full name can return sth like BenchmarkDotNet.Tests.SomeGeneric`1[[System.Int32, System.Private.CoreLib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]].Create
+        {
+            var benchmark = benchmarkCase.Descriptor.WorkloadMethod;
+            var fullBenchmarkName = $"{benchmark.DeclaringType.GetCorrectCSharpTypeName(includeGenericArgumentsNamespace: false)}.{benchmark.Name}";
 
-                return pattern.IsMatch(fullName) || pattern.IsMatch(displayName);
-            });
+            return patterns.Any(pattern => pattern.IsMatch(fullBenchmarkName));
+        }
+
+        // https://stackoverflow.com/a/6907849/5852046 not perfect but should work for all we need
+        private static string WildcardToRegex(string pattern) => $"^{Regex.Escape(pattern).Replace(@"\*", ".*").Replace(@"\?", ".")}$";
     }
 }

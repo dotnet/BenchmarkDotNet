@@ -10,6 +10,7 @@ type File =
       Extension : string
       Length : int }
 
+[<DryJob>]
 type Db() = 
 
     let createDoc name = 

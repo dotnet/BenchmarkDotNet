@@ -13,7 +13,7 @@ If you are using `BenchmarkSwitcher` and want to run all the benchmarks with a c
 ### Command line
 
 ```
---join --category=IntroJoinA
+--join --allCategories=IntroJoinA
 ```
 
 ### Output

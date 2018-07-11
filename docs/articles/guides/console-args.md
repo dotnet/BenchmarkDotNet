@@ -1,3 +1,8 @@
+---
+uid: docs.console-args
+name: Console Arguments
+---
+
 # How to use console arguments
 
 `BenchmarkSwitcher` supports various console arguments, to make it work you need to pass the `args` to switcher:
@@ -14,13 +19,13 @@ class Program
 
 ## Filter
 
-The `--filter` or just `-f` allows you to filter the benchmarks by their full name (`namespace.typeName.methodName`) using .NET regular expressions.
+The `--filter` or just `-f` allows you to filter the benchmarks by their full name (`namespace.typeName.methodName`) using glob patterns.
 
 Examples:
 
-1. Run all benchmarks from System.Memory namespace: `-f System.Memory.*`
-2. Run all benchmarks: `-f .*`
-3. Run all benchmarks from ClassA and ClassB `-f ClassA ClassB`
+1. Run all benchmarks from System.Memory namespace: `-f System.Memory*`
+2. Run all benchmarks: `-f *`
+3. Run all benchmarks from ClassA and ClassB `-f *ClassA* *ClassB*`
 
 **Note**: If you would like to **join** all the results into a **single summary**, you need to us `--join`.
 
