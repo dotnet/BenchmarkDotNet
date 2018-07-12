@@ -13,6 +13,7 @@ using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Toolchains.InProcess;
 using CommandLine;
 
@@ -61,7 +62,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 { "fullxml", new[] { XmlExporter.Full } },
             };
 
-        public static (bool isSuccess, ReadOnlyConfig config) Parse(string[] args, ILogger logger, IConfig passedConfig)
+        public static (bool isSuccess, ReadOnlyConfig config) Parse(string[] args, ILogger logger)
         {
             (bool isSuccess, ReadOnlyConfig config) result = default;
 
@@ -69,7 +70,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             {
                 parser
                     .ParseArguments<CommandLineOptions>(args)
-                    .WithParsed(options => result = Validate(options, logger) ? (true, CreateConfig(options, passedConfig)) : (false, default))
+                    .WithParsed(options => result = Validate(options, logger) ? (true, CreateConfig(options)) : (false, default))
                     .WithNotParsed(errors => result = (false, default));
             }
 
@@ -112,11 +113,11 @@ namespace BenchmarkDotNet.ConsoleArguments
             return true;
         }
 
-        private static ReadOnlyConfig CreateConfig(CommandLineOptions options, IConfig passedConfig)
+        private static ReadOnlyConfig CreateConfig(CommandLineOptions options)
         {
             var config = new ManualConfig();
 
-            config.Add(Expand(GetBaseJob(options), options, passedConfig).ToArray());
+            config.Add(Expand(GetBaseJob(options), options).ToArray());
 
             config.Add(options.Exporters.SelectMany(exporer => AvailableExporters[exporer]).ToArray());
 
@@ -146,7 +147,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         {
             var baseJob = AvailableJobs[options.BaseJob.ToLowerInvariant()];
 
-            if (baseJob != Job.Dry)
+            if (baseJob != Job.Dry && options.Outliers != OutlierMode.OnlyUpper)
                 baseJob = baseJob.WithOutlierMode(options.Outliers);
 
             if (options.Affinity.HasValue)
@@ -155,7 +156,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             return baseJob;
         }
 
-        private static IEnumerable<Job> Expand(Job baseJob, CommandLineOptions options, IConfig passedConfig)
+        private static IEnumerable<Job> Expand(Job baseJob, CommandLineOptions options)
         {
             if (options.RunInProcess)
                 yield return baseJob.With(InProcessToolchain.Instance);
@@ -163,8 +164,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             foreach (string runtime in options.Runtimes)
                 yield return baseJob.With(AvailableRuntimes[runtime.ToLowerInvariant()]);
 
-            if (!options.RunInProcess && !options.Runtimes.Any() 
-                                      && (passedConfig == null || !passedConfig.GetJobs().Any())) // if passed config defines a base job, we don't want to add another one!
+            if (!options.RunInProcess && !options.Runtimes.Any() && baseJob != Job.Default)
                 yield return baseJob;
         }
 

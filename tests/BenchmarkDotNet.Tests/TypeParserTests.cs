@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Tests
         public TypeParserTests(ITestOutputHelper output) => Output = output;
         
         private HashSet<string> Filter(Type[] types, string[] args)
-            => new HashSet<string>(new BenchmarkSwitcher(types).Filter(ConfigParser.Parse(args, new OutputLogger(Output), ManualConfig.CreateEmpty()).config)
+            => new HashSet<string>(new BenchmarkSwitcher(types).Filter(ConfigParser.Parse(args, new OutputLogger(Output)).config)
                 .SelectMany(runInfo => runInfo.BenchmarksCases)
                 .Select(benchmark => $"{benchmark.Descriptor.Type.GetDisplayName()}.{benchmark.Descriptor.WorkloadMethod.Name}"));
 

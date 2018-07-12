@@ -25,11 +25,12 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Single(results);
             Assert.Single(results.SelectMany(r => r.BenchmarksCases));
             Assert.Single(results.SelectMany(r => r.BenchmarksCases.Select(bc => bc.Job)));
+            Assert.True(results.All(r => r.BenchmarksCases.All(bc => bc.Job == Job.Dry)));
             Assert.True(results.All(r => r.BenchmarksCases.All(b => b.Descriptor.Type.Name == "ClassB" && b.Descriptor.WorkloadMethod.Name == "Method4")));
         }
 
         [Fact]
-        public void ConfigPassingTest()
+        public void WhenJobIsDefinedInTheConfigAndArgumentsDontContainJobArgumentOnlySingleJobIsUsed()
         {
             var types = new[] { typeof(ClassB) };
             var switcher = new BenchmarkSwitcher(types);
@@ -43,6 +44,43 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Single(results);
             Assert.Single(results.SelectMany(r => r.BenchmarksCases));
             Assert.Single(results.SelectMany(r => r.BenchmarksCases.Select(bc => bc.Job)));
+            Assert.True(results.All(r => r.BenchmarksCases.All(bc => bc.Job == Job.Dry)));
+        }
+        
+        [Fact]
+        public void WhenJobIsDefinedViaAttributeAndArgumentsDontContainJobArgumentOnlySingleJobIsUsed()
+        {
+            var types = new[] { typeof(WithDryAttribute) };
+            var switcher = new BenchmarkSwitcher(types);
+            MockExporter mockExporter = new MockExporter();
+            var configWithoutJobDefined = ManualConfig.CreateEmpty().With(mockExporter);
+            
+            var results = switcher.Run(new[] { "--filter", "*WithDryAttribute*" }, configWithoutJobDefined);
+
+            Assert.True(mockExporter.exported);
+            
+            Assert.Single(results);
+            Assert.Single(results.SelectMany(r => r.BenchmarksCases));
+            Assert.Single(results.SelectMany(r => r.BenchmarksCases.Select(bc => bc.Job)));
+            Assert.True(results.All(r => r.BenchmarksCases.All(bc => bc.Job == Job.Dry)));
+        }
+        
+        [Fact]
+        public void JobNotDefinedButStillBenchmarkIsExecuted()
+        {
+            var types = new[] { typeof(JustBenchmark) };
+            var switcher = new BenchmarkSwitcher(types);
+            MockExporter mockExporter = new MockExporter();
+            var configWithoutJobDefined = ManualConfig.CreateEmpty().With(mockExporter);
+            
+            var results = switcher.Run(new[] { "--filter", "*" }, configWithoutJobDefined);
+            
+            Assert.True(mockExporter.exported);
+            
+            Assert.Single(results);
+            Assert.Single(results.SelectMany(r => r.BenchmarksCases));
+            Assert.Single(results.SelectMany(r => r.BenchmarksCases.Select(bc => bc.Job)));
+            Assert.True(results.All(r => r.BenchmarksCases.All(bc => bc.Job == Job.Default)));
         }
     }
 }
@@ -75,6 +113,19 @@ namespace BenchmarkDotNet.IntegrationTests
         public void Method1() { }
         public void Method2() { }
         public void Method3() { }
+    }
+
+    [DryJob]
+    public class WithDryAttribute
+    {
+        [Benchmark]
+        public void Method() { }
+    }
+    
+    public class JustBenchmark
+    {
+        [Benchmark]
+        public void Method() { }
     }
 
     public class MockExporter : ExporterBase
