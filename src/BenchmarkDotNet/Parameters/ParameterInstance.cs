@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Parameters
                 return Trim(parameter.DisplayText);
 
             if (value is Type type) // no trimming for types!
-                return type.IsNullable() ? $"{Nullable.GetUnderlyingType(type).Name}?" : type.Name;
+                return type.IsNullable() ? $"{Nullable.GetUnderlyingType(type).GetDisplayName()}?" : type.GetDisplayName();
             
             return Trim(value.ToString());
         }

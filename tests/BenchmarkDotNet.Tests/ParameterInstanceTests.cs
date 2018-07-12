@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Parameters;
 using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests
@@ -50,6 +51,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(typeof(ATypeWithAVeryVeryVeryVeryVeryVeryLongNameeeeeeeee), nameof(ATypeWithAVeryVeryVeryVeryVeryVeryLongNameeeeeeeee))]
         [InlineData(typeof(Guid), nameof(Guid))]
         [InlineData(typeof(Guid?), "Guid?")]
+        [InlineData(typeof(List<int>), "List<Int32>")]
         public void TypeParameterValuesDisplayNotTrmmedTypeNameWithoutNamespace(Type type, string expectedName)
         {
             var parameter = new ParameterInstance(definition, type);
