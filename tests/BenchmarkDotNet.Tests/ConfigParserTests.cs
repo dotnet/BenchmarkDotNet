@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Exporters;
@@ -21,7 +22,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData("-j", "dry", "-e", "html", "rplot")] // alias
         public void SimpleConfigParsedCorrectly(params string[] args)
         {
-            var config = ConfigParser.Parse(args, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(args, new OutputLogger(Output), ManualConfig.CreateEmpty()).config;
 
             Assert.Single(config.GetJobs());
             Assert.Contains(Job.Dry, config.GetJobs());
@@ -40,7 +41,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void SimpleConfigAlternativeVersionParserCorrectly()
         {
-            var config = ConfigParser.Parse(new[] { "--job=Dry" }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "--job=Dry" }, new OutputLogger(Output), ManualConfig.CreateEmpty()).config;
 
             Assert.Single(config.GetJobs());
             Assert.Contains(Job.Dry, config.GetJobs());
@@ -49,7 +50,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void UnknownConfigIsFailure()
         {
-            Assert.False(ConfigParser.Parse(new[] { "--unknown" }, new OutputLogger(Output)).isSuccess);
+            Assert.False(ConfigParser.Parse(new[] { "--unknown" }, new OutputLogger(Output), ManualConfig.CreateEmpty()).isSuccess);
         }
     }
 }

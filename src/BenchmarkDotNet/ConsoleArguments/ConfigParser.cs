@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 { "fullxml", new[] { XmlExporter.Full } },
             };
 
-        public static (bool isSuccess, ReadOnlyConfig config) Parse(string[] args, ILogger logger)
+        public static (bool isSuccess, ReadOnlyConfig config) Parse(string[] args, ILogger logger, IConfig passedConfig)
         {
             (bool isSuccess, ReadOnlyConfig config) result = default;
 
@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             {
                 parser
                     .ParseArguments<CommandLineOptions>(args)
-                    .WithParsed(options => result = Validate(options, logger) ? (true, CreateConfig(options)) : (false, default))
+                    .WithParsed(options => result = Validate(options, logger) ? (true, CreateConfig(options, passedConfig)) : (false, default))
                     .WithNotParsed(errors => result = (false, default));
             }
 
@@ -112,11 +112,11 @@ namespace BenchmarkDotNet.ConsoleArguments
             return true;
         }
 
-        private static ReadOnlyConfig CreateConfig(CommandLineOptions options)
+        private static ReadOnlyConfig CreateConfig(CommandLineOptions options, IConfig passedConfig)
         {
             var config = new ManualConfig();
 
-            config.Add(Expand(GetBaseJob(options), options).ToArray());
+            config.Add(Expand(GetBaseJob(options), options, passedConfig).ToArray());
 
             config.Add(options.Exporters.SelectMany(exporer => AvailableExporters[exporer]).ToArray());
 
@@ -155,7 +155,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             return baseJob;
         }
 
-        private static IEnumerable<Job> Expand(Job baseJob, CommandLineOptions options)
+        private static IEnumerable<Job> Expand(Job baseJob, CommandLineOptions options, IConfig passedConfig)
         {
             if (options.RunInProcess)
                 yield return baseJob.With(InProcessToolchain.Instance);
@@ -163,7 +163,8 @@ namespace BenchmarkDotNet.ConsoleArguments
             foreach (string runtime in options.Runtimes)
                 yield return baseJob.With(AvailableRuntimes[runtime.ToLowerInvariant()]);
 
-            if (!options.RunInProcess || !options.Runtimes.Any())
+            if (!options.RunInProcess && !options.Runtimes.Any() 
+                                      && (passedConfig == null || !passedConfig.GetJobs().Any())) // if passed config defines a base job, we don't want to add another one!
                 yield return baseJob;
         }
 

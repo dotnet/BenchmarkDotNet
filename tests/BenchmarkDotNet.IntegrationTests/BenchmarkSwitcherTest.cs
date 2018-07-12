@@ -6,6 +6,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -23,6 +24,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var results = switcher.Run(new[] { "-j", "Dry", "--filter", "*ClassB.Method4" });
             Assert.Single(results);
             Assert.Single(results.SelectMany(r => r.BenchmarksCases));
+            Assert.Single(results.SelectMany(r => r.BenchmarksCases.Select(bc => bc.Job)));
             Assert.True(results.All(r => r.BenchmarksCases.All(b => b.Descriptor.Type.Name == "ClassB" && b.Descriptor.WorkloadMethod.Name == "Method4")));
         }
 
@@ -31,12 +33,16 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var types = new[] { typeof(ClassB) };
             var switcher = new BenchmarkSwitcher(types);
-            var config = ManualConfig.CreateEmpty();
             MockExporter mockExporter = new MockExporter();
-            config.Add(mockExporter);
-            switcher.Run(new[] { "--job", "Dry", "--filter", "*ClassB*" }, config);
+            var configWithJobDefined = ManualConfig.CreateEmpty().With(mockExporter).With(Job.Dry);
+            
+            var results = switcher.Run(new[] { "--filter", "*Method3" }, configWithJobDefined);
 
             Assert.True(mockExporter.exported);
+            
+            Assert.Single(results);
+            Assert.Single(results.SelectMany(r => r.BenchmarksCases));
+            Assert.Single(results.SelectMany(r => r.BenchmarksCases.Select(bc => bc.Job)));
         }
     }
 }
