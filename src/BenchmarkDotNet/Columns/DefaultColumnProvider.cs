@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BenchmarkDotNet.Reports;
 using System.Linq;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Mathematics;
 
 namespace BenchmarkDotNet.Columns
@@ -22,7 +23,7 @@ namespace BenchmarkDotNet.Columns
             {
                 if (summary.BenchmarksCases.Select(b => b.Descriptor.Type.Namespace).Distinct().Count() > 1)
                     yield return TargetMethodColumn.Namespace;
-                if (summary.BenchmarksCases.Select(b => b.Descriptor.Type.Name).Distinct().Count() > 1)
+                if (summary.BenchmarksCases.Select(b => b.Descriptor.Type.GetDisplayName()).Distinct().Count() > 1)
                     yield return TargetMethodColumn.Type;
                 yield return TargetMethodColumn.Method;
             }
