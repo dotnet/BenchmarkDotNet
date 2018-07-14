@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
@@ -32,11 +33,12 @@ namespace BenchmarkDotNet.Diagnosers
 
             var benchmarkTarget = benchmarkCase.Descriptor;
             string fqnMethod = GetMethodName(benchmarkTarget);
+            string llvmFlag = GetLlvmFlag(benchmarkCase.Job);
             string exePath = benchmarkTarget.Type.GetTypeInfo().Assembly.Location;
             
             var environmentVariables = new Dictionary<string, string> { ["MONO_VERBOSE_METHOD"] = fqnMethod };
             string monoPath = mono?.CustomPath ?? "mono";
-            string arguments = $"--compile {fqnMethod} {exePath}";
+            string arguments = $"--compile {fqnMethod} {llvmFlag} {exePath}";
             
             var output = ProcessHelper.RunAndReadOutputLineByLine(monoPath, arguments, environmentVariables, includeErros: true);
             string commandLine = $"{GetEnvironmentVariables(environmentVariables)} {monoPath} {arguments}";
@@ -49,6 +51,11 @@ namespace BenchmarkDotNet.Diagnosers
 
         private static string GetMethodName(Descriptor descriptor)
             => $"{descriptor.Type.GetTypeInfo().Namespace}.{descriptor.Type.GetTypeInfo().Name}:{descriptor.WorkloadMethod.Name}";
+
+        // TODO: use resolver
+        // TODO: introduce a global helper method for LlvmFlag 
+        private static string GetLlvmFlag(Job job) =>
+            job.ResolveValue(EnvironmentMode.JitCharacteristic, Jit.Default) == Jit.Llvm ? "--llvm" : "--nollvm";
 
         internal static class OutputParser
         {
