@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Running
         public string ProgramName { get; }
 
         /// <summary>
-        /// the benchmarks are groupped by the build settings
+        /// the benchmarks are grouped by the build settings
         /// so you can use this benchmark to get the runtime settings
         /// </summary>
         public BenchmarkCase RepresentativeBenchmarkCase { get; }

@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Attributes
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
     public abstract class ColumnConfigBaseAttribute : Attribute, IConfigSource
     {
-        // CLS-Compliant Code requires a constuctor without an array in the argument list
+        // CLS-Compliant Code requires a constructor without an array in the argument list
         protected ColumnConfigBaseAttribute()
         {
             Config = ManualConfig.CreateEmpty();

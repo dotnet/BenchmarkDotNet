@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Exporters
 
         public IEnumerable<IExporter> Dependencies
         {
-            // R Plots depends on having the full measurments available
+            // R Plots depends on having the full measurements available
             get { yield return CsvMeasurementsExporter.Default; }
         }
 
@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Exporters
             yield return scriptFileName;
 
             string fileNamePrefix = Path.Combine(summary.ResultsDirectoryPath, summary.Title);
-            string csvFullPath = CsvMeasurementsExporter.Default.GetAtrifactFullName(summary);
+            string csvFullPath = CsvMeasurementsExporter.Default.GetArtifactFullName(summary);
             
             string scriptFullPath = Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
             string logFullPath = Path.Combine(summary.ResultsDirectoryPath, logFileName);

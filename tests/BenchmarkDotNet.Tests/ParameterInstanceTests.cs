@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(typeof(Guid), nameof(Guid))]
         [InlineData(typeof(Guid?), "Guid?")]
         [InlineData(typeof(List<int>), "List<Int32>")]
-        public void TypeParameterValuesDisplayNotTrmmedTypeNameWithoutNamespace(Type type, string expectedName)
+        public void TypeParameterValuesDisplayNotTrimmedTypeNameWithoutNamespace(Type type, string expectedName)
         {
             var parameter = new ParameterInstance(definition, type);
 

@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Tests.Mathematics
         }
 
         [Fact]
-        public void SimpeHistogramTest1()
+        public void SimpleHistogramTest1()
         {
             DoSimpleHistogramTest(new[] { 1.0, 2.0, 3.0, 4.0, 5.0 }, 1,
                 new[]
@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Tests.Mathematics
         }
 
         [Fact]
-        public void SimpeHistogramTest2()
+        public void SimpleHistogramTest2()
         {
             DoSimpleHistogramTest(new[] { 1.0, 2.0, 3.0, 4.0, 5.0 }, 2.5,
                 new[]
@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Tests.Mathematics
         }
 
         [Fact]
-        public void SimpeHistogramTest3()
+        public void SimpleHistogramTest3()
         {
             DoSimpleHistogramTest(new[] { 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 2.7 }, 2.0,
                 new[]

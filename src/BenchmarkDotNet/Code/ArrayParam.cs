@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Code
         /// for types where calling .ToString() will be NOT enough to re-create them in auto-generated source code file
         /// </summary>
         /// <param name="array">the array</param>
-        /// <param name="toSourceCode">method which tranforms an item of type T to it's C# representation
+        /// <param name="toSourceCode">method which transforms an item of type T to it's C# representation
         /// example: point => $"new Point2d({point.X}, {point.Y})"
         /// </param>
         public static ArrayParam<T> ForComplexTypes(T[] array, Func<T, string> toSourceCode) => new ArrayParam<T>(array, toSourceCode);

@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 { "stackoverflow", new[] { MarkdownExporter.StackOverflow } },
                 { "github", new[] { MarkdownExporter.GitHub } },
                 { "plain", new[] { PlainExporter.Default } },
-                { "rplot", new[] { CsvMeasurementsExporter.Default, RPlotExporter.Default } }, // R Plots depends on having the full measurments available
+                { "rplot", new[] { CsvMeasurementsExporter.Default, RPlotExporter.Default } }, // R Plots depends on having the full measurements available
                 { "json", new[] { JsonExporter.Default } },
                 { "briefjson", new[] { JsonExporter.Brief } },
                 { "fulljson", new[] { JsonExporter.Full } },
@@ -119,7 +119,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             config.Add(Expand(GetBaseJob(options), options).ToArray());
 
-            config.Add(options.Exporters.SelectMany(exporer => AvailableExporters[exporer]).ToArray());
+            config.Add(options.Exporters.SelectMany(exporter => AvailableExporters[exporter]).ToArray());
 
             if (options.UseMemoryDiagnoser)
                 config.Add(MemoryDiagnoser.Default);

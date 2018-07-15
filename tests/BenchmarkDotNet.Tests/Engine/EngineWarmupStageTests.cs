@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Tests.Engine
     {
         private const int MinIterationCount = EngineResolver.DefaultMinWarmupIterationCount;
         private const int MaxIterationCount = EngineResolver.DefaultMaxWarmupIterationCount;
-        private const int MaxOverheadItertaionCount = EngineWarmupStage.MaxOverheadIterationCount;
+        private const int MaxOverheadIterationCount = EngineWarmupStage.MaxOverheadIterationCount;
 
         private readonly ITestOutputHelper output;
 
@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Tests.Engine
         [Fact]
         public void AutoTest_WithoutSteadyStateOverhead()
         {
-            AutoTest(data => TimeInterval.Millisecond * data.Index, MaxOverheadItertaionCount, mode: IterationMode.Overhead);
+            AutoTest(data => TimeInterval.Millisecond * data.Index, MaxOverheadIterationCount, mode: IterationMode.Overhead);
         }
 
         [Fact]

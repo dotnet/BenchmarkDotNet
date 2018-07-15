@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void RewritesCutomSettings()
+        public void RewritesCustomSettings()
         {
             const string customSettings =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void RewritesCutomRuntimeSettings()
+        public void RewritesCustomRuntimeSettings()
         {
             const string customSettings =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
@@ -170,7 +170,7 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void RewritesCutomAssemblyBindingRedirects()
+        public void RewritesCustomAssemblyBindingRedirects()
         {
             const string settingsWithBindings =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +

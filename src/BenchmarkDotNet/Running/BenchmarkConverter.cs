@@ -92,8 +92,8 @@ namespace BenchmarkDotNet.Running
                 var configs = allAttributes.Select(attribute => attribute.Config)
                     .OrderBy(c => c.GetJobs().Count(job => job.Meta.IsMutator)); // configs with mutators must be the ones applied at the end
                 
-                foreach (var configFromAttrubute in configs)
-                    config = ManualConfig.Union(config, configFromAttrubute);
+                foreach (var configFromAttribute in configs)
+                    config = ManualConfig.Union(config, configFromAttribute);
             }
             return config.AsReadOnly();
         }

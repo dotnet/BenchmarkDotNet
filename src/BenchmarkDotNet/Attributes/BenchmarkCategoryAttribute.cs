@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Attributes
     {
         public string[] Categories { get; }
 
-        // CLS-Compliant Code requires a constuctor without an array in the argument list
+        // CLS-Compliant Code requires a constructor without an array in the argument list
         protected BenchmarkCategoryAttribute() { }
 
         public BenchmarkCategoryAttribute(params string[] categories)

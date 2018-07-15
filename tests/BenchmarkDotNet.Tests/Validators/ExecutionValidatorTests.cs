@@ -11,18 +11,18 @@ namespace BenchmarkDotNet.Tests.Validators
     public class ExecutionValidatorTests
     {
         [Fact]
-        public void FailingConsturctorsAreDiscovered()
+        public void FailingConstructorsAreDiscovered()
         {
-            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(FailingConsturctor))).ToList();
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(FailingConstructor))).ToList();
 
             Assert.NotEmpty(validationErrors);
-            Assert.StartsWith("Unable to create instance of FailingConsturctor", validationErrors.Single().Message);
+            Assert.StartsWith("Unable to create instance of FailingConstructor", validationErrors.Single().Message);
             Assert.Contains("This one fails", validationErrors.Single().Message);
         }
 
-        public class FailingConsturctor
+        public class FailingConstructor
         {
-            public FailingConsturctor()
+            public FailingConstructor()
             {
                 throw new Exception("This one fails");
             }
@@ -108,7 +108,7 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public void NonFailingGlobalSetupsAreOmmited()
+        public void NonFailingGlobalSetupsAreOmitted()
         {
             var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(GlobalSetupThatRequiresParamsToBeSetFirst)));
 
@@ -233,7 +233,7 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public void NonFailingBenchmarksAreOmmited()
+        public void NonFailingBenchmarksAreOmitted()
         {
             var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(NonFailingBenchmark)));
 

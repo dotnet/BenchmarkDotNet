@@ -102,7 +102,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         private void CopyAllRequiredDependencies(Assembly assemblyWithDisassemblersInResources, string destinationFolder)
         {
-            // ClrMD and Cecil are also embeded in the resources, we need to copy them as well
+            // ClrMD and Cecil are also embedded in the resources, we need to copy them as well
             foreach (var dependency in assemblyWithDisassemblersInResources.GetManifestResourceNames().Where(name => name.EndsWith(".dll")))
             {
                 // dependency is sth like "BenchmarkDotNet.Disassemblers.net46.win7_x64.Microsoft.Diagnostics.Runtime.dll"

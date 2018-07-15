@@ -6,10 +6,10 @@ namespace BenchmarkDotNet.Tests.XUnit
     public class TheoryNetCoreOnlyAttribute : TheoryAttribute
     {
         // ReSharper disable once VirtualMemberCallInConstructor
-        public TheoryNetCoreOnlyAttribute(string noDotNetCoreSkipReson)
+        public TheoryNetCoreOnlyAttribute(string noDotNetCoreSkipReason)
         {
             if (!RuntimeInformation.IsNetCore)
-                Skip = noDotNetCoreSkipReson;
+                Skip = noDotNetCoreSkipReason;
         }
     }
 }

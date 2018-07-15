@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         internal const string LocalCoreClrPackagesBin = "localCoreClrPackagesBin";
         internal const string LocalCoreClrPackages = "localCoreClrPackages";
         internal const string CoreClrNuGetFeed = "coreClrNuGetFeed";
-        internal const string LocalCoreFxPacakgesBin = "localCoreFxPacakgesBin";
+        internal const string LocalCoreFxPackagesBin = "localCoreFxPacakgesBin";
         internal const string CoreFxNuGetFeed = "coreFxNuGetFeed";
 
         internal Generator(string coreClrVersion, string coreFxVersion, string runtimeFrameworkVersion, string targetFrameworkMoniker,
@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         private readonly bool useTempFolderForRestore;
 
         private bool IsUsingCustomCoreClr => feeds.ContainsKey(LocalCoreClrPackagesBin) || feeds.ContainsKey(CoreClrNuGetFeed);
-        private bool IsUsingCustomCoreFx => feeds.ContainsKey(LocalCoreFxPacakgesBin) || feeds.ContainsKey(CoreFxNuGetFeed);
+        private bool IsUsingCustomCoreFx => feeds.ContainsKey(LocalCoreFxPackagesBin) || feeds.ContainsKey(CoreFxNuGetFeed);
 
         protected override string GetExecutableExtension() => RuntimeInformation.ExecutableExtension;
 

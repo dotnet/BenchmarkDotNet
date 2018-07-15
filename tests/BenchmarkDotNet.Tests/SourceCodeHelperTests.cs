@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Tests
             string actual = SourceCodeHelper.ToSourceCode(original);
             output.WriteLine("ORIGINAL  : " + original + " (" + original?.GetType() + ")");
             output.WriteLine("ACTUAL    : " + actual);
-            output.WriteLine("EXPRECTED : " + expected);
+            output.WriteLine("EXPECTED  : " + expected);
             Assert.Equal(expected, actual);
         }
 

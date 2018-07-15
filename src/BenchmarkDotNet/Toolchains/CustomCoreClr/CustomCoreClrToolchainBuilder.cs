@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
             if (!Directory.Exists(binPackagesPath)) throw new DirectoryNotFoundException($"{binPackagesPath} does not exist");
 
             this.coreFxVersion = privateCoreFxNetCoreAppVersion;
-            feeds[Generator.LocalCoreFxPacakgesBin] = binPackagesPath;
+            feeds[Generator.LocalCoreFxPackagesBin] = binPackagesPath;
             isCoreFxConfigured = true;
             useTempFolderForRestore = true;
 

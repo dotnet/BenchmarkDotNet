@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Parameters
             if (values.IsEmpty() || values.All(value => SourceCodeHelper.IsCompilationTimeConstant(value)))
                 return values;
 
-            return values.Select((value, index) => new SmartParamameter(source, value, index)).ToArray();
+            return values.Select((value, index) => new SmartParameter(source, value, index)).ToArray();
         }
 
         internal static ParameterInstances CreateForArguments(MethodInfo benchmark, ParameterDefinition[] parameterDefinitions, (MemberInfo source, object[] values) valuesInfo, int sourceIndex)
@@ -78,18 +78,18 @@ namespace BenchmarkDotNet.Parameters
                 : string.Empty; // IEnumerable<object>
 
             // we just execute (cast)source.ToArray()[case][argumentIndex]; 
-            // we know that source is IEnumberable so we can do that!
+            // we know that source is IEnumerable so we can do that!
             return $"{cast}{source.Name}{callPostfix}.ToArray()[{sourceIndex}]{indexPostfix};"; 
         }
     }
 
-    internal class SmartParamameter : IParam
+    internal class SmartParameter : IParam
     {
         private readonly MemberInfo source;
         private readonly MethodBase method;
         private readonly int index;
 
-        public SmartParamameter(MemberInfo source, object value, int index)
+        public SmartParameter(MemberInfo source, object value, int index)
         {
             this.source = source;
             this.method = source is PropertyInfo property ? property.GetMethod : source as MethodInfo;

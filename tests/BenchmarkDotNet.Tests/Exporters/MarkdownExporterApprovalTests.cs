@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Tests.Exporters
 
             [RankColumn, LogicalGroupColumn, BaselineColumn]
             [SimpleJob(id: "Job1"), SimpleJob(id: "Job2")]
-            public class NoBasline_MethodsParamsJobs
+            public class NoBaseline_MethodsParamsJobs
             {
                 [Params(2, 10), UsedImplicitly] public int Param;
 
@@ -84,7 +84,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             [RankColumn, LogicalGroupColumn, BaselineColumn]
             [SimpleJob(id: "Job1"), SimpleJob(id: "Job2")]
             [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByMethod)]
-            public class NoBasline_MethodsParamsJobs_GroupByMethod
+            public class NoBaseline_MethodsParamsJobs_GroupByMethod
             {
                 [Params(2, 10), UsedImplicitly] public int Param;
 
@@ -96,7 +96,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             [RankColumn, LogicalGroupColumn, BaselineColumn]
             [SimpleJob(id: "Job1"), SimpleJob(id: "Job2")]
             [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByJob)]
-            public class NoBasline_MethodsParamsJobs_GroupByJob
+            public class NoBaseline_MethodsParamsJobs_GroupByJob
             {
                 [Params(2, 10), UsedImplicitly] public int Param;
 
@@ -108,7 +108,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             [RankColumn, LogicalGroupColumn, BaselineColumn]
             [SimpleJob(id: "Job1"), SimpleJob(id: "Job2")]
             [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByParams)]
-            public class NoBasline_MethodsParamsJobs_GroupByParams
+            public class NoBaseline_MethodsParamsJobs_GroupByParams
             {
                 [Params(2, 10), UsedImplicitly] public int Param;
 
@@ -120,7 +120,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             [RankColumn, LogicalGroupColumn, BaselineColumn]
             [SimpleJob(id: "Job1"), SimpleJob(id: "Job2")]
             [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
-            public class NoBasline_MethodsParamsJobs_GroupByCategory
+            public class NoBaseline_MethodsParamsJobs_GroupByCategory
             {
                 [Params(2, 10), UsedImplicitly] public int Param;
 
@@ -142,7 +142,7 @@ namespace BenchmarkDotNet.Tests.Exporters
                 BenchmarkLogicalGroupRule.ByJob,
                 BenchmarkLogicalGroupRule.ByParams,
                 BenchmarkLogicalGroupRule.ByCategory)]
-            public class NoBasline_MethodsParamsJobs_GroupByAll
+            public class NoBaseline_MethodsParamsJobs_GroupByAll
             {
                 [Params(2, 10), UsedImplicitly] public int Param;
 
@@ -157,10 +157,10 @@ namespace BenchmarkDotNet.Tests.Exporters
                 [Benchmark, BenchmarkCategory("CatB")] public void B2() { }
             }
 
-            /* MethodBasline */
+            /* MethodBaseline */
 
             [RankColumn, LogicalGroupColumn, BaselineColumn]
-            public class MethodBasline_Methods
+            public class MethodBaseline_Methods
             {
                 [Benchmark(Baseline = true)] public void Base() { }
                 [Benchmark] public void Foo() { }
@@ -168,7 +168,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             }
 
             [RankColumn, LogicalGroupColumn, BaselineColumn]
-            public class MethodBasline_MethodsParams
+            public class MethodBaseline_MethodsParams
             {
                 [Params(2, 10), UsedImplicitly] public int Param;
 
@@ -179,7 +179,7 @@ namespace BenchmarkDotNet.Tests.Exporters
 
             [RankColumn, LogicalGroupColumn, BaselineColumn]
             [SimpleJob(id: "Job1"), SimpleJob(id: "Job2")]
-            public class MethodBasline_MethodsJobs
+            public class MethodBaseline_MethodsJobs
             {
                 [Benchmark(Baseline = true)] public void Base() { }
                 [Benchmark] public void Foo() { }
@@ -188,7 +188,7 @@ namespace BenchmarkDotNet.Tests.Exporters
 
             [RankColumn, LogicalGroupColumn, BaselineColumn]
             [SimpleJob(id: "Job1"), SimpleJob(id: "Job2")]
-            public class MethodBasline_MethodsParamsJobs
+            public class MethodBaseline_MethodsParamsJobs
             {
                 [Params(2, 10), UsedImplicitly] public int Param;
 
@@ -201,7 +201,7 @@ namespace BenchmarkDotNet.Tests.Exporters
 
             [RankColumn, LogicalGroupColumn, BaselineColumn]
             [SimpleJob(id: "Job1", baseline: true), SimpleJob(id: "Job2")]
-            public class JobBasline_MethodsJobs
+            public class JobBaseline_MethodsJobs
             {
                 [Benchmark] public void Base() { }
                 [Benchmark] public void Foo() { }
@@ -210,7 +210,7 @@ namespace BenchmarkDotNet.Tests.Exporters
 
             [RankColumn, LogicalGroupColumn, BaselineColumn]
             [SimpleJob(id: "Job1", baseline: true), SimpleJob(id: "Job2")]
-            public class JobBasline_MethodsParamsJobs
+            public class JobBaseline_MethodsParamsJobs
             {
                 [Params(2, 10), UsedImplicitly] public int Param;
 

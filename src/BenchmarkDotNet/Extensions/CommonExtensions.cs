@@ -91,7 +91,7 @@ namespace BenchmarkDotNet.Extensions
                 hashSet.Add(item);
         }
         
-#if !NETCOREAPP2_1 // method with the same name was added to Dictionary in .NET Core 2.1, so we need this ulgy hack to get compiler happy
+#if !NETCOREAPP2_1 // method with the same name was added to Dictionary in .NET Core 2.1, so we need this ugly hack to get compiler happy
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
             => dictionary.TryGetValue(key, out var value) ? value : default;
 #endif

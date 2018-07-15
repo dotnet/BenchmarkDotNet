@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Tests.Engine
             Assert.Equal(1, timesBenchmarkCalled);
             Assert.Equal(1, timesOverheadCalled);
             Assert.Equal(1, timesIterationCleanupCalled); // 1x for Target
-            Assert.Equal(0, timesGlobalCleanupCalled); // cleanup is called as part of dispode
+            Assert.Equal(0, timesGlobalCleanupCalled); // cleanup is called as part of dispose
 
             Assert.Equal(1, engine.TargetJob.Run.InvocationCount); // call the benchmark once per iteration
             Assert.Equal(1, engine.TargetJob.Run.UnrollFactor); // no unroll factor
@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.Tests.Engine
             Assert.True(engine.TargetJob.Run.HasValue(AccuracyMode.EvaluateOverheadCharacteristic)); // is set to false in explicit way
             Assert.False(engine.TargetJob.Accuracy.EvaluateOverhead); // don't evaluate overhead in that case
 
-            engine.Dispose(); // cleanup is called as part of dispode
+            engine.Dispose(); // cleanup is called as part of dispose
 
             Assert.Equal(1, timesGlobalCleanupCalled);
         }
@@ -142,7 +142,7 @@ namespace BenchmarkDotNet.Tests.Engine
         }
 
         [Fact]
-        public void MediumTimeConsumingBenchmarksShouldStartPilotFrom2AndIcrementItWithEveryStep()
+        public void MediumTimeConsumingBenchmarksShouldStartPilotFrom2AndIncrementItWithEveryStep()
         {
             var unrollFactor = Job.Default.ResolveValue(RunMode.UnrollFactorCharacteristic, DefaultResolver);
 

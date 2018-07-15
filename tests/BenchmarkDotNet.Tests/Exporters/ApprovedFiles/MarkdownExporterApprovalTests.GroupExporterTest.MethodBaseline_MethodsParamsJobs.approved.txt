@@ -1,4 +1,4 @@
-﻿=== MethodBasline_MethodsParamsJobs ===
+﻿=== MethodBaseline_MethodsParamsJobs ===
 
 BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores

@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Extensions
         private static bool? Read(DebuggableAttribute debuggableAttribute, string propertyName)
         {
             // the properties are implemented (https://github.com/dotnet/coreclr/pull/6153)
-            // but not exposed in corefx Contracs due to .NET Standard versioning problems (https://github.com/dotnet/corefx/issues/13717)
+            // but not exposed in corefx Contracts due to .NET Standard versioning problems (https://github.com/dotnet/corefx/issues/13717)
             // so we need to use reflection to read this simple property...
             var propertyInfo = typeof(DebuggableAttribute).GetProperty(propertyName);
             if (debuggableAttribute == null || propertyInfo == null)

@@ -425,7 +425,7 @@ namespace BenchmarkDotNet.Running
                         gcStats = GcStats.Parse(executeResult.Data.Last());
 
                     noOverheadCompositeDiagnoser.ProcessResults(
-                        new DiagnoserResults(benchmarkCase, measurements.Where(measurement => measurement.IsWorklaod()).Sum(m => m.Operations), gcStats));
+                        new DiagnoserResults(benchmarkCase, measurements.Where(measurement => measurement.IsWorkload()).Sum(m => m.Operations), gcStats));
                 }
 
                 if (autoLaunchCount && launchIndex == 2 && analyzeRunToRunVariance)
@@ -451,7 +451,7 @@ namespace BenchmarkDotNet.Running
                 var allRuns = executeResult.Data.Select(line => Measurement.Parse(logger, line, 0)).Where(r => r.IterationMode != IterationMode.Unknown).ToList();
 
                 extraRunCompositeDiagnoser.ProcessResults(
-                    new DiagnoserResults(benchmarkCase, allRuns.Where(measurement => measurement.IsWorklaod()).Sum(m => m.Operations), gcStats));
+                    new DiagnoserResults(benchmarkCase, allRuns.Where(measurement => measurement.IsWorkload()).Sum(m => m.Operations), gcStats));
 
                 if (!executeResult.FoundExecutable)
                     logger.WriteLineError("Executable not found");

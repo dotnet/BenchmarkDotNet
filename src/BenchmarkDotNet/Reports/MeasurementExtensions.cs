@@ -28,6 +28,6 @@ namespace BenchmarkDotNet.Reports
             => measurement.IterationMode == mode && measurement.IterationStage == stage;
 
         public static bool IsOverhead(this Measurement measurement) => measurement.IterationMode == IterationMode.Overhead;
-        public static bool IsWorklaod(this Measurement measurement) => measurement.IterationMode == IterationMode.Workload;
+        public static bool IsWorkload(this Measurement measurement) => measurement.IterationMode == IterationMode.Workload;
     }
 }

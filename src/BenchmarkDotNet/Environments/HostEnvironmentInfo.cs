@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Environments
 {
     // this class is used by our auto-generated benchmark program, 
     // keep it in mind if you want to do some renaming
-    // you can finde the source code at Templates\BenchmarkProgram.txt
+    // you can find the source code at Templates\BenchmarkProgram.txt
     public class HostEnvironmentInfo : BenchmarkEnvironmentInfo
     {
         public const string BenchmarkDotNetCaption = "BenchmarkDotNet";

@@ -23,8 +23,8 @@ namespace BenchmarkDotNet.Tests.Mathematics.Histograms
             var histogram = HistogramBuilder.Adaptive.Build(s);
             output.Print("Distribution", histogram);
 
-            double acutalMValue = MathHelper.CalculateMValue(s);
-            Assert.Equal(expectedMValue, acutalMValue, 4);
+            double actualMValue = MathHelper.CalculateMValue(s);
+            Assert.Equal(expectedMValue, actualMValue, 4);
         }
 
         [Fact]

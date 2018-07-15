@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Exporters
         public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
         {
             string fileName = GetFileName(summary);
-            string filePath = GetAtrifactFullName(summary);
+            string filePath = GetArtifactFullName(summary);
             if (File.Exists(filePath))
             {
                 try
@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Exporters
             return new[] { filePath };
         }
 
-        internal string GetAtrifactFullName(Summary summary)
+        internal string GetArtifactFullName(Summary summary)
         {
             string fileName = GetFileName(summary);
             return $"{Path.Combine(summary.ResultsDirectoryPath, fileName)}-{FileCaption}{FileNameSuffix}.{FileExtension}";

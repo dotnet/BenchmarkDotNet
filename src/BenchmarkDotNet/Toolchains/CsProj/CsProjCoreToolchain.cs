@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
             if (!string.IsNullOrEmpty(CustomDotNetCliPath) && !File.Exists(CustomDotNetCliPath))
             {
-                logger.WriteLineError($"Povided custom dotnet cli path does not exist, benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
+                logger.WriteLineError($"Provided custom dotnet cli path does not exist, benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
                 return false;
             }
 

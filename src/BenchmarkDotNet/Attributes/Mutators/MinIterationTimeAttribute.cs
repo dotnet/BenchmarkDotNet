@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Attributes
     /// </summary>
     public class MinIterationTimeAttribute : JobMutatorConfigBaseAttribute
     {
-        public MinIterationTimeAttribute(double miliseconds) : base(Job.Default.WithMinIterationTime(TimeInterval.FromMilliseconds(miliseconds)))
+        public MinIterationTimeAttribute(double milliseconds) : base(Job.Default.WithMinIterationTime(TimeInterval.FromMilliseconds(milliseconds)))
         {
         }
     }
