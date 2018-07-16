@@ -2,9 +2,9 @@
 
 namespace BenchmarkDotNet.Attributes
 {
-    public class ModerateAccuracyAttribute : JobConfigBaseAttribute
+    public class ModerateAccuracyJobAttribute : JobConfigBaseAttribute
     {
-        public ModerateAccuracyAttribute() : base(Job.ModerateAccuracy)
+        public ModerateAccuracyJobAttribute() : base(Job.ModerateAccuracy)
         {
         }
     }

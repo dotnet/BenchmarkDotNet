@@ -2,9 +2,9 @@
 
 namespace BenchmarkDotNet.Attributes
 {
-    public class QuickRoughAccuracyAttribute : JobConfigBaseAttribute
+    public class QuickRoughAccuracyJobAttribute : JobConfigBaseAttribute
     {
-        public QuickRoughAccuracyAttribute() : base(Job.QuickRough)
+        public QuickRoughAccuracyJobAttribute() : base(Job.QuickRough)
         {
         }
     }
