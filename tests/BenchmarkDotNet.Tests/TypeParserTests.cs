@@ -50,11 +50,24 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void CanSelectClasses()
+        public void CanSelectClassesUsingPatters()
         {
             var benchmarks = Filter(
                 new[] { typeof(ClassA), typeof(ClassB), typeof(ClassC) },
                 new[] { "--filter", "*ClassC*", "*ClassA*" });
+
+            // ClassC not matched as it has NO methods with the [Benchmark] attribute
+            Assert.Equal(2, benchmarks.Count);
+            Assert.Contains("ClassA.Method1", benchmarks);
+            Assert.Contains("ClassA.Method2", benchmarks);
+        }
+        
+        [Fact]
+        public void CanSelectClassesUsingTypeNames()
+        {
+            var benchmarks = Filter(
+                new[] { typeof(ClassA), typeof(ClassB), typeof(ClassC) },
+                new[] { "--filter", "ClassC", "ClassA" });
 
             // ClassC not matched as it has NO methods with the [Benchmark] attribute
             Assert.Equal(2, benchmarks.Count);

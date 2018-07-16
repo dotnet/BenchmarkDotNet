@@ -67,7 +67,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return new Example("Use DisassemblyDiagnoser to get disassembly", style, new CommandLineOptions { UseDisassemblyDiagnoser = true });
                 yield return new Example("Run all benchmarks exactly once", style, new CommandLineOptions { BaseJob = "Dry", Filters = new[] { "*" } });
                 yield return new Example("Run all benchmarks from System.Memory namespace", style, new CommandLineOptions { Filters = new[] { "System.Memory*" } });
-                yield return new Example("Run all benchmarks from ClassA and ClassB and show the results in single summary", style, new CommandLineOptions { Join = true, Filters = new[] { "*ClassA*", "*ClassB*" } });
+                yield return new Example("Run all benchmarks from ClassA and ClassB using type names", style, new CommandLineOptions { Filters = new[] { "ClassA", "ClassB" } });
+                yield return new Example("Run all benchmarks from ClassA and ClassB using patterns", style, new CommandLineOptions { Filters = new[] { "*.ClassA.*", "*.ClassB.*" } });
+                yield return new Example("Run all benchmarks called `BenchmarkName` and show the results in single summary", style, new CommandLineOptions { Join = true, Filters = new[] { "*.BenchmarkName" } });
             }
         }
     }
