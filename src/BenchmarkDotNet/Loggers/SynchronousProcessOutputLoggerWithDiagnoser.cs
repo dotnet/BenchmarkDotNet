@@ -37,8 +37,9 @@ namespace BenchmarkDotNet.Loggers
 
         internal void ProcessInput()
         {
-            string line;
+            process.StandardOutput.BaseStream.ReadTimeout = 5000;
 
+            string line;
             // ReadLine() can return string.Empty/null as values.
             while (!process.StandardOutput.EndOfStream)
             {
