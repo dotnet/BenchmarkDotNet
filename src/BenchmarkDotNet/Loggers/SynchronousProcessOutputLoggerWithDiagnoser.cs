@@ -38,25 +38,30 @@ namespace BenchmarkDotNet.Loggers
         internal void ProcessInput()
         {
             string line;
+
             // ReadLine() can return string.Empty/null as values.
             while (!process.StandardOutput.EndOfStream)
             {
-                line = process.StandardOutput.ReadLine();
-
-                if (!string.IsNullOrEmpty(line))
+                if (process.StandardOutput.Peek() > 0) // 0 or -1 can indicate internal error.
                 {
-                    logger.WriteLine(LogKind.Default, line);
+                    line = process.StandardOutput.ReadLine();
 
-                    if (!line.StartsWith("//"))
-                    { LinesWithResults.Add(line); }
-                    else if (Engine.Signals.TryGetSignal(line, out var signal))
+                    if (!string.IsNullOrEmpty(line)) // Skip bad data.
                     {
-                        diagnoser?.Handle(signal, diagnoserActionParameters);
-                        process.StandardInput.WriteLine(Engine.Signals.Acknowledgment);
+                        logger.WriteLine(LogKind.Default, line);
+
+                        if (!line.StartsWith("//"))
+                        { LinesWithResults.Add(line); }
+                        else if (Engine.Signals.TryGetSignal(line, out var signal))
+                        {
+                            diagnoser?.Handle(signal, diagnoserActionParameters);
+                            process.StandardInput.WriteLine(Engine.Signals.Acknowledgment);
+                        }
+                        else
+                        { LinesWithExtraOutput.Add(line); }
                     }
-                    else
-                    { LinesWithExtraOutput.Add(line); }
                 }
+                else { break; } // No more 'characters' can be read.
             }
         }
     }
