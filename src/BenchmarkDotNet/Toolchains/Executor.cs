@@ -69,11 +69,7 @@ namespace BenchmarkDotNet.Toolchains
 
             loggerWithDiagnoser.ProcessInput();
 
-            // Timeout Added. Freeze detected.
-            if (!process.WaitForExit(30000)) 
-            {
-                process.Kill();
-            }
+            process.WaitForExit(); // should we add timeout here?
 
             if (process.ExitCode == 0)
             {
