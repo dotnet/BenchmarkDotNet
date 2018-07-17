@@ -69,21 +69,17 @@ namespace BenchmarkDotNet.Running
 
             var effectiveConfig = ManualConfig.Union(config ?? DefaultConfig.Instance, parsedConfig);
 
-            var benchmarks = Filter(effectiveConfig);
+            var filteredBenchmarks = typeParser.Filter(effectiveConfig);
+            if (filteredBenchmarks.IsEmpty())
+                return Array.Empty<Summary>();
 
-            summaries.AddRange(BenchmarkRunner.Run(benchmarks, effectiveConfig));
+            summaries.AddRange(BenchmarkRunner.Run(filteredBenchmarks, effectiveConfig));
 
             var totalNumberOfExecutedBenchmarks = summaries.Sum(summary => summary.GetNumberOfExecutedBenchmarks());
             BenchmarkRunner.LogTotalTime(logger, globalChronometer.GetElapsed().GetTimeSpan(), totalNumberOfExecutedBenchmarks, "Global total time");
             return summaries;
         }
 
-        internal BenchmarkRunInfo[] Filter(IConfig effectiveConfig)
-            => (effectiveConfig.GetFilters().Any() ? typeParser.GetAll() : typeParser.AskUser()) // if user provided some filters via args or custom config , we don't ask for any input
-                .Select(typeWithMethods =>
-                    typeWithMethods.AllMethodsInType
-                        ? BenchmarkConverter.TypeToBenchmarks(typeWithMethods.Type, effectiveConfig)
-                        : BenchmarkConverter.MethodsToBenchmarks(typeWithMethods.Type, typeWithMethods.Methods, effectiveConfig))
-                .ToArray();
+
     }
 }

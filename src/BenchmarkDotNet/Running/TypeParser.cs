@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
@@ -25,7 +26,7 @@ namespace BenchmarkDotNet.Running
             allTypes = GenericBenchmarksBuilder.GetRunnableBenchmarks(types);
         }
 
-        internal class TypeWithMethods
+        private class TypeWithMethods
         {
             public Type Type { get; }
             public MethodInfo[] Methods { get; }
@@ -39,16 +40,34 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        internal IEnumerable<TypeWithMethods> GetAll() => allTypes.Select(type => new TypeWithMethods(type));
-
-        internal IEnumerable<TypeWithMethods> AskUser()
+        internal BenchmarkRunInfo[] Filter(IConfig effectiveConfig)
         {
             if (allTypes.IsEmpty())
             {
-                logger.WriteError("No benchmarks to choose from. Make sure you provided public types with public [Benchmark] methods.");
-                return Array.Empty<TypeWithMethods>();
+                logger.WriteError("No benchmarks to choose from. Make sure you provided public non-sealed non-static types with public [Benchmark] methods.");
+                return Array.Empty<BenchmarkRunInfo>();
             }
 
+            bool hasFilters = effectiveConfig.GetFilters().Any();
+
+            var benchmarks = (hasFilters ? GetAll() : AskUser()) // if user provided some filters via args or custom config , we don't ask for any input
+                .Select(typeWithMethods =>
+                    typeWithMethods.AllMethodsInType
+                        ? BenchmarkConverter.TypeToBenchmarks(typeWithMethods.Type, effectiveConfig)
+                        : BenchmarkConverter.MethodsToBenchmarks(typeWithMethods.Type, typeWithMethods.Methods, effectiveConfig))
+                .Where(info => info.BenchmarksCases.Any())
+                .ToArray();
+
+            if (benchmarks.IsEmpty() && hasFilters)
+                PrintWrongFilterInfo();
+
+            return benchmarks;
+        }
+
+        private IEnumerable<TypeWithMethods> GetAll() => allTypes.Select(type => new TypeWithMethods(type));
+
+        private IEnumerable<TypeWithMethods> AskUser()
+        {
             var selectedTypes = new List<TypeWithMethods>();
             var benchmarkCaptionExample = allTypes.First().GetDisplayName();
 
@@ -110,6 +129,25 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLine();
                 logger.WriteLine();
             }
+        }
+
+        private void PrintWrongFilterInfo()
+        {
+            logger.WriteLineError("The filter that you have provided returned 0 benchmarks.");
+            logger.WriteLineInfo("Please remember that the filter is applied to full benchmark name: `namespace.typeName.methodName`.");
+            logger.WriteLineInfo("Some examples of full names:");
+            
+            foreach (var displayName in allTypes
+                .SelectMany(type => BenchmarkConverter.TypeToBenchmarks(type, DefaultConfig.Instance).BenchmarksCases) // we use DefaultConfig to NOT filter the benchmarks
+                .Select(benchmarkCase => benchmarkCase.Descriptor.GetFilterName())
+                .Distinct()
+                .OrderBy(displayName => displayName)
+                .Take(40))
+            {
+                logger.WriteLineInfo($"\t{displayName}");
+            }
+
+            logger.WriteLineInfo("To learn more about filtering use `--help`");
         }
     }
 }

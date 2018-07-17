@@ -68,5 +68,7 @@ namespace BenchmarkDotNet.Running
         }
 
         public bool HasCategory(string category) => Categories.Any(c => c.EqualsWithIgnoreCase(category));
+
+        public string GetFilterName() => $"{Type.GetCorrectCSharpTypeName(includeGenericArgumentsNamespace: false)}.{WorkloadMethod.Name}";
     }
 }

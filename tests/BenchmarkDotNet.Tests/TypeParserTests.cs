@@ -20,11 +20,6 @@ namespace BenchmarkDotNet.Tests
         public ITestOutputHelper Output { get; }
 
         public TypeParserTests(ITestOutputHelper output) => Output = output;
-        
-        private HashSet<string> Filter(Type[] types, string[] args)
-            => new HashSet<string>(new BenchmarkSwitcher(types).Filter(ConfigParser.Parse(args, new OutputLogger(Output)).config)
-                .SelectMany(runInfo => runInfo.BenchmarksCases)
-                .Select(benchmark => $"{benchmark.Descriptor.Type.GetDisplayName()}.{benchmark.Descriptor.WorkloadMethod.Name}"));
 
         [Fact]
         public void CanSelectMethods()
@@ -164,6 +159,33 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(benchmarks);
             Assert.Contains("SomeGeneric<Int32>.Create", benchmarks);
         }
+
+        [Fact]
+        public void WhenThereIsNothingToFilterAnErrorMessageIsDisplayed()
+        {
+            var logger = new OutputLogger(Output);
+            
+            var filtered = Filter(Array.Empty<Type>(), new[] { "--filter", "*" }, logger);
+            
+            Assert.Empty(filtered);
+            Assert.Contains("No benchmarks to choose from. Make sure you provided public non-sealed non-static types with public [Benchmark] methods.", logger.GetLog());
+        }
+        
+        [Fact]
+        public void WhenFilterReturnsNothingAnErrorMessageIsDisplayed()
+        {
+            var logger = new OutputLogger(Output);
+            
+            var filtered = Filter(new [] { typeof(ClassA), typeof(ClassB), typeof(ClassC) }, new[] { "--filter", "WRONG" }, logger);
+            
+            Assert.Empty(filtered);
+            Assert.Contains("The filter that you have provided returned 0 benchmarks.", logger.GetLog());
+        }
+        
+        private HashSet<string> Filter(Type[] types, string[] args, ILogger logger = null)
+            => new HashSet<string>(new TypeParser(types, logger ?? new OutputLogger(Output)).Filter(ConfigParser.Parse(args, logger ?? new OutputLogger(Output)).config)
+                .SelectMany(runInfo => runInfo.BenchmarksCases)
+                .Select(benchmark => $"{benchmark.Descriptor.Type.GetDisplayName()}.{benchmark.Descriptor.WorkloadMethod.Name}"));
     }
 }
 
