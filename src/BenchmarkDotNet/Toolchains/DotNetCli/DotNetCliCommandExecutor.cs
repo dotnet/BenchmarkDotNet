@@ -47,9 +47,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         internal static CommandResult ExecuteCommand(
             string customDotNetCliPath, string commandWithArguments, string workingDirectory, ILogger logger, 
-            IReadOnlyList<EnvironmentVariable> environmentVariables = null, bool useSharedCompilation = false)
+            IReadOnlyList<EnvironmentVariable> environmentVariables = null, bool? useSharedCompilation = false)
         {
-            commandWithArguments = $"{commandWithArguments} /p:UseSharedCompilation={useSharedCompilation.ToString().ToLowerInvariant()}";
+            commandWithArguments = $"{commandWithArguments}{(useSharedCompilation.HasValue ? $" /p:UseSharedCompilation={useSharedCompilation.ToString().ToLowerInvariant()}" : string.Empty)}";
 
             using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath, workingDirectory, commandWithArguments, environmentVariables) })
             {

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
@@ -29,6 +30,22 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
         {
+            //TODO: This doesn't actually use the generate script in the DotNetCliGenerator to do the building... so instead we'll do the nuget checks here as well for now
+            // see: https://github.com/dotnet/BenchmarkDotNet/issues/804
+            var nugetCommands = DotNetCliGenerator.GetNugetPackageCliCommands(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver);
+            foreach(var command in nugetCommands)
+            {
+                var addPackageResult = DotNetCliCommandExecutor.ExecuteCommand(
+                    CustomDotNetCliPath,
+                    command,
+                    generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath,
+                    logger,
+                    useSharedCompilation: null); //exclude the UseSharedCompilation command since that's not compatible with a dotnet add package
+
+                if (!addPackageResult.IsSuccess)
+                    return BuildResult.Failure(generateResult, new Exception(addPackageResult.ProblemDescription));
+            }
+
             var extraArguments = DotNetCliGenerator.GetCustomArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver);
 
             var restoreResult = DotNetCliCommandExecutor.ExecuteCommand(
