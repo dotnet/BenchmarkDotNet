@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Engines
 
         private readonly EnginePilotStage pilotStage;
         private readonly EngineWarmupStage warmupStage;
-        private readonly EngineGeneralStage generalStage;
+        private readonly EngineActualStage actualStage;
         private readonly bool includeMemoryStats;
 
         internal Engine(
@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Engines
 
             warmupStage = new EngineWarmupStage(this);
             pilotStage = new EnginePilotStage(this);
-            generalStage = new EngineGeneralStage(this);
+            actualStage = new EngineActualStage(this);
         }
 
         public void Dispose() => GlobalCleanupAction?.Invoke();
@@ -96,7 +96,7 @@ namespace BenchmarkDotNet.Engines
                     if (EvaluateOverhead)
                     {
                         warmupStage.RunOverhead(invokeCount, UnrollFactor);
-                        idle = generalStage.RunOverhead(invokeCount, UnrollFactor);
+                        idle = actualStage.RunOverhead(invokeCount, UnrollFactor);
                     }
                 }
 
@@ -105,12 +105,12 @@ namespace BenchmarkDotNet.Engines
 
             Host.BeforeMainRun();
 
-            var main = generalStage.RunWorkload(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring);
+            var main = actualStage.RunWorkload(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring);
 
             Host.AfterMainRun();
 
             var workGcHasDone = includeMemoryStats 
-                ? MeasureGcStats(new IterationData(IterationMode.Workload, IterationStage.General, 0, invokeCount, UnrollFactor)) 
+                ? MeasureGcStats(new IterationData(IterationMode.Workload, IterationStage.Actual, 0, invokeCount, UnrollFactor)) 
                 : GcStats.Empty;
 
             var outlierMode = TargetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, Resolver);
@@ -207,8 +207,8 @@ namespace BenchmarkDotNet.Engines
                 = new Dictionary<HostSignal, string>
                 {
                     { HostSignal.BeforeAnythingElse, "// BeforeAnythingElse" },
-                    { HostSignal.BeforeGeneralRun, "// BeforeGeneralRun" },
-                    { HostSignal.AfterGeneralRun, "// AfterGeneralRun" },
+                    { HostSignal.BeforeActualRun, "// BeforeActualRun" },
+                    { HostSignal.AfterActualRun, "// AfterActualRun" },
                     { HostSignal.AfterAll, "// AfterAll" }
                 };
 

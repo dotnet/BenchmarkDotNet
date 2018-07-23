@@ -431,8 +431,8 @@ namespace BenchmarkDotNet.Running
                 if (autoLaunchCount && launchIndex == 2 && analyzeRunToRunVariance)
                 {
                     // TODO: improve this logic
-                    double overheadApprox = new Statistics(measurements.Where(m => m.Is(IterationMode.Overhead, IterationStage.General)).Select(m => m.Nanoseconds)).Median;
-                    double workloadApprox = new Statistics(measurements.Where(m => m.Is(IterationMode.Workload, IterationStage.General)).Select(m => m.Nanoseconds)).Median;
+                    double overheadApprox = new Statistics(measurements.Where(m => m.Is(IterationMode.Overhead, IterationStage.Actual)).Select(m => m.Nanoseconds)).Median;
+                    double workloadApprox = new Statistics(measurements.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual)).Select(m => m.Nanoseconds)).Median;
                     double percent = overheadApprox / workloadApprox * 100;
                     launchCount = (int)Math.Round(Math.Max(2, 2 + (percent - 1) / 3)); // an empirical formula
                 }

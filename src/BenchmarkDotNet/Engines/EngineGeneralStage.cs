@@ -7,7 +7,7 @@ using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Engines
 {
-    public class EngineGeneralStage : EngineStage
+    public class EngineActualStage : EngineStage
     {
         internal const int MaxOverheadIterationCount = 20;
         internal const double MaxOverheadRelativeError = 0.05;
@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Engines
         private readonly int minIterationCount;
         private readonly int maxIterationCount;
 
-        public EngineGeneralStage(IEngine engine) : base(engine)
+        public EngineActualStage(IEngine engine) : base(engine)
         {
             targetCount = engine.TargetJob.ResolveValueAsNullable(RunMode.IterationCountCharacteristic);
             maxRelativeError = engine.TargetJob.ResolveValue(AccuracyMode.MaxRelativeErrorCharacteristic, engine.Resolver);
@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Engines
             while (true)
             {
                 iterationCounter++;
-                var measurement = RunIteration(iterationMode, IterationStage.General, iterationCounter, invokeCount, unrollFactor);
+                var measurement = RunIteration(iterationMode, IterationStage.Actual, iterationCounter, invokeCount, unrollFactor);
                 measurements.Add(measurement);
                 measurementsForStatistics.Add(measurement);
 
@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.Engines
             var measurements = new List<Measurement>(iterationCount);
 
             for (int i = 0; i < iterationCount; i++)
-                measurements.Add(RunIteration(iterationMode, IterationStage.General, i + 1, invokeCount, unrollFactor));
+                measurements.Add(RunIteration(iterationMode, IterationStage.Actual, i + 1, invokeCount, unrollFactor));
 
             WriteLine();
 

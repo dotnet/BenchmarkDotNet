@@ -8,15 +8,15 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Engine
 {
-    public class EngineGeneralStageTests
+    public class EngineActualStageTests
     {
         private const int MinIterationCount = EngineResolver.DefaultMinWorkloadIterationCount;
         private const int MaxIterationCount = EngineResolver.DefaultMaxWorkloadIterationCount;
-        private const int MaxOverheadIterationCount = EngineGeneralStage.MaxOverheadIterationCount;
+        private const int MaxOverheadIterationCount = EngineActualStage.MaxOverheadIterationCount;
 
         private readonly ITestOutputHelper output;
 
-        public EngineGeneralStageTests(ITestOutputHelper output)
+        public EngineActualStageTests(ITestOutputHelper output)
         {
             this.output = output;
         }
@@ -43,10 +43,10 @@ namespace BenchmarkDotNet.Tests.Engine
             Assert.InRange(count, min, max);
         }
 
-        private EngineGeneralStage CreateStage(Job job, Func<IterationData, TimeInterval> measure)
+        private EngineActualStage CreateStage(Job job, Func<IterationData, TimeInterval> measure)
         {
             var engine = new MockEngine(output, job, measure);
-            return new EngineGeneralStage(engine);
+            return new EngineActualStage(engine);
         }
     }
 }
