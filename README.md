@@ -1,7 +1,7 @@
 ![](docs/guide/logo/logo-wide.png)
 
 
-[![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/) [![Gitter](https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet.svg)](https://gitter.im/dotnet/BenchmarkDotNet)  [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md) [![Overview](https://img.shields.io/badge/docs-Overview-green.svg?style=flat)](http://benchmarkdotnet.org/Overview.htm) [![ChangeLog](https://img.shields.io/badge/docs-ChangeLog-green.svg?style=flat)](https://github.com/dotnet/BenchmarkDotNet/wiki/ChangeLog)
+[![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/) [![Gitter](https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet.svg)](https://gitter.im/dotnet/BenchmarkDotNet)  [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md) [![Overview](https://img.shields.io/badge/docs-Overview-green.svg?style=flat)](https://benchmarkdotnet.org/articles/overview.html) [![ChangeLog](https://img.shields.io/badge/docs-ChangeLog-green.svg?style=flat)](https://benchmarkdotnet.org/changelog/index.html)
 
 | AppVeyor/Windows | Travis/Linux | Travis/macOS |
 |------------------|--------------|--------------|
@@ -132,19 +132,19 @@ BenchmarkDotNet has a lot of awesome features for deep performance investigation
 * **Standard benchmarking routine:** generating an isolated project per each benchmark method; auto-selection of iteration amount; warmup; overhead evaluation; and so on
 * **Execution control:** BenchmarkDotNet tries to choose the best possible way to evaluate performance, but you can also manually control amount of iterations, switch between cold start and warmed state, set the accuracy level, tune GC parameters, change environment variables, and more
 * **Statistics:** by default, you will see the most important statistics like mean and standard deviation; but you can also manually ask for min/max values, confidence intervals, skewness, kurtosis, quartile, percentiles, or define own metrics
-* **Comparing environments:** [Easy way](http://benchmarkdotnet.org/Configs/Jobs.htm) to compare different environments (x86 vs x64, LegacyJit vs RyuJit, Mono vs .NET Core, and so on)
-* **Relative performance:** you can [easily]((http://benchmarkdotnet.org/Advanced/Baseline.htm)) evaluate difference between different methods of environments
+* **Comparing environments:** [Easy way](https://benchmarkdotnet.org/articles/configs/jobs.html) to compare different environments (x86 vs x64, LegacyJit vs RyuJit, Mono vs .NET Core, and so on)
+* **Relative performance:** you can [easily](https://benchmarkdotnet.org/articles/features/baselines.html) evaluate difference between different methods of environments
 * **Memory diagnostics:** the library not only measure performance of your code, but also prints information about memory traffic and amount of GC collections
 * **Disassembly diagnostics:** you can ask for an assembly listing with the help of single additional attribute
-* **Parametrization:** performance can be evaluated for different sets of input [parameters](http://benchmarkdotnet.org/Advanced/Params.htm) like in popular unit test frameworks
+* **Parametrization:** performance can be evaluated for different sets of input [parameters](https://benchmarkdotnet.org/articles/features/parameterization.html) like in popular unit test frameworks
 * **Environment information:** when your share performance results, it's very important to share information about your environment; BenchmarkDotNet automatically prints the exact version of your OS and processor; amount of physical CPU, physical cores, and logic cores; hypervisor (if you use it); frequency of the hardware timer; the JIT-compiler version; and more
-* **Command-line support:** you can manage thousands of benchmark, group them by categories, [filter](http://benchmarkdotnet.org/Configs/Filters.htm) and run them from command line
+* **Command-line support:** you can manage thousands of benchmark, group them by categories, [filter](https://benchmarkdotnet.org/articles/configs/filters.html) and run them from [command line](https://benchmarkdotnet.org/articles/guides/console-args.html)
 * **Powerful reporting system:** it's possible to export benchmark results to markdown, csv, html, plain text, png plots
 
 A few useful links for you:
 
-* If you want to know more about BenchmarkDotNet features, check out the [Overview Page](http://benchmarkdotnet.org/Overview.htm).
-* If you want to use BenchmarkDotNet for the first time, the [Getting Started](http://benchmarkdotnet.org/GettingStarted.htm) will help you.
+* If you want to know more about BenchmarkDotNet features, check out the [Overview Page](https://benchmarkdotnet.org/articles/overview.html).
+* If you want to use BenchmarkDotNet for the first time, the [Getting Started](https://benchmarkdotnet.org/articles/guides/getting-started.html) will help you.
 * If you want to ask a quick question or discuss performance topics, use the [gitter](https://gitter.im/dotnet/BenchmarkDotNet) channel.
 
 ## Supported technologies
@@ -199,7 +199,7 @@ Any help will be appreciated.
 You can develop new features, fix bugs, improve the documentation, or do some other cool stuff.
 
 If you want to contribute, check out the
-  [Contributing guide](http://benchmarkdotnet.org/Contributing.htm) and
+  [Contributing guide](https://benchmarkdotnet.org/articles/contributing/building.html) and
   [up-for-grabs](https://github.com/dotnet/BenchmarkDotNet/issues?q=is:open+is:issue+label:up-for-grabs) issues.
 If you have new ideas or want to complain about bugs, feel free to [create a new issue](https://github.com/dotnet/BenchmarkDotNet/issues/new).
 Let's build the best tool for benchmarking together!
