@@ -1,0 +1,620 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Exporters | BenchmarkDotNet </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Exporters | BenchmarkDotNet ">
+    <meta name="generator" content="docfx 2.37.1.0">
+    
+    <link rel="shortcut icon" href="../../logo/icon-32.png">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    <meta property="docfx:rel" content="../../">
+    
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  
+      ga('create', 'UA-41419012-6', 'auto');
+      ga('send', 'pageview');
+  
+    </script>
+    <!-- /Google Analytics -->
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function (d, w, c) {
+            (w[c] = w[c] || []).push(function() {
+                try {
+                    w.yaCounter40812449 = new Ya.Metrika({
+                        id:40812449,
+                        clickmap:true,
+                        trackLinks:true,
+                        accurateTrackBounce:true
+                    });
+                } catch(e) { }
+            });
+  
+            var n = d.getElementsByTagName("script")[0],
+                s = d.createElement("script"),
+                f = function () { n.parentNode.insertBefore(s, n); };
+            s.type = "text/javascript";
+            s.async = true;
+            s.src = "https://mc.yandex.ru/metrika/watch.js";
+  
+            if (w.opera == "[object Opera]") {
+                d.addEventListener("DOMContentLoaded", f, false);
+            } else { f(); }
+        })(document, window, "yandex_metrika_callbacks");
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo/icon.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list"></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="docs.exporters">
+<h1 id="exporters">Exporters</h1>
+
+<p>An <em>exporter</em> allows you to export results of your benchmark in different formats.
+By default, files with results will be located in
+<code>.\BenchmarkDotNet.Artifacts\results</code> directory. Default exporters are: csv, html and markdown.</p>
+<hr>
+<h2 id="sample-introexport">Sample: IntroExport</h2>
+<p>BenchmarkDotNet has a lot of predefined exporters.</p>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroExport.cs">using System;
+using System.Threading;
+using BenchmarkDotNet.Attributes;
+
+namespace BenchmarkDotNet.Samples
+{
+    [ShortRunJob]
+    [MediumRunJob]
+    [KeepBenchmarkFiles]
+
+    [AsciiDocExporter]
+    [CsvExporter]
+    [CsvMeasurementsExporter]
+    [HtmlExporter]
+    [PlainExporter]
+    [RPlotExporter]
+    [JsonExporterAttribute.Brief]
+    [JsonExporterAttribute.BriefCompressed]
+    [JsonExporterAttribute.Full]
+    [JsonExporterAttribute.FullCompressed]
+    [MarkdownExporterAttribute.Default]
+    [MarkdownExporterAttribute.GitHub]
+    [MarkdownExporterAttribute.StackOverflow]
+    [MarkdownExporterAttribute.Atlassian]
+    [XmlExporterAttribute.Brief]
+    [XmlExporterAttribute.BriefCompressed]
+    [XmlExporterAttribute.Full]
+    [XmlExporterAttribute.FullCompressed]
+    public class IntroExport
+    {
+        private Random random = new Random(42);
+
+        [Benchmark(Baseline = true)]
+        public void Sleep10() =&gt; Thread.Sleep(10);
+
+        [Benchmark]
+        public void Sleep50Noisy() =&gt; Thread.Sleep(random.Next(100));
+    }
+}
+</code></pre><h3 id="links">Links</h3>
+<ul>
+<li><a class="xref" href="exporters.html">Exporters</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroExport.html">Sample: IntroExport</a></li>
+</ul>
+<hr>
+<h2 id="sample-introexportjson">Sample: IntroExportJson</h2>
+<p>BenchmarkDotNet has a set of json exporters. You can customize the following properties of these exporters:</p>
+<ul>
+<li><code>fileNameSuffix</code>: a string which be placed in the end of target file name.</li>
+<li><code>indentJson</code>=<code>false</code>/<code>true</code>: should we format json or not.</li>
+<li><code>excludeMeasurements</code>=<code>false</code>/<code>true</code>: should we exclude detailed information about measurements or not
+(the final summary with statistics will be in the json file anyway).</li>
+</ul>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroExportJson.cs">using System.Threading;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Exporters.Json;
+
+namespace BenchmarkDotNet.Samples
+{
+    // *** Attribute style ***
+    
+    [DryJob]
+    [JsonExporterAttribute.Brief]
+    [JsonExporterAttribute.Full]
+    [JsonExporterAttribute.BriefCompressed]
+    [JsonExporterAttribute.FullCompressed]
+    [JsonExporter(&quot;-custom&quot;, indentJson: true, excludeMeasurements: true)]
+    public class IntroExportJson
+    {
+        [Benchmark] public void Sleep10() =&gt; Thread.Sleep(10);
+        [Benchmark] public void Sleep20() =&gt; Thread.Sleep(20);
+    }
+    
+    // *** Object style ***
+    
+    [Config(typeof(Config))]
+    public class IntroJsonExportObjectStyle
+    {
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                Add(JsonExporter.Brief);
+                Add(JsonExporter.Full);
+                Add(JsonExporter.BriefCompressed);
+                Add(JsonExporter.FullCompressed);
+                Add(JsonExporter.Custom(&quot;-custom&quot;, indentJson: true, excludeMeasurements: true));
+            }
+        }
+        
+        [Benchmark] public void Sleep10() =&gt; Thread.Sleep(10);
+        [Benchmark] public void Sleep20() =&gt; Thread.Sleep(20);
+    }
+}
+</code></pre><h3 id="output">Output</h3>
+<p>Example of <code>IntroJsonExport-report-brief.json</code>:</p>
+<pre><code class="lang-js">{
+   &quot;Title&quot;:&quot;IntroJsonExport&quot;,
+   &quot;HostEnvironmentInfo&quot;:{
+      &quot;BenchmarkDotNetCaption&quot;:&quot;BenchmarkDotNet-Dev.Core&quot;,
+      &quot;BenchmarkDotNetVersion&quot;:&quot;0.9.9.0&quot;,
+      &quot;OsVersion&quot;:&quot;Microsoft Windows NT 6.2.9200.0&quot;,
+      &quot;ProcessorName&quot;:{
+         &quot;IsValueCreated&quot;:true,
+         &quot;Value&quot;:&quot;Intel(R) Core(TM) i7-4702MQ CPU 2.20GHz&quot;
+      },
+      &quot;ProcessorCount&quot;:8,
+      &quot;ClrVersion&quot;:&quot;MS.NET 4.0.30319.42000&quot;,
+      &quot;Architecture&quot;:&quot;64-bit&quot;,
+      &quot;HasAttachedDebugger&quot;:false,
+      &quot;HasRyuJit&quot;:true,
+      &quot;Configuration&quot;:&quot;RELEASE&quot;,
+      &quot;JitModules&quot;:&quot;clrjit-v4.6.1586.0&quot;,
+      &quot;DotNetCliVersion&quot;:&quot;1.0.0-preview2-003121&quot;,
+      &quot;ChronometerFrequency&quot;:2143474,
+      &quot;HardwareTimerKind&quot;:&quot;Tsc&quot;
+   },
+   &quot;Benchmarks&quot;:[
+      {
+         &quot;ShortInfo&quot;:&quot;IntroJsonExport_Sleep10&quot;,
+         &quot;Namespace&quot;:&quot;BenchmarkDotNet.Samples.Intro&quot;,
+         &quot;Type&quot;:&quot;IntroJsonExport&quot;,
+         &quot;Method&quot;:&quot;Sleep10&quot;,
+         &quot;MethodTitle&quot;:&quot;Sleep10&quot;,
+         &quot;Parameters&quot;:&quot;&quot;,
+         &quot;Properties&quot;:{
+            &quot;Mode&quot;:&quot;Throughput&quot;,
+            &quot;Platform&quot;:&quot;Host&quot;,
+            &quot;Jit&quot;:&quot;Host&quot;,
+            &quot;Runtime&quot;:&quot;Host&quot;,
+            &quot;GcMode&quot;:&quot;Host&quot;,
+            &quot;WarmupCount&quot;:&quot;Auto&quot;,
+            &quot;TargetCount&quot;:&quot;Auto&quot;,
+            &quot;LaunchCount&quot;:&quot;Auto&quot;,
+            &quot;IterationTime&quot;:&quot;Auto&quot;,
+            &quot;Affinity&quot;:&quot;Auto&quot;
+         },
+         &quot;Statistics&quot;:{
+            &quot;N&quot;:20,
+            &quot;Min&quot;:10265993.7209375,
+            &quot;LowerFence&quot;:10255329.082734371,
+            &quot;Q1&quot;:10337369.528437499,
+            &quot;Median&quot;:10360382.6953125,
+            &quot;Mean&quot;:10362283.085796878,
+            &quot;Q3&quot;:10392063.158906251,
+            &quot;UpperFence&quot;:10474103.60460938,
+            &quot;Max&quot;:10436008.3209375,
+            &quot;InterquartileRange&quot;:54693.630468752235,
+            &quot;Outliers&quot;:[
+               
+            ],
+            &quot;StandardError&quot;:10219.304338928456,
+            &quot;Variance&quot;:2088683623.4328396,
+            &quot;StandardDeviation&quot;:45702.118369205156,
+            &quot;Skewness&quot;:-0.1242777170069375,
+            &quot;Kurtosis&quot;:2.31980277935226,
+            &quot;ConfidenceInterval&quot;:{
+               &quot;Mean&quot;:10362283.085796878,
+               &quot;Error&quot;:10219.304338928456,
+               &quot;Level&quot;:6,
+               &quot;Margin&quot;:20029.836504299772,
+               &quot;Lower&quot;:10342253.249292579,
+               &quot;Upper&quot;:10382312.922301177
+            },
+            &quot;Percentiles&quot;:{
+               &quot;P0&quot;:10265993.7209375,
+               &quot;P25&quot;:10338555.905625,
+               &quot;P50&quot;:10360382.6953125,
+               &quot;P67&quot;:10373496.555659376,
+               &quot;P80&quot;:10400703.4841875,
+               &quot;P85&quot;:10417280.326718749,
+               &quot;P90&quot;:10424125.595812501,
+               &quot;P95&quot;:10435620.51609375,
+               &quot;P100&quot;:10436008.3209375
+            }
+         }
+      },{
+         &quot;ShortInfo&quot;:&quot;IntroJsonExport_Sleep20&quot;,
+         &quot;Namespace&quot;:&quot;BenchmarkDotNet.Samples.Intro&quot;,
+         &quot;Type&quot;:&quot;IntroJsonExport&quot;,
+         &quot;Method&quot;:&quot;Sleep20&quot;,
+         &quot;MethodTitle&quot;:&quot;Sleep20&quot;,
+         &quot;Parameters&quot;:&quot;&quot;,
+         &quot;Properties&quot;:{
+            &quot;Mode&quot;:&quot;Throughput&quot;,
+            &quot;Platform&quot;:&quot;Host&quot;,
+            &quot;Jit&quot;:&quot;Host&quot;,
+            &quot;Runtime&quot;:&quot;Host&quot;,
+            &quot;GcMode&quot;:&quot;Host&quot;,
+            &quot;WarmupCount&quot;:&quot;Auto&quot;,
+            &quot;TargetCount&quot;:&quot;Auto&quot;,
+            &quot;LaunchCount&quot;:&quot;Auto&quot;,
+            &quot;IterationTime&quot;:&quot;Auto&quot;,
+            &quot;Affinity&quot;:&quot;Auto&quot;
+         },
+         &quot;Statistics&quot;:{
+            &quot;N&quot;:20,
+            &quot;Min&quot;:20258672.37,
+            &quot;LowerFence&quot;:20206333.269843742,
+            &quot;Q1&quot;:20325342.761249997,
+            &quot;Median&quot;:20362636.192500003,
+            &quot;Mean&quot;:20360791.931687497,
+            &quot;Q3&quot;:20404682.4221875,
+            &quot;UpperFence&quot;:20523691.913593754,
+            &quot;Max&quot;:20422396.073125,
+            &quot;InterquartileRange&quot;:79339.66093750298,
+            &quot;Outliers&quot;:[
+               
+            ],
+            &quot;StandardError&quot;:10728.817907277158,
+            &quot;Variance&quot;:2302150673.7502208,
+            &quot;StandardDeviation&quot;:47980.732317777525,
+            &quot;Skewness&quot;:-0.50826238372439869,
+            &quot;Kurtosis&quot;:2.11050327966268,
+            &quot;ConfidenceInterval&quot;:{
+               &quot;Mean&quot;:20360791.931687497,
+               &quot;Error&quot;:10728.817907277158,
+               &quot;Level&quot;:6,
+               &quot;Margin&quot;:21028.48309826323,
+               &quot;Lower&quot;:20339763.448589232,
+               &quot;Upper&quot;:20381820.414785761
+            },
+            &quot;Percentiles&quot;:{
+               &quot;P0&quot;:20258672.37,
+               &quot;P25&quot;:20327638.975312497,
+               &quot;P50&quot;:20362636.192500003,
+               &quot;P67&quot;:20391669.3762875,
+               &quot;P80&quot;:20406370.68625,
+               &quot;P85&quot;:20412542.034406248,
+               &quot;P90&quot;:20414412.5376875,
+               &quot;P95&quot;:20416606.697718751,
+               &quot;P100&quot;:20422396.073125
+            }
+         }
+      }
+   ]
+}
+</code></pre>
+<h3 id="links">Links</h3>
+<ul>
+<li><a class="xref" href="exporters.html">Exporters</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroExportJson.html">Sample: IntroExportJson</a></li>
+</ul>
+<hr>
+<h2 id="sample-introexportxml">Sample: IntroExportXml</h2>
+<p>BenchmarkDotNet has a set of XML exporters. You can customize the following properties of these exporters:</p>
+<ul>
+<li><code>fileNameSuffix</code>: a string which be placed in the end of target file name.</li>
+<li><code>indentXml</code>=<code>false</code>/<code>true</code>: should we format xml or not.</li>
+<li><code>excludeMeasurements</code>=<code>false</code>/<code>true</code>: should we exclude detailed information about measurements or not
+(the final summary with statistics will be in the XML file anyway).</li>
+</ul>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroExportXml.cs">using System.Threading;
+using BenchmarkDotNet.Attributes;
+
+namespace BenchmarkDotNet.Samples
+{
+    [DryJob]
+    [XmlExporterAttribute.Brief]
+    [XmlExporterAttribute.Full]
+    [XmlExporterAttribute.BriefCompressed]
+    [XmlExporterAttribute.FullCompressed]
+    [XmlExporter(&quot;-custom&quot;, indentXml: true, excludeMeasurements: true)]
+    public class IntroExportXml
+    {
+        [Benchmark] public void Sleep10() =&gt; Thread.Sleep(10);
+        [Benchmark] public void Sleep20() =&gt; Thread.Sleep(20);
+    }
+}
+</code></pre><h3 id="output">Output</h3>
+<p>Example of <code>IntroXmlExport-report-brief.xml</code>:</p>
+<pre><code class="lang-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;Summary&gt;
+  &lt;Title&gt;IntroXmlExport&lt;/Title&gt;
+  &lt;HostEnvironmentInfo&gt;
+    &lt;BenchmarkDotNetCaption&gt;BenchmarkDotNet&lt;/BenchmarkDotNetCaption&gt;
+    &lt;BenchmarkDotNetVersion&gt;0.10.9.20170805-develop&lt;/BenchmarkDotNetVersion&gt;
+    &lt;OsVersion&gt;Windows 10 Redstone 2 (10.0.15063)&lt;/OsVersion&gt;
+    &lt;ProcessorName&gt;Intel Core i7-3770K CPU 3.50GHz (Ivy Bridge)&lt;/ProcessorName&gt;
+    &lt;ProcessorCount&gt;8&lt;/ProcessorCount&gt;
+    &lt;RuntimeVersion&gt;.NET Framework 4.7 (CLR 4.0.30319.42000)&lt;/RuntimeVersion&gt;
+    &lt;Architecture&gt;64bit&lt;/Architecture&gt;
+    &lt;HasAttachedDebugger&gt;False&lt;/HasAttachedDebugger&gt;
+    &lt;HasRyuJit&gt;True&lt;/HasRyuJit&gt;
+    &lt;Configuration&gt;RELEASE&lt;/Configuration&gt;
+    &lt;JitModules&gt;clrjit-v4.7.2101.1&lt;/JitModules&gt;
+    &lt;DotNetSdkVersion&gt;1.0.4&lt;/DotNetSdkVersion&gt;
+    &lt;ChronometerFrequency&gt;
+      &lt;Hertz&gt;3410220&lt;/Hertz&gt;
+    &lt;/ChronometerFrequency&gt;
+    &lt;HardwareTimerKind&gt;Tsc&lt;/HardwareTimerKind&gt;
+  &lt;/HostEnvironmentInfo&gt;
+  &lt;Benchmarks&gt;
+    &lt;Benchmark&gt;
+      &lt;DisplayInfo&gt;IntroXmlExport.Sleep10: DefaultJob&lt;/DisplayInfo&gt;
+      &lt;Namespace&gt;BenchmarkDotNet.Samples.Intro&lt;/Namespace&gt;
+      &lt;Type&gt;IntroXmlExport&lt;/Type&gt;
+      &lt;Method&gt;Sleep10&lt;/Method&gt;
+      &lt;MethodTitle&gt;Sleep10&lt;/MethodTitle&gt;
+      &lt;Statistics&gt;
+        &lt;N&gt;15&lt;/N&gt;
+        &lt;Min&gt;10989865.8785938&lt;/Min&gt;
+        &lt;LowerFence&gt;10989836.0967969&lt;/LowerFence&gt;
+        &lt;Q1&gt;10990942.6053125&lt;/Q1&gt;
+        &lt;Median&gt;10991249.5870313&lt;/Median&gt;
+        &lt;Mean&gt;10991270.0524583&lt;/Mean&gt;
+        &lt;Q3&gt;10991680.2776563&lt;/Q3&gt;
+        &lt;UpperFence&gt;10992786.7861719&lt;/UpperFence&gt;
+        &lt;Max&gt;10992115.5501563&lt;/Max&gt;
+        &lt;InterquartileRange&gt;737.672343749553&lt;/InterquartileRange&gt;
+        &lt;StandardError&gt;148.484545262958&lt;/StandardError&gt;
+        &lt;Variance&gt;330714.902729213&lt;/Variance&gt;
+        &lt;StandardDeviation&gt;575.07817097262&lt;/StandardDeviation&gt;
+        &lt;Skewness&gt;-0.67759778074187&lt;/Skewness&gt;
+        &lt;Kurtosis&gt;3.14296703520386&lt;/Kurtosis&gt;
+        &lt;ConfidenceInterval&gt;
+          &lt;N&gt;15&lt;/N&gt;
+          &lt;Mean&gt;10991270.0524583&lt;/Mean&gt;
+          &lt;StandardError&gt;148.484545262958&lt;/StandardError&gt;
+          &lt;Level&gt;L999&lt;/Level&gt;
+          &lt;Margin&gt;614.793505974065&lt;/Margin&gt;
+          &lt;Lower&gt;10990655.2589524&lt;/Lower&gt;
+          &lt;Upper&gt;10991884.8459643&lt;/Upper&gt;
+        &lt;/ConfidenceInterval&gt;
+        &lt;Percentiles&gt;
+          &lt;P0&gt;10989865.8785938&lt;/P0&gt;
+          &lt;P25&gt;10991027.3689063&lt;/P25&gt;
+          &lt;P50&gt;10991249.5870313&lt;/P50&gt;
+          &lt;P67&gt;10991489.490875&lt;/P67&gt;
+          &lt;P80&gt;10991696.7722187&lt;/P80&gt;
+          &lt;P85&gt;10991754.5031875&lt;/P85&gt;
+          &lt;P90&gt;10991933.1939688&lt;/P90&gt;
+          &lt;P95&gt;10992067.441125&lt;/P95&gt;
+          &lt;P100&gt;10992115.5501563&lt;/P100&gt;
+        &lt;/Percentiles&gt;
+      &lt;/Statistics&gt;
+    &lt;/Benchmark&gt;
+  &lt;/Benchmarks&gt;
+&lt;/Summary&gt;
+</code></pre>
+<h3 id="links">Links</h3>
+<ul>
+<li><a class="xref" href="exporters.html">Exporters</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroExportXml.html">Sample: IntroExportXml</a></li>
+</ul>
+<hr>
+<h2 id="plots">Plots</h2>
+<p>You can install <a href="https://www.r-project.org/">R</a> to automatically get nice plots of your benchmark results.
+First, make sure <code>Rscript.exe</code> or <code>Rscript</code> is in your path,
+or define an R_HOME environment variable pointing to the R installation directory (containing the <code>bin</code> directory).
+Use <code>RPlotExporter.Default</code> and <code>CsvMeasurementsExporter.Default</code> in your config,
+and the <code>BuildPlots.R</code> script in your bin directory will take care of the rest.</p>
+<p>Examples:</p>
+<pre><code>&lt;BenchmarkName&gt;-barplot.png
+&lt;BenchmarkName&gt;-boxplot.png
+&lt;BenchmarkName&gt;-&lt;MethodName&gt;-density.png
+&lt;BenchmarkName&gt;-&lt;MethodName&gt;-facetTimeline.png
+&lt;BenchmarkName&gt;-&lt;MethodName&gt;-facetTimelineSmooth.png
+&lt;BenchmarkName&gt;-&lt;MethodName&gt;-&lt;JobName&gt;-timelineSmooth.png
+&lt;BenchmarkName&gt;-&lt;MethodName&gt;-&lt;JobName&gt;-timelineSmooth.png
+</code></pre>
+<p>A config example in C#:</p>
+<pre><code class="lang-cs">public class Config : ManualConfig
+{
+    public Config()
+    {
+        Add(CsvMeasurementsExporter.Default);
+        Add(RPlotExporter.Default);
+    }
+}
+</code></pre>
+<p>A config example in F#:</p>
+<pre><code class="lang-fs">module MyBenchmark
+
+open BenchmarkDotNet.Attributes
+open BenchmarkDotNet.Configs
+open BenchmarkDotNet.Exporters
+open BenchmarkDotNet.Exporters.Csv
+open MyProjectUnderTest
+
+type MyConfig() as this =
+    inherit ManualConfig()
+    do
+        this.Add(CsvMeasurementsExporter.Default)
+        this.Add(RPlotExporter.Default)
+
+[&lt;
+  MemoryDiagnoser; 
+  Config(typeof&lt;MyConfig&gt;);
+  RPlotExporter
+&gt;]
+type MyPerformanceTests() =
+
+    let someTestData = getTestDataAsList ()
+
+    [&lt;Benchmark&gt;]
+    member __.SomeTestCase() = 
+        someTestData |&gt; myFunctionUnderTest
+</code></pre>
+<h2 id="csv">CSV</h2>
+<p>The CSV file format is often used to graph the output or to analyze the results programmatically. The CSV exporter may be configured to produce sanitized output, where cell values are numerals and their units are predefined.</p>
+<p>The CSV exporter and other compatible exporters may consume an instance of <code>ISummaryStyle</code> that defines how the output should look like:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Remarks</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PrintUnitsInHeader</td>
+<td>If true, units will be displayed in the header row</td>
+<td>false</td>
+</tr>
+<tr>
+<td>PrintUnitsInContent</td>
+<td>If true, units will be appended to the value</td>
+<td>true</td>
+</tr>
+<tr>
+<td>TimeUnit</td>
+<td>If null, unit will be automatically selected</td>
+<td>null</td>
+</tr>
+<tr>
+<td>SizeUnit</td>
+<td>If null, unit will be automatically selected</td>
+<td>null</td>
+</tr>
+</tbody>
+</table>
+<p>Example of CSV exporter configured to always use microseconds, kilobytes, and to render units only in column headers:</p>
+<pre><code class="lang-cs">var config = ManualConfig.Create(DefaultConfig.Instance);
+config.Add(new CsvExporter(
+    CsvSeparator.CurrentCulture,
+    new BenchmarkDotNet.Reports.SummaryStyle
+    {
+        PrintUnitsInHeader = true,
+        PrintUnitsInContent = false,
+        TimeUnit = BenchmarkDotNet.Horology.TimeUnit.Microsecond,
+        SizeUnit = BenchmarkDotNet.Columns.SizeUnit.KB
+    }));
+</code></pre>
+<p>Excerpt from the resulting CSV file:</p>
+<pre><code>Method,...,Mean [us],Error [us],StdDev [us],Min [us],Max [us],Allocated [KB]
+Benchmark,...,&quot;37,647.6&quot;,&quot;32,717.9&quot;,&quot;21,640.9&quot;,&quot;11,209.2&quot;,&quot;59,492.6&quot;,1.58
+</code></pre>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/articles/configs/exporters.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,361 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Sample: IntroExportJson | BenchmarkDotNet </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Sample: IntroExportJson | BenchmarkDotNet ">
+    <meta name="generator" content="docfx 2.37.1.0">
+    
+    <link rel="shortcut icon" href="../../logo/icon-32.png">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    <meta property="docfx:rel" content="../../">
+    
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  
+      ga('create', 'UA-41419012-6', 'auto');
+      ga('send', 'pageview');
+  
+    </script>
+    <!-- /Google Analytics -->
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function (d, w, c) {
+            (w[c] = w[c] || []).push(function() {
+                try {
+                    w.yaCounter40812449 = new Ya.Metrika({
+                        id:40812449,
+                        clickmap:true,
+                        trackLinks:true,
+                        accurateTrackBounce:true
+                    });
+                } catch(e) { }
+            });
+  
+            var n = d.getElementsByTagName("script")[0],
+                s = d.createElement("script"),
+                f = function () { n.parentNode.insertBefore(s, n); };
+            s.type = "text/javascript";
+            s.async = true;
+            s.src = "https://mc.yandex.ru/metrika/watch.js";
+  
+            if (w.opera == "[object Opera]") {
+                d.addEventListener("DOMContentLoaded", f, false);
+            } else { f(); }
+        })(document, window, "yandex_metrika_callbacks");
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo/icon.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list"></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="BenchmarkDotNet.Samples.IntroExportJson">
+<h2 id="sample-introexportjson">Sample: IntroExportJson</h2>
+
+<p>BenchmarkDotNet has a set of json exporters. You can customize the following properties of these exporters:</p>
+<ul>
+<li><code>fileNameSuffix</code>: a string which be placed in the end of target file name.</li>
+<li><code>indentJson</code>=<code>false</code>/<code>true</code>: should we format json or not.</li>
+<li><code>excludeMeasurements</code>=<code>false</code>/<code>true</code>: should we exclude detailed information about measurements or not
+(the final summary with statistics will be in the json file anyway).</li>
+</ul>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroExportJson.cs">using System.Threading;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Exporters.Json;
+
+namespace BenchmarkDotNet.Samples
+{
+    // *** Attribute style ***
+    
+    [DryJob]
+    [JsonExporterAttribute.Brief]
+    [JsonExporterAttribute.Full]
+    [JsonExporterAttribute.BriefCompressed]
+    [JsonExporterAttribute.FullCompressed]
+    [JsonExporter(&quot;-custom&quot;, indentJson: true, excludeMeasurements: true)]
+    public class IntroExportJson
+    {
+        [Benchmark] public void Sleep10() =&gt; Thread.Sleep(10);
+        [Benchmark] public void Sleep20() =&gt; Thread.Sleep(20);
+    }
+    
+    // *** Object style ***
+    
+    [Config(typeof(Config))]
+    public class IntroJsonExportObjectStyle
+    {
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                Add(JsonExporter.Brief);
+                Add(JsonExporter.Full);
+                Add(JsonExporter.BriefCompressed);
+                Add(JsonExporter.FullCompressed);
+                Add(JsonExporter.Custom(&quot;-custom&quot;, indentJson: true, excludeMeasurements: true));
+            }
+        }
+        
+        [Benchmark] public void Sleep10() =&gt; Thread.Sleep(10);
+        [Benchmark] public void Sleep20() =&gt; Thread.Sleep(20);
+    }
+}
+</code></pre><h3 id="output">Output</h3>
+<p>Example of <code>IntroJsonExport-report-brief.json</code>:</p>
+<pre><code class="lang-js">{
+   &quot;Title&quot;:&quot;IntroJsonExport&quot;,
+   &quot;HostEnvironmentInfo&quot;:{
+      &quot;BenchmarkDotNetCaption&quot;:&quot;BenchmarkDotNet-Dev.Core&quot;,
+      &quot;BenchmarkDotNetVersion&quot;:&quot;0.9.9.0&quot;,
+      &quot;OsVersion&quot;:&quot;Microsoft Windows NT 6.2.9200.0&quot;,
+      &quot;ProcessorName&quot;:{
+         &quot;IsValueCreated&quot;:true,
+         &quot;Value&quot;:&quot;Intel(R) Core(TM) i7-4702MQ CPU 2.20GHz&quot;
+      },
+      &quot;ProcessorCount&quot;:8,
+      &quot;ClrVersion&quot;:&quot;MS.NET 4.0.30319.42000&quot;,
+      &quot;Architecture&quot;:&quot;64-bit&quot;,
+      &quot;HasAttachedDebugger&quot;:false,
+      &quot;HasRyuJit&quot;:true,
+      &quot;Configuration&quot;:&quot;RELEASE&quot;,
+      &quot;JitModules&quot;:&quot;clrjit-v4.6.1586.0&quot;,
+      &quot;DotNetCliVersion&quot;:&quot;1.0.0-preview2-003121&quot;,
+      &quot;ChronometerFrequency&quot;:2143474,
+      &quot;HardwareTimerKind&quot;:&quot;Tsc&quot;
+   },
+   &quot;Benchmarks&quot;:[
+      {
+         &quot;ShortInfo&quot;:&quot;IntroJsonExport_Sleep10&quot;,
+         &quot;Namespace&quot;:&quot;BenchmarkDotNet.Samples.Intro&quot;,
+         &quot;Type&quot;:&quot;IntroJsonExport&quot;,
+         &quot;Method&quot;:&quot;Sleep10&quot;,
+         &quot;MethodTitle&quot;:&quot;Sleep10&quot;,
+         &quot;Parameters&quot;:&quot;&quot;,
+         &quot;Properties&quot;:{
+            &quot;Mode&quot;:&quot;Throughput&quot;,
+            &quot;Platform&quot;:&quot;Host&quot;,
+            &quot;Jit&quot;:&quot;Host&quot;,
+            &quot;Runtime&quot;:&quot;Host&quot;,
+            &quot;GcMode&quot;:&quot;Host&quot;,
+            &quot;WarmupCount&quot;:&quot;Auto&quot;,
+            &quot;TargetCount&quot;:&quot;Auto&quot;,
+            &quot;LaunchCount&quot;:&quot;Auto&quot;,
+            &quot;IterationTime&quot;:&quot;Auto&quot;,
+            &quot;Affinity&quot;:&quot;Auto&quot;
+         },
+         &quot;Statistics&quot;:{
+            &quot;N&quot;:20,
+            &quot;Min&quot;:10265993.7209375,
+            &quot;LowerFence&quot;:10255329.082734371,
+            &quot;Q1&quot;:10337369.528437499,
+            &quot;Median&quot;:10360382.6953125,
+            &quot;Mean&quot;:10362283.085796878,
+            &quot;Q3&quot;:10392063.158906251,
+            &quot;UpperFence&quot;:10474103.60460938,
+            &quot;Max&quot;:10436008.3209375,
+            &quot;InterquartileRange&quot;:54693.630468752235,
+            &quot;Outliers&quot;:[
+               
+            ],
+            &quot;StandardError&quot;:10219.304338928456,
+            &quot;Variance&quot;:2088683623.4328396,
+            &quot;StandardDeviation&quot;:45702.118369205156,
+            &quot;Skewness&quot;:-0.1242777170069375,
+            &quot;Kurtosis&quot;:2.31980277935226,
+            &quot;ConfidenceInterval&quot;:{
+               &quot;Mean&quot;:10362283.085796878,
+               &quot;Error&quot;:10219.304338928456,
+               &quot;Level&quot;:6,
+               &quot;Margin&quot;:20029.836504299772,
+               &quot;Lower&quot;:10342253.249292579,
+               &quot;Upper&quot;:10382312.922301177
+            },
+            &quot;Percentiles&quot;:{
+               &quot;P0&quot;:10265993.7209375,
+               &quot;P25&quot;:10338555.905625,
+               &quot;P50&quot;:10360382.6953125,
+               &quot;P67&quot;:10373496.555659376,
+               &quot;P80&quot;:10400703.4841875,
+               &quot;P85&quot;:10417280.326718749,
+               &quot;P90&quot;:10424125.595812501,
+               &quot;P95&quot;:10435620.51609375,
+               &quot;P100&quot;:10436008.3209375
+            }
+         }
+      },{
+         &quot;ShortInfo&quot;:&quot;IntroJsonExport_Sleep20&quot;,
+         &quot;Namespace&quot;:&quot;BenchmarkDotNet.Samples.Intro&quot;,
+         &quot;Type&quot;:&quot;IntroJsonExport&quot;,
+         &quot;Method&quot;:&quot;Sleep20&quot;,
+         &quot;MethodTitle&quot;:&quot;Sleep20&quot;,
+         &quot;Parameters&quot;:&quot;&quot;,
+         &quot;Properties&quot;:{
+            &quot;Mode&quot;:&quot;Throughput&quot;,
+            &quot;Platform&quot;:&quot;Host&quot;,
+            &quot;Jit&quot;:&quot;Host&quot;,
+            &quot;Runtime&quot;:&quot;Host&quot;,
+            &quot;GcMode&quot;:&quot;Host&quot;,
+            &quot;WarmupCount&quot;:&quot;Auto&quot;,
+            &quot;TargetCount&quot;:&quot;Auto&quot;,
+            &quot;LaunchCount&quot;:&quot;Auto&quot;,
+            &quot;IterationTime&quot;:&quot;Auto&quot;,
+            &quot;Affinity&quot;:&quot;Auto&quot;
+         },
+         &quot;Statistics&quot;:{
+            &quot;N&quot;:20,
+            &quot;Min&quot;:20258672.37,
+            &quot;LowerFence&quot;:20206333.269843742,
+            &quot;Q1&quot;:20325342.761249997,
+            &quot;Median&quot;:20362636.192500003,
+            &quot;Mean&quot;:20360791.931687497,
+            &quot;Q3&quot;:20404682.4221875,
+            &quot;UpperFence&quot;:20523691.913593754,
+            &quot;Max&quot;:20422396.073125,
+            &quot;InterquartileRange&quot;:79339.66093750298,
+            &quot;Outliers&quot;:[
+               
+            ],
+            &quot;StandardError&quot;:10728.817907277158,
+            &quot;Variance&quot;:2302150673.7502208,
+            &quot;StandardDeviation&quot;:47980.732317777525,
+            &quot;Skewness&quot;:-0.50826238372439869,
+            &quot;Kurtosis&quot;:2.11050327966268,
+            &quot;ConfidenceInterval&quot;:{
+               &quot;Mean&quot;:20360791.931687497,
+               &quot;Error&quot;:10728.817907277158,
+               &quot;Level&quot;:6,
+               &quot;Margin&quot;:21028.48309826323,
+               &quot;Lower&quot;:20339763.448589232,
+               &quot;Upper&quot;:20381820.414785761
+            },
+            &quot;Percentiles&quot;:{
+               &quot;P0&quot;:20258672.37,
+               &quot;P25&quot;:20327638.975312497,
+               &quot;P50&quot;:20362636.192500003,
+               &quot;P67&quot;:20391669.3762875,
+               &quot;P80&quot;:20406370.68625,
+               &quot;P85&quot;:20412542.034406248,
+               &quot;P90&quot;:20414412.5376875,
+               &quot;P95&quot;:20416606.697718751,
+               &quot;P100&quot;:20422396.073125
+            }
+         }
+      }
+   ]
+}
+</code></pre>
+<h3 id="links">Links</h3>
+<ul>
+<li><a class="xref" href="../configs/exporters.html">Exporters</a></li>
+<li>The permanent link to this sample: <a class="xref" href="IntroExportJson.html">Sample: IntroExportJson</a></li>
+</ul>
+<hr>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/articles/samples/IntroExportJson.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

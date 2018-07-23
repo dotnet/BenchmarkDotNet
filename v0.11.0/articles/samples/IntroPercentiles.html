@@ -1,0 +1,393 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Sample: IntroPercentiles | BenchmarkDotNet </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Sample: IntroPercentiles | BenchmarkDotNet ">
+    <meta name="generator" content="docfx 2.37.1.0">
+    
+    <link rel="shortcut icon" href="../../logo/icon-32.png">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    <meta property="docfx:rel" content="../../">
+    
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  
+      ga('create', 'UA-41419012-6', 'auto');
+      ga('send', 'pageview');
+  
+    </script>
+    <!-- /Google Analytics -->
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function (d, w, c) {
+            (w[c] = w[c] || []).push(function() {
+                try {
+                    w.yaCounter40812449 = new Ya.Metrika({
+                        id:40812449,
+                        clickmap:true,
+                        trackLinks:true,
+                        accurateTrackBounce:true
+                    });
+                } catch(e) { }
+            });
+  
+            var n = d.getElementsByTagName("script")[0],
+                s = d.createElement("script"),
+                f = function () { n.parentNode.insertBefore(s, n); };
+            s.type = "text/javascript";
+            s.async = true;
+            s.src = "https://mc.yandex.ru/metrika/watch.js";
+  
+            if (w.opera == "[object Opera]") {
+                d.addEventListener("DOMContentLoaded", f, false);
+            } else { f(); }
+        })(document, window, "yandex_metrika_callbacks");
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo/icon.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list"></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="BenchmarkDotNet.Samples.IntroPercentiles">
+<h2 id="sample-intropercentiles">Sample: IntroPercentiles</h2>
+
+<p>The percentile represents a higher boundary for specified percentage of the measurements.
+For example, 95th percentile = 500ms means that 95% of all samples are not slower than 500ms.
+This metric is not very useful in microbenchmarks, as the values from consequent runs have a very narrow distribution.
+However, real-world scenarios often have so-called long tail distribution
+(due to IO delays, locks, memory access latency and so on), so the average execution time cannot be trusted.</p>
+<p>The percentiles allow to include the tail of distribution into the comparison.
+However, it requires some preparations steps.
+At first, you should have enough runs to count percentiles from.
+The <code>TargetCount</code> in the config should be set to 10-20 runs at least.</p>
+<p>Second, the count of iterations for each run should not be very high, or the peak timings will be averaged.
+The <code>IterationTime = 25</code> works fine for most cases;
+for long-running benchmarks the <code>Mode = Mode.SingleRun</code> will be the best choice.
+However, feel free to experiment with the config values.</p>
+<p>Third, if you want to be sure that measurements are repeatable, set the <code>LaunchCount</code> to 3 or higher.</p>
+<p>And last, don't forget to include the columns into the config.
+They are not included by default (as said above, these are not too useful for most of the benchmarks).
+There're predefined <code>StatisticColumn.P0</code>..<code>StatisticColumn.P100</code> for absolute timing percentiles and
+<code>BaselineDiffColumn.Scaled50</code>..<code>BaselineDiffColumn.Scaled95</code>
+for relative percentiles.</p>
+<h3 id="example">Example</h3>
+<p>Run the IntroPercentiles sample. It contains three benchmark methods.</p>
+<ul>
+<li>First delays for 20 ms constantly.</li>
+<li>The second has random delays for 10..30 ms.</li>
+<li>And the third delays for 10ms 85 times of 100 and delays for 40ms 15 times of 100.</li>
+</ul>
+<p>Here's the output from the benchmark (some columns removed for brevity):</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Median</th>
+<th>StdDev</th>
+<th>Scaled</th>
+<th>P0</th>
+<th>P50</th>
+<th>P80</th>
+<th>P85</th>
+<th>P95</th>
+<th>P100</th>
+<th>ScaledP50</th>
+<th>ScaledP85</th>
+<th>ScaledP95</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ConstantDelays</td>
+<td>20.3813 ms</td>
+<td>0.2051 ms</td>
+<td>1.00</td>
+<td>20.0272 ms</td>
+<td>20.3813 ms</td>
+<td>20.4895 ms</td>
+<td>20.4954 ms</td>
+<td>20.5869 ms</td>
+<td>21.1471 ms</td>
+<td>1.00</td>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+<tr>
+<td>RandomDelays</td>
+<td>19.8055 ms</td>
+<td>5.7556 ms</td>
+<td>0.97</td>
+<td>10.0793 ms</td>
+<td>19.8055 ms</td>
+<td>25.4173 ms</td>
+<td>26.5187 ms</td>
+<td>29.0313 ms</td>
+<td>29.4550 ms</td>
+<td>0.97</td>
+<td>1.29</td>
+<td>1.41</td>
+</tr>
+<tr>
+<td>RareDelays</td>
+<td>10.3385 ms</td>
+<td>11.4828 ms</td>
+<td>0.51</td>
+<td>10.0157 ms</td>
+<td>10.3385 ms</td>
+<td>10.5211 ms</td>
+<td>40.0560 ms</td>
+<td>40.3992 ms</td>
+<td>40.4674 ms</td>
+<td>0.51</td>
+<td>1.95</td>
+<td>1.96</td>
+</tr>
+</tbody>
+</table>
+<p>Note that the 'Scaled' column kinda lies to you.
+The &quot;almost same&quot; RandomDelays method is actually not so performant and
+the seems-to-be-fastest RareDelays method is 2 times slower 15 times of 100.</p>
+<p>Also, it's very easy to screw the results with incorrect setup. For example, the same code being run with</p>
+<pre><code class="lang-cs">new Job
+{
+	TargetCount = 5,
+	IterationTime = 500
+}
+</code></pre>
+<p>completely hides the peak values:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Median</th>
+<th>StdDev</th>
+<th>Scaled</th>
+<th>P0</th>
+<th>P50</th>
+<th>P80</th>
+<th>P85</th>
+<th>P95</th>
+<th>P100</th>
+<th>ScaledP50</th>
+<th>ScaledP85</th>
+<th>ScaledP95</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ConstantDelays</td>
+<td>20.2692 ms</td>
+<td>0.0308 ms</td>
+<td>1.00</td>
+<td>20.1986 ms</td>
+<td>20.2692 ms</td>
+<td>20.2843 ms</td>
+<td>20.2968 ms</td>
+<td>20.3097 ms</td>
+<td>20.3122 ms</td>
+<td>1.00</td>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+<tr>
+<td>RandomDelays</td>
+<td>18.9965 ms</td>
+<td>0.8601 ms</td>
+<td>0.94</td>
+<td>18.1339 ms</td>
+<td>18.9965 ms</td>
+<td>19.8126 ms</td>
+<td>19.8278 ms</td>
+<td>20.4485 ms</td>
+<td>20.9466 ms</td>
+<td>0.94</td>
+<td>0.98</td>
+<td>1.01</td>
+</tr>
+<tr>
+<td>RareDelays</td>
+<td>14.0912 ms</td>
+<td>2.8619 ms</td>
+<td>0.70</td>
+<td>10.2606 ms</td>
+<td>14.0912 ms</td>
+<td>15.7653 ms</td>
+<td>17.3862 ms</td>
+<td>18.6728 ms</td>
+<td>18.6940 ms</td>
+<td>0.70</td>
+<td>0.86</td>
+<td>0.92</td>
+</tr>
+</tbody>
+</table>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroPercentiles.cs">using System;
+using System.Threading;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Engines;
+
+namespace BenchmarkDotNet.Samples
+{
+    // Using percentiles for adequate timings representation
+    [Config(typeof(Config))]
+    [SimpleJob(RunStrategy.ColdStart, launchCount: 4,
+        warmupCount: 3, targetCount: 20, id: &quot;MyJob&quot;)]
+    public class IntroPercentiles
+    {
+        // To share between runs.
+        // DO NOT do this in production code. The System.Random IS NOT threadsafe.
+        private static readonly Random Rnd = new Random();
+
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                Add(StatisticColumn.P0,
+                    StatisticColumn.P25,
+                    StatisticColumn.P50,
+                    StatisticColumn.P67,
+                    StatisticColumn.P80,
+                    StatisticColumn.P85,
+                    StatisticColumn.P90,
+                    StatisticColumn.P95,
+                    StatisticColumn.P100);
+            }
+        }
+
+        [Benchmark(Baseline = true)]
+        public void ConstantDelays() =&gt; Thread.Sleep(20);
+
+        [Benchmark]
+        public void RandomDelays() =&gt; Thread.Sleep(10 + (int) (20 * Rnd.NextDouble()));
+
+        [Benchmark]
+        public void RareDelays()
+        {
+            int rndTime = 10;
+            // Bigger delays for 15% of the runs
+            if (Rnd.NextDouble() &gt; 0.85)
+            {
+                rndTime += 30;
+            }
+
+            Thread.Sleep(rndTime);
+        }
+    }
+}
+</code></pre><h3 id="links">Links</h3>
+<ul>
+<li><a class="xref" href="../features/statistics.html">Statistics</a></li>
+<li>The permanent link to this sample: <a class="xref" href="IntroPercentiles.html">Sample: IntroPercentiles</a></li>
+</ul>
+<hr>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/articles/samples/IntroPercentiles.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

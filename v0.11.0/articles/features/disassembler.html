@@ -1,0 +1,468 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Disassembler | BenchmarkDotNet </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Disassembler | BenchmarkDotNet ">
+    <meta name="generator" content="docfx 2.37.1.0">
+    
+    <link rel="shortcut icon" href="../../logo/icon-32.png">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    <meta property="docfx:rel" content="../../">
+    
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  
+      ga('create', 'UA-41419012-6', 'auto');
+      ga('send', 'pageview');
+  
+    </script>
+    <!-- /Google Analytics -->
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function (d, w, c) {
+            (w[c] = w[c] || []).push(function() {
+                try {
+                    w.yaCounter40812449 = new Ya.Metrika({
+                        id:40812449,
+                        clickmap:true,
+                        trackLinks:true,
+                        accurateTrackBounce:true
+                    });
+                } catch(e) { }
+            });
+  
+            var n = d.getElementsByTagName("script")[0],
+                s = d.createElement("script"),
+                f = function () { n.parentNode.insertBefore(s, n); };
+            s.type = "text/javascript";
+            s.async = true;
+            s.src = "https://mc.yandex.ru/metrika/watch.js";
+  
+            if (w.opera == "[object Opera]") {
+                d.addEventListener("DOMContentLoaded", f, false);
+            } else { f(); }
+        })(document, window, "yandex_metrika_callbacks");
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo/icon.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list"></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="docs.disassembler">
+<h1 id="disassembler">Disassembler</h1>
+
+<p>You need to use the <code>DisassemblyDiagnoser</code> attribute to configure it. The available options are:</p>
+<ul>
+<li><code>printIL</code>: IL will be printed. False by default.</li>
+<li><code>printAsm</code>: ASM will be printed. True by default.</li>
+<li><code>printSource</code>: C# source code will be printed. False by default.</li>
+<li><code>printPrologAndEpilog</code>: ASM for prolog and epilog will be printed. False by default.</li>
+<li><code>recursiveDepth</code>: Includes called methods to given level. 1 by default, indexed from 1. To print just benchmark set to 0</li>
+</ul>
+<h3 id="requirements">Requirements</h3>
+<p>Disassembly Diagnoser requires following settings in your <code>.csproj</code> file:</p>
+<pre><code class="lang-xml">&lt;PropertyGroup&gt;
+  &lt;PlatformTarget&gt;AnyCPU&lt;/PlatformTarget&gt;
+  &lt;DebugType&gt;pdbonly&lt;/DebugType&gt;
+  &lt;DebugSymbols&gt;true&lt;/DebugSymbols&gt;
+&lt;/PropertyGroup&gt;
+</code></pre>
+<p>To get the source code we need to locate and read the <code>.pdb</code> files.
+This is why we need <code>DebugType</code> and <code>DebugSymbols</code> settings.
+To compare different platforms the project which defines benchmarks has to target <code>AnyCPU</code>.</p>
+<h3 id="disassembly-diagnoser-for-mono-on-windows">Disassembly Diagnoser for Mono on Windows</h3>
+<p>If you want to get a disassembly listing for Mono on Windows, you need <code>as</code> and <code>x86_64-w64-mingw32-objdump.exe</code> tools.
+If you don't have it, you will get a warning like follows:</p>
+<pre><code>It's impossible to get Mono disasm because you don't have some required tools:
+'as' is not recognized as an internal or external command
+'x86_64-w64-mingw32-objdump.exe' is not recognized as an internal or external command
+</code></pre>
+<p>The easiest way to get these tools:</p>
+<ol>
+<li>Download and install <a href="https://www.cygwin.com/">Cygwin</a></li>
+<li>On the &quot;Select Packages&quot; screen, search for <code>binutils</code></li>
+<li>Install <code>binutils</code> and <code>mingw64-x86_64-binutils</code></li>
+<li>Add <code>cygwin64\bin\</code> (or <code>cygwin\bin\</code>) in <code>%PATH%</code></li>
+</ol>
+<p><img src="../../images/cygwin-binutils.png" alt=""></p>
+<hr>
+<h2 id="sample-introdisassembly">Sample: IntroDisassembly</h2>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroDisassembly.cs">using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Environments;
+
+namespace BenchmarkDotNet.Samples
+{
+    [DryCoreJob, DryMonoJob, DryClrJob(Platform.X86)]
+    [DisassemblyDiagnoser]
+    public class IntroDisassembly
+    {
+        [Benchmark]
+        public double Sum()
+        {
+            double res = 0;
+            for (int i = 0; i &lt; 64; i++)
+                res += i;
+            return res;
+        }
+    }
+}
+</code></pre><h3 id="output">Output</h3>
+<pre><code class="lang-x86asm">; .NET Framework 4.7.2 (CLR 4.0.30319.42000), 32bit LegacyJIT-v4.7.3110.0
+05452718 BenchmarkDotNet.Samples.IntroDisassembly.Sum()
+IL_0000: ldc.r8 0
+IL_0009: stloc.0
+0545271c d9ee            fldz
+IL_000a: ldc.i4.0
+IL_000b: stloc.1
+IL_000c: br.s IL_0017
+0545271e 33c0            xor     eax,eax
+IL_000e: ldloc.0
+IL_000f: ldloc.1
+IL_0010: conv.r8
+IL_0011: add
+IL_0012: stloc.0
+05452720 8945fc          mov     dword ptr [ebp-4],eax
+05452723 db45fc          fild    dword ptr [ebp-4]
+05452726 dec1            faddp   st(1),st
+IL_0013: ldloc.1
+IL_0014: ldc.i4.1
+IL_0015: add
+IL_0016: stloc.1
+05452728 40              inc     eax
+IL_0017: ldloc.1
+IL_0018: ldc.i4.s 64
+IL_001a: blt.s IL_000e
+05452729 83f840          cmp     eax,40h
+0545272c 7cf2            jl      05452720
+IL_001c: ldloc.0
+IL_001d: ret
+0545272e 8be5            mov     esp,ebp
+</code></pre>
+<pre><code class="lang-x86asm">; .NET Core 2.1.0 (CoreCLR 4.6.26515.07, CoreFX 4.6.26515.06), 64bit RyuJIT
+00007ffa`6c621320 BenchmarkDotNet.Samples.IntroDisassembly.Sum()
+IL_0000: ldc.r8 0
+IL_0009: stloc.0
+00007ffa`6c621323 c4e17857c0      vxorps  xmm0,xmm0,xmm0
+IL_000a: ldc.i4.0
+IL_000b: stloc.1
+IL_000c: br.s IL_0017
+00007ffa`6c621328 33c0            xor     eax,eax
+IL_000e: ldloc.0
+IL_000f: ldloc.1
+IL_0010: conv.r8
+IL_0011: add
+IL_0012: stloc.0
+00007ffa`6c62132a c4e17057c9      vxorps  xmm1,xmm1,xmm1
+00007ffa`6c62132f c4e1732ac8      vcvtsi2sd xmm1,xmm1,eax
+00007ffa`6c621334 c4e17b58c1      vaddsd  xmm0,xmm0,xmm1
+IL_0013: ldloc.1
+IL_0014: ldc.i4.1
+IL_0015: add
+IL_0016: stloc.1
+00007ffa`6c621339 ffc0            inc     eax
+IL_0017: ldloc.1
+IL_0018: ldc.i4.s 64
+IL_001a: blt.s IL_000e
+00007ffa`6c62133b 83f840          cmp     eax,40h
+00007ffa`6c62133e 7cea            jl      00007ffa`6c62132a
+IL_001c: ldloc.0
+IL_001d: ret
+00007ffa`6c621340 c3              ret
+</code></pre>
+<pre><code class="lang-x86asm">Mono 5.12.0 (Visual Studio), 64bit
+ Sum
+sub    $0x18,%rsp
+mov    %rsi,(%rsp)
+xorpd  %xmm0,%xmm0
+movsd  %xmm0,0x8(%rsp)
+xor    %esi,%esi
+jmp    2e 
+xchg   %ax,%ax
+movsd  0x8(%rsp),%xmm0
+cvtsi2sd %esi,%xmm1
+addsd  %xmm1,%xmm0
+movsd  %xmm0,0x8(%rsp)
+inc    %esi
+cmp    $0x40,%esi
+jl     18 
+movsd  0x8(%rsp),%xmm0
+mov    (%rsp),%rsi
+add    $0x18,%rsp
+retq   
+</code></pre>
+<h3 id="links">Links</h3>
+<ul>
+<li><a class="xref" href="../configs/diagnosers.html">Diagnosers</a></li>
+<li><a class="xref" href="disassembler.html">Disassembler</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroDisassembly.html">Sample: IntroDisassembly</a></li>
+</ul>
+<hr>
+<h2 id="sample-introdisassemblyryujit">Sample: IntroDisassemblyRyuJit</h2>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroDisassemblyRyuJit.cs">using System.Linq;
+using BenchmarkDotNet.Attributes;
+
+namespace BenchmarkDotNet.Samples
+{
+    [DisassemblyDiagnoser(printAsm: true, printSource: true)]
+    [RyuJitX64Job]
+    public class IntroDisassemblyRyuJit
+    {
+        int[] field = Enumerable.Range(0, 100).ToArray();
+
+        [Benchmark]
+        public int SumLocal()
+        {
+            var local = field; // we use local variable that points to the field
+
+            int sum = 0;
+            for (int i = 0; i &lt; local.Length; i++)
+                sum += local[i];
+
+            return sum;
+        }
+
+        [Benchmark]
+        public int SumField()
+        {
+            int sum = 0;
+            for (int i = 0; i &lt; field.Length; i++)
+                sum += field[i];
+
+            return sum;
+        }
+    }
+}
+</code></pre><h3 id="output">Output</h3>
+<p><img src="../../images/disasm-demo.png" alt=""></p>
+<h3 id="links">Links</h3>
+<ul>
+<li><a class="xref" href="../configs/diagnosers.html">Diagnosers</a></li>
+<li><a class="xref" href="disassembler.html">Disassembler</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroDisassemblyRyuJit.html">Sample: IntroDisassemblyRyuJit</a></li>
+</ul>
+<hr>
+<h2 id="sample-introdisassemblyalljits">Sample: IntroDisassemblyAllJits</h2>
+<p>You can use a single config to compare the generated assembly code for ALL JITs.</p>
+<p>But to allow benchmarking any target platform architecture the project which defines benchmarks has to target <strong>AnyCPU</strong>.</p>
+<pre><code class="lang-xml">&lt;PropertyGroup&gt;
+  &lt;PlatformTarget&gt;AnyCPU&lt;/PlatformTarget&gt;
+&lt;/PropertyGroup&gt;
+</code></pre>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroDisassemblyAllJits.cs">using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Toolchains.CsProj;
+
+namespace BenchmarkDotNet.Samples
+{
+    [Config(typeof(MultipleJits))]
+    public class IntroDisassemblyAllJits
+    {
+        public class MultipleJits : ManualConfig
+        {
+            public MultipleJits()
+            {
+                Add(Job.ShortRun.With(new MonoRuntime(name: &quot;Mono x86&quot;, customPath: @&quot;C:\Program Files (x86)\Mono\bin\mono.exe&quot;)).With(Platform.X86));
+                Add(Job.ShortRun.With(new MonoRuntime(name: &quot;Mono x64&quot;, customPath: @&quot;C:\Program Files\Mono\bin\mono.exe&quot;)).With(Platform.X64));
+
+                Add(Job.ShortRun.With(Jit.LegacyJit).With(Platform.X86).With(Runtime.Clr));
+                Add(Job.ShortRun.With(Jit.LegacyJit).With(Platform.X64).With(Runtime.Clr));
+
+                Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Clr));
+
+                // RyuJit for .NET Core 2.0
+                Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp20));
+
+                // RyuJit for .NET Core 2.1
+                Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp21));
+
+                Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(printAsm: true, printPrologAndEpilog: true, recursiveDepth: 3)));
+            }
+        }
+        
+        private Increment increment = new Increment();
+
+        [Benchmark]
+        public int CallVirtualMethod() =&gt; increment.OperateTwice(10);
+
+        public abstract class Operation  // abstract unary integer operation
+        {
+            public abstract int Operate(int input);
+
+            public int OperateTwice(int input) =&gt; Operate(Operate(input)); // two virtual calls to Operate
+        }
+
+        public sealed class Increment : Operation // concrete, sealed operation: increment by fixed amount
+        {
+            public readonly int Amount;
+            public Increment(int amount = 1) { Amount = amount; }
+
+            public override int Operate(int input) =&gt; input + Amount;
+        }
+    }
+}
+</code></pre><h3 id="output">Output</h3>
+<p>The disassembly result can be obtained <a href="http://adamsitnik.com/files/disasm/Jit_Devirtualization-disassembly-report.html">here</a>.
+The file was too big to embed it in this doc page.</p>
+<h3 id="links">Links</h3>
+<ul>
+<li><a class="xref" href="../configs/diagnosers.html">Diagnosers</a></li>
+<li><a class="xref" href="disassembler.html">Disassembler</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroDisassemblyAllJits.html">Sample: IntroDisassemblyAllJits</a></li>
+</ul>
+<hr>
+<h2 id="sample-introdisassemblydry">Sample: IntroDisassemblyDry</h2>
+<p><strong>Getting only the Disassembly without running the benchmarks for a long time.</strong></p>
+<p>Sometimes you might be interested only in the disassembly, not the results of the benchmarks.
+In that case you can use <strong>Job.Dry</strong> which runs the benchmark only <strong>once</strong>.</p>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroDisassemblyDry.cs">using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Toolchains.CsProj;
+
+namespace BenchmarkDotNet.Samples
+{
+    [Config(typeof(JustDisassembly))]
+    public class IntroDisassemblyDry
+    {
+        public class JustDisassembly : ManualConfig
+        {
+            public JustDisassembly()
+            {
+                Add(Job.Dry.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp20));
+                Add(Job.Dry.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp21));
+
+                Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(printAsm: true, printPrologAndEpilog: true, recursiveDepth: 3)));
+            }
+        }
+
+        [Benchmark]
+        public void Foo()
+        {
+            
+        }
+    }
+}
+</code></pre><h3 id="links">Links</h3>
+<ul>
+<li><a class="xref" href="../configs/diagnosers.html">Diagnosers</a></li>
+<li><a class="xref" href="disassembler.html">Disassembler</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroDisassemblyDry.html">Sample: IntroDisassemblyDry</a></li>
+</ul>
+<hr>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/articles/features/disassembler.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

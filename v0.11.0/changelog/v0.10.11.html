@@ -1,0 +1,238 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>BenchmarkDotNet v0.10.11 | BenchmarkDotNet </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="BenchmarkDotNet v0.10.11 | BenchmarkDotNet ">
+    <meta name="generator" content="docfx 2.37.1.0">
+    
+    <link rel="shortcut icon" href="../logo/icon-32.png">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  
+      ga('create', 'UA-41419012-6', 'auto');
+      ga('send', 'pageview');
+  
+    </script>
+    <!-- /Google Analytics -->
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function (d, w, c) {
+            (w[c] = w[c] || []).push(function() {
+                try {
+                    w.yaCounter40812449 = new Ya.Metrika({
+                        id:40812449,
+                        clickmap:true,
+                        trackLinks:true,
+                        accurateTrackBounce:true
+                    });
+                } catch(e) { }
+            });
+  
+            var n = d.getElementsByTagName("script")[0],
+                s = d.createElement("script"),
+                f = function () { n.parentNode.insertBefore(s, n); };
+            s.type = "text/javascript";
+            s.async = true;
+            s.src = "https://mc.yandex.ru/metrika/watch.js";
+  
+            if (w.opera == "[object Opera]") {
+                d.addEventListener("DOMContentLoaded", f, false);
+            } else { f(); }
+        })(document, window, "yandex_metrika_callbacks");
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo/icon.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list"></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="changelog.v0.10.11">
+<h1 id="benchmarkdotnet-v01011">BenchmarkDotNet v0.10.11</h1>
+
+<h2 id="highlights">Highlights</h2>
+<ul>
+<li>ByRef and Stack-only support (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/492">#492</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/blob/edf20758871ec621fdbfd93d862769da46c4bf15/samples/BenchmarkDotNet.Samples/IL/IL_RefReturns.cs">sample</a>)</li>
+<li>.NET Core 2.1 support (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/587">#587</a>)</li>
+<li>Improved LINQPad support</li>
+<li>Smart logic for precision in ScaledColumn (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/509">#509</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/issues/590">#590</a>)</li>
+<li>Better macOS version detection (<a href="https://github.com/dotnet/BenchmarkDotNet/commit/15d72388436c1060e87662b5f4519b9e7e071627">15d72388</a>)</li>
+<li>Minor fixes and improvements</li>
+</ul>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.10.11">v0.10.11</a> scope,
+6 issues were resolved and 8 pull requests where merged.
+This release includes 18 commits by 8 contributors.</p>
+<h2 id="resolved-issues-6">Resolved issues (6)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/509">#509</a> Better formatting for the Scaled column</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/579">#579</a> Improve error message about non-optimized dependencies (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/580">#580</a> How to get benchmarks running from LINQPad? (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/587">#587</a> Support netcoreapp2.1 (assignee: <a href="https://github.com/eerhardt">@eerhardt</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/588">#588</a> Broken appveyor build</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/593">#593</a> BenchmarkDotNet is not working with LinqPad (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+</ul>
+<h2 id="merged-pull-requests-8">Merged pull requests (8)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/492">#492</a> ByRef and Stack-only support (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/575">#575</a> xUnit runner upgrade and small tests refactoring (by <a href="https://github.com/Ky7m">@Ky7m</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/584">#584</a> Fixed typo. (by <a href="https://github.com/cincuranet">@cincuranet</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/589">#589</a> Add support for netcoreapp2.1 (by <a href="https://github.com/eerhardt">@eerhardt</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/590">#590</a> Add precision to Scaled Column (by <a href="https://github.com/Chrisgozd">@Chrisgozd</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/591">#591</a> Fix CI build (by <a href="https://github.com/Ky7m">@Ky7m</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/592">#592</a> Removed a xunit workaround because an issue has been fixed (by <a href="https://github.com/AlekseiKudelia">@AlekseiKudelia</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/597">#597</a> Fix typo in WithCustomBuildConfiguration API (by <a href="https://github.com/benjamin-hodgson">@benjamin-hodgson</a>)</li>
+</ul>
+<h2 id="commits-18">Commits (18)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2a2e6caf7a0bc2cc58508c528c603a2d72c77b59">2a2e6c</a> ByRef and Stack-only support (#492) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/676c777a05c6f2a9be9b297df8003689af659a7d">676c77</a> xUnit runner upgrade and small tests refactoring (#575) (by <a href="https://github.com/Ky7m">@Ky7m</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7a89cd2593618fe05dac68498a701a509bd6a4f8">7a89cd</a> Fixed typo. (by <a href="https://github.com/cincuranet">@cincuranet</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/dd28b2afb89b9111cc7c9bf85b055f5b3cc7cbe7">dd28b2</a> add better error text for non-optimized dlls + add it to FAQ, fixes #579 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/67e659b580b881de842f9c76dd56d0f21c447db3">67e659</a> detect LINQPad problems and tell the user how to change them, fixes #580 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/543bd6f0dff04239669ff5a190a8176844a9dcea">543bd6</a> don't warn about non-optimized LINQPad dependency (it's OK), #580 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8a94f271d4478226af0d2003a6d0932cd42ecd1d">8a94f2</a> Add support for netcoreapp2.1 (by <a href="https://github.com/eerhardt">@eerhardt</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fb39db6e0f9bcfbf9396ad7d564ec220b8834b80">fb39db</a> Merge pull request #589 from eerhardt/SupportNetCoreApp21 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ef11f065bceff6a2020bc09dd0ca535f29e5afb8">ef11f0</a> Add CoverageFilterXml in DotSettings (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/962b6a708420c535ba0a8819af04b457ee2ff25a">962b6a</a> Update DotSetttings (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/717b62b70a48ef20fdafb8792fe01cea63de1f78">717b62</a> BenchmarkDotNet.Horology cleanup (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d1720b77eccb0b9a686bdfdae166edc855711572">d1720b</a> Upgrade version to 2.0.3 and explicitly specify fx version for .netcoreapp2.0 (by <a href="https://github.com/Ky7m">@Ky7m</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/94d47a39f154368519523fe99f39c640ed654baa">94d47a</a> Removed a xunit workaround because an issue has been fixed (by <a href="https://github.com/AlekseiKudelia">@AlekseiKudelia</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/15d72388436c1060e87662b5f4519b9e7e071627">15d723</a> More details in GetOsVersion on macOS (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/696f89908e82118ecf9989c2484c23a6f52ba6b2">696f89</a> Add precision to Scaled Column (#590) (by <a href="https://github.com/Chrisgozd">@Chrisgozd</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e54924b5a2c5080c3e5e0b528d0d46dd9ffef889">e54924</a> Fix typo in WithCustomBuildConfiguration API (by <a href="https://github.com/benjamin-hodgson">@benjamin-hodgson</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8de978e67772ff3f1f4e47cabaa2c94ce198234c">8de978</a> Merge pull request #597 from benjamin-hodgson/patch-1 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/af15109226821ffcd0774df364f6d7695c4a2fdb">af1510</a> Set library version: 0.10.11 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="contributors-8">Contributors (8)</h2>
+<ul>
+<li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li>AlekseiKudelia (<a href="https://github.com/AlekseiKudelia">@AlekseiKudelia</a>)</li>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>Benjamin Hodgson (<a href="https://github.com/benjamin-hodgson">@benjamin-hodgson</a>)</li>
+<li>Christopher Gozdziewski (<a href="https://github.com/Chrisgozd">@Chrisgozd</a>)</li>
+<li>Eric Erhardt (<a href="https://github.com/eerhardt">@eerhardt</a>)</li>
+<li>Igor Fesenko (<a href="https://github.com/Ky7m">@Ky7m</a>)</li>
+<li>Jiri Cincura ↹ (<a href="https://github.com/cincuranet">@cincuranet</a>)</li>
+</ul>
+<p>Thank you very much!</p>
+<h2 id="additional-details">Additional details</h2>
+<p><em>Date: December 01, 2017</em></p>
+<p><em>Milestone: <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues?q=milestone%3Av0.10.11">v0.10.11</a></em>
+(<a href="https://github.com/dotnet/BenchmarkDotNet/compare/v0.10.10...v0.10.11">List of commits</a>)</p>
+<p><em>NuGet Packages:</em></p>
+<ul>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet/0.10.11">https://www.nuget.org/packages/BenchmarkDotNet/0.10.11</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Core/0.10.11">https://www.nuget.org/packages/BenchmarkDotNet.Core/0.10.11</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Toolchains.Roslyn/0.10.11">https://www.nuget.org/packages/BenchmarkDotNet.Toolchains.Roslyn/0.10.11</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.10.11">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.10.11</a></li>
+</ul>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/changelog/v0.10.11.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

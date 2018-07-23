@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Jobs - BenchmarkDotNet Documentation</title>
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../css/theme_colors.css" type="text/css" />
+    <link rel="stylesheet" href="../css/styles/vs.css">
+    <link rel="stylesheet" href="../css/font-awesome.4.5.0.min.css">
+
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-41419012-6', 'auto');
+      ga('send', 'pageview');
+
+    </script>
+    <!-- /Google Analytics -->
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function (d, w, c) {
+            (w[c] = w[c] || []).push(function() {
+                try {
+                    w.yaCounter40812449 = new Ya.Metrika({
+                        id:40812449,
+                        clickmap:true,
+                        trackLinks:true,
+                        accurateTrackBounce:true
+                    });
+                } catch(e) { }
+            });
+
+            var n = d.getElementsByTagName("script")[0],
+                s = d.createElement("script"),
+                f = function () { n.parentNode.insertBefore(s, n); };
+            s.type = "text/javascript";
+            s.async = true;
+            s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+            if (w.opera == "[object Opera]") {
+                d.addEventListener("DOMContentLoaded", f, false);
+            } else { f(); }
+        })(document, window, "yandex_metrika_callbacks");
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+</head>
+<body role="document">
+    <div class="grid-for-nav">
+        <nav data-toggle="nav-shift" class="nav-side stickynav">
+            <div class="side-nav-search">
+                <a href="../index.htm"><i class="fa fa-home"></i> BenchmarkDotNet Documentation</a>
+                <div role="search">
+                    <form id="search-form" class="form" action="../Docnet_search.htm" method="get">
+                        <input type="text" name="q" placeholder="Search docs" />
+                    </form>
+                </div>
+            </div>
+            <div class="menu menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+<ul>
+<li class="tocentry"><a href="../index.htm">Home</a>
+</li>
+
+<li class="tocentry"><a href="../Overview.htm">Overview</a>
+</li>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Guides.htm">Guides</a></span>
+</li>
+<li class="tocentry">
+<ul>
+<li><span class="navigationgroup"><i class="fa fa-caret-down"></i> <a href="../Configs.htm">Configs</a></span></li>
+<li class="tocentry"><a href="../Configs/Configs.htm">Configs</a>
+</li>
+<li class="tocentry current"><a class="current" href="../Configs/Jobs.htm">Jobs</a>
+<ul class="currentrelative">
+<li class="tocentry"><a href="#characteristics">Characteristics</a></li>
+<li class="tocentry"><a href="#usage">Usage</a></li>
+</ul>
+<li class="tocentry"><a href="../Configs/Columns.htm">Columns</a>
+</li>
+<li class="tocentry"><a href="../Configs/Exporters.htm">Exporters</a>
+</li>
+<li class="tocentry"><a href="../Configs/Loggers.htm">Loggers</a>
+</li>
+<li class="tocentry"><a href="../Configs/Diagnosers.htm">Diagnosers</a>
+</li>
+<li class="tocentry"><a href="../Configs/Toolchains.htm">Toolchains</a>
+</li>
+<li class="tocentry"><a href="../Configs/Analyzers.htm">Analyzers</a>
+</li>
+<li class="tocentry"><a href="../Configs/Validators.htm">Validators</a>
+</li>
+<li class="tocentry"><a href="../Configs/Filters.htm">Filters</a>
+</li>
+<li class="tocentry"><a href="../Configs/OrderProvider.htm">OrderProvider</a>
+</li>
+
+</ul>
+</li>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Advancedfeatures.htm">Advanced features</a></span>
+</li>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Internals.htm">Internals</a></span>
+</li>
+<li class="tocentry">
+<span class="navigationgroup"><i class="fa fa-caret-right"></i> <a href="../Contributing.htm">Contributing</a></span>
+</li>
+<li class="tocentry"><a href="../FAQ.htm">FAQ</a>
+</li>
+<li class="tocentry"><a href="../Team.htm">Team</a>
+</li>
+<li class="tocentry"><a href="../license.htm">License</a>
+</li>
+</ul>
+				<div class="toc-footer">
+					<span class="text-small">
+						<hr/>
+						<a href="https://github.com/FransBouma/DocNet" target="_blank">Made with <i class="fa fa-github"></i> DocNet</a>
+					</span>
+				</div>	
+			</div>
+            &nbsp;
+        </nav>
+        <section data-toggle="nav-shift" class="nav-content-wrap">
+            <nav class="nav-top" role="navigation" aria-label="top navigation">
+                <i data-toggle="nav-top" class="fa fa-bars"></i>
+                <a href="../index.htm">BenchmarkDotNet Documentation</a>
+            </nav>
+            <div class="nav-content">
+                <div role="navigation" aria-label="breadcrumbs navigation">
+                    <div class="breadcrumbs">
+<ul><li><a href="../index.htm">Home</a></li> / <li><a href="../Configs.htm">Configs</a></li> / <li><a href="../Configs/Jobs.htm">Jobs</a></li></ul>
+					
+                    </div>
+                    <hr />
+                </div>
+                <div role="main">
+                    <div class="section">
+<h1 id="jobs">Jobs<a class="headerlink" href="#jobs" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<p>Basically, a <em>job</em> describes how to run your benchmark. Practically, it's a set of characteristics which can be specified. You can specify one or several jobs for your benchmarks.</p>
+<h2 id="characteristics">Characteristics<a class="headerlink" href="#characteristics" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>There are several categories of characteristics which you can specify. Let's consider each category in detail.</p>
+<h3 id="id">Id<a class="headerlink" href="#id" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>It's a single string characteristic. It allows to name your job. This name will be used in logs and a part of a folder name with generated files for this job. <code>Id</code> doesn't affect benchmark results, but it can be useful for diagnostics. If you don't specify <code>Id</code>, random value will be chosen based on other characteristics</p>
+<h3 id="env">Env<a class="headerlink" href="#env" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p><code>Env</code> specifies an environment of the job. You can specify the following characteristics:</p>
+<ul>
+<li><code>Platform</code>: <code>x86</code> or <code>x64</code></li>
+<li>
+<code>Runtime</code>:
+<ul>
+<li><code>Clr</code>: Full .NET Framework (available only on Windows)</li>
+<li><code>Core</code>: CoreCLR (x-plat)</li>
+<li><code>Mono</code>: Mono (x-plat)</li>
+</ul>
+</li>
+<li>
+<code>Jit</code>:
+<ul>
+<li><code>LegacyJit</code> (available only for <code>Runtime.Clr</code>)</li>
+<li><code>RyuJit</code> (available only for <code>Runtime.Clr</code> and <code>Runtime.Core</code>)</li>
+<li><code>Llvm</code> (available only for <code>Runtime.Mono</code>)</li>
+</ul>
+</li>
+<li><code>Affinity</code>: <a href="https://msdn.microsoft.com/library/system.diagnostics.process.processoraffinity.aspx" target="_blank">Affinity</a> of a benchmark process</li>
+<li>
+<code>GcMode</code>: settings of Garbage Collector
+<ul>
+<li><code>Server</code>: <code>true</code> (Server mode) or <code>false</code> (Workstation mode)</li>
+<li><code>Concurrent</code>:  <code>true</code> (Concurrent mode) or <code>false</code> (NonConcurrent mode)</li>
+<li><code>CpuGroups</code>:  Specifies whether garbage collection supports multiple CPU groups</li>
+<li><code>Force</code>: Specifies whether the BenchmarkDotNet's benchmark runner forces full garbage collection after each benchmark invocation</li>
+<li><code>AllowVeryLargeObjects</code>:  On 64-bit platforms, enables arrays that are greater than 2 gigabytes (GB) in total size</li>
+</ul>
+</li>
+</ul>
+<p>BenchmarkDotNet will use host process environment characteristics for non specified values.</p>
+<h3 id="run">Run<a class="headerlink" href="#run" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>In this category, you can specifiy how to benchmark each method.</p>
+<ul>
+<li>
+<code>RunStrategy</code>:
+<ul>
+<li><code>Throughput</code>: default strategy which allows to get good precision level</li>
+<li><code>ColdStart</code>: should be used only for measuring cold start of the application or testing purpose</li>
+<li><code>Monitoring</code>: A mode without overhead evaluating, with several target iterations</li>
+</ul>
+</li>
+<li><code>LaunchCount</code>: how many times we should launch process with target benchmark</li>
+<li><code>WarmupCount</code>: how many warmup iterations should be performed</li>
+<li><code>TargetCount</code>: how many target iterations should be performed</li>
+<li><code>IterationTime</code>: desired time of a single iteration</li>
+<li><code>UnrollFactor</code>: how many times the benchmark method will be invoked per one iteration of a generated loop</li>
+<li><code>InvocationCount</code>: count of invocation in a single iteration (if specified, <code>IterationTime</code> will be ignored), must be a multiple of <code>UnrollFactor</code></li>
+</ul>
+<p>Usually, you shouldn't specify such characteristics like <code>LaunchCount</code>, <code>WarmupCount</code>, <code>TargetCount</code>, or <code>IterationTime</code> because BenchmarkDotNet has a smart algorithm to choose these values automatically based on received measurements. You can specify it for testing purposes or when you are damn sure that you know the right characteristics for your benchmark (when you set <code>TargetCount</code> = <code>20</code> you should understand why <code>20</code> is a good value for your case).</p>
+<h3 id="accuracy">Accuracy<a class="headerlink" href="#accuracy" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>If you want to change the accuracy level, you should use the following characteristics instead of manually adjusting values of <code>WarmupCount</code>, <code>TargetCount</code>, and so on.</p>
+<ul>
+<li><code>MaxRelativeError</code>, <code>MaxAbsoluteError</code>: Maximum acceptable error for a benchmark (by default, BenchmarkDotNet continue iterations until the actual error is less than the specified error). <em>In these two characteristics</em>, the error means half of 99.9% confidence interval. <code>MaxAbsoluteError</code> is an absolute <code>TimeInterval</code>; doesn't have a default value. <code>MaxRelativeError</code> defines max acceptable (<code>(&lt;half of CI 99.9%&gt;) / Mean</code>).</li>
+<li><code>MinIterationTime</code>: Minimum time of a single iteration. Unlike <code>Run.IterationTime</code>, this characteristic specifies only the lower limit. In case of need, BenchmarkDotNet can increase this value.</li>
+<li><code>MinInvokeCount</code>:  Minimum about of target method invocation. Default value if <code>4</code> but you can decrease this value for cases when single invocations takes a lot of time.</li>
+<li><code>EvaluateOverhead</code>: if you benchmark method takes nanoseconds, BenchmarkDotNet overhead can significantly affect measurements. If this characterics is enable, the overhead will be evaluated and subtracted from the result measurements. Default value is <code>true</code>.</li>
+<li><code>RemoveOutliers</code>: sometimes you could have outliers in your measurements. Usually these are unexpected outliers which arose because of other processes activities. If this characteristic is enable, all outliers will be removed from the result measurements. However, some of benchmarks have <em>expected</em> outliers. In these situation, you expect that some of invocation can produce outliers measurements (e.g. in case of network activities, cache operations, and so on). If you want to see result statistics with these outliers, you should disable this characteristic. Default value is <code>true</code>.</li>
+<li><code>AnalyzeLaunchVariance</code>: this characteristic makes sense only if <code>Run.LaunchCount</code> is default. If this mode is enabled and, BenchmarkDotNet will try to perform several launches and detect if there is a veriance between launches. If this mode is disable, only one launch will be performed.</li>
+</ul>
+<h3 id="infrastructure">Infrastructure<a class="headerlink" href="#infrastructure" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>Usually, you shouldn't specify any characteristics from this section, it can be used for advanced cases only.</p>
+<ul>
+<li><code>Toolchain</code>: a toolchain which generate source code for target benchmark methods, build it, and execute it. BenchmarkDotNet has own toolchains for CoreCLR projects and classic projects (the last one is <code>RoslynToolchain</code>, you can find it in the <a href="https://www.nuget.org/packages/BenchmarkDotNet.Toolchains.Roslyn/" target="_blank">BenchmarkDotNet.Toolchains.Roslyn</a> NuGet package). If you want, you can define own toolchain.</li>
+<li><code>Clock</code>: a clock which will be used for measurements. BenchmarkDotNet automatically choose the best available clock source, but you can specify own clock source.</li>
+<li><code>EngineFactory</code>: a provider for measurement engine which performs all the measurement magic. If you don't trust BenchmarkDotNet, you can define own engine and implement all the measurement stages manually.</li>
+</ul>
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>There are several ways to specify a job.</p>
+<h3 id="object-style">Object style<a class="headerlink" href="#object-style" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>You can create own jobs directly from the source code via a cusom config:</p>
+<pre><code class="cs">[Config(typeof(Config))]
+public class MyBenchmarks
+{
+    private class Config : ManualConfig
+    {
+        public Config()
+        {
+            Add(
+                new Job(&quot;MySuperJob&quot;, RunMode.Dry, EnvMode.RyuJitX64)
+                {
+                    Env = { Runtime = Runtime.Core },
+                    Run = { LaunchCount = 5, IterationTime = TimeInterval.Millisecond * 200 },
+                    Accuracy = { MaxStdErrRelative = 0.01 }
+                });
+
+            // The same, using the .With() factory methods:
+            Add(
+                Job.Dry
+                .With(Platform.X64)
+                .With(Jit.RyuJit)
+                .With(Runtime.Core)
+                .WithLaunchCount(5)
+                .WithIterationTime(TimeInterval.Millisecond * 200)
+                .WithMaxStdErrRelative(0.01)
+                .WithId(&quot;MySuperJob&quot;)); // IMPORTANT: Id assignment should be the last call in the chain or the id will be lost.
+        }
+    }
+    // Benchmarks
+}
+</code></pre>
+
+<p>Basically, it's a good idea to start with predefined values (e.g. <code>EnvMode.RyuJitX64</code> and <code>RunMode.Dry</code> passed as constructor args) and modify rest of the properties using property setters or with help of object initializer syntax.</p>
+<p>Note that the job cannot be modified after it's added into config. Trying to set a value on property of the frozen job will throw an <code>InvalidOperationException</code>. Use the <code>Job.Frozen</code> property to determine if the code properties can be altered.</p>
+<p>If you do want to create a new job based on frozen one (all predefined job values are frozen) you can use the <code>.With()</code> extension method </p>
+<pre><code class="cs">            var newJob = Job.Dry.With(Platform.X64);
+</code></pre>
+
+<p>or pass the frozen value as a constructor argument</p>
+<pre><code class="c">#
+            var newJob = new Job(Job.Dry) { Env = { Platform = Platform.X64 } };
+</code></pre>
+
+<p>or use the <code>.Apply()</code> method on unfrozen job</p>
+<pre><code class="c">#
+            var newJob = new Job() { Env = { Platform = Platform.X64 } }.Apply(Job.Dry);
+</code></pre>
+
+<p>in any case the Id property will not be transfered and you must pass it explicitly (using the .ctor id argument or the <code>.WithId()</code> extension method).</p>
+<h3 id="attribute-style">Attribute style<a class="headerlink" href="#attribute-style" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>You can also add new jobs via attributes. Examples:</p>
+<pre><code class="cs">[DryJob]
+[ClrJob, CoreJob, MonoJob]
+[LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
+[SimpleJob(RunStrategy.ColdStart, launchCount: 1, warmupCount: 5, targetCount: 5, id: &quot;FastAndDirtyJob&quot;)]
+public class MyBenchmarkClass
+</code></pre>
+
+<p>Note that each of the attributes identifies a separate job, the sample above will result in 8 different jobs, not a single merged job.</p>
+<h4 id="custom-attributes">Custom attributes<a class="headerlink" href="#custom-attributes" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h4>
+<p>You can also create your own custom attributes with your favourite set of jobs. Example:</p>
+<pre><code class="cs">[AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
+public class MySuperJobAttribute : Attribute, IConfigSource
+{
+    protected MySuperJobAttribute()
+    {
+        var job = new Job(&quot;MySuperJob&quot;, RunMode.Core);
+        job.Env.Platform = Platform.X64;
+        Config = ManualConfig.CreateEmpty().With(job);
+    }
+
+    public IConfig Config { get; }
+}
+
+[MySuperJob]
+public class MyBenchmarks
+</code></pre>
+
+
+                    </div>
+                </div>
+                <footer>
+                    <hr />
+                    <div role="contentinfo">
+BenchmarkDotNet Documentation. &copy;2013-2018. <a href='https://github.com/dotnet/BenchmarkDotNet' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/packages/BenchmarkDotNet/' target='_blank'>NuGet</a>.
+                    </div>
+                </footer>
+            </div>
+        </section>
+    </div>
+    <script src="../js/jquery-2.1.1.min.js"></script>
+    <script src="../js/modernizr-2.8.3.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,256 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Getting started | BenchmarkDotNet </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Getting started | BenchmarkDotNet ">
+    <meta name="generator" content="docfx 2.37.1.0">
+    
+    <link rel="shortcut icon" href="../../logo/icon-32.png">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    <meta property="docfx:rel" content="../../">
+    
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  
+      ga('create', 'UA-41419012-6', 'auto');
+      ga('send', 'pageview');
+  
+    </script>
+    <!-- /Google Analytics -->
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function (d, w, c) {
+            (w[c] = w[c] || []).push(function() {
+                try {
+                    w.yaCounter40812449 = new Ya.Metrika({
+                        id:40812449,
+                        clickmap:true,
+                        trackLinks:true,
+                        accurateTrackBounce:true
+                    });
+                } catch(e) { }
+            });
+  
+            var n = d.getElementsByTagName("script")[0],
+                s = d.createElement("script"),
+                f = function () { n.parentNode.insertBefore(s, n); };
+            s.type = "text/javascript";
+            s.async = true;
+            s.src = "https://mc.yandex.ru/metrika/watch.js";
+  
+            if (w.opera == "[object Opera]") {
+                d.addEventListener("DOMContentLoaded", f, false);
+            } else { f(); }
+        })(document, window, "yandex_metrika_callbacks");
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo/icon.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list"></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="getting-started">Getting started</h1>
+
+<p>To get started with BenchmarkDotNet, please follow these steps.</p>
+<h2 id="step-1-installation">Step 1. Installation</h2>
+<p>Install BenchmarkDotNet via the NuGet package: <a href="https://www.nuget.org/packages/BenchmarkDotNet/">BenchmarkDotNet</a></p>
+<pre><code>PM&gt; Install-Package BenchmarkDotNet
+</code></pre>
+<p>Read more about BenchmarkDotNet NuGet packages: <a class="xref" href="nuget.html">Installing NuGet packages</a></p>
+<h2 id="step-2-design-a-benchmark">Step 2. Design a benchmark</h2>
+<p>Create a new console application, write a class with methods that you want to measure and mark them with the <code>Benchmark</code> attribute. In the following example, we
+compare <a href="https://en.wikipedia.org/wiki/MD5">MD5</a> and <a href="https://en.wikipedia.org/wiki/SHA-2">SHA256</a> cryptographic hash functions:</p>
+<pre><code class="lang-cs">using System;
+using System.Security.Cryptography;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
+
+namespace MyBenchmarks
+{
+    public class Md5VsSha256
+    {
+        private const int N = 10000;
+        private readonly byte[] data;
+
+        private readonly SHA256 sha256 = SHA256.Create();
+        private readonly MD5 md5 = MD5.Create();
+
+        public Md5VsSha256()
+        {
+            data = new byte[N];
+            new Random(42).NextBytes(data);
+        }
+
+        [Benchmark]
+        public byte[] Sha256() =&gt; sha256.ComputeHash(data);
+
+        [Benchmark]
+        public byte[] Md5() =&gt; md5.ComputeHash(data);
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var summary = BenchmarkRunner.Run&lt;Md5VsSha256&gt;();
+        }
+    }
+}
+</code></pre>
+<p>The <code>BenchmarkRunner.Run&lt;Md5VsSha256&gt;()</code> call runs your benchmarks and print results to console output.</p>
+<h2 id="step-3-view-results">Step 3. View results</h2>
+<p>View the results. Here is an example of output from the above benchmark:</p>
+<pre><code class="lang-ini">BenchmarkDotNet=v0.10.1, OS=Microsoft Windows NT 6.2.9200.0
+Processor=Intel(R) Core(TM) i7-4702MQ CPU 2.20GHz, ProcessorCount=8
+Frequency=2143476 Hz, Resolution=466.5319 ns, Timer=TSC
+  [Host]     : Clr 4.0.30319.42000, 64bit RyuJIT-v4.6.1586.0
+  DefaultJob : Clr 4.0.30319.42000, 64bit RyuJIT-v4.6.1586.0
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Mean</th>
+<th>StdDev</th>
+<th>Allocated</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sha256</td>
+<td>130.5169 us</td>
+<td>1.8489 us</td>
+<td>188 B</td>
+</tr>
+<tr>
+<td>Md5</td>
+<td>25.8010 us</td>
+<td>0.1757 us</td>
+<td>113 B</td>
+</tr>
+</tbody>
+</table>
+<h2 id="step-4-analyze-results">Step 4. Analyze results</h2>
+<p>Analyze it. In your bin directory, you can find a lot of useful files with detailed information. For example:</p>
+<ul>
+<li>Csv reports with raw data: <code>Md5VsSha256-report.csv</code>, <code>Md5VsSha256-runs.csv</code></li>
+<li>Markdown reports:  <code>Md5VsSha256-report-default.md</code>, <code>Md5VsSha256-report-stackoverflow.md</code>, <code>Md5VsSha256-report-github.md</code>
+<ul>
+<li>Plain report and log: <code>Md5VsSha256-report.txt</code>, <code>Md5VsSha256.log</code></li>
+<li>Plots (if you have installed R): <code>Md5VsSha256-barplot.png</code>, <code>Md5VsSha256-boxplot.png</code>, and so on.</li>
+</ul>
+</li>
+</ul>
+<h2 id="next-steps">Next steps</h2>
+<p>BenchmarkDotNet provides a lot of features which help to high-quality performance research.
+If you want to know more about BenchmarkDotNet features, checkout the <a href="../overview.html">Overview</a> page.
+If you want have any questions, checkout the <a href="../faq.html">FAQ</a> page.
+If you didn't find answer for your question on this page, <a href="https://gitter.im/dotnet/BenchmarkDotNet">ask it on gitter</a> or <a href="https://github.com/dotnet/BenchmarkDotNet/issues">create an issue</a>.</p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/articles/guides/getting-started.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>
