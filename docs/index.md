@@ -1,6 +1,6 @@
 ![](logo/logo-wide.png)
 
-[![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/) [![Gitter](https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet.svg)](https://gitter.im/dotnet/BenchmarkDotNet)  [![License](https://img.shields.io/badge/license-MIT-blue.svg)](articles/license.md) [![Overview](https://img.shields.io/badge/docs-Overview-green.svg?style=flat)](http://benchmarkdotnet.org/Overview.htm) [![ChangeLog](https://img.shields.io/badge/docs-ChangeLog-green.svg?style=flat)](https://github.com/dotnet/BenchmarkDotNet/wiki/ChangeLog)
+[![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/) [![Gitter](https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet.svg)](https://gitter.im/dotnet/BenchmarkDotNet)  [![License](https://img.shields.io/badge/license-MIT-blue.svg)](articles/license.md) [![Overview](https://img.shields.io/badge/docs-Overview-green.svg?style=flat)](xref:docs.overview) [![ChangeLog](https://img.shields.io/badge/docs-ChangeLog-green.svg?style=flat)](xref:changelog)
 
 **BenchmarkDotNet** is a powerful .NET library for benchmarking.
 
