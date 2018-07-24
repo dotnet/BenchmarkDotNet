@@ -39,4 +39,4 @@ addons:
 before_script:
   - chmod +x build.sh
 script:
-  - ./build.sh
+  - travis_wait 30 ./build.sh
