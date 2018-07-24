@@ -31,8 +31,9 @@ namespace BenchmarkDotNet.Extensions
         /// </summary>
         internal static string GetCorrectCSharpTypeName(this Type type, bool includeNamespace = true, bool includeGenericArgumentsNamespace = true)
         {
-            while (!(type.IsPublic || type.IsNestedPublic))
-                type = type.BaseType;
+            if (!type.Name.EndsWith("&"))
+                while (!(type.IsPublic || type.IsNestedPublic) && type.BaseType != null)
+                    type = type.BaseType;
 
             // the reflection is missing information about types passed by ref (ie ref ValuTuple<int> is reported as NON generic type)
             if (type.IsByRef && !type.IsGenericType && type.Name.Contains('`'))
