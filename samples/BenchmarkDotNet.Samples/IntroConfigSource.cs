@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Samples
         /// </summary>
         private class MyConfigSourceAttribute : Attribute, IConfigSource
         {
-            public IConfig Config { get; private set; }
+            public IConfig Config { get; }
 
             public MyConfigSourceAttribute(params Jit[] jits)
             {
