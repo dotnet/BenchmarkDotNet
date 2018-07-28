@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Mathematics
 
             double v1 = x.Variance, v2 = y.Variance, m1 = x.Mean, m2 = y.Mean;
 
-            double se = Sqrt((v1 / n1) + (v2 / n2));
+            double se = Sqrt(v1 / n1 + v2 / n2);
             double t = (m1 - m2) / se;
             double df = (v1 / n1 + v2 / n2).Sqr() /
                         ((v1 / n1).Sqr() / (n1 - 1) + (v2 / n2).Sqr() / (n2 - 1));

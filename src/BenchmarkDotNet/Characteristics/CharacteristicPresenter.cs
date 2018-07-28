@@ -76,9 +76,9 @@ namespace BenchmarkDotNet.Characteristics
             public override string ToPresentation(object characteristicValue, Characteristic characteristic)
             {
                 // TODO: DO NOT hardcode Characteristic suffix
-                var id = characteristic.Id;
-                var type = characteristic.DeclaringType.FullName;
-                var value = SourceCodeHelper.ToSourceCode(characteristicValue);
+                string id = characteristic.Id;
+                string type = characteristic.DeclaringType.FullName;
+                string value = SourceCodeHelper.ToSourceCode(characteristicValue);
                 return $"{type}.{id}Characteristic[job] = {value}";
             }
         }

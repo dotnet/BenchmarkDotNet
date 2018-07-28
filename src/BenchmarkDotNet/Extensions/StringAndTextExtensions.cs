@@ -66,12 +66,12 @@ namespace BenchmarkDotNet.Extensions
 
             var words = text.Split(' ');
             var lines = new List<string>();
-            var currentLine = "";
+            string currentLine = "";
 
-            foreach (var currentWord in words)
+            foreach (string currentWord in words)
             {
-                if ((currentLine.Length > maxLength) ||
-                   ((currentLine.Length + currentWord.Length) > maxLength))
+                if (currentLine.Length > maxLength ||
+                   currentLine.Length + currentWord.Length > maxLength)
                 {
                     lines.Add(currentLine);
                     currentLine = "";
@@ -100,7 +100,7 @@ namespace BenchmarkDotNet.Extensions
                 return null;
             }
 
-            StringBuilder sb = new StringBuilder(s.Length);
+            var sb = new StringBuilder(s.Length);
 
             for (int i = 0; i < s.Length; i++)
             {

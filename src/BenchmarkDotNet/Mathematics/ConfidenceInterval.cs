@@ -113,7 +113,7 @@ namespace BenchmarkDotNet.Mathematics
                        confidenceLevel => confidenceLevel,
                        confidenceLevel =>
                        {
-                           var textRepresentation = confidenceLevel.ToString().Substring(1);
+                           string textRepresentation = confidenceLevel.ToString().Substring(1);
 
                            return (int.Parse(textRepresentation), textRepresentation.Length);
                        });

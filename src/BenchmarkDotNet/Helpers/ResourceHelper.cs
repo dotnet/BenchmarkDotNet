@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Helpers
     {
         internal static string LoadTemplate(string name)
         {
-            var resourceName = "BenchmarkDotNet.Templates." + name;
+            string resourceName = "BenchmarkDotNet.Templates." + name;
             using (var stream = GetResourceStream(resourceName))
             {
                 if (stream == null)

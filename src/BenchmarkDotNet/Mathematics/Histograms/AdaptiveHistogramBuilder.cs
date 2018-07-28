@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Mathematics.Histograms
                         while (j < list.Count && Inside(list[j]) && list[j] - list[i] < binSize)
                             j++;
                         int count = j - i;
-                        var dist = list[j - 1] - list[i];
+                        double dist = list[j - 1] - list[i];
                         if (count > bestCount || count == bestCount && dist < bestDist)
                         {
                             bestCount = count;

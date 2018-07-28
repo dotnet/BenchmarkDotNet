@@ -22,12 +22,12 @@ namespace BenchmarkDotNet.Validators
                 .ToArray();
             
             var logicalGroups = benchmarkLogicalGroups.Distinct().ToArray();
-            foreach (var logicalGroup in logicalGroups)
+            foreach (string logicalGroup in logicalGroups)
             {
                 var benchmarks = allBenchmarks.Where((benchmark, index) => benchmarkLogicalGroups[index] == logicalGroup).ToArray();
-                var methodBaselineCount = benchmarks.Count(b => b.Descriptor.Baseline);
-                var jobBaselineCount = benchmarks.Count(b => b.Job.Meta.Baseline);
-                var className = benchmarks.First().Descriptor.Type.Name;
+                int methodBaselineCount = benchmarks.Count(b => b.Descriptor.Baseline);
+                int jobBaselineCount = benchmarks.Count(b => b.Job.Meta.Baseline);
+                string className = benchmarks.First().Descriptor.Type.Name;
 
                 if (methodBaselineCount > 1) 
                     yield return CreateError("benchmark method", "Baseline = true", logicalGroup, className, methodBaselineCount.ToString());

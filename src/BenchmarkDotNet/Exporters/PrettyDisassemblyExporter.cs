@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Exporters
 
         private string Export(Summary summary, BenchmarkCase benchmarkCase)
         {
-            var filePath = $"{Path.Combine(summary.ResultsDirectoryPath, benchmarkCase.FolderInfo)}-asm.pretty.html";
+            string filePath = $"{Path.Combine(summary.ResultsDirectoryPath, benchmarkCase.FolderInfo)}-asm.pretty.html";
             if (File.Exists(filePath))
                 File.Delete(filePath);
 
@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.Exporters
                     logger.WriteLine($"<tr class=\"{(even && diffTheLabels ? "evenMap" : string.Empty)}\">");
                     logger.Write("<td></td>");
 
-                    var tooltip = element.Source is Asm asm ? $"title=\"{asm.TextRepresentation}\"" : null;
+                    string tooltip = element.Source is Asm asm ? $"title=\"{asm.TextRepresentation}\"" : null;
 
                     if (element is DisassemblyPrettifier.Reference reference)
                         logger.WriteLine($"<td id=\"{referenceIndex++}\" class=\"reference\" data-reference=\"{reference.Id}\" {tooltip}><a href=\"#{reference.Id}\"><pre><code>{reference.TextRepresentation}</pre></code></a></td>");

@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Portability.Cpu
             var processorModelNames = new HashSet<string>();
             var processorsToPhysicalCoreCount = new Dictionary<string, int>();
             
-            var logicalCoreCount = 0;
+            int logicalCoreCount = 0;
             var nominalFrequency = Frequency.Zero;
             var minFrequency = Frequency.Zero;
             var maxFrequency = Frequency.Zero;
@@ -62,11 +62,11 @@ namespace BenchmarkDotNet.Portability.Cpu
 
         internal static Frequency ParseFrequencyFromBrandString(string brandString)
         {
-            var pattern = "(\\d.\\d+)GHz";
+            string pattern = "(\\d.\\d+)GHz";
             var matches = Regex.Matches(brandString, pattern, RegexOptions.IgnoreCase);
             if (matches.Count > 0 && matches[0].Groups.Count > 1)
             {
-                var match = Regex.Matches(brandString, pattern, RegexOptions.IgnoreCase)[0].Groups[1].ToString();
+                string match = Regex.Matches(brandString, pattern, RegexOptions.IgnoreCase)[0].Groups[1].ToString();
                 return Frequency.TryParseGHz(match, out var result) ? result : Frequency.Zero;
             }
 

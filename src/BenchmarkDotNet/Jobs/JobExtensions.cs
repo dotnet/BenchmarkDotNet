@@ -240,7 +240,7 @@ namespace BenchmarkDotNet.Jobs
 
         private static Job WithCore(this Job job, Action<Job> updateCallback)
         {
-            var hasId = job.HasValue(Job.IdCharacteristic);
+            bool hasId = job.HasValue(Job.IdCharacteristic);
 
             var newJob = hasId ? new Job(job.Id, job) : new Job(job);
             updateCallback(newJob);

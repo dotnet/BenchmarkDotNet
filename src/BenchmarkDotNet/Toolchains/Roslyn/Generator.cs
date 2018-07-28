@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
 
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
-            var prefix = RuntimeInformation.IsWindows() ? "" : "#!/bin/bash\n";
+            string prefix = RuntimeInformation.IsWindows() ? "" : "#!/bin/bash\n";
             var list = new List<string>();
             if (!RuntimeInformation.IsWindows())
                 list.Add("mono");

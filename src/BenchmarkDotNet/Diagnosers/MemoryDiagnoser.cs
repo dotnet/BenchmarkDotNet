@@ -76,7 +76,7 @@ namespace BenchmarkDotNet.Diagnosers
                 if (!results.ContainsKey(benchmarkCase) || benchmarkCase.Job.Environment.Runtime is MonoRuntime)
                     return "N/A";
 
-                var value = results[benchmarkCase].BytesAllocatedPerOperation;
+                long value = results[benchmarkCase].BytesAllocatedPerOperation;
                 return UnitType == UnitType.Size ? value.ToSizeStr(style.SizeUnit, 1, style.PrintUnitsInContent) : ((double)value).ToStr();
             }
         }
@@ -112,12 +112,12 @@ namespace BenchmarkDotNet.Diagnosers
                 if (results.ContainsKey(benchmarkCase))
                 {
                     var gcStats = results[benchmarkCase];
-                    var value = gcStats.GetCollectionsCount(generation);
+                    int value = gcStats.GetCollectionsCount(generation);
 
                     if (value == 0)
                         return "-"; // make zero more obvious
 
-                    return ((value / (double)gcStats.TotalOperations) * 1000).ToString("#0.0000", HostEnvironmentInfo.MainCultureInfo);
+                    return (value / (double)gcStats.TotalOperations * 1000).ToString("#0.0000", HostEnvironmentInfo.MainCultureInfo);
                 }
                 return "N/A";
             }

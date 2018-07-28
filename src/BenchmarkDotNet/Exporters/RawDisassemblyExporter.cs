@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Exporters
 
         private string Export(Summary summary, BenchmarkCase benchmarkCase)
         {
-            var filePath = $"{Path.Combine(summary.ResultsDirectoryPath, benchmarkCase.FolderInfo)}-asm.raw.html";
+            string filePath = $"{Path.Combine(summary.ResultsDirectoryPath, benchmarkCase.FolderInfo)}-asm.raw.html";
             if (File.Exists(filePath))
                 File.Delete(filePath);
 
@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Exporters
                     $"<tr><th colspan=\"2\" id=\"{method.NativeCode}\" style=\"text-align: left;\">{FormatMethodAddress(method.NativeCode)} {method.Name}</th><th></th></tr>");
 
                 // there is no need to distinguish the maps visually if there is only one type of code
-                var diffTheMaps = method.Maps.SelectMany(map => map.Instructions).Select(ins => ins.GetType()).Distinct().Count() > 1; 
+                bool diffTheMaps = method.Maps.SelectMany(map => map.Instructions).Select(ins => ins.GetType()).Distinct().Count() > 1; 
 
                 bool evenMap = true;
                 foreach (var map in method.Maps)
@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Exporters
                         logger.WriteLine($"<tr class=\"{(evenMap && diffTheMaps ? "evenMap" : string.Empty)}\">");
                         logger.WriteLine($"<td><pre><code>{instruction.TextRepresentation}</pre></code></td>");
 
-                        if (!string.IsNullOrEmpty(instruction.Comment) && methodNameToNativeCode.TryGetValue(instruction.Comment, out var id))
+                        if (!string.IsNullOrEmpty(instruction.Comment) && methodNameToNativeCode.TryGetValue(instruction.Comment, out ulong id))
                         {
                             logger.WriteLine($"<td><a href=\"#{id}\">{GetShortName(instruction.Comment)}</a></td>");
                         }
@@ -110,9 +110,9 @@ namespace BenchmarkDotNet.Exporters
 
         private string GetShortName(string fullMethodSignature)
         {
-            var bracketIndex = fullMethodSignature.IndexOf('(');
-            var withoutArguments = fullMethodSignature.Remove(bracketIndex);
-            var methodNameIndex = withoutArguments.LastIndexOf('.') + 1;
+            int bracketIndex = fullMethodSignature.IndexOf('(');
+            string withoutArguments = fullMethodSignature.Remove(bracketIndex);
+            int methodNameIndex = withoutArguments.LastIndexOf('.') + 1;
 
             return withoutArguments.Substring(methodNameIndex);
         }

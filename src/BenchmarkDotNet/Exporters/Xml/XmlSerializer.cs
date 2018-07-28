@@ -103,7 +103,7 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         private void WriteCollectionProperty(object source, PropertyInfo property)
         {
-            IEnumerable collection = (IEnumerable)property.GetValue(source);
+            var collection = (IEnumerable)property.GetValue(source);
 
             if (!IsCollectionWritable(collection))
                 return;
@@ -181,7 +181,7 @@ namespace BenchmarkDotNet.Exporters.Xml
                 if (type == null)
                     throw new ArgumentNullException(nameof(type));
 
-                this.Type = type;
+                Type = type;
                 RootName = type.Name;
             }
 

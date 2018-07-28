@@ -56,8 +56,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 var stopwatch = Stopwatch.StartNew();
                 process.Start();
 
-                var standardOutput = process.StandardOutput.ReadToEnd();
-                var standardError = process.StandardError.ReadToEnd();
+                string standardOutput = process.StandardOutput.ReadToEnd();
+                string standardError = process.StandardError.ReadToEnd();
 
                 process.WaitForExit();
                 stopwatch.Stop();
@@ -83,7 +83,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     return null;
                 }
 
-                var output = process.StandardOutput.ReadToEnd();
+                string output = process.StandardOutput.ReadToEnd();
 
                 process.WaitForExit();
 

@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
 
         protected override string GetExtraArguments(BuildPartition buildPartition)
         {
-            var extraArguments = UseCppCodeGenerator ? $"-r {RuntimeIdentifier} /p:NativeCodeGen=cpp" : $"-r {RuntimeIdentifier}";
+            string extraArguments = UseCppCodeGenerator ? $"-r {RuntimeIdentifier} /p:NativeCodeGen=cpp" : $"-r {RuntimeIdentifier}";
 
             return $"{extraArguments} {base.GetExtraArguments(buildPartition)}";
         }

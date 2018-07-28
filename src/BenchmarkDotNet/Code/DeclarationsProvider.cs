@@ -110,7 +110,7 @@ namespace BenchmarkDotNet.Code
         }
 
         public override string ExtraDefines
-            => Consumer.IsConsumable(WorkloadMethodReturnType) || Consumer.HasConsumableField(WorkloadMethodReturnType, out var _)
+            => Consumer.IsConsumable(WorkloadMethodReturnType) || Consumer.HasConsumableField(WorkloadMethodReturnType, out _)
                 ? "#define RETURNS_CONSUMABLE"
                 : "#define RETURNS_NON_CONSUMABLE_STRUCT";
     }

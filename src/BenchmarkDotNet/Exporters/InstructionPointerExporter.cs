@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Exporters
 
         private string Export(Summary summary, BenchmarkCase benchmarkCase, DisassemblyResult disassemblyResult, PmcStats pmcStats)
         {
-            var filePath = $"{Path.Combine(summary.ResultsDirectoryPath, benchmarkCase.Descriptor.WorkloadMethod.Name)}-{benchmarkCase.Job.Environment.Jit}-{benchmarkCase.Job.Environment.Platform}-instructionPointer.html";
+            string filePath = $"{Path.Combine(summary.ResultsDirectoryPath, benchmarkCase.Descriptor.WorkloadMethod.Name)}-{benchmarkCase.Job.Environment.Jit}-{benchmarkCase.Job.Environment.Platform}-instructionPointer.html";
             if (File.Exists(filePath))
                 File.Delete(filePath);
 
@@ -124,7 +124,7 @@ namespace BenchmarkDotNet.Exporters
                             {
                                 // most probably asm.StartAddress would be enough, but I don't want to miss any edge case
                                 for (ulong instructionPointer = asm.StartAddress; instructionPointer < asm.EndAddress; instructionPointer++)
-                                    if (hardwareCounter.Value.PerInstructionPointer.TryGetValue(instructionPointer, out var value))
+                                    if (hardwareCounter.Value.PerInstructionPointer.TryGetValue(instructionPointer, out ulong value))
                                         totalsPerCounter[hardwareCounter.Key] = totalsPerCounter[hardwareCounter.Key] + value;
                             }
                         }
@@ -202,11 +202,11 @@ namespace BenchmarkDotNet.Exporters
 
                         foreach (var hardwareCounter in hardwareCounters)
                         {
-                            var totalWithoutNoise = totals[hardwareCounter].withoutNoise;
-                            var forRange = instruction.SumPerCounter[hardwareCounter];
+                            ulong totalWithoutNoise = totals[hardwareCounter].withoutNoise;
+                            ulong forRange = instruction.SumPerCounter[hardwareCounter];
 
                             if (forRange != 0)
-                                logger.Write($"<td title=\"{forRange} of {totalWithoutNoise}\">{((double) forRange / totalWithoutNoise):P}</td>");
+                                logger.Write($"<td title=\"{forRange} of {totalWithoutNoise}\">{(double) forRange / totalWithoutNoise:P}</td>");
                             else
                                 logger.Write("<td>-</td>");
                         }
@@ -227,11 +227,11 @@ namespace BenchmarkDotNet.Exporters
                 logger.WriteLine("<tr>");
                 foreach (var hardwareCounter in hardwareCounters)
                 {
-                    var totalWithoutNoise = totals[hardwareCounter].withoutNoise;
-                    var forMethod = method.SumPerCounter[hardwareCounter];
+                    ulong totalWithoutNoise = totals[hardwareCounter].withoutNoise;
+                    ulong forMethod = method.SumPerCounter[hardwareCounter];
 
                     if (forMethod != 0)
-                        logger.Write($"<td class=\"perMethod\" title=\"{forMethod} of {totalWithoutNoise}\">{((double)forMethod / totalWithoutNoise):P}</td>");
+                        logger.Write($"<td class=\"perMethod\" title=\"{forMethod} of {totalWithoutNoise}\">{(double)forMethod / totalWithoutNoise:P}</td>");
                     else
                         logger.Write("<td  class=\"perMethod\">-</td>");
                 }
@@ -250,13 +250,13 @@ namespace BenchmarkDotNet.Exporters
             logger.WriteLine("</tbody></table></body></html>");
         }
 
-        class CodeWithCounters
+        private class CodeWithCounters
         {
             internal Diagnosers.Code Code { get; set; }
             internal IReadOnlyDictionary<HardwareCounter, ulong> SumPerCounter { get; set; }
         }
 
-        class MethodWithCounters
+        private class MethodWithCounters
         {
             internal DisassembledMethod Method { get; set; }
             internal IReadOnlyList<IReadOnlyList<CodeWithCounters>> Instructions { get; set; }

@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Toolchains
     {
         public GenerateResult GenerateProject(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath)
         {
-            ArtifactsPaths artifactsPaths = ArtifactsPaths.Empty;
+            var artifactsPaths = ArtifactsPaths.Empty;
             try
             {
                 artifactsPaths = GetArtifactsPaths(buildPartition, rootArtifactsFolderPath);

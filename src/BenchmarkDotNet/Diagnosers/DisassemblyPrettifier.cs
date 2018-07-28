@@ -60,14 +60,14 @@ namespace BenchmarkDotNet.Diagnosers
                     continue;
                 }
 
-                if (addressesToLabels.TryGetValue(instruction.address, out var label))
+                if (addressesToLabels.TryGetValue(instruction.address, out string label))
                     prettified.Add(new Label(label, label));
 
-                var argument = string.IsNullOrEmpty(instruction.extraArguments)
+                string argument = string.IsNullOrEmpty(instruction.extraArguments)
                     ? instruction.arguments
                     : instruction.extraArguments;
 
-                if (addressesToLabels.TryGetValue(argument, out var reference)) // it's sth like 00007ff7`ffbfd320 7cba jl      00007ff7`ffbfd2dc
+                if (addressesToLabels.TryGetValue(argument, out string reference)) // it's sth like 00007ff7`ffbfd320 7cba jl      00007ff7`ffbfd2dc
                     prettified.Add(new Reference($"{PadRight(instruction.instruction)} {reference}", reference, instruction.source));
                 else if (!string.IsNullOrEmpty(instruction.extraArguments) && !instruction.extraArguments.StartsWith("("))
                     prettified.Add(new Element($"{PadRight(instruction.instruction)} {instruction.arguments} {WithoutAddress(instruction.extraArguments)}", instruction.source));

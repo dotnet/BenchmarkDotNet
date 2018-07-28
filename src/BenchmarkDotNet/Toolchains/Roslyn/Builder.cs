@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 .Distinct()
                 .Select(uniqueMetadata => uniqueMetadata.GetReference());
 
-            (var result, var missingReferences) = Build(generateResult, syntaxTree, compilationOptions, references);
+            var (result, missingReferences) = Build(generateResult, syntaxTree, compilationOptions, references);
 
             if (result.IsBuildSuccess || !missingReferences.Any())
                 return result;
@@ -107,7 +107,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
 
         private static string[] GetFrameworkAssembliesPaths()
         {
-            var frameworkAssembliesDirectory = Path.GetDirectoryName(typeof(object).Assembly.Location);
+            string frameworkAssembliesDirectory = Path.GetDirectoryName(typeof(object).Assembly.Location);
             if (frameworkAssembliesDirectory == null)
                 return Array.Empty<string>();
 

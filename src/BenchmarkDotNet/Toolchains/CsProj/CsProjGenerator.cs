@@ -91,8 +91,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                     }
                     else if (line.Contains("<Import Project"))
                     {
-                        var propsFilePath = line.Trim().Split('"')[1]; // its sth like   <Import Project="..\..\build\common.props" />
-                        var absolutePath = File.Exists(propsFilePath)
+                        string propsFilePath = line.Trim().Split('"')[1]; // its sth like   <Import Project="..\..\build\common.props" />
+                        string absolutePath = File.Exists(propsFilePath)
                             ? propsFilePath // absolute path or relative to current dir
                             : Path.Combine(projectFile.DirectoryName, propsFilePath); // relative to csproj
 
@@ -117,7 +117,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             }
 
             // important assumption! project's file name === output dll name
-            var projectName = benchmarkTarget.GetTypeInfo().Assembly.GetName().Name;
+            string projectName = benchmarkTarget.GetTypeInfo().Assembly.GetName().Name;
 
             // I was afraid of using .GetFiles with some smart search pattern due to the fact that the method was designed for Windows
             // and now .NET is cross platform so who knows if the pattern would be supported for other OSes

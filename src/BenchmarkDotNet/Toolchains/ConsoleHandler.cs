@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Toolchains
 
         public void ClearProcess()
         {
-            this.process = null;
+            process = null;
         }
 
         // This method gives us a chance to make a "best-effort" to clean anything up after Ctrl-C is type in the Console

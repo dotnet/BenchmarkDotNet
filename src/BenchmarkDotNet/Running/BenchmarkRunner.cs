@@ -66,9 +66,9 @@ namespace BenchmarkDotNet.Running
         {
             var resolver = DefaultResolver;
             var artifactsToCleanup = new List<string>();
-            var title = GetTitle(benchmarkRunInfos);
+            string title = GetTitle(benchmarkRunInfos);
 
-            var rootArtifactsFolderPath = (commonSettingsConfig?.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath).CreateIfNotExists();
+            string rootArtifactsFolderPath = (commonSettingsConfig?.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath).CreateIfNotExists();
 
             using (var logStreamWriter = Portability.StreamWriter.FromPath(Path.Combine(rootArtifactsFolderPath, title + ".log")))
             {
@@ -162,7 +162,7 @@ namespace BenchmarkDotNet.Running
             var benchmarks = benchmarkRunInfo.BenchmarksCases;
             var config = benchmarkRunInfo.Config;
             var reports = new List<BenchmarkReport>();
-            var title = GetTitle(new[] { benchmarkRunInfo });
+            string title = GetTitle(new[] { benchmarkRunInfo });
 
             logger.WriteLineInfo("// Found benchmarks:");
             foreach (var benchmark in benchmarks)
@@ -216,8 +216,8 @@ namespace BenchmarkDotNet.Running
             logger.WriteLine();
 
             logger.WriteLineHeader("// * Export *");
-            var currentDirectory = Directory.GetCurrentDirectory();
-            foreach (var file in config.GetCompositeExporter().ExportToFiles(summary, logger))
+            string currentDirectory = Directory.GetCurrentDirectory();
+            foreach (string file in config.GetCompositeExporter().ExportToFiles(summary, logger))
             {
                 logger.WriteLineInfo($"  {file.Replace(currentDirectory, string.Empty).Trim('/', '\\')}");
             }
@@ -368,7 +368,7 @@ namespace BenchmarkDotNet.Running
 
             for (int launchIndex = 1; launchIndex <= launchCount; launchIndex++)
             {
-                string printedLaunchCount = (analyzeRunToRunVariance && autoLaunchCount && launchIndex <= 2)
+                string printedLaunchCount = analyzeRunToRunVariance && autoLaunchCount && launchIndex <= 2
                     ? ""
                     : " / " + launchCount;
                 logger.WriteLineInfo($"// Launch: {launchIndex}{printedLaunchCount}");

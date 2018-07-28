@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Exporters
 
         private static string GetNestedTypes(Type type)
         {
-            var nestedTypes = "";
+            string nestedTypes = "";
             Type child = type, parent = type.DeclaringType;
             while (child.IsNested && parent != null)
             {
@@ -88,8 +88,8 @@ namespace BenchmarkDotNet.Exporters
             if (!type.IsGenericType)
                 return type.Name;
 
-            var mainName = type.Name.Substring(0, type.Name.IndexOf('`'));
-            var args = string.Join(", ", type.GetGenericArguments().Select(GetTypeName).ToArray());
+            string mainName = type.Name.Substring(0, type.Name.IndexOf('`'));
+            string args = string.Join(", ", type.GetGenericArguments().Select(GetTypeName).ToArray());
 
             return $"{mainName}<{args}>";
         }

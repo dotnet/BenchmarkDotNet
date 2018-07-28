@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Characteristics
             if (!string.IsNullOrEmpty(actual) && actual != IdCharacteristic.FallbackValue)
                 return actual;
 
-            var result = CharacteristicSetPresenter.Display.ToPresentation(obj);
+            string result = CharacteristicSetPresenter.Display.ToPresentation(obj);
 
             if (result.Length == 0)
                 result = IdCharacteristic.FallbackValue;
@@ -127,7 +127,7 @@ namespace BenchmarkDotNet.Characteristics
         #region Get value
         public bool HasValue(Characteristic characteristic)
         {
-            if (sharedValues.TryGetValue(characteristic, out object result))
+            if (sharedValues.TryGetValue(characteristic, out var result))
                 return !ReferenceEquals(result, Characteristic.EmptyValue);
 
             return false;
@@ -140,7 +140,7 @@ namespace BenchmarkDotNet.Characteristics
 
         internal object GetValue(Characteristic characteristic)
         {
-            if (!sharedValues.TryGetValue(characteristic, out object result))
+            if (!sharedValues.TryGetValue(characteristic, out var result))
                 result = Characteristic.EmptyValue;
 
             return ResolveCore(characteristic, result);
@@ -268,7 +268,7 @@ namespace BenchmarkDotNet.Characteristics
             oldValues.Remove(thisCharacteristic);
             foreach (var characteristic in GetCharacteristicsToApply())
             {
-                if (oldValues.TryGetValue(characteristic, out object value))
+                if (oldValues.TryGetValue(characteristic, out var value))
                 {
                     oldValues.Remove(characteristic);
                     SetValueCore(characteristic, value);
@@ -331,7 +331,7 @@ namespace BenchmarkDotNet.Characteristics
 
             foreach (var characteristic in characteristicsToApply)
             {
-                if (!other.sharedValues.TryGetValue(characteristic, out object value))
+                if (!other.sharedValues.TryGetValue(characteristic, out var value))
                     continue;
 
                 if (characteristic.HasChildCharacteristics)

@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Portability.Cpu
             if (RuntimeInformation.IsLinux())
             {
                 string content = ProcessHelper.RunAndReadOutput("cat", "/proc/cpuinfo");
-                var output = GetCpuSpeed();
+                string output = GetCpuSpeed();
                 content = content + output;
                 return ProcCpuInfoParser.ParseOutput(content);
             }

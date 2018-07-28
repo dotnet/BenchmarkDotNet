@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Analysers
         public CompositeAnalyser(IAnalyser[] analysers)
         {
             this.analysers = analysers;
-            Id = "Composite-" + (++counter);
+            Id = "Composite-" + ++counter;
         }
 
         public string Id { get; }

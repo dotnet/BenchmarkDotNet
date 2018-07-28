@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Validators
 
         private IEnumerable<ValidationError> ValidateAttributes<T>(string benchmarkClassName, IEnumerable<MethodInfo> allMethods) where T : TargetedAttribute
         {
-            var emptyTargetCount = 0;
+            int emptyTargetCount = 0;
             var targetCount = new Dictionary<string, int>();
 
             foreach (var method in allMethods)

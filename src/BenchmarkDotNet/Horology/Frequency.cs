@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Horology
         
         public static bool TryParse(string s, FrequencyUnit unit, out Frequency freq)
         {
-            var success = double.TryParse(s, NumberStyles.Any, HostEnvironmentInfo.MainCultureInfo, out double result);
+            bool success = double.TryParse(s, NumberStyles.Any, HostEnvironmentInfo.MainCultureInfo, out double result);
             freq = new Frequency(result, unit);
             return success;
         }

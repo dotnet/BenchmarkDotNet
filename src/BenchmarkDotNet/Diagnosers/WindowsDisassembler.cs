@@ -30,9 +30,9 @@ namespace BenchmarkDotNet.Diagnosers
 
         internal DisassemblyResult Disassemble(DiagnoserActionParameters parameters)
         {
-            var resultsPath = Path.GetTempFileName();
+            string resultsPath = Path.GetTempFileName();
 
-            var errors = ProcessHelper.RunAndReadOutput(
+            string errors = ProcessHelper.RunAndReadOutput(
                 GetDisassemblerPath(parameters.Process, parameters.BenchmarkCase.Job.Environment.Platform),
                 BuildArguments(parameters, resultsPath));
 
@@ -76,14 +76,14 @@ namespace BenchmarkDotNet.Diagnosers
         private string GetDisassemblerPath(string architectureName)
         {
             // one can only attach to a process of same target architecture, this is why we need exe for x64 and for x86
-            var exeName = $"BenchmarkDotNet.Disassembler.{architectureName}.exe";
+            string exeName = $"BenchmarkDotNet.Disassembler.{architectureName}.exe";
             var assemblyWithDisassemblersInResources = typeof(WindowsDisassembler).GetTypeInfo().Assembly;
 
-            var disassemblerPath =
+            string disassemblerPath =
                 Path.Combine(
                     new FileInfo(assemblyWithDisassemblersInResources.Location).Directory.FullName,
-                    (Properties.BenchmarkDotNetInfo.FullVersion // possible update
-                    + exeName)); // separate process per architecture!!
+                    Properties.BenchmarkDotNetInfo.FullVersion // possible update
+                    + exeName); // separate process per architecture!!
 
 #if !PRERELEASE_DEVELOP // for development we always want to copy the file to not omit any dev changes (Properties.BenchmarkDotNetInfo.FullVersion in file name is not enough)
             if (File.Exists(disassemblerPath))
@@ -103,11 +103,11 @@ namespace BenchmarkDotNet.Diagnosers
         private void CopyAllRequiredDependencies(Assembly assemblyWithDisassemblersInResources, string destinationFolder)
         {
             // ClrMD and Cecil are also embedded in the resources, we need to copy them as well
-            foreach (var dependency in assemblyWithDisassemblersInResources.GetManifestResourceNames().Where(name => name.EndsWith(".dll")))
+            foreach (string dependency in assemblyWithDisassemblersInResources.GetManifestResourceNames().Where(name => name.EndsWith(".dll")))
             {
                 // dependency is sth like "BenchmarkDotNet.Disassemblers.net46.win7_x64.Microsoft.Diagnostics.Runtime.dll"
-                var fileName = dependency.Replace("BenchmarkDotNet.Disassemblers.net46.win7_x64.", string.Empty);
-                var dllPath = Path.Combine(destinationFolder, fileName);
+                string fileName = dependency.Replace("BenchmarkDotNet.Disassemblers.net46.win7_x64.", string.Empty);
+                string dllPath = Path.Combine(destinationFolder, fileName);
 
                 if (!File.Exists(dllPath))
                     CopyFromResources(

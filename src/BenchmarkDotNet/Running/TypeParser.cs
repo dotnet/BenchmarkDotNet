@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Running
         private IEnumerable<TypeWithMethods> AskUser()
         {
             var selectedTypes = new List<TypeWithMethods>();
-            var benchmarkCaptionExample = allTypes.First().GetDisplayName();
+            string benchmarkCaptionExample = allTypes.First().GetDisplayName();
 
             while (selectedTypes.Count == 0  && !consoleCancelKeyPressed)
             {
@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineHelp("If you want to select few, please separate them with space ` ` (e.g. `1 2 3`)");
                 logger.WriteLineHelp($"You can also provide the class name in console arguments by using --filter. (e.g. '--filter *{benchmarkCaptionExample}*'):");
 
-                var userInput = Console.ReadLine() ?? "";
+                string userInput = Console.ReadLine() ?? "";
 
                 selectedTypes.AddRange(GetMatching(userInput.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)));
                 logger.WriteLine();
@@ -137,7 +137,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineInfo("Please remember that the filter is applied to full benchmark name: `namespace.typeName.methodName`.");
             logger.WriteLineInfo("Some examples of full names:");
             
-            foreach (var displayName in allTypes
+            foreach (string displayName in allTypes
                 .SelectMany(type => BenchmarkConverter.TypeToBenchmarks(type, DefaultConfig.Instance).BenchmarksCases) // we use DefaultConfig to NOT filter the benchmarks
                 .Select(benchmarkCase => benchmarkCase.Descriptor.GetFilterName())
                 .Distinct()

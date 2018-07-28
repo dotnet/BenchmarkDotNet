@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Mathematics
         // Based on http://stackoverflow.com/questions/7040289/converting-integers-to-roman-numerals
         private static string ToRoman(int number)
         {
-            if ((number < 0) || (number > 3999)) throw new ArgumentOutOfRangeException(nameof(number), "insert value between 1 and 3999");
+            if (number < 0 || number > 3999) throw new ArgumentOutOfRangeException(nameof(number), "insert value between 1 and 3999");
             if (number < 1) return string.Empty;
             if (number >= 1000) return "M" + ToRoman(number - 1000);
             if (number >= 900) return "CM" + ToRoman(number - 900);

@@ -26,9 +26,9 @@ namespace BenchmarkDotNet.Columns
         public static SizeUnit GetBestSizeUnit(params long[] values)
         {
             if (!values.Any())
-                return SizeUnit.B;
+                return B;
             // Use the largest unit to display the smallest recorded measurement without loss of precision.
-            var minValue = values.Min();
+            long minValue = values.Min();
             foreach (var sizeUnit in All)
             {
                 if (minValue < sizeUnit.ByteAmount * BytesInKiloByte)

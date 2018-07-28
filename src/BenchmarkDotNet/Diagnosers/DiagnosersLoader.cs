@@ -11,8 +11,8 @@ namespace BenchmarkDotNet.Diagnosers
 {
     internal static class DiagnosersLoader
     {
-        const string DiagnosticAssemblyFileName = "BenchmarkDotNet.Diagnostics.Windows.dll";
-        const string DiagnosticAssemblyName = "BenchmarkDotNet.Diagnostics.Windows";
+        private const string DiagnosticAssemblyFileName = "BenchmarkDotNet.Diagnostics.Windows.dll";
+        private const string DiagnosticAssemblyName = "BenchmarkDotNet.Diagnostics.Windows";
 
         // Make the Diagnosers lazy-loaded, so they are only instantiated if needed
         internal static readonly Lazy<IDiagnoser[]> LazyLoadedDiagnosers 
@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Diagnosers
 
                 if (diagnosticsAssembly.GetName().Version != benchmarkDotNetCoreAssembly.GetName().Version)
                 {
-                    var errorMsg =
+                    string errorMsg =
                         $"Unable to load: {DiagnosticAssemblyFileName} version {diagnosticsAssembly.GetName().Version}" +
                         Environment.NewLine +
                         $"Does not match: {System.IO.Path.GetFileName(benchmarkDotNetCoreAssembly.Location)} version {benchmarkDotNetCoreAssembly.GetName().Version}";
@@ -101,7 +101,7 @@ namespace BenchmarkDotNet.Diagnosers
                 return Assembly.Load(referencedAssemblyName);
 
             // we use the location of BenchmarkDotNet.dll, because it should be in the same folder
-            var diagnosticAssemblyBinPath = Path.Combine(new FileInfo(benchmarkDotNetCoreAssembly.Location).DirectoryName, DiagnosticAssemblyFileName);
+            string diagnosticAssemblyBinPath = Path.Combine(new FileInfo(benchmarkDotNetCoreAssembly.Location).DirectoryName, DiagnosticAssemblyFileName);
             if (File.Exists(diagnosticAssemblyBinPath))
                 return Assembly.LoadFile(diagnosticAssemblyBinPath);
 

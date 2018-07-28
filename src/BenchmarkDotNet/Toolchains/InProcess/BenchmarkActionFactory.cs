@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             BenchmarkActionCodegen codegenMode,
             int unrollFactor)
         {
-            PrepareInstanceAndResultType(instance, targetMethod, fallbackIdleSignature, out object resultInstance, out Type resultType);
+            PrepareInstanceAndResultType(instance, targetMethod, fallbackIdleSignature, out var resultInstance, out var resultType);
 
             if (resultType == typeof(void))
                 return new BenchmarkActionVoid(resultInstance, targetMethod, codegenMode, unrollFactor);
@@ -80,7 +80,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             {
                 // DONTTOUCH: async should be checked for target method
                 // as fallbackIdleSignature used for result type detection only.
-                var isUsingAsyncKeyword = targetMethod?.HasAttribute<AsyncStateMachineAttribute>() ?? false;
+                bool isUsingAsyncKeyword = targetMethod?.HasAttribute<AsyncStateMachineAttribute>() ?? false;
                 if (isUsingAsyncKeyword)
                     throw new NotSupportedException("Async void is not supported by design.");
             }

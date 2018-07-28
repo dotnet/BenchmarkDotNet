@@ -20,23 +20,23 @@ namespace BenchmarkDotNet.Reports
 
         public ISummaryStyle WithTimeUnit(TimeUnit timeUnit)
         {
-            return new SummaryStyle()
+            return new SummaryStyle
             {
-                PrintUnitsInHeader = this.PrintUnitsInHeader,
-                PrintUnitsInContent = this.PrintUnitsInContent,
-                SizeUnit = this.SizeUnit,
+                PrintUnitsInHeader = PrintUnitsInHeader,
+                PrintUnitsInContent = PrintUnitsInContent,
+                SizeUnit = SizeUnit,
                 TimeUnit = timeUnit
             };
         }
 
         public ISummaryStyle WithSizeUnit(SizeUnit sizeUnit)
         {
-            return new SummaryStyle()
+            return new SummaryStyle
             {
-                PrintUnitsInHeader = this.PrintUnitsInHeader,
-                PrintUnitsInContent = this.PrintUnitsInContent,
+                PrintUnitsInHeader = PrintUnitsInHeader,
+                PrintUnitsInContent = PrintUnitsInContent,
                 SizeUnit = sizeUnit,
-                TimeUnit = this.TimeUnit
+                TimeUnit = TimeUnit
             };
         }
     }

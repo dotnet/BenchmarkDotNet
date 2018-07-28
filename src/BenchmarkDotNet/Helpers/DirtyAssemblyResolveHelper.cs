@@ -40,9 +40,9 @@ namespace BenchmarkDotNet.Helpers
         private Assembly HelpTheFrameworkToResolveTheAssembly(object sender, ResolveEventArgs args)
         {
             var fullName = new AssemblyName(args.Name);
-            var simpleName = fullName.Name;
+            string simpleName = fullName.Name;
 
-            var guessedPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{simpleName}.dll");
+            string guessedPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{simpleName}.dll");
 
             if (!File.Exists(guessedPath))
                 return null; // we can't help, and we also don't call Assembly.Load which if fails comes back here, creates endless loop and causes StackOverflow

@@ -23,8 +23,8 @@ namespace BenchmarkDotNet.Toolchains
     {
         public ExecuteResult Execute(ExecuteParameters executeParameters)
         {
-            var exePath = executeParameters.BuildResult.ArtifactsPaths.ExecutablePath;
-            var args = executeParameters.BenchmarkId.ToArgument();
+            string exePath = executeParameters.BuildResult.ArtifactsPaths.ExecutablePath;
+            string args = executeParameters.BenchmarkId.ToArgument();
 
             if (!File.Exists(exePath))
             {

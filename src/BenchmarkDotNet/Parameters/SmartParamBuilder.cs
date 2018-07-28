@@ -69,11 +69,11 @@ namespace BenchmarkDotNet.Parameters
 
         public string ToSourceCode()
         {
-            var cast = $"({Value.GetType().GetCorrectCSharpTypeName()})"; // it's an object so we need to cast it to the right type
+            string cast = $"({Value.GetType().GetCorrectCSharpTypeName()})"; // it's an object so we need to cast it to the right type
 
-            var callPostfix = source is PropertyInfo ? string.Empty : "()";
+            string callPostfix = source is PropertyInfo ? string.Empty : "()";
 
-            var indexPostfix = parameterDefinitions.Length > 1 
+            string indexPostfix = parameterDefinitions.Length > 1 
                 ? $"[{argumentIndex}]" // IEnumerable<object[]> 
                 : string.Empty; // IEnumerable<object>
 
@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.Parameters
         public SmartParameter(MemberInfo source, object value, int index)
         {
             this.source = source;
-            this.method = source is PropertyInfo property ? property.GetMethod : source as MethodInfo;
+            method = source is PropertyInfo property ? property.GetMethod : source as MethodInfo;
             Value = value;
             this.index = index;
         }
@@ -103,11 +103,11 @@ namespace BenchmarkDotNet.Parameters
 
         public string ToSourceCode()
         {
-            var cast = $"({Value.GetType().GetCorrectCSharpTypeName()})";
+            string cast = $"({Value.GetType().GetCorrectCSharpTypeName()})";
 
-            var instancePrefix = method.IsStatic ? source.DeclaringType.GetCorrectCSharpTypeName() : "instance";
+            string instancePrefix = method.IsStatic ? source.DeclaringType.GetCorrectCSharpTypeName() : "instance";
 
-            var callPostfix = source is PropertyInfo ? string.Empty : "()";
+            string callPostfix = source is PropertyInfo ? string.Empty : "()";
 
             // we just execute (cast)source.ToArray()[index]; 
             return $"{cast}{instancePrefix}.{source.Name}{callPostfix}.ToArray()[{index}];";

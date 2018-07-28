@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Portability.Cpu
             var mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
             foreach (var moProcessor in mosProcessor.Get().Cast<ManagementObject>())
             {
-                var name = moProcessor[WmicCpuInfoKeyNames.Name]?.ToString();
+                string name = moProcessor[WmicCpuInfoKeyNames.Name]?.ToString();
                 if (!string.IsNullOrEmpty(name))
                 {
                     processorModelNames.Add(name);

@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Running
 
             summaries.AddRange(BenchmarkRunner.Run(filteredBenchmarks, effectiveConfig));
 
-            var totalNumberOfExecutedBenchmarks = summaries.Sum(summary => summary.GetNumberOfExecutedBenchmarks());
+            int totalNumberOfExecutedBenchmarks = summaries.Sum(summary => summary.GetNumberOfExecutedBenchmarks());
             BenchmarkRunner.LogTotalTime(logger, globalChronometer.GetElapsed().GetTimeSpan(), totalNumberOfExecutedBenchmarks, "Global total time");
             return summaries;
         }

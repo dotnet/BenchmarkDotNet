@@ -83,7 +83,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 return Net46; // we return .NET 4.6 which during validation will tell the user about lack of support
             
             // this logic is put to a separate method to avoid any assembly loading issues on non Windows systems
-            var version = FrameworkVersionHelper.GetLatestNetDeveloperPackVersion();
+            string version = FrameworkVersionHelper.GetLatestNetDeveloperPackVersion();
             return Toolchains.TryGetValue(version, out var toolchain) ? toolchain : Default;
         }
     }

@@ -102,7 +102,7 @@ namespace BenchmarkDotNet.Code
 
         private static (bool, string) GetShadowCopySettings()
         {
-            var benchmarkDotNetLocation = Path.GetDirectoryName(typeof(CodeGenerator).GetTypeInfo().Assembly.Location);
+            string benchmarkDotNetLocation = Path.GetDirectoryName(typeof(CodeGenerator).GetTypeInfo().Assembly.Location);
 
             if (benchmarkDotNetLocation != null && benchmarkDotNetLocation.ToUpper().Contains("LINQPAD"))
             {
@@ -169,7 +169,7 @@ namespace BenchmarkDotNet.Code
 
             if (method.ReturnType == typeof(void))
             {
-                var isUsingAsyncKeyword = method.HasAttribute<AsyncStateMachineAttribute>();
+                bool isUsingAsyncKeyword = method.HasAttribute<AsyncStateMachineAttribute>();
                 if (isUsingAsyncKeyword)
                 {
                     throw new NotSupportedException("async void is not supported by design");

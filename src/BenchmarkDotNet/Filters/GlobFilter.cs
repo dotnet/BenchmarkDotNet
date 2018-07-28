@@ -18,8 +18,8 @@ namespace BenchmarkDotNet.Filters
         public bool Predicate(BenchmarkCase benchmarkCase)
         {
             var benchmark = benchmarkCase.Descriptor.WorkloadMethod;
-            var fullBenchmarkName = benchmarkCase.Descriptor.GetFilterName();
-            var typeName = benchmark.DeclaringType.GetDisplayName();
+            string fullBenchmarkName = benchmarkCase.Descriptor.GetFilterName();
+            string typeName = benchmark.DeclaringType.GetDisplayName();
 
             return patterns.Any(pattern => typeName.EqualsWithIgnoreCase(pattern.userValue) || pattern.regex.IsMatch(fullBenchmarkName));
         }

@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
             if (microsoftDotNetILCompilerVersion == null) throw new ArgumentNullException(nameof(microsoftDotNetILCompilerVersion));
             if (nugetFeedUrl == null) throw new ArgumentNullException(nameof(nugetFeedUrl));
 
-            this.coreRtVersion = microsoftDotNetILCompilerVersion;
+            coreRtVersion = microsoftDotNetILCompilerVersion;
 
             feeds[Generator.CoreRtNuGetFeed] = nugetFeedUrl;
 

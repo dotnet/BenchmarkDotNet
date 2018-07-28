@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Engines
         internal IReadOnlyList<Measurement> Run(long invokeCount, IterationMode iterationMode, bool runAuto, int unrollFactor, bool forceSpecific = false)
             => (runAuto || targetCount == null) && !forceSpecific
                 ? RunAuto(invokeCount, iterationMode, unrollFactor)
-                : RunSpecific(invokeCount, iterationMode, (targetCount ?? DefaultWorkloadCount), unrollFactor);
+                : RunSpecific(invokeCount, iterationMode, targetCount ?? DefaultWorkloadCount, unrollFactor);
 
         private List<Measurement> RunAuto(long invokeCount, IterationMode iterationMode, int unrollFactor)
         {
@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Engines
                 if (iterationCounter >= minIterationCount && actualError < maxError)
                     break;
 
-                if (iterationCounter >= maxIterationCount || (isOverhead && iterationCounter >= MaxOverheadIterationCount))
+                if (iterationCounter >= maxIterationCount || isOverhead && iterationCounter >= MaxOverheadIterationCount)
                     break;
             }
             WriteLine();

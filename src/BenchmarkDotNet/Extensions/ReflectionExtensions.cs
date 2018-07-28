@@ -41,11 +41,11 @@ namespace BenchmarkDotNet.Extensions
 
             if (type == typeof(void))
                 return "void";
-            var prefix = "";
+            string prefix = "";
             if (!string.IsNullOrEmpty(type.Namespace) && includeNamespace)
                 prefix += type.Namespace + ".";
 
-            var nestedTypes = "";
+            string nestedTypes = "";
             Type child = type, parent = type.DeclaringType;
             while (child.IsNested && parent != null)
             {
@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Extensions
                 return type.Name;
             if (type.GetTypeInfo().IsGenericType)
             {
-                var mainName = type.Name.Substring(0, type.Name.IndexOf('`'));
+                string mainName = type.Name.Substring(0, type.Name.IndexOf('`'));
                 string args = string.Join(", ", type.GetGenericArguments().Select(T => GetCorrectCSharpTypeName(T, includeGenericArgumentsNamespace, includeGenericArgumentsNamespace)).ToArray());
                 return $"{prefix}{mainName}<{args}>";
             }
@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.Extensions
             if (!typeInfo.IsGenericType)
                 return typeInfo.Name;
 
-            var mainName = typeInfo.Name.Substring(0, typeInfo.Name.IndexOf('`'));
+            string mainName = typeInfo.Name.Substring(0, typeInfo.Name.IndexOf('`'));
             string args = string.Join(", ", typeInfo.GetGenericArguments().Select(GetDisplayName).ToArray());
             return $"{mainName}<{args}>";
         }
@@ -138,7 +138,7 @@ namespace BenchmarkDotNet.Extensions
             if (typeInfo.IsAbstract 
                 || typeInfo.IsSealed 
                 || typeInfo.IsNotPublic 
-                || (typeInfo.IsGenericType && !IsRunnableGenericType(typeInfo)))
+                || typeInfo.IsGenericType && !IsRunnableGenericType(typeInfo))
                 return false;
 
             return typeInfo.GetBenchmarks().Any();
@@ -183,7 +183,7 @@ namespace BenchmarkDotNet.Extensions
                 return false;
             
             // IsByRefLikeAttribute is not exposed for older runtimes, so we need to check it in an ugly way ;)
-            var isByRefLike = argumentType.GetCustomAttributes().Any(attribute => attribute.ToString().Contains("IsByRefLike"));
+            bool isByRefLike = argumentType.GetCustomAttributes().Any(attribute => attribute.ToString().Contains("IsByRefLike"));
             if (!isByRefLike)
                 return false;
 
@@ -202,7 +202,7 @@ namespace BenchmarkDotNet.Extensions
 
         private static bool IsRunnableGenericType(TypeInfo typeInfo)
             => // if it is an open generic - there must be GenericBenchmark attributes
-                (!typeInfo.IsGenericTypeDefinition || (typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any()))
+                (!typeInfo.IsGenericTypeDefinition || typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any())
                     && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it       
 
     }

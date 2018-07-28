@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Engines
         internal List<Measurement> Run(long invokeCount, IterationMode iterationMode, bool runAuto, int unrollFactor, bool forceSpecific = false)
             => (runAuto || warmupCount == null || warmupCount.Value == EngineResolver.ForceAutoWarmup) && !forceSpecific
                 ? RunAuto(invokeCount, iterationMode, unrollFactor)
-                : RunSpecific(invokeCount, iterationMode, (warmupCount ?? 0), unrollFactor);
+                : RunSpecific(invokeCount, iterationMode, warmupCount ?? 0, unrollFactor);
 
         private List<Measurement> RunAuto(long invokeCount, IterationMode iterationMode, int unrollFactor)
         {
@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Engines
         private bool IsWarmupFinished(List<Measurement> measurements, IterationMode iterationMode)
         {
             int n = measurements.Count;
-            if (n >= maxIterationCount || (iterationMode == IterationMode.Overhead && n >= MaxOverheadIterationCount))
+            if (n >= maxIterationCount || iterationMode == IterationMode.Overhead && n >= MaxOverheadIterationCount)
                 return true;
             if (n < minIterationCount)
                 return false;

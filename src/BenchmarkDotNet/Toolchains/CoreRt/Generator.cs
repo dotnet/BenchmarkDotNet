@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
 
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
-            var extraArguments = useCppCodeGenerator ? $"-r {runtimeIdentifier} /p:NativeCodeGen=cpp" : $"-r {runtimeIdentifier}";
+            string extraArguments = useCppCodeGenerator ? $"-r {runtimeIdentifier} /p:NativeCodeGen=cpp" : $"-r {runtimeIdentifier}";
 
             if (useTempFolderForRestore)
             {

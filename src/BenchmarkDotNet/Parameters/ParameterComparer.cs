@@ -19,9 +19,9 @@ namespace BenchmarkDotNet.Parameters
 
         public int Compare(ParameterInstances x, ParameterInstances y)
         {
-            for (var i = 0; i < Math.Min(x.Count, y.Count); i++)
+            for (int i = 0; i < Math.Min(x.Count, y.Count); i++)
             {
-                var compareTo = primitiveComparer.CompareTo(x[i]?.Value, y[i]?.Value);
+                int compareTo = primitiveComparer.CompareTo(x[i]?.Value, y[i]?.Value);
                 if (compareTo != 0)
                     return compareTo;
             }

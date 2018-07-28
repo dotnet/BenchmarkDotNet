@@ -26,8 +26,8 @@ namespace BenchmarkDotNet.Running
 
             public bool Equals(BenchmarkCase x, BenchmarkCase y)
             {
-                Job jobX = x.Job;
-                Job jobY = y.Job;
+                var jobX = x.Job;
+                var jobY = y.Job;
 
                 if (AreDifferent(GetRuntime(jobX), GetRuntime(jobY))) // Mono vs .NET vs Core
                     return false;

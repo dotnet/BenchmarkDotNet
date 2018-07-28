@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Reports
             var commonColumns = table.Columns.Where(c => !c.NeedToShow && !c.IsDefault).ToArray();
             if (commonColumns.Any())
             {
-                var paramsOnLine = 0;
+                int paramsOnLine = 0;
                 foreach (var column in commonColumns)
                 {
                     logger.WriteInfo($"{column.Header}={column.Content[0]}  ");
@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Reports
                     continue;
                 }
 
-                var text = (startOfGroup && (startOfGroupHighlightStrategy == MarkdownExporter.MarkdownHighlightStrategy.Bold))
+                string text = startOfGroup && startOfGroupHighlightStrategy == MarkdownExporter.MarkdownHighlightStrategy.Bold
                     ? BuildBoldText(table, line, leftDel, rightDel, columnIndex, boldMarkupFormat)
                     : BuildStandardText(table, line, leftDel, rightDel, columnIndex);
                 if (escapeHtml)
@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Reports
                 }
             }
             
-            if (startOfGroup && (startOfGroupHighlightStrategy == MarkdownExporter.MarkdownHighlightStrategy.Marker))
+            if (startOfGroup && startOfGroupHighlightStrategy == MarkdownExporter.MarkdownHighlightStrategy.Marker)
                 logger.Write(highlightRow ? LogKind.Header : LogKind.Statistic, " ^"); //
 
             logger.WriteLine();
@@ -121,7 +121,7 @@ namespace BenchmarkDotNet.Reports
             const char space = ' ';
             const int extraWidth = 2; // " |".Length is not included in the column's Width
 
-            var repeatCount = table.Columns[columnIndex].Width + extraWidth - leftDel.Length - line[columnIndex].Length - rightDel.Length;
+            int repeatCount = table.Columns[columnIndex].Width + extraWidth - leftDel.Length - line[columnIndex].Length - rightDel.Length;
             if (repeatCount > 0)
             {
                 buffer.Append(space, repeatCount);

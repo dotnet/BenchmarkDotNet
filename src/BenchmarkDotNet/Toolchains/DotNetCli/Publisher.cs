@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
         {
-            var extraArguments = GetExtraArguments(buildPartition);
+            string extraArguments = GetExtraArguments(buildPartition);
             var environmentVariables = GetEnvironmentVariables();
 
             var publishNoDependencies = CheckResult(generateResult, Build(generateResult, buildPartition, logger, $"--no-dependencies {extraArguments}", environmentVariables));

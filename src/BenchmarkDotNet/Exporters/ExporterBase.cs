@@ -31,8 +31,8 @@ namespace BenchmarkDotNet.Exporters
                 }
                 catch (IOException)
                 {
-                    var uniqueString = System.DateTime.Now.ToString("yyyyMMdd-HHmmss");
-                    var alternativeFilePath = $"{Path.Combine(summary.ResultsDirectoryPath, fileName)}-{FileCaption}{FileNameSuffix}-{uniqueString}.{FileExtension}";
+                    string uniqueString = System.DateTime.Now.ToString("yyyyMMdd-HHmmss");
+                    string alternativeFilePath = $"{Path.Combine(summary.ResultsDirectoryPath, fileName)}-{FileCaption}{FileNameSuffix}-{uniqueString}.{FileExtension}";
                     consoleLogger.WriteLineError($"Could not overwrite file {filePath}. Exporting to {alternativeFilePath}");
                     filePath = alternativeFilePath;
                 }

@@ -100,7 +100,7 @@ namespace BenchmarkDotNet.Reports
             {
                 var lineSplit = line.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
 
-                var iterationInfo = lineSplit[0];
+                string iterationInfo = lineSplit[0];
                 var iterationInfoSplit = iterationInfo.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 int iterationStageIndex = 0;
                 for (int i = 1; i < iterationInfoSplit[0].Length; i++)
@@ -118,15 +118,15 @@ namespace BenchmarkDotNet.Reports
                 var iterationStage = ParseIterationStage(iterationStageStr);
                 int.TryParse(iterationInfoSplit[1], out int iterationIndex);
 
-                var measurementsInfo = lineSplit[1];
+                string measurementsInfo = lineSplit[1];
                 var measurementsInfoSplit = measurementsInfo.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                var op = 1L;
-                var ns = double.PositiveInfinity;
-                foreach (var item in measurementsInfoSplit)
+                long op = 1L;
+                double ns = double.PositiveInfinity;
+                foreach (string item in measurementsInfoSplit)
                 {
                     var measurementSplit = item.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    var value = measurementSplit[0];
-                    var unit = measurementSplit[1];
+                    string value = measurementSplit[0];
+                    string unit = measurementSplit[1];
                     switch (unit)
                     {
                         case "ns":

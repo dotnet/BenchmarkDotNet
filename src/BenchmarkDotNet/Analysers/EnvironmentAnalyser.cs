@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Analysers
             if (summary.HostEnvironmentInfo.HasAttachedDebugger)
                 yield return CreateWarning("Benchmark was executed with attached debugger");
 
-            var unexpectedExit = summary.Reports.SelectMany(x => x.ExecuteResults).Any(x => x.ExitCode != 0);
+            bool unexpectedExit = summary.Reports.SelectMany(x => x.ExecuteResults).Any(x => x.ExitCode != 0);
             if (unexpectedExit)
             {
                 var avProducts = summary.HostEnvironmentInfo.AntivirusProducts.Value;

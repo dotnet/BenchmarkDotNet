@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
-            IXmlSerializer serializer = BuildSerializer(summary);
+            var serializer = BuildSerializer(summary);
 
             // Use custom UTF-8 StringWriter because the default writes UTF-16
             var stringBuilder = new StringBuilder();
@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         private IXmlSerializer BuildSerializer(Summary summary)
         {
-            XmlSerializer.XmlSerializerBuilder builder =
+            var builder =
                 XmlSerializer.GetBuilder(typeof(SummaryDto))
                                .WithRootName(nameof(Summary))
                                .WithCollectionItemName(nameof(BenchmarkReportDto.Measurements),

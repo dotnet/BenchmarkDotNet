@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 // which could cause the jitting/assembly loading to happen before we do anything
                 // we have some jitting diagnosers and we want them to catch all the informations!!
 
-                var inProcessRunnableTypeName = $"{typeof(InProcessRunner).FullName}+{nameof(Runnable)}";
+                string inProcessRunnableTypeName = $"{typeof(InProcessRunner).FullName}+{nameof(Runnable)}";
                 var type = typeof(InProcessRunner).GetTypeInfo().Assembly.GetType(inProcessRunnableTypeName);
                 if (type == null)
                     throw new InvalidOperationException($"Bug: type {inProcessRunnableTypeName} not found.");
@@ -100,7 +100,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             {
                 var target = benchmarkCase.Descriptor;
                 var job = benchmarkCase.Job; // TODO: filter job (same as SourceCodePresenter does)?
-                var unrollFactor = benchmarkCase.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance);
+                int unrollFactor = benchmarkCase.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance);
 
                 // DONTTOUCH: these should be allocated together
                 var instance = Activator.CreateInstance(benchmarkCase.Descriptor.Type);
@@ -117,7 +117,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 FillMembers(instance, benchmarkCase);
 
                 host.WriteLine();
-                foreach (var infoLine in BenchmarkEnvironmentInfo.GetCurrent().ToFormattedString())
+                foreach (string infoLine in BenchmarkEnvironmentInfo.GetCurrent().ToFormattedString())
                     host.WriteLine("// {0}", infoLine);
                 host.WriteLine("// Job: {0}", job.DisplayInfo);
                 host.WriteLine();

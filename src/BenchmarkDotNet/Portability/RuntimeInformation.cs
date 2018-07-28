@@ -195,7 +195,7 @@ namespace BenchmarkDotNet.Portability
             }
             else if (IsNetCore)
             {
-                var runtimeVersion = GetNetCoreVersion() ?? "?";
+                string runtimeVersion = GetNetCoreVersion() ?? "?";
 
                 var coreclrAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(object).GetTypeInfo().Assembly.Location);
                 var corefxAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(Regex).GetTypeInfo().Assembly.Location);
@@ -282,7 +282,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetConfiguration()
         {
-            bool? isDebug = Assembly.GetEntryAssembly().IsDebug();
+            var isDebug = Assembly.GetEntryAssembly().IsDebug();
             if (isDebug.HasValue == false)
             {
                 return Unknown;
@@ -297,7 +297,7 @@ namespace BenchmarkDotNet.Portability
 
             public bool IsMsX64(int step = 1)
             {
-                var value = 0;
+                int value = 0;
                 for (int i = 0; i < step; i++)
                 {
                     bar = i + 10;
@@ -354,9 +354,9 @@ namespace BenchmarkDotNet.Portability
                 try
                 {
                     var wmi = new ManagementObjectSearcher(@"root\SecurityCenter2", "SELECT * FROM AntiVirusProduct");
-                    ManagementObjectCollection data = wmi.Get();
+                    var data = wmi.Get();
 
-                    foreach (ManagementBaseObject o in data)
+                    foreach (var o in data)
                     {
                         var av = (ManagementObject)o;
                         if (av != null)
@@ -381,11 +381,11 @@ namespace BenchmarkDotNet.Portability
             {
                 try
                 {
-                    using (ManagementObjectSearcher searcher = new ManagementObjectSearcher("Select * from Win32_ComputerSystem"))
+                    using (var searcher = new ManagementObjectSearcher("Select * from Win32_ComputerSystem"))
                     {
-                        using (ManagementObjectCollection items = searcher.Get())
+                        using (var items = searcher.Get())
                         {
-                            foreach (ManagementBaseObject item in items)
+                            foreach (var item in items)
                             {
                                 string manufacturer = item["Manufacturer"]?.ToString();
                                 string model = item["Model"]?.ToString();

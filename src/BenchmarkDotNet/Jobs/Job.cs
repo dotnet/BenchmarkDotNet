@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.Jobs
         {
             get
             {
-                var props = ResolveId(this, null);
+                string props = ResolveId(this, null);
                 return props == IdCharacteristic.FallbackValue
                     ? ResolvedId
                     : ResolvedId + $"({props})";

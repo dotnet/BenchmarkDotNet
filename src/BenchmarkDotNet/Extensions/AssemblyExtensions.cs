@@ -21,9 +21,9 @@ namespace BenchmarkDotNet.Extensions
                             .SingleOrDefault();
         }
 
-        static bool? IsJitOptimizerDisabled(this DebuggableAttribute attribute) => Read(attribute, "IsJITOptimizerDisabled");
+        private static bool? IsJitOptimizerDisabled(this DebuggableAttribute attribute) => Read(attribute, "IsJITOptimizerDisabled");
 
-        static bool? IsJitTrackingEnabled(this DebuggableAttribute attribute) => Read(attribute, "IsJITTrackingEnabled");
+        private static bool? IsJitTrackingEnabled(this DebuggableAttribute attribute) => Read(attribute, "IsJITTrackingEnabled");
 
         private static bool? Read(DebuggableAttribute debuggableAttribute, string propertyName)
         {

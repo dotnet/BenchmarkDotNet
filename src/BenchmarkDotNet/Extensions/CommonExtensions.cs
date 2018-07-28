@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Extensions
         public static string ToSizeStr(this long value, SizeUnit unit = null, int unitNameWidth = 1, bool showUnit = true)
         {
             unit = unit ?? SizeUnit.GetBestSizeUnit(value);
-            var unitValue = SizeUnit.Convert(value, SizeUnit.B, unit);
+            double unitValue = SizeUnit.Convert(value, SizeUnit.B, unit);
             if (showUnit)
             {
                 string unitName = unit.Name.PadLeft(unitNameWidth);
