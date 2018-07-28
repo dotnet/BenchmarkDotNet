@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Diagnosers
         {
             foreach (var diagnoser in diagnosers)
             {
-                // TODO when Diagnosers/Diagnostis are wired up properly, instead of the Type name, 
+                // TODO when Diagnosers/Diagnostics are wired up properly, instead of the Type name, 
                 // print the name used on the cmd line, i.e. -d=<NAME>
                 logger.WriteLineHeader($"// * Diagnostic Output - {diagnoser.GetType().Name} *");
                 diagnoser.DisplayResults(logger);

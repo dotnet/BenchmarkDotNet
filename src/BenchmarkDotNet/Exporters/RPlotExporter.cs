@@ -105,7 +105,7 @@ namespace BenchmarkDotNet.Exporters
                 }
                 catch (Exception)
                 {
-                    // Nevermind
+                    // Never mind
                 }
             }
             return null;

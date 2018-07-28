@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase)
         {
-            if (ShouldUseWindowsDissasembler(benchmarkCase))
+            if (ShouldUseWindowsDisassembler(benchmarkCase))
                 return RunMode.NoOverhead;
             if (ShouldUseMonoDisassembler(benchmarkCase))
                 return RunMode.SeparateLogic;
@@ -64,8 +64,8 @@ namespace BenchmarkDotNet.Diagnosers
         {
             var benchmark = parameters.BenchmarkCase;
 
-            if (signal == HostSignal.AfterAll && ShouldUseWindowsDissasembler(benchmark))
-                results.Add(benchmark, windowsDisassembler.Dissasemble(parameters));
+            if (signal == HostSignal.AfterAll && ShouldUseWindowsDisassembler(benchmark))
+                results.Add(benchmark, windowsDisassembler.Disassemble(parameters));
             else if (signal == HostSignal.SeparateLogic && ShouldUseMonoDisassembler(benchmark))
                 results.Add(benchmark, monoDisassembler.Disassemble(benchmark, benchmark.Job.Environment.Runtime as MonoRuntime));
         }
@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Diagnosers
         private bool ShouldUseMonoDisassembler(BenchmarkCase benchmarkCase)
             => benchmarkCase.Job.Environment.Runtime is MonoRuntime || RuntimeInformation.IsMono;
 
-        private bool ShouldUseWindowsDissasembler(BenchmarkCase benchmarkCase)
+        private bool ShouldUseWindowsDisassembler(BenchmarkCase benchmarkCase)
             => !(benchmarkCase.Job.Environment.Runtime is MonoRuntime) && RuntimeInformation.IsWindows();
     }
 }

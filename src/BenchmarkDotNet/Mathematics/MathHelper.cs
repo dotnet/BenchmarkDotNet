@@ -129,7 +129,7 @@ namespace BenchmarkDotNet.Mathematics
             }
             catch (Exception)
             {
-                return 1; // In case of any bugs, we return 1 because it's an invalud value (mvalue is always >= 2)
+                return 1; // In case of any bugs, we return 1 because it's an invalid value (mvalue is always >= 2)
             }
         }
 

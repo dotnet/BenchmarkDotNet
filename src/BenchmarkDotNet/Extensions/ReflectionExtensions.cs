@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Extensions
                 while (!(type.IsPublic || type.IsNestedPublic) && type.BaseType != null)
                     type = type.BaseType;
 
-            // the reflection is missing information about types passed by ref (ie ref ValuTuple<int> is reported as NON generic type)
+            // the reflection is missing information about types passed by ref (ie ref ValueTuple<int> is reported as NON generic type)
             if (type.IsByRef && !type.IsGenericType && type.Name.Contains('`'))
                 type = type.GetElementType(); // https://github.com/dotnet/corefx/issues/29975#issuecomment-393134330
 

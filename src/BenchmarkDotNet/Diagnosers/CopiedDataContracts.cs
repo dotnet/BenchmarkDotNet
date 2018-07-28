@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Diagnosers
     {
         public const string NotManagedMethod = "not managed method";
 
-        public const string DiassemblerEntryMethodName = "__ForDisassemblyDiagnoser__";
+        public const string DisassemblerEntryMethodName = "__ForDisassemblyDiagnoser__";
     }
 }
 #pragma warning restore CS3003 // Type is not CLS-compliant

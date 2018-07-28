@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
@@ -76,6 +77,7 @@ namespace BenchmarkDotNet.Environments
 
         // see http://www.intel.com/content/www/us/en/processors/processor-numbers.html
         [CanBeNull]
+        [SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static string ParseIntroCoreMicroarchitecture([NotNull] string modelNumber)
         {
             if (modelNumber.Length >= 3 && modelNumber.Substring(0, 3).All(char.IsDigit) &&

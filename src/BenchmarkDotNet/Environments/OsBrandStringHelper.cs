@@ -194,21 +194,21 @@ namespace BenchmarkDotNet.Environments
             };
 
             [CanBeNull]
-            public static string ResolveCodeName([NotNull] string kernelVerion)
+            public static string ResolveCodeName([NotNull] string kernelVersion)
             {
-                if (string.IsNullOrWhiteSpace(kernelVerion))
+                if (string.IsNullOrWhiteSpace(kernelVersion))
                     return null;
 
-                kernelVerion = kernelVerion.ToLowerInvariant().Trim();
-                if (kernelVerion.StartsWith("darwin"))
-                    kernelVerion = kernelVerion.Substring(6).Trim();
-                var numbers = kernelVerion.Split('.');
+                kernelVersion = kernelVersion.ToLowerInvariant().Trim();
+                if (kernelVersion.StartsWith("darwin"))
+                    kernelVersion = kernelVersion.Substring(6).Trim();
+                var numbers = kernelVersion.Split('.');
                 if (numbers.Length == 0)
                     return null;
 
                 string majorVersionStr = numbers[0];
-                if (int.TryParse(majorVersionStr, out int majorVerion))
-                    return WellKnownVersions.FirstOrDefault(v => v.DarwinVersion == majorVerion)?.CodeName;
+                if (int.TryParse(majorVersionStr, out int majorVersion))
+                    return WellKnownVersions.FirstOrDefault(v => v.DarwinVersion == majorVersion)?.CodeName;
                 return null;
             }
         }

@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Diagnosers
         {
             var parsed = method.Maps.SelectMany(map => map.Instructions.Select(Parse)).ToArray();
 
-            // if somebody is using given address as arugment, the address is "used" and should have it's own label
+            // if somebody is using given address as argument, the address is "used" and should have it's own label
             var usedArguments = new HashSet<string>(parsed
                 .Select(
                     a => string.IsNullOrEmpty(a.extraArguments)

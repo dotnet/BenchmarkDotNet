@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             if (!buildResult.IsSuccess)
             {
-                // dotnet cli could have succesfully builded the program, but returned 1 as exit code because it had some warnings
+                // dotnet cli could have successfully built the program, but returned 1 as exit code because it had some warnings
                 // so we need to check whether the exe exists or not, if it does then it is OK
                 if (File.Exists(generateResult.ArtifactsPaths.ExecutablePath))
                 {

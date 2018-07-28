@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Disassembler
                 // we don't want to export the disassembler entry point method which is just an artificial method added to get generic types working
                 var methodsToExport = disasembledMethods.Where(method => 
                     disasembledMethods.Count == 1  // if there is only one method we want to return it (most probably benchmark got inlined)
-                    || !method.Name.Contains(DisassemblerConstants.DiassemblerEntryMethodName)).ToArray();
+                    || !method.Name.Contains(DisassemblerConstants.DisassemblerEntryMethodName)).ToArray();
 
                 using (var stream = new FileStream(settings.ResultsPath, FileMode.Append, FileAccess.Write))
                 using (var writer = XmlWriter.Create(stream))
@@ -489,7 +489,7 @@ namespace BenchmarkDotNet.Disassembler
             PrintIL = printIL;
             PrintSource = printSource;
             PrintPrologAndEpilog = printPrologAndEpilog;
-            RecursiveDepth = methodName == DisassemblerConstants.DiassemblerEntryMethodName && recursiveDepth != int.MaxValue ? recursiveDepth + 1 : recursiveDepth;
+            RecursiveDepth = methodName == DisassemblerConstants.DisassemblerEntryMethodName && recursiveDepth != int.MaxValue ? recursiveDepth + 1 : recursiveDepth;
             ResultsPath = resultsPath;
         }
 

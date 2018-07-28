@@ -105,7 +105,7 @@ namespace BenchmarkDotNet.Exporters.Xml
         {
             IEnumerable collection = (IEnumerable)property.GetValue(source);
 
-            if (!IsCollectionWriteable(collection))
+            if (!IsCollectionWritable(collection))
                 return;
 
             writer.WriteStartElement(property.Name);
@@ -163,7 +163,7 @@ namespace BenchmarkDotNet.Exporters.Xml
         private static bool IsCollection(PropertyInfo property)
             => typeof(IEnumerable).IsAssignableFrom(property.PropertyType);
 
-        private bool IsCollectionWriteable(IEnumerable collection)
+        private bool IsCollectionWritable(IEnumerable collection)
             => collection?.Cast<object>().FirstOrDefault() != null;
 
         internal class XmlSerializerBuilder

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Columns;
@@ -41,6 +42,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             { "corert", Runtime.CoreRT }
         };
 
+        [SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static readonly IReadOnlyDictionary<string, IExporter[]> AvailableExporters =
             new Dictionary<string, IExporter[]>
             {

@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Characteristics
                 .Where(p => p.GetMethod != null && IsCharacteristicSubclass(p.PropertyType))
                 .Select(p => AssertHasValue(p, (Characteristic)p.GetValue(null)));
 
-            // DONTOUCH: DO NOT change the order of characteristic as it may break logic of some operations.
+            // DONTTOUCH: DO NOT change the order of characteristic as it may break logic of some operations.
             return fieldValues
                 .Concat(propertyValues)
                 .Distinct()
@@ -91,7 +91,7 @@ namespace BenchmarkDotNet.Characteristics
         private static void FillAllCharacteristicsCore(
             Type characteristicObjectType, List<Characteristic> result, HashSet<Characteristic> visited)
         {
-            // DONTOUCH: DO NOT change the order of characteristic as it may break logic of some operations.
+            // DONTTOUCH: DO NOT change the order of characteristic as it may break logic of some operations.
 
             var characteristics = GetThisTypeCharacteristics(characteristicObjectType);
             foreach (var characteristic in characteristics.Where(c => !c.HasChildCharacteristics))

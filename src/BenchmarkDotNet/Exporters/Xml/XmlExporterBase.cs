@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Exporters.Xml
         {
             IXmlSerializer serializer = BuildSerializer(summary);
 
-            // Use custom UTF-8 stringwriter because the default writes UTF-16
+            // Use custom UTF-8 StringWriter because the default writes UTF-16
             var stringBuilder = new StringBuilder();
             using (var textWriter = new Utf8StringWriter(stringBuilder))
             {

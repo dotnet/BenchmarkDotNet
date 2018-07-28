@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Diagnosers
             if (RuntimeInformation.IsFullFramework)
                 return LoadClassic();
 
-            // we can try to load `BenchmarkDotNet.Diagnostics.Windows` on Windows because it's using a .NET Standard compatibile EventTrace lib now
+            // we can try to load `BenchmarkDotNet.Diagnostics.Windows` on Windows because it's using a .NET Standard compatible EventTrace lib now
             if (RuntimeInformation.IsWindows())
                 return LoadClassic();
 

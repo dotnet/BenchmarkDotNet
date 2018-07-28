@@ -82,6 +82,6 @@ namespace BenchmarkDotNet.Disassembler
     {
         public const string NotManagedMethod = "not managed method";
 
-        public const string DiassemblerEntryMethodName = "__ForDisassemblyDiagnoser__";
+        public const string DisassemblerEntryMethodName = "__ForDisassemblyDiagnoser__";
     }
 }

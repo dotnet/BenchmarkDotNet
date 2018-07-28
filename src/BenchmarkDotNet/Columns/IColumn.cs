@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Columns
     public interface IColumn
     {
         /// <summary>
-        /// An unique identificator of the column.
+        /// An unique identifier of the column.
         /// <remarks>If there are several columns with the same Id, only one of them will be shown in the summary.</remarks>
         /// </summary>
         string Id { get; }

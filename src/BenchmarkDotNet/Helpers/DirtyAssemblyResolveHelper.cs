@@ -49,10 +49,10 @@ namespace BenchmarkDotNet.Helpers
 
             // the file is right there, but has most probably different version and there is no assembly redirect
             // so we just load it and ignore the version mismatch
-            // we can at leat try because benchmarks are not executed in the Host process, 
-            // so even if we load some bad verison of the assembly
+            // we can at least try because benchmarks are not executed in the Host process, 
+            // so even if we load some bad version of the assembly
             // we might still produce the right exe with proper references
-            // we do the trick only in the host proces, not in the child (benchmark) one
+            // we do the trick only in the host process, not in the child (benchmark) one
 
             // we warn the user about that, in case some Super User want to be aware of that
             logger.WriteLine(LogKind.Info, $".NET Framework was unable to load {args.Name}, but we are going to load it from {guessedPath}");

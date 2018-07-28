@@ -65,7 +65,7 @@ namespace JetBrains.Annotations
     internal sealed class NotNullAttribute : Attribute { }
 
     /// <summary>
-    /// Can be appplied to symbols of types derived from IEnumerable as well as to symbols of Task
+    /// Can be applied to symbols of types derived from IEnumerable as well as to symbols of Task
     /// and Lazy classes to indicate that the value of a collection item, of the Task.Result property
     /// or of the Lazy.Value property can never be null.
     /// </summary>
@@ -75,7 +75,7 @@ namespace JetBrains.Annotations
     internal sealed class ItemNotNullAttribute : Attribute { }
 
     /// <summary>
-    /// Can be appplied to symbols of types derived from IEnumerable as well as to symbols of Task
+    /// Can be applied to symbols of types derived from IEnumerable as well as to symbols of Task
     /// and Lazy classes to indicate that the value of a collection item, of the Task.Result property
     /// or of the Lazy.Value property can be null.
     /// </summary>
@@ -217,7 +217,7 @@ namespace JetBrains.Annotations
     /// </list>
     /// If method has single input parameter, it's name could be omitted.<br/>
     /// Using <c>halt</c> (or <c>void</c>/<c>nothing</c>, which is the same)
-    /// for method output means that the methos doesn't return normally.<br/>
+    /// for method output means that the methods doesn't return normally.<br/>
     /// <c>canbenull</c> annotation is only applicable for output parameters.<br/>
     /// You can use multiple <c>[ContractAnnotation]</c> for each FDT row,
     /// or use single attribute with rows separated by semicolon.<br/>

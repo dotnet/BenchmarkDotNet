@@ -1,4 +1,5 @@
 ﻿﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
@@ -8,6 +9,7 @@ namespace BenchmarkDotNet.Portability.Cpu
     internal static class SysctlCpuInfoParser
     {
         [NotNull]
+        [SuppressMessage("ReSharper", "StringLiteralTypo")]
         internal static CpuInfo ParseOutput([CanBeNull] string content)
         {
             var sysctl = SectionsHelper.ParseSection(content, ':');

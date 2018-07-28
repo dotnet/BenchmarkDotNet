@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
-using JsonSerialiser = SimpleJson.SimpleJson;
+using JsonSerializer = SimpleJson.SimpleJson;
 
 namespace BenchmarkDotNet.Exporters.Json
 {
@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Exporters.Json
         public override void ExportToLog(Summary summary, ILogger logger)
         {
             // We construct HostEnvironmentInfo manually, so that we can have the HardwareTimerKind enum as text, rather than an integer
-            // SimpleJson serialiser doesn't seem to have an enum String/Value option (to-be-fair, it is meant to be "Simple")
+            // SimpleJson serializer doesn't seem to have an enum String/Value option (to-be-fair, it is meant to be "Simple")
             var environmentInfo = new
             {
                 HostEnvironmentInfo.BenchmarkDotNetCaption,
@@ -88,8 +88,8 @@ namespace BenchmarkDotNet.Exporters.Json
                 return data;
             });
 
-            JsonSerialiser.CurrentJsonSerializerStrategy.Indent = IndentJson;
-            logger.WriteLine(JsonSerialiser.SerializeObject(new Dictionary<string, object>
+            JsonSerializer.CurrentJsonSerializerStrategy.Indent = IndentJson;
+            logger.WriteLine(JsonSerializer.SerializeObject(new Dictionary<string, object>
             {
                 { "Title", summary.Title },
                 { "HostEnvironmentInfo", environmentInfo },

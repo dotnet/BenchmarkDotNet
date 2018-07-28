@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         private static BuildResult CheckResult(GenerateResult generateResult, DotNetCliCommandExecutor.CommandResult commandResult) 
-            => commandResult.IsSuccess || File.Exists(generateResult.ArtifactsPaths.ExecutablePath) // dotnet cli could have succesfully builded the program, but returned 1 as exit code because it had some warnings
+            => commandResult.IsSuccess || File.Exists(generateResult.ArtifactsPaths.ExecutablePath) // dotnet cli could have successfully built the program, but returned 1 as exit code because it had some warnings
                 ? BuildResult.Success(generateResult)
                 : BuildResult.Failure(generateResult, new Exception(commandResult.ProblemDescription));
     }

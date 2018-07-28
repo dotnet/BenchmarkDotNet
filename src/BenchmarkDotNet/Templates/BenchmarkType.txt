@@ -81,7 +81,7 @@
 		public void __TrickTheJIT__()
 		{
 			NotEleven = new System.Random(123).Next(0, 10);
-            $DiassemblerEntryMethodName$();
+            $DisassemblerEntryMethodName$();
 		}
 
         private int dummyVar;
@@ -150,7 +150,7 @@
         }
         
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public $WorkloadMethodReturnType$ $DiassemblerEntryMethodName$()
+        public $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
         {
             if (NotEleven == 11)
             {
@@ -213,7 +213,7 @@
         private void NonGenericKeepAliveWithoutBoxing($WorkloadMethodReturnType$ _) { }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public $WorkloadMethodReturnType$ $DiassemblerEntryMethodName$()
+        public $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
         {
             if (NotEleven == 11)
             {
@@ -273,7 +273,7 @@
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public ref $WorkloadMethodReturnType$ $DiassemblerEntryMethodName$()
+        public ref $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
         {
             if (NotEleven == 11)
             {
@@ -322,7 +322,7 @@
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public void $DiassemblerEntryMethodName$()
+        public void $DisassemblerEntryMethodName$()
         {
             if (NotEleven == 11)
             {

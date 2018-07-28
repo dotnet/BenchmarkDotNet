@@ -118,7 +118,7 @@ namespace BenchmarkDotNet.Columns
                     case DiffKind.StdDev:
                         return "Standard deviation of ratio of distribution of [CurrentBenchmark] and [BaselineBenchmark]";
                     case DiffKind.WelchTTestPValue:
-                        return "p-value for Welch's t-test of [CurrentbBenchmark] and [BaselineBenchmark]";
+                        return "p-value for Welch's t-test of [CurrentBenchmark] and [BaselineBenchmark]";
                     default:
                         throw new ArgumentOutOfRangeException(nameof(Kind));
                 }

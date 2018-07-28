@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option('m', "memory", Required = false, Default = false, HelpText = "Prints memory statistics")]
         public bool UseMemoryDiagnoser { get; set; }
 
-        [Option('d', "disassm", Required = false, Default = false, HelpText = "Gets diassembly of benchmarked code")]
+        [Option('d', "disasm", Required = false, Default = false, HelpText = "Gets disassembly of benchmarked code")]
         public bool UseDisassemblyDiagnoser { get; set; }
 
         [Option('f', "filter", Required = false, HelpText = "Glob patterns")]

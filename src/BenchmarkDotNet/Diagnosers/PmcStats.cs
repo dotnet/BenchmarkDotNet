@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Diagnosers
                 .ToDictionary
                 (
                     counter => counter.ProfileSourceId,
-                    coounter => coounter
+                    counter => counter
                 );
             Counters = CountersByProfileSourceId.ToDictionary(c => c.Value.Counter, c => c.Value);
         }
