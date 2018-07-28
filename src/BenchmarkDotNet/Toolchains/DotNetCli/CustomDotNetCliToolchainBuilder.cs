@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using JetBrains.Annotations;
 using Microsoft.DotNet.PlatformAbstractions;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
@@ -21,6 +22,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// <summary>it allows you to define an additional NuGet feed, you can seal the feeds list by using the UseNuGetClearTag() method</summary>
         /// <param name="feedName">the name of the feed, will be used in the auto-generated NuGet.config file</param>
         /// <param name="feedAddress">the address of the feed, will be used in the auto-generated NuGet.config file</param>
+        [PublicAPI]
         public CustomDotNetCliToolchainBuilder AdditionalNuGetFeed(string feedName, string feedAddress)
         {
             if (string.IsNullOrEmpty(feedName)) throw new ArgumentException("Value cannot be null or empty.", nameof(feedName));
@@ -42,6 +44,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         /// <param name="targetFrameworkMoniker">TFM, netcoreapp2.1 is the default</param>
+        [PublicAPI]
         public CustomDotNetCliToolchainBuilder TargetFrameworkMoniker(string targetFrameworkMoniker = "netcoreapp2.1")
         {
             this.targetFrameworkMoniker = targetFrameworkMoniker ?? throw new ArgumentNullException(nameof(targetFrameworkMoniker));
@@ -50,6 +53,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         /// <param name="customDotNetCliPath">if not provided, the one from PATH will be used</param>
+        [PublicAPI]
         public CustomDotNetCliToolchainBuilder DotNetCli(string customDotNetCliPath)
         {
             if (!string.IsNullOrEmpty(customDotNetCliPath) && !File.Exists(customDotNetCliPath))
@@ -61,6 +65,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         /// <param name="runtimeIdentifier">if not provided, portable OS-arch will be used (example: "win-x64", "linux-x86")</param>
+        [PublicAPI]
         public CustomDotNetCliToolchainBuilder RuntimeIdentifier(string runtimeIdentifier)
         {
             this.runtimeIdentifier = runtimeIdentifier;
@@ -69,6 +74,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         /// <param name="runtimeFrameworkVersion">optional, when set it's copied to the generated .csproj file</param>
+        [PublicAPI]
         public CustomDotNetCliToolchainBuilder RuntimeFrameworkVersion(string runtimeFrameworkVersion)
         {
             this.runtimeFrameworkVersion = runtimeFrameworkVersion;
@@ -77,6 +83,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         /// <param name="displayName">the name of the toolchain to be displayed in results</param>
+        [PublicAPI]
         public CustomDotNetCliToolchainBuilder DisplayName(string displayName)
         {
             if (string.IsNullOrEmpty(displayName)) throw new ArgumentException("Value cannot be null or empty.", nameof(displayName));
@@ -90,6 +97,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// restore to temp folder to keep your CI clean or install same package many times (perhaps with different content but same version number), by default true for local builds
         /// https://github.com/dotnet/corefx/blob/master/Documentation/project-docs/dogfooding.md#3---consuming-subsequent-code-changes-by-rebuilding-the-package-alternative-2
         /// </summary>
+        [PublicAPI]
         public CustomDotNetCliToolchainBuilder UseTempFolderForRestore(bool value)
         {
             useTempFolderForRestore = value;

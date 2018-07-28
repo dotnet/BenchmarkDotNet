@@ -10,7 +10,6 @@ namespace BenchmarkDotNet.Characteristics
     public abstract class CharacteristicObject
     {
         #region IdCharacteristic
-        private const string IdSeparator = "&";
 
         protected static string ResolveId(CharacteristicObject obj, string actual)
         {
@@ -170,6 +169,7 @@ namespace BenchmarkDotNet.Characteristics
             return HasValue(characteristic) ? GetValue(characteristic) : (T)characteristic.ResolveValueCore(this, defaultValue);
         }
 
+        [PublicAPI]
         public object ResolveValue(Characteristic characteristic, object defaultValue)
         {
             return HasValue(characteristic) ? GetValue(characteristic) : characteristic.ResolveValueCore(this, defaultValue);
@@ -315,6 +315,8 @@ namespace BenchmarkDotNet.Characteristics
         #endregion
 
         #region Apply
+        
+        [PublicAPI]
         public void Apply(CharacteristicObject other) => ApplyCore(other);
 
         protected CharacteristicObject ApplyCore(CharacteristicObject other) =>
@@ -360,6 +362,8 @@ namespace BenchmarkDotNet.Characteristics
         #endregion
 
         #region Freeze / unfreeze
+        
+        [PublicAPI]
         public void Freeze() => FreezeCore();
 
         protected CharacteristicObject FreezeCore()
@@ -372,6 +376,7 @@ namespace BenchmarkDotNet.Characteristics
             return this;
         }
 
+        [PublicAPI]
         public CharacteristicObject UnfreezeCopy() => UnfreezeCopyCore();
 
         protected CharacteristicObject UnfreezeCopyCore()

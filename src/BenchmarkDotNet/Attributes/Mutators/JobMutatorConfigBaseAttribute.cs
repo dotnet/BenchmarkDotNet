@@ -1,6 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes
 {
@@ -8,6 +9,7 @@ namespace BenchmarkDotNet.Attributes
     public class JobMutatorConfigBaseAttribute : Attribute, IConfigSource
     {
         // CLS-Compliant Code requires a constructor which use only CLS-compliant types
+        [PublicAPI]
         public JobMutatorConfigBaseAttribute() => Config = ManualConfig.CreateEmpty();
         
         protected JobMutatorConfigBaseAttribute(Job job) => Config = ManualConfig.CreateEmpty().With(job.AsMutator());

@@ -1,4 +1,6 @@
-﻿namespace BenchmarkDotNet.Exporters.Xml
+﻿using JetBrains.Annotations;
+
+namespace BenchmarkDotNet.Exporters.Xml
 {
     public class XmlExporter : XmlExporterBase
     {
@@ -19,6 +21,7 @@
             FileNameSuffix = fileNameSuffix;
         }
 
+        [PublicAPI]
         public static IExporter Custom(string fileNameSuffix = "",
                                        bool indentXml = false,
                                        bool excludeMeasurements = false) =>

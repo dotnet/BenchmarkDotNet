@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes
 {
@@ -8,7 +9,7 @@ namespace BenchmarkDotNet.Attributes
         public Type[] GenericTypeArguments { get; }
 
         // CLS-Compliant Code requires a constructor without an array in the argument list
-        public GenericTypeArgumentsAttribute() => GenericTypeArguments = Array.Empty<Type>();
+        [PublicAPI] public GenericTypeArgumentsAttribute() => GenericTypeArguments = Array.Empty<Type>();
 
         public GenericTypeArgumentsAttribute(params Type[] genericTypeArguments) => GenericTypeArguments = genericTypeArguments;
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes
 {
@@ -8,6 +9,7 @@ namespace BenchmarkDotNet.Attributes
         public object[] Values { get; }
 
         // CLS-Compliant Code requires a constructor without an array in the argument list
+        [PublicAPI]
         public ArgumentsAttribute()
         {
             Values = Array.Empty<object>();

@@ -4,6 +4,7 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Columns
 {
@@ -71,14 +72,17 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn P95 = CreatePercentileColumn(95, s => s.Percentiles.P95);
         public static readonly IColumn P100 = CreatePercentileColumn(100, s => s.Percentiles.P100);
 
+        [PublicAPI]
         public static IColumn CiLower(ConfidenceLevel level) => new StatisticColumn(
             $"CI{level.ToPercentStr()} Lower", $"Lower bound of {level.ToPercentStr()} confidence interval",
             s => new ConfidenceInterval(s.Mean, s.StandardError, s.N, level).Lower, Priority.Additional);
 
+        [PublicAPI]
         public static IColumn CiUpper(ConfidenceLevel level) => new StatisticColumn(
             $"CI{level.ToPercentStr()} Upper", $"Upper bound of {level.ToPercentStr()} confidence interval",
             s => new ConfidenceInterval(s.Mean, s.StandardError, s.N, level).Upper, Priority.Additional);
 
+        [PublicAPI]
         public static IColumn CiError(ConfidenceLevel level) => new StatisticColumn(
             $"CI{level.ToPercentStr()} Margin", $"Half of {level.ToPercentStr()} confidence interval",
             s => new ConfidenceInterval(s.Mean, s.StandardError, s.N, level).Margin, Priority.Additional);

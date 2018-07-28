@@ -1,6 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes
 {    
@@ -8,6 +9,7 @@ namespace BenchmarkDotNet.Attributes
     public abstract class ColumnConfigBaseAttribute : Attribute, IConfigSource
     {
         // CLS-Compliant Code requires a constructor without an array in the argument list
+        [PublicAPI]
         protected ColumnConfigBaseAttribute()
         {
             Config = ManualConfig.CreateEmpty();

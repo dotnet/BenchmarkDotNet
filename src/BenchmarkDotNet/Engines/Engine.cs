@@ -200,7 +200,6 @@ namespace BenchmarkDotNet.Engines
         [UsedImplicitly]
         public static class Signals
         {
-            public const string DiagnoserIsAttachedParam = "diagnoserAttached";
             public const string Acknowledgment = "Acknowledgment";
 
             private static readonly Dictionary<HostSignal, string> SignalsToMessages

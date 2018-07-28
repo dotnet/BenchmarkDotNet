@@ -1,6 +1,7 @@
 using System;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes
 {
@@ -8,6 +9,7 @@ namespace BenchmarkDotNet.Attributes
     public class HardwareCountersAttribute : Attribute, IConfigSource
     {
         // CLS-Compliant Code requires a constructor without an array in the argument list
+        [PublicAPI]
         protected HardwareCountersAttribute()
         {
             Config = ManualConfig.CreateEmpty();

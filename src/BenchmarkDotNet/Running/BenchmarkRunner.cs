@@ -23,6 +23,7 @@ using BenchmarkDotNet.Toolchains.InProcess;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
+using JetBrains.Annotations;
 using RunMode = BenchmarkDotNet.Jobs.RunMode;
 using StreamWriter = BenchmarkDotNet.Portability.StreamWriter;
 
@@ -34,16 +35,16 @@ namespace BenchmarkDotNet.Running
 
         internal static readonly IResolver DefaultResolver = new CompositeResolver(EnvironmentResolver.Instance, InfrastructureResolver.Instance);
 
-        public static Summary Run<T>(IConfig config = null) => Run(BenchmarkConverter.TypeToBenchmarks(typeof(T), config));
+        [PublicAPI] public static Summary Run<T>(IConfig config = null) => Run(BenchmarkConverter.TypeToBenchmarks(typeof(T), config));
 
-        public static Summary Run(Type type, IConfig config = null) => Run(BenchmarkConverter.TypeToBenchmarks(type, config));
+        [PublicAPI] public static Summary Run(Type type, IConfig config = null) => Run(BenchmarkConverter.TypeToBenchmarks(type, config));
 
-        public static Summary Run(Type type, MethodInfo[] methods, IConfig config = null) => Run(BenchmarkConverter.MethodsToBenchmarks(type, methods, config));
+        [PublicAPI] public static Summary Run(Type type, MethodInfo[] methods, IConfig config = null) => Run(BenchmarkConverter.MethodsToBenchmarks(type, methods, config));
 
-        public static Summary[] Run(Assembly assembly, IConfig config = null) 
+        [PublicAPI] public static Summary[] Run(Assembly assembly, IConfig config = null) 
             => Run(assembly.GetRunnableBenchmarks().Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray(), config);
 
-        public static Summary RunUrl(string url, IConfig config = null)
+        [PublicAPI] public static Summary RunUrl(string url, IConfig config = null)
         {
 #if CLASSIC
             return Run(BenchmarkConverter.UrlToBenchmarks(url, config), config).Single();
@@ -52,7 +53,7 @@ namespace BenchmarkDotNet.Running
 #endif
         }
 
-        public static Summary RunSource(string source, IConfig config = null)
+        [PublicAPI] public static Summary RunSource(string source, IConfig config = null)
         {
 #if CLASSIC
             return Run(BenchmarkConverter.SourceToBenchmarks(source, config), config).Single();
@@ -61,9 +62,9 @@ namespace BenchmarkDotNet.Running
 #endif
         }
 
-        public static Summary Run(BenchmarkRunInfo benchmarkRunInfo) => Run(new[] { benchmarkRunInfo }, benchmarkRunInfo.Config).Single();
+        [PublicAPI] public static Summary Run(BenchmarkRunInfo benchmarkRunInfo) => Run(new[] { benchmarkRunInfo }, benchmarkRunInfo.Config).Single();
 
-        public static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos, IConfig commonSettingsConfig)
+        [PublicAPI] public static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos, IConfig commonSettingsConfig)
         {
             var resolver = DefaultResolver;
             var artifactsToCleanup = new List<string>();

@@ -1,7 +1,9 @@
 ﻿using BenchmarkDotNet.Validators;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes
 {
+    [PublicAPI]
     public class ReturnValueValidatorAttribute : ValidatorConfigBaseAttribute
     {
         public ReturnValueValidatorAttribute()

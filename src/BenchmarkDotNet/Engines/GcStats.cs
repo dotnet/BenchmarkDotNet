@@ -1,7 +1,10 @@
 ﻿using System;
+#if NETSTANDARD2_0
 using System.Reflection;
+#endif
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.DotNetCli;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Engines
 {
@@ -9,9 +12,11 @@ namespace BenchmarkDotNet.Engines
     {
         internal const string ResultsLinePrefix = "GC: ";
 
-        public static readonly long AllocationQuantum = CalculateAllocationQuantumSize(); 
+        public static readonly long AllocationQuantum = CalculateAllocationQuantumSize();
 
+#if NETSTANDARD2_0
         private static readonly Func<long> GetAllocatedBytesForCurrentThreadDelegate = GetAllocatedBytesForCurrentThread();
+#endif
 
         public static readonly GcStats Empty = new GcStats(0, 0, 0, 0, 0);
 
@@ -123,6 +128,7 @@ namespace BenchmarkDotNet.Engines
                 0);
         }
 
+        [PublicAPI]
         public static GcStats FromForced(int forcedFullGarbageCollections)
             => new GcStats(forcedFullGarbageCollections, forcedFullGarbageCollections, forcedFullGarbageCollections, 0, 0);
 
@@ -151,6 +157,7 @@ namespace BenchmarkDotNet.Engines
 #endif
         }
 
+#if NETSTANDARD2_0
         private static Func<long> GetAllocatedBytesForCurrentThread()
         {
             // for some versions of .NET Core this method is internal, 
@@ -162,7 +169,8 @@ namespace BenchmarkDotNet.Engines
 
             return () => (long)method.Invoke(null, null);
         }
-
+#endif
+  
         public string ToOutputLine() 
             => $"{ResultsLinePrefix} {Gen0Collections} {Gen1Collections} {Gen2Collections} {AllocatedBytes} {TotalOperations}";
 

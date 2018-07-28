@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using BenchmarkDotNet.Loggers;
 
@@ -10,6 +11,7 @@ namespace BenchmarkDotNet.Extensions
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ThreadExtensions
     {
+        [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Global")] // TODO: check result
         public static bool TrySetPriority(
             this Thread thread,
             ThreadPriority priority,

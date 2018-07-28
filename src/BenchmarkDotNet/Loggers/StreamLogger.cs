@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Loggers
 {
@@ -11,6 +12,7 @@ namespace BenchmarkDotNet.Loggers
             this.writer = writer;
         }
 
+        [PublicAPI]
         public StreamLogger(string filePath, bool append = false)
         {
             writer = Portability.StreamWriter.FromPath(filePath, append);

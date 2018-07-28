@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Characteristics
 {
@@ -34,7 +35,7 @@ namespace BenchmarkDotNet.Characteristics
         private static readonly ConcurrentDictionary<Type, IReadOnlyList<Characteristic>> thisTypeCharacteristics =
             new ConcurrentDictionary<Type, IReadOnlyList<Characteristic>>();
 
-        public static IReadOnlyList<Characteristic> GetThisTypeCharacteristics(this CharacteristicObject obj) =>
+        [PublicAPI] public static IReadOnlyList<Characteristic> GetThisTypeCharacteristics(this CharacteristicObject obj) =>
             GetThisTypeCharacteristics(obj.GetType());
 
         public static IReadOnlyList<Characteristic> GetThisTypeCharacteristics(Type characteristicObjectType)

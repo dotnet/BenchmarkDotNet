@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Exporters.Csv
     public class CsvMeasurementsExporter : ExporterBase
     {
         public static readonly CsvMeasurementsExporter Default = new CsvMeasurementsExporter(CsvSeparator.CurrentCulture, SummaryStyle.Default);
-        public static CsvMeasurementsExporter WithStyle(SummaryStyle style) => new CsvMeasurementsExporter(CsvSeparator.CurrentCulture, style);
+        [PublicAPI] public static CsvMeasurementsExporter WithStyle(SummaryStyle style) => new CsvMeasurementsExporter(CsvSeparator.CurrentCulture, style);
 
         private static readonly CharacteristicPresenter Presenter = CharacteristicPresenter.SummaryPresenter;
 
@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Exporters.Csv
 
         [PublicAPI] public ISummaryStyle Style { get; }
 
-        public static Job[] GetJobs(Summary summary) => summary.BenchmarksCases.Select(b => b.Job).ToArray();
+        [PublicAPI] public static Job[] GetJobs(Summary summary) => summary.BenchmarksCases.Select(b => b.Job).ToArray();
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {

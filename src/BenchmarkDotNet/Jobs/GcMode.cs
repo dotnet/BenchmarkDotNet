@@ -5,6 +5,7 @@ using BenchmarkDotNet.Characteristics;
 namespace BenchmarkDotNet.Jobs
 {
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public sealed class GcMode : JobMode<GcMode>, IEquatable<GcMode>
     {
         public static readonly Characteristic<bool> ServerCharacteristic = CreateCharacteristic<bool>(nameof(Server));

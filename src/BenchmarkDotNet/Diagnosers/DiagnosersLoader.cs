@@ -23,11 +23,6 @@ namespace BenchmarkDotNet.Diagnosers
                 .SingleOrDefault(diagnoser => diagnoser is TDiagnoser)
                 ?? GetUnresolvedDiagnoser<TDiagnoser>();
 
-        internal static IDiagnoser GetImplementation<TDiagnoser, TConfig>(TConfig config) where TDiagnoser : IConfigurableDiagnoser<TConfig>
-            => LazyLoadedDiagnosers.Value
-                .OfType<TDiagnoser>().SingleOrDefault()?.Configure(config)
-                ?? GetUnresolvedDiagnoser<TDiagnoser>();
-
         private static IDiagnoser GetUnresolvedDiagnoser<TDiagnoser>() => new UnresolvedDiagnoser(typeof(TDiagnoser));
 
         private static IDiagnoser[] LoadDiagnosers()

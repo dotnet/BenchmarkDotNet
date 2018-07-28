@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime;
 using BenchmarkDotNet.Engines;
@@ -62,6 +63,7 @@ namespace BenchmarkDotNet.Environments
             return $"{RuntimeVersion}, {Architecture} {jitInfo}";
         }
 
+        [SuppressMessage("ReSharper", "UnusedMember.Global")] // TODO: should be used or removed
         public static IEnumerable<ValidationError> Validate(Job job)
         {
             if (job.Environment.Jit == Jit.RyuJit && !RuntimeInformation.HasRyuJit())

@@ -6,6 +6,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -32,6 +33,6 @@ namespace BenchmarkDotNet.Diagnosers
 
     public interface IConfigurableDiagnoser<in TConfig> : IDiagnoser
     {
-        IConfigurableDiagnoser<TConfig> Configure(TConfig config);
+        [PublicAPI] IConfigurableDiagnoser<TConfig> Configure(TConfig config);
     }
 }

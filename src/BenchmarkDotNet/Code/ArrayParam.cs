@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Code
 {
@@ -36,7 +37,7 @@ namespace BenchmarkDotNet.Code
         /// <param name="toSourceCode">method which transforms an item of type T to it's C# representation
         /// example: point => $"new Point2d({point.X}, {point.Y})"
         /// </param>
-        public static ArrayParam<T> ForComplexTypes(T[] array, Func<T, string> toSourceCode) => new ArrayParam<T>(array, toSourceCode);
+        [PublicAPI] public static ArrayParam<T> ForComplexTypes(T[] array, Func<T, string> toSourceCode) => new ArrayParam<T>(array, toSourceCode);
 
         internal static IParam FromObject(object array)
         {

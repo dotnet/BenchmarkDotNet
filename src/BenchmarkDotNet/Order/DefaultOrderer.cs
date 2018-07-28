@@ -1,13 +1,16 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Order
 {
+    [SuppressMessage("ReSharper", "ClassWithVirtualMembersNeverInherited.Global")]
     public class DefaultOrderer : IOrderer
     {
         public static readonly IOrderer Instance = new DefaultOrderer();
@@ -29,6 +32,7 @@ namespace BenchmarkDotNet.Order
             logicalGroupComparer = new LogicalGroupComparer(benchmarkComparer);
         }
 
+        [PublicAPI]
         public virtual IEnumerable<BenchmarkCase> GetExecutionOrder(BenchmarkCase[] benchmarksCase)
         {
             var list = benchmarksCase.ToList();

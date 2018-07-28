@@ -1,10 +1,12 @@
-﻿using BenchmarkDotNet.Analysers;
+﻿using System.Diagnostics.CodeAnalysis;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Horology;
 
 namespace BenchmarkDotNet.Jobs
 {
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public sealed class RunMode : JobMode<RunMode>
     {
         public static readonly Characteristic<RunStrategy> RunStrategyCharacteristic = Characteristic.Create<RunMode, RunStrategy>(nameof(RunStrategy), RunStrategy.Throughput);

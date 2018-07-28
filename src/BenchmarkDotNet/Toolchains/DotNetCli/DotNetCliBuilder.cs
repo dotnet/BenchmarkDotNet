@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
@@ -8,6 +9,7 @@ using JetBrains.Annotations;
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     [PublicAPI]
+    [SuppressMessage("ReSharper", "ClassWithVirtualMembersNeverInherited.Global")]
     public class DotNetCliBuilder : IBuilder
     {
         public virtual string RestoreCommand => "restore --no-dependencies";

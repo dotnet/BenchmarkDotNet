@@ -13,67 +13,67 @@ namespace BenchmarkDotNet.Mathematics
         /// <summary>
         /// 50.0% confidence interval
         /// </summary>
-        L50,
+        [PublicAPI] L50,
 
         /// <summary>
         /// 70.0% confidence interval
         /// </summary>
-        L70,
+        [PublicAPI] L70,
 
         /// <summary>
         /// 75.0% confidence interval
         /// </summary>
-        L75,
+        [PublicAPI] L75,
 
         /// <summary>
         /// 80.0% confidence interval
         /// </summary>
-        L80,
+        [PublicAPI] L80,
 
         /// <summary>
         /// 85.0% confidence interval
         /// </summary>
-        L85,
+        [PublicAPI] L85,
 
         /// <summary>
         /// 90.0% confidence interval
         /// </summary>
-        L90,
+        [PublicAPI] L90,
 
         /// <summary>
         /// 92.0% confidence interval
         /// </summary>
-        L92,
+        [PublicAPI] L92,
 
         /// <summary>
         /// 95.0% confidence interval
         /// </summary>
-        L95,
+        [PublicAPI] L95,
 
         /// <summary>
         /// 96.0% confidence interval
         /// </summary>
-        L96,
+        [PublicAPI] L96,
 
         /// <summary>
         /// 97.0% confidence interval
         /// </summary>
-        L97,
+        [PublicAPI] L97,
 
         /// <summary>
         /// 98.0% confidence interval
         /// </summary>
-        L98,
+        [PublicAPI] L98,
 
         /// <summary>
         /// 99.0% confidence interval
         /// </summary>
-        L99,
+        [PublicAPI] L99,
 
         /// <summary>
         /// 99.9% confidence interval
         /// </summary>
-        L999
+        [PublicAPI] L999
     }
 
     public static class ConfidenceLevelExtensions
@@ -145,9 +145,11 @@ namespace BenchmarkDotNet.Mathematics
 
         public bool Contains(double value) => Lower - 1e-9 < value && value < Upper + 1e-9;
 
-        public string ToStr(bool showLevel = true) => $"[{Lower.ToStr()}; {Upper.ToStr()}] (CI {Level.ToPercentStr()})";
+        private string GetLevelHint(bool showLevel = true) => showLevel ? $" (CI {Level.ToPercentStr()})" : "";
+
+        public string ToStr(bool showLevel = true) => $"[{Lower.ToStr()}; {Upper.ToStr()}]{GetLevelHint(showLevel)}";
 
         public string ToTimeStr(Encoding encoding, TimeUnit unit = null, bool showLevel = true) =>
-            $"[{Lower.ToTimeStr(unit, encoding)}; {Upper.ToTimeStr(unit, encoding)}] (CI {Level.ToPercentStr()})";
+            $"[{Lower.ToTimeStr(unit, encoding)}; {Upper.ToTimeStr(unit, encoding)}]{GetLevelHint(showLevel)}";
     }
 }

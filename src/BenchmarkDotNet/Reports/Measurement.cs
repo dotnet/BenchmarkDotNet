@@ -5,6 +5,7 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -26,7 +27,8 @@ namespace BenchmarkDotNet.Reports
 
         public int IterationIndex { get; }
 
-        private Encoding Encoding { get; }
+        [PublicAPI]
+        public Encoding Encoding { get; }
 
         /// <summary>
         /// Gets the number of operations performed.

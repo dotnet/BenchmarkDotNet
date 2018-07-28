@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Reports;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Analysers
 {
     public interface IAnalyser
     {
-        string Id { get; }
-        IEnumerable<Conclusion> Analyse(Summary summary);
+        [PublicAPI] string Id { get; }
+        [PublicAPI] IEnumerable<Conclusion> Analyse(Summary summary);
     }
 }

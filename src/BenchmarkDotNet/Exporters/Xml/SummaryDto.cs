@@ -5,6 +5,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
+// ReSharper disable UnusedMember.Global
 
 namespace BenchmarkDotNet.Exporters.Xml
 {

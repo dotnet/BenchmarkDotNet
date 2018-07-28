@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using JetBrains.Annotations;
 
 // ReSharper disable NotAccessedField.Local
 namespace BenchmarkDotNet.Engines
@@ -33,52 +34,67 @@ namespace BenchmarkDotNet.Engines
         private object objectHolder;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(byte byteValue) => byteHolder = byteValue;
 
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(sbyte sbyteValue) => sbyteHolder = sbyteValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(short shortValue) => shortHolder = shortValue;
 
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(ushort ushortValue) => ushortHolder = ushortValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(int intValue) => intHolder = intValue;
 
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(uint uintValue) => uintHolder = uintValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(bool boolValue) => boolHolder = boolValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(char charValue) => charHolder = charValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(float floatValue) => floatHolder = floatValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(double doubleValue) => Volatile.Write(ref doubleHolder, doubleValue);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(long longValue) => Volatile.Write(ref longHolder, longValue);
 
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(ulong ulongValue) => Volatile.Write(ref ulongHolder, ulongValue);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(string stringValue) => Volatile.Write(ref stringHolder, stringValue);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(object objectValue) => Volatile.Write(ref objectHolder, objectValue);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume<T>(T objectValue) where T : class // class constraint prevents from boxing structs
             => Volatile.Write(ref objectHolder, objectValue);
 

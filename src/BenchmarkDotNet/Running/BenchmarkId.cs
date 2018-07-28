@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Running
 {
@@ -11,7 +12,7 @@ namespace BenchmarkDotNet.Running
 
         public int Value { get; }
 
-        public bool Equals(BenchmarkId other) => Value == other.Value;
+        [PublicAPI] public bool Equals(BenchmarkId other) => Value == other.Value;
 
         public override bool Equals(object obj) => throw new InvalidOperationException("boxing");
 

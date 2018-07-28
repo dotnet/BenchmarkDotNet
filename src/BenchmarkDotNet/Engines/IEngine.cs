@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
@@ -6,6 +7,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Engines
 {
+    [SuppressMessage("ReSharper", "UnusedMemberInSuper.Global")]
     public interface IEngine : IDisposable
     {
         [NotNull]

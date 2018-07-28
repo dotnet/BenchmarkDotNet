@@ -35,6 +35,7 @@ namespace BenchmarkDotNet.Portability
             System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase);
 #endif
 
+        [PublicAPI]
         public static bool IsNetNative =>
 #if CLASSIC
             false;
@@ -320,6 +321,8 @@ namespace BenchmarkDotNet.Portability
             }
         }
 
+#if CLASSIC
+
         [DllImport("libc", SetLastError = true)]
         private static extern int uname(IntPtr buf);
 
@@ -345,6 +348,8 @@ namespace BenchmarkDotNet.Portability
                     Marshal.FreeHGlobal(buf);
             }
         }
+
+#endif
 
         internal static ICollection<Antivirus> GetAntivirusProducts()
         {

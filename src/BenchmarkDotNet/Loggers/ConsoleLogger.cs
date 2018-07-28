@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Toolchains;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Loggers
 {
@@ -56,6 +57,7 @@ namespace BenchmarkDotNet.Loggers
                 { LogKind.Hint, ConsoleColor.DarkCyan }
             };
 
+        [PublicAPI]
         public static Dictionary<LogKind, ConsoleColor> CreateGrayScheme()
         {
             var colorScheme = new Dictionary<LogKind, ConsoleColor>();

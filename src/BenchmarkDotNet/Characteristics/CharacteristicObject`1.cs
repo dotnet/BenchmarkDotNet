@@ -22,8 +22,10 @@ namespace BenchmarkDotNet.Characteristics
             return (T)result;
         }
 
+        [PublicAPI]
         public T ApplyAndFreeze(CharacteristicObject other) => Apply(other).Freeze();
 
+        [PublicAPI]
         public T ApplyAndFreeze(params CharacteristicObject[] others) => Apply(others).Freeze();
 
         public new T Freeze() => (T)FreezeCore();

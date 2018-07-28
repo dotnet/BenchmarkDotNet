@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Engines;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -7,6 +8,7 @@ namespace BenchmarkDotNet.Validators
     {
         public const string ConsoleErrorPrefix = "// ERROR: ";
         
+        [UsedImplicitly] // Generated benchmarks
         public static bool ReportIfAny(IEnumerable<ValidationError> validationErrors, IHost host)
         {
             bool hasErrors = false;

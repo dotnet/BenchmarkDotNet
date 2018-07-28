@@ -103,9 +103,9 @@ namespace BenchmarkDotNet.Toolchains
 
             switch (runtime)
             {
-                case ClrRuntime clr:
-                case CoreRuntime core:
-                case CoreRtRuntime coreRt:
+                case ClrRuntime _:
+                case CoreRuntime _:
+                case CoreRtRuntime _:
                     start.FileName = exePath;
                     start.Arguments = args;
                     break;

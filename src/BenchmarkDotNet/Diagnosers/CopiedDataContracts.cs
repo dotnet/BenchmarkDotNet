@@ -1,4 +1,5 @@
 ﻿using System.Xml.Serialization;
+using JetBrains.Annotations;
 
 #pragma warning disable CS3003 // I need ulong
 namespace BenchmarkDotNet.Diagnosers
@@ -18,7 +19,7 @@ namespace BenchmarkDotNet.Diagnosers
 
     public class IL : Code
     {
-        public int Offset { get; set; }
+        [PublicAPI] public int Offset { get; set; }
     }
 
     public class Asm : Code
