@@ -284,7 +284,7 @@ namespace BenchmarkDotNet.Running
         private static object Map(object providedValue)
         {
             if (providedValue == null)
-                return providedValue;
+                return null;
 
             return providedValue.GetType().IsArray ? ArrayParam<IParam>.FromObject(providedValue) : providedValue;
         }
@@ -293,7 +293,7 @@ namespace BenchmarkDotNet.Running
         {
             var paramsSourceMethod = parentType.GetAllMethods().SingleOrDefault(method => method.Name == sourceName && method.IsPublic);
 
-            if (paramsSourceMethod != default(MethodInfo))
+            if (paramsSourceMethod != default)
                 return (paramsSourceMethod, ToArray(
                     paramsSourceMethod.Invoke(paramsSourceMethod.IsStatic ? null : Activator.CreateInstance(parentType), null),
                     paramsSourceMethod,
@@ -301,7 +301,7 @@ namespace BenchmarkDotNet.Running
 
             var paramsSourceProperty = parentType.GetAllProperties().SingleOrDefault(property => property.Name == sourceName && property.GetMethod.IsPublic);
 
-            if (paramsSourceProperty != default(PropertyInfo))
+            if (paramsSourceProperty != default)
                 return (paramsSourceProperty, ToArray(
                     paramsSourceProperty.GetValue(paramsSourceProperty.GetMethod.IsStatic ? null : Activator.CreateInstance(parentType)),
                     paramsSourceProperty,

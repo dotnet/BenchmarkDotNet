@@ -370,7 +370,7 @@ namespace BenchmarkDotNet.Characteristics
             return this;
         }
 
-        public CharacteristicObject UnfreezeCopy() => (CharacteristicObject)UnfreezeCopyCore();
+        public CharacteristicObject UnfreezeCopy() => UnfreezeCopyCore();
 
         protected CharacteristicObject UnfreezeCopyCore()
         {

@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Exporters
 {
     internal class XUnitNameProvider 
     {
-        private static readonly IReadOnlyDictionary<Type, string> Aliases = new Dictionary<Type, string>()
+        private static readonly IReadOnlyDictionary<Type, string> Aliases = new Dictionary<Type, string>
         {
             { typeof(byte), "byte" },
             { typeof(sbyte), "sbyte" },

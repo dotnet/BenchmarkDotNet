@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
+using Microsoft.Win32;
 
 namespace BenchmarkDotNet.Helpers
 {
@@ -20,8 +21,8 @@ namespace BenchmarkDotNet.Helpers
         
         private static int? GetReleaseNumberFromWindowsRegistry()
         {
-            using (var ndpKey = Microsoft.Win32.RegistryKey
-                .OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry32)
+            using (var ndpKey = RegistryKey
+                .OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
                 .OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\"))
             {
                 if (ndpKey == null)

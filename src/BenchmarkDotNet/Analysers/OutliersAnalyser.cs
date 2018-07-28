@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Analysers
             {
                 // This should never happen
                 yield return CreateHint(
-                    $"Something went wrong with outliers: " +
+                    "Something went wrong with outliers: " +
                     $"Size(WorkloadActual) = {workloadActual.Length}, " +
                     $"Size(WorkloadActual/Outliers) = {actualOutliers.Length}, " +
                     $"Size(Result) = {result.Length}), " +

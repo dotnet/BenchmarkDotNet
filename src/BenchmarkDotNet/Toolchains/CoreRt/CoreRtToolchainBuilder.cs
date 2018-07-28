@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         private string ilcPath;
         private bool useCppCodeGenerator;
         
-        private bool isCoreRtConfigured = false;
+        private bool isCoreRtConfigured;
 
         /// <summary>
         /// creates a CoreRT toolchain targeting NuGet build of CoreRT
@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
             if (!Directory.Exists(ilcPath)) throw new DirectoryNotFoundException($"{ilcPath} provided as {nameof(ilcPath)} does NOT exist");
 
             this.ilcPath = ilcPath;
-            base.useTempFolderForRestore = true;
+            useTempFolderForRestore = true;
 
             isCoreRtConfigured = true;
 

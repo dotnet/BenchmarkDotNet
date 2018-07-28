@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 using JetBrains.Annotations;

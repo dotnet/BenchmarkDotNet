@@ -147,7 +147,7 @@ namespace BenchmarkDotNet.Engines
 #elif NETCOREAPP2_1
             // but CoreRT does not support the reflection yet, so only because of that we have to target .NET Core 2.1
             // to be able to call this method without reflection and get MemoryDiagnoser support for CoreRT ;)
-            return System.GC.GetAllocatedBytesForCurrentThread();
+            return GC.GetAllocatedBytesForCurrentThread();
 #endif
         }
 

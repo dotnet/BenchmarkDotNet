@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
+using StreamWriter = BenchmarkDotNet.Portability.StreamWriter;
 
 namespace BenchmarkDotNet.Exporters
 {
@@ -31,14 +33,14 @@ namespace BenchmarkDotNet.Exporters
                 }
                 catch (IOException)
                 {
-                    string uniqueString = System.DateTime.Now.ToString("yyyyMMdd-HHmmss");
+                    string uniqueString = DateTime.Now.ToString("yyyyMMdd-HHmmss");
                     string alternativeFilePath = $"{Path.Combine(summary.ResultsDirectoryPath, fileName)}-{FileCaption}{FileNameSuffix}-{uniqueString}.{FileExtension}";
                     consoleLogger.WriteLineError($"Could not overwrite file {filePath}. Exporting to {alternativeFilePath}");
                     filePath = alternativeFilePath;
                 }
             }
 
-            using (var stream = Portability.StreamWriter.FromPath(filePath))
+            using (var stream = StreamWriter.FromPath(filePath))
             {
                 ExportToLog(summary, new StreamLogger(stream));
             }

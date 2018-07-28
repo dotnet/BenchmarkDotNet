@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         public static CustomCoreClrToolchainBuilder Create() => new CustomCoreClrToolchainBuilder();
 
         private string coreClrVersion, coreFxVersion;
-        private bool isCoreClrConfigured = false, isCoreFxConfigured = false;
+        private bool isCoreClrConfigured, isCoreFxConfigured;
 
         /// <summary>
         /// creates a toolchain which publishes self-contained app which references local CoreClr build

@@ -11,7 +11,6 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Validators;
-
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Configs

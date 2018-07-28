@@ -6,6 +6,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using StreamWriter = BenchmarkDotNet.Portability.StreamWriter;
 
 namespace BenchmarkDotNet.Exporters
 {
@@ -30,7 +31,7 @@ namespace BenchmarkDotNet.Exporters
             if (File.Exists(filePath))
                 File.Delete(filePath);
 
-            using (var stream = Portability.StreamWriter.FromPath(filePath))
+            using (var stream = StreamWriter.FromPath(filePath))
             {
                 Export(new StreamLogger(stream), results[benchmarkCase], benchmarkCase);
             }

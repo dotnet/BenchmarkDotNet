@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace BenchmarkDotNet.Properties
@@ -14,13 +15,16 @@ namespace BenchmarkDotNet.Properties
 #endif
 
         // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+        [SuppressMessage("ReSharper", "RedundantLogicalConditionalExpressionOperand")]
         private static readonly Lazy<string> FullVersionLazy = new Lazy<string>(() =>
         {
             string version = typeof(BenchmarkDotNetInfo).GetTypeInfo().Assembly.GetName().Version.ToString();
+#pragma warning disable 162
             if (version.EndsWith(".0") && PrereleaseLabel == "")
                 version = version.Substring(0, version.Length - 2);
             if (version.EndsWith(".0") && PrereleaseLabel == "-develop")
                 version = version.Substring(0, version.Length - 1) + DateTime.Now.ToString("yyyyMMdd");
+#pragma warning restore 162
             return version + PrereleaseLabel;
         });
 

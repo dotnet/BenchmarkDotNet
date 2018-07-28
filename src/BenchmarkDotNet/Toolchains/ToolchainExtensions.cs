@@ -4,6 +4,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.Roslyn;
 
 namespace BenchmarkDotNet.Toolchains
 {
@@ -23,7 +24,7 @@ namespace BenchmarkDotNet.Toolchains
                     if(RuntimeInformation.IsNetCore)
                         return CsProjClassicNetToolchain.Current.Value;
 
-                    return Roslyn.RoslynToolchain.Instance;
+                    return RoslynToolchain.Instance;
                 case CoreRuntime core:
                     return CsProjCoreToolchain.Current.Value;
                 case CoreRtRuntime coreRt:

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
@@ -9,10 +11,8 @@ using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
-using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Reports;
-using System.IO;
-using System.Text;
+using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Configs
 {

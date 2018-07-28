@@ -1,6 +1,6 @@
-﻿using BenchmarkDotNet.Reports;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Mathematics
 {
@@ -50,14 +50,13 @@ namespace BenchmarkDotNet.Mathematics
 
             measurements.Sort(); // sort in place
 
-            double q1, median, q3;
+            double q1, q3;
 
             if (n == 1)
-                q1 = median = q3 = measurements[0].Nanoseconds;
+                q1 = q3 = measurements[0].Nanoseconds;
             else
             {
                 q1 = GetQuartile(measurements, measurements.Count / 2);
-                median = GetQuartile(measurements, measurements.Count);
                 q3 = GetQuartile(measurements, measurements.Count * 3 / 2);
             }
 

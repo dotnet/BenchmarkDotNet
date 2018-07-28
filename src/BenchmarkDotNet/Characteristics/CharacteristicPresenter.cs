@@ -2,9 +2,9 @@
 using System.Collections;
 using System.Text;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Characteristics
 {

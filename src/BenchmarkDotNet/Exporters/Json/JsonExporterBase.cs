@@ -1,9 +1,9 @@
-﻿using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Reports;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Reports;
 using JsonSerializer = SimpleJson.SimpleJson;
 
 namespace BenchmarkDotNet.Exporters.Json
@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Exporters.Json
                     { "Parameters", r.BenchmarkCase.Parameters.PrintInfo },
                     { "FullName", XUnitNameProvider.GetBenchmarkName(r.BenchmarkCase) }, // do NOT remove this property, it is used for xunit-performance migration
                     // { "Properties", r.Benchmark.Job.ToSet().ToDictionary(p => p.Name, p => p.Value) }, // TODO
-                    { "Statistics", r.ResultStatistics },
+                    { "Statistics", r.ResultStatistics }
                 };
 
                 // We show MemoryDiagnoser's results only if it is being used

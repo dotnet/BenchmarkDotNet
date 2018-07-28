@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Text;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Reports;
-using System.IO;
-using System.Text;
 
 namespace BenchmarkDotNet.Extensions
 {

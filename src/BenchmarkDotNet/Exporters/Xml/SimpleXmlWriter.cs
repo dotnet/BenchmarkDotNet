@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Exporters.Xml
             if (writer == null)
                 throw new ArgumentNullException(nameof(writer));
 
-            this.writer = XmlWriter.Create(writer, new XmlWriterSettings() { Indent = indent });
+            this.writer = XmlWriter.Create(writer, new XmlWriterSettings { Indent = indent });
         }
 
         public void WriteElementString(string localName, string value)

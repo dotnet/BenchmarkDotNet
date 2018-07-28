@@ -1,17 +1,17 @@
-﻿using BenchmarkDotNet.Jobs;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Xml;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
-using System.Collections.Generic;
-using System.Diagnostics;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Toolchains
 {
     internal static class AppConfigGenerator
     {
-        private static readonly HashSet<string> JobRuntimeSettings = new HashSet<string>()
+        private static readonly HashSet<string> JobRuntimeSettings = new HashSet<string>
         {
             "useLegacyJit",
             "gcConcurrent",

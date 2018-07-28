@@ -1,8 +1,6 @@
 using System;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Engines
 {

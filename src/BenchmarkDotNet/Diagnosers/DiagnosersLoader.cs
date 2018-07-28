@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 // this method should return a IHardwareCountersDiagnoser when we implement Hardware Counters for Unix
                 MemoryDiagnoser.Default,
-                DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig()), 
+                DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig()) 
             }; 
 
         private static IDiagnoser[] LoadClassic()
@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Diagnosers
                     string errorMsg =
                         $"Unable to load: {DiagnosticAssemblyFileName} version {diagnosticsAssembly.GetName().Version}" +
                         Environment.NewLine +
-                        $"Does not match: {System.IO.Path.GetFileName(benchmarkDotNetCoreAssembly.Location)} version {benchmarkDotNetCoreAssembly.GetName().Version}";
+                        $"Does not match: {Path.GetFileName(benchmarkDotNetCoreAssembly.Location)} version {benchmarkDotNetCoreAssembly.GetName().Version}";
                     ConsoleLogger.Default.WriteLineError(errorMsg);
                 }
                 else
@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Diagnosers
                         MemoryDiagnoser.Default,
                         DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig()),
                         CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.InliningDiagnoser"),
-                        CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.PmcDiagnoser"),
+                        CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.PmcDiagnoser")
                     };
                 }
             }

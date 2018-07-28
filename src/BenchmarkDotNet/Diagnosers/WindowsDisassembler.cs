@@ -1,16 +1,18 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
-using System.Linq;
-using System.Text;
+using BenchmarkDotNet.Properties;
+using RuntimeInformation = BenchmarkDotNet.Portability.RuntimeInformation;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -82,7 +84,7 @@ namespace BenchmarkDotNet.Diagnosers
             string disassemblerPath =
                 Path.Combine(
                     new FileInfo(assemblyWithDisassemblersInResources.Location).Directory.FullName,
-                    Properties.BenchmarkDotNetInfo.FullVersion // possible update
+                    BenchmarkDotNetInfo.FullVersion // possible update
                     + exeName); // separate process per architecture!!
 
 #if !PRERELEASE_DEVELOP // for development we always want to copy the file to not omit any dev changes (Properties.BenchmarkDotNetInfo.FullVersion in file name is not enough)
@@ -149,14 +151,14 @@ namespace BenchmarkDotNet.Diagnosers
                 if (Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE") == "x86")
                     return false;
 
-                if (Portability.RuntimeInformation.IsWindows())
+                if (RuntimeInformation.IsWindows())
                 {
                     IsWow64Process(process.Handle, out bool isWow64);
 
                     return !isWow64;
                 }
 
-                return Portability.RuntimeInformation.GetCurrentPlatform() == Platform.X64; // todo: find the way to cover all scenarios for .NET Core
+                return RuntimeInformation.GetCurrentPlatform() == Platform.X64; // todo: find the way to cover all scenarios for .NET Core
             }
 
             [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]

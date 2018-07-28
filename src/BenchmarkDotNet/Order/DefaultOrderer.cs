@@ -14,7 +14,6 @@ namespace BenchmarkDotNet.Order
 
         private readonly IComparer<ParameterInstances> paramsComparer = ParameterComparer.Instance;
         private readonly IComparer<Job> jobComparer = JobComparer.Instance;
-        private readonly IComparer<Descriptor> targetComparer;
         private readonly IComparer<BenchmarkCase> benchmarkComparer;
         private readonly IComparer<IGrouping<string, BenchmarkCase>> logicalGroupComparer;
 
@@ -25,7 +24,7 @@ namespace BenchmarkDotNet.Order
             MethodOrderPolicy methodOrderPolicy = MethodOrderPolicy.Declared)
         {
             this.summaryOrderPolicy = summaryOrderPolicy;
-            targetComparer = new DescriptorComparer(methodOrderPolicy);
+            IComparer<Descriptor> targetComparer = new DescriptorComparer(methodOrderPolicy);
             benchmarkComparer = new BenchmarkComparer(paramsComparer, jobComparer, targetComparer);
             logicalGroupComparer = new LogicalGroupComparer(benchmarkComparer);
         }

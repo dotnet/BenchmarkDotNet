@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Jobs
         {
         }
 
-        public Job(params CharacteristicObject[] others) : this((string)null, others)
+        public Job(params CharacteristicObject[] others) : this(null, others)
         {
         }
 

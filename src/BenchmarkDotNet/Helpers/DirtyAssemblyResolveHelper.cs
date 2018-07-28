@@ -1,7 +1,7 @@
-﻿using BenchmarkDotNet.Loggers;
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
+using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Helpers
 {

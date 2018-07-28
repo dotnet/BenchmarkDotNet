@@ -3,16 +3,18 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Reflection;
+using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Portability.Cpu;
-using BenchmarkDotNet.Toolchains.CsProj;
 using JetBrains.Annotations;
-using System.Management;
+using Microsoft.Win32;
+using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
 
 namespace BenchmarkDotNet.Portability
 {
@@ -103,8 +105,8 @@ namespace BenchmarkDotNet.Portability
             }
 
             return OsBrandStringHelper.Prettify(
-                Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem,
-                Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion,
+                RuntimeEnvironment.OperatingSystem,
+                RuntimeEnvironment.OperatingSystemVersion,
                 GetWindowsUbr());
         }
 
@@ -121,8 +123,8 @@ namespace BenchmarkDotNet.Portability
             {
                 try
                 {
-                    using (var ndpKey = Microsoft.Win32.RegistryKey
-                        .OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry32)
+                    using (var ndpKey = RegistryKey
+                        .OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
                         .OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion"))
                     {
                         if (ndpKey == null)
@@ -155,7 +157,7 @@ namespace BenchmarkDotNet.Portability
 
         public static string GetNetCoreVersion()
         {
-            var assembly = typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly;
+            var assembly = typeof(GCSettings).GetTypeInfo().Assembly;
             var assemblyPath = assembly.CodeBase.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
             int netCoreAppIndex = Array.IndexOf(assemblyPath, "Microsoft.NETCore.App");
             if (netCoreAppIndex > 0 && netCoreAppIndex < assemblyPath.Length - 2)
@@ -178,7 +180,7 @@ namespace BenchmarkDotNet.Portability
                         if (bracket1 != -1 && bracket2 != -1)
                         {
                             string comment = version.Substring(bracket1 + 1, bracket2 - bracket1 - 1);
-                            var commentParts = comment.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            var commentParts = comment.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                             if (commentParts.Length > 2)
                                 version = version.Substring(0, bracket1) + "(" + commentParts[0] + " " + commentParts[1] + ")";
                         }
@@ -271,11 +273,9 @@ namespace BenchmarkDotNet.Portability
                 // If we have only one JIT module, we know the version of the current JIT compiler
                 return jitName + "-v" + modules[0].Version;
             }
-            else
-            {
-                // Otherwise, let's just print information about all modules
-                return jitName + "/" + GetJitModulesInfo();
-            }
+
+            // Otherwise, let's just print information about all modules
+            return jitName + "/" + GetJitModulesInfo();
         }
 
         internal static IntPtr GetCurrentAffinity() => Process.GetCurrentProcess().TryGetAffinity() ?? default;

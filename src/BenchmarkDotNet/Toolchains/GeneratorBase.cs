@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
+using StreamWriter = System.IO.StreamWriter;
 
 namespace BenchmarkDotNet.Toolchains
 {
@@ -85,7 +87,7 @@ namespace BenchmarkDotNet.Toolchains
             string sourcePath = buildPartition.AssemblyLocation + ".config";
 
             using (var source = File.Exists(sourcePath) ? new StreamReader(File.OpenRead(sourcePath)) : TextReader.Null)
-            using (var destination = new System.IO.StreamWriter(File.Create(artifactsPaths.AppConfigPath), System.Text.Encoding.UTF8))
+            using (var destination = new StreamWriter(File.Create(artifactsPaths.AppConfigPath), Encoding.UTF8))
             {
                 AppConfigGenerator.Generate(buildPartition.RepresentativeBenchmarkCase.Job, source, destination, buildPartition.Resolver);
             }

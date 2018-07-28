@@ -42,8 +42,7 @@ namespace BenchmarkDotNet.Mathematics
             double frac = realIndex - index;
             if (index + 1 < sortedValues.Count)
                 return sortedValues[index] * (1 - frac) + sortedValues[index + 1] * frac;
-            else
-                return sortedValues[index];
+            return sortedValues[index];
         }
 
         public double Percentile(int percentile) => Percentile(SortedValues, percentile);

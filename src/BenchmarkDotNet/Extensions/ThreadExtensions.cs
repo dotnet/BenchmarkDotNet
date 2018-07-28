@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading;
 using BenchmarkDotNet.Loggers;
 
@@ -6,7 +7,7 @@ namespace BenchmarkDotNet.Extensions
 {
     // we need it public to reuse it in the auto-generated dll
     // but we hide it from intellisense with following attribute
-    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ThreadExtensions
     {
         public static bool TrySetPriority(

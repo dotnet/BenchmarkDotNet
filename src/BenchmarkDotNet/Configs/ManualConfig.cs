@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
@@ -12,8 +11,8 @@ using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
-using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -28,8 +27,8 @@ namespace BenchmarkDotNet.Configs
         private readonly List<Job> jobs = new List<Job>();
         private readonly List<HardwareCounter> hardwareCounters = new List<HardwareCounter>();
         private readonly List<IFilter> filters = new List<IFilter>();
-        private IOrderer orderer = null;
-        private ISummaryStyle summaryStyle = null;
+        private IOrderer orderer;
+        private ISummaryStyle summaryStyle;
         private readonly HashSet<BenchmarkLogicalGroupRule> logicalGroupRules = new HashSet<BenchmarkLogicalGroupRule>();
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;

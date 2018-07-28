@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Reports

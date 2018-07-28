@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using BenchmarkDotNet.Reports;
 using System.Linq;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Columns
 {

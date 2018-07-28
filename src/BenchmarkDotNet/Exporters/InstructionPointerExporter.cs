@@ -5,6 +5,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using StreamWriter = BenchmarkDotNet.Portability.StreamWriter;
 
 namespace BenchmarkDotNet.Exporters
 {
@@ -49,15 +50,12 @@ namespace BenchmarkDotNet.Exporters
             if (File.Exists(filePath))
                 File.Delete(filePath);
 
-            checked
-            {
-                var totals = SumHardwareCountersStatsOfBenchmarkedCode(disassemblyResult, pmcStats);
-                var perMethod = SumHardwareCountersPerMethod(disassemblyResult, pmcStats);
+            var totals = SumHardwareCountersStatsOfBenchmarkedCode(disassemblyResult, pmcStats);
+            var perMethod = SumHardwareCountersPerMethod(disassemblyResult, pmcStats);
 
-                using (var stream = Portability.StreamWriter.FromPath(filePath))
-                {
-                    Export(new StreamLogger(stream), benchmarkCase, totals, perMethod, pmcStats.Counters.Keys.ToArray());
-                }
+            using (var stream = StreamWriter.FromPath(filePath))
+            {
+                Export(new StreamLogger(stream), benchmarkCase, totals, perMethod, pmcStats.Counters.Keys.ToArray());
             }
 
             return filePath;
@@ -132,7 +130,7 @@ namespace BenchmarkDotNet.Exporters
                         codeWithCounters.Add(new CodeWithCounters
                         {
                             Code = instruction,
-                            SumPerCounter = totalsPerCounter,
+                            SumPerCounter = totalsPerCounter
                         });
                     }
 

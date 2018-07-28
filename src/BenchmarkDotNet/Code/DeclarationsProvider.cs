@@ -3,9 +3,9 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Code
 {

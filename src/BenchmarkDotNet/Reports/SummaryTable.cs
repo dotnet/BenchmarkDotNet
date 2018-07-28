@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Order;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Order;
 
 namespace BenchmarkDotNet.Reports
 {

@@ -73,16 +73,16 @@ namespace BenchmarkDotNet.Exporters
         };
 
         private string prefix = string.Empty;
-        private bool useCodeBlocks = false;
+        private bool useCodeBlocks;
         private string codeBlockStart = "```";
         private string codeBlockEnd = "```";
         private MarkdownHighlightStrategy startOfGroupHighlightStrategy = MarkdownHighlightStrategy.None;
         private string tableHeaderSeparator = " |";
         private string tableColumnSeparator = " |";
         private bool useHeaderSeparatingRow = true;
-        private bool columnsStartWithSeparator = false;
+        private bool columnsStartWithSeparator;
         private string boldMarkupFormat = "**{0}**";
-        private bool escapeHtml = false;
+        private bool escapeHtml;
 
         private MarkdownExporter() { }
 

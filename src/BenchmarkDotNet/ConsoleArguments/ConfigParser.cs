@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.ConsoleArguments
     {
         private const int MinimumDisplayWidth = 80;
 
-        private static readonly IReadOnlyDictionary<string, Job> AvailableJobs = new Dictionary<string, Job>()
+        private static readonly IReadOnlyDictionary<string, Job> AvailableJobs = new Dictionary<string, Job>
         {
             { "default", Job.Default },
             { "dry", Job.Dry },
@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             { "verylong", Job.VeryLongRun }
         };
 
-        private static readonly IReadOnlyDictionary<string, Runtime> AvailableRuntimes = new Dictionary<string, Runtime>()
+        private static readonly IReadOnlyDictionary<string, Runtime> AvailableRuntimes = new Dictionary<string, Runtime>
         {
             { "clr", Runtime.Clr },
             { "core", Runtime.Core },
@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 { "asciidoc", new[] { AsciiDocExporter.Default } },
                 { "xml", new[] { XmlExporter.Default } },
                 { "briefxml", new[] { XmlExporter.Brief } },
-                { "fullxml", new[] { XmlExporter.Full } },
+                { "fullxml", new[] { XmlExporter.Full } }
             };
 
         public static (bool isSuccess, ReadOnlyConfig config) Parse(string[] args, ILogger logger)

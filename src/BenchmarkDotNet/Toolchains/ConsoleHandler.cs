@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Threading;
 using BenchmarkDotNet.Loggers;
@@ -21,7 +20,7 @@ namespace BenchmarkDotNet.Toolchains
         public ConsoleHandler(ILogger logger)
         {
             this.logger = logger;
-            EventHandler = new ConsoleCancelEventHandler(HandlerCallback);
+            EventHandler = HandlerCallback;
         }
 
         public static void EnsureInitialized(ILogger logger)

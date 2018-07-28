@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Running
 {
     internal class TypeParser
     {
-        private static bool consoleCancelKeyPressed = false;
+        private static bool consoleCancelKeyPressed;
         
         private readonly Type[] allTypes;
         private readonly ILogger logger;

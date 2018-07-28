@@ -37,6 +37,6 @@ namespace BenchmarkDotNet.Columns
             return All.Last();
         }
 
-        public static double Convert(long value, SizeUnit from, SizeUnit to) => value * (double)@from.ByteAmount / (to ?? GetBestSizeUnit(value)).ByteAmount;
+        public static double Convert(long value, SizeUnit from, SizeUnit to) => value * (double)from.ByteAmount / (to ?? GetBestSizeUnit(value)).ByteAmount;
     }
 }

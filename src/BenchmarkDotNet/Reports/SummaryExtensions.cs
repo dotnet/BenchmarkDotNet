@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using BenchmarkDotNet.Columns;
 using System.Linq;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Reports

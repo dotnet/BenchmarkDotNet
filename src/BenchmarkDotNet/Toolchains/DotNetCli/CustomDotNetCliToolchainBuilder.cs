@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         protected string targetFrameworkMoniker = "netcoreapp2.1", displayName;
         protected string runtimeFrameworkVersion;
 
-        protected bool useNuGetClearTag = false, useTempFolderForRestore = false;
+        protected bool useNuGetClearTag, useTempFolderForRestore;
         protected Dictionary<string, string> feeds = new Dictionary<string, string>();
 
         public abstract IToolchain ToToolchain();

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
@@ -12,7 +13,7 @@ namespace BenchmarkDotNet.Extensions
 {
     // we need it public to reuse it in the auto-generated dll
     // but we hide it from intellisense with following attribute
-    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     [PublicAPI]
     public static class ProcessExtensions
     {

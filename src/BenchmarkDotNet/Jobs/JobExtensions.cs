@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Analysers;
-using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.Jobs
 {
