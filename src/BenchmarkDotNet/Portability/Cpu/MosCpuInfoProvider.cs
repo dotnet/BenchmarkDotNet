@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Portability.Cpu
 {
     internal static class MosCpuInfoProvider
     {
-        internal static Lazy<CpuInfo> MosCpuInfo = new Lazy<CpuInfo>(Load);
+        internal static readonly Lazy<CpuInfo> MosCpuInfo = new Lazy<CpuInfo>(Load);
 
         [NotNull]
         private static CpuInfo Load()

@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Analysers
 
         private OutliersAnalyser() { }
 
-        public override IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary)
+        protected override IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary)
         {
             var workloadActual = report.AllMeasurements.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual)).ToArray();
             if (workloadActual.IsEmpty())

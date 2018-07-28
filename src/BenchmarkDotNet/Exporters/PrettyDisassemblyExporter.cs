@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Exporters
             return filePath;
         }
 
-        private void Export(ILogger logger, DisassemblyResult disassemblyResult, BenchmarkCase benchmarkCase)
+        private static void Export(ILogger logger, DisassemblyResult disassemblyResult, BenchmarkCase benchmarkCase)
         {
             logger.WriteLine("<!DOCTYPE html><html lang='en'><head><meta charset='utf-8' /><head>");
             logger.WriteLine($"<title>Pretty Output of DisassemblyDiagnoser for {benchmarkCase.DisplayInfo}</title>");

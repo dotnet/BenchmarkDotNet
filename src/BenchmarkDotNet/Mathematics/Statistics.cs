@@ -82,14 +82,14 @@ namespace BenchmarkDotNet.Mathematics
             Percentiles = new PercentileValues(list);
         }
 
-        public ConfidenceInterval GetConfidenceInterval(ConfidenceLevel level, int n) => new ConfidenceInterval(Mean, StandardError, n, level);
-        public bool IsLowerOutlier(double value) => value < LowerFence;
-        public bool IsUpperOutlier(double value) => value > UpperFence;
-        public bool IsOutlier(double value) => value < LowerFence || value > UpperFence;        
-        public double[] WithoutOutliers() => list.Where(value => !IsOutlier(value)).ToArray();
-        public IEnumerable<double> GetValues() => list;
+        [PublicAPI] public ConfidenceInterval GetConfidenceInterval(ConfidenceLevel level, int n) => new ConfidenceInterval(Mean, StandardError, n, level);
+        [PublicAPI] public bool IsLowerOutlier(double value) => value < LowerFence;
+        [PublicAPI] public bool IsUpperOutlier(double value) => value > UpperFence;
+        [PublicAPI] public bool IsOutlier(double value) => value < LowerFence || value > UpperFence;        
+        [PublicAPI] public double[] WithoutOutliers() => list.Where(value => !IsOutlier(value)).ToArray();
+        [PublicAPI] public IEnumerable<double> GetValues() => list;
 
-        public double CalcCentralMoment(int k) => list.Average(x => (x - Mean).Pow(k));
+        [PublicAPI] public double CalcCentralMoment(int k) => list.Average(x => (x - Mean).Pow(k));
 
         public bool IsActualOutlier(double value, OutlierMode outlierMode)
         {
@@ -147,22 +147,22 @@ namespace BenchmarkDotNet.Mathematics
         /// <summary>
         /// Statistics for [1/X]. If Min is less then or equal to 0, returns null.
         /// </summary>        
-        public Statistics Invert() => CanBeInverted() ? new Statistics(list.Select(x => 1 / x)) : null;
+        [PublicAPI] public Statistics Invert() => CanBeInverted() ? new Statistics(list.Select(x => 1 / x)) : null;
 
         /// <summary>
         /// Statistics for [X^2].
         /// </summary>        
-        public Statistics Sqr() => new Statistics(list.Select(x => x * x));
+        [PublicAPI] public Statistics Sqr() => new Statistics(list.Select(x => x * x));
 
         /// <summary>
         /// Mean for [X*Y].
         /// </summary>        
-        public static double MulMean(Statistics x, Statistics y) => x.Mean * y.Mean;
+        [PublicAPI] public static double MulMean(Statistics x, Statistics y) => x.Mean * y.Mean;
 
         /// <summary>
         /// Mean for [X/Y].
         /// </summary>        
-        public static double DivMean([CanBeNull] Statistics x, [CanBeNull] Statistics y)
+        [PublicAPI] public static double DivMean([CanBeNull] Statistics x, [CanBeNull] Statistics y)
         {
             if (x == null || y == null)
                 return double.NaN;
@@ -175,7 +175,7 @@ namespace BenchmarkDotNet.Mathematics
         /// <summary>
         /// Variance for [X*Y].
         /// </summary>        
-        public static double MulVariance(Statistics x, Statistics y)
+        [PublicAPI] public static double MulVariance(Statistics x, Statistics y)
         {
             return x.Sqr().Mean * y.Sqr().Mean - x.Mean.Sqr() * y.Mean.Sqr();
         }
@@ -183,7 +183,7 @@ namespace BenchmarkDotNet.Mathematics
         /// <summary>
         /// Variance for [X/Y].
         /// </summary>        
-        public static double DivVariance([CanBeNull] Statistics x, [CanBeNull] Statistics y)
+        [PublicAPI] public static double DivVariance([CanBeNull] Statistics x, [CanBeNull] Statistics y)
         {
             if (x == null || y == null)
                 return double.NaN;

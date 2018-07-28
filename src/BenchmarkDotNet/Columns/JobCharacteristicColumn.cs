@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Columns
 
         private readonly Characteristic characteristic;
 
-        public JobCharacteristicColumn(Characteristic characteristic)
+        private JobCharacteristicColumn(Characteristic characteristic)
         {
             this.characteristic = characteristic;
             Id = "Job." + characteristic.Id;

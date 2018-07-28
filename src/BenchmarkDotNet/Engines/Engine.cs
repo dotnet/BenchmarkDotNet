@@ -16,20 +16,20 @@ namespace BenchmarkDotNet.Engines
     {
         public const int MinInvokeCount = 4;
 
-        public IHost Host { get; }
-        public Action<long> WorkloadAction { get; }
-        public Action Dummy1Action { get; }
-        public Action Dummy2Action { get; }
-        public Action Dummy3Action { get; }
-        public Action<long> OverheadAction { get; }
-        public Job TargetJob { get; }
-        public long OperationsPerInvoke { get; }
-        public Action GlobalSetupAction { get; }
-        public Action GlobalCleanupAction { get; }
-        public Action IterationSetupAction { get; }
-        public Action IterationCleanupAction { get; }
-        public IResolver Resolver { get; }
-        public Encoding Encoding { get; }
+        [PublicAPI] public IHost Host { get; }
+        [PublicAPI] public Action<long> WorkloadAction { get; }
+        [PublicAPI] public Action Dummy1Action { get; }
+        [PublicAPI] public Action Dummy2Action { get; }
+        [PublicAPI] public Action Dummy3Action { get; }
+        [PublicAPI] public Action<long> OverheadAction { get; }
+        [PublicAPI] public Job TargetJob { get; }
+        [PublicAPI] public long OperationsPerInvoke { get; }
+        [PublicAPI] public Action GlobalSetupAction { get; }
+        [PublicAPI] public Action GlobalCleanupAction { get; }
+        [PublicAPI] public Action IterationSetupAction { get; }
+        [PublicAPI] public Action IterationCleanupAction { get; }
+        [PublicAPI] public IResolver Resolver { get; }
+        [PublicAPI] public Encoding Encoding { get; }
         
         private IClock Clock { get; }
         private bool ForceAllocations { get; }
@@ -177,7 +177,7 @@ namespace BenchmarkDotNet.Engines
             ForceGcCollect();
         }
 
-        private void ForceGcCollect()
+        private static void ForceGcCollect()
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -188,7 +188,7 @@ namespace BenchmarkDotNet.Engines
 
         public void WriteLine() => Host.WriteLine();
 
-        private void EnableMonitoring()
+        private static void EnableMonitoring()
         {
             if (RuntimeInformation.IsMono) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-in-mono
                 return;

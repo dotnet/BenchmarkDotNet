@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Diagnosers
         private readonly MonoDisassembler monoDisassembler;
         private readonly Dictionary<BenchmarkCase, DisassemblyResult> results;
 
-        internal DisassemblyDiagnoser(WindowsDisassembler windowsDisassembler, MonoDisassembler monoDisassembler)
+        private DisassemblyDiagnoser(WindowsDisassembler windowsDisassembler, MonoDisassembler monoDisassembler)
         {
             this.windowsDisassembler = windowsDisassembler;
             this.monoDisassembler = monoDisassembler;
@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Diagnosers
             if (signal == HostSignal.AfterAll && ShouldUseWindowsDisassembler(benchmark))
                 results.Add(benchmark, windowsDisassembler.Disassemble(parameters));
             else if (signal == HostSignal.SeparateLogic && ShouldUseMonoDisassembler(benchmark))
-                results.Add(benchmark, monoDisassembler.Disassemble(benchmark, benchmark.Job.Environment.Runtime as MonoRuntime));
+                results.Add(benchmark, MonoDisassembler.Disassemble(benchmark, benchmark.Job.Environment.Runtime as MonoRuntime));
         }
 
         public void DisplayResults(ILogger logger)
@@ -91,10 +91,10 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        private bool ShouldUseMonoDisassembler(BenchmarkCase benchmarkCase)
+        private static bool ShouldUseMonoDisassembler(BenchmarkCase benchmarkCase)
             => benchmarkCase.Job.Environment.Runtime is MonoRuntime || RuntimeInformation.IsMono;
 
-        private bool ShouldUseWindowsDisassembler(BenchmarkCase benchmarkCase)
+        private static bool ShouldUseWindowsDisassembler(BenchmarkCase benchmarkCase)
             => !(benchmarkCase.Job.Environment.Runtime is MonoRuntime) && RuntimeInformation.IsWindows();
     }
 }

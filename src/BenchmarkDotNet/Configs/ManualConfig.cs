@@ -13,6 +13,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Validators;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -43,15 +44,11 @@ namespace BenchmarkDotNet.Configs
         
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => logicalGroupRules;
 
-        public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
-
-        public bool KeepBenchmarkFiles { get; set; }
-
-        public bool SummaryPerType { get; set; } = true;
-
-        public string ArtifactsPath { get; set; }
-
-        public Encoding Encoding { get; set; }
+        [PublicAPI] public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
+        [PublicAPI] public bool KeepBenchmarkFiles { get; set; }
+        [PublicAPI] public bool SummaryPerType { get; set; } = true;
+        [PublicAPI] public string ArtifactsPath { get; set; }
+        [PublicAPI] public Encoding Encoding { get; set; }
         
         public void Add(params IColumn[] newColumns) => columnProviders.AddRange(newColumns.Select(c => c.ToProvider()));
         public void Add(params IColumnProvider[] newColumnProviders) => columnProviders.AddRange(newColumnProviders);
@@ -68,6 +65,7 @@ namespace BenchmarkDotNet.Configs
         public void Set(Encoding encoding) => Encoding = encoding;
         public void Add(params BenchmarkLogicalGroupRule[] rules) => logicalGroupRules.AddRange(rules);
 
+        [PublicAPI]
         public void Add(IConfig config)
         {
             columnProviders.AddRange(config.GetColumnProviders());

@@ -82,12 +82,12 @@ namespace BenchmarkDotNet.Running
                 return hashCode;
             }
 
-            private Runtime GetRuntime(Job job)
+            private static Runtime GetRuntime(Job job)
                 => job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
                     ? job.Environment.Runtime
                     : Current;
 
-            private bool AreDifferent(object x, object y)
+            private static bool AreDifferent(object x, object y)
             {
                 if (x == null && y == null)
                     return false;
@@ -97,7 +97,7 @@ namespace BenchmarkDotNet.Running
                 return !x.Equals(y);
             }
 
-            private bool AreDifferent(IReadOnlyList<Argument> x, IReadOnlyList<Argument> y)
+            private static bool AreDifferent(IReadOnlyList<Argument> x, IReadOnlyList<Argument> y)
             {
                 if (x == null && y == null)
                     return false;

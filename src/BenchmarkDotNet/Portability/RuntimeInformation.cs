@@ -155,7 +155,7 @@ namespace BenchmarkDotNet.Portability
             return null;
         }
 
-        public static string GetNetCoreVersion()
+        private static string GetNetCoreVersion()
         {
             var assembly = typeof(GCSettings).GetTypeInfo().Assembly;
             var assemblyPath = assembly.CodeBase.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
@@ -231,7 +231,7 @@ namespace BenchmarkDotNet.Portability
 
         public static Platform GetCurrentPlatform() => IntPtr.Size == 4 ? Platform.X86 : Platform.X64;
 
-        internal static IEnumerable<JitModule> GetJitModules()
+        private static IEnumerable<JitModule> GetJitModules()
         {
             return
                 Process.GetCurrentProcess().Modules
@@ -308,7 +308,7 @@ namespace BenchmarkDotNet.Portability
             }
         }
 
-        public class JitModule
+        private class JitModule
         {
             public string Name { get; }
             public string Version { get; }

@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Exporters
 {
@@ -26,71 +27,71 @@ namespace BenchmarkDotNet.Exporters
         public static readonly IExporter Default = new MarkdownExporter
         {
             Dialect = nameof(Default),
-            startOfGroupHighlightStrategy = MarkdownHighlightStrategy.Bold
+            StartOfGroupHighlightStrategy = MarkdownHighlightStrategy.Bold
         };
 
         public static readonly IExporter Console = new MarkdownExporter
         {
             Dialect = nameof(Console),
-            startOfGroupHighlightStrategy = MarkdownHighlightStrategy.None
+            StartOfGroupHighlightStrategy = MarkdownHighlightStrategy.None
         };
 
         public static readonly IExporter StackOverflow = new MarkdownExporter
         {
             Dialect = nameof(StackOverflow),
-            prefix = "    ",
-            startOfGroupHighlightStrategy = MarkdownHighlightStrategy.Bold
+            Prefix = "    ",
+            StartOfGroupHighlightStrategy = MarkdownHighlightStrategy.Bold
         };
 
         public static readonly IExporter GitHub = new MarkdownExporter
         {
             Dialect = nameof(GitHub),
-            useCodeBlocks = true,
-            codeBlockStart = "``` ini",
-            startOfGroupHighlightStrategy = MarkdownHighlightStrategy.Bold,
-            columnsStartWithSeparator = true,
-            escapeHtml = true
+            UseCodeBlocks = true,
+            CodeBlockStart = "``` ini",
+            StartOfGroupHighlightStrategy = MarkdownHighlightStrategy.Bold,
+            ColumnsStartWithSeparator = true,
+            EscapeHtml = true
         };
 
         public static readonly IExporter Atlassian = new MarkdownExporter
         {
             Dialect = nameof(Atlassian),
-            startOfGroupHighlightStrategy = MarkdownHighlightStrategy.Bold,
-            tableHeaderSeparator = " ||",
-            useHeaderSeparatingRow = false,
-            columnsStartWithSeparator = true,
-            useCodeBlocks = true,
-            codeBlockStart = "{noformat}",
-            codeBlockEnd = "{noformat}",
-            boldMarkupFormat = "*{0}*"
+            StartOfGroupHighlightStrategy = MarkdownHighlightStrategy.Bold,
+            TableHeaderSeparator = " ||",
+            UseHeaderSeparatingRow = false,
+            ColumnsStartWithSeparator = true,
+            UseCodeBlocks = true,
+            CodeBlockStart = "{noformat}",
+            CodeBlockEnd = "{noformat}",
+            BoldMarkupFormat = "*{0}*"
         };
 
         // Only for unit tests
         internal static readonly IExporter Mock = new MarkdownExporter
         {
             Dialect = nameof(Mock),
-            startOfGroupHighlightStrategy = MarkdownHighlightStrategy.Marker
+            StartOfGroupHighlightStrategy = MarkdownHighlightStrategy.Marker
         };
 
-        private string prefix = string.Empty;
-        private bool useCodeBlocks;
-        private string codeBlockStart = "```";
-        private string codeBlockEnd = "```";
-        private MarkdownHighlightStrategy startOfGroupHighlightStrategy = MarkdownHighlightStrategy.None;
-        private string tableHeaderSeparator = " |";
-        private string tableColumnSeparator = " |";
-        private bool useHeaderSeparatingRow = true;
-        private bool columnsStartWithSeparator;
-        private string boldMarkupFormat = "**{0}**";
-        private bool escapeHtml;
+        [PublicAPI] protected string Prefix = string.Empty;
+        [PublicAPI] protected bool UseCodeBlocks;
+        [PublicAPI] protected string CodeBlockStart = "```";
+        [PublicAPI] protected string CodeBlockEnd = "```";
+        [PublicAPI] protected MarkdownHighlightStrategy StartOfGroupHighlightStrategy = MarkdownHighlightStrategy.None;
+        [PublicAPI] protected string TableHeaderSeparator = " |";
+        [PublicAPI] protected string TableColumnSeparator = " |";
+        [PublicAPI] protected bool UseHeaderSeparatingRow = true;
+        [PublicAPI] protected bool ColumnsStartWithSeparator;
+        [PublicAPI] protected string BoldMarkupFormat = "**{0}**";
+        [PublicAPI] protected bool EscapeHtml;
 
         private MarkdownExporter() { }
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
-            if (useCodeBlocks)
+            if (UseCodeBlocks)
             {
-                logger.WriteLine(codeBlockStart);
+                logger.WriteLine(CodeBlockStart);
             }
 
             logger = GetRightLogger(logger);
@@ -120,12 +121,12 @@ namespace BenchmarkDotNet.Exporters
 
         private ILogger GetRightLogger(ILogger logger)
         {
-            if (string.IsNullOrEmpty(prefix)) // most common scenario!! we don't need expensive LoggerWithPrefix
+            if (string.IsNullOrEmpty(Prefix)) // most common scenario!! we don't need expensive LoggerWithPrefix
             {
                 return logger;
             }
 
-            return new LoggerWithPrefix(logger, prefix);
+            return new LoggerWithPrefix(logger, Prefix);
         }
 
         private void PrintTable(SummaryTable table, ILogger logger)
@@ -140,23 +141,23 @@ namespace BenchmarkDotNet.Exporters
             table.PrintCommonColumns(logger);
             logger.WriteLine();
 
-            if (useCodeBlocks)
+            if (UseCodeBlocks)
             {
-                logger.Write(codeBlockEnd);
+                logger.Write(CodeBlockEnd);
                 logger.WriteLine();
             }
 
-            if (columnsStartWithSeparator)
+            if (ColumnsStartWithSeparator)
             {
-                logger.Write(tableHeaderSeparator.TrimStart());
+                logger.Write(TableHeaderSeparator.TrimStart());
             }
 
-            table.PrintLine(table.FullHeader, logger, string.Empty, tableHeaderSeparator);
-            if (useHeaderSeparatingRow)
+            table.PrintLine(table.FullHeader, logger, string.Empty, TableHeaderSeparator);
+            if (UseHeaderSeparatingRow)
             {
-                if (columnsStartWithSeparator)
+                if (ColumnsStartWithSeparator)
                 {
-                    logger.Write(tableHeaderSeparator.TrimStart());
+                    logger.Write(TableHeaderSeparator.TrimStart());
                 }
 
                 logger.WriteLineStatistic(string.Join("",
@@ -171,10 +172,10 @@ namespace BenchmarkDotNet.Exporters
                 if (rowCounter > 0 && table.FullContentStartOfLogicalGroup[rowCounter] && table.SeparateLogicalGroups)
                 {
                     // Print logical separator
-                    if (columnsStartWithSeparator)
-                        logger.Write(tableColumnSeparator.TrimStart());
-                    table.PrintLine(separatorLine, logger, string.Empty, tableColumnSeparator, highlightRow, false, startOfGroupHighlightStrategy,
-                        boldMarkupFormat, false);
+                    if (ColumnsStartWithSeparator)
+                        logger.Write(TableColumnSeparator.TrimStart());
+                    table.PrintLine(separatorLine, logger, string.Empty, TableColumnSeparator, highlightRow, false, StartOfGroupHighlightStrategy,
+                        BoldMarkupFormat, false);
                 }
 
                 // Each time we hit the start of a new group, alternative the colour (in the console) or display bold in Markdown
@@ -183,11 +184,11 @@ namespace BenchmarkDotNet.Exporters
                     highlightRow = !highlightRow;
                 }
 
-                if (columnsStartWithSeparator)
-                    logger.Write(tableColumnSeparator.TrimStart());
+                if (ColumnsStartWithSeparator)
+                    logger.Write(TableColumnSeparator.TrimStart());
 
-                table.PrintLine(line, logger, string.Empty, tableColumnSeparator, highlightRow, table.FullContentStartOfHighlightGroup[rowCounter],
-                    startOfGroupHighlightStrategy, boldMarkupFormat, escapeHtml);
+                table.PrintLine(line, logger, string.Empty, TableColumnSeparator, highlightRow, table.FullContentStartOfHighlightGroup[rowCounter],
+                    StartOfGroupHighlightStrategy, BoldMarkupFormat, EscapeHtml);
                 rowCounter++;
             }
         }

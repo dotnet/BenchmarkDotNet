@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Validators
                     .Union(ValidateNamingConflicts(validationParameters.Benchmarks))
                     .Union(ValidateAccessModifiers(validationParameters.Benchmarks));
 
-        private IEnumerable<ValidationError> ValidateCSharpNaming(IEnumerable<BenchmarkCase> benchmarks)
+        private static IEnumerable<ValidationError> ValidateCSharpNaming(IEnumerable<BenchmarkCase> benchmarks)
             => benchmarks
                 .Where(benchmark => !IsValidCSharpIdentifier(benchmark.Descriptor.WorkloadMethod.Name))
                 .Distinct(BenchmarkMethodEqualityComparer.Instance) // we might have multiple jobs targeting same method. Single error should be enough ;)
@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Validators
                         benchmark
                     ));
 
-        private IEnumerable<ValidationError> ValidateNamingConflicts(IEnumerable<BenchmarkCase> benchmarks)
+        private static IEnumerable<ValidationError> ValidateNamingConflicts(IEnumerable<BenchmarkCase> benchmarks)
             => benchmarks
                 .Select(benchmark => benchmark.Descriptor.Type)
                 .Distinct()
@@ -42,22 +42,22 @@ namespace BenchmarkDotNet.Validators
                         true,
                         "Using \"__Overhead\" for method name is prohibited. We are using it internally in our templates. Please rename your method"));
 
-        private IEnumerable<ValidationError> ValidateAccessModifiers(IEnumerable<BenchmarkCase> benchmarks)
+        private static IEnumerable<ValidationError> ValidateAccessModifiers(IEnumerable<BenchmarkCase> benchmarks)
             => benchmarks.Where(x => x.Descriptor.Type.IsGenericType
                                      && HasPrivateGenericArguments(x.Descriptor.Type))
                          .Select(benchmark => new ValidationError(true, $"Generic class {benchmark.Descriptor.Type.GetDisplayName()} has non public generic argument(s)"));
         
-        private bool IsValidCSharpIdentifier(string identifier) // F# allows to use whitespaces as names #479
+        private static bool IsValidCSharpIdentifier(string identifier) // F# allows to use whitespaces as names #479
             => !string.IsNullOrEmpty(identifier)
                && (char.IsLetter(identifier[0]) || identifier[0] == Underscore) // An identifier must start with a letter or an underscore
                && identifier
                     .Skip(1)
                     .All(character => char.IsLetterOrDigit(character) || character == Underscore);
 
-        private bool IsUsingNameUsedInternallyByOurTemplate(string identifier)
+        private static bool IsUsingNameUsedInternallyByOurTemplate(string identifier)
             => identifier == "__Overhead";
 
-        private bool HasPrivateGenericArguments(Type type) => type.GetGenericArguments().Any(a => !(a.IsPublic
+        private static bool HasPrivateGenericArguments(Type type) => type.GetGenericArguments().Any(a => !(a.IsPublic
                                                                                                  || a.IsNestedPublic));
         
         private class BenchmarkMethodEqualityComparer : IEqualityComparer<BenchmarkCase>

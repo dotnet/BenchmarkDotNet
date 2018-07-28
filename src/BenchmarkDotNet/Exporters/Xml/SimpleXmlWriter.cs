@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Exporters.Xml
 {
     internal class SimpleXmlWriter : IXmlWriter, IDisposable
     {
-        private XmlWriter writer;
+        private readonly XmlWriter writer;
 
         public SimpleXmlWriter(TextWriter writer, bool indent)
         {

@@ -10,8 +10,8 @@ namespace BenchmarkDotNet.Engines
     public class EngineActualStage : EngineStage
     {
         internal const int MaxOverheadIterationCount = 20;
-        internal const double MaxOverheadRelativeError = 0.05;
-        internal const int DefaultWorkloadCount = 10;
+        private const double MaxOverheadRelativeError = 0.05;
+        private const int DefaultWorkloadCount = 10;
 
         private readonly int? targetCount;
         private readonly double maxRelativeError;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Mathematics
 {
@@ -45,7 +46,7 @@ namespace BenchmarkDotNet.Mathematics
             return sortedValues[index];
         }
 
-        public double Percentile(int percentile) => Percentile(SortedValues, percentile);
+        [PublicAPI] public double Percentile(int percentile) => Percentile(SortedValues, percentile);
 
         private List<double> SortedValues { get; }
 

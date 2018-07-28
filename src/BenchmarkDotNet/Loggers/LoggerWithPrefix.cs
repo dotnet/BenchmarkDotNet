@@ -5,8 +5,8 @@
     /// </summary>
     public class LoggerWithPrefix : ILogger
     {
-        public ILogger Logger { get; }
-        public string Prefix { get; }
+        private ILogger Logger { get; }
+        private string Prefix { get; }
         private bool isNewLine = true;
 
         public LoggerWithPrefix(ILogger logger, string prefix)

@@ -12,12 +12,11 @@ namespace BenchmarkDotNet.Characteristics
         internal static bool IsCharacteristicObjectSubclass(Type type) =>
             type.GetTypeInfo().IsSubclassOf(typeof(CharacteristicObject));
 
-        internal static bool IsCharacteristicSubclass(Type type) =>
+        private static bool IsCharacteristicSubclass(Type type) =>
             type.GetTypeInfo().IsSubclassOf(typeof(Characteristic));
 
         private static Characteristic AssertHasValue(MemberInfo member, Characteristic value)
         {
-            // ReSharper disable once PossibleNullReferenceException
             if (value == null)
                 throw new ArgumentException(
                     $"The value of {member.DeclaringType.Name}.{member.Name} is null");

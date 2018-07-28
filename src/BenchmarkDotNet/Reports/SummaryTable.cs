@@ -5,12 +5,13 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Order;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Reports
 {
     public class SummaryTable
     {
-        public Summary Summary { get; }
+        [PublicAPI] public Summary Summary { get; }
 
         public SummaryTableColumn[] Columns { get; }
         public int ColumnCount { get; }
@@ -20,7 +21,7 @@ namespace BenchmarkDotNet.Reports
         public bool[] FullContentStartOfHighlightGroup { get; }
         public bool[] FullContentStartOfLogicalGroup { get; }
         public string[][] FullContentWithHeader { get; }
-        public bool[] IsDefault { get; }
+        [PublicAPI] public bool[] IsDefault { get; }
         public ISummaryStyle EffectiveSummaryStyle { get; }
         public bool SeparateLogicalGroups { get; }
 
@@ -93,7 +94,7 @@ namespace BenchmarkDotNet.Reports
 
         public class SummaryTableColumn
         {
-            public int Index { get; }
+            [PublicAPI] public int Index { get; }
             public string Header { get; }
             public string[] Content { get; }
             public bool NeedToShow { get; }

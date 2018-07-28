@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Helpers
 {
@@ -11,7 +12,7 @@ namespace BenchmarkDotNet.Helpers
         private readonly Dictionary<string, string> encodedStrings;
         
         /// <summary>Ctor for ascii-only presentation</summary>
-        public MultiEncodingString(string asciiPresentation)
+        [PublicAPI] public MultiEncodingString(string asciiPresentation)
         {
             var pairs = new[]
             {
@@ -23,7 +24,7 @@ namespace BenchmarkDotNet.Helpers
         }
         
         /// <summary>Ctor for specified unicode and ascii presentations</summary>
-        public MultiEncodingString(string asciiPresentation, string unicodePresentation)
+        [PublicAPI] public MultiEncodingString(string asciiPresentation, string unicodePresentation)
         {
             var pairs = new[]
             {
@@ -49,7 +50,7 @@ namespace BenchmarkDotNet.Helpers
 
         public string ToString(Encoding encoding) => GetStringByEncoding(encoding);
 
-        public string GetString(Encoding encoding) => GetStringByEncoding(encoding);
+        [PublicAPI] public string GetString(Encoding encoding) => GetStringByEncoding(encoding);
 
         public static implicit operator MultiEncodingString(string s) => new MultiEncodingString(s);
         
@@ -86,6 +87,6 @@ namespace BenchmarkDotNet.Helpers
                 : null;
         }
         
-        private Encoding GetFallback() => Encoding.ASCII;
+        private static Encoding GetFallback() => Encoding.ASCII;
     }
 }

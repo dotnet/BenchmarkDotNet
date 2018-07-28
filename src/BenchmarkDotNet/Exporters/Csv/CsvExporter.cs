@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Exporters.Csv
 {
@@ -15,7 +16,7 @@ namespace BenchmarkDotNet.Exporters.Csv
         {
         }
 
-        public CsvExporter(CsvSeparator separator, ISummaryStyle style)
+        [PublicAPI] public CsvExporter(CsvSeparator separator, ISummaryStyle style)
         {
             this.style = style;
             this.separator = separator;

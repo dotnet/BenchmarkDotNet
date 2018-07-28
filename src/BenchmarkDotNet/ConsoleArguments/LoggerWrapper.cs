@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         public LoggerWrapper(ILogger logger) => this.logger = logger;
 
-        public override Encoding Encoding { get; }
+        public override Encoding Encoding { get; } = Encoding.ASCII;
 
         public override void Write(string value) => logger.WriteInfo(value);
     }

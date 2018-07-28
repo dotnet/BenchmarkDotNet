@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Reports;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Mathematics
 {
@@ -12,6 +13,7 @@ namespace BenchmarkDotNet.Mathematics
         /// <summary>
         /// Standard error in nanoseconds.
         /// </summary>
+        [PublicAPI]
         public double StandardError { get; }
 
         /// <summary>

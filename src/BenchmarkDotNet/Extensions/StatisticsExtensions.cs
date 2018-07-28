@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Extensions
 {
     public static class StatisticsExtensions
     {
-        private static string NullSummaryMessage = "<Empty statistic (N=0)>";
+        private const string NullSummaryMessage = "<Empty statistic (N=0)>";
 
         public static string ToStr(this Statistics s)
         {

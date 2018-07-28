@@ -6,6 +6,7 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Validators;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -14,23 +15,15 @@ namespace BenchmarkDotNet.Environments
         internal const string RuntimeInfoPrefix = "Runtime=";
         internal const string GcInfoPrefix = "GC=";
 
-        public string Architecture { get; protected set; }
-
-        public string Configuration { get; protected set; }
-
-        public string RuntimeVersion { get; protected set; }
-
-        public bool HasAttachedDebugger { get; protected set; }
-
-        public bool HasRyuJit { get; protected set; }
-
-        public string JitInfo { get; protected set; }
-
-        public bool IsServerGC { get; protected set; }
-
-        public bool IsConcurrentGC { get; protected set; }
-
-        public long GCAllocationQuantum { get; protected set; }
+        [PublicAPI] public string Architecture { get; protected set; }
+        [PublicAPI] public string Configuration { get; protected set; }
+        [PublicAPI] public string RuntimeVersion { get; protected set; }
+        [PublicAPI] public bool HasAttachedDebugger { get; protected set; }
+        [PublicAPI] public bool HasRyuJit { get; protected set; }
+        [PublicAPI] public string JitInfo { get; protected set; }
+        [PublicAPI] public bool IsServerGC { get; protected set; }
+        [PublicAPI] public bool IsConcurrentGC { get; protected set; }
+        [PublicAPI] public long GCAllocationQuantum { get; protected set; }
 
         protected BenchmarkEnvironmentInfo()
         {
@@ -55,15 +48,13 @@ namespace BenchmarkDotNet.Environments
             yield return $"{GcInfoPrefix}{GetGcConcurrentFlag()} {GetGcServerFlag()}";
         }
 
-        protected string GetConfigurationFlag() => Configuration == RuntimeInformation.Unknown || Configuration == RuntimeInformation.ReleaseConfigurationName
+        [PublicAPI] protected string GetConfigurationFlag() => Configuration == RuntimeInformation.Unknown || Configuration == RuntimeInformation.ReleaseConfigurationName
             ? ""
             : Configuration;
 
-        protected string GetDebuggerFlag() => HasAttachedDebugger ? " [AttachedDebugger]" : "";
-
-        protected string GetGcServerFlag() => IsServerGC ? "Server" : "Workstation";
-
-        protected string GetGcConcurrentFlag() => IsConcurrentGC ? "Concurrent" : "Non-concurrent";
+        [PublicAPI] protected string GetDebuggerFlag() => HasAttachedDebugger ? " [AttachedDebugger]" : "";
+        [PublicAPI] protected string GetGcServerFlag() => IsServerGC ? "Server" : "Workstation";
+        [PublicAPI] protected string GetGcConcurrentFlag() => IsConcurrentGC ? "Concurrent" : "Non-concurrent";
 
         internal string GetRuntimeInfo()
         {

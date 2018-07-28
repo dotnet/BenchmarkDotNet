@@ -1,5 +1,6 @@
 using System;
 using BenchmarkDotNet.Running;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Filters
 {
@@ -7,11 +8,10 @@ namespace BenchmarkDotNet.Filters
     {
         private readonly Func<BenchmarkCase, bool> predicate;
 
-        public SimpleFilter(Func<BenchmarkCase, bool> predicate)
-        {
-            this.predicate = predicate;
-        }
+        [PublicAPI]
+        public SimpleFilter(Func<BenchmarkCase, bool> predicate) => this.predicate = predicate;
 
+        [PublicAPI]
         public bool Predicate(BenchmarkCase benchmarkCase) => predicate(benchmarkCase);
     }
 }

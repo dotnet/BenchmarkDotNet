@@ -20,6 +20,7 @@ namespace BenchmarkDotNet.Mathematics
         /// </summary>        
         /// <param name="x">-infinity..+infinity</param>        
         /// <returns>Area under the Standard Normal Curve from -infinity to x</returns>
+        [PublicAPI]
         public static double Gauss(double x)
         {
             double z;

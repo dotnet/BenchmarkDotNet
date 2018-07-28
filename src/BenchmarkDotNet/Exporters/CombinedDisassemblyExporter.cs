@@ -107,6 +107,6 @@ namespace BenchmarkDotNet.Exporters
             logger.WriteLine("</table>");
         }
 
-        private string GetImportantInfo(BenchmarkReport benchmarkReport) => benchmarkReport.GetRuntimeInfo();
+        private static string GetImportantInfo(BenchmarkReport benchmarkReport) => benchmarkReport.GetRuntimeInfo();
     }
 }

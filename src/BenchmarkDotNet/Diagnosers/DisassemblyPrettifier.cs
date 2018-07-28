@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -141,7 +142,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         private static string WithoutAddress(string extraArguments)
         {
-            int startOfTheAddress = extraArguments.IndexOf("(");
+            int startOfTheAddress = extraArguments.IndexOf("(", StringComparison.Ordinal);
             if (startOfTheAddress < 0)
                 return extraArguments;
 

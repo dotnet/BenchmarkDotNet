@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Extensions;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Parameters
 {
     public class ParameterDefinitions
     {
-        public IReadOnlyList<ParameterDefinition> Items { get; }
+        [PublicAPI] public IReadOnlyList<ParameterDefinition> Items { get; }
 
         public ParameterDefinitions(IReadOnlyList<ParameterDefinition> items)
         {

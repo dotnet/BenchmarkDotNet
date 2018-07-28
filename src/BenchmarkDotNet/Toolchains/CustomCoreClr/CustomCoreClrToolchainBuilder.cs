@@ -28,8 +28,8 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
 
             this.coreClrVersion = coreClrVersion;
 
-            feeds[Generator.LocalCoreClrPackagesBin] = binPackagesPath;
-            feeds[Generator.LocalCoreClrPackages] = packagesPath;
+            Feeds[Generator.LocalCoreClrPackagesBin] = binPackagesPath;
+            Feeds[Generator.LocalCoreClrPackages] = packagesPath;
 
             isCoreClrConfigured = true;
             useTempFolderForRestore = true;
@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
 
             this.coreClrVersion = coreClrVersion;
 
-            feeds[Generator.CoreClrNuGetFeed] = nugetFeedUrl;
+            Feeds[Generator.CoreClrNuGetFeed] = nugetFeedUrl;
 
             isCoreClrConfigured = true;
 
@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
             if (!Directory.Exists(binPackagesPath)) throw new DirectoryNotFoundException($"{binPackagesPath} does not exist");
 
             coreFxVersion = privateCoreFxNetCoreAppVersion;
-            feeds[Generator.LocalCoreFxPackagesBin] = binPackagesPath;
+            Feeds[Generator.LocalCoreFxPackagesBin] = binPackagesPath;
             isCoreFxConfigured = true;
             useTempFolderForRestore = true;
 
@@ -97,7 +97,7 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
             if (nugetFeedUrl == null) throw new ArgumentNullException(nameof(nugetFeedUrl));
 
             coreFxVersion = privateCoreFxNetCoreAppVersion;
-            feeds[Generator.CoreFxNuGetFeed] = nugetFeedUrl;
+            Feeds[Generator.CoreFxNuGetFeed] = nugetFeedUrl;
             isCoreFxConfigured = true;
 
             return this;
@@ -129,7 +129,7 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
                 targetFrameworkMoniker: targetFrameworkMoniker,
                 runtimeIdentifier: runtimeIdentifier ?? GetPortableRuntimeIdentifier(),
                 customDotNetCliPath: customDotNetCliPath,
-                feeds: feeds,
+                feeds: Feeds,
                 useNuGetClearTag: useNuGetClearTag,
                 useTempFolderForRestore: useTempFolderForRestore);
         }

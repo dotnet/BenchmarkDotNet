@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        private string GetDisassemblerPath(Process process, Platform platform)
+        private static string GetDisassemblerPath(Process process, Platform platform)
         {
             switch (platform)
             {
@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        private string GetDisassemblerPath(string architectureName)
+        private static string GetDisassemblerPath(string architectureName)
         {
             // one can only attach to a process of same target architecture, this is why we need exe for x64 and for x86
             string exeName = $"BenchmarkDotNet.Disassembler.{architectureName}.exe";
@@ -102,7 +102,7 @@ namespace BenchmarkDotNet.Diagnosers
             return disassemblerPath;
         }
 
-        private void CopyAllRequiredDependencies(Assembly assemblyWithDisassemblersInResources, string destinationFolder)
+        private static void CopyAllRequiredDependencies(Assembly assemblyWithDisassemblersInResources, string destinationFolder)
         {
             // ClrMD and Cecil are also embedded in the resources, we need to copy them as well
             foreach (string dependency in assemblyWithDisassemblersInResources.GetManifestResourceNames().Where(name => name.EndsWith(".dll")))
@@ -119,7 +119,7 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        private void CopyFromResources(Assembly assembly, string resourceName, string destinationPath)
+        private static void CopyFromResources(Assembly assembly, string resourceName, string destinationPath)
         {
             using (var resourceStream = assembly.GetManifestResourceStream(resourceName))
             using (var exeStream = File.Create(destinationPath))
@@ -143,7 +143,7 @@ namespace BenchmarkDotNet.Diagnosers
                 .ToString();
 
         // code copied from https://stackoverflow.com/a/33206186/5852046
-        internal static class NativeMethods
+        private static class NativeMethods
         {
             // see https://msdn.microsoft.com/en-us/library/windows/desktop/ms684139%28v=vs.85%29.aspx
             public static bool Is64Bit(Process process)

@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         private IXmlWriter writer;
 
-        public static string DefaultItemName { get; } = "Item";
+        public const string DefaultItemName = "Item";
 
         private XmlSerializer(XmlSerializerBuilder builder)
         {
@@ -156,20 +156,20 @@ namespace BenchmarkDotNet.Exporters.Xml
         {
             return type.IsPrimitive
                        || type.IsEnum
-                       || type.Equals(typeof(string))
-                       || type.Equals(typeof(decimal));
+                       || type == typeof(string)
+                       || type == typeof(decimal);
         }
 
         private static bool IsCollection(PropertyInfo property)
             => typeof(IEnumerable).IsAssignableFrom(property.PropertyType);
 
-        private bool IsCollectionWritable(IEnumerable collection)
+        private static bool IsCollectionWritable(IEnumerable collection)
             => collection?.Cast<object>().FirstOrDefault() != null;
 
         internal class XmlSerializerBuilder
         {
-            private Dictionary<string, string> collectionItemNameMap = new Dictionary<string, string>();
-            private HashSet<string> excludedPropertyNames = new HashSet<string>();
+            private readonly Dictionary<string, string> collectionItemNameMap = new Dictionary<string, string>();
+            private readonly HashSet<string> excludedPropertyNames = new HashSet<string>();
 
             public Type Type { get; }
             public string RootName { get; private set; }

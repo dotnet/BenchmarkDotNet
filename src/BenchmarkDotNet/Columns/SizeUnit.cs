@@ -1,12 +1,15 @@
-﻿using System.Linq;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Columns
 {
+    [SuppressMessage("ReSharper", "InconsistentNaming")] // We want to use "KB", "MB", "GB", "TB"
     public class SizeUnit
     {
-        public string Name { get; }
-        public string Description { get; }
-        public long ByteAmount { get; }
+        [PublicAPI] public string Name { get; }
+        [PublicAPI] public string Description { get; }
+        [PublicAPI] public long ByteAmount { get; }
 
         public SizeUnit(string name, string description, long byteAmount)
         {
@@ -15,13 +18,14 @@ namespace BenchmarkDotNet.Columns
             ByteAmount = byteAmount;
         }
 
-        public const long BytesInKiloByte = 1024L; // this value MUST NOT be changed
-        public static readonly SizeUnit B = new SizeUnit("B", "Byte", 1L);
-        public static readonly SizeUnit KB = new SizeUnit("KB", "Kilobyte", BytesInKiloByte);
-        public static readonly SizeUnit MB = new SizeUnit("MB", "Megabyte", BytesInKiloByte * BytesInKiloByte);
-        public static readonly SizeUnit GB = new SizeUnit("GB", "Gigabyte", BytesInKiloByte * BytesInKiloByte * BytesInKiloByte);
-        public static readonly SizeUnit TB = new SizeUnit("TB", "Terabyte", BytesInKiloByte * BytesInKiloByte * BytesInKiloByte * BytesInKiloByte);
-        public static readonly SizeUnit[] All = { B, KB, MB, GB, TB };
+        private const long BytesInKiloByte = 1024L; // this value MUST NOT be changed
+        
+        [PublicAPI] public static readonly SizeUnit B = new SizeUnit("B", "Byte", 1L);
+        [PublicAPI] public static readonly SizeUnit KB = new SizeUnit("KB", "Kilobyte", BytesInKiloByte);
+        [PublicAPI] public static readonly SizeUnit MB = new SizeUnit("MB", "Megabyte", BytesInKiloByte * BytesInKiloByte);
+        [PublicAPI] public static readonly SizeUnit GB = new SizeUnit("GB", "Gigabyte", BytesInKiloByte * BytesInKiloByte * BytesInKiloByte);
+        [PublicAPI] public static readonly SizeUnit TB = new SizeUnit("TB", "Terabyte", BytesInKiloByte * BytesInKiloByte * BytesInKiloByte * BytesInKiloByte);
+        [PublicAPI] public static readonly SizeUnit[] All = { B, KB, MB, GB, TB };
 
         public static SizeUnit GetBestSizeUnit(params long[] values)
         {

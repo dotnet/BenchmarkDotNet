@@ -12,10 +12,10 @@ namespace BenchmarkDotNet.Exporters.Json
     {
         protected override string FileExtension => "json";
 
-        private bool IndentJson { get; set; }
-        private bool ExcludeMeasurements { get; set; }
+        private bool IndentJson { get; }
+        private bool ExcludeMeasurements { get; }
 
-        public JsonExporterBase(bool indentJson = false, bool excludeMeasurements = false)
+        protected JsonExporterBase(bool indentJson = false, bool excludeMeasurements = false)
         {
             IndentJson = indentJson;
             ExcludeMeasurements = excludeMeasurements;

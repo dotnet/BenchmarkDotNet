@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Diagnosers
         private const string DiagnosticAssemblyName = "BenchmarkDotNet.Diagnostics.Windows";
 
         // Make the Diagnosers lazy-loaded, so they are only instantiated if needed
-        internal static readonly Lazy<IDiagnoser[]> LazyLoadedDiagnosers 
+        private static readonly Lazy<IDiagnoser[]> LazyLoadedDiagnosers 
             = new Lazy<IDiagnoser[]>(LoadDiagnosers, LazyThreadSafetyMode.ExecutionAndPublication);
 
         internal static IDiagnoser GetImplementation<TDiagnoser>() where TDiagnoser : IDiagnoser

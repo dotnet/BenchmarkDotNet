@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Analysers
         {
         }
 
-        public override IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary)
+        protected override IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary)
         {
             var target = report.AllMeasurements.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual)).ToArray();
             if (target.IsEmpty())

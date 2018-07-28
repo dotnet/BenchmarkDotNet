@@ -7,6 +7,7 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Exporters.Csv
 {
@@ -32,7 +33,7 @@ namespace BenchmarkDotNet.Exporters.Csv
 
         protected override string FileCaption => "measurements";
 
-        public ISummaryStyle Style { get; private set; }
+        [PublicAPI] public ISummaryStyle Style { get; }
 
         public static Job[] GetJobs(Summary summary) => summary.BenchmarksCases.Select(b => b.Job).ToArray();
 

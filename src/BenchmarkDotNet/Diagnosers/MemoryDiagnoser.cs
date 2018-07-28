@@ -12,6 +12,7 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -20,7 +21,7 @@ namespace BenchmarkDotNet.Diagnosers
         private const int Gen0 = 0, Gen1 = 1, Gen2 = 2;
 
         public static readonly MemoryDiagnoser Default = new MemoryDiagnoser();
-        public const string DiagnoserId = nameof(MemoryDiagnoser); 
+        private const string DiagnoserId = nameof(MemoryDiagnoser); 
 
         private readonly Dictionary<BenchmarkCase, GcStats> results = new Dictionary<BenchmarkCase, GcStats>();
 
@@ -50,6 +51,7 @@ namespace BenchmarkDotNet.Diagnosers
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) 
             => Array.Empty<ValidationError>();
         
+        [PublicAPI]
         public class AllocationColumn : IColumn
         {
             private readonly Dictionary<BenchmarkCase, GcStats> results;
@@ -81,6 +83,7 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
+        [PublicAPI]
         public class GCCollectionColumn : IColumn
         {
             private readonly Dictionary<BenchmarkCase, GcStats> results;

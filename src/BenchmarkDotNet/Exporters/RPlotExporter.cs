@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Exporters
         public static readonly IExporter Default = new RPlotExporter();
         public string Name => nameof(RPlotExporter);
 
-        private static object buildScriptLock = new object();
+        private static readonly object buildScriptLock = new object();
 
         public IEnumerable<IExporter> Dependencies
         {
@@ -91,7 +91,7 @@ namespace BenchmarkDotNet.Exporters
             throw new NotSupportedException();
         }
 
-        public static string FindInPath(string fileName)
+        private static string FindInPath(string fileName)
         {
             var dirs = Environment.GetEnvironmentVariable("PATH").Split(Path.PathSeparator);
             foreach (string dir in dirs)

@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.Exporters.Xml
     {
         public double Hertz => frequency.Hertz;
 
-        private Frequency frequency;
+        private readonly Frequency frequency;
 
         public ChronometerDto(Frequency frequency)
         {

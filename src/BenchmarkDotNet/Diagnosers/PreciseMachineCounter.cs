@@ -1,15 +1,16 @@
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Diagnosers
 {
 #pragma warning disable CS3001, CS3003 // ulong is non CLS-compilant
     public class PreciseMachineCounter
     {
-        public int ProfileSourceId { get; }
-        public string Name { get; }
-        public HardwareCounter Counter { get; }
-        public int Interval { get; }
-        public Dictionary<ulong, ulong> PerInstructionPointer { get; }
+        [PublicAPI] public int ProfileSourceId { get; }
+        [PublicAPI] public string Name { get; }
+        [PublicAPI] public HardwareCounter Counter { get; }
+        [PublicAPI] public int Interval { get; }
+        [PublicAPI] public Dictionary<ulong, ulong> PerInstructionPointer { get; }
 
         public ulong Count { get; private set; }
 

@@ -15,8 +15,8 @@ namespace BenchmarkDotNet.Reports
         public IReadOnlyList<Measurement> AllMeasurements { get; }
         public GcStats GcStats { get; }
 
-        public GenerateResult GenerateResult { get; }
-        public BuildResult BuildResult { get; }
+        [PublicAPI] public GenerateResult GenerateResult { get; }
+        [PublicAPI] public BuildResult BuildResult { get; }
 
         [NotNull]
         public IReadOnlyList<ExecuteResult> ExecuteResults { get; }

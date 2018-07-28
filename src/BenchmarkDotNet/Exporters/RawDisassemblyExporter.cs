@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Exporters
             return filePath;
         }
 
-        private void Export(ILogger logger, DisassemblyResult disassemblyResult, BenchmarkCase benchmarkCase)
+        private static void Export(ILogger logger, DisassemblyResult disassemblyResult, BenchmarkCase benchmarkCase)
         {
             logger.WriteLine("<!DOCTYPE html><html lang='en'><head><meta charset='utf-8' />");
             logger.WriteLine($"<title>Output of DisassemblyDiagnoser for {benchmarkCase.DisplayInfo}</title>");
@@ -109,7 +109,7 @@ namespace BenchmarkDotNet.Exporters
 
         
 
-        private string GetShortName(string fullMethodSignature)
+        private static string GetShortName(string fullMethodSignature)
         {
             int bracketIndex = fullMethodSignature.IndexOf('(');
             string withoutArguments = fullMethodSignature.Remove(bracketIndex);

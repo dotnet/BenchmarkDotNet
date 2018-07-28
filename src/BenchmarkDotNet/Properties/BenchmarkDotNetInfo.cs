@@ -4,6 +4,7 @@ using System.Reflection;
 
 namespace BenchmarkDotNet.Properties
 {
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public static class BenchmarkDotNetInfo
     {
 #if PRERELEASE_NIGHTLY

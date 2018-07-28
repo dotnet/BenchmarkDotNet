@@ -1,11 +1,12 @@
 ﻿using BenchmarkDotNet.Characteristics;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Jobs
 {
     public class MetaMode : JobMode<MetaMode>
     {
-        public static readonly Characteristic<bool> BaselineCharacteristic = CreateHiddenCharacteristic<bool>(nameof(Baseline));
-        public static readonly Characteristic<bool> IsMutatorCharacteristic = CreateIgnoreOnApplyCharacteristic<bool>(nameof(IsMutator));
+        [PublicAPI] public static readonly Characteristic<bool> BaselineCharacteristic = CreateHiddenCharacteristic<bool>(nameof(Baseline));
+        [PublicAPI] public static readonly Characteristic<bool> IsMutatorCharacteristic = CreateIgnoreOnApplyCharacteristic<bool>(nameof(IsMutator));
 
         public bool Baseline
         {

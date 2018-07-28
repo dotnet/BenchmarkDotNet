@@ -37,13 +37,11 @@ namespace BenchmarkDotNet.Loggers
 
         internal void ProcessInput()
         {
-            string line;
-
             // Peek -1 or 0 can indicate internal error.
             while (!process.StandardOutput.EndOfStream && process.StandardOutput.Peek() > 0)
             {
                 // ReadLine() can actually return string.Empty and null as valid values.
-                line = process.StandardOutput.ReadLine();
+                string line = process.StandardOutput.ReadLine();
 
                 if (!string.IsNullOrEmpty(line)) // Skip bad data.
                 {

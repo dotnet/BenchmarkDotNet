@@ -17,9 +17,9 @@ namespace BenchmarkDotNet.Characteristics
             FallbackValue = fallbackValue;
         }
 
-        public Func<CharacteristicObject, T, T> Resolver { get; }
+        private Func<CharacteristicObject, T, T> Resolver { get; }
 
-        public new T FallbackValue { get; }
+        public T FallbackValue { get; }
 
         public new T this[CharacteristicObject obj]
         {

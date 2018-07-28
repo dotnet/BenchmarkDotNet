@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Microsoft.DotNet.PlatformAbstractions;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public abstract class CustomDotNetCliToolchainBuilder
     {
         protected string runtimeIdentifier, customDotNetCliPath;
@@ -12,7 +14,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         protected string runtimeFrameworkVersion;
 
         protected bool useNuGetClearTag, useTempFolderForRestore;
-        protected Dictionary<string, string> feeds = new Dictionary<string, string>();
+        protected readonly Dictionary<string, string> Feeds = new Dictionary<string, string>();
 
         public abstract IToolchain ToToolchain();
 
@@ -24,7 +26,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (string.IsNullOrEmpty(feedName)) throw new ArgumentException("Value cannot be null or empty.", nameof(feedName));
             if (string.IsNullOrEmpty(feedAddress)) throw new ArgumentException("Value cannot be null or empty.", nameof(feedAddress));
 
-            feeds[feedName] = feedAddress;
+            Feeds[feedName] = feedAddress;
 
             return this;
         }

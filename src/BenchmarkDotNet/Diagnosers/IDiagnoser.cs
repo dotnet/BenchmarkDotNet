@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Diagnosers
         IEnumerable<ValidationError> Validate(ValidationParameters validationParameters);
     }
 
-    public interface IConfigurableDiagnoser<TConfig> : IDiagnoser
+    public interface IConfigurableDiagnoser<in TConfig> : IDiagnoser
     {
         IConfigurableDiagnoser<TConfig> Configure(TConfig config);
     }

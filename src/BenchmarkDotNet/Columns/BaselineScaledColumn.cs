@@ -87,7 +87,7 @@ namespace BenchmarkDotNet.Columns
             }
         }
 
-        public bool IsNonBaselinesPrecise(Summary summary, Statistics baselineStat, BenchmarkCase benchmarkCase)
+        private static bool IsNonBaselinesPrecise(Summary summary, Statistics baselineStat, BenchmarkCase benchmarkCase)
         {
             string logicalGroupKey = summary.GetLogicalGroupKey(benchmarkCase);
             var nonBaselines = summary.BenchmarksCases

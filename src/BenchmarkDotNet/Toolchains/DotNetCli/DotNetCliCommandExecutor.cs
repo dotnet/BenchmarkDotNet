@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
@@ -15,11 +16,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         {
             public bool IsSuccess { get; }
 
-            public TimeSpan ExecutionTime { get; }
+            [PublicAPI] public TimeSpan ExecutionTime { get; }
 
-            public string StandardOutput { get; }
+            [PublicAPI] public string StandardOutput { get; }
 
-            public string StandardError { get; }
+            [PublicAPI] public string StandardError { get; }
 
             /// <summary>
             /// in theory, all errors should be reported to standard error, 
@@ -28,7 +29,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             /// </summary>
             public string ProblemDescription => HasNonEmptyErrorMessage ? StandardError : StandardOutput;
 
-            public bool HasNonEmptyErrorMessage => !string.IsNullOrEmpty(StandardError);
+            [PublicAPI] public bool HasNonEmptyErrorMessage => !string.IsNullOrEmpty(StandardError);
 
             private CommandResult(bool isSuccess, TimeSpan executionTime, string standardOutput, string standardError)
             {
@@ -114,7 +115,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 foreach (var environmentVariable in environmentVariables)
                     startInfo.EnvironmentVariables[environmentVariable.Key] = environmentVariable.Value;
 
-            if (!string.IsNullOrEmpty(customDotNetCliPath) && (environmentVariables == null || !environmentVariables.Any(envVar => envVar.Key == dotnetMultiLevelLookupEnvVarName)))
+            if (!string.IsNullOrEmpty(customDotNetCliPath) && (environmentVariables == null || environmentVariables.All(envVar => envVar.Key != dotnetMultiLevelLookupEnvVarName)))
                 startInfo.EnvironmentVariables[dotnetMultiLevelLookupEnvVarName] = "0";
 
             return startInfo;

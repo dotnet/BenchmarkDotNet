@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.Characteristics
 
         public Type DeclaringType { get; }
 
-        public object FallbackValue { get; }
+        private object FallbackValue { get; }
 
         public object this[CharacteristicObject obj]
         {

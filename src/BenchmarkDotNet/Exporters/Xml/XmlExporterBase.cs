@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Exporters.Xml
         private readonly bool indentXml;
         private readonly bool excludeMeasurements;
 
-        public XmlExporterBase(bool indentXml = false, bool excludeMeasurements = false)
+        protected XmlExporterBase(bool indentXml = false, bool excludeMeasurements = false)
         {
             this.indentXml = indentXml;
             this.excludeMeasurements = excludeMeasurements;

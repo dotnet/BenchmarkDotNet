@@ -3,23 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Extensions
 {
     internal static class ReflectionExtensions
     {
+        [PublicAPI]
         internal static T ResolveAttribute<T>(this Type type) where T : Attribute =>
             type?.GetTypeInfo().GetCustomAttributes(typeof(T), false).OfType<T>().FirstOrDefault();
 
+        [PublicAPI]
         internal static T ResolveAttribute<T>(this MethodInfo methodInfo) where T : Attribute =>
             methodInfo?.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
 
+        [PublicAPI]
         internal static T ResolveAttribute<T>(this PropertyInfo propertyInfo) where T : Attribute =>
             propertyInfo?.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
 
+        [PublicAPI]
         internal static T ResolveAttribute<T>(this FieldInfo fieldInfo) where T : Attribute =>
             fieldInfo?.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
 
+        [PublicAPI]
         internal static bool HasAttribute<T>(this MethodInfo methodInfo) where T : Attribute =>
             methodInfo.ResolveAttribute<T>() != null;
 
@@ -79,7 +85,7 @@ namespace BenchmarkDotNet.Extensions
         /// <summary>
         /// returns simple, human friendly display name
         /// </summary>
-        internal static string GetDisplayName(this TypeInfo typeInfo)
+        private static string GetDisplayName(this TypeInfo typeInfo)
         {
             if (!typeInfo.IsGenericType)
                 return typeInfo.Name;
@@ -143,7 +149,7 @@ namespace BenchmarkDotNet.Extensions
             return typeInfo.GetBenchmarks().Any();
         }
 
-        internal static MethodInfo[] GetBenchmarks(this TypeInfo typeInfo)
+        private static MethodInfo[] GetBenchmarks(this TypeInfo typeInfo)
             => typeInfo
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public)
                 .Where(method => method.GetCustomAttributes(true).OfType<BenchmarkAttribute>().Any())

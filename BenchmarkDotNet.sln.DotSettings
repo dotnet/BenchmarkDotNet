@@ -12,12 +12,10 @@
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ArrangeAccessorOwnerBody/@EntryIndexedValue">DO_NOT_SHOW</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ArrangeConstructorOrDestructorBody/@EntryIndexedValue"></s:String>
 	<s:Boolean x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ArrangeConstructorOrDestructorBody/@EntryIndexRemoved">True</s:Boolean>
-	
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ArrangeLocalFunctionBody/@EntryIndexedValue"></s:String>
 	<s:Boolean x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ArrangeLocalFunctionBody/@EntryIndexRemoved">True</s:Boolean>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ArrangeMethodOrOperatorBody/@EntryIndexedValue"></s:String>
 	<s:Boolean x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ArrangeMethodOrOperatorBody/@EntryIndexRemoved">True</s:Boolean>
-	
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ConvertIfStatementToReturnStatement/@EntryIndexedValue">DO_NOT_SHOW</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=InvertIf/@EntryIndexedValue">DO_NOT_SHOW</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantArgumentDefaultValue/@EntryIndexedValue">DO_NOT_SHOW</s:String>
@@ -25,6 +23,10 @@
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantExplicitTupleComponentName/@EntryIndexedValue">DO_NOT_SHOW</s:String>	
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RemoveRedundantBraces/@EntryIndexedValue"></s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=SuggestBaseTypeForParameter/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ParameterTypeCanBeEnumerable_002ELocal/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ParameterTypeCanBeEnumerable_002EGlobal/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ReturnTypeCanBeEnumerable_002EGlobal/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ReturnTypeCanBeEnumerable_002ELocal/@EntryIndexedValue">DO_NOT_SHOW</s:String>
 	<s:Boolean x:Key="/Default/CodeInspection/Highlighting/ReadSettingsFromFileLevel/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpCodeStyle/BRACES_FOR_IFELSE/@EntryValue">NotRequired</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpCodeStyle/CONSTRUCTOR_OR_DESTRUCTOR_BODY/@EntryValue">ExpressionBody</s:String>

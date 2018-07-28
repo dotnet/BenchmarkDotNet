@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Mathematics
 {
@@ -99,7 +100,7 @@ namespace BenchmarkDotNet.Mathematics
             return s + "%";
         }
 
-        public static double ToPercent(this ConfidenceLevel level)
+        [PublicAPI] public static double ToPercent(this ConfidenceLevel level)
         {
             (int value, int digits) = ConfidenceLevelDetails[level];
 
@@ -121,15 +122,15 @@ namespace BenchmarkDotNet.Mathematics
 
     public struct ConfidenceInterval
     {
-        public int N { get; }
-        public double Mean { get; }
-        public double StandardError { get; }
+        [PublicAPI] public int N { get; }
+        [PublicAPI] public double Mean { get; }
+        [PublicAPI] public double StandardError { get; }
 
-        public ConfidenceLevel Level { get; }
-        public double Margin { get; }
+        [PublicAPI] public ConfidenceLevel Level { get; }
+        [PublicAPI] public double Margin { get; }
 
-        public double Lower { get; }
-        public double Upper { get; }
+        [PublicAPI] public double Lower { get; }
+        [PublicAPI] public double Upper { get; }
 
         public ConfidenceInterval(double mean, double standardError, int n, ConfidenceLevel level = ConfidenceLevel.L999)
         {

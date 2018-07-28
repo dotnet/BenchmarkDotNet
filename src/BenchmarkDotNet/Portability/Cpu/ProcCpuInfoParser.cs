@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Portability.Cpu
 
         internal static Frequency ParseFrequencyFromBrandString(string brandString)
         {
-            string pattern = "(\\d.\\d+)GHz";
+            const string pattern = "(\\d.\\d+)GHz";
             var matches = Regex.Matches(brandString, pattern, RegexOptions.IgnoreCase);
             if (matches.Count > 0 && matches[0].Groups.Count > 1)
             {

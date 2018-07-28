@@ -135,7 +135,7 @@ namespace BenchmarkDotNet.Order
 
         private class LogicalGroupComparer : IComparer<IGrouping<string, BenchmarkCase>>
         {
-            private IComparer<BenchmarkCase> benchmarkComparer;
+            private readonly IComparer<BenchmarkCase> benchmarkComparer;
 
             public LogicalGroupComparer(IComparer<BenchmarkCase> benchmarkComparer) => this.benchmarkComparer = benchmarkComparer;
 

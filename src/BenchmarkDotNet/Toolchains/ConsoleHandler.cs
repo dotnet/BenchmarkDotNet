@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using BenchmarkDotNet.Loggers;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains
 {
@@ -11,13 +12,13 @@ namespace BenchmarkDotNet.Toolchains
         // This needs to be static, so that we can share a single handler amongst all instances of Executor's
         internal static ConsoleHandler Instance;
 
-        public ConsoleCancelEventHandler EventHandler { get; private set; }
+        [PublicAPI] public ConsoleCancelEventHandler EventHandler { get; }
 
         private Process process;
-        private ILogger logger;
+        private readonly ILogger logger;
         private ConsoleColor? colorBefore;
 
-        public ConsoleHandler(ILogger logger)
+        [PublicAPI] public ConsoleHandler(ILogger logger)
         {
             this.logger = logger;
             EventHandler = HandlerCallback;
@@ -99,7 +100,7 @@ namespace BenchmarkDotNet.Toolchains
             return $"Process: {processId}, Handler: {EventHandler?.GetHashCode()}";
         }
 
-        private bool HasProcessDied(Process process)
+        private static bool HasProcessDied(Process process)
         {
             if (process == null)
                 return true;

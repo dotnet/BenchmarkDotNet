@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Columns
 {
     public class StatisticColumn : IColumn
     {
-        public enum Priority
+        private enum Priority
         {
             Main,
             Quartile,

@@ -3,8 +3,6 @@ using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Horology;
 
-// ReSharper disable once CheckNamespace
-
 namespace BenchmarkDotNet.Jobs
 {
     public sealed class RunMode : JobMode<RunMode>
@@ -64,7 +62,7 @@ namespace BenchmarkDotNet.Jobs
         {
         }
 
-        public RunMode(string id) : base(id)
+        private RunMode(string id) : base(id)
         {
         }
 

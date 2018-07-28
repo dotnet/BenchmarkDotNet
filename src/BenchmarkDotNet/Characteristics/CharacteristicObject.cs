@@ -49,7 +49,8 @@ namespace BenchmarkDotNet.Characteristics
         #endregion
 
         #region Assertions
-        protected void AssertNotFrozen()
+
+        private void AssertNotFrozen()
         {
             if (Frozen)
             {
@@ -57,7 +58,7 @@ namespace BenchmarkDotNet.Characteristics
             }
         }
 
-        protected void AssertIsRoot()
+        private void AssertIsRoot()
         {
             if (Owner != null)
             {
@@ -67,13 +68,13 @@ namespace BenchmarkDotNet.Characteristics
             }
         }
 
-        protected void AssertIsNonFrozenRoot()
+        private void AssertIsNonFrozenRoot()
         {
             AssertNotFrozen();
             AssertIsRoot();
         }
 
-        protected void AssertIsAssignable(Characteristic characteristic, object value)
+        private static void AssertIsAssignable(Characteristic characteristic, object value)
         {
             if (ReferenceEquals(value, Characteristic.EmptyValue) || ReferenceEquals(value, null))
             {
@@ -91,7 +92,8 @@ namespace BenchmarkDotNet.Characteristics
         #endregion
 
         #region Properties
-        protected CharacteristicObject Owner => owner;
+        
+        private CharacteristicObject Owner => owner;
 
         protected CharacteristicObject OwnerOrSelf => owner ?? this;
 

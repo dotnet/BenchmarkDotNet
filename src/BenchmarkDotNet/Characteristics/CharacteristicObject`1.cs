@@ -1,4 +1,6 @@
-﻿namespace BenchmarkDotNet.Characteristics
+﻿using JetBrains.Annotations;
+
+namespace BenchmarkDotNet.Characteristics
 {
     public abstract class CharacteristicObject<T> : CharacteristicObject
         where T : CharacteristicObject<T>, new()
@@ -9,6 +11,7 @@
 
         public new T Apply(CharacteristicObject other) => (T)ApplyCore(other);
 
+        [PublicAPI]
         public T Apply(params CharacteristicObject[] others)
         {
             var result = this;

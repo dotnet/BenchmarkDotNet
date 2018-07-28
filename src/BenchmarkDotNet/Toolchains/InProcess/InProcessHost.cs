@@ -52,14 +52,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
         /// <summary><c>True</c> if there are diagnosers attached.</summary>
         /// <value><c>True</c> if there are diagnosers attached.</value>
-        public bool IsDiagnoserAttached { get; }
+        [PublicAPI] public bool IsDiagnoserAttached { get; }
 
         /// <summary>Results of the run.</summary>
         /// <value>Results of the run.</value>
         public RunResults RunResults { get; private set; }
 
         /// <summary>Current config</summary>
-        public IConfig Config { get; set; }
+        [PublicAPI] public IConfig Config { get; set; }
         
         /// <summary>Passes text to the host.</summary>
         /// <param name="message">Text to write.</param>

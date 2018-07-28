@@ -1,5 +1,6 @@
 ﻿using System;
 using BenchmarkDotNet.Extensions;
+using JetBrains.Annotations;
 using static System.Math;
 
 namespace BenchmarkDotNet.Mathematics
@@ -11,7 +12,7 @@ namespace BenchmarkDotNet.Mathematics
         public double PValue { get; }
         public bool NullHypothesisIsRejected => PValue < 0.05;
 
-        public WelchTTest(double x, double df, double pValue)
+        [PublicAPI] public WelchTTest(double x, double df, double pValue)
         {
             T = x;
             Df = df;

@@ -53,17 +53,17 @@ namespace BenchmarkDotNet.Environments
         /// checks if Mono is installed
         /// <remarks>It's expensive to call (creates new process by calling `mono --version`)</remarks>
         /// </summary>
-        public Lazy<bool> IsMonoInstalled { get; protected set; }
+        public Lazy<bool> IsMonoInstalled { get; }
 
         /// <summary>
         /// The frequency of the timer as the number of ticks per second.
         /// </summary>
-        public Frequency ChronometerFrequency { get; protected set; }
-        public TimeInterval ChronometerResolution => ChronometerFrequency.ToResolution();
+        [PublicAPI] public Frequency ChronometerFrequency { get; protected set; }
+        [PublicAPI] public TimeInterval ChronometerResolution => ChronometerFrequency.ToResolution();
 
         public HardwareTimerKind HardwareTimerKind { get; protected set; }
 
-        public Lazy<ICollection<Antivirus>> AntivirusProducts { get; protected set; }
+        public Lazy<ICollection<Antivirus>> AntivirusProducts { get; }
 
         public Lazy<VirtualMachineHypervisor> VirtualMachineHypervisor { get; protected set; }
 

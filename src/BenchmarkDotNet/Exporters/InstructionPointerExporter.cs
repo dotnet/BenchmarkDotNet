@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Exporters
             }
         }
 
-        private string Export(Summary summary, BenchmarkCase benchmarkCase, DisassemblyResult disassemblyResult, PmcStats pmcStats)
+        private static string Export(Summary summary, BenchmarkCase benchmarkCase, DisassemblyResult disassemblyResult, PmcStats pmcStats)
         {
             string filePath = $"{Path.Combine(summary.ResultsDirectoryPath, benchmarkCase.Descriptor.WorkloadMethod.Name)}-{benchmarkCase.Job.Environment.Jit}-{benchmarkCase.Job.Environment.Platform}-instructionPointer.html";
             if (File.Exists(filePath))
@@ -160,7 +160,7 @@ namespace BenchmarkDotNet.Exporters
             return model;
         }
 
-        private void Export(ILogger logger, BenchmarkCase benchmarkCase, Dictionary<HardwareCounter, (ulong withoutNoise, ulong total)> totals, IReadOnlyList<MethodWithCounters> model, HardwareCounter[] hardwareCounters)
+        private static void Export(ILogger logger, BenchmarkCase benchmarkCase, Dictionary<HardwareCounter, (ulong withoutNoise, ulong total)> totals, IReadOnlyList<MethodWithCounters> model, HardwareCounter[] hardwareCounters)
         {
             int columnsCount = hardwareCounters.Length + 2;
 

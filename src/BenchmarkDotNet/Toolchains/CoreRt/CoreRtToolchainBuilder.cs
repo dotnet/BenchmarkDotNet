@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
 
             coreRtVersion = microsoftDotNetILCompilerVersion;
 
-            feeds[Generator.CoreRtNuGetFeed] = nugetFeedUrl;
+            Feeds[Generator.CoreRtNuGetFeed] = nugetFeedUrl;
 
             isCoreRtConfigured = true;
 
@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
                 targetFrameworkMoniker: targetFrameworkMoniker,
                 runtimeIdentifier: runtimeIdentifier ?? GetPortableRuntimeIdentifier(),
                 customDotNetCliPath: customDotNetCliPath,
-                feeds: feeds,
+                feeds: Feeds,
                 useNuGetClearTag: useNuGetClearTag,
                 useTempFolderForRestore: useTempFolderForRestore);
         }

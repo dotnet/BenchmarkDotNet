@@ -1,11 +1,15 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using BenchmarkDotNet.Mathematics;
 using CommandLine;
 using CommandLine.Text;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
     public class CommandLineOptions
     {
         [Option('j', "job", Required = false, Default = "Default", HelpText = "Dry/Short/Medium/Long or Default")]
@@ -54,6 +58,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         public bool Join { get; set; }
 
         [Usage(ApplicationAlias = "")]
+        [PublicAPI]
         public static IEnumerable<Example> Examples
         {
             get

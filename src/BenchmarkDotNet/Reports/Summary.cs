@@ -19,19 +19,19 @@ namespace BenchmarkDotNet.Reports
         public string Title { get; }
         public BenchmarkCase[] BenchmarksCases { get; }
         public BenchmarkReport[] Reports { get; }
-        public ISummaryStyle Style { get; }
+        [PublicAPI] public ISummaryStyle Style { get; }
         public HostEnvironmentInfo HostEnvironmentInfo { get; }
         public IConfig Config { get; }
         public string ResultsDirectoryPath { get; }
         public SummaryTable Table { get; }
-        public TimeSpan TotalTime { get; }
-        public ValidationError[] ValidationErrors { get; }
+        [PublicAPI] public TimeSpan TotalTime { get; }
+        [PublicAPI] public ValidationError[] ValidationErrors { get; }
         public string AllRuntimes { get; }
 
         private readonly Dictionary<BenchmarkCase, BenchmarkReport> reportMap = new Dictionary<BenchmarkCase, BenchmarkReport>();
         private readonly IOrderer orderer;
 
-        public bool HasReport(BenchmarkCase benchmarkCase) => reportMap.ContainsKey(benchmarkCase);
+        [PublicAPI] public bool HasReport(BenchmarkCase benchmarkCase) => reportMap.ContainsKey(benchmarkCase);
 
         /// <summary>
         /// Returns a report for the given benchmark or null if there is no a corresponded report.

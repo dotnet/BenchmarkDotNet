@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Characteristics;
 
-// ReSharper disable once CheckNamespace
 namespace BenchmarkDotNet.Jobs
 {
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public sealed class GcMode : JobMode<GcMode>, IEquatable<GcMode>
     {
         public static readonly Characteristic<bool> ServerCharacteristic = CreateCharacteristic<bool>(nameof(Server));

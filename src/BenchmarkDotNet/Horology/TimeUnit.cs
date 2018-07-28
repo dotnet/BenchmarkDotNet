@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using BenchmarkDotNet.Helpers;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Horology
 {
@@ -20,14 +21,14 @@ namespace BenchmarkDotNet.Horology
 
         public TimeInterval ToInterval(long value = 1) => new TimeInterval(value, this);
 
-        public static readonly TimeUnit Nanosecond = new TimeUnit("ns", "Nanosecond", 1);
-        public static readonly TimeUnit Microsecond = new TimeUnit(new MultiEncodingString("us", "\u03BCs"), "Microsecond", 1000);
-        public static readonly TimeUnit Millisecond = new TimeUnit("ms", "Millisecond", 1000 * 1000);
-        public static readonly TimeUnit Second = new TimeUnit("s", "Second", 1000 * 1000 * 1000);
-        public static readonly TimeUnit Minute = new TimeUnit("m", "Minute", Second.NanosecondAmount * 60);
-        public static readonly TimeUnit Hour = new TimeUnit("h", "Hour", Minute.NanosecondAmount * 60);
-        public static readonly TimeUnit Day = new TimeUnit("d", "Day", Hour.NanosecondAmount * 24);
-        public static readonly TimeUnit[] All = { Nanosecond, Microsecond, Millisecond, Second, Minute, Hour, Day };
+        [PublicAPI] public static readonly TimeUnit Nanosecond = new TimeUnit("ns", "Nanosecond", 1);
+        [PublicAPI] public static readonly TimeUnit Microsecond = new TimeUnit(new MultiEncodingString("us", "\u03BCs"), "Microsecond", 1000);
+        [PublicAPI] public static readonly TimeUnit Millisecond = new TimeUnit("ms", "Millisecond", 1000 * 1000);
+        [PublicAPI] public static readonly TimeUnit Second = new TimeUnit("s", "Second", 1000 * 1000 * 1000);
+        [PublicAPI] public static readonly TimeUnit Minute = new TimeUnit("m", "Minute", Second.NanosecondAmount * 60);
+        [PublicAPI] public static readonly TimeUnit Hour = new TimeUnit("h", "Hour", Minute.NanosecondAmount * 60);
+        [PublicAPI] public static readonly TimeUnit Day = new TimeUnit("d", "Day", Hour.NanosecondAmount * 24);
+        [PublicAPI] public static readonly TimeUnit[] All = { Nanosecond, Microsecond, Millisecond, Second, Minute, Hour, Day };
 
         /// <summary>
         /// This method chooses the best time unit for representing a set of time measurements. 

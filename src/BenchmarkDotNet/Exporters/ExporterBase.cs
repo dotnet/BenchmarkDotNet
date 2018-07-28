@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -13,7 +12,6 @@ namespace BenchmarkDotNet.Exporters
     public abstract class ExporterBase : IExporter
     {
         public string Name => $"{GetType().Name}{FileNameSuffix}";
-        public Encoding Encoding { get; }
 
         protected virtual string FileExtension => "txt";
         protected virtual string FileNameSuffix => string.Empty;

@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Analysers
         {
         }
 
-        public override IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary)
+        protected override IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary)
         {
             var errors = report.ExecuteResults.SelectMany(r => r.Data)
                 .Union(report.ExecuteResults.SelectMany(r => r.ExtraOutput))

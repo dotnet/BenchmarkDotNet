@@ -21,6 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
 
 using System;
+// ReSharper disable All
 
 #pragma warning disable 1591
 // ReSharper disable UnusedMember.Global

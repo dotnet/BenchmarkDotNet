@@ -18,13 +18,13 @@ namespace BenchmarkDotNet.Analysers
         {
         }
 
-        public override IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary)
+        protected override IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary)
         {
             if (report.BenchmarkCase.Descriptor.Type.GetTypeInfo().Assembly.IsJitOptimizationDisabled().IsTrue())
                 yield return CreateWarning("Benchmark was built without optimization enabled (most probably a DEBUG configuration). Please, build it in RELEASE.", report);
         }
 
-        public override IEnumerable<Conclusion> AnalyseSummary(Summary summary)
+        protected override IEnumerable<Conclusion> AnalyseSummary(Summary summary)
         {
             if (summary.HostEnvironmentInfo.HasAttachedDebugger)
                 yield return CreateWarning("Benchmark was executed with attached debugger");

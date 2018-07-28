@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Mathematics.Histograms
 {
@@ -31,7 +32,7 @@ namespace BenchmarkDotNet.Mathematics.Histograms
 
         public override string ToString() => ToString(Encoding.ASCII);
 
-        public string ToString(Encoding encoding)
+        [PublicAPI] public string ToString(Encoding encoding)
         {
             var unit = TimeUnit.GetBestTimeUnit(Values);
             return $"[{Lower.ToTimeStr(unit, encoding)};{Upper.ToTimeStr(unit, encoding)}) {{{string.Join("; ", Values.Select(v => v.ToTimeStr(unit, encoding)))}}}";

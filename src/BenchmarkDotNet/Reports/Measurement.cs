@@ -25,8 +25,8 @@ namespace BenchmarkDotNet.Reports
         public int LaunchIndex { get; }
 
         public int IterationIndex { get; }
-        
-        public Encoding Encoding { get; }
+
+        private Encoding Encoding { get; }
 
         /// <summary>
         /// Gets the number of operations performed.
