@@ -66,11 +66,13 @@ namespace BenchmarkDotNet.Exporters.Csv
             if (!summary.Config.GetDiagnosers().Contains(MemoryDiagnoser.Default))
                 return Columns.Value;
 
-            var columns = new List<MeasurementColumn>(Columns.Value);
-            columns.Add(new MeasurementColumn("Gen_0", (_, report, __) => report.GcStats.Gen0Collections.ToString()));
-            columns.Add(new MeasurementColumn("Gen_1", (_, report, __) => report.GcStats.Gen1Collections.ToString()));
-            columns.Add(new MeasurementColumn("Gen_2", (_, report, __) => report.GcStats.Gen2Collections.ToString()));
-            columns.Add(new MeasurementColumn("Allocated_Bytes", (_, report, __) => report.GcStats.BytesAllocatedPerOperation.ToString()));
+            var columns = new List<MeasurementColumn>(Columns.Value)
+            {
+                new MeasurementColumn("Gen_0", (_, report, __) => report.GcStats.Gen0Collections.ToString()),
+                new MeasurementColumn("Gen_1", (_, report, __) => report.GcStats.Gen1Collections.ToString()),
+                new MeasurementColumn("Gen_2", (_, report, __) => report.GcStats.Gen2Collections.ToString()),
+                new MeasurementColumn("Allocated_Bytes", (_, report, __) => report.GcStats.BytesAllocatedPerOperation.ToString())
+            };
 
             return columns.ToArray();
         }

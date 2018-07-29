@@ -28,13 +28,13 @@ namespace BenchmarkDotNet.Characteristics
         #endregion
 
         #region Fields & ctor
-        private CharacteristicObject owner;
+
         private Dictionary<Characteristic, object> sharedValues;
         private bool frozen;
 
         protected CharacteristicObject()
         {
-            owner = null;
+            Owner = null;
             sharedValues = new Dictionary<Characteristic, object>();
         }
 
@@ -92,9 +92,9 @@ namespace BenchmarkDotNet.Characteristics
 
         #region Properties
         
-        private CharacteristicObject Owner => owner;
+        private CharacteristicObject Owner { get; set; }
 
-        protected CharacteristicObject OwnerOrSelf => owner ?? this;
+        protected CharacteristicObject OwnerOrSelf => Owner ?? this;
 
         public bool Frozen => Owner?.Frozen ?? frozen;
 
@@ -247,7 +247,7 @@ namespace BenchmarkDotNet.Characteristics
             AssertNotFrozen();
             newOwner.AssertIsNonFrozenRoot();
 
-            owner = newOwner;
+            Owner = newOwner;
             sharedValues = newOwner.sharedValues;
             frozen = false;
         }
@@ -263,7 +263,7 @@ namespace BenchmarkDotNet.Characteristics
 
             var oldValues = sharedValues;
 
-            owner = null;
+            Owner = null;
             sharedValues = new Dictionary<Characteristic, object>();
             frozen = false;
 

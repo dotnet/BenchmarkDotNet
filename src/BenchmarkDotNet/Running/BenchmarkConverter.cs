@@ -315,11 +315,7 @@ namespace BenchmarkDotNet.Running
             if (!(sourceValue is IEnumerable collection))
                 throw new InvalidOperationException($"{memberInfo.Name} of type {type.Name} does not implement IEnumerable, unable to read values for [ParamsSource]");
 
-            var values = new List<object>();
-            foreach (var value in collection)
-                values.Add(value);
-
-            return values.ToArray();
+            return collection.Cast<object>().ToArray();
         }
     }
 }

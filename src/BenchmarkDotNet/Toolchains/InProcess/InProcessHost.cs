@@ -34,10 +34,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             if (benchmarkCase == null)
                 throw new ArgumentNullException(nameof(benchmarkCase));
 
-            if (logger == null)
-                throw new ArgumentNullException(nameof(logger));
-
-            this.logger = logger;
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.diagnoser = diagnoser;
             IsDiagnoserAttached = diagnoser != null;
             Config = config;

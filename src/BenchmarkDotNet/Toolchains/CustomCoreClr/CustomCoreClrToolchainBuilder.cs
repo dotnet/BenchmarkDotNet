@@ -20,13 +20,12 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         /// <param name="packagesPath">path to folder with NuGet packages restored for CoreClr build. Example: "C:\Projects\coreclr\packages"</param>
         public CustomCoreClrToolchainBuilder UseCoreClrLocalBuild(string coreClrVersion, string binPackagesPath, string packagesPath)
         {
-            if (coreClrVersion == null) throw new ArgumentNullException(nameof(coreClrVersion));
             if (binPackagesPath == null) throw new ArgumentNullException(nameof(binPackagesPath));
             if (!Directory.Exists(binPackagesPath)) throw new DirectoryNotFoundException($"{binPackagesPath} does not exist");
             if (packagesPath == null) throw new ArgumentNullException(nameof(packagesPath));
             if (!Directory.Exists(packagesPath)) throw new DirectoryNotFoundException($"{packagesPath} does not exist");
 
-            this.coreClrVersion = coreClrVersion;
+            this.coreClrVersion = coreClrVersion ?? throw new ArgumentNullException(nameof(coreClrVersion));
 
             Feeds[Generator.LocalCoreClrPackagesBin] = binPackagesPath;
             Feeds[Generator.LocalCoreClrPackages] = packagesPath;
@@ -44,12 +43,9 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         /// <param name="nugetFeedUrl">url to NuGet CoreCLR feed, The default is: "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json"</param>
         public CustomCoreClrToolchainBuilder UseCoreClrNuGet(string coreClrVersion, string nugetFeedUrl = "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json")
         {
-            if (coreClrVersion == null) throw new ArgumentNullException(nameof(coreClrVersion));
-            if (nugetFeedUrl == null) throw new ArgumentNullException(nameof(nugetFeedUrl));
+            this.coreClrVersion = coreClrVersion ?? throw new ArgumentNullException(nameof(coreClrVersion));
 
-            this.coreClrVersion = coreClrVersion;
-
-            Feeds[Generator.CoreClrNuGetFeed] = nugetFeedUrl;
+            Feeds[Generator.CoreClrNuGetFeed] = nugetFeedUrl ?? throw new ArgumentNullException(nameof(nugetFeedUrl));
 
             isCoreClrConfigured = true;
 
@@ -74,11 +70,10 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         /// <param name="binPackagesPath">path to folder with CoreFX NuGet packages, Example: "C:\Projects\forks\corefx\bin\packages\Release"</param>
         public CustomCoreClrToolchainBuilder UseCoreFxLocalBuild(string privateCoreFxNetCoreAppVersion, string binPackagesPath)
         {
-            if (privateCoreFxNetCoreAppVersion == null) throw new ArgumentNullException(nameof(privateCoreFxNetCoreAppVersion));
             if (binPackagesPath == null) throw new ArgumentNullException(nameof(binPackagesPath));
             if (!Directory.Exists(binPackagesPath)) throw new DirectoryNotFoundException($"{binPackagesPath} does not exist");
 
-            coreFxVersion = privateCoreFxNetCoreAppVersion;
+            coreFxVersion = privateCoreFxNetCoreAppVersion ?? throw new ArgumentNullException(nameof(privateCoreFxNetCoreAppVersion));
             Feeds[Generator.LocalCoreFxPackagesBin] = binPackagesPath;
             isCoreFxConfigured = true;
             useTempFolderForRestore = true;
@@ -93,11 +88,8 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         /// <param name="nugetFeedUrl">ulr to NuGet CoreFX feed, The default is: "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json"</param>
         public CustomCoreClrToolchainBuilder UseCoreFxNuGet(string privateCoreFxNetCoreAppVersion, string nugetFeedUrl = "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json")
         {
-            if (privateCoreFxNetCoreAppVersion == null) throw new ArgumentNullException(nameof(privateCoreFxNetCoreAppVersion));
-            if (nugetFeedUrl == null) throw new ArgumentNullException(nameof(nugetFeedUrl));
-
-            coreFxVersion = privateCoreFxNetCoreAppVersion;
-            Feeds[Generator.CoreFxNuGetFeed] = nugetFeedUrl;
+            coreFxVersion = privateCoreFxNetCoreAppVersion ?? throw new ArgumentNullException(nameof(privateCoreFxNetCoreAppVersion));
+            Feeds[Generator.CoreFxNuGetFeed] = nugetFeedUrl ?? throw new ArgumentNullException(nameof(nugetFeedUrl));
             isCoreFxConfigured = true;
 
             return this;

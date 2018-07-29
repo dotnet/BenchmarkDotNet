@@ -10,11 +10,12 @@ namespace BenchmarkDotNet.Portability.Cpu
 
         private static string Format(string processorName, int? physicalProcessorCount, int? physicalCoreCount, int? logicalCoreCount, double? processorFreq)
         {
-            var parts = new List<string>();
-            if (!string.IsNullOrWhiteSpace(processorName))
-                parts.Add(ProcessorBrandStringHelper.Prettify(processorName, processorFreq));
-            else
-                parts.Add("Unknown processor");
+            var parts = new List<string>
+            {
+                !string.IsNullOrWhiteSpace(processorName)
+                    ? ProcessorBrandStringHelper.Prettify(processorName, processorFreq)
+                    : "Unknown processor"
+            };
 
             if (physicalProcessorCount > 0)
                 parts.Add($", {physicalProcessorCount} CPU");

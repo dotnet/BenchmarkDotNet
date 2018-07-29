@@ -10,32 +10,39 @@ namespace BenchmarkDotNet.Helpers
     {
         public static string ToSourceCode(object value)
         {
-            if (value == null)
-                return "null";
-            if (value is bool)
-                return ((bool) value).ToLowerCase();
-            if (value is string text)
-                return $"$@\"{text.Replace("\"", "\"\"").Replace("{", "{{").Replace("}", "}}")}\"";
-            if (value is char)
-                return (char) value == '\\' ? "'\\\\'" : $"'{value}'";
-            if (value is float)
-                return ((float) value).ToString("G", CultureInfo.InvariantCulture) + "f";
-            if (value is double)
-                return ((double) value).ToString("G", CultureInfo.InvariantCulture) + "d";
-            if (value is decimal)
-                return ((decimal) value).ToString("G", CultureInfo.InvariantCulture) + "m";
+            switch (value) {
+                case null:
+                    return "null";
+                case bool b:
+                    return b.ToLowerCase();
+                case string text:
+                    return $"$@\"{text.Replace("\"", "\"\"").Replace("{", "{{").Replace("}", "}}")}\"";
+                case char c:
+                    return c == '\\' ? "'\\\\'" : $"'{value}'";
+                case float f:
+                    return f.ToString("G", CultureInfo.InvariantCulture) + "f";
+                case double d:
+                    return d.ToString("G", CultureInfo.InvariantCulture) + "d";
+                case decimal f:
+                    return f.ToString("G", CultureInfo.InvariantCulture) + "m";
+            }
+
             if (ReflectionUtils.GetTypeInfo(value.GetType()).IsEnum)
                 return value.GetType().GetCorrectCSharpTypeName() + "." + value;
             if (value is Type)
                 return "typeof(" + ((Type) value).GetCorrectCSharpTypeName() + ")";
             if (!ReflectionUtils.GetTypeInfo(value.GetType()).IsValueType)
                 return "System.Activator.CreateInstance<" + value.GetType().GetCorrectCSharpTypeName() + ">()";
-            if (value is TimeInterval)
-                return "new BenchmarkDotNet.Horology.TimeInterval(" + ToSourceCode(((TimeInterval)value).Nanoseconds) + ")";
-            if (value is IntPtr)
-                return $"new System.IntPtr({value})";
-            if (value is IFormattable)
-                return ((IFormattable)value).ToString(null, CultureInfo.InvariantCulture);
+            
+            switch (value) {
+                case TimeInterval interval:
+                    return "new BenchmarkDotNet.Horology.TimeInterval(" + ToSourceCode(interval.Nanoseconds) + ")";
+                case IntPtr ptr:
+                    return $"new System.IntPtr({ptr})";
+                case IFormattable formattable:
+                    return formattable.ToString(null, CultureInfo.InvariantCulture);
+            }
+
             return value.ToString();
         }
 

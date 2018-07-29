@@ -53,12 +53,13 @@ namespace BenchmarkDotNet.Mathematics
                 Q1 = Median = Q3 = list[0];
             else
             {
-                Func<IList<double>, double> getMedian = x => x.Count % 2 == 0
+                double GetMedian(IList<double> x) => x.Count % 2 == 0
                     ? (x[x.Count / 2 - 1] + x[x.Count / 2]) / 2
                     : x[x.Count / 2];
-                Median = getMedian(list);
-                Q1 = getMedian(list.Take(N / 2).ToList());
-                Q3 = getMedian(list.Skip((N + 1) / 2).ToList());
+
+                Median = GetMedian(list);
+                Q1 = GetMedian(list.Take(N / 2).ToList());
+                Q3 = GetMedian(list.Skip((N + 1) / 2).ToList());
             }
 
             Min = list.First();

@@ -80,12 +80,14 @@ namespace BenchmarkDotNet.Engines
 
         public int GetCollectionsCount(int generation)
         {
-            if (generation == 0)
-                return Gen0Collections;
-            if (generation == 1)
-                return Gen1Collections;
-
-            return Gen2Collections;
+            switch (generation) {
+                case 0:
+                    return Gen0Collections;
+                case 1:
+                    return Gen1Collections;
+                default:
+                    return Gen2Collections;
+            }
         }
 
         /// <summary>

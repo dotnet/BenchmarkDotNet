@@ -123,7 +123,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
         private static AssemblyMetadata[] GetMissingReferences(Diagnostic[] compilationErrors)
             => compilationErrors
                     .Where(diagnostic => diagnostic.Id == MissingReferenceError)
-                    .Select(diagnostic => GetAssemblyName(diagnostic))
+                    .Select(GetAssemblyName)
                     .Where(assemblyName => assemblyName != default)
                     .Distinct()
                     .Select(assemblyName => Assembly.Load(new AssemblyName(assemblyName)))

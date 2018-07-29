@@ -125,23 +125,22 @@ namespace BenchmarkDotNet.Exporters
 
         private static string GetArgument(object argumentValue, Type argumentType)
         {
-            if (argumentValue == null)
-                return "null";
-
-            if (argumentValue is IParam iparam)
-                return GetArgument(iparam.Value, argumentType);
-            
-            if (argumentValue is object[] array && array.Length == 1)
-                return GetArgument(array[0], argumentType);
-
-            if (argumentValue is string text)
-                return $"\"{EscapeWhitespaces(text)}\"";
-            if (argumentValue is char character)
-                return $"'{character}'";
-            if (argumentValue is DateTime time)
-                return time.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss.fffffffK");
-            if (argumentValue is Type type)
-                return $"typeof({GetTypeArgumentName(type)})";
+            switch (argumentValue) {
+                case null:
+                    return "null";
+                case IParam iparam:
+                    return GetArgument(iparam.Value, argumentType);
+                case object[] array when array.Length == 1:
+                    return GetArgument(array[0], argumentType);
+                case string text:
+                    return $"\"{EscapeWhitespaces(text)}\"";
+                case char character:
+                    return $"'{character}'";
+                case DateTime time:
+                    return time.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss.fffffffK");
+                case Type type:
+                    return $"typeof({GetTypeArgumentName(type)})";
+            }
 
             if (argumentType != null && argumentType.IsArray)
                 return GetArray((IEnumerable)argumentValue);

@@ -22,12 +22,9 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         /// <param name="nugetFeedUrl">url to NuGet CoreRT feed, The default is: "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json"</param>
         public CoreRtToolchainBuilder UseCoreRtNuGet(string microsoftDotNetILCompilerVersion = "1.0.0-alpha-*", string nugetFeedUrl = "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json")
         {
-            if (microsoftDotNetILCompilerVersion == null) throw new ArgumentNullException(nameof(microsoftDotNetILCompilerVersion));
-            if (nugetFeedUrl == null) throw new ArgumentNullException(nameof(nugetFeedUrl));
+            coreRtVersion = microsoftDotNetILCompilerVersion ?? throw new ArgumentNullException(nameof(microsoftDotNetILCompilerVersion));
 
-            coreRtVersion = microsoftDotNetILCompilerVersion;
-
-            Feeds[Generator.CoreRtNuGetFeed] = nugetFeedUrl;
+            Feeds[Generator.CoreRtNuGetFeed] = nugetFeedUrl ?? throw new ArgumentNullException(nameof(nugetFeedUrl));
 
             isCoreRtConfigured = true;
 

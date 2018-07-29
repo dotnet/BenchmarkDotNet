@@ -6,15 +6,14 @@ namespace BenchmarkDotNet.Horology
 {
     public class TimeUnit
     {
-        private readonly MultiEncodingString name;
-        
-        public MultiEncodingString Name => name;
+        public MultiEncodingString Name { get; }
+
         public string Description { get; }
         public long NanosecondAmount { get; }
 
         private TimeUnit(MultiEncodingString name, string description, long nanosecondAmount)
         {
-            this.name = name;
+            Name = name;
             Description = description;
             NanosecondAmount = nanosecondAmount;
         }

@@ -34,15 +34,16 @@ namespace BenchmarkDotNet.Parameters
 
         public string ToDisplayText()
         {
-            if (value == null)
-                return NullParameterTextRepresentation;
+            switch (value) {
+                case null:
+                    return NullParameterTextRepresentation;
+                case IParam parameter:
+                    return Trim(parameter.DisplayText);
+                // no trimming for types!
+                case Type type:
+                    return type.IsNullable() ? $"{Nullable.GetUnderlyingType(type).GetDisplayName()}?" : type.GetDisplayName();
+            }
 
-            if (value is IParam parameter)
-                return Trim(parameter.DisplayText);
-
-            if (value is Type type) // no trimming for types!
-                return type.IsNullable() ? $"{Nullable.GetUnderlyingType(type).GetDisplayName()}?" : type.GetDisplayName();
-            
             return Trim(value.ToString());
         }
 

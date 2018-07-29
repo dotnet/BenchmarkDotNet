@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Code;
@@ -9,9 +10,10 @@ namespace BenchmarkDotNet.Parameters
 {
     internal static class SmartParamBuilder
     {
+        [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
         internal static object[] CreateForParams(MemberInfo source, object[] values)
         {
-            if (values.IsEmpty() || values.All(value => SourceCodeHelper.IsCompilationTimeConstant(value)))
+            if (values.IsEmpty() || values.All(SourceCodeHelper.IsCompilationTimeConstant))
                 return values;
 
             return values.Select((value, index) => new SmartParameter(source, value, index)).ToArray();

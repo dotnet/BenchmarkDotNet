@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -131,11 +130,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 return new ExecuteResult(true, exitCode, Array.Empty<string>(), Array.Empty<string>());
             }
 
-            var lines = new List<string>();
-            foreach (var measurement in runResults.GetMeasurements())
-            {
-                lines.Add(measurement.ToOutputLine());
-            }
+            var lines = runResults.GetMeasurements().Select(measurement => measurement.ToOutputLine()).ToList();
             lines.Add(runResults.GCStats.ToOutputLine());
 
             return new ExecuteResult(true, 0, lines.ToArray(), Array.Empty<string>());

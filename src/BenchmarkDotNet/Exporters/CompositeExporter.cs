@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
@@ -16,21 +15,20 @@ namespace BenchmarkDotNet.Exporters
         {
             var allExporters = new List<IExporter>(exporters.Length * 2);
 
-            Action<IExporter> addExporter = null;
-            addExporter = newExporter =>
+            void AddExporter(IExporter newExporter)
             {
                 // All the exporter dependencies should be added before the exporter
                 var dependencies = (newExporter as IExporterDependencies)?.Dependencies;
                 if (dependencies != null)
                     foreach (var dependency in dependencies)
-                        addExporter(dependency);
+                        AddExporter(dependency);
 
                 if (!allExporters.Contains(newExporter)) // TODO: Exporters should be matched by Id
                     allExporters.Add(newExporter);
-            };
+            }
 
             foreach (var exporter in exporters)
-                addExporter(exporter);
+                AddExporter(exporter);
 
             Exporters = allExporters;
         }

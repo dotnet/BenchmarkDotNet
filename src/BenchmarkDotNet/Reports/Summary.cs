@@ -121,9 +121,8 @@ namespace BenchmarkDotNet.Reports
         private string BuildAllRuntimes()
         {
             var jobRuntimes = new Dictionary<string, string>(); // JobId -> Runtime
-            var orderedJobs = new List<string>();
+            var orderedJobs = new List<string> { "[Host]" };
 
-            orderedJobs.Add("[Host]");
             jobRuntimes["[Host]"] = HostEnvironmentInfo.GetRuntimeInfo();
 
             foreach (var benchmarkReport in Reports)

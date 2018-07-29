@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Characteristics
         {
             if (!IsCharacteristicObjectSubclass(characteristicObjectType))
                 return EmptyCharacteristics;
-            return ThisTypeCharacteristics.GetOrAdd(characteristicObjectType, t => GetThisTypeCharacteristicsCore(t));
+            return ThisTypeCharacteristics.GetOrAdd(characteristicObjectType, GetThisTypeCharacteristicsCore);
         }
 
         private static IReadOnlyList<Characteristic> GetThisTypeCharacteristicsCore(Type characteristicObjectType)
@@ -76,7 +76,7 @@ namespace BenchmarkDotNet.Characteristics
         {
             if (!IsCharacteristicObjectSubclass(characteristicObjectType))
                 return EmptyCharacteristics;
-            return AllTypeCharacteristics.GetOrAdd(characteristicObjectType, t => GetAllCharacteristicsCore(t));
+            return AllTypeCharacteristics.GetOrAdd(characteristicObjectType, GetAllCharacteristicsCore);
         }
 
         private static IReadOnlyList<Characteristic> GetAllCharacteristicsCore(Type characteristicObjectType)

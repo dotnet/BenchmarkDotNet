@@ -203,10 +203,9 @@ namespace BenchmarkDotNet.Exporters
                             ulong totalWithoutNoise = totals[hardwareCounter].withoutNoise;
                             ulong forRange = instruction.SumPerCounter[hardwareCounter];
 
-                            if (forRange != 0)
-                                logger.Write($"<td title=\"{forRange} of {totalWithoutNoise}\">{(double) forRange / totalWithoutNoise:P}</td>");
-                            else
-                                logger.Write("<td>-</td>");
+                            logger.Write(forRange != 0
+                                ? $"<td title=\"{forRange} of {totalWithoutNoise}\">{(double) forRange / totalWithoutNoise:P}</td>"
+                                : "<td>-</td>");
                         }
 
                         if (instruction.Code is Sharp sharp && !string.IsNullOrEmpty(sharp.FilePath))
@@ -228,10 +227,9 @@ namespace BenchmarkDotNet.Exporters
                     ulong totalWithoutNoise = totals[hardwareCounter].withoutNoise;
                     ulong forMethod = method.SumPerCounter[hardwareCounter];
 
-                    if (forMethod != 0)
-                        logger.Write($"<td class=\"perMethod\" title=\"{forMethod} of {totalWithoutNoise}\">{(double)forMethod / totalWithoutNoise:P}</td>");
-                    else
-                        logger.Write("<td  class=\"perMethod\">-</td>");
+                    logger.Write(forMethod != 0
+                        ? $"<td class=\"perMethod\" title=\"{forMethod} of {totalWithoutNoise}\">{(double) forMethod / totalWithoutNoise:P}</td>"
+                        : "<td  class=\"perMethod\">-</td>");
                 }
                 logger.WriteLine("<td></td><td></td></tr>");
                 logger.WriteLine($"<tr><td colspan=\"{columnsCount}\"></td></tr>");

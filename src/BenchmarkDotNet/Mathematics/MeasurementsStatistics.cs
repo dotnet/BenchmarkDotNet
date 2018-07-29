@@ -80,8 +80,8 @@ namespace BenchmarkDotNet.Mathematics
         private static double Sum(List<Measurement> measurements)
         {
             double sum = 0;
-            for (int i = 0; i < measurements.Count; i++)
-                sum += measurements[i].Nanoseconds;
+            foreach (var m in measurements)
+                sum += m.Nanoseconds;
             return sum;
         }
 
@@ -91,10 +91,10 @@ namespace BenchmarkDotNet.Mathematics
             sum = 0;
             n = 0;
 
-            for (int i = 0; i < measurements.Count; i++)
-                if (!IsOutlier(outlierMode, measurements[i].Nanoseconds, lowerFence, upperFence))
+            foreach (var m in measurements)
+                if (!IsOutlier(outlierMode, m.Nanoseconds, lowerFence, upperFence))
                 {
-                    sum += measurements[i].Nanoseconds;
+                    sum += m.Nanoseconds;
                     ++n;
                 }
         }
@@ -105,8 +105,8 @@ namespace BenchmarkDotNet.Mathematics
                 return 0;
 
             double variance = 0;
-            for (int i = 0; i < measurements.Count; i++)
-                variance += (measurements[i].Nanoseconds - mean) * (measurements[i].Nanoseconds - mean) / (n - 1);
+            foreach (var m in measurements)
+                variance += (m.Nanoseconds - mean) * (m.Nanoseconds - mean) / (n - 1);
 
             return variance;
         }
@@ -117,9 +117,9 @@ namespace BenchmarkDotNet.Mathematics
                 return 0;
 
             double variance = 0;
-            for (int i = 0; i < measurements.Count; i++)
-                if (!IsOutlier(outlierMode, measurements[i].Nanoseconds, lowerFence, upperFence))
-                    variance += (measurements[i].Nanoseconds - mean) * (measurements[i].Nanoseconds - mean) / (n - 1);
+            foreach (var m in measurements)
+                if (!IsOutlier(outlierMode, m.Nanoseconds, lowerFence, upperFence))
+                    variance += (m.Nanoseconds - mean) * (m.Nanoseconds - mean) / (n - 1);
 
             return variance;
         }

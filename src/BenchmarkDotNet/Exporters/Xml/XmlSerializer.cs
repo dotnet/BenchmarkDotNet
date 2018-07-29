@@ -30,12 +30,10 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         public void Serialize(IXmlWriter writer, object source)
         {
-            if (writer == null)
-                throw new ArgumentNullException(nameof(writer));
             if (source == null || source.GetType() != type)
                 throw new ArgumentNullException(nameof(source));
 
-            this.writer = writer;
+            this.writer = writer ?? throw new ArgumentNullException(nameof(writer));
 
             Write(source);
         }
@@ -116,14 +114,7 @@ namespace BenchmarkDotNet.Exporters.Xml
             {
                 if (itemName == null)
                 {
-                    if (collectionItemNameMap.ContainsKey(property.Name))
-                    {
-                        itemName = collectionItemNameMap[property.Name];
-                    }
-                    else
-                    {
-                        itemName = DefaultItemName;
-                    }
+                    itemName = collectionItemNameMap.ContainsKey(property.Name) ? collectionItemNameMap[property.Name] : DefaultItemName;
                 }
 
                 if (IsSimple(item.GetType().GetTypeInfo()))

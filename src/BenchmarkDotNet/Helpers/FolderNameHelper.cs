@@ -11,26 +11,29 @@ namespace BenchmarkDotNet.Helpers
     {
         public static string ToFolderName(object value)
         {
-            if (value is bool)
-                return ((bool)value).ToLowerCase();
-            if (value is string)
-                return Escape((string)value);
-            if (value is char)
-                return ((int)(char)value).ToString(); // TODO: rewrite
-            if (value is float)
-                return ((float)value).ToString("F", CultureInfo.InvariantCulture).Replace(".", "-");
-            if (value is double)
-                return ((double)value).ToString("F", CultureInfo.InvariantCulture).Replace(".", "-");
-            if (value is decimal)
-                return ((decimal)value).ToString("F", CultureInfo.InvariantCulture).Replace(".", "-");
+            switch (value) {
+                case bool b:
+                    return b.ToLowerCase();
+                case string s:
+                    return Escape(s);
+                case char c:
+                    return ((int)c).ToString(); // TODO: rewrite
+                case float f:
+                    return f.ToString("F", CultureInfo.InvariantCulture).Replace(".", "-");
+                case double d:
+                    return d.ToString("F", CultureInfo.InvariantCulture).Replace(".", "-");
+                case decimal d:
+                    return d.ToString("F", CultureInfo.InvariantCulture).Replace(".", "-");
+            }
+
             if (ReflectionUtils.GetTypeInfo(value.GetType()).IsEnum)
                 return value.ToString();
             if (value is Type type)
                 return ToFolderName(type: type);
             if (!ReflectionUtils.GetTypeInfo(value.GetType()).IsValueType)
                 return value.GetType().Name; // TODO
-            if (value is TimeInterval)
-                return ((TimeInterval) value).Nanoseconds + "ns";
+            if (value is TimeInterval interval)
+                return interval.Nanoseconds + "ns";
             return value.ToString();
         }
 

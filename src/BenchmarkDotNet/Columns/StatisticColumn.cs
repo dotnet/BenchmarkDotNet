@@ -94,13 +94,12 @@ namespace BenchmarkDotNet.Columns
         public string Id => nameof(StatisticColumn) + "." + ColumnName;
         public string ColumnName { get; }
         private readonly Priority priority;
-        private readonly UnitType type;
 
         private StatisticColumn(string columnName, string legend, Func<Statistics, double> calc, Priority priority, UnitType type = UnitType.Time)
         {
             this.calc = calc;
             this.priority = priority;
-            this.type = type;
+            UnitType = type;
             ColumnName = columnName;
             Legend = legend;
         }
@@ -116,7 +115,8 @@ namespace BenchmarkDotNet.Columns
         public ColumnCategory Category => ColumnCategory.Statistics;
         public int PriorityInCategory => (int) priority;
         public bool IsNumeric => true;
-        public UnitType UnitType => type;
+        public UnitType UnitType { get; }
+
         public string Legend { get; }
 
         private string Format(Summary summary, Statistics statistics, ISummaryStyle style)
@@ -129,7 +129,7 @@ namespace BenchmarkDotNet.Columns
                 .Where(r => r.ResultStatistics != null)
                 .Select(r => calc(r.ResultStatistics))
                 .Where(v => !double.IsNaN(v) && !double.IsInfinity(v))
-                .Select(v => type == UnitType.Time ? v / style.TimeUnit.NanosecondAmount : v)
+                .Select(v => UnitType == UnitType.Time ? v / style.TimeUnit.NanosecondAmount : v)
                 .ToList();
             double minValue = allValues.Any() ? allValues.Min() : 0;
             bool allValuesAreZeros = allValues.All(v => Math.Abs(v) < 1e-9);
@@ -138,7 +138,7 @@ namespace BenchmarkDotNet.Columns
             double value = calc(statistics);
             if (double.IsNaN(value))
                 return "NA";
-            return type == UnitType.Time
+            return UnitType == UnitType.Time
                    ? value.ToTimeStr(style.TimeUnit, summary.Config.Encoding, format, 1, style.PrintUnitsInContent)
                    : value.ToStr(format);
         }

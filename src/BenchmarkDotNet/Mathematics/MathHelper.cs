@@ -111,8 +111,7 @@ namespace BenchmarkDotNet.Mathematics
                 while (true)
                 {
                     var histogram = HistogramBuilder.Adaptive.BuildWithFixedBinSize(s.GetValues(), binSize);
-                    var x = new List<int>();
-                    x.Add(0);
+                    var x = new List<int> { 0 };
                     x.AddRange(histogram.Bins.Select(bin => bin.Count));
                     x.Add(0);
 

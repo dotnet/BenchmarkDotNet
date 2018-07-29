@@ -64,10 +64,14 @@ namespace BenchmarkDotNet.Diagnosers
         {
             var benchmark = parameters.BenchmarkCase;
 
-            if (signal == HostSignal.AfterAll && ShouldUseWindowsDisassembler(benchmark))
-                results.Add(benchmark, windowsDisassembler.Disassemble(parameters));
-            else if (signal == HostSignal.SeparateLogic && ShouldUseMonoDisassembler(benchmark))
-                results.Add(benchmark, MonoDisassembler.Disassemble(benchmark, benchmark.Job.Environment.Runtime as MonoRuntime));
+            switch (signal) {
+                case HostSignal.AfterAll when ShouldUseWindowsDisassembler(benchmark):
+                    results.Add(benchmark, windowsDisassembler.Disassemble(parameters));
+                    break;
+                case HostSignal.SeparateLogic when ShouldUseMonoDisassembler(benchmark):
+                    results.Add(benchmark, MonoDisassembler.Disassemble(benchmark, benchmark.Job.Environment.Runtime as MonoRuntime));
+                    break;
+            }
         }
 
         public void DisplayResults(ILogger logger)

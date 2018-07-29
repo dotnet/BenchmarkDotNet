@@ -14,8 +14,7 @@ namespace BenchmarkDotNet.Extensions
             if (actionExp.Body == null)
                 throw new ArgumentException("Extend a an Expression with a valid Body", nameof(actionExp));
 
-            var methodExp = actionExp.Body as MethodCallExpression;
-            if (methodExp == null)
+            if (!(actionExp.Body is MethodCallExpression methodExp))
                 throw new ArgumentException("Extend a MethodCallExpression, but got a " + actionExp.Body.GetType().Name, nameof(actionExp));
 
             return summary.Reports.First(r => r.BenchmarkCase.Descriptor.WorkloadMethod == methodExp.Method);

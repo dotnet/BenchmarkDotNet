@@ -58,9 +58,9 @@ namespace BenchmarkDotNet.Extensions
 
             var sb = new StringBuilder(s.Length);
 
-            for (int i = 0; i < s.Length; i++)
+            foreach (char c in s)
             {
-                switch (s[i])
+                switch (c)
                 {
                     case '<':
                         sb.Append("&lt;");
@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Extensions
                         sb.Append("&amp;");
                         break;
                     default:
-                        sb.Append(s[i]);
+                        sb.Append(c);
                         break;
                 }
             }

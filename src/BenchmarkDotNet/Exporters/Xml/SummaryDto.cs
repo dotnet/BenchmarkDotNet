@@ -84,11 +84,7 @@ namespace BenchmarkDotNet.Exporters.Xml
         public BenchmarkReportDto(BenchmarkReport report, bool excludeMeasurements = false)
         {
             this.report = report;
-
-            if (excludeMeasurements)
-                Measurements = null;
-            else
-                Measurements = report.AllMeasurements;
+            Measurements = excludeMeasurements ? null : report.AllMeasurements;
         }
     }
 }
