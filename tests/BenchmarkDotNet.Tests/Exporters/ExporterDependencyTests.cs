@@ -14,16 +14,16 @@ namespace BenchmarkDotNet.Tests.Exporters
         public void MissingDependencyIsAdded()
         {
             var compositeExporter = new CompositeExporter(TestExporter.Default);
-            Assert.Equal(2, compositeExporter.exporters.Count());
-            Assert.Equal(new IExporter[] { TestExporterDependency.Default, TestExporter.Default }, compositeExporter.exporters);
+            Assert.Equal(2, compositeExporter.Exporters.Count());
+            Assert.Equal(new IExporter[] { TestExporterDependency.Default, TestExporter.Default }, compositeExporter.Exporters);
         }
 
         [Fact]
         public void MissingDependencyIsNotAddedWhenItIsAlreadyPresent()
         {
             var compositeExporter = new CompositeExporter(TestExporter.Default, TestExporterDependency.Default);
-            Assert.Equal(2, compositeExporter.exporters.Count());
-            Assert.Equal(new IExporter[] { TestExporterDependency.Default, TestExporter.Default }, compositeExporter.exporters);
+            Assert.Equal(2, compositeExporter.Exporters.Count());
+            Assert.Equal(new IExporter[] { TestExporterDependency.Default, TestExporter.Default }, compositeExporter.Exporters);
         }
     }
 

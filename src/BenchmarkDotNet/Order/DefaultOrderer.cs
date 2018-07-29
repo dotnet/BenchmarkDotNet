@@ -128,13 +128,19 @@ namespace BenchmarkDotNet.Order
                 this.paramsComparer = paramsComparer;
             }
 
-            public int Compare(BenchmarkCase x, BenchmarkCase y) => new[]
+            public int Compare(BenchmarkCase x, BenchmarkCase y)
             {
-                paramsComparer?.Compare(x.Parameters, y.Parameters) ?? 0,
-                jobComparer?.Compare(x.Job, y.Job) ?? 0,
-                targetComparer?.Compare(x.Descriptor, y.Descriptor) ?? 0,
-                string.CompareOrdinal(x.DisplayInfo, y.DisplayInfo)
-            }.FirstOrDefault(c => c != 0);
+                if (x == null && y == null) return 0;
+                if (x != null && y == null) return 1;
+                if (x == null) return -1;
+                return new[]
+                {
+                    paramsComparer?.Compare(x.Parameters, y.Parameters) ?? 0,
+                    jobComparer?.Compare(x.Job, y.Job) ?? 0,
+                    targetComparer?.Compare(x.Descriptor, y.Descriptor) ?? 0,
+                    string.CompareOrdinal(x.DisplayInfo, y.DisplayInfo)
+                }.FirstOrDefault(c => c != 0);
+            }
         }
 
         private class LogicalGroupComparer : IComparer<IGrouping<string, BenchmarkCase>>
@@ -143,7 +149,13 @@ namespace BenchmarkDotNet.Order
 
             public LogicalGroupComparer(IComparer<BenchmarkCase> benchmarkComparer) => this.benchmarkComparer = benchmarkComparer;
 
-            public int Compare(IGrouping<string, BenchmarkCase> x, IGrouping<string, BenchmarkCase> y) => benchmarkComparer.Compare(x.First(), y.First());
+            public int Compare(IGrouping<string, BenchmarkCase> x, IGrouping<string, BenchmarkCase> y)
+            {
+                if (x == null && y == null) return 0;
+                if (x != null && y == null) return 1;
+                if (x == null) return -1;
+                return benchmarkComparer.Compare(x.First(), y.First());
+            }
         }
     }
 }

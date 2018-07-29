@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Characteristics
         #region Type characteristics
         private static readonly IReadOnlyList<Characteristic> EmptyCharacteristics = Array.Empty<Characteristic>();
 
-        private static readonly ConcurrentDictionary<Type, IReadOnlyList<Characteristic>> thisTypeCharacteristics =
+        private static readonly ConcurrentDictionary<Type, IReadOnlyList<Characteristic>> ThisTypeCharacteristics =
             new ConcurrentDictionary<Type, IReadOnlyList<Characteristic>>();
 
         [PublicAPI] public static IReadOnlyList<Characteristic> GetThisTypeCharacteristics(this CharacteristicObject obj) =>
@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Characteristics
         {
             if (!IsCharacteristicObjectSubclass(characteristicObjectType))
                 return EmptyCharacteristics;
-            return thisTypeCharacteristics.GetOrAdd(characteristicObjectType, t => GetThisTypeCharacteristicsCore(t));
+            return ThisTypeCharacteristics.GetOrAdd(characteristicObjectType, t => GetThisTypeCharacteristicsCore(t));
         }
 
         private static IReadOnlyList<Characteristic> GetThisTypeCharacteristicsCore(Type characteristicObjectType)
@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Characteristics
                 .ToArray();
         }
 
-        private static readonly ConcurrentDictionary<Type, IReadOnlyList<Characteristic>> allTypeCharacteristics =
+        private static readonly ConcurrentDictionary<Type, IReadOnlyList<Characteristic>> AllTypeCharacteristics =
             new ConcurrentDictionary<Type, IReadOnlyList<Characteristic>>();
 
         public static IReadOnlyList<Characteristic> GetAllCharacteristics(this CharacteristicObject obj) =>
@@ -76,7 +76,7 @@ namespace BenchmarkDotNet.Characteristics
         {
             if (!IsCharacteristicObjectSubclass(characteristicObjectType))
                 return EmptyCharacteristics;
-            return allTypeCharacteristics.GetOrAdd(characteristicObjectType, t => GetAllCharacteristicsCore(t));
+            return AllTypeCharacteristics.GetOrAdd(characteristicObjectType, t => GetAllCharacteristicsCore(t));
         }
 
         private static IReadOnlyList<Characteristic> GetAllCharacteristicsCore(Type characteristicObjectType)

@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Environments
         /// </summary>
         public static ILogger FallbackLogger { get; } = ConsoleLogger.Default;
 
-        private static HostEnvironmentInfo Current;
+        private static HostEnvironmentInfo current;
 
         public string BenchmarkDotNetVersion { get; protected set; }
 
@@ -87,7 +87,7 @@ namespace BenchmarkDotNet.Environments
             VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(RuntimeInformation.GetVirtualMachineHypervisor);
         }
 
-        public new static HostEnvironmentInfo GetCurrent() => Current ?? (Current = new HostEnvironmentInfo());
+        public new static HostEnvironmentInfo GetCurrent() => current ?? (current = new HostEnvironmentInfo());
 
         public override IEnumerable<string> ToFormattedString()
         {

@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Exporters
         public static readonly IExporter Default = new RPlotExporter();
         public string Name => nameof(RPlotExporter);
 
-        private static readonly object buildScriptLock = new object();
+        private static readonly object BuildScriptLock = new object();
 
         public IEnumerable<IExporter> Dependencies
         {
@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Exporters
                 LoadTemplate(scriptFileName).
                 Replace("$BenchmarkDotNetVersion$", BenchmarkDotNetInfo.FullTitle).
                 Replace("$CsvSeparator$", CsvMeasurementsExporter.Default.Separator);
-            lock (buildScriptLock)
+            lock (BuildScriptLock)
                 File.WriteAllText(scriptFullPath, script);
 
             string rscriptExecutable = RuntimeInformation.IsWindows() ? "Rscript.exe" : "Rscript";

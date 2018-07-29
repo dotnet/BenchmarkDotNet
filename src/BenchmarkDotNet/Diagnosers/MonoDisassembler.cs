@@ -136,12 +136,12 @@ namespace BenchmarkDotNet.Diagnosers
 
             //line example 1:  0:	48 83 ec 28          	sub    $0x28,%rsp
             //line example 2: 0000000000000000	subq	$0x28, %rsp
-            private static readonly Regex instructionRegex = new Regex(@"\s*(?<address>[0-9a-f]+)(\:\s+([0-9a-f]{2}\s+)+)?\s+(?<instruction>.*)\s*");
+            private static readonly Regex InstructionRegex = new Regex(@"\s*(?<address>[0-9a-f]+)(\:\s+([0-9a-f]{2}\s+)+)?\s+(?<instruction>.*)\s*");
 
             private static bool TryParseInstruction(string line, out Code instruction)
             {
                 instruction = null;
-                var match = instructionRegex.Match(line);
+                var match = InstructionRegex.Match(line);
                 if (!match.Success)
                     return false;
 
