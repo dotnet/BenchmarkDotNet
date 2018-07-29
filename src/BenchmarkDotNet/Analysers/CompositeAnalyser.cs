@@ -6,16 +6,16 @@ namespace BenchmarkDotNet.Analysers
 {
     public class CompositeAnalyser : IAnalyser
     {
-        private readonly IAnalyser[] analysers;
+        private readonly IAnalyser[] _analysers;
         private static int counter; // TODO: improve
 
         public CompositeAnalyser(IAnalyser[] analysers)
         {
-            this.analysers = analysers;
+            this._analysers = analysers;
             Id = "Composite-" + ++counter;
         }
 
         public string Id { get; }
-        public IEnumerable<Conclusion> Analyse(Summary summary) => analysers.SelectMany(analyser => analyser.Analyse(summary));
+        public IEnumerable<Conclusion> Analyse(Summary summary) => _analysers.SelectMany(analyser => analyser.Analyse(summary));
     }
 }
