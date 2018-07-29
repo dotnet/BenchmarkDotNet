@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using JetBrains.Annotations;
 #if !NETCOREAPP2_1
@@ -7,6 +8,7 @@ using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Environments
 {
+    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
     public class OsBrandStringHelper
     {
         // See https://en.wikipedia.org/wiki/Ver_(command)

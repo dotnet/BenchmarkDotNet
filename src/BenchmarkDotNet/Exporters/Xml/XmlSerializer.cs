@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -28,12 +29,12 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         public static XmlSerializerBuilder GetBuilder(Type type) => new XmlSerializerBuilder(type);
 
-        public void Serialize(IXmlWriter writer, object source)
+        public void Serialize(IXmlWriter newWriter, object source)
         {
             if (source == null || source.GetType() != type)
                 throw new ArgumentNullException(nameof(source));
 
-            this.writer = writer ?? throw new ArgumentNullException(nameof(writer));
+            writer = newWriter ?? throw new ArgumentNullException(nameof(newWriter));
 
             Write(source);
         }
@@ -99,6 +100,7 @@ namespace BenchmarkDotNet.Exporters.Xml
             writer.WriteEndElement();
         }
 
+        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         private void WriteCollectionProperty(object source, PropertyInfo property)
         {
             var collection = (IEnumerable)property.GetValue(source);

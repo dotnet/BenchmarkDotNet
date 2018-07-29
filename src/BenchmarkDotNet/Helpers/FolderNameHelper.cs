@@ -7,7 +7,7 @@ using SimpleJson.Reflection;
 
 namespace BenchmarkDotNet.Helpers
 {
-    public class FolderNameHelper
+    public static class FolderNameHelper
     {
         public static string ToFolderName(object value)
         {

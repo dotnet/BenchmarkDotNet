@@ -57,7 +57,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             // we did not find global.json or any Visual Studio solution file? 
             // let's return it in the old way and hope that it works ;)
-            return Path.Combine(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.FullName, programName);
+            var parent = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent;
+            if (parent == null)
+                throw new DirectoryNotFoundException("Parent directory for current directory");
+            return Path.Combine(parent.FullName, programName);
         }
 
         internal static bool GetSolutionRootDirectory(out DirectoryInfo directoryInfo)

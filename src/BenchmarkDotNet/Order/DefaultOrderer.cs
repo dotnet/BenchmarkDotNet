@@ -53,9 +53,9 @@ namespace BenchmarkDotNet.Order
             switch (summaryOrderPolicy)
             {
                 case SummaryOrderPolicy.FastestToSlowest:
-                    return benchmarksCase.OrderBy(b => summary[b].ResultStatistics.Mean);
+                    return benchmarksCase.OrderBy(b => summary[b]?.ResultStatistics?.Mean ?? 0d);
                 case SummaryOrderPolicy.SlowestToFastest:
-                    return benchmarksCase.OrderByDescending(b => summary[b].ResultStatistics.Mean);
+                    return benchmarksCase.OrderByDescending(b => summary[b]?.ResultStatistics?.Mean ?? 0d);
                 case SummaryOrderPolicy.Method:
                     return benchmarksCase.OrderBy(b => b.Descriptor.WorkloadMethodDisplayInfo);
                 case SummaryOrderPolicy.Declared:

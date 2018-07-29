@@ -43,6 +43,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         };
 
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
+        [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
         private static readonly IReadOnlyDictionary<string, IExporter[]> AvailableExporters =
             new Dictionary<string, IExporter[]>
             {

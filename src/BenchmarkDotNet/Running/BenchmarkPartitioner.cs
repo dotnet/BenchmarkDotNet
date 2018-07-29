@@ -9,7 +9,7 @@ using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.Running
 {
-    public class BenchmarkPartitioner
+    public static class BenchmarkPartitioner
     {
         public static BuildPartition[] CreateForBuild(BenchmarkRunInfo[] supportedBenchmarks, IResolver resolver)
             => supportedBenchmarks

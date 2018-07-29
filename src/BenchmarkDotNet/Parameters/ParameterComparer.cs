@@ -19,6 +19,9 @@ namespace BenchmarkDotNet.Parameters
 
         public int Compare(ParameterInstances x, ParameterInstances y)
         {
+            if (x == null && y == null) return 0;
+            if (x != null && y == null) return 1;
+            if (x == null) return -1;
             for (int i = 0; i < Math.Min(x.Count, y.Count); i++)
             {
                 int compareTo = PrimitiveComparer.CompareTo(x[i]?.Value, y[i]?.Value);

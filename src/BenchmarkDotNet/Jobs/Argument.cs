@@ -30,6 +30,7 @@ namespace BenchmarkDotNet.Jobs
     /// Argument passed to dotnet cli when restoring and building the project
     /// example: new MsBuildArgument("/p:MyCustomSetting=123")
     /// </summary>
+    [PublicAPI]
     public class MsBuildArgument : Argument
     {
         public MsBuildArgument(string value) => TextRepresentation = value;

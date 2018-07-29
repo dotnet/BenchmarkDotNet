@@ -95,7 +95,7 @@ namespace BenchmarkDotNet.Reports
             if (encoding == null)
                 encoding = Encoding.ASCII;
             
-            if (line != null && line.StartsWith(GcStats.ResultsLinePrefix))
+            if (line == null || line.StartsWith(GcStats.ResultsLinePrefix))
                 return Error(encoding);
 
             try

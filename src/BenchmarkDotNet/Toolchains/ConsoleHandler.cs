@@ -33,15 +33,9 @@ namespace BenchmarkDotNet.Toolchains
             }
         }
 
-        public void SetProcess(Process process)
-        {
-            this.process = process;
-        }
+        public void SetProcess(Process newProcess) => process = newProcess;
 
-        public void ClearProcess()
-        {
-            process = null;
-        }
+        public void ClearProcess() => process = null;
 
         // This method gives us a chance to make a "best-effort" to clean anything up after Ctrl-C is type in the Console
         private void HandlerCallback(object sender, ConsoleCancelEventArgs e)
@@ -72,7 +66,7 @@ namespace BenchmarkDotNet.Toolchains
                     return;
 
                 var matchingProcess = Process.GetProcesses().FirstOrDefault(p => p.Id == localProcess.Id);
-                if (HasProcessDied(matchingProcess) || HasProcessDied(localProcess))
+                if (matchingProcess == null || HasProcessDied(matchingProcess) || HasProcessDied(localProcess))
                     return;
                 logger?.WriteLineError($"Process {matchingProcess.ProcessName}.exe (Id:{matchingProcess.Id}) has not exited after being killed!");
             }

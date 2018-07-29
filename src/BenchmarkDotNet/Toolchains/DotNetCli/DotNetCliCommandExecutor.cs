@@ -10,7 +10,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
-    internal class DotNetCliCommandExecutor
+    internal static class DotNetCliCommandExecutor
     {
         internal struct CommandResult
         {

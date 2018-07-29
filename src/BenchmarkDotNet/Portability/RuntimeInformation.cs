@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Management;
@@ -292,6 +293,7 @@ namespace BenchmarkDotNet.Portability
         // See http://aakinshin.net/en/blog/dotnet/jit-version-determining-in-runtime/
         private class JitHelper
         {
+            [SuppressMessage("ReSharper", "NotAccessedField.Local")]
             private int bar;
 
             public bool IsMsX64(int step = 1)
@@ -361,7 +363,7 @@ namespace BenchmarkDotNet.Portability
 
                     foreach (var o in data)
                     {
-                        var av = (ManagementObject)o;
+                        var av = (ManagementObject) o;
                         if (av != null)
                         {
                             string name = av["displayName"].ToString();
@@ -370,7 +372,10 @@ namespace BenchmarkDotNet.Portability
                         }
                     }
                 }
-                catch { }
+                catch
+                {
+                    // Never mind
+                }
             }
 
             return products;
@@ -397,7 +402,10 @@ namespace BenchmarkDotNet.Portability
                         }
                     }
                 }
-                catch { }
+                catch
+                {
+                    // Never mind
+                }
             }
 
             return null;

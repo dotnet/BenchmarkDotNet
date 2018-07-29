@@ -77,6 +77,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             if (!IsDiagnoserAttached) // no need to send the signal, nobody is listening for it
                 return;
 
+            if (diagnoser == null)
+                throw new NullReferenceException(nameof(diagnoser));
+            
             diagnoser.Handle(hostSignal, diagnoserActionParameters);
         }
 

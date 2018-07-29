@@ -1,8 +1,10 @@
 ﻿using BenchmarkDotNet.Exporters;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes
 {
     // TODO: Find a better way to introduce dialects in the attribute
+    [PublicAPI]
     public class MarkdownExporterAttribute : ExporterConfigBaseAttribute
     {
         public MarkdownExporterAttribute() : base(MarkdownExporter.Default)

@@ -42,7 +42,8 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 .Select(assembly => AssemblyMetadata.CreateFromFile(assembly.Location))
                 .Concat(FrameworkAssembliesMetadata.Value)
                 .Distinct()
-                .Select(uniqueMetadata => uniqueMetadata.GetReference());
+                .Select(uniqueMetadata => uniqueMetadata.GetReference())
+                .ToList();
 
             var (result, missingReferences) = Build(generateResult, syntaxTree, compilationOptions, references);
 

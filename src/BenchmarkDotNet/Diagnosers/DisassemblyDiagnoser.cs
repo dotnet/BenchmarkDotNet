@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
@@ -17,6 +18,7 @@ namespace BenchmarkDotNet.Diagnosers
     public class DisassemblyDiagnoser : IDisassemblyDiagnoser
     {
         private readonly WindowsDisassembler windowsDisassembler;
+        [SuppressMessage("ReSharper", "NotAccessedField.Local")] // TODO: use or remove
         private readonly MonoDisassembler monoDisassembler;
         private readonly Dictionary<BenchmarkCase, DisassemblyResult> results;
 

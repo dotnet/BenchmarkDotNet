@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Reports
     public static class SummaryTableExtensions
     {
         [ThreadStatic]
-        private static StringBuilder buffer;
+        private static StringBuilder sharedBuffer;
 
         public static void PrintCommonColumns(this SummaryTable table, ILogger logger)
         {
@@ -105,14 +105,14 @@ namespace BenchmarkDotNet.Reports
 
         private static StringBuilder GetClearBuffer()
         {
-            if (buffer == null)
+            if (sharedBuffer == null)
             {
-                return buffer = new StringBuilder(28);
+                return sharedBuffer = new StringBuilder(28);
             }
 
-            buffer.Clear();
+            sharedBuffer.Clear();
 
-            return buffer;
+            return sharedBuffer;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -24,7 +24,8 @@ namespace BenchmarkDotNet.Exporters
         {
             var benchmarksByTarget = summary.BenchmarksCases
                 .Where(benchmark => results.ContainsKey(benchmark))
-                .GroupBy(benchmark => benchmark.Descriptor.WorkloadMethod);
+                .GroupBy(benchmark => benchmark.Descriptor.WorkloadMethod)
+                .ToList();
 
             logger.WriteLine("<!DOCTYPE html>");
             logger.WriteLine("<html lang='en'>");

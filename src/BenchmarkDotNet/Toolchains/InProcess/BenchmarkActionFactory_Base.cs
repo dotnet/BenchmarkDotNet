@@ -135,7 +135,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 MethodInfo callbackInvokeMethod,
                 FieldInfo storeResultField, int unrollFactor)
             {
-                // ReSharper disable CommentTypo
                 /*
                     // for long i = 0
                     IL_0000: ldc.i4.0
@@ -161,7 +160,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
                     IL_0045: ret
                 */
-                // ReSharper restore CommentTypo
 
                 bool noReturnValue = callbackInvokeMethod.ReturnType == typeof(void);
                 bool hasStoreField = !noReturnValue && storeResultField != null;

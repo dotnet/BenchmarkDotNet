@@ -1,5 +1,6 @@
 ﻿using System.Xml.Serialization;
 using JetBrains.Annotations;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 #pragma warning disable CS3003 // I need ulong
 namespace BenchmarkDotNet.Diagnosers

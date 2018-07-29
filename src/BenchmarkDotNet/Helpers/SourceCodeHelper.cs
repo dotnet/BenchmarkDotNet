@@ -6,7 +6,7 @@ using SimpleJson.Reflection;
 
 namespace BenchmarkDotNet.Helpers
 {
-    public class SourceCodeHelper
+    public static class SourceCodeHelper
     {
         public static string ToSourceCode(object value)
         {
@@ -29,8 +29,8 @@ namespace BenchmarkDotNet.Helpers
 
             if (ReflectionUtils.GetTypeInfo(value.GetType()).IsEnum)
                 return value.GetType().GetCorrectCSharpTypeName() + "." + value;
-            if (value is Type)
-                return "typeof(" + ((Type) value).GetCorrectCSharpTypeName() + ")";
+            if (value is Type type)
+                return "typeof(" + type.GetCorrectCSharpTypeName() + ")";
             if (!ReflectionUtils.GetTypeInfo(value.GetType()).IsValueType)
                 return "System.Activator.CreateInstance<" + value.GetType().GetCorrectCSharpTypeName() + ">()";
             

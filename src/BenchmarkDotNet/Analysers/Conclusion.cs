@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Analysers
                 return false;
             if (ReferenceEquals(this, obj))
                 return true;
-            return obj is Conclusion && Equals((Conclusion) obj);
+            return obj is Conclusion conclusion && Equals(conclusion);
         }
 
         public override int GetHashCode()

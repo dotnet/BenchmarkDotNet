@@ -81,9 +81,9 @@ namespace BenchmarkDotNet.Diagnosers
             string exeName = $"BenchmarkDotNet.Disassembler.{architectureName}.exe";
             var assemblyWithDisassemblersInResources = typeof(WindowsDisassembler).GetTypeInfo().Assembly;
 
-            string disassemblerPath =
-                Path.Combine(
-                    new FileInfo(assemblyWithDisassemblersInResources.Location).Directory.FullName,
+            var dir = new FileInfo(assemblyWithDisassemblersInResources.Location).Directory ?? throw new DirectoryNotFoundException();
+            string disassemblerPath = Path.Combine(
+                    dir.FullName,
                     BenchmarkDotNetInfo.FullVersion // possible update
                     + exeName); // separate process per architecture!!
 

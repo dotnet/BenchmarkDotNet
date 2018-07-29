@@ -15,17 +15,17 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         /// creates a toolchain which publishes self-contained app which references local CoreClr build
         /// as described here https://github.com/dotnet/coreclr/blob/master/Documentation/workflow/UsingDotNetCli.md
         /// </summary>
-        /// <param name="coreClrVersion">the version of Microsoft.NETCore.Runtime which should be used. Example: "2.1.0-preview2-26305-0"</param>
+        /// <param name="newCoreClrVersion">the version of Microsoft.NETCore.Runtime which should be used. Example: "2.1.0-preview2-26305-0"</param>
         /// <param name="binPackagesPath">path to folder with CoreClr NuGet packages. Example: "C:\coreclr\bin\Product\Windows_NT.x64.Release\.nuget\pkg"</param>
         /// <param name="packagesPath">path to folder with NuGet packages restored for CoreClr build. Example: "C:\Projects\coreclr\packages"</param>
-        public CustomCoreClrToolchainBuilder UseCoreClrLocalBuild(string coreClrVersion, string binPackagesPath, string packagesPath)
+        public CustomCoreClrToolchainBuilder UseCoreClrLocalBuild(string newCoreClrVersion, string binPackagesPath, string packagesPath)
         {
             if (binPackagesPath == null) throw new ArgumentNullException(nameof(binPackagesPath));
             if (!Directory.Exists(binPackagesPath)) throw new DirectoryNotFoundException($"{binPackagesPath} does not exist");
             if (packagesPath == null) throw new ArgumentNullException(nameof(packagesPath));
             if (!Directory.Exists(packagesPath)) throw new DirectoryNotFoundException($"{packagesPath} does not exist");
 
-            this.coreClrVersion = coreClrVersion ?? throw new ArgumentNullException(nameof(coreClrVersion));
+            coreClrVersion = newCoreClrVersion ?? throw new ArgumentNullException(nameof(newCoreClrVersion));
 
             Feeds[Generator.LocalCoreClrPackagesBin] = binPackagesPath;
             Feeds[Generator.LocalCoreClrPackages] = packagesPath;
@@ -39,11 +39,11 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         /// <summary>
         /// creates a toolchain which publishes self-contained app which references NuGet CoreClr package
         /// </summary>
-        /// <param name="coreClrVersion">the version of Microsoft.NETCore.Runtime which should be used. Example: "2.1.0-preview2-26305-0"</param>
+        /// <param name="newCoreClrVersion">the version of Microsoft.NETCore.Runtime which should be used. Example: "2.1.0-preview2-26305-0"</param>
         /// <param name="nugetFeedUrl">url to NuGet CoreCLR feed, The default is: "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json"</param>
-        public CustomCoreClrToolchainBuilder UseCoreClrNuGet(string coreClrVersion, string nugetFeedUrl = "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json")
+        public CustomCoreClrToolchainBuilder UseCoreClrNuGet(string newCoreClrVersion, string nugetFeedUrl = "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json")
         {
-            this.coreClrVersion = coreClrVersion ?? throw new ArgumentNullException(nameof(coreClrVersion));
+            coreClrVersion = newCoreClrVersion ?? throw new ArgumentNullException(nameof(newCoreClrVersion));
 
             Feeds[Generator.CoreClrNuGetFeed] = nugetFeedUrl ?? throw new ArgumentNullException(nameof(nugetFeedUrl));
 

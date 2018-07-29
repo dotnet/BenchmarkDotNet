@@ -45,8 +45,8 @@ namespace BenchmarkDotNet.Diagnosers
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.NoOverhead; 
 
-        public void ProcessResults(DiagnoserResults results) 
-            => this.results.Add(results.BenchmarkCase, results.GcStats);
+        public void ProcessResults(DiagnoserResults diagnoserResults) 
+            => results.Add(diagnoserResults.BenchmarkCase, diagnoserResults.GcStats);
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) 
             => Array.Empty<ValidationError>();

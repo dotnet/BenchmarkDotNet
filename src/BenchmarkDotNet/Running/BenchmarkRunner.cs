@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Running
 
         [PublicAPI] public static Summary Run(BenchmarkRunInfo benchmarkRunInfo) => Run(new[] { benchmarkRunInfo }, benchmarkRunInfo.Config).Single();
 
-        [PublicAPI] public static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos, IConfig commonSettingsConfig)
+        [PublicAPI] public static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos, [CanBeNull] IConfig commonSettingsConfig)
         {
             var resolver = DefaultResolver;
             var artifactsToCleanup = new List<string>();
@@ -110,7 +110,7 @@ namespace BenchmarkDotNet.Running
                         
                         var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, logger, artifactsToCleanup, rootArtifactsFolderPath, ref runChronometer);
                         
-                        if (commonSettingsConfig.SummaryPerType)
+                        if (commonSettingsConfig == null || commonSettingsConfig.SummaryPerType)
                             PrintSummary(logger, benchmarkRunInfo.Config, summary);
                         
                         LogTotalTime(logger, runChronometer.GetElapsed().GetTimeSpan(), summary.GetNumberOfExecutedBenchmarks(), message: "Run time");
@@ -119,7 +119,7 @@ namespace BenchmarkDotNet.Running
                         results.Add(summary);
                     }
 
-                    if (!commonSettingsConfig.SummaryPerType)
+                    if (commonSettingsConfig != null && !commonSettingsConfig.SummaryPerType)
                     {
                         var joinedSummary = Summary.Join(results, commonSettingsConfig, globalChronometer.GetElapsed());
                         
@@ -345,8 +345,9 @@ namespace BenchmarkDotNet.Running
 
             for (int index = 0; index < executeResults.Count; index++)
             {
+                int currentIndex = index;
                 var executeResult = executeResults[index];
-                runs.AddRange(executeResult.Data.Select(line => Measurement.Parse(logger, line, index + 1)).Where(r => r.IterationMode != IterationMode.Unknown));
+                runs.AddRange(executeResult.Data.Select(line => Measurement.Parse(logger, line, currentIndex + 1)).Where(r => r.IterationMode != IterationMode.Unknown));
             }
 
             return new BenchmarkReport(benchmarkCase, buildResult, buildResult, executeResults, runs, gcStats);

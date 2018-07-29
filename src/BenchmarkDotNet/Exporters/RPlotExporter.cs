@@ -93,7 +93,11 @@ namespace BenchmarkDotNet.Exporters
 
         private static string FindInPath(string fileName)
         {
-            var dirs = Environment.GetEnvironmentVariable("PATH").Split(Path.PathSeparator);
+            string path = Environment.GetEnvironmentVariable("PATH");
+            if (path == null)
+                return null;
+            
+            var dirs = path.Split(Path.PathSeparator);
             foreach (string dir in dirs)
             {
                 string trimmedDir = dir.Trim('\'', '"');

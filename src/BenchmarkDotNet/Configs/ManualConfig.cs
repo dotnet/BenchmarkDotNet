@@ -164,10 +164,11 @@ namespace BenchmarkDotNet.Configs
 
         private void AddJobs(IEnumerable<Job> toAdd)
         {
-            foreach (var notMutator in toAdd.Where(job => !job.Meta.IsMutator))
+            var toAddList = toAdd.ToList();
+            foreach (var notMutator in toAddList.Where(job => !job.Meta.IsMutator))
                 jobs.Add(notMutator);
             
-            var mutators = toAdd.Where(job => job.Meta.IsMutator).ToArray();
+            var mutators = toAddList.Where(job => job.Meta.IsMutator).ToArray();
             if (!mutators.Any())
                 return;
             
