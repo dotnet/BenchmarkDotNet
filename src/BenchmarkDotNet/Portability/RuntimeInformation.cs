@@ -68,7 +68,7 @@ namespace BenchmarkDotNet.Portability
         internal static bool IsWindows()
         {
 #if CLASSIC
-            return System.Environment.OSVersion.Platform.ToString().Contains("Win");
+            return Environment.OSVersion.Platform.ToString().Contains("Win");
 #else
             return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 #endif
@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Portability
         internal static bool IsLinux()
         {
 #if CLASSIC
-            return System.Environment.OSVersion.Platform == PlatformID.Unix
+            return Environment.OSVersion.Platform == PlatformID.Unix
                    && GetSysnameFromUname().Equals("Linux", StringComparison.InvariantCultureIgnoreCase);
 #else
             return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
@@ -87,7 +87,7 @@ namespace BenchmarkDotNet.Portability
         internal static bool IsMacOSX()
         {
 #if CLASSIC
-            return System.Environment.OSVersion.Platform == PlatformID.Unix
+            return Environment.OSVersion.Platform == PlatformID.Unix
                    && GetSysnameFromUname().Equals("Darwin", StringComparison.InvariantCultureIgnoreCase);
 #else
             return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.OSX);

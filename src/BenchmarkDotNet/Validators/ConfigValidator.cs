@@ -50,6 +50,7 @@ namespace BenchmarkDotNet.Validators
 
             try
             {
+                // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
                 Path.GetFullPath(artifactsPath);
             }
             catch (PathTooLongException)

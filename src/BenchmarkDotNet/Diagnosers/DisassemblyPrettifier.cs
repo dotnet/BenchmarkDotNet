@@ -67,6 +67,8 @@ namespace BenchmarkDotNet.Diagnosers
                 string argument = string.IsNullOrEmpty(instruction.extraArguments)
                     ? instruction.arguments
                     : instruction.extraArguments;
+                if (argument == null)
+                    throw new NullReferenceException(nameof(instruction.arguments));
 
                 if (addressesToLabels.TryGetValue(argument, out string reference)) // it's sth like 00007ff7`ffbfd320 7cba jl      00007ff7`ffbfd2dc
                     prettified.Add(new Reference($"{PadRight(instruction.instruction)} {reference}", reference, instruction.source));

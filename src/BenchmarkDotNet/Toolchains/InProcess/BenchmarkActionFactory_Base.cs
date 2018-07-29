@@ -83,7 +83,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
                 var instanceType = instance.GetType();
                 var callbackField = GetCallbackField(instanceType, callbackFieldName);
-                var callbackInvokeMethod = callbackField.FieldType.GetTypeInfo().GetMethod(nameof(Action.Invoke));
+                var callbackInvokeMethod = callbackField.FieldType.GetTypeInfo().GetMethod(nameof(Action.Invoke))
+                    ?? throw new NullReferenceException($"{nameof(Action.Invoke)} not found");
                 var storeResultField = GetStoreResultField(instanceType, storeResultFieldName, callbackInvokeMethod.ReturnType);
 
                 // void InvokeMultipleEmitted(long x) // instance method associated with instanceType

@@ -96,7 +96,9 @@ namespace BenchmarkDotNet.Diagnosers
                 return Assembly.Load(referencedAssemblyName);
 
             // we use the location of BenchmarkDotNet.dll, because it should be in the same folder
-            string diagnosticAssemblyBinPath = Path.Combine(new FileInfo(benchmarkDotNetCoreAssembly.Location).DirectoryName, DiagnosticAssemblyFileName);
+            string directoryName = new FileInfo(benchmarkDotNetCoreAssembly.Location).DirectoryName
+                ?? throw new DirectoryNotFoundException(benchmarkDotNetCoreAssembly.Location);
+            string diagnosticAssemblyBinPath = Path.Combine(directoryName, DiagnosticAssemblyFileName);
             if (File.Exists(diagnosticAssemblyBinPath))
                 return Assembly.LoadFile(diagnosticAssemblyBinPath);
 

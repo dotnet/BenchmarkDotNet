@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Xml;
@@ -123,6 +124,8 @@ namespace BenchmarkDotNet.Toolchains
             var node = document.CreateNode(XmlNodeType.Element, nodeName, string.Empty);
             var attribute = document.CreateAttribute(attributeName);
             attribute.Value = attributeValue;
+            if (node.Attributes == null)
+                throw new NullReferenceException(nameof(node.Attributes));
             node.Attributes.SetNamedItem(attribute);
 
             parentNode.AppendChild(node);

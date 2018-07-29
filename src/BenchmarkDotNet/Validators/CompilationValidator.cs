@@ -65,7 +65,13 @@ namespace BenchmarkDotNet.Validators
             internal static readonly IEqualityComparer<BenchmarkCase> Instance = new BenchmarkMethodEqualityComparer();
 
             public bool Equals(BenchmarkCase x, BenchmarkCase y)
-                => x.Descriptor.WorkloadMethod.Equals(y.Descriptor.WorkloadMethod);
+            {
+                if (x == null && y == null) return true;
+                if (x == null || y == null) return false;
+                if (x.Descriptor.WorkloadMethod.Equals(y.Descriptor.WorkloadMethod))
+                    return true;
+                return false;
+            }
 
             public int GetHashCode(BenchmarkCase obj)
                 => obj.Descriptor.WorkloadMethod.GetHashCode();

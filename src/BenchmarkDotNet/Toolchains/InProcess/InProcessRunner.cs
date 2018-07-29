@@ -24,12 +24,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 // we have some jitting diagnosers and we want them to catch all the informations!!
 
                 string inProcessRunnableTypeName = $"{typeof(InProcessRunner).FullName}+{nameof(Runnable)}";
-                var type = typeof(InProcessRunner).GetTypeInfo().Assembly.GetType(inProcessRunnableTypeName);
-                if (type == null)
-                    throw new InvalidOperationException($"Bug: type {inProcessRunnableTypeName} not found.");
+                var type = typeof(InProcessRunner).GetTypeInfo().Assembly.GetType(inProcessRunnableTypeName)
+                    ?? throw new InvalidOperationException($"Bug: type {inProcessRunnableTypeName} not found.");
 
-                type.GetMethod(nameof(Runnable.RunCore), BindingFlags.Public | BindingFlags.Static)
-                    .Invoke(null, new object[] { host, benchmarkCase, codegenMode, config });
+                var methodInfo = type.GetMethod(nameof(Runnable.RunCore), BindingFlags.Public | BindingFlags.Static)
+                    ?? throw new InvalidOperationException($"Bug: method {nameof(Runnable.RunCore)} in {inProcessRunnableTypeName} not found.");
+                methodInfo.Invoke(null, new object[] { host, benchmarkCase, codegenMode, config });
 
                 return 0;
             }

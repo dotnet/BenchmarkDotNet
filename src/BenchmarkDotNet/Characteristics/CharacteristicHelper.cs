@@ -18,9 +18,10 @@ namespace BenchmarkDotNet.Characteristics
 
         private static Characteristic AssertHasValue(MemberInfo member, Characteristic value)
         {
+            if (member?.DeclaringType == null)
+                throw new NullReferenceException($"{nameof(member.DeclaringType)}");
             if (value == null)
-                throw new ArgumentException(
-                    $"The value of {member.DeclaringType.Name}.{member.Name} is null");
+                throw new ArgumentException($"The value of {member.DeclaringType.Name}.{member.Name} is null");
 
             return value;
         }

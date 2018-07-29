@@ -26,6 +26,10 @@ namespace BenchmarkDotNet.Running
 
             public bool Equals(BenchmarkCase x, BenchmarkCase y)
             {
+                if (x == null && y == null)
+                    return true;
+                if (x == null || y == null)
+                    return false;
                 var jobX = x.Job;
                 var jobY = y.Job;
 

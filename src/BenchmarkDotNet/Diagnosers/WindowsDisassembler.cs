@@ -124,6 +124,8 @@ namespace BenchmarkDotNet.Diagnosers
             using (var resourceStream = assembly.GetManifestResourceStream(resourceName))
             using (var exeStream = File.Create(destinationPath))
             {
+                if (resourceStream == null)
+                    throw new InvalidOperationException($"{nameof(resourceName)} is null");
                 resourceStream.CopyTo(exeStream);
             }
         }

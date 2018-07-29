@@ -49,7 +49,9 @@ namespace BenchmarkDotNet.Code
             
             var arrayParamType = typeof(ArrayParam<>).MakeGenericType(type.GetElementType());
 
-            return (IParam)arrayParamType.GetMethod(nameof(ForPrimitives), BindingFlags.Public | BindingFlags.Static).Invoke(null, new []{ array});
+            var methodInfo = arrayParamType.GetMethod(nameof(ForPrimitives), BindingFlags.Public | BindingFlags.Static)
+                ?? throw new InvalidOperationException($"{nameof(ForPrimitives)} not found");
+            return (IParam)methodInfo.Invoke(null, new []{ array});
         }
     }
 }

@@ -51,6 +51,8 @@ namespace BenchmarkDotNet.Running
         {
             string benchmarkContent = source;
             var cSharpCodeProvider = new CSharpCodeProvider();
+            string directoryName = Path.GetDirectoryName(typeof(BenchmarkCase).Assembly.Location)
+                ?? throw new DirectoryNotFoundException(typeof(BenchmarkCase).Assembly.Location);
             var compilerParameters = new CompilerParameters(
                 new[]
                 {
@@ -62,7 +64,7 @@ namespace BenchmarkDotNet.Running
                 CompilerOptions = "/unsafe /optimize",
                 GenerateInMemory = false,
                 OutputAssembly = Path.Combine(
-                    Path.GetDirectoryName(typeof(BenchmarkCase).Assembly.Location),
+                    directoryName,
                     $"{Path.GetFileNameWithoutExtension(Path.GetTempFileName())}.dll")
             };
 
