@@ -37,5 +37,17 @@ build_script:
 test: off
 deploy: off
 
+#---------------------------------#
+#       R# Command Line Tools     #
+#---------------------------------#
+
+install:
+- cmd: choco install resharper-clt --version 2018.1.3
+
+after_build:
+- cmd: InspectCode.exe .\BenchmarkDotNet.sln --project=BenchmarkDotNet -o=resharper-clt-output.xml
+- ps: $result = [xml](Get-Content .\resharper-clt-output.xml)
+- ps: $result.Report.Issues.ChildNodes | ForEach-Object {$project = $_.Name; $_.ChildNodes | ForEach-Object {Add-AppveyorCompilationMessage -Message $_.Message -Line $_.Line -FileName $_.File -ProjectName $project}}
+
 artifacts:
   - path: '**\BenchmarkDotNet.*.nupkg' # find all NuGet packages recursively
