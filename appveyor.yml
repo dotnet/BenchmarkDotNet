@@ -43,12 +43,12 @@ deploy: off
 
 install:
 - cmd: choco install resharper-clt --version 2018.1.3
+- cmd: choco install nvika
 
 after_build:
-- cmd: InspectCode.exe .\BenchmarkDotNet.sln --project=BenchmarkDotNet -o=resharper-clt-output.xml
-- ps: $result = [xml](Get-Content .\resharper-clt-output.xml)
-- ps: $result.Report.Issues.ChildNodes | ForEach-Object {$project = $_.Name; $_.ChildNodes | ForEach-Object {Add-AppveyorCompilationMessage -Category Error -Message $_.Message -Line $_.Line -FileName $_.File -ProjectName $project}}
+- cmd: InspectCode.exe .\BenchmarkDotNet.sln --project=BenchmarkDotNet -o=resharper-clt-report.xml
+- cmd: NVika parsereport "resharper-clt-report.xml"
 
 artifacts:
   - path: '**\BenchmarkDotNet.*.nupkg' # find all NuGet packages recursively
-  - path: 'resharper-clt-output.xml'
+  - path: 'resharper-clt-report.xml'
