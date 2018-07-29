@@ -47,7 +47,8 @@ install:
 after_build:
 - cmd: InspectCode.exe .\BenchmarkDotNet.sln --project=BenchmarkDotNet -o=resharper-clt-output.xml
 - ps: $result = [xml](Get-Content .\resharper-clt-output.xml)
-- ps: $result.Report.Issues.ChildNodes | ForEach-Object {$project = $_.Name; $_.ChildNodes | ForEach-Object {Add-AppveyorCompilationMessage -Message $_.Message -Line $_.Line -FileName $_.File -ProjectName $project}}
+- ps: $result.Report.Issues.ChildNodes | ForEach-Object {$project = $_.Name; $_.ChildNodes | ForEach-Object {Add-AppveyorCompilationMessage -Category Error -Message $_.Message -Line $_.Line -FileName $_.File -ProjectName $project}}
 
 artifacts:
   - path: '**\BenchmarkDotNet.*.nupkg' # find all NuGet packages recursively
+  - path: 'resharper-clt-output.xml'
