@@ -13,6 +13,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Portability.Cpu;
+using BenchmarkDotNet.Portability.Memory;
 using JetBrains.Annotations;
 using Microsoft.Win32;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
@@ -155,6 +156,22 @@ namespace BenchmarkDotNet.Portability
             return null;
         }
 
+        public static bool IsVistaAndAbove() => Version.Parse(RuntimeEnvironment.OperatingSystemVersion).Major >= 6;
+
+        internal static MemoryInfo GetMemoryInfo()
+        {
+            if (IsWindows() && IsVistaAndAbove())
+                return MoSMemoryInfoProvider.MosMemoryInfo.Value;
+            if (IsWindows())
+                return WmicMemoryInfoProvider.WmicMemoryInfo.Value;
+            if (IsLinux())
+                return ProcMemoryInfoProvider.ProcMemoryInfo.Value;
+            if (IsMacOSX())
+                return SysctlMemoryInfoProvider.SysctlMemoryInfo.Value;
+
+            return null;
+        }
+
         private static string GetNetCoreVersion()
         {
             var assembly = typeof(GCSettings).GetTypeInfo().Assembly;
@@ -225,7 +242,7 @@ namespace BenchmarkDotNet.Portability
                 return Runtime.Core;
             if (IsCoreRT)
                 return Runtime.CoreRT;
-            
+
             throw new NotSupportedException("Unknown .NET Framework"); // todo: adam sitnik fix it
         }
 
@@ -363,7 +380,7 @@ namespace BenchmarkDotNet.Portability
 
                     foreach (var o in data)
                     {
-                        var av = (ManagementObject) o;
+                        var av = (ManagementObject)o;
                         if (av != null)
                         {
                             string name = av["displayName"].ToString();

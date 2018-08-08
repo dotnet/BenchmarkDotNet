@@ -40,4 +40,10 @@
   <ItemGroup>
     <EmbeddedResource Include="Portability\Cpu\TestFiles\*.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="Portability\Memory\TestFiles\SysctlMemory.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Portability\Memory\TestFiles\SysctlMemory.txt" />
+  </ItemGroup>
 </Project>
