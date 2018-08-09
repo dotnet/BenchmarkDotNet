@@ -160,10 +160,8 @@ namespace BenchmarkDotNet.Portability
 
         internal static MemoryInfo GetMemoryInfo()
         {
-            if (IsWindows() && IsVistaAndAbove())
-                return MoSMemoryInfoProvider.MosMemoryInfo.Value;
             if (IsWindows())
-                return WmicMemoryInfoProvider.WmicMemoryInfo.Value;
+                return WmicMemoryInfoProvider.WmicMemoryInfo.Value;            
             if (IsLinux())
                 return ProcMemoryInfoProvider.ProcMemoryInfo.Value;
             if (IsMacOSX())

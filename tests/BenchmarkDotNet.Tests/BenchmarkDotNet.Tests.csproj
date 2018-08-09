@@ -39,13 +39,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Portability\Cpu\TestFiles\*.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Portability\Memory\TestFiles\SysctlMemory.txt" />
-    <None Remove="Portability\Memory\TestFiles\VmStatMemory.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Portability\Memory\TestFiles\SysctlMemory.txt" />
-    <EmbeddedResource Include="Portability\Memory\TestFiles\VmStatMemory.txt" />
+    <EmbeddedResource Include="Portability\Memory\TestFiles\*.txt" />
   </ItemGroup>
 </Project>

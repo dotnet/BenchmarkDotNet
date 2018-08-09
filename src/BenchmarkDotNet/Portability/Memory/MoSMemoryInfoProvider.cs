@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Portability.Memory
         [CanBeNull]
         private static MemoryInfo Load()
         {
-            var mosMemory = new ManagementObjectSearcher("SELECT * FROM CIM_OperatingSystem");
+            var mosMemory = new ManagementObjectSearcher("SELECT TotalVisibleMemorySize, FreePhysicalMemory FROM CIM_OperatingSystem");
             long TotalMemory = 0L;
             long FreePhysicalMemory = 0L;
             var memoryInfoContent = mosMemory.Get().Cast<ManagementObject>().ToList();

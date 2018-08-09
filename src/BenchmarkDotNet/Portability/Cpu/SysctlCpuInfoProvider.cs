@@ -5,7 +5,8 @@ using JetBrains.Annotations;
 namespace BenchmarkDotNet.Portability.Cpu
 {
     /// <summary>    
-    /// CPU information from output of the `sysctl -a` command.
+    /// CPU information from output of the `sysctl -a` command. 
+    /// It is cached by SysctlInfoProvider for reuse in memory and CPU
     /// MacOSX only.
     /// </summary>
     internal static class SysctlCpuInfoProvider
@@ -17,7 +18,7 @@ namespace BenchmarkDotNet.Portability.Cpu
         {
             if (RuntimeInformation.IsMacOSX())
             {
-                string content = ProcessHelper.RunAndReadOutput("sysctl", "-a");
+                string content = SysctlInfoProvider.SysctlInfo.Value;
                 return SysctlCpuInfoParser.ParseOutput(content);
             }
             return null;

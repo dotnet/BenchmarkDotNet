@@ -1,11 +1,13 @@
 ﻿using System;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Portability.Cpu;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Portability.Memory
 {
     /// <summary>    
     /// Memory information from output of the `sysctl -a` command.
+    /// It is cached by SysctlInfoProvider for reuse in memory and CPU
     /// MacOSX only.
     /// </summary>
     internal static class SysctlMemoryInfoProvider
@@ -17,7 +19,7 @@ namespace BenchmarkDotNet.Portability.Memory
         {
             if (RuntimeInformation.IsMacOSX())
             {
-                string sysctlContent = ProcessHelper.RunAndReadOutput("sysctl", "-a");
+                string sysctlContent = SysctlInfoProvider.SysctlInfo.Value;
                 string vmsStatContent = ProcessHelper.RunAndReadOutput("vm_stat");
                 return SysctlMemoryInfoParser.ParseOutput(sysctlContent, vmsStatContent);
             }

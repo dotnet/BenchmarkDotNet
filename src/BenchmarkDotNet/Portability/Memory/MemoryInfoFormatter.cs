@@ -11,9 +11,9 @@ namespace BenchmarkDotNet.Portability.Memory
         public static string Format(MemoryInfo memoryInfo)
         {
             string totalMemory = $"Total Memory={Math.Round((memoryInfo.TotalMemory) / (1024.0 * 1024.0), 2)} GB";
-            string freeMemory = $"Free Memory={Math.Round(memoryInfo.FreePhysicalMemory / (1024.0 * 1024.0), 2)}";
+            string freeMemory = $"Free Memory={Math.Round(memoryInfo.FreePhysicalMemory / (1024.0 * 1024.0), 2)} GB";
 
-            return $"{totalMemory} {freeMemory}";
+            return $"{totalMemory}, {freeMemory}";
         }
     }
 }
