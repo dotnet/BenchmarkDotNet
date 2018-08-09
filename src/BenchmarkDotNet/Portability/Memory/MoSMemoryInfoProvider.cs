@@ -24,11 +24,11 @@ namespace BenchmarkDotNet.Portability.Memory
                 {
                     if (string.Equals(prop.Name, WmicMemoryInfoKeyNames.TotalVisibleMemorySize, StringComparison.Ordinal))
                     {
-                        TotalMemory += (Int64)memory.GetPropertyValue(WmicMemoryInfoKeyNames.TotalVisibleMemorySize);
+                        TotalMemory += (long)(ulong)memory.GetPropertyValue(WmicMemoryInfoKeyNames.TotalVisibleMemorySize);
                     }
                     else if (string.Equals(prop.Name, WmicMemoryInfoKeyNames.FreePhysicalMemory, StringComparison.Ordinal))
                     {
-                        FreePhysicalMemory += (Int64)memory.GetPropertyValue(WmicMemoryInfoKeyNames.FreePhysicalMemory);
+                        FreePhysicalMemory += (long)(ulong)memory.GetPropertyValue(WmicMemoryInfoKeyNames.FreePhysicalMemory);
                     }
                 }
             }

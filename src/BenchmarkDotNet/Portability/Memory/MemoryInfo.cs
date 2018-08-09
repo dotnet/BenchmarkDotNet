@@ -10,7 +10,5 @@
 
         public long TotalMemory { get; set; }
         public long FreePhysicalMemory { get; set; }
-
-        public bool IsValidInfo { get; set; }
     }
 }

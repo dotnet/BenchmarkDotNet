@@ -12,31 +12,30 @@ namespace BenchmarkDotNet.Portability.Memory
     {
         [CanBeNull]
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
-        internal static MemoryInfo ParseOutput([CanBeNull] string content)
+        internal static MemoryInfo ParseOutput([CanBeNull] string systlContent, [CanBeNull] string vmStatContent)
         {
-            var sysctl = SectionsHelper.ParseSection(content, ':');
-            var totalMemory = GetLongValue(sysctl, "hw.memsize");
-            var freePhysicalMemory = GetLongValue(sysctl, "hw.usermem");
+            var sysctl = SectionsHelper.ParseSection(systlContent, ':');
+            var vmstat = SectionsHelper.ParseSection(vmStatContent, ':');
+            long? TotalMemory = null;
+            long? FreePhysicalMemory = null;
 
-            if (totalMemory.HasValue && freePhysicalMemory.HasValue)
+            if (sysctl.TryGetValue("hw.memsize", out string totalMemoryValue) && long.TryParse(totalMemoryValue, out long totalMemory))
             {
-                return new MemoryInfo(totalMemory.Value, freePhysicalMemory.Value);
+                TotalMemory = totalMemory;
+            }
+            if (vmstat.TryGetValue("Pages free", out string freeMemoryValue) && long.TryParse(freeMemoryValue.Replace(".",string.Empty), out long freeMemory))
+            {
+                FreePhysicalMemory = freeMemory;
+            }
+
+            if (TotalMemory.HasValue && FreePhysicalMemory.HasValue)
+            {
+                return new MemoryInfo(TotalMemory.Value, FreePhysicalMemory.Value);
             }
             else
             {
                 return null;
             }
-        }
-
-        [CanBeNull]
-        private static long? GetLongValue([NotNull] Dictionary<string, string> sysctl, [NotNull] string keyName)
-        {
-            if (sysctl.TryGetValue(keyName, out string value) && long.TryParse(value, out long result))
-            {
-                return result;
-            }
-
-            return null;
-        }
+        }     
     }
 }

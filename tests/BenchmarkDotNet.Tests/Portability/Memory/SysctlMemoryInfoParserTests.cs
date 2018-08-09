@@ -8,24 +8,25 @@ namespace BenchmarkDotNet.Tests.Portability.Memory
     {
         [Fact]
         public void EmptyTest()
-        {
-            var memoryInfo = SysctlMemoryInfoParser.ParseOutput(string.Empty);
-            Assert.Null(memoryInfo);            
+        {            
+            Assert.Null(SysctlMemoryInfoParser.ParseOutput(string.Empty, null));
+            Assert.Null(SysctlMemoryInfoParser.ParseOutput(null, string.Empty));            
         }
 
         [Fact]
         public void MalformedTest()
         {
-            var memoryInfo = SysctlMemoryInfoParser.ParseOutput("malformedkey:malformedvalue\n\nmalformedkey2=malformedvalue2");
+            var memoryInfo = SysctlMemoryInfoParser.ParseOutput("malformedkey:malformedvalue\n\nmalformedkey2=malformedvalue2", "malformedkey:malformedvalue\n\nmalformedkey2=malformedvalue2");
             Assert.Null(memoryInfo);
         }
 
         [Fact]
         public void RealMemoryTest()
         {
-            string MemoryInfo = TestHelper.ReadTestFile("SysctlMemory.txt", "Memory");
-            var parsedMemoyInfo = SysctlMemoryInfoParser.ParseOutput(MemoryInfo);
-            Assert.Equal(0, parsedMemoyInfo?.FreePhysicalMemory);
+            string sysctlMemoryInfo = TestHelper.ReadTestFile("SysctlMemory.txt", "Memory");
+            string vmstatMemoryInfo = TestHelper.ReadTestFile("VmStatMemory.txt", "Memory");
+            var parsedMemoyInfo = SysctlMemoryInfoParser.ParseOutput(sysctlMemoryInfo, vmstatMemoryInfo);
+            Assert.Equal(5538, parsedMemoyInfo?.FreePhysicalMemory);
             Assert.Equal(17179869184, parsedMemoyInfo?.TotalMemory);
         }
     }

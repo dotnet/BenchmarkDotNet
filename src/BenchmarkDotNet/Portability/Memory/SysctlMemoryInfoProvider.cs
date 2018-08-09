@@ -17,8 +17,9 @@ namespace BenchmarkDotNet.Portability.Memory
         {
             if (RuntimeInformation.IsMacOSX())
             {
-                string content = ProcessHelper.RunAndReadOutput("sysctl", "-a");
-                return SysctlMemoryInfoParser.ParseOutput(content);
+                string sysctlContent = ProcessHelper.RunAndReadOutput("sysctl", "-a");
+                string vmsStatContent = ProcessHelper.RunAndReadOutput("vm_stat");
+                return SysctlMemoryInfoParser.ParseOutput(sysctlContent, vmsStatContent);
             }
             return null;
         }
