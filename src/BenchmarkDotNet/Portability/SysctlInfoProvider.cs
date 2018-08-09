@@ -11,21 +11,21 @@ namespace BenchmarkDotNet.Portability
     internal static class SysctlInfoProvider
     {
         internal static readonly Lazy<string> SysctlInfo = new Lazy<string>(Load);
-        private static string _sysctlInfo = null;
+        private static string sysctlInfo = null;
 
         [CanBeNull]
         private static string Load()
         {
             // Check if value is already computed
-            if (_sysctlInfo != null)
+            if (sysctlInfo != null)
             {
-                return _sysctlInfo;
+                return sysctlInfo;
             }
 
             if (RuntimeInformation.IsMacOSX())
             {
                 string content = ProcessHelper.RunAndReadOutput("sysctl", "-a");
-                _sysctlInfo = content;
+                sysctlInfo = content;
                 return content;
             }
             return null;
