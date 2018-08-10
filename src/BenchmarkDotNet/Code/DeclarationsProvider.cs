@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -56,6 +57,11 @@ namespace BenchmarkDotNet.Code
         public abstract string OverheadImplementation { get; }
 
         public virtual bool UseRefKeyword => false;
+
+        public IEnumerable<string> ArgumentsNamespaces
+            => Descriptor.WorkloadMethod.GetParameters()
+                .Where(arg => !string.IsNullOrEmpty(arg.ParameterType.Namespace))
+                .Select(arg => $"using {arg.ParameterType.Namespace};");
     }
 
     internal class VoidDeclarationsProvider : DeclarationsProvider

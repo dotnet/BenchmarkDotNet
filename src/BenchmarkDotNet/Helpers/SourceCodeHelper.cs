@@ -1,5 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Globalization;
+using System.Numerics;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 using SimpleJson.Reflection;
@@ -25,6 +27,8 @@ namespace BenchmarkDotNet.Helpers
                     return d.ToString("G", CultureInfo.InvariantCulture) + "d";
                 case decimal f:
                     return f.ToString("G", CultureInfo.InvariantCulture) + "m";
+                case BigInteger bigInteger:
+                    return $"System.Numerics.BigInteger.Parse(\"{bigInteger.ToString(CultureInfo.InvariantCulture)}\")";
             }
 
             if (ReflectionUtils.GetTypeInfo(value.GetType()).IsEnum)

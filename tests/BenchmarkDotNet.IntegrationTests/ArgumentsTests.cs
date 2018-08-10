@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Tests.XUnit;
@@ -330,6 +331,27 @@ namespace BenchmarkDotNet.IntegrationTests
                 
                 if (!notEven.All(n => n % 2 != 0))
                     throw new ArgumentException("Even");
+            }
+        }
+
+        [Fact]
+        public void VeryBigIntegersAreSupported() => CanExecute<WithVeryBigInteger>();
+        
+        public class WithVeryBigInteger
+        {
+            public IEnumerable<object> GetVeryBigInteger()
+            {
+                yield return BigInteger.Parse(new string(Enumerable.Repeat('1', 1000).ToArray()));
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetVeryBigInteger))]
+            public void Method(BigInteger passed)
+            {
+                BigInteger expected = GetVeryBigInteger().OfType<BigInteger>().Single();
+                
+                if (expected != passed)
+                    throw new ArgumentException("The array was empty");
             }
         }
     }

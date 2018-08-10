@@ -28,8 +28,7 @@ namespace BenchmarkDotNet.Code
             var benchmarksCode = new List<string>(buildPartition.Benchmarks.Length);
 
             var extraDefines = new List<string>();
-            var workloadTypeNamespaces = new HashSet<string>();
-            var workloadMethodReturnTypeNamespace = new HashSet<string>();
+            var namespaces = new HashSet<string>();
             var additionalLogic = new HashSet<string>();
 
             foreach (var buildInfo in buildPartition.Benchmarks)
@@ -42,8 +41,11 @@ namespace BenchmarkDotNet.Code
 
                 extraDefines.Add($"{provider.ExtraDefines}_{buildInfo.Id}");
 
-                AddNonEmptyUnique(workloadTypeNamespaces, provider.WorkloadTypeNamespace);
-                AddNonEmptyUnique(workloadMethodReturnTypeNamespace, provider.WorkloadMethodReturnTypeNamespace);
+                AddNonEmptyUnique(namespaces, provider.WorkloadTypeNamespace);
+                AddNonEmptyUnique(namespaces, provider.WorkloadMethodReturnTypeNamespace);
+                foreach (var @namespace in provider.ArgumentsNamespaces)
+                    AddNonEmptyUnique(namespaces, @namespace);
+                
                 AddNonEmptyUnique(additionalLogic, benchmark.Descriptor.AdditionalLogic);
 
                 string benchmarkTypeCode = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkType.txt"))
@@ -83,8 +85,7 @@ namespace BenchmarkDotNet.Code
             string benchmarkProgramContent = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt"))
                 .Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath)
                 .Replace("$ExtraDefines$", string.Join(Environment.NewLine, extraDefines))
-                .Replace("$WorkloadTypeNamespace$", string.Join(Environment.NewLine, workloadTypeNamespaces))
-                .Replace("$WorkloadMethodReturnTypeNamespace$", string.Join(Environment.NewLine, workloadMethodReturnTypeNamespace))
+                .Replace("$Namespaces$", string.Join(Environment.NewLine, namespaces))
                 .Replace("$AdditionalLogic$", string.Join(Environment.NewLine, additionalLogic))
                 .Replace("$DerivedTypes$", string.Join(Environment.NewLine, benchmarksCode))
                 .Replace("$ExtraAttribute$", GetExtraAttributes(buildPartition.RepresentativeBenchmarkCase.Descriptor))

@@ -15,8 +15,7 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Validators;
-$WorkloadTypeNamespace$
-$WorkloadMethodReturnTypeNamespace$
+$Namespaces$
 
 $AdditionalLogic$
 
