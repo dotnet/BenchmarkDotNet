@@ -22,9 +22,9 @@ namespace BenchmarkDotNet.Helpers
                 case char c:
                     return c == '\\' ? "'\\\\'" : $"'{value}'";
                 case float f:
-                    return f.ToString("G", CultureInfo.InvariantCulture) + "f";
+                    return ToSourceCode(f);
                 case double d:
-                    return d.ToString("G", CultureInfo.InvariantCulture) + "d";
+                    return ToSourceCode(d);
                 case decimal f:
                     return f.ToString("G", CultureInfo.InvariantCulture) + "m";
                 case BigInteger bigInteger:
@@ -81,6 +81,42 @@ namespace BenchmarkDotNet.Helpers
                 return true;
 
             return false;
+        }
+
+        private static string ToSourceCode(double value)
+        {
+            if (double.IsNaN(value))
+                return "double.NaN";
+            if (double.IsPositiveInfinity(value))
+                return "double.PositiveInfinity";
+            if (double.IsNegativeInfinity(value))
+                return "double.NegativeInfinity";
+            if (value == double.Epsilon)
+                return "double.Epsilon";
+            if (value == double.MaxValue)
+                return "double.MaxValue";
+            if (value == double.MinValue)
+                return "double.MinValue";
+            
+            return value.ToString("G", CultureInfo.InvariantCulture) + "d";
+        }
+
+        private static string ToSourceCode(float value)
+        {
+            if (float.IsNaN(value))
+                return "float.NaN";
+            if (float.IsPositiveInfinity(value))
+                return "float.PositiveInfinity";
+            if (float.IsNegativeInfinity(value))
+                return "float.NegativeInfinity";
+            if (value == float.Epsilon)
+                return "float.Epsilon";
+            if (value == float.MaxValue)
+                return "float.MaxValue";
+            if (value == float.MinValue)
+                return "float.MinValue";
+            
+            return value.ToString("G", CultureInfo.InvariantCulture) + "f";
         }
     }
 }
