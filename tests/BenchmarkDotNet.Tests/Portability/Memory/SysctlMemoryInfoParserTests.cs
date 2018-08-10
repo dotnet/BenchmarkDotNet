@@ -26,8 +26,8 @@ namespace BenchmarkDotNet.Tests.Portability.Memory
             string sysctlMemoryInfo = TestHelper.ReadTestFile("SysctlMemory.txt", "Memory");
             string vmstatMemoryInfo = TestHelper.ReadTestFile("VmStatMemory.txt", "Memory");
             var parsedMemoyInfo = SysctlMemoryInfoParser.ParseOutput(sysctlMemoryInfo, vmstatMemoryInfo);
-            Assert.Equal(5538, parsedMemoyInfo?.FreePhysicalMemory);
-            Assert.Equal(17179869184, parsedMemoyInfo?.TotalMemory);
+            Assert.Equal(22152, parsedMemoyInfo?.FreePhysicalMemory);
+            Assert.Equal(16777216, parsedMemoyInfo?.TotalMemory);
         }
     }
 }
