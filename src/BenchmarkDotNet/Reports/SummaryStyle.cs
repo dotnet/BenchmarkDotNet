@@ -1,14 +1,15 @@
 ﻿using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Horology;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace BenchmarkDotNet.Reports
 {
     public class SummaryStyle : ISummaryStyle
     {
-        public bool PrintUnitsInHeader { get; private set; }
-        public bool PrintUnitsInContent { get; private set; } = true;
-        public SizeUnit SizeUnit { get; private set; }
-        public TimeUnit TimeUnit { get; private set; }
+        public bool PrintUnitsInHeader { get; set; }
+        public bool PrintUnitsInContent { get; set; } = true;
+        public SizeUnit SizeUnit { get; set; }
+        public TimeUnit TimeUnit { get; set; }
 
         public static SummaryStyle Default => new SummaryStyle
         {
