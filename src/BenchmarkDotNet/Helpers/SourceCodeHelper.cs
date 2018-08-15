@@ -28,7 +28,9 @@ namespace BenchmarkDotNet.Helpers
                 case decimal f:
                     return f.ToString("G", CultureInfo.InvariantCulture) + "m";
                 case BigInteger bigInteger:
-                    return $"System.Numerics.BigInteger.Parse(\"{bigInteger.ToString(CultureInfo.InvariantCulture)}\")";
+                    return $"System.Numerics.BigInteger.Parse(\"{bigInteger.ToString(CultureInfo.InvariantCulture)}\", System.Globalization.CultureInfo.InvariantCulture)";
+                case DateTime dateTime:
+                    return $"System.DateTime.Parse(\"{dateTime.ToString(CultureInfo.InvariantCulture)}\", System.Globalization.CultureInfo.InvariantCulture)";
             }
 
             if (ReflectionUtils.GetTypeInfo(value.GetType()).IsEnum)
@@ -55,6 +57,14 @@ namespace BenchmarkDotNet.Helpers
 
         public static bool IsCompilationTimeConstant(Type type)
         {
+            if (type == typeof(long) || type == typeof(ulong))
+                return true;
+            if (type == typeof(int) || type == typeof(uint))
+                return true;
+            if (type == typeof(short) || type == typeof(ushort))
+                return true;
+            if (type == typeof(byte) || type == typeof(sbyte))
+                return true;
             if (type == typeof(bool))
                 return true;
             if (type == typeof(string))
@@ -71,14 +81,16 @@ namespace BenchmarkDotNet.Helpers
                 return true;
             if (type == typeof(Type))
                 return true;
-            if (!type.IsValueType) // the difference!!
-                return false;
             if (type == typeof(TimeInterval))
                 return true;
             if (type == typeof(IntPtr))
                 return true;
-            if (typeof(IFormattable).IsAssignableFrom(type))
+            if (type == typeof(DateTime))
                 return true;
+            if (!type.IsValueType) // the difference!!
+                return false;
+            if (typeof(IFormattable).IsAssignableFrom(type))
+                return false;
 
             return false;
         }

@@ -351,7 +351,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 BigInteger expected = GetVeryBigInteger().OfType<BigInteger>().Single();
                 
                 if (expected != passed)
-                    throw new ArgumentException("The array was empty");
+                    throw new ArgumentException("The BigInteger has wrong value!");
             }
         }
         
@@ -471,6 +471,27 @@ namespace BenchmarkDotNet.IntegrationTests
                     default:
                         throw new InvalidOperationException($"Unknown case! {name}");
                 }
+            }
+        }
+
+        [Fact]
+        public void DateTimeCanBeUsedAsArgument() => CanExecute<WithDateTime>();
+
+        public class WithDateTime
+        {
+            public IEnumerable<object> DateTimeValues()
+            {
+                yield return new DateTime(2018, 8, 15);
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(DateTimeValues))]
+            public void Test(DateTime passed)
+            {
+                DateTime expected = DateTimeValues().OfType<DateTime>().Single();
+                
+                if (expected != passed)
+                    throw new ArgumentException("The DateTime has wrong value!");
             }
         }
     }
