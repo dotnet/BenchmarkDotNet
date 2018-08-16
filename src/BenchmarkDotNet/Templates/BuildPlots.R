@@ -38,7 +38,7 @@ for (file in files) {
   title <- gsub("-measurements.csv", "", basename(file))
   measurements <- read.csv(file, sep = "$CsvSeparator$")
 
-  result <- measurements %>% filter(Measurement_IterationMode == "Result")
+  result <- measurements %>% filter(Measurement_IterationStage == "Result")
   if (nrow(result[is.na(result$Job_Id),]) > 0)
     result[is.na(result$Job_Id),]$Job_Id <- ""
   if (nrow(result[is.na(result$Params),]) > 0) {
