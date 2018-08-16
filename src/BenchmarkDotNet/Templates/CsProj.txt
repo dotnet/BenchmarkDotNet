@@ -1,4 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+<Project ToolsVersion="15.0">
+  <PropertyGroup>
+    <ImportDirectoryBuildProps>false</ImportDirectoryBuildProps>
+    <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
+  </PropertyGroup>
+
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
   <PropertyGroup>
     <AssemblyTitle>$PROGRAMNAME$</AssemblyTitle>
     <TargetFramework>$TFM$</TargetFramework>
@@ -21,4 +28,6 @@
     <ProjectReference Include="$CSPROJPATH$" />
   </ItemGroup>
   $RUNTIMESETTINGS$
+
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 </Project>
