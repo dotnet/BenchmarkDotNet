@@ -11,10 +11,14 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.Xml;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Toolchains.CoreRun;
+using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess;
 using CommandLine;
 
@@ -112,6 +116,18 @@ namespace BenchmarkDotNet.ConsoleArguments
                     logger.WriteLineError($"The provided exporter \"{exporter}\" is invalid. Available options are: {string.Join(", ", AvailableExporters.Keys)}.");
                     return false;
                 }
+            
+            if (options.CliPath != null && !options.CliPath.Exists)
+            {
+                logger.WriteLineError($"The provided {nameof(options.CliPath)} \"{options.CliPath}\" does NOT exist.");
+                return false;
+            }
+            
+            if (options.CoreRunPath != null && !options.CoreRunPath.Exists)
+            {
+                logger.WriteLineError($"The provided {nameof(options.CoreRunPath)} \"{options.CoreRunPath}\" does NOT exist.");
+                return false;
+            }
 
             return true;
         }
@@ -120,8 +136,11 @@ namespace BenchmarkDotNet.ConsoleArguments
         {
             var config = new ManualConfig();
 
-            config.Add(Expand(GetBaseJob(options), options).ToArray());
-
+            var baseJob = GetBaseJob(options);
+            config.Add(Expand(baseJob, options).ToArray());
+            if (config.GetJobs().IsEmpty() && baseJob != Job.Default)
+                config.Add(baseJob);
+            
             config.Add(options.Exporters.SelectMany(exporter => AvailableExporters[exporter]).ToArray());
 
             if (options.UseMemoryDiagnoser)
@@ -167,8 +186,10 @@ namespace BenchmarkDotNet.ConsoleArguments
             foreach (string runtime in options.Runtimes)
                 yield return baseJob.With(AvailableRuntimes[runtime.ToLowerInvariant()]);
 
-            if (!options.RunInProcess && !options.Runtimes.Any() && baseJob != Job.Default)
-                yield return baseJob;
+            if (options.CoreRunPath != null)
+                yield return CreateCoreRunJob(baseJob, options);
+            else if (options.CliPath != null)
+                yield return baseJob.With(CsProjCoreToolchain.From(NetCoreAppSettings.GetCurrentVersion().WithCustomDotNetCliPath(options.CliPath.FullName, "cli")));
         }
 
         private static IEnumerable<IFilter> GetFilters(CommandLineOptions options)
@@ -194,5 +215,14 @@ namespace BenchmarkDotNet.ConsoleArguments
                 return MinimumDisplayWidth;
             }
         }
+
+        private static Job CreateCoreRunJob(Job baseJob, CommandLineOptions options)
+            => baseJob
+                .With(Runtime.Core)
+                .With(new CoreRunToolchain(
+                    options.CoreRunPath,
+                    createCopy: true,
+                    targetFrameworkMoniker: NetCoreAppSettings.GetCurrentVersion().TargetFrameworkMoniker,
+                    customDotNetCliPath: options.CliPath));
     }
 }

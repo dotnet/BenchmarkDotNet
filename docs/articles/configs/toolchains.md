@@ -133,6 +133,16 @@ Frequency=2742185 Hz, Resolution=364.6727 ns, Timer=TSC
 Jit=RyuJit  
 ```
 
+This feature is now also exposed with the `--cli` console argument.
+
+Example: `dotnet run -c Release -- --cli "C:\Projects\machinelearning\Tools\dotnetcli\dotnet.exe"`
+
+## CoreRun
+
+To use CoreRun for running the benchmarks you need to use `--coreRun `command line argument. You can combine it with `--cli` described above. This is most probably the easiest and most reliable way of running benchmarks against local CoreFX/CoreCLR builds.
+
+Example: `dotnet run -c Release -- --coreRun "C:\Projects\corefx\bin\testhost\netcoreapp-Windows_NT-Release-x64\shared\Microsoft.NETCore.App\9.9.9\CoreRun.exe"`
+
 ## Custom CoreCLR and CoreFX
 
 BenchmarkDotNet allows the users to run their benchmarks against ANY CoreCLR and CoreFX builds. You can compare your local build vs MyGet feed or Debug vs Release or one version vs another.

@@ -56,6 +56,12 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [Option("join", Required = false, Default = false, HelpText = "Prints single table with results for all benchmarks")]
         public bool Join { get; set; }
+        
+        [Option("cli", Required = false, HelpText = "Path to dotnet cli (optional).")]
+        public FileInfo CliPath { get; set; }
+
+        [Option("coreRun", Required = false, HelpText = "Path to CoreRun (optional).")]
+        public FileInfo CoreRunPath { get; set; }
 
         [Usage(ApplicationAlias = "")]
         [PublicAPI]
