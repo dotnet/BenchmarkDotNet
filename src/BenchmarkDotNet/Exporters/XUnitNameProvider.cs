@@ -83,7 +83,7 @@ namespace BenchmarkDotNet.Exporters
             return nestedTypes;
         }
 
-        private static string GetTypeName(Type type)
+        internal static string GetTypeName(Type type)
         {
             if (!type.IsGenericType)
                 return type.Name;

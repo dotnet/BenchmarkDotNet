@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Exporters.Json
                     // We don't need Benchmark.ShortInfo, that info is available via Benchmark.Parameters below
                     { "DisplayInfo", r.BenchmarkCase.DisplayInfo },
                     { "Namespace", r.BenchmarkCase.Descriptor.Type.Namespace },
-                    { "Type", r.BenchmarkCase.Descriptor.Type.Name },
+                    { "Type", XUnitNameProvider.GetTypeName(r.BenchmarkCase.Descriptor.Type) },
                     { "Method", r.BenchmarkCase.Descriptor.WorkloadMethod.Name },
                     { "MethodTitle", r.BenchmarkCase.Descriptor.WorkloadMethodDisplayInfo },
                     { "Parameters", r.BenchmarkCase.Parameters.PrintInfo },
