@@ -86,3 +86,5 @@
   href: IntroOrderManual.md
 - name: IntroGenericTypeArguments
   href: IntroGenericTypeArguments.md
+- name: IntroDeferredExecution
+  href: IntroDeferredExecution.md

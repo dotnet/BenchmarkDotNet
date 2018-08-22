@@ -97,6 +97,42 @@ namespace BenchmarkDotNet.Engines
         [PublicAPI]
         public void Consume<T>(T objectValue) where T : class // class constraint prevents from boxing structs
             => Volatile.Write(ref objectHolder, objectValue);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Consume<T>(in T value)
+        {
+            if (typeof(T) == typeof(byte))
+                byteHolder = (byte)(object)value;
+            else if (typeof(T) == typeof(sbyte))
+                sbyteHolder = (sbyte)(object)value;
+            else if (typeof(T) == typeof(short))
+                shortHolder = (short)(object)value;
+            else if (typeof(T) == typeof(ushort))
+                ushortHolder = (ushort)(object)value;
+            else if (typeof(T) == typeof(int))
+                intHolder = (int)(object)value;
+            else if (typeof(T) == typeof(uint))
+                uintHolder = (uint)(object)value;
+            else if (typeof(T) == typeof(bool))
+                boolHolder = (bool)(object)value;
+            else if (typeof(T) == typeof(char))
+                charHolder = (char)(object)value;
+            else if (typeof(T) == typeof(float))
+                floatHolder = (float)(object)value;
+            else if (typeof(T) == typeof(double))
+                Volatile.Write(ref doubleHolder, (double)(object)value);
+            else if (typeof(T) == typeof(long))
+                Volatile.Write(ref longHolder, (long)(object)value);
+            else if (typeof(T) == typeof(ulong))
+                Volatile.Write(ref ulongHolder, (ulong)(object)value);
+            else if (default(T) == null)
+                objectHolder = (object) value;
+            else
+                ValueTypesConsumer(value); // non-primitive value types
+        }
+        
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void ValueTypesConsumer<T>(in T _) { }
 
         internal static bool IsConsumable(Type type)
             => SupportedTypes.Contains(type) || type.GetTypeInfo().IsClass || type.GetTypeInfo().IsInterface;

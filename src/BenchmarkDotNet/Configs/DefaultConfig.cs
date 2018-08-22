@@ -58,6 +58,7 @@ namespace BenchmarkDotNet.Configs
 #endif
             yield return RunModeValidator.FailOnError;
             yield return GenericBenchmarksValidator.DontFailOnError;
+            yield return DeferredExecutionValidator.FailOnError;
         }
 
         public IEnumerable<Job> GetJobs() => Array.Empty<Job>();
