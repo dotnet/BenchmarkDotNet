@@ -5,7 +5,7 @@ $(function () {
             $('#navbar ul').append('<li id="navbar-versions" class="dropdown">\n' +
                 '  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Version: v0.11.0 <span class="caret"></span></a>\n' +
                 '  <ul class="dropdown-menu">\n' +
-                '    <li><a href="/master/">master</a></li>\n' +
+                '    <li><a href="/v0.11.1/">v0.11.1</a></li>\n' +
                 '    <li><a href="/v0.11.0/">v0.11.0</a></li>\n' +
                 '    <li><a href="/v0.10.14/">v0.10.14</a></li>\n' +
                 '  </ul>\n' +
