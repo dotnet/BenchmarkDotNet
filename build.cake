@@ -49,9 +49,10 @@ var bdnAllVersions = new string[] {
 		"v0.10.12",
 		"v0.10.13",
 		"v0.10.14",
-		"v0.11.0"
+		"v0.11.0",
+		"v0.11.1"
 	};
-var bdnNextVersion = "v0.11.1";
+var bdnNextVersion = "v0.11.2";
 var bdnFirstCommit = "6eda98ab1e83a0d185d09ff8b24c795711af8db1";
 
 var artifactsDirectory = Directory("./artifacts");
