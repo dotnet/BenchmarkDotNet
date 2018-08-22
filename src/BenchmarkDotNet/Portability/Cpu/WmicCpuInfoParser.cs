@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Portability.Cpu
                     processorsCount++;
                 }
                 
-                if (processor.TryGetValue(WmicCpuInfoKeyNames.CurrentClockSpeed, out string frequencyValue) 
+                if (processor.TryGetValue(WmicCpuInfoKeyNames.MaxClockSpeed, out string frequencyValue) 
                     && int.TryParse(frequencyValue, out int frequency)
                     && frequency > 0)
                 {
