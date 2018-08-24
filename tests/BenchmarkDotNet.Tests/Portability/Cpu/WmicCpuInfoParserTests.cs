@@ -50,7 +50,7 @@ NumberOfLogicalProcessors=16
             Assert.Equal(2, parser.PhysicalProcessorCount);
             Assert.Equal(16, parser.PhysicalCoreCount);
             Assert.Equal(32, parser.LogicalCoreCount);
-            Assert.Equal(2400 * Frequency.MHz, parser.NominalFrequency);
+            Assert.Equal(2400 * Frequency.MHz, parser.MaxFrequency);
         }
 
         [Fact]
@@ -70,7 +70,7 @@ NumberOfLogicalProcessors=8
             Assert.Equal(1, parser.PhysicalProcessorCount);
             Assert.Equal(4, parser.PhysicalCoreCount);
             Assert.Equal(8, parser.LogicalCoreCount);
-            Assert.Equal(2500 * Frequency.MHz, parser.NominalFrequency);
+            Assert.Equal(2500 * Frequency.MHz, parser.MaxFrequency);
         }
     }
 }
