@@ -143,8 +143,10 @@ namespace BenchmarkDotNet.Reports
             }
             catch (Exception)
             {
+#if DEBUG // some benchmarks need to write to console and when we display this error it's confusing
                 logger.WriteLineError("Parse error in the following line:");
                 logger.WriteLineError(line);
+#endif
                 return Error(encoding);
             }
         }
