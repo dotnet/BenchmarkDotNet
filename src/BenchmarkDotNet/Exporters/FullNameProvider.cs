@@ -11,7 +11,7 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Exporters
 {
-    internal static class XUnitNameProvider 
+    internal static class FullNameProvider 
     {
         private static readonly IReadOnlyDictionary<Type, string> Aliases = new Dictionary<Type, string>
         {
