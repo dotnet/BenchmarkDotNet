@@ -44,11 +44,21 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         internal override Session EnableProviders()
         {
-            var keywords = Details.Config.GetHardwareCounters().Any()
-                ? KernelTraceEventParser.Keywords.PMCProfile | KernelTraceEventParser.Keywords.Profile // enable PMCs and CPU stacks
-                : KernelTraceEventParser.Keywords.Profile; // enable CPU stacks
-            
-            TraceEventSession.EnableKernelProvider(keywords);
+            if (!Details.Config.GetHardwareCounters().Any())
+            {
+                TraceEventSession.EnableKernelProvider(KernelTraceEventParser.Keywords.Profile); // enable CPU stacks only
+                
+                return this;
+            }
+
+            TraceEventSession.EnableKernelProvider(KernelTraceEventParser.Keywords.PMCProfile | KernelTraceEventParser.Keywords.Profile); // enable PMCs and CPU stacks
+
+            var counters = Details.Config
+                .GetHardwareCounters()
+                .Select(counter => HardwareCounters.FromCounter(counter, info => info.MaxInterval )) // for this diagnoser we want the biggest interval to have smallest overhead
+                .ToArray();
+
+            HardwareCounters.Enable(counters);
 
             return this;
         }
@@ -90,10 +100,16 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         internal abstract Session EnableProviders();
 
-        internal void MergeFiles(Session other) //  `other` is not used here because MergeInPlace expects .etl and .kernel.etl files in this folder
-            => TraceEventSession.MergeInPlace(FilePath, TextWriter.Null);
+        internal string MergeFiles(Session other) 
+        {
+            //  `other` is not used here because MergeInPlace expects .etl and .kernel.etl files in this folder
+            // it searches for them and merges into a single file
+            TraceEventSession.MergeInPlace(FilePath, TextWriter.Null);
 
-        private void OnConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e) => Dispose();
+            return FilePath;
+        }
+
+        private void OnConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e) => Stop();
 
         private string GetFilePath(DiagnoserActionParameters details)
         {

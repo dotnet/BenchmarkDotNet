@@ -9,7 +9,6 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
-using Microsoft.Diagnostics.Tracing.Session;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
@@ -58,7 +57,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 kernelSession.Stop();
                 userSession.Stop();
                 
-                userSession.MergeFiles(kernelSession);
+                var mergedTraceFilePath = userSession.MergeFiles(kernelSession);
+
+                benchmarkToEtlFile[parameters.BenchmarkCase] = mergedTraceFilePath;
                 
                 kernelSession.Dispose();
                 userSession.Dispose();
@@ -72,15 +73,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             if (!benchmarkToEtlFile.Any())
                 return;
             
-            logger.WriteInfo($"Exported {benchmarkToEtlFile.Count} etl files. Some of them:");
-            foreach (string file in benchmarkToEtlFile.Values.Take(10))
-                logger.WriteLineInfo(file);
+            logger.WriteLineInfo($"Exported {benchmarkToEtlFile.Count} trace file(s). Example:");
+            logger.WriteLineInfo(benchmarkToEtlFile.Values.First());
         }
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
-        {
-            if (TraceEventSession.IsElevated() != true)
-                yield return new ValidationError(true, "Must be elevated (Admin) to use Hardware Counters to use ETW Kernel Session.");
-        }
+            => HardwareCounters.Validate(validationParameters, mandatory: false);
     }
 }
