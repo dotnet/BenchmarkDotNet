@@ -124,4 +124,31 @@ namespace BenchmarkDotNet.IntegrationTests
             public void BenchmarkFast() => Thread.Sleep(5);
         }
     }
+
+    public class BaselineScaledColumnWithLongParamsTest : BenchmarkTestExecutor
+    {
+        public BaselineScaledColumnWithLongParamsTest(ITestOutputHelper output) : base(output) { }
+
+        [Fact]
+        public void ColumnsWithBaselineGetsScaled()
+        {
+            var summary = CanExecute<BaselineScaledColumnWithLongParams>(fullValidation: false);
+
+            // Ensure that Params attribute values will not affect Baseline property
+            Assert.False(summary.HasCriticalValidationErrors);
+        }
+
+        public class BaselineScaledColumnWithLongParams
+        {
+            // Long different parameters with equal length but different values
+            [Params("12345ThisIsALongParameter54321", "12345ThisIsARongParameter54321")]
+            public string LongStringParamPropery { get; set; }
+
+            [Benchmark(Baseline = true)]
+            public void BenchmarkSlow() => Thread.Sleep(20);
+
+            [Benchmark]
+            public void BenchmarkFast() => Thread.Sleep(5);
+        }
+    }
 }

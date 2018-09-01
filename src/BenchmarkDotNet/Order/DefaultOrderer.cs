@@ -98,7 +98,7 @@ namespace BenchmarkDotNet.Order
             if (rules.Contains(BenchmarkLogicalGroupRule.ByJob))
                 keys.Add(benchmarkCase.Job.DisplayInfo);
             if (rules.Contains(BenchmarkLogicalGroupRule.ByParams))
-                keys.Add(benchmarkCase.Parameters.DisplayInfo);
+                keys.Add(benchmarkCase.Parameters.ValueInfo);
             if (rules.Contains(BenchmarkLogicalGroupRule.ByCategory))
                 keys.Add(string.Join(",", benchmarkCase.Descriptor.Categories));
 
