@@ -78,6 +78,10 @@ namespace BenchmarkDotNet.Environments
     {
         public string CustomPath { get; }
 
+        public bool Aot { get; set; }
+
+        public string AotParameters { get; set; }
+
         public MonoRuntime() : base("Mono")
         {
         }
