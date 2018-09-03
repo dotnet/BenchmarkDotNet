@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Horology;
+﻿using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Portability.Memory
@@ -29,14 +25,26 @@ namespace BenchmarkDotNet.Portability.Memory
                     isValid = false;
                 }
 
-                if (memory.TryGetValue(ProcMemoryInfoKeyNames.MemFree, out string freePhysicalMemoryValue) &&
-                    long.TryParse(freePhysicalMemoryValue.Replace("kB",string.Empty), out long freePhysicalMemory))
+                if (memory.TryGetValue(ProcMemoryInfoKeyNames.MemAvailable, out string availablePhysicalMemoryValue) &&
+                    long.TryParse(availablePhysicalMemoryValue.Replace("kB", string.Empty), out long availablePhysicalMemory))
                 {
-                    FreePhysicalMemory += freePhysicalMemory;
+                    FreePhysicalMemory += availablePhysicalMemory;
                 }
                 else
                 {
-                    isValid = false;
+                    // Fallback for kernels < 3.14 where proc/meminfo does not provide "MemAvailable"
+                    // calculated as Free + cached
+                    if (memory.TryGetValue(ProcMemoryInfoKeyNames.MemFree, out string freePhysicalMemoryValue) &&
+                       long.TryParse(freePhysicalMemoryValue.Replace("kB", string.Empty), out long freePhysicalMemory) &&
+                       memory.TryGetValue(ProcMemoryInfoKeyNames.Cached, out string cachedMemoryValue) &&
+                       long.TryParse(cachedMemoryValue.Replace("kB", string.Empty), out long cachedMemory))
+                    {
+                        FreePhysicalMemory += (freePhysicalMemory + cachedMemory);
+                    }
+                    else
+                    {
+                        isValid = false;
+                    }
                 }
             }
 

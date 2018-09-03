@@ -24,10 +24,17 @@ namespace BenchmarkDotNet.Portability.Memory
                 // hw.memsize returns in bytes
                 TotalMemory = (long)(totalMemory/1024.0);
             }
+
+            // Available Memory = Free + Inactive
             if (vmstat.TryGetValue("Pages free", out string freeMemoryValue) && long.TryParse(freeMemoryValue.Replace(".",string.Empty), out long freeMemory))
             {
                 // Pages are in 4K units
                 FreePhysicalMemory = freeMemory * 4;
+            }
+            if (vmstat.TryGetValue("Pages inactive", out string inactiveMemoryValue) && long.TryParse(inactiveMemoryValue.Replace(".", string.Empty), out long inactiveMemory))
+            {
+                // Pages are in 4K units
+                FreePhysicalMemory += inactiveMemory * 4;
             }
 
             if (TotalMemory.HasValue && FreePhysicalMemory.HasValue)

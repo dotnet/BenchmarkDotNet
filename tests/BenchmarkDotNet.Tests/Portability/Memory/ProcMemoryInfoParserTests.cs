@@ -22,20 +22,21 @@ namespace BenchmarkDotNet.Tests.Portability.Memory
         }
 
         [Fact]
-        public void RealMemoryTest()
+        public void RealMemoryTestWithAvaibleMemory()
+        {            
+            string MemoryInfo = TestHelper.ReadTestFile("ProcMemoryWithMemAvailable.txt", "Memory");
+            var parsedMemoryInfo = ProcMemoryInfoParser.ParseOutput(MemoryInfo);
+            Assert.Equal(6204328L, parsedMemoryInfo.FreePhysicalMemory);
+            Assert.Equal(32904420L, parsedMemoryInfo.TotalMemory);
+        }
+
+        [Fact]
+        public void RealMemoryTestWithoutAvailableMemory()
         {
-            string MemoryInfo = @"MemTotal:        8309008 kB
-MemFree:         2513996 kB
-HighTotal:             0 kB
-HighFree:              0 kB
-LowTotal:        8309008 kB
-LowFree:         2513996 kB
-SwapTotal:       5060300 kB
-SwapFree:        3334460 kB
-";
-            var parsedMemoyInfo = ProcMemoryInfoParser.ParseOutput(MemoryInfo);
-            Assert.Equal(2513996L, parsedMemoyInfo.FreePhysicalMemory);
-            Assert.Equal(8309008L, parsedMemoyInfo.TotalMemory);
+            string MemoryInfo = TestHelper.ReadTestFile("ProcMemoryWithoutMemAvailable.txt", "Memory");
+            var parsedMemoryInfo = ProcMemoryInfoParser.ParseOutput(MemoryInfo);
+            Assert.Equal(4259532L, parsedMemoryInfo.FreePhysicalMemory);
+            Assert.Equal(32904420L, parsedMemoryInfo.TotalMemory);
         }
     }
 }
