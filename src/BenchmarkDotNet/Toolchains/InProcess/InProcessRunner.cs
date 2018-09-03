@@ -3,6 +3,7 @@ using System.Reflection;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
@@ -146,7 +147,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     IterationCleanupAction = iterationCleanupAction.InvokeSingle,
                     TargetJob = job,
                     OperationsPerInvoke = target.OperationsPerInvoke,
-                    MeasureGcStats = config.HasMemoryDiagnoser()
+                    MeasureGcStats = config.HasMemoryDiagnoser(),
+                    BenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase)
                 };
 
                 using (var engine = job

@@ -30,6 +30,7 @@ namespace BenchmarkDotNet.Engines
         [PublicAPI] public Action IterationCleanupAction { get; }
         [PublicAPI] public IResolver Resolver { get; }
         [PublicAPI] public Encoding Encoding { get; }
+        [PublicAPI] public string BenchmarkName { get; }
         
         private IClock Clock { get; }
         private bool ForceAllocations { get; }
@@ -48,7 +49,7 @@ namespace BenchmarkDotNet.Engines
             IResolver resolver,
             Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> overheadAction, Action<long> workloadAction, Job targetJob,
             Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
-            bool includeMemoryStats, Encoding encoding)
+            bool includeMemoryStats, Encoding encoding, string benchmarkName)
         {
             
             Host = host;
@@ -64,6 +65,7 @@ namespace BenchmarkDotNet.Engines
             IterationCleanupAction = iterationCleanupAction;
             OperationsPerInvoke = operationsPerInvoke;
             this.includeMemoryStats = includeMemoryStats;
+            BenchmarkName = benchmarkName;
 
             Resolver = resolver;
             Encoding = encoding;
@@ -132,10 +134,16 @@ namespace BenchmarkDotNet.Engines
 
             GcCollect();
 
+            if (EngineEventSource.Log.IsEnabled())
+                EngineEventSource.Log.IterationStart(TargetJob.Id, BenchmarkName, data.IterationMode, data.IterationStage);
+
             // Measure
             var clock = Clock.Start();
             action(invokeCount / unrollFactor);
             var clockSpan = clock.GetElapsed();
+
+            if (EngineEventSource.Log.IsEnabled())
+                EngineEventSource.Log.IterationStop(TargetJob.Id, BenchmarkName, data.IterationMode, data.IterationStage);
 
             if(!isOverhead)
                 IterationCleanupAction();

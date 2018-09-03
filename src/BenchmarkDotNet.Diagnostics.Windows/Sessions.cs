@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
 using Microsoft.Diagnostics.Tracing;
@@ -21,6 +22,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         internal override Session EnableProviders()
         {
+            TraceEventSession.EnableProvider(EngineEventSource.Log.Name, TraceEventLevel.Informational);
+
             TraceEventSession.EnableProvider(
                 ClrTraceEventParser.ProviderGuid,
                 TraceEventLevel.Verbose,

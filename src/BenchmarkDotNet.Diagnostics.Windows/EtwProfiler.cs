@@ -50,8 +50,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 kernelSession = new KernelSession(parameters, bufferSizeInMb).EnableProviders();
             }
             
-            //            Marker(signal);
-            
             if (signal == HostSignal.AfterActualRun)
             {
                 kernelSession.Stop();

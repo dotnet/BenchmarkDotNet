@@ -1,6 +1,6 @@
 ﻿namespace BenchmarkDotNet.Engines
 {
-    public enum IterationStage
+    public enum IterationStage : int
     {
         Jitting,
         

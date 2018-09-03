@@ -1,6 +1,6 @@
 ﻿namespace BenchmarkDotNet.Engines
 {
-    public enum IterationMode
+    public enum IterationMode : int
     {
         Overhead,
         
