@@ -1,20 +1,30 @@
 ﻿using System;
 using System.Diagnostics.Tracing;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Engines
 {
     [EventSource(Name = "BenchmarkDotNet.EngineEventSource")]
     public class EngineEventSource : EventSource
     {
+        [PublicAPI] public const int IterationStartEventId = 1;
+        [PublicAPI] public const int IterationStopEventId = 2;
+
+        /// <summary>
+        /// "If you use tasks and opcodes, you should name your method the task name concatenated with the opcode name."
+        /// https://github.com/Microsoft/dotnet-samples/blob/6f2414148e33740c29116138e8bcef28364fafa8/Microsoft.Diagnostics.Tracing/EventSource/EventSource/20_CustomizedEventSource.cs#L37
+        /// </summary>
+        private const EventTask IterationTask = (EventTask)1;
+
         internal static readonly EngineEventSource Log = new EngineEventSource();
 
-        [Event(1, Level = EventLevel.Informational, Opcode = EventOpcode.Start)]
+        [Event(IterationStartEventId, Level = EventLevel.Informational, Task = IterationTask, Opcode = EventOpcode.Start)]
         internal void IterationStart(string jobId, string benchmarkName, IterationMode mode, IterationStage stage)
-            => WriteEngineEvent(1, jobId, benchmarkName, mode, stage);
+            => WriteEngineEvent(IterationStartEventId, jobId, benchmarkName, mode, stage);
         
-        [Event(2, Level = EventLevel.Informational, Opcode = EventOpcode.Stop)]
+        [Event(IterationStopEventId, Level = EventLevel.Informational, Task = IterationTask, Opcode = EventOpcode.Stop)]
         internal void IterationStop(string jobId, string benchmarkName, IterationMode mode, IterationStage stage)
-            => WriteEngineEvent(2, jobId, benchmarkName, mode, stage);
+            => WriteEngineEvent(IterationStopEventId, jobId, benchmarkName, mode, stage);
 
         [NonEvent]
         private unsafe void WriteEngineEvent(int eventId, string jobId, string benchmarkId, IterationMode mode, IterationStage stage)

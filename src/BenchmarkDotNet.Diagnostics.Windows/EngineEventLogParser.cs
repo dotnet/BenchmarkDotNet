@@ -18,24 +18,24 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public event Action<IterationEvent> BenchmarkIterationStart
         {
             add => source.RegisterEventTemplate(BenchmarkIterationStartTemplate(value));
-            remove => source.UnregisterEventTemplate(value, 0, ProviderGuid);
+            remove => source.UnregisterEventTemplate(value, EngineEventSource.IterationStartEventId, ProviderGuid);
         }
         
         public event Action<IterationEvent> BenchmarkIterationStop
         {
             add => source.RegisterEventTemplate(BenchmarkIterationStopTemplate(value));
-            remove => source.UnregisterEventTemplate(value, 1, ProviderGuid);
+            remove => source.UnregisterEventTemplate(value, EngineEventSource.IterationStopEventId, ProviderGuid);
         }
 
         protected override string GetProviderName() { return ProviderName; }
 
         private static IterationEvent BenchmarkIterationStartTemplate(Action<IterationEvent> action)
         {                  // action, eventid, taskid, taskName, taskGuid, opcode, opcodeName, providerGuid, providerName
-            return new IterationEvent(action, 0, 2, "Iteration", Guid.Empty, 1, "Start", ProviderGuid, ProviderName);
+            return new IterationEvent(action, EngineEventSource.IterationStartEventId, 2, "Iteration", Guid.Empty, 1, "Start", ProviderGuid, ProviderName);
         }
         private static IterationEvent BenchmarkIterationStopTemplate(Action<IterationEvent> action)
         {                  // action, eventid, taskid, taskName, taskGuid, opcode, opcodeName, providerGuid, providerName
-            return new IterationEvent(action, 1, 2, "Iteration", Guid.Empty, 2, "Stop", ProviderGuid, ProviderName);
+            return new IterationEvent(action, EngineEventSource.IterationStopEventId, 2, "Iteration", Guid.Empty, 2, "Stop", ProviderGuid, ProviderName);
         }
         
         protected override void EnumerateTemplates(Func<string, string, EventFilterResponse> eventsToObserve, Action<TraceEvent> callback)
