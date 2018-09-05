@@ -3,6 +3,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Portability.Cpu;
+using BenchmarkDotNet.Portability.Memory;
 
 namespace BenchmarkDotNet.Tests.Builders
 {
@@ -31,6 +32,8 @@ namespace BenchmarkDotNet.Tests.Builders
                                               maxFrequency: Frequency.FromMHz(3100),
                                               minFrequency: Frequency.FromMHz(3100));
 
+        private MemoryInfo memoryInfo = new MemoryInfo(8309008, 2883320);
+
         private VirtualMachineHypervisor virtualMachineHypervisor = HyperV.Default;
 
         public HostEnvironmentInfoBuilder WithVMHypervisor(VirtualMachineHypervisor hypervisor)
@@ -55,7 +58,7 @@ namespace BenchmarkDotNet.Tests.Builders
         {
             return new MockHostEnvironmentInfo(architecture, benchmarkDotNetVersion, chronometerFrequency, configuration,
                 dotNetSdkVersion, hardwareTimerKind, hasAttachedDebugger, hasRyuJit, isConcurrentGC, isServerGC,
-                jitInfo, jitModules, osVersion, cpuInfo, runtimeVersion, virtualMachineHypervisor);
+                jitInfo, jitModules, osVersion, cpuInfo, memoryInfo, runtimeVersion, virtualMachineHypervisor);
         }
     }
 
@@ -64,7 +67,7 @@ namespace BenchmarkDotNet.Tests.Builders
         public MockHostEnvironmentInfo(
             string architecture, string benchmarkDotNetVersion, Frequency chronometerFrequency, string configuration, string dotNetSdkVersion,
             HardwareTimerKind hardwareTimerKind, bool hasAttachedDebugger, bool hasRyuJit, bool isConcurrentGC, bool isServerGC,
-            string jitInfo, string jitModules, string osVersion, CpuInfo cpuInfo, 
+            string jitInfo, string jitModules, string osVersion, CpuInfo cpuInfo, MemoryInfo memoryInfo,
             string runtimeVersion, VirtualMachineHypervisor virtualMachineHypervisor)
         {
             Architecture = architecture;
@@ -81,6 +84,7 @@ namespace BenchmarkDotNet.Tests.Builders
             JitModules = jitModules;
             OsVersion = new Lazy<string>(() => osVersion);
             CpuInfo = new Lazy<CpuInfo>(() => cpuInfo);
+            MemoryInfo = new Lazy<MemoryInfo>(() => memoryInfo);
             RuntimeVersion = runtimeVersion;
             VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(() => virtualMachineHypervisor);
         }

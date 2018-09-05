@@ -6,6 +6,7 @@ using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Portability.Cpu;
+using BenchmarkDotNet.Portability.Memory;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
@@ -40,6 +41,11 @@ namespace BenchmarkDotNet.Environments
         /// is expensive to call (1s)
         /// </summary>
         public Lazy<CpuInfo> CpuInfo { get; protected set; }
+
+        // <summary>
+        /// Provides total and free memory, Could be expensive
+        /// </summary>
+        public Lazy<MemoryInfo> MemoryInfo { get; protected set; }
 
         public string JitModules { get; protected set; }
 
@@ -78,6 +84,7 @@ namespace BenchmarkDotNet.Environments
             BenchmarkDotNetVersion = GetBenchmarkDotNetVersion();
             OsVersion = new Lazy<string>(RuntimeInformation.GetOsVersion);
             CpuInfo = new Lazy<CpuInfo>(RuntimeInformation.GetCpuInfo);
+            MemoryInfo = new Lazy<MemoryInfo>(RuntimeInformation.GetMemoryInfo);
             ChronometerFrequency = Chronometer.Frequency;
             HardwareTimerKind = Chronometer.HardwareTimerKind;
             JitModules = RuntimeInformation.GetJitModulesInfo();
@@ -98,8 +105,12 @@ namespace BenchmarkDotNet.Environments
                 yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}, VM={vmName}";
 
             yield return CpuInfoFormatter.Format(CpuInfo.Value);
+
             if (HardwareTimerKind != HardwareTimerKind.Unknown)
                 yield return $"Frequency={ChronometerFrequency}, Resolution={ChronometerResolution}, Timer={HardwareTimerKind.ToString().ToUpper()}";
+
+            if (MemoryInfo.Value != null)            
+                yield return MemoryInfoFormatter.Format(MemoryInfo.Value);            
 
             if (RuntimeInformation.IsNetCore && IsDotNetCliInstalled())
                 yield return $".NET Core SDK={DotNetSdkVersion.Value}";

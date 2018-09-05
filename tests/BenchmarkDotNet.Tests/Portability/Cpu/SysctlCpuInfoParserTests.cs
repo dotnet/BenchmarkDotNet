@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
         [Fact]
         public void RealOneProcessorFourCoresTest()
         {
-            string cpuInfo = TestHelper.ReadTestFile("SysctlRealOneProcessorFourCores.txt");
+            string cpuInfo = TestHelper.ReadTestFile("SysctlRealOneProcessorFourCores.txt", "Cpu");
             var parser = SysctlCpuInfoParser.ParseOutput(cpuInfo);
             Assert.Equal("Intel(R) Core(TM) i7-4770HQ CPU @ 2.20GHz", parser.ProcessorName);
             Assert.Equal(1, parser.PhysicalProcessorCount);

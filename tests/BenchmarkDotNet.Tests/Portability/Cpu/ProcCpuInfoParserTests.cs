@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
         [Fact]
         public void TwoProcessorWithDifferentCoresCountTest()
         {
-            string cpuInfo = TestHelper.ReadTestFile("ProcCpuInfoProcessorWithDifferentCoresCount.txt");
+            string cpuInfo = TestHelper.ReadTestFile("ProcCpuInfoProcessorWithDifferentCoresCount.txt", "Cpu");
             var parser = ProcCpuInfoParser.ParseOutput(cpuInfo);
             Assert.Equal("Unknown processor with 2 cores and hyper threading, Unknown processor with 4 cores", parser.ProcessorName);
             Assert.Equal(2, parser.PhysicalProcessorCount);
@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
         [Fact]
         public void RealOneProcessorTwoCoresTest()
         {
-            string cpuInfo = TestHelper.ReadTestFile("ProcCpuInfoRealOneProcessorTwoCores.txt");
+            string cpuInfo = TestHelper.ReadTestFile("ProcCpuInfoRealOneProcessorTwoCores.txt", "Cpu");
             var parser = ProcCpuInfoParser.ParseOutput(cpuInfo);
             Assert.Equal("Intel(R) Core(TM) i5-6200U CPU @ 2.30GHz", parser.ProcessorName);
             Assert.Equal(1, parser.PhysicalProcessorCount);
@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
         [Fact]
         public void RealOneProcessorFourCoresTest()
         {
-            string cpuInfo = TestHelper.ReadTestFile("ProcCpuInfoRealOneProcessorFourCores.txt");
+            string cpuInfo = TestHelper.ReadTestFile("ProcCpuInfoRealOneProcessorFourCores.txt", "Cpu");
             var parser = ProcCpuInfoParser.ParseOutput(cpuInfo);
             Assert.Equal("Intel(R) Core(TM) i7-4710MQ CPU @ 2.50GHz", parser.ProcessorName);
             Assert.Equal(1, parser.PhysicalProcessorCount);

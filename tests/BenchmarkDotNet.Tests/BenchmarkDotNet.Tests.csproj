@@ -39,5 +39,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Portability\Cpu\TestFiles\*.txt" />
+    <EmbeddedResource Include="Portability\Memory\TestFiles\*.txt" />
   </ItemGroup>
 </Project>
