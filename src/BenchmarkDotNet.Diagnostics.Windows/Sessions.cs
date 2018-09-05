@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             var counters = Details.Config
                 .GetHardwareCounters()
-                .Select(counter => HardwareCounters.FromCounter(counter, info => info.MaxInterval )) // for this diagnoser we want the biggest interval to have smallest overhead
+                .Select(counter => HardwareCounters.FromCounter(counter, info => Math.Min(info.MaxInterval, Math.Max(info.MinInterval, info.Interval))))
                 .ToArray();
 
             HardwareCounters.Enable(counters);
