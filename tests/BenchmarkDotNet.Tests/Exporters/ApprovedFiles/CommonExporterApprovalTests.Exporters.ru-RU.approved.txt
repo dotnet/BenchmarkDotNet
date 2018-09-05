@@ -5,7 +5,7 @@ AsciiDocExporter
 BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
-Total Memory=7,92 GB, Free Memory=2,75 GB
+Total Memory=7,92 GB, Available Memory=2,75 GB
   [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 
 Job=LongRun  IterationCount=100  LaunchCount=3  
@@ -38,7 +38,7 @@ HtmlExporter
 BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
-Total Memory=7,92 GB, Free Memory=2,75 GB
+Total Memory=7,92 GB, Available Memory=2,75 GB
   [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 </code></pre>
 <pre><code>Job=LongRun  IterationCount=100  LaunchCount=3  
@@ -362,7 +362,7 @@ MarkdownExporter-default
 BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
-Total Memory=7,92 GB, Free Memory=2,75 GB
+Total Memory=7,92 GB, Available Memory=2,75 GB
   [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 
 Job=LongRun  IterationCount=100  LaunchCount=3  
@@ -380,7 +380,7 @@ MarkdownExporter-atlassian
 BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
-Total Memory=7,92 GB, Free Memory=2,75 GB
+Total Memory=7,92 GB, Available Memory=2,75 GB
   [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 
 Job=LongRun  IterationCount=100  LaunchCount=3  
@@ -397,7 +397,7 @@ MarkdownExporter-console
 BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
-Total Memory=7,92 GB, Free Memory=2,75 GB
+Total Memory=7,92 GB, Available Memory=2,75 GB
   [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 
 Job=LongRun  IterationCount=100  LaunchCount=3  
@@ -415,7 +415,7 @@ MarkdownExporter-github
 BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
-Total Memory=7,92 GB, Free Memory=2,75 GB
+Total Memory=7,92 GB, Available Memory=2,75 GB
   [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 
 Job=LongRun  IterationCount=100  LaunchCount=3  
@@ -433,7 +433,7 @@ MarkdownExporter-stackoverflow
     BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
     MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
     Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
-    Total Memory=7,92 GB, Free Memory=2,75 GB
+    Total Memory=7,92 GB, Available Memory=2,75 GB
       [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 
     Job=LongRun  IterationCount=100  LaunchCount=3  
