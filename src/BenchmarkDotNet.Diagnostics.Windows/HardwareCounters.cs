@@ -70,16 +70,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         internal static void Enable(IEnumerable<PreciseMachineCounter> counters)
         {
-            try
-            {
-                TraceEventProfileSources.Set( // it's a must have to get the events enabled!!
-                    counters.Select(counter => counter.ProfileSourceId).ToArray(),
-                    counters.Select(counter => counter.Interval).ToArray());
-            }
-            catch (System.Runtime.InteropServices.COMException ex) when (ex.Message.StartsWith("The WMI data block or event notification has already been enabled"))
-            {
-                // previous run was interrupted by ctrl+c and never stopped
-            }
+            TraceEventProfileSources.Set( // it's a must have to get the events enabled!!
+                counters.Select(counter => counter.ProfileSourceId).ToArray(),
+                counters.Select(counter => counter.Interval).ToArray());
         }
     }
 }
