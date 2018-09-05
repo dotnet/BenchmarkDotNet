@@ -41,29 +41,12 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {
-            if (signal == HostSignal.SeparateLogic)
-                return; // ignore it
-            
             if (signal == HostSignal.BeforeAnythingElse)
-            {
-                userSession = new UserSession(parameters, bufferSizeInMb).EnableProviders();
-                kernelSession = new KernelSession(parameters, bufferSizeInMb).EnableProviders();
-            }
-            
-            if (signal == HostSignal.AfterActualRun)
-            {
-                kernelSession.Stop();
-                userSession.Stop();
-                
-                var mergedTraceFilePath = userSession.MergeFiles(kernelSession);
-
-                benchmarkToEtlFile[parameters.BenchmarkCase] = mergedTraceFilePath;
-                
-                kernelSession.Dispose();
-                userSession.Dispose();
-            }
+                Start(parameters);
+            else if (signal == HostSignal.AfterActualRun)
+                Stop(parameters);
         }
-        
+
         public void ProcessResults(DiagnoserResults results) { }
 
         public void DisplayResults(ILogger logger)
@@ -77,5 +60,27 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
             => HardwareCounters.Validate(validationParameters, mandatory: false);
+
+        private void Start(DiagnoserActionParameters parameters)
+        {
+            userSession = new UserSession(parameters, bufferSizeInMb).EnableProviders();
+            kernelSession = new KernelSession(parameters, bufferSizeInMb).EnableProviders();
+        }
+
+        private void Stop(DiagnoserActionParameters parameters)
+        {
+            try
+            {
+                kernelSession.Stop();
+                userSession.Stop();
+
+                benchmarkToEtlFile[parameters.BenchmarkCase] = userSession.MergeFiles(kernelSession);
+            }
+            finally
+            {
+                kernelSession.Dispose();
+                userSession.Dispose();
+            }
+        }
     }
 }
