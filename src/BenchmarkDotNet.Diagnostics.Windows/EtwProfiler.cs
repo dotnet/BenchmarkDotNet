@@ -36,8 +36,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
         
         public IColumnProvider GetColumnProvider() => EmptyColumnProvider.Instance;
-        
+
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => runMode;
+
+        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+            => HardwareCounters.Validate(validationParameters, mandatory: false);
 
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {
@@ -58,11 +61,16 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             logger.WriteLineInfo(benchmarkToEtlFile.Values.First());
         }
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
-            => HardwareCounters.Validate(validationParameters, mandatory: false);
-
         private void Start(DiagnoserActionParameters parameters)
         {
+            var counters = parameters.Config
+                .GetHardwareCounters()
+                .Select(counter => HardwareCounters.FromCounter(counter, info => Math.Min(info.MaxInterval, Math.Max(info.MinInterval, info.Interval))))
+                .ToArray();
+
+            if (counters.Any()) // we need to enable the counters before starting the kernel session
+                HardwareCounters.Enable(counters);
+            
             userSession = new UserSession(parameters, bufferSizeInMb).EnableProviders();
             kernelSession = new KernelSession(parameters, bufferSizeInMb).EnableProviders();
         }

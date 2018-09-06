@@ -47,21 +47,12 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         internal override Session EnableProviders()
         {
-            if (!Details.Config.GetHardwareCounters().Any())
-            {
-                TraceEventSession.EnableKernelProvider(KernelTraceEventParser.Keywords.Profile); // enable CPU stacks only
+            var keywords = KernelTraceEventParser.Keywords.Profile; // CPU stacks
+
+            if (Details.Config.GetHardwareCounters().Any())
+                keywords |= KernelTraceEventParser.Keywords.PMCProfile; // Precise Machine Counters
                 
-                return this;
-            }
-
-            TraceEventSession.EnableKernelProvider(KernelTraceEventParser.Keywords.PMCProfile | KernelTraceEventParser.Keywords.Profile); // enable PMCs and CPU stacks
-
-            var counters = Details.Config
-                .GetHardwareCounters()
-                .Select(counter => HardwareCounters.FromCounter(counter, info => Math.Min(info.MaxInterval, Math.Max(info.MinInterval, info.Interval))))
-                .ToArray();
-
-            HardwareCounters.Enable(counters);
+            TraceEventSession.EnableKernelProvider(keywords);
 
             return this;
         }
