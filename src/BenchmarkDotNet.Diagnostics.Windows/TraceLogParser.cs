@@ -12,18 +12,19 @@ namespace BenchmarkDotNet.Diagnostics.Windows
     public class TraceLogParser
     {
         private readonly Dictionary<int, ProcessMetrics> processIdToData = new Dictionary<int, ProcessMetrics>();
+        private readonly Dictionary<int, int> profileSourceIdToInterval = new Dictionary<int, int>();
         
-        public static void Parse(string etlFilePath)
+        public static ImmutableArray<Metric> Parse(string etlFilePath)
         {
             using (var traceLog = new TraceLog(TraceLog.CreateFromEventTraceLogFile(etlFilePath)))
             {
                 var traceLogEventSource = traceLog.Events.GetSource();
                 
-                new TraceLogParser().Parse(traceLogEventSource);
+                return new TraceLogParser().Parse(traceLogEventSource);
             }
         }
 
-        private void Parse(TraceLogEventSource traceLogEventSource)
+        private ImmutableArray<Metric> Parse(TraceLogEventSource traceLogEventSource)
         {
             var bdnEventsParser = new EngineEventLogParser(traceLogEventSource);
             var kernelEventsParser = new KernelTraceEventParser(traceLogEventSource);
@@ -35,6 +36,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             kernelEventsParser.PerfInfoPMCSample += OnPmcEvent;
 
             traceLogEventSource.Process();
+
+            return processIdToData.Values.Single(x => x.HasBenchmarkEvents).CalculateMetrics(profileSourceIdToInterval);
         }
 
         private void HandleIterationEvent(IterationEvent data)
@@ -52,11 +55,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private void OnPmcIntervalChange(SampledProfileIntervalTraceData data)
         {
-            // if given process did not emit Benchmarking events before, we don't care about it
-            if (!processIdToData.ContainsKey(data.ProcessID))
-                return;
-            
-            processIdToData[data.ProcessID].HandleSamplingIntervalChange(data.SampleSource, data.NewInterval);
+            if (profileSourceIdToInterval.TryGetValue(data.SampleSource, out int storedInterval) && storedInterval != data.NewInterval)
+                throw new NotSupportedException("Sampling interval change is not supported!");
+
+            profileSourceIdToInterval[data.SampleSource] = data.NewInterval;
         }
 
         private void OnPmcEvent(PMCCounterProfTraceData data)
@@ -73,8 +75,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
     {
         private readonly List<double> overheadTimestamps = new List<double>(20);
         private readonly List<double> workloadTimestamps = new List<double>(20);
-        private readonly Dictionary<int, int> profileSourceIdToInterval = new Dictionary<int, int>();
+        
         private readonly List<(double timeStamp, ulong instructionPointer, int profileSource)> samples = new List<(double timeStamp, ulong instructionPointer, int profileSource)>();
+
+        public bool HasBenchmarkEvents => overheadTimestamps.Any() || workloadTimestamps.Any();
 
         public void HandleIterationEvent(double timeStamp, IterationMode iterationMode)
         {
@@ -84,18 +88,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 overheadTimestamps.Add(timeStamp);
         }
 
-        public void HandleSamplingIntervalChange(int profileSourceId, int newInterval)
-        { 
-            if (profileSourceIdToInterval.TryGetValue(profileSourceId, out int storedInterval) && storedInterval != newInterval)
-                throw new NotSupportedException("Sampling interval change is not supported!");
-
-            profileSourceIdToInterval[profileSourceId] = newInterval;
-        }
-
         public void HandleNewSample(double timeStamp, ulong instructionPointer, int profileSourceId)
             => samples.Add((timeStamp, instructionPointer, profileSourceId));
 
-        public ImmutableArray<Metric> CalculateMetrics()
+        public ImmutableArray<Metric> CalculateMetrics(Dictionary<int, int> profileSourceIdToInterval)
         {
             if (overheadTimestamps.Count % 2 != 0)
                 throw new InvalidOperationException("One overhead iteration stop event is missing, unable to calculate stats");
@@ -157,9 +153,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
     public class IterationData
     {
-        public double StartTimestamp { get; }
-        public double StopTimestamp { get; }
         public Dictionary<int, ulong> ProfileSourceIdToCount { get; }
+        private double StartTimestamp { get; }
+        private double StopTimestamp { get; }
 
         public IterationData(double startTimestamp, double stopTimestamp)
         {
