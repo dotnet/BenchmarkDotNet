@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
@@ -44,11 +45,13 @@ namespace BenchmarkDotNet.Helpers
             => Escape(new StringBuilder(type.GetCorrectCSharpTypeName(includeNamespace, includeGenericArgumentsNamespace)));
         
         private static string Escape(StringBuilder builder)
-            => builder
-                .Replace('<', '_')
-                .Replace('>', '_')
-                .Replace('[', '_')
-                .Replace(']', '_')
-                .ToString();
+        {
+            foreach (char invalidPathChar in Path.GetInvalidFileNameChars())
+            {
+                builder.Replace(invalidPathChar, '_');
+            }
+
+            return builder.ToString();
+        }
     }
 }
