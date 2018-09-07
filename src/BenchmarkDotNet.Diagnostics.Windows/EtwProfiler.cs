@@ -38,8 +38,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         
         public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
         
-        public IColumnProvider GetColumnProvider() => EmptyColumnProvider.Instance;
-
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => runMode;
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)

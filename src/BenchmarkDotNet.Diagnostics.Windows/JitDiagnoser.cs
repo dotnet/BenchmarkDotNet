@@ -17,7 +17,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         protected override string SessionNamePrefix => "JitTracing";
 
         public abstract IEnumerable<string> Ids { get; }
-        public IColumnProvider GetColumnProvider() => EmptyColumnProvider.Instance;
 
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {

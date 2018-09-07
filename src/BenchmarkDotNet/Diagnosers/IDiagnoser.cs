@@ -19,8 +19,6 @@ namespace BenchmarkDotNet.Diagnosers
 
         IEnumerable<IAnalyser> Analysers { get; }
 
-        IColumnProvider GetColumnProvider();
-
         RunMode GetRunMode(BenchmarkCase benchmarkCase);
 
         void Handle(HostSignal signal, DiagnoserActionParameters parameters);

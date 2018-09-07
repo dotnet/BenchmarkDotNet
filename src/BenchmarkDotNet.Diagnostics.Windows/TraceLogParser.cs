@@ -122,9 +122,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             var overheadTotalPerCounter = Sum(overheadIterations);
 
             return workloadTotalPerCounter.Select(perCounter =>
-                new Metric(
-                    $"{counters.Single(counter => counter.ProfileSourceId == perCounter.Key).Name}/Op",
-                    (perCounter.Value / (double)workloadIterations.Length - overheadTotalPerCounter[perCounter.Key] / (double)overheadIterations.Length) / totalOperationsPerIteration.Value)); // result = (avg(workload) - avg(overhead))/op
+            {
+                var pmc = counters.Single(counter => counter.ProfileSourceId == perCounter.Key);
+                double result = (perCounter.Value / (double) workloadIterations.Length - overheadTotalPerCounter[perCounter.Key] / (double) overheadIterations.Length) 
+                                    / totalOperationsPerIteration.Value; // result = (avg(workload) - avg(overhead))/op
+
+                return new Metric($"{pmc.Name}/Op", result, $"Hardware counter '{pmc.Name}' per operation");
+            }); 
         }
 
         private IterationData[] CreateIterationData(List<double> startStopTimeStamps)

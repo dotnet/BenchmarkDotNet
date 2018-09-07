@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Reports
 
         [PublicAPI] public GenerateResult GenerateResult { get; }
         [PublicAPI] public BuildResult BuildResult { get; }
-        [PublicAPI] public IReadOnlyList<Metric> Metrics { get; }
+        [PublicAPI] public IReadOnlyDictionary<string, Metric> Metrics { get; }
 
         [NotNull]
         public IReadOnlyList<ExecuteResult> ExecuteResults { get; }
@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Reports
             ExecuteResults = executeResults ?? Array.Empty<ExecuteResult>();
             AllMeasurements = allMeasurements ?? Array.Empty<Measurement>();
             GcStats = gcStats;
-            Metrics = metrics;
+            Metrics = metrics.ToDictionary(metric => metric.UniqueName);
         }
 
         public override string ToString() => $"{BenchmarkCase.DisplayInfo}, {AllMeasurements.Count} runs";

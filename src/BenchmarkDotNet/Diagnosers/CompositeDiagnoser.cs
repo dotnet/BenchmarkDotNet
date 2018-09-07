@@ -29,9 +29,6 @@ namespace BenchmarkDotNet.Diagnosers
         public IEnumerable<IAnalyser> Analysers
             => diagnosers.SelectMany(diagnoser => diagnoser.Analysers);
 
-        public IColumnProvider GetColumnProvider() 
-            => new CompositeColumnProvider(diagnosers.Select(d => d.GetColumnProvider()).ToArray());
-
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
             => diagnosers.ForEach(diagnoser => diagnoser.Handle(signal, parameters));
 

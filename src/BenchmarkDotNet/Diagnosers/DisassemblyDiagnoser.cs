@@ -51,7 +51,6 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<IAnalyser> Analysers => new IAnalyser[] { new DisassemblyAnalyzer(Results) };
 
-        public IColumnProvider GetColumnProvider() => EmptyColumnProvider.Instance;
         public IEnumerable<Metric> ProcessResults(DiagnoserResults _) => Array.Empty<Metric>();
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase)
