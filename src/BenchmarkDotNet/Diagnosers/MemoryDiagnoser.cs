@@ -43,10 +43,17 @@ namespace BenchmarkDotNet.Diagnosers
 
         public void DisplayResults(ILogger logger) { }
 
-        public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.NoOverhead; 
+        public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.NoOverhead;
 
-        public void ProcessResults(DiagnoserResults diagnoserResults) 
-            => results.Add(diagnoserResults.BenchmarkCase, diagnoserResults.GcStats);
+        public IEnumerable<Metric> ProcessResults(DiagnoserResults diagnoserResults)
+        {
+            results.Add(diagnoserResults.BenchmarkCase, diagnoserResults.GcStats);
+            
+            yield return new Metric("Gen 0/1k Op", diagnoserResults.GcStats.Gen0Collections / (double)diagnoserResults.GcStats.TotalOperations * 1000);
+            yield return new Metric("Gen 1/1k Op", diagnoserResults.GcStats.Gen1Collections / (double)diagnoserResults.GcStats.TotalOperations * 1000);
+            yield return new Metric("Gen 2/1k Op", diagnoserResults.GcStats.Gen2Collections / (double)diagnoserResults.GcStats.TotalOperations * 1000);
+            yield return new Metric("Allocated Memory/Op", diagnoserResults.GcStats.BytesAllocatedPerOperation, SizeUnit.B.Name);
+        }
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) 
             => Array.Empty<ValidationError>();

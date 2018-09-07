@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using BenchmarkDotNet.Diagnostics.Windows;
 using BenchmarkDotNet.Engines;
 using Xunit;
@@ -8,26 +9,13 @@ namespace BenchmarkDotNet.IntegrationTests.Diagnosers
     public class ProcessMetricsTests
     {
         [Fact]
-        public void SamplingIntervalChangeIsNotSupported()
-        {
-            const int profileSourceId = 123; 
-            
-            var sut = new ProcessMetrics();
-            
-            sut.HandleSamplingIntervalChange(profileSourceId, newInterval: 200);
-            sut.HandleSamplingIntervalChange(profileSourceId, newInterval: 200); // it's fine, there is no real change
-
-            Assert.Throws<NotSupportedException>(() => sut.HandleSamplingIntervalChange(profileSourceId, newInterval: 9999));
-        }
-        
-        [Fact]
         public void TheNumberOfStopEventsMustBeEqualToStartEvents()
         {
             var sut = new ProcessMetrics();
             
             sut.HandleIterationEvent(0, IterationMode.Overhead); // start but no stop later on
 
-            Assert.Throws<InvalidOperationException>(() => sut.CalculateMetrics());
+            Assert.Throws<InvalidOperationException>(() => sut.CalculateMetrics(null));
         }
 
         [Fact]
@@ -39,8 +27,6 @@ namespace BenchmarkDotNet.IntegrationTests.Diagnosers
             
             var sut = new ProcessMetrics();
             
-            sut.HandleSamplingIntervalChange(profileSourceId, interval);
-
             for (int i = 0; i < 20; i++)
             {
                 sut.HandleIterationEvent(i, IterationMode.Overhead); // Overhead iteration start at i
@@ -62,11 +48,11 @@ namespace BenchmarkDotNet.IntegrationTests.Diagnosers
                 sut.HandleIterationEvent(i + 0.5, IterationMode.Workload); // Workload iteration stop at i + 0.5
             }
 
-            var metrics = sut.CalculateMetrics();
+            var metrics = sut.CalculateMetrics(new Dictionary<int, int> { {profileSourceId, interval }});
 
             const ulong expected = 4 * interval - interval; // every workload was 4 events, the overhead was one
             
-            Assert.All(metrics, metric => Assert.Equal(expected, metric.Count));
+            Assert.All(metrics, metric => Assert.Equal(expected, metric.Value));
         }
     }
 }

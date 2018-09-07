@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Reports;
 using Microsoft.Diagnostics.Tracing.Etlx;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
@@ -37,7 +38,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             traceLogEventSource.Process();
 
-            return processIdToData.Values.Single(x => x.HasBenchmarkEvents).CalculateMetrics(profileSourceIdToInterval);
+            var benchmarkedProcessData = processIdToData.Values.Single(x => x.HasBenchmarkEvents);
+            
+            return benchmarkedProcessData.CalculateMetrics(profileSourceIdToInterval);
         }
 
         private void HandleIterationEvent(IterationEvent data)
@@ -130,9 +133,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 }
             }
 
-            return workloadIterations.SelectMany(iteration =>
-                    iteration.ProfileSourceIdToCount.Select(counterData =>
-                        new Metric(counterData.Key, counterData.Value - (overheadTotalPerCounter[counterData.Key] / (ulong) overheadIterations.Length)))) // result = workload - avg(overhead)
+            var overheadAveragePerCounter = overheadTotalPerCounter.ToDictionary(item => item.Key, item => item.Value / (ulong)overheadIterations.Length);
+
+            return workloadIterations.SelectMany(iteration => iteration.ProfileSourceIdToCount
+                    .Select(counterData => CreateMetric(counterData.Key, counterData.Value - overheadAveragePerCounter[counterData.Key]))) // result = workload - avg(overhead)
                     .ToImmutableArray();
         }
 
@@ -148,6 +152,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             }
 
             return iterations;
+        }
+
+        private Metric CreateMetric(int counterDataKey, ulong @ulong)
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -176,19 +185,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             }
 
             return true;
-        }
-    }
-
-    public struct Metric
-    {
-        public int ProfileSourceId { get; }
-
-        public ulong Count { get; }
-
-        public Metric(int profileSourceId, ulong count)
-        {
-            ProfileSourceId = profileSourceId;
-            Count = count;
         }
     }
 }

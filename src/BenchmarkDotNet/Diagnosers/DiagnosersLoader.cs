@@ -72,7 +72,8 @@ namespace BenchmarkDotNet.Diagnosers
                         MemoryDiagnoser.Default,
                         DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig()),
                         CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.InliningDiagnoser"),
-                        CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.PmcDiagnoser")
+                        CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.PmcDiagnoser"),
+                        CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.EtwProfiler"),
                     };
                 }
             }

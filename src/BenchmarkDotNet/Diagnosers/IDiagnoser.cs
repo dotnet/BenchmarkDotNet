@@ -4,6 +4,7 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
@@ -24,7 +25,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         void Handle(HostSignal signal, DiagnoserActionParameters parameters);
 
-        void ProcessResults(DiagnoserResults results);
+        IEnumerable<Metric> ProcessResults(DiagnoserResults results);
 
         void DisplayResults(ILogger logger);
 

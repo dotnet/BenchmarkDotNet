@@ -60,5 +60,29 @@ namespace BenchmarkDotNet.Diagnosers
                     throw new NotSupportedException($"{hardwareCounter} has no short name mapping");
             }
         }
+
+        public static bool TheGreaterTheBetter(this HardwareCounter hardwareCounter)
+        {
+            // this method could be just a return false as of today but we want to make sure that when we add new counter it's added here on purpose!
+            switch (hardwareCounter)
+            {
+                case HardwareCounter.Timer:
+                case HardwareCounter.TotalIssues:
+                case HardwareCounter.BranchInstructions:
+                case HardwareCounter.CacheMisses:
+                case HardwareCounter.BranchMispredictions:
+                case HardwareCounter.TotalCycles:
+                case HardwareCounter.UnhaltedCoreCycles:
+                case HardwareCounter.InstructionRetired:
+                case HardwareCounter.UnhaltedReferenceCycles:
+                case HardwareCounter.LlcReference:
+                case HardwareCounter.LlcMisses:
+                case HardwareCounter.BranchInstructionRetired:
+                case HardwareCounter.BranchMispredictsRetired:
+                    return false;
+                default:
+                    throw new NotSupportedException($"{hardwareCounter} has no TheGreaterTheBetter mapping");
+            }
+        }
     }
 }

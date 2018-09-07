@@ -7,6 +7,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 
@@ -50,7 +51,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 Stop(parameters);
         }
 
-        public void ProcessResults(DiagnoserResults results) { }
+        public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
+        {
+            if (!benchmarkToEtlFile.TryGetValue(results.BenchmarkCase, out var traceFilePath))
+                return Array.Empty<Metric>();
+
+            return TraceLogParser.Parse(traceFilePath);
+        }
 
         public void DisplayResults(ILogger logger)
         {

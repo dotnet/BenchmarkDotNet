@@ -6,6 +6,7 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 
@@ -24,7 +25,7 @@ namespace BenchmarkDotNet.Diagnosers
         public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
         public IColumnProvider GetColumnProvider() => EmptyColumnProvider.Instance;
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
-        public void ProcessResults(DiagnoserResults results) { }
+        public IEnumerable<Metric> ProcessResults(DiagnoserResults _) => Array.Empty<Metric>();
 
         public void DisplayResults(ILogger logger) => logger.WriteLineError(GetErrorMessage());
 

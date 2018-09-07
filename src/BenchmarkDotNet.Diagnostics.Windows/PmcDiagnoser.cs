@@ -41,12 +41,15 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 Stop();
         }
 
-        public void ProcessResults(DiagnoserResults results)
+        public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
         {
             var processId = BenchmarkToProcess[results.BenchmarkCase];
             var stats = StatsPerProcess[processId];
             stats.TotalOperations = results.TotalOperations;
             this.results.Add(results.BenchmarkCase, stats);
+
+            foreach (var pmc in stats.Counters.Values)
+                yield return new Metric($"{pmc.Name}/Op", (double)pmc.Count / results.TotalOperations, theGreaterTheBetter: pmc.Counter.TheGreaterTheBetter());
         }
 
         public void DisplayResults(ILogger logger) { }
