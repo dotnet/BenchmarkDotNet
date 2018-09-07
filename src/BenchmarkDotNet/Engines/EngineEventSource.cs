@@ -19,20 +19,20 @@ namespace BenchmarkDotNet.Engines
         internal static readonly EngineEventSource Log = new EngineEventSource();
 
         [Event(IterationStartEventId, Level = EventLevel.Informational, Task = IterationTask, Opcode = EventOpcode.Start)]
-        internal void IterationStart(string jobId, string benchmarkName, IterationMode mode, IterationStage stage)
-            => WriteEngineEvent(IterationStartEventId, jobId, benchmarkName, mode, stage);
+        internal void IterationStart(string jobId, string benchmarkName, IterationMode mode, IterationStage stage, long totalOperations)
+            => WriteEngineEvent(IterationStartEventId, jobId, benchmarkName, mode, stage, totalOperations);
         
         [Event(IterationStopEventId, Level = EventLevel.Informational, Task = IterationTask, Opcode = EventOpcode.Stop)]
-        internal void IterationStop(string jobId, string benchmarkName, IterationMode mode, IterationStage stage)
-            => WriteEngineEvent(IterationStopEventId, jobId, benchmarkName, mode, stage);
+        internal void IterationStop(string jobId, string benchmarkName, IterationMode mode, IterationStage stage, long totalOperations)
+            => WriteEngineEvent(IterationStopEventId, jobId, benchmarkName, mode, stage, totalOperations);
 
         [NonEvent]
-        private unsafe void WriteEngineEvent(int eventId, string jobId, string benchmarkId, IterationMode mode, IterationStage stage)
+        private unsafe void WriteEngineEvent(int eventId, string jobId, string benchmarkId, IterationMode mode, IterationStage stage, long totalOperations)
         {
             fixed (char* jobIdPointer = jobId)
             fixed (char* benchmarkIdPointer = benchmarkId)
             {
-                EventData* payload = stackalloc EventData[4];
+                EventData* payload = stackalloc EventData[5];
                 
                 payload[0].Size = (jobId.Length + 1) * sizeof(char);
                 payload[0].DataPointer = (IntPtr) jobIdPointer;
@@ -46,7 +46,10 @@ namespace BenchmarkDotNet.Engines
                 payload[3].Size = sizeof(int);
                 payload[3].DataPointer = (IntPtr) (&stage);
                 
-                WriteEventCore(eventId, 4, payload);
+                payload[4].Size = sizeof(long);
+                payload[4].DataPointer = (IntPtr) (&totalOperations);
+                
+                WriteEventCore(eventId, 5, payload);
             }
         }
     }

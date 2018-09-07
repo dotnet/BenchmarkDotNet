@@ -135,7 +135,7 @@ namespace BenchmarkDotNet.Engines
             GcCollect();
 
             if (EngineEventSource.Log.IsEnabled())
-                EngineEventSource.Log.IterationStart(TargetJob.Id, BenchmarkName, data.IterationMode, data.IterationStage);
+                EngineEventSource.Log.IterationStart(TargetJob.Id, BenchmarkName, data.IterationMode, data.IterationStage, totalOperations);
 
             // Measure
             var clock = Clock.Start();
@@ -143,7 +143,7 @@ namespace BenchmarkDotNet.Engines
             var clockSpan = clock.GetElapsed();
 
             if (EngineEventSource.Log.IsEnabled())
-                EngineEventSource.Log.IterationStop(TargetJob.Id, BenchmarkName, data.IterationMode, data.IterationStage);
+                EngineEventSource.Log.IterationStop(TargetJob.Id, BenchmarkName, data.IterationMode, data.IterationStage, totalOperations);
 
             if(!isOverhead)
                 IterationCleanupAction();

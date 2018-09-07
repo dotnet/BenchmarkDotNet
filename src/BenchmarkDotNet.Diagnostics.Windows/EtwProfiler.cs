@@ -18,6 +18,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         private readonly RunMode runMode;
         private readonly int bufferSizeInMb;
         private readonly Dictionary<BenchmarkCase, string> benchmarkToEtlFile;
+        private readonly Dictionary<BenchmarkCase, PreciseMachineCounter[]> benchmarkToCounters;
 
         private Session kernelSession, userSession;
 
@@ -28,6 +29,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             runMode = performExtraBenchmarksRun ? RunMode.ExtraRun : RunMode.NoOverhead;
             this.bufferSizeInMb = bufferSizeInMb;
             benchmarkToEtlFile = new Dictionary<BenchmarkCase, string>();
+            benchmarkToCounters = new Dictionary<BenchmarkCase, PreciseMachineCounter[]>();
         }
 
         public IEnumerable<string> Ids => new [] { nameof(EtwProfiler) };
@@ -56,7 +58,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             if (!benchmarkToEtlFile.TryGetValue(results.BenchmarkCase, out var traceFilePath))
                 return Array.Empty<Metric>();
 
-            return TraceLogParser.Parse(traceFilePath);
+            return TraceLogParser.Parse(traceFilePath, benchmarkToCounters[results.BenchmarkCase]);
         }
 
         public void DisplayResults(ILogger logger)
@@ -70,7 +72,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private void Start(DiagnoserActionParameters parameters)
         {
-            var counters = parameters.Config
+            var counters = benchmarkToCounters[parameters.BenchmarkCase] = parameters.Config
                 .GetHardwareCounters()
                 .Select(counter => HardwareCounters.FromCounter(counter, info => Math.Min(info.MaxInterval, Math.Max(info.MinInterval, info.Interval))))
                 .ToArray();

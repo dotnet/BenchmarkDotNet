@@ -8,10 +8,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 {
     public sealed class IterationEvent : TraceEvent
     {
-        public string JobId { get { return GetUnicodeStringAt(0); } }
-        public string BenchmarkName { get { return GetUnicodeStringAt(SkipUnicodeString(0)); } }
-        public IterationMode IterationMode { get { return (IterationMode)GetInt32At(SkipUnicodeString(SkipUnicodeString(0))); } }
-        public IterationStage IterationStage { get { return (IterationStage)GetInt32At(SkipUnicodeString(SkipUnicodeString(0)) + sizeof(int)); } }
+        public string JobId { get => GetUnicodeStringAt(0); }
+        public string BenchmarkName { get => GetUnicodeStringAt(SkipUnicodeString(0)); }
+        public IterationMode IterationMode { get => (IterationMode)GetInt32At(SkipUnicodeString(SkipUnicodeString(0))); }
+        public IterationStage IterationStage { get => (IterationStage)GetInt32At(SkipUnicodeString(SkipUnicodeString(0)) + sizeof(int)); }
+        public long TotalOperations { get => GetInt64At(SkipUnicodeString(SkipUnicodeString(0)) + 2 * sizeof(int)); }
         
         private event Action<IterationEvent> target;
 
@@ -29,7 +30,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public override string[] PayloadNames
         {
-            get => payloadNames ?? (payloadNames = new[] { nameof(JobId), nameof(BenchmarkName), nameof(IterationMode), nameof(IterationStage) });
+            get => payloadNames ?? (payloadNames = new[] { nameof(JobId), nameof(BenchmarkName), nameof(IterationMode), nameof(IterationStage), nameof(TotalOperations) });
         }
 
         public override StringBuilder ToXml(StringBuilder sb)
@@ -39,6 +40,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             XmlAttrib(sb, nameof(BenchmarkName), BenchmarkName);
             XmlAttrib(sb, nameof(IterationMode), IterationMode);
             XmlAttrib(sb, nameof(IterationStage), IterationStage);
+            XmlAttrib(sb, nameof(TotalOperations), TotalOperations);
             sb.Append("/>");
             
             return sb;
@@ -56,6 +58,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     return IterationMode;
                 case 3:
                     return IterationStage;
+                case 4:
+                    return TotalOperations;
                 default:
                     Debug.Assert(false, "Bad field index");
                     return null;

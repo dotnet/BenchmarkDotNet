@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Reports;
 using Microsoft.Diagnostics.Tracing.Etlx;
@@ -15,17 +15,17 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         private readonly Dictionary<int, ProcessMetrics> processIdToData = new Dictionary<int, ProcessMetrics>();
         private readonly Dictionary<int, int> profileSourceIdToInterval = new Dictionary<int, int>();
         
-        public static ImmutableArray<Metric> Parse(string etlFilePath)
+        public static IEnumerable<Metric> Parse(string etlFilePath, PreciseMachineCounter[] counters)
         {
             using (var traceLog = new TraceLog(TraceLog.CreateFromEventTraceLogFile(etlFilePath)))
             {
                 var traceLogEventSource = traceLog.Events.GetSource();
                 
-                return new TraceLogParser().Parse(traceLogEventSource);
+                return new TraceLogParser().Parse(traceLogEventSource, counters);
             }
         }
 
-        private ImmutableArray<Metric> Parse(TraceLogEventSource traceLogEventSource)
+        private IEnumerable<Metric> Parse(TraceLogEventSource traceLogEventSource, PreciseMachineCounter[] counters)
         {
             var bdnEventsParser = new EngineEventLogParser(traceLogEventSource);
             var kernelEventsParser = new KernelTraceEventParser(traceLogEventSource);
@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             var benchmarkedProcessData = processIdToData.Values.Single(x => x.HasBenchmarkEvents);
             
-            return benchmarkedProcessData.CalculateMetrics(profileSourceIdToInterval);
+            return benchmarkedProcessData.CalculateMetrics(profileSourceIdToInterval, counters);
         }
 
         private void HandleIterationEvent(IterationEvent data)
@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             if (!processIdToData.ContainsKey(data.ProcessID))
                 processIdToData.Add(data.ProcessID, new ProcessMetrics());
 
-            processIdToData[data.ProcessID].HandleIterationEvent(data.TimeStampRelativeMSec, data.IterationMode);
+            processIdToData[data.ProcessID].HandleIterationEvent(data.TimeStampRelativeMSec, data.IterationMode, data.TotalOperations);
         }
 
         private void OnPmcIntervalChange(SampledProfileIntervalTraceData data)
@@ -78,69 +78,56 @@ namespace BenchmarkDotNet.Diagnostics.Windows
     {
         private readonly List<double> overheadTimestamps = new List<double>(20);
         private readonly List<double> workloadTimestamps = new List<double>(20);
+        private long? totalOperationsPerIteration;
         
         private readonly List<(double timeStamp, ulong instructionPointer, int profileSource)> samples = new List<(double timeStamp, ulong instructionPointer, int profileSource)>();
 
         public bool HasBenchmarkEvents => overheadTimestamps.Any() || workloadTimestamps.Any();
 
-        public void HandleIterationEvent(double timeStamp, IterationMode iterationMode)
+        public void HandleIterationEvent(double timeStamp, IterationMode iterationMode, long totalOperations)
         {
-            if (iterationMode == IterationMode.Workload)
-                workloadTimestamps.Add(timeStamp);
-            else if (iterationMode == IterationMode.Overhead)
+            if (iterationMode == IterationMode.Overhead)
+            {
                 overheadTimestamps.Add(timeStamp);
+            }
+            else if (iterationMode == IterationMode.Workload)
+            {
+                if (!totalOperationsPerIteration.HasValue)
+                    totalOperationsPerIteration = totalOperations;
+                else if (totalOperationsPerIteration.Value != totalOperations)
+                    throw new InvalidOperationException($"TotalOperations count can't change during the benchmark run! Invalid trace!");
+
+                workloadTimestamps.Add(timeStamp);
+            }
         }
 
         public void HandleNewSample(double timeStamp, ulong instructionPointer, int profileSourceId)
             => samples.Add((timeStamp, instructionPointer, profileSourceId));
 
-        public ImmutableArray<Metric> CalculateMetrics(Dictionary<int, int> profileSourceIdToInterval)
+        public IEnumerable<Metric> CalculateMetrics(Dictionary<int, int> profileSourceIdToInterval, PreciseMachineCounter[] counters)
         {
             if (overheadTimestamps.Count % 2 != 0)
                 throw new InvalidOperationException("One overhead iteration stop event is missing, unable to calculate stats");
             if (workloadTimestamps.Count % 2 != 0)
                 throw new InvalidOperationException("One workload iteration stop event is missing, unable to calculate stats");
+            if (!totalOperationsPerIteration.HasValue)
+                throw new InvalidOperationException("TotalOperations is missing, unable to calculate stats");
 
-            var overheadIterations = ToIterationData(overheadTimestamps);
-            var workloadIterations = ToIterationData(workloadTimestamps);
+            var overheadIterations = CreateIterationData(overheadTimestamps);
+            var workloadIterations = CreateIterationData(workloadTimestamps);
 
-            foreach (var sample in samples)
-            {
-                var interval = profileSourceIdToInterval[sample.profileSource];
+            SumCountersPerIterations(profileSourceIdToInterval, workloadIterations, overheadIterations);
 
-                foreach (var workloadIteration in workloadIterations)
-                    if (workloadIteration.TryHandle(sample.timeStamp, sample.profileSource, interval))
-                        goto next;
-                
-                foreach (var overheadIteration in overheadIterations)
-                    if (overheadIteration.TryHandle(sample.timeStamp, sample.profileSource, interval))
-                        goto next;
+            var workloadTotalPerCounter = Sum(workloadIterations);
+            var overheadTotalPerCounter = Sum(overheadIterations);
 
-                next:
-                    continue;
-            }
-
-            var overheadTotalPerCounter = new Dictionary<int, ulong>();
-            foreach (var overheadIteration in overheadIterations)
-            {
-                foreach (var idToCount in overheadIteration.ProfileSourceIdToCount)
-                {
-                    checked
-                    {
-                        overheadTotalPerCounter.TryGetValue(idToCount.Key, out ulong existing);
-                        overheadTotalPerCounter[idToCount.Key] = existing + idToCount.Value;
-                    }
-                }
-            }
-
-            var overheadAveragePerCounter = overheadTotalPerCounter.ToDictionary(item => item.Key, item => item.Value / (ulong)overheadIterations.Length);
-
-            return workloadIterations.SelectMany(iteration => iteration.ProfileSourceIdToCount
-                    .Select(counterData => CreateMetric(counterData.Key, counterData.Value - overheadAveragePerCounter[counterData.Key]))) // result = workload - avg(overhead)
-                    .ToImmutableArray();
+            return workloadTotalPerCounter.Select(perCounter =>
+                new Metric(
+                    $"{counters.Single(counter => counter.ProfileSourceId == perCounter.Key).Name}/Op",
+                    (perCounter.Value / (double)workloadIterations.Length - overheadTotalPerCounter[perCounter.Key] / (double)overheadIterations.Length) / totalOperationsPerIteration.Value)); // result = (avg(workload) - avg(overhead))/op
         }
 
-        private IterationData[] ToIterationData(List<double> startStopTimeStamps)
+        private IterationData[] CreateIterationData(List<double> startStopTimeStamps)
         {
             // collection contains mixted .Start and .Stop intervals, if we sort it we know that n is Start and n + 1 is Stop
             startStopTimeStamps.Sort();
@@ -154,9 +141,42 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             return iterations;
         }
 
-        private Metric CreateMetric(int counterDataKey, ulong @ulong)
+        private void SumCountersPerIterations(Dictionary<int, int> profileSourceIdToInterval, IterationData[] workloadIterations, IterationData[] overheadIterations)
         {
-            throw new NotImplementedException();
+            foreach (var sample in samples)
+            {
+                var interval = profileSourceIdToInterval[sample.profileSource];
+
+                foreach (var workloadIteration in workloadIterations)
+                    if (workloadIteration.TryHandle(sample.timeStamp, sample.profileSource, interval))
+                        goto next;
+
+                foreach (var overheadIteration in overheadIterations)
+                    if (overheadIteration.TryHandle(sample.timeStamp, sample.profileSource, interval))
+                        goto next;
+
+                next:
+                    continue;
+            }
+        }
+
+        private static Dictionary<int, ulong> Sum(IterationData[] iterations)
+        {
+            var totalPerCounter = new Dictionary<int, ulong>();
+            
+            foreach (var iteration in iterations)
+            {
+                foreach (var idToCount in iteration.ProfileSourceIdToCount)
+                {
+                    checked
+                    {
+                        totalPerCounter.TryGetValue(idToCount.Key, out ulong existing);
+                        totalPerCounter[idToCount.Key] = existing + idToCount.Value;
+                    }
+                }
+            }
+
+            return totalPerCounter;
         }
     }
 
