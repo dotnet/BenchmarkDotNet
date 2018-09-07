@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
@@ -13,7 +14,7 @@ using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
-    public class EtwProfiler : IDiagnoser
+    public class EtwProfiler : IDiagnoser, IHardwareCountersDiagnoser
     {
         private readonly RunMode runMode;
         private readonly int bufferSizeInMb;
@@ -37,6 +38,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
         
         public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
+
+        public IReadOnlyDictionary<BenchmarkCase, PmcStats> Results => ImmutableDictionary<BenchmarkCase, PmcStats>.Empty;
         
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => runMode;
 
