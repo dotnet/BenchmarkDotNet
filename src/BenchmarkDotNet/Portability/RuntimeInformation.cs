@@ -155,7 +155,7 @@ namespace BenchmarkDotNet.Portability
             return null;
         }
 
-        private static string GetNetCoreVersion()
+        internal static string GetNetCoreVersion()
         {
             var assembly = typeof(GCSettings).GetTypeInfo().Assembly;
             var assemblyPath = assembly.CodeBase.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
