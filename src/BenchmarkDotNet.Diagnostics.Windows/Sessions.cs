@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             if (Details.Config.GetHardwareCounters().Any())
                 keywords |= KernelTraceEventParser.Keywords.PMCProfile; // Precise Machine Counters
                 
-            TraceEventSession.EnableKernelProvider(keywords);
+            TraceEventSession.EnableKernelProvider(keywords, KernelTraceEventParser.Keywords.Profile);
 
             return this;
         }

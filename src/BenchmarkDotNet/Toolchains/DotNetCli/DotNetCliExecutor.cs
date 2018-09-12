@@ -4,6 +4,7 @@ using System.IO;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -49,6 +50,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             finally
             {
                 ConsoleHandler.Instance.ClearProcess();
+
+                executeParameters.Diagnoser?.Handle(
+                    HostSignal.AfterProcessExit, 
+                    new DiagnoserActionParameters(null, executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Config));
             }
         }
 
@@ -74,6 +79,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId, config);
 
                 ConsoleHandler.Instance.SetProcess(process);
+
+                diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId, config));
 
                 process.Start();
 

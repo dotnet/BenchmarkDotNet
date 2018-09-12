@@ -48,9 +48,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {
-            if (signal == HostSignal.BeforeAnythingElse)
+            // it's crucial to start the trace before the process starts and stop it after the benchmarked process stops to have all of the necessary events in the trace file!
+            if (signal == HostSignal.BeforeProcessStart)
                 Start(parameters);
-            else if (signal == HostSignal.AfterActualRun)
+            else if (signal == HostSignal.AfterProcessExit)
                 Stop(parameters);
         }
 
