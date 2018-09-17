@@ -124,7 +124,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             return workloadTotalPerCounter.Select(perCounter =>
             {
                 var pmc = counters.Single(counter => counter.ProfileSourceId == perCounter.Key);
-                double result = (perCounter.Value / (double) workloadIterations.Length - overheadTotalPerCounter[perCounter.Key] / (double) overheadIterations.Length) 
+                
+                overheadTotalPerCounter.TryGetValue(perCounter.Key, out var overhead);
+                
+                double result = (perCounter.Value / (double) workloadIterations.Length - overhead / (double) overheadIterations.Length) 
                                     / totalOperationsPerIteration.Value; // result = (avg(workload) - avg(overhead))/op
 
                 return new Metric(new PmcMetricDescriptor(pmc), result);
