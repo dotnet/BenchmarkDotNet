@@ -47,11 +47,12 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         internal override Session EnableProviders()
         {
-            var keywords = KernelTraceEventParser.Keywords.Profile; // CPU stacks
+            var keywords = KernelTraceEventParser.Keywords.ImageLoad // handles stack frames from native modules, SUPER IMPORTANT! 
+                           | KernelTraceEventParser.Keywords.Profile; // CPU stacks
 
             if (Details.Config.GetHardwareCounters().Any())
                 keywords |= KernelTraceEventParser.Keywords.PMCProfile; // Precise Machine Counters
-                
+
             TraceEventSession.EnableKernelProvider(keywords, KernelTraceEventParser.Keywords.Profile);
 
             return this;
