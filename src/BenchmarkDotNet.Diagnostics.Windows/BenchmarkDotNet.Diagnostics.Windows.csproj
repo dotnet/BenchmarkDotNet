@@ -12,6 +12,6 @@
     <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="2.0.23" />
+    <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="2.0.25" />
   </ItemGroup>
 </Project>
