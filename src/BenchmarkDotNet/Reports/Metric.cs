@@ -1,41 +1,44 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using BenchmarkDotNet.Columns;
 
 namespace BenchmarkDotNet.Reports
 {
-    public class Metric : IEquatable<Metric>
+    public class Metric
     {
-        private const string NoUnit = "";
-
-        public string UniqueName { get; }
-
         public double Value { get; }
         
-        public string Legend { get; }
-        
-        public string NumberFormat { get; }
+        public IMetricDescriptor Descriptor { get; }
 
-        public UnitType UnitType { get; }
-        
-        public string Unit { get; }
-
-        public bool TheGreaterTheBetter { get; }
-        
-        public Metric(string uniqueName, double value, string legend, string numberFormat = "0.##", UnitType unitType = UnitType.Dimensionless, string unit = NoUnit, bool theGreaterTheBetter = false)
+        public Metric(IMetricDescriptor descriptor, double value)
         {
-            UniqueName = uniqueName;
+            Descriptor = descriptor;
             Value = value;
-            Legend = legend;
-            NumberFormat = numberFormat;
-            Unit = unit;
-            UnitType = unitType;
-            TheGreaterTheBetter = theGreaterTheBetter;
         }
+    }
 
-        public bool Equals(Metric other) => string.Equals(UniqueName, other.UniqueName);
+    public interface IMetricDescriptor
+    {
+        string Id { get; }
+        
+        string DisplayName { get; }
 
-        public override bool Equals(object obj) => obj is Metric metric && Equals(metric);
+        string Legend { get; }
 
-        public override int GetHashCode() => UniqueName.GetHashCode();
+        string NumberFormat { get; }
+
+        UnitType UnitType { get; }
+        
+        string Unit { get; }
+
+        bool TheGreaterTheBetter { get; }
+    }
+
+    public class MetricDescriptorEqualityComparer : EqualityComparer<IMetricDescriptor>
+    {
+        public static readonly EqualityComparer<IMetricDescriptor> Instance = new MetricDescriptorEqualityComparer();
+        
+        public override bool Equals(IMetricDescriptor x, IMetricDescriptor y) => x.Id.Equals(y.Id);
+
+        public override int GetHashCode(IMetricDescriptor obj) => obj.Id.GetHashCode();
     }
 }

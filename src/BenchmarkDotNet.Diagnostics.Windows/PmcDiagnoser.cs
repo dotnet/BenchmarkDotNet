@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             this.results.Add(results.BenchmarkCase, stats);
 
             foreach (var pmc in stats.Counters.Values)
-                yield return new Metric($"{pmc.Name}/Op", (double)pmc.Count / results.TotalOperations, $"Hardware counter '{pmc.Name}' per operation", theGreaterTheBetter: pmc.Counter.TheGreaterTheBetter());
+                yield return new Metric(new PmcMetricDescriptor(pmc), (double)pmc.Count / results.TotalOperations);
         }
 
         public void DisplayResults(ILogger logger) { }

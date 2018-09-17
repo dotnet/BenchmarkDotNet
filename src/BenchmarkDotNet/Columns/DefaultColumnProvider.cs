@@ -83,9 +83,9 @@ namespace BenchmarkDotNet.Columns
             public IEnumerable<IColumn> GetColumns(Summary summary) => summary
                 .Reports
                 .Where(report => report.Metrics != null)
-                .SelectMany(report => report.Metrics.Values)
-                .Distinct()
-                .Select(metricWithUniqueName => new MetricColumn(metricWithUniqueName));
+                .SelectMany(report => report.Metrics.Values.Select(metric => metric.Descriptor))
+                .Distinct(MetricDescriptorEqualityComparer.Instance)
+                .Select(descriptor => new MetricColumn(descriptor));
         }
     }
 }

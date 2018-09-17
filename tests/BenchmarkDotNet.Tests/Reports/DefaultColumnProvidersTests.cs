@@ -43,13 +43,30 @@ namespace BenchmarkDotNet.Tests.Reports
         [Fact]
         public void EveyMetricHasItsOwnColumn()
         {
-            var metrics = new[] { new Metric("metric1", 0.1, "some legend"), new Metric("metric2", 0.1, "some legend") };
+            var metrics = new[] { new Metric(new FakeMetricDescriptor("metric1", "some legend"), 0.1), new Metric(new FakeMetricDescriptor("metric2", "another legend"), 0.1) };
             var summary = CreateSummary(false, metrics);
 
             var columns = DefaultColumnProviders.Metrics.GetColumns(summary).ToArray();
             
-            Assert.Equal("metric1", columns[0].ColumnName);
-            Assert.Equal("metric2", columns[1].ColumnName);
+            Assert.Equal("metric1", columns[0].Id);
+            Assert.Equal("metric2", columns[1].Id);
+        }
+
+        private class FakeMetricDescriptor : IMetricDescriptor
+        {
+            public FakeMetricDescriptor(string id, string legend)
+            {
+                Id = id;
+                Legend = legend;
+            }
+            
+            public string Id { get; }
+            public string DisplayName { get; }
+            public string Legend { get; }
+            public string NumberFormat { get; }
+            public UnitType UnitType { get; }
+            public string Unit { get; }
+            public bool TheGreaterTheBetter { get; }
         }
 
         // TODO: Union this with MockFactory

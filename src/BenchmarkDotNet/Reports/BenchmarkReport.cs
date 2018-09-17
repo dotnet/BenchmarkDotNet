@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Reports
             ExecuteResults = executeResults ?? Array.Empty<ExecuteResult>();
             AllMeasurements = allMeasurements ?? Array.Empty<Measurement>();
             GcStats = gcStats;
-            Metrics = metrics?.ToDictionary(metric => metric.UniqueName);
+            Metrics = metrics?.ToDictionary(metric => metric.Descriptor.Id);
         }
 
         public override string ToString() => $"{BenchmarkCase.DisplayInfo}, {AllMeasurements.Count} runs";

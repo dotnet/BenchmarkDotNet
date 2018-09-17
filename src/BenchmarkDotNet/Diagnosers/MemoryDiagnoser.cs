@@ -36,10 +36,45 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults diagnoserResults)
         {
-            yield return new Metric("Gen 0/1k Op", diagnoserResults.GcStats.Gen0Collections / (double)diagnoserResults.GcStats.TotalOperations * 1000, "GC Generation 0 collects per 1k Operations", "#0.0000");
-            yield return new Metric("Gen 1/1k Op", diagnoserResults.GcStats.Gen1Collections / (double)diagnoserResults.GcStats.TotalOperations * 1000, "GC Generation 1 collects per 1k Operations", "#0.0000");
-            yield return new Metric("Gen 2/1k Op", diagnoserResults.GcStats.Gen2Collections / (double)diagnoserResults.GcStats.TotalOperations * 1000, "GC Generation 2 collects per 1k Operations", "#0.0000");
-            yield return new Metric("Allocated Memory/Op", diagnoserResults.GcStats.BytesAllocatedPerOperation, "Allocated memory per single operation (managed only, inclusive, 1KB = 1024B)", SizeUnit.B.Name, UnitType.Size);
+            yield return new Metric(GarbageCollectionsMetricDescriptor.Gen0, diagnoserResults.GcStats.Gen0Collections / (double)diagnoserResults.GcStats.TotalOperations * 1000);
+            yield return new Metric(GarbageCollectionsMetricDescriptor.Gen1, diagnoserResults.GcStats.Gen1Collections / (double)diagnoserResults.GcStats.TotalOperations * 1000);
+            yield return new Metric(GarbageCollectionsMetricDescriptor.Gen2, diagnoserResults.GcStats.Gen2Collections / (double)diagnoserResults.GcStats.TotalOperations * 1000);
+            yield return new Metric(AllocatedMemoryMetricDescriptor.Instance, diagnoserResults.GcStats.BytesAllocatedPerOperation);
+        }
+
+        private class AllocatedMemoryMetricDescriptor : IMetricDescriptor
+        {
+            internal static readonly IMetricDescriptor Instance = new AllocatedMemoryMetricDescriptor();
+            
+            public string Id => "Allocated Memory";
+            public string DisplayName => "Allocated Memory/Op";
+            public string Legend => "Allocated memory per single operation (managed only, inclusive, 1KB = 1024B)";
+            public string NumberFormat => "N0";
+            public UnitType UnitType => UnitType.Size;
+            public string Unit => SizeUnit.B.Name;
+            public bool TheGreaterTheBetter => false;
+        }
+
+        private class GarbageCollectionsMetricDescriptor : IMetricDescriptor
+        {
+            internal static readonly IMetricDescriptor Gen0 = new GarbageCollectionsMetricDescriptor(0);
+            internal static readonly IMetricDescriptor Gen1 = new GarbageCollectionsMetricDescriptor(1);
+            internal static readonly IMetricDescriptor Gen2 = new GarbageCollectionsMetricDescriptor(2);
+
+            private GarbageCollectionsMetricDescriptor(int generationId)
+            {
+                Id = $"Gen{generationId}Collects";
+                DisplayName = $"Gen {generationId}/1k Op";
+                Legend = $"GC Generation {generationId} collects per 1k Operations";
+            }
+
+            public string Id { get; }
+            public string DisplayName { get; }
+            public string Legend { get; }
+            public string NumberFormat => "#0.0000";
+            public UnitType UnitType => UnitType.Dimensionless;
+            public string Unit => String.Empty;
+            public bool TheGreaterTheBetter => false;
         }
     }
 }

@@ -127,7 +127,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 double result = (perCounter.Value / (double) workloadIterations.Length - overheadTotalPerCounter[perCounter.Key] / (double) overheadIterations.Length) 
                                     / totalOperationsPerIteration.Value; // result = (avg(workload) - avg(overhead))/op
 
-                return new Metric($"{pmc.Name}/Op", result, $"Hardware counter '{pmc.Name}' per operation");
+                return new Metric(new PmcMetricDescriptor(pmc), result);
             }); 
         }
 
