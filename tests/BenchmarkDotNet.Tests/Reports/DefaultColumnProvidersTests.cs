@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Tests.Reports
             }
             
             public string Id { get; }
-            public string DisplayName { get; }
+            public string DisplayName => Id;
             public string Legend { get; }
             public string NumberFormat { get; }
             public UnitType UnitType { get; }
