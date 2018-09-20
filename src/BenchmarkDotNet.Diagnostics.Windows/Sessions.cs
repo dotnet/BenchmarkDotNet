@@ -13,8 +13,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 {
     internal class UserSession : Session
     {
-        public UserSession(DiagnoserActionParameters details, int bufferSizeInMb)
-            : base(FullNameProvider.GetBenchmarkName(details.BenchmarkCase), details, bufferSizeInMb)
+        public UserSession(DiagnoserActionParameters details, EtwProfilerConfig config)
+            : base(FullNameProvider.GetBenchmarkName(details.BenchmarkCase), details, config)
         {
         }
 
@@ -22,18 +22,12 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         internal override Session EnableProviders()
         {
-            TraceEventSession.EnableProvider(EngineEventSource.Log.Name, TraceEventLevel.Informational);
+            TraceEventSession.EnableProvider(EngineEventSource.Log.Name, TraceEventLevel.Informational); // mandatory provider to enable Engine events
 
-            TraceEventSession.EnableProvider(
-                ClrTraceEventParser.ProviderGuid,
-                TraceEventLevel.Verbose,
-                (ulong) (ClrTraceEventParser.Keywords.Exception
-                         | ClrTraceEventParser.Keywords.GC
-                         | ClrTraceEventParser.Keywords.Jit
-                         | ClrTraceEventParser.Keywords.JitTracing // for the inlining events
-                         | ClrTraceEventParser.Keywords.Loader
-                         | ClrTraceEventParser.Keywords.NGen),
-                new TraceEventProviderOptions { StacksEnabled = false }); // stacks are too expensive for our purposes
+            foreach (var provider in Config.Providers)
+            {
+                TraceEventSession.EnableProvider(provider.providerName, provider.providerLevel, provider.keywords, provider.options);
+            }
 
             return this;
         }
@@ -41,14 +35,18 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
     internal class KernelSession : Session
     {
-        public KernelSession(DiagnoserActionParameters details, int bufferSizeInMb) : base(KernelTraceEventParser.KernelSessionName, details, bufferSizeInMb) { }
+        public KernelSession(DiagnoserActionParameters details, EtwProfilerConfig config)
+            : base(KernelTraceEventParser.KernelSessionName, details, config)
+        {
+        }
         
         protected override string FileExtension => ".kernel.etl";
 
         internal override Session EnableProviders()
         {
-            var keywords = KernelTraceEventParser.Keywords.ImageLoad // handles stack frames from native modules, SUPER IMPORTANT! 
-                           | KernelTraceEventParser.Keywords.Profile; // CPU stacks
+            var keywords = Config.KernelKeywords 
+                | KernelTraceEventParser.Keywords.ImageLoad // handles stack frames from native modules, SUPER IMPORTANT! 
+                | KernelTraceEventParser.Keywords.Profile; // CPU stacks
 
             if (Details.Config.GetHardwareCounters().Any())
                 keywords |= KernelTraceEventParser.Keywords.PMCProfile; // Precise Machine Counters
@@ -66,17 +64,20 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         protected TraceEventSession TraceEventSession { get; }
 
         protected DiagnoserActionParameters Details { get; }
+        
+        protected EtwProfilerConfig Config { get; }
 
         private string FilePath { get; }
 
-        protected Session(string sessionName, DiagnoserActionParameters details, int bufferSizeInMb)
+        protected Session(string sessionName, DiagnoserActionParameters details, EtwProfilerConfig config)
         {
             Details = details;
+            Config = config;
             FilePath = EnsureFolderExists(GetFilePath(details));
 
             TraceEventSession = new TraceEventSession(sessionName, FilePath)
             {
-                BufferSizeMB = bufferSizeInMb
+                BufferSizeMB = config.BufferSizeInMb
             };
 
             Console.CancelKeyPress += OnConsoleCancelKeyPress;

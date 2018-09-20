@@ -16,19 +16,17 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 {
     public class EtwProfiler : IDiagnoser, IHardwareCountersDiagnoser
     {
+        private readonly EtwProfilerConfig config;
         private readonly RunMode runMode;
-        private readonly int bufferSizeInMb;
         private readonly Dictionary<BenchmarkCase, string> benchmarkToEtlFile;
         private readonly Dictionary<BenchmarkCase, PreciseMachineCounter[]> benchmarkToCounters;
 
         private Session kernelSession, userSession;
 
-        /// <param name="performExtraBenchmarksRun">if set to true, benchmarks will be executed on more time with the profiler attached. If set to false, there will be no extra run but the results will contain overhead</param>
-        /// <param name="bufferSizeInMb">ETW session buffer size, in MB</param>
-        public EtwProfiler(bool performExtraBenchmarksRun, int bufferSizeInMb)
+        public EtwProfiler(EtwProfilerConfig config)
         {
-            runMode = performExtraBenchmarksRun ? RunMode.ExtraRun : RunMode.NoOverhead;
-            this.bufferSizeInMb = bufferSizeInMb;
+            this.config = config;
+            runMode = config.PerformExtraBenchmarksRun ? RunMode.ExtraRun : RunMode.NoOverhead;
             benchmarkToEtlFile = new Dictionary<BenchmarkCase, string>();
             benchmarkToCounters = new Dictionary<BenchmarkCase, PreciseMachineCounter[]>();
         }
@@ -76,14 +74,15 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             var counters = benchmarkToCounters[parameters.BenchmarkCase] = parameters.Config
                 .GetHardwareCounters()
-                .Select(counter => HardwareCounters.FromCounter(counter, info => Math.Min(info.MaxInterval, Math.Max(info.MinInterval, info.Interval))))
+                .Select(counter => HardwareCounters.FromCounter(counter, 
+                    config.IntervalSelectors.TryGetValue(counter, out var selector) ? selector : info => Math.Min(info.MaxInterval, Math.Max(info.MinInterval, info.Interval))))
                 .ToArray();
 
             if (counters.Any()) // we need to enable the counters before starting the kernel session
                 HardwareCounters.Enable(counters);
             
-            userSession = new UserSession(parameters, bufferSizeInMb).EnableProviders();
-            kernelSession = new KernelSession(parameters, bufferSizeInMb).EnableProviders();
+            userSession = new UserSession(parameters, config).EnableProviders();
+            kernelSession = new KernelSession(parameters, config).EnableProviders();
         }
 
         private void Stop(DiagnoserActionParameters parameters)
