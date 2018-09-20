@@ -8,7 +8,7 @@ using Microsoft.Diagnostics.Tracing.Etlx;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
 
-namespace BenchmarkDotNet.Diagnostics.Windows
+namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 {
     public class TraceLogParser
     {
@@ -30,8 +30,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             var bdnEventsParser = new EngineEventLogParser(traceLogEventSource);
             var kernelEventsParser = new KernelTraceEventParser(traceLogEventSource);
 
-            bdnEventsParser.BenchmarkIterationStart += HandleIterationEvent;
-            bdnEventsParser.BenchmarkIterationStop += HandleIterationEvent;
+            bdnEventsParser.OverheadActualStart += OnOverheadActualStart;
+            bdnEventsParser.OverheadActualStop += OnOverheadActualStop;
+            
+            bdnEventsParser.WorkloadActualStart += OnWorkloadActualStart;
+            bdnEventsParser.WorkloadActualStop += OnWorkloadActualStop;
             
             kernelEventsParser.PerfInfoCollectionStart += OnPmcIntervalChange;
             kernelEventsParser.PerfInfoPMCSample += OnPmcEvent;
@@ -43,17 +46,21 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             return benchmarkedProcessData.CalculateMetrics(profileSourceIdToInterval, counters);
         }
 
-        private void HandleIterationEvent(IterationEvent data)
+        private void OnOverheadActualStart(IterationEvent obj) => HandleIterationEvent(obj.ProcessID, obj.TimeStampRelativeMSec, IterationMode.Overhead, obj.TotalOperations);
+
+        private void OnOverheadActualStop(IterationEvent obj) => HandleIterationEvent(obj.ProcessID, obj.TimeStampRelativeMSec, IterationMode.Overhead, obj.TotalOperations);
+
+        private void OnWorkloadActualStart(IterationEvent obj) => HandleIterationEvent(obj.ProcessID, obj.TimeStampRelativeMSec, IterationMode.Workload, obj.TotalOperations);
+
+        private void OnWorkloadActualStop(IterationEvent obj) => HandleIterationEvent(obj.ProcessID, obj.TimeStampRelativeMSec, IterationMode.Workload, obj.TotalOperations);
+
+        private void HandleIterationEvent(int processId, double timeStampRelative, IterationMode iterationMode, long totalOperations)
         {
-            // we are interested only in the actual runs (not pilot, not warmup)
-            if (data.IterationStage != IterationStage.Actual)
-                return;
-
             // if given process emits Benchmarking events it's the process that we care about
-            if (!processIdToData.ContainsKey(data.ProcessID))
-                processIdToData.Add(data.ProcessID, new ProcessMetrics());
+            if (!processIdToData.ContainsKey(processId))
+                processIdToData.Add(processId, new ProcessMetrics());
 
-            processIdToData[data.ProcessID].HandleIterationEvent(data.TimeStampRelativeMSec, data.IterationMode, data.TotalOperations);
+            processIdToData[processId].HandleIterationEvent(timeStampRelative, iterationMode, totalOperations);
         }
 
         private void OnPmcIntervalChange(SampledProfileIntervalTraceData data)

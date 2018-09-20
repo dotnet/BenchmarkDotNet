@@ -88,6 +88,9 @@ namespace BenchmarkDotNet.Engines
         {
             long invokeCount = InvocationCount;
             IReadOnlyList<Measurement> idle = null;
+            
+            if (EngineEventSource.Log.IsEnabled())
+                EngineEventSource.Log.BenchmarkStart(BenchmarkName);
 
             if (Strategy != RunStrategy.ColdStart)
             {
@@ -114,6 +117,9 @@ namespace BenchmarkDotNet.Engines
             var workGcHasDone = includeMemoryStats 
                 ? MeasureGcStats(new IterationData(IterationMode.Workload, IterationStage.Actual, 0, invokeCount, UnrollFactor)) 
                 : GcStats.Empty;
+            
+            if (EngineEventSource.Log.IsEnabled())
+                EngineEventSource.Log.BenchmarkStop(BenchmarkName);
 
             var outlierMode = TargetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, Resolver);
 
@@ -135,7 +141,7 @@ namespace BenchmarkDotNet.Engines
             GcCollect();
 
             if (EngineEventSource.Log.IsEnabled())
-                EngineEventSource.Log.IterationStart(TargetJob.Id, BenchmarkName, data.IterationMode, data.IterationStage, totalOperations);
+                EngineEventSource.Log.IterationStart(data.IterationMode, data.IterationStage, totalOperations);
 
             // Measure
             var clock = Clock.Start();
@@ -143,7 +149,7 @@ namespace BenchmarkDotNet.Engines
             var clockSpan = clock.GetElapsed();
 
             if (EngineEventSource.Log.IsEnabled())
-                EngineEventSource.Log.IterationStop(TargetJob.Id, BenchmarkName, data.IterationMode, data.IterationStage, totalOperations);
+                EngineEventSource.Log.IterationStop(data.IterationMode, data.IterationStage, totalOperations);
 
             if(!isOverhead)
                 IterationCleanupAction();
