@@ -1,8 +1,8 @@
-﻿using System;
+﻿#if CLASSIC
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Diagnostics.Windows;
 using BenchmarkDotNet.Diagnostics.Windows.Tracing;
 using BenchmarkDotNet.Engines;
 using Xunit;
@@ -72,3 +72,4 @@ namespace BenchmarkDotNet.IntegrationTests.Diagnosers
         }
     }
 }
+#endif
