@@ -11,6 +11,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
+using Microsoft.Diagnostics.Tracing.Session;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
@@ -74,8 +75,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             var counters = benchmarkToCounters[parameters.BenchmarkCase] = parameters.Config
                 .GetHardwareCounters()
-                .Select(counter => HardwareCounters.FromCounter(counter, 
-                    config.IntervalSelectors.TryGetValue(counter, out var selector) ? selector : info => Math.Min(info.MaxInterval, Math.Max(info.MinInterval, info.Interval))))
+                .Select(counter => HardwareCounters.FromCounter(counter, config.IntervalSelectors.TryGetValue(counter, out var selector) ? selector : GetInterval))
                 .ToArray();
 
             if (counters.Any()) // we need to enable the counters before starting the kernel session
@@ -100,5 +100,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 userSession.Dispose();
             }
         }
+
+        private static int GetInterval(ProfileSourceInfo info) => Math.Min(info.MaxInterval, Math.Max(info.MinInterval, info.Interval));
     }
 }
