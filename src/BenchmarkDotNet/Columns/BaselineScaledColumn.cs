@@ -50,9 +50,8 @@ namespace BenchmarkDotNet.Columns
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase)
         {
             string logicalGroupKey = summary.GetLogicalGroupKey(benchmarkCase);
-            var baseline = summary.BenchmarksCases
-                .Where(b => summary.GetLogicalGroupKey(b) == logicalGroupKey)
-                .FirstOrDefault(b => b.IsBaseline());
+            var baseline = summary.GetBaseline(logicalGroupKey);
+            bool isBaseline = summary.IsBaseline(benchmarkCase);
             bool invalidResults = baseline == null ||
                                  summary[baseline] == null ||
                                  summary[baseline].ResultStatistics == null ||
@@ -66,8 +65,8 @@ namespace BenchmarkDotNet.Columns
             var baselineStat = summary[baseline].ResultStatistics;
             var targetStat = summary[benchmarkCase].ResultStatistics;
 
-            double mean = benchmarkCase.IsBaseline() ? 1 : Statistics.DivMean(targetStat, baselineStat);
-            double stdDev = benchmarkCase.IsBaseline() ? 0 : Math.Sqrt(Statistics.DivVariance(targetStat, baselineStat));
+            double mean = isBaseline ? 1 : Statistics.DivMean(targetStat, baselineStat);
+            double stdDev = isBaseline ? 0 : Math.Sqrt(Statistics.DivVariance(targetStat, baselineStat));
 
             switch (Kind)
             {
@@ -90,14 +89,12 @@ namespace BenchmarkDotNet.Columns
         private static bool IsNonBaselinesPrecise(Summary summary, Statistics baselineStat, BenchmarkCase benchmarkCase)
         {
             string logicalGroupKey = summary.GetLogicalGroupKey(benchmarkCase);
-            var nonBaselines = summary.BenchmarksCases
-                        .Where(b => summary.GetLogicalGroupKey(b) == logicalGroupKey)
-                        .Where(b => !b.IsBaseline());
+            var nonBaselines = summary.GetNonBaselines(logicalGroupKey);
 
             return nonBaselines.Any(x => Statistics.DivMean(summary[x].ResultStatistics, baselineStat) < 0.01);
         }
 
-        public bool IsAvailable(Summary summary) => summary.BenchmarksCases.Any(b => b.IsBaseline());
+        public bool IsAvailable(Summary summary) => summary.HasBaselines();
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Baseline;
         public int PriorityInCategory => (int) Kind;

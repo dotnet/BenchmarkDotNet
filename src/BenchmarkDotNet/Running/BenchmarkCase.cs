@@ -25,8 +25,6 @@ namespace BenchmarkDotNet.Running
 
         public int CompareTo(BenchmarkCase other) => string.Compare(FolderInfo, other.FolderInfo, StringComparison.Ordinal);
 
-        public bool IsBaseline() => Descriptor.Baseline || Job.Meta.Baseline;
-
         public bool HasParameters => Parameters != null && Parameters.Items.Any();
 
         public bool HasArguments => Parameters != null && Parameters.Items.Any(parameter => parameter.IsArgument);

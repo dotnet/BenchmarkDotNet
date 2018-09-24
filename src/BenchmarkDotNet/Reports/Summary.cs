@@ -30,6 +30,7 @@ namespace BenchmarkDotNet.Reports
 
         private readonly Dictionary<BenchmarkCase, BenchmarkReport> reportMap = new Dictionary<BenchmarkCase, BenchmarkReport>();
         private readonly IOrderer orderer;
+        private readonly BaseliningStrategy baseliningStrategy;
 
         [PublicAPI] public bool HasReport(BenchmarkCase benchmarkCase) => reportMap.ContainsKey(benchmarkCase);
 
@@ -39,9 +40,6 @@ namespace BenchmarkDotNet.Reports
         public BenchmarkReport this[BenchmarkCase benchmarkCase] => reportMap.GetValueOrDefault(benchmarkCase);
 
         public bool HasCriticalValidationErrors => ValidationErrors.Any(validationError => validationError.IsCritical);
-
-        [CanBeNull]
-        public string GetLogicalGroupKey(BenchmarkCase benchmarkCase) => orderer.GetLogicalGroupKey(Config, BenchmarksCases, benchmarkCase);
 
         public int GetNumberOfExecutedBenchmarks() => Reports.Count(report => report.ExecuteResults.Any(result => result.FoundExecutable));
 
@@ -59,6 +57,7 @@ namespace BenchmarkDotNet.Reports
             Reports = BenchmarksCases.Select(b => reportMap[b]).ToArray();
 
             orderer = config.GetOrderer() ?? DefaultOrderer.Instance;
+            baseliningStrategy = BaseliningStrategy.Create(BenchmarksCases); 
             BenchmarksCases = orderer.GetSummaryOrder(BenchmarksCases, this).ToArray();
             Reports = BenchmarksCases.Select(b => reportMap[b]).ToArray();
 
@@ -145,5 +144,28 @@ namespace BenchmarkDotNet.Reports
             var lines = orderedJobs.Select(jobId => $"  {jobId.PadRight(jobIdMaxWidth)} : {jobRuntimes[jobId]}");
             return string.Join(Environment.NewLine, lines);
         }
+        
+        [CanBeNull]
+        public string GetLogicalGroupKey(BenchmarkCase benchmarkCase) => orderer.GetLogicalGroupKey(Config, BenchmarksCases, benchmarkCase);
+        
+        public bool IsBaseline(BenchmarkCase benchmarkCase) => baseliningStrategy.IsBaseline(benchmarkCase);
+
+        [CanBeNull]
+        public BenchmarkCase GetBaseline(string logicalGroupKey)
+        {
+            return BenchmarksCases
+                .Where(b => GetLogicalGroupKey(b) == logicalGroupKey)
+                .FirstOrDefault(IsBaseline);
+        }
+        
+        [NotNull]
+        public IEnumerable<BenchmarkCase> GetNonBaselines(string logicalGroupKey)
+        {
+            return BenchmarksCases
+                .Where(b => GetLogicalGroupKey(b) == logicalGroupKey)
+                .Where(b => !IsBaseline(b));
+        }
+
+        public bool HasBaselines() => BenchmarksCases.Any(IsBaseline);
     }
 }
