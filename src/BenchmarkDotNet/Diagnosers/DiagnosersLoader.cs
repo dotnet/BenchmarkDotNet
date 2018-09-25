@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         internal static IDiagnoser GetImplementation<TDiagnoser>() where TDiagnoser : IDiagnoser
             => LazyLoadedDiagnosers.Value
-                .SingleOrDefault(diagnoser => diagnoser is TDiagnoser)
+                .FirstOrDefault(diagnoser => diagnoser is TDiagnoser) // few diagnosers can implement same interface, order matters
                 ?? GetUnresolvedDiagnoser<TDiagnoser>();
 
         private static IDiagnoser GetUnresolvedDiagnoser<TDiagnoser>() => new UnresolvedDiagnoser(typeof(TDiagnoser));
@@ -73,6 +73,7 @@ namespace BenchmarkDotNet.Diagnosers
                         DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig()),
                         CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.InliningDiagnoser"),
                         CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.PmcDiagnoser"),
+                        CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.EtwProfiler"),
                     };
                 }
             }

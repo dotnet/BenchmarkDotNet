@@ -147,6 +147,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 config.Add(MemoryDiagnoser.Default);
             if (options.UseDisassemblyDiagnoser)
                 config.Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig()));
+            if (options.UseProfiler)
+                config.Add(DiagnosersLoader.GetImplementation<IProfiler>());
 
             if (options.DisplayAllStatistics)
                 config.Add(StatisticColumn.AllStatistics);

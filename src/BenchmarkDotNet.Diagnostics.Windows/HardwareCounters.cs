@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.InProcess;
 using BenchmarkDotNet.Validators;
 using Microsoft.Diagnostics.Tracing.Session;
@@ -31,6 +32,12 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         
         public static IEnumerable<ValidationError> Validate(ValidationParameters validationParameters, bool mandatory)
         {
+            if (!RuntimeInformation.IsWindows())
+            {
+                yield return new ValidationError(true, "Hardware Counters and EtwProfiler are supported only on Windows");
+                yield break;
+            }
+            
             if (!validationParameters.Config.GetHardwareCounters().Any() && mandatory)
             {
                 yield return new ValidationError(true, "No Hardware Counters defined, probably a bug");

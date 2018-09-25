@@ -11,11 +11,12 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
+using JetBrains.Annotations;
 using Microsoft.Diagnostics.Tracing.Session;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
-    public class EtwProfiler : IDiagnoser, IHardwareCountersDiagnoser
+    public class EtwProfiler : IDiagnoser, IHardwareCountersDiagnoser, IProfiler
     {
         private readonly EtwProfilerConfig config;
         private readonly RunMode runMode;
@@ -24,6 +25,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private Session kernelSession, userSession;
 
+        [PublicAPI] // parameterless ctor required by DiagnosersLoader to support creating this profiler via console line args
+        public EtwProfiler() : this(new EtwProfilerConfig(performExtraBenchmarksRun: false)) { }
+        
+        [PublicAPI]
         public EtwProfiler(EtwProfilerConfig config)
         {
             this.config = config;
