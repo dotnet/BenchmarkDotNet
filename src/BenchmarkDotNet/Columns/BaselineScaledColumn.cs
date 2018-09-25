@@ -18,13 +18,16 @@ namespace BenchmarkDotNet.Columns
 
         public static readonly IColumn Scaled = new BaselineScaledColumn(DiffKind.Mean);
         public static readonly IColumn ScaledStdDev = new BaselineScaledColumn(DiffKind.StdDev);
-        public static readonly IColumn WelchTTestPValue = new BaselineScaledColumn(DiffKind.WelchTTestPValue);
+
+        public static IColumn CreateWelchTTest(Hypothesis h) => new BaselineScaledColumn(DiffKind.WelchTTestPValue, h);
 
         public DiffKind Kind { get; }
+        private readonly Hypothesis hypothesis; 
 
-        private BaselineScaledColumn(DiffKind kind)
+        private BaselineScaledColumn(DiffKind kind, Hypothesis hypothesis = null)
         {
             Kind = kind;
+            this.hypothesis = hypothesis;
         }
 
         public string Id => nameof(BaselineScaledColumn) + "." + Kind;
@@ -40,7 +43,7 @@ namespace BenchmarkDotNet.Columns
                     case DiffKind.StdDev:
                         return "ScaledSD";
                     case DiffKind.WelchTTestPValue:
-                        return "t-test p-value";
+                        return "p-value";
                     default:
                         throw new NotSupportedException();
                 }
@@ -115,7 +118,7 @@ namespace BenchmarkDotNet.Columns
                     case DiffKind.StdDev:
                         return "Standard deviation of ratio of distribution of [CurrentBenchmark] and [BaselineBenchmark]";
                     case DiffKind.WelchTTestPValue:
-                        return "p-value for Welch's t-test of [CurrentBenchmark] and [BaselineBenchmark]";
+                        return $"p-value for Welch's t-test against baseline (H1: {hypothesis.H1})";
                     default:
                         throw new ArgumentOutOfRangeException(nameof(Kind));
                 }

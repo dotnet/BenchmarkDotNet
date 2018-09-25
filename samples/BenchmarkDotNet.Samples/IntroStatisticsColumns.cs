@@ -4,7 +4,7 @@ using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples
 {
-    [MediumRunJob, SkewnessColumn, KurtosisColumn, WelchTTestPValueColumn]
+    [MediumRunJob, SkewnessColumn, KurtosisColumn, WelchTTestRelative]
     public class IntroStatisticsColumns
     {
         private const int N = 10000;
