@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Portability.Cpu
                     processorsCount++;
                     physicalCoreCount += (uint) moProcessor[WmicCpuInfoKeyNames.NumberOfCores];
                     logicalCoreCount += (uint) moProcessor[WmicCpuInfoKeyNames.NumberOfLogicalProcessors];
-                    nominalClockSpeed = maxClockSpeed = minClockSpeed = (uint) moProcessor[WmicCpuInfoKeyNames.CurrentClockSpeed];
+                    maxClockSpeed = (uint) moProcessor[WmicCpuInfoKeyNames.MaxClockSpeed];
                 }
             }
 
@@ -42,9 +42,9 @@ namespace BenchmarkDotNet.Portability.Cpu
                 processorsCount > 0 ? processorsCount : (int?) null,
                 physicalCoreCount > 0 ? (int?) physicalCoreCount : null,
                 logicalCoreCount > 0 ? (int?) logicalCoreCount : null,
-                nominalClockSpeed > 0 && logicalCoreCount > 0 ? Frequency.FromMHz(nominalClockSpeed) : 0,
+                nominalClockSpeed > 0 && logicalCoreCount > 0 ? Frequency.FromMHz(nominalClockSpeed) : (Frequency?)null,
                 maxClockSpeed > 0 && logicalCoreCount > 0 ? Frequency.FromMHz(maxClockSpeed) : 0,
-                minClockSpeed > 0 && logicalCoreCount > 0 ? Frequency.FromMHz(minClockSpeed) : 0);
+                minClockSpeed > 0 && logicalCoreCount > 0 ? Frequency.FromMHz(minClockSpeed) : (Frequency?)null);
         }
     }
 }
