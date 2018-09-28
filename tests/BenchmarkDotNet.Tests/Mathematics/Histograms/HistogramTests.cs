@@ -6,7 +6,7 @@ using BenchmarkDotNet.Mathematics.Histograms;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace BenchmarkDotNet.Tests.Mathematics
+namespace BenchmarkDotNet.Tests.Mathematics.Histograms
 {
     public class HistogramTests
     {

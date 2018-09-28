@@ -1,46 +1,23 @@
 ﻿using System;
 using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Mathematics.StatisticalTesting;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes
 {
     [PublicAPI]
-    public class WelchTTestRelativeAttribute : ColumnConfigBaseAttribute
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = true)]
+    public class StatisticalTestColumnAttribute : ColumnConfigBaseAttribute
     {
-        public WelchTTestRelativeAttribute(double ratio = 0.01)
-            : base(BaselineScaledColumn.CreateWelchTTest(new RelativeHypothesis(ratio))) { }
+        public StatisticalTestColumnAttribute(StatisticalTestKind testKind, ThresholdUnit thresholdUnit, double value, bool showPValues = false)
+            : base(StatisticalTestColumn.Create(testKind, Threshold.Create(thresholdUnit, value), showPValues)) { }
+
+        public StatisticalTestColumnAttribute(StatisticalTestKind testKind, bool showPValues = false) : this(testKind, ThresholdUnit.Ratio, 0.1, showPValues) { }
     }
 
-    [PublicAPI]
-    public class WelchTTestAbsoluteNanosecondsAttribute : ColumnConfigBaseAttribute
+    [Obsolete("Use StatisticalTestAttribute")]
+    public class WelchTTestPValueColumnAttribute : StatisticalTestColumnAttribute
     {
-        public WelchTTestAbsoluteNanosecondsAttribute(double threshold)
-            : base(BaselineScaledColumn.CreateWelchTTest(new AbsoluteHypothesis(TimeInterval.FromNanoseconds(threshold)))) { }
+        public WelchTTestPValueColumnAttribute() : base(StatisticalTestKind.Welch) { }
     }
-
-    [PublicAPI]
-    public class WelchTTestAbsoluteMicrosecondsAttribute : ColumnConfigBaseAttribute
-    {
-        public WelchTTestAbsoluteMicrosecondsAttribute(double threshold)
-            : base(BaselineScaledColumn.CreateWelchTTest(new AbsoluteHypothesis(TimeInterval.FromMicroseconds(threshold)))) { }
-    }
-
-    [PublicAPI]
-    public class WelchTTestAbsoluteMillisecondsAttribute : ColumnConfigBaseAttribute
-    {
-        public WelchTTestAbsoluteMillisecondsAttribute(double threshold)
-            : base(BaselineScaledColumn.CreateWelchTTest(new AbsoluteHypothesis(TimeInterval.FromMilliseconds(threshold)))) { }
-    }
-
-    [PublicAPI]
-    public class WelchTTestAbsoluteSecondsAttribute : ColumnConfigBaseAttribute
-    {
-        public WelchTTestAbsoluteSecondsAttribute(double threshold)
-            : base(BaselineScaledColumn.CreateWelchTTest(new AbsoluteHypothesis(TimeInterval.FromSeconds(threshold)))) { }
-    }
-
-    [Obsolete("Use WelchTTestRelativeAttribute")]
-    public class WelchTTestPValueColumnAttribute : WelchTTestRelativeAttribute { }
 }

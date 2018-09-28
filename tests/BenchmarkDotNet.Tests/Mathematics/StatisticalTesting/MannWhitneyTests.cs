@@ -1,21 +1,127 @@
-﻿using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Mathematics.StatisticalTesting;
 using JetBrains.Annotations;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace BenchmarkDotNet.Tests.Mathematics
+namespace BenchmarkDotNet.Tests.Mathematics.StatisticalTesting
 {
-    // Welch test can be validated in R via (mean(y) should be >= mean(x)):
-    // t.test(x, y, mu=mu, alternative="greater")
-    public class WelchTests
+    public class MannWhitneyTests
     {
         private readonly ITestOutputHelper output;
 
-        public WelchTests(ITestOutputHelper output) => this.output = output;
+        public MannWhitneyTests(ITestOutputHelper output)
+        {
+            this.output = output;
+        }
 
-        [Fact]
-        public void Welch30Vs40Test()
+        [Theory]
+        [InlineData(-30, 91, 0.0005250168)]
+        [InlineData(-15, 76, 0.02621295)]
+        [InlineData(0, 47, 0.6020319)]
+        [InlineData(15, 25, 0.973787)]
+        [InlineData(30, 12, 0.9989554)]
+        public void N10(double t, int u, double pValue)
+        {
+            double[] x =
+            {
+                101.560680277179, 84.5009342862592, 87.2294917081476, 129.63805718437, 105.404085588131, 107.725754537927, 80.1006409348006, 113.864283866225,
+                102.430864178515, 104.403374809552
+            };
+            double[] y =
+            {
+                82.352823982586, 126.135642815364, 109.069571619921, 91.5330798762612, 94.2532257217699, 70.568270818608, 92.5436886596998, 117.210691979832,
+                119.721076854462, 113.813867732564
+            };
+
+            Check(x, y, t, u, pValue);
+        }
+
+        [Theory]
+        [InlineData(-10, 242, 0.1324159)]
+        [InlineData(-5, 197, 0.5372871)]
+        [InlineData(0, 163, 0.8429579)]
+        [InlineData(5, 123, 0.9824947)]
+        [InlineData(10, 88, 0.9991166)]
+        public void N20(double t, int u, double pValue)
+        {
+            double[] x =
+            {
+                97.8506464838511, 90.5704863589574, 106.919850380017, 114.968781001117, 133.163509926947, 98.5371366517863, 89.9809819778675, 94.8330330098023,
+                113.848103602446, 100.747077722794, 118.58905185697, 100.050778406168, 103.429498836193, 91.9991877755192, 117.868745215013, 107.662781698883,
+                110.434016813579, 118.772597143401, 91.0851351093108, 108.595287565388
+            };
+            double[] y =
+            {
+                141.325356080042, 101.705375558118, 121.135232885412, 104.233257876038, 113.697498891312, 89.3279837525589, 112.305397095148, 107.035411938303,
+                126.862312493224, 137.838076178722, 100.055966433672, 106.011372282587, 99.220787317467, 105.141703581153, 95.2136664971929, 127.87168139858,
+                97.5524729768301, 117.961786925524, 142.32225043168, 85.9508305239065
+            };
+
+            Check(x, y, t, u, pValue);
+        }
+
+        [Theory]
+        [InlineData(-75, 947, 4.162974e-11)]
+        [InlineData(-50, 549, 0.3131681)]
+        [InlineData(-25, 119, 1)]
+        [InlineData(0, 5, 1)]
+        [InlineData(25, 0, 1)]
+        public void N32(double t, int u, double pValue)
+        {
+            double[] x =
+            {
+                116.998310570223, 103.536732200858, 81.4977149674052, 109.240370046523, 112.685608892842, 92.4961887142488, 81.0875839754617, 107.885504895313,
+                129.489136448277, 114.743862868848, 92.8640399750995, 99.5044810768261, 100.611715633651, 92.9347711165703, 125.105417118737, 107.956368991103,
+                104.812061571297, 93.8558811186138, 101.649455913474, 108.168151882154, 86.9840546937499, 102.813126398294, 62.9278860673337, 81.9721302396966,
+                99.5326103757994, 99.1127497773892, 89.6472790590878, 94.5383623495609, 104.265979458838, 89.0962721023424, 113.828847763463, 74.9119601526303
+            };
+            double[] y =
+            {
+                134.807641760747, 153.862779834471, 155.685166413893, 153.130746875771, 153.260935827381, 156.349904137714, 156.189659805232, 121.163530829502,
+                147.486553850055, 132.381319853769, 135.272938963356, 159.631552618188, 165.266283582675, 150.072225393336, 150.645061760864, 139.783511337841,
+                144.258022179319, 173.127172505296, 168.767084858625, 138.364489170039, 156.172173370812, 125.970596582247, 152.637584228714, 147.006073519481,
+                134.162738650882, 138.128111355384, 163.306156590866, 133.37466051387, 141.733740469802, 153.328995694082, 154.841803368071, 120.244223151518
+            };
+
+            Check(x, y, t, u, pValue);
+        }
+
+        [Theory]
+        [InlineData(-25, 1089, 1.385151e-19)]
+        [InlineData(0, 1082, 6.23318e-18)]
+        [InlineData(25, 953, 9.170051e-09)]
+        [InlineData(50, 510, 0.6721925)]
+        [InlineData(75, 112, 1)]
+        public void N33(double t, int u, double pValue)
+        {
+            double[] x =
+            {
+                157.183612367683, 152.028902955382, 153.698861602206, 153.609486299015, 154.291063026817, 141.317831985261, 178.900284004259, 167.478597683646,
+                161.832190643462, 147.626654232355, 148.374015299603, 174.068375692261, 141.51911277841, 139.69371979521, 126.871207404749, 153.808773375195,
+                161.106156148851, 155.51480817283, 157.155363595268, 158.055454232685, 162.798646844568, 166.532006705421, 140.111049964116, 128.996157091284,
+                169.680723418997, 137.479319232307, 157.03932404715, 163.508869366932, 165.356386977935, 145.571530643651, 155.600613010786, 158.004851800436,
+                134.918152600764
+            };
+            double[] y =
+            {
+                99.9917764157985, 110.338659968681, 91.9010057855087, 120.039901613317, 117.797945862094, 123.134528084071, 72.8122128513182, 97.7368150018351,
+                113.098574902131, 97.3639348027811, 110.481300557315, 140.288931294698, 102.184946433365, 97.0400366425305, 98.0057356321133, 103.417878439606,
+                99.4765968818225, 79.2430526140985, 75.375686521915, 104.855304104658, 103.619087606989, 96.227750057318, 112.563251473402, 82.063032157974,
+                126.197302954924, 81.2530975187152, 124.059305772757, 117.114945385568, 109.651754612905, 103.601482510961, 128.404461213919, 123.245412480788,
+                121.186685876309
+            };
+
+            Check(x, y, t, u, pValue);
+        }
+
+        [Theory]
+        [InlineData(-2, 897, 0.0001587151)]
+        [InlineData(-1.5, 765, 0.02523963)]
+        [InlineData(-1, 628, 0.3720417)]
+        [InlineData(-0.5, 489, 0.906506)]
+        [InlineData(0, 359, 0.9981441)]
+        [InlineData(0.5, 261, 0.9999845)]
+        public void N30Vs40(double t, int u, double pValue)
         {
             // set.seed(42); x <- rnorm(30, mean = 10)
             // set.seed(42); y <- rnorm(40, mean = 11)
@@ -43,13 +149,16 @@ namespace BenchmarkDotNet.Tests.Mathematics
                 12.0351035219699, 10.3910736245928, 11.504955123298, 9.28299132092666,
                 10.2155409916205, 10.1490924058235, 8.58579235005337, 11.0361226068923
             };
-            Check(x, y, 0, 2.9753, 61.716, 0.002087);
-            Check(x, y, 0.5, 1.3073, 61.716, 0.09798);
-            Check(x, y, 1, -0.36069, 61.716, 0.6402);
+            Check(x, y, t, u, pValue);
         }
 
-        [Fact]
-        public void Welch300Vs300Test()
+        [Theory]
+        [InlineData(0, 63920, 12.521533e-19)]
+        [InlineData(0.5, 56853.5, 1.182653e-08)]
+        [InlineData(1, 45897.5, 0.3363308)]
+        [InlineData(1.1, 43563, 0.7508224)]
+        [InlineData(2, 29397, 1)]
+        public void N300(double t, double u, double pValue)
         {
             double[] x =
             {
@@ -101,26 +210,24 @@ namespace BenchmarkDotNet.Tests.Mathematics
                 355.5348, 347.4069, 348.8350, 348.2581, 347.2280, 347.5418, 348.6233, 348.1083, 347.7203, 348.0728, 347.4089, 347.5658, 347.6575, 347.2848,
                 347.4562, 347.3834, 349.0502, 350.6191, 347.4489, 348.6910
             };
-            Check(x, y, 0, 4.7843, 507.29, 1.127e-06);
-            Check(x, y, 0.5, 3.1361, 507.29, 0.0009056);
-            Check(x, y, 1, 1.488, 507.29, 0.06869);
-            Check(x, y, 2, -1.8084, 507.29, 0.9644);
+
+            Check(x, y, t, u, pValue);
         }
 
         [AssertionMethod]
-        private void Check(double[] x, double[] y, double threshold, double t, double df, double pvalue)
+        private void Check(double[] x, double[] y, double t, double u, double pValue)
         {
-            var welch = WelchTTest.Calc(new Statistics(x), new Statistics(y), new AbsoluteHypothesis(TimeInterval.FromNanoseconds(threshold)));
-            output.WriteLine("T              = " + welch.T);
-            output.WriteLine("Df             = " + welch.Df);
-            output.WriteLine("PValue         = " + welch.PValue);
-            output.WriteLine("H0             = " + welch.Hypotheses.H0);
-            output.WriteLine("H1             = " + welch.Hypotheses.H1);
-            output.WriteLine("H0 is rejected = " + welch.NullHypothesisIsRejected);
-            output.WriteLine("------------");
-            Assert.Equal(t, welch.T, 3);
-            Assert.Equal(df, welch.Df, 1);
-            Assert.Equal(pvalue, welch.PValue, 4);
+            var result = MannWhitneyTest.Instance.IsGreater(x, y, new AbsoluteThreshold(t));
+            output.WriteLine("Ux      = " + result.Ux);
+            output.WriteLine("Uy      = " + result.Uy);
+            output.WriteLine("p-value = " + result.PValue);
+            output.WriteLine("H0      = " + result.H0);
+            output.WriteLine("H1      = " + result.H1);
+
+            Assert.Equal(u, result.Ux, 2);
+            Assert.Equal(pValue, result.PValue, 2);
+
+            Assert.Equal(x.Length * y.Length, result.Ux + result.Uy);
         }
     }
 }
