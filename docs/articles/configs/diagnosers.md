@@ -32,9 +32,9 @@ The current Diagnosers are:
 Below is a sample output from the `GC and Memory Allocation` diagnoser, note the extra columns on the right-hand side ("Gen 0", "Gen 1", "Gen 2" and "Allocated"):
 
 ```
-           Method |        Mean |     StdErr |      StdDev |      Median |  Gen 0 | Allocated |
------------------ |------------ |----------- |------------ |------------ |------- |---------- |
- 'new byte[10kB]' | 884.4896 ns | 46.3528 ns | 245.2762 ns | 776.4237 ns | 0.1183 |     10 kB |
+           Method |        Mean |     StdErr |      Median |  Gen 0 | Allocated |
+----------------- |------------ |----------- |------------ |------- |---------- |
+ 'new byte[10kB]' | 884.4896 ns | 46.3528 ns | 776.4237 ns | 0.1183 |     10 kB |
 ```
 
 A config example:

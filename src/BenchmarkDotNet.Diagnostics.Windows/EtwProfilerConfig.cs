@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         
         public IReadOnlyCollection<(string providerName, TraceEventLevel providerLevel, ulong keywords, TraceEventProviderOptions options)> Providers { get; }
 
-        /// <param name="performExtraBenchmarksRun">if set to true, benchmarks will be executed on more time with the profiler attached. If set to false, there will be no extra run but the results will contain overhead. True by default.</param>
+        /// <param name="performExtraBenchmarksRun">if set to true, benchmarks will be executed one more time with the profiler attached. If set to false, there will be no extra run but the results will contain overhead. True by default.</param>
         /// <param name="bufferSizeInMb">ETW session buffer size, in MB. 256 by default</param>
         /// <param name="intervalSelectors">interval per harwdare counter, if not provided then default values will be used</param>
         /// <param name="kernelKeywords">kernel session keywords, ImageLoad (for native stack frames) and Profile (for CPU Stacks) are the defaults</param>
