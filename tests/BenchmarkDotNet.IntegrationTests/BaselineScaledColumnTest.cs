@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var headerRow = table.FullHeader;
             var column = summary.GetColumns()
                 .OfType<BaselineScaledColumn>()
-                .FirstOrDefault(c => c.Kind == BaselineScaledColumn.DiffKind.Mean);
+                .FirstOrDefault(c => c.Kind == BaselineScaledColumn.ScaledKind.Mean);
             Assert.NotNull(column);
 
             Assert.Equal(column.ColumnName, headerRow.Last());
