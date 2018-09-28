@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         private string GetErrorMessage() => $@"Unable to resolve {unresolved.Name} diagnoser. 
             {(RuntimeInformation.IsFullFramework || RuntimeInformation.IsWindows()
-                ? "Please make sure that you have installed the latest BenchmarkDotNet.Diagnostics.Windows package." 
+                ? "Please make sure that you have installed the latest BenchmarkDotNet.Diagnostics.Windows package and consumed one of its public types to make sure that MSBuild copies it to the output directory."
                 : $"Please make sure that it's supported on {RuntimeInformation.GetOsVersion()}")}";
     }
 }

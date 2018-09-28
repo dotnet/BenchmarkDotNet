@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             }
 
             if (TraceEventSession.IsElevated() != true)
-                yield return new ValidationError(true, "Must be elevated (Admin) to use Hardware Counters to use ETW Kernel Session.");
+                yield return new ValidationError(true, "Must be elevated (Admin) to use ETW Kernel Session (required for Hardware Counters and EtwProfiler).");
 
             var availableCpuCounters = TraceEventProfileSources.GetInfo();
 

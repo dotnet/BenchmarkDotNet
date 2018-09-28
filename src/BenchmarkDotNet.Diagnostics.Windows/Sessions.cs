@@ -1,10 +1,13 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Loggers;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
@@ -51,7 +54,17 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             if (Details.Config.GetHardwareCounters().Any())
                 keywords |= KernelTraceEventParser.Keywords.PMCProfile; // Precise Machine Counters
 
-            TraceEventSession.EnableKernelProvider(keywords, KernelTraceEventParser.Keywords.Profile);
+            try
+            {
+                TraceEventSession.EnableKernelProvider(keywords, KernelTraceEventParser.Keywords.Profile);
+            }
+            catch (Win32Exception)
+            {
+                Details.Config.GetCompositeLogger().WriteLineError(
+                    "Please install the latest Microsoft.Diagnostics.Tracing.TraceEvent package in the project with benchmarks so MSBuild can copy the native dependencies of TraceEvent to the output folder.");
+
+                throw;
+            }
 
             return this;
         }

@@ -85,9 +85,19 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             if (counters.Any()) // we need to enable the counters before starting the kernel session
                 HardwareCounters.Enable(counters);
-            
-            userSession = new UserSession(parameters, config).EnableProviders();
-            kernelSession = new KernelSession(parameters, config).EnableProviders();
+
+            try
+            {
+                userSession = new UserSession(parameters, config).EnableProviders();
+                kernelSession = new KernelSession(parameters, config).EnableProviders();
+            }
+            catch (Exception)
+            {
+                userSession?.Dispose();
+                kernelSession?.Dispose();
+                
+                throw;
+            }
         }
 
         private void Stop(DiagnoserActionParameters parameters)
