@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using ApprovalTests;
 using ApprovalTests.Namers;
@@ -47,6 +48,7 @@ namespace BenchmarkDotNet.Tests.Exporters
         }
 
         [Theory]
+        [MethodImpl(MethodImplOptions.NoInlining)] // required by the Approval test framework, do NOT remove
         [MemberData(nameof(GetCultureInfos))]
         public void Exporters(CultureInfo cultureInfo)
         {
