@@ -19,7 +19,7 @@ Before the process with benchmarked code is started, EtwProfiler starts User and
 
 What we have today comes with following limitations:
 
-* EtwProfiler works only on Windows (one day I might implement similar thing for Unix using EventPipe)
+* EtwProfiler works only on Windows (one day we might implement similar thing for Unix using EventPipe)
 * Requires to run as Admin (to create ETW Kernel Session)
 * No `InProcessToolchain` support 
 * To get the best possible managed code symbols you should configure your project in following way:
