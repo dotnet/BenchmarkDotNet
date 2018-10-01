@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.Tests</AssemblyTitle>
@@ -14,12 +14,12 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
     <PackageReference Include="System.Memory" Version="4.5.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
-    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+    <PackageReference Include="xunit" Version="2.3.1" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
-    <PackageReference Include="ApprovalTests" Version="3.0.15" />
+    <PackageReference Include="ApprovalTests" Version="3.0.13" />
   </ItemGroup>
   <PropertyGroup>
     <NoWarn>NU1701;1701</NoWarn>
@@ -30,9 +30,6 @@
     <Reference Include="System.Threading.Tasks" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' != '.NETFramework' ">
-    <PackageReference Include="ApprovalUtilities" Version="3.0.15" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
