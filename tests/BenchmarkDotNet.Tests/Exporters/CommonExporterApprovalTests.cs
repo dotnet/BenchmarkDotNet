@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using ApprovalTests;
 using ApprovalTests.Namers;
@@ -48,6 +49,7 @@ namespace BenchmarkDotNet.Tests.Exporters
 
         [Theory]
         [MemberData(nameof(GetCultureInfos))]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public void Exporters(CultureInfo cultureInfo)
         {
             NamerFactory.AdditionalInformation = $"{GetName(cultureInfo)}";
