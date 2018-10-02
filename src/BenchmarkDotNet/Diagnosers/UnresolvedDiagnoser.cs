@@ -31,9 +31,11 @@ namespace BenchmarkDotNet.Diagnosers
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
             => new[] { new ValidationError(false, GetErrorMessage()) };
 
-        private string GetErrorMessage() => $@"Unable to resolve {unresolved.Name} diagnoser. 
+        private string GetErrorMessage() => $@"Unable to resolve {unresolved.Name} diagnoser using dynamic assembly loading. 
             {(RuntimeInformation.IsFullFramework || RuntimeInformation.IsWindows()
-                ? "Please make sure that you have installed the latest BenchmarkDotNet.Diagnostics.Windows package and consumed one of its public types to make sure that MSBuild copies it to the output directory."
+                ? "Please make sure that you have installed the latest BenchmarkDotNet.Diagnostics.Windows package. " + Environment.NewLine 
+                    + "If you are using `dotnet build` you also need to consume one of its public types to make sure that MSBuild copies it to the output directory. " 
+                    + "The alternative is to use `<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>` in your project file."
                 : $"Please make sure that it's supported on {RuntimeInformation.GetOsVersion()}")}";
     }
 }
