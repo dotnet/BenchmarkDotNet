@@ -50,7 +50,6 @@ namespace BenchmarkDotNet.Tests.Exporters
         [Theory]
         [MethodImpl(MethodImplOptions.NoInlining)] // required by the Approval test framework, do NOT remove
         [MemberData(nameof(GetCultureInfos))]
-        [MethodImpl(MethodImplOptions.NoInlining)]
         public void Exporters(CultureInfo cultureInfo)
         {
             NamerFactory.AdditionalInformation = $"{GetName(cultureInfo)}";
