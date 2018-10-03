@@ -162,6 +162,8 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             config.SummaryPerType = !options.Join;
 
+            config.KeepBenchmarkFiles = options.KeepBenchmarkFiles;
+
             return config.AsReadOnly();
         }
 

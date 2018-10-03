@@ -62,6 +62,9 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [Option("coreRun", Required = false, HelpText = "Path to CoreRun (optional).")]
         public FileInfo CoreRunPath { get; set; }
+        
+        [Option("keepFiles", Required = false, Default = false, HelpText = "Determines if all auto-generated files should be kept or removed after running the benchmarks.")]
+        public bool KeepBenchmarkFiles { get; set; }
 
         [Usage(ApplicationAlias = "")]
         [PublicAPI]
