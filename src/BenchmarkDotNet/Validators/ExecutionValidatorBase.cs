@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 
-namespace BenchmarkDotNet.Validators 
+namespace BenchmarkDotNet.Validators
 {
     public abstract class ExecutionValidatorBase : IValidator
     {
@@ -92,7 +93,12 @@ namespace BenchmarkDotNet.Validators
 
             try
             {
-                globalSetupMethods.First().Invoke(benchmarkTypeInstance, null);
+                var result = globalSetupMethods.First().Invoke(benchmarkTypeInstance, null);
+
+                if (result is Task task)
+                {
+                    task.GetAwaiter().GetResult();
+                }
             }
             catch (Exception ex)
             {

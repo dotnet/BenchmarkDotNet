@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
@@ -280,6 +281,31 @@ namespace BenchmarkDotNet.Tests.Validators
 
             [GlobalSetup]
             public void Single() { }
+
+            [Benchmark]
+            public void NonThrowing() { }
+        }
+
+        [Fact]
+        public void AsyncGlobalSetupIsExecuted()
+        {
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(AsyncGlobalSetup))).ToList();
+
+            Assert.True(AsyncGlobalSetup.WasCalled);
+            Assert.Empty(validationErrors);
+        }
+
+        public class AsyncGlobalSetup
+        {
+            public static bool WasCalled;
+
+            [GlobalSetup]
+            public async Task GlobalSetup()
+            {
+                await Task.Delay(1);
+
+                WasCalled = true;
+            }
 
             [Benchmark]
             public void NonThrowing() { }
