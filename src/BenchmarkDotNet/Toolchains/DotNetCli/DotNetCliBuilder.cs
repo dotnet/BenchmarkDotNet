@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [SuppressMessage("ReSharper", "ClassWithVirtualMembersNeverInherited.Global")]
     public class DotNetCliBuilder : IBuilder
     {
-        public virtual string RestoreCommand => "restore --no-dependencies";
+        public virtual string RestoreCommand => "restore";
 
         private string TargetFrameworkMoniker { get; }
 
