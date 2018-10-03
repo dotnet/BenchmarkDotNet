@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Exporters
         public override void ExportToLog(Summary summary, ILogger logger)
         {
             logger.WriteLine("....");
-            foreach (string infoLine in summary.HostEnvironmentInfo.ToFormattedString())
+            foreach (string infoLine in summary.GetFormattedEnvironmentInfo())
             {
                 logger.WriteLineInfo(infoLine);
             }

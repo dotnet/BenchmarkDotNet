@@ -91,6 +91,8 @@ namespace BenchmarkDotNet.Running
                 
                 foreach (var configFromAttribute in configs)
                     config = ManualConfig.Union(config, configFromAttribute);
+
+                config = ManualConfig.Union(config, GetConfigWithCustomEnvironmentInfo(type));
             }
             return config.AsReadOnly();
         }
@@ -305,6 +307,25 @@ namespace BenchmarkDotNet.Running
                     parentType));
 
             throw new InvalidOperationException($"{parentType.Name} has no public, accessible method/property called {sourceName}, unable to read values for [ParamsSource]");
+        }
+
+        private static IEnumerable<string> GetCustomEnvironmentInfo(Type type)
+        {
+            var attributedMethods = type
+                .GetMethods()
+                .Where(m => m.GetCustomAttributes().OfType<CustomEnvironmentInfoAttribute>().Any());
+
+            var infos = attributedMethods.Select(m => m.Invoke(null, null).ToString());
+            return infos;
+        }
+
+        private static IConfig GetConfigWithCustomEnvironmentInfo(Type type)
+        {
+            var infos = GetCustomEnvironmentInfo(type).ToArray();
+            var config = ManualConfig.CreateEmpty();
+            config.Add(infos);
+
+            return config.AsReadOnly();
         }
 
         private static object[] ToArray(object sourceValue, MemberInfo memberInfo, Type type)

@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Exporters
             logger.WriteLine("<body>");
             logger.Write("<pre><code>");
             logger.WriteLine();
-            foreach (string infoLine in summary.HostEnvironmentInfo.ToFormattedString())
+            foreach (string infoLine in summary.GetFormattedEnvironmentInfo())
             {
                 logger.WriteLine(infoLine);
             }

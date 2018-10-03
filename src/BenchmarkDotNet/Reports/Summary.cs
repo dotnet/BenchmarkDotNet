@@ -167,5 +167,18 @@ namespace BenchmarkDotNet.Reports
         }
 
         public bool HasBaselines() => BenchmarksCases.Any(IsBaseline);
+
+        public IEnumerable<string> GetFormattedEnvironmentInfo() 
+        {
+            foreach (var hostInfo in HostEnvironmentInfo.ToFormattedString())
+            {
+                yield return hostInfo;
+            }
+            
+            foreach (var customInfo in Config.GetCustomEnvironmentInfo())
+            {
+                yield return customInfo;
+            }
+        }
     }
 }
