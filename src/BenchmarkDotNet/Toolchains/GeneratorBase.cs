@@ -6,10 +6,12 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
+using JetBrains.Annotations;
 using StreamWriter = System.IO.StreamWriter;
 
 namespace BenchmarkDotNet.Toolchains
 {
+    [PublicAPI]
     public abstract class GeneratorBase : IGenerator
     {
         public GenerateResult GenerateProject(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath)
@@ -35,25 +37,80 @@ namespace BenchmarkDotNet.Toolchains
             }
         }
 
-        protected abstract string GetBuildArtifactsDirectoryPath(BuildPartition assemblyLocation, string programName);
+        /// <summary>
+        /// returns a path to the folder where auto-generated project and code are going to be placed
+        /// </summary>
+        [PublicAPI] protected abstract string GetBuildArtifactsDirectoryPath(BuildPartition assemblyLocation, string programName);
 
-        protected virtual string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration) => buildArtifactsDirectoryPath;
+        /// <summary>
+        /// returns a path where executable should be found after the build
+        /// </summary>
+        [PublicAPI] protected virtual string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
+            => buildArtifactsDirectoryPath;
 
-        protected virtual string GetExecutableExtension() => RuntimeInformation.ExecutableExtension;
+        /// <summary>
+        /// returns OS-specific executable extension
+        /// </summary>
+        [PublicAPI] protected virtual string GetExecutableExtension()
+            => RuntimeInformation.ExecutableExtension;
 
-        protected virtual string GetProjectFilePath(string binariesDirectoryPath) => string.Empty;
+        /// <summary>
+        /// returns a path to the auto-generated .csproj file
+        /// </summary>
+        [PublicAPI] protected virtual string GetProjectFilePath(string buildArtifactsDirectoryPath)
+            => string.Empty;
 
-        protected abstract string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths);
+        /// <summary>
+        /// returns a list of artifacts that should be removed after running the benchmarks
+        /// </summary>
+        [PublicAPI] protected abstract string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths);
 
-        protected virtual void CopyAllRequiredFiles(ArtifactsPaths artifactsPaths) { }
+        /// <summary>
+        /// if you need to copy some extra files to make the benchmarks work you should override this method
+        /// </summary>
+        [PublicAPI] protected virtual void CopyAllRequiredFiles(ArtifactsPaths artifactsPaths) { }
 
-        protected virtual void GenerateNuGetConfig(ArtifactsPaths artifactsPaths) { }
+        /// <summary>
+        /// generates Nuget.Config file to make sure that BDN is using the right NuGet feeds
+        /// </summary>
+        [PublicAPI] protected virtual void GenerateNuGetConfig(ArtifactsPaths artifactsPaths) { }
 
-        protected virtual void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) { }
+        /// <summary>
+        /// generates .csproj file with a reference to the project with benchmarks
+        /// </summary>
+        [PublicAPI] protected virtual void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) { }
 
-        protected abstract void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths);
+        /// <summary>
+        /// generates a script can be used when dubugging compilation issues
+        /// </summary>
+        [PublicAPI] protected abstract void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths);
 
-        protected virtual string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath) => Path.Combine(buildArtifactsDirectoryPath, "packages");
+        /// <summary>
+        /// returns a path to the folder where NuGet packages should be restored
+        /// </summary>
+        [PublicAPI] protected virtual string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath)
+            => Path.Combine(buildArtifactsDirectoryPath, "packages");
+
+        /// <summary>
+        /// genrates an app.config file next to the executable with benchmarks
+        /// </summary>
+        [PublicAPI] protected virtual void GenerateAppConfig(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
+        {
+            string sourcePath = buildPartition.AssemblyLocation + ".config";
+
+            using (var source = File.Exists(sourcePath) ? new StreamReader(File.OpenRead(sourcePath)) : TextReader.Null)
+            using (var destination = new StreamWriter(File.Create(artifactsPaths.AppConfigPath), Encoding.UTF8))
+            {
+                AppConfigGenerator.Generate(buildPartition.RepresentativeBenchmarkCase.Job, source, destination, buildPartition.Resolver);
+            }
+        }
+
+        /// <summary>
+        /// generates the C# source code with all required boilerplate.
+        /// <remarks>You most probably do NOT need to override this method!!</remarks>
+        /// </summary>
+        [PublicAPI] protected virtual void GenerateCode(BuildPartition buildPartition, ArtifactsPaths artifactsPaths) 
+            => File.WriteAllText(artifactsPaths.ProgramCodePath, CodeGenerator.Generate(buildPartition));
 
         private ArtifactsPaths GetArtifactsPaths(BuildPartition buildPartition, string rootArtifactsFolderPath)
         {
@@ -77,20 +134,6 @@ namespace BenchmarkDotNet.Toolchains
                 executablePath: executablePath,
                 programName: programName,
                 packagesDirectoryName: GetPackagesDirectoryPath(buildArtifactsDirectoryPath));
-        }
-
-        private static void GenerateCode(BuildPartition buildPartition, ArtifactsPaths artifactsPaths) 
-            => File.WriteAllText(artifactsPaths.ProgramCodePath, CodeGenerator.Generate(buildPartition));
-
-        private static void GenerateAppConfig(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
-        {
-            string sourcePath = buildPartition.AssemblyLocation + ".config";
-
-            using (var source = File.Exists(sourcePath) ? new StreamReader(File.OpenRead(sourcePath)) : TextReader.Null)
-            using (var destination = new StreamWriter(File.Create(artifactsPaths.AppConfigPath), Encoding.UTF8))
-            {
-                AppConfigGenerator.Generate(buildPartition.RepresentativeBenchmarkCase.Job, source, destination, buildPartition.Resolver);
-            }
         }
     }
 }

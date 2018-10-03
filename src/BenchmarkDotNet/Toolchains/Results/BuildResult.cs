@@ -1,7 +1,9 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.Results
 {
+    [PublicAPI]
     public class BuildResult : GenerateResult
     {
         public bool IsBuildSuccess { get; }
@@ -16,9 +18,9 @@ namespace BenchmarkDotNet.Toolchains.Results
 
         public bool FailedToAccess => IsGenerateSuccess && !IsBuildSuccess && BuildException.Message.Contains("cannot access");
 
-        public static BuildResult Success(GenerateResult generateResult) => new BuildResult(generateResult, true, null);
+        [PublicAPI] public static BuildResult Success(GenerateResult generateResult) => new BuildResult(generateResult, true, null);
 
-        public static BuildResult Failure(GenerateResult generateResult, Exception exception = null) => new BuildResult(generateResult, false, exception);
+        [PublicAPI] public static BuildResult Failure(GenerateResult generateResult, Exception exception = null) => new BuildResult(generateResult, false, exception);
 
         public override string ToString() => "BuildResult: " + (IsBuildSuccess ? "Success" : "Failure");
     }
