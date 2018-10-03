@@ -32,6 +32,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IValidator> GetValidators() => config.GetValidators();
         public IEnumerable<HardwareCounter> GetHardwareCounters() => config.GetHardwareCounters();
         public IEnumerable<IFilter> GetFilters() => config.GetFilters();
+        public IEnumerable<string> GetCustomEnvironmentInfo() => config.GetCustomEnvironmentInfo();
 
         public IOrderer GetOrderer() => config.GetOrderer();
         public ISummaryStyle GetSummaryStyle() => config.GetSummaryStyle();

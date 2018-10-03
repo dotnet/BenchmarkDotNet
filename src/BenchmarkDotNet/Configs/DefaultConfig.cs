@@ -84,5 +84,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<HardwareCounter> GetHardwareCounters() => Array.Empty<HardwareCounter>();
 
         public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
+
+        public IEnumerable<string> GetCustomEnvironmentInfo() => Array.Empty<string>();
     }
 }

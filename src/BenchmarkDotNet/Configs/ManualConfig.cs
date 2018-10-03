@@ -28,6 +28,7 @@ namespace BenchmarkDotNet.Configs
         private readonly List<Job> jobs = new List<Job>();
         private readonly List<HardwareCounter> hardwareCounters = new List<HardwareCounter>();
         private readonly List<IFilter> filters = new List<IFilter>();
+        private readonly List<string> customEnvInfo = new List<string>();
         private IOrderer orderer;
         private ISummaryStyle summaryStyle;
         private readonly HashSet<BenchmarkLogicalGroupRule> logicalGroupRules = new HashSet<BenchmarkLogicalGroupRule>();
@@ -39,6 +40,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<Job> GetJobs() => jobs;
         public IEnumerable<HardwareCounter> GetHardwareCounters() => hardwareCounters;
         public IEnumerable<IFilter> GetFilters() => filters;
+        public IEnumerable<string> GetCustomEnvironmentInfo() => customEnvInfo;
         public IOrderer GetOrderer() => orderer;
         public ISummaryStyle GetSummaryStyle() => summaryStyle;
         
@@ -60,6 +62,7 @@ namespace BenchmarkDotNet.Configs
         public void Add(params Job[] newJobs) => jobs.AddRange(newJobs.Select(j => j.Freeze())); // DONTTOUCH: please DO NOT remove .Freeze() call.
         public void Add(params HardwareCounter[] newHardwareCounters) => hardwareCounters.AddRange(newHardwareCounters);
         public void Add(params IFilter[] newFilters) => filters.AddRange(newFilters);
+        public void Add(params string[] newCustomEnvInfo) => customEnvInfo.AddRange(newCustomEnvInfo);
         public void Set(IOrderer provider) => orderer = provider ?? orderer;
         public void Set(ISummaryStyle style) => summaryStyle = style ?? summaryStyle;
         public void Set(Encoding encoding) => Encoding = encoding;
@@ -77,6 +80,7 @@ namespace BenchmarkDotNet.Configs
             validators.AddRange(config.GetValidators());
             hardwareCounters.AddRange(config.GetHardwareCounters());
             filters.AddRange(config.GetFilters());
+            customEnvInfo.AddRange(config.GetCustomEnvironmentInfo());
             orderer = config.GetOrderer() ?? orderer;
             KeepBenchmarkFiles |= config.KeepBenchmarkFiles;
             SummaryPerType &= config.SummaryPerType;

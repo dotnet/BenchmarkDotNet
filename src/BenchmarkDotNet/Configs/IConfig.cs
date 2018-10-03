@@ -25,6 +25,7 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<IValidator> GetValidators();
         IEnumerable<HardwareCounter> GetHardwareCounters();
         IEnumerable<IFilter> GetFilters();
+        IEnumerable<string> GetCustomEnvironmentInfo();
 
         [CanBeNull]
         IOrderer GetOrderer();
