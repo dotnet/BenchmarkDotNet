@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Portability;
 using CommandLine;
 using CommandLine.Text;
 using JetBrains.Annotations;
@@ -79,12 +80,14 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return new Example("Run benchmarks for Clr, Core and Mono", style, new CommandLineOptions { Runtimes = new[] { "Clr", "Core", "Mono" } });
                 yield return new Example("Use MemoryDiagnoser to get GC stats", style, new CommandLineOptions { UseMemoryDiagnoser = true });
                 yield return new Example("Use DisassemblyDiagnoser to get disassembly", style, new CommandLineOptions { UseDisassemblyDiagnoser = true });
-                yield return new Example("Run all benchmarks exactly once", style, new CommandLineOptions { BaseJob = "Dry", Filters = new[] { "*" } });
-                yield return new Example("Run all benchmarks from System.Memory namespace", style, new CommandLineOptions { Filters = new[] { "System.Memory*" } });
+                yield return new Example("Run all benchmarks exactly once", style, new CommandLineOptions { BaseJob = "Dry", Filters = new[] { HandleWildcardsOnUnix("*") } });
+                yield return new Example("Run all benchmarks from System.Memory namespace", style, new CommandLineOptions { Filters = new[] { HandleWildcardsOnUnix("System.Memory*") } });
                 yield return new Example("Run all benchmarks from ClassA and ClassB using type names", style, new CommandLineOptions { Filters = new[] { "ClassA", "ClassB" } });
-                yield return new Example("Run all benchmarks from ClassA and ClassB using patterns", style, new CommandLineOptions { Filters = new[] { "*.ClassA.*", "*.ClassB.*" } });
-                yield return new Example("Run all benchmarks called `BenchmarkName` and show the results in single summary", style, new CommandLineOptions { Join = true, Filters = new[] { "*.BenchmarkName" } });
+                yield return new Example("Run all benchmarks from ClassA and ClassB using patterns", style, new CommandLineOptions { Filters = new[] { HandleWildcardsOnUnix("*.ClassA.*"), HandleWildcardsOnUnix("*.ClassB.*") } });
+                yield return new Example("Run all benchmarks called `BenchmarkName` and show the results in single summary", style, new CommandLineOptions { Join = true, Filters = new[] { HandleWildcardsOnUnix("*.BenchmarkName") } });
             }
         }
+
+        private static string HandleWildcardsOnUnix(string input) => !RuntimeInformation.IsWindows() && input.IndexOf('*') >= 0 ? $"'{input}'" : input; // #842
     }
 }
