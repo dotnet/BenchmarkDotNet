@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples
@@ -8,7 +9,14 @@ namespace BenchmarkDotNet.Samples
     public class IntroCustomEnvironmentInfo
     {
         [CustomEnvironmentInfo]
-        public static string PlainText() => "Plain text";
+        public static string CustomLine() => "Single custom line";
+
+        [CustomEnvironmentInfo]
+        public static IEnumerable<string> SequenceOfCustomLines()
+        {
+            yield return "First custom line";
+            yield return "Second custom line";
+        }
 
         [Benchmark]
         public void Sleep() => Thread.Sleep(10);
