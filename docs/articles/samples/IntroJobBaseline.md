@@ -25,11 +25,11 @@ Frequency=2531249 Hz, Resolution=395.0619 ns, Timer=TSC
 ```
 
 ```markdown
-    Method | Runtime |     Mean |     Error |    StdDev | Scaled | ScaledSD |
----------- |-------- |---------:|----------:|----------:|-------:|---------:|
- SplitJoin |     Clr | 19.42 us | 0.2447 us | 0.1910 us |   1.00 |     0.00 |
- SplitJoin |    Core | 13.00 us | 0.2183 us | 0.1935 us |   0.67 |     0.01 |
- SplitJoin |    Mono | 39.14 us | 0.7763 us | 1.3596 us |   2.02 |     0.07 |
+    Method | Runtime |     Mean |     Error |    StdDev | Ratio | RatioSD |
+---------- |-------- |---------:|----------:|----------:|------:|--------:|
+ SplitJoin |     Clr | 19.42 us | 0.2447 us | 0.1910 us |  1.00 |    0.00 |
+ SplitJoin |    Core | 13.00 us | 0.2183 us | 0.1935 us |  0.67 |    0.01 |
+ SplitJoin |    Mono | 39.14 us | 0.7763 us | 1.3596 us |  2.02 |    0.07 |
 ```
 
 ### Links

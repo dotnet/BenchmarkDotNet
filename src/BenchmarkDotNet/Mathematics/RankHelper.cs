@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Mathematics
         {
             if (x.N >= 3 && y.N >= 3)
             {
-                var tost = StatisticalTestHelper.CalculateTost(MannWhitneyTest.Instance, x.GetValues().ToArray(), y.GetValues().ToArray(), RelativeThreshold.Default);
+                var tost = StatisticalTestHelper.CalculateTost(MannWhitneyTest.Instance, x.GetSortedValues().ToArray(), y.GetSortedValues().ToArray(), RelativeThreshold.Default);
                 if (tost.Conclusion != EquivalenceTestConclusion.Unknown)
                     return tost.Conclusion == EquivalenceTestConclusion.Same;
             }

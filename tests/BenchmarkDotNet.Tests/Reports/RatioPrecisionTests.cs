@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -17,11 +18,11 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Reports
 {
-    public class ScaledPrecisionTests
+    public class RatioPrecisionTests
     {
         private readonly ITestOutputHelper output;
 
-        public ScaledPrecisionTests(ITestOutputHelper output)
+        public RatioPrecisionTests(ITestOutputHelper output)
         {
             this.output = output;
         }
@@ -31,14 +32,14 @@ namespace BenchmarkDotNet.Tests.Reports
         [InlineData(new [] { 40, 1, 20 })]
         [InlineData(new [] { 0, 1, 20 })]
         // First value is baseline, others are benchmark measurements
-        public void ScaledPrecisionTestWithBaseline(int[] values)
+        public void RatioPrecisionTestWithBaseline(int[] values)
         {
             var summary = CreateSummary(values);
-            var scaledIndex = Array.FindIndex(summary.Table.FullHeader, c => c == "Scaled");
+            int ratioIndex = Array.FindIndex(summary.Table.FullHeader, c => c == BaselineRatioColumn.RatioMean.ColumnName);
 
             foreach (var row in summary.Table.FullContent)
             {
-                ContainsDecimalPointAndCheckDecimalPrecision(values, row[scaledIndex]);
+                ContainsDecimalPointAndCheckDecimalPrecision(values, row[ratioIndex]);
             }
         }
 

@@ -6,14 +6,14 @@ Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
   [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 
 
- Method | Param |     Mean |    Error |   StdDev | Scaled | ScaledSD | Rank |          LogicalGroup | Baseline |
-------- |------ |---------:|---------:|---------:|-------:|---------:|-----:|---------------------- |--------- |
-   Base |     2 | 102.0 ns | 6.088 ns | 1.581 ns |   1.00 |     0.00 |    1 |  DefaultJob-[Param=2] |      Yes | ^
-    Foo |     2 | 202.0 ns | 6.088 ns | 1.581 ns |   1.98 |     0.03 |    2 |  DefaultJob-[Param=2] |       No |
-    Bar |     2 | 302.0 ns | 6.088 ns | 1.581 ns |   2.96 |     0.04 |    3 |  DefaultJob-[Param=2] |       No |
-        |       |          |          |          |        |          |      |                       |          |
-   Base |    10 | 402.0 ns | 6.088 ns | 1.581 ns |   1.00 |     0.00 |    1 | DefaultJob-[Param=10] |      Yes | ^
-    Foo |    10 | 502.0 ns | 6.088 ns | 1.581 ns |   1.25 |     0.01 |    2 | DefaultJob-[Param=10] |       No |
-    Bar |    10 | 602.0 ns | 6.088 ns | 1.581 ns |   1.50 |     0.01 |    3 | DefaultJob-[Param=10] |       No |
+ Method | Param |     Mean |    Error |   StdDev | Ratio | RatioSD | Rank |          LogicalGroup | Baseline |
+------- |------ |---------:|---------:|---------:|------:|--------:|-----:|---------------------- |--------- |
+   Base |     2 | 102.0 ns | 6.088 ns | 1.581 ns |  1.00 |    0.00 |    1 |  DefaultJob-[Param=2] |      Yes | ^
+    Foo |     2 | 202.0 ns | 6.088 ns | 1.581 ns |  1.98 |    0.02 |    2 |  DefaultJob-[Param=2] |       No |
+    Bar |     2 | 302.0 ns | 6.088 ns | 1.581 ns |  2.96 |    0.03 |    3 |  DefaultJob-[Param=2] |       No |
+        |       |          |          |          |       |         |      |                       |          |
+   Base |    10 | 402.0 ns | 6.088 ns | 1.581 ns |  1.00 |    0.00 |    1 | DefaultJob-[Param=10] |      Yes | ^
+    Foo |    10 | 502.0 ns | 6.088 ns | 1.581 ns |  1.25 |    0.00 |    2 | DefaultJob-[Param=10] |       No |
+    Bar |    10 | 602.0 ns | 6.088 ns | 1.581 ns |  1.50 |    0.00 |    3 | DefaultJob-[Param=10] |       No |
 
 Errors: 0

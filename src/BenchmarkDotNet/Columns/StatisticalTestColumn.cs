@@ -28,8 +28,8 @@ namespace BenchmarkDotNet.Columns
 
         protected override string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, Statistics current, bool isBaseline)
         {
-            var x = baseline.GetValues().ToArray();
-            var y = current.GetValues().ToArray();
+            var x = baseline.GetOriginalValues().ToArray();
+            var y = current.GetOriginalValues().ToArray();
             switch (Kind)
             {
                 case StatisticalTestKind.Welch:

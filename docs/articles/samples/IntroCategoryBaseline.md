@@ -14,13 +14,13 @@ The only way to have several baselines in the same class is to separate them by 
 ### Output
 
 ```markdown
-|  Method | Categories |      Mean |     Error |    StdDev | Scaled |
-|-------- |----------- |----------:|----------:|----------:|-------:|
-|  Time50 |       Fast |  50.46 ms | 0.0745 ms | 0.0697 ms |   1.00 |
-| Time100 |       Fast | 100.47 ms | 0.0955 ms | 0.0893 ms |   1.99 |
-|         |            |           |           |           |        |
-| Time550 |       Slow | 550.48 ms | 0.0525 ms | 0.0492 ms |   1.00 |
-| Time600 |       Slow | 600.45 ms | 0.0396 ms | 0.0331 ms |   1.09 |
+|  Method | Categories |      Mean |     Error |    StdDev | Ratio |
+|-------- |----------- |----------:|----------:|----------:|------:|
+|  Time50 |       Fast |  50.46 ms | 0.0745 ms | 0.0697 ms |  1.00 |
+| Time100 |       Fast | 100.47 ms | 0.0955 ms | 0.0893 ms |  1.99 |
+|         |            |           |           |           |       |
+| Time550 |       Slow | 550.48 ms | 0.0525 ms | 0.0492 ms |  1.00 |
+| Time600 |       Slow | 600.45 ms | 0.0396 ms | 0.0331 ms |  1.09 |
 ```
 
 ### Links

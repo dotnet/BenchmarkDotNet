@@ -196,7 +196,7 @@ public class Sleeps
 
 As a result, you will have additional column in the summary table:
 
-| Method  | Median      | StdDev    | Scaled |
+| Method  | Median      | StdDev    | Ratio |
 | ------- | ----------- | --------- | ------ |
 | Time100 | 100.2640 ms | 0.1238 ms | 1.00   |
 | Time150 | 150.2093 ms | 0.1034 ms | 1.50   |

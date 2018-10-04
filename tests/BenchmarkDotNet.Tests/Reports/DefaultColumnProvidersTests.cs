@@ -28,8 +28,8 @@ namespace BenchmarkDotNet.Tests.Reports
         }
 
         [Theory]
-        [InlineData(false, "Mean, Error, Scaled")]
-        [InlineData(true, "Mean, Error, StdDev, Scaled, ScaledSD")]
+        [InlineData(false, "Mean, Error, Ratio")]
+        [InlineData(true, "Mean, Error, Median, StdDev, Ratio, RatioSD")]
         public void DefaultStatisticsColumnsTest(bool hugeSd, string expectedColumnNames)
         {
             var summary = CreateSummary(hugeSd, Array.Empty<Metric>());
@@ -90,14 +90,16 @@ namespace BenchmarkDotNet.Tests.Reports
         {
             var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
             var executeResult = new ExecuteResult(true, 0, Array.Empty<string>(), Array.Empty<string>());
+            bool isFoo = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Foo";
+            bool isBar = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Bar";            
             var measurements = new List<Measurement>
             {
                 new Measurement(1, IterationMode.Workload, IterationStage.Result, 1, 1, 1),
-                new Measurement(1, IterationMode.Workload, IterationStage.Result, 2, 1, hugeSd ? 2 : 1),
-                new Measurement(1, IterationMode.Workload, IterationStage.Result, 3, 1, 1),
-                new Measurement(1, IterationMode.Workload, IterationStage.Result, 4, 1, hugeSd ? 2 : 1),
-                new Measurement(1, IterationMode.Workload, IterationStage.Result, 5, 1, 1),
-                new Measurement(1, IterationMode.Workload, IterationStage.Result, 6, 1, 1),
+                new Measurement(1, IterationMode.Workload, IterationStage.Result, 2, 1, hugeSd && isFoo ? 2 : 1),
+                new Measurement(1, IterationMode.Workload, IterationStage.Result, 3, 1, hugeSd && isBar ? 3 : 1),
+                new Measurement(1, IterationMode.Workload, IterationStage.Result, 4, 1, hugeSd && isFoo ? 2 : 1),
+                new Measurement(1, IterationMode.Workload, IterationStage.Result, 5, 1, hugeSd && isBar ? 3 : 1),
+                new Measurement(1, IterationMode.Workload, IterationStage.Result, 6, 1, 1)
             };
             return new BenchmarkReport(benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default, metrics);
         }
