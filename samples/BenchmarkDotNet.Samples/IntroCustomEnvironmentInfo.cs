@@ -18,6 +18,10 @@ namespace BenchmarkDotNet.Samples
             yield return "Second custom line";
         }
 
+        [CustomEnvironmentInfo]
+        public static string[] ArrayOfCustomLines() => 
+            new[] { "First custom line from array", "Second custom line from array" };
+
         [Benchmark]
         public void Sleep() => Thread.Sleep(10);
 

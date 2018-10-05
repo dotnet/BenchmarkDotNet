@@ -329,22 +329,22 @@ namespace BenchmarkDotNet.Running
                 if (methodInfo.GetParameters().Any())
                     throw new InvalidOperationException($"Custom environment info method {methodInfo.Name} has incorrect signature.\nMethod shouldn't have any arguments.");
 
-                switch (methodInfo.ReturnType)
+                var returnType = methodInfo.ReturnType;
+                if (returnType == typeof(string))
                 {
-                    case Type t when t == typeof(string):
-                        yield return (string)methodInfo.Invoke(null, null);
-                        break;
-
-                    case Type t when t == typeof(IEnumerable<string>):
-                        var lines = (IEnumerable<string>)methodInfo.Invoke(null, null);
-                        foreach (var l in lines)
-                        {
-                            yield return l;
-                        }
-                        break;
-
-                    default:
-                        throw new InvalidOperationException($"Custom environment info method {methodInfo.Name} has incorrect signature.\nMethod should return string or IEnumerable<string>.");
+                    yield return (string)methodInfo.Invoke(null, null);
+                }
+                else if (typeof(IEnumerable<string>).IsAssignableFrom(returnType))
+                {
+                    var lines = (IEnumerable<string>)methodInfo.Invoke(null, null);
+                    foreach (var l in lines)
+                    {
+                        yield return l;
+                    }
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Custom environment info method {methodInfo.Name} has incorrect signature.\nMethod should return string or IEnumerable<string>.");
                 }
             }
         }
