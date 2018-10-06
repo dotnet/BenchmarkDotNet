@@ -163,6 +163,11 @@ namespace BenchmarkDotNet.ConsoleArguments
                 config.Add(baseJob);
 
             config.Add(options.Exporters.SelectMany(exporter => AvailableExporters[exporter]).ToArray());
+            
+            config.Add(options.HardwareCounters
+                .Select(counterName => Enum.TryParse(counterName, ignoreCase: true, out HardwareCounter counter) ? counter : HardwareCounter.NotSet)
+                .Where(counter => counter != HardwareCounter.NotSet)
+                .ToArray());
 
             if (options.UseMemoryDiagnoser)
                 config.Add(MemoryDiagnoser.Default);

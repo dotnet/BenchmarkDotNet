@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Portability;
 using CommandLine;
@@ -60,6 +61,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         
         [Option("keepFiles", Required = false, Default = false, HelpText = "Determines if all auto-generated files should be kept or removed after running the benchmarks.")]
         public bool KeepBenchmarkFiles { get; set; }
+
+        [Option("counters", Required = false, HelpText = "Hardware Counters", Separator = '+')]
+        public IEnumerable<string> HardwareCounters { get; set; }
         
         [Option("cli", Required = false, HelpText = "Path to dotnet cli (optional).")]
         public FileInfo CliPath { get; set; }
@@ -94,6 +98,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return new Example("Run benchmarks for .NET Core 2.0, .NET Core 2.1 and .NET Core 2.2. .NET Core 2.0 will be baseline because it was first.", longName, new CommandLineOptions { Runtimes = new[] { "netcoreapp2.0", "netcoreapp2.1", "netcoreapp2.2" } });
                 yield return new Example("Use MemoryDiagnoser to get GC stats", shortName, new CommandLineOptions { UseMemoryDiagnoser = true });
                 yield return new Example("Use DisassemblyDiagnoser to get disassembly", shortName, new CommandLineOptions { UseDisassemblyDiagnoser = true });
+                yield return new Example("Use HardwareCountersDiagnoser to get hardware coutner info", longName, new CommandLineOptions { HardwareCounters = new [] { nameof(HardwareCounter.CacheMisses), nameof(HardwareCounter.InstructionRetired) } });
                 yield return new Example("Run all benchmarks exactly once", shortName, new CommandLineOptions { BaseJob = "Dry", Filters = new[] { HandleWildcardsOnUnix("*") } });
                 yield return new Example("Run all benchmarks from System.Memory namespace", shortName, new CommandLineOptions { Filters = new[] { HandleWildcardsOnUnix("System.Memory*") } });
                 yield return new Example("Run all benchmarks from ClassA and ClassB using type names", shortName, new CommandLineOptions { Filters = new[] { "ClassA", "ClassB" } });

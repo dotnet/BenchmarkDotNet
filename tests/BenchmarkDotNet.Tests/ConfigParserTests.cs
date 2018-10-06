@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.ConsoleArguments;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Exporters;
@@ -167,6 +168,16 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is MonoRuntime));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRtRuntime));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRtRuntime));
+        }
+        
+        [Fact]
+        public void CanParseHardwareCounters()
+        {
+            var config = ConfigParser.Parse(new[] { "--counters", $"{nameof(HardwareCounter.CacheMisses)}+{nameof(HardwareCounter.InstructionRetired)}"}, new OutputLogger(Output)).config;
+
+            Assert.Equal(2, config.GetHardwareCounters().Count());
+            Assert.Single(config.GetHardwareCounters().Where(counter => counter == HardwareCounter.CacheMisses));
+            Assert.Single(config.GetHardwareCounters().Where(counter => counter == HardwareCounter.InstructionRetired));
         }
     }
 }
