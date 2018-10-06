@@ -82,6 +82,39 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [Option("ilcPath", Required = false, HelpText = "Optional IlcPath which should be used to run with private CoreRT build.")]
         public DirectoryInfo CoreRtPath { get; set; }
+        
+        [Option("launchCount", Required = false, HelpText = "How many times we should launch process with target benchmark. The default is 1.")]
+        public int? LaunchCount { get; set; }
+            
+        [Option("warmupCount", Required = false, HelpText = "How many warmup iterations should be performed. If you set it, the minWarmupCount and maxWarmupCount are ignored. By default calculated by the heuristic.")]
+        public int? WarmupIterationCount { get; set; }
+        
+        [Option("minWarmupCount", Required = false, HelpText = "Minimum count of warmup iterations that should be performed. The default is 6.")]
+        public int? MinWarmupIterationCount { get; set; }
+        
+        [Option("maxWarmupCount", Required = false, HelpText = "Maximum count of warmup iterations that should be performed. The default is 50.")]
+        public int? MaxWarmupIterationCount { get; set; }
+        
+        [Option("iterationTime", Required = false, HelpText = "Desired time of execution of an iteration. Used by Pilot stage to estimate the number of invocations per iteration. 500ms by default")]
+        public int? IterationTimeInMiliseconds { get; set; }
+        
+        [Option("iterationCount", Required = false, HelpText = "How many target iterations should be performed. By default calculated by the heuristic.")]
+        public int? IterationCount { get; set; }
+        
+        [Option("minIterationCount", Required = false, HelpText = "Minimum number of iterations to run. The default is 15.")]
+        public int? MinIterationCount { get; set; }
+        
+        [Option("maxIterationCount", Required = false, HelpText = "Maximum number of iterations to run. The default is 100.")]
+        public int? MaxIterationCount { get; set; }
+        
+        [Option("invocationCount", Required = false, HelpText = "Invocation count in a single iteration. By default calculated by the heuristic.")]
+        public int? InvocationCount { get; set; }
+        
+        [Option("unrollFactor", Required = false, HelpText = "How many times the benchmark method will be invoked per one iteration of a generated loop. 16 by default")]
+        public int? UnrollFactor { get; set; }
+        
+        [Option("runOncePerIteration", Required = false, Default = false, HelpText = "Run the benchmark exactly once per iteration.")]
+        public bool RunOncePerIteration { get; set; }
 
         [Usage(ApplicationAlias = "")]
         [PublicAPI]
@@ -103,7 +136,10 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return new Example("Run all benchmarks from System.Memory namespace", shortName, new CommandLineOptions { Filters = new[] { HandleWildcardsOnUnix("System.Memory*") } });
                 yield return new Example("Run all benchmarks from ClassA and ClassB using type names", shortName, new CommandLineOptions { Filters = new[] { "ClassA", "ClassB" } });
                 yield return new Example("Run all benchmarks from ClassA and ClassB using patterns", shortName, new CommandLineOptions { Filters = new[] { HandleWildcardsOnUnix("*.ClassA.*"), HandleWildcardsOnUnix("*.ClassB.*") } });
-                yield return new Example("Run all benchmarks called `BenchmarkName` and show the results in single summary", shortName, new CommandLineOptions { Join = true, Filters = new[] { HandleWildcardsOnUnix("*.BenchmarkName") } });
+                yield return new Example("Run all benchmarks called `BenchmarkName` and show the results in single summary", longName, new CommandLineOptions { Join = true, Filters = new[] { HandleWildcardsOnUnix("*.BenchmarkName") } });
+                yield return new Example("Run selected benchmarks once per iteration", longName, new CommandLineOptions { RunOncePerIteration = true });
+                yield return new Example("Run selected benchmarks 100 times per iteration. Perform single warmup iteration and 5 actual workload iterations", longName, new CommandLineOptions { InvocationCount = 100, WarmupIterationCount = 1, IterationCount = 5});
+                yield return new Example("Run selected benchmarks 250ms per iteration. Perform from 9 to 15 iterations", longName, new CommandLineOptions { IterationTimeInMiliseconds = 250, MinIterationCount = 9, MaxIterationCount = 15});
             }
         }
 

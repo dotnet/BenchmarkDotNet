@@ -51,6 +51,26 @@ Example: run the benchmarks for .NET 4.7.2 and .NET Core 2.1:
 dotnet run -c Release -- --runtimes net472 netcoreapp2.1
 ```
 
+## Number of invocations and iterations
+
+* `--launchCount` - how many times we should launch process with target benchmark. The default is 1.
+* `--warmupCount` - how many warmup iterations should be performed. If you set it, the minWarmupCount and maxWarmupCount are ignored. By default calculated by the heuristic.
+* `--minWarmupCount` - minimum count of warmup iterations that should be performed. The default is 6.
+* `--maxWarmupCount` - maximum count of warmup iterations that should be performed. The default is 50.
+* `--iterationTime` - desired time of execution of an iteration. Used by Pilot stage to estimate the number of invocations per iteration. 500ms by default.
+* `--iterationCount` - how many target iterations should be performed. By default calculated by the heuristic.
+* `--minIterationCount` - minimum number of iterations to run. The default is 15.
+* `--maxIterationCount` - maximum number of iterations to run. The default is 100.
+* `--invocationCount` - invocation count in a single iteration. By default calculated by the heuristic.
+* `--unrollFactor` - how many times the benchmark method will be invoked per one iteration of a generated loop. 16 by default
+* `--runOncePerIteration` - run the benchmark exactly once per iteration. False by default.
+
+Example: run single warmup iteration, from 9 to 12 actual workload iterations.
+
+```log
+dotnet run -c Release -- --warmupCount 1 --minIterationCount 9 --maxIterationCount 12
+```
+
 ## More
 
 * `-j`, `--job` (Default: Default) Dry/Short/Medium/Long or Default

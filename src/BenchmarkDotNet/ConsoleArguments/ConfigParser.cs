@@ -14,6 +14,7 @@ using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
+using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
@@ -203,6 +204,29 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.Affinity.HasValue)
                 baseJob = baseJob.WithAffinity((IntPtr) options.Affinity.Value);
 
+            if (options.LaunchCount.HasValue)
+                baseJob = baseJob.WithLaunchCount(options.LaunchCount.Value);
+            if (options.WarmupIterationCount.HasValue)
+                baseJob = baseJob.WithWarmupCount(options.WarmupIterationCount.Value);
+            if (options.MinWarmupIterationCount.HasValue)
+                baseJob = baseJob.WithMinWarmupCount(options.MinWarmupIterationCount.Value);
+            if (options.MaxWarmupIterationCount.HasValue)
+                baseJob = baseJob.WithMaxWarmupCount(options.MaxWarmupIterationCount.Value);
+            if (options.IterationTimeInMiliseconds.HasValue)
+                baseJob = baseJob.WithIterationTime(TimeInterval.FromMilliseconds(options.IterationTimeInMiliseconds.Value));
+            if (options.IterationCount.HasValue)
+                baseJob = baseJob.WithIterationCount(options.IterationCount.Value);
+            if (options.MinIterationCount.HasValue)
+                baseJob = baseJob.WithMinIterationCount(options.MinIterationCount.Value);
+            if (options.MaxIterationCount.HasValue)
+                baseJob = baseJob.WithMaxIterationCount(options.MaxIterationCount.Value);
+            if (options.InvocationCount.HasValue)
+                baseJob = baseJob.WithInvocationCount(options.InvocationCount.Value);
+            if (options.UnrollFactor.HasValue)
+                baseJob = baseJob.WithUnrollFactor(options.UnrollFactor.Value);
+            if (options.RunOncePerIteration)
+                baseJob = baseJob.RunOncePerIteration();
+            
             return baseJob;
         }
 
@@ -212,7 +236,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return baseJob.With(InProcessToolchain.Instance);
 
             foreach (string runtime in options.Runtimes) // known runtimes
-                yield return CreateJob(baseJob, runtime.ToLowerInvariant(), options);
+                yield return CreateJobForGivenRuntime(baseJob, runtime.ToLowerInvariant(), options);
 
             if (options.CoreRunPath != null)
                 yield return CreateCoreRunJob(baseJob, options); // local CoreFX and CoreCLR builds
@@ -220,7 +244,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return baseJob.With(new ClrRuntime(options.ClrVersion)); // local builds of .NET Runtime
         }
 
-        private static Job CreateJob(Job baseJob, string runtime, CommandLineOptions options)
+        private static Job CreateJobForGivenRuntime(Job baseJob, string runtime, CommandLineOptions options)
         {
             switch (runtime)
             {

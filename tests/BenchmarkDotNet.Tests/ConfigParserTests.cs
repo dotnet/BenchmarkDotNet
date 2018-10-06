@@ -7,6 +7,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
+using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRt;
@@ -54,6 +55,41 @@ namespace BenchmarkDotNet.Tests
 
             Assert.Single(config.GetJobs());
             Assert.Contains(Job.Dry, config.GetJobs());
+        }
+        
+        [Fact]
+        public void UserCanSpecifyHowManyTimesTheBenchmarkShouldBeExecuted()
+        {
+            const int launchCount = 4;
+            const int warmupCount = 1;
+            const int iterationTime = 250;
+            const int iterationCount = 20;
+            
+            var config = ConfigParser.Parse(new[]
+            {
+                "--LaunchCount", launchCount.ToString(), 
+                "--warmupCount",  warmupCount.ToString(),
+                "--iterationTime", iterationTime.ToString(),
+                "--iterationCount", iterationCount.ToString()
+            }, new OutputLogger(Output)).config;
+
+            var job = config.GetJobs().Single();
+            
+            Assert.Equal(launchCount, job.Run.LaunchCount);
+            Assert.Equal(warmupCount, job.Run.WarmupCount);
+            Assert.Equal(TimeInterval.FromMilliseconds(iterationTime), job.Run.IterationTime);
+            Assert.Equal(iterationCount, job.Run.IterationCount);
+        }
+        
+        [Fact]
+        public void UserCanEasilyRequestToRunTheBenchmarkOncePerIteration()
+        {
+            var configEasy = ConfigParser.Parse(new[] { "--runOncePerIteration" }, new OutputLogger(Output)).config;
+
+            var easyJob = configEasy.GetJobs().Single();
+            
+            Assert.Equal(1, easyJob.Run.UnrollFactor);
+            Assert.Equal(1, easyJob.Run.InvocationCount);
         }
 
         [Fact]
