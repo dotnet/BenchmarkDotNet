@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public abstract class DotNetCliGenerator : GeneratorBase
     {
-        protected string TargetFrameworkMoniker { get; }
+        internal string TargetFrameworkMoniker { get; }
 
         protected Func<Platform, string> PlatformProvider { get; }
 

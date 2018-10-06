@@ -43,12 +43,12 @@ You can also filter the benchmarks by categories:
 
 ## Runtimes
 
-The `--runtimes` or just `-r` allows you to run the benchmarks for selected Runtimes. Available options are: Clr, Mono, Core and CoreRT.
+The `--runtimes` or just `-r` allows you to run the benchmarks for selected Runtimes. Available options are: Mono, CoreRT, net46, net461, net462, net47, net471, net472, netcoreapp2.0, netcoreapp2.1, netcoreapp2.2, netcoreapp3.0.
 
-Example: run the benchmarks for .NET and .NET Core:
+Example: run the benchmarks for .NET 4.7.2 and .NET Core 2.1:
 
 ```log
-dotnet run -c Release -- --runtimes clr core
+dotnet run -c Release -- --runtimes net472 netcoreapp2.1
 ```
 
 ## More
@@ -61,4 +61,7 @@ dotnet run -c Release -- --runtimes clr core
 * `--affinity` Affinity mask to set for the benchmark process
 * `--allStats` (Default: false) Displays all statistics (min, max & more)
 * `--attribute` Run all methods with given attribute (applied to class or method)
+* `--monoPath` custom Path for Mono
+* `--cliPath` custom Path for dotnet cli
+* `--coreRt` path to ILCompiler for CoreRT
 

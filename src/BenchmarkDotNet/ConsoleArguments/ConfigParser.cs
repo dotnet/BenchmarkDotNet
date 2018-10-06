@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -16,6 +17,7 @@ using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
@@ -28,7 +30,7 @@ namespace BenchmarkDotNet.ConsoleArguments
     {
         private const int MinimumDisplayWidth = 80;
 
-        private static readonly IReadOnlyDictionary<string, Job> AvailableJobs = new Dictionary<string, Job>
+        private static readonly IReadOnlyDictionary<string, Job> AvailableJobs = new Dictionary<string, Job>(StringComparer.InvariantCultureIgnoreCase)
         {
             { "default", Job.Default },
             { "dry", Job.Dry },
@@ -38,18 +40,25 @@ namespace BenchmarkDotNet.ConsoleArguments
             { "verylong", Job.VeryLongRun }
         };
 
-        private static readonly IReadOnlyDictionary<string, Runtime> AvailableRuntimes = new Dictionary<string, Runtime>
-        {
-            { "clr", Runtime.Clr },
-            { "core", Runtime.Core },
-            { "mono", Runtime.Mono },
-            { "corert", Runtime.CoreRT }
-        };
+        private static readonly ImmutableHashSet<string> AvailableRuntimes = ImmutableHashSet.Create(StringComparer.InvariantCultureIgnoreCase,
+            "net46",
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "netcoreapp2.0",
+            "netcoreapp2.1",
+            "netcoreapp2.2",
+            "netcoreapp3.0",
+            "mono",
+            "corert"
+        );
 
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
         [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
         private static readonly IReadOnlyDictionary<string, IExporter[]> AvailableExporters =
-            new Dictionary<string, IExporter[]>
+            new Dictionary<string, IExporter[]>(StringComparer.InvariantCultureIgnoreCase)
             {
                 { "csv", new[] { CsvExporter.Default } },
                 { "csvmeasurements", new[] { CsvMeasurementsExporter.Default } },
@@ -97,35 +106,47 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         private static bool Validate(CommandLineOptions options, ILogger logger)
         {
-            if (!AvailableJobs.ContainsKey(options.BaseJob.ToLowerInvariant()))
+            if (!AvailableJobs.ContainsKey(options.BaseJob))
             {
                 logger.WriteLineError($"The provided base job \"{options.BaseJob}\" is invalid. Available options are: {string.Join(", ", AvailableJobs.Keys)}.");
                 return false;
             }
 
             foreach (string runtime in options.Runtimes)
-                if (!AvailableRuntimes.ContainsKey(runtime.ToLowerInvariant()))
+                if (!AvailableRuntimes.Contains(runtime))
                 {
-                    logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", AvailableRuntimes.Keys)}.");
+                    logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", AvailableRuntimes)}.");
                     return false;
                 }
 
             foreach (string exporter in options.Exporters)
-                if (!AvailableExporters.ContainsKey(exporter.ToLowerInvariant()))
+                if (!AvailableExporters.ContainsKey(exporter))
                 {
                     logger.WriteLineError($"The provided exporter \"{exporter}\" is invalid. Available options are: {string.Join(", ", AvailableExporters.Keys)}.");
                     return false;
                 }
-            
-            if (options.CliPath != null && !options.CliPath.Exists)
+
+            if (options.CliPath.IsNotNullButDoesNotExist())
             {
                 logger.WriteLineError($"The provided {nameof(options.CliPath)} \"{options.CliPath}\" does NOT exist.");
                 return false;
             }
-            
-            if (options.CoreRunPath != null && !options.CoreRunPath.Exists)
+
+            if (options.CoreRunPath.IsNotNullButDoesNotExist())
             {
                 logger.WriteLineError($"The provided {nameof(options.CoreRunPath)} \"{options.CoreRunPath}\" does NOT exist.");
+                return false;
+            }
+            
+            if (options.MonoPath.IsNotNullButDoesNotExist())
+            {
+                logger.WriteLineError($"The provided {nameof(options.MonoPath)} \"{options.MonoPath}\" does NOT exist.");
+                return false;
+            }
+            
+            if (options.CoreRtPath.IsNotNullButDoesNotExist())
+            {
+                logger.WriteLineError($"The provided {nameof(options.CoreRtPath)} \"{options.CoreRtPath}\" does NOT exist.");
                 return false;
             }
 
@@ -140,7 +161,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             config.Add(Expand(baseJob, options).ToArray());
             if (config.GetJobs().IsEmpty() && baseJob != Job.Default)
                 config.Add(baseJob);
-            
+
             config.Add(options.Exporters.SelectMany(exporter => AvailableExporters[exporter]).ToArray());
 
             if (options.UseMemoryDiagnoser)
@@ -185,13 +206,49 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.RunInProcess)
                 yield return baseJob.With(InProcessToolchain.Instance);
 
-            foreach (string runtime in options.Runtimes)
-                yield return baseJob.With(AvailableRuntimes[runtime.ToLowerInvariant()]);
+            foreach (string runtime in options.Runtimes) // known runtimes
+                yield return CreateJob(baseJob, runtime.ToLowerInvariant(), options);
 
             if (options.CoreRunPath != null)
-                yield return CreateCoreRunJob(baseJob, options);
-            else if (options.CliPath != null)
-                yield return baseJob.With(CsProjCoreToolchain.From(NetCoreAppSettings.GetCurrentVersion().WithCustomDotNetCliPath(options.CliPath.FullName, "cli")));
+                yield return CreateCoreRunJob(baseJob, options); // local CoreFX and CoreCLR builds
+            else if (!string.IsNullOrEmpty(options.ClrVersion))
+                yield return baseJob.With(new ClrRuntime(options.ClrVersion)); // local builds of .NET Runtime
+        }
+
+        private static Job CreateJob(Job baseJob, string runtime, CommandLineOptions options)
+        {
+            switch (runtime)
+            {
+                case "net46":
+                case "net461":
+                case "net462":
+                case "net47":
+                case "net471":
+                case "net472":
+                    return baseJob.With(Runtime.Clr).With(CsProjClassicNetToolchain.From(runtime));
+                case "netcoreapp2.0":
+                case "netcoreapp2.1":
+                case "netcoreapp2.2":
+                case "netcoreapp3.0":
+                    if (options.CliPath != null)
+                        return baseJob.With(Runtime.Core).With(CsProjCoreToolchain.From(new NetCoreAppSettings(runtime, null, runtime, options.CliPath.FullName)));
+                    else
+                        return baseJob.With(Runtime.Core).With(CsProjCoreToolchain.From(new NetCoreAppSettings(runtime, null, runtime)));
+                case "mono":
+                    if (options.MonoPath != null)
+                        return baseJob.With(new MonoRuntime("Mono", options.MonoPath.FullName));
+                    else
+                        return baseJob.With(Runtime.Mono);
+                case "corert":
+                    if (options.CoreRtPath != null)
+                        return baseJob.With(Runtime.CoreRT).With(CoreRtToolchain.CreateBuilder().UseCoreRtLocal(options.CoreRtPath.FullName).ToToolchain());
+                    else if (!string.IsNullOrEmpty(options.CoreRtVersion))
+                        return baseJob.With(Runtime.CoreRT).With(CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(options.CoreRtVersion).ToToolchain());
+                    else
+                        return baseJob.With(Runtime.CoreRT).With(CoreRtToolchain.LatestMyGetBuild);
+                default:
+                    throw new NotSupportedException($"Runtime {runtime} is not supported");
+            }
         }
 
         private static IEnumerable<IFilter> GetFilters(CommandLineOptions options)

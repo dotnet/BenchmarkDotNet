@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             CustomDotNetCliPath = customDotNetCliPath;
         }
 
-        private string CustomDotNetCliPath { get; }
+        internal string CustomDotNetCliPath { get; }
 
         [PublicAPI]
         public static IToolchain From(NetCoreAppSettings settings)
