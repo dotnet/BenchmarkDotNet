@@ -242,6 +242,11 @@ namespace BenchmarkDotNet.Jobs
         /// mutator job should not be added to the config, but instead applied to other jobs in given config
         /// </summary>
         public static Job AsMutator(this Job job) => job.WithCore(j => j.Meta.IsMutator = true);
+        
+        /// <summary>
+        /// use it if you want to specify custom default settings for default job used by console arguments parser
+        /// </summary>
+        public static Job AsDefault(this Job job, bool value = true) => job.WithCore(j => j.Meta.IsDefault = value);
 
         internal static Job MakeSettingsUserFriendly(this Job job, Descriptor descriptor)
         {

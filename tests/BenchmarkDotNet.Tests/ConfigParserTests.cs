@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
@@ -214,6 +215,20 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(2, config.GetHardwareCounters().Count());
             Assert.Single(config.GetHardwareCounters().Where(counter => counter == HardwareCounter.CacheMisses));
             Assert.Single(config.GetHardwareCounters().Where(counter => counter == HardwareCounter.InstructionRetired));
+        }
+
+        [Fact]
+        public void UserCanSpecifyCustomDefaultJobAndOverwriteItsSettingsViaConsoleArgs()
+        {
+            var globalConfig = DefaultConfig.Instance
+                .With(Job.Default
+                    .WithWarmupCount(1)
+                    .AsDefault());
+            
+            var parserdConfig = ConfigParser.Parse(new[] { "--warmupCount", "2"}, new OutputLogger(Output), globalConfig).config;
+            
+            Assert.Equal(2, parserdConfig.GetJobs().Single().Run.WarmupCount);
+            Assert.Equal(false, parserdConfig.GetJobs().Single().Meta.IsDefault); // after the merge the job is not "default" anymore
         }
     }
 }

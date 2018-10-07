@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 { "fullxml", new[] { XmlExporter.Full } }
             };
 
-        public static (bool isSuccess, ReadOnlyConfig config) Parse(string[] args, ILogger logger)
+        public static (bool isSuccess, ReadOnlyConfig config) Parse(string[] args, ILogger logger, IConfig globalConfig = null)
         {
             (bool isSuccess, ReadOnlyConfig config) result = default;
 
@@ -87,7 +87,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             {
                 parser
                     .ParseArguments<CommandLineOptions>(args)
-                    .WithParsed(options => result = Validate(options, logger) ? (true, CreateConfig(options)) : (false, default))
+                    .WithParsed(options => result = Validate(options, logger) ? (true, CreateConfig(options, globalConfig)) : (false, default))
                     .WithNotParsed(errors => result = (false, default));
             }
 
@@ -154,11 +154,11 @@ namespace BenchmarkDotNet.ConsoleArguments
             return true;
         }
 
-        private static ReadOnlyConfig CreateConfig(CommandLineOptions options)
+        private static ReadOnlyConfig CreateConfig(CommandLineOptions options, IConfig globalConfig)
         {
             var config = new ManualConfig();
 
-            var baseJob = GetBaseJob(options);
+            var baseJob = GetBaseJob(options, globalConfig);
             config.Add(Expand(baseJob, options).ToArray());
             if (config.GetJobs().IsEmpty() && baseJob != Job.Default)
                 config.Add(baseJob);
@@ -194,9 +194,11 @@ namespace BenchmarkDotNet.ConsoleArguments
             return config.AsReadOnly();
         }
 
-        private static Job GetBaseJob(CommandLineOptions options)
+        private static Job GetBaseJob(CommandLineOptions options, IConfig globalConfig)
         {
-            var baseJob = AvailableJobs[options.BaseJob.ToLowerInvariant()];
+            var baseJob = 
+                globalConfig?.GetJobs().SingleOrDefault(job => job.Meta.IsDefault) // global config might define single custom Default job
+                ?? AvailableJobs[options.BaseJob.ToLowerInvariant()];
 
             if (baseJob != Job.Dry && options.Outliers != OutlierMode.OnlyUpper)
                 baseJob = baseJob.WithOutlierMode(options.Outliers);
@@ -226,8 +228,13 @@ namespace BenchmarkDotNet.ConsoleArguments
                 baseJob = baseJob.WithUnrollFactor(options.UnrollFactor.Value);
             if (options.RunOncePerIteration)
                 baseJob = baseJob.RunOncePerIteration();
-            
-            return baseJob;
+
+            if (AvailableJobs.Values.Contains(baseJob)) // no custom settings
+                return baseJob;
+
+            return baseJob
+                .AsDefault(false) // after applying all settings from console args the base job is not default anymore
+                .AsMutator(); // we mark it as mutator so it will be applied to other jobs defined via attributes and merged later in GetRunnableJobs method
         }
 
         private static IEnumerable<Job> Expand(Job baseJob, CommandLineOptions options)

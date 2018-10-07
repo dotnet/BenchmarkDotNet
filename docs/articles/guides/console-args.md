@@ -71,6 +71,31 @@ Example: run single warmup iteration, from 9 to 12 actual workload iterations.
 dotnet run -c Release -- --warmupCount 1 --minIterationCount 9 --maxIterationCount 12
 ```
 
+## Specifying custom default settings for console argument parser
+
+If you want to have a possibility to specify custom default Job settings programmatically and optionally overwrite it with console line arguments, then you should create a global config with single job marked as `.AsDefault` and pass it to `BenchmarkSwitcher` together with the console line arguments.
+
+Example: run single warmup iteration by default.
+
+```cs
+static void Main(string[] args)
+    => BenchmarkSwitcher
+        .FromAssembly(typeof(Program).Assembly)
+        .Run(args, GetGlobalConfig());
+
+static IConfig GetGlobalConfig()
+    => DefaultConfig.Instance
+        .With(Job.Default
+            .WithWarmupCount(1)
+            .AsDefault()); // the KEY to get it working
+```
+
+Now, the default settings are: `WarmupCount=1` but you might still overwrite it from console args like in the example below: 
+
+```log
+dotnet run -c Release -- --warmupCount 2
+```
+
 ## More
 
 * `-j`, `--job` (Default: Default) Dry/Short/Medium/Long or Default
