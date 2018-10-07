@@ -4,28 +4,30 @@ using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples
 {
-    // It is very easy to use BenchmarkDotNet. You should just create a class
     [DryJob]
     public class IntroCustomEnvironmentInfo
     {
         [CustomEnvironmentInfo]
-        public static string CustomLine() => "Single custom line";
+        public static string CustomLine() => "Single line";
 
         [CustomEnvironmentInfo]
         public static IEnumerable<string> SequenceOfCustomLines()
         {
-            yield return "First custom line";
-            yield return "Second custom line";
+            yield return "First line from sequence";
+            yield return "Second line from sequence";
         }
 
         [CustomEnvironmentInfo]
         public static string[] ArrayOfCustomLines() => 
-            new[] { "First custom line from array", "Second custom line from array" };
+            new[] {
+                "First line from array",
+                "Second line from array"
+            };
 
         [Benchmark]
-        public void Sleep() => Thread.Sleep(10);
-
-        [Benchmark(Description = "Thread.Sleep(10)")]
-        public void SleepWithDescription() => Thread.Sleep(10);
+        public void Foo()
+        {
+            // Benchmark body
+        }
     }
 }

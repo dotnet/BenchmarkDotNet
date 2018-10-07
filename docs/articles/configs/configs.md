@@ -52,3 +52,5 @@ public class MyClassWithBenchmarks
 [!include[IntroConfigUnion](../samples/IntroConfigUnion.md)]
 
 [!include[IntroFluentConfigBuilder](../samples/IntroFluentConfigBuilder.md)]
+
+[!include[IntroCustomEnvironmentInfo](../samples/IntroCustomEnvironmentInfo.md)]
