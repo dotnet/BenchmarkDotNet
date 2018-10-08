@@ -123,5 +123,8 @@ namespace BenchmarkDotNet.Extensions
 
             return directoryPath;
         }
+
+        internal static bool IsNotNullButDoesNotExist(this FileSystemInfo fileInfo)
+            => fileInfo != null && !fileInfo.Exists;
     }
 }

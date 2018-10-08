@@ -14,8 +14,8 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
             UseCppCodeGenerator = useCppCodeGenerator;
             RuntimeIdentifier = runtimeIdentifier;
         }
-        
-        private string IlcPath { get; }
+
+        internal string IlcPath { get; }
         private bool UseCppCodeGenerator { get; }
         private string RuntimeIdentifier { get; }
 
