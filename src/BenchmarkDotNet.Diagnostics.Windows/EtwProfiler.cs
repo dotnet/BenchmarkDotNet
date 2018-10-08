@@ -37,6 +37,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             benchmarkToCounters = new Dictionary<BenchmarkCase, PreciseMachineCounter[]>();
         }
 
+        public string ShortName => "ETW";
+
         public IEnumerable<string> Ids => new [] { nameof(EtwProfiler) };
         
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();

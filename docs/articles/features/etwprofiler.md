@@ -56,7 +56,7 @@ class Program
 }
 ```
 
-* Passing `-p` or `--profile` command line argument to `BenchmarkSwitcher`
+* Passing `-p ETW` or `--profiler ETW` command line argument to `BenchmarkSwitcher`
 
 
 ## Configuration

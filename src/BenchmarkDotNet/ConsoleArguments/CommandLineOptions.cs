@@ -29,8 +29,8 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option('d', "disasm", Required = false, Default = false, HelpText = "Gets disassembly of benchmarked code")]
         public bool UseDisassemblyDiagnoser { get; set; }
         
-        [Option('p', "profile", Required = false, Default = false, HelpText = "Profiles benchmarked code using available profiling tools, currently available only on Windows")]
-        public bool UseProfiler { get; set; }
+        [Option('p', "profiler", Required = false, HelpText = "Profiles benchmarked code using selected profiler. Currently the only available is \"ETW\" for Windows.")]
+        public string Profiler { get; set; }
 
         [Option('f', "filter", Required = false, HelpText = "Glob patterns")]
         public IEnumerable<string> Filters { get; set; }

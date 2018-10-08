@@ -18,6 +18,7 @@ using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
@@ -174,8 +175,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 config.Add(MemoryDiagnoser.Default);
             if (options.UseDisassemblyDiagnoser)
                 config.Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig()));
-            if (options.UseProfiler)
-                config.Add(DiagnosersLoader.GetImplementation<IProfiler>());
+            if (!string.IsNullOrEmpty(options.Profiler))
+                config.Add(DiagnosersLoader.GetImplementation<IProfiler>(profiler => profiler.ShortName.EqualsWithIgnoreCase(options.Profiler)));
 
             if (options.DisplayAllStatistics)
                 config.Add(StatisticColumn.AllStatistics);

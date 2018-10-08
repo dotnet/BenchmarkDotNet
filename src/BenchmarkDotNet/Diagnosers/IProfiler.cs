@@ -2,5 +2,6 @@
 {
     internal interface IProfiler : IDiagnoser
     {
+        string ShortName { get; }
     }
 }
