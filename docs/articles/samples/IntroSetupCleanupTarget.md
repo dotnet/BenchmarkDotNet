@@ -12,7 +12,7 @@ All four setup and cleanup attributes have a Target property that allow
 
 [!code-csharp[IntroSetupCleanupTarget.cs](../../../samples/BenchmarkDotNet.Samples/IntroSetupCleanupTarget.cs)]
 
-### THe order of method calls
+### The order of method calls
 
 ```cs
 // GlobalSetup A

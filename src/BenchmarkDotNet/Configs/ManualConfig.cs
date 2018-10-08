@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Configs
             loggers.AddRange(config.GetLoggers());
             diagnosers.AddRange(config.GetDiagnosers());
             analysers.AddRange(config.GetAnalysers());
-            AddJobs(config.GetJobs());
+            jobs.AddRange(config.GetJobs());
             validators.AddRange(config.GetValidators());
             hardwareCounters.AddRange(config.GetHardwareCounters());
             filters.AddRange(config.GetFilters());
@@ -160,30 +160,6 @@ namespace BenchmarkDotNet.Configs
                     throw new ArgumentOutOfRangeException();
             }
             return manualConfig;
-        }
-
-        private void AddJobs(IEnumerable<Job> toAdd)
-        {
-            var toAddList = toAdd.ToList();
-            foreach (var notMutator in toAddList.Where(job => !job.Meta.IsMutator))
-                jobs.Add(notMutator);
-            
-            var mutators = toAddList.Where(job => job.Meta.IsMutator).ToArray();
-            if (!mutators.Any())
-                return;
-            
-            if (!jobs.Any())
-                jobs.Add(Job.Default);
-
-            for (int i = 0; i < jobs.Count; i++)
-            {
-                var copy = jobs[i].UnfreezeCopy();
-
-                foreach (var mutator in mutators)
-                    copy.Apply(mutator);
-
-                jobs[i] = copy.Freeze();
-            }
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Text;
-using BenchmarkDotNet.Extensions;
+﻿using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Horology
@@ -50,6 +49,7 @@ namespace BenchmarkDotNet.Horology
         [Pure] public static bool operator <=(TimeInterval a, TimeInterval b) => a.Nanoseconds <= b.Nanoseconds;
         [Pure] public static bool operator >=(TimeInterval a, TimeInterval b) => a.Nanoseconds >= b.Nanoseconds;
 
-        [Pure] public override string ToString() => Nanoseconds.ToTimeStr(Encoding.ASCII);
+        [Pure] public string ToStr(TimeUnit timeUnit = null, string format = "N4") => Nanoseconds.ToTimeStr(timeUnit, format: format);
+        [Pure] public override string ToString() => ToStr();
     }
 }

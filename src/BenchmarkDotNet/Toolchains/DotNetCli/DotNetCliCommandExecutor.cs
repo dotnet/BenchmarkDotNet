@@ -10,11 +10,12 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
-    internal static class DotNetCliCommandExecutor
+    [PublicAPI]
+    public static class DotNetCliCommandExecutor
     {
-        internal struct CommandResult
+        public struct CommandResult
         {
-            public bool IsSuccess { get; }
+            [PublicAPI] public bool IsSuccess { get; }
 
             [PublicAPI] public TimeSpan ExecutionTime { get; }
 
@@ -46,7 +47,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 => new CommandResult(false, time, standardOutput, standardError);
         }
 
-        internal static CommandResult ExecuteCommand(
+        [PublicAPI]
+        public static CommandResult ExecuteCommand(
             string customDotNetCliPath, string commandWithArguments, string workingDirectory, ILogger logger, 
             IReadOnlyList<EnvironmentVariable> environmentVariables = null, bool useSharedCompilation = false)
         {

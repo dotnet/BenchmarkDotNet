@@ -22,10 +22,10 @@ namespace BenchmarkDotNet.IntegrationTests
             CanExecute<GlobalCleanupAttributeBenchmarks>(config);
 
             string log = logger.GetLog();
-            Assert.Contains(GlobalCleanupCalled + System.Environment.NewLine, log);
+            Assert.Contains(BenchmarkCalled + System.Environment.NewLine, log);
             Assert.True(
-                log.IndexOf(GlobalCleanupCalled + System.Environment.NewLine) >
-                log.IndexOf(BenchmarkCalled + System.Environment.NewLine));
+                log.IndexOf(BenchmarkCalled + System.Environment.NewLine) <
+                log.IndexOf(GlobalCleanupCalled + System.Environment.NewLine));
         }
 
         public class GlobalCleanupAttributeBenchmarks

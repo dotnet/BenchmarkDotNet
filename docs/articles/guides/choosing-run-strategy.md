@@ -28,4 +28,4 @@ public class MyBenchmarkClass
 
 [!include[IntroColdStart](../samples/IntroColdStart.md)]
 
-[!include[IntroColdStart](../samples/IntroColdStart.md)]
+[!include[IntroMonitoring](../samples/IntroMonitoring.md)]

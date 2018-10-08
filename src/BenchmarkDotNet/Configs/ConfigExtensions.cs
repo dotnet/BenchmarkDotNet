@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Analysers;
@@ -45,6 +46,9 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static IConfig With(this IConfig config, Encoding encoding) => config.With(c => c.Set(encoding));
         [PublicAPI] public static IConfig With(this IConfig config, ISummaryStyle summaryStyle) => config.With(c => c.Set(summaryStyle));
 
+        /// <summary>
+        /// determines if all auto-generated files should be kept or removed after running the benchmarks
+        /// </summary>
         [PublicAPI] public static IConfig KeepBenchmarkFiles(this IConfig config, bool value = true) => config.With(m => m.KeepBenchmarkFiles = value);
         [PublicAPI] public static IConfig RemoveBenchmarkFiles(this IConfig config) => config.KeepBenchmarkFiles(false);
         [PublicAPI] public static IConfig WithArtifactsPath(this IConfig config, string artifactsPath) => config.With(m => m.ArtifactsPath = artifactsPath);
@@ -56,6 +60,38 @@ namespace BenchmarkDotNet.Configs
                 : new ReadOnlyConfig(config);
 
         public static bool HasMemoryDiagnoser(this IConfig config) => config.GetDiagnosers().Any(diagnoser => diagnoser is MemoryDiagnoser);
+
+        /// <summary>
+        /// returns a set of unique jobs that are ready to run
+        /// </summary>
+        public static IReadOnlyList<Job> GetRunnableJobs(this IConfig config)
+        {
+            var unique = config.GetJobs().Distinct().ToArray();
+            var result = new List<Job>();
+
+            foreach (var standardJob in unique.Where(job => !job.Meta.IsMutator && !job.Meta.IsDefault))
+                result.Add(standardJob);
+
+            var customDefaultJob = unique.SingleOrDefault(job => job.Meta.IsDefault);
+            var defaultJob = customDefaultJob ?? Job.Default;
+            
+            if (!result.Any())
+                result.Add(defaultJob);
+
+            foreach (var mutatorJob in unique.Where(job => job.Meta.IsMutator))
+            {
+                for (int i = 0; i < result.Count; i++)
+                {
+                    var copy = result[i].UnfreezeCopy();
+
+                    copy.Apply(mutatorJob);
+
+                    result[i] = copy.Freeze();
+                }
+            }
+
+            return result;
+        }
 
         private static IConfig With(this IConfig config, Action<ManualConfig> addAction)
         {

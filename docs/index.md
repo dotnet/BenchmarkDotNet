@@ -172,7 +172,7 @@ The library is used by a large number of projects for performance discussions or
 * [Accord.NET Framework](https://github.com/accord-net/framework/tree/development/Tools/Performance)
 * [ImageSharp](https://github.com/SixLabors/ImageSharp/tree/master/tests/ImageSharp.Benchmarks)
 * [RavenDB](https://github.com/ravendb/ravendb/tree/v4.0/bench)
-* [NodeTime](https://github.com/nodatime/nodatime/tree/master/src/NodaTime.Benchmarks)
+* [NodaTime](https://github.com/nodatime/nodatime/tree/master/src/NodaTime.Benchmarks)
 * [Jint](https://github.com/sebastienros/jint/tree/dev/Jint.Benchmark)
 * [NServiceBus](https://github.com/Particular/NServiceBus/issues?utf8=✓&q=+BenchmarkDotNet+)
 * [Serilog](https://github.com/serilog/serilog/tree/dev/test/Serilog.PerformanceTests)

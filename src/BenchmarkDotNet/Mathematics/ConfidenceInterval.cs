@@ -87,8 +87,8 @@ namespace BenchmarkDotNet.Mathematics
         /// <param name="n">Sample size (n >= 3)</param>
         public static double GetZValue(this ConfidenceLevel level, int n)
         {
-            if (n <= 2)
-                throw new ArgumentOutOfRangeException(nameof(n), "n should be >= 3");
+            if (n <= 1)
+                throw new ArgumentOutOfRangeException(nameof(n), "n should be >= 2");
             return MathHelper.InverseStudent(1 - level.ToPercent(), n - 1);
         }
 

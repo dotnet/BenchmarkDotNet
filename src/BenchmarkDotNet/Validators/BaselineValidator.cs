@@ -25,8 +25,8 @@ namespace BenchmarkDotNet.Validators
             foreach (string logicalGroup in logicalGroups)
             {
                 var benchmarks = allBenchmarks.Where((benchmark, index) => benchmarkLogicalGroups[index] == logicalGroup).ToArray();
-                int methodBaselineCount = benchmarks.Count(b => b.Descriptor.Baseline);
-                int jobBaselineCount = benchmarks.Count(b => b.Job.Meta.Baseline);
+                int methodBaselineCount = benchmarks.Select(b => b.Descriptor).Distinct().Count(it => it.Baseline);
+                int jobBaselineCount = benchmarks.Select(b => b.Job).Distinct().Count(it => it.Meta.Baseline);
                 string className = benchmarks.First().Descriptor.Type.Name;
 
                 if (methodBaselineCount > 1) 
@@ -34,9 +34,6 @@ namespace BenchmarkDotNet.Validators
 
                 if (jobBaselineCount > 1) 
                     yield return CreateError("job", "Baseline = true", logicalGroup, className, jobBaselineCount.ToString());
-
-                if (methodBaselineCount > 0 && jobBaselineCount > 1)
-                    yield return CreateError("job-benchmark pair", "Baseline property", logicalGroup, className, "both");
             }
         }
 

@@ -50,10 +50,7 @@ namespace BenchmarkDotNet.Running
             var parameterDefinitions = GetParameterDefinitions(containingType);
             var parameterInstancesList = parameterDefinitions.Expand();
 
-            var rawJobs = fullConfig.GetJobs().ToArray();
-            if (rawJobs.IsEmpty())
-                rawJobs = new[] { Job.Default };
-            var jobs = rawJobs.Distinct().ToArray();
+            var jobs = fullConfig.GetRunnableJobs();
 
             var targets = GetTargets(targetMethods, containingType, globalSetupMethods, globalCleanupMethods, iterationSetupMethods, iterationCleanupMethods).ToArray();
 

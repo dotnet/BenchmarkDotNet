@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using BenchmarkDotNet.Mathematics.StatisticalTesting;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Mathematics
@@ -33,7 +34,12 @@ namespace BenchmarkDotNet.Mathematics
         private static bool AreSame(Statistics x, Statistics y)
         {
             if (x.N >= 3 && y.N >= 3)
-                return !WelchTTest.Calc(x, y).NullHypothesisIsRejected;
+            {
+                var tost = StatisticalTestHelper.CalculateTost(MannWhitneyTest.Instance, x.GetValues().ToArray(), y.GetValues().ToArray(), RelativeThreshold.Default);
+                if (tost.Conclusion != EquivalenceTestConclusion.Unknown)
+                    return tost.Conclusion == EquivalenceTestConclusion.Same;
+            }
+
             return Math.Abs(x.Mean - y.Mean) < Math.Abs(x.Mean + y.Mean) / 2 * 0.01;
         }
     }

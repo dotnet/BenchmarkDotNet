@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Configs
         ConfigUnionRule UnionRule { get; }
 
         /// <summary>
-        /// determines if all auto-generated files should be kept or removed after running benchmarks
+        /// determines if all auto-generated files should be kept or removed after running the benchmarks
         /// </summary>
         bool KeepBenchmarkFiles { get; }
 

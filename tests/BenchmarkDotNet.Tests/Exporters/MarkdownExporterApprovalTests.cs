@@ -219,6 +219,26 @@ namespace BenchmarkDotNet.Tests.Exporters
                 [Benchmark] public void Bar() { }
             }
             
+            /* MethodJobBaseline */
+            
+            [RankColumn, LogicalGroupColumn, BaselineColumn]
+            [SimpleJob(id: "Job1", baseline: true), SimpleJob(id: "Job2")]
+            public class MethodJobBaseline_MethodsJobs
+            {
+                [Benchmark(Baseline = true)] public void Foo() {}
+                [Benchmark] public void Bar() {}
+            }
+
+            [RankColumn, LogicalGroupColumn, BaselineColumn]
+            [SimpleJob(id: "Job1", baseline: true), SimpleJob(id: "Job2")]
+            public class MethodJobBaseline_MethodsJobsParams
+            {
+                [Params(2, 10), UsedImplicitly] public int Param;
+                
+                [Benchmark(Baseline = true)] public void Foo() {}
+                [Benchmark] public void Bar() {}
+            }
+            
             /* Invalid */
 
             [RankColumn, LogicalGroupColumn, BaselineColumn]
@@ -234,15 +254,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             {
                 [Benchmark] public void Foo() {}
                 [Benchmark] public void Bar() {}
-            }
-            
-            [RankColumn, LogicalGroupColumn, BaselineColumn]
-            [SimpleJob(id: "Job1", baseline: true), SimpleJob(id: "Job2")]
-            public class Invalid_MethodAndJobBaselines
-            {
-                [Benchmark(Baseline = true)] public void Foo() {}
-                [Benchmark] public void Bar() {}
-            }
+            }                       
         }
     }
 }

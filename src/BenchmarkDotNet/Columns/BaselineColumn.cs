@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Columns
         public string Id => nameof(BaselineColumn);
         public string ColumnName => "Baseline";
 
-        public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => benchmarkCase.IsBaseline() ? "Yes" : "No";
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => summary.IsBaseline(benchmarkCase) ? "Yes" : "No";
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style) => GetValue(summary, benchmarkCase);
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
         public bool IsAvailable(Summary summary) => true;
