@@ -35,6 +35,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             runMode = config.PerformExtraBenchmarksRun ? RunMode.ExtraRun : RunMode.NoOverhead;
             benchmarkToEtlFile = new Dictionary<BenchmarkCase, string>();
             benchmarkToCounters = new Dictionary<BenchmarkCase, PreciseMachineCounter[]>();
+            CreationTime = DateTime.Now;
         }
 
         public string ShortName => "ETW";
@@ -47,6 +48,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public IReadOnlyDictionary<BenchmarkCase, PmcStats> Results => ImmutableDictionary<BenchmarkCase, PmcStats>.Empty;
         
+        private DateTime CreationTime { get; }
+
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => runMode;
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
@@ -90,8 +93,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             try
             {
-                userSession = new UserSession(parameters, config).EnableProviders();
-                kernelSession = new KernelSession(parameters, config).EnableProviders();
+                userSession = new UserSession(parameters, config, CreationTime).EnableProviders();
+                kernelSession = new KernelSession(parameters, config, CreationTime).EnableProviders();
             }
             catch (Exception)
             {

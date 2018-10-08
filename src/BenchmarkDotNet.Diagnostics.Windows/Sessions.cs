@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Configs;
@@ -16,8 +17,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 {
     internal class UserSession : Session
     {
-        public UserSession(DiagnoserActionParameters details, EtwProfilerConfig config)
-            : base(FullNameProvider.GetBenchmarkName(details.BenchmarkCase), details, config)
+        public UserSession(DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime)
+            : base(FullNameProvider.GetBenchmarkName(details.BenchmarkCase), details, config, creationTime)
         {
         }
 
@@ -38,8 +39,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
     internal class KernelSession : Session
     {
-        public KernelSession(DiagnoserActionParameters details, EtwProfilerConfig config)
-            : base(KernelTraceEventParser.KernelSessionName, details, config)
+        public KernelSession(DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime)
+            : base(KernelTraceEventParser.KernelSessionName, details, config, creationTime)
         {
         }
         
@@ -82,11 +83,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private string FilePath { get; }
 
-        protected Session(string sessionName, DiagnoserActionParameters details, EtwProfilerConfig config)
+        protected Session(string sessionName, DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime)
         {
             Details = details;
             Config = config;
-            FilePath = EnsureFolderExists(GetFilePath(details));
+            FilePath = EnsureFolderExists(GetFilePath(details, creationTime));
 
             TraceEventSession = new TraceEventSession(sessionName, FilePath)
             {
@@ -121,9 +122,15 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private void OnConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e) => Stop();
 
-        private string GetFilePath(DiagnoserActionParameters details)
+        private string GetFilePath(DiagnoserActionParameters details, DateTime creationTime)
         {
             var folderPath = details.Config.ArtifactsPath;
+
+            folderPath = Path.Combine(folderPath, $"{creationTime:yyyyMMdd-hhmm}-{Process.GetCurrentProcess().Id}");
+            
+            // if we run for more than one toolchain, the output file name should contain the name too so we can differ net46 vs netcoreapp2.1 etc
+            if (details.Config.GetJobs().Select(job => job.Infrastructure.Toolchain).Distinct().Count() > 1)
+                folderPath = Path.Combine(folderPath, details.BenchmarkCase.Job.Infrastructure.Toolchain.Name);
 
             if (!string.IsNullOrWhiteSpace(details.BenchmarkCase.Descriptor.Type.Namespace))
                 folderPath = Path.Combine(folderPath, details.BenchmarkCase.Descriptor.Type.Namespace.Replace('.', Path.DirectorySeparatorChar));
