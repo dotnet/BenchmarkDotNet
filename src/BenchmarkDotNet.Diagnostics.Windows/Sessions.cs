@@ -90,7 +90,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             TraceEventSession = new TraceEventSession(sessionName, FilePath)
             {
-                BufferSizeMB = config.BufferSizeInMb
+                BufferSizeMB = config.BufferSizeInMb,
+                CpuSampleIntervalMSec = config.CpuSampleIntervalInMiliseconds
             };
 
             Console.CancelKeyPress += OnConsoleCancelKeyPress;
