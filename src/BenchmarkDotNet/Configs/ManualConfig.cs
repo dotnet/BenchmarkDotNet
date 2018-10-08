@@ -88,7 +88,7 @@ namespace BenchmarkDotNet.Configs
 
         public IEnumerable<IDiagnoser> GetDiagnosers()
         {
-            if (hardwareCounters.IsEmpty())
+            if (hardwareCounters.IsEmpty() || diagnosers.OfType<IHardwareCountersDiagnoser>().Any())
                 return diagnosers;
 
             var hardwareCountersDiagnoser = DiagnosersLoader.GetImplementation<IHardwareCountersDiagnoser>();

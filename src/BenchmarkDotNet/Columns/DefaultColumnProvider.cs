@@ -14,9 +14,9 @@ namespace BenchmarkDotNet.Columns
         [PublicAPI] public static readonly IColumnProvider Job = new JobColumnProvider();
         [PublicAPI] public static readonly IColumnProvider Statistics = new StatisticsColumnProvider();
         [PublicAPI] public static readonly IColumnProvider Params = new ParamsColumnProvider();
-        [PublicAPI] public static readonly IColumnProvider Diagnosers = new DiagnosersColumnProvider();
+        [PublicAPI] public static readonly IColumnProvider Metrics = new MetricsColumnProvider();
 
-        public static readonly IColumnProvider[] Instance = { Descriptor, Job, Statistics, Params, Diagnosers };
+        public static readonly IColumnProvider[] Instance = { Descriptor, Job, Statistics, Params, Metrics };
 
         private class DescriptorColumnProvider : IColumnProvider
         {
@@ -77,14 +77,15 @@ namespace BenchmarkDotNet.Columns
                 .Distinct()
                 .Select(name => new ParamColumn(name));
         }
-
-        private class DiagnosersColumnProvider : IColumnProvider
+        
+        private class MetricsColumnProvider : IColumnProvider
         {
             public IEnumerable<IColumn> GetColumns(Summary summary) => summary
-                .Config
-                .GetDiagnosers()
-                .Select(d => d.GetColumnProvider())
-                .SelectMany(cp => cp.GetColumns(summary));
+                .Reports
+                .Where(report => report.Metrics != null)
+                .SelectMany(report => report.Metrics.Values.Select(metric => metric.Descriptor))
+                .Distinct(MetricDescriptorEqualityComparer.Instance)
+                .Select(descriptor => new MetricColumn(descriptor));
         }
     }
 }

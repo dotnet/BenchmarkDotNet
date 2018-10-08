@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
@@ -15,7 +16,7 @@ namespace BenchmarkDotNet.Helpers
                 case bool b:
                     return b.ToLowerCase();
                 case string s:
-                    return Escape(s);
+                    return Escape(new StringBuilder(s));
                 case char c:
                     return ((int)c).ToString(); // TODO: rewrite
                 case float f:
@@ -34,22 +35,23 @@ namespace BenchmarkDotNet.Helpers
                 return value.GetType().Name; // TODO
             if (value is TimeInterval interval)
                 return interval.Nanoseconds + "ns";
+            
             return value.ToString();
-        }
-
-        private static string Escape(string value)
-        {
-            return value; // TODO: escape special symbols
         }
 
         // we can't simply use type.FullName, because for generics it's too long
         // example: typeof(List<int>).FullName => "System.Collections.Generic.List`1[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
-        public static string ToFolderName(Type type)
-            => new StringBuilder(type.GetCorrectCSharpTypeName(includeGenericArgumentsNamespace: false))
-                .Replace('<', '_')
-                .Replace('>', '_')
-                .Replace('[', '_')
-                .Replace(']', '_')
-                .ToString();
+        public static string ToFolderName(Type type, bool includeNamespace = true, bool includeGenericArgumentsNamespace = false)
+            => Escape(new StringBuilder(type.GetCorrectCSharpTypeName(includeNamespace, includeGenericArgumentsNamespace)));
+        
+        private static string Escape(StringBuilder builder)
+        {
+            foreach (char invalidPathChar in Path.GetInvalidFileNameChars())
+            {
+                builder.Replace(invalidPathChar, '_');
+            }
+
+            return builder.ToString();
+        }
     }
 }

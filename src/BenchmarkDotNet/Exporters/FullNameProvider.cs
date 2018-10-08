@@ -60,10 +60,7 @@ namespace BenchmarkDotNet.Exporters
 
             name.Append(GetTypeName(type)).Append('.');
 
-            name.Append(method.Name);
-
-            if (benchmarkCase.HasParameters)
-                name.Append(GetBenchmarkParameters(method, benchmarkCase.Parameters));
+            name.Append(GetMethodName(benchmarkCase));
 
             return name.ToString();
         }
@@ -92,6 +89,16 @@ namespace BenchmarkDotNet.Exporters
             string args = string.Join(", ", type.GetGenericArguments().Select(GetTypeName).ToArray());
 
             return $"{mainName}<{args}>";
+        }
+
+        internal static string GetMethodName(BenchmarkCase benchmarkCase)
+        {
+            var name = new StringBuilder(benchmarkCase.Descriptor.WorkloadMethod.Name);
+
+            if (benchmarkCase.HasParameters)
+                name.Append(GetBenchmarkParameters(benchmarkCase.Descriptor.WorkloadMethod, benchmarkCase.Parameters));
+
+            return name.ToString();
         }
 
         private static string GetBenchmarkParameters(MethodInfo method, ParameterInstances benchmarkParameters)

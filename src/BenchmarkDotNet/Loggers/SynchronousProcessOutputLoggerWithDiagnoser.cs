@@ -43,19 +43,23 @@ namespace BenchmarkDotNet.Loggers
                 // ReadLine() can actually return string.Empty and null as valid values.
                 string line = process.StandardOutput.ReadLine();
 
-                if (!string.IsNullOrEmpty(line)) // Skip bad data.
-                {
-                    logger.WriteLine(LogKind.Default, line);
+                if (line == null)
+                    continue;
+                
+                logger.WriteLine(LogKind.Default, line);
 
-                    if (!line.StartsWith("//"))
-                    { LinesWithResults.Add(line); }
-                    else if (Engine.Signals.TryGetSignal(line, out var signal))
-                    {
-                        diagnoser?.Handle(signal, diagnoserActionParameters);
-                        process.StandardInput.WriteLine(Engine.Signals.Acknowledgment);
-                    }
-                    else
-                    { LinesWithExtraOutput.Add(line); }
+                if (!line.StartsWith("//"))
+                {
+                    LinesWithResults.Add(line);
+                }
+                else if (Engine.Signals.TryGetSignal(line, out var signal))
+                {
+                    diagnoser?.Handle(signal, diagnoserActionParameters);
+                    process.StandardInput.WriteLine(Engine.Signals.Acknowledgment);
+                }
+                else if (!string.IsNullOrEmpty(line))
+                {
+                    LinesWithExtraOutput.Add(line);
                 }
             }
         }

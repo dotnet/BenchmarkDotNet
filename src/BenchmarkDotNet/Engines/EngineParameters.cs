@@ -30,6 +30,8 @@ namespace BenchmarkDotNet.Engines
         
         [PublicAPI] public Encoding Encoding { get; set; }
         
+        [PublicAPI] public string BenchmarkName { get;  set; }
+        
         public bool NeedsJitting => TargetJob.ResolveValue(RunMode.RunStrategyCharacteristic, DefaultResolver).NeedsJitting();
 
         public bool HasInvocationCount => TargetJob.HasValue(RunMode.InvocationCountCharacteristic);
