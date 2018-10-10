@@ -1,5 +1,6 @@
 ﻿using System;
 using BenchmarkDotNet.Extensions;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Mathematics.StatisticalTesting
 {
@@ -11,12 +12,14 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
         /// Checks that (x-y) > threshold
         /// </summary>
         /// <remarks>Should be consistent with t.test(x, y, mu=threshold, alternative="greater") from R</remarks>
+        [NotNull]
         public WelchResult IsGreater(double[] x, double[] y, Threshold threshold = null) => IsGreater(new Statistics(x), new Statistics(y), threshold);
 
         /// <summary>
         /// Checks that (x-y) > threshold
         /// </summary>
         /// <remarks>Should be consistent with t.test(x, y, mu=threshold, alternative="greater") from R</remarks>
+        [NotNull]
         public WelchResult IsGreater(Statistics x, Statistics y, Threshold threshold = null)
         {
             int n1 = x.N, n2 = y.N;
