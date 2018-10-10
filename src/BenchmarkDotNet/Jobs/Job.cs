@@ -34,6 +34,12 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Job LongRun = new Job(nameof(LongRun), RunMode.Long).Freeze();
         public static readonly Job VeryLongRun = new Job(nameof(VeryLongRun), RunMode.VeryLong).Freeze();
 
+        // Accuracy
+        public static readonly Job QuickRough = new Job(nameof(QuickRough), AccuracyMode.Rough).Freeze();
+        public static readonly Job ModerateAccuracy = new Job(nameof(ModerateAccuracy), AccuracyMode.Moderate).Freeze();
+        public static readonly Job HighAccuracy = new Job(nameof(HighAccuracy), AccuracyMode.High).Freeze();
+
+
         // Infrastructure
         public static readonly Job InProcess = new Job(nameof(InProcess), InfrastructureMode.InProcess);
         public static readonly Job InProcessDontLogOutput = new Job(nameof(InProcessDontLogOutput), InfrastructureMode.InProcessDontLogOutput);

@@ -4,8 +4,8 @@ using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples
 {
-    [ShortRunJob]
-    [MediumRunJob]
+    [QuickRoughAccuracyJob]
+    [ModerateAccuracyJob]
     [KeepBenchmarkFiles]
 
     [AsciiDocExporter]

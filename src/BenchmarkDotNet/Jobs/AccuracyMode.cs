@@ -16,6 +16,10 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<OutlierMode> OutlierModeCharacteristic = CreateCharacteristic<OutlierMode>(nameof(OutlierMode));
         public static readonly Characteristic<bool> AnalyzeLaunchVarianceCharacteristic = CreateCharacteristic<bool>(nameof(AnalyzeLaunchVariance));
 
+        public static readonly AccuracyMode Rough = new AccuracyMode { MaxRelativeError = 0.1 }.Freeze();
+        public static readonly AccuracyMode Moderate = new AccuracyMode { MaxRelativeError = 0.05 }.Freeze();
+        public static readonly AccuracyMode High = new AccuracyMode { MaxRelativeError = 0.02 }.Freeze(); //Default value
+
         /// <summary>
         /// Maximum acceptable error for a benchmark (by default, BenchmarkDotNet continue iterations until the actual error is less than the specified error).
         /// The default value is 0.02.
