@@ -1,6 +1,4 @@
 using BenchmarkDotNet.Analysers;
-using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Mathematics;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Analysers
@@ -74,7 +72,6 @@ namespace BenchmarkDotNet.Tests.Analysers
             var zeroMeasurement = ZeroMeasurementHelper.CheckZeroMeasurement(distribution, ThresholdMock);
             Assert.True(zeroMeasurement);
         }
-
         
         /*
           Test distributions inspired by data from method
