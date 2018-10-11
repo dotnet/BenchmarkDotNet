@@ -43,7 +43,6 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static IConfig With(this IConfig config, IOrderer provider) => config.With(m => m.Set(provider));
         [PublicAPI] public static IConfig With(this IConfig config, params HardwareCounter[] counters) => config.With(c => c.Add(counters));
         [PublicAPI] public static IConfig With(this IConfig config, params IFilter[] filters) => config.With(c => c.Add(filters));
-        [PublicAPI] public static IConfig With(this IConfig config, params string[] customEnvInfo) => config.With(m => m.Add(customEnvInfo));
         [PublicAPI] public static IConfig With(this IConfig config, Encoding encoding) => config.With(c => c.Set(encoding));
         [PublicAPI] public static IConfig With(this IConfig config, ISummaryStyle summaryStyle) => config.With(c => c.Set(summaryStyle));
 

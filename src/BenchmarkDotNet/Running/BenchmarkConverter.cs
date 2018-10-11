@@ -352,9 +352,10 @@ namespace BenchmarkDotNet.Running
         private static IConfig GetConfigWithCustomEnvironmentInfo(Type type)
         {
             var info = GetCustomEnvironmentInfo(type);
-            return ManualConfig.CreateEmpty()
-                .With(info.ToArray())
-                .AsReadOnly();
+            var config = ManualConfig.CreateEmpty();
+            config.AddCustomEnvironmentInfo(info);
+
+            return config.AsReadOnly();
         }
 
         private static object[] ToArray(object sourceValue, MemberInfo memberInfo, Type type)

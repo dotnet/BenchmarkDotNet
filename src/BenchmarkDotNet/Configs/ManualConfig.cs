@@ -62,11 +62,12 @@ namespace BenchmarkDotNet.Configs
         public void Add(params Job[] newJobs) => jobs.AddRange(newJobs.Select(j => j.Freeze())); // DONTTOUCH: please DO NOT remove .Freeze() call.
         public void Add(params HardwareCounter[] newHardwareCounters) => hardwareCounters.AddRange(newHardwareCounters);
         public void Add(params IFilter[] newFilters) => filters.AddRange(newFilters);
-        public void Add(params string[] newCustomEnvInfo) => customEnvInfo.AddRange(newCustomEnvInfo);
         public void Set(IOrderer provider) => orderer = provider ?? orderer;
         public void Set(ISummaryStyle style) => summaryStyle = style ?? summaryStyle;
         public void Set(Encoding encoding) => Encoding = encoding;
         public void Add(params BenchmarkLogicalGroupRule[] rules) => logicalGroupRules.AddRange(rules);
+
+        public void AddCustomEnvironmentInfo(IEnumerable<string> newCustomEnvInfo) => customEnvInfo.AddRange(newCustomEnvInfo);
 
         [PublicAPI]
         public void Add(IConfig config)
