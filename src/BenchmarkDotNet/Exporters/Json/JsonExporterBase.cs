@@ -48,33 +48,33 @@ namespace BenchmarkDotNet.Exporters.Json
             // If we just ask SimpleJson to serialise the entire "summary" object it throws several errors.
             // So we are more specific in what we serialise (plus some fields/properties aren't relevant)
 
-            var benchmarks = summary.Reports.Select(r =>
+            var benchmarks = summary.Reports.Select(report =>
             {
                 var data = new Dictionary<string, object>
                 {
                     // We don't need Benchmark.ShortInfo, that info is available via Benchmark.Parameters below
-                    { "DisplayInfo", r.BenchmarkCase.DisplayInfo },
-                    { "Namespace", r.BenchmarkCase.Descriptor.Type.Namespace },
-                    { "Type", FullNameProvider.GetTypeName(r.BenchmarkCase.Descriptor.Type) },
-                    { "Method", r.BenchmarkCase.Descriptor.WorkloadMethod.Name },
-                    { "MethodTitle", r.BenchmarkCase.Descriptor.WorkloadMethodDisplayInfo },
-                    { "Parameters", r.BenchmarkCase.Parameters.PrintInfo },
-                    { "FullName", FullNameProvider.GetBenchmarkName(r.BenchmarkCase) }, // do NOT remove this property, it is used for xunit-performance migration
+                    { "DisplayInfo", report.BenchmarkCase.DisplayInfo },
+                    { "Namespace", report.BenchmarkCase.Descriptor.Type.Namespace },
+                    { "Type", FullNameProvider.GetTypeName(report.BenchmarkCase.Descriptor.Type) },
+                    { "Method", report.BenchmarkCase.Descriptor.WorkloadMethod.Name },
+                    { "MethodTitle", report.BenchmarkCase.Descriptor.WorkloadMethodDisplayInfo },
+                    { "Parameters", report.BenchmarkCase.Parameters.PrintInfo },
+                    { "FullName", FullNameProvider.GetBenchmarkName(report.BenchmarkCase) }, // do NOT remove this property, it is used for xunit-performance migration
                     // { "Properties", r.Benchmark.Job.ToSet().ToDictionary(p => p.Name, p => p.Value) }, // TODO
-                    { "Statistics", r.ResultStatistics }
+                    { "Statistics", report.ResultStatistics }
                 };
 
                 // We show MemoryDiagnoser's results only if it is being used
                 if(summary.Config.HasMemoryDiagnoser())
                 {
-                    data.Add("Memory", r.GcStats);
+                    data.Add("Memory", report.GcStats);
                 }
                 
                 if (ExcludeMeasurements == false)
                 {
                     // We construct Measurements manually, so that we can have the IterationMode enum as text, rather than an integer
                     data.Add("Measurements",
-                        r.AllMeasurements.Select(m => new
+                        report.AllMeasurements.Select(m => new
                         {
                             IterationMode = m.IterationMode.ToString(),
                             IterationStage = m.IterationStage.ToString(),
@@ -83,6 +83,11 @@ namespace BenchmarkDotNet.Exporters.Json
                             m.Operations,
                             m.Nanoseconds
                         }));
+
+                    if (report.Metrics.Any())
+                    {
+                        data.Add("Metrics", report.Metrics.Values);
+                    }
                 }
 
                 return data;

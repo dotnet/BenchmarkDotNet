@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Mathematics.Histograms
             double binSize = s.GetOptimalBinSize(rule);
             if (Math.Abs(binSize) < 1e-9)
                 binSize = 1;
-            return BuildWithFixedBinSize(s.GetValues(), binSize);
+            return BuildWithFixedBinSize(s.GetSortedValues(), binSize);
         }
 
         private const double Resolution = 0.0001;

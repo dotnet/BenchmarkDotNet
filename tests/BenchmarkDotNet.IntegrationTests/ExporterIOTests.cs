@@ -4,8 +4,10 @@ using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Tests.Portability;
 using BenchmarkDotNet.Tests.XUnit;
 using Xunit;
 using Xunit.Abstractions;
@@ -76,7 +78,9 @@ namespace BenchmarkDotNet.IntegrationTests
             string resultsDirectoryPath = Path.GetTempPath();
             var exporter = new MockExporter();
             var mockSummary = GetMockSummary(resultsDirectoryPath, typeof(Generic<int>));
-            var expectedFilePath = $"{Path.Combine(mockSummary.ResultsDirectoryPath, "BenchmarkDotNet.IntegrationTests.Generic_Int32_")}-report.txt";
+            var expectedFilePath = RuntimeInformation.IsWindows()
+                ? $"{Path.Combine(mockSummary.ResultsDirectoryPath, "BenchmarkDotNet.IntegrationTests.Generic_Int32_")}-report.txt"
+                : $"{Path.Combine(mockSummary.ResultsDirectoryPath, "BenchmarkDotNet.IntegrationTests.Generic<Int32>")}-report.txt"; // "<" is OK for non-Windows OSes ;)
             string actualFilePath = null;
 
             try
@@ -154,7 +158,8 @@ namespace BenchmarkDotNet.IntegrationTests
                                        buildResult: null,
                                        executeResults: null,
                                        allMeasurements: null,
-                                       gcStats: default);
+                                       gcStats: default,
+                                       metrics: null);
         }
     }
 

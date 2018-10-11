@@ -14,9 +14,9 @@ namespace BenchmarkDotNet.Columns
         [PublicAPI] public static readonly IColumnProvider Job = new JobColumnProvider();
         [PublicAPI] public static readonly IColumnProvider Statistics = new StatisticsColumnProvider();
         [PublicAPI] public static readonly IColumnProvider Params = new ParamsColumnProvider();
-        [PublicAPI] public static readonly IColumnProvider Diagnosers = new DiagnosersColumnProvider();
+        [PublicAPI] public static readonly IColumnProvider Metrics = new MetricsColumnProvider();
 
-        public static readonly IColumnProvider[] Instance = { Descriptor, Job, Statistics, Params, Diagnosers };
+        public static readonly IColumnProvider[] Instance = { Descriptor, Job, Statistics, Params, Metrics };
 
         private class DescriptorColumnProvider : IColumnProvider
         {
@@ -44,22 +44,24 @@ namespace BenchmarkDotNet.Columns
 
                 if (NeedToShow(summary, s => s.Percentiles.P95 > s.Mean + 3 * s.StandardDeviation))
                     yield return StatisticColumn.P95;
-                if (NeedToShow(summary, s => s.N >= 3 && !s.GetConfidenceInterval(ConfidenceLevel.L99, s.N).Contains(s.Median)))
+                if (NeedToShow(summary, s => s.N >= 3 &&
+                                             (!s.GetConfidenceInterval(ConfidenceLevel.L99, s.N).Contains(s.Median) ||
+                                              Math.Abs(s.Median - s.Mean) > s.Mean * 0.2)))
                     yield return StatisticColumn.Median;
                 if (NeedToShow(summary, s => s.StandardDeviation > 1e-9))
                     yield return StatisticColumn.StdDev;
 
                 if (summary.Reports != null && summary.HasBaselines())
                 {
-                    yield return BaselineScaledColumn.Scaled;
-                    var stdDevColumn = BaselineScaledColumn.ScaledStdDev;
+                    yield return BaselineRatioColumn.RatioMean;
+                    var stdDevColumn = BaselineRatioColumn.RatioStdDev;
                     var stdDevColumnValues = summary.BenchmarksCases.Select(b => stdDevColumn.GetValue(summary, b));
-
-                    // Hide ScaledSD column if values is small
+    
+                    // Hide RatioSD column if values is small
                     // TODO: rewrite and check raw values
                     bool hide = stdDevColumnValues.All(value => value == "0.00" || value == "0.01");
                     if (!hide)
-                        yield return BaselineScaledColumn.ScaledStdDev;
+                        yield return BaselineRatioColumn.RatioStdDev;
                 }
             }
 
@@ -77,14 +79,15 @@ namespace BenchmarkDotNet.Columns
                 .Distinct()
                 .Select(name => new ParamColumn(name));
         }
-
-        private class DiagnosersColumnProvider : IColumnProvider
+        
+        private class MetricsColumnProvider : IColumnProvider
         {
             public IEnumerable<IColumn> GetColumns(Summary summary) => summary
-                .Config
-                .GetDiagnosers()
-                .Select(d => d.GetColumnProvider())
-                .SelectMany(cp => cp.GetColumns(summary));
+                .Reports
+                .Where(report => report.Metrics != null)
+                .SelectMany(report => report.Metrics.Values.Select(metric => metric.Descriptor))
+                .Distinct(MetricDescriptorEqualityComparer.Instance)
+                .Select(descriptor => new MetricColumn(descriptor));
         }
     }
 }

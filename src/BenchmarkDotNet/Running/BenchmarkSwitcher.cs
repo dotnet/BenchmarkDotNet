@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Running
         {
             args = args ?? Array.Empty<string>();
 
-            (bool isParsingSuccess, var parsedConfig) = ConfigParser.Parse(args, ConsoleLogger.Default);
+            (bool isParsingSuccess, var parsedConfig) = ConfigParser.Parse(args, ConsoleLogger.Default, config);
             if (!isParsingSuccess)
                 return Enumerable.Empty<Summary>();
 

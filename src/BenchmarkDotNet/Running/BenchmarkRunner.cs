@@ -190,7 +190,7 @@ namespace BenchmarkDotNet.Running
                 }
                 else
                 {
-                    reports.Add(new BenchmarkReport(benchmark, buildResult, buildResult, null, null, default));
+                    reports.Add(new BenchmarkReport(benchmark, buildResult, buildResult, default, default, default, default));
 
                     if (buildResult.GenerateException != null)
                         logger.WriteLineError($"// Generate Exception: {buildResult.GenerateException.Message}");
@@ -339,7 +339,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineHeader("// **************************");
             logger.WriteLineHeader("// Benchmark: " + benchmarkCase.DisplayInfo);
 
-            var (executeResults, gcStats) = Execute(logger, benchmarkCase, benchmarkId, toolchain, buildResult, config, resolver);
+            var (executeResults, gcStats, metrics) = Execute(logger, benchmarkCase, benchmarkId, toolchain, buildResult, config, resolver);
 
             var runs = new List<Measurement>();
 
@@ -350,14 +350,15 @@ namespace BenchmarkDotNet.Running
                 runs.AddRange(executeResult.Data.Select(line => Measurement.Parse(logger, line, currentIndex + 1)).Where(r => r.IterationMode != IterationMode.Unknown));
             }
 
-            return new BenchmarkReport(benchmarkCase, buildResult, buildResult, executeResults, runs, gcStats);
+            return new BenchmarkReport(benchmarkCase, buildResult, buildResult, executeResults, runs, gcStats, metrics);
         }
 
-        private static (List<ExecuteResult> executeResults, GcStats gcStats) Execute(ILogger logger, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, IToolchain toolchain,
+        private static (List<ExecuteResult> executeResults, GcStats gcStats, List<Metric> metrics) Execute(ILogger logger, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, IToolchain toolchain,
             BuildResult buildResult, IConfig config, IResolver resolver)
         {
             var executeResults = new List<ExecuteResult>();
             var gcStats = default(GcStats);
+            var metrics = new List<Metric>();
 
             logger.WriteLineInfo("// *** Execute ***");
             bool analyzeRunToRunVariance = benchmarkCase.Job.ResolveValue(AccuracyMode.AnalyzeLaunchVarianceCharacteristic, resolver);
@@ -425,10 +426,11 @@ namespace BenchmarkDotNet.Running
                 if (useDiagnoser)
                 {
                     if (config.HasMemoryDiagnoser())
-                        gcStats = GcStats.Parse(executeResult.Data.Last());
-
-                    noOverheadCompositeDiagnoser.ProcessResults(
-                        new DiagnoserResults(benchmarkCase, measurements.Where(measurement => measurement.IsWorkload()).Sum(m => m.Operations), gcStats));
+                        gcStats = GcStats.Parse(executeResult.Data.Last(line => !string.IsNullOrEmpty(line)));
+                    
+                    metrics.AddRange(
+                        noOverheadCompositeDiagnoser.ProcessResults(
+                            new DiagnoserResults(benchmarkCase, measurements.Where(measurement => measurement.IsWorkload()).Sum(m => m.Operations), gcStats)));
                 }
 
                 if (autoLaunchCount && launchIndex == 2 && analyzeRunToRunVariance)
@@ -453,8 +455,9 @@ namespace BenchmarkDotNet.Running
 
                 var allRuns = executeResult.Data.Select(line => Measurement.Parse(logger, line, 0)).Where(r => r.IterationMode != IterationMode.Unknown).ToList();
 
-                extraRunCompositeDiagnoser.ProcessResults(
-                    new DiagnoserResults(benchmarkCase, allRuns.Where(measurement => measurement.IsWorkload()).Sum(m => m.Operations), gcStats));
+                metrics.AddRange(
+                    extraRunCompositeDiagnoser.ProcessResults(
+                        new DiagnoserResults(benchmarkCase, allRuns.Where(measurement => measurement.IsWorkload()).Sum(m => m.Operations), gcStats)));
 
                 if (!executeResult.FoundExecutable)
                     logger.WriteLineError("Executable not found");
@@ -469,7 +472,7 @@ namespace BenchmarkDotNet.Running
                 separateLogicCompositeDiagnoser.Handle(HostSignal.SeparateLogic, new DiagnoserActionParameters(null, benchmarkCase, benchmarkId, config));
             }
 
-            return (executeResults, gcStats);
+            return (executeResults, gcStats, metrics);
         }
 
         internal static void LogTotalTime(ILogger logger, TimeSpan time, int executedBenchmarksCount, string message = "Total time")

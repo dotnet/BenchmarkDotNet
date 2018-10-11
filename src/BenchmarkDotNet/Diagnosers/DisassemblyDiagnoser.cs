@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
@@ -9,6 +10,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess;
 using BenchmarkDotNet.Validators;
@@ -49,8 +51,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<IAnalyser> Analysers => new IAnalyser[] { new DisassemblyAnalyzer(Results) };
 
-        public IColumnProvider GetColumnProvider() => EmptyColumnProvider.Instance;
-        public void ProcessResults(DiagnoserResults _) { }
+        public IEnumerable<Metric> ProcessResults(DiagnoserResults _) => Array.Empty<Metric>();
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase)
         {

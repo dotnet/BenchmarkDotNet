@@ -12,27 +12,29 @@ The current Diagnosers are:
 - GC and Memory Allocation (`MemoryDiagnoser`) which is cross platform, built-in and **is not enabled by default anymore**.
   Please see Adam Sitnik's [blog post](http://adamsitnik.com/the-new-Memory-Diagnoser/) for all the details.
 - JIT Inlining Events (`InliningDiagnoser`).
-  You can find this diagnoser in a separated package with diagnosers for Windows (`BenchmarkDotNet.Diagnostics.Windows`):
+  You can find this diagnoser in a separate package with diagnosers for Windows (`BenchmarkDotNet.Diagnostics.Windows`):
   [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/)
 - JIT Tail Call Events (`TailCallDiagnoser`).
-  You can find this diagnoser as well as the (`InliningDiagnoser`) in a separated package with diagnosers for Windows (`BenchmarkDotNet.Diagnostics.Windows`):
+  You can find this diagnoser as well as the (`InliningDiagnoser`) in a separate package with diagnosers for Windows (`BenchmarkDotNet.Diagnostics.Windows`):
   [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/) Please see [this post](https://georgeplotnikov.github.io/articles/tale-tail-call-dotnet) for all the details.
 - Hardware Counter Diagnoser.
-  You can find this diagnoser in a separated package with diagnosers for Windows (`BenchmarkDotNet.Diagnostics.Windows`):
+  You can find this diagnoser in a separate package with diagnosers for Windows (`BenchmarkDotNet.Diagnostics.Windows`):
   [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/).
   Please see Adam Sitnik's [blog post](http://adamsitnik.com/Hardware-Counters-Diagnoser/) for all the details.
 - Disassembly Diagnoser.
   It allows you to disassemble the benchmarked code to asm, IL and C#/F#.
   Please see Adam Sitnik's [blog post](http://adamsitnik.com/Disassembly-Diagnoser/) for all the details.
+- ETW Profiler (`EtwProfiler`).
+  It allows you to not only benchmark, but also profile the code. It's using TraceEvent, which internally uses ETW and exports all the information to a trace file. The trace file contains all of the stack traces captured by the profiler, PDBs to resolve symbols for both native and managed code and captured GC, JIT and CLR events. Please use one of the free tools: PerfView or Windows Performance Analyzer to analyze and visualize the data from trace file. You can find this diagnoser in a separate package with diagnosers for Windows (`BenchmarkDotNet.Diagnostics.Windows`): [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/)
 
 ## Usage
 
 Below is a sample output from the `GC and Memory Allocation` diagnoser, note the extra columns on the right-hand side ("Gen 0", "Gen 1", "Gen 2" and "Allocated"):
 
 ```
-           Method |        Mean |     StdErr |      StdDev |      Median |  Gen 0 | Allocated |
------------------ |------------ |----------- |------------ |------------ |------- |---------- |
- 'new byte[10kB]' | 884.4896 ns | 46.3528 ns | 245.2762 ns | 776.4237 ns | 0.1183 |     10 kB |
+           Method |        Mean |     StdErr |      Median |  Gen 0 | Allocated |
+----------------- |------------ |----------- |------------ |------- |---------- |
+ 'new byte[10kB]' | 884.4896 ns | 46.3528 ns | 776.4237 ns | 0.1183 |     10 kB |
 ```
 
 A config example:
@@ -44,6 +46,7 @@ private class Config : ManualConfig
     {
         Add(MemoryDiagnoser.Default);
         Add(new InliningDiagnoser());
+        Add(new EtwProfiler());
     }
 }
 ```
@@ -53,6 +56,7 @@ You can also use one of the following attributes (apply it on a class that conta
 [MemoryDiagnoser]
 [InliningDiagnoser]
 [TailCallDiagnoser]
+[EtwProfiler]
 ```
 
 In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on.
@@ -67,6 +71,10 @@ In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on.
 * HardwareCounters:
 	* Windows 8+ only (we plan to add Unix support in the future)
     * No Hyper-V (Virtualization) support
+    * Requires running as Admin (ETW Kernel Session)
+    * No `InProcessToolchain` support ([#394](https://github.com/dotnet/BenchmarkDotNet/issues/394))
+* EtwProfiler:
+    * Windows only
     * Requires running as Admin (ETW Kernel Session)
     * No `InProcessToolchain` support ([#394](https://github.com/dotnet/BenchmarkDotNet/issues/394))
 * Disassembly Diagnoser:
