@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Environments;
+using System;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -8,21 +8,10 @@ namespace BenchmarkDotNet.Samples
     public class IntroCustomEnvironmentInfo
     {
         [CustomEnvironmentInfo]
-        public static string CustomLine() => "Single line";
+        public static string IsServerGC() => $"IsServerGC={HostEnvironmentInfo.GetCurrent().IsServerGC}";
 
         [CustomEnvironmentInfo]
-        public static IEnumerable<string> SequenceOfCustomLines()
-        {
-            yield return "First line from sequence";
-            yield return "Second line from sequence";
-        }
-
-        [CustomEnvironmentInfo]
-        public static string[] ArrayOfCustomLines() => 
-            new[] {
-                "First line from array",
-                "Second line from array"
-            };
+        public static string[] CommandLineArgs() => Environment.GetCommandLineArgs();
 
         [Benchmark]
         public void Foo()
