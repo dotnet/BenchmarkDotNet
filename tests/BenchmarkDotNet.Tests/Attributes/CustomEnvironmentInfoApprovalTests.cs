@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Tests.Attributes
         [Theory]
         [MemberData(nameof(GetBenchmarkTypes))]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public void CustomEnvironmentInfoTest(Type benchmarkType)
+        public void BenchmarkShouldProduceSummary(Type benchmarkType)
         {
             NamerFactory.AdditionalInformation = benchmarkType.Name;
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Tests.Attributes
             var summary = MockFactory.CreateSummary(benchmarkType);
             exporter.ExportToLog(summary, logger);
 
-            var validator = BaselineValidator.FailOnError;
+            var validator = CustomEnvironmentInfoValidator.FailOnError;
             var errors = validator.Validate(new ValidationParameters(summary.BenchmarksCases, summary.Config)).ToList();
             logger.WriteLine();
             logger.WriteLine("Errors: " + errors.Count);
@@ -68,17 +68,15 @@ namespace BenchmarkDotNet.Tests.Attributes
         [SuppressMessage("ReSharper", "InconsistentNaming")]
         public static class Benchmarks
         {
-            public class SingleLine
+            public class WithSingleCustomLine
             {
                 [CustomEnvironmentInfo]
                 public static string CustomLine() => "Single line";
 
                 [Benchmark] public void Base() { }
-                [Benchmark] public void Foo() { }
-                [Benchmark] public void Bar() { }
             }
 
-            public class SequenceOfLines
+            public class WithSequenceOfCustomLines
             {
                 [CustomEnvironmentInfo]
                 public static IEnumerable<string> SequenceOfCustomLines()
@@ -88,19 +86,47 @@ namespace BenchmarkDotNet.Tests.Attributes
                 }
 
                 [Benchmark] public void Base() { }
-                [Benchmark] public void Foo() { }
-                [Benchmark] public void Bar() { }
             }
 
-            public class ArrayOfLines
+            public class WithArrayOfCustomLines
             {
                 [CustomEnvironmentInfo]
                 public static string[] ArrayOfCustomLines() =>
                     new[] { "First line", "Second line" };
 
                 [Benchmark] public void Base() { }
-                [Benchmark] public void Foo() { }
-                [Benchmark] public void Bar() { }
+            }
+
+            public class WithErrorOnPrivateMethod
+            {
+                [CustomEnvironmentInfo]
+                private static string CustomLine() => "Single line";
+
+                [Benchmark] public void Base() { }
+            }
+
+            public class WithErrorOnNonStaticMethod
+            {
+                [CustomEnvironmentInfo]
+                public string CustomLine() => "Single line";
+
+                [Benchmark] public void Base() { }
+            }
+
+            public class WithErrorOnMethodWithParameters
+            {
+                [CustomEnvironmentInfo]
+                public static string CustomLine(object o) => o.ToString();
+
+                [Benchmark] public void Base() { }
+            }
+
+            public class WithErrorOnWrongReturnType
+            {
+                [CustomEnvironmentInfo]
+                public static int CustomLine() => 42;
+
+                [Benchmark] public void Base() { }
             }
         }
     }
