@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
             string customDotNetCliPath,
             Dictionary<string, string> feeds, bool useNuGetClearTag, bool useTempFolderForRestore)
             : base(displayName,
-                new Generator(coreRtVersion, useCppCodeGenerator, runtimeFrameworkVersion, targetFrameworkMoniker, runtimeIdentifier, feeds, useNuGetClearTag, useTempFolderForRestore),
+                new Generator(coreRtVersion, useCppCodeGenerator, runtimeFrameworkVersion, targetFrameworkMoniker, customDotNetCliPath, runtimeIdentifier, feeds, useNuGetClearTag, useTempFolderForRestore),
                 new DotNetCliPublisher(customDotNetCliPath, GetExtraArguments(useCppCodeGenerator, runtimeIdentifier), GetEnvironmentVariables(ilcPath)), 
                 new Executor())
         {

@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
             RestorePath = restorePath;
 
             Name = displayName;
-            Generator = new CoreRunGenerator(SourceCoreRun, CopyCoreRun, targetFrameworkMoniker, restorePath?.FullName);
+            Generator = new CoreRunGenerator(SourceCoreRun, CopyCoreRun, targetFrameworkMoniker, customDotNetCliPath?.FullName, restorePath?.FullName);
             Builder = new CoreRunPublisher(CopyCoreRun, customDotNetCliPath);
             Executor = new DotNetCliExecutor(customDotNetCliPath: CopyCoreRun.FullName); // instead of executing "dotnet $pathToDll" we do "CoreRun $pathToDll" 
         }

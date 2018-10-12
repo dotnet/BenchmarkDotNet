@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.DotNetCli;
 
 namespace BenchmarkDotNet.Toolchains.CoreRt
 {
@@ -20,9 +22,9 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         internal const string CoreRtNuGetFeed = "coreRtNuGetFeed";
 
         internal Generator(string coreRtVersion, bool useCppCodeGenerator,
-            string runtimeFrameworkVersion, string targetFrameworkMoniker,
+            string runtimeFrameworkVersion, string targetFrameworkMoniker, string cliPath,
             string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag, bool useTempFolderForRestore)
-            : base(targetFrameworkMoniker, GetPackagesDirectoryPath(useTempFolderForRestore), runtimeFrameworkVersion)
+            : base(targetFrameworkMoniker, cliPath, GetPackagesDirectoryPath(useTempFolderForRestore), runtimeFrameworkVersion)
         {
             this.coreRtVersion = coreRtVersion;
             this.useCppCodeGenerator = useCppCodeGenerator;
@@ -57,17 +59,13 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         {
             string extraArguments = useCppCodeGenerator ? $"-r {runtimeIdentifier} /p:NativeCodeGen=cpp" : $"-r {runtimeIdentifier}";
 
-            if (useTempFolderForRestore)
-            {
-                File.WriteAllText(artifactsPaths.BuildScriptFilePath,
-                    $"dotnet restore --packages {artifactsPaths.PackagesDirectoryName} {extraArguments} --no-dependencies" + Environment.NewLine +
-                    $"dotnet build -c {buildPartition.BuildConfiguration} {extraArguments} --no-restore --no-dependencies" + Environment.NewLine +
-                    $"dotnet publish -c {buildPartition.BuildConfiguration} {extraArguments} --no-restore --no-dependencies");
-            }
-            else
-            {
-                File.WriteAllText(artifactsPaths.BuildScriptFilePath, $"dotnet publish -c {buildPartition.BuildConfiguration} {extraArguments}");
-            }
+            var content = new StringBuilder(300)
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition)} {extraArguments}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(buildPartition)} {extraArguments}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetPublishCommand(buildPartition)} {extraArguments}")
+                .ToString();
+            
+            File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
         }
 
         // we always want to have a new directory for NuGet packages restore 

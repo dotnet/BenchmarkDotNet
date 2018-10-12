@@ -1,10 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Text;
-using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
@@ -16,12 +12,15 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI]
         public string TargetFrameworkMoniker { get; }
 
+        protected string CliPath { get; }
+
         private string PackagesPath { get; }
 
         [PublicAPI]
-        protected DotNetCliGenerator(string targetFrameworkMoniker, string packagesPath)
+        protected DotNetCliGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath)
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
+            CliPath = cliPath;
             PackagesPath = packagesPath;
         }
 
@@ -82,8 +81,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
             var content = new StringBuilder(300)
-                .AppendLine($"call dotnet {DotNetCliCommandExecutor.GetRestoreCommand(artifactsPaths, buildPartition)}")
-                .AppendLine($"call dotnet {DotNetCliCommandExecutor.GetBuildCommand(buildPartition)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(buildPartition)}")
                 .ToString();
             
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);

@@ -23,8 +23,8 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         internal const string CoreFxNuGetFeed = "coreFxNuGetFeed";
 
         internal Generator(string coreClrVersion, string coreFxVersion, string runtimeFrameworkVersion, string targetFrameworkMoniker,
-            string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag, bool useTempFolderForRestore)
-            : base(targetFrameworkMoniker, GetPackagesDirectoryPath(useTempFolderForRestore), runtimeFrameworkVersion)
+            string runtimeIdentifier, string cliPath, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag, bool useTempFolderForRestore)
+            : base(targetFrameworkMoniker, cliPath, GetPackagesDirectoryPath(useTempFolderForRestore), runtimeFrameworkVersion)
         {
             this.coreClrVersion = coreClrVersion;
             this.coreFxVersion = coreFxVersion;

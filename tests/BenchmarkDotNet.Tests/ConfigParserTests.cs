@@ -228,7 +228,7 @@ namespace BenchmarkDotNet.Tests
             var parserdConfig = ConfigParser.Parse(new[] { "--warmupCount", "2"}, new OutputLogger(Output), globalConfig).config;
             
             Assert.Equal(2, parserdConfig.GetJobs().Single().Run.WarmupCount);
-            Assert.Equal(false, parserdConfig.GetJobs().Single().Meta.IsDefault); // after the merge the job is not "default" anymore
+            Assert.False(parserdConfig.GetJobs().Single().Meta.IsDefault); // after the merge the job is not "default" anymore
         }
     }
 }

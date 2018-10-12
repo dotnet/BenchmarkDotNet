@@ -1,5 +1,5 @@
 using System;
-using System.IO;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
@@ -22,15 +22,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
-        {
-            var restoreResult = DotNetCliCommandExecutor.Restore(CustomDotNetCliPath, generateResult.ArtifactsPaths, logger, buildPartition);
-
-            if (!restoreResult.IsSuccess)
-                return BuildResult.Failure(generateResult, new Exception(restoreResult.ProblemDescription));
-
-            var buildResult = DotNetCliCommandExecutor.Build(CustomDotNetCliPath, generateResult.ArtifactsPaths, logger, buildPartition);
-
-            return buildResult.ToBuildResult(generateResult);
-        }
+            => new DotNetCliCommand(
+                    CustomDotNetCliPath, 
+                    string.Empty, 
+                    generateResult, 
+                    logger, 
+                    buildPartition,
+                    Array.Empty<EnvironmentVariable>())
+                .RestoreThenBuild();
     }
 }
