@@ -264,27 +264,33 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case "net47":
                 case "net471":
                 case "net472":
-                    return baseJob.With(Runtime.Clr).With(CsProjClassicNetToolchain.From(runtime));
+                    return baseJob.With(Runtime.Clr).With(
+                        CsProjClassicNetToolchain.From(runtime, options.RestorePath?.FullName));
                 case "netcoreapp2.0":
                 case "netcoreapp2.1":
                 case "netcoreapp2.2":
                 case "netcoreapp3.0":
-                    if (options.CliPath != null)
-                        return baseJob.With(Runtime.Core).With(CsProjCoreToolchain.From(new NetCoreAppSettings(runtime, null, runtime, options.CliPath.FullName)));
-                    else
-                        return baseJob.With(Runtime.Core).With(CsProjCoreToolchain.From(new NetCoreAppSettings(runtime, null, runtime)));
+                    return baseJob.With(Runtime.Core).With(
+                        CsProjCoreToolchain.From(new NetCoreAppSettings(runtime, null, runtime, options.CliPath?.FullName, options.RestorePath?.FullName)));
                 case "mono":
                     if (options.MonoPath != null)
                         return baseJob.With(new MonoRuntime("Mono", options.MonoPath.FullName));
                     else
                         return baseJob.With(Runtime.Mono);
                 case "corert":
+                    var builder = CoreRtToolchain.CreateBuilder();
+
+                    if (options.CliPath != null)
+                        builder.DotNetCli(options.CliPath.FullName);
+                    
                     if (options.CoreRtPath != null)
-                        return baseJob.With(Runtime.CoreRT).With(CoreRtToolchain.CreateBuilder().UseCoreRtLocal(options.CoreRtPath.FullName).ToToolchain());
+                        builder.UseCoreRtLocal(options.CoreRtPath.FullName);
                     else if (!string.IsNullOrEmpty(options.CoreRtVersion))
-                        return baseJob.With(Runtime.CoreRT).With(CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(options.CoreRtVersion).ToToolchain());
+                        builder.UseCoreRtNuGet(options.CoreRtVersion);
                     else
-                        return baseJob.With(Runtime.CoreRT).With(CoreRtToolchain.LatestMyGetBuild);
+                        builder.UseCoreRtNuGet();
+                    
+                    return baseJob.With(Runtime.CoreRT).With(builder.ToToolchain());
                 default:
                     throw new NotSupportedException($"Runtime {runtime} is not supported");
             }

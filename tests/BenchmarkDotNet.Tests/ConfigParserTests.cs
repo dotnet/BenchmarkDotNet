@@ -179,6 +179,18 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(fakeDotnetCliPath, toolchain.CustomDotNetCliPath);
         }
         
+        [Fact]
+        public void PackagesPathParsedCorrectly()
+        {
+            var fakeRestoreDirectory = new FileInfo(typeof(object).Assembly.Location).Directory.FullName;
+            var config = ConfigParser.Parse(new[] { "-r", "netcoreapp3.0", "--packages", fakeRestoreDirectory }, new OutputLogger(Output)).config;
+
+            Assert.Single(config.GetJobs());
+            CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
+            Assert.NotNull(toolchain);
+            Assert.Equal(fakeRestoreDirectory, ((DotNetCliGenerator)toolchain.Generator).PackagesPath);
+        }
+        
         [Theory]
         [InlineData("net46")]
         [InlineData("net461")]
@@ -197,7 +209,7 @@ namespace BenchmarkDotNet.Tests
         }
         
         [Fact]
-        public void CanCompreFewDifferentRuntimes()
+        public void CanCompareFewDifferentRuntimes()
         {
             var config = ConfigParser.Parse(new[] { "--runtimes", "net46", "MONO", "netcoreapp3.0", "CoreRT"}, new OutputLogger(Output)).config;
 

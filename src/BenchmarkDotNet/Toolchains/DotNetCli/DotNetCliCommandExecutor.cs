@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 process.WaitForExit();
                 stopwatch.Stop();
 
-                parameters.Logger.WriteLineInfo($"// {parameters.Arguments} took {stopwatch.Elapsed.TotalSeconds:0.##}s and exited with {process.ExitCode}");
+                parameters.Logger.WriteLineInfo($"// {parameters.CliPath ?? "dotnet"} {parameters.Arguments} took {stopwatch.Elapsed.TotalSeconds:0.##}s and exited with {process.ExitCode}");
 
                 return process.ExitCode <= 0
                     ? DotNetCliCommandResult.Success(stopwatch.Elapsed, standardOutput)
