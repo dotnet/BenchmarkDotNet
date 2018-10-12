@@ -15,31 +15,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI]
         public string TargetFrameworkMoniker { get; }
 
-        protected Func<Platform, string> PlatformProvider { get; }
-
-        protected string Runtime { get; }
-
-        protected string ExtraDependencies { get; }
-
-        protected string Imports { get; }
-
         private DotNetCliBuilder Builder { get; }
 
         [PublicAPI]
-        protected DotNetCliGenerator(
-            DotNetCliBuilder builder,
-            string targetFrameworkMoniker,
-            string extraDependencies,
-            Func<Platform, string> platformProvider,
-            string imports,
-            string runtime = null)
+        protected DotNetCliGenerator(DotNetCliBuilder builder, string targetFrameworkMoniker)
         {
             Builder = builder;
             TargetFrameworkMoniker = targetFrameworkMoniker;
-            ExtraDependencies = extraDependencies;
-            PlatformProvider = platformProvider;
-            Imports = imports;
-            Runtime = runtime;
         }
 
         protected override string GetExecutableExtension() => TargetFrameworkMoniker.Contains("core") ? ".dll" : ".exe";

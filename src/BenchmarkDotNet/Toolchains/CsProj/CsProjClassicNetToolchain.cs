@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         private CsProjClassicNetToolchain(string targetFrameworkMoniker)
             : base(targetFrameworkMoniker,
-                new CsProjGenerator(targetFrameworkMoniker, platform => platform.ToConfig()),
+                new CsProjGenerator(targetFrameworkMoniker),
                 new DotNetCliBuilder(targetFrameworkMoniker, customDotNetCliPath: null),
                 new Executor())
         {

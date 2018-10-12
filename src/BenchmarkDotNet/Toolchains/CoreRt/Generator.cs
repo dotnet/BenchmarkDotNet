@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         internal Generator(string coreRtVersion, bool useCppCodeGenerator,
             string runtimeFrameworkVersion, string targetFrameworkMoniker,
             string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag, bool useTempFolderForRestore)
-            : base(targetFrameworkMoniker, platform => platform.ToConfig(), runtimeFrameworkVersion)
+            : base(targetFrameworkMoniker, runtimeFrameworkVersion)
         {
             this.coreRtVersion = coreRtVersion;
             this.useCppCodeGenerator = useCppCodeGenerator;
