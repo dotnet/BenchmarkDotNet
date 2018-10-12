@@ -49,7 +49,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (!restoreResult.IsSuccess)
                 return BuildResult.Failure(GenerateResult, new Exception(restoreResult.ProblemDescription));
 
-            return Build().ToBuildResult(GenerateResult);
+            var buildResult = Build().ToBuildResult(GenerateResult);
+            
+            if (!buildResult.IsBuildSuccess) // if we failed to do the full build, let's try with --no-dependencies
+                buildResult = BuildNoDependencies().ToBuildResult(GenerateResult);
+
+            return buildResult;
         }
 
         [PublicAPI]
@@ -62,6 +67,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             var buildResult = Build();
 
+            if (!buildResult.IsSuccess) // if we failed to do the full build, let's try with --no-dependencies
+                buildResult = BuildNoDependencies();
+            
             if (!buildResult.IsSuccess)
                 return BuildResult.Failure(GenerateResult, new Exception(buildResult.ProblemDescription));
 
@@ -77,6 +85,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             => DotNetCliCommandExecutor.Execute(
                 ExtendArguments(
                     GetBuildCommand(BuildPartition, Arguments)));
+        
+        public DotNetCliCommandResult BuildNoDependencies()
+            => DotNetCliCommandExecutor.Execute(
+                ExtendArguments(
+                    GetBuildCommand(BuildPartition, $"{Arguments} --no-dependencies")));
         
         public DotNetCliCommandResult Publish()
             => DotNetCliCommandExecutor.Execute(
