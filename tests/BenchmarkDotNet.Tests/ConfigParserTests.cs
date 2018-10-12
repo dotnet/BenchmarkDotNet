@@ -159,7 +159,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetJobs());
             CoreRtToolchain toolchain = config.GetJobs().Single().GetToolchain() as CoreRtToolchain;
             Assert.NotNull(toolchain);
-            Assert.Equal(fakeCoreRtPath.FullName, ((Publisher)toolchain.Builder).IlcPath);
+            Assert.Equal(fakeCoreRtPath.FullName, toolchain.IlcPath);
         }
         
         [Theory]

@@ -81,11 +81,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
-            var extraArguments = GetCustomArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver);
-
             var content = new StringBuilder(300)
-                .AppendLine($"call dotnet {GetRestoreCommand(artifactsPaths)} {extraArguments}")
-                .AppendLine($"call dotnet build -f {TargetFrameworkMoniker} -c {buildPartition.BuildConfiguration} --no-restore {extraArguments}")
+                .AppendLine($"call dotnet {DotNetCliCommandExecutor.GetRestoreCommand(artifactsPaths, buildPartition)}")
+                .AppendLine($"call dotnet {DotNetCliCommandExecutor.GetBuildCommand(buildPartition)}")
                 .ToString();
             
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
@@ -102,19 +100,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .GetFileSystemInfos()
                 .Any(fileInfo => fileInfo.Extension == ".sln" || fileInfo.Name == "global.json");
 
-        internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths)
-            => string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName)
-                ? "restore"
-                : $"restore --packages {artifactsPaths.PackagesDirectoryName}";
+        
 
-        internal static string GetCustomArguments(BenchmarkCase benchmarkCase, IResolver resolver)
-        {
-            if (!benchmarkCase.Job.HasValue(InfrastructureMode.ArgumentsCharacteristic))
-                return null;
-
-            var msBuildArguments = benchmarkCase.Job.ResolveValue(InfrastructureMode.ArgumentsCharacteristic, resolver).OfType<MsBuildArgument>();
-
-            return string.Join(" ", msBuildArguments.Select(arg => arg.TextRepresentation));
-        }
+        
     }
 }
