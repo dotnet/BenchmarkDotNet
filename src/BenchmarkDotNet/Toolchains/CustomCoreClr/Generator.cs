@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
 
         internal Generator(string coreClrVersion, string coreFxVersion, string runtimeFrameworkVersion, string targetFrameworkMoniker,
             string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag, bool useTempFolderForRestore)
-            : base(targetFrameworkMoniker, runtimeFrameworkVersion)
+            : base(targetFrameworkMoniker, GetPackagesDirectoryPath(useTempFolderForRestore), runtimeFrameworkVersion)
         {
             this.coreClrVersion = coreClrVersion;
             this.coreFxVersion = coreFxVersion;
@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         // to avoid this https://github.com/dotnet/coreclr/blob/master/Documentation/workflow/UsingDotNetCli.md#update-coreclr-using-runtime-nuget-package
         // some of the packages are going to contain source code, so they can not be in the subfolder of current solution
         // otherwise they would be compiled too (new .csproj include all .cs files from subfolders by default
-        protected override string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath)
+        private static string GetPackagesDirectoryPath(bool useTempFolderForRestore)
             => useTempFolderForRestore
                 ? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString())
                 : null;

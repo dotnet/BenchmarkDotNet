@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
@@ -15,13 +16,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI]
         public string TargetFrameworkMoniker { get; }
 
-        private DotNetCliBuilder Builder { get; }
+        private string PackagesPath { get; }
 
         [PublicAPI]
-        protected DotNetCliGenerator(DotNetCliBuilder builder, string targetFrameworkMoniker)
+        protected DotNetCliGenerator(string targetFrameworkMoniker, string packagesPath)
         {
-            Builder = builder;
             TargetFrameworkMoniker = targetFrameworkMoniker;
+            PackagesPath = packagesPath;
         }
 
         protected override string GetExecutableExtension() => TargetFrameworkMoniker.Contains("core") ? ".dll" : ".exe";
@@ -73,11 +74,20 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
+        protected override string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath)
+            => string.IsNullOrEmpty(PackagesPath)
+                ? base.GetPackagesDirectoryPath(buildArtifactsDirectoryPath)
+                : PackagesPath;
+
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
-            string content = $"call dotnet {Builder.RestoreCommand} {GetCustomArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver)}{Environment.NewLine}" +
-                             $"call dotnet {Builder.GetBuildCommand(TargetFrameworkMoniker, false, buildPartition.BuildConfiguration)} {GetCustomArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver)}";
+            var extraArguments = GetCustomArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver);
 
+            var content = new StringBuilder(300)
+                .AppendLine($"call dotnet {GetRestoreCommand(artifactsPaths)} {extraArguments}")
+                .AppendLine($"call dotnet build -f {TargetFrameworkMoniker} -c {buildPartition.BuildConfiguration} --no-restore {extraArguments}")
+                .ToString();
+            
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
         }
 
@@ -91,6 +101,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             => directoryInfo
                 .GetFileSystemInfos()
                 .Any(fileInfo => fileInfo.Extension == ".sln" || fileInfo.Name == "global.json");
+
+        internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths)
+            => string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName)
+                ? "restore"
+                : $"restore --packages {artifactsPaths.PackagesDirectoryName}";
 
         internal static string GetCustomArguments(BenchmarkCase benchmarkCase, IResolver resolver)
         {

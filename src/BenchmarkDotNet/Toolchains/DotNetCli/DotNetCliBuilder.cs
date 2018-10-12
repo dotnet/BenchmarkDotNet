@@ -12,8 +12,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [SuppressMessage("ReSharper", "ClassWithVirtualMembersNeverInherited.Global")]
     public class DotNetCliBuilder : IBuilder
     {
-        public virtual string RestoreCommand => "restore";
-
         private string TargetFrameworkMoniker { get; }
 
         private string CustomDotNetCliPath { get; }
@@ -35,7 +33,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             var restoreResult = DotNetCliCommandExecutor.ExecuteCommand(
                 CustomDotNetCliPath,
-                $"{RestoreCommand} {extraArguments}",
+                $"{DotNetCliGenerator.GetRestoreCommand(generateResult.ArtifactsPaths)} {extraArguments}",
                 generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath,
                 logger);
 

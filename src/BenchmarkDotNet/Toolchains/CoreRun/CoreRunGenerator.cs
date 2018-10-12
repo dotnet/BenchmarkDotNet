@@ -8,8 +8,8 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
 {
     public class CoreRunGenerator : CsProjGenerator
     {
-        public CoreRunGenerator(FileInfo sourceCoreRun, FileInfo copyCoreRun, string targetFrameworkMoniker)
-            : base(targetFrameworkMoniker)
+        public CoreRunGenerator(FileInfo sourceCoreRun, FileInfo copyCoreRun, string targetFrameworkMoniker, string packagesPath)
+            : base(targetFrameworkMoniker, packagesPath, runtimeFrameworkVersion: null)
         {
             SourceCoreRun = sourceCoreRun;
             CopyCoreRun = copyCoreRun;
