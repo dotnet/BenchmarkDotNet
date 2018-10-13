@@ -75,8 +75,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// </summary>
         public string PackagesPath { get; }
 
-        public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName)
-            => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName, customDotNetCliPath, PackagesPath);
+        public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName = null)
+            => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, customDotNetCliPath, PackagesPath);
+        
+        public NetCoreAppSettings WithCustomPackagesRestorePath(string packagesPath, string displayName = null)
+            => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, CustomDotNetCliPath, packagesPath);
 
         internal static NetCoreAppSettings GetCurrentVersion()
         {

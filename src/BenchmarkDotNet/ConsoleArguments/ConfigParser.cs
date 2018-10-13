@@ -53,6 +53,8 @@ namespace BenchmarkDotNet.ConsoleArguments
             "netcoreapp2.1",
             "netcoreapp2.2",
             "netcoreapp3.0",
+            "clr",
+            "core",
             "mono",
             "corert"
         );
@@ -258,6 +260,14 @@ namespace BenchmarkDotNet.ConsoleArguments
         {
             switch (runtime)
             {
+                case "clr":
+                    return baseJob.With(Runtime.Clr);
+                case "core":
+                    return baseJob.With(Runtime.Core).With(
+                        CsProjCoreToolchain.From(
+                            NetCoreAppSettings.GetCurrentVersion()
+                                .WithCustomDotNetCliPath(options.CliPath?.FullName)
+                                .WithCustomPackagesRestorePath(options.RestorePath?.FullName)));
                 case "net46":
                 case "net461":
                 case "net462":
@@ -273,10 +283,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return baseJob.With(Runtime.Core).With(
                         CsProjCoreToolchain.From(new NetCoreAppSettings(runtime, null, runtime, options.CliPath?.FullName, options.RestorePath?.FullName)));
                 case "mono":
-                    if (options.MonoPath != null)
-                        return baseJob.With(new MonoRuntime("Mono", options.MonoPath.FullName));
-                    else
-                        return baseJob.With(Runtime.Mono);
+                    return baseJob.With(new MonoRuntime("Mono", options.MonoPath?.FullName));
                 case "corert":
                     var builder = CoreRtToolchain.CreateBuilder();
 
