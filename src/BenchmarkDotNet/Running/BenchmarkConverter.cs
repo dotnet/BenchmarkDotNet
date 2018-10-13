@@ -323,7 +323,7 @@ namespace BenchmarkDotNet.Running
             if (parameterType.GetTypeInfo().IsEnum)
             {
                 if (parameterType.GetTypeInfo().IsDefined(typeof(FlagsAttribute)))
-                    throw new InvalidOperationException($"Unable to use {parameterType.Name} with [ParamsAllValues], because it's flags enum.");
+                    return new object[] { Activator.CreateInstance(parameterType) };
 
                 return Enum.GetValues(parameterType).Cast<object>().ToArray();
             }
@@ -332,8 +332,7 @@ namespace BenchmarkDotNet.Running
             if (nullableUnderlyingType != null)
                 return new object[] { null }.Concat(GetAllValidValues(nullableUnderlyingType)).ToArray();
 
-            throw new InvalidOperationException(
-                $"Type {parameterType.Name} cannot be used with [ParamsAllValues], allowed types are: bool, enum types and nullable type for another allowed type.");
+            return new object[] { Activator.CreateInstance(parameterType) };
         }
     }
 }
