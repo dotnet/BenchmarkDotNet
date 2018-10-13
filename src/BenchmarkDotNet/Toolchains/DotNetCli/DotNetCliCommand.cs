@@ -38,8 +38,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             EnvironmentVariables = environmentVariables;
         }
             
-        public DotNetCliCommand ExtendArguments(string arguments)
-            => new DotNetCliCommand(CliPath, arguments + Arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables);
+        public DotNetCliCommand WithArguments(string arguments)
+            => new DotNetCliCommand(CliPath, arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables);
 
         [PublicAPI]
         public BuildResult RestoreThenBuild()
@@ -77,24 +77,20 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         public DotNetCliCommandResult Restore()
-            => DotNetCliCommandExecutor.Execute(
-                ExtendArguments(
-                    GetRestoreCommand(GenerateResult.ArtifactsPaths, BuildPartition, Arguments)));
+            => DotNetCliCommandExecutor.Execute(WithArguments(
+                GetRestoreCommand(GenerateResult.ArtifactsPaths, BuildPartition, Arguments)));
         
         public DotNetCliCommandResult Build()
-            => DotNetCliCommandExecutor.Execute(
-                ExtendArguments(
-                    GetBuildCommand(BuildPartition, Arguments)));
+            => DotNetCliCommandExecutor.Execute(WithArguments(
+                GetBuildCommand(BuildPartition, Arguments)));
         
         public DotNetCliCommandResult BuildNoDependencies()
-            => DotNetCliCommandExecutor.Execute(
-                ExtendArguments(
-                    GetBuildCommand(BuildPartition, $"{Arguments} --no-dependencies")));
+            => DotNetCliCommandExecutor.Execute(WithArguments(
+                GetBuildCommand(BuildPartition, $"{Arguments} --no-dependencies")));
         
         public DotNetCliCommandResult Publish()
-            => DotNetCliCommandExecutor.Execute(
-                ExtendArguments(
-                    GetPublishCommand(BuildPartition, Arguments)));
+            => DotNetCliCommandExecutor.Execute(WithArguments(
+                GetPublishCommand(BuildPartition, Arguments)));
         
         internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string extraArguments = null) 
             => new StringBuilder(100)
