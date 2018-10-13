@@ -11,6 +11,8 @@ name: Benchmark Parameterization
 
 [!include[IntroParamsSource](../samples/IntroParamsSource.md)]
 
+[!include[IntroParamsAllValues](../samples/IntroParamsAllValues.md)]
+
 [!include[IntroArguments](../samples/IntroArguments.md)]
 
 [!include[IntroArgumentsSource](../samples/IntroArgumentsSource.md)]
