@@ -109,4 +109,4 @@ dotnet run -c Release -- --warmupCount 2
 * `--monoPath` custom Path for Mono
 * `--cliPath` custom Path for dotnet cli
 * `--coreRt` path to ILCompiler for CoreRT
-
+* `--info` prints environment configuration including BenchmarkDotNet, OS, CPU and .NET version

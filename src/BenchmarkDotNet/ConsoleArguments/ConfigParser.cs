@@ -80,16 +80,16 @@ namespace BenchmarkDotNet.ConsoleArguments
                 { "fullxml", new[] { XmlExporter.Full } }
             };
 
-        public static (bool isSuccess, ReadOnlyConfig config) Parse(string[] args, ILogger logger, IConfig globalConfig = null)
+        public static (bool isSuccess, ReadOnlyConfig config, CommandLineOptions options) Parse(string[] args, ILogger logger, IConfig globalConfig = null)
         {
-            (bool isSuccess, ReadOnlyConfig config) result = default;
+            (bool isSuccess, ReadOnlyConfig config, CommandLineOptions options) result = default;
 
             using (var parser = CreateParser(logger))
             {
                 parser
                     .ParseArguments<CommandLineOptions>(args)
-                    .WithParsed(options => result = Validate(options, logger) ? (true, CreateConfig(options, globalConfig)) : (false, default))
-                    .WithNotParsed(errors => result = (false, default));
+                    .WithParsed(options => result = Validate(options, logger) ? (true, CreateConfig(options, globalConfig), options) : (false, default, default))
+                    .WithNotParsed(errors => result = (false, default, default));
             }
 
             return result;

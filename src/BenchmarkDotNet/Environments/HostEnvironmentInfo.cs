@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Portability.Cpu;
 using BenchmarkDotNet.Properties;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 
@@ -109,5 +111,22 @@ namespace BenchmarkDotNet.Environments
         public bool IsDotNetCliInstalled() => !string.IsNullOrEmpty(DotNetSdkVersion.Value);
 
         private static string GetBenchmarkDotNetVersion() => BenchmarkDotNetInfo.FullVersion;
+
+        /// <summary>
+        /// Return string representation of CPU and environment configuration including BenchmarkDotNet, OS and .NET version  
+        /// </summary>
+        [PublicAPI]
+        public static string GetInformation()
+        {
+            var hostEnvironmentInfo = GetCurrent();
+            var sb = new StringBuilder();
+            foreach (string infoLine in hostEnvironmentInfo.ToFormattedString())
+            {
+                sb.AppendLine(infoLine);
+            }
+
+            sb.AppendLine(Summary.BuildAllRuntimes(hostEnvironmentInfo, Array.Empty<BenchmarkReport>()));
+            return sb.ToString();
+        }
     }
 }

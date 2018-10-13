@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Reports
 
             Style = config.GetSummaryStyle();
             Table = GetTable(Style);
-            AllRuntimes = BuildAllRuntimes();
+            AllRuntimes = BuildAllRuntimes(HostEnvironmentInfo, Reports);
         }
 
         private Summary(string title,
@@ -117,14 +117,14 @@ namespace BenchmarkDotNet.Reports
                 clockSpan.GetTimeSpan(),
                 summaries.SelectMany(summary => summary.ValidationErrors).ToArray());
 
-        private string BuildAllRuntimes()
+        internal static string BuildAllRuntimes(HostEnvironmentInfo hostEnvironmentInfo, BenchmarkReport[] reports)
         {
             var jobRuntimes = new Dictionary<string, string>(); // JobId -> Runtime
             var orderedJobs = new List<string> { "[Host]" };
 
-            jobRuntimes["[Host]"] = HostEnvironmentInfo.GetRuntimeInfo();
+            jobRuntimes["[Host]"] = hostEnvironmentInfo.GetRuntimeInfo();
 
-            foreach (var benchmarkReport in Reports)
+            foreach (var benchmarkReport in reports)
             {
                 string runtime = benchmarkReport.GetRuntimeInfo();
                 if (runtime != null)
