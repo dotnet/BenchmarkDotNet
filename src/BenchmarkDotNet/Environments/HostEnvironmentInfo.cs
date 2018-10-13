@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
@@ -11,7 +10,6 @@ using BenchmarkDotNet.Portability.Cpu;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains.DotNetCli;
-using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Environments
@@ -117,17 +115,14 @@ namespace BenchmarkDotNet.Environments
         [PublicAPI]
         public static string GetInformation()
         {
-            var summary = new Summary(
-                "Info",
-                new List<BenchmarkReport>(), 
-                GetCurrent(),
-                DefaultConfig.Instance, 
-                resultsDirectoryPath: string.Empty, 
-                TimeSpan.Zero,
-                Array.Empty<ValidationError>());
-
+            var hostEnvironmentInfo = GetCurrent();
             var sb = new StringBuilder();
-            summary.WriteInfo(line => sb.AppendLine(line));
+            foreach (string infoLine in hostEnvironmentInfo.ToFormattedString())
+            {
+                sb.AppendLine(infoLine);
+            }
+
+            sb.AppendLine(Summary.BuildAllRuntimes(hostEnvironmentInfo, Array.Empty<BenchmarkReport>()));
             return sb.ToString();
         }
     }
