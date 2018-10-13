@@ -1,6 +1,8 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Environments;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -11,7 +13,8 @@ namespace BenchmarkDotNet.Samples
         public static string IsServerGC() => $"IsServerGC={HostEnvironmentInfo.GetCurrent().IsServerGC}";
 
         [CustomEnvironmentInfo]
-        public static string[] CommandLineArgs() => Environment.GetCommandLineArgs();
+        public static IEnumerable<string> CommandLineArgs() =>
+            Environment.GetCommandLineArgs().Select((arg, i) => $"args[{i}]={arg}");
 
         [Benchmark]
         public void Foo()
