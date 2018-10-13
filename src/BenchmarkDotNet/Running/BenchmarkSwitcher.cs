@@ -4,10 +4,12 @@ using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Running
@@ -61,9 +63,15 @@ namespace BenchmarkDotNet.Running
         {
             args = args ?? Array.Empty<string>();
 
-            (bool isParsingSuccess, var parsedConfig) = ConfigParser.Parse(args, ConsoleLogger.Default, config);
+            var (isParsingSuccess, parsedConfig, options) = ConfigParser.Parse(args, ConsoleLogger.Default, config);
             if (!isParsingSuccess)
                 return Enumerable.Empty<Summary>();
+
+            if (options.PrintInformation)
+            {
+                Console.WriteLine(HostEnvironmentInfo.GetInformation());
+                return Enumerable.Empty<Summary>();
+            }
 
             var globalChronometer = Chronometer.Start();
             var summaries = new List<Summary>();

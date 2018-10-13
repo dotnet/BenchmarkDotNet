@@ -167,5 +167,15 @@ namespace BenchmarkDotNet.Reports
         }
 
         public bool HasBaselines() => BenchmarksCases.Any(IsBaseline);
+
+        public void WriteInfo(Action<string> writer)
+        {
+            foreach (string infoLine in HostEnvironmentInfo.ToFormattedString())
+            {
+                writer(infoLine);
+            }
+
+            writer(AllRuntimes);
+        }
     }
 }

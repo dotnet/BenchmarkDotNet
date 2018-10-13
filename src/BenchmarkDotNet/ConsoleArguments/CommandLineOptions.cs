@@ -119,6 +119,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("runOncePerIteration", Required = false, Default = false, HelpText = "Run the benchmark exactly once per iteration.")]
         public bool RunOncePerIteration { get; set; }
 
+        [Option("info", Required = false, Default = false, HelpText = "Print environment information.")]
+        public bool PrintInformation { get; set; }
+
         [Usage(ApplicationAlias = "")]
         [PublicAPI]
         public static IEnumerable<Example> Examples
