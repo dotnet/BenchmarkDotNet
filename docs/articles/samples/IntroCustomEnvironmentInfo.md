@@ -13,7 +13,7 @@ You can add any useful information about environment to the benchmark report. Ju
 ### Output
 
 ```
-BenchmarkDotNet=v0.11.1.20181013-develop, OS=Windows 10.0.17134.345 (1803/April2018Update/Redstone4)
+BenchmarkDotNet=v0.11.2, OS=Windows 10.0.17134.345 (1803/April2018Update/Redstone4)
 Intel Core i7-3770 CPU 3.40GHz (Ivy Bridge), 1 CPU, 8 logical and 4 physical cores
 Frequency=3419929 Hz, Resolution=292.4037 ns, Timer=TSC
 .NET Core SDK=2.1.402
@@ -21,13 +21,6 @@ IsServerGC=False
 args[0]=D:\BenchmarkDotNet\samples\BenchmarkDotNet.Samples\bin\Release\netcoreapp2.1\BenchmarkDotNet.Samples.dll
   [Host] : .NET Core 2.1.4 (CoreCLR 4.6.26814.03, CoreFX 4.6.26814.02), 64bit RyuJIT
   Dry    : .NET Core 2.1.4 (CoreCLR 4.6.26814.03, CoreFX 4.6.26814.02), 64bit RyuJIT
-
-Job=Dry  IterationCount=1  LaunchCount=1
-RunStrategy=ColdStart  UnrollFactor=1  WarmupCount=1
-
- Method |     Mean | Error |
-------- |---------:|------:|
-    Foo | 368.1 us |    NA |
 ```
 
 ### Links
