@@ -112,6 +112,9 @@ namespace BenchmarkDotNet.Environments
 
         private static string GetBenchmarkDotNetVersion() => BenchmarkDotNetInfo.FullVersion;
 
+        /// <summary>
+        /// Return string representation of CPU and environment configuration including BenchmarkDotNet, OS and .NET version  
+        /// </summary>
         [PublicAPI]
         public static string GetInformation()
         {
