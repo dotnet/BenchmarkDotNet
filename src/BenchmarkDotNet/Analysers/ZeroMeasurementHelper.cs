@@ -5,13 +5,17 @@ namespace BenchmarkDotNet.Analysers
     public class ZeroMeasurementHelper
     {
         /// <summary>
-        /// Checks distribution against Zero Measurement hypothesis
+        /// Checks distribution against Zero Measurement hypothesis in case of known threshold
         /// </summary>
         /// <returns>True if measurement is ZeroMeasurement</returns>
-        public static bool CheckZeroMeasurement(double[] results, double threshold)
-        {
-            var sample = new [] { threshold, threshold };
-            return !WelchTest.Instance.IsGreater(results, sample).NullHypothesisIsRejected;
-        }
+        public static bool CheckZeroMeasurementOneSample(double[] results, double threshold) 
+            => !OneSampleTTest.Instance.IsGreater(results, threshold).NullHypothesisIsRejected;
+
+        /// <summary>
+        /// Checks distribution against Zero Measurement hypothesis in case of two samples
+        /// </summary>
+        /// <returns>True if measurement is ZeroMeasurement</returns>
+        public static bool CheckZeroMeasurementTwoSamples(double[] workload, double[] overhead) 
+            => !WelchTest.Instance.IsGreater(workload, overhead).NullHypothesisIsRejected;
     }
 }
