@@ -254,6 +254,12 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return CreateCoreRunJob(baseJob, options); // local CoreFX and CoreCLR builds
             else if (!string.IsNullOrEmpty(options.ClrVersion))
                 yield return baseJob.With(new ClrRuntime(options.ClrVersion)); // local builds of .NET Runtime
+            else if (options.CliPath != null && options.Runtimes.IsEmpty()) // runtime not provided (we deduce it from cli `-f`)
+                yield return baseJob.With(Runtime.Core).With(
+                    CsProjCoreToolchain.From(
+                        NetCoreAppSettings.GetCurrentVersion()
+                            .WithCustomDotNetCliPath(options.CliPath?.FullName)
+                            .WithCustomPackagesRestorePath(options.RestorePath?.FullName)));
         }
 
         private static Job CreateJobForGivenRuntime(Job baseJob, string runtime, CommandLineOptions options)
@@ -334,6 +340,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                     options.CoreRunPath,
                     createCopy: true,
                     targetFrameworkMoniker: NetCoreAppSettings.GetCurrentVersion().TargetFrameworkMoniker,
-                    customDotNetCliPath: options.CliPath));
+                    customDotNetCliPath: options.CliPath,
+                    restorePath: options.RestorePath));
     }
 }
