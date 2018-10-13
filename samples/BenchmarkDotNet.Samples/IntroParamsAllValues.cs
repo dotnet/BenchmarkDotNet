@@ -1,8 +1,9 @@
 ﻿using System.Threading;
 using BenchmarkDotNet.Attributes;
 
-namespace BenchmarkDotNet.Samples.Intro
+namespace BenchmarkDotNet.Samples
 {
+    [DryJob]
     public class IntroParamsAllValues
     {
         public enum CustomEnum
