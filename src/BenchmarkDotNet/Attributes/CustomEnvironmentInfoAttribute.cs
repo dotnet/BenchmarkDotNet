@@ -5,7 +5,7 @@ namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Method)]
     [MeansImplicitUse]
-    class CustomEnvironmentInfoAttribute : Attribute
+    public class CustomEnvironmentInfoAttribute : Attribute
     {
     }
 }
