@@ -8,7 +8,7 @@ If you want to use all possible values of an `enum` or another type with a small
 
 * `bool`
 * any `enum` that is not marked with `[Flags]`
-* `Nullable<T>`, where `T` is a supported type
+* `Nullable<T>`, where `T` is an enum or boolean
 
 ### Source code
 
