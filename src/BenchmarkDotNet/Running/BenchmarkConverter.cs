@@ -161,30 +161,30 @@ namespace BenchmarkDotNet.Running
 
         private static ParameterDefinitions GetParameterDefinitions(Type type)
         {
-            const BindingFlags reflectionFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+            IEnumerable<ParameterDefinition> GetDefinitions<TAttribute>(Func<TAttribute, Type, object[]> getValidValues) where TAttribute : Attribute
+            {
+                const BindingFlags reflectionFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
-            var allParamsMembers = type.GetTypeMembersWithGivenAttribute<ParamsAttribute>(reflectionFlags);
-
-            var allParamsSourceMembers = type.GetTypeMembersWithGivenAttribute<ParamsSourceAttribute>(reflectionFlags);
-
-            var definitions = allParamsMembers
-                .Select(member =>
+                var allMembers = type.GetTypeMembersWithGivenAttribute<TAttribute>(reflectionFlags);
+                return allMembers.Select(member =>
                     new ParameterDefinition(
                         member.Name,
                         member.IsStatic,
-                        GetValidValues(member.Attribute.Values, member.ParameterType),
-                        false))
-                .Concat(allParamsSourceMembers.Select(member =>
-                {
-                    var paramsValues = GetValidValuesForParamsSource(type, member.Attribute.Name);
-                    return new ParameterDefinition(
-                       member.Name,
-                       member.IsStatic,
-                       SmartParamBuilder.CreateForParams(paramsValues.source, paramsValues.values),
-                       false);
-                    
-                }))
-                .ToArray();
+                        getValidValues(member.Attribute, member.ParameterType),
+                        false));
+            }
+
+            var paramsDefinitions = GetDefinitions<ParamsAttribute>((attribute, parameterType) => GetValidValues(attribute.Values, parameterType));
+
+            var paramsSourceDefinitions = GetDefinitions<ParamsSourceAttribute>((attribute, _) =>
+            {
+                var paramsValues = GetValidValuesForParamsSource(type, attribute.Name);
+                return SmartParamBuilder.CreateForParams(paramsValues.source, paramsValues.values);
+            });
+
+            var paramsAllValuesDefinitions = GetDefinitions<ParamsAllValuesAttribute>((_, paramaterType) => GetAllValidValues(paramaterType));
+
+            var definitions = paramsDefinitions.Concat(paramsSourceDefinitions).Concat(paramsAllValuesDefinitions).ToArray();
 
             return new ParameterDefinitions(definitions);
         }
@@ -313,6 +313,26 @@ namespace BenchmarkDotNet.Running
                 throw new InvalidOperationException($"{memberInfo.Name} of type {type.Name} does not implement IEnumerable, unable to read values for [ParamsSource]");
 
             return collection.Cast<object>().ToArray();
+        }
+
+        private static object[] GetAllValidValues(Type parameterType)
+        {
+            if (parameterType == typeof(bool))
+                return new object[] { false, true };
+
+            if (parameterType.GetTypeInfo().IsEnum)
+            {
+                if (parameterType.GetTypeInfo().IsDefined(typeof(FlagsAttribute)))
+                    return new object[] { Activator.CreateInstance(parameterType) };
+
+                return Enum.GetValues(parameterType).Cast<object>().ToArray();
+            }
+
+            var nullableUnderlyingType = Nullable.GetUnderlyingType(parameterType);
+            if (nullableUnderlyingType != null)
+                return new object[] { null }.Concat(GetAllValidValues(nullableUnderlyingType)).ToArray();
+
+            return new object[] { Activator.CreateInstance(parameterType) };
         }
     }
 }

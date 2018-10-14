@@ -40,4 +40,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Portability\Cpu\TestFiles\*.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Attributes\ApprovedFiles\" />
+  </ItemGroup>
 </Project>
