@@ -34,7 +34,8 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 new CombinedDisassemblyExporter(results),
                 new RawDisassemblyExporter(results),
-                new PrettyDisassemblyExporter(results)
+                new PrettyHtmlDisassemblyExporter(results),
+                new PrettyGithubMarkdownDisassemblyExporter(results)
             };
         }
 

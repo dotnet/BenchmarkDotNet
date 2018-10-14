@@ -287,7 +287,8 @@ namespace BenchmarkDotNet.Disassembler
                     TextRepresentation = disasmBuffer.ToString(),
                     Comment = calledMethodName,
                     StartAddress = disasmAddress,
-                    EndAddress = endOffset
+                    EndAddress = endOffset,
+                    SizeInBytes = (uint)(endOffset - disasmAddress)
                 };
 
                 if (endOffset >= map.EndAddress)

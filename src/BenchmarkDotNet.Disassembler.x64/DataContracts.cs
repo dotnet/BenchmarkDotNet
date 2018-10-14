@@ -32,6 +32,8 @@ namespace BenchmarkDotNet.Disassembler
         /// The native end offset of this ASM representation
         /// </summary>
         public ulong EndAddress { get; set; }
+        
+        public uint SizeInBytes { get; set; }
     }
 
     public class Map

@@ -11,15 +11,15 @@ using StreamWriter = BenchmarkDotNet.Portability.StreamWriter;
 
 namespace BenchmarkDotNet.Exporters
 {
-    public class PrettyDisassemblyExporter : IExporter
+    public class PrettyHtmlDisassemblyExporter : IExporter
     {
         private static readonly Lazy<string> HighlightingLabelsScript = new Lazy<string>(() => ResourceHelper.LoadTemplate("highlightingLabelsScript.js"));
 
         private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
 
-        public PrettyDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results) => this.results = results;
+        public PrettyHtmlDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results) => this.results = results;
 
-        public string Name => nameof(RawDisassemblyExporter);
+        public string Name => nameof(PrettyHtmlDisassemblyExporter);
 
         public void ExportToLog(Summary summary, ILogger logger) { }
 
