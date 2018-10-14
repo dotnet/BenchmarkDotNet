@@ -11,47 +11,53 @@ namespace BenchmarkDotNet.Validators
     {
         public static readonly ParamsAllValuesValidator FailOnError = new ParamsAllValuesValidator();
 
-        private ParamsAllValuesValidator() { }
-
         public bool TreatsWarningsAsErrors => true;
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters input)
+        private ParamsAllValuesValidator() { }
+
+        private const BindingFlags reflectionFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+
+        public IEnumerable<ValidationError> Validate(ValidationParameters input) => 
+            input.Benchmarks
+                .Select(benchmark => benchmark.Descriptor.Type)
+                .Distinct()
+                .SelectMany(type => type.GetTypeMembersWithGivenAttribute<ParamsAllValuesAttribute>(reflectionFlags))
+                .Distinct()
+                .Select(member => GetErrorOrDefault(member.ParameterType))
+                .Where(error => error != default);
+
+        private bool IsBool(Type paramType) => paramType == typeof(bool);
+        private bool IsEnum(Type paramType) => paramType.GetTypeInfo().IsEnum;
+        private bool IsFlagsEnum(Type paramType)
         {
-            var validationErrors = new List<ValidationError>();
-
-            foreach (var groupByType in input.Benchmarks.GroupBy(benchmark => benchmark.Descriptor.Type))
-            {
-                const BindingFlags reflectionFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-                var allMembers = groupByType.Key.GetTypeMembersWithGivenAttribute<ParamsAllValuesAttribute>(reflectionFlags);
-                validationErrors.AddRange(allMembers.Select(member => member.ParameterType).SelectMany(ValidateAttibute));
-            }
-
-            return validationErrors;
+            var typeInfo = paramType.GetTypeInfo();
+            return typeInfo.IsEnum && typeInfo.IsDefined(typeof(FlagsAttribute));
         }
-
-        private IEnumerable<ValidationError> ValidateAttibute(Type parameterType)
+        private bool IsNullable(Type paramType, out Type underlyingType)
         {
-            var nullableUnderlyingType = Nullable.GetUnderlyingType(parameterType);
-            var typeInfo = parameterType.GetTypeInfo();
+            underlyingType = Nullable.GetUnderlyingType(paramType);
+            return underlyingType != null;
+        }        
 
-            if (typeInfo.IsEnum && typeInfo.IsDefined(typeof(FlagsAttribute)))
+        private ValidationError GetErrorOrDefault(Type parameterType)
+        {
+            switch (parameterType)
             {
-                yield return new ValidationError(
-                    TreatsWarningsAsErrors, 
-                    $"Unable to use {parameterType.Name} with [ParamsAllValues], because it's flags enum.");
-            }
-            else if (nullableUnderlyingType != null)
-            {
-                foreach (var error in ValidateAttibute(nullableUnderlyingType))
-                {
-                    yield return error;
-                }
-            }
-            else if (parameterType != typeof(bool) && !typeInfo.IsEnum && nullableUnderlyingType == null)
-            {
-                yield return new ValidationError(
-                    TreatsWarningsAsErrors,
-                    $"Type {parameterType.Name} cannot be used with [ParamsAllValues], allowed types are: bool, enum types and nullable type for another allowed type.");
+                case Type t when IsNullable(t, out Type underType):
+                    return GetErrorOrDefault(underType);
+
+                case Type t when IsFlagsEnum(t):
+                    return new ValidationError(
+                        TreatsWarningsAsErrors,
+                        $"Unable to use {parameterType.Name} with [ParamsAllValues], because it's flags enum.");
+
+                case Type t when IsBool(t) || IsEnum(t):
+                    return default;
+
+                default:
+                    return new ValidationError(
+                        TreatsWarningsAsErrors,
+                        $"Type {parameterType.Name} cannot be used with [ParamsAllValues], allowed types are: bool, enum types and nullable type for another allowed type.");
             }
         }
     }
