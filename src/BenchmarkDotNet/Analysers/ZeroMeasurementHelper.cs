@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Analysers
         /// </summary>
         /// <returns>True if measurement is ZeroMeasurement</returns>
         public static bool CheckZeroMeasurementOneSample(double[] results, double threshold) 
-            => !OneSampleTTest.Instance.IsGreater(results, threshold).NullHypothesisIsRejected;
+            => !StudentTest.Instance.IsGreater(results, threshold).NullHypothesisIsRejected;
 
         /// <summary>
         /// Checks distribution against Zero Measurement hypothesis in case of two samples
