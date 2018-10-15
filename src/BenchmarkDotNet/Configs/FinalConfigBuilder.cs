@@ -6,6 +6,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Configs 

@@ -92,7 +92,8 @@ namespace BenchmarkDotNet.Running
                             target.IterationSetupMethod, target.IterationCleanupMethod,
                             target.WorkloadMethodDisplayInfo, benchmarkContent, target.Baseline, target.Categories, target.OperationsPerInvoke),
                         b.Job,
-                        b.Parameters);
+                        b.Parameters,
+                        b.Config);
                 });
                 resultBenchmarks.Add(
                     new BenchmarkRunInfo(benchmarks.ToArray(), runInfo.Type, runInfo.Config));

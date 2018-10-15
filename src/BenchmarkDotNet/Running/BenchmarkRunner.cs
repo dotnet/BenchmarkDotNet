@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -17,6 +18,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Portability.Cpu;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.InProcess;
@@ -42,12 +44,12 @@ namespace BenchmarkDotNet.Running
         [PublicAPI] public static Summary Run(Type type, MethodInfo[] methods, IConfig config = null) => Run(BenchmarkConverter.MethodsToBenchmarks(type, methods, config));
 
         [PublicAPI] public static Summary[] Run(Assembly assembly, IConfig config = null) 
-            => Run(assembly.GetRunnableBenchmarks().Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray(), config);
+            => Run(assembly.GetRunnableBenchmarks().Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray());
 
         [PublicAPI] public static Summary RunUrl(string url, IConfig config = null)
         {
 #if CLASSIC
-            return Run(BenchmarkConverter.UrlToBenchmarks(url, config), config).Single();
+            return Run(BenchmarkConverter.UrlToBenchmarks(url, config)).Single();
 #else
             throw new NotSupportedException();
 #endif
@@ -56,49 +58,40 @@ namespace BenchmarkDotNet.Running
         [PublicAPI] public static Summary RunSource(string source, IConfig config = null)
         {
 #if CLASSIC
-            return Run(BenchmarkConverter.SourceToBenchmarks(source, config), config).Single();
+            return Run(BenchmarkConverter.SourceToBenchmarks(source, config)).Single();
 #else
             throw new NotSupportedException();
 #endif
         }
 
-        [PublicAPI] public static Summary Run(BenchmarkRunInfo benchmarkRunInfo) => Run(new[] { benchmarkRunInfo }, benchmarkRunInfo.Config).Single();
+        [PublicAPI] public static Summary Run(BenchmarkRunInfo benchmarkRunInfo) => Run(new[] { benchmarkRunInfo }).Single();
 
-        [PublicAPI] public static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos, [CanBeNull] IConfig commonSettingsConfig)
+        [PublicAPI] public static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos)
         {
             var resolver = DefaultResolver;
             var artifactsToCleanup = new List<string>();
-            string title = GetTitle(benchmarkRunInfos);
+            
+            var title = GetTitle(benchmarkRunInfos);
+            var rootArtifactsFolderPath = GetRootArtifactsFolderPath(benchmarkRunInfos);
+            var resultsFolderPath = GetResultsFolderPath(rootArtifactsFolderPath);
 
-            string rootArtifactsFolderPath = (commonSettingsConfig?.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath).CreateIfNotExists();
-
-            using (var logStreamWriter = StreamWriter.FromPath(Path.Combine(rootArtifactsFolderPath, title + ".log")))
+            using (var streamLogger = new StreamLogger(StreamWriter.FromPath(Path.Combine(rootArtifactsFolderPath, title + ".log"))))
             {
-                var finalConfig = FinalConfigBuilder.Create(
-                    ManualConfig.Create(commonSettingsConfig ?? DefaultConfig.Instance)
-                        .With(new StreamLogger(logStreamWriter)));
+                var compositeLogger = CreateCompositeLogger(benchmarkRunInfos, streamLogger);
                 
-                var logger = finalConfig.GetCompositeLogger();
-
-                var supportedBenchmarks = GetSupportedBenchmarks(benchmarkRunInfos, logger, resolver);
-
+                var supportedBenchmarks = GetSupportedBenchmarks(benchmarkRunInfos, compositeLogger, resolver);
                 if (!supportedBenchmarks.Any(benchmarks => benchmarks.BenchmarksCases.Any()))
-                    return  new [] { Summary.CreateFailed(
-                        supportedBenchmarks.SelectMany(b => b.BenchmarksCases).ToArray(), 
-                        title, HostEnvironmentInfo.GetCurrent(), finalConfig, GetResultsFolderPath(rootArtifactsFolderPath), Array.Empty<ValidationError>()) };
+                    return new [] { Summary.NothingToRun(title, resultsFolderPath) };
 
-                var validationErrors = Validate(supportedBenchmarks, logger);
+                var validationErrors = Validate(supportedBenchmarks, compositeLogger);
                 if (validationErrors.Any(validationError => validationError.IsCritical))
-                    return  new [] { Summary.CreateFailed(
-                        supportedBenchmarks.SelectMany(b => b.BenchmarksCases).ToArray(), 
-                        title, HostEnvironmentInfo.GetCurrent(), finalConfig, GetResultsFolderPath(rootArtifactsFolderPath), validationErrors) };
+                    return new [] { Summary.ValidationFailed(title, resultsFolderPath, validationErrors) };
 
-                var buildPartitions = BenchmarkPartitioner.CreateForBuild(supportedBenchmarks, resolver);
-
-                logger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
+                compositeLogger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
                 var globalChronometer = Chronometer.Start();
 
-                var buildResults = BuildInParallel(logger, rootArtifactsFolderPath, buildPartitions, ref globalChronometer);
+                var buildPartitions = BenchmarkPartitioner.CreateForBuild(supportedBenchmarks, resolver);
+                var buildResults = BuildInParallel(compositeLogger, rootArtifactsFolderPath, buildPartitions, ref globalChronometer);
 
                 try
                 {
@@ -112,32 +105,36 @@ namespace BenchmarkDotNet.Running
                     {
                         var runChronometer = Chronometer.Start();
                         
-                        var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, logger, artifactsToCleanup, rootArtifactsFolderPath, ref runChronometer);
+                        var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, artifactsToCleanup, rootArtifactsFolderPath, ref runChronometer);
                         
-                        if (commonSettingsConfig == null || commonSettingsConfig.SummaryPerType)
-                            PrintSummary(logger, benchmarkRunInfo.Config, summary);
+                        if (benchmarkRunInfo.Config.SummaryPerType)
+                            PrintSummary(compositeLogger, benchmarkRunInfo.Config, summary);
                         
-                        LogTotalTime(logger, runChronometer.GetElapsed().GetTimeSpan(), summary.GetNumberOfExecutedBenchmarks(), message: "Run time");
-                        logger.WriteLine();
+                        LogTotalTime(compositeLogger, runChronometer.GetElapsed().GetTimeSpan(), summary.GetNumberOfExecutedBenchmarks(), message: "Run time");
+                        compositeLogger.WriteLine();
                         
                         results.Add(summary);
                     }
 
-                    if (commonSettingsConfig != null && !commonSettingsConfig.SummaryPerType)
+                    if (supportedBenchmarks.Any(b => !b.Config.SummaryPerType))
                     {
-                        var joinedSummary = Summary.Join(results, commonSettingsConfig, globalChronometer.GetElapsed());
+                        var joinedSummary = Summary.Join(results, globalChronometer.GetElapsed());
                         
-                        PrintSummary(logger, finalConfig, joinedSummary);
+                        PrintSummary(compositeLogger, supportedBenchmarks.First(b => !b.Config.SummaryPerType).Config, joinedSummary);
                         
                         results.Clear();
                         results.Add(joinedSummary);
                     }
+                    
+                    var totalTime = globalChronometer.GetElapsed().GetTimeSpan();
+                    int totalNumberOfExecutedBenchmarks = results.Sum(summary => summary.GetNumberOfExecutedBenchmarks());
+                    LogTotalTime(compositeLogger, totalTime, totalNumberOfExecutedBenchmarks, "Global total time");
 
                     return results.ToArray();
                 }
                 finally
                 {
-                    logger.WriteLineHeader("// * Artifacts cleanup *");
+                    compositeLogger.WriteLineHeader("// * Artifacts cleanup *");
                     Cleanup(new HashSet<string>(artifactsToCleanup.Distinct()));
                 }
             }
@@ -208,9 +205,8 @@ namespace BenchmarkDotNet.Running
             var clockSpan = runChronometer.GetElapsed();
 
             return new Summary(title,
-                reports,
+                reports.ToImmutableArray(),
                 HostEnvironmentInfo.GetCurrent(),
-                config,
                 GetResultsFolderPath(rootArtifactsFolderPath),
                 clockSpan.GetTimeSpan(), 
                 Validate(new[] {benchmarkRunInfo }, NullLogger.Instance)); // validate them once again, but don't print the output
@@ -271,7 +267,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineHeader("// ***** BenchmarkRunner: End *****");
         }
 
-        private static ValidationError[] Validate(BenchmarkRunInfo[] benchmarks, ILogger logger)
+        private static ImmutableArray<ValidationError> Validate(BenchmarkRunInfo[] benchmarks, ILogger logger)
         {
             logger.WriteLineInfo("// Validating benchmarks:");
 
@@ -283,7 +279,7 @@ namespace BenchmarkDotNet.Running
             foreach (var validationError in validationErrors)
                 logger.WriteLineError(validationError.Message);
 
-            return validationErrors.ToArray();
+            return validationErrors.ToImmutableArray();
         }
 
         private static Dictionary<BuildPartition, BuildResult> BuildInParallel(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, ref StartedClock globalChronometer)
@@ -479,7 +475,7 @@ namespace BenchmarkDotNet.Running
             return (executeResults, gcStats, metrics);
         }
 
-        internal static void LogTotalTime(ILogger logger, TimeSpan time, int executedBenchmarksCount, string message = "Total time")
+        private static void LogTotalTime(ILogger logger, TimeSpan time, int executedBenchmarksCount, string message = "Total time")
             => logger.WriteLineStatistic($"{message}: {time.ToFormattedTotalTime()}, executed benchmarks: {executedBenchmarksCount}");
 
         private static BenchmarkRunInfo[] GetSupportedBenchmarks(BenchmarkRunInfo[] benchmarkRunInfos, ILogger logger, IResolver resolver)
@@ -490,7 +486,31 @@ namespace BenchmarkDotNet.Running
                 .Where(infos => infos.BenchmarksCases.Any())
                 .ToArray();
 
+        private static string GetRootArtifactsFolderPath(BenchmarkRunInfo[] benchmarkRunInfos)
+        {
+            var customPath = benchmarkRunInfos.SingleOrDefault(benchmark =>
+                !string.IsNullOrEmpty(benchmark.Config.ArtifactsPath) && benchmark.Config.ArtifactsPath != DefaultConfig.Instance.ArtifactsPath);
+
+            return customPath != default 
+                ? customPath.Config.ArtifactsPath.CreateIfNotExists()
+                : DefaultConfig.Instance.ArtifactsPath.CreateIfNotExists();
+        }
+
         private static string GetResultsFolderPath(string rootArtifactsFolderPath) => Path.Combine(rootArtifactsFolderPath, "results").CreateIfNotExists();
+
+        private static ILogger CreateCompositeLogger(BenchmarkRunInfo[] benchmarkRunInfos, StreamLogger streamLogger)
+        {
+            var builder = ImmutableHashSet.CreateBuilder<ILogger>();
+
+            foreach (var benchmarkRunInfo in benchmarkRunInfos)
+                foreach (var logger in benchmarkRunInfo.Config.GetLoggers())
+                    if (!builder.Contains(logger))
+                        builder.Add(logger);
+
+            builder.Add(streamLogger);
+            
+            return new CompositeLogger(builder.ToImmutable());
+        }
 
         private static IDisposable GetAssemblyResolveHelper(IToolchain toolchain, ILogger logger)
         {

@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -22,6 +17,8 @@ namespace BenchmarkDotNet.Diagnosers
         
         public static readonly MemoryDiagnoser Default = new MemoryDiagnoser();
         
+        private MemoryDiagnoser() { } // we want to have only a single instance of MemoryDiagnoser
+
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.NoOverhead;
 
         public IEnumerable<string> Ids => new[] { DiagnoserId };
@@ -73,7 +70,7 @@ namespace BenchmarkDotNet.Diagnosers
             public string Legend { get; }
             public string NumberFormat => "#0.0000";
             public UnitType UnitType => UnitType.Dimensionless;
-            public string Unit => String.Empty;
+            public string Unit => string.Empty;
             public bool TheGreaterTheBetter => false;
         }
     }

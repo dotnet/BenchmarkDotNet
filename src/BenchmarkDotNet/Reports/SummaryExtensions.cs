@@ -8,8 +8,10 @@ namespace BenchmarkDotNet.Reports
     public static class SummaryExtensions
     {
         public static IColumn[] GetColumns(this Summary summary) =>
-            summary.Config.
-                GetColumnProviders().
+            summary.
+                BenchmarksCases.
+                SelectMany(benchmark => benchmark.Config.GetColumnProviders()).
+                Distinct().
                 SelectMany(provider => provider.GetColumns(summary)).
                 Where(column => column.IsAvailable(summary)).
                 GroupBy(column => column.Id).

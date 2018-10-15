@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
@@ -65,12 +66,11 @@ namespace BenchmarkDotNet.Tests.Reports
 
             var summary = new Summary(
                 "MockSummary",
-                benchmarkReports,
+                benchmarkReports.ToImmutableArray(),
                 new HostEnvironmentInfoBuilder().Build(), 
-                DefaultConfig.Instance,
                 "",
                 TimeSpan.FromMinutes(1),
-                Array.Empty<ValidationError>());
+                ImmutableArray<ValidationError>.Empty);
             MarkdownExporter.Default.ExportToLog(summary, logger);
             output.WriteLine(logger.GetLog());
             return summary;

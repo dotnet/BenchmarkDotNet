@@ -66,14 +66,8 @@ namespace BenchmarkDotNet.Running
             if (!isParsingSuccess)
                 return Enumerable.Empty<Summary>();
 
-            if (options.PrintInformation)
-            {
-                Console.WriteLine(HostEnvironmentInfo.GetInformation());
-                return Enumerable.Empty<Summary>();
-            }
-
-            var globalChronometer = Chronometer.Start();
-            var summaries = new List<Summary>();
+            if (JustPrint(options))
+                return Array.Empty<Summary>();
 
             var effectiveConfig = ManualConfig.Union(config ?? DefaultConfig.Instance, parsedConfig);
 
@@ -81,11 +75,18 @@ namespace BenchmarkDotNet.Running
             if (filteredBenchmarks.IsEmpty())
                 return Array.Empty<Summary>();
 
-            summaries.AddRange(BenchmarkRunner.Run(filteredBenchmarks, effectiveConfig));
+            return BenchmarkRunner.Run(filteredBenchmarks);
+        }
 
-            int totalNumberOfExecutedBenchmarks = summaries.Sum(summary => summary.GetNumberOfExecutedBenchmarks());
-            BenchmarkRunner.LogTotalTime(logger, globalChronometer.GetElapsed().GetTimeSpan(), totalNumberOfExecutedBenchmarks, "Global total time");
-            return summaries;
+        private bool JustPrint(CommandLineOptions options)
+        {
+            if (options.PrintInformation)
+            {
+                Console.WriteLine(HostEnvironmentInfo.GetInformation());
+                return true;
+            }
+
+            return false;
         }
     }
 }

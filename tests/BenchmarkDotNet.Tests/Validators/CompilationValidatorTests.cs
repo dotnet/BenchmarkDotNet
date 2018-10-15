@@ -16,7 +16,8 @@ namespace BenchmarkDotNet.Tests.Validators
         public void BenchmarkedMethodNameMustNotContainWhitespaces()
         {
             Delegate method = BuildDummyMethod<int>("Has Some Whitespaces");
-
+            
+            var config = new ManualConfig().CreateFinalConfig();
             var parameters = new ValidationParameters(
                 new[]
                 {
@@ -25,8 +26,10 @@ namespace BenchmarkDotNet.Tests.Validators
                             typeof(CompilationValidatorTests),
                             method.Method),
                         Job.Dry,
-                        null)
-                }, new ManualConfig().CreateFinalConfig());
+                        null,
+                        config
+                        )
+                }, config);
 
             var errors = CompilationValidator.Default.Validate(parameters);
 

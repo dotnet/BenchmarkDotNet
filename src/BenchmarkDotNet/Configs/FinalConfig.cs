@@ -95,6 +95,8 @@ namespace BenchmarkDotNet.Configs
         public IAnalyser GetCompositeAnalyser() => new CompositeAnalyser(analysers);
         public IDiagnoser GetCompositeDiagnoser() => new CompositeDiagnoser(diagnosers);
 
+        public bool HasMemoryDiagnoser() => diagnosers.Contains(MemoryDiagnoser.Default);
+
         public IDiagnoser GetCompositeDiagnoser(BenchmarkCase benchmarkCase, RunMode runMode)
             => diagnosers.Any(d => d.GetRunMode(benchmarkCase) == runMode)
                 ? new CompositeDiagnoser(diagnosers.Where(d => d.GetRunMode(benchmarkCase) == runMode).ToImmutableHashSet())

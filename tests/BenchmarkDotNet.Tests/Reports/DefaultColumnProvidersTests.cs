@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
@@ -75,12 +76,11 @@ namespace BenchmarkDotNet.Tests.Reports
             var logger = new AccumulationLogger();
             var summary = new Summary(
                 "MockSummary",
-                CreateBenchmarks(DefaultConfig.Instance).Select(b => CreateReport(b, hugeSd, metrics)).ToArray(),
+                CreateBenchmarks(DefaultConfig.Instance).Select(b => CreateReport(b, hugeSd, metrics)).ToImmutableArray(),
                 new HostEnvironmentInfoBuilder().Build(),
-                DefaultConfig.Instance,
                 "",
                 TimeSpan.FromMinutes(1),
-                Array.Empty<ValidationError>());
+                ImmutableArray<ValidationError>.Empty);
             MarkdownExporter.Default.ExportToLog(summary, logger);
             output.WriteLine(logger.GetLog());
             return summary;

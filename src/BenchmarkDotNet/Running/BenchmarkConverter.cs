@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
@@ -63,7 +64,7 @@ namespace BenchmarkDotNet.Running
                     from job in jobs
                     from parameterInstance in parameterInstancesList
                     from argumentDefinition in argumentsDefinitions
-                    select BenchmarkCase.Create(target, job, new ParameterInstances(parameterInstance.Items.Concat(argumentDefinition.Items).ToArray()))
+                    select BenchmarkCase.Create(target, job, new ParameterInstances(parameterInstance.Items.Concat(argumentDefinition.Items).ToArray()), finalConfig)
                 );
             }
 
@@ -232,10 +233,8 @@ namespace BenchmarkDotNet.Running
             return attributes.SelectMany(attr => attr.Categories).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
         }
 
-        private static BenchmarkCase[] GetFilteredBenchmarks(IList<BenchmarkCase> benchmarks, IList<IFilter> filters)
-        {
-            return benchmarks.Where(benchmark => filters.All(filter => filter.Predicate(benchmark))).ToArray();
-        }
+        private static ImmutableArray<BenchmarkCase> GetFilteredBenchmarks(IList<BenchmarkCase> benchmarks, IList<IFilter> filters) 
+            => benchmarks.Where(benchmark => filters.All(filter => filter.Predicate(benchmark))).ToImmutableArray();
 
         private static void AssertMethodHasCorrectSignature(string methodType, MethodInfo methodInfo)
         {

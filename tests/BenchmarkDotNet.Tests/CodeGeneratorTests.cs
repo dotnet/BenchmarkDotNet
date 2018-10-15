@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Tests
                     .Single(method => method.Name == "AsyncVoidMethod");
 
             var target = new Descriptor(typeof(CodeGeneratorTests), asyncVoidMethod);
-            var benchmark = BenchmarkCase.Create(target, Job.Default, null);
+            var benchmark = BenchmarkCase.Create(target, Job.Default, null, ManualConfig.CreateEmpty().CreateFinalConfig());
 
             Assert.Throws<NotSupportedException>(() => CodeGenerator.Generate(new BuildPartition(new[] { new BenchmarkBuildInfo(benchmark, ManualConfig.CreateEmpty().CreateFinalConfig(), 0) }, BenchmarkRunner.DefaultResolver)));
         }

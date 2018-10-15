@@ -42,8 +42,6 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static IConfig WithArtifactsPath(this IConfig config, string artifactsPath) => config.With(m => m.ArtifactsPath = artifactsPath);
         [PublicAPI] public static IConfig With(this IConfig config, params BenchmarkLogicalGroupRule[] rules) => config.With(c => c.Add(rules));
 
-        public static bool HasMemoryDiagnoser(this IConfig config) => config.GetDiagnosers().Any(diagnoser => diagnoser is MemoryDiagnoser);
-
         public static FinalConfig CreateFinalConfig(this IConfig config) => FinalConfigBuilder.Create(config);
 
         private static IConfig With(this IConfig config, Action<ManualConfig> addAction)

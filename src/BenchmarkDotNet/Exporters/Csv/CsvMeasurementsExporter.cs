@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
@@ -63,7 +64,7 @@ namespace BenchmarkDotNet.Exporters.Csv
 
         private static MeasurementColumn[] GetColumns(Summary summary)
         {
-            if (!summary.Config.GetDiagnosers().Contains(MemoryDiagnoser.Default))
+            if (!summary.BenchmarksCases.Any(benchmark => benchmark.Config.HasMemoryDiagnoser()))
                 return Columns.Value;
 
             var columns = new List<MeasurementColumn>(Columns.Value)
