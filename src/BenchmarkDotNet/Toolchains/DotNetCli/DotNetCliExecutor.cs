@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                                       ArtifactsPaths artifactsPaths,
                                       IDiagnoser diagnoser,
                                       string executableName,
-                                      IConfig config,
+                                      FinalConfig config,
                                       IResolver resolver)
         {
             var startInfo = DotNetCliCommandExecutor.BuildStartInfo(

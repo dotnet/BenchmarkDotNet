@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Tests
             var target = new Descriptor(typeof(CodeGeneratorTests), asyncVoidMethod);
             var benchmark = BenchmarkCase.Create(target, Job.Default, null);
 
-            Assert.Throws<NotSupportedException>(() => CodeGenerator.Generate(new BuildPartition(new[] { new BenchmarkBuildInfo(benchmark, ManualConfig.CreateEmpty().AsReadOnly(), 0) }, BenchmarkRunner.DefaultResolver)));
+            Assert.Throws<NotSupportedException>(() => CodeGenerator.Generate(new BuildPartition(new[] { new BenchmarkBuildInfo(benchmark, ManualConfig.CreateEmpty().CreateFinalConfig(), 0) }, BenchmarkRunner.DefaultResolver)));
         }
 
 

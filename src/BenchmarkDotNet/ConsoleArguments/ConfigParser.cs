@@ -80,9 +80,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 { "fullxml", new[] { XmlExporter.Full } }
             };
 
-        public static (bool isSuccess, ReadOnlyConfig config, CommandLineOptions options) Parse(string[] args, ILogger logger, IConfig globalConfig = null)
+        public static (bool isSuccess, IConfig config, CommandLineOptions options) Parse(string[] args, ILogger logger, IConfig globalConfig = null)
         {
-            (bool isSuccess, ReadOnlyConfig config, CommandLineOptions options) result = default;
+            (bool isSuccess, IConfig config, CommandLineOptions options) result = default;
 
             using (var parser = CreateParser(logger))
             {
@@ -128,6 +128,15 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return false;
                 }
 
+            foreach (var counterName in options.HardwareCounters)
+            {
+                if (!Enum.TryParse(counterName, ignoreCase: true, out HardwareCounter _))
+                {
+                    logger.WriteLineError($"The provided hardware counter \"{counterName}\" is invalid. Available options are: {string.Join(", ", Enum.GetNames(typeof(HardwareCounter)))}.");
+                    return false;
+                }
+            }
+
             if (options.CliPath.IsNotNullButDoesNotExist())
             {
                 logger.WriteLineError($"The provided {nameof(options.CliPath)} \"{options.CliPath}\" does NOT exist.");
@@ -155,7 +164,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             return true;
         }
 
-        private static ReadOnlyConfig CreateConfig(CommandLineOptions options, IConfig globalConfig)
+        private static IConfig CreateConfig(CommandLineOptions options, IConfig globalConfig)
         {
             var config = new ManualConfig();
 
@@ -167,8 +176,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             config.Add(options.Exporters.SelectMany(exporter => AvailableExporters[exporter]).ToArray());
             
             config.Add(options.HardwareCounters
-                .Select(counterName => Enum.TryParse(counterName, ignoreCase: true, out HardwareCounter counter) ? counter : HardwareCounter.NotSet)
-                .Where(counter => counter != HardwareCounter.NotSet)
+                .Select(counterName => (HardwareCounter)Enum.Parse(typeof(HardwareCounter), counterName, ignoreCase: true))
                 .ToArray());
 
             if (options.UseMemoryDiagnoser)
@@ -194,7 +202,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             config.KeepBenchmarkFiles = options.KeepBenchmarkFiles;
 
-            return config.AsReadOnly();
+            return config;
         }
 
         private static Job GetBaseJob(CommandLineOptions options, IConfig globalConfig)

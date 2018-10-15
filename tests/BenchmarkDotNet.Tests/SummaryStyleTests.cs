@@ -21,10 +21,10 @@ namespace BenchmarkDotNet.Tests
 
             var config = ManualConfig.CreateEmpty().With(summaryStyle);
             
-            Assert.True(config.GetSummaryStyle().PrintUnitsInHeader);
-            Assert.False(config.GetSummaryStyle().PrintUnitsInContent);
-            Assert.Equal(SizeUnit.B, config.GetSummaryStyle().SizeUnit);
-            Assert.Equal(TimeUnit.Millisecond, config.GetSummaryStyle().TimeUnit);
+            Assert.True(config.SummaryStyle.PrintUnitsInHeader);
+            Assert.False(config.SummaryStyle.PrintUnitsInContent);
+            Assert.Equal(SizeUnit.B, config.SummaryStyle.SizeUnit);
+            Assert.Equal(TimeUnit.Millisecond, config.SummaryStyle.TimeUnit);
         }
     }
 }

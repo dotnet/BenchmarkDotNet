@@ -33,10 +33,10 @@ namespace BenchmarkDotNet.Running
             return MethodsToBenchmarksWithFullConfig(containingType, benchmarkMethods, fullConfig);
         }
 
-        private static BenchmarkRunInfo MethodsToBenchmarksWithFullConfig(Type containingType, MethodInfo[] benchmarkMethods, ReadOnlyConfig fullConfig)
+        private static BenchmarkRunInfo MethodsToBenchmarksWithFullConfig(Type containingType, MethodInfo[] benchmarkMethods, FinalConfig finalConfig)
         {
-            if (fullConfig == null)
-                throw new ArgumentNullException(nameof(fullConfig));
+            if (finalConfig == null)
+                throw new ArgumentNullException(nameof(finalConfig));
 
             var helperMethods = containingType.GetMethods(); // benchmarkMethods can be filtered, without Setups, look #564
 
@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Running
             var parameterDefinitions = GetParameterDefinitions(containingType);
             var parameterInstancesList = parameterDefinitions.Expand();
 
-            var jobs = fullConfig.GetRunnableJobs();
+            var jobs = finalConfig.GetJobs();
 
             var targets = GetTargets(targetMethods, containingType, globalSetupMethods, globalCleanupMethods, iterationSetupMethods, iterationCleanupMethods).ToArray();
 
@@ -67,18 +67,14 @@ namespace BenchmarkDotNet.Running
                 );
             }
 
-            var filters = fullConfig.GetFilters().ToList();
+            var filters = finalConfig.GetFilters().ToArray();
             var filteredBenchmarks = GetFilteredBenchmarks(benchmarks, filters);
+            var orderedBenchmarks = finalConfig.Orderer.GetExecutionOrder(filteredBenchmarks).ToArray();
 
-            var orderProvider = fullConfig.GetOrderer() ?? DefaultOrderer.Instance;
-
-            return new BenchmarkRunInfo(
-                orderProvider.GetExecutionOrder(filteredBenchmarks).ToArray(),
-                containingType,
-                fullConfig);
+            return new BenchmarkRunInfo(orderedBenchmarks, containingType, finalConfig);
         }
 
-        public static ReadOnlyConfig GetFullConfig(Type type, IConfig config)
+        public static FinalConfig GetFullConfig(Type type, IConfig config)
         {
             config = config ?? DefaultConfig.Instance;
             if (type != null)
@@ -92,7 +88,8 @@ namespace BenchmarkDotNet.Running
                 foreach (var configFromAttribute in configs)
                     config = ManualConfig.Union(config, configFromAttribute);
             }
-            return config.AsReadOnly();
+            
+            return FinalConfigBuilder.Create(config);
         }
 
         private static IEnumerable<Descriptor> GetTargets(

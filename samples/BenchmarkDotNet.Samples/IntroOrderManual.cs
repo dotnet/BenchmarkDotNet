@@ -16,10 +16,7 @@ namespace BenchmarkDotNet.Samples
     {
         private class Config : ManualConfig
         {
-            public Config()
-            {
-                Set(new FastestToSlowestOrderer());
-            }
+            public Config() => Orderer = new FastestToSlowestOrderer();
 
             private class FastestToSlowestOrderer : IOrderer
             {

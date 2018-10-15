@@ -56,12 +56,12 @@ namespace BenchmarkDotNet.Reports
                 reportMap[report.BenchmarkCase] = report;
             Reports = BenchmarksCases.Select(b => reportMap[b]).ToArray();
 
-            orderer = config.GetOrderer() ?? DefaultOrderer.Instance;
+            orderer = config.Orderer ?? DefaultOrderer.Instance;
             baseliningStrategy = BaseliningStrategy.Create(BenchmarksCases); 
             BenchmarksCases = orderer.GetSummaryOrder(BenchmarksCases, this).ToArray();
             Reports = BenchmarksCases.Select(b => reportMap[b]).ToArray();
 
-            Style = config.GetSummaryStyle();
+            Style = config.SummaryStyle;
             Table = GetTable(Style);
             AllRuntimes = BuildAllRuntimes(HostEnvironmentInfo, Reports);
         }
@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Reports
             : this(title, hostEnvironmentInfo, config, resultsDirectoryPath, totalTime, validationErrors)
         {
             BenchmarksCases = benchmarksCase;
-            Table = GetTable(config.GetSummaryStyle());
+            Table = GetTable(config.SummaryStyle);
             Reports = reports ?? Array.Empty<BenchmarkReport>();
         }
 

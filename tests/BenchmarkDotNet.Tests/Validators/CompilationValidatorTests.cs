@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Tests.Validators
                             method.Method),
                         Job.Dry,
                         null)
-                }, new ManualConfig());
+                }, new ManualConfig().CreateFinalConfig());
 
             var errors = CompilationValidator.Default.Validate(parameters);
 

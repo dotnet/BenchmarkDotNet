@@ -74,20 +74,24 @@ namespace BenchmarkDotNet.Running
 
             using (var logStreamWriter = StreamWriter.FromPath(Path.Combine(rootArtifactsFolderPath, title + ".log")))
             {
-                var logger = new CompositeLogger(commonSettingsConfig.GetCompositeLogger(), new StreamLogger(logStreamWriter));
+                var finalConfig = FinalConfigBuilder.Create(
+                    ManualConfig.Create(commonSettingsConfig ?? DefaultConfig.Instance)
+                        .With(new StreamLogger(logStreamWriter)));
+                
+                var logger = finalConfig.GetCompositeLogger();
 
                 var supportedBenchmarks = GetSupportedBenchmarks(benchmarkRunInfos, logger, resolver);
 
                 if (!supportedBenchmarks.Any(benchmarks => benchmarks.BenchmarksCases.Any()))
                     return  new [] { Summary.CreateFailed(
                         supportedBenchmarks.SelectMany(b => b.BenchmarksCases).ToArray(), 
-                        title, HostEnvironmentInfo.GetCurrent(), commonSettingsConfig, GetResultsFolderPath(rootArtifactsFolderPath), Array.Empty<ValidationError>()) };
+                        title, HostEnvironmentInfo.GetCurrent(), finalConfig, GetResultsFolderPath(rootArtifactsFolderPath), Array.Empty<ValidationError>()) };
 
                 var validationErrors = Validate(supportedBenchmarks, logger);
                 if (validationErrors.Any(validationError => validationError.IsCritical))
                     return  new [] { Summary.CreateFailed(
                         supportedBenchmarks.SelectMany(b => b.BenchmarksCases).ToArray(), 
-                        title, HostEnvironmentInfo.GetCurrent(), commonSettingsConfig, GetResultsFolderPath(rootArtifactsFolderPath), validationErrors) };
+                        title, HostEnvironmentInfo.GetCurrent(), finalConfig, GetResultsFolderPath(rootArtifactsFolderPath), validationErrors) };
 
                 var buildPartitions = BenchmarkPartitioner.CreateForBuild(supportedBenchmarks, resolver);
 
@@ -123,7 +127,7 @@ namespace BenchmarkDotNet.Running
                     {
                         var joinedSummary = Summary.Join(results, commonSettingsConfig, globalChronometer.GetElapsed());
                         
-                        PrintSummary(logger, commonSettingsConfig, joinedSummary);
+                        PrintSummary(logger, finalConfig, joinedSummary);
                         
                         results.Clear();
                         results.Add(joinedSummary);
@@ -212,7 +216,7 @@ namespace BenchmarkDotNet.Running
                 Validate(new[] {benchmarkRunInfo }, NullLogger.Instance)); // validate them once again, but don't print the output
         }
 
-        private static void PrintSummary(ILogger logger, IConfig config, Summary summary)
+        private static void PrintSummary(ILogger logger, FinalConfig config, Summary summary)
         {
             logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
             logger.WriteLine();
@@ -332,7 +336,7 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        private static BenchmarkReport RunCore(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ReadOnlyConfig config, IResolver resolver, BuildResult buildResult)
+        private static BenchmarkReport RunCore(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, FinalConfig config, IResolver resolver, BuildResult buildResult)
         {
             var toolchain = benchmarkCase.Job.GetToolchain();
 
@@ -354,7 +358,7 @@ namespace BenchmarkDotNet.Running
         }
 
         private static (List<ExecuteResult> executeResults, GcStats gcStats, List<Metric> metrics) Execute(ILogger logger, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, IToolchain toolchain,
-            BuildResult buildResult, IConfig config, IResolver resolver)
+            BuildResult buildResult, FinalConfig config, IResolver resolver)
         {
             var executeResults = new List<ExecuteResult>();
             var gcStats = default(GcStats);
@@ -478,7 +482,7 @@ namespace BenchmarkDotNet.Running
         internal static void LogTotalTime(ILogger logger, TimeSpan time, int executedBenchmarksCount, string message = "Total time")
             => logger.WriteLineStatistic($"{message}: {time.ToFormattedTotalTime()}, executed benchmarks: {executedBenchmarksCount}");
 
-        private static BenchmarkRunInfo[] GetSupportedBenchmarks(BenchmarkRunInfo[] benchmarkRunInfos, CompositeLogger logger, IResolver resolver)
+        private static BenchmarkRunInfo[] GetSupportedBenchmarks(BenchmarkRunInfo[] benchmarkRunInfos, ILogger logger, IResolver resolver)
             => benchmarkRunInfos.Select(info => new BenchmarkRunInfo(
                     info.BenchmarksCases.Where(benchmark => benchmark.Job.GetToolchain().IsSupported(benchmark, logger, resolver)).ToArray(),
                     info.Type,

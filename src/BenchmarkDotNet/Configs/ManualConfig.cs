@@ -28,21 +28,21 @@ namespace BenchmarkDotNet.Configs
         private readonly List<Job> jobs = new List<Job>();
         private readonly List<HardwareCounter> hardwareCounters = new List<HardwareCounter>();
         private readonly List<IFilter> filters = new List<IFilter>();
-        private IOrderer orderer;
-        private ISummaryStyle summaryStyle;
         private readonly HashSet<BenchmarkLogicalGroupRule> logicalGroupRules = new HashSet<BenchmarkLogicalGroupRule>();
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
+        public IEnumerable<IExporter> GetExporters() => exporters;
         public IEnumerable<ILogger> GetLoggers() => loggers;
-        
+        public IEnumerable<IDiagnoser> GetDiagnosers() => diagnosers;
+        public IEnumerable<IAnalyser> GetAnalysers() => analysers;
         public IEnumerable<IValidator> GetValidators() => validators;
         public IEnumerable<Job> GetJobs() => jobs;
         public IEnumerable<HardwareCounter> GetHardwareCounters() => hardwareCounters;
         public IEnumerable<IFilter> GetFilters() => filters;
-        public IOrderer GetOrderer() => orderer;
-        public ISummaryStyle GetSummaryStyle() => summaryStyle;
-        
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => logicalGroupRules;
+        
+        public IOrderer Orderer { get; set; }
+        public ISummaryStyle SummaryStyle  { get; set; }
 
         [PublicAPI] public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
         [PublicAPI] public bool KeepBenchmarkFiles { get; set; }
@@ -60,8 +60,6 @@ namespace BenchmarkDotNet.Configs
         public void Add(params Job[] newJobs) => jobs.AddRange(newJobs.Select(j => j.Freeze())); // DONTTOUCH: please DO NOT remove .Freeze() call.
         public void Add(params HardwareCounter[] newHardwareCounters) => hardwareCounters.AddRange(newHardwareCounters);
         public void Add(params IFilter[] newFilters) => filters.AddRange(newFilters);
-        public void Set(IOrderer provider) => orderer = provider ?? orderer;
-        public void Set(ISummaryStyle style) => summaryStyle = style ?? summaryStyle;
         public void Set(Encoding encoding) => Encoding = encoding;
         public void Add(params BenchmarkLogicalGroupRule[] rules) => logicalGroupRules.AddRange(rules);
 
@@ -77,57 +75,13 @@ namespace BenchmarkDotNet.Configs
             validators.AddRange(config.GetValidators());
             hardwareCounters.AddRange(config.GetHardwareCounters());
             filters.AddRange(config.GetFilters());
-            orderer = config.GetOrderer() ?? orderer;
+            Orderer = config.Orderer ?? Orderer;
             KeepBenchmarkFiles |= config.KeepBenchmarkFiles;
             SummaryPerType &= config.SummaryPerType;
             ArtifactsPath = config.ArtifactsPath ?? ArtifactsPath;
             Encoding = config.Encoding ?? Encoding;
-            summaryStyle = summaryStyle ?? config.GetSummaryStyle();
+            SummaryStyle = config.SummaryStyle ?? SummaryStyle;
             logicalGroupRules.AddRange(config.GetLogicalGroupRules());
-        }
-
-        public IEnumerable<IDiagnoser> GetDiagnosers()
-        {
-            if (hardwareCounters.IsEmpty() || diagnosers.OfType<IHardwareCountersDiagnoser>().Any())
-                return diagnosers;
-
-            var hardwareCountersDiagnoser = DiagnosersLoader.GetImplementation<IHardwareCountersDiagnoser>();
-
-            if(hardwareCountersDiagnoser != default(IDiagnoser))
-                return diagnosers.Union(new [] { hardwareCountersDiagnoser });
-
-            return diagnosers;
-        }
-
-        public IEnumerable<IExporter> GetExporters()
-        {
-            var allDiagnosers = GetDiagnosers().ToArray();
-
-            foreach (var exporter in exporters)
-                yield return exporter;
-
-            foreach (var diagnoser in allDiagnosers)
-                foreach (var exporter in diagnoser.Exporters)
-                    yield return exporter;
-
-            var hardwareCounterDiagnoser = allDiagnosers.OfType<IHardwareCountersDiagnoser>().SingleOrDefault();
-            var disassemblyDiagnoser = allDiagnosers.OfType<IDisassemblyDiagnoser>().SingleOrDefault();
-
-            if (hardwareCounterDiagnoser != null && disassemblyDiagnoser != null)
-                yield return new InstructionPointerExporter(hardwareCounterDiagnoser, disassemblyDiagnoser);
-        }
-
-
-        public IEnumerable<IAnalyser> GetAnalysers()
-        {
-            var allDiagnosers = GetDiagnosers().ToArray();
-
-            foreach (var analyser in analysers)
-                yield return analyser;
-
-            foreach (var diagnoser in allDiagnosers)
-            foreach (var analyser in diagnoser.Analysers)
-                yield return analyser;
         }
 
         public static ManualConfig CreateEmpty() => new ManualConfig();
