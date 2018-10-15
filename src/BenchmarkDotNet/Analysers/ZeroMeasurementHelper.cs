@@ -2,7 +2,7 @@ using BenchmarkDotNet.Mathematics.StatisticalTesting;
 
 namespace BenchmarkDotNet.Analysers
 {
-    public class ZeroMeasurementHelper
+    public static class ZeroMeasurementHelper
     {
         /// <summary>
         /// Checks distribution against Zero Measurement hypothesis in case of known threshold

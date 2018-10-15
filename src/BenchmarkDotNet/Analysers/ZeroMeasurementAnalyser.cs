@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
@@ -29,14 +27,14 @@ namespace BenchmarkDotNet.Analysers
             var overheadMeasurements = entire.Where(m => m.Is(IterationMode.Overhead, IterationStage.Actual)).ToArray();
             var workload = entire.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual)).GetStatistics();
             
-            var cpuResolution = currentFrequency.Value.ToResolution();
+            var threshold = currentFrequency.Value.ToResolution().Nanoseconds / 2;
 
             var zeroMeasurement = overheadMeasurements.Any()
                 ? ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(workload.WithoutOutliers(), overheadMeasurements.GetStatistics().WithoutOutliers())
-                : ZeroMeasurementHelper.CheckZeroMeasurementOneSample(workload.WithoutOutliers(), cpuResolution.Nanoseconds / 2);
+                : ZeroMeasurementHelper.CheckZeroMeasurementOneSample(workload.WithoutOutliers(), threshold);
             
             if (zeroMeasurement)
-                yield return CreateWarning($"It seems that result {entire.Where(m => m.Is(IterationMode.Workload, IterationStage.Result)).GetStatistics().Mean:0.####} is too small to be valid with CPU resolution {cpuResolution}", report);
+                yield return CreateWarning("The method duration is indistinguishable from the empty method duration", report);
         }
     }
 }
