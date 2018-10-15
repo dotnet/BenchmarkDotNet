@@ -115,6 +115,8 @@ namespace BenchmarkDotNet.Configs
                         if (!result.Contains(dependency))
                             result.Insert(i, dependency); // All the exporter dependencies should be added before the exporter
 
+            result.Sort((left, right) => (left is IExporterDependencies).CompareTo(right is IExporterDependencies)); // the case when they were defined by user in wrong order ;)
+
             return result.ToImmutableArray();
         }
 
