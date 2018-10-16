@@ -84,7 +84,7 @@ namespace BenchmarkDotNet.Running
             if (listBenchmarkCase)
             {
                 var testName = filteredBenchmarks.SelectMany(p => p.BenchmarksCases)
-                    .Select(p => p.Descriptor.Type.Namespace + "." + p.Descriptor.DisplayInfo);
+                    .Select(p => p.Descriptor.Type.Namespace + "." + p.Descriptor.DisplayInfo).Distinct();
 
                 var printer = new BenchmarkCasesPrinter(options.ListBenchmarkCaseMode);
                 printer.Print(testName);

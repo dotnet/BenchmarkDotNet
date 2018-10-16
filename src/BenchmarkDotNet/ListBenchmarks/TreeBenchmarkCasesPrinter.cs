@@ -24,16 +24,15 @@ namespace BenchmarkDotNet.ListBenchmarks {
         private static void PrepareNodeTree(List<Node> nodes, string[] partsOfName, int index = 0)
         {
             var node = nodes.FirstOrDefault(p => p.Name == partsOfName[index]);
-            if (node != null)
+            if (node == null)
             {
-                if (partsOfName.Length > index + 1)
-                {
-                    PrepareNodeTree(node.Children, partsOfName, index + 1);
-                }
+                node = new Node { Name = partsOfName[index] };
+                nodes.Add(node);
             }
-            else
+
+            if (partsOfName.Length > index + 1)
             {
-                nodes.Add(new Node { Name = partsOfName[index] });
+                PrepareNodeTree(node.Children, partsOfName, index + 1);
             }
         }
     }
