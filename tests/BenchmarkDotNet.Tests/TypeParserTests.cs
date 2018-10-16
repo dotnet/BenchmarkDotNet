@@ -6,6 +6,7 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
+using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests;
@@ -20,6 +21,43 @@ namespace BenchmarkDotNet.Tests
         public ITestOutputHelper Output { get; }
 
         public TypeParserTests(ITestOutputHelper output) => Output = output;
+
+        [Fact]
+        public void CanFilterAllBenchmark()
+        {
+            var benchmarks = Filter(new [] { typeof(ClassA), typeof(ClassB), typeof(ClassC) }, new [] { "--filter", "*" });
+
+            Assert.Equal(5, benchmarks.Count);
+            Assert.Contains("ClassA.Method1", benchmarks);
+            Assert.Contains("ClassA.Method2", benchmarks);
+            Assert.Contains("ClassB.Method1", benchmarks);
+            Assert.Contains("ClassB.Method2", benchmarks);
+            Assert.Contains("ClassB.Method3", benchmarks);
+        }
+
+        [Fact]
+        public void CanFilterAllBenchmarksDuringListAllBenchmarkCase()
+        {
+            var benchmarks = Filter(new[] { typeof(ClassA), typeof(ClassB), typeof(ClassC) }, new[] { "--list", "flat" });
+
+            Assert.Equal(5, benchmarks.Count);
+            Assert.Contains("ClassA.Method1", benchmarks);
+            Assert.Contains("ClassA.Method2", benchmarks);
+            Assert.Contains("ClassB.Method1", benchmarks);
+            Assert.Contains("ClassB.Method2", benchmarks);
+            Assert.Contains("ClassB.Method3", benchmarks);
+        }
+
+        [Fact]
+        public void CanFilterBenchmarksDuringListAllBenchmarkCase()
+        {
+            var benchmarks = Filter(new[] { typeof(ClassA), typeof(ClassB), typeof(ClassC) }, new[] { "--list", "flat", "--filter", "*ClassB*" });
+
+            Assert.Equal(3, benchmarks.Count);
+            Assert.Contains("ClassB.Method1", benchmarks);
+            Assert.Contains("ClassB.Method2", benchmarks);
+            Assert.Contains("ClassB.Method3", benchmarks);
+        }
 
         [Fact]
         public void CanSelectMethods()
@@ -183,9 +221,14 @@ namespace BenchmarkDotNet.Tests
         }
         
         private HashSet<string> Filter(Type[] types, string[] args, ILogger logger = null)
-            => new HashSet<string>(new TypeParser(types, logger ?? new OutputLogger(Output)).Filter(ConfigParser.Parse(args, logger ?? new OutputLogger(Output)).config)
+        {
+            var config = ConfigParser.Parse(args, logger ?? new OutputLogger(Output));
+
+            return new HashSet<string>(new TypeParser(types, logger ?? new OutputLogger(Output))
+                .Filter(config.config, config.options.ListBenchmarkCaseMode != ListBenchmarkCaseMode.Disable)
                 .SelectMany(runInfo => runInfo.BenchmarksCases)
                 .Select(benchmark => $"{benchmark.Descriptor.Type.GetDisplayName()}.{benchmark.Descriptor.WorkloadMethod.Name}"));
+        }
     }
 }
 

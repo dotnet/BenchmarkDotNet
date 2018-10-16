@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        internal BenchmarkRunInfo[] Filter(IConfig effectiveConfig)
+        internal BenchmarkRunInfo[] Filter(IConfig effectiveConfig, bool listBenchmarkCase = false)
         {
             if (allTypes.IsEmpty())
             {
@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Running
 
             bool hasFilters = effectiveConfig.GetFilters().Any();
 
-            var benchmarks = (hasFilters ? GetAll() : AskUser()) // if user provided some filters via args or custom config , we don't ask for any input
+            var benchmarks = (hasFilters || listBenchmarkCase ? GetAll() : AskUser()) // if user provided some filters via args or custom config , we don't ask for any input
                 .Select(typeWithMethods =>
                     typeWithMethods.AllMethodsInType
                         ? BenchmarkConverter.TypeToBenchmarks(typeWithMethods.Type, effectiveConfig)

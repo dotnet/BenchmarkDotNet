@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Portability;
@@ -121,6 +122,9 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [Option("info", Required = false, Default = false, HelpText = "Print environment information.")]
         public bool PrintInformation { get; set; }
+
+        [Option("list", Required = false, Default = ListBenchmarkCaseMode.Disable, HelpText = "Prints all of the available benchmark names. Flat/Tree")]
+        public ListBenchmarkCaseMode ListBenchmarkCaseMode { get; set; }
 
         [Usage(ApplicationAlias = "")]
         [PublicAPI]

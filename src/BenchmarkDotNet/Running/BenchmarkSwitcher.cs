@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
+using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
@@ -72,15 +73,28 @@ namespace BenchmarkDotNet.Running
                 return Enumerable.Empty<Summary>();
             }
 
-            var globalChronometer = Chronometer.Start();
-            var summaries = new List<Summary>();
-
             var effectiveConfig = ManualConfig.Union(config ?? DefaultConfig.Instance, parsedConfig);
 
-            var filteredBenchmarks = typeParser.Filter(effectiveConfig);
+            var listBenchmarkCase = options.ListBenchmarkCaseMode != ListBenchmarkCaseMode.Disable;
+
+            var filteredBenchmarks = typeParser.Filter(effectiveConfig, listBenchmarkCase);
             if (filteredBenchmarks.IsEmpty())
                 return Array.Empty<Summary>();
 
+            if (listBenchmarkCase)
+            {
+                var testNames = filteredBenchmarks.SelectMany(p => p.BenchmarksCases)
+                    .Select(p => p.Descriptor.GetFilterName()).Distinct();
+
+                var printer = new BenchmarkCasesPrinter(options.ListBenchmarkCaseMode);
+                printer.Print(testNames);
+
+                return Enumerable.Empty<Summary>();
+            }
+
+            var globalChronometer = Chronometer.Start();
+            var summaries = new List<Summary>();
+            
             summaries.AddRange(BenchmarkRunner.Run(filteredBenchmarks, effectiveConfig));
 
             int totalNumberOfExecutedBenchmarks = summaries.Sum(summary => summary.GetNumberOfExecutedBenchmarks());
