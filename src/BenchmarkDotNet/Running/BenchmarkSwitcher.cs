@@ -83,11 +83,11 @@ namespace BenchmarkDotNet.Running
 
             if (listBenchmarkCase)
             {
-                var testName = filteredBenchmarks.SelectMany(p => p.BenchmarksCases)
-                    .Select(p => p.Descriptor.Type.Namespace + "." + p.Descriptor.DisplayInfo).Distinct();
+                var testNames = filteredBenchmarks.SelectMany(p => p.BenchmarksCases)
+                    .Select(p => p.Descriptor.GetFilterName()).Distinct();
 
                 var printer = new BenchmarkCasesPrinter(options.ListBenchmarkCaseMode);
-                printer.Print(testName);
+                printer.Print(testNames);
 
                 return Enumerable.Empty<Summary>();
             }

@@ -4,9 +4,9 @@ using System.Collections.Generic;
 namespace BenchmarkDotNet.ListBenchmarks {
     internal class FlatBenchmarkCasesPrinter : IBenchmarkCasesPrinter
     {
-        public void Print(IEnumerable<string> testName)
+        public void Print(IEnumerable<string> testNames)
         {
-            foreach (string test in testName)
+            foreach (string test in testNames)
             {
                 Console.WriteLine(test);
             }
