@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace BenchmarkDotNet.ListBenchmarks
+namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
 {
     internal interface IBenchmarkCasesPrinter
     {

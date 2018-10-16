@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.ListBenchmarks;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Portability;
 using CommandLine;

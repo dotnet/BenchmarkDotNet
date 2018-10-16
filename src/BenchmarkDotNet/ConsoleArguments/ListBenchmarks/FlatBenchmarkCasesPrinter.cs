@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BenchmarkDotNet.ListBenchmarks {
+namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks {
     internal class FlatBenchmarkCasesPrinter : IBenchmarkCasesPrinter
     {
         public void Print(IEnumerable<string> testNames)

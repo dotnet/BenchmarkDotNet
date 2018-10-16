@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BenchmarkDotNet.ListBenchmarks
+namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
 {
     internal class TreeBenchmarkCasesPrinter : IBenchmarkCasesPrinter
     {

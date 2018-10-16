@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.ListBenchmarks
+﻿namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
 {
     public enum ListBenchmarkCaseMode
     {
