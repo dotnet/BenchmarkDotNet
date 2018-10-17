@@ -32,12 +32,10 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI]
         public static IToolchain From(NetCoreAppSettings settings)
             => new CsProjCoreToolchain(settings.Name,
-                new CsProjGenerator(settings.TargetFrameworkMoniker, PlatformProvider, settings.RuntimeFrameworkVersion), 
+                new CsProjGenerator(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath, settings.PackagesPath, settings.RuntimeFrameworkVersion), 
                 new DotNetCliBuilder(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath), 
                 new DotNetCliExecutor(settings.CustomDotNetCliPath),
                 settings.CustomDotNetCliPath);
-
-        private static string PlatformProvider(Platform platform) => platform.ToConfig();
 
         public override bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver)
         {

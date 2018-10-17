@@ -13,49 +13,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public static class DotNetCliCommandExecutor
     {
-        public struct CommandResult
-        {
-            [PublicAPI] public bool IsSuccess { get; }
-
-            [PublicAPI] public TimeSpan ExecutionTime { get; }
-
-            [PublicAPI] public string StandardOutput { get; }
-
-            [PublicAPI] public string StandardError { get; }
-
-            /// <summary>
-            /// in theory, all errors should be reported to standard error, 
-            /// but sometimes they are not so we can at least return 
-            /// standard output which hopefully will contain some useful information
-            /// </summary>
-            public string ProblemDescription => HasNonEmptyErrorMessage ? StandardError : StandardOutput;
-
-            [PublicAPI] public bool HasNonEmptyErrorMessage => !string.IsNullOrEmpty(StandardError);
-
-            private CommandResult(bool isSuccess, TimeSpan executionTime, string standardOutput, string standardError)
-            {
-                IsSuccess = isSuccess;
-                ExecutionTime = executionTime;
-                StandardOutput = standardOutput;
-                StandardError = standardError;
-            }
-
-            public static CommandResult Success(TimeSpan time, string standardOutput)
-                => new CommandResult(true, time, standardOutput, string.Empty);
-
-            public static CommandResult Failure(TimeSpan time, string standardError, string standardOutput)
-                => new CommandResult(false, time, standardOutput, standardError);
-        }
-
         [PublicAPI]
-        public static CommandResult ExecuteCommand(
-            string customDotNetCliPath, string commandWithArguments, string workingDirectory, ILogger logger, 
-            IReadOnlyList<EnvironmentVariable> environmentVariables = null, bool useSharedCompilation = false)
+        public static DotNetCliCommandResult Execute(DotNetCliCommand parameters)
         {
-            commandWithArguments = $"{commandWithArguments} /p:UseSharedCompilation={useSharedCompilation.ToString().ToLowerInvariant()}";
-
-            using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath, workingDirectory, commandWithArguments, environmentVariables) })
+            using (var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) })
             {
+                parameters.Logger.WriteLineInfo($"// start {parameters.CliPath ?? "dotnet"} {parameters.Arguments} in {parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath}");
+                
                 var stopwatch = Stopwatch.StartNew();
                 process.Start();
 
@@ -65,14 +29,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 process.WaitForExit();
                 stopwatch.Stop();
 
-                logger.WriteLineInfo($"// {commandWithArguments} took {stopwatch.Elapsed.TotalSeconds:0.##}s and exited with {process.ExitCode}");
+                parameters.Logger.WriteLineInfo($"// command took {stopwatch.Elapsed.TotalSeconds:0.##}s and exited with {process.ExitCode}");
 
                 return process.ExitCode <= 0
-                    ? CommandResult.Success(stopwatch.Elapsed, standardOutput)
-                    : CommandResult.Failure(stopwatch.Elapsed, standardError, standardOutput);
+                    ? DotNetCliCommandResult.Success(stopwatch.Elapsed, standardOutput)
+                    : DotNetCliCommandResult.Failure(stopwatch.Elapsed, standardError, standardOutput);
             }
         }
-
+        
         internal static string GetDotNetSdkVersion()
         {
             using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath: null, workingDirectory: string.Empty, arguments: "--version") })

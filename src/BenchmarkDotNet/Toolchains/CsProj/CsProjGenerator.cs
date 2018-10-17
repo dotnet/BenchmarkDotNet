@@ -22,8 +22,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
     {
         public string RuntimeFrameworkVersion { get; }
 
-        public CsProjGenerator(string targetFrameworkMoniker, Func<Platform, string> platformProvider, string runtimeFrameworkVersion = null)
-            : base(new DotNetCliBuilder(targetFrameworkMoniker, null), targetFrameworkMoniker, null, platformProvider, null)
+        public CsProjGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string runtimeFrameworkVersion)
+            : base(targetFrameworkMoniker, cliPath, packagesPath)
         {
             RuntimeFrameworkVersion = runtimeFrameworkVersion;
         }
@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             var benchmark = buildPartition.RepresentativeBenchmarkCase;
             var projectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
 
-            string platform = PlatformProvider(buildPartition.Platform);
+            string platform = buildPartition.Platform.ToConfig();
             string content = SetPlatform(template, platform);
             content = SetCodeFileName(content, Path.GetFileName(artifactsPaths.ProgramCodePath));
             content = content.Replace("$CSPROJPATH$", projectFile.FullName);

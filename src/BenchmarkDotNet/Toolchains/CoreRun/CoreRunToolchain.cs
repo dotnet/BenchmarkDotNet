@@ -19,8 +19,10 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
         /// <param name="targetFrameworkMoniker">TFM, netcoreapp2.1 is the default</param>
         /// <param name="customDotNetCliPath">path to dotnet cli, if not provided the one from PATH will be used</param>
         /// <param name="displayName">display name, CoreRun is the default value</param>
+        /// <param name="restorePath">the directory to restore packages to</param>
         public CoreRunToolchain(FileInfo coreRun, bool createCopy = true,
-            string targetFrameworkMoniker = "netcoreapp2.1", FileInfo customDotNetCliPath = null,
+            string targetFrameworkMoniker = "netcoreapp2.1", 
+            FileInfo customDotNetCliPath = null, DirectoryInfo restorePath = null,
             string displayName = "CoreRun") 
         {
             if (coreRun == null) throw new ArgumentNullException(nameof(coreRun));
@@ -29,9 +31,10 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
             SourceCoreRun = coreRun;
             CopyCoreRun = createCopy ? GetShadowCopyPath(coreRun) : coreRun;
             CustomDotNetCliPath = customDotNetCliPath;
+            RestorePath = restorePath;
 
             Name = displayName;
-            Generator = new CoreRunGenerator(SourceCoreRun, CopyCoreRun, targetFrameworkMoniker, platform => platform.ToConfig());
+            Generator = new CoreRunGenerator(SourceCoreRun, CopyCoreRun, targetFrameworkMoniker, customDotNetCliPath?.FullName, restorePath?.FullName);
             Builder = new CoreRunPublisher(CopyCoreRun, customDotNetCliPath);
             Executor = new DotNetCliExecutor(customDotNetCliPath: CopyCoreRun.FullName); // instead of executing "dotnet $pathToDll" we do "CoreRun $pathToDll" 
         }
@@ -49,6 +52,8 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
         public FileInfo CopyCoreRun { get; }
 
         public FileInfo CustomDotNetCliPath { get; }
+        
+        public DirectoryInfo RestorePath { get; }
 
         public override string ToString() => Name;
 
@@ -66,7 +71,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
                 return false;
             }
 
-            if (CustomDotNetCliPath != null && !CustomDotNetCliPath.Exists)
+            if (CustomDotNetCliPath.IsNotNullButDoesNotExist())
             {
                 logger.WriteLineError($"Povided custom dotnet cli path does not exist, benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;

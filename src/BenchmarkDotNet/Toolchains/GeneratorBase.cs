@@ -88,8 +88,7 @@ namespace BenchmarkDotNet.Toolchains
         /// <summary>
         /// returns a path to the folder where NuGet packages should be restored
         /// </summary>
-        [PublicAPI] protected virtual string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath)
-            => Path.Combine(buildArtifactsDirectoryPath, "packages");
+        [PublicAPI] protected virtual string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath) => default;
 
         /// <summary>
         /// genrates an app.config file next to the executable with benchmarks

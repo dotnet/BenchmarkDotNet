@@ -39,18 +39,21 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// customize dotnet cli path if default is not desired
         /// simply ignored if null
         /// </param>
+        /// <param name="packagesPath">the directory to restore packages to</param>
         /// </summary>
         [PublicAPI]
         public NetCoreAppSettings(
             string targetFrameworkMoniker, 
             string runtimeFrameworkVersion, 
             string name,
-            string customDotNetCliPath = null)
+            string customDotNetCliPath = null,
+            string packagesPath = null)
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
             RuntimeFrameworkVersion = runtimeFrameworkVersion;
             Name = name;
             CustomDotNetCliPath = customDotNetCliPath;
+            PackagesPath = packagesPath;
         }
 
         /// <summary>
@@ -66,9 +69,17 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public string Name { get; }
 
         public string CustomDotNetCliPath { get; }
+        
+        /// <summary>
+        /// The directory to restore packages to.
+        /// </summary>
+        public string PackagesPath { get; }
 
-        public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName)
-            => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName, customDotNetCliPath);
+        public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName = null)
+            => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, customDotNetCliPath, PackagesPath);
+        
+        public NetCoreAppSettings WithCustomPackagesRestorePath(string packagesPath, string displayName = null)
+            => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, CustomDotNetCliPath, packagesPath);
 
         internal static NetCoreAppSettings GetCurrentVersion()
         {
