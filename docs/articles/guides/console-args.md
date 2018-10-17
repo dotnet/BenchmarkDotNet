@@ -67,7 +67,7 @@ dotnet run -c Release -f netcoreapp3.0 -- --runtimes clr core
 But same command executed with `-f netcoreapp2.0` is going to run the benchmarks for .NET Core 2.0:
 
 ```log
-dotnet run -c Release -f netcoreapp3.0 -- --runtimes clr core
+dotnet run -c Release -f netcoreapp2.0 -- --runtimes clr core
 ```
 
 ## Number of invocations and iterations
