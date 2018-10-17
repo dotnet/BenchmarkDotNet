@@ -35,8 +35,8 @@ namespace BenchmarkDotNet.Tests.Environments
         }
         
         [Theory]
-        [InlineData("AMD Ryzen 7 2700X Eight-Core Processor", "AMD Ryzen 7 2700X (Max: 4.10GHz)", 4.1, 8, 16)]
-        [InlineData("AMD Ryzen 7 2700X Eight-Core Processor", "AMD Ryzen 7 2700X Eight-Core Processor (Max: 4.10GHz)", 4.1, null, null)]
+        [InlineData("AMD Ryzen 7 2700X Eight-Core Processor", "AMD Ryzen 7 2700X 4.10GHz", 4.1, 8, 16)]
+        [InlineData("AMD Ryzen 7 2700X Eight-Core Processor", "AMD Ryzen 7 2700X Eight-Core Processor 4.10GHz", 4.1, null, null)]
         public void AmdIsPrettifiedWithDiffFrequencies(string originalName, string prettifiedName, double actualFrequency, int? physicalCoreCount, int? logicalCoreCount)
         {
             var cpuInfo = new CpuInfo(
@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Tests.Environments
                 physicalProcessorCount: null,
                 physicalCoreCount, 
                 logicalCoreCount, 
-                Frequency.FromGHz(actualFrequency), 
+                Frequency.FromGHz(actualFrequency),
                 minFrequency: null, 
                 maxFrequency: null);
 

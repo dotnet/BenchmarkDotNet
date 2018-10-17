@@ -33,7 +33,11 @@ namespace BenchmarkDotNet.Environments
 
             string frequencyString = GetBrandStyledActualFrequency(cpuInfo.NominalFrequency);
             if (includeMaxFrequency && frequencyString != null && !processorName.Contains(frequencyString))
-                processorName = $"{processorName} (Max: {frequencyString})";
+            {
+                // show Max only if there's already a frequency name to differentiate the two
+                string maxFrequency = processorName.Contains("Hz") ? $"(Max: {frequencyString})" : frequencyString;
+                processorName = $"{processorName} {maxFrequency}";
+            }
             
             // Remove double spaces
             processorName = Regex.Replace(processorName.Trim(), @"\s+", " ");
