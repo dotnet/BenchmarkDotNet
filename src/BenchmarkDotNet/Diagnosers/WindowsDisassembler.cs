@@ -12,16 +12,19 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Properties;
+using JetBrains.Annotations;
 using RuntimeInformation = BenchmarkDotNet.Portability.RuntimeInformation;
 
 namespace BenchmarkDotNet.Diagnosers
 {
-    internal class WindowsDisassembler
+    [PublicAPI]
+    public class WindowsDisassembler
     {
         private readonly bool printAsm, printIL, printSource, printPrologAndEpilog;
         private readonly int recursiveDepth;
 
-        internal WindowsDisassembler(DisassemblyDiagnoserConfig config)
+        [PublicAPI]
+        public WindowsDisassembler(DisassemblyDiagnoserConfig config)
         {
             printIL = config.PrintIL;
             printAsm = config.PrintAsm;
@@ -30,7 +33,8 @@ namespace BenchmarkDotNet.Diagnosers
             recursiveDepth = config.RecursiveDepth;
         }
 
-        internal DisassemblyResult Disassemble(DiagnoserActionParameters parameters)
+        [PublicAPI]
+        public DisassemblyResult Disassemble(DiagnoserActionParameters parameters)
         {
             string resultsPath = Path.GetTempFileName();
 
