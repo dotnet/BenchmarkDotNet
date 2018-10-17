@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
 {
@@ -13,6 +14,6 @@ namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
                 : new FlatBenchmarkCasesPrinter();
         }
 
-        public void Print(IEnumerable<string> testName) => printer.Print(testName);
+        public void Print(IEnumerable<string> testNames, ILogger logger) => printer.Print(testNames, logger);
     }
 }

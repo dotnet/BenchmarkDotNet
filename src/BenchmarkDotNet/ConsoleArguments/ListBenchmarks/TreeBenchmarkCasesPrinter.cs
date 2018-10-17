@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
 {
@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
         private const string Vertical = " │ ";
         private const string Space = "   ";
 
-        public void Print(IEnumerable<string> testNames)
+        public void Print(IEnumerable<string> testNames, ILogger logger)
         {
             List<Node> topLevelNodes = new List<Node>();
 
@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
 
             foreach (var node in topLevelNodes)
             {
-                PrintNode(node, indent: "");
+                PrintNode(node, indent: "", logger);
             }
         }
 
@@ -43,9 +43,9 @@ namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
             }
         }
 
-        private void PrintNode(Node node, string indent)
+        private void PrintNode(Node node, string indent, ILogger logger)
         {
-            Console.WriteLine(node.Name);
+            logger.WriteLine(node.Name);
 
             // Loop through the children recursively, passing in the
             // indent, and the isLast parameter
@@ -55,29 +55,29 @@ namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
                 var child = node.Children[i];
                 var isLast = (i == (numberOfChildren - 1));
 
-                PrintChildNode(child, indent, isLast);
+                PrintChildNode(child, indent, isLast, logger);
             }
         }
 
-        private void PrintChildNode(Node node, string indent, bool isLast)
+        private void PrintChildNode(Node node, string indent, bool isLast, ILogger logger)
         {
-            Console.Write(indent);
+            logger.Write(indent);
 
             // Depending if this node is a last child, print the
             // corner or cross, and calculate the indent that will
             // be passed to its children
             if (isLast)
             {
-                Console.Write(Corner);
+                logger.Write(Corner);
                 indent += Space;
             }
             else
             {
-                Console.Write(Cross);
+                logger.Write(Cross);
                 indent += Vertical;
             }
 
-            PrintNode(node, indent);
+            PrintNode(node, indent, logger);
         }
     }
 }

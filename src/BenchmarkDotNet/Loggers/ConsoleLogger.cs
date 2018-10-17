@@ -14,10 +14,7 @@ namespace BenchmarkDotNet.Loggers
 
         private readonly Dictionary<LogKind, ConsoleColor> colorScheme;
 
-        public ConsoleLogger(Dictionary<LogKind, ConsoleColor> colorScheme = null)
-        {
-            this.colorScheme = colorScheme ?? CreateColorfulScheme();
-        }
+        public ConsoleLogger(Dictionary<LogKind, ConsoleColor> colorScheme = null) => this.colorScheme = colorScheme ?? CreateColorfulScheme();
 
         public void Write(LogKind logKind, string text) => Write(logKind, Console.Write, text);
 

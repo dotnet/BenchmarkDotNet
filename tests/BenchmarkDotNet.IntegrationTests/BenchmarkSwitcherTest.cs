@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿using System;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using System.Linq;
 using Xunit;
@@ -6,18 +7,125 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Tests.Loggers;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
     public class BenchmarkSwitcherTest
     {
+        public ITestOutputHelper Output { get; }
+
+        public BenchmarkSwitcherTest(ITestOutputHelper output) => Output = output;
+        
         [Fact]
-        public void CmdLineParsingTest()
+        public void WhenInvalidCommandLineArgumentIsPassedAnErrorMessageIsDisplayedAndNoBenchmarksAreExecuted()
+        {
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty().With(logger);
+
+            var summaries = BenchmarkSwitcher
+                .FromTypes(Array.Empty<Type>())
+                .Run(new[] { "--DOES_NOT_EXIST" }, config);
+            
+            Assert.Empty(summaries);
+            Assert.Contains("Option 'DOES_NOT_EXIST' is unknown.", logger.GetLog());
+        }
+        
+        [Fact]
+        public void WhenUserAsksForInfoAnInfoIsDisplayedAndNoBenchmarksAreExecuted()
+        {
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty().With(logger);
+
+            var summaries = BenchmarkSwitcher
+                .FromTypes(Array.Empty<Type>())
+                .Run(new[] { "--info" }, config);
+            
+            Assert.Empty(summaries);
+            Assert.Contains(HostEnvironmentInfo.GetInformation(), logger.GetLog());
+        }
+
+        [Fact]
+        public void WhenInvalidTypeIsProvidedAnErrorMessageIsDisplayedAndNoBenchmarksAreExecuted()
+        {
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty().With(logger);
+
+            var summaries = BenchmarkSwitcher
+                .FromTypes(new [] { typeof(ClassC) })
+                .Run(new[] { "--filter", "*" }, config);
+            
+            Assert.Empty(summaries);
+            Assert.Contains("Type BenchmarkDotNet.IntegrationTests.ClassC is invalid.", logger.GetLog());
+        }
+
+        [Fact]
+        public void WhenNoTypesAreProvidedAnErrorMessageIsDisplayedAndNoBenchmarksAreExecuted()
+        {
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty().With(logger);
+
+            var summaries = BenchmarkSwitcher
+                .FromTypes(Array.Empty<Type>())
+                .Run(new[] { "--filter", "*" }, config);
+            
+            Assert.Empty(summaries);
+            Assert.Contains("No benchmarks to choose from. Make sure you provided public non-sealed non-static types with public [Benchmark] methods.", logger.GetLog());
+        }
+
+        [Fact]
+        public void WhenFilterReturnsNothingAnErrorMessageIsDisplayedAndNoBenchmarksAreExecuted()
+        {
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty().With(logger);
+
+            var summaries = BenchmarkSwitcher
+                .FromTypes(new [] { typeof(ClassA), typeof(ClassB) })
+                .Run(new[] { "--filter", "WRONG" }, config);
+            
+            Assert.Empty(summaries);
+            Assert.Contains("The filter that you have provided returned 0 benchmarks.", logger.GetLog());
+        }
+        
+        [Fact]
+        public void WhenUserAsksToPrintAListWePrintIt()
+        {
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty().With(logger);
+
+            var summaries = BenchmarkSwitcher
+                .FromTypes(new [] { typeof(ClassA) })
+                .Run(new[] { "--list", "flat" }, config);
+            
+            Assert.Empty(summaries);
+            Assert.Contains("BenchmarkDotNet.IntegrationTests.ClassA.Method1", logger.GetLog());
+            Assert.Contains("BenchmarkDotNet.IntegrationTests.ClassA.Method2", logger.GetLog());
+        }
+        
+        [Fact]
+        public void WhenUserAsksToPrintAListAndProvidesAFilterWePrintFilteredList()
+        {
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty().With(logger);
+
+            var summaries = BenchmarkSwitcher
+                .FromTypes(new [] { typeof(ClassA) })
+                .Run(new[] { "--list", "flat", "--filter", "*.Method1" }, config);
+            
+            Assert.Empty(summaries);
+            Assert.Contains("BenchmarkDotNet.IntegrationTests.ClassA.Method1", logger.GetLog());
+            Assert.DoesNotContain("BenchmarkDotNet.IntegrationTests.ClassA.Method2", logger.GetLog());
+        }
+
+        [Fact]
+        public void ValidCommandLineArgumentsAreProperlyHandled()
         {
             // Don't cover every combination, just pick a complex scenarion and check
             // it works end-to-end, i.e. "method=Method1" and "class=ClassB"
-            var types = new[] { typeof(ClassA), typeof(ClassB), typeof(ClassC), typeof(NOTIntegrationTests.ClassD) };
+            var types = new[] { typeof(ClassA), typeof(ClassB), typeof(NOTIntegrationTests.ClassD) };
             var switcher = new BenchmarkSwitcher(types);
 
             // BenchmarkSwitcher only picks up config values via the args passed in, not via class annotations (e.g "[DryConfig]")

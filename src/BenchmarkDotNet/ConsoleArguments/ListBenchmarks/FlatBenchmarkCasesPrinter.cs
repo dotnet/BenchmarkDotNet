@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using BenchmarkDotNet.Loggers;
 
-namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks {
+namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks 
+{
     internal class FlatBenchmarkCasesPrinter : IBenchmarkCasesPrinter
     {
-        public void Print(IEnumerable<string> testNames)
+        public void Print(IEnumerable<string> testNames, ILogger logger)
         {
             foreach (string test in testNames)
             {
-                Console.WriteLine(test);
+                logger.WriteLine(test);
             }
         }
     }

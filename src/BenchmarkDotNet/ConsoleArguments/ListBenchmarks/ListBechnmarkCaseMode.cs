@@ -5,7 +5,7 @@
         /// <summary>
         /// Do not print any of the available full benchmark names.
         /// </summary>
-        Disable,
+        Disabled,
 
         /// <summary>
         /// Prints flat list of the available benchmark names.

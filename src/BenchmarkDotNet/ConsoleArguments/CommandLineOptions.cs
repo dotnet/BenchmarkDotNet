@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Mathematics;
@@ -126,11 +127,13 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("info", Required = false, Default = false, HelpText = "Print environment information.")]
         public bool PrintInformation { get; set; }
 
-        [Option("list", Required = false, Default = ListBenchmarkCaseMode.Disable, HelpText = "Prints all of the available benchmark names. Flat/Tree")]
+        [Option("list", Required = false, Default = ListBenchmarkCaseMode.Disabled, HelpText = "Prints all of the available benchmark names. Flat/Tree")]
         public ListBenchmarkCaseMode ListBenchmarkCaseMode { get; set; }
         
         [Option("disasmDepth", Required = false, Default = 1, HelpText = "Sets the recursive depth for the disassembler.")]
         public int DisassemblerRecursiveDepth { get; set; }
+
+        internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any(); 
 
         [Usage(ApplicationAlias = "")]
         [PublicAPI]
