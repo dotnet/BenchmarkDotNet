@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -48,9 +49,9 @@ namespace BenchmarkDotNet.Running
                 return Array.Empty<BenchmarkRunInfo>();
             }
 
-            bool hasFilters = effectiveConfig.GetFilters().Any();
+            bool userProvidedGlobFilter = effectiveConfig.GetFilters().OfType<GlobFilter>().Any();
 
-            var benchmarks = (hasFilters || listBenchmarkCase ? GetAll() : AskUser()) // if user provided some filters via args or custom config , we don't ask for any input
+            var benchmarks = (userProvidedGlobFilter || listBenchmarkCase ? GetAll() : AskUser()) // if user provided some filters via args we don't ask for any input
                 .Select(typeWithMethods =>
                     typeWithMethods.AllMethodsInType
                         ? BenchmarkConverter.TypeToBenchmarks(typeWithMethods.Type, effectiveConfig)
@@ -58,7 +59,7 @@ namespace BenchmarkDotNet.Running
                 .Where(info => info.BenchmarksCases.Any())
                 .ToArray();
 
-            if (benchmarks.IsEmpty() && hasFilters)
+            if (benchmarks.IsEmpty() && userProvidedGlobFilter)
                 PrintWrongFilterInfo();
 
             return benchmarks;
