@@ -19,13 +19,15 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class DisassemblyDiagnoser : IDisassemblyDiagnoser
     {
+        public DisassemblyDiagnoserConfig Config { get; }
+
         private readonly WindowsDisassembler windowsDisassembler;
-        [SuppressMessage("ReSharper", "NotAccessedField.Local")] // TODO: use or remove
         private readonly MonoDisassembler monoDisassembler;
         private readonly Dictionary<BenchmarkCase, DisassemblyResult> results;
 
-        private DisassemblyDiagnoser(WindowsDisassembler windowsDisassembler, MonoDisassembler monoDisassembler)
+        private DisassemblyDiagnoser(WindowsDisassembler windowsDisassembler, MonoDisassembler monoDisassembler, DisassemblyDiagnoserConfig config)
         {
+            Config = config;
             this.windowsDisassembler = windowsDisassembler;
             this.monoDisassembler = monoDisassembler;
 
@@ -40,7 +42,7 @@ namespace BenchmarkDotNet.Diagnosers
         }
 
         public static IConfigurableDiagnoser<DisassemblyDiagnoserConfig> Create(DisassemblyDiagnoserConfig config)
-            => new DisassemblyDiagnoser(new WindowsDisassembler(config), new MonoDisassembler(config));
+            => new DisassemblyDiagnoser(new WindowsDisassembler(config), new MonoDisassembler(config), config);
 
         public IConfigurableDiagnoser<DisassemblyDiagnoserConfig> Configure(DisassemblyDiagnoserConfig config)
             => Create(config);
@@ -73,7 +75,7 @@ namespace BenchmarkDotNet.Diagnosers
                     results.Add(benchmark, windowsDisassembler.Disassemble(parameters));
                     break;
                 case HostSignal.SeparateLogic when ShouldUseMonoDisassembler(benchmark):
-                    results.Add(benchmark, MonoDisassembler.Disassemble(benchmark, benchmark.Job.Environment.Runtime as MonoRuntime));
+                    results.Add(benchmark, monoDisassembler.Disassemble(benchmark, benchmark.Job.Environment.Runtime as MonoRuntime));
                     break;
             }
         }

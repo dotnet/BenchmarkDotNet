@@ -176,7 +176,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.UseMemoryDiagnoser)
                 config.Add(MemoryDiagnoser.Default);
             if (options.UseDisassemblyDiagnoser)
-                config.Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig()));
+                config.Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(recursiveDepth: options.DisassemblerRecursiveDepth, printPrologAndEpilog: true)));
             if (!string.IsNullOrEmpty(options.Profiler))
                 config.Add(DiagnosersLoader.GetImplementation<IProfiler>(profiler => profiler.ShortName.EqualsWithIgnoreCase(options.Profiler)));
 

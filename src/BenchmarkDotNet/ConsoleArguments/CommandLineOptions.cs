@@ -128,6 +128,9 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [Option("list", Required = false, Default = ListBenchmarkCaseMode.Disable, HelpText = "Prints all of the available benchmark names. Flat/Tree")]
         public ListBenchmarkCaseMode ListBenchmarkCaseMode { get; set; }
+        
+        [Option("disasmDepth", Required = false, Default = 1, HelpText = "Sets the recursive depth for the disassembler.")]
+        public int DisassemblerRecursiveDepth { get; set; }
 
         [Usage(ApplicationAlias = "")]
         [PublicAPI]

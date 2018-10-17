@@ -230,6 +230,19 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetHardwareCounters().Where(counter => counter == HardwareCounter.CacheMisses));
             Assert.Single(config.GetHardwareCounters().Where(counter => counter == HardwareCounter.InstructionRetired));
         }
+        
+        [Fact]
+        public void CanParseDisassemblerWithCustomRecursiveDepth()
+        {
+            const int depth = 123;
+            
+            var config = ConfigParser.Parse(new[] { "--disasm", "--disasmDepth", depth.ToString()}, new OutputLogger(Output)).config;
+
+            var diagnoser = config.GetDiagnosers().OfType<DisassemblyDiagnoser>().Single();
+            
+            Assert.Equal(depth, diagnoser.Config.RecursiveDepth);
+            Assert.True(diagnoser.Config.PrintPrologAndEpilog); // we want this option to be enabled by default for command line users
+        }
 
         [Fact]
         public void CanParseInfo()
