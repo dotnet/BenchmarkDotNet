@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Loggers
         public void WriteLine(LogKind logKind, string text) => Write(logKind, Console.WriteLine, text);
 
         private void Write(LogKind logKind, Action<object> write, string text) =>
-            write(WithStyle(text, "color:" + GetColor(logKind)));
+            write(WithStyle(text, "color:" + GetColor(logKind) + ";font-family:Consolas,'Lucida Console','Courier New',monospace"));
 
         private object WithStyle(object data, string htmlStyle) =>
             withStyle.Invoke(null, new[] { data, htmlStyle });
