@@ -29,6 +29,68 @@ Examples:
 
 **Note**: If you would like to **join** all the results into a **single summary**, you need to us `--join`.
 
+## List of benchmarks
+
+The `--list` allows you to print all of the available benchmark names. Available options are: 
+
+* `flat` - prints list of the available benchmarks: `--list flat`
+```ini
+BenchmarkDotNet.Samples.Algo_Md5VsSha256.Md5
+BenchmarkDotNet.Samples.Algo_Md5VsSha256.Sha256
+BenchmarkDotNet.Samples.IntroArguments.Benchmark
+BenchmarkDotNet.Samples.IntroArgumentsSource.SingleArgument
+BenchmarkDotNet.Samples.IntroArgumentsSource.ManyArguments
+BenchmarkDotNet.Samples.IntroArrayParam.ArrayIndexOf
+BenchmarkDotNet.Samples.IntroArrayParam.ManualIndexOf
+BenchmarkDotNet.Samples.IntroBasic.Sleep
+[...]
+```
+* `tree` - prints tree of the available benchmarks: `--list tree`
+```ini
+BenchmarkDotNet
+ └─Samples
+    ├─Algo_Md5VsSha256
+    │  ├─Md5
+    │  └─Sha256
+    ├─IntroArguments
+    │  └─Benchmark
+    ├─IntroArgumentsSource
+    │  ├─SingleArgument
+    │  └─ManyArguments
+    ├─IntroArrayParam
+    │  ├─ArrayIndexOf
+    │  └─ManualIndexOf
+    ├─IntroBasic
+    │  ├─Sleep
+[...]
+```
+
+The `--list` option works with the `--filter` option. Examples:
+
+* `--list flat --filter *IntroSetupCleanup*` prints:
+```ini
+BenchmarkDotNet.Samples.IntroSetupCleanupGlobal.Logic
+BenchmarkDotNet.Samples.IntroSetupCleanupIteration.Benchmark
+BenchmarkDotNet.Samples.IntroSetupCleanupTarget.BenchmarkA
+BenchmarkDotNet.Samples.IntroSetupCleanupTarget.BenchmarkB
+BenchmarkDotNet.Samples.IntroSetupCleanupTarget.BenchmarkC
+BenchmarkDotNet.Samples.IntroSetupCleanupTarget.BenchmarkD
+```
+* `--list tree --filter *IntroSetupCleanup*` prints:
+```ini
+BenchmarkDotNet
+ └─Samples
+    ├─IntroSetupCleanupGlobal
+    │  └─Logic
+    ├─IntroSetupCleanupIteration
+    │  └─Benchmark
+    └─IntroSetupCleanupTarget
+       ├─BenchmarkA
+       ├─BenchmarkB
+       ├─BenchmarkC
+       └─BenchmarkD
+```
+
 ## Categories
 
 You can also filter the benchmarks by categories:
@@ -129,3 +191,5 @@ dotnet run -c Release -- --warmupCount 2
 * `--cliPath` custom Path for dotnet cli
 * `--coreRt` path to ILCompiler for CoreRT
 * `--info` prints environment configuration including BenchmarkDotNet, OS, CPU and .NET version
+* `--help` Display this help screen.
+* `--version` Display version information.
