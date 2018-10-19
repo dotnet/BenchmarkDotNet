@@ -1,0 +1,15 @@
+trigger:
+  batch: true
+  branches:
+    # blacklist
+    exclude:
+    - gh-pages
+
+name: $(Year:yyyy).$(Month).$(DayOfMonth)$(Rev:.r)
+
+jobs:
+- template: build/azure-pipelines.job.template.yml
+  parameters:
+    name: Ubuntu
+    vmImage: 'ubuntu-16.04'
+    scriptFileName: ./build.sh

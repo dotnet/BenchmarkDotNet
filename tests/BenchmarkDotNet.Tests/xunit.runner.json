@@ -1,4 +1,9 @@
 ﻿{
   "shadowCopy": false,
-  "methodDisplay": "method"
+  "methodDisplay": "method",
+  "diagnosticMessages": true,
+  "longRunningTestSeconds": 5,
+  "maxParallelThreads": 1,
+  "parallelizeAssembly": false,
+  "parallelizeTestCollections": false
 }

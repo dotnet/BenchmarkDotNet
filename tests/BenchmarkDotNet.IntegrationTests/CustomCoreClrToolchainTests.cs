@@ -9,12 +9,9 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class CustomCoreClrToolchainTests : BenchmarkTestExecutor
     {
-        private const string WeRunTheseTestsForNetCoreOnlyBecauseTheyTakeALotOfTime =
-            "We run it only for .NET Core, it takes too long to run it for all frameworks";
-
         public CustomCoreClrToolchainTests(ITestOutputHelper output) : base(output) { }
 
-        [FactDotNetCoreOnly(skipReason: WeRunTheseTestsForNetCoreOnlyBecauseTheyTakeALotOfTime)]
+        [NotAzurePipelinesFact]
         public void CanBenchmarkGivenCoreFxMyGetBuild()
         {
             var config = ManualConfig.CreateEmpty()
@@ -32,7 +29,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public Check_4_6_26531_02_CoreFxVersion() : base(expectedCoreFxVersion: "4.6.26531.02") { }
         }
 
-        [FactDotNetCoreOnly(skipReason: WeRunTheseTestsForNetCoreOnlyBecauseTheyTakeALotOfTime)]
+        [NotAzurePipelinesFact]
         public void CanBenchmarkGivenCoreClrMyGetBuild()
         {
             var config = ManualConfig.CreateEmpty()
@@ -50,7 +47,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public Check_4_6_26528_02_CoreClrVersion() : base(expectedCoreClrVersion: "4.6.26528.02") { }
         }
 
-        [FactDotNetCoreOnly(skipReason: WeRunTheseTestsForNetCoreOnlyBecauseTheyTakeALotOfTime)]
+        [NotAzurePipelinesFact]
         public void CanBenchmarkGivenCoreClrAndCoreFxMyGetBuilds()
         {
             var config = ManualConfig.CreateEmpty()
