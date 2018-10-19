@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public CoreRtTests(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
-        [NotAzurePipelinesFact]
+        [WorkInProgressFact]
         public void CoreRtIsSupported()
         {
             if (RuntimeInformation.GetCurrentPlatform() == Platform.X86) // CoreRT does not support 32bit yet

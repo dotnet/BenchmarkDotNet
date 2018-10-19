@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public CustomCoreClrToolchainTests(ITestOutputHelper output) : base(output) { }
 
-        [NotAzurePipelinesFact]
+        [WorkInProgressFact]
         public void CanBenchmarkGivenCoreFxMyGetBuild()
         {
             var config = ManualConfig.CreateEmpty()
@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public Check_4_6_26531_02_CoreFxVersion() : base(expectedCoreFxVersion: "4.6.26531.02") { }
         }
 
-        [NotAzurePipelinesFact]
+        [WorkInProgressFact]
         public void CanBenchmarkGivenCoreClrMyGetBuild()
         {
             var config = ManualConfig.CreateEmpty()
@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public Check_4_6_26528_02_CoreClrVersion() : base(expectedCoreClrVersion: "4.6.26528.02") { }
         }
 
-        [NotAzurePipelinesFact]
+        [WorkInProgressFact]
         public void CanBenchmarkGivenCoreClrAndCoreFxMyGetBuilds()
         {
             var config = ManualConfig.CreateEmpty()
