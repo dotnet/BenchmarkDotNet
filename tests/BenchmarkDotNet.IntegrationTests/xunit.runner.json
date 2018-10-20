@@ -3,7 +3,6 @@
   "methodDisplay": "method",
   "diagnosticMessages": true,
   "longRunningTestSeconds": 120,
-  "maxParallelThreads": 1,
-  "parallelizeAssembly": false,
+  "maxParallelThreads": -1,
   "parallelizeTestCollections": false
 }

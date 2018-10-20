@@ -117,7 +117,7 @@ Task("FastTests")
 		string[] targetVersions = IsRunningOnWindows() ?
                 new []{"net46", "netcoreapp2.1"}
                 :
-                new []{"netcoreapp2.1"};	
+                new []{"netcoreapp2.1"};
 
         foreach(var version in targetVersions)
         {
