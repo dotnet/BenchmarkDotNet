@@ -133,7 +133,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("disasmDepth", Required = false, Default = 1, HelpText = "Sets the recursive depth for the disassembler.")]
         public int DisassemblerRecursiveDepth { get; set; }
 
-        internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any(); 
+        internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any(); 
 
         [Usage(ApplicationAlias = "")]
         [PublicAPI]

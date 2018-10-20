@@ -154,6 +154,12 @@ namespace BenchmarkDotNet.ConsoleArguments
                 return false;
             }
 
+            if (options.Runtimes.Count() > 1 && options.CoreRtPath != null)
+            {
+                logger.WriteLineError("CoreRun path can't be combined with multiple .NET Runtimes");
+                return false;
+            }
+
             return true;
         }
 
@@ -246,20 +252,15 @@ namespace BenchmarkDotNet.ConsoleArguments
         {
             if (options.RunInProcess)
                 yield return baseJob.With(InProcessToolchain.Instance);
-
-            foreach (string runtime in options.Runtimes) // known runtimes
-                yield return CreateJobForGivenRuntime(baseJob, runtime.ToLowerInvariant(), options);
-
-            if (options.CoreRunPath != null)
-                yield return CreateCoreRunJob(baseJob, options); // local CoreFX and CoreCLR builds
             else if (!string.IsNullOrEmpty(options.ClrVersion))
                 yield return baseJob.With(new ClrRuntime(options.ClrVersion)); // local builds of .NET Runtime
-            else if (options.CliPath != null && options.Runtimes.IsEmpty()) // runtime not provided (we deduce it from cli `-f`)
-                yield return baseJob.With(Runtime.Core).With(
-                    CsProjCoreToolchain.From(
-                        NetCoreAppSettings.GetCurrentVersion()
-                            .WithCustomDotNetCliPath(options.CliPath?.FullName)
-                            .WithCustomPackagesRestorePath(options.RestorePath?.FullName)));
+            else if (options.CoreRunPath != null)
+                yield return CreateCoreRunJob(baseJob, options); // local CoreFX and CoreCLR builds
+            else if (options.CliPath != null && options.Runtimes.IsEmpty())
+                yield return CreateCoreJobWithCli(baseJob, options);
+            else
+                foreach (string runtime in options.Runtimes) // known runtimes
+                    yield return CreateJobForGivenRuntime(baseJob, runtime.ToLowerInvariant(), options);
         }
 
         private static Job CreateJobForGivenRuntime(Job baseJob, string runtime, CommandLineOptions options)
@@ -280,8 +281,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case "net47":
                 case "net471":
                 case "net472":
-                    return baseJob.With(Runtime.Clr).With(
-                        CsProjClassicNetToolchain.From(runtime, options.RestorePath?.FullName));
+                    return baseJob.With(Runtime.Clr).With(CsProjClassicNetToolchain.From(runtime, options.RestorePath?.FullName));
                 case "netcoreapp2.0":
                 case "netcoreapp2.1":
                 case "netcoreapp2.2":
@@ -339,8 +339,19 @@ namespace BenchmarkDotNet.ConsoleArguments
                 .With(new CoreRunToolchain(
                     options.CoreRunPath,
                     createCopy: true,
-                    targetFrameworkMoniker: NetCoreAppSettings.GetCurrentVersion().TargetFrameworkMoniker,
+                    targetFrameworkMoniker: options.Runtimes.SingleOrDefault() ?? NetCoreAppSettings.GetCurrentVersion().TargetFrameworkMoniker,
                     customDotNetCliPath: options.CliPath,
                     restorePath: options.RestorePath));
+
+        private static Job CreateCoreJobWithCli(Job baseJob, CommandLineOptions options)
+            => baseJob
+                .With(Runtime.Core)
+                .With(CsProjCoreToolchain.From(
+                    new NetCoreAppSettings(
+                        targetFrameworkMoniker: NetCoreAppSettings.GetCurrentVersion().TargetFrameworkMoniker, 
+                        customDotNetCliPath: options.CliPath?.FullName,
+                        runtimeFrameworkVersion: null,
+                        name: NetCoreAppSettings.GetCurrentVersion().TargetFrameworkMoniker,
+                        packagesPath: options.RestorePath?.FullName)));
     }
 }

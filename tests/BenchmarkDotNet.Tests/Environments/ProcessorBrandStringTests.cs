@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Portability.Cpu;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Environments
@@ -19,7 +20,7 @@ namespace BenchmarkDotNet.Tests.Environments
         [InlineData("Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz ", "Intel Core i7-8650U CPU 1.90GHz (Kaby Lake R)")]
         [InlineData("Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz", "Intel Core i7-8700K CPU 3.70GHz (Coffee Lake)")]
         public void IntroCoreIsPrettified(string originalName, string prettifiedName) =>
-            Assert.Equal(prettifiedName, ProcessorBrandStringHelper.Prettify(originalName));
+            Assert.Equal(prettifiedName, ProcessorBrandStringHelper.Prettify(new CpuInfo(originalName, nominalFrequency: null)));
 
         [Theory]
         [InlineData("Intel(R) Pentium(TM) G4560 CPU @ 3.50GHz", "Intel Pentium G4560 CPU 3.50GHz (Max: 3.70GHz)", 3.7)]
@@ -30,7 +31,24 @@ namespace BenchmarkDotNet.Tests.Environments
         [InlineData("Intel(R) Core(TM) i7-5775R CPU @ 3.30GHz", "Intel Core i7-5775R CPU 3.30GHz (Max: 3.40GHz) (Broadwell)", 3.4)]
         public void CoreIsPrettifiedWithDiffFrequencies(string originalName, string prettifiedName, double actualFrequency)
         {
-            Assert.Equal(prettifiedName, ProcessorBrandStringHelper.Prettify(originalName, Frequency.FromGHz(actualFrequency)));
+            Assert.Equal(prettifiedName, ProcessorBrandStringHelper.Prettify(new CpuInfo(originalName, nominalFrequency: Frequency.FromGHz(actualFrequency)), includeMaxFrequency: true));
+        }
+        
+        [Theory]
+        [InlineData("AMD Ryzen 7 2700X Eight-Core Processor", "AMD Ryzen 7 2700X 4.10GHz", 4.1, 8, 16)]
+        [InlineData("AMD Ryzen 7 2700X Eight-Core Processor", "AMD Ryzen 7 2700X Eight-Core Processor 4.10GHz", 4.1, null, null)]
+        public void AmdIsPrettifiedWithDiffFrequencies(string originalName, string prettifiedName, double actualFrequency, int? physicalCoreCount, int? logicalCoreCount)
+        {
+            var cpuInfo = new CpuInfo(
+                originalName, 
+                physicalProcessorCount: null,
+                physicalCoreCount, 
+                logicalCoreCount, 
+                Frequency.FromGHz(actualFrequency),
+                minFrequency: null, 
+                maxFrequency: null);
+
+            Assert.Equal(prettifiedName, ProcessorBrandStringHelper.Prettify(cpuInfo, includeMaxFrequency: true));
         }
     }
 }

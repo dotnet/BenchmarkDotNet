@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using System.Linq;
@@ -16,7 +17,9 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class BenchmarkSwitcherTest
     {
-        public ITestOutputHelper Output { get; }
+        internal const string TestCategory = "TestCategory";
+
+        private ITestOutputHelper Output { get; }
 
         public BenchmarkSwitcherTest(ITestOutputHelper output) => Output = output;
         
@@ -119,6 +122,57 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Contains("BenchmarkDotNet.IntegrationTests.ClassA.Method1", logger.GetLog());
             Assert.DoesNotContain("BenchmarkDotNet.IntegrationTests.ClassA.Method2", logger.GetLog());
         }
+        
+        [Fact]
+        public void WhenUserDoesNotProvideFilterOrCategoriesViaCommandLineWeAskToChooseBenchmark()
+        {
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty().With(logger);
+            var userInteractionMock = new UserInteractionMock(returnValue: Array.Empty<Type>());
+
+            var summaries = new BenchmarkSwitcher(userInteractionMock)
+                .With(new [] { typeof(WithDryAttributeAndCategory) })
+                .Run(Array.Empty<string>(), config);
+            
+            Assert.Empty(summaries); // summaries is empty because the returnValue configured for mock returns 0 types
+            Assert.Equal(1, userInteractionMock.AskUserCalledTimes);
+        }
+        
+        [Theory]
+        [InlineData("--allCategories")]
+        [InlineData("--anyCategories")]
+        public void WhenUserProvidesCategoriesWithoutFiltersWeDontAskToChooseBenchmarkJustRunGivenCategories(string categoriesConsoleLineArgument)
+        {
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty().With(logger);
+            var types = new[] { typeof(WithDryAttributeAndCategory) };
+            var userInteractionMock = new UserInteractionMock(returnValue: types);
+            
+            var summaries = new BenchmarkSwitcher(userInteractionMock)
+                .With(types)
+                .Run(new [] { categoriesConsoleLineArgument, TestCategory }, config);
+
+            Assert.Single(summaries);
+            Assert.Equal(0, userInteractionMock.AskUserCalledTimes);
+        }
+        
+        [Theory]
+        [InlineData("--allCategories")]
+        [InlineData("--anyCategories")]
+        public void WhenUserProvidesCategoriesWithtFiltersWeDontAskToChooseBenchmarkJustUseCombinedFilterAndRunTheBenchmarks(string categoriesConsoleLineArgument)
+        {
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty().With(logger);
+            var types = new[] { typeof(WithDryAttributeAndCategory) };
+            var userInteractionMock = new UserInteractionMock(returnValue: types);
+            
+            var summaries = new BenchmarkSwitcher(userInteractionMock)
+                .With(types)
+                .Run(new [] { categoriesConsoleLineArgument, TestCategory, "--filter", "nothing" }, config);
+
+            Assert.Empty(summaries); // the summaries is empty because the provided filter returns nothing
+            Assert.Equal(0, userInteractionMock.AskUserCalledTimes);
+        }
 
         [Fact]
         public void ValidCommandLineArgumentsAreProperlyHandled()
@@ -158,7 +212,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void WhenJobIsDefinedViaAttributeAndArgumentsDontContainJobArgumentOnlySingleJobIsUsed()
         {
-            var types = new[] { typeof(WithDryAttribute) };
+            var types = new[] { typeof(WithDryAttributeAndCategory) };
             var switcher = new BenchmarkSwitcher(types);
             MockExporter mockExporter = new MockExporter();
             var configWithoutJobDefined = ManualConfig.CreateEmpty().With(mockExporter);
@@ -189,6 +243,27 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Single(results.SelectMany(r => r.BenchmarksCases));
             Assert.Single(results.SelectMany(r => r.BenchmarksCases.Select(bc => bc.Job)));
             Assert.True(results.All(r => r.BenchmarksCases.All(bc => bc.Job == Job.Default)));
+        }
+
+        private class UserInteractionMock : IUserInteraction
+        {
+            private readonly IReadOnlyList<Type> returnValue;
+            internal int PrintNoBenchmarksErrorCalledTimes = 0;
+            internal int PrintWrongFilterInfoCalledTimes = 0;
+            internal int AskUserCalledTimes = 0;
+
+            internal UserInteractionMock(IReadOnlyList<Type> returnValue) => this.returnValue = returnValue;
+
+            public void PrintNoBenchmarksError(ILogger logger) => PrintNoBenchmarksErrorCalledTimes++;
+
+            public void PrintWrongFilterInfo(IReadOnlyList<Type> allTypes, ILogger logger) => PrintWrongFilterInfoCalledTimes++;
+
+            public IReadOnlyList<Type> AskUser(IReadOnlyList<Type> allTypes, ILogger logger)
+            {
+                AskUserCalledTimes++;
+
+                return returnValue;
+            }
         }
     }
 }
@@ -224,7 +299,8 @@ namespace BenchmarkDotNet.IntegrationTests
     }
 
     [DryJob]
-    public class WithDryAttribute
+    [BenchmarkCategory(BenchmarkSwitcherTest.TestCategory)]
+    public class WithDryAttributeAndCategory
     {
         [Benchmark]
         public void Method() { }

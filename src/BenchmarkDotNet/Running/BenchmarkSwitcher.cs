@@ -16,8 +16,11 @@ namespace BenchmarkDotNet.Running
 {
     public class BenchmarkSwitcher
     {
+        private readonly IUserInteraction userInteraction = new UserInteraction();
         private readonly List<Type> types = new List<Type>();
         private readonly List<Assembly> assemblies = new List<Assembly>();
+
+        internal BenchmarkSwitcher(IUserInteraction userInteraction) => this.userInteraction = userInteraction;
 
         [PublicAPI] public BenchmarkSwitcher(Type[] types) => this.types.AddRange(types);
 
@@ -73,7 +76,7 @@ namespace BenchmarkDotNet.Running
             
             if (allAvailableTypesWithRunnableBenchmarks.IsEmpty())
             {
-                UserInteraction.PrintNoBenchmarksError(nonNullLogger);
+                userInteraction.PrintNoBenchmarksError(nonNullLogger);
                 return Array.Empty<Summary>();
             }
 
@@ -85,13 +88,13 @@ namespace BenchmarkDotNet.Running
             
             var benchmarksToFilter = options.UserProvidedFilters
                 ? allAvailableTypesWithRunnableBenchmarks 
-                : UserInteraction.AskUser(allAvailableTypesWithRunnableBenchmarks, nonNullLogger);
+                : userInteraction.AskUser(allAvailableTypesWithRunnableBenchmarks, nonNullLogger);
 
             var filteredBenchmarks = TypeFilter.Filter(effectiveConfig, benchmarksToFilter);
 
             if (filteredBenchmarks.IsEmpty())
             {
-                UserInteraction.PrintWrongFilterInfo(benchmarksToFilter, nonNullLogger);
+                userInteraction.PrintWrongFilterInfo(benchmarksToFilter, nonNullLogger);
                 return Array.Empty<Summary>();
             }
 

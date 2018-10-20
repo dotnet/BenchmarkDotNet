@@ -10,8 +10,13 @@ namespace BenchmarkDotNet.Portability.Cpu
         public int? LogicalCoreCount { get; }
         public Frequency? NominalFrequency { get; }
         public Frequency? MinFrequency { get; }
-        public Frequency? MaxFrequency { get; }        
+        public Frequency? MaxFrequency { get; }
 
+        internal CpuInfo(string processorName, Frequency? nominalFrequency)
+            : this(processorName, null, null, null, nominalFrequency, null, null)
+        {
+        }
+        
         public CpuInfo(string processorName,
                        int? physicalProcessorCount,
                        int? physicalCoreCount,
