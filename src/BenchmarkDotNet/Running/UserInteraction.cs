@@ -12,18 +12,18 @@ using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Running
 {
-    internal static class UserInteraction
+    internal class UserInteraction : IUserInteraction
     {
         private static bool consoleCancelKeyPressed;
         
         static UserInteraction() => Console.CancelKeyPress += (_, __) => consoleCancelKeyPressed = true;
 
-        internal static void PrintNoBenchmarksError(ILogger logger)
+        public void PrintNoBenchmarksError(ILogger logger)
         {
             logger.WriteError("No benchmarks to choose from. Make sure you provided public non-sealed non-static types with public [Benchmark] methods.");
         }
 
-        internal static IReadOnlyList<Type> AskUser(IReadOnlyList<Type> allTypes, ILogger logger)
+        public IReadOnlyList<Type> AskUser(IReadOnlyList<Type> allTypes, ILogger logger)
         {
             var selectedTypes = new List<Type>();
             string benchmarkCaptionExample = allTypes.First().GetDisplayName();
@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Running
             return selectedTypes;
         }
 
-        internal static void PrintWrongFilterInfo(IReadOnlyList<Type> allTypes, ILogger logger)
+        public void PrintWrongFilterInfo(IReadOnlyList<Type> allTypes, ILogger logger)
         {
             logger.WriteLineError("The filter that you have provided returned 0 benchmarks.");
             logger.WriteLineInfo("Please remember that the filter is applied to full benchmark name: `namespace.typeName.methodName`.");
