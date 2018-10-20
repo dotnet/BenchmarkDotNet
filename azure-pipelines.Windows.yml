@@ -1,7 +1,6 @@
 trigger:
   batch: true
   branches:
-    # blacklist
     exclude:
     - gh-pages
 
@@ -13,4 +12,3 @@ jobs:
     name: Windows
     vmImage: 'vs2017-win2016'
     scriptFileName: .\build.ps1
-    timeoutInMinutes: 300

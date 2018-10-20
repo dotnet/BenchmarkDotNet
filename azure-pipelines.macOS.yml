@@ -1,7 +1,6 @@
 trigger:
   batch: true
   branches:
-    # blacklist
     exclude:
     - gh-pages
 
