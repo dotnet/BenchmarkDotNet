@@ -2,5 +2,5 @@
   "shadowCopy": false,
   "methodDisplay": "method",
   "diagnosticMessages": true,
-  "longRunningTestSeconds": 120
+  "longRunningTestSeconds": 60
 }

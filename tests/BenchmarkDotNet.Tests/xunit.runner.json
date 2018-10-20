@@ -2,6 +2,5 @@
   "shadowCopy": false,
   "methodDisplay": "method",
   "diagnosticMessages": true,
-  "longRunningTestSeconds": 5,
-  "maxParallelThreads": -1
+  "longRunningTestSeconds": 3
 }
