@@ -95,10 +95,7 @@ namespace BenchmarkDotNet.Validators
             {
                 var result = globalSetupMethods.First().Invoke(benchmarkTypeInstance, null);
 
-                if (result is Task task)
-                {
-                    task.GetAwaiter().GetResult();
-                }
+                TryGetTaskResult(result);
             }
             catch (Exception ex)
             {
@@ -110,6 +107,34 @@ namespace BenchmarkDotNet.Validators
             }
 
             return true;
+        }
+
+        private void TryGetTaskResult(object result)
+        {
+            if (result == null)
+            {
+                return;
+            }
+
+            if (result is Task task)
+            {
+                task.GetAwaiter().GetResult();
+            }
+            else if (result is ValueTask valueTask)
+            {
+                valueTask.GetAwaiter().GetResult();
+            }
+            else
+            {
+                var returnTypeInfo = result.GetType();
+                if (returnTypeInfo.IsGenericType && returnTypeInfo.GetGenericTypeDefinition() == typeof(ValueTask<>))
+                {
+                    var getAwaiterMethod = result.GetType().GetMethod("GetAwaiter");
+                    var genericValueTaskAwaiter = getAwaiterMethod.Invoke(result, null);
+                    var getResultMethod = genericValueTaskAwaiter.GetType().GetMethod("GetResult");
+                    getResultMethod.Invoke(genericValueTaskAwaiter, null);
+                }
+            }
         }
 
         private bool TryToSetParamsFields(object benchmarkTypeInstance, List<ValidationError> errors)
