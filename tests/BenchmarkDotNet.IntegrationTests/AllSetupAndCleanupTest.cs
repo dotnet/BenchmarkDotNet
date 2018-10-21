@@ -18,7 +18,6 @@ namespace BenchmarkDotNet.IntegrationTests
         private const string IterationSetupCalled = Prefix + "IterationSetup";
         private const string IterationCleanupCalled = Prefix + "IterationCleanup";
         private const string BenchmarkCalled = Prefix + "Benchmark";
-        private const string OutputDelimeter = "===========================================================";
 
         private readonly string[] expectedLogLines = {
             "// ### Called: GlobalSetup",
@@ -53,9 +52,6 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = CreateSimpleConfig(logger, miniJob);
 
             CanExecute<AllSetupAndCleanupAttributeBenchmarks>(config);
-            Output.WriteLine(OutputDelimeter);
-            Output.WriteLine(OutputDelimeter);
-            Output.WriteLine(OutputDelimeter);
             
             var actualLogLines = logger.GetLog().Split('\r', '\n').Where(line => line.StartsWith(Prefix)).ToArray();
             foreach (string line in actualLogLines)
@@ -71,9 +67,6 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = CreateSimpleConfig(logger, miniJob);
 
             CanExecute<AllSetupAndCleanupAttributeBenchmarksAsync>(config);
-            Output.WriteLine(OutputDelimeter);
-            Output.WriteLine(OutputDelimeter);
-            Output.WriteLine(OutputDelimeter);
 
             var actualLogLines = logger.GetLog().Split('\r', '\n').Where(line => line.StartsWith(Prefix)).ToArray();
             foreach (string line in actualLogLines)
@@ -89,9 +82,6 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = CreateSimpleConfig(logger, miniJob);
 
             CanExecute<AllSetupAndCleanupAttributeBenchmarksAsyncSetup>(config);
-            Output.WriteLine(OutputDelimeter);
-            Output.WriteLine(OutputDelimeter);
-            Output.WriteLine(OutputDelimeter);
 
             var actualLogLines = logger.GetLog().Split('\r', '\n').Where(line => line.StartsWith(Prefix)).ToArray();
             foreach (string line in actualLogLines)
