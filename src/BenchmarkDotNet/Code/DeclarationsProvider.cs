@@ -70,12 +70,16 @@ namespace BenchmarkDotNet.Code
                 return EmptyAction;
             }
 
-            if (method.ReturnType != typeof(Task))
+            if (method.ReturnType == typeof(Task) ||
+                method.ReturnType == typeof(ValueTask) ||
+                (method.ReturnType.IsGenericType &&
+                    (method.ReturnType.GetGenericTypeDefinition() == typeof(Task<>) ||
+                     method.ReturnType.GetGenericTypeDefinition() == typeof(ValueTask<>))))
             {
-                return method.Name;
+                return $"() => {method.Name}().GetAwaiter().GetResult()";
             }
 
-            return $"() => {method.Name}().GetAwaiter().GetResult()";
+            return method.Name;
         }
     }
 
