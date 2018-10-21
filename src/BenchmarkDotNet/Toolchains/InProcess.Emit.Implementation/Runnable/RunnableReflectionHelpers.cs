@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
             if (value != null)
             {
-                var implicitOp = GetImplicitConversionOp(targetType, value.GetType());
+                var implicitOp = GetImplicitConversionOpFromTo(value.GetType(), targetType);
                 if (implicitOp != null)
                     return implicitOp.Invoke(null, new[] { value });
             }
@@ -43,9 +43,19 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 && t.GetCustomAttributes().Any(a => a.GetType().FullName == IsByRefLikeAttributeTypeName);
         }
 
-        public static MethodInfo GetImplicitConversionOp(Type target, Type source)
+        public static MethodInfo GetImplicitConversionOpFromTo(Type from, Type to)
         {
-            return target.GetMethod(OpImplicitMethodName, new[] { source });
+            return GetImplicitConversionOpCore(to, from, to)
+                ?? GetImplicitConversionOpCore(from, from, to);
+        }
+
+        private static MethodInfo GetImplicitConversionOpCore(Type owner, Type from, Type to)
+        {
+            return owner.GetMethods(BindingFlagsPublicStatic)
+                .FirstOrDefault(m =>
+                    m.Name == OpImplicitMethodName
+                    && m.ReturnType == to
+                    && m.GetParameters().Single().ParameterType == from);
         }
 
         public static void SetArgumentField<T>(

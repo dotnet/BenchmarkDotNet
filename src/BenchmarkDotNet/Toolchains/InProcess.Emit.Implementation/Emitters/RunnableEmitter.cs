@@ -432,20 +432,38 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             // Define arg fields
             foreach (var parameter in Descriptor.WorkloadMethod.GetParameters())
             {
-                var argLocalsType = parameter.ParameterType;
-                var argFieldType =
-                    (argLocalsType.IsByRef ? argLocalsType.GetElementType() : argLocalsType)
-                    ?? throw new InvalidOperationException($"Bug: cannot get field type from {argLocalsType}");
-
                 var argValue = benchmark.BenchmarkCase.Parameters.GetArgument(parameter.Name);
+                var parameterType = parameter.ParameterType;
 
+                Type argLocalsType;
+                Type argFieldType;
                 MethodInfo opConversion = null;
-                if (IsRefLikeType(argFieldType) && argValue.Value != null)
+                if (parameterType.IsByRef)
                 {
-                    var newType = argValue.Value.GetType();
-                    opConversion = GetImplicitConversionOp(argFieldType, newType);
-                    argFieldType = newType;
+                    argLocalsType = parameterType;
+                    argFieldType = argLocalsType.GetElementType()
+                        ?? throw new InvalidOperationException($"Bug: cannot get field type from {argLocalsType}");
                 }
+                else if (IsRefLikeType(parameterType) && argValue.Value != null)
+                {
+                    argLocalsType = parameterType;
+
+                    // Use conversion on load; store passed value
+                    var passedArgType = argValue.Value.GetType();
+                    opConversion = GetImplicitConversionOpFromTo(passedArgType, argLocalsType) ??
+                        throw new InvalidOperationException($"Bug: No conversion from {passedArgType} to {argLocalsType}.");
+                    argFieldType = passedArgType;
+                }
+                else
+                {
+                    // No conversion; load ref to arg field;
+                    argLocalsType = parameterType;
+                    argFieldType = parameterType;
+                }
+
+                if (IsRefLikeType(argFieldType))
+                    throw new NotSupportedException(
+                        $"Passing ref readonly structs by ref is not supported (cannot store {argFieldType} as a class field).");
 
                 var argField = runnableBuilder.DefineField(
                     ArgFieldPrefix + parameter.Position,
