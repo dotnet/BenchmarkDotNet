@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Code
 
         public string WorkloadTypeName => Descriptor.Type.GetCorrectCSharpTypeName();
 
-        public string GlobalSetupMethodName => Descriptor.GlobalSetupMethod?.Name ?? EmptyAction;
+        public string GlobalSetupMethodName => GetMethodName(Descriptor.GlobalSetupMethod);
 
         public string GlobalCleanupMethodName => Descriptor.GlobalCleanupMethod?.Name ?? EmptyAction;
 
@@ -62,6 +62,21 @@ namespace BenchmarkDotNet.Code
             => Descriptor.WorkloadMethod.GetParameters()
                 .Where(arg => !string.IsNullOrEmpty(arg.ParameterType.Namespace))
                 .Select(arg => $"using {arg.ParameterType.Namespace};");
+
+        private string GetMethodName(MethodInfo method)
+        {
+            if (method == null)
+            {
+                return EmptyAction;
+            }
+
+            if (method.ReturnType != typeof(Task))
+            {
+                return method.Name;
+            }
+
+            return $"() => {method.Name}().GetAwaiter().GetResult()";
+        }
     }
 
     internal class VoidDeclarationsProvider : DeclarationsProvider
@@ -81,10 +96,10 @@ namespace BenchmarkDotNet.Code
     {
         public NonVoidDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
 
-        public override string WorkloadMethodReturnTypeNamespace 
+        public override string WorkloadMethodReturnTypeNamespace
             => WorkloadMethodReturnType.Namespace == "System" // As "using System;" is always included in the template, don't emit it again
-                || string.IsNullOrWhiteSpace(WorkloadMethodReturnType.Namespace) 
-                    ? string.Empty 
+                || string.IsNullOrWhiteSpace(WorkloadMethodReturnType.Namespace)
+                    ? string.Empty
                     : $"using {WorkloadMethodReturnType.Namespace};";
 
         public override string ConsumeField
@@ -110,7 +125,7 @@ namespace BenchmarkDotNet.Code
                 else if (type.GetTypeInfo().IsClass || type.GetTypeInfo().IsInterface)
                     value = "null";
                 else
-                    value = SourceCodeHelper.ToSourceCode(Activator.CreateInstance(type)) + ";";                                    
+                    value = SourceCodeHelper.ToSourceCode(Activator.CreateInstance(type)) + ";";
                 return $"return {value};";
             }
         }

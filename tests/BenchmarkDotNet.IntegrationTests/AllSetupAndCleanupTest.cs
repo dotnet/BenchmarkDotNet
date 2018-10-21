@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
@@ -62,6 +63,42 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Equal(expectedLogLines, actualLogLines);
         }
 
+        [Fact]
+        public void AllSetupAndCleanupMethodRunsAsyncTest()
+        {
+            var logger = new OutputLogger(Output);
+            var miniJob = Job.Default.With(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
+            var config = CreateSimpleConfig(logger, miniJob);
+
+            CanExecute<AllSetupAndCleanupAttributeBenchmarksAsync>(config);
+            Output.WriteLine(OutputDelimeter);
+            Output.WriteLine(OutputDelimeter);
+            Output.WriteLine(OutputDelimeter);
+
+            var actualLogLines = logger.GetLog().Split('\r', '\n').Where(line => line.StartsWith(Prefix)).ToArray();
+            foreach (string line in actualLogLines)
+                Output.WriteLine(line);
+            Assert.Equal(expectedLogLines, actualLogLines);
+        }
+
+        [Fact]
+        public void AllSetupAndCleanupMethodRunsAsyncSetupTest()
+        {
+            var logger = new OutputLogger(Output);
+            var miniJob = Job.Default.With(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
+            var config = CreateSimpleConfig(logger, miniJob);
+
+            CanExecute<AllSetupAndCleanupAttributeBenchmarksAsyncSetup>(config);
+            Output.WriteLine(OutputDelimeter);
+            Output.WriteLine(OutputDelimeter);
+            Output.WriteLine(OutputDelimeter);
+
+            var actualLogLines = logger.GetLog().Split('\r', '\n').Where(line => line.StartsWith(Prefix)).ToArray();
+            foreach (string line in actualLogLines)
+                Output.WriteLine(line);
+            Assert.Equal(expectedLogLines, actualLogLines);
+        }
+
         public class AllSetupAndCleanupAttributeBenchmarks
         {
             private int setupCounter;
@@ -75,6 +112,48 @@ namespace BenchmarkDotNet.IntegrationTests
 
             [GlobalSetup]
             public void GlobalSetup() => Console.WriteLine(GlobalSetupCalled);
+
+            [GlobalCleanup]
+            public void GlobalCleanup() => Console.WriteLine(GlobalCleanupCalled);
+
+            [Benchmark]
+            public void Benchmark() => Console.WriteLine(BenchmarkCalled);
+        }
+
+        public class AllSetupAndCleanupAttributeBenchmarksAsync
+        {
+            private int setupCounter;
+            private int cleanupCounter;
+
+            [IterationSetup]
+            public void IterationSetup() => Console.WriteLine(IterationSetupCalled + " (" + ++setupCounter + ")");
+
+            [IterationCleanup]
+            public void IterationCleanup() => Console.WriteLine(IterationCleanupCalled + " (" + ++cleanupCounter + ")");
+
+            [GlobalSetup]
+            public Task GlobalSetup() => Console.Out.WriteLineAsync(GlobalSetupCalled);
+
+            [GlobalCleanup]
+            public void GlobalCleanup() => Console.WriteLine(GlobalCleanupCalled);
+
+            [Benchmark]
+            public Task Benchmark() => Console.Out.WriteLineAsync(BenchmarkCalled);
+        }
+
+        public class AllSetupAndCleanupAttributeBenchmarksAsyncSetup
+        {
+            private int setupCounter;
+            private int cleanupCounter;
+
+            [IterationSetup]
+            public void IterationSetup() => Console.WriteLine(IterationSetupCalled + " (" + ++setupCounter + ")");
+
+            [IterationCleanup]
+            public void IterationCleanup() => Console.WriteLine(IterationCleanupCalled + " (" + ++cleanupCounter + ")");
+
+            [GlobalSetup]
+            public Task GlobalSetup() => Console.Out.WriteLineAsync(GlobalSetupCalled);
 
             [GlobalCleanup]
             public void GlobalCleanup() => Console.WriteLine(GlobalCleanupCalled);
