@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -113,7 +112,7 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             if (!AreSameTypeIgnoreNested(method1.DeclaringType, method2.DeclaringType))
                 throw new InvalidOperationException($"No matching method for {method1}");
         }
-        
+
         private static void DiffSignature(ParameterDefinition parameter1, ParameterDefinition parameter2)
         {
             if (parameter1.Name != parameter2.Name)
@@ -381,10 +380,10 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             }
 
             if (instructions1.Count > diffMax)
-                throw new InvalidOperationException($"There're additional instructions in {method1}.");
+                throw new InvalidOperationException($"There are additional instructions in {method1}.");
 
             if (instructions2.Count > diffMax)
-                throw new InvalidOperationException($"There're additional instructions in {method2}.");
+                throw new InvalidOperationException($"There are additional instructions in {method2}.");
         }
 
         private static void Diff(Instruction op1, Instruction op2, Dictionary<Instruction, Instruction> op2ToOp1Map)

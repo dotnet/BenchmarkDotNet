@@ -52,5 +52,4 @@
 
         public const int DummyUnrollFactor = 1 << 6;
     }
-
 }

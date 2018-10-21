@@ -66,13 +66,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 )
              */
             if (ActionKind == RunnableActionKind.Overhead)
-            {
                 resultLocal = ilBuilder.DeclareLocal(ConsumableInfo.OverheadMethodReturnType);
-            }
             else
-            {
                 resultLocal = ilBuilder.DeclareLocal(ConsumableInfo.WorkloadMethodReturnType);
-            }
         }
 
         /// <summary>Emits the action before loop override.</summary>
@@ -148,13 +144,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 IL_0084: call void [BenchmarkDotNet]BenchmarkDotNet.Engines.DeadCodeEliminationHelper::KeepAliveWithoutBoxing<int32>(!!0&)
              */
             if (ActionKind == RunnableActionKind.Overhead)
-            {
                 ilBuilder.EmitStaticCall(overheadKeepAliveWithoutBoxingMethod, resultLocal);
-            }
             else
-            {
                 ilBuilder.EmitStaticCall(workloadKeepAliveWithoutBoxingMethod, resultLocal);
-            }
         }
     }
 }

@@ -87,13 +87,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 )
              */
             if (ActionKind == RunnableActionKind.Overhead)
-            {
                 resultLocal = ilBuilder.DeclareLocal(ConsumableInfo.OverheadMethodReturnType);
-            }
             else
-            {
                 resultLocal = ilBuilder.DeclareLocal(ConsumableInfo.WorkloadMethodReturnType);
-            }
         }
 
         /// <summary>Emits the action before loop override.</summary>

@@ -111,7 +111,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var summary = CanExecute(benchmarkType, config);
 #if NETFRAMEWORK
-            // .Net core does not support assembly saving so far
+            // .Net Core does not support assembly saving so far
             // SEE https://github.com/dotnet/corefx/issues/4491
             DiffEmit(summary);
 #endif

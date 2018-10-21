@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             }
 
 #if NETFRAMEWORK
-            // .Net core does not support assembly saving so far
+            // .Net Core does not support assembly saving so far
             // SEE https://github.com/dotnet/corefx/issues/4491
             if (config.KeepBenchmarkFiles)
             {
@@ -97,7 +97,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 assemblyMode,
                 assemblyDir);
 #else
-            // .Net core does not support assembly saving so far
+            // .Net Core does not support assembly saving so far
             // SEE https://github.com/dotnet/corefx/issues/4491
             var assemblyMode = AssemblyBuilderAccess.RunAndCollect;
 
@@ -115,7 +115,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         {
             // [assembly: CompilationRelaxations(8)]
             var attributeCtor = typeof(CompilationRelaxationsAttribute)
-                .GetConstructor(new[] { typeof(int) });
+                .GetConstructor(new[] { typeof(int) })
+                ?? throw new MissingMemberException(nameof(CompilationRelaxationsAttribute));
+
             var attBuilder = new CustomAttributeBuilder(
                 attributeCtor,
                 new object[] { (int)CompilationRelaxations.NoStringInterning });
@@ -123,7 +125,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
             // [assembly: RuntimeCompatibility(WrapNonExceptionThrows = true)]
             attributeCtor = typeof(RuntimeCompatibilityAttribute)
-                .GetConstructor(Array.Empty<Type>());
+                .GetConstructor(Array.Empty<Type>())
+                ?? throw new MissingMemberException(nameof(RuntimeCompatibilityAttribute));
+
             var attributeProp = typeof(RuntimeCompatibilityAttribute)
                 .GetProperty(nameof(RuntimeCompatibilityAttribute.WrapNonExceptionThrows));
             attBuilder = new CustomAttributeBuilder(
@@ -135,7 +139,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
             // [assembly: Debuggable(DebuggableAttribute.DebuggingModes.IgnoreSymbolStoreSequencePoints)]
             attributeCtor = typeof(DebuggableAttribute)
-                .GetConstructor(new[] { typeof(DebuggableAttribute.DebuggingModes) });
+                .GetConstructor(new[] { typeof(DebuggableAttribute.DebuggingModes) })
+                ?? throw new MissingMemberException(nameof(DebuggableAttribute));
             attBuilder = new CustomAttributeBuilder(
                 attributeCtor,
                 new object[] { DebuggableAttribute.DebuggingModes.IgnoreSymbolStoreSequencePoints });
@@ -144,7 +149,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
         private static ModuleBuilder DefineModuleBuilder(AssemblyBuilder assemblyBuilder, string moduleFileName)
         {
-            var moduleName = Path.GetFileNameWithoutExtension(moduleFileName);
+            var moduleName = Path.GetFileNameWithoutExtension(moduleFileName)
+               ?? throw new ArgumentNullException(nameof(moduleFileName));
 #if NETFRAMEWORK
             var moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName, moduleFileName);
 #else
@@ -152,7 +158,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 #endif
             // [module:UnverifiableCodeAttribute()]
             var attributeCtor = typeof(UnverifiableCodeAttribute)
-                .GetConstructor(Array.Empty<Type>());
+                .GetConstructor(Array.Empty<Type>())
+                ?? throw new MissingMemberException(nameof(UnverifiableCodeAttribute));
             var attBuilder = new CustomAttributeBuilder(
                 attributeCtor,
                 Array.Empty<object>());
@@ -160,7 +167,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
             return moduleBuilder;
         }
-
 
         private static TypeBuilder DefineRunnableTypeBuilder(
             BenchmarkBuildInfo benchmark,
@@ -235,7 +241,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
         private BenchmarkBuildInfo benchmark;
         private List<ArgFieldInfo> argFields;
-        private int unrollFactor;
+        private int jobUnrollFactor;
         private int dummyUnrollFactor;
 
         private Type overheadDelegateType;
@@ -253,6 +259,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         private FieldBuilder notElevenField;
         private FieldBuilder dummyVarField;
 
+        // ReSharper disable NotAccessedField.Local
         private ConstructorBuilder ctorMethod;
         private MethodBuilder trickTheJitMethod;
         private MethodBuilder dummy1Method;
@@ -272,6 +279,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         private MethodBuilder iterationCleanupMethod;
 
         private MethodBuilder runMethod;
+        // ReSharper restore NotAccessedField.Local
 
         private RunnableEmitter([NotNull] BuildPartition buildPartition, [NotNull] ModuleBuilder moduleBuilder)
         {
@@ -287,13 +295,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         [NotNull]
         private Descriptor Descriptor => benchmark.BenchmarkCase.Descriptor;
 
-
-        private Type EmitRunnableCore(BenchmarkBuildInfo benchmark)
+        // ReSharper disable once UnusedMethodReturnValue.Local
+        private Type EmitRunnableCore(BenchmarkBuildInfo newBenchmark)
         {
-            if (benchmark == null)
-                throw new ArgumentNullException(nameof(benchmark));
+            if (newBenchmark == null)
+                throw new ArgumentNullException(nameof(newBenchmark));
 
-            InitForEmitRunnable(benchmark);
+            InitForEmitRunnable(newBenchmark);
 
             // 1. Emit fields
             DefineFields();
@@ -312,12 +320,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
             // Overhead impl
             overheadImplementationMethod = EmitOverheadImplementation(OverheadImplementationMethodName);
-            overheadActionUnrollMethod = EmitOverheadAction(OverheadActionUnrollMethodName, unrollFactor);
+            overheadActionUnrollMethod = EmitOverheadAction(OverheadActionUnrollMethodName, jobUnrollFactor);
             overheadActionNoUnrollMethod = EmitOverheadAction(OverheadActionNoUnrollMethodName, 1);
 
             // Workload impl
             workloadImplementationMethod = EmitWorkloadImplementation(WorkloadImplementationMethodName);
-            workloadActionUnrollMethod = EmitWorkloadAction(WorkloadActionUnrollMethodName, unrollFactor);
+            workloadActionUnrollMethod = EmitWorkloadAction(WorkloadActionUnrollMethodName, jobUnrollFactor);
             workloadActionNoUnrollMethod = EmitWorkloadAction(WorkloadActionNoUnrollMethodName, 1);
 
             // __ForDisassemblyDiagnoser__ impl
@@ -341,21 +349,21 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 #endif
         }
 
-        private void InitForEmitRunnable(BenchmarkBuildInfo benchmark)
+        private void InitForEmitRunnable(BenchmarkBuildInfo newBenchmark)
         {
             // Init current state
             argFields = new List<ArgFieldInfo>();
-            this.benchmark = benchmark;
-            unrollFactor = this.benchmark.BenchmarkCase.Job.ResolveValue(
+            benchmark = newBenchmark;
+            jobUnrollFactor = benchmark.BenchmarkCase.Job.ResolveValue(
                 RunMode.UnrollFactorCharacteristic,
                 buildPartition.Resolver);
             dummyUnrollFactor = DummyUnrollFactor;
 
-            consumableInfo = new ConsumableTypeInfo(this.benchmark.BenchmarkCase.Descriptor.WorkloadMethod.ReturnType);
+            consumableInfo = new ConsumableTypeInfo(benchmark.BenchmarkCase.Descriptor.WorkloadMethod.ReturnType);
             consumeEmitter = ConsumeEmitter.GetConsumeEmitter(consumableInfo);
 
             // Init types
-            runnableBuilder = DefineRunnableTypeBuilder(this.benchmark, moduleBuilder);
+            runnableBuilder = DefineRunnableTypeBuilder(benchmark, moduleBuilder);
             overheadDelegateType = EmitOverheadDelegateType();
             workloadDelegateType = EmitWorkloadDelegateType();
         }
@@ -425,7 +433,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             foreach (var parameter in Descriptor.WorkloadMethod.GetParameters())
             {
                 var argLocalsType = parameter.ParameterType;
-                var argFieldType = argLocalsType.IsByRef ? argLocalsType.GetElementType() : argLocalsType;
+                var argFieldType =
+                    (argLocalsType.IsByRef ? argLocalsType.GetElementType() : argLocalsType)
+                    ?? throw new InvalidOperationException($"Bug: cannot get field type from {argLocalsType}");
 
                 var argValue = benchmark.BenchmarkCase.Parameters.GetArgument(parameter.Name);
 
@@ -558,7 +568,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 args);
             args = methodBuilder.GetEmitParameters(args);
             var callResultType = consumableInfo.OriginMethodReturnType;
-            var awaiterType = consumableInfo.GetAwaiterMethod.ReturnType;
+            var awaiterType = consumableInfo.GetAwaiterMethod?.ReturnType
+                ?? throw new InvalidOperationException($"Bug: {nameof(consumableInfo.GetAwaiterMethod)} is null");
 
             var ilBuilder = methodBuilder.GetILGenerator();
 
@@ -809,7 +820,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             if (consumableInfo.IsAwaitable)
             {
                 var callResultType = consumableInfo.OriginMethodReturnType;
-                var awaiterType = consumableInfo.GetAwaiterMethod.ReturnType;
+                var awaiterType = consumableInfo.GetAwaiterMethod?.ReturnType
+                    ?? throw new InvalidOperationException($"Bug: {nameof(consumableInfo.GetAwaiterMethod)} is null");
                 callResultLocal =
                     ilBuilder.DeclareOptionalLocalForInstanceCall(callResultType, consumableInfo.GetAwaiterMethod);
                 awaiterLocal =
@@ -932,13 +944,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             ilBuilder.EmitSetDelegateToThisField(overheadDelegateField, overheadImplementationMethod);
 
             if (workloadImplementationMethod == null)
-            {
                 ilBuilder.EmitSetDelegateToThisField(workloadDelegateField, Descriptor.WorkloadMethod);
-            }
             else
-            {
                 ilBuilder.EmitSetDelegateToThisField(workloadDelegateField, workloadImplementationMethod);
-            }
 
             ilBuilder.EmitCtorReturn(ctorMethod);
         }
@@ -957,8 +965,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 IL_000b: callvirt instance int32 [mscorlib]System.Random::Next(int32, int32)
                 IL_0010: stfld int32 BenchmarkDotNet.Autogenerated.Runnable_0::NotEleven
              */
-            var randomCtor = typeof(Random).GetConstructor(new[] { typeof(int) });
-            var randomNextMethod = typeof(Random).GetMethod(nameof(Random.Next), new[] { typeof(int), typeof(int) });
+            var randomCtor = typeof(Random).GetConstructor(new[] { typeof(int) })
+                ?? throw new MissingMemberException(nameof(Random));
+            var randomNextMethod = typeof(Random).GetMethod(nameof(Random.Next), new[] { typeof(int), typeof(int) })
+                ?? throw new MissingMemberException(nameof(Random.Next));
 
             ilBuilder.Emit(OpCodes.Ldarg_0);
             ilBuilder.Emit(OpCodes.Ldc_I4_S, 123);
@@ -982,7 +992,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
         private MethodBuilder EmitRunMethod()
         {
-            var prepareForRunMethodTemplate = typeof(RunnableReuse).GetMethod(nameof(RunnableReuse.PrepareForRun));
+            var prepareForRunMethodTemplate = typeof(RunnableReuse).GetMethod(nameof(RunnableReuse.PrepareForRun))
+                ?? throw new MissingMemberException(nameof(RunnableReuse.PrepareForRun));
             var resultTuple = new ValueTuple<Job, EngineParameters, IEngineFactory>();
 
             /*
@@ -1093,7 +1104,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 IL_0029: callvirt instance class [BenchmarkDotNet]BenchmarkDotNet.Engines.IEngine [BenchmarkDotNet]BenchmarkDotNet.Engines.IEngineFactory::CreateReadyToRun(class [BenchmarkDotNet]BenchmarkDotNet.Engines.EngineParameters)
                 IL_002e: stloc.s 4
              */
-            var createReadyToRunMethod = typeof(IEngineFactory).GetMethod(nameof(IEngineFactory.CreateReadyToRun));
+            var createReadyToRunMethod = typeof(IEngineFactory).GetMethod(nameof(IEngineFactory.CreateReadyToRun))
+                ?? throw new MissingMemberException(nameof(IEngineFactory.CreateReadyToRun));
             ilBuilder.MarkLabel(notNullLabel);
             ilBuilder.EmitLdloc(engineFactoryLocal);
             ilBuilder.EmitLdloc(engineParametersLocal);
@@ -1110,9 +1122,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                     IL_0032: callvirt instance valuetype [BenchmarkDotNet]BenchmarkDotNet.Engines.RunResults [BenchmarkDotNet]BenchmarkDotNet.Engines.IEngine::Run()
                     IL_0037: stloc.s 5
                  */
-                var runMethod = typeof(IEngine).GetMethod(nameof(IEngine.Run));
+                var runMethodImpl = typeof(IEngine).GetMethod(nameof(IEngine.Run))
+                    ?? throw new MissingMemberException(nameof(IEngine.Run));
                 ilBuilder.EmitLdloc(engineLocal);
-                ilBuilder.Emit(OpCodes.Callvirt, runMethod);
+                ilBuilder.Emit(OpCodes.Callvirt, runMethodImpl);
                 ilBuilder.EmitStloc(runResultsLocal);
                 /*
                     // host.ReportResults(results);
@@ -1120,7 +1133,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                     IL_003a: ldloc.s 5
                     IL_003c: callvirt instance void [BenchmarkDotNet]BenchmarkDotNet.Engines.IHost::ReportResults(valuetype [BenchmarkDotNet]BenchmarkDotNet.Engines.RunResults)
                  */
-                var reportResultsMethod = typeof(IHost).GetMethod(nameof(IHost.ReportResults));
+                var reportResultsMethod = typeof(IHost).GetMethod(nameof(IHost.ReportResults))
+                    ?? throw new MissingMemberException(nameof(IHost.ReportResults));
                 ilBuilder.EmitLdarg(hostArg);
                 ilBuilder.EmitLdloc(runResultsLocal);
                 ilBuilder.Emit(OpCodes.Callvirt, reportResultsMethod);
@@ -1142,7 +1156,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                     IL_01ea: ldloc.s 5
                     IL_01ec: callvirt instance void [mscorlib]System.IDisposable::Dispose()
                  */
-                var disposeMethod = typeof(IDisposable).GetMethod(nameof(IDisposable.Dispose));
+                var disposeMethod = typeof(IDisposable).GetMethod(nameof(IDisposable.Dispose))
+                    ?? throw new MissingMemberException(nameof(IDisposable.Dispose));
                 var disposeNullLabel = ilBuilder.DefineLabel();
                 ilBuilder.EmitLdloc(engineLocal);
                 ilBuilder.Emit(OpCodes.Brfalse_S, disposeNullLabel);

@@ -1,10 +1,10 @@
-﻿using BenchmarkDotNet.Configs;
+﻿using System.Linq;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
-using System.Linq;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableReflectionHelpers;
 
@@ -87,7 +87,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             IConfig config,
             IHost host)
         {
-            var engineParameters = new EngineParameters()
+            var engineParameters = new EngineParameters
             {
                 Host = host,
                 WorkloadActionUnroll = LoopCallbackFromMethod(instance, WorkloadActionUnrollMethodName),
