@@ -39,39 +39,33 @@ namespace BenchmarkDotNet.IntegrationTests
             Output = outputHelper;
         }
 
-        public static TheoryData<Runtime, Jit, Platform, string> DataForWindows = new TheoryData<Runtime, Jit, Platform, string>
-        {
-            // our CI would need to have Mono installed..
-            //{ Runtime.Mono, Jit.LegacyJit, Platform.X86, LegacyJitNotAvailableForMono },
-            //{ Runtime.Mono, Jit.LegacyJit, Platform.X64, LegacyJitNotAvailableForMono },
-            //{ Runtime.Mono, Jit.RyuJit, Platform.X86, RyuJitNotAvailable },
-            //{ Runtime.Mono, Jit.RyuJit, Platform.X64, RyuJitNotAvailable },
-            { Runtime.Clr, Jit.LegacyJit, Platform.X86, OkCaption },
-            { Runtime.Clr, Jit.LegacyJit, Platform.X64, OkCaption },
-            { Runtime.Clr, Jit.RyuJit, Platform.X86, RyuJitNotAvailable },
-            { Runtime.Clr, Jit.RyuJit, Platform.X64, OkCaption },
-        };
-
-        public static TheoryData<Runtime, Jit, Platform, string> DataForCore = new TheoryData<Runtime, Jit, Platform, string>
-        {
-            { Runtime.Core, Jit.LegacyJit, Platform.X86, ToolchainSupportsOnlyRyuJit },
-            { Runtime.Core, Jit.LegacyJit, Platform.X64, ToolchainSupportsOnlyRyuJit },
-            { Runtime.Core, Jit.RyuJit, Platform.X64, OkCaption }
-        };
-
-
         [TheoryWindowsOnly("CLR is a valid job only on Windows")]
-        [MemberData(nameof(DataForWindows))]
-        public void CheckWindows(Runtime runtime, Jit jit, Platform platform, string exptectedText)
+        [InlineData(Jit.LegacyJit, Platform.X86, OkCaption)]
+        [InlineData(Jit.LegacyJit, Platform.X64, OkCaption)]
+        [InlineData(Jit.RyuJit, Platform.X86, RyuJitNotAvailable)]
+        [InlineData(Jit.RyuJit, Platform.X64, OkCaption)]
+        public void CheckClrOnWindows(Jit jit, Platform platform, string expectedText)
         {
-            Verify(runtime, jit, platform, exptectedText);
+            Verify(Runtime.Clr, jit, platform, expectedText);
         }
+        
+//        [TheoryWindowsOnly("CLR is a valid job only on Windows")]
+//        [InlineData(Jit.LegacyJit, Platform.X86, LegacyJitNotAvailableForMono)]
+//        [InlineData(Jit.LegacyJit, Platform.X64, LegacyJitNotAvailableForMono)]
+//        [InlineData(Jit.RyuJit, Platform.X86, RyuJitNotAvailable)]
+//        [InlineData(Jit.RyuJit, Platform.X64, RyuJitNotAvailable)]
+//        public void CheckMono(Jit jit, Platform platform, string expectedText)
+//        {
+//            Verify(Runtime.Mono, jit, platform, expectedText);
+//        }
 
         [Theory]
-        [MemberData(nameof(DataForCore))]
-        public void CheckCore(Runtime runtime, Jit jit, Platform platform, string exptectedText)
+        [InlineData(Jit.LegacyJit, Platform.X86, ToolchainSupportsOnlyRyuJit)]
+        [InlineData(Jit.LegacyJit, Platform.X64, ToolchainSupportsOnlyRyuJit)]
+        [InlineData(Jit.RyuJit, Platform.X64, OkCaption)]
+        public void CheckCore(Jit jit, Platform platform, string expectedText)
         {
-            Verify(runtime, jit, platform, exptectedText);
+            Verify(Runtime.Core, jit, platform, expectedText);
         }
 
         private void Verify(Runtime runtime, Jit jit, Platform platform, string expectedText)
