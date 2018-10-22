@@ -27,6 +27,8 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
 
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
+            //TODO: For nuget refs i think we need to use the MsBuildArgument/Argument to tell msbuild to fetch nuget refs?
+
             var prefix = RuntimeInformation.IsWindows() ? "" : "#!/bin/bash\n";
             var list = new List<string>();
             if (!RuntimeInformation.IsWindows())
@@ -47,6 +49,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 prefix + string.Join(" ", list));
         }
 
+        //TODO: We need to get nuget dependencies in here somehow
         internal static IEnumerable<Assembly> GetAllReferences(BenchmarkCase benchmarkCase) 
             => benchmarkCase.Descriptor.Type.GetTypeInfo().Assembly
                 .GetReferencedAssemblies()
