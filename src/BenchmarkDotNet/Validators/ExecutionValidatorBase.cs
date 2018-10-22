@@ -95,7 +95,7 @@ namespace BenchmarkDotNet.Validators
             {
                 var result = globalSetupMethods.First().Invoke(benchmarkTypeInstance, null);
 
-                TryGetTaskResult(result);
+                TryToGetTaskResult(result);
             }
             catch (Exception ex)
             {
@@ -109,11 +109,18 @@ namespace BenchmarkDotNet.Validators
             return true;
         }
 
-        private void TryGetTaskResult(object result)
+        private void TryToGetTaskResult(object result)
         {
             if (result == null)
             {
                 return;
+            }
+
+            var returnType = result.GetType();
+            if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(ValueTask<>))
+            {
+                var asTaskMethod = result.GetType().GetMethod("AsTask");
+                result = asTaskMethod.Invoke(result, null);
             }
 
             if (result is Task task)
@@ -123,17 +130,6 @@ namespace BenchmarkDotNet.Validators
             else if (result is ValueTask valueTask)
             {
                 valueTask.GetAwaiter().GetResult();
-            }
-            else
-            {
-                var returnTypeInfo = result.GetType();
-                if (returnTypeInfo.IsGenericType && returnTypeInfo.GetGenericTypeDefinition() == typeof(ValueTask<>))
-                {
-                    var getAwaiterMethod = result.GetType().GetMethod("GetAwaiter");
-                    var genericValueTaskAwaiter = getAwaiterMethod.Invoke(result, null);
-                    var getResultMethod = genericValueTaskAwaiter.GetType().GetMethod("GetResult");
-                    getResultMethod.Invoke(genericValueTaskAwaiter, null);
-                }
             }
         }
 
