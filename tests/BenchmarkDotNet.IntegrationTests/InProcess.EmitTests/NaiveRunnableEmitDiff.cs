@@ -70,8 +70,8 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         {
             var bodyInstructions = method.Body.GetILProcessor().Body.Instructions;
 
-            // There's something wrong with ldloc with index >= 255. The c# compiler emits random nops for them.
-            var compareNops = method.Body.Variables.Count < 255;
+            // There's something wrong with ldloc/ldarg with index >= 255. The c# compiler emits random nops for them.
+            var compareNops = method.Body.Variables.Count < 255 && method.Parameters.Count < 255;
             var result = new List<Instruction>(bodyInstructions.Count);
             foreach (var instruction in bodyInstructions)
             {
@@ -372,12 +372,6 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             var variables1 = method1.Body.Variables.ToList();
             var variables2 = method2.Body.Variables.ToList();
             var diffMax = Math.Min(variables1.Count, variables2.Count);
-
-            var op2ToOp1Map = variables1.Take(diffMax)
-                .Zip(
-                    variables2.Take(diffMax),
-                    (i1, i2) => (i1, i2))
-                .ToDictionary(x => x.i2, x => x.i1);
 
             for (var i = 0; i < diffMax; i++)
             {
