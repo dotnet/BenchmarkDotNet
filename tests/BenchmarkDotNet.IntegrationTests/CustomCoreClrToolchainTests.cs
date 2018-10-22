@@ -9,9 +9,14 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class CustomCoreClrToolchainTests : BenchmarkTestExecutor
     {
+        private const string WeRunTheseTestsForNetCoreOnlyBecauseTheyTakeALotOfTime =
+            "We run it only for .NET Core, it takes too long to run it for all frameworks";
+
         public CustomCoreClrToolchainTests(ITestOutputHelper output) : base(output) { }
 
+        
         [WorkInProgressFact]
+        //[FactDotNetCoreOnly(skipReason: WeRunTheseTestsForNetCoreOnlyBecauseTheyTakeALotOfTime)]
         public void CanBenchmarkGivenCoreFxMyGetBuild()
         {
             var config = ManualConfig.CreateEmpty()
@@ -30,6 +35,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [WorkInProgressFact]
+        //[FactDotNetCoreOnly(skipReason: WeRunTheseTestsForNetCoreOnlyBecauseTheyTakeALotOfTime)]
         public void CanBenchmarkGivenCoreClrMyGetBuild()
         {
             var config = ManualConfig.CreateEmpty()
@@ -48,6 +54,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [WorkInProgressFact]
+        //[FactDotNetCoreOnly(skipReason: WeRunTheseTestsForNetCoreOnlyBecauseTheyTakeALotOfTime)]
         public void CanBenchmarkGivenCoreClrAndCoreFxMyGetBuilds()
         {
             var config = ManualConfig.CreateEmpty()
