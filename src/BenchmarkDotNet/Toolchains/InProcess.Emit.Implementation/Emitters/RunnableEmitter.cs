@@ -858,7 +858,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
              */
             ilBuilder.Emit(OpCodes.Ldarg_0);
             ilBuilder.Emit(OpCodes.Ldfld, notElevenField);
-            ilBuilder.Emit(OpCodes.Ldc_I4_S, 11);
+            ilBuilder.Emit(OpCodes.Ldc_I4_S, (byte)11);
             ilBuilder.Emit(OpCodes.Bne_Un, notElevenLabel);
             {
                 /*
@@ -989,10 +989,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 ?? throw new MissingMemberException(nameof(Random.Next));
 
             ilBuilder.Emit(OpCodes.Ldarg_0);
-            ilBuilder.Emit(OpCodes.Ldc_I4_S, 123);
+            ilBuilder.Emit(OpCodes.Ldc_I4_S, (byte)123);
             ilBuilder.Emit(OpCodes.Newobj, randomCtor);
             ilBuilder.Emit(OpCodes.Ldc_I4_0);
-            ilBuilder.Emit(OpCodes.Ldc_I4_S, 10);
+            ilBuilder.Emit(OpCodes.Ldc_I4_S, (byte)10);
             ilBuilder.Emit(OpCodes.Callvirt, randomNextMethod);
             ilBuilder.Emit(OpCodes.Stfld, notElevenField);
 

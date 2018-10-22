@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
                     ilBuilder.Emit(OpCodes.Stloc_3);
                     break;
                 case var i when i < 255:
-                    ilBuilder.Emit(OpCodes.Stloc_S, local.LocalIndex);
+                    ilBuilder.Emit(OpCodes.Stloc_S, (byte)local.LocalIndex);
                     break;
                 default:
                     ilBuilder.Emit(OpCodes.Stloc, local.LocalIndex);
@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
                     ilBuilder.Emit(OpCodes.Ldloc_3);
                     break;
                 case var i when i < 255:
-                    ilBuilder.Emit(OpCodes.Ldloc_S, local.LocalIndex);
+                    ilBuilder.Emit(OpCodes.Ldloc_S, (byte)local.LocalIndex);
                     break;
                 default:
                     ilBuilder.Emit(OpCodes.Ldloc, local.LocalIndex);
@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
             switch (local.LocalIndex)
             {
                 case var i when i < 255:
-                    ilBuilder.Emit(OpCodes.Ldloca_S, local.LocalIndex);
+                    ilBuilder.Emit(OpCodes.Ldloca_S, (byte)local.LocalIndex);
                     break;
                 default:
                     ilBuilder.Emit(OpCodes.Ldloca, local.LocalIndex);
@@ -108,7 +108,7 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
                     ilBuilder.Emit(OpCodes.Ldarg_3);
                     break;
                 case var i when i < 255:
-                    ilBuilder.Emit(OpCodes.Ldarg_S, position);
+                    ilBuilder.Emit(OpCodes.Ldarg_S, (byte)position);
                     break;
                 default:
                     ilBuilder.Emit(OpCodes.Ldarg, position);

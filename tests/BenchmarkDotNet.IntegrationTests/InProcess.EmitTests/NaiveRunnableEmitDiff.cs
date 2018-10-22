@@ -83,10 +83,10 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         private static void DiffSignature(TypeReference type1, TypeReference type2)
         {
             if (type2 == null)
-                throw new InvalidOperationException($"No matching type for {type1.FullName}");
+                throw new InvalidOperationException($"No matching type for {type1}");
 
             if (!AreSameTypeIgnoreNested(type1, type2))
-                throw new InvalidOperationException($"No matching type for {type1.FullName}");
+                throw new InvalidOperationException($"No matching type for {type1}");
         }
 
         private static void DiffSignature(FieldReference field1, FieldReference field2)
@@ -125,63 +125,64 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
                 throw new InvalidOperationException($"No matching parameter for {parameter1.Name} ({parameter1.Method})");
         }
 
-        private static void DiffSignature(Instruction op1, Instruction op2)
+        private static void DiffSignature(Instruction op1, Instruction op2, MethodDefinition method1)
         {
             if (op1.OpCode != op2.OpCode)
             {
                 if (!AltOpCodes.TryGetValue(op1.OpCode, out var altOpCode1) || altOpCode1 != op2.OpCode)
-                    throw new InvalidOperationException($"No matching op for {op1}.");
+                    throw new InvalidOperationException($"No matching op for {op1} ({method1}).");
             }
             else if (op1.GetSize() != op2.GetSize())
             {
-                throw new InvalidOperationException($"No matching op for {op1}.");
+                throw new InvalidOperationException($"No matching op for {op1} ({method1}).");
             }
 
             if (op1.Operand == null && op2.Operand != null)
-                throw new InvalidOperationException($"No matching op for {op1}.");
+                throw new InvalidOperationException($"No matching op for {op1} ({method1}).");
 
             if (op1.Operand != null && op2.Operand == null)
-                throw new InvalidOperationException($"No matching op for {op1}.");
+                throw new InvalidOperationException($"No matching op for {op1} ({method1}).");
         }
 
-        private static void DiffSignature(VariableDefinition v1, VariableDefinition v2)
+        private static void DiffSignature(VariableDefinition v1, VariableDefinition v2, MethodDefinition method1)
         {
             if (v1.Index != v2.Index)
-                throw new InvalidOperationException($"No matching variable for {v1}.");
+                throw new InvalidOperationException($"No matching variable for {v1} ({method1}).");
 
             if (v1.IsPinned != v2.IsPinned)
-                throw new InvalidOperationException($"No matching variable for {v1}.");
+                throw new InvalidOperationException($"No matching variable for {v1} ({method1}).");
 
             if (!AreSameTypeIgnoreNested(v1.VariableType, v2.VariableType))
-                throw new InvalidOperationException($"No matching variable for {v1}.");
+                throw new InvalidOperationException($"No matching variable for {v1} ({method1}).");
         }
 
         private static void Diff(
             Collection<CustomAttribute> attributes1,
-            Collection<CustomAttribute> attributes2)
+            Collection<CustomAttribute> attributes2,
+            ICustomAttributeProvider owner1)
         {
             var attributes2ByTypeName = attributes2.ToLookup(a => a.AttributeType.FullName);
             foreach (var attribute1 in attributes1)
             {
                 var attribute2 = attributes2ByTypeName[attribute1.AttributeType.FullName].FirstOrDefault();
-                Diff(attribute1, attribute2);
+                Diff(attribute1, attribute2, owner1);
             }
         }
 
-        private static void Diff(CustomAttribute attribute1, CustomAttribute attribute2)
+        private static void Diff(CustomAttribute attribute1, CustomAttribute attribute2, ICustomAttributeProvider owner1)
         {
 
             if (IgnoredAttributeTypeNames.Contains(attribute1.AttributeType.FullName) && attribute2 == null)
                 return;
 
             if (attribute2 == null)
-                throw new InvalidOperationException($"No matching attribute for {attribute1.AttributeType}");
+                throw new InvalidOperationException($"No matching attribute for {attribute1.AttributeType} ({owner1})");
 
             if (!AreSameTypeIgnoreNested(attribute1.AttributeType, attribute2.AttributeType))
-                throw new InvalidOperationException($"No matching attribute for {attribute1.AttributeType}");
+                throw new InvalidOperationException($"No matching attribute for {attribute1.AttributeType} ({owner1})");
 
             if (attribute1.ConstructorArguments.Count != attribute2.ConstructorArguments.Count)
-                throw new InvalidOperationException($"No matching attribute for {attribute1.AttributeType}");
+                throw new InvalidOperationException($"No matching attribute for {attribute1.AttributeType} ({owner1})");
 
             for (int i = 0; i < attribute1.ConstructorArguments.Count; i++)
             {
@@ -189,10 +190,10 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
                 var attArg2 = attribute2.ConstructorArguments[i];
 
                 if (!AreSameTypeIgnoreNested(attArg1.Type, attArg2.Type))
-                    throw new InvalidOperationException($"No matching attribute for {attribute1.AttributeType}");
+                    throw new InvalidOperationException($"No matching attribute for {attribute1.AttributeType} ({owner1})");
 
                 if (!Equals(attArg1.Value, attArg2.Value))
-                    throw new InvalidOperationException($"No matching attribute for {attribute1.AttributeType}");
+                    throw new InvalidOperationException($"No matching attribute for {attribute1.AttributeType} ({owner1})");
             }
         }
 
@@ -201,7 +202,7 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             AssemblyDefinition assemblyDefinition2,
             ILogger logger)
         {
-            Diff(assemblyDefinition1.CustomAttributes, assemblyDefinition2.CustomAttributes);
+            Diff(assemblyDefinition1.CustomAttributes, assemblyDefinition2.CustomAttributes, assemblyDefinition1);
 
             var modules2ByName = assemblyDefinition2.Modules.ToLookup(m => m.Name);
             foreach (var module1 in assemblyDefinition1.Modules)
@@ -216,7 +217,7 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 
         private static void Diff(ModuleDefinition module1, ModuleDefinition module2, ILogger logger)
         {
-            Diff(module1.CustomAttributes, module2.CustomAttributes);
+            Diff(module1.CustomAttributes, module2.CustomAttributes, module1);
 
             foreach (var type1 in module1.Types)
             {
@@ -265,7 +266,7 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             if (type1.Attributes != type2.Attributes)
                 throw new InvalidOperationException($"No matching type for {type1.FullName}");
 
-            Diff(type1.CustomAttributes, type2.CustomAttributes);
+            Diff(type1.CustomAttributes, type2.CustomAttributes, type1);
         }
 
         private static void DiffMembers(TypeDefinition type1, TypeDefinition type2, ILogger logger)
@@ -306,7 +307,7 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             if (field1.Attributes != field2.Attributes)
                 throw new InvalidOperationException($"No matching field for {field1.FullName}");
 
-            Diff(field1.CustomAttributes, field2.CustomAttributes);
+            Diff(field1.CustomAttributes, field2.CustomAttributes, field1);
         }
 
         private static bool Diff(MethodDefinition method1, MethodDefinition method2)
@@ -341,14 +342,14 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 
             Diff(method1.MethodReturnType, method2.MethodReturnType);
 
-            Diff(method1.CustomAttributes, method2.CustomAttributes);
+            Diff(method1.CustomAttributes, method2.CustomAttributes, method1);
         }
 
         private static void Diff(ParameterDefinition parameter1, ParameterDefinition parameter2)
         {
             DiffSignature(parameter1, parameter2);
 
-            Diff(parameter1.CustomAttributes, parameter2.CustomAttributes);
+            Diff(parameter1.CustomAttributes, parameter2.CustomAttributes, parameter1);
         }
 
         private static void Diff(MethodReturnType returnType1, MethodReturnType returnType2)
@@ -359,7 +360,7 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             if (returnType1.Attributes != returnType2.Attributes)
                 throw new InvalidOperationException($"No matching method for {returnType1.Method}");
 
-            Diff(returnType1.CustomAttributes, returnType2.CustomAttributes);
+            Diff(returnType1.CustomAttributes, returnType2.CustomAttributes, returnType1);
         }
 
         private static void DiffBody(MethodDefinition method1, MethodDefinition method2)
@@ -376,7 +377,7 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 
             for (var i = 0; i < diffMax; i++)
             {
-                Diff(instructions1[i], instructions2[i], op2ToOp1Map);
+                Diff(instructions1[i], instructions2[i], method1, op2ToOp1Map);
             }
 
             if (instructions1.Count > diffMax)
@@ -386,9 +387,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
                 throw new InvalidOperationException($"There are additional instructions in {method2}.");
         }
 
-        private static void Diff(Instruction op1, Instruction op2, Dictionary<Instruction, Instruction> op2ToOp1Map)
+        private static void Diff(Instruction op1, Instruction op2, MethodDefinition method1, Dictionary<Instruction, Instruction> op2ToOp1Map)
         {
-            DiffSignature(op1, op2);
+            DiffSignature(op1, op2, method1);
 
             if (op1.Operand == null)
             {
@@ -412,16 +413,16 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             }
             else if (op1.Operand is VariableDefinition v)
             {
-                DiffSignature(v, (VariableDefinition)op2.Operand);
+                DiffSignature(v, (VariableDefinition)op2.Operand, method1);
             }
             else if (op1.Operand is Instruction i)
             {
                 op2ToOp1Map.TryGetValue((Instruction)op2.Operand, out var expectedOp1Operand);
                 if (i != expectedOp1Operand)
-                    throw new InvalidOperationException($"No matching op for {op1}.");
+                    throw new InvalidOperationException($"No matching op for {op1} ({method1}).");
             }
             else if (!Equals(op1.Operand, op2.Operand))
-                throw new InvalidOperationException($"No matching op for {op1}.");
+                throw new InvalidOperationException($"No matching op for {op1} ({method1}).");
         }
     }
 }
