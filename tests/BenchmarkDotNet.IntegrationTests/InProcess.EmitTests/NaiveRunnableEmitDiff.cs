@@ -70,12 +70,12 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         {
             var bodyInstructions = method.Body.GetILProcessor().Body.Instructions;
 
-            // There's something wrong with ldloc with index >= 512. The c# compiler emits random nops for them.
-            var skipNops = method.Body.Variables.Count > 512;
+            // There's something wrong with ldloc with index >= 255. The c# compiler emits random nops for them.
+            var compareNops = method.Body.Variables.Count < 255;
             var result = new List<Instruction>(bodyInstructions.Count);
             foreach (var instruction in bodyInstructions)
             {
-                if (!skipNops || instruction.OpCode != OpCodes.Nop)
+                if (compareNops || instruction.OpCode != OpCodes.Nop)
                     result.Add(instruction);
             }
 

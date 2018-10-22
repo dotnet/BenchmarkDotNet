@@ -109,7 +109,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
              */
             if (ActionKind != RunnableActionKind.Overhead)
             {
-                ilBuilder.Emit(OpCodes.Ldloc, resultLocal);
+                ilBuilder.EmitLdloc(resultLocal);
             }
         }
 

@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
                     ilBuilder.Emit(OpCodes.Stloc_S, (byte)local.LocalIndex);
                     break;
                 default:
-                    ilBuilder.Emit(OpCodes.Stloc, local.LocalIndex);
+                    ilBuilder.Emit(OpCodes.Stloc, checked((short)local.LocalIndex));
                     break;
             }
         }
@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
                     ilBuilder.Emit(OpCodes.Ldloc_S, (byte)local.LocalIndex);
                     break;
                 default:
-                    ilBuilder.Emit(OpCodes.Ldloc, local.LocalIndex);
+                    ilBuilder.Emit(OpCodes.Ldloc, checked((short)local.LocalIndex));
                     break;
             }
         }
@@ -65,7 +65,7 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
                     ilBuilder.Emit(OpCodes.Ldloca_S, (byte)local.LocalIndex);
                     break;
                 default:
-                    ilBuilder.Emit(OpCodes.Ldloca, local.LocalIndex);
+                    ilBuilder.Emit(OpCodes.Ldloca, checked((short)local.LocalIndex));
                     break;
             }
         }
@@ -111,7 +111,7 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
                     ilBuilder.Emit(OpCodes.Ldarg_S, (byte)position);
                     break;
                 default:
-                    ilBuilder.Emit(OpCodes.Ldarg, position);
+                    ilBuilder.Emit(OpCodes.Ldarg, checked((short)position));
                     break;
             }
         }

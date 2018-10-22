@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
                     break;
                 case Type t when t.UseInitObjForReturnDefault():
                     EmitInitObj(ilBuilder, resultType, optionalLocalForInitobj);
-                    ilBuilder.Emit(OpCodes.Ldloc, optionalLocalForInitobj);
+                    ilBuilder.EmitLdloc(optionalLocalForInitobj);
                     break;
                 default:
                     EmitLoadDefaultPrimitive(ilBuilder, resultType);

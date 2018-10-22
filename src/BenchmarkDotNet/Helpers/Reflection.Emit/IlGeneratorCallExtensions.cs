@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
                 if (optionalLocalThis == null)
                     throw new ArgumentNullException(nameof(optionalLocalThis));
 
-                ilBuilder.Emit(OpCodes.Stloc, optionalLocalThis);
+                ilBuilder.EmitStloc(optionalLocalThis);
                 EmitCallCore(ilBuilder, optionalLocalThis, methodToCall, argLocals, forceDirectCall);
             }
             else
