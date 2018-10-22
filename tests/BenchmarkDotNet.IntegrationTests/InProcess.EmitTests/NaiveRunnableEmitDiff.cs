@@ -70,10 +70,12 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         {
             var bodyInstructions = method.Body.GetILProcessor().Body.Instructions;
 
+            // There's something wrong with ldloc with index >= 512. The c# compiler emits random nops for them.
+            var skipNops = method.Body.Variables.Count > 512;
             var result = new List<Instruction>(bodyInstructions.Count);
             foreach (var instruction in bodyInstructions)
             {
-                if (instruction.OpCode != OpCodes.Nop)
+                if (!skipNops || instruction.OpCode != OpCodes.Nop)
                     result.Add(instruction);
             }
 
@@ -319,6 +321,8 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 
             DiffDefinition(method1, method2);
 
+            DiffVariables(method1, method2);
+
             DiffBody(method1, method2);
 
             return true;
@@ -361,6 +365,30 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
                 throw new InvalidOperationException($"No matching method for {returnType1.Method}");
 
             Diff(returnType1.CustomAttributes, returnType2.CustomAttributes, returnType1);
+        }
+
+        private static void DiffVariables(MethodDefinition method1, MethodDefinition method2)
+        {
+            var variables1 = method1.Body.Variables.ToList();
+            var variables2 = method2.Body.Variables.ToList();
+            var diffMax = Math.Min(variables1.Count, variables2.Count);
+
+            var op2ToOp1Map = variables1.Take(diffMax)
+                .Zip(
+                    variables2.Take(diffMax),
+                    (i1, i2) => (i1, i2))
+                .ToDictionary(x => x.i2, x => x.i1);
+
+            for (var i = 0; i < diffMax; i++)
+            {
+                DiffSignature(variables1[i], variables2[i], method1);
+            }
+
+            if (variables1.Count > diffMax)
+                throw new InvalidOperationException($"There are additional variables in {method1}.");
+
+            if (variables2.Count > diffMax)
+                throw new InvalidOperationException($"There are additional variables in {method2}.");
         }
 
         private static void DiffBody(MethodDefinition method1, MethodDefinition method2)
