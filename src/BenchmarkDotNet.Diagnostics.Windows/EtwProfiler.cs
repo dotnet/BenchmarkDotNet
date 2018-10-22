@@ -1,12 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Diagnostics.Windows.Tracing;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -69,7 +72,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             if (!benchmarkToEtlFile.TryGetValue(results.BenchmarkCase, out var traceFilePath))
                 return Array.Empty<Metric>();
 
-            return TraceLogParser.Parse(traceFilePath, benchmarkToCounters[results.BenchmarkCase]);
+            // currently TraceLogParser parsers the counters metrics only. So if there are no counters configured, it makes no sense to parse the file
+            if (!benchmarkToCounters.TryGetValue(results.BenchmarkCase, out var counters) || counters.IsEmpty())
+                return Array.Empty<Metric>();
+
+            return TraceLogParser.Parse(traceFilePath, counters);
         }
 
         public void DisplayResults(ILogger logger)
@@ -107,6 +114,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private void Stop(DiagnoserActionParameters parameters)
         {
+            WaitForDelayedEvents();
+
             try
             {
                 kernelSession.Stop();
@@ -122,5 +131,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         }
 
         private static int GetInterval(ProfileSourceInfo info) => Math.Min(info.MaxInterval, Math.Max(info.MinInterval, info.Interval));
+
+        /// <summary>
+        /// ETW sessions receive events with a slight delay.
+        /// This increases the likelihood that all relevant events are processed by the collection thread by the time we are done with the benchmark.
+        /// </summary>
+        private static void WaitForDelayedEvents() => Thread.Sleep(TimeSpan.FromMilliseconds(500));
     }
 }
