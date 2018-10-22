@@ -2,6 +2,8 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
@@ -84,7 +86,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition)}")
                 .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(buildPartition)}")
                 .ToString();
-            
+
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
         }
 
@@ -99,18 +101,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .GetFileSystemInfos()
                 .Any(fileInfo => fileInfo.Extension == ".sln" || fileInfo.Name == "global.json");
 
-        
 
-        
-        }
+       
 
-        internal static IEnumerable<string> GetNugetPackageCliCommands(BenchmarkCase benchmarkCase, IResolver resolver)
-        {
-            if (!benchmarkCase.Job.HasValue(InfrastructureMode.NugetReferencesCharacteristic))
-                return Enumerable.Empty<string>();
-
-            var nugetRefs = benchmarkCase.Job.ResolveValue(InfrastructureMode.NugetReferencesCharacteristic, resolver).OfType<NugetReference>();
-
-            return nugetRefs.Select(x => $"add package {x.PackageName}{(string.IsNullOrWhiteSpace(x.PackageVersion) ? string.Empty : " -v " + x.PackageVersion)}");
     }
+
+
 }

@@ -18,9 +18,6 @@ namespace BenchmarkDotNet.Jobs
         public string PackageName { get; }
         public string PackageVersion { get; }
 
-        public override string ToString()
-        {
-            return $"{PackageName}{(string.IsNullOrWhiteSpace(PackageVersion) ? string.Empty : $" {PackageVersion}")}";
-        }
+        public override string ToString() => $"{PackageName}{(string.IsNullOrWhiteSpace(PackageVersion) ? string.Empty : $" {PackageVersion}")}";
     }
 }

@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Samples
             public Config()
             {
                 //TODO: So far only implemented with any toolchain using DotNetCliBuilder
-                Add(Job.MediumRun.With(CsProjCoreToolchain.Current.Value).WithNuget("Newtonsoft.Json", "11.0.1").WithId("11.0.1"));
+                Add(Job.MediumRun.With(CsProjCoreToolchain.Current.Value).WithNuget("Newtonsoft.Json", "11.0.2").WithId("11.0.2"));
                 Add(Job.MediumRun.With(CsProjCoreToolchain.Current.Value).WithNuget("Newtonsoft.Json", "10.0.3").WithId("10.0.3"));
                 Add(Job.MediumRun.With(CsProjCoreToolchain.Current.Value).WithNuget("Newtonsoft.Json", "9.0.1").WithId("9.0.1"));
                 Add(Job.MediumRun.With(CsProjCoreToolchain.Current.Value).WithNuget("Newtonsoft.Json", "8.0.1").WithId("8.0.1"));
