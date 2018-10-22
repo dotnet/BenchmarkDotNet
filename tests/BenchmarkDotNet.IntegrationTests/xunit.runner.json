@@ -2,5 +2,7 @@
   "shadowCopy": false,
   "methodDisplay": "method",
   "diagnosticMessages": true,
-  "longRunningTestSeconds": 60
+  "longRunningTestSeconds": 60,
+  "parallelizeAssembly": false,
+  "parallelizeTestCollections": false
 }

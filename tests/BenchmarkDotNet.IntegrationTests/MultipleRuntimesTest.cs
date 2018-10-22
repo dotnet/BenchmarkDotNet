@@ -25,8 +25,7 @@ namespace BenchmarkDotNet.IntegrationTests
             output = outputHelper;
         }
 
-        [WorkInProgressFact]
-        //[FactWindowsOnly("CLR is a valid job only on Windows")]
+        [FactWindowsOnly("CLR is a valid job only on Windows")]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void SingleBenchmarkCanBeExecutedForMultipleRuntimes()
         {
