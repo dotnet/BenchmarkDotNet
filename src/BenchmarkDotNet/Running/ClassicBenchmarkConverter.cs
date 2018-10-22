@@ -24,12 +24,19 @@ namespace BenchmarkDotNet.Running
                 var webRequest = WebRequest.Create(url);
                 using (var response = webRequest.GetResponse())
                 using (var content = response.GetResponseStream())
-                using (var reader = new StreamReader(content))
-                    benchmarkContent = reader.ReadToEnd();
-                if (string.IsNullOrWhiteSpace(benchmarkContent))
                 {
-                    logger.WriteLineHint($"content of '{url}' is empty.");
-                    return Array.Empty<BenchmarkRunInfo>();
+                    if (content == null)
+                    {
+                        logger.WriteLineError("ResponseStream == null");
+                        return Array.Empty<BenchmarkRunInfo>();
+                    }
+                    using (var reader = new StreamReader(content))
+                        benchmarkContent = reader.ReadToEnd();
+                    if (string.IsNullOrWhiteSpace(benchmarkContent))
+                    {
+                        logger.WriteLineHint($"content of '{url}' is empty.");
+                        return Array.Empty<BenchmarkRunInfo>();
+                    }
                 }
             }
             catch (Exception e)
@@ -44,6 +51,8 @@ namespace BenchmarkDotNet.Running
         {
             string benchmarkContent = source;
             var cSharpCodeProvider = new CSharpCodeProvider();
+            string directoryName = Path.GetDirectoryName(typeof(BenchmarkCase).Assembly.Location)
+                ?? throw new DirectoryNotFoundException(typeof(BenchmarkCase).Assembly.Location);
             var compilerParameters = new CompilerParameters(
                 new[]
                 {
@@ -55,7 +64,7 @@ namespace BenchmarkDotNet.Running
                 CompilerOptions = "/unsafe /optimize",
                 GenerateInMemory = false,
                 OutputAssembly = Path.Combine(
-                    Path.GetDirectoryName(typeof(BenchmarkCase).Assembly.Location),
+                    directoryName,
                     $"{Path.GetFileNameWithoutExtension(Path.GetTempFileName())}.dll")
             };
 

@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Helpers
         }
 
         internal static IReadOnlyList<string> RunAndReadOutputLineByLine(string fileName, string arguments = "", 
-            Dictionary<string, string> environmentVariables = null, bool includeErros = false)
+            Dictionary<string, string> environmentVariables = null, bool includeErrors = false)
         {
             var output = new List<string>(20000);
 
@@ -65,7 +65,7 @@ namespace BenchmarkDotNet.Helpers
                 process.OutputDataReceived += (sender, args) => output.Add(args.Data);
                 process.ErrorDataReceived += (sender, args) =>
                 {
-                    if (includeErros)
+                    if (includeErrors)
                         output.Add(args.Data);
                 };
 

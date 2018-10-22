@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Portability
 
         public abstract bool IsVirtualMachine(string manufacturer, string model);
 
-        protected bool ContainsVmIdentifier(string systemInformation, string vmIdentifier)
+        protected static bool ContainsVmIdentifier(string systemInformation, string vmIdentifier)
         {
             return systemInformation != null && systemInformation.ContainsWithIgnoreCase(vmIdentifier);
         }

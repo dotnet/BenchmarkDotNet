@@ -1,5 +1,4 @@
 ﻿using System;
-using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 
@@ -20,9 +19,6 @@ namespace BenchmarkDotNet.Engines
             return engine.RunIteration(new IterationData(mode, stage, index, invokeCount, unrollFactor));
         }
 
-        protected bool ShouldRunAuto(RunMode runMode, Characteristic<int> iterationCount) => !runMode.HasValue(iterationCount);
-
         protected void WriteLine() => engine.WriteLine();
-        protected void WriteLine(string line) => engine.WriteLine(line);
     }
 }

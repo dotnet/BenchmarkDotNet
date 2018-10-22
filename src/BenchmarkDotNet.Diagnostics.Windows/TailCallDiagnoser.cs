@@ -68,6 +68,19 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     }
                 }
             };
+            traceEventSession.Source.Clr.MethodTailCallFailedAnsi += jitData => // this is new event exposed by .NET Core 2.2 https://github.com/dotnet/coreclr/commit/95a9055dbe5f6233f75ee2d7b6194e18cc4977fd
+            {
+                if (ShouldPrintEventInfo(jitData.CallerNamespace, jitData.CalleeNamespace))
+                {
+                    if (StatsPerProcess.TryGetValue(jitData.ProcessID, out object ignored))
+                    {
+                        Logger.WriteLineHelp($"Caller: {jitData.CallerNamespace}.{jitData.CallerName} - {jitData.CallerNameSignature}");
+                        Logger.WriteLineHelp($"Callee: {jitData.CalleeNamespace}.{jitData.CalleeName} - {jitData.CalleeNameSignature}");
+                        Logger.WriteLineError($"Fail Reason: {jitData.FailReason}");
+                        Logger.WriteLineHeader(LogSeparator);
+                    }
+                }
+            };
         }
 
         private bool ShouldPrintEventInfo(string callerNamespace, string calleeNamespace) =>

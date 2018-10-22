@@ -4,15 +4,16 @@ using System.Linq;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Characteristics
 {
     public abstract class CharacteristicSetPresenter
     {
-        public static readonly CharacteristicSetPresenter Default = new DefaultPresenter();
-        public static readonly CharacteristicSetPresenter Display = new DisplayPresenter();
-        public static readonly CharacteristicSetPresenter Folder = new FolderPresenter();
-        public static readonly CharacteristicSetPresenter SourceCode = new SourceCodePresenter();
+        [PublicAPI] public static readonly CharacteristicSetPresenter Default = new DefaultPresenter();
+        [PublicAPI] public static readonly CharacteristicSetPresenter Display = new DisplayPresenter();
+        [PublicAPI] public static readonly CharacteristicSetPresenter Folder = new FolderPresenter();
+        [PublicAPI] public static readonly CharacteristicSetPresenter SourceCode = new SourceCodePresenter();
 
         public abstract string ToPresentation(CharacteristicObject obj);
 

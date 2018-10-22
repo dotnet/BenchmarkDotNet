@@ -207,7 +207,7 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public void InonsistentCustomEquatableImplementationIsDetected()
+        public void InconsistentCustomEquatableImplementationIsDetected()
             => AssertInconsistent<InconsistentCustomEquatableReturnType>();
 
         public class InconsistentCustomEquatableReturnType

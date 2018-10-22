@@ -1,20 +1,22 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Order
 {
+    [SuppressMessage("ReSharper", "ClassWithVirtualMembersNeverInherited.Global")]
     public class DefaultOrderer : IOrderer
     {
         public static readonly IOrderer Instance = new DefaultOrderer();
 
         private readonly IComparer<ParameterInstances> paramsComparer = ParameterComparer.Instance;
         private readonly IComparer<Job> jobComparer = JobComparer.Instance;
-        private readonly IComparer<Descriptor> targetComparer;
         private readonly IComparer<BenchmarkCase> benchmarkComparer;
         private readonly IComparer<IGrouping<string, BenchmarkCase>> logicalGroupComparer;
 
@@ -25,11 +27,12 @@ namespace BenchmarkDotNet.Order
             MethodOrderPolicy methodOrderPolicy = MethodOrderPolicy.Declared)
         {
             this.summaryOrderPolicy = summaryOrderPolicy;
-            targetComparer = new DescriptorComparer(methodOrderPolicy);
+            IComparer<Descriptor> targetComparer = new DescriptorComparer(methodOrderPolicy);
             benchmarkComparer = new BenchmarkComparer(paramsComparer, jobComparer, targetComparer);
             logicalGroupComparer = new LogicalGroupComparer(benchmarkComparer);
         }
 
+        [PublicAPI]
         public virtual IEnumerable<BenchmarkCase> GetExecutionOrder(BenchmarkCase[] benchmarksCase)
         {
             var list = benchmarksCase.ToList();
@@ -50,9 +53,9 @@ namespace BenchmarkDotNet.Order
             switch (summaryOrderPolicy)
             {
                 case SummaryOrderPolicy.FastestToSlowest:
-                    return benchmarksCase.OrderBy(b => summary[b].ResultStatistics.Mean);
+                    return benchmarksCase.OrderBy(b => summary[b]?.ResultStatistics?.Mean ?? 0d);
                 case SummaryOrderPolicy.SlowestToFastest:
-                    return benchmarksCase.OrderByDescending(b => summary[b].ResultStatistics.Mean);
+                    return benchmarksCase.OrderByDescending(b => summary[b]?.ResultStatistics?.Mean ?? 0d);
                 case SummaryOrderPolicy.Method:
                     return benchmarksCase.OrderBy(b => b.Descriptor.WorkloadMethodDisplayInfo);
                 case SummaryOrderPolicy.Declared:
@@ -78,15 +81,22 @@ namespace BenchmarkDotNet.Order
         public string GetLogicalGroupKey(IConfig config, BenchmarkCase[] allBenchmarksCases, BenchmarkCase benchmarkCase)
         {
             var rules = new HashSet<BenchmarkLogicalGroupRule>(config.GetLogicalGroupRules());
-            if (allBenchmarksCases.Any(b => b.Job.Meta.Baseline))
+            bool hasJobBaselines = allBenchmarksCases.Any(b => b.Job.Meta.Baseline);
+            bool hasDescriptorBaselines = allBenchmarksCases.Any(b => b.Descriptor.Baseline);
+            if (hasJobBaselines)
             {
                 rules.Add(BenchmarkLogicalGroupRule.ByMethod);
                 rules.Add(BenchmarkLogicalGroupRule.ByParams);
-            }
-            if (allBenchmarksCases.Any(b => b.Descriptor.Baseline))
+            }            
+            if (hasDescriptorBaselines)
             {
                 rules.Add(BenchmarkLogicalGroupRule.ByJob);
                 rules.Add(BenchmarkLogicalGroupRule.ByParams);
+            }
+            if (hasJobBaselines && hasDescriptorBaselines)
+            {
+                rules.Remove(BenchmarkLogicalGroupRule.ByMethod);
+                rules.Remove(BenchmarkLogicalGroupRule.ByJob);
             }
 
             var keys = new List<string>();            
@@ -95,7 +105,7 @@ namespace BenchmarkDotNet.Order
             if (rules.Contains(BenchmarkLogicalGroupRule.ByJob))
                 keys.Add(benchmarkCase.Job.DisplayInfo);
             if (rules.Contains(BenchmarkLogicalGroupRule.ByParams))
-                keys.Add(benchmarkCase.Parameters.DisplayInfo);
+                keys.Add(benchmarkCase.Parameters.ValueInfo);
             if (rules.Contains(BenchmarkLogicalGroupRule.ByCategory))
                 keys.Add(string.Join(",", benchmarkCase.Descriptor.Categories));
 
@@ -125,22 +135,34 @@ namespace BenchmarkDotNet.Order
                 this.paramsComparer = paramsComparer;
             }
 
-            public int Compare(BenchmarkCase x, BenchmarkCase y) => new[]
+            public int Compare(BenchmarkCase x, BenchmarkCase y)
             {
-                paramsComparer?.Compare(x.Parameters, y.Parameters) ?? 0,
-                jobComparer?.Compare(x.Job, y.Job) ?? 0,
-                targetComparer?.Compare(x.Descriptor, y.Descriptor) ?? 0,
-                string.CompareOrdinal(x.DisplayInfo, y.DisplayInfo)
-            }.FirstOrDefault(c => c != 0);
+                if (x == null && y == null) return 0;
+                if (x != null && y == null) return 1;
+                if (x == null) return -1;
+                return new[]
+                {
+                    paramsComparer?.Compare(x.Parameters, y.Parameters) ?? 0,
+                    jobComparer?.Compare(x.Job, y.Job) ?? 0,
+                    targetComparer?.Compare(x.Descriptor, y.Descriptor) ?? 0,
+                    string.CompareOrdinal(x.DisplayInfo, y.DisplayInfo)
+                }.FirstOrDefault(c => c != 0);
+            }
         }
 
         private class LogicalGroupComparer : IComparer<IGrouping<string, BenchmarkCase>>
         {
-            private IComparer<BenchmarkCase> benchmarkComparer;
+            private readonly IComparer<BenchmarkCase> benchmarkComparer;
 
             public LogicalGroupComparer(IComparer<BenchmarkCase> benchmarkComparer) => this.benchmarkComparer = benchmarkComparer;
 
-            public int Compare(IGrouping<string, BenchmarkCase> x, IGrouping<string, BenchmarkCase> y) => benchmarkComparer.Compare(x.First(), y.First());
+            public int Compare(IGrouping<string, BenchmarkCase> x, IGrouping<string, BenchmarkCase> y)
+            {
+                if (x == null && y == null) return 0;
+                if (x != null && y == null) return 1;
+                if (x == null) return -1;
+                return benchmarkComparer.Compare(x.First(), y.First());
+            }
         }
     }
 }

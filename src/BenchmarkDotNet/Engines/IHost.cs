@@ -1,5 +1,8 @@
-﻿namespace BenchmarkDotNet.Engines
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace BenchmarkDotNet.Engines
 {
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public interface IHost
     {
         void Write(string message);

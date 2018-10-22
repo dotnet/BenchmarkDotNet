@@ -2,9 +2,9 @@
 using System.Collections;
 using System.Text;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Characteristics
 {
@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Characteristics
                     return ToPresentation(collection);
 
                 if (characteristic == EnvironmentMode.AffinityCharacteristic && value is IntPtr intPtr)
-                    return ToPresentation(intPtr);
+                    return intPtr.ToPresentation(Environment.ProcessorCount);
 
                 return ToPresentation(value);
             }
@@ -65,11 +65,7 @@ namespace BenchmarkDotNet.Characteristics
                       ?? value?.ToString()
                       ?? "";
 
-            private static string ToPresentation(IntPtr processorAffinity)
-                => (RuntimeInformation.GetCurrentPlatform() == Platform.X64
-                        ? Convert.ToString(processorAffinity.ToInt64(), 2)
-                        : Convert.ToString(processorAffinity.ToInt32(), 2))
-                   .PadLeft(Environment.ProcessorCount, '0');
+            
         }
 
         private class SourceCodeCharacteristicPresenter : CharacteristicPresenter
@@ -80,9 +76,9 @@ namespace BenchmarkDotNet.Characteristics
             public override string ToPresentation(object characteristicValue, Characteristic characteristic)
             {
                 // TODO: DO NOT hardcode Characteristic suffix
-                var id = characteristic.Id;
-                var type = characteristic.DeclaringType.FullName;
-                var value = SourceCodeHelper.ToSourceCode(characteristicValue);
+                string id = characteristic.Id;
+                string type = characteristic.DeclaringType.FullName;
+                string value = SourceCodeHelper.ToSourceCode(characteristicValue);
                 return $"{type}.{id}Characteristic[job] = {value}";
             }
         }

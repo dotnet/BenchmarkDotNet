@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Attributes
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = true)]
     public class JsonExporterAttribute : ExporterConfigBaseAttribute
     {
-        protected JsonExporterAttribute(IExporter exporter) : base(exporter)
+        private JsonExporterAttribute(IExporter exporter) : base(exporter)
         {
         }
 

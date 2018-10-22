@@ -17,6 +17,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI] public static readonly IToolchain NetCoreApp20 = From(NetCoreAppSettings.NetCoreApp20);
         [PublicAPI] public static readonly IToolchain NetCoreApp21 = From(NetCoreAppSettings.NetCoreApp21);
         [PublicAPI] public static readonly IToolchain NetCoreApp22 = From(NetCoreAppSettings.NetCoreApp22);
+        [PublicAPI] public static readonly IToolchain NetCoreApp30 = From(NetCoreAppSettings.NetCoreApp30);
 
         [PublicAPI] public static readonly Lazy<IToolchain> Current = new Lazy<IToolchain>(() => From(NetCoreAppSettings.GetCurrentVersion()));
 
@@ -26,17 +27,15 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             CustomDotNetCliPath = customDotNetCliPath;
         }
 
-        private string CustomDotNetCliPath { get; }
+        internal string CustomDotNetCliPath { get; }
 
         [PublicAPI]
         public static IToolchain From(NetCoreAppSettings settings)
             => new CsProjCoreToolchain(settings.Name,
-                new CsProjGenerator(settings.TargetFrameworkMoniker, PlatformProvider, settings.RuntimeFrameworkVersion), 
+                new CsProjGenerator(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath, settings.PackagesPath, settings.RuntimeFrameworkVersion), 
                 new DotNetCliBuilder(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath), 
                 new DotNetCliExecutor(settings.CustomDotNetCliPath),
                 settings.CustomDotNetCliPath);
-
-        private static string PlatformProvider(Platform platform) => platform.ToConfig();
 
         public override bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver)
         {
@@ -53,7 +52,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
             if (!string.IsNullOrEmpty(CustomDotNetCliPath) && !File.Exists(CustomDotNetCliPath))
             {
-                logger.WriteLineError($"Povided custom dotnet cli path does not exist, benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
+                logger.WriteLineError($"Provided custom dotnet cli path does not exist, benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
                 return false;
             }
 

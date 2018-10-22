@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes
 {
@@ -7,9 +8,10 @@ namespace BenchmarkDotNet.Attributes
     /// Minimum time of a single iteration. Unlike Run.IterationTime, this characteristic specifies only the lower limit. In case of need, BenchmarkDotNet can increase this value.
     /// The default value is 500 milliseconds.
     /// </summary>
+    [PublicAPI]
     public class MinIterationTimeAttribute : JobMutatorConfigBaseAttribute
     {
-        public MinIterationTimeAttribute(double miliseconds) : base(Job.Default.WithMinIterationTime(TimeInterval.FromMilliseconds(miliseconds)))
+        public MinIterationTimeAttribute(double milliseconds) : base(Job.Default.WithMinIterationTime(TimeInterval.FromMilliseconds(milliseconds)))
         {
         }
     }

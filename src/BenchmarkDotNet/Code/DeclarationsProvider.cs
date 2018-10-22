@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Code
 {
@@ -43,7 +44,7 @@ namespace BenchmarkDotNet.Code
 
         public virtual string WorkloadMethodReturnTypeName => WorkloadMethodReturnType.GetCorrectCSharpTypeName();
 
-        public virtual string WorkloadMethodDelegate => Descriptor.WorkloadMethod.Name;
+        public virtual string WorkloadMethodDelegate(string passArguments) => Descriptor.WorkloadMethod.Name;
 
         public virtual string GetWorkloadMethodCall(string passArguments) => $"{Descriptor.WorkloadMethod.Name}({passArguments})";
 
@@ -56,6 +57,11 @@ namespace BenchmarkDotNet.Code
         public abstract string OverheadImplementation { get; }
 
         public virtual bool UseRefKeyword => false;
+
+        public IEnumerable<string> ArgumentsNamespaces
+            => Descriptor.WorkloadMethod.GetParameters()
+                .Where(arg => !string.IsNullOrEmpty(arg.ParameterType.Namespace))
+                .Select(arg => $"using {arg.ParameterType.Namespace};");
     }
 
     internal class VoidDeclarationsProvider : DeclarationsProvider
@@ -110,7 +116,7 @@ namespace BenchmarkDotNet.Code
         }
 
         public override string ExtraDefines
-            => Consumer.IsConsumable(WorkloadMethodReturnType) || Consumer.HasConsumableField(WorkloadMethodReturnType, out var _)
+            => Consumer.IsConsumable(WorkloadMethodReturnType) || Consumer.HasConsumableField(WorkloadMethodReturnType, out _)
                 ? "#define RETURNS_CONSUMABLE"
                 : "#define RETURNS_NON_CONSUMABLE_STRUCT";
     }
@@ -138,8 +144,8 @@ namespace BenchmarkDotNet.Code
 
         // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
         // and will eventually throw actual exception, not aggregated one
-        public override string WorkloadMethodDelegate
-            => $"() => {{ {Descriptor.WorkloadMethod.Name}().GetAwaiter().GetResult(); }}";
+        public override string WorkloadMethodDelegate(string passArguments)
+            => $"({passArguments}) => {{ {Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult(); }}";
 
         public override string GetWorkloadMethodCall(string passArguments) => $"{Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult()";
 
@@ -157,8 +163,8 @@ namespace BenchmarkDotNet.Code
 
         // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
         // and will eventually throw actual exception, not aggregated one
-        public override string WorkloadMethodDelegate
-            => $"() => {{ return {Descriptor.WorkloadMethod.Name}().GetAwaiter().GetResult(); }}";
+        public override string WorkloadMethodDelegate(string passArguments)
+            => $"({passArguments}) => {{ return {Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult(); }}";
 
         public override string GetWorkloadMethodCall(string passArguments) => $"{Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult()";
     }

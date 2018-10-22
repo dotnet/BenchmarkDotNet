@@ -8,8 +8,8 @@ namespace BenchmarkDotNet.Helpers
     {
         internal static string LoadTemplate(string name)
         {
-            var resourceName = "BenchmarkDotNet.Templates." + name;
-            using (var stream = GetResouceStream(resourceName))
+            string resourceName = "BenchmarkDotNet.Templates." + name;
+            using (var stream = GetResourceStream(resourceName))
             {
                 if (stream == null)
                     throw new Exception($"Resource {resourceName} not found");
@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Helpers
             }
         }
 
-        private static Stream GetResouceStream(string resourceName)
+        private static Stream GetResourceStream(string resourceName)
         {
             return typeof(ResourceHelper).GetTypeInfo().Assembly.GetManifestResourceStream(resourceName);
         }

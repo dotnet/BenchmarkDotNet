@@ -4,6 +4,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.CoreRt;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Running
 {
@@ -22,7 +23,7 @@ namespace BenchmarkDotNet.Running
         public string ProgramName { get; }
 
         /// <summary>
-        /// the benchmarks are groupped by the build settings
+        /// the benchmarks are grouped by the build settings
         /// so you can use this benchmark to get the runtime settings
         /// </summary>
         public BenchmarkCase RepresentativeBenchmarkCase { get; }
@@ -35,10 +36,10 @@ namespace BenchmarkDotNet.Running
 
         public Platform Platform => RepresentativeBenchmarkCase.Job.ResolveValue(EnvironmentMode.PlatformCharacteristic, Resolver);
 
-        public Jit Jit => RepresentativeBenchmarkCase.Job.ResolveValue(EnvironmentMode.JitCharacteristic, Resolver);
+        [PublicAPI] public Jit Jit => RepresentativeBenchmarkCase.Job.ResolveValue(EnvironmentMode.JitCharacteristic, Resolver);
 
         public bool IsCoreRT => Runtime is CoreRtRuntime
-            || (RepresentativeBenchmarkCase.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic) && RepresentativeBenchmarkCase.Job.Infrastructure.Toolchain is CoreRtToolchain); // given job can have CoreRT toolchain set, but Runtime == default ;)
+            || RepresentativeBenchmarkCase.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic) && RepresentativeBenchmarkCase.Job.Infrastructure.Toolchain is CoreRtToolchain; // given job can have CoreRT toolchain set, but Runtime == default ;)
 
         private Runtime Runtime => RepresentativeBenchmarkCase.Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
                 ? RepresentativeBenchmarkCase.Job.Environment.Runtime

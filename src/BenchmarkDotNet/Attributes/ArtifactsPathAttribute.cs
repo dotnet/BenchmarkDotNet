@@ -1,8 +1,10 @@
 ﻿using System;
 using BenchmarkDotNet.Configs;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes
 {
+    [PublicAPI]
     public class ArtifactsPathAttribute : Attribute, IConfigSource
     {
         public string Value { get; }

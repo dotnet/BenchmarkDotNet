@@ -1,29 +1,30 @@
 ﻿using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.Xml;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Exporters
 {
     public static class DefaultExporters
     {
-        public static IExporter AsciiDoc = AsciiDocExporter.Default;
-        public static IExporter Csv = CsvExporter.Default;
-        public static IExporter CsvMeasurements = CsvMeasurementsExporter.Default;
-        public static IExporter Html = HtmlExporter.Default;
-        public static IExporter Markdown = MarkdownExporter.Default;
-        public static IExporter Plain = PlainExporter.Default;
-        public static IExporter RPlot = RPlotExporter.Default;
+        [PublicAPI] public static readonly IExporter AsciiDoc = AsciiDocExporter.Default;
+        [PublicAPI] public static readonly IExporter Csv = CsvExporter.Default;
+        [PublicAPI] public static readonly IExporter CsvMeasurements = CsvMeasurementsExporter.Default;
+        [PublicAPI] public static readonly IExporter Html = HtmlExporter.Default;
+        [PublicAPI] public static readonly IExporter Markdown = MarkdownExporter.Default;
+        [PublicAPI] public static readonly IExporter Plain = PlainExporter.Default;
+        [PublicAPI] public static readonly IExporter RPlot = RPlotExporter.Default;
 
-        public static IExporter Json = JsonExporter.Default;
-        public static IExporter JsonBrief = JsonExporter.Brief;
-        public static IExporter JsonBriefCompressed = JsonExporter.BriefCompressed;
-        public static IExporter JsonFull = JsonExporter.Full;
-        public static IExporter JsonFullCompressed = JsonExporter.FullCompressed;
+        [PublicAPI] public static readonly IExporter Json = JsonExporter.Default;
+        [PublicAPI] public static readonly IExporter JsonBrief = JsonExporter.Brief;
+        [PublicAPI] public static readonly IExporter JsonBriefCompressed = JsonExporter.BriefCompressed;
+        [PublicAPI] public static readonly IExporter JsonFull = JsonExporter.Full;
+        [PublicAPI] public static readonly IExporter JsonFullCompressed = JsonExporter.FullCompressed;
 
-        public static IExporter Xml = XmlExporter.Default;
-        public static IExporter XmlBrief = XmlExporter.Brief;
-        public static IExporter XmlBriefCompressed = XmlExporter.BriefCompressed;
-        public static IExporter XmlFull = XmlExporter.Full;
-        public static IExporter XmlFullCompressed = XmlExporter.FullCompressed;
+        [PublicAPI] public static readonly IExporter Xml = XmlExporter.Default;
+        [PublicAPI] public static readonly IExporter XmlBrief = XmlExporter.Brief;
+        [PublicAPI] public static readonly IExporter XmlBriefCompressed = XmlExporter.BriefCompressed;
+        [PublicAPI] public static readonly IExporter XmlFull = XmlExporter.Full;
+        [PublicAPI] public static readonly IExporter XmlFullCompressed = XmlExporter.FullCompressed;
     }
 }

@@ -3,24 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Loggers;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Extensions
 {
     internal static class ReflectionExtensions
     {
+        [PublicAPI]
         internal static T ResolveAttribute<T>(this Type type) where T : Attribute =>
             type?.GetTypeInfo().GetCustomAttributes(typeof(T), false).OfType<T>().FirstOrDefault();
 
+        [PublicAPI]
         internal static T ResolveAttribute<T>(this MethodInfo methodInfo) where T : Attribute =>
             methodInfo?.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
 
+        [PublicAPI]
         internal static T ResolveAttribute<T>(this PropertyInfo propertyInfo) where T : Attribute =>
             propertyInfo?.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
 
+        [PublicAPI]
         internal static T ResolveAttribute<T>(this FieldInfo fieldInfo) where T : Attribute =>
             fieldInfo?.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
 
+        [PublicAPI]
         internal static bool HasAttribute<T>(this MethodInfo methodInfo) where T : Attribute =>
             methodInfo.ResolveAttribute<T>() != null;
 
@@ -31,17 +36,21 @@ namespace BenchmarkDotNet.Extensions
         /// </summary>
         internal static string GetCorrectCSharpTypeName(this Type type, bool includeNamespace = true, bool includeGenericArgumentsNamespace = true)
         {
-            // the reflection is missing information about types passed by ref (ie ref ValuTuple<int> is reported as NON generic type)
+            if (!type.Name.EndsWith("&"))
+                while (!(type.IsPublic || type.IsNestedPublic) && type.BaseType != null)
+                    type = type.BaseType;
+
+            // the reflection is missing information about types passed by ref (ie ref ValueTuple<int> is reported as NON generic type)
             if (type.IsByRef && !type.IsGenericType && type.Name.Contains('`'))
-                type = type.GetElementType(); // https://github.com/dotnet/corefx/issues/29975#issuecomment-393134330
+                type = type.GetElementType() ?? throw new NullReferenceException(nameof(type.GetElementType)); // https://github.com/dotnet/corefx/issues/29975#issuecomment-393134330
 
             if (type == typeof(void))
                 return "void";
-            var prefix = "";
+            string prefix = "";
             if (!string.IsNullOrEmpty(type.Namespace) && includeNamespace)
                 prefix += type.Namespace + ".";
 
-            var nestedTypes = "";
+            string nestedTypes = "";
             Type child = type, parent = type.DeclaringType;
             while (child.IsNested && parent != null)
             {
@@ -57,7 +66,7 @@ namespace BenchmarkDotNet.Extensions
                 return type.Name;
             if (type.GetTypeInfo().IsGenericType)
             {
-                var mainName = type.Name.Substring(0, type.Name.IndexOf('`'));
+                string mainName = type.Name.Substring(0, type.Name.IndexOf('`'));
                 string args = string.Join(", ", type.GetGenericArguments().Select(T => GetCorrectCSharpTypeName(T, includeGenericArgumentsNamespace, includeGenericArgumentsNamespace)).ToArray());
                 return $"{prefix}{mainName}<{args}>";
             }
@@ -76,12 +85,12 @@ namespace BenchmarkDotNet.Extensions
         /// <summary>
         /// returns simple, human friendly display name
         /// </summary>
-        internal static string GetDisplayName(this TypeInfo typeInfo)
+        private static string GetDisplayName(this TypeInfo typeInfo)
         {
             if (!typeInfo.IsGenericType)
                 return typeInfo.Name;
 
-            var mainName = typeInfo.Name.Substring(0, typeInfo.Name.IndexOf('`'));
+            string mainName = typeInfo.Name.Substring(0, typeInfo.Name.IndexOf('`'));
             string args = string.Join(", ", typeInfo.GetGenericArguments().Select(GetDisplayName).ToArray());
             return $"{mainName}<{args}>";
         }
@@ -134,13 +143,13 @@ namespace BenchmarkDotNet.Extensions
             if (typeInfo.IsAbstract 
                 || typeInfo.IsSealed 
                 || typeInfo.IsNotPublic 
-                || (typeInfo.IsGenericType && !IsRunnableGenericType(typeInfo)))
+                || typeInfo.IsGenericType && !IsRunnableGenericType(typeInfo))
                 return false;
 
             return typeInfo.GetBenchmarks().Any();
         }
 
-        internal static MethodInfo[] GetBenchmarks(this TypeInfo typeInfo)
+        private static MethodInfo[] GetBenchmarks(this TypeInfo typeInfo)
             => typeInfo
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public)
                 .Where(method => method.GetCustomAttributes(true).OfType<BenchmarkAttribute>().Any())
@@ -179,7 +188,7 @@ namespace BenchmarkDotNet.Extensions
                 return false;
             
             // IsByRefLikeAttribute is not exposed for older runtimes, so we need to check it in an ugly way ;)
-            var isByRefLike = argumentType.GetCustomAttributes().Any(attribute => attribute.ToString().Contains("IsByRefLike"));
+            bool isByRefLike = argumentType.GetCustomAttributes().Any(attribute => attribute.ToString().Contains("IsByRefLike"));
             if (!isByRefLike)
                 return false;
 
@@ -198,7 +207,7 @@ namespace BenchmarkDotNet.Extensions
 
         private static bool IsRunnableGenericType(TypeInfo typeInfo)
             => // if it is an open generic - there must be GenericBenchmark attributes
-                (!typeInfo.IsGenericTypeDefinition || (typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any()))
+                (!typeInfo.IsGenericTypeDefinition || typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any())
                     && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it       
 
     }

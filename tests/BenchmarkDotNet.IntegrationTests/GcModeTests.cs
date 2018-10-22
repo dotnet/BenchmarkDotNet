@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.IntegrationTests
             CanExecute<WorkstationGcOnly>(config);
         }
 
-        [Fact(Skip = "It fails on appveyor")]
+        [Fact]
         public void CanEnableServerGcMode()
         {
             var config = CreateConfig(new GcMode { Server = true });

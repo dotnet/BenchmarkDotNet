@@ -1,4 +1,6 @@
-﻿namespace BenchmarkDotNet.Loggers
+﻿using JetBrains.Annotations;
+
+namespace BenchmarkDotNet.Loggers
 {
     public static class LoggerExtensions
     {
@@ -20,10 +22,12 @@
 
         public static void Write(this ILogger logger, string text) =>  logger.Write(LogKind.Default, text);
 
+        [PublicAPI]
         public static void WriteHelp(this ILogger logger, string text) => logger.Write(LogKind.Help, text);
 
         public static void WriteHeader(this ILogger logger, string text) => logger.Write(LogKind.Header, text);
 
+        [PublicAPI]
         public static void WriteResult(this ILogger logger, string text) => logger.Write(LogKind.Result, text);
 
         public static void WriteStatistic(this ILogger logger, string text) => logger.Write(LogKind.Statistic, text);
@@ -32,6 +36,7 @@
 
         public static void WriteError(this ILogger logger, string text) => logger.Write(LogKind.Error, text);
 
+        [PublicAPI]
         public static void WriteHint(this ILogger logger, string text) => logger.Write(LogKind.Hint, text);
     }
 }

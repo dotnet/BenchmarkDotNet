@@ -1,41 +1,54 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Globalization;
+using System.Numerics;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 using SimpleJson.Reflection;
 
 namespace BenchmarkDotNet.Helpers
 {
-    public class SourceCodeHelper
+    public static class SourceCodeHelper
     {
         public static string ToSourceCode(object value)
         {
-            if (value == null)
-                return "null";
-            if (value is bool)
-                return ((bool) value).ToLowerCase();
-            if (value is string text)
-                return $"$@\"{text.Replace("\"", "\"\"").Replace("{", "{{").Replace("}", "}}")}\"";
-            if (value is char)
-                return (char) value == '\\' ? "'\\\\'" : $"'{value}'";
-            if (value is float)
-                return ((float) value).ToString("G", CultureInfo.InvariantCulture) + "f";
-            if (value is double)
-                return ((double) value).ToString("G", CultureInfo.InvariantCulture) + "d";
-            if (value is decimal)
-                return ((decimal) value).ToString("G", CultureInfo.InvariantCulture) + "m";
+            switch (value) {
+                case null:
+                    return "null";
+                case bool b:
+                    return b.ToLowerCase();
+                case string text:
+                    return $"$@\"{text.Replace("\"", "\"\"").Replace("{", "{{").Replace("}", "}}")}\"";
+                case char c:
+                    return c == '\\' ? "'\\\\'" : $"'{value}'";
+                case float f:
+                    return ToSourceCode(f);
+                case double d:
+                    return ToSourceCode(d);
+                case decimal f:
+                    return f.ToString("G", CultureInfo.InvariantCulture) + "m";
+                case BigInteger bigInteger:
+                    return $"System.Numerics.BigInteger.Parse(\"{bigInteger.ToString(CultureInfo.InvariantCulture)}\", System.Globalization.CultureInfo.InvariantCulture)";
+                case DateTime dateTime:
+                    return $"System.DateTime.Parse(\"{dateTime.ToString(CultureInfo.InvariantCulture)}\", System.Globalization.CultureInfo.InvariantCulture)";
+            }
+
             if (ReflectionUtils.GetTypeInfo(value.GetType()).IsEnum)
                 return value.GetType().GetCorrectCSharpTypeName() + "." + value;
-            if (value is Type)
-                return "typeof(" + ((Type) value).GetCorrectCSharpTypeName() + ")";
+            if (value is Type type)
+                return "typeof(" + type.GetCorrectCSharpTypeName() + ")";
             if (!ReflectionUtils.GetTypeInfo(value.GetType()).IsValueType)
                 return "System.Activator.CreateInstance<" + value.GetType().GetCorrectCSharpTypeName() + ">()";
-            if (value is TimeInterval)
-                return "new BenchmarkDotNet.Horology.TimeInterval(" + ToSourceCode(((TimeInterval)value).Nanoseconds) + ")";
-            if (value is IntPtr)
-                return $"new System.IntPtr({value})";
-            if (value is IFormattable)
-                return ((IFormattable)value).ToString(null, CultureInfo.InvariantCulture);
+            
+            switch (value) {
+                case TimeInterval interval:
+                    return "new BenchmarkDotNet.Horology.TimeInterval(" + ToSourceCode(interval.Nanoseconds) + ")";
+                case IntPtr ptr:
+                    return $"new System.IntPtr({ptr})";
+                case IFormattable formattable:
+                    return formattable.ToString(null, CultureInfo.InvariantCulture);
+            }
+
             return value.ToString();
         }
 
@@ -44,6 +57,14 @@ namespace BenchmarkDotNet.Helpers
 
         public static bool IsCompilationTimeConstant(Type type)
         {
+            if (type == typeof(long) || type == typeof(ulong))
+                return true;
+            if (type == typeof(int) || type == typeof(uint))
+                return true;
+            if (type == typeof(short) || type == typeof(ushort))
+                return true;
+            if (type == typeof(byte) || type == typeof(sbyte))
+                return true;
             if (type == typeof(bool))
                 return true;
             if (type == typeof(string))
@@ -60,16 +81,54 @@ namespace BenchmarkDotNet.Helpers
                 return true;
             if (type == typeof(Type))
                 return true;
-            if (!type.IsValueType) // the difference!!
-                return false;
             if (type == typeof(TimeInterval))
                 return true;
             if (type == typeof(IntPtr))
                 return true;
-            if (typeof(IFormattable).IsAssignableFrom(type))
+            if (type == typeof(DateTime))
                 return true;
+            if (!type.IsValueType) // the difference!!
+                return false;
+            if (typeof(IFormattable).IsAssignableFrom(type))
+                return false;
 
             return false;
+        }
+
+        private static string ToSourceCode(double value)
+        {
+            if (double.IsNaN(value))
+                return "double.NaN";
+            if (double.IsPositiveInfinity(value))
+                return "double.PositiveInfinity";
+            if (double.IsNegativeInfinity(value))
+                return "double.NegativeInfinity";
+            if (value == double.Epsilon)
+                return "double.Epsilon";
+            if (value == double.MaxValue)
+                return "double.MaxValue";
+            if (value == double.MinValue)
+                return "double.MinValue";
+            
+            return value.ToString("G", CultureInfo.InvariantCulture) + "d";
+        }
+
+        private static string ToSourceCode(float value)
+        {
+            if (float.IsNaN(value))
+                return "float.NaN";
+            if (float.IsPositiveInfinity(value))
+                return "float.PositiveInfinity";
+            if (float.IsNegativeInfinity(value))
+                return "float.NegativeInfinity";
+            if (value == float.Epsilon)
+                return "float.Epsilon";
+            if (value == float.MaxValue)
+                return "float.MaxValue";
+            if (value == float.MinValue)
+                return "float.MinValue";
+            
+            return value.ToString("G", CultureInfo.InvariantCulture) + "f";
         }
     }
 }

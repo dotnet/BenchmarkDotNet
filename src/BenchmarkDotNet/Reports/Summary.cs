@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
+#if !NETCOREAPP2_1
+using BenchmarkDotNet.Extensions;
+#endif
 
 namespace BenchmarkDotNet.Reports
 {
@@ -18,19 +19,20 @@ namespace BenchmarkDotNet.Reports
         public string Title { get; }
         public BenchmarkCase[] BenchmarksCases { get; }
         public BenchmarkReport[] Reports { get; }
-        public ISummaryStyle Style { get; }
+        [PublicAPI] public ISummaryStyle Style { get; }
         public HostEnvironmentInfo HostEnvironmentInfo { get; }
         public IConfig Config { get; }
         public string ResultsDirectoryPath { get; }
         public SummaryTable Table { get; }
-        public TimeSpan TotalTime { get; }
-        public ValidationError[] ValidationErrors { get; }
+        [PublicAPI] public TimeSpan TotalTime { get; }
+        [PublicAPI] public ValidationError[] ValidationErrors { get; }
         public string AllRuntimes { get; }
 
         private readonly Dictionary<BenchmarkCase, BenchmarkReport> reportMap = new Dictionary<BenchmarkCase, BenchmarkReport>();
         private readonly IOrderer orderer;
+        private readonly BaseliningStrategy baseliningStrategy;
 
-        public bool HasReport(BenchmarkCase benchmarkCase) => reportMap.ContainsKey(benchmarkCase);
+        [PublicAPI] public bool HasReport(BenchmarkCase benchmarkCase) => reportMap.ContainsKey(benchmarkCase);
 
         /// <summary>
         /// Returns a report for the given benchmark or null if there is no a corresponded report.
@@ -38,9 +40,6 @@ namespace BenchmarkDotNet.Reports
         public BenchmarkReport this[BenchmarkCase benchmarkCase] => reportMap.GetValueOrDefault(benchmarkCase);
 
         public bool HasCriticalValidationErrors => ValidationErrors.Any(validationError => validationError.IsCritical);
-
-        [CanBeNull]
-        public string GetLogicalGroupKey(BenchmarkCase benchmarkCase) => orderer.GetLogicalGroupKey(Config, BenchmarksCases, benchmarkCase);
 
         public int GetNumberOfExecutedBenchmarks() => Reports.Count(report => report.ExecuteResults.Any(result => result.FoundExecutable));
 
@@ -58,12 +57,13 @@ namespace BenchmarkDotNet.Reports
             Reports = BenchmarksCases.Select(b => reportMap[b]).ToArray();
 
             orderer = config.GetOrderer() ?? DefaultOrderer.Instance;
+            baseliningStrategy = BaseliningStrategy.Create(BenchmarksCases); 
             BenchmarksCases = orderer.GetSummaryOrder(BenchmarksCases, this).ToArray();
             Reports = BenchmarksCases.Select(b => reportMap[b]).ToArray();
 
             Style = config.GetSummaryStyle();
             Table = GetTable(Style);
-            AllRuntimes = BuildAllRuntimes();
+            AllRuntimes = BuildAllRuntimes(HostEnvironmentInfo, Reports);
         }
 
         private Summary(string title,
@@ -117,15 +117,14 @@ namespace BenchmarkDotNet.Reports
                 clockSpan.GetTimeSpan(),
                 summaries.SelectMany(summary => summary.ValidationErrors).ToArray());
 
-        private string BuildAllRuntimes()
+        internal static string BuildAllRuntimes(HostEnvironmentInfo hostEnvironmentInfo, BenchmarkReport[] reports)
         {
             var jobRuntimes = new Dictionary<string, string>(); // JobId -> Runtime
-            var orderedJobs = new List<string>();
+            var orderedJobs = new List<string> { "[Host]" };
 
-            orderedJobs.Add("[Host]");
-            jobRuntimes["[Host]"] = HostEnvironmentInfo.GetRuntimeInfo();
+            jobRuntimes["[Host]"] = hostEnvironmentInfo.GetRuntimeInfo();
 
-            foreach (var benchmarkReport in Reports)
+            foreach (var benchmarkReport in reports)
             {
                 string runtime = benchmarkReport.GetRuntimeInfo();
                 if (runtime != null)
@@ -145,5 +144,28 @@ namespace BenchmarkDotNet.Reports
             var lines = orderedJobs.Select(jobId => $"  {jobId.PadRight(jobIdMaxWidth)} : {jobRuntimes[jobId]}");
             return string.Join(Environment.NewLine, lines);
         }
+        
+        [CanBeNull]
+        public string GetLogicalGroupKey(BenchmarkCase benchmarkCase) => orderer.GetLogicalGroupKey(Config, BenchmarksCases, benchmarkCase);
+        
+        public bool IsBaseline(BenchmarkCase benchmarkCase) => baseliningStrategy.IsBaseline(benchmarkCase);
+
+        [CanBeNull]
+        public BenchmarkCase GetBaseline(string logicalGroupKey)
+        {
+            return BenchmarksCases
+                .Where(b => GetLogicalGroupKey(b) == logicalGroupKey)
+                .FirstOrDefault(IsBaseline);
+        }
+        
+        [NotNull]
+        public IEnumerable<BenchmarkCase> GetNonBaselines(string logicalGroupKey)
+        {
+            return BenchmarksCases
+                .Where(b => GetLogicalGroupKey(b) == logicalGroupKey)
+                .Where(b => !IsBaseline(b));
+        }
+
+        public bool HasBaselines() => BenchmarksCases.Any(IsBaseline);
     }
 }

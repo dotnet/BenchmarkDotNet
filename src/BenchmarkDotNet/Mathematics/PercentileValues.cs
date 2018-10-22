@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Mathematics
 {
@@ -12,14 +13,14 @@ namespace BenchmarkDotNet.Mathematics
         /// Calculates the Nth percentile from the set of values
         /// </summary>
         /// <remarks>
-        /// The implementation is expected to be consitent with the one from Excel.
+        /// The implementation is expected to be consistent with the one from Excel.
         /// It's a quite common to export bench output into .csv for further analysis 
         /// And it's a good idea to have same results from all tools being used.
         /// </remarks>
         /// <param name="sortedValues">Sequence of the values to be calculated</param>
         /// <param name="percentile">Value in range 0..100</param>
         /// <returns>Percentile from the set of values</returns>
-        // BASEDON: http://stackoverflow.com/a/8137526
+        // Based on: http://stackoverflow.com/a/8137526
         private static double Percentile(List<double> sortedValues, int percentile)
         {
             if (sortedValues == null)
@@ -42,11 +43,10 @@ namespace BenchmarkDotNet.Mathematics
             double frac = realIndex - index;
             if (index + 1 < sortedValues.Count)
                 return sortedValues[index] * (1 - frac) + sortedValues[index + 1] * frac;
-            else
-                return sortedValues[index];
+            return sortedValues[index];
         }
 
-        public double Percentile(int percentile) => Percentile(SortedValues, percentile);
+        [PublicAPI] public double Percentile(int percentile) => Percentile(SortedValues, percentile);
 
         private List<double> SortedValues { get; }
 
@@ -76,8 +76,8 @@ namespace BenchmarkDotNet.Mathematics
             P100 = Percentile(100);
         }
 
-        public string ToStr(bool showLevel = true) => $"[P95: {P95.ToStr()}] [P0: {P0.ToStr()}]; [P50: {P50.ToStr()}]; [P100: {P100.ToStr()}]";
-        public string ToTimeStr(TimeUnit unit = null, bool showLevel = true, Encoding encoding = null)
+        public string ToStr() => $"[P95: {P95.ToStr()}] [P0: {P0.ToStr()}]; [P50: {P50.ToStr()}]; [P100: {P100.ToStr()}]";
+        [PublicAPI] public string ToTimeStr(TimeUnit unit = null, Encoding encoding = null)
         {
             encoding = encoding ?? Encoding.ASCII;
             return $"[P95: {P95.ToTimeStr(unit, encoding)}] [P0: {P0.ToTimeStr(unit, encoding)}]; [P50: {P50.ToTimeStr(unit, encoding)}]; [P100: {P100.ToTimeStr(unit, encoding)})]";

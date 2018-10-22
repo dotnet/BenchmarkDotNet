@@ -1,12 +1,12 @@
-using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.CsProj;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.CsProj;
 
 namespace BenchmarkDotNet.Toolchains.CustomCoreClr
 {
@@ -19,12 +19,12 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         internal const string LocalCoreClrPackagesBin = "localCoreClrPackagesBin";
         internal const string LocalCoreClrPackages = "localCoreClrPackages";
         internal const string CoreClrNuGetFeed = "coreClrNuGetFeed";
-        internal const string LocalCoreFxPacakgesBin = "localCoreFxPacakgesBin";
+        internal const string LocalCoreFxPackagesBin = "localCoreFxPacakgesBin";
         internal const string CoreFxNuGetFeed = "coreFxNuGetFeed";
 
         internal Generator(string coreClrVersion, string coreFxVersion, string runtimeFrameworkVersion, string targetFrameworkMoniker,
-            string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag, bool useTempFolderForRestore)
-            : base(targetFrameworkMoniker, platfrom => platfrom.ToConfig(), runtimeFrameworkVersion)
+            string runtimeIdentifier, string cliPath, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag, bool useTempFolderForRestore)
+            : base(targetFrameworkMoniker, cliPath, GetPackagesDirectoryPath(useTempFolderForRestore), runtimeFrameworkVersion)
         {
             this.coreClrVersion = coreClrVersion;
             this.coreFxVersion = coreFxVersion;
@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         private readonly bool useTempFolderForRestore;
 
         private bool IsUsingCustomCoreClr => feeds.ContainsKey(LocalCoreClrPackagesBin) || feeds.ContainsKey(CoreClrNuGetFeed);
-        private bool IsUsingCustomCoreFx => feeds.ContainsKey(LocalCoreFxPacakgesBin) || feeds.ContainsKey(CoreFxNuGetFeed);
+        private bool IsUsingCustomCoreFx => feeds.ContainsKey(LocalCoreFxPackagesBin) || feeds.ContainsKey(CoreFxNuGetFeed);
 
         protected override string GetExecutableExtension() => RuntimeInformation.ExecutableExtension;
 
@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         // to avoid this https://github.com/dotnet/coreclr/blob/master/Documentation/workflow/UsingDotNetCli.md#update-coreclr-using-runtime-nuget-package
         // some of the packages are going to contain source code, so they can not be in the subfolder of current solution
         // otherwise they would be compiled too (new .csproj include all .cs files from subfolders by default
-        protected override string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath)
+        private static string GetPackagesDirectoryPath(bool useTempFolderForRestore)
             => useTempFolderForRestore
                 ? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString())
                 : null;

@@ -12,6 +12,8 @@
   href: IntroArrayParam.md
 - name: IntroBenchmarkBaseline
   href: IntroBenchmarkBaseline.md
+- name: IntroRatioSD
+  href: IntroRatioSD.md
 - name: IntroCategoryBaseline
   href: IntroCategoryBaseline.md
 - name: IntroJobBaseline
@@ -70,8 +72,6 @@
   href: IntroExportXml.md
 - name: IntroTagColumn
   href: IntroTagColumn.md
-- name: IntroCommandStyle
-  href: IntroCommandStyle.md
 - name: IntroConfigSource
   href: IntroConfigSource.md
 - name: IntroConfigUnion
@@ -88,3 +88,5 @@
   href: IntroOrderManual.md
 - name: IntroGenericTypeArguments
   href: IntroGenericTypeArguments.md
+- name: IntroDeferredExecution
+  href: IntroDeferredExecution.md

@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Exporters.Xml
         private readonly bool indentXml;
         private readonly bool excludeMeasurements;
 
-        public XmlExporterBase(bool indentXml = false, bool excludeMeasurements = false)
+        protected XmlExporterBase(bool indentXml = false, bool excludeMeasurements = false)
         {
             this.indentXml = indentXml;
             this.excludeMeasurements = excludeMeasurements;
@@ -22,9 +22,9 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
-            IXmlSerializer serializer = BuildSerializer(summary);
+            var serializer = BuildSerializer(summary);
 
-            // Use custom UTF-8 stringwriter because the default writes UTF-16
+            // Use custom UTF-8 StringWriter because the default writes UTF-16
             var stringBuilder = new StringBuilder();
             using (var textWriter = new Utf8StringWriter(stringBuilder))
             {
@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         private IXmlSerializer BuildSerializer(Summary summary)
         {
-            XmlSerializer.XmlSerializerBuilder builder =
+            var builder =
                 XmlSerializer.GetBuilder(typeof(SummaryDto))
                                .WithRootName(nameof(Summary))
                                .WithCollectionItemName(nameof(BenchmarkReportDto.Measurements),

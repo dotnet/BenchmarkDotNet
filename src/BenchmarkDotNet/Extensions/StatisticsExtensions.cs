@@ -2,13 +2,15 @@
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Mathematics.Histograms;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Extensions
 {
     public static class StatisticsExtensions
     {
-        private static string NullSummaryMessage = "<Empty statistic (N=0)>";
+        private const string NullSummaryMessage = "<Empty statistic (N=0)>";
 
+        [PublicAPI]
         public static string ToStr(this Statistics s)
         {
             if (s == null)
@@ -25,6 +27,7 @@ namespace BenchmarkDotNet.Extensions
             return builder.ToString();
         }
 
+        [PublicAPI]
         public static string ToTimeStr(this Statistics s, Encoding encoding, TimeUnit unit = null, bool calcHistogram = false)
         {
             if (s == null)

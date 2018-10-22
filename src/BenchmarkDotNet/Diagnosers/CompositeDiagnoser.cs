@@ -5,9 +5,10 @@ using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Diagnosers
@@ -28,20 +29,17 @@ namespace BenchmarkDotNet.Diagnosers
         public IEnumerable<IAnalyser> Analysers
             => diagnosers.SelectMany(diagnoser => diagnoser.Analysers);
 
-        public IColumnProvider GetColumnProvider() 
-            => new CompositeColumnProvider(diagnosers.Select(d => d.GetColumnProvider()).ToArray());
-
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
             => diagnosers.ForEach(diagnoser => diagnoser.Handle(signal, parameters));
 
-        public void ProcessResults(DiagnoserResults results)
-            => diagnosers.ForEach(diagnoser => diagnoser.ProcessResults(results));
+        public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
+            => diagnosers.SelectMany(diagnoser => diagnoser.ProcessResults(results));
 
         public void DisplayResults(ILogger logger)
         {
             foreach (var diagnoser in diagnosers)
             {
-                // TODO when Diagnosers/Diagnostis are wired up properly, instead of the Type name, 
+                // TODO when Diagnosers/Diagnostics are wired up properly, instead of the Type name, 
                 // print the name used on the cmd line, i.e. -d=<NAME>
                 logger.WriteLineHeader($"// * Diagnostic Output - {diagnoser.GetType().Name} *");
                 diagnoser.DisplayResults(logger);

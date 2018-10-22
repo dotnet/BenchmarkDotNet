@@ -9,7 +9,7 @@ using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.Running
 {
-    public class BenchmarkPartitioner
+    public static class BenchmarkPartitioner
     {
         public static BuildPartition[] CreateForBuild(BenchmarkRunInfo[] supportedBenchmarks, IResolver resolver)
             => supportedBenchmarks
@@ -26,8 +26,12 @@ namespace BenchmarkDotNet.Running
 
             public bool Equals(BenchmarkCase x, BenchmarkCase y)
             {
-                Job jobX = x.Job;
-                Job jobY = y.Job;
+                if (x == null && y == null)
+                    return true;
+                if (x == null || y == null)
+                    return false;
+                var jobX = x.Job;
+                var jobY = y.Job;
 
                 if (AreDifferent(GetRuntime(jobX), GetRuntime(jobY))) // Mono vs .NET vs Core
                     return false;
@@ -82,12 +86,12 @@ namespace BenchmarkDotNet.Running
                 return hashCode;
             }
 
-            private Runtime GetRuntime(Job job)
+            private static Runtime GetRuntime(Job job)
                 => job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
                     ? job.Environment.Runtime
                     : Current;
 
-            private bool AreDifferent(object x, object y)
+            private static bool AreDifferent(object x, object y)
             {
                 if (x == null && y == null)
                     return false;
@@ -97,7 +101,7 @@ namespace BenchmarkDotNet.Running
                 return !x.Equals(y);
             }
 
-            private bool AreDifferent(IReadOnlyList<Argument> x, IReadOnlyList<Argument> y)
+            private static bool AreDifferent(IReadOnlyList<Argument> x, IReadOnlyList<Argument> y)
             {
                 if (x == null && y == null)
                     return false;

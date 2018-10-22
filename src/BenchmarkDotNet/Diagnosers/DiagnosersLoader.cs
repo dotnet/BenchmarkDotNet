@@ -11,22 +11,22 @@ namespace BenchmarkDotNet.Diagnosers
 {
     internal static class DiagnosersLoader
     {
-        const string DiagnosticAssemblyFileName = "BenchmarkDotNet.Diagnostics.Windows.dll";
-        const string DiagnosticAssemblyName = "BenchmarkDotNet.Diagnostics.Windows";
+        private const string DiagnosticAssemblyFileName = "BenchmarkDotNet.Diagnostics.Windows.dll";
+        private const string DiagnosticAssemblyName = "BenchmarkDotNet.Diagnostics.Windows";
 
         // Make the Diagnosers lazy-loaded, so they are only instantiated if needed
-        internal static readonly Lazy<IDiagnoser[]> LazyLoadedDiagnosers 
+        private static readonly Lazy<IDiagnoser[]> LazyLoadedDiagnosers 
             = new Lazy<IDiagnoser[]>(LoadDiagnosers, LazyThreadSafetyMode.ExecutionAndPublication);
 
         internal static IDiagnoser GetImplementation<TDiagnoser>() where TDiagnoser : IDiagnoser
             => LazyLoadedDiagnosers.Value
-                .SingleOrDefault(diagnoser => diagnoser is TDiagnoser)
+                    .FirstOrDefault(diagnoser => diagnoser is TDiagnoser) // few diagnosers can implement same interface, order matters
                 ?? GetUnresolvedDiagnoser<TDiagnoser>();
-
-        internal static IDiagnoser GetImplementation<TDiagnoser, TConfig>(TConfig config) where TDiagnoser : IConfigurableDiagnoser<TConfig>
+        
+        internal static IDiagnoser GetImplementation<TDiagnoser>(Predicate<TDiagnoser> filter) where TDiagnoser : IDiagnoser
             => LazyLoadedDiagnosers.Value
-                .OfType<TDiagnoser>().SingleOrDefault()?.Configure(config)
-                ?? GetUnresolvedDiagnoser<TDiagnoser>();
+                    .FirstOrDefault(diagnoser => diagnoser is TDiagnoser typed && filter(typed)) // few diagnosers can implement same interface, order matters
+               ?? GetUnresolvedDiagnoser<TDiagnoser>();
 
         private static IDiagnoser GetUnresolvedDiagnoser<TDiagnoser>() => new UnresolvedDiagnoser(typeof(TDiagnoser));
 
@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Diagnosers
             if (RuntimeInformation.IsFullFramework)
                 return LoadClassic();
 
-            // we can try to load `BenchmarkDotNet.Diagnostics.Windows` on Windows because it's using a .NET Standard compatibile EventTrace lib now
+            // we can try to load `BenchmarkDotNet.Diagnostics.Windows` on Windows because it's using a .NET Standard compatible EventTrace lib now
             if (RuntimeInformation.IsWindows())
                 return LoadClassic();
 
@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 // this method should return a IHardwareCountersDiagnoser when we implement Hardware Counters for Unix
                 MemoryDiagnoser.Default,
-                DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig()), 
+                DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig()) 
             }; 
 
         private static IDiagnoser[] LoadClassic()
@@ -64,10 +64,10 @@ namespace BenchmarkDotNet.Diagnosers
 
                 if (diagnosticsAssembly.GetName().Version != benchmarkDotNetCoreAssembly.GetName().Version)
                 {
-                    var errorMsg =
+                    string errorMsg =
                         $"Unable to load: {DiagnosticAssemblyFileName} version {diagnosticsAssembly.GetName().Version}" +
                         Environment.NewLine +
-                        $"Does not match: {System.IO.Path.GetFileName(benchmarkDotNetCoreAssembly.Location)} version {benchmarkDotNetCoreAssembly.GetName().Version}";
+                        $"Does not match: {Path.GetFileName(benchmarkDotNetCoreAssembly.Location)} version {benchmarkDotNetCoreAssembly.GetName().Version}";
                     ConsoleLogger.Default.WriteLineError(errorMsg);
                 }
                 else
@@ -78,6 +78,7 @@ namespace BenchmarkDotNet.Diagnosers
                         DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig()),
                         CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.InliningDiagnoser"),
                         CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.PmcDiagnoser"),
+                        CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.EtwProfiler"),
                     };
                 }
             }
@@ -101,7 +102,9 @@ namespace BenchmarkDotNet.Diagnosers
                 return Assembly.Load(referencedAssemblyName);
 
             // we use the location of BenchmarkDotNet.dll, because it should be in the same folder
-            var diagnosticAssemblyBinPath = Path.Combine(new FileInfo(benchmarkDotNetCoreAssembly.Location).DirectoryName, DiagnosticAssemblyFileName);
+            string directoryName = new FileInfo(benchmarkDotNetCoreAssembly.Location).DirectoryName
+                ?? throw new DirectoryNotFoundException(benchmarkDotNetCoreAssembly.Location);
+            string diagnosticAssemblyBinPath = Path.Combine(directoryName, DiagnosticAssemblyFileName);
             if (File.Exists(diagnosticAssemblyBinPath))
                 return Assembly.LoadFile(diagnosticAssemblyBinPath);
 

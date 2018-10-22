@@ -1,8 +1,8 @@
-﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Extensions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Validators
 
         private IEnumerable<ValidationError> ValidateAttributes<T>(string benchmarkClassName, IEnumerable<MethodInfo> allMethods) where T : TargetedAttribute
         {
-            var emptyTargetCount = 0;
+            int emptyTargetCount = 0;
             var targetCount = new Dictionary<string, int>();
 
             foreach (var method in allMethods)
@@ -42,15 +42,13 @@ namespace BenchmarkDotNet.Validators
 
                 foreach (var attribute in attributes)
                 {
-                    if (string.IsNullOrEmpty(attribute.Target))
+                    if (attribute.Targets.IsNullOrEmpty())
                     {
                         emptyTargetCount++;
                     }
                     else
                     {
-                        var targets = attribute.Target.Split(',');
-
-                        foreach (string target in targets)
+                        foreach (string target in attribute.Targets)
                         {
                             if (!targetCount.ContainsKey(target))
                             {

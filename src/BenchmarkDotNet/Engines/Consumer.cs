@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using JetBrains.Annotations;
 
 // ReSharper disable NotAccessedField.Local
 namespace BenchmarkDotNet.Engines
@@ -33,54 +34,105 @@ namespace BenchmarkDotNet.Engines
         private object objectHolder;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(byte byteValue) => byteHolder = byteValue;
 
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(sbyte sbyteValue) => sbyteHolder = sbyteValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(short shortValue) => shortHolder = shortValue;
 
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(ushort ushortValue) => ushortHolder = ushortValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(int intValue) => intHolder = intValue;
 
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(uint uintValue) => uintHolder = uintValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(bool boolValue) => boolHolder = boolValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(char charValue) => charHolder = charValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(float floatValue) => floatHolder = floatValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(double doubleValue) => Volatile.Write(ref doubleHolder, doubleValue);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(long longValue) => Volatile.Write(ref longHolder, longValue);
 
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(ulong ulongValue) => Volatile.Write(ref ulongHolder, ulongValue);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(string stringValue) => Volatile.Write(ref stringHolder, stringValue);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(object objectValue) => Volatile.Write(ref objectHolder, objectValue);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume<T>(T objectValue) where T : class // class constraint prevents from boxing structs
             => Volatile.Write(ref objectHolder, objectValue);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Consume<T>(in T value)
+        {
+            if (typeof(T) == typeof(byte))
+                byteHolder = (byte)(object)value;
+            else if (typeof(T) == typeof(sbyte))
+                sbyteHolder = (sbyte)(object)value;
+            else if (typeof(T) == typeof(short))
+                shortHolder = (short)(object)value;
+            else if (typeof(T) == typeof(ushort))
+                ushortHolder = (ushort)(object)value;
+            else if (typeof(T) == typeof(int))
+                intHolder = (int)(object)value;
+            else if (typeof(T) == typeof(uint))
+                uintHolder = (uint)(object)value;
+            else if (typeof(T) == typeof(bool))
+                boolHolder = (bool)(object)value;
+            else if (typeof(T) == typeof(char))
+                charHolder = (char)(object)value;
+            else if (typeof(T) == typeof(float))
+                floatHolder = (float)(object)value;
+            else if (typeof(T) == typeof(double))
+                Volatile.Write(ref doubleHolder, (double)(object)value);
+            else if (typeof(T) == typeof(long))
+                Volatile.Write(ref longHolder, (long)(object)value);
+            else if (typeof(T) == typeof(ulong))
+                Volatile.Write(ref ulongHolder, (ulong)(object)value);
+            else if (default(T) == null)
+                objectHolder = (object) value;
+            else
+                ValueTypesConsumer(value); // non-primitive value types
+        }
+        
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void ValueTypesConsumer<T>(in T _) { }
 
         internal static bool IsConsumable(Type type)
             => SupportedTypes.Contains(type) || type.GetTypeInfo().IsClass || type.GetTypeInfo().IsInterface;

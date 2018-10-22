@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -37,7 +38,7 @@ namespace BenchmarkDotNet.Diagnosers
         {
             var parsed = method.Maps.SelectMany(map => map.Instructions.Select(Parse)).ToArray();
 
-            // if somebody is using given address as arugment, the address is "used" and should have it's own label
+            // if somebody is using given address as argument, the address is "used" and should have it's own label
             var usedArguments = new HashSet<string>(parsed
                 .Select(
                     a => string.IsNullOrEmpty(a.extraArguments)
@@ -60,14 +61,16 @@ namespace BenchmarkDotNet.Diagnosers
                     continue;
                 }
 
-                if (addressesToLabels.TryGetValue(instruction.address, out var label))
+                if (addressesToLabels.TryGetValue(instruction.address, out string label))
                     prettified.Add(new Label(label, label));
 
-                var argument = string.IsNullOrEmpty(instruction.extraArguments)
+                string argument = string.IsNullOrEmpty(instruction.extraArguments)
                     ? instruction.arguments
                     : instruction.extraArguments;
+                if (argument == null)
+                    throw new NullReferenceException(nameof(instruction.arguments));
 
-                if (addressesToLabels.TryGetValue(argument, out var reference)) // it's sth like 00007ff7`ffbfd320 7cba jl      00007ff7`ffbfd2dc
+                if (addressesToLabels.TryGetValue(argument, out string reference)) // it's sth like 00007ff7`ffbfd320 7cba jl      00007ff7`ffbfd2dc
                     prettified.Add(new Reference($"{PadRight(instruction.instruction)} {reference}", reference, instruction.source));
                 else if (!string.IsNullOrEmpty(instruction.extraArguments) && !instruction.extraArguments.StartsWith("("))
                     prettified.Add(new Element($"{PadRight(instruction.instruction)} {instruction.arguments} {WithoutAddress(instruction.extraArguments)}", instruction.source));
@@ -141,7 +144,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         private static string WithoutAddress(string extraArguments)
         {
-            int startOfTheAddress = extraArguments.IndexOf("(");
+            int startOfTheAddress = extraArguments.IndexOf("(", StringComparison.Ordinal);
             if (startOfTheAddress < 0)
                 return extraArguments;
 

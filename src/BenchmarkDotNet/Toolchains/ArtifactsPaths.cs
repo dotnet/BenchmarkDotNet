@@ -1,30 +1,22 @@
+using JetBrains.Annotations;
+
 namespace BenchmarkDotNet.Toolchains
 {
     public class ArtifactsPaths
     {
-        public static ArtifactsPaths Empty = new ArtifactsPaths("", "", "", "", "", "", "", "", "", "", "");
+        public static readonly ArtifactsPaths Empty = new ArtifactsPaths("", "", "", "", "", "", "", "", "", "", "");
 
-        public string RootArtifactsFolderPath { get; }
-
-        public string BuildArtifactsDirectoryPath { get; }
-
-        public string BinariesDirectoryPath { get; }
-
-        public string ProgramCodePath { get; }
-
-        public string AppConfigPath { get; }
-
-        public string NuGetConfigPath { get; }
-
-        public string ProjectFilePath { get; }
-
-        public string BuildScriptFilePath { get; }
-
-        public string ExecutablePath { get; }
-
-        public string ProgramName { get; }
-
-        public string PackagesDirectoryName { get; }
+        [PublicAPI] public string RootArtifactsFolderPath { get; }
+        [PublicAPI] public string BuildArtifactsDirectoryPath { get; }
+        [PublicAPI] public string BinariesDirectoryPath { get; }
+        [PublicAPI] public string ProgramCodePath { get; }
+        [PublicAPI] public string AppConfigPath { get; }
+        [PublicAPI] public string NuGetConfigPath { get; }
+        [PublicAPI] public string ProjectFilePath { get; }
+        [PublicAPI] public string BuildScriptFilePath { get; }
+        [PublicAPI] public string ExecutablePath { get; }
+        [PublicAPI] public string ProgramName { get; }
+        [PublicAPI] public string PackagesDirectoryName { get; }
 
         public ArtifactsPaths(
             string rootArtifactsFolderPath,

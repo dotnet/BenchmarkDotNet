@@ -1,25 +1,27 @@
-﻿using BenchmarkDotNet.Analysers;
+﻿using System.Diagnostics.CodeAnalysis;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Horology;
 
-// ReSharper disable once CheckNamespace
-
 namespace BenchmarkDotNet.Jobs
 {
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public sealed class RunMode : JobMode<RunMode>
     {
         public static readonly Characteristic<RunStrategy> RunStrategyCharacteristic = Characteristic.Create<RunMode, RunStrategy>(nameof(RunStrategy), RunStrategy.Throughput);
 
         public static readonly Characteristic<int> LaunchCountCharacteristic = CreateCharacteristic<int>(nameof(LaunchCount));
-        public static readonly Characteristic<int> WarmupCountCharacteristic = CreateCharacteristic<int>(nameof(WarmupCount));
-        public static readonly Characteristic<int> IterationCountCharacteristic = CreateCharacteristic<int>(nameof(IterationCount));
-        public static readonly Characteristic<TimeInterval> IterationTimeCharacteristic = CreateCharacteristic<TimeInterval>(nameof(IterationTime));
         public static readonly Characteristic<int> InvocationCountCharacteristic = CreateCharacteristic<int>(nameof(InvocationCount));
         public static readonly Characteristic<int> UnrollFactorCharacteristic = CreateCharacteristic<int>(nameof(UnrollFactor));
+        public static readonly Characteristic<int> IterationCountCharacteristic = CreateCharacteristic<int>(nameof(IterationCount));
         public static readonly Characteristic<int> MinIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MinIterationCount));
         public static readonly Characteristic<int> MaxIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MaxIterationCount));
-
+        public static readonly Characteristic<TimeInterval> IterationTimeCharacteristic = CreateCharacteristic<TimeInterval>(nameof(IterationTime));
+        public static readonly Characteristic<int> WarmupCountCharacteristic = CreateCharacteristic<int>(nameof(WarmupCount));
+        public static readonly Characteristic<int> MinWarmupIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MinWarmupIterationCount));
+        public static readonly Characteristic<int> MaxWarmupIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MaxWarmupIterationCount));
+        
         public static readonly RunMode Dry = new RunMode(nameof(Dry))
         {
             LaunchCount = 1,
@@ -62,7 +64,7 @@ namespace BenchmarkDotNet.Jobs
         {
         }
 
-        public RunMode(string id) : base(id)
+        private RunMode(string id) : base(id)
         {
         }
 
@@ -157,6 +159,26 @@ namespace BenchmarkDotNet.Jobs
         {
             get { return MaxIterationCountCharacteristic[this]; }
             set { MaxIterationCountCharacteristic[this] = value; }
+        }
+        
+        /// <summary>
+        /// Minimum count of warmup iterations that should be performed
+        /// The default value is 6
+        /// </summary>
+        public int MinWarmupIterationCount
+        {
+            get { return MinWarmupIterationCountCharacteristic[this]; }
+            set { MinWarmupIterationCountCharacteristic[this] = value; }
+        }
+
+        /// <summary>
+        /// Maximum count of warmup iterations that should be performed
+        /// The default value is 50
+        /// </summary>
+        public int MaxWarmupIterationCount
+        {
+            get { return MaxWarmupIterationCountCharacteristic[this]; }
+            set { MaxWarmupIterationCountCharacteristic[this] = value; }
         }
     }
 }

@@ -6,14 +6,14 @@ namespace BenchmarkDotNet.Exporters.Xml
 {
     internal class SimpleXmlWriter : IXmlWriter, IDisposable
     {
-        private XmlWriter writer;
+        private readonly XmlWriter writer;
 
         public SimpleXmlWriter(TextWriter writer, bool indent)
         {
             if (writer == null)
                 throw new ArgumentNullException(nameof(writer));
 
-            this.writer = XmlWriter.Create(writer, new XmlWriterSettings() { Indent = indent });
+            this.writer = XmlWriter.Create(writer, new XmlWriterSettings { Indent = indent });
         }
 
         public void WriteElementString(string localName, string value)

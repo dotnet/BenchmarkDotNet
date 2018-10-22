@@ -5,6 +5,9 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
+using JetBrains.Annotations;
+
+// ReSharper disable UnusedMember.Global
 
 namespace BenchmarkDotNet.Exporters.Xml
 {
@@ -15,6 +18,7 @@ namespace BenchmarkDotNet.Exporters.Xml
         public HostEnvironmentInfoDto HostEnvironmentInfo =>
             new HostEnvironmentInfoDto(summary.HostEnvironmentInfo);
 
+        [PublicAPI]
         public IEnumerable<BenchmarkReportDto> Benchmarks { get; }
 
         private readonly Summary summary;
@@ -32,7 +36,7 @@ namespace BenchmarkDotNet.Exporters.Xml
         public string BenchmarkDotNetCaption => HostEnvironmentInfo.BenchmarkDotNetCaption;
         public string BenchmarkDotNetVersion => hei.BenchmarkDotNetVersion;
         public string OsVersion => hei.OsVersion.Value;
-        public string ProcessorName => ProcessorBrandStringHelper.Prettify(hei.CpuInfo.Value?.ProcessorName ?? "");
+        public string ProcessorName => ProcessorBrandStringHelper.Prettify(hei.CpuInfo.Value);
         public string PhysicalProcessorCount => hei.CpuInfo.Value?.PhysicalProcessorCount?.ToString();
         public string PhysicalCoreCount => hei.CpuInfo.Value?.PhysicalCoreCount?.ToString();
         public string LogicalCoreCount => hei.CpuInfo.Value?.LogicalCoreCount?.ToString();
@@ -58,7 +62,7 @@ namespace BenchmarkDotNet.Exporters.Xml
     {
         public double Hertz => frequency.Hertz;
 
-        private Frequency frequency;
+        private readonly Frequency frequency;
 
         public ChronometerDto(Frequency frequency)
         {
@@ -76,18 +80,14 @@ namespace BenchmarkDotNet.Exporters.Xml
         public string Parameters => report.BenchmarkCase.Parameters.PrintInfo;
         public Statistics Statistics => report.ResultStatistics;
         public GcStats Memory => report.GcStats;
-        public IEnumerable<Measurement> Measurements { get; }
+        [PublicAPI] public IEnumerable<Measurement> Measurements { get; }
 
         private readonly BenchmarkReport report;
 
         public BenchmarkReportDto(BenchmarkReport report, bool excludeMeasurements = false)
         {
             this.report = report;
-
-            if (excludeMeasurements)
-                Measurements = null;
-            else
-                Measurements = report.AllMeasurements;
+            Measurements = excludeMeasurements ? null : report.AllMeasurements;
         }
     }
 }

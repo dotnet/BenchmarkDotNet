@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Jobs;
+using System.Text;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
@@ -13,33 +10,18 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public abstract class DotNetCliGenerator : GeneratorBase
     {
-        protected string TargetFrameworkMoniker { get; }
+        [PublicAPI] public string TargetFrameworkMoniker { get; }
 
-        protected Func<Platform, string> PlatformProvider { get; }
+        [PublicAPI] public string CliPath { get; }
 
-        protected string Runtime { get; }
-
-        protected string ExtraDependencies { get; }
-
-        protected string Imports { get; }
-
-        private DotNetCliBuilder Builder { get; }
+        [PublicAPI] public string PackagesPath { get; }
 
         [PublicAPI]
-        protected DotNetCliGenerator(
-            DotNetCliBuilder builder,
-            string targetFrameworkMoniker,
-            string extraDependencies,
-            Func<Platform, string> platformProvider,
-            string imports,
-            string runtime = null)
+        protected DotNetCliGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath)
         {
-            Builder = builder;
             TargetFrameworkMoniker = targetFrameworkMoniker;
-            ExtraDependencies = extraDependencies;
-            PlatformProvider = platformProvider;
-            Imports = imports;
-            Runtime = runtime;
+            CliPath = cliPath;
+            PackagesPath = packagesPath;
         }
 
         protected override string GetExecutableExtension() => TargetFrameworkMoniker.Contains("core") ? ".dll" : ".exe";
@@ -58,7 +40,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             // we did not find global.json or any Visual Studio solution file? 
             // let's return it in the old way and hope that it works ;)
-            return Path.Combine(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.FullName, programName);
+            var parent = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent;
+            if (parent == null)
+                throw new DirectoryNotFoundException("Parent directory for current directory");
+            return Path.Combine(parent.FullName, programName);
         }
 
         internal static bool GetSolutionRootDirectory(out DirectoryInfo directoryInfo)
@@ -88,15 +73,18 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
+        protected override string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath)
+            => string.IsNullOrEmpty(PackagesPath)
+                ? base.GetPackagesDirectoryPath(buildArtifactsDirectoryPath)
+                : PackagesPath;
+
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
-            //TODO: This build script isn't actually used, so this logic is also duplicated in the DotNetCliBuilder, see https://github.com/dotnet/BenchmarkDotNet/issues/804
-
-            var nugetPackages = string.Join("call dotnet ", GetNugetPackageCliCommands(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver));
-            string content = string.IsNullOrWhiteSpace(nugetPackages) ? string.Empty : (nugetPackages + Environment.NewLine) +
-                $"call dotnet {Builder.RestoreCommand} {GetCustomArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver)}{Environment.NewLine}" +
-                $"call dotnet {Builder.GetBuildCommand(TargetFrameworkMoniker, false, buildPartition.BuildConfiguration)} {GetCustomArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver)}";
-
+            var content = new StringBuilder(300)
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(buildPartition)}")
+                .ToString();
+            
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
         }
 
@@ -111,14 +99,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .GetFileSystemInfos()
                 .Any(fileInfo => fileInfo.Extension == ".sln" || fileInfo.Name == "global.json");
 
-        internal static string GetCustomArguments(BenchmarkCase benchmarkCase, IResolver resolver)
-        {
-            if (!benchmarkCase.Job.HasValue(InfrastructureMode.ArgumentsCharacteristic))
-                return null;
+        
 
-            var msBuildArguments = benchmarkCase.Job.ResolveValue(InfrastructureMode.ArgumentsCharacteristic, resolver).OfType<MsBuildArgument>();
-
-            return string.Join(" ", msBuildArguments.Select(arg => arg.TextRepresentation));
+        
         }
 
         internal static IEnumerable<string> GetNugetPackageCliCommands(BenchmarkCase benchmarkCase, IResolver resolver)
@@ -129,6 +112,5 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             var nugetRefs = benchmarkCase.Job.ResolveValue(InfrastructureMode.NugetReferencesCharacteristic, resolver).OfType<NugetReference>();
 
             return nugetRefs.Select(x => $"add package {x.PackageName}{(string.IsNullOrWhiteSpace(x.PackageVersion) ? string.Empty : " -v " + x.PackageVersion)}");
-        }
     }
 }

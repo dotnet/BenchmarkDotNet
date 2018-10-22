@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Exporters
             logger.WriteLine("</html>");
         }
 
-        private void PrintTable(SummaryTable table, ILogger logger)
+        private static void PrintTable(SummaryTable table, ILogger logger)
         {
             if (table.FullContent.Length == 0)
             {
@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Exporters
             logger.WriteLine("</table>");
         }
 
-        private void PrintLine(SummaryTable table, string[] line, ILogger logger, string leftDel, string rightDel)
+        private static void PrintLine(SummaryTable table, string[] line, ILogger logger, string leftDel, string rightDel)
         {
             for (int columnIndex = 0; columnIndex < table.ColumnCount; columnIndex++)
             {

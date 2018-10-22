@@ -11,7 +11,7 @@
         
         Warmup,
         
-        General,
+        Actual,
         
         Result,
         

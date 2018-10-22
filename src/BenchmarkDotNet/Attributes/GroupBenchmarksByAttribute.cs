@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Attributes
     {
         public IConfig Config { get; }
 
-        // CLS-Compliant Code requires a constuctor without an array in the argument list
+        // CLS-Compliant Code requires a constructor without an array in the argument list
         protected GroupBenchmarksByAttribute()
         {
             Config = ManualConfig.CreateEmpty();

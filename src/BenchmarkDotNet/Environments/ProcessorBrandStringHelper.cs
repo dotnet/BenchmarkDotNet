@@ -1,5 +1,9 @@
-﻿using System.Linq;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Text.RegularExpressions;
+using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Portability.Cpu;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Environments
@@ -9,14 +13,32 @@ namespace BenchmarkDotNet.Environments
         /// <summary>
         /// Transform a processor brand string to a nice form for summary.
         /// </summary>
-        /// <param name="processorName">Original processor brand string</param>
+        /// <param name="cpuInfo">The CPU information</param>
+        /// <param name="includeMaxFrequency">Whether to include determined max frequency information</param>
         /// <returns>Prettified version</returns>
         [NotNull]
-        public static string Prettify([NotNull] string processorName)
+        public static string Prettify(CpuInfo cpuInfo, bool includeMaxFrequency = false)
         {
-            // Remove parts which don't provide any useful information for user
-            processorName = processorName.Replace("@", "").Replace("(R)", "").Replace("(TM)", "");
+            if (cpuInfo == null)
+            {
+                return "";
+            }
 
+            // Remove parts which don't provide any useful information for user
+            var processorName = cpuInfo.ProcessorName.Replace("@", "").Replace("(R)", "").Replace("(TM)", "");
+            
+            // If we have found physical core(s), we can safely assume we can drop extra info from brand
+            if (cpuInfo.PhysicalCoreCount > 0)
+                processorName = Regex.Replace(processorName, @"(\w+?-Core Processor)", "").Trim();
+
+            string frequencyString = GetBrandStyledActualFrequency(cpuInfo.NominalFrequency);
+            if (includeMaxFrequency && frequencyString != null && !processorName.Contains(frequencyString))
+            {
+                // show Max only if there's already a frequency name to differentiate the two
+                string maxFrequency = processorName.Contains("Hz") ? $"(Max: {frequencyString})" : frequencyString;
+                processorName = $"{processorName} {maxFrequency}";
+            }
+            
             // Remove double spaces
             processorName = Regex.Replace(processorName.Trim(), @"\s+", " ");
 
@@ -26,6 +48,17 @@ namespace BenchmarkDotNet.Environments
                 processorName = $"{processorName} ({microarchitecture})";
 
             return processorName;
+        }
+
+        /// <summary>
+        /// Presents actual processor's frequency into brand string format
+        /// </summary>
+        /// <param name="frequency"></param>
+        private static string GetBrandStyledActualFrequency(Frequency? frequency)
+        {
+            if (frequency == null)
+                return null;
+            return $"{frequency.Value.ToGHz().ToStr("N2")}GHz";
         }
 
         /// <summary>
@@ -58,6 +91,7 @@ namespace BenchmarkDotNet.Environments
 
         // see http://www.intel.com/content/www/us/en/processors/processor-numbers.html
         [CanBeNull]
+        [SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static string ParseIntroCoreMicroarchitecture([NotNull] string modelNumber)
         {
             if (modelNumber.Length >= 3 && modelNumber.Substring(0, 3).All(char.IsDigit) &&

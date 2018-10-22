@@ -1,8 +1,6 @@
 using System;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Engines
 {
@@ -121,6 +119,7 @@ namespace BenchmarkDotNet.Engines
                 engineParameters.IterationCleanupAction,
                 engineParameters.OperationsPerInvoke,
                 engineParameters.MeasureGcStats,
-                engineParameters.Encoding);
+                engineParameters.Encoding,
+                engineParameters.BenchmarkName);
     }
 }

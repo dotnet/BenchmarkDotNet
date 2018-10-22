@@ -32,6 +32,8 @@ namespace BenchmarkDotNet.Disassembler
         /// The native end offset of this ASM representation
         /// </summary>
         public ulong EndAddress { get; set; }
+        
+        public uint SizeInBytes { get; set; }
     }
 
     public class Map
@@ -82,6 +84,6 @@ namespace BenchmarkDotNet.Disassembler
     {
         public const string NotManagedMethod = "not managed method";
 
-        public const string DiassemblerEntryMethodName = "__ForDisassemblyDiagnoser__";
+        public const string DisassemblerEntryMethodName = "__ForDisassemblyDiagnoser__";
     }
 }

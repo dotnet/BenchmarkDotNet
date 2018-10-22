@@ -1,6 +1,10 @@
 ﻿using System;
+#if NETSTANDARD2_0
 using System.Reflection;
+#endif
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Toolchains.DotNetCli;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Engines
 {
@@ -8,9 +12,11 @@ namespace BenchmarkDotNet.Engines
     {
         internal const string ResultsLinePrefix = "GC: ";
 
-        public static readonly long AllocationQuantum = CalculateAllocationQuantumSize(); 
+        public static readonly long AllocationQuantum = CalculateAllocationQuantumSize();
 
+#if NETSTANDARD2_0
         private static readonly Func<long> GetAllocatedBytesForCurrentThreadDelegate = GetAllocatedBytesForCurrentThread();
+#endif
 
         public static readonly GcStats Empty = new GcStats(0, 0, 0, 0, 0);
 
@@ -39,7 +45,7 @@ namespace BenchmarkDotNet.Engines
         {
             get
             {
-                bool excludeAllocationQuantumSideEffects = !RuntimeInformation.IsNetCore; // the issue got fixed for .NET Core 2.0 https://github.com/dotnet/coreclr/issues/10207
+                bool excludeAllocationQuantumSideEffects = !RuntimeInformation.IsNetCore || NetCoreAppSettings.Current.Value == NetCoreAppSettings.NetCoreApp20; // the issue got fixed for .NET Core 2.0+ https://github.com/dotnet/coreclr/issues/10207
                 
                 return GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects) == 0
                     ? 0
@@ -74,12 +80,14 @@ namespace BenchmarkDotNet.Engines
 
         public int GetCollectionsCount(int generation)
         {
-            if (generation == 0)
-                return Gen0Collections;
-            if (generation == 1)
-                return Gen1Collections;
-
-            return Gen2Collections;
+            switch (generation) {
+                case 0:
+                    return Gen0Collections;
+                case 1:
+                    return Gen1Collections;
+                default:
+                    return Gen2Collections;
+            }
         }
 
         /// <summary>
@@ -122,6 +130,7 @@ namespace BenchmarkDotNet.Engines
                 0);
         }
 
+        [PublicAPI]
         public static GcStats FromForced(int forcedFullGarbageCollections)
             => new GcStats(forcedFullGarbageCollections, forcedFullGarbageCollections, forcedFullGarbageCollections, 0, 0);
 
@@ -146,10 +155,11 @@ namespace BenchmarkDotNet.Engines
 #elif NETCOREAPP2_1
             // but CoreRT does not support the reflection yet, so only because of that we have to target .NET Core 2.1
             // to be able to call this method without reflection and get MemoryDiagnoser support for CoreRT ;)
-            return System.GC.GetAllocatedBytesForCurrentThread();
+            return GC.GetAllocatedBytesForCurrentThread();
 #endif
         }
 
+#if NETSTANDARD2_0
         private static Func<long> GetAllocatedBytesForCurrentThread()
         {
             // for some versions of .NET Core this method is internal, 
@@ -161,7 +171,8 @@ namespace BenchmarkDotNet.Engines
 
             return () => (long)method.Invoke(null, null);
         }
-
+#endif
+  
         public string ToOutputLine() 
             => $"{ResultsLinePrefix} {Gen0Collections} {Gen1Collections} {Gen2Collections} {AllocatedBytes} {TotalOperations}";
 

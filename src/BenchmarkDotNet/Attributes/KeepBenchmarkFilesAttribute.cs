@@ -1,16 +1,19 @@
 ﻿using System;
 using BenchmarkDotNet.Configs;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes
 {
+    /// <summary>
+    /// determines if all auto-generated files should be kept or removed after running the benchmarks
+    /// </summary>
+    [PublicAPI]
     public class KeepBenchmarkFilesAttribute : Attribute, IConfigSource
     {
-        public bool Value { get; }
         public IConfig Config { get; }
 
         public KeepBenchmarkFilesAttribute(bool value = true)
         {
-            Value = value;
             Config = ManualConfig.CreateEmpty().KeepBenchmarkFiles(value);
         }
     }

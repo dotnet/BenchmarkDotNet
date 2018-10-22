@@ -7,11 +7,11 @@ using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Engines
 {
-    public class EngineGeneralStage : EngineStage
+    public class EngineActualStage : EngineStage
     {
         internal const int MaxOverheadIterationCount = 20;
-        internal const double MaxOverheadRelativeError = 0.05;
-        internal const int DefaultWorkloadCount = 10;
+        private const double MaxOverheadRelativeError = 0.05;
+        private const int DefaultWorkloadCount = 10;
 
         private readonly int? targetCount;
         private readonly double maxRelativeError;
@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Engines
         private readonly int minIterationCount;
         private readonly int maxIterationCount;
 
-        public EngineGeneralStage(IEngine engine) : base(engine)
+        public EngineActualStage(IEngine engine) : base(engine)
         {
             targetCount = engine.TargetJob.ResolveValueAsNullable(RunMode.IterationCountCharacteristic);
             maxRelativeError = engine.TargetJob.ResolveValue(AccuracyMode.MaxRelativeErrorCharacteristic, engine.Resolver);
@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Engines
         internal IReadOnlyList<Measurement> Run(long invokeCount, IterationMode iterationMode, bool runAuto, int unrollFactor, bool forceSpecific = false)
             => (runAuto || targetCount == null) && !forceSpecific
                 ? RunAuto(invokeCount, iterationMode, unrollFactor)
-                : RunSpecific(invokeCount, iterationMode, (targetCount ?? DefaultWorkloadCount), unrollFactor);
+                : RunSpecific(invokeCount, iterationMode, targetCount ?? DefaultWorkloadCount, unrollFactor);
 
         private List<Measurement> RunAuto(long invokeCount, IterationMode iterationMode, int unrollFactor)
         {
@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Engines
             while (true)
             {
                 iterationCounter++;
-                var measurement = RunIteration(iterationMode, IterationStage.General, iterationCounter, invokeCount, unrollFactor);
+                var measurement = RunIteration(iterationMode, IterationStage.Actual, iterationCounter, invokeCount, unrollFactor);
                 measurements.Add(measurement);
                 measurementsForStatistics.Add(measurement);
 
@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Engines
                 if (iterationCounter >= minIterationCount && actualError < maxError)
                     break;
 
-                if (iterationCounter >= maxIterationCount || (isOverhead && iterationCounter >= MaxOverheadIterationCount))
+                if (iterationCounter >= maxIterationCount || isOverhead && iterationCounter >= MaxOverheadIterationCount)
                     break;
             }
             WriteLine();
@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.Engines
             var measurements = new List<Measurement>(iterationCount);
 
             for (int i = 0; i < iterationCount; i++)
-                measurements.Add(RunIteration(iterationMode, IterationStage.General, i + 1, invokeCount, unrollFactor));
+                measurements.Add(RunIteration(iterationMode, IterationStage.Actual, i + 1, invokeCount, unrollFactor));
 
             WriteLine();
 

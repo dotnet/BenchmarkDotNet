@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Code;
@@ -10,12 +10,13 @@ namespace BenchmarkDotNet.Parameters
 {
     internal static class SmartParamBuilder
     {
+        [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
         internal static object[] CreateForParams(MemberInfo source, object[] values)
         {
-            if (values.IsEmpty() || values.All(value => SourceCodeHelper.IsCompilationTimeConstant(value)))
+            if (values.IsEmpty() || values.All(SourceCodeHelper.IsCompilationTimeConstant))
                 return values;
 
-            return values.Select((value, index) => new SmartParamameter(source, value, index)).ToArray();
+            return values.Select((value, index) => new SmartParameter(source, value, index)).ToArray();
         }
 
         internal static ParameterInstances CreateForArguments(MethodInfo benchmark, ParameterDefinition[] parameterDefinitions, (MemberInfo source, object[] values) valuesInfo, int sourceIndex)
@@ -30,12 +31,14 @@ namespace BenchmarkDotNet.Parameters
                 return new ParameterInstances(
                     array.Select((value, argumentIndex) => Create(parameterDefinitions, value, valuesInfo.source, sourceIndex, argumentIndex)).ToArray());
             }
-            else if (parameterDefinitions.Length == 1)
+
+            if (parameterDefinitions.Length == 1)
             {
                 return new ParameterInstances(
                     new[] { Create(parameterDefinitions, unwrappedValue, valuesInfo.source, sourceIndex, argumentIndex: 0) });
             }
-            else throw new NotSupportedException($"Benchmark {benchmark.Name} has invalid type of arguments provided by [ArgumentsSource({valuesInfo.source.Name})]. It should be IEnumerable<object[]> or IEnumerable<object>.");
+
+            throw new NotSupportedException($"Benchmark {benchmark.Name} has invalid type of arguments provided by [ArgumentsSource({valuesInfo.source.Name})]. It should be IEnumerable<object[]> or IEnumerable<object>.");
         }
 
         private static ParameterInstance Create(ParameterDefinition[] parameterDefinitions, object value, MemberInfo source, int sourceIndex, int argumentIndex)
@@ -69,30 +72,30 @@ namespace BenchmarkDotNet.Parameters
 
         public string ToSourceCode()
         {
-            var cast = $"({Value.GetType().GetCorrectCSharpTypeName()})"; // it's an object so we need to cast it to the right type
+            string cast = $"({Value.GetType().GetCorrectCSharpTypeName()})"; // it's an object so we need to cast it to the right type
 
-            var callPostfix = source is PropertyInfo ? string.Empty : "()";
+            string callPostfix = source is PropertyInfo ? string.Empty : "()";
 
-            var indexPostfix = parameterDefinitions.Length > 1 
+            string indexPostfix = parameterDefinitions.Length > 1 
                 ? $"[{argumentIndex}]" // IEnumerable<object[]> 
                 : string.Empty; // IEnumerable<object>
 
             // we just execute (cast)source.ToArray()[case][argumentIndex]; 
-            // we know that source is IEnumberable so we can do that!
+            // we know that source is IEnumerable so we can do that!
             return $"{cast}{source.Name}{callPostfix}.ToArray()[{sourceIndex}]{indexPostfix};"; 
         }
     }
 
-    internal class SmartParamameter : IParam
+    internal class SmartParameter : IParam
     {
         private readonly MemberInfo source;
         private readonly MethodBase method;
         private readonly int index;
 
-        public SmartParamameter(MemberInfo source, object value, int index)
+        public SmartParameter(MemberInfo source, object value, int index)
         {
             this.source = source;
-            this.method = source is PropertyInfo property ? property.GetMethod : source as MethodInfo;
+            method = source is PropertyInfo property ? property.GetMethod : source as MethodInfo;
             Value = value;
             this.index = index;
         }
@@ -103,11 +106,11 @@ namespace BenchmarkDotNet.Parameters
 
         public string ToSourceCode()
         {
-            var cast = $"({Value.GetType().GetCorrectCSharpTypeName()})";
+            string cast = $"({Value.GetType().GetCorrectCSharpTypeName()})";
 
-            var instancePrefix = method.IsStatic ? source.DeclaringType.GetCorrectCSharpTypeName() : "instance";
+            string instancePrefix = method.IsStatic ? source.DeclaringType.GetCorrectCSharpTypeName() : "instance";
 
-            var callPostfix = source is PropertyInfo ? string.Empty : "()";
+            string callPostfix = source is PropertyInfo ? string.Empty : "()";
 
             // we just execute (cast)source.ToArray()[index]; 
             return $"{cast}{instancePrefix}.{source.Name}{callPostfix}.ToArray()[{index}];";

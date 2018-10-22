@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Tests.XUnit;
 using Xunit;
@@ -24,6 +26,28 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 if (boolean && number != 1 || !boolean && number != 2)
                     throw new InvalidOperationException("Incorrect values were passed");
+            }
+            
+            [Benchmark]
+            [Arguments(true, 1)]
+            [Arguments(false, 2)]
+            public Task SimpleAsync(bool boolean, int number)
+            {
+                if (boolean && number != 1 || !boolean && number != 2)
+                    throw new InvalidOperationException("Incorrect values were passed");
+                
+                return Task.CompletedTask;
+            }
+            
+            [Benchmark]
+            [Arguments(true, 1)]
+            [Arguments(false, 2)]
+            public ValueTask<int> SimpleValueTaskAsync(bool boolean, int number)
+            {
+                if (boolean && number != 1 || !boolean && number != 2)
+                    throw new InvalidOperationException("Incorrect values were passed");
+                
+                return new ValueTask<int>(0);
             }
         }
 
@@ -307,6 +331,167 @@ namespace BenchmarkDotNet.IntegrationTests
                 
                 if (!notEven.All(n => n % 2 != 0))
                     throw new ArgumentException("Even");
+            }
+        }
+
+        [Fact]
+        public void VeryBigIntegersAreSupported() => CanExecute<WithVeryBigInteger>();
+
+        public class WithVeryBigInteger
+        {
+            public IEnumerable<object> GetVeryBigInteger()
+            {
+                yield return BigInteger.Parse(new string(Enumerable.Repeat('1', 1000).ToArray()));
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetVeryBigInteger))]
+            public void Method(BigInteger passed)
+            {
+                BigInteger expected = GetVeryBigInteger().OfType<BigInteger>().Single();
+                
+                if (expected != passed)
+                    throw new ArgumentException("The BigInteger has wrong value!");
+            }
+        }
+        
+        [Fact]
+        public void SpecialDoubleValuesAreSupported() => CanExecute<WithSpecialDoubleValues>();
+        
+        public class WithSpecialDoubleValues
+        {
+            public IEnumerable<object[]> GetSpecialDoubleValues()
+            {
+                yield return new object[] { double.Epsilon, nameof(double.Epsilon) };
+                yield return new object[] { double.MinValue, nameof(double.MinValue) };
+                yield return new object[] { double.MaxValue, nameof(double.MaxValue) };
+                yield return new object[] { double.NaN, nameof(double.NaN) };
+                yield return new object[] { double.NegativeInfinity, nameof(double.NegativeInfinity) };
+                yield return new object[] { double.PositiveInfinity, nameof(double.PositiveInfinity) };
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetSpecialDoubleValues))]
+            public void Method(double passed, string name)
+            {
+                switch (name)
+                {
+                    case nameof(double.Epsilon):
+                        if (passed != double.Epsilon) throw new InvalidOperationException($"Unable to pass {nameof(double.Epsilon)}");
+                        break;
+                    case nameof(double.MaxValue):
+                        if (passed != double.MaxValue) throw new InvalidOperationException($"Unable to pass {nameof(double.MaxValue)}");
+                        break;
+                    case nameof(double.MinValue):
+                        if (passed != double.MinValue) throw new InvalidOperationException($"Unable to pass {nameof(double.MinValue)}");
+                        break;
+                    case nameof(double.NaN):
+                        if (!double.IsNaN(passed)) throw new InvalidOperationException($"Unable to pass {nameof(double.NaN)}");
+                        break;
+                    case nameof(double.PositiveInfinity):
+                        if (!double.IsPositiveInfinity(passed)) throw new InvalidOperationException($"Unable to pass {nameof(double.PositiveInfinity)}");
+                        break;
+                    case nameof(double.NegativeInfinity):
+                        if (!double.IsNegativeInfinity(passed)) throw new InvalidOperationException($"Unable to pass {nameof(double.NegativeInfinity)}");
+                        break;
+                    default:
+                        throw new InvalidOperationException($"Unknown case! {name}");
+                }
+            }
+        }
+        
+        [Fact]
+        public void SpecialFloatValuesAreSupported() => CanExecute<WithSpecialFloatValues>();
+        
+        public class WithSpecialFloatValues
+        {
+            public IEnumerable<object[]> GetSpecialFloatValues()
+            {
+                yield return new object[] { float.Epsilon, nameof(float.Epsilon) };
+                yield return new object[] { float.MinValue, nameof(float.MinValue) };
+                yield return new object[] { float.MaxValue, nameof(float.MaxValue) };
+                yield return new object[] { float.NaN, nameof(float.NaN) };
+                yield return new object[] { float.NegativeInfinity, nameof(float.NegativeInfinity) };
+                yield return new object[] { float.PositiveInfinity, nameof(float.PositiveInfinity) };
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetSpecialFloatValues))]
+            public void Method(float passed, string name)
+            {
+                switch (name)
+                {
+                    case nameof(float.Epsilon):
+                        if (passed != float.Epsilon) throw new InvalidOperationException($"Unable to pass {nameof(float.Epsilon)}");
+                        break;
+                    case nameof(float.MaxValue):
+                        if (passed != float.MaxValue) throw new InvalidOperationException($"Unable to pass {nameof(float.MaxValue)}");
+                        break;
+                    case nameof(float.MinValue):
+                        if (passed != float.MinValue) throw new InvalidOperationException($"Unable to pass {nameof(float.MinValue)}");
+                        break;
+                    case nameof(float.NaN):
+                        if (!float.IsNaN(passed)) throw new InvalidOperationException($"Unable to pass {nameof(float.NaN)}");
+                        break;
+                    case nameof(float.PositiveInfinity):
+                        if (!float.IsPositiveInfinity(passed)) throw new InvalidOperationException($"Unable to pass {nameof(float.PositiveInfinity)}");
+                        break;
+                    case nameof(float.NegativeInfinity):
+                        if (!float.IsNegativeInfinity(passed)) throw new InvalidOperationException($"Unable to pass {nameof(float.NegativeInfinity)}");
+                        break;
+                    default:
+                        throw new InvalidOperationException($"Unknown case! {name}");
+                }
+            }
+        }
+        
+        [Fact]
+        public void SpecialDecimalValuesAreSupported() => CanExecute<WithSpecialDecimalValues>();
+        
+        public class WithSpecialDecimalValues
+        {
+            public IEnumerable<object[]> GetSpecialDecimalValues()
+            {
+                yield return new object[] { decimal.MaxValue, nameof(decimal.MaxValue) };
+                yield return new object[] { decimal.MinValue, nameof(decimal.MinValue) };
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetSpecialDecimalValues))]
+            public void Method(decimal passed, string name)
+            {
+                switch (name)
+                {
+                    case nameof(decimal.MaxValue):
+                        if (passed != decimal.MaxValue) throw new InvalidOperationException($"Unable to pass {nameof(decimal.MaxValue)}");
+                        break;
+                    case nameof(decimal.MinValue):
+                        if (passed != decimal.MinValue) throw new InvalidOperationException($"Unable to pass {nameof(decimal.MinValue)}");
+                        break;
+                    default:
+                        throw new InvalidOperationException($"Unknown case! {name}");
+                }
+            }
+        }
+
+        [Fact]
+        public void DateTimeCanBeUsedAsArgument() => CanExecute<WithDateTime>();
+
+        public class WithDateTime
+        {
+            public IEnumerable<object> DateTimeValues()
+            {
+                yield return new DateTime(2018, 8, 15);
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(DateTimeValues))]
+            public void Test(DateTime passed)
+            {
+                DateTime expected = DateTimeValues().OfType<DateTime>().Single();
+                
+                if (expected != passed)
+                    throw new ArgumentException("The DateTime has wrong value!");
             }
         }
     }

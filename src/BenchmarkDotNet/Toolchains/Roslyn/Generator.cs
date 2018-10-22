@@ -28,8 +28,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
             //TODO: For nuget refs i think we need to use the MsBuildArgument/Argument to tell msbuild to fetch nuget refs?
-
-            var prefix = RuntimeInformation.IsWindows() ? "" : "#!/bin/bash\n";
+            string prefix = RuntimeInformation.IsWindows() ? "" : "#!/bin/bash\n";
             var list = new List<string>();
             if (!RuntimeInformation.IsWindows())
                 list.Add("mono");
@@ -40,7 +39,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             list.Add("/unsafe");
             list.Add("/platform:" + buildPartition.Platform.ToConfig());
             list.Add("/appconfig:" + artifactsPaths.AppConfigPath.Escape());
-            var references = GetAllReferences(buildPartition.RepresentativeBenchmarkCase).Select(assembly => StringAndTextExtensions.Escape(assembly.Location));
+            var references = GetAllReferences(buildPartition.RepresentativeBenchmarkCase).Select(assembly => assembly.Location.Escape());
             list.Add("/reference:" + string.Join(",", references));
             list.Add(Path.GetFileName(artifactsPaths.ProgramCodePath));
 
@@ -58,7 +57,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                     new[]
                     {
                         benchmarkCase.Descriptor.Type.GetTypeInfo().Assembly, // this assembly does not has to have a reference to BenchmarkDotNet (e.g. custom framework for benchmarking that internally uses BenchmarkDotNet
-                        typeof(BenchmarkCase).Assembly, // BenchmarkDotNet
+                        typeof(BenchmarkCase).Assembly // BenchmarkDotNet
                     })
                 .Distinct();
     }

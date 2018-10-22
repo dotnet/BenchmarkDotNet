@@ -22,21 +22,18 @@ namespace BenchmarkDotNet.Validators
                 .ToArray();
             
             var logicalGroups = benchmarkLogicalGroups.Distinct().ToArray();
-            foreach (var logicalGroup in logicalGroups)
+            foreach (string logicalGroup in logicalGroups)
             {
                 var benchmarks = allBenchmarks.Where((benchmark, index) => benchmarkLogicalGroups[index] == logicalGroup).ToArray();
-                var methodBaselineCount = benchmarks.Count(b => b.Descriptor.Baseline);
-                var jobBaselineCount = benchmarks.Count(b => b.Job.Meta.Baseline);
-                var className = benchmarks.First().Descriptor.Type.Name;
+                int methodBaselineCount = benchmarks.Select(b => b.Descriptor).Distinct().Count(it => it.Baseline);
+                int jobBaselineCount = benchmarks.Select(b => b.Job).Distinct().Count(it => it.Meta.Baseline);
+                string className = benchmarks.First().Descriptor.Type.Name;
 
                 if (methodBaselineCount > 1) 
                     yield return CreateError("benchmark method", "Baseline = true", logicalGroup, className, methodBaselineCount.ToString());
 
                 if (jobBaselineCount > 1) 
                     yield return CreateError("job", "Baseline = true", logicalGroup, className, jobBaselineCount.ToString());
-
-                if (methodBaselineCount > 0 && jobBaselineCount > 1)
-                    yield return CreateError("job-benchmark pair", "Baseline property", logicalGroup, className, "both");
             }
         }
 

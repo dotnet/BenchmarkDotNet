@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Security;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
-using System.IO;
-using BenchmarkDotNet.Configs;
-using System.Linq;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -49,13 +50,14 @@ namespace BenchmarkDotNet.Validators
 
             try
             {
+                // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
                 Path.GetFullPath(artifactsPath);
             }
             catch (PathTooLongException)
             {
-                return new ValidationError(true, $"The ArtifactsPath is too long.");
+                return new ValidationError(true, "The ArtifactsPath is too long.");
             }
-            catch (System.Security.SecurityException)
+            catch (SecurityException)
             {
                 return new ValidationError(true, $"You don't have the required permission to access ArtifactsPath ({artifactsPath}).");
             }

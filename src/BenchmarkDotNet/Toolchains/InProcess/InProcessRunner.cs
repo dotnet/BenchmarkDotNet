@@ -3,6 +3,7 @@ using System.Reflection;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
@@ -23,13 +24,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 // which could cause the jitting/assembly loading to happen before we do anything
                 // we have some jitting diagnosers and we want them to catch all the informations!!
 
-                var inProcessRunnableTypeName = $"{typeof(InProcessRunner).FullName}+{nameof(Runnable)}";
-                var type = typeof(InProcessRunner).GetTypeInfo().Assembly.GetType(inProcessRunnableTypeName);
-                if (type == null)
-                    throw new InvalidOperationException($"Bug: type {inProcessRunnableTypeName} not found.");
+                string inProcessRunnableTypeName = $"{typeof(InProcessRunner).FullName}+{nameof(Runnable)}";
+                var type = typeof(InProcessRunner).GetTypeInfo().Assembly.GetType(inProcessRunnableTypeName)
+                    ?? throw new InvalidOperationException($"Bug: type {inProcessRunnableTypeName} not found.");
 
-                type.GetMethod(nameof(Runnable.RunCore), BindingFlags.Public | BindingFlags.Static)
-                    .Invoke(null, new object[] { host, benchmarkCase, codegenMode, config });
+                var methodInfo = type.GetMethod(nameof(Runnable.RunCore), BindingFlags.Public | BindingFlags.Static)
+                    ?? throw new InvalidOperationException($"Bug: method {nameof(Runnable.RunCore)} in {inProcessRunnableTypeName} not found.");
+                methodInfo.Invoke(null, new object[] { host, benchmarkCase, codegenMode, config });
 
                 return 0;
             }
@@ -100,7 +101,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             {
                 var target = benchmarkCase.Descriptor;
                 var job = benchmarkCase.Job; // TODO: filter job (same as SourceCodePresenter does)?
-                var unrollFactor = benchmarkCase.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance);
+                int unrollFactor = benchmarkCase.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance);
 
                 // DONTTOUCH: these should be allocated together
                 var instance = Activator.CreateInstance(benchmarkCase.Descriptor.Type);
@@ -117,7 +118,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 FillMembers(instance, benchmarkCase);
 
                 host.WriteLine();
-                foreach (var infoLine in BenchmarkEnvironmentInfo.GetCurrent().ToFormattedString())
+                foreach (string infoLine in BenchmarkEnvironmentInfo.GetCurrent().ToFormattedString())
                     host.WriteLine("// {0}", infoLine);
                 host.WriteLine("// Job: {0}", job.DisplayInfo);
                 host.WriteLine();
@@ -146,7 +147,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     IterationCleanupAction = iterationCleanupAction.InvokeSingle,
                     TargetJob = job,
                     OperationsPerInvoke = target.OperationsPerInvoke,
-                    MeasureGcStats = config.HasMemoryDiagnoser()
+                    MeasureGcStats = config.HasMemoryDiagnoser(),
+                    BenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase)
                 };
 
                 using (var engine = job

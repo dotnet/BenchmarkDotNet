@@ -16,11 +16,11 @@ namespace BenchmarkDotNet.Exporters
         public static readonly IExporter Default = new RPlotExporter();
         public string Name => nameof(RPlotExporter);
 
-        private static object buildScriptLock = new object();
+        private static readonly object BuildScriptLock = new object();
 
         public IEnumerable<IExporter> Dependencies
         {
-            // R Plots depends on having the full measurments available
+            // R Plots depends on having the full measurements available
             get { yield return CsvMeasurementsExporter.Default; }
         }
 
@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Exporters
             yield return scriptFileName;
 
             string fileNamePrefix = Path.Combine(summary.ResultsDirectoryPath, summary.Title);
-            string csvFullPath = CsvMeasurementsExporter.Default.GetAtrifactFullName(summary);
+            string csvFullPath = CsvMeasurementsExporter.Default.GetArtifactFullName(summary);
             
             string scriptFullPath = Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
             string logFullPath = Path.Combine(summary.ResultsDirectoryPath, logFileName);
@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Exporters
                 LoadTemplate(scriptFileName).
                 Replace("$BenchmarkDotNetVersion$", BenchmarkDotNetInfo.FullTitle).
                 Replace("$CsvSeparator$", CsvMeasurementsExporter.Default.Separator);
-            lock (buildScriptLock)
+            lock (BuildScriptLock)
                 File.WriteAllText(scriptFullPath, script);
 
             string rscriptExecutable = RuntimeInformation.IsWindows() ? "Rscript.exe" : "Rscript";
@@ -91,9 +91,13 @@ namespace BenchmarkDotNet.Exporters
             throw new NotSupportedException();
         }
 
-        public static string FindInPath(string fileName)
+        private static string FindInPath(string fileName)
         {
-            var dirs = Environment.GetEnvironmentVariable("PATH").Split(Path.PathSeparator);
+            string path = Environment.GetEnvironmentVariable("PATH");
+            if (path == null)
+                return null;
+            
+            var dirs = path.Split(Path.PathSeparator);
             foreach (string dir in dirs)
             {
                 string trimmedDir = dir.Trim('\'', '"');
@@ -105,7 +109,7 @@ namespace BenchmarkDotNet.Exporters
                 }
                 catch (Exception)
                 {
-                    // Nevermind
+                    // Never mind
                 }
             }
             return null;

@@ -83,7 +83,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
                 var instanceType = instance.GetType();
                 var callbackField = GetCallbackField(instanceType, callbackFieldName);
-                var callbackInvokeMethod = callbackField.FieldType.GetTypeInfo().GetMethod(nameof(Action.Invoke));
+                var callbackInvokeMethod = callbackField.FieldType.GetTypeInfo().GetMethod(nameof(Action.Invoke))
+                    ?? throw new NullReferenceException($"{nameof(Action.Invoke)} not found");
                 var storeResultField = GetStoreResultField(instanceType, storeResultFieldName, callbackInvokeMethod.ReturnType);
 
                 // void InvokeMultipleEmitted(long x) // instance method associated with instanceType
@@ -135,7 +136,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 MethodInfo callbackInvokeMethod,
                 FieldInfo storeResultField, int unrollFactor)
             {
-                // ReSharper disable CommentTypo
                 /*
                     // for long i = 0
                     IL_0000: ldc.i4.0
@@ -161,7 +161,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
                     IL_0045: ret
                 */
-                // ReSharper restore CommentTypo
 
                 bool noReturnValue = callbackInvokeMethod.ReturnType == typeof(void);
                 bool hasStoreField = !noReturnValue && storeResultField != null;

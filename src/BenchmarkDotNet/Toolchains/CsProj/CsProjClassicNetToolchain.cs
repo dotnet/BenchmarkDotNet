@@ -4,7 +4,6 @@ using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -43,17 +42,17 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         private string targetFrameworkMoniker;
 
-        private CsProjClassicNetToolchain(string targetFrameworkMoniker)
-            : base($"CsProj{targetFrameworkMoniker}",
-                new CsProjGenerator(targetFrameworkMoniker, platform => platform.ToConfig()),
+        private CsProjClassicNetToolchain(string targetFrameworkMoniker, string packagesPath = null)
+            : base(targetFrameworkMoniker,
+                new CsProjGenerator(targetFrameworkMoniker, cliPath: null, packagesPath: packagesPath, runtimeFrameworkVersion: null),
                 new DotNetCliBuilder(targetFrameworkMoniker, customDotNetCliPath: null),
                 new Executor())
         {
             this.targetFrameworkMoniker = targetFrameworkMoniker;
         }
 
-        public static IToolchain From(string targetFrameworkMoniker)
-            => new CsProjClassicNetToolchain(targetFrameworkMoniker);
+        public static IToolchain From(string targetFrameworkMoniker, string packagesPath = null)
+            => new CsProjClassicNetToolchain(targetFrameworkMoniker, packagesPath);
 
         public override bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver)
         {
@@ -80,10 +79,10 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         private static IToolchain GetCurrentVersion()
         {
             if (!RuntimeInformation.IsWindows())
-                return Net46; // we return .NET 4.6 which during validaiton will tell the user about lack of support
+                return Net46; // we return .NET 4.6 which during validation will tell the user about lack of support
             
             // this logic is put to a separate method to avoid any assembly loading issues on non Windows systems
-            var version = FrameworkVersionHelper.GetLatestNetDeveloperPackVersion();
+            string version = FrameworkVersionHelper.GetLatestNetDeveloperPackVersion();
             return Toolchains.TryGetValue(version, out var toolchain) ? toolchain : Default;
         }
     }

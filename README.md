@@ -1,7 +1,7 @@
 ![](docs/guide/logo/logo-wide.png)
 
 
-[![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/) [![Gitter](https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet.svg)](https://gitter.im/dotnet/BenchmarkDotNet)  [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md) [![Overview](https://img.shields.io/badge/docs-Overview-green.svg?style=flat)](http://benchmarkdotnet.org/Overview.htm) [![ChangeLog](https://img.shields.io/badge/docs-ChangeLog-green.svg?style=flat)](https://github.com/dotnet/BenchmarkDotNet/wiki/ChangeLog)
+[![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/) [![Gitter](https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet.svg)](https://gitter.im/dotnet/BenchmarkDotNet)  [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md) [![Overview](https://img.shields.io/badge/docs-Overview-green.svg?style=flat)](https://benchmarkdotnet.org/articles/overview.html) [![ChangeLog](https://img.shields.io/badge/docs-ChangeLog-green.svg?style=flat)](https://benchmarkdotnet.org/changelog/index.html)
 
 | AppVeyor/Windows | Travis/Linux | Travis/macOS |
 |------------------|--------------|--------------|
@@ -48,7 +48,7 @@ using BenchmarkDotNet.Running;
 
 namespace MyBenchmarks
 {
-    [ClrJob(isBaseline: true), CoreJob, MonoJob, CoreRtJob]
+    [ClrJob(baseline: true), CoreJob, MonoJob, CoreRtJob]
     [RPlotExporter, RankColumn]
     public class Md5VsSha256
     {
@@ -97,27 +97,27 @@ Frequency=3507504 Hz, Resolution=285.1030 ns, Timer=TSC
   CoreRT     : .NET CoreRT 1.0.26414.01, 64bit AOT
   Mono       : Mono 5.10.0 (Visual Studio), 64bit 
 
-| Method | Runtime |     N |       Mean |     Error |    StdDev | Scaled | Rank |
-|------- |-------- |------ |-----------:|----------:|----------:|-------:|-----:|
-| Sha256 |     Clr |  1000 |   8.009 us | 0.0370 us | 0.0346 us |   1.00 |    3 |
-| Sha256 |    Core |  1000 |   4.447 us | 0.0117 us | 0.0110 us |   0.56 |    2 |
-| Sha256 |  CoreRT |  1000 |   4.321 us | 0.0139 us | 0.0130 us |   0.54 |    1 |
-| Sha256 |    Mono |  1000 |  14.924 us | 0.0574 us | 0.0479 us |   1.86 |    4 |
-|        |         |       |            |           |           |        |      |
-|    Md5 |     Clr |  1000 |   3.051 us | 0.0604 us | 0.0742 us |   1.00 |    3 |
-|    Md5 |    Core |  1000 |   2.004 us | 0.0058 us | 0.0054 us |   0.66 |    2 |
-|    Md5 |  CoreRT |  1000 |   1.892 us | 0.0087 us | 0.0077 us |   0.62 |    1 |
-|    Md5 |    Mono |  1000 |   3.878 us | 0.0181 us | 0.0170 us |   1.27 |    4 |
-|        |         |       |            |           |           |        |      |
-| Sha256 |     Clr | 10000 |  75.780 us | 1.0445 us | 0.9771 us |   1.00 |    3 |
-| Sha256 |    Core | 10000 |  41.134 us | 0.2185 us | 0.1937 us |   0.54 |    2 |
-| Sha256 |  CoreRT | 10000 |  40.895 us | 0.0804 us | 0.0628 us |   0.54 |    1 |
-| Sha256 |    Mono | 10000 | 141.377 us | 0.5598 us | 0.5236 us |   1.87 |    4 |
-|        |         |       |            |           |           |        |      |
-|    Md5 |     Clr | 10000 |  18.575 us | 0.0727 us | 0.0644 us |   1.00 |    3 |
-|    Md5 |    Core | 10000 |  17.562 us | 0.0436 us | 0.0408 us |   0.95 |    2 |
-|    Md5 |  CoreRT | 10000 |  17.447 us | 0.0293 us | 0.0244 us |   0.94 |    1 |
-|    Md5 |    Mono | 10000 |  34.500 us | 0.1553 us | 0.1452 us |   1.86 |    4 |
+| Method | Runtime |     N |       Mean |     Error |    StdDev | Ratio | Rank |
+|------- |-------- |------ |-----------:|----------:|----------:|------:|-----:|
+| Sha256 |     Clr |  1000 |   8.009 us | 0.0370 us | 0.0346 us |  1.00 |    3 |
+| Sha256 |    Core |  1000 |   4.447 us | 0.0117 us | 0.0110 us |  0.56 |    2 |
+| Sha256 |  CoreRT |  1000 |   4.321 us | 0.0139 us | 0.0130 us |  0.54 |    1 |
+| Sha256 |    Mono |  1000 |  14.924 us | 0.0574 us | 0.0479 us |  1.86 |    4 |
+|        |         |       |            |           |           |       |      |
+|    Md5 |     Clr |  1000 |   3.051 us | 0.0604 us | 0.0742 us |  1.00 |    3 |
+|    Md5 |    Core |  1000 |   2.004 us | 0.0058 us | 0.0054 us |  0.66 |    2 |
+|    Md5 |  CoreRT |  1000 |   1.892 us | 0.0087 us | 0.0077 us |  0.62 |    1 |
+|    Md5 |    Mono |  1000 |   3.878 us | 0.0181 us | 0.0170 us |  1.27 |    4 |
+|        |         |       |            |           |           |       |      |
+| Sha256 |     Clr | 10000 |  75.780 us | 1.0445 us | 0.9771 us |  1.00 |    3 |
+| Sha256 |    Core | 10000 |  41.134 us | 0.2185 us | 0.1937 us |  0.54 |    2 |
+| Sha256 |  CoreRT | 10000 |  40.895 us | 0.0804 us | 0.0628 us |  0.54 |    1 |
+| Sha256 |    Mono | 10000 | 141.377 us | 0.5598 us | 0.5236 us |  1.87 |    4 |
+|        |         |       |            |           |           |       |      |
+|    Md5 |     Clr | 10000 |  18.575 us | 0.0727 us | 0.0644 us |  1.00 |    3 |
+|    Md5 |    Core | 10000 |  17.562 us | 0.0436 us | 0.0408 us |  0.95 |    2 |
+|    Md5 |  CoreRT | 10000 |  17.447 us | 0.0293 us | 0.0244 us |  0.94 |    1 |
+|    Md5 |    Mono | 10000 |  34.500 us | 0.1553 us | 0.1452 us |  1.86 |    4 |
 ```
 
 In artifacts, you can also find detailed information about each iteration.
@@ -132,19 +132,19 @@ BenchmarkDotNet has a lot of awesome features for deep performance investigation
 * **Standard benchmarking routine:** generating an isolated project per each benchmark method; auto-selection of iteration amount; warmup; overhead evaluation; and so on
 * **Execution control:** BenchmarkDotNet tries to choose the best possible way to evaluate performance, but you can also manually control amount of iterations, switch between cold start and warmed state, set the accuracy level, tune GC parameters, change environment variables, and more
 * **Statistics:** by default, you will see the most important statistics like mean and standard deviation; but you can also manually ask for min/max values, confidence intervals, skewness, kurtosis, quartile, percentiles, or define own metrics
-* **Comparing environments:** [Easy way](http://benchmarkdotnet.org/Configs/Jobs.htm) to compare different environments (x86 vs x64, LegacyJit vs RyuJit, Mono vs .NET Core, and so on)
-* **Relative performance:** you can [easily]((http://benchmarkdotnet.org/Advanced/Baseline.htm)) evaluate difference between different methods of environments
+* **Comparing environments:** [Easy way](https://benchmarkdotnet.org/articles/configs/jobs.html) to compare different environments (x86 vs x64, LegacyJit vs RyuJit, Mono vs .NET Core, and so on)
+* **Relative performance:** you can [easily](https://benchmarkdotnet.org/articles/features/baselines.html) evaluate difference between different methods of environments
 * **Memory diagnostics:** the library not only measure performance of your code, but also prints information about memory traffic and amount of GC collections
 * **Disassembly diagnostics:** you can ask for an assembly listing with the help of single additional attribute
-* **Parametrization:** performance can be evaluated for different sets of input [parameters](http://benchmarkdotnet.org/Advanced/Params.htm) like in popular unit test frameworks
+* **Parametrization:** performance can be evaluated for different sets of input [parameters](https://benchmarkdotnet.org/articles/features/parameterization.html) like in popular unit test frameworks
 * **Environment information:** when your share performance results, it's very important to share information about your environment; BenchmarkDotNet automatically prints the exact version of your OS and processor; amount of physical CPU, physical cores, and logic cores; hypervisor (if you use it); frequency of the hardware timer; the JIT-compiler version; and more
-* **Command-line support:** you can manage thousands of benchmark, group them by categories, [filter](http://benchmarkdotnet.org/Configs/Filters.htm) and run them from command line
+* **Command-line support:** you can manage thousands of benchmark, group them by categories, [filter](https://benchmarkdotnet.org/articles/configs/filters.html) and run them from [command line](https://benchmarkdotnet.org/articles/guides/console-args.html)
 * **Powerful reporting system:** it's possible to export benchmark results to markdown, csv, html, plain text, png plots
 
 A few useful links for you:
 
-* If you want to know more about BenchmarkDotNet features, check out the [Overview Page](http://benchmarkdotnet.org/Overview.htm).
-* If you want to use BenchmarkDotNet for the first time, the [Getting Started](http://benchmarkdotnet.org/GettingStarted.htm) will help you.
+* If you want to know more about BenchmarkDotNet features, check out the [Overview Page](https://benchmarkdotnet.org/articles/overview.html).
+* If you want to use BenchmarkDotNet for the first time, the [Getting Started](https://benchmarkdotnet.org/articles/guides/getting-started.html) will help you.
 * If you want to ask a quick question or discuss performance topics, use the [gitter](https://gitter.im/dotnet/BenchmarkDotNet) channel.
 
 ## Supported technologies
@@ -163,9 +163,9 @@ The library is used by a large number of projects for performance discussions or
 * [CoreFX](https://github.com/dotnet/corefx/issues?utf8=✓&q=BenchmarkDotNet) (.NET Core foundational libraries;
   see also [official benchmarking guide](https://github.com/dotnet/corefx/blob/master/Documentation/project-docs/benchmarking.md)),
 * [Roslyn](https://github.com/dotnet/roslyn/search?q=BenchmarkDotNet&type=Issues&utf8=✓) (C# and Visual Basic compiler)
-* [KestrelHttpServer](https://github.com/aspnet/KestrelHttpServer/tree/dev/benchmarks/Kestrel.Performance) (A cross platform web server for ASP.NET Core)
-* [SignalR](https://github.com/aspnet/SignalR/tree/dev/benchmarks/Microsoft.AspNetCore.SignalR.Microbenchmarks)
-* [EntityFrameworkCore](https://github.com/aspnet/EntityFrameworkCore/tree/dev/benchmarks)
+* [KestrelHttpServer](https://github.com/aspnet/KestrelHttpServer/tree/master/benchmarks/Kestrel.Performance) (A cross platform web server for ASP.NET Core)
+* [SignalR](https://github.com/aspnet/SignalR/tree/master/benchmarks/Microsoft.AspNetCore.SignalR.Microbenchmarks)
+* [EntityFrameworkCore](https://github.com/aspnet/EntityFrameworkCore/tree/master/benchmarks)
 * [F#](https://github.com/fsharp/fsharp/blob/master/tests/scripts/array-perf/array-perf.fs)
 * [Orleans](https://github.com/dotnet/orleans/tree/master/test/Benchmarks)
 * [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json/tree/master/Src/Newtonsoft.Json.Tests/Benchmarks)
@@ -199,7 +199,7 @@ Any help will be appreciated.
 You can develop new features, fix bugs, improve the documentation, or do some other cool stuff.
 
 If you want to contribute, check out the
-  [Contributing guide](http://benchmarkdotnet.org/Contributing.htm) and
+  [Contributing guide](https://benchmarkdotnet.org/articles/contributing/building.html) and
   [up-for-grabs](https://github.com/dotnet/BenchmarkDotNet/issues?q=is:open+is:issue+label:up-for-grabs) issues.
 If you have new ideas or want to complain about bugs, feel free to [create a new issue](https://github.com/dotnet/BenchmarkDotNet/issues/new).
 Let's build the best tool for benchmarking together!

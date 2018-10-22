@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Validators;
 using Microsoft.Diagnostics.Tracing.Parsers;
 
@@ -16,7 +17,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         protected override string SessionNamePrefix => "JitTracing";
 
         public abstract IEnumerable<string> Ids { get; }
-        public IColumnProvider GetColumnProvider() => EmptyColumnProvider.Instance;
 
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {
@@ -26,9 +26,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 Stop();
         }
 
-        public virtual void ProcessResults(DiagnoserResults results) { }
+        public virtual IEnumerable<Metric> ProcessResults(DiagnoserResults results) => Array.Empty<Metric>();
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Enumerable.Empty<ValidationError>();
+        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Array.Empty<ValidationError>();
 
         public void DisplayResults(ILogger outputLogger)
         {

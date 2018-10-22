@@ -7,12 +7,12 @@ namespace BenchmarkDotNet.Analysers
     public class CompositeAnalyser : IAnalyser
     {
         private readonly IAnalyser[] analysers;
-        private static int counter = 0; // TODO: improve
+        private static int counter; // TODO: improve
 
         public CompositeAnalyser(IAnalyser[] analysers)
         {
             this.analysers = analysers;
-            Id = "Composite-" + (++counter);
+            Id = "Composite-" + ++counter;
         }
 
         public string Id { get; }

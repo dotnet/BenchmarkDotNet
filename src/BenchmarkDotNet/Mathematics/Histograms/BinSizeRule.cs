@@ -12,6 +12,6 @@
         
         Sturges,
         
-        Rice,
+        Rice
     }
 }

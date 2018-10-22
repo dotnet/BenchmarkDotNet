@@ -213,4 +213,6 @@ clflush size	: 64
 cache_alignment	: 64
 address sizes	: 39 bits physical, 48 bits virtual
 power management:
-
+nominal freq : 2500
+max freq : 2500
+min freq : 800

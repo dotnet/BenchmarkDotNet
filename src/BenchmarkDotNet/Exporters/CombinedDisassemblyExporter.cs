@@ -24,7 +24,8 @@ namespace BenchmarkDotNet.Exporters
         {
             var benchmarksByTarget = summary.BenchmarksCases
                 .Where(benchmark => results.ContainsKey(benchmark))
-                .GroupBy(benchmark => benchmark.Descriptor.WorkloadMethod);
+                .GroupBy(benchmark => benchmark.Descriptor.WorkloadMethod)
+                .ToList();
 
             logger.WriteLine("<!DOCTYPE html>");
             logger.WriteLine("<html lang='en'>");
@@ -107,6 +108,6 @@ namespace BenchmarkDotNet.Exporters
             logger.WriteLine("</table>");
         }
 
-        private string GetImportantInfo(BenchmarkReport benchmarkReport) => benchmarkReport.GetRuntimeInfo();
+        private static string GetImportantInfo(BenchmarkReport benchmarkReport) => benchmarkReport.GetRuntimeInfo();
     }
 }

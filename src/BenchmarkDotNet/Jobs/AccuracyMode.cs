@@ -1,9 +1,11 @@
-﻿using BenchmarkDotNet.Characteristics;
+﻿using System.Diagnostics.CodeAnalysis;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Mathematics;
 
 namespace BenchmarkDotNet.Jobs
 {
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public sealed class AccuracyMode : JobMode<AccuracyMode>
     {
         public static readonly Characteristic<double> MaxRelativeErrorCharacteristic = CreateCharacteristic<double>(nameof(MaxRelativeError));

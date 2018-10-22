@@ -8,7 +8,7 @@ var skipTests = Argument("SkipTests", false);
 // GLOBAL VARIABLES
 var toolsDirectory = "./tools/";
 var docfxExe = toolsDirectory + "docfx/docfx.exe";
-var docfxVersion = "2.36.2";
+var docfxVersion = "2.37.1";
 var changelogDir = "./docs/changelog/";
 var changelogGenDir = "./docs/_changelog/";
 var bdnAllVersions = new string[] {
@@ -49,8 +49,10 @@ var bdnAllVersions = new string[] {
 		"v0.10.12",
 		"v0.10.13",
 		"v0.10.14",
+		"v0.11.0",
+		"v0.11.1"
 	};
-var bdnNextVersion = "v0.11.0";
+var bdnNextVersion = "v0.11.2";
 var bdnFirstCommit = "6eda98ab1e83a0d185d09ff8b24c795711af8db1";
 
 var artifactsDirectory = Directory("./artifacts");

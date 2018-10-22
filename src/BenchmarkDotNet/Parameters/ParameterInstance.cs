@@ -1,5 +1,8 @@
-﻿using BenchmarkDotNet.Code;
+﻿using System;
+using BenchmarkDotNet.Code;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Parameters
 {
@@ -8,7 +11,7 @@ namespace BenchmarkDotNet.Parameters
         public const string NullParameterTextRepresentation = "?";
         private const int MaxDisplayTextInnerLength = 15 + 5; // 5 is for postfix " [15]"
 
-        public ParameterDefinition Definition { get; }
+        [PublicAPI] public ParameterDefinition Definition { get; }
         
         private readonly object value;
 
@@ -30,14 +33,23 @@ namespace BenchmarkDotNet.Parameters
                 : SourceCodeHelper.ToSourceCode(value);
 
         public string ToDisplayText()
-            => Trim(value is IParam parameter
-                ? parameter.DisplayText
-                : value?.ToString() 
-                    ?? NullParameterTextRepresentation);
-        
+        {
+            switch (value) {
+                case null:
+                    return NullParameterTextRepresentation;
+                case IParam parameter:
+                    return Trim(parameter.DisplayText);
+                // no trimming for types!
+                case Type type:
+                    return type.IsNullable() ? $"{Nullable.GetUnderlyingType(type).GetDisplayName()}?" : type.GetDisplayName();
+            }
+
+            return Trim(value.ToString());
+        }
+
         public override string ToString() => ToDisplayText();
 
-        private string Trim(string value) 
+        private static string Trim(string value) 
             => value.Length <= MaxDisplayTextInnerLength
                 ? value
                 : value.Substring(0, 5) + "(...)" + value.Substring(value.Length - 5, 5) + $" [{value.Length}]";

@@ -4,6 +4,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.Roslyn;
 
 namespace BenchmarkDotNet.Toolchains
 {
@@ -18,15 +19,15 @@ namespace BenchmarkDotNet.Toolchains
         {
             switch (runtime)
             {
-                case ClrRuntime clr:
-                case MonoRuntime mono:
+                case ClrRuntime _:
+                case MonoRuntime _:
                     if(RuntimeInformation.IsNetCore)
                         return CsProjClassicNetToolchain.Current.Value;
 
-                    return Roslyn.RoslynToolchain.Instance;
-                case CoreRuntime core:
+                    return RoslynToolchain.Instance;
+                case CoreRuntime _:
                     return CsProjCoreToolchain.Current.Value;
-                case CoreRtRuntime coreRt:
+                case CoreRtRuntime _:
                     return CoreRtToolchain.LatestMyGetBuild;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtime), runtime, "Runtime not supported");

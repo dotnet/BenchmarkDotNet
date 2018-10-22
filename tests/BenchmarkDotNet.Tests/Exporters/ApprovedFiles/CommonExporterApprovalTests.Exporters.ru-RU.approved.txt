@@ -3,7 +3,7 @@ AsciiDocExporter
 ############################################
 ....
 BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
-MockIntel Core i7-6700HQ CPU 2.60GHz, 1 CPU, 8 logical and 4 physical cores
+MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
   [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 
@@ -35,7 +35,7 @@ HtmlExporter
 <body>
 <pre><code>
 BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
-MockIntel Core i7-6700HQ CPU 2.60GHz, 1 CPU, 8 logical and 4 physical cores
+MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
   [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 </code></pre>
@@ -358,7 +358,7 @@ MarkdownExporter-default
 ############################################
 
 BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
-MockIntel Core i7-6700HQ CPU 2.60GHz, 1 CPU, 8 logical and 4 physical cores
+MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
   [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 
@@ -375,7 +375,7 @@ MarkdownExporter-atlassian
 {noformat}
 
 BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
-MockIntel Core i7-6700HQ CPU 2.60GHz, 1 CPU, 8 logical and 4 physical cores
+MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
   [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 
@@ -391,7 +391,7 @@ MarkdownExporter-console
 ############################################
 
 BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
-MockIntel Core i7-6700HQ CPU 2.60GHz, 1 CPU, 8 logical and 4 physical cores
+MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
   [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 
@@ -408,7 +408,7 @@ MarkdownExporter-github
 ``` ini
 
 BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
-MockIntel Core i7-6700HQ CPU 2.60GHz, 1 CPU, 8 logical and 4 physical cores
+MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
   [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 
@@ -425,7 +425,7 @@ MarkdownExporter-stackoverflow
 ############################################
 
     BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
-    MockIntel Core i7-6700HQ CPU 2.60GHz, 1 CPU, 8 logical and 4 physical cores
+    MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
     Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
       [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 

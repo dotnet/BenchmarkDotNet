@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Jobs
 {
@@ -23,14 +24,14 @@ namespace BenchmarkDotNet.Jobs
         public static readonly EnvironmentMode RyuJitX64 = new EnvironmentMode(nameof(RyuJitX64), Jit.RyuJit, Platform.X64).Freeze();
         public static readonly EnvironmentMode RyuJitX86 = new EnvironmentMode(nameof(RyuJitX86), Jit.RyuJit, Platform.X86).Freeze();
 
-        public EnvironmentMode() : this(id: null) { }
+        [PublicAPI] public EnvironmentMode() : this(id: null) { }
 
-        public EnvironmentMode(Runtime runtime) : this(runtime.ToString())
+        [PublicAPI] public EnvironmentMode(Runtime runtime) : this(runtime.ToString())
         {
             Runtime = runtime;
         }
 
-        public EnvironmentMode(string id, Jit jit, Platform platform) : this(id)
+        [PublicAPI] public EnvironmentMode(string id, Jit jit, Platform platform) : this(id)
         {
             Jit = jit;
             Platform = platform;
@@ -38,7 +39,7 @@ namespace BenchmarkDotNet.Jobs
                 Runtime = Runtime.Clr;
         }
 
-        public EnvironmentMode(string id) : base(id)
+        [PublicAPI] public EnvironmentMode(string id) : base(id)
         {
             GcCharacteristic[this] = new GcMode();
         }

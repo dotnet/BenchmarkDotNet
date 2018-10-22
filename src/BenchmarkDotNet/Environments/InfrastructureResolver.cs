@@ -12,7 +12,6 @@ namespace BenchmarkDotNet.Environments
 
         private InfrastructureResolver()
         {
-            var infra = Job.Default.Infrastructure;
             Register(InfrastructureMode.ClockCharacteristic, () => Chronometer.BestClock);
             Register(InfrastructureMode.EngineFactoryCharacteristic, () => new EngineFactory());
             Register(InfrastructureMode.BuildConfigurationCharacteristic, () => InfrastructureMode.ReleaseConfigurationName);

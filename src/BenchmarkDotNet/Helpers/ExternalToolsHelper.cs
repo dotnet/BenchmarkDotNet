@@ -7,13 +7,6 @@ namespace BenchmarkDotNet.Helpers
     public static class ExternalToolsHelper
     {
         /// <summary>
-        /// Output of the `lsb_release -a` command.
-        /// Linux only.
-        /// </summary>
-        public static readonly Lazy<Dictionary<string, string>> LsbRelease = LazyParse(RuntimeInformation.IsLinux, "lsb_release", "-a",
-            s => SectionsHelper.ParseSection(s, ':'));
-
-        /// <summary>
         /// Output of the `system_profiler SPSoftwareDataType` command.
         /// MacOSX only.
         /// </summary>

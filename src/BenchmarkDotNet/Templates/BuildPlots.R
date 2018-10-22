@@ -2,7 +2,7 @@ BenchmarkDotNetVersion <- "$BenchmarkDotNetVersion$ "
 dir.create(Sys.getenv("R_LIBS_USER"), recursive = TRUE, showWarnings = FALSE)
 list.of.packages <- c("ggplot2", "dplyr", "gdata", "tidyr", "grid", "gridExtra", "Rcpp")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-if(length(new.packages)) install.packages(new.packages, lib = Sys.getenv("R_LIBS_USER"), repos = "http://cran.rstudio.com/")
+if(length(new.packages)) install.packages(new.packages, lib = Sys.getenv("R_LIBS_USER"), repos = "https://cran.rstudio.com/")
 library(ggplot2)
 library(dplyr)
 library(gdata)
@@ -38,7 +38,7 @@ for (file in files) {
   title <- gsub("-measurements.csv", "", basename(file))
   measurements <- read.csv(file, sep = "$CsvSeparator$")
 
-  result <- measurements %>% filter(Measurement_IterationMode == "Result")
+  result <- measurements %>% filter(Measurement_IterationStage == "Result")
   if (nrow(result[is.na(result$Job_Id),]) > 0)
     result[is.na(result$Job_Id),]$Job_Id <- ""
   if (nrow(result[is.na(result$Params),]) > 0) {

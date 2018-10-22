@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Horology;
@@ -7,6 +8,7 @@ using BenchmarkDotNet.Toolchains.InProcess;
 
 namespace BenchmarkDotNet.Jobs
 {
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public sealed class InfrastructureMode : JobMode<InfrastructureMode>
     {
         public const string ReleaseConfigurationName = "Release";

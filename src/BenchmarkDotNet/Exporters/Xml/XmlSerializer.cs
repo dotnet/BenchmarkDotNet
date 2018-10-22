@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -16,7 +17,7 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         private IXmlWriter writer;
 
-        public static string DefaultItemName { get; } = "Item";
+        public const string DefaultItemName = "Item";
 
         private XmlSerializer(XmlSerializerBuilder builder)
         {
@@ -28,14 +29,12 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         public static XmlSerializerBuilder GetBuilder(Type type) => new XmlSerializerBuilder(type);
 
-        public void Serialize(IXmlWriter writer, object source)
+        public void Serialize(IXmlWriter newWriter, object source)
         {
-            if (writer == null)
-                throw new ArgumentNullException(nameof(writer));
             if (source == null || source.GetType() != type)
                 throw new ArgumentNullException(nameof(source));
 
-            this.writer = writer;
+            writer = newWriter ?? throw new ArgumentNullException(nameof(newWriter));
 
             Write(source);
         }
@@ -101,11 +100,12 @@ namespace BenchmarkDotNet.Exporters.Xml
             writer.WriteEndElement();
         }
 
+        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         private void WriteCollectionProperty(object source, PropertyInfo property)
         {
-            IEnumerable collection = (IEnumerable)property.GetValue(source);
+            var collection = (IEnumerable)property.GetValue(source);
 
-            if (!IsCollectionWriteable(collection))
+            if (!IsCollectionWritable(collection))
                 return;
 
             writer.WriteStartElement(property.Name);
@@ -116,14 +116,7 @@ namespace BenchmarkDotNet.Exporters.Xml
             {
                 if (itemName == null)
                 {
-                    if (collectionItemNameMap.ContainsKey(property.Name))
-                    {
-                        itemName = collectionItemNameMap[property.Name];
-                    }
-                    else
-                    {
-                        itemName = DefaultItemName;
-                    }
+                    itemName = collectionItemNameMap.ContainsKey(property.Name) ? collectionItemNameMap[property.Name] : DefaultItemName;
                 }
 
                 if (IsSimple(item.GetType().GetTypeInfo()))
@@ -156,20 +149,20 @@ namespace BenchmarkDotNet.Exporters.Xml
         {
             return type.IsPrimitive
                        || type.IsEnum
-                       || type.Equals(typeof(string))
-                       || type.Equals(typeof(decimal));
+                       || type == typeof(string)
+                       || type == typeof(decimal);
         }
 
         private static bool IsCollection(PropertyInfo property)
             => typeof(IEnumerable).IsAssignableFrom(property.PropertyType);
 
-        private bool IsCollectionWriteable(IEnumerable collection)
+        private static bool IsCollectionWritable(IEnumerable collection)
             => collection?.Cast<object>().FirstOrDefault() != null;
 
         internal class XmlSerializerBuilder
         {
-            private Dictionary<string, string> collectionItemNameMap = new Dictionary<string, string>();
-            private HashSet<string> excludedPropertyNames = new HashSet<string>();
+            private readonly Dictionary<string, string> collectionItemNameMap = new Dictionary<string, string>();
+            private readonly HashSet<string> excludedPropertyNames = new HashSet<string>();
 
             public Type Type { get; }
             public string RootName { get; private set; }
@@ -181,7 +174,7 @@ namespace BenchmarkDotNet.Exporters.Xml
                 if (type == null)
                     throw new ArgumentNullException(nameof(type));
 
-                this.Type = type;
+                Type = type;
                 RootName = type.Name;
             }
 

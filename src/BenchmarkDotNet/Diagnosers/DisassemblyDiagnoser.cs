@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
@@ -8,6 +10,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess;
 using BenchmarkDotNet.Validators;
@@ -16,12 +19,15 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class DisassemblyDiagnoser : IDisassemblyDiagnoser
     {
+        public DisassemblyDiagnoserConfig Config { get; }
+
         private readonly WindowsDisassembler windowsDisassembler;
         private readonly MonoDisassembler monoDisassembler;
         private readonly Dictionary<BenchmarkCase, DisassemblyResult> results;
 
-        internal DisassemblyDiagnoser(WindowsDisassembler windowsDisassembler, MonoDisassembler monoDisassembler)
+        private DisassemblyDiagnoser(WindowsDisassembler windowsDisassembler, MonoDisassembler monoDisassembler, DisassemblyDiagnoserConfig config)
         {
+            Config = config;
             this.windowsDisassembler = windowsDisassembler;
             this.monoDisassembler = monoDisassembler;
 
@@ -30,12 +36,13 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 new CombinedDisassemblyExporter(results),
                 new RawDisassemblyExporter(results),
-                new PrettyDisassemblyExporter(results)
+                new PrettyHtmlDisassemblyExporter(results),
+                new PrettyGithubMarkdownDisassemblyExporter(results)
             };
         }
 
         public static IConfigurableDiagnoser<DisassemblyDiagnoserConfig> Create(DisassemblyDiagnoserConfig config)
-            => new DisassemblyDiagnoser(new WindowsDisassembler(config), new MonoDisassembler(config));
+            => new DisassemblyDiagnoser(new WindowsDisassembler(config), new MonoDisassembler(config), config);
 
         public IConfigurableDiagnoser<DisassemblyDiagnoserConfig> Configure(DisassemblyDiagnoserConfig config)
             => Create(config);
@@ -47,12 +54,11 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<IAnalyser> Analysers => new IAnalyser[] { new DisassemblyAnalyzer(Results) };
 
-        public IColumnProvider GetColumnProvider() => EmptyColumnProvider.Instance;
-        public void ProcessResults(DiagnoserResults _) { }
+        public IEnumerable<Metric> ProcessResults(DiagnoserResults _) => Array.Empty<Metric>();
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase)
         {
-            if (ShouldUseWindowsDissasembler(benchmarkCase))
+            if (ShouldUseWindowsDisassembler(benchmarkCase))
                 return RunMode.NoOverhead;
             if (ShouldUseMonoDisassembler(benchmarkCase))
                 return RunMode.SeparateLogic;
@@ -64,10 +70,14 @@ namespace BenchmarkDotNet.Diagnosers
         {
             var benchmark = parameters.BenchmarkCase;
 
-            if (signal == HostSignal.AfterAll && ShouldUseWindowsDissasembler(benchmark))
-                results.Add(benchmark, windowsDisassembler.Dissasemble(parameters));
-            else if (signal == HostSignal.SeparateLogic && ShouldUseMonoDisassembler(benchmark))
-                results.Add(benchmark, monoDisassembler.Disassemble(benchmark, benchmark.Job.Environment.Runtime as MonoRuntime));
+            switch (signal) {
+                case HostSignal.AfterAll when ShouldUseWindowsDisassembler(benchmark):
+                    results.Add(benchmark, windowsDisassembler.Disassemble(parameters));
+                    break;
+                case HostSignal.SeparateLogic when ShouldUseMonoDisassembler(benchmark):
+                    results.Add(benchmark, monoDisassembler.Disassemble(benchmark, benchmark.Job.Environment.Runtime as MonoRuntime));
+                    break;
+            }
         }
 
         public void DisplayResults(ILogger logger)
@@ -91,10 +101,10 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        private bool ShouldUseMonoDisassembler(BenchmarkCase benchmarkCase)
+        private static bool ShouldUseMonoDisassembler(BenchmarkCase benchmarkCase)
             => benchmarkCase.Job.Environment.Runtime is MonoRuntime || RuntimeInformation.IsMono;
 
-        private bool ShouldUseWindowsDissasembler(BenchmarkCase benchmarkCase)
+        private static bool ShouldUseWindowsDisassembler(BenchmarkCase benchmarkCase)
             => !(benchmarkCase.Job.Environment.Runtime is MonoRuntime) && RuntimeInformation.IsWindows();
     }
 }

@@ -1,25 +1,30 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
-using System.Linq;
-using System.Text;
+using BenchmarkDotNet.Properties;
+using JetBrains.Annotations;
+using RuntimeInformation = BenchmarkDotNet.Portability.RuntimeInformation;
 
 namespace BenchmarkDotNet.Diagnosers
 {
-    internal class WindowsDisassembler
+    [PublicAPI]
+    public class WindowsDisassembler
     {
         private readonly bool printAsm, printIL, printSource, printPrologAndEpilog;
         private readonly int recursiveDepth;
 
-        internal WindowsDisassembler(DisassemblyDiagnoserConfig config)
+        [PublicAPI]
+        public WindowsDisassembler(DisassemblyDiagnoserConfig config)
         {
             printIL = config.PrintIL;
             printAsm = config.PrintAsm;
@@ -28,11 +33,12 @@ namespace BenchmarkDotNet.Diagnosers
             recursiveDepth = config.RecursiveDepth;
         }
 
-        internal DisassemblyResult Dissasemble(DiagnoserActionParameters parameters)
+        [PublicAPI]
+        public DisassemblyResult Disassemble(DiagnoserActionParameters parameters)
         {
-            var resultsPath = Path.GetTempFileName();
+            string resultsPath = Path.GetTempFileName();
 
-            var errors = ProcessHelper.RunAndReadOutput(
+            string errors = ProcessHelper.RunAndReadOutput(
                 GetDisassemblerPath(parameters.Process, parameters.BenchmarkCase.Job.Environment.Platform),
                 BuildArguments(parameters, resultsPath));
 
@@ -55,7 +61,7 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        private string GetDisassemblerPath(Process process, Platform platform)
+        private static string GetDisassemblerPath(Process process, Platform platform)
         {
             switch (platform)
             {
@@ -73,23 +79,23 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        private string GetDisassemblerPath(string architectureName)
+        private static string GetDisassemblerPath(string architectureName)
         {
             // one can only attach to a process of same target architecture, this is why we need exe for x64 and for x86
-            var exeName = $"BenchmarkDotNet.Disassembler.{architectureName}.exe";
+            string exeName = $"BenchmarkDotNet.Disassembler.{architectureName}.exe";
             var assemblyWithDisassemblersInResources = typeof(WindowsDisassembler).GetTypeInfo().Assembly;
 
-            var disassemblerPath =
-                Path.Combine(
-                    new FileInfo(assemblyWithDisassemblersInResources.Location).Directory.FullName,
-                    (Properties.BenchmarkDotNetInfo.FullVersion // possible update
-                    + exeName)); // separate process per architecture!!
+            var dir = new FileInfo(assemblyWithDisassemblersInResources.Location).Directory ?? throw new DirectoryNotFoundException();
+            string disassemblerPath = Path.Combine(
+                    dir.FullName,
+                    BenchmarkDotNetInfo.FullVersion // possible update
+                    + exeName); // separate process per architecture!!
 
-#if !PRERELEASE_DEVELOP // for development we always want to copy the file to not ommit any dev changes (Properties.BenchmarkDotNetInfo.FullVersion in file name is not enough)
+#if !PRERELEASE_DEVELOP // for development we always want to copy the file to not omit any dev changes (Properties.BenchmarkDotNetInfo.FullVersion in file name is not enough)
             if (File.Exists(disassemblerPath))
                 return disassemblerPath;
 #endif
-            // the disassembler has not been yet retrived from the resources
+            // the disassembler has not been yet retrieved from the resources
             CopyFromResources(
                 assemblyWithDisassemblersInResources,
                 $"BenchmarkDotNet.Disassemblers.net46.win7_{architectureName}.{exeName}",
@@ -100,14 +106,14 @@ namespace BenchmarkDotNet.Diagnosers
             return disassemblerPath;
         }
 
-        private void CopyAllRequiredDependencies(Assembly assemblyWithDisassemblersInResources, string destinationFolder)
+        private static void CopyAllRequiredDependencies(Assembly assemblyWithDisassemblersInResources, string destinationFolder)
         {
-            // ClrMD and Cecil are also embeded in the resources, we need to copy them as well
-            foreach (var dependency in assemblyWithDisassemblersInResources.GetManifestResourceNames().Where(name => name.EndsWith(".dll")))
+            // ClrMD and Cecil are also embedded in the resources, we need to copy them as well
+            foreach (string dependency in assemblyWithDisassemblersInResources.GetManifestResourceNames().Where(name => name.EndsWith(".dll")))
             {
                 // dependency is sth like "BenchmarkDotNet.Disassemblers.net46.win7_x64.Microsoft.Diagnostics.Runtime.dll"
-                var fileName = dependency.Replace("BenchmarkDotNet.Disassemblers.net46.win7_x64.", string.Empty);
-                var dllPath = Path.Combine(destinationFolder, fileName);
+                string fileName = dependency.Replace("BenchmarkDotNet.Disassemblers.net46.win7_x64.", string.Empty);
+                string dllPath = Path.Combine(destinationFolder, fileName);
 
                 if (!File.Exists(dllPath))
                     CopyFromResources(
@@ -117,21 +123,23 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        private void CopyFromResources(Assembly assembly, string resourceName, string destinationPath)
+        private static void CopyFromResources(Assembly assembly, string resourceName, string destinationPath)
         {
             using (var resourceStream = assembly.GetManifestResourceStream(resourceName))
             using (var exeStream = File.Create(destinationPath))
             {
+                if (resourceStream == null)
+                    throw new InvalidOperationException($"{nameof(resourceName)} is null");
                 resourceStream.CopyTo(exeStream);
             }
         }
 
-        // if the benechmark requires jitting we use disassembler entry method, if not we use benchmark method name
+        // if the benchmark requires jitting we use disassembler entry method, if not we use benchmark method name
         private string BuildArguments(DiagnoserActionParameters parameters, string resultsPath)
             => new StringBuilder(200)
                 .Append(parameters.Process.Id).Append(' ')
                 .Append("BenchmarkDotNet.Autogenerated.Runnable_").Append(parameters.BenchmarkId.Value).Append(' ')
-                .Append(DisassemblerConstants.DiassemblerEntryMethodName).Append(' ')
+                .Append(DisassemblerConstants.DisassemblerEntryMethodName).Append(' ')
                 .Append(printAsm).Append(' ')
                 .Append(printIL).Append(' ')
                 .Append(printSource).Append(' ')
@@ -141,7 +149,7 @@ namespace BenchmarkDotNet.Diagnosers
                 .ToString();
 
         // code copied from https://stackoverflow.com/a/33206186/5852046
-        internal static class NativeMethods
+        private static class NativeMethods
         {
             // see https://msdn.microsoft.com/en-us/library/windows/desktop/ms684139%28v=vs.85%29.aspx
             public static bool Is64Bit(Process process)
@@ -149,14 +157,14 @@ namespace BenchmarkDotNet.Diagnosers
                 if (Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE") == "x86")
                     return false;
 
-                if (Portability.RuntimeInformation.IsWindows())
+                if (RuntimeInformation.IsWindows())
                 {
                     IsWow64Process(process.Handle, out bool isWow64);
 
                     return !isWow64;
                 }
 
-                return Portability.RuntimeInformation.GetCurrentPlatform() == Platform.X64; // todo: find the way to cover all scenarios for .NET Core
+                return RuntimeInformation.GetCurrentPlatform() == Platform.X64; // todo: find the way to cover all scenarios for .NET Core
             }
 
             [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]

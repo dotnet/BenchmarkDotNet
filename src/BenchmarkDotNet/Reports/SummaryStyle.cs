@@ -1,16 +1,17 @@
-﻿using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Columns;
+﻿using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Horology;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace BenchmarkDotNet.Reports
 {
     public class SummaryStyle : ISummaryStyle
     {
-        public bool PrintUnitsInHeader { get; set; } = false;
+        public bool PrintUnitsInHeader { get; set; }
         public bool PrintUnitsInContent { get; set; } = true;
-        public SizeUnit SizeUnit { get; set; } = null;
-        public TimeUnit TimeUnit { get; set; } = null;
+        public SizeUnit SizeUnit { get; set; }
+        public TimeUnit TimeUnit { get; set; }
 
-        public static SummaryStyle Default => new SummaryStyle()
+        public static SummaryStyle Default => new SummaryStyle
         {
             PrintUnitsInHeader = false,
             PrintUnitsInContent = true,
@@ -20,23 +21,23 @@ namespace BenchmarkDotNet.Reports
 
         public ISummaryStyle WithTimeUnit(TimeUnit timeUnit)
         {
-            return new SummaryStyle()
+            return new SummaryStyle
             {
-                PrintUnitsInHeader = this.PrintUnitsInHeader,
-                PrintUnitsInContent = this.PrintUnitsInContent,
-                SizeUnit = this.SizeUnit,
+                PrintUnitsInHeader = PrintUnitsInHeader,
+                PrintUnitsInContent = PrintUnitsInContent,
+                SizeUnit = SizeUnit,
                 TimeUnit = timeUnit
             };
         }
 
         public ISummaryStyle WithSizeUnit(SizeUnit sizeUnit)
         {
-            return new SummaryStyle()
+            return new SummaryStyle
             {
-                PrintUnitsInHeader = this.PrintUnitsInHeader,
-                PrintUnitsInContent = this.PrintUnitsInContent,
+                PrintUnitsInHeader = PrintUnitsInHeader,
+                PrintUnitsInContent = PrintUnitsInContent,
                 SizeUnit = sizeUnit,
-                TimeUnit = this.TimeUnit
+                TimeUnit = TimeUnit
             };
         }
     }

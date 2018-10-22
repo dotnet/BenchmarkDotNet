@@ -34,10 +34,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             if (benchmarkCase == null)
                 throw new ArgumentNullException(nameof(benchmarkCase));
 
-            if (logger == null)
-                throw new ArgumentNullException(nameof(logger));
-
-            this.logger = logger;
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.diagnoser = diagnoser;
             IsDiagnoserAttached = diagnoser != null;
             Config = config;
@@ -52,14 +49,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
         /// <summary><c>True</c> if there are diagnosers attached.</summary>
         /// <value><c>True</c> if there are diagnosers attached.</value>
-        public bool IsDiagnoserAttached { get; }
+        [PublicAPI] public bool IsDiagnoserAttached { get; }
 
         /// <summary>Results of the run.</summary>
         /// <value>Results of the run.</value>
         public RunResults RunResults { get; private set; }
 
         /// <summary>Current config</summary>
-        public IConfig Config { get; set; }
+        [PublicAPI] public IConfig Config { get; set; }
         
         /// <summary>Passes text to the host.</summary>
         /// <param name="message">Text to write.</param>
@@ -80,6 +77,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             if (!IsDiagnoserAttached) // no need to send the signal, nobody is listening for it
                 return;
 
+            if (diagnoser == null)
+                throw new NullReferenceException(nameof(diagnoser));
+            
             diagnoser.Handle(hostSignal, diagnoserActionParameters);
         }
 

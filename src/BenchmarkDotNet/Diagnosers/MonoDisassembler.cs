@@ -1,21 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Diagnosers
 {
+    [SuppressMessage("ReSharper", "NotAccessedField.Local")] // TODO: use config fields
     internal class MonoDisassembler
     {
         private readonly bool printAsm, printIL, printSource, printPrologAndEpilog;
-        private readonly int recursiveDepth = 1;
+        private readonly int recursiveDepth;
 
         internal MonoDisassembler(DisassemblyDiagnoserConfig config)
         {
@@ -32,13 +35,14 @@ namespace BenchmarkDotNet.Diagnosers
 
             var benchmarkTarget = benchmarkCase.Descriptor;
             string fqnMethod = GetMethodName(benchmarkTarget);
+            string llvmFlag = GetLlvmFlag(benchmarkCase.Job);
             string exePath = benchmarkTarget.Type.GetTypeInfo().Assembly.Location;
             
             var environmentVariables = new Dictionary<string, string> { ["MONO_VERBOSE_METHOD"] = fqnMethod };
             string monoPath = mono?.CustomPath ?? "mono";
-            string arguments = $"--compile {fqnMethod} {exePath}";
+            string arguments = $"--compile {fqnMethod} {llvmFlag} {exePath}";
             
-            var output = ProcessHelper.RunAndReadOutputLineByLine(monoPath, arguments, environmentVariables, includeErros: true);
+            var output = ProcessHelper.RunAndReadOutputLineByLine(monoPath, arguments, environmentVariables, includeErrors: true);
             string commandLine = $"{GetEnvironmentVariables(environmentVariables)} {monoPath} {arguments}";
             
             return OutputParser.Parse(output, benchmarkTarget.WorkloadMethod.Name, commandLine);
@@ -49,6 +53,11 @@ namespace BenchmarkDotNet.Diagnosers
 
         private static string GetMethodName(Descriptor descriptor)
             => $"{descriptor.Type.GetTypeInfo().Namespace}.{descriptor.Type.GetTypeInfo().Name}:{descriptor.WorkloadMethod.Name}";
+
+        // TODO: use resolver
+        // TODO: introduce a global helper method for LlvmFlag 
+        private static string GetLlvmFlag(Job job) =>
+            job.ResolveValue(EnvironmentMode.JitCharacteristic, Jit.Default) == Jit.Llvm ? "--llvm" : "--nollvm";
 
         internal static class OutputParser
         {
@@ -129,12 +138,12 @@ namespace BenchmarkDotNet.Diagnosers
 
             //line example 1:  0:	48 83 ec 28          	sub    $0x28,%rsp
             //line example 2: 0000000000000000	subq	$0x28, %rsp
-            private static Regex instructionRegex = new Regex(@"\s*(?<address>[0-9a-f]+)(\:\s+([0-9a-f]{2}\s+)+)?\s+(?<instruction>.*)\s*");
+            private static readonly Regex InstructionRegex = new Regex(@"\s*(?<address>[0-9a-f]+)(\:\s+([0-9a-f]{2}\s+)+)?\s+(?<instruction>.*)\s*");
 
-            public static bool TryParseInstruction(string line, out Code instruction)
+            private static bool TryParseInstruction(string line, out Code instruction)
             {
                 instruction = null;
-                var match = instructionRegex.Match(line);
+                var match = InstructionRegex.Match(line);
                 if (!match.Success)
                     return false;
 

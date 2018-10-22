@@ -1,9 +1,9 @@
-﻿using BenchmarkDotNet.Reports;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -14,8 +14,7 @@ namespace BenchmarkDotNet.Extensions
             if (actionExp.Body == null)
                 throw new ArgumentException("Extend a an Expression with a valid Body", nameof(actionExp));
 
-            var methodExp = actionExp.Body as MethodCallExpression;
-            if (methodExp == null)
+            if (!(actionExp.Body is MethodCallExpression methodExp))
                 throw new ArgumentException("Extend a MethodCallExpression, but got a " + actionExp.Body.GetType().Name, nameof(actionExp));
 
             return summary.Reports.First(r => r.BenchmarkCase.Descriptor.WorkloadMethod == methodExp.Method);
@@ -23,7 +22,7 @@ namespace BenchmarkDotNet.Extensions
 
         public static IList<Measurement> GetRunsFor<T>(this Summary summary, Expression<Action<T>> actionExp)
         {
-            return summary.GetReportFor<T>(actionExp).GetResultRuns().ToList();
+            return summary.GetReportFor(actionExp).GetResultRuns().ToList();
         }
 
         public static Statistics GetStatistics(this IReadOnlyCollection<Measurement> runs)

@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Parameters
 
         // We will only worry about common, basic types, i.e. int, long, double, etc
         // (e.g. you can't write [Params(10.0m, 20.0m, 100.0m, 200.0m)], the compiler won't let you!)
-        private static readonly Comparer primitiveComparer = new Comparer().
+        private static readonly Comparer PrimitiveComparer = new Comparer().
             Add((string x, string y) => string.CompareOrdinal(x, y)).
             Add((int x, int y) => x.CompareTo(y)).
             Add((long x, long y) => x.CompareTo(y)).
@@ -19,9 +19,12 @@ namespace BenchmarkDotNet.Parameters
 
         public int Compare(ParameterInstances x, ParameterInstances y)
         {
-            for (var i = 0; i < Math.Min(x.Count, y.Count); i++)
+            if (x == null && y == null) return 0;
+            if (x != null && y == null) return 1;
+            if (x == null) return -1;
+            for (int i = 0; i < Math.Min(x.Count, y.Count); i++)
             {
-                var compareTo = primitiveComparer.CompareTo(x[i]?.Value, y[i]?.Value);
+                int compareTo = PrimitiveComparer.CompareTo(x[i]?.Value, y[i]?.Value);
                 if (compareTo != 0)
                     return compareTo;
             }

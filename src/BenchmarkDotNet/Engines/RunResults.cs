@@ -13,10 +13,11 @@ namespace BenchmarkDotNet.Engines
     {
         private readonly OutlierMode outlierMode;
         private readonly Encoding encoding;
-        [CanBeNull]
+        
+        [CanBeNull, PublicAPI]
         public IReadOnlyList<Measurement> Overhead { get; }
 
-        [NotNull]
+        [NotNull, PublicAPI]
         public IReadOnlyList<Measurement> Workload { get; }
 
         public GcStats GCStats { get; }

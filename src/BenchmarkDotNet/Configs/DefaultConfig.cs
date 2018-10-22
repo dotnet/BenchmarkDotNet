@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
@@ -9,10 +11,8 @@ using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
-using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Reports;
-using System.IO;
-using System.Text;
+using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -37,7 +37,10 @@ namespace BenchmarkDotNet.Configs
 
         public IEnumerable<ILogger> GetLoggers()
         {
-            yield return ConsoleLogger.Default;
+            if (LinqPadLogger.IsAvailable)
+                yield return LinqPadLogger.Instance;
+            else
+                yield return ConsoleLogger.Default;
         }
 
         public IEnumerable<IAnalyser> GetAnalysers()
@@ -58,6 +61,8 @@ namespace BenchmarkDotNet.Configs
 #endif
             yield return RunModeValidator.FailOnError;
             yield return GenericBenchmarksValidator.DontFailOnError;
+            yield return DeferredExecutionValidator.FailOnError;
+            yield return ParamsAllValuesValidator.FailOnError;
         }
 
         public IEnumerable<Job> GetJobs() => Array.Empty<Job>();
@@ -67,6 +72,8 @@ namespace BenchmarkDotNet.Configs
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
 
         public bool KeepBenchmarkFiles => false;
+
+        public bool SummaryPerType => true;
 
         public string ArtifactsPath => Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");
 

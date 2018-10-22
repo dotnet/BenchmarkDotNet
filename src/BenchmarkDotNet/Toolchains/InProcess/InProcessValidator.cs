@@ -115,7 +115,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             {
                 if (ValidationRules.TryGetValue(characteristic, out var validationRule))
                 {
-                    var message = validationRule(job, characteristic);
+                    string message = validationRule(job, characteristic);
                     if (!string.IsNullOrEmpty(message))
                         yield return new ValidationError(
                                 isCritical,

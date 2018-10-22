@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
@@ -12,7 +13,7 @@ namespace BenchmarkDotNet.Extensions
 {
     // we need it public to reuse it in the auto-generated dll
     // but we hide it from intellisense with following attribute
-    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     [PublicAPI]
     public static class ProcessExtensions
     {
@@ -27,6 +28,12 @@ namespace BenchmarkDotNet.Extensions
                 logger.WriteLineError($"Failed to set up high priority. Make sure you have the right permissions. Message: {ex.Message}");
             }
         }
+        
+        internal static string ToPresentation(this IntPtr processorAffinity, int processorCount)
+            => (RuntimeInformation.GetCurrentPlatform() == Platform.X64
+                    ? Convert.ToString(processorAffinity.ToInt64(), 2)
+                    : Convert.ToString(processorAffinity.ToInt32(), 2))
+                .PadLeft(processorCount, '0');
 
         private static IntPtr FixAffinity(IntPtr processorAffinity)
         {

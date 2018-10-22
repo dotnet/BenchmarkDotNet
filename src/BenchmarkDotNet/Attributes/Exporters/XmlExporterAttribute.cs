@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Attributes
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = true)]
     public class XmlExporterAttribute : ExporterConfigBaseAttribute
     {
-        public XmlExporterAttribute(IExporter exporter) : base(exporter)
+        private XmlExporterAttribute(IExporter exporter) : base(exporter)
         {
         }
 

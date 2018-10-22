@@ -4,6 +4,7 @@ using BenchmarkDotNet.Attributes;
 namespace BenchmarkDotNet.Samples
 {
     // It is very easy to use BenchmarkDotNet. You should just create a class
+    [DryJob]
     public class IntroBasic
     {
         // And define a method with the Benchmark attribute

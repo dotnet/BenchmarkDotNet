@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Code
 {
@@ -33,10 +34,10 @@ namespace BenchmarkDotNet.Code
         /// for types where calling .ToString() will be NOT enough to re-create them in auto-generated source code file
         /// </summary>
         /// <param name="array">the array</param>
-        /// <param name="toSourceCode">method which tranforms an item of type T to it's C# representation
+        /// <param name="toSourceCode">method which transforms an item of type T to it's C# representation
         /// example: point => $"new Point2d({point.X}, {point.Y})"
         /// </param>
-        public static ArrayParam<T> ForComplexTypes(T[] array, Func<T, string> toSourceCode) => new ArrayParam<T>(array, toSourceCode);
+        [PublicAPI] public static ArrayParam<T> ForComplexTypes(T[] array, Func<T, string> toSourceCode) => new ArrayParam<T>(array, toSourceCode);
 
         internal static IParam FromObject(object array)
         {
@@ -48,7 +49,9 @@ namespace BenchmarkDotNet.Code
             
             var arrayParamType = typeof(ArrayParam<>).MakeGenericType(type.GetElementType());
 
-            return (IParam)arrayParamType.GetMethod(nameof(ForPrimitives), BindingFlags.Public | BindingFlags.Static).Invoke(null, new []{ array});
+            var methodInfo = arrayParamType.GetMethod(nameof(ForPrimitives), BindingFlags.Public | BindingFlags.Static)
+                ?? throw new InvalidOperationException($"{nameof(ForPrimitives)} not found");
+            return (IParam)methodInfo.Invoke(null, new []{ array});
         }
     }
 }

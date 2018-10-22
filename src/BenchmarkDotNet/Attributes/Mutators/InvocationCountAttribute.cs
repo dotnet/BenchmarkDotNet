@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Jobs;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes
 {
@@ -7,6 +8,7 @@ namespace BenchmarkDotNet.Attributes
     /// If specified, <see cref="RunMode.IterationTime"/> will be ignored.
     /// If specified, it must be a multiple of <see cref="RunMode.UnrollFactor"/>.
     /// </summary>
+    [PublicAPI]
     public class InvocationCountAttribute : JobMutatorConfigBaseAttribute
     {
         public InvocationCountAttribute(int invocationCount, int unrollFactor = 1)

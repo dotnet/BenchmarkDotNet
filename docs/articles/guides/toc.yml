@@ -12,3 +12,7 @@
   href: customizing-runtime.md
 - name: How it works
   href: how-it-works.md
+- name: Console Arguments
+  href: console-args.md
+- name: Troubleshooting
+  href: troubleshooting.md

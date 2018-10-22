@@ -6,10 +6,11 @@ using System.Text;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Parameters;
@@ -23,8 +24,8 @@ namespace BenchmarkDotNet.Toolchains
     {
         public ExecuteResult Execute(ExecuteParameters executeParameters)
         {
-            var exePath = executeParameters.BuildResult.ArtifactsPaths.ExecutablePath;
-            var args = executeParameters.BenchmarkId.ToArgument();
+            string exePath = executeParameters.BuildResult.ArtifactsPaths.ExecutablePath;
+            string args = executeParameters.BenchmarkId.ToArguments();
 
             if (!File.Exists(exePath))
             {
@@ -44,12 +45,16 @@ namespace BenchmarkDotNet.Toolchains
                 {
                     var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId, config);
 
+                    diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId, config));
+
                     return Execute(process, benchmarkCase, loggerWithDiagnoser, logger);
                 }
             }
             finally
             {
                 ConsoleHandler.Instance.ClearProcess();
+
+                diagnoser?.Handle(HostSignal.AfterProcessExit, new DiagnoserActionParameters(null, benchmarkCase, benchmarkId, config));
             }
         }
 
@@ -103,9 +108,9 @@ namespace BenchmarkDotNet.Toolchains
 
             switch (runtime)
             {
-                case ClrRuntime clr:
-                case CoreRuntime core:
-                case CoreRtRuntime coreRt:
+                case ClrRuntime _:
+                case CoreRuntime _:
+                case CoreRtRuntime _:
                     start.FileName = exePath;
                     start.Arguments = args;
                     break;

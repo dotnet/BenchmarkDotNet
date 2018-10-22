@@ -1,30 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Reflection;
+using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Portability.Cpu;
-using BenchmarkDotNet.Toolchains.CsProj;
 using JetBrains.Annotations;
-using System.Management;
+using Microsoft.Win32;
+using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
 
 namespace BenchmarkDotNet.Portability
 {
     internal static class RuntimeInformation
     {
-        private static readonly bool isMono = Type.GetType("Mono.Runtime") != null; // it allocates a lot of memory, we need to check it once in order to keep Enging non-allocating!
-
         private const string DebugConfigurationName = "DEBUG";
         internal const string ReleaseConfigurationName = "RELEASE";
         internal const string Unknown = "?";
 
-        public static bool IsMono => isMono;
+        public static bool IsMono { get; } = Type.GetType("Mono.Runtime") != null; // it allocates a lot of memory, we need to check it once in order to keep Engine non-allocating!
 
         public static bool IsFullFramework =>
 #if CLASSIC
@@ -33,6 +34,7 @@ namespace BenchmarkDotNet.Portability
             System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase);
 #endif
 
+        [PublicAPI]
         public static bool IsNetNative =>
 #if CLASSIC
             false;
@@ -66,7 +68,7 @@ namespace BenchmarkDotNet.Portability
         internal static bool IsWindows()
         {
 #if CLASSIC
-            return System.Environment.OSVersion.Platform.ToString().Contains("Win");
+            return Environment.OSVersion.Platform.ToString().Contains("Win");
 #else
             return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 #endif
@@ -75,7 +77,7 @@ namespace BenchmarkDotNet.Portability
         internal static bool IsLinux()
         {
 #if CLASSIC
-            return System.Environment.OSVersion.Platform == PlatformID.Unix
+            return Environment.OSVersion.Platform == PlatformID.Unix
                    && GetSysnameFromUname().Equals("Linux", StringComparison.InvariantCultureIgnoreCase);
 #else
             return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
@@ -85,7 +87,7 @@ namespace BenchmarkDotNet.Portability
         internal static bool IsMacOSX()
         {
 #if CLASSIC
-            return System.Environment.OSVersion.Platform == PlatformID.Unix
+            return Environment.OSVersion.Platform == PlatformID.Unix
                    && GetSysnameFromUname().Equals("Darwin", StringComparison.InvariantCultureIgnoreCase);
 #else
             return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
@@ -103,8 +105,8 @@ namespace BenchmarkDotNet.Portability
             }
 
             return OsBrandStringHelper.Prettify(
-                Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem,
-                Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion,
+                RuntimeEnvironment.OperatingSystem,
+                RuntimeEnvironment.OperatingSystemVersion,
                 GetWindowsUbr());
         }
 
@@ -121,8 +123,8 @@ namespace BenchmarkDotNet.Portability
             {
                 try
                 {
-                    using (var ndpKey = Microsoft.Win32.RegistryKey
-                        .OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry32)
+                    using (var ndpKey = RegistryKey
+                        .OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
                         .OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion"))
                     {
                         if (ndpKey == null)
@@ -153,9 +155,9 @@ namespace BenchmarkDotNet.Portability
             return null;
         }
 
-        public static string GetNetCoreVersion()
+        internal static string GetNetCoreVersion()
         {
-            var assembly = typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly;
+            var assembly = typeof(GCSettings).GetTypeInfo().Assembly;
             var assemblyPath = assembly.CodeBase.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
             int netCoreAppIndex = Array.IndexOf(assemblyPath, "Microsoft.NETCore.App");
             if (netCoreAppIndex > 0 && netCoreAppIndex < assemblyPath.Length - 2)
@@ -178,7 +180,7 @@ namespace BenchmarkDotNet.Portability
                         if (bracket1 != -1 && bracket2 != -1)
                         {
                             string comment = version.Substring(bracket1 + 1, bracket2 - bracket1 - 1);
-                            var commentParts = comment.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            var commentParts = comment.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                             if (commentParts.Length > 2)
                                 version = version.Substring(0, bracket1) + "(" + commentParts[0] + " " + commentParts[1] + ")";
                         }
@@ -195,7 +197,7 @@ namespace BenchmarkDotNet.Portability
             }
             else if (IsNetCore)
             {
-                var runtimeVersion = GetNetCoreVersion() ?? "?";
+                string runtimeVersion = GetNetCoreVersion() ?? "?";
 
                 var coreclrAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(object).GetTypeInfo().Assembly.Location);
                 var corefxAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(Regex).GetTypeInfo().Assembly.Location);
@@ -229,7 +231,7 @@ namespace BenchmarkDotNet.Portability
 
         public static Platform GetCurrentPlatform() => IntPtr.Size == 4 ? Platform.X86 : Platform.X64;
 
-        internal static IEnumerable<JitModule> GetJitModules()
+        private static IEnumerable<JitModule> GetJitModules()
         {
             return
                 Process.GetCurrentProcess().Modules
@@ -271,18 +273,16 @@ namespace BenchmarkDotNet.Portability
                 // If we have only one JIT module, we know the version of the current JIT compiler
                 return jitName + "-v" + modules[0].Version;
             }
-            else
-            {
-                // Otherwise, let's just print information about all modules
-                return jitName + "/" + GetJitModulesInfo();
-            }
+
+            // Otherwise, let's just print information about all modules
+            return jitName + "/" + GetJitModulesInfo();
         }
 
         internal static IntPtr GetCurrentAffinity() => Process.GetCurrentProcess().TryGetAffinity() ?? default;
 
         internal static string GetConfiguration()
         {
-            bool? isDebug = Assembly.GetEntryAssembly().IsDebug();
+            var isDebug = Assembly.GetEntryAssembly().IsDebug();
             if (isDebug.HasValue == false)
             {
                 return Unknown;
@@ -293,11 +293,12 @@ namespace BenchmarkDotNet.Portability
         // See http://aakinshin.net/en/blog/dotnet/jit-version-determining-in-runtime/
         private class JitHelper
         {
+            [SuppressMessage("ReSharper", "NotAccessedField.Local")]
             private int bar;
 
             public bool IsMsX64(int step = 1)
             {
-                var value = 0;
+                int value = 0;
                 for (int i = 0; i < step; i++)
                 {
                     bar = i + 10;
@@ -308,7 +309,7 @@ namespace BenchmarkDotNet.Portability
             }
         }
 
-        public class JitModule
+        private class JitModule
         {
             public string Name { get; }
             public string Version { get; }
@@ -319,6 +320,8 @@ namespace BenchmarkDotNet.Portability
                 Version = version;
             }
         }
+
+#if CLASSIC
 
         [DllImport("libc", SetLastError = true)]
         private static extern int uname(IntPtr buf);
@@ -346,6 +349,8 @@ namespace BenchmarkDotNet.Portability
             }
         }
 
+#endif
+
         internal static ICollection<Antivirus> GetAntivirusProducts()
         {
             var products = new List<Antivirus>();
@@ -354,11 +359,11 @@ namespace BenchmarkDotNet.Portability
                 try
                 {
                     var wmi = new ManagementObjectSearcher(@"root\SecurityCenter2", "SELECT * FROM AntiVirusProduct");
-                    ManagementObjectCollection data = wmi.Get();
+                    var data = wmi.Get();
 
-                    foreach (ManagementBaseObject o in data)
+                    foreach (var o in data)
                     {
-                        var av = (ManagementObject)o;
+                        var av = (ManagementObject) o;
                         if (av != null)
                         {
                             string name = av["displayName"].ToString();
@@ -367,7 +372,10 @@ namespace BenchmarkDotNet.Portability
                         }
                     }
                 }
-                catch { }
+                catch
+                {
+                    // Never mind
+                }
             }
 
             return products;
@@ -381,11 +389,11 @@ namespace BenchmarkDotNet.Portability
             {
                 try
                 {
-                    using (ManagementObjectSearcher searcher = new ManagementObjectSearcher("Select * from Win32_ComputerSystem"))
+                    using (var searcher = new ManagementObjectSearcher("Select * from Win32_ComputerSystem"))
                     {
-                        using (ManagementObjectCollection items = searcher.Get())
+                        using (var items = searcher.Get())
                         {
-                            foreach (ManagementBaseObject item in items)
+                            foreach (var item in items)
                             {
                                 string manufacturer = item["Manufacturer"]?.ToString();
                                 string model = item["Model"]?.ToString();
@@ -394,7 +402,10 @@ namespace BenchmarkDotNet.Portability
                         }
                     }
                 }
-                catch { }
+                catch
+                {
+                    // Never mind
+                }
             }
 
             return null;

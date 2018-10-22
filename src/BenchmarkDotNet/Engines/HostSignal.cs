@@ -3,6 +3,11 @@
     public enum HostSignal
     {
         /// <summary>
+        /// before we start the benchmarking process
+        /// </summary>
+        BeforeProcessStart,
+        
+        /// <summary>
         /// before jitting, warmup
         /// </summary>
         BeforeAnythingElse,
@@ -10,12 +15,12 @@
         /// <summary>
         /// after globalSetup, warmup and pilot but before the main run
         /// </summary>
-        BeforeGeneralRun,
+        BeforeActualRun,
 
         /// <summary>
         /// after main run, but before global Cleanup
         /// </summary>
-        AfterGeneralRun,
+        AfterActualRun,
 
         /// <summary>
         /// after all (the last thing the benchmarking engine does is to fire this signal)
@@ -25,6 +30,11 @@
         /// <summary>
         /// used to run some code independent to the benchmarked process
         /// </summary>
-        SeparateLogic
+        SeparateLogic,
+        
+        /// <summary>
+        /// after the benchmarking process exits
+        /// </summary>
+        AfterProcessExit
     }
 }

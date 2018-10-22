@@ -11,17 +11,17 @@ namespace BenchmarkDotNet.Tests.Running
     public class JobRuntimePropertiesComparerTests
     {
         [Fact]
-        public void SingleJobLeadsToNoGroupping()
+        public void SingleJobLeadsToNoGrouping()
         {
             var benchmarks1 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain1));
             var benchmarks2 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain2));
 
-            var groupped = benchmarks1.BenchmarksCases.Union(benchmarks2.BenchmarksCases)
+            var grouped = benchmarks1.BenchmarksCases.Union(benchmarks2.BenchmarksCases)
                 .GroupBy(benchmark => benchmark, new BenchmarkPartitioner.BenchmarkRuntimePropertiesComparer())
                 .ToArray();
 
-            Assert.Single(groupped); // we should have single exe!
-            Assert.Equal(benchmarks1.BenchmarksCases.Length + benchmarks2.BenchmarksCases.Length, groupped.Single().Count());
+            Assert.Single(grouped); // we should have single exe!
+            Assert.Equal(benchmarks1.BenchmarksCases.Length + benchmarks2.BenchmarksCases.Length, grouped.Single().Count());
         }
 
         public class Plain1
@@ -39,17 +39,17 @@ namespace BenchmarkDotNet.Tests.Running
         }
 
         [Fact]
-        public void BenchmarksAreGrouppedByJob()
+        public void BenchmarksAreGroupedByJob()
         {
             var benchmarks = BenchmarkConverter.TypeToBenchmarks(typeof(AllRuntimes));
 
-            var groupped = benchmarks.BenchmarksCases
+            var grouped = benchmarks.BenchmarksCases
                 .GroupBy(benchmark => benchmark, new BenchmarkPartitioner.BenchmarkRuntimePropertiesComparer())
                 .ToArray();
 
-            Assert.Equal(3, groupped.Length); // Clr + Mono + Core
+            Assert.Equal(3, grouped.Length); // Clr + Mono + Core
 
-            foreach (var grouping in groupped)
+            foreach (var grouping in grouped)
                 Assert.Equal(2, grouping.Count()); // M1 + M2
         }
 
@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Tests.Running
         }
 
         [Fact]
-        public void CustomClrBuildJobsAreGrouppedByVersion()
+        public void CustomClrBuildJobsAreGroupedByVersion()
         {
             const string version = "abcd";
 
@@ -73,13 +73,13 @@ namespace BenchmarkDotNet.Tests.Running
             var benchmarks1 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain1), config);
             var benchmarks2 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain2), config);
 
-            var groupped = benchmarks1.BenchmarksCases.Union(benchmarks2.BenchmarksCases)
+            var grouped = benchmarks1.BenchmarksCases.Union(benchmarks2.BenchmarksCases)
                 .GroupBy(benchmark => benchmark, new BenchmarkPartitioner.BenchmarkRuntimePropertiesComparer())
                 .ToArray();
 
-            Assert.Equal(3, groupped.Length); // Job.Clr + Job.Clr(version) + Job.Clr(different)
+            Assert.Equal(3, grouped.Length); // Job.Clr + Job.Clr(version) + Job.Clr(different)
 
-            foreach (var grouping in groupped)
+            foreach (var grouping in grouped)
                 Assert.Equal(3 * 2, grouping.Count()); // (M1 + M2 + M3) * (Plain1 + Plain2)
         }
     }

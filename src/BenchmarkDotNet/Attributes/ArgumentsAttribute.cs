@@ -1,13 +1,15 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class ArgumentsAttribute : Attribute
     {
-        public object[] Values { get; private set; }
+        public object[] Values { get; }
 
-        // CLS-Compliant Code requires a constuctor without an array in the argument list
+        // CLS-Compliant Code requires a constructor without an array in the argument list
+        [PublicAPI]
         public ArgumentsAttribute()
         {
             Values = Array.Empty<object>();

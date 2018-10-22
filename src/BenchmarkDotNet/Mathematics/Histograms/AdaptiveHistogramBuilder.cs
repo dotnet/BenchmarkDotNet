@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Mathematics.Histograms
             double binSize = s.GetOptimalBinSize(rule);
             if (Math.Abs(binSize) < 1e-9)
                 binSize = 1;
-            return BuildWithFixedBinSize(s.GetValues(), binSize);
+            return BuildWithFixedBinSize(s.GetSortedValues(), binSize);
         }
 
         private const double Resolution = 0.0001;
@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Mathematics.Histograms
                         while (j < list.Count && Inside(list[j]) && list[j] - list[i] < binSize)
                             j++;
                         int count = j - i;
-                        var dist = list[j - 1] - list[i];
+                        double dist = list[j - 1] - list[i];
                         if (count > bestCount || count == bestCount && dist < bestDist)
                         {
                             bestCount = count;

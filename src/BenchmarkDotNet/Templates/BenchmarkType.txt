@@ -1,7 +1,7 @@
     // the type name must be in sync with WindowsDisassembler.BuildArguments
     public class Runnable_$ID$ : global::$WorkloadTypeName$
     {
-        public static void Run(IHost host)
+        public static void Run(BenchmarkDotNet.Engines.IHost host, string benchmarkName)
         {
             Runnable_$ID$ instance = new Runnable_$ID$(); // do NOT change name "instance" (used in SmartParamameter)
             $ParamsContent$
@@ -38,7 +38,8 @@
                 TargetJob = job,
                 OperationsPerInvoke = $OperationsPerInvoke$,
                 MeasureGcStats = $MeasureGcStats$,
-                Encoding = $Encoding$
+                Encoding = $Encoding$,
+                BenchmarkName = benchmarkName
             };
 
             using (var engine = new $EngineFactoryType$().CreateReadyToRun(engineParameters))
@@ -48,7 +49,7 @@
                 host.ReportResults(results); // printing costs memory, do this after runs
 
                 instance.__TrickTheJIT__(); // compile the method for disassembler, but without actual run of the benchmark ;)
-			}
+            }
         }
 
         public delegate $OverheadMethodReturnTypeName$ OverheadDelegate($ArgumentsDefinition$);
@@ -75,14 +76,14 @@
         $DeclareArgumentFields$
 
         // this method is used only for the disassembly diagnoser purposes
-		// the goal is to get this and the benchmarked method jitted, but without executing the benchmarked method itself
-		public int NotEleven;
+        // the goal is to get this and the benchmarked method jitted, but without executing the benchmarked method itself
+        public int NotEleven;
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-		public void __TrickTheJIT__()
-		{
-			NotEleven = new System.Random(123).Next(0, 10);
-            $DiassemblerEntryMethodName$();
-		}
+        public void __TrickTheJIT__()
+        {
+            NotEleven = new System.Random(123).Next(0, 10);
+            $DisassemblerEntryMethodName$();
+        }
 
         private int dummyVar;
 
@@ -150,7 +151,7 @@
         }
         
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public $WorkloadMethodReturnType$ $DiassemblerEntryMethodName$()
+        public $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
         {
             if (NotEleven == 11)
             {
@@ -213,7 +214,7 @@
         private void NonGenericKeepAliveWithoutBoxing($WorkloadMethodReturnType$ _) { }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public $WorkloadMethodReturnType$ $DiassemblerEntryMethodName$()
+        public $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
         {
             if (NotEleven == 11)
             {
@@ -236,7 +237,7 @@
             }
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
         }
-        
+
         private void OverheadActionNoUnroll(long invokeCount)
         {
             $LoadArguments$
@@ -273,7 +274,7 @@
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public ref $WorkloadMethodReturnType$ $DiassemblerEntryMethodName$()
+        public ref $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
         {
             if (NotEleven == 11)
             {
@@ -302,7 +303,7 @@
                 overheadDelegate($PassArguments$);
             }
         }
-        
+
         private void WorkloadActionUnroll(long invokeCount)
         {
             $LoadArguments$
@@ -311,7 +312,7 @@
                 workloadDelegate($PassArguments$);@Unroll@
             }
         }
-        
+
         private void WorkloadActionNoUnroll(long invokeCount)
         {
             $LoadArguments$
@@ -322,7 +323,7 @@
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public void $DiassemblerEntryMethodName$()
+        public void $DisassemblerEntryMethodName$()
         {
             if (NotEleven == 11)
             {

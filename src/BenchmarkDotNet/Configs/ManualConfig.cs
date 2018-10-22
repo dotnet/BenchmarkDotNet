@@ -11,8 +11,9 @@ using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
-using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Validators;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -27,8 +28,8 @@ namespace BenchmarkDotNet.Configs
         private readonly List<Job> jobs = new List<Job>();
         private readonly List<HardwareCounter> hardwareCounters = new List<HardwareCounter>();
         private readonly List<IFilter> filters = new List<IFilter>();
-        private IOrderer orderer = null;
-        private ISummaryStyle summaryStyle = null;
+        private IOrderer orderer;
+        private ISummaryStyle summaryStyle;
         private readonly HashSet<BenchmarkLogicalGroupRule> logicalGroupRules = new HashSet<BenchmarkLogicalGroupRule>();
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
@@ -43,13 +44,11 @@ namespace BenchmarkDotNet.Configs
         
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => logicalGroupRules;
 
-        public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
-
-        public bool KeepBenchmarkFiles { get; set; }
-
-        public string ArtifactsPath { get; set; }
-
-        public Encoding Encoding { get; set; }
+        [PublicAPI] public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
+        [PublicAPI] public bool KeepBenchmarkFiles { get; set; }
+        [PublicAPI] public bool SummaryPerType { get; set; } = true;
+        [PublicAPI] public string ArtifactsPath { get; set; }
+        [PublicAPI] public Encoding Encoding { get; set; }
         
         public void Add(params IColumn[] newColumns) => columnProviders.AddRange(newColumns.Select(c => c.ToProvider()));
         public void Add(params IColumnProvider[] newColumnProviders) => columnProviders.AddRange(newColumnProviders);
@@ -66,6 +65,7 @@ namespace BenchmarkDotNet.Configs
         public void Set(Encoding encoding) => Encoding = encoding;
         public void Add(params BenchmarkLogicalGroupRule[] rules) => logicalGroupRules.AddRange(rules);
 
+        [PublicAPI]
         public void Add(IConfig config)
         {
             columnProviders.AddRange(config.GetColumnProviders());
@@ -73,12 +73,13 @@ namespace BenchmarkDotNet.Configs
             loggers.AddRange(config.GetLoggers());
             diagnosers.AddRange(config.GetDiagnosers());
             analysers.AddRange(config.GetAnalysers());
-            AddJobs(config.GetJobs());
+            jobs.AddRange(config.GetJobs());
             validators.AddRange(config.GetValidators());
             hardwareCounters.AddRange(config.GetHardwareCounters());
             filters.AddRange(config.GetFilters());
             orderer = config.GetOrderer() ?? orderer;
             KeepBenchmarkFiles |= config.KeepBenchmarkFiles;
+            SummaryPerType &= config.SummaryPerType;
             ArtifactsPath = config.ArtifactsPath ?? ArtifactsPath;
             Encoding = config.Encoding ?? Encoding;
             summaryStyle = summaryStyle ?? config.GetSummaryStyle();
@@ -87,7 +88,7 @@ namespace BenchmarkDotNet.Configs
 
         public IEnumerable<IDiagnoser> GetDiagnosers()
         {
-            if (hardwareCounters.IsEmpty())
+            if (hardwareCounters.IsEmpty() || diagnosers.OfType<IHardwareCountersDiagnoser>().Any())
                 return diagnosers;
 
             var hardwareCountersDiagnoser = DiagnosersLoader.GetImplementation<IHardwareCountersDiagnoser>();
@@ -159,34 +160,6 @@ namespace BenchmarkDotNet.Configs
                     throw new ArgumentOutOfRangeException();
             }
             return manualConfig;
-        }
-
-        public static IConfig Parse(string[] args) => new ConfigParser().Parse(args);
-
-        public static void PrintOptions(ILogger logger, int prefixWidth, int outputWidth)
-            => new ConfigParser().PrintOptions(logger, prefixWidth: prefixWidth, outputWidth: outputWidth);
-
-        private void AddJobs(IEnumerable<Job> toAdd)
-        {
-            foreach (var notMutator in toAdd.Where(job => !job.Meta.IsMutator))
-                jobs.Add(notMutator);
-            
-            var mutators = toAdd.Where(job => job.Meta.IsMutator).ToArray();
-            if (!mutators.Any())
-                return;
-            
-            if (!jobs.Any())
-                jobs.Add(Job.Default);
-
-            for (int i = 0; i < jobs.Count; i++)
-            {
-                var copy = jobs[i].UnfreezeCopy();
-
-                foreach (var mutator in mutators)
-                    copy.Apply(mutator);
-
-                jobs[i] = copy.Freeze();
-            }
         }
     }
 }

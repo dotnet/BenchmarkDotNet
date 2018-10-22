@@ -1,10 +1,11 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Jobs
 {
     public abstract class Argument
     {
-        public virtual string TextRepresentation { get; protected set; }
+        [PublicAPI] public string TextRepresentation { get; protected set; }
 
         // CharacteristicPresenters call ToString(), this is why we need this override
         public override string ToString() => TextRepresentation;
@@ -29,6 +30,7 @@ namespace BenchmarkDotNet.Jobs
     /// Argument passed to dotnet cli when restoring and building the project
     /// example: new MsBuildArgument("/p:MyCustomSetting=123")
     /// </summary>
+    [PublicAPI]
     public class MsBuildArgument : Argument
     {
         public MsBuildArgument(string value) => TextRepresentation = value;

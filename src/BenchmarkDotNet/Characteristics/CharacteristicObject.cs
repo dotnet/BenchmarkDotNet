@@ -10,14 +10,13 @@ namespace BenchmarkDotNet.Characteristics
     public abstract class CharacteristicObject
     {
         #region IdCharacteristic
-        private const string IdSeparator = "&";
 
         protected static string ResolveId(CharacteristicObject obj, string actual)
         {
             if (!string.IsNullOrEmpty(actual) && actual != IdCharacteristic.FallbackValue)
                 return actual;
 
-            var result = CharacteristicSetPresenter.Display.ToPresentation(obj);
+            string result = CharacteristicSetPresenter.Display.ToPresentation(obj);
 
             if (result.Length == 0)
                 result = IdCharacteristic.FallbackValue;
@@ -29,13 +28,13 @@ namespace BenchmarkDotNet.Characteristics
         #endregion
 
         #region Fields & ctor
-        private CharacteristicObject owner;
+
         private Dictionary<Characteristic, object> sharedValues;
         private bool frozen;
 
         protected CharacteristicObject()
         {
-            owner = null;
+            Owner = null;
             sharedValues = new Dictionary<Characteristic, object>();
         }
 
@@ -49,7 +48,8 @@ namespace BenchmarkDotNet.Characteristics
         #endregion
 
         #region Assertions
-        protected void AssertNotFrozen()
+
+        private void AssertNotFrozen()
         {
             if (Frozen)
             {
@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Characteristics
             }
         }
 
-        protected void AssertIsRoot()
+        private void AssertIsRoot()
         {
             if (Owner != null)
             {
@@ -67,13 +67,13 @@ namespace BenchmarkDotNet.Characteristics
             }
         }
 
-        protected void AssertIsNonFrozenRoot()
+        private void AssertIsNonFrozenRoot()
         {
             AssertNotFrozen();
             AssertIsRoot();
         }
 
-        protected void AssertIsAssignable(Characteristic characteristic, object value)
+        private static void AssertIsAssignable(Characteristic characteristic, object value)
         {
             if (ReferenceEquals(value, Characteristic.EmptyValue) || ReferenceEquals(value, null))
             {
@@ -91,9 +91,10 @@ namespace BenchmarkDotNet.Characteristics
         #endregion
 
         #region Properties
-        protected CharacteristicObject Owner => owner;
+        
+        private CharacteristicObject Owner { get; set; }
 
-        protected CharacteristicObject OwnerOrSelf => owner ?? this;
+        protected CharacteristicObject OwnerOrSelf => Owner ?? this;
 
         public bool Frozen => Owner?.Frozen ?? frozen;
 
@@ -127,7 +128,7 @@ namespace BenchmarkDotNet.Characteristics
         #region Get value
         public bool HasValue(Characteristic characteristic)
         {
-            if (sharedValues.TryGetValue(characteristic, out object result))
+            if (sharedValues.TryGetValue(characteristic, out var result))
                 return !ReferenceEquals(result, Characteristic.EmptyValue);
 
             return false;
@@ -140,7 +141,7 @@ namespace BenchmarkDotNet.Characteristics
 
         internal object GetValue(Characteristic characteristic)
         {
-            if (!sharedValues.TryGetValue(characteristic, out object result))
+            if (!sharedValues.TryGetValue(characteristic, out var result))
                 result = Characteristic.EmptyValue;
 
             return ResolveCore(characteristic, result);
@@ -168,6 +169,7 @@ namespace BenchmarkDotNet.Characteristics
             return HasValue(characteristic) ? GetValue(characteristic) : (T)characteristic.ResolveValueCore(this, defaultValue);
         }
 
+        [PublicAPI]
         public object ResolveValue(Characteristic characteristic, object defaultValue)
         {
             return HasValue(characteristic) ? GetValue(characteristic) : characteristic.ResolveValueCore(this, defaultValue);
@@ -245,7 +247,7 @@ namespace BenchmarkDotNet.Characteristics
             AssertNotFrozen();
             newOwner.AssertIsNonFrozenRoot();
 
-            owner = newOwner;
+            Owner = newOwner;
             sharedValues = newOwner.sharedValues;
             frozen = false;
         }
@@ -261,14 +263,14 @@ namespace BenchmarkDotNet.Characteristics
 
             var oldValues = sharedValues;
 
-            owner = null;
+            Owner = null;
             sharedValues = new Dictionary<Characteristic, object>();
             frozen = false;
 
             oldValues.Remove(thisCharacteristic);
             foreach (var characteristic in GetCharacteristicsToApply())
             {
-                if (oldValues.TryGetValue(characteristic, out object value))
+                if (oldValues.TryGetValue(characteristic, out var value))
                 {
                     oldValues.Remove(characteristic);
                     SetValueCore(characteristic, value);
@@ -313,6 +315,8 @@ namespace BenchmarkDotNet.Characteristics
         #endregion
 
         #region Apply
+        
+        [PublicAPI]
         public void Apply(CharacteristicObject other) => ApplyCore(other);
 
         protected CharacteristicObject ApplyCore(CharacteristicObject other) =>
@@ -331,7 +335,7 @@ namespace BenchmarkDotNet.Characteristics
 
             foreach (var characteristic in characteristicsToApply)
             {
-                if (!other.sharedValues.TryGetValue(characteristic, out object value))
+                if (!other.sharedValues.TryGetValue(characteristic, out var value))
                     continue;
 
                 if (characteristic.HasChildCharacteristics)
@@ -358,6 +362,8 @@ namespace BenchmarkDotNet.Characteristics
         #endregion
 
         #region Freeze / unfreeze
+        
+        [PublicAPI]
         public void Freeze() => FreezeCore();
 
         protected CharacteristicObject FreezeCore()
@@ -370,7 +376,8 @@ namespace BenchmarkDotNet.Characteristics
             return this;
         }
 
-        public CharacteristicObject UnfreezeCopy() => (CharacteristicObject)UnfreezeCopyCore();
+        [PublicAPI]
+        public CharacteristicObject UnfreezeCopy() => UnfreezeCopyCore();
 
         protected CharacteristicObject UnfreezeCopyCore()
         {

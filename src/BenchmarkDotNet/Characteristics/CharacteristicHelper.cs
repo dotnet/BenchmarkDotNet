@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Characteristics
 {
@@ -12,15 +13,15 @@ namespace BenchmarkDotNet.Characteristics
         internal static bool IsCharacteristicObjectSubclass(Type type) =>
             type.GetTypeInfo().IsSubclassOf(typeof(CharacteristicObject));
 
-        internal static bool IsCharacteristicSubclass(Type type) =>
+        private static bool IsCharacteristicSubclass(Type type) =>
             type.GetTypeInfo().IsSubclassOf(typeof(Characteristic));
 
         private static Characteristic AssertHasValue(MemberInfo member, Characteristic value)
         {
-            // ReSharper disable once PossibleNullReferenceException
+            if (member?.DeclaringType == null)
+                throw new NullReferenceException($"{nameof(member.DeclaringType)}");
             if (value == null)
-                throw new ArgumentException(
-                    $"The value of {member.DeclaringType.Name}.{member.Name} is null");
+                throw new ArgumentException($"The value of {member.DeclaringType.Name}.{member.Name} is null");
 
             return value;
         }
@@ -32,17 +33,17 @@ namespace BenchmarkDotNet.Characteristics
         #region Type characteristics
         private static readonly IReadOnlyList<Characteristic> EmptyCharacteristics = Array.Empty<Characteristic>();
 
-        private static readonly ConcurrentDictionary<Type, IReadOnlyList<Characteristic>> thisTypeCharacteristics =
+        private static readonly ConcurrentDictionary<Type, IReadOnlyList<Characteristic>> ThisTypeCharacteristics =
             new ConcurrentDictionary<Type, IReadOnlyList<Characteristic>>();
 
-        public static IReadOnlyList<Characteristic> GetThisTypeCharacteristics(this CharacteristicObject obj) =>
+        [PublicAPI] public static IReadOnlyList<Characteristic> GetThisTypeCharacteristics(this CharacteristicObject obj) =>
             GetThisTypeCharacteristics(obj.GetType());
 
         public static IReadOnlyList<Characteristic> GetThisTypeCharacteristics(Type characteristicObjectType)
         {
             if (!IsCharacteristicObjectSubclass(characteristicObjectType))
                 return EmptyCharacteristics;
-            return thisTypeCharacteristics.GetOrAdd(characteristicObjectType, t => GetThisTypeCharacteristicsCore(t));
+            return ThisTypeCharacteristics.GetOrAdd(characteristicObjectType, GetThisTypeCharacteristicsCore);
         }
 
         private static IReadOnlyList<Characteristic> GetThisTypeCharacteristicsCore(Type characteristicObjectType)
@@ -57,7 +58,7 @@ namespace BenchmarkDotNet.Characteristics
                 .Where(p => p.GetMethod != null && IsCharacteristicSubclass(p.PropertyType))
                 .Select(p => AssertHasValue(p, (Characteristic)p.GetValue(null)));
 
-            // DONTOUCH: DO NOT change the order of characteristic as it may break logic of some operations.
+            // DONTTOUCH: DO NOT change the order of characteristic as it may break logic of some operations.
             return fieldValues
                 .Concat(propertyValues)
                 .Distinct()
@@ -66,7 +67,7 @@ namespace BenchmarkDotNet.Characteristics
                 .ToArray();
         }
 
-        private static readonly ConcurrentDictionary<Type, IReadOnlyList<Characteristic>> allTypeCharacteristics =
+        private static readonly ConcurrentDictionary<Type, IReadOnlyList<Characteristic>> AllTypeCharacteristics =
             new ConcurrentDictionary<Type, IReadOnlyList<Characteristic>>();
 
         public static IReadOnlyList<Characteristic> GetAllCharacteristics(this CharacteristicObject obj) =>
@@ -76,7 +77,7 @@ namespace BenchmarkDotNet.Characteristics
         {
             if (!IsCharacteristicObjectSubclass(characteristicObjectType))
                 return EmptyCharacteristics;
-            return allTypeCharacteristics.GetOrAdd(characteristicObjectType, t => GetAllCharacteristicsCore(t));
+            return AllTypeCharacteristics.GetOrAdd(characteristicObjectType, GetAllCharacteristicsCore);
         }
 
         private static IReadOnlyList<Characteristic> GetAllCharacteristicsCore(Type characteristicObjectType)
@@ -91,7 +92,7 @@ namespace BenchmarkDotNet.Characteristics
         private static void FillAllCharacteristicsCore(
             Type characteristicObjectType, List<Characteristic> result, HashSet<Characteristic> visited)
         {
-            // DONTOUCH: DO NOT change the order of characteristic as it may break logic of some operations.
+            // DONTTOUCH: DO NOT change the order of characteristic as it may break logic of some operations.
 
             var characteristics = GetThisTypeCharacteristics(characteristicObjectType);
             foreach (var characteristic in characteristics.Where(c => !c.HasChildCharacteristics))

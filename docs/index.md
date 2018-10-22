@@ -1,6 +1,6 @@
 ![](logo/logo-wide.png)
 
-[![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/) [![Gitter](https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet.svg)](https://gitter.im/dotnet/BenchmarkDotNet)  [![License](https://img.shields.io/badge/license-MIT-blue.svg)](articles/license.md) [![Overview](https://img.shields.io/badge/docs-Overview-green.svg?style=flat)](http://benchmarkdotnet.org/Overview.htm) [![ChangeLog](https://img.shields.io/badge/docs-ChangeLog-green.svg?style=flat)](https://github.com/dotnet/BenchmarkDotNet/wiki/ChangeLog)
+[![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/) [![Gitter](https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet.svg)](https://gitter.im/dotnet/BenchmarkDotNet)  [![License](https://img.shields.io/badge/license-MIT-blue.svg)](articles/license.md) [![Overview](https://img.shields.io/badge/docs-Overview-green.svg?style=flat)](xref:docs.overview) [![ChangeLog](https://img.shields.io/badge/docs-ChangeLog-green.svg?style=flat)](xref:changelog)
 
 **BenchmarkDotNet** is a powerful .NET library for benchmarking.
 
@@ -94,27 +94,27 @@ Frequency=3507504 Hz, Resolution=285.1030 ns, Timer=TSC
   CoreRT     : .NET CoreRT 1.0.26414.01, 64bit AOT
   Mono       : Mono 5.10.0 (Visual Studio), 64bit 
 
-| Method | Runtime |     N |       Mean |     Error |    StdDev | Scaled | Rank |
-|------- |-------- |------ |-----------:|----------:|----------:|-------:|-----:|
-| Sha256 |     Clr |  1000 |   8.009 us | 0.0370 us | 0.0346 us |   1.00 |    3 |
-| Sha256 |    Core |  1000 |   4.447 us | 0.0117 us | 0.0110 us |   0.56 |    2 |
-| Sha256 |  CoreRT |  1000 |   4.321 us | 0.0139 us | 0.0130 us |   0.54 |    1 |
-| Sha256 |    Mono |  1000 |  14.924 us | 0.0574 us | 0.0479 us |   1.86 |    4 |
-|        |         |       |            |           |           |        |      |
-|    Md5 |     Clr |  1000 |   3.051 us | 0.0604 us | 0.0742 us |   1.00 |    3 |
-|    Md5 |    Core |  1000 |   2.004 us | 0.0058 us | 0.0054 us |   0.66 |    2 |
-|    Md5 |  CoreRT |  1000 |   1.892 us | 0.0087 us | 0.0077 us |   0.62 |    1 |
-|    Md5 |    Mono |  1000 |   3.878 us | 0.0181 us | 0.0170 us |   1.27 |    4 |
-|        |         |       |            |           |           |        |      |
-| Sha256 |     Clr | 10000 |  75.780 us | 1.0445 us | 0.9771 us |   1.00 |    3 |
-| Sha256 |    Core | 10000 |  41.134 us | 0.2185 us | 0.1937 us |   0.54 |    2 |
-| Sha256 |  CoreRT | 10000 |  40.895 us | 0.0804 us | 0.0628 us |   0.54 |    1 |
-| Sha256 |    Mono | 10000 | 141.377 us | 0.5598 us | 0.5236 us |   1.87 |    4 |
-|        |         |       |            |           |           |        |      |
-|    Md5 |     Clr | 10000 |  18.575 us | 0.0727 us | 0.0644 us |   1.00 |    3 |
-|    Md5 |    Core | 10000 |  17.562 us | 0.0436 us | 0.0408 us |   0.95 |    2 |
-|    Md5 |  CoreRT | 10000 |  17.447 us | 0.0293 us | 0.0244 us |   0.94 |    1 |
-|    Md5 |    Mono | 10000 |  34.500 us | 0.1553 us | 0.1452 us |   1.86 |    4 |
+| Method | Runtime |     N |       Mean |     Error |    StdDev | Ratio | Rank |
+|------- |-------- |------ |-----------:|----------:|----------:|------:|-----:|
+| Sha256 |     Clr |  1000 |   8.009 us | 0.0370 us | 0.0346 us |  1.00 |    3 |
+| Sha256 |    Core |  1000 |   4.447 us | 0.0117 us | 0.0110 us |  0.56 |    2 |
+| Sha256 |  CoreRT |  1000 |   4.321 us | 0.0139 us | 0.0130 us |  0.54 |    1 |
+| Sha256 |    Mono |  1000 |  14.924 us | 0.0574 us | 0.0479 us |  1.86 |    4 |
+|        |         |       |            |           |           |       |      |
+|    Md5 |     Clr |  1000 |   3.051 us | 0.0604 us | 0.0742 us |  1.00 |    3 |
+|    Md5 |    Core |  1000 |   2.004 us | 0.0058 us | 0.0054 us |  0.66 |    2 |
+|    Md5 |  CoreRT |  1000 |   1.892 us | 0.0087 us | 0.0077 us |  0.62 |    1 |
+|    Md5 |    Mono |  1000 |   3.878 us | 0.0181 us | 0.0170 us |  1.27 |    4 |
+|        |         |       |            |           |           |       |      |
+| Sha256 |     Clr | 10000 |  75.780 us | 1.0445 us | 0.9771 us |  1.00 |    3 |
+| Sha256 |    Core | 10000 |  41.134 us | 0.2185 us | 0.1937 us |  0.54 |    2 |
+| Sha256 |  CoreRT | 10000 |  40.895 us | 0.0804 us | 0.0628 us |  0.54 |    1 |
+| Sha256 |    Mono | 10000 | 141.377 us | 0.5598 us | 0.5236 us |  1.87 |    4 |
+|        |         |       |            |           |           |       |      |
+|    Md5 |     Clr | 10000 |  18.575 us | 0.0727 us | 0.0644 us |  1.00 |    3 |
+|    Md5 |    Core | 10000 |  17.562 us | 0.0436 us | 0.0408 us |  0.95 |    2 |
+|    Md5 |  CoreRT | 10000 |  17.447 us | 0.0293 us | 0.0244 us |  0.94 |    1 |
+|    Md5 |    Mono | 10000 |  34.500 us | 0.1553 us | 0.1452 us |  1.86 |    4 |
 ```
 
 In artifacts, you can also find detailed information about each iteration.
@@ -172,7 +172,7 @@ The library is used by a large number of projects for performance discussions or
 * [Accord.NET Framework](https://github.com/accord-net/framework/tree/development/Tools/Performance)
 * [ImageSharp](https://github.com/SixLabors/ImageSharp/tree/master/tests/ImageSharp.Benchmarks)
 * [RavenDB](https://github.com/ravendb/ravendb/tree/v4.0/bench)
-* [NodeTime](https://github.com/nodatime/nodatime/tree/master/src/NodaTime.Benchmarks)
+* [NodaTime](https://github.com/nodatime/nodatime/tree/master/src/NodaTime.Benchmarks)
 * [Jint](https://github.com/sebastienros/jint/tree/dev/Jint.Benchmark)
 * [NServiceBus](https://github.com/Particular/NServiceBus/issues?utf8=✓&q=+BenchmarkDotNet+)
 * [Serilog](https://github.com/serilog/serilog/tree/dev/test/Serilog.PerformanceTests)

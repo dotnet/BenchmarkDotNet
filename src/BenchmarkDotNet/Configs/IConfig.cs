@@ -8,8 +8,8 @@ using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
-using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Configs
@@ -33,9 +33,14 @@ namespace BenchmarkDotNet.Configs
         ConfigUnionRule UnionRule { get; }
 
         /// <summary>
-        /// determines if all auto-generated files should be kept or removed after running benchmarks
+        /// determines if all auto-generated files should be kept or removed after running the benchmarks
         /// </summary>
         bool KeepBenchmarkFiles { get; }
+
+        /// <summary>
+        /// determines if all benchmarks results should be joined into a single summary or not
+        /// </summary>
+        bool SummaryPerType { get; }
 
         /// <summary>
         /// the default value is "./BenchmarkDotNet.Artifacts"

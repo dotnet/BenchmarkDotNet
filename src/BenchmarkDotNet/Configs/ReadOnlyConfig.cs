@@ -11,7 +11,6 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Validators;
-
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Configs
@@ -40,6 +39,7 @@ namespace BenchmarkDotNet.Configs
         public ConfigUnionRule UnionRule => config.UnionRule;
 
         public bool KeepBenchmarkFiles => config.KeepBenchmarkFiles;
+        public bool SummaryPerType => config.SummaryPerType;
 
         public string ArtifactsPath => config.ArtifactsPath;
 

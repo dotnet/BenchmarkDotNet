@@ -79,8 +79,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
             var config = new PlatformConfig(runtime, jit, platform).With(logger).With(DefaultColumnProviders.Instance);
 
-            BenchmarkRunner.Run(new[] { BenchmarkConverter.TypeToBenchmarks(typeof(TestBenchmark), config) }, summaryPerType: true,
-                commonSettingsConfig: config);
+            BenchmarkRunner.Run(new[] { BenchmarkConverter.TypeToBenchmarks(typeof(TestBenchmark), config) }, config);
 
             Assert.Contains(expectedText, logger.GetLog());
         }

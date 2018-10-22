@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Text;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Reports;
-using System.IO;
-using System.Text;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -37,7 +36,7 @@ namespace BenchmarkDotNet.Extensions
         public static string ToSizeStr(this long value, SizeUnit unit = null, int unitNameWidth = 1, bool showUnit = true)
         {
             unit = unit ?? SizeUnit.GetBestSizeUnit(value);
-            var unitValue = SizeUnit.Convert(value, SizeUnit.B, unit);
+            double unitValue = SizeUnit.Convert(value, SizeUnit.B, unit);
             if (showUnit)
             {
                 string unitName = unit.Name.PadLeft(unitNameWidth);
@@ -91,7 +90,7 @@ namespace BenchmarkDotNet.Extensions
                 hashSet.Add(item);
         }
         
-#if !NETCOREAPP2_1 // method with the same name was added to Dictionary in .NET Core 2.1, so we need this ulgy hack to get compiler happy
+#if !NETCOREAPP2_1 // method with the same name was added to Dictionary in .NET Core 2.1, so we need this ugly hack to get compiler happy
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
             => dictionary.TryGetValue(key, out var value) ? value : default;
 #endif
@@ -124,5 +123,8 @@ namespace BenchmarkDotNet.Extensions
 
             return directoryPath;
         }
+
+        internal static bool IsNotNullButDoesNotExist(this FileSystemInfo fileInfo)
+            => fileInfo != null && !fileInfo.Exists;
     }
 }

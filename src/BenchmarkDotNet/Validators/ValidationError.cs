@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Running;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -11,12 +12,10 @@ namespace BenchmarkDotNet.Validators
             BenchmarkCase = benchmarkCase;
         }
 
-        public bool IsCritical { get; }
-
-        public string Message { get; }
-
-        public BenchmarkCase BenchmarkCase { get; }
-
+        [PublicAPI] public bool IsCritical { get; }
+        [PublicAPI] public string Message { get; }
+        [PublicAPI] public BenchmarkCase BenchmarkCase { get; }
+        
         public override string ToString() => Message;
     }
 }

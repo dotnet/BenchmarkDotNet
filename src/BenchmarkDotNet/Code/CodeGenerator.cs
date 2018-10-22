@@ -28,8 +28,7 @@ namespace BenchmarkDotNet.Code
             var benchmarksCode = new List<string>(buildPartition.Benchmarks.Length);
 
             var extraDefines = new List<string>();
-            var workloadTypeNamespaces = new HashSet<string>();
-            var workloadMethodReturnTypeNamespace = new HashSet<string>();
+            var namespaces = new HashSet<string>();
             var additionalLogic = new HashSet<string>();
 
             foreach (var buildInfo in buildPartition.Benchmarks)
@@ -42,15 +41,18 @@ namespace BenchmarkDotNet.Code
 
                 extraDefines.Add($"{provider.ExtraDefines}_{buildInfo.Id}");
 
-                AddNonEmptyUnique(workloadTypeNamespaces, provider.WorkloadTypeNamespace);
-                AddNonEmptyUnique(workloadMethodReturnTypeNamespace, provider.WorkloadMethodReturnTypeNamespace);
+                AddNonEmptyUnique(namespaces, provider.WorkloadTypeNamespace);
+                AddNonEmptyUnique(namespaces, provider.WorkloadMethodReturnTypeNamespace);
+                foreach (var @namespace in provider.ArgumentsNamespaces)
+                    AddNonEmptyUnique(namespaces, @namespace);
+                
                 AddNonEmptyUnique(additionalLogic, benchmark.Descriptor.AdditionalLogic);
 
                 string benchmarkTypeCode = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkType.txt"))
                     .Replace("$ID$", buildInfo.Id.ToString())
                     .Replace("$OperationsPerInvoke$", provider.OperationsPerInvoke)
                     .Replace("$WorkloadTypeName$", provider.WorkloadTypeName)
-                    .Replace("$WorkloadMethodDelegate$", provider.WorkloadMethodDelegate)
+                    .Replace("$WorkloadMethodDelegate$", provider.WorkloadMethodDelegate(passArguments))
                     .Replace("$WorkloadMethodReturnType$", provider.WorkloadMethodReturnTypeName)
                     .Replace("$OverheadMethodReturnTypeName$", provider.OverheadMethodReturnTypeName)
                     .Replace("$GlobalSetupMethodName$", provider.GlobalSetupMethodName)
@@ -69,7 +71,7 @@ namespace BenchmarkDotNet.Code
                     .Replace("$Ref$", provider.UseRefKeyword ? "ref" : null)
                     .Replace("$MeasureGcStats$", buildInfo.Config.HasMemoryDiagnoser() ? "true" : "false")
                     .Replace("$Encoding$", buildInfo.Config.Encoding.ToTemplateString())
-                    .Replace("$DiassemblerEntryMethodName$", DisassemblerConstants.DiassemblerEntryMethodName)
+                    .Replace("$DisassemblerEntryMethodName$", DisassemblerConstants.DisassemblerEntryMethodName)
                     .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments)).ToString();
 
                 benchmarkTypeCode = Unroll(benchmarkTypeCode, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance));
@@ -83,8 +85,7 @@ namespace BenchmarkDotNet.Code
             string benchmarkProgramContent = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt"))
                 .Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath)
                 .Replace("$ExtraDefines$", string.Join(Environment.NewLine, extraDefines))
-                .Replace("$WorkloadTypeNamespace$", string.Join(Environment.NewLine, workloadTypeNamespaces))
-                .Replace("$WorkloadMethodReturnTypeNamespace$", string.Join(Environment.NewLine, workloadMethodReturnTypeNamespace))
+                .Replace("$Namespaces$", string.Join(Environment.NewLine, namespaces))
                 .Replace("$AdditionalLogic$", string.Join(Environment.NewLine, additionalLogic))
                 .Replace("$DerivedTypes$", string.Join(Environment.NewLine, benchmarksCode))
                 .Replace("$ExtraAttribute$", GetExtraAttributes(buildPartition.RepresentativeBenchmarkCase.Descriptor))
@@ -102,7 +103,7 @@ namespace BenchmarkDotNet.Code
 
         private static (bool, string) GetShadowCopySettings()
         {
-            var benchmarkDotNetLocation = Path.GetDirectoryName(typeof(CodeGenerator).GetTypeInfo().Assembly.Location);
+            string benchmarkDotNetLocation = Path.GetDirectoryName(typeof(CodeGenerator).GetTypeInfo().Assembly.Location);
 
             if (benchmarkDotNetLocation != null && benchmarkDotNetLocation.ToUpper().Contains("LINQPAD"))
             {
@@ -169,7 +170,7 @@ namespace BenchmarkDotNet.Code
 
             if (method.ReturnType == typeof(void))
             {
-                var isUsingAsyncKeyword = method.HasAttribute<AsyncStateMachineAttribute>();
+                bool isUsingAsyncKeyword = method.HasAttribute<AsyncStateMachineAttribute>();
                 if (isUsingAsyncKeyword)
                 {
                     throw new NotSupportedException("async void is not supported by design");
@@ -258,7 +259,7 @@ namespace BenchmarkDotNet.Code
             @switch.AppendLine("switch (id) {");
 
             foreach (var buildInfo in buildPartition.Benchmarks)
-                @switch.AppendLine($"case {buildInfo.Id.Value}: BenchmarkDotNet.Autogenerated.Runnable_{buildInfo.Id.Value}.Run(host); break;");
+                @switch.AppendLine($"case {buildInfo.Id.Value}: BenchmarkDotNet.Autogenerated.Runnable_{buildInfo.Id.Value}.Run(host, benchmarkName); break;");
 
             @switch.AppendLine("default: throw new NotSupportedException(\"invalid benchmark id\");");
             @switch.AppendLine("}");

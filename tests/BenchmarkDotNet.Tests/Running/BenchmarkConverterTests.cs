@@ -83,6 +83,21 @@ namespace BenchmarkDotNet.Tests.Running
             Assert.Equal(1, benchmark.Job.Run.InvocationCount);
             Assert.Equal(1, benchmark.Job.Run.UnrollFactor);
         }
+
+        [Fact]
+        public void IfIterationCleanupIsProvidedTheBenchmarkShouldRunOncePerIteration()
+        {
+            var benchmark = BenchmarkConverter.TypeToBenchmarks(typeof(WithIterationCleanupOnly)).BenchmarksCases.Single();
+            
+            Assert.Equal(1, benchmark.Job.Run.InvocationCount);
+            Assert.Equal(1, benchmark.Job.Run.UnrollFactor);
+        }
+
+        public class WithIterationCleanupOnly
+        {
+            [IterationCleanup] public void Cleanup() { }
+            [Benchmark] public void Benchmark() { }
+        }
         
         [Fact]
         public void InvocationCountIsRespectedForBenchmarksWithIterationSetup()
@@ -125,6 +140,7 @@ namespace BenchmarkDotNet.Tests.Running
             Assert.All(info.BenchmarksCases, benchmark => Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxIterationCount));
             Assert.Single(info.BenchmarksCases, benchmark => benchmark.Job.Environment.Runtime is ClrRuntime);
             Assert.Single(info.BenchmarksCases, benchmark => benchmark.Job.Environment.Runtime is CoreRuntime);
+            Assert.All(info.BenchmarksCases, benchmark => Assert.False(benchmark.Job.Meta.IsMutator)); // the job does not became a mutator itself, this config should not be copied
         }
 
         [MaxIterationCount(int.MaxValue)]
@@ -141,6 +157,7 @@ namespace BenchmarkDotNet.Tests.Running
             var benchmark = info.BenchmarksCases.Single();
             
             Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxIterationCount);
+            Assert.False(benchmark.Job.Meta.IsMutator);
         }
         
         [Fact]
@@ -152,6 +169,7 @@ namespace BenchmarkDotNet.Tests.Running
             
             Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxIterationCount);
             Assert.True(benchmark.Job.Environment.Runtime is CoreRuntime);
+            Assert.False(benchmark.Job.Meta.IsMutator);
         }
 
         [MaxIterationCount(int.MaxValue)] // mutator attribute is before job attribute
@@ -171,6 +189,7 @@ namespace BenchmarkDotNet.Tests.Running
             Assert.Equal(1, benchmarkCase.Job.Run.InvocationCount);
             Assert.Equal(1, benchmarkCase.Job.Run.UnrollFactor);
             Assert.Equal(OutlierMode.None, benchmarkCase.Job.Accuracy.OutlierMode);
+            Assert.False(benchmarkCase.Job.Meta.IsMutator);
         }
 
         [RunOncePerIteration]

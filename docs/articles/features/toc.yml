@@ -8,3 +8,5 @@
   href: statistics.md
 - name: Disassembler
   href: disassembler.md
+- name: EtwProfiler
+  href: etwprofiler.md

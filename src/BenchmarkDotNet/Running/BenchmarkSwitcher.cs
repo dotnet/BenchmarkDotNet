@@ -3,120 +3,121 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.ConsoleArguments;
+using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Properties;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Running
 {
     public class BenchmarkSwitcher
     {
-        private readonly ConsoleLogger logger = new ConsoleLogger();
-        private readonly TypeParser typeParser;
+        private readonly IUserInteraction userInteraction = new UserInteraction();
+        private readonly List<Type> types = new List<Type>();
+        private readonly List<Assembly> assemblies = new List<Assembly>();
 
-        public BenchmarkSwitcher(Type[] types)
-        {
-            foreach (var type in types.Where(type => !type.ContainsRunnableBenchmarks()).ToArray())
-            {
-                logger.WriteLineError($"Type {type} is invalid. Only public, non-generic (closed generic types with public parameterless ctors are supported), non-abstract, non-sealed types with public instance [Benchmark] method(s) are supported.");
-            }
+        internal BenchmarkSwitcher(IUserInteraction userInteraction) => this.userInteraction = userInteraction;
 
-            typeParser = new TypeParser(types.Where(type => type.ContainsRunnableBenchmarks()).ToArray(), logger);
-        }
+        [PublicAPI] public BenchmarkSwitcher(Type[] types) => this.types.AddRange(types);
 
-        public BenchmarkSwitcher(Assembly assembly)
-        {
-            typeParser = new TypeParser(assembly.GetRunnableBenchmarks(), logger);
-        }
+        [PublicAPI] public BenchmarkSwitcher(Assembly assembly) => assemblies.Add(assembly);
 
-        public BenchmarkSwitcher(Assembly[] assemblies)
-        {
-            var runnableBenchmarkTypes = assemblies.SelectMany(a => a.GetRunnableBenchmarks()).ToArray();
-            typeParser = new TypeParser(runnableBenchmarkTypes, logger);
-        }
+        [PublicAPI] public BenchmarkSwitcher(Assembly[] assemblies) => this.assemblies.AddRange(assemblies);
+        
+        [PublicAPI] public BenchmarkSwitcher With(Type type) { types.Add(type); return this; }
 
-        public static BenchmarkSwitcher FromTypes(Type[] types) => new BenchmarkSwitcher(types);
+        [PublicAPI] public BenchmarkSwitcher With(Type[] types) { this.types.AddRange(types); return this; }
 
-        public static BenchmarkSwitcher FromAssembly(Assembly assembly) => new BenchmarkSwitcher(assembly);
+        [PublicAPI] public BenchmarkSwitcher With(Assembly assembly) { assemblies.Add(assembly); return this; }
 
-        public static BenchmarkSwitcher FromAssemblies(Assembly[] assemblies) => new BenchmarkSwitcher(assemblies);
+        [PublicAPI] public BenchmarkSwitcher With(Assembly[] assemblies) { this.assemblies.AddRange(assemblies); return this; }
 
-        public static BenchmarkSwitcher FromAssemblyAndTypes(Assembly assembly, Type[] types) 
-            => new BenchmarkSwitcher(assembly.GetRunnableBenchmarks().Concat(types).ToArray());
+        [PublicAPI] public static BenchmarkSwitcher FromTypes(Type[] types) => new BenchmarkSwitcher(types);
+
+        [PublicAPI] public static BenchmarkSwitcher FromAssembly(Assembly assembly) => new BenchmarkSwitcher(assembly);
+
+        [PublicAPI] public static BenchmarkSwitcher FromAssemblies(Assembly[] assemblies) => new BenchmarkSwitcher(assemblies);
 
         /// <summary>
         /// Run all available benchmarks.
         /// </summary>
-        public IEnumerable<Summary> RunAll() => Run(new[] { "*" });
+        [PublicAPI] public IEnumerable<Summary> RunAll() => Run(new[] { "--filter", "*" });
 
         /// <summary>
         /// Run all available benchmarks and join them to a single summary
         /// </summary>
-        public Summary RunAllJoined() => Run(new[] { "*", "--join" }).Single();
+        [PublicAPI] public Summary RunAllJoined() => Run(new[] { "--filter", "*", "--join" }).Single();
 
-        public IEnumerable<Summary> Run(string[] args = null, IConfig config = null)
+        [PublicAPI] public IEnumerable<Summary> Run(string[] args = null, IConfig config = null)
         {
-            args = args ?? Array.Empty<string>();
+            var nonNullConfig = config ?? DefaultConfig.Instance;
+            // if user did not provide any loggers, we use the ConsoleLogger to somehow show the errors to the user
+            var nonNullLogger = nonNullConfig.GetLoggers().Any() ? nonNullConfig.GetCompositeLogger() : ConsoleLogger.Default;
+            
+            var (isParsingSuccess, parsedConfig, options) = ConfigParser.Parse(args ?? Array.Empty<string>(), nonNullLogger, config);
+            if (!isParsingSuccess) // invalid console args, the ConfigParser printed the error
+                return Array.Empty<Summary>();
 
-            if (ShouldDisplayOptions(args))
+            if (options.PrintInformation)
             {
-                DisplayOptions();
-                return Enumerable.Empty<Summary>();
+                nonNullLogger.WriteLine(HostEnvironmentInfo.GetInformation());
+                return Array.Empty<Summary>();
+            }
+
+            var effectiveConfig = ManualConfig.Union(nonNullConfig, parsedConfig);
+
+            (var allTypesValid, var allAvailableTypesWithRunnableBenchmarks) = TypeFilter.GetTypesWithRunnableBenchmarks(types, assemblies, nonNullLogger);
+            if (!allTypesValid) // there were some invalid and TypeFilter printed errors
+                return Array.Empty<Summary>();
+            
+            if (allAvailableTypesWithRunnableBenchmarks.IsEmpty())
+            {
+                userInteraction.PrintNoBenchmarksError(nonNullLogger);
+                return Array.Empty<Summary>();
+            }
+
+            if (options.ListBenchmarkCaseMode != ListBenchmarkCaseMode.Disabled)
+            {
+                PrintList(nonNullLogger, effectiveConfig, allAvailableTypesWithRunnableBenchmarks, options);
+                return Array.Empty<Summary>();
+            }
+            
+            var benchmarksToFilter = options.UserProvidedFilters
+                ? allAvailableTypesWithRunnableBenchmarks 
+                : userInteraction.AskUser(allAvailableTypesWithRunnableBenchmarks, nonNullLogger);
+
+            var filteredBenchmarks = TypeFilter.Filter(effectiveConfig, benchmarksToFilter);
+
+            if (filteredBenchmarks.IsEmpty())
+            {
+                userInteraction.PrintWrongFilterInfo(benchmarksToFilter, nonNullLogger);
+                return Array.Empty<Summary>();
             }
 
             var globalChronometer = Chronometer.Start();
             var summaries = new List<Summary>();
 
-            var effectiveConfig = ManualConfig.Union(config ?? DefaultConfig.Instance, ManualConfig.Parse(args));
-            bool join = args.Any(arg => arg.EqualsWithIgnoreCase("--join"));
+            summaries.AddRange(BenchmarkRunner.Run(filteredBenchmarks, effectiveConfig));
 
-            var benchmarks = Filter(effectiveConfig);
-
-            summaries.AddRange(BenchmarkRunner.Run(benchmarks, effectiveConfig, summaryPerType: !join));
-
-            var totalNumberOfExecutedBenchmarks = summaries.Sum(summary => summary.GetNumberOfExecutedBenchmarks());
-            BenchmarkRunner.LogTotalTime(logger, globalChronometer.GetElapsed().GetTimeSpan(), totalNumberOfExecutedBenchmarks, "Global total time");
+            int totalNumberOfExecutedBenchmarks = summaries.Sum(summary => summary.GetNumberOfExecutedBenchmarks());
+            BenchmarkRunner.LogTotalTime(nonNullLogger, globalChronometer.GetElapsed().GetTimeSpan(), totalNumberOfExecutedBenchmarks, "Global total time");
             return summaries;
         }
 
-        public bool ShouldDisplayOptions(string[] args) 
-            => args.Any(arg => arg.EqualsWithIgnoreCase("--help") || arg.EqualsWithIgnoreCase("-h"));
-
-        internal BenchmarkRunInfo[] Filter(IConfig effectiveConfig)
-            => (effectiveConfig.GetFilters().Any() ? typeParser.GetAll() : typeParser.AskUser()) // if user provided some filters via args or custom config , we don't ask for any input
-                .Select(typeWithMethods =>
-                    typeWithMethods.AllMethodsInType
-                        ? BenchmarkConverter.TypeToBenchmarks(typeWithMethods.Type, effectiveConfig)
-                        : BenchmarkConverter.MethodsToBenchmarks(typeWithMethods.Type, typeWithMethods.Methods, effectiveConfig))
-                .ToArray();
-
-        private void DisplayOptions()
+        private static void PrintList(ILogger nonNullLogger, IConfig effectiveConfig, IReadOnlyList<Type> allAvailableTypesWithRunnableBenchmarks, CommandLineOptions options)
         {
-            logger.WriteLineHeader($"{BenchmarkDotNetInfo.FullTitle}");
-            logger.WriteLine();
-            logger.WriteLineHeader("Options:");
+            var printer = new BenchmarkCasesPrinter(options.ListBenchmarkCaseMode);
+            
+            var testNames = TypeFilter.Filter(effectiveConfig, allAvailableTypesWithRunnableBenchmarks)
+                .SelectMany(p => p.BenchmarksCases)
+                .Select(p => p.Descriptor.GetFilterName())
+                .Distinct();
 
-            var consoleWidth = 80;
-            try
-            {
-                consoleWidth = Console.WindowWidth;
-            }
-            // IOException causes build error
-            // The type 'IOException' exists in both 
-            //    'System.IO, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a' and 
-            //    'System.Runtime, Version=4.0.20.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
-            // TODO see if this error goes away after RC2, in the meantime just use "catch (Exception)"
-            catch (Exception)
-            {
-                logger.WriteLine($"Unable to get the Console width, defaulting to {consoleWidth}");
-            }
-
-            ManualConfig.PrintOptions(logger, prefixWidth: 30, outputWidth: consoleWidth);
-            logger.WriteLine();
-            typeParser.PrintOptions(prefixWidth: 30, outputWidth: consoleWidth);
+            printer.Print(testNames, nonNullLogger);
         }
     }
 }

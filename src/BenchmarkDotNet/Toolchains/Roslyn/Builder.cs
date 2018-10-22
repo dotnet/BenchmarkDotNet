@@ -42,9 +42,10 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 .Select(assembly => AssemblyMetadata.CreateFromFile(assembly.Location))
                 .Concat(FrameworkAssembliesMetadata.Value)
                 .Distinct()
-                .Select(uniqueMetadata => uniqueMetadata.GetReference());
+                .Select(uniqueMetadata => uniqueMetadata.GetReference())
+                .ToList();
 
-            (var result, var missingReferences) = Build(generateResult, syntaxTree, compilationOptions, references);
+            var (result, missingReferences) = Build(generateResult, syntaxTree, compilationOptions, references);
 
             if (result.IsBuildSuccess || !missingReferences.Any())
                 return result;
@@ -107,7 +108,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
 
         private static string[] GetFrameworkAssembliesPaths()
         {
-            var frameworkAssembliesDirectory = Path.GetDirectoryName(typeof(object).Assembly.Location);
+            string frameworkAssembliesDirectory = Path.GetDirectoryName(typeof(object).Assembly.Location);
             if (frameworkAssembliesDirectory == null)
                 return Array.Empty<string>();
 
@@ -123,7 +124,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
         private static AssemblyMetadata[] GetMissingReferences(Diagnostic[] compilationErrors)
             => compilationErrors
                     .Where(diagnostic => diagnostic.Id == MissingReferenceError)
-                    .Select(diagnostic => GetAssemblyName(diagnostic))
+                    .Select(GetAssemblyName)
                     .Where(assemblyName => assemblyName != default)
                     .Distinct()
                     .Select(assemblyName => Assembly.Load(new AssemblyName(assemblyName)))

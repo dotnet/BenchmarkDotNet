@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Jobs
                     continue;
                 }
 
-                var compare = string.CompareOrdinal(
+                int compare = string.CompareOrdinal(
                     presenter.ToPresentation(x, characteristic),
                     presenter.ToPresentation(y, characteristic));
                 if (compare != 0)

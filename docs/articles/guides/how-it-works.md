@@ -4,13 +4,13 @@ BenchmarkDotNet follows the following steps to run your benchmarks:
 
 1. `BenchmarkRunner` generates an isolated project per each runtime settings and builds it in Release mode.
 2. Next, we take each method/job/params combination and try to measure its performance by launching benchmark process several times (`LaunchCount`).
-3. An invocation of the target method is an *operation*. A bunch of operation is an *iteration*. If you have an `IterationSetup` method, it will be invoked before each iteration, 
+3. An invocation of the workload method is an *operation*. A bunch of operation is an *iteration*. If you have an `IterationSetup` method, it will be invoked before each iteration, 
 but not between operations. We have the following type of iterations:
     * `Pilot`: The best operation count will be chosen.
-    * `IdleWarmup`, `IdleTarget`: BenchmarkDotNet overhead will be evaluated.
-    * `MainWarmup`: Warmup of the main method.
-    * `MainTarget`: Main measurements.
-    * `Result` = `MainTarget` - `<AverageOverhead>`
+    * `OverheadWarmup`, `OverheadWorkload`: BenchmarkDotNet overhead will be evaluated.
+    * `ActualWarmup`: Warmup of the workload method.
+    * `ActualWorkload`: Actual measurements.
+    * `Result` = `ActualWorkload` - `<AverageOverhead>`
 4. After all of the measurements, BenchmarkDotNet creates:
     * An instance of the `Summary` class that contains all information about benchmark runs.
     * A set of files that contains summary in human-readable and machine-readable formats.
@@ -21,7 +21,7 @@ but not between operations. We have the following type of iterations:
 If you don't understand our "count terminology", then you might find following pseudocode useful:
 
 ```cs
-IEnumberable<Results> Run(Benchmark benchmark)
+IEnumerable<Results> Run(Benchmark benchmark)
 {
     var toolchain = benchmark.GetToolchain();
 
@@ -32,24 +32,29 @@ IEnumberable<Results> Run(Benchmark benchmark)
         yield return ParseResults(Process.Start(exe).Output); // calls ActualRun in a separate process
 }
 
-Result ActualRun(Method method)
+Result ActualRun(Method method, Job job)
 {
     GlobalSetup();
 
-    long perfectInvocationCount = Pilot(method);
+    int unrollFactor = job.Run.UnrollFactor; // 16 by default
 
-    Warmup(EMPTY_METHOD, perfectInvocationCount); // EMPTY_METHOD has same return type and arguments as benchmark
-    var overhead = Target(EMPTY_METHOD, perfectInvocationCount);
+    long perfectInvocationCount = Pilot(method, unrollFactor);
 
-    Warmup(method, perfectInvocationCount);
-    var result = Target(method, perfectInvocationCount);
+    WarmupStage(EMPTY_METHOD, perfectInvocationCount, unrollFactor); // EMPTY_METHOD has same return type and arguments as benchmark
+    var overhead = ActualStage(EMPTY_METHOD, perfectInvocationCount, unrollFactor);
+
+    WarmupStage(method, perfectInvocationCount, unrollFactor);
+    var result = ActualStage(method, perfectInvocationCount);
+
+    if (MemoryDiagnoser.IsEnabled)
+        var gcStats = MeasureGcStats(method, perfectInvocationCount, unrollFactor);
 
     GlobalCleanup(); 
 
-    return result - Avg(overhead);
+    return (result - Avg(overhead), gcStats);
 }
 
-long Pilot(Method method)
+long Pilot(Method method, int unrollFactor)
 {
     // invokeCount is the equivalent of InnerIterationCount from xunit-performance
     long invokeCount = minInvokeCount;
@@ -67,18 +72,18 @@ long Pilot(Method method)
     return invokeCount;
 }
 
-void Warmup(Method method, long invokeCount)
+void Warmup(Method method, long invokeCount, int unrollFactor)
 {
     while (true)
     {
         var measurement = RunIteration(method, invokeCount, unrollFactor);
 
-        if (heuristic.IsWamupRequirementMet(measurement))
+        if (heuristic.IsWarmupRequirementMet(measurement))
             break;
     }
 }
 
-IEnumberable<Measurement> Target(Method method, long invokeCount)
+IEnuberable<Measurement> Workload(Method method, long invokeCount, int unrollFactor)
 {
     while (true)
     {
@@ -87,7 +92,7 @@ IEnumberable<Measurement> Target(Method method, long invokeCount)
         if (measurement.IsNotOutlier)
             yield return measurement;
 
-        if (heuristic.IsTargetRequirementMet(measurement))
+        if (heuristic.IsWorkloadRequirementMet(measurement))
             yield break;
     }
 }
@@ -102,7 +107,7 @@ Measurement RunIteration(Method method, long invokeCount, long unrollFactor)
 
     for (long i = 0; i < invokeCount / unrollFactor; i++)
     {
-        // we perform manuall loop unrolling!!
+        // we perform manual loop unrolling!!
         method(); // 1st call
         method(); // 2nd call
 
@@ -116,5 +121,38 @@ Measurement RunIteration(Method method, long invokeCount, long unrollFactor)
     MemoryCleanup();
 
     return Measurement(clockSpan);
+}
+
+GcStats MeasureGcStats(Method method, long invokeCount, long unrollFacto)
+{
+    // we enable monitoring after workload actual run, for this single iteration which is executed at the end
+    // so even if we enable AppDomain monitoring in separate process
+    // it does not matter, because we have already obtained the results!
+    EnableMonitoring(); 
+
+    IterationSetup();
+
+    var initialGcStats = GcStats.ReadInitial();
+
+    // we do NOT start any clock here, because the enabled monitoring might have some overhead
+    // so we just get the gc stats and ignore the timing
+    // it's last thing the process does before it dies, so also enabled monitoring is not an issue for next benchmarks
+    // because each of them is going to be executed in a new process
+
+    for (long i = 0; i < invokeCount / unrollFactor; i++)
+    {
+        // we perform manual loop unrolling!!
+        method(); // 1st call
+        method(); // 2nd call
+
+        method(); // (unrollFactor - 1)'th call
+        method(); // unrollFactor'th call
+    }
+
+    var finalGcStats = GcStats.ReadFinal();
+
+    IterationCleanup();
+
+    return finalGcStats - initialGcStats; // the result is the difference between the stats collected after and before running the extra iteration
 }
 ```

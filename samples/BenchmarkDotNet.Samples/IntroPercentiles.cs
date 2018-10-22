@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Samples
     public class IntroPercentiles
     {
         // To share between runs.
-        // DO NOT do this in production code. The System.Random IS NOT threadsafe.
+        // DO NOT do this in production code. The System.Random IS NOT thread safe.
         private static readonly Random Rnd = new Random();
 
         private class Config : ManualConfig

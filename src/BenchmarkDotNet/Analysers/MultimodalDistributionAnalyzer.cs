@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Analysers
 
         public override string Id => "MultimodalDistribution";
 
-        public override IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary)
+        protected override IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary)
         {
             var statistics = report.ResultStatistics;
             if (statistics == null || statistics.N < EngineResolver.DefaultMinWorkloadIterationCount)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
@@ -7,46 +8,50 @@ using SimpleJson.Reflection;
 
 namespace BenchmarkDotNet.Helpers
 {
-    public class FolderNameHelper
+    public static class FolderNameHelper
     {
         public static string ToFolderName(object value)
         {
-            if (value is bool)
-                return ((bool)value).ToLowerCase();
-            if (value is string)
-                return Escape((string)value);
-            if (value is char)
-                return ((int)(char)value).ToString(); // TODO: rewrite
-            if (value is float)
-                return ((float)value).ToString("F", CultureInfo.InvariantCulture).Replace(".", "-");
-            if (value is double)
-                return ((double)value).ToString("F", CultureInfo.InvariantCulture).Replace(".", "-");
-            if (value is decimal)
-                return ((decimal)value).ToString("F", CultureInfo.InvariantCulture).Replace(".", "-");
+            switch (value) {
+                case bool b:
+                    return b.ToLowerCase();
+                case string s:
+                    return Escape(new StringBuilder(s));
+                case char c:
+                    return ((int)c).ToString(); // TODO: rewrite
+                case float f:
+                    return f.ToString("F", CultureInfo.InvariantCulture).Replace(".", "-");
+                case double d:
+                    return d.ToString("F", CultureInfo.InvariantCulture).Replace(".", "-");
+                case decimal d:
+                    return d.ToString("F", CultureInfo.InvariantCulture).Replace(".", "-");
+            }
+
             if (ReflectionUtils.GetTypeInfo(value.GetType()).IsEnum)
                 return value.ToString();
             if (value is Type type)
                 return ToFolderName(type: type);
             if (!ReflectionUtils.GetTypeInfo(value.GetType()).IsValueType)
                 return value.GetType().Name; // TODO
-            if (value is TimeInterval)
-                return ((TimeInterval) value).Nanoseconds + "ns";
+            if (value is TimeInterval interval)
+                return interval.Nanoseconds + "ns";
+            
             return value.ToString();
         }
 
-        private static string Escape(string value)
-        {
-            return value; // TODO: escape special symbols
-        }
-
-        // we can't simply use type.FullName, because for generics it's tooo long
+        // we can't simply use type.FullName, because for generics it's too long
         // example: typeof(List<int>).FullName => "System.Collections.Generic.List`1[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
-        public static string ToFolderName(Type type)
-            => new StringBuilder(type.GetCorrectCSharpTypeName(includeGenericArgumentsNamespace: false))
-                .Replace('<', '_')
-                .Replace('>', '_')
-                .Replace('[', '_')
-                .Replace(']', '_')
-                .ToString();
+        public static string ToFolderName(Type type, bool includeNamespace = true, bool includeGenericArgumentsNamespace = false)
+            => Escape(new StringBuilder(type.GetCorrectCSharpTypeName(includeNamespace, includeGenericArgumentsNamespace)));
+        
+        private static string Escape(StringBuilder builder)
+        {
+            foreach (char invalidPathChar in Path.GetInvalidFileNameChars())
+            {
+                builder.Replace(invalidPathChar, '_');
+            }
+
+            return builder.ToString();
+        }
     }
 }

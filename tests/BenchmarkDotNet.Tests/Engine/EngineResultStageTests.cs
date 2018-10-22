@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Tests.Engine
 
         private static void Add(List<Measurement> measurements, int time)
         {
-            measurements.Add(new Measurement(1, IterationMode.Workload, IterationStage.General, measurements.Count + 1, 1, time));
+            measurements.Add(new Measurement(1, IterationMode.Workload, IterationStage.Actual, measurements.Count + 1, 1, time));
         }
     }
 }

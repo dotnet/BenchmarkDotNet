@@ -1,4 +1,6 @@
 ﻿using System.Xml.Serialization;
+using JetBrains.Annotations;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 #pragma warning disable CS3003 // I need ulong
 namespace BenchmarkDotNet.Diagnosers
@@ -18,7 +20,7 @@ namespace BenchmarkDotNet.Diagnosers
 
     public class IL : Code
     {
-        public int Offset { get; set; }
+        [PublicAPI] public int Offset { get; set; }
     }
 
     public class Asm : Code
@@ -32,6 +34,8 @@ namespace BenchmarkDotNet.Diagnosers
         /// The native end offset of this ASM representation
         /// </summary>
         public ulong EndAddress { get; set; }
+        
+        public uint SizeInBytes { get; set; }
     }
 
     public class Map
@@ -73,7 +77,7 @@ namespace BenchmarkDotNet.Diagnosers
     {
         public const string NotManagedMethod = "not managed method";
 
-        public const string DiassemblerEntryMethodName = "__ForDisassemblyDiagnoser__";
+        public const string DisassemblerEntryMethodName = "__ForDisassemblyDiagnoser__";
     }
 }
 #pragma warning restore CS3003 // Type is not CLS-compliant

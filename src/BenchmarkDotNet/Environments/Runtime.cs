@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -27,7 +28,7 @@ namespace BenchmarkDotNet.Environments
         /// </summary>
         public static readonly Runtime CoreRT = new CoreRtRuntime();
 
-        public string Name { get; }
+        [PublicAPI] public string Name { get; }
 
         protected Runtime(string name) => Name = name;
 

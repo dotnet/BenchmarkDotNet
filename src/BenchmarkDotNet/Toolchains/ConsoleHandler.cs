@@ -1,9 +1,9 @@
 using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Threading;
 using BenchmarkDotNet.Loggers;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains
 {
@@ -12,16 +12,16 @@ namespace BenchmarkDotNet.Toolchains
         // This needs to be static, so that we can share a single handler amongst all instances of Executor's
         internal static ConsoleHandler Instance;
 
-        public ConsoleCancelEventHandler EventHandler { get; private set; }
+        [PublicAPI] public ConsoleCancelEventHandler EventHandler { get; }
 
         private Process process;
-        private ILogger logger;
+        private readonly ILogger logger;
         private ConsoleColor? colorBefore;
 
-        public ConsoleHandler(ILogger logger)
+        [PublicAPI] public ConsoleHandler(ILogger logger)
         {
             this.logger = logger;
-            EventHandler = new ConsoleCancelEventHandler(HandlerCallback);
+            EventHandler = HandlerCallback;
         }
 
         public static void EnsureInitialized(ILogger logger)
@@ -33,15 +33,9 @@ namespace BenchmarkDotNet.Toolchains
             }
         }
 
-        public void SetProcess(Process process)
-        {
-            this.process = process;
-        }
+        public void SetProcess(Process newProcess) => process = newProcess;
 
-        public void ClearProcess()
-        {
-            this.process = null;
-        }
+        public void ClearProcess() => process = null;
 
         // This method gives us a chance to make a "best-effort" to clean anything up after Ctrl-C is type in the Console
         private void HandlerCallback(object sender, ConsoleCancelEventArgs e)
@@ -72,7 +66,7 @@ namespace BenchmarkDotNet.Toolchains
                     return;
 
                 var matchingProcess = Process.GetProcesses().FirstOrDefault(p => p.Id == localProcess.Id);
-                if (HasProcessDied(matchingProcess) || HasProcessDied(localProcess))
+                if (matchingProcess == null || HasProcessDied(matchingProcess) || HasProcessDied(localProcess))
                     return;
                 logger?.WriteLineError($"Process {matchingProcess.ProcessName}.exe (Id:{matchingProcess.Id}) has not exited after being killed!");
             }
@@ -100,7 +94,7 @@ namespace BenchmarkDotNet.Toolchains
             return $"Process: {processId}, Handler: {EventHandler?.GetHashCode()}";
         }
 
-        private bool HasProcessDied(Process process)
+        private static bool HasProcessDied(Process process)
         {
             if (process == null)
                 return true;

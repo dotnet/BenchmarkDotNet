@@ -1,6 +1,7 @@
 using System.Runtime.ExceptionServices;
-using System.Security;
 using System.Runtime.InteropServices;
+using System.Security;
+using RuntimeInformation = BenchmarkDotNet.Portability.RuntimeInformation;
 
 namespace BenchmarkDotNet.Horology
 {
@@ -21,7 +22,7 @@ namespace BenchmarkDotNet.Horology
         [SecurityCritical]
         private static bool Initialize(out long qpf)
         {
-            if (!Portability.RuntimeInformation.IsWindows())
+            if (!RuntimeInformation.IsWindows())
             {
                 qpf = default;
                 return false;

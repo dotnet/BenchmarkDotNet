@@ -4,8 +4,10 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -17,21 +19,19 @@ namespace BenchmarkDotNet.Diagnosers
 
         IEnumerable<IAnalyser> Analysers { get; }
 
-        IColumnProvider GetColumnProvider();
-
         RunMode GetRunMode(BenchmarkCase benchmarkCase);
 
         void Handle(HostSignal signal, DiagnoserActionParameters parameters);
 
-        void ProcessResults(DiagnoserResults results);
+        IEnumerable<Metric> ProcessResults(DiagnoserResults results);
 
         void DisplayResults(ILogger logger);
 
         IEnumerable<ValidationError> Validate(ValidationParameters validationParameters);
     }
 
-    public interface IConfigurableDiagnoser<TConfig> : IDiagnoser
+    public interface IConfigurableDiagnoser<in TConfig> : IDiagnoser
     {
-        IConfigurableDiagnoser<TConfig> Configure(TConfig config);
+        [PublicAPI] IConfigurableDiagnoser<TConfig> Configure(TConfig config);
     }
 }

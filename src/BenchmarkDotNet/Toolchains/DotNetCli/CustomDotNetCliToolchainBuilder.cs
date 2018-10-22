@@ -1,30 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using JetBrains.Annotations;
 using Microsoft.DotNet.PlatformAbstractions;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public abstract class CustomDotNetCliToolchainBuilder
     {
         protected string runtimeIdentifier, customDotNetCliPath;
         protected string targetFrameworkMoniker = "netcoreapp2.1", displayName;
         protected string runtimeFrameworkVersion;
 
-        protected bool useNuGetClearTag = false, useTempFolderForRestore = false;
-        protected Dictionary<string, string> feeds = new Dictionary<string, string>();
+        protected bool useNuGetClearTag, useTempFolderForRestore;
+        protected readonly Dictionary<string, string> Feeds = new Dictionary<string, string>();
 
         public abstract IToolchain ToToolchain();
 
         /// <summary>it allows you to define an additional NuGet feed, you can seal the feeds list by using the UseNuGetClearTag() method</summary>
         /// <param name="feedName">the name of the feed, will be used in the auto-generated NuGet.config file</param>
         /// <param name="feedAddress">the address of the feed, will be used in the auto-generated NuGet.config file</param>
+        [PublicAPI]
         public CustomDotNetCliToolchainBuilder AdditionalNuGetFeed(string feedName, string feedAddress)
         {
             if (string.IsNullOrEmpty(feedName)) throw new ArgumentException("Value cannot be null or empty.", nameof(feedName));
             if (string.IsNullOrEmpty(feedAddress)) throw new ArgumentException("Value cannot be null or empty.", nameof(feedAddress));
 
-            feeds[feedName] = feedAddress;
+            Feeds[feedName] = feedAddress;
 
             return this;
         }
@@ -39,47 +43,52 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return this;
         }
 
-        /// <param name="targetFrameworkMoniker">TFM, netcoreapp2.1 is the default</param>
-        public CustomDotNetCliToolchainBuilder TargetFrameworkMoniker(string targetFrameworkMoniker = "netcoreapp2.1")
+        /// <param name="newTargetFrameworkMoniker">TFM, netcoreapp2.1 is the default</param>
+        [PublicAPI]
+        public CustomDotNetCliToolchainBuilder TargetFrameworkMoniker(string newTargetFrameworkMoniker = "netcoreapp2.1")
         {
-            this.targetFrameworkMoniker = targetFrameworkMoniker ?? throw new ArgumentNullException(nameof(targetFrameworkMoniker));
+            targetFrameworkMoniker = newTargetFrameworkMoniker ?? throw new ArgumentNullException(nameof(newTargetFrameworkMoniker));
 
             return this;
         }
 
-        /// <param name="customDotNetCliPath">if not provided, the one from PATH will be used</param>
-        public CustomDotNetCliToolchainBuilder DotNetCli(string customDotNetCliPath)
+        /// <param name="newCustomDotNetCliPath">if not provided, the one from PATH will be used</param>
+        [PublicAPI]
+        public CustomDotNetCliToolchainBuilder DotNetCli(string newCustomDotNetCliPath)
         {
-            if (!string.IsNullOrEmpty(customDotNetCliPath) && !File.Exists(customDotNetCliPath))
-                throw new FileNotFoundException("Given file does not exist", customDotNetCliPath);
+            if (!string.IsNullOrEmpty(newCustomDotNetCliPath) && !File.Exists(newCustomDotNetCliPath))
+                throw new FileNotFoundException("Given file does not exist", newCustomDotNetCliPath);
 
-            this.customDotNetCliPath = customDotNetCliPath;
+            customDotNetCliPath = newCustomDotNetCliPath;
 
             return this;
         }
 
-        /// <param name="runtimeIdentifier">if not provided, portable OS-arch will be used (example: "win-x64", "linux-x86")</param>
-        public CustomDotNetCliToolchainBuilder RuntimeIdentifier(string runtimeIdentifier)
+        /// <param name="newRuntimeIdentifier">if not provided, portable OS-arch will be used (example: "win-x64", "linux-x86")</param>
+        [PublicAPI]
+        public CustomDotNetCliToolchainBuilder RuntimeIdentifier(string newRuntimeIdentifier)
         {
-            this.runtimeIdentifier = runtimeIdentifier;
+            runtimeIdentifier = newRuntimeIdentifier;
 
             return this;
         }
 
-        /// <param name="runtimeFrameworkVersion">optional, when set it's copied to the generated .csproj file</param>
-        public CustomDotNetCliToolchainBuilder RuntimeFrameworkVersion(string runtimeFrameworkVersion)
+        /// <param name="newRuntimeFrameworkVersion">optional, when set it's copied to the generated .csproj file</param>
+        [PublicAPI]
+        public CustomDotNetCliToolchainBuilder RuntimeFrameworkVersion(string newRuntimeFrameworkVersion)
         {
-            this.runtimeFrameworkVersion = runtimeFrameworkVersion;
+            runtimeFrameworkVersion = newRuntimeFrameworkVersion;
 
             return this;
         }
 
-        /// <param name="displayName">the name of the toolchain to be displayed in results</param>
-        public CustomDotNetCliToolchainBuilder DisplayName(string displayName)
+        /// <param name="newDisplayName">the name of the toolchain to be displayed in results</param>
+        [PublicAPI]
+        public CustomDotNetCliToolchainBuilder DisplayName(string newDisplayName)
         {
-            if (string.IsNullOrEmpty(displayName)) throw new ArgumentException("Value cannot be null or empty.", nameof(displayName));
+            if (string.IsNullOrEmpty(newDisplayName)) throw new ArgumentException("Value cannot be null or empty.", nameof(newDisplayName));
 
-            this.displayName = displayName;
+            displayName = newDisplayName;
 
             return this;
         }
@@ -88,6 +97,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// restore to temp folder to keep your CI clean or install same package many times (perhaps with different content but same version number), by default true for local builds
         /// https://github.com/dotnet/corefx/blob/master/Documentation/project-docs/dogfooding.md#3---consuming-subsequent-code-changes-by-rebuilding-the-package-alternative-2
         /// </summary>
+        [PublicAPI]
         public CustomDotNetCliToolchainBuilder UseTempFolderForRestore(bool value)
         {
             useTempFolderForRestore = value;

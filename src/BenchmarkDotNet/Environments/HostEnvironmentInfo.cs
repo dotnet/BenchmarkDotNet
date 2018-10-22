@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Portability.Cpu;
 using BenchmarkDotNet.Properties;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 
@@ -14,7 +16,7 @@ namespace BenchmarkDotNet.Environments
 {
     // this class is used by our auto-generated benchmark program, 
     // keep it in mind if you want to do some renaming
-    // you can finde the source code at Templates\BenchmarkProgram.txt
+    // you can find the source code at Templates\BenchmarkProgram.txt
     public class HostEnvironmentInfo : BenchmarkEnvironmentInfo
     {
         public const string BenchmarkDotNetCaption = "BenchmarkDotNet";
@@ -27,7 +29,7 @@ namespace BenchmarkDotNet.Environments
         /// </summary>
         public static ILogger FallbackLogger { get; } = ConsoleLogger.Default;
 
-        private static HostEnvironmentInfo Current;
+        private static HostEnvironmentInfo current;
 
         public string BenchmarkDotNetVersion { get; protected set; }
 
@@ -53,17 +55,17 @@ namespace BenchmarkDotNet.Environments
         /// checks if Mono is installed
         /// <remarks>It's expensive to call (creates new process by calling `mono --version`)</remarks>
         /// </summary>
-        public Lazy<bool> IsMonoInstalled { get; protected set; }
+        public Lazy<bool> IsMonoInstalled { get; }
 
         /// <summary>
         /// The frequency of the timer as the number of ticks per second.
         /// </summary>
-        public Frequency ChronometerFrequency { get; protected set; }
-        public TimeInterval ChronometerResolution => ChronometerFrequency.ToResolution();
+        [PublicAPI] public Frequency ChronometerFrequency { get; protected set; }
+        [PublicAPI] public TimeInterval ChronometerResolution => ChronometerFrequency.ToResolution();
 
         public HardwareTimerKind HardwareTimerKind { get; protected set; }
 
-        public Lazy<ICollection<Antivirus>> AntivirusProducts { get; protected set; }
+        public Lazy<ICollection<Antivirus>> AntivirusProducts { get; }
 
         public Lazy<VirtualMachineHypervisor> VirtualMachineHypervisor { get; protected set; }
 
@@ -87,7 +89,7 @@ namespace BenchmarkDotNet.Environments
             VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(RuntimeInformation.GetVirtualMachineHypervisor);
         }
 
-        public new static HostEnvironmentInfo GetCurrent() => Current ?? (Current = new HostEnvironmentInfo());
+        public new static HostEnvironmentInfo GetCurrent() => current ?? (current = new HostEnvironmentInfo());
 
         public override IEnumerable<string> ToFormattedString()
         {
@@ -109,5 +111,22 @@ namespace BenchmarkDotNet.Environments
         public bool IsDotNetCliInstalled() => !string.IsNullOrEmpty(DotNetSdkVersion.Value);
 
         private static string GetBenchmarkDotNetVersion() => BenchmarkDotNetInfo.FullVersion;
+
+        /// <summary>
+        /// Return string representation of CPU and environment configuration including BenchmarkDotNet, OS and .NET version  
+        /// </summary>
+        [PublicAPI]
+        public static string GetInformation()
+        {
+            var hostEnvironmentInfo = GetCurrent();
+            var sb = new StringBuilder();
+            foreach (string infoLine in hostEnvironmentInfo.ToFormattedString())
+            {
+                sb.AppendLine(infoLine);
+            }
+
+            sb.AppendLine(Summary.BuildAllRuntimes(hostEnvironmentInfo, Array.Empty<BenchmarkReport>()));
+            return sb.ToString();
+        }
     }
 }

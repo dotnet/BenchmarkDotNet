@@ -16,20 +16,21 @@ namespace BenchmarkDotNet.Engines
     {
         public const int MinInvokeCount = 4;
 
-        public IHost Host { get; }
-        public Action<long> WorkloadAction { get; }
-        public Action Dummy1Action { get; }
-        public Action Dummy2Action { get; }
-        public Action Dummy3Action { get; }
-        public Action<long> OverheadAction { get; }
-        public Job TargetJob { get; }
-        public long OperationsPerInvoke { get; }
-        public Action GlobalSetupAction { get; }
-        public Action GlobalCleanupAction { get; }
-        public Action IterationSetupAction { get; }
-        public Action IterationCleanupAction { get; }
-        public IResolver Resolver { get; }
-        public Encoding Encoding { get; }
+        [PublicAPI] public IHost Host { get; }
+        [PublicAPI] public Action<long> WorkloadAction { get; }
+        [PublicAPI] public Action Dummy1Action { get; }
+        [PublicAPI] public Action Dummy2Action { get; }
+        [PublicAPI] public Action Dummy3Action { get; }
+        [PublicAPI] public Action<long> OverheadAction { get; }
+        [PublicAPI] public Job TargetJob { get; }
+        [PublicAPI] public long OperationsPerInvoke { get; }
+        [PublicAPI] public Action GlobalSetupAction { get; }
+        [PublicAPI] public Action GlobalCleanupAction { get; }
+        [PublicAPI] public Action IterationSetupAction { get; }
+        [PublicAPI] public Action IterationCleanupAction { get; }
+        [PublicAPI] public IResolver Resolver { get; }
+        [PublicAPI] public Encoding Encoding { get; }
+        [PublicAPI] public string BenchmarkName { get; }
         
         private IClock Clock { get; }
         private bool ForceAllocations { get; }
@@ -40,7 +41,7 @@ namespace BenchmarkDotNet.Engines
 
         private readonly EnginePilotStage pilotStage;
         private readonly EngineWarmupStage warmupStage;
-        private readonly EngineGeneralStage generalStage;
+        private readonly EngineActualStage actualStage;
         private readonly bool includeMemoryStats;
 
         internal Engine(
@@ -48,7 +49,7 @@ namespace BenchmarkDotNet.Engines
             IResolver resolver,
             Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> overheadAction, Action<long> workloadAction, Job targetJob,
             Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
-            bool includeMemoryStats, Encoding encoding)
+            bool includeMemoryStats, Encoding encoding, string benchmarkName)
         {
             
             Host = host;
@@ -64,6 +65,7 @@ namespace BenchmarkDotNet.Engines
             IterationCleanupAction = iterationCleanupAction;
             OperationsPerInvoke = operationsPerInvoke;
             this.includeMemoryStats = includeMemoryStats;
+            BenchmarkName = benchmarkName;
 
             Resolver = resolver;
             Encoding = encoding;
@@ -77,7 +79,7 @@ namespace BenchmarkDotNet.Engines
 
             warmupStage = new EngineWarmupStage(this);
             pilotStage = new EnginePilotStage(this);
-            generalStage = new EngineGeneralStage(this);
+            actualStage = new EngineActualStage(this);
         }
 
         public void Dispose() => GlobalCleanupAction?.Invoke();
@@ -86,6 +88,9 @@ namespace BenchmarkDotNet.Engines
         {
             long invokeCount = InvocationCount;
             IReadOnlyList<Measurement> idle = null;
+            
+            if (EngineEventSource.Log.IsEnabled())
+                EngineEventSource.Log.BenchmarkStart(BenchmarkName);
 
             if (Strategy != RunStrategy.ColdStart)
             {
@@ -96,7 +101,7 @@ namespace BenchmarkDotNet.Engines
                     if (EvaluateOverhead)
                     {
                         warmupStage.RunOverhead(invokeCount, UnrollFactor);
-                        idle = generalStage.RunOverhead(invokeCount, UnrollFactor);
+                        idle = actualStage.RunOverhead(invokeCount, UnrollFactor);
                     }
                 }
 
@@ -105,13 +110,16 @@ namespace BenchmarkDotNet.Engines
 
             Host.BeforeMainRun();
 
-            var main = generalStage.RunWorkload(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring);
+            var main = actualStage.RunWorkload(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring);
 
             Host.AfterMainRun();
 
             var workGcHasDone = includeMemoryStats 
-                ? MeasureGcStats(new IterationData(IterationMode.Workload, IterationStage.General, 0, invokeCount, UnrollFactor)) 
+                ? MeasureGcStats(new IterationData(IterationMode.Workload, IterationStage.Actual, 0, invokeCount, UnrollFactor)) 
                 : GcStats.Empty;
+            
+            if (EngineEventSource.Log.IsEnabled())
+                EngineEventSource.Log.BenchmarkStop(BenchmarkName);
 
             var outlierMode = TargetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, Resolver);
 
@@ -132,10 +140,16 @@ namespace BenchmarkDotNet.Engines
 
             GcCollect();
 
+            if (EngineEventSource.Log.IsEnabled())
+                EngineEventSource.Log.IterationStart(data.IterationMode, data.IterationStage, totalOperations);
+
             // Measure
             var clock = Clock.Start();
             action(invokeCount / unrollFactor);
             var clockSpan = clock.GetElapsed();
+
+            if (EngineEventSource.Log.IsEnabled())
+                EngineEventSource.Log.IterationStop(data.IterationMode, data.IterationStage, totalOperations);
 
             if(!isOverhead)
                 IterationCleanupAction();
@@ -177,7 +191,7 @@ namespace BenchmarkDotNet.Engines
             ForceGcCollect();
         }
 
-        private void ForceGcCollect()
+        private static void ForceGcCollect()
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -188,7 +202,7 @@ namespace BenchmarkDotNet.Engines
 
         public void WriteLine() => Host.WriteLine();
 
-        private void EnableMonitoring()
+        private static void EnableMonitoring()
         {
             if (RuntimeInformation.IsMono) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-in-mono
                 return;
@@ -200,15 +214,14 @@ namespace BenchmarkDotNet.Engines
         [UsedImplicitly]
         public static class Signals
         {
-            public const string DiagnoserIsAttachedParam = "diagnoserAttached";
             public const string Acknowledgment = "Acknowledgment";
 
             private static readonly Dictionary<HostSignal, string> SignalsToMessages
                 = new Dictionary<HostSignal, string>
                 {
                     { HostSignal.BeforeAnythingElse, "// BeforeAnythingElse" },
-                    { HostSignal.BeforeGeneralRun, "// BeforeGeneralRun" },
-                    { HostSignal.AfterGeneralRun, "// AfterGeneralRun" },
+                    { HostSignal.BeforeActualRun, "// BeforeActualRun" },
+                    { HostSignal.AfterActualRun, "// AfterActualRun" },
                     { HostSignal.AfterAll, "// AfterAll" }
                 };
 

@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Order;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Running
 {
     internal class DescriptorComparer : IComparer<Descriptor>
     {
-        public static readonly IComparer<Descriptor> Alphabetical = new DescriptorComparer(MethodOrderPolicy.Alphabetical);
-        public static readonly IComparer<Descriptor> Declared = new DescriptorComparer(MethodOrderPolicy.Declared);
+        [PublicAPI] public static readonly IComparer<Descriptor> Alphabetical = new DescriptorComparer(MethodOrderPolicy.Alphabetical);
+        [PublicAPI] public static readonly IComparer<Descriptor> Declared = new DescriptorComparer(MethodOrderPolicy.Declared);
 
         private readonly MethodOrderPolicy methodOrderPolicy;
 
@@ -18,6 +19,9 @@ namespace BenchmarkDotNet.Running
 
         public int Compare(Descriptor x, Descriptor y)
         {
+            if (x == null && y == null) return 0;
+            if (x != null && y == null) return 1;
+            if (x == null) return -1;
             switch (methodOrderPolicy)
             {
                 case MethodOrderPolicy.Alphabetical:

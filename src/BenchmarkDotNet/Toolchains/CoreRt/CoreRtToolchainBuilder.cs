@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         private string ilcPath;
         private bool useCppCodeGenerator;
         
-        private bool isCoreRtConfigured = false;
+        private bool isCoreRtConfigured;
 
         /// <summary>
         /// creates a CoreRT toolchain targeting NuGet build of CoreRT
@@ -22,12 +22,9 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         /// <param name="nugetFeedUrl">url to NuGet CoreRT feed, The default is: "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json"</param>
         public CoreRtToolchainBuilder UseCoreRtNuGet(string microsoftDotNetILCompilerVersion = "1.0.0-alpha-*", string nugetFeedUrl = "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json")
         {
-            if (microsoftDotNetILCompilerVersion == null) throw new ArgumentNullException(nameof(microsoftDotNetILCompilerVersion));
-            if (nugetFeedUrl == null) throw new ArgumentNullException(nameof(nugetFeedUrl));
+            coreRtVersion = microsoftDotNetILCompilerVersion ?? throw new ArgumentNullException(nameof(microsoftDotNetILCompilerVersion));
 
-            this.coreRtVersion = microsoftDotNetILCompilerVersion;
-
-            feeds[Generator.CoreRtNuGetFeed] = nugetFeedUrl;
+            Feeds[Generator.CoreRtNuGetFeed] = nugetFeedUrl ?? throw new ArgumentNullException(nameof(nugetFeedUrl));
 
             isCoreRtConfigured = true;
 
@@ -39,14 +36,14 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         /// creates a CoreRT toolchain targeting local build for CoreRT
         /// Based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built
         /// </summary>
-        /// <param name="ilcPath">the ilcPath, an example: "C:\Projects\corert\bin\Windows_NT.x64.Release"</param>
-        public CoreRtToolchainBuilder UseCoreRtLocal(string ilcPath)
+        /// <param name="newIlcPath">the ilcPath, an example: "C:\Projects\corert\bin\Windows_NT.x64.Release"</param>
+        public CoreRtToolchainBuilder UseCoreRtLocal(string newIlcPath)
         {
-            if (ilcPath == null) throw new ArgumentNullException(nameof(ilcPath));
-            if (!Directory.Exists(ilcPath)) throw new DirectoryNotFoundException($"{ilcPath} provided as {nameof(ilcPath)} does NOT exist");
+            if (newIlcPath == null) throw new ArgumentNullException(nameof(newIlcPath));
+            if (!Directory.Exists(newIlcPath)) throw new DirectoryNotFoundException($"{newIlcPath} provided as {nameof(newIlcPath)} does NOT exist");
 
-            this.ilcPath = ilcPath;
-            base.useTempFolderForRestore = true;
+            ilcPath = newIlcPath;
+            useTempFolderForRestore = true;
 
             isCoreRtConfigured = true;
 
@@ -79,7 +76,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
                 targetFrameworkMoniker: targetFrameworkMoniker,
                 runtimeIdentifier: runtimeIdentifier ?? GetPortableRuntimeIdentifier(),
                 customDotNetCliPath: customDotNetCliPath,
-                feeds: feeds,
+                feeds: Feeds,
                 useNuGetClearTag: useNuGetClearTag,
                 useTempFolderForRestore: useTempFolderForRestore);
         }

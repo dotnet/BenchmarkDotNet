@@ -1,4 +1,6 @@
-﻿namespace BenchmarkDotNet.Portability
+﻿using JetBrains.Annotations;
+
+namespace BenchmarkDotNet.Portability
 {
     public class Antivirus
     {
@@ -8,8 +10,8 @@
             Path = path;
         }
 
-        public string Name { get; }
-        public string Path { get; }
+        [PublicAPI] public string Name { get; }
+        [PublicAPI] public string Path { get; }
 
         public override string ToString() => $"{Name} ({Path})";
     }

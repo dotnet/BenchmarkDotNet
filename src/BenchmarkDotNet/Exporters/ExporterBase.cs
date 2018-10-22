@@ -1,17 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
+using StreamWriter = BenchmarkDotNet.Portability.StreamWriter;
 
 namespace BenchmarkDotNet.Exporters
 {
     public abstract class ExporterBase : IExporter
     {
         public string Name => $"{GetType().Name}{FileNameSuffix}";
-        public Encoding Encoding { get; }
 
         protected virtual string FileExtension => "txt";
         protected virtual string FileNameSuffix => string.Empty;
@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Exporters
         public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
         {
             string fileName = GetFileName(summary);
-            string filePath = GetAtrifactFullName(summary);
+            string filePath = GetArtifactFullName(summary);
             if (File.Exists(filePath))
             {
                 try
@@ -31,14 +31,14 @@ namespace BenchmarkDotNet.Exporters
                 }
                 catch (IOException)
                 {
-                    var uniqueString = System.DateTime.Now.ToString("yyyyMMdd-HHmmss");
-                    var alternativeFilePath = $"{Path.Combine(summary.ResultsDirectoryPath, fileName)}-{FileCaption}{FileNameSuffix}-{uniqueString}.{FileExtension}";
+                    string uniqueString = DateTime.Now.ToString("yyyyMMdd-HHmmss");
+                    string alternativeFilePath = $"{Path.Combine(summary.ResultsDirectoryPath, fileName)}-{FileCaption}{FileNameSuffix}-{uniqueString}.{FileExtension}";
                     consoleLogger.WriteLineError($"Could not overwrite file {filePath}. Exporting to {alternativeFilePath}");
                     filePath = alternativeFilePath;
                 }
             }
 
-            using (var stream = Portability.StreamWriter.FromPath(filePath))
+            using (var stream = StreamWriter.FromPath(filePath))
             {
                 ExportToLog(summary, new StreamLogger(stream));
             }
@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Exporters
             return new[] { filePath };
         }
 
-        internal string GetAtrifactFullName(Summary summary)
+        internal string GetArtifactFullName(Summary summary)
         {
             string fileName = GetFileName(summary);
             return $"{Path.Combine(summary.ResultsDirectoryPath, fileName)}-{FileCaption}{FileNameSuffix}.{FileExtension}";

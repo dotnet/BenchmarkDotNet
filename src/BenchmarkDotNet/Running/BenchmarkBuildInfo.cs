@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Running
         {
             BenchmarkCase = benchmarkCase;
             Config = config;
-            Id = new BenchmarkId(id);
+            Id = new BenchmarkId(id, benchmarkCase);
         }
 
         public BenchmarkCase BenchmarkCase { get; }

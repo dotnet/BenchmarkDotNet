@@ -1,5 +1,5 @@
-﻿using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Columns;
+﻿using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Horology;
 
 namespace BenchmarkDotNet.Reports
 {

@@ -12,6 +12,8 @@ Let's learn this feature by examples.
 
 [!include[IntroBenchmarkBaseline](../samples/IntroBenchmarkBaseline.md)]
 
+[!include[IntroRatioSD](../samples/IntroRatioSD.md)]
+
 [!include[IntroCategoryBaseline](../samples/IntroCategoryBaseline.md)]
 
 [!include[IntroJobBaseline](../samples/IntroJobBaseline.md)]

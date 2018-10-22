@@ -50,10 +50,7 @@ namespace BenchmarkDotNet.Running
             var parameterDefinitions = GetParameterDefinitions(containingType);
             var parameterInstancesList = parameterDefinitions.Expand();
 
-            var rawJobs = fullConfig.GetJobs().ToArray();
-            if (rawJobs.IsEmpty())
-                rawJobs = new[] { Job.Default };
-            var jobs = rawJobs.Distinct().ToArray();
+            var jobs = fullConfig.GetRunnableJobs();
 
             var targets = GetTargets(targetMethods, containingType, globalSetupMethods, globalCleanupMethods, iterationSetupMethods, iterationCleanupMethods).ToArray();
 
@@ -92,8 +89,8 @@ namespace BenchmarkDotNet.Running
                 var configs = allAttributes.Select(attribute => attribute.Config)
                     .OrderBy(c => c.GetJobs().Count(job => job.Meta.IsMutator)); // configs with mutators must be the ones applied at the end
                 
-                foreach (var configFromAttrubute in configs)
-                    config = ManualConfig.Union(config, configFromAttrubute);
+                foreach (var configFromAttribute in configs)
+                    config = ManualConfig.Union(config, configFromAttribute);
             }
             return config.AsReadOnly();
         }
@@ -119,20 +116,7 @@ namespace BenchmarkDotNet.Running
         }
 
         private static MethodInfo GetTargetedMatchingMethod(MethodInfo benchmarkMethod, Tuple<MethodInfo, TargetedAttribute>[] methods)
-        {
-            foreach (var method in methods)
-            {
-                if (string.IsNullOrEmpty(method.Item2.Target))
-                    return method.Item1;
-
-                var targets = method.Item2.Target.Split(',');
-
-                if (targets.Contains(benchmarkMethod.Name))
-                    return method.Item1;
-            }
-
-            return null;
-        }
+            => methods.Where(method => method.Item2.Match(benchmarkMethod)).Select(method => method.Item1).FirstOrDefault();
 
         private static Tuple<MethodInfo, TargetedAttribute>[] GetAttributedMethods<T>(MethodInfo[] methods, string methodName) where T : TargetedAttribute
         {
@@ -144,7 +128,7 @@ namespace BenchmarkDotNet.Running
                     AssertMethodIsNotGeneric(methodName, m);
 
                     return new Tuple<MethodInfo, TargetedAttribute>(m, attr);
-                })).OrderByDescending(x => x.Item2.Target ?? "").ToArray();
+                })).OrderByDescending(x => x.Item2.Targets?.Length ?? 0).ToArray();
         }
 
         private static Descriptor CreateDescriptor(
@@ -177,30 +161,30 @@ namespace BenchmarkDotNet.Running
 
         private static ParameterDefinitions GetParameterDefinitions(Type type)
         {
-            const BindingFlags reflectionFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+            IEnumerable<ParameterDefinition> GetDefinitions<TAttribute>(Func<TAttribute, Type, object[]> getValidValues) where TAttribute : Attribute
+            {
+                const BindingFlags reflectionFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
-            var allParamsMembers = type.GetTypeMembersWithGivenAttribute<ParamsAttribute>(reflectionFlags);
-
-            var allParamsSourceMembers = type.GetTypeMembersWithGivenAttribute<ParamsSourceAttribute>(reflectionFlags);
-
-            var definitions = allParamsMembers
-                .Select(member =>
+                var allMembers = type.GetTypeMembersWithGivenAttribute<TAttribute>(reflectionFlags);
+                return allMembers.Select(member =>
                     new ParameterDefinition(
                         member.Name,
                         member.IsStatic,
-                        GetValidValues(member.Attribute.Values, member.ParameterType),
-                        false))
-                .Concat(allParamsSourceMembers.Select(member =>
-                {
-                    var paramsValues = GetValidValuesForParamsSource(type, member.Attribute.Name);
-                    return new ParameterDefinition(
-                       member.Name,
-                       member.IsStatic,
-                       SmartParamBuilder.CreateForParams(paramsValues.source, paramsValues.values),
-                       false);
-                    
-                }))
-                .ToArray();
+                        getValidValues(member.Attribute, member.ParameterType),
+                        false));
+            }
+
+            var paramsDefinitions = GetDefinitions<ParamsAttribute>((attribute, parameterType) => GetValidValues(attribute.Values, parameterType));
+
+            var paramsSourceDefinitions = GetDefinitions<ParamsSourceAttribute>((attribute, _) =>
+            {
+                var paramsValues = GetValidValuesForParamsSource(type, attribute.Name);
+                return SmartParamBuilder.CreateForParams(paramsValues.source, paramsValues.values);
+            });
+
+            var paramsAllValuesDefinitions = GetDefinitions<ParamsAllValuesAttribute>((_, paramaterType) => GetAllValidValues(paramaterType));
+
+            var definitions = paramsDefinitions.Concat(paramsSourceDefinitions).Concat(paramsAllValuesDefinitions).ToArray();
 
             return new ParameterDefinitions(definitions);
         }
@@ -297,7 +281,7 @@ namespace BenchmarkDotNet.Running
         private static object Map(object providedValue)
         {
             if (providedValue == null)
-                return providedValue;
+                return null;
 
             return providedValue.GetType().IsArray ? ArrayParam<IParam>.FromObject(providedValue) : providedValue;
         }
@@ -306,7 +290,7 @@ namespace BenchmarkDotNet.Running
         {
             var paramsSourceMethod = parentType.GetAllMethods().SingleOrDefault(method => method.Name == sourceName && method.IsPublic);
 
-            if (paramsSourceMethod != default(MethodInfo))
+            if (paramsSourceMethod != default)
                 return (paramsSourceMethod, ToArray(
                     paramsSourceMethod.Invoke(paramsSourceMethod.IsStatic ? null : Activator.CreateInstance(parentType), null),
                     paramsSourceMethod,
@@ -314,7 +298,7 @@ namespace BenchmarkDotNet.Running
 
             var paramsSourceProperty = parentType.GetAllProperties().SingleOrDefault(property => property.Name == sourceName && property.GetMethod.IsPublic);
 
-            if (paramsSourceProperty != default(PropertyInfo))
+            if (paramsSourceProperty != default)
                 return (paramsSourceProperty, ToArray(
                     paramsSourceProperty.GetValue(paramsSourceProperty.GetMethod.IsStatic ? null : Activator.CreateInstance(parentType)),
                     paramsSourceProperty,
@@ -328,11 +312,27 @@ namespace BenchmarkDotNet.Running
             if (!(sourceValue is IEnumerable collection))
                 throw new InvalidOperationException($"{memberInfo.Name} of type {type.Name} does not implement IEnumerable, unable to read values for [ParamsSource]");
 
-            var values = new List<object>();
-            foreach (var value in collection)
-                values.Add(value);
+            return collection.Cast<object>().ToArray();
+        }
 
-            return values.ToArray();
+        private static object[] GetAllValidValues(Type parameterType)
+        {
+            if (parameterType == typeof(bool))
+                return new object[] { false, true };
+
+            if (parameterType.GetTypeInfo().IsEnum)
+            {
+                if (parameterType.GetTypeInfo().IsDefined(typeof(FlagsAttribute)))
+                    return new object[] { Activator.CreateInstance(parameterType) };
+
+                return Enum.GetValues(parameterType).Cast<object>().ToArray();
+            }
+
+            var nullableUnderlyingType = Nullable.GetUnderlyingType(parameterType);
+            if (nullableUnderlyingType != null)
+                return new object[] { null }.Concat(GetAllValidValues(nullableUnderlyingType)).ToArray();
+
+            return new object[] { Activator.CreateInstance(parameterType) };
         }
     }
 }

@@ -36,8 +36,8 @@
     <LangVersion>7.2</LangVersion>
     
     <Major>0</Major>
-    <Minor>10</Minor>
-    <Revision>14</Revision>
+    <Minor>11</Minor>
+    <Revision>1</Revision>
 
     <BuildNumber Condition=" '$(APPVEYOR_BUILD_NUMBER)' != '' ">$(APPVEYOR_BUILD_NUMBER)</BuildNumber>
     <BuildNumber Condition=" '$(BuildNumber)' == '' ">0</BuildNumber>
@@ -55,5 +55,10 @@
     <AssemblyFileVersion>$(Major).$(Minor).$(Revision).$(BuildNumber)</AssemblyFileVersion>
     <InformationalVersion>$(Major).$(Minor).$(Revision).$(BuildNumber)$(PrereleaseLabel)</InformationalVersion>
     <PackageVersion>$(Major).$(Minor).$(Revision).$(BuildNumber)$(PrereleaseLabel)</PackageVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworkRootPath Condition="'$(TargetFrameworkRootPath)' == '' AND Exists('/Library/Frameworks/Mono.framework/Versions/Current')">/Library/Frameworks/Mono.framework/Versions/Current/lib/mono/xbuild-frameworks</TargetFrameworkRootPath>
+    <TargetFrameworkRootPath Condition="'$(TargetFrameworkRootPath)' == '' AND Exists('/usr/local/lib/mono/xbuild-frameworks')">/usr/local/lib/mono/xbuild-frameworks</TargetFrameworkRootPath>
+    <TargetFrameworkRootPath Condition="'$(TargetFrameworkRootPath)' == '' AND Exists('/usr/lib/mono/xbuild-frameworks')">/usr/lib/mono/xbuild-frameworks</TargetFrameworkRootPath>
   </PropertyGroup>
 </Project>

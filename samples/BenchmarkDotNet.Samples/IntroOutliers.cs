@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Samples
             }
         }
 
-        private int counter = 0;
+        private int counter;
 
         [Benchmark]
         public void Foo()

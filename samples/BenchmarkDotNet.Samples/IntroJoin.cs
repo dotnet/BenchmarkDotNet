@@ -3,7 +3,7 @@ using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples
 {
-    // Run BenchmarkSwither with arguments: "--join --category=IntroJoinA"
+    // Run BenchmarkSwitcher with arguments: "--join --category=IntroJoinA"
     
     [DryJob]
     public class IntroJoin1
