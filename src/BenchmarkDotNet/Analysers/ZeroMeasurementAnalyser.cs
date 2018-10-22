@@ -34,7 +34,8 @@ namespace BenchmarkDotNet.Analysers
                 : ZeroMeasurementHelper.CheckZeroMeasurementOneSample(workload.WithoutOutliers(), threshold);
             
             if (zeroMeasurement)
-                yield return CreateWarning("The method duration is indistinguishable from the empty method duration", report);
+                yield return CreateWarning("The method duration is indistinguishable from the empty method duration",
+                                           report, false);
         }
     }
 }

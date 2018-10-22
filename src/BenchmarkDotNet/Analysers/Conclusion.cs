@@ -11,6 +11,8 @@ namespace BenchmarkDotNet.Analysers
         public string AnalyserId { get; }
 
         public ConclusionKind Kind { get; }
+        
+        public bool Mergeable { get; }
 
         [NotNull]
         public string Message { get; }
@@ -18,22 +20,27 @@ namespace BenchmarkDotNet.Analysers
         [CanBeNull]
         public BenchmarkReport Report { get; }
 
-        private Conclusion([NotNull] string analyserId, ConclusionKind kind, [NotNull] string message, [CanBeNull] BenchmarkReport report)
+        private Conclusion([NotNull] string analyserId, 
+                           ConclusionKind kind, 
+                           [NotNull] string message, 
+                           [CanBeNull] BenchmarkReport report, 
+                           bool mergeable)
         {
             AnalyserId = analyserId;
             Kind = kind;
             Message = message;
             Report = report;
+            Mergeable = mergeable;
         }
 
-        public static Conclusion CreateHint(string analyserId, string message, [CanBeNull] BenchmarkReport report = null) 
-            => new Conclusion(analyserId, ConclusionKind.Hint, message, report);
+        public static Conclusion CreateHint(string analyserId, string message, [CanBeNull] BenchmarkReport report = null, bool mergeable = true) 
+            => new Conclusion(analyserId, ConclusionKind.Hint, message, report, mergeable);
 
-        public static Conclusion CreateWarning(string analyserId, string message, [CanBeNull] BenchmarkReport report = null) 
-            => new Conclusion(analyserId, ConclusionKind.Warning, message, report);
+        public static Conclusion CreateWarning(string analyserId, string message, [CanBeNull] BenchmarkReport report = null, bool mergeable = true) 
+            => new Conclusion(analyserId, ConclusionKind.Warning, message, report, mergeable);
 
-        public static Conclusion CreateError(string analyserId, string message, [CanBeNull] BenchmarkReport report = null) 
-            => new Conclusion(analyserId, ConclusionKind.Error, message, report);
+        public static Conclusion CreateError(string analyserId, string message, [CanBeNull] BenchmarkReport report = null, bool mergeable = true) 
+            => new Conclusion(analyserId, ConclusionKind.Error, message, report, mergeable);
 
         public bool Equals(Conclusion other)
         {
@@ -41,6 +48,8 @@ namespace BenchmarkDotNet.Analysers
                 return false;
             if (ReferenceEquals(this, other))
                 return true;
+            if (!Mergeable)
+                return string.Equals(AnalyserId, other.AnalyserId) && Kind == other.Kind && string.Equals(Report?.ToString(), other.Report?.ToString());
             return string.Equals(AnalyserId, other.AnalyserId) && Kind == other.Kind && string.Equals(Message, other.Message);
         }
 
