@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
@@ -280,6 +281,110 @@ namespace BenchmarkDotNet.Tests.Validators
 
             [GlobalSetup]
             public void Single() { }
+
+            [Benchmark]
+            public void NonThrowing() { }
+        }
+
+        [Fact]
+        public void AsyncTaskGlobalSetupIsExecuted()
+        {
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(AsyncTaskGlobalSetup))).ToList();
+
+            Assert.True(AsyncTaskGlobalSetup.WasCalled);
+            Assert.Empty(validationErrors);
+        }
+
+        public class AsyncTaskGlobalSetup
+        {
+            public static bool WasCalled;
+
+            [GlobalSetup]
+            public async Task GlobalSetup()
+            {
+                await Task.Delay(1);
+
+                WasCalled = true;
+            }
+
+            [Benchmark]
+            public void NonThrowing() { }
+        }
+
+        [Fact]
+        public void AsyncGenericTaskGlobalSetupIsExecuted()
+        {
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(AsyncGenericTaskGlobalSetup))).ToList();
+
+            Assert.True(AsyncGenericTaskGlobalSetup.WasCalled);
+            Assert.Empty(validationErrors);
+        }
+
+        public class AsyncGenericTaskGlobalSetup
+        {
+            public static bool WasCalled;
+
+            [GlobalSetup]
+            public async Task<int> GlobalSetup()
+            {
+                await Task.Delay(1);
+
+                WasCalled = true;
+
+                return 42;
+            }
+
+            [Benchmark]
+            public void NonThrowing() { }
+        }
+
+        [Fact]
+        public void AsyncValueTaskGlobalSetupIsExecuted()
+        {
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(AsyncValueTaskGlobalSetup))).ToList();
+
+            Assert.True(AsyncValueTaskGlobalSetup.WasCalled);
+            Assert.Empty(validationErrors);
+        }
+
+        public class AsyncValueTaskGlobalSetup
+        {
+            public static bool WasCalled;
+
+            [GlobalSetup]
+            public async ValueTask GlobalSetup()
+            {
+                await Task.Delay(1);
+
+                WasCalled = true;
+            }
+
+            [Benchmark]
+            public void NonThrowing() { }
+        }
+
+        [Fact]
+        public void AsyncGenericValueTaskGlobalSetupIsExecuted()
+        {
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(AsyncGenericValueTaskGlobalSetup))).ToList();
+
+            Assert.True(AsyncGenericValueTaskGlobalSetup.WasCalled);
+            Assert.Empty(validationErrors);
+        }
+
+        public class AsyncGenericValueTaskGlobalSetup
+        {
+            public static bool WasCalled;
+
+            [GlobalSetup]
+            public async ValueTask<int> GlobalSetup()
+            {
+                await Task.Delay(1);
+
+                WasCalled = true;
+
+                return 42;
+            }
 
             [Benchmark]
             public void NonThrowing() { }
