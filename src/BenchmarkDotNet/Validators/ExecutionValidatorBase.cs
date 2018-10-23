@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 
-namespace BenchmarkDotNet.Validators 
+namespace BenchmarkDotNet.Validators
 {
     public abstract class ExecutionValidatorBase : IValidator
     {
@@ -92,7 +93,9 @@ namespace BenchmarkDotNet.Validators
 
             try
             {
-                globalSetupMethods.First().Invoke(benchmarkTypeInstance, null);
+                var result = globalSetupMethods.First().Invoke(benchmarkTypeInstance, null);
+
+                TryToGetTaskResult(result);
             }
             catch (Exception ex)
             {
@@ -104,6 +107,30 @@ namespace BenchmarkDotNet.Validators
             }
 
             return true;
+        }
+
+        private void TryToGetTaskResult(object result)
+        {
+            if (result == null)
+            {
+                return;
+            }
+
+            var returnType = result.GetType();
+            if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(ValueTask<>))
+            {
+                var asTaskMethod = result.GetType().GetMethod("AsTask");
+                result = asTaskMethod.Invoke(result, null);
+            }
+
+            if (result is Task task)
+            {
+                task.GetAwaiter().GetResult();
+            }
+            else if (result is ValueTask valueTask)
+            {
+                valueTask.GetAwaiter().GetResult();
+            }
         }
 
         private bool TryToSetParamsFields(object benchmarkTypeInstance, List<ValidationError> errors)
