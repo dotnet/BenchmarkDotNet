@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Text;
-using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
@@ -99,12 +96,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         private static bool IsRootSolutionFolder(DirectoryInfo directoryInfo)
             => directoryInfo
                 .GetFileSystemInfos()
-                .Any(fileInfo => fileInfo.Extension == ".sln" || fileInfo.Name == "global.json");
-
-
-       
-
+                .Any(fileInfo => fileInfo.Extension == ".sln" || fileInfo.Name == "global.json");          
     }
-
-
 }
