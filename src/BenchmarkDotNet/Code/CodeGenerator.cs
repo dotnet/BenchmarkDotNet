@@ -72,7 +72,9 @@ namespace BenchmarkDotNet.Code
                     .Replace("$MeasureGcStats$", buildInfo.Config.HasMemoryDiagnoser() ? "true" : "false")
                     .Replace("$Encoding$", buildInfo.Config.Encoding.ToTemplateString())
                     .Replace("$DisassemblerEntryMethodName$", DisassemblerConstants.DisassemblerEntryMethodName)
-                    .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments)).ToString();
+                    .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments))
+                    .Replace("$CustomEnvInfo$", GetCustomEnvInfo(provider))
+                    .ToString();
 
                 benchmarkTypeCode = Unroll(benchmarkTypeCode, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance));
 
@@ -93,6 +95,24 @@ namespace BenchmarkDotNet.Code
                 .ToString();
 
             return benchmarkProgramContent;
+        }
+
+        private static string GetCustomEnvInfo(DeclarationsProvider provider)
+        {
+            if (provider.CustomEnvInfoMethodName is null)
+            {
+                return "Array.Empty<string>()";
+            }
+
+            switch (provider.CustomEnvInfoMethodReturnType)
+            {
+                case Type t when t == typeof(string):
+                    return $"new string[] {{ {provider.CustomEnvInfoMethodName}() }}";
+                case Type t when typeof(IEnumerable<string>).IsAssignableFrom(t):
+                    return $"{provider.CustomEnvInfoMethodName}()";
+                default:
+                    return "Array.Empty<string>()";
+            }
         }
 
         private static void AddNonEmptyUnique(HashSet<string> items, string value)

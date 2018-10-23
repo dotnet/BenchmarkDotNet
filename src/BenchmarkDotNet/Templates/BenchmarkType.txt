@@ -11,6 +11,10 @@
             {
                 host.WriteLine("// {0}", infoLine);
             }
+            foreach (var infoLine in $CustomEnvInfo$)
+            {
+                host.WriteLine("// {0}", infoLine);
+            }
             var job = new BenchmarkDotNet.Jobs.Job(); // use full name to avoid naming conflicts, #778
             $JobSetDefinition$;
             job.Freeze();

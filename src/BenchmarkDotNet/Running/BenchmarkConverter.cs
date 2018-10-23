@@ -44,6 +44,7 @@ namespace BenchmarkDotNet.Running
             var globalCleanupMethods = GetAttributedMethods<GlobalCleanupAttribute>(helperMethods, "GlobalCleanup");
             var iterationSetupMethods = GetAttributedMethods<IterationSetupAttribute>(helperMethods, "IterationSetup");
             var iterationCleanupMethods = GetAttributedMethods<IterationCleanupAttribute>(helperMethods, "IterationCleanup");
+            var customEnvInfoMethods = GetAttributedMethods<CustomEnvironmentInfoAttribute>(helperMethods, "CustomEnvironmentInfo");
 
             var targetMethods = benchmarkMethods.Where(method => method.HasAttribute<BenchmarkAttribute>()).ToArray();
 
@@ -52,7 +53,13 @@ namespace BenchmarkDotNet.Running
 
             var jobs = fullConfig.GetRunnableJobs();
 
-            var targets = GetTargets(targetMethods, containingType, globalSetupMethods, globalCleanupMethods, iterationSetupMethods, iterationCleanupMethods).ToArray();
+            var targets = GetTargets(targetMethods, 
+                containingType, 
+                globalSetupMethods, 
+                globalCleanupMethods, 
+                iterationSetupMethods, 
+                iterationCleanupMethods,
+                customEnvInfoMethods).ToArray();
 
             var benchmarks = new List<BenchmarkCase>();
             foreach (var target in targets)
@@ -101,7 +108,8 @@ namespace BenchmarkDotNet.Running
             Tuple<MethodInfo, TargetedAttribute>[] globalSetupMethods,
             Tuple<MethodInfo, TargetedAttribute>[] globalCleanupMethods,
             Tuple<MethodInfo, TargetedAttribute>[] iterationSetupMethods,
-            Tuple<MethodInfo, TargetedAttribute>[] iterationCleanupMethods)
+            Tuple<MethodInfo, TargetedAttribute>[] iterationCleanupMethods,
+            Tuple<MethodInfo, TargetedAttribute>[] customEnvInfoMethods)
         {
             return targetMethods
                 .Where(m => m.HasAttribute<BenchmarkAttribute>())
@@ -112,20 +120,21 @@ namespace BenchmarkDotNet.Running
                                                    GetTargetedMatchingMethod(methodInfo, iterationSetupMethods),
                                                    GetTargetedMatchingMethod(methodInfo, iterationCleanupMethods),
                                                    methodInfo.ResolveAttribute<BenchmarkAttribute>(),
-                                                   targetMethods));
+                                                   targetMethods,
+                                                   GetTargetedMatchingMethod(methodInfo, customEnvInfoMethods)));
         }
 
         private static MethodInfo GetTargetedMatchingMethod(MethodInfo benchmarkMethod, Tuple<MethodInfo, TargetedAttribute>[] methods)
             => methods.Where(method => method.Item2.Match(benchmarkMethod)).Select(method => method.Item1).FirstOrDefault();
 
-        private static Tuple<MethodInfo, TargetedAttribute>[] GetAttributedMethods<T>(MethodInfo[] methods, string methodName) where T : TargetedAttribute
+        private static Tuple<MethodInfo, TargetedAttribute>[] GetAttributedMethods<T>(MethodInfo[] methods, string methodType) where T : TargetedAttribute
         {
             return methods.SelectMany(m => m.GetCustomAttributes<T>()
                 .Select(attr =>
                 {
-                    AssertMethodHasCorrectSignature(methodName, m);
-                    AssertMethodIsAccessible(methodName, m);
-                    AssertMethodIsNotGeneric(methodName, m);
+                    AssertMethodHasCorrectSignature(methodType, m);
+                    AssertMethodIsAccessible(methodType, m);
+                    AssertMethodIsNotGeneric(methodType, m);
 
                     return new Tuple<MethodInfo, TargetedAttribute>(m, attr);
                 })).OrderByDescending(x => x.Item2.Targets?.Length ?? 0).ToArray();
@@ -139,7 +148,8 @@ namespace BenchmarkDotNet.Running
             MethodInfo iterationSetupMethod,
             MethodInfo iterationCleanupMethod,
             BenchmarkAttribute attr,
-            MethodInfo[] targetMethods)
+            MethodInfo[] targetMethods,
+            MethodInfo customEnvInfoMethod)
         {
             var target = new Descriptor(
                 type,
@@ -152,7 +162,8 @@ namespace BenchmarkDotNet.Running
                 baseline: attr.Baseline,
                 categories: GetCategories(methodInfo),
                 operationsPerInvoke: attr.OperationsPerInvoke,
-                methodIndex: Array.IndexOf(targetMethods, methodInfo));
+                methodIndex: Array.IndexOf(targetMethods, methodInfo),
+                customEnvInfoMethod: customEnvInfoMethod);
             AssertMethodHasCorrectSignature("Benchmark", methodInfo);
             AssertMethodIsAccessible("Benchmark", methodInfo);
             AssertMethodIsNotGeneric("Benchmark", methodInfo);

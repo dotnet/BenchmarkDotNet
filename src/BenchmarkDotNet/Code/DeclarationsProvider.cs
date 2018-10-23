@@ -36,6 +36,10 @@ namespace BenchmarkDotNet.Code
 
         public string IterationCleanupMethodName => Descriptor.IterationCleanupMethod?.Name ?? EmptyAction;
 
+        public string CustomEnvInfoMethodName => Descriptor.CustomEnvInfoMethod?.Name;
+
+        public Type CustomEnvInfoMethodReturnType => Descriptor.CustomEnvInfoMethod.ReturnType;
+
         public abstract string ExtraDefines { get; }
 
         public abstract string WorkloadMethodReturnTypeNamespace { get; }

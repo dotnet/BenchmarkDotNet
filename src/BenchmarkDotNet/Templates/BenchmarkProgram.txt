@@ -6,6 +6,7 @@ using System.Linq; // must not be removed, used by SmartParameter and SmartArgum
 using System.Threading;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 using BenchmarkDotNet;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
