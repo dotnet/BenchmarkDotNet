@@ -55,6 +55,28 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
+        public void FailingGlobalCleanupsAreDiscovered()
+        {
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(FailingGlobalCleanup))).ToList();
+
+            Assert.NotEmpty(validationErrors);
+            Assert.StartsWith("Failed to execute [GlobalCleanup]", validationErrors.Single().Message);
+            Assert.Contains("This one fails", validationErrors.Single().Message);
+        }
+
+        public class FailingGlobalCleanup
+        {
+            [GlobalCleanup]
+            public void Failing()
+            {
+                throw new Exception("This one fails");
+            }
+
+            [Benchmark]
+            public void NonThrowing() { }
+        }
+
+        [Fact]
         public void MultipleGlobalSetupsAreDiscovered()
         {
             var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(MultipleGlobalSetups))).ToList();
@@ -76,6 +98,27 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
+        public void MultipleGlobalCleanupsAreDiscovered()
+        {
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(MultipleGlobalCleanups))).ToList();
+
+            Assert.NotEmpty(validationErrors);
+            Assert.StartsWith("Only single [GlobalCleanup] method is allowed per type", validationErrors.Single().Message);
+        }
+
+        public class MultipleGlobalCleanups
+        {
+            [GlobalCleanup]
+            public void First() { }
+
+            [GlobalCleanup]
+            public void Second() { }
+
+            [Benchmark]
+            public void NonThrowing() { }
+        }
+
+        [Fact]
         public void VirtualGlobalSetupsAreSupported()
         {
             Assert.False(OverridesGlobalSetup.WasCalled);
@@ -90,7 +133,7 @@ namespace BenchmarkDotNet.Tests.Validators
             [GlobalSetup]
             public virtual void GlobalSetup()
             {
-                throw new Exception("should not be executed when overridden");
+                throw new Exception("Should not be executed when overridden");
             }
 
             [Benchmark]
@@ -103,6 +146,39 @@ namespace BenchmarkDotNet.Tests.Validators
 
             [GlobalSetup]
             public override void GlobalSetup()
+            {
+                WasCalled = true;
+            }
+        }
+
+        [Fact]
+        public void VirtualGlobalCleanupsAreSupported()
+        {
+            Assert.False(OverridesGlobalCleanup.WasCalled);
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(OverridesGlobalCleanup)));
+
+            Assert.True(OverridesGlobalCleanup.WasCalled);
+            Assert.Empty(validationErrors);
+        }
+
+        public class BaseClassWithThrowingGlobalCleanup
+        {
+            [GlobalCleanup]
+            public virtual void GlobalCleanup()
+            {
+                throw new Exception("Should not be executed when overridden");
+            }
+
+            [Benchmark]
+            public void NonThrowing() { }
+        }
+
+        public class OverridesGlobalCleanup : BaseClassWithThrowingGlobalCleanup
+        {
+            public static bool WasCalled;
+
+            [GlobalCleanup]
+            public override void GlobalCleanup()
             {
                 WasCalled = true;
             }
@@ -126,7 +202,32 @@ namespace BenchmarkDotNet.Tests.Validators
             public void Failing()
             {
                 if (Field == default)
-                    throw new Exception("this should have never happened");
+                    throw new Exception("This should have never happened");
+            }
+
+            [Benchmark]
+            public void NonThrowing() { }
+        }
+
+        [Fact]
+        public void NonFailingGlobalCleanupsAreOmitted()
+        {
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(GlobalCleanupThatRequiresParamsToBeSetFirst)));
+
+            Assert.Empty(validationErrors);
+        }
+
+        public class GlobalCleanupThatRequiresParamsToBeSetFirst
+        {
+            [Params(100)]
+            [UsedImplicitly]
+            public int Field;
+
+            [GlobalCleanup]
+            public void Failing()
+            {
+                if (Field == default)
+                    throw new Exception("This should have never happened");
             }
 
             [Benchmark]
@@ -150,6 +251,33 @@ namespace BenchmarkDotNet.Tests.Validators
             public int Field;
 
             [GlobalSetup]
+            public void Failing()
+            {
+                if (Field == default)
+                    throw new Exception("Field is missing Params attribute");
+            }
+
+            [Benchmark]
+            public void NonThrowing() { }
+        }
+
+        [Fact]
+        public void MissingParamsAttributeThatMakesGlobalCleanupsFailAreDiscovered()
+        {
+            var validationErrors = ExecutionValidator.FailOnError
+                .Validate(BenchmarkConverter.TypeToBenchmarks(typeof(FailingGlobalCleanupWhichShouldHaveHadParamsForField)))
+                .ToList();
+
+            Assert.NotEmpty(validationErrors);
+            Assert.StartsWith("Failed to execute [GlobalCleanup]", validationErrors.Single().Message);
+        }
+
+        public class FailingGlobalCleanupWhichShouldHaveHadParamsForField
+        {
+            [UsedImplicitly]
+            public int Field;
+
+            [GlobalCleanup]
             public void Failing()
             {
                 if (Field == default)
@@ -312,6 +440,31 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
+        public void AsyncTaskGlobalCleanupIsExecuted()
+        {
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(AsyncTaskGlobalCleanup))).ToList();
+
+            Assert.True(AsyncTaskGlobalCleanup.WasCalled);
+            Assert.Empty(validationErrors);
+        }
+
+        public class AsyncTaskGlobalCleanup
+        {
+            public static bool WasCalled;
+
+            [GlobalCleanup]
+            public async Task GlobalCleanup()
+            {
+                await Task.Delay(1);
+
+                WasCalled = true;
+            }
+
+            [Benchmark]
+            public void NonThrowing() { }
+        }
+
+        [Fact]
         public void AsyncGenericTaskGlobalSetupIsExecuted()
         {
             var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(AsyncGenericTaskGlobalSetup))).ToList();
@@ -326,6 +479,33 @@ namespace BenchmarkDotNet.Tests.Validators
 
             [GlobalSetup]
             public async Task<int> GlobalSetup()
+            {
+                await Task.Delay(1);
+
+                WasCalled = true;
+
+                return 42;
+            }
+
+            [Benchmark]
+            public void NonThrowing() { }
+        }
+
+        [Fact]
+        public void AsyncGenericTaskGlobalCleanupIsExecuted()
+        {
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(AsyncGenericTaskGlobalCleanup))).ToList();
+
+            Assert.True(AsyncGenericTaskGlobalCleanup.WasCalled);
+            Assert.Empty(validationErrors);
+        }
+
+        public class AsyncGenericTaskGlobalCleanup
+        {
+            public static bool WasCalled;
+
+            [GlobalCleanup]
+            public async Task<int> GlobalCleanup()
             {
                 await Task.Delay(1);
 
@@ -364,6 +544,31 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
+        public void AsyncValueTaskGlobalCleanupIsExecuted()
+        {
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(AsyncValueTaskGlobalCleanup))).ToList();
+
+            Assert.True(AsyncValueTaskGlobalCleanup.WasCalled);
+            Assert.Empty(validationErrors);
+        }
+
+        public class AsyncValueTaskGlobalCleanup
+        {
+            public static bool WasCalled;
+
+            [GlobalCleanup]
+            public async ValueTask GlobalCleanup()
+            {
+                await Task.Delay(1);
+
+                WasCalled = true;
+            }
+
+            [Benchmark]
+            public void NonThrowing() { }
+        }
+
+        [Fact]
         public void AsyncGenericValueTaskGlobalSetupIsExecuted()
         {
             var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(AsyncGenericValueTaskGlobalSetup))).ToList();
@@ -378,6 +583,33 @@ namespace BenchmarkDotNet.Tests.Validators
 
             [GlobalSetup]
             public async ValueTask<int> GlobalSetup()
+            {
+                await Task.Delay(1);
+
+                WasCalled = true;
+
+                return 42;
+            }
+
+            [Benchmark]
+            public void NonThrowing() { }
+        }
+
+        [Fact]
+        public void AsyncGenericValueTaskGlobalCleanupIsExecuted()
+        {
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(AsyncGenericValueTaskGlobalCleanup))).ToList();
+
+            Assert.True(AsyncGenericValueTaskGlobalCleanup.WasCalled);
+            Assert.Empty(validationErrors);
+        }
+
+        public class AsyncGenericValueTaskGlobalCleanup
+        {
+            public static bool WasCalled;
+
+            [GlobalCleanup]
+            public async ValueTask<int> GlobalCleanup()
             {
                 await Task.Delay(1);
 
