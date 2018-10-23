@@ -1,6 +1,5 @@
 using System;
 using BenchmarkDotNet.Jobs;
-using System.Linq;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
