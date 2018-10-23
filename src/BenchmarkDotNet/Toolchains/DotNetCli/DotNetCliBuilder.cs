@@ -23,15 +23,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
-        {
-            return new DotNetCliCommand(
-                               CustomDotNetCliPath,
-                               string.Empty,
-                               generateResult,
-                               logger,
-                               buildPartition,
-                               Array.Empty<EnvironmentVariable>())
-                           .RestoreThenBuild();
-        }
+            => new DotNetCliCommand(
+                    CustomDotNetCliPath,
+                    string.Empty,
+                    generateResult,
+                    logger,
+                    buildPartition,
+                    Array.Empty<EnvironmentVariable>())
+                .RestoreThenBuild();
     }
 }
