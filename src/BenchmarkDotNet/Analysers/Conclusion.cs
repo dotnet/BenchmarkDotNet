@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 
@@ -48,7 +49,7 @@ namespace BenchmarkDotNet.Analysers
                 return false;
             if (ReferenceEquals(this, other))
                 return true;
-            if (!Mergeable)
+            if (!Mergeable && !other.Mergeable)
                 return string.Equals(AnalyserId, other.AnalyserId) && Kind == other.Kind && string.Equals(Report?.ToString(), other.Report?.ToString());
             return string.Equals(AnalyserId, other.AnalyserId) && Kind == other.Kind && string.Equals(Message, other.Message);
         }
@@ -68,7 +69,9 @@ namespace BenchmarkDotNet.Analysers
             {
                 int hashCode = AnalyserId.GetHashCode();
                 hashCode = (hashCode * 397) ^ (int) Kind;
-                hashCode = (hashCode * 397) ^ Message.GetHashCode();
+                hashCode = Mergeable
+                           ? (hashCode * 397) ^ Message.GetHashCode()
+                           : (hashCode * 397) ^ Report?.ToString().GetHashCode() ?? string.Empty.GetHashCode();
                 return hashCode;
             }
         }
