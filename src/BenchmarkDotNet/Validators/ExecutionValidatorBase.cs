@@ -44,14 +44,9 @@ namespace BenchmarkDotNet.Validators
                     continue;
                 }
 
-                int errorCount = errors.Count;
-
                 ExecuteBenchmarks(benchmarkTypeInstance, typeGroup, errors);
 
-                if (errorCount == errors.Count)
-                {
-                    TryToCallGlobalCleanup(benchmarkTypeInstance, errors);
-                }
+                TryToCallGlobalCleanup(benchmarkTypeInstance, errors);
             }
 
             return errors;
