@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Configs;
@@ -149,6 +150,21 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(fakeCoreRunPath, toolchain.SourceCoreRun.FullName);
             Assert.Equal(fakeDotnetCliPath, toolchain.CustomDotNetCliPath.FullName);
             Assert.Equal(fakeRestorePackages, toolchain.RestorePath.FullName);
+        }
+        
+        [Fact]
+        public void UserCanSpecifyMultipleCoreRunPaths()
+        {
+            var fakeCoreRunPath_1 = typeof(object).Assembly.Location;
+            var fakeCoreRunPath_2 = typeof(ConfigParserTests).Assembly.Location;
+
+            var config = ConfigParser.Parse(new[] { "--job=Dry", "--coreRun", fakeCoreRunPath_1, fakeCoreRunPath_2 }, new OutputLogger(Output)).config;
+
+            var jobs = config.GetJobs().ToArray();
+            Assert.Equal(2, jobs.Length);
+            Assert.Single(jobs.Where(job => job.GetToolchain() is CoreRunToolchain toolchain && toolchain.SourceCoreRun.FullName == fakeCoreRunPath_1));
+            Assert.Single(jobs.Where(job => job.GetToolchain() is CoreRunToolchain toolchain && toolchain.SourceCoreRun.FullName == fakeCoreRunPath_2));
+            Assert.Equal(2, jobs.Select(job => job.Id).Distinct().Count()); // each job must have a unique ID
         }
         
         [Fact]

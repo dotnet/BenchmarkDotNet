@@ -136,10 +136,13 @@ namespace BenchmarkDotNet.ConsoleArguments
                 return false;
             }
 
-            if (options.CoreRunPath.IsNotNullButDoesNotExist())
+            foreach (var coreRunPath in options.CoreRunPaths)
             {
-                logger.WriteLineError($"The provided {nameof(options.CoreRunPath)} \"{options.CoreRunPath}\" does NOT exist.");
-                return false;
+                if (coreRunPath.IsNotNullButDoesNotExist())
+                {
+                    logger.WriteLineError($"The provided path to CoreRun: \"{options.CoreRunPaths}\" does NOT exist.");
+                    return false;
+                }
             }
             
             if (options.MonoPath.IsNotNullButDoesNotExist())
@@ -168,7 +171,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             var config = new ManualConfig();
 
             var baseJob = GetBaseJob(options, globalConfig);
-            config.Add(Expand(baseJob, options).ToArray());
+            config.Add(Expand(baseJob.UnfreezeCopy(), options).ToArray()); // UnfreezeCopy ensures that each of the expanded jobs will have it's own ID
             if (config.GetJobs().IsEmpty() && baseJob != Job.Default)
                 config.Add(baseJob);
 
@@ -254,8 +257,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return baseJob.With(InProcessToolchain.Instance);
             else if (!string.IsNullOrEmpty(options.ClrVersion))
                 yield return baseJob.With(new ClrRuntime(options.ClrVersion)); // local builds of .NET Runtime
-            else if (options.CoreRunPath != null)
-                yield return CreateCoreRunJob(baseJob, options); // local CoreFX and CoreCLR builds
+            else if (options.CoreRunPaths.Any())
+                foreach (var coreRunPath in options.CoreRunPaths)
+                    yield return CreateCoreRunJob(baseJob, options, coreRunPath); // local CoreFX and CoreCLR builds
             else if (options.CliPath != null && options.Runtimes.IsEmpty())
                 yield return CreateCoreJobWithCli(baseJob, options);
             else
@@ -333,15 +337,16 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
         }
 
-        private static Job CreateCoreRunJob(Job baseJob, CommandLineOptions options)
+        private static Job CreateCoreRunJob(Job baseJob, CommandLineOptions options, FileInfo coreRunPath)
             => baseJob
                 .With(Runtime.Core)
                 .With(new CoreRunToolchain(
-                    options.CoreRunPath,
+                    coreRunPath,
                     createCopy: true,
                     targetFrameworkMoniker: options.Runtimes.SingleOrDefault() ?? NetCoreAppSettings.GetCurrentVersion().TargetFrameworkMoniker,
                     customDotNetCliPath: options.CliPath,
-                    restorePath: options.RestorePath));
+                    restorePath: options.RestorePath,
+                    displayName: GetCoreRunToolchainDisplayName(options.CoreRunPaths, coreRunPath)));
 
         private static Job CreateCoreJobWithCli(Job baseJob, CommandLineOptions options)
             => baseJob
@@ -353,5 +358,43 @@ namespace BenchmarkDotNet.ConsoleArguments
                         runtimeFrameworkVersion: null,
                         name: NetCoreAppSettings.GetCurrentVersion().TargetFrameworkMoniker,
                         packagesPath: options.RestorePath?.FullName)));
+
+        /// <summary>
+        /// we have a limited amout of space when printing the output to the console, so we try to keep things small and simple
+        ///
+        /// for following paths:
+        ///  C:\Projects\coreclr_upstream\bin\tests\Windows_NT.x64.Release\Tests\Core_Root\CoreRun.exe
+        ///  C:\Projects\coreclr_upstream\bin\tests\Windows_NT.x64.Release\Tests\Core_Root_beforeMyChanges\CoreRun.exe
+        ///
+        /// we get:
+        ///
+        /// \Core_Root\CoreRun.exe
+        /// \Core_Root_beforeMyChanges\CoreRun.exe
+        /// </summary>
+        private static string GetCoreRunToolchainDisplayName(IReadOnlyList<FileInfo> paths, FileInfo coreRunPath)
+        {
+            if (paths.Count <= 1)
+                return "CoreRun";
+
+            int commonLongestPrefixIndex = paths[0].FullName.Length;
+            for (int i = 1; i < paths.Count; i++)
+            {
+                commonLongestPrefixIndex = Math.Min(commonLongestPrefixIndex, paths[i].FullName.Length);
+                for (int j = 0; j < commonLongestPrefixIndex; j++)
+                    if (paths[i].FullName[j] != paths[0].FullName[j])
+                    {
+                        commonLongestPrefixIndex = j;
+                        break;
+                    }
+            }
+
+
+            if (commonLongestPrefixIndex <= 1)
+                return coreRunPath.FullName;
+
+            var lastCommonDirectorySeparatorIndex = coreRunPath.FullName.LastIndexOf(Path.DirectorySeparatorChar, commonLongestPrefixIndex - 1);
+            
+            return coreRunPath.FullName.Substring(lastCommonDirectorySeparatorIndex);
+        }
     }
 }
