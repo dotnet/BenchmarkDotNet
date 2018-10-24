@@ -76,8 +76,8 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("packages", Required = false, HelpText = "The directory to restore packages to (optional).")]
         public DirectoryInfo RestorePath { get; set; }
 
-        [Option("coreRun", Required = false, HelpText = "Path to CoreRun (optional).")]
-        public FileInfo CoreRunPath { get; set; }
+        [Option("coreRun", Required = false, HelpText = "Path(s) to CoreRun (optional).")]
+        public IReadOnlyList<FileInfo> CoreRunPaths { get; set; }
 
         [Option("monoPath", Required = false, HelpText = "Optional path to Mono which should be used for running benchmarks.")]
         public FileInfo MonoPath { get; set; }

@@ -15,7 +15,6 @@ using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
-using BenchmarkDotNet.Toolchains.Roslyn;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -152,6 +151,21 @@ namespace BenchmarkDotNet.Tests
         }
         
         [Fact]
+        public void UserCanSpecifyMultipleCoreRunPaths()
+        {
+            var fakeCoreRunPath_1 = typeof(object).Assembly.Location;
+            var fakeCoreRunPath_2 = typeof(ConfigParserTests).Assembly.Location;
+
+            var config = ConfigParser.Parse(new[] { "--job=Dry", "--coreRun", fakeCoreRunPath_1, fakeCoreRunPath_2 }, new OutputLogger(Output)).config;
+
+            var jobs = config.GetJobs().ToArray();
+            Assert.Equal(2, jobs.Length);
+            Assert.Single(jobs.Where(job => job.GetToolchain() is CoreRunToolchain toolchain && toolchain.SourceCoreRun.FullName == fakeCoreRunPath_1));
+            Assert.Single(jobs.Where(job => job.GetToolchain() is CoreRunToolchain toolchain && toolchain.SourceCoreRun.FullName == fakeCoreRunPath_2));
+            Assert.Equal(2, jobs.Select(job => job.Id).Distinct().Count()); // each job must have a unique ID
+        }
+        
+        [Fact]
         public void MonoPathParsedCorrectly()
         {
             var fakeMonoPath = typeof(object).Assembly.Location;
@@ -248,6 +262,18 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(2, config.GetHardwareCounters().Count());
             Assert.Single(config.GetHardwareCounters().Where(counter => counter == HardwareCounter.CacheMisses));
             Assert.Single(config.GetHardwareCounters().Where(counter => counter == HardwareCounter.InstructionRetired));
+        }
+        
+        [Fact]
+        public void InvalidHardwareCounterNameMeansFailure()
+        {
+            Assert.False(ConfigParser.Parse(new[] { "--counters", "WRONG_NAME" }, new OutputLogger(Output)).isSuccess);
+        }
+        
+        [Fact]
+        public void TooManyHardwareCounterNameMeansFailure()
+        {
+            Assert.False(ConfigParser.Parse(new[] { "--counters", "Timer+TotalIssues+BranchInstructions+CacheMisses" }, new OutputLogger(Output)).isSuccess);
         }
         
         [Fact]
