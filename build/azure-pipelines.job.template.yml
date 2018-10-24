@@ -25,6 +25,7 @@ jobs:
       testRunner: VSTest
       testResultsFiles: '**/*.trx'
       testRunTitle: ${{ parameters.name }}
+      mergeTestResults: true
   - script: 'echo 1>&2'
     failOnStderr: true
     displayName: 'If above is partially succeeded, then fail'
