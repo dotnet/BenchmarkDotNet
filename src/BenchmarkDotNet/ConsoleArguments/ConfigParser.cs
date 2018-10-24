@@ -137,13 +137,11 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
 
             foreach (var coreRunPath in options.CoreRunPaths)
-            {
                 if (coreRunPath.IsNotNullButDoesNotExist())
                 {
                     logger.WriteLineError($"The provided path to CoreRun: \"{options.CoreRunPaths}\" does NOT exist.");
                     return false;
                 }
-            }
             
             if (options.MonoPath.IsNotNullButDoesNotExist())
             {
@@ -157,11 +155,24 @@ namespace BenchmarkDotNet.ConsoleArguments
                 return false;
             }
 
-            if (options.Runtimes.Count() > 1 && options.CoreRtPath != null)
+            if (options.Runtimes.Count() > 1 && !options.CoreRunPaths.IsNullOrEmpty())
             {
                 logger.WriteLineError("CoreRun path can't be combined with multiple .NET Runtimes");
                 return false;
             }
+
+            if (options.HardwareCounters.Count() > 3)
+            {
+                logger.WriteLineError("You can't use more than 3 HardwareCounters at the same time.");
+                return false;
+            }
+            
+            foreach (var counterName in options.HardwareCounters)
+                if (!Enum.TryParse(counterName, ignoreCase: true, out HardwareCounter _))
+                {
+                    logger.WriteLineError($"The provided hardware counter \"{counterName}\" is invalid. Available options are: {string.Join("+", Enum.GetNames(typeof(HardwareCounter)))}.");
+                    return false;
+                }
 
             return true;
         }
@@ -178,8 +189,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             config.Add(options.Exporters.SelectMany(exporter => AvailableExporters[exporter]).ToArray());
             
             config.Add(options.HardwareCounters
-                .Select(counterName => Enum.TryParse(counterName, ignoreCase: true, out HardwareCounter counter) ? counter : HardwareCounter.NotSet)
-                .Where(counter => counter != HardwareCounter.NotSet)
+                .Select(counterName => (HardwareCounter)Enum.Parse(typeof(HardwareCounter), counterName, ignoreCase: true))
                 .ToArray());
 
             if (options.UseMemoryDiagnoser)

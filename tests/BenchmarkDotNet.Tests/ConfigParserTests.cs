@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Configs;
@@ -16,7 +15,6 @@ using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
-using BenchmarkDotNet.Toolchains.Roslyn;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -264,6 +262,18 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(2, config.GetHardwareCounters().Count());
             Assert.Single(config.GetHardwareCounters().Where(counter => counter == HardwareCounter.CacheMisses));
             Assert.Single(config.GetHardwareCounters().Where(counter => counter == HardwareCounter.InstructionRetired));
+        }
+        
+        [Fact]
+        public void InvalidHardwareCounterNameMeansFailure()
+        {
+            Assert.False(ConfigParser.Parse(new[] { "--counters", "WRONG_NAME" }, new OutputLogger(Output)).isSuccess);
+        }
+        
+        [Fact]
+        public void TooManyHardwareCounterNameMeansFailure()
+        {
+            Assert.False(ConfigParser.Parse(new[] { "--counters", "Timer+TotalIssues+BranchInstructions+CacheMisses" }, new OutputLogger(Output)).isSuccess);
         }
         
         [Fact]
