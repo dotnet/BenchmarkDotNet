@@ -23,10 +23,7 @@ namespace BenchmarkDotNet.Tests.Validators
 
         public class FailingConstructor
         {
-            public FailingConstructor()
-            {
-                throw new Exception("This one fails");
-            }
+            public FailingConstructor() => throw new Exception("This one fails");
 
             [Benchmark]
             public void NonThrowing() { }
@@ -45,10 +42,7 @@ namespace BenchmarkDotNet.Tests.Validators
         public class FailingGlobalSetup
         {
             [GlobalSetup]
-            public void Failing()
-            {
-                throw new Exception("This one fails");
-            }
+            public void Failing() => throw new Exception("This one fails");
 
             [Benchmark]
             public void NonThrowing() { }
@@ -67,10 +61,7 @@ namespace BenchmarkDotNet.Tests.Validators
         public class FailingGlobalCleanup
         {
             [GlobalCleanup]
-            public void Failing()
-            {
-                throw new Exception("This one fails");
-            }
+            public void Failing() => throw new Exception("This one fails");
 
             [Benchmark]
             public void NonThrowing() { }
@@ -131,10 +122,7 @@ namespace BenchmarkDotNet.Tests.Validators
         public class BaseClassWithThrowingGlobalSetup
         {
             [GlobalSetup]
-            public virtual void GlobalSetup()
-            {
-                throw new Exception("Should not be executed when overridden");
-            }
+            public virtual void GlobalSetup() => throw new Exception("Should not be executed when overridden");
 
             [Benchmark]
             public void NonThrowing() { }
@@ -145,10 +133,7 @@ namespace BenchmarkDotNet.Tests.Validators
             public static bool WasCalled;
 
             [GlobalSetup]
-            public override void GlobalSetup()
-            {
-                WasCalled = true;
-            }
+            public override void GlobalSetup() => WasCalled = true;
         }
 
         [Fact]
@@ -164,10 +149,7 @@ namespace BenchmarkDotNet.Tests.Validators
         public class BaseClassWithThrowingGlobalCleanup
         {
             [GlobalCleanup]
-            public virtual void GlobalCleanup()
-            {
-                throw new Exception("Should not be executed when overridden");
-            }
+            public virtual void GlobalCleanup() => throw new Exception("Should not be executed when overridden");
 
             [Benchmark]
             public void NonThrowing() { }
@@ -178,10 +160,7 @@ namespace BenchmarkDotNet.Tests.Validators
             public static bool WasCalled;
 
             [GlobalCleanup]
-            public override void GlobalCleanup()
-            {
-                WasCalled = true;
-            }
+            public override void GlobalCleanup() => WasCalled = true;
         }
 
         [Fact]
@@ -387,10 +366,7 @@ namespace BenchmarkDotNet.Tests.Validators
         public class FailingBenchmark
         {
             [Benchmark]
-            public void Throwing()
-            {
-                throw new Exception("This benchmark throws");
-            }
+            public void Throwing() => throw new Exception("This benchmark throws");
         }
 
         [Fact]
