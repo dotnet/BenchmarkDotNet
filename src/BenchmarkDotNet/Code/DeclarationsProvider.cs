@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Code
 
         public string GlobalSetupMethodName => GetMethodName(Descriptor.GlobalSetupMethod);
 
-        public string GlobalCleanupMethodName => Descriptor.GlobalCleanupMethod?.Name ?? EmptyAction;
+        public string GlobalCleanupMethodName => GetMethodName(Descriptor.GlobalCleanupMethod);
 
         public string IterationSetupMethodName => Descriptor.IterationSetupMethod?.Name ?? EmptyAction;
 
