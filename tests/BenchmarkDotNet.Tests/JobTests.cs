@@ -459,6 +459,27 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
+        [Fact]
+        public static void WithNuget() 
+        {
+            var j = new Job("SomeId");
+
+            //.WithNuget extensions
+
+            j = j.Freeze().WithNuget("Newtonsoft.Json");
+            Assert.Equal(1, j.Infrastructure.NugetReferences.Count);
+            
+            j = j.WithNuget("AutoMapper", "7.0.1");
+            Assert.Equal(2, j.Infrastructure.NugetReferences.Count); //appends
+
+            j = j.WithNuget("AutoMapper");
+            Assert.Equal(2, j.Infrastructure.NugetReferences.Count); //does not append, same package
+            j = j.WithNuget("AutoMapper", "7.0.0-alpha-0001");
+            Assert.Equal(2, j.Infrastructure.NugetReferences.Count); //does not append, same package
+
+            Assert.Equal("AutoMapper 7.0.1", j.Infrastructure.NugetReferences.ElementAt(1).ToString()); //first package reference in wins
+        }
+
         private static bool IsSubclassOfobModeOfItself(Type type)
         {
             Type jobModeOfT;
