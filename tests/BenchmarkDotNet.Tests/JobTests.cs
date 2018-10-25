@@ -415,7 +415,7 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Equal("Id;Accuracy;AnalyzeLaunchVariance;EvaluateOverhead;" +
                 "MaxAbsoluteError;MaxRelativeError;MinInvokeCount;MinIterationTime;OutlierMode;Environment;Affinity;EnvironmentVariables;" +
                 "Jit;Platform;Runtime;Gc;AllowVeryLargeObjects;Concurrent;CpuGroups;Force;HeapAffinitizeMask;HeapCount;NoAffinitize;" +
-                "RetainVm;Server;Infrastructure;Arguments;BuildConfiguration;Clock;EngineFactory;Toolchain;Meta;Baseline;IsDefault;IsMutator;Run;InvocationCount;IterationCount;IterationTime;" +
+                "RetainVm;Server;Infrastructure;Arguments;BuildConfiguration;Clock;EngineFactory;NugetReferences;Toolchain;Meta;Baseline;IsDefault;IsMutator;Run;InvocationCount;IterationCount;IterationTime;" +
                 "LaunchCount;MaxIterationCount;MaxWarmupIterationCount;MinIterationCount;MinWarmupIterationCount;RunStrategy;UnrollFactor;WarmupCount", string.Join(";", a));
         }
         
@@ -457,6 +457,27 @@ namespace BenchmarkDotNet.IntegrationTests
                     Assert.True(null != jobMode.GetField(expectedPropertyName, BindingFlags.Static | BindingFlags.Public), $"{expectedPropertyName} in {jobMode.Name} does not exist");
                 }
             }
+        }
+
+        [Fact]
+        public static void WithNuget() 
+        {
+            var j = new Job("SomeId");
+
+            //.WithNuget extensions
+
+            j = j.Freeze().WithNuget("Newtonsoft.Json");
+            Assert.Equal(1, j.Infrastructure.NugetReferences.Count);
+            
+            j = j.WithNuget("AutoMapper", "7.0.1");
+            Assert.Equal(2, j.Infrastructure.NugetReferences.Count); //appends
+
+            j = j.WithNuget("AutoMapper");
+            Assert.Equal(2, j.Infrastructure.NugetReferences.Count); //does not append, same package
+            j = j.WithNuget("AutoMapper", "7.0.0-alpha-0001");
+            Assert.Equal(2, j.Infrastructure.NugetReferences.Count); //does not append, same package
+
+            Assert.Equal("AutoMapper 7.0.1", j.Infrastructure.NugetReferences.ElementAt(1).ToString()); //first package reference in wins
         }
 
         private static bool IsSubclassOfobModeOfItself(Type type)
