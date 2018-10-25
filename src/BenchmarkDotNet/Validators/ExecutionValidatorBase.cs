@@ -45,6 +45,8 @@ namespace BenchmarkDotNet.Validators
                 }
 
                 ExecuteBenchmarks(benchmarkTypeInstance, typeGroup, errors);
+
+                TryToCallGlobalCleanup(benchmarkTypeInstance, errors);
             }
 
             return errors;
@@ -71,29 +73,39 @@ namespace BenchmarkDotNet.Validators
 
         private bool TryToCallGlobalSetup(object benchmarkTypeInstance, List<ValidationError> errors)
         {
-            var globalSetupMethods = benchmarkTypeInstance
+            return TryToCallGlobalMethod<GlobalSetupAttribute>(benchmarkTypeInstance, errors);
+        }
+
+        private void TryToCallGlobalCleanup(object benchmarkTypeInstance, List<ValidationError> errors)
+        {
+            TryToCallGlobalMethod<GlobalCleanupAttribute>(benchmarkTypeInstance, errors);
+        }
+
+        private bool TryToCallGlobalMethod<T>(object benchmarkTypeInstance, List<ValidationError> errors)
+        {
+            var methods = benchmarkTypeInstance
                 .GetType()
                 .GetAllMethods()
-                .Where(methodInfo => methodInfo.GetCustomAttributes(false).OfType<GlobalSetupAttribute>().Any())
+                .Where(methodInfo => methodInfo.GetCustomAttributes(false).OfType<T>().Any())
                 .ToArray();
 
-            if (!globalSetupMethods.Any())
+            if (!methods.Any())
             {
                 return true;
             }
 
-            if (globalSetupMethods.Count(methodInfo => !methodInfo.IsVirtual) > 1)
+            if (methods.Count(methodInfo => !methodInfo.IsVirtual) > 1)
             {
                 errors.Add(new ValidationError(
                     TreatsWarningsAsErrors,
-                    $"Only single [GlobalSetup] method is allowed per type, type {benchmarkTypeInstance.GetType().Name} has few"));
+                    $"Only single [{GetAttributeName(typeof(T))}] method is allowed per type, type {benchmarkTypeInstance.GetType().Name} has few"));
 
                 return false;
             }
 
             try
             {
-                var result = globalSetupMethods.First().Invoke(benchmarkTypeInstance, null);
+                var result = methods.First().Invoke(benchmarkTypeInstance, null);
 
                 TryToGetTaskResult(result);
             }
@@ -101,13 +113,15 @@ namespace BenchmarkDotNet.Validators
             {
                 errors.Add(new ValidationError(
                     TreatsWarningsAsErrors,
-                    $"Failed to execute [GlobalSetup] for {benchmarkTypeInstance.GetType().Name}, exception was {GetDisplayExceptionMessage(ex)}"));
+                    $"Failed to execute [{GetAttributeName(typeof(T))}] for {benchmarkTypeInstance.GetType().Name}, exception was {GetDisplayExceptionMessage(ex)}"));
 
                 return false;
             }
 
             return true;
         }
+
+        private string GetAttributeName(Type type) => type.Name.Replace("Attribute", string.Empty);
 
         private void TryToGetTaskResult(object result)
         {

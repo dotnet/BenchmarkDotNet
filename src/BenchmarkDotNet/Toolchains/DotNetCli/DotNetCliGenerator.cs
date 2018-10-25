@@ -83,7 +83,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition)}")
                 .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(buildPartition)}")
                 .ToString();
-            
+
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
         }
 
@@ -96,10 +96,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         private static bool IsRootSolutionFolder(DirectoryInfo directoryInfo)
             => directoryInfo
                 .GetFileSystemInfos()
-                .Any(fileInfo => fileInfo.Extension == ".sln" || fileInfo.Name == "global.json");
-
-        
-
-        
+                .Any(fileInfo => fileInfo.Extension == ".sln" || fileInfo.Name == "global.json");          
     }
 }
