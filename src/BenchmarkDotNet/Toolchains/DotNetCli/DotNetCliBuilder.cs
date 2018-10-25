@@ -23,10 +23,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
             => new DotNetCliCommand(
-                    CustomDotNetCliPath, 
-                    string.Empty, 
-                    generateResult, 
-                    logger, 
+                    CustomDotNetCliPath,
+                    string.Empty,
+                    generateResult,
+                    logger,
                     buildPartition,
                     Array.Empty<EnvironmentVariable>())
                 .RestoreThenBuild();
