@@ -10,15 +10,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Memory" Version="4.5.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
-    <PackageReference Include="xunit" Version="2.3.1" />
-    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
+    <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="ApprovalTests" Version="3.0.13" />
   </ItemGroup>
   <PropertyGroup>
@@ -39,8 +38,5 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Portability\Cpu\TestFiles\*.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Attributes\ApprovedFiles\" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,14 @@
+trigger:
+  batch: true
+  branches:
+    exclude:
+    - gh-pages
+
+name: $(Year:yyyy).$(Month).$(DayOfMonth)$(Rev:.r)
+
+jobs:
+- template: build/azure-pipelines.job.template.yml
+  parameters:
+    name: Windows
+    vmImage: 'vs2017-win2016'
+    scriptFileName: .\build.ps1

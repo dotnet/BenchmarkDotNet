@@ -1,0 +1,21 @@
+trigger:
+  batch: true
+  branches:
+    exclude:
+    - gh-pages
+
+name: $(Year:yyyy).$(Month).$(DayOfMonth)$(Rev:.r)
+
+jobs:
+- template: build/azure-pipelines.job.template.yml
+  parameters:
+    name: Ubuntu
+    vmImage: 'ubuntu-16.04'
+    scriptFileName: ./build.sh
+    initialization:
+      - bash: |
+          echo "deb http://llvm.org/apt/xenial/ llvm-toolchain-xenial-3.9 main" | sudo tee /etc/apt/sources.list.d/llvm.list
+          wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo apt-get update
+      - bash: |
+          sudo apt-get install cmake clang-3.9 libicu55 uuid-dev libcurl4-openssl-dev zlib1g-dev libkrb5-dev
