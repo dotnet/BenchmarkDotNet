@@ -159,7 +159,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (!benchmarkCase.Job.HasValue(InfrastructureMode.NugetReferencesCharacteristic))
                 return Enumerable.Empty<string>();
 
-            var nugetRefs = benchmarkCase.Job.ResolveValue(InfrastructureMode.NugetReferencesCharacteristic, resolver).OfType<NugetReference>();
+            var nugetRefs = benchmarkCase.Job.ResolveValue(InfrastructureMode.NugetReferencesCharacteristic, resolver);
 
             return nugetRefs.Select(x => $"add package {x.PackageName}{(string.IsNullOrWhiteSpace(x.PackageVersion) ? string.Empty : " -v " + x.PackageVersion)}");
         }
