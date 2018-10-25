@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Jobs
         private bool IsValidVersion(string version)
         {
             if (string.IsNullOrWhiteSpace(version)) return false;
-            //TODO: There is a great nuget package for this called `semver` however we probably
+            //There is a great nuget package for semver validation called `semver` however we probably
             // don't want to add another dependency here so this will do some rudimentary validation
             // and if that fails, then the actual add package command will fail anyways.
             var parts = version.Split('-');
