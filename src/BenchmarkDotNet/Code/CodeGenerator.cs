@@ -111,7 +111,7 @@ namespace BenchmarkDotNet.Code
                 case Type t when typeof(IEnumerable<string>).IsAssignableFrom(t):
                     return $"{provider.CustomEnvInfoMethodName}()";
                 default:
-                    return "Array.Empty<string>()";
+                    return "System.Array.Empty<string>()";
             }
         }
 
