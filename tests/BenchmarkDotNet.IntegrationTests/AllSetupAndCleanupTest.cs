@@ -110,7 +110,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public Task GlobalSetup() => Console.Out.WriteLineAsync(GlobalSetupCalled);
 
             [GlobalCleanup]
-            public void GlobalCleanup() => Console.WriteLine(GlobalCleanupCalled);
+            public Task GlobalCleanup() => Console.Out.WriteLineAsync(GlobalCleanupCalled);
 
             [Benchmark]
             public Task Benchmark() => Console.Out.WriteLineAsync(BenchmarkCalled);
@@ -146,7 +146,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public Task GlobalSetup() => Console.Out.WriteLineAsync(GlobalSetupCalled);
 
             [GlobalCleanup]
-            public void GlobalCleanup() => Console.WriteLine(GlobalCleanupCalled);
+            public Task GlobalCleanup() => Console.Out.WriteLineAsync(GlobalCleanupCalled);
 
             [Benchmark]
             public void Benchmark() => Console.WriteLine(BenchmarkCalled);
@@ -187,7 +187,12 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             [GlobalCleanup]
-            public void GlobalCleanup() => Console.WriteLine(GlobalCleanupCalled);
+            public async Task<int> GlobalCleanup()
+            {
+                await Console.Out.WriteLineAsync(GlobalCleanupCalled);
+
+                return 42;
+            }
 
             [Benchmark]
             public void Benchmark() => Console.WriteLine(BenchmarkCalled);
@@ -223,7 +228,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public ValueTask GlobalSetup() => new ValueTask(Console.Out.WriteLineAsync(GlobalSetupCalled));
 
             [GlobalCleanup]
-            public void GlobalCleanup() => Console.WriteLine(GlobalCleanupCalled);
+            public ValueTask GlobalCleanup() => new ValueTask(Console.Out.WriteLineAsync(GlobalCleanupCalled));
 
             [Benchmark]
             public void Benchmark() => Console.WriteLine(BenchmarkCalled);
@@ -264,7 +269,12 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             [GlobalCleanup]
-            public void GlobalCleanup() => Console.WriteLine(GlobalCleanupCalled);
+            public async ValueTask<int> GlobalCleanup()
+            {
+                await Console.Out.WriteLineAsync(GlobalCleanupCalled);
+
+                return 42;
+            }
 
             [Benchmark]
             public void Benchmark() => Console.WriteLine(BenchmarkCalled);
