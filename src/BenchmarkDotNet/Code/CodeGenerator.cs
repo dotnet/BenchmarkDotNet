@@ -101,7 +101,7 @@ namespace BenchmarkDotNet.Code
         {
             if (provider.CustomEnvInfoMethodName is null)
             {
-                return "Array.Empty<string>()";
+                return "System.Array.Empty<string>()";
             }
 
             switch (provider.CustomEnvInfoMethodReturnType)
