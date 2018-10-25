@@ -48,8 +48,7 @@ namespace BenchmarkDotNet.Exporters
 
                         RunGitDiff(firstFileName, secondFileName, builder);
 
-                        if (firstBenchmarkCase.Descriptor.WorkloadMethod == secondBenchmarkCase.Descriptor.WorkloadMethod
-                        ) // diff between the same method for different JITs
+                        if (firstBenchmarkCase.Descriptor.WorkloadMethod == secondBenchmarkCase.Descriptor.WorkloadMethod) // diff between the same method for different JITs
                         {
                             logger.WriteLine($"**Diff for {firstBenchmarkCase.Descriptor.WorkloadMethod.Name} method between:**");
                             logger.WriteLine($"{GetImportantInfo(summary[firstBenchmarkCase])}");
