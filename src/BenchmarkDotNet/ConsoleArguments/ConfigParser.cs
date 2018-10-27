@@ -370,7 +370,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                         packagesPath: options.RestorePath?.FullName)));
 
         /// <summary>
-        /// we have a limited amout of space when printing the output to the console, so we try to keep things small and simple
+        /// we have a limited amount of space when printing the output to the console, so we try to keep things small and simple
         ///
         /// for following paths:
         ///  C:\Projects\coreclr_upstream\bin\tests\Windows_NT.x64.Release\Tests\Core_Root\CoreRun.exe

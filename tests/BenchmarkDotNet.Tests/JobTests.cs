@@ -439,7 +439,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public static void AllJobModesPropertyNamesMatchCharacteristicNames() // it't mandatory to generate the right c# code
+        public static void AllJobModesPropertyNamesMatchCharacteristicNames() // it's mandatory to generate the right c# code
         {
             var jobModes = typeof(JobMode<>)
                 .Assembly
