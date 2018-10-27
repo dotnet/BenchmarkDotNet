@@ -343,7 +343,7 @@ namespace BenchmarkDotNet.Disassembler
             var rightPart = textRepresentation
                 .Split(CallSeparator, StringSplitOptions.RemoveEmptyEntries).Last() // take the right part
                 .Trim() // remove leading whitespaces
-                .Replace("`", string.Empty); // remove the magic delimeter
+                .Replace("`", string.Empty); // remove the magic delimiter
 
             string addressPart = string.Empty;
             if (rightPart.Contains('(') && rightPart.Contains(')'))
@@ -456,7 +456,7 @@ namespace BenchmarkDotNet.Disassembler
                     return false;
 
                 // sometimes ClrMD reports same address range in two different ILToNativeMaps
-                // this happens usualy for prolog and the instruction after prolog
+                // this happens usually for prolog and the instruction after prolog
                 // and for the epilog and last instruction before epilog
                 if (x is Asm asmLeft && y is Asm asmRight)
                     return asmLeft.StartAddress == asmRight.StartAddress && asmLeft.EndAddress == asmRight.EndAddress;

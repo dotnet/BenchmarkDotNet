@@ -91,7 +91,7 @@ namespace BenchmarkDotNet.Toolchains
         [PublicAPI] protected virtual string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath) => default;
 
         /// <summary>
-        /// genrates an app.config file next to the executable with benchmarks
+        /// generates an app.config file next to the executable with benchmarks
         /// </summary>
         [PublicAPI] protected virtual void GenerateAppConfig(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {

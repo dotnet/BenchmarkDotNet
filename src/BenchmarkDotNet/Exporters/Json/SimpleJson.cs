@@ -353,7 +353,7 @@ namespace SimpleJson
         /// <param name="binder">Provides information about the conversion operation. The binder.Type property provides the type to which the object must be converted. For example, for the statement (String)sampleObject in C# (CType(sampleObject, Type) in Visual Basic), where sampleObject is an instance of the class derived from the <see cref="T:System.Dynamic.DynamicObject"/> class, binder.Type returns the <see cref="T:System.String"/> type. The binder.Explicit property provides information about the kind of conversion that occurs. It returns true for explicit conversion and false for implicit conversion.</param>
         /// <param name="result">The result of the type conversion operation.</param>
         /// <returns>
-        /// Alwasy returns true.
+        /// Always returns true.
         /// </returns>
         public override bool TryConvert(ConvertBinder binder, out object result)
         {
@@ -380,7 +380,7 @@ namespace SimpleJson
         /// </summary>
         /// <param name="binder">Provides information about the deletion.</param>
         /// <returns>
-        /// Alwasy returns true.
+        /// Always returns true.
         /// </returns>
         public override bool TryDeleteMember(DeleteMemberBinder binder)
         {
@@ -398,7 +398,7 @@ namespace SimpleJson
         /// <param name="indexes">The indexes that are used in the operation. For example, for the sampleObject[3] operation in C# (sampleObject(3) in Visual Basic), where sampleObject is derived from the DynamicObject class, <paramref name="indexes"/> is equal to 3.</param>
         /// <param name="result">The result of the index operation.</param>
         /// <returns>
-        /// Alwasy returns true.
+        /// Always returns true.
         /// </returns>
         public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
         {
@@ -418,7 +418,7 @@ namespace SimpleJson
         /// <param name="binder">Provides information about the object that called the dynamic operation. The binder.Name property provides the name of the member on which the dynamic operation is performed. For example, for the Console.WriteLine(sampleObject.SampleProperty) statement, where sampleObject is an instance of the class derived from the <see cref="T:System.Dynamic.DynamicObject"/> class, binder.Name returns "SampleProperty". The binder.IgnoreCase property specifies whether the member name is case-sensitive.</param>
         /// <param name="result">The result of the get operation. For example, if the method is called for a property, you can assign the property value to <paramref name="result"/>.</param>
         /// <returns>
-        /// Alwasy returns true.
+        /// Always returns true.
         /// </returns>
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
@@ -555,7 +555,7 @@ namespace SimpleJson
         /// The object.
         /// </param>
         /// <returns>
-        /// Returns true if successfull otherwise false.
+        /// Returns true if successful otherwise false.
         /// </returns>
         [SuppressMessage("Microsoft.Design", "CA1007:UseGenericsWhereAppropriate", Justification="Need to support .NET 2")]
         public static bool TryDeserializeObject(string json, out object obj)

@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         /// creates a toolchain which publishes self-contained app which references NuGet CoreFx build
         /// </summary>
         /// <param name="privateCoreFxNetCoreAppVersion">the version of Microsoft.Private.CoreFx.NETCoreApp which should be used. Example: "4.5.0-preview2-26307-0"</param>
-        /// <param name="nugetFeedUrl">ulr to NuGet CoreFX feed, The default is: "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json"</param>
+        /// <param name="nugetFeedUrl">url to NuGet CoreFX feed, The default is: "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json"</param>
         public CustomCoreClrToolchainBuilder UseCoreFxNuGet(string privateCoreFxNetCoreAppVersion, string nugetFeedUrl = "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json")
         {
             coreFxVersion = privateCoreFxNetCoreAppVersion ?? throw new ArgumentNullException(nameof(privateCoreFxNetCoreAppVersion));

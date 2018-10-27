@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Samples
         public IEnumerable<int> Wrong() => from number in numbers orderby number descending select number;
         
         /// <summary>
-        /// this benchmark uses .Consume extension method which executes given deferred query and cosumes its result
+        /// this benchmark uses .Consume extension method which executes given deferred query and consumes its result
         /// so the benchmark measures the cost of creating the query and executing it
         /// </summary>
         [Benchmark]

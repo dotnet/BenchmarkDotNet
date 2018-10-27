@@ -126,7 +126,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetJobs());
             CoreRunToolchain toolchain = config.GetJobs().Single().GetToolchain() as CoreRunToolchain;
             Assert.NotNull(toolchain);
-            Assert.Equal(NetCoreAppSettings.GetCurrentVersion().TargetFrameworkMoniker, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker); // runtime was not specified so the defautl was used
+            Assert.Equal(NetCoreAppSettings.GetCurrentVersion().TargetFrameworkMoniker, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker); // runtime was not specified so the default was used
             Assert.Equal(fakeCoreRunPath, toolchain.SourceCoreRun.FullName);
             Assert.Equal(fakeDotnetCliPath, toolchain.CustomDotNetCliPath.FullName);
             Assert.Equal(fakeRestorePackages, toolchain.RestorePath.FullName);

@@ -137,7 +137,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             if (diagnostic.Id != MissingReferenceError || !diagnostic.GetMessage().Contains("You must add a reference to assembly"))
                 return default;
 
-            // there is no nice property which would expose the reference name, so we need to to some parsing..
+            // there is no nice property which would expose the reference name, so we need to some parsing..
             // CS0012: The type 'ValueType' is defined in an assembly that is not referenced. You must add a reference to assembly 'netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51'
             return diagnostic.GetMessage().Split('\'').SingleOrDefault(text => text.Contains("Version="));
         }

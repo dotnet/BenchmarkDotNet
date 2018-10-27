@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
             string displayName = "CoreRun") 
         {
             if (coreRun == null) throw new ArgumentNullException(nameof(coreRun));
-            if (!coreRun.Exists) throw new FileNotFoundException("Povided CoreRun path does not exist");
+            if (!coreRun.Exists) throw new FileNotFoundException("Provided CoreRun path does not exist");
 
             SourceCoreRun = coreRun;
             CopyCoreRun = createCopy ? GetShadowCopyPath(coreRun) : coreRun;
@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
         {
             if (!SourceCoreRun.Exists)
             {
-                logger.WriteLineError($"Povided CoreRun path does not exist, benchmark '{benchmark.DisplayInfo}' will not be executed");
+                logger.WriteLineError($"Provided CoreRun path does not exist, benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;
             }
 
@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
 
             if (CustomDotNetCliPath.IsNotNullButDoesNotExist())
             {
-                logger.WriteLineError($"Povided custom dotnet cli path does not exist, benchmark '{benchmark.DisplayInfo}' will not be executed");
+                logger.WriteLineError($"Provided custom dotnet cli path does not exist, benchmark '{benchmark.DisplayInfo}' will not be executed");
                 return false;
             }
 
