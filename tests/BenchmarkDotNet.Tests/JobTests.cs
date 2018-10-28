@@ -470,14 +470,27 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Equal(1, j.Infrastructure.NugetReferences.Count);
             
             j = j.WithNuget("AutoMapper", "7.0.1");
-            Assert.Equal(2, j.Infrastructure.NugetReferences.Count); //appends
+            Assert.Collection(j.Infrastructure.NugetReferences,
+                reference => Assert.Equal(new NugetReference("AutoMapper", "7.0.1"), reference),
+                reference => Assert.Equal(new NugetReference("Newtonsoft.Json", ""), reference));
 
-            j = j.WithNuget("AutoMapper");
-            Assert.Equal(2, j.Infrastructure.NugetReferences.Count); //does not append, same package
-            j = j.WithNuget("AutoMapper", "7.0.0-alpha-0001");
-            Assert.Equal(2, j.Infrastructure.NugetReferences.Count); //does not append, same package
+            Assert.Throws<ArgumentException>(() => j = j.WithNuget("AutoMapper")); //adding is an error, since it's the same package
+            Assert.Throws<ArgumentException>(() => j = j.WithNuget("AutoMapper", "7.0.0-alpha-0001")); //adding is an error, since it's the same package
 
-            Assert.Equal("AutoMapper 7.0.1", j.Infrastructure.NugetReferences.ElementAt(1).ToString()); //first package reference in wins
+            j = j.WithNuget("NLog", "4.5.10"); // ensure we can add at the end of a non-empty list
+            Assert.Collection(j.Infrastructure.NugetReferences,
+                reference => Assert.Equal(new NugetReference("AutoMapper", "7.0.1"), reference),
+                reference => Assert.Equal(new NugetReference("Newtonsoft.Json", ""), reference),
+                reference => Assert.Equal(new NugetReference("NLog", "4.5.10"), reference));
+
+            var expected = new NugetReferenceList(Array.Empty<NugetReference>())
+            {
+                new NugetReference("AutoMapper", "7.0.1"),
+                new NugetReference("Newtonsoft.Json", ""),
+                new NugetReference("NLog", "4.5.10"),
+            };
+
+            Assert.Equal(expected, j.Infrastructure.NugetReferences); // ensure that the list's equality operator returns true when the contents are the same
         }
 
         private static bool IsSubclassOfobModeOfItself(Type type)
