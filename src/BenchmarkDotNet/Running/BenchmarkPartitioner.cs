@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.Running
                 if (job.Infrastructure.Arguments != null && job.Infrastructure.Arguments.Any())
                     hashCode ^= job.Infrastructure.Arguments.GetHashCode();
                 if (job.Infrastructure.NugetReferences != null)
-                    hashCode ^= job.Infrastructure.GetHashCode();
+                    hashCode ^= job.Infrastructure.NugetReferences.GetHashCode();
                 if (!string.IsNullOrEmpty(obj.Descriptor.AdditionalLogic))
                     hashCode ^= obj.Descriptor.AdditionalLogic.GetHashCode();
 

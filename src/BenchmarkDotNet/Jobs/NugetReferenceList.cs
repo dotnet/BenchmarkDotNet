@@ -7,9 +7,13 @@ namespace BenchmarkDotNet.Jobs
     /// <summary>
     /// An ordered list of Nuget references. Does not allow duplicate references with the same PackageName.
     /// </summary>
-    internal class NugetReferenceList : IReadOnlyCollection<NugetReference>
+    public class NugetReferenceList : IReadOnlyCollection<NugetReference>
     {
         private readonly List<NugetReference> references = new List<NugetReference>();
+
+        public NugetReferenceList()
+        {
+        }
 
         public NugetReferenceList(IReadOnlyCollection<NugetReference> readOnlyCollection)
         {
