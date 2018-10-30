@@ -114,14 +114,14 @@ Task("FastTests")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
-        string[] targetVersions = IsRunningOnWindows() ? 
+		string[] targetVersions = IsRunningOnWindows() ?
                 new []{"net46", "netcoreapp2.1"}
                 :
                 new []{"netcoreapp2.1"};
 
         foreach(var version in targetVersions)
         {
-            DotNetCoreTool("./tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj", "xunit", GetTestSettingsParameters(version));
+            DotNetCoreTest("./tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj", GetTestSettingsParameters(version));
         }
     });
     
@@ -130,16 +130,16 @@ Task("SlowTestsNet46")
     .WithCriteria(!skipTests && isRunningOnWindows)
     .Does(() =>
     {
-        DotNetCoreTool(integrationTestsProjectPath, "xunit", GetTestSettingsParameters("net46"));
-    });    
-    
+        DotNetCoreTest(integrationTestsProjectPath, GetTestSettingsParameters("net46"));
+    }); 
+
 Task("SlowTestsNetCore2")
-    .IsDependentOn("Build")
-    .WithCriteria(!skipTests)
-    .Does(() =>
-    {
-        DotNetCoreTool(integrationTestsProjectPath, "xunit", GetTestSettingsParameters("netcoreapp2.1"));
-    });       
+	.IsDependentOn("Build")
+	.WithCriteria(!skipTests)
+	.Does(() =>
+	{
+		DotNetCoreTest(integrationTestsProjectPath, GetTestSettingsParameters("netcoreapp2.1"));
+	});          
 
 Task("Pack")
     .IsDependentOn("Build")
@@ -215,9 +215,16 @@ Task("Default")
 RunTarget(target);
 
 // HELPERS
-private string GetTestSettingsParameters(string tfm)
+private DotNetCoreTestSettings GetTestSettingsParameters(string tfm)
 {
-    return $"-configuration {configuration} -parallel none -nobuild  -framework {tfm}";
+	return new DotNetCoreTestSettings
+                {
+                    Configuration = configuration,
+					Framework = tfm,
+                    NoBuild = true,
+					NoRestore = true,
+					Logger = "trx"
+				}; 
 }
 
 private void RunDocfx(string args)

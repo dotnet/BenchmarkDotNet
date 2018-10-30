@@ -29,22 +29,20 @@ namespace BenchmarkDotNet.Jobs
         }
 
         /// <summary>
-        /// Object is equals when the package name is the same
+        /// Object is equals when the package name and version are the same
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        /// <remarks>
-        /// There can only be one package reference of the same name regardless of version
-        /// </remarks>
         public bool Equals(NugetReference other)
         {
             return other != null &&
-                   PackageName == other.PackageName;
+                   PackageName == other.PackageName &&
+                   PackageVersion == other.PackageVersion;
         }
 
         public override int GetHashCode()
         {
-            return 557888800 + EqualityComparer<string>.Default.GetHashCode(PackageName);
+            return 557888800 + EqualityComparer<string>.Default.GetHashCode(PackageName) + EqualityComparer<string>.Default.GetHashCode(PackageVersion).GetHashCode();
         }
 
         public override string ToString() => $"{PackageName}{(string.IsNullOrWhiteSpace(PackageVersion) ? string.Empty : $" {PackageVersion}")}";

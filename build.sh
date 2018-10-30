@@ -10,7 +10,7 @@ SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 TOOLS_DIR=$SCRIPT_DIR/tools
 NUGET_EXE=$TOOLS_DIR/nuget.exe
 NUGET_URL=https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
-CAKE_VERSION=0.26.1
+CAKE_VERSION=0.30.0
 CAKE_EXE=$TOOLS_DIR/Cake.$CAKE_VERSION/Cake.exe
 
 # Define default arguments.
@@ -47,10 +47,11 @@ if [ ! -d "$SCRIPT_DIR/.dotnet" ]; then
   mkdir "$SCRIPT_DIR/.dotnet"
 fi
 curl -Lsfo "$SCRIPT_DIR/.dotnet/dotnet-install.sh" https://dot.net/v1/dotnet-install.sh
-sudo bash "$SCRIPT_DIR/.dotnet/dotnet-install.sh" --version 2.1.300 --install-dir .dotnet --no-path
+sudo bash "$SCRIPT_DIR/.dotnet/dotnet-install.sh" --version 2.1.403 --install-dir .dotnet --no-path
 export PATH="$SCRIPT_DIR/.dotnet":$PATH
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
+export DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0
 export DOTNET_MULTILEVEL_LOOKUP=0
 "$SCRIPT_DIR/.dotnet/dotnet" --info
 
@@ -75,7 +76,7 @@ fi
 if [ ! -f "$CAKE_EXE" ]; then
     mono "$NUGET_EXE" install Cake -Version $CAKE_VERSION -OutputDirectory "$TOOLS_DIR"
     if [ $? -ne 0 ]; then
-        echo "An error occured while installing Cake."
+        echo "An error occurred while installing Cake."
         exit 1
     fi
 fi

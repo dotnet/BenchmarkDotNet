@@ -31,10 +31,13 @@ Param(
     [string[]]$ScriptArgs
 )
 
-$CakeVersion = "0.26.1"
-$DotNetVersion = "2.1.300";
+$CakeVersion = "0.30.0"
+$DotNetVersion = "2.1.403";
 $DotNetInstallerUri = "https://dot.net/v1/dotnet-install.ps1";
 $NugetUrl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
+
+# SSL FIX
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12;
 
 # Make sure tools folder exists
 $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent
@@ -65,16 +68,23 @@ Function Remove-PathVariable([string]$VariableToRemove)
     }
 }
 
-# Install .NET Core CLI
-$InstallPath = Join-Path $PSScriptRoot ".dotnet"
-if (!(Test-Path $InstallPath)) {
-    mkdir -Force $InstallPath | Out-Null;
+# Get .NET Core CLI path if installed.
+$FoundDotNetCliVersion = $null;
+if (Get-Command dotnet -ErrorAction SilentlyContinue) {
+    $FoundDotNetCliVersion = dotnet --version;
 }
-(New-Object System.Net.WebClient).DownloadFile($DotNetInstallerUri, "$InstallPath\dotnet-install.ps1");
-& $InstallPath\dotnet-install.ps1 -Version $DotNetVersion -InstallDir $InstallPath
 
-Remove-PathVariable "$InstallPath"
-$env:PATH = "$InstallPath;$env:PATH"
+if($FoundDotNetCliVersion -ne $DotNetVersion) {
+    $InstallPath = Join-Path $PSScriptRoot ".dotnet"
+    if (!(Test-Path $InstallPath)) {
+        mkdir -Force $InstallPath | Out-Null;
+    }
+    (New-Object System.Net.WebClient).DownloadFile($DotNetInstallerUri, "$InstallPath\dotnet-install.ps1");
+    & $InstallPath\dotnet-install.ps1 -Channel $DotNetChannel -Version $DotNetVersion -InstallDir $InstallPath;
+
+    Remove-PathVariable "$InstallPath"
+    $env:PATH = "$InstallPath;$env:PATH"
+}
 
 $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 $env:DOTNET_CLI_TELEMETRY_OPTOUT=1

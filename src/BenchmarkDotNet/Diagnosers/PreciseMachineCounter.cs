@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Diagnosers
 {
-#pragma warning disable CS3001, CS3003 // ulong is non CLS-compilant
+#pragma warning disable CS3001, CS3003 // ulong is non CLS-compliant
     public class PreciseMachineCounter
     {
         [PublicAPI] public int ProfileSourceId { get; }

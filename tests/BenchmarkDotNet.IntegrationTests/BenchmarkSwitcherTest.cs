@@ -177,7 +177,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void ValidCommandLineArgumentsAreProperlyHandled()
         {
-            // Don't cover every combination, just pick a complex scenarion and check
+            // Don't cover every combination, just pick a complex scenario and check
             // it works end-to-end, i.e. "method=Method1" and "class=ClassB"
             var types = new[] { typeof(ClassA), typeof(ClassB), typeof(NOTIntegrationTests.ClassD) };
             var switcher = new BenchmarkSwitcher(types);
