@@ -7,7 +7,7 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Exporters
 {
-    public class PrettyGithubMarkdownDisassemblyExporter : PrettyGithubMarkdownDisassemblyExporterBase
+    public class PrettyGithubMarkdownDisassemblyExporter : ExporterBase
     {
         private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
 
@@ -21,16 +21,63 @@ namespace BenchmarkDotNet.Exporters
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
-            var benchmarksCases = summary.BenchmarksCases
-                .Where(results.ContainsKey);
-
-            foreach (var benchmarkCase in benchmarksCases)
+            foreach (var benchmarkCase in summary.BenchmarksCases.Where(results.ContainsKey))
             {
-                logger.WriteLine($"## {GetImportantInfo(summary[benchmarkCase])}");
+                logger.WriteLine($"## {summary[benchmarkCase].GetRuntimeInfo()}");
                 Export(logger, results[benchmarkCase]);
             }
         }
 
-        private static string GetImportantInfo(BenchmarkReport benchmarkReport) => benchmarkReport.GetRuntimeInfo();
+        internal static void Export(ILogger logger, DisassemblyResult disassemblyResult, bool quotingCode = true)
+        {
+            int methodIndex = 0;
+            foreach (var method in disassemblyResult.Methods.Where(method => string.IsNullOrEmpty(method.Problem)))
+            {
+                if (quotingCode)
+                {
+                    logger.WriteLine("```assembly");
+                }
+
+                logger.WriteLine($"; {method.Name}");
+
+                var pretty = DisassemblyPrettifier.Prettify(method, $"M{methodIndex++:00}");
+
+                uint totalSizeInBytes = 0;
+                foreach (var element in pretty)
+                {
+                    if (element is DisassemblyPrettifier.Label label)
+                    {
+                        logger.WriteLine($"{label.TextRepresentation}:");
+
+                        continue;
+                    }
+                    if (element.Source is Asm asm)
+                    {
+                        totalSizeInBytes += asm.SizeInBytes;
+                    }
+
+                    logger.WriteLine($"       {element.TextRepresentation}");
+                }
+
+                logger.WriteLine($"; Total bytes of code {totalSizeInBytes}");
+                if (quotingCode)
+                {
+                    logger.WriteLine("```");
+                }
+            }
+
+            foreach (var withProblems in disassemblyResult.Methods
+                .Where(method => !string.IsNullOrEmpty(method.Problem))
+                .GroupBy(method => method.Problem))
+            {
+                logger.WriteLine($"**{withProblems.Key}**");
+                foreach (var withProblem in withProblems)
+                {
+                    logger.WriteLine(withProblem.Name);
+                }
+            }
+
+            logger.WriteLine();
+        }
     }
 }

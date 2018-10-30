@@ -15,21 +15,13 @@ namespace BenchmarkDotNet.Exporters
             
         private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
 
-        private static int referenceIndex;
-
-        public PrettyHtmlDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results)
-        {
-            this.results = results;
-        }
+        public PrettyHtmlDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results) => this.results = results;
 
         protected override string FileExtension => "html";
         protected override string FileCaption => "asm.pretty";
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
-            var benchmarksCases = summary.BenchmarksCases
-                .Where(results.ContainsKey);
-
             logger.WriteLine("<!DOCTYPE html><html lang='en'><head><meta charset='utf-8' /><head>");
             logger.WriteLine($"<title>Pretty Output of DisassemblyDiagnoser for {summary.Title}</title>");
             logger.WriteLine(InstructionPointerExporter.CssStyle);
@@ -41,17 +33,19 @@ namespace BenchmarkDotNet.Exporters
             logger.WriteLine("<script src=\"https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js\"></script>");
             logger.WriteLine($"<script>{HighlightingLabelsScript.Value}</script>");
 
-            foreach (var benchmarkCase in benchmarksCases)
+            int referenceIndex = 0;
+
+            foreach (var benchmarkCase in summary.BenchmarksCases.Where(results.ContainsKey))
             {
-                Export(logger, summary, results[benchmarkCase], benchmarkCase);
+                Export(logger, summary, results[benchmarkCase], benchmarkCase, ref referenceIndex);
             }
 
             logger.WriteLine("</body></html>");
         }
 
-        private static void Export(ILogger logger, Summary summary, DisassemblyResult disassemblyResult, BenchmarkCase benchmarkCase)
+        private static void Export(ILogger logger, Summary summary, DisassemblyResult disassemblyResult, BenchmarkCase benchmarkCase, ref int referenceIndex)
         {
-            logger.WriteLine($"<h2>{GetImportantInfo(summary[benchmarkCase])}</h2>");
+            logger.WriteLine($"<h2>{summary[benchmarkCase].GetRuntimeInfo()}</h2>");
             logger.WriteLine("<table><tbody>");
 
             int methodIndex = 0;
@@ -106,6 +100,5 @@ namespace BenchmarkDotNet.Exporters
 
             logger.WriteLine("</tbody></table>");
         }
-        private static string GetImportantInfo(BenchmarkReport benchmarkReport) => benchmarkReport.GetRuntimeInfo();
     }
 }

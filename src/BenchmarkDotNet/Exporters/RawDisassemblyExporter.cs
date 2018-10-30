@@ -12,10 +12,7 @@ namespace BenchmarkDotNet.Exporters
     {
         private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
 
-        public RawDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results)
-        {
-            this.results = results;
-        }
+        public RawDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results) => this.results = results;
 
         protected override string FileExtension => "html";
         protected override string FileCaption => "asm.raw";
@@ -28,10 +25,7 @@ namespace BenchmarkDotNet.Exporters
             logger.WriteLine("</head>");
             logger.WriteLine("<body>");
 
-            var benchmarksCases = summary.BenchmarksCases
-                .Where(results.ContainsKey);
-
-            foreach (var benchmarkCase in benchmarksCases)
+            foreach (var benchmarkCase in summary.BenchmarksCases.Where(results.ContainsKey))
             {
                 Export(logger, summary, results[benchmarkCase], benchmarkCase);
             }
@@ -41,7 +35,7 @@ namespace BenchmarkDotNet.Exporters
 
         private static void Export(ILogger logger, Summary summary, DisassemblyResult disassemblyResult, BenchmarkCase benchmarkCase)
         {
-            logger.WriteLine($"<h2>{GetImportantInfo(summary[benchmarkCase])}</h2>");
+            logger.WriteLine($"<h2>{summary[benchmarkCase].GetRuntimeInfo()}</h2>");
 
             logger.WriteLine("<table>");
             logger.WriteLine("<tbody>");
@@ -135,6 +129,5 @@ namespace BenchmarkDotNet.Exporters
 
             return buffer.ToString();
         }
-        private static string GetImportantInfo(BenchmarkReport benchmarkReport) => benchmarkReport.GetRuntimeInfo();
     }
 }
