@@ -59,18 +59,17 @@ namespace BenchmarkDotNet.Portability
                 && string.IsNullOrEmpty(typeof(object).Assembly.Location); // but it's merged to a single .exe and .Location returns null here ;)
 #endif
 
-        public static bool IsInDocker => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
-        
-        internal static string DockerSdkVersion => Environment.GetEnvironmentVariable("DOTNET_VERSION");
-        
-        internal static string DockerAspnetSdkVersion => Environment.GetEnvironmentVariable("ASPNETCORE_VERSION");
-        
+        public static bool InDocker => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
+                
         internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
 
         internal static string ScriptFileExtension => IsWindows() ? ".bat" : ".sh";
 
         internal static string GetArchitecture() => GetCurrentPlatform() == Platform.X86 ? "32bit" : "64bit";
 
+        private static string DockerSdkVersion => Environment.GetEnvironmentVariable("DOTNET_VERSION");
+        private static string DockerAspnetSdkVersion => Environment.GetEnvironmentVariable("ASPNETCORE_VERSION");
+        
         internal static bool IsWindows()
         {
 #if CLASSIC
@@ -161,7 +160,7 @@ namespace BenchmarkDotNet.Portability
             return null;
         }
 
-        internal static string GetNetCoreVersion() => IsInDocker ? GetDockerNetCoreVersion() : GetBaseNetCoreVersion();
+        internal static string GetNetCoreVersion() => InDocker ? GetDockerNetCoreVersion() : GetBaseNetCoreVersion();
 
         private static string GetDockerNetCoreVersion() => string.IsNullOrEmpty(DockerSdkVersion) ? DockerAspnetSdkVersion : DockerSdkVersion;
 
