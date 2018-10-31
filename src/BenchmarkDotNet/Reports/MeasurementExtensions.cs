@@ -21,8 +21,7 @@ namespace BenchmarkDotNet.Reports
         public static double GetAverageNanoseconds(this Measurement report) =>
             report.Nanoseconds / report.Operations;
 
-        //TODO OPTIONAL ENCODING
-        public static string ToStr(this Measurement run, Encoding encoding) =>
+        public static string ToStr(this Measurement run, Encoding encoding = null) =>
             $"{run.IterationMode}{run.IterationStage} {run.IterationIndex}: {run.Operations} op, {run.Nanoseconds.ToStr()} ns, {run.GetAverageNanoseconds().ToTimeStr(encoding ?? Encoding.ASCII)}/op";
 
         public static bool Is(this Measurement measurement, IterationMode mode, IterationStage stage)
