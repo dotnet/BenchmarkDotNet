@@ -4,6 +4,7 @@ uid: changelog
 
 # ChangeLog
 
+* @changelog.v0.11.2
 * @changelog.v0.11.1
 * @changelog.v0.11.0
 * @changelog.v0.10.14

@@ -4,6 +4,7 @@ uid: changelog.full
 
 # Full ChangeLog
 
+[!include[v0.11.2](v0.11.2.md)]
 [!include[v0.11.1](v0.11.1.md)]
 [!include[v0.11.0](v0.11.0.md)]
 [!include[v0.10.14](v0.10.14.md)]
