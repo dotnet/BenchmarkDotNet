@@ -133,6 +133,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("disasmDepth", Required = false, Default = 1, HelpText = "Sets the recursive depth for the disassembler.")]
         public int DisassemblerRecursiveDepth { get; set; }
 
+        [Option("disasmDiff", Required = false, Default = false, HelpText = "Generates diff reports for the disassembler.")]
+        public bool DisassemblerDiff { get; set; }
+
         [Option("buildTimeout", Required = false, HelpText = "Build timeout in seconds.")]
         public int? TimeOutInSeconds { get; set; }
 

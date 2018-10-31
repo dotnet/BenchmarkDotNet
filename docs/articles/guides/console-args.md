@@ -101,7 +101,9 @@ You can also filter the benchmarks by categories:
 ## Diagnosers
 
 * `-m`, `--memory` - enables MemoryDiagnoser and prints memory statistics
-* `-d`, `--disassm`- enables DisassemblyDiagnoser and exports diassembly of benchmarked code
+* `-d`, `--disasm`- enables DisassemblyDiagnoser and exports diassembly of benchmarked code. When you enable this option, you can use:
+  - `--disasmDepth` - Sets the recursive depth for the disassembler.
+  - `--disasmDiff` - Generates diff reports for the disassembler.
 
 ## Runtimes
 
