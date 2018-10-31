@@ -44,7 +44,6 @@ namespace BenchmarkDotNet.Engines
             {
                 if (mainStats.IsActualOutlier(measurement.Nanoseconds, outlierMode))
                     continue;
-
                 double value = Math.Max(0, measurement.Nanoseconds - overhead);
                 if (IsSuspiciouslySmall(value))
                     value = 0;
