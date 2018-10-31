@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Environments;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.Roslyn
@@ -13,6 +14,11 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
     public class RoslynToolchain : Toolchain
     {
         public static IToolchain Instance = new RoslynToolchain();
+
+        [PublicAPI]
+        public RoslynToolchain(MonoRuntime mono) : base("MonoAot", new Generator(), new MonoAotBuilder(mono), new Executor())
+        {
+        }
 
         [PublicAPI]
         public RoslynToolchain() : base("Roslyn", new Generator(), new Builder(), new Executor())
