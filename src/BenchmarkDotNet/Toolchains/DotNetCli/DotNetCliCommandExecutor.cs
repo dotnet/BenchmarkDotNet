@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using JetBrains.Annotations;
@@ -19,21 +21,36 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             using (var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) })
             {
                 parameters.Logger.WriteLineInfo($"// start {parameters.CliPath ?? "dotnet"} {parameters.Arguments} in {parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath}");
+
+                var standardOutput = new StringBuilder(1000);
+                var standardError = new StringBuilder();
+
+                process.OutputDataReceived += (sender, args) => standardOutput.AppendLine(args.Data);
+                process.ErrorDataReceived += (sender, args) => standardError.AppendLine(args.Data);
                 
                 var stopwatch = Stopwatch.StartNew();
+
                 process.Start();
 
-                string standardOutput = process.StandardOutput.ReadToEnd();
-                string standardError = process.StandardError.ReadToEnd();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
 
-                process.WaitForExit();
+                if (!process.WaitForExit((int)parameters.Timeout.TotalMilliseconds))
+                {
+                    parameters.Logger.WriteLineError($"// command took more that the timeout: {parameters.Timeout.TotalSeconds:0.##}s. Killing the process tree!");
+
+                    process.KillTree();
+                    
+                    return DotNetCliCommandResult.Failure(stopwatch.Elapsed, $"The configured timeout {parameters.Timeout} was reached!" + standardError.ToString(), standardOutput.ToString());
+                }
+
                 stopwatch.Stop();
 
                 parameters.Logger.WriteLineInfo($"// command took {stopwatch.Elapsed.TotalSeconds:0.##}s and exited with {process.ExitCode}");
 
                 return process.ExitCode <= 0
-                    ? DotNetCliCommandResult.Success(stopwatch.Elapsed, standardOutput)
-                    : DotNetCliCommandResult.Failure(stopwatch.Elapsed, standardError, standardOutput);
+                    ? DotNetCliCommandResult.Success(stopwatch.Elapsed, standardOutput.ToString())
+                    : DotNetCliCommandResult.Failure(stopwatch.Elapsed, standardError.ToString(), standardOutput.ToString());
             }
         }
         

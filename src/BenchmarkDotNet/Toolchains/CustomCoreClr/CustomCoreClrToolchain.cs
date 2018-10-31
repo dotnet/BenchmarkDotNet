@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 
 namespace BenchmarkDotNet.Toolchains.CustomCoreClr
@@ -8,10 +9,11 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         internal CustomCoreClrToolchain(string displayName, string coreClrVersion, string coreFxVersion, string runtimeFrameworkVersion,
             string targetFrameworkMoniker, string runtimeIdentifier, 
             string customDotNetCliPath, 
-            Dictionary<string, string> feeds, bool useNuGetClearTag, bool useTempFolderForRestore)
+            Dictionary<string, string> feeds, bool useNuGetClearTag, bool useTempFolderForRestore,
+            TimeSpan timeout)
             : base(displayName,
                 new Generator(coreClrVersion, coreFxVersion, runtimeFrameworkVersion, targetFrameworkMoniker, runtimeIdentifier, customDotNetCliPath, feeds, useNuGetClearTag, useTempFolderForRestore),
-                new DotNetCliPublisher(customDotNetCliPath),
+                new DotNetCliPublisher(customDotNetCliPath: customDotNetCliPath, timeout: timeout),
                 new Executor())
         {
         }

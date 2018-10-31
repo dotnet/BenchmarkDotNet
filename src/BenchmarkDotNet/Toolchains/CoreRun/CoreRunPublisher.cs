@@ -11,10 +11,10 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
 {
     public class CoreRunPublisher : IBuilder
     {
-        public CoreRunPublisher(FileInfo coreRun, FileInfo customDotNetCliPath = null)
+        public CoreRunPublisher(FileInfo coreRun, FileInfo customDotNetCliPath = null, TimeSpan? timeout = null)
         {
             CoreRun = coreRun;
-            DotNetCliPublisher = new DotNetCliPublisher(customDotNetCliPath?.FullName);
+            DotNetCliPublisher = new DotNetCliPublisher(customDotNetCliPath?.FullName, timeout: timeout);
         }
 
         private FileInfo CoreRun { get; }

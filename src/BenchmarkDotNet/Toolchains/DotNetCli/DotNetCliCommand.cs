@@ -26,9 +26,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI] public BuildPartition BuildPartition { get; }
 
         [PublicAPI] public IReadOnlyList<EnvironmentVariable> EnvironmentVariables { get; }
-            
+        
+        [PublicAPI] public TimeSpan Timeout { get; }
+
         public DotNetCliCommand(string cliPath, string arguments, GenerateResult generateResult, ILogger logger, 
-            BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable> environmentVariables)
+            BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable> environmentVariables, TimeSpan timeout)
         {
             CliPath = cliPath;
             Arguments = arguments;
@@ -36,10 +38,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             Logger = logger;
             BuildPartition = buildPartition;
             EnvironmentVariables = environmentVariables;
+            Timeout = timeout;
         }
             
         public DotNetCliCommand WithArguments(string arguments)
-            => new DotNetCliCommand(CliPath, arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables);
+            => new DotNetCliCommand(CliPath, arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout);
 
         [PublicAPI]
         public BuildResult RestoreThenBuild()

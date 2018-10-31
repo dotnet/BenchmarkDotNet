@@ -103,7 +103,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("maxWarmupCount", Required = false, HelpText = "Maximum count of warmup iterations that should be performed. The default is 50.")]
         public int? MaxWarmupIterationCount { get; set; }
         
-        [Option("iterationTime", Required = false, HelpText = "Desired time of execution of an iteration. Used by Pilot stage to estimate the number of invocations per iteration. 500ms by default")]
+        [Option("iterationTime", Required = false, HelpText = "Desired time of execution of an iteration in miliseconds. Used by Pilot stage to estimate the number of invocations per iteration. 500ms by default")]
         public int? IterationTimeInMiliseconds { get; set; }
         
         [Option("iterationCount", Required = false, HelpText = "How many target iterations should be performed. By default calculated by the heuristic.")]
@@ -132,6 +132,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         
         [Option("disasmDepth", Required = false, Default = 1, HelpText = "Sets the recursive depth for the disassembler.")]
         public int DisassemblerRecursiveDepth { get; set; }
+
+        [Option("buildTimeout", Required = false, HelpText = "Build timeout in seconds.")]
+        public int? TimeOutInSeconds { get; set; }
 
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any(); 
 

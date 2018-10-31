@@ -119,7 +119,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             foreach (string runtime in options.Runtimes)
                 if (!AvailableRuntimes.Contains(runtime))
                 {
-                    logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", AvailableRuntimes)}.");
+                    logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", AvailableRuntimes.OrderBy(name => name))}.");
                     return false;
                 }
 
@@ -279,6 +279,8 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         private static Job CreateJobForGivenRuntime(Job baseJob, string runtime, CommandLineOptions options)
         {
+            TimeSpan? timeOut = options.TimeOutInSeconds.HasValue ? TimeSpan.FromSeconds(options.TimeOutInSeconds.Value) : default(TimeSpan?);
+
             switch (runtime)
             {
                 case "clr":
@@ -288,20 +290,21 @@ namespace BenchmarkDotNet.ConsoleArguments
                         CsProjCoreToolchain.From(
                             NetCoreAppSettings.GetCurrentVersion()
                                 .WithCustomDotNetCliPath(options.CliPath?.FullName)
-                                .WithCustomPackagesRestorePath(options.RestorePath?.FullName)));
+                                .WithCustomPackagesRestorePath(options.RestorePath?.FullName)
+                                .WithTimeout(timeOut)));
                 case "net46":
                 case "net461":
                 case "net462":
                 case "net47":
                 case "net471":
                 case "net472":
-                    return baseJob.With(Runtime.Clr).With(CsProjClassicNetToolchain.From(runtime, options.RestorePath?.FullName));
+                    return baseJob.With(Runtime.Clr).With(CsProjClassicNetToolchain.From(runtime, options.RestorePath?.FullName, timeOut));
                 case "netcoreapp2.0":
                 case "netcoreapp2.1":
                 case "netcoreapp2.2":
                 case "netcoreapp3.0":
                     return baseJob.With(Runtime.Core).With(
-                        CsProjCoreToolchain.From(new NetCoreAppSettings(runtime, null, runtime, options.CliPath?.FullName, options.RestorePath?.FullName)));
+                        CsProjCoreToolchain.From(new NetCoreAppSettings(runtime, null, runtime, options.CliPath?.FullName, options.RestorePath?.FullName, timeOut)));
                 case "mono":
                     return baseJob.With(new MonoRuntime("Mono", options.MonoPath?.FullName));
                 case "corert":
@@ -316,6 +319,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                         builder.UseCoreRtNuGet(options.CoreRtVersion);
                     else
                         builder.UseCoreRtNuGet();
+
+                    if (timeOut.HasValue)
+                        builder.Timeout(timeOut.Value);
                     
                     return baseJob.With(Runtime.CoreRT).With(builder.ToToolchain());
                 default:
