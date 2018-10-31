@@ -31,7 +31,7 @@ What we have today comes with following limitations:
 
 ## How to use it?
 
-You need to install `BenchmarkDotNet.Diagnostics.Windows` package. The official `0.11.2` version should be released to nuget.org in October. If you can't wait and want to give it a try today you need to download `0.11.1.755` preview package from our CI feed by adding following line `<add key="appveyor-bdn" value="https://ci.appveyor.com/nuget/benchmarkdotnet" />` to your `NuGet.config` file (if you don't have such file you can generate if by running `dotnet new nugetconfig` command). 
+You need to install `BenchmarkDotNet.Diagnostics.Windows` package.
 
 It can be enabled in few ways, some of them:
 
