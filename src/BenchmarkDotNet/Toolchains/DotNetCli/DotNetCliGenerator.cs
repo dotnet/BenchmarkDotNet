@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// <summary>
         /// we need our folder to be on the same level as the project that we want to reference
         /// we are limited by xprojs (by default compiles all .cs files in all subfolders, Program.cs could be doubled and fail the build)
-        /// and also by nuget internal implementation like looking for global.json file in parent folders
+        /// and also by NuGet internal implementation like looking for global.json file in parent folders
         /// </summary>
         protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programName)
         {

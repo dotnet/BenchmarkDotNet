@@ -25,6 +25,7 @@ namespace BenchmarkDotNet.Environments
         [PublicAPI] public bool IsServerGC { get; protected set; }
         [PublicAPI] public bool IsConcurrentGC { get; protected set; }
         [PublicAPI] public long GCAllocationQuantum { get; protected set; }
+        [PublicAPI] public bool InDocker { get; protected set; }
 
         protected BenchmarkEnvironmentInfo()
         {
@@ -37,6 +38,7 @@ namespace BenchmarkDotNet.Environments
             IsConcurrentGC = GCSettings.LatencyMode != GCLatencyMode.Batch;
             HasAttachedDebugger = Debugger.IsAttached;
             GCAllocationQuantum = GcStats.AllocationQuantum;
+            InDocker = RuntimeInformation.InDocker;
         }
 
         public static BenchmarkEnvironmentInfo GetCurrent() => new BenchmarkEnvironmentInfo();

@@ -14,9 +14,9 @@ using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class NugetReferenceTests : BenchmarkTestExecutor
+    public class NuGetReferenceTests : BenchmarkTestExecutor
     {
-        public NugetReferenceTests(ITestOutputHelper output) : base(output) { }
+        public NuGetReferenceTests(ITestOutputHelper output) : base(output) { }
 
         [Fact]
         public void UserCanSpecifyCustomNuGetPackageDependency()
@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 ? CsProjClassicNetToolchain.Current.Value // this .NET toolchain will do the right thing, the default RoslynToolchain does not support it
                 : CsProjCoreToolchain.Current.Value;
 
-            var job = Job.Dry.With(toolchain).WithNuget("Newtonsoft.Json", "11.0.2");
+            var job = Job.Dry.With(toolchain).WithNuGet("Newtonsoft.Json", "11.0.2");
             var config = CreateSimpleConfig(job: job);
 
             CanExecute<WithCallToNewtonsoft>(config);
@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var toolchain = RoslynToolchain.Instance;
 
-            var unsupportedJob = Job.Dry.With(toolchain).WithNuget("Newtonsoft.Json", "11.0.2");
+            var unsupportedJob = Job.Dry.With(toolchain).WithNuGet("Newtonsoft.Json", "11.0.2");
             var unsupportedJobConfig = CreateSimpleConfig(job: unsupportedJob);
             var unsupportedJobBenchmark = BenchmarkConverter.TypeToBenchmarks(typeof(WithCallToNewtonsoft), unsupportedJobConfig);
             var unsupportedJobLogger = new CompositeLogger(unsupportedJobConfig.GetLoggers().ToArray());

@@ -4,9 +4,9 @@ using System.Text.RegularExpressions;
 
 namespace BenchmarkDotNet.Jobs
 {
-    public class NugetReference : IEquatable<NugetReference>
+    public class NuGetReference : IEquatable<NuGetReference>
     {
-        public NugetReference(string packageName, string packageVersion)
+        public NuGetReference(string packageName, string packageVersion)
         {
             if (string.IsNullOrWhiteSpace(packageName))
                 throw new ArgumentException("message", nameof(packageName));
@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Jobs
 
         public override bool Equals(object obj)
         {
-            return Equals(obj as NugetReference);
+            return Equals(obj as NuGetReference);
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public bool Equals(NugetReference other)
+        public bool Equals(NuGetReference other)
         {
             return other != null &&
                    PackageName == other.PackageName &&
@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Jobs
         private bool IsValidVersion(string version)
         {
             if (string.IsNullOrWhiteSpace(version)) return false;
-            //There is a great nuget package for semver validation called `semver` however we probably
+            //There is a great NuGet package for semver validation called `semver` however we probably
             // don't want to add another dependency here so this will do some rudimentary validation
             // and if that fails, then the actual add package command will fail anyways.
             var parts = version.Split('-');

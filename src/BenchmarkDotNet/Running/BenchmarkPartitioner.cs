@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Running
                     return false;
                 if (AreDifferent(jobX.Infrastructure.Arguments, jobY.Infrastructure.Arguments)) // arguments can be anything (Mono runtime settings or MsBuild parameters)
                     return false;
-                if (AreDifferent(jobX.Infrastructure.NugetReferences, jobY.Infrastructure.NugetReferences))
+                if (AreDifferent(jobX.Infrastructure.NuGetReferences, jobY.Infrastructure.NuGetReferences))
                     return false;
                 if (!jobX.Environment.Gc.Equals(jobY.Environment.Gc)) // GC settings are per .config/.csproj
                     return false;
@@ -80,8 +80,8 @@ namespace BenchmarkDotNet.Running
                     hashCode ^= job.Infrastructure.BuildConfiguration.GetHashCode();
                 if (job.Infrastructure.Arguments != null && job.Infrastructure.Arguments.Any())
                     hashCode ^= job.Infrastructure.Arguments.GetHashCode();
-                if (job.Infrastructure.NugetReferences != null)
-                    hashCode ^= job.Infrastructure.NugetReferences.GetHashCode();
+                if (job.Infrastructure.NuGetReferences != null)
+                    hashCode ^= job.Infrastructure.NuGetReferences.GetHashCode();
                 if (!string.IsNullOrEmpty(obj.Descriptor.AdditionalLogic))
                     hashCode ^= obj.Descriptor.AdditionalLogic.GetHashCode();
 

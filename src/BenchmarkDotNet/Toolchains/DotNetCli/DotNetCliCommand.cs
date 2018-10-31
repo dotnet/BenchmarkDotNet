@@ -26,9 +26,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI] public BuildPartition BuildPartition { get; }
 
         [PublicAPI] public IReadOnlyList<EnvironmentVariable> EnvironmentVariables { get; }
-            
+        
+        [PublicAPI] public TimeSpan Timeout { get; }
+
         public DotNetCliCommand(string cliPath, string arguments, GenerateResult generateResult, ILogger logger, 
-            BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable> environmentVariables)
+            BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable> environmentVariables, TimeSpan timeout)
         {
             CliPath = cliPath;
             Arguments = arguments;
@@ -36,10 +38,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             Logger = logger;
             BuildPartition = buildPartition;
             EnvironmentVariables = environmentVariables;
+            Timeout = timeout;
         }
             
         public DotNetCliCommand WithArguments(string arguments)
-            => new DotNetCliCommand(CliPath, arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables);
+            => new DotNetCliCommand(CliPath, arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout);
 
         [PublicAPI]
         public BuildResult RestoreThenBuild()
@@ -47,12 +50,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             var packagesResult = AddPackages();
 
             if (!packagesResult.IsSuccess)
-                return BuildResult.Failure(GenerateResult, new Exception(packagesResult.ProblemDescription));
+                return BuildResult.Failure(GenerateResult, new Exception(packagesResult.AllInformation));
 
             var restoreResult = Restore();
 
             if (!restoreResult.IsSuccess)
-                return BuildResult.Failure(GenerateResult, new Exception(restoreResult.ProblemDescription));
+                return BuildResult.Failure(GenerateResult, new Exception(restoreResult.AllInformation));
 
             var buildResult = Build().ToBuildResult(GenerateResult);
             
@@ -68,12 +71,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             var packagesResult = AddPackages();
 
             if (!packagesResult.IsSuccess)
-                return BuildResult.Failure(GenerateResult, new Exception(packagesResult.ProblemDescription));
+                return BuildResult.Failure(GenerateResult, new Exception(packagesResult.AllInformation));
 
             var restoreResult = Restore();
 
             if (!restoreResult.IsSuccess)
-                return BuildResult.Failure(GenerateResult, new Exception(restoreResult.ProblemDescription));
+                return BuildResult.Failure(GenerateResult, new Exception(restoreResult.AllInformation));
 
             var buildResult = Build();
 
@@ -81,7 +84,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 buildResult = BuildNoDependencies();
             
             if (!buildResult.IsSuccess)
-                return BuildResult.Failure(GenerateResult, new Exception(buildResult.ProblemDescription));
+                return BuildResult.Failure(GenerateResult, new Exception(buildResult.AllInformation));
 
             return Publish().ToBuildResult(GenerateResult);
         }
@@ -117,7 +120,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 GetPublishCommand(BuildPartition, Arguments)));
 
         internal static IEnumerable<string> GetAddPackagesCommands(BuildPartition buildPartition)
-            => GetNugetAddPackageCommands(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver);
+            => GetNuGetAddPackageCommands(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver);
 
         internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string extraArguments = null) 
             => new StringBuilder(100)
@@ -154,14 +157,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return string.Join(" ", msBuildArguments.Select(arg => arg.TextRepresentation));
         }
 
-        private static IEnumerable<string> GetNugetAddPackageCommands(BenchmarkCase benchmarkCase, IResolver resolver)
+        private static IEnumerable<string> GetNuGetAddPackageCommands(BenchmarkCase benchmarkCase, IResolver resolver)
         {
-            if (!benchmarkCase.Job.HasValue(InfrastructureMode.NugetReferencesCharacteristic))
+            if (!benchmarkCase.Job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic))
                 return Enumerable.Empty<string>();
 
-            var nugetRefs = benchmarkCase.Job.ResolveValue(InfrastructureMode.NugetReferencesCharacteristic, resolver);
+            var nuGetRefs = benchmarkCase.Job.ResolveValue(InfrastructureMode.NuGetReferencesCharacteristic, resolver);
 
-            return nugetRefs.Select(x => $"add package {x.PackageName}{(string.IsNullOrWhiteSpace(x.PackageVersion) ? string.Empty : " -v " + x.PackageVersion)}");
+            return nuGetRefs.Select(x => $"add package {x.PackageName}{(string.IsNullOrWhiteSpace(x.PackageVersion) ? string.Empty : " -v " + x.PackageVersion)}");
         }
     }
 }

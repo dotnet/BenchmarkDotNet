@@ -186,29 +186,29 @@ namespace BenchmarkDotNet.Jobs
         public static Job With(this Job job, IReadOnlyList<Argument> arguments) => job.WithCore(j => j.Infrastructure.Arguments = arguments);
         
         /// <summary>
-        /// Runs the job with a specific Nuget dependency which will be resolved during the Job build process
+        /// Runs the job with a specific NuGet dependency which will be resolved during the Job build process
         /// </summary>
         /// <param name="job"></param>
-        /// <param name="packageName">The Nuget package name</param>
-        /// <param name="packageVersion">The Nuget package version</param>
+        /// <param name="packageName">The NuGet package name</param>
+        /// <param name="packageVersion">The NuGet package version</param>
         /// <returns></returns>
-        public static Job WithNuget(this Job job, string packageName, string packageVersion) => job.WithCore(j => j.Infrastructure.NugetReferences = new NugetReferenceList(j.Infrastructure.NugetReferences ?? Array.Empty<NugetReference>()) { new NugetReference(packageName, packageVersion) });
+        public static Job WithNuGet(this Job job, string packageName, string packageVersion) => job.WithCore(j => j.Infrastructure.NuGetReferences = new NuGetReferenceList(j.Infrastructure.NuGetReferences ?? Array.Empty<NuGetReference>()) { new NuGetReference(packageName, packageVersion) });
 
         /// <summary>
-        /// Runs the job with a specific Nuget dependency which will be resolved during the Job build process
+        /// Runs the job with a specific NuGet dependency which will be resolved during the Job build process
         /// </summary>
         /// <param name="job"></param>
-        /// <param name="packageName">The Nuget package name, the latest version will be resolved</param>
+        /// <param name="packageName">The NuGet package name, the latest version will be resolved</param>
         /// <returns></returns>
-        public static Job WithNuget(this Job job, string packageName) => job.WithNuget(packageName, string.Empty);
+        public static Job WithNuGet(this Job job, string packageName) => job.WithNuGet(packageName, string.Empty);
 
         /// <summary>
-        /// Runs the job with a specific Nuget dependencies which will be resolved during the Job build process
+        /// Runs the job with a specific NuGet dependencies which will be resolved during the Job build process
         /// </summary>
         /// <param name="job"></param>
-        /// <param name="nugetReferences">A collection of Nuget dependencies</param>
+        /// <param name="nuGetReferences">A collection of NuGet dependencies</param>
         /// <returns></returns>
-        public static Job WithNuget(this Job job, IReadOnlyCollection<NugetReference> nugetReferences) => job.WithCore(j => j.Infrastructure.NugetReferences = nugetReferences);
+        public static Job WithNuGet(this Job job, IReadOnlyCollection<NuGetReference> nuGetReferences) => job.WithCore(j => j.Infrastructure.NuGetReferences = nuGetReferences);
 
         // Accuracy
         /// <summary>
