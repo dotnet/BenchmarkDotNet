@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Environments
             Register(InfrastructureMode.BuildConfigurationCharacteristic, () => InfrastructureMode.ReleaseConfigurationName);
 
             Register(InfrastructureMode.ArgumentsCharacteristic, Array.Empty<Argument>);
-            Register(InfrastructureMode.NugetReferencesCharacteristic, Array.Empty<NugetReference>);
+            Register(InfrastructureMode.NuGetReferencesCharacteristic, Array.Empty<NuGetReference>);
         }
     }
 }

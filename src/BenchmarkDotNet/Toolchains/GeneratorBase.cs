@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.Toolchains
         [PublicAPI] protected virtual void CopyAllRequiredFiles(ArtifactsPaths artifactsPaths) { }
 
         /// <summary>
-        /// generates Nuget.Config file to make sure that BDN is using the right NuGet feeds
+        /// generates NuGet.Config file to make sure that BDN is using the right NuGet feeds
         /// </summary>
         [PublicAPI] protected virtual void GenerateNuGetConfig(ArtifactsPaths artifactsPaths) { }
 
@@ -127,7 +127,7 @@ namespace BenchmarkDotNet.Toolchains
                 binariesDirectoryPath: binariesDirectoryPath,
                 programCodePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{codeFileExtension}"),
                 appConfigPath: $"{executablePath}.config",
-                nugetConfigPath: Path.Combine(buildArtifactsDirectoryPath, "NuGet.config"),
+                nuGetConfigPath: Path.Combine(buildArtifactsDirectoryPath, "NuGet.config"),
                 projectFilePath: GetProjectFilePath(buildArtifactsDirectoryPath),
                 buildScriptFilePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{RuntimeInformation.ScriptFileExtension}"),
                 executablePath: executablePath,

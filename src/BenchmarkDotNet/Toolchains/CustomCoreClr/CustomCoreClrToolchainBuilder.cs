@@ -40,12 +40,12 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         /// creates a toolchain which publishes self-contained app which references NuGet CoreClr package
         /// </summary>
         /// <param name="newCoreClrVersion">the version of Microsoft.NETCore.Runtime which should be used. Example: "2.1.0-preview2-26305-0"</param>
-        /// <param name="nugetFeedUrl">url to NuGet CoreCLR feed, The default is: "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json"</param>
-        public CustomCoreClrToolchainBuilder UseCoreClrNuGet(string newCoreClrVersion, string nugetFeedUrl = "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json")
+        /// <param name="nuGetFeedUrl">url to NuGet CoreCLR feed, The default is: "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json"</param>
+        public CustomCoreClrToolchainBuilder UseCoreClrNuGet(string newCoreClrVersion, string nuGetFeedUrl = "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json")
         {
             coreClrVersion = newCoreClrVersion ?? throw new ArgumentNullException(nameof(newCoreClrVersion));
 
-            Feeds[Generator.CoreClrNuGetFeed] = nugetFeedUrl ?? throw new ArgumentNullException(nameof(nugetFeedUrl));
+            Feeds[Generator.CoreClrNuGetFeed] = nuGetFeedUrl ?? throw new ArgumentNullException(nameof(nuGetFeedUrl));
 
             isCoreClrConfigured = true;
 
@@ -85,11 +85,11 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
         /// creates a toolchain which publishes self-contained app which references NuGet CoreFx build
         /// </summary>
         /// <param name="privateCoreFxNetCoreAppVersion">the version of Microsoft.Private.CoreFx.NETCoreApp which should be used. Example: "4.5.0-preview2-26307-0"</param>
-        /// <param name="nugetFeedUrl">url to NuGet CoreFX feed, The default is: "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json"</param>
-        public CustomCoreClrToolchainBuilder UseCoreFxNuGet(string privateCoreFxNetCoreAppVersion, string nugetFeedUrl = "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json")
+        /// <param name="nuGetFeedUrl">url to NuGet CoreFX feed, The default is: "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json"</param>
+        public CustomCoreClrToolchainBuilder UseCoreFxNuGet(string privateCoreFxNetCoreAppVersion, string nuGetFeedUrl = "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json")
         {
             coreFxVersion = privateCoreFxNetCoreAppVersion ?? throw new ArgumentNullException(nameof(privateCoreFxNetCoreAppVersion));
-            Feeds[Generator.CoreFxNuGetFeed] = nugetFeedUrl ?? throw new ArgumentNullException(nameof(nugetFeedUrl));
+            Feeds[Generator.CoreFxNuGetFeed] = nuGetFeedUrl ?? throw new ArgumentNullException(nameof(nuGetFeedUrl));
             isCoreFxConfigured = true;
 
             return this;

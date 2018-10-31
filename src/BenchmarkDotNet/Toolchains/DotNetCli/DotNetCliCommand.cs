@@ -117,7 +117,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 GetPublishCommand(BuildPartition, Arguments)));
 
         internal static IEnumerable<string> GetAddPackagesCommands(BuildPartition buildPartition)
-            => GetNugetAddPackageCommands(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver);
+            => GetNuGetAddPackageCommands(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver);
 
         internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string extraArguments = null) 
             => new StringBuilder(100)
@@ -154,14 +154,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return string.Join(" ", msBuildArguments.Select(arg => arg.TextRepresentation));
         }
 
-        private static IEnumerable<string> GetNugetAddPackageCommands(BenchmarkCase benchmarkCase, IResolver resolver)
+        private static IEnumerable<string> GetNuGetAddPackageCommands(BenchmarkCase benchmarkCase, IResolver resolver)
         {
-            if (!benchmarkCase.Job.HasValue(InfrastructureMode.NugetReferencesCharacteristic))
+            if (!benchmarkCase.Job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic))
                 return Enumerable.Empty<string>();
 
-            var nugetRefs = benchmarkCase.Job.ResolveValue(InfrastructureMode.NugetReferencesCharacteristic, resolver);
+            var nuGetRefs = benchmarkCase.Job.ResolveValue(InfrastructureMode.NuGetReferencesCharacteristic, resolver);
 
-            return nugetRefs.Select(x => $"add package {x.PackageName}{(string.IsNullOrWhiteSpace(x.PackageVersion) ? string.Empty : " -v " + x.PackageVersion)}");
+            return nuGetRefs.Select(x => $"add package {x.PackageName}{(string.IsNullOrWhiteSpace(x.PackageVersion) ? string.Empty : " -v " + x.PackageVersion)}");
         }
     }
 }

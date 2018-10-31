@@ -84,10 +84,10 @@ namespace BenchmarkDotNet.Tests.Running
         }
 
         [Fact]
-        public void CustomNugetJobsWithSamePackageVersionAreGroupedTogether()
+        public void CustomNuGetJobsWithSamePackageVersionAreGroupedTogether()
         {
-            var job1 = Job.Default.WithNuget("AutoMapper", "7.0.1");
-            var job2 = Job.Default.WithNuget("AutoMapper", "7.0.1");
+            var job1 = Job.Default.WithNuGet("AutoMapper", "7.0.1");
+            var job2 = Job.Default.WithNuGet("AutoMapper", "7.0.1");
 
             var config = ManualConfig.Create(DefaultConfig.Instance)
                 .With(job1)
@@ -107,11 +107,11 @@ namespace BenchmarkDotNet.Tests.Running
         }
 
         [Fact]
-        public void CustomNugetJobsAreGroupedByPackageVersion()
+        public void CustomNuGetJobsAreGroupedByPackageVersion()
         {
             var config = ManualConfig.Create(DefaultConfig.Instance)
-                .With(Job.Default.WithNuget("AutoMapper", "7.0.1"))
-                .With(Job.Default.WithNuget("AutoMapper", "7.0.0-alpha-0001"));
+                .With(Job.Default.WithNuGet("AutoMapper", "7.0.1"))
+                .With(Job.Default.WithNuGet("AutoMapper", "7.0.0-alpha-0001"));
 
             var benchmarks1 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain1), config);
             var benchmarks2 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain2), config);

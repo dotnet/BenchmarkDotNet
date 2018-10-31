@@ -40,9 +40,9 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 return false;
             }
 
-            if (benchmarkCase.Job.HasValue(InfrastructureMode.NugetReferencesCharacteristic))
+            if (benchmarkCase.Job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic))
             {
-                logger.WriteLineError("The Roslyn toolchain does not allow specifying Nuget package dependencies");
+                logger.WriteLineError("The Roslyn toolchain does not allow specifying NuGet package dependencies");
                 return false;
             }
 

@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<IEngineFactory> EngineFactoryCharacteristic = CreateCharacteristic<IEngineFactory>(nameof(EngineFactory));
         public static readonly Characteristic<string> BuildConfigurationCharacteristic = CreateCharacteristic<string>(nameof(BuildConfiguration));        
         public static readonly Characteristic<IReadOnlyList<Argument>> ArgumentsCharacteristic = CreateCharacteristic<IReadOnlyList<Argument>>(nameof(Arguments));
-        public static readonly Characteristic<IReadOnlyCollection<NugetReference>> NugetReferencesCharacteristic = CreateCharacteristic<IReadOnlyCollection<NugetReference>>(nameof(NugetReferences));
+        public static readonly Characteristic<IReadOnlyCollection<NuGetReference>> NuGetReferencesCharacteristic = CreateCharacteristic<IReadOnlyCollection<NuGetReference>>(nameof(NuGetReferences));
 
         public static readonly InfrastructureMode InProcess = new InfrastructureMode(InProcessToolchain.Instance);
         public static readonly InfrastructureMode InProcessDontLogOutput = new InfrastructureMode(InProcessToolchain.DontLogOutput);
@@ -64,10 +64,10 @@ namespace BenchmarkDotNet.Jobs
             set => ArgumentsCharacteristic[this] = value;
         }
 
-        public IReadOnlyCollection<NugetReference> NugetReferences
+        public IReadOnlyCollection<NuGetReference> NuGetReferences
         {
-            get => NugetReferencesCharacteristic[this];
-            set => NugetReferencesCharacteristic[this] = value;
+            get => NuGetReferencesCharacteristic[this];
+            set => NuGetReferencesCharacteristic[this] = value;
         }
     }
 }

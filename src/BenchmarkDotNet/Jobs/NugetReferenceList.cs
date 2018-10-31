@@ -5,38 +5,38 @@ using System.Collections.Generic;
 namespace BenchmarkDotNet.Jobs
 {
     /// <summary>
-    /// An ordered list of Nuget references. Does not allow duplicate references with the same PackageName.
+    /// An ordered list of NuGet references. Does not allow duplicate references with the same PackageName.
     /// </summary>
-    public class NugetReferenceList : IReadOnlyCollection<NugetReference>
+    public class NuGetReferenceList : IReadOnlyCollection<NuGetReference>
     {
-        private readonly List<NugetReference> references = new List<NugetReference>();
+        private readonly List<NuGetReference> references = new List<NuGetReference>();
 
-        public NugetReferenceList()
+        public NuGetReferenceList()
         {
         }
 
-        public NugetReferenceList(IReadOnlyCollection<NugetReference> readOnlyCollection)
+        public NuGetReferenceList(IReadOnlyCollection<NuGetReference> readOnlyCollection)
         {
-            foreach (var nugetReference in readOnlyCollection)
+            foreach (var nuGetReference in readOnlyCollection)
             {
-                Add(nugetReference);
+                Add(nuGetReference);
             }
         }
 
         public int Count => references.Count;
 
-        public IEnumerator<NugetReference> GetEnumerator() => references.GetEnumerator();
+        public IEnumerator<NuGetReference> GetEnumerator() => references.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public void Add(NugetReference reference)
+        public void Add(NuGetReference reference)
         {
             if (reference == null)
                 throw new ArgumentNullException(nameof(reference));
 
             var insertionIndex = references.BinarySearch(reference, PackageNameComparer.Default);
             if (0 <= insertionIndex && insertionIndex < Count)
-                throw new ArgumentException($"Nuget package {reference.PackageName} was already added", nameof(reference));
+                throw new ArgumentException($"NuGet package {reference.PackageName} was already added", nameof(reference));
 
             references.Insert(~insertionIndex, reference);
         }
@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Jobs
             if (obj.GetType() != GetType())
                 return false;
 
-            var otherList = (NugetReferenceList)obj;
+            var otherList = (NuGetReferenceList)obj;
             if (Count != otherList.Count)
                 return false;
 
@@ -68,22 +68,22 @@ namespace BenchmarkDotNet.Jobs
             unchecked
             {
                 int hashCode = 0;
-                foreach (var nugetReference in references)
+                foreach (var nuGetReference in references)
                 {
-                    hashCode = hashCode * 397 + nugetReference.GetHashCode();
+                    hashCode = hashCode * 397 + nuGetReference.GetHashCode();
                 }
 
                 return hashCode;
             }
         }
 
-        private class PackageNameComparer : IComparer<NugetReference>
+        private class PackageNameComparer : IComparer<NuGetReference>
         {
             private PackageNameComparer() { }
 
             public static PackageNameComparer Default { get; } = new PackageNameComparer();
 
-            public int Compare(NugetReference x, NugetReference y) => Comparer<string>.Default.Compare(x.PackageName, y.PackageName);
+            public int Compare(NuGetReference x, NuGetReference y) => Comparer<string>.Default.Compare(x.PackageName, y.PackageName);
         }
     }
 }
