@@ -32,14 +32,7 @@ namespace BenchmarkDotNet.Diagnosers
             this.monoDisassembler = monoDisassembler;
 
             results = new Dictionary<BenchmarkCase, DisassemblyResult>();
-            Exporters = new IExporter[]
-            {
-                new CombinedDisassemblyExporter(results),
-                new RawDisassemblyExporter(results),
-                new PrettyHtmlDisassemblyExporter(results),
-                new PrettyGithubMarkdownDisassemblyExporter(results),
-                new PrettyGithubMarkdownDiffDisassemblyExporter(results)
-            };
+            Exporters = GetExporters(results, config);
         }
 
         public static IConfigurableDiagnoser<DisassemblyDiagnoserConfig> Create(DisassemblyDiagnoserConfig config)
@@ -107,5 +100,18 @@ namespace BenchmarkDotNet.Diagnosers
 
         private static bool ShouldUseWindowsDisassembler(BenchmarkCase benchmarkCase)
             => !(benchmarkCase.Job.Environment.Runtime is MonoRuntime) && RuntimeInformation.IsWindows();
+
+        private static IEnumerable<IExporter> GetExporters(Dictionary<BenchmarkCase, DisassemblyResult> results, DisassemblyDiagnoserConfig config)
+        {
+            yield return new CombinedDisassemblyExporter(results);
+            yield return new RawDisassemblyExporter(results);
+            yield return new PrettyHtmlDisassemblyExporter(results);
+            yield return new PrettyGithubMarkdownDisassemblyExporter(results);
+
+            if (config.PrintDiff)
+            {
+                yield return new PrettyGithubMarkdownDiffDisassemblyExporter(results);
+            }
+        }
     }
 }
