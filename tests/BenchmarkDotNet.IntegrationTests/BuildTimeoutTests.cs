@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
@@ -17,7 +15,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public BuildTimeoutTests(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
         [Fact]
-        public void WhenBuildTakesMoreTimeThanTheTimeoutTheEntireProcessTreeIsKilled()
+        public void WhenBuildTakesMoreTimeThanTheTimeoutTheBuildIsCancelled()
         {
             if (RuntimeInformation.GetCurrentPlatform() == Platform.X86) // CoreRT does not support 32bit yet
                 return;
@@ -34,19 +32,11 @@ namespace BenchmarkDotNet.IntegrationTests
                         .Timeout(timeout)
                         .ToToolchain()));
 
-            var processesBefore = Process.GetProcesses();
             var summary = CanExecute<CoreRtBenchmark>(config, fullValidation: false);
-            var processesAfter = Process.GetProcesses();
 
             Assert.All(summary.Reports, report => Assert.False(report.BuildResult.IsBuildSuccess));
             Assert.All(summary.Reports, report => Assert.Contains("The configured timeout", report.BuildResult.BuildException.Message));
-            Assert.True(CountOfProcessesWeCareAbout(processesAfter) <= CountOfProcessesWeCareAbout(processesBefore)); // CI or the VM could have spawn something in the meantime, but let's hope for the best. Remove in the case the test is not stable 
         }
-
-        private static int CountOfProcessesWeCareAbout(Process[] processes)
-            => processes.Count(process =>
-                process.ProcessName.StartsWith("dotnet", StringComparison.InvariantCultureIgnoreCase) ||
-                process.ProcessName.StartsWith("msbuild", StringComparison.InvariantCultureIgnoreCase));
     }
 
     public class Impossible
