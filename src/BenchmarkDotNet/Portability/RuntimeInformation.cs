@@ -59,12 +59,17 @@ namespace BenchmarkDotNet.Portability
                 && string.IsNullOrEmpty(typeof(object).Assembly.Location); // but it's merged to a single .exe and .Location returns null here ;)
 #endif
 
+        public static bool InDocker => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
+                
         internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
 
         internal static string ScriptFileExtension => IsWindows() ? ".bat" : ".sh";
 
         internal static string GetArchitecture() => GetCurrentPlatform() == Platform.X86 ? "32bit" : "64bit";
 
+        private static string DockerSdkVersion => Environment.GetEnvironmentVariable("DOTNET_VERSION");
+        private static string DockerAspnetSdkVersion => Environment.GetEnvironmentVariable("ASPNETCORE_VERSION");
+        
         internal static bool IsWindows()
         {
 #if CLASSIC
@@ -155,16 +160,20 @@ namespace BenchmarkDotNet.Portability
             return null;
         }
 
-        internal static string GetNetCoreVersion()
+        internal static string GetNetCoreVersion() => InDocker ? GetDockerNetCoreVersion() : GetBaseNetCoreVersion();
+
+        private static string GetDockerNetCoreVersion() => string.IsNullOrEmpty(DockerSdkVersion) ? DockerAspnetSdkVersion : DockerSdkVersion;
+
+        private static string GetBaseNetCoreVersion()
         {
             var assembly = typeof(GCSettings).GetTypeInfo().Assembly;
             var assemblyPath = assembly.CodeBase.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
             int netCoreAppIndex = Array.IndexOf(assemblyPath, "Microsoft.NETCore.App");
             if (netCoreAppIndex > 0 && netCoreAppIndex < assemblyPath.Length - 2)
                 return assemblyPath[netCoreAppIndex + 1];
-            return null;
+            return null;            
         }
-
+        
         internal static string GetRuntimeVersion()
         {
             if (IsMono)
