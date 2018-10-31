@@ -123,7 +123,8 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
                 customDotNetCliPath: customDotNetCliPath,
                 feeds: Feeds,
                 useNuGetClearTag: useNuGetClearTag,
-                useTempFolderForRestore: useTempFolderForRestore);
+                useTempFolderForRestore: useTempFolderForRestore,
+                timeout: timeout ?? TimeSpan.FromMinutes(3)); // downloading entire Runtime for this toolchain might take a while!
         }
     }
 }

@@ -78,7 +78,8 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
                 customDotNetCliPath: customDotNetCliPath,
                 feeds: Feeds,
                 useNuGetClearTag: useNuGetClearTag,
-                useTempFolderForRestore: useTempFolderForRestore);
+                useTempFolderForRestore: useTempFolderForRestore,
+                timeout: timeout ?? TimeSpan.FromMinutes(5)); // downloading all CoreRT dependencies can take a LOT of time
         }
     }
 }

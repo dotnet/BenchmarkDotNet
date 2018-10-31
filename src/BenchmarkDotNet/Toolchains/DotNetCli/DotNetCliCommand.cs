@@ -26,9 +26,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI] public BuildPartition BuildPartition { get; }
 
         [PublicAPI] public IReadOnlyList<EnvironmentVariable> EnvironmentVariables { get; }
-            
+        
+        [PublicAPI] public TimeSpan Timeout { get; }
+
         public DotNetCliCommand(string cliPath, string arguments, GenerateResult generateResult, ILogger logger, 
-            BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable> environmentVariables)
+            BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable> environmentVariables, TimeSpan timeout)
         {
             CliPath = cliPath;
             Arguments = arguments;
@@ -36,10 +38,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             Logger = logger;
             BuildPartition = buildPartition;
             EnvironmentVariables = environmentVariables;
+            Timeout = timeout;
         }
             
         public DotNetCliCommand WithArguments(string arguments)
-            => new DotNetCliCommand(CliPath, arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables);
+            => new DotNetCliCommand(CliPath, arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout);
 
         [PublicAPI]
         public BuildResult RestoreThenBuild()
@@ -47,12 +50,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             var packagesResult = AddPackages();
 
             if (!packagesResult.IsSuccess)
-                return BuildResult.Failure(GenerateResult, new Exception(packagesResult.ProblemDescription));
+                return BuildResult.Failure(GenerateResult, new Exception(packagesResult.AllInformation));
 
             var restoreResult = Restore();
 
             if (!restoreResult.IsSuccess)
-                return BuildResult.Failure(GenerateResult, new Exception(restoreResult.ProblemDescription));
+                return BuildResult.Failure(GenerateResult, new Exception(restoreResult.AllInformation));
 
             var buildResult = Build().ToBuildResult(GenerateResult);
             
@@ -68,12 +71,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             var packagesResult = AddPackages();
 
             if (!packagesResult.IsSuccess)
-                return BuildResult.Failure(GenerateResult, new Exception(packagesResult.ProblemDescription));
+                return BuildResult.Failure(GenerateResult, new Exception(packagesResult.AllInformation));
 
             var restoreResult = Restore();
 
             if (!restoreResult.IsSuccess)
-                return BuildResult.Failure(GenerateResult, new Exception(restoreResult.ProblemDescription));
+                return BuildResult.Failure(GenerateResult, new Exception(restoreResult.AllInformation));
 
             var buildResult = Build();
 
@@ -81,7 +84,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 buildResult = BuildNoDependencies();
             
             if (!buildResult.IsSuccess)
-                return BuildResult.Failure(GenerateResult, new Exception(buildResult.ProblemDescription));
+                return BuildResult.Failure(GenerateResult, new Exception(buildResult.AllInformation));
 
             return Publish().ToBuildResult(GenerateResult);
         }

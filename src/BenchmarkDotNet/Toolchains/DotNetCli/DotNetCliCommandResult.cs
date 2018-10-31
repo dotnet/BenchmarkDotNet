@@ -15,12 +15,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         [PublicAPI] public string StandardError { get; }
 
-        /// <summary>
-        /// in theory, all errors should be reported to standard error, 
-        /// but sometimes they are not so we can at least return 
-        /// standard output which hopefully will contain some useful information
-        /// </summary>
-        public string ProblemDescription => HasNonEmptyErrorMessage ? StandardError : StandardOutput;
+        public string AllInformation => $"Standard output: {Environment.NewLine} {StandardOutput} {Environment.NewLine} Standard error: {Environment.NewLine} {StandardError}";
 
         [PublicAPI] public bool HasNonEmptyErrorMessage => !string.IsNullOrEmpty(StandardError);
 
@@ -42,6 +37,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public BuildResult ToBuildResult(GenerateResult generateResult)
             => IsSuccess || File.Exists(generateResult.ArtifactsPaths.ExecutablePath) // dotnet cli could have successfully built the program, but returned 1 as exit code because it had some warnings
                 ? BuildResult.Success(generateResult)
-                : BuildResult.Failure(generateResult, new Exception(ProblemDescription));
+                : BuildResult.Failure(generateResult, new Exception(AllInformation));
     }
 }

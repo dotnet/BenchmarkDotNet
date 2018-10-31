@@ -10,12 +10,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public abstract class CustomDotNetCliToolchainBuilder
     {
+        protected readonly Dictionary<string, string> Feeds = new Dictionary<string, string>();
+
         protected string runtimeIdentifier, customDotNetCliPath;
         protected string targetFrameworkMoniker = "netcoreapp2.1", displayName;
         protected string runtimeFrameworkVersion;
 
         protected bool useNuGetClearTag, useTempFolderForRestore;
-        protected readonly Dictionary<string, string> Feeds = new Dictionary<string, string>();
+        protected TimeSpan? timeout;
 
         public abstract IToolchain ToToolchain();
 
@@ -101,6 +103,17 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public CustomDotNetCliToolchainBuilder UseTempFolderForRestore(bool value)
         {
             useTempFolderForRestore = value;
+
+            return this;
+        }
+
+        /// <summary>
+        /// sets provided timeout for build
+        /// </summary>
+        [PublicAPI]
+        public CustomDotNetCliToolchainBuilder Timeout(TimeSpan timeout)
+        {
+            this.timeout = timeout;
 
             return this;
         }

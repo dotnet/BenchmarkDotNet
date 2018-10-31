@@ -42,17 +42,17 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         private string targetFrameworkMoniker;
 
-        private CsProjClassicNetToolchain(string targetFrameworkMoniker, string packagesPath = null)
+        private CsProjClassicNetToolchain(string targetFrameworkMoniker, string packagesPath = null, TimeSpan? timeout = null)
             : base(targetFrameworkMoniker,
                 new CsProjGenerator(targetFrameworkMoniker, cliPath: null, packagesPath: packagesPath, runtimeFrameworkVersion: null),
-                new DotNetCliBuilder(targetFrameworkMoniker, customDotNetCliPath: null),
+                new DotNetCliBuilder(targetFrameworkMoniker, customDotNetCliPath: null, timeout: timeout),
                 new Executor())
         {
             this.targetFrameworkMoniker = targetFrameworkMoniker;
         }
 
-        public static IToolchain From(string targetFrameworkMoniker, string packagesPath = null)
-            => new CsProjClassicNetToolchain(targetFrameworkMoniker, packagesPath);
+        public static IToolchain From(string targetFrameworkMoniker, string packagesPath = null, TimeSpan? timeout = null)
+            => new CsProjClassicNetToolchain(targetFrameworkMoniker, packagesPath, timeout);
 
         public override bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver)
         {
