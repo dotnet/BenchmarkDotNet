@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
@@ -39,8 +40,13 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.All(summary.Reports, report => Assert.False(report.BuildResult.IsBuildSuccess));
             Assert.All(summary.Reports, report => Assert.Contains("The configured timeout", report.BuildResult.BuildException.Message));
-            Assert.True(processesAfter.Length <= processesBefore.Length); // CI or the VM could have spawn something in the meantime, but let's hope for the best. Remove in the case the test is not stable 
+            Assert.True(CountOfProcessesWeCareAbout(processesAfter) <= CountOfProcessesWeCareAbout(processesBefore)); // CI or the VM could have spawn something in the meantime, but let's hope for the best. Remove in the case the test is not stable 
         }
+
+        private static int CountOfProcessesWeCareAbout(Process[] processes)
+            => processes.Count(process =>
+                process.ProcessName.StartsWith("dotnet", StringComparison.InvariantCultureIgnoreCase) ||
+                process.ProcessName.StartsWith("msbuild", StringComparison.InvariantCultureIgnoreCase));
     }
 
     public class Impossible
