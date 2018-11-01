@@ -25,7 +25,10 @@ namespace BenchmarkDotNet.Analysers
 
             var entire = report.AllMeasurements;
             var overheadMeasurements = entire.Where(m => m.Is(IterationMode.Overhead, IterationStage.Actual)).ToArray();
-            var workload = entire.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual)).GetStatistics();
+            var workloadMeasurements = entire.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual)).ToArray();
+            if (workloadMeasurements.IsEmpty())
+                yield break;
+            var workload = workloadMeasurements.GetStatistics();
             
             var threshold = currentFrequency.Value.ToResolution().Nanoseconds / 2;
 
