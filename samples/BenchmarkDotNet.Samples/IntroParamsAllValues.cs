@@ -22,7 +22,9 @@ namespace BenchmarkDotNet.Samples
         [Benchmark]
         public void Benchmark()
         {
-            Thread.Sleep(E.ToString().Length * 100 + (B == true ? 20 : B == false ? 10 : 0));
+            Thread.Sleep(
+                E.ToString().Length * 100 +
+                (B == true ? 20 : B == false ? 10 : 0));
         }
     }
 }

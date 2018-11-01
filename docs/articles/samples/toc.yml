@@ -10,6 +10,8 @@
   href: IntroArgumentsSource.md
 - name: IntroArrayParam
   href: IntroArrayParam.md
+- name: IntroParamsAllValues
+  href: IntroParamsAllValues.md
 - name: IntroBenchmarkBaseline
   href: IntroBenchmarkBaseline.md
 - name: IntroRatioSD
@@ -44,6 +46,8 @@
   href: IntroPercentiles.md
 - name: IntroRankColumn
   href: IntroRankColumn.md
+- name: IntroStatisticalTesting
+  href: IntroStatisticalTesting.md
 - name: IntroMultimodal
   href: IntroMultimodal.md
 - name: IntroOutliers
@@ -90,3 +94,5 @@
   href: IntroGenericTypeArguments.md
 - name: IntroDeferredExecution
   href: IntroDeferredExecution.md
+- name: IntroNuGet
+  href: IntroNuGet.md
