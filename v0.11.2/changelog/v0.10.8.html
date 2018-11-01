@@ -1,0 +1,214 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>BenchmarkDotNet v0.10.8 | BenchmarkDotNet </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="BenchmarkDotNet v0.10.8 | BenchmarkDotNet ">
+    <meta name="generator" content="docfx 2.37.1.0">
+    
+    <link rel="shortcut icon" href="../logo/icon-32.png">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  
+      ga('create', 'UA-41419012-6', 'auto');
+      ga('send', 'pageview');
+  
+    </script>
+    <!-- /Google Analytics -->
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function (d, w, c) {
+            (w[c] = w[c] || []).push(function() {
+                try {
+                    w.yaCounter40812449 = new Ya.Metrika({
+                        id:40812449,
+                        clickmap:true,
+                        trackLinks:true,
+                        accurateTrackBounce:true
+                    });
+                } catch(e) { }
+            });
+  
+            var n = d.getElementsByTagName("script")[0],
+                s = d.createElement("script"),
+                f = function () { n.parentNode.insertBefore(s, n); };
+            s.type = "text/javascript";
+            s.async = true;
+            s.src = "https://mc.yandex.ru/metrika/watch.js";
+  
+            if (w.opera == "[object Opera]") {
+                d.addEventListener("DOMContentLoaded", f, false);
+            } else { f(); }
+        })(document, window, "yandex_metrika_callbacks");
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo/icon.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list"></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="changelog.v0.10.8">
+<h1 id="benchmarkdotnet-v0108">BenchmarkDotNet v0.10.8</h1>
+
+<ul>
+<li>Legend for time units (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/349">#349</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/issues/459">#459</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/commit/f14e508e44b510a26cc3ec5aed30ee7843a92baf">f14e508e</a>)</li>
+<li>XML exporter (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/157">#157</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/pull/452">#452</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/commit/a0148db80c518a9d255f496534a8d1666be52c69">a0148db8</a>)</li>
+<li>.NET Framework 4.7 support (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/461">#461</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/commit/3f2b5c3c134c62f34f0ecf1a9c90d91ad37f2c6a">3f2b5c3c</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/commit/5513873ac40d07583d6136e431e3b7c8cdf6c851">5513873a</a>)</li>
+<li>Public API for AllocationQuantum (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/450">#450</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/pull/462">#462</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/commit/a0148db80c518a9d255f496534a8d1666be52c69">a0148db8</a>)</li>
+</ul>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.10.8">v0.10.8</a> scope,
+5 issues were resolved and 3 pull requests where merged.
+This release includes 8 commits by 4 contributors.</p>
+<h2 id="resolved-issues-5">Resolved issues (5)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/157">#157</a> Implement export to xml</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/349">#349</a> What the report title and value means? (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/450">#450</a> [Minor feature request] Please make GcStats.AllocationQuantum public</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/459">#459</a> [Question] What does the unit of measurement us stand for</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/461">#461</a> .NET Framework 4.7 support (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+</ul>
+<h2 id="merged-pull-requests-3">Merged pull requests (3)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/452">#452</a> Feature: XML Exporter (by <a href="https://github.com/Teknikaali">@Teknikaali</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/455">#455</a> Wrong xml doc comment (by <a href="https://github.com/ig-sinicyn">@ig-sinicyn</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/462">#462</a> make allocation quantum public, deal with a spelling error and expose… (by <a href="https://github.com/RichLinnell">@RichLinnell</a>)</li>
+</ul>
+<h2 id="commits-8">Commits (8)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f14e508e44b510a26cc3ec5aed30ee7843a92baf">f14e50</a> Add legend for time units (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e5955083f372cfaf706b4665acc1eb37b21b07c3">e59550</a> Add info about OrderProviders in docs (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6fc2456ceec071bfc2e3432c3b800ae905c90c6a">6fc245</a> Fix ConfigPassingTest (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ef0583365a97d899e918ad14b56b697db1b8e910">ef0583</a> Feature: XML Exporter (#452) (by <a href="https://github.com/Teknikaali">@Teknikaali</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3f2b5c3c134c62f34f0ecf1a9c90d91ad37f2c6a">3f2b5c</a> .NET 4.7 support from .NET Core host process on Windows, fixes #461 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a0148db80c518a9d255f496534a8d1666be52c69">a0148d</a> make allocation quantum public, deal with a spelling error and expose allocat... (by <a href="https://github.com/RichLinnell">@RichLinnell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5513873ac40d07583d6136e431e3b7c8cdf6c851">551387</a> add Windows check to our CsProjClassicNetToolchain (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/971565b3674555731692933f5924a850a448ba27">971565</a> Set library version: 0.10.8 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="contributors-4">Contributors (4)</h2>
+<ul>
+<li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>Anssi Kettunen (<a href="https://github.com/Teknikaali">@Teknikaali</a>)</li>
+<li>Rich Linnell (<a href="https://github.com/RichLinnell">@RichLinnell</a>)</li>
+</ul>
+<p>Thank you very much!</p>
+<h2 id="additional-details">Additional details</h2>
+<p><em>Date: June 09, 2017</em></p>
+<p><em>Milestone: <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues?q=milestone%3Av0.10.8">v0.10.8</a></em></p>
+<p><em>NuGet Packages:</em></p>
+<ul>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet/0.10.8">https://www.nuget.org/packages/BenchmarkDotNet/0.10.8</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Core/0.10.8">https://www.nuget.org/packages/BenchmarkDotNet.Core/0.10.8</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Toolchains.Roslyn/0.10.8">https://www.nuget.org/packages/BenchmarkDotNet.Toolchains.Roslyn/0.10.8</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.10.8">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.10.8</a></li>
+</ul>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/changelog/v0.10.8.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,366 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Customizing Runtime | BenchmarkDotNet </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Customizing Runtime | BenchmarkDotNet ">
+    <meta name="generator" content="docfx 2.37.1.0">
+    
+    <link rel="shortcut icon" href="../../logo/icon-32.png">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    <meta property="docfx:rel" content="../../">
+    
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  
+      ga('create', 'UA-41419012-6', 'auto');
+      ga('send', 'pageview');
+  
+    </script>
+    <!-- /Google Analytics -->
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function (d, w, c) {
+            (w[c] = w[c] || []).push(function() {
+                try {
+                    w.yaCounter40812449 = new Ya.Metrika({
+                        id:40812449,
+                        clickmap:true,
+                        trackLinks:true,
+                        accurateTrackBounce:true
+                    });
+                } catch(e) { }
+            });
+  
+            var n = d.getElementsByTagName("script")[0],
+                s = d.createElement("script"),
+                f = function () { n.parentNode.insertBefore(s, n); };
+            s.type = "text/javascript";
+            s.async = true;
+            s.src = "https://mc.yandex.ru/metrika/watch.js";
+  
+            if (w.opera == "[object Opera]") {
+                d.addEventListener("DOMContentLoaded", f, false);
+            } else { f(); }
+        })(document, window, "yandex_metrika_callbacks");
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo/icon.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list"></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="docs.customizing-runtime">
+<h1 id="customizing-runtime">Customizing Runtime</h1>
+
+<p>Currently, we have only information about customzing Mono in this section.
+If you want to customize .NET Core, read an artcile about <a class="xref" href="../configs/toolchains.html">Toolchains</a>.</p>
+<hr>
+<h2 id="sample-introcustommono">Sample: IntroCustomMono</h2>
+<p>BenchmarkDotNet allows you to compare different runtimes, including Mono.
+If you apply <code>[MonoJob]</code> attribute to your class we use your default mono runtime.
+If you want to compare different versions of Mono you need to provide use the custom paths.
+You can do this today by using the overloaded ctor of MonoJob attribute or by specifying the runtime in a fluent way.</p>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroCustomMono.cs">using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Running;
+
+namespace BenchmarkDotNet.Samples
+{
+    // *** Attribute Style ***
+
+    [MonoJob(&quot;Mono x64&quot;, @&quot;C:\Program Files\Mono\bin\mono.exe&quot;)]
+    [MonoJob(&quot;Mono x86&quot;, @&quot;C:\Program Files (x86)\Mono\bin\mono.exe&quot;)]
+    public class IntroCustomMono
+    {
+        [Benchmark]
+        public void Foo()
+        {
+            // Benchmark body
+        }
+    }
+
+    // *** Object Style ***
+
+    [Config(typeof(Config))]
+    public class IntroCustomMonoObjectStyle
+    {
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                Add(Job.ShortRun.With(new MonoRuntime(
+                    &quot;Mono x64&quot;, @&quot;C:\Program Files\Mono\bin\mono.exe&quot;)));
+                Add(Job.ShortRun.With(new MonoRuntime(
+                    &quot;Mono x86&quot;, @&quot;C:\Program Files (x86)\Mono\bin\mono.exe&quot;)));
+            }
+        }
+
+        [Benchmark]
+        public void Foo()
+        {
+            // Benchmark body
+        }
+    }
+
+    // *** Fluent Config ***
+
+    public class IntroCustomMonoFluentConfig
+    {
+        public static void Run()
+        {
+            BenchmarkRunner.Run&lt;IntroCustomMonoFluentConfig&gt;(ManualConfig
+                .CreateEmpty()
+                .With(Job.ShortRun.With(new MonoRuntime(
+                    &quot;Mono x64&quot;, @&quot;C:\Program Files\Mono\bin\mono.exe&quot;)))
+                .With(Job.ShortRun.With(new MonoRuntime(
+                    &quot;Mono x86&quot;, @&quot;C:\Program Files (x86)\Mono\bin\mono.exe&quot;))));
+        }
+
+        [Benchmark]
+        public void Foo()
+        {
+            // Benchmark body
+        }
+    }
+}
+</code></pre><h3 id="links">Links</h3>
+<ul>
+<li><a class="xref" href="customizing-runtime.html">Customizing Runtime</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroCustomMono.html">Sample: IntroCustomMono</a></li>
+</ul>
+<hr>
+<h2 id="sample-introcustommonoarguments">Sample: IntroCustomMonoArguments</h2>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroCustomMonoArguments.cs">using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
+
+namespace BenchmarkDotNet.Samples
+{
+    [Config(typeof(ConfigWithCustomArguments))]
+    public class IntroCustomMonoArguments
+    {
+        public class ConfigWithCustomArguments : ManualConfig
+        {
+            public ConfigWithCustomArguments()
+            {
+                // --optimize=MODE , -O=mode
+                // MODE is a comma separated list of optimizations. They also allow
+                // optimizations to be turned off by prefixing the optimization
+                // name with a minus sign.
+
+                Add(Job.Mono
+                    .With(new[] { new MonoArgument(&quot;--optimize=inline&quot;) })
+                    .WithId(&quot;Inlining enabled&quot;));
+                Add(Job.Mono
+                    .With(new[] { new MonoArgument(&quot;--optimize=-inline&quot;) })
+                    .WithId(&quot;Inlining disabled&quot;));
+            }
+        }
+
+        [Benchmark]
+        public void Sample()
+        {
+            ShouldGetInlined(); ShouldGetInlined(); ShouldGetInlined();
+            ShouldGetInlined(); ShouldGetInlined(); ShouldGetInlined();
+            ShouldGetInlined(); ShouldGetInlined(); ShouldGetInlined();
+        }
+
+        void ShouldGetInlined() { }
+    }
+}
+</code></pre><h3 id="output">Output</h3>
+<pre><code class="lang-markdown">| Method |               Job |          Arguments |       Mean |    StdDev |
+|------- |------------------ |------------------- |-----------:|----------:|
+| Sample | Inlining disabled | --optimize=-inline | 19.4252 ns | 0.4525 ns |
+| Sample |  Inlining enabled |  --optimize=inline |  0.0000 ns | 0.0000 ns |
+</code></pre>
+<h3 id="links">Links</h3>
+<ul>
+<li><a class="xref" href="customizing-runtime.html">Customizing Runtime</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroCustomMonoArguments.html">Sample: IntroCustomMonoArguments</a></li>
+</ul>
+<hr>
+<h2 id="sample-introenvvars">Sample: IntroEnvVars</h2>
+<p>You can configure custom environment variables for the process that is running your benchmarks.
+One reason for doing this might be checking out how different
+<a href="https://github.com/dotnet/coreclr/blob/master/Documentation/project-docs/clr-configuration-knobs.md">runtime knobs</a>
+affect the performance of .NET Core.</p>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroEnvVars.cs">using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
+
+namespace BenchmarkDotNet.Samples
+{
+    [Config(typeof(ConfigWithCustomEnvVars))]
+    public class IntroEnvVars
+    {
+        private class ConfigWithCustomEnvVars : ManualConfig
+        {
+            private const string JitNoInline = &quot;COMPlus_JitNoInline&quot;;
+            
+            public ConfigWithCustomEnvVars()
+            {
+                Add(Job.Core.WithId(&quot;Inlining enabled&quot;));
+                Add(Job.Core
+                    .With(new[] { new EnvironmentVariable(JitNoInline, &quot;1&quot;) })
+                    .WithId(&quot;Inlining disabled&quot;));
+            }
+        }
+
+        [Benchmark]
+        public void Foo()
+        {
+            // Benchmark body
+        }
+    }
+}
+</code></pre><h3 id="links">Links</h3>
+<ul>
+<li><a class="xref" href="customizing-runtime.html">Customizing Runtime</a></li>
+<li><a class="xref" href="../configs/configs.html">Configs</a></li>
+<li><a class="xref" href="../configs/jobs.html">Jobs</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroEnvVars.html">Sample: IntroEnvVars</a></li>
+</ul>
+<hr>
+<h2 id="sample-introstathread">Sample: IntroStaThread</h2>
+<p>If the code you want to benchmark requires <code>[System.STAThread]</code>
+then you need to apply this attribute to the benchmarked method.
+BenchmarkDotNet will generate executable with <code>[STAThread]</code> applied to it's <code>Main</code> method.</p>
+<p>Currently it does not work for .NET Core 2.0 due to <a href="https://github.com/dotnet/coreclr/issues/13688">this</a> bug.</p>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroStaThread.cs">using System.Threading;
+using BenchmarkDotNet.Attributes;
+
+namespace BenchmarkDotNet.Samples
+{
+    public class IntroStaThread
+    {
+        [Benchmark, System.STAThread]
+        public void CheckForSTA()
+        {
+            if (Thread.CurrentThread.GetApartmentState() != ApartmentState.STA)
+            {
+                throw new ThreadStateException(
+                    &quot;The current threads apartment state is not STA&quot;);
+            }
+        }
+    }
+}
+</code></pre><h3 id="links">Links</h3>
+<ul>
+<li><a class="xref" href="customizing-runtime.html">Customizing Runtime</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroStaThread.html">Sample: IntroStaThread</a></li>
+</ul>
+<hr>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/articles/guides/customizing-runtime.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,235 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Troubleshooting | BenchmarkDotNet </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Troubleshooting | BenchmarkDotNet ">
+    <meta name="generator" content="docfx 2.37.1.0">
+    
+    <link rel="shortcut icon" href="../../logo/icon-32.png">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    <meta property="docfx:rel" content="../../">
+    
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  
+      ga('create', 'UA-41419012-6', 'auto');
+      ga('send', 'pageview');
+  
+    </script>
+    <!-- /Google Analytics -->
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function (d, w, c) {
+            (w[c] = w[c] || []).push(function() {
+                try {
+                    w.yaCounter40812449 = new Ya.Metrika({
+                        id:40812449,
+                        clickmap:true,
+                        trackLinks:true,
+                        accurateTrackBounce:true
+                    });
+                } catch(e) { }
+            });
+  
+            var n = d.getElementsByTagName("script")[0],
+                s = d.createElement("script"),
+                f = function () { n.parentNode.insertBefore(s, n); };
+            s.type = "text/javascript";
+            s.async = true;
+            s.src = "https://mc.yandex.ru/metrika/watch.js";
+  
+            if (w.opera == "[object Opera]") {
+                d.addEventListener("DOMContentLoaded", f, false);
+            } else { f(); }
+        })(document, window, "yandex_metrika_callbacks");
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo/icon.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list"></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="troubleshooting">Troubleshooting</h1>
+
+<h2 id="benchmarkdotnet">BenchmarkDotNet</h2>
+<p>You need to be aware of the fact that to ensure process-level isolation BenchmarkDotNet generates, builds and executes every benchmark in a dedicated process. For .NET and Mono we generate a C# file and compile it using Roslyn. For .NET Core and CoreRT we generate not only C# file but also a project file which later is restored and build with dotnet cli. If your project has some non-trivial build settings like a <code>.props</code> and <code>.target</code> files or native dependencies things might not work well out of the box.</p>
+<p>How do you know that BenchmarkDotNet has failed to build the project? BDN is going to tell you about it. An example:</p>
+<pre><code class="lang-log">  // ***** BenchmarkRunner: Start   *****
+  // ***** Building 1 exe(s) in Parallel: Start   *****
+  // msbuild /p:ConfigurationGroup=Release  /p:UseSharedCompilation=false took 12,93s and exited with 1
+  // ***** Done, took 00:00:15 (15.59 sec)   *****
+  // Found benchmarks:
+  //   Perf_Console.OpenStandardInput: Job-ZAFVFJ(Force=True, Toolchain=CoreFX, IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+  // Build Exception: Microsoft (R) Build Engine version 15.9.8-preview+g0a5001fc4d for .NET Core
+  Copyright (C) Microsoft Corporation. All rights reserved.
+
+  C:\Program Files\dotnet\sdk\2.2.100-preview2-009404\Microsoft.Common.CurrentVersion.targets(4176,5): warning MSB3026: Could not copy &quot;C:\Projects\corefx/bin/obj/AnyOS.AnyCPU.Release/BenchmarksRunner/netstandard/BenchmarksRunner.exe&quot; to &quot;C:\Projects\corefx\bin/AnyOS.AnyCPU.Release/BenchmarksRunner/netstandard/BenchmarksRunner.exe&quot;. Beginning retry 1 in 1000ms. The process cannot access the file 'C:\Projects\corefx\bin\AnyOS.AnyCPU.Release\BenchmarksRunner\netstandard\BenchmarksRunner.exe' because it is being used by another process.  [C:\Projects\corefx\src\Common\perf\BenchmarksRunner\BenchmarksRunner.csproj]
+</code></pre>
+<p>If the error message is not clear enough, you need to investigate it further.</p>
+<p>How to troubleshoot the build process:</p>
+<ol>
+<li>Configure BenchmarkDotNet to keep auto-generated benchmark files (they are being removed after benchmark is executed by default). You can do that by either passing <code>--keepFiles</code> console argument to <code>BenchmarkSwitcher</code> or by using <code>[KeepBenchmarkFiles]</code> attribute on the type which defines the benchmarks or by using <code>config.KeepBenchmarkFiles()</code> extension method.</li>
+<li>Run the benchmarks</li>
+<li>Go to the output folder, which typicaly is <code>bin\Release\$FrameworkMoniker</code> and search for the new folder with auto-generated files. The name of the folder is just Job's ID. So if you are using <code>--job short</code> the folder should be called &quot;ShortRun&quot;. If you want to change the name, use <code>Job.WithId(&quot;$newID&quot;)</code> extension method.</li>
+<li>The folder should contain:
+<ul>
+<li>a file with source code (ends with <code>.notcs</code> to make sure IDE don't include it in other projects by default)</li>
+<li>a project file (<code>.csproj</code>)</li>
+<li>a script file (<code>.bat</code> on Windows, <code>.sh</code> for other OSes) which should be doing exactly the same thing as BDN does:
+<ul>
+<li>dotnet restore</li>
+<li>dotnet build (with some parameters like <code>-c Release</code>)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Run the script, read the error message. From here you continue with the troubleshooting like it was a project in your solution.</li>
+</ol>
+<p>The recommended order of solving build issues:</p>
+<ol>
+<li>Change the right settings in your project file which defines benchmarks to get it working.</li>
+<li>Customize the <code>Job</code> settings using available options like <code>job.WithCustomBuildConfiguration($name)</code>or <code>job.With(new Argument[] { new MsBuildArgument(&quot;/p:SomeProperty=Value&quot;)})</code>.</li>
+<li>Implement your own <code>IToolchain</code> and generate and build all the right things in your way (you can use existing Builders and Generators and just override some methods to change specific behaviour).</li>
+<li>Report a bug in BenchmarkDotNet repository.</li>
+</ol>
+<h2 id="debugging-benchmarks">Debugging Benchmarks</h2>
+<h2 id="in-the-same-process">In the same process</h2>
+<p>If your benchmark builds but fails to run, you can simply debug it. The first thing you should try is to do it in a single process (host process === runner process).</p>
+<ol>
+<li>Use <code>DebugInProcessConfig</code></li>
+</ol>
+<pre><code class="lang-cs">static void Main(string[] args) =&gt; BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args, new DebugInProcessConfig());
+</code></pre>
+<ol start="2">
+<li>Set the breakpoints in your favorite IDE</li>
+<li>Start debugging the project with benchmarks</li>
+</ol>
+<h2 id="in-a-different-process">In a different process</h2>
+<p>Sometimes you won't be able to reproduce the problem in the same process. In this case, you have 3 options:</p>
+<h3 id="launch-a-debugger-from-the-benchmark-process-using-debugger-api">Launch a debugger from the benchmark process using Debugger API</h3>
+<pre><code class="lang-cs">[GlobalSetup]
+public void Setup()
+{
+    System.Diagnostics.Debugger.Launch();
+}
+</code></pre>
+<h3 id="attach-a-debugger-from-ide">Attach a debugger from IDE</h3>
+<p>Modify your benchmark to sleep until the Debugger is not attached and use your favorite IDE to attach the debugger to benchmark process. <strong>Do attach to the process which is running the benchmark</strong> (the arguments of the process are going to be <code>--benchmarkId $someNumber --benchmarkName $theName</code>), not the host process.</p>
+<pre><code class="lang-cs">[GlobalSetup]
+public void Setup()
+{
+    while(!System.Diagnostics.Debugger.IsAttached)
+        Thread.Sleep(TimeSpan.FromMilliseconds(100));
+}
+</code></pre>
+<h3 id="one-of-the-above-but-with-a-debug-build">One of the above, but with a Debug build</h3>
+<p>By default, BDN builds everything in Release. But debugging Release builds even with full symbols might be non-trivial. To enforce BDN to build the benchmark in Debug please use <code>DebugBuildConfig</code> and then attach the debugger.</p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/articles/guides/troubleshooting.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>
