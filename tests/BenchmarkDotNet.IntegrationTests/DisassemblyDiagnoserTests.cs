@@ -114,6 +114,26 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Contains(result.Methods, method => method.Maps.Any(map => map.Instructions.OfType<Asm>().Any()));
         }
 
+        public class WithInlineable
+        {
+            [Benchmark] public void JustReturn() { }
+        }
+        
+        [TheoryWindowsOnly(WindowsOnly)]
+        [MemberData(nameof(GetAllJits))]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
+        public void CanDisassembleInlinableBenchmarks(Jit jit, Platform platform, Runtime runtime)
+        {
+            var disassemblyDiagnoser = (IDisassemblyDiagnoser)DisassemblyDiagnoser.Create(
+                new DisassemblyDiagnoserConfig(printAsm: true, printIL: true, printSource: true, recursiveDepth: 3));
+
+            CanExecute<WithInlineable>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.Monitoring));
+
+            var disassemblyResult = disassemblyDiagnoser.Results.Values.Single(result => result.Methods.Count(method => method.Name.Contains(nameof(WithInlineable.JustReturn))) == 1);
+
+            Assert.Contains(disassemblyResult.Methods, method => method.Maps.Any(map => map.Instructions.OfType<Asm>().All(asm => asm.TextRepresentation.Contains("ret"))));
+        }
+
         private IConfig CreateConfig(Jit jit, Platform platform, Runtime runtime, IDiagnoser disassemblyDiagnoser, RunStrategy runStrategy)
             => ManualConfig.CreateEmpty()
                 .With(Job.Dry.With(jit).With(platform).With(runtime).With(runStrategy))
