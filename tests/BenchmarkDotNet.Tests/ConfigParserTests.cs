@@ -271,6 +271,7 @@ namespace BenchmarkDotNet.Tests
         {
             var config = ConfigParser.Parse(new[] { "--runtimes", "net46", "MONO", "netcoreapp3.0", "CoreRT"}, new OutputLogger(Output)).config;
 
+            Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as basline
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is ClrRuntime));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is MonoRuntime));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRtRuntime));

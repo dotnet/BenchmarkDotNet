@@ -182,7 +182,10 @@ namespace BenchmarkDotNet.ConsoleArguments
             var config = new ManualConfig();
 
             var baseJob = GetBaseJob(options, globalConfig);
-            config.Add(Expand(baseJob.UnfreezeCopy(), options).ToArray()); // UnfreezeCopy ensures that each of the expanded jobs will have it's own ID
+            var expanded = Expand(baseJob.UnfreezeCopy(), options).ToArray(); // UnfreezeCopy ensures that each of the expanded jobs will have it's own ID
+            if (expanded.Length > 1)
+                expanded[0] = expanded[0].AsBaseline(); // if the user provides multiple jobs, then the first one should be a baseline
+            config.Add(expanded); 
             if (config.GetJobs().IsEmpty() && baseJob != Job.Default)
                 config.Add(baseJob);
 
