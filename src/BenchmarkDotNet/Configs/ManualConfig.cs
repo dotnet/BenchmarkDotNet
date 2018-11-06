@@ -43,13 +43,13 @@ namespace BenchmarkDotNet.Configs
         public ISummaryStyle GetSummaryStyle() => summaryStyle;
         
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => logicalGroupRules;
-
+        [PublicAPI] public bool StopOnFirstError { get; set; }
         [PublicAPI] public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
         [PublicAPI] public bool KeepBenchmarkFiles { get; set; }
         [PublicAPI] public bool SummaryPerType { get; set; } = true;
         [PublicAPI] public string ArtifactsPath { get; set; }
         [PublicAPI] public Encoding Encoding { get; set; }
-        
+
         public void Add(params IColumn[] newColumns) => columnProviders.AddRange(newColumns.Select(c => c.ToProvider()));
         public void Add(params IColumnProvider[] newColumnProviders) => columnProviders.AddRange(newColumnProviders);
         public void Add(params IExporter[] newExporters) => exporters.AddRange(newExporters);
@@ -84,6 +84,7 @@ namespace BenchmarkDotNet.Configs
             Encoding = config.Encoding ?? Encoding;
             summaryStyle = summaryStyle ?? config.GetSummaryStyle();
             logicalGroupRules.AddRange(config.GetLogicalGroupRules());
+            StopOnFirstError |= config.StopOnFirstError;
         }
 
         public IEnumerable<IDiagnoser> GetDiagnosers()

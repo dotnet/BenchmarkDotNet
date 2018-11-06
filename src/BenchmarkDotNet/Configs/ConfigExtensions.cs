@@ -53,6 +53,7 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static IConfig RemoveBenchmarkFiles(this IConfig config) => config.KeepBenchmarkFiles(false);
         [PublicAPI] public static IConfig WithArtifactsPath(this IConfig config, string artifactsPath) => config.With(m => m.ArtifactsPath = artifactsPath);
         [PublicAPI] public static IConfig With(this IConfig config, params BenchmarkLogicalGroupRule[] rules) => config.With(c => c.Add(rules));
+        [PublicAPI] public static IConfig StopOnFirstError(this IConfig config, bool value = true) => config.With(m => m.StopOnFirstError = value);
 
         public static ReadOnlyConfig AsReadOnly(this IConfig config) =>
             config is ReadOnlyConfig readOnly

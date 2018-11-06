@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Reports
         public BenchmarkCase BenchmarkCase { get; }
         public IReadOnlyList<Measurement> AllMeasurements { get; }
         public GcStats GcStats { get; }
-
+        [PublicAPI] public bool Success { get; }
         [PublicAPI] public GenerateResult GenerateResult { get; }
         [PublicAPI] public BuildResult BuildResult { get; }
         [PublicAPI] public IReadOnlyDictionary<string, Metric> Metrics { get; }
@@ -30,6 +30,7 @@ namespace BenchmarkDotNet.Reports
         private Statistics resultStatistics;
 
         public BenchmarkReport(
+            bool success,
             BenchmarkCase benchmarkCase,
             GenerateResult generateResult,
             BuildResult buildResult,
@@ -38,6 +39,7 @@ namespace BenchmarkDotNet.Reports
             GcStats gcStats, 
             IReadOnlyList<Metric> metrics)
         {
+            Success = success;
             BenchmarkCase = benchmarkCase;
             GenerateResult = generateResult;
             BuildResult = buildResult;

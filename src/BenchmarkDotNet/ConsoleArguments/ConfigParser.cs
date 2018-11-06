@@ -214,6 +214,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             config.SummaryPerType = !options.Join;
 
             config.KeepBenchmarkFiles = options.KeepBenchmarkFiles;
+            config.StopOnFirstError = options.StopOnFirstError;
 
             return config.AsReadOnly();
         }

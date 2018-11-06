@@ -193,5 +193,6 @@ dotnet run -c Release -- --warmupCount 2
 * `--cliPath` custom Path for dotnet cli
 * `--coreRt` path to ILCompiler for CoreRT
 * `--info` prints environment configuration including BenchmarkDotNet, OS, CPU and .NET version
+* `--stopOnFirstError` Stop on first error.
 * `--help` Display this help screen.
 * `--version` Display version information.
