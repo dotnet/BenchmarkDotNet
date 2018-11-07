@@ -11,14 +11,13 @@ namespace BenchmarkDotNet.Analysers
         
         public RegressionAnalyser(Threshold threshold) => Threshold = threshold;
 
-        public override string Id => nameof(RegressionAnalyser);
+        public override string Id => "Regression";
 
         private Threshold Threshold { get; }
 
         protected override IEnumerable<Conclusion> AnalyseSummary(Summary summary)
         {
-            foreach (var sameMethod in summary.BenchmarksCases.GroupBy(benchmark => benchmark.Descriptor))
-            foreach (var sameArguments in sameMethod.GroupBy(benchmark => benchmark.Parameters))
+            foreach (var sameArguments in summary.BenchmarksCases.GroupBy(benchmark => (benchmark.Descriptor, benchmark.Parameters)))
             {
                 var benchmarks = sameArguments.ToArray();
                 if (benchmarks.Length != 2)
@@ -35,12 +34,12 @@ namespace BenchmarkDotNet.Analysers
                 else if (y.Length > x.Length)
                     y = y.Take(x.Length).ToArray();
                 
-                var welchTestResult = StatisticalTestHelper.CalculateTost(WelchTest.Instance, x, y, Threshold);
                 var mannWhitneyTestResult = StatisticalTestHelper.CalculateTost(MannWhitneyTest.Instance, x, y, Threshold);
+                var welchTestResult = StatisticalTestHelper.CalculateTost(WelchTest.Instance, x, y, Threshold);
 
                 var conclusions = new[] { welchTestResult.Conclusion, mannWhitneyTestResult.Conclusion };
                 
-                if (conclusions.All(conclusion => conclusion == EquivalenceTestConclusion.Same))
+                if (conclusions.All(conclusion => conclusion == EquivalenceTestConclusion.Same) || conclusions.All(conclusion => conclusion == EquivalenceTestConclusion.Base))
                     yield return Conclusion.CreateHint(Id, $"Same for {baseline.Descriptor.GetFilterName()} {baseline.Parameters.DisplayInfo}");
                 else if (conclusions.All(conclusion => conclusion == EquivalenceTestConclusion.Slower))
                     yield return Conclusion.CreateError(Id, $"Slower for {baseline.Descriptor.GetFilterName()} {baseline.Parameters.DisplayInfo}");
