@@ -80,6 +80,8 @@ namespace BenchmarkDotNet.Configs
 
         public Encoding Encoding => Encoding.ASCII;
 
+        public bool HighPerformancePowerPlan => true;
+
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => Array.Empty<BenchmarkLogicalGroupRule>();
 
         public ISummaryStyle GetSummaryStyle() => SummaryStyle.Default;

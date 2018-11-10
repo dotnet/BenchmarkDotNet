@@ -45,6 +45,8 @@ namespace BenchmarkDotNet.Configs
 
         public Encoding Encoding => config.Encoding;
 
+        public bool HighPerformancePowerPlan => config.HighPerformancePowerPlan;
+
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => config.GetLogicalGroupRules();
     }
 }

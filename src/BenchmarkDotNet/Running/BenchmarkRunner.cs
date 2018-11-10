@@ -75,6 +75,7 @@ namespace BenchmarkDotNet.Running
             using (var logStreamWriter = StreamWriter.FromPath(Path.Combine(rootArtifactsFolderPath, title + ".log")))
             {
                 var logger = new CompositeLogger(commonSettingsConfig.GetCompositeLogger(), new StreamLogger(logStreamWriter));
+                var powerManagementApplier = new PowerManagementApplier();
 
                 var supportedBenchmarks = GetSupportedBenchmarks(benchmarkRunInfos, logger, resolver);
 
@@ -106,6 +107,7 @@ namespace BenchmarkDotNet.Running
 
                     foreach (var benchmarkRunInfo in supportedBenchmarks) // we run them in the old order now using the new build artifacts
                     {
+                        powerManagementApplier.ApplyPerformancePlan(logger, benchmarkRunInfo.Config.HighPerformancePowerPlan);
                         var runChronometer = Chronometer.Start();
                         
                         var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, logger, artifactsToCleanup, rootArtifactsFolderPath, ref runChronometer);
@@ -133,6 +135,7 @@ namespace BenchmarkDotNet.Running
                 }
                 finally
                 {
+                    powerManagementApplier.ApplyUserPowerPlan(logger);
                     logger.WriteLineHeader("// * Artifacts cleanup *");
                     Cleanup(new HashSet<string>(artifactsToCleanup.Distinct()));
                 }
