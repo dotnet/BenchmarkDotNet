@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Running
 
             if (filteredBenchmarks.IsEmpty())
             {
-                userInteraction.PrintWrongFilterInfo(benchmarksToFilter, nonNullLogger);
+                userInteraction.PrintWrongFilterInfo(benchmarksToFilter, nonNullLogger, options.Filters.ToArray());
                 return Array.Empty<Summary>();
             }
 

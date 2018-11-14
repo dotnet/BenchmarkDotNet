@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.ConsoleArguments;
+using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Helpers;
@@ -48,20 +49,18 @@ namespace BenchmarkDotNet.Running
             return selectedTypes;
         }
 
-        public void PrintWrongFilterInfo(IReadOnlyList<Type> allTypes, ILogger logger)
+        public void PrintWrongFilterInfo(IReadOnlyList<Type> allTypes, ILogger logger, string[] userFilters)
         {
             logger.WriteLineError("The filter that you have provided returned 0 benchmarks.");
             logger.WriteLineInfo("Please remember that the filter is applied to full benchmark name: `namespace.typeName.methodName`.");
-            logger.WriteLineInfo("Some examples of full names:");
             
-            foreach (string displayName in allTypes
-                .SelectMany(type => BenchmarkConverter.TypeToBenchmarks(type, DefaultConfig.Instance).BenchmarksCases) // we use DefaultConfig to NOT filter the benchmarks
-                .Select(benchmarkCase => benchmarkCase.Descriptor.GetFilterName())
-                .Distinct()
-                .OrderBy(displayName => displayName)
-                .Take(40))
+            var misspellingBenchmarkFilter = new MisspellingsFinder(allTypes);
+            foreach (string userFilter in userFilters)
             {
-                logger.WriteLineInfo($"\t{displayName}");
+                var displayNames = misspellingBenchmarkFilter.Find(userFilter);
+                logger.WriteLine($"You must be misspelled in '{userFilter}'. Suggestions:");
+                foreach (string displayName in displayNames)
+                    logger.WriteLineInfo($"\t{displayName}");                    
             }
 
             logger.WriteLineInfo("To print all available benchmarks use `--list flat` or `--list tree`.");
