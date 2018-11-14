@@ -18,15 +18,14 @@ namespace BenchmarkDotNet.Tests
         public void CheckEmpty()
         {
             var foundNames = new MisspellingsFinder(new[] { typeof(ClassNameNumberOne) }).Find("");
-            Assert.Empty(foundNames);
+            Assert.Equal(6, foundNames.Length);
         }
-
+        
         [Fact]
         public void CheckMisspelling_NamespaceClassMethod()
         {
             var foundNames = new MisspellingsFinder(new[] { typeof(ClassNameNumberOne) })
                 .Find("BenchmarkDotNet.All.ClassNameNumbrOne.MethodClassOneNameNumberOne");
-            Assert.Single(foundNames);
             Assert.Contains("BenchmarkDotNet.All.ClassNameNumberOne.MethodClassOneNameNumberOne", foundNames);
         }
 
@@ -35,8 +34,14 @@ namespace BenchmarkDotNet.Tests
         {
             var foundNames = new MisspellingsFinder(new[] { typeof(ClassNameNumberOne) })
                 .Find("BenchmarkDotNet.All.ClassNameNumbrOne");
-            Assert.Single(foundNames);
             Assert.Contains("BenchmarkDotNet.All.ClassNameNumberOne", foundNames);
+        }
+        
+        [Fact]
+        public void CheckMisspelling_Class()
+        {
+            var foundNames = new MisspellingsFinder(new[]{typeof(ClassNameNumberOne)}).Find("ClassNameNumberOe");
+            Assert.Contains("ClassNameNumberOne", foundNames);
         }
 
         [Fact]
@@ -44,12 +49,11 @@ namespace BenchmarkDotNet.Tests
         {
             var foundNames = new MisspellingsFinder(new[] { typeof(ClassNameNumberOne) })
                 .Find("BechmarkDotNet.All");
-            Assert.Single(foundNames);
             Assert.Contains("BenchmarkDotNet.All", foundNames);
         }
 
         [Fact]
-        public void CheckMultipleResults_MisspellingNamespaceClassMethod()
+        public void CheckMultipleMisspelling_NamespaceClassMethod()
         {
             var foundNames = new MisspellingsFinder(new[] { typeof(ClassNameNumberOne) })
                 .Find("BenchmarkDotNet.All.ClassNameNumberOne.MethodClassOneNameNumber");
@@ -64,6 +68,15 @@ namespace BenchmarkDotNet.Tests
                 .Find("BenchmarkDotNet.All.ClassNameNumber");
             Assert.Contains("BenchmarkDotNet.All.ClassNameNumberOne", foundNames);
             Assert.Contains("BenchmarkDotNet.All.ClassNameNumberTwo", foundNames);
+        }
+        
+        [Fact]
+        public void CheckMultipleMisspelling_Class()
+        {
+            var foundNames = new MisspellingsFinder(new[] { typeof(ClassNameNumberOne), typeof(ClassNameNumberTwo) })
+                .Find("ClassNameNumberOe");
+            Assert.Contains("ClassNameNumberOne", foundNames);
+            Assert.Contains("ClassNameNumberTwo", foundNames);
         }
 
         [Fact]
@@ -80,7 +93,7 @@ namespace BenchmarkDotNet.Tests
         {
             var foundNames = new MisspellingsFinder(new[] { typeof(ClassNameNumberOne) })
                 .Find("BenchmarkDotNet.All.ClasNameNumerOne.MetodClassOneNameNmberThree");
-            Assert.Empty(foundNames);
+            Assert.Equal(6, foundNames.Length);
         }
     }
 }

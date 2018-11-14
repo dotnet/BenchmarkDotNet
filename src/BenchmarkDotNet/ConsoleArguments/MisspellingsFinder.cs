@@ -11,9 +11,6 @@ namespace BenchmarkDotNet.ConsoleArguments
     {
         private readonly List<string> benchmarkNames = new List<string>();
 
-        //note this is an heuristic value, we suppose that user can make three misspellings
-        private static int PossibleMisspellingCount => 3;
-
         public MisspellingsFinder(IReadOnlyList<Type> benchmarks)
         {
             foreach (var benchmark in benchmarks)
@@ -25,42 +22,15 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             benchmarkNames.AddRange(benchmarks.Select(bn => bn.FullName).Distinct());
             benchmarkNames.AddRange(benchmarks.Select(bn => bn.Namespace).Distinct());
+            benchmarkNames.AddRange(benchmarks.Select(bn => bn.Name).Distinct());
         }
 
         public string[] Find([NotNull] string userInput)
         {
             if (userInput == null) 
                 throw new ArgumentNullException(nameof(userInput));
-            return benchmarkNames.Where(name => GetLevenshteinDistance(userInput, name) <= PossibleMisspellingCount).ToArray();
-        }
-
-        private static int GetLevenshteinDistance(string string1, string string2)
-        {
-            var m = new int[string1.Length + 1, string2.Length + 1];
-
-            for (int i = 0; i <= string1.Length; i++)
-            {
-                m[i, 0] = i;
-            }
-
-            for (int j = 0; j <= string2.Length; j++)
-            {
-                m[0, j] = j;
-            }
-
-            for (int i = 1; i <= string1.Length; i++)
-            {
-                for (int j = 1; j <= string2.Length; j++)
-                {
-                    int diff = (string1[i - 1] == string2[j - 1]) ? 0 : 1;
-
-                    m[i, j] = Math.Min(Math.Min(m[i - 1, j] + 1,
-                            m[i, j - 1] + 1),
-                        m[i - 1, j - 1] + diff);
-                }
-            }
-
-            return m[string1.Length, string2.Length];
+            var calculator = new LevenshteinDistanceCalculator();
+            return benchmarkNames.OrderBy(bn => calculator.Calculate(userInput, bn)).ToArray();
         }
     }
 }

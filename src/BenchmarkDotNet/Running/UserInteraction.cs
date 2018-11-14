@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Running
             {
                 var displayNames = misspellingBenchmarkFilter.Find(userFilter);
                 logger.WriteLine($"You must be misspelled in '{userFilter}'. Suggestions:");
-                foreach (string displayName in displayNames)
+                foreach (string displayName in displayNames.Take(40))
                     logger.WriteLineInfo($"\t{displayName}");                    
             }
 
