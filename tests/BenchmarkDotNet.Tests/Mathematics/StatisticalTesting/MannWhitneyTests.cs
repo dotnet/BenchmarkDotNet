@@ -215,7 +215,7 @@ namespace BenchmarkDotNet.Tests.Mathematics.StatisticalTesting
         }
 
         [Theory]
-        [InlineData(0.1, 0, 0)] //I don't know u and pValue values
+        [InlineData(0.1, 266, 1.22128573920577E-09)]
         public void Issue_948(double t, double u, double pValue)
         {
             double[] x =
