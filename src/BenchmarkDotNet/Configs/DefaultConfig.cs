@@ -82,6 +82,8 @@ namespace BenchmarkDotNet.Configs
 
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => Array.Empty<BenchmarkLogicalGroupRule>();
 
+        public bool StopOnFirstError => false;
+
         public ISummaryStyle GetSummaryStyle() => SummaryStyle.Default;
 
         public IEnumerable<IDiagnoser> GetDiagnosers() => Array.Empty<IDiagnoser>();

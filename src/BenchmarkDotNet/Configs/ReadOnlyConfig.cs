@@ -46,5 +46,7 @@ namespace BenchmarkDotNet.Configs
         public Encoding Encoding => config.Encoding;
 
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => config.GetLogicalGroupRules();
+
+        public bool StopOnFirstError => config.StopOnFirstError;
     }
 }
