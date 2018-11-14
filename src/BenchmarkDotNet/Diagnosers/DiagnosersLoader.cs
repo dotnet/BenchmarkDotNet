@@ -6,6 +6,7 @@ using System.Threading;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
+using Microsoft.Extensions.DependencyModel;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -96,10 +97,16 @@ namespace BenchmarkDotNet.Diagnosers
 
         private static Assembly LoadDiagnosticsAssembly(Assembly benchmarkDotNetCoreAssembly)
         {
+            // We couldn't use Assembly.GetEntryAssembly()?.GetReferencedAssemblies() because
             // it not enough to just install NuGet to be "referenced", the project has to consume the dll for real to be on the referenced assembly list
-            var referencedAssemblyName = Assembly.GetEntryAssembly()?.GetReferencedAssemblies().SingleOrDefault(name => name.Name == DiagnosticAssemblyName);
-            if (referencedAssemblyName != default(AssemblyName))
-                return Assembly.Load(referencedAssemblyName);
+            // So we use DependencyContext that reads *.deps.json file that contains all referenced assembly. 
+            var inCompileLibraries = DependencyContext.Default.CompileLibraries.Any(l => l.Name.Equals(DiagnosticAssemblyName, StringComparison.OrdinalIgnoreCase));
+            var inRuntimeLibraries = DependencyContext.Default.RuntimeLibraries.Any(l => l.Name.Equals(DiagnosticAssemblyName, StringComparison.OrdinalIgnoreCase));
+
+            if (inCompileLibraries || inRuntimeLibraries)
+            {
+                return Assembly.Load(new AssemblyName(DiagnosticAssemblyName));
+            }
 
             // we use the location of BenchmarkDotNet.dll, because it should be in the same folder
             string directoryName = new FileInfo(benchmarkDotNetCoreAssembly.Location).DirectoryName
