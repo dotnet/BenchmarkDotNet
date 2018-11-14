@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Tests.Mathematics.StatisticalTesting
                 119.721076854462, 113.813867732564
             };
 
-            Check(x, y, t, u, pValue);
+            Check(x, y, new AbsoluteThreshold(t), u, pValue);
         }
 
         [Theory]
@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Tests.Mathematics.StatisticalTesting
                 97.5524729768301, 117.961786925524, 142.32225043168, 85.9508305239065
             };
 
-            Check(x, y, t, u, pValue);
+            Check(x, y, new AbsoluteThreshold(t), u, pValue);
         }
 
         [Theory]
@@ -83,7 +83,7 @@ namespace BenchmarkDotNet.Tests.Mathematics.StatisticalTesting
                 134.162738650882, 138.128111355384, 163.306156590866, 133.37466051387, 141.733740469802, 153.328995694082, 154.841803368071, 120.244223151518
             };
 
-            Check(x, y, t, u, pValue);
+            Check(x, y, new AbsoluteThreshold(t), u, pValue);
         }
 
         [Theory]
@@ -111,7 +111,7 @@ namespace BenchmarkDotNet.Tests.Mathematics.StatisticalTesting
                 121.186685876309
             };
 
-            Check(x, y, t, u, pValue);
+            Check(x, y, new AbsoluteThreshold(t), u, pValue);
         }
 
         [Theory]
@@ -149,7 +149,7 @@ namespace BenchmarkDotNet.Tests.Mathematics.StatisticalTesting
                 12.0351035219699, 10.3910736245928, 11.504955123298, 9.28299132092666,
                 10.2155409916205, 10.1490924058235, 8.58579235005337, 11.0361226068923
             };
-            Check(x, y, t, u, pValue);
+            Check(x, y, new AbsoluteThreshold(t), u, pValue);
         }
 
         [Theory]
@@ -211,13 +211,32 @@ namespace BenchmarkDotNet.Tests.Mathematics.StatisticalTesting
                 347.4562, 347.3834, 349.0502, 350.6191, 347.4489, 348.6910
             };
 
-            Check(x, y, t, u, pValue);
+            Check(x, y, new AbsoluteThreshold(t), u, pValue);
+        }
+
+        [Theory]
+        [InlineData(0.1, 0, 0)] //I don't know u and pValue values
+        public void Issue_948(double t, double u, double pValue)
+        {
+            double[] x =
+            {
+                117.428150690794, 114.372210364342, 113.014660415649, 112.944919220209, 112.383144277334, 112.360203094482, 111.301456588507, 110.338494982719,
+                116.107656214237, 115.510661094189, 114.018304386139, 118.674752711058, 110.82060939908, 110.29270001173, 111.751715534925, 112.928226778507,
+                109.582877969742, 112.403332518339, 115.566637580395
+            };
+            double[] y =
+            {
+                87.7416295671463, 88.7655491733551, 88.2931792974472, 88.481253298521, 90.3308806920052, 90.3109546351433, 89.6487628591061, 88.9729374647141,
+                89.3410451281071, 88.1987927174568, 88.7037609219551, 89.2515526676178, 87.8502615296841, 87.7515925955772
+            };
+
+            Check(x, y, new RelativeThreshold(t), u, pValue);
         }
 
         [AssertionMethod]
-        private void Check(double[] x, double[] y, double t, double u, double pValue)
+        private void Check(double[] x, double[] y, Threshold t, double u, double pValue)
         {
-            var result = MannWhitneyTest.Instance.IsGreater(x, y, new AbsoluteThreshold(t));
+            var result = MannWhitneyTest.Instance.IsGreater(x, y, t);
             output.WriteLine("Ux      = " + result.Ux);
             output.WriteLine("Uy      = " + result.Uy);
             output.WriteLine("p-value = " + result.PValue);
