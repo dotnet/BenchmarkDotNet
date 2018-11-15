@@ -139,6 +139,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("buildTimeout", Required = false, HelpText = "Build timeout in seconds.")]
         public int? TimeOutInSeconds { get; set; }
 
+        [Option("stopOnFirstError", Required = false, Default = false, HelpText = "Stop on first error.")]
+        public bool StopOnFirstError { get; set; }
+
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any(); 
 
         [Usage(ApplicationAlias = "")]

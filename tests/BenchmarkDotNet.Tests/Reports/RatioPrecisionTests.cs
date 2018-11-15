@@ -89,7 +89,7 @@ namespace BenchmarkDotNet.Tests.Reports
                     new Measurement(1, IterationMode.Workload, IterationStage.Result, 5, 1, measurementValue),
                     new Measurement(1, IterationMode.Workload, IterationStage.Result, 6, 1, measurementValue),
                 };
-            return new BenchmarkReport(benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default, Array.Empty<Metric>());
+            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default, Array.Empty<Metric>());
         }
 
         private static IEnumerable<BenchmarkCase> CreateBenchmarks(IConfig config) =>
