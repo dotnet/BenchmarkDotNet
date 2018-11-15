@@ -58,16 +58,16 @@ namespace BenchmarkDotNet.Diagnosers
         {
             try
             {
-                var benchmarkDotNetCoreAssembly = typeof(DefaultConfig).GetTypeInfo().Assembly;
+                var benchmarkDotNetAssembly = typeof(DefaultConfig).GetTypeInfo().Assembly;
 
-                var diagnosticsAssembly = LoadDiagnosticsAssembly(benchmarkDotNetCoreAssembly);
+                var diagnosticsAssembly = Assembly.Load(new AssemblyName(DiagnosticAssemblyName));
 
-                if (diagnosticsAssembly.GetName().Version != benchmarkDotNetCoreAssembly.GetName().Version)
+                if (diagnosticsAssembly.GetName().Version != benchmarkDotNetAssembly.GetName().Version)
                 {
                     string errorMsg =
                         $"Unable to load: {DiagnosticAssemblyFileName} version {diagnosticsAssembly.GetName().Version}" +
                         Environment.NewLine +
-                        $"Does not match: {Path.GetFileName(benchmarkDotNetCoreAssembly.Location)} version {benchmarkDotNetCoreAssembly.GetName().Version}";
+                        $"Does not match: {Path.GetFileName(benchmarkDotNetAssembly.Location)} version {benchmarkDotNetAssembly.GetName().Version}";
                     ConsoleLogger.Default.WriteLineError(errorMsg);
                 }
                 else
@@ -92,24 +92,6 @@ namespace BenchmarkDotNet.Diagnosers
                 MemoryDiagnoser.Default,
                 DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig())
             };
-        }
-
-        private static Assembly LoadDiagnosticsAssembly(Assembly benchmarkDotNetCoreAssembly)
-        {
-            // it not enough to just install NuGet to be "referenced", the project has to consume the dll for real to be on the referenced assembly list
-            var referencedAssemblyName = Assembly.GetEntryAssembly()?.GetReferencedAssemblies().SingleOrDefault(name => name.Name == DiagnosticAssemblyName);
-            if (referencedAssemblyName != default(AssemblyName))
-                return Assembly.Load(referencedAssemblyName);
-
-            // we use the location of BenchmarkDotNet.dll, because it should be in the same folder
-            string directoryName = new FileInfo(benchmarkDotNetCoreAssembly.Location).DirectoryName
-                ?? throw new DirectoryNotFoundException(benchmarkDotNetCoreAssembly.Location);
-            string diagnosticAssemblyBinPath = Path.Combine(directoryName, DiagnosticAssemblyFileName);
-            if (File.Exists(diagnosticAssemblyBinPath))
-                return Assembly.LoadFile(diagnosticAssemblyBinPath);
-
-            // Assembly.LoadFrom(fileName) searches in current directory, not bin, but it's our last chance
-            return Assembly.LoadFrom(DiagnosticAssemblyFileName);
         }
 
         private static IDiagnoser CreateDiagnoser(Assembly loadedAssembly, string typeName)
