@@ -47,6 +47,23 @@ namespace BenchmarkDotNet.Tests.Analysers
         }
         
         [Fact]
+        public void CanCompareDifferentSampleSizes()
+        {
+            var @base = new[] { 10.0, 10.01, 10.02, 10.0, 10.03, 10.02, 9.99, 9.98, 10.0, 10.02 };
+            var diff = @base
+                .Skip(1) // we skip one element to make sure the sample size is different
+                .Select(value => value * 1.03).ToArray();
+            
+            var summary = CreateSummary(@base, diff);
+            var sut = new RegressionAnalyser(new RelativeThreshold(0.02));
+
+            var conclusion = sut.Analyse(summary).Single();
+            
+            Assert.Equal(ConclusionKind.Error, conclusion.Kind);
+            Assert.Contains("Slower", conclusion.Message);
+        }
+        
+        [Fact]
         public void ImprovementsreDetected()
         {
             var @base = new[] { 10.0, 10.01, 10.02, 10.0, 10.03, 10.02, 9.99, 9.98, 10.0, 10.02 };
@@ -87,7 +104,7 @@ namespace BenchmarkDotNet.Tests.Analysers
             var measurements = values
                 .Select((value, index) => new Measurement(1, IterationMode.Workload, IterationStage.Result, index + 1, 1, value))
                 .ToList();
-            return new BenchmarkReport(benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default, Array.Empty<Metric>());
+            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default, Array.Empty<Metric>());
         }
 
         [ClrJob(baseline: true), CoreJob]

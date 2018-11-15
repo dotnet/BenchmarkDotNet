@@ -29,11 +29,6 @@ namespace BenchmarkDotNet.Analysers
                 var x = summary[baseline].ResultStatistics.GetOriginalValues().ToArray();
                 var y = summary[diff].ResultStatistics.GetOriginalValues().ToArray();
 
-                if (x.Length > y.Length)
-                    x = x.Take(y.Length).ToArray();
-                else if (y.Length > x.Length)
-                    y = y.Take(x.Length).ToArray();
-                
                 var mannWhitneyTestResult = StatisticalTestHelper.CalculateTost(MannWhitneyTest.Instance, x, y, Threshold);
                 var welchTestResult = StatisticalTestHelper.CalculateTost(WelchTest.Instance, x, y, Threshold);
 
