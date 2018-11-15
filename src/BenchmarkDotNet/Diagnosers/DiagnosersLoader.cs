@@ -6,7 +6,6 @@ using System.Threading;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
-using Microsoft.Extensions.DependencyModel;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -59,16 +58,16 @@ namespace BenchmarkDotNet.Diagnosers
         {
             try
             {
-                var benchmarkDotNetCoreAssembly = typeof(DefaultConfig).GetTypeInfo().Assembly;
+                var benchmarkDotNetAssembly = typeof(DefaultConfig).GetTypeInfo().Assembly;
 
-                var diagnosticsAssembly = LoadDiagnosticsAssembly(benchmarkDotNetCoreAssembly);
+                var diagnosticsAssembly = Assembly.Load(new AssemblyName(DiagnosticAssemblyName));
 
-                if (diagnosticsAssembly.GetName().Version != benchmarkDotNetCoreAssembly.GetName().Version)
+                if (diagnosticsAssembly.GetName().Version != benchmarkDotNetAssembly.GetName().Version)
                 {
                     string errorMsg =
                         $"Unable to load: {DiagnosticAssemblyFileName} version {diagnosticsAssembly.GetName().Version}" +
                         Environment.NewLine +
-                        $"Does not match: {Path.GetFileName(benchmarkDotNetCoreAssembly.Location)} version {benchmarkDotNetCoreAssembly.GetName().Version}";
+                        $"Does not match: {Path.GetFileName(benchmarkDotNetAssembly.Location)} version {benchmarkDotNetAssembly.GetName().Version}";
                     ConsoleLogger.Default.WriteLineError(errorMsg);
                 }
                 else
@@ -93,30 +92,6 @@ namespace BenchmarkDotNet.Diagnosers
                 MemoryDiagnoser.Default,
                 DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig())
             };
-        }
-
-        private static Assembly LoadDiagnosticsAssembly(Assembly benchmarkDotNetCoreAssembly)
-        {
-            // We couldn't use Assembly.GetEntryAssembly()?.GetReferencedAssemblies() because
-            // it not enough to just install NuGet to be "referenced", the project has to consume the dll for real to be on the referenced assembly list
-            // So we use DependencyContext that reads *.deps.json file that contains all referenced assembly. 
-            var inCompileLibraries = DependencyContext.Default.CompileLibraries.Any(l => l.Name.Equals(DiagnosticAssemblyName, StringComparison.OrdinalIgnoreCase));
-            var inRuntimeLibraries = DependencyContext.Default.RuntimeLibraries.Any(l => l.Name.Equals(DiagnosticAssemblyName, StringComparison.OrdinalIgnoreCase));
-
-            if (inCompileLibraries || inRuntimeLibraries)
-            {
-                return Assembly.Load(new AssemblyName(DiagnosticAssemblyName));
-            }
-
-            // we use the location of BenchmarkDotNet.dll, because it should be in the same folder
-            string directoryName = new FileInfo(benchmarkDotNetCoreAssembly.Location).DirectoryName
-                ?? throw new DirectoryNotFoundException(benchmarkDotNetCoreAssembly.Location);
-            string diagnosticAssemblyBinPath = Path.Combine(directoryName, DiagnosticAssemblyFileName);
-            if (File.Exists(diagnosticAssemblyBinPath))
-                return Assembly.LoadFile(diagnosticAssemblyBinPath);
-
-            // Assembly.LoadFrom(fileName) searches in current directory, not bin, but it's our last chance
-            return Assembly.LoadFrom(DiagnosticAssemblyFileName);
         }
 
         private static IDiagnoser CreateDiagnoser(Assembly loadedAssembly, string typeName)
