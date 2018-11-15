@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             foreach (var provider in Config.Providers)
             {
-                TraceEventSession.EnableProvider(provider.providerName, provider.providerLevel, provider.keywords, provider.options);
+                TraceEventSession.EnableProvider(provider.providerGuid, provider.providerLevel, provider.keywords, provider.options);
             }
 
             return this;
@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         
         protected EtwProfilerConfig Config { get; }
 
-        private string FilePath { get; }
+        internal string FilePath { get; }
 
         protected Session(string sessionName, DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime)
         {

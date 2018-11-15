@@ -50,6 +50,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
 
         public IReadOnlyDictionary<BenchmarkCase, PmcStats> Results => ImmutableDictionary<BenchmarkCase, PmcStats>.Empty;
+
+        internal IReadOnlyDictionary<BenchmarkCase, string> BenchmarkToEtlFile => benchmarkToEtlFile;
         
         private DateTime CreationTime { get; }
 
