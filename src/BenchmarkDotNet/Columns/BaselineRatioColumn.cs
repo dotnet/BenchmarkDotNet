@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Columns
             }
         }
 
-        protected override string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, Statistics current, bool isBaseline)
+        internal override string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, Statistics current, bool isBaseline)
         {
             var ratio = GetRatioStatistics(current, baseline);
             if (ratio == null)

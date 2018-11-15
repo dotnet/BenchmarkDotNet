@@ -5,6 +5,7 @@ using System.Linq;
 using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Mathematics.StatisticalTesting;
 using BenchmarkDotNet.Portability;
 using CommandLine;
 using CommandLine.Text;
@@ -141,6 +142,15 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [Option("stopOnFirstError", Required = false, Default = false, HelpText = "Stop on first error.")]
         public bool StopOnFirstError { get; set; }
+        
+        [Option("statisticalTest", Required = false, HelpText = "Statistical Test Kind: MannWhitney (recommended) or Welch")]
+        public StatisticalTestKind StatisticalTest { get; set; }
+        
+        [Option("thresholdUnit", Required = false, HelpText = "Threshold unit for Statistical Test, possible values are: Ratio, Nanoseconds, Microseconds, Milliseconds, Seconds, Minutes.")]
+        public ThresholdUnit ThresholdUnit { get; set; }
+        
+        [Option("thresholdValue", Required = false, HelpText = "Threshold value for Statistical Test. Example: 0.05 is 5%")]
+        public double? ThresholdValue { get; set; }
 
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any(); 
 
@@ -168,6 +178,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return new Example("Run selected benchmarks once per iteration", longName, new CommandLineOptions { RunOncePerIteration = true });
                 yield return new Example("Run selected benchmarks 100 times per iteration. Perform single warmup iteration and 5 actual workload iterations", longName, new CommandLineOptions { InvocationCount = 100, WarmupIterationCount = 1, IterationCount = 5});
                 yield return new Example("Run selected benchmarks 250ms per iteration. Perform from 9 to 15 iterations", longName, new CommandLineOptions { IterationTimeInMiliseconds = 250, MinIterationCount = 9, MaxIterationCount = 15});
+                yield return new Example("Run MannWhitney test with relative ratio of 5% for all benchmarks for .NET Core 2.0 (base) vs .NET Core 2.1 (diff). .NET Core 2.0 will be baseline because it was first.", longName, 
+                    new CommandLineOptions { Filters = new [] { "*"}, Runtimes = new[] { "netcoreapp2.0", "netcoreapp2.1" }, StatisticalTest = StatisticalTestKind.MannWhitney, ThresholdUnit = Mathematics.StatisticalTesting.ThresholdUnit.Ratio, ThresholdValue = 0.05 });
             }
         }
 

@@ -18,6 +18,7 @@ using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Mathematics.StatisticalTesting;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CoreRun;
@@ -174,6 +175,13 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return false;
                 }
 
+            if ((options.StatisticalTest != StatisticalTestKind.NotSet || options.ThresholdUnit != ThresholdUnit.NotSet || options.ThresholdValue.HasValue)
+                && !(options.StatisticalTest != StatisticalTestKind.NotSet && options.ThresholdUnit != ThresholdUnit.NotSet && options.ThresholdValue.HasValue))
+            {
+                logger.WriteLineError("To use Statistical Test you need to provide all 3 parameters: --statisticalTest, --thresholdUnit and --thresholdValue. Use --help to see examples.");
+                return false;
+            }
+
             return true;
         }
 
@@ -204,6 +212,8 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             if (options.DisplayAllStatistics)
                 config.Add(StatisticColumn.AllStatistics);
+            if (options.StatisticalTest != StatisticalTestKind.NotSet && options.ThresholdUnit != ThresholdUnit.NotSet && options.ThresholdValue.HasValue)
+                config.Add(new StatisticalTestColumn(options.StatisticalTest, Threshold.Create(options.ThresholdUnit, options.ThresholdValue.Value)));
 
             if (options.ArtifactsDirectory != null)
                 config.ArtifactsPath = options.ArtifactsDirectory.FullName;

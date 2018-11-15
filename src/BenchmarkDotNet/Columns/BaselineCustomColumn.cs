@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Columns
             return GetValue(summary, benchmarkCase, baselineStat, currentStat, isBaseline);
         }
 
-        protected abstract string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, Statistics current, bool isBaseline);
+        internal abstract string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, Statistics current, bool isBaseline);
 
         public bool IsAvailable(Summary summary) => summary.HasBaselines();
         public bool AlwaysShow => true;
