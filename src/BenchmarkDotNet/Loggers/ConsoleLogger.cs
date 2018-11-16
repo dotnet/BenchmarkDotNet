@@ -22,19 +22,19 @@ namespace BenchmarkDotNet.Loggers
 
         public void WriteLine(LogKind logKind, string text) => Write(logKind, Console.WriteLine, text);
 
+        public void Flush() { }
+
         private void Write(LogKind logKind, Action<string> write, string text)
         {
-            ConsoleHandler.EnsureInitialized(this);
-
             try
             {
-                ConsoleHandler.SetForegroundColor(GetColor(logKind));
+                ConsoleColorHandler.SetForegroundColor(GetColor(logKind));
                 
                 write(text);
             }
             finally
             {
-                ConsoleHandler.RestoreForegroundColor();
+                ConsoleColorHandler.RestoreForegroundColor();
             }
         }
 
