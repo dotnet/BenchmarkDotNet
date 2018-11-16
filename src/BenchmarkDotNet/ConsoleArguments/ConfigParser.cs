@@ -175,7 +175,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return false;
                 }
 
-            if (!string.IsNullOrEmpty(options.Threshold) && !Threshold.TryParse(options.Threshold, out _))
+            if (!string.IsNullOrEmpty(options.StatisticalTestThreshold) && !Threshold.TryParse(options.StatisticalTestThreshold, out _))
             {
                 logger.WriteLineError("Invalid Threshold for Statistical Test. Use --help to see examples.");
                 return false;
@@ -211,8 +211,8 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             if (options.DisplayAllStatistics)
                 config.Add(StatisticColumn.AllStatistics);
-            if (!string.IsNullOrEmpty(options.Threshold) && Threshold.TryParse(options.Threshold, out var threshold))
-                config.Add(new StatisticalTestColumn(options.StatisticalTest, threshold));
+            if (!string.IsNullOrEmpty(options.StatisticalTestThreshold) && Threshold.TryParse(options.StatisticalTestThreshold, out var threshold))
+                config.Add(new StatisticalTestColumn(StatisticalTestKind.MannWhitney, threshold));
 
             if (options.ArtifactsDirectory != null)
                 config.ArtifactsPath = options.ArtifactsDirectory.FullName;

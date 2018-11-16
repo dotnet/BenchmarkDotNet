@@ -181,16 +181,14 @@ dotnet run -c Release -- --warmupCount 2
 
 ## Statistical Test
 
-To perform a Statistical Test and display the results in a dedicated column you need to provide:
+To perform a Mann–Whitney U Test and display the results in a dedicated column you need to provide the Threshold:
 
-
-* `--threshold` - Threshold for Statistical Test. Examples: 5%, 10ms, 100ns, 1s
-* `--statisticalTest`- Statistical Test Kind. MannWhitney (recommended) is the default. The other option is Welch..
+* `--statisticalTest`- Threshold for Statistical Test. Examples: 5%, 10ms, 100ns, 1s
 
 Example: run Mann–Whitney U test with relative ratio of 5% for all benchmarks for .NET Core 2.0 (base) vs .NET Core 2.1 (diff). .NET Core 2.0 will be baseline because it was first.
 
 ```log
-dotnet run -c Release -- --filter * --runtimes netcoreapp2.0 netcoreapp2.1 --threshold 5%
+dotnet run -c Release -- --filter * --runtimes netcoreapp2.0 netcoreapp2.1 --statisticalTest 5%
 ```
 
 ## More

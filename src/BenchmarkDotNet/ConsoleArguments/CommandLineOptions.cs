@@ -143,12 +143,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("stopOnFirstError", Required = false, Default = false, HelpText = "Stop on first error.")]
         public bool StopOnFirstError { get; set; }
         
-        [Option("statisticalTest", Required = false, Default = StatisticalTestKind.MannWhitney, HelpText = "Statistical Test Kind. MannWhitney (recommended) is the default. The other option is Welch.")]
-        public StatisticalTestKind StatisticalTest { get; set; }
+        [Option("statisticalTest", Required = false, HelpText = "Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s")]
+        public string StatisticalTestThreshold { get; set; }
         
-        [Option("threshold", Required = false, HelpText = "Threshold for Statistical Test. Examples: 5%, 10ms, 100ns, 1s")]
-        public string Threshold { get; set; }
-
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any(); 
 
         [Usage(ApplicationAlias = "")]
@@ -176,7 +173,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return new Example("Run selected benchmarks 100 times per iteration. Perform single warmup iteration and 5 actual workload iterations", longName, new CommandLineOptions { InvocationCount = 100, WarmupIterationCount = 1, IterationCount = 5});
                 yield return new Example("Run selected benchmarks 250ms per iteration. Perform from 9 to 15 iterations", longName, new CommandLineOptions { IterationTimeInMiliseconds = 250, MinIterationCount = 9, MaxIterationCount = 15});
                 yield return new Example("Run MannWhitney test with relative ratio of 5% for all benchmarks for .NET Core 2.0 (base) vs .NET Core 2.1 (diff). .NET Core 2.0 will be baseline because it was provided as first.", longName, 
-                    new CommandLineOptions { Filters = new [] { "*"}, Runtimes = new[] { "netcoreapp2.0", "netcoreapp2.1" }, Threshold = "5%" });
+                    new CommandLineOptions { Filters = new [] { "*"}, Runtimes = new[] { "netcoreapp2.0", "netcoreapp2.1" }, StatisticalTestThreshold = "5%" });
             }
         }
 
