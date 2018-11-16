@@ -18,6 +18,7 @@ using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Mathematics.StatisticalTesting;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CoreRun;
@@ -174,6 +175,12 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return false;
                 }
 
+            if (!string.IsNullOrEmpty(options.StatisticalTestThreshold) && !Threshold.TryParse(options.StatisticalTestThreshold, out _))
+            {
+                logger.WriteLineError("Invalid Threshold for Statistical Test. Use --help to see examples.");
+                return false;
+            }
+
             return true;
         }
 
@@ -182,7 +189,10 @@ namespace BenchmarkDotNet.ConsoleArguments
             var config = new ManualConfig();
 
             var baseJob = GetBaseJob(options, globalConfig);
-            config.Add(Expand(baseJob.UnfreezeCopy(), options).ToArray()); // UnfreezeCopy ensures that each of the expanded jobs will have it's own ID
+            var expanded = Expand(baseJob.UnfreezeCopy(), options).ToArray(); // UnfreezeCopy ensures that each of the expanded jobs will have it's own ID
+            if (expanded.Length > 1)
+                expanded[0] = expanded[0].AsBaseline(); // if the user provides multiple jobs, then the first one should be a baseline
+            config.Add(expanded); 
             if (config.GetJobs().IsEmpty() && baseJob != Job.Default)
                 config.Add(baseJob);
 
@@ -201,6 +211,8 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             if (options.DisplayAllStatistics)
                 config.Add(StatisticColumn.AllStatistics);
+            if (!string.IsNullOrEmpty(options.StatisticalTestThreshold) && Threshold.TryParse(options.StatisticalTestThreshold, out var threshold))
+                config.Add(new StatisticalTestColumn(StatisticalTestKind.MannWhitney, threshold));
 
             if (options.ArtifactsDirectory != null)
                 config.ArtifactsPath = options.ArtifactsDirectory.FullName;

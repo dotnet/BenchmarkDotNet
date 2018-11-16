@@ -179,6 +179,18 @@ Now, the default settings are: `WarmupCount=1` but you might still overwrite it 
 dotnet run -c Release -- --warmupCount 2
 ```
 
+## Statistical Test
+
+To perform a Mann–Whitney U Test and display the results in a dedicated column you need to provide the Threshold:
+
+* `--statisticalTest`- Threshold for Statistical Test. Examples: 5%, 10ms, 100ns, 1s
+
+Example: run Mann–Whitney U test with relative ratio of 5% for all benchmarks for .NET Core 2.0 (base) vs .NET Core 2.1 (diff). .NET Core 2.0 will be baseline because it was first.
+
+```log
+dotnet run -c Release -- --filter * --runtimes netcoreapp2.0 netcoreapp2.1 --statisticalTest 5%
+```
+
 ## More
 
 * `-j`, `--job` (Default: Default) Dry/Short/Medium/Long or Default
