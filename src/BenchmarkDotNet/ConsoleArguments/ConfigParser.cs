@@ -175,10 +175,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return false;
                 }
 
-            if ((options.StatisticalTest != StatisticalTestKind.NotSet || options.ThresholdUnit != ThresholdUnit.NotSet || options.ThresholdValue.HasValue)
-                && !(options.StatisticalTest != StatisticalTestKind.NotSet && options.ThresholdUnit != ThresholdUnit.NotSet && options.ThresholdValue.HasValue))
+            if (!string.IsNullOrEmpty(options.Threshold) && !Threshold.TryParse(options.Threshold, out _))
             {
-                logger.WriteLineError("To use Statistical Test you need to provide all 3 parameters: --statisticalTest, --thresholdUnit and --thresholdValue. Use --help to see examples.");
+                logger.WriteLineError("Invalid Threshold for Statistical Test. Use --help to see examples.");
                 return false;
             }
 
@@ -212,8 +211,8 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             if (options.DisplayAllStatistics)
                 config.Add(StatisticColumn.AllStatistics);
-            if (options.StatisticalTest != StatisticalTestKind.NotSet && options.ThresholdUnit != ThresholdUnit.NotSet && options.ThresholdValue.HasValue)
-                config.Add(new StatisticalTestColumn(options.StatisticalTest, Threshold.Create(options.ThresholdUnit, options.ThresholdValue.Value)));
+            if (!string.IsNullOrEmpty(options.Threshold) && Threshold.TryParse(options.Threshold, out var threshold))
+                config.Add(new StatisticalTestColumn(options.StatisticalTest, threshold));
 
             if (options.ArtifactsDirectory != null)
                 config.ArtifactsPath = options.ArtifactsDirectory.FullName;

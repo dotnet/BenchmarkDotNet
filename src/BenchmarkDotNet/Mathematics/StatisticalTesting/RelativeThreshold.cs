@@ -14,7 +14,8 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
         public override double GetValue(Statistics x) => x.Mean * ratio;
 
         public override bool IsZero() => Math.Abs(ratio) < 1e-9;
-        public override string ToString() => ratio * 100 + "%";
+
+        public override string ToString() => ratio * 100 + ThresholdUnit.Ratio.ToShortName();
 
         public bool Equals(RelativeThreshold other) => other != null && ratio.Equals(other.ratio);
 

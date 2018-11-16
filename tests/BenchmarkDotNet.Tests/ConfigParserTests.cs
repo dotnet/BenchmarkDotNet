@@ -284,8 +284,8 @@ namespace BenchmarkDotNet.Tests
         }
         
         [Theory]
-        [InlineData(StatisticalTestKind.MannWhitney, ThresholdUnit.Ratio, 0.05)]
-        [InlineData(StatisticalTestKind.Welch, ThresholdUnit.Ratio, 0.05)]
+        [InlineData(StatisticalTestKind.MannWhitney, ThresholdUnit.Ratio, 5)]
+        [InlineData(StatisticalTestKind.Welch, ThresholdUnit.Ratio, 5)]
         [InlineData(StatisticalTestKind.Welch, ThresholdUnit.Milliseconds, 10)]
         [InlineData(StatisticalTestKind.MannWhitney, ThresholdUnit.Milliseconds, 10)]
         public void CanUseStatisticalTestsToCompareFewDifferentRuntimes(StatisticalTestKind statisticalTestKind, ThresholdUnit thresholdUnit, double thresholdValue)
@@ -293,7 +293,7 @@ namespace BenchmarkDotNet.Tests
             var config = ConfigParser.Parse(new[]
             {
                 "--runtimes", "netcoreapp2.1", "netcoreapp2.2", 
-                "--statisticalTest", statisticalTestKind.ToString(), "--thresholdUnit", thresholdUnit.ToString(), "--thresholdValue", thresholdValue.ToString(CultureInfo.InvariantCulture)
+                "--statisticalTest", statisticalTestKind.ToString(), "--threshold", $"{thresholdValue.ToString(CultureInfo.InvariantCulture)}{thresholdUnit.ToShortName()}"
             }, new OutputLogger(Output)).config;
             
             var mockSummary = MockFactory.CreateSummary(config);
@@ -304,17 +304,35 @@ namespace BenchmarkDotNet.Tests
             var statisticalTestColumn = config.GetColumnProviders().SelectMany(columnProvider => columnProvider.GetColumns(mockSummary)).OfType<StatisticalTestColumn>().Single();
 
             Assert.Equal(statisticalTestKind, statisticalTestColumn.Kind);
-            Assert.Equal(Threshold.Create(thresholdUnit, thresholdValue), statisticalTestColumn.Threshold);
+            Assert.Equal(Threshold.Create(thresholdUnit, thresholdUnit == ThresholdUnit.Ratio ? thresholdValue / 100.0 : thresholdValue), statisticalTestColumn.Threshold);
+        }
+        
+        [Fact]
+        public void MannWhitneyIsTheDefaultStatisticalTests()
+        {
+            var config = ConfigParser.Parse(new[]
+            {
+                "--runtimes", "netcoreapp2.1", "netcoreapp2.2", 
+                "--threshold", "5%" // --statisticalTest not specified!
+            }, new OutputLogger(Output)).config;
+            
+            var mockSummary = MockFactory.CreateSummary(config);
+
+            Assert.True(config.GetJobs().First().Meta.Baseline);
+            Assert.False(config.GetJobs().Last().Meta.Baseline);
+
+            var statisticalTestColumn = config.GetColumnProviders().SelectMany(columnProvider => columnProvider.GetColumns(mockSummary)).OfType<StatisticalTestColumn>().Single();
+
+            Assert.Equal(StatisticalTestKind.MannWhitney, statisticalTestColumn.Kind);
+            Assert.Equal(Threshold.Create(ThresholdUnit.Ratio, 0.05), statisticalTestColumn.Threshold);
         }
 
         [Fact]
-        public void NotSpecyfingAllThreeStatisticalTestParametersMeansFailure()
+        public void SpecyfingInvalidThresholdMeansFailure()
         {
-            Assert.False(ConfigParser.Parse(new[] {"--statisticalTest", StatisticalTestKind.MannWhitney.ToString(), "--thresholdUnit", ThresholdUnit.Ratio.ToString(), "--thresholdValue" }, new OutputLogger(Output)).isSuccess);
-            Assert.False(ConfigParser.Parse(new[] {"--statisticalTest", StatisticalTestKind.MannWhitney.ToString(), "--thresholdUnit", ThresholdUnit.Ratio.ToString() }, new OutputLogger(Output)).isSuccess);
-            Assert.False(ConfigParser.Parse(new[] {"--statisticalTest", StatisticalTestKind.MannWhitney.ToString(), "--thresholdUnit" }, new OutputLogger(Output)).isSuccess);
-            Assert.False(ConfigParser.Parse(new[] {"--statisticalTest", StatisticalTestKind.MannWhitney.ToString() }, new OutputLogger(Output)).isSuccess);
-            Assert.False(ConfigParser.Parse(new[] {"--statisticalTest" }, new OutputLogger(Output)).isSuccess);
+            Assert.False(ConfigParser.Parse(new[] {"--statisticalTest", StatisticalTestKind.MannWhitney.ToString(), "--threshold", "not a number" }, new OutputLogger(Output)).isSuccess);
+            Assert.False(ConfigParser.Parse(new[] {"--statisticalTest", StatisticalTestKind.Welch.ToString(), "--threshold", "not a number" }, new OutputLogger(Output)).isSuccess);
+            Assert.False(ConfigParser.Parse(new[] {"--threshold", "not a number" }, new OutputLogger(Output)).isSuccess);
         }
 
         [Fact]

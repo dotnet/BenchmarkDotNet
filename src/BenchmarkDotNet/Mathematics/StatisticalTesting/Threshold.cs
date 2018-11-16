@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using BenchmarkDotNet.Horology;
 
 namespace BenchmarkDotNet.Mathematics.StatisticalTesting
@@ -21,5 +22,28 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
 
         public abstract double GetValue(Statistics x);
         public abstract bool IsZero();
+
+        public static bool TryParse(string input, out Threshold parsed)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                parsed = default;
+                return false;
+            }
+            
+            var trimmed = input.Trim().ToLowerInvariant();
+            var number = new string(trimmed.TakeWhile(c => char.IsDigit(c) || c == '.' || c == ',').ToArray());
+            var unit = new string(trimmed.SkipWhile(c => char.IsDigit(c) || c == '.' || c == ',' || char.IsWhiteSpace(c)).ToArray());
+
+            if (!double.TryParse(number, out var parsedValue) || !ThresholdUnitExtensions.ShortNameToUnit.TryGetValue(unit, out var parsedUnit))
+            {
+                parsed = default;
+                return false;
+            }
+
+            parsed = parsedUnit == ThresholdUnit.Ratio ? Create(ThresholdUnit.Ratio, parsedValue / 100.0) : Create(parsedUnit, parsedValue);
+
+            return true;
+        }
     }
 }
