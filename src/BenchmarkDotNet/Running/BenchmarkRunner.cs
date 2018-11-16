@@ -66,6 +66,8 @@ namespace BenchmarkDotNet.Running
 
         [PublicAPI] public static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos, [CanBeNull] IConfig commonSettingsConfig)
         {
+            if (commonSettingsConfig == null)
+                commonSettingsConfig = DefaultConfig.Instance;
             var resolver = DefaultResolver;
             var artifactsToCleanup = new List<string>();
             string title = GetTitle(benchmarkRunInfos);
