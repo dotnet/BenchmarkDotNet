@@ -12,6 +12,8 @@ namespace BenchmarkDotNet.Loggers
 
         public virtual void WriteLine(LogKind logKind, string text) => builder.AppendLine(text);
 
+        public void Flush() { }
+
         public void ClearLog() => builder.Clear();
 
         public string GetLog() => builder.ToString();

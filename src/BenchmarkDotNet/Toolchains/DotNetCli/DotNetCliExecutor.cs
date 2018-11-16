@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 return new ExecuteResult(false, -1, Array.Empty<string>(), Array.Empty<string>());
             }
 
-            ConsoleHandler.EnsureInitialized(executeParameters.Logger);
+            ConsoleExitHandler.Instance.Logger = executeParameters.Logger;
 
             try
             {
@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
             finally
             {
-                ConsoleHandler.Instance.ClearProcess();
+                ConsoleExitHandler.Instance.Process = null;
 
                 executeParameters.Diagnoser?.Handle(
                     HostSignal.AfterProcessExit, 
@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             {
                 var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId, config);
 
-                ConsoleHandler.Instance.SetProcess(process);
+                ConsoleExitHandler.Instance.Process = process;
 
                 diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId, config));
 

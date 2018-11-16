@@ -7,5 +7,7 @@
         void WriteLine();
 
         void WriteLine(LogKind logKind, string text);
+
+        void Flush();
     }
 }
