@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "ConsoleApp1": {
-      "commandName": "Project",
-      "commandLineArgs": "--filter * --profiler ETW"
-    }
-  }
-}
