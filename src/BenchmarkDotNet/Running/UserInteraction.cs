@@ -54,10 +54,10 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineError("The filter that you have provided returned 0 benchmarks.");
             logger.WriteLineInfo("Please remember that the filter is applied to full benchmark name: `namespace.typeName.methodName`.");
             
-            var misspellingBenchmarkFilter = new MisspellingsFinder(allTypes);
+            var correctionSuggester = new CorrectionsSuggester(allTypes);
             foreach (string userFilter in userFilters)
             {
-                var displayNames = misspellingBenchmarkFilter.Find(userFilter);
+                var displayNames = correctionSuggester.SuggestFor(userFilter);
                 logger.WriteLine($"You must be misspelled in '{userFilter}'. Suggestions:");
                 foreach (string displayName in displayNames.Take(40))
                     logger.WriteLineInfo($"\t{displayName}");                    
