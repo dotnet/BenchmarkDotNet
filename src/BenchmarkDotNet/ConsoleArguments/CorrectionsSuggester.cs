@@ -9,12 +9,14 @@ namespace BenchmarkDotNet.ConsoleArguments
 {
     public class CorrectionsSuggester
     {
-        private static int PossibleMisspellingCount => 3;
+        // note This is a heuristic value, we suppose that user can make three or fewer typos.
+        private static int PossibleTyposCount => 3;
         private readonly HashSet<string> possibleBenchmarkNames = new HashSet<string>();
         private readonly HashSet<string> allBenchmarkNames = new HashSet<string>();
 
         public CorrectionsSuggester(IReadOnlyList<Type> types)
         {
+            var benchmarkNames = new HashSet<string>();
             foreach (var type in types)
             {
                 var namesCollection = type.GetMethods()
@@ -23,27 +25,31 @@ namespace BenchmarkDotNet.ConsoleArguments
                         ? type.GetDisplayName() 
                         : type.FullName)}.{methodInfo.Name}")
                     .ToArray();
-                allBenchmarkNames.AddRange(namesCollection);
+                benchmarkNames.AddRange(namesCollection);
                 
                 var names = namesCollection.Select(name => name.Split('.', '+')).SelectMany(GetAllPartialNames);
                 possibleBenchmarkNames.AddRange(names);
             }
+
+            allBenchmarkNames.AddRange(benchmarkNames.OrderBy(name => name));
         }
 
         public string[] SuggestFor([NotNull] string userInput)
         {
             if (userInput == null)
                 throw new ArgumentNullException(nameof(userInput));
+            
             var calculator = new LevenshteinDistanceCalculator();
-            var possibleMisspellings = possibleBenchmarkNames
+            return possibleBenchmarkNames
                 .Select(name => (name: name, distance: calculator.Calculate(userInput, name)))
-                .Where(tuple => tuple.distance <= PossibleMisspellingCount)
+                .Where(tuple => tuple.distance <= PossibleTyposCount)
                 .OrderBy(tuple => tuple.distance)
                 .ThenBy(tuple => tuple.name)
                 .Select(tuple => tuple.name)
                 .ToArray();
-            return possibleMisspellings.Length != 0 ? possibleMisspellings : allBenchmarkNames.OrderBy(name => name).ToArray();
         }
+
+        public string[] GetAllBenchmarkNames() => allBenchmarkNames.ToArray();
 
         private static IEnumerable<string> GetAllPartialNames(string[] nameParts)
         {

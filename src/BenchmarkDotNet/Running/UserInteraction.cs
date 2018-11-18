@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Extensions;
@@ -51,16 +52,31 @@ namespace BenchmarkDotNet.Running
 
         public void PrintWrongFilterInfo(IReadOnlyList<Type> allTypes, ILogger logger, string[] userFilters)
         {
-            logger.WriteLineError("The filter that you have provided returned 0 benchmarks.");
-            logger.WriteLineInfo("Please remember that the filter is applied to full benchmark name: `namespace.typeName.methodName`.");
-            
             var correctionSuggester = new CorrectionsSuggester(allTypes);
-            foreach (string userFilter in userFilters)
+
+            var filterToNames = userFilters
+                .Select(userFilter => (userFilter: userFilter, suggestedBenchmarkNames: correctionSuggester.SuggestFor(userFilter)))
+                .ToArray();
+            
+            foreach ((string userFilter, var suggestedBenchmarkNames) in filterToNames)
+                if (!suggestedBenchmarkNames.IsEmpty())
+                {
+                    logger.WriteLine($"You must have made a typo in '{userFilter}'. Suggestions:");
+                    foreach (string displayName in suggestedBenchmarkNames.Take(40))
+                        logger.WriteLineInfo($"\t{displayName}");
+                }
+
+            string unknownBenchmarks = string.Join("', '", filterToNames
+                .Where(u => u.suggestedBenchmarkNames.IsEmpty())
+                .Select(u => u.userFilter));
+            
+            if (!string.IsNullOrEmpty(unknownBenchmarks))
             {
-                var displayNames = correctionSuggester.SuggestFor(userFilter);
-                logger.WriteLine($"You must be misspelled in '{userFilter}'. Suggestions:");
-                foreach (string displayName in displayNames.Take(40))
-                    logger.WriteLineInfo($"\t{displayName}");                    
+                logger.WriteLineError($"Filters '{unknownBenchmarks}' that you have provided returned 0 benchmarks.");
+                logger.WriteLineInfo("Please remember that the filter is applied to full benchmark name: `namespace.typeName.methodName`.");
+
+                foreach (string displayName in correctionSuggester.GetAllBenchmarkNames().Take(40))
+                    logger.WriteLineInfo($"\t{displayName}");
             }
 
             logger.WriteLineInfo("To print all available benchmarks use `--list flat` or `--list tree`.");
