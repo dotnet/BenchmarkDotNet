@@ -251,8 +251,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 baseJob = baseJob.WithMinWarmupCount(options.MinWarmupIterationCount.Value);
             if (options.MaxWarmupIterationCount.HasValue)
                 baseJob = baseJob.WithMaxWarmupCount(options.MaxWarmupIterationCount.Value);
-            if (options.IterationTimeInMiliseconds.HasValue)
-                baseJob = baseJob.WithIterationTime(TimeInterval.FromMilliseconds(options.IterationTimeInMiliseconds.Value));
+            if (options.IterationTimeInMilliseconds.HasValue)
+                baseJob = baseJob.WithIterationTime(TimeInterval.FromMilliseconds(options.IterationTimeInMilliseconds.Value));
             if (options.IterationCount.HasValue)
                 baseJob = baseJob.WithIterationCount(options.IterationCount.Value);
             if (options.MinIterationCount.HasValue)
