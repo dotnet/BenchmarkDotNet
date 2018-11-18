@@ -53,6 +53,7 @@ namespace BenchmarkDotNet.Toolchains
             finally
             {
                 ConsoleExitHandler.Instance.Process = null;
+                ConsoleExitHandler.Instance.Logger = null;
 
                 diagnoser?.Handle(HostSignal.AfterProcessExit, new DiagnoserActionParameters(null, benchmarkCase, benchmarkId, config));
             }

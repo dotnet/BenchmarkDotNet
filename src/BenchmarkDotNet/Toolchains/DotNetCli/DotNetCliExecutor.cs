@@ -50,6 +50,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             finally
             {
                 ConsoleExitHandler.Instance.Process = null;
+                ConsoleExitHandler.Instance.Logger = null;
 
                 executeParameters.Diagnoser?.Handle(
                     HostSignal.AfterProcessExit, 
