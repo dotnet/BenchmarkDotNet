@@ -85,12 +85,13 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
             var config = ManualConfig.CreateEmpty().With(logger);
 
+            const string filter = "WRONG";
             var summaries = BenchmarkSwitcher
                 .FromTypes(new [] { typeof(ClassA), typeof(ClassB) })
-                .Run(new[] { "--filter", "WRONG" }, config);
+                .Run(new[] { "--filter", filter }, config);
             
             Assert.Empty(summaries);
-            Assert.Contains("The filter that you have provided returned 0 benchmarks.", logger.GetLog());
+            Assert.Contains($"The filter '{filter}' that you have provided returned 0 benchmarks.", logger.GetLog());
         }
         
         [Fact]
