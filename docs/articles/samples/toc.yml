@@ -96,3 +96,5 @@
   href: IntroDeferredExecution.md
 - name: IntroNuGet
   href: IntroNuGet.md
+- name: IntroStopOnFirstError
+  href: IntroStopOnFirstError.md

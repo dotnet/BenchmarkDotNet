@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Diagnosers;
@@ -9,7 +12,9 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Mathematics.StatisticalTesting;
 using BenchmarkDotNet.Tests.Loggers;
+using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CoreRun;
@@ -271,12 +276,44 @@ namespace BenchmarkDotNet.Tests
         {
             var config = ConfigParser.Parse(new[] { "--runtimes", "net46", "MONO", "netcoreapp3.0", "CoreRT"}, new OutputLogger(Output)).config;
 
+            Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as basline
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is ClrRuntime));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is MonoRuntime));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRtRuntime));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRtRuntime));
         }
         
+        [Theory]
+        [InlineData(ThresholdUnit.Ratio, 5)]
+        [InlineData(ThresholdUnit.Milliseconds, 10)]
+        public void CanUseStatisticalTestsToCompareFewDifferentRuntimes(ThresholdUnit thresholdUnit, double thresholdValue)
+        {
+            var config = ConfigParser.Parse(new[]
+            {
+                "--runtimes", "netcoreapp2.1", "netcoreapp2.2", 
+                "--statisticalTest", $"{thresholdValue.ToString(CultureInfo.InvariantCulture)}{thresholdUnit.ToShortName()}"
+            }, new OutputLogger(Output)).config;
+            
+            var mockSummary = MockFactory.CreateSummary(config);
+
+            Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as basline
+            Assert.False(config.GetJobs().Last().Meta.Baseline);
+
+            var statisticalTestColumn = config.GetColumnProviders().SelectMany(columnProvider => columnProvider.GetColumns(mockSummary)).OfType<StatisticalTestColumn>().Single();
+
+            Assert.Equal(StatisticalTestKind.MannWhitney, statisticalTestColumn.Kind);
+            Assert.Equal(Threshold.Create(thresholdUnit, thresholdUnit == ThresholdUnit.Ratio ? thresholdValue / 100.0 : thresholdValue), statisticalTestColumn.Threshold);
+        }
+
+        [Fact]
+        public void SpecyfingInvalidStatisticalTestsThresholdMeansFailure()
+        {
+            Assert.False(ConfigParser.Parse(new[] {"--statisticalTest", "not a number" }, new OutputLogger(Output)).isSuccess);
+            Assert.False(ConfigParser.Parse(new[] {"--statisticalTest", "1unknownUnit" }, new OutputLogger(Output)).isSuccess);
+            Assert.False(ConfigParser.Parse(new[] {"--statisticalTest", "1 unknownUnit" }, new OutputLogger(Output)).isSuccess);
+            Assert.False(ConfigParser.Parse(new[] {"--statisticalTest", "%1" }, new OutputLogger(Output)).isSuccess); // reverse order - a typo
+        }
+
         [Fact]
         public void CanParseHardwareCounters()
         {
@@ -286,19 +323,19 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetHardwareCounters().Where(counter => counter == HardwareCounter.CacheMisses));
             Assert.Single(config.GetHardwareCounters().Where(counter => counter == HardwareCounter.InstructionRetired));
         }
-        
+
         [Fact]
         public void InvalidHardwareCounterNameMeansFailure()
         {
             Assert.False(ConfigParser.Parse(new[] { "--counters", "WRONG_NAME" }, new OutputLogger(Output)).isSuccess);
         }
-        
+
         [Fact]
         public void TooManyHardwareCounterNameMeansFailure()
         {
             Assert.False(ConfigParser.Parse(new[] { "--counters", "Timer+TotalIssues+BranchInstructions+CacheMisses" }, new OutputLogger(Output)).isSuccess);
         }
-        
+
         [Fact]
         public void CanParseDisassemblerWithCustomRecursiveDepth()
         {

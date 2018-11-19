@@ -59,11 +59,15 @@ namespace BenchmarkDotNet.Running
             {
                 var argumentsDefinitions = GetArgumentsDefinitions(target.WorkloadMethod, target.Type).ToArray();
 
+                var parameterInstanceses = 
+                    (from parameterInstance in parameterInstancesList
+                    from argumentDefinition in argumentsDefinitions
+                    select new ParameterInstances(parameterInstance.Items.Concat(argumentDefinition.Items).ToArray())).ToArray();
+
                 benchmarks.AddRange(
                     from job in jobs
-                    from parameterInstance in parameterInstancesList
-                    from argumentDefinition in argumentsDefinitions
-                    select BenchmarkCase.Create(target, job, new ParameterInstances(parameterInstance.Items.Concat(argumentDefinition.Items).ToArray()))
+                    from parameterInstance in parameterInstanceses
+                    select BenchmarkCase.Create(target, job, parameterInstance)
                 );
             }
 

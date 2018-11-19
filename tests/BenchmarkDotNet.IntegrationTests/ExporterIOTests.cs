@@ -153,7 +153,8 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private BenchmarkReport CreateReport(BenchmarkCase benchmarkCase)
         {
-            return new BenchmarkReport(benchmarkCase: benchmarkCase,
+            return new BenchmarkReport(success: true,
+                                       benchmarkCase: benchmarkCase,
                                        generateResult: null,
                                        buildResult: null,
                                        executeResults: null,

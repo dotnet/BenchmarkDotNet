@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Columns
         public override string Id => nameof(StatisticalTestColumn) + "." + Kind + "." + Threshold + "." + (ShowPValues ? "WithDetails" : "WithoutDetails");
         public override string ColumnName => $"{Kind}({Threshold.ToString().Replace(" ", "")}){(ShowPValues ? "/p-values" : "")}";
 
-        protected override string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, Statistics current, bool isBaseline)
+        internal override string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, Statistics current, bool isBaseline)
         {
             var x = baseline.GetOriginalValues().ToArray();
             var y = current.GetOriginalValues().ToArray();

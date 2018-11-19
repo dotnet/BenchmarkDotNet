@@ -113,7 +113,7 @@ namespace BenchmarkDotNet.Mathematics.Histograms
 
                     if (left > lower + binSize * margin)
                         points.Insert(pointIndex + 1, left);
-                    else if (right < upper - binSize * margin)
+                    else if (right < upper - binSize * margin && right > lower + binSize * margin)
                     {
                         points.Insert(pointIndex + 1, right);
                         processedPointCount++;

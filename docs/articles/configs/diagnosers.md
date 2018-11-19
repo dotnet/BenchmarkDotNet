@@ -26,6 +26,8 @@ The current Diagnosers are:
   Please see Adam Sitnik's [blog post](http://adamsitnik.com/Disassembly-Diagnoser/) for all the details.
 - ETW Profiler (`EtwProfiler`).
   It allows you to not only benchmark, but also profile the code. It's using TraceEvent, which internally uses ETW and exports all the information to a trace file. The trace file contains all of the stack traces captured by the profiler, PDBs to resolve symbols for both native and managed code and captured GC, JIT and CLR events. Please use one of the free tools: PerfView or Windows Performance Analyzer to analyze and visualize the data from trace file. You can find this diagnoser in a separate package with diagnosers for Windows (`BenchmarkDotNet.Diagnostics.Windows`): [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/)
+- Concurrency Visualizer Profiler (`ConcurrencyVisualizerProfiler`)
+  It uses `EtwProfiler` to profile the code using ETW and create not only `.etl` file but also a CVTrace file which can be opened by Concurrency Visualizer plugin from Visual Studio.
 
 ## Usage
 
@@ -57,6 +59,7 @@ You can also use one of the following attributes (apply it on a class that conta
 [InliningDiagnoser]
 [TailCallDiagnoser]
 [EtwProfiler]
+[ConcurrencyVisualizerProfiler]
 ```
 
 In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on.
@@ -73,7 +76,7 @@ In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on.
     * No Hyper-V (Virtualization) support
     * Requires running as Admin (ETW Kernel Session)
     * No `InProcessToolchain` support ([#394](https://github.com/dotnet/BenchmarkDotNet/issues/394))
-* EtwProfiler:
+* EtwProfiler, ConcurrencyVisualizerProfiler:
     * Windows only
     * Requires running as Admin (ETW Kernel Session)
     * No `InProcessToolchain` support ([#394](https://github.com/dotnet/BenchmarkDotNet/issues/394))

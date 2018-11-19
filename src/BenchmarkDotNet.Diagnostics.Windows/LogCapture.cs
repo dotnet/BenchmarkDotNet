@@ -33,6 +33,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             WriteLine();
         }
 
+        public void Flush() { }
+
         public void Clear() => capturedOutput.Clear();
     }
 
