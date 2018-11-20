@@ -1,0 +1,258 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Sample: IntroArgumentsSource | BenchmarkDotNet </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Sample: IntroArgumentsSource | BenchmarkDotNet ">
+    <meta name="generator" content="docfx 2.37.1.0">
+    
+    <link rel="shortcut icon" href="../../logo/icon-32.png">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    <meta property="docfx:rel" content="../../">
+    
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  
+      ga('create', 'UA-41419012-6', 'auto');
+      ga('send', 'pageview');
+  
+    </script>
+    <!-- /Google Analytics -->
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function (d, w, c) {
+            (w[c] = w[c] || []).push(function() {
+                try {
+                    w.yaCounter40812449 = new Ya.Metrika({
+                        id:40812449,
+                        clickmap:true,
+                        trackLinks:true,
+                        accurateTrackBounce:true
+                    });
+                } catch(e) { }
+            });
+  
+            var n = d.getElementsByTagName("script")[0],
+                s = d.createElement("script"),
+                f = function () { n.parentNode.insertBefore(s, n); };
+            s.type = "text/javascript";
+            s.async = true;
+            s.src = "https://mc.yandex.ru/metrika/watch.js";
+  
+            if (w.opera == "[object Opera]") {
+                d.addEventListener("DOMContentLoaded", f, false);
+            } else { f(); }
+        })(document, window, "yandex_metrika_callbacks");
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo/icon.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list"></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="BenchmarkDotNet.Samples.IntroArgumentsSource">
+<h2 id="sample-introargumentssource">Sample: IntroArgumentsSource</h2>
+
+<p>In case you want to use a lot of values, you should use
+<a class="xref" href="../../api/BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.html"><code>[ArgumentsSource]</code></a>.</p>
+<p>You can mark one or several fields or properties in your class by the
+<a class="xref" href="../../api/BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.html"><code>[ArgumentsSource]</code></a> attribute.
+In this attribute, you have to specify the name of public method/property which is going to provide the values
+(something that implements <code>IEnumerable</code>).
+The source must be within benchmarked type!</p>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroArgumentsSource.cs">using System;
+using System.Collections.Generic;
+using System.Threading;
+using BenchmarkDotNet.Attributes;
+
+namespace BenchmarkDotNet.Samples
+{
+    public class IntroArgumentsSource
+    {
+        [Benchmark]
+        [ArgumentsSource(nameof(Numbers))]
+        public double ManyArguments(double x, double y) =&gt; Math.Pow(x, y);
+
+        public IEnumerable&lt;object[]&gt; Numbers() // for multiple arguments it's an IEnumerable of array of objects (object[])
+        {
+            yield return new object[] { 1.0, 1.0 };
+            yield return new object[] { 2.0, 2.0 };
+            yield return new object[] { 4.0, 4.0 };
+            yield return new object[] { 10.0, 10.0 };
+        }
+
+        [Benchmark]
+        [ArgumentsSource(nameof(TimeSpans))]
+        public void SingleArgument(TimeSpan time) =&gt; Thread.Sleep(time);
+
+        public IEnumerable&lt;object&gt; TimeSpans() // for single argument it's an IEnumerable of objects (object)
+        {
+            yield return TimeSpan.FromMilliseconds(10);
+            yield return TimeSpan.FromMilliseconds(100);
+        }
+    }
+}
+</code></pre><h3 id="output">Output</h3>
+<pre><code class="lang-markdown">| Method |  x |  y |      Mean |     Error |    StdDev |
+|------- |--- |--- |----------:|----------:|----------:|
+|    Pow |  1 |  1 |  9.360 ns | 0.0190 ns | 0.0149 ns |
+|    Pow |  2 |  2 | 40.624 ns | 0.3413 ns | 0.3192 ns |
+|    Pow |  4 |  4 | 40.537 ns | 0.0560 ns | 0.0524 ns |
+|    Pow | 10 | 10 | 40.395 ns | 0.3274 ns | 0.3063 ns |
+</code></pre>
+<h3 id="another-example">Another example</h3>
+<p>If the values are complex types you need to override <code>ToString</code> method to change the display names used in the results.</p>
+<pre><code class="lang-cs">[DryJob]
+public class WithNonPrimitiveArgumentsSource
+{
+    [Benchmark]
+    [ArgumentsSource(nameof(NonPrimitive))]
+    public void Simple(SomeClass someClass, SomeStruct someStruct)
+    {
+        for (int i = 0; i &lt; someStruct.RangeEnd; i++)
+            Console.WriteLine($&quot;// array.Values[{i}] = {someClass.Values[i]}&quot;);
+    }
+
+    public IEnumerable&lt;object[]&gt; NonPrimitive()
+    {
+        yield return new object[] { new SomeClass(Enumerable.Range(0, 10).ToArray()), new SomeStruct(10) };
+        yield return new object[] { new SomeClass(Enumerable.Range(0, 15).ToArray()), new SomeStruct(15) };
+    }
+
+    public class SomeClass
+    {
+        public SomeClass(int[] initialValues) =&gt; Values = initialValues.Select(val =&gt; val * 2).ToArray();
+
+        public int[] Values { get; }
+
+        public override string ToString() =&gt; $&quot;{Values.Length} items&quot;;
+    }
+
+    public struct SomeStruct
+    {
+        public SomeStruct(int rangeEnd) =&gt; RangeEnd = rangeEnd;
+
+        public int RangeEnd { get; }
+
+        public override string ToString() =&gt; $&quot;{RangeEnd}&quot;;
+    }
+}
+</code></pre>
+<pre><code class="lang-markdown">| Method | someClass | someStruct |     Mean | Error |
+|------- |---------- |----------- |---------:|------:|
+| Simple |  10 items |         10 | 887.2 us |    NA |
+| Simple |  15 items |         15 | 963.1 us |    NA |
+</code></pre>
+<h3 id="links">Links</h3>
+<ul>
+<li><a class="xref" href="../features/parameterization.html">Parameterization</a></li>
+<li>The permanent link to this sample: <a class="xref" href="IntroArgumentsSource.html">Sample: IntroArgumentsSource</a></li>
+</ul>
+<hr>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/articles/samples/IntroArgumentsSource.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

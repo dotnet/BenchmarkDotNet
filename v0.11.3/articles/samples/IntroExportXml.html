@@ -1,0 +1,263 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Sample: IntroExportXml | BenchmarkDotNet </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Sample: IntroExportXml | BenchmarkDotNet ">
+    <meta name="generator" content="docfx 2.37.1.0">
+    
+    <link rel="shortcut icon" href="../../logo/icon-32.png">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    <meta property="docfx:rel" content="../../">
+    
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  
+      ga('create', 'UA-41419012-6', 'auto');
+      ga('send', 'pageview');
+  
+    </script>
+    <!-- /Google Analytics -->
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function (d, w, c) {
+            (w[c] = w[c] || []).push(function() {
+                try {
+                    w.yaCounter40812449 = new Ya.Metrika({
+                        id:40812449,
+                        clickmap:true,
+                        trackLinks:true,
+                        accurateTrackBounce:true
+                    });
+                } catch(e) { }
+            });
+  
+            var n = d.getElementsByTagName("script")[0],
+                s = d.createElement("script"),
+                f = function () { n.parentNode.insertBefore(s, n); };
+            s.type = "text/javascript";
+            s.async = true;
+            s.src = "https://mc.yandex.ru/metrika/watch.js";
+  
+            if (w.opera == "[object Opera]") {
+                d.addEventListener("DOMContentLoaded", f, false);
+            } else { f(); }
+        })(document, window, "yandex_metrika_callbacks");
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo/icon.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list"></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="BenchmarkDotNet.Samples.IntroExportXml">
+<h2 id="sample-introexportxml">Sample: IntroExportXml</h2>
+
+<p>BenchmarkDotNet has a set of XML exporters. You can customize the following properties of these exporters:</p>
+<ul>
+<li><code>fileNameSuffix</code>: a string which be placed in the end of target file name.</li>
+<li><code>indentXml</code>=<code>false</code>/<code>true</code>: should we format xml or not.</li>
+<li><code>excludeMeasurements</code>=<code>false</code>/<code>true</code>: should we exclude detailed information about measurements or not
+(the final summary with statistics will be in the XML file anyway).</li>
+</ul>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroExportXml.cs">using System.Threading;
+using BenchmarkDotNet.Attributes;
+
+namespace BenchmarkDotNet.Samples
+{
+    [DryJob]
+    [XmlExporterAttribute.Brief]
+    [XmlExporterAttribute.Full]
+    [XmlExporterAttribute.BriefCompressed]
+    [XmlExporterAttribute.FullCompressed]
+    [XmlExporter(&quot;-custom&quot;, indentXml: true, excludeMeasurements: true)]
+    public class IntroExportXml
+    {
+        [Benchmark] public void Sleep10() =&gt; Thread.Sleep(10);
+        [Benchmark] public void Sleep20() =&gt; Thread.Sleep(20);
+    }
+}
+</code></pre><h3 id="output">Output</h3>
+<p>Example of <code>IntroXmlExport-report-brief.xml</code>:</p>
+<pre><code class="lang-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;Summary&gt;
+  &lt;Title&gt;IntroXmlExport&lt;/Title&gt;
+  &lt;HostEnvironmentInfo&gt;
+    &lt;BenchmarkDotNetCaption&gt;BenchmarkDotNet&lt;/BenchmarkDotNetCaption&gt;
+    &lt;BenchmarkDotNetVersion&gt;0.10.9.20170805-develop&lt;/BenchmarkDotNetVersion&gt;
+    &lt;OsVersion&gt;Windows 10 Redstone 2 (10.0.15063)&lt;/OsVersion&gt;
+    &lt;ProcessorName&gt;Intel Core i7-3770K CPU 3.50GHz (Ivy Bridge)&lt;/ProcessorName&gt;
+    &lt;ProcessorCount&gt;8&lt;/ProcessorCount&gt;
+    &lt;RuntimeVersion&gt;.NET Framework 4.7 (CLR 4.0.30319.42000)&lt;/RuntimeVersion&gt;
+    &lt;Architecture&gt;64bit&lt;/Architecture&gt;
+    &lt;HasAttachedDebugger&gt;False&lt;/HasAttachedDebugger&gt;
+    &lt;HasRyuJit&gt;True&lt;/HasRyuJit&gt;
+    &lt;Configuration&gt;RELEASE&lt;/Configuration&gt;
+    &lt;JitModules&gt;clrjit-v4.7.2101.1&lt;/JitModules&gt;
+    &lt;DotNetSdkVersion&gt;1.0.4&lt;/DotNetSdkVersion&gt;
+    &lt;ChronometerFrequency&gt;
+      &lt;Hertz&gt;3410220&lt;/Hertz&gt;
+    &lt;/ChronometerFrequency&gt;
+    &lt;HardwareTimerKind&gt;Tsc&lt;/HardwareTimerKind&gt;
+  &lt;/HostEnvironmentInfo&gt;
+  &lt;Benchmarks&gt;
+    &lt;Benchmark&gt;
+      &lt;DisplayInfo&gt;IntroXmlExport.Sleep10: DefaultJob&lt;/DisplayInfo&gt;
+      &lt;Namespace&gt;BenchmarkDotNet.Samples.Intro&lt;/Namespace&gt;
+      &lt;Type&gt;IntroXmlExport&lt;/Type&gt;
+      &lt;Method&gt;Sleep10&lt;/Method&gt;
+      &lt;MethodTitle&gt;Sleep10&lt;/MethodTitle&gt;
+      &lt;Statistics&gt;
+        &lt;N&gt;15&lt;/N&gt;
+        &lt;Min&gt;10989865.8785938&lt;/Min&gt;
+        &lt;LowerFence&gt;10989836.0967969&lt;/LowerFence&gt;
+        &lt;Q1&gt;10990942.6053125&lt;/Q1&gt;
+        &lt;Median&gt;10991249.5870313&lt;/Median&gt;
+        &lt;Mean&gt;10991270.0524583&lt;/Mean&gt;
+        &lt;Q3&gt;10991680.2776563&lt;/Q3&gt;
+        &lt;UpperFence&gt;10992786.7861719&lt;/UpperFence&gt;
+        &lt;Max&gt;10992115.5501563&lt;/Max&gt;
+        &lt;InterquartileRange&gt;737.672343749553&lt;/InterquartileRange&gt;
+        &lt;StandardError&gt;148.484545262958&lt;/StandardError&gt;
+        &lt;Variance&gt;330714.902729213&lt;/Variance&gt;
+        &lt;StandardDeviation&gt;575.07817097262&lt;/StandardDeviation&gt;
+        &lt;Skewness&gt;-0.67759778074187&lt;/Skewness&gt;
+        &lt;Kurtosis&gt;3.14296703520386&lt;/Kurtosis&gt;
+        &lt;ConfidenceInterval&gt;
+          &lt;N&gt;15&lt;/N&gt;
+          &lt;Mean&gt;10991270.0524583&lt;/Mean&gt;
+          &lt;StandardError&gt;148.484545262958&lt;/StandardError&gt;
+          &lt;Level&gt;L999&lt;/Level&gt;
+          &lt;Margin&gt;614.793505974065&lt;/Margin&gt;
+          &lt;Lower&gt;10990655.2589524&lt;/Lower&gt;
+          &lt;Upper&gt;10991884.8459643&lt;/Upper&gt;
+        &lt;/ConfidenceInterval&gt;
+        &lt;Percentiles&gt;
+          &lt;P0&gt;10989865.8785938&lt;/P0&gt;
+          &lt;P25&gt;10991027.3689063&lt;/P25&gt;
+          &lt;P50&gt;10991249.5870313&lt;/P50&gt;
+          &lt;P67&gt;10991489.490875&lt;/P67&gt;
+          &lt;P80&gt;10991696.7722187&lt;/P80&gt;
+          &lt;P85&gt;10991754.5031875&lt;/P85&gt;
+          &lt;P90&gt;10991933.1939688&lt;/P90&gt;
+          &lt;P95&gt;10992067.441125&lt;/P95&gt;
+          &lt;P100&gt;10992115.5501563&lt;/P100&gt;
+        &lt;/Percentiles&gt;
+      &lt;/Statistics&gt;
+    &lt;/Benchmark&gt;
+  &lt;/Benchmarks&gt;
+&lt;/Summary&gt;
+</code></pre>
+<h3 id="links">Links</h3>
+<ul>
+<li><a class="xref" href="../configs/exporters.html">Exporters</a></li>
+<li>The permanent link to this sample: <a class="xref" href="IntroExportXml.html">Sample: IntroExportXml</a></li>
+</ul>
+<hr>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/articles/samples/IntroExportXml.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,722 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class HostEnvironmentInfo
+   | BenchmarkDotNet </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class HostEnvironmentInfo
+   | BenchmarkDotNet ">
+    <meta name="generator" content="docfx 2.37.1.0">
+    
+    <link rel="shortcut icon" href="../logo/icon-32.png">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  
+      ga('create', 'UA-41419012-6', 'auto');
+      ga('send', 'pageview');
+  
+    </script>
+    <!-- /Google Analytics -->
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function (d, w, c) {
+            (w[c] = w[c] || []).push(function() {
+                try {
+                    w.yaCounter40812449 = new Ya.Metrika({
+                        id:40812449,
+                        clickmap:true,
+                        trackLinks:true,
+                        accurateTrackBounce:true
+                    });
+                } catch(e) { }
+            });
+  
+            var n = d.getElementsByTagName("script")[0],
+                s = d.createElement("script"),
+                f = function () { n.parentNode.insertBefore(s, n); };
+            s.type = "text/javascript";
+            s.async = true;
+            s.src = "https://mc.yandex.ru/metrika/watch.js";
+  
+            if (w.opera == "[object Opera]") {
+                d.addEventListener("DOMContentLoaded", f, false);
+            } else { f(); }
+        })(document, window, "yandex_metrika_callbacks");
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo/icon.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list"></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo">
+  
+  
+  <h1 id="BenchmarkDotNet_Environments_HostEnvironmentInfo" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo" class="text-break">Class HostEnvironmentInfo
+  </h1>
+  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><a class="xref" href="BenchmarkDotNet.Environments.BenchmarkEnvironmentInfo.html">BenchmarkEnvironmentInfo</a></div>
+    <div class="level2"><span class="xref">HostEnvironmentInfo</span></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.BenchmarkEnvironmentInfo.html#BenchmarkDotNet_Environments_BenchmarkEnvironmentInfo_Architecture">BenchmarkEnvironmentInfo.Architecture</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.BenchmarkEnvironmentInfo.html#BenchmarkDotNet_Environments_BenchmarkEnvironmentInfo_Configuration">BenchmarkEnvironmentInfo.Configuration</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.BenchmarkEnvironmentInfo.html#BenchmarkDotNet_Environments_BenchmarkEnvironmentInfo_RuntimeVersion">BenchmarkEnvironmentInfo.RuntimeVersion</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.BenchmarkEnvironmentInfo.html#BenchmarkDotNet_Environments_BenchmarkEnvironmentInfo_HasAttachedDebugger">BenchmarkEnvironmentInfo.HasAttachedDebugger</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.BenchmarkEnvironmentInfo.html#BenchmarkDotNet_Environments_BenchmarkEnvironmentInfo_HasRyuJit">BenchmarkEnvironmentInfo.HasRyuJit</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.BenchmarkEnvironmentInfo.html#BenchmarkDotNet_Environments_BenchmarkEnvironmentInfo_JitInfo">BenchmarkEnvironmentInfo.JitInfo</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.BenchmarkEnvironmentInfo.html#BenchmarkDotNet_Environments_BenchmarkEnvironmentInfo_IsServerGC">BenchmarkEnvironmentInfo.IsServerGC</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.BenchmarkEnvironmentInfo.html#BenchmarkDotNet_Environments_BenchmarkEnvironmentInfo_IsConcurrentGC">BenchmarkEnvironmentInfo.IsConcurrentGC</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.BenchmarkEnvironmentInfo.html#BenchmarkDotNet_Environments_BenchmarkEnvironmentInfo_GCAllocationQuantum">BenchmarkEnvironmentInfo.GCAllocationQuantum</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.BenchmarkEnvironmentInfo.html#BenchmarkDotNet_Environments_BenchmarkEnvironmentInfo_InDocker">BenchmarkEnvironmentInfo.InDocker</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.BenchmarkEnvironmentInfo.html#BenchmarkDotNet_Environments_BenchmarkEnvironmentInfo_GetConfigurationFlag">BenchmarkEnvironmentInfo.GetConfigurationFlag()</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.BenchmarkEnvironmentInfo.html#BenchmarkDotNet_Environments_BenchmarkEnvironmentInfo_GetDebuggerFlag">BenchmarkEnvironmentInfo.GetDebuggerFlag()</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.BenchmarkEnvironmentInfo.html#BenchmarkDotNet_Environments_BenchmarkEnvironmentInfo_GetGcServerFlag">BenchmarkEnvironmentInfo.GetGcServerFlag()</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.BenchmarkEnvironmentInfo.html#BenchmarkDotNet_Environments_BenchmarkEnvironmentInfo_GetGcConcurrentFlag">BenchmarkEnvironmentInfo.GetGcConcurrentFlag()</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.BenchmarkEnvironmentInfo.html#BenchmarkDotNet_Environments_BenchmarkEnvironmentInfo_Validate_BenchmarkDotNet_Jobs_Job_">BenchmarkEnvironmentInfo.Validate(Job)</a>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Environments.html">BenchmarkDotNet.Environments</a></h6>
+  <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
+  <h5 id="BenchmarkDotNet_Environments_HostEnvironmentInfo_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class HostEnvironmentInfo : BenchmarkEnvironmentInfo</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+  </h3>
+  
+  
+  <a id="BenchmarkDotNet_Environments_HostEnvironmentInfo__ctor_" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.#ctor*"></a>
+  <h4 id="BenchmarkDotNet_Environments_HostEnvironmentInfo__ctor" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.#ctor">HostEnvironmentInfo()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected HostEnvironmentInfo()</code></pre>
+  </div>
+  <h3 id="fields">Fields
+  </h3>
+  
+  
+  <h4 id="BenchmarkDotNet_Environments_HostEnvironmentInfo_BenchmarkDotNetCaption" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.BenchmarkDotNetCaption">BenchmarkDotNetCaption</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string BenchmarkDotNetCaption = &quot;BenchmarkDotNet&quot;</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="BenchmarkDotNet_Environments_HostEnvironmentInfo_MainCultureInfo" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.MainCultureInfo">MainCultureInfo</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly CultureInfo MainCultureInfo</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Globalization.CultureInfo</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+  </h3>
+  
+  
+  <a id="BenchmarkDotNet_Environments_HostEnvironmentInfo_AntivirusProducts_" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.AntivirusProducts*"></a>
+  <h4 id="BenchmarkDotNet_Environments_HostEnvironmentInfo_AntivirusProducts" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.AntivirusProducts">AntivirusProducts</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Lazy&lt;ICollection&lt;Antivirus&gt;&gt; AntivirusProducts { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Lazy</span>&lt;<span class="xref">System.Collections.Generic.ICollection</span>&lt;<a class="xref" href="BenchmarkDotNet.Portability.Antivirus.html">Antivirus</a>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Environments_HostEnvironmentInfo_BenchmarkDotNetVersion_" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.BenchmarkDotNetVersion*"></a>
+  <h4 id="BenchmarkDotNet_Environments_HostEnvironmentInfo_BenchmarkDotNetVersion" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.BenchmarkDotNetVersion">BenchmarkDotNetVersion</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string BenchmarkDotNetVersion { get; protected set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Environments_HostEnvironmentInfo_ChronometerFrequency_" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.ChronometerFrequency*"></a>
+  <h4 id="BenchmarkDotNet_Environments_HostEnvironmentInfo_ChronometerFrequency" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.ChronometerFrequency">ChronometerFrequency</h4>
+  <div class="markdown level1 summary"><p>The frequency of the timer as the number of ticks per second.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Frequency ChronometerFrequency { get; protected set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Horology.Frequency.html">Frequency</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Environments_HostEnvironmentInfo_ChronometerResolution_" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.ChronometerResolution*"></a>
+  <h4 id="BenchmarkDotNet_Environments_HostEnvironmentInfo_ChronometerResolution" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.ChronometerResolution">ChronometerResolution</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TimeInterval ChronometerResolution { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Horology.TimeInterval.html">TimeInterval</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Environments_HostEnvironmentInfo_CpuInfo_" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.CpuInfo*"></a>
+  <h4 id="BenchmarkDotNet_Environments_HostEnvironmentInfo_CpuInfo" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.CpuInfo">CpuInfo</h4>
+  <div class="markdown level1 summary"><p>is expensive to call (1s)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Lazy&lt;CpuInfo&gt; CpuInfo { get; protected set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Lazy</span>&lt;<a class="xref" href="BenchmarkDotNet.Portability.Cpu.CpuInfo.html">CpuInfo</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Environments_HostEnvironmentInfo_DotNetSdkVersion_" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.DotNetSdkVersion*"></a>
+  <h4 id="BenchmarkDotNet_Environments_HostEnvironmentInfo_DotNetSdkVersion" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.DotNetSdkVersion">DotNetSdkVersion</h4>
+  <div class="markdown level1 summary"><p>.NET Core SDK version
+<remarks>It's expensive to call (creates new process by calling <code>dotnet --version</code>)</remarks></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Lazy&lt;string&gt; DotNetSdkVersion { get; protected set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Lazy</span>&lt;<span class="xref">System.String</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Environments_HostEnvironmentInfo_FallbackLogger_" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.FallbackLogger*"></a>
+  <h4 id="BenchmarkDotNet_Environments_HostEnvironmentInfo_FallbackLogger" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.FallbackLogger">FallbackLogger</h4>
+  <div class="markdown level1 summary"><p>Logger to use when there's no config available.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static ILogger FallbackLogger { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Environments_HostEnvironmentInfo_HardwareTimerKind_" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.HardwareTimerKind*"></a>
+  <h4 id="BenchmarkDotNet_Environments_HostEnvironmentInfo_HardwareTimerKind" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.HardwareTimerKind">HardwareTimerKind</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public HardwareTimerKind HardwareTimerKind { get; protected set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Horology.HardwareTimerKind.html">HardwareTimerKind</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Environments_HostEnvironmentInfo_IsMonoInstalled_" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.IsMonoInstalled*"></a>
+  <h4 id="BenchmarkDotNet_Environments_HostEnvironmentInfo_IsMonoInstalled" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.IsMonoInstalled">IsMonoInstalled</h4>
+  <div class="markdown level1 summary"><p>checks if Mono is installed
+<remarks>It's expensive to call (creates new process by calling <code>mono --version</code>)</remarks></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Lazy&lt;bool&gt; IsMonoInstalled { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Lazy</span>&lt;<span class="xref">System.Boolean</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Environments_HostEnvironmentInfo_JitModules_" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.JitModules*"></a>
+  <h4 id="BenchmarkDotNet_Environments_HostEnvironmentInfo_JitModules" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.JitModules">JitModules</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string JitModules { get; protected set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Environments_HostEnvironmentInfo_OsVersion_" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.OsVersion*"></a>
+  <h4 id="BenchmarkDotNet_Environments_HostEnvironmentInfo_OsVersion" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.OsVersion">OsVersion</h4>
+  <div class="markdown level1 summary"><p>Could be expensive</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Lazy&lt;string&gt; OsVersion { get; protected set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Lazy</span>&lt;<span class="xref">System.String</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Environments_HostEnvironmentInfo_VirtualMachineHypervisor_" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.VirtualMachineHypervisor*"></a>
+  <h4 id="BenchmarkDotNet_Environments_HostEnvironmentInfo_VirtualMachineHypervisor" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.VirtualMachineHypervisor">VirtualMachineHypervisor</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Lazy&lt;VirtualMachineHypervisor&gt; VirtualMachineHypervisor { get; protected set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Lazy</span>&lt;<a class="xref" href="BenchmarkDotNet.Portability.VirtualMachineHypervisor.html">VirtualMachineHypervisor</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="BenchmarkDotNet_Environments_HostEnvironmentInfo_GetCurrent_" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.GetCurrent*"></a>
+  <h4 id="BenchmarkDotNet_Environments_HostEnvironmentInfo_GetCurrent" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.GetCurrent">GetCurrent()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static HostEnvironmentInfo GetCurrent()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Environments.HostEnvironmentInfo.html">HostEnvironmentInfo</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Environments_HostEnvironmentInfo_GetInformation_" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.GetInformation*"></a>
+  <h4 id="BenchmarkDotNet_Environments_HostEnvironmentInfo_GetInformation" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.GetInformation">GetInformation()</h4>
+  <div class="markdown level1 summary"><p>Return string representation of CPU and environment configuration including BenchmarkDotNet, OS and .NET version</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string GetInformation()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Environments_HostEnvironmentInfo_IsDotNetCliInstalled_" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.IsDotNetCliInstalled*"></a>
+  <h4 id="BenchmarkDotNet_Environments_HostEnvironmentInfo_IsDotNetCliInstalled" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.IsDotNetCliInstalled">IsDotNetCliInstalled()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsDotNetCliInstalled()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Environments_HostEnvironmentInfo_ToFormattedString_" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.ToFormattedString*"></a>
+  <h4 id="BenchmarkDotNet_Environments_HostEnvironmentInfo_ToFormattedString" data-uid="BenchmarkDotNet.Environments.HostEnvironmentInfo.ToFormattedString">ToFormattedString()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override IEnumerable&lt;string&gt; ToFormattedString()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<span class="xref">System.String</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="BenchmarkDotNet.Environments.BenchmarkEnvironmentInfo.html#BenchmarkDotNet_Environments_BenchmarkEnvironmentInfo_ToFormattedString">BenchmarkEnvironmentInfo.ToFormattedString()</a></div>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

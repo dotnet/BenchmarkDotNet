@@ -1,0 +1,296 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Sample: IntroStatisticalTesting | BenchmarkDotNet </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Sample: IntroStatisticalTesting | BenchmarkDotNet ">
+    <meta name="generator" content="docfx 2.37.1.0">
+    
+    <link rel="shortcut icon" href="../../logo/icon-32.png">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    <meta property="docfx:rel" content="../../">
+    
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  
+      ga('create', 'UA-41419012-6', 'auto');
+      ga('send', 'pageview');
+  
+    </script>
+    <!-- /Google Analytics -->
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function (d, w, c) {
+            (w[c] = w[c] || []).push(function() {
+                try {
+                    w.yaCounter40812449 = new Ya.Metrika({
+                        id:40812449,
+                        clickmap:true,
+                        trackLinks:true,
+                        accurateTrackBounce:true
+                    });
+                } catch(e) { }
+            });
+  
+            var n = d.getElementsByTagName("script")[0],
+                s = d.createElement("script"),
+                f = function () { n.parentNode.insertBefore(s, n); };
+            s.type = "text/javascript";
+            s.async = true;
+            s.src = "https://mc.yandex.ru/metrika/watch.js";
+  
+            if (w.opera == "[object Opera]") {
+                d.addEventListener("DOMContentLoaded", f, false);
+            } else { f(); }
+        })(document, window, "yandex_metrika_callbacks");
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo/icon.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list"></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="BenchmarkDotNet.Samples.IntroStatisticalTesting">
+<h2 id="sample-introstatisticaltesting">Sample: IntroStatisticalTesting</h2>
+
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroStatisticalTesting.cs">using System.Threading;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Mathematics.StatisticalTesting;
+
+namespace BenchmarkDotNet.Samples
+{
+    [StatisticalTestColumn(StatisticalTestKind.Welch, ThresholdUnit.Microseconds, 1, true)]
+    [StatisticalTestColumn(StatisticalTestKind.MannWhitney, ThresholdUnit.Microseconds, 1, true)]
+    [StatisticalTestColumn(StatisticalTestKind.Welch, ThresholdUnit.Ratio, 0.03, true)]
+    [StatisticalTestColumn(StatisticalTestKind.MannWhitney, ThresholdUnit.Ratio, 0.03, true)]
+    [SimpleJob(warmupCount: 0, targetCount: 5)]
+    public class IntroStatisticalTesting
+    {
+        [Benchmark] public void Sleep50() =&gt; Thread.Sleep(50);
+        [Benchmark] public void Sleep97() =&gt; Thread.Sleep(97);
+        [Benchmark] public void Sleep99() =&gt; Thread.Sleep(99);
+        [Benchmark(Baseline = true)] public void Sleep100() =&gt; Thread.Sleep(100);
+        [Benchmark] public void Sleep101() =&gt; Thread.Sleep(101);
+        [Benchmark] public void Sleep103() =&gt; Thread.Sleep(103);
+        [Benchmark] public void Sleep150() =&gt; Thread.Sleep(150);
+    }
+}
+</code></pre><h3 id="output">Output</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">Error</th>
+<th style="text-align: right;">StdDev</th>
+<th style="text-align: right;">Ratio</th>
+<th>Welch(1us)/p-values</th>
+<th>Welch(3%)/p-values</th>
+<th>MannWhitney(1us)/p-values</th>
+<th>MannWhitney(3%)/p-values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sleep50</td>
+<td style="text-align: right;">53.13 ms</td>
+<td style="text-align: right;">0.5901 ms</td>
+<td style="text-align: right;">0.1532 ms</td>
+<td style="text-align: right;">0.51</td>
+<td>Faster: 1.0000/0.0000</td>
+<td>Faster: 1.0000/0.0000</td>
+<td>Faster: 1.0000/0.0040</td>
+<td>Faster: 1.0000/0.0040</td>
+</tr>
+<tr>
+<td>Sleep97</td>
+<td style="text-align: right;">100.07 ms</td>
+<td style="text-align: right;">0.9093 ms</td>
+<td style="text-align: right;">0.2361 ms</td>
+<td style="text-align: right;">0.97</td>
+<td>Faster: 1.0000/0.0000</td>
+<td>Same: 1.0000/0.1290</td>
+<td>Faster: 1.0000/0.0040</td>
+<td>Same: 1.0000/0.1111</td>
+</tr>
+<tr>
+<td>Sleep99</td>
+<td style="text-align: right;">102.23 ms</td>
+<td style="text-align: right;">2.4462 ms</td>
+<td style="text-align: right;">0.6353 ms</td>
+<td style="text-align: right;">0.99</td>
+<td>Faster: 0.9928/0.0072</td>
+<td>Same: 1.0000/0.9994</td>
+<td>Faster: 0.9960/0.0079</td>
+<td>Same: 1.0000/1.0000</td>
+</tr>
+<tr>
+<td>Sleep100</td>
+<td style="text-align: right;">103.34 ms</td>
+<td style="text-align: right;">0.8180 ms</td>
+<td style="text-align: right;">0.2124 ms</td>
+<td style="text-align: right;">1.00</td>
+<td>Base: 0.5029/0.5029</td>
+<td>Base: 1.0000/1.0000</td>
+<td>Base: 0.7262/0.7262</td>
+<td>Base: 1.0000/1.0000</td>
+</tr>
+<tr>
+<td>Sleep101</td>
+<td style="text-align: right;">103.73 ms</td>
+<td style="text-align: right;">2.1591 ms</td>
+<td style="text-align: right;">0.5607 ms</td>
+<td style="text-align: right;">1.00</td>
+<td>Same: 0.1041/0.8969</td>
+<td>Same: 0.9999/1.0000</td>
+<td>Same: 0.1111/0.9246</td>
+<td>Same: 1.0000/1.0000</td>
+</tr>
+<tr>
+<td>Sleep103</td>
+<td style="text-align: right;">106.21 ms</td>
+<td style="text-align: right;">1.2511 ms</td>
+<td style="text-align: right;">0.3249 ms</td>
+<td style="text-align: right;">1.03</td>
+<td>Slower: 0.0000/1.0000</td>
+<td>Same: 0.9447/1.0000</td>
+<td>Slower: 0.0040/1.0000</td>
+<td>Same: 0.9246/1.0000</td>
+</tr>
+<tr>
+<td>Sleep150</td>
+<td style="text-align: right;">153.16 ms</td>
+<td style="text-align: right;">3.4929 ms</td>
+<td style="text-align: right;">0.9071 ms</td>
+<td style="text-align: right;">1.48</td>
+<td>Slower: 0.0000/1.0000</td>
+<td>Slower: 0.0000/1.0000</td>
+<td>Slower: 0.0040/1.0000</td>
+<td>Slower: 0.0040/1.0000</td>
+</tr>
+</tbody>
+</table>
+<p>// * Legends *
+Mean                      : Arithmetic mean of all measurements
+Error                     : Half of 99.9% confidence interval
+StdDev                    : Standard deviation of all measurements
+Ratio                     : Mean of the ratio distribution ([Current]/[Baseline])
+Welch(1us)/p-values       : Welch-based TOST equivalence test with 1 us threshold. Format: 'Result: p-value(Slower)|p-value(Faster)'
+Welch(3%)/p-values        : Welch-based TOST equivalence test with 3% threshold. Format: 'Result: p-value(Slower)|p-value(Faster)'
+MannWhitney(1us)/p-values : MannWhitney-based TOST equivalence test with 1 us threshold. Format: 'Result: p-value(Slower)|p-value(Faster)'
+MannWhitney(3%)/p-values  : MannWhitney-based TOST equivalence test with 3% threshold. Format: 'Result: p-value(Slower)|p-value(Faster)'
+1 ms                      : 1 Millisecond (0.001 sec)</p>
+<pre><code>
+### Links
+
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroStatisticalTesting
+
+---
+</code></pre>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/articles/samples/IntroStatisticalTesting.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>
