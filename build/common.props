@@ -8,7 +8,7 @@
     <PackageTags>benchmark;benchmarking;performance</PackageTags>
     <PackageIconUrl>https://raw.githubusercontent.com/dotnet/BenchmarkDotNet/master/docs/guide/logo.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/dotnet/BenchmarkDotNet</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/dotnet/BenchmarkDotNet/blob/master/LICENSE.md</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/dotnet/BenchmarkDotNet</RepositoryUrl>
 

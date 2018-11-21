@@ -38,4 +38,4 @@ test: off
 deploy: off
 
 artifacts:
-  - path: '**\BenchmarkDotNet.*.nupkg' # find all NuGet packages recursively
+  - path: '**\BenchmarkDotNet.*.*nupkg' # find all NuGet packages recursively
