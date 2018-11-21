@@ -5,6 +5,7 @@ using System.Text;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Filters;
@@ -94,5 +95,6 @@ namespace BenchmarkDotNet.Configs
         public Encoding Encoding => Encoding.ASCII;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => Array.Empty<BenchmarkLogicalGroupRule>();
         public bool StopOnFirstError => false;
+        public CacheClearingStrategy CacheClearingStrategy => CacheClearingStrategy.None;
     }
 }

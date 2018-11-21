@@ -227,6 +227,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             config.KeepBenchmarkFiles = options.KeepBenchmarkFiles;
             config.StopOnFirstError = options.StopOnFirstError;
+            config.CacheClearingStrategy = options.CacheClearingStrategy;
 
             return config.AsReadOnly();
         }

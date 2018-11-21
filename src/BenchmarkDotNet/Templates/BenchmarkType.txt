@@ -38,6 +38,7 @@
                 TargetJob = job,
                 OperationsPerInvoke = $OperationsPerInvoke$,
                 MeasureGcStats = $MeasureGcStats$,
+				CacheClearingStrategy = CacheClearingStrategy.$CacheClearingStrategy$,
                 Encoding = $Encoding$,
                 BenchmarkName = benchmarkName
             };

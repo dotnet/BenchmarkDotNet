@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Engines.CacheClearingStrategies;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
@@ -43,13 +44,14 @@ namespace BenchmarkDotNet.Engines
         private readonly EngineWarmupStage warmupStage;
         private readonly EngineActualStage actualStage;
         private readonly bool includeMemoryStats;
+        private readonly ICacheClearingStrategy cacheClearingStrategy;
 
         internal Engine(
             IHost host,
             IResolver resolver,
             Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> overheadAction, Action<long> workloadAction, Job targetJob,
             Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
-            bool includeMemoryStats, Encoding encoding, string benchmarkName)
+            bool includeMemoryStats, Encoding encoding, string benchmarkName, CacheClearingStrategy cacheClearingStrategy)
         {
             
             Host = host;
@@ -69,6 +71,7 @@ namespace BenchmarkDotNet.Engines
 
             Resolver = resolver;
             Encoding = encoding;
+            this.cacheClearingStrategy = CacheClearingStrategiesFactory.GetStrategy(cacheClearingStrategy);
 
             Clock = targetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, Resolver);
             ForceAllocations = targetJob.ResolveValue(GcMode.ForceCharacteristic, Resolver);
@@ -137,6 +140,8 @@ namespace BenchmarkDotNet.Engines
 
             if(!isOverhead)
                 IterationSetupAction();
+
+            cacheClearingStrategy?.ClearCache();
 
             GcCollect();
 

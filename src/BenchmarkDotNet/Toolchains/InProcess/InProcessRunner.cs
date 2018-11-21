@@ -148,6 +148,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     TargetJob = job,
                     OperationsPerInvoke = target.OperationsPerInvoke,
                     MeasureGcStats = config.HasMemoryDiagnoser(),
+                    CacheClearingStrategy = config.CacheClearingStrategy,
                     BenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase)
                 };
 

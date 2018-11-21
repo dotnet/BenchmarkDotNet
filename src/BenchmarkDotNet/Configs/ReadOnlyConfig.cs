@@ -4,6 +4,7 @@ using System.Text;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
@@ -48,5 +49,6 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => config.GetLogicalGroupRules();
 
         public bool StopOnFirstError => config.StopOnFirstError;
+        public CacheClearingStrategy CacheClearingStrategy => config.CacheClearingStrategy;
     }
 }

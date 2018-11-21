@@ -5,6 +5,7 @@ using System.Text;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Filters;
@@ -83,6 +84,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => Array.Empty<BenchmarkLogicalGroupRule>();
 
         public bool StopOnFirstError => false;
+        public CacheClearingStrategy CacheClearingStrategy => CacheClearingStrategy.None;
 
         public ISummaryStyle GetSummaryStyle() => SummaryStyle.Default;
 

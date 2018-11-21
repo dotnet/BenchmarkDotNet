@@ -5,6 +5,7 @@ using System.Text;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
@@ -49,6 +50,7 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public bool SummaryPerType { get; set; } = true;
         [PublicAPI] public string ArtifactsPath { get; set; }
         [PublicAPI] public Encoding Encoding { get; set; }
+        [PublicAPI] public CacheClearingStrategy CacheClearingStrategy { get; set; }
 
         public void Add(params IColumn[] newColumns) => columnProviders.AddRange(newColumns.Select(c => c.ToProvider()));
         public void Add(params IColumnProvider[] newColumnProviders) => columnProviders.AddRange(newColumnProviders);
@@ -85,6 +87,7 @@ namespace BenchmarkDotNet.Configs
             summaryStyle = summaryStyle ?? config.GetSummaryStyle();
             logicalGroupRules.AddRange(config.GetLogicalGroupRules());
             StopOnFirstError |= config.StopOnFirstError;
+            CacheClearingStrategy = config.CacheClearingStrategy != CacheClearingStrategy.None ? config.CacheClearingStrategy : CacheClearingStrategy;
         }
 
         public IEnumerable<IDiagnoser> GetDiagnosers()
