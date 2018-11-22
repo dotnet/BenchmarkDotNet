@@ -51,9 +51,10 @@ var bdnAllVersions = new string[] {
 		"v0.10.14",
 		"v0.11.0",
 		"v0.11.1",
-		"v0.11.2"
+		"v0.11.2",
+		"v0.11.3"
 	};
-var bdnNextVersion = "v0.11.3";
+var bdnNextVersion = "v0.11.4";
 var bdnFirstCommit = "6eda98ab1e83a0d185d09ff8b24c795711af8db1";
 
 var artifactsDirectory = Directory("./artifacts");
@@ -150,7 +151,8 @@ Task("Pack")
         var settings = new DotNetCorePackSettings
         {
             Configuration = configuration,
-            OutputDirectory = artifactsDirectory
+            OutputDirectory = artifactsDirectory,
+			ArgumentCustomization = args=>args.Append("--include-symbols").Append("-p:SymbolPackageFormat=snupkg")
         };
 
         var projects = GetFiles("./src/**/*.csproj");
