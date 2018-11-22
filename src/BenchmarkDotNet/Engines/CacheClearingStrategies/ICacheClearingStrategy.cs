@@ -1,7 +1,9 @@
-﻿namespace BenchmarkDotNet.Engines.CacheClearingStrategies
+﻿using System;
+
+namespace BenchmarkDotNet.Engines.CacheClearingStrategies
 {
     internal interface ICacheClearingStrategy
     {
-        void ClearCache();
+        void ClearCache(IntPtr? affinity);
     }
 }

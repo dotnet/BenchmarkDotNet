@@ -141,7 +141,7 @@ namespace BenchmarkDotNet.Engines
             if(!isOverhead)
                 IterationSetupAction();
 
-            cacheClearingStrategy?.ClearCache();
+            ClearCache();
 
             GcCollect();
 
@@ -166,6 +166,17 @@ namespace BenchmarkDotNet.Engines
             WriteLine(measurement.ToOutputLine());
 
             return measurement;
+        }
+
+        private void ClearCache()
+        {
+            IntPtr? affinity = null;
+            if (TargetJob.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
+            {
+                affinity = TargetJob.Job.Environment.Affinity;
+            }
+
+            cacheClearingStrategy?.ClearCache(affinity);
         }
 
         private GcStats MeasureGcStats(IterationData data)

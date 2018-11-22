@@ -1,4 +1,5 @@
 ﻿using System;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Engines.CacheClearingStrategies
 {
@@ -6,6 +7,12 @@ namespace BenchmarkDotNet.Engines.CacheClearingStrategies
     {
         public static ICacheClearingStrategy GetStrategy(CacheClearingStrategy cacheClearingStrategy)
         {
+            if (!RuntimeInformation.IsWindows())
+            {
+                //All methods use pinvoke.
+                return null;
+            }
+
             switch (cacheClearingStrategy)
             {
                 case CacheClearingStrategy.None:

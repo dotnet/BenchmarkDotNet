@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Engines.CacheClearingStrategies
         [DllImport("kernel32.dll")]
         static extern bool FlushInstructionCache(IntPtr hProcess, IntPtr lpBaseAddress, UIntPtr dwSize);
 
-        public void ClearCache()
+        public void ClearCache(IntPtr? affinity)
         {
             Process process = Process.GetCurrentProcess();
             FlushInstructionCache(process.Handle, IntPtr.Zero, UIntPtr.Zero);

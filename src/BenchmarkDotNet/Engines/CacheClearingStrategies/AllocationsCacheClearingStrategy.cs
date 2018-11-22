@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.ConstrainedExecution;
@@ -12,53 +12,72 @@ namespace BenchmarkDotNet.Engines.CacheClearingStrategies
 {
     internal class AllocationsCacheClearingStrategy : ICacheClearingStrategy
     {
-        public void ClearCache()
+        public void ClearCache(IntPtr? affinity)
         {
-            var howManyProcessOnCore = 2;
-            
+            if (affinity.HasValue)
+            {
+                ClearCacheForKnownAffinity(affinity.Value);
+            }
+            else
+            {
+                ClearCacheForAllProcessor();
+            }            
+        }
+
+        private void ClearCacheForKnownAffinity(IntPtr affinity)
+        {
+            ClearCache(GetAffinitiesForSelectedProcessors(affinity).ToArray());
+        }
+
+        private static IEnumerable<int> GetAffinitiesForSelectedProcessors(IntPtr affinityPtr)
+        {
+            int cpuCount = Environment.ProcessorCount;
+
+            int affinity = (int)affinityPtr;
+
+            for (int i = 0; i < cpuCount; i++)
+            {
+                var cpuMask = 1 << i;
+
+                if ((affinity & cpuMask) > 0)
+                {
+                    yield return cpuMask;
+                }
+            }
+        }
+
+        private void ClearCacheForAllProcessor()
+        {
             //Get the processor count of our machine.
             int cpuCount = Environment.ProcessorCount;
-            Console.WriteLine("cpuCount " + cpuCount);
 
-            //Get the our application's process.
-//            Process process = Process.GetCurrentProcess();
-            
-            //Since the application starts with a few threads, we have to record the offset.
-//            var currentThread = process.Threads.Cast<ProcessThread>().Select(p => p.Id).ToArray();
-
-//            int offset = process.Threads.Count;
-//            Console.WriteLine("offset " + offset);
-            Thread[] threads = new Thread[cpuCount * howManyProcessOnCore];
-
-            //Create and start a number of threads.
-
-            Console.WriteLine("cpuCount * howManyProcessOnCore " + cpuCount * howManyProcessOnCore);
-
-            for (int i = 0; i < cpuCount * howManyProcessOnCore; ++i)
+            var affinities = new int[cpuCount];
+            for (int i = 0; i < cpuCount ; ++i)
             {
-                Console.WriteLine("new "+ i);
-                var t = new Thread(()=>AllocateMemory(1 << (i % cpuCount))) { IsBackground = true, };
-                t.Start();
+                affinities[i] = (1 << i);
 
-                threads[i] = t;
             }
 
-            // Refresh the process information in order to get the newest thread list.
-//            process.Refresh();
-//            var newThread = process.Threads.Cast<ProcessThread>().Where(p=> currentThread.All(c => c != p.Id)).ToDictionary(p => p.Id, p => p);
-//            Console.WriteLine("newThread.Count " + newThread.Count);
-//            Console.WriteLine("new offset " + process.Threads.Count);
+            ClearCache(affinities);
+        }
 
-            //Set the affinity of newly created threads.
-//            for (int i = 0; i < cpuCount * howManyProcessOnCore; ++i)
-//            {
-//                if (newThread.Count > i) //check if process is still running.
-//                {
-//                    Console.WriteLine("(i % cpuCount) " + (i % cpuCount));
-                    
-//                    process.Threads[i + offset].ProcessorAffinity = (IntPtr)(1L << (i % cpuCount));
-//                }
-//            }
+        private void ClearCache(int[] affinities)
+        {
+            const int howManyProcessOnProcessor = 2;
+
+            var threads = new Thread[affinities.Length * howManyProcessOnProcessor];
+
+            int index = 0;
+            for (int i = 0; i < howManyProcessOnProcessor; i++)
+            {
+                foreach (int affinity in affinities)
+                {
+                    var thread = new Thread(() => AllocateMemory(affinity)) { IsBackground = true, };
+                    thread.Start();
+
+                    threads[index++] = thread;
+                }
+            }
 
             //Wait for all thread
             foreach (var thread in threads)
@@ -67,10 +86,40 @@ namespace BenchmarkDotNet.Engines.CacheClearingStrategies
             }
         }
 
-        public static void SetProcessorAffinity(int coreMask)
+        private void AllocateMemory(long affinity)
+        {
+            SetProcessorAffinity(affinity);
+
+            const int howManyMb = 6;
+            const int howManyPass = 10;
+            const int sizeOfOneArray = 64;
+            for (int i = 0; i < (howManyMb * 1024 * 1024 / sizeOfOneArray) * howManyPass; i++)
+            {
+                var tmpArray = new int[sizeOfOneArray];
+
+                for (int j = 0; j < sizeOfOneArray; j++)
+                {
+                    tmpArray[j] = i * j;
+                }
+
+                tmpArray[0] = 6;
+
+                for (int j = 0; j < sizeOfOneArray; j++)
+                {
+                    Consumer(tmpArray[j]);
+                }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void Consumer(int v)
+        {
+
+        }
+
+        private static void SetProcessorAffinity(long coreMask)
         {
             int threadId = GetCurrentThreadId();
-            Console.WriteLine("threadId " + threadId + " coreMask "+ coreMask);
             SafeThreadHandle handle = null;
             var tempHandle = new object();
             try
@@ -78,27 +127,21 @@ namespace BenchmarkDotNet.Engines.CacheClearingStrategies
                 handle = OpenThread(0x60, false, threadId);
                 if (SetThreadAffinityMask(handle, new HandleRef(tempHandle, (IntPtr)coreMask)) == IntPtr.Zero)
                 {
-                    Console.WriteLine("Failed to set processor affinity for thread");
-                }
-                else
-                {
-                    Console.WriteLine("OK");
+
+                    Console.WriteLine("Failed to set processor affinity for thread "+ Marshal.GetLastWin32Error());
                 }
             }
             finally
             {
-                if (handle != null)
-                {
-                    handle.Close();
-                }
+                handle?.Close();
             }
         }
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern IntPtr SetThreadAffinityMask(SafeThreadHandle handle, HandleRef mask);
+        private static extern IntPtr SetThreadAffinityMask(SafeThreadHandle handle, HandleRef mask);
 
         [SuppressUnmanagedCodeSecurity]
-        public class SafeThreadHandle : SafeHandleZeroOrMinusOneIsInvalid
+        private class SafeThreadHandle : SafeHandleZeroOrMinusOneIsInvalid
         {
             public SafeThreadHandle() : base(true)
             {
@@ -112,45 +155,12 @@ namespace BenchmarkDotNet.Engines.CacheClearingStrategies
         }
 
         [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success), DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true, ExactSpelling = true)]
-        public static extern bool CloseHandle(IntPtr handle);
+        private static extern bool CloseHandle(IntPtr handle);
 
         [DllImport("kernel32")]
-        public static extern int GetCurrentThreadId();
+        private static extern int GetCurrentThreadId();
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern SafeThreadHandle OpenThread(int access, bool inherit, int threadId);
-
-
-        public void AllocateMemory(int affinity)
-        {
-            SetProcessorAffinity(affinity);
-
-            
-            var HowManyMB = 6;
-            var HowManyPass = 10;
-            var SizeOfOneArray = 64;
-            for (int i = 0; i < (HowManyMB * 1024 * 1024 / SizeOfOneArray) * HowManyPass; i++)
-            {
-                var tmpArray = new int[SizeOfOneArray];
-
-                for (int j = 0; j < SizeOfOneArray; j++)
-                {
-                    tmpArray[j] = i * j;
-                }
-
-                tmpArray[0] = 6;
-
-                for (int j = 0; j < SizeOfOneArray; j++)
-                {
-                    Consumer(tmpArray[j]);
-                }
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public void Consumer(int v)
-        {
-
-        }
+        private static extern SafeThreadHandle OpenThread(int access, bool inherit, int threadId);
     }
 }
