@@ -1,5 +1,5 @@
-﻿using System.Threading;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
+using System.Threading;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -8,9 +8,9 @@ namespace BenchmarkDotNet.Samples
     {
         public enum CustomEnum
         {
-            A,
-            BB,
-            CCC
+            One = 1,
+            Two,
+            Three
         }
 
         [ParamsAllValues]
@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Samples
         public void Benchmark()
         {
             Thread.Sleep(
-                E.ToString().Length * 100 +
+                (int)E * 100 +
                 (B == true ? 20 : B == false ? 10 : 0));
         }
     }
