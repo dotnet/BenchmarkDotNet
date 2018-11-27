@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
             TimeSpan? timeout = null) 
         {
             if (coreRun == null) throw new ArgumentNullException(nameof(coreRun));
-            if (!coreRun.Exists) throw new FileNotFoundException("Provided CoreRun path does not exist");
+            if (!coreRun.Exists) throw new FileNotFoundException("Provided CoreRun path does not exist. Please remember that BDN expects path to CoreRun.exe (corerun on Unix), not to Core_Root folder.");
 
             SourceCoreRun = coreRun;
             CopyCoreRun = createCopy ? GetShadowCopyPath(coreRun) : coreRun;
@@ -63,21 +63,12 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
         {
             if (!SourceCoreRun.Exists)
             {
-                logger.WriteLineError($"Provided CoreRun path does not exist, benchmark '{benchmark.DisplayInfo}' will not be executed");
+                logger.WriteLineError($"Provided CoreRun path does not exist, benchmark '{benchmark.DisplayInfo}' will not be executed. Please remember that BDN expects path to CoreRun.exe (corerun on Unix), not to Core_Root folder.");
                 return false;
             }
-
-            if (CustomDotNetCliPath == null && !HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled())
-            {
-                logger.WriteLineError($"BenchmarkDotNet requires dotnet cli toolchain to be installed, benchmark '{benchmark.DisplayInfo}' will not be executed");
+            
+            if (Toolchain.InvalidCliPath(CustomDotNetCliPath?.FullName, benchmark, logger))
                 return false;
-            }
-
-            if (CustomDotNetCliPath.IsNotNullButDoesNotExist())
-            {
-                logger.WriteLineError($"Provided custom dotnet cli path does not exist, benchmark '{benchmark.DisplayInfo}' will not be executed");
-                return false;
-            }
 
             return true;
         }
