@@ -17,17 +17,17 @@ If you want to use all possible values of an `enum` or another type with a small
 ### Output
 
 ```markdown
-    Method |   E |     B |     Mean | Error |
----------- |---- |------ |---------:|------:|
- Benchmark |   A |     ? | 101.9 ms |    NA |
- Benchmark |   A | False | 111.9 ms |    NA |
- Benchmark |   A |  True | 122.3 ms |    NA |
- Benchmark |  BB |     ? | 201.5 ms |    NA |
- Benchmark |  BB | False | 211.8 ms |    NA |
- Benchmark |  BB |  True | 221.4 ms |    NA |
- Benchmark | CCC |     ? | 301.8 ms |    NA |
- Benchmark | CCC | False | 312.3 ms |    NA |
- Benchmark | CCC |  True | 322.2 ms |    NA |
+    Method |     E |     B |     Mean | Error |
+---------- |------ |------ |---------:|------:|
+ Benchmark |   One |     ? | 101.4 ms |    NA |
+ Benchmark |   One | False | 111.1 ms |    NA |
+ Benchmark |   One |  True | 122.0 ms |    NA |
+ Benchmark |   Two |     ? | 201.3 ms |    NA |
+ Benchmark |   Two | False | 212.1 ms |    NA |
+ Benchmark |   Two |  True | 221.3 ms |    NA |
+ Benchmark | Three |     ? | 301.4 ms |    NA |
+ Benchmark | Three | False | 311.5 ms |    NA |
+ Benchmark | Three |  True | 320.8 ms |    NA |
 
 // * Legends *
   E     : Value of the 'E' parameter
