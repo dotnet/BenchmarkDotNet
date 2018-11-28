@@ -166,8 +166,13 @@ namespace BenchmarkDotNet.Mathematics
             return MulMean(x, yInvert);
         }
 
-        public static Statistics Divide(Statistics x, Statistics y)
+        [NotNull]
+        public static Statistics Divide([NotNull] Statistics x, [NotNull] Statistics y)
         {
+            if (x.N < 1)
+                throw new ArgumentOutOfRangeException(nameof(x), "Argument doesn't contain any values");
+            if (y.N < 1)
+                throw new ArgumentOutOfRangeException(nameof(y), "Argument doesn't contain any values");
             int n = Math.Min(x.N, y.N);
             var z = new double[n];
             for (int i = 0; i < n; i++)
