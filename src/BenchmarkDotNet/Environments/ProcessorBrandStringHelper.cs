@@ -19,9 +19,9 @@ namespace BenchmarkDotNet.Environments
         [NotNull]
         public static string Prettify(CpuInfo cpuInfo, bool includeMaxFrequency = false)
         {
-            if (cpuInfo == null)
+            if (cpuInfo == null || string.IsNullOrEmpty(cpuInfo.ProcessorName))
             {
-                return "";
+                return "Unknown processor";
             }
 
             // Remove parts which don't provide any useful information for user
