@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Extensions
         }
         
         internal static string ToPresentation(this IntPtr processorAffinity, int processorCount)
-            => (RuntimeInformation.GetCurrentPlatform() == Platform.X64
+            => (RuntimeInformation.Is64BitPlatform()
                     ? Convert.ToString(processorAffinity.ToInt64(), 2)
                     : Convert.ToString(processorAffinity.ToInt32(), 2))
                 .PadLeft(processorCount, '0');
@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Extensions
         {
             int cpuMask = (1 << Environment.ProcessorCount) - 1;
 
-            return RuntimeInformation.GetCurrentPlatform() == Platform.X64
+            return RuntimeInformation.Is64BitPlatform()
                 ? new IntPtr(processorAffinity.ToInt64() & cpuMask)
                 : new IntPtr(processorAffinity.ToInt32() & cpuMask);
         }
