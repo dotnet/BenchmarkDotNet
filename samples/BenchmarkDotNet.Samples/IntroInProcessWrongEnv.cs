@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                var wrongPlatform = RuntimeInformation.GetCurrentPlatform() == Platform.X86
+                var wrongPlatform = RuntimeInformation.Is64BitPlatform()
                     ? Platform.X64
                     : Platform.X86;
 

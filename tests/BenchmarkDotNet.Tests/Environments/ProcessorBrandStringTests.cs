@@ -50,5 +50,15 @@ namespace BenchmarkDotNet.Tests.Environments
 
             Assert.Equal(prettifiedName, ProcessorBrandStringHelper.Prettify(cpuInfo, includeMaxFrequency: true));
         }
+        
+        [Theory]
+        [InlineData("", "Unknown processor")]
+        [InlineData(null, "Unknown processor")]
+        public void UnknownProcessorDoesNotThrow(string originalName, string prettifiedName)
+        {
+            var cpuInfo = new CpuInfo(originalName, nominalFrequency: null);
+
+            Assert.Equal(prettifiedName, ProcessorBrandStringHelper.Prettify(cpuInfo, includeMaxFrequency: true));
+        }
     }
 }

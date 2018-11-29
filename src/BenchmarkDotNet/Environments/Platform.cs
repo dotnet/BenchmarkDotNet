@@ -15,6 +15,16 @@
         /// <summary>
         /// x64
         /// </summary>
-        X64
+        X64,
+        
+        /// <summary>
+        /// ARM
+        /// </summary>
+        Arm,
+        
+        /// <summary>
+        /// ARM64
+        /// </summary>
+        Arm64
     }
 }

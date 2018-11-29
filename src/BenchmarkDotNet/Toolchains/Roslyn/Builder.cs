@@ -95,6 +95,10 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                     return Platform.X86;
                 case OurPlatform.X64:
                     return Platform.X64;
+                case OurPlatform.Arm:
+                    return Platform.Arm;
+                case OurPlatform.Arm64:
+                    return Platform.Arm64;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(platform), platform, null);
             }
