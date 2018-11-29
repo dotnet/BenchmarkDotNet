@@ -317,7 +317,6 @@ namespace BenchmarkDotNet.Portability
         }
 
         // See http://aakinshin.net/en/blog/dotnet/jit-version-determining-in-runtime/
-
         private class JitHelper
         {
             [SuppressMessage("ReSharper", "NotAccessedField.Local")]
