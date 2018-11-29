@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Environments
             var processorName = cpuInfo.ProcessorName.Replace("@", "").Replace("(R)", "").Replace("(TM)", "");
             
             // If we have found physical core(s), we can safely assume we can drop extra info from brand
-            if (cpuInfo.PhysicalCoreCount > 0)
+            if (cpuInfo.PhysicalCoreCount.HasValue && cpuInfo.PhysicalCoreCount.Value > 0)
                 processorName = Regex.Replace(processorName, @"(\w+?-Core Processor)", "").Trim();
 
             string frequencyString = GetBrandStyledActualFrequency(cpuInfo.NominalFrequency);
