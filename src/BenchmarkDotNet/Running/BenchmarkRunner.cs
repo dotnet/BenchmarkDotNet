@@ -197,7 +197,19 @@ namespace BenchmarkDotNet.Running
                     reports.Add(new BenchmarkReport(false, benchmark, buildResult, buildResult, default, default, default, default));
 
                     if (buildResult.GenerateException != null)
+                    {
                         logger.WriteLineError($"// Generate Exception: {buildResult.GenerateException.Message}");
+
+                        if (benchmark.Job.Environment == EnvironmentMode.Core)
+                        {
+                            var assembly = benchmark.Descriptor.Type.GetTypeInfo().Assembly;
+                            if (assembly.FullName.ToUpper().Contains("LINQPAD"))
+                            {
+                                logger.WriteLineError("// .NET Core benchmarks are not possible with LINQPad. See BenchmarkDotNet issue #975 on GitHub.");
+                            }
+                        }
+                    }
+
                     if (buildResult.BuildException != null)
                         logger.WriteLineError($"// Build Exception: {buildResult.BuildException.Message}");
 
