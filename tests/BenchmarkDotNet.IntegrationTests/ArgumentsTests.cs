@@ -518,8 +518,8 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Fact]
-        public void CustomTypeThatAlsoExistsInTheSystemNamespaceAsArgument() => CanExecute<WithDateTime>();
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void CustomTypeThatAlsoExistsInTheSystemNamespaceAsArgument(IToolchain toolchain) => CanExecute<WithDateTime>(toolchain);
 
         public class CustomTypeThatAlsoExistsInTheSystemNamespace
         {
@@ -537,6 +537,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (expected != passed)
                     throw new ArgumentException("The passed enum has wrong value!");
             }
+        }
 
         private void CanExecute<T>(IToolchain toolchain)
         {
