@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -58,6 +59,13 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             if (benchmarkCase.Job.ResolveValue(GcMode.AllowVeryLargeObjectsCharacteristic, resolver))
             {
                 logger.WriteLineError($"Currently project.json does not support gcAllowVeryLargeObjects (app.config does), benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
+                return false;
+            }
+
+            var benchmarkAssembly = benchmarkCase.Descriptor.Type.GetTypeInfo().Assembly;
+            if (benchmarkAssembly.FullName.ToUpper().Contains("LINQPAD"))
+            {
+                logger.WriteLineError($"Currently LINQPad does not support .NET Core benchmarks (see dotnet/BenchmarkDotNet#975), benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
                 return false;
             }
 
