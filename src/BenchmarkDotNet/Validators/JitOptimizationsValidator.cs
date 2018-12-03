@@ -26,7 +26,10 @@ namespace BenchmarkDotNet.Validators
                 {
                     var referencedAssembly = Assembly.Load(referencedAssemblyName);
 
-                    if (referencedAssembly.IsJitOptimizationDisabled().IsTrue() && !IsLinqPad(referencedAssembly))
+                    // LINQPad.exe is non-optimized on purpose, see https://github.com/dotnet/BenchmarkDotNet/issues/580#issuecomment-345484889 for more details
+                    // we don't warn about non-optimized dependency to LINQPad
+                    // but we give extra hint if the dll with benchmark itself was build without optimization by LINQPad
+                    if (referencedAssembly.IsJitOptimizationDisabled().IsTrue() && !referencedAssembly.IsLinqPad())
                     {
                         yield return new ValidationError(
                             TreatsWarningsAsErrors,
@@ -44,16 +47,11 @@ namespace BenchmarkDotNet.Validators
                         TreatsWarningsAsErrors,
                         $"Assembly {group.Key.GetName().Name} which defines benchmarks is non-optimized" + Environment.NewLine +
                         "Benchmark was built without optimization enabled (most probably a DEBUG configuration). Please, build it in RELEASE."
-                        + (IsLinqPad(group.Key)
+                        + (group.Key.IsLinqPad()
                             ? Environment.NewLine + "Please enable optimizations in your LINQPad. Go to Preferences -> Query and select \"compile with /optimize+\""
                             : string.Empty));
                 }
             }
-        }
-
-        // LINQPad.exe is non-optimized on purpose, see https://github.com/dotnet/BenchmarkDotNet/issues/580#issuecomment-345484889 for more details
-        // we don't warn about non-optimized dependency to LINQPad
-        // but we give extra hint if the dll with benchmark itself was build without optimization by LINQPad
-        private static bool IsLinqPad(Assembly assembly) => assembly.FullName.ToUpper().Contains("LINQPAD");
+        }        
     }
 }

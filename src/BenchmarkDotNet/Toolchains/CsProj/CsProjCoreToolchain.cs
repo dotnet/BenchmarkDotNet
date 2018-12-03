@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             }
 
             var benchmarkAssembly = benchmarkCase.Descriptor.Type.GetTypeInfo().Assembly;
-            if (benchmarkAssembly.FullName.ToUpper().Contains("LINQPAD"))
+            if (benchmarkAssembly.IsLinqPad())
             {
                 logger.WriteLineError($"Currently LINQPad does not support .NET Core benchmarks (see dotnet/BenchmarkDotNet#975), benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
                 return false;
