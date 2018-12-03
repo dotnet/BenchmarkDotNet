@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Mathematics
         /// <param name="percentile">Value in range 0..100</param>
         /// <returns>Percentile from the set of values</returns>
         // Based on: http://stackoverflow.com/a/8137526
-        private static double Percentile(List<double> sortedValues, int percentile)
+        private static double Percentile(IReadOnlyList<double> sortedValues, int percentile)
         {
             if (sortedValues == null)
                 throw new ArgumentNullException(nameof(sortedValues));
@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Mathematics
 
         [PublicAPI] public double Percentile(int percentile) => Percentile(SortedValues, percentile);
 
-        private List<double> SortedValues { get; }
+        private IReadOnlyList<double> SortedValues { get; }
 
         public double P0 { get; }
         public double P25 { get; }
@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Mathematics
         public double P95 { get; }
         public double P100 { get; }
 
-        internal PercentileValues(List<double> sortedValues)
+        internal PercentileValues(IReadOnlyList<double> sortedValues)
         {
             SortedValues = sortedValues;
 

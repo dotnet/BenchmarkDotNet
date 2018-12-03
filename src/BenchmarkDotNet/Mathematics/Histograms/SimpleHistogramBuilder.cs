@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Mathematics.Histograms
         public Histogram Build(Statistics s, BinSizeRule? rule = null)
         {
             double binSize = s.GetOptimalBinSize(rule);
-            return BuildWithFixedBinSize(s.GetSortedValues(), binSize);
+            return BuildWithFixedBinSize(s.SortedValues, binSize);
         }
 
         [PublicAPI, Pure]

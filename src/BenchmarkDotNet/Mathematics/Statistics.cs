@@ -8,8 +8,8 @@ namespace BenchmarkDotNet.Mathematics
 {
     public class Statistics
     {
-        private readonly List<double> originalValues, sortedValues;
-
+        public IReadOnlyList<double> OriginalValues { get; }
+        public IReadOnlyList<double> SortedValues { get; }
         public int N { get; }
         public double Min { get; }
         public double LowerFence { get; }
@@ -39,56 +39,53 @@ namespace BenchmarkDotNet.Mathematics
 
         public Statistics(IEnumerable<double> values)
         {
-            originalValues = values.Where(d => !double.IsNaN(d)).ToList();
-            sortedValues = originalValues.ToList();
-            N = sortedValues.Count;
+            OriginalValues = values.Where(d => !double.IsNaN(d)).ToArray();
+            SortedValues = OriginalValues.OrderBy(value => value).ToArray();
+            N = SortedValues.Count;
             if (N == 0)
                 throw new InvalidOperationException("Sequence of values contains no elements, Statistics can't be calculated");
-            sortedValues.Sort();
 
             if (N == 1)
-                Q1 = Median = Q3 = sortedValues[0];
+                Q1 = Median = Q3 = SortedValues[0];
             else
             {
-                double GetMedian(IList<double> x) => x.Count % 2 == 0
+                double GetMedian(IReadOnlyList<double> x) => x.Count % 2 == 0
                     ? (x[x.Count / 2 - 1] + x[x.Count / 2]) / 2
                     : x[x.Count / 2];
 
-                Median = GetMedian(sortedValues);
-                Q1 = GetMedian(sortedValues.Take(N / 2).ToList());
-                Q3 = GetMedian(sortedValues.Skip((N + 1) / 2).ToList());
+                Median = GetMedian(SortedValues);
+                Q1 = GetMedian(SortedValues.Take(N / 2).ToList());
+                Q3 = GetMedian(SortedValues.Skip((N + 1) / 2).ToList());
             }
 
-            Min = sortedValues.First();
-            Mean = sortedValues.Average();
-            Max = sortedValues.Last();
+            Min = SortedValues.First();
+            Mean = SortedValues.Average();
+            Max = SortedValues.Last();
 
             InterquartileRange = Q3 - Q1;
             LowerFence = Q1 - 1.5 * InterquartileRange;
             UpperFence = Q3 + 1.5 * InterquartileRange;
 
-            AllOutliers = sortedValues.Where(IsOutlier).ToArray();
-            LowerOutliers = sortedValues.Where(IsLowerOutlier).ToArray();
-            UpperOutliers = sortedValues.Where(IsUpperOutlier).ToArray();
+            AllOutliers = SortedValues.Where(IsOutlier).ToArray();
+            LowerOutliers = SortedValues.Where(IsLowerOutlier).ToArray();
+            UpperOutliers = SortedValues.Where(IsUpperOutlier).ToArray();
 
-            Variance = N == 1 ? 0 : sortedValues.Sum(d => Math.Pow(d - Mean, 2)) / (N - 1);
+            Variance = N == 1 ? 0 : SortedValues.Sum(d => Math.Pow(d - Mean, 2)) / (N - 1);
             StandardDeviation = Math.Sqrt(Variance);
             StandardError = StandardDeviation / Math.Sqrt(N);
             Skewness = CalcCentralMoment(3) / StandardDeviation.Pow(3);
             Kurtosis = CalcCentralMoment(4) / StandardDeviation.Pow(4);
             ConfidenceInterval = new ConfidenceInterval(Mean, StandardError, N);
-            Percentiles = new PercentileValues(sortedValues);
+            Percentiles = new PercentileValues(SortedValues);
         }
 
         [PublicAPI] public ConfidenceInterval GetConfidenceInterval(ConfidenceLevel level, int n) => new ConfidenceInterval(Mean, StandardError, n, level);
         [PublicAPI] public bool IsLowerOutlier(double value) => value < LowerFence;
         [PublicAPI] public bool IsUpperOutlier(double value) => value > UpperFence;
         [PublicAPI] public bool IsOutlier(double value) => value < LowerFence || value > UpperFence;
-        [PublicAPI] public double[] WithoutOutliers() => sortedValues.Where(value => !IsOutlier(value)).ToArray();
-        [PublicAPI] public IReadOnlyCollection<double> GetOriginalValues() => originalValues;
-        [PublicAPI] public IReadOnlyCollection<double> GetSortedValues() => sortedValues;
+        [PublicAPI] public double[] WithoutOutliers() => SortedValues.Where(value => !IsOutlier(value)).ToArray();
 
-        [PublicAPI] public double CalcCentralMoment(int k) => sortedValues.Average(x => (x - Mean).Pow(k));
+        [PublicAPI] public double CalcCentralMoment(int k) => SortedValues.Average(x => (x - Mean).Pow(k));
 
         public bool IsActualOutlier(double value, OutlierMode outlierMode)
         {
@@ -130,9 +127,9 @@ namespace BenchmarkDotNet.Mathematics
             switch (N)
             {
                 case 1:
-                    return $"{sortedValues[0]} (N = 1)";
+                    return $"{SortedValues[0]} (N = 1)";
                 case 2:
-                    return $"{sortedValues[0]},{sortedValues[1]} (N = 2)";
+                    return $"{SortedValues[0]},{SortedValues[1]} (N = 2)";
                 default:
                     return $"{Mean} +- {ConfidenceInterval.Margin} (N = {N})";
             }
@@ -146,7 +143,7 @@ namespace BenchmarkDotNet.Mathematics
         /// <summary>
         /// Statistics for [1/X]. If Min is less then or equal to 0, returns null.
         /// </summary>        
-        public Statistics Invert() => CanBeInverted() ? new Statistics(sortedValues.Select(x => 1 / x)) : null;
+        public Statistics Invert() => CanBeInverted() ? new Statistics(SortedValues.Select(x => 1 / x)) : null;
 
         /// <summary>
         /// Mean for [X*Y].
@@ -177,9 +174,9 @@ namespace BenchmarkDotNet.Mathematics
             var z = new double[n];
             for (int i = 0; i < n; i++)
             {
-                if (Math.Abs(y.originalValues[i]) < 1e-9)
-                    throw new DivideByZeroException($"y[{i}] is {y.originalValues[i]}");
-                z[i] = x.originalValues[i] / y.originalValues[i];
+                if (Math.Abs(y.OriginalValues[i]) < 1e-9)
+                    throw new DivideByZeroException($"y[{i}] is {y.OriginalValues[i]}");
+                z[i] = x.OriginalValues[i] / y.OriginalValues[i];
             }
 
             return new Statistics(z);
