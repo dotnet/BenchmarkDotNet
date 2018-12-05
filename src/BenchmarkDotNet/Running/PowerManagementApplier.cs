@@ -7,15 +7,21 @@ namespace BenchmarkDotNet.Running
 {
     internal class PowerManagementApplier
     {
-        private Guid? _userCurrentPowerPlan;
-        private bool _powerPlanChanged = false;
-        private bool _isInitialized = false;
+        private readonly ILogger logger;
+        private Guid? userCurrentPowerPlan;
+        private bool powerPlanChanged = false;
+        private bool isInitialized = false;
 
-        internal void ApplyPerformancePlan(ILogger logger, bool highPerformancePowerPlan)
+        internal PowerManagementApplier(ILogger logger)
+        {
+            this.logger = logger;
+        }
+
+        internal void ApplyPerformancePlan(bool highPerformancePowerPlan)
         {
             if (RuntimeInformation.IsWindows())
             {
-                if (highPerformancePowerPlan && _powerPlanChanged == false)
+                if (highPerformancePowerPlan && powerPlanChanged == false)
                     ApplyHighPerformancePlan(logger);
                 else if (highPerformancePowerPlan == false)
                     ApplyUserPowerPlan(logger);
@@ -24,15 +30,15 @@ namespace BenchmarkDotNet.Running
 
         internal void ApplyUserPowerPlan(ILogger logger)
         {
-            if (_powerPlanChanged && _userCurrentPowerPlan != null && RuntimeInformation.IsWindows())
+            if (powerPlanChanged && userCurrentPowerPlan != null && RuntimeInformation.IsWindows())
             {
                 try
                 {
-                    if (_userCurrentPowerPlan != null && PowerManagementHelper.Set(_userCurrentPowerPlan.Value))
+                    if (userCurrentPowerPlan != null && PowerManagementHelper.Set(userCurrentPowerPlan.Value))
                     {
-                        _powerPlanChanged = false;
+                        powerPlanChanged = false;
                         var powerPlanFriendlyName = PowerManagementHelper.CurrentPlanFriendlyName;
-                        logger.WriteInfo($"Succesfully reverted power plan (GUID: {_userCurrentPowerPlan.Value} FriendlyName: {powerPlanFriendlyName})");
+                        logger.WriteInfo($"Succesfully reverted power plan (GUID: {userCurrentPowerPlan.Value} FriendlyName: {powerPlanFriendlyName})");
                     }
                 }
                 catch (Exception ex)
@@ -46,15 +52,15 @@ namespace BenchmarkDotNet.Running
         {
             try
             {
-                if (_isInitialized == false)
+                if (isInitialized == false)
                 {
-                    _userCurrentPowerPlan = PowerManagementHelper.CurrentPlan;
-                    _isInitialized = true;
+                    userCurrentPowerPlan = PowerManagementHelper.CurrentPlan;
+                    isInitialized = true;
                 }
 
                 if (PowerManagementHelper.Set(new Guid(PowerManagementHelper.HighPerformanceGuid)))
                 {
-                    _powerPlanChanged = true;
+                    powerPlanChanged = true;
                     var powerPlanFriendlyName = PowerManagementHelper.CurrentPlanFriendlyName;
                     logger.WriteInfo($"Setup power plan (GUID: {PowerManagementHelper.HighPerformanceGuid} FriendlyName: {powerPlanFriendlyName})");
                 }
