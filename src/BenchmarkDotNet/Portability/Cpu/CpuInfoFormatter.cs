@@ -14,9 +14,7 @@ namespace BenchmarkDotNet.Portability.Cpu
             
             var parts = new List<string>
             {
-                !string.IsNullOrWhiteSpace(cpuInfo.ProcessorName)
-                    ? ProcessorBrandStringHelper.Prettify(cpuInfo, includeMaxFrequency: true)
-                    : "Unknown processor"
+                ProcessorBrandStringHelper.Prettify(cpuInfo, includeMaxFrequency: true)
             };
 
             if (cpuInfo.PhysicalProcessorCount > 0)

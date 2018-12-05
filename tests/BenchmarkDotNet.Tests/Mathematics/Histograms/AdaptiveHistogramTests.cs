@@ -295,5 +295,40 @@ namespace BenchmarkDotNet.Tests.Mathematics.Histograms
             };
             HistogramTestHelper.DoHistogramTest(output, HistogramBuilder.Adaptive, values, 0.0001, new[] { values });
         }
+        
+        /// <summary>
+        /// <see cref="https://github.com/dotnet/BenchmarkDotNet/issues/870"/>
+        /// </summary>
+        [Fact]
+        public void Issue870()
+        {
+            var values = new[]
+            {
+                0.003599657069,
+                0.003634646485,
+                0.003697427313,
+                0.003699466536,
+                0.003708548049,
+                0.003713960151,
+                0.003734243611,
+                0.003739674340,
+                0.003744175980,
+                0.003800773571,
+                0.003830879132,
+                0.003877980957,
+                0.003890512834,
+                0.003932129542,
+                0.003952739338
+            };
+            HistogramTestHelper.DoHistogramTest(output, HistogramBuilder.Adaptive, values, 0.0001,
+                new[]
+                {
+                    new[] { values[0] },
+                    new[] { values[1], values[2], values[3] },
+                    new[] { values[4], values[5], values[6], values[7], values[8] },
+                    new[] { values[9], values[10], values[11], values[12] },
+                    new[] { values[13], values[14] }
+                });
+        }
     }
 }

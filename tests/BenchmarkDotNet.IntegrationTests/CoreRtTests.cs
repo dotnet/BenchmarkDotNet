@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void CoreRtIsSupported()
         {
-            if (RuntimeInformation.GetCurrentPlatform() == Platform.X86) // CoreRT does not support 32bit yet
+            if (!RuntimeInformation.Is64BitPlatform()) // CoreRT does not support 32bit yet
                 return;
             
             var config = ManualConfig.CreateEmpty()

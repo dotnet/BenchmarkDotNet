@@ -57,9 +57,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         public override bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver)
         {
             if (!base.IsSupported(benchmarkCase, logger, resolver))
-            {
                 return false;
-            }
 
             if (!RuntimeInformation.IsWindows())
             {
@@ -67,11 +65,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 return false;
             }
 
-            if (!HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled())
-            {
-                logger.WriteLineError($"BenchmarkDotNet requires dotnet cli toolchain to be installed, benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
+            if (InvalidCliPath(customDotNetCliPath: null, benchmarkCase, logger))
                 return false;
-            }
 
             return true;
         }

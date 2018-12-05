@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Columns
             }
         }
 
-        protected override string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, Statistics current, bool isBaseline)
+        internal override string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, Statistics current, bool isBaseline)
         {
             double mean = isBaseline ? 1 : Statistics.DivMean(current, baseline);
 

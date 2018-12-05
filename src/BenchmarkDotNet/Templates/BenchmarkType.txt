@@ -150,7 +150,7 @@
             }
         }
         
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         public $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
         {
             if (NotEleven == 11)
@@ -213,7 +213,7 @@
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void NonGenericKeepAliveWithoutBoxing($WorkloadMethodReturnType$ _) { }
 
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         public $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
         {
             if (NotEleven == 11)
@@ -273,7 +273,7 @@
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(ref alias);
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         public ref $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
         {
             if (NotEleven == 11)
@@ -322,7 +322,7 @@
             }
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         public void $DisassemblerEntryMethodName$()
         {
             if (NotEleven == 11)

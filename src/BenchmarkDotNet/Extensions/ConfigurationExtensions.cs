@@ -16,6 +16,10 @@ namespace BenchmarkDotNet.Extensions
                     return "x86";
                 case Platform.X64:
                     return "x64";
+                case Platform.Arm:
+                    return "ARM";
+                case Platform.Arm64:
+                    return "ARM64";
                 default:
                     return "AnyCPU";
             }

@@ -40,5 +40,7 @@
 
             isNewLine = true;
         }
+
+        public void Flush() { }
     }
 }

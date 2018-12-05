@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Diagnosers
             public string Legend { get; }
             public string NumberFormat => "#0.0000";
             public UnitType UnitType => UnitType.Dimensionless;
-            public string Unit => String.Empty;
+            public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
         }
     }

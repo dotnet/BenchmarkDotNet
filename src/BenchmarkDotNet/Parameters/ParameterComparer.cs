@@ -38,18 +38,21 @@ namespace BenchmarkDotNet.Parameters
 
             public Comparer Add<T>(Func<T, T, int> compareFunc)
             {
-                comparers.Add(typeof(T), (x, y) => compareFunc((T) x, (T) y));
+                comparers.Add(typeof(T), (x, y) => compareFunc((T)x, (T)y));
                 return this;
             }
 
             public int CompareTo(object x, object y)
             {
-                return x != null && y != null && x.GetType() == y.GetType() && HasComparer(x)
-                    ? comparers[x.GetType()](x, y)
+                return x != null && y != null && x.GetType() == y.GetType() && comparers.TryGetValue(GetComparisonType(x), out var comparer)
+                    ? comparer(x, y)
                     : string.CompareOrdinal(x?.ToString(), y?.ToString());
             }
 
-            private bool HasComparer(object x) => comparers.ContainsKey(x.GetType());
+            private static Type GetComparisonType(object x) =>
+                x.GetType().IsEnum
+                ? x.GetType().GetEnumUnderlyingType()
+                : x.GetType();
         }
     }
 }

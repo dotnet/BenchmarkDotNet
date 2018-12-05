@@ -97,7 +97,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             {
                 var result = DotNetCliCommandExecutor.Execute(WithArguments(cmd));
                 if (!result.IsSuccess) return result;
-                executionTime.Add(result.ExecutionTime);
+                executionTime += result.ExecutionTime;
                 stdOutput.Append(result.StandardOutput);
             }
             return DotNetCliCommandResult.Success(executionTime, stdOutput.ToString());

@@ -11,5 +11,7 @@
         public void WriteLine() { }
 
         public void WriteLine(LogKind logKind, string text) { }
+
+        public void Flush() { }
     }
 }

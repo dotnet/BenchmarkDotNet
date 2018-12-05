@@ -18,6 +18,7 @@ using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Mathematics.StatisticalTesting;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CoreRun;
@@ -139,7 +140,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             foreach (var coreRunPath in options.CoreRunPaths)
                 if (coreRunPath.IsNotNullButDoesNotExist())
                 {
-                    logger.WriteLineError($"The provided path to CoreRun: \"{options.CoreRunPaths}\" does NOT exist.");
+                    logger.WriteLineError($"The provided path to CoreRun: \"{coreRunPath}\" does NOT exist. Please remember that BDN expects path to CoreRun.exe (corerun on Unix), not to Core_Root folder.");
                     return false;
                 }
             
@@ -174,6 +175,12 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return false;
                 }
 
+            if (!string.IsNullOrEmpty(options.StatisticalTestThreshold) && !Threshold.TryParse(options.StatisticalTestThreshold, out _))
+            {
+                logger.WriteLineError("Invalid Threshold for Statistical Test. Use --help to see examples.");
+                return false;
+            }
+
             return true;
         }
 
@@ -182,7 +189,10 @@ namespace BenchmarkDotNet.ConsoleArguments
             var config = new ManualConfig();
 
             var baseJob = GetBaseJob(options, globalConfig);
-            config.Add(Expand(baseJob.UnfreezeCopy(), options).ToArray()); // UnfreezeCopy ensures that each of the expanded jobs will have it's own ID
+            var expanded = Expand(baseJob.UnfreezeCopy(), options).ToArray(); // UnfreezeCopy ensures that each of the expanded jobs will have it's own ID
+            if (expanded.Length > 1)
+                expanded[0] = expanded[0].AsBaseline(); // if the user provides multiple jobs, then the first one should be a baseline
+            config.Add(expanded); 
             if (config.GetJobs().IsEmpty() && baseJob != Job.Default)
                 config.Add(baseJob);
 
@@ -201,6 +211,8 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             if (options.DisplayAllStatistics)
                 config.Add(StatisticColumn.AllStatistics);
+            if (!string.IsNullOrEmpty(options.StatisticalTestThreshold) && Threshold.TryParse(options.StatisticalTestThreshold, out var threshold))
+                config.Add(new StatisticalTestColumn(StatisticalTestKind.MannWhitney, threshold));
 
             if (options.ArtifactsDirectory != null)
                 config.ArtifactsPath = options.ArtifactsDirectory.FullName;
@@ -214,6 +226,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             config.SummaryPerType = !options.Join;
 
             config.KeepBenchmarkFiles = options.KeepBenchmarkFiles;
+            config.StopOnFirstError = options.StopOnFirstError;
 
             return config.AsReadOnly();
         }
@@ -238,8 +251,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 baseJob = baseJob.WithMinWarmupCount(options.MinWarmupIterationCount.Value);
             if (options.MaxWarmupIterationCount.HasValue)
                 baseJob = baseJob.WithMaxWarmupCount(options.MaxWarmupIterationCount.Value);
-            if (options.IterationTimeInMiliseconds.HasValue)
-                baseJob = baseJob.WithIterationTime(TimeInterval.FromMilliseconds(options.IterationTimeInMiliseconds.Value));
+            if (options.IterationTimeInMilliseconds.HasValue)
+                baseJob = baseJob.WithIterationTime(TimeInterval.FromMilliseconds(options.IterationTimeInMilliseconds.Value));
             if (options.IterationCount.HasValue)
                 baseJob = baseJob.WithIterationCount(options.IterationCount.Value);
             if (options.MinIterationCount.HasValue)

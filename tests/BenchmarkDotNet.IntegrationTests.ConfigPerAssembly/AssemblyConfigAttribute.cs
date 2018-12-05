@@ -32,6 +32,8 @@ namespace BenchmarkDotNet.IntegrationTests.ConfigPerAssembly
             {
                 IsActivated = true;
             }
+
+            public void Flush() { }
         }
     }
 }

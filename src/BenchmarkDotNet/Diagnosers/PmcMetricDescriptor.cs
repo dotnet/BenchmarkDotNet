@@ -19,6 +19,6 @@ namespace BenchmarkDotNet.Diagnosers
         public bool TheGreaterTheBetter { get; }
         public string NumberFormat => "N0";
         public UnitType UnitType => UnitType.Dimensionless;
-        public string Unit => string.Empty;
+        public string Unit => "Count";
     }
 }

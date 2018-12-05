@@ -91,7 +91,8 @@ namespace BenchmarkDotNet.IntegrationTests
             var baseConfig = job == null ? (IConfig)new SingleRunFastConfig() : new SingleJobConfig(job);
             return baseConfig
                 .With(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default))
-                .With(DefaultColumnProviders.Instance);
+                .With(DefaultColumnProviders.Instance)
+                .With(DefaultConfig.Instance.GetAnalysers().ToArray());
         }
     }
 }

@@ -48,5 +48,7 @@ namespace BenchmarkDotNet.Configs
         public bool HighPerformancePowerPlan => config.HighPerformancePowerPlan;
 
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => config.GetLogicalGroupRules();
+
+        public bool StopOnFirstError => config.StopOnFirstError;
     }
 }

@@ -23,5 +23,7 @@ namespace BenchmarkDotNet.Loggers
         public void WriteLine() => writer.WriteLine();
 
         public void WriteLine(LogKind logKind, string text) => writer.WriteLine(text);
+
+        public void Flush() => writer.Flush();
     }
 }

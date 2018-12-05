@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Columns;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -18,19 +19,19 @@ namespace BenchmarkDotNet.Reports
 
     public interface IMetricDescriptor
     {
-        string Id { get; }
+        [PublicAPI] string Id { get; }
         
-        string DisplayName { get; }
+        [PublicAPI] string DisplayName { get; }
 
-        string Legend { get; }
+        [PublicAPI] string Legend { get; }
 
-        string NumberFormat { get; }
+        [PublicAPI] string NumberFormat { get; }
 
-        UnitType UnitType { get; }
+        [PublicAPI] UnitType UnitType { get; }
         
-        string Unit { get; }
+        [PublicAPI] string Unit { get; }
 
-        bool TheGreaterTheBetter { get; }
+        [PublicAPI] bool TheGreaterTheBetter { get; }
     }
 
     public class MetricDescriptorEqualityComparer : EqualityComparer<IMetricDescriptor>

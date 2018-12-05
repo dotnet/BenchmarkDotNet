@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Configs
         public ISummaryStyle GetSummaryStyle() => summaryStyle;
         
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => logicalGroupRules;
-
+        [PublicAPI] public bool StopOnFirstError { get; set; }
         [PublicAPI] public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
         [PublicAPI] public bool KeepBenchmarkFiles { get; set; }
         [PublicAPI] public bool SummaryPerType { get; set; } = true;
@@ -86,6 +86,7 @@ namespace BenchmarkDotNet.Configs
             HighPerformancePowerPlan &= config.HighPerformancePowerPlan;
             summaryStyle = summaryStyle ?? config.GetSummaryStyle();
             logicalGroupRules.AddRange(config.GetLogicalGroupRules());
+            StopOnFirstError |= config.StopOnFirstError;
         }
 
         public IEnumerable<IDiagnoser> GetDiagnosers()
