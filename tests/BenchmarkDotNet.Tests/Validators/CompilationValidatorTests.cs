@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
@@ -28,12 +29,25 @@ namespace BenchmarkDotNet.Tests.Validators
                         null)
                 }, new ManualConfig());
 
-            var errors = CompilationValidator.Default.Validate(parameters);
+            var errors = CompilationValidator.Default.Validate(parameters).Select(e => e.Message);
 
-            Assert.Equal("Benchmarked method `Has Some Whitespaces` contains illegal character(s). Please use `[<Benchmark(Description = \"Custom name\")>]` to set custom display name.", 
-                errors.Single().Message);
+            Assert.Contains(errors,
+                s => s.Equals(
+                    "Benchmarked method `Has Some Whitespaces` contains illegal character(s). Please use `[<Benchmark(Description = \"Custom name\")>]` to set custom display name."));
         }
 
+        [Theory]
+        [InlineData(typeof(BenchmarkClassWithStaticMethod), true)]
+        [InlineData(typeof(BenchmarkClass<PublicClass>), false)]
+        public void Benchmark_Class_Methods_Must_Be_Non_Static(Type type, bool hasErrors)
+        {
+            // Act
+            var validationErrors = CompilationValidator.Default.Validate(BenchmarkConverter.TypeToBenchmarks(type))
+                                                               .ToList();
+            
+            // Assert
+            Assert.Equal(validationErrors.Any(), hasErrors);
+        }
         
         [Theory]
         [InlineData(typeof(PublicClass), false)]
@@ -81,6 +95,12 @@ namespace BenchmarkDotNet.Tests.Validators
         {
             protected internal class ProtectedInternalNestedClass { }
         }
+    }
+    
+    public class BenchmarkClassWithStaticMethod
+    {
+        [Benchmark]
+        public static void StaticMethod() { }
     }
     
     public class BenchmarkClass<T> where T : new()
