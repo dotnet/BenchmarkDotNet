@@ -105,7 +105,7 @@ namespace BenchmarkDotNet.Engines
                     }
                 }
 
-                warmupStage.RunWorkload(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring);
+                warmupStage.RunWorkload(invokeCount, UnrollFactor, Strategy);
             }
 
             Host.BeforeMainRun();
