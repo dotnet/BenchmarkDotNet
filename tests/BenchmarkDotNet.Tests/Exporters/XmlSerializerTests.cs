@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using BenchmarkDotNet.Exporters.Xml;
+using JetBrains.Annotations;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Exporters
@@ -134,20 +135,44 @@ namespace BenchmarkDotNet.Tests.Exporters
         }
 
         [Theory]
-        [MemberData(nameof(SerializeTestData))]
-        public void SerializeThrowsGivenNullArguments(MockXmlWriter writer, object source, Type exception)
+        [MemberData(nameof(SerializeTestDataNames))]
+        public void SerializeThrowsGivenNullArguments(string dataName)
         {
-            IXmlSerializer serializer = XmlSerializer.GetBuilder(typeof(MockSource)).Build();
+            var (writer, source, exception) = SerializeTestDataItems[dataName]; 
+            var serializer = XmlSerializer.GetBuilder(typeof(MockSource)).Build();
             Assert.Throws(exception, () => serializer.Serialize(writer, source));
         }
 
-        public static IEnumerable<object[]> SerializeTestData { get; } =
-            new List<object[]>
+        private class SerializeTestData
+        {
+            private MockXmlWriter Writer { get; }
+            private object Source { get; }
+            private Type Exception { get; }
+
+            public SerializeTestData(MockXmlWriter writer, object source, Type exception)
             {
-                new object[] { null, null, typeof(ArgumentNullException) },
-                new object[] { null, new MockSource(), typeof(ArgumentNullException) },
-                new object[] { new MockXmlWriter(), null, typeof(ArgumentNullException) }
-            };
+                Writer = writer;
+                Source = source;
+                Exception = exception;
+            }
+
+            public void Deconstruct(out MockXmlWriter writer, out object source, out Type exception)
+            {
+                writer = Writer;
+                source = Source;
+                exception = Exception;
+            }
+        }
+            
+        private static readonly Dictionary<string, SerializeTestData> SerializeTestDataItems = new Dictionary<string, SerializeTestData>
+        {
+            {"Null", new SerializeTestData(null, null, typeof(ArgumentNullException))},
+            {"MockSource", new SerializeTestData(null, new MockSource(), typeof(ArgumentNullException))},
+            {"MockXmlWriter", new SerializeTestData(new MockXmlWriter(), null, typeof(ArgumentNullException))}
+        };
+
+        [UsedImplicitly]
+        public static TheoryData<string> SerializeTestDataNames => TheoryDataHelper.Create(SerializeTestDataItems.Keys);
 
         [Fact]
         public void WritesElementStringGivenSimpleCollectionItem()
