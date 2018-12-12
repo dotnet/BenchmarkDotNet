@@ -22,13 +22,17 @@ namespace BenchmarkDotNet.Columns
 
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
 
-        public bool IsAvailable(Summary summary) => summary.Reports.Any(report => report.Metrics.ContainsKey(descriptor.Id));
+        public bool IsAvailable(Summary summary) => summary.Reports.Any(report => report.Metrics?.ContainsKey(descriptor.Id) ?? false);
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => GetValue(summary, benchmarkCase, SummaryStyle.Default);
         
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style) 
         {
-            if (!summary.HasReport(benchmarkCase) || !summary[benchmarkCase].Metrics.TryGetValue(descriptor.Id, out Metric metric) || metric.Value == 0.0)
+            if (!summary.HasReport(benchmarkCase))
+                return "-";
+
+            BenchmarkReport report = summary[benchmarkCase];
+            if (report.Metrics == null || !report.Metrics.TryGetValue(descriptor.Id, out Metric metric) || metric.Value == 0.0)
                 return "-";
 
             if (style.PrintUnitsInContent && descriptor.UnitType == UnitType.Size)
