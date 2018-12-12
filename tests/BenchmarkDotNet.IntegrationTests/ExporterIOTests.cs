@@ -78,9 +78,7 @@ namespace BenchmarkDotNet.IntegrationTests
             string resultsDirectoryPath = Path.GetTempPath();
             var exporter = new MockExporter();
             var mockSummary = GetMockSummary(resultsDirectoryPath, typeof(Generic<int>));
-            var expectedFilePath = RuntimeInformation.IsWindows()
-                ? $"{Path.Combine(mockSummary.ResultsDirectoryPath, "BenchmarkDotNet.IntegrationTests.Generic_Int32_")}-report.txt"
-                : $"{Path.Combine(mockSummary.ResultsDirectoryPath, "BenchmarkDotNet.IntegrationTests.Generic<Int32>")}-report.txt"; // "<" is OK for non-Windows OSes ;)
+            var expectedFilePath = $"{Path.Combine(mockSummary.ResultsDirectoryPath, "BenchmarkDotNet.IntegrationTests.Generic_Int32_")}-report.txt";
             string actualFilePath = null;
 
             try

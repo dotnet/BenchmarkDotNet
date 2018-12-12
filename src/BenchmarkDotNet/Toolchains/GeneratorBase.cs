@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.Toolchains
         [PublicAPI] protected virtual void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) { }
 
         /// <summary>
-        /// generates a script can be used when dubugging compilation issues
+        /// generates a script can be used when debugging compilation issues
         /// </summary>
         [PublicAPI] protected abstract void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths);
 

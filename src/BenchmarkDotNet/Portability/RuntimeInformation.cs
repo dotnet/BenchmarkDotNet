@@ -65,7 +65,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static string ScriptFileExtension => IsWindows() ? ".bat" : ".sh";
 
-        internal static string GetArchitecture() => GetCurrentPlatform() == Platform.X86 ? "32bit" : "64bit";
+        internal static string GetArchitecture() => Is64BitPlatform() ? "64bit" : "32bit";
 
         private static string DockerSdkVersion => Environment.GetEnvironmentVariable("DOTNET_VERSION");
         private static string DockerAspnetSdkVersion => Environment.GetEnvironmentVariable("ASPNETCORE_VERSION");
@@ -238,7 +238,24 @@ namespace BenchmarkDotNet.Portability
             throw new NotSupportedException("Unknown .NET Framework"); // todo: adam sitnik fix it
         }
 
-        public static Platform GetCurrentPlatform() => IntPtr.Size == 4 ? Platform.X86 : Platform.X64;
+        public static Platform GetCurrentPlatform()
+        {
+            switch (System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture)
+            {
+                case Architecture.Arm:
+                    return Platform.Arm;
+                case Architecture.Arm64:
+                    return Platform.Arm64;
+                case Architecture.X64:
+                    return Platform.X64;
+                case Architecture.X86:
+                    return Platform.X86;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        public static bool Is64BitPlatform() => IntPtr.Size == 8;
 
         private static IEnumerable<JitModule> GetJitModules()
         {
@@ -258,7 +275,7 @@ namespace BenchmarkDotNet.Portability
             if (IsNetCore)
                 return true;
 
-            return GetCurrentPlatform() == Platform.X64
+            return Is64BitPlatform()
                    && GetConfiguration() != DebugConfigurationName
                    && !new JitHelper().IsMsX64();
         }

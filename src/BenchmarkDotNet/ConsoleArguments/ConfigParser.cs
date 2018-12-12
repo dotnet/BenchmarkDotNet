@@ -140,7 +140,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             foreach (var coreRunPath in options.CoreRunPaths)
                 if (coreRunPath.IsNotNullButDoesNotExist())
                 {
-                    logger.WriteLineError($"The provided path to CoreRun: \"{options.CoreRunPaths}\" does NOT exist.");
+                    logger.WriteLineError($"The provided path to CoreRun: \"{coreRunPath}\" does NOT exist. Please remember that BDN expects path to CoreRun.exe (corerun on Unix), not to Core_Root folder.");
                     return false;
                 }
             

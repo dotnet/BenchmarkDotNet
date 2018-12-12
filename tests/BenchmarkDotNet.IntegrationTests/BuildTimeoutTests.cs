@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void WhenBuildTakesMoreTimeThanTheTimeoutTheBuildIsCancelled()
         {
-            if (RuntimeInformation.GetCurrentPlatform() == Platform.X86) // CoreRT does not support 32bit yet
+            if (!RuntimeInformation.Is64BitPlatform()) // CoreRT does not support 32bit yet
                 return;
             
             // we use CoreRT on purpose because it takes a LOT of time to build it

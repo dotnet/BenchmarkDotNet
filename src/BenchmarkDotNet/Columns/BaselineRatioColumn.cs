@@ -69,8 +69,12 @@ namespace BenchmarkDotNet.Columns
         }
 
         [CanBeNull]
-        private static Statistics GetRatioStatistics(Statistics current, Statistics baseline)
+        private static Statistics GetRatioStatistics([CanBeNull] Statistics current, [CanBeNull] Statistics baseline)
         {
+            if (current == null || current.N < 1)
+                return null;
+            if (baseline == null || baseline.N < 1)
+                return null;
             try
             {
                 return Statistics.Divide(current, baseline);

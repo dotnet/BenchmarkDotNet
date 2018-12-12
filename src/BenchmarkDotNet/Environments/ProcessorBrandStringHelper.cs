@@ -19,16 +19,16 @@ namespace BenchmarkDotNet.Environments
         [NotNull]
         public static string Prettify(CpuInfo cpuInfo, bool includeMaxFrequency = false)
         {
-            if (cpuInfo == null)
+            if (cpuInfo == null || string.IsNullOrEmpty(cpuInfo.ProcessorName))
             {
-                return "";
+                return "Unknown processor";
             }
 
             // Remove parts which don't provide any useful information for user
             var processorName = cpuInfo.ProcessorName.Replace("@", "").Replace("(R)", "").Replace("(TM)", "");
             
             // If we have found physical core(s), we can safely assume we can drop extra info from brand
-            if (cpuInfo.PhysicalCoreCount > 0)
+            if (cpuInfo.PhysicalCoreCount.HasValue && cpuInfo.PhysicalCoreCount.Value > 0)
                 processorName = Regex.Replace(processorName, @"(\w+?-Core Processor)", "").Trim();
 
             string frequencyString = GetBrandStyledActualFrequency(cpuInfo.NominalFrequency);
