@@ -7,23 +7,23 @@ namespace BenchmarkDotNet.Engines.CacheClearingStrategies
     {
         public static ICacheClearingStrategy GetStrategy(CacheClearingStrategy cacheClearingStrategy, IntPtr? affinity)
         {
-            if (cacheClearingStrategy == CacheClearingStrategy.None)
-                return null;
+            string message = Validate(cacheClearingStrategy, (int?) affinity);
+            if (!string.IsNullOrEmpty(message))
+                throw new NotSupportedException(message);
 
-            if (cacheClearingStrategy == CacheClearingStrategy.Native)
+            switch (cacheClearingStrategy)
             {
-                return new NativeCacheClearingStrategy();
-            }
-
-            if (cacheClearingStrategy == CacheClearingStrategy.Allocations)
-            {
-                if (affinity.HasValue && CountSetBits((int) affinity.Value) <= 1)
+                case CacheClearingStrategy.None:
+                    return null;
+                case CacheClearingStrategy.Native:
+                    return new NativeCacheClearingStrategy();
+                case CacheClearingStrategy.Allocations when affinity.HasValue && CountSetBits((int) affinity.Value) <= 1:
                     return new AllocationsCacheClearingStrategyForOneCore(new MemoryAllocator());
-
-                return new AllocationsCacheClearingStrategyForWindows(new MemoryAllocator());
+                case CacheClearingStrategy.Allocations:
+                    return new AllocationsCacheClearingStrategyForWindows(new MemoryAllocator());
+                default:
+                    throw new NotSupportedException($"Not supported cache clearing strategy: {cacheClearingStrategy}.");
             }
-
-            return null;
         }
 
         public static string Validate(CacheClearingStrategy cacheClearingStrategy, int? affinity)
@@ -31,16 +31,12 @@ namespace BenchmarkDotNet.Engines.CacheClearingStrategies
             if (!RuntimeInformation.IsWindows())
             {
                 if (cacheClearingStrategy == CacheClearingStrategy.Native)
-                {
                     return "The native method of clearing the cache is only available on Windows.";
-                }
 
                 if (cacheClearingStrategy == CacheClearingStrategy.Allocations)
-                {
                     if (!affinity.HasValue || CountSetBits(affinity.Value) != 1)
-                        return "The allocations method of clearing the cache for more then one core is only available on Windows. Please use --affinity if you want to set process affinity.";
-     
-                }
+                        return
+                            "The allocations method of clearing the cache for more then one core is only available on Windows. Please use --affinity if you want to set process affinity.";
             }
 
             return null;
