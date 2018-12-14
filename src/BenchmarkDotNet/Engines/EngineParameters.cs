@@ -27,7 +27,6 @@ namespace BenchmarkDotNet.Engines
         public Action IterationSetupAction { get; set; }
         public Action IterationCleanupAction { get; set; }
         public bool MeasureGcStats { get; set; }
-        public CacheClearingStrategy CacheClearingStrategy { get; set; }
         
         [PublicAPI] public Encoding Encoding { get; set; }
         

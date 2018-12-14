@@ -146,7 +146,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("statisticalTest", Required = false, HelpText = "Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s")]
         public string StatisticalTestThreshold { get; set; }
 
-        [Option("cacheClearingStrategy", Required = false, Default = CacheClearingStrategy.None, HelpText = "Cache clearing strategy.")]
+        [Option("cleaningCache", Required = false, Default = CacheClearingStrategy.None, HelpText = "Cache clearing strategy. Allocations/Native")]
         public CacheClearingStrategy CacheClearingStrategy { get; set; }
 
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any(); 
@@ -160,6 +160,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 var shortName = new UnParserSettings { PreferShortName = true };
                 var longName = new UnParserSettings { PreferShortName = false };
 
+                yield return new Example("List all of the benchmark names as flat list", longName, new CommandLineOptions { ListBenchmarkCaseMode = ListBenchmarkCaseMode.Flat});
+                yield return new Example("List all of the benchmark names as tree list", longName, new CommandLineOptions { ListBenchmarkCaseMode = ListBenchmarkCaseMode.Tree});
                 yield return new Example("Use Job.ShortRun for running the benchmarks", shortName, new CommandLineOptions { BaseJob = "short" });
                 yield return new Example("Run benchmarks in process", shortName, new CommandLineOptions { RunInProcess = true });
                 yield return new Example("Run benchmarks for .NET 4.7.2, .NET Core 2.1 and Mono. .NET 4.7.2 will be baseline because it was first.", longName, new CommandLineOptions { Runtimes = new[] { "net472", "netcoreapp2.1", "Mono" } });
@@ -177,6 +179,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return new Example("Run selected benchmarks 250ms per iteration. Perform from 9 to 15 iterations", longName, new CommandLineOptions { IterationTimeInMilliseconds = 250, MinIterationCount = 9, MaxIterationCount = 15});
                 yield return new Example("Run MannWhitney test with relative ratio of 5% for all benchmarks for .NET Core 2.0 (base) vs .NET Core 2.1 (diff). .NET Core 2.0 will be baseline because it was provided as first.", longName, 
                     new CommandLineOptions { Filters = new [] { "*"}, Runtimes = new[] { "netcoreapp2.0", "netcoreapp2.1" }, StatisticalTestThreshold = "5%" });
+                yield return new Example("Run benchmarks with cleaning cache", longName, new CommandLineOptions { CacheClearingStrategy = CacheClearingStrategy.Allocations });
+                yield return new Example("Run benchmarks with cleaning cache and processor affinity", longName, new CommandLineOptions { CacheClearingStrategy = CacheClearingStrategy.Allocations, Affinity = 1});
             }
         }
 

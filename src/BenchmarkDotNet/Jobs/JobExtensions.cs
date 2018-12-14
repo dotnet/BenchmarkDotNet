@@ -27,6 +27,11 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithAffinity(this Job job, IntPtr affinity) => job.WithCore(j => j.Environment.Affinity = affinity);
 
         /// <summary>
+        /// The cache clearing strategy
+        /// </summary>
+        public static Job WithCacheClearingStrategy(this Job job, CacheClearingStrategy cacheClearingStrategy) => job.WithCore(j => j.Environment.CacheClearingStrategy = cacheClearingStrategy);
+
+        /// <summary>
         /// Specifies whether the common language runtime runs server garbage collection.
         /// <value>false: Does not run server garbage collection. This is the default.</value>
         /// <value>true: Runs server garbage collection.</value>

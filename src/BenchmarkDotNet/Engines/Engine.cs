@@ -39,11 +39,12 @@ namespace BenchmarkDotNet.Engines
         private RunStrategy Strategy { get; }
         private bool EvaluateOverhead { get; }
         private int InvocationCount { get; }
-
+        
         private readonly EnginePilotStage pilotStage;
         private readonly EngineWarmupStage warmupStage;
         private readonly EngineActualStage actualStage;
         private readonly bool includeMemoryStats;
+        private readonly IntPtr? affinity;
         private readonly ICacheClearingStrategy cacheClearingStrategy;
 
         internal Engine(
@@ -51,7 +52,7 @@ namespace BenchmarkDotNet.Engines
             IResolver resolver,
             Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> overheadAction, Action<long> workloadAction, Job targetJob,
             Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
-            bool includeMemoryStats, Encoding encoding, string benchmarkName, CacheClearingStrategy cacheClearingStrategy)
+            bool includeMemoryStats, Encoding encoding, string benchmarkName)
         {
             
             Host = host;
@@ -71,8 +72,12 @@ namespace BenchmarkDotNet.Engines
 
             Resolver = resolver;
             Encoding = encoding;
-            this.cacheClearingStrategy = CacheClearingStrategiesFactory.GetStrategy(cacheClearingStrategy);
 
+            affinity = TargetJob.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic) ? (IntPtr?) TargetJob.Job.Environment.Affinity : null;
+
+            var strategy = targetJob.ResolveValue(EnvironmentMode.CacheClearingStrategyCharacteristic, Resolver);
+            this.cacheClearingStrategy = CacheClearingStrategiesFactory.GetStrategy(strategy, affinity);
+            
             Clock = targetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, Resolver);
             ForceAllocations = targetJob.ResolveValue(GcMode.ForceCharacteristic, Resolver);
             UnrollFactor = targetJob.ResolveValue(RunMode.UnrollFactorCharacteristic, Resolver);
@@ -141,7 +146,8 @@ namespace BenchmarkDotNet.Engines
             if(!isOverhead)
                 IterationSetupAction();
 
-            ClearCache();
+            // this line should be before GcCollect because some strategies can allocate managed memory
+            cacheClearingStrategy?.ClearCache(affinity);
 
             GcCollect();
 
@@ -166,17 +172,6 @@ namespace BenchmarkDotNet.Engines
             WriteLine(measurement.ToOutputLine());
 
             return measurement;
-        }
-
-        private void ClearCache()
-        {
-            IntPtr? affinity = null;
-            if (TargetJob.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
-            {
-                affinity = TargetJob.Job.Environment.Affinity;
-            }
-
-            cacheClearingStrategy?.ClearCache(affinity);
         }
 
         private GcStats MeasureGcStats(IterationData data)
