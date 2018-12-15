@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Tests.Validators
                                                                .ToList();
             
             // Assert
-            Assert.Equal(validationErrors.Any(), hasErrors);
+            Assert.Equal(hasErrors, validationErrors.Any());
         }
       
         private static Delegate BuildDummyMethod<T>(string name)
