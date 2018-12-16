@@ -81,7 +81,6 @@ namespace BenchmarkDotNet.Tests.Reports
 
         public class MockBenchmarkClass
         {
-            // Looks like this attribute is significant here. The issue does not reproduce if it is omitted.
             [Benchmark(Baseline = true)]
             public void Foo() { }
         }
