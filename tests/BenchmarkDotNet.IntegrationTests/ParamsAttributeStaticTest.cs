@@ -106,7 +106,7 @@ namespace BenchmarkDotNet.IntegrationTests
             private static HashSet<int> collectedParams = new HashSet<int>();
 
             [Benchmark]
-            public static void Benchmark()
+            public void Benchmark()
             {
                 if (collectedParams.Contains(StaticParamField) == false)
                 {
@@ -135,7 +135,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
 #pragma warning disable xUnit1013 // Public method should be marked as test
         [Benchmark]
-        public static void Benchmark()
+        public void Benchmark()
         {
             if (collectedParams.Contains(StaticParamField) == false)
             {
