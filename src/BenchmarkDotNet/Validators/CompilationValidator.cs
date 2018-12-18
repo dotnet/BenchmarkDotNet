@@ -19,7 +19,8 @@ namespace BenchmarkDotNet.Validators
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
             => ValidateCSharpNaming(validationParameters.Benchmarks)
                     .Union(ValidateNamingConflicts(validationParameters.Benchmarks))
-                    .Union(ValidateAccessModifiers(validationParameters.Benchmarks));
+                    .Union(ValidateAccessModifiers(validationParameters.Benchmarks))
+                    .Union(ValidateBindingModifiers(validationParameters.Benchmarks));
 
         private static IEnumerable<ValidationError> ValidateCSharpNaming(IEnumerable<BenchmarkCase> benchmarks)
             => benchmarks
@@ -46,7 +47,17 @@ namespace BenchmarkDotNet.Validators
             => benchmarks.Where(x => x.Descriptor.Type.IsGenericType
                                      && HasPrivateGenericArguments(x.Descriptor.Type))
                          .Select(benchmark => new ValidationError(true, $"Generic class {benchmark.Descriptor.Type.GetDisplayName()} has non public generic argument(s)"));
-        
+
+        private static IEnumerable<ValidationError> ValidateBindingModifiers(IEnumerable<BenchmarkCase> benchmarks)
+            => benchmarks.Where(x => x.Descriptor.WorkloadMethod.IsStatic)
+                          .Distinct(BenchmarkMethodEqualityComparer.Instance)
+                          .Select(benchmark
+                              => new ValidationError(
+                                  true,
+                                  $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` is static. Please use instance methods only for benchmarks.",
+                                  benchmark
+                              ));
+                
         private static bool IsValidCSharpIdentifier(string identifier) // F# allows to use whitespaces as names #479
             => !string.IsNullOrEmpty(identifier)
                && (char.IsLetter(identifier[0]) || identifier[0] == Underscore) // An identifier must start with a letter or an underscore
