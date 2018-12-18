@@ -143,11 +143,14 @@ namespace BenchmarkDotNet.Engines
             bool isOverhead = data.IterationMode == IterationMode.Overhead;
             var action = isOverhead ? OverheadAction : WorkloadAction;
 
-            if(!isOverhead)
+            if (!isOverhead)
                 IterationSetupAction();
 
-            // this line should be before GcCollect because some strategies can allocate managed memory
-            cacheClearingStrategy?.ClearCache(affinity);
+            if (data.IterationMode == IterationMode.Workload && data.IterationStage == IterationStage.Actual)
+            {
+                // this line should be before GcCollect because some strategies can allocate managed memory
+                cacheClearingStrategy?.ClearCache(affinity);
+            }
 
             GcCollect();
 

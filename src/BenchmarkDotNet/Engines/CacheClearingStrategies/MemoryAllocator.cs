@@ -1,30 +1,19 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace BenchmarkDotNet.Engines.CacheClearingStrategies
 {
     internal class MemoryAllocator : IMemoryAllocator
     {
+        private const int HowManyMb = 14;
+        private const int SizeOfArray = HowManyMb * 1024 * 1024;
+        private readonly int[] memory = Enumerable.Range(1, SizeOfArray).ToArray();
+
         public void AllocateMemory()
         {
-            const int howManyMb = 14;
-            const int howManyPass = 10;
-            const int sizeOfOneArray = 64;
-
-            for (int i = 0; i < (howManyMb * 1024 * 1024 / sizeOfOneArray) * howManyPass; i++)
+            for (int i = 0; i < SizeOfArray; i++)
             {
-                var tmpArray = new int[sizeOfOneArray];
-
-                for (int j = 0; j < sizeOfOneArray; j++)
-                {
-                    tmpArray[j] = i * j;
-                }
-
-                tmpArray[0] = 6;
-
-                for (int j = 0; j < sizeOfOneArray; j++)
-                {
-                    Consumer(tmpArray[j]);
-                }
+                Consumer(memory[i]);
             }
         }
 

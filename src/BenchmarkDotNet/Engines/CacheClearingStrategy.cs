@@ -3,7 +3,6 @@
     public enum CacheClearingStrategy
     {
         None,
-        Allocations,
-        Native
+        Allocations
     }
 }
