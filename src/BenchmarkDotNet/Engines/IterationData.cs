@@ -1,6 +1,6 @@
 ﻿namespace BenchmarkDotNet.Engines
 {
-    public struct IterationData
+    public struct IterationData : IIterationInfo
     {
         public IterationMode IterationMode { get; }
         public IterationStage IterationStage { get; }

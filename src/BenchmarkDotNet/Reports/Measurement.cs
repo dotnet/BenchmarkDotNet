@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Reports
     /// <summary>
     /// The basic captured statistics for a benchmark.
     /// </summary>
-    public struct Measurement : IComparable<Measurement>
+    public struct Measurement : IComparable<Measurement>, IIterationInfo
     {
         private static Measurement Error (Encoding encoding) => new Measurement(-1, IterationMode.Unknown, IterationStage.Unknown, 0, 0, 0, encoding);
 

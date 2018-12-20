@@ -140,13 +140,13 @@ namespace BenchmarkDotNet.Engines
             long invokeCount = data.InvokeCount;
             int unrollFactor = data.UnrollFactor;
             long totalOperations = invokeCount * OperationsPerInvoke;
-            bool isOverhead = data.IterationMode == IterationMode.Overhead;
+            bool isOverhead = data.IsOverhead();
             var action = isOverhead ? OverheadAction : WorkloadAction;
 
             if (!isOverhead)
                 IterationSetupAction();
 
-            if (data.IterationMode == IterationMode.Workload && data.IterationStage == IterationStage.Actual)
+            if (data.IsWorkload() && data.IsActualState())
             {
                 // this line should be before GcCollect because some strategies can allocate managed memory
                 cacheClearingStrategy?.ClearCache(affinity);

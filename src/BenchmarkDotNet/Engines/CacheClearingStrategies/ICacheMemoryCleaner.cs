@@ -1,7 +1,7 @@
 ﻿namespace BenchmarkDotNet.Engines.CacheClearingStrategies
 {
-    internal interface IMemoryAllocator
+    internal interface ICacheMemoryCleaner
     {
-        void AllocateMemory();
+        void Clean();
     }
 }

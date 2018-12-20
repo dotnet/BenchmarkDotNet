@@ -28,13 +28,13 @@ namespace BenchmarkDotNet.Samples
             }
         }
 
-        private readonly int[] array = Enumerable.Range(1, 1024 * 1024 * 1024).ToArray();
+        private readonly int[] array = Enumerable.Range(1, 14 * 1024 * 1024).ToArray();
 
         [Benchmark]
         public int ArraySum()
         {
             int result = 0;
-            for (int i = 0; i < array.Length; i += 16)
+            for (int i = 0; i < array.Length; i += 16) // 16 because sizeof(int) = 4, 4 * 16 = 64 bytes.
             {
                 result += array[i];
             }

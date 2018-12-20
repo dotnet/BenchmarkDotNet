@@ -5,9 +5,9 @@ namespace BenchmarkDotNet.Engines.CacheClearingStrategies
 {
     internal class AllocationsCacheClearingStrategyForOneCore : ICacheClearingStrategy
     {
-        private readonly IMemoryAllocator memoryAllocator;
+        private readonly ICacheMemoryCleaner cacheMemoryCleaner;
 
-        public AllocationsCacheClearingStrategyForOneCore(IMemoryAllocator memoryAllocator) => this.memoryAllocator = memoryAllocator;
+        public AllocationsCacheClearingStrategyForOneCore(ICacheMemoryCleaner cacheMemoryCleaner) => this.cacheMemoryCleaner = cacheMemoryCleaner;
 
         public void ClearCache(IntPtr? affinity)
         {
@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Engines.CacheClearingStrategies
             int index = 0;
             for (int i = 0; i < howManyProcessOnProcessor; i++)
             {
-                var thread = new Thread(() => memoryAllocator.AllocateMemory()) { IsBackground = true, };
+                var thread = new Thread(() => cacheMemoryCleaner.Clean()) { IsBackground = true, };
                 thread.Start();
 
                 threads[index++] = thread;

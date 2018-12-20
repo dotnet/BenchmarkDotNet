@@ -16,9 +16,9 @@ namespace BenchmarkDotNet.Engines.CacheClearingStrategies
                 case CacheClearingStrategy.None:
                     return null;
                 case CacheClearingStrategy.Allocations when affinity.HasValue && CountSetBits((int) affinity.Value) <= 1:
-                    return new AllocationsCacheClearingStrategyForOneCore(new MemoryAllocator());
+                    return new AllocationsCacheClearingStrategyForOneCore(new CacheMemoryCleaner());
                 case CacheClearingStrategy.Allocations:
-                    return new AllocationsCacheClearingStrategyForWindows(new MemoryAllocator());
+                    return new AllocationsCacheClearingStrategyForWindows(new CacheMemoryCleaner());
                 default:
                     throw new NotSupportedException($"Not supported cache clearing strategy: {cacheClearingStrategy}.");
             }

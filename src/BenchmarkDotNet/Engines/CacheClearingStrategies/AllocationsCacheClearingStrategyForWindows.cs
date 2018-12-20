@@ -32,9 +32,9 @@ namespace BenchmarkDotNet.Engines.CacheClearingStrategies
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern SafeThreadHandle OpenThread(int access, bool inherit, int threadId);
 
-        private readonly IMemoryAllocator memoryAllocator;
+        private readonly ICacheMemoryCleaner cacheMemoryCleaner;
 
-        public AllocationsCacheClearingStrategyForWindows(IMemoryAllocator memoryAllocator) => this.memoryAllocator = memoryAllocator;
+        public AllocationsCacheClearingStrategyForWindows(ICacheMemoryCleaner cacheMemoryCleaner) => this.cacheMemoryCleaner = cacheMemoryCleaner;
 
         public void ClearCache(IntPtr? affinity)
         {
@@ -83,7 +83,7 @@ namespace BenchmarkDotNet.Engines.CacheClearingStrategies
         private void AllocateMemory(int affinity)
         {
             SetProcessorAffinity(affinity);
-            memoryAllocator.AllocateMemory();
+            cacheMemoryCleaner.Clean();
         }
 
         private static void SetProcessorAffinity(long coreMask)
