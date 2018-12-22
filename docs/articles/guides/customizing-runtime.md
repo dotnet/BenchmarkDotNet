@@ -5,8 +5,8 @@ name: Customizing Runtime
 
 # Customizing Runtime
 
-Currently, we have only information about customzing Mono in this section.
-If you want to customize .NET Core, read an artcile about @docs.toolchains.
+Currently, we have only information about customizing Mono in this section.
+If you want to customize .NET Core, read an article about @docs.toolchains.
 
 ---
 
