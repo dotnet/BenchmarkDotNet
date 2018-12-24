@@ -18,7 +18,7 @@
     <UseSharedCompilation>false</UseSharedCompilation>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(IsVisualBasic)' != 'true' And '$(TargetFramework)' == 'net46' ">
+  <PropertyGroup Condition=" '$(IsVisualBasic)' != 'true' And $(TargetFramework.StartsWith('net4')) ">
     <DefineConstants>$(DefineConstants);CLASSIC</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(IsVisualBasic)' != 'true' And ('$(TargetFramework)' == 'netcoreapp2.0' Or '$(TargetFramework)' == 'netcoreapp2.1') ">
