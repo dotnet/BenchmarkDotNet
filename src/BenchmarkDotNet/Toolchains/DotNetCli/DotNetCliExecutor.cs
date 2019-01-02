@@ -79,6 +79,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             {
                 var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId, config);
 
+                logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
+
                 ConsoleExitHandler.Instance.Process = process;
 
                 diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId, config));

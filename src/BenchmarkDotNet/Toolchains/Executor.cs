@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Toolchains
 
         private ExecuteResult Execute(Process process, BenchmarkCase benchmarkCase, SynchronousProcessOutputLoggerWithDiagnoser loggerWithDiagnoser, ILogger logger)
         {
-            logger.WriteLineInfo("// Execute: " + process.StartInfo.FileName + " " + process.StartInfo.Arguments);
+            logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
             ConsoleExitHandler.Instance.Process = process;
 
