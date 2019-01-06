@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
                 ilcPath: ilcPath,
                 useCppCodeGenerator: useCppCodeGenerator,
                 runtimeFrameworkVersion: runtimeFrameworkVersion,
-                targetFrameworkMoniker: targetFrameworkMoniker,
+                targetFrameworkMoniker: GetTargetFrameworkMoniker(),
                 runtimeIdentifier: runtimeIdentifier ?? GetPortableRuntimeIdentifier(),
                 customDotNetCliPath: customDotNetCliPath,
                 feeds: Feeds,
