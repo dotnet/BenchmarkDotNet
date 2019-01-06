@@ -66,17 +66,18 @@ If you forgot to change the configuration, BenchmarkDotNet will print a warning.
 ## Benchmark results
 
 ```
-BenchmarkDotNet=v0.10.1, OS=Microsoft Windows NT 6.2.9200.0
-Processor=Intel(R) Core(TM) i7-4702MQ CPU 2.20GHz, ProcessorCount=8
-Frequency=2143476 Hz, Resolution=466.5319 ns, Timer=TSC
-  [Host]     : Clr 4.0.30319.42000, 64bit RyuJIT-v4.6.1586.0
-  DefaultJob : Clr 4.0.30319.42000, 64bit RyuJIT-v4.6.1586.0
+BenchmarkDotNet=v0.11.3, OS=Windows 10.0.17134.472 (1803/April2018Update/Redstone4)
+Intel Core i7-2630QM CPU 2.00GHz (Sandy Bridge), 1 CPU, 8 logical and 4 physical cores
+Frequency=1948699 Hz, Resolution=513.1629 ns, Timer=TSC
+.NET Core SDK=2.1.502
+  [Host]     : .NET Core 2.1.6 (CoreCLR 4.6.27019.06, CoreFX 4.6.27019.05), 64bit RyuJIT
+  DefaultJob : .NET Core 2.1.6 (CoreCLR 4.6.27019.06, CoreFX 4.6.27019.05), 64bit RyuJIT
 
 
-| Method |        Mean |    StdDev | Allocated |
-|------- |------------ |---------- |---------- |
-| Sha256 | 130.5169 us | 1.8489 us |     188 B |
-|    Md5 |  25.8010 us | 0.1757 us |     113 B |
+| Method |      Mean |     Error |    StdDev |
+|------- |----------:|----------:|----------:|
+| Sha256 | 100.90 us | 0.5070 us | 0.4494 us |
+|    Md5 |  37.66 us | 0.1290 us | 0.1207 us |
 ```
 
 ## Jobs
