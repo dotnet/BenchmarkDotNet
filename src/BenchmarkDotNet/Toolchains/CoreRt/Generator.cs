@@ -106,7 +106,14 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                         : GenerateProjectForLocalBuild(buildPartition, artifactsPaths, logger));
 
         private string GenerateProjectForNuGetBuild(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $@"
-<Project Sdk=""Microsoft.NET.Sdk"">
+<Project ToolsVersion=""15.0"">
+  <PropertyGroup>
+    <ImportDirectoryBuildProps>false</ImportDirectoryBuildProps>
+    <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
+  </PropertyGroup>
+
+  <Import Project=""Sdk.props"" Sdk=""Microsoft.NET.Sdk"" />
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>{TargetFrameworkMoniker}</TargetFramework>
@@ -127,6 +134,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{coreRtVersion}"" />
     <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName}"" />
   </ItemGroup>
+  <Import Project=""Sdk.targets"" Sdk=""Microsoft.NET.Sdk"" />
 </Project>";
 
         private string GenerateProjectForLocalBuild(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $@"
