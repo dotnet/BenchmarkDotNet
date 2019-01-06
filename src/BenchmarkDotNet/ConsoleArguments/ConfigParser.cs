@@ -325,7 +325,9 @@ namespace BenchmarkDotNet.ConsoleArguments
 
                     if (options.CliPath != null)
                         builder.DotNetCli(options.CliPath.FullName);
-                    
+                    if (options.RestorePath != null)
+                        builder.PackagesRestorePath(options.RestorePath.FullName);
+
                     if (options.CoreRtPath != null)
                         builder.UseCoreRtLocal(options.CoreRtPath.FullName);
                     else if (!string.IsNullOrEmpty(options.CoreRtVersion))

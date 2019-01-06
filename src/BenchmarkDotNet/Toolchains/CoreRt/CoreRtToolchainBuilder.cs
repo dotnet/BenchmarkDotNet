@@ -11,7 +11,8 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         private string coreRtVersion;
         private string ilcPath;
         private bool useCppCodeGenerator;
-        
+        private string packagesRestorePath;
+
         private bool isCoreRtConfigured;
 
         /// <summary>
@@ -62,6 +63,17 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
             return this;
         }
 
+        /// <summary>
+        /// The directory to restore packages to (optional).
+        /// </summary>
+        /// <returns></returns>
+        public CoreRtToolchainBuilder PackagesRestorePath(string packagesRestorePath)
+        {
+            this.packagesRestorePath = packagesRestorePath;
+
+            return this;
+        }
+
         public override IToolchain ToToolchain()
         {
             if (!isCoreRtConfigured)
@@ -76,6 +88,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
                 targetFrameworkMoniker: GetTargetFrameworkMoniker(),
                 runtimeIdentifier: runtimeIdentifier ?? GetPortableRuntimeIdentifier(),
                 customDotNetCliPath: customDotNetCliPath,
+                packagesRestorePath: packagesRestorePath,
                 feeds: Feeds,
                 useNuGetClearTag: useNuGetClearTag,
                 useTempFolderForRestore: useTempFolderForRestore,
