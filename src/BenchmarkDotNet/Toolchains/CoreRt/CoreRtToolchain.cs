@@ -15,11 +15,11 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         internal CoreRtToolchain(string displayName, 
             string coreRtVersion, string ilcPath, bool useCppCodeGenerator,
             string runtimeFrameworkVersion, string targetFrameworkMoniker, string runtimeIdentifier,
-            string customDotNetCliPath,
+            string customDotNetCliPath, string packagesRestorePath,
             Dictionary<string, string> feeds, bool useNuGetClearTag, bool useTempFolderForRestore,
             TimeSpan timeout)
             : base(displayName,
-                new Generator(coreRtVersion, useCppCodeGenerator, runtimeFrameworkVersion, targetFrameworkMoniker, customDotNetCliPath, runtimeIdentifier, feeds, useNuGetClearTag, useTempFolderForRestore),
+                new Generator(coreRtVersion, useCppCodeGenerator, runtimeFrameworkVersion, targetFrameworkMoniker, customDotNetCliPath, runtimeIdentifier, feeds, useNuGetClearTag, useTempFolderForRestore, packagesRestorePath),
                 new DotNetCliPublisher(customDotNetCliPath, GetExtraArguments(useCppCodeGenerator, runtimeIdentifier), GetEnvironmentVariables(ilcPath), timeout), 
                 new Executor())
         {

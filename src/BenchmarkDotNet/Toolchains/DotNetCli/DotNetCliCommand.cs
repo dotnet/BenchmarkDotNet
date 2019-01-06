@@ -86,7 +86,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (!buildResult.IsSuccess)
                 return BuildResult.Failure(GenerateResult, new Exception(buildResult.AllInformation));
 
-            return Publish().ToBuildResult(GenerateResult);
+            var publishResult = Publish();
+            
+            if (!publishResult.IsSuccess) // if we failed to do the standard publish, let's try with --no-build
+                publishResult = PublishNoBuild();
+
+            return publishResult.ToBuildResult(GenerateResult);
         }
 
         public DotNetCliCommandResult AddPackages()
@@ -118,6 +123,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public DotNetCliCommandResult Publish()
             => DotNetCliCommandExecutor.Execute(WithArguments(
                 GetPublishCommand(BuildPartition, Arguments)));
+
+        public DotNetCliCommandResult PublishNoBuild()
+            => DotNetCliCommandExecutor.Execute(WithArguments(
+                GetPublishCommand(BuildPartition, $"{Arguments} --no-build")));
 
         internal static IEnumerable<string> GetAddPackagesCommands(BuildPartition buildPartition)
             => GetNuGetAddPackageCommands(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver);
