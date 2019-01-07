@@ -99,16 +99,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (RuntimeInformation.IsFullFramework)
                 return Default;
 
-            string netCoreAppVersion = null;
-
-            try
-            {
-                netCoreAppVersion = RuntimeInformation.GetNetCoreVersion(); // it might throw on CoreRT
-            }
-            catch
-            {
-                return Default;
-            }
+            var netCoreAppVersion = RuntimeInformation.GetNetCoreVersion();
 
             if (string.IsNullOrEmpty(netCoreAppVersion))
                 return Default;
