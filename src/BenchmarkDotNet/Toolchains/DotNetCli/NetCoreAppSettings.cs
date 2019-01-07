@@ -101,19 +101,19 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             var netCoreAppVersion = RuntimeInformation.GetNetCoreVersion();
 
-            if (string.IsNullOrEmpty(netCoreAppVersion))
-                return Default;
-
-            if (netCoreAppVersion.StartsWith("2.0", StringComparison.InvariantCultureIgnoreCase))
-                return NetCoreApp20;
-            if (netCoreAppVersion.StartsWith("2.1", StringComparison.InvariantCultureIgnoreCase))
-                return NetCoreApp21;
-            if (netCoreAppVersion.StartsWith("2.2", StringComparison.InvariantCultureIgnoreCase))
-                return NetCoreApp22;
-            if (netCoreAppVersion.StartsWith("3.0", StringComparison.InvariantCultureIgnoreCase))
-                return NetCoreApp30;
-
-            return Default;
+            switch (netCoreAppVersion)
+            {
+                case Version v when v.Major == 3 && v.Minor == 0:
+                    return NetCoreApp30;
+                case Version v when v.Major == 2 && v.Minor == 2:
+                    return NetCoreApp22;
+                case Version v when v.Major == 2 && v.Minor == 1:
+                    return NetCoreApp21;
+                case Version v when v.Major == 2 && v.Minor == 0:
+                    return NetCoreApp20;
+                default:
+                    return Default;
+            }
         }
     }
 }

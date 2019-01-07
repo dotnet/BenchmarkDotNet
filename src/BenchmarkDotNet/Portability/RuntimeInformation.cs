@@ -160,18 +160,14 @@ namespace BenchmarkDotNet.Portability
             return null;
         }
 
-        internal static string GetNetCoreVersion() => InDocker ? GetDockerNetCoreVersion() : GetBaseNetCoreVersion();
-
-        private static string GetDockerNetCoreVersion() => string.IsNullOrEmpty(DockerSdkVersion) ? DockerAspnetSdkVersion : DockerSdkVersion;
-
-        private static string GetBaseNetCoreVersion()
+        internal static Version GetNetCoreVersion()
         {
             var frameworkName = Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
 
             if (frameworkName == null)
                 return null;
 
-            return new FrameworkName(frameworkName).Version.ToString();
+            return new FrameworkName(frameworkName).Version;
         }
         
         internal static string GetRuntimeVersion()
@@ -206,7 +202,7 @@ namespace BenchmarkDotNet.Portability
             }
             else if (IsNetCore)
             {
-                string runtimeVersion = GetNetCoreVersion() ?? "?";
+                string runtimeVersion = GetNetCoreVersion()?.ToString() ?? "?";
 
                 var coreclrAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(object).GetTypeInfo().Assembly.Location);
                 var corefxAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(Regex).GetTypeInfo().Assembly.Location);
