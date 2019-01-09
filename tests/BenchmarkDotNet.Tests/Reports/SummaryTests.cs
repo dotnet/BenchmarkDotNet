@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.Tests.Reports
         private static BenchmarkReport CreateFailureReport(BenchmarkCase benchmark)
         {
             GenerateResult generateResult = GenerateResult.Failure(ArtifactsPaths.Empty, Array.Empty<string>());
-            BuildResult buildResult = BuildResult.Failure(generateResult);
+            BuildResult buildResult = BuildResult.Failure(generateResult, string.Empty);
             // Null may be legitimately passed as metrics to BenchmarkReport ctor here:
             // https://github.com/dotnet/BenchmarkDotNet/blob/89255c9fceb1b27c475a93d08c152349be4199e9/src/BenchmarkDotNet/Running/BenchmarkRunner.cs#L197
             return new BenchmarkReport(false, benchmark, generateResult, buildResult, default, default, default, default);

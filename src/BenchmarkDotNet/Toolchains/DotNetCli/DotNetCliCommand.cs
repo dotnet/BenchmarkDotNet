@@ -50,12 +50,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             var packagesResult = AddPackages();
 
             if (!packagesResult.IsSuccess)
-                return BuildResult.Failure(GenerateResult, new Exception(packagesResult.AllInformation));
+                return BuildResult.Failure(GenerateResult, packagesResult.AllInformation);
 
             var restoreResult = Restore();
 
             if (!restoreResult.IsSuccess)
-                return BuildResult.Failure(GenerateResult, new Exception(restoreResult.AllInformation));
+                return BuildResult.Failure(GenerateResult, restoreResult.AllInformation);
 
             var buildResult = Build().ToBuildResult(GenerateResult);
             
@@ -71,12 +71,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             var packagesResult = AddPackages();
 
             if (!packagesResult.IsSuccess)
-                return BuildResult.Failure(GenerateResult, new Exception(packagesResult.AllInformation));
+                return BuildResult.Failure(GenerateResult, packagesResult.AllInformation);
 
             var restoreResult = Restore();
 
             if (!restoreResult.IsSuccess)
-                return BuildResult.Failure(GenerateResult, new Exception(restoreResult.AllInformation));
+                return BuildResult.Failure(GenerateResult, restoreResult.AllInformation);
 
             var buildResult = Build();
 
@@ -84,7 +84,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 buildResult = BuildNoDependencies();
             
             if (!buildResult.IsSuccess)
-                return BuildResult.Failure(GenerateResult, new Exception(buildResult.AllInformation));
+                return BuildResult.Failure(GenerateResult, buildResult.AllInformation);
 
             var publishResult = Publish();
             
