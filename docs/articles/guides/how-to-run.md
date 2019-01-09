@@ -9,6 +9,16 @@ var summary = BenchmarkRunner.Run<MyBenchmarkClass>();
 var summary = BenchmarkRunner.Run(typeof(MyBenchmarkClass));
 ```
 
+## Global dotnet tool
+
+```log
+dotnet tool install BenchmarkDotNet.Tool -g
+```
+
+```log
+dotnet benchmarkdotnet MyAssemblyWithBenchmarks.dll --filter *
+```
+
 ## Url
 
 You can also run a benchmark directly from the internet:
