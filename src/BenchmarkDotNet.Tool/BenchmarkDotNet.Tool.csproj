@@ -1,30 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <Product>BenchmarkDotNet</Product>
     <IsPackable>true</IsPackable>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>dotnet-BenchmarkDotNet</ToolCommandName>
     <Description>A dotnet tool to execute BenchmarkDotNet benchmarks.</Description>
     <PackageTags>benchmark;benchmarking;performance;tool</PackageTags>
     <PackageId>BenchmarkDotNetTool</PackageId>
-    <Version>0.1.0</Version>
-    <PackageLicenseUrl />
-    <PackageProjectUrl>https://github.com/dotnet/BenchmarkDotNet</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/dotnet/BenchmarkDotNet</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageIconUrl>https://raw.githubusercontent.com/dotnet/BenchmarkDotNet/master/docs/guide/logo.png</PackageIconUrl>
-    <Copyright>.NET Foundation and contributors</Copyright>
-    <Authors>.NET Foundation and contributors</Authors>
-    <Company>.NET Foundation and contributors</Company>
-    <NeutralLanguage>en-US</NeutralLanguage>
-    <LangVersion>latest</LangVersion>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-  </PropertyGroup>  
   <ItemGroup>
     <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.3.0" />
