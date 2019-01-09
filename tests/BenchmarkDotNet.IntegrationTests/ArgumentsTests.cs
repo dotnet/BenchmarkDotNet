@@ -494,5 +494,26 @@ namespace BenchmarkDotNet.IntegrationTests
                     throw new ArgumentException("The DateTime has wrong value!");
             }
         }
+
+        [Fact]
+        public void CustomTypeThatAlsoExistsInTheSystemNamespaceAsArgument() => CanExecute<WithDateTime>();
+
+        public class CustomTypeThatAlsoExistsInTheSystemNamespace
+        {
+            public enum Action
+            {
+                It, Is, A, Duplicate, Of, System, Dot, Action
+            }
+
+            [Benchmark]
+            [Arguments(Action.System)]
+            public void Test(Action passed)
+            {
+                Action expected = Action.System;
+
+                if (expected != passed)
+                    throw new ArgumentException("The passed enum has wrong value!");
+            }
+        }
     }
 }
