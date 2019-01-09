@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.Parameters
 
             // we just execute (cast)source.ToArray()[case][argumentIndex]; 
             // we know that source is IEnumerable so we can do that!
-            return $"{cast}{source.Name}{callPostfix}.ToArray()[{sourceIndex}]{indexPostfix};"; 
+            return $"{cast}System.Linq.Enumerable.ToArray({source.Name}{callPostfix})[{sourceIndex}]{indexPostfix};"; 
         }
     }
 
@@ -113,7 +113,7 @@ namespace BenchmarkDotNet.Parameters
             string callPostfix = source is PropertyInfo ? string.Empty : "()";
 
             // we just execute (cast)source.ToArray()[index]; 
-            return $"{cast}{instancePrefix}.{source.Name}{callPostfix}.ToArray()[{index}];";
+            return $"{cast}System.Linq.Enumerable.ToArray({instancePrefix}.{source.Name}{callPostfix})[{index}];";
         }
     }
 }
