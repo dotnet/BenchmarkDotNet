@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
 
                 var missingReferences = GetMissingReferences(compilationErrors);
 
-                return (BuildResult.Failure(generateResult, new Exception(errors.ToString())), missingReferences);
+                return (BuildResult.Failure(generateResult, errors.ToString()), missingReferences);
             }
         }
 

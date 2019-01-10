@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var summary = CanExecute<CoreRtBenchmark>(config, fullValidation: false);
 
             Assert.All(summary.Reports, report => Assert.False(report.BuildResult.IsBuildSuccess));
-            Assert.All(summary.Reports, report => Assert.Contains("The configured timeout", report.BuildResult.BuildException.Message));
+            Assert.All(summary.Reports, report => Assert.Contains("The configured timeout", report.BuildResult.ErrorMessage));
         }
     }
 
