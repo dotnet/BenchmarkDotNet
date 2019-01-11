@@ -88,8 +88,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             var publishResult = Publish();
             
-            if (!publishResult.IsSuccess) // if we failed to do the standard publish, let's try with --no-build
-                publishResult = PublishNoBuild();
+//            if (!publishResult.IsSuccess) // if we failed to do the standard publish, let's try with --no-build
+//                publishResult = PublishNoBuild();
 
             return publishResult.ToBuildResult(GenerateResult);
         }
