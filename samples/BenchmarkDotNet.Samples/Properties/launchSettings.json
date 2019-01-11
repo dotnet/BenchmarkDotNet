@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "BenchmarkDotNet.Samples": {
-      "commandName": "Project",
-      "commandLineArgs": "--filter *IntroColdCpuCache*"
-    }
-  }
-}
