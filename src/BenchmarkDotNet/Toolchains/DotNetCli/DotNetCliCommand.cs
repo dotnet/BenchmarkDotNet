@@ -57,10 +57,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (!restoreResult.IsSuccess)
                 return BuildResult.Failure(GenerateResult, restoreResult.AllInformation);
 
-            var buildResult = Build().ToBuildResult(GenerateResult);
-            
-            if (!buildResult.IsBuildSuccess) // if we failed to do the full build, let's try with --no-dependencies
-                buildResult = BuildNoDependencies().ToBuildResult(GenerateResult);
+            var buildResult = BuildNoRestore().ToBuildResult(GenerateResult);
 
             return buildResult;
         }
@@ -78,18 +75,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (!restoreResult.IsSuccess)
                 return BuildResult.Failure(GenerateResult, restoreResult.AllInformation);
 
-            var buildResult = Build();
+            var buildResult = BuildNoRestore();
 
-            if (!buildResult.IsSuccess) // if we failed to do the full build, let's try with --no-dependencies
-                buildResult = BuildNoDependencies();
-            
             if (!buildResult.IsSuccess)
                 return BuildResult.Failure(GenerateResult, buildResult.AllInformation);
 
-            var publishResult = Publish();
-            
-            if (!publishResult.IsSuccess) // if we failed to do the standard publish, let's try with --no-build
-                publishResult = PublishNoBuild();
+            var publishResult = PublishNoBuildAndNoRestore();    
 
             return publishResult.ToBuildResult(GenerateResult);
         }
@@ -112,21 +103,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             => DotNetCliCommandExecutor.Execute(WithArguments(
                 GetRestoreCommand(GenerateResult.ArtifactsPaths, BuildPartition, Arguments)));
         
-        public DotNetCliCommandResult Build()
+        public DotNetCliCommandResult BuildNoRestore()
             => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetBuildCommand(BuildPartition, Arguments)));
-        
-        public DotNetCliCommandResult BuildNoDependencies()
-            => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetBuildCommand(BuildPartition, $"{Arguments} --no-dependencies")));
-        
-        public DotNetCliCommandResult Publish()
-            => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetPublishCommand(BuildPartition, Arguments)));
+                GetBuildCommand(BuildPartition, $"{Arguments} --no-restore")));
+                
 
-        public DotNetCliCommandResult PublishNoBuild()
+        public DotNetCliCommandResult PublishNoBuildAndNoRestore()
             => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetPublishCommand(BuildPartition, $"{Arguments} --no-build")));
+                GetPublishCommand(BuildPartition, $"{Arguments} --no-build --no-restore")));
 
         internal static IEnumerable<string> GetAddPackagesCommands(BuildPartition buildPartition)
             => GetNuGetAddPackageCommands(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver);
