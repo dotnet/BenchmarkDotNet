@@ -34,7 +34,7 @@ Skewness = 2.28, Kurtosis = 6.57, MValue = 2
 ---------------------------------------------------
 ```
 
-As you can, a single outlier significantly affected the metrics.
+As you can see, a single outlier significantly affected the metrics.
 Because of this, BenchmarkDotNet adds the `Median` and the `RatioSD` columns in the summary table:
 
 ```markdown
