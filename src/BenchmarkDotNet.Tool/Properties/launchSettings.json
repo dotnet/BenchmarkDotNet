@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "BenchmarkDotNet.Tool": {
+      "commandName": "Project"
+    }
+  }
+}
