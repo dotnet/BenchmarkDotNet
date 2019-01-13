@@ -49,6 +49,32 @@ namespace BenchmarkDotNet.Engines
                                     $"the minimum amount of iterations ({minIterationCount}) are achieved";
         }
 
+        public override StoppingResult Evaluate(IReadOnlyList<Measurement> measurements)
+        {
+            int n = measurements.Count;
+
+            if (n >= maxIterationCount)
+                return StoppingResult.CreateFinished(maxIterationMessage);
+            if (n < minIterationCount)
+                return StoppingResult.NotFinished;
+
+            int direction = -1; // The default "pre-state" is "decrease mode"
+            int fluctuationCount = 0;
+            for (int i = 1; i < n; i++)
+            {
+                int nextDirection = Math.Sign(measurements[i].Nanoseconds - measurements[i - 1].Nanoseconds);
+                if (nextDirection != direction || nextDirection == 0)
+                {
+                    direction = nextDirection;
+                    fluctuationCount++;
+                }
+            }
+
+            return fluctuationCount >= minFluctuationCount
+                ? StoppingResult.CreateFinished(minFluctuationMessage)
+                : StoppingResult.NotFinished;
+        }
+
         protected override string GetTitle() => $"{nameof(AutoWarmupStoppingCriteria)}(" +
                                                 $"{nameof(minIterationCount)}={minIterationCount}, " +
                                                 $"{nameof(maxIterationCount)}={maxIterationCount}, " +
@@ -66,32 +92,6 @@ namespace BenchmarkDotNet.Engines
                 yield return $"Min Fluctuation Count ({minFluctuationCount}) is negative";
             if (minIterationCount > maxIterationCount)
                 yield return $"Min Iteration Count ({minFluctuationCount}) is greater than Max Iteration Count ({maxIterationCount})";
-        }
-
-        public override StoppingResolution Evaluate(IReadOnlyList<Measurement> measurements)
-        {
-            int n = measurements.Count;
-
-            if (n >= maxIterationCount)
-                return StoppingResolution.CreateFinished(maxIterationMessage);
-            if (n < minIterationCount)
-                return StoppingResolution.NotFinished;
-
-            int dir = -1; // The default "pre-state" is "decrease mode"
-            int fluctuationCount = 0;
-            for (int i = 1; i < n; i++)
-            {
-                int nextDir = Math.Sign(measurements[i].Nanoseconds - measurements[i - 1].Nanoseconds);
-                if (nextDir != dir || nextDir == 0)
-                {
-                    dir = nextDir;
-                    fluctuationCount++;
-                }
-            }
-
-            return fluctuationCount >= minFluctuationCount
-                ? StoppingResolution.CreateFinished(minFluctuationMessage)
-                : StoppingResolution.NotFinished;
         }
     }
 }

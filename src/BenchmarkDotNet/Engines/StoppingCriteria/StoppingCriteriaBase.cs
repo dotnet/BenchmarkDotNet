@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Engines
 
         public string Title => lazyTitle.Value;
         public int MaxIterationCount => lazyMaxIterationCount.Value;
-        public string[] Warnings => lazyWarnings.Value;
+        public IReadOnlyList<string> Warnings => lazyWarnings.Value;
 
         protected StoppingCriteriaBase()
         {
@@ -23,12 +23,14 @@ namespace BenchmarkDotNet.Engines
             lazyWarnings = new Lazy<string[]>(() => GetWarnings().ToArray());
         }
 
+        public abstract StoppingResult Evaluate(IReadOnlyList<Measurement> measurements);
+
         [NotNull]
         protected abstract string GetTitle();
+
         protected abstract int GetMaxIterationCount();
+
         [NotNull]
         protected abstract IEnumerable<string> GetWarnings();
-
-        public abstract StoppingResolution Evaluate(IReadOnlyList<Measurement> measurements);
     }
 }

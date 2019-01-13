@@ -19,6 +19,11 @@ namespace BenchmarkDotNet.Engines
             message = $"The required amount of iteration ({iterationCount}) is achieved";
         }
 
+        public override StoppingResult Evaluate(IReadOnlyList<Measurement> measurements)
+            => measurements.Count >= MaxIterationCount
+                ? StoppingResult.CreateFinished(message)
+                : StoppingResult.NotFinished;
+
         protected override string GetTitle() => $"{nameof(FixedStoppingCriteria)}({nameof(iterationCount)}={iterationCount})";
 
         protected override int GetMaxIterationCount() => iterationCount;
@@ -28,10 +33,5 @@ namespace BenchmarkDotNet.Engines
             if (iterationCount < 0)
                 yield return $"Iteration count ({iterationCount}) is negative";
         }
-
-        public override StoppingResolution Evaluate(IReadOnlyList<Measurement> measurements)
-            => measurements.Count >= MaxIterationCount
-                ? StoppingResolution.CreateFinished(message)
-                : StoppingResolution.NotFinished;
     }
 }
