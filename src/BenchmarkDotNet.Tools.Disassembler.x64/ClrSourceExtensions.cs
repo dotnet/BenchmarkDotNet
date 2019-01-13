@@ -10,23 +10,23 @@ namespace Microsoft.Diagnostics.RuntimeExt
     // This is taken from the Samples\FileAndLineNumbers projects from microsoft/clrmd,
     // and replaces the previously-available SourceLocation functionality.
 
-    public class SourceLocation
+    internal class SourceLocation
     {
-        public string FilePath;
-        public int LineNumber;
-        public int LineNumberEnd;
-        public int ColStart;
-        public int ColEnd;
+        internal string FilePath;
+        internal int LineNumber;
+        internal int LineNumberEnd;
+        internal int ColStart;
+        internal int ColEnd;
     }
 
-    public static class ClrSourceExtensions
+    internal static class ClrSourceExtensions
     {
         // TODO Not sure we want this to be a shared dictionary, especially without
         //      any synchronization. Probably want to put this hanging off the Context
         //      somewhere, or inside SymbolCache.
         static Dictionary<PdbInfo, PdbReader> s_pdbReaders = new Dictionary<PdbInfo, PdbReader>();
 
-        public static SourceLocation GetSourceLocation(this ClrMethod method, int ilOffset)
+        internal static SourceLocation GetSourceLocation(this ClrMethod method, int ilOffset)
         {
             PdbReader reader = GetReaderForMethod(method);
             if (reader == null)
@@ -36,7 +36,7 @@ namespace Microsoft.Diagnostics.RuntimeExt
             return FindNearestLine(function, ilOffset);
         }
 
-        public static SourceLocation GetSourceLocation(this ClrStackFrame frame)
+        internal static SourceLocation GetSourceLocation(this ClrStackFrame frame)
         {
             PdbReader reader = GetReaderForMethod(frame.Method);
             if (reader == null)
