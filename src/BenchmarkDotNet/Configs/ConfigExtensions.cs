@@ -50,7 +50,6 @@ namespace BenchmarkDotNet.Configs
         /// determines if all auto-generated files should be kept or removed after running the benchmarks
         /// </summary>
         /// 
-        [PublicAPI] public static IConfig WithHighPerformancePowerPlan(this IConfig config, bool highPerformancePowerPlan = true) => config.With(c => c.HighPerformancePowerPlan = highPerformancePowerPlan);
         [PublicAPI] public static IConfig KeepBenchmarkFiles(this IConfig config, bool value = true) => config.With(m => m.KeepBenchmarkFiles = value);
         [PublicAPI] public static IConfig RemoveBenchmarkFiles(this IConfig config) => config.KeepBenchmarkFiles(false);
         [PublicAPI] public static IConfig WithArtifactsPath(this IConfig config, string artifactsPath) => config.With(m => m.ArtifactsPath = artifactsPath);

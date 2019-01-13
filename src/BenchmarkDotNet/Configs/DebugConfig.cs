@@ -92,7 +92,6 @@ namespace BenchmarkDotNet.Configs
         public bool SummaryPerType => false;
         public string ArtifactsPath => Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");
         public Encoding Encoding => Encoding.ASCII;
-        public bool HighPerformancePowerPlan => true;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => Array.Empty<BenchmarkLogicalGroupRule>();
         public bool StopOnFirstError => false;
     }

@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -13,7 +14,7 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class PowerManagementApplierTests : BenchmarkTestExecutor
     {
-        public const string PowerSaverGuid = "e22fd527-0c09-43ad-83d6-ba300affc27d";
+        public const string HighPerformancePlanGuid = "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c";
 
         public PowerManagementApplierTests(ITestOutputHelper output) : base(output) { }
 
@@ -24,10 +25,10 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
             var powerManagementApplier = new PowerManagementApplier(logger);
             var config = DefaultConfig.Instance.With(logger);
-            powerManagementApplier.ApplyPerformancePlan(config.HighPerformancePowerPlan);
-            Assert.Equal(PowerManagementHelper.HighPerformanceGuid, PowerManagementHelper.CurrentPlan.ToString());
+            powerManagementApplier.ApplyPerformancePlan(PowerPlan.HighPerformance);
+            Assert.Equal(HighPerformancePlanGuid, PowerManagementHelper.CurrentPlan.ToString());
             Assert.Equal("High performance", PowerManagementHelper.CurrentPlanFriendlyName);
-            powerManagementApplier.ApplyUserPowerPlan(logger);
+            powerManagementApplier.ApplyUserPowerPlan();
             Assert.Equal(userPlan, PowerManagementHelper.CurrentPlan);
         }
 
@@ -37,10 +38,10 @@ namespace BenchmarkDotNet.IntegrationTests
             var userPlan = PowerManagementHelper.CurrentPlan;
             var logger = new OutputLogger(Output);
             var powerManagementApplier = new PowerManagementApplier(logger);
-            var config = DefaultConfig.Instance.With(logger).WithHighPerformancePowerPlan(false);
-            powerManagementApplier.ApplyPerformancePlan(config.HighPerformancePowerPlan);
+            var config = DefaultConfig.Instance.With(logger);
+            powerManagementApplier.ApplyPerformancePlan(PowerPlan.UserPowerPlan);
             Assert.Equal(userPlan.ToString(), PowerManagementHelper.CurrentPlan.ToString());
-            powerManagementApplier.ApplyUserPowerPlan(logger);
+            powerManagementApplier.ApplyUserPowerPlan();
             Assert.Equal(userPlan, PowerManagementHelper.CurrentPlan);
         }
     }

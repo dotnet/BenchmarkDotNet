@@ -14,6 +14,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<IntPtr> AffinityCharacteristic = CreateCharacteristic<IntPtr>(nameof(Affinity));
         public static readonly Characteristic<GcMode> GcCharacteristic = CreateCharacteristic<GcMode>(nameof(Gc));
         public static readonly Characteristic<IReadOnlyList<EnvironmentVariable>> EnvironmentVariablesCharacteristic = CreateCharacteristic<IReadOnlyList<EnvironmentVariable>>(nameof(EnvironmentVariables));
+        public static readonly Characteristic<PowerPlanMode> PowerPlanModeCharacteristic = CreateCharacteristic<PowerPlanMode>(nameof(PowerPlanMode));
 
         public static readonly EnvironmentMode Clr = new EnvironmentMode(Runtime.Clr).Freeze();
         public static readonly EnvironmentMode Core = new EnvironmentMode(Runtime.Core).Freeze();
@@ -42,6 +43,7 @@ namespace BenchmarkDotNet.Jobs
         [PublicAPI] public EnvironmentMode(string id) : base(id)
         {
             GcCharacteristic[this] = new GcMode();
+            PowerPlanModeCharacteristic[this] = new PowerPlanMode();
         }
 
         /// <summary>
@@ -90,6 +92,13 @@ namespace BenchmarkDotNet.Jobs
         {
             get => EnvironmentVariablesCharacteristic[this];
             set => EnvironmentVariablesCharacteristic[this] = value;
+        }
+
+
+        public PowerPlanMode PowerPlanMode
+        {
+            get => PowerPlanModeCharacteristic[this];
+            set => PowerPlanModeCharacteristic[this] = value;
         }
 
     }

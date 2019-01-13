@@ -52,11 +52,6 @@ namespace BenchmarkDotNet.Configs
         /// </summary>
         Encoding Encoding { get; }
 
-        /// <summary>
-        /// the default value is true
-        /// </summary>
-        bool HighPerformancePowerPlan { get; }
-
         IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules();
 
         bool StopOnFirstError { get; }

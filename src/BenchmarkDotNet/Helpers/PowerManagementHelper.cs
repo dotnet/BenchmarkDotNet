@@ -6,7 +6,6 @@ namespace BenchmarkDotNet.Helpers
 {
     internal class PowerManagementHelper
     {
-        internal const string HighPerformanceGuid = "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c";
         private const uint ErrorMoreData = 234;
         private const uint SuccessCode = 0;
 

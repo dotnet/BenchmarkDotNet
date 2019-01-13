@@ -77,7 +77,6 @@ namespace BenchmarkDotNet.Running
             using (var logStreamWriter = StreamWriter.FromPath(Path.Combine(rootArtifactsFolderPath, title + ".log")))
             {
                 var logger = new CompositeLogger(commonSettingsConfig.GetCompositeLogger(), new StreamLogger(logStreamWriter));
-                var powerManagementApplier = new PowerManagementApplier(logger);
 
                 var supportedBenchmarks = GetSupportedBenchmarks(benchmarkRunInfos, logger, resolver);
 
@@ -109,7 +108,6 @@ namespace BenchmarkDotNet.Running
 
                     foreach (var benchmarkRunInfo in supportedBenchmarks) // we run them in the old order now using the new build artifacts
                     {
-                        powerManagementApplier.ApplyPerformancePlan(benchmarkRunInfo.Config.HighPerformancePowerPlan);
                         var runChronometer = Chronometer.Start();
                         
                         var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, logger, artifactsToCleanup, rootArtifactsFolderPath, ref runChronometer);
@@ -137,7 +135,6 @@ namespace BenchmarkDotNet.Running
                 }
                 finally
                 {
-                    powerManagementApplier.ApplyUserPowerPlan(logger);
                     logger.WriteLineHeader("// * Artifacts cleanup *");
                     Cleanup(new HashSet<string>(artifactsToCleanup.Distinct()));
                 }
@@ -170,6 +167,7 @@ namespace BenchmarkDotNet.Running
             var config = benchmarkRunInfo.Config;
             var reports = new List<BenchmarkReport>();
             string title = GetTitle(new[] { benchmarkRunInfo });
+            var powerManagementApplier = new PowerManagementApplier(logger);
 
             logger.WriteLineInfo("// Found benchmarks:");
             foreach (var benchmark in benchmarks)
@@ -177,6 +175,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteLine();
             foreach (var benchmark in benchmarks)
             {
+                powerManagementApplier.ApplyPerformancePlan(benchmark.Job.Environment.PowerPlanMode.PowerPlan);
                 var info = buildResults[benchmark];
                 var buildResult = info.buildResult;
 
@@ -217,6 +216,7 @@ namespace BenchmarkDotNet.Running
             
             var clockSpan = runChronometer.GetElapsed();
 
+            powerManagementApplier.ApplyUserPowerPlan();
             return new Summary(title,
                 reports,
                 HostEnvironmentInfo.GetCurrent(),

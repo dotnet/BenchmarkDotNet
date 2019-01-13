@@ -49,7 +49,6 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public bool SummaryPerType { get; set; } = true;
         [PublicAPI] public string ArtifactsPath { get; set; }
         [PublicAPI] public Encoding Encoding { get; set; }
-        [PublicAPI] public bool HighPerformancePowerPlan { get; set; } = true;
 
         public void Add(params IColumn[] newColumns) => columnProviders.AddRange(newColumns.Select(c => c.ToProvider()));
         public void Add(params IColumnProvider[] newColumnProviders) => columnProviders.AddRange(newColumnProviders);
@@ -83,7 +82,6 @@ namespace BenchmarkDotNet.Configs
             SummaryPerType &= config.SummaryPerType;
             ArtifactsPath = config.ArtifactsPath ?? ArtifactsPath;
             Encoding = config.Encoding ?? Encoding;
-            HighPerformancePowerPlan &= config.HighPerformancePowerPlan;
             summaryStyle = summaryStyle ?? config.GetSummaryStyle();
             logicalGroupRules.AddRange(config.GetLogicalGroupRules());
             StopOnFirstError |= config.StopOnFirstError;

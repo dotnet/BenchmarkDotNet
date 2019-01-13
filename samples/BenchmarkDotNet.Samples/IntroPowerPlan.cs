@@ -1,20 +1,34 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples
 {
-    [HighPerformancePowerPlan(false)]
-    public class IntroPowerPlanDisabled
+    [Config(typeof(Config))]
+    public class IntroPowerPlan
     {
-        [Benchmark]
-        public int SplitJoin()
-            => string.Join(",", new string[1000]).Split(',').Length;
-    }
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                Add(Job.MediumRun.WithPowerPlan(PowerPlan.HighPerformance));
+                Add(Job.MediumRun.WithPowerPlan(PowerPlan.UserPowerPlan));
+            }
+        }
 
-    // By default benchmark.net uses high-performance power plan.
-    // There is no need to set it to true explicitly
-    [HighPerformancePowerPlan(true)]
-    public class IntroPowerPlanEnabled
-    {
+        [Benchmark]
+        public int IterationTest()
+        {
+            int j = 0;
+            for (int i = 0; i < short.MaxValue; ++i)
+            {
+                j = i;
+            }
+
+            return j;
+        }
+
         [Benchmark]
         public int SplitJoin()
             => string.Join(",", new string[1000]).Split(',').Length;
