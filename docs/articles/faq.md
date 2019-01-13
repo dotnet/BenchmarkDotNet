@@ -33,7 +33,7 @@ If you want to target netcoreapp1.0 in your main assembly, it's recommended to c
     [CoreJob, ClrJob, MonoJob]
     ```
 
-* **Q** My source code targets old versions of .NET Framework or .NET Core, but BenchmarkDotNet requires `net46` and `netcoreapp2.0`. How can I run benchmarks in this case?
+* **Q** My source code targets old versions of .NET Framework or .NET Core, but BenchmarkDotNet requires `net461` and `netcoreapp2.0`. How can I run benchmarks in this case?
 
     **A** It's a good practice to introduce an additional console application (e.g. `MyAwesomeLibrary.Benchmarks`) which will depend on your code and BenchmarkDotNet.
 Due to the fact that users usually run benchmarks in a develop environment and don't distribute benchmarks for users, it shouldn't be a problem.
