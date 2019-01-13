@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
-using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Diagnosers.DisassemblerDataContracts;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -21,14 +21,14 @@ namespace BenchmarkDotNet.Diagnosers
     {
         public DisassemblyDiagnoserConfig Config { get; }
 
-        private readonly WindowsDisassembler windowsDisassembler;
+        private readonly ManagedDotNetDisassembler managedDotNetDisassembler;
         private readonly MonoDisassembler monoDisassembler;
         private readonly Dictionary<BenchmarkCase, DisassemblyResult> results;
 
-        private DisassemblyDiagnoser(WindowsDisassembler windowsDisassembler, MonoDisassembler monoDisassembler, DisassemblyDiagnoserConfig config)
+        private DisassemblyDiagnoser(ManagedDotNetDisassembler managedDotNetDisassembler, MonoDisassembler monoDisassembler, DisassemblyDiagnoserConfig config)
         {
             Config = config;
-            this.windowsDisassembler = windowsDisassembler;
+            this.managedDotNetDisassembler = managedDotNetDisassembler;
             this.monoDisassembler = monoDisassembler;
 
             results = new Dictionary<BenchmarkCase, DisassemblyResult>();
@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Diagnosers
         }
 
         public static IConfigurableDiagnoser<DisassemblyDiagnoserConfig> Create(DisassemblyDiagnoserConfig config)
-            => new DisassemblyDiagnoser(new WindowsDisassembler(config), new MonoDisassembler(config), config);
+            => new DisassemblyDiagnoser(new ManagedDotNetDisassembler(config), new MonoDisassembler(config), config);
 
         public IConfigurableDiagnoser<DisassemblyDiagnoserConfig> Configure(DisassemblyDiagnoserConfig config)
             => Create(config);
@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase)
         {
-            if (ShouldUseWindowsDisassembler(benchmarkCase))
+            if (ShouldManagedDotNetDisassembler(benchmarkCase))
                 return RunMode.NoOverhead;
             if (ShouldUseMonoDisassembler(benchmarkCase))
                 return RunMode.SeparateLogic;
@@ -65,8 +65,8 @@ namespace BenchmarkDotNet.Diagnosers
             var benchmark = parameters.BenchmarkCase;
 
             switch (signal) {
-                case HostSignal.AfterAll when ShouldUseWindowsDisassembler(benchmark):
-                    results.Add(benchmark, windowsDisassembler.Disassemble(parameters));
+                case HostSignal.AfterAll when ShouldManagedDotNetDisassembler(benchmark):
+                    results.Add(benchmark, managedDotNetDisassembler.Disassemble(parameters));
                     break;
                 case HostSignal.SeparateLogic when ShouldUseMonoDisassembler(benchmark):
                     results.Add(benchmark, monoDisassembler.Disassemble(benchmark, benchmark.Job.Environment.Runtime as MonoRuntime));
@@ -84,8 +84,13 @@ namespace BenchmarkDotNet.Diagnosers
         {
             foreach (var benchmark in validationParameters.Benchmarks)
             {
-                if (!RuntimeInformation.IsWindows() && !ShouldUseMonoDisassembler(benchmark))
-                    yield return new ValidationError(false, "No Disassembler support, only Mono is supported for non-Windows OS", benchmark);
+                // TODO: add verification for global tool installed
+
+                if (ShouldUseNativeDisassembler(benchmark))
+                    yield return new ValidationError(false, "No native Disassembler support (yet!)", benchmark);
+
+                if (ShouldUseArmDisassembler(benchmark))
+                    yield return new ValidationError(false, "No ARM Disassembler support (yet!)", benchmark);
 
                 if (benchmark.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic)
                     && benchmark.Job.Infrastructure.Toolchain is InProcessToolchain)
@@ -95,11 +100,18 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
+        private static bool ShouldUseNativeDisassembler(BenchmarkCase benchmarkCase)
+            => benchmarkCase.Job.Environment.Runtime is CoreRtRuntime || RuntimeInformation.IsCoreRT || RuntimeInformation.IsNetNative;
+
+        private static bool ShouldUseArmDisassembler(BenchmarkCase benchmarkCase)
+            => benchmarkCase.Job.Environment.Platform.IsArm() || RuntimeInformation.GetCurrentPlatform().IsArm();
+
         private static bool ShouldUseMonoDisassembler(BenchmarkCase benchmarkCase)
             => benchmarkCase.Job.Environment.Runtime is MonoRuntime || RuntimeInformation.IsMono;
 
-        private static bool ShouldUseWindowsDisassembler(BenchmarkCase benchmarkCase)
-            => !(benchmarkCase.Job.Environment.Runtime is MonoRuntime) && RuntimeInformation.IsWindows();
+        private static bool ShouldManagedDotNetDisassembler(BenchmarkCase benchmarkCase)
+            => benchmarkCase.Job.Environment.Runtime is CoreRuntime || RuntimeInformation.IsNetCore
+            || benchmarkCase.Job.Environment.Runtime is ClrRuntime || RuntimeInformation.IsFullFramework;
 
         private static IEnumerable<IExporter> GetExporters(Dictionary<BenchmarkCase, DisassemblyResult> results, DisassemblyDiagnoserConfig config)
         {

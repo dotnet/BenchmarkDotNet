@@ -6,12 +6,12 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Diagnosers.DisassemblerDataContracts;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.Loggers;
-using BenchmarkDotNet.Tests.XUnit;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -19,8 +19,6 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class DisassemblyDiagnoserTests : BenchmarkTestExecutor
     {
-        private const string WindowsOnly = "Disassembler supports only Windows";
-
         public DisassemblyDiagnoserTests(ITestOutputHelper output) : base(output)
         {
         }
@@ -75,7 +73,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [MethodImpl(MethodImplOptions.NoInlining)] public void Benchmark(bool justAnOverload) { } // we need to test overloads (#562)
         }
 
-        [TheoryWindowsOnly(WindowsOnly)]
+        [Theory]
         [MemberData(nameof(GetAllJits))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleAllMethodCalls(Jit jit, Platform platform, Runtime runtime)
@@ -99,7 +97,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public T Create() => new T();
         }
 
-        [TheoryWindowsOnly(WindowsOnly)]
+        [Theory]
         [MemberData(nameof(GetAllJits))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleGenericTypes(Jit jit, Platform platform, Runtime runtime)
@@ -119,7 +117,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark] public void JustReturn() { }
         }
         
-        [TheoryWindowsOnly(WindowsOnly)]
+        [Theory]
         [MemberData(nameof(GetAllJits))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleInlinableBenchmarks(Jit jit, Platform platform, Runtime runtime)

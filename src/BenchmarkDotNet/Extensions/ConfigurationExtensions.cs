@@ -25,6 +25,8 @@ namespace BenchmarkDotNet.Extensions
             }
         }
 
+        public static bool IsArm(this Platform platform) => platform == Platform.Arm || platform == Platform.Arm64;
+
         public static string ToConfig(this Jit jit) => jit == Jit.LegacyJit ? "1" : "0";
     }
 }

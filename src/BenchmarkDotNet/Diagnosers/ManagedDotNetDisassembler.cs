@@ -1,30 +1,31 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers.DisassemblerDataContracts;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Properties;
+using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 using RuntimeInformation = BenchmarkDotNet.Portability.RuntimeInformation;
 
 namespace BenchmarkDotNet.Diagnosers
 {
     [PublicAPI]
-    public class WindowsDisassembler
+    public class ManagedDotNetDisassembler
     {
         private readonly bool printAsm, printIL, printSource, printPrologAndEpilog;
         private readonly int recursiveDepth;
 
         [PublicAPI]
-        public WindowsDisassembler(DisassemblyDiagnoserConfig config)
+        public ManagedDotNetDisassembler(DisassemblyDiagnoserConfig config)
         {
             printIL = config.PrintIL;
             printAsm = config.PrintAsm;
@@ -38,9 +39,11 @@ namespace BenchmarkDotNet.Diagnosers
         {
             string resultsPath = Path.GetTempFileName();
 
+            string architectureName = GetArchitectureName(parameters.Process, parameters.BenchmarkCase.Job.Environment.Platform);
+
             string errors = ProcessHelper.RunAndReadOutput(
-                GetDisassemblerPath(parameters.Process, parameters.BenchmarkCase.Job.Environment.Platform),
-                BuildArguments(parameters, resultsPath));
+                GetDisassemblerPath(architectureName),
+                BuildArguments(parameters, resultsPath, architectureName));
 
             if (!string.IsNullOrEmpty(errors))
                 parameters.Config.GetCompositeLogger().WriteError(errors);
@@ -61,19 +64,16 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        private static string GetDisassemblerPath(Process process, Platform platform)
+        private static string GetArchitectureName(Process process, Platform platform)
         {
             switch (platform)
             {
                 case Platform.AnyCpu:
-                    return GetDisassemblerPath(process,
-                        NativeMethods.Is64Bit(process)
-                            ? Platform.X64
-                            : Platform.X86);
+                    return GetArchitectureName(process, NativeMethods.Is64Bit(process) ? Platform.X64 : Platform.X86);
                 case Platform.X86:
-                    return GetDisassemblerPath("x86");
+                    return "x86";
                 case Platform.X64:
-                    return GetDisassemblerPath("x64");
+                    return "x64";
                 default:
                     throw new NotSupportedException($"Platform {platform} not supported!");
             }
@@ -81,62 +81,37 @@ namespace BenchmarkDotNet.Diagnosers
 
         private static string GetDisassemblerPath(string architectureName)
         {
-            // one can only attach to a process of same target architecture, this is why we need exe for x64 and for x86
-            string exeName = $"BenchmarkDotNet.Disassembler.{architectureName}.exe";
-            var assemblyWithDisassemblersInResources = typeof(WindowsDisassembler).GetTypeInfo().Assembly;
-
-            var dir = new FileInfo(assemblyWithDisassemblersInResources.Location).Directory ?? throw new DirectoryNotFoundException();
-            string disassemblerPath = Path.Combine(
-                    dir.FullName,
-                    BenchmarkDotNetInfo.FullVersion // possible update
-                    + exeName); // separate process per architecture!!
-
-#if !PRERELEASE_DEVELOP // for development we always want to copy the file to not omit any dev changes (Properties.BenchmarkDotNetInfo.FullVersion in file name is not enough)
-            if (File.Exists(disassemblerPath))
-                return disassemblerPath;
-#endif
-            // the disassembler has not been yet retrieved from the resources
-            CopyFromResources(
-                assemblyWithDisassemblersInResources,
-                $"BenchmarkDotNet.Disassemblers.net46.win7_{architectureName}.{exeName}",
-                disassemblerPath);
-
-            CopyAllRequiredDependencies(assemblyWithDisassemblersInResources, Path.GetDirectoryName(disassemblerPath));
-
-            return disassemblerPath;
-        }
-
-        private static void CopyAllRequiredDependencies(Assembly assemblyWithDisassemblersInResources, string destinationFolder)
-        {
-            // ClrMD and Cecil are also embedded in the resources, we need to copy them as well
-            foreach (string dependency in assemblyWithDisassemblersInResources.GetManifestResourceNames().Where(name => name.EndsWith(".dll")))
+            // for development and tests on CI we want to run the executable from our bin
+            if (BenchmarkDotNetInfo.IsDevelop() || BenchmarkDotNetInfo.IsAppveyor())
             {
-                // dependency is sth like "BenchmarkDotNet.Disassemblers.net46.win7_x64.Microsoft.Diagnostics.Runtime.dll"
-                string fileName = dependency.Replace("BenchmarkDotNet.Disassemblers.net46.win7_x64.", string.Empty);
-                string dllPath = Path.Combine(destinationFolder, fileName);
+                if (DotNetCliGenerator.GetSolutionRootDirectory(out var rootDirectory))
+                {
+                    var configuration = typeof(ManagedDotNetDisassembler).Assembly.IsDebug() == true ? "Debug" : "Release";
 
-                if (!File.Exists(dllPath))
-                    CopyFromResources(
-                        assemblyWithDisassemblersInResources,
-                        dependency,
-                        dllPath);
-            }
-        }
+                    var path = Path.Combine(rootDirectory.FullName,
+                        "src",
+                        $"BenchmarkDotNet.Tools.Disassembler.{architectureName}",
+                        "bin",
+                        $"{configuration}",
+                        "netcoreapp2.1",
+                        $"BenchmarkDotNet.Tools.Disassembler.{architectureName}");
 
-        private static void CopyFromResources(Assembly assembly, string resourceName, string destinationPath)
-        {
-            using (var resourceStream = assembly.GetManifestResourceStream(resourceName))
-            using (var exeStream = File.Create(destinationPath))
-            {
-                if (resourceStream == null)
-                    throw new InvalidOperationException($"{nameof(resourceName)} is null");
-                resourceStream.CopyTo(exeStream);
+                    if (RuntimeInformation.IsWindows())
+                        return $"{path}.exe";
+
+                    return path;
+                }
+
+                throw new InvalidOperationException("Unable to find root of the Solution");
             }
+
+            return "dotnet"; // otherwise our process is just "dotnet"
         }
 
         // if the benchmark requires jitting we use disassembler entry method, if not we use benchmark method name
-        private string BuildArguments(DiagnoserActionParameters parameters, string resultsPath)
+        private string BuildArguments(DiagnoserActionParameters parameters, string resultsPath, string architectureName)
             => new StringBuilder(200)
+                .Append((BenchmarkDotNetInfo.IsDevelop() || BenchmarkDotNetInfo.IsAppveyor()) ? string.Empty : $"disassembler_{architectureName} ")
                 .Append(parameters.Process.Id).Append(' ')
                 .Append("BenchmarkDotNet.Autogenerated.Runnable_").Append(parameters.BenchmarkId.Value).Append(' ')
                 .Append(DisassemblerConstants.DisassemblerEntryMethodName).Append(' ')

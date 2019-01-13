@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using BenchmarkDotNet.Diagnosers.DisassemblerDataContracts;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Diagnosers

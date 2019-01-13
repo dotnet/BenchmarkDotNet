@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <RootNamespace>BenchmarkDotNet.Disassembler</RootNamespace>
+    <IsPackable>true</IsPackable>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>dotnet-disassembler_x64</ToolCommandName>
+    <Description>A dotnet tool for disassembling .NET Code.</Description>
+    <PackageTags>disassembler;dism;asm;benchmark;benchmarking;performance;tool</PackageTags>
+    <PackageId>BenchmarkDotNet.Disassembler.x64</PackageId>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
+    <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="1.0.2" />
+    <PackageReference Include="Mono.Cecil" Version="0.10.1" />
+  </ItemGroup>
+</Project>

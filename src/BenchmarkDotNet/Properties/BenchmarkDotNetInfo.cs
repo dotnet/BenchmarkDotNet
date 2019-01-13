@@ -15,6 +15,12 @@ namespace BenchmarkDotNet.Properties
         public const string PrereleaseLabel = "";
 #endif
 
+        internal static bool IsDevelop() => PrereleaseLabel == "-develop";
+
+        // when we run the tests on AppVeyor the CI runs our process with this env var set to the build number
+        // we can't use PRERELEASE_NIGHTLY because it's a constant and would affect the logic of packages installed from our CI
+        internal static bool IsAppveyor() => !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APPVEYOR_BUILD_NUMBER"));
+
         // ReSharper disable once ConditionIsAlwaysTrueOrFalse
         [SuppressMessage("ReSharper", "RedundantLogicalConditionalExpressionOperand")]
         private static readonly Lazy<string> FullVersionLazy = new Lazy<string>(() =>

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Diagnosers.DisassemblerDataContracts;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;

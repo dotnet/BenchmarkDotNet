@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BenchmarkDotNet.Diagnosers.DisassemblerDataContracts;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -11,9 +12,9 @@ namespace BenchmarkDotNet.Diagnosers
         {
             internal string TextRepresentation { get; }
 
-            internal Code Source { get; }
+            internal SourceCode Source { get; }
 
-            public Element(string textRepresentation, Code source)
+            public Element(string textRepresentation, SourceCode source)
             {
                 TextRepresentation = textRepresentation;
                 Source = source;
@@ -24,7 +25,7 @@ namespace BenchmarkDotNet.Diagnosers
         {
             internal string Id { get; }
 
-            public Reference(string textRepresentation, string id, Code source) : base(textRepresentation, source) => Id = id;
+            public Reference(string textRepresentation, string id, SourceCode source) : base(textRepresentation, source) => Id = id;
         }
 
         internal class Label : Element
@@ -83,7 +84,7 @@ namespace BenchmarkDotNet.Diagnosers
             return prettified;
         }
 
-        private static (Code source, string address, string byteRepresentation, string instruction, string arguments, string extraArguments) Parse(Code code)
+        private static (SourceCode source, string address, string byteRepresentation, string instruction, string arguments, string extraArguments) Parse(SourceCode code)
         {
             if (!(code is Asm asm))
                 return (code, null, null, null, null, null);

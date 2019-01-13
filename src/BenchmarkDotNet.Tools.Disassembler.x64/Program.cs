@@ -1,4 +1,5 @@
-﻿using Microsoft.Diagnostics.Runtime;
+﻿using BenchmarkDotNet.Diagnosers.DisassemblerDataContracts;
+using Microsoft.Diagnostics.Runtime;
 using Microsoft.Diagnostics.Runtime.Interop;
 using Microsoft.Diagnostics.RuntimeExt;
 using Mono.Cecil;
@@ -185,7 +186,7 @@ namespace BenchmarkDotNet.Disassembler
 
             for (int i = startIndex; i < endIndex; ++i)
             {
-                var group = new List<Code>();
+                var group = new List<SourceCode>();
                 var map = mapByStartAddress[i];
 
                 var correspondingIL = Array.Empty<Instruction>();
@@ -229,7 +230,7 @@ namespace BenchmarkDotNet.Disassembler
             };
         }
 
-        static Map CreateMap(IEnumerable<Code> instructions) => new Map { Instructions = instructions.ToList()  };
+        static Map CreateMap(IEnumerable<SourceCode> instructions) => new Map { Instructions = instructions.ToList()  };
 
         static IEnumerable<IL> GetIL(ICollection<Instruction> instructions)
             => instructions.Select(instruction 
@@ -433,7 +434,7 @@ namespace BenchmarkDotNet.Disassembler
 
         static Map[] EliminateDuplicates(List<Map> maps)
         {
-            var unique = new HashSet<Code>(CodeComparer.Instance);
+            var unique = new HashSet<SourceCode>(CodeComparer.Instance);
 
             foreach (var map in maps)
                 for (int i = map.Instructions.Count - 1; i >= 0; i--)
@@ -446,11 +447,11 @@ namespace BenchmarkDotNet.Disassembler
         static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
             => DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, reason);
 
-        class CodeComparer : IEqualityComparer<Code>
+        class CodeComparer : IEqualityComparer<SourceCode>
         {
-            internal static readonly IEqualityComparer<Code> Instance = new CodeComparer();
+            internal static readonly IEqualityComparer<SourceCode> Instance = new CodeComparer();
 
-            public bool Equals(Code x, Code y)
+            public bool Equals(SourceCode x, SourceCode y)
             {
                 if (x.GetType() != y.GetType())
                     return false;
@@ -475,7 +476,7 @@ namespace BenchmarkDotNet.Disassembler
                 throw new InvalidOperationException("Impossible");
             }
 
-            public int GetHashCode(Code obj) => obj.TextRepresentation.GetHashCode();
+            public int GetHashCode(SourceCode obj) => obj.TextRepresentation.GetHashCode();
         }
     }
 

@@ -1,29 +1,30 @@
-﻿using System.Xml.Serialization;
+﻿using System;
+using System.Collections.Generic;
+using System.Xml.Serialization;
 using JetBrains.Annotations;
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
 #pragma warning disable CS3003 // I need ulong
-namespace BenchmarkDotNet.Diagnosers
+namespace BenchmarkDotNet.Diagnosers.DisassemblerDataContracts
 {
-    // keep it in sync with src\BenchmarkDotNet.Disassembler.x64\DataContracts.cs!
-    public class Code
+    public class SourceCode
     {
         public string TextRepresentation { get; set; }
         public string Comment { get; set; }
     }
 
-    public class Sharp : Code
+    public class Sharp : SourceCode
     {
         public string FilePath { get; set; }
         public int LineNumber { get; set; }
     }
 
-    public class IL : Code
+    public class IL : SourceCode
     {
         [PublicAPI] public int Offset { get; set; }
     }
 
-    public class Asm : Code
+    public class Asm : SourceCode
     {
         /// <summary>
         /// The native start offset of this ASM representation
@@ -41,11 +42,11 @@ namespace BenchmarkDotNet.Diagnosers
     public class Map
     {
         [XmlArray("Instructions")]
-        [XmlArrayItem(nameof(Code), typeof(Code))]
+        [XmlArrayItem(nameof(SourceCode), typeof(SourceCode))]
         [XmlArrayItem(nameof(Sharp), typeof(Sharp))]
         [XmlArrayItem(nameof(IL), typeof(IL))]
         [XmlArrayItem(nameof(Asm), typeof(Asm))]
-        public Code[] Instructions { get; set; }
+        public List<SourceCode> Instructions { get; set; }
     }
 
     public class DisassembledMethod
@@ -59,6 +60,15 @@ namespace BenchmarkDotNet.Diagnosers
         public Map[] Maps { get; set; }
 
         public string CommandLine { get; set; }
+
+        public static DisassembledMethod Empty(string fullSignature, ulong nativeCode, string problem)
+            => new DisassembledMethod
+            {
+                Name = fullSignature,
+                NativeCode = nativeCode,
+                Maps = Array.Empty<Map>(),
+                Problem = problem
+            };
     }
 
     public class DisassemblyResult

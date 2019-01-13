@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Diagnosers.DisassemblerDataContracts;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -110,7 +111,7 @@ namespace BenchmarkDotNet.Exporters
 
                 foreach (var map in method.Maps)
                 {
-                    var codeWithCounters = new List<CodeWithCounters>(map.Instructions.Length);
+                    var codeWithCounters = new List<CodeWithCounters>(map.Instructions.Count);
 
                     foreach (var instruction in map.Instructions)
                     {
@@ -248,7 +249,7 @@ namespace BenchmarkDotNet.Exporters
 
         private class CodeWithCounters
         {
-            internal Diagnosers.Code Code { get; set; }
+            internal SourceCode Code { get; set; }
             internal IReadOnlyDictionary<HardwareCounter, ulong> SumPerCounter { get; set; }
         }
 

@@ -33,9 +33,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Integration
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.IntegrationTests.ConfigPerAssembly", "tests\BenchmarkDotNet.IntegrationTests.ConfigPerAssembly\BenchmarkDotNet.IntegrationTests.ConfigPerAssembly.csproj", "{043F1DA4-CD51-45FD-805E-6571D67AA661}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Disassembler.x64", "src\BenchmarkDotNet.Disassembler.x64\BenchmarkDotNet.Disassembler.x64.csproj", "{E5A0833C-B633-4D62-B645-A927CEBFEEBB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Tools.Disassembler.x64", "src\BenchmarkDotNet.Tools.Disassembler.x64\BenchmarkDotNet.Tools.Disassembler.x64.csproj", "{E5A0833C-B633-4D62-B645-A927CEBFEEBB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Disassembler.x86", "src\BenchmarkDotNet.Disassembler.x86\BenchmarkDotNet.Disassembler.x86.csproj", "{D189AAB3-46B4-4437-8E9C-72F021AB2B6E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Tools.Disassembler.x86", "src\BenchmarkDotNet.Tools.Disassembler.x86\BenchmarkDotNet.Tools.Disassembler.x86.csproj", "{D189AAB3-46B4-4437-8E9C-72F021AB2B6E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.IntegrationTests.ManualRunning", "tests\BenchmarkDotNet.IntegrationTests.ManualRunning\BenchmarkDotNet.IntegrationTests.ManualRunning.csproj", "{9816D316-95C4-42E6-9E7B-A256C7E5D4BF}"
 EndProject

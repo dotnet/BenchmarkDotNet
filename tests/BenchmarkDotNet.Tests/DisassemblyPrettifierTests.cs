@@ -1,4 +1,6 @@
 ﻿using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Diagnosers.DisassemblerDataContracts;
+using System.Collections.Generic;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests
@@ -14,7 +16,7 @@ namespace BenchmarkDotNet.Tests
                 {
                     new Map
                     {
-                        Instructions = new Diagnosers.Code[]
+                        Instructions = new List<SourceCode>
                         {
                             new Asm { TextRepresentation = "00007ff7`ffbfd2da 33ff            xor     edi,edi" },
                             new Asm { TextRepresentation = "00007ff7`ffbfd2dc 48b9e04be659f87f0000 mov rcx,offset System_Private_CoreLib+0x8f4be0 (00007ff8`59e64be0)" },
@@ -78,7 +80,7 @@ namespace BenchmarkDotNet.Tests
                 {
                     new Map
                     {
-                        Instructions = new Diagnosers.Code[]
+                        Instructions = new List<SourceCode>
                         {
                             new Asm { TextRepresentation = "00007ffd`a6304a70 8b4108          mov     eax,dword ptr [rcx+8]" },
                             new Asm { TextRepresentation = "00007ffd`a6304a73 48894c2410      mov     qword ptr [rsp+10h],rcx" },
@@ -162,7 +164,7 @@ namespace BenchmarkDotNet.Tests
                 {
                     new Map
                     {
-                        Instructions = new Diagnosers.Code[]
+                        Instructions = new List<SourceCode>
                         {
                             new Asm { TextRepresentation = "00007ffe`2f9bd341 e828000000      call    00007ffe`2f9bd36e" },
                             new Asm { TextRepresentation = "00007ffe`2f9bd346 90              nop" },
