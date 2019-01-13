@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Mathematics
     public class Statistics
     {
         public IReadOnlyList<double> OriginalValues { get; }
-        public IReadOnlyList<double> SortedValues { get; }
+        internal IReadOnlyList<double> SortedValues { get; }
         public int N { get; }
         public double Min { get; }
         public double LowerFence { get; }
