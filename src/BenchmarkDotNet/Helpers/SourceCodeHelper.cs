@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Globalization;
 using System.Numerics;
 using BenchmarkDotNet.Extensions;
@@ -98,17 +97,17 @@ namespace BenchmarkDotNet.Helpers
         private static string ToSourceCode(double value)
         {
             if (double.IsNaN(value))
-                return "double.NaN";
+                return "System.Double.NaN";
             if (double.IsPositiveInfinity(value))
-                return "double.PositiveInfinity";
+                return "System.Double.PositiveInfinity";
             if (double.IsNegativeInfinity(value))
-                return "double.NegativeInfinity";
+                return "System.Double.NegativeInfinity";
             if (value == double.Epsilon)
-                return "double.Epsilon";
+                return "System.Double.Epsilon";
             if (value == double.MaxValue)
-                return "double.MaxValue";
+                return "System.Double.MaxValue";
             if (value == double.MinValue)
-                return "double.MinValue";
+                return "System.Double.MinValue";
             
             return value.ToString("G", CultureInfo.InvariantCulture) + "d";
         }
@@ -116,17 +115,17 @@ namespace BenchmarkDotNet.Helpers
         private static string ToSourceCode(float value)
         {
             if (float.IsNaN(value))
-                return "float.NaN";
+                return "System.Single.NaN";
             if (float.IsPositiveInfinity(value))
-                return "float.PositiveInfinity";
+                return "System.Single.PositiveInfinity";
             if (float.IsNegativeInfinity(value))
-                return "float.NegativeInfinity";
+                return "System.Single.NegativeInfinity";
             if (value == float.Epsilon)
-                return "float.Epsilon";
+                return "System.Single.Epsilon";
             if (value == float.MaxValue)
-                return "float.MaxValue";
+                return "System.Single.MaxValue";
             if (value == float.MinValue)
-                return "float.MinValue";
+                return "System.Single.MinValue";
             
             return value.ToString("G", CultureInfo.InvariantCulture) + "f";
         }

@@ -118,7 +118,7 @@ namespace BenchmarkDotNet.Toolchains.CustomCoreClr
                 coreClrVersion: coreClrVersion,
                 coreFxVersion: coreFxVersion,
                 runtimeFrameworkVersion: runtimeFrameworkVersion,
-                targetFrameworkMoniker: targetFrameworkMoniker,
+                targetFrameworkMoniker: GetTargetFrameworkMoniker(),
                 runtimeIdentifier: runtimeIdentifier ?? GetPortableRuntimeIdentifier(),
                 customDotNetCliPath: customDotNetCliPath,
                 feeds: Feeds,

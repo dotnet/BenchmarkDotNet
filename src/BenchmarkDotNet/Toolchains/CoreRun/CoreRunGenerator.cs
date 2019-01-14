@@ -19,8 +19,8 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
 
         private bool NeedsCopy => SourceCoreRun != CopyCoreRun;
 
-        protected override string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath) 
-            => null; // we don't want to restore to a dedicated folder
+        protected override string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath)
+            => base.PackagesPath;
 
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
             => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, "publish");
@@ -46,8 +46,9 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
             
             foreach (DirectoryInfo dir in source.GetDirectories())
                 CopyFilesRecursively(dir, target.CreateSubdirectory(dir.Name));
+
             foreach (FileInfo file in source.GetFiles())
-                file.CopyTo(Path.Combine(target.FullName, file.Name));
+                file.CopyTo(Path.Combine(target.FullName, file.Name), overwrite: true);
         }
     }
 }

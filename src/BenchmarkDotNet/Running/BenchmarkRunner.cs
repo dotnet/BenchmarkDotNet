@@ -198,8 +198,8 @@ namespace BenchmarkDotNet.Running
 
                     if (buildResult.GenerateException != null)
                         logger.WriteLineError($"// Generate Exception: {buildResult.GenerateException.Message}");
-                    if (buildResult.BuildException != null)
-                        logger.WriteLineError($"// Build Exception: {buildResult.BuildException.Message}");
+                    if (buildResult.ErrorMessage != null)
+                        logger.WriteLineError($"// Build Error: {buildResult.ErrorMessage}");
 
                     success = true;
                 }
@@ -333,7 +333,7 @@ namespace BenchmarkDotNet.Running
             try
             {
                 if (!generateResult.IsGenerateSuccess)
-                    return BuildResult.Failure(generateResult);
+                    return BuildResult.Failure(generateResult, generateResult.GenerateException);
 
                 return toolchain.Builder.Build(generateResult, buildPartition, buildLogger);
             }

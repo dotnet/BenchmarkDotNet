@@ -13,11 +13,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         protected readonly Dictionary<string, string> Feeds = new Dictionary<string, string>();
 
         protected string runtimeIdentifier, customDotNetCliPath;
-        protected string targetFrameworkMoniker = "netcoreapp2.1", displayName;
+        protected string displayName;
         protected string runtimeFrameworkVersion;
 
         protected bool useNuGetClearTag, useTempFolderForRestore;
         protected TimeSpan? timeout;
+        private string targetFrameworkMoniker;
 
         public abstract IToolchain ToToolchain();
 
@@ -53,6 +54,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             return this;
         }
+
+        protected string GetTargetFrameworkMoniker() => targetFrameworkMoniker ?? NetCoreAppSettings.Current.Value.TargetFrameworkMoniker;
 
         /// <param name="newCustomDotNetCliPath">if not provided, the one from PATH will be used</param>
         [PublicAPI]

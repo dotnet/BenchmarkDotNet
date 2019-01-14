@@ -72,10 +72,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        protected override string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath)
-            => string.IsNullOrEmpty(PackagesPath)
-                ? base.GetPackagesDirectoryPath(buildArtifactsDirectoryPath)
-                : PackagesPath;
+        protected override string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath) => PackagesPath;
 
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {

@@ -1,4 +1,5 @@
-![](docs/guide/logo/logo-wide.png)
+
+![](docs/logo/logo-wide.png)
 
 
 [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/) [![Gitter](https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet.svg)](https://gitter.im/dotnet/BenchmarkDotNet)  [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md) [![Overview](https://img.shields.io/badge/docs-Overview-green.svg?style=flat)](https://benchmarkdotnet.org/articles/overview.html) [![ChangeLog](https://img.shields.io/badge/docs-ChangeLog-green.svg?style=flat)](https://benchmarkdotnet.org/changelog/index.html)
