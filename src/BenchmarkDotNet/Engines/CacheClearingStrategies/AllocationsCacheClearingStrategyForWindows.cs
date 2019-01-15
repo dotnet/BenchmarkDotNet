@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Engines.CacheClearingStrategies
             if (affinity.HasValue)
                 ClearCacheForKnownAffinity(affinity.Value);
             else
-                ClearCacheForAllProcessor();
+                ClearCacheForAllProcessors();
         }
 
         private void ClearCacheForKnownAffinity(IntPtr affinity)
@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Engines.CacheClearingStrategies
             ClearCache(GetAffinitiesForSelectedProcessors(affinity).ToArray());
         }
 
-        private void ClearCacheForAllProcessor()
+        private void ClearCacheForAllProcessors()
         {
             int cpuCount = Environment.ProcessorCount;
 

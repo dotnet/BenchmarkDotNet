@@ -1,7 +1,7 @@
 ﻿namespace BenchmarkDotNet.Engines.CacheClearingStrategies
 {
     /// <summary>
-    /// This class clean CPU cache. To archive it, 
+    /// This class clean CPU cache.
     /// </summary>
     internal class CacheMemoryCleaner : ICacheMemoryCleaner
     {
