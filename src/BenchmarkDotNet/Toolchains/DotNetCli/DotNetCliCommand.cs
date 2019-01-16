@@ -57,9 +57,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (!restoreResult.IsSuccess)
                 return BuildResult.Failure(GenerateResult, restoreResult.AllInformation);
 
-            var buildResult = BuildNoRestore().ToBuildResult(GenerateResult);
+            var buildResult = BuildNoRestore();
 
-            return buildResult;
+            if (!buildResult.IsSuccess) // if we fail to do the full build, we try with --no-dependencies
+                buildResult = BuildNoRestoreNoDependencies();
+
+            return buildResult.ToBuildResult(GenerateResult);
         }
 
         [PublicAPI]
@@ -106,7 +109,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public DotNetCliCommandResult BuildNoRestore()
             => DotNetCliCommandExecutor.Execute(WithArguments(
                 GetBuildCommand(BuildPartition, $"{Arguments} --no-restore")));
-                
+
+        public DotNetCliCommandResult BuildNoRestoreNoDependencies()
+            => DotNetCliCommandExecutor.Execute(WithArguments(
+                GetBuildCommand(BuildPartition, $"{Arguments} --no-restore --no-dependencies")));
 
         public DotNetCliCommandResult PublishNoBuildAndNoRestore()
             => DotNetCliCommandExecutor.Execute(WithArguments(
