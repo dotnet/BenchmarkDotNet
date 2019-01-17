@@ -118,6 +118,8 @@ namespace BenchmarkDotNet.Toolchains
                 case MonoRuntime mono:
                     start.FileName = mono.CustomPath ?? "mono";
                     start.Arguments = GetMonoArguments(benchmarkCase.Job, exePath, args, resolver);
+                    if (mono.MonoBclPath != null)
+                        start.EnvironmentVariables["MONO_PATH"] = mono.MonoBclPath;
                     break;
                 default:
                     throw new NotSupportedException("Runtime = " + runtime);
