@@ -78,6 +78,9 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             
             // this logic is put to a separate method to avoid any assembly loading issues on non Windows systems
             string version = FrameworkVersionHelper.GetLatestNetDeveloperPackVersion();
+            if (version == null) // .NET Developer Pack is not installed 
+                return Default;
+            
             return Toolchains.TryGetValue(version, out var toolchain) ? toolchain : Default;
         }
     }
