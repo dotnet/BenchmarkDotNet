@@ -88,7 +88,7 @@ namespace BenchmarkDotNet.Exporters
         {
             try
             {
-                var output = ProcessHelper.RunAndReadOutputLineByLine("git", $"diff --no-index --no-color --text {firstFile} {secondFile}");
+                (int exitCode, IReadOnlyList<string> output) = ProcessHelper.RunAndReadOutputLineByLine("git", $"diff --no-index --no-color --text {firstFile} {secondFile}");
 
                 bool canRead = false;
 

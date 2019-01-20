@@ -41,8 +41,8 @@ namespace BenchmarkDotNet.Diagnosers
             var environmentVariables = new Dictionary<string, string> { ["MONO_VERBOSE_METHOD"] = fqnMethod };
             string monoPath = mono?.CustomPath ?? "mono";
             string arguments = $"--compile {fqnMethod} {llvmFlag} {exePath}";
-            
-            var output = ProcessHelper.RunAndReadOutputLineByLine(monoPath, arguments, environmentVariables, includeErrors: true);
+
+            (int exitCode, IReadOnlyList<string> output) = ProcessHelper.RunAndReadOutputLineByLine(monoPath, arguments, environmentVariables: environmentVariables, includeErrors: true);
             string commandLine = $"{GetEnvironmentVariables(environmentVariables)} {monoPath} {arguments}";
             
             return OutputParser.Parse(output, benchmarkTarget.WorkloadMethod.Name, commandLine);

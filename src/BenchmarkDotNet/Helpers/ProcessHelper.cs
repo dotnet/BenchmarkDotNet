@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Helpers
             }
         }
 
-        internal static IReadOnlyList<string> RunAndReadOutputLineByLine(string fileName, string arguments = "", 
+        internal static (int exitCode, IReadOnlyList<string> output) RunAndReadOutputLineByLine(string fileName, string arguments = "", string workingDirectory = "",
             Dictionary<string, string> environmentVariables = null, bool includeErrors = false)
         {
             var output = new List<string>(20000);
@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Helpers
             var processStartInfo = new ProcessStartInfo
             {
                 FileName = fileName,
-                WorkingDirectory = "",
+                WorkingDirectory = workingDirectory,
                 Arguments = arguments,
                 UseShellExecute = false,
                 CreateNoWindow = true,
@@ -75,10 +75,9 @@ namespace BenchmarkDotNet.Helpers
                 process.BeginErrorReadLine();
 
                 process.WaitForExit();
+
+                return (process.ExitCode, output);
             }
-
-            return output;
         }
-
     }
 }

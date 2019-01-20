@@ -4,6 +4,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.Mono;
 using BenchmarkDotNet.Toolchains.Roslyn;
 
 namespace BenchmarkDotNet.Toolchains
@@ -25,8 +26,8 @@ namespace BenchmarkDotNet.Toolchains
 
                     return RoslynToolchain.Instance;
                 case MonoRuntime mono:
-                    if(mono.AotArgs != null)
-                        return new RoslynToolchain (mono);
+                    if(!string.IsNullOrEmpty(mono.AotArgs))
+                        return MonoAotToolchain.Instance;
 
                     return RoslynToolchain.Instance;
                 case CoreRuntime _:

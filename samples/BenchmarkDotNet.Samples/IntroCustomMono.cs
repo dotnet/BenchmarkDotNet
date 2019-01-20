@@ -3,7 +3,6 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
-using System;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -53,8 +52,8 @@ namespace BenchmarkDotNet.Samples
             public void AddMono (string name, string mono_top_dir)
             {
                 var aot_compile_args  = "--aot=llvm";
-                var mono_bcl = String.Format(@"{0}\lib\mono\4.5", mono_top_dir);
-                var mono_bin = String.Format(@"{0}\bin\mono", mono_top_dir);
+                var mono_bcl = $@"{mono_top_dir}\lib\mono\4.5";
+                var mono_bin = $@"{mono_top_dir}\bin\mono.exe";
                 Add(Job.ShortRun.With(new MonoRuntime(
                     name, mono_bin, aot_compile_args, mono_bcl)));
             }
@@ -62,7 +61,7 @@ namespace BenchmarkDotNet.Samples
             public Config()
             {
                 AddMono("Mono x64", @"C:\Program Files\Mono");
-                AddMono("Mono x86", @"C:\Program Files (x86)");
+                AddMono("Mono x86", @"C:\Program Files (x86)\Mono");
             }
         }
 
