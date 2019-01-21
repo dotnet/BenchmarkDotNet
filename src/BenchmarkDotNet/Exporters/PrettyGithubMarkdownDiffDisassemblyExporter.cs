@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.Exporters
                     logger.WriteLine($"{GetImportantInfo(summary[secondBenchmarkCase])}");
 
                     logger.WriteLine("```diff");
-                    logger.WriteLine(builder.ToString());
+                    logger.WriteLine(builder.ToString().Trim());
                     logger.WriteLine("```");
                 }
                 finally
@@ -88,7 +88,7 @@ namespace BenchmarkDotNet.Exporters
         {
             try
             {
-                (int exitCode, IReadOnlyList<string> output) = ProcessHelper.RunAndReadOutputLineByLine("git", $"diff --no-index --no-color --text {firstFile} {secondFile}");
+                (int exitCode, IReadOnlyList<string> output) = ProcessHelper.RunAndReadOutputLineByLine("git", $"diff --no-index --no-color --text --function-context {firstFile} {secondFile}");
 
                 bool canRead = false;
 
