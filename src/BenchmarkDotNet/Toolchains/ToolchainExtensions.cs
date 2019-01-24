@@ -4,6 +4,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.Mono;
 using BenchmarkDotNet.Toolchains.Roslyn;
 
 namespace BenchmarkDotNet.Toolchains
@@ -20,9 +21,13 @@ namespace BenchmarkDotNet.Toolchains
             switch (runtime)
             {
                 case ClrRuntime _:
-                case MonoRuntime _:
                     if(RuntimeInformation.IsNetCore)
                         return CsProjClassicNetToolchain.Current.Value;
+
+                    return RoslynToolchain.Instance;
+                case MonoRuntime mono:
+                    if(!string.IsNullOrEmpty(mono.AotArgs))
+                        return MonoAotToolchain.Instance;
 
                     return RoslynToolchain.Instance;
                 case CoreRuntime _:

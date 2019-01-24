@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Tests.Engine
     {
         private const int MinIterationCount = EngineResolver.DefaultMinWarmupIterationCount;
         private const int MaxIterationCount = EngineResolver.DefaultMaxWarmupIterationCount;
-        private const int MaxOverheadIterationCount = EngineWarmupStage.MaxOverheadIterationCount;
+        private const int MaxOverheadIterationCount = DefaultStoppingCriteriaFactory.MaxOverheadIterationCount;
 
         private readonly ITestOutputHelper output;
 
@@ -86,7 +86,7 @@ namespace BenchmarkDotNet.Tests.Engine
             if (max == -1)
                 max = min;
             var stage = CreateStage(job ?? Job.Default, measure);
-            var measurements = stage.Run(1, mode, true, 1);
+            var measurements = stage.Run(1, mode, 1, RunStrategy.Throughput);
             int count = measurements.Count;
             output.WriteLine($"MeasurementCount = {count} (Min= {min}, Max = {max})");
             Assert.InRange(count, min, max);
