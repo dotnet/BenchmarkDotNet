@@ -52,49 +52,61 @@ namespace BenchmarkDotNet.Running
         /// </summary>
         [PublicAPI] public Summary RunAllJoined() => Run(new[] { "--filter", "*", "--join" }).Single();
 
+
         [PublicAPI] public IEnumerable<Summary> Run(string[] args = null, IConfig config = null)
         {
             var nonNullConfig = config ?? DefaultConfig.Instance;
             // if user did not provide any loggers, we use the ConsoleLogger to somehow show the errors to the user
             var nonNullLogger = nonNullConfig.GetLoggers().Any() ? nonNullConfig.GetCompositeLogger() : ConsoleLogger.Default;
-            
-            var (isParsingSuccess, parsedConfig, options) = ConfigParser.Parse(args ?? Array.Empty<string>(), nonNullLogger, config);
+
+            OptionHandler optionHandler = new OptionHandler();
+            if (CommandLineParser.Parser(optionHandler, args, nonNullLogger) != 0)
+            {
+                return Array.Empty<Summary>();
+            }
+
+            return Run(optionHandler.Options, nonNullConfig, nonNullLogger);
+        }
+
+        internal IEnumerable<Summary> Run(CommandLineOptions options, IConfig config, ILogger logger)
+        { 
+            var (isParsingSuccess, parsedConfig) = ConfigParser.Parse(options, logger, config);
             if (!isParsingSuccess) // invalid console args, the ConfigParser printed the error
                 return Array.Empty<Summary>();
 
             if (options.PrintInformation)
             {
-                nonNullLogger.WriteLine(HostEnvironmentInfo.GetInformation());
+                logger.WriteLine(HostEnvironmentInfo.GetInformation());
                 return Array.Empty<Summary>();
             }
 
-            var effectiveConfig = ManualConfig.Union(nonNullConfig, parsedConfig);
+            var effectiveConfig = ManualConfig.Union(config, parsedConfig);
 
-            (var allTypesValid, var allAvailableTypesWithRunnableBenchmarks) = TypeFilter.GetTypesWithRunnableBenchmarks(types, assemblies, nonNullLogger);
+            (var allTypesValid, var allAvailableTypesWithRunnableBenchmarks) = TypeFilter.GetTypesWithRunnableBenchmarks(types, assemblies, logger);
             if (!allTypesValid) // there were some invalid and TypeFilter printed errors
                 return Array.Empty<Summary>();
             
             if (allAvailableTypesWithRunnableBenchmarks.IsEmpty())
             {
-                userInteraction.PrintNoBenchmarksError(nonNullLogger);
+                userInteraction.PrintNoBenchmarksError(logger);
                 return Array.Empty<Summary>();
             }
 
             if (options.ListBenchmarkCaseMode != ListBenchmarkCaseMode.Disabled)
             {
-                PrintList(nonNullLogger, effectiveConfig, allAvailableTypesWithRunnableBenchmarks, options);
+                PrintList(logger, effectiveConfig, allAvailableTypesWithRunnableBenchmarks, options);
                 return Array.Empty<Summary>();
             }
             
             var benchmarksToFilter = options.UserProvidedFilters
                 ? allAvailableTypesWithRunnableBenchmarks 
-                : userInteraction.AskUser(allAvailableTypesWithRunnableBenchmarks, nonNullLogger);
+                : userInteraction.AskUser(allAvailableTypesWithRunnableBenchmarks, logger);
 
             var filteredBenchmarks = TypeFilter.Filter(effectiveConfig, benchmarksToFilter);
 
             if (filteredBenchmarks.IsEmpty())
             {
-                userInteraction.PrintWrongFilterInfo(benchmarksToFilter, nonNullLogger, options.Filters.ToArray());
+                userInteraction.PrintWrongFilterInfo(benchmarksToFilter, logger, options.Filters.ToArray());
                 return Array.Empty<Summary>();
             }
 
@@ -104,7 +116,7 @@ namespace BenchmarkDotNet.Running
             summaries.AddRange(BenchmarkRunner.Run(filteredBenchmarks, effectiveConfig));
 
             int totalNumberOfExecutedBenchmarks = summaries.Sum(summary => summary.GetNumberOfExecutedBenchmarks());
-            BenchmarkRunner.LogTotalTime(nonNullLogger, globalChronometer.GetElapsed().GetTimeSpan(), totalNumberOfExecutedBenchmarks, "Global total time");
+            BenchmarkRunner.LogTotalTime(logger, globalChronometer.GetElapsed().GetTimeSpan(), totalNumberOfExecutedBenchmarks, "Global total time");
             return summaries;
         }
 

@@ -25,7 +25,6 @@ using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess;
-using CommandLine;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {
@@ -85,29 +84,27 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         public static (bool isSuccess, ReadOnlyConfig config, CommandLineOptions options) Parse(string[] args, ILogger logger, IConfig globalConfig = null)
         {
-            (bool isSuccess, ReadOnlyConfig config, CommandLineOptions options) result = default;
-
-            using (var parser = CreateParser(logger))
+            OptionHandler optionHandler = new OptionHandler();
+            if (CommandLineParser.Parser(optionHandler, args, logger) != 0)
             {
-                parser
-                    .ParseArguments<CommandLineOptions>(args)
-                    .WithParsed(options => result = Validate(options, logger) ? (true, CreateConfig(options, globalConfig), options) : (false, default, default))
-                    .WithNotParsed(errors => result = (false, default, default));
+                return (false, default, default);
             }
 
-            return result;
+            var result = Parse(optionHandler.Options, logger, globalConfig);
+            if (result.isSuccess)
+            {
+                return (true, result.config, optionHandler.Options);
+            }
+            else
+            {
+                return (false, default, default);
+            }
         }
 
-        private static Parser CreateParser(ILogger logger)
-            => new Parser(settings =>
-            {
-                settings.CaseInsensitiveEnumValues = true;
-                settings.CaseSensitive = false;
-                settings.EnableDashDash = true;
-                settings.IgnoreUnknownArguments = false;
-                settings.HelpWriter = new LoggerWrapper(logger);
-                settings.MaximumDisplayWidth = Math.Max(MinimumDisplayWidth, GetMaximumDisplayWidth());
-            });
+        public static (bool isSuccess, ReadOnlyConfig config) Parse(CommandLineOptions options, ILogger logger, IConfig globalConfig = null)
+        {
+            return Validate(options, logger) ? (true, CreateConfig(options, globalConfig)) : (false, default);
+        }
 
         private static bool Validate(CommandLineOptions options, ILogger logger)
         {

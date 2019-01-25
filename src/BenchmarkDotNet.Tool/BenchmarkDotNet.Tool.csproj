@@ -13,6 +13,10 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.CommandLine">
+      <HintPath>C:\Work\command-line-api\src\System.CommandLine\bin\Debug\netstandard2.0\System.CommandLine.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
