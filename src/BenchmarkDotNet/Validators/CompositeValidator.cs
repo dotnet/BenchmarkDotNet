@@ -3,31 +3,13 @@ using System.Linq;
 
 namespace BenchmarkDotNet.Validators
 {
-    internal class CompositeValidator : IValidator
+    public class CompositeValidator : IValidator
     {
-        private static readonly IValidator[] MandatoryValidators = 
-        {
-            BaselineValidator.FailOnError,
-            SetupCleanupValidator.FailOnError,
-            RunModeValidator.FailOnError,
-            DiagnosersValidator.Default,
-            CompilationValidator.Default,
-            ConfigValidator.Default,
-            ShadowCopyValidator.Default,
-            JitOptimizationsValidator.DontFailOnError,
-            DeferredExecutionValidator.DontFailOnError
-        };
-
         internal readonly IValidator[] Validators;
 
         public CompositeValidator(IValidator[] configuredValidators)
         {
-            Validators = configuredValidators
-                .Concat(MandatoryValidators)
-                .GroupBy(validator => validator.GetType())
-                .Select(groupedByType => groupedByType.FirstOrDefault(validator => validator.TreatsWarningsAsErrors) ?? groupedByType.First())
-                .Distinct()
-                .ToArray();
+            Validators = configuredValidators;
         }
 
         /// <summary>

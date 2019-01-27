@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Linq;
+
 using BenchmarkDotNet.Validators;
+
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Validators
@@ -8,36 +9,24 @@ namespace BenchmarkDotNet.Tests.Validators
     public class CompositeValidatorTests
     {
         [Fact]
-        public void ThreatWarningsAsErrorsOverridesDefaultBehaviour()
+        public void ValidatorsAreNotAltered()
         {
-            var compositeValidator = new CompositeValidator(
-                new IValidator[]
-                {
-                    ExecutionValidator.DontFailOnError,
-                    ExecutionValidator.FailOnError
-                });
+            var validators = new IValidator[]
+            {
+                ExecutionValidator.DontFailOnError,
+                ExecutionValidator.FailOnError
+            };
+            var compositeValidator = new CompositeValidator(validators);
 
-            Assert.True(compositeValidator.TreatsWarningsAsErrors);
-            Assert.Contains(ExecutionValidator.FailOnError, compositeValidator.Validators);
-            Assert.DoesNotContain(ExecutionValidator.DontFailOnError, compositeValidator.Validators);
+            Assert.Equal(validators, compositeValidator.Validators);
         }
 
         [Fact]
-        public void BaseLineValidatorIsMandatory()
+        public void NoMandatoryValidatorsAdded()
         {
             var compositeValidator = new CompositeValidator(Array.Empty<IValidator>());
 
-            Assert.Contains(BaselineValidator.FailOnError, compositeValidator.Validators);
-        }
-
-        [Fact]
-        public void DuplicatesAreEliminated()
-        {
-            var compositeValidator = new CompositeValidator(Enumerable.Repeat(JitOptimizationsValidator.DontFailOnError, 3).ToArray());
-
-            Assert.Single(
-                compositeValidator.Validators,
-                validator => ReferenceEquals(validator, JitOptimizationsValidator.DontFailOnError));
+            Assert.Empty(compositeValidator.Validators);
         }
     }
 }

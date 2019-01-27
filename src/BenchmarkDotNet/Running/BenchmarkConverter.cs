@@ -33,7 +33,16 @@ namespace BenchmarkDotNet.Running
             return MethodsToBenchmarksWithFullConfig(containingType, benchmarkMethods, fullConfig);
         }
 
-        private static BenchmarkRunInfo MethodsToBenchmarksWithFullConfig(Type containingType, MethodInfo[] benchmarkMethods, ReadOnlyConfig fullConfig)
+        public static BenchmarkRunInfo TypeToBenchmarksWithFullConfig(Type type, ReadOnlyConfig fullConfig)
+        {
+            if (type.IsGenericTypeDefinition)
+                throw new ArgumentException($"{type.Name} is generic type definition, use BenchmarkSwitcher for it"); // for "open generic types" should be used BenchmarkSwitcher
+
+            var allMethods = type.GetMethods();
+            return MethodsToBenchmarksWithFullConfig(type, allMethods, fullConfig);
+        }
+
+        public static BenchmarkRunInfo MethodsToBenchmarksWithFullConfig(Type containingType, MethodInfo[] benchmarkMethods, ReadOnlyConfig fullConfig)
         {
             if (fullConfig == null)
                 throw new ArgumentNullException(nameof(fullConfig));
@@ -96,7 +105,14 @@ namespace BenchmarkDotNet.Running
                 foreach (var configFromAttribute in configs)
                     config = ManualConfig.Union(config, configFromAttribute);
             }
-            return config.AsReadOnly();
+
+            // Add mandatory members
+            config = ManualConfig.UnionWithMandatory(config);
+
+            // Cleanup
+            var fullConfig = ManualConfig.Cleanup(config);
+
+            return fullConfig;
         }
 
         private static IEnumerable<Descriptor> GetTargets(

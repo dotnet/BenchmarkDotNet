@@ -162,5 +162,63 @@ namespace BenchmarkDotNet.Configs
             }
             return manualConfig;
         }
+
+        public static ManualConfig UnionWithMandatory(IConfig sourceConfig)
+        {
+            var manualConfig = new ManualConfig();
+            manualConfig.Add(sourceConfig);
+            manualConfig.Add(GetMandatoryValidators());
+            return manualConfig;
+        }
+
+        public static ReadOnlyConfig Cleanup(IConfig config)
+        {
+            // Same as .Add() but includes Cleanup calls if required.
+
+            var cleaned = new ManualConfig();
+            cleaned.columnProviders.AddRange(config.GetColumnProviders());
+            cleaned.exporters.AddRange(config.GetExporters());
+            cleaned.loggers.AddRange(config.GetLoggers());
+            cleaned.diagnosers.AddRange(config.GetDiagnosers());
+            cleaned.analysers.AddRange(config.GetAnalysers());
+            cleaned.jobs.AddRange(config.GetJobs());
+            cleaned.validators.AddRange(CleanupValidators(config.GetValidators()));
+            cleaned.hardwareCounters.AddRange(config.GetHardwareCounters());
+            cleaned.filters.AddRange(config.GetFilters());
+            cleaned.orderer = config.GetOrderer() ?? cleaned.orderer;
+            cleaned.KeepBenchmarkFiles |= config.KeepBenchmarkFiles;
+            cleaned.SummaryPerType &= config.SummaryPerType;
+            cleaned.ArtifactsPath = config.ArtifactsPath ?? cleaned.ArtifactsPath;
+            cleaned.Encoding = config.Encoding ?? cleaned.Encoding;
+            cleaned.summaryStyle = cleaned.summaryStyle ?? config.GetSummaryStyle();
+            cleaned.logicalGroupRules.AddRange(config.GetLogicalGroupRules());
+            cleaned.StopOnFirstError |= config.StopOnFirstError;
+
+            return cleaned.AsReadOnly();
+        }
+
+        // Taken from CompositeValidator
+        private static IValidator[] CleanupValidators(IEnumerable<IValidator> validators) =>
+            validators
+                .GroupBy(validator => validator.GetType())
+                .Select(groupedByType => groupedByType.FirstOrDefault(validator => validator.TreatsWarningsAsErrors) ?? groupedByType.First())
+                .Distinct()
+                .ToArray();
+
+        // TODO: place to somewhere else. Create a MandatoryConfig, maybe?
+        private static readonly IValidator[] MandatoryValidators =
+        {
+            BaselineValidator.FailOnError,
+            SetupCleanupValidator.FailOnError,
+            RunModeValidator.FailOnError,
+            DiagnosersValidator.Default,
+            CompilationValidator.Default,
+            ConfigValidator.Default,
+            ShadowCopyValidator.Default,
+            JitOptimizationsValidator.DontFailOnError,
+            DeferredExecutionValidator.DontFailOnError
+        };
+
+        public static IValidator[] GetMandatoryValidators() => MandatoryValidators.ToArray();
     }
 }

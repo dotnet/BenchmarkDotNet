@@ -1,10 +1,13 @@
 ﻿using System.Linq;
+
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Validators;
+
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Running
@@ -34,6 +37,75 @@ namespace BenchmarkDotNet.Tests.Running
 
             Assert.NotNull(benchmarkCase.Descriptor.GlobalSetupMethod);
             Assert.Equal(benchmarkCase.Descriptor.GlobalSetupMethod.DeclaringType, derivedType);
+        }
+
+        [Fact]
+        public void OverrideForIncompleteConfig()
+        {
+            var runInfo = BenchmarkConverter.TypeToBenchmarks(typeof(Base), DefaultConfig.Instance.AsReadOnly());
+            var resultConfig = runInfo.Config;
+            var validators = resultConfig.GetValidators().ToArray();
+            var compositeValidator = resultConfig.GetCompositeValidator();
+
+            Assert.True(compositeValidator.TreatsWarningsAsErrors);
+            Assert.Contains(BaselineValidator.FailOnError, validators);
+            Assert.Contains(DiagnosersValidator.Default, validators);
+        }
+
+        [Fact]
+        public void NoOverrideIfFullConfigPassed()
+        {
+            var runInfo = BenchmarkConverter.TypeToBenchmarksWithFullConfig(typeof(Base), DefaultConfig.Instance.AsReadOnly());
+            var resultConfig = runInfo.Config;
+            var validators = resultConfig.GetValidators().ToArray();
+            var compositeValidator = resultConfig.GetCompositeValidator();
+
+            Assert.True(compositeValidator.TreatsWarningsAsErrors);
+            Assert.Contains(BaselineValidator.FailOnError, validators);
+            Assert.DoesNotContain(DiagnosersValidator.Default, validators);
+        }
+
+        [Fact]
+        public void FullConfigOverridesDefaultValidators()
+        {
+            var config = new ManualConfig();
+            config.Add(
+                ExecutionValidator.DontFailOnError,
+                ExecutionValidator.FailOnError);
+
+            var resultConfig = BenchmarkConverter.GetFullConfig(null, config);
+            var validators = resultConfig.GetValidators().ToArray();
+            var compositeValidator = resultConfig.GetCompositeValidator();
+
+            Assert.True(compositeValidator.TreatsWarningsAsErrors);
+            Assert.Contains(ExecutionValidator.FailOnError, validators);
+            Assert.DoesNotContain(ExecutionValidator.DontFailOnError, validators);
+        }
+
+        [Fact]
+        public void FullConfigBaseLineValidatorIsMandatory()
+        {
+            var config = new ManualConfig();
+
+            var resultConfig = BenchmarkConverter.GetFullConfig(null, config);
+            var validators = resultConfig.GetValidators().ToArray();
+
+            Assert.Contains(BaselineValidator.FailOnError, validators);
+        }
+
+        [Fact]
+        public void FullConfigDuplicatesAreEliminated()
+        {
+            var config = new ManualConfig();
+            config.Add(
+                Enumerable.Repeat(JitOptimizationsValidator.DontFailOnError, 3).ToArray());
+
+            var resultConfig = BenchmarkConverter.GetFullConfig(null, config);
+            var validators = resultConfig.GetValidators().ToArray();
+
+            Assert.Single(
+                validators,
+                validator => ReferenceEquals(validator, JitOptimizationsValidator.DontFailOnError));
         }
 
         public abstract class Base
