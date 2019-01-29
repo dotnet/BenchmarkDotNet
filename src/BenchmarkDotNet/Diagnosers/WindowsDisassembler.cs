@@ -98,7 +98,7 @@ namespace BenchmarkDotNet.Diagnosers
             // the disassembler has not been yet retrieved from the resources
             CopyFromResources(
                 assemblyWithDisassemblersInResources,
-                $"BenchmarkDotNet.Disassemblers.net46.win7_{architectureName}.{exeName}",
+                $"BenchmarkDotNet.Disassemblers.net461.win7_{architectureName}.{exeName}",
                 disassemblerPath);
 
             CopyAllRequiredDependencies(assemblyWithDisassemblersInResources, Path.GetDirectoryName(disassemblerPath));
@@ -111,8 +111,8 @@ namespace BenchmarkDotNet.Diagnosers
             // ClrMD and Cecil are also embedded in the resources, we need to copy them as well
             foreach (string dependency in assemblyWithDisassemblersInResources.GetManifestResourceNames().Where(name => name.EndsWith(".dll")))
             {
-                // dependency is sth like "BenchmarkDotNet.Disassemblers.net46.win7_x64.Microsoft.Diagnostics.Runtime.dll"
-                string fileName = dependency.Replace("BenchmarkDotNet.Disassemblers.net46.win7_x64.", string.Empty);
+                // dependency is sth like "BenchmarkDotNet.Disassemblers.net461.win7_x64.Microsoft.Diagnostics.Runtime.dll"
+                string fileName = dependency.Replace("BenchmarkDotNet.Disassemblers.net461.win7_x64.", string.Empty);
                 string dllPath = Path.Combine(destinationFolder, fileName);
 
                 if (!File.Exists(dllPath))

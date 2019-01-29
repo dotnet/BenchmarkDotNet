@@ -44,7 +44,6 @@ namespace BenchmarkDotNet.ConsoleArguments
         };
 
         private static readonly ImmutableHashSet<string> AvailableRuntimes = ImmutableHashSet.Create(StringComparer.InvariantCultureIgnoreCase,
-            "net46",
             "net461",
             "net462",
             "net47",
@@ -305,7 +304,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                                 .WithCustomDotNetCliPath(options.CliPath?.FullName)
                                 .WithCustomPackagesRestorePath(options.RestorePath?.FullName)
                                 .WithTimeout(timeOut)));
-                case "net46":
                 case "net461":
                 case "net462":
                 case "net47":
