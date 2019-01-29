@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
 using System.Reflection.Emit;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
@@ -33,7 +32,30 @@ namespace BenchmarkDotNet.Tests.Validators
 
             Assert.Contains(errors,
                 s => s.Equals(
-                    "Benchmarked method `Has Some Whitespaces` contains illegal character(s). Please use `[<Benchmark(Description = \"Custom name\")>]` to set custom display name."));
+                    "Benchmarked method `Has Some Whitespaces` contains illegal character(s) or uses C# keyword. Please use `[<Benchmark(Description = \"Custom name\")>]` to set custom display name."));
+        }
+
+        [Fact]
+        public void BenchmarkedMethodNameMustNotUseCsharpKeywords()
+        {
+            Delegate method = BuildDummyMethod<int>("typeof");
+
+            var parameters = new ValidationParameters(
+                new[]
+                {
+                    BenchmarkCase.Create(
+                        new Descriptor(
+                            typeof(CompilationValidatorTests),
+                            method.Method),
+                        Job.Dry,
+                        null)
+                }, new ManualConfig());
+
+            var errors = CompilationValidator.Default.Validate(parameters).Select(e => e.Message);
+
+            Assert.Contains(errors,
+                s => s.Equals(
+                    "Benchmarked method `typeof` contains illegal character(s) or uses C# keyword. Please use `[<Benchmark(Description = \"Custom name\")>]` to set custom display name."));
         }
 
         [Theory]
@@ -115,6 +137,4 @@ namespace BenchmarkDotNet.Tests.Validators
     {
         internal class InternalNestedClass { }
     }
-        
-    
 }
