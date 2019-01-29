@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Validators
                           .Select(benchmark
                               => new ValidationError(
                                   true,
-                                  $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` is static. Please use instance methods only for benchmarks.",
+                                  $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.DeclaringType.Name}.{benchmark.Descriptor.WorkloadMethod.Name}` is static. Please use instance methods only for benchmarks.",
                                   benchmark
                               ));
                 

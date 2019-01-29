@@ -246,6 +246,34 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.True(results.All(r => r.BenchmarksCases.All(bc => bc.Job == Job.Default)));
         }
 
+        [Fact]
+        public void WhenUserCreatesStaticBenchmarkMethodWeDisplayAnError_FromTypes()
+        {
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty().With(logger);
+
+            var summariesForType = BenchmarkSwitcher
+                .FromTypes(new[] { typeof(Static.BenchmarkClassWithStaticMethodsOnly) })
+                .Run(new[] { "--filter", "*" }, config);
+
+            Assert.True(summariesForType.Single().HasCriticalValidationErrors);
+            Assert.Contains("static", logger.GetLog());
+        }
+
+        [Fact]
+        public void WhenUserCreatesStaticBenchmarkMethodWeDisplayAnError_FromAssembly()
+        {
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty().With(logger);
+
+            var summariesForAssembly = BenchmarkSwitcher
+                .FromAssembly(typeof(Static.BenchmarkClassWithStaticMethodsOnly).Assembly)
+                .Run(new[] { "--filter", "*" }, config);
+
+            Assert.True(summariesForAssembly.Single().HasCriticalValidationErrors);
+            Assert.Contains("static", logger.GetLog());
+        }
+
         private class UserInteractionMock : IUserInteraction
         {
             private readonly IReadOnlyList<Type> returnValue;

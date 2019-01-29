@@ -41,11 +41,8 @@ namespace BenchmarkDotNet.Tests.Validators
         [InlineData(typeof(BenchmarkClass<PublicClass>), false)]
         public void Benchmark_Class_Methods_Must_Be_Non_Static(Type type, bool hasErrors)
         {
-            // Act
-            var validationErrors = CompilationValidator.Default.Validate(BenchmarkConverter.TypeToBenchmarks(type))
-                                                               .ToList();
+            var validationErrors = CompilationValidator.Default.Validate(BenchmarkConverter.TypeToBenchmarks(type));
             
-            // Assert
             Assert.Equal(hasErrors, validationErrors.Any());
         }
         
