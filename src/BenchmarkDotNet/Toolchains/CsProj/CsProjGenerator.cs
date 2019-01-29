@@ -22,6 +22,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
     {
         public string RuntimeFrameworkVersion { get; }
 
+        protected virtual string TemplateName => "CsProj.txt";
+
         public CsProjGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string runtimeFrameworkVersion)
             : base(targetFrameworkMoniker, cliPath, packagesPath)
         {
@@ -44,7 +46,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
-            string template = ResourceHelper.LoadTemplate("CsProj.txt");
+            string template = ResourceHelper.LoadTemplate(TemplateName);
             var benchmark = buildPartition.RepresentativeBenchmarkCase;
             var projectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
 

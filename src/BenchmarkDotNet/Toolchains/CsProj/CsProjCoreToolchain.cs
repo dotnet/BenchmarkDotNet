@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         [PublicAPI] public static readonly Lazy<IToolchain> Current = new Lazy<IToolchain>(() => From(NetCoreAppSettings.GetCurrentVersion()));
 
-        private CsProjCoreToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath) 
+        protected CsProjCoreToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath) 
             : base(name, generator, builder, executor)
         {
             CustomDotNetCliPath = customDotNetCliPath;

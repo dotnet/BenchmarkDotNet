@@ -1,0 +1,27 @@
+﻿<Project Sdk="MSBuild.Sdk.Extras/1.6.65">
+  <PropertyGroup>
+    <AssemblyTitle>$PROGRAMNAME$</AssemblyTitle>
+    <TargetFramework>$TFM$</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>$PLATFORM$</PlatformTarget>
+    <AssemblyName>$PROGRAMNAME$</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <OutputPath>bin\$CONFIGURATIONNAME$</OutputPath>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <CodeAnalysisRuleSet></CodeAnalysisRuleSet>
+    $COPIEDSETTINGS$
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$CODEFILENAME$" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$CSPROJPATH$" />
+  </ItemGroup>
+
+  $RUNTIMESETTINGS$
+</Project>
