@@ -6,15 +6,14 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
-using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Validators;
 
-namespace BenchmarkDotNet.Configs 
+namespace BenchmarkDotNet.Configs
 {
     /// <summary>
     /// this class is responsible for config that has no duplicates, does all of the internal hacks and is ready to run
     /// </summary>
-    public static class FinalConfigBuilder
+    public static class ImmutableConfigBuilder
     {
         private static readonly IValidator[] MandatoryValidators = 
         {
@@ -32,7 +31,7 @@ namespace BenchmarkDotNet.Configs
         /// <summary>
         /// removes duplicates and applies all extra logic required to make the config a final one
         /// </summary>
-        public static FinalConfig Create(IConfig source)
+        public static ImmutableConfig Create(IConfig source)
         {
             var uniqueColumnProviders = source.GetColumnProviders().Distinct().ToImmutableArray();
             var uniqueLoggers = source.GetLoggers().ToImmutableHashSet();
@@ -49,7 +48,7 @@ namespace BenchmarkDotNet.Configs
 
             var uniqueRunnableJobs = GetRunnableJobs(source.GetJobs()).ToImmutableHashSet();
             
-            return new FinalConfig(
+            return new ImmutableConfig(
                 uniqueColumnProviders,
                 uniqueLoggers,
                 uniqueHardwareCounters,
@@ -177,11 +176,12 @@ namespace BenchmarkDotNet.Configs
             return result;
         }
 
-        private class TypeComparer<T> : IEqualityComparer<T>
+        private class TypeComparer<TInterface> : IEqualityComparer<TInterface>
         {
-            public bool Equals(T x, T y) => x.GetType() == y.GetType();
+            // different types can implement the same interface, we want to distinct by type
+            public bool Equals(TInterface x, TInterface y) => x.GetType() == y.GetType();
 
-            public int GetHashCode(T obj) => obj.GetType().GetHashCode();
+            public int GetHashCode(TInterface obj) => obj.GetType().GetHashCode();
         }
     }
 }

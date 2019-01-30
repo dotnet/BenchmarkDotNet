@@ -4,7 +4,6 @@ using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Order;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Reports
@@ -22,10 +21,10 @@ namespace BenchmarkDotNet.Reports
         public bool[] FullContentStartOfLogicalGroup { get; }
         public string[][] FullContentWithHeader { get; }
         [PublicAPI] public bool[] IsDefault { get; }
-        public ISummaryStyle EffectiveSummaryStyle { get; }
+        public SummaryStyle EffectiveSummaryStyle { get; }
         public bool SeparateLogicalGroups { get; }
 
-        internal SummaryTable(Summary summary, ISummaryStyle style = null)
+        internal SummaryTable(Summary summary, SummaryStyle style = null)
         {
             Summary = summary;
 

@@ -5,7 +5,7 @@ namespace BenchmarkDotNet.Running
 {
     public class BenchmarkRunInfo
     {
-        public BenchmarkRunInfo(BenchmarkCase[] benchmarksCase, Type type, FinalConfig config)
+        public BenchmarkRunInfo(BenchmarkCase[] benchmarksCase, Type type, ImmutableConfig config)
         {
             BenchmarksCases = benchmarksCase;
             Type = type;
@@ -14,6 +14,6 @@ namespace BenchmarkDotNet.Running
 
         public BenchmarkCase[] BenchmarksCases { get; }
         public Type Type { get; }
-        public FinalConfig Config { get; }
+        public ImmutableConfig Config { get; }
     }
 }

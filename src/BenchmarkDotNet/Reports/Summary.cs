@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Reports
         [PublicAPI] public string ResultsDirectoryPath { get; }
         [PublicAPI] public HostEnvironmentInfo HostEnvironmentInfo { get; }
         [PublicAPI] public TimeSpan TotalTime { get; }
-        [PublicAPI] public ISummaryStyle Style { get; }
+        [PublicAPI] public SummaryStyle Style { get; }
         [PublicAPI] public IOrderer Orderer { get; }
         [PublicAPI] public SummaryTable Table { get; }
         [PublicAPI] public string AllRuntimes { get; }
@@ -109,7 +109,7 @@ namespace BenchmarkDotNet.Reports
             return string.Join(Environment.NewLine, lines);
         }
 
-        internal SummaryTable GetTable(ISummaryStyle style) => new SummaryTable(this, style);
+        internal SummaryTable GetTable(SummaryStyle style) => new SummaryTable(this, style);
 
         [CanBeNull]
         public string GetLogicalGroupKey(BenchmarkCase benchmarkCase)
@@ -132,10 +132,10 @@ namespace BenchmarkDotNet.Reports
 
         public bool HasBaselines() => BenchmarksCases.Any(IsBaseline);
 
-        private static IOrderer GetConfiguredOrdererOrDefaultOne(IEnumerable<FinalConfig> configs)
+        private static IOrderer GetConfiguredOrdererOrDefaultOne(IEnumerable<ImmutableConfig> configs)
             => configs.SingleOrDefault(config => config.Orderer != DefaultOrderer.Instance)?.Orderer ?? DefaultOrderer.Instance;
 
-        private static ISummaryStyle GetConfiguredSummaryStyleOrNull(ImmutableArray<BenchmarkCase> benchmarkCases)
+        private static SummaryStyle GetConfiguredSummaryStyleOrNull(ImmutableArray<BenchmarkCase> benchmarkCases)
             => benchmarkCases.Select(benchmark => benchmark.Config.SummaryStyle).Distinct().SingleOrDefault();
     }
 }

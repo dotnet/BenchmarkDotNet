@@ -8,9 +8,9 @@ namespace BenchmarkDotNet.Validators
     {
         public IReadOnlyList<BenchmarkCase> Benchmarks { get; }
 
-        public FinalConfig Config { get; }
+        public ImmutableConfig Config { get; }
 
-        public ValidationParameters(IReadOnlyList<BenchmarkCase> benchmarks, FinalConfig config)
+        public ValidationParameters(IReadOnlyList<BenchmarkCase> benchmarks, ImmutableConfig config)
         {
             Benchmarks = benchmarks;
             Config = config;

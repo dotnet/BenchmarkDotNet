@@ -32,10 +32,10 @@ namespace BenchmarkDotNet.Running
             return MethodsToBenchmarksWithFullConfig(containingType, benchmarkMethods, fullConfig);
         }
 
-        private static BenchmarkRunInfo MethodsToBenchmarksWithFullConfig(Type containingType, MethodInfo[] benchmarkMethods, FinalConfig finalConfig)
+        private static BenchmarkRunInfo MethodsToBenchmarksWithFullConfig(Type containingType, MethodInfo[] benchmarkMethods, ImmutableConfig immutableConfig)
         {
-            if (finalConfig == null)
-                throw new ArgumentNullException(nameof(finalConfig));
+            if (immutableConfig == null)
+                throw new ArgumentNullException(nameof(immutableConfig));
 
             var helperMethods = containingType.GetMethods(); // benchmarkMethods can be filtered, without Setups, look #564
 
@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Running
             var parameterDefinitions = GetParameterDefinitions(containingType);
             var parameterInstancesList = parameterDefinitions.Expand();
 
-            var jobs = finalConfig.GetJobs();
+            var jobs = immutableConfig.GetJobs();
 
             var targets = GetTargets(targetMethods, containingType, globalSetupMethods, globalCleanupMethods, iterationSetupMethods, iterationCleanupMethods).ToArray();
 
@@ -66,18 +66,18 @@ namespace BenchmarkDotNet.Running
                 benchmarks.AddRange(
                     from job in jobs
                     from parameterInstance in parameterInstances
-                    select BenchmarkCase.Create(target, job, parameterInstance, finalConfig)
+                    select BenchmarkCase.Create(target, job, parameterInstance, immutableConfig)
                 );
             }
 
-            var filters = finalConfig.GetFilters().ToArray();
+            var filters = immutableConfig.GetFilters().ToArray();
             var filteredBenchmarks = GetFilteredBenchmarks(benchmarks, filters);
-            var orderedBenchmarks = finalConfig.Orderer.GetExecutionOrder(filteredBenchmarks).ToArray();
+            var orderedBenchmarks = immutableConfig.Orderer.GetExecutionOrder(filteredBenchmarks).ToArray();
 
-            return new BenchmarkRunInfo(orderedBenchmarks, containingType, finalConfig);
+            return new BenchmarkRunInfo(orderedBenchmarks, containingType, immutableConfig);
         }
 
-        public static FinalConfig GetFullConfig(Type type, IConfig config)
+        public static ImmutableConfig GetFullConfig(Type type, IConfig config)
         {
             config = config ?? DefaultConfig.Instance;
             if (type != null)
@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.Running
                     config = ManualConfig.Union(config, configFromAttribute);
             }
             
-            return FinalConfigBuilder.Create(config);
+            return ImmutableConfigBuilder.Create(config);
         }
 
         private static IEnumerable<Descriptor> GetTargets(

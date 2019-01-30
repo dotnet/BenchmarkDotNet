@@ -130,15 +130,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return false;
                 }
 
-            foreach (var counterName in options.HardwareCounters)
-            {
-                if (!Enum.TryParse(counterName, ignoreCase: true, out HardwareCounter _))
-                {
-                    logger.WriteLineError($"The provided hardware counter \"{counterName}\" is invalid. Available options are: {string.Join(", ", Enum.GetNames(typeof(HardwareCounter)))}.");
-                    return false;
-                }
-            }
-
             if (options.CliPath.IsNotNullButDoesNotExist())
             {
                 logger.WriteLineError($"The provided {nameof(options.CliPath)} \"{options.CliPath}\" does NOT exist.");

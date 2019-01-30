@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Tests.Validators
         {
             Delegate method = BuildDummyMethod<int>("Has Some Whitespaces");
             
-            var config = new ManualConfig().CreateFinalConfig();
+            var config = new ManualConfig().CreateImmutableConfig();
             var parameters = new ValidationParameters(
                 new[]
                 {
@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Tests.Validators
         {
             Delegate method = BuildDummyMethod<int>("typeof");
 
-            var config = ManualConfig.CreateEmpty().CreateFinalConfig();
+            var config = ManualConfig.CreateEmpty().CreateImmutableConfig();
             var parameters = new ValidationParameters(
                 new[]
                 {

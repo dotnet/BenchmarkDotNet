@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Exporters.Csv
 {
     public class CsvExporter : ExporterBase
     {
-        private readonly ISummaryStyle style;
+        private readonly SummaryStyle style;
         private readonly CsvSeparator separator;
         protected override string FileExtension => "csv";
 
@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Exporters.Csv
         {
         }
 
-        [PublicAPI] public CsvExporter(CsvSeparator separator, ISummaryStyle style)
+        [PublicAPI] public CsvExporter(CsvSeparator separator, SummaryStyle style)
         {
             this.style = style;
             this.separator = separator;

@@ -9,15 +9,15 @@ namespace BenchmarkDotNet.Tests
     public class SummaryStyleTests
     {
         [Fact]
-        public void UserCanDefineCusomSummaryStyle()
+        public void UserCanDefineCustomSummaryStyle()
         {
             var summaryStyle = new SummaryStyle
-            {
-                PrintUnitsInHeader = true,
-                PrintUnitsInContent = false,
-                SizeUnit = SizeUnit.B,
-                TimeUnit = TimeUnit.Millisecond
-            };
+            (
+                printUnitsInHeader: true,
+                printUnitsInContent: false,
+                sizeUnit: SizeUnit.B,
+                timeUnit: TimeUnit.Millisecond
+            );
 
             var config = ManualConfig.CreateEmpty().With(summaryStyle);
             

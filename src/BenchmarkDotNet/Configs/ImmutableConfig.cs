@@ -18,7 +18,7 @@ using RunMode = BenchmarkDotNet.Diagnosers.RunMode;
 
 namespace BenchmarkDotNet.Configs
 {
-    public class FinalConfig : IConfig
+    public sealed class ImmutableConfig : IConfig
     {
         // if something is an array here instead of hashset it means it must have a guaranteed order of elements
         private readonly ImmutableArray<IColumnProvider> columnProviders;
@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Configs
         private readonly ImmutableHashSet<IFilter> filters;
         private readonly ImmutableHashSet<BenchmarkLogicalGroupRule> rules;
 
-        internal FinalConfig(
+        internal ImmutableConfig(
             ImmutableArray<IColumnProvider> uniqueColumnProviders,
             ImmutableHashSet<ILogger> uniqueLoggers,
             ImmutableHashSet<HardwareCounter> uniqueHardwareCounters,
@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Configs
             string artifactsPath, 
             Encoding encoding,
             IOrderer orderer,
-            ISummaryStyle summaryStyle,
+            SummaryStyle summaryStyle,
             bool stopOnFirstError)
         {
             columnProviders = uniqueColumnProviders;
@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Configs
         public string ArtifactsPath { get; }
         public Encoding Encoding { get; }
         [NotNull] public IOrderer Orderer { get; } 
-        public ISummaryStyle SummaryStyle { get; }
+        public SummaryStyle SummaryStyle { get; }
         public bool StopOnFirstError { get; }
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
@@ -101,8 +101,10 @@ namespace BenchmarkDotNet.Configs
         public bool HasMemoryDiagnoser() => diagnosers.Contains(MemoryDiagnoser.Default);
 
         public IDiagnoser GetCompositeDiagnoser(BenchmarkCase benchmarkCase, RunMode runMode)
-            => diagnosers.Any(d => d.GetRunMode(benchmarkCase) == runMode)
-                ? new CompositeDiagnoser(diagnosers.Where(d => d.GetRunMode(benchmarkCase) == runMode).ToImmutableHashSet())
-                : null;
+        {
+            var diagnosersForGivenMode = diagnosers.Where(diagnoser => diagnoser.GetRunMode(benchmarkCase) == runMode).ToImmutableHashSet();
+
+            return diagnosersForGivenMode.Any() ? new CompositeDiagnoser(diagnosersForGivenMode) : null;
+        }
     }
 }

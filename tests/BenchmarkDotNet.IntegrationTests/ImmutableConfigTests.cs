@@ -15,7 +15,7 @@ using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class FinalConfigTests
+    public class ImmutableConfigTests
     {
         [Fact]
         public void DuplicateColumnProvidersAreExcluded()
@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.IntegrationTests
             mutable.Add(DefaultColumnProviders.Job);
             mutable.Add(DefaultColumnProviders.Job);
 
-            var final = FinalConfigBuilder.Create(mutable);
+            var final = ImmutableConfigBuilder.Create(mutable);
 
             Assert.Same(DefaultColumnProviders.Job, final.GetColumnProviders().Single());
         }
@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.IntegrationTests
             mutable.Add(ConsoleLogger.Default);
             mutable.Add(ConsoleLogger.Default);
 
-            var final = FinalConfigBuilder.Create(mutable);
+            var final = ImmutableConfigBuilder.Create(mutable);
 
             Assert.Same(ConsoleLogger.Default, final.GetLoggers().Single());
         }
@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.IntegrationTests
             mutable.Add(HardwareCounter.CacheMisses);
             mutable.Add(HardwareCounter.CacheMisses);
 
-            var final = FinalConfigBuilder.Create(mutable);
+            var final = ImmutableConfigBuilder.Create(mutable);
 
             Assert.Equal(HardwareCounter.CacheMisses, final.GetHardwareCounters().Single());
         }
@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.IntegrationTests
             
             mutable.Add(HardwareCounter.CacheMisses);
 
-            var final = FinalConfigBuilder.Create(mutable);
+            var final = ImmutableConfigBuilder.Create(mutable);
 
             Assert.Single(final.GetDiagnosers());
             Assert.Single(final.GetDiagnosers().OfType<IHardwareCountersDiagnoser>());
@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.IntegrationTests
             mutable.Add(HardwareCounter.CacheMisses);
             mutable.Add(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.All));
 
-            var final = FinalConfigBuilder.Create(mutable);
+            var final = ImmutableConfigBuilder.Create(mutable);
 
             Assert.Single(final.GetDiagnosers().OfType<IHardwareCountersDiagnoser>());
             Assert.Single(final.GetDiagnosers().OfType<IDisassemblyDiagnoser>());
@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.IntegrationTests
             mutable.Add(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.All));
             mutable.Add(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.Asm));
 
-            var final = FinalConfigBuilder.Create(mutable);
+            var final = ImmutableConfigBuilder.Create(mutable);
 
             Assert.Single(final.GetDiagnosers());
         }
@@ -105,7 +105,7 @@ namespace BenchmarkDotNet.IntegrationTests
             mutable.Add(MarkdownExporter.GitHub);
             mutable.Add(MarkdownExporter.GitHub);
 
-            var final = FinalConfigBuilder.Create(mutable);
+            var final = ImmutableConfigBuilder.Create(mutable);
 
             Assert.Same(MarkdownExporter.GitHub, final.GetExporters().Single());
         }
@@ -118,7 +118,7 @@ namespace BenchmarkDotNet.IntegrationTests
             mutable.Add(OutliersAnalyser.Default);
             mutable.Add(OutliersAnalyser.Default);
 
-            var final = FinalConfigBuilder.Create(mutable);
+            var final = ImmutableConfigBuilder.Create(mutable);
 
             Assert.Same(OutliersAnalyser.Default, final.GetAnalysers().Single());
         }
@@ -131,7 +131,7 @@ namespace BenchmarkDotNet.IntegrationTests
             mutable.Add(JitOptimizationsValidator.DontFailOnError);
             mutable.Add(JitOptimizationsValidator.FailOnError);
 
-            var final = FinalConfigBuilder.Create(mutable);
+            var final = ImmutableConfigBuilder.Create(mutable);
 
             Assert.Same(JitOptimizationsValidator.FailOnError, final.GetValidators().OfType<JitOptimizationsValidator>().Single());
         }
@@ -139,7 +139,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void BaseLineValidatorIsMandatory()
         {
-            var fromEmpty = FinalConfigBuilder.Create(ManualConfig.CreateEmpty());
+            var fromEmpty = ImmutableConfigBuilder.Create(ManualConfig.CreateEmpty());
 
             Assert.Contains(BaselineValidator.FailOnError, fromEmpty.GetValidators());
         }
@@ -151,7 +151,7 @@ namespace BenchmarkDotNet.IntegrationTests
             
             mutable.Add(TestExporter.Default);
 
-            var exporters = FinalConfigBuilder.Create(mutable).GetExporters().ToArray();
+            var exporters = ImmutableConfigBuilder.Create(mutable).GetExporters().ToArray();
             
             Assert.Equal(2, exporters.Length);
             Assert.Equal(new IExporter[] { TestExporterDependency.Default, TestExporter.Default }, exporters);
@@ -165,7 +165,7 @@ namespace BenchmarkDotNet.IntegrationTests
             mutable.Add(TestExporter.Default);
             mutable.Add(TestExporterDependency.Default);
             
-            var exporters = FinalConfigBuilder.Create(mutable).GetExporters().ToArray();
+            var exporters = ImmutableConfigBuilder.Create(mutable).GetExporters().ToArray();
             
             Assert.Equal(2, exporters.Length);
             Assert.Equal(new IExporter[] { TestExporterDependency.Default, TestExporter.Default }, exporters);
@@ -248,7 +248,7 @@ namespace BenchmarkDotNet.IntegrationTests
             return config;
         }
         
-        private static FinalConfig[] AddLeftToTheRightAndRightToTheLef(ManualConfig left, ManualConfig right)
+        private static ImmutableConfig[] AddLeftToTheRightAndRightToTheLef(ManualConfig left, ManualConfig right)
         {
             var rightAddedToLeft = ManualConfig.Create(left);
             rightAddedToLeft.Add(right);
@@ -256,7 +256,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var leftAddedToTheRight = ManualConfig.Create(right);
             leftAddedToTheRight.Add(left);
 
-            return new []{ rightAddedToLeft.CreateFinalConfig(), leftAddedToTheRight.CreateFinalConfig() };
+            return new []{ rightAddedToLeft.CreateImmutableConfig(), leftAddedToTheRight.CreateImmutableConfig() };
         }
         
         public class TestExporter : IExporter, IExporterDependencies

@@ -108,7 +108,7 @@ namespace BenchmarkDotNet.Columns
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase)
             => Format(summary, benchmarkCase.Config, summary[benchmarkCase].ResultStatistics, SummaryStyle.Default);
 
-        public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style)
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style)
             => Format(summary, benchmarkCase.Config, summary[benchmarkCase].ResultStatistics, style);
 
         public bool IsAvailable(Summary summary) => true;
@@ -120,7 +120,7 @@ namespace BenchmarkDotNet.Columns
 
         public string Legend { get; }
 
-        private string Format(Summary summary, FinalConfig config, Statistics statistics, ISummaryStyle style)
+        private string Format(Summary summary, ImmutableConfig config, Statistics statistics, SummaryStyle style)
         {
             if (statistics == null)
                 return "NA";

@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Configs
 
         [CanBeNull] IOrderer Orderer { get; }
 
-        ISummaryStyle SummaryStyle { get; } 
+        SummaryStyle SummaryStyle { get; } 
 
         ConfigUnionRule UnionRule { get; }
 

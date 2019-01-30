@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public Encoding Encoding { get; set; }
         [PublicAPI] public bool StopOnFirstError { get; set; }
         [PublicAPI] public IOrderer Orderer { get; set; }
-        [PublicAPI] public ISummaryStyle SummaryStyle { get; set; }
+        [PublicAPI] public SummaryStyle SummaryStyle { get; set; }
 
         public void Add(params IColumn[] newColumns) => columnProviders.AddRange(newColumns.Select(c => c.ToProvider()));
         public void Add(params IColumnProvider[] newColumnProviders) => columnProviders.AddRange(newColumnProviders);

@@ -76,7 +76,7 @@ namespace BenchmarkDotNet.Configs
 
         public Encoding Encoding => Encoding.ASCII;
 
-        public ISummaryStyle SummaryStyle => Reports.SummaryStyle.Default;
+        public SummaryStyle SummaryStyle => SummaryStyle.Default;
 
         public string ArtifactsPath => Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");
 

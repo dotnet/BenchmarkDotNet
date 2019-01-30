@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 {
     internal class InProcessRunner
     {
-        public static int Run(IHost host, BenchmarkCase benchmarkCase, BenchmarkActionCodegen codegenMode, IConfig config)
+        public static int Run(IHost host, BenchmarkCase benchmarkCase, BenchmarkActionCodegen codegenMode)
         {
             // the first thing to do is to let diagnosers hook in before anything happens
             // so all jit-related diagnosers can catch first jit compilation!

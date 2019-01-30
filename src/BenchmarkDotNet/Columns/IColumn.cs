@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Columns
         /// <summary>
         /// Value in this column formatted using the specified style.
         /// </summary>
-        string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style);
+        string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style);
 
         bool IsDefault(Summary summary, BenchmarkCase benchmarkCase);
 
