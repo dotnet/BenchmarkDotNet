@@ -538,12 +538,15 @@ namespace BenchmarkDotNet.Running
 
         private static string GetRootArtifactsFolderPath(BenchmarkRunInfo[] benchmarkRunInfos)
         {
-            var customPath = benchmarkRunInfos.SingleOrDefault(benchmark =>
-                !string.IsNullOrEmpty(benchmark.Config.ArtifactsPath) && benchmark.Config.ArtifactsPath != DefaultConfig.Instance.ArtifactsPath);
+            var defaultPath = DefaultConfig.Instance.ArtifactsPath;
 
-            return customPath != default 
-                ? customPath.Config.ArtifactsPath.CreateIfNotExists()
-                : DefaultConfig.Instance.ArtifactsPath.CreateIfNotExists();
+            var customPath = benchmarkRunInfos
+                .Where(benchmark => !string.IsNullOrEmpty(benchmark.Config.ArtifactsPath) && benchmark.Config.ArtifactsPath != defaultPath)
+                .Select(benchmark => benchmark.Config.ArtifactsPath)
+                .Distinct()
+                .SingleOrDefault();
+
+            return customPath != default ? customPath.CreateIfNotExists() : defaultPath;
         }
 
         private static string GetResultsFolderPath(string rootArtifactsFolderPath) => Path.Combine(rootArtifactsFolderPath, "results").CreateIfNotExists();
