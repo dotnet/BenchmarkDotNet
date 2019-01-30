@@ -1,15 +1,17 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Mathematics;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {
-    public class OptionHandler
+    internal class OptionHandler
     {
         public CommandLineOptions Options { get; set; }
 
+        public FileInfo AssemblyFile { get; set; }
+
         public void Init(
+            FileInfo assemblyFile,
             string job,
             string[] runtimes,
             string[] exporters,
@@ -54,6 +56,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             bool stopOnFirstError,
             string statisticalTest)
         {
+            AssemblyFile = assemblyFile;
             Options = new CommandLineOptions
             {
                 BaseJob = job,

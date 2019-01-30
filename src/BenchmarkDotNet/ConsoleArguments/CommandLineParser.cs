@@ -12,9 +12,9 @@ namespace BenchmarkDotNet.ConsoleArguments
 {
     internal static class CommandLineParser
     {
-        internal static int Parser(OptionHandler optionHandler, string[] args, ILogger logger) 
+        internal static int Parser(OptionHandler optionHandler, string[] args, ILogger logger, string description = null, Argument argument = null) 
         {
-            var parser = new CommandLineBuilder(Root(optionHandler))
+            var parser = new CommandLineBuilder(Root(optionHandler, description, argument))
                 // parser
                 .AddVersionOption()
 
@@ -36,10 +36,10 @@ namespace BenchmarkDotNet.ConsoleArguments
             
         }
 
-        internal static RootCommand Root(OptionHandler optionHandler)
+        internal static RootCommand Root(OptionHandler optionHandler, string description, Argument argument = null)
         {
-            var root = new RootCommand();
-            root.Description = "BenchmarkDotNet";
+            var root = new RootCommand(argument: argument);
+            root.Description = description;
             AddAllOptions(root);
 
             root.Handler = new MethodBinder(optionHandler.GetType().GetMethod("Init"), () => optionHandler);

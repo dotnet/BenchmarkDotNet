@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         }
         public void Write(string value)
         {
-            logger.WriteLine(value);
+            logger.Write(value);
         }
     }
 }

@@ -9,6 +9,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 
@@ -60,7 +61,13 @@ namespace BenchmarkDotNet.Running
             var nonNullLogger = nonNullConfig.GetLoggers().Any() ? nonNullConfig.GetCompositeLogger() : ConsoleLogger.Default;
 
             OptionHandler optionHandler = new OptionHandler();
-            if (CommandLineParser.Parser(optionHandler, args, nonNullLogger) != 0)
+            var result = CommandLineParser.Parser(
+                optionHandler, 
+                args, 
+                nonNullLogger,
+                $"{BenchmarkDotNetInfo.FullTitle} - Powerful .NET library for benchmarking.");
+
+            if (result != 0 || optionHandler.Options == null)
             {
                 return Array.Empty<Summary>();
             }
