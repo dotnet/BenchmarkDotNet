@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net46</TargetFramework>
+    <TargetFramework>net461</TargetFramework>
     <OutputType>Exe</OutputType>
     <AssemblyTitle>BenchmarkDotNet.Disassembler.x64</AssemblyTitle>
     <AssemblyName>BenchmarkDotNet.Disassembler.x64</AssemblyName>

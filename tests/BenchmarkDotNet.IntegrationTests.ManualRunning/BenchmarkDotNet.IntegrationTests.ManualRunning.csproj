@@ -14,7 +14,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\BenchmarkDotNet.IntegrationTests\BenchmarkTestExecutor.cs" Link="BenchmarkTestExecutor.cs" />
-    <Compile Include="..\BenchmarkDotNet.IntegrationTests\CheckCoreClrAndCoreFxVersions.cs" Link="CheckCoreClrAndCoreFxVersions.cs" />
     <Compile Include="..\BenchmarkDotNet.IntegrationTests\TestConfigs.cs" Link="TestConfigs.cs" />
     <Compile Include="..\BenchmarkDotNet.Tests\Loggers\OutputLogger.cs" Link="OutputLogger.cs" />
   </ItemGroup>

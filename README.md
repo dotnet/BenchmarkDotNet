@@ -157,7 +157,7 @@ A few useful links for you:
 
 BenchmarkDotNet supports all kinds of .NET stacks:
 
-* **Supported runtimes:** .NET Framework (4.6+), .NET Core (2.0+), Mono, CoreRT
+* **Supported runtimes:** .NET Framework (4.6.1+), .NET Core (2.0+), Mono, CoreRT
 * **Supported languages:** C#, F#, Visual Basic
 * **Supported OS:** Windows, Linux, macOS
 
