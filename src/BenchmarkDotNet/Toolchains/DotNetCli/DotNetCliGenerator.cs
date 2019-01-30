@@ -1,9 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
-using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Jobs;
+using System.Text;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
@@ -12,34 +9,18 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public abstract class DotNetCliGenerator : GeneratorBase
     {
-        [PublicAPI]
-        public string TargetFrameworkMoniker { get; }
+        [PublicAPI] public string TargetFrameworkMoniker { get; }
 
-        protected Func<Platform, string> PlatformProvider { get; }
+        [PublicAPI] public string CliPath { get; }
 
-        protected string Runtime { get; }
-
-        protected string ExtraDependencies { get; }
-
-        protected string Imports { get; }
-
-        private DotNetCliBuilder Builder { get; }
+        [PublicAPI] public string PackagesPath { get; }
 
         [PublicAPI]
-        protected DotNetCliGenerator(
-            DotNetCliBuilder builder,
-            string targetFrameworkMoniker,
-            string extraDependencies,
-            Func<Platform, string> platformProvider,
-            string imports,
-            string runtime = null)
+        protected DotNetCliGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath)
         {
-            Builder = builder;
             TargetFrameworkMoniker = targetFrameworkMoniker;
-            ExtraDependencies = extraDependencies;
-            PlatformProvider = platformProvider;
-            Imports = imports;
-            Runtime = runtime;
+            CliPath = cliPath;
+            PackagesPath = packagesPath;
         }
 
         protected override string GetExecutableExtension() => TargetFrameworkMoniker.Contains("core") ? ".dll" : ".exe";
@@ -47,7 +28,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// <summary>
         /// we need our folder to be on the same level as the project that we want to reference
         /// we are limited by xprojs (by default compiles all .cs files in all subfolders, Program.cs could be doubled and fail the build)
-        /// and also by nuget internal implementation like looking for global.json file in parent folders
+        /// and also by NuGet internal implementation like looking for global.json file in parent folders
         /// </summary>
         protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programName)
         {
@@ -91,10 +72,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
+        protected override string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath) => PackagesPath;
+
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
-            string content = $"call dotnet {Builder.RestoreCommand} {GetCustomArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver)}{Environment.NewLine}" +
-                             $"call dotnet {Builder.GetBuildCommand(TargetFrameworkMoniker, false, buildPartition.BuildConfiguration)} {GetCustomArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver)}";
+            var content = new StringBuilder(300)
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(buildPartition)}")
+                .ToString();
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
         }
@@ -108,16 +93,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         private static bool IsRootSolutionFolder(DirectoryInfo directoryInfo)
             => directoryInfo
                 .GetFileSystemInfos()
-                .Any(fileInfo => fileInfo.Extension == ".sln" || fileInfo.Name == "global.json");
-
-        internal static string GetCustomArguments(BenchmarkCase benchmarkCase, IResolver resolver)
-        {
-            if (!benchmarkCase.Job.HasValue(InfrastructureMode.ArgumentsCharacteristic))
-                return null;
-
-            var msBuildArguments = benchmarkCase.Job.ResolveValue(InfrastructureMode.ArgumentsCharacteristic, resolver).OfType<MsBuildArgument>();
-
-            return string.Join(" ", msBuildArguments.Select(arg => arg.TextRepresentation));
-        }
+                .Any(fileInfo => fileInfo.Extension == ".sln" || fileInfo.Name == "global.json");          
     }
 }

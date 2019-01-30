@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
+using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Mathematics.StatisticalTesting;
 using BenchmarkDotNet.Portability;
 using CommandLine;
 using CommandLine.Text;
@@ -70,9 +73,12 @@ namespace BenchmarkDotNet.ConsoleArguments
         
         [Option("cli", Required = false, HelpText = "Path to dotnet cli (optional).")]
         public FileInfo CliPath { get; set; }
+        
+        [Option("packages", Required = false, HelpText = "The directory to restore packages to (optional).")]
+        public DirectoryInfo RestorePath { get; set; }
 
-        [Option("coreRun", Required = false, HelpText = "Path to CoreRun (optional).")]
-        public FileInfo CoreRunPath { get; set; }
+        [Option("coreRun", Required = false, HelpText = "Path(s) to CoreRun (optional).")]
+        public IReadOnlyList<FileInfo> CoreRunPaths { get; set; }
 
         [Option("monoPath", Required = false, HelpText = "Optional path to Mono which should be used for running benchmarks.")]
         public FileInfo MonoPath { get; set; }
@@ -98,8 +104,8 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("maxWarmupCount", Required = false, HelpText = "Maximum count of warmup iterations that should be performed. The default is 50.")]
         public int? MaxWarmupIterationCount { get; set; }
         
-        [Option("iterationTime", Required = false, HelpText = "Desired time of execution of an iteration. Used by Pilot stage to estimate the number of invocations per iteration. 500ms by default")]
-        public int? IterationTimeInMiliseconds { get; set; }
+        [Option("iterationTime", Required = false, HelpText = "Desired time of execution of an iteration in milliseconds. Used by Pilot stage to estimate the number of invocations per iteration. 500ms by default")]
+        public int? IterationTimeInMilliseconds { get; set; }
         
         [Option("iterationCount", Required = false, HelpText = "How many target iterations should be performed. By default calculated by the heuristic.")]
         public int? IterationCount { get; set; }
@@ -122,6 +128,26 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("info", Required = false, Default = false, HelpText = "Print environment information.")]
         public bool PrintInformation { get; set; }
 
+        [Option("list", Required = false, Default = ListBenchmarkCaseMode.Disabled, HelpText = "Prints all of the available benchmark names. Flat/Tree")]
+        public ListBenchmarkCaseMode ListBenchmarkCaseMode { get; set; }
+        
+        [Option("disasmDepth", Required = false, Default = 1, HelpText = "Sets the recursive depth for the disassembler.")]
+        public int DisassemblerRecursiveDepth { get; set; }
+
+        [Option("disasmDiff", Required = false, Default = false, HelpText = "Generates diff reports for the disassembler.")]
+        public bool DisassemblerDiff { get; set; }
+
+        [Option("buildTimeout", Required = false, HelpText = "Build timeout in seconds.")]
+        public int? TimeOutInSeconds { get; set; }
+
+        [Option("stopOnFirstError", Required = false, Default = false, HelpText = "Stop on first error.")]
+        public bool StopOnFirstError { get; set; }
+        
+        [Option("statisticalTest", Required = false, HelpText = "Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s")]
+        public string StatisticalTestThreshold { get; set; }
+        
+        internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any(); 
+
         [Usage(ApplicationAlias = "")]
         [PublicAPI]
         public static IEnumerable<Example> Examples
@@ -137,7 +163,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return new Example("Run benchmarks for .NET Core 2.0, .NET Core 2.1 and .NET Core 2.2. .NET Core 2.0 will be baseline because it was first.", longName, new CommandLineOptions { Runtimes = new[] { "netcoreapp2.0", "netcoreapp2.1", "netcoreapp2.2" } });
                 yield return new Example("Use MemoryDiagnoser to get GC stats", shortName, new CommandLineOptions { UseMemoryDiagnoser = true });
                 yield return new Example("Use DisassemblyDiagnoser to get disassembly", shortName, new CommandLineOptions { UseDisassemblyDiagnoser = true });
-                yield return new Example("Use HardwareCountersDiagnoser to get hardware coutner info", longName, new CommandLineOptions { HardwareCounters = new [] { nameof(HardwareCounter.CacheMisses), nameof(HardwareCounter.InstructionRetired) } });
+                yield return new Example("Use HardwareCountersDiagnoser to get hardware counter info", longName, new CommandLineOptions { HardwareCounters = new [] { nameof(HardwareCounter.CacheMisses), nameof(HardwareCounter.InstructionRetired) } });
                 yield return new Example("Run all benchmarks exactly once", shortName, new CommandLineOptions { BaseJob = "Dry", Filters = new[] { HandleWildcardsOnUnix("*") } });
                 yield return new Example("Run all benchmarks from System.Memory namespace", shortName, new CommandLineOptions { Filters = new[] { HandleWildcardsOnUnix("System.Memory*") } });
                 yield return new Example("Run all benchmarks from ClassA and ClassB using type names", shortName, new CommandLineOptions { Filters = new[] { "ClassA", "ClassB" } });
@@ -145,7 +171,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return new Example("Run all benchmarks called `BenchmarkName` and show the results in single summary", longName, new CommandLineOptions { Join = true, Filters = new[] { HandleWildcardsOnUnix("*.BenchmarkName") } });
                 yield return new Example("Run selected benchmarks once per iteration", longName, new CommandLineOptions { RunOncePerIteration = true });
                 yield return new Example("Run selected benchmarks 100 times per iteration. Perform single warmup iteration and 5 actual workload iterations", longName, new CommandLineOptions { InvocationCount = 100, WarmupIterationCount = 1, IterationCount = 5});
-                yield return new Example("Run selected benchmarks 250ms per iteration. Perform from 9 to 15 iterations", longName, new CommandLineOptions { IterationTimeInMiliseconds = 250, MinIterationCount = 9, MaxIterationCount = 15});
+                yield return new Example("Run selected benchmarks 250ms per iteration. Perform from 9 to 15 iterations", longName, new CommandLineOptions { IterationTimeInMilliseconds = 250, MinIterationCount = 9, MaxIterationCount = 15});
+                yield return new Example("Run MannWhitney test with relative ratio of 5% for all benchmarks for .NET Core 2.0 (base) vs .NET Core 2.1 (diff). .NET Core 2.0 will be baseline because it was provided as first.", longName, 
+                    new CommandLineOptions { Filters = new [] { "*"}, Runtimes = new[] { "netcoreapp2.0", "netcoreapp2.1" }, StatisticalTestThreshold = "5%" });
             }
         }
 

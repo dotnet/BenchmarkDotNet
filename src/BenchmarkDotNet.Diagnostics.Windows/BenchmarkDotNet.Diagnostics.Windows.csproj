@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <Description>Powerful .NET library for benchmarking (Diagnostic Tools for Windows)</Description>
     <AssemblyTitle>BenchmarkDotNet.Diagnostics.Windows</AssemblyTitle>
-    <TargetFrameworks>net46;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <NoWarn>1701;1702;1705;1591;3001;3003;3002;3009</NoWarn>
     <AssemblyName>BenchmarkDotNet.Diagnostics.Windows</AssemblyName>
     <PackageId>BenchmarkDotNet.Diagnostics.Windows</PackageId>
@@ -12,6 +12,6 @@
     <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="2.0.26" />
+    <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="2.0.26" PrivateAssets="contentfiles;analyzers" />
   </ItemGroup>
 </Project>

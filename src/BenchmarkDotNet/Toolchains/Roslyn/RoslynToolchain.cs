@@ -12,10 +12,10 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
     [PublicAPI]
     public class RoslynToolchain : Toolchain
     {
-        public static IToolchain Instance = new RoslynToolchain();
+        public static readonly IToolchain Instance = new RoslynToolchain();
 
         [PublicAPI]
-        public RoslynToolchain() : base("Roslyn", new Generator(), new Builder(), new Executor())
+        public RoslynToolchain() : base("Roslyn", new Generator(), Roslyn.Builder.Instance, new Executor())
         {
         }
 
@@ -37,6 +37,12 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 && benchmarkCase.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, resolver) != InfrastructureMode.ReleaseConfigurationName)
             {
                 logger.WriteLineError("The Roslyn toolchain does not allow to rebuild source project, so defining custom build configuration makes no sense");
+                return false;
+            }
+
+            if (benchmarkCase.Job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic))
+            {
+                logger.WriteLineError("The Roslyn toolchain does not allow specifying NuGet package dependencies");
                 return false;
             }
 

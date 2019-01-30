@@ -11,9 +11,10 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
         private static double PValueForSmallN(int n, int m, double u)
         {
             int q = (int)Math.Floor(u + 1e-9);
-            var w = new long[n + 1, m + 1, q + 1];
-            for (int i = 0; i <= n; i++)
-            for (int j = 0; j <= m; j++)
+            int nm = Math.Max(n, m);
+            var w = new long[nm + 1, nm + 1, q + 1];
+            for (int i = 0; i <= nm; i++)
+            for (int j = 0; j <= nm; j++)
             for (int k = 0; k <= q; k++)
             {
                 if (i == 0 || j == 0 || k == 0)

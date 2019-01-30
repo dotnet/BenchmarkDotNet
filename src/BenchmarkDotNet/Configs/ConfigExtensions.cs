@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static IConfig With(this IConfig config, IOrderer provider) => config.With(m => m.Orderer = provider);
         [PublicAPI] public static IConfig With(this IConfig config, params HardwareCounter[] counters) => config.With(c => c.Add(counters));
         [PublicAPI] public static IConfig With(this IConfig config, params IFilter[] filters) => config.With(c => c.Add(filters));
-        [PublicAPI] public static IConfig With(this IConfig config, Encoding encoding) => config.With(c => c.Set(encoding));
+        [PublicAPI] public static IConfig With(this IConfig config, Encoding encoding) => config.With(c => c.Encoding = encoding);
         [PublicAPI] public static IConfig With(this IConfig config, ISummaryStyle summaryStyle) => config.With(c => c.SummaryStyle = summaryStyle);
 
         /// <summary>
@@ -41,6 +41,7 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static IConfig RemoveBenchmarkFiles(this IConfig config) => config.KeepBenchmarkFiles(false);
         [PublicAPI] public static IConfig WithArtifactsPath(this IConfig config, string artifactsPath) => config.With(m => m.ArtifactsPath = artifactsPath);
         [PublicAPI] public static IConfig With(this IConfig config, params BenchmarkLogicalGroupRule[] rules) => config.With(c => c.Add(rules));
+        [PublicAPI] public static IConfig StopOnFirstError(this IConfig config, bool value = true) => config.With(m => m.StopOnFirstError = value);
 
         public static FinalConfig CreateFinalConfig(this IConfig config) => FinalConfigBuilder.Create(config);
 

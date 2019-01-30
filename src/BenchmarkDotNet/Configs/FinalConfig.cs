@@ -49,7 +49,8 @@ namespace BenchmarkDotNet.Configs
             string artifactsPath, 
             Encoding encoding,
             IOrderer orderer,
-            ISummaryStyle summaryStyle)
+            ISummaryStyle summaryStyle,
+            bool stopOnFirstError)
         {
             columnProviders = uniqueColumnProviders;
             loggers = uniqueLoggers;
@@ -68,6 +69,7 @@ namespace BenchmarkDotNet.Configs
             Encoding = encoding;
             Orderer = orderer;
             SummaryStyle = summaryStyle;
+            StopOnFirstError = stopOnFirstError;
         }
 
         public ConfigUnionRule UnionRule { get; }
@@ -76,8 +78,9 @@ namespace BenchmarkDotNet.Configs
         public string ArtifactsPath { get; }
         public Encoding Encoding { get; }
         [NotNull] public IOrderer Orderer { get; } 
-        public ISummaryStyle SummaryStyle { get; } 
-        
+        public ISummaryStyle SummaryStyle { get; }
+        public bool StopOnFirstError { get; }
+
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;
         public IEnumerable<ILogger> GetLoggers() => loggers;

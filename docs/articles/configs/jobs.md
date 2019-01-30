@@ -46,7 +46,7 @@ In this category, you can specifiy how to benchmark each method.
   * `Monitoring`: A mode without overhead evaluating, with several target iterations
 * `LaunchCount`: how many times we should launch process with target benchmark
 * `WarmupCount`: how many warmup iterations should be performed
-* `TargetCount`: how many target iterations should be performed
+* `IterationCount`: how many target iterations should be performed (if specified, `BenchmarkDotNet.Jobs.RunMode.MinIterationCount` and `BenchmarkDotNet.Jobs.RunMode.MaxIterationCount` will be ignored)
 * `IterationTime`: desired time of a single iteration
 * `UnrollFactor`: how many times the benchmark method will be invoked per one iteration of a generated loop
 * `InvocationCount`: count of invocation in a single iteration (if specified, `IterationTime` will be ignored), must be a multiple of `UnrollFactor`

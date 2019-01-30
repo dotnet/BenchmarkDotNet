@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.DotNetCli;
 
 namespace BenchmarkDotNet.Toolchains.CoreRt
 {
@@ -20,9 +22,10 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         internal const string CoreRtNuGetFeed = "coreRtNuGetFeed";
 
         internal Generator(string coreRtVersion, bool useCppCodeGenerator,
-            string runtimeFrameworkVersion, string targetFrameworkMoniker,
-            string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag, bool useTempFolderForRestore)
-            : base(targetFrameworkMoniker, platform => platform.ToConfig(), runtimeFrameworkVersion)
+            string runtimeFrameworkVersion, string targetFrameworkMoniker, string cliPath,
+            string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag, 
+            bool useTempFolderForRestore, string packagesRestorePath)
+            : base(targetFrameworkMoniker, cliPath, GetPackagesDirectoryPath(useTempFolderForRestore, packagesRestorePath), runtimeFrameworkVersion)
         {
             this.coreRtVersion = coreRtVersion;
             this.useCppCodeGenerator = useCppCodeGenerator;
@@ -57,27 +60,21 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         {
             string extraArguments = useCppCodeGenerator ? $"-r {runtimeIdentifier} /p:NativeCodeGen=cpp" : $"-r {runtimeIdentifier}";
 
-            if (useTempFolderForRestore)
-            {
-                File.WriteAllText(artifactsPaths.BuildScriptFilePath,
-                    $"dotnet restore --packages {artifactsPaths.PackagesDirectoryName} {extraArguments} --no-dependencies" + Environment.NewLine +
-                    $"dotnet build -c {buildPartition.BuildConfiguration} {extraArguments} --no-restore --no-dependencies" + Environment.NewLine +
-                    $"dotnet publish -c {buildPartition.BuildConfiguration} {extraArguments} --no-restore --no-dependencies");
-            }
-            else
-            {
-                File.WriteAllText(artifactsPaths.BuildScriptFilePath, $"dotnet publish -c {buildPartition.BuildConfiguration} {extraArguments}");
-            }
+            var content = new StringBuilder(300)
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition)} {extraArguments}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(buildPartition)} {extraArguments}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetPublishCommand(buildPartition)} {extraArguments}")
+                .ToString();
+            
+            File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
         }
 
         // we always want to have a new directory for NuGet packages restore 
         // to avoid this https://github.com/dotnet/coreclr/blob/master/Documentation/workflow/UsingDotNetCli.md#update-coreclr-using-runtime-nuget-package
         // some of the packages are going to contain source code, so they can not be in the subfolder of current solution
         // otherwise they would be compiled too (new .csproj include all .cs files from subfolders by default
-        protected override string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath)
-            => useTempFolderForRestore
-                ? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString())
-                : null;
+        private static string GetPackagesDirectoryPath(bool useTempFolderForRestore, string packagesRestorePath)
+            => packagesRestorePath ?? (useTempFolderForRestore ? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()) : null);
 
         protected override string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths)
             => useTempFolderForRestore
@@ -108,7 +105,14 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                         : GenerateProjectForLocalBuild(buildPartition, artifactsPaths, logger));
 
         private string GenerateProjectForNuGetBuild(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $@"
-<Project Sdk=""Microsoft.NET.Sdk"">
+<Project ToolsVersion=""15.0"">
+  <PropertyGroup>
+    <ImportDirectoryBuildProps>false</ImportDirectoryBuildProps>
+    <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
+  </PropertyGroup>
+
+  <Import Project=""Sdk.props"" Sdk=""Microsoft.NET.Sdk"" />
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>{TargetFrameworkMoniker}</TargetFramework>
@@ -120,6 +124,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <UseSharedCompilation>false</UseSharedCompilation>
   </PropertyGroup>
   {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc, buildPartition.Resolver)}
   <ItemGroup>
@@ -129,6 +134,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{coreRtVersion}"" />
     <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName}"" />
   </ItemGroup>
+  <Import Project=""Sdk.targets"" Sdk=""Microsoft.NET.Sdk"" />
 </Project>";
 
         private string GenerateProjectForLocalBuild(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $@"
@@ -145,6 +151,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <UseSharedCompilation>false</UseSharedCompilation>
   </PropertyGroup>
   <Import Project=""$(MSBuildSDKsPath)\Microsoft.NET.Sdk\Sdk\Sdk.targets"" />
   <Import Project=""$(IlcPath)\build\Microsoft.NETCore.Native.targets"" />

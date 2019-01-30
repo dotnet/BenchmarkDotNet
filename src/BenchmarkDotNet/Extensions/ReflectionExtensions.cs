@@ -139,7 +139,7 @@ namespace BenchmarkDotNet.Extensions
         internal static bool ContainsRunnableBenchmarks(this Type type)
         {
             var typeInfo = type.GetTypeInfo();
-            
+
             if (typeInfo.IsAbstract 
                 || typeInfo.IsSealed 
                 || typeInfo.IsNotPublic 
@@ -151,7 +151,7 @@ namespace BenchmarkDotNet.Extensions
 
         private static MethodInfo[] GetBenchmarks(this TypeInfo typeInfo)
             => typeInfo
-                .GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static) // we allow for Static now to produce a nice Validator warning later
                 .Where(method => method.GetCustomAttributes(true).OfType<BenchmarkAttribute>().Any())
                 .ToArray();
 
@@ -210,5 +210,6 @@ namespace BenchmarkDotNet.Extensions
                 (!typeInfo.IsGenericTypeDefinition || typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any())
                     && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it       
 
+        internal static bool IsLinqPad(this Assembly assembly) => assembly.FullName.ToUpper().Contains("LINQPAD");
     }
 }

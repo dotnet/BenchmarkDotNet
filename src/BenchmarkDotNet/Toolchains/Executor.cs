@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Toolchains
 
         private ExecuteResult Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, string exePath, string workingDirectory, string args, IDiagnoser diagnoser, IResolver resolver, FinalConfig config)
         {
-            ConsoleHandler.EnsureInitialized(logger);
+            ConsoleExitHandler.Instance.Logger = logger;
 
             try
             {
@@ -52,7 +52,8 @@ namespace BenchmarkDotNet.Toolchains
             }
             finally
             {
-                ConsoleHandler.Instance.ClearProcess();
+                ConsoleExitHandler.Instance.Process = null;
+                ConsoleExitHandler.Instance.Logger = null;
 
                 diagnoser?.Handle(HostSignal.AfterProcessExit, new DiagnoserActionParameters(null, benchmarkCase, benchmarkId, config));
             }
@@ -60,9 +61,9 @@ namespace BenchmarkDotNet.Toolchains
 
         private ExecuteResult Execute(Process process, BenchmarkCase benchmarkCase, SynchronousProcessOutputLoggerWithDiagnoser loggerWithDiagnoser, ILogger logger)
         {
-            logger.WriteLineInfo("// Execute: " + process.StartInfo.FileName + " " + process.StartInfo.Arguments);
+            logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
-            ConsoleHandler.Instance.SetProcess(process);
+            ConsoleExitHandler.Instance.Process = process;
 
             process.Start();
 

@@ -15,37 +15,37 @@ BenchmarkDotNet uses [DocFX](https://dotnet.github.io/docfx/) as a documentation
     
 ## Notes
 
-DocFX uses the following syntax for different types of notes:
+DocFX uses the [following syntax](https://dotnet.github.io/docfx/spec/docfx_flavored_markdown.html?tabs=tabid-1%2Ctabid-a#note-warningtipimportant) inside block quote for different types of notes:
 
 ```markdown
 > [!NOTE]
-> <note content>
+> note content
 > [!TIP]
-> <note content>
+> tip content
 > [!WARNING]
-> <warning content>
+> warning content
 > [!IMPORTANT]
-> <important content>
+> important content
 > [!Caution]
-> <caution content>
+> caution content
 ```
 
 It will be transformed to:
 
 > [!NOTE]
-> <note content>
+> note content
 
 > [!TIP]
-> <note content>
+> tip content
 
 > [!WARNING]
-> <warning content>
+> warning content
 
 > [!IMPORTANT]
-> <important content>
+> important content
 
 > [!Caution]
-> <caution content>
+> caution content
 
 ## Building documentation locally
 

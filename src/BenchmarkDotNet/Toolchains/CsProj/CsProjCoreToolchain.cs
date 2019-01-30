@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -32,31 +33,18 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI]
         public static IToolchain From(NetCoreAppSettings settings)
             => new CsProjCoreToolchain(settings.Name,
-                new CsProjGenerator(settings.TargetFrameworkMoniker, PlatformProvider, settings.RuntimeFrameworkVersion), 
-                new DotNetCliBuilder(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath), 
+                new CsProjGenerator(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath, settings.PackagesPath, settings.RuntimeFrameworkVersion), 
+                new DotNetCliBuilder(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath, settings.Timeout), 
                 new DotNetCliExecutor(settings.CustomDotNetCliPath),
                 settings.CustomDotNetCliPath);
-
-        private static string PlatformProvider(Platform platform) => platform.ToConfig();
 
         public override bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver)
         {
             if (!base.IsSupported(benchmarkCase, logger, resolver))
-            {
                 return false;
-            }
 
-            if (string.IsNullOrEmpty(CustomDotNetCliPath) && !HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled())
-            {
-                logger.WriteLineError($"BenchmarkDotNet requires dotnet cli toolchain to be installed, benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
+            if (InvalidCliPath(CustomDotNetCliPath, benchmarkCase, logger))
                 return false;
-            }
-
-            if (!string.IsNullOrEmpty(CustomDotNetCliPath) && !File.Exists(CustomDotNetCliPath))
-            {
-                logger.WriteLineError($"Provided custom dotnet cli path does not exist, benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
-                return false;
-            }
 
             if (benchmarkCase.Job.HasValue(EnvironmentMode.JitCharacteristic) && benchmarkCase.Job.ResolveValue(EnvironmentMode.JitCharacteristic, resolver) == Jit.LegacyJit)
             {
@@ -71,6 +59,13 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             if (benchmarkCase.Job.ResolveValue(GcMode.AllowVeryLargeObjectsCharacteristic, resolver))
             {
                 logger.WriteLineError($"Currently project.json does not support gcAllowVeryLargeObjects (app.config does), benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
+                return false;
+            }
+
+            var benchmarkAssembly = benchmarkCase.Descriptor.Type.GetTypeInfo().Assembly;
+            if (benchmarkAssembly.IsLinqPad())
+            {
+                logger.WriteLineError($"Currently LINQPad does not support .NET Core benchmarks (see dotnet/BenchmarkDotNet#975), benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
                 return false;
             }
 

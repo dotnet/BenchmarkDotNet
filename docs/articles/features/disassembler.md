@@ -5,13 +5,15 @@ name: Disassembler
 
 # Disassembler
 
-You need to use the `DisassemblyDiagnoser` attribute to configure it. The available options are:
+Can be enabled by using `[DisassemblyDiagnoser]` or command line args: `-d` or `--disasm`.
+
+The configuration options available from code level are:
 
 * `printIL`: IL will be printed. False by default.
 * `printAsm`: ASM will be printed. True by default.
 * `printSource`: C# source code will be printed. False by default.
 * `printPrologAndEpilog`: ASM for prolog and epilog will be printed. False by default.
-* `recursiveDepth`: Includes called methods to given level. 1 by default, indexed from 1. To print just benchmark set to 0 
+* `recursiveDepth`: Includes called methods to given level. 1 by default, indexed from 1. To print just benchmark set to 0. This option is also available from the console arguments level `--disasmDepth`.
 
 ### Requirements
 

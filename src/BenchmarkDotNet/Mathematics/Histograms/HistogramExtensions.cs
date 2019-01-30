@@ -18,9 +18,8 @@ namespace BenchmarkDotNet.Mathematics.Histograms
         public static IEnumerable<double> GetAllValues([NotNull] this Histogram histogram) => histogram.Bins.SelectMany(bin => bin.Values);
 
         [PublicAPI, Pure]
-        public static string ToTimeStr(this Histogram histogram, TimeUnit unit = null, char binSymbol = '@', bool full = false, Encoding encoding = null)
+        public static string ToTimeStr(this Histogram histogram, TimeUnit unit = null, char binSymbol = '@', bool full = false, Encoding encoding = null, string format = "0.000")
         {
-            const string format = "0.000";
             var bins = histogram.Bins;
             int binCount = histogram.Bins.Length;
             if (unit == null)

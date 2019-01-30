@@ -392,7 +392,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             a = InfrastructureMode.ToolchainCharacteristic;
             // will not throw:
-            a[j] = CsProjClassicNetToolchain.Net46;
+            a[j] = CsProjClassicNetToolchain.Net461;
             a[j] = null;
             a[j] = Characteristic.EmptyValue;
             Assert.Throws<ArgumentException>(() => a[j] = new EnvironmentMode()); // not assignable;
@@ -415,7 +415,7 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Equal("Id;Accuracy;AnalyzeLaunchVariance;EvaluateOverhead;" +
                 "MaxAbsoluteError;MaxRelativeError;MinInvokeCount;MinIterationTime;OutlierMode;Environment;Affinity;EnvironmentVariables;" +
                 "Jit;Platform;Runtime;Gc;AllowVeryLargeObjects;Concurrent;CpuGroups;Force;HeapAffinitizeMask;HeapCount;NoAffinitize;" +
-                "RetainVm;Server;Infrastructure;Arguments;BuildConfiguration;Clock;EngineFactory;Toolchain;Meta;Baseline;IsDefault;IsMutator;Run;InvocationCount;IterationCount;IterationTime;" +
+                "RetainVm;Server;Infrastructure;Arguments;BuildConfiguration;Clock;EngineFactory;NuGetReferences;Toolchain;Meta;Baseline;IsDefault;IsMutator;Run;InvocationCount;IterationCount;IterationTime;" +
                 "LaunchCount;MaxIterationCount;MaxWarmupIterationCount;MinIterationCount;MinWarmupIterationCount;RunStrategy;UnrollFactor;WarmupCount", string.Join(";", a));
         }
         
@@ -439,7 +439,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public static void AllJobModesPropertyNamesMatchCharacteristicNames() // it't mandatory to generate the right c# code
+        public static void AllJobModesPropertyNamesMatchCharacteristicNames() // it's mandatory to generate the right c# code
         {
             var jobModes = typeof(JobMode<>)
                 .Assembly
@@ -457,6 +457,40 @@ namespace BenchmarkDotNet.IntegrationTests
                     Assert.True(null != jobMode.GetField(expectedPropertyName, BindingFlags.Static | BindingFlags.Public), $"{expectedPropertyName} in {jobMode.Name} does not exist");
                 }
             }
+        }
+
+        [Fact]
+        public static void WithNuGet() 
+        {
+            var j = new Job("SomeId");
+
+            //.WithNuGet extensions
+
+            j = j.Freeze().WithNuGet("Newtonsoft.Json");
+            Assert.Equal(1, j.Infrastructure.NuGetReferences.Count);
+            
+            j = j.WithNuGet("AutoMapper", "7.0.1");
+            Assert.Collection(j.Infrastructure.NuGetReferences,
+                reference => Assert.Equal(new NuGetReference("AutoMapper", "7.0.1"), reference),
+                reference => Assert.Equal(new NuGetReference("Newtonsoft.Json", ""), reference));
+
+            Assert.Throws<ArgumentException>(() => j = j.WithNuGet("AutoMapper")); //adding is an error, since it's the same package
+            Assert.Throws<ArgumentException>(() => j = j.WithNuGet("AutoMapper", "7.0.0-alpha-0001")); //adding is an error, since it's the same package
+
+            j = j.WithNuGet("NLog", "4.5.10"); // ensure we can add at the end of a non-empty list
+            Assert.Collection(j.Infrastructure.NuGetReferences,
+                reference => Assert.Equal(new NuGetReference("AutoMapper", "7.0.1"), reference),
+                reference => Assert.Equal(new NuGetReference("Newtonsoft.Json", ""), reference),
+                reference => Assert.Equal(new NuGetReference("NLog", "4.5.10"), reference));
+
+            var expected = new NuGetReferenceList(Array.Empty<NuGetReference>())
+            {
+                new NuGetReference("AutoMapper", "7.0.1"),
+                new NuGetReference("Newtonsoft.Json", ""),
+                new NuGetReference("NLog", "4.5.10"),
+            };
+
+            Assert.Equal(expected, j.Infrastructure.NuGetReferences); // ensure that the list's equality operator returns true when the contents are the same
         }
 
         private static bool IsSubclassOfobModeOfItself(Type type)

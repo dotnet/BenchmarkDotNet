@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -17,28 +16,21 @@ namespace BenchmarkDotNet.Code
 
         protected readonly Descriptor Descriptor;
 
-        internal DeclarationsProvider(Descriptor descriptor)
-        {
-            Descriptor = descriptor;
-        }
+        internal DeclarationsProvider(Descriptor descriptor) => Descriptor = descriptor;
 
         public string OperationsPerInvoke => Descriptor.OperationsPerInvoke.ToString();
 
-        public string WorkloadTypeNamespace => string.IsNullOrWhiteSpace(Descriptor.Type.Namespace) ? string.Empty : $"using {Descriptor.Type.Namespace};";
-
         public string WorkloadTypeName => Descriptor.Type.GetCorrectCSharpTypeName();
 
-        public string GlobalSetupMethodName => Descriptor.GlobalSetupMethod?.Name ?? EmptyAction;
+        public string GlobalSetupMethodName => GetMethodName(Descriptor.GlobalSetupMethod);
 
-        public string GlobalCleanupMethodName => Descriptor.GlobalCleanupMethod?.Name ?? EmptyAction;
+        public string GlobalCleanupMethodName => GetMethodName(Descriptor.GlobalCleanupMethod);
 
         public string IterationSetupMethodName => Descriptor.IterationSetupMethod?.Name ?? EmptyAction;
 
         public string IterationCleanupMethodName => Descriptor.IterationCleanupMethod?.Name ?? EmptyAction;
 
         public abstract string ExtraDefines { get; }
-
-        public abstract string WorkloadMethodReturnTypeNamespace { get; }
 
         protected virtual Type WorkloadMethodReturnType => Descriptor.WorkloadMethod.ReturnType;
 
@@ -58,10 +50,24 @@ namespace BenchmarkDotNet.Code
 
         public virtual bool UseRefKeyword => false;
 
-        public IEnumerable<string> ArgumentsNamespaces
-            => Descriptor.WorkloadMethod.GetParameters()
-                .Where(arg => !string.IsNullOrEmpty(arg.ParameterType.Namespace))
-                .Select(arg => $"using {arg.ParameterType.Namespace};");
+        private string GetMethodName(MethodInfo method)
+        {
+            if (method == null)
+            {
+                return EmptyAction;
+            }
+
+            if (method.ReturnType == typeof(Task) ||
+                method.ReturnType == typeof(ValueTask) ||
+                (method.ReturnType.IsGenericType &&
+                    (method.ReturnType.GetGenericTypeDefinition() == typeof(Task<>) ||
+                     method.ReturnType.GetGenericTypeDefinition() == typeof(ValueTask<>))))
+            {
+                return $"() => {method.Name}().GetAwaiter().GetResult()";
+            }
+
+            return method.Name;
+        }
     }
 
     internal class VoidDeclarationsProvider : DeclarationsProvider
@@ -69,8 +75,6 @@ namespace BenchmarkDotNet.Code
         public VoidDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
 
         public override string ExtraDefines => "#define RETURNS_VOID";
-
-        public override string WorkloadMethodReturnTypeNamespace => string.Empty;
 
         protected override Type OverheadMethodReturnType => typeof(void);
 
@@ -80,12 +84,6 @@ namespace BenchmarkDotNet.Code
     internal class NonVoidDeclarationsProvider : DeclarationsProvider
     {
         public NonVoidDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
-
-        public override string WorkloadMethodReturnTypeNamespace 
-            => WorkloadMethodReturnType.Namespace == "System" // As "using System;" is always included in the template, don't emit it again
-                || string.IsNullOrWhiteSpace(WorkloadMethodReturnType.Namespace) 
-                    ? string.Empty 
-                    : $"using {WorkloadMethodReturnType.Namespace};";
 
         public override string ConsumeField
             => !Consumer.IsConsumable(WorkloadMethodReturnType) && Consumer.HasConsumableField(WorkloadMethodReturnType, out var field)
@@ -110,7 +108,7 @@ namespace BenchmarkDotNet.Code
                 else if (type.GetTypeInfo().IsClass || type.GetTypeInfo().IsInterface)
                     value = "null";
                 else
-                    value = SourceCodeHelper.ToSourceCode(Activator.CreateInstance(type)) + ";";                                    
+                    value = SourceCodeHelper.ToSourceCode(Activator.CreateInstance(type)) + ";";
                 return $"return {value};";
             }
         }
@@ -131,7 +129,7 @@ namespace BenchmarkDotNet.Code
 
         public override string ConsumeField => null;
 
-        public override string OverheadImplementation => $"return default({nameof(IntPtr)});";
+        public override string OverheadImplementation => $"return default(System.{nameof(IntPtr)});";
 
         public override string ExtraDefines => "#define RETURNS_BYREF";
 

@@ -1,8 +1,10 @@
 ﻿using System;
 using BenchmarkDotNet.Configs;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Diagnostics.Windows.Configs
 {
+    [PublicAPI]
     public class EtwProfilerAttribute : Attribute, IConfigSource
     {
         /// <param name="performExtraBenchmarksRun">if set to true, benchmarks will be executed on more time with the profiler attached. If set to false, there will be no extra run but the results will contain overhead. True by default.</param>

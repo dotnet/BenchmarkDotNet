@@ -12,16 +12,19 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Properties;
+using JetBrains.Annotations;
 using RuntimeInformation = BenchmarkDotNet.Portability.RuntimeInformation;
 
 namespace BenchmarkDotNet.Diagnosers
 {
-    internal class WindowsDisassembler
+    [PublicAPI]
+    public class WindowsDisassembler
     {
         private readonly bool printAsm, printIL, printSource, printPrologAndEpilog;
         private readonly int recursiveDepth;
 
-        internal WindowsDisassembler(DisassemblyDiagnoserConfig config)
+        [PublicAPI]
+        public WindowsDisassembler(DisassemblyDiagnoserConfig config)
         {
             printIL = config.PrintIL;
             printAsm = config.PrintAsm;
@@ -30,7 +33,8 @@ namespace BenchmarkDotNet.Diagnosers
             recursiveDepth = config.RecursiveDepth;
         }
 
-        internal DisassemblyResult Disassemble(DiagnoserActionParameters parameters)
+        [PublicAPI]
+        public DisassemblyResult Disassemble(DiagnoserActionParameters parameters)
         {
             string resultsPath = Path.GetTempFileName();
 
@@ -94,7 +98,7 @@ namespace BenchmarkDotNet.Diagnosers
             // the disassembler has not been yet retrieved from the resources
             CopyFromResources(
                 assemblyWithDisassemblersInResources,
-                $"BenchmarkDotNet.Disassemblers.net46.win7_{architectureName}.{exeName}",
+                $"BenchmarkDotNet.Disassemblers.net461.win7_{architectureName}.{exeName}",
                 disassemblerPath);
 
             CopyAllRequiredDependencies(assemblyWithDisassemblersInResources, Path.GetDirectoryName(disassemblerPath));
@@ -107,8 +111,8 @@ namespace BenchmarkDotNet.Diagnosers
             // ClrMD and Cecil are also embedded in the resources, we need to copy them as well
             foreach (string dependency in assemblyWithDisassemblersInResources.GetManifestResourceNames().Where(name => name.EndsWith(".dll")))
             {
-                // dependency is sth like "BenchmarkDotNet.Disassemblers.net46.win7_x64.Microsoft.Diagnostics.Runtime.dll"
-                string fileName = dependency.Replace("BenchmarkDotNet.Disassemblers.net46.win7_x64.", string.Empty);
+                // dependency is sth like "BenchmarkDotNet.Disassemblers.net461.win7_x64.Microsoft.Diagnostics.Runtime.dll"
+                string fileName = dependency.Replace("BenchmarkDotNet.Disassemblers.net461.win7_x64.", string.Empty);
                 string dllPath = Path.Combine(destinationFolder, fileName);
 
                 if (!File.Exists(dllPath))
@@ -160,7 +164,7 @@ namespace BenchmarkDotNet.Diagnosers
                     return !isWow64;
                 }
 
-                return RuntimeInformation.GetCurrentPlatform() == Platform.X64; // todo: find the way to cover all scenarios for .NET Core
+                return RuntimeInformation.Is64BitPlatform(); // todo: find the way to cover all scenarios for .NET Core
             }
 
             [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]

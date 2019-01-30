@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Mathematics;
@@ -14,7 +15,7 @@ namespace BenchmarkDotNet.Reports
         public BenchmarkCase BenchmarkCase { get; }
         public IReadOnlyList<Measurement> AllMeasurements { get; }
         public GcStats GcStats { get; }
-
+        [PublicAPI] public bool Success { get; }
         [PublicAPI] public GenerateResult GenerateResult { get; }
         [PublicAPI] public BuildResult BuildResult { get; }
         [PublicAPI] public IReadOnlyDictionary<string, Metric> Metrics { get; }
@@ -30,6 +31,7 @@ namespace BenchmarkDotNet.Reports
         private Statistics resultStatistics;
 
         public BenchmarkReport(
+            bool success,
             BenchmarkCase benchmarkCase,
             GenerateResult generateResult,
             BuildResult buildResult,
@@ -38,13 +40,15 @@ namespace BenchmarkDotNet.Reports
             GcStats gcStats, 
             IReadOnlyList<Metric> metrics)
         {
+            Success = success;
             BenchmarkCase = benchmarkCase;
             GenerateResult = generateResult;
             BuildResult = buildResult;
             ExecuteResults = executeResults ?? Array.Empty<ExecuteResult>();
             AllMeasurements = allMeasurements ?? Array.Empty<Measurement>();
             GcStats = gcStats;
-            Metrics = metrics?.ToDictionary(metric => metric.Descriptor.Id);
+            Metrics = metrics?.ToDictionary(metric => metric.Descriptor.Id)
+                ?? (IReadOnlyDictionary<string, Metric>)ImmutableDictionary<string, Metric>.Empty;
         }
 
         public override string ToString() => $"{BenchmarkCase.DisplayInfo}, {AllMeasurements.Count} runs";

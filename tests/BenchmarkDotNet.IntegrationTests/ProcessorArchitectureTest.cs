@@ -12,14 +12,6 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class ProcessorArchitectureTest : BenchmarkTestExecutor
     {
-        private class PlatformConfig : ManualConfig
-        {
-            public PlatformConfig(Platform platform)
-            {
-                Add(new Job(Job.Dry) { Environment = { Platform = platform } });
-            }
-        }
-
         const string X86FailedCaption = "// x86FAILED";
         const string X64FailedCaption = "// x64FAILED";
         const string AnyCpuOkCaption = "// AnyCpuOkCaption";
@@ -43,12 +35,14 @@ namespace BenchmarkDotNet.IntegrationTests
         private void Verify(Platform platform, Type benchmark, string failureText)
         {
             var logger = new OutputLogger(Output);
-            // make sure we get an output in the TestRunner log
-            var config = new PlatformConfig(platform).With(logger).With(DefaultColumnProviders.Instance);
+
+            var config = ManualConfig.CreateEmpty()
+                    .With(Job.Dry.With(platform))
+                    .With(logger); // make sure we get an output in the TestRunner log
 
             CanExecute(benchmark, config);
-            var testLog = logger.GetLog();
 
+            var testLog = logger.GetLog();
             Assert.DoesNotContain(failureText, testLog);
             Assert.DoesNotContain(BenchmarkNotFound, testLog);
         }

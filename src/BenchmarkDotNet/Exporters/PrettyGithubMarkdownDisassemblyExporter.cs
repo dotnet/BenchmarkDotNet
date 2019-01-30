@@ -1,49 +1,43 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
-using StreamWriter = BenchmarkDotNet.Portability.StreamWriter;
 
 namespace BenchmarkDotNet.Exporters
 {
-    public class PrettyGithubMarkdownDisassemblyExporter : IExporter
+    public class PrettyGithubMarkdownDisassemblyExporter : ExporterBase
     {
         private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
 
-        public PrettyGithubMarkdownDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results) => this.results = results;
-
-        public string Name => nameof(PrettyGithubMarkdownDisassemblyExporter);
-
-        public void ExportToLog(Summary summary, ILogger logger) { }
-
-        public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
-            => summary.BenchmarksCases
-                      .Where(results.ContainsKey)
-                      .Select(benchmark => Export(summary, benchmark));
-
-        private string Export(Summary summary, BenchmarkCase benchmarkCase)
+        public PrettyGithubMarkdownDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results)
         {
-            string filePath = $"{Path.Combine(summary.ResultsDirectoryPath, benchmarkCase.FolderInfo)}-asm.pretty.md";
-            if (File.Exists(filePath))
-                File.Delete(filePath);
-
-            using (var stream = StreamWriter.FromPath(filePath))
-            {
-                Export(new StreamLogger(stream), results[benchmarkCase], benchmarkCase);
-            }
-
-            return filePath;
+            this.results = results;
         }
 
-        private static void Export(ILogger logger, DisassemblyResult disassemblyResult, BenchmarkCase benchmarkCase)
+        protected override string FileExtension => "md";
+        protected override string FileCaption => "asm.pretty";
+
+        public override void ExportToLog(Summary summary, ILogger logger)
+        {
+            foreach (var benchmarkCase in summary.BenchmarksCases.Where(results.ContainsKey))
+            {
+                logger.WriteLine($"## {summary[benchmarkCase].GetRuntimeInfo()}");
+                Export(logger, results[benchmarkCase]);
+            }
+        }
+
+        internal static void Export(ILogger logger, DisassemblyResult disassemblyResult, bool quotingCode = true)
         {
             int methodIndex = 0;
             foreach (var method in disassemblyResult.Methods.Where(method => string.IsNullOrEmpty(method.Problem)))
             {
-                logger.WriteLine("```assembly");
+                if (quotingCode)
+                {
+                    logger.WriteLine("```assembly");
+                }
+
                 logger.WriteLine($"; {method.Name}");
 
                 var pretty = DisassemblyPrettifier.Prettify(method, $"M{methodIndex++:00}");
@@ -54,19 +48,22 @@ namespace BenchmarkDotNet.Exporters
                     if (element is DisassemblyPrettifier.Label label)
                     {
                         logger.WriteLine($"{label.TextRepresentation}:");
-                        
+
                         continue;
                     }
                     if (element.Source is Asm asm)
                     {
                         totalSizeInBytes += asm.SizeInBytes;
                     }
-                    
-                    logger.WriteLine($"       {element.TextRepresentation}");                        
+
+                    logger.WriteLine($"       {element.TextRepresentation}");
                 }
 
                 logger.WriteLine($"; Total bytes of code {totalSizeInBytes}");
-                logger.WriteLine("```");
+                if (quotingCode)
+                {
+                    logger.WriteLine("```");
+                }
             }
 
             foreach (var withProblems in disassemblyResult.Methods
@@ -79,6 +76,8 @@ namespace BenchmarkDotNet.Exporters
                     logger.WriteLine(withProblem.Name);
                 }
             }
+
+            logger.WriteLine();
         }
     }
 }

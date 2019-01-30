@@ -27,8 +27,7 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<IFilter> GetFilters();
         IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules();
 
-        [CanBeNull]
-        IOrderer Orderer { get; }
+        [CanBeNull] IOrderer Orderer { get; }
 
         ISummaryStyle SummaryStyle { get; } 
 
@@ -53,5 +52,7 @@ namespace BenchmarkDotNet.Configs
         /// the default value is ASCII
         /// </summary>
         Encoding Encoding { get; }
+
+        bool StopOnFirstError { get; }
     }
 }

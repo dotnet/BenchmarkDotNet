@@ -9,8 +9,6 @@ using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
-using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Parameters;
 
 namespace BenchmarkDotNet.Running
@@ -60,11 +58,15 @@ namespace BenchmarkDotNet.Running
             {
                 var argumentsDefinitions = GetArgumentsDefinitions(target.WorkloadMethod, target.Type).ToArray();
 
+                var parameterInstances =
+                    (from parameterInstance in parameterInstancesList
+                     from argumentDefinition in argumentsDefinitions
+                     select new ParameterInstances(parameterInstance.Items.Concat(argumentDefinition.Items).ToArray())).ToArray();
+
                 benchmarks.AddRange(
                     from job in jobs
-                    from parameterInstance in parameterInstancesList
-                    from argumentDefinition in argumentsDefinitions
-                    select BenchmarkCase.Create(target, job, new ParameterInstances(parameterInstance.Items.Concat(argumentDefinition.Items).ToArray()), finalConfig)
+                    from parameterInstance in parameterInstances
+                    select BenchmarkCase.Create(target, job, parameterInstance, finalConfig)
                 );
             }
 
@@ -180,7 +182,7 @@ namespace BenchmarkDotNet.Running
                 return SmartParamBuilder.CreateForParams(paramsValues.source, paramsValues.values);
             });
 
-            var paramsAllValuesDefinitions = GetDefinitions<ParamsAllValuesAttribute>((_, paramaterType) => GetAllValidValues(paramaterType));
+            var paramsAllValuesDefinitions = GetDefinitions<ParamsAllValuesAttribute>((_, parameterType) => GetAllValidValues(parameterType));
 
             var definitions = paramsDefinitions.Concat(paramsSourceDefinitions).Concat(paramsAllValuesDefinitions).ToArray();
 

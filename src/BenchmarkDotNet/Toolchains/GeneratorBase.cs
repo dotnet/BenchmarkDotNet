@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.Toolchains
         [PublicAPI] protected virtual void CopyAllRequiredFiles(ArtifactsPaths artifactsPaths) { }
 
         /// <summary>
-        /// generates Nuget.Config file to make sure that BDN is using the right NuGet feeds
+        /// generates NuGet.Config file to make sure that BDN is using the right NuGet feeds
         /// </summary>
         [PublicAPI] protected virtual void GenerateNuGetConfig(ArtifactsPaths artifactsPaths) { }
 
@@ -81,18 +81,17 @@ namespace BenchmarkDotNet.Toolchains
         [PublicAPI] protected virtual void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) { }
 
         /// <summary>
-        /// generates a script can be used when dubugging compilation issues
+        /// generates a script can be used when debugging compilation issues
         /// </summary>
         [PublicAPI] protected abstract void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths);
 
         /// <summary>
         /// returns a path to the folder where NuGet packages should be restored
         /// </summary>
-        [PublicAPI] protected virtual string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath)
-            => Path.Combine(buildArtifactsDirectoryPath, "packages");
+        [PublicAPI] protected virtual string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath) => default;
 
         /// <summary>
-        /// genrates an app.config file next to the executable with benchmarks
+        /// generates an app.config file next to the executable with benchmarks
         /// </summary>
         [PublicAPI] protected virtual void GenerateAppConfig(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
@@ -128,7 +127,7 @@ namespace BenchmarkDotNet.Toolchains
                 binariesDirectoryPath: binariesDirectoryPath,
                 programCodePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{codeFileExtension}"),
                 appConfigPath: $"{executablePath}.config",
-                nugetConfigPath: Path.Combine(buildArtifactsDirectoryPath, "NuGet.config"),
+                nuGetConfigPath: Path.Combine(buildArtifactsDirectoryPath, "NuGet.config"),
                 projectFilePath: GetProjectFilePath(buildArtifactsDirectoryPath),
                 buildScriptFilePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{RuntimeInformation.ScriptFileExtension}"),
                 executablePath: executablePath,

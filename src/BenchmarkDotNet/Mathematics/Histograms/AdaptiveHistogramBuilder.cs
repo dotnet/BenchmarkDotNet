@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Mathematics.Histograms
             double binSize = s.GetOptimalBinSize(rule);
             if (Math.Abs(binSize) < 1e-9)
                 binSize = 1;
-            return BuildWithFixedBinSize(s.GetSortedValues(), binSize);
+            return BuildWithFixedBinSize(s.SortedValues, binSize);
         }
 
         private const double Resolution = 0.0001;
@@ -113,7 +113,7 @@ namespace BenchmarkDotNet.Mathematics.Histograms
 
                     if (left > lower + binSize * margin)
                         points.Insert(pointIndex + 1, left);
-                    else if (right < upper - binSize * margin)
+                    else if (right < upper - binSize * margin && right > lower + binSize * margin)
                     {
                         points.Insert(pointIndex + 1, right);
                         processedPointCount++;

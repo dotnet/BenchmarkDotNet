@@ -66,7 +66,8 @@ namespace BenchmarkDotNet.Configs
                 source.ArtifactsPath,
                 source.Encoding,
                 source.Orderer ?? DefaultOrderer.Instance,
-                source.SummaryStyle
+                source.SummaryStyle,
+                source.StopOnFirstError
             );
         }
 

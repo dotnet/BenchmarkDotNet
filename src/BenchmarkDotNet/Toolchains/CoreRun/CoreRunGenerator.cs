@@ -1,15 +1,13 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Toolchains.CsProj;
 
 namespace BenchmarkDotNet.Toolchains.CoreRun
 {
     public class CoreRunGenerator : CsProjGenerator
     {
-        public CoreRunGenerator(FileInfo sourceCoreRun, FileInfo copyCoreRun, string targetFrameworkMoniker, Func<Platform, string> platformProvider)
-            : base(targetFrameworkMoniker, platformProvider)
+        public CoreRunGenerator(FileInfo sourceCoreRun, FileInfo copyCoreRun, string targetFrameworkMoniker, string cliPath, string packagesPath)
+            : base(targetFrameworkMoniker, cliPath, packagesPath, runtimeFrameworkVersion: null)
         {
             SourceCoreRun = sourceCoreRun;
             CopyCoreRun = copyCoreRun;
@@ -21,8 +19,8 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
 
         private bool NeedsCopy => SourceCoreRun != CopyCoreRun;
 
-        protected override string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath) 
-            => null; // we don't want to restore to a dedicated folder
+        protected override string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath)
+            => base.PackagesPath;
 
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
             => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, "publish");
@@ -48,8 +46,9 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
             
             foreach (DirectoryInfo dir in source.GetDirectories())
                 CopyFilesRecursively(dir, target.CreateSubdirectory(dir.Name));
+
             foreach (FileInfo file in source.GetFiles())
-                file.CopyTo(Path.Combine(target.FullName, file.Name));
+                file.CopyTo(Path.Combine(target.FullName, file.Name), overwrite: true);
         }
     }
 }

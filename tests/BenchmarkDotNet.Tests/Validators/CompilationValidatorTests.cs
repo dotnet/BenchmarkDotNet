@@ -31,12 +31,47 @@ namespace BenchmarkDotNet.Tests.Validators
                         )
                 }, config);
 
-            var errors = CompilationValidator.Default.Validate(parameters);
+            var errors = CompilationValidator.Default.Validate(parameters).Select(e => e.Message);
 
-            Assert.Equal("Benchmarked method `Has Some Whitespaces` contains illegal character(s). Please use `[<Benchmark(Description = \"Custom name\")>]` to set custom display name.", 
-                errors.Single().Message);
+            Assert.Contains(errors,
+                s => s.Equals(
+                    "Benchmarked method `Has Some Whitespaces` contains illegal character(s) or uses C# keyword. Please use `[<Benchmark(Description = \"Custom name\")>]` to set custom display name."));
         }
 
+        [Fact]
+        public void BenchmarkedMethodNameMustNotUseCsharpKeywords()
+        {
+            Delegate method = BuildDummyMethod<int>("typeof");
+
+            var config = ManualConfig.CreateEmpty().CreateFinalConfig();
+            var parameters = new ValidationParameters(
+                new[]
+                {
+                    BenchmarkCase.Create(
+                        new Descriptor(
+                            typeof(CompilationValidatorTests),
+                            method.Method),
+                        Job.Dry,
+                        null,
+                        config)
+                }, config);
+
+            var errors = CompilationValidator.Default.Validate(parameters).Select(e => e.Message);
+
+            Assert.Contains(errors,
+                s => s.Equals(
+                    "Benchmarked method `typeof` contains illegal character(s) or uses C# keyword. Please use `[<Benchmark(Description = \"Custom name\")>]` to set custom display name."));
+        }
+
+        [Theory]
+        [InlineData(typeof(BenchmarkClassWithStaticMethod), true)]
+        [InlineData(typeof(BenchmarkClass<PublicClass>), false)]
+        public void Benchmark_Class_Methods_Must_Be_Non_Static(Type type, bool hasErrors)
+        {
+            var validationErrors = CompilationValidator.Default.Validate(BenchmarkConverter.TypeToBenchmarks(type));
+            
+            Assert.Equal(hasErrors, validationErrors.Any());
+        }
         
         [Theory]
         [InlineData(typeof(PublicClass), false)]
@@ -59,7 +94,7 @@ namespace BenchmarkDotNet.Tests.Validators
                                                                .ToList();
             
             // Assert
-            Assert.Equal(validationErrors.Any(), hasErrors);
+            Assert.Equal(hasErrors, validationErrors.Any());
         }
       
         private static Delegate BuildDummyMethod<T>(string name)
@@ -86,6 +121,12 @@ namespace BenchmarkDotNet.Tests.Validators
         }
     }
     
+    public class BenchmarkClassWithStaticMethod
+    {
+        [Benchmark]
+        public static void StaticMethod() { }
+    }
+    
     public class BenchmarkClass<T> where T : new()
     {
         [Benchmark]
@@ -101,6 +142,4 @@ namespace BenchmarkDotNet.Tests.Validators
     {
         internal class InternalNestedClass { }
     }
-        
-    
 }

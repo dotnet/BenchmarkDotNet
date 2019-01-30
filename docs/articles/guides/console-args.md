@@ -29,6 +29,68 @@ Examples:
 
 **Note**: If you would like to **join** all the results into a **single summary**, you need to us `--join`.
 
+## List of benchmarks
+
+The `--list` allows you to print all of the available benchmark names. Available options are: 
+
+* `flat` - prints list of the available benchmarks: `--list flat`
+```ini
+BenchmarkDotNet.Samples.Algo_Md5VsSha256.Md5
+BenchmarkDotNet.Samples.Algo_Md5VsSha256.Sha256
+BenchmarkDotNet.Samples.IntroArguments.Benchmark
+BenchmarkDotNet.Samples.IntroArgumentsSource.SingleArgument
+BenchmarkDotNet.Samples.IntroArgumentsSource.ManyArguments
+BenchmarkDotNet.Samples.IntroArrayParam.ArrayIndexOf
+BenchmarkDotNet.Samples.IntroArrayParam.ManualIndexOf
+BenchmarkDotNet.Samples.IntroBasic.Sleep
+[...]
+```
+* `tree` - prints tree of the available benchmarks: `--list tree`
+```ini
+BenchmarkDotNet
+ └─Samples
+    ├─Algo_Md5VsSha256
+    │  ├─Md5
+    │  └─Sha256
+    ├─IntroArguments
+    │  └─Benchmark
+    ├─IntroArgumentsSource
+    │  ├─SingleArgument
+    │  └─ManyArguments
+    ├─IntroArrayParam
+    │  ├─ArrayIndexOf
+    │  └─ManualIndexOf
+    ├─IntroBasic
+    │  ├─Sleep
+[...]
+```
+
+The `--list` option works with the `--filter` option. Examples:
+
+* `--list flat --filter *IntroSetupCleanup*` prints:
+```ini
+BenchmarkDotNet.Samples.IntroSetupCleanupGlobal.Logic
+BenchmarkDotNet.Samples.IntroSetupCleanupIteration.Benchmark
+BenchmarkDotNet.Samples.IntroSetupCleanupTarget.BenchmarkA
+BenchmarkDotNet.Samples.IntroSetupCleanupTarget.BenchmarkB
+BenchmarkDotNet.Samples.IntroSetupCleanupTarget.BenchmarkC
+BenchmarkDotNet.Samples.IntroSetupCleanupTarget.BenchmarkD
+```
+* `--list tree --filter *IntroSetupCleanup*` prints:
+```ini
+BenchmarkDotNet
+ └─Samples
+    ├─IntroSetupCleanupGlobal
+    │  └─Logic
+    ├─IntroSetupCleanupIteration
+    │  └─Benchmark
+    └─IntroSetupCleanupTarget
+       ├─BenchmarkA
+       ├─BenchmarkB
+       ├─BenchmarkC
+       └─BenchmarkD
+```
+
 ## Categories
 
 You can also filter the benchmarks by categories:
@@ -39,16 +101,37 @@ You can also filter the benchmarks by categories:
 ## Diagnosers
 
 * `-m`, `--memory` - enables MemoryDiagnoser and prints memory statistics
-* `-d`, `--disassm`- enables DisassemblyDiagnoser and exports diassembly of benchmarked code
+* `-d`, `--disasm`- enables DisassemblyDiagnoser and exports diassembly of benchmarked code. When you enable this option, you can use:
+  - `--disasmDepth` - Sets the recursive depth for the disassembler.
+  - `--disasmDiff` - Generates diff reports for the disassembler.
 
 ## Runtimes
 
-The `--runtimes` or just `-r` allows you to run the benchmarks for selected Runtimes. Available options are: Mono, CoreRT, net46, net461, net462, net47, net471, net472, netcoreapp2.0, netcoreapp2.1, netcoreapp2.2, netcoreapp3.0.
+The `--runtimes` or just `-r` allows you to run the benchmarks for selected Runtimes. Available options are: 
+
+* Clr - BDN will either use Roslyn (if you run it as .NET app) or latest installed .NET SDK to build the benchmarks (if you run it as .NET Core app)
+* Core - if you run it as .NET Core app, BDN will use the same target framework moniker, if you run it as .NET app it's going to use netcoreapp2.0
+* Mono - it's going to use the Mono from `$Path`, you can override  it with `--monoPath`
+* CoreRT - it's going to use latest CoreRT. Can be customized with additional options: `--ilcPath`, `--coreRtVersion` 
+* net46, net461, net462, net47, net471, net472 - to build and run benchmarks against specific .NET framework version 
+* netcoreapp2.0, netcoreapp2.1, netcoreapp2.2, netcoreapp3.0 - to build and run benchmarks against specific .NET Core version
 
 Example: run the benchmarks for .NET 4.7.2 and .NET Core 2.1:
 
 ```log
 dotnet run -c Release -- --runtimes net472 netcoreapp2.1
+```
+
+Example: run the benchmarks for .NET Core 3.0 and latest .NET SDK installed on your PC:
+
+```log
+dotnet run -c Release -f netcoreapp3.0 -- --runtimes clr core
+```
+
+But same command executed with `-f netcoreapp2.0` is going to run the benchmarks for .NET Core 2.0:
+
+```log
+dotnet run -c Release -f netcoreapp2.0 -- --runtimes clr core
 ```
 
 ## Number of invocations and iterations
@@ -96,6 +179,18 @@ Now, the default settings are: `WarmupCount=1` but you might still overwrite it 
 dotnet run -c Release -- --warmupCount 2
 ```
 
+## Statistical Test
+
+To perform a Mann–Whitney U Test and display the results in a dedicated column you need to provide the Threshold:
+
+* `--statisticalTest`- Threshold for Statistical Test. Examples: 5%, 10ms, 100ns, 1s
+
+Example: run Mann–Whitney U test with relative ratio of 5% for all benchmarks for .NET Core 2.0 (base) vs .NET Core 2.1 (diff). .NET Core 2.0 will be baseline because it was first.
+
+```log
+dotnet run -c Release -- --filter * --runtimes netcoreapp2.0 netcoreapp2.1 --statisticalTest 5%
+```
+
 ## More
 
 * `-j`, `--job` (Default: Default) Dry/Short/Medium/Long or Default
@@ -110,3 +205,6 @@ dotnet run -c Release -- --warmupCount 2
 * `--cliPath` custom Path for dotnet cli
 * `--coreRt` path to ILCompiler for CoreRT
 * `--info` prints environment configuration including BenchmarkDotNet, OS, CPU and .NET version
+* `--stopOnFirstError` Stop on first error.
+* `--help` Display this help screen.
+* `--version` Display version information.

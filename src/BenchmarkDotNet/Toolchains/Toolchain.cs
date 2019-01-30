@@ -53,6 +53,23 @@ namespace BenchmarkDotNet.Toolchains
             return true;
         }
 
+        internal static bool InvalidCliPath(string customDotNetCliPath, BenchmarkCase benchmarkCase, ILogger logger)
+        {
+            if (string.IsNullOrEmpty(customDotNetCliPath) && !HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled())
+            {
+                logger.WriteLineError($"BenchmarkDotNet requires dotnet cli to be installed or path to local dotnet cli provided in explicit way using `--cli` argument, benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
+                return true;
+            }
+            
+            if (!string.IsNullOrEmpty(customDotNetCliPath) && !File.Exists(customDotNetCliPath))
+            {
+                logger.WriteLineError($"Provided custom dotnet cli path does not exist, benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
+                return true;
+            }
+
+            return false;
+        }
+
         public override string ToString() => Name;
     }
 }

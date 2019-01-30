@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Diagnosers
             recursiveDepth = config.RecursiveDepth;
         }
 
-        internal static DisassemblyResult Disassemble(BenchmarkCase benchmarkCase, MonoRuntime mono)
+        internal DisassemblyResult Disassemble(BenchmarkCase benchmarkCase, MonoRuntime mono)
         {
             Debug.Assert(mono == null || !RuntimeInformation.IsMono, "Must never be called for Non-Mono benchmarks");
 
@@ -41,8 +41,8 @@ namespace BenchmarkDotNet.Diagnosers
             var environmentVariables = new Dictionary<string, string> { ["MONO_VERBOSE_METHOD"] = fqnMethod };
             string monoPath = mono?.CustomPath ?? "mono";
             string arguments = $"--compile {fqnMethod} {llvmFlag} {exePath}";
-            
-            var output = ProcessHelper.RunAndReadOutputLineByLine(monoPath, arguments, environmentVariables, includeErrors: true);
+
+            (int exitCode, IReadOnlyList<string> output) = ProcessHelper.RunAndReadOutputLineByLine(monoPath, arguments, environmentVariables: environmentVariables, includeErrors: true);
             string commandLine = $"{GetEnvironmentVariables(environmentVariables)} {monoPath} {arguments}";
             
             return OutputParser.Parse(output, benchmarkTarget.WorkloadMethod.Name, commandLine);

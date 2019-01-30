@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             foreach (var provider in Config.Providers)
             {
-                TraceEventSession.EnableProvider(provider.providerName, provider.providerLevel, provider.keywords, provider.options);
+                TraceEventSession.EnableProvider(provider.providerGuid, provider.providerLevel, provider.keywords, provider.options);
             }
 
             return this;
@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         
         protected EtwProfilerConfig Config { get; }
 
-        private string FilePath { get; }
+        internal string FilePath { get; }
 
         protected Session(string sessionName, DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime)
         {
@@ -128,7 +128,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             folderPath = Path.Combine(folderPath, $"{creationTime:yyyyMMdd-hhmm}-{Process.GetCurrentProcess().Id}");
             
-            // if we run for more than one toolchain, the output file name should contain the name too so we can differ net46 vs netcoreapp2.1 etc
+            // if we run for more than one toolchain, the output file name should contain the name too so we can differ net461 vs netcoreapp2.1 etc
             if (details.Config.GetJobs().Select(job => job.Infrastructure.Toolchain).Distinct().Count() > 1)
                 folderPath = Path.Combine(folderPath, details.BenchmarkCase.Job.Infrastructure.Toolchain.Name);
 

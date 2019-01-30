@@ -50,9 +50,11 @@ var bdnAllVersions = new string[] {
 		"v0.10.13",
 		"v0.10.14",
 		"v0.11.0",
-		"v0.11.1"
+		"v0.11.1",
+		"v0.11.2",
+		"v0.11.3"
 	};
-var bdnNextVersion = "v0.11.2";
+var bdnNextVersion = "v0.11.4";
 var bdnFirstCommit = "6eda98ab1e83a0d185d09ff8b24c795711af8db1";
 
 var artifactsDirectory = Directory("./artifacts");
@@ -114,14 +116,14 @@ Task("FastTests")
     .WithCriteria(!skipTests)
     .Does(() =>
     {
-        string[] targetVersions = IsRunningOnWindows() ? 
+		string[] targetVersions = IsRunningOnWindows() ?
                 new []{"net46", "netcoreapp2.1"}
                 :
                 new []{"netcoreapp2.1"};
 
         foreach(var version in targetVersions)
         {
-            DotNetCoreTool("./tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj", "xunit", GetTestSettingsParameters(version));
+            DotNetCoreTest("./tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj", GetTestSettingsParameters(version));
         }
     });
     
@@ -130,16 +132,16 @@ Task("SlowTestsNet46")
     .WithCriteria(!skipTests && isRunningOnWindows)
     .Does(() =>
     {
-        DotNetCoreTool(integrationTestsProjectPath, "xunit", GetTestSettingsParameters("net46"));
-    });    
-    
+        DotNetCoreTest(integrationTestsProjectPath, GetTestSettingsParameters("net46"));
+    }); 
+
 Task("SlowTestsNetCore2")
-    .IsDependentOn("Build")
-    .WithCriteria(!skipTests)
-    .Does(() =>
-    {
-        DotNetCoreTool(integrationTestsProjectPath, "xunit", GetTestSettingsParameters("netcoreapp2.1"));
-    });       
+	.IsDependentOn("Build")
+	.WithCriteria(!skipTests)
+	.Does(() =>
+	{
+		DotNetCoreTest(integrationTestsProjectPath, GetTestSettingsParameters("netcoreapp2.1"));
+	});          
 
 Task("Pack")
     .IsDependentOn("Build")
@@ -149,7 +151,8 @@ Task("Pack")
         var settings = new DotNetCorePackSettings
         {
             Configuration = configuration,
-            OutputDirectory = artifactsDirectory
+            OutputDirectory = artifactsDirectory,
+			ArgumentCustomization = args=>args.Append("--include-symbols").Append("-p:SymbolPackageFormat=snupkg")
         };
 
         var projects = GetFiles("./src/**/*.csproj");
@@ -215,9 +218,16 @@ Task("Default")
 RunTarget(target);
 
 // HELPERS
-private string GetTestSettingsParameters(string tfm)
+private DotNetCoreTestSettings GetTestSettingsParameters(string tfm)
 {
-    return $"-configuration {configuration} -parallel none -nobuild  -framework {tfm}";
+	return new DotNetCoreTestSettings
+                {
+                    Configuration = configuration,
+					Framework = tfm,
+                    NoBuild = true,
+					NoRestore = true,
+					Logger = "trx"
+				}; 
 }
 
 private void RunDocfx(string args)

@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public class ParamsTestStaticProperty
         {
             /// <summary>
-            /// Delibrately made the Property "static" to ensure that Params also work okay in this scenario 
+            /// Deliberately made the Property "static" to ensure that Params also work okay in this scenario 
             /// </summary>
             [Params(1, 2)]
             public static int StaticParamProperty { get; set; }
@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public ParamsTestStaticPrivatePropertyError(ITestOutputHelper output) : base(output) { }
 
         /// <summary>
-        /// Delibrately made the Property "static" to ensure that Params also work okay in this scenario
+        /// Deliberately made the Property "static" to ensure that Params also work okay in this scenario
         /// </summary>
         [Params(1, 2)]
         public static int StaticParamProperty { get; private set; }
@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.IntegrationTests
 #pragma warning restore xUnit1013 // Public method should be marked as test
     }
 
-    // Delibrately made everything "static" (as well as using a Field) to ensure that Params also work okay in this scenario
+    // Deliberately made everything "static" (as well as using a Field) to ensure that Params also work okay in this scenario
     public class ParamsTestStaticFieldTest : BenchmarkTestExecutor
     {
         public ParamsTestStaticFieldTest(ITestOutputHelper output) : base(output)
@@ -106,7 +106,7 @@ namespace BenchmarkDotNet.IntegrationTests
             private static HashSet<int> collectedParams = new HashSet<int>();
 
             [Benchmark]
-            public static void Benchmark()
+            public void Benchmark()
             {
                 if (collectedParams.Contains(StaticParamField) == false)
                 {
@@ -117,7 +117,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
     }
 
-    // Delibrately made everything "static" (as well as using a Field) to ensure that Params also work okay in this scenario
+    // Deliberately made everything "static" (as well as using a Field) to ensure that Params also work okay in this scenario
     [Config(typeof(SingleRunFastConfig))]
     public class ParamsTestStaticPrivateFieldError
     {
@@ -135,7 +135,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
 #pragma warning disable xUnit1013 // Public method should be marked as test
         [Benchmark]
-        public static void Benchmark()
+        public void Benchmark()
         {
             if (collectedParams.Contains(StaticParamField) == false)
             {

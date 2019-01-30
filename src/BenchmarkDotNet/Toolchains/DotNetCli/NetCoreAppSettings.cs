@@ -10,6 +10,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public class NetCoreAppSettings
     {
+        public static readonly TimeSpan DefaultBuildTimeout = TimeSpan.FromMinutes(2); // it should always be a few seconds, but some users might have a bad internet connection
+
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp20 = new NetCoreAppSettings("netcoreapp2.0", null, ".NET Core 2.0");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp21 = new NetCoreAppSettings("netcoreapp2.1", null, ".NET Core 2.1");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp22 = new NetCoreAppSettings("netcoreapp2.2", null, ".NET Core 2.2");
@@ -39,18 +41,24 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// customize dotnet cli path if default is not desired
         /// simply ignored if null
         /// </param>
+        /// <param name="packagesPath">the directory to restore packages to</param>
+        /// <param name="timeout">timeout to build the benchmark</param>
         /// </summary>
         [PublicAPI]
         public NetCoreAppSettings(
             string targetFrameworkMoniker, 
             string runtimeFrameworkVersion, 
             string name,
-            string customDotNetCliPath = null)
+            string customDotNetCliPath = null,
+            string packagesPath = null,
+            TimeSpan? timeout = null)
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
             RuntimeFrameworkVersion = runtimeFrameworkVersion;
             Name = name;
             CustomDotNetCliPath = customDotNetCliPath;
+            PackagesPath = packagesPath;
+            Timeout = timeout ?? DefaultBuildTimeout;
         }
 
         /// <summary>
@@ -66,9 +74,25 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public string Name { get; }
 
         public string CustomDotNetCliPath { get; }
+        
+        /// <summary>
+        /// The directory to restore packages to.
+        /// </summary>
+        public string PackagesPath { get; }
 
-        public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName)
-            => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName, customDotNetCliPath);
+        /// <summary>
+        /// timeout to build the benchmark
+        /// </summary>
+        public TimeSpan Timeout { get; }
+
+        public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName = null)
+            => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, customDotNetCliPath, PackagesPath, Timeout);
+        
+        public NetCoreAppSettings WithCustomPackagesRestorePath(string packagesPath, string displayName = null)
+            => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, CustomDotNetCliPath, packagesPath, Timeout);
+        
+        public NetCoreAppSettings WithTimeout(TimeSpan? timeOut)
+            => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, Name, CustomDotNetCliPath, PackagesPath, timeOut ?? Timeout);
 
         internal static NetCoreAppSettings GetCurrentVersion()
         {

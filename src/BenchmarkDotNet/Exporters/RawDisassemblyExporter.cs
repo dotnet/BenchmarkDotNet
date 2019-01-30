@@ -1,51 +1,41 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
-using StreamWriter = BenchmarkDotNet.Portability.StreamWriter;
 
 namespace BenchmarkDotNet.Exporters
 {
-    public class RawDisassemblyExporter : IExporter
+    public class RawDisassemblyExporter : ExporterBase
     {
         private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
 
         public RawDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results) => this.results = results;
 
-        public string Name => nameof(RawDisassemblyExporter);
+        protected override string FileExtension => "html";
+        protected override string FileCaption => "asm.raw";
 
-        public void ExportToLog(Summary summary, ILogger logger) { }
-
-        public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
-            => summary.BenchmarksCases
-                      .Where(results.ContainsKey)
-                      .Select(benchmark => Export(summary, benchmark));
-
-        private string Export(Summary summary, BenchmarkCase benchmarkCase)
-        {
-            string filePath = $"{Path.Combine(summary.ResultsDirectoryPath, benchmarkCase.FolderInfo)}-asm.raw.html";
-            if (File.Exists(filePath))
-                File.Delete(filePath);
-
-            using (var stream = StreamWriter.FromPath(filePath))
-            {
-                Export(new StreamLogger(stream), results[benchmarkCase], benchmarkCase);
-            }
-
-            return filePath;
-        }
-
-        private static void Export(ILogger logger, DisassemblyResult disassemblyResult, BenchmarkCase benchmarkCase)
+        public override void ExportToLog(Summary summary, ILogger logger)
         {
             logger.WriteLine("<!DOCTYPE html><html lang='en'><head><meta charset='utf-8' />");
-            logger.WriteLine($"<title>Output of DisassemblyDiagnoser for {benchmarkCase.DisplayInfo}</title>");
+            logger.WriteLine($"<title>Output of DisassemblyDiagnoser for {summary.Title}</title>");
             logger.WriteLine(InstructionPointerExporter.CssStyle);
             logger.WriteLine("</head>");
             logger.WriteLine("<body>");
+
+            foreach (var benchmarkCase in summary.BenchmarksCases.Where(results.ContainsKey))
+            {
+                Export(logger, summary, results[benchmarkCase], benchmarkCase);
+            }
+
+            logger.WriteLine("</body></html>");
+        }
+
+        private static void Export(ILogger logger, Summary summary, DisassemblyResult disassemblyResult, BenchmarkCase benchmarkCase)
+        {
+            logger.WriteLine($"<h2>{summary[benchmarkCase].GetRuntimeInfo()}</h2>");
 
             logger.WriteLine("<table>");
             logger.WriteLine("<tbody>");
@@ -104,10 +94,8 @@ namespace BenchmarkDotNet.Exporters
                 logger.WriteLine("<tr><td colspan=\"{2}\"></td></tr>");
             }
 
-            logger.WriteLine("</tbody></table></body></html>");
+            logger.WriteLine("</tbody></table>");
         }
-
-        
 
         private static string GetShortName(string fullMethodSignature)
         {

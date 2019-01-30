@@ -1,0 +1,32 @@
+parameters:
+  name: ''
+  vmImage: ''
+  scriptFileName: ''
+  timeoutInMinutes: 120
+  initialization: []
+
+jobs:
+- job: ${{ parameters.name }}
+  timeoutInMinutes: ${{ parameters.timeoutInMinutes }}
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+  steps:
+  - ${{ parameters.initialization }}
+  # Linux or macOS
+  - bash: ${{ parameters.scriptFileName }}
+    continueOnError: true
+    condition: in( variables['Agent.OS'], 'Linux', 'Darwin' )
+  # Windows
+  - powershell: ${{ parameters.scriptFileName }}
+    continueOnError: true
+    condition: eq( variables['Agent.OS'], 'Windows_NT' )
+  - task: PublishTestResults@2
+    inputs:
+      testRunner: VSTest
+      testResultsFiles: '**/*.trx'
+      testRunTitle: ${{ parameters.name }}
+      mergeTestResults: true
+  - script: 'echo 1>&2'
+    failOnStderr: true
+    displayName: 'If above is partially succeeded, then fail'
+    condition: eq(variables['Agent.JobStatus'], 'SucceededWithIssues')

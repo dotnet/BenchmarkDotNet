@@ -11,10 +11,10 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
 {
     public class CoreRunPublisher : IBuilder
     {
-        public CoreRunPublisher(FileInfo coreRun, FileInfo customDotNetCliPath = null)
+        public CoreRunPublisher(FileInfo coreRun, FileInfo customDotNetCliPath = null, TimeSpan? timeout = null)
         {
             CoreRun = coreRun;
-            DotNetCliPublisher = new DotNetCliPublisher(customDotNetCliPath?.FullName);
+            DotNetCliPublisher = new DotNetCliPublisher(customDotNetCliPath?.FullName, timeout: timeout);
         }
 
         private FileInfo CoreRun { get; }
@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
                 
                 if(publishedVersion > coreRunVersion) 
                 {
-                    File.Copy(publishedDependency.FullName, coreRunDependency.FullName, overwrite: true); // we need to ovwerite old things with their newer versions
+                    File.Copy(publishedDependency.FullName, coreRunDependency.FullName, overwrite: true); // we need to overwrite old things with their newer versions
                     
                     logger.WriteLineInfo($"Copying {publishedDependency.FullName} to {coreRunDependency.FullName}");
                 }

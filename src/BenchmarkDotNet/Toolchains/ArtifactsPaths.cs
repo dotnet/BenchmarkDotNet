@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Toolchains
             string binariesDirectoryPath,
             string programCodePath,
             string appConfigPath,
-            string nugetConfigPath,
+            string nuGetConfigPath,
             string projectFilePath,
             string buildScriptFilePath,
             string executablePath,
@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Toolchains
             BinariesDirectoryPath = binariesDirectoryPath;
             ProgramCodePath = programCodePath;
             AppConfigPath = appConfigPath;
-            NuGetConfigPath = nugetConfigPath;
+            NuGetConfigPath = nuGetConfigPath;
             ProjectFilePath = projectFilePath;
             BuildScriptFilePath = buildScriptFilePath;
             ExecutablePath = executablePath;

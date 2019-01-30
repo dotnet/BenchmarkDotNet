@@ -19,28 +19,24 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class DisassemblyDiagnoser : IDisassemblyDiagnoser
     {
+        public DisassemblyDiagnoserConfig Config { get; }
+
         private readonly WindowsDisassembler windowsDisassembler;
-        [SuppressMessage("ReSharper", "NotAccessedField.Local")] // TODO: use or remove
         private readonly MonoDisassembler monoDisassembler;
         private readonly Dictionary<BenchmarkCase, DisassemblyResult> results;
 
-        private DisassemblyDiagnoser(WindowsDisassembler windowsDisassembler, MonoDisassembler monoDisassembler)
+        private DisassemblyDiagnoser(WindowsDisassembler windowsDisassembler, MonoDisassembler monoDisassembler, DisassemblyDiagnoserConfig config)
         {
+            Config = config;
             this.windowsDisassembler = windowsDisassembler;
             this.monoDisassembler = monoDisassembler;
 
             results = new Dictionary<BenchmarkCase, DisassemblyResult>();
-            Exporters = new IExporter[]
-            {
-                new CombinedDisassemblyExporter(results),
-                new RawDisassemblyExporter(results),
-                new PrettyHtmlDisassemblyExporter(results),
-                new PrettyGithubMarkdownDisassemblyExporter(results)
-            };
+            Exporters = GetExporters(results, config);
         }
 
         public static IConfigurableDiagnoser<DisassemblyDiagnoserConfig> Create(DisassemblyDiagnoserConfig config)
-            => new DisassemblyDiagnoser(new WindowsDisassembler(config), new MonoDisassembler(config));
+            => new DisassemblyDiagnoser(new WindowsDisassembler(config), new MonoDisassembler(config), config);
 
         public IConfigurableDiagnoser<DisassemblyDiagnoserConfig> Configure(DisassemblyDiagnoserConfig config)
             => Create(config);
@@ -73,7 +69,7 @@ namespace BenchmarkDotNet.Diagnosers
                     results.Add(benchmark, windowsDisassembler.Disassemble(parameters));
                     break;
                 case HostSignal.SeparateLogic when ShouldUseMonoDisassembler(benchmark):
-                    results.Add(benchmark, MonoDisassembler.Disassemble(benchmark, benchmark.Job.Environment.Runtime as MonoRuntime));
+                    results.Add(benchmark, monoDisassembler.Disassemble(benchmark, benchmark.Job.Environment.Runtime as MonoRuntime));
                     break;
             }
         }
@@ -104,5 +100,18 @@ namespace BenchmarkDotNet.Diagnosers
 
         private static bool ShouldUseWindowsDisassembler(BenchmarkCase benchmarkCase)
             => !(benchmarkCase.Job.Environment.Runtime is MonoRuntime) && RuntimeInformation.IsWindows();
+
+        private static IEnumerable<IExporter> GetExporters(Dictionary<BenchmarkCase, DisassemblyResult> results, DisassemblyDiagnoserConfig config)
+        {
+            yield return new CombinedDisassemblyExporter(results);
+            yield return new RawDisassemblyExporter(results);
+            yield return new PrettyHtmlDisassemblyExporter(results);
+            yield return new PrettyGithubMarkdownDisassemblyExporter(results);
+
+            if (config.PrintDiff)
+            {
+                yield return new PrettyGithubMarkdownDiffDisassemblyExporter(results);
+            }
+        }
     }
 }

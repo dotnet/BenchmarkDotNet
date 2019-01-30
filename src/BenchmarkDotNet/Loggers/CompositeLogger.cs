@@ -25,5 +25,11 @@ namespace BenchmarkDotNet.Loggers
             foreach (var logger in loggers)
                 logger.WriteLine(logKind, text);
         }
+
+        public void Flush()
+        {
+            foreach (var logger in loggers)
+                logger.Flush();
+        }
     }
 }

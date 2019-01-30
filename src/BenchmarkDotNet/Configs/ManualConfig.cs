@@ -40,16 +40,16 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<HardwareCounter> GetHardwareCounters() => hardwareCounters;
         public IEnumerable<IFilter> GetFilters() => filters;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => logicalGroupRules;
-        
-        public IOrderer Orderer { get; set; }
-        public ISummaryStyle SummaryStyle  { get; set; }
 
         [PublicAPI] public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
         [PublicAPI] public bool KeepBenchmarkFiles { get; set; }
         [PublicAPI] public bool SummaryPerType { get; set; } = true;
         [PublicAPI] public string ArtifactsPath { get; set; }
         [PublicAPI] public Encoding Encoding { get; set; }
-        
+        [PublicAPI] public bool StopOnFirstError { get; set; }
+        [PublicAPI] public IOrderer Orderer { get; set; }
+        [PublicAPI] public ISummaryStyle SummaryStyle { get; set; }
+
         public void Add(params IColumn[] newColumns) => columnProviders.AddRange(newColumns.Select(c => c.ToProvider()));
         public void Add(params IColumnProvider[] newColumnProviders) => columnProviders.AddRange(newColumnProviders);
         public void Add(params IExporter[] newExporters) => exporters.AddRange(newExporters);
@@ -60,7 +60,6 @@ namespace BenchmarkDotNet.Configs
         public void Add(params Job[] newJobs) => jobs.AddRange(newJobs.Select(j => j.Freeze())); // DONTTOUCH: please DO NOT remove .Freeze() call.
         public void Add(params HardwareCounter[] newHardwareCounters) => hardwareCounters.AddRange(newHardwareCounters);
         public void Add(params IFilter[] newFilters) => filters.AddRange(newFilters);
-        public void Set(Encoding encoding) => Encoding = encoding;
         public void Add(params BenchmarkLogicalGroupRule[] rules) => logicalGroupRules.AddRange(rules);
 
         [PublicAPI]
@@ -82,6 +81,7 @@ namespace BenchmarkDotNet.Configs
             Encoding = config.Encoding ?? Encoding;
             SummaryStyle = config.SummaryStyle ?? SummaryStyle;
             logicalGroupRules.AddRange(config.GetLogicalGroupRules());
+            StopOnFirstError |= config.StopOnFirstError;
         }
 
         public static ManualConfig CreateEmpty() => new ManualConfig();

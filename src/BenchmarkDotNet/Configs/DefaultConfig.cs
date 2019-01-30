@@ -50,6 +50,7 @@ namespace BenchmarkDotNet.Configs
             yield return MinIterationTimeAnalyser.Default;
             yield return MultimodalDistributionAnalyzer.Default;
             yield return RuntimeErrorAnalyser.Default;
+            yield return ZeroMeasurementAnalyser.Default;
         }
 
         public IEnumerable<IValidator> GetValidators()
@@ -65,8 +66,6 @@ namespace BenchmarkDotNet.Configs
             yield return ParamsAllValuesValidator.FailOnError;
         }
 
-        public IEnumerable<Job> GetJobs() => Array.Empty<Job>();
-
         public IOrderer Orderer => null;
 
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
@@ -75,13 +74,17 @@ namespace BenchmarkDotNet.Configs
 
         public bool SummaryPerType => true;
 
-        public string ArtifactsPath => Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");
-
         public Encoding Encoding => Encoding.ASCII;
 
-        public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => Array.Empty<BenchmarkLogicalGroupRule>();
-
         public ISummaryStyle SummaryStyle => Reports.SummaryStyle.Default;
+
+        public string ArtifactsPath => Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");
+
+        public bool StopOnFirstError => false;
+
+        public IEnumerable<Job> GetJobs() => Array.Empty<Job>();
+
+        public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => Array.Empty<BenchmarkLogicalGroupRule>();
 
         public IEnumerable<IDiagnoser> GetDiagnosers() => Array.Empty<IDiagnoser>();
 
