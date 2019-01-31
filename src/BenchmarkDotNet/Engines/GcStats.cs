@@ -149,14 +149,11 @@ namespace BenchmarkDotNet.Engines
 
         private static Func<long> GetAllocatedBytesForCurrentThread()
         {
-            // for some versions of .NET Core this method is internal, 
-            // for some public and for others public and exposed ;)
-            var method = typeof(GC).GetTypeInfo().GetMethod("GetAllocatedBytesForCurrentThread",
-                            BindingFlags.Public | BindingFlags.Static)
-                      ?? typeof(GC).GetTypeInfo().GetMethod("GetAllocatedBytesForCurrentThread",
-                            BindingFlags.NonPublic | BindingFlags.Static);
+            // this method is not a part of .NET Standard so we need to use reflection
+            var method = typeof(GC).GetTypeInfo().GetMethod("GetAllocatedBytesForCurrentThread", BindingFlags.Public | BindingFlags.Static);
 
-            return () => (long)method.Invoke(null, null);
+            // we create delegate to avoid boxing, IMPORTANT!
+            return method != null ? (Func<long>)method.CreateDelegate(typeof(Func<long>)) : null;
         }
   
         public string ToOutputLine() 
