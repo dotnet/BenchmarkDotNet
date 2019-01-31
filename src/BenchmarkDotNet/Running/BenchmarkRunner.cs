@@ -50,23 +50,15 @@ namespace BenchmarkDotNet.Running
 
         [PublicAPI]
         public static Summary RunUrl(string url, IConfig config = null)
-        {
-#if CLASSIC
-            return Run(BenchmarkConverter.UrlToBenchmarks(url, config)).Single();
-#else
-            throw new NotSupportedException();
-#endif
-        }
+            => RuntimeInformation.IsFullFramework
+                ? Run(BenchmarkConverter.UrlToBenchmarks(url, config)).Single()
+                : throw new NotSupportedException("Supported only on Full .NET Framework");
 
         [PublicAPI]
         public static Summary RunSource(string source, IConfig config = null)
-        {
-#if CLASSIC
-            return Run(BenchmarkConverter.SourceToBenchmarks(source, config)).Single();
-#else
-            throw new NotSupportedException();
-#endif
-        }
+            => RuntimeInformation.IsFullFramework
+                ? Run(BenchmarkConverter.SourceToBenchmarks(source, config)).Single()
+                : throw new NotSupportedException("Supported only on Full .NET Framework");
 
         [PublicAPI]
         public static Summary Run(BenchmarkRunInfo benchmarkRunInfo) => Run(new[] { benchmarkRunInfo }).Single();
