@@ -57,6 +57,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             content = content.Replace("$RUNTIMESETTINGS$", GetRuntimeSettings(benchmark.Job.Environment.Gc, buildPartition.Resolver));
             content = content.Replace("$COPIEDSETTINGS$", GetSettingsThatNeedsToBeCopied(projectFile));
             content = content.Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration);
+            content = content.Replace("$REDIRECTS$", benchmark.Job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic).ToLowerCase());
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
         }

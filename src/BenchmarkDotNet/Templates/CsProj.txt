@@ -18,7 +18,7 @@
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <UseSharedCompilation>false</UseSharedCompilation>
-    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+    <AutoGenerateBindingRedirects>$REDIRECTS$</AutoGenerateBindingRedirects>
     $COPIEDSETTINGS$
   </PropertyGroup>
 
