@@ -22,7 +22,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.CommandLine">
-      <HintPath>C:\Work\command-line-api\src\System.CommandLine\bin\Debug\netstandard2.0\System.CommandLine.dll</HintPath>
+      <HintPath>..\..\System.CommandLine.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>

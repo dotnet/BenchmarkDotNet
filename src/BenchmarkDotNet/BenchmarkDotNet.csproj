@@ -28,7 +28,7 @@
     <PackageReference Include="System.Reflection.Metadata" Version="1.6.0" />
 
     <Reference Include="System.CommandLine">
-      <HintPath>C:\Work\command-line-api\src\System.CommandLine\bin\Debug\netstandard2.0\System.CommandLine.dll</HintPath>
+      <HintPath>..\..\System.CommandLine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
