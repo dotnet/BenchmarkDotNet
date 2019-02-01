@@ -6,12 +6,11 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class DiagnoserActionParameters
     {
-        public DiagnoserActionParameters(Process process, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, IConfig config)
+        public DiagnoserActionParameters(Process process, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId)
         {
             Process = process;
             BenchmarkCase = benchmarkCase;
             BenchmarkId = benchmarkId;
-            Config = config;
         }
 
         public Process Process { get; }
@@ -20,6 +19,6 @@ namespace BenchmarkDotNet.Diagnosers
 
         public BenchmarkId BenchmarkId { get; }
 
-        public IConfig Config { get; }
+        public ImmutableConfig Config => BenchmarkCase.Config;
     }
 }

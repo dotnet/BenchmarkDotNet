@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
-using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
@@ -15,13 +15,16 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class CompositeDiagnoser : IDiagnoser
     {
-        private readonly IDiagnoser[] diagnosers;
+        private readonly ImmutableHashSet<IDiagnoser> diagnosers;
 
-        public CompositeDiagnoser(params IDiagnoser[] diagnosers) => this.diagnosers = diagnosers.Distinct().ToArray();
+        public CompositeDiagnoser(ImmutableHashSet<IDiagnoser> diagnosers)
+            => this.diagnosers = diagnosers;
+        
+        public RunMode GetRunMode(BenchmarkCase benchmarkCase)
+            => throw new InvalidOperationException("Should never be called for Composite Diagnoser");
 
-        public RunMode GetRunMode(BenchmarkCase benchmarkCase) => throw new InvalidOperationException("Should never be called for Composite Diagnoser");
-
-        public IEnumerable<string> Ids => diagnosers.SelectMany(d => d.Ids);
+        public IEnumerable<string> Ids
+            => diagnosers.SelectMany(d => d.Ids);
 
         public IEnumerable<IExporter> Exporters 
             => diagnosers.SelectMany(diagnoser => diagnoser.Exporters);
@@ -30,7 +33,10 @@ namespace BenchmarkDotNet.Diagnosers
             => diagnosers.SelectMany(diagnoser => diagnoser.Analysers);
 
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
-            => diagnosers.ForEach(diagnoser => diagnoser.Handle(signal, parameters));
+        {
+            foreach (var diagnoser in diagnosers)
+                diagnoser.Handle(signal, parameters);
+        }
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
             => diagnosers.SelectMany(diagnoser => diagnoser.ProcessResults(results));
@@ -39,9 +45,7 @@ namespace BenchmarkDotNet.Diagnosers
         {
             foreach (var diagnoser in diagnosers)
             {
-                // TODO when Diagnosers/Diagnostics are wired up properly, instead of the Type name, 
-                // print the name used on the cmd line, i.e. -d=<NAME>
-                logger.WriteLineHeader($"// * Diagnostic Output - {diagnoser.GetType().Name} *");
+                logger.WriteLineHeader($"// * Diagnostic Output - {diagnoser.Ids.Single()} *");
                 diagnoser.DisplayResults(logger);
                 logger.WriteLine();
             }

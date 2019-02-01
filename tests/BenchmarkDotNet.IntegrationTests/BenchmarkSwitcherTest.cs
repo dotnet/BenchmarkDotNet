@@ -11,6 +11,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.Loggers;
+using BenchmarkDotNet.Tests.XUnit;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -22,8 +23,8 @@ namespace BenchmarkDotNet.IntegrationTests
         private ITestOutputHelper Output { get; }
 
         public BenchmarkSwitcherTest(ITestOutputHelper output) => Output = output;
-        
-        [Fact]
+
+        [FactDotNetCoreOnly("When CommandLineParser wants to display help, it tries to get the Title of the Entry Assembly which is an xunit runner, which has no Title and fails..")]
         public void WhenInvalidCommandLineArgumentIsPassedAnErrorMessageIsDisplayedAndNoBenchmarksAreExecuted()
         {
             var logger = new OutputLogger(Output);
@@ -178,13 +179,16 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void ValidCommandLineArgumentsAreProperlyHandled()
         {
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty().With(logger);
+
             // Don't cover every combination, just pick a complex scenario and check
             // it works end-to-end, i.e. "method=Method1" and "class=ClassB"
             var types = new[] { typeof(ClassA), typeof(ClassB), typeof(NOTIntegrationTests.ClassD) };
             var switcher = new BenchmarkSwitcher(types);
 
             // BenchmarkSwitcher only picks up config values via the args passed in, not via class annotations (e.g "[DryConfig]")
-            var results = switcher.Run(new[] { "-j", "Dry", "--filter", "*ClassB.Method4" });
+            var results = switcher.Run(new[] { "-j", "Dry", "--filter", "*ClassB.Method4" }, config);
             Assert.Single(results);
             Assert.Single(results.SelectMany(r => r.BenchmarksCases));
             Assert.Single(results.SelectMany(r => r.BenchmarksCases.Select(bc => bc.Job)));
@@ -244,6 +248,34 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Single(results.SelectMany(r => r.BenchmarksCases));
             Assert.Single(results.SelectMany(r => r.BenchmarksCases.Select(bc => bc.Job)));
             Assert.True(results.All(r => r.BenchmarksCases.All(bc => bc.Job == Job.Default)));
+        }
+
+        [Fact]
+        public void WhenUserCreatesStaticBenchmarkMethodWeDisplayAnError_FromTypes()
+        {
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty().With(logger);
+
+            var summariesForType = BenchmarkSwitcher
+                .FromTypes(new[] { typeof(Static.BenchmarkClassWithStaticMethodsOnly) })
+                .Run(new[] { "--filter", "*" }, config);
+
+            Assert.True(summariesForType.Single().HasCriticalValidationErrors);
+            Assert.Contains("static", logger.GetLog());
+        }
+
+        [Fact]
+        public void WhenUserCreatesStaticBenchmarkMethodWeDisplayAnError_FromAssembly()
+        {
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty().With(logger);
+
+            var summariesForAssembly = BenchmarkSwitcher
+                .FromAssembly(typeof(Static.BenchmarkClassWithStaticMethodsOnly).Assembly)
+                .Run(new[] { "--filter", "*" }, config);
+
+            Assert.True(summariesForAssembly.Single().HasCriticalValidationErrors);
+            Assert.Contains("static", logger.GetLog());
         }
 
         private class UserInteractionMock : IUserInteraction

@@ -25,10 +25,11 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<IValidator> GetValidators();
         IEnumerable<HardwareCounter> GetHardwareCounters();
         IEnumerable<IFilter> GetFilters();
+        IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules();
 
-        [CanBeNull]
-        IOrderer GetOrderer();
-        ISummaryStyle GetSummaryStyle();
+        [CanBeNull] IOrderer Orderer { get; }
+
+        SummaryStyle SummaryStyle { get; } 
 
         ConfigUnionRule UnionRule { get; }
 
@@ -51,8 +52,6 @@ namespace BenchmarkDotNet.Configs
         /// the default value is ASCII
         /// </summary>
         Encoding Encoding { get; }
-
-        IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules();
 
         bool StopOnFirstError { get; }
     }

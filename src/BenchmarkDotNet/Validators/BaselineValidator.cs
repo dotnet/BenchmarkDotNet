@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Order;
 
@@ -14,11 +15,11 @@ namespace BenchmarkDotNet.Validators
 
         public IEnumerable<ValidationError> Validate(ValidationParameters input)
         {
-            var allBenchmarks = input.Benchmarks.ToArray();
-            var orderProvider = input.Config.GetOrderer() ?? DefaultOrderer.Instance;
-            
+            var allBenchmarks = input.Benchmarks.ToImmutableArray();
+            var orderProvider = input.Config.Orderer;
+
             var benchmarkLogicalGroups = allBenchmarks
-                .Select(benchmark => orderProvider.GetLogicalGroupKey(input.Config, allBenchmarks, benchmark))
+                .Select(benchmark => orderProvider.GetLogicalGroupKey(allBenchmarks, benchmark))
                 .ToArray();
             
             var logicalGroups = benchmarkLogicalGroups.Distinct().ToArray();

@@ -17,7 +17,7 @@ Just add it to the top level of csproj.
 Specify a conditional dependency:
 
 ```xml
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('net4')) ">
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
   </ItemGroup>
 ```

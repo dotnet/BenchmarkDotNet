@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Columns
         public abstract bool IsNumeric { get; }
         public abstract UnitType UnitType { get; }
         public abstract string Legend { get; }
-        public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style) => GetValue(summary, benchmarkCase);
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style) => GetValue(summary, benchmarkCase);
         public override string ToString() => ColumnName;
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
     }
