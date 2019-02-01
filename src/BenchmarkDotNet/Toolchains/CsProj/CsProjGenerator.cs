@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
@@ -57,7 +56,6 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             content = content.Replace("$RUNTIMESETTINGS$", GetRuntimeSettings(benchmark.Job.Environment.Gc, buildPartition.Resolver));
             content = content.Replace("$COPIEDSETTINGS$", GetSettingsThatNeedsToBeCopied(projectFile));
             content = content.Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration);
-            content = content.Replace("$REDIRECTS$", benchmark.Job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic).ToLowerCase());
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
         }

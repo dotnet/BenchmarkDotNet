@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var unsupportedJobLogger = new CompositeLogger(unsupportedJobConfig.GetLoggers().ToImmutableHashSet());
             foreach (var benchmarkCase in unsupportedJobBenchmark.BenchmarksCases) 
             {
-                Assert.False(toolchain.IsSupported(benchmarkCase, unsupportedJobLogger, BenchmarkRunner.DefaultResolver));
+                Assert.False(toolchain.IsSupported(benchmarkCase, unsupportedJobLogger, BenchmarkRunnerClean.DefaultResolver));
             }
 
             var supportedJob = Job.Dry.With(toolchain);
@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var supportedLogger = new CompositeLogger(supportedConfig.GetLoggers().ToImmutableHashSet());
             foreach (var benchmarkCase in supportedBenchmark.BenchmarksCases)
             {
-                Assert.True(toolchain.IsSupported(benchmarkCase, supportedLogger, BenchmarkRunner.DefaultResolver));
+                Assert.True(toolchain.IsSupported(benchmarkCase, supportedLogger, BenchmarkRunnerClean.DefaultResolver));
             }
         }
 

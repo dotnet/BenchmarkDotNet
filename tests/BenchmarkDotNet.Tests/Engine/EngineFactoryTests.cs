@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Tests.Engine
 
         TimeSpan IterationTime => TimeSpan.FromMilliseconds(EngineResolver.Instance.Resolve(Job.Default, RunMode.IterationTimeCharacteristic).ToMilliseconds());
 
-        IResolver DefaultResolver => BenchmarkRunner.DefaultResolver;
+        IResolver DefaultResolver => BenchmarkRunnerClean.DefaultResolver;
 
         void GlobalSetup() => timesGlobalSetupCalled++;
         void IterationSetup() => timesIterationSetupCalled++;

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
@@ -58,46 +57,55 @@ namespace BenchmarkDotNet.Running
         {
             args = args ?? Array.Empty<string>();
             config = config ?? DefaultConfig.Instance;
-            // if user did not provide any loggers, we use the ConsoleLogger to somehow show the errors to the user
-            var nonNullLogger = config.GetLoggers().Any() ? new CompositeLogger(config.GetLoggers().ToImmutableHashSet()) : ConsoleLogger.Default;
 
-            var (isParsingSuccess, parsedConfig, options) = ConfigParser.Parse(args, nonNullLogger, config);
+            // VS generates bad assembly binding redirects for ValueTuple for Full .NET Framework 
+            // we need to keep the logic that uses it in a separate method and create DirtyAssemblyResolveHelper first
+            // so it can ignore the version mismatch ;)
+            using (DirtyAssemblyResolveHelper.Create())
+                return RunWithDirtyAssemblyResolveHelper(args, config);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private IEnumerable<Summary> RunWithDirtyAssemblyResolveHelper(string[] args, IConfig config)
+        {
+            var logger = config.GetNonNullCompositeLogger();
+            var (isParsingSuccess, parsedConfig, options) = ConfigParser.Parse(args, logger, config);
             if (!isParsingSuccess) // invalid console args, the ConfigParser printed the error
                 return Array.Empty<Summary>();
 
             if (options.PrintInformation)
             {
-                nonNullLogger.WriteLine(HostEnvironmentInfo.GetInformation());
+                logger.WriteLine(HostEnvironmentInfo.GetInformation());
                 return Array.Empty<Summary>();
             }
 
             var effectiveConfig = ManualConfig.Union(config, parsedConfig);
 
-            (var allTypesValid, var allAvailableTypesWithRunnableBenchmarks) = TypeFilter.GetTypesWithRunnableBenchmarks(types, assemblies, nonNullLogger);
+            var (allTypesValid, allAvailableTypesWithRunnableBenchmarks) = TypeFilter.GetTypesWithRunnableBenchmarks(types, assemblies, logger);
             if (!allTypesValid) // there were some invalid and TypeFilter printed errors
                 return Array.Empty<Summary>();
 
             if (allAvailableTypesWithRunnableBenchmarks.IsEmpty())
             {
-                userInteraction.PrintNoBenchmarksError(nonNullLogger);
+                userInteraction.PrintNoBenchmarksError(logger);
                 return Array.Empty<Summary>();
             }
 
             if (options.ListBenchmarkCaseMode != ListBenchmarkCaseMode.Disabled)
             {
-                PrintList(nonNullLogger, effectiveConfig, allAvailableTypesWithRunnableBenchmarks, options);
+                PrintList(logger, effectiveConfig, allAvailableTypesWithRunnableBenchmarks, options);
                 return Array.Empty<Summary>();
             }
 
             var benchmarksToFilter = options.UserProvidedFilters
                 ? allAvailableTypesWithRunnableBenchmarks
-                : userInteraction.AskUser(allAvailableTypesWithRunnableBenchmarks, nonNullLogger);
+                : userInteraction.AskUser(allAvailableTypesWithRunnableBenchmarks, logger);
 
             var filteredBenchmarks = TypeFilter.Filter(effectiveConfig, benchmarksToFilter);
 
             if (filteredBenchmarks.IsEmpty())
             {
-                userInteraction.PrintWrongFilterInfo(benchmarksToFilter, nonNullLogger, options.Filters.ToArray());
+                userInteraction.PrintWrongFilterInfo(benchmarksToFilter, logger, options.Filters.ToArray());
                 return Array.Empty<Summary>();
             }
 
