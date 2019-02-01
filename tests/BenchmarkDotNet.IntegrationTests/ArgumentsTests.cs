@@ -4,12 +4,9 @@ using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using Xunit;
 using Xunit.Abstractions;
@@ -19,20 +16,18 @@ namespace BenchmarkDotNet.IntegrationTests
     public class ArgumentsTests : BenchmarkTestExecutor
     {
         public static IEnumerable<object[]> GetToolchains()
-            => RuntimeInformation.IsMono // https://github.com/mono/mono/issues/8397
-                ? Array.Empty<object[]>()
-                : new[]
+            => new[]
                 {
                     new object[] { Job.Default.GetToolchain() },
                     new object[] { InProcessEmitToolchain.Instance },
 #if NETCOREAPP2_1 
 // we don't want to test CoreRT twice (for .NET 4.6 and Core 2.1) when running the integration tests (these tests take a lot of time)
 // we test against specific version to keep this test stable
-                    new object[] { CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-26414-01").ToToolchain() }
-    #endif
+                    new object[] { Toolchains.CoreRt.CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-26414-01").ToToolchain() }
+#endif
                 };
-        public ArgumentsTests(ITestOutputHelper output) : base(output) { }
 
+        public ArgumentsTests(ITestOutputHelper output) : base(output) { }
 
         [Theory, MemberData(nameof(GetToolchains))]
         public void ArgumentsArePassedToBenchmarks(IToolchain toolchain) => CanExecute<WithArguments>(toolchain);
