@@ -39,20 +39,28 @@ namespace BenchmarkDotNet.Tool
 
         public int OnExecute()
         {
-            Assembly assembly;
             try
             {
-                assembly = Assembly.LoadFrom(AssemblyFile);
+                using (var dynamicContext = new AssemblyResolver(Path.GetFullPath(AssemblyFile)))
+                {
+
+                    BenchmarkSwitcher benchmarkSwitcher = BenchmarkSwitcher.FromAssembly(dynamicContext.Assembly);
+                    benchmarkSwitcher.Run(RemainingArguments);
+                }
             }
-            catch (Exception ex)
+            catch (FileLoadException ex)
             {
                 Console.Error.WriteLine($"Couldn't load the assembly {AssemblyFile}.");
                 Console.Error.WriteLine(ex.ToString());
                 return 1;
             }
+            catch (BadImageFormatException ex)
+            {
+                Console.Error.WriteLine($"The assembly {AssemblyFile} is not a valid assembly.");
+                Console.Error.WriteLine(ex.ToString());
+                return 1;
+            }
 
-            BenchmarkSwitcher benchmarkSwitcher = BenchmarkSwitcher.FromAssembly(assembly);
-            benchmarkSwitcher.Run(RemainingArguments);
             return 0;
         }
 
