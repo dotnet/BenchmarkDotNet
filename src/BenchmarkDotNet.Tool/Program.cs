@@ -1,11 +1,8 @@
 ﻿using BenchmarkDotNet.Running;
 using System;
 using System.CommandLine;
-using System.CommandLine.Builder;
-using System.CommandLine.Invocation;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Loggers;
@@ -19,7 +16,7 @@ namespace BenchmarkDotNet.Tool
 
         public static int Main(string[] args)
         {
-            
+            File.AppendAllText("c:\\abc.txt", "Main");
             var nonNullConfig = DefaultConfig.Instance;
 
             // if user did not provide any loggers, we use the ConsoleLogger to somehow show the errors to the user
@@ -52,42 +49,30 @@ namespace BenchmarkDotNet.Tool
             {
                 return -1;
             }
+            File.AppendAllText("c:\\abc.txt", "Run");
 
-            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) => CurrentDomainOnAssemblyResolve(assemblyFile, args);
-         
-            Assembly assembly;
             try
             {
-                assembly = Assembly.LoadFrom(assemblyFile.FullName);
+                using (var dynamicContext = new AssemblyResolver(assemblyFile.FullName))
+                {
+                    BenchmarkSwitcher benchmarkSwitcher = BenchmarkSwitcher.FromAssembly(dynamicContext.Assembly);
+                    benchmarkSwitcher.Run(optionHandlerOptions, config, logger);
+                }
             }
-            catch (Exception ex)
+            catch (FileLoadException ex)
             {
                 Console.Error.WriteLine($"Couldn't load the assembly {assemblyFile}.");
                 Console.Error.WriteLine(ex.ToString());
                 return 1;
             }
-
-            BenchmarkSwitcher benchmarkSwitcher = BenchmarkSwitcher.FromAssembly(assembly);
-            benchmarkSwitcher.Run(optionHandlerOptions, config, logger);
+            catch (BadImageFormatException ex)
+            {
+                Console.Error.WriteLine($"The assembly {assemblyFile} is not a valid assembly.");
+                Console.Error.WriteLine(ex.ToString());
+                return 1;
+            }
+           
             return 0;
-        }
-
-        private static Assembly CurrentDomainOnAssemblyResolve(FileInfo assemblyFile, ResolveEventArgs args)
-        {
-            var fullName = new AssemblyName(args.Name);
-            string simpleName = fullName.Name;
-
-            var directory = Path.GetDirectoryName(assemblyFile.FullName);
-
-            string guessedPath = Path.Combine(directory, $"{simpleName}.dll");
-            Console.WriteLine(guessedPath);
-            if (!File.Exists(guessedPath))
-                return null; // we can't help, and we also don't call Assembly.Load which if fails comes back here, creates endless loop and causes StackOverflow
-
-            // we warn the user about that, in case some Super User want to be aware of that
-            Console.WriteLine($".NET Framework was unable to load {args.Name}, but we are going to load it from {guessedPath}");
-
-            return Assembly.LoadFrom(guessedPath);
         }
     }
 }
