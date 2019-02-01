@@ -86,8 +86,8 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IAnalyser> GetAnalysers() => Array.Empty<IAnalyser>();
         public IEnumerable<HardwareCounter> GetHardwareCounters() => Array.Empty<HardwareCounter>();
         public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
-        public IOrderer GetOrderer() => DefaultOrderer.Instance;
-        public ISummaryStyle GetSummaryStyle() => SummaryStyle.Default;
+        public IOrderer Orderer => DefaultOrderer.Instance;
+        public SummaryStyle SummaryStyle => SummaryStyle.Default;
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
         public bool SummaryPerType => false;
         public string ArtifactsPath => Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");

@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         {
             // TODO: preallocate buffer for output (no direct logging)?
             var hostLogger = LogOutput ? executeParameters.Logger : NullLogger.Instance;
-            var host = new InProcessHost(executeParameters.BenchmarkCase, hostLogger, executeParameters.Diagnoser, executeParameters.Config);
+            var host = new InProcessHost(executeParameters.BenchmarkCase, hostLogger, executeParameters.Diagnoser);
 
             int exitCode = -1;
             var runThread = new Thread(() => exitCode = ExecuteCore(host, executeParameters));
@@ -80,7 +80,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     $"Benchmark {executeParameters.BenchmarkCase.DisplayInfo} takes to long to run. " +
                     "Prefer to use out-of-process toolchains for long-running benchmarks.");
 
-            return GetExecutionResult(host.RunResults, exitCode, executeParameters.Logger, executeParameters.Config.Encoding);
+            return GetExecutionResult(host.RunResults, exitCode, executeParameters.Logger, executeParameters.BenchmarkCase.Config.Encoding);
         }
 
         private int ExecuteCore(IHost host, ExecuteParameters parameters)
@@ -103,7 +103,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     process.TrySetAffinity(affinity.Value, parameters.Logger);
                 }
 
-                exitCode = InProcessRunner.Run(host, parameters.BenchmarkCase, CodegenMode, parameters.Config);
+                exitCode = InProcessRunner.Run(host, parameters.BenchmarkCase, CodegenMode);
             }
             catch (Exception ex)
             {

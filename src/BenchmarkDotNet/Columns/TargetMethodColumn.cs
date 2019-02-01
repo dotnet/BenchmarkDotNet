@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Columns
         public bool IsNumeric => false;
         public UnitType UnitType => UnitType.Dimensionless;
         public string Legend => "";
-        public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style) => GetValue(summary, benchmarkCase);
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style) => GetValue(summary, benchmarkCase);
 
         private TargetMethodColumn(string columnName, Func<BenchmarkCase, string> valueProvider, bool alwaysShow = false)
         {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
@@ -26,12 +27,9 @@ namespace BenchmarkDotNet.Tests.Reports
         [Fact]
         public void SummaryWithFailureReportDoesNotThrowNre()
         {
-            // Arrange:
-            IConfig config = CreateConfig();
-            IList<BenchmarkReport> reports = CreateReports(config);
+            IList<BenchmarkReport> reports = CreateReports(CreateConfig());
 
-            // Act:
-            Summary _ = CreateSummary(reports, config);
+            Assert.NotNull(CreateSummary(reports));
         }
 
         private static IConfig CreateConfig()
@@ -73,10 +71,10 @@ namespace BenchmarkDotNet.Tests.Reports
                 Array.Empty<ExecuteResult>(), Array.Empty<Measurement>(), default, metrics);
         }
 
-        private static Summary CreateSummary(IList<BenchmarkReport> reports, IConfig config)
+        private static Summary CreateSummary(IList<BenchmarkReport> reports)
         {
             HostEnvironmentInfo hostEnvironmentInfo = new HostEnvironmentInfoBuilder().Build();
-            return new Summary("MockSummary", reports, hostEnvironmentInfo, config, string.Empty, TimeSpan.FromMinutes(1.0), Array.Empty<ValidationError>());
+            return new Summary("MockSummary", reports.ToImmutableArray(), hostEnvironmentInfo, string.Empty, TimeSpan.FromMinutes(1.0), ImmutableArray<ValidationError>.Empty);
         }
 
         public class MockBenchmarkClass

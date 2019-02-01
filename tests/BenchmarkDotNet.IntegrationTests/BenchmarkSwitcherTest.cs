@@ -178,13 +178,16 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void ValidCommandLineArgumentsAreProperlyHandled()
         {
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty().With(logger);
+
             // Don't cover every combination, just pick a complex scenario and check
             // it works end-to-end, i.e. "method=Method1" and "class=ClassB"
             var types = new[] { typeof(ClassA), typeof(ClassB), typeof(NOTIntegrationTests.ClassD) };
             var switcher = new BenchmarkSwitcher(types);
 
             // BenchmarkSwitcher only picks up config values via the args passed in, not via class annotations (e.g "[DryConfig]")
-            var results = switcher.Run(new[] { "-j", "Dry", "--filter", "*ClassB.Method4" });
+            var results = switcher.Run(new[] { "-j", "Dry", "--filter", "*ClassB.Method4" }, config);
             Assert.Single(results);
             Assert.Single(results.SelectMany(r => r.BenchmarksCases));
             Assert.Single(results.SelectMany(r => r.BenchmarksCases.Select(bc => bc.Job)));

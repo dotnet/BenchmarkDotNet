@@ -5,7 +5,6 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
-using StreamWriter = BenchmarkDotNet.Portability.StreamWriter;
 
 namespace BenchmarkDotNet.Exporters
 {
@@ -53,7 +52,7 @@ namespace BenchmarkDotNet.Exporters
             var totals = SumHardwareCountersStatsOfBenchmarkedCode(disassemblyResult, pmcStats);
             var perMethod = SumHardwareCountersPerMethod(disassemblyResult, pmcStats);
 
-            using (var stream = StreamWriter.FromPath(filePath))
+            using (var stream = new StreamWriter(filePath, append: false))
             {
                 Export(new StreamLogger(stream), benchmarkCase, totals, perMethod, pmcStats.Counters.Keys.ToArray());
             }

@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Columns
 {
-    public class BaselineColumn: IColumn
+    public class BaselineColumn : IColumn
     {
         [PublicAPI] public static readonly IColumn Default = new BaselineColumn();
 
@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Columns
         public string ColumnName => "Baseline";
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => summary.IsBaseline(benchmarkCase) ? "Yes" : "No";
-        public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style) => GetValue(summary, benchmarkCase);
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style) => GetValue(summary, benchmarkCase);
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
         public bool IsAvailable(Summary summary) => true;
 

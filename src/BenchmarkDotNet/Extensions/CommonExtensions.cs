@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Extensions
         /// <summary>
         /// Gets column title formatted using the specified style
         /// </summary>
-        public static string GetColumnTitle(this IColumn column, ISummaryStyle style)
+        public static string GetColumnTitle(this IColumn column, SummaryStyle style)
         {
             if (!style.PrintUnitsInHeader)
                 return column.ColumnName;
