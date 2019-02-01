@@ -70,17 +70,13 @@ namespace BenchmarkDotNet.Configs
 
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
 
-        public bool KeepBenchmarkFiles => false;
-
-        public bool SummaryPerType => true;
-
         public Encoding Encoding => Encoding.ASCII;
+
+        public ConfigOptions Options => ConfigOptions.Default;
 
         public SummaryStyle SummaryStyle => SummaryStyle.Default;
 
         public string ArtifactsPath => Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");
-
-        public bool StopOnFirstError => false;
 
         public IEnumerable<Job> GetJobs() => Array.Empty<Job>();
 

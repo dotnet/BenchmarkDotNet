@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Tests.Validators
                         )
                 }, config);
 
-            var errors = CompilationValidator.Default.Validate(parameters).Select(e => e.Message);
+            var errors = CompilationValidator.FailOnError.Validate(parameters).Select(e => e.Message);
 
             Assert.Contains(errors,
                 s => s.Equals(
@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.Tests.Validators
                         config)
                 }, config);
 
-            var errors = CompilationValidator.Default.Validate(parameters).Select(e => e.Message);
+            var errors = CompilationValidator.FailOnError.Validate(parameters).Select(e => e.Message);
 
             Assert.Contains(errors,
                 s => s.Equals(
@@ -68,7 +68,7 @@ namespace BenchmarkDotNet.Tests.Validators
         [InlineData(typeof(BenchmarkClass<PublicClass>), false)]
         public void Benchmark_Class_Methods_Must_Be_Non_Static(Type type, bool hasErrors)
         {
-            var validationErrors = CompilationValidator.Default.Validate(BenchmarkConverter.TypeToBenchmarks(type));
+            var validationErrors = CompilationValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(type));
             
             Assert.Equal(hasErrors, validationErrors.Any());
         }
@@ -90,7 +90,7 @@ namespace BenchmarkDotNet.Tests.Validators
             var constructed = typeof(BenchmarkClass<>).MakeGenericType(type);
             
             // Act
-            var validationErrors = CompilationValidator.Default.Validate(BenchmarkConverter.TypeToBenchmarks(constructed))
+            var validationErrors = CompilationValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(constructed))
                                                                .ToList();
             
             // Assert

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
@@ -20,10 +21,10 @@ namespace BenchmarkDotNet.Configs
             BaselineValidator.FailOnError,
             SetupCleanupValidator.FailOnError,
             RunModeValidator.FailOnError,
-            DiagnosersValidator.Default,
-            CompilationValidator.Default,
-            ConfigValidator.Default,
-            ShadowCopyValidator.Default,
+            DiagnosersValidator.Composite,
+            CompilationValidator.FailOnError,
+            ConfigValidator.DontFailOnError,
+            ShadowCopyValidator.DontFailOnError,
             JitOptimizationsValidator.DontFailOnError,
             DeferredExecutionValidator.DontFailOnError
         };
@@ -41,7 +42,7 @@ namespace BenchmarkDotNet.Configs
             var uniqueExporters = GetExporters(source.GetExporters(), uniqueDiagnosers);
             var unqueAnalyzers = GetAnalysers(source.GetAnalysers(), uniqueDiagnosers);
 
-            var uniqueValidators = GetValidators(source.GetValidators(), MandatoryValidators);
+            var uniqueValidators = GetValidators(source.GetValidators(), MandatoryValidators, source.Options);
             
             var uniqueFilters = source.GetFilters().ToImmutableHashSet();
             var uniqueRules = source.GetLogicalGroupRules().ToImmutableHashSet();
@@ -60,13 +61,11 @@ namespace BenchmarkDotNet.Configs
                 uniqueRules,
                 uniqueRunnableJobs,
                 source.UnionRule,
-                source.KeepBenchmarkFiles,
-                source.SummaryPerType,
                 source.ArtifactsPath,
                 source.Encoding,
                 source.Orderer ?? DefaultOrderer.Instance,
                 source.SummaryStyle,
-                source.StopOnFirstError
+                source.Options
             );
         }
 
@@ -137,13 +136,26 @@ namespace BenchmarkDotNet.Configs
             return builder.ToImmutable();
         }
 
-        private static ImmutableHashSet<IValidator> GetValidators(IEnumerable<IValidator> configuredValidators, IValidator[] mandatoryValidators)
-            => configuredValidators
+        private static ImmutableHashSet<IValidator> GetValidators(IEnumerable<IValidator> configuredValidators, IValidator[] mandatoryValidators, ConfigOptions options)
+        {
+            var builder = ImmutableHashSet.CreateBuilder<IValidator>();
+
+            foreach (var validator in configuredValidators
                 .Concat(mandatoryValidators)
                 .GroupBy(validator => validator.GetType())
-                .Select(groupedByType => groupedByType.FirstOrDefault(validator => validator.TreatsWarningsAsErrors) ?? groupedByType.First())
-                .ToImmutableHashSet();
-        
+                .Select(groupedByType => groupedByType.FirstOrDefault(validator => validator.TreatsWarningsAsErrors) ?? groupedByType.First()))
+            {
+                builder.Add(validator);
+            }
+
+            if (options.IsSet(ConfigOptions.DisableOptimizationsValidator) && builder.Contains(JitOptimizationsValidator.DontFailOnError))
+                builder.Remove(JitOptimizationsValidator.DontFailOnError);
+            if (options.IsSet(ConfigOptions.DisableOptimizationsValidator) && builder.Contains(JitOptimizationsValidator.FailOnError))
+                builder.Remove(JitOptimizationsValidator.FailOnError);
+
+            return builder.ToImmutable();
+        }
+
         /// <summary>
         /// returns a set of unique jobs that are ready to run
         /// </summary>

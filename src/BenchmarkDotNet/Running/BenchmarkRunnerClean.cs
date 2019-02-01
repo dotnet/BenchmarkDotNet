@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Running
                         
                         var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, artifactsToCleanup, rootArtifactsFolderPath, ref runChronometer);
                         
-                        if (benchmarkRunInfo.Config.SummaryPerType)
+                        if (!benchmarkRunInfo.Config.Options.IsSet(ConfigOptions.JoinSummary))
                             PrintSummary(compositeLogger, benchmarkRunInfo.Config, summary);
                         
                         LogTotalTime(compositeLogger, runChronometer.GetElapsed().GetTimeSpan(), summary.GetNumberOfExecutedBenchmarks(), message: "Run time");
@@ -81,11 +81,11 @@ namespace BenchmarkDotNet.Running
                         results.Add(summary);
                     }
 
-                    if (supportedBenchmarks.Any(b => !b.Config.SummaryPerType))
+                    if (supportedBenchmarks.Any(b => b.Config.Options.IsSet(ConfigOptions.JoinSummary)))
                     {
                         var joinedSummary = Summary.Join(results, globalChronometer.GetElapsed());
                         
-                        PrintSummary(compositeLogger, supportedBenchmarks.First(b => !b.Config.SummaryPerType).Config, joinedSummary);
+                        PrintSummary(compositeLogger, supportedBenchmarks.First(b => b.Config.Options.IsSet(ConfigOptions.JoinSummary)).Config, joinedSummary);
                         
                         results.Clear();
                         results.Add(joinedSummary);
@@ -141,7 +141,7 @@ namespace BenchmarkDotNet.Running
                 var info = buildResults[benchmark];
                 var buildResult = info.buildResult;
 
-                if (!config.KeepBenchmarkFiles)
+                if (!config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles))
                     artifactsToCleanup.AddRange(buildResult.ArtifactsToCleanup);
 
                 bool success;
@@ -170,7 +170,7 @@ namespace BenchmarkDotNet.Running
 
                 logger.WriteLine();
 
-                if (!success && config.StopOnFirstError)
+                if (!success && config.Options.IsSet(ConfigOptions.StopOnFirstError))
                 {
                     break;
                 }
@@ -410,7 +410,7 @@ namespace BenchmarkDotNet.Running
                     launchCount = (int)Math.Round(Math.Max(2, 2 + (percent - 1) / 3)); // an empirical formula
                 }
 
-                if (!success && benchmarkCase.Config.StopOnFirstError)
+                if (!success && benchmarkCase.Config.Options.IsSet(ConfigOptions.StopOnFirstError))
                 {
                     break;
                 }

@@ -34,16 +34,6 @@ namespace BenchmarkDotNet.Configs
         ConfigUnionRule UnionRule { get; }
 
         /// <summary>
-        /// determines if all auto-generated files should be kept or removed after running the benchmarks
-        /// </summary>
-        bool KeepBenchmarkFiles { get; }
-
-        /// <summary>
-        /// determines if all benchmarks results should be joined into a single summary or not
-        /// </summary>
-        bool SummaryPerType { get; }
-
-        /// <summary>
         /// the default value is "./BenchmarkDotNet.Artifacts"
         /// </summary>
         string ArtifactsPath { get; }
@@ -53,6 +43,9 @@ namespace BenchmarkDotNet.Configs
         /// </summary>
         Encoding Encoding { get; }
 
-        bool StopOnFirstError { get; }
+        /// <summary>
+        /// a set of custom flags that can enable/disable various settings
+        /// </summary>
+        ConfigOptions Options { get; }
     }
 }

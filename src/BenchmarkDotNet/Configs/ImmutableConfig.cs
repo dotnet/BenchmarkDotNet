@@ -44,13 +44,11 @@ namespace BenchmarkDotNet.Configs
             ImmutableHashSet<BenchmarkLogicalGroupRule> uniqueRules,
             ImmutableHashSet<Job> uniqueRunnableJobs, 
             ConfigUnionRule unionRule, 
-            bool keepBenchmarkFiles, 
-            bool summaryPerType, 
             string artifactsPath, 
             Encoding encoding,
             IOrderer orderer,
             SummaryStyle summaryStyle,
-            bool stopOnFirstError)
+            ConfigOptions options)
         {
             columnProviders = uniqueColumnProviders;
             loggers = uniqueLoggers;
@@ -63,23 +61,19 @@ namespace BenchmarkDotNet.Configs
             rules = uniqueRules;
             jobs = uniqueRunnableJobs;
             UnionRule = unionRule;
-            KeepBenchmarkFiles = keepBenchmarkFiles;
-            SummaryPerType = summaryPerType;
             ArtifactsPath = artifactsPath;
             Encoding = encoding;
             Orderer = orderer;
             SummaryStyle = summaryStyle;
-            StopOnFirstError = stopOnFirstError;
+            Options = options;
         }
 
         public ConfigUnionRule UnionRule { get; }
-        public bool KeepBenchmarkFiles { get; }
-        public bool SummaryPerType { get; }
         public string ArtifactsPath { get; }
         public Encoding Encoding { get; }
+        public ConfigOptions Options { get; }
         [NotNull] public IOrderer Orderer { get; } 
         public SummaryStyle SummaryStyle { get; }
-        public bool StopOnFirstError { get; }
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;

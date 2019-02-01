@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Validators
     {
         private const char Underscore = '_';
 
-        public static readonly IValidator Default = new CompilationValidator();
+        public static readonly IValidator FailOnError = new CompilationValidator();
 
         private static readonly ImmutableHashSet<string> CsharpKeywords = GetCsharpKeywords().ToImmutableHashSet();
 

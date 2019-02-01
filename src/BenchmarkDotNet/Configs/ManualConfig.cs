@@ -41,14 +41,33 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IFilter> GetFilters() => filters;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => logicalGroupRules;
 
+        [PublicAPI] public ConfigOptions Options { get; set; }
         [PublicAPI] public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
-        [PublicAPI] public bool KeepBenchmarkFiles { get; set; }
-        [PublicAPI] public bool SummaryPerType { get; set; } = true;
         [PublicAPI] public string ArtifactsPath { get; set; }
         [PublicAPI] public Encoding Encoding { get; set; }
-        [PublicAPI] public bool StopOnFirstError { get; set; }
         [PublicAPI] public IOrderer Orderer { get; set; }
         [PublicAPI] public SummaryStyle SummaryStyle { get; set; }
+
+        [Obsolete("This property will soon be removed, please start using .Options instead")]
+        public bool KeepBenchmarkFiles
+        {
+            get => Options.IsSet(ConfigOptions.KeepBenchmarkFiles);
+            set => Options = Options.Set(value, ConfigOptions.KeepBenchmarkFiles);
+        }
+
+        [Obsolete("This property will soon be removed, please start using .Options instead")]
+        public bool SummaryPerType
+        {
+            get => !Options.IsSet(ConfigOptions.JoinSummary);
+            set => Options = Options.Set(!value, ConfigOptions.JoinSummary);
+        }
+
+        [Obsolete("This property will soon be removed, please start using .Options instead")]
+        public bool StopOnFirstError
+        {
+            get => Options.IsSet(ConfigOptions.StopOnFirstError);
+            set => Options = Options.Set(value, ConfigOptions.StopOnFirstError);
+        }
 
         public void Add(params IColumn[] newColumns) => columnProviders.AddRange(newColumns.Select(c => c.ToProvider()));
         public void Add(params IColumnProvider[] newColumnProviders) => columnProviders.AddRange(newColumnProviders);
@@ -75,13 +94,11 @@ namespace BenchmarkDotNet.Configs
             hardwareCounters.AddRange(config.GetHardwareCounters());
             filters.AddRange(config.GetFilters());
             Orderer = config.Orderer ?? Orderer;
-            KeepBenchmarkFiles |= config.KeepBenchmarkFiles;
-            SummaryPerType &= config.SummaryPerType;
             ArtifactsPath = config.ArtifactsPath ?? ArtifactsPath;
             Encoding = config.Encoding ?? Encoding;
             SummaryStyle = config.SummaryStyle ?? SummaryStyle;
             logicalGroupRules.AddRange(config.GetLogicalGroupRules());
-            StopOnFirstError |= config.StopOnFirstError;
+            Options |= config.Options;
         }
 
         public static ManualConfig CreateEmpty() => new ManualConfig();

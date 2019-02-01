@@ -143,7 +143,33 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.Contains(BaselineValidator.FailOnError, fromEmpty.GetValidators());
         }
-        
+
+        [Fact]
+        public void JitOptimizationsValidatorIsMandatoryByDefault()
+        {
+            var fromEmpty = ImmutableConfigBuilder.Create(ManualConfig.CreateEmpty());
+            Assert.Contains(JitOptimizationsValidator.DontFailOnError, fromEmpty.GetValidators());
+
+            var fromDefault = ImmutableConfigBuilder.Create(DefaultConfig.Instance);
+            Assert.Contains(JitOptimizationsValidator.FailOnError, fromDefault.GetValidators());
+        }
+
+        [Fact]
+        public void JitOptimizationsValidatorIsMandatoryCanBeDisabledOnDemand()
+        {
+            var disabled = ImmutableConfigBuilder.Create(ManualConfig.CreateEmpty().With(ConfigOptions.DisableOptimizationsValidator));
+
+            Assert.DoesNotContain(JitOptimizationsValidator.FailOnError, disabled.GetValidators());
+            Assert.DoesNotContain(JitOptimizationsValidator.DontFailOnError, disabled.GetValidators());
+
+            var enabledThenDisabled = ImmutableConfigBuilder.Create(ManualConfig.CreateEmpty()
+                .With(JitOptimizationsValidator.FailOnError) // we enable it first (to mimic few configs merge)
+                .With(ConfigOptions.DisableOptimizationsValidator)); // then disable
+
+            Assert.DoesNotContain(JitOptimizationsValidator.FailOnError, enabledThenDisabled.GetValidators());
+            Assert.DoesNotContain(JitOptimizationsValidator.DontFailOnError, enabledThenDisabled.GetValidators());
+        }
+
         [Fact] // See https://github.com/dotnet/BenchmarkDotNet/issues/172
         public void MissingExporterDependencyIsAddedWhenNeeded()
         {

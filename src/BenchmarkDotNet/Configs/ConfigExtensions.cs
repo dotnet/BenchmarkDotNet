@@ -35,11 +35,17 @@ namespace BenchmarkDotNet.Configs
         /// <summary>
         /// determines if all auto-generated files should be kept or removed after running the benchmarks
         /// </summary>
-        [PublicAPI] public static IConfig KeepBenchmarkFiles(this IConfig config, bool value = true) => config.With(m => m.KeepBenchmarkFiles = value);
-        [PublicAPI] public static IConfig RemoveBenchmarkFiles(this IConfig config) => config.KeepBenchmarkFiles(false);
+        [PublicAPI] public static IConfig KeepBenchmarkFiles(this IConfig config, bool value = true) => config.With(m => m.Options = m.Options.Set(value, ConfigOptions.KeepBenchmarkFiles));
+        /// <summary>
+        /// determines if benchmarking should be stopped after the first error (by default it's not)
+        /// </summary>
+        [PublicAPI] public static IConfig StopOnFirstError(this IConfig config, bool value = true) => config.With(m => m.Options = m.Options.Set(value, ConfigOptions.StopOnFirstError));
         [PublicAPI] public static IConfig WithArtifactsPath(this IConfig config, string artifactsPath) => config.With(m => m.ArtifactsPath = artifactsPath);
+        /// <summary>
+        /// sets given options for the config
+        /// </summary>
+        [PublicAPI] public static IConfig With(this IConfig config, ConfigOptions options) => config.With(m => m.Options = options);
         [PublicAPI] public static IConfig With(this IConfig config, params BenchmarkLogicalGroupRule[] rules) => config.With(c => c.Add(rules));
-        [PublicAPI] public static IConfig StopOnFirstError(this IConfig config, bool value = true) => config.With(m => m.StopOnFirstError = value);
 
         public static ImmutableConfig CreateImmutableConfig(this IConfig config) => ImmutableConfigBuilder.Create(config);
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
@@ -15,7 +16,7 @@ namespace BenchmarkDotNet.Running
             Resolver = resolver;
             RepresentativeBenchmarkCase = benchmarks[0].BenchmarkCase;
             Benchmarks = benchmarks;
-            ProgramName = benchmarks[0].Config.KeepBenchmarkFiles ? RepresentativeBenchmarkCase.Job.FolderInfo : Guid.NewGuid().ToString();
+            ProgramName = benchmarks[0].Config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles) ? RepresentativeBenchmarkCase.Job.FolderInfo : Guid.NewGuid().ToString();
         }
 
         public BenchmarkBuildInfo[] Benchmarks { get; }

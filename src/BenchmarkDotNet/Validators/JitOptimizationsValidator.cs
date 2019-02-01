@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Validators
                             $"Assembly {group.Key.GetName().Name} which defines benchmarks references non-optimized {referencedAssemblyName.Name}"
                             + (TreatsWarningsAsErrors
                                 ? $"{Environment.NewLine}\tIf you own this dependency, please, build it in RELEASE." +
-                                  $"{Environment.NewLine}\tIf you don't, you can create custom config with {nameof(DontFailOnError)} to disable our custom policy and allow this benchmark to run."
+                                  $"{Environment.NewLine}\tIf you don't, you can create custom config with {nameof(JitOptimizationsValidator)}.{nameof(DontFailOnError)} to disable our custom policy and allow this benchmark to run."
                                 : string.Empty));
                     }
                 }
