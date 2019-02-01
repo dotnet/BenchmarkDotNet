@@ -2,9 +2,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using JetBrains.Annotations;
-#if !NETCOREAPP2_1
 using BenchmarkDotNet.Extensions;
-#endif
 
 namespace BenchmarkDotNet.Environments
 {

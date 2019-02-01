@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Engines
 {
     public class EngineParameters
     {
-        public static readonly IResolver DefaultResolver = new CompositeResolver(BenchmarkRunner.DefaultResolver, EngineResolver.Instance);
+        public static readonly IResolver DefaultResolver = new CompositeResolver(BenchmarkRunnerClean.DefaultResolver, EngineResolver.Instance);
         
         public IHost Host { get; set; }
         public Action<long> WorkloadActionNoUnroll { get; set; }

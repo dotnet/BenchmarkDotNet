@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 { "fullxml", new[] { XmlExporter.Full } }
             };
 
-        public static (bool isSuccess, ReadOnlyConfig config, CommandLineOptions options) Parse(string[] args, ILogger logger, IConfig globalConfig = null)
+        public static (bool isSuccess, IConfig config, CommandLineOptions options) Parse(string[] args, ILogger logger, IConfig globalConfig = null)
         {
             OptionHandler optionHandler = new OptionHandler();
             if (CommandLineParser.Parser(optionHandler, args, logger) != 0)
@@ -94,13 +94,11 @@ namespace BenchmarkDotNet.ConsoleArguments
             {
                 return (true, result.config, optionHandler.Options);
             }
-            else
-            {
-                return (false, default, default);
-            }
+
+            return (false, default, default);
         }
 
-        public static (bool isSuccess, ReadOnlyConfig config) Parse(CommandLineOptions options, ILogger logger, IConfig globalConfig = null)
+        public static (bool isSuccess, IConfig config) Parse(CommandLineOptions options, ILogger logger, IConfig globalConfig = null)
         {
             return Validate(options, logger) ? (true, CreateConfig(options, globalConfig)) : (false, default);
         }
@@ -180,7 +178,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             return true;
         }
 
-        private static ReadOnlyConfig CreateConfig(CommandLineOptions options, IConfig globalConfig)
+        private static IConfig CreateConfig(CommandLineOptions options, IConfig globalConfig)
         {
             var config = new ManualConfig();
 
@@ -219,12 +217,11 @@ namespace BenchmarkDotNet.ConsoleArguments
             else
                 config.Add(filters);
 
-            config.SummaryPerType = !options.Join;
+            config.Options = config.Options.Set(options.Join, ConfigOptions.JoinSummary);
+            config.Options = config.Options.Set(options.KeepBenchmarkFiles, ConfigOptions.KeepBenchmarkFiles);
+            config.Options = config.Options.Set(options.StopOnFirstError, ConfigOptions.StopOnFirstError);
 
-            config.KeepBenchmarkFiles = options.KeepBenchmarkFiles;
-            config.StopOnFirstError = options.StopOnFirstError;
-
-            return config.AsReadOnly();
+            return config;
         }
 
         private static Job GetBaseJob(CommandLineOptions options, IConfig globalConfig)

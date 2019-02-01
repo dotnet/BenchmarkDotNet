@@ -16,7 +16,8 @@ namespace BenchmarkDotNet.Tests.Validators
         public void BenchmarkedMethodNameMustNotContainWhitespaces()
         {
             Delegate method = BuildDummyMethod<int>("Has Some Whitespaces");
-
+            
+            var config = new ManualConfig().CreateImmutableConfig();
             var parameters = new ValidationParameters(
                 new[]
                 {
@@ -25,10 +26,12 @@ namespace BenchmarkDotNet.Tests.Validators
                             typeof(CompilationValidatorTests),
                             method.Method),
                         Job.Dry,
-                        null)
-                }, new ManualConfig());
+                        null,
+                        config
+                        )
+                }, config);
 
-            var errors = CompilationValidator.Default.Validate(parameters).Select(e => e.Message);
+            var errors = CompilationValidator.FailOnError.Validate(parameters).Select(e => e.Message);
 
             Assert.Contains(errors,
                 s => s.Equals(
@@ -40,6 +43,7 @@ namespace BenchmarkDotNet.Tests.Validators
         {
             Delegate method = BuildDummyMethod<int>("typeof");
 
+            var config = ManualConfig.CreateEmpty().CreateImmutableConfig();
             var parameters = new ValidationParameters(
                 new[]
                 {
@@ -48,10 +52,11 @@ namespace BenchmarkDotNet.Tests.Validators
                             typeof(CompilationValidatorTests),
                             method.Method),
                         Job.Dry,
-                        null)
-                }, new ManualConfig());
+                        null,
+                        config)
+                }, config);
 
-            var errors = CompilationValidator.Default.Validate(parameters).Select(e => e.Message);
+            var errors = CompilationValidator.FailOnError.Validate(parameters).Select(e => e.Message);
 
             Assert.Contains(errors,
                 s => s.Equals(
@@ -63,7 +68,7 @@ namespace BenchmarkDotNet.Tests.Validators
         [InlineData(typeof(BenchmarkClass<PublicClass>), false)]
         public void Benchmark_Class_Methods_Must_Be_Non_Static(Type type, bool hasErrors)
         {
-            var validationErrors = CompilationValidator.Default.Validate(BenchmarkConverter.TypeToBenchmarks(type));
+            var validationErrors = CompilationValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(type));
             
             Assert.Equal(hasErrors, validationErrors.Any());
         }
@@ -85,7 +90,7 @@ namespace BenchmarkDotNet.Tests.Validators
             var constructed = typeof(BenchmarkClass<>).MakeGenericType(type);
             
             // Act
-            var validationErrors = CompilationValidator.Default.Validate(BenchmarkConverter.TypeToBenchmarks(constructed))
+            var validationErrors = CompilationValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(constructed))
                                                                .ToList();
             
             // Assert

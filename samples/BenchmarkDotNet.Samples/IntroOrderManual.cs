@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using BenchmarkDotNet.Attributes;
@@ -16,27 +17,24 @@ namespace BenchmarkDotNet.Samples
     {
         private class Config : ManualConfig
         {
-            public Config()
-            {
-                Set(new FastestToSlowestOrderer());
-            }
+            public Config() => Orderer = new FastestToSlowestOrderer();
 
             private class FastestToSlowestOrderer : IOrderer
             {
-                public IEnumerable<BenchmarkCase> GetExecutionOrder(BenchmarkCase[] benchmarksCase) =>
+                public IEnumerable<BenchmarkCase> GetExecutionOrder(ImmutableArray<BenchmarkCase> benchmarksCase) =>
                     from benchmark in benchmarksCase
                     orderby benchmark.Parameters["X"] descending,
                         benchmark.Descriptor.WorkloadMethodDisplayInfo
                     select benchmark;
 
-                public IEnumerable<BenchmarkCase> GetSummaryOrder(BenchmarkCase[] benchmarksCase, Summary summary) =>
+                public IEnumerable<BenchmarkCase> GetSummaryOrder(ImmutableArray<BenchmarkCase> benchmarksCase, Summary summary) =>
                     from benchmark in benchmarksCase
                     orderby summary[benchmark].ResultStatistics.Mean
                     select benchmark;
 
                 public string GetHighlightGroupKey(BenchmarkCase benchmarkCase) => null;
 
-                public string GetLogicalGroupKey(IConfig config, BenchmarkCase[] allBenchmarksCases, BenchmarkCase benchmarkCase) =>
+                public string GetLogicalGroupKey(ImmutableArray<BenchmarkCase> allBenchmarksCases, BenchmarkCase benchmarkCase) =>
                     benchmarkCase.Job.DisplayInfo + "_" + benchmarkCase.Parameters.DisplayInfo;
 
                 public IEnumerable<IGrouping<string, BenchmarkCase>> GetLogicalGroupOrder(IEnumerable<IGrouping<string, BenchmarkCase>> logicalGroups) => 

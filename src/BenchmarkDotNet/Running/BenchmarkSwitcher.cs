@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Reports;
@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Running
         [PublicAPI] public BenchmarkSwitcher(Assembly assembly) => assemblies.Add(assembly);
 
         [PublicAPI] public BenchmarkSwitcher(Assembly[] assemblies) => this.assemblies.AddRange(assemblies);
-        
+
         [PublicAPI] public BenchmarkSwitcher With(Type type) { types.Add(type); return this; }
 
         [PublicAPI] public BenchmarkSwitcher With(Type[] types) { this.types.AddRange(types); return this; }
@@ -53,18 +53,29 @@ namespace BenchmarkDotNet.Running
         /// </summary>
         [PublicAPI] public Summary RunAllJoined() => Run(new[] { "--filter", "*", "--join" }).Single();
 
-
-        [PublicAPI] public IEnumerable<Summary> Run(string[] args = null, IConfig config = null)
+        [PublicAPI]
+        public IEnumerable<Summary> Run(string[] args = null, IConfig config = null)
         {
-            var nonNullConfig = config ?? DefaultConfig.Instance;
-            // if user did not provide any loggers, we use the ConsoleLogger to somehow show the errors to the user
-            var nonNullLogger = nonNullConfig.GetLoggers().Any() ? nonNullConfig.GetCompositeLogger() : ConsoleLogger.Default;
+            args = args ?? Array.Empty<string>();
+            config = config ?? DefaultConfig.Instance;
+
+            // VS generates bad assembly binding redirects for ValueTuple for Full .NET Framework 
+            // we need to keep the logic that uses it in a separate method and create DirtyAssemblyResolveHelper first
+            // so it can ignore the version mismatch ;)
+            using (DirtyAssemblyResolveHelper.Create())
+                return RunWithDirtyAssemblyResolveHelper(args, config);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private IEnumerable<Summary> RunWithDirtyAssemblyResolveHelper(string[] args, IConfig config)
+        {
+            var logger = config.GetNonNullCompositeLogger();
 
             OptionHandler optionHandler = new OptionHandler();
             var result = CommandLineParser.Parser(
                 optionHandler, 
-                args, 
-                nonNullLogger,
+                args,
+                logger,
                 $"{BenchmarkDotNetInfo.FullTitle} - Powerful .NET library for benchmarking.");
 
             if (result != 0 || optionHandler.Options == null)
@@ -72,7 +83,7 @@ namespace BenchmarkDotNet.Running
                 return Array.Empty<Summary>();
             }
 
-            return Run(optionHandler.Options, nonNullConfig, nonNullLogger);
+            return Run(optionHandler.Options, config, logger);
         }
 
         internal IEnumerable<Summary> Run(CommandLineOptions options, IConfig config, ILogger logger)
@@ -89,10 +100,10 @@ namespace BenchmarkDotNet.Running
 
             var effectiveConfig = ManualConfig.Union(config, parsedConfig);
 
-            (var allTypesValid, var allAvailableTypesWithRunnableBenchmarks) = TypeFilter.GetTypesWithRunnableBenchmarks(types, assemblies, logger);
+            var (allTypesValid, allAvailableTypesWithRunnableBenchmarks) = TypeFilter.GetTypesWithRunnableBenchmarks(types, assemblies, logger);
             if (!allTypesValid) // there were some invalid and TypeFilter printed errors
                 return Array.Empty<Summary>();
-            
+
             if (allAvailableTypesWithRunnableBenchmarks.IsEmpty())
             {
                 userInteraction.PrintNoBenchmarksError(logger);
@@ -104,9 +115,9 @@ namespace BenchmarkDotNet.Running
                 PrintList(logger, effectiveConfig, allAvailableTypesWithRunnableBenchmarks, options);
                 return Array.Empty<Summary>();
             }
-            
+
             var benchmarksToFilter = options.UserProvidedFilters
-                ? allAvailableTypesWithRunnableBenchmarks 
+                ? allAvailableTypesWithRunnableBenchmarks
                 : userInteraction.AskUser(allAvailableTypesWithRunnableBenchmarks, logger);
 
             var filteredBenchmarks = TypeFilter.Filter(effectiveConfig, benchmarksToFilter);
@@ -117,20 +128,13 @@ namespace BenchmarkDotNet.Running
                 return Array.Empty<Summary>();
             }
 
-            var globalChronometer = Chronometer.Start();
-            var summaries = new List<Summary>();
-
-            summaries.AddRange(BenchmarkRunner.Run(filteredBenchmarks, effectiveConfig));
-
-            int totalNumberOfExecutedBenchmarks = summaries.Sum(summary => summary.GetNumberOfExecutedBenchmarks());
-            BenchmarkRunner.LogTotalTime(logger, globalChronometer.GetElapsed().GetTimeSpan(), totalNumberOfExecutedBenchmarks, "Global total time");
-            return summaries;
+            return BenchmarkRunner.Run(filteredBenchmarks);
         }
 
         private static void PrintList(ILogger nonNullLogger, IConfig effectiveConfig, IReadOnlyList<Type> allAvailableTypesWithRunnableBenchmarks, CommandLineOptions options)
         {
             var printer = new BenchmarkCasesPrinter(options.ListBenchmarkCaseMode);
-            
+
             var testNames = TypeFilter.Filter(effectiveConfig, allAvailableTypesWithRunnableBenchmarks)
                 .SelectMany(p => p.BenchmarksCases)
                 .Select(p => p.Descriptor.GetFilterName())

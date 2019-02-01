@@ -10,7 +10,7 @@
     <PackAsTool>true</PackAsTool>
     <Description>A dotnet tool to execute BenchmarkDotNet benchmarks.</Description>
     <PackageTags>benchmark;benchmarking;performance;tool</PackageTags>
-    
+    <NoWarn>$(NoWarn);1701;1702;1705;1591;3005;NU1702</NoWarn>
     
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>

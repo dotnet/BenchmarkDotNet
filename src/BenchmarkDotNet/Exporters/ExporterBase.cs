@@ -5,7 +5,6 @@ using System.Linq;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
-using StreamWriter = BenchmarkDotNet.Portability.StreamWriter;
 
 namespace BenchmarkDotNet.Exporters
 {
@@ -38,7 +37,7 @@ namespace BenchmarkDotNet.Exporters
                 }
             }
 
-            using (var stream = StreamWriter.FromPath(filePath))
+            using (var stream = new StreamWriter(filePath, append: false))
             {
                 ExportToLog(summary, new StreamLogger(stream));
             }

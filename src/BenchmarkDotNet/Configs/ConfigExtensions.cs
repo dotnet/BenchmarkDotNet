@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Analysers;
@@ -11,27 +11,13 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
-using RunMode = BenchmarkDotNet.Diagnosers.RunMode;
 
 namespace BenchmarkDotNet.Configs
 {
     public static class ConfigExtensions
     {
-        public static ILogger GetCompositeLogger(this IConfig config) => new CompositeLogger(config.GetLoggers().ToArray());
-        public static IExporter GetCompositeExporter(this IConfig config) => new CompositeExporter(config.GetExporters().ToArray());
-        public static IDiagnoser GetCompositeDiagnoser(this IConfig config) => new CompositeDiagnoser(config.GetDiagnosers().ToArray());
-
-        public static IDiagnoser GetCompositeDiagnoser(this IConfig config, BenchmarkCase benchmarkCase, RunMode runMode)
-            => config.GetDiagnosers().Any(d => d.GetRunMode(benchmarkCase) == runMode)
-                ? new CompositeDiagnoser(config.GetDiagnosers().Where(d => d.GetRunMode(benchmarkCase) == runMode).ToArray())
-                : null;
-
-        public static IAnalyser GetCompositeAnalyser(this IConfig config) => new CompositeAnalyser(config.GetAnalysers().ToArray());
-        public static IValidator GetCompositeValidator(this IConfig config) => new CompositeValidator(config.GetValidators().ToArray());
-
         [PublicAPI] public static IConfig With(this IConfig config, params IColumn[] columns) => config.With(m => m.Add(columns));
         [PublicAPI] public static IConfig With(this IConfig config, params IColumnProvider[] columnProviders) => config.With(m => m.Add(columnProviders));
         [PublicAPI] public static IConfig With(this IConfig config, params ILogger[] loggers) => config.With(m => m.Add(loggers));
@@ -40,58 +26,36 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static IConfig With(this IConfig config, params IAnalyser[] analysers) => config.With(m => m.Add(analysers));
         [PublicAPI] public static IConfig With(this IConfig config, params IValidator[] validators) => config.With(m => m.Add(validators));
         [PublicAPI] public static IConfig With(this IConfig config, params Job[] jobs) => config.With(m => m.Add(jobs));
-        [PublicAPI] public static IConfig With(this IConfig config, IOrderer provider) => config.With(m => m.Set(provider));
+        [PublicAPI] public static IConfig With(this IConfig config, IOrderer provider) => config.With(m => m.Orderer = provider);
         [PublicAPI] public static IConfig With(this IConfig config, params HardwareCounter[] counters) => config.With(c => c.Add(counters));
         [PublicAPI] public static IConfig With(this IConfig config, params IFilter[] filters) => config.With(c => c.Add(filters));
-        [PublicAPI] public static IConfig With(this IConfig config, Encoding encoding) => config.With(c => c.Set(encoding));
-        [PublicAPI] public static IConfig With(this IConfig config, ISummaryStyle summaryStyle) => config.With(c => c.Set(summaryStyle));
+        [PublicAPI] public static IConfig With(this IConfig config, Encoding encoding) => config.With(c => c.Encoding = encoding);
+        [PublicAPI] public static IConfig With(this IConfig config, SummaryStyle summaryStyle) => config.With(c => c.SummaryStyle = summaryStyle);
 
         /// <summary>
         /// determines if all auto-generated files should be kept or removed after running the benchmarks
         /// </summary>
-        [PublicAPI] public static IConfig KeepBenchmarkFiles(this IConfig config, bool value = true) => config.With(m => m.KeepBenchmarkFiles = value);
-        [PublicAPI] public static IConfig RemoveBenchmarkFiles(this IConfig config) => config.KeepBenchmarkFiles(false);
-        [PublicAPI] public static IConfig WithArtifactsPath(this IConfig config, string artifactsPath) => config.With(m => m.ArtifactsPath = artifactsPath);
-        [PublicAPI] public static IConfig With(this IConfig config, params BenchmarkLogicalGroupRule[] rules) => config.With(c => c.Add(rules));
-        [PublicAPI] public static IConfig StopOnFirstError(this IConfig config, bool value = true) => config.With(m => m.StopOnFirstError = value);
-
-        public static ReadOnlyConfig AsReadOnly(this IConfig config) =>
-            config is ReadOnlyConfig readOnly
-                ? readOnly
-                : new ReadOnlyConfig(config);
-
-        public static bool HasMemoryDiagnoser(this IConfig config) => config.GetDiagnosers().Any(diagnoser => diagnoser is MemoryDiagnoser);
-
+        [PublicAPI] public static IConfig KeepBenchmarkFiles(this IConfig config, bool value = true) => config.With(m => m.Options = m.Options.Set(value, ConfigOptions.KeepBenchmarkFiles));
         /// <summary>
-        /// returns a set of unique jobs that are ready to run
+        /// determines if benchmarking should be stopped after the first error (by default it's not)
         /// </summary>
-        public static IReadOnlyList<Job> GetRunnableJobs(this IConfig config)
+        [PublicAPI] public static IConfig StopOnFirstError(this IConfig config, bool value = true) => config.With(m => m.Options = m.Options.Set(value, ConfigOptions.StopOnFirstError));
+        [PublicAPI] public static IConfig WithArtifactsPath(this IConfig config, string artifactsPath) => config.With(m => m.ArtifactsPath = artifactsPath);
+        /// <summary>
+        /// sets given options for the config
+        /// </summary>
+        [PublicAPI] public static IConfig With(this IConfig config, ConfigOptions options) => config.With(m => m.Options = options);
+        [PublicAPI] public static IConfig With(this IConfig config, params BenchmarkLogicalGroupRule[] rules) => config.With(c => c.Add(rules));
+
+        public static ImmutableConfig CreateImmutableConfig(this IConfig config) => ImmutableConfigBuilder.Create(config);
+
+        internal static ILogger GetNonNullCompositeLogger(this IConfig config)
         {
-            var unique = config.GetJobs().Distinct().ToArray();
-            var result = new List<Job>();
+            // if user did not provide any loggers, we use the ConsoleLogger to somehow show the errors to the user
+            if (config == null || !config.GetLoggers().Any())
+                return new CompositeLogger(ImmutableHashSet.Create(ConsoleLogger.Default));
 
-            foreach (var standardJob in unique.Where(job => !job.Meta.IsMutator && !job.Meta.IsDefault))
-                result.Add(standardJob);
-
-            var customDefaultJob = unique.SingleOrDefault(job => job.Meta.IsDefault);
-            var defaultJob = customDefaultJob ?? Job.Default;
-            
-            if (!result.Any())
-                result.Add(defaultJob);
-
-            foreach (var mutatorJob in unique.Where(job => job.Meta.IsMutator))
-            {
-                for (int i = 0; i < result.Count; i++)
-                {
-                    var copy = result[i].UnfreezeCopy();
-
-                    copy.Apply(mutatorJob);
-
-                    result[i] = copy.Freeze();
-                }
-            }
-
-            return result;
+            return new CompositeLogger(config.GetLoggers().ToImmutableHashSet());
         }
 
         private static IConfig With(this IConfig config, Action<ManualConfig> addAction)

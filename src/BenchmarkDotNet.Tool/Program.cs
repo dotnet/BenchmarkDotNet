@@ -2,7 +2,6 @@
 using System;
 using System.CommandLine;
 using System.IO;
-using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Loggers;
@@ -10,23 +9,19 @@ using BenchmarkDotNet.Properties;
 
 namespace BenchmarkDotNet.Tool
 {
-
     public sealed class Program
     {
-
         public static int Main(string[] args)
         {
-            File.AppendAllText("c:\\abc.txt", "Main");
-            var nonNullConfig = DefaultConfig.Instance;
+            var config = DefaultConfig.Instance;
 
-            // if user did not provide any loggers, we use the ConsoleLogger to somehow show the errors to the user
-            var nonNullLogger = nonNullConfig.GetLoggers().Any() ? nonNullConfig.GetCompositeLogger() : ConsoleLogger.Default;
+            var logger = config.GetNonNullCompositeLogger();
 
             OptionHandler optionHandler = new OptionHandler();
             var result = CommandLineParser.Parser(
                 optionHandler,
                 args,
-                nonNullLogger,
+                logger,
                 $"A dotnet tool to execute benchmarks built with {BenchmarkDotNetInfo.FullTitle}.",
                 new Argument<FileInfo>()
                 {
@@ -40,7 +35,7 @@ namespace BenchmarkDotNet.Tool
                 return result;
             }
 
-            return Run(optionHandler.AssemblyFile, optionHandler.Options, nonNullConfig, nonNullLogger);
+            return Run(optionHandler.AssemblyFile, optionHandler.Options, config, logger);
         }
 
         public static int Run(FileInfo assemblyFile, CommandLineOptions optionHandlerOptions, IConfig config, ILogger logger)
@@ -49,7 +44,6 @@ namespace BenchmarkDotNet.Tool
             {
                 return -1;
             }
-            File.AppendAllText("c:\\abc.txt", "Run");
 
             try
             {

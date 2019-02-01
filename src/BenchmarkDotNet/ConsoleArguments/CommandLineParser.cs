@@ -1,9 +1,7 @@
-﻿using System.CodeDom;
-using System.CommandLine;
+﻿using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Invocation;
 using System.IO;
-using System.Threading.Tasks;
 using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
@@ -32,8 +30,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                 .Build();
 
             return parser.InvokeAsync(args, new CommandLineConsole(logger)).Result;
-
-            
         }
 
         internal static RootCommand Root(OptionHandler optionHandler, string description, Argument argument = null)

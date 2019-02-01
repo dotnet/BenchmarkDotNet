@@ -15,6 +15,7 @@ using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Mathematics.StatisticalTesting;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
+using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CoreRun;
@@ -97,7 +98,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(1, easyJob.Run.InvocationCount);
         }
 
-        [Fact]
+        [FactDotNetCoreOnly("When CommandLineParser wants to display help, it tries to get the Title of the Entry Assembly which is an xunit runner, which has no Title and fails..")]
         public void UnknownConfigMeansFailure()
         {
             Assert.False(ConfigParser.Parse(new[] { "--unknown" }, new OutputLogger(Output)).isSuccess);

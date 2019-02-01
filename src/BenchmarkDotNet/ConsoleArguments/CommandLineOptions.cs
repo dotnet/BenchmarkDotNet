@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -96,8 +97,8 @@ namespace BenchmarkDotNet.ConsoleArguments
         public bool StopOnFirstError { get; set; }
 
         public string StatisticalTestThreshold { get; set; }
-
-        internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any(); 
+        
+        internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
 
 //        [Usage(ApplicationAlias = "")]
 //        [PublicAPI]
