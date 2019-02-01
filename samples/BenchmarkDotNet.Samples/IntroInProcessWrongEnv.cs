@@ -1,10 +1,10 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.InProcess;
 
 namespace BenchmarkDotNet.Samples
@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                var wrongPlatform = RuntimeInformation.Is64BitPlatform()
+                var wrongPlatform = Environment.Is64BitProcess
                     ? Platform.X64
                     : Platform.X86;
 
