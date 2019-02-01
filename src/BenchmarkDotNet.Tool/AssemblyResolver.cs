@@ -22,11 +22,11 @@ namespace BenchmarkDotNet.Tool
             this.dependencyContext = DependencyContext.Load(this.Assembly);
 
             this.assemblyResolver = new CompositeCompilationAssemblyResolver
-                                    (new ICompilationAssemblyResolver[]
+            (new ICompilationAssemblyResolver[]
             {
-            new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(path)),
-            new ReferenceAssemblyPathResolver(),
-            new PackageCompilationAssemblyResolver()
+                new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(path)),
+                new ReferenceAssemblyPathResolver(),
+                new PackageCompilationAssemblyResolver()
             });
 
             this.loadContext = AssemblyLoadContext.GetLoadContext(this.Assembly);
