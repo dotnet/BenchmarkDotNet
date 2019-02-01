@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -148,7 +148,6 @@ namespace BenchmarkDotNet.ConsoleArguments
         
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
 
-        [CLSCompliant(false)]
         [Usage(ApplicationAlias = "")]
         [PublicAPI]
         public static IEnumerable<Example> Examples
