@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <IsPackable>true</IsPackable>
     <PackAsTool>true</PackAsTool>
-    <ToolCommandName>dotnet-BenchmarkDotNet</ToolCommandName>
+    <ToolCommandName>dotnet-benchmark</ToolCommandName>
     <Description>A dotnet tool to execute BenchmarkDotNet benchmarks.</Description>
     <PackageTags>benchmark;benchmarking;performance;tool</PackageTags>
     <PackageId>BenchmarkDotNetTool</PackageId>
@@ -13,6 +13,8 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
+    <ProjectReference Include="..\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.3.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.1.0" />
   </ItemGroup>
 </Project>
