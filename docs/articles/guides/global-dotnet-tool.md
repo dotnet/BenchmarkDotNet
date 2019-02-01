@@ -12,13 +12,19 @@ BenchmarkDotNet is also available as a global dotnet tool and provides a conveni
 Download and install the [.NET Core 2.1 SDK](https://www.microsoft.com/net/download) or newer. Once installed, run the following command:
 
 ```log
-dotnet tool install BenchmarkDotNet.Tool -g
+dotnet tool install -g BenchmarkDotNet.Tool
 ```
 
 If you already have a previous version of installed, you can upgrade to the latest version using the following command:
 
 ```log
-dotnet tool update BenchmarkDotNet.Tool -g
+dotnet tool update -g BenchmarkDotNet.Tool
+```
+
+If you want to remove the tool:
+
+```log
+dotnet tool uninstall -g BenchmarkDotNet.Tool
 ```
 
 ## Usage
@@ -26,7 +32,7 @@ dotnet tool update BenchmarkDotNet.Tool -g
 The basic usage syntax is:
 
 ```log
-dotnet benchmarkdotnet [arguments] [options]
+dotnet benchmark [arguments] [options]
 ```
 
 ### Arguments
@@ -42,7 +48,7 @@ dotnet benchmarkdotnet [arguments] [options]
 |-?, -h or --help|Show help information|
 
 ```log
-dotnet benchmarkdotnet -?
+dotnet benchmark -?
 ```
 
 **Note**: This shows also all valid arguments for `BenchmarkSwitcher`.
@@ -52,13 +58,13 @@ dotnet benchmarkdotnet -?
 The following example scans the `MyAssemblyWithBenchmarks.dll` for benchmarks and lets you select which benchmark(s) to execute: 
 
 ```log
-dotnet benchmarkdotnet MyAssemblyWithBenchmarks.dll
+dotnet benchmark MyAssemblyWithBenchmarks.dll
 ```
 
 To execute all benchmarks use `--filter *`:
 
 ```log
-dotnet benchmarkdotnet MyAssemblyWithBenchmarks.dll --filter *
+dotnet benchmark MyAssemblyWithBenchmarks.dll --filter *
 ```
 
 **Note**: For further arguments for the `BenchmarkSwticher` see also [Console Arguments](console-args.md).

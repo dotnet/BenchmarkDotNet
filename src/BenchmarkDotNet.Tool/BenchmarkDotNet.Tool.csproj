@@ -8,7 +8,7 @@
     <ToolCommandName>dotnet-benchmark</ToolCommandName>
     <Description>A dotnet tool to execute BenchmarkDotNet benchmarks.</Description>
     <PackageTags>benchmark;benchmarking;performance;tool</PackageTags>
-    <PackageId>BenchmarkDotNetTool</PackageId>
+    <PackageId>BenchmarkDotNet.Tool</PackageId>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
   <ItemGroup>

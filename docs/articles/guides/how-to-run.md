@@ -11,12 +11,14 @@ var summary = BenchmarkRunner.Run(typeof(MyBenchmarkClass));
 
 ## Global dotnet tool
 
+You can also run a banchmark using `BenchmarkDotNet.Tool`.
+
 ```log
-dotnet tool install BenchmarkDotNet.Tool -g
+dotnet tool install -g BenchmarkDotNet.Tool
 ```
 
 ```log
-dotnet benchmarkdotnet MyAssemblyWithBenchmarks.dll --filter *
+dotnet benchmark MyAssemblyWithBenchmarks.dll --filter *
 ```
 
 ## Url

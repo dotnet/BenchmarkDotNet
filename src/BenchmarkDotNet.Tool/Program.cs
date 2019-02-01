@@ -11,7 +11,7 @@ using System.Text;
 namespace BenchmarkDotNet.Tool
 {
     [Command(
-        Name = "BenchmarkDotNet",
+        Name = "benchmark",
         Description = "A dotnet tool to execute benchmarks built with BenchmarkDotNet.")]
     [HelpOption()]
     [VersionOptionFromMember(MemberName = nameof(GetVersion))]
