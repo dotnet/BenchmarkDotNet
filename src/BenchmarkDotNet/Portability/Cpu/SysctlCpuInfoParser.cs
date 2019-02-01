@@ -2,9 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
-#if !NETCOREAPP2_1
 using BenchmarkDotNet.Extensions;
-#endif
 
 namespace BenchmarkDotNet.Portability.Cpu
 {

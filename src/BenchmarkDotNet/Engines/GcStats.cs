@@ -1,7 +1,5 @@
 ﻿using System;
-#if NETSTANDARD2_0
 using System.Reflection;
-#endif
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
@@ -14,9 +12,7 @@ namespace BenchmarkDotNet.Engines
 
         public static readonly long AllocationQuantum = CalculateAllocationQuantumSize();
 
-#if NETSTANDARD2_0
         private static readonly Func<long> GetAllocatedBytesForCurrentThreadDelegate = GetAllocatedBytesForCurrentThread();
-#endif
 
         public static readonly GcStats Empty = new GcStats(0, 0, 0, 0, 0);
 
@@ -144,34 +140,21 @@ namespace BenchmarkDotNet.Engines
             // so we enforce GC.Collect here just to make sure we get accurate results
             GC.Collect();
 
-#if CLASSIC
-            return AppDomain.CurrentDomain.MonitoringTotalAllocatedMemorySize;
-#elif NETSTANDARD2_0
             if (RuntimeInformation.IsFullFramework) // it can be a .NET app consuming our .NET Standard package
                 return AppDomain.CurrentDomain.MonitoringTotalAllocatedMemorySize;
 
             // https://apisof.net/catalog/System.GC.GetAllocatedBytesForCurrentThread() is not part of the .NET Standard, so we use reflection to call it..
             return GetAllocatedBytesForCurrentThreadDelegate.Invoke();
-#elif NETCOREAPP2_1
-            // but CoreRT does not support the reflection yet, so only because of that we have to target .NET Core 2.1
-            // to be able to call this method without reflection and get MemoryDiagnoser support for CoreRT ;)
-            return GC.GetAllocatedBytesForCurrentThread();
-#endif
         }
 
-#if NETSTANDARD2_0
         private static Func<long> GetAllocatedBytesForCurrentThread()
         {
-            // for some versions of .NET Core this method is internal, 
-            // for some public and for others public and exposed ;)
-            var method = typeof(GC).GetTypeInfo().GetMethod("GetAllocatedBytesForCurrentThread",
-                            BindingFlags.Public | BindingFlags.Static)
-                      ?? typeof(GC).GetTypeInfo().GetMethod("GetAllocatedBytesForCurrentThread",
-                            BindingFlags.NonPublic | BindingFlags.Static);
+            // this method is not a part of .NET Standard so we need to use reflection
+            var method = typeof(GC).GetTypeInfo().GetMethod("GetAllocatedBytesForCurrentThread", BindingFlags.Public | BindingFlags.Static);
 
-            return () => (long)method.Invoke(null, null);
+            // we create delegate to avoid boxing, IMPORTANT!
+            return method != null ? (Func<long>)method.CreateDelegate(typeof(Func<long>)) : null;
         }
-#endif
   
         public string ToOutputLine() 
             => $"{ResultsLinePrefix} {Gen0Collections} {Gen1Collections} {Gen2Collections} {AllocatedBytes} {TotalOperations}";

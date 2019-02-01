@@ -19,12 +19,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         
         public static readonly Lazy<NetCoreAppSettings> Current = new Lazy<NetCoreAppSettings>(GetCurrentVersion);
 
-        private static NetCoreAppSettings Default => 
-#if NETCOREAPP2_1
-            NetCoreApp21;
-#else    
-            NetCoreApp20;
-#endif
+        private static NetCoreAppSettings Default => NetCoreApp20;
 
         /// <summary>
         /// <param name="targetFrameworkMoniker">

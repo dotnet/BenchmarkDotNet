@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Analysers;
@@ -11,10 +11,8 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
-using RunMode = BenchmarkDotNet.Diagnosers.RunMode;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -44,6 +42,15 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static IConfig StopOnFirstError(this IConfig config, bool value = true) => config.With(m => m.StopOnFirstError = value);
 
         public static ImmutableConfig CreateImmutableConfig(this IConfig config) => ImmutableConfigBuilder.Create(config);
+
+        internal static ILogger GetNonNullCompositeLogger(this IConfig config)
+        {
+            // if user did not provide any loggers, we use the ConsoleLogger to somehow show the errors to the user
+            if (config == null || !config.GetLoggers().Any())
+                return new CompositeLogger(ImmutableHashSet.Create(ConsoleLogger.Default));
+
+            return new CompositeLogger(config.GetLoggers().ToImmutableHashSet());
+        }
 
         private static IConfig With(this IConfig config, Action<ManualConfig> addAction)
         {

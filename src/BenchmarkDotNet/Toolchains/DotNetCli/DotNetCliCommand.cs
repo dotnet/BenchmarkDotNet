@@ -48,17 +48,20 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public BuildResult RestoreThenBuild()
         {
             var packagesResult = AddPackages();
-
             if (!packagesResult.IsSuccess)
                 return BuildResult.Failure(GenerateResult, packagesResult.AllInformation);
 
-            var restoreResult = Restore();
+            // there is no way to do tell dotnet restore which configuration to use (https://github.com/NuGet/Home/issues/5119)
+            // so when users go with custom build configuration, we must perform full build
+            // which will internally restore for the right configuration
+            if (BuildPartition.IsCustomBuildConfiguration)
+                return Build().ToBuildResult(GenerateResult);
 
+            var restoreResult = Restore();
             if (!restoreResult.IsSuccess)
                 return BuildResult.Failure(GenerateResult, restoreResult.AllInformation);
 
             var buildResult = BuildNoRestore();
-
             if (!buildResult.IsSuccess) // if we fail to do the full build, we try with --no-dependencies
                 buildResult = BuildNoRestoreNoDependencies();
 
@@ -69,26 +72,27 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public BuildResult RestoreThenBuildThenPublish()
         {
             var packagesResult = AddPackages();
-
             if (!packagesResult.IsSuccess)
                 return BuildResult.Failure(GenerateResult, packagesResult.AllInformation);
 
-            var restoreResult = Restore();
+            // there is no way to do tell dotnet restore which configuration to use (https://github.com/NuGet/Home/issues/5119)
+            // so when users go with custom build configuration, we must perform full publish
+            // which will internally restore and build for the right configuration
+            if (BuildPartition.IsCustomBuildConfiguration)
+                return Publish().ToBuildResult(GenerateResult);
 
+            var restoreResult = Restore();
             if (!restoreResult.IsSuccess)
                 return BuildResult.Failure(GenerateResult, restoreResult.AllInformation);
 
             var buildResult = BuildNoRestore();
-
             if (!buildResult.IsSuccess) // if we fail to do the full build, we try with --no-dependencies
                 buildResult = BuildNoRestoreNoDependencies();
 
             if (!buildResult.IsSuccess)
                 return BuildResult.Failure(GenerateResult, buildResult.AllInformation);
 
-            var publishResult = PublishNoBuildAndNoRestore();    
-
-            return publishResult.ToBuildResult(GenerateResult);
+            return PublishNoBuildAndNoRestore().ToBuildResult(GenerateResult);
         }
 
         public DotNetCliCommandResult AddPackages()
@@ -108,7 +112,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public DotNetCliCommandResult Restore()
             => DotNetCliCommandExecutor.Execute(WithArguments(
                 GetRestoreCommand(GenerateResult.ArtifactsPaths, BuildPartition, Arguments)));
-        
+
+        public DotNetCliCommandResult Build()
+            => DotNetCliCommandExecutor.Execute(WithArguments(
+                GetBuildCommand(BuildPartition, Arguments)));
+
         public DotNetCliCommandResult BuildNoRestore()
             => DotNetCliCommandExecutor.Execute(WithArguments(
                 GetBuildCommand(BuildPartition, $"{Arguments} --no-restore")));
@@ -116,6 +124,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public DotNetCliCommandResult BuildNoRestoreNoDependencies()
             => DotNetCliCommandExecutor.Execute(WithArguments(
                 GetBuildCommand(BuildPartition, $"{Arguments} --no-restore --no-dependencies")));
+
+        public DotNetCliCommandResult Publish()
+            => DotNetCliCommandExecutor.Execute(WithArguments(
+                GetPublishCommand(BuildPartition, Arguments)));
 
         public DotNetCliCommandResult PublishNoBuildAndNoRestore()
             => DotNetCliCommandExecutor.Execute(WithArguments(

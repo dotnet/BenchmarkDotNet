@@ -2,7 +2,7 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet</AssemblyTitle>
-    <TargetFrameworks>net461;netstandard2.0;netcoreapp2.1</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <NoWarn>$(NoWarn);1701;1702;1705;1591;3005</NoWarn>
     <AssemblyName>BenchmarkDotNet</AssemblyName>
@@ -11,21 +11,6 @@
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\*" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
-    <EmbeddedResource Include="Disassemblers\net461\win7-x86\BenchmarkDotNet.Disassembler.x86.exe" />
-    <EmbeddedResource Include="Disassemblers\net461\win7-x64\BenchmarkDotNet.Disassembler.x64.exe" />
-    <EmbeddedResource Include="Disassemblers\net461\win7-x64\Microsoft.Diagnostics.Runtime.dll" />
-    <EmbeddedResource Include="Disassemblers\net461\win7-x64\Mono.Cecil.Mdb.dll" />
-    <EmbeddedResource Include="Disassemblers\net461\win7-x64\Mono.Cecil.Pdb.dll" />
-    <EmbeddedResource Include="Disassemblers\net461\win7-x64\Mono.Cecil.Rocks.dll" />
-    <EmbeddedResource Include="Disassemblers\net461\win7-x64\Mono.Cecil.dll" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
-    <ProjectReference Include="..\BenchmarkDotNet.Disassembler.x64\BenchmarkDotNet.Disassembler.x64.csproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\BenchmarkDotNet.Disassembler.x86\BenchmarkDotNet.Disassembler.x86.csproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.4.3" />
@@ -42,5 +27,20 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
     <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
     <PackageReference Include="System.Reflection.Metadata" Version="1.6.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+    <ProjectReference Include="..\BenchmarkDotNet.Disassembler.x64\BenchmarkDotNet.Disassembler.x64.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\BenchmarkDotNet.Disassembler.x86\BenchmarkDotNet.Disassembler.x86.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <EmbeddedResource Include="Disassemblers\net461\win7-x86\BenchmarkDotNet.Disassembler.x86.exe" />
+    <EmbeddedResource Include="Disassemblers\net461\win7-x64\BenchmarkDotNet.Disassembler.x64.exe" />
+    <EmbeddedResource Include="Disassemblers\net461\win7-x64\Microsoft.Diagnostics.Runtime.dll" />
+    <EmbeddedResource Include="Disassemblers\net461\win7-x64\Mono.Cecil.Mdb.dll" />
+    <EmbeddedResource Include="Disassemblers\net461\win7-x64\Mono.Cecil.Pdb.dll" />
+    <EmbeddedResource Include="Disassemblers\net461\win7-x64\Mono.Cecil.Rocks.dll" />
+    <EmbeddedResource Include="Disassemblers\net461\win7-x64\Mono.Cecil.dll" />
   </ItemGroup>
 </Project>

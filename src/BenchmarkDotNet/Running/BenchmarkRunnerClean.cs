@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
@@ -17,62 +16,22 @@ using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.InProcess;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
-using JetBrains.Annotations;
 using RunMode = BenchmarkDotNet.Jobs.RunMode;
 
 namespace BenchmarkDotNet.Running
 {
-    public static class BenchmarkRunner
+    internal static class BenchmarkRunnerClean
     {
         private static int benchmarkRunIndex;
 
         internal static readonly IResolver DefaultResolver = new CompositeResolver(EnvironmentResolver.Instance, InfrastructureResolver.Instance);
 
-        [PublicAPI]
-        public static Summary Run<T>(IConfig config = null) => Run(BenchmarkConverter.TypeToBenchmarks(typeof(T), config));
-
-        [PublicAPI]
-        public static Summary Run(Type type, IConfig config = null) => Run(BenchmarkConverter.TypeToBenchmarks(type, config));
-
-        [PublicAPI]
-        public static Summary Run(Type type, MethodInfo[] methods, IConfig config = null) => Run(BenchmarkConverter.MethodsToBenchmarks(type, methods, config));
-
-        [PublicAPI]
-        public static Summary[] Run(Assembly assembly, IConfig config = null) 
-            => Run(assembly.GetRunnableBenchmarks().Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray());
-
-        [PublicAPI]
-        public static Summary RunUrl(string url, IConfig config = null)
-        {
-#if CLASSIC
-            return Run(BenchmarkConverter.UrlToBenchmarks(url, config)).Single();
-#else
-            throw new NotSupportedException();
-#endif
-        }
-
-        [PublicAPI]
-        public static Summary RunSource(string source, IConfig config = null)
-        {
-#if CLASSIC
-            return Run(BenchmarkConverter.SourceToBenchmarks(source, config)).Single();
-#else
-            throw new NotSupportedException();
-#endif
-        }
-
-        [PublicAPI]
-        public static Summary Run(BenchmarkRunInfo benchmarkRunInfo) => Run(new[] { benchmarkRunInfo }).Single();
-
-        [PublicAPI]
-        public static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos)
+        internal static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos)
         {
             var resolver = DefaultResolver;
             var artifactsToCleanup = new List<string>();
@@ -299,33 +258,29 @@ namespace BenchmarkDotNet.Running
 
         private static Dictionary<BuildPartition, BuildResult> BuildInParallel(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, ref StartedClock globalChronometer)
         {
-            using (buildPartitions.Select(partition=> GetAssemblyResolveHelper(partition.RepresentativeBenchmarkCase.Job.GetToolchain(), logger))
-                                  .FirstOrDefault(helper => helper != null))
-            {
-                logger.WriteLineHeader($"// ***** Building {buildPartitions.Length} exe(s) in Parallel: Start   *****");
+            logger.WriteLineHeader($"// ***** Building {buildPartitions.Length} exe(s) in Parallel: Start   *****");
 
-                var buildLogger = buildPartitions.Length == 1 ? logger : NullLogger.Instance; // when we have just one partition we can print to std out
+            var buildLogger = buildPartitions.Length == 1 ? logger : NullLogger.Instance; // when we have just one partition we can print to std out
 
-                var buildResults = buildPartitions
-                    .AsParallel()
-                    .Select(buildPartition => (buildPartition, buildResult: Build(buildPartition, rootArtifactsFolderPath, buildLogger)))
-                    .ToDictionary(result => result.buildPartition, result => result.buildResult);
+            var buildResults = buildPartitions
+                .AsParallel()
+                .Select(buildPartition => (buildPartition, buildResult: Build(buildPartition, rootArtifactsFolderPath, buildLogger)))
+                .ToDictionary(result => result.buildPartition, result => result.buildResult);
 
-                logger.WriteLineHeader($"// ***** Done, took {globalChronometer.GetElapsed().GetTimeSpan().ToFormattedTotalTime()}   *****");
+            logger.WriteLineHeader($"// ***** Done, took {globalChronometer.GetElapsed().GetTimeSpan().ToFormattedTotalTime()}   *****");
 
-                if (buildPartitions.Length <= 1 || !buildResults.Values.Any(result => result.IsGenerateSuccess && !result.IsBuildSuccess))
-                    return buildResults;
-
-                logger.WriteLineHeader("// ***** Failed to build in Parallel, switching to sequential build..   *****");
-
-                foreach (var buildPartition in buildPartitions)
-                    if(buildResults[buildPartition].IsGenerateSuccess && !buildResults[buildPartition].IsBuildSuccess)
-                        buildResults[buildPartition] = Build(buildPartition, rootArtifactsFolderPath, buildLogger);
-
-                logger.WriteLineHeader($"// ***** Done, took {globalChronometer.GetElapsed().GetTimeSpan().ToFormattedTotalTime()}   *****");
-
+            if (buildPartitions.Length <= 1 || !buildResults.Values.Any(result => result.IsGenerateSuccess && !result.IsBuildSuccess))
                 return buildResults;
-            }
+
+            logger.WriteLineHeader("// ***** Failed to build in Parallel, switching to sequential build..   *****");
+
+            foreach (var buildPartition in buildPartitions)
+                if(buildResults[buildPartition].IsGenerateSuccess && !buildResults[buildPartition].IsBuildSuccess)
+                    buildResults[buildPartition] = Build(buildPartition, rootArtifactsFolderPath, buildLogger);
+
+            logger.WriteLineHeader($"// ***** Done, took {globalChronometer.GetElapsed().GetTimeSpan().ToFormattedTotalTime()}   *****");
+
+            return buildResults;
         }
 
         private static BuildResult Build(BuildPartition buildPartition, string rootArtifactsFolderPath, ILogger buildLogger)
@@ -563,20 +518,6 @@ namespace BenchmarkDotNet.Running
             builder.Add(streamLogger);
             
             return new CompositeLogger(builder.ToImmutable());
-        }
-
-        private static IDisposable GetAssemblyResolveHelper(IToolchain toolchain, ILogger logger)
-        {
-            if (RuntimeInformation.IsFullFramework 
-                // we don't want to mess with assembly loading when running benchmarks in the same process (could produce wrong results)
-                && !(toolchain is InProcessToolchain) 
-                // so far it was never an issue for Mono
-                && !RuntimeInformation.IsMono) 
-            {
-                return DirtyAssemblyResolveHelper.Create(logger);
-            }
-
-            return null;
         }
 
         private static void Cleanup(HashSet<string> artifactsToCleanup)

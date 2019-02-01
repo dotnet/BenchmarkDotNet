@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Tests
 {
     public class AppConfigGeneratorTests
     {
-        private static readonly IResolver Resolver = BenchmarkRunner.DefaultResolver;
+        private static readonly IResolver Resolver = BenchmarkRunnerClean.DefaultResolver;
 
         [Fact]
         public void GeneratesMinimalRequiredAppConfigForEmptySource()
