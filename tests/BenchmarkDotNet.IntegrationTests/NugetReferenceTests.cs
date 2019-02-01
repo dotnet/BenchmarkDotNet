@@ -7,10 +7,10 @@ using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Attributes;
 using Newtonsoft.Json;
 using System;
-using System.Linq;
 using BenchmarkDotNet.Toolchains.Roslyn;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Loggers;
+using System.Collections.Immutable;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -39,21 +39,20 @@ namespace BenchmarkDotNet.IntegrationTests
             var unsupportedJob = Job.Dry.With(toolchain).WithNuGet("Newtonsoft.Json", "11.0.2");
             var unsupportedJobConfig = CreateSimpleConfig(job: unsupportedJob);
             var unsupportedJobBenchmark = BenchmarkConverter.TypeToBenchmarks(typeof(WithCallToNewtonsoft), unsupportedJobConfig);
-            var unsupportedJobLogger = new CompositeLogger(unsupportedJobConfig.GetLoggers().ToArray());
+            var unsupportedJobLogger = new CompositeLogger(unsupportedJobConfig.GetLoggers().ToImmutableHashSet());
             foreach (var benchmarkCase in unsupportedJobBenchmark.BenchmarksCases) 
             {
-                Assert.False(toolchain.IsSupported(benchmarkCase, unsupportedJobLogger, BenchmarkRunner.DefaultResolver));
+                Assert.False(toolchain.IsSupported(benchmarkCase, unsupportedJobLogger, BenchmarkRunnerClean.DefaultResolver));
             }
 
             var supportedJob = Job.Dry.With(toolchain);
             var supportedConfig = CreateSimpleConfig(job: supportedJob);
             var supportedBenchmark = BenchmarkConverter.TypeToBenchmarks(typeof(WithCallToNewtonsoft), supportedConfig);
-            var supportedLogger = new CompositeLogger(supportedConfig.GetLoggers().ToArray());
+            var supportedLogger = new CompositeLogger(supportedConfig.GetLoggers().ToImmutableHashSet());
             foreach (var benchmarkCase in supportedBenchmark.BenchmarksCases)
             {
-                Assert.True(toolchain.IsSupported(benchmarkCase, supportedLogger, BenchmarkRunner.DefaultResolver));
+                Assert.True(toolchain.IsSupported(benchmarkCase, supportedLogger, BenchmarkRunnerClean.DefaultResolver));
             }
-
         }
 
         public class WithCallToNewtonsoft

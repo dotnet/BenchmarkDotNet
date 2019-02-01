@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Extensions
         /// <summary>
         /// Gets column title formatted using the specified style
         /// </summary>
-        public static string GetColumnTitle(this IColumn column, ISummaryStyle style)
+        public static string GetColumnTitle(this IColumn column, SummaryStyle style)
         {
             if (!style.PrintUnitsInHeader)
                 return column.ColumnName;
@@ -90,10 +90,9 @@ namespace BenchmarkDotNet.Extensions
                 hashSet.Add(item);
         }
         
-#if !NETCOREAPP2_1 // method with the same name was added to Dictionary in .NET Core 2.1, so we need this ugly hack to get compiler happy
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
             => dictionary.TryGetValue(key, out var value) ? value : default;
-#endif
+
         public static double Sqr(this double x) => x * x;
         public static double Pow(this double x, double k) => Math.Pow(x, k);
 

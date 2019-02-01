@@ -66,25 +66,21 @@ namespace BenchmarkDotNet.Configs
             yield return ParamsAllValuesValidator.FailOnError;
         }
 
-        public IEnumerable<Job> GetJobs() => Array.Empty<Job>();
-
-        public IOrderer GetOrderer() => null;
+        public IOrderer Orderer => null;
 
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
 
-        public bool KeepBenchmarkFiles => false;
+        public Encoding Encoding => Encoding.ASCII;
 
-        public bool SummaryPerType => true;
+        public ConfigOptions Options => ConfigOptions.Default;
+
+        public SummaryStyle SummaryStyle => SummaryStyle.Default;
 
         public string ArtifactsPath => Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");
 
-        public Encoding Encoding => Encoding.ASCII;
+        public IEnumerable<Job> GetJobs() => Array.Empty<Job>();
 
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => Array.Empty<BenchmarkLogicalGroupRule>();
-
-        public bool StopOnFirstError => false;
-
-        public ISummaryStyle GetSummaryStyle() => SummaryStyle.Default;
 
         public IEnumerable<IDiagnoser> GetDiagnosers() => Array.Empty<IDiagnoser>();
 

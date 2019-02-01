@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Validators
 {
     public class ShadowCopyValidator : IValidator
     {
-        public static readonly IValidator Default = new ShadowCopyValidator();
+        public static readonly IValidator DontFailOnError = new ShadowCopyValidator();
 
         private ShadowCopyValidator() { }
 

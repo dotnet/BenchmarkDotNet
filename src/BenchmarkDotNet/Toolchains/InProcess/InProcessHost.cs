@@ -28,8 +28,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <param name="benchmarkCase">Current benchmark.</param>
         /// <param name="logger">Logger for informational output.</param>
         /// <param name="diagnoser">Diagnosers, if attached.</param>
-        /// <param name="config">Current config.</param>
-        public InProcessHost(BenchmarkCase benchmarkCase, ILogger logger, IDiagnoser diagnoser, IConfig config)
+        public InProcessHost(BenchmarkCase benchmarkCase, ILogger logger, IDiagnoser diagnoser)
         {
             if (benchmarkCase == null)
                 throw new ArgumentNullException(nameof(benchmarkCase));
@@ -37,14 +36,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.diagnoser = diagnoser;
             IsDiagnoserAttached = diagnoser != null;
-            Config = config;
+            Config = benchmarkCase.Config;
 
             if (diagnoser != null)
                 diagnoserActionParameters = new DiagnoserActionParameters(
                     Process.GetCurrentProcess(),
                     benchmarkCase,
-                    default,
-                    config);
+                    default);
         }
 
         /// <summary><c>True</c> if there are diagnosers attached.</summary>

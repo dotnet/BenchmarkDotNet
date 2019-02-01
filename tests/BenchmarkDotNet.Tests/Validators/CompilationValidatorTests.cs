@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
 using System.Reflection.Emit;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
@@ -17,7 +16,8 @@ namespace BenchmarkDotNet.Tests.Validators
         public void BenchmarkedMethodNameMustNotContainWhitespaces()
         {
             Delegate method = BuildDummyMethod<int>("Has Some Whitespaces");
-
+            
+            var config = new ManualConfig().CreateImmutableConfig();
             var parameters = new ValidationParameters(
                 new[]
                 {
@@ -26,14 +26,41 @@ namespace BenchmarkDotNet.Tests.Validators
                             typeof(CompilationValidatorTests),
                             method.Method),
                         Job.Dry,
-                        null)
-                }, new ManualConfig());
+                        null,
+                        config
+                        )
+                }, config);
 
-            var errors = CompilationValidator.Default.Validate(parameters).Select(e => e.Message);
+            var errors = CompilationValidator.FailOnError.Validate(parameters).Select(e => e.Message);
 
             Assert.Contains(errors,
                 s => s.Equals(
-                    "Benchmarked method `Has Some Whitespaces` contains illegal character(s). Please use `[<Benchmark(Description = \"Custom name\")>]` to set custom display name."));
+                    "Benchmarked method `Has Some Whitespaces` contains illegal character(s) or uses C# keyword. Please use `[<Benchmark(Description = \"Custom name\")>]` to set custom display name."));
+        }
+
+        [Fact]
+        public void BenchmarkedMethodNameMustNotUseCsharpKeywords()
+        {
+            Delegate method = BuildDummyMethod<int>("typeof");
+
+            var config = ManualConfig.CreateEmpty().CreateImmutableConfig();
+            var parameters = new ValidationParameters(
+                new[]
+                {
+                    BenchmarkCase.Create(
+                        new Descriptor(
+                            typeof(CompilationValidatorTests),
+                            method.Method),
+                        Job.Dry,
+                        null,
+                        config)
+                }, config);
+
+            var errors = CompilationValidator.FailOnError.Validate(parameters).Select(e => e.Message);
+
+            Assert.Contains(errors,
+                s => s.Equals(
+                    "Benchmarked method `typeof` contains illegal character(s) or uses C# keyword. Please use `[<Benchmark(Description = \"Custom name\")>]` to set custom display name."));
         }
 
         [Theory]
@@ -41,11 +68,8 @@ namespace BenchmarkDotNet.Tests.Validators
         [InlineData(typeof(BenchmarkClass<PublicClass>), false)]
         public void Benchmark_Class_Methods_Must_Be_Non_Static(Type type, bool hasErrors)
         {
-            // Act
-            var validationErrors = CompilationValidator.Default.Validate(BenchmarkConverter.TypeToBenchmarks(type))
-                                                               .ToList();
+            var validationErrors = CompilationValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(type));
             
-            // Assert
             Assert.Equal(hasErrors, validationErrors.Any());
         }
         
@@ -66,7 +90,7 @@ namespace BenchmarkDotNet.Tests.Validators
             var constructed = typeof(BenchmarkClass<>).MakeGenericType(type);
             
             // Act
-            var validationErrors = CompilationValidator.Default.Validate(BenchmarkConverter.TypeToBenchmarks(constructed))
+            var validationErrors = CompilationValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(constructed))
                                                                .ToList();
             
             // Assert
@@ -118,6 +142,4 @@ namespace BenchmarkDotNet.Tests.Validators
     {
         internal class InternalNestedClass { }
     }
-        
-    
 }

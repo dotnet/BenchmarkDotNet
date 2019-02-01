@@ -8,7 +8,6 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
-using StreamWriter = BenchmarkDotNet.Portability.StreamWriter;
 
 namespace BenchmarkDotNet.Exporters
 {
@@ -56,7 +55,7 @@ namespace BenchmarkDotNet.Exporters
                     logger.WriteLine($"{GetImportantInfo(summary[secondBenchmarkCase])}");
 
                     logger.WriteLine("```diff");
-                    logger.WriteLine(builder.ToString());
+                    logger.WriteLine(builder.ToString().Trim());
                     logger.WriteLine("```");
                 }
                 finally
@@ -74,7 +73,7 @@ namespace BenchmarkDotNet.Exporters
             if (File.Exists(filePath))
                 File.Delete(filePath);
 
-            using (var stream = StreamWriter.FromPath(filePath))
+            using (var stream = new StreamWriter(filePath, append: false))
             {
                 PrettyGithubMarkdownDisassemblyExporter.Export(new StreamLogger(stream), disassemblyResult, quotingCode: false);
             }
@@ -88,7 +87,7 @@ namespace BenchmarkDotNet.Exporters
         {
             try
             {
-                var output = ProcessHelper.RunAndReadOutputLineByLine("git", $"diff --no-index --no-color --text {firstFile} {secondFile}");
+                (int exitCode, IReadOnlyList<string> output) = ProcessHelper.RunAndReadOutputLineByLine("git", $"diff --no-index --no-color --text --function-context {firstFile} {secondFile}");
 
                 bool canRead = false;
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
@@ -105,10 +106,10 @@ namespace BenchmarkDotNet.Columns
         }
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase)
-            => Format(summary, summary[benchmarkCase].ResultStatistics, SummaryStyle.Default);
+            => Format(summary, benchmarkCase.Config, summary[benchmarkCase].ResultStatistics, SummaryStyle.Default);
 
-        public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style)
-            => Format(summary, summary[benchmarkCase].ResultStatistics, style);
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style)
+            => Format(summary, benchmarkCase.Config, summary[benchmarkCase].ResultStatistics, style);
 
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;
@@ -119,7 +120,7 @@ namespace BenchmarkDotNet.Columns
 
         public string Legend { get; }
 
-        private string Format(Summary summary, Statistics statistics, ISummaryStyle style)
+        private string Format(Summary summary, ImmutableConfig config, Statistics statistics, SummaryStyle style)
         {
             if (statistics == null)
                 return "NA";
@@ -139,7 +140,7 @@ namespace BenchmarkDotNet.Columns
             if (double.IsNaN(value))
                 return "NA";
             return UnitType == UnitType.Time
-                   ? value.ToTimeStr(style.TimeUnit, summary.Config.Encoding, format, 1, style.PrintUnitsInContent)
+                   ? value.ToTimeStr(style.TimeUnit, config.Encoding, format, 1, style.PrintUnitsInContent)
                    : value.ToStr(format);
         }
 

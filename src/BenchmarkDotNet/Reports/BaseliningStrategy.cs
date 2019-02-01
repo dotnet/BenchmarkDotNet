@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Running;
 
@@ -18,7 +19,7 @@ namespace BenchmarkDotNet.Reports
             this.useJobs = useJobs;
         }
 
-        public static BaseliningStrategy Create(BenchmarkCase[] benchmarkCases)
+        public static BaseliningStrategy Create(ImmutableArray<BenchmarkCase> benchmarkCases)
         {
             bool hasDescriptorBaselines = benchmarkCases.Any(b => b.Descriptor.Baseline);
             bool hasJobBaselines = benchmarkCases.Any(b => b.Job.Meta.Baseline);

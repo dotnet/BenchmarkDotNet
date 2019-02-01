@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -10,7 +13,9 @@ namespace BenchmarkDotNet.Validators
     {
         private const char Underscore = '_';
 
-        public static readonly IValidator Default = new CompilationValidator();
+        public static readonly IValidator FailOnError = new CompilationValidator();
+
+        private static readonly ImmutableHashSet<string> CsharpKeywords = GetCsharpKeywords().ToImmutableHashSet();
 
         private CompilationValidator() { }
 
@@ -29,7 +34,7 @@ namespace BenchmarkDotNet.Validators
                 .Select(benchmark
                     => new ValidationError(
                         true,
-                        $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` contains illegal character(s). Please use `[<Benchmark(Description = \"Custom name\")>]` to set custom display name.",
+                        $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` contains illegal character(s) or uses C# keyword. Please use `[<Benchmark(Description = \"Custom name\")>]` to set custom display name.",
                         benchmark
                     ));
 
@@ -61,16 +66,25 @@ namespace BenchmarkDotNet.Validators
         private static bool IsValidCSharpIdentifier(string identifier) // F# allows to use whitespaces as names #479
             => !string.IsNullOrEmpty(identifier)
                && (char.IsLetter(identifier[0]) || identifier[0] == Underscore) // An identifier must start with a letter or an underscore
-               && identifier
-                    .Skip(1)
-                    .All(character => char.IsLetterOrDigit(character) || character == Underscore);
+               && identifier.Skip(1).All(character => char.IsLetterOrDigit(character) || character == Underscore)
+               && !CsharpKeywords.Contains(identifier);
 
         private static bool IsUsingNameUsedInternallyByOurTemplate(string identifier)
             => identifier == "__Overhead";
 
-        private static bool HasPrivateGenericArguments(Type type) => type.GetGenericArguments().Any(a => !(a.IsPublic
-                                                                                                 || a.IsNestedPublic));
-        
+        private static bool HasPrivateGenericArguments(Type type) => type.GetGenericArguments().Any(a => !(a.IsPublic || a.IsNestedPublic));
+
+        // source: https://stackoverflow.com/a/19562316
+        private static IEnumerable<string> GetCsharpKeywords()
+        {
+            var memberInfos = typeof(SyntaxKind).GetMembers(BindingFlags.Public | BindingFlags.Static);
+
+            return from memberInfo in memberInfos
+                           where memberInfo.Name.EndsWith("Keyword")
+                           orderby memberInfo.Name
+                           select memberInfo.Name.Substring(startIndex: 0, length: memberInfo.Name.IndexOf("Keyword")).ToLower();
+        }
+
         private class BenchmarkMethodEqualityComparer : IEqualityComparer<BenchmarkCase>
         {
             internal static readonly IEqualityComparer<BenchmarkCase> Instance = new BenchmarkMethodEqualityComparer();

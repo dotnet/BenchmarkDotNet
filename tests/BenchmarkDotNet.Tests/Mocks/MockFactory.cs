@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
@@ -20,12 +21,11 @@ namespace BenchmarkDotNet.Tests.Mocks
             var runInfo = BenchmarkConverter.TypeToBenchmarks(benchmarkType);
             return new Summary(
                 "MockSummary",
-                runInfo.BenchmarksCases.Select((benchmark, index) => CreateReport(benchmark, 5, (index + 1) * 100)).ToList(),
+                runInfo.BenchmarksCases.Select((benchmark, index) => CreateReport(benchmark, 5, (index + 1) * 100)).ToImmutableArray(),
                 new HostEnvironmentInfoBuilder().WithoutDotNetSdkVersion().Build(),
-                runInfo.Config,
                 "",
                 TimeSpan.FromMinutes(1),
-                Array.Empty<ValidationError>());
+                ImmutableArray<ValidationError>.Empty);
         }
 
         public static Summary CreateSummary(IConfig config)
@@ -34,21 +34,16 @@ namespace BenchmarkDotNet.Tests.Mocks
                 "MockSummary",
                 CreateReports(config),
                 new HostEnvironmentInfoBuilder().WithoutDotNetSdkVersion().Build(),
-                config,
                 "",
                 TimeSpan.FromMinutes(1),
-                Array.Empty<ValidationError>());
+                ImmutableArray<ValidationError>.Empty);
         }
 
-        private static BenchmarkReport[] CreateReports(IConfig config)
-        {
-            return CreateBenchmarks(config).Select(CreateSimpleReport).ToArray();
-        }
+        private static ImmutableArray<BenchmarkReport> CreateReports(IConfig config) 
+            => CreateBenchmarks(config).Select(CreateSimpleReport).ToImmutableArray();
 
-        private static BenchmarkCase[] CreateBenchmarks(IConfig config)
-        {
-            return BenchmarkConverter.TypeToBenchmarks(typeof(MockBenchmarkClass), config).BenchmarksCases;
-        }
+        private static BenchmarkCase[] CreateBenchmarks(IConfig config) 
+            => BenchmarkConverter.TypeToBenchmarks(typeof(MockBenchmarkClass), config).BenchmarksCases;
 
         private static BenchmarkReport CreateSimpleReport(BenchmarkCase benchmarkCase) => CreateReport(benchmarkCase, 1, 1);
 

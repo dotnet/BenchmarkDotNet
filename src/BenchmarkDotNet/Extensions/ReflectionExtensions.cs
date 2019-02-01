@@ -139,7 +139,7 @@ namespace BenchmarkDotNet.Extensions
         internal static bool ContainsRunnableBenchmarks(this Type type)
         {
             var typeInfo = type.GetTypeInfo();
-            
+
             if (typeInfo.IsAbstract 
                 || typeInfo.IsSealed 
                 || typeInfo.IsNotPublic 
@@ -151,7 +151,7 @@ namespace BenchmarkDotNet.Extensions
 
         private static MethodInfo[] GetBenchmarks(this TypeInfo typeInfo)
             => typeInfo
-                .GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static) // we allow for Static now to produce a nice Validator warning later
                 .Where(method => method.GetCustomAttributes(true).OfType<BenchmarkAttribute>().Any())
                 .ToArray();
 

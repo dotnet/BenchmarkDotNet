@@ -1,14 +1,15 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Tests.Portability;
 using BenchmarkDotNet.Tests.XUnit;
+using BenchmarkDotNet.Validators;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -23,7 +24,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             string resultsDirectoryPath = Path.GetTempPath();
             var exporter = new MockExporter();
-            var mockSummary = GetMockSummary(resultsDirectoryPath);
+            var mockSummary = GetMockSummary(resultsDirectoryPath, config: null);
             var filePath = $"{Path.Combine(mockSummary.ResultsDirectoryPath, mockSummary.Title)}-report.txt"; // ExporterBase default
 
             try
@@ -45,7 +46,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             string resultsDirectoryPath = Path.GetTempPath();
             var exporter = new MockExporter();
-            var mockSummary = GetMockSummary(resultsDirectoryPath);
+            var mockSummary = GetMockSummary(resultsDirectoryPath, config: null);
             var filePath = $"{Path.Combine(mockSummary.ResultsDirectoryPath, mockSummary.Title)}-report.txt"; // ExporterBase default
 
             try
@@ -77,7 +78,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             string resultsDirectoryPath = Path.GetTempPath();
             var exporter = new MockExporter();
-            var mockSummary = GetMockSummary(resultsDirectoryPath, typeof(Generic<int>));
+            var mockSummary = GetMockSummary(resultsDirectoryPath, config: null, typeof(Generic<int>));
             var expectedFilePath = $"{Path.Combine(mockSummary.ResultsDirectoryPath, "BenchmarkDotNet.IntegrationTests.Generic_Int32_")}-report.txt";
             string actualFilePath = null;
 
@@ -99,7 +100,8 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             string resultsDirectoryPath = Path.GetTempPath();
             var exporter = new MockExporter();
-            var mockSummary = GetMockSummary(resultsDirectoryPath, typeof(ClassA), typeof(ClassB));
+            var joinConfig = ManualConfig.CreateEmpty().With(ConfigOptions.JoinSummary);
+            var mockSummary = GetMockSummary(resultsDirectoryPath, joinConfig, typeof(ClassA), typeof(ClassB));
             var expectedFilePath = $"{Path.Combine(mockSummary.ResultsDirectoryPath, mockSummary.Title)}-report.txt";
             string actualFilePath = null;
 
@@ -116,16 +118,15 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private Summary GetMockSummary(string resultsDirectoryPath, params Type[] typesWithBenchmarks)
+        private Summary GetMockSummary(string resultsDirectoryPath, IConfig config, params Type[] typesWithBenchmarks)
         {
             return new Summary(
                 title: "bdn-test",
-                reports: typesWithBenchmarks.Length > 0 ? CreateReports(typesWithBenchmarks) : Array.Empty<BenchmarkReport>(),
+                reports: typesWithBenchmarks.Length > 0 ? CreateReports(typesWithBenchmarks, config) : ImmutableArray<BenchmarkReport>.Empty,
                 hostEnvironmentInfo: Environments.HostEnvironmentInfo.GetCurrent(),
-                config: Configs.DefaultConfig.Instance,
                 resultsDirectoryPath: resultsDirectoryPath,
                 totalTime: System.TimeSpan.Zero,
-                validationErrors: new Validators.ValidationError[0]
+                validationErrors: ImmutableArray<ValidationError>.Empty
             );
         }
 
@@ -139,14 +140,12 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private BenchmarkReport[] CreateReports(Type[] types)
-        {
-            return CreateBenchmarks(types).Select(CreateReport).ToArray();
-        }
+        private ImmutableArray<BenchmarkReport> CreateReports(Type[] types, IConfig config = null) 
+            => CreateBenchmarks(types, config).Select(CreateReport).ToImmutableArray();
 
-        private BenchmarkCase[] CreateBenchmarks(Type[] types)
+        private BenchmarkCase[] CreateBenchmarks(Type[] types, IConfig config)
         {
-            return types.SelectMany(type => BenchmarkConverter.TypeToBenchmarks(type).BenchmarksCases).ToArray();
+            return types.SelectMany(type => BenchmarkConverter.TypeToBenchmarks(type, config).BenchmarksCases).ToArray();
         }
 
         private BenchmarkReport CreateReport(BenchmarkCase benchmarkCase)
