@@ -62,6 +62,11 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private void DiffEmit(Summary summary)
         {
+            // .Net Core does not support assembly saving so far
+            // SEE https://github.com/dotnet/corefx/issues/4491
+            if (!Portability.RuntimeInformation.IsFullFramework)
+                return;
+
             var caseName = summary.BenchmarksCases.First().Job.ToString();
             NaiveRunnableEmitDiff.RunDiff(
                 $@"{caseName}.exe",
@@ -109,11 +114,9 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = CreateInProcessAndRoslynConfig(logger);
 
             var summary = CanExecute(benchmarkType, config);
-#if NETFRAMEWORK
-            // .Net Core does not support assembly saving so far
-            // SEE https://github.com/dotnet/corefx/issues/4491
+
             DiffEmit(summary);
-#endif
+
             string testLog = logger.GetLog();
             Assert.Contains(benchmarkType.Name, testLog);
             Assert.DoesNotContain("No benchmarks found", logger.GetLog());

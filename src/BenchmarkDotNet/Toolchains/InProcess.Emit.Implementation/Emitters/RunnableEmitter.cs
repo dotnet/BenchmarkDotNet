@@ -57,24 +57,32 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             var assemblyFileName = Path.GetFileName(assemblyResultPath);
             var config = buildPartition.Benchmarks.First().Config;
 
-            var assemblyBuilder = DefineAssemblyBuilder(assemblyResultPath, config);
-            var moduleBuilder = DefineModuleBuilder(assemblyBuilder, assemblyFileName);
+            var saveToDisk = ShouldSaveToDisk(config);
+            var assemblyBuilder = DefineAssemblyBuilder(assemblyResultPath, saveToDisk);
+            var moduleBuilder = DefineModuleBuilder(assemblyBuilder, assemblyFileName, saveToDisk);
             foreach (var benchmark in buildPartition.Benchmarks)
             {
                 var runnableEmitter = new RunnableEmitter(buildPartition, moduleBuilder);
                 runnableEmitter.EmitRunnableCore(benchmark);
             }
 
-#if NETFRAMEWORK
-            // .Net Core does not support assembly saving so far
-            // SEE https://github.com/dotnet/corefx/issues/4491
-            if (config.KeepBenchmarkFiles)
+            if (saveToDisk)
             {
                 assemblyBuilder.Save(assemblyFileName);
                 logger.WriteLineInfo($"{assemblyFileName} assembly saved to {assemblyResultPath}");
             }
-#endif
+
             return assemblyBuilder;
+        }
+
+
+        private static bool ShouldSaveToDisk(IConfig config)
+        {
+#if PRERELEASE_DEVELOP || PRERELEASE_NIGHTLY // we never want to do that in our official NuGet.org package, it's a hack
+            return config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles) && Portability.RuntimeInformation.IsFullFramework;
+#else
+            return false;
+#endif
         }
 
         private static string GetRunnableTypeName(BenchmarkBuildInfo benchmark)
@@ -82,29 +90,17 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             return EmittedTypePrefix + benchmark.Id;
         }
 
-        private static AssemblyBuilder DefineAssemblyBuilder(string assemblyResultPath, IConfig config)
+        private static AssemblyBuilder DefineAssemblyBuilder(string assemblyResultPath, bool saveToDisk)
         {
-            var assemblyName = Path.GetFileNameWithoutExtension(assemblyResultPath);
+            var assemblyName = new AssemblyName { Name = Path.GetFileNameWithoutExtension(assemblyResultPath) };
 
-#if NETFRAMEWORK
-            var assemblyDir = Path.GetDirectoryName(assemblyResultPath);
-            var assemblyMode = config.KeepBenchmarkFiles
-                ? AssemblyBuilderAccess.RunAndSave
+            var assemblyMode = saveToDisk
+                ? (AssemblyBuilderAccess)3 // https://apisof.net/catalog/System.Reflection.Emit.AssemblyBuilderAccess.RunAndSave
                 : AssemblyBuilderAccess.RunAndCollect;
 
-            var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(
-                new AssemblyName { Name = assemblyName },
-                assemblyMode,
-                assemblyDir);
-#else
-            // .Net Core does not support assembly saving so far
-            // SEE https://github.com/dotnet/corefx/issues/4491
-            var assemblyMode = AssemblyBuilderAccess.RunAndCollect;
-
-            var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(
-                new AssemblyName { Name = assemblyName },
-                assemblyMode);
-#endif
+            var assemblyBuilder = saveToDisk
+                ? AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, assemblyMode, Path.GetDirectoryName(assemblyResultPath))
+                : AssemblyBuilder.DefineDynamicAssembly(assemblyName, assemblyMode);
 
             DefineAssemblyAttributes(assemblyBuilder);
 
@@ -147,15 +143,15 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             assemblyBuilder.SetCustomAttribute(attBuilder);
         }
 
-        private static ModuleBuilder DefineModuleBuilder(AssemblyBuilder assemblyBuilder, string moduleFileName)
+        private static ModuleBuilder DefineModuleBuilder(AssemblyBuilder assemblyBuilder, string moduleFileName, bool saveToDisk)
         {
             var moduleName = Path.GetFileNameWithoutExtension(moduleFileName)
                ?? throw new ArgumentNullException(nameof(moduleFileName));
-#if NETFRAMEWORK
-            var moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName, moduleFileName);
-#else
-            var moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName);
-#endif
+
+            var moduleBuilder = saveToDisk
+                ? assemblyBuilder.DefineDynamicModule(moduleName, moduleFileName)
+                : assemblyBuilder.DefineDynamicModule(moduleName);
+
             // [module:UnverifiableCodeAttribute()]
             var attributeCtor = typeof(UnverifiableCodeAttribute)
                 .GetConstructor(Array.Empty<Type>())
