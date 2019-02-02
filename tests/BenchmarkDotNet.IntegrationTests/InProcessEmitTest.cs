@@ -10,6 +10,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tests.Loggers;
+using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.Roslyn;
 using JetBrains.Annotations;
@@ -100,7 +101,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory]
+        [TheoryFullFrameworkOnly("We can't use Roslyn toolchain for .NET Core because we don't know which assemblies to reference and .NET Core does not support dynamic assembly saving")]
         [InlineData(typeof(SampleBenchmark))]
         [InlineData(typeof(RunnableVoidCaseBenchmark))]
         [InlineData(typeof(RunnableRefStructCaseBenchmark))]
