@@ -40,6 +40,10 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             {
                 Diff(roslynAssemblyDefinition, emittedAssemblyDefinition, logger);
             }
+
+            // all checks have passed, so we can remove the files to avoid "file in use" problems
+            System.IO.File.Delete(roslynAssemblyPath);
+            System.IO.File.Delete(emittedAssemblyPath);
         }
 
         private static bool IsRunnable(TypeReference t) =>
