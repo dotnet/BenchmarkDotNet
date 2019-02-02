@@ -13,7 +13,6 @@
 using BenchmarkDotNet.Attributes;
 
 using System;
-using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 {
@@ -40,9 +39,6 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 
         [Benchmark, Arguments(<#=argValue#>, "<#=counter#>", 0.<#=counter#>)]
         public <#=type#> RefStructCase<#=counter#>(<#=type#> x, ref string y, double? z) => x;
-
-        [Benchmark, Arguments(<#=argValue#>, "<#=counter#>", 0.<#=counter#>)]
-        public static <#=type#> StaticRefStructCase<#=counter#>(<#=type#> x, ref string y, double? z) => x;
 
 <#+
         counter++;

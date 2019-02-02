@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace BenchmarkDotNet.Validators
@@ -54,12 +55,12 @@ namespace BenchmarkDotNet.Validators
                          .Select(benchmark => new ValidationError(true, $"Generic class {benchmark.Descriptor.Type.GetDisplayName()} has non public generic argument(s)"));
 
         private static IEnumerable<ValidationError> ValidateBindingModifiers(IEnumerable<BenchmarkCase> benchmarks)
-            => benchmarks.Where(x => x.Descriptor.WorkloadMethod.IsStatic)
+            => benchmarks.Where(x => x.Descriptor.WorkloadMethod.IsStatic && !x.Job.GetToolchain().IsInProcess)
                           .Distinct(BenchmarkMethodEqualityComparer.Instance)
                           .Select(benchmark
                               => new ValidationError(
                                   true,
-                                  $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` is static. Please use instance methods only for benchmarks.",
+                                  $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` is static. Benchmarks MUST be instance methods, static methods are not supported.",
                                   benchmark
                               ));
                 
@@ -98,8 +99,7 @@ namespace BenchmarkDotNet.Validators
                 return false;
             }
 
-            public int GetHashCode(BenchmarkCase obj)
-                => obj.Descriptor.WorkloadMethod.GetHashCode();
+            public int GetHashCode(BenchmarkCase obj) => obj.Descriptor.WorkloadMethod.GetHashCode();
         }
     }
 }

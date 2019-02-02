@@ -12,9 +12,6 @@
 
 using BenchmarkDotNet.Attributes;
 
-using System;
-using System.Threading.Tasks;
-
 namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 {
     /// <summary>
@@ -37,7 +34,6 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 #>
         // ---- Begin ClassCase(<#=type#>) ----
 
-        private static <#=type#> _staticRefResultHolder<#=counter#>;
         private <#=type#> _refResultHolder<#=counter#>;
 
         [Benchmark]
@@ -46,17 +42,11 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         [Benchmark, Arguments(<#=argValue#>, "<#=counter#>", 0.<#=counter#>)]
         public <#=type#> ClassCase<#=counter#>(<#=type#> x, ref string y, double? z) => default;
 
-        [Benchmark, Arguments(<#=argValue#>, "<#=counter#>", 0.<#=counter#>)]
-        public static <#=type#> StaticClassCase<#=counter#>(<#=type#> x, ref string y, double? z) => default;
-
         [Benchmark]
         public ref <#=type#> RefReturnClassCase<#=counter#>() => ref _refResultHolder<#=counter#>;
 
         [Benchmark, Arguments(<#=argValue#>, "<#=counter#>", 0.<#=counter#>)]
         public ref <#=type#> RefReturnClassCase<#=counter#>(<#=type#> x, ref string y, double? z) => ref _refResultHolder<#=counter#>;
-
-        [Benchmark, Arguments(<#=argValue#>, "<#=counter#>", 0.<#=counter#>)]
-        public static ref <#=type#> StaticRefReturnClassCase<#=counter#>(<#=type#> x, ref string y, double? z) => ref _staticRefResultHolder<#=counter#>;
 
 <#+
         counter++;

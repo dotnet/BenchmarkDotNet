@@ -173,7 +173,6 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 
         private static void Diff(CustomAttribute attribute1, CustomAttribute attribute2, ICustomAttributeProvider owner1)
         {
-
             if (IgnoredAttributeTypeNames.Contains(attribute1.AttributeType.FullName) && attribute2 == null)
                 return;
 

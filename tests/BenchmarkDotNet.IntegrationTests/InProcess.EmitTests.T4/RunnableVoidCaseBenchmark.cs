@@ -9,9 +9,6 @@
 
 using BenchmarkDotNet.Attributes;
 
-using System;
-using System.Threading.Tasks;
-
 namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 {
     /// <summary>
@@ -22,15 +19,6 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         // ---- Begin VoidCase ----
 
         [Benchmark]
-        public static void StaticVoidCase() { }
-
-        [Benchmark, Arguments(1)]
-        public static void StaticVoidCase(int x) { }
-
-        [Benchmark, Arguments(1, "2", 3.0)]
-        public static void StaticVoidCase(int x, ref string y, double? z) { }
-
-        [Benchmark]
         public void VoidCase() { }
 
         [Benchmark, Arguments(1)]
@@ -38,6 +26,5 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 
         [Benchmark, Arguments(1, "2", 3.0)]
         public void VoidCase(int x, ref string y, double? z) { }
-
     }
 }

@@ -47,14 +47,7 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 #>
         // ---- Begin ManyArgsCase(<#=type#> x <#=argsCount#>) ----        
 
-        private static <#=type#> _staticRefResultHolder<#=argsCount#>;
         private <#=type#> _refResultHolder<#=argsCount#>;
-
-        [Benchmark, Arguments(<#=argValues#>)]
-        public static <#=type#> StaticManyArgsCase<#=argsCount#>(<#=argDefinition#>) => default;
-
-        [Benchmark, Arguments(<#=argValues#>)]
-        public static ref <#=type#> StaticRefReturnManyArgsCase<#=argsCount#>(<#=refArgDefinition#>) => ref _staticRefResultHolder<#=argsCount#>;
         
         [Benchmark, Arguments(<#=argValues#>)]
         public <#=type#> ManyArgsCase<#=argsCount#>(<#=argDefinition#>) => default;
