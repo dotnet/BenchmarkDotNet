@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
@@ -48,6 +46,8 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
         public IBuilder Builder { get; }
         
         public IExecutor Executor { get; }
+
+        public bool IsInProcess => false;
 
         public FileInfo SourceCoreRun { get; }
 

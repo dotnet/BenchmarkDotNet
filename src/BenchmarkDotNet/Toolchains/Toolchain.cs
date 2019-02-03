@@ -17,6 +17,8 @@ namespace BenchmarkDotNet.Toolchains
 
         public IExecutor Executor { get; }
 
+        public virtual bool IsInProcess => false;
+
         public Toolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor)
         {
             Name = name;

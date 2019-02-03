@@ -6,23 +6,13 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 {
     public class SampleBenchmark
     {
-        //[GlobalSetup]
-        //public void GlobalSetup()
-        //{ }
+        [GlobalSetup] public void GlobalSetup() { }
 
-        [GlobalCleanup]
-        public static void GlobalCleanup()
-        {
-        }
+        [IterationSetup] public void IterationSetup() { }
 
-        //[IterationSetup]
-        //public void IterationSetup()
-        //{ }
+        [IterationCleanup] public void IterationCleanup() { }
 
-        [IterationCleanup]
-        public static void IterationCleanup()
-        {
-        }
+        [GlobalCleanup] public void GlobalCleanup() { }
 
         [Benchmark]
         public void VoidNoParamsCase()

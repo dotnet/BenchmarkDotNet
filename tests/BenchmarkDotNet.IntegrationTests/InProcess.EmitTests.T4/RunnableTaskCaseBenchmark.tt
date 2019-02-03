@@ -12,7 +12,6 @@
 
 using BenchmarkDotNet.Attributes;
 
-using System;
 using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
@@ -45,12 +44,6 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
     {
 #>
         // ---- Begin TaskCase(<#=type#>) ----
-
-        [Benchmark]
-        public static <#=type#> StaticTaskCase<#=counter#>() => <#=returnCode#>;
-
-        [Benchmark, Arguments(<#=counter#>, "<#=counter#>", 0.<#=counter#>)]
-        public static <#=type#> StaticTaskCase<#=counter#>(int x, string y, double? z) => <#=returnCode#>;
 
         [Benchmark]
         public <#=type#> TaskCase<#=counter#>() => <#=returnCode#>;

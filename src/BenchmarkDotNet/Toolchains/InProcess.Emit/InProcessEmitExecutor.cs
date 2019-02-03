@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
         {
             // TODO: preallocate buffer for output (no direct logging)?
             var hostLogger = LogOutput ? executeParameters.Logger : NullLogger.Instance;
-            var host = new InProcessHost(executeParameters.BenchmarkCase, hostLogger, executeParameters.Diagnoser, executeParameters.Config);
+            var host = new InProcessHost(executeParameters.BenchmarkCase, hostLogger, executeParameters.Diagnoser);
 
             int exitCode = -1;
             var runThread = new Thread(() => exitCode = ExecuteCore(host, executeParameters));
@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
                 host.RunResults,
                 exitCode,
                 executeParameters.Logger,
-                executeParameters.Config.Encoding);
+                executeParameters.BenchmarkCase.Config.Encoding);
         }
 
         private int ExecuteCore(IHost host, ExecuteParameters parameters)
@@ -109,7 +109,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
                     parameters.BenchmarkId,
                     generatedAssembly,
                     parameters.BenchmarkCase,
-                    parameters.Config,
                     host);
             }
             catch (Exception ex)

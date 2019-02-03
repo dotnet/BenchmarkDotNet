@@ -9,7 +9,6 @@
 
 using BenchmarkDotNet.Attributes;
 
-using System;
 using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
@@ -22,12 +21,6 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         // ---- Begin TaskCase(Task) ----
 
         [Benchmark]
-        public static Task StaticTaskCase1() => Task.CompletedTask;
-
-        [Benchmark, Arguments(1, "1", 0.1)]
-        public static Task StaticTaskCase1(int x, string y, double? z) => Task.CompletedTask;
-
-        [Benchmark]
         public Task TaskCase1() => Task.CompletedTask;
 
         [Benchmark, Arguments(1, "1", 0.1)]
@@ -36,24 +29,12 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         // ---- Begin TaskCase(Task<int>) ----
 
         [Benchmark]
-        public static Task<int> StaticTaskCase2() => Task.FromResult(123);
-
-        [Benchmark, Arguments(2, "2", 0.2)]
-        public static Task<int> StaticTaskCase2(int x, string y, double? z) => Task.FromResult(123);
-
-        [Benchmark]
         public Task<int> TaskCase2() => Task.FromResult(123);
 
         [Benchmark, Arguments(2, "2", 0.2)]
         public Task<int> TaskCase2(int x, string y, double? z) => Task.FromResult(123);
 
         // ---- Begin TaskCase(ValueTask<string>) ----
-
-        [Benchmark]
-        public static ValueTask<string> StaticTaskCase3() => new ValueTask<string>("");
-
-        [Benchmark, Arguments(3, "3", 0.3)]
-        public static ValueTask<string> StaticTaskCase3(int x, string y, double? z) => new ValueTask<string>("");
 
         [Benchmark]
         public ValueTask<string> TaskCase3() => new ValueTask<string>("");

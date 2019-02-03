@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.IntegrationTests.InProcess.EmitTests;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -29,7 +28,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private const int UnrollFactor = 16;
 
-        private IConfig CreateInProcessConfig(OutputLogger logger = null, IDiagnoser diagnoser = null)
+        private IConfig CreateInProcessConfig(OutputLogger logger)
         {
             return new ManualConfig()
                 .With(Job.Dry.With(new InProcessEmitToolchain(TimeSpan.Zero, true)).WithInvocationCount(UnrollFactor).WithUnrollFactor(UnrollFactor))
@@ -37,7 +36,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .With(DefaultColumnProviders.Instance);
         }
 
-        private IConfig CreateInProcessOrRoslynConfig(OutputLogger logger = null, IDiagnoser diagnoser = null)
+        private IConfig CreateInProcessAndRoslynConfig(OutputLogger logger)
         {
             var config = new ManualConfig();
 
@@ -56,27 +55,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     .With(new RoslynToolchain())
                     .WithInvocationCount(4)
                     .WithUnrollFactor(4));
-            config.KeepBenchmarkFiles = true;
-            config.Add(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default));
-
-            return config;
-        }
-
-        private IConfig CreateRoslynConfig(OutputLogger logger = null, IDiagnoser diagnoser = null)
-        {
-            var config = new ManualConfig();
-
-            config.Add(DefaultConfig.Instance.GetColumnProviders().ToArray());
-            config.Add(DefaultConfig.Instance.GetAnalysers().ToArray());
-            config.Add(DefaultConfig.Instance.GetExporters().ToArray());
-            config.Add(DefaultConfig.Instance.GetFilters().ToArray());
-            config.Add(DefaultConfig.Instance.GetLoggers().ToArray());
-            config.Add(
-                Job.Dry
-                    .With(new RoslynToolchain())
-                    .WithInvocationCount(4)
-                    .WithUnrollFactor(4));
-            config.KeepBenchmarkFiles = true;
+            config.Options = ConfigOptions.KeepBenchmarkFiles;
             config.Add(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default));
 
             return config;
@@ -84,6 +63,11 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private void DiffEmit(Summary summary)
         {
+            // .Net Core does not support assembly saving so far
+            // SEE https://github.com/dotnet/corefx/issues/4491
+            if (!Portability.RuntimeInformation.IsFullFramework)
+                return;
+
             var caseName = summary.BenchmarksCases.First().Job.ToString();
             NaiveRunnableEmitDiff.RunDiff(
                 $@"{caseName}.exe",
@@ -117,7 +101,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [TheoryNetCore21PlusOnly("CheckIfRoslynToolchainFailsOnNetCore")]
+        [TheoryFullFrameworkOnly("We can't use Roslyn toolchain for .NET Core because we don't know which assemblies to reference and .NET Core does not support dynamic assembly saving")]
         [InlineData(typeof(SampleBenchmark))]
         [InlineData(typeof(RunnableVoidCaseBenchmark))]
         [InlineData(typeof(RunnableRefStructCaseBenchmark))]
@@ -125,37 +109,15 @@ namespace BenchmarkDotNet.IntegrationTests
         [InlineData(typeof(RunnableClassCaseBenchmark))]
         [InlineData(typeof(RunnableManyArgsCaseBenchmark))]
         [InlineData(typeof(RunnableTaskCaseBenchmark))]
-        public void CheckIfRoslynToolchainFailsOnNetCore(Type benchmarkType)
+        public void InProcessBenchmarkEmitsSameIL(Type benchmarkType)
         {
             var logger = new OutputLogger(Output);
-            var config = CreateRoslynConfig(logger);
-
-            CanExecute(benchmarkType, config);
-
-            string testLog = logger.GetLog();
-            Assert.Contains(benchmarkType.Name, testLog);
-            Assert.DoesNotContain("No benchmarks found", logger.GetLog());
-        }
-
-        [Theory]
-        [InlineData(typeof(SampleBenchmark))]
-        [InlineData(typeof(RunnableVoidCaseBenchmark))]
-        [InlineData(typeof(RunnableRefStructCaseBenchmark))]
-        [InlineData(typeof(RunnableStructCaseBenchmark))]
-        [InlineData(typeof(RunnableClassCaseBenchmark))]
-        [InlineData(typeof(RunnableManyArgsCaseBenchmark))]
-        [InlineData(typeof(RunnableTaskCaseBenchmark))]
-        public void InProcessBenchmarkEmitsSameMsil(Type benchmarkType)
-        {
-            var logger = new OutputLogger(Output);
-            var config = CreateInProcessOrRoslynConfig(logger);
+            var config = CreateInProcessAndRoslynConfig(logger);
 
             var summary = CanExecute(benchmarkType, config);
-#if NETFRAMEWORK
-            // .Net Core does not support assembly saving so far
-            // SEE https://github.com/dotnet/corefx/issues/4491
+
             DiffEmit(summary);
-#endif
+
             string testLog = logger.GetLog();
             Assert.Contains(benchmarkType.Name, testLog);
             Assert.DoesNotContain("No benchmarks found", logger.GetLog());

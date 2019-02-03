@@ -29,5 +29,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
                 new InProcessEmitExecutor(timeout, logOutput))
         {
         }
+
+        public override bool IsInProcess => true;
     }
 }

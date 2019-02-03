@@ -59,11 +59,7 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 #>
         // ---- Begin StructCase(<#=type#>) ----
 
-        private static <#=type#> _staticRefResultHolder<#=counter#>;
         private <#=type#> _refResultHolder<#=counter#>;
-
-        [Benchmark]
-        public static <#=type#> StaticStructCase<#=counter#>() => default;
 
         [Benchmark]
         public ref <#=type#> RefReturnStructCase<#=counter#>() => ref _refResultHolder<#=counter#>;
@@ -75,9 +71,6 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         [Benchmark, Arguments(<#=argValue#>, "<#=counter#>", 0.<#=counter#>)]
         public <#=type#> StructCase<#=counter#>(<#=type#> x, ref string y, double? z) => default;
 
-        [Benchmark, Arguments(<#=argValue#>, "<#=counter#>", 0.<#=counter#>)]
-        public static ref <#=type#> StaticRefReturnStructCase<#=counter#>(ref <#=type#> x, ref string y, double? z) => ref _staticRefResultHolder<#=counter#>;
-
 <#+
         }
         else
@@ -85,9 +78,6 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 #>
         [Benchmark, Arguments(<#=counter#>, "<#=counter#>", 0.<#=counter#>)]
         public <#=type#> StructCase<#=counter#>(int x, ref string y, double? z) => default;
-
-        [Benchmark, Arguments(<#=counter#>, "<#=counter#>", 0.<#=counter#>)]
-        public static ref <#=type#> StaticRefReturnStructCase<#=counter#>(int x, ref string y, double? z) => ref _staticRefResultHolder<#=counter#>;
 
 <#+
         }
