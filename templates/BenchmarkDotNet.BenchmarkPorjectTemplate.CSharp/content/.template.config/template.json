@@ -1,0 +1,86 @@
+{
+    "$schema": "http://json.schemastore.org/template",
+    "identity": "BenchmarkDotNet.BenchmarkProjectTemplate.CSharp",
+    "name": "Benchmark Project",
+    "shortName": "benchmark",
+    "groupIdentity": "BenchmarkDotNet",
+    "classifications": [
+      "Benchmark",
+      "Library"
+    ],
+    "precedence": "3000",
+    "tags": {
+      "language": "C#",
+      "type": "project"
+    },
+    "description": "A project template for creating benchmarks.",
+    "author": "BenchmarkDotnet",
+    "generatorVersions": "[1.0.0.0-*)",
+    
+    "sourceName": "_BenchmarkProjectName_",
+    "preferNameDirectory": true,
+    "defaultName": "MyBenchmark",
+    "symbols": {
+      "benchmarkName": {
+        "type": "parameter",
+        "datatype": "string",
+        "description": "The name of the benchmark class.",
+        "defaultValue": "MyBenchmark",
+        "FileRename" : "_BenchmarkName_",
+        "replaces": "$(BenchmarkName)"
+      },
+      "framework": {
+        "type": "parameter",
+        "datatype": "string",
+        "description": "The target framework for the project.",
+        "defaultValue": "netstandard2.0",
+        "replaces": "$(Framework)"
+      },
+      "config": {
+        "type": "parameter",
+        "datatype": "bool",
+        "description": "Adds a benchmark config class.",
+        "defaultValue": "false"
+      },
+      "skipRestore": {
+        "type": "parameter",
+        "datatype": "bool",
+        "description": "If specified, skips the automatic restore of the project on create.",
+        "defaultValue": "false"
+      }
+    },
+    "sources": [
+      {
+        "source": "./",
+        "target": "./",
+        "exclude": [
+          ".template.config/**"
+        ],
+        "modifiers": [
+            { 
+                "condition": "(!config)",
+                "exclude": [
+                    "BenchmarkConfig.cs"
+            ]}
+        ]
+      }
+    ],
+    "primaryOutputs": [
+      {
+        "path": "_BenchmarkProjectName_.csproj"
+      }
+    ],
+    "postActions": [
+      {
+        "condition": "(!skipRestore)",
+        "description": "Restore NuGet packages required by this project.",
+        "manualInstructions": [
+          {
+            "text": "Run 'dotnet restore'"
+          }
+        ],
+        "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+        "continueOnError": true
+      }
+    ]
+  }
