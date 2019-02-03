@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public RoslynToolchainTest(ITestOutputHelper output) : base(output) { }
 
         /// <summary>Prooftest for #1039.</summary>
-        [Theory]
+        [TheoryFullFrameworkOnly]
         [InlineData("en-US")]
         [InlineData("fr-FR")]
         [InlineData("ru-RU")]
