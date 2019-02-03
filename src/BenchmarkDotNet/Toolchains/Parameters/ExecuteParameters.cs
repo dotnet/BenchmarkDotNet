@@ -9,14 +9,13 @@ namespace BenchmarkDotNet.Toolchains.Parameters
 {
     public class ExecuteParameters
     {
-        public ExecuteParameters(BuildResult buildResult, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, IResolver resolver, IConfig config, IDiagnoser diagnoser = null)
+        public ExecuteParameters(BuildResult buildResult, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, IResolver resolver, IDiagnoser diagnoser = null)
         {
             BuildResult = buildResult;
             BenchmarkCase = benchmarkCase;
             BenchmarkId = benchmarkId;
             Logger = logger;
             Resolver = resolver;
-            Config = config;
             Diagnoser = diagnoser;
         }
 
@@ -29,8 +28,6 @@ namespace BenchmarkDotNet.Toolchains.Parameters
         public ILogger Logger { get; }
 
         public IResolver Resolver { get; }
-
-        public IConfig Config { get; }
 
         public IDiagnoser Diagnoser { get; }
     }

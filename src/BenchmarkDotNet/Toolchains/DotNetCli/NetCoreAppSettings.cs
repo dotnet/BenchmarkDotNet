@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public class NetCoreAppSettings
     {
-        public static readonly TimeSpan DefaultBuildTimeout = TimeSpan.FromMinutes(1); // it should always be few seconds, but some ppl might have a bad internet connection
+        public static readonly TimeSpan DefaultBuildTimeout = TimeSpan.FromMinutes(2); // it should always be a few seconds, but some users might have a bad internet connection
 
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp20 = new NetCoreAppSettings("netcoreapp2.0", null, ".NET Core 2.0");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp21 = new NetCoreAppSettings("netcoreapp2.1", null, ".NET Core 2.1");
@@ -19,12 +19,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         
         public static readonly Lazy<NetCoreAppSettings> Current = new Lazy<NetCoreAppSettings>(GetCurrentVersion);
 
-        private static NetCoreAppSettings Default => 
-#if NETCOREAPP2_1
-            NetCoreApp21;
-#else    
-            NetCoreApp20;
-#endif
+        private static NetCoreAppSettings Default => NetCoreApp20;
 
         /// <summary>
         /// <param name="targetFrameworkMoniker">

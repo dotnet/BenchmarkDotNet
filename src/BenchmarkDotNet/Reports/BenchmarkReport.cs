@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Mathematics;
@@ -46,7 +47,8 @@ namespace BenchmarkDotNet.Reports
             ExecuteResults = executeResults ?? Array.Empty<ExecuteResult>();
             AllMeasurements = allMeasurements ?? Array.Empty<Measurement>();
             GcStats = gcStats;
-            Metrics = metrics?.ToDictionary(metric => metric.Descriptor.Id);
+            Metrics = metrics?.ToDictionary(metric => metric.Descriptor.Id)
+                ?? (IReadOnlyDictionary<string, Metric>)ImmutableDictionary<string, Metric>.Empty;
         }
 
         public override string ToString() => $"{BenchmarkCase.DisplayInfo}, {AllMeasurements.Count} runs";

@@ -3,6 +3,7 @@ using System.Linq;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.Builders;
+using JetBrains.Annotations;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Environments
@@ -10,9 +11,10 @@ namespace BenchmarkDotNet.Tests.Environments
     public class HostEnvironmentInfoTests
     {
         [Theory]
-        [MemberData(nameof(Hypervisors))]
-        public void ReturnsHipervisorNameWhenItsDetected(VirtualMachineHypervisor hypervisor)
+        [MemberData(nameof(HypervisorNames))]
+        public void ReturnsHypervisorNameWhenItsDetected(string hypervisorName)
         {
+            var hypervisor = Hypervisors[hypervisorName];
             var info = new HostEnvironmentInfoBuilder()
                 .WithVMHypervisor(hypervisor)
                 .Build();
@@ -24,12 +26,15 @@ namespace BenchmarkDotNet.Tests.Environments
             Assert.Equal(expected, line);
         }
 
-        public static IEnumerable<object[]> Hypervisors()
+        private static readonly IDictionary<string, VirtualMachineHypervisor> Hypervisors = new Dictionary<string, VirtualMachineHypervisor>
         {
-            yield return new object[] { HyperV.Default };
-            yield return new object[] { VirtualBox.Default };
-            yield return new object[] { VMware.Default };
-        }
+            { HyperV.Default.Name, HyperV.Default },
+            { VirtualBox.Default.Name, VirtualBox.Default },
+            { VMware.Default.Name, VMware.Default }
+        };
+
+        [UsedImplicitly]
+        public static TheoryData<string> HypervisorNames => TheoryDataHelper.Create(Hypervisors.Keys);
 
         [Fact]
         public void DoesntReturnHypervisorNameWhenItsNotDetected()

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Reports;
@@ -10,16 +11,16 @@ namespace BenchmarkDotNet.Order
     public interface IOrderer
     {
         [PublicAPI, NotNull]
-        IEnumerable<BenchmarkCase> GetExecutionOrder([NotNull] BenchmarkCase[] benchmarksCase);
+        IEnumerable<BenchmarkCase> GetExecutionOrder(ImmutableArray<BenchmarkCase> benchmarksCase);
 
         [PublicAPI, NotNull]
-        IEnumerable<BenchmarkCase> GetSummaryOrder([NotNull] BenchmarkCase[] benchmarksCase, [NotNull] Summary summary);
+        IEnumerable<BenchmarkCase> GetSummaryOrder(ImmutableArray<BenchmarkCase> benchmarksCases, [NotNull] Summary summary);
 
         [PublicAPI, CanBeNull]
         string GetHighlightGroupKey([NotNull] BenchmarkCase benchmarkCase);
 
         [PublicAPI, CanBeNull]
-        string GetLogicalGroupKey(IConfig config, [NotNull] BenchmarkCase[] allBenchmarksCases, [NotNull] BenchmarkCase benchmarkCase);
+        string GetLogicalGroupKey(ImmutableArray<BenchmarkCase> allBenchmarksCases, [NotNull] BenchmarkCase benchmarkCase);
 
         [PublicAPI, NotNull]
         IEnumerable<IGrouping<string, BenchmarkCase>> GetLogicalGroupOrder(IEnumerable<IGrouping<string, BenchmarkCase>> logicalGroups);

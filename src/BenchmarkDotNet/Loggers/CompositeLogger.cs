@@ -1,13 +1,12 @@
-﻿namespace BenchmarkDotNet.Loggers
-{
-    public class CompositeLogger : ILogger
-    {
-        private readonly ILogger[] loggers;
+﻿using System.Collections.Immutable;
 
-        public CompositeLogger(params ILogger[] loggers)
-        {
-            this.loggers = loggers;
-        }
+namespace BenchmarkDotNet.Loggers
+{
+    internal class CompositeLogger : ILogger
+    {
+        private readonly ImmutableHashSet<ILogger> loggers;
+
+        internal CompositeLogger(ImmutableHashSet<ILogger> loggers) => this.loggers = loggers;
 
         public void Write(LogKind logKind, string text)
         {

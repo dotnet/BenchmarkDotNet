@@ -17,6 +17,7 @@
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <UseSharedCompilation>false</UseSharedCompilation>
     $COPIEDSETTINGS$
   </PropertyGroup>
 

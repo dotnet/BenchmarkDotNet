@@ -19,6 +19,8 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
     {
         private const string MissingReferenceError = "CS0012";
 
+        public static readonly IBuilder Instance = new Builder();
+
         private static readonly Lazy<AssemblyMetadata[]> FrameworkAssembliesMetadata = new Lazy<AssemblyMetadata[]>(GetFrameworkAssembliesMetadata);
 
         [PublicAPI]
@@ -81,7 +83,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
 
                 var missingReferences = GetMissingReferences(compilationErrors);
 
-                return (BuildResult.Failure(generateResult, new Exception(errors.ToString())), missingReferences);
+                return (BuildResult.Failure(generateResult, errors.ToString()), missingReferences);
             }
         }
 

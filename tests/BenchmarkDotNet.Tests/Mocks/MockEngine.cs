@@ -59,6 +59,6 @@ namespace BenchmarkDotNet.Tests.Mocks
         public void WriteLine() => output.WriteLine("");
         public void WriteLine(string line) => output.WriteLine(line);
 
-        public IResolver Resolver => new CompositeResolver(BenchmarkRunner.DefaultResolver, EngineResolver.Instance);
+        public IResolver Resolver => new CompositeResolver(BenchmarkRunnerClean.DefaultResolver, EngineResolver.Instance);
     }
 }

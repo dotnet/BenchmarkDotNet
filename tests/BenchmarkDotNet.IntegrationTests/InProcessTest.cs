@@ -54,24 +54,6 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void BenchmarkActionValueTaskOfTSupported() => TestInvoke(x => x.InvokeOnceValueTaskOfT(), UnrollFactor, DecimalResult);
 
-        [Fact]
-        public void BenchmarkActionStaticVoidSupported() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticVoid(), UnrollFactor);
-
-        [Fact]
-        public void BenchmarkActionStaticTaskSupported() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticTaskAsync(), UnrollFactor, null);
-
-        [Fact]
-        public void BenchmarkActionStaticRefTypeSupported() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticRefType(), UnrollFactor, StringResult);
-
-        [Fact]
-        public void BenchmarkActionStaticValueTypeSupported() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticValueType(), UnrollFactor, DecimalResult);
-
-        [Fact]
-        public void BenchmarkActionStaticTaskOfTSupported() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticTaskOfTAsync(), UnrollFactor, StringResult);
-
-        [Fact]
-        public void BenchmarkActionStaticValueTaskOfTSupported() => TestInvoke(x => BenchmarkAllCases.InvokeOnceStaticValueTaskOfT(), UnrollFactor, DecimalResult);
-
         [AssertionMethod]
         private void TestInvoke(Expression<Action<BenchmarkAllCases>> methodCall, int unrollFactor)
         {
@@ -296,48 +278,6 @@ namespace BenchmarkDotNet.IntegrationTests
 
             [Benchmark]
             public ValueTask<decimal> InvokeOnceValueTaskOfT()
-            {
-                Interlocked.Increment(ref Counter);
-                return new ValueTask<decimal>(DecimalResult);
-            }
-
-            [Benchmark]
-            public static void InvokeOnceStaticVoid()
-            {
-                Interlocked.Increment(ref Counter);
-            }
-
-            [Benchmark]
-            public static async Task InvokeOnceStaticTaskAsync()
-            {
-                await Task.Yield();
-                Interlocked.Increment(ref Counter);
-            }
-
-            [Benchmark]
-            public static string InvokeOnceStaticRefType()
-            {
-                Interlocked.Increment(ref Counter);
-                return StringResult;
-            }
-
-            [Benchmark]
-            public static decimal InvokeOnceStaticValueType()
-            {
-                Interlocked.Increment(ref Counter);
-                return DecimalResult;
-            }
-
-            [Benchmark]
-            public static async Task<string> InvokeOnceStaticTaskOfTAsync()
-            {
-                await Task.Yield();
-                Interlocked.Increment(ref Counter);
-                return StringResult;
-            }
-
-            [Benchmark]
-            public static ValueTask<decimal> InvokeOnceStaticValueTaskOfT()
             {
                 Interlocked.Increment(ref Counter);
                 return new ValueTask<decimal>(DecimalResult);

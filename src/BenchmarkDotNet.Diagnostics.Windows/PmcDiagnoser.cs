@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Loggers;
@@ -23,7 +22,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public IReadOnlyDictionary<BenchmarkCase, PmcStats> Results => results;
 
-        public const string DiagnoserId = nameof(InliningDiagnoser);
+        public const string DiagnoserId = nameof(PmcDiagnoser);
 
         public IEnumerable<string> Ids => new[] { DiagnoserId };
 

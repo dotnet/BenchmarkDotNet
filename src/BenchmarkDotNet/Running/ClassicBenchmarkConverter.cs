@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Running
     {
         public static BenchmarkRunInfo[] UrlToBenchmarks(string url, IConfig config = null)
         {
-            var logger = config?.GetCompositeLogger() ?? HostEnvironmentInfo.FallbackLogger;
+            var logger = HostEnvironmentInfo.FallbackLogger;
 
             url = GetRawUrl(url);
             string benchmarkContent;
@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Running
             var compilerResults = cSharpCodeProvider.CompileAssemblyFromSource(compilerParameters, benchmarkContent);
             if (compilerResults.Errors.HasErrors)
             {
-                var logger = config?.GetCompositeLogger() ?? HostEnvironmentInfo.FallbackLogger;
+                var logger = HostEnvironmentInfo.FallbackLogger;
 
                 compilerResults.Errors.Cast<CompilerError>().ToList().ForEach(error => logger.WriteLineError(error.ErrorText));
                 return Array.Empty<BenchmarkRunInfo>();
@@ -92,7 +92,8 @@ namespace BenchmarkDotNet.Running
                             target.IterationSetupMethod, target.IterationCleanupMethod,
                             target.WorkloadMethodDisplayInfo, benchmarkContent, target.Baseline, target.Categories, target.OperationsPerInvoke),
                         b.Job,
-                        b.Parameters);
+                        b.Parameters,
+                        b.Config);
                 });
                 resultBenchmarks.Add(
                     new BenchmarkRunInfo(benchmarks.ToArray(), runInfo.Type, runInfo.Config));

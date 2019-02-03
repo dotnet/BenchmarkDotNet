@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Running;
@@ -15,7 +14,7 @@ namespace BenchmarkDotNet.Loggers
         private readonly IDiagnoser diagnoser;
         private readonly DiagnoserActionParameters diagnoserActionParameters;
 
-        public SynchronousProcessOutputLoggerWithDiagnoser(ILogger logger, Process process, IDiagnoser diagnoser, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, IConfig config)
+        public SynchronousProcessOutputLoggerWithDiagnoser(ILogger logger, Process process, IDiagnoser diagnoser, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId)
         {
             if (!process.StartInfo.RedirectStandardOutput)
                 throw new NotSupportedException("set RedirectStandardOutput to true first");
@@ -25,7 +24,7 @@ namespace BenchmarkDotNet.Loggers
             this.logger = logger;
             this.process = process;
             this.diagnoser = diagnoser;
-            diagnoserActionParameters = new DiagnoserActionParameters(process, benchmarkCase, benchmarkId, config);
+            diagnoserActionParameters = new DiagnoserActionParameters(process, benchmarkCase, benchmarkId);
 
             LinesWithResults = new List<string>();
             LinesWithExtraOutput = new List<string>();

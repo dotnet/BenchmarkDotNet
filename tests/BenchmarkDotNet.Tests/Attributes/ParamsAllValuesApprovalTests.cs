@@ -7,6 +7,7 @@ using System.Threading;
 using ApprovalTests;
 using ApprovalTests.Namers;
 using ApprovalTests.Reporters;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
@@ -15,6 +16,7 @@ using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 using Xunit;
 using System.Collections.Generic;
+using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Tests.Attributes
 {
@@ -54,7 +56,7 @@ namespace BenchmarkDotNet.Tests.Attributes
             exporter.ExportToLog(summary, logger);
 
             var validator = ParamsAllValuesValidator.FailOnError;
-            var errors = validator.Validate(new ValidationParameters(summary.BenchmarksCases, summary.Config)).ToList();
+            var errors = validator.Validate(new ValidationParameters(summary.BenchmarksCases, summary.BenchmarksCases.First().Config)).ToList();
             logger.WriteLine();
             logger.WriteLine("Errors: " + errors.Count);
             foreach (var error in errors)

@@ -9,8 +9,9 @@ name: Installing NuGet packages
 
 We have the following set of NuGet packages (you can install it directly from `nuget.org`):
 
-* `BenchmarkDotNet`: Basic BenchmarkDotNet infrastructure and logic. Doesn't have any dependencies. This is all you need to run benchmarks.
+* `BenchmarkDotNet`: Basic BenchmarkDotNet infrastructure and logic. This is all you need to run benchmarks.
 * `BenchmarkDotNet.Diagnostics.Windows`: an additional optional package that provides a set of Windows diagnosers.
+* `BenchmarkDotNet.Tool`: A dotnet tool to execute benchmarks built with BenchmarkDotNet.
 
 ## Versioning system and feeds
 We have 3 kinds of versions: *stable*, *nightly*, and *develop*.

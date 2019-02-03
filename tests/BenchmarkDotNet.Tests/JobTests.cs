@@ -392,7 +392,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             a = InfrastructureMode.ToolchainCharacteristic;
             // will not throw:
-            a[j] = CsProjClassicNetToolchain.Net46;
+            a[j] = CsProjClassicNetToolchain.Net461;
             a[j] = null;
             a[j] = Characteristic.EmptyValue;
             Assert.Throws<ArgumentException>(() => a[j] = new EnvironmentMode()); // not assignable;

@@ -23,8 +23,9 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
 
         internal Generator(string coreRtVersion, bool useCppCodeGenerator,
             string runtimeFrameworkVersion, string targetFrameworkMoniker, string cliPath,
-            string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag, bool useTempFolderForRestore)
-            : base(targetFrameworkMoniker, cliPath, GetPackagesDirectoryPath(useTempFolderForRestore), runtimeFrameworkVersion)
+            string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag, 
+            bool useTempFolderForRestore, string packagesRestorePath)
+            : base(targetFrameworkMoniker, cliPath, GetPackagesDirectoryPath(useTempFolderForRestore, packagesRestorePath), runtimeFrameworkVersion)
         {
             this.coreRtVersion = coreRtVersion;
             this.useCppCodeGenerator = useCppCodeGenerator;
@@ -72,10 +73,8 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         // to avoid this https://github.com/dotnet/coreclr/blob/master/Documentation/workflow/UsingDotNetCli.md#update-coreclr-using-runtime-nuget-package
         // some of the packages are going to contain source code, so they can not be in the subfolder of current solution
         // otherwise they would be compiled too (new .csproj include all .cs files from subfolders by default
-        private static string GetPackagesDirectoryPath(bool useTempFolderForRestore)
-            => useTempFolderForRestore
-                ? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString())
-                : null;
+        private static string GetPackagesDirectoryPath(bool useTempFolderForRestore, string packagesRestorePath)
+            => packagesRestorePath ?? (useTempFolderForRestore ? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()) : null);
 
         protected override string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths)
             => useTempFolderForRestore
@@ -100,13 +99,24 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         }
 
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
-            => File.WriteAllText(artifactsPaths.ProjectFilePath, 
-                    IsNuGetCoreRt 
-                        ? GenerateProjectForNuGetBuild(buildPartition, artifactsPaths, logger) 
-                        : GenerateProjectForLocalBuild(buildPartition, artifactsPaths, logger));
+        {
+            File.WriteAllText(artifactsPaths.ProjectFilePath,
+                IsNuGetCoreRt
+                    ? GenerateProjectForNuGetBuild(buildPartition, artifactsPaths, logger)
+                    : GenerateProjectForLocalBuild(buildPartition, artifactsPaths, logger));
+
+            GenerateReflectionFile(artifactsPaths);
+        }
 
         private string GenerateProjectForNuGetBuild(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $@"
-<Project Sdk=""Microsoft.NET.Sdk"">
+<Project ToolsVersion=""15.0"">
+  <PropertyGroup>
+    <ImportDirectoryBuildProps>false</ImportDirectoryBuildProps>
+    <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
+  </PropertyGroup>
+
+  <Import Project=""Sdk.props"" Sdk=""Microsoft.NET.Sdk"" />
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>{TargetFrameworkMoniker}</TargetFramework>
@@ -118,6 +128,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <UseSharedCompilation>false</UseSharedCompilation>
   </PropertyGroup>
   {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc, buildPartition.Resolver)}
   <ItemGroup>
@@ -127,6 +138,10 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{coreRtVersion}"" />
     <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName}"" />
   </ItemGroup>
+  <ItemGroup>
+    <RdXmlFile Include=""rd.xml"" />
+  </ItemGroup>
+  <Import Project=""Sdk.targets"" Sdk=""Microsoft.NET.Sdk"" />
 </Project>";
 
         private string GenerateProjectForLocalBuild(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $@"
@@ -143,6 +158,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <UseSharedCompilation>false</UseSharedCompilation>
   </PropertyGroup>
   <Import Project=""$(MSBuildSDKsPath)\Microsoft.NET.Sdk\Sdk\Sdk.targets"" />
   <Import Project=""$(IlcPath)\build\Microsoft.NETCore.Native.targets"" />
@@ -153,7 +169,27 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   <ItemGroup>
     <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName}"" />
   </ItemGroup>
+  <ItemGroup>
+    <RdXmlFile Include=""rd.xml"" />
+  </ItemGroup>
 </Project>";
 
+        /// <summary>
+        /// mandatory to make it possible ot call GC.GetAllocatedBytesForCurrentThread() using reflection (not part of .NET Standard)
+        /// </summary>
+        private void GenerateReflectionFile(ArtifactsPaths artifactsPaths)
+        {
+            const string content = @"
+<Directives>
+    <Application>
+        <Assembly Name=""System.Runtime"">
+            <Type Name=""System.GC"" Dynamic=""Required All"" />
+        </Assembly>
+    </Application>
+</Directives>
+";
+
+            File.WriteAllText(Path.Combine(Path.GetDirectoryName(artifactsPaths.ProjectFilePath), "rd.xml"), content);
+        }
     }
 }

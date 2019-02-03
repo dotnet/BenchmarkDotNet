@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
@@ -21,7 +22,7 @@ namespace BenchmarkDotNet.Exporters.Csv
         private static readonly Lazy<MeasurementColumn[]> Columns = new Lazy<MeasurementColumn[]>(BuildColumns);
 
         private readonly CsvSeparator separator;
-        public CsvMeasurementsExporter(CsvSeparator separator, ISummaryStyle style = null)
+        public CsvMeasurementsExporter(CsvSeparator separator, SummaryStyle style = null)
         {
             this.separator = separator;
             Style = style ?? SummaryStyle.Default;
@@ -33,7 +34,7 @@ namespace BenchmarkDotNet.Exporters.Csv
 
         protected override string FileCaption => "measurements";
 
-        [PublicAPI] public ISummaryStyle Style { get; }
+        [PublicAPI] public SummaryStyle Style { get; }
 
         [PublicAPI] public static Job[] GetJobs(Summary summary) => summary.BenchmarksCases.Select(b => b.Job).ToArray();
 
@@ -63,7 +64,7 @@ namespace BenchmarkDotNet.Exporters.Csv
 
         private static MeasurementColumn[] GetColumns(Summary summary)
         {
-            if (!summary.Config.GetDiagnosers().Contains(MemoryDiagnoser.Default))
+            if (!summary.BenchmarksCases.Any(benchmark => benchmark.Config.HasMemoryDiagnoser()))
                 return Columns.Value;
 
             var columns = new List<MeasurementColumn>(Columns.Value)

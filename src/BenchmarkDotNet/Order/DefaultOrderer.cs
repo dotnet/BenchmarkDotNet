@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using BenchmarkDotNet.Configs;
@@ -33,22 +34,22 @@ namespace BenchmarkDotNet.Order
         }
 
         [PublicAPI]
-        public virtual IEnumerable<BenchmarkCase> GetExecutionOrder(BenchmarkCase[] benchmarksCase)
+        public virtual IEnumerable<BenchmarkCase> GetExecutionOrder(ImmutableArray<BenchmarkCase> benchmarkCases)
         {
-            var list = benchmarksCase.ToList();
+            var list = benchmarkCases.ToList();
             list.Sort(benchmarkComparer);
             return list;
         }
 
-        public virtual IEnumerable<BenchmarkCase> GetSummaryOrder(BenchmarkCase[] benchmarksCase, Summary summary)
+        public virtual IEnumerable<BenchmarkCase> GetSummaryOrder(ImmutableArray<BenchmarkCase> benchmarksCases, Summary summary)
         {
-            var benchmarkLogicalGroups = benchmarksCase.GroupBy(b => GetLogicalGroupKey(summary.Config, benchmarksCase, b));
+            var benchmarkLogicalGroups = benchmarksCases.GroupBy(b => GetLogicalGroupKey(benchmarksCases, b));
             foreach (var logicalGroup in GetLogicalGroupOrder(benchmarkLogicalGroups))
-            foreach (var benchmark in GetSummaryOrderForGroup(logicalGroup.ToArray(), summary))
+            foreach (var benchmark in GetSummaryOrderForGroup(logicalGroup.ToImmutableArray(), summary))
                 yield return benchmark;
         }
         
-        protected virtual IEnumerable<BenchmarkCase> GetSummaryOrderForGroup(BenchmarkCase[] benchmarksCase, Summary summary)
+        protected virtual IEnumerable<BenchmarkCase> GetSummaryOrderForGroup(ImmutableArray<BenchmarkCase> benchmarksCase, Summary summary)
         {            
             switch (summaryOrderPolicy)
             {
@@ -78,9 +79,9 @@ namespace BenchmarkDotNet.Order
             }
         }
 
-        public string GetLogicalGroupKey(IConfig config, BenchmarkCase[] allBenchmarksCases, BenchmarkCase benchmarkCase)
+        public string GetLogicalGroupKey(ImmutableArray<BenchmarkCase> allBenchmarksCases, BenchmarkCase benchmarkCase)
         {
-            var rules = new HashSet<BenchmarkLogicalGroupRule>(config.GetLogicalGroupRules());
+            var rules = new HashSet<BenchmarkLogicalGroupRule>(benchmarkCase.Config.GetLogicalGroupRules());
             bool hasJobBaselines = allBenchmarksCases.Any(b => b.Job.Meta.Baseline);
             bool hasDescriptorBaselines = allBenchmarksCases.Any(b => b.Descriptor.Baseline);
             if (hasJobBaselines)
