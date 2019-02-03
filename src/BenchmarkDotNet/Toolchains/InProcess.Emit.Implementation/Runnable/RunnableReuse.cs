@@ -1,7 +1,7 @@
 ﻿using System.Linq;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
@@ -102,7 +102,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 TargetJob = benchmarkCase.Job,
                 OperationsPerInvoke = benchmarkCase.Descriptor.OperationsPerInvoke,
                 MeasureGcStats = benchmarkCase.Config.HasMemoryDiagnoser(),
-                Encoding = benchmarkCase.Config.Encoding
+                Encoding = benchmarkCase.Config.Encoding,
+                BenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase)
             };
             return engineParameters;
         }
