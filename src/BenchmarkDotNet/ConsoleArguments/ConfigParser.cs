@@ -24,7 +24,7 @@ using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
-using BenchmarkDotNet.Toolchains.InProcess;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using CommandLine;
 
 namespace BenchmarkDotNet.ConsoleArguments
@@ -275,7 +275,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         private static IEnumerable<Job> Expand(Job baseJob, CommandLineOptions options)
         {
             if (options.RunInProcess)
-                yield return baseJob.With(InProcessToolchain.Instance);
+                yield return baseJob.With(InProcessEmitToolchain.Instance);
             else if (!string.IsNullOrEmpty(options.ClrVersion))
                 yield return baseJob.With(new ClrRuntime(options.ClrVersion)); // local builds of .NET Runtime
             else if (options.CoreRunPaths.Any())
