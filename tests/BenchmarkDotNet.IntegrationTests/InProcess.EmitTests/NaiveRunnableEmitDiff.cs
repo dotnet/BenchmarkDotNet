@@ -339,8 +339,12 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             if (method1.Attributes != method2.Attributes)
                 throw new InvalidOperationException($"No matching method for {method1}");
 
+            if (method1.ImplAttributes != method2.ImplAttributes)
+                throw new InvalidOperationException($"No matching method for {method1}");
+
             if (method1.Parameters.Count != method2.Parameters.Count)
                 throw new InvalidOperationException($"No matching method for {method1}");
+
             for (int i = 0; i < method1.Parameters.Count; i++)
             {
                 var parameter1 = method1.Parameters[i];

@@ -514,7 +514,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory, MemberData(nameof(GetToolchains))]
-        public void CustomTypeThatAlsoExistsInTheSystemNamespaceAsArgument(IToolchain toolchain) => CanExecute<WithDateTime>(toolchain);
+        public void CustomTypeThatAlsoExistsInTheSystemNamespaceAsArgument(IToolchain toolchain) => CanExecute<CustomTypeThatAlsoExistsInTheSystemNamespace>(toolchain);
 
         public class CustomTypeThatAlsoExistsInTheSystemNamespace
         {
