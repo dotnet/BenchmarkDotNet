@@ -152,10 +152,13 @@ namespace BenchmarkDotNet.Running
                 baseline: attr.Baseline,
                 categories: GetCategories(methodInfo),
                 operationsPerInvoke: attr.OperationsPerInvoke,
-                methodIndex: Array.IndexOf(targetMethods, methodInfo));
+                methodIndex: Array.IndexOf(targetMethods, methodInfo),
+                kind: methodInfo.HasAttribute<ScenarioAttribute>() ? BenchmarkKind.Scenario : BenchmarkKind.MicroBenchmark);
+
             AssertMethodHasCorrectSignature("Benchmark", methodInfo);
             AssertMethodIsAccessible("Benchmark", methodInfo);
             AssertMethodIsNotGeneric("Benchmark", methodInfo);
+
             return target;
         }
 

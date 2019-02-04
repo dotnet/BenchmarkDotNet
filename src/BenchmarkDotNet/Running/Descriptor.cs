@@ -22,6 +22,7 @@ namespace BenchmarkDotNet.Running
         public int MethodIndex { get; }
         public bool Baseline { get; }
         public string[] Categories { get; }
+        public BenchmarkKind Kind { get; }
 
         internal string TypeInfo => Type?.GetDisplayName() ?? "Untitled";
         private string MethodFolderInfo => WorkloadMethod?.Name ?? "Untitled";
@@ -41,7 +42,8 @@ namespace BenchmarkDotNet.Running
             bool baseline = false,
             string[] categories = null,
             int operationsPerInvoke = 1,
-            int methodIndex = 0)
+            int methodIndex = 0,
+            BenchmarkKind kind = BenchmarkKind.MicroBenchmark)
         {
             Type = type;
             WorkloadMethod = workloadMethod;
@@ -55,6 +57,7 @@ namespace BenchmarkDotNet.Running
             Baseline = baseline;
             Categories = categories ?? Array.Empty<string>();
             MethodIndex = methodIndex;
+            Kind = kind;
         }
 
         public override string ToString() => DisplayInfo;

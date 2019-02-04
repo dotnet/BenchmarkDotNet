@@ -5,6 +5,7 @@ namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Method)]
     [MeansImplicitUse]
+    [PublicAPI]
     public class BenchmarkAttribute : Attribute
     {
         public string Description { get; set; }

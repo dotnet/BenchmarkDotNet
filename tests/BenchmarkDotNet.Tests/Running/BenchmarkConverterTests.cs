@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Mathematics;
@@ -197,6 +199,45 @@ namespace BenchmarkDotNet.Tests.Running
         public class WithFewMutators
         {
             [Benchmark] public void Method() { }
+        }
+
+        [Fact]
+        public void ScenariosAreRecognizedAndHaveProperDefaultValues()
+        {
+            var info = BenchmarkConverter.TypeToBenchmarks(typeof(WithScenarioDefaultSettings));
+
+            var benchmarkCase = info.BenchmarksCases.Single();
+
+            Assert.Equal(BenchmarkKind.Scenario, benchmarkCase.Descriptor.Kind);
+        }
+
+        public class WithScenarioDefaultSettings
+        {
+            [Scenario]
+            public void HelloWorld() => Console.WriteLine("Hello World!");
+        }
+
+        [Fact]
+        public void ScenariosCanBeCustomized()
+        {
+            var info = BenchmarkConverter.TypeToBenchmarks(typeof(WithScenarioCustomSettings));
+
+            var benchmarkCase = info.BenchmarksCases.Single();
+
+            Assert.Equal(BenchmarkKind.Scenario, benchmarkCase.Descriptor.Kind);
+            Assert.Equal(321, benchmarkCase.Job.Run.WarmupCount);
+            Assert.Equal(123, benchmarkCase.Job.Run.LaunchCount);
+            Assert.Equal(RunStrategy.Monitoring, benchmarkCase.Job.Run.RunStrategy);
+            Assert.False(benchmarkCase.Job.Accuracy.EvaluateOverhead);
+            Assert.Equal(OutlierMode.None, benchmarkCase.Job.Accuracy.OutlierMode);
+            Assert.False(benchmarkCase.Job.Meta.IsMutator);
+        }
+
+        [ScenarioJob(launchCount: 123, warmupCount: 321)]
+        public class WithScenarioCustomSettings
+        {
+            [Scenario]
+            public void HelloWorld() => Console.WriteLine("Hello World!");
         }
     }
 }
