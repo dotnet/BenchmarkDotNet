@@ -125,5 +125,27 @@ namespace BenchmarkDotNet.Tests.Running
             foreach (var grouping in grouped)
                 Assert.Equal(3 * 2, grouping.Count()); // (M1 + M2 + M3) * (Plain1 + Plain2)
         }
+
+        [Fact]
+        public void EveryScenarioHasUniqueBuildPartition()
+        {
+            var benchmarks = BenchmarkConverter.TypeToBenchmarks(typeof(ScenariosAllRuntimes));
+
+            var grouped = benchmarks.BenchmarksCases
+                .GroupBy(benchmark => benchmark, new BenchmarkPartitioner.BenchmarkRuntimePropertiesComparer())
+                .ToArray();
+
+            Assert.Equal(6, grouped.Length); // (Clr + Mono + Core) * 2
+
+            foreach (var grouping in grouped)
+                Assert.Single(grouping);
+        }
+
+        [ClrJob, MonoJob, CoreJob]
+        public class ScenariosAllRuntimes
+        {
+            [Scenario] public void HelloWorld() => System.Console.WriteLine("Hello World!");
+            [Scenario] public void Empty() { }
+        }
     }
 }

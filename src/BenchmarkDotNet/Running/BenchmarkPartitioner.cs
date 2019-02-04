@@ -30,6 +30,11 @@ namespace BenchmarkDotNet.Running
                     return true;
                 if (x == null || y == null)
                     return false;
+
+                // every scenario MUST have it's own unique build partition
+                if (!object.ReferenceEquals(x, y) && (x.Descriptor.Kind == BenchmarkKind.Scenario || y.Descriptor.Kind == BenchmarkKind.Scenario))
+                    return false;
+
                 var jobX = x.Job;
                 var jobY = y.Job;
 
